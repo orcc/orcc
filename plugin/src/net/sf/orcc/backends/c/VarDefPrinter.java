@@ -86,7 +86,7 @@ public class VarDefPrinter {
 	 * @return a string with its full name
 	 */
 	public String getVarDefName(VarDef varDef) {
-		String name = translateName(varDef.getName());
+		String name = varDef.getName();
 		if (varDef.hasSuffix()) {
 			name += varDef.getSuffix();
 		}
@@ -96,28 +96,6 @@ public class VarDefPrinter {
 			if (index != 0) {
 				name += "_" + varDef.getIndex();
 			}
-		}
-
-		return name;
-	}
-
-	/**
-	 * Return a new name if the existing one would conflict with existing APIs.
-	 * 
-	 * @param name
-	 *            the name of a variable or a function/procedure
-	 * @return name or a new name
-	 */
-	public String translateName(String name) {
-		if (name.equals("abs")) {
-			// abs is an intrisic
-			name = "abs_";
-		} else if (name.equals("index")) {
-			// index is a function from <string.h>
-			name = "index_";
-		} else if (name.equals("getw")) {
-			// getw is in <stdio.h>
-			name = "getw_";
 		}
 
 		return name;

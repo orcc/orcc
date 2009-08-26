@@ -97,8 +97,7 @@ public class ActorPrinterTemplate {
 		StringTemplate procTmpl = group.getInstanceOf("proc");
 
 		// name
-		String name = varDefPrinter.translateName(proc.getName());
-		procTmpl.setAttribute("name", name);
+		procTmpl.setAttribute("name", proc.getName());
 
 		// return type
 		TypeToString type = new TypeToString(proc.getReturnType());
@@ -161,10 +160,12 @@ public class ActorPrinterTemplate {
 
 	private void setActions(String actorName, List<Action> actions) {
 		for (Action action : actions) {
-			StringTemplate proc = applyProc(actorName, action.getBody());
-			template.setAttribute("actions", proc);
-			proc = applyProc(actorName, action.getScheduler());
-			template.setAttribute("actions", proc);
+			StringTemplate procTmpl = applyProc(actorName, action.getBody());
+			template.setAttribute("actions", procTmpl);
+			Procedure proc = action.getScheduler();
+			proc.setName("isSchedulable_" + action.getTag());
+			procTmpl = applyProc(actorName, proc);
+			template.setAttribute("actions", procTmpl);
 		}
 	}
 

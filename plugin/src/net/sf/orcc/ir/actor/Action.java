@@ -31,6 +31,7 @@ package net.sf.orcc.ir.actor;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.VarDef;
 
 /**
@@ -85,7 +86,7 @@ public class Action {
 			}
 
 			str += tag.get(tag.size() - 1);
-			return str;
+			return NameTransformer.transform(str);
 		}
 	}
 

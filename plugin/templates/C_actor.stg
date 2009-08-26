@@ -153,19 +153,33 @@ $endif$
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-actionTest(action) ::= <<
-if (isSchedulable_$action.tag$()) {
-	$action.tag$();
-	res = 1;
-	i++;
-}>>
-
-schedulingTest(actions) ::= <<
-$actions: actionTest(it); separator=" else "$
+outputPattern(actorName, pattern) ::= <<
+$pattern.keys:{port|hasRoom($actorName$_$port$, $pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
+
+actionCall(action) ::= <<
+$action.tag$();
+res = 1;
+i++;
+>>
+
+actionTest(actorName, action) ::= <<
+if (isSchedulable_$action.tag$()) {
+	$if(action.outputPattern)$
+	if ($outputPattern(actorName=actorName, pattern=action.outputPattern)$) {
+		$actionCall(action)$
+	}
+	$else$
+	$actionCall(action)$
+	$endif$
+}>>
+
+schedulingTest(actorName, actions) ::= <<
+$actions: actionTest(actorName=actorName, action=it); separator=" else "$
+>>
 
 scheduler(actorName, actions) ::= <<
 int $actorName$_scheduler() {
@@ -175,7 +189,7 @@ int $actorName$_scheduler() {
 	while (res) {
 		res = 0;
 		$if(actions)$
-		$schedulingTest(actions)$
+		$schedulingTest(actorName=actorName, actions=actions)$
 		$endif$
 	}
 
@@ -187,28 +201,42 @@ int $actorName$_scheduler() {
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
 
-actionTestState(nextState) ::= <<
-if (isSchedulable_$nextState.action.tag$()) {
-	$nextState.action.tag$();
-	_FSM_state = s_$nextState.targetState$;
-	res = 1;
-}>>
-
-schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(it); separator=" else "$
+actionCallState(nextState) ::= <<
+$nextState.action.tag$();
+_FSM_state = s_$nextState.targetState$;
+res = 1;
 >>
 
-stateScheduler(transition) ::= <<
+actionTestState(actorName, nextState) ::= <<
+if (isSchedulable_$nextState.action.tag$()) {
+	$if(nextState.action.outputPattern)$
+	if ($outputPattern(actorName=actorName, pattern=nextState.action.outputPattern)$) {
+		$actionCallState(nextState)$
+	}
+	$else$
+	$actionCallState(nextState)$
+	$endif$
+}>>
+
+schedulingTestState(actorName, nextStates) ::= <<
+$nextStates: actionTestState(actorName=actorName, nextState=it); separator=" else "$
+>>
+
+stateScheduler(actorName, transition) ::= <<
 static int $transition.sourceState$_state_scheduler() {
 	int res = 0;
-	$schedulingTestState(transition.nextStateInfo)$
+	$schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo)$
 	return res;
 }
 
 >>
 
 switch(transitions) ::= <<
-switch (_FSM_state) { 
+switch (_FSM_state) {
+$transitions: {case s_$it.sourceState$:
+	res = $it.sourceState$_state_scheduler();
+	break;
+}$
 default:
 	printf("unknown state: %s\n", stateNames[_FSM_state]);
 	break;
@@ -230,13 +258,14 @@ static enum states _FSM_state = s_$fsm.initialState$;
 $if(actions)$
 static int outside_FSM_scheduler() {
 	int res = 0;
-	$schedulingTest(actions)$
+	int i = 0;
+	$schedulingTest(actorName=actorName, actions=actions)$
 	return res;
 }
 
 
 $endif$
-$fsm.transitions: stateScheduler(); separator="\n"$
+$fsm.transitions: stateScheduler(actorName=actorName, transition=it); separator="\n"$
 int $actorName$_scheduler() {
 	int res = 1;
 	int i = 0;
