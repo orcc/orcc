@@ -227,46 +227,48 @@ public class NetworkPrinter {
 		int size, count;
 		
 		for (Instance instance : instances) {
-			if (!instance.isBroadcast()&& instance.getId().compareTo("source")!=0 && instance.getId().compareTo("display")!=0) {
+			if (!instance.isBroadcast()) {
 				List<Action> initializes = instance.getActor().getInitializes();
 				if (!initializes.isEmpty()) {
 					init.add(instance.getId());
 				}
-
-				Map<String, Object> attrs = new HashMap<String, Object>();
-				List <String> inputName = new ArrayList<String>();
-				List <String> outputName = new ArrayList<String>();
-				
-				count = 0;
-				attrs.put("id",instance.getId());
-				size = instance.getActor().getInputs().size();
-				attrs.put("nbInput",instance.getActor().getInputs().size());
-
-				for (VarDef input : instance.getActor().getInputs())
+				if (instance.getId().compareTo("source")!=0 && instance.getId().compareTo("display")!=0)
 				{
-					if (count ==  size-1)
-						inputName.add(input.getName());				
-					else
-						inputName.add(input.getName()+",");
+					Map<String, Object> attrs = new HashMap<String, Object>();
+					List <String> inputName = new ArrayList<String>();
+					List <String> outputName = new ArrayList<String>();
 					
-					count++;
+					count = 0;
+					attrs.put("id",instance.getId());
+					size = instance.getActor().getInputs().size();
+					attrs.put("nbInput",instance.getActor().getInputs().size());
+	
+					for (VarDef input : instance.getActor().getInputs())
+					{
+						if (count ==  size-1)
+							inputName.add(input.getName());				
+						else
+							inputName.add(input.getName()+",");
+						
+						count++;
+					}
+	
+					count = 0;
+					attrs.put("input", inputName);
+					size = instance.getActor().getOutputs().size();
+					attrs.put("nbOutput",instance.getActor().getOutputs().size());
+					for (VarDef output : instance.getActor().getOutputs())
+					{
+						if (count ==  size-1)
+							outputName.add(output.getName());
+						else
+							outputName.add(output.getName()+",");
+						
+						count++;
+					}
+					attrs.put("output", outputName);
+					inst.add(attrs);
 				}
-
-				count = 0;
-				attrs.put("input", inputName);
-				size = instance.getActor().getOutputs().size();
-				attrs.put("nbOutput",instance.getActor().getOutputs().size());
-				for (VarDef output : instance.getActor().getOutputs())
-				{
-					if (count ==  size-1)
-						outputName.add(output.getName());
-					else
-						outputName.add(output.getName()+",");
-					
-					count++;
-				}
-				attrs.put("output", outputName);
-				inst.add(attrs);
 			}
 		}
 

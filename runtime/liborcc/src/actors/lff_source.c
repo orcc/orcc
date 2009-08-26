@@ -31,29 +31,48 @@
 #include <stdlib.h>
 
 #include "lock_free_fifo.h"
+#include "orcc_util.h"
 
-const char *source_file_name;
+// from APR
+/* Ignore Microsoft's interpretation of secure development
+ * and the POSIX string handling API
+ */
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#pragma warning(disable: 4996)
+#endif
 
-void source_set_file_name(const char *file_name) {
-	source_file_name = file_name;
+static FILE *F = NULL;
+static int cnt = 0;
+
+// Called before any *_scheduler function.
+void source_initialize() {
+	if (input_file == NULL) {
+		print_usage();
+		fprintf(stderr, "No input file given!\n");
+		pause();
+		exit(1);
+	}
+
+	F = fopen(input_file, "rb");
+	if (F == NULL) {
+		if (input_file == NULL) {
+			input_file = "<null>";
+		}
+
+		fprintf(stderr, "could not open file \"%s\"\n", input_file);
+		pause();
+		exit(1);
+	}
 }
 
 extern lff_t *source_O;
 
-static FILE *F = NULL;
-static int cnt=0;
-
 int source_scheduler() {
 	unsigned char ptr[1];
 	int n;
-
-	if (F == NULL) {
-		F = fopen(source_file_name, "rb");
-		if (F == NULL) {
-			fprintf(stderr, "could not open file\n");
-			exit(-1);
-		}
-	}
 
 	if (feof(F)) {
 		return 0;
@@ -63,7 +82,7 @@ int source_scheduler() {
 		n = fread(ptr, 1, 1, F);
 		if (n < 1) {
 			fseek(F, 0, 0);
-			cnt=0;
+			cnt = 0;
 			n = fread(ptr, 1, 1, F);
 		}
 		cnt++;
