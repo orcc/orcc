@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="decoder">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="bits">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MCD">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="VIDEO">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MBD">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MBA">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MCA">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <Decl kind="Variable" name="ACCODED">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="2"/>
+    </Decl>
+    <Decl kind="Variable" name="ACPRED">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="1"/>
+    </Decl>
+    <Decl kind="Variable" name="ADDR_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="24"/>
+    </Decl>
+    <Decl kind="Variable" name="BTYPE_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="12"/>
+    </Decl>
+    <Decl kind="Variable" name="FCODE_MASK">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="448"/>
+    </Decl>
+    <Decl kind="Variable" name="FCODE_SHIFT">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="6"/>
+    </Decl>
+    <Decl kind="Variable" name="FOURMV">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="4"/>
+    </Decl>
+    <Decl kind="Variable" name="INTER">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="512"/>
+    </Decl>
+    <Decl kind="Variable" name="INTRA">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="1024"/>
+    </Decl>
+    <Decl kind="Variable" name="MAXH_IN_MB">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="69"/>
+    </Decl>
+    <Decl kind="Variable" name="MAXW_IN_MB">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="121"/>
+    </Decl>
+    <Decl kind="Variable" name="MB_COORD_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Decl>
+    <Decl kind="Variable" name="MOTION">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Decl>
+    <Decl kind="Variable" name="MV_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="9"/>
+    </Decl>
+    <Decl kind="Variable" name="NEWVOP">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="2048"/>
+    </Decl>
+    <Decl kind="Variable" name="PIX_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="9"/>
+    </Decl>
+    <Decl kind="Variable" name="QUANT_MASK">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="31"/>
+    </Decl>
+    <Decl kind="Variable" name="QUANT_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="6"/>
+    </Decl>
+    <Decl kind="Variable" name="ROUND_TYPE">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="32"/>
+    </Decl>
+    <Decl kind="Variable" name="SAMPLE_COUNT_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Decl>
+    <Decl kind="Variable" name="SAMPLE_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="13"/>
+    </Decl>
+    <Decl kind="Variable" name="scs">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Decl>
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="serialize">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="byte2bit"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="parser">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="parser"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="ACCODED">
+            <Expr kind="Var" name="ACCODED"/>
+        </Parameter>
+        <Parameter name="ACPRED">
+            <Expr kind="Var" name="ACPRED"/>
+        </Parameter>
+        <Parameter name="BTYPE_SZ">
+            <Expr kind="Var" name="BTYPE_SZ"/>
+        </Parameter>
+        <Parameter name="FCODE_MASK">
+            <Expr kind="Var" name="FCODE_MASK"/>
+        </Parameter>
+        <Parameter name="FCODE_SHIFT">
+            <Expr kind="Var" name="FCODE_SHIFT"/>
+        </Parameter>
+        <Parameter name="FOURMV">
+            <Expr kind="Var" name="FOURMV"/>
+        </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA"/>
+        </Parameter>
+        <Parameter name="MAXW_IN_MB">
+            <Expr kind="Var" name="MAXW_IN_MB"/>
+        </Parameter>
+        <Parameter name="MB_COORD_SZ">
+            <Expr kind="Var" name="MB_COORD_SZ"/>
+        </Parameter>
+        <Parameter name="MOTION">
+            <Expr kind="Var" name="MOTION"/>
+        </Parameter>
+        <Parameter name="MV_SZ">
+            <Expr kind="Var" name="MV_SZ"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
+        <Parameter name="QUANT_MASK">
+            <Expr kind="Var" name="QUANT_MASK"/>
+        </Parameter>
+        <Parameter name="ROUND_TYPE">
+            <Expr kind="Var" name="ROUND_TYPE"/>
+        </Parameter>
+        <Parameter name="SAMPLE_COUNT_SZ">
+            <Expr kind="Var" name="scs"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="acdc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="acdc"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="ACCODED">
+            <Expr kind="Var" name="ACCODED"/>
+        </Parameter>
+        <Parameter name="ACPRED">
+            <Expr kind="Var" name="ACPRED"/>
+        </Parameter>
+        <Parameter name="BTYPE_SZ">
+            <Expr kind="Var" name="BTYPE_SZ"/>
+        </Parameter>
+        <Parameter name="FCODE_MASK">
+            <Expr kind="Var" name="FCODE_MASK"/>
+        </Parameter>
+        <Parameter name="FCODE_SHIFT">
+            <Expr kind="Var" name="FCODE_SHIFT"/>
+        </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA"/>
+        </Parameter>
+        <Parameter name="MAXW_IN_MB">
+            <Expr kind="Var" name="MAXW_IN_MB"/>
+        </Parameter>
+        <Parameter name="MB_COORD_SZ">
+            <Expr kind="Var" name="MB_COORD_SZ"/>
+        </Parameter>
+        <Parameter name="MOTION">
+            <Expr kind="Var" name="MOTION"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
+        <Parameter name="QUANT_MASK">
+            <Expr kind="Var" name="QUANT_MASK"/>
+        </Parameter>
+        <Parameter name="QUANT_SZ">
+            <Expr kind="Var" name="QUANT_SZ"/>
+        </Parameter>
+        <Parameter name="ROUND_TYPE">
+            <Expr kind="Var" name="ROUND_TYPE"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="idct2d">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="idct2d"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="INP_SZ">
+            <Expr kind="Var" name="SAMPLE_SZ"/>
+        </Parameter>
+        <Parameter name="PIX_SZ">
+            <Expr kind="Var" name="PIX_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="motion">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="motion3"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="ACCODED">
+            <Expr kind="Var" name="ACCODED"/>
+        </Parameter>
+        <Parameter name="ADDR_SZ">
+            <Expr kind="Var" name="ADDR_SZ"/>
+        </Parameter>
+        <Parameter name="BTYPE_SZ">
+            <Expr kind="Var" name="BTYPE_SZ"/>
+        </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA"/>
+        </Parameter>
+        <Parameter name="MAXH_IN_MB">
+            <Expr kind="Var" name="MAXH_IN_MB"/>
+        </Parameter>
+        <Parameter name="MAXW_IN_MB">
+            <Expr kind="Var" name="MAXW_IN_MB"/>
+        </Parameter>
+        <Parameter name="MB_COORD_SZ">
+            <Expr kind="Var" name="MB_COORD_SZ"/>
+        </Parameter>
+        <Parameter name="MOTION">
+            <Expr kind="Var" name="MOTION"/>
+        </Parameter>
+        <Parameter name="MV_SZ">
+            <Expr kind="Var" name="MV_SZ"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
+        <Parameter name="PIX_SZ">
+            <Expr kind="Var" name="PIX_SZ"/>
+        </Parameter>
+        <Parameter name="ROUND_TYPE">
+            <Expr kind="Var" name="ROUND_TYPE"/>
+        </Parameter>
+        <Parameter name="SEARCHWIN_IN_MB">
+            <Expr kind="Literal" literal-kind="Integer" value="3"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="serialize" dst-port="in8" src="" src-port="bits"/>
+    <Connection dst="motion" dst-port="MCD" src="" src-port="MCD"/>
+    <Connection dst="parser" dst-port="BITS" src="serialize" src-port="out"/>
+    <Connection dst="acdc" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
+    <Connection dst="motion" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
+    <Connection dst="acdc" dst-port="data" src="parser" src-port="B"/>
+    <Connection dst="motion" dst-port="MV" src="parser" src-port="MV"/>
+    <Connection dst="idct2d" dst-port="in" src="acdc" src-port="out"/>
+    <Connection dst="idct2d" dst-port="signed" src="acdc" src-port="signed"/>
+    <Connection dst="motion" dst-port="TEX" src="idct2d" src-port="out"/>
+    <Connection dst="" dst-port="MBD" src="motion" src-port="MBD"/>
+    <Connection dst="" dst-port="MBA" src="motion" src-port="MBA"/>
+    <Connection dst="" dst-port="MCA" src="motion" src-port="MCA"/>
+    <Connection dst="" dst-port="VIDEO" src="motion" src-port="VID"/>
+</XDF>

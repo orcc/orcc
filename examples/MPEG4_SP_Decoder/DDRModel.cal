@@ -1,0 +1,191 @@
+/* 
+BEGINCOPYRIGHT X
+	
+	Copyright (c) 2004-2005, Xilinx Inc.
+	All rights reserved.
+	
+	Redistribution and use in source and binary forms, 
+	with or without modification, are permitted provided 
+	that the following conditions are met:
+	- Redistributions of source code must retain the above 
+	  copyright notice, this list of conditions and the 
+	  following disclaimer.
+	- Redistributions in binary form must reproduce the 
+	  above copyright notice, this list of conditions and 
+	  the following disclaimer in the documentation and/or 
+	  other materials provided with the distribution.
+	- Neither the name of the copyright holder nor the names 
+	  of its contributors may be used to endorse or promote 
+	  products derived from this software without specific 
+	  prior written permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	
+ENDCOPYRIGHT
+*/
+// DDRModel.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com), Ian Miller (ian.miller@xilinx.com)
+//
+
+import all caltrop.lib.BitOps;
+import java.lang.Math;
+
+actor DDRModel(int MAXW_IN_MB, int MAXH_IN_MB)
+  int(size=32) RA, int(size=32) WA, int(size=32) WD ==>
+  int(size=32) RD :
+
+  //bool _CAL_tokenMonitor := true;
+  
+  // find the number of bits needed to represent some positive integer
+  
+/*   function log2_ceil(n):
+	 Math.round( Math.ceil( Math.log( n * 1.0 ) / Math.log( 2.0 ) ) )
+   end
+*/
+
+  // Frame buffer organization:
+  // Address    <-- FRAMEBITS --><-- YBITS --><-- XBITS --><-- COMPBITS --><-- BLOCKBITS -->
+  // Data are stored as 32 bit words representing 4 horizontally consecutive pixels.
+  // This allows an entire macroblock to be streamed to/from DRAM in one burst.
+
+  int COMPONENTS      = 6;              // Y0, Y1, Y2, Y2, U, V
+  int BLOCKSIZE       = 64;
+  int PIXELS_PER_WORD = 4;
+  //int FRAMEBITS       = log2_ceil( 2 );                 // Current, prev. frame
+  int FRAMEBITS       = 1;
+  //int COMPBITS        = log2_ceil( COMPONENTS );        
+  int COMPBITS        = 3;
+  //int YBITS           = log2_ceil( MAXH_IN_MB );
+  int YBITS           = 5;
+  //int XBITS           = log2_ceil( MAXW_IN_MB );
+  int XBITS           = 6;
+  //int BLOCKBITS       = log2_ceil( BLOCKSIZE / PIXELS_PER_WORD ) ;
+  int BLOCKBITS       = 4;
+  int MEMBITS         = FRAMEBITS + YBITS + XBITS + COMPBITS + BLOCKBITS;
+  //int MEMSIZE         = lshift( 1, MEMBITS );
+  int MEMSIZE         = 524268;
+  //int BURSTSIZE       = COMPONENTS * BLOCKSIZE / PIXELS_PER_WORD;
+  int BURSTSIZE       = 96;
+
+  List( type:int(size=32), size=MEMSIZE ) buf := [ 0 : for int i in Integers(1,MEMSIZE ) ];
+
+  /*
+  action RA:[ a ] ==> RD:[ [ buf[a + i]  : for i in Integers(0, BURSTSIZE-1) ] ] repeat BURSTSIZE
+  end
+
+  action WA:[ a ], WD:[ d ] repeat BURSTSIZE ==>
+  var i := 0
+  do
+    while i < BURSTSIZE do
+      buf[ a + i ] :=  d[i];
+      i := i + 1;
+    end
+  end
+  */
+
+  int address_t := 0;
+  int burstSize := 0;
+  bool preferRead := true;
+  
+  select.read.prefer: action RA:[a] ==>
+    guard preferRead
+    do
+      println("select.read.prefer RA "+a); 
+      address_t := a;
+      burstSize := BURSTSIZE;
+      preferRead := false;
+  end
+
+  select.write.prefer: action WA:[a] ==>
+    guard not preferRead
+    do
+      println("select.write.prefer WA "+a);
+      address_t := a;
+      burstSize := BURSTSIZE;
+      preferRead := true;
+  end
+
+  select.read.low: action RA:[a] ==>
+    guard not preferRead
+    do
+      println("select.read.low RA"+a);
+      address_t := a;
+      burstSize := BURSTSIZE;
+      preferRead := false;
+  end
+
+  select.write.low: action WA:[a] ==>
+    guard preferRead
+    do
+      println("select.write.low WA"+a);
+      address_t := a;
+      burstSize := BURSTSIZE;
+      preferRead := true;
+  end
+
+  data.read: action ==> RD:[ dat ]
+    guard
+      burstSize > 0
+    var
+      int dat
+    do
+      dat := buf[address_t];
+      address_t := address_t + 1;
+      burstSize := burstSize - 1;
+  end
+
+  data.write: action WD:[ dat ] ==>
+    guard
+      burstSize > 0
+    var
+      int wa_t
+    do
+      wa_t := address_t;
+      burstSize := burstSize - 1;
+      address_t := address_t + 1;
+      buf[wa_t] := dat;
+  end
+  
+  data.done: action ==>
+    guard burstSize = 0
+  end
+
+  priority
+    select.read.prefer > select.read.low;
+    select.read.prefer > select.write.low;
+
+    select.write.prefer > select.read.low;
+    select.write.prefer > select.write.low;
+
+    data.read > data.done;
+    data.write > data.done;
+  end
+      
+  schedule fsm getAddr :
+
+    getAddr ( select.read ) --> doDataRead;
+    getAddr ( select.write ) --> doDataWrite;
+
+    doDataRead ( data.read ) --> doDataRead;
+    doDataRead ( data.done ) --> getAddr;
+    
+    doDataWrite ( data.write ) --> doDataWrite;
+    doDataWrite ( data.done ) --> getAddr;
+    
+  end
+
+  
+end

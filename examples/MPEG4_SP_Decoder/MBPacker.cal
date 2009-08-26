@@ -1,0 +1,91 @@
+/* 
+BEGINCOPYRIGHT X
+	
+	Copyright (c) 2004-2005, Xilinx Inc.
+	All rights reserved.
+	
+	Redistribution and use in source and binary forms, 
+	with or without modification, are permitted provided 
+	that the following conditions are met:
+	- Redistributions of source code must retain the above 
+	  copyright notice, this list of conditions and the 
+	  following disclaimer.
+	- Redistributions in binary form must reproduce the 
+	  above copyright notice, this list of conditions and 
+	  the following disclaimer in the documentation and/or 
+	  other materials provided with the distribution.
+	- Neither the name of the copyright holder nor the names 
+	  of its contributors may be used to endorse or promote 
+	  products derived from this software without specific 
+	  prior written permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	
+ENDCOPYRIGHT
+*/
+// MBPacker.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+
+// Pack pixels into 32-bit words, pass an address once per macroblock so that the
+// burst write into the DRAM will not be starved for data
+
+import all caltrop.lib.BitOps;
+
+actor MBPacker ( int PIX_SZ, int ADDR_SZ ) int(size=PIX_SZ) DI, int(size=32) AI ==> int(size=32) DO, int(size=32) AO :
+
+  int TC = 6 * 64;
+
+  int(size=10) pix_count := 0;
+  int(size=24) buf       := 0;
+
+  // Just passed an entire macroblock
+  tc: action ==>
+  guard pix_count = TC
+  end
+
+  // Every fourth pixel, emit a 32 bit word
+  data.out: action DI:[d] ==> DO:[ bitor( lshift( buf, 8 ), d ) ]
+  guard bitand( pix_count, 3) = 3
+  do
+    pix_count := pix_count + 1;
+  end
+
+  // Just accumulate pixels
+  data.inp: action DI:[d] ==> 
+  do
+    buf := bitor( lshift( buf, 8 ), d );
+    pix_count := pix_count + 1;
+  end
+
+  // Pass the address to the memory controller now
+  addr: action AI:[a] ==> AO:[a]
+  do
+    pix_count := 0;
+  end
+
+  schedule fsm rw:
+    rw    ( tc   ) --> addr;
+    rw    ( data ) --> rw;
+    addr  ( addr ) --> rw;
+  end
+
+  priority
+    tc > data;
+    data.out > data.inp;
+  end
+
+end

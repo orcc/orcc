@@ -1,0 +1,36 @@
+This file describes how to build ORCC.
+
+-------------------------------------------------------------------------------
+Build ORCC plugin
+
+1) build the frontend: see INSTALL in "frontend" folder.
+2) import the plugin project in Eclipse (it will build automatically)
+
+At this point you can already use ORCC with the command-line interface.
+To use it as an Eclipse plugin, you will need to do the following step.
+
+3) build the fragment that matches your platform: see INSTALL in
+"fragments" folder.
+
+Then launch an "Eclipse application" from Eclipse, you should
+be able to compile applications with ORCC in the guest Eclipse.
+
+-------------------------------------------------------------------------------
+Build a release of ORCC
+
+1) follow step 1) above
+2) follow step 2) above
+3) follow step 3) above, for every platform
+  (see the INSTALL file of the frontend to read about cross-compiling ORCC)
+4) import the feature project (folder "feature")
+5) import the site project (folder "site"), and build all.
+
+-------------------------------------------------------------------------------
+Troubleshooting
+
+frontend: see INSTALL in "frontend" folder
+fragments and plugin:
+  if Eclipse complains about missing files, or corrupted files, or weird
+  issues, try to launch Eclipse with -clean option, this will flush whatever
+  is cached, and in general will solve this kind of problem.
+

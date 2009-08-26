@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Top_sobel">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="img_read">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="ImgRead"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="img_display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="ImgDisplay"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="rgb2y">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="RGBToY"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="y2rgb">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="YToRGB"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="sobel">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Sobel"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="MAXW">
+            <Expr kind="Literal" literal-kind="Integer" value="2048"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="img_display" dst-port="width" src="img_read" src-port="width">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="img_display" dst-port="height" src="img_read" src-port="height">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="rgb2y" dst-port="red" src="img_read" src-port="red"/>
+    <Connection dst="rgb2y" dst-port="green" src="img_read" src-port="green"/>
+    <Connection dst="rgb2y" dst-port="blue" src="img_read" src-port="blue"/>
+    <Connection dst="img_display" dst-port="red" src="y2rgb" src-port="red"/>
+    <Connection dst="img_display" dst-port="green" src="y2rgb" src-port="green"/>
+    <Connection dst="img_display" dst-port="blue" src="y2rgb" src-port="blue"/>
+    <Connection dst="sobel" dst-port="width" src="img_read" src-port="width"/>
+    <Connection dst="sobel" dst-port="height" src="img_read" src-port="height"/>
+    <Connection dst="sobel" dst-port="y" src="rgb2y" src-port="y"/>
+    <Connection dst="y2rgb" dst-port="y" src="sobel" src-port="gradient"/>
+</XDF>

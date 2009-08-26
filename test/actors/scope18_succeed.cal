@@ -1,0 +1,45 @@
+actor scope18() bool Port1 ==> int Port2, int Port3:
+  
+  procedure f()
+  begin
+  end
+  
+  procedure g(int c)
+  begin
+  end
+  
+  procedure h(int c)
+  begin
+  end
+  
+  procedure my_proc(int a, int b)
+  var
+    int c := a
+  begin
+    begin
+    var
+      int d
+    do
+      d := a;
+      c := d;
+      if c > 1 then
+        if c >= 2 then
+          f();
+          // println("c >= 2!");
+        else
+          g(c);
+          // println("c = " + c);
+        end
+      else
+        h(c);
+        // println("c <= 0");
+      end
+    end
+  end
+
+  action ==>
+  do
+    my_proc (5, 3);
+  end
+
+end

@@ -1,0 +1,22 @@
+actor const02() bool Test ==> int Port2 :
+  
+  procedure test_const()
+  var
+    int a := 0, uint b := 0
+  begin
+    a := a + 1;
+    b := a + 1;
+    if b <= a * 2 then
+      b := (4 - b) / 2;
+    else
+      b := 0;
+    end
+    b := b - 1;
+  end
+  
+  action ==>
+  do
+    test_const ();
+  end
+
+end

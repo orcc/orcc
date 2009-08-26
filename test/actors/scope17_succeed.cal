@@ -1,0 +1,36 @@
+actor scope17() bool Port1 ==> int Port2, int Port3:
+  
+  int a;
+  int c;
+  
+  a: action Port1:[d] ==> [c], [c]
+  do
+    if a > 5 then
+      begin
+      var
+        int b
+      do
+        b := d;
+        if b < 3 then
+          c := b;
+        else
+          begin
+          var
+            int e = b
+          do
+            c := e;
+          end
+        end
+      end
+    else
+      begin
+      var
+        int b = d, int e := d, int f
+      do
+        e := b;
+        c := e;
+      end
+    end
+  end
+
+end

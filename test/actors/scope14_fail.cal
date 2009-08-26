@@ -1,0 +1,17 @@
+/* global variable "a", local variable "a". */
+
+actor scope14() bool Port1 ==> int Port2, int Port3:
+  
+  int a;
+  
+  a: action Port1:[b] ==> [b], [b]
+  do
+    begin
+    var
+      int a
+    do
+      a := b;
+    end
+  end
+
+end

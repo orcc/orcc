@@ -1,0 +1,31 @@
+actor action01() int I1, bool I2 ==> int O1, int O2, int O3:
+  
+  int acc := 0;
+  
+  action01: action I1:[i, j] repeat 8, I2:[x, y, z] ==>
+    O1:[i[7], i[5], i[6], i[4], i[3], i[1], i[2], i[0]],
+    O2:[ k * i[0], myList[4][1] ] repeat 3,
+    O3:[ a, b, c] repeat 2
+  var
+    int k := 0, List(type: List(type: int, size = 2), size=5) myList,
+    List(type: int, size = 3) a,
+    List(type: int, size = 2) b,
+    List(type: int, size = 3) c
+  do
+    a[0] := 1;
+    a[1] := 2;
+    a[2] := 3;
+
+    b[0] := 4;
+    b[1] := 5;
+
+    c[0] := 6;
+    c[1] := 7;
+    c[2] := 8;
+
+    k := 0;
+    k := myList[k + 1][(k + 1) *2];
+    acc := acc + 1;
+  end
+
+end

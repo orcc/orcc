@@ -1,0 +1,223 @@
+/* 
+BEGINCOPYRIGHT X
+	
+	Copyright (c) 2004-2005, Xilinx Inc.
+	All rights reserved.
+	
+	Redistribution and use in source and binary forms, 
+	with or without modification, are permitted provided 
+	that the following conditions are met:
+	- Redistributions of source code must retain the above 
+	  copyright notice, this list of conditions and the 
+	  following disclaimer.
+	- Redistributions in binary form must reproduce the 
+	  above copyright notice, this list of conditions and 
+	  the following disclaimer in the documentation and/or 
+	  other materials provided with the distribution.
+	- Neither the name of the copyright holder nor the names 
+	  of its contributors may be used to endorse or promote 
+	  products derived from this software without specific 
+	  prior written permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	
+ENDCOPYRIGHT
+*/
+
+// Unpack.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+
+// Each row of compensation data arrives as 3 32 bits numbers. This actor extracts
+// the 9 relevant horizontal pixels. This must take no more than 9 clocks for HD rate!
+
+import all caltrop.lib.BitOps;
+
+actor Unpack (
+    int SEARCHWIN_IN_MB,      // search window size (in macroblocks)
+    int FLAG_SZ,
+    int MV_SZ,
+    int MB_COORD_SZ,
+    int BTYPE_SZ,
+    int PIX_SZ,
+    int INTRA,
+    int INTER,
+    int NEWVOP,
+    int MOTION,
+    int ROUND_TYPE
+ )
+   int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI  ==> int(size=PIX_SZ) DO :
+
+  function maskBits( int v, int n ) --> int :
+    bitand( v, lshift(1,n)-1 )
+  end
+
+  function extractByte( int v, int n ) --> int :
+   bitand( rshift( v, (3-n)*8 ), 255 )
+  end
+
+  int(size=4) comp;
+
+  cmd.newVop: action BTYPE:[ cmd ] ==>
+  guard
+    bitand( cmd, NEWVOP ) != 0
+  do
+    comp := 0;
+    mbx  := 0;
+  end
+
+  int(size=MB_COORD_SZ) mbw_max;
+  int(size=MB_COORD_SZ) mbx;
+
+  getw: action BTYPE:[w] ==>
+  do
+    mbw_max := w - 1;
+  end
+
+  geth: action BTYPE:[h] ==>
+  end
+
+  int(size=5) count;
+  int(size=5) row;
+  int(size=MB_COORD_SZ+4) xstart;
+
+  cmd.motion: action BTYPE:[cmd] ==>
+  guard bitand( cmd, bitor( INTER, MOTION ) ) = bitor( INTER, MOTION )
+ // var int mask = bitor( INTER, MOTION )
+  end
+
+  cmd.noMotion: action BTYPE:[cmd] ==>
+  guard bitand( cmd, INTER ) = INTER
+  do 
+    mvx := 0;
+    count := 0;
+    row := 0;
+    xstart := if comp < 4 then
+                lshift( mbx, 4 ) + if bitand(comp,1) != 0 then 8 else 0 end
+              else
+                lshift( mbx, 3 )
+              end;
+  end
+
+  cmd.other: action BTYPE:[cmd] ==> /* debugggggggggg DO:[ [0:for i in Integers(1,81)] ] repeat 81 */
+  do
+    row := 9;  // skip extraction process
+  end
+
+  int(size=MV_SZ) mvx;
+
+  // Encode flags on halfpel: bit2 = interp. x
+  //                          bit1 = interp. y
+  //                          bit0 = round
+
+  getmvx: action MV:[ v ] ==>
+  var
+    int(size=MV_SZ) vv = rshift( v, 1 )
+  do
+    mvx := vv;
+    count := 0;
+    row  := 0;
+    xstart := if comp < 4 then
+                vv + lshift( mbx, 4 ) + if bitand(comp,1) != 0 then 8 else 0 end
+              else
+                vv + lshift( mbx, 3 )
+              end;
+  end
+
+  getmvy: action MV:[ v ] ==>
+  end
+
+  int(size=32) data;
+
+  done: action ==>
+  guard row = 9
+  do
+    if comp = 5 then
+      comp := 0;
+      mbx := if mbx = mbw_max then 0 else mbx + 1 end;
+    else
+      comp := comp + 1;
+    end
+  end
+
+  extract.noRead: action ==> DO:[ extractByte( data, shift ) ]
+  guard
+    bitand( xstart+count, 3) != 0,   // Must read a new value on quad-word boundary
+    count != 0            // Must read at start of row
+  var
+    int(size=MB_COORD_SZ+4) x = xstart+count,
+    bool left_clip = x < 0,
+    bool right_clip_luma   = bitand( comp, 4 )  = 0 and rshift( x, 4 ) > mbw_max,
+    bool right_clip_chroma = bitand( comp, 4 ) != 0 and rshift( x, 3 ) > mbw_max,
+    int(size=3) shift = if left_clip then 0 else
+                          if right_clip_luma or right_clip_chroma then 3 else
+                            bitand( x, 3 )
+                          end
+                        end
+  do
+    if count = 8 then 
+      count := 0;
+      row := row + 1;
+    else
+      count := count + 1;
+    end
+  end
+
+  extract.read: action DI:[d] ==> DO:[ extractByte( data, shift ) ]
+  var
+    int(size=MB_COORD_SZ+4) x = xstart+count,
+    bool left_clip = x < 0,
+    bool right_clip_luma   = bitand( comp, 4 )  = 0 and rshift( x, 4 ) > mbw_max,
+    bool right_clip_chroma = bitand( comp, 4 ) != 0 and rshift( x, 3 ) > mbw_max,
+    int(size=3) shift = if left_clip then 0 else
+                          if right_clip_luma or right_clip_chroma then 3 else
+                            bitand( x, 3 )
+                          end
+                        end
+  do
+    data := d;
+    if count = 8 then 
+      count := 0;
+      row := row + 1;
+    else
+      count := count + 1;
+    end
+  end
+
+  schedule fsm cmd:
+    cmd     ( cmd.newVop     ) --> getw;
+    cmd     ( cmd.noMotion   ) --> extract;
+    cmd     ( cmd.motion     ) --> getmvx;
+    cmd     ( cmd.other      ) --> extract;
+
+    getw    ( getw           ) --> geth;
+    geth    ( geth           ) --> cmd;
+  
+    getmvx  ( getmvx         ) --> getmvy;
+    getmvy  ( getmvy         ) --> extract;
+
+    extract ( done           ) --> cmd;
+    extract ( extract.read   ) --> extract;
+    extract ( extract.noRead ) --> extract;
+
+  end
+
+  priority
+    cmd.newVop > cmd.motion > cmd.noMotion > cmd.other;
+    done > extract.noRead > extract.read;
+  end
+
+end

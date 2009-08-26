@@ -1,0 +1,28 @@
+This file describes how to use ORCC.
+
+ORCC is made of several components:
+  - a frontend that takes XDF networks and RVC-CAL actors, transforms them,
+    and outputs a single flattened XDF network and actors under an
+    Intermediate Representation (IR).
+  - several backends that generate code from a flat XDF network and actors
+    in IR form.
+  - an Eclipse plugin that allows users to compile their dataflow program
+    seamlessly.
+
+The frontend is located in the "frontend" folder, and the backends and
+plugin reside in the "plugin" folder.
+
+Please read the INSTALL file to see how to build ORCC.
+
+
+Using ORCC plugin:
+  Just right-click an XDF file and Run As > ORCC Compilation,
+a wizard will ask you to specify some settings, will create a launch
+configuration, and compile your network. You can later access the configuration
+created, and run it again to recompile your model.
+
+Using ORCC on the command-line:
+  ORCC may also be used on the command-line by calling the frontend and
+backend separately.
+Please see the README files located in the "frontend" and "plugin" folders
+(in this order) to read more about how to run the different components.

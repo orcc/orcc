@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="testing_testbed">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="decoder">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="testing_decoder"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="fread"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="fname">
+            <Expr kind="Literal" literal-kind="String" value="D:\repositories\FAT\opendf\trunk\models\MPEG4_SP_Decoder\data\foreman_qcif_30.bit"/>
+        </Parameter>
+    </Instance>
+    <Instance id="display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DispYUV"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="doCompare">
+            <Expr kind="Literal" literal-kind="Integer" value="0"/>
+        </Parameter>
+        <Parameter name="file">
+            <Expr kind="Literal" literal-kind="String" value="D:\repositories\FAT\opendf\trunk\models\MPEG4_SP_Decoder\data\foreman_qcif_30.yuv"/>
+        </Parameter>
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+        </Parameter>
+        <Parameter name="title">
+            <Expr kind="Literal" literal-kind="String" value="Foreman QCIF"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+        </Parameter>
+    </Instance>
+    <Instance id="ddr">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DDRModel"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="MAXH_IN_MB">
+            <Expr kind="Literal" literal-kind="Integer" value="69"/>
+        </Parameter>
+        <Parameter name="MAXW_IN_MB">
+            <Expr kind="Literal" literal-kind="Integer" value="121"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="decoder" dst-port="bits" src="source" src-port="O"/>
+    <Connection dst="display" dst-port="B" src="decoder" src-port="VIDEO"/>
+    <Connection dst="decoder" dst-port="MCD" src="ddr" src-port="RD"/>
+    <Connection dst="ddr" dst-port="WD" src="decoder" src-port="MBD"/>
+    <Connection dst="ddr" dst-port="WA" src="decoder" src-port="MBA"/>
+    <Connection dst="ddr" dst-port="RA" src="decoder" src-port="MCA"/>
+</XDF>

@@ -1,0 +1,54 @@
+actor ssa04() bool Test ==> int Port2 :
+
+  function p(int i, int j, int k, int l) --> int :
+    i < 10 and j < 10 and k < 10 and l < 10
+  end
+
+  function q(int i, int j, int k, int l) --> int :
+    i < 10 and j < 10 and k < 10 and l < 10
+  end
+
+  function r(int i, int j, int k, int l) --> int :
+    i < 10 and j < 10 and k < 10 and l < 10
+  end
+
+  function s(int i, int j, int k, int l) --> int :
+    i < 10 and j < 10 and k < 10 and l < 10
+  end
+
+  function t(int i, int j, int k, int l) --> int :
+    i < 10 and j < 10 and k < 10 and l < 10
+  end
+  
+  procedure test_ssa()
+  var
+    int i := 1, int j := 1, int k := 1, int l := 1
+  begin
+    while t(i, j, k, l) do
+       if p(i, j, k, l) then
+         j := i;
+         if q(i, j, k, l) then
+           l := 2;
+         else
+           l := 3;
+         end
+         k := k + 1;
+       else
+         k := k + 2;
+       end
+       println("i = " + i + ", j = " + j + ", k = " + k + ", l = " + l);
+       while s(i, j, k, l) do
+         if r(i, j, k, l) then
+           l := l + 4;
+         end
+       end
+       i := i + 6;
+    end
+  end
+
+  action ==>
+  do
+    test_ssa ();
+  end
+
+end

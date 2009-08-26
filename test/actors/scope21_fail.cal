@@ -1,0 +1,15 @@
+actor scope21() bool Port1 ==> int Port2, int Port3:
+  
+  int a;
+  
+  procedure test_const()
+  begin
+    a := a + 1;
+  end
+
+  procedure test_const()
+  begin
+    a := a + 1;
+  end
+
+end

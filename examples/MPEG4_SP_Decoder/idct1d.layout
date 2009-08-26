@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="X0" x="57" y="161"/>
+      <vertex id="X1" x="57" y="254"/>
+      <vertex id="ROW" x="149" y="79"/>
+      <vertex id="Y0" x="727" y="70"/>
+      <vertex id="Y1" x="727" y="163"/>
+      <vertex id="Y2" x="727" y="256"/>
+      <vertex id="Y3" x="727" y="349"/>
+      <vertex id="scale" x="149" y="172"/>
+      <vertex id="combine" x="258" y="163"/>
+      <vertex id="shufflefly" x="380" y="172"/>
+      <vertex id="shuffle" x="505" y="172"/>
+      <vertex id="final" x="618" y="172"/>
+   </vertices>
+</layout>

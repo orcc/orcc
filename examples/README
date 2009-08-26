@@ -1,0 +1,17 @@
+This folder contains examples of dataflow applications that can be compiled with ORCC.
+
+The top networks of these applications are:
+  MPEG4_SP_Decoder: orcc_testbed.xdf
+  RVC_MPEG4_SP_Decoder: orcc_testbed.xdf
+  Seam_carving: Top_sobel.xdf
+
+To test them under Eclipse, right-click on the top network and Run As > ORCC Compilation
+The output folder should be set to:
+  MPEG4_SP_Decoder -> output/MPEG4_SP_Decoder/src
+  RVC_MPEG4_SP_Decoder -> output/RVC_MPEG4_SP_Decoder/src
+  Seam_carving -> output/Seam_carving/src
+
+The output folders contain Makefiles and Visual Studio projects.
+
+There are other top networks that may be used with ORCC (e.g. for tests), but
+their use is not documented yet.

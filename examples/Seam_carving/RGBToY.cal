@@ -1,0 +1,15 @@
+// RGB2Y.cal
+//
+// Author: Matthieu Wipliez
+//
+
+// Converts RGB to Y.
+
+actor RGBToY() uint(size=8) red, uint(size=8) green, uint(size=8) blue ==>
+  uint(size=8) y:
+  
+  action red:[r], green:[g], blue:[b] ==>
+    y:[ rshift(66 * r + 129 * g + 25 * b + 128, 8) + 16 ]
+  end
+
+end

@@ -1,0 +1,8 @@
+check types of source/target ports match! (and once done, remember to remove that check from backends!)
+
+-> peephole in Ast2ir when adding load/store?
+
+-> peephole to remove:
+  a := <something>;
+  b := a;
+when a and b are locals.

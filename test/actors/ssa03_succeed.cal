@@ -1,0 +1,22 @@
+actor ssa03() bool Test ==> int Port2 :
+  
+  procedure test_ssa()
+  var
+    int a, int b
+  begin
+    a := 1;
+    while a <= 16 do
+      b := a + 1;
+      a := a * 2;
+      a := a * 2;
+    end
+    a := a + 1;
+    b := a * 2 + b;
+  end
+
+  action ==>
+  do
+    test_ssa ();
+  end
+
+end

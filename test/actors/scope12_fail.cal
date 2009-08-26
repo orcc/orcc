@@ -1,0 +1,10 @@
+/* why this should fail: in the action, "a" is declared as an input token *and* as a local variable. */
+
+actor scope12() bool Port1 ==> int Port2, int Port3:
+  
+  a: action Port1:[a] ==> [a], [a]
+  var
+    int a
+  end
+
+end

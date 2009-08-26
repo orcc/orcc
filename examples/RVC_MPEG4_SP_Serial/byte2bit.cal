@@ -1,0 +1,13 @@
+// Author: Ghislain Roquier(ghislain.roquier@epfl.ch)
+// Rewrote the actor to convert a byte to 8 bits in one firing
+
+
+import all caltrop.lib.BitOps;
+
+actor byte2bit () int(size=8) in8 ==> bool out :
+
+ action in8:[ i ] ==> out:[ [bit_mask( i, n ) : for int n in Integers( 0, 7 )] ] repeat 8 end
+ 
+ function bit_mask( int x, int n ) --> int : bitand( lshift( x, n ), 0x80 ) != 0 end  
+
+end

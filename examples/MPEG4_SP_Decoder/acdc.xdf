@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="acdc">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="BTYPE">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="data">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="signed">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="out">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <Decl kind="Param" name="MAXW_IN_MB">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="MB_COORD_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="BTYPE_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="SAMPLE_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="NEWVOP">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="INTRA">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="INTER">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="QUANT_MASK">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="ROUND_TYPE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="FCODE_MASK">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="FCODE_SHIFT">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="MOTION">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="ACCODED">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="ACPRED">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="QUANT_SZ">
+        <Type name="int"/>
+    </Decl>
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="seq">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Sequence"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="BTYPE_SZ">
+            <Expr kind="Var" name="BTYPE_SZ"/>
+        </Parameter>
+        <Parameter name="FCODE_MASK">
+            <Expr kind="Var" name="FCODE_MASK"/>
+        </Parameter>
+        <Parameter name="FCODE_SHIFT">
+            <Expr kind="Var" name="FCODE_SHIFT"/>
+        </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA"/>
+        </Parameter>
+        <Parameter name="MAXW_IN_MB">
+            <Expr kind="Var" name="MAXW_IN_MB"/>
+        </Parameter>
+        <Parameter name="MB_COORD_SZ">
+            <Expr kind="Var" name="MB_COORD_SZ"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
+        <Parameter name="QUANT_MASK">
+            <Expr kind="Var" name="QUANT_MASK"/>
+        </Parameter>
+        <Parameter name="ROUND_TYPE">
+            <Expr kind="Var" name="ROUND_TYPE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="dcsplit">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DCSplit"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="dcpred">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DCPred"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="ACCODED">
+            <Expr kind="Var" name="ACCODED"/>
+        </Parameter>
+        <Parameter name="ACPRED">
+            <Expr kind="Var" name="ACPRED"/>
+        </Parameter>
+        <Parameter name="BTYPE_SZ">
+            <Expr kind="Var" name="BTYPE_SZ"/>
+        </Parameter>
+        <Parameter name="DCVAL">
+            <Expr kind="BinOpSeq">
+                <Expr kind="Literal" literal-kind="Integer" value="128"/>
+                <Op name="*"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Expr>
+        </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA"/>
+        </Parameter>
+        <Parameter name="MAXW_IN_MB">
+            <Expr kind="Var" name="MAXW_IN_MB"/>
+        </Parameter>
+        <Parameter name="MB_COORD_SZ">
+            <Expr kind="Var" name="MB_COORD_SZ"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
+        <Parameter name="QUANT_MASK">
+            <Expr kind="Var" name="QUANT_MASK"/>
+        </Parameter>
+        <Parameter name="QUANT_SZ">
+            <Expr kind="Var" name="QUANT_SZ"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="zzaddr">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="ZigzagAddr"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="zigzag">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Zigzag"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="acpred">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="ACPred"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="MAXW_IN_MB">
+            <Expr kind="Var" name="MAXW_IN_MB"/>
+        </Parameter>
+        <Parameter name="MB_COORD_SZ">
+            <Expr kind="Var" name="MB_COORD_SZ"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="dequant">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Dequant"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="QUANT_SZ">
+            <Expr kind="Var" name="QUANT_SZ"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SZ"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="seq" dst-port="BTYPE" src="" src-port="BTYPE"/>
+    <Connection dst="dcpred" dst-port="BTYPE" src="" src-port="BTYPE"/>
+    <Connection dst="dcsplit" dst-port="IN" src="" src-port="data"/>
+    <Connection dst="dcpred" dst-port="A" src="seq" src-port="A"/>
+    <Connection dst="dcpred" dst-port="B" src="seq" src-port="B"/>
+    <Connection dst="dcpred" dst-port="C" src="seq" src-port="C"/>
+    <Connection dst="dcpred" dst-port="IN" src="dcsplit" src-port="DC"/>
+    <Connection dst="zigzag" dst-port="AC" src="dcsplit" src-port="AC">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="BinOpSeq">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                <Op name="*"/>
+                <Expr kind="Literal" literal-kind="Integer" value="64"/>
+            </Expr>
+        </Attribute>
+    </Connection>
+    <Connection dst="" dst-port="signed" src="dcpred" src-port="SIGNED"/>
+    <Connection dst="dequant" dst-port="QP" src="dcpred" src-port="QUANT">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="dequant" dst-port="DC" src="dcpred" src-port="OUT">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="acpred" dst-port="PTR" src="dcpred" src-port="PTR"/>
+    <Connection dst="zzaddr" dst-port="START" src="dcpred" src-port="START"/>
+    <Connection dst="zigzag" dst-port="START" src="dcpred" src-port="START"/>
+    <Connection dst="acpred" dst-port="START" src="dcpred" src-port="START"/>
+    <Connection dst="zigzag" dst-port="ADDR" src="zzaddr" src-port="ADDR"/>
+    <Connection dst="acpred" dst-port="AC" src="zigzag" src-port="OUT">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="BinOpSeq">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                <Op name="*"/>
+                <Expr kind="Literal" literal-kind="Integer" value="64"/>
+            </Expr>
+        </Attribute>
+    </Connection>
+    <Connection dst="dequant" dst-port="AC" src="acpred" src-port="OUT">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="BinOpSeq">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                <Op name="*"/>
+                <Expr kind="Literal" literal-kind="Integer" value="63"/>
+            </Expr>
+        </Attribute>
+    </Connection>
+    <Connection dst="" dst-port="out" src="dequant" src-port="OUT"/>
+</XDF>

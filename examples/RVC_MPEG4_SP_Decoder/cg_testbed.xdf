@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="cg_testbed">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="cg_fread"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="fname">
+            <Expr kind="Literal" literal-kind="String" value="D:/Projects/RVC/OpenDF/models/MPEG4_SP_Decoder/data/foreman_qcif_30.bit"/>
+        </Parameter>
+    </Instance>
+    <Instance id="display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="cg_DispYUV"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="MAX_HEIGHT">
+            <Expr kind="Literal" literal-kind="Integer" value="576"/>
+        </Parameter>
+        <Parameter name="MAX_WIDTH">
+            <Expr kind="Literal" literal-kind="Integer" value="704"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Decoder">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="decoder"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Decoder" dst-port="bits" src="source" src-port="O"/>
+    <Connection dst="display" dst-port="B" src="Decoder" src-port="VID"/>
+    <Connection dst="display" dst-port="WIDTH" src="Decoder" src-port="WIDTH"/>
+    <Connection dst="display" dst-port="HEIGHT" src="Decoder" src-port="HEIGHT"/>
+</XDF>

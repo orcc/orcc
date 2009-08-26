@@ -1,0 +1,6 @@
+actor scope07() bool Port1 ==> int Port2:
+  
+  a: action ==> Port1:[a]
+  end
+
+end

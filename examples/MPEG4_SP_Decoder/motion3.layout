@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="MV" x="57" y="334"/>
+      <vertex id="BTYPE" x="57" y="241"/>
+      <vertex id="TEX" x="457" y="184"/>
+      <vertex id="MCD" x="57" y="427"/>
+      <vertex id="MBD" x="837" y="81"/>
+      <vertex id="MBA" x="837" y="174"/>
+      <vertex id="MCA" x="327" y="70"/>
+      <vertex id="VID" x="721" y="241"/>
+      <vertex id="memorymanager" x="167" y="109"/>
+      <vertex id="mbpack" x="721" y="109"/>
+      <vertex id="searchwin" x="167" y="382"/>
+      <vertex id="unpack" x="327" y="298"/>
+      <vertex id="interpolate" x="457" y="328"/>
+      <vertex id="add" x="589" y="214"/>
+   </vertices>
+</layout>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="backend" name="backend" schema="schema/backend.exsd"/>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="net.sf.orcc.ui.launching.OrccLaunchDelegate"
+            id="net.sf.orcc.launchConfigurationType"
+            modes="run"
+            name="ORCC compilation"
+            public="true">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="net.sf.orcc.ui.launching.OrccLaunchShortcut"
+            icon="icons/orcc.gif"
+            id="net.sf.orcc.launchShortcut"
+            label="ORCC compilation"
+            modes="run">
+         <configurationType
+               id="net.sf.orcc.launchConfigurationType">
+         </configurationType>
+         <description
+               description="Compiles a dataflow program with ORCC"
+               mode="run">
+         </description>
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <test
+                           property="net.sf.orcc.isXDF">
+                     </test>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="net.sf.orcc.ui.launching.OrccLaunchConfigurationTabGroup"
+            description="Compiles a dataflow program with ORCC."
+            id="net.sf.orcc.launchConfigurationTabGroup"
+            type="net.sf.orcc.launchConfigurationType">
+         <launchMode
+               mode="run">
+         </launchMode>
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="net.sf.orcc.ui.launching.OrccPropertyTester"
+            id="net.sf.orcc.propertyTester"
+            namespace="net.sf.orcc"
+            properties="isXDF"
+            type="org.eclipse.core.runtime.IAdaptable">
+      </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="net.sf.orcc.launchConfigurationType"
+            icon="icons/orcc.gif"
+            id="net.sf.orcc.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   <extension
+         point="net.sf.orcc.plugin.backend">
+      <backend
+            class="net.sf.orcc.backends.c.CBackendImpl"
+            name="C">
+      </backend>
+		<backend class="net.sf.orcc.backends.cllvm.CLLVMBackendImpl" name="C (LLVM-compatible)"/>
+		<backend class="net.sf.orcc.backends.llvm.LLVMBackendImpl" name="LLVM"/>
+      <backend
+            class="net.sf.orcc.backends.multicore.MultiCoreBackendImpl"
+            name="C (multicore)">
+      </backend>
+      <backend
+            class="net.sf.orcc.backends.xlim.XlimBackendImpl"
+            name="XLIM (TODO)">
+      </backend>
+   </extension>
+
+</plugin>

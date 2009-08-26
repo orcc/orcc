@@ -1,0 +1,12 @@
+// ImgRead.cal
+//
+// Author: Matthieu Wipliez
+//
+
+// Reads an image. Outputs width, height, and image content (RGB).
+
+actor ImgRead() ==>
+  uint(size=16) width, uint(size=16) height,
+  uint(size=8) red, uint(size=8) green, uint(size=8) blue :
+
+end

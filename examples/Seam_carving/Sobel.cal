@@ -1,0 +1,160 @@
+// Sobel.cal
+//
+// Author: Matthieu Wipliez
+//
+
+// Reads an image in raster scan order, fills a three-line cache, and apply Sobel filter.
+
+actor Sobel(uint(size=16) MAXW)
+  uint(size=16) width, uint(size=16) height, uint(size=8) y ==>
+  uint(size=8) gradient :
+
+  uint(size=16) img_w;
+  uint(size=16) wcnt := 0;
+  uint(size=16) img_h;
+  uint(size=16) hcnt := 0;
+  uint(size=16) fill_ptr := 0;
+  uint(size=16) consume_ptr := 0;
+  
+  int CACHE_LINES = 3;
+
+  // pixels contains three lines of MAXW pixels with Y component.
+  List(type:uint(size=8), size=CACHE_LINES * MAXW) pixels;
+  
+  int res;
+  
+  // software version of SQRT
+  procedure soft_sqrt(int num)
+  var
+    int op := num,
+    int one := lshift(1, 14) // The second-to-top bit is set: 1L<<30 for long
+  begin
+    res := 0;
+    
+    // "one" starts at the highest power of four <= the argument.
+    while (one > op) do
+      one := rshift(one, 2);
+    end
+    
+    while (one != 0) do
+      if (op >= res + one) then
+        op := op - (res + one);
+        res := res + lshift(one, 1);
+      end
+      res := rshift(res, 1);
+      one := rshift(one, 2);
+    end
+  end
+
+  // get image dimension
+  get_dim: action width:[w], height: [h] ==>
+  do
+    img_w := w;
+    img_h := h;
+  end
+
+  // get a pixel and store it in the cache
+  read_pixel: action y:[y_component] ==>
+  do
+    pixels[fill_ptr * img_w + wcnt] := y_component;
+    wcnt := wcnt + 1;
+  end
+  
+  // one line has been loaded
+  one_line_done: action ==>
+  guard
+    wcnt = img_w
+  do
+    wcnt := 0;
+    hcnt := hcnt + 1;
+
+    fill_ptr := fill_ptr + 1;
+    if fill_ptr >= CACHE_LINES then
+      // we set fill_ptr to 0 which is the next line to fill
+      fill_ptr := 0;
+    end
+  end
+  
+  // retrieve pixel at point i, j
+  function get_pixel(int i, int j) --> uint(size=8):
+    if i < 0 or i >= img_w then
+      0
+    else
+      if j < 0 then
+        pixels[(CACHE_LINES + j) * img_w + i]
+      else
+        if j >= CACHE_LINES then
+          pixels[(CACHE_LINES - j) * img_w + i]
+        else
+          pixels[j * img_w + i]
+        end
+      end
+    end
+  end
+  
+  // applies Sobel filter on one line.
+  compute_sobel: action ==> gradient:[g]
+  var
+    uint(size=8) g,
+    int gx, int gy,
+    int i = wcnt,
+    int j = consume_ptr,
+    List(type:List(type:int, size=2), size=9) coord,
+    List(type:int, size=9) off,
+    List(type:int, size=9) val
+  do
+    coord :=
+      [ [i - 1, j - 1], [i, j - 1], [i + 1, j - 1],
+        [i - 1,   j  ], [i,   j  ], [i + 1,   j  ],
+        [i - 1, j + 1], [i, j + 1], [i + 1, j + 1] ];
+    
+    val := [ get_pixel(coord[k][0], coord[k][1]) : for int k in Integers(0, 8) ];
+  
+    gx := - val[0] + val[2] - lshift(val[3], 1) + lshift(val[5], 1) - val[6] + val[8];
+    gy := - val[0] - lshift(val[1], 1) - val[2] + val[6] + lshift(val[7], 1) + val[8];
+    
+    g := soft_sqrt(gx * gx + gy * gy);
+
+    wcnt := wcnt + 1;
+  end
+  
+  // one line of Sobel done.
+  done: action ==>
+  guard
+    wcnt = img_w
+  do
+    wcnt := 0;
+    consume_ptr := consume_ptr + 1;
+    if consume_ptr >= CACHE_LINES then
+      consume_ptr := 0;
+    end
+  end
+
+  // priority statement
+  priority
+    one_line_done > read_pixel;
+    done > compute_sobel;
+  end
+
+  // FSM schedule
+  schedule fsm get_dim:
+    get_dim (get_dim) --> fill_line1;
+
+    // fill first line
+    fill_line1 (read_pixel) --> fill_line1;
+    fill_line1 (one_line_done) --> fill_line2;
+
+    // fill second line
+    fill_line2 (read_pixel) --> fill_line2;
+    fill_line2 (one_line_done) --> compute_sobel;
+
+    // compute sobel, and get next line
+    compute_sobel (compute_sobel) --> compute_sobel;
+    compute_sobel (done) --> get_line;
+
+    // fill one line, and go to compute sobel
+    get_line (read_pixel) --> get_line;
+    get_line (one_line_done) --> compute_sobel;
+  end
+
+end

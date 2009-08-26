@@ -1,0 +1,24 @@
+/* this should fail because one declaration shadows the other. */
+
+actor scope20() bool Port1 ==> int Port2, int Port3:
+  
+  int a;
+  int c;
+  
+  a: action Port1:[d] ==> [c], [c]
+  do
+    begin
+    var
+      int b
+    do
+      begin
+      var
+        int b
+      do
+        b := d;
+        c := b;
+      end
+    end
+  end
+
+end

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="bits" x="57" y="256"/>
+      <vertex id="MCD" x="531" y="70"/>
+      <vertex id="VIDEO" x="793" y="327"/>
+      <vertex id="MBD" x="824" y="243"/>
+      <vertex id="MBA" x="785" y="211"/>
+      <vertex id="MCA" x="785" y="277"/>
+      <vertex id="WIDTH" x="757" y="457"/>
+      <vertex id="HEIGHT" x="762" y="409"/>
+      <vertex id="serialize" x="154" y="247"/>
+      <vertex id="parser" x="272" y="229"/>
+      <vertex id="acdc" x="385" y="163"/>
+      <vertex id="idct2d" x="531" y="163"/>
+      <vertex id="motion" x="648" y="220"/>
+   </vertices>
+</layout>

@@ -1,0 +1,16 @@
+actor expr02() int inp ==> int outp:
+  
+  int acc := 0;
+  
+  action inp:[cccaacca] ==> outp:[o]
+  var
+    int o, int v
+  do
+    foreach int i in Integers(1, 8) do
+      // println("i = " + i);
+      v := i;
+    end
+    acc := acc + 1;
+  end
+
+end

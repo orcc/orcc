@@ -1,0 +1,70 @@
+------------------------------------------------------------------------------
+
+                                 Prerequisites
+                                 -------------
+
+- Objective Caml (or OCaml for short), downloadable from:
+  http://caml.inria.fr/download.en.html
+Minimum version of OCaml that ORCC compiles with is 3.11
+
+To install OCaml, you can either:
+  - (Linux) compile it from source
+  - (Linux) install it using your package manager:
+    - on Debian/Ubuntu:
+        apt-get install ocaml-compiler-libs ocaml-native-compilers
+    - other platforms: ?
+  - (Windows) download binary (or compile from source)
+    You will need the following tools:
+    - a build environment, one of:
+      - Cygwin, available from http://www.cygwin.com/
+        You only need to click "devel/gcc", "devel/make", and "devel/patchutils".
+      - MinGW/MSYS, available from http://sourceforge.net/projects/mingw/
+        You will have to install the following:
+        (1) MinGW (tested with 5.1.4)     http://downloads.sourceforge.net/mingw/MinGW-5.1.4.exe?use_mirror=
+        (2) MSYS (tested with 1.0.11rc1)  http://downloads.sourceforge.net/mingw/MSYS-1.0.11-rc-1.exe?use_mirror=
+
+    - Flexdll from http://alain.frisch.fr/flexdll.html#download
+      Extract it wherever you want, say C:\flexdll, and add this folder to your PATH
+      Once this is done, before using OCaml, you need to set Flexdll's flags on MinGW:
+        export FLEXLINKFLAGS="-L C:\MinGW\lib"
+      This is not necessary on Cygwin because flexdll uses cygpath to get the path to the libraries.
+
+
+- ocamlgraph, available from http://ocamlgraph.lri.fr/index.en.html
+Compile ocamlgraph (with the classic ./configure, make, make install)
+Note: "make install" of ocamlgraph-1.0 is currently broken on Windows because it assumes a OCaml MSVC port.
+You will need to type one of:
+  - if you use Cygwin/MinGW
+      cp graph.a $OCAMLLIB
+  - if you use Windows command prompt (cmd)
+      copy graph.a %OCAMLLIB%
+
+                            Compiling ORCC frontend
+                            -----------------------
+
+make all
+  Builds debug and release versions of ORCC frontend
+make help
+  Get help and see available targets
+
+This is it!
+
+                             Editing ORCC frontend
+                             ---------------------
+
+A few IDEs exist for OCaml (apart from Emacs + make), I use OcaIDE under Eclipse.
+Before installing and using OcaIDE, make sure:
+  1) that under Linux, your default JRE is a Sun, not a GNU (gcj).
+  2) that your variable OCAMLLIB points to the folder where lies OCaml library,
+  /usr/local/lib/ocaml if you compiled it from source on Linux, and
+  C:\ocamlmgw\lib if you compiled it from source on Windows.
+
+                                Troubleshooting
+                                ---------------
+
+If something does not work, here are a few tips that may solve the problem.
+
+Is there an OCAMLLIB environment variable set to the output of
+  ocamlc -where
+Is ocamlgraph correctly installed in the standard library folder?
+  - if you did not make install as root, it may not be the case

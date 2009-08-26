@@ -1,0 +1,10 @@
+actor assignment01() bool Port1 ==> int Port2, int Port3:
+  
+  int a = 3;
+  
+  a: action ==>
+  do
+    a := a + 1;
+  end
+
+end

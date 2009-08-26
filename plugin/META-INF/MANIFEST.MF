@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ORCC plug-in
+Bundle-SymbolicName: net.sf.orcc.plugin;singleton:=true
+Bundle-Version: 0.2.0
+Bundle-Activator: net.sf.orcc.ui.OrccActivator
+Require-Bundle: org.eclipse.core.expressions,
+ org.eclipse.core.runtime,
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui,
+ org.eclipse.ui,
+ org.eclipse.ui.console,
+ org.eclipse.ui.ide
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .,
+ lib/jgrapht-jdk1.6.jar,
+ lib/antlr-2.7.7.jar,
+ lib/stringtemplate.jar
+Bundle-Vendor: IETR/INSA of Rennes

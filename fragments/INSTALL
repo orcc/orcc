@@ -1,0 +1,6 @@
+After you have compiled the frontend, please go to the folder matching your
+platform and execute copy.sh (or copy.bat on Windows platforms) to copy
+frontend executables.
+
+Under Eclipse, simply import the relevant project.
+

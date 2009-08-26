@@ -1,0 +1,8 @@
+actor scope13() bool Port1 ==> int Port2, int Port3:
+  
+  int a;
+  
+  a: action Port1:[a] ==> [a], [a]
+  end
+
+end

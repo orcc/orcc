@@ -1,0 +1,12 @@
+// ImgDisplay.cal
+//
+// Author: Matthieu Wipliez
+//
+
+// Displays an image. Reads width, height, and image content (RGB).
+
+actor ImgDisplay()
+  uint(size=16) width, uint(size=16) height,
+  uint(size=8) red, uint(size=8) green, uint(size=8) blue ==> :
+
+end

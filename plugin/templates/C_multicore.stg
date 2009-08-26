@@ -1,0 +1,168 @@
+group main;
+
+broadcast(bcast) ::= <<
+int $bcast.id$_scheduler() {
+	$bcast.type$ tok_input[1];
+
+	while (lff_hasTokens($bcast.id$_input, 1)
+		$bcast.num:{ && lff_hasRoom($bcast.id$_output_$i0$, 1)}$) {
+		lff_read($bcast.id$_input, tok_input);
+		$bcast.num: { n | lff_write($bcast.id$_output_$n$, tok_input);
+}$	}
+  
+	return 0;
+}
+
+
+>>
+
+struct_fifo(fifo) ::= <<
+static void* array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
+static struct lock_free_fifo fifo_$fifo.count$ = { $fifo.size$, (char *)array_$fifo.count$, sizeof($fifo.type$), 0, 0 };
+
+>>
+
+ptr_fifo(fifo) ::= <<
+struct lff_t *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
+struct lff_t *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
+
+>>
+
+network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+// Generated from "$name$"
+
+#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <apr_getopt.h>
+#include <pthread.h>
+
+// define to 1 if your system has the termios.h header
+#define HAS_TERMIOS 0
+
+#ifdef _WIN32
+	#include <conio.h>
+#else
+	#if HAS_TERMIOS
+		#include <termios.h>
+	#endif
+#endif
+
+#include "lock_free_fifo.h"
+
+#define SIZE $size$
+
+////////////////////////////////////////////////////////////////////////////////
+// FIFO allocation
+$connections:struct_fifo()$
+////////////////////////////////////////////////////////////////////////////////
+// FIFO pointer assignments
+$connections:ptr_fifo()$
+
+////////////////////////////////////////////////////////////////////////////////
+$broadcasts:broadcast()$////////////////////////////////////////////////////////////////////////////////
+// Action schedulers
+$initializes: { init | extern int $init$_initialize(); 
+}$
+$instances: { inst | extern int $inst$_scheduler();
+}$
+////////////////////////////////////////////////////////////////////////////////
+// Actor scheduler
+
+static void scheduler() {
+	$initializes: { init | $init$_initialize(); 
+}$	while (1) {
+		$instances: { inst | $inst$_scheduler(); 
+}$
+		$broadcasts: { bcast | $bcast.id$_scheduler(); 
+}$	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Pause function
+void pause() {
+#ifdef _WIN32
+	printf("Press a key to continue\n");
+	_getch();
+#else
+	#if HAS_TERMIOS
+		// the user has termios.h
+		struct termios oldT, newT;
+		char c;
+
+		printf("Press a key to continue\n");
+
+		// save current terminal mode
+		ioctl(0, TCGETS, &oldT);
+
+		// echo off, echo newline off, canonical mode off, 
+		// extended input processing off, signal chars off
+		newT.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+
+		ioctl(0, TCSETS, &newT); // set new terminal mode
+		read(0, &c, 1); // read 1 char at a time from stdin
+		ioctl(0, TCSETS, &oldT); // restore previous terminal mode
+	#else
+		// just revert to standard getc
+		printf("Press Enter to continue\n");
+		getc(stdin);
+	#endif
+#endif
+}
+
+apr_getopt_t *os;
+
+void print_and_exit(apr_status_t statcode) {
+	char buf[1024];
+	apr_strerror(statcode, buf, 1024);
+	puts(buf);
+	pause();
+	exit(1);
+}
+
+static void init_apr(int argc, char *argv[], char *env[]) {
+	apr_pool_t *pool;
+	apr_status_t statcode;
+	
+	statcode = apr_app_initialize(&argc, &argv, &env);
+	if (statcode != APR_SUCCESS) {
+		print_and_exit(statcode);
+	}
+
+	// will call apr_terminate when program exits
+	atexit(apr_terminate);
+
+	statcode = apr_pool_create(&pool, NULL);
+	if (statcode != APR_SUCCESS) {
+		print_and_exit(statcode);
+	}
+
+	statcode = apr_getopt_init(&os, pool, argc, argv);
+	if (statcode != APR_SUCCESS) {
+		print_and_exit(statcode);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int main(int argc, char *argv[], char *env[]) {
+	pthread_t pThread1;
+	int pThreadRet;
+
+	init_apr(argc, argv, env);
+
+	pThreadRet = pthread_create (&pThread1, NULL, scheduler, NULL);
+	if (pThreadRet != 0) {
+		printf(stderr, "Thread initialization failed: %d\n", pThreadRet);
+		pause();
+		exit(1);
+	}
+
+	printf("End of simulation! Press a key to continue\n");
+	pause();
+
+	return 0;
+}
+
+>>
+

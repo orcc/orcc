@@ -1,0 +1,5 @@
+actor scope04(int PARAM) bool Port1 ==> int Port2:
+
+  int PARAM := 5;
+
+end

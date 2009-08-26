@@ -1,0 +1,85 @@
+group main;
+
+broadcast(bcast) ::= <<
+int $bcast.id$_scheduler() {
+	$bcast.type$ *tok_input;
+	$bcast.num: { n | $bcast.type$ *tok_output_$n$;
+}$
+	while (hasTokens($bcast.id$_input, 1)
+		$bcast.num:{ && hasRoom($bcast.id$_output_$i0$, 1)}$) {
+		tok_input = getReadPtr($bcast.id$_input, 1);
+		$bcast.num: { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
+}$
+		$bcast.num: { n | *tok_output_$n$ = *tok_input;
+}$	}
+  
+	return 0;
+}
+
+
+>>
+
+struct_fifo(fifo) ::= <<
+static $fifo.type$ array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
+static struct fifo_s fifo_$fifo.count$ = { sizeof($fifo.type$), $fifo.size$, (char *)array_$fifo.count$, 0, 0 };
+
+>>
+
+ptr_fifo(fifo) ::= <<
+struct fifo_s *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
+struct fifo_s *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
+
+>>
+
+network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+// Generated from "$name$"
+
+#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "fifo.h"
+#include "orcc_util.h"
+
+#define SIZE $size$
+
+////////////////////////////////////////////////////////////////////////////////
+// FIFO allocation
+$connections:struct_fifo()$
+////////////////////////////////////////////////////////////////////////////////
+// FIFO pointer assignments
+$connections:ptr_fifo()$
+
+////////////////////////////////////////////////////////////////////////////////
+$broadcasts:broadcast()$////////////////////////////////////////////////////////////////////////////////
+// Action schedulers
+$initializes: { init | extern int $init$_initialize(); 
+}$
+$instances: { inst | extern int $inst$_scheduler();
+}$
+////////////////////////////////////////////////////////////////////////////////
+// Actor scheduler
+
+static void scheduler() {
+	$initializes: { init | $init$_initialize();
+}$	while (1) {
+		$instances: { inst | $inst$_scheduler();
+}$
+		$broadcasts: { bcast | $bcast.id$_scheduler();
+}$	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int __cdecl main(int argc, char *argv[], char *env[]) {
+	init_orcc(argc, argv, env);
+
+	scheduler();
+
+	printf("End of simulation! Press a key to continue\n");
+	pause();
+
+	return 0;
+}
+
+>>
+

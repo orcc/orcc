@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="bits" x="57" y="334"/>
+      <vertex id="VID" x="871" y="334"/>
+      <vertex id="WIDTH" x="524" y="563"/>
+      <vertex id="HEIGHT" x="535" y="613"/>
+      <vertex id="serialize" x="154" y="325"/>
+      <vertex id="parser" x="272" y="253"/>
+      <vertex id="texture_Y" x="422" y="70"/>
+      <vertex id="texture_U" x="422" y="241"/>
+      <vertex id="texture_V" x="422" y="412"/>
+      <vertex id="GEN_mgnt_Merger420" x="683" y="307"/>
+      <vertex id="cg_MV" x="584" y="463"/>
+   </vertices>
+</layout>

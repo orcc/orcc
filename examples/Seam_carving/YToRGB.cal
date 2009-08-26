@@ -1,0 +1,14 @@
+// YToRGB.cal
+//
+// Author: Matthieu Wipliez
+//
+
+// Converts Y to RGB.
+
+actor YToRGB() uint(size=8) y ==>
+  uint(size=8) red, uint(size=8) green, uint(size=8) blue :
+  
+  action y:[ g ] ==> red:[g], green:[g], blue:[g]
+  end
+
+end

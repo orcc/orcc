@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="BITS" x="12" y="347"/>
+      <vertex id="BTYPE_Y" x="412" y="83"/>
+      <vertex id="BTYPE_U" x="412" y="5"/>
+      <vertex id="BTYPE_V" x="420" y="57"/>
+      <vertex id="MV_Y" x="680" y="269"/>
+      <vertex id="MV_U" x="674" y="196"/>
+      <vertex id="MV_V" x="671" y="231"/>
+      <vertex id="B_Y" x="655" y="360"/>
+      <vertex id="B_U" x="654" y="293"/>
+      <vertex id="B_V" x="648" y="327"/>
+      <vertex id="parseheaders" x="115" y="188"/>
+      <vertex id="mvseq" x="308" y="162"/>
+      <vertex id="blkexp" x="381" y="321"/>
+      <vertex id="mvrecon" x="428" y="166"/>
+      <vertex id="splitter_BTYPE" x="260" y="23"/>
+      <vertex id="splitter_MV" x="578" y="203"/>
+      <vertex id="splitter_420_B" x="512" y="303"/>
+      <vertex id="WIDTH" x="269" y="490"/>
+      <vertex id="HEIGHT" x="302" y="267"/>
+   </vertices>
+</layout>
