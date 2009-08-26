@@ -30,6 +30,7 @@ package net.sf.orcc.backends.llvm;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Set;
 
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.ir.network.Network;

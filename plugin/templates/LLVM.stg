@@ -1,4 +1,4 @@
-group main;
+group main; 
 
 broadcast(bcast) ::= <<
 int $bcast.id$_scheduler() {
@@ -60,19 +60,33 @@ $connections:struct_fifo()$
 $connections:ptr_fifo()$
 
 ////////////////////////////////////////////////////////////////////////////////
+// Actor structure
+$instances: struct_actor()$
+
+////////////////////////////////////////////////////////////////////////////////
 $broadcasts:broadcast()$////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
-$initializes: { init | extern int $init$_initialize(); 
+extern int source_scheduler();
+$initializes: { init | int (*$init$_initialize)(); 
 }$
-$instances: { inst | extern int $inst$_scheduler();
+$instances: { inst | int (*$inst.id$_scheduler)();
 }$
+extern int display_scheduler();
+
+////////////////////////////////////////////////////////////////////////////////
+// Init
+void init() {
+		$instances: { inst | $inst.id$_scheduler = (int(*)())initModule("$inst.id$", $inst.id$_In, $inst.id$_Out);
+}$
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
 static void scheduler() {
 	$initializes: { init | $init$_initialize();
 }$	while (1) {
-		$instances: { inst | $inst$_scheduler();
+		$instances: { inst | $inst.id$_scheduler();
 }$
 		$broadcasts: { bcast | $bcast.id$_scheduler();
 }$	}
