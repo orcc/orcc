@@ -53,7 +53,7 @@ $connections:ptr_fifo()$
 ////////////////////////////////////////////////////////////////////////////////
 $broadcasts:broadcast()$////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
-$initializes: { init | extern int $init$_initialize(); 
+$initializes: { init | extern void $init$_initialize(); 
 }$
 $instances: { inst | extern int $inst$_scheduler();
 }$

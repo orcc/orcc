@@ -294,7 +294,7 @@ int $actorName$_scheduler() {
 ///////////////////////////////////////////////////////////////////////////////
 
 actor(name, inputs, outputs, stateVars, procs,
-      actions, initializes, scheduler) ::= <<
+      actions, initializes, scheduler, initialize) ::= <<
 // Generated from "$name$"
 
 #include <stdio.h>
@@ -321,6 +321,15 @@ $if(initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
 $initializes$
+void $name$_initialize() {
+	int res = 1;
+	int i = 0;
+
+	$if(initialize)$
+	$schedulingTest(actorName=name, actions=initialize)$
+	$endif$
+}
+
 $endif$
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler

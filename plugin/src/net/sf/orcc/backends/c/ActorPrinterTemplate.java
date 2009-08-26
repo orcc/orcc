@@ -158,14 +158,15 @@ public class ActorPrinterTemplate {
 		os.close();
 	}
 
-	private void setActions(String actorName, List<Action> actions) {
+	private void setActions(String tmplName, String actorName,
+			List<Action> actions) {
 		for (Action action : actions) {
 			StringTemplate procTmpl = applyProc(actorName, action.getBody());
-			template.setAttribute("actions", procTmpl);
+			template.setAttribute(tmplName, procTmpl);
 			Procedure proc = action.getScheduler();
 			proc.setName("isSchedulable_" + action.getTag());
 			procTmpl = applyProc(actorName, proc);
-			template.setAttribute("actions", procTmpl);
+			template.setAttribute(tmplName, procTmpl);
 		}
 	}
 
@@ -176,9 +177,10 @@ public class ActorPrinterTemplate {
 		setFifos("outputs", actor.getOutputs());
 		setStateVars(actor.getStateVars());
 		setProcedures(actorName, actor.getProcs());
-		setActions(actorName, actor.getActions());
-		setInitializes(actorName, actor.getInitializes());
+		setActions("actions", actorName, actor.getActions());
+		setActions("initializes", actorName, actor.getInitializes());
 		template.setAttribute("scheduler", actor.getActionScheduler());
+		template.setAttribute("initialize", actor.getInitializes());
 	}
 
 	private void setFifos(String attribute, List<VarDef> ports) {
@@ -189,15 +191,6 @@ public class ActorPrinterTemplate {
 		}
 
 		template.setAttribute(attribute, names);
-	}
-
-	private void setInitializes(String actorName, List<Action> initializes) {
-		for (Action action : initializes) {
-			StringTemplate proc = applyProc(actorName, action.getBody());
-			template.setAttribute("initializes", proc);
-			proc = applyProc(actorName, action.getScheduler());
-			template.setAttribute("initializes", proc);
-		}
 	}
 
 	private void setProcedures(String actorName, List<Procedure> procs) {
