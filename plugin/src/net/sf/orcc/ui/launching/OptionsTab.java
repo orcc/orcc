@@ -153,7 +153,7 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc.gif");
+		return OrccActivator.getImage("icons/orcc_run.gif");
 	}
 
 	@Override

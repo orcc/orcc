@@ -29,14 +29,14 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.CONFIGURATION_TYPE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_CONFIG_TYPE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.sf.orcc.backends.BackendFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -49,13 +49,9 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.ILaunchShortcut2;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -70,17 +66,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
  * @author Matthieu Wipliez
  * 
  */
-public class OrccLaunchShortcut implements ILaunchShortcut2 {
-
-	private String browseOutputFolder(Shell shell, IFile file) {
-		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select output folder:");
-		// set initial directory
-		String location = file.getParent().getLocation().toOSString();
-		dialog.setFilterPath(location);
-
-		return dialog.open();
-	}
+public class OrccDebugLaunchShortcut implements ILaunchShortcut2 {
 
 	private void chooseAndLaunch(IFile file, ILaunchConfiguration[] configs) {
 		ILaunchConfiguration config = null;
@@ -93,26 +79,8 @@ public class OrccLaunchShortcut implements ILaunchShortcut2 {
 		}
 
 		if (config != null) {
-			DebugUITools.launch(config, ILaunchManager.RUN_MODE);
+			DebugUITools.launch(config, ILaunchManager.DEBUG_MODE);
 		}
-	}
-
-	private String chooseBackend() {
-		ILabelProvider labelProvider = new LabelProvider();
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
-				getShell(), labelProvider);
-		BackendFactory factory = BackendFactory.getInstance();
-		dialog.setElements(factory.listBackends().toArray());
-		dialog.setTitle("Select backend");
-		dialog.setMessage("&Select backend:");
-		dialog.setMultipleSelection(false);
-		int result = dialog.open();
-		labelProvider.dispose();
-		if (result == Window.OK) {
-			return (String) dialog.getFirstResult();
-		}
-
-		return null;
 	}
 
 	private ILaunchConfiguration chooseConfiguration(
@@ -122,7 +90,7 @@ public class OrccLaunchShortcut implements ILaunchShortcut2 {
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
 				getShell(), labelProvider);
 		dialog.setElements(configs);
-		dialog.setTitle("Select ORCC compilation");
+		dialog.setTitle("Select Orcc debug simulation");
 		dialog.setMessage("&Select existing configuration:");
 		dialog.setMultipleSelection(false);
 		int result = dialog.open();
@@ -135,7 +103,7 @@ public class OrccLaunchShortcut implements ILaunchShortcut2 {
 
 	private ILaunchConfiguration createConfiguration(IFile file) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-		String id = CONFIGURATION_TYPE;
+		String id = DEBUG_CONFIG_TYPE;
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(id);
 
 		ILaunchConfigurationWorkingCopy wc;
@@ -148,19 +116,17 @@ public class OrccLaunchShortcut implements ILaunchShortcut2 {
 			// source file
 			wc.setAttribute(INPUT_FILE, file.getLocation().toOSString());
 
-			// output folder
-			String folder = browseOutputFolder(getShell(), file);
-			if (folder == null) {
-				return null;
+			// output folder is the temporary folder
+			String folder = System.getProperty("java.io.tmpdir");
+			try {
+				folder = new File(folder).getCanonicalPath();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			wc.setAttribute(OUTPUT_FOLDER, folder);
 
 			// backend
-			String backend = chooseBackend();
-			if (backend == null) {
-				return null;
-			}
-			wc.setAttribute(BACKEND, backend);
+			wc.setAttribute(BACKEND, "Java");
 
 			// other options need not be set.
 
@@ -174,7 +140,7 @@ public class OrccLaunchShortcut implements ILaunchShortcut2 {
 
 	private ILaunchConfiguration[] getConfigurations(IFile file) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-		String id = CONFIGURATION_TYPE;
+		String id = DEBUG_CONFIG_TYPE;
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(id);
 		try {
 			// configurations that match the given resource

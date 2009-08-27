@@ -76,7 +76,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * @author Matthieu Wipliez
  * 
  */
-public class SettingsTab extends AbstractLaunchConfigurationTab {
+public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private Combo comboBackend;
 
@@ -289,7 +289,7 @@ public class SettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc.gif");
+		return OrccActivator.getImage("icons/orcc_run.gif");
 	}
 
 	@Override

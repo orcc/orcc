@@ -5,27 +5,63 @@
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            delegate="net.sf.orcc.ui.launching.OrccLaunchDelegate"
-            id="net.sf.orcc.launchConfigurationType"
+            delegate="net.sf.orcc.ui.launching.OrccRunLaunchDelegate"
+            id="net.sf.orcc.runLaunchConfigurationType"
             modes="run"
-            name="ORCC compilation"
+            name="Orcc compilation"
+            public="true">
+      </launchConfigurationType>
+      <launchConfigurationType
+            delegate="net.sf.orcc.ui.launching.OrccDebugLaunchDelegate"
+            id="net.sf.orcc.debugLaunchConfigurationType"
+            modes="debug"
+            name="Orcc debug simulation"
             public="true">
       </launchConfigurationType>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            class="net.sf.orcc.ui.launching.OrccLaunchShortcut"
-            icon="icons/orcc.gif"
-            id="net.sf.orcc.launchShortcut"
-            label="ORCC compilation"
+            class="net.sf.orcc.ui.launching.OrccRunLaunchShortcut"
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.runLaunchShortcut"
+            label="Orcc compilation"
             modes="run">
          <configurationType
-               id="net.sf.orcc.launchConfigurationType">
+               id="net.sf.orcc.runLaunchConfigurationType">
          </configurationType>
          <description
-               description="Compiles a dataflow program with ORCC"
+               description="Compiles a dataflow program with Orcc"
                mode="run">
+         </description>
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <test
+                           property="net.sf.orcc.isXDF">
+                     </test>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+      <shortcut
+            class="net.sf.orcc.ui.launching.OrccDebugLaunchShortcut"
+            icon="icons/orcc_debug.gif"
+            id="net.sf.orcc.debugLaunchShortcut"
+            label="Orcc debug simulation"
+            modes="debug">
+         <configurationType
+               id="net.sf.orcc.debugLaunchConfigurationType">
+         </configurationType>
+         <description
+               description="Debugs a dataflow program with Orcc"
+               mode="debug">
          </description>
          <contextualLaunch>
             <enablement>
@@ -47,12 +83,21 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="net.sf.orcc.ui.launching.OrccLaunchConfigurationTabGroup"
-            description="Compiles a dataflow program with ORCC."
-            id="net.sf.orcc.launchConfigurationTabGroup"
-            type="net.sf.orcc.launchConfigurationType">
+            class="net.sf.orcc.ui.launching.OrccRunLaunchConfigurationTabGroup"
+            description="Compiles a dataflow program with Orcc."
+            id="net.sf.orcc.runLaunchConfigurationTabGroup"
+            type="net.sf.orcc.runLaunchConfigurationType">
          <launchMode
                mode="run">
+         </launchMode>
+      </launchConfigurationTabGroup>
+      <launchConfigurationTabGroup
+            class="net.sf.orcc.ui.launching.OrccDebugLaunchConfigurationTabGroup"
+            description="Debugs a dataflow program with Orcc."
+            id="net.sf.orcc.debugLaunchConfigurationTabGroup"
+            type="net.sf.orcc.debugLaunchConfigurationType">
+         <launchMode
+               mode="debug">
          </launchMode>
       </launchConfigurationTabGroup>
    </extension>
@@ -69,9 +114,14 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
-            configTypeID="net.sf.orcc.launchConfigurationType"
-            icon="icons/orcc.gif"
-            id="net.sf.orcc.launchConfigurationTypeImage">
+            configTypeID="net.sf.orcc.runLaunchConfigurationType"
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.runLaunchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+      <launchConfigurationTypeImage
+            configTypeID="net.sf.orcc.debugLaunchConfigurationType"
+            icon="icons/orcc_debug.gif"
+            id="net.sf.orcc.debugLaunchConfigurationTypeImage">
       </launchConfigurationTypeImage>
    </extension>
    <extension
@@ -81,11 +131,15 @@
             name="C">
       </backend>
 		<backend class="net.sf.orcc.backends.cllvm.CLLVMBackendImpl" name="C (LLVM-compatible)"/>
+  <backend
+        class="net.sf.orcc.backends.multicore.MultiCoreBackendImpl"
+        name="C (multicore)">
+  </backend>
+  <backend
+        class="net.sf.orcc.backends.java.JavaBackendImpl"
+        name="Java">
+  </backend>
 		<backend class="net.sf.orcc.backends.llvm.LLVMBackendImpl" name="LLVM"/>
-      <backend
-            class="net.sf.orcc.backends.multicore.MultiCoreBackendImpl"
-            name="C (multicore)">
-      </backend>
       <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
             name="XLIM (TODO)">

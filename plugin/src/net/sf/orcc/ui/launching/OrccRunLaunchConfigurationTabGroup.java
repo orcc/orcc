@@ -38,13 +38,13 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
  * @author Matthieu Wipliez
  * 
  */
-public class OrccLaunchConfigurationTabGroup extends
+public class OrccRunLaunchConfigurationTabGroup extends
 		AbstractLaunchConfigurationTabGroup {
 
 	@Override
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
-				new SettingsTab(), new ParametersTab(), new OptionsTab(),
+				new RunSettingsTab(), new ParametersTab(), new OptionsTab(),
 				new CommonTab() };
 		setTabs(tabs);
 	}

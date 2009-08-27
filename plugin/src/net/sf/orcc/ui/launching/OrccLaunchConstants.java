@@ -29,7 +29,7 @@
 package net.sf.orcc.ui.launching;
 
 /**
- * Constants associated with an ORCC launch configuration.
+ * Constants associated with an Orcc launch configuration.
  * 
  * @author Matthieu Wipliez
  * 
@@ -37,17 +37,17 @@ package net.sf.orcc.ui.launching;
 public interface OrccLaunchConstants {
 
 	/**
-	 * Back-end associated with an ORCC configuration.
+	 * Back-end associated with an Orcc configuration.
 	 */
 	public static final String BACKEND = "net.sf.orcc.backend";
 
 	/**
-	 * ORCC Configuration type.
+	 * Orcc debug configuration type.
 	 */
-	public static final String CONFIGURATION_TYPE = "net.sf.orcc.launchConfigurationType";
+	public static final String DEBUG_CONFIG_TYPE = "net.sf.orcc.debugLaunchConfigurationType";
 
 	/**
-	 * When set, ORCC frontend will be launched in debug mode.
+	 * When set, Orcc frontend will be launched in debug mode.
 	 */
 	public static final String DEBUG_MODE = "net.sf.orcc.debugMode";
 
@@ -93,7 +93,7 @@ public interface OrccLaunchConstants {
 	public static final String FIFO_SIZE = "net.sf.orcc.fifoSize";
 
 	/**
-	 * Input file associated with an ORCC configuration.
+	 * Input file associated with an Orcc configuration.
 	 */
 	public static final String INPUT_FILE = "net.sf.orcc.fileName";
 
@@ -103,13 +103,18 @@ public interface OrccLaunchConstants {
 	public static final String KEEP_INTERMEDIATE = "net.sf.orcc.keepIntermediate";
 
 	/**
-	 * Output folder associated with an ORCC configuration.
+	 * Output folder associated with an Orcc configuration.
 	 */
 	public static final String OUTPUT_FOLDER = "net.sf.orcc.outputFolder";
 
 	/**
-	 * Parameters associated with an ORCC configuration.
+	 * Parameters associated with an Orcc configuration.
 	 */
 	public static final String PARAMETERS = "net.sf.orcc.parameters";
+
+	/**
+	 * Orcc run configuration type.
+	 */
+	public static final String RUN_CONFIG_TYPE = "net.sf.orcc.runLaunchConfigurationType";
 
 }

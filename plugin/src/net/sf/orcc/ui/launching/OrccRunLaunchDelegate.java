@@ -29,7 +29,7 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.CONFIGURATION_TYPE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
@@ -82,8 +82,7 @@ import org.osgi.framework.Bundle;
  * @author Matthieu Wipliez
  * 
  */
-
-public class OrccLaunchDelegate implements ILaunchConfigurationDelegate {
+public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 
 	private class DebugListener implements IDebugEventSetListener {
 
@@ -111,8 +110,8 @@ public class OrccLaunchDelegate implements ILaunchConfigurationDelegate {
 			try {
 				ILaunchConfigurationType type = configuration.getType();
 				String id = type.getIdentifier();
-				if (CONFIGURATION_TYPE.equals(id)) {
-					// the process belongs to a launch created from an ORCC
+				if (RUN_CONFIG_TYPE.equals(id)) {
+					// the process belongs to a launch created from an Orcc
 					// configuration
 					if (kind == DebugEvent.TERMINATE) {
 						if (process.isTerminated()) {
@@ -138,7 +137,7 @@ public class OrccLaunchDelegate implements ILaunchConfigurationDelegate {
 	private IOConsoleOutputStream out;
 
 	/**
-	 * Checks that the URL that points to ORCC frontend executable is not null,
+	 * Checks that the URL that points to Orcc frontend executable is not null,
 	 * and throws a CoreException otherwise.
 	 * 
 	 * @param url
@@ -153,13 +152,13 @@ public class OrccLaunchDelegate implements ILaunchConfigurationDelegate {
 					detail1);
 
 			String detail2 = "Another cause of this problem might be that no "
-					+ "ORCC frontend is available for your platform.";
+					+ "Orcc frontend is available for your platform.";
 			IStatus s2 = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					detail2);
 
 			IStatus status = new MultiStatus(OrccActivator.PLUGIN_ID, 0,
 					new IStatus[] { s1, s2 },
-					"No executable of ORCC frontend available!", null);
+					"No executable of Orcc frontend available!", null);
 			throw new CoreException(status);
 		}
 	}
@@ -230,15 +229,15 @@ public class OrccLaunchDelegate implements ILaunchConfigurationDelegate {
 			int value = launchFrontend(configuration.getName(), launch,
 					monitor, cmdLine);
 
-			out.write("ORCC frontend exit code: " + value + "\n");
+			out.write("Orcc frontend exit code: " + value + "\n");
 			if (value == 0) {
 				monitor.subTask("Launching backend...");
 				out.write("\n");
 				out.write("*********************************************"
 						+ "**********************************\n");
-				out.write("Launching ORCC backend...\n");
+				out.write("Launching Orcc backend...\n");
 				launchBackend(configuration);
-				out.write("ORCC backend done.");
+				out.write("Orcc backend done.");
 			}
 
 			monitor.worked(1);
