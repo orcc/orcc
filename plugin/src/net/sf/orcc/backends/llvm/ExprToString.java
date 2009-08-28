@@ -260,6 +260,9 @@ public class ExprToString implements ExprVisitor {
 	@Override
 	public void visit(VarExpr expr, Object... args) {
 		VarDef varDef = expr.getVar().getVarDef();
+		TypeToString type = new TypeToString(varDef.getType());
+		builder.append(type);
+		builder.append(" ");
 		builder.append(varDefPrinter.getVarDefName(varDef));
 	}
 

@@ -125,7 +125,7 @@ $var$ $op$= $expr$;
 
 // store node
 storeNode(typetarget, target, indexes, expr) ::= <<
-	store $typetarget$ $expr$, $typetarget$* $target$$indexes : {[$it$]}$
+	store $expr$, $typetarget$* $target$$indexes : {[$it$]}$
 
 >>
 

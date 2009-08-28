@@ -76,6 +76,11 @@ public class LLVMBackendImpl implements IBackend {
 		Set<Instance> instances = network.getGraph().vertexSet();
 		for (Instance instance : instances) {
 			if (instance.hasActor()) {
+				if (instance.getId().compareTo("clip")==0 )
+				{
+					int i;
+					i=0;
+				}
 				String outputName = path + File.separator + instance.getId()
 						+ ".s";
 				File out = new File(outputName);
