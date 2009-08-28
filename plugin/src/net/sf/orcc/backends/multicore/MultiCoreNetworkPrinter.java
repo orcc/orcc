@@ -30,7 +30,8 @@ package net.sf.orcc.backends.multicore;
 
 import java.io.IOException;
 
-import net.sf.orcc.backends.c.NetworkPrinter;
+import net.sf.orcc.backends.c.CNetworkPrinter;
+import net.sf.orcc.backends.c.TypeToString;
 
 /**
  * Multicore network printer.
@@ -38,14 +39,14 @@ import net.sf.orcc.backends.c.NetworkPrinter;
  * @author Jérôme GORIN
  * 
  */
-public class MultiCoreNetworkPrinter extends NetworkPrinter {
+public class MultiCoreNetworkPrinter extends CNetworkPrinter {
 
 	public MultiCoreNetworkPrinter() throws IOException {
 		this("C_multicore.st");
 	}
 
 	protected MultiCoreNetworkPrinter(String name) throws IOException {
-		super(name);
+		super(name, new TypeToString());
 	}
 
 }

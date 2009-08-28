@@ -41,6 +41,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.type.AbstractType;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -51,13 +52,15 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Mathieu Wippliez
  * 
  */
-public class ActorPrinterTemplate {
+public class CActorPrinter {
 
 	private ConstPrinter constPrinter;
 
 	private StringTemplateGroup group;
 
 	private StringTemplate template;
+
+	private TypeToString typeVisitor;
 
 	private VarDefPrinter varDefPrinter;
 
@@ -67,8 +70,8 @@ public class ActorPrinterTemplate {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public ActorPrinterTemplate() throws IOException {
-		this("C_actor");
+	public CActorPrinter() throws IOException {
+		this("C_actor", new TypeToString());
 	}
 
 	/**
@@ -79,10 +82,12 @@ public class ActorPrinterTemplate {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected ActorPrinterTemplate(String name) throws IOException {
+	protected CActorPrinter(String name, TypeToString visitor)
+			throws IOException {
 		group = new PluginGroupLoader().loadGroup(name);
 
 		constPrinter = new ConstPrinter(group);
+		typeVisitor = visitor;
 	}
 
 	/**
@@ -100,8 +105,8 @@ public class ActorPrinterTemplate {
 		procTmpl.setAttribute("name", proc.getName());
 
 		// return type
-		TypeToString type = new TypeToString(proc.getReturnType());
-		procTmpl.setAttribute("type", type.toString());
+		AbstractType type = proc.getReturnType();
+		procTmpl.setAttribute("type", typeVisitor.toString(type));
 
 		// parameters
 		for (VarDef param : proc.getParameters()) {
@@ -148,7 +153,7 @@ public class ActorPrinterTemplate {
 		fillPorts(ports, actor.getInputs());
 		fillPorts(ports, actor.getOutputs());
 
-		varDefPrinter = new VarDefPrinter(group, ports);
+		varDefPrinter = new VarDefPrinter(group, ports, typeVisitor);
 
 		setAttributes(actor);
 

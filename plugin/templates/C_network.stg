@@ -1,4 +1,4 @@
-group main;
+group C_network;
 
 broadcast(bcast) ::= <<
 int $bcast.id$_scheduler() {

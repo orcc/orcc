@@ -26,69 +26,48 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.xlim;
+package net.sf.orcc.backends.java;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Set;
-
-import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.ir.network.Instance;
-import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.parser.NetworkParser;
-import net.sf.orcc.ir.transforms.BroadcastAdder;
+import net.sf.orcc.backends.c.TypeToString;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.type.UintType;
 
 /**
- * C back-end.
+ * Java type printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class XlimBackendImpl implements IBackend {
+public class JavaTypePrinter extends TypeToString implements TypeVisitor {
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				new XlimBackendImpl().generateCode(args[0], 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: XlimBackendImpl <flattened XDF network>");
+	protected void printInt(int size) {
+		if (size <= 8) {
+			builder.append("byte");
+		} else if (size <= 16) {
+			builder.append("short");
+		} else if (size <= 32) {
+			builder.append("int");
+		} else if (size <= 64) {
+			builder.append("long");
 		}
 	}
 
 	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
-		File file = new File(fileName);
-		String path = file.getParent();
-		Network network = new NetworkParser().parseNetwork(path,
-				new FileInputStream(file));
-
-		Set<Instance> instances = network.getGraph().vertexSet();
-		for (Instance instance : instances) {
-			if (instance.hasActor()) {
-				// Actor actor = instance.getActor();
-
-				// prints actor
-				// String outputName = path + File.separator + instance.getId()
-				// + ".xlim";
-				// new ActorPrinter(outputName, actor);
-			}
-		}
-
-		// add broadcasts
-		new BroadcastAdder(network);
-
-		// print network
-		// CNetworkPrinter networkPrinter = new CNetworkPrinter();
-		// String outputName = path + File.separator + network.getName() + ".c";
-		// networkPrinter.printNetwork(outputName, network, false);
+	public void visit(BoolType type) {
+		builder.append("boolean");
 	}
+
+	@Override
+	public void visit(StringType type) {
+		builder.append("String");
+	}
+
+	@Override
+	public void visit(UintType type) {
+		// no unsigned in Java
+		printInt(type.getSize());
+	}
+
 }

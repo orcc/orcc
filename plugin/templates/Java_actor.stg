@@ -1,11 +1,11 @@
-group C_actor;
+group Java_actor : C_actor;
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(actorName, portName) ::= <<
-extern struct fifo_s *$actorName$_$portName$;
+	private IntFifo $actorName$_$portName$;
 
 >>
 
@@ -13,10 +13,10 @@ extern struct fifo_s *$actorName$_$portName$;
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
-// the dimensions of a list: [dim1][dim2]...[dimn]
+// the dimensions of a list: [][]...[]
 // does not output anything if $value$ is empty
 listSize(value) ::= <<
-$value : {[$it$]} $
+$value : {[]} $
 >>
 
 // the values of a list: {val1, val2, ..., valn}
@@ -27,17 +27,17 @@ listValue(value) ::= <<
 // a variable definition
 vardef(name, type, size, isPort) ::= <<
 $if(isPort)$
-$type$ *$name$
+$type$[] $name$
 $else$
-$type$ $name$$listSize(size)$
+$type$$listSize(size)$ $name$
 $endif$>>
 
 // a state variable
 stateVar(vardef, value) ::= <<
 $if(value)$
-static $vardef$ = $value$;$\n$
+private $vardef$ = $value$;$\n\n$
 $else$
-static $vardef$;$\n$
+private $vardef$;$\n\n$
 $endif$
 >>
 
@@ -45,49 +45,9 @@ $endif$
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-// assignment node
-assignVarNode(var, expr) ::= <<
-$var$ = $expr$;
-
->>
-
-// call node
-callNode(res, name, parameters) ::= <<
-$if(res)$
-$res$ = 
-$endif$
-$name$($parameters; separator=", "$);
-
->>
-
-// decrement node
-decrementNode(var) ::= <<
-$var$--;
-
->>
-
 // hasTokens node
 hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
 $var$ = hasTokens($actorName$_$fifoName$, $numTokens$);
-
->>
-
-// if node
-ifNode(expr, thenNodes, elseNodes) ::= <<
-if ($expr$) {
-	$thenNodes$}$if(elseNodes)$ else {
-	$elseNodes$}$endif$$\n$
->>
-
-// increment node
-incrementNode(var) ::= <<
-$var$++;
-
->>
-
-// load node
-loadNode(target, source, indexes) ::= <<
-$target$ = $source$$indexes : {[$it$]}$;
 
 >>
 
@@ -103,28 +63,9 @@ $var$ = getReadPtr($actorName$_$fifoName$, $numTokens$);
 
 >>
 
-// return node
-returnNode(expr) ::= <<
-return $expr$;
-
->>
-
 // self-assignment node
 selfAssignmentNode(var, op, expr) ::= <<
 $var$ $op$= $expr$;
-
->>
-
-// store node
-storeNode(target, indexes, expr) ::= <<
-$target$$indexes : {[$it$]}$ = $expr$;
-
->>
-
-// while node
-whileNode(expr, nodes) ::= <<
-while ($expr$) {
-	$nodes$}
 
 >>
 
@@ -140,7 +81,7 @@ $var$ = getWritePtr($actorName$_$fifoName$, $numTokens$);
 
 proc(name, type, parameters, locals, nodes) ::= <<
 
-static $type$ $name$($parameters; wrap, anchor, separator=", "$) {
+private $type$ $name$($parameters; wrap, anchor, separator=", "$) {
 $if(locals)$
 	$locals: {$it$;$\n$}$
 
@@ -295,47 +236,49 @@ int $actorName$_scheduler() {
 
 actor(name, inputs, outputs, stateVars, procs,
       actions, initializes, scheduler, initialize) ::= <<
-// Generated from "$name$"
+/**
+ * Generated from "$name$"
+ */
 
-#include <stdio.h>
-#include <stdlib.h>
+public class Actor$name$ implements IActor {
 
-#include "fifo.h"
-
-////////////////////////////////////////////////////////////////////////////////
-// Input FIFOs
-$inputs: fifo(actorName=name, portName=it)$
-////////////////////////////////////////////////////////////////////////////////
-// Output FIFOs
-$outputs: fifo(actorName=name, portName=it)$
-////////////////////////////////////////////////////////////////////////////////
-// State variables of the actor
-$stateVars$
-////////////////////////////////////////////////////////////////////////////////
-// Functions/procedures
-$procs$
-////////////////////////////////////////////////////////////////////////////////
-// Actions
-$actions$
+	////////////////////////////////////////////////////////////////////////////////
+	// Input FIFOs
+	$inputs: fifo(actorName=name, portName=it)$
+	////////////////////////////////////////////////////////////////////////////////
+	// Output FIFOs
+	$outputs: fifo(actorName=name, portName=it)$
+	////////////////////////////////////////////////////////////////////////////////
+	// State variables of the actor
+	$stateVars$
+	////////////////////////////////////////////////////////////////////////////////
+	// Functions/procedures
+	$procs$
+	////////////////////////////////////////////////////////////////////////////////
+	// Actions
+	$actions$
 $if(initializes)$
-////////////////////////////////////////////////////////////////////////////////
-// Initializes
-$initializes$
-void $name$_initialize() {
-	int res = 1;
-	int i = 0;
+	////////////////////////////////////////////////////////////////////////////////
+	// Initializes
+	$initializes$
+	public void $name$_initialize() {
+		int res = 1;
+		int i = 0;
 
-	$if(initialize)$
-	$schedulingTest(actorName=name, actions=initialize)$
-	$endif$
+		$if(initialize)$
+		$schedulingTest(actorName=name, actions=initialize)$
+		$endif$
+	}
+
+$endif$
+	////////////////////////////////////////////////////////////////////////////////
+	// Action scheduler
+$if(scheduler.fsm)$
+	$schedulerFSM(actorName=name, actions=scheduler.actions, fsm=scheduler.fsm)$
+$else$
+	$scheduler(actorName=name, actions=scheduler.actions)$
+$endif$
+
 }
 
-$endif$
-////////////////////////////////////////////////////////////////////////////////
-// Action scheduler
-$if(scheduler.fsm)$
-$schedulerFSM(actorName=name, actions=scheduler.actions, fsm=scheduler.fsm)$
-$else$
-$scheduler(actorName=name, actions=scheduler.actions)$
-$endif$
 >>

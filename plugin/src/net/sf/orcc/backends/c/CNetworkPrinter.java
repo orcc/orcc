@@ -56,11 +56,13 @@ import org.jgrapht.graph.DirectedMultigraph;
  * @author Matthieu Wipliez
  * 
  */
-public class NetworkPrinter {
+public class CNetworkPrinter {
 
 	private StringTemplateGroup group;
 
 	private StringTemplate template;
+
+	private TypeToString typeVisitor;
 
 	/**
 	 * Creates a new network printer with the template "C.st".
@@ -68,8 +70,8 @@ public class NetworkPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public NetworkPrinter() throws IOException {
-		this("C");
+	public CNetworkPrinter() throws IOException {
+		this("C_network", new TypeToString());
 	}
 
 	/**
@@ -80,8 +82,10 @@ public class NetworkPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected NetworkPrinter(String name) throws IOException {
+	protected CNetworkPrinter(String name, TypeToString typeVisitor)
+			throws IOException {
 		group = new PluginGroupLoader().loadGroup(name);
+		this.typeVisitor = typeVisitor;
 	}
 
 	/**
@@ -150,7 +154,7 @@ public class NetworkPrinter {
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("id", bcast.getId());
 				AbstractType type = bcast.getType();
-				attrs.put("type", new TypeToString(type).toString());
+				attrs.put("type", typeVisitor.toString(type));
 
 				List<Integer> num = new ArrayList<Integer>();
 				for (int i = 0; i < bcast.getNumOutput(); i++) {
@@ -199,7 +203,7 @@ public class NetworkPrinter {
 			Map<String, Object> attrs = new HashMap<String, Object>();
 			attrs.put("count", fifoCount);
 			attrs.put("size", size);
-			attrs.put("type", new TypeToString(type).toString());
+			attrs.put("type", typeVisitor.toString(type));
 			attrs.put("source", source.getId());
 			attrs.put("src_port", connection.getSource().getName());
 			attrs.put("target", target.getId());

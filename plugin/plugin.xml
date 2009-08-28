@@ -145,5 +145,55 @@
             name="XLIM (TODO)">
       </backend>
    </extension>
+   <extension
+         id="net.sf.orcc.marker"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="true">
+      </persistent>
+      <super
+            type="org.eclipse.debug.core.breakpointMarker">
+      </super>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            class="net.sf.orcc.debug.model.OrccLineBreakpoint"
+            id="net.sf.orcc.breakpoint"
+            markerType="net.sf.orcc.marker">
+      </breakpoint>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="net.sf.orcc.debug.ui.OrccModelPresentation"
+            id="net.sf.orcc.debug.model">
+      </debugModelPresentation>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.contextViewBindings">
+      <perspective
+            perspectiveId="org.eclipse.debug.ui.DebugPerspective"></perspective>
+      <contextViewBinding
+            autoOpen="true"
+            contextId="net.sf.orcc.debug.context"
+            viewId="org.eclipse.debug.ui.DebugView">
+      </contextViewBinding>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelContextBindings">
+      <modelContextBinding
+            contextId="net.sf.orcc.debug.context"
+            debugModelId="net.sf.orcc.debug.model">
+      </modelContextBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="net.sf.orcc.debug.context"
+            name="Orcc context"
+            parentId="org.eclipse.debug.ui.debugging">
+      </context>
+   </extension>
 
 </plugin>

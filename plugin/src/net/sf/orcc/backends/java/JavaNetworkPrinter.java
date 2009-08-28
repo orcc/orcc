@@ -26,69 +26,28 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.xlim;
+package net.sf.orcc.backends.java;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Set;
+import java.io.IOException;
 
-import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.ir.network.Instance;
-import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.parser.NetworkParser;
-import net.sf.orcc.ir.transforms.BroadcastAdder;
+import net.sf.orcc.backends.c.CNetworkPrinter;
 
 /**
- * C back-end.
+ * Network printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class XlimBackendImpl implements IBackend {
+public class JavaNetworkPrinter extends CNetworkPrinter {
 
 	/**
+	 * Creates a new network printer with the template "Java_network.stg".
 	 * 
-	 * @param args
+	 * @throws IOException
+	 *             If the template file could not be read.
 	 */
-	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				new XlimBackendImpl().generateCode(args[0], 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: XlimBackendImpl <flattened XDF network>");
-		}
+	public JavaNetworkPrinter() throws IOException {
+		super("Java_network", new JavaTypePrinter());
 	}
 
-	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
-		File file = new File(fileName);
-		String path = file.getParent();
-		Network network = new NetworkParser().parseNetwork(path,
-				new FileInputStream(file));
-
-		Set<Instance> instances = network.getGraph().vertexSet();
-		for (Instance instance : instances) {
-			if (instance.hasActor()) {
-				// Actor actor = instance.getActor();
-
-				// prints actor
-				// String outputName = path + File.separator + instance.getId()
-				// + ".xlim";
-				// new ActorPrinter(outputName, actor);
-			}
-		}
-
-		// add broadcasts
-		new BroadcastAdder(network);
-
-		// print network
-		// CNetworkPrinter networkPrinter = new CNetworkPrinter();
-		// String outputName = path + File.separator + network.getName() + ".c";
-		// networkPrinter.printNetwork(outputName, network, false);
-	}
 }

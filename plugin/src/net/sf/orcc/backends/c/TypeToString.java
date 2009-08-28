@@ -45,22 +45,9 @@ import net.sf.orcc.ir.type.VoidType;
  */
 public class TypeToString implements TypeVisitor {
 
-	private StringBuilder builder;
+	protected StringBuilder builder;
 
-	/**
-	 * Creates a string buffer and fills it with the text representation of the
-	 * given type. The buffer contents can be retrieved by using the
-	 * {@link #toString()} method.
-	 * 
-	 * @param type
-	 *            An {@link AbstractType}.
-	 */
-	public TypeToString(AbstractType type) {
-		builder = new StringBuilder();
-		type.accept(this);
-	}
-
-	private void printInt(int size) {
+	protected void printInt(int size) {
 		if (size <= 8) {
 			builder.append("char");
 		} else if (size <= 16) {
@@ -72,8 +59,16 @@ public class TypeToString implements TypeVisitor {
 		}
 	}
 
-	@Override
-	public String toString() {
+	/**
+	 * Creates a string buffer and fills it with the text representation of the
+	 * given type. Returns the text representation.
+	 * 
+	 * @param type
+	 *            An {@link AbstractType}.
+	 */
+	public String toString(AbstractType type) {
+		builder = new StringBuilder();
+		type.accept(this);
 		return builder.toString();
 	}
 

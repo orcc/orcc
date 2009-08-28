@@ -29,7 +29,6 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_CONFIG_TYPE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
@@ -48,9 +47,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.debug.model.OrccDebugTarget;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -61,20 +60,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
-import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IOConsole;
-import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.osgi.framework.Bundle;
 
 /**
@@ -83,58 +74,6 @@ import org.osgi.framework.Bundle;
  * 
  */
 public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
-
-	private class DebugListener implements IDebugEventSetListener {
-
-		private Semaphore sem;
-
-		public DebugListener(Semaphore sem) {
-			this.sem = sem;
-		}
-
-		@Override
-		public void handleDebugEvents(DebugEvent[] events) {
-			for (DebugEvent event : events) {
-				Object source = event.getSource();
-				if (source instanceof IProcess) {
-					IProcess process = (IProcess) source;
-					handleProcessEvent(process, event.getKind());
-				}
-			}
-		}
-
-		private void handleProcessEvent(IProcess process, int kind) {
-			ILaunch launch = process.getLaunch();
-			ILaunchConfiguration configuration = launch
-					.getLaunchConfiguration();
-			try {
-				ILaunchConfigurationType type = configuration.getType();
-				String id = type.getIdentifier();
-				if (DEBUG_CONFIG_TYPE.equals(id)) {
-					// the process belongs to a launch created from an Orcc
-					// configuration
-					if (kind == DebugEvent.TERMINATE) {
-						if (process.isTerminated()) {
-							DebugPlugin.getDefault().removeDebugEventListener(
-									this);
-							sem.release();
-						}
-					}
-				}
-			} catch (CoreException e) {
-				// not much we can do about it :/
-				e.printStackTrace();
-
-				// assume the worst, will abort the launch
-				DebugPlugin.getDefault().removeDebugEventListener(this);
-				sem.release();
-			}
-		}
-	}
-
-	private IOConsole console;
-
-	private IOConsoleOutputStream out;
 
 	/**
 	 * Checks that the URL that points to Orcc frontend executable is not null,
@@ -209,14 +148,6 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 		}
 	}
 
-	private void createConsole(IProcess process) {
-		IConsole console = DebugUITools.getConsole(process);
-		if (console instanceof IOConsole) {
-			this.console = (IOConsole) console;
-			out = this.console.newOutputStream();
-		}
-	}
-
 	@Override
 	public void launch(ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
@@ -225,45 +156,29 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 			createCmdLine(configuration, cmdList);
 
 			String[] cmdLine = cmdList.toArray(new String[] {});
+			monitor.subTask("Launching frontend...");
+			int value = launchFrontend(monitor, cmdLine);
+			if (monitor.isCanceled()) {
+				return;
+			}
+			monitor.worked(1);
 
-			int value = launchFrontend(configuration.getName(), launch,
-					monitor, cmdLine);
-
-			out.write("Orcc frontend exit code: " + value + "\n");
 			if (value == 0) {
 				monitor.subTask("Launching backend...");
-				out.write("\n");
-				out.write("*********************************************"
-						+ "**********************************\n");
-				out.write("Launching Orcc backend...\n");
 				launchBackend(configuration);
-				out.write("Orcc backend done.");
+
+				monitor.subTask("Starting debugging...");
+
+				IDebugTarget target = new OrccDebugTarget(launch);
+				launch.addDebugTarget(target);
 			}
 
 			monitor.worked(1);
-
-			// String url =
-			// "file:/C:/Documents%20and%20Settings/mwipliez/workspace/tttt/bin/";
-			// String url2 =
-			// "file:/D:/repositories/mwipliez/orcc/trunk/plugin/bin/";
-			// URLClassLoader cl = new URLClassLoader(new URL[] { new URL(url),
-			// new URL(url2) });
-			// try {
-			// Class<?> clasz = cl.loadClass("aaax.Test");
-			// Object test = clasz.newInstance();
-			// System.out.println(test.toString());
-			// } catch (ClassNotFoundException e) {
-			// e.printStackTrace();
-			// } catch (InstantiationException e) {
-			// e.printStackTrace();
-			// } catch (IllegalAccessException e) {
-			// e.printStackTrace();
-			// }
-
-			monitor.done();
 		} catch (IOException e) {
 			MessageDialog.openError(null, "Error launching frontend", e
 					.getMessage());
+		} finally {
+			monitor.done();
 		}
 	}
 
@@ -297,50 +212,26 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 	/**
 	 * Launches the front-end, and returns the exit value.
 	 * 
-	 * @param name
-	 *            Configuration name.
-	 * @param launch
-	 *            Launch.
 	 * @param monitor
 	 *            Monitor.
 	 * @param cmdLine
 	 *            Command-line.
-	 * @param envp
-	 *            Environment.
 	 * @return the exit value of the process.
-	 * @throws CoreException
+	 * @throws InterruptedException
 	 */
-	private int launchFrontend(String name, ILaunch launch,
-			IProgressMonitor monitor, String[] cmdLine) throws CoreException {
-		Semaphore sem = new Semaphore(0);
-		DebugListener listener = new DebugListener(sem);
-		DebugPlugin.getDefault().addDebugEventListener(listener);
-
+	private int launchFrontend(IProgressMonitor monitor, String[] cmdLine)
+			throws CoreException {
 		monitor.beginTask("Compiling dataflow program", 2);
 		monitor.subTask("Launching frontend...");
 
-		Process process = DebugPlugin.exec(cmdLine, null);
-		IProcess proc = DebugPlugin.newProcess(launch, process, name);
-
-		createConsole(proc);
-
-		// wait for the launch to terminate.
 		try {
-			sem.acquire();
+			Process process = DebugPlugin.exec(cmdLine, null);
+			return process.waitFor();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Status status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+					"Could not launch frontend", e);
+			throw new CoreException(status);
 		}
-		monitor.worked(1);
-
-		if (proc.isTerminated()) {
-			try {
-				return proc.getExitValue();
-			} catch (DebugException e) {
-				// will not happen because the process is terminated
-			}
-		}
-
-		return -1;
 	}
 
 	/**

@@ -29,17 +29,14 @@
 package net.sf.orcc.backends.c;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.util.Set;
+import java.io.IOException;
 
+import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.network.Instance;
 import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.parser.NetworkParser;
-import net.sf.orcc.ir.transforms.BroadcastAdder;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 
 /**
@@ -48,7 +45,7 @@ import net.sf.orcc.ir.transforms.PhiRemoval;
  * @author Matthieu Wipliez
  * 
  */
-public class CBackendImpl implements IBackend {
+public class CBackendImpl extends AbstractBackend implements IBackend {
 
 	/**
 	 * 
@@ -67,40 +64,24 @@ public class CBackendImpl implements IBackend {
 		}
 	}
 
+	private CActorPrinter printer;
+
+	public CBackendImpl() throws IOException {
+		printer = new CActorPrinter();
+	}
+
 	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
-		File file = new File(fileName);
-		String path = file.getParent();
+	protected void printActor(String id, Actor actor) throws Exception {
+		new PhiRemoval(actor);
+		new IncrementPeephole(actor);
+		new MoveWritesTransformation(actor);
+		String outputName = path + File.separator + id + ".c";
+		printer.printActor(outputName, actor);
+	}
 
-		Network network = new NetworkParser().parseNetwork(path,
-				new FileInputStream(file));
-		ActorPrinterTemplate printer = new ActorPrinterTemplate();
-
-		Set<Instance> instances = network.getGraph().vertexSet();
-		for (Instance instance : instances) {
-			if (instance.hasActor()) {
-				String outputName = path + File.separator + instance.getId()
-						+ ".c";
-				File out = new File(outputName);
-				if (instance.getFile().lastModified() > out.lastModified()) {
-					// only goes through the whole code generation process if
-					// the source JSON file is newer than the target C file
-					Actor actor = instance.getActor();
-
-					new PhiRemoval(actor);
-					new IncrementPeephole(actor);
-					new MoveWritesTransformation(actor);
-					// new ActorPrinter(outputName, actor);
-					printer.printActor(outputName, actor);
-				}
-			}
-		}
-
-		// add broadcasts
-		new BroadcastAdder(network);
-
-		// print network
-		NetworkPrinter networkPrinter = new NetworkPrinter();
+	@Override
+	protected void printNetwork(Network network) throws Exception {
+		CNetworkPrinter networkPrinter = new CNetworkPrinter();
 		String outputName = path + File.separator + network.getName() + ".c";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
