@@ -46,8 +46,7 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 import net.sf.orcc.backends.c.ConstPrinter;
-import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.backends.c.NodePrinterTemplate;
+
 
 
 /**

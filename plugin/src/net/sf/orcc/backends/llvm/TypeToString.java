@@ -40,7 +40,7 @@ import net.sf.orcc.ir.type.VoidType;
 /**
  * Type to string.
  * 
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
 public class TypeToString implements TypeVisitor {
@@ -62,13 +62,13 @@ public class TypeToString implements TypeVisitor {
 
 	private void printInt(int size) {
 		if (size <= 8) {
-			builder.append("char");
+			builder.append("i8");
 		} else if (size <= 16) {
-			builder.append("short");
+			builder.append("i16");
 		} else if (size <= 32) {
-			builder.append("int");
+			builder.append("i32");
 		} else if (size <= 64) {
-			builder.append("long long");
+			builder.append("i64");
 		}
 	}
 
@@ -80,7 +80,7 @@ public class TypeToString implements TypeVisitor {
 	@Override
 	public void visit(BoolType type) {
 		// boolean is a C int.
-		builder.append("int");
+		builder.append("i1");
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class TypeToString implements TypeVisitor {
 
 	@Override
 	public void visit(StringType type) {
-		builder.append("char *");
+		builder.append("u8 *");
 	}
 
 	@Override

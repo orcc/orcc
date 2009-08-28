@@ -47,6 +47,8 @@ import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.VarDef;
 
+import net.sf.orcc.backends.c.TypeToString;
+
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.jgrapht.graph.DirectedMultigraph;

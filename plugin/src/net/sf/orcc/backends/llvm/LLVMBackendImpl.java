@@ -79,7 +79,7 @@ public class LLVMBackendImpl implements IBackend {
 				String outputName = path + File.separator + instance.getId()
 						+ ".s";
 				File out = new File(outputName);
-				if (instance.getFile().lastModified() > out.lastModified()) {
+				//if (instance.getFile().lastModified() > out.lastModified()) {
 					// only goes through the whole code generation process if
 					// the source JSON file is newer than the target C file
 					Actor actor = instance.getActor();
@@ -89,7 +89,7 @@ public class LLVMBackendImpl implements IBackend {
 //					new MoveWritesTransformation(actor);
 					// new ActorPrinter(outputName, actor);
 					printer.printActor(outputName, actor);
-				}
+				//}
 			}
 		}
 

@@ -5,7 +5,7 @@ group main;
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(actorName, portName) ::= <<
-extern struct fifo_s *$actorName$_$portName$;
+@$actorName$_$portName$ = common global %struct.lff_t* null
 
 >>
 
@@ -13,11 +13,12 @@ extern struct fifo_s *$actorName$_$portName$;
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
-// the dimensions of a list: [dim1][dim2]...[dimn]
-// does not output anything if $value$ is empty
-listSize(value) ::= <<
-$value : {[$it$]} $
->>
+typedef(typeValue, sizeValue) ::= <<
+$if(sizeValue)$
+[$sizeValue$ x $typeValue$]
+$else$
+$typeValue$
+$endif$>>
 
 // the values of a list: {val1, val2, ..., valn}
 listValue(value) ::= <<
@@ -25,19 +26,21 @@ listValue(value) ::= <<
 >>
 
 // a variable definition
-vardef(name, type, size, isPort) ::= <<
-$if(isPort)$
-$type$ *$name$
+vardef(name, type, size, isPort, isGlobal) ::= <<
+$if(isGlobal)$
+$name$ = internal global $typedef(typeValue=type, sizeValue=size)$
 $else$
-$type$ $name$$listSize(size)$
+$if(isPort)$
+$name$ = alloca $typedef(typeValue=type, sizeValue=size)$
+$endif$
 $endif$>>
 
 // a state variable
 stateVar(vardef, value) ::= <<
 $if(value)$
-static $vardef$ = $value$;$\n$
+$vardef$ $value$$\n$
 $else$
-static $vardef$;$\n$
+$vardef$ 0$\n$
 $endif$
 >>
 
@@ -68,7 +71,8 @@ $var$--;
 
 // hasTokens node
 hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = hasTokens($actorName$_$fifoName$, $numTokens$);
+%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
+$var$ = call i32 @lff_hasTokens(%struct.lff_t* %$actorName$_$fifoName$, i32 $numTokens$)
 
 >>
 
@@ -86,8 +90,8 @@ $var$++;
 >>
 
 // load node
-loadNode(target, source, indexes) ::= <<
-$target$ = $source$$indexes : {[$it$]}$;
+loadNode(target, typesource, source, indexes) ::= <<
+$target$ = load $typesource$* $source$ $indexes : {[$it$]}$
 
 >>
 
@@ -98,8 +102,9 @@ $var$ = getPeekPtr($actorName$_$fifoName$, $numTokens$);
 >>
 
 // read node
-readNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getReadPtr($actorName$_$fifoName$, $numTokens$);
+readNode(typevar, var, actorName, fifoName, numTokens) ::= <<
+%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
+call void @lff_read(%struct.lff_t* %$actorName$_$fifoName$, $typevar$* $var$)
 
 >>
 
@@ -116,8 +121,8 @@ $var$ $op$= $expr$;
 >>
 
 // store node
-storeNode(target, indexes, expr) ::= <<
-$target$$indexes : {[$it$]}$ = $expr$;
+storeNode(typetarget, target, indexes, expr) ::= <<
+store $typetarget$ $expr$, $typetarget$* $target$$indexes : {[$it$]}$
 
 >>
 
@@ -140,13 +145,19 @@ $var$ = getWritePtr($actorName$_$fifoName$, $numTokens$);
 
 proc(name, type, parameters, locals, nodes) ::= <<
 
-static $type$ $name$($parameters; wrap, anchor, separator=", "$) {
+define internal $type$ @$name$($parameters; wrap, anchor, separator=", "$) {
+entry:
 $if(locals)$
-	$locals: {$it$;$\n$}$
+	$locals: {$it$}$
 
 $endif$
-	$nodes$}
 
+	$nodes$
+	br label %return
+	
+return:
+	ret void
+}
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -295,27 +306,25 @@ int $actorName$_scheduler() {
 
 actor(name, inputs, outputs, stateVars, procs,
       actions, initializes, scheduler, initialize) ::= <<
-// Generated from "$name$"
+; Generated from "$name$"
 
-#include <stdio.h>
-#include <stdlib.h>
+%struct.lff_t = type { i32, i8*, i32, i32, i32 }
 
-#include "fifo.h"
-
-////////////////////////////////////////////////////////////////////////////////
-// Input FIFOs
+;Input FIFOs
 $inputs: fifo(actorName=name, portName=it)$
-////////////////////////////////////////////////////////////////////////////////
-// Output FIFOs
+
+;Output FIFOs
 $outputs: fifo(actorName=name, portName=it)$
-////////////////////////////////////////////////////////////////////////////////
-// State variables of the actor
+
+
+;State variables of the actor
 $stateVars$
-////////////////////////////////////////////////////////////////////////////////
-// Functions/procedures
+
+
+; // Functions/procedures
 $procs$
-////////////////////////////////////////////////////////////////////////////////
-// Actions
+
+; Actions
 $actions$
 $if(initializes)$
 ////////////////////////////////////////////////////////////////////////////////
