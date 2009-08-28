@@ -29,7 +29,7 @@ public class PluginGroupLoader implements StringTemplateGroupLoader {
 	public PluginGroupLoader() {
 		StringTemplateGroup.registerGroupLoader(this);
 	}
-
+	
 	@Override
 	public StringTemplateGroup loadGroup(String groupName) {
 		return loadGroup(groupName, null);

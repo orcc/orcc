@@ -85,7 +85,6 @@ public class ActorPrinterTemplate {
 	 */
 	protected ActorPrinterTemplate(String name) throws IOException {
 		group = new PluginGroupLoader().loadGroup(name);
-
 		constPrinter = new ConstPrinter(group);
 	}
 

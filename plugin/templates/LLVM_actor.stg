@@ -50,7 +50,7 @@ $endif$
 
 // assignment node
 assignVarNode(var, expr) ::= <<
-$var$ = $expr$;
+	$var$ = $expr$
 
 >>
 
@@ -71,16 +71,19 @@ $var$--;
 
 // hasTokens node
 hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
-%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
-$var$ = call i32 @lff_hasTokens(%struct.lff_t* %$actorName$_$fifoName$, i32 $numTokens$)
+	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
+	$var$ = call i1 @lff_hasTokens(%struct.lff_t* %$actorName$_$fifoName$, i32 $numTokens$)
 
 >>
 
 // if node
 ifNode(expr, thenNodes, elseNodes) ::= <<
-if ($expr$) {
-	$thenNodes$}$if(elseNodes)$ else {
-	$elseNodes$}$endif$$\n$
+	br i1 $expr$, label %bb, label %bb1
+
+bb:
+$thenNodes$ $if(elseNodes)$ 
+bb1:	
+$elseNodes$ $endif$$\n$
 >>
 
 // increment node
@@ -91,20 +94,20 @@ $var$++;
 
 // load node
 loadNode(target, typesource, source, indexes) ::= <<
-$target$ = load $typesource$* $source$ $indexes : {[$it$]}$
+	$target$ = load $typesource$* $source$ $indexes : {[$it$]}$
 
 >>
 
 // peek node
-peekNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getPeekPtr($actorName$_$fifoName$, $numTokens$);
-
+peekNode(typevar, var, actorName, fifoName, numTokens) ::= <<
+	call void @lff_peek(%struct.lff_t* %$actorName$_$fifoName$, $typevar$* $var$)
+	
 >>
 
 // read node
 readNode(typevar, var, actorName, fifoName, numTokens) ::= <<
-%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
-call void @lff_read(%struct.lff_t* %$actorName$_$fifoName$, $typevar$* $var$)
+	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
+	call void @lff_read(%struct.lff_t* %$actorName$_$fifoName$, $typevar$* $var$)
 
 >>
 
@@ -122,7 +125,7 @@ $var$ $op$= $expr$;
 
 // store node
 storeNode(typetarget, target, indexes, expr) ::= <<
-store $typetarget$ $expr$, $typetarget$* $target$$indexes : {[$it$]}$
+	store $typetarget$ $expr$, $typetarget$* $target$$indexes : {[$it$]}$
 
 >>
 
@@ -151,8 +154,7 @@ $if(locals)$
 	$locals: {$it$}$
 
 $endif$
-
-	$nodes$
+$nodes$
 	br label %return
 	
 return:
