@@ -43,15 +43,7 @@ import net.sf.orcc.ir.type.UintType;
 public class JavaTypePrinter extends TypeToString implements TypeVisitor {
 
 	protected void printInt(int size) {
-		if (size <= 8) {
-			builder.append("byte");
-		} else if (size <= 16) {
-			builder.append("short");
-		} else if (size <= 32) {
-			builder.append("int");
-		} else if (size <= 64) {
-			builder.append("long");
-		}
+		builder.append("int");
 	}
 
 	@Override

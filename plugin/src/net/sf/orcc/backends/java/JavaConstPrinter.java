@@ -26,18 +26,12 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c;
+package net.sf.orcc.backends.java;
 
-import java.util.List;
-
-import net.sf.orcc.ir.consts.AbstractConst;
+import net.sf.orcc.backends.c.ConstPrinter;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ConstVisitor;
-import net.sf.orcc.ir.consts.IntConst;
-import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.ir.consts.StringConst;
 
-import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
@@ -47,17 +41,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Matthieu Wipliez
  * 
  */
-public class ConstPrinter implements ConstVisitor {
-
-	/**
-	 * template group
-	 */
-	private StringTemplateGroup group;
-
-	/**
-	 * current template
-	 */
-	protected StringTemplate template;
+public class JavaConstPrinter extends ConstPrinter implements ConstVisitor {
 
 	/**
 	 * Creates a new const printer from the given template group.
@@ -65,56 +49,13 @@ public class ConstPrinter implements ConstVisitor {
 	 * @param group
 	 *            template group
 	 */
-	public ConstPrinter(StringTemplateGroup group) {
-		this.group = group;
-	}
-
-	/**
-	 * Sets the top-level template.
-	 * 
-	 * @param template
-	 *            top-level template
-	 */
-	public void setTemplate(StringTemplate template) {
-		this.template = template;
+	public JavaConstPrinter(StringTemplateGroup group) {
+		super(group);
 	}
 
 	@Override
 	public void visit(BoolConst constant) {
-		template.setAttribute("value", constant.getValue() ? "1" : "0");
-	}
-
-	@Override
-	public void visit(IntConst constant) {
-		template.setAttribute("value", constant.getValue());
-	}
-
-	@Override
-	public void visit(ListConst constant) {
-		// save current template
-		StringTemplate previousTempl = template;
-
-		// set instance of list template as current template
-		StringTemplate listTempl = group.getInstanceOf("listValue");
-		template = listTempl;
-
-		List<AbstractConst> list = constant.getValue();
-		for (AbstractConst cst : list) {
-			cst.accept(this);
-		}
-
-		// restore previous template as current template, and set attribute
-		// "value" to the instance of the list template
-		template = previousTempl;
-		template.setAttribute("value", listTempl);
-	}
-
-	@Override
-	public void visit(StringConst constant) {
-		// escape backslashes
-		String val = constant.getValue();
-		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
-		template.setAttribute("value", res);
+		template.setAttribute("value", constant.getValue() ? "true" : "false");
 	}
 
 }

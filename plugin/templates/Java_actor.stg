@@ -5,7 +5,7 @@ group Java_actor : C_actor;
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(actorName, portName) ::= <<
-	private IntFifo $actorName$_$portName$;
+private IntFifo $actorName$_$portName$;
 
 >>
 
@@ -15,7 +15,7 @@ fifo(actorName, portName) ::= <<
 
 // the dimensions of a list: [][]...[]
 // does not output anything if $value$ is empty
-listSize(value) ::= <<
+listDim(value) ::= <<
 $value : {[]} $
 >>
 
@@ -27,9 +27,9 @@ listValue(value) ::= <<
 // a variable definition
 vardef(name, type, size, isPort) ::= <<
 $if(isPort)$
-$type$[] $name$
+$type$[] $name$ = new $type$$listSize(size)$
 $else$
-$type$$listSize(size)$ $name$
+$type$$listDim(size)$ $name$
 $endif$>>
 
 // a state variable
@@ -47,31 +47,25 @@ $endif$
 
 // hasTokens node
 hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = hasTokens($actorName$_$fifoName$, $numTokens$);
+$var$ = $actorName$_$fifoName$.hasTokens($numTokens$);
 
 >>
 
 // peek node
 peekNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getPeekPtr($actorName$_$fifoName$, $numTokens$);
+$actorName$_$fifoName$.peek($var$);
 
 >>
 
 // read node
 readNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getReadPtr($actorName$_$fifoName$, $numTokens$);
-
->>
-
-// self-assignment node
-selfAssignmentNode(var, op, expr) ::= <<
-$var$ $op$= $expr$;
+$actorName$_$fifoName$.get($var$);
 
 >>
 
 // write node
 writeNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getWritePtr($actorName$_$fifoName$, $numTokens$);
+$actorName$_$fifoName$.put($var$);
 
 >>
 
@@ -95,7 +89,7 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(actorName, pattern) ::= <<
-$pattern.keys:{port|hasRoom($actorName$_$port$, $pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|$actorName$_$port$.hasRoom($pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,7 +97,7 @@ $pattern.keys:{port|hasRoom($actorName$_$port$, $pattern.(port)$)}; separator=" 
 
 actionCall(action) ::= <<
 $action.tag$();
-res = 1;
+res = true;
 i++;
 >>
 
@@ -123,12 +117,12 @@ $actions: actionTest(actorName=actorName, action=it); separator=" else "$
 >>
 
 scheduler(actorName, actions) ::= <<
-int $actorName$_scheduler() {
-	int res = 1;
+public int $actorName$_scheduler() {
+	boolean res = true;
 	int i = 0;
   
 	while (res) {
-		res = 0;
+		res = false;
 		$if(actions)$
 		$schedulingTest(actorName=actorName, actions=actions)$
 		$endif$
@@ -144,8 +138,8 @@ int $actorName$_scheduler() {
 
 actionCallState(nextState) ::= <<
 $nextState.action.tag$();
-_FSM_state = s_$nextState.targetState$;
-res = 1;
+_FSM_state = States.s_$nextState.targetState$;
+res = true;
 >>
 
 actionTestState(actorName, nextState) ::= <<
@@ -164,8 +158,8 @@ $nextStates: actionTestState(actorName=actorName, nextState=it); separator=" els
 >>
 
 stateScheduler(actorName, transition) ::= <<
-static int $transition.sourceState$_state_scheduler() {
-	int res = 0;
+private boolean $transition.sourceState$_state_scheduler() {
+	boolean res = false;
 	$schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo)$
 	return res;
 }
@@ -179,26 +173,21 @@ $transitions: {case s_$it.sourceState$:
 	break;
 }$
 default:
-	printf("unknown state: %s\n", stateNames[_FSM_state]);
+	System.out.println("unknown state: %s\n" + _FSM_state);
 	break;
 }
 >>
 
 schedulerFSM(actorName, actions, fsm) ::= <<
-enum states {
-	s_$first(fsm.states)$ = 0,
-	$rest(fsm.states) : {s_$it$}; separator=",\n"$
+private enum States {
+	$fsm.states : {s_$it$}; separator=",\n"$
 };
 
-static char *stateNames[] = {
-	$fsm.states : {"s_$it$"}; separator=",\n"$
-};
-
-static enum states _FSM_state = s_$fsm.initialState$;
+private States _FSM_state = States.s_$fsm.initialState$;
 
 $if(actions)$
-static int outside_FSM_scheduler() {
-	int res = 0;
+private boolean outside_FSM_scheduler() {
+	boolean res = false;
 	int i = 0;
 	$schedulingTest(actorName=actorName, actions=actions)$
 	return res;
@@ -207,15 +196,15 @@ static int outside_FSM_scheduler() {
 
 $endif$
 $fsm.transitions: stateScheduler(actorName=actorName, transition=it); separator="\n"$
-int $actorName$_scheduler() {
-	int res = 1;
+public int $actorName$_scheduler() {
+	boolean res = true;
 	int i = 0;
 	
 	while (res) {
-		res = 0;
+		res = false;
 		$if(actions)$
 		if (outside_FSM_scheduler()) {
-			res = 1;
+			res = true;
 			i++;
 		} else {
 			$switch(fsm.transitions)$
@@ -240,7 +229,7 @@ actor(name, inputs, outputs, stateVars, procs,
  * Generated from "$name$"
  */
 
-public class Actor$name$ implements IActor {
+public class Actor_$name$ implements IActor {
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Input FIFOs
@@ -262,7 +251,7 @@ $if(initializes)$
 	// Initializes
 	$initializes$
 	public void $name$_initialize() {
-		int res = 1;
+		boolean res = true;
 		int i = 0;
 
 		$if(initialize)$

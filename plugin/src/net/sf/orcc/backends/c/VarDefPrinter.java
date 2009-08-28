@@ -50,11 +50,9 @@ public class VarDefPrinter {
 
 	private TypeToString typeVisitor;
 
-	public VarDefPrinter(StringTemplateGroup group, List<String> ports,
-			TypeToString typeVisitor) {
+	public VarDefPrinter(StringTemplateGroup group, TypeToString typeVisitor) {
 		this.group = group;
 		this.listSizePrinter = new ListSizePrinter();
-		this.ports = ports;
 		this.typeVisitor = typeVisitor;
 	}
 
@@ -102,5 +100,9 @@ public class VarDefPrinter {
 		}
 
 		return name;
+	}
+
+	public void setPortList(List<String> ports) {
+		this.ports = ports;
 	}
 }

@@ -110,17 +110,15 @@ public class ExprToString implements ExprVisitor {
 		}
 	}
 
-	private StringBuilder builder;
+	protected StringBuilder builder;
 
-	private final VarDefPrinter varDefPrinter;
+	protected final VarDefPrinter varDefPrinter;
 
-	public ExprToString(VarDefPrinter varDefPrinter, AbstractExpr expr) {
-		builder = new StringBuilder();
+	public ExprToString(VarDefPrinter varDefPrinter) {
 		this.varDefPrinter = varDefPrinter;
-		expr.accept(this, 0);
 	}
 
-	private int getPriority(BinaryOp op) {
+	protected int getPriority(BinaryOp op) {
 		switch (op) {
 		case LOR:
 			return 1;
@@ -165,7 +163,7 @@ public class ExprToString implements ExprVisitor {
 		}
 	}
 
-	private int getPriority(UnaryOp op) {
+	protected int getPriority(UnaryOp op) {
 		switch (op) {
 		case NUM_ELTS:
 			return 12;
@@ -181,8 +179,9 @@ public class ExprToString implements ExprVisitor {
 		}
 	}
 
-	@Override
-	public String toString() {
+	public String toString(AbstractExpr expr) {
+		builder = new StringBuilder();
+		expr.accept(this, 0);
 		return builder.toString();
 	}
 

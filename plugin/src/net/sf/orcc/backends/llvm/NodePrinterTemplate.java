@@ -51,8 +51,6 @@ import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 
-import net.sf.orcc.ir.expr.IntExpr;
-
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
@@ -70,7 +68,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	private StringTemplateGroup group;
 
 	private StringTemplate template;
-	
+
 	private String attrName;
 
 	public NodePrinterTemplate(StringTemplateGroup group,
@@ -193,25 +191,23 @@ public class NodePrinterTemplate implements CNodeVisitor {
 
 		VarDef varDef = node.getTarget();
 		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef));
-		
+
 		TypeToString type = new TypeToString(varDef.getType());
 		nodeTmpl.setAttribute("typesource", type.toString());
-		
+
 		varDef = node.getSource().getVarDef();
 		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef));
 
 		List<AbstractExpr> indexes = node.getIndexes();
 		for (AbstractExpr index : indexes) {
-				ExprToString expr = new ExprToString(varDefPrinter, index);
-				try {
-					if (Integer.parseInt(expr.toString())>0)
-					{
-						nodeTmpl.setAttribute("indexes", expr.toString());
-					}
-				}catch (NumberFormatException e)
-				{
-					
+			ExprToString expr = new ExprToString(varDefPrinter, index);
+			try {
+				if (Integer.parseInt(expr.toString()) > 0) {
+					nodeTmpl.setAttribute("indexes", expr.toString());
 				}
+			} catch (NumberFormatException e) {
+
+			}
 		}
 
 		template.setAttribute(attrName, nodeTmpl);

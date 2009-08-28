@@ -31,6 +31,7 @@ package net.sf.orcc.backends.java;
 import java.io.IOException;
 
 import net.sf.orcc.backends.c.CActorPrinter;
+import net.sf.orcc.backends.c.VarDefPrinter;
 
 /**
  * Actor printer.
@@ -47,7 +48,11 @@ public class JavaActorPrinter extends CActorPrinter {
 	 *             If the template file could not be read.
 	 */
 	public JavaActorPrinter() throws IOException {
-		super("Java_actor", new JavaTypePrinter());
+		super("Java_actor");
+		constPrinter = new JavaConstPrinter(group);
+		typePrinter = new JavaTypePrinter();
+		varDefPrinter = new VarDefPrinter(group, typePrinter);
+		exprPrinter = new JavaExprPrinter(varDefPrinter);
 	}
 
 }

@@ -20,21 +20,21 @@ int $bcast.id$_scheduler() {
 >>
 
 struct_fifo(fifo) ::= <<
-static $fifo.type$ array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
-static struct fifo_s fifo_$fifo.count$ = { sizeof($fifo.type$), $fifo.size$, (char *)array_$fifo.count$, 0, 0 };
+//static $fifo.type$ array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
+//static struct fifo_s fifo_$fifo.count$ = { sizeof($fifo.type$), $fifo.size$, (char *)array_$fifo.count$, 0, 0 };
 
 >>
 
 ptr_fifo(fifo) ::= <<
-struct fifo_s *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
-struct fifo_s *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
+//struct fifo_s *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
+//struct fifo_s *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
 
 >>
 
 network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
 // Generated from "$name$"
 
-#include <locale.h>
+/*#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -79,7 +79,7 @@ int __cdecl main(int argc, char *argv[], char *env[]) {
 	pause();
 
 	return 0;
-}
+}*/
 
 >>
 

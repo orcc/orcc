@@ -54,15 +54,17 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class CActorPrinter {
 
-	private ConstPrinter constPrinter;
+	protected ConstPrinter constPrinter;
 
-	private StringTemplateGroup group;
+	protected ExprToString exprPrinter;
+
+	protected StringTemplateGroup group;
 
 	private StringTemplate template;
 
-	private TypeToString typeVisitor;
+	protected TypeToString typePrinter;
 
-	private VarDefPrinter varDefPrinter;
+	protected VarDefPrinter varDefPrinter;
 
 	/**
 	 * Creates a new network printer with the template "C.st".
@@ -71,7 +73,12 @@ public class CActorPrinter {
 	 *             If the template file could not be read.
 	 */
 	public CActorPrinter() throws IOException {
-		this("C_actor", new TypeToString());
+		this("C_actor");
+
+		constPrinter = new ConstPrinter(group);
+		typePrinter = new TypeToString();
+		varDefPrinter = new VarDefPrinter(group, typePrinter);
+		exprPrinter = new ExprToString(varDefPrinter);
 	}
 
 	/**
@@ -82,12 +89,8 @@ public class CActorPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected CActorPrinter(String name, TypeToString visitor)
-			throws IOException {
+	protected CActorPrinter(String name) throws IOException {
 		group = new PluginGroupLoader().loadGroup(name);
-
-		constPrinter = new ConstPrinter(group);
-		typeVisitor = visitor;
 	}
 
 	/**
@@ -106,7 +109,7 @@ public class CActorPrinter {
 
 		// return type
 		AbstractType type = proc.getReturnType();
-		procTmpl.setAttribute("type", typeVisitor.toString(type));
+		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters
 		for (VarDef param : proc.getParameters()) {
@@ -122,7 +125,7 @@ public class CActorPrinter {
 
 		// body
 		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
-				actorName, varDefPrinter);
+				actorName, varDefPrinter, exprPrinter);
 		for (AbstractNode node : proc.getNodes()) {
 			node.accept(printer);
 		}
@@ -152,8 +155,7 @@ public class CActorPrinter {
 		List<String> ports = new ArrayList<String>();
 		fillPorts(ports, actor.getInputs());
 		fillPorts(ports, actor.getOutputs());
-
-		varDefPrinter = new VarDefPrinter(group, ports, typeVisitor);
+		varDefPrinter.setPortList(ports);
 
 		setAttributes(actor);
 
