@@ -51,6 +51,8 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.jgrapht.graph.DirectedMultigraph;
 
+import net.sf.orcc.backends.c.TypeToString;
+
 /**
  * LLVM Network printer.
  * 
@@ -62,6 +64,8 @@ public class NetworkPrinter {
 	private StringTemplateGroup group;
 
 	private StringTemplate template;
+	
+	private TypeToString typeVisitor;
 
 	/**
 	 * Creates a new network printer with the template "LLVM.st".
@@ -70,7 +74,7 @@ public class NetworkPrinter {
 	 *             If the template file could not be read.
 	 */
 	public NetworkPrinter() throws IOException {
-		this("LLVM");
+		this("LLVM", new TypeToString());
 	}
 
 	/**
@@ -81,8 +85,10 @@ public class NetworkPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected NetworkPrinter(String name) throws IOException {
+	protected NetworkPrinter(String name, TypeToString typeVisitor)
+			throws IOException {
 		group = new PluginGroupLoader().loadGroup(name);
+		this.typeVisitor = typeVisitor;
 	}
 
 	/**
@@ -151,7 +157,7 @@ public class NetworkPrinter {
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("id", bcast.getId());
 				AbstractType type = bcast.getType();
-				attrs.put("type", new TypeToString(type).toString());
+				attrs.put("type", typeVisitor.toString(type));
 
 				List<Integer> num = new ArrayList<Integer>();
 				for (int i = 0; i < bcast.getNumOutput(); i++) {
@@ -200,7 +206,7 @@ public class NetworkPrinter {
 			Map<String, Object> attrs = new HashMap<String, Object>();
 			attrs.put("count", fifoCount);
 			attrs.put("size", size);
-			attrs.put("type", new TypeToString(type).toString());
+			attrs.put("type", typeVisitor.toString(type));
 			attrs.put("source", source.getId());
 			attrs.put("src_port", connection.getSource().getName());
 			attrs.put("target", target.getId());

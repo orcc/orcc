@@ -26,62 +26,64 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm;
+package net.sf.orcc.backends.llvm.nodes;
 
-import java.io.File;
-import java.io.IOException;
-
-import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.backends.llvm.transforms.AdaptNodeTransformation;
-
-import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.nodes.NodeVisitor;
 
 /**
- * LLVM back-end.
- * 
- * @author Jérôme GORIN
+ * @author Matthieu Wipliez
  * 
  */
-public class LLVMBackendImpl extends AbstractBackend implements IBackend {
+public class LoadFifo extends AbstractLLVMNode {
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				new LLVMBackendImpl().generateCode(args[0], 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err.println("Usage: LLVMBackendImpl <flattened XDF network>");
-		}
-	}
+	private String fifoName;
 
-	private ActorPrinterTemplate printer;
+	private int numTokens;
 
-	public LLVMBackendImpl() throws IOException {
-		printer = new ActorPrinterTemplate();
+	private VarDef varDef;
+
+	public LoadFifo(int id, Location location, String fifoName, VarDef varDef) {
+		super(id, location);
+		this.fifoName = fifoName;
+		this.varDef = varDef;
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws Exception {
-		
-		new AdaptNodeTransformation(actor);
-		String outputName = path + File.separator + id + ".s";
-		printer.printActor(outputName, actor);
+	public void accept(LLVMNodeVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
+
+	public String getFifoName() {
+		return fifoName;
+	}
+
+	public int getNumTokens() {
+		return numTokens;
+	}
+
+	public VarDef getVarDef() {
+		return varDef;
+	}
+
+	public void setFifoName(String fifoName) {
+		this.fifoName = fifoName;
+	}
+
+	public void setNumTokens(int numTokens) {
+		this.numTokens = numTokens;
+	}
+
+	public void setVar(VarDef varDef) {
+		this.varDef = varDef;
 	}
 
 	@Override
-	protected void printNetwork(Network network) throws Exception {
-		NetworkPrinter networkPrinter = new NetworkPrinter();
-		String outputName = path + File.separator + network.getName() + ".cpp";
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
+	public String toString() {
+		return varDef + " = loadFifo(" + fifoName + ", " + numTokens + ")";
 	}
+
 }

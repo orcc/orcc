@@ -30,10 +30,8 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.List;
 
-import net.sf.orcc.backends.c.nodes.CNodeVisitor;
-import net.sf.orcc.backends.c.nodes.DecrementNode;
-import net.sf.orcc.backends.c.nodes.IncrementNode;
-import net.sf.orcc.backends.c.nodes.SelfAssignment;
+import net.sf.orcc.backends.llvm.nodes.LLVMNodeVisitor;
+import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
@@ -59,7 +57,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public class NodePrinterTemplate implements CNodeVisitor {
+public class NodePrinterTemplate implements LLVMNodeVisitor {
 
 	private String actorName;
 
@@ -113,15 +111,6 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	}
 
 	@Override
-	public void visit(DecrementNode node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("decrementNode");
-		VarDef varDef = node.getVar();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
-
-		template.setAttribute(attrName, nodeTmpl);
-	}
-
-	@Override
 	public void visit(EmptyNode node, Object... args) {
 		// nothing to print
 	}
@@ -168,15 +157,6 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		// restore previous template and attribute name
 		attrName = previousAttrName;
 		template = previousTempl;
-		template.setAttribute(attrName, nodeTmpl);
-	}
-
-	@Override
-	public void visit(IncrementNode node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("incrementNode");
-		VarDef varDef = node.getVar();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
-
 		template.setAttribute(attrName, nodeTmpl);
 	}
 
@@ -246,22 +226,19 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	}
 
 	@Override
-	public void visit(ReturnNode node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("returnNode");
+	public void visit(LoadFifo node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("loadFifo");
 
-		ExprToString expr = new ExprToString(varDefPrinter, node.getValue());
-		nodeTmpl.setAttribute("expr", expr.toString());
+		// varDef contains the variable (with the same name as the port)
+		nodeTmpl.setAttribute("actorName", actorName);
+		nodeTmpl.setAttribute("fifoName", node.getFifoName());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
-
+	
 	@Override
-	public void visit(SelfAssignment node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("selfAssignmentNode");
-
-		VarDef varDef = node.getVar();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
-		nodeTmpl.setAttribute("op", ExprToString.toString(node.getOp()));
+	public void visit(ReturnNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("returnNode");
 
 		ExprToString expr = new ExprToString(varDefPrinter, node.getValue());
 		nodeTmpl.setAttribute("expr", expr.toString());

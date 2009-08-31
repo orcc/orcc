@@ -43,7 +43,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 
 /**
  * 
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
 public class ExprToString implements ExprVisitor {
