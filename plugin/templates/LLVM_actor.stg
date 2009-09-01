@@ -78,7 +78,7 @@ hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
 
 // if node
 ifNode(expr, thenNodes, elseNodes) ::= <<
-	br i1 $expr$, label %bb, label %bb1
+	br $expr$, label %bb, label %bb1
 
 bb:
 $thenNodes$ $if(elseNodes)$ 
@@ -89,6 +89,12 @@ $elseNodes$ $endif$$\n$
 // increment node
 incrementNode(var) ::= <<
 $var$++;
+
+>>
+
+// label node
+labelNode(name) ::= <<
+$name$:
 
 >>
 
@@ -106,14 +112,19 @@ peekNode(typevar, var, actorName, fifoName, numTokens) ::= <<
 
 // read node
 readNode(typevar, var, actorName, fifoName, numTokens) ::= <<
-	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
 	call void @lff_read(%struct.lff_t* %$actorName$_$fifoName$, $typevar$* $var$)
+
+>>
+
+// loadfifo node
+loadFifo(actorName, fifoName) ::= <<
+	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
 
 >>
 
 // return node
 returnNode(expr) ::= <<
-return $expr$;
+	ret $expr$
 
 >>
 
@@ -155,10 +166,7 @@ $if(locals)$
 
 $endif$
 $nodes$
-	br label %return
-	
-return:
-	ret void
+
 }
 >>
 

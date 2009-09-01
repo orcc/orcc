@@ -28,18 +28,45 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.VarDef;
 
 /**
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
-public interface LLVMNodeVisitor extends NodeVisitor {
+
+public class BrNode extends AbstractLLVMNode {
+
+	private LabelNode LabelTrue;
 	
-	public void visit(LoadFifo node, Object... args);
+	private LabelNode LabelFalse;
+
+	private VarDef varDef;
+
+	public BrNode(int id, Location location, LabelNode LabelTrue, LabelNode LabelFalse,  VarDef varDef) {
+		super(id, location);
+		this.LabelTrue = LabelTrue;
+		this.LabelFalse = LabelFalse;
+		this.varDef = varDef;
+	}
+
+	@Override
+	public void accept(LLVMNodeVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
+
+	public LabelNode getLabelTrueName() {
+		return LabelTrue;
+	}
 	
-	public void visit(BrNode node, Object... args);
-	
-	public void visit(LabelNode node, Object... args);
+	public LabelNode getLabelFalseName() {
+		return LabelFalse;
+	}
+
+	@Override
+	public String toString() {
+		return "br "+ varDef + ", label  "+LabelTrue.getLabelName()+", label "+LabelFalse.getLabelName();
+	}
 
 }

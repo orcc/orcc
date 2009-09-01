@@ -42,11 +42,14 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.ReadNode;
+import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.LoadNode;
+import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
+import net.sf.orcc.ir.expr.TypeExpr;
 
 /**
  * Move writes to the beginning of an action (because we use pointers).
@@ -54,9 +57,13 @@ import net.sf.orcc.backends.llvm.nodes.LoadFifo;
  * @author Jérôme GORIN
  * 
  */
-public class AdaptNodeTransformation extends AbstractNodeVisitor {
+public class ControlFlowTransformation extends AbstractNodeVisitor {
+
+	private int BrCounter;
 	
-	public AdaptNodeTransformation(Actor actor) {
+	private boolean returnDefine;
+	
+	public ControlFlowTransformation(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -87,13 +94,10 @@ public class AdaptNodeTransformation extends AbstractNodeVisitor {
 	public void visit(ReadNode node, Object... args) {
 		List<AbstractExpr> indexes = new ArrayList<AbstractExpr>();
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		/*VarDef varDef = new VarDef(false, false, 0, node.getLocation(), node.getFifoName(), node,
-				null, 0, new VoidType());
-		VarUse varuse = new VarUse(varDef, node);*/
-		LoadFifo loadfifo = new LoadFifo(node.getId(),node.getLocation(), node.getFifoName(), node.getVarDef());		
-		it.previous();
-		it.add(loadfifo);
-		it.next();
+		//it.previous(); 
+		//it.remove();
+	/*	StringExpr expr = new StringExpr(null, " void");
+		it.add(new ReturnNode(0, null, expr));*/
 	}
 	
 	private void visitNodes(List<AbstractNode> nodes) {
@@ -104,7 +108,13 @@ public class AdaptNodeTransformation extends AbstractNodeVisitor {
 	}
 	
 	private void visitProc(Procedure proc) {
-		visitNodes(proc.getNodes());
+		BrCounter = 0;
+		List<AbstractNode> nodes = proc.getNodes();
+		visitNodes(nodes);
+		if (proc.getReturnType() instanceof VoidType)
+		{
+			TypeExpr expr = new TypeExpr(null, new VoidType());
+			nodes.add(new ReturnNode(0, null, expr));
+		}
 	}
-
 }

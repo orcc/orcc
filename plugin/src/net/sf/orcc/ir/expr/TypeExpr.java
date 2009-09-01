@@ -26,20 +26,40 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.type.AbstractType;
 
 /**
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
-public interface LLVMNodeVisitor extends NodeVisitor {
-	
-	public void visit(LoadFifo node, Object... args);
-	
-	public void visit(BrNode node, Object... args);
-	
-	public void visit(LabelNode node, Object... args);
+public class TypeExpr extends AbstractExpr {
+
+	private AbstractType type;
+
+	public TypeExpr(Location location, AbstractType type) {
+		super(location);
+		this.type = type;
+	}
+
+	@Override
+	public void accept(ExprVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
+
+	public AbstractType getType() {
+		return type;
+	}
+
+	public void setType(AbstractType type) {
+		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return type.toString();
+	}
 
 }

@@ -40,6 +40,7 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.expr.TypeExpr;
 
 /**
  * 
@@ -226,6 +227,11 @@ public class ExprToString implements ExprVisitor {
 	@Override
 	public void visit(IntExpr expr, Object... args) {
 		builder.append(expr.getValue());
+	}
+	
+	@Override
+	public void visit(TypeExpr expr, Object... args) {
+		builder.append(expr.getType());
 	}
 
 	@Override

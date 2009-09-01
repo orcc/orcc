@@ -36,6 +36,7 @@ import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.backends.llvm.transforms.AdaptNodeTransformation;
+import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
 
 import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
 
@@ -72,8 +73,8 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		
 		new AdaptNodeTransformation(actor);
+		new ControlFlowTransformation(actor);
 		String outputName = path + File.separator + id + ".s";
 		printer.printActor(outputName, actor);
 	}

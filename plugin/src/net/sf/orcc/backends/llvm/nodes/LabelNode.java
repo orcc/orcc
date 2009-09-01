@@ -28,18 +28,34 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.Location;
+
 
 /**
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
-public interface LLVMNodeVisitor extends NodeVisitor {
-	
-	public void visit(LoadFifo node, Object... args);
-	
-	public void visit(BrNode node, Object... args);
-	
-	public void visit(LabelNode node, Object... args);
+public class LabelNode extends AbstractLLVMNode {
+
+	private String labelName;
+
+	public LabelNode(int id, Location location, String labelName) {
+		super(id, location);
+		this.labelName = labelName;
+	}
+
+	@Override
+	public void accept(LLVMNodeVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
+
+	public String getLabelName() {
+		return labelName;
+	}
+
+	@Override
+	public String toString() {
+		return labelName + ":";
+	}
 
 }

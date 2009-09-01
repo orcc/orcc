@@ -37,6 +37,7 @@ import net.sf.orcc.ir.expr.ExprVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -231,6 +232,11 @@ public class ExprToString implements ExprVisitor {
 		throw new IllegalArgumentException("List expression not supported");
 	}
 
+	@Override
+	public void visit(TypeExpr expr, Object... args) {
+		builder.append(expr.getType());
+	}
+	
 	@Override
 	public void visit(StringExpr expr, Object... args) {
 		builder.append('"');

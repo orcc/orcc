@@ -48,4 +48,5 @@ public interface ExprVisitor {
 
 	public void visit(VarExpr expr, Object... args);
 
+	public void visit(TypeExpr expr, Object... args);
 }

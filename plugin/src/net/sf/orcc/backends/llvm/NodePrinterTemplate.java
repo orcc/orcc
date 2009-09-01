@@ -30,7 +30,9 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.List;
 
+import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.LLVMNodeVisitor;
+import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.expr.AbstractExpr;
@@ -300,6 +302,19 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
+
+		template.setAttribute(attrName, nodeTmpl);
+	}
+	
+	public void visit(BrNode node, Object... args){
+		
+	}
+	
+	public void visit(LabelNode node, Object... args){
+		StringTemplate nodeTmpl = group.getInstanceOf("labelNode");
+
+		// varDef contains the variable (with the same name as the port)
+		nodeTmpl.setAttribute("name", node.getLabelName());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
