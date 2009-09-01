@@ -76,14 +76,21 @@ hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
 
 >>
 
-// if node
-ifNode(expr, thenNodes, elseNodes) ::= <<
-	br $expr$, label %bb, label %bb1
+// brnode
+brNode(expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
+	br $expr$, label %$thenLabelNode$, label %$elseLabelNode$
 
-bb:
-$thenNodes$ $if(elseNodes)$ 
-bb1:	
-$elseNodes$ $endif$$\n$
+$thenLabelNode$:
+$thenNodes$ $if(elseNodes)$	br label %$endLabelNode$
+
+$elseLabelNode$:	
+$elseNodes$	br label %$endLabelNode$
+
+$endLabelNode$:
+$else$ 	br label %$elseLabelNode$
+
+$elseLabelNode$:	
+$endif$ $\n$
 >>
 
 // increment node
@@ -95,6 +102,18 @@ $var$++;
 // label node
 labelNode(name) ::= <<
 $name$:
+
+>>
+
+// join node
+joinNode(target) ::= <<
+phi $target$
+
+>>
+
+// brlabel node
+brlabelNode(name) ::= <<
+	br label %$name$
 
 >>
 
@@ -166,7 +185,6 @@ $if(locals)$
 
 $endif$
 $nodes$
-
 }
 >>
 

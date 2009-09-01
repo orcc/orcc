@@ -45,6 +45,8 @@ import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 
@@ -94,6 +96,17 @@ public class AdaptNodeTransformation extends AbstractNodeVisitor {
 		it.previous();
 		it.add(loadfifo);
 		it.next();
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(StoreNode node, Object... args) {
+	/*	AbstractExpr expr = node.getValue();
+		if (expr instanceof IntExpr){
+			VarDef vardef = new VarDef(false, false, 0, null,
+			null, null, null, 0, null);
+			VarExpr varexpr = new VarExpr
+		}*/
 	}
 	
 	private void visitNodes(List<AbstractNode> nodes) {

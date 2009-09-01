@@ -28,27 +28,58 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
+import java.util.List;
+
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.JoinNode;
+import net.sf.orcc.ir.nodes.NodeVisitor;
 
 /**
  * @author Jérôme GORIN
  * 
  */
+public class BrNode extends AbstractLLVMNode{
 
-public class BrNode extends AbstractLLVMNode {
+	protected AbstractExpr condition;
 
-	private LabelNode LabelTrue;
+	protected List<AbstractNode> elseNodes;
+
+	protected JoinNode joinNode;
+
+	protected List<AbstractNode> thenNodes;
 	
-	private LabelNode LabelFalse;
+	private LabelNode labelTrueNode;
+	
+	private LabelNode labelFalseNode;
+	
+	private LabelNode labelEndNode;
 
-	private VarDef varDef;
-
-	public BrNode(int id, Location location, LabelNode LabelTrue, LabelNode LabelFalse,  VarDef varDef) {
+	public BrNode(int id, Location location, AbstractExpr condition,
+			List<AbstractNode> thenNodes, List<AbstractNode> elseNodes,
+			JoinNode joinNode, LabelNode labelTrueNode, LabelNode labelFalseNode,
+			LabelNode labelEndNode) {
 		super(id, location);
-		this.LabelTrue = LabelTrue;
-		this.LabelFalse = LabelFalse;
-		this.varDef = varDef;
+		this.condition = condition;
+		this.elseNodes = elseNodes;
+		this.joinNode = joinNode;
+		this.thenNodes = thenNodes;
+		this.labelTrueNode = labelTrueNode;
+		this.labelFalseNode = labelFalseNode;
+		this.labelEndNode = labelEndNode;
+	}
+	
+	public BrNode(IfNode node, LabelNode labelTrueNode, LabelNode labelFalseNode, LabelNode labelEndNode) {
+		super(node.getId(), node.getLocation());
+		this.condition = node.getCondition();
+		this.elseNodes = node.getElseNodes();
+		this.joinNode = node.getJoinNode();
+		this.thenNodes = node.getThenNodes();
+		this.labelTrueNode = labelTrueNode;
+		this.labelFalseNode = labelFalseNode;
+		this.labelEndNode = labelEndNode;
 	}
 
 	@Override
@@ -56,17 +87,47 @@ public class BrNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public LabelNode getLabelTrueName() {
-		return LabelTrue;
+
+	public AbstractExpr getCondition() {
+		return condition;
+	}
+
+	public List<AbstractNode> getElseNodes() {
+		return elseNodes;
+	}
+
+	public LabelNode getLabelTrueNode() {
+		return labelTrueNode;
+	}
+
+	public LabelNode getLabelFalseNode() {
+		return labelFalseNode;
 	}
 	
-	public LabelNode getLabelFalseName() {
-		return LabelFalse;
+	public LabelNode getLabelEndNode() {
+		return labelEndNode;
 	}
+
+	public JoinNode getJoinNode() {
+		return joinNode;
+	}
+
+	public List<AbstractNode> getThenNodes() {
+		return thenNodes;
+	}
+
+	public void setCondition(AbstractExpr condition) {
+		this.condition = condition;
+	}
+
+	public void setJoinNode(JoinNode joinNode) {
+		this.joinNode = joinNode;
+	}
+
 
 	@Override
 	public String toString() {
-		return "br "+ varDef + ", label  "+LabelTrue.getLabelName()+", label "+LabelFalse.getLabelName();
+		return "br i1" + condition + ", label "+labelTrueNode+", label "+ labelFalseNode;
 	}
 
 }

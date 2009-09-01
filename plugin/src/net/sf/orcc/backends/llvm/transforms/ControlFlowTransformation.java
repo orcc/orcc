@@ -40,6 +40,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
@@ -49,6 +50,8 @@ import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
+import net.sf.orcc.backends.llvm.nodes.BrNode;
+import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.ir.expr.TypeExpr;
 
 /**
@@ -78,27 +81,22 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			visitProc(action.getScheduler());
 		}
 	}
-/*
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(StoreNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		LoadNode loadnode = new LoadNode(node.getId(),node.getLocation());
-		//store.add(node);
-		//it.remove();
-	}
-*/
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(ReadNode node, Object... args) {
-		List<AbstractExpr> indexes = new ArrayList<AbstractExpr>();
+	public void visit(IfNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		//it.previous(); 
-		//it.remove();
-	/*	StringExpr expr = new StringExpr(null, " void");
-		it.add(new ReturnNode(0, null, expr));*/
+		
+		
+		LabelNode thenLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		LabelNode elseLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		LabelNode endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		
+		BrNode brNode = new BrNode(node, thenLabelNode, elseLabelNode, endLabelNode);
+		
+		it.remove();
+		it.add(brNode);
 	}
+	
 	
 	private void visitNodes(List<AbstractNode> nodes) {
 		ListIterator<AbstractNode> it = nodes.listIterator();

@@ -29,19 +29,22 @@
 package net.sf.orcc.backends.llvm.nodes;
 
 import net.sf.orcc.ir.Location;
-
+import net.sf.orcc.ir.VarDef;
 
 /**
  * @author Jérôme GORIN
  * 
  */
-public class LabelNode extends AbstractLLVMNode {
 
-	private String labelName;
+public class BrLabelNode extends AbstractLLVMNode {
 
-	public LabelNode(int id, Location location, String labelName) {
+	private LabelNode labelNode;
+
+	private VarDef varDef;
+
+	public BrLabelNode(int id, Location location, LabelNode labelNode) {
 		super(id, location);
-		this.labelName = labelName;
+		this.labelNode = labelNode;
 	}
 
 	@Override
@@ -49,13 +52,13 @@ public class LabelNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public String getLabelName() {
-		return labelName;
+	public LabelNode getLabelNode() {
+		return labelNode;
 	}
-
+	
 	@Override
 	public String toString() {
-		return labelName;
+		return "br label %"+ labelNode.toString();
 	}
 
 }

@@ -38,8 +38,10 @@ public interface LLVMNodeVisitor extends NodeVisitor {
 	
 	public void visit(LoadFifo node, Object... args);
 	
-	public void visit(BrNode node, Object... args);
+	public void visit(BrLabelNode node, Object... args);
 	
 	public void visit(LabelNode node, Object... args);
+	
+	public void visit(BrNode node, Object... args);
 
 }
