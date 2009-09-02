@@ -88,8 +88,17 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		
 		
 		LabelNode thenLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		visitNodes(node.getThenNodes());
+		
 		LabelNode elseLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
-		LabelNode endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		List<AbstractNode> elseNodes = node.getElseNodes();
+		LabelNode endLabelNode = null;
+		
+		if (!elseNodes.isEmpty())
+		{
+			visitNodes(elseNodes);
+			endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		}
 		
 		BrNode brNode = new BrNode(node, thenLabelNode, elseLabelNode, endLabelNode);
 		

@@ -185,16 +185,34 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 	public void visit(JoinNode node, Object... args) {
 		// there is nothing to print.
 		List<PhiAssignment> phis = node.getPhis();
-		if (!phis.isEmpty()) {
+		if (!phis.isEmpty()) {		
 			for (PhiAssignment phi : phis) {
+				int i = 0;
+				
 				VarDef varDef = phi.getVarDef();
+				List<VarUse> varuses = phi.getVars();
+				
+				TypeToString type = new TypeToString(varDef.getType());
 				//VarDef source = phi.getVars().get(phiIndex).getVarDef();
 				StringTemplate nodeTmpl = group.getInstanceOf("joinNode");
 
 				// varDef contains the variable (with the same name as the port)
 				nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef));
-
+				nodeTmpl.setAttribute("type", type.toString());
+				for (VarUse varuse : varuses)
+				{
+					StringTemplate phiTmpl = group.getInstanceOf("phiNode");
+					VarDef value = varuse.getVarDef();
+					
+					// name
+					phiTmpl.setAttribute("value", varDefPrinter.getVarDefName(value));
+					phiTmpl.setAttribute("label", (LabelNode) args[i++]);
+					
+					nodeTmpl.setAttribute("phiNode", phiTmpl);
+				}
+				
 				template.setAttribute(attrName, nodeTmpl);
+				
 			}
 		}
 	}
