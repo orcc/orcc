@@ -88,27 +88,19 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 	@Override
 	public void visit(IfNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		
-		LabelNode thenLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
-		visitNodes(node.getThenNodes());
-		
-		LabelNode elseLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		List<AbstractNode> thenNodes = node.getThenNodes();
 		List<AbstractNode> elseNodes = node.getElseNodes();
-		LabelNode endLabelNode = null;
 		
-		if (!elseNodes.isEmpty())
-		{
-			visitNodes(elseNodes);
-			endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		
+		if (thenNodes.isEmpty()&&elseNodes.isEmpty()){
+			SelectNodeCreate(node);
+		} else { 
+			BrNode brNode = BrNodeCreate(node);
+			it.remove();
+			it.add(brNode);
 		}
-		
-		BrNode brNode = new BrNode(node, thenLabelNode, elseLabelNode, endLabelNode);
-		
-		it.remove();
-		it.add(brNode);
-		
+
 	}
-		
 	
 	private void visitNodes(List<AbstractNode> nodes) {
 		ListIterator<AbstractNode> it = nodes.listIterator();
@@ -129,4 +121,73 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		}
 	}
 	
+	private BrNode SelectNodeCreate(IfNode node) {
+		
+		// Get IfNode attributes
+		int id = node.getId();
+		Location location = node.getLocation();
+		AbstractExpr condition = node.getCondition();
+		List<AbstractNode> thenNodes = node.getThenNodes();
+		List<AbstractNode> elseNodes = node.getElseNodes();
+		JoinNode joinNode = node.getJoinNode();
+		
+		//Create LabelNode
+		LabelNode thenLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		
+		//If thenNode is empty switch with elseNode 
+		if (thenNodes.isEmpty())
+		{
+			thenNodes = elseNodes;
+			elseNodes.clear();
+		}
+		
+		//Continue transformation on thenNode
+		visitNodes(thenNodes);
+			
+		//Create label for elseNode
+		LabelNode elseLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		LabelNode endLabelNode = null;
+		
+		if (!elseNodes.isEmpty()){
+			visitNodes(elseNodes);
+			endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));	
+		}
+		
+		return new BrNode(id, location, condition, thenNodes, elseNodes, joinNode, thenLabelNode, elseLabelNode, endLabelNode);
+	}
+	
+	private BrNode BrNodeCreate(IfNode node) {
+		
+		// Get IfNode attributes
+		int id = node.getId();
+		Location location = node.getLocation();
+		AbstractExpr condition = node.getCondition();
+		List<AbstractNode> thenNodes = node.getThenNodes();
+		List<AbstractNode> elseNodes = node.getElseNodes();
+		JoinNode joinNode = node.getJoinNode();
+		
+		//Create LabelNode
+		LabelNode thenLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		
+		//If thenNode is empty switch with elseNode 
+		if (thenNodes.isEmpty())
+		{
+			thenNodes = elseNodes;
+			elseNodes.clear();
+		}
+		
+		//Continue transformation on thenNode
+		visitNodes(thenNodes);
+			
+		//Create label for elseNode
+		LabelNode elseLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		LabelNode endLabelNode = null;
+		
+		if (!elseNodes.isEmpty()){
+			visitNodes(elseNodes);
+			endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));	
+		}
+		
+		return new BrNode(id, location, condition, thenNodes, elseNodes, joinNode, thenLabelNode, elseLabelNode, endLabelNode);
+	}
 }
