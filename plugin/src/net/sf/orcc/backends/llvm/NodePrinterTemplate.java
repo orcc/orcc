@@ -90,6 +90,8 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(AssignVarNode node, Object... args) {
+		AbstractExpr Value = node.getValue();
+
 		StringTemplate nodeTmpl = group.getInstanceOf("assignVarNode");
 
 		// varDef contains the variable (with the same name as the port)

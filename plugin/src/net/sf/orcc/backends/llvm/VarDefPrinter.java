@@ -89,26 +89,29 @@ public class VarDefPrinter {
 	public String getVarDefName(VarDef varDef) {
 		String name;
 		
-		if (varDef.isGlobal()) {
-			name = "@";
-		}else{
-			name = "%";
-		}
-		
-		name += varDef.getName();
-
-		
-		if (varDef.hasSuffix()) {
-			name += varDef.getSuffix();
-		}
-
-		if (!varDef.isGlobal()) {
-			int index = varDef.getIndex();
-			if (index != 0) {
-				name += "_" + varDef.getIndex();
+		if(!varDef.isConstant()){
+			if (varDef.isGlobal()) {
+				name = "@";
+			}else {
+				name = "%";
+			}				
+			name += varDef.getName();
+	
+			
+			if (varDef.hasSuffix()) {
+				name += varDef.getSuffix();
 			}
+	
+			if (!varDef.isGlobal()) {
+				int index = varDef.getIndex();
+				if (index != 0) {
+					name += "_" + varDef.getIndex();
+				}
+			}
+		}else{
+			ExprToString expr = new ExprToString(this, varDef.getConstant());
+			name = expr.toString();
 		}
-
 		return name;
 	}
 }

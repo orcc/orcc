@@ -42,12 +42,18 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.ReadNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.transforms.ConstantPropagation;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.backends.llvm.nodes.BrNode;
+import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 
 /**
@@ -57,6 +63,8 @@ import net.sf.orcc.backends.llvm.nodes.LoadFifo;
  * 
  */
 public class AdaptNodeTransformation extends AbstractNodeVisitor {
+	
+	ConstantPropagation constantPropagation;
 	
 	public AdaptNodeTransformation(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
@@ -73,16 +81,18 @@ public class AdaptNodeTransformation extends AbstractNodeVisitor {
 			visitProc(action.getScheduler());
 		}
 	}
-/*
+
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(StoreNode node, Object... args) {
+	public void visit(AssignVarNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		LoadNode loadnode = new LoadNode(node.getId(),node.getLocation());
-		//store.add(node);
-		//it.remove();
+		AbstractExpr value = node.getValue();
+		if (value instanceof BooleanExpr)
+		{
+			//it.remove();
+			//((IntExpr) value).setValue(3);
+			
+		}
 	}
-*/
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -101,12 +111,15 @@ public class AdaptNodeTransformation extends AbstractNodeVisitor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(StoreNode node, Object... args) {
-	/*	AbstractExpr expr = node.getValue();
-		if (expr instanceof IntExpr){
-			VarDef vardef = new VarDef(false, false, 0, null,
-			null, null, null, 0, null);
-			VarExpr varexpr = new VarExpr
-		}*/
+
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(IfNode node, Object... args) {
+		visitNodes(node.getThenNodes());
+		visitNodes(node.getElseNodes());
+		visit(node.getJoinNode(),args);
 	}
 	
 	private void visitNodes(List<AbstractNode> nodes) {

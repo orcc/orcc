@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.AbstractType;
 
@@ -86,6 +87,15 @@ public class VarDef implements Comparable<VarDef> {
 	 */
 	private AbstractType type;
 
+	
+	/**
+	 * Used for constant's propagation
+	 */
+	private boolean constant;
+	
+	private AbstractExpr constantExpr;
+	
+	
 	public VarDef(boolean assignable, boolean global, int index, Location loc,
 			String name, AbstractNode node, List<VarUse> references,
 			Integer suffix, AbstractType type) {
@@ -98,6 +108,8 @@ public class VarDef implements Comparable<VarDef> {
 		this.references = references;
 		this.suffix = suffix;
 		this.type = type;
+		this.constant = false;
+		constantExpr = null; 
 	}
 
 	public VarDef(VarDef other) {
@@ -110,6 +122,8 @@ public class VarDef implements Comparable<VarDef> {
 		references = new ArrayList<VarUse>();
 		suffix = other.suffix;
 		type = other.type;
+		this.constant = false;
+		constantExpr = null;
 	}
 
 	@Override
@@ -211,5 +225,17 @@ public class VarDef implements Comparable<VarDef> {
 	public String toString() {
 		return name;
 	}
+	
+	public void setConstant(AbstractExpr expr) {
+		constantExpr = expr;
+		constant = true;
+	}
+	
+	public boolean isConstant() {
+		return constant;
+	}
 
+	public AbstractExpr getConstant() {
+		return constantExpr;
+	}
 }

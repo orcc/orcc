@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.transforms;
+package net.sf.orcc.ir.transforms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,23 +41,22 @@ import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.JoinNode;
+import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.ReadNode;
-import net.sf.orcc.ir.nodes.ReturnNode;
-import net.sf.orcc.ir.nodes.LoadNode;
-import net.sf.orcc.ir.nodes.JoinNode;
-import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
-import net.sf.orcc.backends.llvm.nodes.LabelNode;
+import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.type.VoidType;
-import net.sf.orcc.backends.llvm.nodes.LoadFifo;
-import net.sf.orcc.backends.llvm.nodes.BrNode;
-import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.ir.expr.TypeExpr;
-import net.sf.orcc.ir.actor.Procedure;
+import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.backends.llvm.nodes.BrNode;
+import net.sf.orcc.backends.llvm.nodes.LabelNode;
+import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 
 /**
  * Move writes to the beginning of an action (because we use pointers).
@@ -65,11 +64,9 @@ import net.sf.orcc.ir.actor.Procedure;
  * @author Jérôme GORIN
  * 
  */
-public class ControlFlowTransformation extends AbstractNodeVisitor {
-
-	private int BrCounter;
-	
-	public ControlFlowTransformation(Actor actor) {
+public class ConstantPropagation extends AbstractNodeVisitor {
+		
+	public ConstantPropagation(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -87,26 +84,19 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 
 	@Override
 	public void visit(IfNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		
-		LabelNode thenLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
 		visitNodes(node.getThenNodes());
-		
-		LabelNode elseLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
-		List<AbstractNode> elseNodes = node.getElseNodes();
-		LabelNode endLabelNode = null;
-		
-		if (!elseNodes.isEmpty())
+		visitNodes(node.getElseNodes());	
+	}
+	
+	@Override
+	public void visit(AssignVarNode node, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		if (node.getValue() instanceof BooleanExpr)
 		{
-			visitNodes(elseNodes);
-			endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+			VarDef vardef = node.getVar();
+			vardef.setConstant(node.getValue());
+			it.remove();
 		}
-		
-		BrNode brNode = new BrNode(node, thenLabelNode, elseLabelNode, endLabelNode);
-		
-		it.remove();
-		it.add(brNode);
-		
 	}
 		
 	
@@ -118,15 +108,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 	}
 	
 	private void visitProc(Procedure proc) {
-		List<AbstractNode> nodes = proc.getNodes();
-		BrCounter = 0;
-		
+		List<AbstractNode> nodes = proc.getNodes();		
 		visitNodes(nodes);
-		if (proc.getReturnType() instanceof VoidType)
-		{
-			TypeExpr expr = new TypeExpr(null, new VoidType());
-			nodes.add(new ReturnNode(0, null, expr));
-		}
 	}
-	
 }
