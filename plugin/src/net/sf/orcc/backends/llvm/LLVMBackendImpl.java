@@ -39,8 +39,6 @@ import net.sf.orcc.ir.transforms.ConstantPropagation;
 import net.sf.orcc.backends.llvm.transforms.AdaptNodeTransformation;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
 
-import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
-
 /**
  * LLVM back-end.
  * 

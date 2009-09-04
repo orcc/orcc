@@ -35,7 +35,6 @@ import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
 
 /**
  * @author Jérôme GORIN

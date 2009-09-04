@@ -28,25 +28,27 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
+import net.sf.orcc.backends.llvm.TypeToString;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.expr.AbstractExpr;
+
 
 /**
  * @author Jérôme GORIN
  * 
  */
-public class LoadFifo extends AbstractLLVMNode {
+public class BitcastNode extends AbstractLLVMNode {
 
-	private String fifoName;
+	private AbstractExpr value;
+	
+	private VarDef var;
 
-	private int numTokens;
 
-	private VarDef varDef;
-
-	public LoadFifo(int id, Location location, String fifoName, VarDef varDef) {
+	public BitcastNode(int id, Location location, VarDef var, AbstractExpr value) {
 		super(id, location);
-		this.fifoName = fifoName;
-		this.varDef = varDef;
+		this.var = var;
+		this.value = value;
 	}
 
 	@Override
@@ -54,33 +56,28 @@ public class LoadFifo extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public String getFifoName() {
-		return fifoName;
-	}
 
-	public int getNumTokens() {
-		return numTokens;
+	public AbstractExpr getValue() {
+		return value;
 	}
-
-	public VarDef getVarDef() {
-		return varDef;
+	
+	public void setValue(AbstractExpr value) {
+		this.value = value;
 	}
-
-	public void setFifoName(String fifoName) {
-		this.fifoName = fifoName;
+	
+	public VarDef getVar() {
+		return var;
 	}
-
-	public void setNumTokens(int numTokens) {
-		this.numTokens = numTokens;
+	
+	public void setVar(VarDef var) {
+		this.var = var;
 	}
-
-	public void setVar(VarDef varDef) {
-		this.varDef = varDef;
-	}
-
+	
 	@Override
 	public String toString() {
-		return varDef + " = loadFifo(" + fifoName + ", " + numTokens + ")";
+		TypeToString varType = new TypeToString(var.getType());
+		
+		return var + " = bitcast " + value.toString() + " to " + varType.toString();
 	}
 
 }

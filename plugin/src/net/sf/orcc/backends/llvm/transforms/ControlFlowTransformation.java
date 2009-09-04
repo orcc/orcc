@@ -28,13 +28,10 @@
  */
 package net.sf.orcc.backends.llvm.transforms;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -42,21 +39,13 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
-import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
-import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
-import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.ir.expr.AbstractExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.VoidType;
-import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
-import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.ir.expr.TypeExpr;
 
@@ -138,6 +127,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public void visit(IfNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		List<AbstractNode> thenNodes = node.getThenNodes();

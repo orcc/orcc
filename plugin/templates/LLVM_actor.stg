@@ -16,9 +16,13 @@ fifo(actorName, portName) ::= <<
 typedef(typeValue, sizeValue) ::= <<
 $if(sizeValue)$
 [$sizeValue$ x $typeValue$]
+
 $else$
 $typeValue$
-$endif$>>
+
+$endif$
+
+>>
 
 // the values of a list: {val1, val2, ..., valn}
 listValue(value) ::= <<
@@ -88,6 +92,12 @@ selectNode(var, type, expr, trueVar, falseVar) ::= <<
 
 >>
 
+// bitcastnode
+BitcastNode(var, type, expr) ::= <<
+	$var$ = bitcast $expr$ to $type$
+
+>>
+
 // brnode
 brNode(expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
 	br $expr$, label %$thenLabelNode$, label %$elseLabelNode$
@@ -142,8 +152,8 @@ peekNode(typevar, var, actorName, fifoName, numTokens) ::= <<
 >>
 
 // read node
-readNode(typevar, var, actorName, fifoName, numTokens) ::= <<
-	call void @lff_read(%struct.lff_t* %$actorName$_$fifoName$, $typevar$* $var$)
+readNode(var, actorName, fifoName, numTokens) ::= <<
+	call void @lff_read(%struct.lff_t* %$actorName$_$fifoName$, i8* $var$)
 
 >>
 

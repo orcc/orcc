@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.llvm.nodes;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.VarDef;
 
 /**
  * @author Jérôme GORIN
@@ -39,8 +38,6 @@ import net.sf.orcc.ir.VarDef;
 public class BrLabelNode extends AbstractLLVMNode {
 
 	private LabelNode labelNode;
-
-	private VarDef varDef;
 
 	public BrLabelNode(int id, Location location, LabelNode labelNode) {
 		super(id, location);
