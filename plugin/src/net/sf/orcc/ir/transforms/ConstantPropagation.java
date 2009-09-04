@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -76,6 +75,7 @@ public class ConstantPropagation extends AbstractNodeVisitor {
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public void visit(AssignVarNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		if ((node.getValue() instanceof BooleanExpr) || 

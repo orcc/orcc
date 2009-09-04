@@ -57,6 +57,7 @@ import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
+import net.sf.orcc.backends.llvm.nodes.SelectNode;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -142,12 +143,16 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(BrNode node, Object... args) {
+		LabelNode labelTrueNode =  node.getLabelTrueNode();
+		LabelNode labelFalseNode =  node.getLabelFalseNode();
+		
 		StringTemplate nodeTmpl = group.getInstanceOf("brNode");
-
+		
+		
 		ExprToString expr = new ExprToString(varDefPrinter, node.getCondition());
 		nodeTmpl.setAttribute("expr", expr.toString());
-		nodeTmpl.setAttribute("thenLabelNode", node.getLabelTrueNode());
-		nodeTmpl.setAttribute("elseLabelNode", node.getLabelFalseNode());
+		nodeTmpl.setAttribute("thenLabelNode", labelTrueNode);
+		nodeTmpl.setAttribute("elseLabelNode", labelFalseNode);
 		
 		// save current template
 		StringTemplate previousTempl = template;
@@ -166,6 +171,8 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 			for (AbstractNode subNode : elseNodes) {
 				subNode.accept(this, args);
 			}
+		} else {
+			labelFalseNode = node.getLabelEntryNode();
 		}
 		
 		// restore previous template and attribute name
@@ -174,13 +181,48 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		template.setAttribute(attrName, nodeTmpl);
 		
 		JoinNode joinNode = node.getJoinNode();
-		joinNode.accept(this,  node.getLabelTrueNode(), node.getLabelFalseNode());
+		joinNode.accept(this,  labelTrueNode, labelFalseNode);
 	}
 
 	
 	@Override
 	public void visit(IfNode node, Object... args) {
 		
+	}
+	
+	@Override
+	public void visit(SelectNode node, Object... args) {
+
+		// there is nothing to print.
+		List<PhiAssignment> phis = node.getPhis();
+		AbstractExpr condition = node.getCondition();
+		
+		if (!phis.isEmpty()) {		
+			for (PhiAssignment phi : phis) {
+				
+				VarDef varDef = phi.getVarDef();
+				List<VarUse> varuses = phi.getVars();
+				
+				TypeToString type = new TypeToString(varDef.getType());
+				StringTemplate nodeTmpl = group.getInstanceOf("selectNode");
+
+				
+				// varDef contains the variable (with the same name as the port)
+				nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+				nodeTmpl.setAttribute("type", type.toString());
+				
+				ExprToString expr = new ExprToString(varDefPrinter, condition);
+				nodeTmpl.setAttribute("expr", expr.toString());
+				
+				VarDef varDefTrue = varuses.get(0).getVarDef();
+				VarDef varDefFalse = varuses.get(1).getVarDef();
+				
+				nodeTmpl.setAttribute("trueVar", varDefPrinter.getVarDefName(varDefTrue));
+				nodeTmpl.setAttribute("falseVar", varDefPrinter.getVarDefName(varDefFalse));
+				
+				template.setAttribute(attrName, nodeTmpl);
+			}
+		}
 	}
 
 	@Override
@@ -195,7 +237,6 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 				List<VarUse> varuses = phi.getVars();
 				
 				TypeToString type = new TypeToString(varDef.getType());
-				//VarDef source = phi.getVars().get(phiIndex).getVarDef();
 				StringTemplate nodeTmpl = group.getInstanceOf("joinNode");
 
 				// varDef contains the variable (with the same name as the port)

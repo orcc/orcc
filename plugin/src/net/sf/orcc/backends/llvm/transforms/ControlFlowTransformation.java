@@ -41,6 +41,7 @@ import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
@@ -56,8 +57,8 @@ import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
+import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.ir.expr.TypeExpr;
-import net.sf.orcc.ir.actor.Procedure;
 
 /**
  * Move writes to the beginning of an action (because we use pointers).
@@ -68,6 +69,7 @@ import net.sf.orcc.ir.actor.Procedure;
 public class ControlFlowTransformation extends AbstractNodeVisitor {
 
 	private int BrCounter;
+	private LabelNode labelNode;
 	
 	public ControlFlowTransformation(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
@@ -85,75 +87,14 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		}
 	}
 
-	@Override
-	public void visit(IfNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		List<AbstractNode> thenNodes = node.getThenNodes();
-		List<AbstractNode> elseNodes = node.getElseNodes();
-		
-		
-		if (thenNodes.isEmpty()&&elseNodes.isEmpty()){
-			SelectNodeCreate(node);
-		} else { 
-			BrNode brNode = BrNodeCreate(node);
-			it.remove();
-			it.add(brNode);
-		}
-
-	}
-	
-	private void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
-		while (it.hasNext()) {
-			it.next().accept(this, it);
-		}
-	}
-	
-	private void visitProc(Procedure proc) {
-		List<AbstractNode> nodes = proc.getNodes();
-		BrCounter = 0;
-		
-		visitNodes(nodes);
-		if (proc.getReturnType() instanceof VoidType)
-		{
-			TypeExpr expr = new TypeExpr(null, new VoidType());
-			nodes.add(new ReturnNode(0, null, expr));
-		}
-	}
-	
-	private BrNode SelectNodeCreate(IfNode node) {
-		
-		// Get IfNode attributes
+	private SelectNode SelectNodeCreate(IfNode node) {
 		int id = node.getId();
 		Location location = node.getLocation();
 		AbstractExpr condition = node.getCondition();
-		List<AbstractNode> thenNodes = node.getThenNodes();
-		List<AbstractNode> elseNodes = node.getElseNodes();
 		JoinNode joinNode = node.getJoinNode();
-		
-		//Create LabelNode
-		LabelNode thenLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
-		
-		//If thenNode is empty switch with elseNode 
-		if (thenNodes.isEmpty())
-		{
-			thenNodes = elseNodes;
-			elseNodes.clear();
-		}
-		
-		//Continue transformation on thenNode
-		visitNodes(thenNodes);
-			
-		//Create label for elseNode
-		LabelNode elseLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
-		LabelNode endLabelNode = null;
-		
-		if (!elseNodes.isEmpty()){
-			visitNodes(elseNodes);
-			endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));	
-		}
-		
-		return new BrNode(id, location, condition, thenNodes, elseNodes, joinNode, thenLabelNode, elseLabelNode, endLabelNode);
+		List<PhiAssignment> phis = joinNode.getPhis();
+
+		return new SelectNode(id, location, condition, phis);
 	}
 	
 	private BrNode BrNodeCreate(IfNode node) {
@@ -167,13 +108,15 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		JoinNode joinNode = node.getJoinNode();
 		
 		//Create LabelNode
+		LabelNode entryLabelNode = labelNode;
 		LabelNode thenLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
 		
 		//If thenNode is empty switch with elseNode 
-		if (thenNodes.isEmpty())
+		if (thenNodes.size() == 1 && thenNodes.get(0) instanceof EmptyNode)
 		{
+			List<AbstractNode> tmpNode = thenNodes;
 			thenNodes = elseNodes;
-			elseNodes.clear();
+			elseNodes = tmpNode;
 		}
 		
 		//Continue transformation on thenNode
@@ -181,13 +124,58 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			
 		//Create label for elseNode
 		LabelNode elseLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+		labelNode = elseLabelNode;
 		LabelNode endLabelNode = null;
 		
-		if (!elseNodes.isEmpty()){
+		if (!(thenNodes.size() == 1 && thenNodes.get(0) instanceof EmptyNode)){
 			visitNodes(elseNodes);
-			endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));	
+			endLabelNode = new LabelNode(node.getId(),node.getLocation(), "bb"+ Integer.toString(BrCounter++));
+			labelNode = endLabelNode;
 		}
 		
-		return new BrNode(id, location, condition, thenNodes, elseNodes, joinNode, thenLabelNode, elseLabelNode, endLabelNode);
+		return new BrNode(id, location, condition, thenNodes, elseNodes, joinNode, 
+							entryLabelNode, thenLabelNode, elseLabelNode, endLabelNode);
+	}
+	
+	@Override
+	public void visit(IfNode node, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		List<AbstractNode> thenNodes = node.getThenNodes();
+		List<AbstractNode> elseNodes = node.getElseNodes();
+		
+		
+		if ((thenNodes.size() == 1 && thenNodes.get(0) instanceof EmptyNode)&&
+				(elseNodes.size() == 1 && elseNodes.get(0) instanceof EmptyNode)){
+			
+			SelectNode selectNode = SelectNodeCreate(node);
+			it.remove();
+			it.add(selectNode);
+		} else {
+			BrNode brNode = BrNodeCreate(node);
+			it.remove();
+			it.add(brNode);
+		}
+
+	}
+	
+	private void visitNodes(List<AbstractNode> nodes) {
+		ListIterator<AbstractNode> it = nodes.listIterator();
+
+		while (it.hasNext()) {
+			it.next().accept(this, it);
+		}
+	}
+	
+	private void visitProc(Procedure proc) {
+		List<AbstractNode> nodes = proc.getNodes();
+		BrCounter = 0;
+		labelNode = new LabelNode(0,null, "entry");
+		
+		visitNodes(nodes);
+		if (proc.getReturnType() instanceof VoidType)
+		{
+			TypeExpr expr = new TypeExpr(null, new VoidType());
+			nodes.add(new ReturnNode(0, null, expr));
+		}
 	}
 }

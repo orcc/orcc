@@ -82,6 +82,12 @@ hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
 
 >>
 
+// selectnode
+selectNode(var, type, expr, trueVar, falseVar) ::= <<
+	$var$ = select $expr$, $type$ $trueVar$, $type$ $falseVar$
+
+>>
+
 // brnode
 brNode(expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
 	br $expr$, label %$thenLabelNode$, label %$elseLabelNode$

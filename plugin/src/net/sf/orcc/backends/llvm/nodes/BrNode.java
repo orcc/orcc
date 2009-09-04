@@ -43,13 +43,15 @@ import net.sf.orcc.ir.nodes.NodeVisitor;
  */
 public class BrNode extends AbstractLLVMNode{
 
-	protected AbstractExpr condition;
+	private AbstractExpr condition;
 
-	protected List<AbstractNode> elseNodes;
+	private List<AbstractNode> elseNodes;
 
-	protected JoinNode joinNode;
+	private JoinNode joinNode;
 
-	protected List<AbstractNode> thenNodes;
+	private List<AbstractNode> thenNodes;
+	
+	private LabelNode labelEntryNode;
 	
 	private LabelNode labelTrueNode;
 	
@@ -59,24 +61,26 @@ public class BrNode extends AbstractLLVMNode{
 
 	public BrNode(int id, Location location, AbstractExpr condition,
 			List<AbstractNode> thenNodes, List<AbstractNode> elseNodes,
-			JoinNode joinNode, LabelNode labelTrueNode, LabelNode labelFalseNode,
-			LabelNode labelEndNode) {
+			JoinNode joinNode, LabelNode labelEntryNode, LabelNode labelTrueNode, 
+			LabelNode labelFalseNode, LabelNode labelEndNode) {
 		super(id, location);
 		this.condition = condition;
 		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
 		this.thenNodes = thenNodes;
+		this.labelEntryNode = labelEntryNode;
 		this.labelTrueNode = labelTrueNode;
 		this.labelFalseNode = labelFalseNode;
 		this.labelEndNode = labelEndNode;
 	}
 	
-	public BrNode(IfNode node, LabelNode labelTrueNode, LabelNode labelFalseNode, LabelNode labelEndNode) {
+	public BrNode(IfNode node, LabelNode labelEntryNode, LabelNode labelTrueNode, LabelNode labelFalseNode, LabelNode labelEndNode) {
 		super(node.getId(), node.getLocation());
 		this.condition = node.getCondition();
 		this.elseNodes = node.getElseNodes();
 		this.joinNode = node.getJoinNode();
 		this.thenNodes = node.getThenNodes();
+		this.labelEntryNode = labelEntryNode;
 		this.labelTrueNode = labelTrueNode;
 		this.labelFalseNode = labelFalseNode;
 		this.labelEndNode = labelEndNode;
@@ -96,6 +100,10 @@ public class BrNode extends AbstractLLVMNode{
 		return elseNodes;
 	}
 
+	public LabelNode getLabelEntryNode() {
+		return labelEntryNode;
+	}
+	
 	public LabelNode getLabelTrueNode() {
 		return labelTrueNode;
 	}

@@ -28,22 +28,46 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import java.util.List;
+
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.nodes.PhiAssignment;
 
 /**
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
-public interface LLVMNodeVisitor extends NodeVisitor {
-	
-	public void visit(LoadFifo node, Object... args);
-	
-	public void visit(BrLabelNode node, Object... args);
-	
-	public void visit(LabelNode node, Object... args);
-	
-	public void visit(BrNode node, Object... args);
-	
-	public void visit(SelectNode node, Object... args);
+public class SelectNode extends AbstractLLVMNode{
 
+	private List<PhiAssignment> phis;
+	
+	private AbstractExpr condition;
+
+
+	public SelectNode(int id, Location location, AbstractExpr condition, 
+						List<PhiAssignment> phis) {
+		super(id, location);
+		this.condition = condition;
+		this.phis = phis;
+	}
+
+	@Override
+	public void accept(LLVMNodeVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
+
+
+	public AbstractExpr getCondition() {
+		return condition;
+	}
+
+	public List<PhiAssignment> getPhis() {
+		return phis;
+	}
+	
+	public void setPhis(List<PhiAssignment> phis) {
+		this.phis = phis;
+	}
+	
 }
