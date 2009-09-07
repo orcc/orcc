@@ -134,7 +134,7 @@ public class BrNode extends AbstractLLVMNode{
 
 	@Override
 	public String toString() {
-		return "br i1" + condition + ", label "+labelTrueNode+", label "+ labelFalseNode;
+		return "br i1 " + condition + ", label "+labelTrueNode+", label "+ labelFalseNode;
 	}
 
 }

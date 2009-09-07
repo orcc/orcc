@@ -66,19 +66,19 @@ public class ExprToString implements ExprVisitor {
 		case EXP:
 			return "pow";
 		case GE:
-			return "sge";
+			return "icmp sge";
 		case GT:
-			return "sgt";
+			return "icmp sgt";
 		case LAND:
 			return "&&";
 		case LE:
-			return "sle";
+			return "icmp sle";
 		case LOR:
 			return "||";
 		case LT:
-			return "slt";
+			return "icmp slt";
 		case MINUS:
-			return "-";
+			return "sub";
 		case MOD:
 			return "%";
 		case NE:
@@ -198,7 +198,7 @@ public class ExprToString implements ExprVisitor {
 	
 		BinaryOp op = expr.getOp();
 		
-		builder.append("icmp " + toString(op) + " ");
+		builder.append(toString(op) + " ");
 		
 		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
 			expr.getE1().accept(this, Integer.MAX_VALUE);

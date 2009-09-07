@@ -33,21 +33,31 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.backends.llvm.type.IType;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
-import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.PhiAssignment;
+import net.sf.orcc.ir.nodes.ReturnNode;
+import net.sf.orcc.ir.nodes.JoinNode;
+import net.sf.orcc.ir.nodes.EmptyNode;
+import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.backends.llvm.nodes.LabelNode;
+import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.backends.llvm.nodes.LoadFifo;
-import net.sf.orcc.backends.llvm.nodes.BitcastNode;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.backends.llvm.nodes.BrNode;
+import net.sf.orcc.backends.llvm.nodes.SelectNode;
+import net.sf.orcc.backends.llvm.type.IType;
+import net.sf.orcc.ir.expr.TypeExpr;
 
 /**
  * Move writes to the beginning of an action (because we use pointers).
@@ -55,9 +65,17 @@ import net.sf.orcc.backends.llvm.nodes.BitcastNode;
  * @author Jérôme GORIN
  * 
  */
-public class AdaptNodeTransformation extends AbstractNodeVisitor {
+public class ExpressionTransformation extends AbstractNodeVisitor {
+
+	int exprCounter;
 	
-	public AdaptNodeTransformation(Actor actor) {
+	public ExpressionTransformation(Actor actor) {
+		if (actor.toString().compareTo("clip")==0)
+		{
+			int i=0;
+			i = i+1;
+		}
+		
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -72,58 +90,68 @@ public class AdaptNodeTransformation extends AbstractNodeVisitor {
 			visitProc(action.getScheduler());
 		}
 	}
-
-	@Override
-	public void visit(AssignVarNode node, Object... args) {
-
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(ReadNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-
-		VarDef vardef = new  VarDef(false, false, 0, new Location(),
-				node.getFifoName()+"_addr", null, null,
-				0, new IType(new IntType(8),true));	
-		
-		VarDef exprVarDef =  node.getVarDef();
-		exprVarDef.setType(new IType(exprVarDef.getType(),true));
-			
-		VarUse varUse = new VarUse(node.getVarDef(), null);
-		VarExpr expr = new VarExpr(new Location(), varUse);
-		
-		LoadFifo loadfifo = new LoadFifo(node.getId(),node.getLocation(), node.getFifoName(), node.getVarDef());
-		BitcastNode bitcast = new BitcastNode(node.getId(), node.getLocation(), vardef, expr);
-		node.setVar(vardef);
-		
-		it.previous();
-		it.add(loadfifo);
-		it.add(bitcast);
-		it.next();
-	}
-	
-	@Override
-	public void visit(StoreNode node, Object... args) {
-
-	}
-	
-	@Override
-	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
-		visit(node.getJoinNode(),args);
-	}
 	
 	private void visitNodes(List<AbstractNode> nodes) {
 		ListIterator<AbstractNode> it = nodes.listIterator();
+
 		while (it.hasNext()) {
 			it.next().accept(this, it);
 		}
 	}
 	
-	private void visitProc(Procedure proc) {
-		visitNodes(proc.getNodes());
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(StoreNode node, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		
+		if (node.getValue() instanceof BinaryExpr)
+		{
+			AbstractType targetType = node.getTarget().getVarDef().getType();
+			
+			VarDef vardef = new  VarDef(false, false, exprCounter++, new Location(),
+					"expr", null, null,
+					0, new IType(targetType,false));
+			VarUse varUse = new VarUse(vardef, null);
+			VarExpr expr = new VarExpr(new Location(), varUse);
+			
+			AssignVarNode assignNode = new AssignVarNode(0, new Location(), vardef, node.getValue());
+			node.setValue(expr);
+			
+			it.previous();
+			it.add(assignNode);
+			it.next();
+		}
 	}
-
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(IfNode node, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		
+		if (node.getCondition() instanceof BinaryExpr)
+		{			
+			VarDef vardef = new  VarDef(false, false, exprCounter++, new Location(),
+					"expr", null, null,
+					0, new IType(new BoolType(),false));
+			VarUse varUse = new VarUse(vardef, null);
+			VarExpr expr = new VarExpr(new Location(), varUse);
+			
+			AssignVarNode assignNode = new AssignVarNode(0, new Location(), vardef, node.getCondition());
+			node.setCondition(expr);
+			
+			it.previous();
+			it.add(assignNode);
+			it.next();
+		}
+		
+		visitNodes(node.getThenNodes());
+		visitNodes(node.getElseNodes());
+	}
+	
+	private void visitProc(Procedure proc) {
+		exprCounter=0;
+		
+		List<AbstractNode> nodes = proc.getNodes();		
+		visitNodes(nodes);
+	}
 }
