@@ -93,6 +93,7 @@ public class ActorPrinterTemplate {
 	 * @return a string template
 	 */
 	private StringTemplate applyProc(String actorName, Procedure proc) {
+	
 		StringTemplate procTmpl = group.getInstanceOf("proc");
 
 		// name

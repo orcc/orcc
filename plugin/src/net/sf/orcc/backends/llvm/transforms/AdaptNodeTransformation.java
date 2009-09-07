@@ -33,7 +33,7 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.backends.llvm.type.IType;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -47,6 +47,9 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.transforms.ConstantPropagation;
 import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 
@@ -88,9 +91,11 @@ public class AdaptNodeTransformation extends AbstractNodeVisitor {
 
 		VarDef vardef = new  VarDef(false, false, 0, new Location(),
 				node.getFifoName()+"_addr", null, null,
-				0, new IntType(8));	
+				0, new IType(new IntType(8),true));	
 		
-		
+		VarDef exprVarDef =  node.getVarDef();
+		exprVarDef.setType(new IType(exprVarDef.getType(),true));
+			
 		VarUse varUse = new VarUse(node.getVarDef(), null);
 		VarExpr expr = new VarExpr(new Location(), varUse);
 		

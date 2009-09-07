@@ -36,7 +36,7 @@ public class IntType extends AbstractType {
 
 	public static final String NAME = "int";
 
-	private int size;
+	protected int size;
 
 	public IntType(int size) {
 		super(NAME);

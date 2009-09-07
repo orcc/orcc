@@ -30,6 +30,8 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.List;
 
+import net.sf.orcc.backends.llvm.type.IType;
+
 import net.sf.orcc.ir.VarDef;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -65,8 +67,18 @@ public class VarDefPrinter {
 	public StringTemplate applyVarDef(VarDef varDef) {
 		StringTemplate varDefTmpl = group.getInstanceOf("vardef");
 		varDefTmpl.setAttribute("name", getVarDefName(varDef));
-		TypeToString type = new TypeToString(varDef.getType());
-		varDefTmpl.setAttribute("type", type.toString());
+		
+		if (varDef.getType() instanceof IType)
+		{
+			IType iType = (IType)varDef.getType();
+			
+			TypeToString type = new TypeToString(iType.getType());
+			varDefTmpl.setAttribute("type", type.toString());
+			
+		}else {
+			TypeToString type = new TypeToString(varDef.getType());
+			varDefTmpl.setAttribute("type", type.toString());
+		}
 		
 		// if varDef is a list, => list of dimensions
 		listSizePrinter.setTemplate(varDefTmpl);

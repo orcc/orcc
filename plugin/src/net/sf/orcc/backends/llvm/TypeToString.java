@@ -33,9 +33,10 @@ import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
-import net.sf.orcc.ir.type.TypeVisitor;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.backends.llvm.type.IType;
+import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 
 /**
  * Type to string.
@@ -43,7 +44,7 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class TypeToString implements TypeVisitor {
+public class TypeToString extends LLVMTypeVisitor {
 
 	private StringBuilder builder;
 
@@ -86,6 +87,15 @@ public class TypeToString implements TypeVisitor {
 	@Override
 	public void visit(IntType type) {
 		printInt(type.getSize());
+	}
+	
+	@Override
+	public void visit(IType type) {
+		type.getType().accept(this);
+		if (type.IsPointer())
+		{
+			builder.append("*");
+		}
 	}
 
 	@Override

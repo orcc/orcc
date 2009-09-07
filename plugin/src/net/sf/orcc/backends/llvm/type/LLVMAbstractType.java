@@ -26,42 +26,20 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm;
+package net.sf.orcc.backends.llvm.type;
 
-import  net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
-import net.sf.orcc.ir.type.ListType;
-
-import org.antlr.stringtemplate.StringTemplate;
+import net.sf.orcc.ir.type.AbstractType;
 
 /**
- * Sets the "size" attribute of the given top-level template to the type
- * visited. If it is a list, the element type is visited.
+ * @author Jérôme
  * 
- * @author Jérôme GORIN
  */
-public class ListSizePrinter extends LLVMTypeVisitor {
+public abstract class LLVMAbstractType extends AbstractType{
+
+	protected LLVMAbstractType(String name) {
+		super(name);
+	}
 	
-	private StringTemplate template;
-
-	public ListSizePrinter() {
-	}
-
-	/**
-	 * Sets the top-level template.
-	 * 
-	 * @param template
-	 *            top-level template
-	 */
-	public void setTemplate(StringTemplate template) {
-		this.template = template;
-	}
-
-	public void visit(ListType type) {
-		if (type.getSize()>1)
-		{
-			template.setAttribute("size", type.getSize());
-			type.getType().accept(this);
-		}
-	}
+	public abstract void accept(LLVMTypeVisitor visitor);
 
 }
