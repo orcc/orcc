@@ -42,6 +42,7 @@ import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 
 
 /**
@@ -80,7 +81,8 @@ public class ConstantPropagation extends AbstractNodeVisitor {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		if ((node.getValue() instanceof BooleanExpr) || 
 			(node.getValue() instanceof IntExpr) ||
-			(node.getValue() instanceof StringExpr))
+			(node.getValue() instanceof StringExpr)||
+			(node.getValue() instanceof VarExpr))
 		{
 			VarDef vardef = node.getVar();
 			vardef.setConstant(node.getValue());
