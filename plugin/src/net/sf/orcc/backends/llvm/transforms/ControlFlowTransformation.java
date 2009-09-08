@@ -50,7 +50,7 @@ import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.type.VoidType;
 
 /**
- * Move writes to the beginning of an action (because we use pointers).
+ * Adds control flow.
  * 
  * @author Jérôme GORIN
  * 
@@ -92,7 +92,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 				.getLocation(), "bb" + Integer.toString(BrCounter++));
 
 		// If thenNode is empty switch with elseNode
-		if (thenNodes.size() == 1 && thenNodes.get(0) instanceof EmptyNode) {
+		if (thenNodes.isEmpty()) {
 			List<AbstractNode> tmpNode = thenNodes;
 			thenNodes = elseNodes;
 			elseNodes = tmpNode;
@@ -107,7 +107,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		labelNode = elseLabelNode;
 		LabelNode endLabelNode = null;
 
-		if (!(thenNodes.size() == 1 && thenNodes.get(0) instanceof EmptyNode)) {
+		if (!(thenNodes.isEmpty())) {
 			visitNodes(elseNodes);
 			endLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
 					+ Integer.toString(BrCounter++));
@@ -136,8 +136,8 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		List<AbstractNode> thenNodes = node.getThenNodes();
 		List<AbstractNode> elseNodes = node.getElseNodes();
 
-		if ((thenNodes.size() == 1 && thenNodes.get(0) instanceof EmptyNode)
-				&& (elseNodes.size() == 1 && elseNodes.get(0) instanceof EmptyNode)) {
+		if ((thenNodes.isEmpty())
+				&& (elseNodes.isEmpty())) {
 
 			SelectNode selectNode = SelectNodeCreate(node);
 			it.remove();

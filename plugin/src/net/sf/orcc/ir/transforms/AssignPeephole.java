@@ -50,9 +50,9 @@ import net.sf.orcc.ir.nodes.IfNode;
  * @author Jérôme GORIN
  * 
  */
-public class ConstantPropagation extends AbstractNodeVisitor {
+public class AssignPeephole extends AbstractNodeVisitor {
 
-	public ConstantPropagation(Actor actor) {
+	public AssignPeephole(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}

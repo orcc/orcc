@@ -38,7 +38,8 @@ import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
 import net.sf.orcc.backends.llvm.transforms.ExpressionTransformation;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.transforms.ConstantPropagation;
+import net.sf.orcc.ir.transforms.AssignPeephole;
+import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
 
 /**
  * LLVM back-end.
@@ -74,7 +75,8 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		new ConstantPropagation(actor);
+		new EmptyNodeRemoval(actor);
+		new AssignPeephole(actor);
 		new ExpressionTransformation(actor);
 		new AdaptNodeTransformation(actor);
 		new ControlFlowTransformation(actor);
