@@ -42,7 +42,6 @@ import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
-import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
@@ -94,8 +93,15 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		// If thenNode is empty switch with elseNode
 		if (thenNodes.isEmpty()) {
 			List<AbstractNode> tmpNode = thenNodes;
+			LabelNode tmpLabel = entryLabelNode;
+			
+			//Switch nodes
 			thenNodes = elseNodes;
 			elseNodes = tmpNode;
+			
+			//Switch labels
+			entryLabelNode = thenLabelNode;
+			thenLabelNode = tmpLabel;
 		}
 
 		// Continue transformation on thenNode
@@ -107,13 +113,13 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		labelNode = elseLabelNode;
 		LabelNode endLabelNode = null;
 
-		if (!(thenNodes.isEmpty())) {
+		if (!(elseNodes.isEmpty())) {
 			visitNodes(elseNodes);
 			endLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
 					+ Integer.toString(BrCounter++));
 			labelNode = endLabelNode;
 		}
-
+		
 		return new BrNode(id, location, condition, thenNodes, elseNodes,
 				joinNode, entryLabelNode, thenLabelNode, elseLabelNode,
 				endLabelNode);

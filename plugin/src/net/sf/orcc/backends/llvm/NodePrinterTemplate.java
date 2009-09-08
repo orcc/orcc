@@ -151,7 +151,7 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		}
 
 		List<AbstractNode> elseNodes = node.getElseNodes();
-		if (!(elseNodes.size() == 1 && elseNodes.get(0) instanceof EmptyNode)) {
+		if (!(elseNodes.isEmpty())) {
 			attrName = "elseNodes";
 			nodeTmpl.setAttribute("endLabelNode", node.getLabelEndNode());
 			for (AbstractNode subNode : elseNodes) {
