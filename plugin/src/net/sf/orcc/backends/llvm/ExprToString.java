@@ -37,10 +37,10 @@ import net.sf.orcc.ir.expr.ExprVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.expr.TypeExpr;
 
 /**
  * 
@@ -195,11 +195,11 @@ public class ExprToString implements ExprVisitor {
 		if (currentPrec < oldPrec) {
 			builder.append("(");
 		}
-	
+
 		BinaryOp op = expr.getOp();
-		
+
 		builder.append(toString(op) + " ");
-		
+
 		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
 			expr.getE1().accept(this, Integer.MAX_VALUE);
 		} else {
@@ -228,11 +228,6 @@ public class ExprToString implements ExprVisitor {
 	public void visit(IntExpr expr, Object... args) {
 		builder.append(expr.getValue());
 	}
-	
-	@Override
-	public void visit(TypeExpr expr, Object... args) {
-		builder.append(expr.getType());
-	}
 
 	@Override
 	public void visit(ListExpr expr, Object... args) {
@@ -244,6 +239,11 @@ public class ExprToString implements ExprVisitor {
 		builder.append('"');
 		builder.append(expr.getValue().replaceAll("\\\\", "\\\\"));
 		builder.append('"');
+	}
+
+	@Override
+	public void visit(TypeExpr expr, Object... args) {
+		builder.append(expr.getType());
 	}
 
 	@Override

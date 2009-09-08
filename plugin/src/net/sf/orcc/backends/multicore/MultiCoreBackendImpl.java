@@ -86,9 +86,9 @@ public class MultiCoreBackendImpl implements IBackend {
 				new IncrementPeephole(actor);
 
 				// prints actor
-				//String outputName = path + File.separator + instance.getId()
-				//		+ ".c";
-				//new MultiCoreActorPrinter(outputName, actor);
+				// String outputName = path + File.separator + instance.getId()
+				// + ".c";
+				// new MultiCoreActorPrinter(outputName, actor);
 			}
 		}
 

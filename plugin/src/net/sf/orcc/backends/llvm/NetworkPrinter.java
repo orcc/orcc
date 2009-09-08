@@ -39,19 +39,18 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.orcc.backends.PluginGroupLoader;
+import net.sf.orcc.backends.c.TypeToString;
+import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.network.Broadcast;
 import net.sf.orcc.ir.network.Connection;
 import net.sf.orcc.ir.network.Instance;
 import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.type.AbstractType;
-import net.sf.orcc.ir.VarDef;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.jgrapht.graph.DirectedMultigraph;
-
-import net.sf.orcc.backends.c.TypeToString;
 
 /**
  * LLVM Network printer.
@@ -64,7 +63,7 @@ public class NetworkPrinter {
 	private StringTemplateGroup group;
 
 	private StringTemplate template;
-	
+
 	private TypeToString typeVisitor;
 
 	/**
@@ -198,7 +197,7 @@ public class NetworkPrinter {
 
 			String size;
 			if (connection.hasSize()) {
-				size = Integer.toString(connection.getSize()+1);
+				size = Integer.toString(connection.getSize() + 1);
 			} else {
 				size = "SIZE";
 			}
@@ -229,47 +228,48 @@ public class NetworkPrinter {
 	private void setInstances(Set<Instance> instances) {
 		List<String> init = new ArrayList<String>();
 		List<Map<String, Object>> inst = new ArrayList<Map<String, Object>>();
-		
+
 		int size, count;
-		
+
 		for (Instance instance : instances) {
 			if (!instance.isBroadcast()) {
 				List<Action> initializes = instance.getActor().getInitializes();
 				if (!initializes.isEmpty()) {
 					init.add(instance.getId());
 				}
-				if (instance.getId().compareTo("source")!=0 && instance.getId().compareTo("display")!=0)
-				{
+				if (instance.getId().compareTo("source") != 0
+						&& instance.getId().compareTo("display") != 0) {
 					Map<String, Object> attrs = new HashMap<String, Object>();
-					List <String> inputName = new ArrayList<String>();
-					List <String> outputName = new ArrayList<String>();
-					
+					List<String> inputName = new ArrayList<String>();
+					List<String> outputName = new ArrayList<String>();
+
 					count = 0;
-					attrs.put("id",instance.getId());
+					attrs.put("id", instance.getId());
 					size = instance.getActor().getInputs().size();
-					attrs.put("nbInput",instance.getActor().getInputs().size());
-	
-					for (VarDef input : instance.getActor().getInputs())
-					{
-						if (count ==  size-1)
-							inputName.add(input.getName());				
+					attrs
+							.put("nbInput", instance.getActor().getInputs()
+									.size());
+
+					for (VarDef input : instance.getActor().getInputs()) {
+						if (count == size - 1)
+							inputName.add(input.getName());
 						else
-							inputName.add(input.getName()+",");
-						
+							inputName.add(input.getName() + ",");
+
 						count++;
 					}
-	
+
 					count = 0;
 					attrs.put("input", inputName);
 					size = instance.getActor().getOutputs().size();
-					attrs.put("nbOutput",instance.getActor().getOutputs().size());
-					for (VarDef output : instance.getActor().getOutputs())
-					{
-						if (count ==  size-1)
+					attrs.put("nbOutput", instance.getActor().getOutputs()
+							.size());
+					for (VarDef output : instance.getActor().getOutputs()) {
+						if (count == size - 1)
 							outputName.add(output.getName());
 						else
-							outputName.add(output.getName()+",");
-						
+							outputName.add(output.getName() + ",");
+
 						count++;
 					}
 					attrs.put("output", outputName);

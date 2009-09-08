@@ -93,12 +93,11 @@ public class ActorPrinterTemplate {
 	 * @return a string template
 	 */
 	private StringTemplate applyProc(String actorName, Procedure proc) {
-	
-		if (actorName.compareTo("clip")==0)
-		{
-			int i =0;
-			i=i+1;
-			
+
+		if (actorName.compareTo("clip") == 0) {
+			int i = 0;
+			i = i + 1;
+
 		}
 		StringTemplate procTmpl = group.getInstanceOf("proc");
 

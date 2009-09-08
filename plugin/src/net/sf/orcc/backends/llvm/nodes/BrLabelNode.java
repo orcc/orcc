@@ -52,10 +52,10 @@ public class BrLabelNode extends AbstractLLVMNode {
 	public LabelNode getLabelNode() {
 		return labelNode;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "br label %"+ labelNode.toString();
+		return "br label %" + labelNode.toString();
 	}
 
 }

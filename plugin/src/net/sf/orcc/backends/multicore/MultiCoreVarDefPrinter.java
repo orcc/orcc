@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.multicore;
 
-
 /**
  * 
  * @author Matthieu Wipliez
@@ -36,19 +35,19 @@ package net.sf.orcc.backends.multicore;
  */
 public class MultiCoreVarDefPrinter {
 
-//	public MultiCoreVarDefPrinter(PrettyPrinter pp, TypeVisitor typePrinter,
-//			TypeVisitor listSizePrinter, List<String> ports) {
-//		super(pp, typePrinter, listSizePrinter, ports);
-//	}
-//
-//	public void printVarDef(VarDef varDef, String terminator) {
-//
-//		varDef.getType().accept(typePrinter);
-//		pp.print(" ");
-//		printVarDefName(varDef);
-//		// prints "[x]" if varDef has type List
-//		varDef.getType().accept(listSizePrinter);
-//		pp.print(terminator);
-//
-//	}
+	// public MultiCoreVarDefPrinter(PrettyPrinter pp, TypeVisitor typePrinter,
+	// TypeVisitor listSizePrinter, List<String> ports) {
+	// super(pp, typePrinter, listSizePrinter, ports);
+	// }
+	//
+	// public void printVarDef(VarDef varDef, String terminator) {
+	//
+	// varDef.getType().accept(typePrinter);
+	// pp.print(" ");
+	// printVarDefName(varDef);
+	// // prints "[x]" if varDef has type List
+	// varDef.getType().accept(listSizePrinter);
+	// pp.print(terminator);
+	//
+	// }
 }

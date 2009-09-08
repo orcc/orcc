@@ -34,12 +34,12 @@ import net.sf.orcc.ir.type.AbstractType;
  * @author Jérôme
  * 
  */
-public abstract class LLVMAbstractType extends AbstractType{
+public abstract class LLVMAbstractType extends AbstractType {
 
 	protected LLVMAbstractType(String name) {
 		super(name);
 	}
-	
+
 	public abstract void accept(LLVMTypeVisitor visitor);
 
 }

@@ -29,9 +29,9 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
 
 import java.util.ArrayList;
 import java.util.List;

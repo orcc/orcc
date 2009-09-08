@@ -35,7 +35,7 @@ package net.sf.orcc.debug.model;
  * 
  */
 public interface IOrccDebugConstants {
-	
+
 	public static final String DEBUG_MODEL_ID = "net.sf.orcc.debug.model";
 
 }

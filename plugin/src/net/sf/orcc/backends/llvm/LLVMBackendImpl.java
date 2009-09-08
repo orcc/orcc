@@ -33,12 +33,12 @@ import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.transforms.ConstantPropagation;
 import net.sf.orcc.backends.llvm.transforms.AdaptNodeTransformation;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
 import net.sf.orcc.backends.llvm.transforms.ExpressionTransformation;
+import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.network.Network;
+import net.sf.orcc.ir.transforms.ConstantPropagation;
 
 /**
  * LLVM back-end.
@@ -61,7 +61,8 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Usage: LLVMBackendImpl <flattened XDF network>");
+			System.err
+					.println("Usage: LLVMBackendImpl <flattened XDF network>");
 		}
 	}
 

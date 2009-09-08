@@ -35,15 +35,14 @@ import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.AssignVarNode;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-
+import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
+import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.nodes.IfNode;
 
 /**
  * Move writes to the beginning of an action (because we use pointers).
@@ -52,7 +51,7 @@ import net.sf.orcc.ir.expr.VarExpr;
  * 
  */
 public class ConstantPropagation extends AbstractNodeVisitor {
-		
+
 	public ConstantPropagation(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
@@ -70,36 +69,34 @@ public class ConstantPropagation extends AbstractNodeVisitor {
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());	
-	}
-	
-	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(AssignVarNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		if ((node.getValue() instanceof BooleanExpr) || 
-			(node.getValue() instanceof IntExpr) ||
-			(node.getValue() instanceof StringExpr)||
-			(node.getValue() instanceof VarExpr))
-		{
+		if ((node.getValue() instanceof BooleanExpr)
+				|| (node.getValue() instanceof IntExpr)
+				|| (node.getValue() instanceof StringExpr)
+				|| (node.getValue() instanceof VarExpr)) {
 			VarDef vardef = node.getVar();
 			vardef.setConstant(node.getValue());
 			it.remove();
 		}
 	}
-		
-	
+
+	@Override
+	public void visit(IfNode node, Object... args) {
+		visitNodes(node.getThenNodes());
+		visitNodes(node.getElseNodes());
+	}
+
 	private void visitNodes(List<AbstractNode> nodes) {
 		ListIterator<AbstractNode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			it.next().accept(this, it);
 		}
 	}
-	
+
 	private void visitProc(Procedure proc) {
-		List<AbstractNode> nodes = proc.getNodes();		
+		List<AbstractNode> nodes = proc.getNodes();
 		visitNodes(nodes);
 	}
 }

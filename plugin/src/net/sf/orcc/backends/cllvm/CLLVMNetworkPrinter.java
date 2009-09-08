@@ -44,116 +44,118 @@ public class CLLVMNetworkPrinter extends MultiCoreNetworkPrinter {
 		super("C_LLVM.st");
 	}
 
-//	private void printActorInit(DirectedMultigraph<Instance, Connection> graph) {
-//		printSeparator();
-//		pp.println("// Actor init");
-//		pp.indent();
-//		pp.println();
-//		pp.println("static void init() {");
-//
-//		Set<Instance> instances = new TreeSet<Instance>(graph.vertexSet());
-//		Object[] instArray = instances.toArray();
-//		int n = instArray.length - 1;
-//		for (int i = 0; i <= n; i++) {
-//			if (!((Instance) instArray[i]).isBroadcast()) {
-//				String instArrayId = ((Instance) instArray[i]).getId();
-//				if (!instArrayId.contentEquals("source")
-//						&& !instArrayId.contentEquals("display")) {
-//					pp.println(instArrayId
-//							+ "_scheduler = (int(*)())initModule(\""
-//							+ instArrayId + "\", " + instArrayId + "_In, "
-//							+ instArrayId + "_Out);");
-//				}
-//			}
-//		}
-//
-//		pp.unindent();
-//		pp.println("");
-//		pp.println("}");
-//
-//	}
-//
-//	private void printActorStruct(DirectedMultigraph<Instance, Connection> graph) {
-//		printSeparator();
-//		pp.println("// Actor structure");
-//		pp.indent();
-//		pp.println();
-//
-//		PrinterCallback AdrressPrinter = new PrinterCallback() {
-//
-//			@Override
-//			public void print(Object... args) {
-//				varDefPrinter.printName(((VarDef) args[0]).getName());
-//			}
-//
-//		};
-//
-//		Set<Instance> instances = new TreeSet<Instance>(graph.vertexSet());
-//		Object[] instArray = instances.toArray();
-//		int n = instArray.length - 1;
-//
-//		for (int i = 0; i <= n; i++) {
-//			if (!((Instance) instArray[i]).isBroadcast()) {
-//				Instance actorInst = (Instance) instArray[i];
-//				String instArrayId = actorInst.getId();
-//
-//				List<VarDef> instInput = actorInst.getActor().getInputs();
-//				List<VarDef> instOutput = actorInst.getActor().getOutputs();
-//
-//				if (!instArrayId.contentEquals("source")
-//						&& !instArrayId.contentEquals("display")) {
-//					pp.print("lff_t* " + instArrayId + "_In["
-//							+ instInput.size() + "] = {" + instArrayId + "_");
-//					pp.printList(", " + instArrayId + "_", instInput,
-//							AdrressPrinter);
-//					pp.println("};");
-//
-//					pp.print("lff_t* " + instArrayId + "_Out["
-//							+ instOutput.size() + "]= {" + instArrayId + "_");
-//					pp.printList(", " + instArrayId + "_", instOutput,
-//							AdrressPrinter);
-//					pp.println("};");
-//				}
-//			}
-//
-//		}
-//		pp.unindent();
-//		pp.println("");
-//
-//	}
-//
-//	@Override
-//	protected void printConnectionPointers(
-//			DirectedMultigraph<Instance, Connection> graph) {
-//		pp.println("// FIFO pointer assignments");
-//		pp.println();
-//
-//		Set<Instance> instances = new TreeSet<Instance>(graph.vertexSet());
-//		for (Instance instance : instances) {
-//			Set<Connection> connections = graph.outgoingEdgesOf(instance);
-//			for (Connection connection : connections) {
-//				Instance source = graph.getEdgeSource(connection);
-//				Instance target = graph.getEdgeTarget(connection);
-//
-//				int fifoCount = fifos.get(connection);
-//				if (source.getId().contentEquals("source")) {
-//					pp.print("extern \"C\" lff_t *" + source.getId() + "_");
-//				} else {
-//					pp.print("lff_t *" + source.getId() + "_");
-//				}
-//				varDefPrinter.printVarDefName(connection.getSource());
-//				pp.println(" = &fifo_" + fifoCount + ";");
-//
-//				if (target.getId().contentEquals("display")) {
-//					pp.print("extern \"C\" lff_t *" + target.getId() + "_");
-//				} else {
-//					pp.print("lff_t *" + target.getId() + "_");
-//				}
-//				varDefPrinter.printVarDefName(connection.getTarget());
-//				pp.println(" = &fifo_" + fifoCount + ";");
-//			}
-//		}
-//	}
-//
+	// private void printActorInit(DirectedMultigraph<Instance, Connection>
+	// graph) {
+	// printSeparator();
+	// pp.println("// Actor init");
+	// pp.indent();
+	// pp.println();
+	// pp.println("static void init() {");
+	//
+	// Set<Instance> instances = new TreeSet<Instance>(graph.vertexSet());
+	// Object[] instArray = instances.toArray();
+	// int n = instArray.length - 1;
+	// for (int i = 0; i <= n; i++) {
+	// if (!((Instance) instArray[i]).isBroadcast()) {
+	// String instArrayId = ((Instance) instArray[i]).getId();
+	// if (!instArrayId.contentEquals("source")
+	// && !instArrayId.contentEquals("display")) {
+	// pp.println(instArrayId
+	// + "_scheduler = (int(*)())initModule(\""
+	// + instArrayId + "\", " + instArrayId + "_In, "
+	// + instArrayId + "_Out);");
+	// }
+	// }
+	// }
+	//
+	// pp.unindent();
+	// pp.println("");
+	// pp.println("}");
+	//
+	// }
+	//
+	// private void printActorStruct(DirectedMultigraph<Instance, Connection>
+	// graph) {
+	// printSeparator();
+	// pp.println("// Actor structure");
+	// pp.indent();
+	// pp.println();
+	//
+	// PrinterCallback AdrressPrinter = new PrinterCallback() {
+	//
+	// @Override
+	// public void print(Object... args) {
+	// varDefPrinter.printName(((VarDef) args[0]).getName());
+	// }
+	//
+	// };
+	//
+	// Set<Instance> instances = new TreeSet<Instance>(graph.vertexSet());
+	// Object[] instArray = instances.toArray();
+	// int n = instArray.length - 1;
+	//
+	// for (int i = 0; i <= n; i++) {
+	// if (!((Instance) instArray[i]).isBroadcast()) {
+	// Instance actorInst = (Instance) instArray[i];
+	// String instArrayId = actorInst.getId();
+	//
+	// List<VarDef> instInput = actorInst.getActor().getInputs();
+	// List<VarDef> instOutput = actorInst.getActor().getOutputs();
+	//
+	// if (!instArrayId.contentEquals("source")
+	// && !instArrayId.contentEquals("display")) {
+	// pp.print("lff_t* " + instArrayId + "_In["
+	// + instInput.size() + "] = {" + instArrayId + "_");
+	// pp.printList(", " + instArrayId + "_", instInput,
+	// AdrressPrinter);
+	// pp.println("};");
+	//
+	// pp.print("lff_t* " + instArrayId + "_Out["
+	// + instOutput.size() + "]= {" + instArrayId + "_");
+	// pp.printList(", " + instArrayId + "_", instOutput,
+	// AdrressPrinter);
+	// pp.println("};");
+	// }
+	// }
+	//
+	// }
+	// pp.unindent();
+	// pp.println("");
+	//
+	// }
+	//
+	// @Override
+	// protected void printConnectionPointers(
+	// DirectedMultigraph<Instance, Connection> graph) {
+	// pp.println("// FIFO pointer assignments");
+	// pp.println();
+	//
+	// Set<Instance> instances = new TreeSet<Instance>(graph.vertexSet());
+	// for (Instance instance : instances) {
+	// Set<Connection> connections = graph.outgoingEdgesOf(instance);
+	// for (Connection connection : connections) {
+	// Instance source = graph.getEdgeSource(connection);
+	// Instance target = graph.getEdgeTarget(connection);
+	//
+	// int fifoCount = fifos.get(connection);
+	// if (source.getId().contentEquals("source")) {
+	// pp.print("extern \"C\" lff_t *" + source.getId() + "_");
+	// } else {
+	// pp.print("lff_t *" + source.getId() + "_");
+	// }
+	// varDefPrinter.printVarDefName(connection.getSource());
+	// pp.println(" = &fifo_" + fifoCount + ";");
+	//
+	// if (target.getId().contentEquals("display")) {
+	// pp.print("extern \"C\" lff_t *" + target.getId() + "_");
+	// } else {
+	// pp.print("lff_t *" + target.getId() + "_");
+	// }
+	// varDefPrinter.printVarDefName(connection.getTarget());
+	// pp.println(" = &fifo_" + fifoCount + ";");
+	// }
+	// }
+	// }
+	//
 
 }

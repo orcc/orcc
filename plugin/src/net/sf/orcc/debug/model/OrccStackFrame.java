@@ -7,7 +7,7 @@ import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IVariable;
 
 public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
-	
+
 	private OrccThread thread;
 
 	public OrccStackFrame(OrccDebugTarget target, OrccThread thread) {

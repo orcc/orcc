@@ -48,6 +48,13 @@ public class VarDef implements Comparable<VarDef> {
 	private boolean assignable;
 
 	/**
+	 * Used for constant's propagation
+	 */
+	private boolean constant;
+
+	private AbstractExpr constantExpr;
+
+	/**
 	 * if the variable is global.
 	 */
 	private boolean global;
@@ -87,15 +94,6 @@ public class VarDef implements Comparable<VarDef> {
 	 */
 	private AbstractType type;
 
-	
-	/**
-	 * Used for constant's propagation
-	 */
-	private boolean constant;
-	
-	private AbstractExpr constantExpr;
-	
-	
 	public VarDef(boolean assignable, boolean global, int index, Location loc,
 			String name, AbstractNode node, List<VarUse> references,
 			Integer suffix, AbstractType type) {
@@ -109,7 +107,7 @@ public class VarDef implements Comparable<VarDef> {
 		this.suffix = suffix;
 		this.type = type;
 		this.constant = false;
-		constantExpr = null; 
+		constantExpr = null;
 	}
 
 	public VarDef(VarDef other) {
@@ -143,6 +141,10 @@ public class VarDef implements Comparable<VarDef> {
 			return name && suffix && index;
 		}
 		return false;
+	}
+
+	public AbstractExpr getConstant() {
+		return constantExpr;
 	}
 
 	public int getIndex() {
@@ -181,12 +183,21 @@ public class VarDef implements Comparable<VarDef> {
 		return assignable;
 	}
 
+	public boolean isConstant() {
+		return constant;
+	}
+
 	public boolean isGlobal() {
 		return global;
 	}
 
 	public void setAssignable(boolean assignable) {
 		this.assignable = assignable;
+	}
+
+	public void setConstant(AbstractExpr expr) {
+		constantExpr = expr;
+		constant = true;
 	}
 
 	public void setGlobal(boolean global) {
@@ -224,18 +235,5 @@ public class VarDef implements Comparable<VarDef> {
 	@Override
 	public String toString() {
 		return name;
-	}
-	
-	public void setConstant(AbstractExpr expr) {
-		constantExpr = expr;
-		constant = true;
-	}
-	
-	public boolean isConstant() {
-		return constant;
-	}
-
-	public AbstractExpr getConstant() {
-		return constantExpr;
 	}
 }

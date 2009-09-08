@@ -41,7 +41,7 @@ import org.antlr.stringtemplate.StringTemplate;
  * 
  */
 public class ListSizePrinter extends AbstractTypeVisitor {
-	
+
 	private StringTemplate template;
 
 	public ListSizePrinter() {

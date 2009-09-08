@@ -38,15 +38,14 @@ import net.sf.orcc.ir.nodes.PhiAssignment;
  * @author Jérôme GORIN
  * 
  */
-public class SelectNode extends AbstractLLVMNode{
+public class SelectNode extends AbstractLLVMNode {
 
-	private List<PhiAssignment> phis;
-	
 	private AbstractExpr condition;
 
+	private List<PhiAssignment> phis;
 
-	public SelectNode(int id, Location location, AbstractExpr condition, 
-						List<PhiAssignment> phis) {
+	public SelectNode(int id, Location location, AbstractExpr condition,
+			List<PhiAssignment> phis) {
 		super(id, location);
 		this.condition = condition;
 		this.phis = phis;
@@ -57,7 +56,6 @@ public class SelectNode extends AbstractLLVMNode{
 		visitor.visit(this, args);
 	}
 
-
 	public AbstractExpr getCondition() {
 		return condition;
 	}
@@ -65,9 +63,9 @@ public class SelectNode extends AbstractLLVMNode{
 	public List<PhiAssignment> getPhis() {
 		return phis;
 	}
-	
+
 	public void setPhis(List<PhiAssignment> phis) {
 		this.phis = phis;
 	}
-	
+
 }

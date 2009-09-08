@@ -31,7 +31,6 @@ package net.sf.orcc.backends.llvm;
 import java.util.List;
 
 import net.sf.orcc.backends.llvm.type.IType;
-
 import net.sf.orcc.ir.VarDef;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -67,19 +66,18 @@ public class VarDefPrinter {
 	public StringTemplate applyVarDef(VarDef varDef) {
 		StringTemplate varDefTmpl = group.getInstanceOf("vardef");
 		varDefTmpl.setAttribute("name", getVarDefName(varDef));
-		
-		if (varDef.getType() instanceof IType)
-		{
-			IType iType = (IType)varDef.getType();
-			
+
+		if (varDef.getType() instanceof IType) {
+			IType iType = (IType) varDef.getType();
+
 			TypeToString type = new TypeToString(iType.getType());
 			varDefTmpl.setAttribute("type", type.toString());
-			
-		}else {
+
+		} else {
 			TypeToString type = new TypeToString(varDef.getType());
 			varDefTmpl.setAttribute("type", type.toString());
 		}
-		
+
 		// if varDef is a list, => list of dimensions
 		listSizePrinter.setTemplate(varDefTmpl);
 		varDef.getType().accept(listSizePrinter);
@@ -100,27 +98,26 @@ public class VarDefPrinter {
 	 */
 	public String getVarDefName(VarDef varDef) {
 		String name;
-		
-		if(!varDef.isConstant()){
+
+		if (!varDef.isConstant()) {
 			if (varDef.isGlobal()) {
 				name = "@";
-			}else {
+			} else {
 				name = "%";
-			}				
+			}
 			name += varDef.getName();
-	
-			
+
 			if (varDef.hasSuffix()) {
 				name += varDef.getSuffix();
 			}
-	
+
 			if (!varDef.isGlobal()) {
 				int index = varDef.getIndex();
 				if (index != 0) {
 					name += "_" + varDef.getIndex();
 				}
 			}
-		}else{
+		} else {
 			ExprToString expr = new ExprToString(this, varDef.getConstant());
 			name = expr.toString();
 		}

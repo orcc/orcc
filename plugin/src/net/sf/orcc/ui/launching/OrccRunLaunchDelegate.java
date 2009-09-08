@@ -29,7 +29,6 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
@@ -42,6 +41,7 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
 
 import java.io.File;
 import java.io.IOException;

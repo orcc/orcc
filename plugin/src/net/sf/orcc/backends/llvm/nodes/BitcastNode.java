@@ -33,7 +33,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.expr.AbstractExpr;
 
-
 /**
  * @author Jérôme GORIN
  * 
@@ -41,9 +40,8 @@ import net.sf.orcc.ir.expr.AbstractExpr;
 public class BitcastNode extends AbstractLLVMNode {
 
 	private AbstractExpr value;
-	
-	private VarDef var;
 
+	private VarDef var;
 
 	public BitcastNode(int id, Location location, VarDef var, AbstractExpr value) {
 		super(id, location);
@@ -56,28 +54,28 @@ public class BitcastNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-
 	public AbstractExpr getValue() {
 		return value;
 	}
-	
-	public void setValue(AbstractExpr value) {
-		this.value = value;
-	}
-	
+
 	public VarDef getVar() {
 		return var;
 	}
-	
+
+	public void setValue(AbstractExpr value) {
+		this.value = value;
+	}
+
 	public void setVar(VarDef var) {
 		this.var = var;
 	}
-	
+
 	@Override
 	public String toString() {
 		TypeToString varType = new TypeToString(var.getType());
-		
-		return var + " = bitcast " + value.toString() + " to " + varType.toString();
+
+		return var + " = bitcast " + value.toString() + " to "
+				+ varType.toString();
 	}
 
 }

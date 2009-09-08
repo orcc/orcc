@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.multicore;
 
-
 /**
  * Multicore actor printer.
  * 
@@ -36,7 +35,5 @@ package net.sf.orcc.backends.multicore;
  * 
  */
 public class MultiCoreActorPrinter {
-
-	
 
 }

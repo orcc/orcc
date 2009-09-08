@@ -49,11 +49,11 @@ public abstract class AbstractBackend implements IBackend {
 	protected int fifoSize;
 
 	protected String path;
-	
+
 	@Override
 	public void generateCode(String fileName, int fifoSize) throws Exception {
 		this.fifoSize = fifoSize;
-		
+
 		File file = new File(fileName);
 		path = file.getParent();
 

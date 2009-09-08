@@ -12,7 +12,7 @@ import org.eclipse.ui.IEditorInput;
 
 /**
  * @author mwipliez
- *
+ * 
  */
 public class OrccModelPresentation implements IDebugModelPresentation {
 

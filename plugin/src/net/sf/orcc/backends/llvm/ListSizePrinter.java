@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import  net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
+import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 import net.sf.orcc.ir.type.ListType;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -40,7 +40,7 @@ import org.antlr.stringtemplate.StringTemplate;
  * @author Jérôme GORIN
  */
 public class ListSizePrinter extends LLVMTypeVisitor {
-	
+
 	private StringTemplate template;
 
 	public ListSizePrinter() {
@@ -57,8 +57,7 @@ public class ListSizePrinter extends LLVMTypeVisitor {
 	}
 
 	public void visit(ListType type) {
-		if (type.getSize()>1)
-		{
+		if (type.getSize() > 1) {
 			template.setAttribute("size", type.getSize());
 			type.getType().accept(this);
 		}

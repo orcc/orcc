@@ -233,15 +233,15 @@ public class ExprToString implements ExprVisitor {
 	}
 
 	@Override
-	public void visit(TypeExpr expr, Object... args) {
-		builder.append(expr.getType());
-	}
-	
-	@Override
 	public void visit(StringExpr expr, Object... args) {
 		builder.append('"');
 		builder.append(expr.getValue().replaceAll("\\\\", "\\\\"));
 		builder.append('"');
+	}
+
+	@Override
+	public void visit(TypeExpr expr, Object... args) {
+		builder.append(expr.getType());
 	}
 
 	@Override

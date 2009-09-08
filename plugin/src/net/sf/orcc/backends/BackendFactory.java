@@ -44,6 +44,12 @@ import org.eclipse.core.runtime.Platform;
  */
 public class BackendFactory {
 
+	private static final BackendFactory instance = new BackendFactory();
+
+	public static BackendFactory getInstance() {
+		return instance;
+	}
+
 	private final Map<String, IBackend> backends;
 
 	private BackendFactory() {
@@ -61,12 +67,6 @@ public class BackendFactory {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private static final BackendFactory instance = new BackendFactory();
-
-	public static BackendFactory getInstance() {
-		return instance;
 	}
 
 	public List<String> listBackends() {

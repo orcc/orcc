@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.type;
 
-import net.sf.orcc.ir.type.TypeVisitor;
 import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
  * @author Jérôme GORIN
@@ -37,44 +37,42 @@ import net.sf.orcc.ir.type.AbstractType;
  */
 public class IType extends LLVMAbstractType {
 
-
 	public static final String NAME = "i";
 
-	AbstractType type;
-	
 	private boolean pointer;
+
+	AbstractType type;
 
 	public IType(AbstractType type, boolean isPointer) {
 		super(NAME);
 		this.type = type;
 		pointer = isPointer;
 	}
-	
 
 	public void accept(LLVMTypeVisitor visitor) {
 		visitor.visit(this);
 	}
-	
+
 	public void accept(TypeVisitor visitor) {
-		((LLVMTypeVisitor)visitor).visit(this);
+		((LLVMTypeVisitor) visitor).visit(this);
 	}
 
 	public AbstractType getType() {
 		return type;
 	}
 
-	public void setType(AbstractType type) {
-		this.type = type;
-	}
-	
-	public void setPointer(boolean pointer) {
-		this.pointer = pointer;
-	}
-	
 	public boolean IsPointer() {
 		return pointer;
 	}
-	
+
+	public void setPointer(boolean pointer) {
+		this.pointer = pointer;
+	}
+
+	public void setType(AbstractType type) {
+		this.type = type;
+	}
+
 	@Override
 	public String toString() {
 		return type.toString();

@@ -38,5 +38,4 @@ import net.sf.orcc.backends.multicore.MultiCoreActorPrinter;
  */
 public class CLLVMActorPrinter extends MultiCoreActorPrinter {
 
-	
 }
