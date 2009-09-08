@@ -89,6 +89,8 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		LabelNode entryLabelNode = labelNode;
 		LabelNode thenLabelNode = new LabelNode(node.getId(), node
 				.getLocation(), "bb" + Integer.toString(BrCounter++));
+		LabelNode elseLabelNode = null;
+		LabelNode endLabelNode = null;
 
 		// If thenNode is empty switch with elseNode
 		if (thenNodes.isEmpty()) {
@@ -99,19 +101,26 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			thenNodes = elseNodes;
 			elseNodes = tmpNode;
 			
+			// Continue transformation on thenNode
+			visitNodes(thenNodes);
+			
 			//Switch labels
-			entryLabelNode = thenLabelNode;
-			thenLabelNode = tmpLabel;
+			elseLabelNode = thenLabelNode;
+			thenLabelNode = new LabelNode(node.getId(), node
+					.getLocation(), "bb" + Integer.toString(BrCounter++));
+			
+			return new BrNode(id, location, condition, thenNodes, elseNodes,
+					joinNode, entryLabelNode, thenLabelNode, elseLabelNode,
+					endLabelNode);
 		}
 
 		// Continue transformation on thenNode
 		visitNodes(thenNodes);
 
 		// Create label for elseNode
-		LabelNode elseLabelNode = new LabelNode(node.getId(), node
+		elseLabelNode = new LabelNode(node.getId(), node
 				.getLocation(), "bb" + Integer.toString(BrCounter++));
 		labelNode = elseLabelNode;
-		LabelNode endLabelNode = null;
 
 		if (!(elseNodes.isEmpty())) {
 			visitNodes(elseNodes);

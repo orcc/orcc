@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.llvm;
 
 import net.sf.orcc.backends.llvm.type.IType;
-import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
+import net.sf.orcc.backends.llvm.type.LLVMAbstractTypeVisitor;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -44,7 +44,7 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class TypeToString extends LLVMTypeVisitor {
+public class TypeToString extends LLVMAbstractTypeVisitor {
 
 	private StringBuilder builder;
 

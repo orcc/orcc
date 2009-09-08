@@ -28,45 +28,14 @@
  */
 package net.sf.orcc.backends.llvm.type;
 
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.TypeVisitor;
-import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
 
 /**
  * @author Matthieu Wipliez
  * 
  */
-public abstract class LLVMTypeVisitor implements TypeVisitor {
+public interface LLVMTypeVisitor extends TypeVisitor {
 
-	@Override
-	public void visit(BoolType type) {
-	}
-
-	@Override
-	public void visit(IntType type) {
-	}
-
-	public void visit(IType type) {
-	}
-
-	@Override
-	public void visit(ListType type) {
-	}
-
-	@Override
-	public void visit(StringType type) {
-	}
-
-	@Override
-	public void visit(UintType type) {
-	}
-
-	@Override
-	public void visit(VoidType type) {
-	}
+	public void visit(IType type);
 
 }

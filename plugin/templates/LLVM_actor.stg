@@ -98,6 +98,12 @@ BitcastNode(var, type, expr) ::= <<
 
 >>
 
+// trunknode
+TruncNode(var, type, expr) ::= <<
+	$var$ = trunc $expr$ to $type$
+
+>>
+
 // brnode
 brNode(expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
 	br $expr$, label %$thenLabelNode$, label %$elseLabelNode$

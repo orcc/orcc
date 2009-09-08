@@ -28,26 +28,54 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
+import net.sf.orcc.backends.llvm.TypeToString;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.expr.AbstractExpr;
 
 /**
  * @author Jérôme GORIN
  * 
  */
-public abstract class AbstractLLVMNode extends AbstractNode {
+public class TruncNode extends AbstractLLVMNode {
 
-	protected AbstractLLVMNode(int id, Location location) {
+	private AbstractExpr value;
+
+	private VarDef var;
+
+	public TruncNode(int id, Location location, VarDef var, AbstractExpr value) {
 		super(id, location);
+		this.var = var;
+		this.value = value;
 	}
 
-	public abstract void accept(LLVMNodeVisitor visitor, Object... args);
+	@Override
+	public void accept(LLVMNodeVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
 
-	public void accept(NodeVisitor visitor, Object... args) {
-		if (visitor instanceof LLVMNodeVisitor) {
-			accept((LLVMNodeVisitor) visitor);
-		}
+	public AbstractExpr getValue() {
+		return value;
+	}
+
+	public VarDef getVar() {
+		return var;
+	}
+
+	public void setValue(AbstractExpr value) {
+		this.value = value;
+	}
+
+	public void setVar(VarDef var) {
+		this.var = var;
+	}
+
+	@Override
+	public String toString() {
+		TypeToString varType = new TypeToString(var.getType());
+
+		return var + " = bitcast " + value.toString() + " to "
+				+ varType.toString();
 	}
 
 }

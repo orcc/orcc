@@ -41,6 +41,7 @@ import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.backends.llvm.TypeToString;
 
 /**
  * 
@@ -115,71 +116,10 @@ public class ExprToString implements ExprVisitor {
 
 	private final VarDefPrinter varDefPrinter;
 
-	public ExprToString(VarDefPrinter varDefPrinter, AbstractExpr expr) {
+	public ExprToString(VarDefPrinter varDefPrinter, AbstractExpr expr, boolean showType) {		
 		builder = new StringBuilder();
-		this.varDefPrinter = varDefPrinter;
-		expr.accept(this, 0);
-	}
-
-	private int getPriority(BinaryOp op) {
-		switch (op) {
-		case LOR:
-			return 1;
-		case LAND:
-			return 2;
-		case BOR:
-			return 3;
-		case BXOR:
-			return 4;
-		case BAND:
-			return 5;
-
-		case EQ:
-		case NE:
-			return 6;
-
-		case GE:
-		case GT:
-		case LE:
-		case LT:
-			return 7;
-
-		case SHIFT_LEFT:
-		case SHIFT_RIGHT:
-			return 8;
-
-		case MINUS:
-		case PLUS:
-			return 9;
-
-		case DIV:
-		case DIV_INT:
-		case MOD:
-		case TIMES:
-			return 10;
-
-		case EXP:
-			return 11;
-
-		default:
-			throw new NullPointerException();
-		}
-	}
-
-	private int getPriority(UnaryOp op) {
-		switch (op) {
-		case NUM_ELTS:
-			return 12;
-
-		case BNOT:
-		case LNOT:
-			return 13;
-
-		case MINUS:
-			return 14;
-		default:
-			throw new NullPointerException();
-		}
+		this.varDefPrinter = varDefPrinter;		
+		expr.accept(this, showType);
 	}
 
 	@Override
@@ -189,34 +129,13 @@ public class ExprToString implements ExprVisitor {
 
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
-		int oldPrec = (Integer) args[0];
-		int currentPrec = getPriority(expr.getOp());
-
-		if (currentPrec < oldPrec) {
-			builder.append("(");
-		}
-
 		BinaryOp op = expr.getOp();
 
 		builder.append(toString(op) + " ");
-
-		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
-			expr.getE1().accept(this, Integer.MAX_VALUE);
-		} else {
-			expr.getE1().accept(this, currentPrec);
-		}
-
+		expr.getE1().accept(this, true);
 		builder.append(", ");
+		expr.getE2().accept(this, false);
 
-		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
-			expr.getE2().accept(this, Integer.MAX_VALUE);
-		} else {
-			expr.getE2().accept(this, currentPrec);
-		}
-
-		if (currentPrec < oldPrec) {
-			builder.append(")");
-		}
 	}
 
 	@Override
@@ -248,27 +167,21 @@ public class ExprToString implements ExprVisitor {
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		int oldPrec = (Integer) args[0];
-		int currentPrec = getPriority(expr.getOp());
-
-		if (oldPrec > currentPrec) {
-			builder.append("(");
-		}
-
-		builder.append(toString(expr.getOp()));
 		expr.getExpr().accept(this, args);
-
-		if (oldPrec > currentPrec) {
-			builder.append(")");
-		}
 	}
 
 	@Override
 	public void visit(VarExpr expr, Object... args) {
+		Boolean showType= (Boolean)args[0];
 		VarDef varDef = expr.getVar().getVarDef();
-		TypeToString type = new TypeToString(varDef.getType());
-		builder.append(type);
-		builder.append(" ");
+
+		if (showType)
+		{
+			TypeToString typeStr = new TypeToString(varDef.getType());
+			builder.append(typeStr);
+			builder.append(" ");
+		}
+		
 		builder.append(varDefPrinter.getVarDefName(varDef));
 	}
 

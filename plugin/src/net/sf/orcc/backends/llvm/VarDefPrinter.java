@@ -118,9 +118,23 @@ public class VarDefPrinter {
 				}
 			}
 		} else {
-			ExprToString expr = new ExprToString(this, varDef.getConstant());
+			ExprToString expr = new ExprToString(this, varDef.getConstant(), false);
 			name = expr.toString();
 		}
 		return name;
+	}
+	
+	/**
+	 * Returns the full name of the given variable definition, with type, index and
+	 * suffix.
+	 * 
+	 * @param varDef
+	 *            the variable definition
+	 * @return a string with its full name
+	 */
+	public String getVarDefNameType(VarDef varDef) {
+		TypeToString type = new TypeToString(varDef.getType());
+		
+		return type.toString()+ " " + getVarDefName(varDef);
 	}
 }

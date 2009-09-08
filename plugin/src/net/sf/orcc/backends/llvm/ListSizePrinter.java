@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
+import net.sf.orcc.backends.llvm.type.LLVMAbstractTypeVisitor;
 import net.sf.orcc.ir.type.ListType;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -39,7 +39,7 @@ import org.antlr.stringtemplate.StringTemplate;
  * 
  * @author Jérôme GORIN
  */
-public class ListSizePrinter extends LLVMTypeVisitor {
+public class ListSizePrinter extends LLVMAbstractTypeVisitor {
 
 	private StringTemplate template;
 

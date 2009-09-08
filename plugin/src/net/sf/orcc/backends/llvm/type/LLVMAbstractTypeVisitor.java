@@ -26,28 +26,46 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.type;
 
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 
 /**
- * @author Jérôme GORIN
+ * @author Jérôme
  * 
  */
-public abstract class AbstractLLVMNode extends AbstractNode {
+public abstract class LLVMAbstractTypeVisitor implements LLVMTypeVisitor {
 
-	protected AbstractLLVMNode(int id, Location location) {
-		super(id, location);
+	@Override
+	public void visit(BoolType type) {
 	}
 
-	public abstract void accept(LLVMNodeVisitor visitor, Object... args);
+	@Override
+	public void visit(IntType type) {
+	}
 
-	public void accept(NodeVisitor visitor, Object... args) {
-		if (visitor instanceof LLVMNodeVisitor) {
-			accept((LLVMNodeVisitor) visitor);
-		}
+	public void visit(IType type) {
+	}
+
+	@Override
+	public void visit(ListType type) {
+	}
+
+	@Override
+	public void visit(StringType type) {
+	}
+
+	@Override
+	public void visit(UintType type) {
+	}
+
+	@Override
+	public void visit(VoidType type) {
 	}
 
 }
