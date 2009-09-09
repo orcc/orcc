@@ -69,7 +69,7 @@ static Uint32 start_time;
 static int num_images_start;
 static int num_images_end;
 
-void __cdecl print_fps_avg(void) {
+void print_fps_avg(void) {
 	Uint32 t = SDL_GetTicks();
 
 	printf("%i images in %f seconds: %f FPS\n",
