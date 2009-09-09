@@ -1,41 +1,34 @@
-#C Generation variable
+# C target variables
 
 ACTORS = $(shell ls src/*.c | sed -e "s/src\/display\.c//" -e "s/src\/source\.c//" | xargs)
-SOURCES = ../../runtime/liborcc/actors/display.c ../../runtime/liborcc/actors/source.c
+SOURCES = ../../runtime/liborcc/src/actors/display.c ../../runtime/liborcc/src/actors/source.c ../../runtime/liborcc/src/orcc_util.c
 
-CFLAGS = -O3 -I ../../runtime/liborcc/scheduler
-LDFLAGS =
+CFLAGS = -O5 -I ../../runtime/liborcc/include `sdl-config --cflags` `apr-config --includes`
+CPPFLAGS = `apr-config --cppflags`
+LDFLAGS = `apr-config --link-ld`
 
 all: c llvm
 
-#LLVM generation variable
+# LLVM target variables
 
-#Core Generation
+# Core target
 NETWORK = $(shell ls llvm_src/*.cpp)
-CXX= g++
-LFF_SOURCES = ../../runtime/liborcc/actors/lff_display.c ../../runtime/liborcc/actors/lff_source.c
+CXX = g++
+LFF_SOURCES = ../../runtime/liborcc/src/actors/lff_display.c ../../runtime/liborcc/src/actors/lff_source.c ../../runtime/liborcc/src/orcc_util.c
 
-#VTL generation
+# VTL target
 LLVM_CC = llvm-gcc
 LLVM_ACTORS = $(shell ls llvm_src/*.c | sed -e "s/llvm_src\/display\.c//" -e "s/llvm_src\/source\.c//" | xargs)
 
 
-#C Generation
+# C target
 
-c: $(ACTORS:src/%.c=bin/%.o) $(SOURCES:%.c=%.o)
+c: $(ACTORS:src/%.c=src/%.o) $(SOURCES:%.c=%.o)
 	$(CC) $(LDFLAGS) -o testbed $^ `sdl-config --libs`
 
-bin:
-	mkdir bin
-
-bin/%.o : src/%.c bin
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
-
-%.o : %.c
-	$(CC) -c $(CFLAGS) `sdl-config --cflags` $(CPPFLAGS) $< -o $@
-
 clean:
-	rm -rf bin/*.o
+	rm -rf src/*.o
+	rm -rf $(SOURCES:%.c=%.o)
 	rm -rf llvm_bin/*.o
 	rm -rf VTL/*.bc
 
@@ -51,7 +44,7 @@ diff:
 	diff reference/$$FILE src/$$FILE
 
 
-#LLVM generation
+# LLVM target
 
 llvm: vtl llvm_core
 
@@ -65,7 +58,7 @@ llvm_core: $(NETWORK:llvm_src/%.cpp=llvm_bin/%.o) $(LFF_SOURCES:%.c=%.o)
 llvm_bin/%.o : llvm_src/%.cpp llvm_bin
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@ `llvm-config --cxxflags --ldflags`
 
-#VTL Generation
+# VTL target
 vtl: $(LLVM_ACTORS:llvm_src/%.c=VTL/%.bc)
 
 VTL:
