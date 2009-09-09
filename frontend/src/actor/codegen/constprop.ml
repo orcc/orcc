@@ -370,9 +370,10 @@ let rec apply_latt_single graph node =
 			match latt with
 			| LattCst (CBool true) ->
 				(* remove else branch because it is never taken *)
-				remove_use expr;
+				(*remove_use expr;
 				apply_latt graph bt if_join;
-				remove_branch graph node ~keep:0 bt be if_join
+				remove_branch graph node ~keep:0 bt be if_join*)
+				()
 			| LattCst (CBool false) ->
 				(* remove then branch because it is never taken. *)
 				remove_use expr;
