@@ -95,7 +95,6 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		// If thenNode is empty switch with elseNode
 		if (thenNodes.isEmpty()) {
 			List<AbstractNode> tmpNode = thenNodes;
-			LabelNode tmpLabel = entryLabelNode;
 			
 			//Switch nodes
 			thenNodes = elseNodes;

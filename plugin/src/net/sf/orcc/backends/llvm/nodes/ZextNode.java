@@ -37,13 +37,13 @@ import net.sf.orcc.ir.expr.AbstractExpr;
  * @author Jérôme GORIN
  * 
  */
-public class TruncNode extends AbstractLLVMNode {
+public class ZextNode extends AbstractLLVMNode {
 
 	private AbstractExpr value;
 
 	private VarDef var;
 
-	public TruncNode(int id, Location location, VarDef var, AbstractExpr value) {
+	public ZextNode(int id, Location location, VarDef var, AbstractExpr value) {
 		super(id, location);
 		this.var = var;
 		this.value = value;

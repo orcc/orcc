@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
@@ -39,16 +40,19 @@ import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
+import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.IType;
+import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
+import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.ExprVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -56,7 +60,6 @@ import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
@@ -65,21 +68,15 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
+import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
-import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
-import net.sf.orcc.ir.expr.ExprVisitor;
-import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
-import net.sf.orcc.ir.type.AbstractType;
-import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 
 
 /**
@@ -88,15 +85,21 @@ import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
  * @author Jérôme GORIN
  * 
  */
-public class castTransformation extends AbstractLLVMNodeVisitor implements ExprVisitor{
+public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprVisitor{
 
 	ListIterator<AbstractNode> it;
 	
 	List<AbstractType> types;
+	List<String> portNames;
 	
-	
-	public castTransformation(Actor actor) {
-			
+	public TypeTransformation(Actor actor) {
+		
+		portNames = new ArrayList<String>();;
+		fillPorts(actor.getInputs());
+		fillPorts(actor.getOutputs());
+		
+		visitStateVars(actor.getStateVars());
+		
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -110,6 +113,8 @@ public class castTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			visitProc(action.getBody());
 			visitProc(action.getScheduler());
 		}
+		
+		portNames.clear();
 	}
 
 	private void visitNodes(List<AbstractNode> nodes) {
@@ -122,7 +127,41 @@ public class castTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 
 	private void visitProc(Procedure proc) {
+		visitLocals(proc.getLocals());
 		visitNodes(proc.getNodes());
+	}
+	
+	/**
+	 * Store ports of the current actor
+	 * 
+	 */
+	private void fillPorts(List<VarDef> ports) {
+		for (VarDef port : ports) {
+			portNames.add(port.getName());
+		}
+	}
+	
+	/**
+	 * Variable visitor.
+	 * 
+	 */
+	
+	private void visitLocals(List<VarDef> locals){
+		for (VarDef local : locals){
+			if (portNames.contains(local.getName())){
+				IType newType = new IType(local.getType(),true);
+				local.setType(newType);
+			}
+		}
+	}
+	
+	private void visitStateVars(List<StateVar> stateVars){
+		for (StateVar stateVar : stateVars){
+			VarDef vardef = stateVar.getDef();
+			
+			IType newType = new IType(vardef.getType(),true);
+			vardef.setType(newType);
+		}
 	}
 	
 	
@@ -141,22 +180,49 @@ public class castTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(ReadNode node, Object... args) {
-		VarDef vardef = new VarDef(false, false, 0, new Location(), node
-				.getFifoName()
-				+ "_addr", null, null, 0, new IType(new IntType(8), true));
+	public void visit(SelectNode node, Object... args) {
+		 List<PhiAssignment> phis = node.getPhis();
+		 for (PhiAssignment phi : phis){
+			 VarDef varDef = phi.getVarDef();
+			 AbstractType typeRef =  varDef.getType();
+			 List<VarUse> varUses = phi.getVars();
+		
+			 for (VarUse varUse : varUses){
+				 AbstractType type = varUse.getVarDef().getType();
+				 
+				if (!(type.equals(typeRef))){
+					varUse.setVarDef(castNodeCreate(varUse.getVarDef(), typeRef));
+				}
+				 
+			 }
+			 
+		 }
+	}
+	
+	@Override
+	public void visit(ReadNode node, Object... args) {	
+		
+		//Type to cast into
+		LLVMAbstractType addrType =  new IType(new IntType(8), true);
 
-		VarDef exprVarDef = node.getVarDef();
-		exprVarDef.setType(new IType(exprVarDef.getType(), true));
-
-		VarUse varUse = new VarUse(node.getVarDef(), null);
+		//Vardef to cast
+		VarDef readVar = node.getVarDef();
+		VarUse varUse = new VarUse(readVar, null);
 		VarExpr expr = new VarExpr(new Location(), varUse);
 
-		LoadFifo loadfifo = new LoadFifo(node.getId(), node.getLocation(), node
-				.getFifoName(), node.getVarDef());
+		//New vardef casted
+		VarDef vardef = new VarDef(false, false, 0, new Location(), node
+				.getFifoName()
+				+ "_addr", null, null, 0, addrType);
+		
+		//Create bitcast node
 		BitcastNode bitcast = new BitcastNode(node.getId(), node.getLocation(),
 				vardef, expr);
+		
+		//Create a load fifo node
+		LoadFifo loadfifo = new LoadFifo(node.getId(), node.getLocation(), node
+				.getFifoName(), node.getVarDef());
+	
 		node.setVar(vardef);
 
 		it.previous();
@@ -167,7 +233,22 @@ public class castTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(StoreNode node, Object... args) {
-
+		types.clear(); 
+		types.add(node.getTarget().getVarDef().getType());
+		node.getValue().accept(this);
+		if (types.size()==2){
+			AbstractType typeE1 = types.get(0);
+			AbstractType typeE2 = types.get(1);
+			if (!(typeE1.equals(typeE2))){
+				VarExpr sourceVar = (VarExpr)node.getValue();
+				VarDef sourceVarDef = sourceVar.getVar().getVarDef();
+				VarDef targetVarDef = castNodeCreate(sourceVarDef , typeE1);
+				VarUse targetvarUse = new VarUse(targetVarDef, null);
+				VarExpr targetExpr = new VarExpr(new Location(), targetvarUse);
+				
+				node.setValue(targetExpr);
+			}
+		}
 	}
 
 	/**
@@ -184,39 +265,63 @@ public class castTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			AbstractType typeE1 = types.get(0);
 			AbstractType typeE2 = types.get(1);
 			if (!(typeE1.equals(typeE2))){
-				expr.setE2(castNodeCreate(typeE2, expr.getE2(), typeE1));
+				VarExpr sourceVar = (VarExpr)expr.getE2();
+				VarDef sourceVarDef = sourceVar.getVar().getVarDef();
+				VarDef targetVarDef = castNodeCreate(sourceVarDef , typeE1);
+				VarUse targetvarUse = new VarUse(targetVarDef, null);
+				VarExpr targetExpr = new VarExpr(new Location(), targetvarUse);
+				
+				expr.setE2(targetExpr);
 			}
 		}
 		types = tmpTypes;
 	}
 
 	
-	private AbstractExpr castNodeCreate(AbstractType sourceType, AbstractExpr sourceExpr, AbstractType targetType){
-		int sourceSize = sizeOf(sourceType);
+	private VarDef castNodeCreate(VarDef var, AbstractType targetType){
+		
+		//Get source size and target size
+		int sourceSize = sizeOf(var.getType());
 		int targetSize = sizeOf(targetType);
 		
-		VarExpr sourceVar = (VarExpr)sourceExpr;
-		VarDef sourceVarDef = sourceVar.getVar().getVarDef();
-			
-		VarDef vardef = new VarDef(false, false, sourceVarDef.getIndex()+1, new Location(), sourceVarDef.getName(), null, null, 0, targetType);
 		
-		VarUse varUse = new VarUse(vardef, null);
+		//Get attribute of the source vardef
+		boolean assignable = var.isAssignable();
+		boolean global = var.isGlobal();
+		int index = var.getIndex();
+		Location location = var.getLoc();
+		String name = var.getName();
+		AbstractNode node = null;
+		List<VarUse> reference = null;
+		Integer suffix;
+		if (var.hasSuffix()){
+			suffix=var.getSuffix();
+		}else{
+			suffix = null;
+		}
+
+		// Create target vardef for bitcast
+		VarDef vardef = new VarDef(assignable, global, index+1, location, name, node, reference, suffix, targetType);
+		VarUse varUse = new VarUse(var, null);
 		VarExpr expr = new VarExpr(new Location(), varUse);
 		
+		
+		//Add cast node before the current expression
 		it.previous();
 		
+		//Select the type of cast (trunc if smaller, zext otherwise)
 		if (sourceSize<targetSize)
 		{
-			BitcastNode cast = new BitcastNode(0, new Location(), vardef, sourceExpr);
+			ZextNode cast = new ZextNode(0, new Location(), vardef, expr);
 			it.add(cast);
 		}else{
-			TruncNode cast = new TruncNode(0, new Location(), vardef, sourceExpr);
+			TruncNode cast = new TruncNode(0, new Location(), vardef, expr);
 			it.add(cast);
 		}
 		
 		it.next();
 		
-		return expr;
+		return vardef;
 	}
 	
 	private int sizeOf(AbstractType type){
@@ -291,12 +396,6 @@ public class castTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 
 	@Override
-	public void visit(SelectNode node, Object... args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void visit(CallNode node, Object... args) {
 		// TODO Auto-generated method stub
 		
@@ -352,6 +451,12 @@ public class castTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(TruncNode node, Object... args) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(ZextNode node, Object... args) {
 		// TODO Auto-generated method stub
 		
 	}

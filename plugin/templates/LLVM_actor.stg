@@ -98,9 +98,15 @@ BitcastNode(var, type, expr) ::= <<
 
 >>
 
-// trunknode
+// truncnode
 TruncNode(var, type, expr) ::= <<
 	$var$ = trunc $expr$ to $type$
+
+>>
+
+// zextnode
+ZextNode(var, type, expr) ::= <<
+	$var$ = zext $expr$ to $type$
 
 >>
 
@@ -146,14 +152,14 @@ brlabelNode(name) ::= <<
 >>
 
 // load node
-loadNode(target, typesource, source, indexes) ::= <<
-	$target$ = load $typesource$* $source$ $indexes : {[$it$]}$
+loadNode(target, source, indexes) ::= <<
+	$target$ = load $source$ $indexes : {[$it$]}$
 
 >>
 
 // peek node
 peekNode(typevar, var, actorName, fifoName, numTokens) ::= <<
-	call void @lff_peek(%struct.lff_t* %$actorName$_$fifoName$, $typevar$* $var$)
+	call void @lff_peek(%struct.lff_t* %$actorName$_$fifoName$, $typevar$ $var$)
 	
 >>
 
@@ -182,8 +188,8 @@ $var$ $op$= $expr$;
 >>
 
 // store node
-storeNode(typetarget, target, indexes, expr) ::= <<
-	store $expr$, $typetarget$* $target$$indexes : {[$it$]}$
+storeNode(var, indexes, expr) ::= <<
+	store $expr$, $var$$indexes : {[$it$]}$
 
 >>
 

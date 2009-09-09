@@ -155,7 +155,11 @@ public class VarDef implements Comparable<VarDef> {
 		name = varDef.getName();
 		node = varDef.getNode();
 		references = varDef.getReferences();
-		suffix = varDef.getSuffix();
+		if (varDef.hasSuffix()){
+			suffix = varDef.getSuffix();
+		}else{
+			suffix = null;
+		}
 		type = varDef.getType();
 		this.constant = varDef.isConstant();
 		constantExpr = varDef.getConstant();
@@ -183,13 +187,9 @@ public class VarDef implements Comparable<VarDef> {
 
 	public int getSuffix() {
 		
-		if (suffix == null)
-		{
-			return 0;
-		}
 		return suffix;
 	}
-
+	
 	public AbstractType getType() {
 		return type;
 	}

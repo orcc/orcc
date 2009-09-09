@@ -34,7 +34,7 @@ import java.io.IOException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
-import net.sf.orcc.backends.llvm.transforms.castTransformation;
+import net.sf.orcc.backends.llvm.transforms.TypeTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Network;
@@ -83,15 +83,15 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 		new AssignPeephole(actor);
 		new ExpressionTransformation(actor);
 		new ControlFlowTransformation(actor);
-		new castTransformation(actor);
+		new TypeTransformation(actor);
 		String outputName = path + File.separator + id + ".s";
 		printer.printActor(outputName, actor);
 	}
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
-		NetworkPrinter networkPrinter = new NetworkPrinter();
+	/*	NetworkPrinter networkPrinter = new NetworkPrinter();
 		String outputName = path + File.separator + network.getName() + ".cpp";
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
+		networkPrinter.printNetwork(outputName, network, false, fifoSize);*/
 	}
 }
