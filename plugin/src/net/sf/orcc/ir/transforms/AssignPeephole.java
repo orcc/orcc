@@ -74,10 +74,15 @@ public class AssignPeephole extends AbstractNodeVisitor {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		if ((node.getValue() instanceof BooleanExpr)
 				|| (node.getValue() instanceof IntExpr)
-				|| (node.getValue() instanceof StringExpr)
-				|| (node.getValue() instanceof VarExpr)) {
+				|| (node.getValue() instanceof StringExpr)) {
 			VarDef vardef = node.getVar();
 			vardef.setConstant(node.getValue());
+			it.remove();
+		}else if (node.getValue() instanceof VarExpr){
+			VarDef vardef = node.getVar();
+			VarExpr expr = (VarExpr) node.getValue();
+			
+			vardef.duplicate(expr.getVar().getVarDef());
 			it.remove();
 		}
 	}

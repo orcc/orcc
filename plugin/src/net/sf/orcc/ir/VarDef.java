@@ -146,6 +146,20 @@ public class VarDef implements Comparable<VarDef> {
 	public AbstractExpr getConstant() {
 		return constantExpr;
 	}
+	
+	public void duplicate(VarDef varDef) {
+		assignable = varDef.isAssignable();
+		global = varDef.isGlobal();
+		index = varDef.getIndex();
+		loc = varDef.getLoc();
+		name = varDef.getName();
+		node = varDef.getNode();
+		references = varDef.getReferences();
+		suffix = varDef.getSuffix();
+		type = varDef.getType();
+		this.constant = varDef.isConstant();
+		constantExpr = varDef.getConstant();
+	}
 
 	public int getIndex() {
 		return index;
@@ -168,6 +182,11 @@ public class VarDef implements Comparable<VarDef> {
 	}
 
 	public int getSuffix() {
+		
+		if (suffix == null)
+		{
+			return 0;
+		}
 		return suffix;
 	}
 
