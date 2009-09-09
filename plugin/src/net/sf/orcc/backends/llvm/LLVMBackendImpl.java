@@ -33,13 +33,14 @@ import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.backends.llvm.transforms.castTransformation;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
-import net.sf.orcc.ir.transforms.ExpressionTransformation;
+import net.sf.orcc.backends.llvm.transforms.castTransformation;
+import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.transforms.AssignPeephole;
 import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
+import net.sf.orcc.ir.transforms.ExpressionTransformation;
 
 /**
  * LLVM back-end.
@@ -69,8 +70,11 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 
 	private ActorPrinterTemplate printer;
 
-	public LLVMBackendImpl() throws IOException {
+	@Override
+	protected void init() throws IOException {
 		printer = new ActorPrinterTemplate();
+		
+		NameTransformer.names.clear();
 	}
 
 	@Override

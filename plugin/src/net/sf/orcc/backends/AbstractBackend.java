@@ -30,6 +30,7 @@ package net.sf.orcc.backends;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Set;
 
 import net.sf.orcc.ir.actor.Actor;
@@ -52,11 +53,17 @@ public abstract class AbstractBackend implements IBackend {
 
 	@Override
 	public void generateCode(String fileName, int fifoSize) throws Exception {
+		// set FIFO size
 		this.fifoSize = fifoSize;
 
+		// set output path
 		File file = new File(fileName);
 		path = file.getParent();
 
+		// initializes stuff
+		init();
+
+		// parses top network
 		Network network = new NetworkParser().parseNetwork(path,
 				new FileInputStream(file));
 
@@ -74,6 +81,11 @@ public abstract class AbstractBackend implements IBackend {
 		// print network
 		printNetwork(network);
 	}
+
+	/**
+	 * Perform any initialization necessary.
+	 */
+	abstract protected void init() throws IOException;
 
 	/**
 	 * Prints the given actor with the given id.

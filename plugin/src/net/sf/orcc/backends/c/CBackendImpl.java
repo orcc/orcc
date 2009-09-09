@@ -35,6 +35,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
+import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.transforms.PhiRemoval;
@@ -66,8 +67,16 @@ public class CBackendImpl extends AbstractBackend implements IBackend {
 
 	private CActorPrinter printer;
 
-	public CBackendImpl() throws IOException {
+	@Override
+	protected void init() throws IOException {
 		printer = new CActorPrinter();
+		
+		// register transformations
+		NameTransformer.names.clear();
+		NameTransformer.names.put("abs", "abs_");
+		NameTransformer.names.put("index", "index_");
+		NameTransformer.names.put("getw", "getw_");
+		NameTransformer.names.put("select", "select_");
 	}
 
 	@Override

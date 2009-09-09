@@ -30,6 +30,7 @@ package net.sf.orcc.backends.c;
 
 import java.util.List;
 
+import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.VarDef;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -87,7 +88,7 @@ public class VarDefPrinter {
 	 * @return a string with its full name
 	 */
 	public String getVarDefName(VarDef varDef) {
-		String name = varDef.getName();
+		String name = NameTransformer.transform(varDef.getName());
 		if (varDef.hasSuffix()) {
 			name += varDef.getSuffix();
 		}

@@ -34,6 +34,7 @@ import java.io.IOException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
+import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.transforms.PhiRemoval;
@@ -66,8 +67,11 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 
 	private JavaActorPrinter printer;
 
-	public JavaBackendImpl() throws IOException {
+	@Override
+	protected void init() throws IOException {
 		printer = new JavaActorPrinter();
+		
+		NameTransformer.names.clear();
 	}
 
 	@Override

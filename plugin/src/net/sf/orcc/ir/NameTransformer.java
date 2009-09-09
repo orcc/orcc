@@ -12,13 +12,7 @@ import java.util.Map;
  */
 public class NameTransformer {
 
-	private static Map<String, String> names = new HashMap<String, String>();
-
-	static {
-		names.put("abs", "abs_");
-		names.put("index", "index_");
-		names.put("getw", "getw_");
-	}
+	public static Map<String, String> names = new HashMap<String, String>();
 
 	public static String transform(String name) {
 		if (names.containsKey(name)) {
