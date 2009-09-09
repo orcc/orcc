@@ -129,7 +129,6 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="0"
-				CallingConvention="1"
 				CompileAs="1"
 			/>
 			<Tool
