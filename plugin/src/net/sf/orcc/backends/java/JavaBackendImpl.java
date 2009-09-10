@@ -70,7 +70,7 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void init() throws IOException {
 		printer = new JavaActorPrinter();
-		
+
 		NameTransformer.names.clear();
 	}
 
@@ -79,14 +79,21 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 		new PhiRemoval(actor);
 		new IncrementPeephole(actor);
 
-		String outputName = path + File.separator + "Actor_" + id + ".java";
+		String outputPath = path + File.separator + "actors";
+		new File(outputPath).mkdir();
+		String outputName = outputPath + File.separator + "Actor_" + id
+				+ ".java";
 		printer.printActor(outputName, actor);
 	}
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
 		JavaNetworkPrinter networkPrinter = new JavaNetworkPrinter();
-		String outputName = path + File.separator + network.getName() + ".java";
+
+		String outputPath = path + File.separator + "scheduler";
+		new File(outputPath).mkdir();
+		String outputName = outputPath + File.separator + "Network_"
+				+ network.getName() + ".java";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 }

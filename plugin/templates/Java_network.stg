@@ -1,4 +1,4 @@
-group C_network;
+group Java_network;
 
 broadcast(bcast) ::= <<
 int $bcast.id$_scheduler() {
@@ -20,8 +20,7 @@ int $bcast.id$_scheduler() {
 >>
 
 struct_fifo(fifo) ::= <<
-//static $fifo.type$ array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
-//static struct fifo_s fifo_$fifo.count$ = { sizeof($fifo.type$), $fifo.size$, (char *)array_$fifo.count$, 0, 0 };
+private IntFifo fifo_$fifo.count$ = new IntFifo($fifo.size$);
 
 >>
 
@@ -32,54 +31,51 @@ ptr_fifo(fifo) ::= <<
 >>
 
 network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
-// Generated from "$name$"
+/**
+ * Generated from "$name$"
+ */
+package scheduler;
 
-/*#include <locale.h>
-#include <stdio.h>
-#include <stdlib.h>
+import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.IScheduler;
 
-#include "fifo.h"
-#include "orcc_util.h"
+public class Network_$name$ implements IScheduler {
 
-#define SIZE $size$
+	public static final int SIZE = $size$;
 
-////////////////////////////////////////////////////////////////////////////////
-// FIFO allocation
-$connections:struct_fifo()$
-////////////////////////////////////////////////////////////////////////////////
-// FIFO pointer assignments
-$connections:ptr_fifo()$
+	////////////////////////////////////////////////////////////////////////////////
+	// FIFO allocation
+	$connections:struct_fifo()$
 
-////////////////////////////////////////////////////////////////////////////////
-$broadcasts:broadcast()$////////////////////////////////////////////////////////////////////////////////
-// Action schedulers
-$initializes: { init | extern void $init$_initialize(); 
-}$
-$instances: { inst | extern int $inst$_scheduler();
-}$
-////////////////////////////////////////////////////////////////////////////////
-// Actor scheduler
+	////////////////////////////////////////////////////////////////////////////////
+	// FIFO pointer assignments
+	$connections:ptr_fifo()$
 
-static void scheduler() {
-	$initializes: { init | $init$_initialize();
-}$	while (1) {
-		$instances: { inst | $inst$_scheduler();
-}$
-		$broadcasts: { bcast | $bcast.id$_scheduler();
-}$	}
+	////////////////////////////////////////////////////////////////////////////////
+	$broadcasts:broadcast()$
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Action schedulers
+	$instances: { inst | private IActor actor_$inst$;$\n$}$
+	
+	@Override
+	public void schedule() {
+		$initializes: { init | actor_$init$.initialize();}; separator="\n"$
+		while (true) {
+			$instances: { inst | actor_$inst$.schedule();$\n$}$
+			$broadcasts: { bcast | actor_$bcast.id$_scheduler();}; separator="\n"$
+		}
+	}
+
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		new Network_$name$().schedule();
+	}
 }
-
-////////////////////////////////////////////////////////////////////////////////
-int __cdecl main(int argc, char *argv[], char *env[]) {
-	init_orcc(argc, argv, env);
-
-	scheduler();
-
-	printf("End of simulation! Press a key to continue\n");
-	pause();
-
-	return 0;
-}*/
 
 >>
 

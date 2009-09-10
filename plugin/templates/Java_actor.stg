@@ -117,7 +117,8 @@ $actions: actionTest(actorName=actorName, action=it); separator=" else "$
 >>
 
 scheduler(actorName, actions) ::= <<
-public int $actorName$_scheduler() {
+@Override
+public int schedule() {
 	boolean res = true;
 	int i = 0;
   
@@ -196,7 +197,8 @@ private boolean outside_FSM_scheduler() {
 
 $endif$
 $fsm.transitions: stateScheduler(actorName=actorName, transition=it); separator="\n"$
-public int $actorName$_scheduler() {
+@Override
+public int schedule() {
 	boolean res = true;
 	int i = 0;
 	
@@ -228,6 +230,10 @@ actor(name, inputs, outputs, stateVars, procs,
 /**
  * Generated from "$name$"
  */
+package actors;
+
+import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IntFifo;
 
 public class Actor_$name$ implements IActor {
 
@@ -250,16 +256,17 @@ $if(initializes)$
 	////////////////////////////////////////////////////////////////////////////////
 	// Initializes
 	$initializes$
-	public void $name$_initialize() {
+$endif$
+	@Override
+	public void initialize() {
+$if(initialize)$
 		boolean res = true;
 		int i = 0;
 
-		$if(initialize)$
 		$schedulingTest(actorName=name, actions=initialize)$
-		$endif$
+$endif$
 	}
 
-$endif$
 	////////////////////////////////////////////////////////////////////////////////
 	// Action scheduler
 $if(scheduler.fsm)$
