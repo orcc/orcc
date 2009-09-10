@@ -17,6 +17,8 @@ open IR
 open Printf
 open Ast2ir_util
 
+exception List_expression
+
 exception Not_evaluable of string
 
 let error_size_not_constant ?reason loc typename =
@@ -42,18 +44,6 @@ let rec assert_cst_types_equal loc = function
 	| _ ->
 		Asthelper.failwith loc
 			"all elements must have the same type"
-
-exception Not_null
-
-(** [null_list expr_list] returns the null element (false, or zero, whatever is
-appropriate) if expr_list contains only null elements, or lists of null elements,
-and raise Not_null otherwise. *)
-let rec null_list expr_list =
-	match expr_list with
-		| [ Calast.ExprBool (_, false) ] -> CList [CBool false]
-		| [ Calast.ExprInt (_, 0) ] -> CList [CInt 0]
-		| [ Calast.ExprList (_, expr_list, _) ] -> CList [null_list expr_list]
-		| _ -> raise Not_null
 
 (** [eval e] evaluates the [Calast.expr] [e] and returns its contents as a
 [Calir.constant].
@@ -280,26 +270,23 @@ let rec eval env = function
 				Asthelper.failwith loc "type error: condition should evaluate to a boolean")
 
 	| Calast.ExprList (loc, expr_list, generators) ->
-		try
-			null_list expr_list
-		with Not_null ->
-			let bounds =
-				List.fold_left
-					(fun bounds (var_info, expr) ->
-						match expr with
-							| Calast.ExprCall (_, "Integers", [e1;e2]) ->
-								(match (eval env e1, eval env e2) with
-									| (CInt a, CInt b) -> (var_info, a, b) :: bounds
-									| _ ->
-										Asthelper.failwith loc
-											"eval: only generators over Integers(<a>, <b>) where \
-											a and b are integers are supported")
-							| _ ->
-								Asthelper.failwith loc
-									"eval: only generators over Integers(<a>, <b>) are supported")
-				[] generators
-			in
-			CList (List.rev (eval_list env loc expr_list bounds []))
+		let bounds =
+			List.fold_left
+				(fun bounds (var_info, expr) ->
+					match expr with
+						| Calast.ExprCall (_, "Integers", [e1;e2]) ->
+							(match (eval env e1, eval env e2) with
+								| (CInt a, CInt b) -> (var_info, a, b) :: bounds
+								| _ ->
+									Asthelper.failwith loc
+										"eval: only generators over Integers(<a>, <b>) where \
+										a and b are integers are supported")
+						| _ ->
+							Asthelper.failwith loc
+								"eval: only generators over Integers(<a>, <b>) are supported")
+			[] generators
+		in
+		CList (List.rev (eval_list env loc expr_list bounds []))
 
 and eval_list env loc expr_list bounds acc =
 	match bounds with
@@ -312,15 +299,9 @@ and eval_list env loc expr_list bounds acc =
 						| hd :: _ -> assert_cst_types_equal loc (hd, cst));
 					cst :: csts)
 				acc expr_list
-		| (var_info, a, b) :: t ->
-			let res = ref acc in
-			let vd = ir_of_var_info env var_info in
-			let env = add_binding_var env vd.v_name vd in
-			for i = a to b do
-				vd.v_node.n_latt <- LattCst (CInt i);
-				res := eval_list env loc expr_list t !res;
-			done;
-			!res
+		| _ ->
+			(* when we have a generator, they are executed in the initialize action *)
+			raise List_expression
 
 and ir_of_var_info env var_info =
 	mk_var_def

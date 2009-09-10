@@ -41,17 +41,42 @@ let map_params env vars =
 	in
 	(env, List.rev vars)
 
-(** [mk_globals env parameters values globals] adds global variable declarations for
-[parameters] (and their associated [values]) and the global variables [globals]. *)
-let mk_globals env parameters values globals =
-	let aux env globals var_info value =
-		let vd = Evaluator.ir_of_var_info env var_info in
+(** [add_value initializes var_info value] adds a statement StmtInstr
+that contains a single instruction InstrAssignVar that assigns
+value to var_info, at the beginning of every initialize action. If no
+initialize action exists, an empty initialize is created. *)
+let add_value initializes var_info value =
+	let initializes =
+		if initializes = [] then
+			[{ Calast.a_guards = [];
+			a_inputs = [];
+			a_loc = dummy_loc;
+			a_outputs = [];
+			a_stmts = [];
+			a_tag = [];
+			a_vars = [] }]
+		else
+			initializes
+	in
+	List.map
+		(fun initialize ->
+			let var_ref = (dummy_loc, var_info.Calast.v_name) in
+			let instr = Calast.InstrAssignVar (dummy_loc, var_ref, value) in
+			let stmt = Calast.StmtInstr (dummy_loc, [instr]) in
+			{initialize with Calast.a_stmts = stmt :: initialize.Calast.a_stmts})
+		initializes
 
-		(* compute initial value *)
-		let init =
-			match value with
-			| None -> None
-			| Some v ->
+(** [mk_var_def env globals initializes var_info value] translates
+the var_info and value, and adds it to the environment. *)
+let mk_var_def env globals initializes var_info value =
+	let vd = Evaluator.ir_of_var_info env var_info in
+
+	(* compute initial value *)
+	let (init, initializes) =
+		match value with
+		| None -> (None, initializes)
+		| Some v ->
+			try
 				let constant =
 					try
 						Evaluator.eval env v
@@ -66,23 +91,27 @@ let mk_globals env parameters values globals =
 					Asthelper.failwith var_info.Calast.v_loc
 						("the global variable has a type incompatible with its initial value: " ^
 						reason));
-				Some constant
-		in
-		let global = { g_def = vd; g_init = init } in
-
-		(* assign the constant found to the lattice, so that all globals can be initialized *)
-		(* properly. Later in the transformation process, all assignable will be marked *)
-		(* "undetermined". *)
-		(match init with
-			| None -> vd.v_node.n_latt <- LattTop
-			| Some cst -> vd.v_node.n_latt <- LattCst cst);
-
-		(add_binding_var_check env vd.v_name vd, global :: globals)
+				(Some constant, initializes)
+			with Evaluator.List_expression ->
+				(None, add_value initializes var_info v)
 	in
-	
-	let (env, vars) =
+	let global = { g_def = vd; g_init = init } in
+
+	(* assign the constant found to the lattice, so that all globals can be initialized *)
+	(* properly. Later in the transformation process, all assignable will be marked *)
+	(* "undetermined". *)
+	(match init with
+		| None -> vd.v_node.n_latt <- LattTop
+		| Some cst -> vd.v_node.n_latt <- LattCst cst);
+
+	(add_binding_var_check env vd.v_name vd, global :: globals, initializes)
+
+(** [mk_globals env parameters values globals] adds global variable declarations for
+[parameters] (and their associated [values]) and the global variables [globals]. *)
+let mk_globals env parameters values globals initializes =
+	let (env, vars, initializes) =
 		List.fold_left
-			(fun (env, vars) var_info ->
+			(fun (env, vars, initializes) var_info ->
 				let value =
 					try
 						Some (List.assoc var_info.Calast.v_name values)
@@ -90,18 +119,19 @@ let mk_globals env parameters values globals =
 						Asthelper.failwith var_info.Calast.v_loc
 							(sprintf "no value supplied for parameter \"%s\"!" var_info.Calast.v_name)
 				in
-				aux env vars var_info value)
-		(env, []) parameters
+				mk_var_def env vars initializes var_info value)
+		(env, [], initializes) parameters
 	in
 	
-	let (env, globals) =
+	let (env, globals, initializes) =
 		List.fold_left
-			(fun (env, vars) var_info -> aux env vars var_info var_info.Calast.v_value)
-		(env, vars) globals
+			(fun (env, vars, initializes) var_info ->
+				mk_var_def env vars initializes var_info var_info.Calast.v_value)
+		(env, vars, initializes) globals
 	in
 
 	reset_suffix env;
-	(env, List.rev globals)
+	(env, List.rev globals, initializes)
 
 (** [map_ports env inputs outputs] converts ports from Cal AST to Cal IR. Checks that they have
 distinct names. *)
@@ -246,9 +276,12 @@ let ir_of_ast options out_base actor =
 	let t1 = Sys.time () in
 	
 	(* first map parameters and globals because types of ports may depend on them. *)
+	(* Lists initializations are done at the beginning of initialize actions. *)
 	let env = mk_env () in
-	let (env, vars) =
-		mk_globals env actor.Calast.ac_parameters options.o_values actor.Calast.ac_vars
+	let (env, vars, initializes) =
+		mk_globals
+			env actor.Calast.ac_parameters options.o_values actor.Calast.ac_vars
+			actor.Calast.ac_initializes
 	in
 
 	(* set all globals that are assignable to LattTop so that their values will not be *)
@@ -280,7 +313,7 @@ let ir_of_ast options out_base actor =
 	(* initialize actions *)
 	let initializes =
 		Ast2ir_action.map_actions
-			cnt inputs_map outputs_map env inputs outputs actor.Calast.ac_initializes
+			cnt inputs_map outputs_map env inputs outputs initializes
 	in
 
 	let sched =

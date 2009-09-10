@@ -14,6 +14,9 @@
 
 (** This modules provides evaluators for expressions. *)
 
+(** Raised when a [Calast.expr] is a list expression. *)
+exception List_expression
+
 (** Raised when a [Calast.expr] is not statically evaluable by [eval]. *)
 exception Not_evaluable of string
 
