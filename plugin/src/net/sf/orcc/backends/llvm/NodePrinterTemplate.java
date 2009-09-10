@@ -272,6 +272,7 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		// varDef contains the variable (with the same name as the port)
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("index", node.getIndex());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -385,12 +386,6 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		VarDef varDef = node.getTarget().getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefNameType(varDef));
 
-		List<AbstractExpr> indexes = node.getIndexes();
-		for (AbstractExpr index : indexes) {
-			ExprToString expr = new ExprToString(varDefPrinter, index,true);
-			nodeTmpl.setAttribute("indexes", expr.toString());
-		}
-
 		ExprToString expr = new ExprToString(varDefPrinter, node.getValue(),true);
 
 		AbstractExpr abstractexpr = node.getValue();
@@ -437,7 +432,7 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 
 		// varDef contains the variable (with the same name as the port)
 		VarDef varDef = node.getVarDef();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefNameType(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());

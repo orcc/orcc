@@ -67,5 +67,5 @@ public abstract class LLVMAbstractTypeVisitor implements LLVMTypeVisitor {
 	@Override
 	public void visit(VoidType type) {
 	}
-
+	
 }

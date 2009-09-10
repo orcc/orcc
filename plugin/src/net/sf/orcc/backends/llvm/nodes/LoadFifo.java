@@ -40,13 +40,16 @@ public class LoadFifo extends AbstractLLVMNode {
 	private String fifoName;
 
 	private int numTokens;
+	
+	private int index;
 
 	private VarDef varDef;
 
-	public LoadFifo(int id, Location location, String fifoName, VarDef varDef) {
+	public LoadFifo(int id, Location location, String fifoName, VarDef varDef, int index) {
 		super(id, location);
 		this.fifoName = fifoName;
 		this.varDef = varDef;
+		this.index = index;
 	}
 
 	@Override
@@ -76,6 +79,14 @@ public class LoadFifo extends AbstractLLVMNode {
 
 	public void setVar(VarDef varDef) {
 		this.varDef = varDef;
+	}
+	
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 
 	@Override

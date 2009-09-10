@@ -14,11 +14,8 @@ fifo(actorName, portName) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 typedef(typeValue, sizeValue) ::= <<
-$if(sizeValue)$
-[$sizeValue$ x $typeValue$]
-
-$else$
-$typeValue$
+$if(sizeValue)$ [$sizeValue$ x $typeValue$]
+$else$ $typeValue$
 
 $endif$
 
@@ -173,8 +170,8 @@ readNode(var, actorName, fifoName, numTokens) ::= <<
 >>
 
 // loadfifo node
-loadFifo(actorName, fifoName) ::= <<
-	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
+loadFifo(actorName, fifoName, index) ::= <<
+	%$actorName$_$fifoName$_$index$ = load %struct.lff_t** @$actorName$_$fifoName$
 
 >>
 
@@ -191,8 +188,8 @@ $var$ $op$= $expr$;
 >>
 
 // store node
-storeNode(var, indexes, expr) ::= <<
-	store $expr$, $var$$indexes : {[$it$]}$
+storeNode(var, expr) ::= <<
+	store $expr$, $var$
 
 >>
 
@@ -205,7 +202,7 @@ while ($expr$) {
 
 // write node
 writeNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getWritePtr($actorName$_$fifoName$, $numTokens$);
+	call void @lff_write(%struct.lff_t* %$actorName$_$fifoName$, $var$)
 
 >>
 
@@ -229,47 +226,66 @@ $nodes$
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
+loadPattern(actorName, pattern) ::= <<
+$pattern.keys:{port|%$actorName$_$port$ = load %struct.lff_t** @$actorName$_$port$}$
+>>
+
 outputPattern(actorName, pattern) ::= <<
-$pattern.keys:{port|hasRoom($actorName$_$port$, $pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|call i1 @lff_hasRoom(%struct.lff_t* %$actorName$_$port$, i32 $pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-$action.tag$();
-res = 1;
-i++;
+	call void @$action.tag$()
+	br label %bb
+	
 >>
 
 actionTest(actorName, action) ::= <<
-if (isSchedulable_$action.tag$()) {
+	%$action.tag$ = call i1 @isSchedulable_$action.tag$()
+	br i1 %$action.tag$, label %fire_$action.tag$, label %skip_$action.tag$
+
+fire_$action.tag$:
 	$if(action.outputPattern)$
-	if ($outputPattern(actorName=actorName, pattern=action.outputPattern)$) {
-		$actionCall(action)$
-	}
-	$else$
-	$actionCall(action)$
-	$endif$
-}>>
+	$loadPattern(actorName=actorName, pattern=action.outputPattern)$
+	%room_$action.tag$ = $outputPattern(actorName=actorName, pattern=action.outputPattern)$
+	br i1 %room_$action.tag$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
+
+hasRoom_$action.tag$:
+$actionCall(action)$
+hasNoRoom_$action.tag$:
+	br label %return
+
+$else$
+$actionCall(action)$
+$endif$
+
+skip_$action.tag$:
+
+>>
 
 schedulingTest(actorName, actions) ::= <<
-$actions: actionTest(actorName=actorName, action=it); separator=" else "$
+$actions: actionTest(actorName=actorName, action=it)$
 >>
 
 scheduler(actorName, actions) ::= <<
-int $actorName$_scheduler() {
-	int res = 1;
-	int i = 0;
-  
-	while (res) {
-		res = 0;
-		$if(actions)$
-		$schedulingTest(actorName=actorName, actions=actions)$
-		$endif$
-	}
+define i32 @$actorName$_scheduler() {
+entry:
+	%i = alloca i32
+	store i32 0, i32* %i
+	br label %bb
+	
+bb:  
+$if(actions)$
+$schedulingTest(actorName=actorName, actions=actions)$
+$endif$
+	br label %return
 
-	return i;
+return:
+	%i_ret = load i32* %i
+	ret i32 %i_ret
 }
 
 >>
@@ -375,6 +391,14 @@ actor(name, inputs, outputs, stateVars, procs,
 
 %struct.lff_t = type { i32, i8*, i32, i32, i32 }
 
+;function declaration
+declare void @lff_read(%struct.lff_t* %lff, i8* %data)
+declare i1 @lff_hasTokens(%struct.lff_t* %lff, i32 %nbTokens)
+declare i1 @lff_hasRoom(%struct.lff_t* %lff, i32 %room)
+declare void @lff_peek(%struct.lff_t* %lff, i8* %data)
+declare void @lff_write(%struct.lff_t* %lff, i8* %data)
+
+
 ;Input FIFOs
 $inputs: fifo(actorName=name, portName=it)$
 
@@ -405,8 +429,9 @@ void $name$_initialize() {
 }
 
 $endif$
-////////////////////////////////////////////////////////////////////////////////
-// Action scheduler
+
+;////////////////////////////////////////////////////////////////////////////////
+;// Action scheduler
 $if(scheduler.fsm)$
 $schedulerFSM(actorName=name, actions=scheduler.actions, fsm=scheduler.fsm)$
 $else$

@@ -29,8 +29,13 @@
 package net.sf.orcc.backends.llvm.transforms;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+
+import java.util.Iterator;
 
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
@@ -90,16 +95,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	ListIterator<AbstractNode> it;
 	
 	List<AbstractType> types;
-	List<String> portNames;
+	Hashtable<String, Integer> portIndex;
 	
 	public TypeTransformation(Actor actor) {
-		if(actor.getName().compareTo("clip")==0)
-		{
-			int i=0;
-			i=i+1;
-		}
 		
-		portNames = new ArrayList<String>();;
+		portIndex = new Hashtable<String, Integer>();;
 		fillPorts(actor.getInputs());
 		fillPorts(actor.getOutputs());
 		
@@ -119,7 +119,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			visitProc(action.getScheduler());
 		}
 		
-		portNames.clear();
+		portIndex.clear();
 	}
 
 	private void visitNodes(List<AbstractNode> nodes) {
@@ -133,6 +133,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	private void visitProc(Procedure proc) {
 		visitLocals(proc.getLocals());
+		clearPorts();
 		visitNodes(proc.getNodes());
 	}
 	
@@ -142,8 +143,19 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	 */
 	private void fillPorts(List<VarDef> ports) {
 		for (VarDef port : ports) {
-			portNames.add(port.getName());
+			portIndex.put(port.getName(), new Integer(0));
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void clearPorts() {	
+		Set entries = portIndex.entrySet();
+		Iterator itr = entries.iterator();
+		
+		while (itr.hasNext()) {
+			Map.Entry entry = (Map.Entry) itr.next();
+			entry.setValue(0);
+		}	
 	}
 	
 	/**
@@ -153,7 +165,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	
 	private void visitLocals(List<VarDef> locals){
 		for (VarDef local : locals){
-			if (portNames.contains(local.getName())){
+			if (portIndex.containsKey(local.getName())){
 				PointType newType = new PointType(local.getType());
 				local.setType(newType);
 			}
@@ -204,42 +216,72 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		 }
 	}
 	
-	@Override
-	public void visit(ReadNode node, Object... args) {	
+	public VarDef castFifo(VarDef readVar, String fifoName) {
 		
 		//Type to cast into
 		LLVMAbstractType addrType =  new PointType(new IntType(8));
 
+		int index = (Integer)portIndex.get(fifoName);
+		
 		//Vardef to cast
-		VarDef readVar = node.getVarDef();
 		VarUse varUse = new VarUse(readVar, null);
 		VarExpr expr = new VarExpr(new Location(), varUse);
-
 		//New vardef casted
-		VarDef vardef = new VarDef(false, false, 0, new Location(), node
-				.getFifoName()
-				+ "_addr", null, null, 0, addrType);
+		VarDef vardef = new VarDef(false, false, index, new Location(), fifoName, null, null, 0, addrType);
+		
 		
 		//Create bitcast node
-		BitcastNode bitcast = new BitcastNode(node.getId(), node.getLocation(),
-				vardef, expr);
+		BitcastNode bitcast = new BitcastNode(0, new Location(), vardef, expr);
 		
 		//Create a load fifo node
-		LoadFifo loadfifo = new LoadFifo(node.getId(), node.getLocation(), node
-				.getFifoName(), node.getVarDef());
-	
-		node.setVar(vardef);
+		LoadFifo loadfifo = new LoadFifo(0, new Location(), fifoName, readVar, index);
 
 		it.previous();
 		it.add(loadfifo);
 		it.add(bitcast);
 		it.next();
+		
+		return vardef;
+
+		
 	}
+	
+	@Override
+	public void visit(ReadNode node, Object... args) {	
+		
+		String fifoName = node.getFifoName();
+		
+		node.setVar(castFifo(node.getVarDef(), fifoName));
+		int index = (Integer)portIndex.get(fifoName);
+		node.setFifoName(fifoName + "_" + Integer.toString(index));
+		portIndex.remove(fifoName);
+		portIndex.put(fifoName, new Integer(++index));
+		
+	}
+	
+	@Override
+	public void visit(WriteNode node, Object... args) {
+		String fifoName = node.getFifoName();
+			
+		node.setVarDef(castFifo(node.getVarDef(), fifoName));
+		int index = (Integer)portIndex.get(fifoName);
+		node.setFifoName(fifoName + "_" + Integer.toString(index));
+		portIndex.remove(fifoName);
+		portIndex.put(fifoName, new Integer(++index));
+		
+	}
+	
+	@Override
+	public void visit(PeekNode node, Object... args) {
+		node.setVar(castFifo(node.getVarDef(), node.getFifoName()));
+	}
+
 
 	@Override
 	public void visit(StoreNode node, Object... args) {
 		types.clear();
 		PointType type = (PointType)node.getTarget().getVarDef().getType();
+		
 		types.add(type.getType());
 		node.getValue().accept(this);
 		if (types.size()==2){
@@ -385,8 +427,12 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(BrNode node, Object... args) {
+		
+		ListIterator<AbstractNode> tmpit = it;
 		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());		
+		visitNodes(node.getElseNodes());
+		it= tmpit;
+		
 	}
 
 	@Override
@@ -432,12 +478,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 
 	@Override
-	public void visit(PeekNode node, Object... args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void visit(ReturnNode node, Object... args) {
 		// TODO Auto-generated method stub
 		
@@ -445,12 +485,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(WhileNode node, Object... args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void visit(WriteNode node, Object... args) {
 		// TODO Auto-generated method stub
 		
 	}
