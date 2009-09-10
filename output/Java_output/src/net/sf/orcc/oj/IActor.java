@@ -33,5 +33,7 @@ public interface IActor {
 	public void initialize();
 	
 	public int schedule();
+	
+	public void setFifo(String portName, IntFifo fifo);
 
 }

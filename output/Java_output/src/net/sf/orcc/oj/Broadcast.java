@@ -28,10 +28,77 @@
  */
 package net.sf.orcc.oj;
 
-public interface IScheduler {
-	
-	public void initialize();
-	
-	public void schedule();
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * A generic broadcast actor.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
+public class Broadcast implements IActor {
+
+	private IntFifo input;
+
+	private IntFifo outputs[];
+
+	/**
+	 * Creates a new broadcast with the given number of outputs.
+	 * 
+	 * @param numOutputs
+	 *            number of output ports.
+	 */
+	public Broadcast(int numOutputs) {
+		outputs = new IntFifo[numOutputs];
+	}
+
+	@Override
+	public void initialize() {
+	}
+
+	private boolean outputsHaveRoom() {
+		boolean hasRoom = true;
+		for (int i = 0; i < outputs.length && hasRoom; i++) {
+			hasRoom &= outputs[i].hasRoom(1);
+		}
+
+		return hasRoom;
+	}
+
+	@Override
+	public int schedule() {
+		int i = 0;
+		int[] tokens = new int[1];
+		while (input.hasTokens(1) && outputsHaveRoom()) {
+			input.get(tokens);
+			for (IntFifo output : outputs) {
+				output.put(tokens);
+			}
+
+			i++;
+		}
+
+		return i;
+	}
+
+	@Override
+	public void setFifo(String portName, IntFifo fifo) {
+		if (portName.equals("input")) {
+			input = fifo;
+		} else if (portName.startsWith("output_")) {
+			try {
+				int portNumber = Integer.parseInt(portName.substring(7));
+				outputs[portNumber] = fifo;
+			} catch (NumberFormatException e) {
+				String msg = "invalid port name: \"" + portName + "\"";
+				throw new IllegalArgumentException(msg, e);
+			}
+		} else {
+			String msg = "invalid port name: \"" + portName + "\"";
+			throw new IllegalArgumentException(msg);
+		}
+	}
 
 }

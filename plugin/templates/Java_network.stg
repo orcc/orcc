@@ -1,32 +1,8 @@
 group Java_network;
 
-broadcast(bcast) ::= <<
-int $bcast.id$_scheduler() {
-	$bcast.type$ *tok_input;
-	$bcast.num: { n | $bcast.type$ *tok_output_$n$;
-}$
-	while (hasTokens($bcast.id$_input, 1)
-		$bcast.num:{ && hasRoom($bcast.id$_output_$i0$, 1)}$) {
-		tok_input = getReadPtr($bcast.id$_input, 1);
-		$bcast.num: { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
-}$
-		$bcast.num: { n | *tok_output_$n$ = *tok_input;
-}$	}
-  
-	return 0;
-}
-
-
->>
-
-struct_fifo(fifo) ::= <<
-private IntFifo fifo_$fifo.count$ = new IntFifo($fifo.size$);
-
->>
-
-ptr_fifo(fifo) ::= <<
-//struct fifo_s *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
-//struct fifo_s *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
+setFifo(fifo) ::= <<
+actor_$fifo.source$.setFifo("$fifo.src_port$", fifo_$fifo.count$);
+actor_$fifo.target$.setFifo("$fifo.tgt_port$", fifo_$fifo.count$);
 
 >>
 
@@ -36,35 +12,41 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
  */
 package scheduler;
 
+import net.sf.orcc.oj.Broadcast;
 import net.sf.orcc.oj.IActor;
-import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.IScheduler;
-
+import net.sf.orcc.oj.IntFifo;
+$instances: { inst |import actors.Actor_$inst$;$\n$}$
 public class Network_$name$ implements IScheduler {
 
 	public static final int SIZE = $size$;
 
-	////////////////////////////////////////////////////////////////////////////////
-	// FIFO allocation
-	$connections:struct_fifo()$
+	// FIFO declarations
+	$connections:{fifo|private IntFifo fifo_$fifo.count$;}; separator="\n"$
 
-	////////////////////////////////////////////////////////////////////////////////
-	// FIFO pointer assignments
-	$connections:ptr_fifo()$
+	// Actors
+	$instances: { inst | private IActor actor_$inst$;}; separator="\n"$
 
-	////////////////////////////////////////////////////////////////////////////////
-	$broadcasts:broadcast()$
+	// Broadcasts
+	$broadcasts: { bcast | private Broadcast actor_$bcast.id$;}; separator="\n"$
 
-	////////////////////////////////////////////////////////////////////////////////
-	// Action schedulers
-	$instances: { inst | private IActor actor_$inst$;$\n$}$
-	
+	@Override
+	public void initialize() {
+		$instances: { inst | actor_$inst$ = new Actor_$inst$();}; separator="\n"$
+
+		$broadcasts: { bcast | actor_$bcast.id$ = new Broadcast($length(bcast.num)$);}; separator="\n"$
+
+		$connections:{ fifo | fifo_$fifo.count$ = new IntFifo($fifo.size$);}; separator="\n"$
+
+		$connections:setFifo()$
+	}
+
 	@Override
 	public void schedule() {
 		$initializes: { init | actor_$init$.initialize();}; separator="\n"$
 		while (true) {
 			$instances: { inst | actor_$inst$.schedule();$\n$}$
-			$broadcasts: { bcast | actor_$bcast.id$_scheduler();}; separator="\n"$
+			$broadcasts: { bcast | actor_$bcast.id$.schedule();}; separator="\n"$
 		}
 	}
 
@@ -73,7 +55,9 @@ public class Network_$name$ implements IScheduler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new Network_$name$().schedule();
+		IScheduler scheduler = new Network_$name$();
+		scheduler.initialize();
+		scheduler.schedule();
 	}
 }
 

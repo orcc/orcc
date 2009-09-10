@@ -4,9 +4,15 @@ group Java_actor : C_actor;
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-fifo(actorName, portName) ::= <<
-private IntFifo $actorName$_$portName$;
+fifo(portName) ::= <<
+private IntFifo fifo_$portName$;
 
+>>
+
+setFifo(portName) ::= <<
+if ("$portName$".equals(portName)) {
+	fifo_$portName$ = fifo;
+} else 
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,25 +53,25 @@ $endif$
 
 // hasTokens node
 hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = $actorName$_$fifoName$.hasTokens($numTokens$);
+$var$ = fifo_$fifoName$.hasTokens($numTokens$);
 
 >>
 
 // peek node
 peekNode(var, actorName, fifoName, numTokens) ::= <<
-$actorName$_$fifoName$.peek($var$);
+fifo_$fifoName$.peek($var$);
 
 >>
 
 // read node
 readNode(var, actorName, fifoName, numTokens) ::= <<
-$actorName$_$fifoName$.get($var$);
+fifo_$fifoName$.get($var$);
 
 >>
 
 // write node
 writeNode(var, actorName, fifoName, numTokens) ::= <<
-$actorName$_$fifoName$.put($var$);
+fifo_$fifoName$.put($var$);
 
 >>
 
@@ -88,8 +94,8 @@ $endif$
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-outputPattern(actorName, pattern) ::= <<
-$pattern.keys:{port|$actorName$_$port$.hasRoom($pattern.(port)$)}; separator=" && "$
+outputPattern(pattern) ::= <<
+$pattern.keys:{port|fifo_$port$.hasRoom($pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,10 +107,10 @@ res = true;
 i++;
 >>
 
-actionTest(actorName, action) ::= <<
+actionTest(action) ::= <<
 if (isSchedulable_$action.tag$()) {
 	$if(action.outputPattern)$
-	if ($outputPattern(actorName=actorName, pattern=action.outputPattern)$) {
+	if ($outputPattern(action.outputPattern)$) {
 		$actionCall(action)$
 	}
 	$else$
@@ -112,20 +118,20 @@ if (isSchedulable_$action.tag$()) {
 	$endif$
 }>>
 
-schedulingTest(actorName, actions) ::= <<
-$actions: actionTest(actorName=actorName, action=it); separator=" else "$
+schedulingTest(actions) ::= <<
+$actions: actionTest(); separator=" else "$
 >>
 
-scheduler(actorName, actions) ::= <<
+scheduler(actions) ::= <<
 @Override
 public int schedule() {
 	boolean res = true;
 	int i = 0;
-  
+
 	while (res) {
 		res = false;
 		$if(actions)$
-		$schedulingTest(actorName=actorName, actions=actions)$
+		$schedulingTest(actions)$
 		$endif$
 	}
 
@@ -143,10 +149,10 @@ _FSM_state = States.s_$nextState.targetState$;
 res = true;
 >>
 
-actionTestState(actorName, nextState) ::= <<
+actionTestState(nextState) ::= <<
 if (isSchedulable_$nextState.action.tag$()) {
 	$if(nextState.action.outputPattern)$
-	if ($outputPattern(actorName=actorName, pattern=nextState.action.outputPattern)$) {
+	if ($outputPattern(nextState.action.outputPattern)$) {
 		$actionCallState(nextState)$
 	}
 	$else$
@@ -154,14 +160,14 @@ if (isSchedulable_$nextState.action.tag$()) {
 	$endif$
 }>>
 
-schedulingTestState(actorName, nextStates) ::= <<
-$nextStates: actionTestState(actorName=actorName, nextState=it); separator=" else "$
+schedulingTestState(nextStates) ::= <<
+$nextStates: actionTestState(); separator=" else "$
 >>
 
-stateScheduler(actorName, transition) ::= <<
+stateScheduler(transition) ::= <<
 private boolean $transition.sourceState$_state_scheduler() {
 	boolean res = false;
-	$schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo)$
+	$schedulingTestState(transition.nextStateInfo)$
 	return res;
 }
 
@@ -179,7 +185,7 @@ default:
 }
 >>
 
-schedulerFSM(actorName, actions, fsm) ::= <<
+schedulerFSM(actions, fsm) ::= <<
 private enum States {
 	$fsm.states : {s_$it$}; separator=",\n"$
 };
@@ -190,18 +196,18 @@ $if(actions)$
 private boolean outside_FSM_scheduler() {
 	boolean res = false;
 	int i = 0;
-	$schedulingTest(actorName=actorName, actions=actions)$
+	$schedulingTest(actions)$
 	return res;
 }
 
 
 $endif$
-$fsm.transitions: stateScheduler(actorName=actorName, transition=it); separator="\n"$
+$fsm.transitions: stateScheduler(); separator="\n"$
 @Override
 public int schedule() {
 	boolean res = true;
 	int i = 0;
-	
+
 	while (res) {
 		res = false;
 		$if(actions)$
@@ -232,28 +238,32 @@ actor(name, inputs, outputs, stateVars, procs,
  */
 package actors;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
 
 public class Actor_$name$ implements IActor {
 
-	////////////////////////////////////////////////////////////////////////////////
+	private Map<String, IntFifo> fifos;
+
 	// Input FIFOs
-	$inputs: fifo(actorName=name, portName=it)$
-	////////////////////////////////////////////////////////////////////////////////
+	$inputs: fifo()$
 	// Output FIFOs
-	$outputs: fifo(actorName=name, portName=it)$
-	////////////////////////////////////////////////////////////////////////////////
+	$outputs: fifo()$
 	// State variables of the actor
 	$stateVars$
-	////////////////////////////////////////////////////////////////////////////////
+	
+	public Actor_$name$() {
+		fifos = new HashMap<String, IntFifo>();
+	}
+	
 	// Functions/procedures
 	$procs$
-	////////////////////////////////////////////////////////////////////////////////
 	// Actions
 	$actions$
 $if(initializes)$
-	////////////////////////////////////////////////////////////////////////////////
 	// Initializes
 	$initializes$
 $endif$
@@ -263,16 +273,23 @@ $if(initialize)$
 		boolean res = true;
 		int i = 0;
 
-		$schedulingTest(actorName=name, actions=initialize)$
+		$schedulingTest(initialize)$
 $endif$
 	}
 
-	////////////////////////////////////////////////////////////////////////////////
+	@Override
+	public void setFifo(String portName, IntFifo fifo) {
+		$inputs : setFifo()$$outputs : setFifo()${
+			String msg = "unknown port \"" + portName + "\"";
+			throw new IllegalArgumentException(msg);
+		}
+	}
+
 	// Action scheduler
 $if(scheduler.fsm)$
-	$schedulerFSM(actorName=name, actions=scheduler.actions, fsm=scheduler.fsm)$
+	$schedulerFSM(actions=scheduler.actions, fsm=scheduler.fsm)$
 $else$
-	$scheduler(actorName=name, actions=scheduler.actions)$
+	$scheduler(scheduler.actions)$
 $endif$
 
 }
