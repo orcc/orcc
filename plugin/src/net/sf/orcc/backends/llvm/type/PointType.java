@@ -35,18 +35,15 @@ import net.sf.orcc.ir.type.TypeVisitor;
  * @author Jérôme GORIN
  * 
  */
-public class IType extends LLVMAbstractType {
+public class PointType extends LLVMAbstractType {
 
-	public static final String NAME = "i";
-
-	private boolean pointer;
+	public static final String NAME = "i*";
 
 	AbstractType type;
 
-	public IType(AbstractType type, boolean isPointer) {
+	public PointType(AbstractType type) {
 		super(NAME);
 		this.type = type;
-		pointer = isPointer;
 	}
 
 	public void accept(LLVMTypeVisitor visitor) {
@@ -59,14 +56,6 @@ public class IType extends LLVMAbstractType {
 
 	public AbstractType getType() {
 		return type;
-	}
-
-	public boolean IsPointer() {
-		return pointer;
-	}
-
-	public void setPointer(boolean pointer) {
-		this.pointer = pointer;
 	}
 
 	public void setType(AbstractType type) {

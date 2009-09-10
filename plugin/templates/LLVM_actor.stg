@@ -114,17 +114,20 @@ ZextNode(var, type, expr) ::= <<
 brNode(expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
 	br $expr$, label %$thenLabelNode$, label %$elseLabelNode$
 
+$if(thenNodes)$
 $thenLabelNode$:
-$thenNodes$ $if(elseNodes)$	br label %$endLabelNode$
+$thenNodes$	br label %$endLabelNode$
 
+$endif$
+
+$if(elseNodes)$
 $elseLabelNode$:	
 $elseNodes$	br label %$endLabelNode$
 
-$endLabelNode$:
-$else$ 	br label %$elseLabelNode$
+$endif$
 
-$elseLabelNode$:
-$endif$$\n$
+$endLabelNode$:
+
 >>
 
 // increment node

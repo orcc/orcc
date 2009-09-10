@@ -36,6 +36,6 @@ import net.sf.orcc.ir.type.TypeVisitor;
  */
 public interface LLVMTypeVisitor extends TypeVisitor {
 
-	public void visit(IType type);
+	public void visit(PointType type);
 
 }

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.backends.llvm.type.IType;
+import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractTypeVisitor;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
@@ -90,11 +90,9 @@ public class TypeToString extends LLVMAbstractTypeVisitor {
 	}
 
 	@Override
-	public void visit(IType type) {
+	public void visit(PointType type) {
 		type.getType().accept(this);
-		if (type.IsPointer()) {
-			builder.append("*");
-		}
+		builder.append("*");
 	}
 
 	@Override

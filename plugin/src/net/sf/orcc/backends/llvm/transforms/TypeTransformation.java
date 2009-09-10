@@ -41,7 +41,7 @@ import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
-import net.sf.orcc.backends.llvm.type.IType;
+import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
@@ -93,6 +93,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	List<String> portNames;
 	
 	public TypeTransformation(Actor actor) {
+		if(actor.getName().compareTo("clip")==0)
+		{
+			int i=0;
+			i=i+1;
+		}
 		
 		portNames = new ArrayList<String>();;
 		fillPorts(actor.getInputs());
@@ -149,7 +154,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	private void visitLocals(List<VarDef> locals){
 		for (VarDef local : locals){
 			if (portNames.contains(local.getName())){
-				IType newType = new IType(local.getType(),true);
+				PointType newType = new PointType(local.getType());
 				local.setType(newType);
 			}
 		}
@@ -159,7 +164,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		for (StateVar stateVar : stateVars){
 			VarDef vardef = stateVar.getDef();
 			
-			IType newType = new IType(vardef.getType(),true);
+			PointType newType = new PointType(vardef.getType());
 			vardef.setType(newType);
 		}
 	}
@@ -203,7 +208,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	public void visit(ReadNode node, Object... args) {	
 		
 		//Type to cast into
-		LLVMAbstractType addrType =  new IType(new IntType(8), true);
+		LLVMAbstractType addrType =  new PointType(new IntType(8));
 
 		//Vardef to cast
 		VarDef readVar = node.getVarDef();
@@ -233,8 +238,9 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(StoreNode node, Object... args) {
-		types.clear(); 
-		types.add(node.getTarget().getVarDef().getType());
+		types.clear();
+		PointType type = (PointType)node.getTarget().getVarDef().getType();
+		types.add(type.getType());
 		node.getValue().accept(this);
 		if (types.size()==2){
 			AbstractType typeE1 = types.get(0);

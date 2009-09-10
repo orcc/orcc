@@ -39,7 +39,7 @@ import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
-import net.sf.orcc.backends.llvm.type.IType;
+import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.VarUse;
@@ -134,35 +134,29 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(BrNode node, Object... args) {
-		LabelNode labelTrueNode = node.getLabelTrueNode();
-		LabelNode labelFalseNode = node.getLabelFalseNode();
-
 		StringTemplate nodeTmpl = group.getInstanceOf("brNode");
+		 List<AbstractNode> thenNodes = node.getThenNodes();
+		 List<AbstractNode> elseNodes = node.getElseNodes();
 
 		ExprToString expr = new ExprToString(varDefPrinter, node.getCondition(),true);
 		nodeTmpl.setAttribute("expr", expr.toString());
-		nodeTmpl.setAttribute("thenLabelNode", labelTrueNode);
-		nodeTmpl.setAttribute("elseLabelNode", labelFalseNode);
-
+		nodeTmpl.setAttribute("thenLabelNode", node.getLabelTrueNode());
+		nodeTmpl.setAttribute("elseLabelNode", node.getLabelFalseNode());
+		nodeTmpl.setAttribute("endLabelNode", node.getLabelEndNode());
+		
 		// save current template
 		StringTemplate previousTempl = template;
 		String previousAttrName = attrName;
 		template = nodeTmpl;
+		
 		attrName = "thenNodes";
-
-		for (AbstractNode subNode : node.getThenNodes()) {
+		for (AbstractNode subNode : thenNodes) {
 			subNode.accept(this, args);
 		}
 
-		List<AbstractNode> elseNodes = node.getElseNodes();
-		if (!(elseNodes.isEmpty())) {
-			attrName = "elseNodes";
-			nodeTmpl.setAttribute("endLabelNode", node.getLabelEndNode());
-			for (AbstractNode subNode : elseNodes) {
-				subNode.accept(this, args);
-			}
-		} else {
-			labelFalseNode = node.getLabelEntryNode();
+		attrName = "elseNodes";
+		for (AbstractNode subNode : elseNodes) {
+			subNode.accept(this, args);
 		}
 
 		// restore previous template and attribute name
@@ -170,7 +164,18 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
 
+		LabelNode labelTrueNode = node.getLabelTrueNode();
+		LabelNode labelFalseNode = node.getLabelFalseNode();
+		
 		JoinNode joinNode = node.getJoinNode();
+		
+		if (thenNodes.isEmpty()){
+			labelTrueNode = node.getLabelEntryNode();
+		}
+		if (elseNodes.isEmpty()){
+			labelFalseNode = node.getLabelEntryNode();
+		}
+		
 		joinNode.accept(this, labelTrueNode, labelFalseNode);
 	}
 
@@ -391,8 +396,8 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		AbstractExpr abstractexpr = node.getValue();
 		if (abstractexpr instanceof IntExpr) {
 			LLVMAbstractType type = (LLVMAbstractType)varDef.getType();	
-			if (type instanceof IType){
-				IType iType = (IType)type;
+			if (type instanceof PointType){
+				PointType iType = (PointType)type;
 				TypeToString typeStr = new TypeToString(iType.getType());
 				nodeTmpl.setAttribute("expr", typeStr.toString() + " "
 						+ expr.toString());

@@ -31,7 +31,6 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.backends.llvm.type.IType;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
@@ -82,8 +81,7 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 
 		if (node.getCondition() instanceof BinaryExpr) {
 			VarDef vardef = new VarDef(false, false, exprCounter++,
-					new Location(), "expr", null, null, 0, new IType(
-							new BoolType(), false));
+					new Location(), "expr", null, null, 0,	new BoolType());
 			VarUse varUse = new VarUse(vardef, null);
 			VarExpr expr = new VarExpr(new Location(), varUse);
 
@@ -109,8 +107,7 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 			AbstractType targetType = node.getTarget().getVarDef().getType();
 
 			VarDef vardef = new VarDef(false, false, exprCounter++,
-					new Location(), "expr", null, null, 0, new IType(
-							targetType, false));
+					new Location(), "expr", null, null, 0, targetType);
 			VarUse varUse = new VarUse(vardef, null);
 			VarExpr expr = new VarExpr(new Location(), varUse);
 
