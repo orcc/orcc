@@ -25,19 +25,26 @@ listValue(value) ::= <<
 >>
 
 // a variable definition
-vardef(name, type, size, isPort) ::= <<
-$if(isPort)$
-$type$ *$name$
+// called by "function parameter", or "state variable with value"
+vardef(var) ::= <<
+$var.type$ $var.name$$listSize(var.size)$
+>>
+
+// a variable definition with initialization
+// called by "local variable", or "state variable with no value"
+vardefInit(var) ::= <<
+$if(var.isPort)$
+$var.type$ *$var.name$
 $else$
-$type$ $name$$listSize(size)$
+$var.type$ $var.name$$listSize(var.size)$
 $endif$>>
 
 // a state variable
 stateVar(vardef, value) ::= <<
 $if(value)$
-static $vardef$ = $value$;$\n$
+static $vardef(vardef)$ = $value$;$\n$
 $else$
-static $vardef$;$\n$
+static $vardefInit(vardef)$;$\n$
 $endif$
 >>
 
@@ -140,9 +147,9 @@ $var$ = getWritePtr($actorName$_$fifoName$, $numTokens$);
 
 proc(name, type, parameters, locals, nodes) ::= <<
 
-static $type$ $name$($parameters; wrap, anchor, separator=", "$) {
+static $type$ $name$($parameters:vardef(); wrap, anchor, separator=", "$) {
 $if(locals)$
-	$locals: {$it$;$\n$}$
+	$locals: {$vardefInit(it)$;$\n$}$
 
 $endif$
 	$nodes$}

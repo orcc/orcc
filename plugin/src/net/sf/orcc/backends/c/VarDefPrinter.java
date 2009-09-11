@@ -28,13 +28,12 @@
  */
 package net.sf.orcc.backends.c;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.VarDef;
-
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * 
@@ -43,16 +42,13 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class VarDefPrinter {
 
-	private StringTemplateGroup group;
-
 	private ListSizePrinter listSizePrinter;
 
 	private List<String> ports;
 
 	private TypeToString typeVisitor;
 
-	public VarDefPrinter(StringTemplateGroup group, TypeToString typeVisitor) {
-		this.group = group;
+	public VarDefPrinter(TypeToString typeVisitor) {
 		this.listSizePrinter = new ListSizePrinter();
 		this.typeVisitor = typeVisitor;
 	}
@@ -65,18 +61,18 @@ public class VarDefPrinter {
 	 *            a variable definition
 	 * @return a string template
 	 */
-	public StringTemplate applyVarDef(VarDef varDef) {
-		StringTemplate varDefTmpl = group.getInstanceOf("vardef");
-		varDefTmpl.setAttribute("name", getVarDefName(varDef));
-		varDefTmpl.setAttribute("type", typeVisitor.toString(varDef.getType()));
+	public Map<String, Object> applyVarDef(VarDef varDef) {
+		Map<String, Object> varDefMap = new HashMap<String, Object>();
+		varDefMap.put("name", getVarDefName(varDef));
+		varDefMap.put("type", typeVisitor.toString(varDef.getType()));
 
 		// if varDef is a list, => list of dimensions
-		listSizePrinter.setTemplate(varDefTmpl);
 		varDef.getType().accept(listSizePrinter);
 
-		varDefTmpl.setAttribute("isPort", ports.contains(varDef.getName()));
+		varDefMap.put("size", listSizePrinter.getSize());
+		varDefMap.put("isPort", ports.contains(varDef.getName()));
 
-		return varDefTmpl;
+		return varDefMap;
 	}
 
 	/**

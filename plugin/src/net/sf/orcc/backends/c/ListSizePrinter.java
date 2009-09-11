@@ -28,10 +28,11 @@
  */
 package net.sf.orcc.backends.c;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.ir.type.AbstractTypeVisitor;
 import net.sf.orcc.ir.type.ListType;
-
-import org.antlr.stringtemplate.StringTemplate;
 
 /**
  * Sets the "size" attribute of the given top-level template to the type
@@ -41,25 +42,22 @@ import org.antlr.stringtemplate.StringTemplate;
  * 
  */
 public class ListSizePrinter extends AbstractTypeVisitor {
-
-	private StringTemplate template;
+	
+	private List<Integer> sizeList;
 
 	public ListSizePrinter() {
-	}
-
-	/**
-	 * Sets the top-level template.
-	 * 
-	 * @param template
-	 *            top-level template
-	 */
-	public void setTemplate(StringTemplate template) {
-		this.template = template;
+		sizeList = new ArrayList<Integer>();
 	}
 
 	public void visit(ListType type) {
-		template.setAttribute("size", type.getSize());
+		sizeList.add(type.getSize());
 		type.getType().accept(this);
+	}
+
+	public List<Integer> getSize() {
+		List<Integer> list = new ArrayList<Integer>(sizeList);
+		sizeList.clear();
+		return list;
 	}
 
 }

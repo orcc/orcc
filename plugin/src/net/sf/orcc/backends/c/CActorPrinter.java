@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.ir.VarDef;
@@ -77,7 +78,7 @@ public class CActorPrinter {
 
 		constPrinter = new ConstPrinter(group);
 		typePrinter = new TypeToString();
-		varDefPrinter = new VarDefPrinter(group, typePrinter);
+		varDefPrinter = new VarDefPrinter(typePrinter);
 		exprPrinter = new ExprToString(varDefPrinter);
 	}
 
@@ -112,16 +113,20 @@ public class CActorPrinter {
 		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters
+		List<Object> varDefs = new ArrayList<Object>();
 		for (VarDef param : proc.getParameters()) {
-			StringTemplate tmpl = varDefPrinter.applyVarDef(param);
-			procTmpl.setAttribute("parameters", tmpl);
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
+			varDefs.add(varDefMap);
 		}
+		procTmpl.setAttribute("parameters", varDefs);
 
 		// locals
+		varDefs = new ArrayList<Object>();
 		for (VarDef local : proc.getLocals()) {
-			StringTemplate tmpl = varDefPrinter.applyVarDef(local);
-			procTmpl.setAttribute("locals", tmpl);
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
+			varDefs.add(varDefMap);
 		}
+		procTmpl.setAttribute("locals", varDefs);
 
 		// body
 		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
@@ -213,8 +218,9 @@ public class CActorPrinter {
 			StringTemplate stateTempl = group.getInstanceOf("stateVar");
 			template.setAttribute("stateVars", stateTempl);
 
-			StringTemplate tmpl = varDefPrinter.applyVarDef(stateVar.getDef());
-			stateTempl.setAttribute("vardef", tmpl);
+			VarDef varDef = stateVar.getDef();
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(varDef);
+			stateTempl.setAttribute("vardef", varDefMap);
 
 			// initial value of state var (if any)
 			if (stateVar.hasInit()) {

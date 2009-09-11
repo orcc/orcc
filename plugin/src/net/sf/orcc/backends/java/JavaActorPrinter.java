@@ -51,7 +51,7 @@ public class JavaActorPrinter extends CActorPrinter {
 		super("Java_actor");
 		constPrinter = new JavaConstPrinter(group);
 		typePrinter = new JavaTypePrinter();
-		varDefPrinter = new VarDefPrinter(group, typePrinter);
+		varDefPrinter = new VarDefPrinter(typePrinter);
 		exprPrinter = new JavaExprPrinter(varDefPrinter);
 	}
 

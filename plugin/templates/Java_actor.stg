@@ -21,29 +21,35 @@ if ("$portName$".equals(portName)) {
 
 // the dimensions of a list: [][]...[]
 // does not output anything if $value$ is empty
+// differs from inherited listSize because this one does not print any size
+// information.
 listDim(value) ::= <<
 $value : {[]} $
 >>
 
-// the values of a list: {val1, val2, ..., valn}
-listValue(value) ::= <<
-{$value; wrap, separator=", "$}
+// a variable definition
+// called by "function parameter", or "state variable with value"
+vardef(var) ::= <<
+$var.type$$listDim(var.size)$ $var.name$
 >>
 
-// a variable definition
-vardef(name, type, size, isPort) ::= <<
-$if(isPort)$
-$type$[] $name$ = new $type$$listSize(size)$
+// a variable definition with initialization
+// called by "local variable", or "state variable with no value"
+vardefInit(var) ::= <<
+$if(var.isPort)$
+$var.type$[] $var.name$ = new $var.type$$listSize(var.size)$
 $else$
-$type$$listDim(size)$ $name$
+$var.type$$listDim(var.size)$ $var.name$$if(var.size)$
+ = new $var.type$$listSize(var.size)$
+$endif$
 $endif$>>
 
 // a state variable
 stateVar(vardef, value) ::= <<
 $if(value)$
-private $vardef$ = $value$;$\n\n$
+private $vardef(vardef)$ = $value$;$\n\n$
 $else$
-private $vardef$;$\n\n$
+private $vardefInit(vardef)$;$\n\n$
 $endif$
 >>
 
@@ -81,9 +87,9 @@ fifo_$fifoName$.put($var$);
 
 proc(name, type, parameters, locals, nodes) ::= <<
 
-private $type$ $name$($parameters; wrap, anchor, separator=", "$) {
+private $type$ $name$($parameters:vardef(); wrap, anchor, separator=", "$) {
 $if(locals)$
-	$locals: {$it$;$\n$}$
+	$locals: {$vardefInit(it)$;$\n$}$
 
 $endif$
 	$nodes$}

@@ -65,7 +65,7 @@ public class IntFifo {
 	}
 
 	public boolean hasTokens(int n) {
-		return read < contents.length;
+		return (write - read) > n;
 	}
 
 	public void peek(boolean[] target) {
