@@ -33,14 +33,15 @@ public class Actor_source implements IActor {
 		int i = 0;
 
 		try {
-			try {
-				while (fifo_O.hasRoom(1)) {
-					source[0] = in.read();
-					fifo_O.put(source);
-					i++;
+			while (fifo_O.hasRoom(1)) {
+				int byteRead = in.read();
+				if (byteRead == -1) {
+					break;
 				}
-			} catch (EOFException e) {
-				in.seek(0);
+
+				source[0] = byteRead;
+				fifo_O.put(source);
+				i++;
 			}
 		} catch (IOException e) {
 			String msg = "I/O exception: \"" + fileName + "\"";

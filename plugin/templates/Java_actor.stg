@@ -183,6 +183,9 @@ switch(transitions) ::= <<
 switch (_FSM_state) {
 $transitions: {case s_$it.sourceState$:
 	res = $it.sourceState$_state_scheduler();
+	if (res) {
+		i++;
+	}
 	break;
 }$
 default:
@@ -242,7 +245,7 @@ actor(name, inputs, outputs, stateVars, procs,
 /**
  * Generated from "$name$"
  */
-package actors;
+package net.sf.orcc.generated;
 
 import java.util.HashMap;
 import java.util.Map;

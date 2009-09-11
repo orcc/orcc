@@ -10,13 +10,17 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
 /**
  * Generated from "$name$"
  */
-package scheduler;
+package net.sf.orcc.generated;
 
+import net.sf.orcc.oj.Actor_display;
+import net.sf.orcc.oj.Actor_source;
 import net.sf.orcc.oj.Broadcast;
+import net.sf.orcc.oj.CLIParameters;
+import net.sf.orcc.oj.FifoManager;
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IScheduler;
 import net.sf.orcc.oj.IntFifo;
-$instances: { inst |import actors.Actor_$inst$;$\n$}$
+
 public class Network_$name$ implements IScheduler {
 
 	public static final int SIZE = $size$;
@@ -44,9 +48,14 @@ public class Network_$name$ implements IScheduler {
 	@Override
 	public void schedule() {
 		$initializes: { init | actor_$init$.initialize();}; separator="\n"$
-		while (true) {
-			$instances: { inst | actor_$inst$.schedule();$\n$}$
-			$broadcasts: { bcast | actor_$bcast.id$.schedule();}; separator="\n"$
+
+		int i = 1;
+		while (i > 0) {
+			i = 0;
+			$instances: { inst | i += actor_$inst$.schedule();$\n$}$
+			$broadcasts: { bcast | i += actor_$bcast.id$.schedule();}; separator="\n"$
+
+			FifoManager.getInstance().emptyFifos();
 		}
 	}
 
@@ -55,6 +64,7 @@ public class Network_$name$ implements IScheduler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		CLIParameters.getInstance().setArguments(args);
 		IScheduler scheduler = new Network_$name$();
 		scheduler.initialize();
 		scheduler.schedule();

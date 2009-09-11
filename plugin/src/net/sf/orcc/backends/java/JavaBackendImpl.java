@@ -67,11 +67,18 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 
 	private JavaActorPrinter printer;
 
+	private String outputPath;
+
 	@Override
 	protected void init() throws IOException {
 		printer = new JavaActorPrinter();
 
 		NameTransformer.names.clear();
+
+		String sep = File.separator;
+		outputPath = path + sep + "net" + sep + "sf" + sep + "orcc" + sep
+				+ "generated" + sep;
+		new File(outputPath).mkdir();
 	}
 
 	@Override
@@ -79,10 +86,7 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 		new PhiRemoval(actor);
 		new IncrementPeephole(actor);
 
-		String outputPath = path + File.separator + "actors";
-		new File(outputPath).mkdir();
-		String outputName = outputPath + File.separator + "Actor_" + id
-				+ ".java";
+		String outputName = outputPath + "Actor_" + id + ".java";
 		printer.printActor(outputName, actor);
 	}
 
@@ -90,10 +94,8 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 	protected void printNetwork(Network network) throws Exception {
 		JavaNetworkPrinter networkPrinter = new JavaNetworkPrinter();
 
-		String outputPath = path + File.separator + "scheduler";
-		new File(outputPath).mkdir();
-		String outputName = outputPath + File.separator + "Network_"
-				+ network.getName() + ".java";
+		String name = network.getName();
+		String outputName = outputPath + "Network_" + name + ".java";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 }

@@ -28,10 +28,14 @@ public class Actor_display implements IActor {
 			res = false;
 			if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
 				setVideoSize();
+				res = true;
+				i++;
 			}
 
 			if (fifo_B.hasTokens(384)) {
 				writeMB();
+				res = true;
+				i++;
 			}
 		}
 
