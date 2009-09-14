@@ -182,7 +182,7 @@ public class ActorPrinterTemplate {
 		template.setAttribute("scheduler", actor.getActionScheduler());
 		template.setAttribute("initialize", actor.getInitializes());
 	}
-
+	
 	private void setFifos(String attribute, List<VarDef> ports) {
 		int size = ports.size();
 		List<String> names = new ArrayList<String>(size);

@@ -79,7 +79,7 @@ $var$--;
 // hasTokens node
 hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
 	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
-	$var$ = call i1 @lff_hasTokens(%struct.lff_t* %$actorName$_$fifoName$, i32 $numTokens$)
+	$var$ = call i32 @lff_hasTokens(%struct.lff_t* %$actorName$_$fifoName$, i32 $numTokens$)
 
 >>
 
@@ -231,7 +231,7 @@ $pattern.keys:{port|%$actorName$_$port$ = load %struct.lff_t** @$actorName$_$por
 >>
 
 outputPattern(actorName, pattern) ::= <<
-$pattern.keys:{port|call i1 @lff_hasRoom(%struct.lff_t* %$actorName$_$port$, i32 $pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|call i32 @lff_hasRoom(%struct.lff_t* %$actorName$_$port$, i32 $pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -250,7 +250,8 @@ actionTest(actorName, action) ::= <<
 fire_$action.tag$:
 	$if(action.outputPattern)$
 	$loadPattern(actorName=actorName, pattern=action.outputPattern)$
-	%room_$action.tag$ = $outputPattern(actorName=actorName, pattern=action.outputPattern)$
+	%room_$action.tag$_i32 = $outputPattern(actorName=actorName, pattern=action.outputPattern)$
+	%room_$action.tag$ = icmp ne i32 %room_$action.tag$_i32, 0
 	br i1 %room_$action.tag$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
 
 hasRoom_$action.tag$:
@@ -385,7 +386,7 @@ int $actorName$_scheduler() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(name, inputs, outputs, stateVars, procs,
+actor(name, inputs, outputs, stateVars, inits, procs,  
       actions, initializes, scheduler, initialize) ::= <<
 ; Generated from "$name$"
 
@@ -393,8 +394,8 @@ actor(name, inputs, outputs, stateVars, procs,
 
 ;function declaration
 declare void @lff_read(%struct.lff_t* %lff, i8* %data)
-declare i1 @lff_hasTokens(%struct.lff_t* %lff, i32 %nbTokens)
-declare i1 @lff_hasRoom(%struct.lff_t* %lff, i32 %room)
+declare i32 @lff_hasTokens(%struct.lff_t* %lff, i32 %nbTokens)
+declare i32 @lff_hasRoom(%struct.lff_t* %lff, i32 %room)
 declare void @lff_peek(%struct.lff_t* %lff, i8* %data)
 declare void @lff_write(%struct.lff_t* %lff, i8* %data)
 
@@ -409,8 +410,6 @@ $outputs: fifo(actorName=name, portName=it)$
 ;State variables of the actor
 $stateVars$
 
-
-; // Functions/procedures
 $procs$
 
 ; Actions

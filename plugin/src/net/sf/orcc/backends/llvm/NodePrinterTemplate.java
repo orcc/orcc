@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
+import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.nodes.LLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
@@ -473,6 +474,12 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		nodeTmpl.setAttribute("expr", expr.toString());
 
 		template.setAttribute(attrName, nodeTmpl);
+		
+	}
+
+	@Override
+	public void visit(GetElementPtrNode node, Object... args) {
+		// TODO Auto-generated method stub
 		
 	}
 }

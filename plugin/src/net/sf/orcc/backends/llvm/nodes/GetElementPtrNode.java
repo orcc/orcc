@@ -28,30 +28,64 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import java.util.List;
+
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.ir.expr.AbstractExpr;
 
 /**
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
-public interface LLVMNodeVisitor extends NodeVisitor {
+public class GetElementPtrNode extends AbstractLLVMNode {
 
-	public void visit(BitcastNode node, Object... args);
-
-	public void visit(BrLabelNode node, Object... args);
-
-	public void visit(BrNode node, Object... args);
-
-	public void visit(LabelNode node, Object... args);
-
-	public void visit(LoadFifo node, Object... args);
-
-	public void visit(SelectNode node, Object... args);
+	List<Integer> indexs;
 	
-	public void visit(TruncNode node, Object... args);
+	private VarUse source;
+
+	private VarDef varDef;
+
+	public GetElementPtrNode(int id, Location location, VarDef varDef, VarUse source, List<Integer> indexs) {
+		super(id, location);
+		this.varDef = varDef;
+		this.source = source;
+		this.indexs = indexs;
+	}
+
+	@Override
+	public void accept(LLVMNodeVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
+
+	public List<Integer> getIndexs() {
+		return indexs;
+	}
 	
-	public void visit(ZextNode node, Object... args);
+	public void setIndexs(List<Integer> indexs) {
+		this.indexs = indexs;
+	}
+
+	public VarDef getVarDef() {
+		return varDef;
+	}
 	
-	public void visit(GetElementPtrNode node, Object... args);
+	public void setVar(VarDef varDef) {
+		this.varDef = varDef;
+	}
+
+	public VarUse getSource() {
+		return source;
+	}
+
+	public void setSource(VarUse source) {
+		this.source = source;
+	}
+
+	@Override
+	public String toString() {
+		return varDef + " = getelementptr(" + source + ", " + indexs + ")";
+	}
 
 }

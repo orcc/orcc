@@ -83,7 +83,7 @@ public class ExprToString implements ExprVisitor {
 		case MOD:
 			return "%";
 		case NE:
-			return "!=";
+			return "icmp ne";
 		case PLUS:
 			return "+";
 		case SHIFT_LEFT:
