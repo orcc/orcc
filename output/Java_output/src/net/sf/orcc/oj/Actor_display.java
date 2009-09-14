@@ -4,7 +4,6 @@
 package net.sf.orcc.oj;
 
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,33 +15,39 @@ import javax.swing.Timer;
 
 public class Actor_display extends JFrame implements IActor, ActionListener {
 
+	private static Actor_display instance;
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private static int clip(int n) {
+		if (n < 0) {
+			return 0;
+		} else if (n > 255) {
+			return 255;
+		} else {
+			return n;
+		}
+	}
+
+	public static void closeDisplay() {
+		if (instance != null) {
+			instance.timer.stop();
+			instance.dispose();
+		}
+	}
+
 	private static int convertYCbCrtoRGB(int y, int cb, int cr) {
-		int r = (int) ((298.082f * y + 408.583f * cr) / 256f - 222.921f);
-		int g = (int) ((298.082f * y - 100.291f * cb - 208.120f * cr) / 256f + 135.576f);
-		int b = (int) ((298.082f * y + 516.412f * cb) / 256f - 276.836f);
+		y = (76306 * (y - 16)) + 32768;
+		int r = (y + (104597 * (cr - 128))) >> 16;
+		int g = (y - ((25675 * (cb - 128)) + (53279 * (cr - 128)))) >> 16;
+		int b = (y + (132201 * (cb - 128)) >> 16);
 
-		if (r < 0) {
-			r = 0;
-		} else if (r > 255) {
-			r = 255;
-		}
-
-		if (g < 0) {
-			g = 0;
-		} else if (g > 255) {
-			g = 255;
-		}
-
-		if (b < 0) {
-			b = 0;
-		} else if (b > 255) {
-			b = 255;
-		}
+		r = clip(r);
+		g = clip(g);
+		b = clip(b);
 
 		return (r << 16) | (g << 8) | b;
 	}
@@ -61,22 +66,13 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 
 	private BufferedImage image;
 
+	private Timer timer;
+
 	private int width;
 
 	private int x;
 
 	private int y;
-
-	private Timer timer;
-	
-	private static Actor_display instance;
-	
-	public static void closeDisplay() {
-		if (instance != null) {
-			instance.timer.stop();
-			instance.dispose();
-		}
-	}
 
 	public Actor_display() {
 		super("display");
@@ -87,9 +83,9 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		timer = new Timer(20, this);
+		timer = new Timer(40, this);
 		timer.start();
-		
+
 		instance = this;
 	}
 
@@ -97,8 +93,6 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (buffer != null) {
 			Graphics graphics = buffer.getDrawGraphics();
-			graphics.setColor(Color.RED);
-			graphics.clearRect(0, 0, this.width, this.height);
 			graphics.drawImage(image, 0, 0, null);
 			buffer.show();
 			graphics.dispose();
@@ -159,7 +153,7 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 		if (newWidth != this.width || newHeight != this.height) {
 			this.width = newWidth;
 			this.height = newHeight;
-			
+
 			canvas.setSize(this.width, this.height);
 			pack();
 
@@ -177,14 +171,14 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				int u = 128;
-				int v = 128;
+				int index = 8 * j + i;
 
-				int index = 8 * i + j;
+				int u = mb[256 + index];
+				int v = mb[320 + index];
 
 				for (int ym = 0; ym < 2; ym++) {
 					for (int xm = 0; xm < 2; xm++) {
-						int y = mb[index];
+						int y = mb[64 * (xm + 2 * ym) + index];
 
 						int rgb = convertYCbCrtoRGB(y, u, v);
 
