@@ -60,4 +60,6 @@ public interface NodeVisitor {
 
 	public void visit(WriteNode node, Object... args);
 
+	public void visit(InitPortNode node, Object... args);
+
 }

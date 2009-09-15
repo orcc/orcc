@@ -176,6 +176,7 @@ public class ActorPrinterTemplate {
 		setFifos("inputs", actor.getInputs());
 		setFifos("outputs", actor.getOutputs());
 		setStateVars(actor.getStateVars());
+		setInstantations(actorName, actor.getInstantations());
 		setProcedures(actorName, actor.getProcs());
 		setActions("actions", actorName, actor.getActions());
 		setActions("initializes", actorName, actor.getInitializes());
@@ -198,6 +199,26 @@ public class ActorPrinterTemplate {
 			if (!proc.isExternal()) {
 				template.setAttribute("procs", applyProc(actorName, proc));
 			}
+		}
+	}
+	
+	private void setInstantations(String actorName, List<Procedure> procs) {
+		for (Procedure proc : procs) {
+			int count = 0;
+			
+			StringTemplate instTmpl = group.getInstanceOf("inst");
+			// name
+			instTmpl.setAttribute("name", proc.getName());
+
+			// body
+			NodePrinterTemplate printer = new NodePrinterTemplate(group, instTmpl,
+					actorName, varDefPrinter);
+			for (AbstractNode node : proc.getNodes()) {
+				node.accept(printer, count);
+				count++;
+			}
+			
+			template.setAttribute("insts", instTmpl);
 		}
 	}
 

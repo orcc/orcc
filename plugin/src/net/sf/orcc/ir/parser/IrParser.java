@@ -317,7 +317,7 @@ public class IrParser {
 		ActionScheduler sched = parseActionScheduler(array);
 
 		Actor actor = new Actor(name, inputs, outputs, stateVars, procs,
-				actions, initializes, sched);
+				actions, initializes, sched, null);
 
 		try {
 			in.close();

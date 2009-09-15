@@ -33,12 +33,12 @@ import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.backends.llvm.transforms.AddInitializationProcedure;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
 import net.sf.orcc.backends.llvm.transforms.TypeTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Network;
+import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.AssignPeephole;
 import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
 import net.sf.orcc.ir.transforms.ExpressionTransformation;
@@ -84,7 +84,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 		new AssignPeephole(actor);
 		new ExpressionTransformation(actor);
 		new ControlFlowTransformation(actor);
-		new AddInitializationProcedure(actor);
+		new AddInstantationProcedure(actor);
 		new TypeTransformation(actor);
 		String outputName = path + File.separator + id + ".s";
 		printer.printActor(outputName, actor);

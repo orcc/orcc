@@ -33,7 +33,6 @@ import java.util.List;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.AbstractExpr;
 
 /**
  * @author Jérôme GORIN

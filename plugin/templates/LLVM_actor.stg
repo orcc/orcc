@@ -76,6 +76,14 @@ $var$--;
 
 >>
 
+// initialization port node
+initPortNode(actorName, fifoName, expr, index) ::= <<
+	%$fifoName$_ptr = getelementptr %struct.lff_t** $expr$, i32 $index$
+	%$fifoName$_val = load %struct.lff_t** %$fifoName$_ptr
+	store %struct.lff_t* %$fifoName$_val, %struct.lff_t** @$actorName$_$fifoName$
+
+>>
+
 // hasTokens node
 hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
 	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
@@ -204,6 +212,19 @@ while ($expr$) {
 writeNode(var, actorName, fifoName, numTokens) ::= <<
 	call void @lff_write(%struct.lff_t* %$actorName$_$fifoName$, $var$)
 
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Instantiation
+///////////////////////////////////////////////////////////////////////////////
+
+inst(name, nodes) ::= <<
+
+define internal void @$name$(%struct.lff_t** %fifo) {
+entry:
+$nodes$
+	ret void
+}
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -386,7 +407,7 @@ int $actorName$_scheduler() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(name, inputs, outputs, stateVars, inits, procs,  
+actor(name, inputs, outputs, stateVars, insts, procs,  
       actions, initializes, scheduler, initialize) ::= <<
 ; Generated from "$name$"
 
@@ -409,6 +430,8 @@ $outputs: fifo(actorName=name, portName=it)$
 
 ;State variables of the actor
 $stateVars$
+
+$insts$
 
 $procs$
 

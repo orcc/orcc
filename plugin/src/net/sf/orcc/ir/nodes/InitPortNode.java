@@ -28,66 +28,46 @@
  */
 package net.sf.orcc.ir.nodes;
 
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.expr.VarExpr;
+
 /**
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
-public abstract class AbstractNodeVisitor implements NodeVisitor {
+public class InitPortNode extends AbstractNode {
 
-	@Override
-	public void visit(AssignVarNode node, Object... args) {
+	private String fifoName;
+
+	private VarExpr value;
+
+	public InitPortNode(int id, Location location, String fifoName,
+			int index, VarExpr value) {
+		super(id, location);
+		this.fifoName = fifoName;
+		this.value = value;
 	}
 
 	@Override
-	public void visit(CallNode node, Object... args) {
+	public void accept(NodeVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
-	@Override
-	public void visit(EmptyNode node, Object... args) {
+	public String getFifoName() {
+		return fifoName;
 	}
-
-	@Override
-	public void visit(HasTokensNode node, Object... args) {
+	
+	public void setFifoName(String fifoName) {
+		this.fifoName = fifoName;
 	}
-
-	@Override
-	public void visit(IfNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(JoinNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(LoadNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(PeekNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(ReadNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(ReturnNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(StoreNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(WhileNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(WriteNode node, Object... args) {
+	
+	public VarExpr getValue() {
+		return value;
 	}
 	
 	@Override
-	public void visit(InitPortNode node, Object... args) {
+	public String toString() {
+		return fifoName + " = " + value ;
 	}
 
 }

@@ -43,6 +43,8 @@ public class Actor {
 	private ActionScheduler actionScheduler;
 
 	private List<Action> initializes;
+	
+	private List<Procedure> instantations;
 
 	private List<VarDef> inputs;
 
@@ -57,7 +59,7 @@ public class Actor {
 	public Actor(String name, List<VarDef> inputs, List<VarDef> outputs,
 			List<StateVar> stateVars, List<Procedure> procs,
 			List<Action> actions, List<Action> initializes,
-			ActionScheduler scheduler) {
+			ActionScheduler scheduler, List<Procedure> instantations) {
 		this.actions = actions;
 		this.initializes = initializes;
 		this.inputs = inputs;
@@ -66,6 +68,7 @@ public class Actor {
 		this.procs = procs;
 		this.actionScheduler = scheduler;
 		this.stateVars = stateVars;
+		this.instantations = instantations;
 	}
 
 	public List<Action> getActions() {
@@ -78,6 +81,14 @@ public class Actor {
 
 	public List<Action> getInitializes() {
 		return initializes;
+	}
+	
+	public List<Procedure> getInstantations() {
+		return instantations;
+	}
+	
+	public void setInstantations(List<Procedure> instantations) {
+		this.instantations = instantations;
 	}
 
 	public VarDef getInput(String port) {

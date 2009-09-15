@@ -26,29 +26,19 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.transforms;
+package net.sf.orcc.ir.transforms;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
-import net.sf.orcc.backends.llvm.nodes.BrNode;
-import net.sf.orcc.backends.llvm.nodes.LabelNode;
-import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.AbstractExpr;
-import net.sf.orcc.ir.expr.TypeExpr;
+import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.JoinNode;
-import net.sf.orcc.ir.nodes.PhiAssignment;
-import net.sf.orcc.ir.nodes.ReturnNode;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.type.VoidType;
 
 /**
@@ -57,24 +47,38 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class AddInitializationProcedure {
+public class AddInstantationProcedure {
 
 	private String actorName;
 
-	public AddInitializationProcedure(Actor actor) {
-		List<Procedure> procedures = actor.getProcs();
+	public AddInstantationProcedure(Actor actor) {
+		List<Procedure> instations = new ArrayList<Procedure>();
 		this.actorName = actor.getName();
 		Procedure inputInit = createInitProcedure("Input", actor.getInputs());
-		procedures.add(inputInit);
+		Procedure inputOutput = createInitProcedure("Output", actor.getOutputs());
+		instations.add(inputInit);
+		instations.add(inputOutput);
+		actor.setInstantations(instations);
 	}
 
-	private Procedure createInitProcedure(String Attributs, List<VarDef> inputs) {
+	private Procedure createInitProcedure(String Attributs, List<VarDef> ports) {
 		List<VarDef> parameters = new ArrayList<VarDef> ();
 		List<VarDef> locals = new ArrayList<VarDef> ();
 		List<AbstractNode> nodes = new ArrayList<AbstractNode> ();
 		
-		for (VarDef input : inputs){
+		VarDef parameter = new VarDef(false, false, 0, new Location(),
+				"fifo", null, null,	null, new VoidType());
+		
+		parameters.add(parameter);
+		for (VarDef port : ports){ 
 			
+			VarUse varuse = new VarUse(parameter, null);
+			VarExpr expr = new VarExpr(new Location(), varuse);
+			
+			InitPortNode node = new InitPortNode(0, new Location(), port.getName(),
+					0, expr);
+			
+			nodes.add(node);
 		}
 		
 		return new Procedure(actorName+"_init"+Attributs, false, new Location(),

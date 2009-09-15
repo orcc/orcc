@@ -72,6 +72,7 @@ import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
@@ -524,6 +525,12 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(InitPortNode node, Object... args) {
 		// TODO Auto-generated method stub
 		
 	}

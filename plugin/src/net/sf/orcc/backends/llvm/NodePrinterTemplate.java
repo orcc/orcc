@@ -52,6 +52,7 @@ import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
@@ -481,5 +482,18 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 	public void visit(GetElementPtrNode node, Object... args) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void visit(InitPortNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("initPortNode");
+		
+		nodeTmpl.setAttribute("actorName", actorName);
+		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		ExprToString expr = new ExprToString(varDefPrinter, node.getValue(),false);
+		nodeTmpl.setAttribute("expr", expr.toString());
+		nodeTmpl.setAttribute("index", (Integer) args[0]);
+		
+		template.setAttribute(attrName, nodeTmpl);
 	}
 }

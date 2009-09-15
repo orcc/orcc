@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
+import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 
 /**
@@ -53,5 +54,7 @@ public interface LLVMNodeVisitor extends NodeVisitor {
 	public void visit(ZextNode node, Object... args);
 	
 	public void visit(GetElementPtrNode node, Object... args);
+	
+	public void visit(InitPortNode node, Object... args);
 
 }
