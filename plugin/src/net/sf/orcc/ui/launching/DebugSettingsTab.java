@@ -28,7 +28,13 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+
+import java.io.File;
+import java.io.IOException;
+
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
@@ -223,6 +229,18 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(INPUT_FILE, "");
+
+		// output folder is the temporary folder
+		String folder = System.getProperty("java.io.tmpdir");
+		try {
+			folder = new File(folder).getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		configuration.setAttribute(OUTPUT_FOLDER, folder);
+
+		// backend
+		configuration.setAttribute(BACKEND, "Java");
 	}
 
 }

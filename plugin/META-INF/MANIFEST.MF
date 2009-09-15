@@ -10,7 +10,10 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.debug.ui,
  org.eclipse.ui,
  org.eclipse.ui.console,
- org.eclipse.ui.ide
+ org.eclipse.ui.ide,
+ net.sf.opendf.eclipse.debug,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
