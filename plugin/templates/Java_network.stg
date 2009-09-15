@@ -68,6 +68,7 @@ public class Network_$name$ implements IScheduler {
 		IScheduler scheduler = new Network_$name$();
 		scheduler.initialize();
 		scheduler.schedule();
+		Actor_display.closeDisplay();
 	}
 }
 
