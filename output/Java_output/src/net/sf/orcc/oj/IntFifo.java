@@ -60,7 +60,7 @@ public class IntFifo {
 	}
 
 	public boolean hasRoom(int n) {
-		if (write < size) {
+		if ((size - write) > n) {
 			return true;
 		} else {
 			FifoManager.getInstance().addFullFifo(this);
@@ -69,7 +69,7 @@ public class IntFifo {
 	}
 
 	public boolean hasTokens(int n) {
-		if ((write - read) >= n) {
+		if ((write - read) > n) {
 			return true;
 		} else {
 			FifoManager.getInstance().addEmptyFifo(this);
