@@ -31,10 +31,7 @@ package net.sf.orcc.ui.launching;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_CONFIG_TYPE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,15 +112,6 @@ public class OrccDebugLaunchShortcut implements ILaunchShortcut2 {
 
 			// source file
 			wc.setAttribute(INPUT_FILE, file.getLocation().toOSString());
-
-			// output folder is the temporary folder
-			String folder = System.getProperty("java.io.tmpdir");
-			try {
-				folder = new File(folder).getCanonicalPath();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			wc.setAttribute(OUTPUT_FOLDER, folder);
 
 			// backend
 			wc.setAttribute(BACKEND, "Java");

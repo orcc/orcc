@@ -76,14 +76,14 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 		NameTransformer.names.clear();
 
 		String sep = File.separator;
-		outputPath = path + sep + "net" + sep;
-		new File(outputPath).mkdir();
-		outputPath += "sf" + sep;
-		new File(outputPath).mkdir();
-		outputPath += "orcc" + sep;
-		new File(outputPath).mkdir();
-		outputPath += "generated" + sep;
-		new File(outputPath).mkdir();
+
+		// create paths
+		outputPath = path + sep;
+		String[] segments = { "src", "net", "sf", "orcc", "generated" };
+		for (String segment : segments) {
+			outputPath += segment + sep;
+			new File(outputPath).mkdir();
+		}
 	}
 
 	@Override
