@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.c.nodes;
 
+import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 
 /**
@@ -41,5 +42,7 @@ public interface CNodeVisitor extends NodeVisitor {
 	public void visit(IncrementNode node, Object... args);
 
 	public void visit(SelfAssignment node, Object... args);
-
+	
+	public void visit(InitPortNode node, Object... args);
+	
 }

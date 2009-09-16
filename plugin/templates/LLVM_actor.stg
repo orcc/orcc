@@ -14,9 +14,7 @@ fifo(actorName, portName) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 typedef(typeValue, sizeValue) ::= <<
-$if(sizeValue)$ [$sizeValue$ x $typeValue$]
-$else$ $typeValue$
-
+$if(sizeValue)$ [$sizeValue$ x $typeValue$] $else$ $typeValue$
 $endif$
 
 >>
@@ -87,7 +85,7 @@ initPortNode(actorName, fifoName, expr, index) ::= <<
 // hasTokens node
 hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
 	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
-	$var$ = call i32 @lff_hasTokens(%struct.lff_t* %$actorName$_$fifoName$, i32 $numTokens$)
+	$var$ = call i1 @lff_hasTokens(%struct.lff_t* %$actorName$_$fifoName$, i32 $numTokens$)
 
 >>
 
@@ -222,8 +220,7 @@ inst(name, nodes) ::= <<
 
 define internal void @$name$(%struct.lff_t** %fifo) {
 entry:
-$nodes$
-	ret void
+$nodes$	ret void
 }
 >>
 
@@ -252,7 +249,7 @@ $pattern.keys:{port|%$actorName$_$port$ = load %struct.lff_t** @$actorName$_$por
 >>
 
 outputPattern(actorName, pattern) ::= <<
-$pattern.keys:{port|call i32 @lff_hasRoom(%struct.lff_t* %$actorName$_$port$, i32 $pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|call i1 @lff_hasRoom(%struct.lff_t* %$actorName$_$port$, i32 $pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -271,8 +268,7 @@ actionTest(actorName, action) ::= <<
 fire_$action.tag$:
 	$if(action.outputPattern)$
 	$loadPattern(actorName=actorName, pattern=action.outputPattern)$
-	%room_$action.tag$_i32 = $outputPattern(actorName=actorName, pattern=action.outputPattern)$
-	%room_$action.tag$ = icmp ne i32 %room_$action.tag$_i32, 0
+	%room_$action.tag$ = $outputPattern(actorName=actorName, pattern=action.outputPattern)$
 	br i1 %room_$action.tag$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
 
 hasRoom_$action.tag$:
@@ -415,8 +411,8 @@ actor(name, inputs, outputs, stateVars, insts, procs,
 
 ;function declaration
 declare void @lff_read(%struct.lff_t* %lff, i8* %data)
-declare i32 @lff_hasTokens(%struct.lff_t* %lff, i32 %nbTokens)
-declare i32 @lff_hasRoom(%struct.lff_t* %lff, i32 %room)
+declare i1 @lff_hasTokens(%struct.lff_t* %lff, i32 %nbTokens)
+declare i1 @lff_hasRoom(%struct.lff_t* %lff, i32 %room)
 declare void @lff_peek(%struct.lff_t* %lff, i8* %data)
 declare void @lff_write(%struct.lff_t* %lff, i8* %data)
 

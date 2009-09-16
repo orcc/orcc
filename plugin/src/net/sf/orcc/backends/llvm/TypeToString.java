@@ -71,6 +71,9 @@ public class TypeToString extends LLVMAbstractTypeVisitor {
 		} else if (size <= 64) {
 			builder.append("i64");
 		}
+		
+		
+	//builder.append("i"+Integer.toString(size));
 	}
 
 	@Override

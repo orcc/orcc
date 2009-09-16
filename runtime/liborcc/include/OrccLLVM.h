@@ -1,6 +1,7 @@
 #ifndef ORCCLLVM_H
 #define ORCCLLVM_H
 
+#include <fstream>
 
 #include "llvm/Module.h"
 #include "llvm/Constants.h"
@@ -142,14 +143,24 @@ void* initModule(std::string moduleName, lff_t **fifoIn, lff_t **fifoOut)
   jit = ParseBitcodeFile(buffer, &error);
   delete buffer;
 
-  Linker::LinkModules(mod, jit, 0 /* error string */);
-  delete jit;
+  if (moduleName.compare("clip")==0)
+  {
+	buffer = MemoryBuffer::getFile("D:\\Projets\\orcc\\trunk\\runtime\\liborcc\\include\\lock_free_fifo.bc", &error);
+	Module* mod = ParseBitcodeFile(buffer, &error);
+	Linker::LinkModules(jit, mod, 0 /* error string */);
+	delete buffer;
+  }
 
 
-  // Get usefull function from module
-  initInput =  mod->getFunction(std::string(moduleName+"_initInput"));
-  initOutput =  mod->getFunction(std::string(moduleName+"_initOutput"));
-  sched =  mod->getFunction(std::string(moduleName+"_scheduler")); 
+  //// Get usefull function from module
+  //initInput =  mod->getFunction(std::string(moduleName+"_initInput"));
+  //initOutput =  mod->getFunction(std::string(moduleName+"_initOutput"));
+  //sched =  mod->getFunction(std::string(moduleName+"_scheduler")); 
+
+
+  initInput =  jit->getFunction(std::string(moduleName+"_initInput"));
+  initOutput =  jit->getFunction(std::string(moduleName+"_initOutput"));
+  sched =  jit->getFunction(std::string(moduleName+"_scheduler")); 
 
   // Get pointer function
   funcInitInput = (void(*)(lff_t **))(engine->getPointerToFunction(initInput));

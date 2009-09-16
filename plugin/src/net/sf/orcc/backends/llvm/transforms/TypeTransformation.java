@@ -30,12 +30,11 @@ package net.sf.orcc.backends.llvm.transforms;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-
-import java.util.Iterator;
 
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNode;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
@@ -48,8 +47,8 @@ import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
-import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
+import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
@@ -85,7 +84,6 @@ import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.expr.BinaryOp;
 
 /**
  * Verify type coherence for every nodes.
@@ -102,7 +100,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	int nodeCount;
 	
 	public TypeTransformation(Actor actor) {
-		
+			
 		portIndex = new Hashtable<String, Integer>();;
 		fillPorts(actor.getInputs());
 		fillPorts(actor.getOutputs());
@@ -290,7 +288,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(StoreNode node, Object... args) {
-/*		types.clear();
+		types.clear();
 		PointType type = (PointType)node.getTarget().getVarDef().getType();
 		
 		types.add(type.getType());
@@ -300,19 +298,18 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			AbstractType typeE2 = types.get(1);
 			if (!(typeE1.equals(typeE2))){
 				it.previous();
+								
 				VarExpr sourceVar = (VarExpr)node.getValue();
-				VarDef sourceVarDef = sourceVar.getVar().getVarDef();
-				VarDef castVar = new VarDef(varDef);
-				castVar.setIndex(castVar.getIndex()+1);
+				VarUse varUse = sourceVar.getVar();
+								
+				VarDef castVar = varDefCreate(typeE1);
 				it.add(castNodeCreate(varUse.getVarDef(), castVar));
-				VarDef targetVarDef = castNodeCreate(sourceVarDef , typeE1);
-				VarUse targetvarUse = new VarUse(targetVarDef, null);
-				VarExpr targetExpr = new VarExpr(new Location(), targetvarUse);
+				varUse.setVarDef(castVar);
 				
-				node.setValue(targetExpr);
+				node.setValue(sourceVar);
 				it.next();
 			}
-		}*/
+		}
 	}
 
 	/**
@@ -321,6 +318,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	 */
 
 	public void visit(BinaryExpr expr, Object... args){
+		
 		List<AbstractType> tmpTypes = types;
 		types = new ArrayList<AbstractType>(); 
 		expr.getE1().accept(this);
@@ -329,10 +327,12 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			AbstractType typeE1 = types.get(0);
 			AbstractType typeE2 = types.get(1);
 			if (!(typeE1.equals(typeE2))){
+				VarExpr sourceVar;
+
 				//Add cast node before the current expression
 				it.previous();
 				
-				VarExpr sourceVar = (VarExpr)expr.getE2();
+				sourceVar = (VarExpr)expr.getE2();
 				VarDef sourceVarDef = sourceVar.getVar().getVarDef();
 				VarDef vardef = varDefCreate(typeE1);
 				it.add(castNodeCreate(sourceVarDef , vardef));
@@ -416,13 +416,12 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 	@Override
 	public void visit(BitcastNode node, Object... args) {
-		// TODO Auto-generated method stub
-		
+				
 	}
 
 	@Override
 	public void visit(BrLabelNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -438,46 +437,35 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(LabelNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(LoadFifo node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(CallNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(EmptyNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(HasTokensNode node, Object... args) {
-		Location location = new Location();
-		
-		VarDef varDef = varDefCreate(new IntType(32));
-		
-		VarUse varUse = new VarUse(varDef, null);
-		VarExpr varExpr = new VarExpr(location, varUse);
-		BinaryExpr expr = new BinaryExpr(location,varExpr, BinaryOp.NE, new IntExpr(location,0), new BoolType());
-		AssignVarNode compNode = new AssignVarNode(0, location, node.getVarDef(),expr);
-		
-		node.setVarDef(varDef);
-		it.add(compNode);	
 	}
 
 	@Override
 	public void visit(JoinNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -501,37 +489,37 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(ReturnNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(WhileNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(TruncNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(ZextNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	@Override
 	public void visit(InitPortNode node, Object... args) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 	

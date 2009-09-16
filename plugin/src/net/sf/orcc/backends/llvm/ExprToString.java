@@ -53,7 +53,7 @@ public class ExprToString implements ExprVisitor {
 	public static String toString(BinaryOp op) {
 		switch (op) {
 		case BAND:
-			return "&";
+			return "and";
 		case BOR:
 			return "|";
 		case BXOR:
@@ -63,7 +63,7 @@ public class ExprToString implements ExprVisitor {
 		case DIV_INT:
 			return "/";
 		case EQ:
-			return "==";
+			return "icmp eq";
 		case EXP:
 			return "pow";
 		case GE:

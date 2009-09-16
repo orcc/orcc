@@ -306,7 +306,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 
 	@Override
 	public void visit(InitPortNode node, Object... args) {
-		// TODO Auto-generated method stub
 		
 	}
+
 }

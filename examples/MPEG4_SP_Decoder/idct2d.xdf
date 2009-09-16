@@ -1,185 +1,186 @@
-<?xml version="1.0" encoding="UTF-8"?><XDF name="idct2d">
-   <!-- ************************************** -->
-   <!-- Input ports of the Graph               -->
-   <!-- ************************************** -->
-   <Port kind="Input" name="in">
-      <Type name="int">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="32"/>
-         </Entry>
-      </Type>
-   </Port>
-   <Port kind="Input" name="signed">
-      <Type name="int">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="32"/>
-         </Entry>
-      </Type>
-   </Port>
-   <!-- ************************************** -->
-   <!-- Output ports of the Graph              -->
-   <!-- ************************************** -->
-   <Port kind="Output" name="out">
-      <Type name="int">
-         <Entry kind="Expr" name="size">
-            <Expr kind="Literal" literal-kind="Integer" value="32"/>
-         </Entry>
-      </Type>
-   </Port>
-   <!-- ************************************** -->
-   <!-- Variables and Parameters of the Graph  -->
-   <!-- ************************************** -->
-   <Decl kind="Param" name="INP_SZ">
-      <Type name="int"/>
-   </Decl>
-   <Decl kind="Param" name="PIX_SZ">
-      <Type name="int"/>
-   </Decl>
-   <Decl kind="Variable" name="MEM_SZ">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="16"/>
-   </Decl>
-   <Decl kind="Variable" name="OUT_SZ">
-      <Type name="int"/>
-      <Expr kind="Literal" literal-kind="Integer" value="10"/>
-   </Decl>
-   <!-- ************************************** -->
-   <!-- Instances of the Graph                 -->
-   <!-- ************************************** -->
-   <Instance id="rowsort">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="RowSort"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="sz">
-         <Expr kind="Var" name="INP_SZ"/>
-      </Parameter>
-   </Instance>
-   <Instance id="fairmerge">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="FairMerge"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="csz">
-         <Expr kind="Var" name="MEM_SZ"/>
-      </Parameter>
-      <Parameter name="rsz">
-         <Expr kind="Var" name="INP_SZ"/>
-      </Parameter>
-   </Instance>
-   <Instance id="downsample">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Downsample"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <Instance id="idct1d">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="idct1d"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="MEM_SZ">
-         <Expr kind="Var" name="MEM_SZ"/>
-      </Parameter>
-   </Instance>
-   <Instance id="sep">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Separate"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="csz">
-         <Expr kind="Var" name="OUT_SZ"/>
-      </Parameter>
-      <Parameter name="isz">
-         <Expr kind="Var" name="MEM_SZ"/>
-      </Parameter>
-      <Parameter name="rsz">
-         <Expr kind="Var" name="MEM_SZ"/>
-      </Parameter>
-   </Instance>
-   <Instance id="trans">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Transpose"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="sz">
-         <Expr kind="Var" name="MEM_SZ"/>
-      </Parameter>
-   </Instance>
-   <Instance id="retrans">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Retranspose"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="isz">
-         <Expr kind="Var" name="OUT_SZ"/>
-      </Parameter>
-      <Parameter name="osz">
-         <Expr kind="Var" name="OUT_SZ"/>
-      </Parameter>
-   </Instance>
-   <Instance id="clip">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Clip"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-      <Parameter name="isz">
-         <Expr kind="Var" name="OUT_SZ"/>
-      </Parameter>
-      <Parameter name="osz">
-         <Expr kind="Var" name="PIX_SZ"/>
-      </Parameter>
-   </Instance>
-   <!-- ************************************** -->
-   <!-- Connections of the Graph               -->
-   <!-- ************************************** -->
-   <Connection dst="rowsort" dst-port="ROW" src="" src-port="in"/>
-   <Connection dst="clip" dst-port="SIGNED" src="" src-port="signed"/>
-   <Connection dst="fairmerge" dst-port="R0" src="rowsort" src-port="Y0"/>
-   <Connection dst="fairmerge" dst-port="R1" src="rowsort" src-port="Y1"/>
-   <Connection dst="idct1d" dst-port="X0" src="fairmerge" src-port="Y0"/>
-   <Connection dst="idct1d" dst-port="X1" src="fairmerge" src-port="Y1"/>
-   <Connection dst="downsample" dst-port="R" src="fairmerge" src-port="ROWOUT"/>
-   <Connection dst="idct1d" dst-port="ROW" src="fairmerge" src-port="ROWOUT"/>
-   <Connection dst="sep" dst-port="ROW" src="downsample" src-port="R2"/>
-   <Connection dst="sep" dst-port="X0" src="idct1d" src-port="Y0"/>
-   <Connection dst="sep" dst-port="X1" src="idct1d" src-port="Y1"/>
-   <Connection dst="sep" dst-port="X2" src="idct1d" src-port="Y2"/>
-   <Connection dst="sep" dst-port="X3" src="idct1d" src-port="Y3"/>
-   <Connection dst="trans" dst-port="X0" src="sep" src-port="R0"/>
-   <Connection dst="trans" dst-port="X1" src="sep" src-port="R1"/>
-   <Connection dst="trans" dst-port="X2" src="sep" src-port="R2"/>
-   <Connection dst="trans" dst-port="X3" src="sep" src-port="R3"/>
-   <Connection dst="retrans" dst-port="X0" src="sep" src-port="C0"/>
-   <Connection dst="retrans" dst-port="X1" src="sep" src-port="C1"/>
-   <Connection dst="retrans" dst-port="X2" src="sep" src-port="C2"/>
-   <Connection dst="retrans" dst-port="X3" src="sep" src-port="C3"/>
-   <Connection dst="fairmerge" dst-port="C0" src="trans" src-port="Y0"/>
-   <Connection dst="fairmerge" dst-port="C1" src="trans" src-port="Y1"/>
-   <Connection dst="clip" dst-port="I" src="retrans" src-port="Y"/>
-   <Connection dst="" dst-port="out" src="clip" src-port="O"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="idct2d">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="in">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="signed">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="out">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <Decl kind="Param" name="INP_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="PIX_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Variable" name="MEM_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="16"/>
+    </Decl>
+    <Decl kind="Variable" name="OUT_SZ">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="10"/>
+    </Decl>
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="rowsort">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="RowSort"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="sz">
+            <Expr kind="Var" name="INP_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="fairmerge">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="FairMerge"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="csz">
+            <Expr kind="Var" name="MEM_SZ"/>
+        </Parameter>
+        <Parameter name="rsz">
+            <Expr kind="Var" name="INP_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="downsample">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Downsample"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="idct1d">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="idct1d"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="MEM_SZ">
+            <Expr kind="Var" name="MEM_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="sep">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Separate"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="csz">
+            <Expr kind="Var" name="OUT_SZ"/>
+        </Parameter>
+        <Parameter name="isz">
+            <Expr kind="Var" name="MEM_SZ"/>
+        </Parameter>
+        <Parameter name="rsz">
+            <Expr kind="Var" name="MEM_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="trans">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Transpose"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="sz">
+            <Expr kind="Var" name="MEM_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="retrans">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Retranspose"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="isz">
+            <Expr kind="Var" name="OUT_SZ"/>
+        </Parameter>
+        <Parameter name="osz">
+            <Expr kind="Var" name="OUT_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="clip">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Clip"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="isz">
+            <Expr kind="Var" name="OUT_SZ"/>
+        </Parameter>
+        <Parameter name="osz">
+            <Expr kind="Var" name="PIX_SZ"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="rowsort" dst-port="ROW" src="" src-port="in"/>
+    <Connection dst="clip" dst-port="SIGNED" src="" src-port="signed"/>
+    <Connection dst="fairmerge" dst-port="R0" src="rowsort" src-port="Y0"/>
+    <Connection dst="fairmerge" dst-port="R1" src="rowsort" src-port="Y1"/>
+    <Connection dst="idct1d" dst-port="X0" src="fairmerge" src-port="Y0"/>
+    <Connection dst="idct1d" dst-port="X1" src="fairmerge" src-port="Y1"/>
+    <Connection dst="downsample" dst-port="R" src="fairmerge" src-port="ROWOUT"/>
+    <Connection dst="idct1d" dst-port="ROW" src="fairmerge" src-port="ROWOUT"/>
+    <Connection dst="sep" dst-port="ROW" src="downsample" src-port="R2"/>
+    <Connection dst="sep" dst-port="X0" src="idct1d" src-port="Y0"/>
+    <Connection dst="sep" dst-port="X1" src="idct1d" src-port="Y1"/>
+    <Connection dst="sep" dst-port="X2" src="idct1d" src-port="Y2"/>
+    <Connection dst="sep" dst-port="X3" src="idct1d" src-port="Y3"/>
+    <Connection dst="trans" dst-port="X0" src="sep" src-port="R0"/>
+    <Connection dst="trans" dst-port="X1" src="sep" src-port="R1"/>
+    <Connection dst="trans" dst-port="X2" src="sep" src-port="R2"/>
+    <Connection dst="trans" dst-port="X3" src="sep" src-port="R3"/>
+    <Connection dst="retrans" dst-port="X0" src="sep" src-port="C0"/>
+    <Connection dst="retrans" dst-port="X1" src="sep" src-port="C1"/>
+    <Connection dst="retrans" dst-port="X2" src="sep" src-port="C2"/>
+    <Connection dst="retrans" dst-port="X3" src="sep" src-port="C3"/>
+    <Connection dst="fairmerge" dst-port="C0" src="trans" src-port="Y0"/>
+    <Connection dst="fairmerge" dst-port="C1" src="trans" src-port="Y1"/>
+    <Connection dst="clip" dst-port="I" src="retrans" src-port="Y"/>
+    <Connection dst="" dst-port="out" src="clip" src-port="O"/>
 </XDF>

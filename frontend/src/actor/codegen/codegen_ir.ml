@@ -122,12 +122,12 @@ let rec mk_expr expr =
 		| ExprStr (loc, s) -> (loc, string s)
 		| ExprVar (loc, var_use) -> (loc, array [ string "var"; mk_var_use var_use])
 	
-		| ExprUOp (loc, uop, expr, _t) ->
+		| ExprUOp (loc, uop, expr, t) ->
 			(loc,	array [string "1 op";
-				array [string (string_of_uop uop); mk_expr expr] ])
-		| ExprBOp (loc, e1, bop, e2, _t) ->
+				array [string (string_of_uop uop); mk_expr expr; mk_type t] ])
+		| ExprBOp (loc, e1, bop, e2, t) ->
 			(loc, array [string "2 op";
-				array [string (string_of_bop bop); mk_expr e1; mk_expr e2] ])
+				array [string (string_of_bop bop); mk_expr e1; mk_expr e2; mk_type t] ])
 	in
 	array [mk_loc loc; node]
 

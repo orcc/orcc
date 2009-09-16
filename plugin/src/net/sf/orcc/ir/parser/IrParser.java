@@ -340,6 +340,7 @@ public class IrParser {
 		String name = array.getString(0);
 		AbstractExpr e1 = parseExpr(array.getJSONArray(1));
 		AbstractExpr e2 = parseExpr(array.getJSONArray(2));
+		AbstractType type = parseType(array.getJSONArray(3));
 		BinaryOp op = null;
 
 		if (name.equals(BOP_BAND)) {
@@ -386,7 +387,7 @@ public class IrParser {
 			throw new IrParseException("Invalid binary operator: " + name);
 		}
 
-		return new BinaryExpr(location, e1, op, e2, null);
+		return new BinaryExpr(location, e1, op, e2, type);
 	}
 
 	private CallNode parseCallNode(int id, Location loc, JSONArray array)
@@ -827,6 +828,7 @@ public class IrParser {
 			throws JSONException {
 		String name = array.getString(0);
 		AbstractExpr expr = parseExpr(array.getJSONArray(1));
+		AbstractType type = parseType(array.getJSONArray(2));
 		UnaryOp op = null;
 
 		if (name.equals(UOP_BNOT)) {
@@ -841,7 +843,7 @@ public class IrParser {
 			throw new IrParseException("Invalid unary operator: " + name);
 		}
 
-		return new UnaryExpr(location, op, expr, null);
+		return new UnaryExpr(location, op, expr, type);
 	}
 
 	/**
