@@ -122,10 +122,12 @@ let rec mk_expr expr =
 		| ExprStr (loc, s) -> (loc, string s)
 		| ExprVar (loc, var_use) -> (loc, array [ string "var"; mk_var_use var_use])
 	
-		| ExprUOp (loc, uop, expr, t) ->
+		| ExprUOp (loc, uop, e, _) ->
+			let t = Typing.type_of_expr expr in
 			(loc,	array [string "1 op";
-				array [string (string_of_uop uop); mk_expr expr; mk_type t] ])
-		| ExprBOp (loc, e1, bop, e2, t) ->
+				array [string (string_of_uop uop); mk_expr e; mk_type t] ])
+		| ExprBOp (loc, e1, bop, e2, _) ->
+			let t = Typing.type_of_expr expr in
 			(loc, array [string "2 op";
 				array [string (string_of_bop bop); mk_expr e1; mk_expr e2; mk_type t] ])
 	in
