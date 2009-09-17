@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="D:/repositories/mwipliez/orcc/trunk/output/oj.jar"/>
+    <jar path="orcc plugin/lib/oj.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/orcc Java library/oj.jardesc" exportErrors="false" exportWarnings="false" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -11,10 +11,19 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <file path="/orcc Java library/.classpath"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{InterpreterThread.java"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{FifoManager.java"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{SocketServerThread.java"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{CLIParameters.java"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Actor_display.java"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Broadcast.java"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IntFifo.java"/>
         <file path="/orcc Java library/oj.jardesc"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IScheduler.java"/>
         <file path="/orcc Java library/MANIFEST.MF"/>
-        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj"/>
         <file path="/orcc Java library/.project"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IActor.java"/>
+        <file path="/orcc Java library/.classpath"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Actor_source.java"/>
     </selectedElements>
 </jardesc>

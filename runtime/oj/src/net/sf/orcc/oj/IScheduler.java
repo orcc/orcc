@@ -29,9 +29,11 @@
 package net.sf.orcc.oj;
 
 public interface IScheduler {
-	
+
+	public String[] getActors();
+
 	public void initialize();
-	
+
 	public void schedule();
 
 }
