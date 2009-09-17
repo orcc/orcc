@@ -45,13 +45,10 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import net.sf.opendf.eclipse.debug.model.OpendfDebugTarget;
 import net.sf.orcc.backends.BackendFactory;
@@ -96,30 +93,6 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 	private static final String PROJECT_NAME = "orcc project";
 
 	/**
-	 * Returns a free port number on localhost, or -1 if unable to find a free
-	 * port.
-	 * 
-	 * @return a free port number on localhost, or -1 if unable to find a free
-	 *         port
-	 */
-	public static int findFreePort() {
-		ServerSocket socket = null;
-		try {
-			socket = new ServerSocket(0);
-			return socket.getLocalPort();
-		} catch (IOException e) {
-		} finally {
-			if (socket != null) {
-				try {
-					socket.close();
-				} catch (IOException e) {
-				}
-			}
-		}
-		return -1;
-	}
-
-	/**
 	 * Checks that the URL that points to Orcc frontend executable is not null,
 	 * and throws a CoreException otherwise.
 	 * 
@@ -157,28 +130,26 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 	 *            output URI
 	 * @throws CoreException
 	 */
-	private void createAndOpen(final IProject project,
-			IProgressMonitor monitor, final URI outputURI) throws CoreException {
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+	private void createAndOpen(IProject project, IProgressMonitor monitor,
+			String outputFolder) throws CoreException {
+		URI outputURI = new File(outputFolder).toURI();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
-		// create the project
-		if (!project.exists()) {
-			// new description with Java nature and correct location.
-			final IProjectDescription description = workspace
-					.newProjectDescription(PROJECT_NAME);
-			description.setLocationURI(outputURI);
-			description.setNatureIds(new String[] { JavaCore.NATURE_ID });
+		// new description with Java nature and correct location.
+		final IProjectDescription description = workspace
+				.newProjectDescription(PROJECT_NAME);
+		description.setLocationURI(outputURI);
+		description.setNatureIds(new String[] { JavaCore.NATURE_ID });
 
-			// set builder
-			ICommand command = description.newCommand();
-			command.setBuilderName(JavaCore.BUILDER_ID);
-			description.setBuildSpec(new ICommand[] { command });
+		// set builder
+		ICommand command = description.newCommand();
+		command.setBuilderName(JavaCore.BUILDER_ID);
+		description.setBuildSpec(new ICommand[] { command });
 
-			// create the project with the description
-			// note: creating the project, and later setting the
-			// description seems not to work as expected.
-			project.create(description, monitor);
-		}
+		// create the project with the description
+		// note: creating the project, and later setting the
+		// description seems not to work as expected.
+		project.create(description, monitor);
 
 		// open the project
 		if (!project.isOpen()) {
@@ -237,13 +208,17 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 		String folder = System.getProperty("java.io.tmpdir");
 		File dir = new File(folder);
 
-		Random random = new Random();
-		File file = new File(dir, "orcc_" + Math.abs(random.nextInt()));
-		while (file.exists() || !file.mkdir()) {
-			file = new File(dir, "orcc_" + Math.abs(random.nextInt()));
-		}
+		// Random random = new Random();
+		// File file = new File(dir, "orcc_" + Math.abs(random.nextInt()));
+		// while (file.exists() || !file.mkdir()) {
+		// file = new File(dir, "orcc_" + Math.abs(random.nextInt()));
+		// }
 
-		file.deleteOnExit();
+		// TODO: when debugger works, remove that.
+		File file = new File(dir, "orcc_42");
+		if (!file.exists()) {
+			file.mkdir();
+		}
 
 		return file;
 	}
@@ -259,28 +234,34 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 			wc.setAttribute(OUTPUT_FOLDER, file.getCanonicalPath());
 			wc.doSave();
 
-			createCmdLine(configuration, cmdList);
+			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			final IProject project = workspace.getRoot().getProject(
+					PROJECT_NAME);
 
-			String[] cmdLine = cmdList.toArray(new String[] {});
-			monitor.subTask("Launching frontend...");
-			int value = launchFrontend(monitor, cmdLine);
-			if (monitor.isCanceled()) {
-				return;
-			}
-			monitor.worked(1);
+			if (!project.exists()) {
+				createCmdLine(configuration, cmdList);
 
-			if (value == 0) {
-				monitor.subTask("Launching backend...");
-				launchBackend(configuration);
-
+				String[] cmdLine = cmdList.toArray(new String[] {});
+				monitor.subTask("Launching frontend...");
+				int value = launchFrontend(monitor, cmdLine);
 				if (monitor.isCanceled()) {
 					return;
 				}
 				monitor.worked(1);
 
-				monitor.subTask("Starting debugging...");
-				launchDebugger(configuration, launch, monitor);
+				if (value == 0) {
+					monitor.subTask("Launching backend...");
+					launchBackend(configuration);
+
+					if (monitor.isCanceled()) {
+						return;
+					}
+					monitor.worked(1);
+				}
 			}
+
+			monitor.subTask("Starting debugging...");
+			launchDebugger(configuration, launch, monitor);
 
 			monitor.worked(1);
 		} catch (IOException e) {
@@ -321,45 +302,21 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 	private void launchDebugger(ILaunchConfiguration configuration,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException,
 			IOException {
-
-		int commandPort = findFreePort();
-		int eventPort = findFreePort();
-		if (commandPort == -1 || eventPort == -1) {
-			throw new CoreException(new Status(IStatus.ERROR,
-					OrccActivator.PLUGIN_ID, 0, "Unable to find free port",
-					null));
-		}
-
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
-		final URI outputURI = new File(outputFolder).toURI();
 
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(PROJECT_NAME);
 
 		// create the project, open it, set class path and build
-		createAndOpen(project, monitor, outputURI);
-		setClasspathAndBuild(project, monitor);
-
-		// load class
-		URL url0 = outputURI.toURL();
-		URL[] urls = { url0 };
-		URLClassLoader cl = new URLClassLoader(urls);
-		try {
-			Class<?> clasz = cl.loadClass("net.sf.orcc.oj.Interpreter");
-			clasz.newInstance();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+		if (!project.exists()) {
+			createAndOpen(project, monitor, outputFolder);
+			setClasspathAndBuild(project, monitor);
 		}
 
-		//IProcess p = DebugPlugin.newProcess(launch, null, "Opendf Debugger");
+		// launch generated code
+		launchGeneratedCode(configuration, launch, outputFolder);
 
-		IDebugTarget target = new OpendfDebugTarget(launch, null, commandPort,
-				eventPort);
-		launch.addDebugTarget(target);
+		// IProcess p = DebugPlugin.newProcess(launch, null, "Opendf Debugger");
 	}
 
 	/**
@@ -385,6 +342,85 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 					"Could not launch frontend", e);
 			throw new CoreException(status);
 		}
+	}
+
+	private void launchGeneratedCode(ILaunchConfiguration configuration,
+			ILaunch launch, String outputFolder) throws CoreException,
+			IOException {
+		int commandPort = 5405; // SocketUtil.findFreePort();
+		int eventPort = 5406; // SocketUtil.findFreePort();
+		if (commandPort == -1 || eventPort == -1) {
+			throw new CoreException(new Status(IStatus.ERROR,
+					OrccActivator.PLUGIN_ID, 0, "Unable to find free port",
+					null));
+		}
+
+		// // bin folder with .class files
+		// File binFolder = new File(outputFolder + File.separator + "bin");
+		// URL url0 = binFolder.toURI().toURL();
+		//
+		// // library archive
+		// File oj = new File(outputFolder + File.separator + "lib"
+		// + File.separator + "oj.jar");
+		// URL url1 = oj.toURI().toURL();
+		//
+		// // init class loader with URLs
+		// URL[] urls = { url0, url1 };
+		// URLClassLoader cl = new URLClassLoader(urls);
+
+		// load network.
+		// DO NOT REMOVE CODE BELOW
+		// TODO to be used when interpreter works
+
+		// try {
+		// String inputFile = configuration.getAttribute(INPUT_FILE, "");
+		// String file = new File(inputFile).getName();
+		// file = file.substring(0, file.indexOf('.'));
+		// Class<?> clasz = cl.loadClass("net.sf.orcc.generated.Network_"
+		// + file);
+		// Constructor<?> ctor = clasz.getConstructor(Integer.TYPE,
+		// Integer.TYPE, new String[0].getClass());
+		// ctor.newInstance(commandPort, eventPort,
+		// new String[] { "D:\\Partage\\sequences\\san002.m4v" });
+		// } catch (Exception e) {
+		// IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+		// "could not execute generated code", e);
+		// throw new CoreException(status);
+		// }
+
+		// launch project in new JVM
+		// final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		// final IProject project =
+		// workspace.getRoot().getProject(PROJECT_NAME);
+		//
+		// IJavaProject myJavaProject = JavaCore.create(project);
+		//
+		// IVMInstall vmInstall = JavaRuntime.getVMInstall(myJavaProject);
+		// if (vmInstall == null)
+		// vmInstall = JavaRuntime.getDefaultVMInstall();
+		// if (vmInstall != null) {
+		// IVMRunner vmRunner = vmInstall.getVMRunner(ILaunchManager.RUN_MODE);
+		// if (vmRunner != null) {
+		// String[] classPath = null;
+		// try {
+		// classPath = JavaRuntime
+		// .computeDefaultRuntimeClassPath(myJavaProject);
+		// } catch (CoreException e) {
+		// }
+		// if (classPath != null) {
+		// VMRunnerConfiguration vmConfig = new VMRunnerConfiguration(
+		// "MyClass", classPath);
+		// ILaunch launch2 = new Launch(null, ILaunchManager.RUN_MODE,
+		// null);
+		// vmRunner.run(vmConfig, launch2, null);
+		// }
+		// }
+		// }
+
+		// launch target
+		IDebugTarget target = new OpendfDebugTarget(launch, null, commandPort,
+				eventPort);
+		launch.addDebugTarget(target);
 	}
 
 	/**
