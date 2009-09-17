@@ -13,9 +13,8 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
         <file path="/orcc Java library/.classpath"/>
         <file path="/orcc Java library/oj.jardesc"/>
-        <javaElement handleIdentifier="=orcc Java library/src&lt;net"/>
         <file path="/orcc Java library/MANIFEST.MF"/>
-        <file path="/orcc Java library/.project"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj"/>
+        <file path="/orcc Java library/.project"/>
     </selectedElements>
 </jardesc>

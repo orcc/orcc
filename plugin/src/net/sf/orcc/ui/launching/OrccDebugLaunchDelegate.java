@@ -44,6 +44,7 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URL;
@@ -57,10 +58,11 @@ import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -77,15 +79,10 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
-import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPage;
-import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageOne;
-import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageTwo;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.osgi.framework.Bundle;
 
@@ -339,9 +336,8 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(PROJECT_NAME);
 
-		// create and open the project
+		// create the project, open it, set class path and build
 		createAndOpen(project, monitor, outputURI);
-
 		setClasspathAndBuild(project, monitor);
 
 		// load class
@@ -359,9 +355,9 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 			e.printStackTrace();
 		}
 
-		IProcess p = DebugPlugin.newProcess(launch, null, "Opendf Debugger");
+		//IProcess p = DebugPlugin.newProcess(launch, null, "Opendf Debugger");
 
-		IDebugTarget target = new OpendfDebugTarget(launch, p, commandPort,
+		IDebugTarget target = new OpendfDebugTarget(launch, null, commandPort,
 				eventPort);
 		launch.addDebugTarget(target);
 	}
@@ -407,9 +403,9 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 	}
 
 	private void setClasspathAndBuild(IProject project, IProgressMonitor monitor)
-			throws CoreException {
+			throws CoreException, IOException {
 		// add classpath
-		IClasspathEntry[] entries = new IClasspathEntry[2];
+		IClasspathEntry[] entries = new IClasspathEntry[3];
 
 		// source entry
 		IJavaProject myJavaProject = JavaCore.create(project);
@@ -418,6 +414,17 @@ public class OrccDebugLaunchDelegate implements ILaunchConfigurationDelegate {
 
 		// container entry
 		entries[1] = JavaRuntime.getDefaultJREContainerEntry();
+
+		// oj library
+		Bundle bundle = OrccActivator.getDefault().getBundle();
+		IPath sourcePath = new Path("lib/oj.jar");
+		InputStream source = FileLocator.openStream(bundle, sourcePath, false);
+		IFolder folder = project.getFolder("lib");
+		folder.create(true, false, monitor);
+		IFile file = folder.getFile("oj.jar");
+		file.create(source, true, monitor);
+
+		entries[2] = JavaCore.newLibraryEntry(file.getFullPath(), null, null);
 
 		myJavaProject.setRawClasspath(entries, monitor);
 
