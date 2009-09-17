@@ -71,7 +71,7 @@ public class Instance implements Comparable<Instance> {
 				actor = new IrParser().parseActor(in);
 			} catch (Exception e) {
 				throw new NetworkParseException("Could not parse instance \""
-						+ id + "\" because: " + e.getLocalizedMessage());
+						+ id + "\" because: " + e.getLocalizedMessage(), e);
 			}
 		}
 	}

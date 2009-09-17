@@ -340,7 +340,7 @@ public class IrParser {
 		String name = array.getString(0);
 		AbstractExpr e1 = parseExpr(array.getJSONArray(1));
 		AbstractExpr e2 = parseExpr(array.getJSONArray(2));
-		AbstractType type = parseType(array.getJSONArray(3));
+		AbstractType type = parseType(array.get(3));
 		BinaryOp op = null;
 
 		if (name.equals(BOP_BAND)) {
@@ -828,7 +828,7 @@ public class IrParser {
 			throws JSONException {
 		String name = array.getString(0);
 		AbstractExpr expr = parseExpr(array.getJSONArray(1));
-		AbstractType type = parseType(array.getJSONArray(2));
+		AbstractType type = parseType(array.get(2));
 		UnaryOp op = null;
 
 		if (name.equals(UOP_BNOT)) {
