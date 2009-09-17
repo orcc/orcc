@@ -10,7 +10,12 @@
             <packagesToUnSeal/>
         </sealing>
     </manifest>
-    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=orcc Java library"/>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <file path="/orcc Java library/.classpath"/>
+        <file path="/orcc Java library/oj.jardesc"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net"/>
+        <file path="/orcc Java library/MANIFEST.MF"/>
+        <file path="/orcc Java library/.project"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj"/>
     </selectedElements>
 </jardesc>

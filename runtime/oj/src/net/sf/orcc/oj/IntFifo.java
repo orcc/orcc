@@ -40,24 +40,66 @@ public class IntFifo {
 
 	private int read;
 
+	private int size;
+
 	private int write;
 
 	public IntFifo(int size) {
+		this.size = size;
 		contents = new int[size];
 	}
 
+	public void get(boolean[] target) {
+		peek(target);
+		read += target.length;
+	}
+
 	public void get(int[] target) {
-		int n = target.length;
-		System.arraycopy(contents, read, target, 0, n);
-		read += n;
+		peek(target);
+		read += target.length;
 	}
 
 	public boolean hasRoom(int n) {
-		return write < contents.length;
+		if ((size - write) >= n) {
+			return true;
+		} else {
+			FifoManager.getInstance().addFullFifo(this);
+			return false;
+		}
 	}
 
 	public boolean hasTokens(int n) {
-		return read < contents.length;
+		if ((write - read) >= n) {
+			return true;
+		} else {
+			FifoManager.getInstance().addEmptyFifo(this);
+			return false;
+		}
+	}
+	
+	void moveTokens() {
+		// number of tokens in the FIFO
+		int n = write - read;
+
+		// if the read pointer is greater than the number of tokens, we can safely move
+		// the tokens at the beginning of the FIFO
+		if (read > n) {
+			// there is room to copy the not-read-yet tokens at the beginning of the FIFO
+			if (n > 0) {
+				// only copy if there are tokens
+				System.arraycopy(contents, read, contents, 0, n);
+			}
+			
+			read = 0;
+			write = n;
+		}
+	}
+
+	public void peek(boolean[] target) {
+		int n = target.length;
+		for (int i = 0; i < n; i++) {
+			target[i] = (contents[read + i] != 0);
+		}
 	}
 
 	public void peek(int[] target) {
@@ -65,10 +107,22 @@ public class IntFifo {
 		System.arraycopy(contents, read, target, 0, n);
 	}
 
+	public void put(boolean[] source) {
+		int n = source.length;
+		for (int i = 0; i < n; i++) {
+			contents[write + i] = source[i] ? 1 : 0;
+		}
+		write += n;
+	}
+
 	public void put(int[] source) {
 		int n = source.length;
 		System.arraycopy(source, 0, contents, write, n);
 		write += n;
+	}
+	
+	public String toString() {
+		return write + "/" + read;
 	}
 
 }

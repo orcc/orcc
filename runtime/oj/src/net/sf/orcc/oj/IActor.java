@@ -28,19 +28,12 @@
  */
 package net.sf.orcc.oj;
 
-/**
- * An actor.
- * 
- * @author Matthieu Wipliez
- * 
- */
 public interface IActor {
-
-	/**
-	 * Schedules this actor as long as possible.
-	 * 
-	 * @return the number of firings that occurred
-	 */
+	
+	public void initialize();
+	
 	public int schedule();
+	
+	public void setFifo(String portName, IntFifo fifo);
 
 }
