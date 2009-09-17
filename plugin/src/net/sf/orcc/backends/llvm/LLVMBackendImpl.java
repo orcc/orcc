@@ -81,8 +81,8 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		new EmptyNodeRemoval(actor);
-		new AssignPeephole(actor);
 		new ExpressionTransformation(actor);
+		new AssignPeephole(actor);
 		new ControlFlowTransformation(actor);
 		new AddInstantationProcedure(actor);
 		new TypeTransformation(actor);

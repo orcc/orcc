@@ -100,7 +100,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	int nodeCount;
 	
 	public TypeTransformation(Actor actor) {
-			
+		
 		portIndex = new Hashtable<String, Integer>();;
 		fillPorts(actor.getInputs());
 		fillPorts(actor.getOutputs());
@@ -194,7 +194,18 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	
 	@Override
 	public void visit(AssignVarNode node, Object... args) {
-		node.getValue().accept(this, node.getVar().getType());
+		AbstractType varType = node.getVar().getType();
+		
+		node.getValue().accept(this, varType);
+		if (!types.isEmpty()){
+			for (AbstractType type : types){
+				if (!varType.equals(type)){
+					VarDef castVar = varDefCreate(type);			
+					it.add(castNodeCreate(castVar, node.getVar()));
+					node.setVar(castVar);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -318,7 +329,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	 */
 
 	public void visit(BinaryExpr expr, Object... args){
-		
+	
 		List<AbstractType> tmpTypes = types;
 		types = new ArrayList<AbstractType>(); 
 		expr.getE1().accept(this);
@@ -327,24 +338,27 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			AbstractType typeE1 = types.get(0);
 			AbstractType typeE2 = types.get(1);
 			if (!(typeE1.equals(typeE2))){
-				VarExpr sourceVar;
+				if (expr.getE2() instanceof VarExpr){
+					VarExpr sourceVar;
 
-				//Add cast node before the current expression
-				it.previous();
-				
-				sourceVar = (VarExpr)expr.getE2();
-				VarDef sourceVarDef = sourceVar.getVar().getVarDef();
-				VarDef vardef = varDefCreate(typeE1);
-				it.add(castNodeCreate(sourceVarDef , vardef));
-				VarUse targetvarUse = new VarUse(vardef, null);
-				VarExpr targetExpr = new VarExpr(new Location(), targetvarUse);
-				
-				expr.setE2(targetExpr);
-				
-				it.next();
+					//Add cast node before the current expression
+					it.previous();
+
+					sourceVar = (VarExpr)expr.getE2();
+					VarDef sourceVarDef = sourceVar.getVar().getVarDef();
+					VarDef vardef = varDefCreate(typeE1);
+					it.add(castNodeCreate(sourceVarDef , vardef));
+					VarUse targetvarUse = new VarUse(vardef, null);
+					VarExpr targetExpr = new VarExpr(new Location(), targetvarUse);
+					
+					expr.setE2(targetExpr);
+					
+					it.next();
+				}
 			}
 		}
 		types = tmpTypes;
+		types.add(expr.getType());
 	}
 
 	
@@ -432,6 +446,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
 		it= tmpit;
+		node.getJoinNode().accept(this, node);
 		
 	}
 
@@ -464,8 +479,38 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 
 	@Override
-	public void visit(JoinNode node, Object... args) {
+	public void visit(JoinNode node, Object... args) {		
+	/*	List<PhiAssignment> phis = node.getPhis();
+		BrNode brNode = (BrNode)args[0];
 		
+		for (PhiAssignment phi : phis){
+			int count=0;
+			
+			VarDef varDef = phi.getVarDef();
+			List<VarUse> varUses = phi.getVars();
+			
+			for (VarUse varUse : varUses){
+				VarDef varDefUse = varUse.getVarDef();
+				AbstractType TypeE1 = varDef.getType();
+				AbstractType TypeE2 = varDefUse.getType();
+				if(!(TypeE1.equals(TypeE2))){
+					List<AbstractNode> nodes;
+					if (count==0){
+						nodes = brNode.getThenNodes();
+					}else {
+						nodes = brNode.getElseNodes();
+					}
+					VarDef castVar = varDefCreate(TypeE1);
+					AbstractLLVMNode castNode = castNodeCreate(varDefUse, castVar);
+					varUse.setVarDef(castVar);
+					nodes.add(castNode);
+				}
+				
+				count++;
+			}
+			
+			
+		}*/
 		
 	}
 

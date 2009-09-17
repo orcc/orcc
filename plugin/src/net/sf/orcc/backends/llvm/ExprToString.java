@@ -71,7 +71,7 @@ public class ExprToString implements ExprVisitor {
 		case GT:
 			return "icmp sgt";
 		case LAND:
-			return "&&";
+			return "and";
 		case LE:
 			return "icmp sle";
 		case LOR:
@@ -85,7 +85,7 @@ public class ExprToString implements ExprVisitor {
 		case NE:
 			return "icmp ne";
 		case PLUS:
-			return "+";
+			return "add";
 		case SHIFT_LEFT:
 			return "shl";
 		case SHIFT_RIGHT:

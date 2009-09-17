@@ -59,7 +59,11 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 	int exprCounter;
 
 	public ExpressionTransformation(Actor actor) {
-			
+		if (actor.getName().compareTo("shuffle")==0){
+			int i =0;
+			i=i+1;
+		}
+		
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
