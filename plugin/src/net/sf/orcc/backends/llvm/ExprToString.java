@@ -87,9 +87,9 @@ public class ExprToString implements ExprVisitor {
 		case PLUS:
 			return "+";
 		case SHIFT_LEFT:
-			return "<<";
+			return "shl";
 		case SHIFT_RIGHT:
-			return ">>";
+			return "lshr";
 		case TIMES:
 			return "*";
 		default:

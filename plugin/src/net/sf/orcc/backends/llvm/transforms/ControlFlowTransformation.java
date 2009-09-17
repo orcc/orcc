@@ -35,13 +35,18 @@ import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
+import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
+import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
@@ -60,7 +65,10 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 	private LabelNode labelNode;
 
 	public ControlFlowTransformation(Actor actor) {
-		
+		if (actor.getName().compareTo("serialize")==0){
+			int i=0;
+			i=i+1;
+		}
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -137,6 +145,38 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 
 		return new SelectNode(id, location, condition, phis);
 	}
+	
+	private List<AbstractNode> clearIfNode(IfNode node){
+		BooleanExpr condition = (BooleanExpr)node.getCondition();
+		List<AbstractNode> nodes;
+		List<PhiAssignment> phis = node.getJoinNode().getPhis();
+		boolean value = condition.getValue();
+		
+		if (value == true){
+			nodes = node.getThenNodes();
+		}else{
+			nodes = node.getThenNodes();
+		}
+		
+		for (PhiAssignment phi : phis){
+			VarDef varDef = phi.getVarDef();
+			List<VarUse> varUses = phi.getVars();
+			VarDef phiVar;
+			if (value == true) {
+				phiVar = varUses.get(0).getVarDef();
+				
+			}else {
+				phiVar = varUses.get(1).getVarDef();
+			}
+			
+			VarUse varuse = new VarUse(varDef, null);
+			VarExpr expr = new VarExpr(new Location(), varuse);
+			
+			phiVar.setConstant(expr);
+		}
+		
+		return nodes;
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -151,6 +191,12 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			SelectNode selectNode = SelectNodeCreate(node);
 			it.remove();
 			it.add(selectNode);
+		}else if (node.getCondition() instanceof BooleanExpr){
+			List<AbstractNode> brNodes = clearIfNode(node);
+			it.remove();
+			for (AbstractNode brNode: brNodes){
+				it.add(brNode);
+			}
 		} else {
 			BrNode brNode = BrNodeCreate(node);
 			it.remove();
