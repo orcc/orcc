@@ -6,11 +6,11 @@ package net.sf.orcc.generated;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IActorDebug;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.Location;
 
-public class Actor_dcpred implements IActor {
+public class Actor_dcpred implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 
@@ -777,7 +777,7 @@ public class Actor_dcpred implements IActor {
 				res = true;
 			}
 		} else if (isSchedulable_read_inter_ac()) {
-			if (fifo_QUANT.hasRoom(1) && fifo_SIGNED.hasRoom(1) && fifo_START.hasRoom(1) && fifo_PTR.hasRoom(1)) {
+			if (fifo_PTR.hasRoom(1) && fifo_QUANT.hasRoom(1) && fifo_START.hasRoom(1) && fifo_SIGNED.hasRoom(1)) {
 				read_inter_ac();
 				_FSM_state = States.s_inter;
 				res = true;
@@ -789,7 +789,7 @@ public class Actor_dcpred implements IActor {
 				res = true;
 			}
 		} else if (isSchedulable_read_intra()) {
-			if (fifo_START.hasRoom(1) && fifo_QUANT.hasRoom(1) && fifo_PTR.hasRoom(1) && fifo_SIGNED.hasRoom(1)) {
+			if (fifo_START.hasRoom(1) && fifo_QUANT.hasRoom(1) && fifo_SIGNED.hasRoom(1) && fifo_PTR.hasRoom(1)) {
 				read_intra();
 				_FSM_state = States.s_intra;
 				res = true;

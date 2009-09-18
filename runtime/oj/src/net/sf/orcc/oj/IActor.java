@@ -31,25 +31,25 @@ package net.sf.orcc.oj;
 public interface IActor {
 
 	/**
-	 * Returns the RVC-CAL this actor was defined in.
-	 * 
-	 * @return the RVC-CAL this actor was defined in
+	 * Initializes this actor.
 	 */
-	public String getFile();
-
-	/**
-	 * Returns the location of the given action
-	 * 
-	 * @param action
-	 *            action name
-	 * @return location
-	 */
-	public Location getLocation(String action);
-
 	public void initialize();
 
+	/**
+	 * Schedules this actor.
+	 * 
+	 * @return the number of firings that occurred.
+	 */
 	public int schedule();
 
+	/**
+	 * Sets the port whose name is given to the given FIFO.
+	 * 
+	 * @param portName
+	 *            port name
+	 * @param fifo
+	 *            FIFO
+	 */
 	public void setFifo(String portName, IntFifo fifo);
 
 }

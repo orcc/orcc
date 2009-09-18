@@ -34,7 +34,7 @@ import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Actor_source implements IActor {
+public class Actor_source implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 
@@ -79,7 +79,8 @@ public class Actor_source implements IActor {
 			while (fifo_O.hasRoom(1)) {
 				int byteRead = in.read();
 				if (byteRead == -1) {
-					break;
+					// back to beginning
+					in.seek(0L);
 				}
 
 				source[0] = byteRead;

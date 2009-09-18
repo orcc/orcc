@@ -17,7 +17,9 @@
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{CLIParameters.java"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Actor_display.java"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Broadcast.java"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{ISchedulerDebug.java"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IntFifo.java"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IActorDebug.java"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IScheduler.java"/>
         <file path="/orcc Java library/MANIFEST.MF"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Location.java"/>

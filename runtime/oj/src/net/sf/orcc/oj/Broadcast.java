@@ -38,7 +38,7 @@ import java.util.Map;
  * @author Matthieu Wipliez
  * 
  */
-public class Broadcast implements IActor {
+public class Broadcast implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 

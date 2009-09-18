@@ -6,11 +6,11 @@ package net.sf.orcc.generated;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IActorDebug;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.Location;
 
-public class Actor_seq implements IActor {
+public class Actor_seq implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 
@@ -861,13 +861,13 @@ public class Actor_seq implements IActor {
 	private boolean predict_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_predict_b2()) {
-			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
+			if (fifo_C.hasRoom(1) && fifo_A.hasRoom(1) && fifo_B.hasRoom(1)) {
 				predict_b2();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b0()) {
-			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
+			if (fifo_A.hasRoom(1) && fifo_C.hasRoom(1) && fifo_B.hasRoom(1)) {
 				predict_b0();
 				_FSM_state = States.s_advance;
 				res = true;
@@ -879,7 +879,7 @@ public class Actor_seq implements IActor {
 				res = true;
 			}
 		} else if (isSchedulable_predict_b1()) {
-			if (fifo_A.hasRoom(1) && fifo_C.hasRoom(1) && fifo_B.hasRoom(1)) {
+			if (fifo_C.hasRoom(1) && fifo_A.hasRoom(1) && fifo_B.hasRoom(1)) {
 				predict_b1();
 				_FSM_state = States.s_advance;
 				res = true;

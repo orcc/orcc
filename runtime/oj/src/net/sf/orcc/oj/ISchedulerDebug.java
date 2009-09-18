@@ -28,16 +28,27 @@
  */
 package net.sf.orcc.oj;
 
-public interface IScheduler {
+public interface ISchedulerDebug extends IScheduler {
 
 	/**
-	 * Initializes the network.
+	 * Returns the list of actors' names.
+	 * 
+	 * @return the list of actors' names.
 	 */
-	public void initialize();
+	public String[] getActors();
 
 	/**
-	 * Schedules the network.
+	 * Resumes the actor with the given name.
+	 * 
+	 * @param actorName
 	 */
-	public void schedule();
+	public void resume(String actorName);
+
+	/**
+	 * Suspends the actor with the given name.
+	 * 
+	 * @param actorName
+	 */
+	public void suspend(String actorName);
 
 }

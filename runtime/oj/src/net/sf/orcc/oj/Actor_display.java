@@ -40,7 +40,8 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-public class Actor_display extends JFrame implements IActor, ActionListener {
+public class Actor_display extends JFrame implements IActorDebug,
+		ActionListener {
 
 	private static Actor_display instance;
 
@@ -48,7 +49,7 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private static int clip(int n) {
 		if (n < 0) {
 			return 0;
@@ -112,8 +113,8 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		timer = new Timer(1, this);
-		// timer.start();
+		timer = new Timer(40, this);
+		timer.start();
 
 		instance = this;
 
@@ -129,8 +130,6 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 			graphics.drawImage(image, 0, 0, null);
 			buffer.show();
 			graphics.dispose();
-
-			timer.stop();
 		}
 	}
 
@@ -242,7 +241,6 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 		if (y == height) {
 			x = 0;
 			y = 0;
-			timer.start();
 		}
 	}
 

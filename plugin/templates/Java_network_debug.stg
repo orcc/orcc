@@ -15,12 +15,12 @@ import net.sf.orcc.oj.Actor_source;
 import net.sf.orcc.oj.Broadcast;
 import net.sf.orcc.oj.CLIParameters;
 import net.sf.orcc.oj.FifoManager;
-import net.sf.orcc.oj.IActor;
-import net.sf.orcc.oj.IScheduler;
+import net.sf.orcc.oj.IActorDebug;
+import net.sf.orcc.oj.ISchedulerDebug;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.InterpreterThread;
 
-public class Network_$name$ implements IScheduler {
+public class Network_$name$ implements ISchedulerDebug {
 
 	public static final int SIZE = $size$;
 
@@ -28,7 +28,10 @@ public class Network_$name$ implements IScheduler {
 	$connections:{fifo|private IntFifo fifo_$fifo.count$;}; separator="\n"$
 
 	// Actors
-	$instances: { inst | private IActor actor_$inst$;}; separator="\n"$
+	$instances: { inst | private IActorDebug actor_$inst$;}; separator="\n"$
+
+	// suspended indicators
+	$instances: { inst | public boolean isSuspended_$inst$;}; separator="\n"$
 
 	// Broadcasts
 	$broadcasts: { bcast | private Broadcast actor_$bcast.id$;}; separator="\n"$
@@ -51,6 +54,26 @@ public class Network_$name$ implements IScheduler {
 	}
 
 	@Override
+	public void resume(String actorName) {
+		try {
+			getClass().getField("isSuspended_" + actorName).setBoolean(this,
+					false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void suspend(String actorName) {
+		try {
+			getClass().getField("isSuspended_" + actorName).setBoolean(this,
+					true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
 	public void initialize() {
 		$instances: { inst | actor_$inst$ = new Actor_$inst$();}; separator="\n"$
 
@@ -66,12 +89,22 @@ public class Network_$name$ implements IScheduler {
 		$initializes: { init | actor_$init$.initialize();}; separator="\n"$
 
 		int i = 1;
-		while (i > 0) {
+		while (true) {
 			i = 0;
-			$instances: { inst | i += actor_$inst$.schedule();$\n$}$
+			$instances: { inst | if (!isSuspended_$inst$) {
+	i += actor_$inst$.schedule();
+}$\n$}$
 			$broadcasts: { bcast | i += actor_$bcast.id$.schedule();}; separator="\n"$
 
 			FifoManager.getInstance().emptyFifos();
+
+			if (i == 0) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

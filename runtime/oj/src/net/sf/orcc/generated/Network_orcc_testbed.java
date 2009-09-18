@@ -12,12 +12,12 @@ import net.sf.orcc.oj.Actor_source;
 import net.sf.orcc.oj.Broadcast;
 import net.sf.orcc.oj.CLIParameters;
 import net.sf.orcc.oj.FifoManager;
-import net.sf.orcc.oj.IActor;
-import net.sf.orcc.oj.IScheduler;
+import net.sf.orcc.oj.IActorDebug;
+import net.sf.orcc.oj.ISchedulerDebug;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.InterpreterThread;
 
-public class Network_orcc_testbed implements IScheduler {
+public class Network_orcc_testbed implements ISchedulerDebug {
 
 	public static final int SIZE = 10000;
 
@@ -113,39 +113,74 @@ public class Network_orcc_testbed implements IScheduler {
 	private IntFifo fifo_88;
 
 	// Actors
-	private IActor actor_acpred;
-	private IActor actor_add;
-	private IActor actor_blkexp;
-	private IActor actor_clip;
-	private IActor actor_combine;
-	private IActor actor_dcpred;
-	private IActor actor_dcsplit;
-	private IActor actor_ddr;
-	private IActor actor_dequant;
-	private IActor actor_display;
-	private IActor actor_downsample;
-	private IActor actor_fairmerge;
-	private IActor actor_final;
-	private IActor actor_interpolate;
-	private IActor actor_mbpack;
-	private IActor actor_memorymanager;
-	private IActor actor_mvrecon;
-	private IActor actor_mvseq;
-	private IActor actor_parseheaders;
-	private IActor actor_retrans;
-	private IActor actor_rowsort;
-	private IActor actor_scale;
-	private IActor actor_searchwin;
-	private IActor actor_sep;
-	private IActor actor_seq;
-	private IActor actor_serialize;
-	private IActor actor_shuffle;
-	private IActor actor_shufflefly;
-	private IActor actor_source;
-	private IActor actor_trans;
-	private IActor actor_unpack;
-	private IActor actor_zigzag;
-	private IActor actor_zzaddr;
+	private IActorDebug actor_acpred;
+	private IActorDebug actor_add;
+	private IActorDebug actor_blkexp;
+	private IActorDebug actor_clip;
+	private IActorDebug actor_combine;
+	private IActorDebug actor_dcpred;
+	private IActorDebug actor_dcsplit;
+	private IActorDebug actor_ddr;
+	private IActorDebug actor_dequant;
+	private IActorDebug actor_display;
+	private IActorDebug actor_downsample;
+	private IActorDebug actor_fairmerge;
+	private IActorDebug actor_final;
+	private IActorDebug actor_interpolate;
+	private IActorDebug actor_mbpack;
+	private IActorDebug actor_memorymanager;
+	private IActorDebug actor_mvrecon;
+	private IActorDebug actor_mvseq;
+	private IActorDebug actor_parseheaders;
+	private IActorDebug actor_retrans;
+	private IActorDebug actor_rowsort;
+	private IActorDebug actor_scale;
+	private IActorDebug actor_searchwin;
+	private IActorDebug actor_sep;
+	private IActorDebug actor_seq;
+	private IActorDebug actor_serialize;
+	private IActorDebug actor_shuffle;
+	private IActorDebug actor_shufflefly;
+	private IActorDebug actor_source;
+	private IActorDebug actor_trans;
+	private IActorDebug actor_unpack;
+	private IActorDebug actor_zigzag;
+	private IActorDebug actor_zzaddr;
+
+	// suspended indicators
+	public boolean isSuspended_acpred;
+	public boolean isSuspended_add;
+	public boolean isSuspended_blkexp;
+	public boolean isSuspended_clip;
+	public boolean isSuspended_combine;
+	public boolean isSuspended_dcpred;
+	public boolean isSuspended_dcsplit;
+	public boolean isSuspended_ddr;
+	public boolean isSuspended_dequant;
+	public boolean isSuspended_display;
+	public boolean isSuspended_downsample;
+	public boolean isSuspended_fairmerge;
+	public boolean isSuspended_final;
+	public boolean isSuspended_interpolate;
+	public boolean isSuspended_mbpack;
+	public boolean isSuspended_memorymanager;
+	public boolean isSuspended_mvrecon;
+	public boolean isSuspended_mvseq;
+	public boolean isSuspended_parseheaders;
+	public boolean isSuspended_retrans;
+	public boolean isSuspended_rowsort;
+	public boolean isSuspended_scale;
+	public boolean isSuspended_searchwin;
+	public boolean isSuspended_sep;
+	public boolean isSuspended_seq;
+	public boolean isSuspended_serialize;
+	public boolean isSuspended_shuffle;
+	public boolean isSuspended_shufflefly;
+	public boolean isSuspended_source;
+	public boolean isSuspended_trans;
+	public boolean isSuspended_unpack;
+	public boolean isSuspended_zigzag;
+	public boolean isSuspended_zzaddr;
 
 	// Broadcasts
 	private Broadcast actor_broadcast_add_VID;
@@ -173,6 +208,26 @@ public class Network_orcc_testbed implements IScheduler {
 			"sep", "seq", "serialize", "shuffle", "shufflefly", "source", "trans", "unpack", 
 			"zigzag", "zzaddr"
 		};
+	}
+
+	@Override
+	public void resume(String actorName) {
+		try {
+			getClass().getField("isSuspended_" + actorName).setBoolean(this,
+					false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void suspend(String actorName) {
+		try {
+			getClass().getField("isSuspended_" + actorName).setBoolean(this,
+					true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -284,9 +339,9 @@ public class Network_orcc_testbed implements IScheduler {
 		fifo_64 = new IntFifo(SIZE);
 		fifo_65 = new IntFifo(SIZE);
 		fifo_66 = new IntFifo(SIZE);
-		fifo_67 = new IntFifo(384);
-		fifo_68 = new IntFifo(384);
-		fifo_69 = new IntFifo(384);
+		fifo_67 = new IntFifo(SIZE);
+		fifo_68 = new IntFifo(SIZE);
+		fifo_69 = new IntFifo(SIZE);
 		fifo_70 = new IntFifo(SIZE);
 		fifo_71 = new IntFifo(SIZE);
 		fifo_72 = new IntFifo(SIZE);
@@ -300,9 +355,9 @@ public class Network_orcc_testbed implements IScheduler {
 		fifo_80 = new IntFifo(SIZE);
 		fifo_81 = new IntFifo(SIZE);
 		fifo_82 = new IntFifo(SIZE);
-		fifo_83 = new IntFifo(SIZE);
-		fifo_84 = new IntFifo(SIZE);
-		fifo_85 = new IntFifo(SIZE);
+		fifo_83 = new IntFifo(384);
+		fifo_84 = new IntFifo(384);
+		fifo_85 = new IntFifo(384);
 		fifo_86 = new IntFifo(SIZE);
 		fifo_87 = new IntFifo(SIZE);
 		fifo_88 = new IntFifo(SIZE);
@@ -441,50 +496,50 @@ public class Network_orcc_testbed implements IScheduler {
 		actor_dcpred.setFifo("B", fifo_65);
 		actor_seq.setFifo("C", fifo_66);
 		actor_dcpred.setFifo("C", fifo_66);
-		actor_add.setFifo("VID", fifo_67);
-		actor_broadcast_add_VID.setFifo("input", fifo_67);
-		actor_broadcast_add_VID.setFifo("output_0", fifo_68);
-		actor_mbpack.setFifo("DI", fifo_68);
-		actor_broadcast_add_VID.setFifo("output_1", fifo_69);
-		actor_display.setFifo("B", fifo_69);
-		actor_fairmerge.setFifo("ROWOUT", fifo_70);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("input", fifo_70);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("output_0", fifo_71);
-		actor_combine.setFifo("ROW", fifo_71);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("output_1", fifo_72);
-		actor_downsample.setFifo("R", fifo_72);
-		actor_dcpred.setFifo("START", fifo_73);
-		actor_broadcast_dcpred_START.setFifo("input", fifo_73);
-		actor_broadcast_dcpred_START.setFifo("output_0", fifo_74);
-		actor_zigzag.setFifo("START", fifo_74);
-		actor_broadcast_dcpred_START.setFifo("output_1", fifo_75);
-		actor_zzaddr.setFifo("START", fifo_75);
-		actor_broadcast_dcpred_START.setFifo("output_2", fifo_76);
-		actor_acpred.setFifo("START", fifo_76);
-		actor_mvrecon.setFifo("MV", fifo_77);
-		actor_broadcast_mvrecon_MV.setFifo("input", fifo_77);
-		actor_broadcast_mvrecon_MV.setFifo("output_0", fifo_78);
-		actor_unpack.setFifo("MV", fifo_78);
-		actor_broadcast_mvrecon_MV.setFifo("output_1", fifo_79);
-		actor_searchwin.setFifo("MV", fifo_79);
-		actor_parseheaders.setFifo("BTYPE", fifo_80);
-		actor_broadcast_parseheaders_BTYPE.setFifo("input", fifo_80);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_0", fifo_81);
-		actor_mvseq.setFifo("BTYPE", fifo_81);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_1", fifo_82);
-		actor_memorymanager.setFifo("BTYPE", fifo_82);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_2", fifo_83);
-		actor_seq.setFifo("BTYPE", fifo_83);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_3", fifo_84);
-		actor_add.setFifo("BTYPE", fifo_84);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_4", fifo_85);
-		actor_unpack.setFifo("BTYPE", fifo_85);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_5", fifo_86);
-		actor_mvrecon.setFifo("BTYPE", fifo_86);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_6", fifo_87);
-		actor_dcpred.setFifo("BTYPE", fifo_87);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_7", fifo_88);
-		actor_searchwin.setFifo("BTYPE", fifo_88);
+		actor_parseheaders.setFifo("BTYPE", fifo_67);
+		actor_broadcast_parseheaders_BTYPE.setFifo("input", fifo_67);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_0", fifo_68);
+		actor_memorymanager.setFifo("BTYPE", fifo_68);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_1", fifo_69);
+		actor_add.setFifo("BTYPE", fifo_69);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_2", fifo_70);
+		actor_mvseq.setFifo("BTYPE", fifo_70);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_3", fifo_71);
+		actor_unpack.setFifo("BTYPE", fifo_71);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_4", fifo_72);
+		actor_seq.setFifo("BTYPE", fifo_72);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_5", fifo_73);
+		actor_dcpred.setFifo("BTYPE", fifo_73);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_6", fifo_74);
+		actor_searchwin.setFifo("BTYPE", fifo_74);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_7", fifo_75);
+		actor_mvrecon.setFifo("BTYPE", fifo_75);
+		actor_mvrecon.setFifo("MV", fifo_76);
+		actor_broadcast_mvrecon_MV.setFifo("input", fifo_76);
+		actor_broadcast_mvrecon_MV.setFifo("output_0", fifo_77);
+		actor_unpack.setFifo("MV", fifo_77);
+		actor_broadcast_mvrecon_MV.setFifo("output_1", fifo_78);
+		actor_searchwin.setFifo("MV", fifo_78);
+		actor_dcpred.setFifo("START", fifo_79);
+		actor_broadcast_dcpred_START.setFifo("input", fifo_79);
+		actor_broadcast_dcpred_START.setFifo("output_0", fifo_80);
+		actor_zigzag.setFifo("START", fifo_80);
+		actor_broadcast_dcpred_START.setFifo("output_1", fifo_81);
+		actor_zzaddr.setFifo("START", fifo_81);
+		actor_broadcast_dcpred_START.setFifo("output_2", fifo_82);
+		actor_acpred.setFifo("START", fifo_82);
+		actor_add.setFifo("VID", fifo_83);
+		actor_broadcast_add_VID.setFifo("input", fifo_83);
+		actor_broadcast_add_VID.setFifo("output_0", fifo_84);
+		actor_mbpack.setFifo("DI", fifo_84);
+		actor_broadcast_add_VID.setFifo("output_1", fifo_85);
+		actor_display.setFifo("B", fifo_85);
+		actor_fairmerge.setFifo("ROWOUT", fifo_86);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("input", fifo_86);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("output_0", fifo_87);
+		actor_combine.setFifo("ROW", fifo_87);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("output_1", fifo_88);
+		actor_downsample.setFifo("R", fifo_88);
 
 	}
 
@@ -502,41 +557,107 @@ public class Network_orcc_testbed implements IScheduler {
 		actor_zigzag.initialize();
 
 		int i = 1;
-		while (i > 0) {
+		while (true) {
 			i = 0;
-			i += actor_acpred.schedule();
-			i += actor_add.schedule();
-			i += actor_blkexp.schedule();
-			i += actor_clip.schedule();
-			i += actor_combine.schedule();
-			i += actor_dcpred.schedule();
-			i += actor_dcsplit.schedule();
-			i += actor_ddr.schedule();
-			i += actor_dequant.schedule();
-			i += actor_display.schedule();
-			i += actor_downsample.schedule();
-			i += actor_fairmerge.schedule();
-			i += actor_final.schedule();
-			i += actor_interpolate.schedule();
-			i += actor_mbpack.schedule();
-			i += actor_memorymanager.schedule();
-			i += actor_mvrecon.schedule();
-			i += actor_mvseq.schedule();
-			i += actor_parseheaders.schedule();
-			i += actor_retrans.schedule();
-			i += actor_rowsort.schedule();
-			i += actor_scale.schedule();
-			i += actor_searchwin.schedule();
-			i += actor_sep.schedule();
-			i += actor_seq.schedule();
-			i += actor_serialize.schedule();
-			i += actor_shuffle.schedule();
-			i += actor_shufflefly.schedule();
-			i += actor_source.schedule();
-			i += actor_trans.schedule();
-			i += actor_unpack.schedule();
-			i += actor_zigzag.schedule();
-			i += actor_zzaddr.schedule();
+			if (!isSuspended_acpred) {
+				i += actor_acpred.schedule();
+			}
+			if (!isSuspended_add) {
+				i += actor_add.schedule();
+			}
+			if (!isSuspended_blkexp) {
+				i += actor_blkexp.schedule();
+			}
+			if (!isSuspended_clip) {
+				i += actor_clip.schedule();
+			}
+			if (!isSuspended_combine) {
+				i += actor_combine.schedule();
+			}
+			if (!isSuspended_dcpred) {
+				i += actor_dcpred.schedule();
+			}
+			if (!isSuspended_dcsplit) {
+				i += actor_dcsplit.schedule();
+			}
+			if (!isSuspended_ddr) {
+				i += actor_ddr.schedule();
+			}
+			if (!isSuspended_dequant) {
+				i += actor_dequant.schedule();
+			}
+			if (!isSuspended_display) {
+				i += actor_display.schedule();
+			}
+			if (!isSuspended_downsample) {
+				i += actor_downsample.schedule();
+			}
+			if (!isSuspended_fairmerge) {
+				i += actor_fairmerge.schedule();
+			}
+			if (!isSuspended_final) {
+				i += actor_final.schedule();
+			}
+			if (!isSuspended_interpolate) {
+				i += actor_interpolate.schedule();
+			}
+			if (!isSuspended_mbpack) {
+				i += actor_mbpack.schedule();
+			}
+			if (!isSuspended_memorymanager) {
+				i += actor_memorymanager.schedule();
+			}
+			if (!isSuspended_mvrecon) {
+				i += actor_mvrecon.schedule();
+			}
+			if (!isSuspended_mvseq) {
+				i += actor_mvseq.schedule();
+			}
+			if (!isSuspended_parseheaders) {
+				i += actor_parseheaders.schedule();
+			}
+			if (!isSuspended_retrans) {
+				i += actor_retrans.schedule();
+			}
+			if (!isSuspended_rowsort) {
+				i += actor_rowsort.schedule();
+			}
+			if (!isSuspended_scale) {
+				i += actor_scale.schedule();
+			}
+			if (!isSuspended_searchwin) {
+				i += actor_searchwin.schedule();
+			}
+			if (!isSuspended_sep) {
+				i += actor_sep.schedule();
+			}
+			if (!isSuspended_seq) {
+				i += actor_seq.schedule();
+			}
+			if (!isSuspended_serialize) {
+				i += actor_serialize.schedule();
+			}
+			if (!isSuspended_shuffle) {
+				i += actor_shuffle.schedule();
+			}
+			if (!isSuspended_shufflefly) {
+				i += actor_shufflefly.schedule();
+			}
+			if (!isSuspended_source) {
+				i += actor_source.schedule();
+			}
+			if (!isSuspended_trans) {
+				i += actor_trans.schedule();
+			}
+			if (!isSuspended_unpack) {
+				i += actor_unpack.schedule();
+			}
+			if (!isSuspended_zigzag) {
+				i += actor_zigzag.schedule();
+			}
+			if (!isSuspended_zzaddr) {
+				i += actor_zzaddr.schedule();
+			}
 
 			i += actor_broadcast_add_VID.schedule();
 			i += actor_broadcast_dcpred_START.schedule();
@@ -545,6 +666,14 @@ public class Network_orcc_testbed implements IScheduler {
 			i += actor_broadcast_parseheaders_BTYPE.schedule();
 
 			FifoManager.getInstance().emptyFifos();
+
+			if (i == 0) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 

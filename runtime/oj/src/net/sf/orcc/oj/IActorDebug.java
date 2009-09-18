@@ -28,16 +28,22 @@
  */
 package net.sf.orcc.oj;
 
-public interface IScheduler {
+public interface IActorDebug extends IActor {
 
 	/**
-	 * Initializes the network.
+	 * Returns the RVC-CAL this actor was defined in.
+	 * 
+	 * @return the RVC-CAL this actor was defined in
 	 */
-	public void initialize();
+	public String getFile();
 
 	/**
-	 * Schedules the network.
+	 * Returns the location of the given action
+	 * 
+	 * @param action
+	 *            action name
+	 * @return location
 	 */
-	public void schedule();
+	public Location getLocation(String action);
 
 }

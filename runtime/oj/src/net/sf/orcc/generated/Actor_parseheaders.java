@@ -6,11 +6,11 @@ package net.sf.orcc.generated;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IActorDebug;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.Location;
 
-public class Actor_parseheaders implements IActor {
+public class Actor_parseheaders implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 
@@ -3188,7 +3188,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean get_dc_a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_get_dc()) {
-			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
 				get_dc();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3204,7 +3204,7 @@ public class Actor_parseheaders implements IActor {
 			_FSM_state = States.s_stuck;
 			res = true;
 		} else if (isSchedulable_get_dc_bits_none()) {
-			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
 				get_dc_bits_none();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3402,7 +3402,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean send_new_vop_height_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_send_new_vop_height()) {
-			if (fifo_BTYPE.hasRoom(1) && fifo_HEIGHT.hasRoom(1)) {
+			if (fifo_HEIGHT.hasRoom(1) && fifo_BTYPE.hasRoom(1)) {
 				send_new_vop_height();
 				_FSM_state = States.s_mb;
 				res = true;
@@ -3426,7 +3426,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean send_new_vop_width_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_send_new_vop_width()) {
-			if (fifo_BTYPE.hasRoom(1) && fifo_WIDTH.hasRoom(1)) {
+			if (fifo_WIDTH.hasRoom(1) && fifo_BTYPE.hasRoom(1)) {
 				send_new_vop_width();
 				_FSM_state = States.s_send_new_vop_height;
 				res = true;
@@ -3578,7 +3578,7 @@ public class Actor_parseheaders implements IActor {
 			_FSM_state = States.s_texac;
 			res = true;
 		} else if (isSchedulable_vld_start_inter_not_ac_coded()) {
-			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
 				vld_start_inter_not_ac_coded();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3590,7 +3590,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean vld1_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_code()) {
-			if (fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
+			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
 				vld_code();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3628,7 +3628,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean vld4a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_level_lookup()) {
-			if (fifo_LAST.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1)) {
+			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
 				vld_level_lookup();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3654,7 +3654,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean vld6a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_run_lookup()) {
-			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
 				vld_run_lookup();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3680,7 +3680,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean vld_direct_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_direct()) {
-			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
 				vld_direct();
 				_FSM_state = States.s_texac;
 				res = true;

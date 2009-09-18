@@ -6,11 +6,11 @@ package net.sf.orcc.generated;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IActorDebug;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.Location;
 
-public class Actor_scale implements IActor {
+public class Actor_scale implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 
@@ -164,7 +164,7 @@ public class Actor_scale implements IActor {
 		while (res) {
 			res = false;
 			if (isSchedulable_untagged01()) {
-				if (fifo_Y2.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y3.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+				if (fifo_Y3.hasRoom(1) && fifo_Y2.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 					untagged01();
 					res = true;
 					i++;

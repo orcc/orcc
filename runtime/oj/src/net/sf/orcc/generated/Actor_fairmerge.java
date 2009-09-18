@@ -6,11 +6,11 @@ package net.sf.orcc.generated;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IActorDebug;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.Location;
 
-public class Actor_fairmerge implements IActor {
+public class Actor_fairmerge implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 
@@ -268,7 +268,7 @@ public class Actor_fairmerge implements IActor {
 				res = true;
 			}
 		} else if (isSchedulable_row_low()) {
-			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
+			if (fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				row_low();
 				_FSM_state = States.s_r1;
 				res = true;
@@ -316,7 +316,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean r0_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_row()) {
-			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
+			if (fifo_ROWOUT.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				row();
 				_FSM_state = States.s_r1;
 				res = true;
@@ -334,7 +334,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean r1_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_row()) {
-			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
+			if (fifo_ROWOUT.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				row();
 				_FSM_state = States.s_r2;
 				res = true;
@@ -346,7 +346,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean r2_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_row()) {
-			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
+			if (fifo_ROWOUT.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				row();
 				_FSM_state = States.s_r3;
 				res = true;
@@ -358,7 +358,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean r3_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_row()) {
-			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
+			if (fifo_ROWOUT.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				row();
 				_FSM_state = States.s_c0;
 				res = true;

@@ -45,15 +45,33 @@ public class InterpreterThread extends Thread {
 
 	private SocketServerThread eventSocket;
 
-	private IScheduler scheduler;
+	private ISchedulerDebug scheduler;
 
 	private boolean terminateInterpreter;
 
-	public InterpreterThread(int cmdPort, int eventPort, IScheduler scheduler)
-			throws IOException {
+	public InterpreterThread(int cmdPort, int eventPort,
+			ISchedulerDebug scheduler) throws IOException {
 		cmdSocket = new SocketServerThread(cmdPort);
 		eventSocket = new SocketServerThread(eventPort);
 		this.scheduler = scheduler;
+	}
+
+	private void getComponents() {
+		String[] actors = scheduler.getActors();
+		if (actors.length > 0) {
+			String response = actors[0];
+			for (int i = 1; i < actors.length; i++) {
+				response += "|" + actors[i];
+			}
+			writeReply(response);
+		}
+	}
+
+	private void resume(String actorName) {
+		System.out.println("resume " + actorName);
+		scheduler.resume(actorName);
+		writeReply("ok");
+		writeEvent("resumed " + actorName + ":client");
 	}
 
 	@Override
@@ -90,6 +108,8 @@ public class InterpreterThread extends Thread {
 					resume(command.substring(7));
 				} else if (command.startsWith("stack")) {
 					stack(command.substring(6));
+				} else if (command.startsWith("suspend")) {
+					suspend(command.substring(8));
 				} else {
 					System.out.println("ignoring received command " + command);
 				}
@@ -99,31 +119,23 @@ public class InterpreterThread extends Thread {
 		}
 	}
 
-	private void resume(String actorName) {
-		writeReply("ok");
-	}
-
 	private void stack(String actorName) {
+		System.out.println("stack " + actorName);
+
 		String actionName = "my_action";
 		String response = "fileName|" + actorName + "|" + actionName;
 		int lineNumber = 50;
 		response += "|" + lineNumber;
-		response += "|var_x";
-		response += "|var_y";
 		// response =
 		// "fileName|componentName|function name|location|variable name|variable name|...|variable name"
 		writeReply(response);
 	}
 
-	private void getComponents() {
-		String[] actors = scheduler.getActors();
-		if (actors.length > 0) {
-			String response = actors[0];
-			for (int i = 1; i < actors.length; i++) {
-				response += "|" + actors[i];
-			}
-			writeReply(response);
-		}
+	private void suspend(String actorName) {
+		System.out.println("suspend " + actorName);
+		scheduler.suspend(actorName);
+		writeReply("ok");
+		writeEvent("suspended " + actorName + ":client");
 	}
 
 	private void terminate() {

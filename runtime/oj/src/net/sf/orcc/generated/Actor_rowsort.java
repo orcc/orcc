@@ -6,11 +6,11 @@ package net.sf.orcc.generated;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IActorDebug;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.Location;
 
-public class Actor_rowsort implements IActor {
+public class Actor_rowsort implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 
@@ -393,7 +393,7 @@ public class Actor_rowsort implements IActor {
 	private boolean s4_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_a4()) {
-			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				a4();
 				_FSM_state = States.s_s5;
 				res = true;
@@ -427,7 +427,7 @@ public class Actor_rowsort implements IActor {
 	private boolean s7_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_a7()) {
-			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				a7();
 				_FSM_state = States.s_s8;
 				res = true;
