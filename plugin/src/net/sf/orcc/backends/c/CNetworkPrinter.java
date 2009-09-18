@@ -110,7 +110,7 @@ public class CNetworkPrinter {
 
 		setAttributes(network, debugFifos, fifoSize);
 
-		byte[] b = template.toString().getBytes();
+		byte[] b = template.toString(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();

@@ -226,7 +226,7 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(INPUT_FILE, "");
 
 		// backend
-		configuration.setAttribute(BACKEND, "Java");
+		configuration.setAttribute(BACKEND, "Java *debug*");
 	}
 
 }

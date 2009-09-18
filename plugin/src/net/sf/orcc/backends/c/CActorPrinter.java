@@ -61,7 +61,7 @@ public class CActorPrinter {
 
 	protected StringTemplateGroup group;
 
-	private StringTemplate template;
+	protected StringTemplate template;
 
 	protected TypeToString typePrinter;
 
@@ -182,7 +182,14 @@ public class CActorPrinter {
 		}
 	}
 
-	private void setAttributes(Actor actor) {
+	/**
+	 * Sets attributes of the template from the given actor. Classes may extend,
+	 * but should call super.setAttributes(actor) first.
+	 * 
+	 * @param actor
+	 *            An actor
+	 */
+	protected void setAttributes(Actor actor) {
 		String actorName = actor.getName();
 		template.setAttribute("name", actorName);
 		setFifos("inputs", actor.getInputs());

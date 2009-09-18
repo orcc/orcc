@@ -114,7 +114,7 @@ public class OrccDebugLaunchShortcut implements ILaunchShortcut2 {
 			wc.setAttribute(INPUT_FILE, file.getLocation().toOSString());
 
 			// backend
-			wc.setAttribute(BACKEND, "Java");
+			wc.setAttribute(BACKEND, "Java *debug*");
 
 			// other options need not be set.
 

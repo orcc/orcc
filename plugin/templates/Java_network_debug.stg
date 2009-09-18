@@ -1,0 +1,98 @@
+group Java_network_debug : Java_network;
+
+network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+/**
+ * Generated from "$name$"
+ * 
+ * DEBUG version.
+ */
+package net.sf.orcc.generated;
+
+import java.io.IOException;
+
+import net.sf.orcc.oj.Actor_display;
+import net.sf.orcc.oj.Actor_source;
+import net.sf.orcc.oj.Broadcast;
+import net.sf.orcc.oj.CLIParameters;
+import net.sf.orcc.oj.FifoManager;
+import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IScheduler;
+import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.InterpreterThread;
+
+public class Network_$name$ implements IScheduler {
+
+	public static final int SIZE = $size$;
+
+	// FIFO declarations
+	$connections:{fifo|private IntFifo fifo_$fifo.count$;}; separator="\n"$
+
+	// Actors
+	$instances: { inst | private IActor actor_$inst$;}; separator="\n"$
+
+	// Broadcasts
+	$broadcasts: { bcast | private Broadcast actor_$bcast.id$;}; separator="\n"$
+	
+	public Network_$name$(int cmdPort, int eventPort, String[] args)
+			throws IOException {
+		new InterpreterThread(cmdPort, eventPort, this).start();
+
+		CLIParameters.getInstance().setArguments(args);
+		initialize();
+		schedule();
+		Actor_display.closeDisplay();
+	}
+	
+	@Override
+	public String[] getActors() {
+		return new String[] {
+			$instances: { inst | "$inst$"}; wrap, anchor, separator=", "$
+		};
+	}
+
+	@Override
+	public void initialize() {
+		$instances: { inst | actor_$inst$ = new Actor_$inst$();}; separator="\n"$
+
+		$broadcasts: { bcast | actor_$bcast.id$ = new Broadcast($length(bcast.num)$);}; separator="\n"$
+
+		$connections:{ fifo | fifo_$fifo.count$ = new IntFifo($fifo.size$);}; separator="\n"$
+
+		$connections:setFifo()$
+	}
+
+	@Override
+	public void schedule() {
+		$initializes: { init | actor_$init$.initialize();}; separator="\n"$
+
+		int i = 1;
+		while (i > 0) {
+			i = 0;
+			$instances: { inst | i += actor_$inst$.schedule();$\n$}$
+			$broadcasts: { bcast | i += actor_$bcast.id$.schedule();}; separator="\n"$
+
+			FifoManager.getInstance().emptyFifos();
+		}
+	}
+
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) throws IOException {
+		if (args.length < 2) {
+			System.err.println("error: expecting at least two arguments");
+			System.err.println("usage: main <command port> <event port> ...");
+			System.exit(-1);
+		}
+		int cmdPort = Integer.decode(args[0]);
+		int eventPort = Integer.decode(args[1]);
+
+		String[] otherArgs = new String[args.length - 2];
+		System.arraycopy(args, 2, otherArgs, 0, args.length - 2);
+		new Network_orcc_testbed(cmdPort, eventPort, otherArgs);
+	}
+}
+
+>>
+

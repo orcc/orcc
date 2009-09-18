@@ -26,85 +26,29 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.backends.java.debug;
+
+import java.io.IOException;
+
+import net.sf.orcc.backends.c.CNetworkPrinter;
+import net.sf.orcc.backends.java.JavaTypePrinter;
 
 /**
+ * Network printer.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class Location {
-
-	private int endColumn;
-
-	private int endLine;
-
-	private String file;
-
-	private int startColumn;
-
-	private int startLine;
+public class JavaDebugNetworkPrinter extends CNetworkPrinter {
 
 	/**
-	 * Constructs a dummy location.
-	 */
-	public Location() {
-		file = "";
-		// other fields are initialized to 0.
-	}
-
-	/**
-	 * Constructs a location from the specified file, start line and column, end
-	 * line and column.
+	 * Creates a new network printer with the template "Java_network.stg".
 	 * 
-	 * @param file
-	 *            The file name.
-	 * @param startLine
-	 *            The line where the location starts.
-	 * @param startColumn
-	 *            The column where the location starts.
-	 * @param endLine
-	 *            The line where the location ends.
-	 * @param endColumn
-	 *            The column where the location ends.
+	 * @throws IOException
+	 *             If the template file could not be read.
 	 */
-	public Location(String file, int startLine, int startColumn, int endLine,
-			int endColumn) {
-		this.file = file;
-		this.startLine = startLine;
-		this.startColumn = startColumn;
-		this.endLine = endLine;
-		this.endColumn = endColumn;
-	}
-
-	public int getEndColumn() {
-		return endColumn;
-	}
-
-	public int getEndLine() {
-		return endLine;
-	}
-
-	public String getFile() {
-		return file;
-	}
-
-	public int getStartColumn() {
-		return startColumn;
-	}
-
-	public int getStartLine() {
-		return startLine;
-	}
-
-	public String toString() {
-		String res = "File \"" + file + "\", line " + startLine;
-		if (startLine == endLine) {
-			res += ", characters " + startColumn + "-" + endColumn;
-		} else {
-			res += ", character " + startColumn + " (end at line " + endLine;
-			res += ", character " + endColumn + ")";
-		}
-		return res;
+	public JavaDebugNetworkPrinter() throws IOException {
+		super("Java_network_debug", new JavaTypePrinter());
 	}
 
 }

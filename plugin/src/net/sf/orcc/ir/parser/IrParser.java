@@ -316,7 +316,7 @@ public class IrParser {
 		array = obj.getJSONArray(KEY_ACTION_SCHED);
 		ActionScheduler sched = parseActionScheduler(array);
 
-		Actor actor = new Actor(name, inputs, outputs, stateVars, procs,
+		Actor actor = new Actor(name, file, inputs, outputs, stateVars, procs,
 				actions, initializes, sched, null);
 
 		try {

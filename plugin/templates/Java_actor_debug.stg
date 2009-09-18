@@ -1,0 +1,89 @@
+group Java_actor_debug : Java_actor;
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor
+///////////////////////////////////////////////////////////////////////////////
+
+actor(name, inputs, outputs, stateVars, procs,
+      actions, initializes, scheduler, initialize,
+      file, actionLoc) ::= <<
+/**
+ * Generated from "$name$"
+ */
+package net.sf.orcc.generated;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import net.sf.orcc.oj.IActor;
+import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
+
+public class Actor_$name$ implements IActor {
+
+	private Map<String, Location> actionLocation;
+
+	private Map<String, IntFifo> fifos;
+	
+	private String file;
+
+	// Input FIFOs
+	$inputs: fifo()$
+	// Output FIFOs
+	$outputs: fifo()$
+	// State variables of the actor
+	$stateVars$
+	
+	public Actor_$name$() {
+		fifos = new HashMap<String, IntFifo>();
+		file = "$file$";
+		actionLocation = new HashMap<String, Location>();
+		$actionLoc.keys: { tag | actionLocation.put("$tag$", new Location($actionLoc.(tag); separator=", "$)); }; separator="\n"$
+	}
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
+	// Functions/procedures
+	$procs$
+	// Actions
+	$actions$
+$if(initializes)$
+	// Initializes
+	$initializes$
+$endif$
+	@Override
+	public void initialize() {
+$if(initialize)$
+		boolean res = true;
+		int i = 0;
+
+		$schedulingTest(initialize)$
+$endif$
+	}
+
+	@Override
+	public void setFifo(String portName, IntFifo fifo) {
+		$inputs : setFifo()$$outputs : setFifo()${
+			String msg = "unknown port \"" + portName + "\"";
+			throw new IllegalArgumentException(msg);
+		}
+	}
+
+	// Action scheduler
+$if(scheduler.fsm)$
+	$schedulerFSM(actions=scheduler.actions, fsm=scheduler.fsm)$
+$else$
+	$scheduler(scheduler.actions)$
+$endif$
+
+}
+
+>>

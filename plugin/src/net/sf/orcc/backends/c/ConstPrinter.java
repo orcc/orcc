@@ -113,7 +113,7 @@ public class ConstPrinter implements ConstVisitor {
 	public void visit(StringConst constant) {
 		// escape backslashes
 		String val = constant.getValue();
-		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
+		String res = "\"" + val.replaceAll("\\\\", "\\\\\\\\") + "\"";
 		template.setAttribute("value", res);
 	}
 

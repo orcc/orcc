@@ -139,6 +139,10 @@
         class="net.sf.orcc.backends.java.JavaBackendImpl"
         name="Java">
   </backend>
+      <backend
+            class="net.sf.orcc.backends.java.debug.JavaDebugBackendImpl"
+            name="Java *debug*">
+      </backend>
 		<backend class="net.sf.orcc.backends.llvm.LLVMBackendImpl" name="LLVM"/>
       <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"

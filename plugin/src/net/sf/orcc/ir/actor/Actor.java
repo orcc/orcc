@@ -42,11 +42,16 @@ public class Actor {
 
 	private ActionScheduler actionScheduler;
 
+	/**
+	 * The RVC-CAL file this actor was defined in.
+	 */
+	private String file;
+
 	private List<Action> initializes;
-	
-	private List<Procedure> instantations;
 
 	private List<VarDef> inputs;
+
+	private List<Procedure> instantations;
 
 	private String name;
 
@@ -56,11 +61,13 @@ public class Actor {
 
 	private List<StateVar> stateVars;
 
-	public Actor(String name, List<VarDef> inputs, List<VarDef> outputs,
-			List<StateVar> stateVars, List<Procedure> procs,
-			List<Action> actions, List<Action> initializes,
-			ActionScheduler scheduler, List<Procedure> instantations) {
+	public Actor(String name, String file, List<VarDef> inputs,
+			List<VarDef> outputs, List<StateVar> stateVars,
+			List<Procedure> procs, List<Action> actions,
+			List<Action> initializes, ActionScheduler scheduler,
+			List<Procedure> instantations) {
 		this.actions = actions;
+		this.file = file;
 		this.initializes = initializes;
 		this.inputs = inputs;
 		this.name = name;
@@ -79,16 +86,17 @@ public class Actor {
 		return actionScheduler;
 	}
 
+	/**
+	 * Returns the RVC-CAL file this actor was declared in.
+	 * 
+	 * @return the RVC-CAL file this actor was declared in
+	 */
+	public String getFile() {
+		return file;
+	}
+
 	public List<Action> getInitializes() {
 		return initializes;
-	}
-	
-	public List<Procedure> getInstantations() {
-		return instantations;
-	}
-	
-	public void setInstantations(List<Procedure> instantations) {
-		this.instantations = instantations;
 	}
 
 	public VarDef getInput(String port) {
@@ -103,6 +111,10 @@ public class Actor {
 
 	public List<VarDef> getInputs() {
 		return inputs;
+	}
+
+	public List<Procedure> getInstantations() {
+		return instantations;
 	}
 
 	public String getName() {
@@ -129,6 +141,10 @@ public class Actor {
 
 	public List<StateVar> getStateVars() {
 		return stateVars;
+	}
+
+	public void setInstantations(List<Procedure> instantations) {
+		this.instantations = instantations;
 	}
 
 	public void setName(String name) {
