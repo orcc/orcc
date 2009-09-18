@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.oj;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * A generic broadcast actor.
@@ -36,6 +39,8 @@ package net.sf.orcc.oj;
  * 
  */
 public class Broadcast implements IActor {
+
+	private Map<String, Location> actionLocation;
 
 	private IntFifo input;
 
@@ -49,6 +54,18 @@ public class Broadcast implements IActor {
 	 */
 	public Broadcast(int numOutputs) {
 		outputs = new IntFifo[numOutputs];
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("untagged", new Location(89, 13, 31));
+	}
+
+	@Override
+	public String getFile() {
+		return "Broadcast.java";
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
 	}
 
 	@Override

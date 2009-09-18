@@ -28,80 +28,59 @@
  */
 package net.sf.orcc.oj;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.HashMap;
-import java.util.Map;
+/**
+ * @author Matthieu Wipliez
+ * 
+ */
+public class Location {
 
-public class Actor_source implements IActor {
+	private int endChar;
 
-	private Map<String, Location> actionLocation;
+	private int line;
 
-	private String fileName;
+	private int startChar;
 
-	private RandomAccessFile in;
-
-	private IntFifo fifo_O;
-
-	public Actor_source() {
-		fileName = CLIParameters.getInstance().getSourceFile();
-		actionLocation = new HashMap<String, Location>();
-		actionLocation.put("untagged", new Location(80, 17, 42));
+	/**
+	 * Constructs a dummy location.
+	 */
+	public Location() {
 	}
 
-	@Override
-	public String getFile() {
-		return "Actor_source.java";
+	/**
+	 * Creates a new location.
+	 * 
+	 * @param line
+	 * @param startChar
+	 * @param endChar
+	 */
+	public Location(int line, int startChar, int endChar) {
+		this.line = line;
+		this.startChar = startChar;
+		this.endChar = endChar;
 	}
 
-	@Override
-	public Location getLocation(String action) {
-		return actionLocation.get(action);
+	/**
+	 * 
+	 * @return end char
+	 */
+	public int getEndChar() {
+		return endChar;
 	}
 
-	@Override
-	public void initialize() {
-		try {
-			in = new RandomAccessFile(fileName, "r");
-		} catch (FileNotFoundException e) {
-			String msg = "file not found: \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
-		}
+	/**
+	 * 
+	 * @return line number
+	 */
+	public int getLine() {
+		return line;
 	}
 
-	@Override
-	public int schedule() {
-		int[] source = new int[1];
-		int i = 0;
-
-		try {
-			while (fifo_O.hasRoom(1)) {
-				int byteRead = in.read();
-				if (byteRead == -1) {
-					break;
-				}
-
-				source[0] = byteRead;
-				fifo_O.put(source);
-				i++;
-			}
-		} catch (IOException e) {
-			String msg = "I/O exception: \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
-		}
-
-		return i;
-	}
-
-	@Override
-	public void setFifo(String portName, IntFifo fifo) {
-		if ("O".equals(portName)) {
-			fifo_O = fifo;
-		} else {
-			String msg = "unknown port \"" + portName + "\"";
-			throw new IllegalArgumentException(msg);
-		}
+	/**
+	 * 
+	 * @return start char
+	 */
+	public int getStartChar() {
+		return startChar;
 	}
 
 }

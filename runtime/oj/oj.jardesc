@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
     <jar path="orcc plugin/lib/oj.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/orcc Java library/oj.jardesc" exportErrors="false" exportWarnings="false" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/orcc Java library/oj.jardesc" exportErrors="false" exportWarnings="false" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="true"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
-    <manifest generateManifest="false" manifestLocation="/orcc Java library/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
         <sealing sealJar="false">
             <packagesToSeal/>
             <packagesToUnSeal/>
@@ -18,9 +18,9 @@
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Actor_display.java"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Broadcast.java"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IntFifo.java"/>
-        <file path="/orcc Java library/oj.jardesc"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IScheduler.java"/>
         <file path="/orcc Java library/MANIFEST.MF"/>
+        <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{Location.java"/>
         <file path="/orcc Java library/.project"/>
         <javaElement handleIdentifier="=orcc Java library/src&lt;net.sf.orcc.oj{IActor.java"/>
         <file path="/orcc Java library/.classpath"/>

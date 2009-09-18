@@ -85,18 +85,44 @@ public class InterpreterThread extends Thread {
 				if (command.startsWith("exit")) {
 
 				} else if (command.startsWith("getComponents")) {
-					String[] actors = scheduler.getActors();
-					if (actors.length > 0) {
-						String response = actors[0];
-						for (int i = 1; i < actors.length; i++) {
-							response += "|" + actors[i];
-						}
-						writeReply(response);
-					}
+					getComponents();
+				} else if (command.startsWith("resume")) {
+					resume(command.substring(7));
+				} else if (command.startsWith("stack")) {
+					stack(command.substring(6));
+				} else {
+					System.out.println("ignoring received command " + command);
 				}
 			}
 		} catch (IOException e) {
 			terminate();
+		}
+	}
+
+	private void resume(String actorName) {
+		writeReply("ok");
+	}
+
+	private void stack(String actorName) {
+		String actionName = "my_action";
+		String response = "fileName|" + actorName + "|" + actionName;
+		int lineNumber = 50;
+		response += "|" + lineNumber;
+		response += "|var_x";
+		response += "|var_y";
+		// response =
+		// "fileName|componentName|function name|location|variable name|variable name|...|variable name"
+		writeReply(response);
+	}
+
+	private void getComponents() {
+		String[] actors = scheduler.getActors();
+		if (actors.length > 0) {
+			String response = actors[0];
+			for (int i = 1; i < actors.length; i++) {
+				response += "|" + actors[i];
+			}
+			writeReply(response);
 		}
 	}
 

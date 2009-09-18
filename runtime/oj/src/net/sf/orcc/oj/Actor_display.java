@@ -34,6 +34,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.Timer;
@@ -46,7 +48,7 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	
 	private static int clip(int n) {
 		if (n < 0) {
 			return 0;
@@ -76,6 +78,8 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 
 		return (r << 16) | (g << 8) | b;
 	}
+
+	private Map<String, Location> actionLocation;
 
 	private BufferStrategy buffer;
 
@@ -109,9 +113,13 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		timer = new Timer(1, this);
-		//timer.start();
+		// timer.start();
 
 		instance = this;
+
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("setVideoSize", new Location(188, 1, 34));
+		actionLocation.put("writeMB", new Location(213, 1, 29));
 	}
 
 	@Override
@@ -121,9 +129,19 @@ public class Actor_display extends JFrame implements IActor, ActionListener {
 			graphics.drawImage(image, 0, 0, null);
 			buffer.show();
 			graphics.dispose();
-			
+
 			timer.stop();
 		}
+	}
+
+	@Override
+	public String getFile() {
+		return "Actor_display.java";
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
 	}
 
 	@Override
