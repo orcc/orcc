@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_seq implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_BTYPE;
@@ -68,8 +73,31 @@ public class Actor_seq implements IActor {
 	
 	public Actor_seq() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Sequence.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("advance", new Location(134, 2, 426)); 
+		actionLocation.put("geth", new Location(119, 2, 34)); 
+		actionLocation.put("getw", new Location(110, 2, 144)); 
+		actionLocation.put("predict_b0", new Location(154, 2, 770)); 
+		actionLocation.put("predict_b1", new Location(185, 2, 650)); 
+		actionLocation.put("predict_b2", new Location(210, 2, 641)); 
+		actionLocation.put("predict_b3", new Location(235, 2, 543)); 
+		actionLocation.put("predict_b45", new Location(254, 2, 952)); 
+		actionLocation.put("read_intra", new Location(122, 2, 128)); 
+		actionLocation.put("read_other", new Location(129, 2, 90)); 
+		actionLocation.put("start", new Location(100, 2, 167)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int decrement(int p) {
@@ -833,31 +861,31 @@ public class Actor_seq implements IActor {
 	private boolean predict_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_predict_b2()) {
-			if (fifo_B.hasRoom(1) && fifo_A.hasRoom(1) && fifo_C.hasRoom(1)) {
+			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
 				predict_b2();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b0()) {
-			if (fifo_B.hasRoom(1) && fifo_C.hasRoom(1) && fifo_A.hasRoom(1)) {
+			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
 				predict_b0();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b3()) {
-			if (fifo_C.hasRoom(1) && fifo_B.hasRoom(1) && fifo_A.hasRoom(1)) {
+			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
 				predict_b3();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b1()) {
-			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
+			if (fifo_A.hasRoom(1) && fifo_C.hasRoom(1) && fifo_B.hasRoom(1)) {
 				predict_b1();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b45()) {
-			if (fifo_B.hasRoom(1) && fifo_A.hasRoom(1) && fifo_C.hasRoom(1)) {
+			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
 				predict_b45();
 				_FSM_state = States.s_advance;
 				res = true;

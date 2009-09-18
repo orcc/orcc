@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_mvrecon implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_BTYPE;
@@ -102,8 +107,39 @@ public class Actor_mvrecon implements IActor {
 	
 	public Actor_mvrecon() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\MVReconstruct.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("advance", new Location(327, 2, 245)); 
+		actionLocation.put("compute_done", new Location(159, 2, 83)); 
+		actionLocation.put("compute_start", new Location(166, 2, 94)); 
+		actionLocation.put("do_pred", new Location(186, 2, 344)); 
+		actionLocation.put("get_mag", new Location(205, 2, 55)); 
+		actionLocation.put("get_pred", new Location(174, 2, 206)); 
+		actionLocation.put("get_residual_adjust", new Location(263, 2, 89)); 
+		actionLocation.put("get_residual_calc", new Location(268, 2, 91)); 
+		actionLocation.put("get_residual_clip", new Location(273, 2, 79)); 
+		actionLocation.put("get_residual_final", new Location(278, 2, 336)); 
+		actionLocation.put("get_residual_init", new Location(248, 2, 105)); 
+		actionLocation.put("get_residual_shift", new Location(253, 2, 187)); 
+		actionLocation.put("geth", new Location(108, 2, 34)); 
+		actionLocation.put("getw", new Location(102, 2, 116)); 
+		actionLocation.put("read_motion", new Location(127, 2, 157)); 
+		actionLocation.put("read_noMotion", new Location(112, 2, 265)); 
+		actionLocation.put("start", new Location(82, 2, 469)); 
+		actionLocation.put("write_chroma", new Location(318, 2, 205)); 
+		actionLocation.put("write_luma", new Location(291, 2, 278)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int middle(int a, int b, int c) {

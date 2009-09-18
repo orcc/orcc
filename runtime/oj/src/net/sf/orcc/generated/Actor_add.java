@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_add implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_MOT;
@@ -42,8 +47,28 @@ public class Actor_add implements IActor {
 	
 	public Actor_add() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Add.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("cmd_motionOnly", new Location(76, 2, 87)); 
+		actionLocation.put("cmd_newVop", new Location(62, 2, 83)); 
+		actionLocation.put("cmd_other", new Location(83, 2, 43)); 
+		actionLocation.put("cmd_textureOnly", new Location(70, 2, 87)); 
+		actionLocation.put("combine", new Location(103, 2, 187)); 
+		actionLocation.put("done", new Location(86, 2, 68)); 
+		actionLocation.put("motion", new Location(98, 2, 77)); 
+		actionLocation.put("texture", new Location(93, 2, 80)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 

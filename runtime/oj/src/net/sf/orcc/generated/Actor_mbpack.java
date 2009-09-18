@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_mbpack implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_DI;
@@ -36,8 +41,24 @@ public class Actor_mbpack implements IActor {
 	
 	public Actor_mbpack() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\MBPacker.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("addr", new Location(77, 2, 63)); 
+		actionLocation.put("data_inp", new Location(70, 2, 114)); 
+		actionLocation.put("data_out", new Location(63, 2, 142)); 
+		actionLocation.put("tc", new Location(58, 2, 45)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 

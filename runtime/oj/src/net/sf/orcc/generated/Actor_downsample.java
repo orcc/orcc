@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_downsample implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_R;
@@ -23,8 +28,22 @@ public class Actor_downsample implements IActor {
 	
 	public Actor_downsample() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Downsample.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("a0", new Location(48, 2, 27)); 
+		actionLocation.put("a1", new Location(51, 2, 34)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 

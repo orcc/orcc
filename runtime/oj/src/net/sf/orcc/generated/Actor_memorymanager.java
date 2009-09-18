@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_memorymanager implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_BTYPE;
@@ -95,8 +100,29 @@ public class Actor_memorymanager implements IActor {
 	
 	public Actor_memorymanager() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\MemoryManager.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("cmd_newVop", new Location(118, 2, 286)); 
+		actionLocation.put("cmd_other", new Location(155, 2, 98)); 
+		actionLocation.put("cmd_y0", new Location(138, 2, 347)); 
+		actionLocation.put("height", new Location(135, 2, 38)); 
+		actionLocation.put("read_above", new Location(166, 2, 79)); 
+		actionLocation.put("read_below", new Location(170, 2, 79)); 
+		actionLocation.put("read_none", new Location(162, 2, 56)); 
+		actionLocation.put("read_this", new Location(168, 2, 79)); 
+		actionLocation.put("set_width", new Location(130, 2, 62)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int mask_bits(int v, int n) {

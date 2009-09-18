@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_parseheaders implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_bits;
@@ -280,8 +285,86 @@ public class Actor_parseheaders implements IActor {
 	
 	public Actor_parseheaders() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\ParseHeaders.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("block_done", new Location(603, 2, 101)); 
+		actionLocation.put("byte_align", new Location(285, 2, 87)); 
+		actionLocation.put("dc_bits_shift", new Location(576, 2, 223)); 
+		actionLocation.put("dct_coeff", new Location(611, 2, 171)); 
+		actionLocation.put("do_level_lookup", new Location(740, 2, 348)); 
+		actionLocation.put("do_run_lookup", new Location(811, 2, 385)); 
+		actionLocation.put("do_vld_failure", new Location(1064, 2, 102)); 
+		actionLocation.put("final_cbpy_inter", new Location(479, 2, 206)); 
+		actionLocation.put("final_cbpy_intra", new Location(491, 2, 159)); 
+		actionLocation.put("generic_done", new Location(1071, 2, 64)); 
+		actionLocation.put("generic_done_with_bitread", new Location(1076, 2, 123)); 
+		actionLocation.put("get_dc", new Location(588, 2, 341)); 
+		actionLocation.put("get_dc_bits_none", new Location(558, 2, 159)); 
+		actionLocation.put("get_dc_bits_some", new Location(566, 2, 129)); 
+		actionLocation.put("get_mbtype_ac", new Location(461, 2, 312)); 
+		actionLocation.put("get_mbtype_noac", new Location(445, 2, 383)); 
+		actionLocation.put("get_mcbpc_ivop", new Location(410, 2, 118)); 
+		actionLocation.put("get_mcbpc_pvop", new Location(417, 2, 175)); 
+		actionLocation.put("get_residual_x", new Location(865, 2, 87)); 
+		actionLocation.put("get_residual_y", new Location(879, 2, 118)); 
+		actionLocation.put("mag_x", new Location(856, 2, 207)); 
+		actionLocation.put("mag_y", new Location(870, 2, 207)); 
+		actionLocation.put("mb_dispatch_done", new Location(501, 2, 79)); 
+		actionLocation.put("mb_dispatch_inter_ac_coded", new Location(527, 2, 170)); 
+		actionLocation.put("mb_dispatch_inter_no_ac", new Location(519, 2, 225)); 
+		actionLocation.put("mb_dispatch_intra", new Location(508, 2, 308)); 
+		actionLocation.put("mb_done", new Location(405, 2, 56)); 
+		actionLocation.put("mcbpc_pvop_uncoded", new Location(427, 2, 158)); 
+		actionLocation.put("mcbpc_pvop_uncoded1", new Location(436, 2, 61)); 
+		actionLocation.put("mvcode", new Location(851, 2, 71)); 
+		actionLocation.put("mvcode_done", new Location(846, 2, 90)); 
+		actionLocation.put("request_byte", new Location(1122, 2, 96)); 
+		actionLocation.put("send_new_vop_cmd", new Location(357, 2, 925)); 
+		actionLocation.put("send_new_vop_height", new Location(382, 0, 81)); 
+		actionLocation.put("send_new_vop_width", new Location(380, 0, 77)); 
+		actionLocation.put("set_vol_height", new Location(262, 2, 241)); 
+		actionLocation.put("set_vol_width", new Location(254, 2, 257)); 
+		actionLocation.put("test_one_byte", new Location(1116, 2, 103)); 
+		actionLocation.put("test_vo_byte", new Location(1089, 2, 102)); 
+		actionLocation.put("test_vol_byte", new Location(1095, 2, 226)); 
+		actionLocation.put("test_vop_byte", new Location(1104, 2, 189)); 
+		actionLocation.put("test_zero_byte", new Location(1083, 2, 104)); 
+		actionLocation.put("untagged01", new Location(148, 2, 254)); 
+		actionLocation.put("untagged02", new Location(1056, 2, 216)); 
+		actionLocation.put("vld_code", new Location(618, 2, 759)); 
+		actionLocation.put("vld_direct", new Location(668, 2, 735)); 
+		actionLocation.put("vld_direct_read", new Location(662, 2, 177)); 
+		actionLocation.put("vld_level", new Location(638, 2, 239)); 
+		actionLocation.put("vld_level_lookup", new Location(750, 2, 752)); 
+		actionLocation.put("vld_run", new Location(654, 2, 214)); 
+		actionLocation.put("vld_run_lookup", new Location(823, 2, 852)); 
+		actionLocation.put("vld_run_or_direct", new Location(647, 2, 120)); 
+		actionLocation.put("vld_start_inter_ac_coded", new Location(542, 2, 92)); 
+		actionLocation.put("vld_start_inter_not_ac_coded", new Location(550, 2, 105)); 
+		actionLocation.put("vld_start_intra", new Location(533, 2, 182)); 
+		actionLocation.put("vol_aspect_detailed", new Location(180, 2, 267)); 
+		actionLocation.put("vol_control_detailed", new Location(189, 2, 190)); 
+		actionLocation.put("vol_object_layer_identification", new Location(166, 2, 383)); 
+		actionLocation.put("vol_shape", new Location(212, 2, 166)); 
+		actionLocation.put("vol_time_inc_res", new Location(221, 2, 855)); 
+		actionLocation.put("vol_vbv_detailed", new Location(198, 2, 538)); 
+		actionLocation.put("vop_coding_coded", new Location(339, 2, 441)); 
+		actionLocation.put("vop_coding_uncoded", new Location(330, 2, 142)); 
+		actionLocation.put("vop_predict_supported", new Location(300, 2, 462)); 
+		actionLocation.put("vop_timebase_one", new Location(312, 2, 130)); 
+		actionLocation.put("vop_timebase_zero", new Location(320, 2, 145)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int mask_bits(int v, int n) {
@@ -3105,7 +3188,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean get_dc_a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_get_dc()) {
-			if (fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
+			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
 				get_dc();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3121,7 +3204,7 @@ public class Actor_parseheaders implements IActor {
 			_FSM_state = States.s_stuck;
 			res = true;
 		} else if (isSchedulable_get_dc_bits_none()) {
-			if (fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
+			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
 				get_dc_bits_none();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3343,7 +3426,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean send_new_vop_width_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_send_new_vop_width()) {
-			if (fifo_WIDTH.hasRoom(1) && fifo_BTYPE.hasRoom(1)) {
+			if (fifo_BTYPE.hasRoom(1) && fifo_WIDTH.hasRoom(1)) {
 				send_new_vop_width();
 				_FSM_state = States.s_send_new_vop_height;
 				res = true;
@@ -3507,7 +3590,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean vld1_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_code()) {
-			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
 				vld_code();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3545,7 +3628,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean vld4a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_level_lookup()) {
-			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_LAST.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1)) {
 				vld_level_lookup();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3571,7 +3654,7 @@ public class Actor_parseheaders implements IActor {
 	private boolean vld6a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_run_lookup()) {
-			if (fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
+			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
 				vld_run_lookup();
 				_FSM_state = States.s_texac;
 				res = true;

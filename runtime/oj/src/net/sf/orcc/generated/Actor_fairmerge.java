@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_fairmerge implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_R0;
@@ -33,8 +38,24 @@ public class Actor_fairmerge implements IActor {
 	
 	public Actor_fairmerge() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\FairMerge.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("col", new Location(53, 6, 71)); 
+		actionLocation.put("col_low", new Location(55, 2, 71)); 
+		actionLocation.put("row", new Location(52, 6, 70)); 
+		actionLocation.put("row_low", new Location(54, 2, 70)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 
@@ -241,13 +262,13 @@ public class Actor_fairmerge implements IActor {
 	private boolean c0_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_col()) {
-			if (fifo_ROWOUT.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				col();
 				_FSM_state = States.s_c1;
 				res = true;
 			}
 		} else if (isSchedulable_row_low()) {
-			if (fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				row_low();
 				_FSM_state = States.s_r1;
 				res = true;
@@ -259,7 +280,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean c1_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_col()) {
-			if (fifo_ROWOUT.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				col();
 				_FSM_state = States.s_c2;
 				res = true;
@@ -271,7 +292,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean c2_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_col()) {
-			if (fifo_ROWOUT.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				col();
 				_FSM_state = States.s_c3;
 				res = true;
@@ -283,7 +304,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean c3_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_col()) {
-			if (fifo_ROWOUT.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				col();
 				_FSM_state = States.s_r0;
 				res = true;
@@ -295,13 +316,13 @@ public class Actor_fairmerge implements IActor {
 	private boolean r0_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_row()) {
-			if (fifo_ROWOUT.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				row();
 				_FSM_state = States.s_r1;
 				res = true;
 			}
 		} else if (isSchedulable_col_low()) {
-			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
+			if (fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				col_low();
 				_FSM_state = States.s_c1;
 				res = true;
@@ -313,7 +334,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean r1_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_row()) {
-			if (fifo_ROWOUT.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				row();
 				_FSM_state = States.s_r2;
 				res = true;
@@ -325,7 +346,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean r2_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_row()) {
-			if (fifo_ROWOUT.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				row();
 				_FSM_state = States.s_r3;
 				res = true;
@@ -337,7 +358,7 @@ public class Actor_fairmerge implements IActor {
 	private boolean r3_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_row()) {
-			if (fifo_ROWOUT.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_ROWOUT.hasRoom(1)) {
 				row();
 				_FSM_state = States.s_c0;
 				res = true;

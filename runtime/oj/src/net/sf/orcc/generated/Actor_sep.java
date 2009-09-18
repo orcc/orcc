@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_sep implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -41,8 +46,22 @@ public class Actor_sep implements IActor {
 	
 	public Actor_sep() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Separate.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("untagged01", new Location(53, 3, 99)); 
+		actionLocation.put("untagged02", new Location(56, 3, 143)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 
@@ -235,13 +254,13 @@ public class Actor_sep implements IActor {
 		while (res) {
 			res = false;
 			if (isSchedulable_untagged01()) {
-				if (fifo_R1.hasRoom(1) && fifo_R3.hasRoom(1) && fifo_R0.hasRoom(1) && fifo_R2.hasRoom(1)) {
+				if (fifo_R3.hasRoom(1) && fifo_R2.hasRoom(1) && fifo_R1.hasRoom(1) && fifo_R0.hasRoom(1)) {
 					untagged01();
 					res = true;
 					i++;
 				}
 			} else if (isSchedulable_untagged02()) {
-				if (fifo_C1.hasRoom(1) && fifo_C3.hasRoom(1) && fifo_C2.hasRoom(1) && fifo_C0.hasRoom(1)) {
+				if (fifo_C2.hasRoom(1) && fifo_C3.hasRoom(1) && fifo_C1.hasRoom(1) && fifo_C0.hasRoom(1)) {
 					untagged02();
 					res = true;
 					i++;

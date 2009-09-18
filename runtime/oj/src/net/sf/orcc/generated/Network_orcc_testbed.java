@@ -1,5 +1,7 @@
 /**
  * Generated from "orcc_testbed"
+ * 
+ * DEBUG version.
  */
 package net.sf.orcc.generated;
 
@@ -151,7 +153,7 @@ public class Network_orcc_testbed implements IScheduler {
 	private Broadcast actor_broadcast_fairmerge_ROWOUT;
 	private Broadcast actor_broadcast_mvrecon_MV;
 	private Broadcast actor_broadcast_parseheaders_BTYPE;
-
+	
 	public Network_orcc_testbed(int cmdPort, int eventPort, String[] args)
 			throws IOException {
 		new InterpreterThread(cmdPort, eventPort, this).start();
@@ -160,6 +162,17 @@ public class Network_orcc_testbed implements IScheduler {
 		initialize();
 		schedule();
 		Actor_display.closeDisplay();
+	}
+	
+	@Override
+	public String[] getActors() {
+		return new String[] {
+			"acpred", "add", "blkexp", "clip", "combine", "dcpred", "dcsplit", "ddr", "dequant", 
+			"display", "downsample", "fairmerge", "final", "interpolate", "mbpack", "memorymanager", 
+			"mvrecon", "mvseq", "parseheaders", "retrans", "rowsort", "scale", "searchwin", 
+			"sep", "seq", "serialize", "shuffle", "shufflefly", "source", "trans", "unpack", 
+			"zigzag", "zzaddr"
+		};
 	}
 
 	@Override
@@ -271,12 +284,12 @@ public class Network_orcc_testbed implements IScheduler {
 		fifo_64 = new IntFifo(SIZE);
 		fifo_65 = new IntFifo(SIZE);
 		fifo_66 = new IntFifo(SIZE);
-		fifo_67 = new IntFifo(SIZE);
-		fifo_68 = new IntFifo(SIZE);
-		fifo_69 = new IntFifo(SIZE);
-		fifo_70 = new IntFifo(384);
-		fifo_71 = new IntFifo(384);
-		fifo_72 = new IntFifo(384);
+		fifo_67 = new IntFifo(384);
+		fifo_68 = new IntFifo(384);
+		fifo_69 = new IntFifo(384);
+		fifo_70 = new IntFifo(SIZE);
+		fifo_71 = new IntFifo(SIZE);
+		fifo_72 = new IntFifo(SIZE);
 		fifo_73 = new IntFifo(SIZE);
 		fifo_74 = new IntFifo(SIZE);
 		fifo_75 = new IntFifo(SIZE);
@@ -428,50 +441,50 @@ public class Network_orcc_testbed implements IScheduler {
 		actor_dcpred.setFifo("B", fifo_65);
 		actor_seq.setFifo("C", fifo_66);
 		actor_dcpred.setFifo("C", fifo_66);
-		actor_fairmerge.setFifo("ROWOUT", fifo_67);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("input", fifo_67);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("output_0", fifo_68);
-		actor_downsample.setFifo("R", fifo_68);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("output_1", fifo_69);
-		actor_combine.setFifo("ROW", fifo_69);
-		actor_add.setFifo("VID", fifo_70);
-		actor_broadcast_add_VID.setFifo("input", fifo_70);
-		actor_broadcast_add_VID.setFifo("output_0", fifo_71);
-		actor_mbpack.setFifo("DI", fifo_71);
-		actor_broadcast_add_VID.setFifo("output_1", fifo_72);
-		actor_display.setFifo("B", fifo_72);
-		actor_mvrecon.setFifo("MV", fifo_73);
-		actor_broadcast_mvrecon_MV.setFifo("input", fifo_73);
-		actor_broadcast_mvrecon_MV.setFifo("output_0", fifo_74);
-		actor_unpack.setFifo("MV", fifo_74);
-		actor_broadcast_mvrecon_MV.setFifo("output_1", fifo_75);
-		actor_searchwin.setFifo("MV", fifo_75);
-		actor_parseheaders.setFifo("BTYPE", fifo_76);
-		actor_broadcast_parseheaders_BTYPE.setFifo("input", fifo_76);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_0", fifo_77);
-		actor_seq.setFifo("BTYPE", fifo_77);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_1", fifo_78);
-		actor_unpack.setFifo("BTYPE", fifo_78);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_2", fifo_79);
-		actor_memorymanager.setFifo("BTYPE", fifo_79);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_3", fifo_80);
-		actor_searchwin.setFifo("BTYPE", fifo_80);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_4", fifo_81);
-		actor_mvrecon.setFifo("BTYPE", fifo_81);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_5", fifo_82);
-		actor_mvseq.setFifo("BTYPE", fifo_82);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_6", fifo_83);
-		actor_add.setFifo("BTYPE", fifo_83);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_7", fifo_84);
-		actor_dcpred.setFifo("BTYPE", fifo_84);
-		actor_dcpred.setFifo("START", fifo_85);
-		actor_broadcast_dcpred_START.setFifo("input", fifo_85);
-		actor_broadcast_dcpred_START.setFifo("output_0", fifo_86);
-		actor_zigzag.setFifo("START", fifo_86);
-		actor_broadcast_dcpred_START.setFifo("output_1", fifo_87);
-		actor_acpred.setFifo("START", fifo_87);
-		actor_broadcast_dcpred_START.setFifo("output_2", fifo_88);
-		actor_zzaddr.setFifo("START", fifo_88);
+		actor_add.setFifo("VID", fifo_67);
+		actor_broadcast_add_VID.setFifo("input", fifo_67);
+		actor_broadcast_add_VID.setFifo("output_0", fifo_68);
+		actor_mbpack.setFifo("DI", fifo_68);
+		actor_broadcast_add_VID.setFifo("output_1", fifo_69);
+		actor_display.setFifo("B", fifo_69);
+		actor_fairmerge.setFifo("ROWOUT", fifo_70);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("input", fifo_70);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("output_0", fifo_71);
+		actor_combine.setFifo("ROW", fifo_71);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("output_1", fifo_72);
+		actor_downsample.setFifo("R", fifo_72);
+		actor_dcpred.setFifo("START", fifo_73);
+		actor_broadcast_dcpred_START.setFifo("input", fifo_73);
+		actor_broadcast_dcpred_START.setFifo("output_0", fifo_74);
+		actor_zigzag.setFifo("START", fifo_74);
+		actor_broadcast_dcpred_START.setFifo("output_1", fifo_75);
+		actor_zzaddr.setFifo("START", fifo_75);
+		actor_broadcast_dcpred_START.setFifo("output_2", fifo_76);
+		actor_acpred.setFifo("START", fifo_76);
+		actor_mvrecon.setFifo("MV", fifo_77);
+		actor_broadcast_mvrecon_MV.setFifo("input", fifo_77);
+		actor_broadcast_mvrecon_MV.setFifo("output_0", fifo_78);
+		actor_unpack.setFifo("MV", fifo_78);
+		actor_broadcast_mvrecon_MV.setFifo("output_1", fifo_79);
+		actor_searchwin.setFifo("MV", fifo_79);
+		actor_parseheaders.setFifo("BTYPE", fifo_80);
+		actor_broadcast_parseheaders_BTYPE.setFifo("input", fifo_80);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_0", fifo_81);
+		actor_mvseq.setFifo("BTYPE", fifo_81);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_1", fifo_82);
+		actor_memorymanager.setFifo("BTYPE", fifo_82);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_2", fifo_83);
+		actor_seq.setFifo("BTYPE", fifo_83);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_3", fifo_84);
+		actor_add.setFifo("BTYPE", fifo_84);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_4", fifo_85);
+		actor_unpack.setFifo("BTYPE", fifo_85);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_5", fifo_86);
+		actor_mvrecon.setFifo("BTYPE", fifo_86);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_6", fifo_87);
+		actor_dcpred.setFifo("BTYPE", fifo_87);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_7", fifo_88);
+		actor_searchwin.setFifo("BTYPE", fifo_88);
 
 	}
 
@@ -540,13 +553,16 @@ public class Network_orcc_testbed implements IScheduler {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
+		if (args.length < 2) {
+			System.err.println("error: expecting at least two arguments");
+			System.err.println("usage: main <command port> <event port> ...");
+			System.exit(-1);
+		}
 		int cmdPort = Integer.decode(args[0]);
 		int eventPort = Integer.decode(args[1]);
-		new Network_orcc_testbed(cmdPort, eventPort, new String[] { args[2] });
-	}
 
-	@Override
-	public String[] getActors() {
-		return new String[] { "display", "source", "zigzag" };
+		String[] otherArgs = new String[args.length - 2];
+		System.arraycopy(args, 2, otherArgs, 0, args.length - 2);
+		new Network_orcc_testbed(cmdPort, eventPort, otherArgs);
 	}
 }

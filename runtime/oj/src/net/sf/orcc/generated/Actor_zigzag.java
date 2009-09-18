@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_zigzag implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_AC;
@@ -36,8 +41,26 @@ public class Actor_zigzag implements IActor {
 	
 	public Actor_zigzag() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Zigzag.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("done", new Location(60, 2, 86)); 
+		actionLocation.put("read_only", new Location(76, 2, 91)); 
+		actionLocation.put("read_write", new Location(88, 2, 132)); 
+		actionLocation.put("skip", new Location(53, 2, 50)); 
+		actionLocation.put("start", new Location(57, 2, 37)); 
+		actionLocation.put("write_only", new Location(83, 2, 99)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int wa() {

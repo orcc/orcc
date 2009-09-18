@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_rowsort implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_ROW;
@@ -37,8 +42,29 @@ public class Actor_rowsort implements IActor {
 	
 	public Actor_rowsort() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\RowSort.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("a0", new Location(53, 2, 42)); 
+		actionLocation.put("a1", new Location(56, 2, 42)); 
+		actionLocation.put("a2", new Location(59, 2, 42)); 
+		actionLocation.put("a3", new Location(62, 2, 42)); 
+		actionLocation.put("a4", new Location(65, 2, 46)); 
+		actionLocation.put("a5", new Location(68, 2, 42)); 
+		actionLocation.put("a6", new Location(71, 2, 46)); 
+		actionLocation.put("a7", new Location(74, 2, 46)); 
+		actionLocation.put("a9", new Location(80, 2, 39)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 
@@ -389,7 +415,7 @@ public class Actor_rowsort implements IActor {
 	private boolean s6_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_a6()) {
-			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				a6();
 				_FSM_state = States.s_s7;
 				res = true;
@@ -401,7 +427,7 @@ public class Actor_rowsort implements IActor {
 	private boolean s7_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_a7()) {
-			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
 				a7();
 				_FSM_state = States.s_s8;
 				res = true;
@@ -413,7 +439,7 @@ public class Actor_rowsort implements IActor {
 	private boolean s8_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_a9()) {
-			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
 				a9();
 				_FSM_state = States.s_s0;
 				res = true;

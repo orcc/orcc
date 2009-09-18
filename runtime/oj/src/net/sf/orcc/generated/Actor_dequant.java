@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_dequant implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_DC;
@@ -36,8 +41,23 @@ public class Actor_dequant implements IActor {
 	
 	public Actor_dequant() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Dequant.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("ac", new Location(75, 2, 241)); 
+		actionLocation.put("done", new Location(67, 2, 43)); 
+		actionLocation.put("get_qp", new Location(60, 2, 130)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int saturate(int x) {

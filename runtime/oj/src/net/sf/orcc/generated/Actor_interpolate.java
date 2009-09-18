@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_interpolate implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_RD;
@@ -59,8 +64,24 @@ public class Actor_interpolate implements IActor {
 	
 	public Actor_interpolate() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Interpolate.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("done", new Location(83, 2, 42)); 
+		actionLocation.put("other", new Location(120, 2, 307)); 
+		actionLocation.put("row_col_0", new Location(99, 2, 286)); 
+		actionLocation.put("start", new Location(75, 2, 120)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int compensate(int p00, int p10, int p01, int p11) {

@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_blkexp implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_RUN;
@@ -40,8 +45,25 @@ public class Actor_blkexp implements IActor {
 	
 	public Actor_blkexp() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\BlockExpand.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("done", new Location(60, 2, 110)); 
+		actionLocation.put("read_immediate", new Location(90, 2, 141)); 
+		actionLocation.put("read_save", new Location(99, 2, 157)); 
+		actionLocation.put("write_value", new Location(70, 2, 114)); 
+		actionLocation.put("write_zero", new Location(79, 2, 117)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 

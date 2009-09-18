@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_mvseq implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_BTYPE;
@@ -68,8 +73,29 @@ public class Actor_mvseq implements IActor {
 	
 	public Actor_mvseq() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\MVSequence.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("geth", new Location(121, 2, 34)); 
+		actionLocation.put("getw", new Location(111, 2, 300)); 
+		actionLocation.put("read_noPredict", new Location(124, 2, 632)); 
+		actionLocation.put("read_predict_y0", new Location(155, 2, 407)); 
+		actionLocation.put("read_predict_y1", new Location(170, 2, 336)); 
+		actionLocation.put("read_predict_y2", new Location(184, 2, 243)); 
+		actionLocation.put("read_predict_y3", new Location(197, 2, 150)); 
+		actionLocation.put("start", new Location(101, 2, 174)); 
+		actionLocation.put("write", new Location(205, 2, 80)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int decrement(int p) {

@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_unpack implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_MV;
@@ -64,8 +69,31 @@ public class Actor_unpack implements IActor {
 	
 	public Actor_unpack() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Unpack.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("cmd_motion", new Location(97, 2, 155)); 
+		actionLocation.put("cmd_newVop", new Location(74, 2, 118)); 
+		actionLocation.put("cmd_noMotion", new Location(102, 2, 309)); 
+		actionLocation.put("cmd_other", new Location(115, 2, 154)); 
+		actionLocation.put("done", new Location(145, 2, 179)); 
+		actionLocation.put("extract_noRead", new Location(156, 2, 798)); 
+		actionLocation.put("extract_read", new Location(179, 2, 671)); 
+		actionLocation.put("geth", new Location(90, 2, 34)); 
+		actionLocation.put("getmvx", new Location(126, 2, 320)); 
+		actionLocation.put("getmvy", new Location(140, 2, 35)); 
+		actionLocation.put("getw", new Location(85, 2, 61)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int maskBits(int v, int n) {

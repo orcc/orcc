@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_dcpred implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_BTYPE;
@@ -78,8 +83,29 @@ public class Actor_dcpred implements IActor {
 	
 	public Actor_dcpred() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\DCPred.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("advance", new Location(183, 2, 156)); 
+		actionLocation.put("getdc_inter", new Location(154, 2, 261)); 
+		actionLocation.put("getdc_intra", new Location(164, 2, 85)); 
+		actionLocation.put("read_inter_ac", new Location(94, 2, 200)); 
+		actionLocation.put("read_intra", new Location(133, 2, 666)); 
+		actionLocation.put("read_other", new Location(103, 2, 94)); 
+		actionLocation.put("sat", new Location(176, 2, 134)); 
+		actionLocation.put("skip", new Location(91, 2, 36)); 
+		actionLocation.put("start", new Location(81, 2, 204)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int abs(int x) {
@@ -763,7 +789,7 @@ public class Actor_dcpred implements IActor {
 				res = true;
 			}
 		} else if (isSchedulable_read_intra()) {
-			if (fifo_PTR.hasRoom(1) && fifo_START.hasRoom(1) && fifo_SIGNED.hasRoom(1) && fifo_QUANT.hasRoom(1)) {
+			if (fifo_START.hasRoom(1) && fifo_QUANT.hasRoom(1) && fifo_PTR.hasRoom(1) && fifo_SIGNED.hasRoom(1)) {
 				read_intra();
 				_FSM_state = States.s_intra;
 				res = true;

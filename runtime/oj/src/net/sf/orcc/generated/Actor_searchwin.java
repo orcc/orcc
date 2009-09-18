@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_searchwin implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_MV;
@@ -101,8 +106,38 @@ public class Actor_searchwin implements IActor {
 	
 	public Actor_searchwin() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\SearchWindow.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("bypass", new Location(156, 2, 265)); 
+		actionLocation.put("cmd_motion", new Location(136, 2, 183)); 
+		actionLocation.put("cmd_newVop", new Location(104, 2, 399)); 
+		actionLocation.put("cmd_noMotion", new Location(143, 2, 150)); 
+		actionLocation.put("cmd_other", new Location(151, 2, 70)); 
+		actionLocation.put("done", new Location(184, 2, 114)); 
+		actionLocation.put("geth", new Location(131, 2, 61)); 
+		actionLocation.put("getmvx", new Location(229, 2, 104)); 
+		actionLocation.put("getmvy", new Location(235, 2, 214)); 
+		actionLocation.put("getw", new Location(126, 2, 61)); 
+		actionLocation.put("motion", new Location(245, 2, 88)); 
+		actionLocation.put("next", new Location(165, 2, 298)); 
+		actionLocation.put("noMotion", new Location(252, 2, 26)); 
+		actionLocation.put("read_chroma", new Location(206, 2, 528)); 
+		actionLocation.put("read_luma", new Location(195, 2, 505)); 
+		actionLocation.put("search_chroma", new Location(287, 2, 1043)); 
+		actionLocation.put("search_done", new Location(254, 2, 53)); 
+		actionLocation.put("search_luma", new Location(258, 2, 813)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 
 	private int maskBits(int v, int n) {

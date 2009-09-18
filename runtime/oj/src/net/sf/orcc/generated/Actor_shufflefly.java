@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_shufflefly implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -34,8 +39,22 @@ public class Actor_shufflefly implements IActor {
 	
 	public Actor_shufflefly() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\ShuffleFly.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("a0", new Location(54, 2, 68)); 
+		actionLocation.put("a1", new Location(60, 2, 86)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 
@@ -168,7 +187,7 @@ public class Actor_shufflefly implements IActor {
 	private boolean s1_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_a1()) {
-			if (fifo_Y0.hasRoom(1) && fifo_Y3.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_Y2.hasRoom(1)) {
+			if (fifo_Y3.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y2.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 				a1();
 				_FSM_state = States.s_s0;
 				res = true;

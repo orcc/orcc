@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_retrans implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -39,8 +44,23 @@ public class Actor_retrans implements IActor {
 	
 	public Actor_retrans() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Retranspose.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("untagged01", new Location(58, 2, 205)); 
+		actionLocation.put("untagged02", new Location(68, 2, 550)); 
+		actionLocation.put("untagged03", new Location(91, 2, 132)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 

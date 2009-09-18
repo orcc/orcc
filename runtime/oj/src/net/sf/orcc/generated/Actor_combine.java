@@ -8,10 +8,15 @@ import java.util.Map;
 
 import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.Location;
 
 public class Actor_combine implements IActor {
 
+	private Map<String, Location> actionLocation;
+
 	private Map<String, IntFifo> fifos;
+	
+	private String file;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -35,8 +40,22 @@ public class Actor_combine implements IActor {
 	
 	public Actor_combine() {
 		fifos = new HashMap<String, IntFifo>();
+		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Combine.cal";
+		actionLocation = new HashMap<String, Location>();
+		actionLocation.put("col", new Location(80, 2, 308)); 
+		actionLocation.put("row", new Location(68, 2, 296)); 
 	}
-	
+
+	@Override
+	public String getFile() {
+		return file;
+	}
+
+	@Override
+	public Location getLocation(String action) {
+		return actionLocation.get(action);
+	}
+
 	// Functions/procedures
 	// Actions
 
@@ -235,13 +254,13 @@ public class Actor_combine implements IActor {
 		while (res) {
 			res = false;
 			if (isSchedulable_row()) {
-				if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+				if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
 					row();
 					res = true;
 					i++;
 				}
 			} else if (isSchedulable_col()) {
-				if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+				if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
 					col();
 					res = true;
 					i++;
