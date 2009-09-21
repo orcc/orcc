@@ -55,7 +55,7 @@ public class ExprToString implements ExprVisitor {
 		case BAND:
 			return "and";
 		case BOR:
-			return "|";
+			return "or";
 		case BXOR:
 			return "^";
 		case DIV:
@@ -75,7 +75,7 @@ public class ExprToString implements ExprVisitor {
 		case LE:
 			return "icmp sle";
 		case LOR:
-			return "||";
+			return "or";
 		case LT:
 			return "icmp slt";
 		case MINUS:
