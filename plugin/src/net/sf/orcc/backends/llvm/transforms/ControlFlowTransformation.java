@@ -64,10 +64,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 	private LabelNode labelNode;
 
 	public ControlFlowTransformation(Actor actor) {
-		if (actor.getName().compareTo("serialize")==0){
-			int i=0;
-			i=i+1;
-		}
+
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}

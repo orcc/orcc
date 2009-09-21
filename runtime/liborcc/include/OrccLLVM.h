@@ -143,7 +143,7 @@ void* initModule(std::string moduleName, lff_t **fifoIn, lff_t **fifoOut)
   jit = ParseBitcodeFile(buffer, &error);
   delete buffer;
 
-  if (moduleName.compare("clip")==0)
+  if ((moduleName.compare("clip")==0)||(moduleName.compare("serialize")==0))
   {
 	buffer = MemoryBuffer::getFile("D:\\Projets\\orcc\\trunk\\runtime\\liborcc\\include\\lock_free_fifo.bc", &error);
 	Module* mod = ParseBitcodeFile(buffer, &error);

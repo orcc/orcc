@@ -31,22 +31,20 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
 
 
 /**
@@ -55,16 +53,10 @@ import net.sf.orcc.ir.type.BoolType;
  * @author Jérôme GORIN
  * 
  */
-public class ExpressionTransformation extends AbstractNodeVisitor {
+public class CorrectBinayExpressionType extends AbstractNodeVisitor {
 
-	int exprCounter;
-
-	public ExpressionTransformation(Actor actor) {
-		if (actor.getName().compareTo("serialize")==0){
-			int i =0;
-			i=i+1;
-		}
-		
+	public CorrectBinayExpressionType(Actor actor) {
+	
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -81,99 +73,73 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void visit(IfNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
-		
-		if (node.getCondition() instanceof BinaryExpr) {
-			
-			VarDef vardef = varDefCreate (new BoolType());
-			VarUse varUse = new VarUse(vardef, null);
-			VarExpr expr = new VarExpr(new Location(), varUse);
-			AssignVarNode assignNode = new AssignVarNode(0, new Location(),
-					vardef, node.getCondition());
-			node.setCondition(expr);
-
-			it.previous();
-			it.add(assignNode);
-			it.next();
-		}
-
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public void visit(AssignVarNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
 		AbstractExpr value = node.getValue();
 		
 		if (value instanceof BinaryExpr){
 			BinaryExpr expr = (BinaryExpr)value;
-			if (expr.getE1() instanceof BinaryExpr){
-				expr.setE1(splitBinaryExpr((BinaryExpr)expr.getE1(), it));
+			AbstractType type = checkType(expr);
+			expr.setType(type);
+			node.getVar().setType(type);
+		}
+	}
+	
+
+	
+	public AbstractType checkType(BinaryExpr expr, Object... args){
+		AbstractType type;
+		
+		if ((expr.getOp() == BinaryOp.EQ) ||
+			(expr.getOp() == BinaryOp.GE) ||
+			(expr.getOp() == BinaryOp.GT) || 
+			(expr.getOp() == BinaryOp.LE) ||
+			(expr.getOp() == BinaryOp.LT) ||
+			(expr.getOp() == BinaryOp.NE))
+		{
+			type = new BoolType();
+		}else if ((expr.getE1() instanceof VarExpr) && (expr.getE2() instanceof VarExpr)){
+			AbstractType typeE1 = ((VarExpr)expr.getE1()).getVar().getVarDef().getType();
+			AbstractType typeE2 = ((VarExpr)expr.getE1()).getVar().getVarDef().getType();
+			
+			if (sizeOf(typeE1)> sizeOf(typeE2)){
+				type = typeE1;
+			}else{
+				type = typeE2;
 			}
 			
-			if (expr.getE2() instanceof BinaryExpr){
-				expr.setE2(splitBinaryExpr((BinaryExpr)expr.getE2(), it));
-			}
 		}
+		else if (expr.getE1() instanceof VarExpr){
+			type = ((VarExpr)expr.getE1()).getVar().getVarDef().getType();
+		} else if (expr.getE2() instanceof VarExpr){
+			type = ((VarExpr)expr.getE2()).getVar().getVarDef().getType();
+		}else {
+			type = expr.getType();
+		}
+		
+		
+		return type;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public VarExpr splitBinaryExpr(BinaryExpr expr, Object... args){
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];		
+	private int sizeOf(AbstractType type){
+		int size=0;
 		
-		if (expr.getE1() instanceof BinaryExpr){ 
-			expr.setE1(splitBinaryExpr((BinaryExpr)expr.getE1(), it));
-		}
+		if (type instanceof IntType)
+		{
+			size = ((IntType)type).getSize();
+		} else if (type instanceof BoolType){
+			size = 1;
+		}			
 		
-		if (expr.getE2() instanceof BinaryExpr){
-			expr.setE2(splitBinaryExpr((BinaryExpr)expr.getE2(), it));
-		}
-		
-		VarDef vardef = varDefCreate (expr.getType());
-		VarUse varuse = new VarUse(vardef, null);
-		VarExpr varexpr = new VarExpr(new Location(), varuse);
-		
-		AssignVarNode assignNode = new AssignVarNode(0, new Location(),
-				vardef, expr);
-		
-		it.previous();
-		it.add(assignNode);
-		it.next();
-		
-		return varexpr;
-		
-	}
-	
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(StoreNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-
-		if (node.getValue() instanceof BinaryExpr) {			
-			AbstractType targetType = node.getTarget().getVarDef().getType();
-
-			VarDef vardef = varDefCreate (targetType);
-			VarUse varUse = new VarUse(vardef, null);
-			VarExpr expr = new VarExpr(new Location(), varUse);
-
-			AssignVarNode assignNode = new AssignVarNode(0, new Location(),
-					vardef, node.getValue());
-			node.setValue(expr);
-
-			it.previous();
-			it.add(assignNode);
-			it.next();
-		}
+		return size;
 	}
 
-	private VarDef varDefCreate(AbstractType type){
-		return new VarDef(false, false, exprCounter++, new Location(), "expr", null, null, 0, type);
-	}
+
 	
 	private void visitNodes(List<AbstractNode> nodes) {
 		ListIterator<AbstractNode> it = nodes.listIterator();
@@ -184,7 +150,6 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 	}
 
 	private void visitProc(Procedure proc) {
-		exprCounter = 0;
 
 		List<AbstractNode> nodes = proc.getNodes();
 		visitNodes(nodes);
