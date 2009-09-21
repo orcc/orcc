@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import net.sf.orcc.ui.OrccActivator;
-
 import org.antlr.stringtemplate.StringTemplateGroup;
 import org.antlr.stringtemplate.StringTemplateGroupInterface;
 import org.antlr.stringtemplate.StringTemplateGroupLoader;
@@ -43,10 +41,10 @@ public class PluginGroupLoader implements StringTemplateGroupLoader {
 
 		try {
 			InputStream is;
-			if (OrccActivator.getDefault() == null) {
+			if (Activator.getDefault() == null) {
 				is = new FileInputStream("templates/" + groupName + ".stg");
 			} else {
-				Bundle bundle = OrccActivator.getDefault().getBundle();
+				Bundle bundle = Activator.getDefault().getBundle();
 				IPath file = new Path("templates/" + groupName + ".stg");
 				is = FileLocator.openStream(bundle, file, false);
 			}

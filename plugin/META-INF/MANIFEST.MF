@@ -18,7 +18,16 @@ Require-Bundle: org.eclipse.core.expressions,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- lib/jgrapht-jdk1.6.jar,
- lib/antlr-2.7.7.jar,
- lib/stringtemplate.jar
+ lib/jgrapht-jdk1.6.jar
 Bundle-Vendor: IETR/INSA of Rennes
+Export-Package: net.sf.orcc.backends,
+ net.sf.orcc.ir,
+ net.sf.orcc.ir.actor,
+ net.sf.orcc.ir.consts,
+ net.sf.orcc.ir.expr,
+ net.sf.orcc.ir.network,
+ net.sf.orcc.ir.nodes,
+ net.sf.orcc.ir.parser,
+ net.sf.orcc.ir.transforms,
+ net.sf.orcc.ir.type,
+ org.jgrapht.graph
