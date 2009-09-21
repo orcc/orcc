@@ -76,24 +76,8 @@ public class InterpreterThread extends Thread {
 
 	@Override
 	public void run() {
-		// at most 1 minute timeout
-		int attempts = 0;
-		while (!cmdSocket.isConnected() || !eventSocket.isConnected()) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-			}
-
-			attempts++;
-			if (attempts > 60) {
-				cmdSocket.close();
-				eventSocket.close();
-
-				System.err.println("Timeout when waiting for connections");
-				System.exit(-1);
-			}
-		}
-		writeEvent(STARTED);
+		// wait for connection (or exit after one minute)
+		waitForConnection();
 
 		BufferedReader input = new BufferedReader(new InputStreamReader(
 				cmdSocket.getInputStream()));
@@ -101,7 +85,7 @@ public class InterpreterThread extends Thread {
 			while (!terminateInterpreter) {
 				String command = input.readLine();
 				if (command.startsWith("exit")) {
-
+					terminate();
 				} else if (command.startsWith("getComponents")) {
 					getComponents();
 				} else if (command.startsWith("resume")) {
@@ -117,6 +101,32 @@ public class InterpreterThread extends Thread {
 		} catch (IOException e) {
 			terminate();
 		}
+
+		cmdSocket.close();
+		eventSocket.close();
+		System.exit(0);
+	}
+
+	private void waitForConnection() {
+		// at most 1 minute timeout
+		int attempts = 0;
+		while (!cmdSocket.isConnected() || !eventSocket.isConnected()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+
+			attempts++;
+			if (attempts > 600) {
+				cmdSocket.close();
+				eventSocket.close();
+
+				System.err.println("Timeout when waiting for connections");
+				System.exit(-1);
+			}
+		}
+
+		writeEvent(STARTED);
 	}
 
 	private void stack(String actorName) {

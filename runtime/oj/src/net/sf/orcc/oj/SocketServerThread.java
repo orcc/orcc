@@ -114,14 +114,10 @@ public class SocketServerThread extends Thread {
 	public void run() {
 		try {
 			socket = serverSocket.accept();
-			// System.out.println("Started socket server on port: " +
-			// ipPortNumber);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			System.err.println("*** ERROR Could not listen on socket port: "
 					+ ipPortNumber);
-		} catch (Exception e) {
-			System.err.println("*** ERROR unexpected error encountered "
-					+ e.getMessage());
+			System.exit(-1);
 		}
 	}
 
