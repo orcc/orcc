@@ -101,7 +101,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	
 	public TypeTransformation(Actor actor) {
 		
-		portIndex = new Hashtable<String, Integer>();;
+		portIndex = new Hashtable<String, Integer>();
 		fillPorts(actor.getInputs());
 		fillPorts(actor.getOutputs());
 		

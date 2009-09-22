@@ -37,6 +37,7 @@ $name$ = internal global $typedef(typeValue=type, sizeValue=size)$
 $else$
 $if(isPort)$
 $name$ = alloca $typedef(typeValue=type, sizeValue=size)$
+
 $endif$
 $endif$>>
 
