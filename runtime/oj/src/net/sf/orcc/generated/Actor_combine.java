@@ -15,8 +15,10 @@ public class Actor_combine implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -37,7 +39,7 @@ public class Actor_combine implements IActorDebug {
 	private int count = 0;
 
 
-	
+
 	public Actor_combine() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Combine.cal";
@@ -54,6 +56,31 @@ public class Actor_combine implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		if (isSchedulable_row()) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+				return "row";
+			}
+		} else if (isSchedulable_col()) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+				return "col";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -248,19 +275,19 @@ public class Actor_combine implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {
 			res = false;
 			if (isSchedulable_row()) {
-				if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+				if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
 					row();
 					res = true;
 					i++;
 				}
 			} else if (isSchedulable_col()) {
-				if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+				if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
 					col();
 					res = true;
 					i++;

@@ -15,8 +15,10 @@ public class Actor_sep implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -43,7 +45,7 @@ public class Actor_sep implements IActorDebug {
 	private int csz = 10;
 
 
-	
+
 	public Actor_sep() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Separate.cal";
@@ -60,6 +62,31 @@ public class Actor_sep implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		if (isSchedulable_untagged01()) {
+			if (fifo_R3.hasRoom(1) && fifo_R0.hasRoom(1) && fifo_R1.hasRoom(1) && fifo_R2.hasRoom(1)) {
+				return "untagged01";
+			}
+		} else if (isSchedulable_untagged02()) {
+			if (fifo_C2.hasRoom(1) && fifo_C0.hasRoom(1) && fifo_C1.hasRoom(1) && fifo_C3.hasRoom(1)) {
+				return "untagged02";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -248,19 +275,19 @@ public class Actor_sep implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {
 			res = false;
 			if (isSchedulable_untagged01()) {
-				if (fifo_R1.hasRoom(1) && fifo_R0.hasRoom(1) && fifo_R2.hasRoom(1) && fifo_R3.hasRoom(1)) {
+				if (fifo_R3.hasRoom(1) && fifo_R0.hasRoom(1) && fifo_R1.hasRoom(1) && fifo_R2.hasRoom(1)) {
 					untagged01();
 					res = true;
 					i++;
 				}
 			} else if (isSchedulable_untagged02()) {
-				if (fifo_C3.hasRoom(1) && fifo_C2.hasRoom(1) && fifo_C1.hasRoom(1) && fifo_C0.hasRoom(1)) {
+				if (fifo_C2.hasRoom(1) && fifo_C0.hasRoom(1) && fifo_C1.hasRoom(1) && fifo_C3.hasRoom(1)) {
 					untagged02();
 					res = true;
 					i++;

@@ -15,8 +15,10 @@ public class Actor_add implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_MOT;
@@ -44,7 +46,7 @@ public class Actor_add implements IActorDebug {
 	private int count = 0;
 
 
-	
+
 	public Actor_add() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Add.cal";
@@ -67,6 +69,104 @@ public class Actor_add implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_cmd() {
+		if (isSchedulable_cmd_newVop()) {
+			return "cmd_newVop";
+		} else if (isSchedulable_cmd_textureOnly()) {
+			return "cmd_textureOnly";
+		} else if (isSchedulable_cmd_motionOnly()) {
+			return "cmd_motionOnly";
+		} else if (isSchedulable_cmd_other()) {
+			return "cmd_other";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_combine() {
+		if (isSchedulable_done()) {
+			return "done";
+		} else if (isSchedulable_combine()) {
+			if (fifo_VID.hasRoom(1)) {
+				return "combine";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_motion() {
+		if (isSchedulable_done()) {
+			return "done";
+		} else if (isSchedulable_motion()) {
+			if (fifo_VID.hasRoom(1)) {
+				return "motion";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_skiph() {
+		if (isSchedulable_cmd_other()) {
+			return "cmd_other";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_skipw() {
+		if (isSchedulable_cmd_other()) {
+			return "cmd_other";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_texture() {
+		if (isSchedulable_done()) {
+			return "done";
+		} else if (isSchedulable_texture()) {
+			if (fifo_VID.hasRoom(1)) {
+				return "texture";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_cmd:
+			return getNextSchedulableAction_cmd();
+		case s_combine:
+			return getNextSchedulableAction_combine();
+		case s_motion:
+			return getNextSchedulableAction_motion();
+		case s_skiph:
+			return getNextSchedulableAction_skiph();
+		case s_skipw:
+			return getNextSchedulableAction_skipw();
+		case s_texture:
+			return getNextSchedulableAction_texture();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -434,7 +534,7 @@ public class Actor_add implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

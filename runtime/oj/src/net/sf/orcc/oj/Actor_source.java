@@ -38,11 +38,13 @@ public class Actor_source implements IActorDebug {
 
 	private Map<String, Location> actionLocation;
 
+	private IntFifo fifo_O;
+
 	private String fileName;
 
 	private RandomAccessFile in;
 
-	private IntFifo fifo_O;
+	private boolean suspended;
 
 	public Actor_source() {
 		fileName = CLIParameters.getInstance().getSourceFile();
@@ -61,6 +63,15 @@ public class Actor_source implements IActorDebug {
 	}
 
 	@Override
+	public String getNextSchedulableAction() {
+		if (fifo_O.hasRoom(1)) {
+			return "untagged";
+		}
+
+		return null;
+	}
+
+	@Override
 	public void initialize() {
 		try {
 			in = new RandomAccessFile(fileName, "r");
@@ -71,12 +82,17 @@ public class Actor_source implements IActorDebug {
 	}
 
 	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
 	public int schedule() {
 		int[] source = new int[1];
 		int i = 0;
 
 		try {
-			while (fifo_O.hasRoom(1)) {
+			while (!suspended && fifo_O.hasRoom(1)) {
 				int byteRead = in.read();
 				if (byteRead == -1) {
 					// back to beginning
@@ -103,6 +119,11 @@ public class Actor_source implements IActorDebug {
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 }

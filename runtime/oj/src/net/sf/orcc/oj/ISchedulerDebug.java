@@ -28,27 +28,15 @@
  */
 package net.sf.orcc.oj;
 
+import java.util.Map;
+
 public interface ISchedulerDebug extends IScheduler {
 
 	/**
-	 * Returns the list of actors' names.
+	 * Returns a map of (names, actors).
 	 * 
-	 * @return the list of actors' names.
+	 * @return a map of (names, actors).
 	 */
-	public String[] getActors();
-
-	/**
-	 * Resumes the actor with the given name.
-	 * 
-	 * @param actorName
-	 */
-	public void resume(String actorName);
-
-	/**
-	 * Suspends the actor with the given name.
-	 * 
-	 * @param actorName
-	 */
-	public void suspend(String actorName);
+	public Map<String, IActorDebug> getActors();
 
 }

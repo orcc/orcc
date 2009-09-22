@@ -16,7 +16,9 @@
             id="net.sf.orcc.debugLaunchConfigurationType"
             modes="debug"
             name="Orcc debug simulation"
-            public="true">
+            public="true"
+            sourceLocatorId="opendf.CALSourceLocator"
+            sourcePathComputerId="opendf.CALSourcePathComputer">
       </launchConfigurationType>
    </extension>
    <extension

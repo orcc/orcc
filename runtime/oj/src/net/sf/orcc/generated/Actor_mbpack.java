@@ -15,8 +15,10 @@ public class Actor_mbpack implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_DI;
@@ -38,7 +40,7 @@ public class Actor_mbpack implements IActorDebug {
 	private int buf = 0;
 
 
-	
+
 	public Actor_mbpack() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\MBPacker.cal";
@@ -57,6 +59,54 @@ public class Actor_mbpack implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_addr() {
+		if (isSchedulable_addr()) {
+			if (fifo_AO.hasRoom(1)) {
+				return "addr";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_rw() {
+		if (isSchedulable_tc()) {
+			return "tc";
+		} else if (isSchedulable_data_out()) {
+			if (fifo_DO.hasRoom(1)) {
+				return "data_out";
+			}
+		} else if (isSchedulable_data_inp()) {
+			return "data_inp";
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_addr:
+			return getNextSchedulableAction_addr();
+		case s_rw:
+			return getNextSchedulableAction_rw();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -239,7 +289,7 @@ public class Actor_mbpack implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

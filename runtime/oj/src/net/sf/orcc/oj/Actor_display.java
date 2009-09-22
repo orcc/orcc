@@ -96,6 +96,8 @@ public class Actor_display extends JFrame implements IActorDebug,
 
 	private BufferedImage image;
 
+	private boolean suspended;
+
 	private Timer timer;
 
 	private int width;
@@ -144,23 +146,42 @@ public class Actor_display extends JFrame implements IActorDebug,
 	}
 
 	@Override
+	public String getNextSchedulableAction() {
+		if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
+			return "setVideoSize";
+		}
+
+		if (fifo_B.hasTokens(384)) {
+			return "writeMB";
+		}
+
+		return null;
+	}
+
+	@Override
 	public void initialize() {
 	}
 
 	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {
 			res = false;
-			if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
+			if (!suspended && fifo_WIDTH.hasTokens(1)
+					&& fifo_HEIGHT.hasTokens(1)) {
 				setVideoSize();
 				res = true;
 				i++;
 			}
 
-			if (fifo_B.hasTokens(384)) {
+			if (!suspended && fifo_B.hasTokens(384)) {
 				writeMB();
 				res = true;
 				i++;
@@ -207,6 +228,11 @@ public class Actor_display extends JFrame implements IActorDebug,
 			image = new BufferedImage(this.width, this.height,
 					BufferedImage.TYPE_INT_RGB);
 		}
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	private void writeMB() {

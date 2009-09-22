@@ -15,8 +15,10 @@ public class Actor_trans implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -40,7 +42,7 @@ public class Actor_trans implements IActorDebug {
 	private int select = 0;
 
 
-	
+
 	public Actor_trans() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Transpose.cal";
@@ -58,6 +60,31 @@ public class Actor_trans implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		if (isSchedulable_untagged01()) {
+			return "untagged01";
+		} else if (isSchedulable_untagged02()) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+				return "untagged02";
+			}
+		} else if (isSchedulable_untagged03()) {
+			return "untagged03";
+		}
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -352,7 +379,7 @@ public class Actor_trans implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

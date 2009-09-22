@@ -15,8 +15,10 @@ public class Actor_dequant implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_DC;
@@ -38,7 +40,7 @@ public class Actor_dequant implements IActorDebug {
 	private int round;
 
 
-	
+
 	public Actor_dequant() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Dequant.cal";
@@ -56,6 +58,52 @@ public class Actor_dequant implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_ac() {
+		if (isSchedulable_done()) {
+			return "done";
+		} else if (isSchedulable_ac()) {
+			if (fifo_OUT.hasRoom(1)) {
+				return "ac";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_start() {
+		if (isSchedulable_get_qp()) {
+			if (fifo_OUT.hasRoom(1)) {
+				return "get_qp";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_ac:
+			return getNextSchedulableAction_ac();
+		case s_start:
+			return getNextSchedulableAction_start();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -276,7 +324,7 @@ public class Actor_dequant implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

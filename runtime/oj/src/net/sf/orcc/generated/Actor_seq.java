@@ -15,8 +15,10 @@ public class Actor_seq implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_BTYPE;
@@ -70,7 +72,7 @@ public class Actor_seq implements IActorDebug {
 	private int ptr_above_left;
 
 
-	
+
 	public Actor_seq() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Sequence.cal";
@@ -96,6 +98,98 @@ public class Actor_seq implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_advance() {
+		if (isSchedulable_advance()) {
+			return "advance";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_geth() {
+		if (isSchedulable_geth()) {
+			return "geth";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getw() {
+		if (isSchedulable_getw()) {
+			return "getw";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_predict() {
+		if (isSchedulable_predict_b2()) {
+			if (fifo_C.hasRoom(1) && fifo_B.hasRoom(1) && fifo_A.hasRoom(1)) {
+				return "predict_b2";
+			}
+		} else if (isSchedulable_predict_b0()) {
+			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
+				return "predict_b0";
+			}
+		} else if (isSchedulable_predict_b3()) {
+			if (fifo_C.hasRoom(1) && fifo_B.hasRoom(1) && fifo_A.hasRoom(1)) {
+				return "predict_b3";
+			}
+		} else if (isSchedulable_predict_b1()) {
+			if (fifo_A.hasRoom(1) && fifo_C.hasRoom(1) && fifo_B.hasRoom(1)) {
+				return "predict_b1";
+			}
+		} else if (isSchedulable_predict_b45()) {
+			if (fifo_B.hasRoom(1) && fifo_A.hasRoom(1) && fifo_C.hasRoom(1)) {
+				return "predict_b45";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_read() {
+		if (isSchedulable_start()) {
+			return "start";
+		} else if (isSchedulable_read_intra()) {
+			return "read_intra";
+		} else if (isSchedulable_read_other()) {
+			return "read_other";
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_advance:
+			return getNextSchedulableAction_advance();
+		case s_geth:
+			return getNextSchedulableAction_geth();
+		case s_getw:
+			return getNextSchedulableAction_getw();
+		case s_predict:
+			return getNextSchedulableAction_predict();
+		case s_read:
+			return getNextSchedulableAction_read();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -861,31 +955,31 @@ public class Actor_seq implements IActorDebug {
 	private boolean predict_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_predict_b2()) {
-			if (fifo_C.hasRoom(1) && fifo_A.hasRoom(1) && fifo_B.hasRoom(1)) {
+			if (fifo_C.hasRoom(1) && fifo_B.hasRoom(1) && fifo_A.hasRoom(1)) {
 				predict_b2();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b0()) {
-			if (fifo_A.hasRoom(1) && fifo_C.hasRoom(1) && fifo_B.hasRoom(1)) {
+			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
 				predict_b0();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b3()) {
-			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
+			if (fifo_C.hasRoom(1) && fifo_B.hasRoom(1) && fifo_A.hasRoom(1)) {
 				predict_b3();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b1()) {
-			if (fifo_C.hasRoom(1) && fifo_A.hasRoom(1) && fifo_B.hasRoom(1)) {
+			if (fifo_A.hasRoom(1) && fifo_C.hasRoom(1) && fifo_B.hasRoom(1)) {
 				predict_b1();
 				_FSM_state = States.s_advance;
 				res = true;
 			}
 		} else if (isSchedulable_predict_b45()) {
-			if (fifo_A.hasRoom(1) && fifo_B.hasRoom(1) && fifo_C.hasRoom(1)) {
+			if (fifo_B.hasRoom(1) && fifo_A.hasRoom(1) && fifo_C.hasRoom(1)) {
 				predict_b45();
 				_FSM_state = States.s_advance;
 				res = true;
@@ -914,7 +1008,7 @@ public class Actor_seq implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

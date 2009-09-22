@@ -15,8 +15,10 @@ public class Actor_memorymanager implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_BTYPE;
@@ -97,7 +99,7 @@ public class Actor_memorymanager implements IActorDebug {
 	private boolean prediction_is_IVOP;
 
 
-	
+
 	public Actor_memorymanager() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\MemoryManager.cal";
@@ -121,6 +123,100 @@ public class Actor_memorymanager implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_cmd() {
+		if (isSchedulable_cmd_newVop()) {
+			return "cmd_newVop";
+		} else if (isSchedulable_cmd_y0()) {
+			if (fifo_WA.hasRoom(1)) {
+				return "cmd_y0";
+			}
+		} else if (isSchedulable_cmd_other()) {
+			return "cmd_other";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_geth() {
+		if (isSchedulable_height()) {
+			return "height";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getw() {
+		if (isSchedulable_set_width()) {
+			return "set_width";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_readAbove() {
+		if (isSchedulable_read_none()) {
+			return "read_none";
+		} else if (isSchedulable_read_above()) {
+			if (fifo_RA.hasRoom(1)) {
+				return "read_above";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_readBelow() {
+		if (isSchedulable_read_below()) {
+			if (fifo_RA.hasRoom(1)) {
+				return "read_below";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_readThis() {
+		if (isSchedulable_read_this()) {
+			if (fifo_RA.hasRoom(1)) {
+				return "read_this";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_cmd:
+			return getNextSchedulableAction_cmd();
+		case s_geth:
+			return getNextSchedulableAction_geth();
+		case s_getw:
+			return getNextSchedulableAction_getw();
+		case s_readAbove:
+			return getNextSchedulableAction_readAbove();
+		case s_readBelow:
+			return getNextSchedulableAction_readBelow();
+		case s_readThis:
+			return getNextSchedulableAction_readThis();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -527,7 +623,7 @@ public class Actor_memorymanager implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

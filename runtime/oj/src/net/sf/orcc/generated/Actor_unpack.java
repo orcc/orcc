@@ -15,8 +15,10 @@ public class Actor_unpack implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_MV;
@@ -66,7 +68,7 @@ public class Actor_unpack implements IActorDebug {
 	private int data;
 
 
-	
+
 	public Actor_unpack() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Unpack.cal";
@@ -92,6 +94,100 @@ public class Actor_unpack implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_cmd() {
+		if (isSchedulable_cmd_newVop()) {
+			return "cmd_newVop";
+		} else if (isSchedulable_cmd_motion()) {
+			return "cmd_motion";
+		} else if (isSchedulable_cmd_noMotion()) {
+			return "cmd_noMotion";
+		} else if (isSchedulable_cmd_other()) {
+			return "cmd_other";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_extract() {
+		if (isSchedulable_done()) {
+			return "done";
+		} else if (isSchedulable_extract_noRead()) {
+			if (fifo_DO.hasRoom(1)) {
+				return "extract_noRead";
+			}
+		} else if (isSchedulable_extract_read()) {
+			if (fifo_DO.hasRoom(1)) {
+				return "extract_read";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_geth() {
+		if (isSchedulable_geth()) {
+			return "geth";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getmvx() {
+		if (isSchedulable_getmvx()) {
+			return "getmvx";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getmvy() {
+		if (isSchedulable_getmvy()) {
+			return "getmvy";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getw() {
+		if (isSchedulable_getw()) {
+			return "getw";
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_cmd:
+			return getNextSchedulableAction_cmd();
+		case s_extract:
+			return getNextSchedulableAction_extract();
+		case s_geth:
+			return getNextSchedulableAction_geth();
+		case s_getmvx:
+			return getNextSchedulableAction_getmvx();
+		case s_getmvy:
+			return getNextSchedulableAction_getmvy();
+		case s_getw:
+			return getNextSchedulableAction_getw();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -706,7 +802,7 @@ public class Actor_unpack implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

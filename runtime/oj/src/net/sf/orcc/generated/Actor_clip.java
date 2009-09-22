@@ -15,8 +15,10 @@ public class Actor_clip implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_I;
@@ -35,7 +37,7 @@ public class Actor_clip implements IActorDebug {
 	private boolean sflag;
 
 
-	
+
 	public Actor_clip() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Clip.cal";
@@ -52,6 +54,29 @@ public class Actor_clip implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		if (isSchedulable_read_signed()) {
+			return "read_signed";
+		} else if (isSchedulable_limit()) {
+			if (fifo_O.hasRoom(1)) {
+				return "limit";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -172,7 +197,7 @@ public class Actor_clip implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

@@ -15,8 +15,10 @@ public class Actor_display implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_B;
@@ -25,7 +27,7 @@ public class Actor_display implements IActorDebug {
 
 	// Output FIFOs
 	// State variables of the actor
-	
+
 	public Actor_display() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\orcc_DispYUV.cal";
@@ -40,6 +42,22 @@ public class Actor_display implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -65,7 +83,7 @@ public class Actor_display implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

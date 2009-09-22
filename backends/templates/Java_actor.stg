@@ -171,7 +171,7 @@ $nextStates: actionTestState(); separator=" else "$
 >>
 
 stateScheduler(transition) ::= <<
-private boolean $transition.sourceState$_state_scheduler() {
+private boolean stateScheduler_$transition.sourceState$() {
 	boolean res = false;
 	$schedulingTestState(transition.nextStateInfo)$
 	return res;
@@ -182,7 +182,7 @@ private boolean $transition.sourceState$_state_scheduler() {
 switch(transitions) ::= <<
 switch (_FSM_state) {
 $transitions: {case s_$it.sourceState$:
-	res = $it.sourceState$_state_scheduler();
+	res = stateScheduler_$it.sourceState$();
 	if (res) {
 		i++;
 	}

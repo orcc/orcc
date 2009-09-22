@@ -15,8 +15,10 @@ public class Actor_zzaddr implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_START;
@@ -41,7 +43,7 @@ public class Actor_zzaddr implements IActorDebug {
 	private int count = 0;
 
 
-	
+
 	public Actor_zzaddr() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\ZigzagAddr.cal";
@@ -60,6 +62,52 @@ public class Actor_zzaddr implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_start() {
+		if (isSchedulable_skip()) {
+			return "skip";
+		} else if (isSchedulable_start()) {
+			return "start";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_zz() {
+		if (isSchedulable_done()) {
+			return "done";
+		} else if (isSchedulable_zz()) {
+			if (fifo_ADDR.hasRoom(1)) {
+				return "zz";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_start:
+			return getNextSchedulableAction_start();
+		case s_zz:
+			return getNextSchedulableAction_zz();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -234,7 +282,7 @@ public class Actor_zzaddr implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

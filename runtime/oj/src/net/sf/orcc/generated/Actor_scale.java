@@ -15,8 +15,10 @@ public class Actor_scale implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -46,7 +48,7 @@ public class Actor_scale implements IActorDebug {
 	private int index = 0;
 
 
-	
+
 	public Actor_scale() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Scale.cal";
@@ -62,6 +64,27 @@ public class Actor_scale implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		if (isSchedulable_untagged01()) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y3.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y2.hasRoom(1)) {
+				return "untagged01";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -158,13 +181,13 @@ public class Actor_scale implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {
 			res = false;
 			if (isSchedulable_untagged01()) {
-				if (fifo_Y3.hasRoom(1) && fifo_Y2.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+				if (fifo_Y1.hasRoom(1) && fifo_Y3.hasRoom(1) && fifo_Y0.hasRoom(1) && fifo_Y2.hasRoom(1)) {
 					untagged01();
 					res = true;
 					i++;

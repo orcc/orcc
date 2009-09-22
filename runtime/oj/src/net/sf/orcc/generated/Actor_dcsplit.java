@@ -15,8 +15,10 @@ public class Actor_dcsplit implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_IN;
@@ -31,7 +33,7 @@ public class Actor_dcsplit implements IActorDebug {
 	private int count = 0;
 
 
-	
+
 	public Actor_dcsplit() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\DCSplit.cal";
@@ -48,6 +50,31 @@ public class Actor_dcsplit implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		if (isSchedulable_dc()) {
+			if (fifo_DC.hasRoom(1)) {
+				return "dc";
+			}
+		} else if (isSchedulable_ac()) {
+			if (fifo_AC.hasRoom(1)) {
+				return "ac";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -138,7 +165,7 @@ public class Actor_dcsplit implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

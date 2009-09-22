@@ -15,8 +15,10 @@ public class Actor_ddr implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_RA;
@@ -62,7 +64,7 @@ public class Actor_ddr implements IActorDebug {
 	private boolean preferRead = true;
 
 
-	
+
 	public Actor_ddr() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\DDRModel.cal";
@@ -84,6 +86,68 @@ public class Actor_ddr implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_doDataRead() {
+		if (isSchedulable_data_read()) {
+			if (fifo_RD.hasRoom(1)) {
+				return "data_read";
+			}
+		} else if (isSchedulable_data_done()) {
+			return "data_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_doDataWrite() {
+		if (isSchedulable_data_write()) {
+			return "data_write";
+		} else if (isSchedulable_data_done()) {
+			return "data_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getAddr() {
+		if (isSchedulable_select_read_prefer()) {
+			return "select_read_prefer";
+		} else if (isSchedulable_select_write_prefer()) {
+			return "select_write_prefer";
+		} else if (isSchedulable_select_read_low()) {
+			return "select_read_low";
+		} else if (isSchedulable_select_write_low()) {
+			return "select_write_low";
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_doDataRead:
+			return getNextSchedulableAction_doDataRead();
+		case s_doDataWrite:
+			return getNextSchedulableAction_doDataWrite();
+		case s_getAddr:
+			return getNextSchedulableAction_getAddr();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -416,7 +480,7 @@ public class Actor_ddr implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

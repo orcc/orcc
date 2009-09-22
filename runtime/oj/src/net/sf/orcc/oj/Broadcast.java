@@ -31,7 +31,6 @@ package net.sf.orcc.oj;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * A generic broadcast actor.
  * 
@@ -45,6 +44,8 @@ public class Broadcast implements IActorDebug {
 	private IntFifo input;
 
 	private IntFifo outputs[];
+
+	private boolean suspended;
 
 	/**
 	 * Creates a new broadcast with the given number of outputs.
@@ -69,6 +70,15 @@ public class Broadcast implements IActorDebug {
 	}
 
 	@Override
+	public String getNextSchedulableAction() {
+		if (input.hasTokens(1) && outputsHaveRoom()) {
+			return "untagged";
+		}
+
+		return null;
+	}
+
+	@Override
 	public void initialize() {
 	}
 
@@ -82,10 +92,15 @@ public class Broadcast implements IActorDebug {
 	}
 
 	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
 	public int schedule() {
 		int i = 0;
 		int[] tokens = new int[1];
-		while (input.hasTokens(1) && outputsHaveRoom()) {
+		while (!suspended && input.hasTokens(1) && outputsHaveRoom()) {
 			input.get(tokens);
 			for (IntFifo output : outputs) {
 				output.put(tokens);
@@ -113,6 +128,11 @@ public class Broadcast implements IActorDebug {
 			String msg = "invalid port name: \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 }

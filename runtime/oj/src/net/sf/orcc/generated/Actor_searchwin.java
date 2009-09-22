@@ -15,8 +15,10 @@ public class Actor_searchwin implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_MV;
@@ -103,7 +105,7 @@ public class Actor_searchwin implements IActorDebug {
 	private int mvycount;
 
 
-	
+
 	public Actor_searchwin() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\SearchWindow.cal";
@@ -136,6 +138,142 @@ public class Actor_searchwin implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_cmd() {
+		if (isSchedulable_cmd_newVop()) {
+			return "cmd_newVop";
+		} else if (isSchedulable_cmd_motion()) {
+			return "cmd_motion";
+		} else if (isSchedulable_cmd_noMotion()) {
+			if (fifo_FLAGS.hasRoom(1)) {
+				return "cmd_noMotion";
+			}
+		} else if (isSchedulable_cmd_other()) {
+			return "cmd_other";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_fill() {
+		if (isSchedulable_bypass()) {
+			return "bypass";
+		} else if (isSchedulable_done()) {
+			return "done";
+		} else if (isSchedulable_read_luma()) {
+			return "read_luma";
+		} else if (isSchedulable_read_chroma()) {
+			return "read_chroma";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_geth() {
+		if (isSchedulable_geth()) {
+			return "geth";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getmvx() {
+		if (isSchedulable_getmvx()) {
+			return "getmvx";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getmvy() {
+		if (isSchedulable_getmvy()) {
+			if (fifo_FLAGS.hasRoom(1)) {
+				return "getmvy";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getw() {
+		if (isSchedulable_getw()) {
+			return "getw";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_motion() {
+		if (isSchedulable_motion()) {
+			return "motion";
+		} else if (isSchedulable_noMotion()) {
+			return "noMotion";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_next() {
+		if (isSchedulable_next()) {
+			return "next";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_search() {
+		if (isSchedulable_search_done()) {
+			return "search_done";
+		} else if (isSchedulable_search_luma()) {
+			if (fifo_DO.hasRoom(1)) {
+				return "search_luma";
+			}
+		} else if (isSchedulable_search_chroma()) {
+			if (fifo_DO.hasRoom(1)) {
+				return "search_chroma";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_cmd:
+			return getNextSchedulableAction_cmd();
+		case s_fill:
+			return getNextSchedulableAction_fill();
+		case s_geth:
+			return getNextSchedulableAction_geth();
+		case s_getmvx:
+			return getNextSchedulableAction_getmvx();
+		case s_getmvy:
+			return getNextSchedulableAction_getmvy();
+		case s_getw:
+			return getNextSchedulableAction_getw();
+		case s_motion:
+			return getNextSchedulableAction_motion();
+		case s_next:
+			return getNextSchedulableAction_next();
+		case s_search:
+			return getNextSchedulableAction_search();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -1159,7 +1297,7 @@ public class Actor_searchwin implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

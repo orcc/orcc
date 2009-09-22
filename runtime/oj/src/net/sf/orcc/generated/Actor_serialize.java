@@ -15,8 +15,10 @@ public class Actor_serialize implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_in8;
@@ -32,7 +34,7 @@ public class Actor_serialize implements IActorDebug {
 	private int buf;
 
 
-	
+
 	public Actor_serialize() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\byte2bit.cal";
@@ -49,6 +51,29 @@ public class Actor_serialize implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		if (isSchedulable_reload()) {
+			return "reload";
+		} else if (isSchedulable_shift()) {
+			if (fifo_out.hasRoom(1)) {
+				return "shift";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -134,7 +159,7 @@ public class Actor_serialize implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

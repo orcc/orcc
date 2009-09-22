@@ -15,8 +15,10 @@ public class Actor_downsample implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_R;
@@ -25,7 +27,7 @@ public class Actor_downsample implements IActorDebug {
 	private IntFifo fifo_R2;
 
 	// State variables of the actor
-	
+
 	public Actor_downsample() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\Downsample.cal";
@@ -42,6 +44,48 @@ public class Actor_downsample implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_s0() {
+		if (isSchedulable_a0()) {
+			return "a0";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s1() {
+		if (isSchedulable_a1()) {
+			if (fifo_R2.hasRoom(1)) {
+				return "a1";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_s0:
+			return getNextSchedulableAction_s0();
+		case s_s1:
+			return getNextSchedulableAction_s1();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -146,7 +190,7 @@ public class Actor_downsample implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

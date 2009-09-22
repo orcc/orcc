@@ -15,8 +15,10 @@ public class Actor_blkexp implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_RUN;
@@ -42,7 +44,7 @@ public class Actor_blkexp implements IActorDebug {
 	private boolean last = false;
 
 
-	
+
 	public Actor_blkexp() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\BlockExpand.cal";
@@ -62,6 +64,41 @@ public class Actor_blkexp implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		if (isSchedulable_done()) {
+			return "done";
+		} else if (isSchedulable_write_value()) {
+			if (fifo_OUT.hasRoom(1)) {
+				return "write_value";
+			}
+		} else if (isSchedulable_write_zero()) {
+			if (fifo_OUT.hasRoom(1)) {
+				return "write_zero";
+			}
+		} else if (isSchedulable_read_immediate()) {
+			if (fifo_OUT.hasRoom(1)) {
+				return "read_immediate";
+			}
+		} else if (isSchedulable_read_save()) {
+			if (fifo_OUT.hasRoom(1)) {
+				return "read_save";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -263,7 +300,7 @@ public class Actor_blkexp implements IActorDebug {
 	// Action scheduler
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

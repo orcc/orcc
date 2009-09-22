@@ -32,6 +32,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * @author mwipliez
@@ -40,6 +42,8 @@ import java.io.PrintStream;
 public class InterpreterThread extends Thread {
 
 	private static final String STARTED = "started";
+
+	private Map<String, IActorDebug> actors;
 
 	private SocketServerThread cmdSocket;
 
@@ -54,22 +58,25 @@ public class InterpreterThread extends Thread {
 		cmdSocket = new SocketServerThread(cmdPort);
 		eventSocket = new SocketServerThread(eventPort);
 		this.scheduler = scheduler;
+		actors = this.scheduler.getActors();
 	}
 
 	private void getComponents() {
-		String[] actors = scheduler.getActors();
-		if (actors.length > 0) {
-			String response = actors[0];
-			for (int i = 1; i < actors.length; i++) {
-				response += "|" + actors[i];
+		String[] names = new TreeSet<String>(actors.keySet())
+				.toArray(new String[0]);
+		if (names.length > 0) {
+			String response = names[0];
+			for (int i = 1; i < names.length; i++) {
+				response += "|" + names[i];
 			}
+
 			writeReply(response);
 		}
 	}
 
 	private void resume(String actorName) {
 		System.out.println("resume " + actorName);
-		scheduler.resume(actorName);
+		actors.get(actorName).resume();
 		writeReply("ok");
 		writeEvent("resumed " + actorName + ":client");
 	}
@@ -107,6 +114,41 @@ public class InterpreterThread extends Thread {
 		System.exit(0);
 	}
 
+	private void stack(String actorName) {
+		System.out.println("stack " + actorName);
+		IActorDebug actor = actors.get(actorName);
+
+		String fileName = actor.getFile();
+		int lineNumber;
+
+		String actionName = actor.getNextSchedulableAction();
+		if (actionName == null) {
+			actionName = "<no schedulable action>";
+			lineNumber = -1;
+		} else {
+			lineNumber = actor.getLocation(actionName).getLine();
+		}
+
+		String response = fileName + "|" + actorName + "|" + actionName;
+		response += "|" + lineNumber;
+		// response =
+		// "fileName|componentName|function name|location|variable name|variable name|...|variable name"
+		writeReply(response);
+	}
+
+	private void suspend(String actorName) {
+		System.out.println("suspend " + actorName);
+		actors.get(actorName).suspend();
+		writeReply("ok");
+		writeEvent("suspended " + actorName + ":client");
+	}
+
+	private void terminate() {
+		writeEvent("terminated");
+		System.out.println("Debug session terminated.");
+		terminateInterpreter = true;
+	}
+
 	private void waitForConnection() {
 		// at most 1 minute timeout
 		int attempts = 0;
@@ -127,31 +169,6 @@ public class InterpreterThread extends Thread {
 		}
 
 		writeEvent(STARTED);
-	}
-
-	private void stack(String actorName) {
-		System.out.println("stack " + actorName);
-
-		String actionName = "my_action";
-		String response = "fileName|" + actorName + "|" + actionName;
-		int lineNumber = 50;
-		response += "|" + lineNumber;
-		// response =
-		// "fileName|componentName|function name|location|variable name|variable name|...|variable name"
-		writeReply(response);
-	}
-
-	private void suspend(String actorName) {
-		System.out.println("suspend " + actorName);
-		scheduler.suspend(actorName);
-		writeReply("ok");
-		writeEvent("suspended " + actorName + ":client");
-	}
-
-	private void terminate() {
-		writeEvent("terminated");
-		System.out.println("Debug session terminated.");
-		terminateInterpreter = true;
 	}
 
 	private void writeEvent(String event) {

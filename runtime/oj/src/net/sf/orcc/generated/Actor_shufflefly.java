@@ -15,8 +15,10 @@ public class Actor_shufflefly implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_X0;
@@ -36,7 +38,7 @@ public class Actor_shufflefly implements IActorDebug {
 	private int D1;
 
 
-	
+
 	public Actor_shufflefly() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\ShuffleFly.cal";
@@ -53,6 +55,48 @@ public class Actor_shufflefly implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_s0() {
+		if (isSchedulable_a0()) {
+			return "a0";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s1() {
+		if (isSchedulable_a1()) {
+			if (fifo_Y3.hasRoom(1) && fifo_Y2.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+				return "a1";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_s0:
+			return getNextSchedulableAction_s0();
+		case s_s1:
+			return getNextSchedulableAction_s1();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -187,7 +231,7 @@ public class Actor_shufflefly implements IActorDebug {
 	private boolean s1_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_a1()) {
-			if (fifo_Y0.hasRoom(1) && fifo_Y2.hasRoom(1) && fifo_Y3.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+			if (fifo_Y3.hasRoom(1) && fifo_Y2.hasRoom(1) && fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
 				a1();
 				_FSM_state = States.s_s0;
 				res = true;
@@ -198,7 +242,7 @@ public class Actor_shufflefly implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

@@ -15,8 +15,10 @@ public class Actor_rowsort implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_ROW;
@@ -39,7 +41,7 @@ public class Actor_rowsort implements IActorDebug {
 	private int x5;
 
 
-	
+
 	public Actor_rowsort() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\RowSort.cal";
@@ -63,6 +65,124 @@ public class Actor_rowsort implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_s0() {
+		if (isSchedulable_a0()) {
+			return "a0";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s1() {
+		if (isSchedulable_a1()) {
+			return "a1";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s2() {
+		if (isSchedulable_a2()) {
+			return "a2";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s3() {
+		if (isSchedulable_a3()) {
+			return "a3";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s4() {
+		if (isSchedulable_a4()) {
+			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+				return "a4";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s5() {
+		if (isSchedulable_a5()) {
+			return "a5";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s6() {
+		if (isSchedulable_a6()) {
+			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+				return "a6";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s7() {
+		if (isSchedulable_a7()) {
+			if (fifo_Y0.hasRoom(1) && fifo_Y1.hasRoom(1)) {
+				return "a7";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_s8() {
+		if (isSchedulable_a9()) {
+			if (fifo_Y1.hasRoom(1) && fifo_Y0.hasRoom(1)) {
+				return "a9";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_s0:
+			return getNextSchedulableAction_s0();
+		case s_s1:
+			return getNextSchedulableAction_s1();
+		case s_s2:
+			return getNextSchedulableAction_s2();
+		case s_s3:
+			return getNextSchedulableAction_s3();
+		case s_s4:
+			return getNextSchedulableAction_s4();
+		case s_s5:
+			return getNextSchedulableAction_s5();
+		case s_s6:
+			return getNextSchedulableAction_s6();
+		case s_s7:
+			return getNextSchedulableAction_s7();
+		case s_s8:
+			return getNextSchedulableAction_s8();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -450,7 +570,7 @@ public class Actor_rowsort implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

@@ -15,8 +15,10 @@ public class Actor_parseheaders implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_bits;
@@ -282,7 +284,7 @@ public class Actor_parseheaders implements IActorDebug {
 	private int vld_codeword = 1;
 
 
-	
+
 	public Actor_parseheaders() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\ParseHeaders.cal";
@@ -363,6 +365,670 @@ public class Actor_parseheaders implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableActionOutsideFSM() {
+		if (isSchedulable_untagged01()) {
+			return "untagged01";
+		} else if (isSchedulable_untagged02()) {
+			return "untagged02";
+		}
+		return null;
+	}
+
+	private String getNextSchedulableAction_block() {
+		if (isSchedulable_mb_dispatch_done()) {
+			return "mb_dispatch_done";
+		} else if (isSchedulable_mb_dispatch_intra()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mb_dispatch_intra";
+			}
+		} else if (isSchedulable_mb_dispatch_inter_no_ac()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mb_dispatch_inter_no_ac";
+			}
+		} else if (isSchedulable_mb_dispatch_inter_ac_coded()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mb_dispatch_inter_ac_coded";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_final_cbpy() {
+		if (isSchedulable_final_cbpy_inter()) {
+			return "final_cbpy_inter";
+		} else if (isSchedulable_do_vld_failure()) {
+			return "do_vld_failure";
+		} else if (isSchedulable_final_cbpy_intra()) {
+			return "final_cbpy_intra";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_dc() {
+		if (isSchedulable_dc_bits_shift()) {
+			return "dc_bits_shift";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_dc_a() {
+		if (isSchedulable_get_dc()) {
+			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+				return "get_dc";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_dc_bits() {
+		if (isSchedulable_do_vld_failure()) {
+			return "do_vld_failure";
+		} else if (isSchedulable_get_dc_bits_none()) {
+			if (fifo_LAST.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1)) {
+				return "get_dc_bits_none";
+			}
+		} else if (isSchedulable_get_dc_bits_some()) {
+			return "get_dc_bits_some";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_mbtype() {
+		if (isSchedulable_get_mbtype_noac()) {
+			return "get_mbtype_noac";
+		} else if (isSchedulable_do_vld_failure()) {
+			return "do_vld_failure";
+		} else if (isSchedulable_get_mbtype_ac()) {
+			return "get_mbtype_ac";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_residual_x() {
+		if (isSchedulable_get_residual_x()) {
+			if (fifo_MV.hasRoom(1)) {
+				return "get_residual_x";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_residual_y() {
+		if (isSchedulable_get_residual_y()) {
+			if (fifo_MV.hasRoom(1)) {
+				return "get_residual_y";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_mag_x() {
+		if (isSchedulable_mag_x()) {
+			if (fifo_MV.hasRoom(1)) {
+				return "mag_x";
+			}
+		} else if (isSchedulable_do_vld_failure()) {
+			return "do_vld_failure";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_mag_y() {
+		if (isSchedulable_mag_y()) {
+			if (fifo_MV.hasRoom(1)) {
+				return "mag_y";
+			}
+		} else if (isSchedulable_do_vld_failure()) {
+			return "do_vld_failure";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_mb() {
+		if (isSchedulable_mb_done()) {
+			return "mb_done";
+		} else if (isSchedulable_get_mcbpc_ivop()) {
+			return "get_mcbpc_ivop";
+		} else if (isSchedulable_get_mcbpc_pvop()) {
+			return "get_mcbpc_pvop";
+		} else if (isSchedulable_mcbpc_pvop_uncoded()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mcbpc_pvop_uncoded";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_mv() {
+		if (isSchedulable_mvcode_done()) {
+			return "mvcode_done";
+		} else if (isSchedulable_mvcode()) {
+			return "mvcode";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_mv_y() {
+		if (isSchedulable_mvcode()) {
+			return "mvcode";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_pvop_uncoded1() {
+		if (isSchedulable_mcbpc_pvop_uncoded1()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mcbpc_pvop_uncoded1";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_pvop_uncoded2() {
+		if (isSchedulable_mcbpc_pvop_uncoded1()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mcbpc_pvop_uncoded1";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_pvop_uncoded3() {
+		if (isSchedulable_mcbpc_pvop_uncoded1()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mcbpc_pvop_uncoded1";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_pvop_uncoded4() {
+		if (isSchedulable_mcbpc_pvop_uncoded1()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mcbpc_pvop_uncoded1";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_pvop_uncoded5() {
+		if (isSchedulable_mcbpc_pvop_uncoded1()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "mcbpc_pvop_uncoded1";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_send_new_vop_height() {
+		if (isSchedulable_send_new_vop_height()) {
+			if (fifo_BTYPE.hasRoom(1) && fifo_HEIGHT.hasRoom(1)) {
+				return "send_new_vop_height";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_send_new_vop_info() {
+		if (isSchedulable_send_new_vop_cmd()) {
+			if (fifo_BTYPE.hasRoom(1)) {
+				return "send_new_vop_cmd";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_send_new_vop_width() {
+		if (isSchedulable_send_new_vop_width()) {
+			if (fifo_WIDTH.hasRoom(1) && fifo_BTYPE.hasRoom(1)) {
+				return "send_new_vop_width";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck() {
+		if (isSchedulable_byte_align()) {
+			return "byte_align";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck_1a() {
+		if (isSchedulable_request_byte()) {
+			return "request_byte";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck_1b() {
+		if (isSchedulable_test_zero_byte()) {
+			return "test_zero_byte";
+		} else if (isSchedulable_generic_done()) {
+			return "generic_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck_2a() {
+		if (isSchedulable_request_byte()) {
+			return "request_byte";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck_2b() {
+		if (isSchedulable_test_zero_byte()) {
+			return "test_zero_byte";
+		} else if (isSchedulable_generic_done()) {
+			return "generic_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck_3a() {
+		if (isSchedulable_request_byte()) {
+			return "request_byte";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck_3b() {
+		if (isSchedulable_test_one_byte()) {
+			return "test_one_byte";
+		} else if (isSchedulable_test_zero_byte()) {
+			return "test_zero_byte";
+		} else if (isSchedulable_generic_done()) {
+			return "generic_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck_4a() {
+		if (isSchedulable_request_byte()) {
+			return "request_byte";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_stuck_4b() {
+		if (isSchedulable_test_vo_byte()) {
+			return "test_vo_byte";
+		} else if (isSchedulable_test_vol_byte()) {
+			return "test_vol_byte";
+		} else if (isSchedulable_test_vop_byte()) {
+			return "test_vop_byte";
+		} else if (isSchedulable_generic_done()) {
+			return "generic_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_texac() {
+		if (isSchedulable_block_done()) {
+			return "block_done";
+		} else if (isSchedulable_dct_coeff()) {
+			return "dct_coeff";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_texture() {
+		if (isSchedulable_vld_start_intra()) {
+			return "vld_start_intra";
+		} else if (isSchedulable_vld_start_inter_ac_coded()) {
+			return "vld_start_inter_ac_coded";
+		} else if (isSchedulable_vld_start_inter_not_ac_coded()) {
+			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
+				return "vld_start_inter_not_ac_coded";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vld1() {
+		if (isSchedulable_vld_code()) {
+			if (fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
+				return "vld_code";
+			}
+		} else if (isSchedulable_do_vld_failure()) {
+			return "do_vld_failure";
+		} else if (isSchedulable_vld_level()) {
+			return "vld_level";
+		} else if (isSchedulable_vld_run_or_direct()) {
+			return "vld_run_or_direct";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vld4() {
+		if (isSchedulable_do_level_lookup()) {
+			return "do_level_lookup";
+		} else if (isSchedulable_do_vld_failure()) {
+			return "do_vld_failure";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vld4a() {
+		if (isSchedulable_vld_level_lookup()) {
+			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+				return "vld_level_lookup";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vld6() {
+		if (isSchedulable_do_run_lookup()) {
+			return "do_run_lookup";
+		} else if (isSchedulable_do_vld_failure()) {
+			return "do_vld_failure";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vld6a() {
+		if (isSchedulable_vld_run_lookup()) {
+			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
+				return "vld_run_lookup";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vld7() {
+		if (isSchedulable_vld_run()) {
+			return "vld_run";
+		} else if (isSchedulable_vld_direct_read()) {
+			return "vld_direct_read";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vld_direct() {
+		if (isSchedulable_vld_direct()) {
+			if (fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
+				return "vld_direct";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_aspect() {
+		if (isSchedulable_vol_aspect_detailed()) {
+			return "vol_aspect_detailed";
+		} else if (isSchedulable_generic_done()) {
+			return "generic_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_control() {
+		if (isSchedulable_vol_control_detailed()) {
+			return "vol_control_detailed";
+		} else if (isSchedulable_generic_done_with_bitread()) {
+			return "generic_done_with_bitread";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_height() {
+		if (isSchedulable_set_vol_height()) {
+			return "set_vol_height";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_misc() {
+		if (isSchedulable_generic_done()) {
+			return "generic_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_object() {
+		if (isSchedulable_vol_object_layer_identification()) {
+			return "vol_object_layer_identification";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_shape() {
+		if (isSchedulable_vol_shape()) {
+			return "vol_shape";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_time_inc_res() {
+		if (isSchedulable_vol_time_inc_res()) {
+			return "vol_time_inc_res";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_vbv() {
+		if (isSchedulable_vol_vbv_detailed()) {
+			return "vol_vbv_detailed";
+		} else if (isSchedulable_generic_done_with_bitread()) {
+			return "generic_done_with_bitread";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vol_width() {
+		if (isSchedulable_set_vol_width()) {
+			return "set_vol_width";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vop_coding() {
+		if (isSchedulable_vop_coding_uncoded()) {
+			return "vop_coding_uncoded";
+		} else if (isSchedulable_vop_coding_coded()) {
+			return "vop_coding_coded";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vop_predict() {
+		if (isSchedulable_vop_predict_supported()) {
+			return "vop_predict_supported";
+		} else if (isSchedulable_generic_done()) {
+			return "generic_done";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_vop_timebase() {
+		if (isSchedulable_vop_timebase_one()) {
+			return "vop_timebase_one";
+		} else if (isSchedulable_vop_timebase_zero()) {
+			return "vop_timebase_zero";
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		String next = getNextSchedulableActionOutsideFSM();
+		if (next == null) {
+			switch (_FSM_state) {
+			case s_block:
+				return getNextSchedulableAction_block();
+			case s_final_cbpy:
+				return getNextSchedulableAction_final_cbpy();
+			case s_get_dc:
+				return getNextSchedulableAction_get_dc();
+			case s_get_dc_a:
+				return getNextSchedulableAction_get_dc_a();
+			case s_get_dc_bits:
+				return getNextSchedulableAction_get_dc_bits();
+			case s_get_mbtype:
+				return getNextSchedulableAction_get_mbtype();
+			case s_get_residual_x:
+				return getNextSchedulableAction_get_residual_x();
+			case s_get_residual_y:
+				return getNextSchedulableAction_get_residual_y();
+			case s_mag_x:
+				return getNextSchedulableAction_mag_x();
+			case s_mag_y:
+				return getNextSchedulableAction_mag_y();
+			case s_mb:
+				return getNextSchedulableAction_mb();
+			case s_mv:
+				return getNextSchedulableAction_mv();
+			case s_mv_y:
+				return getNextSchedulableAction_mv_y();
+			case s_pvop_uncoded1:
+				return getNextSchedulableAction_pvop_uncoded1();
+			case s_pvop_uncoded2:
+				return getNextSchedulableAction_pvop_uncoded2();
+			case s_pvop_uncoded3:
+				return getNextSchedulableAction_pvop_uncoded3();
+			case s_pvop_uncoded4:
+				return getNextSchedulableAction_pvop_uncoded4();
+			case s_pvop_uncoded5:
+				return getNextSchedulableAction_pvop_uncoded5();
+			case s_send_new_vop_height:
+				return getNextSchedulableAction_send_new_vop_height();
+			case s_send_new_vop_info:
+				return getNextSchedulableAction_send_new_vop_info();
+			case s_send_new_vop_width:
+				return getNextSchedulableAction_send_new_vop_width();
+			case s_stuck:
+				return getNextSchedulableAction_stuck();
+			case s_stuck_1a:
+				return getNextSchedulableAction_stuck_1a();
+			case s_stuck_1b:
+				return getNextSchedulableAction_stuck_1b();
+			case s_stuck_2a:
+				return getNextSchedulableAction_stuck_2a();
+			case s_stuck_2b:
+				return getNextSchedulableAction_stuck_2b();
+			case s_stuck_3a:
+				return getNextSchedulableAction_stuck_3a();
+			case s_stuck_3b:
+				return getNextSchedulableAction_stuck_3b();
+			case s_stuck_4a:
+				return getNextSchedulableAction_stuck_4a();
+			case s_stuck_4b:
+				return getNextSchedulableAction_stuck_4b();
+			case s_texac:
+				return getNextSchedulableAction_texac();
+			case s_texture:
+				return getNextSchedulableAction_texture();
+			case s_vld1:
+				return getNextSchedulableAction_vld1();
+			case s_vld4:
+				return getNextSchedulableAction_vld4();
+			case s_vld4a:
+				return getNextSchedulableAction_vld4a();
+			case s_vld6:
+				return getNextSchedulableAction_vld6();
+			case s_vld6a:
+				return getNextSchedulableAction_vld6a();
+			case s_vld7:
+				return getNextSchedulableAction_vld7();
+			case s_vld_direct:
+				return getNextSchedulableAction_vld_direct();
+			case s_vol_aspect:
+				return getNextSchedulableAction_vol_aspect();
+			case s_vol_control:
+				return getNextSchedulableAction_vol_control();
+			case s_vol_height:
+				return getNextSchedulableAction_vol_height();
+			case s_vol_misc:
+				return getNextSchedulableAction_vol_misc();
+			case s_vol_object:
+				return getNextSchedulableAction_vol_object();
+			case s_vol_shape:
+				return getNextSchedulableAction_vol_shape();
+			case s_vol_time_inc_res:
+				return getNextSchedulableAction_vol_time_inc_res();
+			case s_vol_vbv:
+				return getNextSchedulableAction_vol_vbv();
+			case s_vol_width:
+				return getNextSchedulableAction_vol_width();
+			case s_vop_coding:
+				return getNextSchedulableAction_vop_coding();
+			case s_vop_predict:
+				return getNextSchedulableAction_vop_predict();
+			case s_vop_timebase:
+				return getNextSchedulableAction_vop_timebase();
+
+			default:
+				System.out.println("unknown state: %s\n" + _FSM_state);
+				return null;
+			}
+		} else {
+			return next;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -3188,7 +3854,7 @@ public class Actor_parseheaders implements IActorDebug {
 	private boolean get_dc_a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_get_dc()) {
-			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
+			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
 				get_dc();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3204,7 +3870,7 @@ public class Actor_parseheaders implements IActorDebug {
 			_FSM_state = States.s_stuck;
 			res = true;
 		} else if (isSchedulable_get_dc_bits_none()) {
-			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
+			if (fifo_LAST.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1)) {
 				get_dc_bits_none();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3402,7 +4068,7 @@ public class Actor_parseheaders implements IActorDebug {
 	private boolean send_new_vop_height_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_send_new_vop_height()) {
-			if (fifo_HEIGHT.hasRoom(1) && fifo_BTYPE.hasRoom(1)) {
+			if (fifo_BTYPE.hasRoom(1) && fifo_HEIGHT.hasRoom(1)) {
 				send_new_vop_height();
 				_FSM_state = States.s_mb;
 				res = true;
@@ -3590,7 +4256,7 @@ public class Actor_parseheaders implements IActorDebug {
 	private boolean vld1_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_code()) {
-			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
+			if (fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
 				vld_code();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3628,7 +4294,7 @@ public class Actor_parseheaders implements IActorDebug {
 	private boolean vld4a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_level_lookup()) {
-			if (fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
 				vld_level_lookup();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3654,7 +4320,7 @@ public class Actor_parseheaders implements IActorDebug {
 	private boolean vld6a_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_run_lookup()) {
-			if (fifo_VALUE.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1)) {
+			if (fifo_VALUE.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1)) {
 				vld_run_lookup();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3680,7 +4346,7 @@ public class Actor_parseheaders implements IActorDebug {
 	private boolean vld_direct_state_scheduler() {
 		boolean res = false;
 		if (isSchedulable_vld_direct()) {
-			if (fifo_LAST.hasRoom(1) && fifo_RUN.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
+			if (fifo_RUN.hasRoom(1) && fifo_LAST.hasRoom(1) && fifo_VALUE.hasRoom(1)) {
 				vld_direct();
 				_FSM_state = States.s_texac;
 				res = true;
@@ -3835,7 +4501,7 @@ public class Actor_parseheaders implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {

@@ -6,6 +6,8 @@
 package net.sf.orcc.generated;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
 
 import net.sf.orcc.oj.Actor_display;
 import net.sf.orcc.oj.Actor_source;
@@ -18,6 +20,8 @@ import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.InterpreterThread;
 
 public class Network_orcc_testbed implements ISchedulerDebug {
+
+	private Map<String, IActorDebug> actors;
 
 	public static final int SIZE = 10000;
 
@@ -147,41 +151,6 @@ public class Network_orcc_testbed implements ISchedulerDebug {
 	private IActorDebug actor_zigzag;
 	private IActorDebug actor_zzaddr;
 
-	// suspended indicators
-	public boolean isSuspended_acpred;
-	public boolean isSuspended_add;
-	public boolean isSuspended_blkexp;
-	public boolean isSuspended_clip;
-	public boolean isSuspended_combine;
-	public boolean isSuspended_dcpred;
-	public boolean isSuspended_dcsplit;
-	public boolean isSuspended_ddr;
-	public boolean isSuspended_dequant;
-	public boolean isSuspended_display;
-	public boolean isSuspended_downsample;
-	public boolean isSuspended_fairmerge;
-	public boolean isSuspended_final;
-	public boolean isSuspended_interpolate;
-	public boolean isSuspended_mbpack;
-	public boolean isSuspended_memorymanager;
-	public boolean isSuspended_mvrecon;
-	public boolean isSuspended_mvseq;
-	public boolean isSuspended_parseheaders;
-	public boolean isSuspended_retrans;
-	public boolean isSuspended_rowsort;
-	public boolean isSuspended_scale;
-	public boolean isSuspended_searchwin;
-	public boolean isSuspended_sep;
-	public boolean isSuspended_seq;
-	public boolean isSuspended_serialize;
-	public boolean isSuspended_shuffle;
-	public boolean isSuspended_shufflefly;
-	public boolean isSuspended_source;
-	public boolean isSuspended_trans;
-	public boolean isSuspended_unpack;
-	public boolean isSuspended_zigzag;
-	public boolean isSuspended_zzaddr;
-
 	// Broadcasts
 	private Broadcast actor_broadcast_add_VID;
 	private Broadcast actor_broadcast_dcpred_START;
@@ -191,80 +160,90 @@ public class Network_orcc_testbed implements ISchedulerDebug {
 	
 	public Network_orcc_testbed(int cmdPort, int eventPort, String[] args)
 			throws IOException {
-		new InterpreterThread(cmdPort, eventPort, this).start();
+		actors = new HashMap<String, IActorDebug>();
 
 		CLIParameters.getInstance().setArguments(args);
 		initialize();
+
+		// start interpreter thread
+		new InterpreterThread(cmdPort, eventPort, this).start();
 		schedule();
 		Actor_display.closeDisplay();
 	}
 	
 	@Override
-	public String[] getActors() {
-		return new String[] {
-			"acpred", "add", "blkexp", "clip", "combine", "dcpred", "dcsplit", "ddr", "dequant", 
-			"display", "downsample", "fairmerge", "final", "interpolate", "mbpack", "memorymanager", 
-			"mvrecon", "mvseq", "parseheaders", "retrans", "rowsort", "scale", "searchwin", 
-			"sep", "seq", "serialize", "shuffle", "shufflefly", "source", "trans", "unpack", 
-			"zigzag", "zzaddr"
-		};
-	}
-
-	@Override
-	public void resume(String actorName) {
-		try {
-			getClass().getField("isSuspended_" + actorName).setBoolean(this,
-					false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void suspend(String actorName) {
-		try {
-			getClass().getField("isSuspended_" + actorName).setBoolean(this,
-					true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public Map<String, IActorDebug> getActors() {
+		return actors;
 	}
 
 	@Override
 	public void initialize() {
 		actor_acpred = new Actor_acpred();
+		actors.put("acpred", actor_acpred);
 		actor_add = new Actor_add();
+		actors.put("add", actor_add);
 		actor_blkexp = new Actor_blkexp();
+		actors.put("blkexp", actor_blkexp);
 		actor_clip = new Actor_clip();
+		actors.put("clip", actor_clip);
 		actor_combine = new Actor_combine();
+		actors.put("combine", actor_combine);
 		actor_dcpred = new Actor_dcpred();
+		actors.put("dcpred", actor_dcpred);
 		actor_dcsplit = new Actor_dcsplit();
+		actors.put("dcsplit", actor_dcsplit);
 		actor_ddr = new Actor_ddr();
+		actors.put("ddr", actor_ddr);
 		actor_dequant = new Actor_dequant();
+		actors.put("dequant", actor_dequant);
 		actor_display = new Actor_display();
+		actors.put("display", actor_display);
 		actor_downsample = new Actor_downsample();
+		actors.put("downsample", actor_downsample);
 		actor_fairmerge = new Actor_fairmerge();
+		actors.put("fairmerge", actor_fairmerge);
 		actor_final = new Actor_final();
+		actors.put("final", actor_final);
 		actor_interpolate = new Actor_interpolate();
+		actors.put("interpolate", actor_interpolate);
 		actor_mbpack = new Actor_mbpack();
+		actors.put("mbpack", actor_mbpack);
 		actor_memorymanager = new Actor_memorymanager();
+		actors.put("memorymanager", actor_memorymanager);
 		actor_mvrecon = new Actor_mvrecon();
+		actors.put("mvrecon", actor_mvrecon);
 		actor_mvseq = new Actor_mvseq();
+		actors.put("mvseq", actor_mvseq);
 		actor_parseheaders = new Actor_parseheaders();
+		actors.put("parseheaders", actor_parseheaders);
 		actor_retrans = new Actor_retrans();
+		actors.put("retrans", actor_retrans);
 		actor_rowsort = new Actor_rowsort();
+		actors.put("rowsort", actor_rowsort);
 		actor_scale = new Actor_scale();
+		actors.put("scale", actor_scale);
 		actor_searchwin = new Actor_searchwin();
+		actors.put("searchwin", actor_searchwin);
 		actor_sep = new Actor_sep();
+		actors.put("sep", actor_sep);
 		actor_seq = new Actor_seq();
+		actors.put("seq", actor_seq);
 		actor_serialize = new Actor_serialize();
+		actors.put("serialize", actor_serialize);
 		actor_shuffle = new Actor_shuffle();
+		actors.put("shuffle", actor_shuffle);
 		actor_shufflefly = new Actor_shufflefly();
+		actors.put("shufflefly", actor_shufflefly);
 		actor_source = new Actor_source();
+		actors.put("source", actor_source);
 		actor_trans = new Actor_trans();
+		actors.put("trans", actor_trans);
 		actor_unpack = new Actor_unpack();
+		actors.put("unpack", actor_unpack);
 		actor_zigzag = new Actor_zigzag();
+		actors.put("zigzag", actor_zigzag);
 		actor_zzaddr = new Actor_zzaddr();
+		actors.put("zzaddr", actor_zzaddr);
 
 		actor_broadcast_add_VID = new Broadcast(2);
 		actor_broadcast_dcpred_START = new Broadcast(3);
@@ -342,9 +321,9 @@ public class Network_orcc_testbed implements ISchedulerDebug {
 		fifo_67 = new IntFifo(SIZE);
 		fifo_68 = new IntFifo(SIZE);
 		fifo_69 = new IntFifo(SIZE);
-		fifo_70 = new IntFifo(SIZE);
-		fifo_71 = new IntFifo(SIZE);
-		fifo_72 = new IntFifo(SIZE);
+		fifo_70 = new IntFifo(384);
+		fifo_71 = new IntFifo(384);
+		fifo_72 = new IntFifo(384);
 		fifo_73 = new IntFifo(SIZE);
 		fifo_74 = new IntFifo(SIZE);
 		fifo_75 = new IntFifo(SIZE);
@@ -355,9 +334,9 @@ public class Network_orcc_testbed implements ISchedulerDebug {
 		fifo_80 = new IntFifo(SIZE);
 		fifo_81 = new IntFifo(SIZE);
 		fifo_82 = new IntFifo(SIZE);
-		fifo_83 = new IntFifo(384);
-		fifo_84 = new IntFifo(384);
-		fifo_85 = new IntFifo(384);
+		fifo_83 = new IntFifo(SIZE);
+		fifo_84 = new IntFifo(SIZE);
+		fifo_85 = new IntFifo(SIZE);
 		fifo_86 = new IntFifo(SIZE);
 		fifo_87 = new IntFifo(SIZE);
 		fifo_88 = new IntFifo(SIZE);
@@ -496,50 +475,50 @@ public class Network_orcc_testbed implements ISchedulerDebug {
 		actor_dcpred.setFifo("B", fifo_65);
 		actor_seq.setFifo("C", fifo_66);
 		actor_dcpred.setFifo("C", fifo_66);
-		actor_parseheaders.setFifo("BTYPE", fifo_67);
-		actor_broadcast_parseheaders_BTYPE.setFifo("input", fifo_67);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_0", fifo_68);
-		actor_memorymanager.setFifo("BTYPE", fifo_68);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_1", fifo_69);
-		actor_add.setFifo("BTYPE", fifo_69);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_2", fifo_70);
-		actor_mvseq.setFifo("BTYPE", fifo_70);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_3", fifo_71);
-		actor_unpack.setFifo("BTYPE", fifo_71);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_4", fifo_72);
-		actor_seq.setFifo("BTYPE", fifo_72);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_5", fifo_73);
-		actor_dcpred.setFifo("BTYPE", fifo_73);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_6", fifo_74);
+		actor_fairmerge.setFifo("ROWOUT", fifo_67);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("input", fifo_67);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("output_0", fifo_68);
+		actor_downsample.setFifo("R", fifo_68);
+		actor_broadcast_fairmerge_ROWOUT.setFifo("output_1", fifo_69);
+		actor_combine.setFifo("ROW", fifo_69);
+		actor_add.setFifo("VID", fifo_70);
+		actor_broadcast_add_VID.setFifo("input", fifo_70);
+		actor_broadcast_add_VID.setFifo("output_0", fifo_71);
+		actor_mbpack.setFifo("DI", fifo_71);
+		actor_broadcast_add_VID.setFifo("output_1", fifo_72);
+		actor_display.setFifo("B", fifo_72);
+		actor_parseheaders.setFifo("BTYPE", fifo_73);
+		actor_broadcast_parseheaders_BTYPE.setFifo("input", fifo_73);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_0", fifo_74);
 		actor_searchwin.setFifo("BTYPE", fifo_74);
-		actor_broadcast_parseheaders_BTYPE.setFifo("output_7", fifo_75);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_1", fifo_75);
 		actor_mvrecon.setFifo("BTYPE", fifo_75);
-		actor_mvrecon.setFifo("MV", fifo_76);
-		actor_broadcast_mvrecon_MV.setFifo("input", fifo_76);
-		actor_broadcast_mvrecon_MV.setFifo("output_0", fifo_77);
-		actor_unpack.setFifo("MV", fifo_77);
-		actor_broadcast_mvrecon_MV.setFifo("output_1", fifo_78);
-		actor_searchwin.setFifo("MV", fifo_78);
-		actor_dcpred.setFifo("START", fifo_79);
-		actor_broadcast_dcpred_START.setFifo("input", fifo_79);
-		actor_broadcast_dcpred_START.setFifo("output_0", fifo_80);
-		actor_zigzag.setFifo("START", fifo_80);
-		actor_broadcast_dcpred_START.setFifo("output_1", fifo_81);
-		actor_zzaddr.setFifo("START", fifo_81);
-		actor_broadcast_dcpred_START.setFifo("output_2", fifo_82);
-		actor_acpred.setFifo("START", fifo_82);
-		actor_add.setFifo("VID", fifo_83);
-		actor_broadcast_add_VID.setFifo("input", fifo_83);
-		actor_broadcast_add_VID.setFifo("output_0", fifo_84);
-		actor_mbpack.setFifo("DI", fifo_84);
-		actor_broadcast_add_VID.setFifo("output_1", fifo_85);
-		actor_display.setFifo("B", fifo_85);
-		actor_fairmerge.setFifo("ROWOUT", fifo_86);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("input", fifo_86);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("output_0", fifo_87);
-		actor_combine.setFifo("ROW", fifo_87);
-		actor_broadcast_fairmerge_ROWOUT.setFifo("output_1", fifo_88);
-		actor_downsample.setFifo("R", fifo_88);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_2", fifo_76);
+		actor_mvseq.setFifo("BTYPE", fifo_76);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_3", fifo_77);
+		actor_memorymanager.setFifo("BTYPE", fifo_77);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_4", fifo_78);
+		actor_unpack.setFifo("BTYPE", fifo_78);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_5", fifo_79);
+		actor_add.setFifo("BTYPE", fifo_79);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_6", fifo_80);
+		actor_dcpred.setFifo("BTYPE", fifo_80);
+		actor_broadcast_parseheaders_BTYPE.setFifo("output_7", fifo_81);
+		actor_seq.setFifo("BTYPE", fifo_81);
+		actor_dcpred.setFifo("START", fifo_82);
+		actor_broadcast_dcpred_START.setFifo("input", fifo_82);
+		actor_broadcast_dcpred_START.setFifo("output_0", fifo_83);
+		actor_acpred.setFifo("START", fifo_83);
+		actor_broadcast_dcpred_START.setFifo("output_1", fifo_84);
+		actor_zzaddr.setFifo("START", fifo_84);
+		actor_broadcast_dcpred_START.setFifo("output_2", fifo_85);
+		actor_zigzag.setFifo("START", fifo_85);
+		actor_mvrecon.setFifo("MV", fifo_86);
+		actor_broadcast_mvrecon_MV.setFifo("input", fifo_86);
+		actor_broadcast_mvrecon_MV.setFifo("output_0", fifo_87);
+		actor_searchwin.setFifo("MV", fifo_87);
+		actor_broadcast_mvrecon_MV.setFifo("output_1", fifo_88);
+		actor_unpack.setFifo("MV", fifo_88);
 
 	}
 
@@ -559,105 +538,39 @@ public class Network_orcc_testbed implements ISchedulerDebug {
 		int i = 1;
 		while (true) {
 			i = 0;
-			if (!isSuspended_acpred) {
-				i += actor_acpred.schedule();
-			}
-			if (!isSuspended_add) {
-				i += actor_add.schedule();
-			}
-			if (!isSuspended_blkexp) {
-				i += actor_blkexp.schedule();
-			}
-			if (!isSuspended_clip) {
-				i += actor_clip.schedule();
-			}
-			if (!isSuspended_combine) {
-				i += actor_combine.schedule();
-			}
-			if (!isSuspended_dcpred) {
-				i += actor_dcpred.schedule();
-			}
-			if (!isSuspended_dcsplit) {
-				i += actor_dcsplit.schedule();
-			}
-			if (!isSuspended_ddr) {
-				i += actor_ddr.schedule();
-			}
-			if (!isSuspended_dequant) {
-				i += actor_dequant.schedule();
-			}
-			if (!isSuspended_display) {
-				i += actor_display.schedule();
-			}
-			if (!isSuspended_downsample) {
-				i += actor_downsample.schedule();
-			}
-			if (!isSuspended_fairmerge) {
-				i += actor_fairmerge.schedule();
-			}
-			if (!isSuspended_final) {
-				i += actor_final.schedule();
-			}
-			if (!isSuspended_interpolate) {
-				i += actor_interpolate.schedule();
-			}
-			if (!isSuspended_mbpack) {
-				i += actor_mbpack.schedule();
-			}
-			if (!isSuspended_memorymanager) {
-				i += actor_memorymanager.schedule();
-			}
-			if (!isSuspended_mvrecon) {
-				i += actor_mvrecon.schedule();
-			}
-			if (!isSuspended_mvseq) {
-				i += actor_mvseq.schedule();
-			}
-			if (!isSuspended_parseheaders) {
-				i += actor_parseheaders.schedule();
-			}
-			if (!isSuspended_retrans) {
-				i += actor_retrans.schedule();
-			}
-			if (!isSuspended_rowsort) {
-				i += actor_rowsort.schedule();
-			}
-			if (!isSuspended_scale) {
-				i += actor_scale.schedule();
-			}
-			if (!isSuspended_searchwin) {
-				i += actor_searchwin.schedule();
-			}
-			if (!isSuspended_sep) {
-				i += actor_sep.schedule();
-			}
-			if (!isSuspended_seq) {
-				i += actor_seq.schedule();
-			}
-			if (!isSuspended_serialize) {
-				i += actor_serialize.schedule();
-			}
-			if (!isSuspended_shuffle) {
-				i += actor_shuffle.schedule();
-			}
-			if (!isSuspended_shufflefly) {
-				i += actor_shufflefly.schedule();
-			}
-			if (!isSuspended_source) {
-				i += actor_source.schedule();
-			}
-			if (!isSuspended_trans) {
-				i += actor_trans.schedule();
-			}
-			if (!isSuspended_unpack) {
-				i += actor_unpack.schedule();
-			}
-			if (!isSuspended_zigzag) {
-				i += actor_zigzag.schedule();
-			}
-			if (!isSuspended_zzaddr) {
-				i += actor_zzaddr.schedule();
-			}
+			i += actor_acpred.schedule();
+			i += actor_add.schedule();
+			i += actor_blkexp.schedule();
+			i += actor_clip.schedule();
+			i += actor_combine.schedule();
+			i += actor_dcpred.schedule();
+			i += actor_dcsplit.schedule();
+			i += actor_ddr.schedule();
+			i += actor_dequant.schedule();
+			i += actor_display.schedule();
+			i += actor_downsample.schedule();
+			i += actor_fairmerge.schedule();
+			i += actor_final.schedule();
+			i += actor_interpolate.schedule();
+			i += actor_mbpack.schedule();
+			i += actor_memorymanager.schedule();
+			i += actor_mvrecon.schedule();
+			i += actor_mvseq.schedule();
+			i += actor_parseheaders.schedule();
+			i += actor_retrans.schedule();
+			i += actor_rowsort.schedule();
+			i += actor_scale.schedule();
+			i += actor_searchwin.schedule();
+			i += actor_sep.schedule();
+			i += actor_seq.schedule();
+			i += actor_serialize.schedule();
+			i += actor_shuffle.schedule();
+			i += actor_shufflefly.schedule();
+			i += actor_source.schedule();
+			i += actor_trans.schedule();
+			i += actor_unpack.schedule();
+			i += actor_zigzag.schedule();
+			i += actor_zzaddr.schedule();
 
 			i += actor_broadcast_add_VID.schedule();
 			i += actor_broadcast_dcpred_START.schedule();

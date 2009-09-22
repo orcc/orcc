@@ -1,6 +1,181 @@
 group Java_actor_debug : Java_actor;
 
 ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// EXTENSION OF NORMAL SCHEDULERS
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+scheduler(actions) ::= <<
+@Override
+public int schedule() {
+	boolean res = !suspended;
+	int i = 0;
+
+	while (res) {
+		res = false;
+		$if(actions)$
+		$schedulingTest(actions)$
+		$endif$
+	}
+
+	return i;
+}
+
+>>
+
+schedulerFSM(actions, fsm) ::= <<
+private enum States {
+	$fsm.states : {s_$it$}; separator=",\n"$
+};
+
+private States _FSM_state = States.s_$fsm.initialState$;
+
+$if(actions)$
+private boolean outside_FSM_scheduler() {
+	boolean res = false;
+	int i = 0;
+	$schedulingTest(actions)$
+	return res;
+}
+
+
+$endif$
+$fsm.transitions: stateScheduler(); separator="\n"$
+@Override
+public int schedule() {
+	boolean res = !suspended;
+	int i = 0;
+
+	while (res) {
+		res = false;
+		$if(actions)$
+		if (outside_FSM_scheduler()) {
+			res = true;
+			i++;
+		} else {
+			$switch(fsm.transitions)$
+		}
+		$else$
+		$switch(fsm.transitions)$
+		$endif$
+	}
+
+	return i;
+}
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// DEBUGGING SCHEDULERS
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler without FSM
+
+actionCall_DEBUG(action) ::= <<
+return "$action.tag$";
+>>
+
+actionTest_DEBUG(action) ::= <<
+if (isSchedulable_$action.tag$()) {
+	$if(action.outputPattern)$
+	if ($outputPattern(action.outputPattern)$) {
+		$actionCall_DEBUG(action)$
+	}
+	$else$
+	$actionCall_DEBUG(action)$
+	$endif$
+}>>
+
+schedulingTest_DEBUG(actions) ::= <<
+$actions: actionTest_DEBUG(); separator=" else "$
+>>
+
+scheduler_DEBUG(actions) ::= <<
+@Override
+public String getNextSchedulableAction() {
+	$if(actions)$
+	$schedulingTest_DEBUG(actions)$
+	$endif$
+
+	return null;
+}
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler with FSM
+
+actionCallState_DEBUG(nextState) ::= <<
+return "$nextState.action.tag$";
+>>
+
+actionTestState_DEBUG(nextState) ::= <<
+if (isSchedulable_$nextState.action.tag$()) {
+	$if(nextState.action.outputPattern)$
+	if ($outputPattern(nextState.action.outputPattern)$) {
+		$actionCallState_DEBUG(nextState)$
+	}
+	$else$
+	$actionCallState_DEBUG(nextState)$
+	$endif$
+}>>
+
+schedulingTestState_DEBUG(nextStates) ::= <<
+$nextStates: actionTestState_DEBUG(); separator=" else "$
+>>
+
+stateScheduler_DEBUG(transition) ::= <<
+private String getNextSchedulableAction_$transition.sourceState$() {
+	$schedulingTestState_DEBUG(transition.nextStateInfo)$
+
+	return null;
+}
+
+>>
+
+switch_DEBUG(transitions) ::= <<
+switch (_FSM_state) {
+$transitions: {case s_$it.sourceState$:
+	return getNextSchedulableAction_$it.sourceState$();
+}$
+default:
+	System.out.println("unknown state: %s\n" + _FSM_state);
+	return null;
+}
+>>
+
+schedulerFSM_DEBUG(actions, fsm) ::= <<
+$if(actions)$
+private String getNextSchedulableActionOutsideFSM() {
+	$schedulingTest_DEBUG(actions)$
+	return null;
+}
+
+
+$endif$
+$fsm.transitions: stateScheduler_DEBUG(); separator="\n"$
+@Override
+public String getNextSchedulableAction() {
+	$if(actions)$
+	String next = getNextSchedulableActionOutsideFSM();
+	if (next == null) {
+		$switch_DEBUG(fsm.transitions)$
+	} else {
+		return next;
+	}
+	$else$
+	$switch_DEBUG(fsm.transitions)$
+	$endif$
+}
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -24,8 +199,10 @@ public class Actor_$name$ implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	$inputs: fifo()$
@@ -33,7 +210,7 @@ public class Actor_$name$ implements IActorDebug {
 	$outputs: fifo()$
 	// State variables of the actor
 	$stateVars$
-	
+
 	public Actor_$name$() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "$file$";
@@ -49,6 +226,22 @@ public class Actor_$name$ implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+$if(scheduler.fsm)$
+	$schedulerFSM_DEBUG(actions=scheduler.actions, fsm=scheduler.fsm)$
+$else$
+	$scheduler_DEBUG(scheduler.actions)$
+$endif$
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures

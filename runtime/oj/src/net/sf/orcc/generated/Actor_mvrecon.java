@@ -15,8 +15,10 @@ public class Actor_mvrecon implements IActorDebug {
 	private Map<String, Location> actionLocation;
 
 	private Map<String, IntFifo> fifos;
-	
+
 	private String file;
+
+	private boolean suspended;
 
 	// Input FIFOs
 	private IntFifo fifo_BTYPE;
@@ -104,7 +106,7 @@ public class Actor_mvrecon implements IActorDebug {
 	private int res_shift;
 
 
-	
+
 	public Actor_mvrecon() {
 		fifos = new HashMap<String, IntFifo>();
 		file = "D:\\repositories\\mwipliez\\orcc\\trunk\\examples\\MPEG4_SP_Decoder\\MVReconstruct.cal";
@@ -138,6 +140,354 @@ public class Actor_mvrecon implements IActorDebug {
 	@Override
 	public Location getLocation(String action) {
 		return actionLocation.get(action);
+	}
+
+	private String getNextSchedulableAction_advance() {
+		if (isSchedulable_advance()) {
+			return "advance";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_compute() {
+		if (isSchedulable_compute_done()) {
+			return "compute_done";
+		} else if (isSchedulable_compute_start()) {
+			return "compute_start";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_do_pred_x() {
+		if (isSchedulable_do_pred()) {
+			return "do_pred";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_do_pred_y() {
+		if (isSchedulable_do_pred()) {
+			return "do_pred";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_mag_x() {
+		if (isSchedulable_get_mag()) {
+			return "get_mag";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_mag_y() {
+		if (isSchedulable_get_mag()) {
+			return "get_mag";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_pred_p() {
+		if (isSchedulable_compute_start()) {
+			return "compute_start";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_pred_p1() {
+		if (isSchedulable_compute_start()) {
+			return "compute_start";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_pred_x() {
+		if (isSchedulable_get_pred()) {
+			return "get_pred";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_pred_x1() {
+		if (isSchedulable_get_pred()) {
+			return "get_pred";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_pred_x2() {
+		if (isSchedulable_get_pred()) {
+			return "get_pred";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_pred_y() {
+		if (isSchedulable_get_pred()) {
+			return "get_pred";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_pred_y1() {
+		if (isSchedulable_get_pred()) {
+			return "get_pred";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_pred_y2() {
+		if (isSchedulable_get_pred()) {
+			return "get_pred";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_x() {
+		if (isSchedulable_get_residual_init()) {
+			return "get_residual_init";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_x_a() {
+		if (isSchedulable_get_residual_shift()) {
+			return "get_residual_shift";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_x_b() {
+		if (isSchedulable_get_residual_adjust()) {
+			return "get_residual_adjust";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_x_c() {
+		if (isSchedulable_get_residual_calc()) {
+			return "get_residual_calc";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_x_d() {
+		if (isSchedulable_get_residual_clip()) {
+			return "get_residual_clip";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_x_e() {
+		if (isSchedulable_get_residual_final()) {
+			return "get_residual_final";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_y() {
+		if (isSchedulable_get_residual_init()) {
+			return "get_residual_init";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_y_a() {
+		if (isSchedulable_get_residual_shift()) {
+			return "get_residual_shift";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_y_b() {
+		if (isSchedulable_get_residual_adjust()) {
+			return "get_residual_adjust";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_y_c() {
+		if (isSchedulable_get_residual_calc()) {
+			return "get_residual_calc";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_y_d() {
+		if (isSchedulable_get_residual_clip()) {
+			return "get_residual_clip";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_get_res_y_e() {
+		if (isSchedulable_get_residual_final()) {
+			return "get_residual_final";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_geth() {
+		if (isSchedulable_geth()) {
+			return "geth";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_getw() {
+		if (isSchedulable_getw()) {
+			return "getw";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_read() {
+		if (isSchedulable_start()) {
+			return "start";
+		} else if (isSchedulable_read_noMotion()) {
+			return "read_noMotion";
+		} else if (isSchedulable_read_motion()) {
+			return "read_motion";
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_write() {
+		if (isSchedulable_write_luma()) {
+			if (fifo_MV.hasRoom(1)) {
+				return "write_luma";
+			}
+		} else if (isSchedulable_write_chroma()) {
+			if (fifo_MV.hasRoom(1)) {
+				return "write_chroma";
+			}
+		}
+
+		return null;
+	}
+
+	private String getNextSchedulableAction_write_y() {
+		if (isSchedulable_write_luma()) {
+			if (fifo_MV.hasRoom(1)) {
+				return "write_luma";
+			}
+		} else if (isSchedulable_write_chroma()) {
+			if (fifo_MV.hasRoom(1)) {
+				return "write_chroma";
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public String getNextSchedulableAction() {
+		switch (_FSM_state) {
+		case s_advance:
+			return getNextSchedulableAction_advance();
+		case s_compute:
+			return getNextSchedulableAction_compute();
+		case s_do_pred_x:
+			return getNextSchedulableAction_do_pred_x();
+		case s_do_pred_y:
+			return getNextSchedulableAction_do_pred_y();
+		case s_get_mag_x:
+			return getNextSchedulableAction_get_mag_x();
+		case s_get_mag_y:
+			return getNextSchedulableAction_get_mag_y();
+		case s_get_pred_p:
+			return getNextSchedulableAction_get_pred_p();
+		case s_get_pred_p1:
+			return getNextSchedulableAction_get_pred_p1();
+		case s_get_pred_x:
+			return getNextSchedulableAction_get_pred_x();
+		case s_get_pred_x1:
+			return getNextSchedulableAction_get_pred_x1();
+		case s_get_pred_x2:
+			return getNextSchedulableAction_get_pred_x2();
+		case s_get_pred_y:
+			return getNextSchedulableAction_get_pred_y();
+		case s_get_pred_y1:
+			return getNextSchedulableAction_get_pred_y1();
+		case s_get_pred_y2:
+			return getNextSchedulableAction_get_pred_y2();
+		case s_get_res_x:
+			return getNextSchedulableAction_get_res_x();
+		case s_get_res_x_a:
+			return getNextSchedulableAction_get_res_x_a();
+		case s_get_res_x_b:
+			return getNextSchedulableAction_get_res_x_b();
+		case s_get_res_x_c:
+			return getNextSchedulableAction_get_res_x_c();
+		case s_get_res_x_d:
+			return getNextSchedulableAction_get_res_x_d();
+		case s_get_res_x_e:
+			return getNextSchedulableAction_get_res_x_e();
+		case s_get_res_y:
+			return getNextSchedulableAction_get_res_y();
+		case s_get_res_y_a:
+			return getNextSchedulableAction_get_res_y_a();
+		case s_get_res_y_b:
+			return getNextSchedulableAction_get_res_y_b();
+		case s_get_res_y_c:
+			return getNextSchedulableAction_get_res_y_c();
+		case s_get_res_y_d:
+			return getNextSchedulableAction_get_res_y_d();
+		case s_get_res_y_e:
+			return getNextSchedulableAction_get_res_y_e();
+		case s_geth:
+			return getNextSchedulableAction_geth();
+		case s_getw:
+			return getNextSchedulableAction_getw();
+		case s_read:
+			return getNextSchedulableAction_read();
+		case s_write:
+			return getNextSchedulableAction_write();
+		case s_write_y:
+			return getNextSchedulableAction_write_y();
+
+		default:
+			System.out.println("unknown state: %s\n" + _FSM_state);
+			return null;
+		}
+	}
+
+	@Override
+	public void resume() {
+		suspended = false;
+	}
+
+	@Override
+	public void suspend() {
+		suspended = true;
 	}
 
 	// Functions/procedures
@@ -1321,7 +1671,7 @@ public class Actor_mvrecon implements IActorDebug {
 
 	@Override
 	public int schedule() {
-		boolean res = true;
+		boolean res = !suspended;
 		int i = 0;
 
 		while (res) {
