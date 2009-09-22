@@ -39,8 +39,11 @@ public class NextStateInfo {
 	private Action action;
 
 	private String targetState;
-
-	public NextStateInfo(Action action, String targetState) {
+	
+	private int targetIntState;
+	
+	public NextStateInfo(int targetIntState, Action action, String targetState) {
+		this.targetIntState = targetIntState;
 		this.action = action;
 		this.targetState = targetState;
 	}
@@ -60,5 +63,12 @@ public class NextStateInfo {
 	public void setTargetState(String targetState) {
 		this.targetState = targetState;
 	}
-
+	
+	public int getTargetIntState() {
+		return targetIntState;
+	}
+	
+	public void setTargetIntState(int targetIntState) {
+		this.targetIntState = targetIntState;
+	}
 }

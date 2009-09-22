@@ -312,58 +312,61 @@ return:
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-$nextState.action.tag$();
-_FSM_state = s_$nextState.targetState$;
-res = 1;
+	call void @$nextState.action.tag$()
+	store i32 $nextState.targetIntState$, i32* @_FSM_state
+	ret i1 1
+
 >>
 
 actionTestState(actorName, nextState) ::= <<
-if (isSchedulable_$nextState.action.tag$()) {
-	$if(nextState.action.outputPattern)$
-	if ($outputPattern(actorName=actorName, pattern=nextState.action.outputPattern)$) {
-		$actionCallState(nextState)$
-	}
-	$else$
-	$actionCallState(nextState)$
-	$endif$
-}>>
+
+	%sched_$nextState.action.tag$ = call i1 @isSchedulable_$nextState.action.tag$()
+	br i1 %sched_$nextState.action.tag$, label %bb, label %return
+
+bb:
+$if(nextState.action.outputPattern)$
+	$loadPattern(actorName=actorName, pattern=nextState.action.outputPattern)$
+	%hasToken_$actorName$ = $outputPattern(actorName=actorName, pattern=nextState.action.outputPattern)$
+	br i1 %hasToken_$actorName$, label %token_$actorName$, label %return
+
+token_$actorName$:
+$actionCallState(nextState)$
+$else$
+$actionCallState(nextState)$
+$endif$
+
+>>
 
 schedulingTestState(actorName, nextStates) ::= <<
 $nextStates: actionTestState(actorName=actorName, nextState=it); separator=" else "$
 >>
 
 stateScheduler(actorName, transition) ::= <<
-static int $transition.sourceState$_state_scheduler() {
-	int res = 0;
-	$schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo)$
-	return res;
+define internal i1 @$transition.sourceState$_state_scheduler() {
+entry:
+$schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo)$
+return:
+	ret i1 0
 }
 
 >>
 
 switch(transitions) ::= <<
-switch (_FSM_state) {
-$transitions: {case s_$it.sourceState$:
-	res = $it.sourceState$_state_scheduler();
-	break;
+	%_FSM_state = load i32* @_FSM_state
+	switch i32 %_FSM_state, label %default [$\n$$transitions:{$\t\t$i32 $it.indexState$, label %s_$it.sourceState$$\n$}$$\t$]
+$transitions: {
+s_$it.sourceState$:
+	%$it.sourceState$_res = call i1 @$it.sourceState$_state_scheduler();
+	br i1 %$it.sourceState$_res, label %bb, label %return
 }$
 default:
-	printf("unknown state: %s\n", stateNames[_FSM_state]);
-	break;
-}
+	br label %return
+
 >>
 
 schedulerFSM(actorName, actions, fsm) ::= <<
-enum states {
-	s_$first(fsm.states)$ = 0,
-	$rest(fsm.states) : {s_$it$}; separator=",\n"$
-};
 
-static char *stateNames[] = {
-	$fsm.states : {"s_$it$"}; separator=",\n"$
-};
-
-static enum states _FSM_state = s_$fsm.initialState$;
+@_FSM_state = internal global i32 $fsm.initialIntState$
 
 $if(actions)$
 static int outside_FSM_scheduler() {
@@ -376,25 +379,26 @@ static int outside_FSM_scheduler() {
 
 $endif$
 $fsm.transitions: stateScheduler(actorName=actorName, transition=it); separator="\n"$
-int $actorName$_scheduler() {
-	int res = 1;
-	int i = 0;
+define i32 @$actorName$_scheduler() {
+entry:
+	%i = alloca i32
+	store i32 0, i32* %i
+	br label %bb
 	
-	while (res) {
-		res = 0;
-		$if(actions)$
-		if (outside_FSM_scheduler()) {
-			res = 1;
-			i++;
-		} else {
-			$switch(fsm.transitions)$
-		}
-		$else$
-		$switch(fsm.transitions)$
-		$endif$
-	}
+bb:  
+$if(actions)$
+if (outside_FSM_scheduler()) {
+res = 1;
+i++;
+} else {
+$switch(fsm.transitions)$
+}
+$else$ $switch(fsm.transitions)$
+$endif$
 
-	return i;
+return:
+	%i_ret = load i32* %i
+	ret i32 %i_ret
 }
 
 >>

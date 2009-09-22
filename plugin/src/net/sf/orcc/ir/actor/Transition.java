@@ -42,9 +42,13 @@ public class Transition {
 
 	private String sourceState;
 
-	public Transition(String sourceState, List<NextStateInfo> nextStateInfo) {
+	private int indexState;
+	
+	public Transition(int indexState, String sourceState, List<NextStateInfo> nextStateInfo) {
+		this.indexState = indexState;
 		this.sourceState = sourceState;
 		this.nextStateInfo = nextStateInfo;
+		
 	}
 
 	public List<NextStateInfo> getNextStateInfo() {
@@ -57,6 +61,14 @@ public class Transition {
 
 	public void setSourceState(String sourceState) {
 		this.sourceState = sourceState;
+	}
+	
+	public int getIndexState() {
+		return indexState;
+	}
+
+	public void setIndexState(int indexState) {
+		this.indexState = indexState;
 	}
 
 }
