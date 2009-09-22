@@ -60,10 +60,6 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 	int exprCounter;
 
 	public ExpressionTransformation(Actor actor) {
-		if (actor.getName().compareTo("serialize")==0){
-			int i =0;
-			i=i+1;
-		}
 		
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
@@ -158,19 +154,8 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 
 		if (node.getValue() instanceof BinaryExpr) {			
-			AbstractType targetType = node.getTarget().getVarDef().getType();
-
-			VarDef vardef = varDefCreate (targetType);
-			VarUse varUse = new VarUse(vardef, null);
-			VarExpr expr = new VarExpr(new Location(), varUse);
-
-			AssignVarNode assignNode = new AssignVarNode(0, new Location(),
-					vardef, node.getValue());
+			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getValue(), it);
 			node.setValue(expr);
-
-			it.previous();
-			it.add(assignNode);
-			it.next();
 		}
 	}
 
