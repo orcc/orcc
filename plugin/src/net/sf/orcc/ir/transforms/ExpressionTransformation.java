@@ -84,18 +84,9 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 		if (node.getCondition() instanceof BinaryExpr) {
 			
 			BinaryExpr binExpr = (BinaryExpr)node.getCondition();
-			splitBinaryExpr(binExpr, it);
-			
-			VarDef vardef = varDefCreate (new BoolType());
-			VarUse varUse = new VarUse(vardef, null);
-			VarExpr expr = new VarExpr(new Location(), varUse);
-			AssignVarNode assignNode = new AssignVarNode(0, new Location(),
-					vardef, node.getCondition());
-			node.setCondition(expr);
+			VarExpr expr = splitBinaryExpr(binExpr, it);
 
-			it.previous();
-			it.add(assignNode);
-			it.next();
+			node.setCondition(expr);
 		}
 
 		visitNodes(node.getThenNodes());
