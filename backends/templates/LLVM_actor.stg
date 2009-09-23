@@ -322,34 +322,41 @@ actionCallState(nextState) ::= <<
 
 >>
 
-actionTestState(actorName, nextState) ::= <<
+actionTestState(actorName, nextState, br) ::= <<
 
+$if(nextState.action.outputPattern)$
 	%sched_$nextState.action.tag$ = call i1 @isSchedulable_$nextState.action.tag$()
-	br i1 %sched_$nextState.action.tag$, label %bb, label %return
+	br i1 %sched_$nextState.action.tag$, label %$nextState.action.tag$, label %$br$
 
-bb:
-	$if(nextState.action.outputPattern)$
+$nextState.action.tag$:
 	$loadPattern(actorName=actorName, pattern=nextState.action.outputPattern)$
 	$outputPattern(tag="hasToken_"+actorName, actorName=actorName, pattern=nextState.action.outputPattern)$
-	br i1 %hasToken_$actorName$, label %token_$actorName$, label %return
+	br i1 %hasToken_$actorName$, label %n_$nextState.action.tag$, label %$br$
 
-token_$actorName$:
+n_$nextState.action.tag$:
 $actionCallState(nextState)$
+$br$:
 $else$
+	%sched_$nextState.action.tag$ = call i1 @isSchedulable_$nextState.action.tag$()
+	br i1 %sched_$nextState.action.tag$, label %$nextState.action.tag$, label %$br$
+
+$nextState.action.tag$:
 $actionCallState(nextState)$
+
+$br$:
 $endif$
 
 >>
 
 schedulingTestState(actorName, nextStates) ::= <<
-$nextStates: actionTestState(actorName=actorName, nextState=it); separator=" else "$
+$trunc(nextStates): actionTestState(actorName=actorName, nextState=it, br = "bb"+i0)$
+$last(nextStates): actionTestState(actorName=actorName, nextState=it, br = "return")$
 >>
 
 stateScheduler(actorName, transition) ::= <<
 define internal i1 @$transition.sourceState$_state_scheduler() {
 entry:
 $schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo)$
-return:
 	ret i1 0
 }
 
