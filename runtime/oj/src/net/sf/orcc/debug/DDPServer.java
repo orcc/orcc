@@ -26,61 +26,27 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.debug;
+
+import net.sf.orcc.oj.Location;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 /**
+ * Implementation of a Dataflow Debug Protocol server.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class Location {
+public class DDPServer {
 
-	private int charEnd;
-
-	private int charStart;
-
-	private int lineNumber;
-
-	/**
-	 * Constructs a dummy location.
-	 */
-	public Location() {
-	}
-
-	/**
-	 * Creates a new location.
-	 * 
-	 * @param lineNumber
-	 * @param charStart
-	 * @param charEnd
-	 */
-	public Location(int lineNumber, int charStart, int charEnd) {
-		this.charEnd = charEnd;
-		this.charStart = charStart;
-		this.lineNumber = lineNumber;
-	}
-
-	/**
-	 * 
-	 * @return end char
-	 */
-	public int getCharEnd() {
-		return charEnd;
-	}
-
-	/**
-	 * 
-	 * @return start char
-	 */
-	public int getCharStart() {
-		return charStart;
-	}
-
-	/**
-	 * 
-	 * @return line number
-	 */
-	public int getLineNumber() {
-		return lineNumber;
+	public static JSONArray getArray(Location location) throws JSONException {
+		JSONArray array = new JSONArray();
+		array.put(0, location.getLineNumber());
+		array.put(1, location.getCharStart());
+		array.put(2, location.getCharEnd());
+		return array;
 	}
 
 }

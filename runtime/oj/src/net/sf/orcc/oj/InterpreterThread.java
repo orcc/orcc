@@ -33,7 +33,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
+
+import net.sf.orcc.debug.DDPConstants;
+import net.sf.orcc.debug.DDPServer;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author mwipliez
@@ -61,23 +69,22 @@ public class InterpreterThread extends Thread {
 		actors = this.scheduler.getActors();
 	}
 
-	private void getComponents() {
-		String[] names = new TreeSet<String>(actors.keySet())
-				.toArray(new String[0]);
-		if (names.length > 0) {
-			String response = names[0];
-			for (int i = 1; i < names.length; i++) {
-				response += "|" + names[i];
-			}
-
-			writeReply(response);
-		}
+	private void getComponents() throws JSONException {
+		Set<String> set = new TreeSet<String>(actors.keySet());
+		JSONObject reply = new JSONObject();
+		reply.put(DDPConstants.REPLY, DDPConstants.REP_GET_COMPONENTS);
+		JSONArray array = new JSONArray(set);
+		reply.put(DDPConstants.ATTR_COMPONENTS, array);
+		writeReply(reply);
 	}
 
-	private void resume(String actorName) {
-		System.out.println("resume " + actorName);
+	private void resume(JSONObject request) throws JSONException {
+		String actorName = request.getString(DDPConstants.ATTR_NAME);
 		actors.get(actorName).resume();
-		writeReply("ok");
+
+		JSONObject reply = new JSONObject();
+		reply.put(DDPConstants.REPLY, DDPConstants.REP_RESUME);
+		writeReply(reply);
 		writeEvent("resumed " + actorName + ":client");
 	}
 
@@ -90,22 +97,27 @@ public class InterpreterThread extends Thread {
 				cmdSocket.getInputStream()));
 		try {
 			while (!terminateInterpreter) {
-				String command = input.readLine();
-				if (command.startsWith("exit")) {
+				String line = input.readLine();
+				JSONObject request = new JSONObject(line);
+				System.out.println(request);
+
+				String requestType = request.getString(DDPConstants.REQUEST);
+				if (requestType.equals(DDPConstants.REQ_EXIT)) {
 					terminate();
-				} else if (command.startsWith("getComponents")) {
+				} else if (requestType.equals(DDPConstants.REQ_GET_COMPONENTS)) {
 					getComponents();
-				} else if (command.startsWith("resume")) {
-					resume(command.substring(7));
-				} else if (command.startsWith("stack")) {
-					stack(command.substring(6));
-				} else if (command.startsWith("suspend")) {
-					suspend(command.substring(8));
+				} else if (requestType.equals(DDPConstants.REQ_RESUME)) {
+					resume(request);
+				} else if (requestType.equals(DDPConstants.REQ_STACK)) {
+					stack(request);
+				} else if (requestType.equals(DDPConstants.REQ_SUSPEND)) {
+					suspend(request);
 				} else {
-					System.out.println("ignoring received command " + command);
+					System.out.println("ignoring request");
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 			terminate();
 		}
 
@@ -114,36 +126,54 @@ public class InterpreterThread extends Thread {
 		System.exit(0);
 	}
 
-	private void stack(String actorName) {
-		System.out.println("stack " + actorName);
+	private void stack(JSONObject request) throws JSONException {
+		String actorName = request.getString(DDPConstants.ATTR_NAME);
 		IActorDebug actor = actors.get(actorName);
 
 		String fileName = actor.getFile();
-		int lineNumber;
+		Location location;
 
 		String actionName = actor.getNextSchedulableAction();
 		if (actionName == null) {
 			actionName = "<no schedulable action>";
-			lineNumber = -1;
+			location = new Location();
 		} else {
-			lineNumber = actor.getLocation(actionName).getLine();
+			location = actor.getLocation(actionName);
 		}
 
-		String response = fileName + "|" + actorName + "|" + actionName;
-		response += "|" + lineNumber;
-		// response =
-		// "fileName|componentName|function name|location|variable name|variable name|...|variable name"
-		writeReply(response);
+		JSONObject frame = new JSONObject();
+		frame.put("file", fileName);
+		frame.put("actor", actorName);
+		frame.put("function", actionName);
+		frame.put("location", DDPServer.getArray(location));
+		frame.put("variables", new JSONArray());
+
+		JSONArray frames = new JSONArray();
+		frames.put(0, frame);
+
+		JSONObject reply = new JSONObject();
+		reply.put(DDPConstants.ATTR_FRAMES, frames);
+		writeReply(reply);
 	}
 
-	private void suspend(String actorName) {
-		System.out.println("suspend " + actorName);
+	private void suspend(JSONObject request) throws JSONException {
+		String actorName = request.getString(DDPConstants.ATTR_NAME);
 		actors.get(actorName).suspend();
-		writeReply("ok");
+
+		JSONObject reply = new JSONObject();
+		reply.put(DDPConstants.REPLY, DDPConstants.REP_SUSPEND);
+		writeReply(reply);
 		writeEvent("suspended " + actorName + ":client");
 	}
 
 	private void terminate() {
+		try {
+			JSONObject reply = new JSONObject();
+			reply.put(DDPConstants.REPLY, DDPConstants.REP_EXIT);
+			writeReply(reply);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 		writeEvent("terminated");
 		System.out.println("Debug session terminated.");
 		terminateInterpreter = true;
@@ -177,7 +207,7 @@ public class InterpreterThread extends Thread {
 		out.flush();
 	}
 
-	private void writeReply(String reply) {
+	private void writeReply(JSONObject reply) {
 		PrintStream out = cmdSocket.getPrintStream();
 		out.println(reply);
 		out.flush();
