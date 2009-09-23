@@ -375,7 +375,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		//Select the type of cast (trunc if smaller, zext otherwise)
 		if (sourceSize<targetSize)
 		{
-			if (targetVar.getType() instanceof UintType){
+			if (var.getType() instanceof UintType){
 				return new ZextNode(0, new Location(), targetVar, expr);
 			}else {
 				return new SextNode(0, new Location(), targetVar, expr);	

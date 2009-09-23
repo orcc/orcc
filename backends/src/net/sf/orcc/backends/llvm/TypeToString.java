@@ -100,7 +100,6 @@ public class TypeToString extends LLVMAbstractTypeVisitor {
 
 	@Override
 	public void visit(UintType type) {
-		builder.append("unsigned ");
 		printInt(type.getSize());
 	}
 
