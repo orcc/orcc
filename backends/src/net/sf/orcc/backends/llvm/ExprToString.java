@@ -91,7 +91,7 @@ public class ExprToString implements ExprVisitor {
 		case SHIFT_RIGHT:
 			return "lshr";
 		case TIMES:
-			return "*";
+			return "mul";
 		default:
 			throw new NullPointerException();
 		}
