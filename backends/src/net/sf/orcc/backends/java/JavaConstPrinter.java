@@ -54,7 +54,7 @@ public class JavaConstPrinter extends ConstPrinter implements ConstVisitor {
 	}
 
 	@Override
-	public void visit(BoolConst constant) {
+	public void visit(BoolConst constant, Object... args) {
 		template.setAttribute("value", constant.getValue() ? "true" : "false");
 	}
 

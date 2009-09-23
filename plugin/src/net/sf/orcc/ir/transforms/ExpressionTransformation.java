@@ -46,7 +46,6 @@ import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.type.AbstractType;
-import net.sf.orcc.ir.type.BoolType;
 
 
 /**

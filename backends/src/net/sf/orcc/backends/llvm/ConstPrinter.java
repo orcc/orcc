@@ -36,6 +36,8 @@ import net.sf.orcc.ir.consts.ConstVisitor;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
+import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.ListType;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -80,27 +82,39 @@ public class ConstPrinter implements ConstVisitor {
 	}
 
 	@Override
-	public void visit(BoolConst constant) {
+	public void visit(BoolConst constant, Object... args) {
+		TypeToString typeStr = new TypeToString((AbstractType)args[0]);
+		template.setAttribute("type", typeStr.toString());
 		template.setAttribute("value", constant.getValue() ? "1" : "0");
 	}
 
 	@Override
-	public void visit(IntConst constant) {
-		template.setAttribute("value", constant.getValue());
+	public void visit(IntConst constant, Object... args) {
+		if (args[0] instanceof AbstractType){
+			TypeToString typeStr = new TypeToString((AbstractType)args[0]);
+			template.setAttribute("value", typeStr.toString() + " " +constant.getValue());
+		} else {
+			template.setAttribute("value", constant.getValue());
+		}
+		
+			
 	}
 
 	@Override
-	public void visit(ListConst constant) {
+	public void visit(ListConst constant, Object... args) {
+		ListType listType = (ListType) args[0];
+		AbstractType type = listType.getType();
+				
 		// save current template
 		StringTemplate previousTempl = template;
 
 		// set instance of list template as current template
 		StringTemplate listTempl = group.getInstanceOf("listValue");
 		template = listTempl;
-
+		
 		List<AbstractConst> list = constant.getValue();
 		for (AbstractConst cst : list) {
-			cst.accept(this);
+			cst.accept(this, type);
 		}
 
 		// restore previous template as current template, and set attribute
@@ -110,10 +124,12 @@ public class ConstPrinter implements ConstVisitor {
 	}
 
 	@Override
-	public void visit(StringConst constant) {
+	public void visit(StringConst constant, Object... args) {
 		// escape backslashes
 		String val = constant.getValue();
 		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
+		TypeToString typeStr = new TypeToString((AbstractType)args[0]);
+		template.setAttribute("type", typeStr.toString());
 		template.setAttribute("value", res);
 	}
 

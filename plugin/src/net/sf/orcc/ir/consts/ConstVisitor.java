@@ -34,12 +34,12 @@ package net.sf.orcc.ir.consts;
  */
 public interface ConstVisitor {
 
-	public void visit(BoolConst constant);
+	public void visit(BoolConst constant, Object... args);
 
-	public void visit(IntConst constant);
+	public void visit(IntConst constant, Object... args);
 
-	public void visit(ListConst constant);
+	public void visit(ListConst constant, Object... args);
 
-	public void visit(StringConst constant);
+	public void visit(StringConst constant, Object... args);
 
 }

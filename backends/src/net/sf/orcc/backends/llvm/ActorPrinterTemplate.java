@@ -35,12 +35,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.PluginGroupLoader;
+import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.ListType;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -232,8 +235,20 @@ public class ActorPrinterTemplate {
 
 			// initial value of state var (if any)
 			if (stateVar.hasInit()) {
+				AbstractType type;
+				VarDef varDef = stateVar.getDef();
+				
+				if (varDef.getType() instanceof PointType) {
+					PointType iType = (PointType) varDef.getType();
+					type = iType.getType();
+				} else {
+					type = varDef.getType();
+				}
+				
 				constPrinter.setTemplate(stateTempl);
-				stateVar.getInit().accept(constPrinter);
+				if (type instanceof ListType){
+					stateVar.getInit().accept(constPrinter, type);
+				}
 			}
 		}
 	}

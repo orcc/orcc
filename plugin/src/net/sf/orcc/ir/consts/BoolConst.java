@@ -41,8 +41,8 @@ public class BoolConst extends AbstractConst {
 	}
 
 	@Override
-	public void accept(ConstVisitor visitor) {
-		visitor.visit(this);
+	public void accept(ConstVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
 	public boolean getValue() {

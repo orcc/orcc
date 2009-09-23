@@ -32,6 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.type.AbstractType;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -66,21 +67,21 @@ public class VarDefPrinter {
 	public StringTemplate applyVarDef(VarDef varDef) {
 		StringTemplate varDefTmpl = group.getInstanceOf("vardef");
 		varDefTmpl.setAttribute("name", getVarDefName(varDef));
-
+		AbstractType type;
+		
 		if (varDef.getType() instanceof PointType) {
 			PointType iType = (PointType) varDef.getType();
-
-			TypeToString type = new TypeToString(iType.getType());
-			varDefTmpl.setAttribute("type", type.toString());
-
+			type = iType.getType();
 		} else {
-			TypeToString type = new TypeToString(varDef.getType());
-			varDefTmpl.setAttribute("type", type.toString());
+			type = varDef.getType();
 		}
-
+		
+		TypeToString typeStr = new TypeToString(type);
+		varDefTmpl.setAttribute("type", typeStr.toString());
+		
 		// if varDef is a list, => list of dimensions
 		listSizePrinter.setTemplate(varDefTmpl);
-		varDef.getType().accept(listSizePrinter);
+		type.accept(listSizePrinter);
 
 		varDefTmpl.setAttribute("isPort", ports.contains(varDef.getName()));
 		varDefTmpl.setAttribute("isGlobal", varDef.isGlobal());

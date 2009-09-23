@@ -21,7 +21,7 @@ $endif$
 
 // the values of a list: {val1, val2, ..., valn}
 listValue(value) ::= <<
-{$value; wrap, separator=", "$}
+[$value; wrap, separator=", "$]
 >>
 
 // phi definition

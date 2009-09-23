@@ -80,17 +80,17 @@ public class ConstPrinter implements ConstVisitor {
 	}
 
 	@Override
-	public void visit(BoolConst constant) {
+	public void visit(BoolConst constant, Object... args) {
 		template.setAttribute("value", constant.getValue() ? "1" : "0");
 	}
 
 	@Override
-	public void visit(IntConst constant) {
+	public void visit(IntConst constant, Object... args) {
 		template.setAttribute("value", constant.getValue());
 	}
 
 	@Override
-	public void visit(ListConst constant) {
+	public void visit(ListConst constant, Object... args) {
 		// save current template
 		StringTemplate previousTempl = template;
 
@@ -110,7 +110,7 @@ public class ConstPrinter implements ConstVisitor {
 	}
 
 	@Override
-	public void visit(StringConst constant) {
+	public void visit(StringConst constant, Object... args) {
 		// escape backslashes
 		String val = constant.getValue();
 		String res = "\"" + val.replaceAll("\\\\", "\\\\\\\\") + "\"";

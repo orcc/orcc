@@ -34,6 +34,6 @@ package net.sf.orcc.ir.consts;
  */
 public abstract class AbstractConst {
 
-	public abstract void accept(ConstVisitor visitor);
+	public abstract void accept(ConstVisitor visitor, Object... args);
 
 }
