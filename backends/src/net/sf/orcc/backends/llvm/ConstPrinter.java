@@ -83,14 +83,16 @@ public class ConstPrinter implements ConstVisitor {
 
 	@Override
 	public void visit(BoolConst constant, Object... args) {
-		TypeToString typeStr = new TypeToString((AbstractType)args[0]);
-		template.setAttribute("type", typeStr.toString());
+		if (args.length == 1){
+			TypeToString typeStr = new TypeToString((AbstractType)args[0]);
+			template.setAttribute("type", typeStr.toString());
+		}
 		template.setAttribute("value", constant.getValue() ? "1" : "0");
 	}
 
 	@Override
 	public void visit(IntConst constant, Object... args) {
-		if (args[0] instanceof AbstractType){
+		if (args.length == 1){
 			TypeToString typeStr = new TypeToString((AbstractType)args[0]);
 			template.setAttribute("value", typeStr.toString() + " " +constant.getValue());
 		} else {
@@ -128,8 +130,10 @@ public class ConstPrinter implements ConstVisitor {
 		// escape backslashes
 		String val = constant.getValue();
 		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
+		if (args.length == 1){
 		TypeToString typeStr = new TypeToString((AbstractType)args[0]);
 		template.setAttribute("type", typeStr.toString());
+		}
 		template.setAttribute("value", res);
 	}
 

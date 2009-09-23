@@ -248,6 +248,8 @@ public class ActorPrinterTemplate {
 				constPrinter.setTemplate(stateTempl);
 				if (type instanceof ListType){
 					stateVar.getInit().accept(constPrinter, type);
+				}else {
+					stateVar.getInit().accept(constPrinter);
 				}
 			}
 		}
