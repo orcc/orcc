@@ -39,12 +39,11 @@ import java.util.Set;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNode;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
-import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
-import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
+import net.sf.orcc.backends.llvm.nodes.SextNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
@@ -71,7 +70,6 @@ import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
@@ -84,6 +82,7 @@ import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.UintType;
 
 /**
  * Verify type coherence for every nodes.
@@ -376,7 +375,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		//Select the type of cast (trunc if smaller, zext otherwise)
 		if (sourceSize<targetSize)
 		{
-			return new ZextNode(0, new Location(), targetVar, expr);
+			if (targetVar.getType() instanceof UintType){
+				return new ZextNode(0, new Location(), targetVar, expr);
+			}else {
+				return new SextNode(0, new Location(), targetVar, expr);	
+			}
 		}else{
 			return new TruncNode(0, new Location(), targetVar, expr);
 		}
@@ -401,42 +404,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 	
 	
-	public void visit(BooleanExpr expr, Object... args){
-		
-	}
-
-	public void visit(IntExpr expr, Object... args){
-		
-	}
-
-	public void visit(ListExpr expr, Object... args){
-		
-	}
-
-	public void visit(StringExpr expr, Object... args){
-		
-	}
-
-	public void visit(TypeExpr expr, Object... args){
-		
-	}
-
-	public void visit(UnaryExpr expr, Object... args){
-		
-	}
-
 	public void visit(VarExpr expr, Object... args){
 		types.add(expr.getVar().getVarDef().getType());
-	}
-	@Override
-	public void visit(BitcastNode node, Object... args) {
-				
-	}
-
-	@Override
-	public void visit(BrLabelNode node, Object... args) {
-		
-		
 	}
 
 	@Override
@@ -533,39 +502,43 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 
 	@Override
-	public void visit(ReturnNode node, Object... args) {
+	public void visit(BooleanExpr expr, Object... args) {
 		
+	}
+
+	@Override
+	public void visit(IntExpr expr, Object... args) {
+		
+	}
+
+	@Override
+	public void visit(ListExpr expr, Object... args) {
+		
+	}
+
+	@Override
+	public void visit(StringExpr expr, Object... args) {
+		
+	}
+
+	@Override
+	public void visit(TypeExpr expr, Object... args) {
+		
+	}
+
+	@Override
+	public void visit(UnaryExpr expr, Object... args) {
+		
+	}
+
+	@Override
+	public void visit(ReturnNode node, Object... args) {
 		
 	}
 
 	@Override
 	public void visit(WhileNode node, Object... args) {
 		
-		
 	}
 
-	@Override
-	public void visit(TruncNode node, Object... args) {
-		
-		
-	}
-
-	@Override
-	public void visit(ZextNode node, Object... args) {
-		
-		
-	}
-
-	@Override
-	public void visit(GetElementPtrNode node, Object... args) {
-		
-		
-	}
-
-	@Override
-	public void visit(InitPortNode node, Object... args) {
-		
-		
-	}
-	
 }

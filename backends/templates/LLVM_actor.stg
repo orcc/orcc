@@ -114,6 +114,12 @@ ZextNode(var, type, expr) ::= <<
 
 >>
 
+// sextnode
+SextNode(var, type, expr) ::= <<
+	$var$ = sext $expr$ to $type$
+
+>>
+
 // brnode
 brNode(expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
 	br $expr$, label %$thenLabelNode$, label %$elseLabelNode$

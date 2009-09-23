@@ -53,6 +53,8 @@ public interface LLVMNodeVisitor extends NodeVisitor {
 	
 	public void visit(ZextNode node, Object... args);
 	
+	public void visit(SextNode node, Object... args);
+	
 	public void visit(GetElementPtrNode node, Object... args);
 	
 	public void visit(InitPortNode node, Object... args);

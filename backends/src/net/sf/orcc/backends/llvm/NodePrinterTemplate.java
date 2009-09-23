@@ -38,6 +38,7 @@ import net.sf.orcc.backends.llvm.nodes.LLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
+import net.sf.orcc.backends.llvm.nodes.SextNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.PointType;
@@ -495,5 +496,23 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		nodeTmpl.setAttribute("index", (Integer) args[0]);
 		
 		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(SextNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("SextNode");
+
+		// varDef contains the variable (with the same name as the port)
+		VarDef varDef = node.getVar();
+		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+
+		TypeToString type = new TypeToString(varDef.getType());
+		nodeTmpl.setAttribute("type", type.toString());
+
+		ExprToString expr = new ExprToString(varDefPrinter, node.getValue(),true);
+		nodeTmpl.setAttribute("expr", expr.toString());
+
+		template.setAttribute(attrName, nodeTmpl);
+		
 	}
 }

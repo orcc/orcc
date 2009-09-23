@@ -62,18 +62,7 @@ public class TypeToString extends LLVMAbstractTypeVisitor {
 	}
 
 	private void printInt(int size) {
-		if (size <= 8) {
-			builder.append("i8");
-		} else if (size <= 16) {
-			builder.append("i16");
-		} else if (size <= 32) {
-			builder.append("i32");
-		} else if (size <= 64) {
-			builder.append("i64");
-		}
-		
-		
-	//builder.append("i"+Integer.toString(size));
+		builder.append("i"+Integer.toString(size));
 	}
 
 	@Override

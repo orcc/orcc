@@ -40,15 +40,6 @@ public class IntType extends AbstractType {
 
 	public IntType(int size) {
 		super(NAME);
-		if (size <= 8) {
-			size = 8;
-		} else if (size <= 16) {
-			size = 16;
-		} else if (size <= 32) {
-			size = 32;
-		} else if (size <= 64) {
-			size=64;
-		}
 		setSize(size);
 	}
 
