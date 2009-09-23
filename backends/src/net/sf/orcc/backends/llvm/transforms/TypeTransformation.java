@@ -40,7 +40,7 @@ import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNode;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
-import net.sf.orcc.backends.llvm.nodes.LabelNode;
+import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.backends.llvm.nodes.SextNode;
@@ -55,6 +55,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.ExprVisitor;
@@ -66,26 +67,21 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
-import net.sf.orcc.ir.nodes.CallNode;
-import net.sf.orcc.ir.nodes.EmptyNode;
-import net.sf.orcc.ir.nodes.HasTokensNode;
-import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.ReadNode;
-import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.UintType;
 
 /**
- * Verify type coherence for every nodes.
+ * Verify coherence type for every nodes.
  * 
  * @author Jérôme GORIN
  * 
@@ -207,10 +203,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		}
 	}
 
-	@Override
-	public void visit(IfNode node, Object... args) {
-	}
-	
 	@Override
 	public void visit(SelectNode node, Object... args) {
 		 List<PhiAssignment> phis = node.getPhis();
@@ -420,34 +412,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 
 	@Override
-	public void visit(LabelNode node, Object... args) {
-		
-		
-	}
-
-	@Override
-	public void visit(LoadFifo node, Object... args) {
-		
-		
-	}
-
-	@Override
-	public void visit(CallNode node, Object... args) {
-		
-		
-	}
-
-	@Override
-	public void visit(EmptyNode node, Object... args) {
-		
-		
-	}
-
-	@Override
-	public void visit(HasTokensNode node, Object... args) {
-	}
-
-	@Override
 	public void visit(JoinNode node, Object... args) {		
 	/*	List<PhiAssignment> phis = node.getPhis();
 		BrNode brNode = (BrNode)args[0];
@@ -482,7 +446,42 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		}*/
 		
 	}
+	
+	@Override
+	public void visit(GetElementPtrNode node, Object... args) {
+		//Set every index to i32 (mandatory in llvm)
+		for (AbstractExpr index : node.getIndexes()){
+			if (index instanceof VarExpr){
+				VarExpr indExpr =  (VarExpr)index;
+				VarUse indUse = indExpr.getVar();
+				VarDef indVar = indUse.getVarDef();
+				AbstractType indType = indVar.getType();
+				
+				if (indType instanceof IntType){
+					IntType type = (IntType)indType;
+					if (type.getSize() != 32){
+						
+						it.previous();
+						
+						VarDef vardef = varDefCreate(new IntType(32));
+						it.add(castNodeCreate(indVar, vardef));
+						
+						it.next();
+						
+						indUse.setVarDef(vardef);
+						
+						
+					}
+					
+				}
+				
 
+			}
+			
+		}
+	}
+
+		
 	@Override
 	public void visit(LoadNode node, Object... args) {
 		VarDef sourceVar = node.getSource().getVarDef();
@@ -490,7 +489,15 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		
 		AbstractType targetType = targetVar.getType();
 		PointType sourceType = (PointType)sourceVar.getType();
-		if (!(targetType.equals(sourceType.getType()))){
+		AbstractType type;
+		
+		if (sourceType.getType() instanceof ListType){
+			type = ((ListType)sourceType.getType()).getType();
+		}else{
+			type = sourceType.getType();
+		}
+		
+		if (!(targetType.equals(type))){
 			VarDef castVar = new VarDef(sourceVar);
 			castVar.setName("");
 			castVar.setIndex(0);
@@ -528,16 +535,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		
-	}
-
-	@Override
-	public void visit(ReturnNode node, Object... args) {
-		
-	}
-
-	@Override
-	public void visit(WhileNode node, Object... args) {
 		
 	}
 

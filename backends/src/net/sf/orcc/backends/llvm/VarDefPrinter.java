@@ -46,13 +46,10 @@ public class VarDefPrinter {
 
 	private StringTemplateGroup group;
 
-	private ListSizePrinter listSizePrinter;
-
 	private List<String> ports;
 
 	public VarDefPrinter(StringTemplateGroup group, List<String> ports) {
 		this.group = group;
-		this.listSizePrinter = new ListSizePrinter();
 		this.ports = ports;
 	}
 
@@ -78,10 +75,6 @@ public class VarDefPrinter {
 		
 		TypeToString typeStr = new TypeToString(type);
 		varDefTmpl.setAttribute("type", typeStr.toString());
-		
-		// if varDef is a list, => list of dimensions
-		listSizePrinter.setTemplate(varDefTmpl);
-		type.accept(listSizePrinter);
 
 		varDefTmpl.setAttribute("isPort", ports.contains(varDef.getName()));
 		varDefTmpl.setAttribute("isGlobal", varDef.isGlobal());

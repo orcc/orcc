@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.ir.expr.AbstractExpr;
 
 /**
  * @author Jérôme GORIN
@@ -40,13 +41,13 @@ import net.sf.orcc.ir.actor.VarUse;
  */
 public class GetElementPtrNode extends AbstractLLVMNode {
 
-	List<Integer> indexs;
+	List<AbstractExpr> indexs;
 	
 	private VarUse source;
 
 	private VarDef varDef;
 
-	public GetElementPtrNode(int id, Location location, VarDef varDef, VarUse source, List<Integer> indexs) {
+	public GetElementPtrNode(int id, Location location, VarDef varDef, VarUse source, List<AbstractExpr> indexs) {
 		super(id, location);
 		this.varDef = varDef;
 		this.source = source;
@@ -58,11 +59,11 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public List<Integer> getIndexs() {
+	public List<AbstractExpr> getIndexes() {
 		return indexs;
 	}
 	
-	public void setIndexs(List<Integer> indexs) {
+	public void setIndexs(List<AbstractExpr> indexs) {
 		this.indexs = indexs;
 	}
 

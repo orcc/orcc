@@ -139,7 +139,13 @@ public class ExprToString implements ExprVisitor {
 	}
 
 	@Override
-	public void visit(BooleanExpr expr, Object... args) {
+	public void visit(BooleanExpr expr, Object... args ) {
+		Boolean showType= (Boolean)args[0];
+
+		if (showType)
+		{
+			builder.append("i1 ");
+		}
 		builder.append(expr.getValue() ? "1" : "0");
 	}
 

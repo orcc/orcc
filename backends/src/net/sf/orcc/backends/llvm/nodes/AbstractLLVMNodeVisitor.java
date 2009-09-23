@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
+import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.InitPortNode;
 
 
@@ -35,7 +36,7 @@ import net.sf.orcc.ir.nodes.InitPortNode;
  * @author Jérôme GORIN
  * 
  */
-public abstract class AbstractLLVMNodeVisitor implements LLVMNodeVisitor {
+public abstract class AbstractLLVMNodeVisitor extends AbstractNodeVisitor implements LLVMNodeVisitor {
 	
 	public void visit(BitcastNode node, Object... args){
 		

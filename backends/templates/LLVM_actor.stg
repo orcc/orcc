@@ -13,12 +13,6 @@ fifo(actorName, portName) ::= <<
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef(typeValue, sizeValue) ::= <<
-$if(sizeValue)$ [$sizeValue$ x $typeValue$] $else$ $typeValue$
-$endif$
-
->>
-
 // the values of a list: {val1, val2, ..., valn}
 listValue(value) ::= <<
 [$value; wrap, separator=", "$]
@@ -31,12 +25,12 @@ phiNode(value, label) ::= <<
 
 
 // a variable definition
-vardef(name, type, size, isPort, isGlobal) ::= <<
+vardef(name, type, isPort, isGlobal) ::= <<
 $if(isGlobal)$
-$name$ = internal global $typedef(typeValue=type, sizeValue=size)$
+$name$ = internal global $type$
 $else$
 $if(isPort)$
-$name$ = alloca $typedef(typeValue=type, sizeValue=size)$
+$name$ = alloca $type$
 
 $endif$
 $endif$>>
@@ -69,9 +63,9 @@ $name$($parameters; separator=", "$);
 
 >>
 
-// decrement node
-decrementNode(var) ::= <<
-$var$--;
+// getElementPtrNode node
+getElementPtrNode(target, source, indexes) ::= <<
+	$target$ = getelementptr $source$, i32 0, $indexes : {$it; separator=", "$}$
 
 >>
 
@@ -140,11 +134,6 @@ $endLabelNode$:
 
 >>
 
-// increment node
-incrementNode(var) ::= <<
-$var$++;
-
->>
 
 // label node
 labelNode(name) ::= <<
@@ -165,8 +154,8 @@ brlabelNode(name) ::= <<
 >>
 
 // load node
-loadNode(target, source, indexes) ::= <<
-	$target$ = load $source$ $indexes : {[$it$]}$
+loadNode(target, source) ::= <<
+	$target$ = load $source$
 
 >>
 

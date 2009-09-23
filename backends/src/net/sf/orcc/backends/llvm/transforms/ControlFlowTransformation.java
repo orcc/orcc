@@ -215,6 +215,8 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		labelNode = new LabelNode(0, null, "entry");
 
 		visitNodes(nodes);
+		
+		//Add void return
 		if (proc.getReturnType() instanceof VoidType) {
 			TypeExpr expr = new TypeExpr(null, new VoidType());
 			nodes.add(new ReturnNode(0, null, expr));

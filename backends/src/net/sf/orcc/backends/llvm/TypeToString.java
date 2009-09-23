@@ -89,8 +89,9 @@ public class TypeToString extends LLVMAbstractTypeVisitor {
 
 	@Override
 	public void visit(ListType type) {
-		// size will be printed later
+		builder.append("[ "+type.getSize()+" x ");
 		type.getType().accept(this);
+		builder.append(" ]");
 	}
 
 	@Override

@@ -290,18 +290,6 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 		varDef = node.getSource().getVarDef();
 		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefNameType(varDef));
 
-		List<AbstractExpr> indexes = node.getIndexes();
-		for (AbstractExpr index : indexes) {
-			ExprToString expr = new ExprToString(varDefPrinter, index,true);
-			try {
-				if (Integer.parseInt(expr.toString()) > 0) {
-					nodeTmpl.setAttribute("indexes", expr.toString());
-				}
-			} catch (NumberFormatException e) {
-
-			}
-		}
-
 		template.setAttribute(attrName, nodeTmpl);
 	}
 
@@ -481,7 +469,21 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
-		// TODO Auto-generated method stub
+		StringTemplate nodeTmpl = group.getInstanceOf("getElementPtrNode");
+
+		VarDef varDef = node.getVarDef();
+		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef));
+
+		varDef = node.getSource().getVarDef();
+		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefNameType(varDef));
+
+		List<AbstractExpr> indexes = node.getIndexes();
+		for (AbstractExpr index : indexes) {
+			ExprToString expr = new ExprToString(varDefPrinter, index,true);
+			nodeTmpl.setAttribute("indexes", expr.toString());
+		}
+
+		template.setAttribute(attrName, nodeTmpl);
 		
 	}
 

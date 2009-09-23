@@ -69,7 +69,6 @@ public class VarDefPrinter {
 		// if varDef is a list, => list of dimensions
 		varDef.getType().accept(listSizePrinter);
 
-		varDefMap.put("size", listSizePrinter.getSize());
 		varDefMap.put("isPort", ports.contains(varDef.getName()));
 
 		return varDefMap;
