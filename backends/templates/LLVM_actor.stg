@@ -246,11 +246,19 @@ $nodes$
 ///////////////////////////////////////////////////////////////////////////////
 
 loadPattern(actorName, pattern) ::= <<
-$pattern.keys:{port|%$actorName$_$port$ = load %struct.lff_t** @$actorName$_$port$}$
+$pattern.keys:{port|%$actorName$_$port$ = load %struct.lff_t** @$actorName$_$port$$\n$}$
 >>
 
-outputPattern(actorName, pattern) ::= <<
-$pattern.keys:{port|call i1 @lff_hasRoom(%struct.lff_t* %$actorName$_$port$, i32 $pattern.(port)$)}; separator=" && "$
+outputPattern(tag, actorName, pattern) ::= <<
+$if(rest(pattern))$
+$pattern.keys:{%$it$ =  call i1 @lff_hasRoom(%struct.lff_t* %$actorName$_$it$, i32 $pattern.(it)$) $\n$}$
+%0 = and i1 %$first(pattern.keys)$, %$first(rest(pattern.keys))$
+$rest(rest(trunc(pattern.keys))):{port|%$i$= and i1 %$i0$, %$port$$\n$}$
+%$tag$ = and i1 %$last(pattern.keys)$, %$i$
+
+$else$
+%$tag$ = $pattern.keys:{port|call i1 @lff_hasRoom(%struct.lff_t* %$actorName$_$port$, i32 $pattern.(port)$)}$
+$endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -269,7 +277,7 @@ actionTest(actorName, action) ::= <<
 fire_$action.tag$:
 	$if(action.outputPattern)$
 	$loadPattern(actorName=actorName, pattern=action.outputPattern)$
-	%room_$action.tag$ = $outputPattern(actorName=actorName, pattern=action.outputPattern)$
+	$outputPattern(tag="room_"+action.tag, actorName=actorName, pattern=action.outputPattern)$
 	br i1 %room_$action.tag$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
 
 hasRoom_$action.tag$:
@@ -325,9 +333,9 @@ actionTestState(actorName, nextState) ::= <<
 	br i1 %sched_$nextState.action.tag$, label %bb, label %return
 
 bb:
-$if(nextState.action.outputPattern)$
+	$if(nextState.action.outputPattern)$
 	$loadPattern(actorName=actorName, pattern=nextState.action.outputPattern)$
-	%hasToken_$actorName$ = $outputPattern(actorName=actorName, pattern=nextState.action.outputPattern)$
+	$outputPattern(tag="hasToken_"+actorName, actorName=actorName, pattern=nextState.action.outputPattern)$
 	br i1 %hasToken_$actorName$, label %token_$actorName$, label %return
 
 token_$actorName$:
