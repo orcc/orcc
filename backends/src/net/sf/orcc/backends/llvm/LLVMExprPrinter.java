@@ -57,7 +57,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 		case BOR:
 			return "or";
 		case BXOR:
-			return "^";
+			return "xor";
 		case DIV:
 			return "/";
 		case DIV_INT:
@@ -104,7 +104,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 		case LNOT:
 			return "!";
 		case MINUS:
-			return "-";
+			return "sub i32 0, ";
 		case NUM_ELTS:
 			return "sizeof";
 		default:
@@ -173,7 +173,8 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		expr.getExpr().accept(this, args);
+		builder.append(toString(expr.getOp()));
+		expr.getExpr().accept(this, false);
 	}
 
 	@Override

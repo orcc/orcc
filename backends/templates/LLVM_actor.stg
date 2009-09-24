@@ -226,7 +226,7 @@ $nodes$	ret void
 
 proc(name, type, parameters, locals, nodes) ::= <<
 
-define internal $type$ @$name$($parameters:vardef(); wrap, anchor, separator=", "$) {
+define internal $type$ @$name$($parameters; wrap, anchor, separator=", "$) {
 entry:
 $if(locals)$
 	$locals: {$vardef(it)$}$

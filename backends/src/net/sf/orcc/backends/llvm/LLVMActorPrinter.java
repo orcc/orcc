@@ -115,15 +115,14 @@ public class LLVMActorPrinter {
 		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters
-		List<Object> varDefs = new ArrayList<Object>();
+		List<String> parameters = new ArrayList<String>();
 		for (VarDef param : proc.getParameters()) {
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
-			varDefs.add(varDefMap);
+			parameters.add(varDefPrinter.getVarDefNameType(param));
 		}
-		procTmpl.setAttribute("parameters", varDefs);
+		procTmpl.setAttribute("parameters", parameters);
 
 		// locals
-		varDefs = new ArrayList<Object>();
+		List<Object> varDefs = new ArrayList<Object>();
 		for (VarDef local : proc.getLocals()) {
 			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
 			varDefs.add(varDefMap);
