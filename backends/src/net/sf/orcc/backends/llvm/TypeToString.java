@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.backends.llvm.type.LLVMAbstractTypeVisitor;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -44,29 +44,24 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class TypeToString extends LLVMAbstractTypeVisitor {
+public class TypeToString implements LLVMTypeVisitor  {
 
 	private StringBuilder builder;
-
-	/**
-	 * Creates a string buffer and fills it with the text representation of the
-	 * given type. The buffer contents can be retrieved by using the
-	 * {@link #toString()} method.
-	 * 
-	 * @param type
-	 *            An {@link AbstractType}.
-	 */
-	public TypeToString(AbstractType type) {
-		builder = new StringBuilder();
-		type.accept(this);
-	}
 
 	private void printInt(int size) {
 		builder.append("i"+Integer.toString(size));
 	}
 
-	@Override
-	public String toString() {
+	/**
+	 * Creates a string buffer and fills it with the text representation of the
+	 * given type. Returns the text representation.
+	 * 
+	 * @param type
+	 *            An {@link AbstractType}.
+	 */
+	public String toString(AbstractType type) {
+		builder = new StringBuilder();
+		type.accept(this);
 		return builder.toString();
 	}
 

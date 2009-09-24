@@ -28,14 +28,13 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.type.AbstractType;
-
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * 
@@ -44,13 +43,15 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class VarDefPrinter {
 
-	private StringTemplateGroup group;
-
 	private List<String> ports;
 
-	public VarDefPrinter(StringTemplateGroup group, List<String> ports) {
-		this.group = group;
-		this.ports = ports;
+	private TypeToString typeVisitor;
+	
+	protected ExprToString exprPrinter;
+
+	public VarDefPrinter(TypeToString typeVisitor) {
+		this.typeVisitor = typeVisitor;
+		exprPrinter = new ExprToString(this);
 	}
 
 	/**
@@ -61,9 +62,10 @@ public class VarDefPrinter {
 	 *            a variable definition
 	 * @return a string template
 	 */
-	public StringTemplate applyVarDef(VarDef varDef) {
-		StringTemplate varDefTmpl = group.getInstanceOf("vardef");
-		varDefTmpl.setAttribute("name", getVarDefName(varDef));
+	public Map<String, Object> applyVarDef(VarDef varDef) {
+		Map<String, Object> varDefMap = new HashMap<String, Object>();
+		varDefMap.put("name", getVarDefName(varDef));
+		
 		AbstractType type;
 		
 		if (varDef.getType() instanceof PointType) {
@@ -73,13 +75,11 @@ public class VarDefPrinter {
 			type = varDef.getType();
 		}
 		
-		TypeToString typeStr = new TypeToString(type);
-		varDefTmpl.setAttribute("type", typeStr.toString());
+		varDefMap.put("type", typeVisitor.toString(type));
 
-		varDefTmpl.setAttribute("isPort", ports.contains(varDef.getName()));
-		varDefTmpl.setAttribute("isGlobal", varDef.isGlobal());
-
-		return varDefTmpl;
+		varDefMap.put("isPort", ports.contains(varDef.getName()));
+		varDefMap.put("isGlobal", varDef.isGlobal());
+		return varDefMap;
 	}
 
 	/**
@@ -92,30 +92,32 @@ public class VarDefPrinter {
 	 */
 	public String getVarDefName(VarDef varDef) {
 		String name;
+		if (varDef.isConstant()) {
+			return exprPrinter.toString(varDef.getConstant(), false);
+		}
 
-		if (!varDef.isConstant()) {
-			if (varDef.isGlobal()) {
-				name = "@";
-			} else {
-				name = "%";
-			}
-			name += varDef.getName();
-
-			if (varDef.hasSuffix()) {
-				name += varDef.getSuffix();
-			}
-
-			if (!varDef.isGlobal()) {
-				int index = varDef.getIndex();
-				if (index != 0) {
-					name += "_" + varDef.getIndex();
-				}
-			}
+		if (varDef.isGlobal()) {
+			name = "@";
 		} else {
-			ExprToString expr = new ExprToString(this, varDef.getConstant(), false);
-			name = expr.toString();
+			name = "%";
+		}
+		name += varDef.getName();
+	
+		if (varDef.hasSuffix()) {
+			name += varDef.getSuffix();
+		}
+	
+		if (!varDef.isGlobal()) {
+			int index = varDef.getIndex();
+			if (index != 0) {
+				name += "_" + varDef.getIndex();
+			}
 		}
 		return name;
+	}
+	
+	public void setPortList(List<String> ports) {
+		this.ports = ports;
 	}
 	
 	/**
@@ -126,9 +128,7 @@ public class VarDefPrinter {
 	 *            the variable definition
 	 * @return a string with its full name
 	 */
-	public String getVarDefNameType(VarDef varDef) {
-		TypeToString type = new TypeToString(varDef.getType());
-		
-		return type.toString()+ " " + getVarDefName(varDef);
+	public String getVarDefNameType(VarDef varDef) {	
+		return typeVisitor.toString(varDef.getType())+ " " + getVarDefName(varDef);
 	}
 }

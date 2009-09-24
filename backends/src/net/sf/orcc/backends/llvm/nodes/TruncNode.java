@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.backends.llvm.TypeToString;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.expr.AbstractExpr;
@@ -72,10 +71,8 @@ public class TruncNode extends AbstractLLVMNode {
 
 	@Override
 	public String toString() {
-		TypeToString varType = new TypeToString(var.getType());
-
 		return var + " = bitcast " + value.toString() + " to "
-				+ varType.toString();
+				+ var.getType();
 	}
 
 }

@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.backends.llvm.type.PointType;
@@ -56,13 +57,17 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class ActorPrinterTemplate {
 
-	private ConstPrinter constPrinter;
+	protected ConstPrinter constPrinter;
 
-	private StringTemplateGroup group;
+	protected ExprToString exprPrinter;
 
-	private StringTemplate template;
+	protected StringTemplateGroup group;
 
-	private VarDefPrinter varDefPrinter;
+	protected StringTemplate template;
+
+	protected TypeToString typePrinter;
+
+	protected VarDefPrinter varDefPrinter;
 
 	/**
 	 * Creates a new network printer with the template "C.st".
@@ -72,6 +77,10 @@ public class ActorPrinterTemplate {
 	 */
 	public ActorPrinterTemplate() throws IOException {
 		this("LLVM_actor");
+		typePrinter = new TypeToString();
+		constPrinter = new ConstPrinter(group, typePrinter);
+		varDefPrinter = new VarDefPrinter(typePrinter);
+		exprPrinter = new ExprToString(varDefPrinter);
 	}
 
 	/**
@@ -84,7 +93,6 @@ public class ActorPrinterTemplate {
 	 */
 	protected ActorPrinterTemplate(String name) throws IOException {
 		group = new PluginGroupLoader().loadGroup(name);
-		constPrinter = new ConstPrinter(group);
 	}
 
 	/**
@@ -103,24 +111,28 @@ public class ActorPrinterTemplate {
 		procTmpl.setAttribute("name", proc.getName());
 
 		// return type
-		TypeToString type = new TypeToString(proc.getReturnType());
-		procTmpl.setAttribute("type", type.toString());
+		AbstractType type = proc.getReturnType();
+		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters
+		List<Object> varDefs = new ArrayList<Object>();
 		for (VarDef param : proc.getParameters()) {
-			StringTemplate tmpl = varDefPrinter.applyVarDef(param);
-			procTmpl.setAttribute("parameters", tmpl);
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
+			varDefs.add(varDefMap);
 		}
+		procTmpl.setAttribute("parameters", varDefs);
 
 		// locals
+		varDefs = new ArrayList<Object>();
 		for (VarDef local : proc.getLocals()) {
-			StringTemplate tmpl = varDefPrinter.applyVarDef(local);
-			procTmpl.setAttribute("locals", tmpl);
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
+			varDefs.add(varDefMap);
 		}
+		procTmpl.setAttribute("locals", varDefs);
 
 		// body
 		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
-				actorName, varDefPrinter);
+				actorName, varDefPrinter, exprPrinter, typePrinter);
 		for (AbstractNode node : proc.getNodes()) {
 			node.accept(printer);
 		}
@@ -144,14 +156,14 @@ public class ActorPrinterTemplate {
 	 * @throws IOException
 	 */
 	public void printActor(String fileName, Actor actor) throws IOException {
+		
 		template = group.getInstanceOf("actor");
 
 		// fill port names list
 		List<String> ports = new ArrayList<String>();
 		fillPorts(ports, actor.getInputs());
 		fillPorts(ports, actor.getOutputs());
-
-		varDefPrinter = new VarDefPrinter(group, ports);
+		varDefPrinter.setPortList(ports);
 
 		setAttributes(actor);
 
@@ -215,7 +227,8 @@ public class ActorPrinterTemplate {
 
 			// body
 			NodePrinterTemplate printer = new NodePrinterTemplate(group, instTmpl,
-					actorName, varDefPrinter);
+					actorName, varDefPrinter, exprPrinter, typePrinter);
+
 			for (AbstractNode node : proc.getNodes()) {
 				node.accept(printer, count);
 				count++;
@@ -230,8 +243,8 @@ public class ActorPrinterTemplate {
 			StringTemplate stateTempl = group.getInstanceOf("stateVar");
 			template.setAttribute("stateVars", stateTempl);
 
-			StringTemplate tmpl = varDefPrinter.applyVarDef(stateVar.getDef());
-			stateTempl.setAttribute("vardef", tmpl);
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar.getDef());
+			stateTempl.setAttribute("vardef", varDefMap);
 
 			// initial value of state var (if any)
 			if (stateVar.hasInit()) {

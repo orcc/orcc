@@ -25,12 +25,12 @@ phiNode(value, label) ::= <<
 
 
 // a variable definition
-vardef(name, type, isPort, isGlobal) ::= <<
-$if(isGlobal)$
-$name$ = internal global $type$
+vardef(var) ::= <<
+$if(var.isGlobal)$
+$var.name$ = internal global $var.type$
 $else$
-$if(isPort)$
-$name$ = alloca $type$
+$if(var.isPort)$
+$var.name$ = alloca $var.type$
 
 $endif$
 $endif$>>
@@ -38,9 +38,9 @@ $endif$>>
 // a state variable
 stateVar(vardef, value) ::= <<
 $if(value)$
-$vardef$ $value$$\n$
+$vardef(vardef)$ $value$$\n$
 $else$
-$vardef$ 0$\n$
+$vardef(vardef)$ 0$\n$
 $endif$
 >>
 
@@ -226,10 +226,10 @@ $nodes$	ret void
 
 proc(name, type, parameters, locals, nodes) ::= <<
 
-define internal $type$ @$name$($parameters; wrap, anchor, separator=", "$) {
+define internal $type$ @$name$($parameters:vardef(); wrap, anchor, separator=", "$) {
 entry:
 $if(locals)$
-	$locals: {$it$}$
+	$locals: {$vardef(it)$}$
 
 $endif$
 $nodes$

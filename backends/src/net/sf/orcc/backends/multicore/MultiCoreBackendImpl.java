@@ -33,8 +33,6 @@ import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.backends.c.CActorPrinter;
-import net.sf.orcc.backends.c.CBackendImpl;
 import net.sf.orcc.backends.c.CNetworkPrinter;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;

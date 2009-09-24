@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import net.sf.orcc.backends.llvm.VarDefPrinter;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -41,7 +42,6 @@ import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.backends.llvm.TypeToString;
 
 /**
  * 
@@ -116,17 +116,17 @@ public class ExprToString implements ExprVisitor {
 
 	private final VarDefPrinter varDefPrinter;
 
-	public ExprToString(VarDefPrinter varDefPrinter, AbstractExpr expr, boolean showType) {		
-		builder = new StringBuilder();
-		this.varDefPrinter = varDefPrinter;		
-		expr.accept(this, showType);
+	public ExprToString(VarDefPrinter varDefPrinter) {
+		this.varDefPrinter = varDefPrinter;
 	}
 
-	@Override
-	public String toString() {
+
+	public String toString(AbstractExpr expr, Object... args) {
+		builder = new StringBuilder();
+		expr.accept(this, args);
 		return builder.toString();
 	}
-
+	
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
@@ -183,12 +183,11 @@ public class ExprToString implements ExprVisitor {
 
 		if (showType)
 		{
-			TypeToString typeStr = new TypeToString(varDef.getType());
-			builder.append(typeStr);
-			builder.append(" ");
+			builder.append(varDefPrinter.getVarDefNameType(varDef));
+		}else{
+			builder.append(varDefPrinter.getVarDefName(varDef));
 		}
 		
-		builder.append(varDefPrinter.getVarDefName(varDef));
 	}
 
 }

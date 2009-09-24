@@ -61,14 +61,17 @@ public class ConstPrinter implements ConstVisitor {
 	 */
 	private StringTemplate template;
 
+	private TypeToString typeVisitor;
+	
 	/**
 	 * Creates a new const printer from the given template group.
 	 * 
 	 * @param group
 	 *            template group
 	 */
-	public ConstPrinter(StringTemplateGroup group) {
+	public ConstPrinter(StringTemplateGroup group, TypeToString typeVisitor) {
 		this.group = group;
+		this.typeVisitor = typeVisitor;
 	}
 
 	/**
@@ -84,8 +87,7 @@ public class ConstPrinter implements ConstVisitor {
 	@Override
 	public void visit(BoolConst constant, Object... args) {
 		if (args.length == 1){
-			TypeToString typeStr = new TypeToString((AbstractType)args[0]);
-			template.setAttribute("type", typeStr.toString());
+			template.setAttribute("type", typeVisitor.toString((AbstractType)args[0]));
 		}
 		template.setAttribute("value", constant.getValue() ? "1" : "0");
 	}
@@ -93,8 +95,7 @@ public class ConstPrinter implements ConstVisitor {
 	@Override
 	public void visit(IntConst constant, Object... args) {
 		if (args.length == 1){
-			TypeToString typeStr = new TypeToString((AbstractType)args[0]);
-			template.setAttribute("value", typeStr.toString() + " " +constant.getValue());
+			template.setAttribute("value", typeVisitor.toString((AbstractType)args[0]) + " " +constant.getValue());
 		} else {
 			template.setAttribute("value", constant.getValue());
 		}
@@ -131,8 +132,7 @@ public class ConstPrinter implements ConstVisitor {
 		String val = constant.getValue();
 		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
 		if (args.length == 1){
-		TypeToString typeStr = new TypeToString((AbstractType)args[0]);
-		template.setAttribute("type", typeStr.toString());
+		template.setAttribute("type", typeVisitor.toString((AbstractType)args[0]));
 		}
 		template.setAttribute("value", res);
 	}
