@@ -12,14 +12,14 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
  */
 package net.sf.orcc.generated;
 
-import net.sf.orcc.oj.Actor_display;
-import net.sf.orcc.oj.Actor_source;
-import net.sf.orcc.oj.Broadcast;
 import net.sf.orcc.oj.CLIParameters;
 import net.sf.orcc.oj.FifoManager;
-import net.sf.orcc.oj.IActor;
-import net.sf.orcc.oj.IScheduler;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.actors.Actor_display;
+import net.sf.orcc.oj.actors.Actor_source;
+import net.sf.orcc.oj.actors.Broadcast;
+import net.sf.orcc.oj.actors.IActor;
+import net.sf.orcc.oj.actors.IScheduler;
 
 public class Network_$name$ implements IScheduler {
 

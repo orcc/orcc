@@ -250,8 +250,8 @@ package net.sf.orcc.generated;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.oj.IActor;
 import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.actors.IActor;
 
 public class Actor_$name$ implements IActor {
 

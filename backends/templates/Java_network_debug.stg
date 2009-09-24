@@ -9,18 +9,18 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
 package net.sf.orcc.generated;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-import net.sf.orcc.oj.Actor_display;
-import net.sf.orcc.oj.Actor_source;
-import net.sf.orcc.oj.Broadcast;
 import net.sf.orcc.oj.CLIParameters;
 import net.sf.orcc.oj.FifoManager;
-import net.sf.orcc.oj.IActorDebug;
-import net.sf.orcc.oj.ISchedulerDebug;
 import net.sf.orcc.oj.IntFifo;
-import net.sf.orcc.oj.InterpreterThread;
+import net.sf.orcc.oj.actors.Actor_display;
+import net.sf.orcc.oj.actors.Actor_source;
+import net.sf.orcc.oj.actors.Broadcast;
+import net.sf.orcc.oj.debug.IActorDebug;
+import net.sf.orcc.oj.debug.ISchedulerDebug;
+import net.sf.orcc.oj.debug.InterpreterThread;
 
 public class Network_$name$ implements ISchedulerDebug {
 

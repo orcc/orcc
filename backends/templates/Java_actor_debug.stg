@@ -190,19 +190,13 @@ package net.sf.orcc.generated;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.oj.IActorDebug;
+import net.sf.orcc.debug.Location;
 import net.sf.orcc.oj.IntFifo;
-import net.sf.orcc.oj.Location;
+import net.sf.orcc.oj.debug.AbstractActorDebug;
 
-public class Actor_$name$ implements IActorDebug {
-
-	private Map<String, Location> actionLocation;
+public class Actor_$name$ extends AbstractActorDebug {
 
 	private Map<String, IntFifo> fifos;
-
-	private String file;
-
-	private boolean suspended;
 
 	// Input FIFOs
 	$inputs: fifo()$
@@ -212,20 +206,10 @@ public class Actor_$name$ implements IActorDebug {
 	$stateVars$
 
 	public Actor_$name$() {
+		super("$file$");
+
 		fifos = new HashMap<String, IntFifo>();
-		file = "$file$";
-		actionLocation = new HashMap<String, Location>();
 		$actionLoc.keys: { tag | actionLocation.put("$tag$", new Location($actionLoc.(tag); separator=", "$)); }; separator="\n"$
-	}
-
-	@Override
-	public String getFile() {
-		return file;
-	}
-
-	@Override
-	public Location getLocation(String action) {
-		return actionLocation.get(action);
 	}
 
 $if(scheduler.fsm)$
@@ -233,16 +217,6 @@ $if(scheduler.fsm)$
 $else$
 	$scheduler_DEBUG(scheduler.actions)$
 $endif$
-
-	@Override
-	public void resume() {
-		suspended = false;
-	}
-
-	@Override
-	public void suspend() {
-		suspended = true;
-	}
 
 	// Functions/procedures
 	$procs$
