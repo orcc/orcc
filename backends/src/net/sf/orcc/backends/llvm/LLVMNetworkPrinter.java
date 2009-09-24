@@ -58,7 +58,7 @@ import org.jgrapht.graph.DirectedMultigraph;
  * @author Jérôme GORIN
  * 
  */
-public class NetworkPrinter {
+public class LLVMNetworkPrinter {
 
 	private StringTemplateGroup group;
 
@@ -72,7 +72,7 @@ public class NetworkPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public NetworkPrinter() throws IOException {
+	public LLVMNetworkPrinter() throws IOException {
 		this("LLVM", new TypeToString());
 	}
 
@@ -84,7 +84,7 @@ public class NetworkPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected NetworkPrinter(String name, TypeToString typeVisitor)
+	protected LLVMNetworkPrinter(String name, TypeToString typeVisitor)
 			throws IOException {
 		group = new PluginGroupLoader().loadGroup(name);
 		this.typeVisitor = typeVisitor;

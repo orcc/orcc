@@ -41,17 +41,17 @@ import net.sf.orcc.ir.type.AbstractType;
  * @author Jérôme GORIN
  * 
  */
-public class VarDefPrinter {
+public class LLVMVarDefPrinter {
 
 	private List<String> ports;
 
-	private TypeToString typeVisitor;
+	private LLVMTypePrinter typeVisitor;
 	
-	protected ExprToString exprPrinter;
+	protected LLVMExprPrinter exprPrinter;
 
-	public VarDefPrinter(TypeToString typeVisitor) {
+	public LLVMVarDefPrinter(LLVMTypePrinter typeVisitor) {
 		this.typeVisitor = typeVisitor;
-		exprPrinter = new ExprToString(this);
+		exprPrinter = new LLVMExprPrinter(this);
 	}
 
 	/**

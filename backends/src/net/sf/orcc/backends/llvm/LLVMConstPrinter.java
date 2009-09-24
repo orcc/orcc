@@ -49,7 +49,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public class ConstPrinter implements ConstVisitor {
+public class LLVMConstPrinter implements ConstVisitor {
 
 	/**
 	 * template group
@@ -61,7 +61,7 @@ public class ConstPrinter implements ConstVisitor {
 	 */
 	private StringTemplate template;
 
-	private TypeToString typeVisitor;
+	private LLVMTypePrinter typeVisitor;
 	
 	/**
 	 * Creates a new const printer from the given template group.
@@ -69,7 +69,7 @@ public class ConstPrinter implements ConstVisitor {
 	 * @param group
 	 *            template group
 	 */
-	public ConstPrinter(StringTemplateGroup group, TypeToString typeVisitor) {
+	public LLVMConstPrinter(StringTemplateGroup group, LLVMTypePrinter typeVisitor) {
 		this.group = group;
 		this.typeVisitor = typeVisitor;
 	}

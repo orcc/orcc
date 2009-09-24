@@ -71,11 +71,11 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 		}
 	}
 
-	private ActorPrinterTemplate printer;
+	private LLVMActorPrinter printer;
 
 	@Override
 	protected void init() throws IOException {
-		printer = new ActorPrinterTemplate();
+		printer = new LLVMActorPrinter();
 		
 		NameTransformer.names.clear();
 	}

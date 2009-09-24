@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.backends.llvm.VarDefPrinter;
+import net.sf.orcc.backends.llvm.LLVMVarDefPrinter;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -48,7 +48,7 @@ import net.sf.orcc.ir.expr.VarExpr;
  * @author Jérôme GORIN
  * 
  */
-public class ExprToString implements ExprVisitor {
+public class LLVMExprPrinter implements ExprVisitor {
 
 	public static String toString(BinaryOp op) {
 		switch (op) {
@@ -114,9 +114,9 @@ public class ExprToString implements ExprVisitor {
 
 	private StringBuilder builder;
 
-	private final VarDefPrinter varDefPrinter;
+	private final LLVMVarDefPrinter varDefPrinter;
 
-	public ExprToString(VarDefPrinter varDefPrinter) {
+	public LLVMExprPrinter(LLVMVarDefPrinter varDefPrinter) {
 		this.varDefPrinter = varDefPrinter;
 	}
 

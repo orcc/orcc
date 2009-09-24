@@ -55,19 +55,19 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public class ActorPrinterTemplate {
+public class LLVMActorPrinter {
 
-	protected ConstPrinter constPrinter;
+	protected LLVMConstPrinter constPrinter;
 
-	protected ExprToString exprPrinter;
+	protected LLVMExprPrinter exprPrinter;
 
 	protected StringTemplateGroup group;
 
 	protected StringTemplate template;
 
-	protected TypeToString typePrinter;
+	protected LLVMTypePrinter typePrinter;
 
-	protected VarDefPrinter varDefPrinter;
+	protected LLVMVarDefPrinter varDefPrinter;
 
 	/**
 	 * Creates a new network printer with the template "C.st".
@@ -75,12 +75,12 @@ public class ActorPrinterTemplate {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public ActorPrinterTemplate() throws IOException {
+	public LLVMActorPrinter() throws IOException {
 		this("LLVM_actor");
-		typePrinter = new TypeToString();
-		constPrinter = new ConstPrinter(group, typePrinter);
-		varDefPrinter = new VarDefPrinter(typePrinter);
-		exprPrinter = new ExprToString(varDefPrinter);
+		typePrinter = new LLVMTypePrinter();
+		constPrinter = new LLVMConstPrinter(group, typePrinter);
+		varDefPrinter = new LLVMVarDefPrinter(typePrinter);
+		exprPrinter = new LLVMExprPrinter(varDefPrinter);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class ActorPrinterTemplate {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected ActorPrinterTemplate(String name) throws IOException {
+	protected LLVMActorPrinter(String name) throws IOException {
 		group = new PluginGroupLoader().loadGroup(name);
 	}
 
@@ -131,7 +131,7 @@ public class ActorPrinterTemplate {
 		procTmpl.setAttribute("locals", varDefs);
 
 		// body
-		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
+		LLVMNodePrinter printer = new LLVMNodePrinter(group, procTmpl,
 				actorName, varDefPrinter, exprPrinter, typePrinter);
 		for (AbstractNode node : proc.getNodes()) {
 			node.accept(printer);
@@ -226,7 +226,7 @@ public class ActorPrinterTemplate {
 			instTmpl.setAttribute("name", proc.getName());
 
 			// body
-			NodePrinterTemplate printer = new NodePrinterTemplate(group, instTmpl,
+			LLVMNodePrinter printer = new LLVMNodePrinter(group, instTmpl,
 					actorName, varDefPrinter, exprPrinter, typePrinter);
 
 			for (AbstractNode node : proc.getNodes()) {

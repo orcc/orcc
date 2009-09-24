@@ -44,7 +44,7 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class TypeToString implements LLVMTypeVisitor  {
+public class LLVMTypePrinter implements LLVMTypeVisitor  {
 
 	private StringBuilder builder;
 

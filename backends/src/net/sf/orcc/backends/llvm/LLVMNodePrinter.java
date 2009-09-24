@@ -30,7 +30,7 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.List;
 
-import net.sf.orcc.backends.llvm.ExprToString;
+import net.sf.orcc.backends.llvm.LLVMExprPrinter;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
@@ -73,7 +73,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public class NodePrinterTemplate implements LLVMNodeVisitor {
+public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	private String actorName;
 
@@ -83,16 +83,16 @@ public class NodePrinterTemplate implements LLVMNodeVisitor {
 
 	private StringTemplate template;
 
-	private VarDefPrinter varDefPrinter;
+	private LLVMVarDefPrinter varDefPrinter;
 
-	private ExprToString exprPrinter;
+	private LLVMExprPrinter exprPrinter;
 	
-	private TypeToString typeToString;
+	private LLVMTypePrinter typeToString;
 	
-	public NodePrinterTemplate(StringTemplateGroup group,
+	public LLVMNodePrinter(StringTemplateGroup group,
 			StringTemplate template, String actorName,
-			VarDefPrinter varDefPrinter, ExprToString exprPrinter,
-			TypeToString typeToString) {
+			LLVMVarDefPrinter varDefPrinter, LLVMExprPrinter exprPrinter,
+			LLVMTypePrinter typeToString) {
 		attrName = "nodes";
 		this.actorName = actorName;
 		this.group = group;
