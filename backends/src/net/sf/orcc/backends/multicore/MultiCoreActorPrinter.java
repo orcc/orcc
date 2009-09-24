@@ -28,12 +28,47 @@
  */
 package net.sf.orcc.backends.multicore;
 
+import java.io.IOException;
+
+import net.sf.orcc.backends.PluginGroupLoader;
+import net.sf.orcc.backends.c.CActorPrinter;
+import net.sf.orcc.backends.c.ConstPrinter;
+import net.sf.orcc.backends.c.ExprToString;
+import net.sf.orcc.backends.c.TypeToString;
+import net.sf.orcc.backends.c.VarDefPrinter;
+
 /**
  * Multicore actor printer.
  * 
  * @author Jérôme GORIN
  * 
  */
-public class MultiCoreActorPrinter {
+public class MultiCoreActorPrinter extends CActorPrinter{
 
+	/**
+	 * Creates a new network printer with the template "C.st".
+	 * 
+	 * @throws IOException
+	 *             If the template file could not be read.
+	 */
+	public MultiCoreActorPrinter() throws IOException {
+		this("C_actor");
+
+		constPrinter = new ConstPrinter(group);
+		typePrinter = new TypeToString();
+		varDefPrinter = new VarDefPrinter(typePrinter);
+		exprPrinter = new ExprToString(varDefPrinter);
+	}
+
+	/**
+	 * Creates a new network printer using the given template file name.
+	 * 
+	 * @param name
+	 *            The template file name.
+	 * @throws IOException
+	 *             If the template file could not be read.
+	 */
+	protected MultiCoreActorPrinter(String name) throws IOException {
+		group = new PluginGroupLoader().loadGroup(name);
+	}
 }

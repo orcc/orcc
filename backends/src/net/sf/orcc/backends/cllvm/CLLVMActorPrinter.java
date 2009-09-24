@@ -28,6 +28,13 @@
  */
 package net.sf.orcc.backends.cllvm;
 
+import java.io.IOException;
+
+import net.sf.orcc.backends.PluginGroupLoader;
+import net.sf.orcc.backends.c.ConstPrinter;
+import net.sf.orcc.backends.c.ExprToString;
+import net.sf.orcc.backends.c.TypeToString;
+import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.backends.multicore.MultiCoreActorPrinter;
 
 /**
@@ -38,4 +45,31 @@ import net.sf.orcc.backends.multicore.MultiCoreActorPrinter;
  */
 public class CLLVMActorPrinter extends MultiCoreActorPrinter {
 
+
+	/**
+	 * Creates a new network printer with the template "C.st".
+	 * 
+	 * @throws IOException
+	 *             If the template file could not be read.
+	 */
+	public CLLVMActorPrinter() throws IOException {
+		this("C_actor");
+
+		constPrinter = new ConstPrinter(group);
+		typePrinter = new TypeToString();
+		varDefPrinter = new VarDefPrinter(typePrinter);
+		exprPrinter = new ExprToString(varDefPrinter);
+	}
+
+	/**
+	 * Creates a new network printer using the given template file name.
+	 * 
+	 * @param name
+	 *            The template file name.
+	 * @throws IOException
+	 *             If the template file could not be read.
+	 */
+	protected CLLVMActorPrinter(String name) throws IOException {
+		group = new PluginGroupLoader().loadGroup(name);
+	}
 }

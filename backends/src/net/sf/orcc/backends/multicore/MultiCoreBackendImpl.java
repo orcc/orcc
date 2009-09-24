@@ -29,16 +29,18 @@
 package net.sf.orcc.backends.multicore;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.util.Set;
+import java.io.IOException;
 
+import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
+import net.sf.orcc.backends.c.CActorPrinter;
+import net.sf.orcc.backends.c.CBackendImpl;
+import net.sf.orcc.backends.c.CNetworkPrinter;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
+import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
+import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.network.Instance;
 import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.parser.NetworkParser;
-import net.sf.orcc.ir.transforms.BroadcastAdder;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 
 /**
@@ -47,7 +49,8 @@ import net.sf.orcc.ir.transforms.PhiRemoval;
  * @author Jérôme GORIN
  * 
  */
-public class MultiCoreBackendImpl implements IBackend {
+public class MultiCoreBackendImpl extends AbstractBackend implements IBackend  {
+
 
 	/**
 	 * 
@@ -62,41 +65,36 @@ public class MultiCoreBackendImpl implements IBackend {
 				e.printStackTrace();
 			}
 		} else {
-			System.err
-					.println("Usage: MultiCoreBackendImpl <flattened XDF network>");
+			System.err.println("Usage: CBackendImpl <flattened XDF network>");
 		}
 	}
 
+	private MultiCoreActorPrinter printer;
+
 	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
-		File file = new File(fileName);
-		String path = file.getParent();
-		Network network = new NetworkParser().parseNetwork(path,
-				new FileInputStream(file));
+	protected void init() throws IOException {
+		printer = new MultiCoreActorPrinter();
+		
+		// register transformations
+		NameTransformer.names.clear();
+		NameTransformer.names.put("abs", "abs_");
+		NameTransformer.names.put("index", "index_");
+		NameTransformer.names.put("getw", "getw_");
+		NameTransformer.names.put("select", "select_");
+	}
 
-		Set<Instance> instances = network.getGraph().vertexSet();
-		for (Instance instance : instances) {
-			if (instance.hasActor()) {
-				Actor actor = instance.getActor();
+	@Override
+	protected void printActor(String id, Actor actor) throws Exception {
+		new PhiRemoval(actor);
+		new IncrementPeephole(actor);
+		new MoveWritesTransformation(actor);
+		String outputName = path + File.separator + id + ".c";
+		printer.printActor(outputName, actor);
+	}
 
-				// transforms Phi assignments to copies
-				new PhiRemoval(actor);
-
-				// replaces nodes by specific C nodes where appropriate
-				new IncrementPeephole(actor);
-
-				// prints actor
-				// String outputName = path + File.separator + instance.getId()
-				// + ".c";
-				// new MultiCoreActorPrinter(outputName, actor);
-			}
-		}
-
-		// add broadcasts
-		new BroadcastAdder(network);
-
-		// print network
-		MultiCoreNetworkPrinter networkPrinter = new MultiCoreNetworkPrinter();
+	@Override
+	protected void printNetwork(Network network) throws Exception {
+		CNetworkPrinter networkPrinter = new CNetworkPrinter();
 		String outputName = path + File.separator + network.getName() + ".c";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}

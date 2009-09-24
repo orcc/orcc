@@ -42,7 +42,7 @@ import net.sf.orcc.backends.c.TypeToString;
 public class MultiCoreNetworkPrinter extends CNetworkPrinter {
 
 	public MultiCoreNetworkPrinter() throws IOException {
-		this("C_multicore.st");
+		this("C_multicore");
 	}
 
 	protected MultiCoreNetworkPrinter(String name) throws IOException {
