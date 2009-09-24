@@ -131,4 +131,8 @@ public class LLVMVarDefPrinter {
 	public String getVarDefNameType(VarDef varDef) {	
 		return typeVisitor.toString(varDef.getType())+ " " + getVarDefName(varDef);
 	}
+	
+	public String getVarDefType(VarDef varDef) {	
+		return typeVisitor.toString(varDef.getType());
+	}
 }

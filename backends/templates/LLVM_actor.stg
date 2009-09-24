@@ -55,11 +55,11 @@ assignVarNode(var, expr) ::= <<
 >>
 
 // call node
-callNode(res, name, parameters) ::= <<
+callNode(res, name, return, parameters) ::= <<
 $if(res)$
-$res$ = 
+	$res$ = 
 $endif$
-$name$($parameters; separator=", "$);
+call $return$ @$name$($parameters; separator=", "$)
 
 >>
 

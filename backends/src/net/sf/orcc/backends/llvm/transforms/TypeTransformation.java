@@ -67,6 +67,7 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
@@ -225,6 +226,35 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			 }
 			 
 		 }
+	}
+	
+	@Override
+	public void visit(CallNode node, Object... args) {
+		int tmpCnt = 0;
+		
+		Procedure proc = node.getProcedure();
+		List<VarDef> procParams = proc.getParameters();
+		List<AbstractExpr> parameters = node.getParameters();
+		try {
+			for (AbstractExpr parameter:parameters){
+				VarExpr expr = (VarExpr) parameter;
+				VarUse varUse =expr.getVar();
+				AbstractType typeVar = varUse.getVarDef().getType();
+				VarDef procParam = procParams.get(tmpCnt);
+				if (!(typeVar.equals(procParam.getType()))){
+					it.previous();
+					VarDef castVar = varDefCreate(procParam.getType());
+					it.add(castNodeCreate(varUse.getVarDef(), castVar));
+					varUse.setVarDef(castVar);
+					it.next();
+				}
+				
+				tmpCnt++;
+			}
+		}catch(Exception e) {
+			
+		}
+		
 	}
 	
 	public VarDef castFifo(VarDef readVar, String fifoName) {

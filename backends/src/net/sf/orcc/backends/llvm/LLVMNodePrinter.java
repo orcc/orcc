@@ -45,6 +45,7 @@ import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -186,14 +187,18 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	@Override
 	public void visit(CallNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("callNode");
+		
 		if (node.hasRes()) {
 			VarDef varDef = node.getRes();
 			nodeTmpl.setAttribute("res", varDefPrinter.getVarDefName(varDef));
 		}
+		
+		Procedure proc = node.getProcedure();
 
-		nodeTmpl.setAttribute("name", node.getProcedure().getName());
+		nodeTmpl.setAttribute("return", typeToString.toString(proc.getReturnType()));
+		nodeTmpl.setAttribute("name", proc.getName());
 		for (AbstractExpr parameter : node.getParameters()) {
-			nodeTmpl.setAttribute("parameters", exprPrinter.toString(parameter,true));
+			nodeTmpl.setAttribute("parameters", exprPrinter.toString(parameter, true));
 		}
 
 		template.setAttribute(attrName, nodeTmpl);

@@ -42,6 +42,7 @@ import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.type.AbstractType;
 
 /**
  * 
@@ -49,7 +50,10 @@ import net.sf.orcc.ir.expr.VarExpr;
  * 
  */
 public class LLVMExprPrinter implements ExprVisitor {
+	private StringBuilder builder;
 
+	private static LLVMVarDefPrinter varDefPrinter;
+	
 	public static String toString(BinaryOp op) {
 		switch (op) {
 		case BAND:
@@ -97,24 +101,22 @@ public class LLVMExprPrinter implements ExprVisitor {
 		}
 	}
 
-	public static String toString(UnaryOp op) {
+	public static String toString(UnaryOp op, Object... args) {
+		VarDef var = (VarDef)args[0];
+		
 		switch (op) {
 		case BNOT:
 			return "~";
 		case LNOT:
 			return "!";
 		case MINUS:
-			return "sub i32 0, ";
+			return "sub "+ varDefPrinter.getVarDefType(var) +  " 0, ";
 		case NUM_ELTS:
 			return "sizeof";
 		default:
 			throw new NullPointerException();
 		}
 	}
-
-	private StringBuilder builder;
-
-	private final LLVMVarDefPrinter varDefPrinter;
 
 	public LLVMExprPrinter(LLVMVarDefPrinter varDefPrinter) {
 		this.varDefPrinter = varDefPrinter;
@@ -173,7 +175,9 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		builder.append(toString(expr.getOp()));
+		VarExpr varExpr = (VarExpr)expr.getExpr();
+		VarDef var = varExpr.getVar().getVarDef();
+		builder.append(toString(expr.getOp(), var));
 		expr.getExpr().accept(this, false);
 	}
 
