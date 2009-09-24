@@ -26,42 +26,32 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.oj.actors;
 
-public interface IActorDebug extends IActor {
+import net.sf.orcc.oj.IntFifo;
+
+public interface IActor {
 
 	/**
-	 * Returns the RVC-CAL this actor was defined in.
+	 * Initializes this actor.
+	 */
+	public void initialize();
+
+	/**
+	 * Schedules this actor.
 	 * 
-	 * @return the RVC-CAL this actor was defined in
+	 * @return the number of firings that occurred.
 	 */
-	public String getFile();
+	public int schedule();
 
 	/**
-	 * Returns the location of the given action
+	 * Sets the port whose name is given to the given FIFO.
 	 * 
-	 * @param action
-	 *            action name
-	 * @return location
+	 * @param portName
+	 *            port name
+	 * @param fifo
+	 *            FIFO
 	 */
-	public Location getLocation(String action);
-
-	/**
-	 * Returns the name of the next schedulable action.
-	 * 
-	 * @return the name of the next schedulable action, or <code>null</code> if
-	 *         no action is schedulable.
-	 */
-	public String getNextSchedulableAction();
-
-	/**
-	 * Resumes this actor.
-	 */
-	public void resume();
-
-	/**
-	 * Suspends this actor.
-	 */
-	public void suspend();
+	public void setFifo(String portName, IntFifo fifo);
 
 }

@@ -28,7 +28,13 @@
  */
 package net.sf.orcc.debug;
 
-import net.sf.orcc.oj.Location;
+import net.sf.orcc.debug.type.AbstractType;
+import net.sf.orcc.debug.type.BoolType;
+import net.sf.orcc.debug.type.IntType;
+import net.sf.orcc.debug.type.ListType;
+import net.sf.orcc.debug.type.StringType;
+import net.sf.orcc.debug.type.UintType;
+import net.sf.orcc.debug.type.VoidType;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,12 +47,56 @@ import org.json.JSONException;
  */
 public class DDPServer {
 
+	/**
+	 * Returns a JSON array from a Location.
+	 * 
+	 * @param location
+	 *            a location
+	 * @return a JSON array
+	 * @throws JSONException
+	 */
 	public static JSONArray getArray(Location location) throws JSONException {
 		JSONArray array = new JSONArray();
 		array.put(0, location.getLineNumber());
 		array.put(1, location.getCharStart());
 		array.put(2, location.getCharEnd());
 		return array;
+	}
+
+	/**
+	 * Returns an object from the given abstract type.
+	 * 
+	 * @param type
+	 *            an abstract type
+	 * @return an object
+	 * @throws JSONException
+	 */
+	public static Object getType(AbstractType type) throws JSONException {
+		if (type instanceof BoolType) {
+			return BoolType.NAME;
+		} else if (type instanceof StringType) {
+			return StringType.NAME;
+		} else if (type instanceof VoidType) {
+			return VoidType.NAME;
+		} else {
+			JSONArray array = new JSONArray();
+			if (type instanceof IntType) {
+				array.put(IntType.NAME);
+				array.put(((IntType) type).getSize());
+			} else if (type instanceof UintType) {
+				array.put(UintType.NAME);
+				array.put(((UintType) type).getSize());
+			} else if (type instanceof ListType) {
+				array.put(ListType.NAME);
+				array.put(((ListType) type).getSize());
+				array.put(getType(((ListType) type).getType()));
+			} else {
+				throw new JSONException("Invalid type definition: "
+						+ type.toString());
+			}
+
+			return array;
+		}
 	}
 
 }

@@ -1,4 +1,4 @@
-package net.sf.orcc.oj;
+package net.sf.orcc.oj.debug;
 
 import java.io.IOException;
 import java.io.InputStream;

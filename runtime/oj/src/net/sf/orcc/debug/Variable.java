@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA Rennes
+ * Copyright (c) 2009, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,61 +26,69 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.debug;
+
+import net.sf.orcc.debug.type.AbstractType;
 
 /**
  * @author Matthieu Wipliez
  * 
  */
-public class Location {
-
-	private int charEnd;
-
-	private int charStart;
-
-	private int lineNumber;
+public class Variable implements Comparable<Variable> {
 
 	/**
-	 * Constructs a dummy location.
+	 * location of variable.
 	 */
-	public Location() {
-	}
+	private Location loc;
 
 	/**
-	 * Creates a new location.
-	 * 
-	 * @param lineNumber
-	 * @param charStart
-	 * @param charEnd
+	 * name of variable.
 	 */
-	public Location(int lineNumber, int charStart, int charEnd) {
-		this.charEnd = charEnd;
-		this.charStart = charStart;
-		this.lineNumber = lineNumber;
-	}
+	private String name;
 
 	/**
-	 * 
-	 * @return end char
+	 * type of this variable.
 	 */
-	public int getCharEnd() {
-		return charEnd;
+	private AbstractType type;
+
+	public Variable(AbstractType type, String name) {
+		this.name = name;
+		this.type = type;
 	}
 
-	/**
-	 * 
-	 * @return start char
-	 */
-	public int getCharStart() {
-		return charStart;
+	@Override
+	public int compareTo(Variable variable) {
+		return name.compareTo(variable.name);
 	}
 
-	/**
-	 * 
-	 * @return line number
-	 */
-	public int getLineNumber() {
-		return lineNumber;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Variable) {
+			return name.equals(((Variable) obj).name);
+		}
+
+		return false;
 	}
 
+	public Location getLoc() {
+		return loc;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public AbstractType getType() {
+		return type;
+	}
+
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
 }

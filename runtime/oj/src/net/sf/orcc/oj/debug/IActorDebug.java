@@ -26,17 +26,65 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.oj.debug;
 
 import java.util.Map;
 
-public interface ISchedulerDebug extends IScheduler {
+import net.sf.orcc.debug.Location;
+import net.sf.orcc.debug.type.AbstractType;
+import net.sf.orcc.oj.actors.IActor;
+
+public interface IActorDebug extends IActor {
 
 	/**
-	 * Returns a map of (names, actors).
+	 * Returns the RVC-CAL this actor was defined in.
 	 * 
-	 * @return a map of (names, actors).
+	 * @return the RVC-CAL this actor was defined in
 	 */
-	public Map<String, IActorDebug> getActors();
+	public String getFile();
+
+	/**
+	 * Returns the location of the given action
+	 * 
+	 * @param action
+	 *            action name
+	 * @return location
+	 */
+	public Location getLocation(String action);
+
+	/**
+	 * Returns the name of the next schedulable action.
+	 * 
+	 * @return the name of the next schedulable action, or <code>null</code> if
+	 *         no action is schedulable.
+	 */
+	public String getNextSchedulableAction();
+
+	/**
+	 * Returns the value of the given state variable.
+	 * 
+	 * @param variable
+	 *            the state variable name.
+	 * 
+	 * @return the value of the given state variable
+	 */
+	public String getValue(String variable);
+
+	/**
+	 * Returns the map of state variables of this actor.
+	 * 
+	 * @return the map of state variables of this actor
+	 */
+	public Map<String, AbstractType> getVariables();
+
+	/**
+	 * Resumes this actor.
+	 */
+	public void resume();
+
+	/**
+	 * Suspends this actor.
+	 */
+	public void suspend();
 
 }

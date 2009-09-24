@@ -37,6 +37,16 @@ package net.sf.orcc.debug;
 public interface DDPConstants {
 
 	/**
+	 * string to indicate the "action name" attribute.
+	 */
+	public static final String ATTR_ACTION_NAME = "action name";
+
+	/**
+	 * string to indicate the "actor name" attribute.
+	 */
+	public static final String ATTR_ACTOR_NAME = "actor name";
+
+	/**
 	 * string to indicate the "components" attribute of reply of
 	 * "get components" request.
 	 */
@@ -46,6 +56,11 @@ public interface DDPConstants {
 	 * string to indicate the "expression" attribute.
 	 */
 	public static final String ATTR_EXPRESSION = "expression";
+
+	/**
+	 * string to indicate the "file" attribute.
+	 */
+	public static final String ATTR_FILE = "file";
 
 	/**
 	 * string to indicate the "frame name" attribute.
@@ -63,21 +78,44 @@ public interface DDPConstants {
 	public static final String ATTR_LINE = "line";
 
 	/**
-	 * string to indicate the "name" attribute.
+	 * string to indicate the "location" attribute.
 	 */
-	public static final String ATTR_NAME = "name";
+	public static final String ATTR_LOCATION = "location";
 
 	/**
 	 * string to indicate the "var name" attribute.
 	 */
 	public static final String ATTR_VAR_NAME = "var name";
 
+	/**
+	 * string to indicate the "var type" attribute.
+	 */
+	public static final String ATTR_VAR_TYPE = "var type";
+
+	/**
+	 * string to indicate the "value" attribute.
+	 */
+	public static final String ATTR_VALUE = "value";
+
+	/**
+	 * string to indicate the "variables" attribute.
+	 */
+	public static final String ATTR_VARIABLES = "variables";
+
+	/**
+	 * string to indicate the "exit" reply.
+	 */
 	public static final String REP_EXIT = "exit";
 
 	/**
 	 * string to indicate the "get components" reply.
 	 */
 	public static final String REP_GET_COMPONENTS = "get components";
+
+	/**
+	 * string to indicate the "get value" reply.
+	 */
+	public static final String REP_GET_VALUE = "get value";
 
 	/**
 	 * string to indicate the "resume" actor reply.
@@ -110,9 +148,9 @@ public interface DDPConstants {
 	public static final String REQ_GET_COMPONENTS = "get components";
 
 	/**
-	 * string to indicate the "get variable" request.
+	 * string to indicate the "get value" request.
 	 */
-	public static final String REQ_GET_VARIABLE = "get variable";
+	public static final String REQ_GET_VALUE = "get value";
 
 	/**
 	 * string to indicate the "resume" actor request.

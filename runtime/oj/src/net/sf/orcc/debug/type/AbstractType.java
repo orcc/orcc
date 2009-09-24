@@ -26,18 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.debug.type;
 
-public interface IScheduler {
+/**
+ * @author Matthieu Wipliez
+ * 
+ */
+public abstract class AbstractType {
 
-	/**
-	 * Initializes the network.
-	 */
-	public void initialize();
+	private String name;
 
-	/**
-	 * Schedules the network.
-	 */
-	public void schedule();
+	protected AbstractType(String name) {
+		this.name = name;
+	}
+
+	public abstract void accept(TypeVisitor visitor);
+
+	@Override
+	public String toString() {
+		return name;
+	}
 
 }

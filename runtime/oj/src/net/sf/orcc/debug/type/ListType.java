@@ -26,30 +26,64 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.debug.type;
 
-public interface IActor {
+/**
+ * @author Matthieu Wipliez
+ * 
+ */
+public class ListType extends AbstractType {
 
-	/**
-	 * Initializes this actor.
-	 */
-	public void initialize();
+	public static final String NAME = "List";
 
-	/**
-	 * Schedules this actor.
-	 * 
-	 * @return the number of firings that occurred.
-	 */
-	public int schedule();
+	private int size;
 
-	/**
-	 * Sets the port whose name is given to the given FIFO.
-	 * 
-	 * @param portName
-	 *            port name
-	 * @param fifo
-	 *            FIFO
-	 */
-	public void setFifo(String portName, IntFifo fifo);
+	private AbstractType type;
+
+	public ListType(int size, AbstractType type) {
+		super(NAME);
+		setSize(size);
+		setType(type);
+	}
+
+	@Override
+	public void accept(TypeVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof UintType) {
+			ListType list = (ListType) obj;
+			return (size == list.size && type.equals(list.type));
+		} else {
+			return false;
+		}
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public AbstractType getType() {
+		return type;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+	}
+
+	public void setType(AbstractType type) {
+		if (type == null) {
+			throw new NullPointerException();
+		}
+
+		this.type = type;
+	}
+
+	@Override
+	public String toString() {
+		return NAME + "(type:" + type + ", size=" + size + ")";
+	}
 
 }

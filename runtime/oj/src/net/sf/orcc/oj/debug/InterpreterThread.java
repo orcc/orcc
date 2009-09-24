@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.oj.debug;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,9 +35,12 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import net.sf.orcc.debug.DDPConstants;
 import net.sf.orcc.debug.DDPServer;
+import net.sf.orcc.debug.Location;
+import net.sf.orcc.debug.type.AbstractType;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,8 +81,41 @@ public class InterpreterThread extends Thread {
 		writeReply(reply);
 	}
 
+	private void getVariable(JSONObject request) throws JSONException {
+		String actorName = request.getString(DDPConstants.ATTR_ACTOR_NAME);
+		IActorDebug actor = actors.get(actorName);
+		String varName = request.getString(DDPConstants.ATTR_VAR_NAME);
+
+		JSONObject reply = new JSONObject();
+		reply.put(DDPConstants.REPLY, DDPConstants.REP_GET_VALUE);
+		JSONArray array = new JSONArray();
+		reply.put(DDPConstants.ATTR_VARIABLES, array);
+
+		if (varName.equals("this")) {
+			Map<String, AbstractType> variables = actor.getVariables();
+			for (Entry<String, AbstractType> variable : variables.entrySet()) {
+				JSONObject obj = new JSONObject();
+				obj.put(DDPConstants.ATTR_VAR_NAME, variable.getKey());
+				obj.put(DDPConstants.ATTR_VAR_TYPE, DDPServer.getType(variable
+						.getValue()));
+				array.put(obj);
+			}
+			reply.put(DDPConstants.ATTR_VALUE, "");
+		} else {
+			Map<String, AbstractType> variables = actor.getVariables();
+			if (variables.containsKey(varName)) {
+				String value = actor.getValue(varName);
+				reply.put(DDPConstants.ATTR_VALUE, value);
+			} else {
+				// TODO implement that
+				reply.put(DDPConstants.ATTR_VALUE, "");
+			}
+		}
+		writeReply(reply);
+	}
+
 	private void resume(JSONObject request) throws JSONException {
-		String actorName = request.getString(DDPConstants.ATTR_NAME);
+		String actorName = request.getString(DDPConstants.ATTR_ACTOR_NAME);
 		actors.get(actorName).resume();
 
 		JSONObject reply = new JSONObject();
@@ -106,6 +142,8 @@ public class InterpreterThread extends Thread {
 					terminate();
 				} else if (requestType.equals(DDPConstants.REQ_GET_COMPONENTS)) {
 					getComponents();
+				} else if (requestType.equals(DDPConstants.REQ_GET_VALUE)) {
+					getVariable(request);
 				} else if (requestType.equals(DDPConstants.REQ_RESUME)) {
 					resume(request);
 				} else if (requestType.equals(DDPConstants.REQ_STACK)) {
@@ -127,7 +165,7 @@ public class InterpreterThread extends Thread {
 	}
 
 	private void stack(JSONObject request) throws JSONException {
-		String actorName = request.getString(DDPConstants.ATTR_NAME);
+		String actorName = request.getString(DDPConstants.ATTR_ACTOR_NAME);
 		IActorDebug actor = actors.get(actorName);
 
 		String fileName = actor.getFile();
@@ -142,11 +180,13 @@ public class InterpreterThread extends Thread {
 		}
 
 		JSONObject frame = new JSONObject();
-		frame.put("file", fileName);
-		frame.put("actor", actorName);
-		frame.put("function", actionName);
-		frame.put("location", DDPServer.getArray(location));
-		frame.put("variables", new JSONArray());
+		frame.put(DDPConstants.ATTR_FILE, fileName);
+		frame.put(DDPConstants.ATTR_ACTOR_NAME, actorName);
+		frame.put(DDPConstants.ATTR_ACTION_NAME, actionName);
+		frame.put(DDPConstants.ATTR_LOCATION, DDPServer.getArray(location));
+
+		JSONArray variables = new JSONArray();
+		frame.put(DDPConstants.ATTR_VARIABLES, variables);
 
 		JSONArray frames = new JSONArray();
 		frames.put(0, frame);
@@ -157,7 +197,7 @@ public class InterpreterThread extends Thread {
 	}
 
 	private void suspend(JSONObject request) throws JSONException {
-		String actorName = request.getString(DDPConstants.ATTR_NAME);
+		String actorName = request.getString(DDPConstants.ATTR_ACTOR_NAME);
 		actors.get(actorName).suspend();
 
 		JSONObject reply = new JSONObject();

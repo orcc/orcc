@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.oj.actors;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
@@ -34,14 +34,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-public class Actor_display extends JFrame implements IActorDebug,
-		ActionListener {
+import net.sf.orcc.debug.Location;
+import net.sf.orcc.debug.type.AbstractType;
+import net.sf.orcc.debug.type.IntType;
+import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.debug.AbstractActorDebug;
+
+public class Actor_display extends AbstractActorDebug implements ActionListener {
 
 	private static Actor_display instance;
 
@@ -63,7 +67,7 @@ public class Actor_display extends JFrame implements IActorDebug,
 	public static void closeDisplay() {
 		if (instance != null) {
 			instance.timer.stop();
-			instance.dispose();
+			instance.frame.dispose();
 		}
 	}
 
@@ -80,8 +84,6 @@ public class Actor_display extends JFrame implements IActorDebug,
 		return (r << 16) | (g << 8) | b;
 	}
 
-	private Map<String, Location> actionLocation;
-
 	private BufferStrategy buffer;
 
 	private Canvas canvas;
@@ -92,37 +94,44 @@ public class Actor_display extends JFrame implements IActorDebug,
 
 	private IntFifo fifo_WIDTH;
 
-	private int height;
+	private JFrame frame;
+
+	public int height;
 
 	private BufferedImage image;
 
-	private boolean suspended;
-
 	private Timer timer;
 
-	private int width;
+	public int width;
 
-	private int x;
+	public int x;
 
-	private int y;
+	public int y;
 
 	public Actor_display() {
-		super("display");
+		super("Actor_display.java");
+
+		frame = new JFrame("display");
 
 		canvas = new Canvas();
-		add(canvas);
-		setVisible(true);
+		frame.add(canvas);
+		frame.setVisible(true);
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		timer = new Timer(40, this);
 		timer.start();
 
 		instance = this;
 
-		actionLocation = new HashMap<String, Location>();
 		actionLocation.put("setVideoSize", new Location(188, 1, 34));
 		actionLocation.put("writeMB", new Location(213, 1, 29));
+
+		variables = new TreeMap<String, AbstractType>();
+		variables.put("x", new IntType(16));
+		variables.put("y", new IntType(16));
+		variables.put("width", new IntType(32));
+		variables.put("height", new IntType(32));
 	}
 
 	@Override
@@ -136,16 +145,6 @@ public class Actor_display extends JFrame implements IActorDebug,
 	}
 
 	@Override
-	public String getFile() {
-		return "Actor_display.java";
-	}
-
-	@Override
-	public Location getLocation(String action) {
-		return actionLocation.get(action);
-	}
-
-	@Override
 	public String getNextSchedulableAction() {
 		if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
 			return "setVideoSize";
@@ -156,15 +155,6 @@ public class Actor_display extends JFrame implements IActorDebug,
 		}
 
 		return null;
-	}
-
-	@Override
-	public void initialize() {
-	}
-
-	@Override
-	public void resume() {
-		suspended = false;
 	}
 
 	@Override
@@ -220,7 +210,7 @@ public class Actor_display extends JFrame implements IActorDebug,
 			this.height = newHeight;
 
 			canvas.setSize(this.width, this.height);
-			pack();
+			frame.pack();
 
 			canvas.createBufferStrategy(2);
 			buffer = canvas.getBufferStrategy();
@@ -228,11 +218,6 @@ public class Actor_display extends JFrame implements IActorDebug,
 			image = new BufferedImage(this.width, this.height,
 					BufferedImage.TYPE_INT_RGB);
 		}
-	}
-
-	@Override
-	public void suspend() {
-		suspended = true;
 	}
 
 	private void writeMB() {

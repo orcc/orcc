@@ -26,86 +26,66 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj;
+package net.sf.orcc.oj.actors;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.HashMap;
-import java.util.Map;
+import net.sf.orcc.debug.Location;
+import net.sf.orcc.oj.IntFifo;
+import net.sf.orcc.oj.debug.AbstractActorDebug;
 
-public class Actor_source implements IActorDebug {
+/**
+ * A generic broadcast actor.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
+public class Broadcast extends AbstractActorDebug {
 
-	private Map<String, Location> actionLocation;
+	private IntFifo input;
 
-	private IntFifo fifo_O;
+	private IntFifo outputs[];
 
-	private String fileName;
+	/**
+	 * Creates a new broadcast with the given number of outputs.
+	 * 
+	 * @param numOutputs
+	 *            number of output ports.
+	 */
+	public Broadcast(int numOutputs) {
+		super("Broadcast.java");
 
-	private RandomAccessFile in;
-
-	private boolean suspended;
-
-	public Actor_source() {
-		fileName = CLIParameters.getInstance().getSourceFile();
-		actionLocation = new HashMap<String, Location>();
-		actionLocation.put("untagged", new Location(80, 17, 42));
-	}
-
-	@Override
-	public String getFile() {
-		return "Actor_source.java";
-	}
-
-	@Override
-	public Location getLocation(String action) {
-		return actionLocation.get(action);
+		outputs = new IntFifo[numOutputs];
+		actionLocation.put("untagged", new Location(89, 13, 31));
 	}
 
 	@Override
 	public String getNextSchedulableAction() {
-		if (fifo_O.hasRoom(1)) {
+		if (input.hasTokens(1) && outputsHaveRoom()) {
 			return "untagged";
 		}
 
 		return null;
 	}
 
-	@Override
-	public void initialize() {
-		try {
-			in = new RandomAccessFile(fileName, "r");
-		} catch (FileNotFoundException e) {
-			String msg = "file not found: \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
+	private boolean outputsHaveRoom() {
+		boolean hasRoom = true;
+		for (int i = 0; i < outputs.length && hasRoom; i++) {
+			hasRoom &= outputs[i].hasRoom(1);
 		}
-	}
 
-	@Override
-	public void resume() {
-		suspended = false;
+		return hasRoom;
 	}
 
 	@Override
 	public int schedule() {
-		int[] source = new int[1];
 		int i = 0;
-
-		try {
-			while (!suspended && fifo_O.hasRoom(1)) {
-				int byteRead = in.read();
-				if (byteRead == -1) {
-					// back to beginning
-					in.seek(0L);
-				}
-
-				source[0] = byteRead;
-				fifo_O.put(source);
-				i++;
+		int[] tokens = new int[1];
+		while (!suspended && input.hasTokens(1) && outputsHaveRoom()) {
+			input.get(tokens);
+			for (IntFifo output : outputs) {
+				output.put(tokens);
 			}
-		} catch (IOException e) {
-			String msg = "I/O exception: \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
+
+			i++;
 		}
 
 		return i;
@@ -113,17 +93,20 @@ public class Actor_source implements IActorDebug {
 
 	@Override
 	public void setFifo(String portName, IntFifo fifo) {
-		if ("O".equals(portName)) {
-			fifo_O = fifo;
+		if (portName.equals("input")) {
+			input = fifo;
+		} else if (portName.startsWith("output_")) {
+			try {
+				int portNumber = Integer.parseInt(portName.substring(7));
+				outputs[portNumber] = fifo;
+			} catch (NumberFormatException e) {
+				String msg = "invalid port name: \"" + portName + "\"";
+				throw new IllegalArgumentException(msg, e);
+			}
 		} else {
-			String msg = "unknown port \"" + portName + "\"";
+			String msg = "invalid port name: \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
-	}
-
-	@Override
-	public void suspend() {
-		suspended = true;
 	}
 
 }
