@@ -57,6 +57,7 @@ import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.AbstractExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.ExprVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -64,6 +65,7 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
@@ -190,6 +192,10 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	
 	@Override
 	public void visit(AssignVarNode node, Object... args) {
+		//Visit expr
+		node.getValue().accept(this, node);
+		
+		//Check type cohesion
 		AbstractType varType = node.getVar().getType();
 		
 		node.getValue().accept(this, varType);
@@ -324,7 +330,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		PointType type = (PointType)node.getTarget().getVarDef().getType();
 		
 		types.add(type.getType());
-		node.getValue().accept(this);
+		node.getValue().accept(this, node);
 		if (types.size()==2){
 			AbstractType typeE1 = types.get(0);
 			AbstractType typeE2 = types.get(1);
@@ -353,8 +359,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	
 		List<AbstractType> tmpTypes = types;
 		types = new ArrayList<AbstractType>(); 
-		expr.getE1().accept(this);
-		expr.getE2().accept(this);
+		expr.getE1().accept(this, args);
+		expr.getE2().accept(this, args);
 		if (types.size()==2){
 			AbstractType typeE1 = types.get(0);
 			AbstractType typeE2 = types.get(1);
@@ -565,7 +571,25 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		
+		//Unary expression doesn't exists in LLVM
+		if (args[0] instanceof AssignVarNode){
+			AssignVarNode node = (AssignVarNode)args[0];
+			Location loc = expr.getLocation();
+			AbstractType type = expr.getType();
+			AbstractExpr exprE1 = expr.getExpr();
+			UnaryOp op = expr.getOp();
+			
+			
+			switch (op) {
+			case MINUS:
+				IntExpr constExpr = new IntExpr(new Location(), 0);
+				BinaryExpr varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS,
+						exprE1, type);
+				node.setValue(varExpr);
+			default:
+				
+			}
+		}
 	}
 
 }

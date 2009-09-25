@@ -51,7 +51,7 @@ public class LLVMVarDefPrinter {
 
 	public LLVMVarDefPrinter(LLVMTypePrinter typeVisitor) {
 		this.typeVisitor = typeVisitor;
-		exprPrinter = new LLVMExprPrinter(this);
+		exprPrinter = new LLVMExprPrinter(typeVisitor, this);
 	}
 
 	/**

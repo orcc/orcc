@@ -30,7 +30,6 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.List;
 
-import net.sf.orcc.backends.llvm.LLVMExprPrinter;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
@@ -43,12 +42,10 @@ import net.sf.orcc.backends.llvm.nodes.SextNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.AbstractExpr;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
@@ -65,6 +62,9 @@ import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -110,7 +110,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		// varDef contains the variable (with the same name as the port)
 		VarDef varDef = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),true));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),varDef.getType()));
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -123,7 +123,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		VarDef varDef = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),true));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),varDef.getType()));
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -144,7 +144,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		 List<AbstractNode> thenNodes = node.getThenNodes();
 		 List<AbstractNode> elseNodes = node.getElseNodes();
 
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getCondition(),true));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getCondition(),new BoolType()));
 		nodeTmpl.setAttribute("thenLabelNode", node.getLabelTrueNode());
 		nodeTmpl.setAttribute("elseLabelNode", node.getLabelFalseNode());
 		nodeTmpl.setAttribute("endLabelNode", node.getLabelEndNode());
@@ -198,7 +198,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		nodeTmpl.setAttribute("return", typeToString.toString(proc.getReturnType()));
 		nodeTmpl.setAttribute("name", proc.getName());
 		for (AbstractExpr parameter : node.getParameters()) {
-			nodeTmpl.setAttribute("parameters", exprPrinter.toString(parameter, true));
+			nodeTmpl.setAttribute("parameters", exprPrinter.toString(parameter, new IntType(32)));
 		}
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -326,7 +326,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	@Override
 	public void visit(ReturnNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("returnNode");
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),true));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),new IntType(32)));
 		template.setAttribute(attrName, nodeTmpl);
 	}
 
@@ -350,7 +350,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 						.getVarDefName(varDef, false));
 				nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
 
-				nodeTmpl.setAttribute("expr", exprPrinter.toString(condition,true));
+				nodeTmpl.setAttribute("expr", exprPrinter.toString(condition, new BoolType()));
 
 				VarDef varDefTrue = varuses.get(0).getVarDef();
 				VarDef varDefFalse = varuses.get(1).getVarDef();
@@ -372,17 +372,14 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		VarDef varDef = node.getTarget().getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, true));
 
-		AbstractExpr abstractexpr = node.getValue();
-		if (abstractexpr instanceof IntExpr) {
-			LLVMAbstractType type = (LLVMAbstractType)varDef.getType();	
-			if (type instanceof PointType){
-				PointType iType = (PointType)type;
-				nodeTmpl.setAttribute("expr", typeToString.toString(iType.getType()) + " "
-						+ exprPrinter.toString(node.getValue(),true));
-			}
-		} else {
-			nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),true));
+		AbstractType type = varDef.getType();
+		
+		if (type instanceof PointType){
+			type = ((PointType)type).getType();
 		}
+		
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),type));
+
 		template.setAttribute(attrName, nodeTmpl);
 	}
 
@@ -390,7 +387,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	public void visit(WhileNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("whileNode");
 
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getCondition(),true));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getCondition(),new BoolType()));
 
 		// save current template
 		StringTemplate previousTempl = template;
@@ -430,7 +427,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		VarDef varDef = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),true));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),varDef.getType()));
 
 		template.setAttribute(attrName, nodeTmpl);
 		
@@ -444,7 +441,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		VarDef varDef = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),true));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),varDef.getType()));
 
 		template.setAttribute(attrName, nodeTmpl);
 		
@@ -462,7 +459,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 		List<AbstractExpr> indexes = node.getIndexes();
 		for (AbstractExpr index : indexes) {
-			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index,true));
+			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index,varDef.getType()));
 		}
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -475,7 +472,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),false));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(), false));
 		nodeTmpl.setAttribute("index", (Integer) args[0]);
 		
 		template.setAttribute(attrName, nodeTmpl);
@@ -489,7 +486,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		VarDef varDef = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),true));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),varDef.getType()));
 
 		template.setAttribute(attrName, nodeTmpl);
 		

@@ -41,6 +41,7 @@ import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.type.AbstractType;
 
 /**
  * 
@@ -51,6 +52,8 @@ public class LLVMExprPrinter implements ExprVisitor {
 	private StringBuilder builder;
 
 	private LLVMVarDefPrinter varDefPrinter;
+	
+	private LLVMTypePrinter typePrinter;
 	
 	public static String toString(BinaryOp op) {
 		switch (op) {
@@ -115,8 +118,9 @@ public class LLVMExprPrinter implements ExprVisitor {
 		}
 	}
 
-	public LLVMExprPrinter(LLVMVarDefPrinter varDefPrinter) {
+	public LLVMExprPrinter(LLVMTypePrinter typePrinter, LLVMVarDefPrinter varDefPrinter) {
 		this.varDefPrinter = varDefPrinter;
+		this.typePrinter = typePrinter;
 	}
 
 
@@ -131,7 +135,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 		BinaryOp op = expr.getOp();
 
 		builder.append(toString(op) + " ");
-		expr.getE1().accept(this, true);
+		expr.getE1().accept(this, expr.getType());
 		builder.append(", ");
 		expr.getE2().accept(this, false);
 
@@ -139,10 +143,8 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(BooleanExpr expr, Object... args ) {
-		Boolean showType= (Boolean)args[0];
-
-		if (showType)
-		{
+		
+		if (args[0] instanceof AbstractType){
 			builder.append("i1 ");
 		}
 		builder.append(expr.getValue() ? "1" : "0");
@@ -150,6 +152,13 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(IntExpr expr, Object... args) {
+
+		
+		if (args[0] instanceof AbstractType){
+			String type = typePrinter.toString((AbstractType)args[0]);
+			builder.append(type+" ");
+		}
+		
 		builder.append(expr.getValue());
 	}
 
@@ -177,8 +186,14 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(VarExpr expr, Object... args) {
+		Boolean showType = false;
+		
+		if (args[0] instanceof AbstractType){
+			showType = true;
+		}
+		
 		VarDef varDef = expr.getVar().getVarDef();
-		builder.append(varDefPrinter.getVarDefName(varDef, args));	
+		builder.append(varDefPrinter.getVarDefName(varDef, showType));	
 	}
 
 }

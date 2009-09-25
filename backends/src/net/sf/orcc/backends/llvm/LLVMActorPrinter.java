@@ -80,7 +80,7 @@ public class LLVMActorPrinter {
 		typePrinter = new LLVMTypePrinter();
 		constPrinter = new LLVMConstPrinter(group, typePrinter);
 		varDefPrinter = new LLVMVarDefPrinter(typePrinter);
-		exprPrinter = new LLVMExprPrinter(varDefPrinter);
+		exprPrinter = new LLVMExprPrinter(typePrinter, varDefPrinter);
 	}
 
 	/**
