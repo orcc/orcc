@@ -57,21 +57,24 @@ public class Actor {
 
 	private List<VarDef> outputs;
 
+	private List<VarDef> parameters;
+
 	private List<Procedure> procs;
 
 	private List<StateVar> stateVars;
 
-	public Actor(String name, String file, List<VarDef> inputs,
-			List<VarDef> outputs, List<StateVar> stateVars,
-			List<Procedure> procs, List<Action> actions,
-			List<Action> initializes, ActionScheduler scheduler,
-			List<Procedure> instantations) {
+	public Actor(String name, String file, List<VarDef> parameters,
+			List<VarDef> inputs, List<VarDef> outputs,
+			List<StateVar> stateVars, List<Procedure> procs,
+			List<Action> actions, List<Action> initializes,
+			ActionScheduler scheduler, List<Procedure> instantations) {
 		this.actions = actions;
 		this.file = file;
 		this.initializes = initializes;
 		this.inputs = inputs;
 		this.name = name;
 		this.outputs = outputs;
+		this.parameters = parameters;
 		this.procs = procs;
 		this.actionScheduler = scheduler;
 		this.stateVars = stateVars;
@@ -133,6 +136,10 @@ public class Actor {
 
 	public List<VarDef> getOutputs() {
 		return outputs;
+	}
+
+	public List<VarDef> getParameters() {
+		return parameters;
 	}
 
 	public List<Procedure> getProcs() {

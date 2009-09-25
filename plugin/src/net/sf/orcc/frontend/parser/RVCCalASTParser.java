@@ -35,9 +35,20 @@ import java.util.List;
 
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CharStream;
@@ -55,19 +66,58 @@ import org.antlr.runtime.tree.Tree;
  */
 public class RVCCalASTParser {
 
-	private String fileName;
-
-	public RVCCalASTParser(String fileName) throws IOException {
-		this.fileName = new File(fileName).getCanonicalPath();
+	public static void main(String[] args) throws IOException,
+			RVCCalParseException {
+		new RVCCalASTParser(args[0]).parse();
 	}
 
-	public Actor parse() throws IOException, RecognitionException {
-		CharStream stream = new ANTLRFileStream(fileName);
+	private String file;
+
+	/**
+	 * input ports
+	 */
+	private List<VarDef> inputs;
+
+	/**
+	 * output ports
+	 */
+	private List<VarDef> outputs;
+
+	/**
+	 * parameters
+	 */
+	private List<VarDef> parameters;
+
+	private List<StateVar> stateVars;
+
+	/**
+	 * creates a new parser from the given file name.
+	 * 
+	 * @param fileName
+	 * @throws IOException
+	 */
+	public RVCCalASTParser(String fileName) throws IOException {
+		this.file = new File(fileName).getCanonicalPath();
+	}
+
+	/**
+	 * parses the file this parser was created with and return an actor.
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws RVCCalParseException
+	 */
+	public Actor parse() throws IOException, RVCCalParseException {
+		CharStream stream = new ANTLRFileStream(file);
 		Lexer lexer = new RVCCalLexer(stream);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		RVCCalParser parser = new RVCCalParser(tokens);
-		RVCCalParser.actor_return ret = parser.actor();
-		return parseActor((Tree) ret.getTree());
+		try {
+			RVCCalParser.actor_return ret = parser.actor();
+			return parseActor((Tree) ret.getTree());
+		} catch (RecognitionException e) {
+			throw new RVCCalParseException(e);
+		}
 	}
 
 	/**
@@ -76,59 +126,168 @@ public class RVCCalASTParser {
 	 * @param tree
 	 * @return
 	 */
-	private Actor parseActor(Tree tree) {
+	private Actor parseActor(Tree tree) throws RVCCalParseException {
 		String name = tree.getChild(1).getText();
-		List<VarDef> inputs = parsePorts(tree.getChild(3));
-		List<VarDef> outputs = parsePorts(tree.getChild(4));
-		return new Actor(name, fileName, inputs, outputs, null, null, null,
-				null, null, null);
+		parameters = parseVarDefs(tree.getChild(2));
+		inputs = parseVarDefs(tree.getChild(3));
+		outputs = parseVarDefs(tree.getChild(4));
+		parseActorDecls(tree.getChild(5));
+		return new Actor(name, file, parameters, inputs, outputs, stateVars,
+				null, null, null, null, null);
+	}
+
+	private void parseActorDecls(Tree actorDecls) {
+		stateVars = new ArrayList<StateVar>();
+		int n = actorDecls.getChildCount();
+		for (int i = 0; i < n; i++) {
+			Tree child = actorDecls.getChild(i);
+			String declType = child.getText();
+			if (declType.equals("STATE_VAR")) {
+				stateVars.add(parseStateVar(child));
+			}
+		}
+	}
+
+	private int parseExpression(Tree expr) {
+		// TODO parse expression
+		return 0;
 	}
 
 	/**
-	 * children = port 1, ..., port n
+	 * Returns a location from a tree that contains a real token.
 	 * 
 	 * @param tree
-	 * @return
+	 *            a tree
+	 * @return a location
 	 */
-	private List<VarDef> parsePorts(Tree tree) {
-		List<VarDef> ports = new ArrayList<VarDef>();
-		int numPorts = tree.getChildCount();
-		for (int i = 0; i < numPorts; i++) {
-			Tree child = tree.getChild(i);
-			ports.add(parsePort(child));
-		}
+	private Location parseLocation(Tree tree) {
+		int lineNumber = tree.getLine();
+		int startColumn = tree.getCharPositionInLine();
+		int endColumn = startColumn + tree.getText().length();
 
-		return ports;
+		return new Location(file, lineNumber, startColumn, 0, endColumn);
 	}
 
-	/**
-	 * tree = PORT, children = TYPE, ID
-	 * @param tree
-	 * @return
-	 */
-	private VarDef parsePort(Tree tree) {
-		AbstractType type = parseType(tree.getChild(0));
-		String name = tree.getChild(1).getText();
-		
-		name.toString();
-		type.toString();
+	private StateVar parseStateVar(Tree stateVar) {
+		// TODO parse state variable
 		return null;
 	}
 
 	/**
 	 * tree = TYPE, children = type name (ID), TYPE_ATTRS
+	 * 
+	 * @param tree
+	 * @return
+	 * @throws RVCCalParseException
+	 */
+	private AbstractType parseType(Tree tree) throws RVCCalParseException {
+		Tree typeTree = tree.getChild(0);
+		Location location = parseLocation(typeTree);
+		String typeName = typeTree.getText();
+		AbstractType type;
+
+		if (typeName.equals(BoolType.NAME)) {
+			type = new BoolType();
+		} else if (typeName.equals(StringType.NAME)) {
+			type = new StringType();
+		} else if (typeName.equals(VoidType.NAME)) {
+			type = new VoidType();
+		} else if (typeName.equals(IntType.NAME)) {
+			int size = parseTypeAttributeSize(location, tree.getChild(1), 32);
+			type = new IntType(size);
+		} else if (typeName.equals(UintType.NAME)) {
+			int size = parseTypeAttributeSize(location, tree.getChild(1), 32);
+			type = new UintType(size);
+		} else if (typeName.equals(ListType.NAME)) {
+			int size = parseTypeAttributeSize(location, tree.getChild(1), null);
+			AbstractType subType = parseTypeAttributeType(location, tree
+					.getChild(1));
+			type = new ListType(size, subType);
+		} else {
+			throw new RVCCalParseException(location, "Unknown type: "
+					+ typeName);
+		}
+
+		return type;
+	}
+
+	private int parseTypeAttributeSize(Location location, Tree typeAttrs,
+			Integer defaultSize) throws RVCCalParseException {
+		int n = typeAttrs.getChildCount();
+		for (int i = 0; i < n; i++) {
+			Tree attr = typeAttrs.getChild(i);
+			if (attr.getText().equals("EXPR")) {
+				return parseExpression(attr);
+			}
+		}
+
+		// if there is a default size, return it
+		if (defaultSize == null) {
+			// size attribute not found, and no default size given => error
+			throw new RVCCalParseException(location,
+					"missing \"size\" attribute");
+		} else {
+			return defaultSize;
+		}
+	}
+
+	private AbstractType parseTypeAttributeType(Location location,
+			Tree typeAttrs) throws RVCCalParseException {
+		int n = typeAttrs.getChildCount();
+		for (int i = 0; i < n; i++) {
+			Tree attr = typeAttrs.getChild(i);
+			if (attr.getText().equals("TYPE")) {
+				return parseType(attr.getChild(0));
+			}
+		}
+
+		// size attribute not found, and no default size given => error
+		throw new RVCCalParseException(location, "missing \"type\" attribute");
+	}
+
+	/**
+	 * tree = PORT/PARAMETER, children = TYPE, ID
+	 * 
+	 * @param tree
+	 * @param assignable
+	 * @param global
+	 * @param index
+	 * @param suffix
+	 * @return
+	 */
+	private VarDef parseVarDef(Tree tree, boolean assignable, boolean global,
+			int index, Integer suffix) throws RVCCalParseException {
+		AbstractType type = parseType(tree.getChild(0));
+		Tree nameTree = tree.getChild(1);
+		String name = nameTree.getText();
+
+		int lineNumber = nameTree.getLine();
+		int startColumn = nameTree.getCharPositionInLine();
+		int endColumn = startColumn + name.length();
+		Location loc = new Location(file, lineNumber, startColumn, 0, endColumn);
+
+		List<VarUse> references = new ArrayList<VarUse>();
+		AbstractNode node = new EmptyNode(0, new Location());
+
+		return new VarDef(assignable, global, index, loc, name, node,
+				references, suffix, type);
+	}
+
+	/**
+	 * children = vardef 1, ..., vardef n
+	 * 
 	 * @param tree
 	 * @return
 	 */
-	private AbstractType parseType(Tree tree) {
-		String typeName = tree.getChild(0).getText();
-		typeName.toString();
-		return null;
-	}
+	private List<VarDef> parseVarDefs(Tree tree) throws RVCCalParseException {
+		List<VarDef> varDefs = new ArrayList<VarDef>();
+		int numPorts = tree.getChildCount();
+		for (int i = 0; i < numPorts; i++) {
+			Tree child = tree.getChild(i);
+			varDefs.add(parseVarDef(child, false, true, 0, null));
+		}
 
-	public static void main(String[] args) throws IOException,
-			RecognitionException {
-		new RVCCalASTParser(args[0]).parse();
+		return varDefs;
 	}
 
 }

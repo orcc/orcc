@@ -316,8 +316,11 @@ public class IrParser {
 		array = obj.getJSONArray(KEY_ACTION_SCHED);
 		ActionScheduler sched = parseActionScheduler(array);
 
-		Actor actor = new Actor(name, file, inputs, outputs, stateVars, procs,
-				actions, initializes, sched, null);
+		// no parameters at this point.
+		List<VarDef> parameters = new ArrayList<VarDef>();
+
+		Actor actor = new Actor(name, file, parameters, inputs, outputs,
+				stateVars, procs, actions, initializes, sched, null);
 
 		try {
 			in.close();
@@ -491,29 +494,31 @@ public class IrParser {
 		return new FSM(initialState, states, transitions);
 	}
 
-	private List<NextStateInfo> parseFSMNextStates(List<String> states, JSONArray array)
-			throws JSONException {
+	private List<NextStateInfo> parseFSMNextStates(List<String> states,
+			JSONArray array) throws JSONException {
 		List<NextStateInfo> nextStates = new ArrayList<NextStateInfo>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray stateArray = array.getJSONArray(i);
 			Action action = getAction(stateArray.getJSONArray(0));
 			String targetState = stateArray.getString(1);
-			nextStates.add(new NextStateInfo(states.indexOf(targetState), action, targetState));
+			nextStates.add(new NextStateInfo(states.indexOf(targetState),
+					action, targetState));
 		}
 		return nextStates;
 	}
 
-	private List<Transition> parseFSMTransitions(List<String> states, JSONArray array)
-			throws JSONException {
+	private List<Transition> parseFSMTransitions(List<String> states,
+			JSONArray array) throws JSONException {
 		List<Transition> transitions = new ArrayList<Transition>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray transitionArray = array.getJSONArray(i);
 
 			String sourceState = transitionArray.getString(0);
-			List<NextStateInfo> nextStates = parseFSMNextStates(states, transitionArray
-					.getJSONArray(1));
+			List<NextStateInfo> nextStates = parseFSMNextStates(states,
+					transitionArray.getJSONArray(1));
 
-			transitions.add(new Transition(states.indexOf(sourceState), sourceState, nextStates));
+			transitions.add(new Transition(states.indexOf(sourceState),
+					sourceState, nextStates));
 		}
 		return transitions;
 	}

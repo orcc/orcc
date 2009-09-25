@@ -35,15 +35,32 @@ options {
 }
 
 tokens {
+  // actor structure
   ACTOR;
-  EXPR;
   INPUTS;
   OUTPUTS;
-  PARAMETERS;
   PORT;
+
+  // expressions  
+  EXPR;
   
+  // actor declarations
+  ACTOR_DECLS;
+  FUNCTION;
+  PROCEDURE;
+  STATE_VAR;
+
+  // actor parameters
+  PARAMETER;
+  PARAMETERS;
+
+  // type definitions
   TYPE;
   TYPE_ATTRS;
+  
+  // variable declarations
+  ASSIGNABLE;
+  NON_ASSIGNABLE;
 }
 
 @lexer::header {
@@ -53,7 +70,7 @@ package net.sf.orcc.frontend.parser.internal;
 @parser::header {
 package net.sf.orcc.frontend.parser.internal;
 
-import net.sf.orcc.frontend.ast.*;
+// @SuppressWarnings("unused")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,10 +105,14 @@ actionStatements: 'do' statement* { };
 /***************************************************************************/
 /* a CAL actor. */
 
-actor: actorImport* 'actor' id=ID ('[' typePar+ ']')? '(' actorParameters? ')'
+actor: actorImport* 'actor' id=ID ('[' typePars? ']')? '(' actorParameters? ')'
 	inputs=actorPortDecls? '==>' outputs=actorPortDecls? ':'
 	actorDeclarations 'end' EOF
-	-> 'actor' $id ^(PARAMETERS actorParameters?) ^(INPUTS $inputs?) ^(OUTPUTS $outputs?);
+	-> 'actor' $id
+	^(PARAMETERS actorParameters?)
+	^(INPUTS $inputs?)
+	^(OUTPUTS $outputs?)
+	^(ACTOR_DECLS actorDeclarations);
 
 /*****************************************************************************/
 /* actor declarations */
@@ -101,15 +122,23 @@ actorDeclaration:
   // why is the keyword "action" *after* the identifier of the action?
   // parsing "action a.b:" would be much easier than parsing "a.b: action"
 
-  ID
-    ((('.' ID)? ':')?
+  ID (
+    (('.' ID)* ':'
       ('action' actionInputs? '==>' actionOutputs? actionGuards? actionDelay? ('var' varDecls)? actionStatements? 'end'
-      { }
+        { }
 
     | 'initialize' '==>' actionOutputs? actionGuards? actionDelay? ('var' varDecls)? actionStatements? 'end'
-      { })
+        { })
+	)
 
-  | ('[' typePar+ ']' | '(' typeAttrs ')')? ID ('=' expression | ':=' expression)? ';') { }
+  // a variable declaration.
+  // NOTE: a variable declared with no initial value is assignable (hence the last line)
+  | ('[' typePars ']' | '(' attrs=typeAttrs ')')?
+    varName=ID
+    (  '=' expression -> ^(STATE_VAR ^(TYPE ID ^(TYPE_ATTRS $attrs?)) $varName NON_ASSIGNABLE expression)
+     | ':=' expression -> ^(STATE_VAR ^(TYPE ID ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE expression)
+     | -> ^(STATE_VAR ^(TYPE ID ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE)) ';'
+  )
 
 // anonymous action
 | 'action' actionInputs? '==>' actionOutputs? actionGuards? actionDelay? ('var' varDecls)? actionStatements? 'end'
@@ -125,14 +154,14 @@ actorDeclaration:
     ('var' varDecls)? ':'
       expression
     'end'
-	{ }
+	-> FUNCTION
 
 | 'procedure' ID '(' (varDeclNoExpr (',' varDeclNoExpr)*)? ')'
     ('var' varDecls)?
     'begin' statement* 'end'
-	{ };
+	-> PROCEDURE;
 
-actorDeclarations: actorDeclaration* (schedule actorDeclaration*)? { };
+actorDeclarations: actorDeclaration* (schedule actorDeclaration*)? -> actorDeclaration* schedule?;
 
 /*****************************************************************************/
 
@@ -144,9 +173,9 @@ actorImport: 'import'
 /*****************************************************************************/
 /* actor parameters: type name (= expression)? */
 actorParameter:
-	typeDef ID ('=' expression)? { };
+	typeDef ID ('=' expression)? -> ^(PARAMETER typeDef ID expression?);
 
-actorParameters: actorParameter (',' actorParameter)* { };
+actorParameters: actorParameter (',' actorParameter)* -> actorParameter+;
 
 /*****************************************************************************/
 /* actor ports */
@@ -256,19 +285,22 @@ statement:
 /* type attributes and definitions */
 
 /* a type attribute, such as "type:" and "size=" */
-typeAttr: ID (':' typeDef -> ^(TYPE ID typeDef) | '=' expression -> ^(EXPR ID expression));
+typeAttr: 'type' ':' typeDef -> ^(TYPE typeDef)
+| 'size' '=' expression -> ^(EXPR expression) ;
 
 typeAttrs: typeAttr (',' typeAttr)* -> typeAttr+;
 
 /* a type definition: bool, int(size=5), list(type:int, size=10)... */	
 typeDef: ID
-  ('[' typePar+ ']'
+  ('[' typePars ']'
   | '(' attrs=typeAttrs ')')? -> ^(TYPE ID ^(TYPE_ATTRS $attrs?));
 
 /*****************************************************************************/
 /* type parameters */
 
 typePar: ID ('<' typeDef)? { System.out.println("RVC-CAL does not support type parameters."); };
+
+typePars: typePar (',' typePar)* -> typePar+;
 
 /*****************************************************************************/
 /* variable declarations */
