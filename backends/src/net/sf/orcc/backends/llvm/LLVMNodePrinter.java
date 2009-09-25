@@ -126,7 +126,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		VarDef varDef = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),varDef.getType()));
+		nodeTmpl.setAttribute("expr", varDefPrinter.getVarDefName(node.getValue(),true));
 
 		template.setAttribute(attrName, nodeTmpl);
 	}

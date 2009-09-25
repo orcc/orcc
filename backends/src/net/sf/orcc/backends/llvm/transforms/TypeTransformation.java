@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.transforms;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -252,54 +251,36 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		Procedure proc = node.getProcedure();
 		List<VarDef> procParams = proc.getParameters();
 		List<AbstractExpr> parameters = node.getParameters();
-		try {
-			for (AbstractExpr parameter:parameters){
-				VarExpr expr = (VarExpr) parameter;
-				VarUse varUse =expr.getVar();
-				AbstractType typeVar = varUse.getVarDef().getType();
-				VarDef procParam = procParams.get(tmpCnt);
-				if (!(typeVar.equals(procParam.getType()))){
-					it.previous();
-					VarDef castVar = varDefCreate(procParam.getType());
-					it.add(castNodeCreate(varUse.getVarDef(), castVar));
-					varUse.setVarDef(castVar);
-					it.next();
-				}
+
+		for (AbstractExpr parameter:parameters){
+			VarDef procParam = procParams.get(tmpCnt);
+			parameter.accept(this, procParam.getType());
 				
-				tmpCnt++;
-			}
-		}catch(Exception e) {
-			
+			tmpCnt++;
 		}
 		
 	}
 	
+	//VarDef must be cast into i8* for accessing fifo
 	public VarDef castFifo(VarDef readVar, String fifoName) {
-		
-		//Type to cast into
-		LLVMAbstractType addrType =  new PointType(new IntType(8));
-
 		int index = (Integer)portIndex.get(fifoName);
+		LLVMAbstractType addrType =  new PointType(new IntType(8));
 		
-		//Vardef to cast
-		VarUse varUse = new VarUse(readVar, null);
-		VarExpr expr = new VarExpr(new Location(), varUse);
-		//New vardef casted
-		VarDef vardef = new VarDef(false, false, index, new Location(), fifoName, null, null, 0, addrType);
+		it.previous();
 		
-		
+		VarDef varDef = varDefCreate(addrType);
+
 		//Create bitcast node
-		BitcastNode bitcast = new BitcastNode(0, new Location(), vardef, expr);
+		BitcastNode bitcast = new BitcastNode(0, new Location(), varDef, readVar);
+		it.add(bitcast);
 		
 		//Create a load fifo node
 		LoadFifo loadfifo = new LoadFifo(0, new Location(), fifoName, readVar, index);
-
-		it.previous();
-		it.add(loadfifo);
-		it.add(bitcast);
+		it.add(loadfifo);	
+		
 		it.next();
 		
-		return vardef;
+		return varDef;
 
 		
 	}
@@ -347,13 +328,51 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	 */
 
 	public void visit(BinaryExpr expr, Object... args){
+		BinaryOp op = expr.getOp();
+		switch (op) {
+		case BAND:
+		case LAND:
+		case BOR:
+		case LOR:
+		case MINUS:
+		case TIMES:
+		case PLUS:
+		case SHIFT_LEFT:
+		case SHIFT_RIGHT:
+		case BXOR:
+			// recover the reference type from the current node
+			AbstractType refType = (AbstractType) args[0];
+			
+			expr.getE1().accept(this, args);
+			expr.getE2().accept(this, args);
+			expr.setType(refType);
+			return ;
 		
-		// recover the reference type from the current node
-		AbstractType refType = (AbstractType) args[0];
+		case EQ:
+		case GE:
+		case GT:
+		case LE:
+		case LT:
+		case NE:
+			
+			if ((expr.getE1() instanceof VarExpr)){
+				VarExpr e1 = (VarExpr)expr.getE1();
+				expr.getE2().accept(this, e1.getVar().getVarDef().getType());	
+			} else if (expr.getE1() instanceof VarExpr){
+				VarExpr e2 = (VarExpr)expr.getE2();
+				expr.getE2().accept(this, e2.getVar().getVarDef().getType());	
+			}
+			return ;
 		
-		expr.getE1().accept(this, args);
-		expr.getE2().accept(this, args);
-		expr.setType(refType);
+		case DIV:
+		case DIV_INT:
+		case MOD:
+		case EXP:
+		
+		default:
+			
+		}
+
 	}
 
 	

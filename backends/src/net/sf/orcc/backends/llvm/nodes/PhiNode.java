@@ -28,23 +28,29 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
+import java.util.Map;
+
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.type.AbstractType;
 
 /**
  * @author Jérôme GORIN
  * 
  */
-public class BitcastNode extends AbstractLLVMNode {
+public class PhiNode extends AbstractLLVMNode {
 
-	private VarDef value;
+	private VarDef varDef;
+	
+	private AbstractType type;
 
-	private VarDef var;
+	private Map<VarDef, LabelNode> assignements;
 
-	public BitcastNode(int id, Location location, VarDef var, VarDef value) {
-		super(id, location);
-		this.var = var;
-		this.value = value;
+	public PhiNode(int id, Location location, VarDef varDef, AbstractType type, Map<VarDef, LabelNode> assignements) {
+		super(id, location);	
+		this.varDef = varDef;
+		this.assignements = assignements;
+		this.type = type;
 	}
 
 	@Override
@@ -52,26 +58,28 @@ public class BitcastNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public VarDef getValue() {
-		return value;
+	public VarDef getVarDef() {
+		return varDef;
 	}
 
-	public VarDef getVar() {
-		return var;
+	public Map<VarDef, LabelNode> getAssignements() {
+		return assignements;
+	}
+	
+	public void setAssignements(Map<VarDef, LabelNode> assignements) {
+		this.assignements= assignements;
 	}
 
-	public void setValue(VarDef value) {
-		this.value = value;
+	public void setVarDef(VarDef varDef) {
+		this.varDef = varDef;
 	}
 
-	public void setVar(VarDef var) {
-		this.var = var;
+	public AbstractType getType() {
+		return type;
 	}
 
-	@Override
-	public String toString() {
-		return var + " = bitcast " + value + " to "
-				+ var.getType();
+	public void setType(AbstractType type) {
+		this.type = type;
 	}
 
 }
