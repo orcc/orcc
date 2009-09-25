@@ -92,7 +92,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	ListIterator<AbstractNode> it;
 	
-	List<AbstractType> types;
 	Hashtable<String, Integer> portIndex;
 	int nodeCount;
 	
@@ -124,9 +123,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	private void visitNodes(List<AbstractNode> nodes) {
 		it = nodes.listIterator();
 		while (it.hasNext()) {
-			types = new ArrayList<AbstractType>();
 			it.next().accept(this);
-			types.clear();
 		}
 	}
 
@@ -190,25 +187,40 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	 */
 	
 	@Override
-	public void visit(AssignVarNode node, Object... args) {
-		//Visit expr
-		node.getValue().accept(this, node);
+	public void visit(AssignVarNode node, Object... args) {	
+		VarDef varDef = node.getVar();
+		AbstractExpr expr = node.getValue();
 		
-		//Check type cohesion
-		AbstractType varType = node.getVar().getType();
-		
-		node.getValue().accept(this, varType);
-		if (!types.isEmpty()){
-			for (AbstractType type : types){
-				if (!varType.equals(type)){
-					VarDef castVar = varDefCreate(type);			
-					it.add(castNodeCreate(castVar, node.getVar()));
-					node.setVar(castVar);
-				}
-			}
+		//Change unary expression into binary expression
+		if (expr instanceof UnaryExpr){
+			node.setValue(removeUnaryExpr((UnaryExpr)expr));
 		}
+		
+		//Visit expr
+		node.getValue().accept(this, varDef.getType());
+
 	}
 
+	public AbstractExpr removeUnaryExpr(UnaryExpr expr){
+		//Unary expression doesn't exists in LLVM
+		Location loc = expr.getLocation();
+		AbstractType type = expr.getType();
+		AbstractExpr exprE1 = expr.getExpr();
+		UnaryOp op = expr.getOp();
+			
+			
+		switch (op) {
+		case MINUS:
+			IntExpr constExpr = new IntExpr(new Location(), 0);
+			BinaryExpr varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS,
+					exprE1, type);
+			return varExpr;
+		default:
+				
+		}
+		return expr;
+	}
+	
 	@Override
 	public void visit(SelectNode node, Object... args) {
 		 List<PhiAssignment> phis = node.getPhis();
@@ -325,28 +337,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 
 	@Override
 	public void visit(StoreNode node, Object... args) {
-		types.clear();
-		PointType type = (PointType)node.getTarget().getVarDef().getType();
-		
-		types.add(type.getType());
-		node.getValue().accept(this, node);
-		if (types.size()==2){
-			AbstractType typeE1 = types.get(0);
-			AbstractType typeE2 = types.get(1);
-			if (!(typeE1.equals(typeE2))){
-				it.previous();
-								
-				VarExpr sourceVar = (VarExpr)node.getValue();
-				VarUse varUse = sourceVar.getVar();
-								
-				VarDef castVar = varDefCreate(typeE1);
-				it.add(castNodeCreate(varUse.getVarDef(), castVar));
-				varUse.setVarDef(castVar);
-				
-				node.setValue(sourceVar);
-				it.next();
-			}
-		}
+		PointType type = (PointType)node.getTarget().getVarDef().getType();		
+		node.getValue().accept(this, type.getType());
 	}
 
 	/**
@@ -355,36 +347,13 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	 */
 
 	public void visit(BinaryExpr expr, Object... args){
-	
-		List<AbstractType> tmpTypes = types;
-		types = new ArrayList<AbstractType>(); 
+		
+		// recover the reference type from the current node
+		AbstractType refType = (AbstractType) args[0];
+		
 		expr.getE1().accept(this, args);
 		expr.getE2().accept(this, args);
-		if (types.size()==2){
-			AbstractType typeE1 = types.get(0);
-			AbstractType typeE2 = types.get(1);
-			if (!(typeE1.equals(typeE2))){
-				if (expr.getE2() instanceof VarExpr){
-					VarExpr sourceVar;
-
-					//Add cast node before the current expression
-					it.previous();
-
-					sourceVar = (VarExpr)expr.getE2();
-					VarDef sourceVarDef = sourceVar.getVar().getVarDef();
-					VarDef vardef = varDefCreate(typeE1);
-					it.add(castNodeCreate(sourceVarDef , vardef));
-					VarUse targetvarUse = new VarUse(vardef, null);
-					VarExpr targetExpr = new VarExpr(new Location(), targetvarUse);
-					
-					expr.setE2(targetExpr);
-					
-					it.next();
-				}
-			}
-		}
-		types = tmpTypes;
-		types.add(expr.getType());
+		expr.setType(refType);
 	}
 
 	
@@ -432,7 +401,22 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	
 	
 	public void visit(VarExpr expr, Object... args){
-		types.add(expr.getVar().getVarDef().getType());
+		// recover the reference type from the current node
+		AbstractType refType = (AbstractType) args[0];
+		VarDef var = expr.getVar().getVarDef();
+		AbstractType varType = var.getType();
+		
+		if (!(refType.equals(varType))){
+			//Add cast node before the current expression
+			it.previous();
+
+			VarDef vardef = varDefCreate(refType);
+			it.add(castNodeCreate(var , vardef));
+			VarUse varUse = new VarUse(vardef, null);
+			expr.setVar(varUse);
+				
+			it.next();
+		}
 	}
 
 	@Override
@@ -548,6 +532,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 				BinaryExpr varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS,
 						exprE1, type);
 				node.setValue(varExpr);
+				varExpr.accept(this, args);
 			default:
 				
 			}

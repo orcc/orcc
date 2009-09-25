@@ -168,7 +168,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			LabelNode nextLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
 					+ Integer.toString(BrCounter));	
 			
-			//Set labels of brNode and phiNodes 
+			//Simplify the control flow and branch to it to the next node
 			if (thenNodes.isEmpty())
 			{
 				thenLabelNode = nextLabelNode;			
@@ -177,6 +177,8 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			} 
 			
 		}else{
+			
+			// if node set  label
 			endLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
 					+ Integer.toString(BrCounter++));
 			
