@@ -29,6 +29,8 @@
 package net.sf.orcc.backends.llvm;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
@@ -37,6 +39,7 @@ import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.nodes.LLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
+import net.sf.orcc.backends.llvm.nodes.PhiNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.backends.llvm.nodes.SextNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
@@ -143,6 +146,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("brNode");
 		 List<AbstractNode> thenNodes = node.getThenNodes();
 		 List<AbstractNode> elseNodes = node.getElseNodes();
+		 List<PhiNode> phiNodes = node.getPhiNodes();
 
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getCondition(),new BoolType()));
 		nodeTmpl.setAttribute("thenLabelNode", node.getLabelTrueNode());
@@ -163,25 +167,15 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		for (AbstractNode subNode : elseNodes) {
 			subNode.accept(this, args);
 		}
-
+		
 		// restore previous template and attribute name
 		attrName = previousAttrName;
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
-
-		LabelNode labelTrueNode = node.getLabelTrueNode();
-		LabelNode labelFalseNode = node.getLabelFalseNode();
 		
-		JoinNode joinNode = node.getJoinNode();
-		
-		if (thenNodes.isEmpty()){
-			labelTrueNode = node.getLabelEntryNode();
+		for (PhiNode phiNode : phiNodes) {
+			phiNode.accept(this, args);
 		}
-		if (elseNodes.isEmpty()){
-			labelFalseNode = node.getLabelEntryNode();
-		}
-		
-		joinNode.accept(this, labelTrueNode, labelFalseNode);
 	}
 
 	@Override
@@ -230,36 +224,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(JoinNode node, Object... args) {
-		// there is nothing to print.
-		List<PhiAssignment> phis = node.getPhis();
-		if (!phis.isEmpty()) {
-			for (PhiAssignment phi : phis) {
-				int i = 0;
-
-				VarDef varDef = phi.getVarDef();
-				List<VarUse> varuses = phi.getVars();
-				StringTemplate nodeTmpl = group.getInstanceOf("joinNode");
-
-				// varDef contains the variable (with the same name as the port)
-				nodeTmpl.setAttribute("target", varDefPrinter
-						.getVarDefName(varDef, false));
-				nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
-				for (VarUse varuse : varuses) {
-					StringTemplate phiTmpl = group.getInstanceOf("phiNode");
-					VarDef value = varuse.getVarDef();
-
-					// name
-					phiTmpl.setAttribute("value", varDefPrinter
-							.getVarDefName(value, false));
-					phiTmpl.setAttribute("label", (LabelNode) args[i++]);
-
-					nodeTmpl.setAttribute("phiNode", phiTmpl);
-				}
-
-				template.setAttribute(attrName, nodeTmpl);
-
-			}
-		}
+		//Not supported in llvm's backend
 	}
 
 	public void visit(LabelNode node, Object... args) {
@@ -490,5 +455,29 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 		template.setAttribute(attrName, nodeTmpl);
 		
+	}
+
+	@Override
+	public void visit(PhiNode node, Object... args) {
+		Map<VarDef, LabelNode> assignements = node.getAssignements();
+		
+		StringTemplate nodeTmpl = group.getInstanceOf("phiNode");
+
+		// varDef contains the variable (with the same name as the port)
+		nodeTmpl.setAttribute("target", varDefPrinter
+					.getVarDefName(node.getVarDef(), false));
+		nodeTmpl.setAttribute("type", typeToString.toString(node.getType()));
+		
+		for(Entry<VarDef, LabelNode>  assignement : assignements.entrySet()) {
+			StringTemplate phiTmpl = group.getInstanceOf("phiPair");
+			
+			VarDef varDef = assignement.getKey();
+			phiTmpl.setAttribute("value", varDefPrinter.getVarDefName(varDef, false));
+			phiTmpl.setAttribute("label", assignement.getValue());
+
+			nodeTmpl.setAttribute("assignements", phiTmpl);
+		}
+			
+		template.setAttribute(attrName, nodeTmpl);
 	}
 }

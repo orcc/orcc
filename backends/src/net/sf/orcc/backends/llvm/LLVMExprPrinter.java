@@ -42,6 +42,7 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.BoolType;
 
 /**
  * 
@@ -145,7 +146,8 @@ public class LLVMExprPrinter implements ExprVisitor {
 	public void visit(BooleanExpr expr, Object... args ) {
 		
 		if (args[0] instanceof AbstractType){
-			builder.append("i1 ");
+			String type = typePrinter.toString(new BoolType());
+			builder.append(type+" ");
 		}
 		builder.append(expr.getValue() ? "1" : "0");
 	}

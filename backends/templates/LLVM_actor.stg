@@ -19,7 +19,7 @@ listValue(value) ::= <<
 >>
 
 // phi definition
-phiNode(value, label) ::= <<
+phiPair(value, label) ::= <<
 [$value$, %$label$]
 >>
 
@@ -120,18 +120,20 @@ brNode(expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) :
 
 $if(thenNodes)$
 $thenLabelNode$:
-$thenNodes$	br label %$endLabelNode$
 
+$thenNodes$
 $endif$
 
 $if(elseNodes)$
-$elseLabelNode$:	
-$elseNodes$	br label %$endLabelNode$
-
+$elseLabelNode$:
+	
+$elseNodes$
 $endif$
 
+$if(endLabelNode)$
 $endLabelNode$:
 
+$endif$
 >>
 
 
@@ -141,9 +143,9 @@ $name$:
 
 >>
 
-// join node
-joinNode(target, type, phiNode) ::= <<
-	$target$ = phi $type$ $phiNode: {$it$}; separator=", "$
+// phi node
+phiNode(target, type, assignements) ::= <<
+	$target$ = phi $type$ $assignements: {$it$}; separator=", "$
 
 >>
 

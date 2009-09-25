@@ -81,5 +81,9 @@ public abstract class AbstractLLVMNodeVisitor extends AbstractNodeVisitor implem
 	public void visit(InitPortNode node, Object... args){
 		
 	}
+	
+	public void visit(PhiNode node, Object... args){
+		
+	}
 
 }

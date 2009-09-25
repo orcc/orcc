@@ -70,7 +70,6 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
-import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
@@ -443,45 +442,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
 		it= tmpit;
-		node.getJoinNode().accept(this, node);
-		
 	}
 
-	@Override
-	public void visit(JoinNode node, Object... args) {		
-	/*	List<PhiAssignment> phis = node.getPhis();
-		BrNode brNode = (BrNode)args[0];
-		
-		for (PhiAssignment phi : phis){
-			int count=0;
-			
-			VarDef varDef = phi.getVarDef();
-			List<VarUse> varUses = phi.getVars();
-			
-			for (VarUse varUse : varUses){
-				VarDef varDefUse = varUse.getVarDef();
-				AbstractType TypeE1 = varDef.getType();
-				AbstractType TypeE2 = varDefUse.getType();
-				if(!(TypeE1.equals(TypeE2))){
-					List<AbstractNode> nodes;
-					if (count==0){
-						nodes = brNode.getThenNodes();
-					}else {
-						nodes = brNode.getElseNodes();
-					}
-					VarDef castVar = varDefCreate(TypeE1);
-					AbstractLLVMNode castNode = castNodeCreate(varDefUse, castVar);
-					varUse.setVarDef(castVar);
-					nodes.add(castNode);
-				}
-				
-				count++;
-			}
-			
-			
-		}*/
-		
-	}
 	
 	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
