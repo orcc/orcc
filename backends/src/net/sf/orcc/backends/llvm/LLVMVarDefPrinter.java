@@ -64,7 +64,7 @@ public class LLVMVarDefPrinter {
 	 */
 	public Map<String, Object> applyVarDef(VarDef varDef) {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
-		varDefMap.put("name", getVarDefName(varDef));
+		varDefMap.put("name", getVarDefName(varDef, false));
 		
 		AbstractType type;
 		
@@ -90,16 +90,26 @@ public class LLVMVarDefPrinter {
 	 *            the variable definition
 	 * @return a string with its full name
 	 */
-	public String getVarDefName(VarDef varDef) {
-		String name;
+	public String getVarDefName(VarDef varDef, Object... args) {
+		Boolean showType= (Boolean)args[0];
+		String name = "";
+		
+		if (showType)
+		{
+			name = typeVisitor.toString(varDef.getType());
+			name += " ";
+		}
+		
+
 		if (varDef.isConstant()) {
-			return exprPrinter.toString(varDef.getConstant(), false);
+			name += exprPrinter.toString(varDef.getConstant(), false);
+			return name;
 		}
 
 		if (varDef.isGlobal()) {
-			name = "@";
+			name += "@";
 		} else {
-			name = "%";
+			name += "%";
 		}
 		name += varDef.getName();
 	
@@ -120,19 +130,4 @@ public class LLVMVarDefPrinter {
 		this.ports = ports;
 	}
 	
-	/**
-	 * Returns the full name of the given variable definition, with type, index and
-	 * suffix.
-	 * 
-	 * @param varDef
-	 *            the variable definition
-	 * @return a string with its full name
-	 */
-	public String getVarDefNameType(VarDef varDef) {	
-		return typeVisitor.toString(varDef.getType())+ " " + getVarDefName(varDef);
-	}
-	
-	public String getVarDefType(VarDef varDef) {	
-		return typeVisitor.toString(varDef.getType());
-	}
 }

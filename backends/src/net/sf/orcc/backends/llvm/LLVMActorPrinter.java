@@ -117,7 +117,7 @@ public class LLVMActorPrinter {
 		// parameters
 		List<String> parameters = new ArrayList<String>();
 		for (VarDef param : proc.getParameters()) {
-			parameters.add(varDefPrinter.getVarDefNameType(param));
+			parameters.add(varDefPrinter.getVarDefName(param, true));
 		}
 		procTmpl.setAttribute("parameters", parameters);
 
