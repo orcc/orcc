@@ -71,6 +71,19 @@ public interface IActorDebug extends IActor {
 	public String getValue(String variable);
 
 	/**
+	 * Returns the value of the given state variable, if the state variable is
+	 * an array.
+	 * 
+	 * @param variable
+	 *            the state variable name.
+	 * @param index
+	 *            the index.
+	 * 
+	 * @return the value of the given state variable
+	 */
+	public String getValue(String variable, int index);
+
+	/**
 	 * Returns the map of state variables of this actor.
 	 * 
 	 * @return the map of state variables of this actor

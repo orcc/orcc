@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.oj.debug;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +66,53 @@ public abstract class AbstractActorDebug implements IActorDebug {
 	@Override
 	public String getValue(String variable) {
 		try {
-			return getClass().getField(variable).get(this).toString();
+			Field field = getClass().getField(variable);
+			Object obj = field.get(this);
+			if (obj == null) {
+				return "null";
+			} else if (obj.getClass().isArray()) {
+				StringBuilder builder = new StringBuilder();
+				int length = Array.getLength(obj);
+				if (length > 0) {
+					Object entry = Array.get(obj, 0);
+					builder.append('[');
+					builder.append(entry.toString());
+					int maxLength = Math.min(length, 100);
+					for (int i = 1; i < maxLength; i++) {
+						builder.append(", ");
+						entry = Array.get(obj, i);
+						builder.append(entry.toString());
+					}
+				}
+
+				if (length > 100) {
+					builder.append(", ...");
+				}
+				builder.append(']');
+
+				return builder.toString();
+			} else {
+				return obj.toString();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "could not get value of \"" + variable + "\"";
+	}
+
+	@Override
+	public String getValue(String variable, int index) {
+		try {
+			Field field = getClass().getField(variable);
+			Object obj = field.get(this);
+			if (obj == null) {
+				return "null";
+			} else if (obj.getClass().isArray()) {
+				return Array.get(obj, index).toString();
+			} else {
+				return "\"" + variable + "\" is not an array!";
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

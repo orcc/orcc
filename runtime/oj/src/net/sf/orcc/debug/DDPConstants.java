@@ -73,6 +73,11 @@ public interface DDPConstants {
 	public static final String ATTR_FRAMES = "frames";
 
 	/**
+	 * string to indicate the "indexes" attribute.
+	 */
+	public static final String ATTR_INDEXES = "indexes";
+
+	/**
 	 * string to indicate the "line" attribute.
 	 */
 	public static final String ATTR_LINE = "line";

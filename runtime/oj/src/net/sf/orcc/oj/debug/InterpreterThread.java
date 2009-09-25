@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.oj.debug;
 
+import static net.sf.orcc.debug.DDPConstants.ATTR_INDEXES;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,6 +43,7 @@ import net.sf.orcc.debug.DDPConstants;
 import net.sf.orcc.debug.DDPServer;
 import net.sf.orcc.debug.Location;
 import net.sf.orcc.debug.type.AbstractType;
+import net.sf.orcc.debug.type.ListType;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,7 +84,7 @@ public class InterpreterThread extends Thread {
 		writeReply(reply);
 	}
 
-	private void getVariable(JSONObject request) throws JSONException {
+	private void getValue(JSONObject request) throws JSONException {
 		String actorName = request.getString(DDPConstants.ATTR_ACTOR_NAME);
 		IActorDebug actor = actors.get(actorName);
 		String varName = request.getString(DDPConstants.ATTR_VAR_NAME);
@@ -102,16 +105,35 @@ public class InterpreterThread extends Thread {
 			}
 			reply.put(DDPConstants.ATTR_VALUE, "");
 		} else {
-			Map<String, AbstractType> variables = actor.getVariables();
-			if (variables.containsKey(varName)) {
-				String value = actor.getValue(varName);
-				reply.put(DDPConstants.ATTR_VALUE, value);
-			} else {
-				// TODO implement that
-				reply.put(DDPConstants.ATTR_VALUE, "");
-			}
+			getStateVariableValue(actor, varName, request, reply, array);
 		}
+
 		writeReply(reply);
+	}
+
+	private void getStateVariableValue(IActorDebug actor, String varName,
+			JSONObject request, JSONObject reply, JSONArray varArray)
+			throws JSONException {
+		Map<String, AbstractType> variables = actor.getVariables();
+		AbstractType type = variables.get(varName);
+		if (type != null) {
+			if (type instanceof ListType) {
+				if (request.has(ATTR_INDEXES)) {
+					JSONArray array = request.getJSONArray(ATTR_INDEXES);
+					int offset = array.getInt(0);
+					int length = array.getInt(1);
+					for (int i = offset; i < length; i++) {
+						String val = actor.getValue(varName, i);
+						varArray.put(val);
+					}
+				}
+			}
+			String value = actor.getValue(varName);
+			reply.put(DDPConstants.ATTR_VALUE, value);
+		} else {
+			// TODO implement that
+			reply.put(DDPConstants.ATTR_VALUE, "");
+		}
 	}
 
 	private void resume(JSONObject request) throws JSONException {
@@ -143,7 +165,7 @@ public class InterpreterThread extends Thread {
 				} else if (requestType.equals(DDPConstants.REQ_GET_COMPONENTS)) {
 					getComponents();
 				} else if (requestType.equals(DDPConstants.REQ_GET_VALUE)) {
-					getVariable(request);
+					getValue(request);
 				} else if (requestType.equals(DDPConstants.REQ_RESUME)) {
 					resume(request);
 				} else if (requestType.equals(DDPConstants.REQ_STACK)) {
