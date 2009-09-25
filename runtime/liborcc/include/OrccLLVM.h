@@ -144,7 +144,8 @@ void* initModule(std::string moduleName, lff_t **fifoIn, lff_t **fifoOut)
   delete buffer;
 
   if ((moduleName.compare("clip")==0)||(moduleName.compare("serialize")==0)||(moduleName.compare("downsample")==0)||
-	  (moduleName.compare("dcsplit")==0)||(moduleName.compare("final")==0)||(moduleName.compare("zzaddr")==0))
+	  (moduleName.compare("dcsplit")==0)||(moduleName.compare("final")==0)||(moduleName.compare("zzaddr")==0)||
+	  (moduleName.compare("dequant")==0))
   {
 	buffer = MemoryBuffer::getFile("D:\\Projets\\orcc\\trunk\\runtime\\liborcc\\include\\lock_free_fifo.bc", &error);
 	Module* mod = ParseBitcodeFile(buffer, &error);

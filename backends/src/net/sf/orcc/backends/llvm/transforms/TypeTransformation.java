@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.transforms;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +41,9 @@ import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
+import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
+import net.sf.orcc.backends.llvm.nodes.PhiNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.backends.llvm.nodes.SextNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
@@ -198,6 +201,41 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		//Visit expr
 		node.getValue().accept(this, varDef.getType());
 
+	}
+	
+	@Override
+	public void visit(PhiNode node, Object... args) {	
+		
+		BrNode brNode = (BrNode)args[0];
+		
+		AbstractType varType = node.getType();
+		Map<VarDef, LabelNode> assignements = node.getAssignements();
+		Map<VarDef, LabelNode> tmpAssignements = new HashMap<VarDef, LabelNode>();
+		
+	     for (Map.Entry<VarDef,LabelNode> assignement : assignements.entrySet()){
+	    	 VarDef varKey = assignement.getKey();
+	    	 LabelNode labelNode = assignement.getValue();
+	    	 
+	    	 if (!(varType.equals(varKey.getType()))){
+					VarDef castVar = varDefCreate(varType);
+					AbstractLLVMNode castNode = castNodeCreate(varKey, castVar);
+					
+					//it.add(castNode);
+					//it.next();
+					/*
+					if (labelNode.getLabelName().compareTo(brNode.getLabelTrueNode().getLabelName()) ==0 ){
+						brNode.getThenNodes().add(castNode);
+					}else if (labelNode.getLabelName().compareTo(brNode.getLabelFalseNode().getLabelName()) ==0 ){
+						brNode.getElseNodes().add(castNode);
+					}else{
+						
+					}*/
+				
+					varKey = castVar;
+	    	 }
+	    	 tmpAssignements.put(varKey, labelNode);
+	     }
+	     node.setAssignements(tmpAssignements);
 	}
 
 	public AbstractExpr removeUnaryExpr(UnaryExpr expr){
@@ -406,16 +444,21 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 	
 	private int sizeOf(AbstractType type){
-		int size=0;
 		
 		if (type instanceof IntType)
 		{
-			size = ((IntType)type).getSize();
+			return ((IntType)type).getSize();
+		}else if (type instanceof UintType)
+		{
+			return ((UintType)type).getSize();
+		} else if (type instanceof ListType){
+			return sizeOf(((ListType)type).getType());
 		} else if (type instanceof BoolType){
-			size = 1;
-		}			
+			return 1;
+		} else {
+			throw new NullPointerException();
+		}
 		
-		return size;
 	}
 	
 	
@@ -443,8 +486,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		
 		ListIterator<AbstractNode> tmpit = it;
 		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
+		visitNodes(node.getElseNodes());				
 		it= tmpit;
+		for (PhiNode phiNode : node.getPhiNodes()){
+			visit(phiNode, node);
+		}
 	}
 
 	
