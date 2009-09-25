@@ -42,6 +42,15 @@ import net.sf.orcc.backends.java.JavaTypePrinter;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 
 /**
  * Actor printer.
@@ -50,6 +59,57 @@ import net.sf.orcc.ir.actor.Actor;
  * 
  */
 public class JavaDebugActorPrinter extends CActorPrinter {
+
+	private class TypeConstructor implements TypeVisitor {
+
+		private StringBuilder builder;
+
+		private AbstractType type;
+
+		public TypeConstructor(AbstractType type) {
+			this.type = type;
+		}
+
+		@Override
+		public String toString() {
+			builder = new StringBuilder();
+			type.accept(this);
+			return builder.toString();
+		}
+
+		@Override
+		public void visit(BoolType type) {
+			builder.append("new BoolType()");
+		}
+
+		@Override
+		public void visit(IntType type) {
+			builder.append("new IntType(" + type.getSize() + ")");
+		}
+
+		@Override
+		public void visit(ListType type) {
+			builder.append("new ListType(" + type.getSize() + ", ");
+			type.getType().accept(this);
+			builder.append(")");
+		}
+
+		@Override
+		public void visit(StringType type) {
+			builder.append("new StringType()");
+		}
+
+		@Override
+		public void visit(UintType type) {
+			builder.append("new UintType(" + type.getSize() + ")");
+		}
+
+		@Override
+		public void visit(VoidType type) {
+			builder.append("new VoidType()");
+		}
+
+	}
 
 	/**
 	 * Creates a new network printer with the template "Java_actor.stg".
@@ -65,13 +125,7 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 		exprPrinter = new JavaExprPrinter(varDefPrinter);
 	}
 
-	@Override
-	protected void setAttributes(Actor actor) {
-		super.setAttributes(actor);
-		String res = actor.getFile().replaceAll("\\\\", "\\\\\\\\");
-		template.setAttribute("file", res);
-
-		List<Action> actions = actor.getActions();
+	private void setActionLocation(List<Action> actions) {
 		Map<String, List<Integer>> locationMap = new TreeMap<String, List<Integer>>();
 		for (Action action : actions) {
 			Location location = action.getBody().getLocation();
@@ -81,8 +135,28 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 			list.add(location.getEndColumn());
 			locationMap.put(action.getTag(), list);
 		}
-		
+
 		template.setAttribute("actionLoc", locationMap);
 	}
 
+	@Override
+	protected void setAttributes(Actor actor) {
+		super.setAttributes(actor);
+		String res = actor.getFile().replaceAll("\\\\", "\\\\\\\\");
+		template.setAttribute("file", res);
+
+		setActionLocation(actor.getActions());
+		setStateVariables(actor.getStateVars());
+	}
+
+	private void setStateVariables(List<StateVar> stateVars) {
+		Map<String, TypeVisitor> vars = new TreeMap<String, TypeVisitor>();
+		for (StateVar var : stateVars) {
+			String name = var.getDef().getName();
+			AbstractType type = var.getDef().getType();
+			vars.put(name, new TypeConstructor(type));
+		}
+
+		template.setAttribute("stateVars_DEBUG", vars);
+	}
 }

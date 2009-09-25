@@ -1,5 +1,14 @@
 group Java_actor_debug : Java_actor;
 
+// a state variable
+stateVar(vardef, value) ::= <<
+$if(value)$
+public $vardef(vardef)$ = $value$;$\n\n$
+$else$
+public $vardefInit(vardef)$;$\n\n$
+$endif$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // EXTENSION OF NORMAL SCHEDULERS
@@ -181,7 +190,7 @@ public String getNextSchedulableAction() {
 
 actor(name, inputs, outputs, stateVars, procs,
       actions, initializes, scheduler, initialize,
-      file, actionLoc) ::= <<
+      file, actionLoc, stateVars_DEBUG) ::= <<
 /**
  * Generated from "$name$"
  */
@@ -191,6 +200,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.debug.Location;
+import net.sf.orcc.debug.type.*;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.debug.AbstractActorDebug;
 
@@ -209,7 +219,9 @@ public class Actor_$name$ extends AbstractActorDebug {
 		super("$file$");
 
 		fifos = new HashMap<String, IntFifo>();
-		$actionLoc.keys: { tag | actionLocation.put("$tag$", new Location($actionLoc.(tag); separator=", "$)); }; separator="\n"$
+		$actionLoc.keys: { tag | actionLocation.put("$tag$", new Location($actionLoc.(tag); separator=", "$));}; separator="\n"$
+
+		$stateVars_DEBUG.keys: { name | variables.put("$name$", $stateVars_DEBUG.(name)$);}; separator="\n"$
 	}
 
 $if(scheduler.fsm)$
