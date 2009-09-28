@@ -39,7 +39,7 @@ import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -87,12 +87,12 @@ public class IncrementPeephole extends Peephole {
 				VarDef varDefTmp = load.getTarget();
 				if (varDef == store.getTarget().getVarDef()
 						&& load.getIndexes().isEmpty()) {
-					AbstractExpr expr = store.getValue();
+					IExpr expr = store.getValue();
 					if (expr instanceof BinaryExpr) {
 						BinaryExpr binExpr = (BinaryExpr) expr;
 						BinaryOp op = binExpr.getOp();
-						AbstractExpr e1 = binExpr.getE1();
-						AbstractExpr e2 = binExpr.getE2();
+						IExpr e1 = binExpr.getE1();
+						IExpr e2 = binExpr.getE2();
 
 						if (e1 instanceof VarExpr) {
 							VarExpr v1 = (VarExpr) e1;
@@ -115,7 +115,7 @@ public class IncrementPeephole extends Peephole {
 
 	private boolean replaceSelfAssignment(List<VarDef> locals,
 			ListIterator<AbstractNode> it, VarDef varDefTmp, VarDef varDef,
-			VarExpr v1, BinaryOp op, AbstractExpr e2) {
+			VarExpr v1, BinaryOp op, IExpr e2) {
 		AbstractNode node;
 		if (op == BinaryOp.PLUS && e2 instanceof IntExpr
 				&& ((IntExpr) e2).getValue() == 1) {

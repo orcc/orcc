@@ -57,10 +57,11 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.ExprEvaluateException;
 import net.sf.orcc.ir.expr.ExprVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -68,6 +69,7 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
@@ -90,21 +92,23 @@ import net.sf.orcc.ir.type.UintType;
  * @author Jérôme GORIN
  * 
  */
-public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprVisitor{
+public class TypeTransformation extends AbstractLLVMNodeVisitor implements
+		ExprVisitor {
 
 	ListIterator<AbstractNode> it;
-	
-	Hashtable<String, Integer> portIndex;
-	int nodeCount;
-	
+
+	private int nodeCount;
+
+	private Hashtable<String, Integer> portIndex;
+
 	public TypeTransformation(Actor actor) {
-		
+
 		portIndex = new Hashtable<String, Integer>();
 		fillPorts(actor.getInputs());
 		fillPorts(actor.getOutputs());
-		
+
 		visitStateVars(actor.getStateVars());
-		
+
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -118,25 +122,70 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			visitProc(action.getBody());
 			visitProc(action.getScheduler());
 		}
-		
+
 		portIndex.clear();
 	}
 
-	private void visitNodes(List<AbstractNode> nodes) {
-		it = nodes.listIterator();
-		while (it.hasNext()) {
-			it.next().accept(this);
+	// VarDef must be cast into i8* for accessing fifo
+	public VarDef castFifo(VarDef readVar, String fifoName) {
+		int index = (Integer) portIndex.get(fifoName);
+		LLVMAbstractType addrType = new PointType(new IntType(new IntExpr(
+				new Location(), 8)));
+
+		it.previous();
+
+		VarDef varDef = varDefCreate(addrType);
+
+		// Create bitcast node
+		BitcastNode bitcast = new BitcastNode(0, new Location(), varDef,
+				readVar);
+		it.add(bitcast);
+
+		// Create a load fifo node
+		LoadFifo loadfifo = new LoadFifo(0, new Location(), fifoName, readVar,
+				index);
+		it.add(loadfifo);
+
+		it.next();
+
+		return varDef;
+
+	}
+
+	private AbstractLLVMNode castNodeCreate(VarDef var, VarDef targetVar) {
+
+		// Get source size and target size
+		int sourceSize = sizeOf(var.getType());
+		AbstractType targetType = targetVar.getType();
+		int targetSize = sizeOf(targetType);
+
+		// Create target expr for bitcast
+		VarUse varUse = new VarUse(var, null);
+		VarExpr expr = new VarExpr(new Location(), varUse);
+
+		// Select the type of cast (trunc if smaller, zext otherwise)
+		if (sourceSize < targetSize) {
+			if (var.getType() instanceof UintType) {
+				return new ZextNode(0, new Location(), targetVar, expr);
+			} else {
+				return new SextNode(0, new Location(), targetVar, expr);
+			}
+		} else {
+			return new TruncNode(0, new Location(), targetVar, expr);
 		}
 	}
 
-	private void visitProc(Procedure proc) {
-		nodeCount = 0;
-		
-		visitLocals(proc.getLocals());
-		clearPorts();
-		visitNodes(proc.getNodes());
+	@SuppressWarnings("unchecked")
+	private void clearPorts() {
+		Set entries = portIndex.entrySet();
+		Iterator itr = entries.iterator();
+
+		while (itr.hasNext()) {
+			Map.Entry entry = (Map.Entry) itr.next();
+			entry.setValue(0);
+		}
 	}
-	
+
 	/**
 	 * Store ports of the current actor
 	 * 
@@ -146,106 +195,14 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 			portIndex.put(port.getName(), new Integer(0));
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
-	private void clearPorts() {	
-		Set entries = portIndex.entrySet();
-		Iterator itr = entries.iterator();
-		
-		while (itr.hasNext()) {
-			Map.Entry entry = (Map.Entry) itr.next();
-			entry.setValue(0);
-		}	
-	}
-	
-	/**
-	 * Variable visitor.
-	 * 
-	 */
-	
-	private void visitLocals(List<VarDef> locals){
-		for (VarDef local : locals){
-			if (portIndex.containsKey(local.getName())){
-				//PointType newType = new PointType(local.getType());
-				PointType newType = new PointType(new IntType(32));
-				local.setType(newType);
-			}
-		}
-	}
-	
-	private void visitStateVars(List<StateVar> stateVars){
-		for (StateVar stateVar : stateVars){
-			VarDef vardef = stateVar.getDef();
-			
-			PointType newType = new PointType(vardef.getType());
-			vardef.setType(newType);
-		}
-	}
-	
-	
-	/**
-	 * Nodes visitor.
-	 * 
-	 */
-	
-	@Override
-	public void visit(AssignVarNode node, Object... args) {	
-		VarDef varDef = node.getVar();
-		AbstractExpr expr = node.getValue();
-		
-		//Change unary expression into binary expression
-		if (expr instanceof UnaryExpr){
-			node.setValue(removeUnaryExpr((UnaryExpr)expr));
-		}
-		
-		//Visit expr
-		node.getValue().accept(this, varDef.getType());
 
-	}
-	
-	@Override
-	public void visit(PhiNode node, Object... args) {	
-		
-		BrNode brNode = (BrNode)args[0];
-		
-		AbstractType varType = node.getType();
-		Map<VarDef, LabelNode> assignements = node.getAssignements();
-		Map<VarDef, LabelNode> tmpAssignements = new HashMap<VarDef, LabelNode>();
-		
-	     for (Map.Entry<VarDef,LabelNode> assignement : assignements.entrySet()){
-	    	 VarDef varKey = assignement.getKey();
-	    	 LabelNode labelNode = assignement.getValue();
-	    	 
-	    	 if (!(varType.equals(varKey.getType()))){
-					VarDef castVar = varDefCreate(varType);
-					AbstractLLVMNode castNode = castNodeCreate(varKey, castVar);
-					
-					//it.add(castNode);
-					//it.next();
-					/*
-					if (labelNode.getLabelName().compareTo(brNode.getLabelTrueNode().getLabelName()) ==0 ){
-						brNode.getThenNodes().add(castNode);
-					}else if (labelNode.getLabelName().compareTo(brNode.getLabelFalseNode().getLabelName()) ==0 ){
-						brNode.getElseNodes().add(castNode);
-					}else{
-						
-					}*/
-				
-					varKey = castVar;
-	    	 }
-	    	 tmpAssignements.put(varKey, labelNode);
-	     }
-	     node.setAssignements(tmpAssignements);
-	}
-
-	public AbstractExpr removeUnaryExpr(UnaryExpr expr){
-		//Unary expression doesn't exists in LLVM
+	public IExpr removeUnaryExpr(UnaryExpr expr) {
+		// Unary expression doesn't exists in LLVM
 		Location loc = expr.getLocation();
 		AbstractType type = expr.getType();
-		AbstractExpr exprE1 = expr.getExpr();
+		IExpr exprE1 = expr.getExpr();
 		UnaryOp op = expr.getOp();
-			
-			
+
 		switch (op) {
 		case MINUS:
 			IntExpr constExpr = new IntExpr(new Location(), 0);
@@ -253,111 +210,58 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 					exprE1, type);
 			return varExpr;
 		default:
-				
+
 		}
 		return expr;
 	}
-	
-	@Override
-	public void visit(SelectNode node, Object... args) {
-		 List<PhiAssignment> phis = node.getPhis();
-		 for (PhiAssignment phi : phis){
-			 VarDef varDef = phi.getVarDef();
-			 AbstractType typeRef =  varDef.getType();
-			 List<VarUse> varUses = phi.getVars();
-		
-			 for (VarUse varUse : varUses){
-				 AbstractType type = varUse.getVarDef().getType();
-				 
-				if (!(type.equals(typeRef))){
-					it.previous();
-					VarDef castVar = varDefCreate(typeRef);
-					it.add(castNodeCreate(varUse.getVarDef(), castVar));
-					varUse.setVarDef(castVar);
-					it.next();
-				}
-				 
-			 }
-			 
-		 }
-	}
-	
-	@Override
-	public void visit(CallNode node, Object... args) {
-		int tmpCnt = 0;
-		
-		Procedure proc = node.getProcedure();
-		List<VarDef> procParams = proc.getParameters();
-		List<AbstractExpr> parameters = node.getParameters();
 
-		for (AbstractExpr parameter:parameters){
-			VarDef procParam = procParams.get(tmpCnt);
-			parameter.accept(this, procParam.getType());
-				
-			tmpCnt++;
+	private int sizeOf(AbstractType type) {
+		if (type instanceof IntType) {
+			try {
+				return Util.evaluateAsInteger(((IntType) type).getSize());
+			} catch (ExprEvaluateException e) {
+				e.printStackTrace();
+				return 32;
+			}
+		} else if (type instanceof UintType) {
+			try {
+				return Util.evaluateAsInteger(((UintType) type).getSize());
+			} catch (ExprEvaluateException e) {
+				e.printStackTrace();
+				return 32;
+			}
+		} else if (type instanceof ListType) {
+			return sizeOf(((ListType) type).getType());
+		} else if (type instanceof BoolType) {
+			return 1;
+		} else {
+			throw new NullPointerException();
 		}
-		
-	}
-	
-	//VarDef must be cast into i8* for accessing fifo
-	public VarDef castFifo(VarDef readVar, String fifoName) {
-		int index = (Integer)portIndex.get(fifoName);
-		LLVMAbstractType addrType =  new PointType(new IntType(8));
-		
-		it.previous();
-		
-		VarDef varDef = varDefCreate(addrType);
-
-		//Create bitcast node
-		BitcastNode bitcast = new BitcastNode(0, new Location(), varDef, readVar);
-		it.add(bitcast);
-		
-		//Create a load fifo node
-		LoadFifo loadfifo = new LoadFifo(0, new Location(), fifoName, readVar, index);
-		it.add(loadfifo);	
-		
-		it.next();
-		
-		return varDef;
-
-		
-	}
-	
-	@Override
-	public void visit(ReadNode node, Object... args) {	
-		
-		String fifoName = node.getFifoName();
-		
-		node.setVar(castFifo(node.getVarDef(), fifoName));
-		int index = (Integer)portIndex.get(fifoName);
-		node.setFifoName(fifoName + "_" + Integer.toString(index));
-		portIndex.remove(fifoName);
-		portIndex.put(fifoName, new Integer(++index));
-		
-	}
-	
-	@Override
-	public void visit(WriteNode node, Object... args) {
-		String fifoName = node.getFifoName();
-			
-		node.setVarDef(castFifo(node.getVarDef(), fifoName));
-		int index = (Integer)portIndex.get(fifoName);
-		node.setFifoName(fifoName + "_" + Integer.toString(index));
-		portIndex.remove(fifoName);
-		portIndex.put(fifoName, new Integer(++index));
-		
-	}
-	
-	@Override
-	public void visit(PeekNode node, Object... args) {
-		node.setVar(castFifo(node.getVarDef(), node.getFifoName()));
 	}
 
+	private VarDef varDefCreate(AbstractType type) {
+		return new VarDef(false, false, 0, new Location(), "", null, null,
+				nodeCount++, type);
+	}
+
+	/**
+	 * Nodes visitor.
+	 * 
+	 */
 
 	@Override
-	public void visit(StoreNode node, Object... args) {
-		PointType type = (PointType)node.getTarget().getVarDef().getType();		
-		node.getValue().accept(this, type.getType());
+	public void visit(AssignVarNode node, Object... args) {
+		VarDef varDef = node.getVar();
+		IExpr expr = node.getValue();
+
+		// Change unary expression into binary expression
+		if (expr instanceof UnaryExpr) {
+			node.setValue(removeUnaryExpr((UnaryExpr) expr));
+		}
+
+		// Visit expr
+		node.getValue().accept(this, varDef.getType());
+
 	}
 
 	/**
@@ -365,7 +269,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	 * 
 	 */
 
-	public void visit(BinaryExpr expr, Object... args){
+	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
 		switch (op) {
 		case BAND:
@@ -380,171 +284,132 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 		case BXOR:
 			// recover the reference type from the current node
 			AbstractType refType = (AbstractType) args[0];
-			
+
 			expr.getE1().accept(this, args);
 			expr.getE2().accept(this, args);
 			expr.setType(refType);
-			return ;
-		
+			return;
+
 		case EQ:
 		case GE:
 		case GT:
 		case LE:
 		case LT:
 		case NE:
-			
-			if ((expr.getE1() instanceof VarExpr)){
-				VarExpr e1 = (VarExpr)expr.getE1();
-				expr.getE2().accept(this, e1.getVar().getVarDef().getType());	
-			} else if (expr.getE1() instanceof VarExpr){
-				VarExpr e2 = (VarExpr)expr.getE2();
-				expr.getE2().accept(this, e2.getVar().getVarDef().getType());	
+
+			if ((expr.getE1() instanceof VarExpr)) {
+				VarExpr e1 = (VarExpr) expr.getE1();
+				expr.getE2().accept(this, e1.getVar().getVarDef().getType());
+			} else if (expr.getE1() instanceof VarExpr) {
+				VarExpr e2 = (VarExpr) expr.getE2();
+				expr.getE2().accept(this, e2.getVar().getVarDef().getType());
 			}
-			return ;
-		
+			return;
+
 		case DIV:
 		case DIV_INT:
 		case MOD:
 		case EXP:
-		
+
 		default:
-			
+
 		}
 
 	}
 
-	
-	private AbstractLLVMNode castNodeCreate(VarDef var, VarDef targetVar){
-		
-		//Get source size and target size
-		int sourceSize = sizeOf(var.getType());
-		AbstractType targetType = targetVar.getType();
-		int targetSize = sizeOf(targetType);
-		
-		// Create target expr for bitcast
-		VarUse varUse = new VarUse(var, null);
-		VarExpr expr = new VarExpr(new Location(), varUse);
-		
-		//Select the type of cast (trunc if smaller, zext otherwise)
-		if (sourceSize<targetSize)
-		{
-			if (var.getType() instanceof UintType){
-				return new ZextNode(0, new Location(), targetVar, expr);
-			}else {
-				return new SextNode(0, new Location(), targetVar, expr);	
-			}
-		}else{
-			return new TruncNode(0, new Location(), targetVar, expr);
-		}
-	}
-	
-	private VarDef varDefCreate(AbstractType type){
-		
-		return new VarDef(false, false, 0, new Location(), "", null, null, nodeCount++, type);
-	}
-	
-	private int sizeOf(AbstractType type){
-		
-		if (type instanceof IntType)
-		{
-			return ((IntType)type).getSize();
-		}else if (type instanceof UintType)
-		{
-			return ((UintType)type).getSize();
-		} else if (type instanceof ListType){
-			return sizeOf(((ListType)type).getType());
-		} else if (type instanceof BoolType){
-			return 1;
-		} else {
-			throw new NullPointerException();
-		}
-		
-	}
-	
-	
-	public void visit(VarExpr expr, Object... args){
-		// recover the reference type from the current node
-		AbstractType refType = (AbstractType) args[0];
-		VarDef var = expr.getVar().getVarDef();
-		AbstractType varType = var.getType();
-		
-		if (!(refType.equals(varType))){
-			//Add cast node before the current expression
-			it.previous();
+	@Override
+	public void visit(BooleanExpr expr, Object... args) {
 
-			VarDef vardef = varDefCreate(refType);
-			it.add(castNodeCreate(var , vardef));
-			VarUse varUse = new VarUse(vardef, null);
-			expr.setVar(varUse);
-				
-			it.next();
-		}
 	}
 
 	@Override
 	public void visit(BrNode node, Object... args) {
-		
+
 		ListIterator<AbstractNode> tmpit = it;
 		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());				
-		it= tmpit;
-		for (PhiNode phiNode : node.getPhiNodes()){
+		visitNodes(node.getElseNodes());
+		it = tmpit;
+		for (PhiNode phiNode : node.getPhiNodes()) {
 			visit(phiNode, node);
 		}
 	}
 
-	
+	@Override
+	public void visit(CallNode node, Object... args) {
+		int tmpCnt = 0;
+
+		Procedure proc = node.getProcedure();
+		List<VarDef> procParams = proc.getParameters();
+		List<IExpr> parameters = node.getParameters();
+
+		for (IExpr parameter : parameters) {
+			VarDef procParam = procParams.get(tmpCnt);
+			parameter.accept(this, procParam.getType());
+
+			tmpCnt++;
+		}
+
+	}
+
 	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
-		//Set every index to i32 (mandatory in llvm)
-		for (AbstractExpr index : node.getIndexes()){
-			if (index instanceof VarExpr){
-				VarExpr indExpr =  (VarExpr)index;
+		// Set every index to i32 (mandatory in llvm)
+		for (IExpr index : node.getIndexes()) {
+			if (index instanceof VarExpr) {
+				VarExpr indExpr = (VarExpr) index;
 				VarUse indUse = indExpr.getVar();
 				VarDef indVar = indUse.getVarDef();
 				AbstractType indType = indVar.getType();
-				
-				if (indType instanceof IntType){
-					IntType type = (IntType)indType;
-					if (type.getSize() != 32){
-						
-						it.previous();
-						
-						VarDef vardef = varDefCreate(new IntType(32));
-						it.add(castNodeCreate(indVar, vardef));
-						
-						it.next();
-						
-						indUse.setVarDef(vardef);
-						
-						
-					}
-					
-				}
-				
 
+				if (indType instanceof IntType) {
+					IntType type = (IntType) indType;
+					try {
+						int size = Util.evaluateAsInteger(type.getSize());
+						if (size != 32) {
+							it.previous();
+
+							VarDef vardef = varDefCreate(new IntType(
+									new IntExpr(new Location(), 32)));
+							it.add(castNodeCreate(indVar, vardef));
+
+							it.next();
+
+							indUse.setVarDef(vardef);
+						}
+					} catch (ExprEvaluateException e) {
+						e.printStackTrace();
+					}
+				}
 			}
-			
 		}
 	}
 
-		
+	@Override
+	public void visit(IntExpr expr, Object... args) {
+
+	}
+
+	@Override
+	public void visit(ListExpr expr, Object... args) {
+
+	}
+
 	@Override
 	public void visit(LoadNode node, Object... args) {
 		VarDef sourceVar = node.getSource().getVarDef();
 		VarDef targetVar = node.getTarget();
-		
+
 		AbstractType targetType = targetVar.getType();
-		PointType sourceType = (PointType)sourceVar.getType();
+		PointType sourceType = (PointType) sourceVar.getType();
 		AbstractType type;
-		
-		if (sourceType.getType() instanceof ListType){
-			type = ((ListType)sourceType.getType()).getType();
-		}else{
+
+		if (sourceType.getType() instanceof ListType) {
+			type = ((ListType) sourceType.getType()).getType();
+		} else {
 			type = sourceType.getType();
 		}
-		
-		if (!(targetType.equals(type))){
+
+		if (!(targetType.equals(type))) {
 			VarDef castVar = new VarDef(sourceVar);
 			castVar.setName("");
 			castVar.setIndex(0);
@@ -556,51 +421,190 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements ExprV
 	}
 
 	@Override
-	public void visit(BooleanExpr expr, Object... args) {
-		
+	public void visit(PeekNode node, Object... args) {
+		node.setVar(castFifo(node.getVarDef(), node.getFifoName()));
 	}
 
 	@Override
-	public void visit(IntExpr expr, Object... args) {
-		
+	public void visit(PhiNode node, Object... args) {
+		BrNode brNode = (BrNode) args[0];
+
+		AbstractType varType = node.getType();
+		Map<VarDef, LabelNode> assignements = node.getAssignements();
+		Map<VarDef, LabelNode> tmpAssignements = new HashMap<VarDef, LabelNode>();
+
+		for (Map.Entry<VarDef, LabelNode> assignement : assignements.entrySet()) {
+			VarDef varKey = assignement.getKey();
+			LabelNode labelNode = assignement.getValue();
+
+			if (!(varType.equals(varKey.getType()))) {
+				VarDef castVar = varDefCreate(varType);
+				AbstractLLVMNode castNode = castNodeCreate(varKey, castVar);
+
+				// it.add(castNode);
+				// it.next();
+				/*
+				 * if
+				 * (labelNode.getLabelName().compareTo(brNode.getLabelTrueNode
+				 * ().getLabelName()) ==0 ){
+				 * brNode.getThenNodes().add(castNode); }else if
+				 * (labelNode.getLabelName
+				 * ().compareTo(brNode.getLabelFalseNode().getLabelName()) ==0
+				 * ){ brNode.getElseNodes().add(castNode); }else{
+				 * 
+				 * }
+				 */
+
+				varKey = castVar;
+			}
+			tmpAssignements.put(varKey, labelNode);
+		}
+		node.setAssignements(tmpAssignements);
 	}
 
 	@Override
-	public void visit(ListExpr expr, Object... args) {
-		
+	public void visit(ReadNode node, Object... args) {
+		String fifoName = node.getFifoName();
+
+		node.setVar(castFifo(node.getVarDef(), fifoName));
+		int index = (Integer) portIndex.get(fifoName);
+		node.setFifoName(fifoName + "_" + Integer.toString(index));
+		portIndex.remove(fifoName);
+		portIndex.put(fifoName, new Integer(++index));
+
+	}
+
+	@Override
+	public void visit(SelectNode node, Object... args) {
+		List<PhiAssignment> phis = node.getPhis();
+		for (PhiAssignment phi : phis) {
+			VarDef varDef = phi.getVarDef();
+			AbstractType typeRef = varDef.getType();
+			List<VarUse> varUses = phi.getVars();
+
+			for (VarUse varUse : varUses) {
+				AbstractType type = varUse.getVarDef().getType();
+
+				if (!(type.equals(typeRef))) {
+					it.previous();
+					VarDef castVar = varDefCreate(typeRef);
+					it.add(castNodeCreate(varUse.getVarDef(), castVar));
+					varUse.setVarDef(castVar);
+					it.next();
+				}
+
+			}
+
+		}
+	}
+
+	@Override
+	public void visit(StoreNode node, Object... args) {
+		PointType type = (PointType) node.getTarget().getVarDef().getType();
+		node.getValue().accept(this, type.getType());
 	}
 
 	@Override
 	public void visit(StringExpr expr, Object... args) {
-		
+
 	}
 
 	@Override
 	public void visit(TypeExpr expr, Object... args) {
-		
+
 	}
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		//Unary expression doesn't exists in LLVM
-		if (args[0] instanceof AssignVarNode){
-			AssignVarNode node = (AssignVarNode)args[0];
+		// Unary expression doesn't exists in LLVM
+		if (args[0] instanceof AssignVarNode) {
+			AssignVarNode node = (AssignVarNode) args[0];
 			Location loc = expr.getLocation();
 			AbstractType type = expr.getType();
-			AbstractExpr exprE1 = expr.getExpr();
+			IExpr exprE1 = expr.getExpr();
 			UnaryOp op = expr.getOp();
-			
-			
+
 			switch (op) {
 			case MINUS:
 				IntExpr constExpr = new IntExpr(new Location(), 0);
-				BinaryExpr varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS,
-						exprE1, type);
+				BinaryExpr varExpr = new BinaryExpr(loc, constExpr,
+						BinaryOp.MINUS, exprE1, type);
 				node.setValue(varExpr);
 				varExpr.accept(this, args);
 			default:
-				
+
 			}
+		}
+	}
+
+	public void visit(VarExpr expr, Object... args) {
+		// recover the reference type from the current node
+		AbstractType refType = (AbstractType) args[0];
+		VarDef var = expr.getVar().getVarDef();
+		AbstractType varType = var.getType();
+
+		if (!(refType.equals(varType))) {
+			// Add cast node before the current expression
+			it.previous();
+
+			VarDef vardef = varDefCreate(refType);
+			it.add(castNodeCreate(var, vardef));
+			VarUse varUse = new VarUse(vardef, null);
+			expr.setVar(varUse);
+
+			it.next();
+		}
+	}
+
+	@Override
+	public void visit(WriteNode node, Object... args) {
+		String fifoName = node.getFifoName();
+
+		node.setVarDef(castFifo(node.getVarDef(), fifoName));
+		int index = (Integer) portIndex.get(fifoName);
+		node.setFifoName(fifoName + "_" + Integer.toString(index));
+		portIndex.remove(fifoName);
+		portIndex.put(fifoName, new Integer(++index));
+
+	}
+
+	/**
+	 * Variable visitor.
+	 * 
+	 */
+
+	private void visitLocals(List<VarDef> locals) {
+		for (VarDef local : locals) {
+			if (portIndex.containsKey(local.getName())) {
+				// PointType newType = new PointType(local.getType());
+				PointType newType = new PointType(new IntType(new IntExpr(
+						new Location(), 32)));
+				local.setType(newType);
+			}
+		}
+	}
+
+	private void visitNodes(List<AbstractNode> nodes) {
+		it = nodes.listIterator();
+		while (it.hasNext()) {
+			it.next().accept(this);
+		}
+	}
+
+	private void visitProc(Procedure proc) {
+		nodeCount = 0;
+
+		visitLocals(proc.getLocals());
+		clearPorts();
+		visitNodes(proc.getNodes());
+	}
+
+	private void visitStateVars(List<StateVar> stateVars) {
+		for (StateVar stateVar : stateVars) {
+			VarDef vardef = stateVar.getDef();
+
+			PointType newType = new PointType(vardef.getType());
+			vardef.setType(newType);
 		}
 	}
 

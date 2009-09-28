@@ -26,66 +26,52 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
-
-import net.sf.orcc.ir.expr.IExpr;
+package net.sf.orcc.ir.expr;
 
 /**
  * @author Matthieu Wipliez
  * 
  */
-public class ListType extends AbstractType {
+public interface IExpr {
 
-	public static final String NAME = "List";
+	public static final int BINARY = 1;
 
-	private IExpr size;
+	public static final int BOOLEAN = 2;
 
-	private AbstractType type;
+	public static final int INT = 3;
 
-	public ListType(IExpr size, AbstractType type) {
-		super(NAME);
-		setSize(size);
-		setType(type);
-	}
+	public static final int LIST = 4;
 
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
+	public static final int STRING = 5;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof UintType) {
-			ListType list = (ListType) obj;
-			return (size == list.size && type.equals(list.type));
-		} else {
-			return false;
-		}
-	}
+	public static final int TYPE = 6;
 
-	public IExpr getSize() {
-		return size;
-	}
+	public static final int UNARY = 7;
 
-	public AbstractType getType() {
-		return type;
-	}
+	public static final int VAR = 8;
 
-	public void setSize(IExpr size) {
-		this.size = size;
-	}
+	/**
+	 * Accepts a visitor.
+	 * 
+	 * @param visitor
+	 * @param args
+	 */
+	public void accept(ExprVisitor visitor, Object... args);
 
-	public void setType(AbstractType type) {
-		if (type == null) {
-			throw new NullPointerException();
-		}
+	/**
+	 * Evaluates this expression.
+	 * 
+	 * @return an expression.
+	 * @throws ExprEvaluateException
+	 *             if the expression cannot be evaluated.
+	 */
+	public IExpr evaluate() throws ExprEvaluateException;
 
-		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return NAME + "(type:" + type + ", size=" + size + ")";
-	}
+	/**
+	 * Returns the type of this expression.
+	 * 
+	 * @return the type of this expression
+	 */
+	public int getExprType();
 
 }

@@ -34,7 +34,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.parser.IrParser;
 import net.sf.orcc.ir.parser.NetworkParseException;
 
@@ -54,10 +54,10 @@ public class Instance implements Comparable<Instance> {
 
 	private String id;
 
-	private Map<String, AbstractExpr> parameters;
+	private Map<String, IExpr> parameters;
 
 	public Instance(String path, String id, String clasz,
-			Map<String, AbstractExpr> parameters) {
+			Map<String, IExpr> parameters) {
 		this.clasz = clasz;
 		this.id = id;
 		this.parameters = parameters;
@@ -97,7 +97,7 @@ public class Instance implements Comparable<Instance> {
 		return id;
 	}
 
-	public Map<String, AbstractExpr> getParameters() {
+	public Map<String, IExpr> getParameters() {
 		return parameters;
 	}
 

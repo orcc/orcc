@@ -29,7 +29,7 @@
 package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * @author Matthieu Wipliez
@@ -37,9 +37,9 @@ import net.sf.orcc.ir.expr.AbstractExpr;
  */
 public class ReturnNode extends AbstractNode {
 
-	private AbstractExpr value;
+	private IExpr value;
 
-	public ReturnNode(int id, Location location, AbstractExpr expr) {
+	public ReturnNode(int id, Location location, IExpr expr) {
 		super(id, location);
 		this.value = expr;
 	}
@@ -49,11 +49,11 @@ public class ReturnNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public AbstractExpr getValue() {
+	public IExpr getValue() {
 		return value;
 	}
 
-	public void setValue(AbstractExpr value) {
+	public void setValue(IExpr value) {
 		this.value = value;
 	}
 

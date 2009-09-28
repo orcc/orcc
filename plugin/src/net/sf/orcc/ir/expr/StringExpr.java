@@ -48,6 +48,16 @@ public class StringExpr extends AbstractExpr {
 		visitor.visit(this, args);
 	}
 
+	@Override
+	public IExpr evaluate() throws ExprEvaluateException {
+		return this;
+	}
+
+	@Override
+	public int getExprType() {
+		return STRING;
+	}
+
 	public String getValue() {
 		return value;
 	}

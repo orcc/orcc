@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends.c;
 
+import net.sf.orcc.ir.expr.ExprEvaluateException;
+import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -47,15 +50,21 @@ public class TypeToString implements TypeVisitor {
 
 	protected StringBuilder builder;
 
-	protected void printInt(int size) {
-		if (size <= 8) {
-			builder.append("char");
-		} else if (size <= 16) {
-			builder.append("short");
-		} else if (size <= 32) {
-			builder.append("int");
-		} else if (size <= 64) {
-			builder.append("long long");
+	protected void printInt(IExpr expr) {
+		try {
+			int size = Util.evaluateAsInteger(expr);
+
+			if (size <= 8) {
+				builder.append("char");
+			} else if (size <= 16) {
+				builder.append("short");
+			} else if (size <= 32) {
+				builder.append("int");
+			} else if (size <= 64) {
+				builder.append("long long");
+			}
+		} catch (ExprEvaluateException e) {
+			e.printStackTrace();
 		}
 	}
 

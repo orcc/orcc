@@ -31,7 +31,7 @@ package net.sf.orcc.backends.llvm.nodes;
 import java.util.List;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.IfNode;
 
@@ -41,7 +41,7 @@ import net.sf.orcc.ir.nodes.IfNode;
  */
 public class BrNode extends AbstractLLVMNode {
 
-	private AbstractExpr condition;
+	private IExpr condition;
 
 	private List<AbstractNode> elseNodes;
 
@@ -73,7 +73,7 @@ public class BrNode extends AbstractLLVMNode {
 		this.phiNodes = phiNodes;
 	}
 
-	public BrNode(int id, Location location, AbstractExpr condition,
+	public BrNode(int id, Location location, IExpr condition,
 			List<AbstractNode> thenNodes, List<AbstractNode> elseNodes, List<PhiNode> phiNodes,
 			LabelNode labelEntryNode, LabelNode labelTrueNode, LabelNode labelFalseNode,
 			LabelNode labelEndNode) {
@@ -93,7 +93,7 @@ public class BrNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public AbstractExpr getCondition() {
+	public IExpr getCondition() {
 		return condition;
 	}
 
@@ -129,7 +129,7 @@ public class BrNode extends AbstractLLVMNode {
 		return thenNodes;
 	}
 
-	public void setCondition(AbstractExpr condition) {
+	public void setCondition(IExpr condition) {
 		this.condition = condition;
 	}
 	

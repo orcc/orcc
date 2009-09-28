@@ -37,16 +37,16 @@ import net.sf.orcc.ir.type.AbstractType;
  */
 public class BinaryExpr extends AbstractExpr {
 
-	private AbstractExpr e1;
+	private IExpr e1;
 
-	private AbstractExpr e2;
+	private IExpr e2;
 
 	private BinaryOp op;
 
 	private AbstractType type;
 
-	public BinaryExpr(Location location, AbstractExpr e1, BinaryOp op,
-			AbstractExpr e2, AbstractType type) {
+	public BinaryExpr(Location location, IExpr e1, BinaryOp op,
+			IExpr e2, AbstractType type) {
 		super(location);
 		this.e1 = e1;
 		this.e2 = e2;
@@ -59,12 +59,73 @@ public class BinaryExpr extends AbstractExpr {
 		visitor.visit(this, args);
 	}
 
-	public AbstractExpr getE1() {
+	@Override
+	public IExpr evaluate() throws ExprEvaluateException {
+		switch (op) {
+		case BAND:
+			IExpr expr1 = e1.evaluate();
+			IExpr expr2 = e2.evaluate();
+			if (expr1.getExprType() == IExpr.BOOLEAN
+					&& expr2.getExprType() == IExpr.BOOLEAN) {
+				boolean b1 = ((BooleanExpr) expr1).getValue();
+				boolean b2 = ((BooleanExpr) expr2).getValue();
+				return new BooleanExpr(getLocation(), b1 && b2);
+			}
+			break;
+		case BOR:
+			break;
+		case BXOR:
+			break;
+		case DIV:
+			break;
+		case DIV_INT:
+			break;
+		case EQ:
+			break;
+		case EXP:
+			break;
+		case GE:
+			break;
+		case GT:
+			break;
+		case LAND:
+			break;
+		case LE:
+			break;
+		case LOR:
+			break;
+		case LT:
+			break;
+		case MINUS:
+			break;
+		case MOD:
+			break;
+		case NE:
+			break;
+		case PLUS:
+			break;
+		case SHIFT_LEFT:
+			break;
+		case SHIFT_RIGHT:
+			break;
+		case TIMES:
+			break;
+		}
+
+		throw new ExprEvaluateException("could not evaluate");
+	}
+
+	public IExpr getE1() {
 		return e1;
 	}
 
-	public AbstractExpr getE2() {
+	public IExpr getE2() {
 		return e2;
+	}
+
+	@Override
+	public int getExprType() {
+		return BINARY;
 	}
 
 	public BinaryOp getOp() {
@@ -75,11 +136,11 @@ public class BinaryExpr extends AbstractExpr {
 		return type;
 	}
 
-	public void setE1(AbstractExpr e1) {
+	public void setE1(IExpr e1) {
 		this.e1 = e1;
 	}
 
-	public void setE2(AbstractExpr e2) {
+	public void setE2(IExpr e2) {
 		this.e2 = e2;
 	}
 

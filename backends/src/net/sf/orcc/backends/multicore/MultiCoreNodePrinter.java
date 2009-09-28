@@ -79,7 +79,7 @@ public class MultiCoreNodePrinter {
 	//
 	// @Override
 	// public void print(Object... args) {
-	// ((AbstractExpr) args[0]).accept(exprPrinter, 0);
+	// ((IExpr) args[0]).accept(exprPrinter, 0);
 	// }
 	//
 	// });
@@ -158,9 +158,9 @@ public class MultiCoreNodePrinter {
 	// pp.print(" = ");
 	//
 	// varDefPrinter.printVarDefName(node.getSource().getVarDef());
-	// List<AbstractExpr> indexes = node.getIndexes();
+	// List<IExpr> indexes = node.getIndexes();
 	// if (!indexes.isEmpty()) {
-	// for (AbstractExpr expr : indexes) {
+	// for (IExpr expr : indexes) {
 	// pp.print("[");
 	// expr.accept(exprPrinter, 0);
 	// pp.print("]");
@@ -226,9 +226,9 @@ public class MultiCoreNodePrinter {
 	// pp.println();
 	//
 	// varDefPrinter.printVarDefName(node.getTarget().getVarDef());
-	// List<AbstractExpr> indexes = node.getIndexes();
+	// List<IExpr> indexes = node.getIndexes();
 	// if (!indexes.isEmpty()) {
-	// for (AbstractExpr expr : indexes) {
+	// for (IExpr expr : indexes) {
 	// pp.print("[");
 	// expr.accept(exprPrinter, 0);
 	// pp.print("]");

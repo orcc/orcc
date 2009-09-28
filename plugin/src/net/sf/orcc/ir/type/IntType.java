@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.expr.IExpr;
+
 /**
  * @author Matthieu Wipliez
  * 
@@ -36,9 +38,9 @@ public class IntType extends AbstractType {
 
 	public static final String NAME = "int";
 
-	protected int size;
+	private IExpr size;
 
-	public IntType(int size) {
+	public IntType(IExpr size) {
 		super(NAME);
 		setSize(size);
 	}
@@ -57,11 +59,11 @@ public class IntType extends AbstractType {
 		}
 	}
 
-	public int getSize() {
+	public IExpr getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
+	public void setSize(IExpr size) {
 		this.size = size;
 	}
 

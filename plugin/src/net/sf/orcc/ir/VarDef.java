@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.AbstractType;
 
@@ -52,7 +52,7 @@ public class VarDef implements Comparable<VarDef> {
 	 */
 	private boolean constant;
 
-	private AbstractExpr constantExpr;
+	private IExpr constantExpr;
 
 	/**
 	 * if the variable is global.
@@ -143,7 +143,7 @@ public class VarDef implements Comparable<VarDef> {
 		return false;
 	}
 
-	public AbstractExpr getConstant() {
+	public IExpr getConstant() {
 		return constantExpr;
 	}
 	
@@ -214,7 +214,7 @@ public class VarDef implements Comparable<VarDef> {
 		this.assignable = assignable;
 	}
 
-	public void setConstant(AbstractExpr expr) {
+	public void setConstant(IExpr expr) {
 		constantExpr = expr;
 		constant = true;
 	}

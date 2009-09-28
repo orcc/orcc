@@ -33,7 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * @author Matthieu Wipliez
@@ -41,14 +41,14 @@ import net.sf.orcc.ir.expr.AbstractExpr;
  */
 public class LoadNode extends AbstractNode {
 
-	private List<AbstractExpr> indexes;
+	private List<IExpr> indexes;
 
 	private VarUse source;
 
 	private VarDef target;
 
 	public LoadNode(int id, Location location, VarDef target, VarUse source,
-			List<AbstractExpr> indexes) {
+			List<IExpr> indexes) {
 		super(id, location);
 		this.indexes = indexes;
 		this.source = source;
@@ -60,7 +60,7 @@ public class LoadNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public List<AbstractExpr> getIndexes() {
+	public List<IExpr> getIndexes() {
 		return indexes;
 	}
 
@@ -72,7 +72,7 @@ public class LoadNode extends AbstractNode {
 		return target;
 	}
 
-	public void setIndexes(List<AbstractExpr> indexes) {
+	public void setIndexes(List<IExpr> indexes) {
 		this.indexes = indexes;
 	}
 

@@ -48,6 +48,16 @@ public class IntExpr extends AbstractExpr {
 		visitor.visit(this, args);
 	}
 
+	@Override
+	public IExpr evaluate() throws ExprEvaluateException {
+		return this;
+	}
+
+	@Override
+	public int getExprType() {
+		return INT;
+	}
+
 	public int getValue() {
 		return value;
 	}

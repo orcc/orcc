@@ -49,6 +49,16 @@ public class TypeExpr extends AbstractExpr {
 		visitor.visit(this, args);
 	}
 
+	@Override
+	public IExpr evaluate() throws ExprEvaluateException {
+		return this;
+	}
+
+	@Override
+	public int getExprType() {
+		return TYPE;
+	}
+
 	public AbstractType getType() {
 		return type;
 	}

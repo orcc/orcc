@@ -40,6 +40,9 @@ import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.ir.consts.AbstractConst;
+import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.type.AbstractType;
@@ -136,7 +139,7 @@ public class RVCCalASTParser {
 				null, null, null, null, null);
 	}
 
-	private void parseActorDecls(Tree actorDecls) {
+	private void parseActorDecls(Tree actorDecls) throws RVCCalParseException {
 		stateVars = new ArrayList<StateVar>();
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
@@ -148,9 +151,9 @@ public class RVCCalASTParser {
 		}
 	}
 
-	private int parseExpression(Tree expr) {
+	private IExpr parseExpression(Tree expr) {
 		// TODO parse expression
-		return 0;
+		return null;
 	}
 
 	/**
@@ -168,9 +171,15 @@ public class RVCCalASTParser {
 		return new Location(file, lineNumber, startColumn, 0, endColumn);
 	}
 
-	private StateVar parseStateVar(Tree stateVar) {
-		// TODO parse state variable
-		return null;
+	private StateVar parseStateVar(Tree stateVar) throws RVCCalParseException {
+		boolean assignable = stateVar.getChild(2).getText()
+				.equals("ASSIGNABLE");
+		VarDef def = parseVarDef(stateVar, assignable, true, 0, null);
+		AbstractConst init = null;
+		if (stateVar.getChildCount() == 4) {
+		}
+
+		return new StateVar(def, init);
 	}
 
 	/**
@@ -193,13 +202,14 @@ public class RVCCalASTParser {
 		} else if (typeName.equals(VoidType.NAME)) {
 			type = new VoidType();
 		} else if (typeName.equals(IntType.NAME)) {
-			int size = parseTypeAttributeSize(location, tree.getChild(1), 32);
+			IExpr size = parseTypeAttributeSize(location, tree.getChild(1), 32);
 			type = new IntType(size);
 		} else if (typeName.equals(UintType.NAME)) {
-			int size = parseTypeAttributeSize(location, tree.getChild(1), 32);
+			IExpr size = parseTypeAttributeSize(location, tree.getChild(1), 32);
 			type = new UintType(size);
 		} else if (typeName.equals(ListType.NAME)) {
-			int size = parseTypeAttributeSize(location, tree.getChild(1), null);
+			IExpr size = parseTypeAttributeSize(location, tree.getChild(1),
+					null);
 			AbstractType subType = parseTypeAttributeType(location, tree
 					.getChild(1));
 			type = new ListType(size, subType);
@@ -211,8 +221,8 @@ public class RVCCalASTParser {
 		return type;
 	}
 
-	private int parseTypeAttributeSize(Location location, Tree typeAttrs,
-			Integer defaultSize) throws RVCCalParseException {
+	private IExpr parseTypeAttributeSize(Location location,
+			Tree typeAttrs, Integer defaultSize) throws RVCCalParseException {
 		int n = typeAttrs.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
@@ -227,7 +237,7 @@ public class RVCCalASTParser {
 			throw new RVCCalParseException(location,
 					"missing \"size\" attribute");
 		} else {
-			return defaultSize;
+			return new IntExpr(location, defaultSize);
 		}
 	}
 
@@ -261,10 +271,7 @@ public class RVCCalASTParser {
 		Tree nameTree = tree.getChild(1);
 		String name = nameTree.getText();
 
-		int lineNumber = nameTree.getLine();
-		int startColumn = nameTree.getCharPositionInLine();
-		int endColumn = startColumn + name.length();
-		Location loc = new Location(file, lineNumber, startColumn, 0, endColumn);
+		Location loc = parseLocation(nameTree);
 
 		List<VarUse> references = new ArrayList<VarUse>();
 		AbstractNode node = new EmptyNode(0, new Location());

@@ -37,7 +37,7 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
@@ -96,7 +96,7 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 	@SuppressWarnings("unchecked")
 	public void visit(AssignVarNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
-		AbstractExpr value = node.getValue();
+		IExpr value = node.getValue();
 		
 		if (value instanceof BinaryExpr){
 			BinaryExpr expr = (BinaryExpr)value;

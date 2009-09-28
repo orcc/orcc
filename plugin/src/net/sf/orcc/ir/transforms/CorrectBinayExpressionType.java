@@ -34,9 +34,11 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.ExprEvaluateException;
+import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
@@ -45,7 +47,6 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
-
 
 /**
  * Split expression and effective node.
@@ -56,7 +57,6 @@ import net.sf.orcc.ir.type.IntType;
 public class CorrectBinayExpressionType extends AbstractNodeVisitor {
 
 	public CorrectBinayExpressionType(Actor actor) {
-	
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -72,75 +72,74 @@ public class CorrectBinayExpressionType extends AbstractNodeVisitor {
 		}
 	}
 
-	@Override
-	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
+	public AbstractType checkType(BinaryExpr expr, Object... args) {
+		AbstractType type;
+
+		if ((expr.getOp() == BinaryOp.EQ) || (expr.getOp() == BinaryOp.GE)
+				|| (expr.getOp() == BinaryOp.GT)
+				|| (expr.getOp() == BinaryOp.LE)
+				|| (expr.getOp() == BinaryOp.LT)
+				|| (expr.getOp() == BinaryOp.NE)) {
+			type = new BoolType();
+		} else if ((expr.getE1() instanceof VarExpr)
+				&& (expr.getE2() instanceof VarExpr)) {
+			AbstractType typeE1 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+					.getType();
+			AbstractType typeE2 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+					.getType();
+
+			if (sizeOf(typeE1) > sizeOf(typeE2)) {
+				type = typeE1;
+			} else {
+				type = typeE2;
+			}
+
+		} else if (expr.getE1() instanceof VarExpr) {
+			type = ((VarExpr) expr.getE1()).getVar().getVarDef().getType();
+		} else if (expr.getE2() instanceof VarExpr) {
+			type = ((VarExpr) expr.getE2()).getVar().getVarDef().getType();
+		} else {
+			type = expr.getType();
+		}
+
+		return type;
 	}
-	
+
+	private int sizeOf(AbstractType type) {
+		int size = 0;
+
+		if (type instanceof IntType) {
+			try {
+				return Util.evaluateAsInteger(((IntType) type).getSize());
+			} catch (ExprEvaluateException e) {
+				e.printStackTrace();
+				return 32;
+			}
+		} else if (type instanceof BoolType) {
+			size = 1;
+		}
+
+		return size;
+	}
+
 	@Override
 	public void visit(AssignVarNode node, Object... args) {
-		AbstractExpr value = node.getValue();
-		
-		if (value instanceof BinaryExpr){
-			BinaryExpr expr = (BinaryExpr)value;
+		IExpr value = node.getValue();
+
+		if (value instanceof BinaryExpr) {
+			BinaryExpr expr = (BinaryExpr) value;
 			AbstractType type = checkType(expr);
 			expr.setType(type);
 			node.getVar().setType(type);
 		}
 	}
-	
 
-	
-	public AbstractType checkType(BinaryExpr expr, Object... args){
-		AbstractType type;
-		
-		if ((expr.getOp() == BinaryOp.EQ) ||
-			(expr.getOp() == BinaryOp.GE) ||
-			(expr.getOp() == BinaryOp.GT) || 
-			(expr.getOp() == BinaryOp.LE) ||
-			(expr.getOp() == BinaryOp.LT) ||
-			(expr.getOp() == BinaryOp.NE))
-		{
-			type = new BoolType();
-		}else if ((expr.getE1() instanceof VarExpr) && (expr.getE2() instanceof VarExpr)){
-			AbstractType typeE1 = ((VarExpr)expr.getE1()).getVar().getVarDef().getType();
-			AbstractType typeE2 = ((VarExpr)expr.getE1()).getVar().getVarDef().getType();
-			
-			if (sizeOf(typeE1)> sizeOf(typeE2)){
-				type = typeE1;
-			}else{
-				type = typeE2;
-			}
-			
-		}
-		else if (expr.getE1() instanceof VarExpr){
-			type = ((VarExpr)expr.getE1()).getVar().getVarDef().getType();
-		} else if (expr.getE2() instanceof VarExpr){
-			type = ((VarExpr)expr.getE2()).getVar().getVarDef().getType();
-		}else {
-			type = expr.getType();
-		}
-		
-		
-		return type;
-	}
-	
-	private int sizeOf(AbstractType type){
-		int size=0;
-		
-		if (type instanceof IntType)
-		{
-			size = ((IntType)type).getSize();
-		} else if (type instanceof BoolType){
-			size = 1;
-		}			
-		
-		return size;
+	@Override
+	public void visit(IfNode node, Object... args) {
+		visitNodes(node.getThenNodes());
+		visitNodes(node.getElseNodes());
 	}
 
-
-	
 	private void visitNodes(List<AbstractNode> nodes) {
 		ListIterator<AbstractNode> it = nodes.listIterator();
 
@@ -150,7 +149,6 @@ public class CorrectBinayExpressionType extends AbstractNodeVisitor {
 	}
 
 	private void visitProc(Procedure proc) {
-
 		List<AbstractNode> nodes = proc.getNodes();
 		visitNodes(nodes);
 	}

@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.java;
 
 import net.sf.orcc.backends.c.TypeToString;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.TypeVisitor;
@@ -42,7 +43,7 @@ import net.sf.orcc.ir.type.UintType;
  */
 public class JavaTypePrinter extends TypeToString implements TypeVisitor {
 
-	protected void printInt(int size) {
+	protected void printInt(IExpr expr) {
 		builder.append("int");
 	}
 
@@ -58,8 +59,8 @@ public class JavaTypePrinter extends TypeToString implements TypeVisitor {
 
 	@Override
 	public void visit(UintType type) {
-		// no unsigned in Java
-		printInt(type.getSize());
+		// no unsigned in Java, and size is not taken in consideration anyway
+		printInt(null);
 	}
 
 }

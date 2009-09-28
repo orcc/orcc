@@ -48,6 +48,16 @@ public class BooleanExpr extends AbstractExpr {
 		visitor.visit(this, args);
 	}
 
+	@Override
+	public IExpr evaluate() throws ExprEvaluateException {
+		return this;
+	}
+
+	@Override
+	public int getExprType() {
+		return BOOLEAN;
+	}
+
 	public boolean getValue() {
 		return value;
 	}

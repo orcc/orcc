@@ -38,9 +38,9 @@ import net.sf.orcc.ir.Location;
  */
 public class ListExpr extends AbstractExpr {
 
-	private List<AbstractExpr> value;
+	private List<IExpr> value;
 
-	public ListExpr(Location location, List<AbstractExpr> value) {
+	public ListExpr(Location location, List<IExpr> value) {
 		super(location);
 		this.value = value;
 	}
@@ -50,7 +50,17 @@ public class ListExpr extends AbstractExpr {
 		visitor.visit(this, args);
 	}
 
-	public List<AbstractExpr> getValue() {
+	@Override
+	public IExpr evaluate() throws ExprEvaluateException {
+		throw new ExprEvaluateException("could not evaluate");
+	}
+
+	@Override
+	public int getExprType() {
+		return LIST;
+	}
+
+	public List<IExpr> getValue() {
 		return value;
 	}
 

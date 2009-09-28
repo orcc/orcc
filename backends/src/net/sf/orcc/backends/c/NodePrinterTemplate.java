@@ -35,7 +35,7 @@ import net.sf.orcc.backends.c.nodes.DecrementNode;
 import net.sf.orcc.backends.c.nodes.IncrementNode;
 import net.sf.orcc.backends.c.nodes.SelfAssignment;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
@@ -106,7 +106,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		}
 
 		nodeTmpl.setAttribute("name", node.getProcedure().getName());
-		for (AbstractExpr parameter : node.getParameters()) {
+		for (IExpr parameter : node.getParameters()) {
 			nodeTmpl
 					.setAttribute("parameters", exprPrinter.toString(parameter));
 		}
@@ -146,7 +146,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	public void visit(IfNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("ifNode");
 
-		AbstractExpr expr = node.getCondition();
+		IExpr expr = node.getCondition();
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(expr));
 
 		// save current template
@@ -197,8 +197,8 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		varDef = node.getSource().getVarDef();
 		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef));
 
-		List<AbstractExpr> indexes = node.getIndexes();
-		for (AbstractExpr index : indexes) {
+		List<IExpr> indexes = node.getIndexes();
+		for (IExpr index : indexes) {
 			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index));
 		}
 
@@ -259,8 +259,8 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		VarDef varDef = node.getTarget().getVarDef();
 		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef));
 
-		List<AbstractExpr> indexes = node.getIndexes();
-		for (AbstractExpr index : indexes) {
+		List<IExpr> indexes = node.getIndexes();
+		for (IExpr index : indexes) {
 			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index));
 		}
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue()));
@@ -271,7 +271,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	@Override
 	public void visit(WhileNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("whileNode");
-		AbstractExpr expr = node.getCondition();
+		IExpr expr = node.getCondition();
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(expr));
 
 		// save current template

@@ -38,7 +38,7 @@ import java.util.Set;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -160,7 +160,7 @@ public class NetworkParser {
 		}
 	}
 
-	private AbstractExpr parseExpr(Node node) {
+	private IExpr parseExpr(Node node) {
 		while (node != null) {
 			if (node.getNodeName().equals("Expr")) {
 				Element elt = (Element) node;
@@ -181,7 +181,7 @@ public class NetworkParser {
 								+ "literal kind: \"" + kind + "\"");
 					}
 				} else if (kind.equals("List")) {
-					List<AbstractExpr> exprs = parseExprs(node.getFirstChild());
+					List<IExpr> exprs = parseExprs(node.getFirstChild());
 					return new ListExpr(new Location(), exprs);
 				} else {
 					throw new NetworkParseException("Unsupported Expr kind: \""
@@ -195,8 +195,8 @@ public class NetworkParser {
 		throw new NetworkParseException("Expected a Expr element");
 	}
 
-	private List<AbstractExpr> parseExprs(Node node) {
-		List<AbstractExpr> exprs = new ArrayList<AbstractExpr>();
+	private List<IExpr> parseExprs(Node node) {
+		List<IExpr> exprs = new ArrayList<IExpr>();
 		while (node != null) {
 			if (node.getNodeName().equals("Expr")) {
 				exprs.add(parseExpr(node));
@@ -250,7 +250,7 @@ public class NetworkParser {
 		}
 
 		// instance parameters
-		Map<String, AbstractExpr> parameters = parseParameters(child);
+		Map<String, IExpr> parameters = parseParameters(child);
 
 		return new Instance(path, id, clasz, parameters);
 	}
@@ -297,8 +297,8 @@ public class NetworkParser {
 		return parseXDF(builder.parse(input));
 	}
 
-	private Map<String, AbstractExpr> parseParameters(Node node) {
-		Map<String, AbstractExpr> parameters = new HashMap<String, AbstractExpr>();
+	private Map<String, IExpr> parseParameters(Node node) {
+		Map<String, IExpr> parameters = new HashMap<String, IExpr>();
 		while (node != null) {
 			if (node.getNodeName().equals("Parameter")) {
 				String name = ((Element) node).getAttribute("name");
@@ -307,7 +307,7 @@ public class NetworkParser {
 							+ "must have a valid \"name\" attribute");
 				}
 
-				AbstractExpr expr = parseExpr(node.getFirstChild());
+				IExpr expr = parseExpr(node.getFirstChild());
 				parameters.put(name, expr);
 			}
 
@@ -323,7 +323,7 @@ public class NetworkParser {
 				Element attribute = (Element) node;
 				if (attribute.getAttribute("kind").equals("Value")
 						&& attribute.getAttribute("name").equals("bufferSize")) {
-					AbstractExpr expr = parseExpr(attribute.getFirstChild());
+					IExpr expr = parseExpr(attribute.getFirstChild());
 					if (expr instanceof IntExpr) {
 						return ((IntExpr) expr).getValue();
 					} else {

@@ -30,7 +30,7 @@ package net.sf.orcc.backends.llvm.nodes;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * @author Jérôme GORIN
@@ -38,11 +38,11 @@ import net.sf.orcc.ir.expr.AbstractExpr;
  */
 public class ZextNode extends AbstractLLVMNode {
 
-	private AbstractExpr value;
+	private IExpr value;
 
 	private VarDef var;
 
-	public ZextNode(int id, Location location, VarDef var, AbstractExpr value) {
+	public ZextNode(int id, Location location, VarDef var, IExpr value) {
 		super(id, location);
 		this.var = var;
 		this.value = value;
@@ -53,7 +53,7 @@ public class ZextNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public AbstractExpr getValue() {
+	public IExpr getValue() {
 		return value;
 	}
 
@@ -61,7 +61,7 @@ public class ZextNode extends AbstractLLVMNode {
 		return var;
 	}
 
-	public void setTarget(AbstractExpr value) {
+	public void setTarget(IExpr value) {
 		this.value = value;
 	}
 

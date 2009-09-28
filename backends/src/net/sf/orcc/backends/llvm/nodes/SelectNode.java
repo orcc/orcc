@@ -31,7 +31,7 @@ package net.sf.orcc.backends.llvm.nodes;
 import java.util.List;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 
 /**
@@ -40,11 +40,11 @@ import net.sf.orcc.ir.nodes.PhiAssignment;
  */
 public class SelectNode extends AbstractLLVMNode {
 
-	private AbstractExpr condition;
+	private IExpr condition;
 
 	private List<PhiAssignment> phis;
 
-	public SelectNode(int id, Location location, AbstractExpr condition,
+	public SelectNode(int id, Location location, IExpr condition,
 			List<PhiAssignment> phis) {
 		super(id, location);
 		this.condition = condition;
@@ -56,7 +56,7 @@ public class SelectNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public AbstractExpr getCondition() {
+	public IExpr getCondition() {
 		return condition;
 	}
 

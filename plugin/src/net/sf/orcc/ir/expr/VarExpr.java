@@ -49,6 +49,16 @@ public class VarExpr extends AbstractExpr {
 		visitor.visit(this, args);
 	}
 
+	@Override
+	public IExpr evaluate() throws ExprEvaluateException {
+		throw new ExprEvaluateException("could not evaluate");
+	}
+
+	@Override
+	public int getExprType() {
+		return VAR;
+	}
+
 	public VarUse getVar() {
 		return varUse;
 	}

@@ -31,7 +31,7 @@ package net.sf.orcc.ir.nodes;
 import java.util.List;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * @author Matthieu Wipliez
@@ -39,13 +39,13 @@ import net.sf.orcc.ir.expr.AbstractExpr;
  */
 public class WhileNode extends AbstractNode {
 
-	private AbstractExpr condition;
+	private IExpr condition;
 
 	private JoinNode joinNode;
 
 	private List<AbstractNode> nodes;
 
-	public WhileNode(int id, Location location, AbstractExpr condition,
+	public WhileNode(int id, Location location, IExpr condition,
 			List<AbstractNode> nodes, JoinNode joinNode) {
 		super(id, location);
 		this.condition = condition;
@@ -58,7 +58,7 @@ public class WhileNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public AbstractExpr getCondition() {
+	public IExpr getCondition() {
 		return condition;
 	}
 
@@ -70,7 +70,7 @@ public class WhileNode extends AbstractNode {
 		return nodes;
 	}
 
-	public void setCondition(AbstractExpr condition) {
+	public void setCondition(IExpr condition) {
 		this.condition = condition;
 	}
 

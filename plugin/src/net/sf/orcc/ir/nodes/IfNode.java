@@ -31,7 +31,7 @@ package net.sf.orcc.ir.nodes;
 import java.util.List;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * @author Matthieu Wipliez
@@ -39,7 +39,7 @@ import net.sf.orcc.ir.expr.AbstractExpr;
  */
 public class IfNode extends AbstractNode {
 
-	private AbstractExpr condition;
+	private IExpr condition;
 
 	private List<AbstractNode> elseNodes;
 
@@ -47,7 +47,7 @@ public class IfNode extends AbstractNode {
 
 	private List<AbstractNode> thenNodes;
 
-	public IfNode(int id, Location location, AbstractExpr condition,
+	public IfNode(int id, Location location, IExpr condition,
 			List<AbstractNode> thenNodes, List<AbstractNode> elseNodes,
 			JoinNode joinNode) {
 		super(id, location);
@@ -62,7 +62,7 @@ public class IfNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public AbstractExpr getCondition() {
+	public IExpr getCondition() {
 		return condition;
 	}
 
@@ -78,7 +78,7 @@ public class IfNode extends AbstractNode {
 		return thenNodes;
 	}
 
-	public void setCondition(AbstractExpr condition) {
+	public void setCondition(IExpr condition) {
 		this.condition = condition;
 	}
 

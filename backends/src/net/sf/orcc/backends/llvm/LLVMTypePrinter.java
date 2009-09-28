@@ -30,6 +30,9 @@ package net.sf.orcc.backends.llvm;
 
 import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 import net.sf.orcc.backends.llvm.type.PointType;
+import net.sf.orcc.ir.expr.ExprEvaluateException;
+import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -44,12 +47,17 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMTypePrinter implements LLVMTypeVisitor  {
+public class LLVMTypePrinter implements LLVMTypeVisitor {
 
 	private StringBuilder builder;
 
-	private void printInt(int size) {
-		builder.append("i"+Integer.toString(size));
+	private void printInt(IExpr expr) {
+		try {
+			int size = Util.evaluateAsInteger(expr);
+			builder.append(size);
+		} catch (ExprEvaluateException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -67,13 +75,23 @@ public class LLVMTypePrinter implements LLVMTypeVisitor  {
 
 	@Override
 	public void visit(BoolType type) {
-		// boolean is a C int.
+		// boolean is a 1-bit integer.
 		builder.append("i1");
 	}
 
 	@Override
 	public void visit(IntType type) {
+		builder.append('i');
 		printInt(type.getSize());
+	}
+
+	@Override
+	public void visit(ListType type) {
+		builder.append("[ ");
+		printInt(type.getSize());
+		builder.append(" x ");
+		type.getType().accept(this);
+		builder.append(" ]");
 	}
 
 	@Override
@@ -83,19 +101,13 @@ public class LLVMTypePrinter implements LLVMTypeVisitor  {
 	}
 
 	@Override
-	public void visit(ListType type) {
-		builder.append("[ "+type.getSize()+" x ");
-		type.getType().accept(this);
-		builder.append(" ]");
-	}
-
-	@Override
 	public void visit(StringType type) {
 		builder.append("u8 *");
 	}
 
 	@Override
 	public void visit(UintType type) {
+		builder.append('i');
 		printInt(type.getSize());
 	}
 

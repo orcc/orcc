@@ -52,7 +52,7 @@ import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -334,15 +334,15 @@ public class IrParser {
 	private AssignVarNode parseAssignVarNode(int id, Location loc,
 			JSONArray array) throws JSONException {
 		VarDef var = getVarDef(array.getJSONArray(0));
-		AbstractExpr value = parseExpr(array.getJSONArray(1));
+		IExpr value = parseExpr(array.getJSONArray(1));
 		return new AssignVarNode(id, loc, var, value);
 	}
 
 	private BinaryExpr parseBinaryExpr(Location location, JSONArray array)
 			throws JSONException {
 		String name = array.getString(0);
-		AbstractExpr e1 = parseExpr(array.getJSONArray(1));
-		AbstractExpr e2 = parseExpr(array.getJSONArray(2));
+		IExpr e1 = parseExpr(array.getJSONArray(1));
+		IExpr e2 = parseExpr(array.getJSONArray(2));
 		AbstractType type = parseType(array.get(3));
 		BinaryOp op = null;
 
@@ -401,7 +401,7 @@ public class IrParser {
 			res = getVarDef(array.getJSONArray(1));
 		}
 
-		List<AbstractExpr> parameters = parseExprs(array.getJSONArray(2));
+		List<IExpr> parameters = parseExprs(array.getJSONArray(2));
 		return new CallNode(id, loc, res, procs.get(procName), parameters);
 	}
 
@@ -441,10 +441,10 @@ public class IrParser {
 		return new EmptyNode(nodeId, location);
 	}
 
-	private AbstractExpr parseExpr(JSONArray array) throws JSONException {
+	private IExpr parseExpr(JSONArray array) throws JSONException {
 		Location location = parseLocation(array.getJSONArray(0));
 		Object obj = array.get(1);
-		AbstractExpr expr = null;
+		IExpr expr = null;
 
 		if (obj instanceof Boolean) {
 			expr = new BooleanExpr(location, (Boolean) obj);
@@ -472,8 +472,8 @@ public class IrParser {
 		return expr;
 	}
 
-	private List<AbstractExpr> parseExprs(JSONArray array) throws JSONException {
-		List<AbstractExpr> exprs = new ArrayList<AbstractExpr>();
+	private List<IExpr> parseExprs(JSONArray array) throws JSONException {
+		List<IExpr> exprs = new ArrayList<IExpr>();
 		for (int i = 0; i < array.length(); i++) {
 			exprs.add(parseExpr(array.getJSONArray(i)));
 		}
@@ -533,7 +533,7 @@ public class IrParser {
 
 	private IfNode parseIfNode(int id, Location loc, JSONArray array)
 			throws JSONException {
-		AbstractExpr condition = parseExpr(array.getJSONArray(0));
+		IExpr condition = parseExpr(array.getJSONArray(0));
 		List<AbstractNode> thenNodes = parseNodes(array.getJSONArray(1));
 		List<AbstractNode> elseNodes = parseNodes(array.getJSONArray(2));
 
@@ -553,7 +553,7 @@ public class IrParser {
 			throws JSONException {
 		VarDef target = getVarDef(array.getJSONArray(0));
 		VarUse source = parseVarUse(array.getJSONArray(1));
-		List<AbstractExpr> indexes = parseExprs(array.getJSONArray(2));
+		List<IExpr> indexes = parseExprs(array.getJSONArray(2));
 
 		return new LoadNode(id, loc, target, source, indexes);
 	}
@@ -741,7 +741,7 @@ public class IrParser {
 
 	private ReturnNode parseReturnNode(int id, Location loc, JSONArray array)
 			throws JSONException {
-		AbstractExpr expr = parseExpr(array);
+		IExpr expr = parseExpr(array);
 		return new ReturnNode(id, loc, expr);
 	}
 
@@ -775,8 +775,8 @@ public class IrParser {
 	private StoreNode parseStoreNode(int id, Location loc, JSONArray array)
 			throws JSONException {
 		VarUse target = parseVarUse(array.getJSONArray(0));
-		List<AbstractExpr> indexes = parseExprs(array.getJSONArray(1));
-		AbstractExpr value = parseExpr(array.getJSONArray(2));
+		List<IExpr> indexes = parseExprs(array.getJSONArray(1));
+		IExpr value = parseExpr(array.getJSONArray(2));
 
 		return new StoreNode(id, loc, target, indexes, value);
 	}
@@ -810,14 +810,17 @@ public class IrParser {
 			String name = array.getString(0);
 			if (name.equals(IntType.NAME)) {
 				int size = array.getInt(1);
-				type = new IntType(size);
+				IExpr expr = new IntExpr(new Location(), size);
+				type = new IntType(expr);
 			} else if (name.equals(UintType.NAME)) {
 				int size = array.getInt(1);
-				type = new UintType(size);
+				IExpr expr = new IntExpr(new Location(), size);
+				type = new UintType(expr);
 			} else if (name.equals(ListType.NAME)) {
 				int size = array.getInt(1);
+				IExpr expr = new IntExpr(new Location(), size);
 				AbstractType subType = parseType(array.get(2));
-				type = new ListType(size, subType);
+				type = new ListType(expr, subType);
 			} else {
 				throw new IrParseException("Unknown type: " + name);
 			}
@@ -832,7 +835,7 @@ public class IrParser {
 	private UnaryExpr parseUnaryExpr(Location location, JSONArray array)
 			throws JSONException {
 		String name = array.getString(0);
-		AbstractExpr expr = parseExpr(array.getJSONArray(1));
+		IExpr expr = parseExpr(array.getJSONArray(1));
 		AbstractType type = parseType(array.get(2));
 		UnaryOp op = null;
 
@@ -909,7 +912,7 @@ public class IrParser {
 
 	private WhileNode parseWhileNode(int id, Location loc, JSONArray array)
 			throws JSONException {
-		AbstractExpr condition = parseExpr(array.getJSONArray(0));
+		IExpr condition = parseExpr(array.getJSONArray(0));
 		List<AbstractNode> nodes = parseNodes(array.getJSONArray(1));
 		JoinNode joinNode = (JoinNode) nodes.remove(0);
 		return new WhileNode(id, loc, condition, nodes, joinNode);

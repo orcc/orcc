@@ -32,7 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * @author Matthieu Wipliez
@@ -40,14 +40,14 @@ import net.sf.orcc.ir.expr.AbstractExpr;
  */
 public class StoreNode extends AbstractNode {
 
-	private List<AbstractExpr> indexes;
+	private List<IExpr> indexes;
 
 	private VarUse target;
 
-	private AbstractExpr value;
+	private IExpr value;
 
 	public StoreNode(int id, Location location, VarUse target,
-			List<AbstractExpr> indexes, AbstractExpr value) {
+			List<IExpr> indexes, IExpr value) {
 		super(id, location);
 		this.indexes = indexes;
 		this.target = target;
@@ -59,7 +59,7 @@ public class StoreNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public List<AbstractExpr> getIndexes() {
+	public List<IExpr> getIndexes() {
 		return indexes;
 	}
 
@@ -67,7 +67,7 @@ public class StoreNode extends AbstractNode {
 		return target;
 	}
 
-	public AbstractExpr getValue() {
+	public IExpr getValue() {
 		return value;
 	}
 
@@ -75,7 +75,7 @@ public class StoreNode extends AbstractNode {
 		this.target = target;
 	}
 
-	public void setValue(AbstractExpr value) {
+	public void setValue(IExpr value) {
 		this.value = value;
 	}
 

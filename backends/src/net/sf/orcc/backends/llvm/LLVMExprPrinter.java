@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.llvm;
 
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -125,7 +125,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 	}
 
 
-	public String toString(AbstractExpr expr, Object... args) {
+	public String toString(IExpr expr, Object... args) {
 		builder = new StringBuilder();
 		expr.accept(this, args);
 		return builder.toString();

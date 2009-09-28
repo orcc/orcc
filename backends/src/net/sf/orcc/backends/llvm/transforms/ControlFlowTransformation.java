@@ -45,7 +45,7 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -66,10 +66,10 @@ import net.sf.orcc.ir.type.VoidType;
 public class ControlFlowTransformation extends AbstractNodeVisitor {
 
 	private int BrCounter;
-	private LabelNode labelNode;
-	List<PhiNode> tmpPhiNodes;
-	
 	ListIterator<AbstractNode> it;
+	private LabelNode labelNode;
+
+	List<PhiNode> tmpPhiNodes;
 
 	public ControlFlowTransformation(Actor actor) {
 
@@ -93,104 +93,97 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		// Get IfNode attributes
 		int id = node.getId();
 		Location location = node.getLocation();
-		AbstractExpr condition = node.getCondition();
+		IExpr condition = node.getCondition();
 		List<AbstractNode> thenNodes = node.getThenNodes();
 		List<AbstractNode> elseNodes = node.getElseNodes();
 		JoinNode joinNode = node.getJoinNode();
-		
+
 		LabelNode thenLabelNode = null;
-		LabelNode elseLabelNode= null;
-		LabelNode endLabelNode= null;
-		List<PhiNode> phiNodes= null;
+		LabelNode elseLabelNode = null;
+		LabelNode endLabelNode = null;
+		List<PhiNode> phiNodes = null;
 
 		// Create LabelNode
 		LabelNode entryLabelNode = labelNode;
 
 		if (!thenNodes.isEmpty()) {
 			// Create thenLabelNode
-			thenLabelNode = new LabelNode(node.getId(), node
-					.getLocation(), "bb" + Integer.toString(BrCounter++));
-			
-			
-			//Store current iterator and branch label
+			thenLabelNode = new LabelNode(node.getId(), node.getLocation(),
+					"bb" + Integer.toString(BrCounter++));
+
+			// Store current iterator and branch label
 			ListIterator<AbstractNode> itTmp = it;
 			labelNode = thenLabelNode;
-			
+
 			// Continue transformation on thenNode
 			visitNodes(thenNodes, node);
-			
-			//Restore current iterator
+
+			// Restore current iterator
 			it = itTmp;
 		}
-		
+
 		if (!(elseNodes.isEmpty())) {
-			
+
 			// Create elseLabelNode
-			elseLabelNode = new LabelNode(node.getId(), node
-					.getLocation(), "bb" + Integer.toString(BrCounter++));
-			
-			//Store current iterator and branch label
+			elseLabelNode = new LabelNode(node.getId(), node.getLocation(),
+					"bb" + Integer.toString(BrCounter++));
+
+			// Store current iterator and branch label
 			ListIterator<AbstractNode> itTmp = it;
 			labelNode = elseLabelNode;
-			
+
 			// Continue transformation on elseNode
 			visitNodes(elseNodes, node);
-			
-			//Restore current iterator
+
+			// Restore current iterator
 			it = itTmp;
 		}
-		
-		
-		//Create phiNode
-		if (thenNodes.isEmpty())
-		{		
-			phiNodes = phiNodeCreate(joinNode, entryLabelNode, elseLabelNode);		
-		}else if (elseNodes.isEmpty()){
+
+		// Create phiNode
+		if (thenNodes.isEmpty()) {
+			phiNodes = phiNodeCreate(joinNode, entryLabelNode, elseLabelNode);
+		} else if (elseNodes.isEmpty()) {
 			phiNodes = phiNodeCreate(joinNode, thenLabelNode, entryLabelNode);
 		} else {
 			phiNodes = phiNodeCreate(joinNode, thenLabelNode, elseLabelNode);
 		}
-			
-		
-		//Simplify controlflow structure by removing imbricated if node
-		if (tmpPhiNodes != null){
+
+		// Simplify controlflow structure by removing imbricated if node
+		if (tmpPhiNodes != null) {
 			mergePhiNode(tmpPhiNodes, phiNodes);
-			tmpPhiNodes=null;
+			tmpPhiNodes = null;
 		}
-		
+
 		BrLabelNode endBrLabelNode = null;
-		
-		
+
 		// Detect if phiNode can be simplify
-		if ((args.length != 0)&&(!it.hasNext())){ 
+		if ((args.length != 0) && (!it.hasNext())) {
 			tmpPhiNodes = phiNodes;
 			phiNodes = new ArrayList<PhiNode>();
-			LabelNode nextLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
-					+ Integer.toString(BrCounter));	
-			
-			//Simplify the control flow and branch to it to the next node
-			if (thenNodes.isEmpty())
-			{
-				thenLabelNode = nextLabelNode;			
-			}else if (elseNodes.isEmpty()){
+			LabelNode nextLabelNode = new LabelNode(node.getId(), node
+					.getLocation(), "bb" + Integer.toString(BrCounter));
+
+			// Simplify the control flow and branch to it to the next node
+			if (thenNodes.isEmpty()) {
+				thenLabelNode = nextLabelNode;
+			} else if (elseNodes.isEmpty()) {
 				elseLabelNode = nextLabelNode;
-			} 
-			
-		}else{
-			
-			// if node set  label
+			}
+
+		} else {
+
+			// if node set label
 			endLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
 					+ Integer.toString(BrCounter++));
-			
+
 			endBrLabelNode = new BrLabelNode(0, new Location(), endLabelNode);
 			labelNode = endLabelNode;
-			
-			//Set labels of brNode and phiNodes 
-			if (thenNodes.isEmpty())
-			{
-				thenLabelNode = endLabelNode;			
+
+			// Set labels of brNode and phiNodes
+			if (thenNodes.isEmpty()) {
+				thenLabelNode = endLabelNode;
 				elseNodes.add(endBrLabelNode);
-			}else if (elseNodes.isEmpty()){
+			} else if (elseNodes.isEmpty()) {
 				elseLabelNode = endLabelNode;
 				thenNodes.add(new BrLabelNode(0, new Location(), endLabelNode));
 			} else {
@@ -198,94 +191,97 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 				thenNodes.add(endBrLabelNode);
 			}
 		}
-			
-		return new BrNode(id, location, condition, thenNodes, elseNodes, phiNodes,
-				entryLabelNode, thenLabelNode, elseLabelNode,
+
+		return new BrNode(id, location, condition, thenNodes, elseNodes,
+				phiNodes, entryLabelNode, thenLabelNode, elseLabelNode,
 				endLabelNode);
 	}
 
-	
-	private List<PhiNode> phiNodeCreate(JoinNode node, LabelNode labelTrueNode, LabelNode labelFalseNode) {
-		List<PhiAssignment> phis = node.getPhis();
-		List<PhiNode> PhiNodes = new ArrayList<PhiNode>();
-		
-		for (PhiAssignment phi : phis){
-			Map<VarDef, LabelNode> assignements = new HashMap<VarDef, LabelNode>();
-			VarDef varDef = phi.getVarDef();
-			List<VarUse> vars =  phi.getVars();
-			assignements.put(vars.get(0).getVarDef(), labelTrueNode);
-			assignements.put(vars.get(1).getVarDef(), labelFalseNode);
-
-			PhiNodes.add(new PhiNode(0, new Location(), varDef, varDef.getType(), assignements));
-		}
-		
-		return PhiNodes;
-		
-	}
-	
-	private void mergePhiNode(List<PhiNode> sourceNodes, List<PhiNode> targetNodes){
-		for (PhiNode sourceNode : sourceNodes){
-			Boolean varDefFound = false;
-			VarDef varDef = sourceNode.getVarDef();
-			
-			for (PhiNode targetNode : targetNodes){
-				Map<VarDef, LabelNode> Assignement = targetNode.getAssignements();
-				if (Assignement.containsKey(varDef)){
-					Assignement.remove(varDef);
-					Assignement.putAll(sourceNode.getAssignements());
-					varDefFound = true;
-				}
-			}
-			
-			if (varDefFound== false){
-				targetNodes.add(sourceNode);
-			}
-			
-		}
-		sourceNodes.clear();
-		
-	}
-	
-	private SelectNode selectNodeCreate(IfNode node) {
-		int id = node.getId();
-		Location location = node.getLocation();
-		AbstractExpr condition = node.getCondition();
-		JoinNode joinNode = node.getJoinNode();
-		List<PhiAssignment> phis = joinNode.getPhis();
-
-		return new SelectNode(id, location, condition, phis);
-	}
-	
-	private List<AbstractNode> clearIfNode(IfNode node){
-		BooleanExpr condition = (BooleanExpr)node.getCondition();
+	private List<AbstractNode> clearIfNode(IfNode node) {
+		BooleanExpr condition = (BooleanExpr) node.getCondition();
 		List<AbstractNode> nodes;
 		List<PhiAssignment> phis = node.getJoinNode().getPhis();
 		boolean value = condition.getValue();
-		
-		if (value == true){
+
+		if (value == true) {
 			nodes = node.getThenNodes();
-		}else{
+		} else {
 			nodes = node.getThenNodes();
 		}
-		
-		for (PhiAssignment phi : phis){
+
+		for (PhiAssignment phi : phis) {
 			VarDef varDef = phi.getVarDef();
 			List<VarUse> varUses = phi.getVars();
 			VarDef phiVar;
 			if (value == true) {
 				phiVar = varUses.get(0).getVarDef();
-				
-			}else {
+
+			} else {
 				phiVar = varUses.get(1).getVarDef();
 			}
-			
+
 			VarUse varuse = new VarUse(varDef, null);
 			VarExpr expr = new VarExpr(new Location(), varuse);
-			
+
 			phiVar.setConstant(expr);
 		}
-		
+
 		return nodes;
+	}
+
+	private void mergePhiNode(List<PhiNode> sourceNodes,
+			List<PhiNode> targetNodes) {
+		for (PhiNode sourceNode : sourceNodes) {
+			Boolean varDefFound = false;
+			VarDef varDef = sourceNode.getVarDef();
+
+			for (PhiNode targetNode : targetNodes) {
+				Map<VarDef, LabelNode> Assignement = targetNode
+						.getAssignements();
+				if (Assignement.containsKey(varDef)) {
+					Assignement.remove(varDef);
+					Assignement.putAll(sourceNode.getAssignements());
+					varDefFound = true;
+				}
+			}
+
+			if (varDefFound == false) {
+				targetNodes.add(sourceNode);
+			}
+
+		}
+		sourceNodes.clear();
+
+	}
+
+	private List<PhiNode> phiNodeCreate(JoinNode node, LabelNode labelTrueNode,
+			LabelNode labelFalseNode) {
+		List<PhiAssignment> phis = node.getPhis();
+		List<PhiNode> PhiNodes = new ArrayList<PhiNode>();
+
+		for (PhiAssignment phi : phis) {
+			Map<VarDef, LabelNode> assignements = new HashMap<VarDef, LabelNode>();
+			VarDef varDef = phi.getVarDef();
+			List<VarUse> vars = phi.getVars();
+			assignements.put(vars.get(0).getVarDef(), labelTrueNode);
+			assignements.put(vars.get(1).getVarDef(), labelFalseNode);
+
+			PhiNodes.add(new PhiNode(0, new Location(), varDef, varDef
+					.getType(), assignements));
+		}
+
+		return PhiNodes;
+
+	}
+
+	private SelectNode selectNodeCreate(IfNode node) {
+		int id = node.getId();
+		Location location = node.getLocation();
+		IExpr condition = node.getCondition();
+		JoinNode joinNode = node.getJoinNode();
+		List<PhiAssignment> phis = joinNode.getPhis();
+
+		return new SelectNode(id, location, condition, phis);
 	}
 
 	@Override
@@ -293,16 +289,15 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		List<AbstractNode> thenNodes = node.getThenNodes();
 		List<AbstractNode> elseNodes = node.getElseNodes();
 
-		if ((thenNodes.isEmpty())
-				&& (elseNodes.isEmpty())) {
+		if ((thenNodes.isEmpty()) && (elseNodes.isEmpty())) {
 
 			SelectNode selectNode = selectNodeCreate(node);
 			it.remove();
 			it.add(selectNode);
-		}else if (node.getCondition() instanceof BooleanExpr){
+		} else if (node.getCondition() instanceof BooleanExpr) {
 			List<AbstractNode> brNodes = clearIfNode(node);
 			it.remove();
-			for (AbstractNode brNode: brNodes){
+			for (AbstractNode brNode : brNodes) {
 				it.add(brNode);
 			}
 		} else {
@@ -328,8 +323,8 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		labelNode = new LabelNode(0, null, "entry");
 
 		visitNodes(nodes);
-		
-		//Add void return
+
+		// Add void return
 		if (proc.getReturnType() instanceof VoidType) {
 			TypeExpr expr = new TypeExpr(null, new VoidType());
 			nodes.add(new ReturnNode(0, null, expr));

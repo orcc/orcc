@@ -34,15 +34,13 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractExpr {
+public abstract class AbstractExpr implements IExpr {
 
 	private Location location;
 
 	protected AbstractExpr(Location location) {
 		this.location = location;
 	}
-
-	public abstract void accept(ExprVisitor visitor, Object... args);
 
 	public Location getLocation() {
 		return location;

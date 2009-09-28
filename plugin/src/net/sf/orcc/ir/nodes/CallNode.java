@@ -33,7 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * @author Matthieu Wipliez
@@ -41,14 +41,14 @@ import net.sf.orcc.ir.expr.AbstractExpr;
  */
 public class CallNode extends AbstractNode {
 
-	private List<AbstractExpr> parameters;
+	private List<IExpr> parameters;
 
 	private Procedure procedure;
 
 	private VarDef res;
 
 	public CallNode(int id, Location location, VarDef res, Procedure procedure,
-			List<AbstractExpr> parameters) {
+			List<IExpr> parameters) {
 		super(id, location);
 		this.parameters = parameters;
 		this.procedure = procedure;
@@ -60,7 +60,7 @@ public class CallNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public List<AbstractExpr> getParameters() {
+	public List<IExpr> getParameters() {
 		return parameters;
 	}
 
@@ -76,7 +76,7 @@ public class CallNode extends AbstractNode {
 		return (res != null);
 	}
 
-	public void setParameters(List<AbstractExpr> parameters) {
+	public void setParameters(List<IExpr> parameters) {
 		this.parameters = parameters;
 	}
 

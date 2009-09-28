@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.c;
 
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -180,7 +180,7 @@ public class ExprToString implements ExprVisitor {
 		}
 	}
 
-	public String toString(AbstractExpr expr) {
+	public String toString(IExpr expr) {
 		builder = new StringBuilder();
 		expr.accept(this, 0);
 		return builder.toString();

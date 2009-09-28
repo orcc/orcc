@@ -39,7 +39,7 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.AbstractExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.LoadNode;
@@ -73,49 +73,45 @@ public class ArrayListTransformation extends AbstractNodeVisitor {
 	@SuppressWarnings("unchecked")
 	public void visit(LoadNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		
-		List<AbstractExpr> indexes = node.getIndexes();
-		
-		if (indexes.size() > 0){
-			AbstractExpr expr = indexes.get(0);
+
+		List<IExpr> indexes = node.getIndexes();
+
+		if (indexes.size() > 0) {
+			IExpr expr = indexes.get(0);
 			try {
-				
-				//Check if the array is an only value
-				if ((Integer.parseInt(expr.toString()) == 0)&& (indexes.size()==1)) {
+				// Check if the array is an only value
+				if ((Integer.parseInt(expr.toString()) == 0)
+						&& (indexes.size() == 1)) {
 					return;
 				}
 			} catch (NumberFormatException e) {
-
 			}
-			
+
 			it.previous();
-			
-			
-			//Adding the getElementPtrNode
+
+			// Adding the getElementPtrNode
 			VarUse sourceUse = node.getSource();
 			VarDef sourceVar = sourceUse.getVarDef();
-			ListType sourceType = (ListType)sourceVar.getType();
+			ListType sourceType = (ListType) sourceVar.getType();
 			VarDef targetVar = node.getTarget();
-			
-			VarDef varDef = new VarDef(false, false, targetVar.getIndex()+1, new Location(),
-					targetVar.getName(), null, null, targetVar.getSuffix(), new PointType(sourceType.getType()));
+
+			VarDef varDef = new VarDef(false, false, targetVar.getIndex() + 1,
+					new Location(), targetVar.getName(), null, null, targetVar
+							.getSuffix(), new PointType(sourceType.getType()));
 			VarUse varUse = new VarUse(varDef, node);
-							
-			//Create and insert the new node
-			GetElementPtrNode elementPtrNode = new GetElementPtrNode(0, new Location(), varDef, node.getSource(), indexes);
-			
+
+			// Create and insert the new node
+			GetElementPtrNode elementPtrNode = new GetElementPtrNode(0,
+					new Location(), varDef, node.getSource(), indexes);
+
 			it.add(elementPtrNode);
 			it.next();
-			
-			
-			//Insert the new VarDef in the load node
+
+			// Insert the new VarDef in the load node
 			node.setSource(varUse);
 		}
-		
-		
 	}
 
-	
 	private void visitNodes(List<AbstractNode> nodes) {
 		ListIterator<AbstractNode> it = nodes.listIterator();
 

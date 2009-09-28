@@ -26,66 +26,34 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
-
-import net.sf.orcc.ir.expr.IExpr;
+package net.sf.orcc.ir.expr;
 
 /**
  * @author Matthieu Wipliez
  * 
  */
-public class ListType extends AbstractType {
+public class ExprEvaluateException extends Exception {
 
-	public static final String NAME = "List";
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-	private IExpr size;
-
-	private AbstractType type;
-
-	public ListType(IExpr size, AbstractType type) {
-		super(NAME);
-		setSize(size);
-		setType(type);
+	/**
+	 * Constructs a new runtime exception with the specified detail message. The
+	 * cause is not initialized, and may subsequently be initialized by a call
+	 * to {@link #initCause}.
+	 * 
+	 * @param message
+	 *            the detail message. The detail message is saved for later
+	 *            retrieval by the {@link #getMessage()} method.
+	 */
+	public ExprEvaluateException(String message) {
+		super(message);
 	}
 
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof UintType) {
-			ListType list = (ListType) obj;
-			return (size == list.size && type.equals(list.type));
-		} else {
-			return false;
-		}
-	}
-
-	public IExpr getSize() {
-		return size;
-	}
-
-	public AbstractType getType() {
-		return type;
-	}
-
-	public void setSize(IExpr size) {
-		this.size = size;
-	}
-
-	public void setType(AbstractType type) {
-		if (type == null) {
-			throw new NullPointerException();
-		}
-
-		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return NAME + "(type:" + type + ", size=" + size + ")";
+	public ExprEvaluateException(String message, Throwable throwable) {
+		super(message, throwable);
 	}
 
 }

@@ -37,13 +37,13 @@ import net.sf.orcc.ir.type.AbstractType;
  */
 public class UnaryExpr extends AbstractExpr {
 
-	private AbstractExpr expr;
+	private IExpr expr;
 
 	private UnaryOp op;
 
 	private AbstractType type;
 
-	public UnaryExpr(Location location, UnaryOp op, AbstractExpr expr,
+	public UnaryExpr(Location location, UnaryOp op, IExpr expr,
 			AbstractType type) {
 		super(location);
 		this.expr = expr;
@@ -56,8 +56,29 @@ public class UnaryExpr extends AbstractExpr {
 		visitor.visit(this, args);
 	}
 
-	public AbstractExpr getExpr() {
+	@Override
+	public IExpr evaluate() throws ExprEvaluateException {
+		switch (op) {
+		case BNOT:
+			break;
+		case LNOT:
+			break;
+		case MINUS:
+			break;
+		case NUM_ELTS:
+			break;
+		}
+
+		throw new ExprEvaluateException("could not evaluate");
+	}
+
+	public IExpr getExpr() {
 		return expr;
+	}
+
+	@Override
+	public int getExprType() {
+		return UNARY;
 	}
 
 	public UnaryOp getOp() {
@@ -68,7 +89,7 @@ public class UnaryExpr extends AbstractExpr {
 		return type;
 	}
 
-	public void setExpr(AbstractExpr expr) {
+	public void setExpr(IExpr expr) {
 		this.expr = expr;
 	}
 
