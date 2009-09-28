@@ -43,6 +43,28 @@ tokens {
 
   // expressions  
   EXPR;
+  EXPR_OR;
+  EXPR_AND;
+  EXPR_BITOR;
+  EXPR_BITAND;
+  EXPR_EQ;
+  EXPR_REL;
+  EXPR_SHIFT;
+  EXPR_ADD;
+  EXPR_MUL;
+  EXPR_EXP;
+  EXPR_UN;
+  
+  EXPR_LIST;
+  EXPR_IF;
+  EXPR_CALL;
+  EXPR_IDX;
+  EXPR_VAR;
+
+  EXPR_BOOL;
+  EXPR_FLOAT;
+  EXPR_INT;
+  EXPR_STRING;
   
   // actor declarations
   ACTOR_DECLS;
@@ -190,53 +212,59 @@ actorPortDecls: actorPortDecl (',' actorPortDecl)* -> actorPortDecl+;
 /*****************************************************************************/
 /* expressions */
 
-expression: and_expr (('or' | '||') and_expr)? { };
+// what we want here is to avoid useless derivations in the AST
+// that's why rules have the form X: y1=Y ((op y2=Y)+ -> EXPR_X (y1 y2+) | -> y1)
+// this way if X is really only Y, then we just return the tree from Y.
 
-and_expr: bitor_expr (('and' | '&&') bitor_expr)? { };
+expression: e1=and_expr ((('or' | '||') e2=and_expr)+ -> ^(EXPR_OR $e1 $e2+) | -> $e1 );
 
-bitor_expr: bitand_expr ('|' bitand_expr)? { };
+and_expr: e1=bitor_expr ((('and' | '&&') e2=bitor_expr)+ -> ^(EXPR_AND $e1 $e2+) | -> $e1 );
 
-bitand_expr: eq_expr ('&' eq_expr)? { };
+bitor_expr: e1=bitand_expr (('|' e2=bitand_expr)+ -> ^(EXPR_BITOR $e1 $e2+) | -> $e1 );
 
-eq_expr: rel_expr (('=' | '!=') rel_expr)? { };
+bitand_expr: e1=eq_expr (('&' e2=eq_expr)+ -> ^(EXPR_BITAND $e1 $e2+) | -> $e1 );
 
-rel_expr: shift_expr (('<' | '>' | '<=' | '>=') shift_expr)? { };
+eq_expr: e1=rel_expr (((op='=' | op='!=') e2=rel_expr)+ -> ^(EXPR_EQ $e1 ($op $e2)+) | -> $e1 );
 
-shift_expr: add_expr (('<<' | '>>') add_expr)? { };
+rel_expr: e1=shift_expr (((op='<' | op='>' | op='<=' | op='>=') e2=shift_expr)+ -> ^(EXPR_REL $e1 ($op $e2)+) | -> $e1);
 
-add_expr: mul_expr (('+' | '-') mul_expr)? { };
+shift_expr: e1=add_expr (((op='<<' | op='>>') e2=add_expr)+ -> ^(EXPR_SHIFT $e1 ($op $e2)+) | -> $e1 );
 
-mul_expr: exp_expr (('div' | 'mod' | '*' | '/') exp_expr)? { };
+add_expr: e1=mul_expr (((op='+' | op='-') e2=mul_expr)+ -> ^(EXPR_ADD $e1 ($op $e2)+) | -> $e1 );
 
-exp_expr: un_expr ('^' un_expr)? { };
+mul_expr: e1=exp_expr (((op='div' | op='mod' | op='*' | op='/') e2=exp_expr)+ -> ^(EXPR_MUL $e1 ($op $e2)+) | -> $e1 );
 
-un_expr: postfix_expression
-	| '-' un_expr
-	| 'not' un_expr
-	| '#' un_expr { };
+exp_expr: e1=un_expr (('^' e2=un_expr)+ -> ^(EXPR_EXP $e1 $e2+) | -> $e1 );
+
+un_expr: postfix_expression -> postfix_expression
+	| '-' un_expr -> ^(EXPR_UN '-' un_expr)
+	| 'not' un_expr -> ^(EXPR_UN 'not' un_expr)
+	| '#' un_expr  -> ^(EXPR_UN '#' un_expr);
 
 postfix_expression:
-  '[' expressions (':' expressionGenerators)? ']'
-| 'if' expression 'then' expression 'else' expression 'end'
-| constant
-| '(' expression ')'
-| ID (
-    '(' expressions? ')'
-  |  ('[' expressions ']')+ )?;
+  '[' e=expressions (':' g=expressionGenerators)? ']' -> ^(EXPR_LIST $e $g?)
+| 'if' e1=expression 'then' e2=expression 'else' e3=expression 'end' -> ^(EXPR_IF $e1 $e2 $e3)
+| constant -> constant
+| '(' expression ')' -> expression
+| var=ID (
+    '(' expressions? ')' -> ^(EXPR_CALL $var expressions?)
+  |  ('[' expressions ']')+ -> ^(EXPR_IDX $var expressions+)
+  | -> ^(EXPR_VAR $var));
 
 constant:
-  'true'
-| 'false'
-| INTEGER
-| STRING { };
+  'true' -> ^(EXPR_BOOL 'true')
+| 'false' -> ^(EXPR_BOOL 'false')
+| FLOAT -> ^(EXPR_FLOAT FLOAT)
+| INTEGER -> ^(EXPR_INT INTEGER)
+| STRING -> ^(EXPR_STRING STRING);
 
 expressionGenerator:
 	'for' typeDef ID 'in' expression
 	{ };
 
-expressionGenerators: expressionGenerator (',' expressionGenerator)* { };
+expressionGenerators: expressionGenerator (',' expressionGenerator)* -> expressionGenerator+;
 
-expressions: expression (',' expression)* { };
+expressions: expression (',' expression)* -> expression+;
 
 /*****************************************************************************/
 /* identifiers */
@@ -285,8 +313,10 @@ statement:
 /* type attributes and definitions */
 
 /* a type attribute, such as "type:" and "size=" */
-typeAttr: 'type' ':' typeDef -> ^(TYPE typeDef)
-| 'size' '=' expression -> ^(EXPR expression) ;
+// thanks to the language designers, there is no specific name for type attributes.
+// even though only type and expr attributes are taken into account.
+
+typeAttr: ID (':' typeDef -> ^(TYPE ID typeDef) | '=' expression -> ^(EXPR ID expression)) ;
 
 typeAttrs: typeAttr (',' typeAttr)* -> typeAttr+;
 
@@ -315,13 +345,34 @@ varDecls: varDecl (',' varDecl)* { };
 ///////////////////////////////////////////////////////////////////////////////
 // TOKENS
 
-ID: ('a'..'z' | 'A'..'Z' | '_' | '$') ('a'..'z' | 'A'..'Z' | '_' | '$' | '0' .. '9')* ;
+ID: LETTER (LETTER | '0'..'9')*;
+	
+fragment
+LETTER:	'$' | 'A'..'Z' | 'a'..'z' | '_';
 
-FLOAT: '-'? (('0'..'9')+ '.' ('0'..'9')* (('e' | 'E') ('+' | '-')? ('0'..'9')+)?
-	| '.' ('0'..'9')+ (('e' | 'E') ('+' | '-')? ('0'..'9')+)?
-	| ('0'..'9')+ (('e' | 'E') ('+' | '-')? ('0'..'9')+));
-INTEGER: '-'? ('0'..'9')+ ;
-STRING: '\"' .* '\"';
+FLOAT: (('0'..'9')+ '.' ('0'..'9')* Exponent?
+	| '.' ('0'..'9')+ Exponent?
+	| ('0'..'9')+ Exponent);
+
+fragment
+Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+
+INTEGER: ('0' | '1'..'9' '0'..'9'*);
+
+STRING: '"' ( EscapeSequence | ~('\\'|'"') )* '"';
+
+fragment
+EscapeSequence
+    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\')
+    |   OctalEscape
+    ;
+
+fragment
+OctalEscape
+    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
+    |   '\\' ('0'..'7') ('0'..'7')
+    |   '\\' ('0'..'7')
+    ;
 
 LINE_COMMENT: '//' ~('\n'|'\r')* '\r'? '\n' {$channel=HIDDEN;};
 MULTI_LINE_COMMENT: '/*' .* '*/' {$channel=HIDDEN;};

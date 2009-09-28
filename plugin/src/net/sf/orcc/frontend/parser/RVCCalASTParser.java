@@ -42,8 +42,11 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.consts.AbstractConst;
+import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.type.AbstractType;
@@ -158,9 +161,28 @@ public class RVCCalASTParser {
 		}
 	}
 
-	private IExpr parseExpression(Tree expr) {
-		// TODO parse expression
-		return null;
+	private IExpr parseExpression(Tree expr) throws OrccException {
+		String type = expr.getText();
+		if (type.equals("EXPR_BOOL")) {
+			expr = expr.getChild(0);
+			boolean value = Boolean.parseBoolean(expr.getText());
+			return new BooleanExpr(parseLocation(expr), value);
+		} else if (type.equals("EXPR_FLOAT")) {
+			throw new OrccException("not yet implemented!");
+		} else if (type.equals("EXPR_INT")) {
+			expr = expr.getChild(0);
+			int value = Integer.parseInt(expr.getText());
+			return new IntExpr(parseLocation(expr), value);
+		} else if (type.equals("EXPR_STRING")) {
+			expr = expr.getChild(0);
+			return new StringExpr(parseLocation(expr), expr.getText());
+		} else if (type.equals("EXPR_VAR")) {
+			expr = expr.getChild(0);
+			VarUse varUse = new VarUse(null, null);
+			return new VarExpr(parseLocation(expr), varUse);
+		} else {
+			throw new OrccException("not yet implemented");
+		}
 	}
 
 	/**
@@ -233,7 +255,8 @@ public class RVCCalASTParser {
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
 			if (attr.getText().equals("EXPR")) {
-				return parseExpression(attr);
+				// TODO check type attribute id
+				return parseExpression(attr.getChild(1));
 			}
 		}
 
@@ -253,7 +276,8 @@ public class RVCCalASTParser {
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
 			if (attr.getText().equals("TYPE")) {
-				return parseType(attr.getChild(0));
+				// TODO check type attribute id
+				return parseType(attr.getChild(1));
 			}
 		}
 
