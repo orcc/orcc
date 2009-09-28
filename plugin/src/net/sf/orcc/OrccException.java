@@ -26,13 +26,17 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.parser;
+package net.sf.orcc;
+
+import net.sf.orcc.ir.Location;
 
 /**
+ * An exception raised in Orcc.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class NetworkParseException extends RuntimeException {
+public class OrccException extends Exception {
 
 	/**
 	 * 
@@ -40,34 +44,34 @@ public class NetworkParseException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new runtime exception with the specified detail message. The
-	 * cause is not initialized, and may subsequently be initialized by a call
-	 * to {@link #initCause}.
-	 * 
-	 * @param message
-	 *            the detail message. The detail message is saved for later
-	 *            retrieval by the {@link #getMessage()} method.
+	 * Creates a new OrccException with the given message.
 	 */
-	public NetworkParseException(String message) {
+	public OrccException(String message) {
 		super(message);
 	}
 
-    /**
-     * Constructs a new runtime exception with the specified detail message and
-     * cause.  <p>Note that the detail message associated with
-     * <code>cause</code> is <i>not</i> automatically incorporated in
-     * this runtime exception's detail message.
-     *
-     * @param  message the detail message (which is saved for later retrieval
-     *         by the {@link #getMessage()} method).
-     * @param  cause the cause (which is saved for later retrieval by the
-     *         {@link #getCause()} method).  (A <tt>null</tt> value is
-     *         permitted, and indicates that the cause is nonexistent or
-     *         unknown.)
-     * @since  1.4
-     */
-    public NetworkParseException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	/**
+	 * Creates a new OrccException with the given message, identified to have
+	 * occurred in the given file at the given location.
+	 */
+	public OrccException(String fileName, Location location, String message) {
+		this(fileName, location, message, null);
+	}
+
+	/**
+	 * Creates a new OrccException with the given message and cause, identified
+	 * to have occurred in the given file at the given location.
+	 */
+	public OrccException(String fileName, Location location, String message,
+			Throwable cause) {
+		super("File \"" + fileName + "\", " + location + "\n" + message, cause);
+	}
+
+	/**
+	 * Creates a new OrccException with the given message and cause.
+	 */
+	public OrccException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

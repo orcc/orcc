@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
@@ -221,7 +222,8 @@ public class IrParser {
 		}
 	}
 
-	private VarDef getVarDef(JSONArray array) throws JSONException {
+	private VarDef getVarDef(JSONArray array) throws JSONException,
+			OrccException {
 		String name = array.getString(0);
 		Integer suffix = array.isNull(1) ? null : array.getInt(1);
 		int index = array.getInt(2);
@@ -229,13 +231,14 @@ public class IrParser {
 		// retrieve the variable definition
 		VarDef varDef = varDefs.get(stringOfVar(name, suffix, index));
 		if (varDef == null) {
-			throw new IrParseException("unknown variable: " + name + suffix
-					+ "_" + index);
+			throw new OrccException("unknown variable: " + name + suffix + "_"
+					+ index);
 		}
 		return varDef;
 	}
 
-	private Action parseAction(JSONArray array) throws JSONException {
+	private Action parseAction(JSONArray array) throws JSONException,
+			OrccException {
 		JSONArray tagArray = array.getJSONArray(0);
 		List<String> tag = new ArrayList<String>();
 		for (int i = 0; i < tagArray.length(); i++) {
@@ -253,7 +256,8 @@ public class IrParser {
 		return action;
 	}
 
-	private List<Action> parseActions(JSONArray array) throws JSONException {
+	private List<Action> parseActions(JSONArray array) throws JSONException,
+			OrccException {
 		List<Action> actions = new ArrayList<Action>();
 		for (int i = 0; i < array.length(); i++) {
 			actions.add(parseAction(array.getJSONArray(i)));
@@ -284,62 +288,62 @@ public class IrParser {
 	 * @return An {@link Actor}.
 	 * @throws JSONException
 	 */
-	public Actor parseActor(InputStream in) throws JSONException {
-		actions = new HashMap<List<String>, Action>();
-		procs = new HashMap<String, Procedure>();
-		untaggedActions = new ArrayList<Action>();
-		varDefs = new HashMap<String, VarDef>();
-
-		JSONTokener tokener = new JSONTokener(new InputStreamReader(in));
-		JSONObject obj = new JSONObject(tokener);
-
-		file = obj.getString("source file");
-		String name = obj.getString(KEY_NAME);
-		List<VarDef> inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
-		List<VarDef> outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
-
-		JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
-		List<StateVar> stateVars = parseStateVars(array);
-
-		array = obj.getJSONArray(KEY_PROCEDURES);
-		List<Procedure> procs = parseProcs(array);
-
-		array = obj.getJSONArray(KEY_ACTIONS);
-		List<Action> actions = parseActions(array);
-
-		// a bit dirty, this one...
-		// when isInitialize is true, don't put actions in hash tables.
-		isInitialize = true;
-		array = obj.getJSONArray(KEY_INITIALIZES);
-		List<Action> initializes = parseActions(array);
-
-		array = obj.getJSONArray(KEY_ACTION_SCHED);
-		ActionScheduler sched = parseActionScheduler(array);
-
-		// no parameters at this point.
-		List<VarDef> parameters = new ArrayList<VarDef>();
-
-		Actor actor = new Actor(name, file, parameters, inputs, outputs,
-				stateVars, procs, actions, initializes, sched, null);
-
+	public Actor parseActor(InputStream in) throws OrccException {
 		try {
-			in.close();
-		} catch (IOException e) {
-			throw new IrParseException("Could not close input stream", e);
-		}
+			actions = new HashMap<List<String>, Action>();
+			procs = new HashMap<String, Procedure>();
+			untaggedActions = new ArrayList<Action>();
+			varDefs = new HashMap<String, VarDef>();
 
-		return actor;
+			JSONTokener tokener = new JSONTokener(new InputStreamReader(in));
+			JSONObject obj = new JSONObject(tokener);
+
+			file = obj.getString("source file");
+			String name = obj.getString(KEY_NAME);
+			List<VarDef> inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
+			List<VarDef> outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
+
+			JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
+			List<StateVar> stateVars = parseStateVars(array);
+
+			array = obj.getJSONArray(KEY_PROCEDURES);
+			List<Procedure> procs = parseProcs(array);
+
+			array = obj.getJSONArray(KEY_ACTIONS);
+			List<Action> actions = parseActions(array);
+
+			// a bit dirty, this one...
+			// when isInitialize is true, don't put actions in hash tables.
+			isInitialize = true;
+			array = obj.getJSONArray(KEY_INITIALIZES);
+			List<Action> initializes = parseActions(array);
+
+			array = obj.getJSONArray(KEY_ACTION_SCHED);
+			ActionScheduler sched = parseActionScheduler(array);
+
+			// no parameters at this point.
+			List<VarDef> parameters = new ArrayList<VarDef>();
+
+			Actor actor = new Actor(name, file, parameters, inputs, outputs,
+					stateVars, procs, actions, initializes, sched, null);
+			in.close();
+			return actor;
+		} catch (JSONException e) {
+			throw new OrccException("JSON error", e);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	private AssignVarNode parseAssignVarNode(int id, Location loc,
-			JSONArray array) throws JSONException {
+			JSONArray array) throws JSONException, OrccException {
 		VarDef var = getVarDef(array.getJSONArray(0));
 		IExpr value = parseExpr(array.getJSONArray(1));
 		return new AssignVarNode(id, loc, var, value);
 	}
 
 	private BinaryExpr parseBinaryExpr(Location location, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		String name = array.getString(0);
 		IExpr e1 = parseExpr(array.getJSONArray(1));
 		IExpr e2 = parseExpr(array.getJSONArray(2));
@@ -387,14 +391,14 @@ public class IrParser {
 		} else if (name.equals(BOP_TIMES)) {
 			op = BinaryOp.TIMES;
 		} else {
-			throw new IrParseException("Invalid binary operator: " + name);
+			throw new OrccException("Invalid binary operator: " + name);
 		}
 
 		return new BinaryExpr(location, e1, op, e2, type);
 	}
 
 	private CallNode parseCallNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		VarDef res = null;
 		String procName = array.getString(0);
 		if (!array.isNull(1)) {
@@ -414,7 +418,8 @@ public class IrParser {
 	 * @return An {@link AbstractConst} created from the given object.
 	 * @throws JSONException
 	 */
-	private AbstractConst parseConstant(Object obj) throws JSONException {
+	private AbstractConst parseConstant(Object obj) throws JSONException,
+			OrccException {
 		AbstractConst constant = null;
 
 		if (obj instanceof Boolean) {
@@ -431,7 +436,7 @@ public class IrParser {
 		} else if (obj instanceof String) {
 			constant = new StringConst((String) obj);
 		} else {
-			throw new IrParseException("Unknown constant: " + obj);
+			throw new OrccException("Unknown constant: " + obj);
 		}
 
 		return constant;
@@ -441,7 +446,8 @@ public class IrParser {
 		return new EmptyNode(nodeId, location);
 	}
 
-	private IExpr parseExpr(JSONArray array) throws JSONException {
+	private IExpr parseExpr(JSONArray array) throws JSONException,
+			OrccException {
 		Location location = parseLocation(array.getJSONArray(0));
 		Object obj = array.get(1);
 		IExpr expr = null;
@@ -463,16 +469,17 @@ public class IrParser {
 			} else if (name.equals(BINARY_EXPR)) {
 				return parseBinaryExpr(location, array.getJSONArray(1));
 			} else {
-				throw new IrParseException("Invalid expression kind: " + name);
+				throw new OrccException("Invalid expression kind: " + name);
 			}
 		} else {
-			throw new IrParseException("Invalid expression: " + obj);
+			throw new OrccException("Invalid expression: " + obj);
 		}
 
 		return expr;
 	}
 
-	private List<IExpr> parseExprs(JSONArray array) throws JSONException {
+	private List<IExpr> parseExprs(JSONArray array) throws JSONException,
+			OrccException {
 		List<IExpr> exprs = new ArrayList<IExpr>();
 		for (int i = 0; i < array.length(); i++) {
 			exprs.add(parseExpr(array.getJSONArray(i)));
@@ -524,7 +531,7 @@ public class IrParser {
 	}
 
 	private HasTokensNode parseHasTokensNode(int id, Location loc,
-			JSONArray array) throws JSONException {
+			JSONArray array) throws JSONException, OrccException {
 		VarDef varDef = getVarDef(array.getJSONArray(0));
 		String fifoName = array.getString(1);
 		int numTokens = array.getInt(2);
@@ -532,7 +539,7 @@ public class IrParser {
 	}
 
 	private IfNode parseIfNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		IExpr condition = parseExpr(array.getJSONArray(0));
 		List<AbstractNode> thenNodes = parseNodes(array.getJSONArray(1));
 		List<AbstractNode> elseNodes = parseNodes(array.getJSONArray(2));
@@ -541,7 +548,7 @@ public class IrParser {
 	}
 
 	private JoinNode parseJoinNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		List<PhiAssignment> phis = new ArrayList<PhiAssignment>();
 		for (int i = 0; i < array.length(); i++) {
 			phis.add(parsePhiNode(array.getJSONArray(i)));
@@ -550,7 +557,7 @@ public class IrParser {
 	}
 
 	private LoadNode parseLoadNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		VarDef target = getVarDef(array.getJSONArray(0));
 		VarUse source = parseVarUse(array.getJSONArray(1));
 		List<IExpr> indexes = parseExprs(array.getJSONArray(2));
@@ -580,7 +587,8 @@ public class IrParser {
 		}
 	}
 
-	private AbstractNode parseNode(JSONArray array) throws JSONException {
+	private AbstractNode parseNode(JSONArray array) throws JSONException,
+			OrccException {
 		String name = array.getString(0);
 		int id = array.getInt(1);
 		Location loc = parseLocation(array.getJSONArray(2));
@@ -623,14 +631,15 @@ public class IrParser {
 		} else if (name.equals(NAME_WRITE)) {
 			node = parseWriteNode(id, loc, array.getJSONArray(3));
 		} else {
-			throw new IrParseException("Invalid node definition: " + name);
+			throw new OrccException("Invalid node definition: " + name);
 		}
 
 		previousNode = node;
 		return node;
 	}
 
-	private List<AbstractNode> parseNodes(JSONArray array) throws JSONException {
+	private List<AbstractNode> parseNodes(JSONArray array)
+			throws JSONException, OrccException {
 		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
 		for (int i = 0; i < array.length(); i++) {
 			AbstractNode node = parseNode(array.getJSONArray(i));
@@ -643,7 +652,7 @@ public class IrParser {
 	}
 
 	private Map<VarDef, Integer> parsePattern(JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		Map<VarDef, Integer> pattern = new HashMap<VarDef, Integer>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray patternArray = array.getJSONArray(i);
@@ -655,14 +664,15 @@ public class IrParser {
 	}
 
 	private PeekNode parsePeekNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
 		int numTokens = array.getInt(1);
 		VarDef varDef = getVarDef(array.getJSONArray(2));
 		return new PeekNode(id, loc, fifoName, numTokens, varDef);
 	}
 
-	private PhiAssignment parsePhiNode(JSONArray array) throws JSONException {
+	private PhiAssignment parsePhiNode(JSONArray array) throws JSONException,
+			OrccException {
 		VarDef varDef = getVarDef(array.getJSONArray(0));
 		List<VarUse> vars = new ArrayList<VarUse>();
 		array = array.getJSONArray(1);
@@ -681,7 +691,8 @@ public class IrParser {
 	 * @return A {@link List}&lt;{@link VarDef}&gt;.
 	 * @throws JSONException
 	 */
-	private List<VarDef> parsePorts(JSONArray array) throws JSONException {
+	private List<VarDef> parsePorts(JSONArray array) throws JSONException,
+			OrccException {
 		List<VarDef> ports = new ArrayList<VarDef>();
 		for (int i = 0; i < array.length(); i++) {
 			ports.add(parseVarDef(array.getJSONArray(i)));
@@ -690,7 +701,8 @@ public class IrParser {
 		return ports;
 	}
 
-	private Procedure parseProc(JSONArray array) throws JSONException {
+	private Procedure parseProc(JSONArray array) throws JSONException,
+			OrccException {
 		JSONArray array1 = array.getJSONArray(0);
 		String name = array1.getString(0);
 		boolean external = array1.getBoolean(1);
@@ -716,7 +728,8 @@ public class IrParser {
 	 * @return A {@link List}&lt;{@link Procedure}&gt;.
 	 * @throws JSONException
 	 */
-	private List<Procedure> parseProcs(JSONArray array) throws JSONException {
+	private List<Procedure> parseProcs(JSONArray array) throws JSONException,
+			OrccException {
 		List<Procedure> procs = new ArrayList<Procedure>();
 		for (int i = 0; i < array.length(); i++) {
 			procs.add(parseProc(array.getJSONArray(i)));
@@ -726,7 +739,7 @@ public class IrParser {
 	}
 
 	private ReadNode parseReadNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
 		int numTokens = array.getInt(1);
 		VarDef varDef = getVarDef(array.getJSONArray(2));
@@ -740,7 +753,7 @@ public class IrParser {
 	}
 
 	private ReturnNode parseReturnNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		IExpr expr = parseExpr(array);
 		return new ReturnNode(id, loc, expr);
 	}
@@ -755,7 +768,8 @@ public class IrParser {
 	 * @return A {@link List}&lt;{@link StateVar}&gt;.
 	 * @throws JSONException
 	 */
-	private List<StateVar> parseStateVars(JSONArray array) throws JSONException {
+	private List<StateVar> parseStateVars(JSONArray array)
+			throws JSONException, OrccException {
 		List<StateVar> stateVars = new ArrayList<StateVar>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray varDefArray = array.getJSONArray(i);
@@ -773,7 +787,7 @@ public class IrParser {
 	}
 
 	private StoreNode parseStoreNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		VarUse target = parseVarUse(array.getJSONArray(0));
 		List<IExpr> indexes = parseExprs(array.getJSONArray(1));
 		IExpr value = parseExpr(array.getJSONArray(2));
@@ -791,7 +805,8 @@ public class IrParser {
 	 * @return An {@link AbstractType}.
 	 * @throws JSONException
 	 */
-	private AbstractType parseType(Object obj) throws JSONException {
+	private AbstractType parseType(Object obj) throws JSONException,
+			OrccException {
 		AbstractType type = null;
 
 		if (obj instanceof String) {
@@ -803,7 +818,7 @@ public class IrParser {
 			} else if (name.equals(VoidType.NAME)) {
 				type = new VoidType();
 			} else {
-				throw new IrParseException("Unknown type: " + name);
+				throw new OrccException("Unknown type: " + name);
 			}
 		} else if (obj instanceof JSONArray) {
 			JSONArray array = (JSONArray) obj;
@@ -822,10 +837,10 @@ public class IrParser {
 				AbstractType subType = parseType(array.get(2));
 				type = new ListType(expr, subType);
 			} else {
-				throw new IrParseException("Unknown type: " + name);
+				throw new OrccException("Unknown type: " + name);
 			}
 		} else {
-			throw new IrParseException("Invalid type definition: "
+			throw new OrccException("Invalid type definition: "
 					+ obj.toString());
 		}
 
@@ -833,7 +848,7 @@ public class IrParser {
 	}
 
 	private UnaryExpr parseUnaryExpr(Location location, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		String name = array.getString(0);
 		IExpr expr = parseExpr(array.getJSONArray(1));
 		AbstractType type = parseType(array.get(2));
@@ -848,7 +863,7 @@ public class IrParser {
 		} else if (name.equals(UOP_NUM_ELTS)) {
 			op = UnaryOp.NUM_ELTS;
 		} else {
-			throw new IrParseException("Invalid unary operator: " + name);
+			throw new OrccException("Invalid unary operator: " + name);
 		}
 
 		return new UnaryExpr(location, op, expr, type);
@@ -864,7 +879,8 @@ public class IrParser {
 	 * @return A {@link VarDef}.
 	 * @throws JSONException
 	 */
-	private VarDef parseVarDef(JSONArray array) throws JSONException {
+	private VarDef parseVarDef(JSONArray array) throws JSONException,
+			OrccException {
 		JSONArray details = array.getJSONArray(0);
 		String name = details.getString(0);
 		boolean assignable = details.getBoolean(1);
@@ -891,7 +907,8 @@ public class IrParser {
 		return varDef;
 	}
 
-	private List<VarDef> parseVarDefs(JSONArray array) throws JSONException {
+	private List<VarDef> parseVarDefs(JSONArray array) throws JSONException,
+			OrccException {
 		List<VarDef> variables = new ArrayList<VarDef>();
 		for (int i = 0; i < array.length(); i++) {
 			variables.add(parseVarDef(array.getJSONArray(i)));
@@ -900,7 +917,8 @@ public class IrParser {
 		return variables;
 	}
 
-	private VarUse parseVarUse(JSONArray array) throws JSONException {
+	private VarUse parseVarUse(JSONArray array) throws JSONException,
+			OrccException {
 		VarDef varDef = getVarDef(array.getJSONArray(0));
 
 		// TODO parse node in VarUse
@@ -911,7 +929,7 @@ public class IrParser {
 	}
 
 	private WhileNode parseWhileNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		IExpr condition = parseExpr(array.getJSONArray(0));
 		List<AbstractNode> nodes = parseNodes(array.getJSONArray(1));
 		JoinNode joinNode = (JoinNode) nodes.remove(0);
@@ -919,7 +937,7 @@ public class IrParser {
 	}
 
 	private WriteNode parseWriteNode(int id, Location loc, JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
 		int numTokens = array.getInt(1);
 		VarDef varDef = getVarDef(array.getJSONArray(2));

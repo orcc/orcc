@@ -35,11 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -68,7 +69,8 @@ public class NetworkParser {
 
 	private String path;
 
-	private void checkConnections(DirectedMultigraph<Instance, Connection> graph) {
+	private void checkConnections(DirectedMultigraph<Instance, Connection> graph)
+			throws OrccException {
 		Set<Connection> connections = graph.edgeSet();
 		for (Connection connection : connections) {
 			Instance source = graph.getEdgeSource(connection);
@@ -79,57 +81,58 @@ public class NetworkParser {
 			AbstractType srcType = connection.getSource().getType();
 			AbstractType dstType = connection.getTarget().getType();
 			if (!srcType.equals(dstType)) {
-				throw new IllegalArgumentException("Type error: " + srcActor
-						+ "." + connection.getSource() + " is " + srcType
-						+ ", " + tgtActor + "." + connection.getTarget()
-						+ " is " + dstType);
+				throw new OrccException("Type error: " + srcActor + "."
+						+ connection.getSource() + " is " + srcType + ", "
+						+ tgtActor + "." + connection.getTarget() + " is "
+						+ dstType);
 			}
 		}
 	}
 
 	private void checkInstances(Instance source, String src, Instance target,
-			String dst) {
+			String dst) throws OrccException {
 		if (source == null) {
-			throw new NetworkParseException("A Connection refers to "
+			throw new OrccException("A Connection refers to "
 					+ "a non-existent Instance: \"" + src + "\"");
 		}
 		if (target == null) {
-			throw new NetworkParseException("A Connection refers to "
+			throw new OrccException("A Connection refers to "
 					+ "a non-existent Instance: \"" + dst + "\"");
 		}
 	}
 
 	private void checkPorts(String src, String src_port, String dst,
-			String dst_port) {
+			String dst_port) throws OrccException {
 		if (src.isEmpty()) {
-			throw new NetworkParseException("A Connection element "
+			throw new OrccException("A Connection element "
 					+ "must have a valid non-empty \"src\" attribute");
 		} else if (src_port.isEmpty()) {
-			throw new NetworkParseException("An Connection element "
+			throw new OrccException("An Connection element "
 					+ "must have a valid non-empty \"src-port\" " + "attribute");
 		} else if (dst.isEmpty()) {
-			throw new NetworkParseException("An Connection element "
+			throw new OrccException("An Connection element "
 					+ "must have a valid non-empty \"dst\" attribute");
 		} else if (dst_port.isEmpty()) {
-			throw new NetworkParseException("An Connection element "
+			throw new OrccException("An Connection element "
 					+ "must have a valid non-empty \"dst-port\" " + "attribute");
 		}
 	}
 
 	private void checkPortsVarDef(VarDef srcPort, String src_port,
-			VarDef dstPort, String dst_port) {
+			VarDef dstPort, String dst_port) throws OrccException {
 		if (srcPort == null) {
-			throw new NetworkParseException("A Connection refers to "
+			throw new OrccException("A Connection refers to "
 					+ "a non-existent source port: \"" + src_port + "\"");
 		}
 		if (dstPort == null) {
-			throw new NetworkParseException("A Connection refers to "
+			throw new OrccException("A Connection refers to "
 					+ "a non-existent target port: \"" + dst_port + "\"");
 		}
 	}
 
 	private void parseConnections(
-			DirectedMultigraph<Instance, Connection> graph, Node node) {
+			DirectedMultigraph<Instance, Connection> graph, Node node)
+			throws OrccException {
 		while (node != null) {
 			if (node.getNodeName().equals("Connection")) {
 				Element connection = (Element) node;
@@ -160,7 +163,7 @@ public class NetworkParser {
 		}
 	}
 
-	private IExpr parseExpr(Node node) {
+	private IExpr parseExpr(Node node) throws OrccException {
 		while (node != null) {
 			if (node.getNodeName().equals("Expr")) {
 				Element elt = (Element) node;
@@ -177,25 +180,25 @@ public class NetworkParser {
 					} else if (kind.equals("String")) {
 						return new StringExpr(new Location(), value);
 					} else {
-						throw new NetworkParseException("Unsupported Expr "
+						throw new OrccException("Unsupported Expr "
 								+ "literal kind: \"" + kind + "\"");
 					}
 				} else if (kind.equals("List")) {
 					List<IExpr> exprs = parseExprs(node.getFirstChild());
 					return new ListExpr(new Location(), exprs);
 				} else {
-					throw new NetworkParseException("Unsupported Expr kind: \""
-							+ kind + "\"");
+					throw new OrccException("Unsupported Expr kind: \"" + kind
+							+ "\"");
 				}
 			}
 
 			node = node.getNextSibling();
 		}
 
-		throw new NetworkParseException("Expected a Expr element");
+		throw new OrccException("Expected a Expr element");
 	}
 
-	private List<IExpr> parseExprs(Node node) {
+	private List<IExpr> parseExprs(Node node) throws OrccException {
 		List<IExpr> exprs = new ArrayList<IExpr>();
 		while (node != null) {
 			if (node.getNodeName().equals("Expr")) {
@@ -208,14 +211,15 @@ public class NetworkParser {
 		return exprs;
 	}
 
-	private DirectedMultigraph<Instance, Connection> parseGraph(Element root) {
+	private DirectedMultigraph<Instance, Connection> parseGraph(Element root)
+			throws OrccException {
 		DirectedMultigraph<Instance, Connection> graph = new DirectedMultigraph<Instance, Connection>(
 				Connection.class);
 
 		Node node = parseInstances(graph, root);
 
 		if (instances.isEmpty()) {
-			throw new NetworkParseException(
+			throw new OrccException(
 					"A valid network must contain at least one instance");
 		}
 
@@ -224,11 +228,11 @@ public class NetworkParser {
 		return graph;
 	}
 
-	private Instance parseInstance(Node node) {
+	private Instance parseInstance(Node node) throws OrccException {
 		// instance id
 		String id = ((Element) node).getAttribute("id");
 		if (id.isEmpty()) {
-			throw new NetworkParseException("An Instance element "
+			throw new OrccException("An Instance element "
 					+ "must have a valid \"id\" attribute");
 		}
 
@@ -245,7 +249,7 @@ public class NetworkParser {
 		}
 
 		if (clasz == null || clasz.isEmpty()) {
-			throw new NetworkParseException("An Instance element "
+			throw new OrccException("An Instance element "
 					+ "must have a valid \"Class\" child.");
 		}
 
@@ -256,7 +260,7 @@ public class NetworkParser {
 	}
 
 	private Node parseInstances(DirectedMultigraph<Instance, Connection> graph,
-			Element root) {
+			Element root) throws OrccException {
 		Node node = root.getFirstChild();
 		while (node != null) {
 			if (node.getNodeName().equals("Instance")) {
@@ -274,36 +278,45 @@ public class NetworkParser {
 	}
 
 	public Network parseNetwork(String path, InputStream in)
-			throws ClassCastException, ClassNotFoundException,
-			InstantiationException, IllegalAccessException {
+			throws OrccException {
 		this.path = path;
 
-		// input
-		DOMImplementationRegistry registry = DOMImplementationRegistry
-				.newInstance();
-		DOMImplementationLS impl = (DOMImplementationLS) registry
-				.getDOMImplementation("Core 3.0 XML 3.0 LS");
-		LSInput input = impl.createLSInput();
-		input.setByteStream(in);
+		try {
+			// input
+			DOMImplementationRegistry registry = DOMImplementationRegistry
+					.newInstance();
+			DOMImplementationLS impl = (DOMImplementationLS) registry
+					.getDOMImplementation("Core 3.0 XML 3.0 LS");
+			LSInput input = impl.createLSInput();
+			input.setByteStream(in);
 
-		// parse without comments and whitespace
-		LSParser builder = impl.createLSParser(
-				DOMImplementationLS.MODE_SYNCHRONOUS, null);
-		DOMConfiguration config = builder.getDomConfig();
-		config.setParameter("comments", false);
-		config.setParameter("element-content-whitespace", false);
+			// parse without comments and whitespace
+			LSParser builder = impl.createLSParser(
+					DOMImplementationLS.MODE_SYNCHRONOUS, null);
+			DOMConfiguration config = builder.getDomConfig();
+			config.setParameter("comments", false);
+			config.setParameter("element-content-whitespace", false);
 
-		// returns the document parsed from the input
-		return parseXDF(builder.parse(input));
+			// returns the document parsed from the input
+			return parseXDF(builder.parse(input));
+		} catch (ClassCastException e) {
+			throw new OrccException("could not initialize DOM parser", e);
+		} catch (ClassNotFoundException e) {
+			throw new OrccException("could not initialize DOM parser", e);
+		} catch (InstantiationException e) {
+			throw new OrccException("could not initialize DOM parser", e);
+		} catch (IllegalAccessException e) {
+			throw new OrccException("could not initialize DOM parser", e);
+		}
 	}
 
-	private Map<String, IExpr> parseParameters(Node node) {
+	private Map<String, IExpr> parseParameters(Node node) throws OrccException {
 		Map<String, IExpr> parameters = new HashMap<String, IExpr>();
 		while (node != null) {
 			if (node.getNodeName().equals("Parameter")) {
 				String name = ((Element) node).getAttribute("name");
 				if (name.isEmpty()) {
-					throw new NetworkParseException("A Parameter element "
+					throw new OrccException("A Parameter element "
 							+ "must have a valid \"name\" attribute");
 				}
 
@@ -317,7 +330,7 @@ public class NetworkParser {
 		return parameters;
 	}
 
-	private Integer parseSize(Node node) {
+	private Integer parseSize(Node node) throws OrccException {
 		while (node != null) {
 			if (node.getNodeName().equals("Attribute")) {
 				Element attribute = (Element) node;
@@ -327,7 +340,7 @@ public class NetworkParser {
 					if (expr instanceof IntExpr) {
 						return ((IntExpr) expr).getValue();
 					} else {
-						throw new NetworkParseException(
+						throw new OrccException(
 								"FIFO size: expected an integer, got: " + expr);
 					}
 				}
@@ -339,15 +352,15 @@ public class NetworkParser {
 		return null;
 	}
 
-	private Network parseXDF(Document doc) {
+	private Network parseXDF(Document doc) throws OrccException {
 		Element root = doc.getDocumentElement();
 		if (!root.getNodeName().equals("XDF")) {
-			throw new NetworkParseException("Expected \"XDF\" start element");
+			throw new OrccException("Expected \"XDF\" start element");
 		}
 
 		String name = root.getAttribute("name");
 		if (name.isEmpty()) {
-			throw new NetworkParseException("Expected a \"name\" attribute");
+			throw new OrccException("Expected a \"name\" attribute");
 		}
 
 		instances = new HashMap<String, Instance>();

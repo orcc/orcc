@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.ir.Location;
@@ -69,8 +70,7 @@ import org.antlr.runtime.tree.Tree;
  */
 public class RVCCalASTParser {
 
-	public static void main(String[] args) throws IOException,
-			RVCCalParseException {
+	public static void main(String[] args) throws OrccException {
 		new RVCCalASTParser(args[0]).parse();
 	}
 
@@ -99,8 +99,13 @@ public class RVCCalASTParser {
 	 * @param fileName
 	 * @throws IOException
 	 */
-	public RVCCalASTParser(String fileName) throws IOException {
-		this.file = new File(fileName).getCanonicalPath();
+	public RVCCalASTParser(String fileName) throws OrccException {
+		try {
+			this.file = new File(fileName).getCanonicalPath();
+		} catch (IOException e) {
+			String msg = "could not solve the path \"" + fileName + "\"";
+			throw new OrccException(msg, e);
+		}
 	}
 
 	/**
@@ -110,16 +115,18 @@ public class RVCCalASTParser {
 	 * @throws IOException
 	 * @throws RVCCalParseException
 	 */
-	public Actor parse() throws IOException, RVCCalParseException {
-		CharStream stream = new ANTLRFileStream(file);
-		Lexer lexer = new RVCCalLexer(stream);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		RVCCalParser parser = new RVCCalParser(tokens);
+	public Actor parse() throws OrccException {
 		try {
+			CharStream stream = new ANTLRFileStream(file);
+			Lexer lexer = new RVCCalLexer(stream);
+			CommonTokenStream tokens = new CommonTokenStream(lexer);
+			RVCCalParser parser = new RVCCalParser(tokens);
 			RVCCalParser.actor_return ret = parser.actor();
 			return parseActor((Tree) ret.getTree());
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
 		} catch (RecognitionException e) {
-			throw new RVCCalParseException(e);
+			throw new OrccException("parse error", e);
 		}
 	}
 
@@ -129,7 +136,7 @@ public class RVCCalASTParser {
 	 * @param tree
 	 * @return
 	 */
-	private Actor parseActor(Tree tree) throws RVCCalParseException {
+	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
 		parameters = parseVarDefs(tree.getChild(2));
 		inputs = parseVarDefs(tree.getChild(3));
@@ -139,7 +146,7 @@ public class RVCCalASTParser {
 				null, null, null, null, null);
 	}
 
-	private void parseActorDecls(Tree actorDecls) throws RVCCalParseException {
+	private void parseActorDecls(Tree actorDecls) throws OrccException {
 		stateVars = new ArrayList<StateVar>();
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
@@ -171,7 +178,7 @@ public class RVCCalASTParser {
 		return new Location(file, lineNumber, startColumn, 0, endColumn);
 	}
 
-	private StateVar parseStateVar(Tree stateVar) throws RVCCalParseException {
+	private StateVar parseStateVar(Tree stateVar) throws OrccException {
 		boolean assignable = stateVar.getChild(2).getText()
 				.equals("ASSIGNABLE");
 		VarDef def = parseVarDef(stateVar, assignable, true, 0, null);
@@ -189,7 +196,7 @@ public class RVCCalASTParser {
 	 * @return
 	 * @throws RVCCalParseException
 	 */
-	private AbstractType parseType(Tree tree) throws RVCCalParseException {
+	private AbstractType parseType(Tree tree) throws OrccException {
 		Tree typeTree = tree.getChild(0);
 		Location location = parseLocation(typeTree);
 		String typeName = typeTree.getText();
@@ -214,15 +221,14 @@ public class RVCCalASTParser {
 					.getChild(1));
 			type = new ListType(size, subType);
 		} else {
-			throw new RVCCalParseException(location, "Unknown type: "
-					+ typeName);
+			throw new OrccException(file, location, "Unknown type: " + typeName);
 		}
 
 		return type;
 	}
 
-	private IExpr parseTypeAttributeSize(Location location,
-			Tree typeAttrs, Integer defaultSize) throws RVCCalParseException {
+	private IExpr parseTypeAttributeSize(Location location, Tree typeAttrs,
+			Integer defaultSize) throws OrccException {
 		int n = typeAttrs.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
@@ -234,7 +240,7 @@ public class RVCCalASTParser {
 		// if there is a default size, return it
 		if (defaultSize == null) {
 			// size attribute not found, and no default size given => error
-			throw new RVCCalParseException(location,
+			throw new OrccException(file, location,
 					"missing \"size\" attribute");
 		} else {
 			return new IntExpr(location, defaultSize);
@@ -242,7 +248,7 @@ public class RVCCalASTParser {
 	}
 
 	private AbstractType parseTypeAttributeType(Location location,
-			Tree typeAttrs) throws RVCCalParseException {
+			Tree typeAttrs) throws OrccException {
 		int n = typeAttrs.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
@@ -252,7 +258,7 @@ public class RVCCalASTParser {
 		}
 
 		// size attribute not found, and no default size given => error
-		throw new RVCCalParseException(location, "missing \"type\" attribute");
+		throw new OrccException(file, location, "missing \"type\" attribute");
 	}
 
 	/**
@@ -266,7 +272,7 @@ public class RVCCalASTParser {
 	 * @return
 	 */
 	private VarDef parseVarDef(Tree tree, boolean assignable, boolean global,
-			int index, Integer suffix) throws RVCCalParseException {
+			int index, Integer suffix) throws OrccException {
 		AbstractType type = parseType(tree.getChild(0));
 		Tree nameTree = tree.getChild(1);
 		String name = nameTree.getText();
@@ -286,7 +292,7 @@ public class RVCCalASTParser {
 	 * @param tree
 	 * @return
 	 */
-	private List<VarDef> parseVarDefs(Tree tree) throws RVCCalParseException {
+	private List<VarDef> parseVarDefs(Tree tree) throws OrccException {
 		List<VarDef> varDefs = new ArrayList<VarDef>();
 		int numPorts = tree.getChildCount();
 		for (int i = 0; i < numPorts; i++) {

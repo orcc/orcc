@@ -30,13 +30,14 @@ package net.sf.orcc.ir.network;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Map;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.parser.IrParser;
-import net.sf.orcc.ir.parser.NetworkParseException;
 
 /**
  * An Instance is an {@link Actor} with parameters.
@@ -57,7 +58,7 @@ public class Instance implements Comparable<Instance> {
 	private Map<String, IExpr> parameters;
 
 	public Instance(String path, String id, String clasz,
-			Map<String, IExpr> parameters) {
+			Map<String, IExpr> parameters) throws OrccException {
 		this.clasz = clasz;
 		this.id = id;
 		this.parameters = parameters;
@@ -69,9 +70,12 @@ public class Instance implements Comparable<Instance> {
 				file = new File(fileName);
 				InputStream in = new FileInputStream(file);
 				actor = new IrParser().parseActor(in);
-			} catch (Exception e) {
-				throw new NetworkParseException("Could not parse instance \""
-						+ id + "\" because: " + e.getLocalizedMessage(), e);
+			} catch (OrccException e) {
+				throw new OrccException("Could not parse instance \"" + id
+						+ "\" because: " + e.getLocalizedMessage(), e);
+			} catch (FileNotFoundException e) {
+				throw new OrccException(
+						"I/O error when parsing \"" + id + "\"", e);
 			}
 		}
 	}

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Broadcast;
@@ -52,11 +53,12 @@ import org.jgrapht.graph.DirectedMultigraph;
  */
 public class BroadcastAdder {
 
-	public BroadcastAdder(Network network) {
+	public BroadcastAdder(Network network) throws OrccException {
 		addBroadcast(network.getGraph());
 	}
 
-	private void addBroadcast(DirectedMultigraph<Instance, Connection> graph) {
+	private void addBroadcast(DirectedMultigraph<Instance, Connection> graph)
+			throws OrccException {
 		Set<Connection> toBeRemoved = new HashSet<Connection>();
 
 		Set<Instance> instances = new HashSet<Instance>(graph.vertexSet());

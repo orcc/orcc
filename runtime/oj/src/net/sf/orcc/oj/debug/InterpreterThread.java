@@ -75,6 +75,37 @@ public class InterpreterThread extends Thread {
 		actors = this.scheduler.getActors();
 	}
 
+	private void getArrayValue(JSONObject request) throws JSONException {
+		String actorName = request.getString(DDPConstants.ATTR_ACTOR_NAME);
+		IActorDebug actor = actors.get(actorName);
+		String varName = request.getString(DDPConstants.ATTR_VAR_NAME);
+
+		JSONObject reply = new JSONObject();
+		reply.put(DDPConstants.REPLY, DDPConstants.REP_GET_VALUE);
+		JSONArray varArray = new JSONArray();
+		reply.put(DDPConstants.ATTR_VARIABLES, varArray);
+
+		Map<String, AbstractType> variables = actor.getVariables();
+		AbstractType type = variables.get(varName);
+		if (type != null && type instanceof ListType) {
+			JSONArray array = request.getJSONArray(ATTR_INDEXES);
+			int offset = array.getInt(0);
+			int length = array.getInt(1);
+			for (int i = offset; i < length; i++) {
+				JSONObject obj = new JSONObject();
+				// String val = actor.getValue(varName, i);
+				obj.put(DDPConstants.ATTR_VAR_NAME, "[" + i + "]");
+				obj.put(DDPConstants.ATTR_VAR_TYPE, DDPServer
+						.getType(((ListType) type).getType()));
+				varArray.put(obj);
+			}
+			String value = actor.getValue(varName);
+			reply.put(DDPConstants.ATTR_VALUE, value);
+		}
+
+		writeReply(reply);
+	}
+
 	private void getComponents() throws JSONException {
 		Set<String> set = new TreeSet<String>(actors.keySet());
 		JSONObject reply = new JSONObject();
@@ -82,6 +113,20 @@ public class InterpreterThread extends Thread {
 		JSONArray array = new JSONArray(set);
 		reply.put(DDPConstants.ATTR_COMPONENTS, array);
 		writeReply(reply);
+	}
+
+	private void getStateVariableValue(IActorDebug actor, String varName,
+			JSONObject request, JSONObject reply, JSONArray varArray)
+			throws JSONException {
+		Map<String, AbstractType> variables = actor.getVariables();
+		AbstractType type = variables.get(varName);
+		if (type != null) {
+			String value = actor.getValue(varName);
+			reply.put(DDPConstants.ATTR_VALUE, value);
+		} else {
+			// TODO implement that
+			reply.put(DDPConstants.ATTR_VALUE, "");
+		}
 	}
 
 	private void getValue(JSONObject request) throws JSONException {
@@ -111,31 +156,6 @@ public class InterpreterThread extends Thread {
 		writeReply(reply);
 	}
 
-	private void getStateVariableValue(IActorDebug actor, String varName,
-			JSONObject request, JSONObject reply, JSONArray varArray)
-			throws JSONException {
-		Map<String, AbstractType> variables = actor.getVariables();
-		AbstractType type = variables.get(varName);
-		if (type != null) {
-			if (type instanceof ListType) {
-				if (request.has(ATTR_INDEXES)) {
-					JSONArray array = request.getJSONArray(ATTR_INDEXES);
-					int offset = array.getInt(0);
-					int length = array.getInt(1);
-					for (int i = offset; i < length; i++) {
-						String val = actor.getValue(varName, i);
-						varArray.put(val);
-					}
-				}
-			}
-			String value = actor.getValue(varName);
-			reply.put(DDPConstants.ATTR_VALUE, value);
-		} else {
-			// TODO implement that
-			reply.put(DDPConstants.ATTR_VALUE, "");
-		}
-	}
-
 	private void resume(JSONObject request) throws JSONException {
 		String actorName = request.getString(DDPConstants.ATTR_ACTOR_NAME);
 		actors.get(actorName).resume();
@@ -162,6 +182,8 @@ public class InterpreterThread extends Thread {
 				String requestType = request.getString(DDPConstants.REQUEST);
 				if (requestType.equals(DDPConstants.REQ_EXIT)) {
 					terminate();
+				} else if (requestType.equals(DDPConstants.REQ_GET_ARRAY_VALUE)) {
+					getArrayValue(request);
 				} else if (requestType.equals(DDPConstants.REQ_GET_COMPONENTS)) {
 					getComponents();
 				} else if (requestType.equals(DDPConstants.REQ_GET_VALUE)) {

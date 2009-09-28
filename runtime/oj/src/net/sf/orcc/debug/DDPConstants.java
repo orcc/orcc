@@ -148,6 +148,11 @@ public interface DDPConstants {
 	public static final String REQ_EXIT = "exit";
 
 	/**
+	 * string to indicate the "get array value" request.
+	 */
+	public static final String REQ_GET_ARRAY_VALUE = "get array value";
+
+	/**
 	 * string to indicate the "get components" request.
 	 */
 	public static final String REQ_GET_COMPONENTS = "get components";
