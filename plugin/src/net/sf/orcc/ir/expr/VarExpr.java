@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.actor.VarUse;
 
@@ -50,8 +51,8 @@ public class VarExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws ExprEvaluateException {
-		throw new ExprEvaluateException("could not evaluate");
+	public IExpr evaluate() throws OrccException {
+		throw new OrccException("could not evaluate");
 	}
 
 	@Override

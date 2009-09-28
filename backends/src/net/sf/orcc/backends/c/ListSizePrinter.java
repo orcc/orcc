@@ -31,7 +31,7 @@ package net.sf.orcc.backends.c;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.expr.ExprEvaluateException;
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.AbstractTypeVisitor;
@@ -59,9 +59,9 @@ public class ListSizePrinter extends AbstractTypeVisitor {
 				sizeList.add(((IntExpr) expr).getValue());
 				type.getType().accept(this);
 			} else {
-				throw new ExprEvaluateException("expected int");
+				throw new OrccException("expected int");
 			}
-		} catch (ExprEvaluateException e) {
+		} catch (OrccException e) {
 			e.printStackTrace();
 		}
 	}

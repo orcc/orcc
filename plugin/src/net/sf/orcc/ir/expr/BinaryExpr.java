@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.type.AbstractType;
 
@@ -45,8 +46,8 @@ public class BinaryExpr extends AbstractExpr {
 
 	private AbstractType type;
 
-	public BinaryExpr(Location location, IExpr e1, BinaryOp op,
-			IExpr e2, AbstractType type) {
+	public BinaryExpr(Location location, IExpr e1, BinaryOp op, IExpr e2,
+			AbstractType type) {
 		super(location);
 		this.e1 = e1;
 		this.e2 = e2;
@@ -60,7 +61,7 @@ public class BinaryExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws ExprEvaluateException {
+	public IExpr evaluate() throws OrccException {
 		switch (op) {
 		case BAND:
 			IExpr expr1 = e1.evaluate();
@@ -112,7 +113,7 @@ public class BinaryExpr extends AbstractExpr {
 			break;
 		}
 
-		throw new ExprEvaluateException("could not evaluate");
+		throw new OrccException("could not evaluate");
 	}
 
 	public IExpr getE1() {

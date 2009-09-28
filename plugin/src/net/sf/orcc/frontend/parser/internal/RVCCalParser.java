@@ -5,14 +5,23 @@ package net.sf.orcc.frontend.parser.internal;
 // @SuppressWarnings("unused")
 
 
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.MismatchedSetException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.Parser;
+import org.antlr.runtime.ParserRuleReturnScope;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.RewriteEarlyExitException;
+import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
+import org.antlr.runtime.tree.RewriteRuleTokenStream;
+import org.antlr.runtime.tree.TreeAdaptor;
 
-
-import org.antlr.runtime.tree.*;
-
+@SuppressWarnings("unused")
 public class RVCCalParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ACTOR", "INPUTS", "OUTPUTS", "PORT", "EXPR", "ACTOR_DECLS", "FUNCTION", "PROCEDURE", "STATE_VAR", "PARAMETER", "PARAMETERS", "TYPE", "TYPE_ATTRS", "ASSIGNABLE", "NON_ASSIGNABLE", "ID", "INTEGER", "STRING", "FLOAT", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "'all'", "'any'", "'at'", "'at*'", "'delay'", "'guard'", "':'", "'['", "']'", "','", "'repeat'", "'do'", "'actor'", "'('", "')'", "'==>'", "'end'", "'.'", "'action'", "'var'", "'initialize'", "'='", "':='", "';'", "'function'", "'-->'", "'procedure'", "'begin'", "'import'", "'multi'", "'or'", "'||'", "'and'", "'&&'", "'|'", "'&'", "'!='", "'<'", "'>'", "'<='", "'>='", "'<<'", "'>>'", "'+'", "'-'", "'div'", "'mod'", "'*'", "'/'", "'^'", "'not'", "'#'", "'if'", "'then'", "'else'", "'true'", "'false'", "'for'", "'in'", "'priority'", "'schedule'", "'fsm'", "'regexp'", "'choose'", "'foreach'", "'..'", "'while'", "'type'", "'size'"

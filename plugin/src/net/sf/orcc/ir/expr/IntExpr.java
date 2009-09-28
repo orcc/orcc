@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -49,7 +50,7 @@ public class IntExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws ExprEvaluateException {
+	public IExpr evaluate() throws OrccException {
 		return this;
 	}
 

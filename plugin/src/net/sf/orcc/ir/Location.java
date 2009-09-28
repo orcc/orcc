@@ -36,10 +36,6 @@ public class Location {
 
 	private int endColumn;
 
-	private int endLine;
-
-	private String file;
-
 	private int startColumn;
 
 	private int startLine;
@@ -48,13 +44,11 @@ public class Location {
 	 * Constructs a dummy location.
 	 */
 	public Location() {
-		file = "";
-		// other fields are initialized to 0.
 	}
 
 	/**
-	 * Constructs a location from the specified file, start line and column, end
-	 * line and column.
+	 * Constructs a location from the specified start line, start column, end
+	 * column.
 	 * 
 	 * @param file
 	 *            The file name.
@@ -62,30 +56,17 @@ public class Location {
 	 *            The line where the location starts.
 	 * @param startColumn
 	 *            The column where the location starts.
-	 * @param endLine
-	 *            The line where the location ends.
 	 * @param endColumn
 	 *            The column where the location ends.
 	 */
-	public Location(String file, int startLine, int startColumn, int endLine,
-			int endColumn) {
-		this.file = file;
+	public Location(int startLine, int startColumn, int endColumn) {
 		this.startLine = startLine;
 		this.startColumn = startColumn;
-		this.endLine = endLine;
 		this.endColumn = endColumn;
 	}
 
 	public int getEndColumn() {
 		return endColumn;
-	}
-
-	public int getEndLine() {
-		return endLine;
-	}
-
-	public String getFile() {
-		return file;
 	}
 
 	public int getStartColumn() {
@@ -97,13 +78,8 @@ public class Location {
 	}
 
 	public String toString() {
-		String res = "File \"" + file + "\", line " + startLine;
-		if (startLine == endLine) {
-			res += ", characters " + startColumn + "-" + endColumn;
-		} else {
-			res += ", character " + startColumn + " (end at line " + endLine;
-			res += ", character " + endColumn + ")";
-		}
+		String res = "line " + startLine + ", characters " + startColumn + "-"
+				+ endColumn;
 		return res;
 	}
 

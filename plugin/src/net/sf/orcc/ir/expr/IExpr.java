@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.OrccException;
+
 /**
  * @author Matthieu Wipliez
  * 
@@ -65,7 +67,7 @@ public interface IExpr {
 	 * @throws ExprEvaluateException
 	 *             if the expression cannot be evaluated.
 	 */
-	public IExpr evaluate() throws ExprEvaluateException;
+	public IExpr evaluate() throws OrccException;
 
 	/**
 	 * Returns the type of this expression.

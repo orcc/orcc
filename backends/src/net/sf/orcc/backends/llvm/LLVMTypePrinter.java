@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.ir.expr.ExprEvaluateException;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.AbstractType;
@@ -55,7 +55,7 @@ public class LLVMTypePrinter implements LLVMTypeVisitor {
 		try {
 			int size = Util.evaluateAsInteger(expr);
 			builder.append(size);
-		} catch (ExprEvaluateException e) {
+		} catch (OrccException e) {
 			e.printStackTrace();
 		}
 	}

@@ -36,6 +36,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNode;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
@@ -57,12 +58,11 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.ExprEvaluateException;
 import net.sf.orcc.ir.expr.ExprVisitor;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -219,14 +219,14 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		if (type instanceof IntType) {
 			try {
 				return Util.evaluateAsInteger(((IntType) type).getSize());
-			} catch (ExprEvaluateException e) {
+			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;
 			}
 		} else if (type instanceof UintType) {
 			try {
 				return Util.evaluateAsInteger(((UintType) type).getSize());
-			} catch (ExprEvaluateException e) {
+			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;
 			}
@@ -376,7 +376,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 							indUse.setVarDef(vardef);
 						}
-					} catch (ExprEvaluateException e) {
+					} catch (OrccException e) {
 						e.printStackTrace();
 					}
 				}

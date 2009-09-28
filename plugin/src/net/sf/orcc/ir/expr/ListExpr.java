@@ -30,6 +30,7 @@ package net.sf.orcc.ir.expr;
 
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -51,8 +52,8 @@ public class ListExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws ExprEvaluateException {
-		throw new ExprEvaluateException("could not evaluate");
+	public IExpr evaluate() throws OrccException {
+		throw new OrccException("could not evaluate");
 	}
 
 	@Override

@@ -31,13 +31,13 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.ExprEvaluateException;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
@@ -111,7 +111,7 @@ public class CorrectBinayExpressionType extends AbstractNodeVisitor {
 		if (type instanceof IntType) {
 			try {
 				return Util.evaluateAsInteger(((IntType) type).getSize());
-			} catch (ExprEvaluateException e) {
+			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;
 			}

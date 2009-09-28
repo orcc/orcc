@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.c;
 
-import net.sf.orcc.ir.expr.ExprEvaluateException;
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.AbstractType;
@@ -63,7 +63,7 @@ public class TypeToString implements TypeVisitor {
 			} else if (size <= 64) {
 				builder.append("long long");
 			}
-		} catch (ExprEvaluateException e) {
+		} catch (OrccException e) {
 			e.printStackTrace();
 		}
 	}

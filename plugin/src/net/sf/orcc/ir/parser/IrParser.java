@@ -28,6 +28,56 @@
  */
 package net.sf.orcc.ir.parser;
 
+import static net.sf.orcc.ir.IrConstants.BINARY_EXPR;
+import static net.sf.orcc.ir.IrConstants.BOP_BAND;
+import static net.sf.orcc.ir.IrConstants.BOP_BOR;
+import static net.sf.orcc.ir.IrConstants.BOP_BXOR;
+import static net.sf.orcc.ir.IrConstants.BOP_DIV;
+import static net.sf.orcc.ir.IrConstants.BOP_DIV_INT;
+import static net.sf.orcc.ir.IrConstants.BOP_EQ;
+import static net.sf.orcc.ir.IrConstants.BOP_EXP;
+import static net.sf.orcc.ir.IrConstants.BOP_GE;
+import static net.sf.orcc.ir.IrConstants.BOP_GT;
+import static net.sf.orcc.ir.IrConstants.BOP_LAND;
+import static net.sf.orcc.ir.IrConstants.BOP_LE;
+import static net.sf.orcc.ir.IrConstants.BOP_LOR;
+import static net.sf.orcc.ir.IrConstants.BOP_LT;
+import static net.sf.orcc.ir.IrConstants.BOP_MINUS;
+import static net.sf.orcc.ir.IrConstants.BOP_MOD;
+import static net.sf.orcc.ir.IrConstants.BOP_NE;
+import static net.sf.orcc.ir.IrConstants.BOP_PLUS;
+import static net.sf.orcc.ir.IrConstants.BOP_SHIFT_LEFT;
+import static net.sf.orcc.ir.IrConstants.BOP_SHIFT_RIGHT;
+import static net.sf.orcc.ir.IrConstants.BOP_TIMES;
+import static net.sf.orcc.ir.IrConstants.KEY_ACTIONS;
+import static net.sf.orcc.ir.IrConstants.KEY_ACTION_SCHED;
+import static net.sf.orcc.ir.IrConstants.KEY_INITIALIZES;
+import static net.sf.orcc.ir.IrConstants.KEY_INPUTS;
+import static net.sf.orcc.ir.IrConstants.KEY_NAME;
+import static net.sf.orcc.ir.IrConstants.KEY_OUTPUTS;
+import static net.sf.orcc.ir.IrConstants.KEY_PROCEDURES;
+import static net.sf.orcc.ir.IrConstants.KEY_SOURCE_FILE;
+import static net.sf.orcc.ir.IrConstants.KEY_STATE_VARS;
+import static net.sf.orcc.ir.IrConstants.NAME_ASSIGN;
+import static net.sf.orcc.ir.IrConstants.NAME_CALL;
+import static net.sf.orcc.ir.IrConstants.NAME_EMPTY;
+import static net.sf.orcc.ir.IrConstants.NAME_HAS_TOKENS;
+import static net.sf.orcc.ir.IrConstants.NAME_IF;
+import static net.sf.orcc.ir.IrConstants.NAME_JOIN;
+import static net.sf.orcc.ir.IrConstants.NAME_LOAD;
+import static net.sf.orcc.ir.IrConstants.NAME_PEEK;
+import static net.sf.orcc.ir.IrConstants.NAME_READ;
+import static net.sf.orcc.ir.IrConstants.NAME_RETURN;
+import static net.sf.orcc.ir.IrConstants.NAME_STORE;
+import static net.sf.orcc.ir.IrConstants.NAME_WHILE;
+import static net.sf.orcc.ir.IrConstants.NAME_WRITE;
+import static net.sf.orcc.ir.IrConstants.UNARY_EXPR;
+import static net.sf.orcc.ir.IrConstants.UOP_BNOT;
+import static net.sf.orcc.ir.IrConstants.UOP_LNOT;
+import static net.sf.orcc.ir.IrConstants.UOP_MINUS;
+import static net.sf.orcc.ir.IrConstants.UOP_NUM_ELTS;
+import static net.sf.orcc.ir.IrConstants.VAR_EXPR;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -53,10 +103,10 @@ import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
@@ -97,102 +147,6 @@ import org.json.JSONTokener;
  * 
  */
 public class IrParser {
-
-	private static final String BINARY_EXPR = "2 op";
-
-	private static final String BOP_BAND = "bitand";
-
-	private static final String BOP_BOR = "bitor";
-
-	private static final String BOP_BXOR = "bitxor";
-
-	private static final String BOP_DIV = "div";
-
-	private static final String BOP_DIV_INT = "intDiv";
-
-	private static final String BOP_EQ = "equal";
-
-	private static final String BOP_EXP = "exp";
-
-	private static final String BOP_GE = "ge";
-
-	private static final String BOP_GT = "gt";
-
-	private static final String BOP_LAND = "and";
-
-	private static final String BOP_LE = "le";
-
-	private static final String BOP_LOR = "or";
-
-	private static final String BOP_LT = "lt";
-
-	private static final String BOP_MINUS = "minus";
-
-	private static final String BOP_MOD = "mod";
-
-	private static final String BOP_NE = "ne";
-
-	private static final String BOP_PLUS = "plus";
-
-	private static final String BOP_SHIFT_LEFT = "lshift";
-
-	private static final String BOP_SHIFT_RIGHT = "rshift";
-
-	private static final String BOP_TIMES = "mul";
-
-	private static final String KEY_ACTION_SCHED = "action scheduler";
-
-	private final static String KEY_ACTIONS = "actions";
-
-	private final static String KEY_INITIALIZES = "initializes";
-
-	private final static String KEY_INPUTS = "inputs";
-
-	private final static String KEY_NAME = "name";
-
-	private final static String KEY_OUTPUTS = "outputs";
-
-	private final static String KEY_PROCEDURES = "procedures";
-
-	private final static String KEY_STATE_VARS = "state variables";
-
-	private static final String NAME_ASSIGN = "assign";
-
-	private static final String NAME_CALL = "call";
-
-	private static final String NAME_EMPTY = "empty";
-
-	private static final String NAME_HAS_TOKENS = "hasTokens";
-
-	private static final String NAME_IF = "if";
-
-	private static final String NAME_JOIN = "join";
-
-	private static final String NAME_LOAD = "load";
-
-	private static final String NAME_PEEK = "peek";
-
-	private static final String NAME_READ = "read";
-
-	private static final String NAME_RETURN = "return";
-
-	private static final String NAME_STORE = "store";
-
-	private static final String NAME_WHILE = "while";
-
-	private static final String NAME_WRITE = "write";
-
-	private static final String UNARY_EXPR = "1 op";
-
-	private static final String UOP_BNOT = "bitnot";
-
-	private static final String UOP_LNOT = "not";
-
-	private static final String UOP_MINUS = "unaryMinus";
-
-	private static final String UOP_NUM_ELTS = "numElements";
-
-	private static final String VAR_EXPR = "var";
 
 	private Map<List<String>, Action> actions;
 
@@ -298,7 +252,7 @@ public class IrParser {
 			JSONTokener tokener = new JSONTokener(new InputStreamReader(in));
 			JSONObject obj = new JSONObject(tokener);
 
-			file = obj.getString("source file");
+			file = obj.getString(KEY_SOURCE_FILE);
 			String name = obj.getString(KEY_NAME);
 			List<VarDef> inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
 			List<VarDef> outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
@@ -565,23 +519,15 @@ public class IrParser {
 		return new LoadNode(id, loc, target, source, indexes);
 	}
 
-	/**
-	 * Parses the given list as a location.
-	 * 
-	 * @param list
-	 *            A YAML-encoded list of objects that contain location
-	 *            information.
-	 * @return A {@link Location}.
-	 * @throws JSONException
-	 */
 	private Location parseLocation(JSONArray array) throws JSONException {
 		if (array.length() == 4) {
 			int startLine = array.getInt(0);
 			int startCol = array.getInt(1);
-			int endLine = array.getInt(2);
+			// TODO to be removed when Java frontend done.
+			// int endLine = array.getInt(2);
 			int endCol = array.getInt(3);
 
-			return new Location(file, startLine, startCol, endLine, endCol);
+			return new Location(startLine, startCol, endCol);
 		} else {
 			return new Location();
 		}

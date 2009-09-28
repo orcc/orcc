@@ -175,7 +175,7 @@ public class RVCCalASTParser {
 		int startColumn = tree.getCharPositionInLine();
 		int endColumn = startColumn + tree.getText().length();
 
-		return new Location(file, lineNumber, startColumn, 0, endColumn);
+		return new Location(lineNumber, startColumn, endColumn);
 	}
 
 	private StateVar parseStateVar(Tree stateVar) throws OrccException {
