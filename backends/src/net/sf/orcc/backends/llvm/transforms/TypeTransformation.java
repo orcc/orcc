@@ -200,12 +200,17 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		AbstractType type = expr.getType();
 		IExpr exprE1 = expr.getExpr();
 		UnaryOp op = expr.getOp();
-
+		IntExpr constExpr = new IntExpr(new Location(), 0);
+		BinaryExpr varExpr;
+		
 		switch (op) {
 		case MINUS:
-			IntExpr constExpr = new IntExpr(new Location(), 0);
-			BinaryExpr varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS,
+			varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS,
 					exprE1, type);
+			return varExpr;
+		case LNOT:
+			varExpr = new BinaryExpr(loc, exprE1,
+					BinaryOp.NE, constExpr, type);
 			return varExpr;
 		default:
 
@@ -478,25 +483,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		// Unary expression doesn't exists in LLVM
-		if (args[0] instanceof AssignVarNode) {
-			AssignVarNode node = (AssignVarNode) args[0];
-			Location loc = expr.getLocation();
-			AbstractType type = expr.getType();
-			IExpr exprE1 = expr.getExpr();
-			UnaryOp op = expr.getOp();
 
-			switch (op) {
-			case MINUS:
-				IntExpr constExpr = new IntExpr(new Location(), 0);
-				BinaryExpr varExpr = new BinaryExpr(loc, constExpr,
-						BinaryOp.MINUS, exprE1, type);
-				node.setValue(varExpr);
-				varExpr.accept(this, args);
-			default:
-
-			}
-		}
 	}
 
 	public void visit(VarExpr expr, Object... args) {

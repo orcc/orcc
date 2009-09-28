@@ -41,7 +41,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.AssignPeephole;
-import net.sf.orcc.ir.transforms.CorrectBinayExpressionType;
+import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
 import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
 import net.sf.orcc.ir.transforms.ExpressionTransformation;
 
@@ -84,7 +84,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 	protected void printActor(String id, Actor actor) throws Exception {
 		new EmptyNodeRemoval(actor);
 		new ExpressionTransformation(actor);
-		new CorrectBinayExpressionType(actor);
+		new CorrectBinaryExpressionType(actor);
 		new AssignPeephole(actor);
 		new ControlFlowTransformation(actor);
 		new AddInstantationProcedure(actor);

@@ -54,9 +54,9 @@ import net.sf.orcc.ir.type.IntType;
  * @author Jérôme GORIN
  * 
  */
-public class CorrectBinayExpressionType extends AbstractNodeVisitor {
+public class CorrectBinaryExpressionType extends AbstractNodeVisitor {
 
-	public CorrectBinayExpressionType(Actor actor) {
+	public CorrectBinaryExpressionType(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
