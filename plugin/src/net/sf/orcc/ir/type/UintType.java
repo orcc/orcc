@@ -53,7 +53,7 @@ public class UintType extends AbstractType {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof UintType) {
-			return (size == ((UintType) obj).size);
+			return size.equals(((UintType)obj).size);
 		} else {
 			return false;
 		}
