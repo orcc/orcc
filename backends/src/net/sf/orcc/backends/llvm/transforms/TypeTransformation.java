@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.transforms;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -42,7 +41,6 @@ import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
-import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.PhiNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
@@ -410,11 +408,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 
 		if (!(targetType.equals(type))) {
-			VarDef castVar = new VarDef(sourceVar);
-			castVar.setName("");
-			castVar.setIndex(0);
-			castVar.setType(sourceType.getType());
-			castVar.setSuffix(nodeCount++);
+			VarDef castVar = varDefCreate(sourceType.getType());
 			node.setTarget(castVar);
 			it.add(castNodeCreate(castVar, targetVar));
 		}
@@ -427,39 +421,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(PhiNode node, Object... args) {
-		BrNode brNode = (BrNode) args[0];
-
-		AbstractType varType = node.getType();
-		Map<VarDef, LabelNode> assignements = node.getAssignements();
-		Map<VarDef, LabelNode> tmpAssignements = new HashMap<VarDef, LabelNode>();
-
-		for (Map.Entry<VarDef, LabelNode> assignement : assignements.entrySet()) {
-			VarDef varKey = assignement.getKey();
-			LabelNode labelNode = assignement.getValue();
-
-			if (!(varType.equals(varKey.getType()))) {
-				VarDef castVar = varDefCreate(varType);
-				AbstractLLVMNode castNode = castNodeCreate(varKey, castVar);
-
-				// it.add(castNode);
-				// it.next();
-				/*
-				 * if
-				 * (labelNode.getLabelName().compareTo(brNode.getLabelTrueNode
-				 * ().getLabelName()) ==0 ){
-				 * brNode.getThenNodes().add(castNode); }else if
-				 * (labelNode.getLabelName
-				 * ().compareTo(brNode.getLabelFalseNode().getLabelName()) ==0
-				 * ){ brNode.getElseNodes().add(castNode); }else{
-				 * 
-				 * }
-				 */
-
-				varKey = castVar;
-			}
-			tmpAssignements.put(varKey, labelNode);
-		}
-		node.setAssignements(tmpAssignements);
+	
 	}
 
 	@Override
