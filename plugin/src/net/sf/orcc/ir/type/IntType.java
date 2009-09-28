@@ -53,7 +53,7 @@ public class IntType extends AbstractType {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof IntType) {
-			return (size == ((IntType) obj).size);
+			return size.equals(((IntType)obj).size);
 		} else {
 			return false;
 		}
