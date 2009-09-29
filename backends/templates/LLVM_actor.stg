@@ -179,6 +179,11 @@ loadFifo(actorName, fifoName, index) ::= <<
 
 >>
 
+loadFifoTmp(var, actorName, fifoName) ::= <<
+	%$var$ = load %struct.lff_t** @$actorName$_$fifoName$
+
+>>
+
 // return node
 returnNode(expr) ::= <<
 	ret $expr$
@@ -202,6 +207,17 @@ whileNode(expr, nodes) ::= <<
 while ($expr$) {
 	$nodes$}
 
+>>
+
+// hasRoom node
+hasRoomNode(var, expr, token) ::= <<
+	%$var$ =  call i1 @lff_hasRoom(%struct.lff_t* $expr$, i32 $token$)
+	
+>>
+
+// andNode node
+andNode(var, e1, e2) ::= <<
+	%$var$ = and i1 $e1$, $e2$
 >>
 
 // write node
@@ -242,21 +258,10 @@ $nodes$
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-loadPattern(actorName, pattern) ::= <<
-$pattern.keys:{port|%$actorName$_$port$ = load %struct.lff_t** @$actorName$_$port$$\n$}$
+outputPattern(actorName, pattern, token, iterator) ::= <<
+$loadFifoTmp(var=iterator.index, actorName= actorName, fifoName=pattern)$ $hasRoomNode(var=iterator.nextNodeIndex.index, expr="%"+iterator.lastIndex, token=token)$
 >>
 
-outputPattern(tag, actorName, pattern) ::= <<
-$if(rest(pattern))$
-$pattern.keys:{%$it$ =  call i1 @lff_hasRoom(%struct.lff_t* %$actorName$_$it$, i32 $pattern.(it)$) $\n$}$
-%0 = and i1 %$first(pattern.keys)$, %$first(rest(pattern.keys))$
-$rest(rest(trunc(pattern.keys))):{port|%$i$= and i1 %$i0$, %$port$$\n$}$
-%$tag$ = and i1 %$last(pattern.keys)$, %$i$
-
-$else$
-%$tag$ = $pattern.keys:{port|call i1 @lff_hasRoom(%struct.lff_t* %$actorName$_$port$, i32 $pattern.(port)$)}$
-$endif$
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
@@ -267,15 +272,17 @@ actionCall(action) ::= <<
 	
 >>
 
-actionTest(actorName, action) ::= <<
+actionTest(actorName, action, iterator) ::= <<
 	%$action.tag$ = call i1 @isSchedulable_$action.tag$()
 	br i1 %$action.tag$, label %fire_$action.tag$, label %skip_$action.tag$
 
 fire_$action.tag$:
-	$if(action.outputPattern)$
-	$loadPattern(actorName=actorName, pattern=action.outputPattern)$
-	$outputPattern(tag="room_"+action.tag, actorName=actorName, pattern=action.outputPattern)$
-	br i1 %room_$action.tag$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
+$if(action.outputPattern)$
+$first(action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
+$first(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
+$rest(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
+$andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$$\n$}$
+	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
 
 hasRoom_$action.tag$:
 $actionCall(action)$
@@ -290,11 +297,11 @@ skip_$action.tag$:
 
 >>
 
-schedulingTest(actorName, actions) ::= <<
-$actions: actionTest(actorName=actorName, action=it)$
+schedulingTest(actorName, actions, iterator) ::= <<
+$actions: actionTest(actorName=actorName, action=it, iterator = iterator)$
 >>
 
-scheduler(actorName, actions) ::= <<
+scheduler(actorName, actions, iterator) ::= <<
 define i32 @$actorName$_scheduler() {
 entry:
 	%i = alloca i32
@@ -303,7 +310,7 @@ entry:
 	
 bb:  
 $if(actions)$
-$schedulingTest(actorName=actorName, actions=actions)$
+$schedulingTest(actorName=actorName, actions=actions, iterator = iterator)$
 $endif$
 	br label %return
 
@@ -324,16 +331,15 @@ actionCallState(nextState) ::= <<
 
 >>
 
-actionTestState(actorName, nextState, br) ::= <<
+actionTestState(actorName, nextState, br, iterator) ::= <<
 
 $if(nextState.action.outputPattern)$
 	%sched_$nextState.action.tag$ = call i1 @isSchedulable_$nextState.action.tag$()
 	br i1 %sched_$nextState.action.tag$, label %$nextState.action.tag$, label %$br$
 
 $nextState.action.tag$:
-	$loadPattern(actorName=actorName, pattern=nextState.action.outputPattern)$
-	$outputPattern(tag="hasToken_"+actorName, actorName=actorName, pattern=nextState.action.outputPattern)$
-	br i1 %hasToken_$actorName$, label %n_$nextState.action.tag$, label %$br$
+$nextState.action.outputPattern.keys:{port|$outputPattern(actorName=actorName, pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator.init)$}$
+	br i1 %$iterator.nextNodeIndex.lastIndex$, label %n_$nextState.action.tag$, label %$br$
 
 n_$nextState.action.tag$:
 $actionCallState(nextState)$
@@ -350,15 +356,15 @@ $endif$
 
 >>
 
-schedulingTestState(actorName, nextStates) ::= <<
-$trunc(nextStates): actionTestState(actorName=actorName, nextState=it, br = "bb"+i0)$
-$last(nextStates): actionTestState(actorName=actorName, nextState=it, br = "return")$
+schedulingTestState(actorName, nextStates, iterator) ::= <<
+$trunc(nextStates): actionTestState(actorName=actorName, nextState=it, br = "bb"+i0, iterator = iterator)$
+$last(nextStates): actionTestState(actorName=actorName, nextState=it, br = "return", iterator = iterator)$
 >>
 
-stateScheduler(actorName, transition) ::= <<
+stateScheduler(actorName, transition, iterator) ::= <<
 define internal i1 @$transition.sourceState$_state_scheduler() {
 entry:
-$schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo)$
+$schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo, iterator = iterator)$
 	ret i1 0
 }
 
@@ -377,7 +383,7 @@ default:
 
 >>
 
-schedulerFSM(actorName, actions, fsm) ::= <<
+schedulerFSM(actorName, actions, fsm, iterator) ::= <<
 
 @_FSM_state = internal global i32 $fsm.initialIntState$
 
@@ -385,13 +391,13 @@ $if(actions)$
 static int outside_FSM_scheduler() {
 	int res = 0;
 	int i = 0;
-	$schedulingTest(actorName=actorName, actions=actions)$
+	$schedulingTest(actorName=actorName, actions=actions, iterator = iterator)$
 	return res;
 }
 
 
 $endif$
-$fsm.transitions: stateScheduler(actorName=actorName, transition=it); separator="\n"$
+$fsm.transitions: stateScheduler(actorName=actorName, transition=it, iterator = iterator); separator="\n"$
 define i32 @$actorName$_scheduler() {
 entry:
 	%i = alloca i32
@@ -421,7 +427,7 @@ return:
 ///////////////////////////////////////////////////////////////////////////////
 
 actor(name, inputs, outputs, stateVars, insts, procs,  
-      actions, initializes, scheduler, initialize) ::= <<
+      actions, initializes, scheduler, initialize, iterator) ::= <<
 ; Generated from "$name$"
 
 %struct.lff_t = type { i32, i8*, i32, i32, i32 }
@@ -468,8 +474,8 @@ $endif$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Action scheduler
 $if(scheduler.fsm)$
-$schedulerFSM(actorName=name, actions=scheduler.actions, fsm=scheduler.fsm)$
+$schedulerFSM(actorName=name, actions=scheduler.actions, fsm=scheduler.fsm, iterator = iterator)$
 $else$
-$scheduler(actorName=name, actions=scheduler.actions)$
+$scheduler(actorName=name, actions=scheduler.actions, iterator= iterator)$
 $endif$
 >>

@@ -37,6 +37,7 @@ import java.util.Map;
 
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.backends.llvm.type.PointType;
+import net.sf.orcc.backends.llvm.util.NodeIndex;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
@@ -185,6 +186,8 @@ public class LLVMActorPrinter {
 	}
 
 	private void setAttributes(Actor actor) {
+		
+
 		String actorName = actor.getName();
 		template.setAttribute("name", actorName);
 		setFifos("inputs", actor.getInputs());
@@ -195,6 +198,7 @@ public class LLVMActorPrinter {
 		setActions("actions", actorName, actor.getActions());
 		setActions("initializes", actorName, actor.getInitializes());
 		template.setAttribute("scheduler", actor.getActionScheduler());
+		template.setAttribute("iterator", new NodeIndex(0));
 		template.setAttribute("initialize", actor.getInitializes());
 	}
 	
