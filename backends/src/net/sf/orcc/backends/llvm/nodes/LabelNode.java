@@ -53,6 +53,15 @@ public class LabelNode extends AbstractLLVMNode {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof LabelNode) {
+			return (labelName.compareTo(((LabelNode) obj).getLabelName()) == 0);
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
 	public String toString() {
 		return labelName;
 	}

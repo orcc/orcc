@@ -208,14 +208,6 @@ public class LLVMActorPrinter {
 		template.setAttribute(attribute, names);
 	}
 
-	private void setProcedures(String actorName, List<Procedure> procs) {
-		for (Procedure proc : procs) {
-			if (!proc.isExternal()) {
-				template.setAttribute("procs", applyProc(actorName, proc));
-			}
-		}
-	}
-	
 	private void setInstantations(String actorName, List<Procedure> procs) {
 		for (Procedure proc : procs) {
 			int count = 0;
@@ -234,6 +226,14 @@ public class LLVMActorPrinter {
 			}
 			
 			template.setAttribute("insts", instTmpl);
+		}
+	}
+	
+	private void setProcedures(String actorName, List<Procedure> procs) {
+		for (Procedure proc : procs) {
+			if (!proc.isExternal()) {
+				template.setAttribute("procs", applyProc(actorName, proc));
+			}
 		}
 	}
 

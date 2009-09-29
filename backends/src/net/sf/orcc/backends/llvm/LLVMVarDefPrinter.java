@@ -43,11 +43,11 @@ import net.sf.orcc.ir.type.AbstractType;
  */
 public class LLVMVarDefPrinter {
 
-	private List<String> ports;
-
-	private LLVMTypePrinter typeVisitor;
-	
 	protected LLVMExprPrinter exprPrinter;
+
+	private List<String> ports;
+	
+	private LLVMTypePrinter typeVisitor;
 
 	public LLVMVarDefPrinter(LLVMTypePrinter typeVisitor) {
 		this.typeVisitor = typeVisitor;

@@ -85,15 +85,15 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	private String attrName;
 
+	private LLVMExprPrinter exprPrinter;
+
 	private StringTemplateGroup group;
 
 	private StringTemplate template;
 
-	private LLVMVarDefPrinter varDefPrinter;
-
-	private LLVMExprPrinter exprPrinter;
-
 	private LLVMTypePrinter typeToString;
+
+	private LLVMVarDefPrinter varDefPrinter;
 
 	public LLVMNodePrinter(StringTemplateGroup group, StringTemplate template,
 			String actorName, LLVMVarDefPrinter varDefPrinter,
@@ -213,6 +213,28 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	}
 
 	@Override
+	public void visit(GetElementPtrNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("getElementPtrNode");
+
+		VarDef varDef = node.getVarDef();
+		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef,
+				false));
+
+		varDef = node.getSource().getVarDef();
+		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef,
+				true));
+
+		List<IExpr> indexes = node.getIndexes();
+		for (IExpr index : indexes) {
+			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index, varDef
+					.getType()));
+		}
+
+		template.setAttribute(attrName, nodeTmpl);
+
+	}
+
+	@Override
 	public void visit(HasTokensNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("hasTokensNode");
 
@@ -230,6 +252,19 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	@Override
 	public void visit(IfNode node, Object... args) {
 
+	}
+
+	@Override
+	public void visit(InitPortNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("initPortNode");
+
+		nodeTmpl.setAttribute("actorName", actorName);
+		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
+				false));
+		nodeTmpl.setAttribute("index", (Integer) args[0]);
+
+		template.setAttribute(attrName, nodeTmpl);
 	}
 
 	@Override
@@ -284,6 +319,31 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
+
+		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(PhiNode node, Object... args) {
+		Map<VarDef, LabelNode> assignements = node.getAssignements();
+
+		StringTemplate nodeTmpl = group.getInstanceOf("phiNode");
+
+		// varDef contains the variable (with the same name as the port)
+		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(node
+				.getVarDef(), false));
+		nodeTmpl.setAttribute("type", typeToString.toString(node.getType()));
+
+		for (Entry<VarDef, LabelNode> assignement : assignements.entrySet()) {
+			StringTemplate phiTmpl = group.getInstanceOf("phiPair");
+
+			VarDef varDef = assignement.getKey();
+			phiTmpl.setAttribute("value", varDefPrinter.getVarDefName(varDef,
+					false));
+			phiTmpl.setAttribute("label", assignement.getValue());
+
+			nodeTmpl.setAttribute("assignements", phiTmpl);
+		}
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -349,6 +409,22 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	}
 
 	@Override
+	public void visit(SextNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("SextNode");
+
+		// varDef contains the variable (with the same name as the port)
+		VarDef varDef = node.getVar();
+		nodeTmpl
+				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
+		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
+				varDef.getType()));
+
+		template.setAttribute(attrName, nodeTmpl);
+
+	}
+
+	@Override
 	public void visit(StoreNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("storeNode");
 
@@ -365,6 +441,22 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 				type));
 
 		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(TruncNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("TruncNode");
+
+		// varDef contains the variable (with the same name as the port)
+		VarDef varDef = node.getVar();
+		nodeTmpl
+				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
+		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
+				varDef.getType()));
+
+		template.setAttribute(attrName, nodeTmpl);
+
 	}
 
 	@Override
@@ -405,22 +497,6 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	}
 
 	@Override
-	public void visit(TruncNode node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("TruncNode");
-
-		// varDef contains the variable (with the same name as the port)
-		VarDef varDef = node.getVar();
-		nodeTmpl
-				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
-		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
-				varDef.getType()));
-
-		template.setAttribute(attrName, nodeTmpl);
-
-	}
-
-	@Override
 	public void visit(ZextNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("ZextNode");
 
@@ -434,81 +510,5 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 		template.setAttribute(attrName, nodeTmpl);
 
-	}
-
-	@Override
-	public void visit(GetElementPtrNode node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("getElementPtrNode");
-
-		VarDef varDef = node.getVarDef();
-		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef,
-				false));
-
-		varDef = node.getSource().getVarDef();
-		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef,
-				true));
-
-		List<IExpr> indexes = node.getIndexes();
-		for (IExpr index : indexes) {
-			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index, varDef
-					.getType()));
-		}
-
-		template.setAttribute(attrName, nodeTmpl);
-
-	}
-
-	@Override
-	public void visit(InitPortNode node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("initPortNode");
-
-		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
-				false));
-		nodeTmpl.setAttribute("index", (Integer) args[0]);
-
-		template.setAttribute(attrName, nodeTmpl);
-	}
-
-	@Override
-	public void visit(SextNode node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("SextNode");
-
-		// varDef contains the variable (with the same name as the port)
-		VarDef varDef = node.getVar();
-		nodeTmpl
-				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
-		nodeTmpl.setAttribute("type", typeToString.toString(varDef.getType()));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
-				varDef.getType()));
-
-		template.setAttribute(attrName, nodeTmpl);
-
-	}
-
-	@Override
-	public void visit(PhiNode node, Object... args) {
-		Map<VarDef, LabelNode> assignements = node.getAssignements();
-
-		StringTemplate nodeTmpl = group.getInstanceOf("phiNode");
-
-		// varDef contains the variable (with the same name as the port)
-		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(node
-				.getVarDef(), false));
-		nodeTmpl.setAttribute("type", typeToString.toString(node.getType()));
-
-		for (Entry<VarDef, LabelNode> assignement : assignements.entrySet()) {
-			StringTemplate phiTmpl = group.getInstanceOf("phiPair");
-
-			VarDef varDef = assignement.getKey();
-			phiTmpl.setAttribute("value", varDefPrinter.getVarDefName(varDef,
-					false));
-			phiTmpl.setAttribute("label", assignement.getValue());
-
-			nodeTmpl.setAttribute("assignements", phiTmpl);
-		}
-
-		template.setAttribute(attrName, nodeTmpl);
 	}
 }

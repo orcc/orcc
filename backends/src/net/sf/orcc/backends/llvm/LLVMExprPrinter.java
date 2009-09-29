@@ -50,12 +50,6 @@ import net.sf.orcc.ir.type.BoolType;
  * 
  */
 public class LLVMExprPrinter implements ExprVisitor {
-	private StringBuilder builder;
-
-	private LLVMVarDefPrinter varDefPrinter;
-	
-	private LLVMTypePrinter typePrinter;
-	
 	public static String toString(BinaryOp op) {
 		switch (op) {
 		case BAND:
@@ -118,6 +112,12 @@ public class LLVMExprPrinter implements ExprVisitor {
 			throw new NullPointerException();
 		}
 	}
+	
+	private StringBuilder builder;
+	
+	private LLVMTypePrinter typePrinter;
+
+	private LLVMVarDefPrinter varDefPrinter;
 
 	public LLVMExprPrinter(LLVMTypePrinter typePrinter, LLVMVarDefPrinter varDefPrinter) {
 		this.varDefPrinter = varDefPrinter;
