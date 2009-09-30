@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\..\liborcc\SDL-1.2.13\include&quot;;..\..\runtime\liborcc\scheduler"
+				AdditionalIncludeDirectories="&quot;..\..\runtime\liborcc\SDL-1.2.13\include&quot;;..\..\runtime\liborcc\scheduler;..\..\runtime\liborcc\libapr\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\runtime\SDL-1.2.13\lib\SDL.lib ..\..\runtime\SDL-1.2.13\lib\SDLmain.lib"
+				AdditionalDependencies="..\..\runtime\liborcc\SDL-1.2.13\lib\SDL.lib ..\..\runtime\liborcc\SDL-1.2.13\lib\SDLmain.lib ..\..\runtime\liborcc\libapr\lib\libapr-1.lib winmm.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -122,7 +122,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				EnableFiberSafeOptimizations="true"
-				AdditionalIncludeDirectories="&quot;..\..\liborcc\SDL-1.2.13\include&quot;;..\..\runtime\liborcc\scheduler"
+				AdditionalIncludeDirectories="&quot;..\..\runtime\liborcc\SDL-1.2.13\include&quot;;..\..\runtime\liborcc\scheduler;..\..\runtime\liborcc\libapr\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -141,7 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\runtime\SDL-1.2.13\lib\SDL.lib ..\..\runtime\SDL-1.2.13\lib\SDLmain.lib"
+				AdditionalDependencies="..\..\runtime\liborcc\SDL-1.2.13\lib\SDL.lib ..\..\runtime\liborcc\SDL-1.2.13\lib\SDLmain.lib ..\..\runtime\liborcc\libapr\lib\libapr-1.lib winmm.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -233,10 +233,6 @@
 			</File>
 			<File
 				RelativePath=".\src\buffer_02.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\cg_testbed.c"
 				>
 			</File>
 			<File
@@ -348,6 +344,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\orcc_testbed.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\parseheaders.c"
 				>
 			</File>
@@ -376,7 +376,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\scale.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\scale_01.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\scale_02.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\serialize.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\shift.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\shift_01.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\shift_02.c"
 				>
 			</File>
 			<File
@@ -407,15 +431,19 @@
 				Name="orcc"
 				>
 				<File
-					RelativePath="..\..\runtime\liborcc\actors\lff_display.c"
+					RelativePath="..\..\..\..\..\Bib_m4\lib_TestandMeasure\src\DiffUcharImage.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\runtime\liborcc\actors\lff_source.c"
+					RelativePath="..\..\runtime\liborcc\actors\display.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\runtime\liborcc\scheduler\lock_free_fifo.c"
+					RelativePath="..\..\..\..\..\Bib_m4\lib_avformat\src\Read_YUV.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\runtime\liborcc\actors\source.c"
 					>
 				</File>
 			</Filter>

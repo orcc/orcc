@@ -1,0 +1,576 @@
+// AVC_algo_loopFilter_noMBAFF.cal
+//
+// Author: Paul Schumacher, Xilinx Research Labs 
+//         (Email: paul.schumacher@xilinx.com)
+//
+// Copyright (c) 2006-2007 Xilinx Inc.
+// All Rights Reserved
+//
+// Description:
+//   This design performs the in-loop deblocking filter for an AVC video 
+//   coder.  Tokens on the inputs and outputs of this block contain maps 
+//   (similar to structures) for easier interfacing.  One token on 'mbIn' is 
+//   assumed to contain the contents of a single macroblock (MB) including the 
+//   input YUV values as well as the MB parameters.  This design assumes raster 
+//   order of MBs (see below).  One token on 'imgParams' contains a map of 
+//   parameters for one frame or field.
+//
+//   The 'mbDataOut' and 'StrengthOut' outputs each produce one token per MB.
+//   One token on 'mbDataOut' is a map containing the (x,y) position (in MB
+//   coordinates) as well as arrays of YUV 4:2:0 output data.  'StrengthOut'
+//   should be used for debug only and produces a map of strength values and
+//   important parameters for debug purposes.
+//
+//   Note that the following modes are not supported by this revision of the 
+//   design:
+//     * MBAFF (Macroblock Adaptive Field/Frame mode)
+//     * only 4:2:0 format is supported
+//     * > 8-bit video
+
+// Revised:
+//  Author: Jia-Wei Liang, MSOC Lab, NCKU
+//  (E-mail: n2697181@mail.ncku.edu.tw)
+//  This loop filter has a bug and is fixed.
+//  The bug is that the loop filter does not perform deblocking on the right and
+//  bottom boundaries of a macroblock before outputting it out.
+//  The codes have been modified to output macroblocks at correct time.
+
+// Mgnt_DBF.cal
+// Description: The management part of deblocking filter without mbaff
+
+  
+actor Mgnt_DBF (int LUMA_CHROMA, int QUANT_SZ, int MV_SZ, int Idx_SZ) 
+	int(size=9) Z,
+	uint(size=7) PicWidthInMb,
+	uint(size=13) PicSizeInMb,
+	uint(size=8) MbIntraFlag,
+	uint(size=6) Cbp_blk,
+	int(size=6) Alpha_offset,
+	int(size=6) Beta_offset,
+	int(size=QUANT_SZ) QP,
+	int(size=MV_SZ) MV,
+	uint(size=Idx_SZ) RefIdx,
+	uint(size=2) LFDisable,
+	uint(size=8) DB_O 
+					==> 
+						uint(size=6) BS,
+						uint(size=8) DB_I,
+						int(size=9)WD:
+
+///////////////
+// Constants //
+///////////////
+int MB_WIDTH=22; //number of MB per lines
+int SAMPLE_SZ = 8; 
+int MB_BLOCK_SIZE = LUMA_CHROMA;
+int INT64_MIN = -32768;
+int MIN_QP =  0;
+int MAX_QP = 51;
+int FRAME  = 0;   // image structures
+int TOP_FIELD = 1;
+int BOTTOM_FIELD = 2;
+int MAXVAL_LUMA = 255;
+int MAXVAL_CHROMA = 255;
+uint(size=1) mixedModeEdgeFlag = 0; // mixed mode currently not supported
+
+/////////////////////
+// State Variables //
+/////////////////////
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE)curr_mb:=[[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)];
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE)left_mb:=[[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)];
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE)up_mb  :=[[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)];
+//mrl upFifo;
+uint(size=4) left_mb_type; int left_cbp_blk; uint(size=QUANT_SZ) left_QP;
+uint(size=4) up_mb_type; int up_cbp_blk; uint(size=QUANT_SZ) up_QP;
+uint(size=5) blkP; uint(size=5) blkQ; 
+uint cnt:=0;      
+//
+// Image parameters
+//
+uint(size=8) MB_Width := 1;          // MBs across one frame of current image
+uint(size=8) MB_Height := 1;         // MBs from top to bottom of one frame of current image
+uint(size=2) chroma_format := 1;     // only 4:2:0 supported
+uint(size=3) bit_depth := 8;         // up to 8 supported
+uint(size=2) interlace := FRAME;     // frame or field
+uint(size=2) valLFDisable := 0;         // option to disable filtering for image or across slices
+// Macroblock parameters
+uint(size=QUANT_SZ) valQP := 0; // Quantization parameter: value between 0 and 51 inclusive
+int(size=6) alpha_offset := 0;      // Alpha QP offset. Between -12 and 12, equal to 2*slice_alpha_c0_offset_div2 from H.264 specification 
+int(size=6) beta_offset := 0;       // Beta QP offset. Between -12 and 12, equal to 2*slice_beta_offset_div2 from H.264 specification 
+uint(size=4) mb_type := 0;      // Mb_type as tabulated in section 7 of the H.264 specification 
+uint(size=1) luma_transform_8x8 := 0;   // active high indicates that only half of the edges within the current MB should be filtered
+uint(size=16) cbp_blk := 0;          // One bit per 4x4 block in the current macroblock
+                                    // (high indicates non-zero transform coefficient levels for thiis 4x4 pixel block)
+uint(size=8) mb_x := 0;              // x-coordinate of current macroblock using luma pixel coordinates/16
+uint(size=8) mb_y := 0;              // y-coordinate of current macroblock using luma pixel coordinates/16
+List(type:uint(size=6), size=3) Alist := [ 0 : for int i in Integers(0, 3-1) ]; //curr,left,up
+List(type:uint(size=6), size=3) Blist := [ 0 : for int i in Integers(0, 3-1) ]; //curr,left,up
+List(type:int, size=16) list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) list0_refPicIDX := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) left_list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) left_list0_refPicIDX := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) left_list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) left_list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) up_list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) up_list0_refPicIDX := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) up_list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
+List(type:int, size=16) up_list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
+uint(size=1) StrengthNotZero := 0;
+uint(size=1) useLeft := 0;
+uint(size=1) useUp := 0;
+uint(size=3) mvlimit := 4;
+uint(size=3) edge_curr := 0;
+int xQ := 0; int yQ := 0;
+int xP := 0; int yP := 0;
+int QP_p := 0;
+int mb_type_p := 0;
+int cbp_blk_p := 0;
+List( type:uint(size=3), size=32 ) Strength := [ 0 : for int i in Integers(0, 32-1) ];
+
+List(type:List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE), size=MB_WIDTH ) upFifo_mb :=  [[[0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1)]: for int l in Integers( 0, MB_WIDTH-1)];
+
+List(type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) upFifo_mb_type :=  [0: for int l in Integers( 0, MB_WIDTH-1)];
+
+List(type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) upFifo_cbp_blk :=  [0: for int l in Integers( 0, MB_WIDTH-1)];
+
+List(type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) upFifo_valQP :=  [0: for int l in Integers( 0, MB_WIDTH-1)];
+
+
+////////////////
+// ROM Tables //
+////////////////
+// NOTE: In principle, the alpha and beta tables are calculated with the formulas below
+//       Alpha( qp ) := 0.8 * (2^(qp/6)  -  1)
+//       Beta ( qp ) := 0.5 * qp  -  7
+// The tables actually used have been "hand optimized" though (by Anthony Joch). So, the
+// table values might be a little different to formula-generated values. Also, the first
+// few values of both tables is set to zero to force the filter off at low QPs
+
+// chroma edge table (32 x 3-bit ROM)
+List( type:int( size=4 ), size=32 ) CHROMA_EDGE_ROM = [  
+   -1, 0, 0, 0,  -1,-1,-1, 1,  -1, 1, 1, 2,  -1,-1,-1, 3,
+   -1, 0, 0, 0,  -1,-1, 1, 1,  -1, 1, 2, 2,  -1,-1, 3, 3  ];
+///////////////
+// Functions //
+///////////////
+//
+// Arithmetic functions
+//
+function abs( int val ) --> int  :  if (val < 0) then -val else val end end
+function mask_one_bit( int v, int n ) --> int :  rshift( bitand( v, lshift(1,n) ), n ) end
+function mask_bits( int v, int n ) --> int :  bitand( v, lshift(1,n)-1 ) end
+function Clip( int Min, int Max, int Val  )--> int :  if (Val < Min) then Min else if (Val > Max) then Max else Val end end end
+function ClipPicId( int Check, int Val ) --> int  :  if (Check < 0) then INT64_MIN else Val end end
+//
+// Memory interface functions
+//
+function chroma_edge( int d, int e, int f ) --> int:  CHROMA_EDGE_ROM[d*16 + e*4 + f] end
+function mv( int ptype,  int blknum, int component ) --> int :  
+	if (useLeft=1 and ptype=1) then if (component = 0) then left_list0_MV0[blknum] else left_list0_MV1[blknum] end
+    else if (useUp=1 and ptype=1) then if (component = 0) then up_list0_MV0[blknum] else up_list0_MV1[blknum] end
+         else  if (component = 0) then list0_MV0[blknum] else list0_MV1[blknum] end  
+         end 
+    end 
+end
+function ref_idx( int ptype,  int blknum ) --> int : if (useLeft=1 and ptype=1) then left_list0_refPicIDX[blknum]
+      else if (useUp=1 and ptype=1) then up_list0_refPicIDX[blknum] else list0_refPicIDX[blknum] end end end
+function ref_pic_id( int ptype,  int blknum ) --> int :  if (useLeft=1 and ptype=1) then left_list0_ref_pic_id[blknum]
+      else if (useUp=1 and ptype=1) then up_list0_ref_pic_id[blknum] else list0_ref_pic_id[blknum] end end end
+// Get the X position in the current MB (0 to 15)
+function getPixelPosX( int pel, int dir ) --> int : if (dir=1) then pel else 4*edge_curr end end
+// Get the Y position in the current MB (0 to 15)
+function getPixelPosY( int pel, int dir ) --> int : if (dir=1) then if (edge_curr < 4) then 4*edge_curr else 1 end else pel end end
+// Set the neighbour (used in GetStrengths)
+// NOTE: only options are: within current MB, use left MB,
+// or use up/top MB 
+procedure setNeighbour( int xN, int yN, int sth )
+var 
+	int width_mb
+begin
+  if (sth = 0) then  width_mb := MB_BLOCK_SIZE; else width_mb := 16; end
+  useLeft := 0;
+  useUp := 0;
+  if (xN < 0) then       // only used when dir=0 & edge=0
+    xP := width_mb + xN; // -1 becomes 15, -2 becomes 14, etc.
+    yP := yN;
+    mb_type_p := left_mb_type;
+    cbp_blk_p := left_cbp_blk;
+    QP_p := left_QP;
+    useLeft := 1;
+  else if (yN < 0) then  // only used when dir=1 & edge=0
+      xP := xN;
+      yP := width_mb + yN;
+      mb_type_p := up_mb_type;
+      cbp_blk_p := up_cbp_blk;
+      QP_p := up_QP;
+      useUp := 1;
+    else
+      xP := xN;
+      yP := yN;
+      mb_type_p := mb_type;
+      cbp_blk_p := cbp_blk;
+      QP_p := valQP;
+    end
+  end
+  blkQ := lshift(rshift(yQ, 2), 2) + rshift(xQ, 2);
+  blkP := lshift(rshift(yP, 2), 2) + rshift(xP, 2);
+end
+
+/*************************************************************
+ *************************************************************
+ ********        Deblocking Filter: Actions           ********
+ *************************************************************
+ *************************************************************/
+read_pic_parameters: action  ==>
+  do           
+    mb_x:=0;
+    mb_y:=0;
+  end
+  
+ReadMB.Inter: action PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g,h] repeat 16,LFDisable:[j]==> 
+  guard a=2
+  var   
+  	uint cbp1,
+  	uint cbp2,
+  	int mv1,
+  	int mv2
+  do    
+    MB_Width := width;          
+    MB_Height:= height / width;
+    mb_type:=a;
+    valQP:=b;
+    cbp_blk := c;
+    alpha_offset := d;
+    beta_offset := e;    
+    list0_refPicIDX:=[ 0 : for int i in Integers(0, 16-1) ];
+    list0_ref_pic_id:=[ f[m] : for int m in Integers(0, 16-1) ]; 
+    list0_MV0:=[ g[k] : for int k in Integers(0, 16-1) ];
+    list0_MV1:=[ h[l] : for int l in Integers(0, 16-1) ];  
+    valLFDisable := j;        
+  end
+
+ReadMB.Intra: action PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
+  guard a!=2 
+  do         
+    MB_Width := width;          
+    MB_Height:= height / width;
+    mb_type:=a;     
+    valQP:=b;
+    cbp_blk := c;
+    alpha_offset := d;
+    beta_offset := e;    
+    list0_refPicIDX:=[-1 : for int i in Integers(0,15)];
+    list0_ref_pic_id:=[ 0 : for int i in Integers(0, 16-1) ];    
+    list0_MV0:=[ 0 : for int i in Integers(0, 16-1) ];
+    list0_MV1:=[ 0 : for int i in Integers(0, 16-1) ];   
+    valLFDisable := j;
+  end 
+  
+StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>  
+  do        
+    foreach int y in Integers(0,MB_BLOCK_SIZE-1) do   
+      foreach int x in Integers(0,MB_BLOCK_SIZE-1) do 
+        curr_mb[y,x]:=v[y*MB_BLOCK_SIZE+x]; 
+      end   
+    end	
+    if (interlace != FRAME) then  mvlimit := 2;  else  mvlimit := 4;  end   
+    if (mb_y != 0) then
+	  foreach int y in Integers(0,MB_BLOCK_SIZE-1) do
+	    foreach int x in Integers(0,MB_BLOCK_SIZE-1) do  
+	  	  up_mb[y,x]:= upFifo_mb[mb_x][y][x];  
+	  	end
+      end        
+      up_mb_type := upFifo_mb_type[mb_x];
+      up_cbp_blk := upFifo_cbp_blk[mb_x];
+      up_QP := upFifo_valQP[mb_x];
+      up_list0_MV1 := [ list0_MV1[i] : for int i in Integers(0, 16-1) ];
+      up_list0_MV0 := [ list0_MV0[i] : for int i in Integers(0, 16-1) ];
+      up_list0_ref_pic_id := [ list0_ref_pic_id[i] : for int i in Integers(0, 16-1) ];
+      up_list0_refPicIDX :=  [ list0_refPicIDX[i] : for int i in Integers(0, 16-1) ];
+    else
+      up_mb_type :=0;
+      up_cbp_blk:=0;
+      up_QP:=0;
+      up_list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
+      up_list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
+      up_list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
+      up_list0_refPicIDX :=  [ 0 : for int i in Integers(0, 16-1) ];
+      up_mb := [[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)];     
+    end      
+    if (mb_x != 0) then
+	  foreach int y in Integers(0,MB_BLOCK_SIZE-1) do
+	    foreach int x in Integers(0,MB_BLOCK_SIZE-1) do  
+	  	  left_mb[y,x]:= upFifo_mb[mb_x - 1][y][x];  
+	  	end
+      end        
+      left_mb_type := upFifo_mb_type[mb_x-1];
+      left_cbp_blk := upFifo_cbp_blk[mb_x-1];
+      left_QP := upFifo_valQP[mb_x-1];
+      left_list0_MV1 := [ list0_MV1[i] : for int i in Integers(0, 16-1) ];
+      left_list0_MV0 := [ list0_MV0[i] : for int i in Integers(0, 16-1) ];
+      left_list0_ref_pic_id := [ list0_ref_pic_id[i] : for int i in Integers(0, 16-1) ];
+      left_list0_refPicIDX :=  [ list0_refPicIDX[i] : for int i in Integers(0, 16-1) ];
+    else
+      left_mb_type :=0;
+      left_cbp_blk:=0;
+      left_QP:=0;
+      left_list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
+      left_list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
+      left_list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
+      left_list0_refPicIDX :=  [ 0 : for int i in Integers(0, 16-1) ];
+      left_mb := [[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)]; 
+    end
+  end    
+SkipMB: action ==> BS:[[0:for int i in Integers(0,37)]] repeat 38
+  guard (valLFDisable != 0) end  
+//
+// Get strengths for this MB (32 total values)
+//
+GetStrengths: action ==> BS:[Strength] repeat 32
+  var 
+    uint(size=5) idx,
+    int ref_p0,int ref_q0,
+    List( type:uint(size=5), size=32 ) routine := [ 0 : for int l in Integers(0, 32-1) ]
+  do    
+    StrengthNotZero := 0;
+    Strength := [ 0 : for int i in Integers(0, 32-1) ]; // Initialize
+	foreach int dir in Integers(0, 1) do // vertical edges, than horizontal edges
+      foreach int b in Integers(0, 3) do
+        edge_curr := b;
+        if ((b>0) or (dir=1 and mb_y!=0) or (dir=0 and mb_x!=0)) then
+          foreach int c in Integers(0, 3) do
+            idx := lshift(dir,4) + lshift(c,2) + b;
+			xQ := getPixelPosX(lshift(c,2),dir);
+			yQ := getPixelPosY(lshift(c,2),dir);                    
+			setNeighbour(xQ - 1 + dir, yQ - dir ,1);			      
+			// Start w/ Strength = 3 or = 4 for Mb-edge
+			if ((b=0) and ((interlace=FRAME) or (dir=0))) then
+			  Strength[idx] := 4;
+			  routine[idx] := 1;
+			else
+			  Strength[idx] := 3;
+			  routine[idx] := 2;
+			end			
+			if (mb_type_p=2 and mb_type=2) then
+			  // Check if either P & Q have coeffs in them
+			  if ((mask_one_bit(cbp_blk,blkQ)!= 0) or (mask_one_bit(cbp_blk_p,blkP)!= 0)) then
+			    Strength[idx] := 2;
+			    routine[idx] := 3;
+			  else  
+			    // if no coefs, but vector difference >= 1 set Strength=1 
+			    // if this is a mixed mode edge then one set of reference pictures will be frame and the
+			    // other will be field
+			    if (mixedModeEdgeFlag=1) then
+			      Strength[idx] := 1;
+			      routine[idx] := 4;
+			    else  
+			      ref_p0 := ClipPicId( ref_idx(0, blkQ), ref_pic_id(0, blkQ) );
+			      ref_q0 := ClipPicId( ref_idx(1, blkP), ref_pic_id(1, blkP) );
+			      if (ref_p0 = ref_q0) then 
+			        if ( (abs( mv(0,  blkQ, 0) - mv(1,  blkP, 0)) >= 4) 
+			          or (abs( mv(0,  blkQ, 1) - mv(1,  blkP, 1)) >= mvlimit)) then 
+			          Strength[idx] := 1; 
+			          routine[idx] := 5;
+			        else
+			          Strength[idx] := 0;
+			          routine[idx] := 6;
+			        end			                    
+			      else
+			        Strength[idx] := 1;
+			        routine[idx] := 7;
+			      end
+			    end//mixmode
+			  end//cbp
+			end//intra			      
+			if (Strength[idx] != 0) then  StrengthNotZero := 1;  end
+    	  end // while (j<4)
+        end // if-then    		
+      end // while (edge<4)    	
+    end // while (dir<2)
+  end // GetStrengths
+
+ZeroStrengths: action ==> BS:[[0:for int i in Integers(0,5)]] repeat 6
+  guard (StrengthNotZero=0) 
+  end    
+//
+// Edge Loops
+//
+EdgeLoops: action ==> BS:[Alist[0],Alist[1],Alist[2],Blist[0],Blist[1],Blist[2]]
+  var
+    uint pel := 0,
+    int PelNum := MB_BLOCK_SIZE,    
+    int indexA, int indexB,int QP_avg
+  do
+    Alist := [ 0 : for int i in Integers(0, 3-1) ]; 
+    Blist := [ 0 : for int i in Integers(0, 3-1) ]; 
+    foreach int dir in Integers(0,1) do
+      foreach int edge in Integers(0,3) do
+        if (LUMA_CHROMA = 8) then 
+          edge_curr := chroma_edge(dir, edge, chroma_format); 
+        else 
+          edge_curr := edge;
+        end        
+        if ((edge_curr=2) or (edge_curr=0 and ((dir=1 and mb_y!=0) or (dir=0 and mb_x!=0))) or ((edge_curr=1 or edge_curr=3) and luma_transform_8x8=0)) then   
+		  pel := 0;
+		  while (pel < PelNum) do
+			xQ := getPixelPosX(pel,dir);
+			yQ := getPixelPosY(pel,dir);                    
+			setNeighbour(xQ - 1 + dir, yQ - dir,0);				        
+			// Average QP of the two blocks			      
+			QP_avg := rshift((QP_p + valQP + 1), 1);  
+			indexA := Clip(MIN_QP, MAX_QP, QP_avg + alpha_offset);			      
+			indexB := Clip(MIN_QP, MAX_QP, QP_avg + beta_offset);	
+			if useLeft=1 then 
+			  Alist[1]:=indexA; 
+			  Blist[1]:=indexB; 
+		    else 
+		      if useUp=1 then 
+		        Alist[2]:=indexA; 
+		        Blist[2]:=indexB; 
+			  else 
+			    Alist[0]:=indexA; 
+			    Blist[0]:=indexB;
+		      end 
+		    end
+	        pel := pel + 1;
+		  end // while (pel<PelNum)
+		end // if-then
+	  end // foreach (edge<4)
+	end // foreach (dir<2)
+  end // EdgeLoops
+
+DBI: action ==> DB_I:[buff] repeat (MB_BLOCK_SIZE+4) * (MB_BLOCK_SIZE+4)
+  var 
+  	List(type:uint(size=SAMPLE_SZ),size=(MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4))buff=[0:for int s in Integers(0,(MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4)-1)],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE) upbuf := [0 : for int o in Integers(0, 4*MB_BLOCK_SIZE-1) ],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE-1) ],
+    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE*MB_BLOCK_SIZE) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ],
+  	int uc:=0,int lc:=0,int cc:=0     
+  do    
+    upbuf   := [up_mb[ MB_BLOCK_SIZE - 4 + i / MB_BLOCK_SIZE ][i mod MB_BLOCK_SIZE] : for int i in Integers(0, 4*MB_BLOCK_SIZE-1) ];
+    leftbuf := [left_mb[i / 4 ][MB_BLOCK_SIZE - 4 + (i mod 4)] : for int i in Integers(0, 4*MB_BLOCK_SIZE-1) ];
+    currbuf := [curr_mb[i / MB_BLOCK_SIZE][i mod MB_BLOCK_SIZE] : for int i in Integers(0, MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ];
+    foreach int i in Integers(0,(MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4)-1) do        
+        if (i<4*(MB_BLOCK_SIZE+4)) then  if((i mod (MB_BLOCK_SIZE+4))>3) then buff[i]:=upbuf[uc]; uc:=uc+1; end
+        else  if((i mod (MB_BLOCK_SIZE+4))>3) then buff[i]:=currbuf[cc]; cc:=cc+1; else buff[i]:=leftbuf[lc]; lc:=lc+1; end  end
+    end      
+  end
+
+DBO: action DB_O:[v] repeat (MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4) ==> 
+var
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE) upbuf := [0 : for int os in Integers(0, 4*MB_BLOCK_SIZE-1) ],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE-1) ],
+    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE*MB_BLOCK_SIZE) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ],
+    int uc:=0, int lc:=0, int cc:=0     
+do      
+  
+    foreach int i in Integers(0, (MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4)-1) do
+      if (i<4*(MB_BLOCK_SIZE+4)) then  if((i mod (MB_BLOCK_SIZE+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
+      else  if((i mod (MB_BLOCK_SIZE+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
+    end
+    foreach int y in Integers(0, MB_BLOCK_SIZE-1) do
+        foreach int x in Integers(0, MB_BLOCK_SIZE-1) do  curr_mb[y,x]:= currbuf[x + y * MB_BLOCK_SIZE]; end
+    end
+    if (mb_x>0)then			   
+      foreach int y in Integers(0, MB_BLOCK_SIZE-1) do
+        foreach int x in Integers(MB_BLOCK_SIZE-4, MB_BLOCK_SIZE-1) do  upFifo_mb[mb_x-1,y,x]:= leftbuf[(x mod 4)+y*4]; end
+      end
+    end			   
+    if (mb_y>0)then			   
+	    foreach int y in Integers(MB_BLOCK_SIZE-4, MB_BLOCK_SIZE-1) do
+	        foreach int x in Integers(0, MB_BLOCK_SIZE-1) do  upFifo_mb[mb_x,y,x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE)]; end
+	    end
+	end     
+end 
+
+SkipOut: action ==> end
+
+
+OutMB: action ==> WD:[buff] repeat MB_BLOCK_SIZE * MB_BLOCK_SIZE
+  guard (mb_y>0) and mb_y<MB_Height
+  var 
+      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE * MB_BLOCK_SIZE) buff = [ 0 :for int s in Integers(0,MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ] 
+  do    
+    foreach int y in Integers(0,MB_BLOCK_SIZE-1) do
+      foreach int x in Integers(0,MB_BLOCK_SIZE-1) do  
+      	buff[x + y * MB_BLOCK_SIZE]:= upFifo_mb[mb_x,y,x];  end
+    end
+ end
+//
+// Completed w/ Macroblock
+//
+DoneMB: action ==>
+  do
+    foreach int y in Integers(0,MB_BLOCK_SIZE-1) do
+      foreach int x in Integers(0,MB_BLOCK_SIZE-1) do  
+  	    upFifo_mb[mb_x,y,x]:= curr_mb[y][x];
+  	  end
+    end        
+    upFifo_valQP[mb_x]:=valQP;
+    upFifo_mb_type[mb_x]:=mb_type;
+    upFifo_cbp_blk[mb_x]:=cbp_blk;  
+      
+    if (mb_x=MB_Width-1) then 
+      mb_y := mb_y+1;mb_x:=0;
+    else 
+      mb_x := mb_x+1;
+    end
+  end
+   
+DB_done: action  ==> 
+  guard mb_x=MB_Width -1 and mb_y=MB_Height-1
+  do
+    foreach int y in Integers(0,MB_BLOCK_SIZE-1) do
+      foreach int x in Integers(0,MB_BLOCK_SIZE-1) do  
+  	    upFifo_mb[mb_x,y,x]:= curr_mb[y][x];
+  	  end
+    end 
+    mb_x:=0;      
+end 
+
+flush_fifo: action  ==> WD:[buff] repeat MB_BLOCK_SIZE * MB_BLOCK_SIZE
+  var 
+      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE * MB_BLOCK_SIZE) buff = [ 0 :for int s in Integers(0,MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ] 
+  do    
+    foreach int y in Integers(0,MB_BLOCK_SIZE-1) do
+      foreach int x in Integers(0,MB_BLOCK_SIZE-1) do  
+      	buff[x + y * MB_BLOCK_SIZE]:= upFifo_mb[mb_x,y,x];  end
+    end
+    mb_x:=mb_x+1;       
+end
+
+flush_done: action  ==> 
+  guard mb_x=MB_Width
+  do
+    mb_x:=0;  
+end    
+///////////////////////
+// Schedule/Priority //
+///////////////////////
+schedule fsm read_pic_parameters :
+  read_pic_parameters   	(read_pic_parameters)		--> ReadMB;
+  ReadMB					(ReadMB)					--> StartMB;
+  StartMB					(StartMB) 					--> SkipMB;  
+  SkipMB					(SkipMB) 					--> DBI;
+  SkipMB    				(GetStrengths)				--> ZeroStrengths;  
+  ZeroStrengths				(ZeroStrengths)				--> DBI;
+  ZeroStrengths			    (EdgeLoops)					--> DBI;
+  DBI			            (DBI)					    --> DBO;
+  DBO						(DBO)						--> OutMB;  
+  OutMB						(OutMB) 					--> DoneMB;
+  OutMB  					(SkipOut) 					--> DoneMB;  
+  DoneMB				    (DoneMB)					--> ReadMB;
+  DoneMB					(DB_done)					--> flush_fifo;
+  flush_fifo                (flush_fifo)                --> flush_fifo; 
+  flush_fifo                (flush_done)                --> read_pic_parameters;  
+  end
+priority  
+  DB_done > DoneMB;
+  SkipMB > GetStrengths; 
+  ZeroStrengths > EdgeLoops;
+  OutMB > SkipOut;
+  flush_done>flush_fifo;
+  end
+end

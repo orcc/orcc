@@ -28,12 +28,23 @@
  */
 
 #include "fifo.h"
+#include "orcc_util.h"
+
+// from APR
+/* Ignore Microsoft's interpretation of secure development
+ * and the POSIX string handling API
+ */
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#pragma warning(disable: 4996)
+#endif
 
 
 extern struct fifo_s *Compare_B;
 extern struct fifo_s *Compare_WIDTH;
 extern struct fifo_s *Compare_HEIGHT;
-extern char *YUV_FILENAME;
 
 #define MAX_WIDTH 704
 #define MAX_HEIGHT 576
@@ -126,9 +137,9 @@ void Compare_write_mb(short tokens[384]) {
 		m_y = 0;
 		printf("Frame number %d \n", FrameCounter);
 		Read_YUV(Y, U, V);
-		DiffUcharImage(m_width, m_height, Y, img_buf_y);
+		//DiffUcharImage(m_width, m_height, Y, img_buf_y);
 		DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u);
-		DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v);
+		//DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v);
 		FrameCounter ++;
 		if ( NumberOfFrames == FrameCounter){
 			exit(666);
@@ -139,11 +150,11 @@ void Compare_write_mb(short tokens[384]) {
 static int init = 0;
 
 static void Compare_init(int width, int height) {
-	
+
 	if ( !init){
 		m_width = width;
 		m_height = height;
-		NumberOfFrames = Read_YUV_init_with_input_filename (width, height, YUV_FILENAME);
+		NumberOfFrames = Read_YUV_init_with_input_filename (width, height, yuv_file);
 		init = 1;
 	}
 }

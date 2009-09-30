@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CurrMbAddr" x="5" y="17"/>
+      <vertex id="PicWidthInMb" x="-12" y="164"/>
+      <vertex id="PredMode" x="16" y="762"/>
+      <vertex id="FirstMbInSlice" x="5" y="694"/>
+      <vertex id="PicSizeInMb" x="-17" y="101"/>
+      <vertex id="MbPartHeigth" x="-11" y="384"/>
+      <vertex id="MbPartWidth" x="-17" y="442"/>
+      <vertex id="MbPartIdx" x="-5" y="415"/>
+      <vertex id="RefIdx" x="11" y="630"/>
+      <vertex id="Coef_ACR" x="-18" y="232"/>
+      <vertex id="LOCATION" x="-13" y="302"/>
+      <vertex id="MV" x="6" y="341"/>
+      <vertex id="PartSZ" x="4" y="565"/>
+      <vertex id="POC" x="19" y="64"/>
+      <vertex id="RefList" x="749" y="290"/>
+      <vertex id="Mb_TypeC" x="-12" y="487"/>
+      <vertex id="slice_beta_offset" x="910" y="714"/>
+      <vertex id="slice_alpha_c0_offset" x="889" y="676"/>
+      <vertex id="LFDisable" x="920" y="629"/>
+      <vertex id="CodedBlockPattern" x="883" y="583"/>
+      <vertex id="QP" x="925" y="540"/>
+      <vertex id="ref_idx_in" x="894" y="515"/>
+      <vertex id="mv_in" x="895" y="479"/>
+      <vertex id="Display_C" x="1237" y="71"/>
+      <vertex id="Intra8x8" x="696" y="635"/>
+      <vertex id="Inter" x="540" y="119"/>
+      <vertex id="Buffer_inter" x="1017" y="53"/>
+      <vertex id="Select_chroma" x="785" y="429"/>
+      <vertex id="Deblocking Filter" x="1069" y="471"/>
+   </vertices>
+</layout>

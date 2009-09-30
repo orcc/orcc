@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Decoding_C">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="CoefDC">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="QP">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ScalingList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="CoefAC">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="CurrMbAddr">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="PredMode">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="FirstMbInSlice">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="Mb_TypeC">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="PicWidthInMB">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="POC">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="PicSizeInMb">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="LOCATION">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MV">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MbPartHeight">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MbPartIdx">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MbPartWidth">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="PartSZ">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="RefList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="RefIdx">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="slice_alpha_c0_offset">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="LFDisable">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="CodedBlockPattern">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ref_idx_in">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="mv_in">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="slice_beta_offset">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Display">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <Decl kind="Param" name="SAMPLE_SIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="QUANT_SIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="DPBMAXSIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="PREDTYPE_SIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Variable" name="MB_WIDTH">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Decl>
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="PRED_C">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Prediction_C"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="DPBMAXSIZE">
+            <Expr kind="Var" name="DPBMAXSIZE"/>
+        </Parameter>
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
+        <Parameter name="MB_WIDTH">
+            <Expr kind="Var" name="MB_WIDTH"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SIZE">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="RES_C">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="RES_C"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="QUANT_SIZE">
+            <Expr kind="Var" name="QUANT_SIZE"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SIZE">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="PRED_C" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
+    <Connection dst="PRED_C" dst-port="PredMode" src="" src-port="PredMode"/>
+    <Connection dst="PRED_C" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
+    <Connection dst="RES_C" dst-port="CoefDC" src="" src-port="CoefDC"/>
+    <Connection dst="RES_C" dst-port="ScalingList" src="" src-port="ScalingList"/>
+    <Connection dst="RES_C" dst-port="QP" src="" src-port="QP"/>
+    <Connection dst="RES_C" dst-port="CoefAC" src="" src-port="CoefAC"/>
+    <Connection dst="PRED_C" dst-port="Coef_ACR" src="RES_C" src-port="CoefACR_C"/>
+    <Connection dst="" dst-port="Display" src="PRED_C" src-port="Display_C"/>
+    <Connection dst="PRED_C" dst-port="Mb_TypeC" src="" src-port="Mb_TypeC"/>
+    <Connection dst="PRED_C" dst-port="PicWidthInMb" src="" src-port="PicWidthInMB"/>
+    <Connection dst="PRED_C" dst-port="POC" src="" src-port="POC"/>
+    <Connection dst="PRED_C" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
+    <Connection dst="PRED_C" dst-port="LOCATION" src="" src-port="LOCATION"/>
+    <Connection dst="PRED_C" dst-port="MV" src="" src-port="MV"/>
+    <Connection dst="PRED_C" dst-port="MbPartHeigth" src="" src-port="MbPartHeight"/>
+    <Connection dst="PRED_C" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
+    <Connection dst="PRED_C" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
+    <Connection dst="PRED_C" dst-port="PartSZ" src="" src-port="PartSZ"/>
+    <Connection dst="PRED_C" dst-port="RefList" src="" src-port="RefList"/>
+    <Connection dst="PRED_C" dst-port="RefIdx" src="" src-port="RefIdx"/>
+    <Connection dst="PRED_C" dst-port="mv_in" src="" src-port="mv_in"/>
+    <Connection dst="PRED_C" dst-port="ref_idx_in" src="" src-port="ref_idx_in"/>
+    <Connection dst="PRED_C" dst-port="CodedBlockPattern" src="" src-port="CodedBlockPattern"/>
+    <Connection dst="PRED_C" dst-port="LFDisable" src="" src-port="LFDisable"/>
+    <Connection dst="PRED_C" dst-port="slice_alpha_c0_offset" src="" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="PRED_C" dst-port="slice_beta_offset" src="" src-port="slice_beta_offset"/>
+    <Connection dst="PRED_C" dst-port="QP" src="" src-port="QP"/>
+</XDF>

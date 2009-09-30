@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Parser">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="bits8">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="CoefDC_L">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CoefAC_L">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Intra_DC_flag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="PredMode">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="ScalingList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QP">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CurrMbAddr">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="PicWidthInMb">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="PicSizeInMb">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="FirstMbInSlice">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="POC">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbPartIdx">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefIdx">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbPartWidth">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbPartHeigth">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MvRes">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbIntraFlag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Mb_Type">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefReordering">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MMCO">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Width">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Height">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MV">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="LOCATION">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="PART_SZ">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Mb_TypeC">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CoefAC_Cb">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CoefDC_Cb">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CoefDC_Cr">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CoefAC_Cr">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="IntraPredModeC">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QP_Cb">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QP_Cr">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="slice_alpha_c0_offset">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="slice_beta_offset">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="LFDisable">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CodedBlockPattern">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="mv_out">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="ref_idx">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <Decl kind="Param" name="SAMPLE_SIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="DPBMAXSIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="PREDTYPE_SIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="MV_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="MODE_SZ">
+        <Type name="int"/>
+    </Decl>
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="byte2bit">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="byte2bit"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_NALU">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Algo_NALU"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_Synp_AVC">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Algo_Synp_AVC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
+        <Parameter name="MVSZ">
+            <Expr kind="Var" name="MV_SZ"/>
+        </Parameter>
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Algo_BlockExpand_AVC">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Algo_BlockExpand_AVC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Algo_BlockSplit_AVC">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Algo_BlockSplit_AVC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Algo_IntraPred_Split">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Algo_IntraPred_Split"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="PREDTYPE_SIZE">
+            <Expr kind="Var" name="PREDTYPE_SIZE"/>
+        </Parameter>
+    </Instance>
+    <Instance id="MVReconstruct">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="MVReconstruct"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
+        <Parameter name="MODE_SZ">
+            <Expr kind="Var" name="MODE_SZ"/>
+        </Parameter>
+        <Parameter name="MV_SZ">
+            <Expr kind="Var" name="MV_SZ"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Algo_MMCO">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Algo_MMCO"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="NB_PIC">
+            <Expr kind="Var" name="DPBMAXSIZE"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Algo_NALU" dst-port="bits8" src="" src-port="bits8"/>
+    <Connection dst="" dst-port="CoefDC_L" src="Algo_BlockSplit_AVC" src-port="Block_Y_DC"/>
+    <Connection dst="" dst-port="CoefAC_L" src="Algo_BlockSplit_AVC" src-port="Block_Y_AC"/>
+    <Connection dst="" dst-port="ScalingList" src="Algo_Synp_AVC" src-port="ScalingList"/>
+    <Connection dst="" dst-port="QP" src="Algo_Synp_AVC" src-port="QP"/>
+    <Connection dst="" dst-port="CurrMbAddr" src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
+    <Connection dst="" dst-port="PicWidthInMb" src="Algo_Synp_AVC" src-port="PicWidthInMb"/>
+    <Connection dst="" dst-port="PicSizeInMb" src="Algo_Synp_AVC" src-port="PicSizeInMb"/>
+    <Connection dst="" dst-port="FirstMbInSlice" src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
+    <Connection dst="" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
+    <Connection dst="" dst-port="MbPartIdx" src="Algo_Synp_AVC" src-port="MbPartIdx"/>
+    <Connection dst="" dst-port="RefIdx" src="Algo_Synp_AVC" src-port="RefIdx"/>
+    <Connection dst="" dst-port="MbPartWidth" src="Algo_Synp_AVC" src-port="MbPartWidth"/>
+    <Connection dst="" dst-port="MbPartHeigth" src="Algo_Synp_AVC" src-port="MbPartHeigth"/>
+    <Connection dst="" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
+    <Connection dst="" dst-port="MbIntraFlag" src="Algo_Synp_AVC" src-port="MbIntraFlag"/>
+    <Connection dst="" dst-port="Intra_DC_flag"
+        src="Algo_IntraPred_Split" src-port="Intra_DC_flag"/>
+    <Connection dst="" dst-port="PredMode" src="Algo_IntraPred_Split" src-port="PredMode"/>
+    <Connection dst="byte2bit" dst-port="in8" src="Algo_NALU" src-port="bits_rbsp8">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="20000"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="Algo_Synp_AVC" dst-port="bits" src="byte2bit" src-port="out">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="10000"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="Algo_Synp_AVC" dst-port="nb_rbsp_bytes"
+        src="Algo_NALU" src-port="nb_rbsp_bytes"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="RUN"
+        src="Algo_Synp_AVC" src-port="RUN"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="VALUE"
+        src="Algo_Synp_AVC" src-port="VALUE"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="LAST"
+        src="Algo_Synp_AVC" src-port="LAST"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
+        src="Algo_BlockExpand_AVC" src-port="Block"/>
+    <Connection dst="Algo_IntraPred_Split" dst-port="CurrMbAddr"
+        src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
+    <Connection dst="Algo_IntraPred_Split" dst-port="MbIntraFlag"
+        src="Algo_Synp_AVC" src-port="MbIntraFlag"/>
+    <Connection dst="Algo_IntraPred_Split" dst-port="PicWidthInMb"
+        src="Algo_Synp_AVC" src-port="PicWidthInMb"/>
+    <Connection dst="Algo_IntraPred_Split" dst-port="IntraPredMode"
+        src="Algo_Synp_AVC" src-port="IntraPredMode"/>
+    <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="Mb_Type"/>
+    <Connection dst="" dst-port="RefReordering" src="Algo_Synp_AVC" src-port="RefReordering"/>
+    <Connection dst="" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
+    <Connection dst="" dst-port="Width" src="Algo_Synp_AVC" src-port="WIDTH"/>
+    <Connection dst="" dst-port="Height" src="Algo_Synp_AVC" src-port="HEIGHT"/>
+    <Connection dst="" dst-port="LOCATION" src="MVReconstruct" src-port="LOCATION"/>
+    <Connection dst="" dst-port="PART_SZ" src="MVReconstruct" src-port="PartSZ"/>
+    <Connection dst="" dst-port="MV" src="MVReconstruct" src-port="MV"/>
+    <Connection dst="MVReconstruct" dst-port="MbPartHeigth"
+        src="Algo_Synp_AVC" src-port="MbPartHeigth"/>
+    <Connection dst="MVReconstruct" dst-port="MbPartWidth"
+        src="Algo_Synp_AVC" src-port="MbPartWidth"/>
+    <Connection dst="MVReconstruct" dst-port="PicWidthInMb"
+        src="Algo_Synp_AVC" src-port="PicWidthInMb"/>
+    <Connection dst="MVReconstruct" dst-port="MbIntraFlag"
+        src="Algo_Synp_AVC" src-port="MbIntraFlag"/>
+    <Connection dst="MVReconstruct" dst-port="CurrMbAddr"
+        src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
+    <Connection dst="MVReconstruct" dst-port="MbPartIdx"
+        src="Algo_Synp_AVC" src-port="MbPartIdx"/>
+    <Connection dst="MVReconstruct" dst-port="RefIdx"
+        src="Algo_Synp_AVC" src-port="RefIdx"/>
+    <Connection dst="MVReconstruct" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
+    <Connection dst="Algo_MMCO" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
+    <Connection dst="Algo_MMCO" dst-port="RefReordering"
+        src="Algo_Synp_AVC" src-port="RefReordering"/>
+    <Connection dst="" dst-port="RefList" src="Algo_MMCO" src-port="RefList"/>
+    <Connection dst="" dst-port="Mb_TypeC" src="Algo_IntraPred_Split" src-port="Mb_TypeC"/>
+    <Connection dst="" dst-port="CoefDC_Cr" src="Algo_BlockSplit_AVC" src-port="Block_V_DC"/>
+    <Connection dst="" dst-port="CoefDC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_DC"/>
+    <Connection dst="" dst-port="CoefAC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_AC"/>
+    <Connection dst="" dst-port="CoefAC_Cr" src="Algo_BlockSplit_AVC" src-port="Block_V_AC"/>
+    <Connection dst="" dst-port="QP_Cb" src="Algo_Synp_AVC" src-port="QP_Cb"/>
+    <Connection dst="" dst-port="QP_Cr" src="Algo_Synp_AVC" src-port="QP_Cr"/>
+    <Connection dst="" dst-port="IntraPredModeC" src="Algo_Synp_AVC" src-port="IntraPredModeC"/>
+    <Connection dst="" dst-port="slice_alpha_c0_offset"
+        src="Algo_Synp_AVC" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="" dst-port="slice_beta_offset" src="Algo_Synp_AVC" src-port="slice_beta_offset"/>
+    <Connection dst="" dst-port="LFDisable" src="Algo_Synp_AVC" src-port="LFDisable"/>
+    <Connection dst="" dst-port="CodedBlockPattern" src="Algo_Synp_AVC" src-port="CodedBlockPattern"/>
+    <Connection dst="" dst-port="mv_out" src="MVReconstruct" src-port="mv_out"/>
+    <Connection dst="" dst-port="ref_idx" src="MVReconstruct" src-port="ref_idx"/>
+</XDF>

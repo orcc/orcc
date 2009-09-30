@@ -1,0 +1,270 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Florian Decologne (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+actor Mgnt_MVR ( int MV_SZ, int Idx_SZ, int MODE_SZ) 
+  uint(size=3) MbPartIdx, uint(size=Idx_SZ) RefIdx, uint(size=5) MbPartWidth, uint(size=5) MbPartHeigth, uint(size=13) CurrMbAddr, uint(size=7) PicWidthInMb, int(size=16) MV, uint(size=1)  MbIntraFlag
+  ==> 
+  uint(size=11)Location , uint(size=MODE_SZ) PartSZ, uint(size=Idx_SZ) refIdxLXN, int(size=MV_SZ) mvLX,  int(size=MV_SZ) mv_out ,uint(size=Idx_SZ) refidx_out
+  :
+ 
+  uint(size=5) count := 16;
+  uint currmb:= 0;
+  uint x:= 0;
+  uint y:= 0;
+  uint picW;
+  uint(size=5) mbpart_idx;
+  uint(size=5) ref_idx;
+  uint(size=5) mbpart_w;
+  uint(size=5) mbpart_h;
+  bool mvdone:=true;
+  
+  List(type: List(type:int(size=14), size=2), size=rshift(1920*1080, 4)) mv;
+  List(type: int(size=5), size=rshift(1920*1080, 4)) refidx;
+  List(type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
+  
+  // initialize mv to a huge list of [0, 0]s, and refidx to a huge list of -2's
+  initialize ==>
+  do
+    mv := [ [0, 0] : for int i in Integers(0, rshift(1920*1080, 4) - 1) ];
+    refidx := [ -2 : for int i in Integers(0, rshift(1920*1080, 4) - 1) ];
+  end
+  
+  get_pos.intra: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c] ==>
+  guard
+  	count >= 16,
+    c = 1
+  end
+  
+  get_pos.inter: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c] ==>  
+  guard
+    count >= 16,
+    c = 0
+  var 
+    uint CurrMb4x4Addr
+  do
+    picW := b; 
+    if a <= x + y *picW then 
+      foreach int i in Integers(0, 1) do
+          foreach int j in Integers (0,  rshift(1920*1080,4) - 1 ) do 
+          	mv[j,i] := 0; 
+          end
+      end
+      refidx := [ -2 : for int i in Integers( 0, rshift(1920*1080,4) - 1)];
+    else
+      if a - currmb > 1 then
+        foreach int i in Integers((currmb+1), (a-1)) do
+          foreach int j in Integers (0, 15) do
+            CurrMb4x4Addr := (i/picW) * lshift( picW,4) + lshift((i mod picW),2)+ (InverseScan4x4Tab[j] /4) * lshift( picW,2) + (InverseScan4x4Tab[j] mod 4);
+            refidx[CurrMb4x4Addr] := -1;
+          end
+        end
+      end
+    end
+    currmb := a;
+    x := a mod picW;
+    y := a / picW;
+    count := 0;
+    mvdone:=false;
+  end
+  
+  get_part: action MbPartIdx:[a], RefIdx:[b], MbPartWidth:[c], MbPartHeigth:[d] ==> PartSZ:[c , d], Location:[locx , locy]
+  guard
+    count < 16
+  var
+   uint(size=11) locx, uint(size=11) locy
+  do
+    mbpart_idx:= a;
+    ref_idx := b;
+    mbpart_w:= c;
+    mbpart_h:= d;
+    locx := lshift(x,4)+ lshift(InverseScan4x4Tab[count] mod 4, 2);
+    locy := lshift(y,4)+ lshift(InverseScan4x4Tab[count] /4, 2) ;
+    //println("currmb "+currmb+" "+mbpart_w+"x"+mbpart_h+" "+mbpart_idx+" ref "+ref_idx);
+  end
+  
+  send_part.others: action ==> refIdxLXN:[[refABC[t]:for int t in Integers(0,2)]] repeat 3, mvLX:[[mvABC[s]:for int s in Integers(0,5)]] repeat 6
+  var 
+    uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2)+ (InverseScan4x4Tab[count] /4) * lshift( picW,2) + (InverseScan4x4Tab[count] mod 4),
+    List(type:int(size=5),size=3) refABC := [-2 : for int i in Integers(0,2)],
+    uint(size=2) match_count := 0,
+    List(type:int,size=6) mvABC := [0 : for int i0 in Integers(0,5)]    
+  do
+    if (CurrMb4x4Addr mod lshift( picW,2)) != 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
+      refABC[0] := refidx[CurrMb4x4Addr - 1];
+      if refABC[0] != -2 then 
+        mvABC[0] := mv[CurrMb4x4Addr - 1][0];
+        mvABC[1] := mv[CurrMb4x4Addr - 1][1];
+        if refABC[0] = ref_idx then match_count := match_count +1; end
+      end
+    end
+    if CurrMb4x4Addr >= lshift( picW,2) then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
+      refABC[1] := refidx[CurrMb4x4Addr - lshift(picW,2)];
+      if refABC[1] != -2 then 
+        mvABC[2] := mv[CurrMb4x4Addr - lshift(picW,2)][0];
+        mvABC[3] := mv[CurrMb4x4Addr - lshift(picW,2)][1];
+        if refABC[1] = ref_idx then match_count := match_count +1; end
+      end
+    end
+    if mbpart_w = 16 and mbpart_h = 16 and mbpart_idx = 1 and (refABC[0] = -2 or refABC[1] = -2 or (refABC[0] = 0 and mvABC[0] = 0 and mvABC[1] = 0) or (refABC[1] = 0 and mvABC[2] = 0 and mvABC[3] = 0)) then
+      mvABC := [0 : for int t in Integers(0,5)];
+    else 
+      if (CurrMb4x4Addr + rshift(mbpart_w,2) >= lshift( picW,2)) and ((CurrMb4x4Addr+rshift(mbpart_w,2)) mod lshift( picW,2)) != 0 then   
+        refABC[2]:= refidx[CurrMb4x4Addr+rshift(mbpart_w,2) - lshift(picW,2)];
+        if refABC[2] != -2 then 
+          mvABC[4] := mv[CurrMb4x4Addr+rshift(mbpart_w,2) - lshift(picW,2)][0];
+          mvABC[5] := mv[CurrMb4x4Addr+rshift(mbpart_w,2) - lshift(picW,2)][1];
+          if refABC[2] = ref_idx then match_count := match_count +1; end
+        end
+      end
+      if refABC[2] = -2 and CurrMb4x4Addr-1 >= lshift( picW,2) and (CurrMb4x4Addr mod lshift( picW,2)) != 0 then 
+        refABC[2]:= refidx[CurrMb4x4Addr-1 - lshift(picW,2)];
+        if refABC[2] != -2 then 
+          mvABC[4] := mv[CurrMb4x4Addr-1 - lshift(picW,2)][0];
+          mvABC[5] := mv[CurrMb4x4Addr-1 - lshift(picW,2)][1];
+          if refABC[2] = ref_idx then match_count := match_count +1; end
+        end
+      end
+      if match_count = 1 then 
+        if refABC[0] = ref_idx then mvABC[4] := mvABC[0]; mvABC[5] := mvABC[1]; //mvC = mvA
+        else if refABC[1] = ref_idx then mvABC[4] := mvABC[2]; mvABC[5] := mvABC[3];  //mbC = mvB
+        else mvABC[0] := mvABC[4]; mvABC[1] := mvABC[5]; end //mbA = mvC
+        end
+      else if match_count = 0 then
+        if refABC[0] != -2 and refABC[1] = -2 and refABC[2] = -2 then mvABC[4] := mvABC[0]; mvABC[5] := mvABC[1]; end//mvC = mvA
+      end end
+    end
+    //println(" match_count "+match_count+" refABC "+refABC+" mvABC "+mvABC);
+  end
+  
+  get_mv.part4x8: action MV:[a,b] ==>
+  guard
+    mbpart_w = 4 and mbpart_h = 8 
+  var 
+    uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2)+ (InverseScan4x4Tab[count] /4) * lshift( picW,2) + (InverseScan4x4Tab[count] mod 4) 
+  do
+      mv[CurrMb4x4Addr,0] := a;
+      mv[CurrMb4x4Addr,1] := b;
+      refidx[CurrMb4x4Addr] := ref_idx;
+      mv[CurrMb4x4Addr+lshift( picW,2),0] := a;
+      mv[CurrMb4x4Addr+lshift( picW,2),1] := b;
+      refidx[CurrMb4x4Addr+lshift( picW,2)] := ref_idx;
+      count := count+1+lshift(mbpart_idx,1);
+  end
+  
+  get_mv.part8x16: action MV:[a,b] ==>
+  guard
+    mbpart_w = 8 and mbpart_h = 16  
+  var 
+    uint CurrMb4x4Addr  
+  do
+    foreach int i in Integers(0, 3) do
+      CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2)+ (InverseScan4x4Tab[count] /4) * lshift( picW,2) + (InverseScan4x4Tab[count] mod 4);
+      mv[CurrMb4x4Addr,0] := a;
+      mv[CurrMb4x4Addr,1] := b;
+      refidx[CurrMb4x4Addr] := ref_idx;
+      mv[CurrMb4x4Addr+lshift( picW,3),0] := a;
+      mv[CurrMb4x4Addr+lshift( picW,3),1] := b;
+      refidx[CurrMb4x4Addr+lshift( picW,3)] := ref_idx;
+      count := count+1;
+    end
+    if mbpart_idx = 1 then count :=16; end
+  end
+  
+  get_mv.others: action MV:[a,b] ==> 
+  var 
+    uint CurrMb4x4Addr  
+  do
+    foreach int i in Integers(0, (rshift(mbpart_w,2)*rshift(mbpart_h,2)-1)) do
+      CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2)+ (InverseScan4x4Tab[count] /4) * lshift( picW,2) + (InverseScan4x4Tab[count] mod 4);
+      mv[CurrMb4x4Addr,0] := a;
+      mv[CurrMb4x4Addr,1] := b;
+      refidx[CurrMb4x4Addr] := ref_idx;
+      count := count+1;
+    end
+  end
+  
+  a_mv_out: action  ==>  refidx_out:[[refidx_out_l[i0]:for int i0 in Integers(0,15)]] repeat 16, mv_out:[[mv_out_l[s]:for int s in Integers(0,31)]] repeat 32
+  guard
+    count >= 16 and  mvdone=false
+  var 
+    uint CurrMb4x4Addr,
+    uint j,
+    List(type:uint(size=5),size=16) refidx_out_l := [-2 : for int i2 in Integers(0,15)],
+    List(type:int(size=14),size=32) mv_out_l := [0 : for int i1 in Integers(0,31)]   
+  do    
+    CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2);
+    foreach int i in Integers(0, 15) do
+      j:=(i mod 4)+ (rshift(i,2)* lshift(picW,2));      
+      mv_out_l[(2*i)]   := mv[CurrMb4x4Addr+j][0] ;
+      mv_out_l[(2*i+1)] := mv[CurrMb4x4Addr+j][1] ;
+      refidx_out_l[i] := refidx[CurrMb4x4Addr+j];
+      //println("currmb="+currmb+",i="+i+",j="+j+",mv_out_l["+2*i+"]="+mv_out_l[(2*i)]+",mv_out_l["+(2*i+1)+"]="+mv_out_l[(2*i+1)]+",refidx_out_l["+i+"]="+refidx_out_l[i]);
+    end
+    mvdone:=true;
+  end
+  
+  
+  schedule fsm get_pos :
+    get_pos     ( get_pos  	) --> get_pos;
+    get_pos		( get_part 	) --> send_part;
+    send_part   ( send_part ) --> get_mv;
+    get_mv		( get_mv 	) --> get_pos;
+    get_pos     ( a_mv_out	) --> get_pos;
+  end
+
+  priority
+	get_mv.part4x8 > get_mv.part8x16 > get_mv.others;
+	a_mv_out>get_pos;
+  end
+    
+end

@@ -6,7 +6,7 @@
 	ProjectGUID="{A8677512-4CDA-4D95-870E-09D996BCEEAF}"
 	RootNamespace="RVC"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="196613"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\runtime\libapr\include;..\..\runtime\liborcc\include;&quot;..\..\runtime\SDL-1.2.13\include&quot;;&quot;..\..\runtime\SDL_image-1.2.7\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;..\..\runtime\liborcc\SDL-1.2.13\include&quot;;..\..\runtime\liborcc\scheduler"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,10 +61,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\runtime\libapr\lib\libapr-1.lib ..\..\runtime\SDL-1.2.13\lib\SDL.lib ..\..\runtime\SDL-1.2.13\lib\SDLmain.lib"
+				AdditionalDependencies="..\..\runtime\liborcc\SDL-1.2.13\lib\SDL.lib ..\..\runtime\liborcc\SDL-1.2.13\lib\SDLmain.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -114,18 +116,17 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				AdditionalOptions="/vmg"
+				Optimization="2"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
-				AdditionalIncludeDirectories="..\..\runtime\libapr\include;..\..\runtime\liborcc\include;&quot;..\..\runtime\SDL-1.2.13\include&quot;;&quot;..\..\runtime\SDL_image-1.2.7\include&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;..\..\runtime\liborcc\SDL-1.2.13\include&quot;;..\..\runtime\liborcc\scheduler"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
-				EnableEnhancedInstructionSet="1"
+				EnableEnhancedInstructionSet="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="0"
@@ -141,12 +142,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\runtime\libapr\lib\libapr-1.lib ..\..\runtime\SDL-1.2.13\lib\SDL.lib ..\..\runtime\SDL-1.2.13\lib\SDLmain.lib"
+				AdditionalDependencies="..\..\runtime\liborcc\SDL-1.2.13\lib\SDL.lib ..\..\runtime\liborcc\SDL-1.2.13\lib\SDLmain.lib"
 				LinkIncremental="1"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -268,15 +271,11 @@
 				Name="orcc"
 				>
 				<File
-					RelativePath="..\..\runtime\liborcc\src\actors\display.c"
+					RelativePath="..\..\runtime\liborcc\actors\display.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\runtime\liborcc\src\orcc_util.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\runtime\liborcc\src\actors\source.c"
+					RelativePath="..\..\runtime\liborcc\actors\source.c"
 					>
 				</File>
 			</Filter>
@@ -287,11 +286,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\runtime\liborcc\include\fifo.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\runtime\liborcc\include\orcc_util.h"
+				RelativePath="..\..\runtime\liborcc\scheduler\fifo.h"
 				>
 			</File>
 		</Filter>

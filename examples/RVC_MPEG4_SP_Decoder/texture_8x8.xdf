@@ -176,7 +176,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="idct2d"/>
+        <Class name="idct2d_23002"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -193,9 +193,9 @@
     <Connection dst="IS" dst-port="QFS_AC" src="DCsplit" src-port="AC"/>
     <Connection dst="IAP" dst-port="PQF_AC" src="IS" src-port="PQF_AC"/>
     <Connection dst="IQ" dst-port="AC" src="IAP" src-port="QF_AC"/>
-    <Connection dst="idct2d" dst-port="in" src="IQ" src-port="OUT"/>
-    <Connection dst="" dst-port="f" src="idct2d" src-port="out"/>
-    <Connection dst="idct2d" dst-port="signed" src="DCRecontruction" src-port="SIGNED"/>
+    <Connection dst="idct2d" dst-port="IN" src="IQ" src-port="OUT"/>
+    <Connection dst="" dst-port="f" src="idct2d" src-port="OUT"/>
+    <Connection dst="idct2d" dst-port="SIGNED" src="DCRecontruction" src-port="SIGNED"/>
     <Connection dst="IQ" dst-port="QP" src="DCRecontruction" src-port="QUANT"/>
     <Connection dst="IQ" dst-port="DC" src="DCRecontruction" src-port="QF_DC"/>
     <Connection dst="IAP" dst-port="PTR" src="DCRecontruction" src-port="PTR"/>

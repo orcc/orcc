@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CurrMbAddr" x="98" y="135"/>
+      <vertex id="PicWidthInMb" x="52" y="311"/>
+      <vertex id="PredMode" x="184" y="248"/>
+      <vertex id="FirstMbInSlice" x="182" y="215"/>
+      <vertex id="Coef_ACR" x="202" y="142"/>
+      <vertex id="MB_IN" x="57" y="427"/>
+      <vertex id="Mb_Type" x="57" y="385"/>
+      <vertex id="MBPred_intra_4x4" x="1370" y="454"/>
+      <vertex id="Mgnt_Intra4x4" x="404" y="235"/>
+      <vertex id="Algo_IntraPred_LUMA_4x4" x="629" y="262"/>
+      <vertex id="Algo_Add_4x4" x="914" y="436"/>
+      <vertex id="Algo_Merge_4x4_to_16x16_norasterscan" x="1076" y="445"/>
+      <vertex id="Algo_Split_16x16_to_4x4_norasterscan" x="629" y="445"/>
+      <vertex id="Buffer_Neighbour_4x4" x="202" y="397"/>
+   </vertices>
+</layout>

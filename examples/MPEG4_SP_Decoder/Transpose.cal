@@ -62,15 +62,15 @@ actor Transpose ( int sz )
     // { 0, 7, 3, 4 }
     // { 1, 6, 2, 5 }
     if  quad = 0 then
-      mem[select][row][0] := a;
-      mem[select][row][7] := b;
-      mem[select][row][3] := c;
-      mem[select][row][4] := d;
+      mem[select,row,0] := a;
+      mem[select,row,7] := b;
+      mem[select,row,3] := c;
+      mem[select,row,4] := d;
     else
-      mem[select][row][1] := a;
-      mem[select][row][6] := b;
-      mem[select][row][2] := c;
-      mem[select][row][5] := d;
+      mem[select,row,1] := a;
+      mem[select,row,6] := b;
+      mem[select,row,2] := c;
+      mem[select,row,5] := d;
     end
     rcount := rcount + 4;
   end

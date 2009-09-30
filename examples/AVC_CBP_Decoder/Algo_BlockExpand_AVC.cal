@@ -1,0 +1,170 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Florian Decologne (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+
+*****************************************************************************/
+
+actor Algo_BlockExpand_AVC (int SAMPLE_SZ) 
+  uint(size=4) RUN, 
+  int(size=12) VALUE,
+  bool LAST 
+  ==> 
+  int(size=SAMPLE_SZ) Block :
+
+  
+  List( type:int(size=SAMPLE_SZ), size=16 ) value_buf := [ 0 : for int i in Integers(0,15) ];  
+  uint(size=5) stuff_count := 0;
+  
+  uint(size=5) count := 0;   // Index of next sample to be transmitted
+  int(size=5) run := -1;    // Index offset of next sample decoded (-1 means no sample pending)
+  bool last := false;       // the end of block.
+  
+  uint(size=2) leveltype := 0; // Intra16x16DCLevel 0, Intra16x16ACLevel / LumaLevel 1, ChromaDCLevel 2, ChromaACLevel 3
+  uint(size=5) nb4x4 :=0;
+  
+  //if it is the end of a block, begin to stuff 0.
+  //if it is not the end, begin to read data to buffer.
+  check_last: action LAST:[l] ==>
+  do
+    last := l;
+    if last then
+      if leveltype = 2 then stuff_count := 4 - count; else stuff_count := 16 - count; end
+    else
+      stuff_count := 0;
+    end
+  end
+ 
+  // begin to output data in buffer: from high address to low address
+  out_buffer: action ==> Block:[b]
+  guard
+    last,
+    count > 0
+  var
+    int(size=12) b
+  do
+    b := value_buf[count-1];
+    count := count - 1;
+  end
+  
+  // output the stuff zero after the last level
+  out_zero: action ==> Block:[0]
+  guard
+    last,
+    stuff_count > 0,
+    count = 0
+  do
+    stuff_count := stuff_count - 1;  
+  end
+  
+  out_finish: action ==>
+  guard
+    last,
+    stuff_count = 0,
+    count = 0
+  do
+    nb4x4 := nb4x4 +1;
+    if (leveltype = 0 and nb4x4 = 1) or (leveltype = 1 and nb4x4 = 16) or (leveltype = 2 and nb4x4 = 2) then leveltype := leveltype +1; nb4x4 := 0; end
+    if leveltype = 3 and nb4x4 = 8 then leveltype := 0; nb4x4 := 0; end
+  end
+
+  // Read and write the sample out immediately if RUN = 0
+  read_immediate: action RUN:[ r ], VALUE:[ v ] ==>
+  guard
+    r = 0,
+    not last
+  do
+    value_buf[count]:= v;
+    run := r;
+    count := count + 1;
+  end  
+
+  // Save the level in buffer and write out a zero sample
+  read_save: action RUN:[ r ], VALUE:[ v ] ==>
+  guard
+    r > 0,
+    not last
+  do
+    value_buf[count]:= v;
+    run := r ;
+    count := count + 1;
+  end
+
+  // Stuff zeros after the sample value
+  write_zero: action ==>
+  guard 
+    run > 0
+  do
+    value_buf[count]:= 0;
+    run := run - 1;
+    count := count + 1;
+  end
+  
+  write_zero_finish: action ==>
+  guard 
+    run = 0
+  end
+
+  schedule fsm check_last:
+	check_last 		( check_last 		) --> check_last_done;
+	check_last_done ( read_immediate 	) --> check_last;
+	check_last_done ( read_save 		) --> write_zero;
+	write_zero 		( write_zero 		) --> write_zero;
+	write_zero 		( write_zero_finish ) --> check_last;
+	check_last_done	( out_buffer 		) --> out_buffer;
+	out_buffer 		( out_buffer 		) --> out_buffer;
+	out_buffer 		( out_zero 			) --> out_zero;
+	out_buffer 		( out_finish 		) --> check_last;
+	check_last_done	( out_zero			) --> out_zero;
+	out_zero 		( out_zero 			) --> out_zero;
+	out_zero 		( out_finish		) --> check_last;  
+  end
+end

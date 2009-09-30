@@ -30,7 +30,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
         <Parameter name="fname">
-            <Expr kind="Literal" literal-kind="String" value="D:\repositories\mwipliez\orcc\examples\MPEG4_SP_Decoder\data\foreman_qcif_30.bit"/>
+            <Expr kind="Literal" literal-kind="String" value="D:\Projects\RVC\OpenDF\models\MPEG4_SP_Decoder\data\foreman_qcif_30.bit"/>
         </Parameter>
     </Instance>
     <Instance id="display">
@@ -45,7 +45,7 @@
             <Expr kind="Literal" literal-kind="Integer" value="0"/>
         </Parameter>
         <Parameter name="file">
-            <Expr kind="Literal" literal-kind="String" value="D:\repositories\FAT\opendf\trunk\models\MPEG4_SP_Decoder\data\foreman_qcif_30.yuv"/>
+            <Expr kind="Literal" literal-kind="String" value="D:\Projects\RVC\OpenDF\models\MPEG4_SP_Decoder\data\foreman_qcif_30.yuv"/>
         </Parameter>
         <Parameter name="height">
             <Expr kind="Literal" literal-kind="Integer" value="144"/>

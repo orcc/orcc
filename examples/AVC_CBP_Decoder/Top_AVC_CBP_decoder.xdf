@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Top_AVC_CBP_decoder">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="fread"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="fname">
+            <Expr kind="Literal" literal-kind="String" value="D:\sequences\AVC\CAVLC\general\AVCNL-3\NL2_Sony_H.jsv"/>
+        </Parameter>
+    </Instance>
+    <Instance id="AVCDecoder">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="AVC_CBP_decoder"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="SAMPLE_SIZE">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DispYUV_AVC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+        </Parameter>
+        <Parameter name="title">
+            <Expr kind="Literal" literal-kind="String" value="RVC Display Foreman QCIF"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Comp">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="CompAVC_To_File"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="file">
+            <Expr kind="Literal" literal-kind="String" value="D:\sequences\AVC\CAVLC\general\AVCNL-3\NL2_Sony_H.yuv"/>
+        </Parameter>
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="AVCDecoder" dst-port="bits8" src="Source" src-port="O"/>
+    <Connection dst="Display" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
+    <Connection dst="Display" dst-port="U" src="AVCDecoder" src-port="Display_Cb"/>
+    <Connection dst="Display" dst-port="V" src="AVCDecoder" src-port="Display_Cr"/>
+    <Connection dst="Comp" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
+    <Connection dst="Comp" dst-port="V" src="AVCDecoder" src-port="Display_Cr"/>
+    <Connection dst="Comp" dst-port="U" src="AVCDecoder" src-port="Display_Cb"/>
+</XDF>

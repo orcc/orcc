@@ -1,0 +1,3972 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Florian Decologne (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+ 
+FU realizing Syntax Parsing for AVC
+*****************************************************************************/
+
+// This FU has been modified by Mickaël Raulet (INSA of Rennes) July 2009
+
+actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
+		bool bits, 
+		uint nb_rbsp_bytes 
+		==> /*uint(size=16) pix_I_PCM,*/ 
+			uint(size=4) IntraPredMode,
+			uint(size=4) IntraPredModeC, 
+			uint(size=4) RUN, 
+			int(size=12) VALUE, 
+			bool LAST, 
+			int(size=8) ScalingList, 
+			int(size=8) QP, 
+			int(size=8) QP_Cb, 
+			int(size=8) QP_Cr, 
+			uint(size=13) CurrMbAddr, 
+			uint(size=7) PicWidthInMb, 
+			uint(size=13) PicSizeInMb, 
+			uint(size=1) FirstMbInSlice, 
+			uint POC, 
+			uint(size=Idx_SZ) MbPartIdx, 
+			uint(size=Idx_SZ) RefIdx, 
+			uint(size=5) MbPartWidth, 
+			uint(size=5) MbPartHeigth, 
+			int(size=MVSZ) MvRes, 
+			uint(size=1) MbIntraFlag, 
+			uint(size=5) RefReordering, 
+			uint(size=5) MMCO, 
+			uint(size=6) CodedBlockPattern,
+			int(size=6) slice_alpha_c0_offset, 
+			int(size=6) slice_beta_offset,
+			uint(size=2) LFDisable, 
+			int(size=16) WIDTH, 
+			int(size=16) HEIGHT
+		:
+
+	// ********** Read bits ********** //  
+	int(size=9) bits_to_read_count := -1;
+	int(size=41) read_result_in_progress; 
+	uint bit_count := 0;
+	uint val_nb_rbsp_bytes := 0;
+
+	// ********** Read VLD ********** //
+	bool NewVLD := false;
+	int VLD_Counter;
+	bool First_part;
+	int Codeword;
+	int CodeLen;
+
+	// ********** Read CAVLC ********** //
+	bool NewCoeff := false;
+	uint(size=2) CAVLC_type;// 0 coeff_token, 1 total_zeros, 2 run_before
+	uint(size=7) coeff_token;
+	uint(size=4) total_zeros;
+	uint(size=4) run_before :=0;
+
+	/*************************************************************
+	*************************************************************
+	********              NAL Unit HEADER                ********
+	*************************************************************
+	*************************************************************/
+	int START_CODE_LENGTH = 24;
+	int NAL_UNIT_HEADER_LENGTH := 8; //forbidden_zero_bit | nal_ref_idc | nal_unit_type
+
+	uint(size=2) nal_ref_idc :=0;
+	uint(size=5) nal_unit_type :=0;
+
+	/*************************************************************
+	*************************************************************
+	********        Sequence Parameter Set HEADER        ********
+	*************************************************************
+	*************************************************************/
+
+	uint Sps_inc;
+	List (type: uint(size=8), size=32) profile_idc := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=4), size=32) constraint_set_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=8), size=32) level_idc := [ 0 : for int i in Integers( 0, 31) ];
+	uint(size=5) sps_id ;
+	// High Profile
+	List (type:uint(size=2), size=32 ) chroma_format_idc := [ 1 : for int i in Integers( 0, 31) ];
+	List (type:uint(size=1), size=32 ) separate_colour_plane_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type:uint(size=3), size=32 ) bit_depth_luma_minus8 := [ 0 : for int i in Integers( 0, 31) ];
+	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8 := [ 0 : for int i in Integers( 0, 31) ];
+	List (type:uint(size=1), size=32 ) qpprime_y_zero_transform_bypass_flag:= [ 0 : for int i in Integers( 0, 31) ];
+	List (type:uint(size=1), size=32 ) seq_scaling_matrix_present_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: List ( type: int(size=6), size=12), size=32 ) seq_scaling_list_present_flag := [[ 0 : for int i in Integers( 1, 12) ]: for int j in Integers( 0, 31) ];
+
+	List (type: uint(size=4), size=32) log2_max_frame_num_minus4 := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=2), size=32) pic_order_cnt_type := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=4), size=32) log2_max_pic_order_cnt_lsb_minus4 := [ 0 : for int i in Integers( 0, 31) ];
+  
+	List (type: uint(size=1), size=32) delta_pic_order_always_zero_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: int, size=32) offset_for_non_ref_pic := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: int, size=32) offset_for_top_to_bottom_field := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=8), size=32) num_ref_frames_in_pic_order_cnt_cycle := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: List ( type: int, size=255), size=32 ) offset_for_ref_frame := [[ 0 : for int i in Integers( 0, 254) ]: for int j in Integers( 0, 31) ];
+
+	List (type: uint, size=32) num_ref_frames := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=1), size=32) gaps_in_frame_num_value_allowed_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint, size=32) pic_width_in_mbs_minus1 := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint, size=32) pic_height_in_map_units_minus1 := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=1), size=32) frame_mbs_only_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=1), size=32) mb_adaptive_frame_field_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=1), size=32) direct_8x8_interference_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=1), size=32) frame_cropping_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint, size=32) frame_crop_left_offset := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint, size=32) frame_crop_right_offset := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint, size=32) frame_crop_top_offset := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint, size=32) frame_crop_bottom_offset := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=1), size=32) vui_parameters_present_flag := [ 0 : for int i in Integers( 0, 31) ];
+
+	/*************************************************************
+	*************************************************************
+	********        Picture Parameter Set HEADER        *********
+	*************************************************************
+	*************************************************************/
+
+	uint(size=8) pps_id;
+	List (type:uint(size=5),size=255) sequence_parameter_set_id := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=1),size=255) entropy_coding_mode_flag := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=1),size=255) pic_order_present_flag := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=3),size=255) num_slice_groups_minus1 := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=3),size=255) slice_group_map_type := [ 0 : for int i in Integers( 0, 254)];
+
+	uint Pps_inc;
+	List (type:List (type:uint,size=7),size=255) run_length_minus1 := [[ 0 : for int i in Integers( 1, 7)] :for int j in Integers( 0, 254)];
+	List (type:List (type:uint,size=7),size=255) top_left := [[ 0 : for int i in Integers( 1, 7)] : for int j in Integers( 0, 254)];
+	List (type:List (type:uint,size=7),size=255) bottom_right := [[ 0 : for int i in Integers( 1, 7)] : for int j in Integers( 0, 254)];	
+	List (type:uint(size=1),size=255) slice_group_change_direction_flag := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint,size=255) slice_group_change_rate_minus1 := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint,size=255) pic_size_in_map_units_minus1 := [ 0 : for int i in Integers( 0, 254)];
+
+	List (type:uint(size=5),size=255) num_ref_idx_l0_active_minus1 := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=5),size=255) num_ref_idx_l1_active_minus1 := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=1),size=255) weighted_pred_flag := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=2),size=255) weighted_bipred_idc := [ 0 : for int i in Integers( 0, 254)];
+	List (type:int(size=6),size=255) pic_init_qp_minus26 := [ 0 : for int i in Integers( 0, 254)];
+	List (type:int(size=6),size=255) pic_init_qs_minus26 := [ 0 : for int i in Integers( 0, 254)];
+	List (type:int(size=5),size=255) chroma_qp_index_offset := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=1),size=255) deblocking_filter_control_present_flag := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=1),size=255) constrained_intra_pred_flag := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=1),size=255) redundant_pic_cnt_present_flag := [ 0 : for int i in Integers( 0, 254)];
+
+	//High profile 
+	List (type:uint(size=1),size=255) transform_8x8_mode_flag := [ 0 : for int i in Integers(0, 254)];
+	List (type:uint(size=1),size=255) pic_scaling_matrix_present_flag := [ 0 : for int i in Integers(0, 254)];
+	List (type:List (type:uint(size=1), size=12),size=255) pic_scaling_list_present_flag := [[ 0 : for int i in Integers( 0, 11)] : for int j in Integers(0, 254)];
+	List (type:int(size=5),size=255) second_chroma_qp_index_offset := [ 0 : for int i in Integers( 0, 254)];
+
+	/*************************************************************
+	*************************************************************
+	********       		Slice HEADER  	  		    *********
+	*************************************************************
+	*************************************************************/
+	uint first_mb_in_slice ;
+	uint(size=4) slice_type ;
+	uint(size=2) colour_plane_id := 0;
+	uint frame_num;
+	uint(size=1) field_pic_flag := 0;
+	uint(size=1) bottom_field_flag := 0;
+	uint(size=16) idr_pic_id := 0;
+	int pic_order_cnt_lsb := 0;
+	int delta_pic_order_cnt_bottom := 0;
+	List (type:int,size=2)delta_pic_order_cnt  := [ 0 : for int i in Integers(0, 1)];
+	uint(size=7) redundant_pic_cnt := 0;
+	uint(size=1) direct_spatial_mv_pred_flag := 0;
+	uint(size=1) num_ref_idx_active_override_flag := 0;
+	uint(size=5) slice_num_ref_idx_l0_active_minus1 := 0;
+	uint(size=5) slice_num_ref_idx_l1_active_minus1 := 0;
+	uint(size=2) cabac_init_idc := 0;
+	int slice_qp_delta;
+	uint(size=1) sp_for_switch_flag := 0;
+	uint(size=6) slice_qs_delta;
+	uint(size=2) disable_deblocking_filter_idc := 0;
+	int(size=5) slice_alpha_c0_offset_div2 := 0;
+	int(size=5) slice_beta_offset_div2 := 0;
+	int(size=6) val_slice_alpha_c0_offset := 0;
+	int(size=6) val_slice_beta_offset := 0;
+	uint slice_group_change_cycle := 0;
+
+	uint(size=6) val_QP;
+	uint(size=6) val_QP_Cb;
+	uint(size=6) val_QP_Cr;
+	List (type:uint(size=6),size=58) qP_tab := 
+		[
+			0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+			17,18,19,20,21,22,23,24,25,26,27,28,29,29,
+			30,31,32,32,33,34,34,35,35,36,36,37,37,37,
+			38,38,38,39,39,39,39,39,39,39,39,39,39
+		];
+
+	uint(size=3) SLICE_TYPE_P := 0;
+	uint(size=3) SLICE_TYPE_B := 1;
+	uint(size=3) SLICE_TYPE_I := 2;
+	uint(size=3) SLICE_TYPE_SP := 3;
+	uint(size=3) SLICE_TYPE_SI := 4;
+
+	// MMO
+	int prevPicOrderCntMsb := 0;
+	int prevPicOrderCntLsb := 0;
+	uint prev_frame_num := 0;
+	uint prev_frame_num_offset := 0;
+	//*****************************************************************
+
+	//*******  ref_pic_list_reordering  ********/
+	uint(size=1) ref_pic_list_reordering_flag_l0;
+	uint(size=1) ref_pic_list_reordering_flag_l1;
+	uint(size=1) flag_list_l1;
+	uint(size=5) ref_pic_idx;
+	uint(size=2) reordering_of_pic_nums_idc;
+	List (type:uint,size=32) abs_diff_pic_num_minus1_l0 := [ 0 : for int i in Integers( 0, 31)];
+	List (type:uint,size=32) abs_diff_pic_num_minus1_l1 := [ 0 : for int i in Integers( 0, 31)];
+	List (type:int,size=32) long_term_pic_num_l0 := [ 0 : for int i in Integers( 0, 31)];
+	List (type:int,size=32) long_term_pic_num_l1 := [ 0 : for int i in Integers( 0, 31)];
+
+	/*************************************************************
+	*************************************************************
+	********       		Slice DATA 	  	  		    *********
+	*************************************************************
+	*************************************************************/
+	uint val_CurrMbAddr;
+	uint(size=1) moreDataFlag;
+	uint prevMbSkipped;
+	uint(size=1) MbaffFrameFlag;
+	uint mb_skip_run;
+	uint(size=1) mb_skip_flag;
+	uint(size=1) mb_field_decoding_flag := 0;
+	uint(size=1) end_of_slice_flag;
+
+	uint Mb_x;
+	uint Mb_y;
+	uint PicWidthInMbs;
+	uint PicSizeInMbs;
+	//*************************************************************/
+
+	/*************************************************************
+	*************************************************************
+	********       		Macroblock layer    	    *********
+	*************************************************************
+	*************************************************************/
+	uint(size=6) mb_type;
+	uint(size=1) mb_intra_flag; // INTER 0, INTRA 1
+	uint MB_inc;
+	uint(size=1) noSubMbPartSizeLessThan8x8Flag;
+	uint(size=1) transform_size_8x8_flag := 0;
+	uint(size=6) val_CodedBlockPatternLuma := 0;
+	uint(size=6) CodedBlockPatternChroma := 0;
+	int mb_qp_delta;
+	List ( type: List ( type: uint(size=4), size=3), size=25 ) Intra_16x16_tab = //[mb_type][Intra16x16PredMode / CBPChroma / CBPLuma]
+		[ 
+			[0,0,0], [0,0,0], [1,0,0], [2,0,0], [3,0,0], [0,1,0], [1,1,0], [2,1,0], 
+			[3,1,0], [0,2,0], [1,2,0], [2,2,0], [3,2,0], [0,0,15], [1,0,15], [2,0,15], 
+			[3,0,15], [0,1,15], [1,1,15], [2,1,15], [3,1,15], [0,2,15], [1,2,15], [2,2,15], [3,2,15]  
+		];
+
+	List ( type: List ( type: uint(size=5), size=5), size=6 ) P_tab = //[mb_type][NumMbPart / MbPartWidth / MbPartHeight /MbPartPredMode,0 / MbPartPredMode,1]
+		[ [1,16,16,0,7], [2,16,8,0,0], [2,8,16,0,0], [4,8,8,7,7], [4,8,8,7,7], [1,16,16,0,7] ];
+
+	List ( type: List ( type: uint(size=5), size=5), size=24 ) B_tab = //[mb_type][NumMbPart / MbPartWidth / MbPartHeight /MbPartPredMode,0 / MbPartPredMode,1]
+		[ 
+			[0,8,8,3,0], [1,16,16,0,7], [1,16,16,1,7], [1,16,16,2,7], 
+			[2,16,8,0,0], [2,8,16,0,0], [2,16,8,1,1], [2,8,16,1,1],
+			[2,16,8,0,1], [2,8,16,0,1], [2,16,8,1,0], [2,8,16,1,0],
+			[2,16,8,0,2], [2,8,16,0,2], [2,16,8,1,2], [2,8,16,1,2],
+			[2,16,8,2,0], [2,8,16,2,0], [2,16,8,2,1], [2,8,16,2,1], 
+			[2,16,8,2,2], [2,8,16,2,2], [4,8,8,7,7],[0,8,8,3,7] 
+		];
+
+	List ( type: List ( type: uint(size=6), size=2), size=64 ) CBP_Table = // [codeNum][CBP Intra_4x4,Intra_8x8 / CBP Inter]
+		[ // chroma_format_idc is equal to 0
+			[15,0],[0,1], [7,2], [11,4],[13,8],[14,3], [3,5],[5,10],
+			[10,12],[12,15], [1,7], [2,11],[4,13],[8,14], [6,6], [9,9],
+			// chroma_format_idc is not equal to 0
+			[47,0],[31,16],[15,1],[0,2],[23,4],[27,8],[29,32],[30,3],
+			[7, 5],[11,10],[13,12],[14,15],[39,47],[43,7],[45,11],[46,13],
+			[16,14], [3,6],[5,9],[10,31],[12,35],[19,37],[21,42],[26,44],
+			[28,33],[35,34],[37,36],[42,40],[44,39],[1,43],[2,45],[4,46],
+			[8,17],[17,18],[18,20],[20,24],[24,19],[6,21],[9,26],[22,28],
+			[25,23],[32,27],[33,29],[34,30],[36,22],[40,25],[38,38],[41,41]    
+		];
+
+	/*************************************************************
+	*************************************************************
+	********       			Sub Mb Pred    	    		*********
+	*************************************************************
+	*************************************************************/
+
+	uint(size=3) mbPartIdx;
+	uint(size=3) subMbPartIdx;
+	List (type:uint,size=5) sub_mb_type := [ 0 : for int i in Integers( 0, 4)];
+	List (type:int,size=4) ref_idx_l0 := [ 0 : for int i in Integers( 0, 3)];
+	List (type:int,size=4) ref_idx_l1 := [ 0 : for int i in Integers( 0, 3)];
+	int mvd_l0 := 0;
+	int mvd_l1 := 0;
+
+	/*************************************************************
+	*************************************************************
+	********       			Mb Pred    	    		*********
+	*************************************************************
+	*************************************************************/
+
+	uint(size=5) luma4x4BlkIdx;
+	uint(size=1) prev_intra4x4_pred_mode_flag := 0;
+	List (type:uint(size=4),size=16) rem_intra4x4_pred_mode := [ 0 : for int i in Integers( 1, 16)];
+	uint(size=2) intra_chroma_pred_mode;
+	//*************************************************************/
+
+
+	//******* dec_ref_pic_marking  ********/
+	uint(size=1) no_output_of_prior_pics_flag;
+	uint(size=1) long_term_reference_flag;
+	uint(size=1) adaptative_ref_pic_marking_mode_flag;
+	uint(size=3) memory_management_control_operation;
+	uint(size=5) difference_of_pic_nums_minus1;
+	uint(size=5) long_term_pic_num;
+	uint(size=5) long_term_frame_idx;
+	uint(size=5) max_long_term_frame_idx_plus1;
+
+	/*************************************************************
+	*************************************************************
+	********       		Residual Block CAVLC   	    *********
+	*************************************************************
+	*************************************************************/
+	int(size=6) nc;
+	List ( type: uint(size=4),size=4 * 99*16) NonZeroCount; // FIXME those numbers should be independent of the size
+	List ( type: uint(size=4),size=4 * 99*4) NonZeroCountCb; // FIXME those numbers should be independent of the size
+	List ( type: uint(size=4),size=4 * 99*4) NonZeroCountCr; // FIXME those numbers should be independent of the size
+	uint(size=3) suffixLength;
+	uint(size=5) inc_nb_coeff;
+	uint level_prefix;
+	uint levelCode;
+	uint level_suffix;
+	uint(size=4) zerosLeft;
+	int(size=16) coeff_sent := 0;
+
+	List (type:int(size=SAMPLE_SZ),size=16) level := [ 0 : for int i in Integers( 1, 16)];
+	List (type:uint(size=4),size=16) run := [ 0 : for int i in Integers( 1, 16)];
+	List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
+
+	List ( type: List ( type: uint(size=7), size=3), size=62 ) VLC_nC_0to2 = //[n][coef_length / coef_val / coef_token]
+		[ 
+			[1,1,0], [6,5,4], [2,1,5], [8,7,8], [6,4,9], [3,1,10], [9,7,12], [8,6,13], 
+			[7,5,14], [5,3,15], [10,7,16], [9,6,17], [8,5,18], [6,3,19], [11,7,20], [10,6,21],
+			[9,5,22], [7,4,23], [13,15,24], [11,6,25], [10,5,26], [8,4,27], [13,11,28], [13,14,29],
+			[11,5,30], [9,4,31], [13,8,32], [13,10,33], [13,13,34], [10,4,35], [14,15,36], [14,14,37],
+			[13,9,38], [11,4,39], [14,11,40], [14,10,41], [14,13,42], [13,12,43], [15,15,44], [15,14,45],
+			[14,9,46], [14,12,47], [15,11,48], [15,10,49], [15,13,50], [14,8,51], [16,15,52], 
+			[15,1,53], [15,9,54], [15,12,55], [16,11,56], [16,14,57], [16,13,58], [15,8,59], [16,7,60],
+			[16,10,61], [16,9,62], [16,12,63], [16,4,64], [16,6,65], [16,5,66], [16,8,67] 
+		];
+	List ( type: List ( type: uint(size=7), size=3), size=62 ) VLC_nC_2to4 = //[n][coef_length / coef_val / coef_token]
+		[
+			[2,3,0], [6,11,4], [2,2,5], [6,7,8], [5,7,9], [3,3,10], [7,7,12], 
+			[6,10,13], [6,9,14], [4,5,15], [8,7,16], [6,6,17], [6,5,18], [4,4,19], [8,4,20], [7,6,21],
+			[7,5,22], [5,6,23], [9,7,24], [8,6,25], [8,5,26], [6,8,27], [11,15,28], [9,6,29], [9,5,30],
+			[6,4,31], [11,11,32], [11,14,33], [11,13,34], [7,4,35], [12,15,36], [11,10,37],
+			[11,9,38], [9,4,39], [12,11,40], [12,14,41], [12,13,42], [11,12,43], [12,8,44],
+			[12,10,45], [12,9,46], [11,8,47], [13,15,48], [13,14,49], [13,13,50], [12,12,51], [13,11,52], 
+			[13,10,53], [13,9,54], [13,12,55], [13,7,56], [14,11,57], [13,6,58], [13,8,59], [14,9,60],
+			[14,8,61], [14,10,62], [13,1,63], [14,7,64], [14,6,65], [14,5,66], [14,4,67] 
+		];
+	List ( type: List ( type: uint(size=7), size=3), size=62 ) VLC_nC_4to8 = //[n][coef_length / coef_val / coef_token]
+		[ 
+			[4,15,0], [6,15,4], [4,14,5], [6,11,8], [5,15,9], [4,13,10], [6,8,12], 
+			[5,12,13], [5,14,14], [4,12,15], [7,15,16], [5,10,17], [5,11,18], [4,11,19], [7,11,20], [5,8,21],
+			[5,9,22], [4,10,23], [7,9,24], [6,14,25], [6,13,26], [4,9,27], [7,8,28], [6,10,29],
+			[6,9,30], [4,8,31], [8,15,32], [7,14,33], [7,13,34], [5,13,35], [8,11,36], [8,14,37],
+			[7,10,38], [6,12,39], [9,15,40], [8,10,41], [8,13,42], [7,12,43], [9,11,44], 
+			[9,14,45], [8,9,46], [8,12,47], [9,8,48], [9,10,49], [9,13,50], [8,8,51], [10,13,52], 
+			[9,7,53], [9,9,54], [9,12,55], [10,9,56], [10,12,57], [10,11,58], [10,10,59], 
+			[10,5,60], [10,8,61], [10,7,62], [10,6,63], [10,1,64], [10,4,65], [10,3,66], [10,2,67] 
+		];
+	List ( type: List ( type: uint(size=7), size=3), size=62 ) VLC_nC_8 = //[n][coef_length / coef_val / coef_token]
+		[ 
+			[6,3,0], [6,0,4], [6,1,5], [6,4,8], [6,5,9], [6,6,10], [6,8,12], [6,9,13], [6,10,14],
+			[6,11,15], [6,12,16], [6,13,17], [6,14,18], [6,15,19], [6,16,20], [6,17,21],
+			[6,18,22], [6,19,23], [6,20,24], [6,21,25], [6,22,26], [6,23,27], [6,24,28], 
+			[6,25,29], [6,26,30], [6,27,31], [6,28,32], [6,29,33], [6,30,34], [6,31,35], [6,32,36], [6,33,37],
+			[6,34,38], [6,35,39], [6,36,40], [6,37,41], [6,38,42], [6,39,43], [6,40,44], [6,41,45], 
+			[6,42,46], [6,43,47], [6,44,48], [6,45,49], [6,46,50], [6,47,51], [6,48,52], 
+			[6,49,53], [6,50,54], [6,51,55], [6,52,56], [6,53,57], [6,54,58], [6,55,59], [6,56,60],
+			[6,57,61], [6,58,62], [6,59,63], [6,60,64], [6,61,65], [6,62,66], [6,63,67] 
+		];
+	List ( type: List ( type: uint(size=7), size=3), size=14 ) VLC_nC_1 = //[n][coef_length / coef_val / coef_token]
+		[ [2,1,0], [6,7,4], [1,1,5], [6,4,8], [6,6,9], [3,1,10], [6,3,12], [7,3,13], [7,2,14], [6,5,15], [6,2,16], [8,3,17], [8,2,18], [7,0,19] ];
+	List ( type: List ( type: uint(size=7), size=3), size=30 ) VLC_nC_2 = //[n][coef_length / coef_val / coef_token]
+		[ [1,1,0], [7,15,4], [2,1,5], [8,14,8], [8,13,9], [3,1,10], [9,7,12], [7,12,13], [7,13,14], [5,1,15], [9,6,16], [9,5,17], [7,10,18], [6,1,19], [10,7,20], [10,6,21],
+		[9,4,22], [7,9,23], [11,7,24], [11,6,25], [10,5,26], [7,8,27], [12,7,28], [12,6,29], [11,5,30], [10,4,31], [13,7,32], [12,5,33], [12,4,34], [11,4,35]
+		];
+	List ( type:List ( type: List ( type: uint(size=4), size=3), size=16 ), size=15) VLC_total0 = //[TotalCoeff()-1][n][coef_length / coef_val / total_zeros]
+		[ [ [1,1,0], [3,3,1], [3,2,2], [4,3,3], [4,2,4], [5,3,5], [5,2,6], [6,3,7], [6,2,8], [7,3,9], [7,2,10], [8,3,11], [8,2,12], [9,3,13], [9,2,14], [9,1,15] ],//tzVlcIndex = 1
+		[ [3,7,0], [3,6,1], [3,5,2], [3,4,3], [3,3,4], [4,5,5], [4,4,6], [4,3,7], [4,2,8], [5,3,9], [5,2,10], [6,3,11], [6,2,12], [6,1,13], [6,0,14] ],//tzVlcIndex = 2
+		[ [4,5,0], [3,7,1], [3,6,2], [3,5,3], [4,4,4], [4,3,5], [3,4,6], [3,3,7], [4,2,8], [5,3,9], [5,2,10], [6,1,11], [5,1,12], [6,0,13] ],//tzVlcIndex = 3
+		[ [5,3,0], [3,7,1], [4,5,2], [4,4,3], [3,6,4], [3,5,5], [3,4,6], [4,3,7], [3,3,8], [4,2,9], [5,2,10], [5,1,11], [5,0,12] ],//tzVlcIndex = 4
+		[ [4,5,0], [4,4,1], [4,3,2], [3,7,3], [3,6,4], [3,5,5], [3,4,6], [3,3,7], [4,2,8], [5,1,9], [4,1,10], [5,0,11] ],//tzVlcIndex = 5
+		[ [6,1,0], [5,1,1], [3,7,2], [3,6,3], [3,5,4], [3,4,5], [3,3,6], [3,2,7], [4,1,8], [3,1,9], [6,0,10] ],//tzVlcIndex = 6
+		[ [6,1,0], [5,1,1], [3,5,2], [3,4,3], [3,3,4], [2,3,5], [3,2,6], [4,1,7], [3,1,8], [6,0,9] ],//tzVlcIndex = 7
+		[ [6,1,0], [4,1,1], [5,1,2], [3,3,3], [2,3,4], [2,2,5], [3,2,6], [3,1,7], [6,0,8] ],//tzVlcIndex = 8
+		[ [6,1,0], [6,0,1], [4,1,2], [2,3,3], [2,2,4], [3,1,5], [2,1,6], [5,1,7] ],//tzVlcIndex = 9
+		[ [5,1,0], [5,0,1], [3,1,2], [2,3,3], [2,2,4], [2,1,5], [4,1,6] ],//tzVlcIndex = 10
+		[ [4,0,0], [4,1,1], [3,1,2], [3,2,3], [1,1,4], [3,3,5] ],//tzVlcIndex = 11
+		[ [4,0,0], [4,1,1], [2,1,2], [1,1,3], [3,1,4]  ],//tzVlcIndex = 12
+		[ [3,0,0], [3,1,1], [1,1,2], [2,1,3]  ],//tzVlcIndex = 13
+		[ [2,0,0], [2,1,1], [1,1,2]  ],//tzVlcIndex = 14
+		[ [1,0,0], [1,1,1]  ]//tzVlcIndex = 15
+		]; 
+	List ( type:List ( type: List ( type: uint(size=4), size=3), size=4 ), size=3) VLC_total0_Cr_DC2x2 = //[TotalCoeff()-1][n][coef_length / coef_val / total_zeros]
+		[ [ [1,1,0], [2,1,1], [3,1,2], [3,0,3]  ],//tzVlcIndex = 1
+		[ [1,1,0], [2,1,1], [2,0,2]  ],//tzVlcIndex = 2
+		[ [1,1,0], [1,0,1]  ]//tzVlcIndex = 3
+		]; 
+	List ( type:List ( type: List ( type: uint(size=7), size=3), size=15 ), size=7) VLC_run_before = //[TotalCoeff()-1][n][coef_length / coef_val / total_zeros]
+		[ [ [1,1,0], [1,0,1]  ], //zerosLeft = 1
+		[ [1,1,0], [2,1,1], [2,0,2]  ], //zerosLeft = 2
+		[ [2,3,0], [2,2,1], [2,1,2], [2,0,3]  ], //zerosLeft = 3
+		[ [2,3,0], [2,2,1], [2,1,2], [3,1,3], [3,0,4]  ], //zerosLeft = 4
+		[ [2,3,0], [2,2,1], [3,3,2], [3,2,3], [3,1,4], [3,0,5]  ], //zerosLeft = 5
+		[ [2,3,0], [3,0,1], [3,1,2], [3,3,3], [3,2,4], [3,5,5], [3,4,6]  ], //zerosLeft = 6
+		[ [3,7,0], [3,6,1], [3,5,2], [3,4,3], [3,3,4], [3,2,5], [3,1,6], [4,1,7], [5,1,8], [6,1,9], [7,1,10], [8,1,11], [9,1,12], [10,1,13], [11,1,14] ] //zerosLeft > 6
+		];
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********       		Residual		    	    *********
+	*************************************************************
+	*************************************************************/
+
+	uint(size=1) bmFlag;
+	uint(size=4) startIdx;
+	uint(size=4) endIdx;
+	List (type:uint(size=12),size=16) coeffLevel := [ 0 : for int i in Integers( 1, 16)]; 
+	uint(size=4) block_startIdx;
+	uint(size=6) block_endIdx;
+	uint(size=7) maxNumCoeff;
+
+	uint(size=3) i8x8;
+	uint(size=3) i4x4;
+	uint(size=3) NumC8x8;
+	uint(size=2) iCbCr;
+	uint(size=2) leveltype := 0; // Intra16x16DCLevel 0, Intra16x16ACLevel / LumaLevel 1, ChromaDCLevel 2, ChromaACLevel 3
+
+	// ********** Read VLD ********** //
+
+	procedure start_vld()
+	begin
+		NewVLD := true;
+		VLD_Counter := 0;
+		First_part := true;
+		Codeword := 0;
+		CodeLen := 0;
+	end
+
+	function IS_Intra_4x4() --> bool : mb_intra_flag = 1 and mb_type = 0 and transform_size_8x8_flag = 0 end
+	function IS_Intra_8x8() --> bool : mb_intra_flag = 1 and mb_type = 0 and transform_size_8x8_flag = 1 end
+	function IS_Intra_16x16() --> bool : mb_intra_flag = 1 and mb_type > 0 and mb_type <25 end
+	function IS_I_PCM() --> bool : mb_intra_flag = 1 and mb_type = 25 end
+	function IS_P_8x8ref0() --> bool : slice_type = SLICE_TYPE_P and mb_type = 4 end
+	function IS_B_Direct_8x8() --> bool : slice_type = SLICE_TYPE_B and sub_mb_type[ mbPartIdx ] = 0 end
+
+	function vld_end() --> bool : not NewVLD end
+	function vld_ue() --> int : lshift(1, CodeLen)+Codeword-1 end
+	function vld_se() --> int : if (vld_ue() mod 2) = 0 then - (vld_ue() / 2) else (vld_ue() / 2) + 1 end end
+	function vld_me() --> int : 
+		if chroma_format_idc[sps_id] = 0 then 
+			CBP_Table[vld_ue()] [if IS_Intra_4x4() or IS_Intra_8x8()  then 0 else 1 end] 
+		else 
+			CBP_Table[16 + vld_ue()] [if IS_Intra_4x4() or IS_Intra_8x8() then 0 else 1 end] 
+		end 
+	end
+
+	procedure set_bits_to_read( int count )
+	begin
+		bits_to_read_count := count - 1;
+		read_result_in_progress := 0;
+	end
+
+	function done_reading_bits() --> bool : bits_to_read_count < 0 end
+	function read_result() --> int : read_result_in_progress end
+	function more_rbsp_data() --> uint(size=1) : 
+		if bit_count / 8 + if (bit_count mod 8) = 0 then 0 else 1 end < val_nb_rbsp_bytes then 1 else 0 end 
+	end
+	
+  
+	function mask_bits( int(size=41)v, int(size=41)n ) --> int :
+		bitand( v, lshift(1,n)-1 )
+	end
+  
+	action bits:[ b ] ==>
+	guard 
+		not done_reading_bits()
+	do
+		read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b then 1 else 0 end );
+		bits_to_read_count := bits_to_read_count - 1;
+		bit_count := bit_count + 1;
+	end
+
+	action bits:[ b ] ==>
+	guard
+		NewVLD,
+		First_part
+	do
+		if b then
+			First_part := false;
+			CodeLen := VLD_Counter;
+			if CodeLen = 0 then NewVLD := false; end
+		else
+			VLD_Counter := VLD_Counter + 1;
+		end
+		bit_count := bit_count + 1;
+	end
+  
+	action bits:[ b ] ==>
+	guard
+		NewVLD,
+		not First_part
+	do
+		VLD_Counter := VLD_Counter - 1;
+		Codeword := bitor( lshift( Codeword, 1), if b then 1 else 0 end);
+		bit_count := bit_count + 1;
+		if   VLD_Counter = 0 then NewVLD := false; end
+	end  
+
+	// ********** Read CAVLC ********** //
+
+	function CAVLC_end() --> bool : not NewCoeff end
+
+	procedure start_CAVLC(uint(size=2) x)
+	begin
+		NewCoeff := true;
+		VLD_Counter := 0;
+		Codeword := 0;
+		CAVLC_type := x;
+	end
+      
+	function TotalCoeff() --> uint(size=7) : rshift(coeff_token,2) end
+	function TrailingOnes() --> uint(size=2) : mask_bits(coeff_token,2) end
+	function Abs(int x) --> uint : if x >= 0 then x else -x end end
+
+	action bits:[ b ] ==>
+	guard
+	NewCoeff
+	do
+		VLD_Counter := VLD_Counter + 1;
+		Codeword := bitor( lshift( Codeword, 1), if b then 1 else 0 end);
+		if CAVLC_type =0 then // coeff_token
+			foreach int i in Integers(0,61) do
+				if nc >=0 and nc < 2 then
+					if VLD_Counter = VLC_nC_0to2[i][0] and Codeword = VLC_nC_0to2[i][1] then coeff_token := VLC_nC_0to2[i][2]; NewCoeff := false; end
+				else
+					if nc >=2 and nc < 4 then
+						if VLD_Counter = VLC_nC_2to4[i][0] and Codeword = VLC_nC_2to4[i][1] then coeff_token := VLC_nC_2to4[i][2]; NewCoeff := false; end
+					else
+						if nc >=4 and nc < 8 then
+							if VLD_Counter = VLC_nC_4to8[i][0] and Codeword = VLC_nC_4to8[i][1] then coeff_token := VLC_nC_4to8[i][2]; NewCoeff := false; end
+						else
+							if nc >=8 then
+								if VLD_Counter = VLC_nC_8[i][0] and Codeword = VLC_nC_8[i][1] then coeff_token := VLC_nC_8[i][2]; NewCoeff := false; end 
+							else
+								if nc = -1 and i <14 then
+									if VLD_Counter = VLC_nC_1[i][0] and Codeword = VLC_nC_1[i][1] then coeff_token := VLC_nC_1[i][2]; NewCoeff := false; end
+								else
+									if nc = -2 and i <30 then
+										if VLD_Counter = VLC_nC_2[i][0] and Codeword = VLC_nC_2[i][1] then coeff_token := VLC_nC_2[i][2]; NewCoeff := false; end  
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		else
+			if CAVLC_type = 1 then // total_zeros
+				foreach int i in Integers(0, (maxNumCoeff - TotalCoeff() )) do
+					if maxNumCoeff != 4 and maxNumCoeff !=8 then 
+						if VLD_Counter = VLC_total0[TotalCoeff()-1][i][0] and Codeword = VLC_total0[TotalCoeff()-1][i][1] then 
+							total_zeros := VLC_total0[TotalCoeff()-1][i][2]; NewCoeff := false; 
+						end
+					else 
+						if maxNumCoeff = 4 then
+							if VLD_Counter = VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][0] and Codeword = VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][1] then 
+								total_zeros := VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][2]; NewCoeff := false; 
+							end
+						else //maxNumCoeff = 8
+							println("Chroma DC 2x4 block not implemented");
+						end
+					end
+				end
+			else //run_before
+				foreach int i in Integers(0,zerosLeft) do
+					if zerosLeft > 6 then
+						if VLD_Counter = VLC_run_before[6][i][0] and Codeword = VLC_run_before[6][i][1] then 
+							run_before := VLC_run_before[6][i][2]; NewCoeff := false; 
+						end
+					else
+						if VLD_Counter = VLC_run_before[zerosLeft-1][i][0] and Codeword = VLC_run_before[zerosLeft-1][i][1] then
+							run_before := VLC_run_before[zerosLeft-1][i][2]; NewCoeff := false; 
+						end         
+					end
+				end
+			end
+		end
+		bit_count := bit_count + 1;
+	end
+  
+
+	/*************************************************************
+	*************************************************************
+	********              NAL Unit HEADER                ********
+	*************************************************************
+	*************************************************************/
+
+
+	look_for_Sequence_Header: action ==>
+	end
+
+	//FIXME this action is not used any more
+	search_start_code: action ==>
+	end
+
+	read_Nal_unit_header: action nb_rbsp_bytes:[n] ==>
+	guard
+    	done_reading_bits()
+	do
+		val_nb_rbsp_bytes := n;
+		set_bits_to_read(NAL_UNIT_HEADER_LENGTH);
+	end
+  
+  
+	look_for_which_Header: action ==>
+	guard
+		done_reading_bits()
+	do
+		nal_unit_type := mask_bits(read_result(), 5);
+		nal_ref_idc := mask_bits(rshift(read_result(), 5), 2);
+		//println("nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
+		bit_count := 0;
+	end
+ 
+	look_for_other_header: action ==>
+	guard
+		nal_unit_type != 7 and nal_unit_type != 8 and nal_unit_type != 5 and nal_unit_type != 1
+	end
+ 
+	look_for_Sps_header: action ==>
+	guard
+		nal_unit_type = 7
+	do
+		set_bits_to_read(24); //8 + 1+1+1+1 + 4 + 8
+	end
+
+	look_for_Pps_header: action ==>
+	guard
+		nal_unit_type = 8
+	do
+		start_vld();
+	end
+ 
+	look_for_Slice_header: action ==>
+	guard
+		nal_unit_type = 5 or nal_unit_type = 1
+	do
+		start_vld();
+	end
+
+	/*************************************************************
+	*************************************************************
+	********        Sequence Parameter Set HEADER        ********
+	*************************************************************
+	*************************************************************/
+
+
+	read_Sps_id: action ==>
+	guard
+		done_reading_bits()
+	do
+		start_vld();
+	end
+
+	read_Sps_id_done: action ==>
+	guard
+		vld_end()
+	do
+		sps_id := vld_ue();
+		level_idc[sps_id] := mask_bits(read_result(), 8);
+		constraint_set_flag[sps_id] := mask_bits(rshift(read_result(),12), 4);
+		profile_idc[sps_id] := mask_bits(rshift(read_result(),16), 8);
+	end
+ 
+	 // if profile is not Baseline or Main
+	 read_Sps_chroma_format_idc: action ==>
+	 guard
+		(profile_idc[sps_id] = 100 
+		or profile_idc[sps_id] = 110 
+		or profile_idc[sps_id] = 122 
+		or profile_idc[sps_id] = 244 
+		or profile_idc[sps_id] = 44 
+		or profile_idc[sps_id] = 83 
+		or profile_idc[sps_id] = 86)
+	 do
+		println("read_Sps_chroma_format_idc not yet implemented");
+	 end
+	 // end if
+ 
+	read_Sps_log2_max_frame_num_minus4: action ==>
+	do
+		start_vld();
+	end
+ 
+	read_Sps_pic_order_cnt_type: action ==>
+	guard
+		vld_end()
+	do
+		log2_max_frame_num_minus4[sps_id] := vld_ue();
+		start_vld();
+	end
+
+	// if pic_order_cnt_type == 0
+	read_Sps_log2_max_pic_order_cnt_lsb_minus4: action ==>
+	guard
+		vld_end(),
+		vld_ue() = 0
+	do
+		pic_order_cnt_type[sps_id] := 0;
+		start_vld();
+	end
+ 
+	read_Sps_log2_max_pic_order_cnt_lsb_minus4_done: action ==>
+	guard
+		vld_end()
+	do
+		log2_max_pic_order_cnt_lsb_minus4[sps_id] := vld_ue();
+	end
+
+	// else if pic_order_cnt_type == 1
+	read_Sps_delta_pic_order_always_zero_flag: action ==>
+	guard
+		vld_end() and
+		vld_ue() = 1
+	do
+		pic_order_cnt_type[sps_id] := 1;
+		set_bits_to_read(1);
+	end
+
+	read_Sps_offset_for_non_ref_pic: action ==>
+	guard
+		done_reading_bits()
+	do
+		delta_pic_order_always_zero_flag[sps_id] := read_result();
+		start_vld();
+	end
+
+	read_Sps_offset_for_top_to_bottom_field: action ==>
+	guard
+		vld_end()
+	do
+		offset_for_non_ref_pic[sps_id] := vld_se();
+		start_vld();
+	end
+
+	read_Sps_num_ref_frames_in_pic_order_cnt_cycle: action ==>
+	guard
+		vld_end()
+	do
+		offset_for_top_to_bottom_field[sps_id] := vld_se();
+		start_vld();
+	end
+
+	// for (Sps_inc=0 ; Sps_inc<num_ref_frames_in_pic_order_cnt_cycle ; Sps_inc++) 
+	read_Sps_offset_for_ref_frame0: action ==>
+	guard
+		vld_end()
+	do
+		num_ref_frames_in_pic_order_cnt_cycle[sps_id] := vld_ue();
+		if num_ref_frames_in_pic_order_cnt_cycle[sps_id] >0 then start_vld(); Sps_inc:=0; end
+	end
+
+	read_Sps_offset_for_ref_frame1: action ==>
+	guard
+		vld_end(),
+		Sps_inc < num_ref_frames_in_pic_order_cnt_cycle[sps_id]
+	do
+		offset_for_ref_frame[sps_id,Sps_inc] := vld_se();
+		Sps_inc := Sps_inc + 1;
+		if Sps_inc < num_ref_frames_in_pic_order_cnt_cycle[sps_id] then start_vld();  end
+	end
+
+	read_Sps_skip_offset_for_ref_frame1: action ==>
+	guard
+		Sps_inc = num_ref_frames_in_pic_order_cnt_cycle[sps_id]
+	end
+	// end for
+
+	// else (pic_order_cnt_type != 0 and !=1)
+	read_Sps_pic_order_cnt_type_skip01: action ==>
+	guard
+		vld_end() and   vld_ue() = 2
+	do
+		pic_order_cnt_type[sps_id] := 2;
+	end
+	// end if
+
+	read_Sps_num_ref_frames: action ==>
+	do
+		start_vld();
+	end
+
+	read_Sps_gaps_in_frame_num_value_allowed_flag: action ==>
+	guard
+		vld_end()
+	do
+		num_ref_frames[sps_id] := vld_ue();
+		set_bits_to_read(1);
+	end
+
+	read_Sps_pic_width_in_mbs_minus1: action ==>
+	guard
+		done_reading_bits()
+	do
+		gaps_in_frame_num_value_allowed_flag[sps_id] := mask_bits(read_result(), 1);
+		start_vld();
+	end
+
+	read_Sps_pic_height_in_map_units_minus1: action ==> WIDTH:[pic_width_in_mbs_minus1[sps_id] + 1]
+	guard
+		vld_end()
+	do
+		pic_width_in_mbs_minus1[sps_id] := vld_ue();
+		start_vld();
+	end
+
+	read_Sps_frame_mbs_only_flag: action ==> HEIGHT:[pic_height_in_map_units_minus1[sps_id] + 1]
+	guard
+		vld_end()
+	do
+		pic_height_in_map_units_minus1[sps_id] := vld_ue();
+		set_bits_to_read(1);
+	end
+
+	// if (!frame_mbs_only_flag)
+	read_Sps_mb_adaptive_frame_field_flag: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 0
+	do
+		frame_mbs_only_flag[sps_id] := mask_bits(read_result(), 1);
+		set_bits_to_read(1);
+	end
+
+	read_Sps_mb_adaptive_frame_field_flag_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		mb_adaptive_frame_field_flag[sps_id] := mask_bits(read_result(), 1);
+	end
+ 
+	//else (frame_mbs_only_flag)
+	read_Sps_skip_mb_adaptive_frame_field_flag: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 1
+	do
+		frame_mbs_only_flag[sps_id] := mask_bits(read_result(), 1);
+	end
+	//end if
+
+	read_Sps_direct_8x8_interference_flag: action ==>
+	do
+		set_bits_to_read(1);
+	end
+
+	read_Sps_frame_cropping_flag: action ==>
+	guard
+		done_reading_bits()
+	do
+		direct_8x8_interference_flag[sps_id] := mask_bits(read_result(), 1);
+		set_bits_to_read(1);
+	end
+
+	// if (frame_cropping_flag)
+	read_Sps_frame_crop_left_offset: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 1
+	do
+		frame_cropping_flag[sps_id] := 1;
+		start_vld();
+	end
+
+	read_Sps_frame_crop_right_offset: action ==>
+	guard
+		vld_end()
+	do
+		frame_crop_left_offset[sps_id] := vld_ue();
+		start_vld();
+	end
+
+	read_Sps_frame_crop_top_offset: action ==>
+	guard
+		vld_end()
+	do
+		frame_crop_right_offset[sps_id] := vld_ue();
+		start_vld();
+	end
+
+	read_Sps_frame_crop_bottom_offset: action ==>
+	guard
+		vld_end()
+	do
+		frame_crop_top_offset[sps_id] := vld_ue();
+		start_vld();
+	end
+
+	read_Sps_frame_crop_bottom_offset_done: action ==>
+	guard
+		vld_end()
+	do
+		frame_crop_bottom_offset[sps_id] := vld_ue();
+	end
+
+	// else (!frame_cropping_flag)
+	read_Sps_skip_frame_crop_left_offset: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 0
+	do
+		frame_cropping_flag[sps_id] := 0;
+	end
+	//end if 
+
+	read_Sps_vui_parameters_present_flag: action ==>
+	guard
+		done_reading_bits()
+	do
+		set_bits_to_read(1);
+	end
+
+	read_Sps_vui_parameters_present_flag_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		vui_parameters_present_flag[sps_id] := mask_bits(read_result(), 1);
+		set_bits_to_read(1); //to continue reading the bitstream
+		//println("read Sps header done");
+		//println("");
+	end
+	/******* End of Sequence Parameter Set HEADER  ********/
+ 
+
+
+	/*************************************************************
+	*************************************************************
+	********        Picture Parameter Set HEADER        *********
+	*************************************************************
+	*************************************************************/
+
+
+	//*************************************
+	read_Pps_seq_parameter_set_id: action ==>
+	guard
+		vld_end()
+	do
+		pps_id := vld_ue();
+		start_vld();
+	end
+
+	read_Pps_entropy_coding_mode_pic_order_flag: action ==>
+	guard
+		vld_end()
+	do
+		sequence_parameter_set_id[pps_id] := vld_ue();
+		set_bits_to_read(2);
+	end
+
+	read_Pps_num_slice_groups_minus1: action ==>
+	guard
+		done_reading_bits()
+	do
+		pic_order_present_flag[pps_id] := mask_bits(read_result(), 1);
+		entropy_coding_mode_flag[pps_id] := mask_bits(rshift(read_result(),1), 1);
+		start_vld();
+	end
+
+	// if (num_slice_groups_minus1 <=0)
+	read_Pps_slice_group_map_type_skip: action ==>
+	guard
+		vld_end(),
+		vld_ue() <= 0
+	do
+		num_slice_groups_minus1[pps_id] := vld_ue();
+	end
+
+	// if (num_slice_groups_minus1 >0)
+	read_Pps_slice_group_map_type: action ==>
+	guard
+		vld_end(),
+		vld_ue() > 0
+	do
+		num_slice_groups_minus1[pps_id] := vld_ue();
+		start_vld();
+		println("num_slice_groups_minus1 > 0 not yet implemented");
+	end
+
+	read_Pps_check_slice_group_map_type: action ==>
+	guard
+		vld_end()
+	do
+		slice_group_map_type[pps_id] := vld_ue();
+		println("read_Pps_check_slice_group_map_type : "+slice_group_map_type[pps_id]);
+		if slice_group_map_type[pps_id] = 0 or slice_group_map_type[pps_id] = 2 or slice_group_map_type[pps_id] = 6 then start_vld(); end
+		if slice_group_map_type[pps_id] = 3 or slice_group_map_type[pps_id] = 4 or slice_group_map_type[pps_id] =5 then set_bits_to_read(1); end
+		Pps_inc :=0;
+	end
+
+	// if (slice_group_map_type == 0)
+	//   for (Pps_inc =0 ; Pps_inc < num_slice_groups_minus1 ; Pps_inc++)
+	read_Pps_run_length_minus1: action ==>
+	guard
+		vld_end(),
+		slice_group_map_type[pps_id] = 0,
+		Pps_inc < num_slice_groups_minus1[pps_id]
+	do
+		run_length_minus1[pps_id,Pps_inc] := vld_ue();
+		Pps_inc := Pps_inc +1;
+		if Pps_inc < num_slice_groups_minus1[pps_id] then start_vld();end
+	end
+	// end for
+
+	// else if (slice_group_map_type == 1)
+	read_Pps_check_slice_group_map_type1: action ==>
+	guard
+		slice_group_map_type[pps_id] = 1
+	end
+
+	// else if (slice_group_map_type == 2)
+	//   for (Pps_inc =0 ; Pps_inc < num_slice_groups_minus1 ; Pps_inc++)
+	read_Pps_top_left: action ==>
+	guard
+		vld_end(),
+		slice_group_map_type[pps_id] = 2,
+		Pps_inc < num_slice_groups_minus1[pps_id]
+	do
+		top_left[pps_id,Pps_inc] := vld_ue();
+		start_vld();
+	end
+
+	read_Pps_bottom_right: action ==>
+	guard
+		vld_end()
+	do
+		bottom_right[pps_id,Pps_inc] := vld_ue();
+		Pps_inc := Pps_inc +1;
+		if Pps_inc < num_slice_groups_minus1[pps_id] then start_vld();end
+	end
+	//end for
+
+	// else if (slice_group_map_type == 3 | 4 | 5)
+	read_Pps_slice_group_change_direction_flag: action ==>
+	guard
+		done_reading_bits(),
+		slice_group_map_type[pps_id] = 3 or slice_group_map_type[pps_id] = 4 or slice_group_map_type[pps_id] = 5
+	do
+		slice_group_change_direction_flag[pps_id] := read_result();
+		start_vld();
+	end
+
+	read_Pps_slice_group_change_rate_minus1: action ==>
+	guard
+		vld_end()
+	do
+		slice_group_change_rate_minus1[pps_id] := vld_ue();
+	end
+
+	// else if (slice_group_map_type == 6)
+	read_Pps_pic_size_in_map_units_minus1: action ==>
+	guard
+		vld_end(),
+		slice_group_map_type[pps_id] = 6
+	do
+		pic_size_in_map_units_minus1[pps_id] := vld_ue();
+		println(" PB : slice_group_map_type = 6 -> search code_start"); 
+	end
+	// end if
+
+	read_Pps_num_ref_idx_l0_active_minus1: action ==>
+	do
+		start_vld();
+	end
+
+	read_Pps_num_ref_idx_l1_active_minus1: action ==>
+	guard
+		vld_end()
+	do
+		num_ref_idx_l0_active_minus1[pps_id] := vld_ue();
+		start_vld();
+	end
+
+	read_Pps_weighted_pred_bipred: action ==>
+	guard
+		vld_end()
+	do
+		num_ref_idx_l1_active_minus1[pps_id] := vld_ue();
+		set_bits_to_read(3);
+	end
+
+	read_Pps_pic_init_qp_minus26: action ==>
+	guard
+		done_reading_bits()
+	do
+		weighted_pred_flag[pps_id] := mask_bits(rshift(read_result(),2), 1);
+		weighted_bipred_idc[pps_id] := mask_bits(read_result(), 2);
+		start_vld();
+	end
+
+	read_Pps_pic_init_qs_minus26: action ==>
+	guard
+		vld_end()
+	do
+		pic_init_qp_minus26[pps_id] := vld_se();
+		start_vld();
+	end
+
+	read_Pps_chroma_qp_index_offset: action ==>
+	guard
+		vld_end()
+	do
+		pic_init_qs_minus26[pps_id] := vld_se();
+		start_vld();
+	end
+
+	read_Pps_flag_deblocking_constrained_redundant: action ==>
+	guard
+		vld_end()
+	do
+		chroma_qp_index_offset[pps_id] := vld_se();
+		second_chroma_qp_index_offset[pps_id] := vld_se();
+		set_bits_to_read(3);
+	end
+
+	read_Pps_check_High_Profile: action ==>
+	guard
+		done_reading_bits()
+	do
+		deblocking_filter_control_present_flag[pps_id] := mask_bits(rshift(read_result(),2), 1);
+		constrained_intra_pred_flag[pps_id] := mask_bits(rshift(read_result(),1), 1);
+		redundant_pic_cnt_present_flag[pps_id] := mask_bits(read_result(), 1);
+		set_bits_to_read(8 -  bit_count mod 8); //byte_alignment
+	end 
+
+	//if (!more_rbsp_data)
+	read_Pps_not_High_Profile: action ==>
+	guard
+		done_reading_bits()
+	do
+		//println("read Pps header done");
+		println("");
+	end
+
+	//Not implemented due to guard condition : more_rbsp_data 
+	/* read_Pps_pic_scaling_matrix_present_flag: action ==>
+	guard
+	more_rbsp_data()=1
+	do
+	println("PPS High Profile not yet implemented !");
+	println("");
+	end
+	*/
+	/******* End of Picture Parameter Set HEADER  ********/
+  
+  
+  
+	/*************************************************************
+	*************************************************************
+	********       Slice HEADER  	      *********
+	*************************************************************
+	*************************************************************/
+
+
+	read_SliceH_slice_type: action ==>
+	guard
+		vld_end()
+	do
+		first_mb_in_slice := vld_ue();
+		start_vld();
+	end
+
+	read_SliceH_pps_id: action ==>
+	guard
+		vld_end()
+	do
+		slice_type := vld_ue();
+		slice_type := slice_type mod 5;
+		start_vld();
+	end
+
+	read_SliceH_check_separate_colour_plane_flag: action ==> MMCO:[num_ref_frames[sps_id]]
+	guard
+		vld_end()
+	do
+		pps_id := vld_ue();
+		sps_id := sequence_parameter_set_id[pps_id];
+	end
+
+	read_SliceH_separate_colour_plane_flag_done: action ==> 
+	guard
+		separate_colour_plane_flag[sps_id] = 1
+	do
+		set_bits_to_read(2);
+	end
+
+	read_SliceH_skip_separate_colour_plane_flag: action ==> 
+	guard
+		separate_colour_plane_flag[sps_id] != 1
+	do
+		set_bits_to_read(4+log2_max_frame_num_minus4[sps_id]);
+	end
+
+	// if(separate_colour_plane_flag ==1)
+	read_SliceH_read_colour_plane_id: action ==>
+	guard
+		done_reading_bits(),
+		separate_colour_plane_flag[sps_id] = 1
+	do
+		colour_plane_id := read_result();
+		set_bits_to_read(4+log2_max_frame_num_minus4[sps_id]);
+	end
+	//end if 
+
+	read_SliceH_frame_num: action ==>
+	guard
+		done_reading_bits()
+	do
+		frame_num := read_result();
+	end
+
+	//if (!frame_mbs_only_flag)
+	read_SliceH_field_pic_flag: action ==>
+	guard
+		frame_mbs_only_flag[sps_id] = 0
+	do
+		set_bits_to_read(1);
+	end
+
+	//if (field_pic_flag)
+	read_SliceH_bottom_field_flag: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 1
+	do
+		field_pic_flag := 1;
+		set_bits_to_read(1);
+	end
+
+
+	read_SliceH_bottom_field_flag_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		bottom_field_flag := read_result();
+	end
+
+	//else (!field_flag)
+	read_SliceH_skip_bottom_field_flag: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 0
+	do
+		field_pic_flag := 0;
+	end
+	//end if
+
+	// else (frame_mbs_only_flag)
+	read_SliceH_skip_field_pic_flag: action ==>
+	guard
+		frame_mbs_only_flag[sps_id] = 1
+	end
+	//end if
+
+	//if (nal_unit_type == 5)
+	read_SliceH_idr_pic_id: action ==>
+	guard
+		nal_unit_type = 5
+	do
+		start_vld();
+	end
+
+	read_SliceH_idr_pic_id_done: action ==>
+	guard
+		vld_end()
+	do
+		idr_pic_id := vld_ue();
+	end
+
+	//else (nal_unit_type != 5)
+	read_SliceH_skip_idr_pic_id: action ==>
+	guard
+		nal_unit_type != 5
+	end
+	//end if
+
+	read_SliceH_pic_order_cnt_lsb: action ==>
+	guard 
+		pic_order_cnt_type[sps_id] = 0
+	do
+		set_bits_to_read(log2_max_pic_order_cnt_lsb_minus4[sps_id] +4);
+	end
+
+	read_SliceH_skip_pic_order_cnt_lsb: action ==>
+	guard 
+		pic_order_cnt_type[sps_id] != 0
+	end
+
+	//if (pic_order_cnt_type == 0)
+	read_SliceH_pic_order_cnt_lsb_done: action ==>
+	guard
+		done_reading_bits(),
+		pic_order_cnt_type[sps_id] = 0
+	do
+		pic_order_cnt_lsb := read_result();
+	end
+
+	read_SliceH_delta_pic_order_cnt_bottom:action ==>
+	guard 
+		pic_order_present_flag[pps_id] = 1 and field_pic_flag = 0
+	do
+		start_vld();
+	end
+
+	//if (pic_order_present_flag && !field_pic_flag )
+	read_SliceH_delta_pic_order_cnt_bottom_done: action ==>
+	guard
+		vld_end(),
+		pic_order_present_flag[pps_id] = 1 and field_pic_flag = 0
+	do
+		delta_pic_order_cnt_bottom := vld_se();
+	end
+
+	//else (!pic_order_present_flag || field_pic_flag )
+	read_SliceH_skip_delta_pic_order_cnt_bottom: action ==>
+	guard
+		pic_order_present_flag[pps_id] != 1 or field_pic_flag != 0
+	end
+	//end if
+
+	read_SliceH_delta_pic_order_cnt0: action ==>
+	guard
+		pic_order_cnt_type[sps_id] = 1 and delta_pic_order_always_zero_flag[sps_id] = 0
+	do
+		start_vld();
+	end
+
+	read_SliceH_skip_delta_pic_order_cnt0 : action ==>
+	guard
+		pic_order_cnt_type[sps_id] != 1 or delta_pic_order_always_zero_flag[sps_id] != 0
+	end
+
+	//else if (pic_order_cnt_type ==1 && !delta_pic_order_always_zero_flag)
+	read_SliceH_delta_pic_order_cnt0_done: action ==>
+	guard
+		vld_end(),
+		pic_order_cnt_type[sps_id] = 1 and delta_pic_order_always_zero_flag[sps_id] = 0
+	do
+		delta_pic_order_cnt[0] := vld_se();
+	end
+
+	read_SliceH_delta_pic_order_cnt1: action ==>
+	guard 
+		pic_order_present_flag[pps_id] = 1 and field_pic_flag = 0
+	do
+		start_vld(); 
+	end
+
+	//if (pic_order_present_flag && !field_pic_flag )
+	read_SliceH_delta_pic_order_cnt1_done: action ==>
+	guard
+		vld_end(),
+		pic_order_present_flag[pps_id] = 1 and field_pic_flag = 0
+	do
+		delta_pic_order_cnt[1] := vld_se();
+	end
+
+	//else (!pic_order_present_flag || field_pic_flag )
+	read_SliceH_skip_delta_pic_order_cnt1: action ==>
+	guard
+		pic_order_present_flag[pps_id] != 1 or field_pic_flag != 0
+	end
+	//end if
+
+	CalcPOC: action ==> POC:[POC_val]
+	var 
+		int PicOrderCntMsb,
+		int TopFieldOrderCnt,
+		int BottomFieldOrderCnt,
+		int POC_val,
+		int MaxPicOrderCntLsb = lshift(1, log2_max_pic_order_cnt_lsb_minus4[sps_id]+4),
+		int frame_num_offset, 
+		int abs_frame_num, 
+		int expected_delta_per_poc_cycle := 0, 
+		int expectedpoc := 0
+	do
+		if nal_unit_type = 5 then 
+			frame_num_offset := 0;
+		else 
+			if frame_num < prev_frame_num then
+				frame_num_offset := prev_frame_num_offset + lshift(1, 4+log2_max_frame_num_minus4[sps_id]);
+			else
+				frame_num_offset := prev_frame_num_offset;
+			end
+		end
+		if pic_order_cnt_type[sps_id] = 0 then 
+			if nal_unit_type = 5 then
+				prevPicOrderCntMsb := 0;
+				prevPicOrderCntLsb := 0;
+			end
+			if  (pic_order_cnt_lsb < prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) >= rshift(MaxPicOrderCntLsb, 1)) then
+				PicOrderCntMsb :=  prevPicOrderCntMsb + MaxPicOrderCntLsb;
+				prevPicOrderCntMsb := PicOrderCntMsb;
+				prevPicOrderCntLsb := 0;
+			else 
+				if (pic_order_cnt_lsb > prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) > rshift(MaxPicOrderCntLsb, 1)) then 
+					PicOrderCntMsb := prevPicOrderCntMsb - MaxPicOrderCntLsb;
+					prevPicOrderCntMsb := PicOrderCntMsb;
+				else
+					PicOrderCntMsb :=  prevPicOrderCntMsb;
+				end
+			end
+			BottomFieldOrderCnt := PicOrderCntMsb + pic_order_cnt_lsb;
+			TopFieldOrderCnt := BottomFieldOrderCnt;
+		else
+			if pic_order_cnt_type[sps_id] = 1 then
+				abs_frame_num := if num_ref_frames_in_pic_order_cnt_cycle[sps_id] != 0 then frame_num_offset + frame_num else 0 end ;
+				if nal_ref_idc = 0 and abs_frame_num > 0 then abs_frame_num := abs_frame_num -1; end
+				foreach int i in Integers (0, num_ref_frames_in_pic_order_cnt_cycle[sps_id]-1) do
+					expected_delta_per_poc_cycle := expected_delta_per_poc_cycle + offset_for_ref_frame[sps_id][ i ];
+				end
+				if abs_frame_num > 0 then
+					expectedpoc := expected_delta_per_poc_cycle * ((abs_frame_num - 1) / num_ref_frames_in_pic_order_cnt_cycle[sps_id]);
+					foreach int i in Integers(0, ((abs_frame_num - 1) / num_ref_frames_in_pic_order_cnt_cycle[sps_id])) do
+						expectedpoc := expectedpoc + offset_for_ref_frame[sps_id][ i ];
+					end
+				end
+				if nal_ref_idc = 0 then expectedpoc := expectedpoc + offset_for_non_ref_pic[sps_id]; end
+				TopFieldOrderCnt := expectedpoc + delta_pic_order_cnt[0];
+				BottomFieldOrderCnt := TopFieldOrderCnt + offset_for_top_to_bottom_field[sps_id] + delta_pic_order_cnt[1];
+				if field_pic_flag = 1 then BottomFieldOrderCnt := BottomFieldOrderCnt +delta_pic_order_cnt[1]; end
+			else // pic_order_cnt_type[sps_id] = 2
+				TopFieldOrderCnt := if nal_unit_type = 5 then 0 else if nal_ref_idc > 0 then lshift(frame_num_offset + frame_num, 1) else lshift(frame_num_offset + frame_num, 1) - 1 end end;
+				BottomFieldOrderCnt := TopFieldOrderCnt; 
+			end 
+		end
+		POC_val := if TopFieldOrderCnt < BottomFieldOrderCnt then TopFieldOrderCnt else BottomFieldOrderCnt end ;
+		//println("Currentpoc "+POC);
+		prev_frame_num_offset := frame_num_offset;
+		prev_frame_num := frame_num;
+		prevPicOrderCntLsb := pic_order_cnt_lsb;
+	end
+
+	//if (redundant_pic_cnt_present_flag)
+	read_SliceH_redundant_pic_cnt: action ==>
+	guard
+		redundant_pic_cnt_present_flag[pps_id] = 1
+	do
+		start_vld();
+	end
+
+	read_SliceH_redundant_pic_cnt_done: action ==>
+	guard
+		vld_end()
+	do
+		redundant_pic_cnt := vld_ue();
+	end
+
+	//else
+	read_SliceH_skip_redundant_pic_cnt: action ==>
+	guard
+		redundant_pic_cnt_present_flag[pps_id] = 0
+	end
+	//end if
+
+	//if (slice_type == B)
+	read_SliceH_direct_spatial_mv_pred_flag: action ==>
+	guard
+		slice_type = SLICE_TYPE_B
+	do
+		set_bits_to_read(1);
+	end
+
+	read_SliceH_direct_spatial_mv_pred_flag_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		direct_spatial_mv_pred_flag := read_result();
+	end
+
+	//else
+	read_SliceH_skip_direct_spatial_mv_pred_flag: action ==>
+	guard
+		slice_type != SLICE_TYPE_B
+	end
+	//end if
+
+	//if (slice_type == P || slice_type == SP || slice_type == B)
+	read_SliceH_num_ref_idx_active_override_flag: action ==>
+	guard
+		slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP or slice_type = SLICE_TYPE_B
+	do
+		set_bits_to_read(1);
+	end
+
+	//if (num_ref_idx_active_override_flag)
+	read_SliceH_num_ref_idx_l0_active_minus1: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 1
+	do
+		num_ref_idx_active_override_flag := 1;
+		start_vld();
+	end
+
+	//if (slice_type == B)
+	read_SliceH_num_ref_idx_l1_active_minus1: action ==>
+	guard
+		vld_end(),
+		slice_type = SLICE_TYPE_B
+	do
+		slice_num_ref_idx_l0_active_minus1 := vld_ue();
+		start_vld();
+	end
+
+	read_SliceH_num_ref_idx_l1_active_minus1_done: action ==>
+	guard
+		vld_end()
+	do
+		slice_num_ref_idx_l1_active_minus1 := vld_ue();
+	end
+ 
+	//else (slice_type != B)
+	read_SliceH_skip_num_ref_idx_l1_active_minus1: action ==>
+	guard
+		vld_end(),
+		slice_type != SLICE_TYPE_B
+	do
+		slice_num_ref_idx_l0_active_minus1 := vld_ue();
+	end
+	//end if
+
+	//else (!num_ref_idx_active_override_flag)
+	read_SliceH_skip_num_ref_idx_l0_active_minus1: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 0
+	do
+		num_ref_idx_active_override_flag := 0;
+		slice_num_ref_idx_l0_active_minus1 := num_ref_idx_l0_active_minus1[pps_id];
+		slice_num_ref_idx_l1_active_minus1 := num_ref_idx_l1_active_minus1[pps_id];
+	end
+	//end if
+
+	//else (slice_type != P & slice_type != SP && slice_type != B)
+	read_SliceH_skip_num_ref_idx_active_override_flag: action ==>
+	guard
+		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
+	do
+		slice_num_ref_idx_l0_active_minus1 := num_ref_idx_l0_active_minus1[pps_id];
+		slice_num_ref_idx_l1_active_minus1 := num_ref_idx_l1_active_minus1[pps_id];
+	end
+	//end if
+
+
+	//*******  ref_pic_list_reordering  ********/
+
+	//if (slice_type % 5 != 2 && slice_type % 5 != 4)
+	read_SliceH_ref_pic_list_reordering_flag_l0: action ==>
+	guard
+		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI
+	do
+		set_bits_to_read(1);
+		flag_list_l1 := 0;
+		ref_pic_idx :=0 ;
+	end
+
+	read_SliceH_ref_pic_list_reordering_flag_l0_done: action ==> RefReordering:[ref_pic_list_reordering_flag_l0]
+	guard
+		done_reading_bits()
+	do
+		ref_pic_list_reordering_flag_l0 := read_result();
+		reordering_of_pic_nums_idc :=0;
+	end
+
+	//if (ref_pic_list_reordering_flag_l0) || (ref_pic_list_reordering_flag_l1)
+	//do
+	read_SliceH_reordering_of_pic_nums_idc: action ==>
+	guard 
+		(flag_list_l1=0 and ref_pic_list_reordering_flag_l0 = 1) or (flag_list_l1=1 and ref_pic_list_reordering_flag_l1 = 1)
+	do
+		start_vld();
+	end
+
+	read_SliceH_reordering_of_pic_nums_idc_done: action ==> RefReordering:[reordering_of_pic_nums_idc]
+	guard
+		vld_end()
+	do
+		reordering_of_pic_nums_idc := vld_ue();
+		if reordering_of_pic_nums_idc != 3 then start_vld(); end
+	end
+
+	//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
+	read_SliceH_abs_diff_pic_num_minus1_done: action ==> RefReordering:[vld_ue()]
+	guard
+		vld_end(),
+		reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
+	do
+		if flag_list_l1 = 0 then
+			abs_diff_pic_num_minus1_l0[ref_pic_idx] := vld_ue();
+		else
+			abs_diff_pic_num_minus1_l1[ref_pic_idx] := vld_ue();
+		end
+	end
+
+	// else if (reordering_of_pic_nums_idc == 2)
+	read_SliceH_long_term_pic_num_done_idc2: action ==> RefReordering:[vld_ue()]
+	guard
+		vld_end(),
+		reordering_of_pic_nums_idc =2
+	do
+		if flag_list_l1 = 0 then
+			long_term_pic_num_l0[ref_pic_idx] := vld_ue();
+		else
+			long_term_pic_num_l1[ref_pic_idx] := vld_ue();
+		end
+	end
+
+	//else (reordering_of_pic_nums_idc == 3)
+	read_SliceH_skip_reordering_of_pic_nums_idc3: action ==>
+	guard
+		reordering_of_pic_nums_idc = 3
+	end
+	//end if
+	//while (reordering_of_pic_nums_idc != 3)
+
+	//else ( !ref_pic_list_reordering_flag_l0 && !ref_pic_list_reordering_flag_l1 )
+	read_SliceH_skip_reordering_of_pic_nums_idc: action ==>
+	guard 
+		(flag_list_l1=0 and ref_pic_list_reordering_flag_l0 = 0) or (flag_list_l1=1 and ref_pic_list_reordering_flag_l1 = 0)
+	end
+	//end if
+
+	//if (slice_type %5 ==1)
+	read_SliceH_ref_pic_list_reordering_flag_l1: action ==>
+	guard
+		slice_type = SLICE_TYPE_B and flag_list_l1=0
+	do
+		set_bits_to_read(1);
+		flag_list_l1 := 1;
+	end
+
+	read_SliceH_ref_pic_list_reordering_flag_l1_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		ref_pic_list_reordering_flag_l1 := read_result();
+		reordering_of_pic_nums_idc :=0;
+		ref_pic_idx :=0;
+	end
+
+	//else (slice_type %5 !=1)
+	read_SliceH_skip_ref_pic_list_reordering_flag_l1: action ==>
+	guard
+		slice_type != SLICE_TYPE_B or flag_list_l1=1
+	end
+	//end if
+
+	//else (slice_type % 5 == 2 || slice_type % 5 == 4)
+	read_SliceH_skip_ref_pic_list_reordering: action ==> RefReordering:[0]
+	guard
+		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
+	end
+	//end if
+	//******* End of ref_pic_list_reordering  ********/
+
+
+	//******* pred_weight_table  ********/
+	//if (weighted_pred_flag && (slice_type == P or slice_type == SP)) ||
+	//   (weighted_bipred_idc == 1 && slice_type == B)
+	read_SliceH_pred_weight_table: action ==>
+	guard
+		(weighted_pred_flag[sps_id] = 1 and (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP))
+		or (weighted_bipred_idc[sps_id] = 1 and slice_type = SLICE_TYPE_B)
+	do
+		println("SliceH : pred_weight_table not yet implemented"); 
+	end
+ 
+	//else
+	read_SliceH_skip_pred_weight_table: action ==>
+	end
+	//end if
+	//******* End of pred_weight_table  ********/
+
+	//******* dec_ref_pic_marking  ********/
+
+	// if (nal_ref_idc !=0)
+	read_SliceH_dec_ref_pic_marking: action ==>
+	guard
+		nal_ref_idc !=0
+	do
+		if nal_unit_type = 5 then set_bits_to_read(2); else set_bits_to_read(1); end  
+	end
+
+	// if (IdrPicFlag)
+	read_SliceH_no_output_of_prior_pics_flag_done: action ==> MMCO:[0, long_term_reference_flag]
+	guard
+		nal_unit_type = 5,
+		done_reading_bits()
+	do
+		no_output_of_prior_pics_flag := rshift(read_result(),1);
+		long_term_reference_flag := mask_bits(read_result(),1);
+	end
+
+	// else (!IdrPicFlag)
+	read_SliceH_adaptative_ref_pic_marking_mode_flag_done: action ==> MMCO:[1,adaptative_ref_pic_marking_mode_flag]
+	guard
+		nal_unit_type != 5,
+		done_reading_bits()
+	do
+		adaptative_ref_pic_marking_mode_flag := read_result();
+		if adaptative_ref_pic_marking_mode_flag = 1 then start_vld(); end
+	end
+
+	// if (adaptative_ref_pic_marking_mode_flag)
+	//do
+	read_SliceH_memory_management_control_operation_done: action ==> MMCO:[memory_management_control_operation]
+	guard
+		adaptative_ref_pic_marking_mode_flag = 1,
+		vld_end()
+	do
+		memory_management_control_operation := vld_ue();
+		if 	memory_management_control_operation = 1 or 
+			memory_management_control_operation = 2 or 
+			memory_management_control_operation = 3 or 
+			memory_management_control_operation = 4 or 
+			memory_management_control_operation = 6 then 
+				start_vld(); 
+		end
+	end
+
+	// if (mmco == 1 || mmco == 3)
+	read_SliceH_difference_of_pic_nums_minus1_done: action ==> MMCO:[difference_of_pic_nums_minus1]
+	guard
+		memory_management_control_operation = 1 or memory_management_control_operation = 3,
+		vld_end()
+	do
+		difference_of_pic_nums_minus1 := vld_ue();
+		start_vld();
+	end
+	// end if
+
+	// if (mmco == 2)
+	read_SliceH_long_term_pic_num_done: action ==> MMCO:[long_term_pic_num]
+	guard
+		memory_management_control_operation = 2,
+		vld_end()
+	do
+		long_term_pic_num := vld_ue();
+		start_vld();
+	end
+	// end if
+
+	// if (mmco == 3 || mmco == 6)
+	read_SliceH_long_term_frame_idx_done: action ==> MMCO:[long_term_frame_idx]
+	guard
+		memory_management_control_operation = 3 or memory_management_control_operation = 6,
+		vld_end()
+	do
+		long_term_frame_idx := vld_ue();
+		start_vld();
+	end
+
+	read_SliceH_long_not_term_frame_idx_done: action ==> 
+	guard
+		memory_management_control_operation != 3 and memory_management_control_operation != 6
+	end
+
+
+	// end if
+
+	// if (mmco == 4)
+	read_SliceH_max_long_term_frame_idx_plus1_done: action ==> MMCO:[max_long_term_frame_idx_plus1]
+	guard
+		memory_management_control_operation = 4,
+		vld_end()
+	do
+		max_long_term_frame_idx_plus1 := vld_ue();
+		start_vld();
+	end
+	// end if
+
+	// if (mmco == 5)
+	read_SliceH_mmco_5: action ==>
+	guard
+		memory_management_control_operation = 5
+	do
+		start_vld();
+	end
+	// end if
+
+	// if (mmco == 0)
+	read_SliceH_mmco_0: action ==>
+	guard
+		memory_management_control_operation = 0
+	end
+	// end if
+	// while (mmco != 0)
+
+	// else (!adaptative_ref_pic_marking_mode_flag)
+	read_SliceH_skip_memory_management_control_operation_done: action ==>
+	guard
+		adaptative_ref_pic_marking_mode_flag = 0
+	end
+
+	//else (nal_ref_idc == 0)
+	read_SliceH_skip_dec_ref_pic_marking: action ==>
+	guard
+		nal_ref_idc = 0
+	end
+	//end if
+	//******* End of dec_ref_pic_marking  ********/
+
+	//if (entropy_coding_mode_flag && slice_type != I && slice_type != SI)
+	read_SliceH_cabac_init_idc: action ==>
+	guard
+		entropy_coding_mode_flag[pps_id] = 1,
+		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI
+	do
+		start_vld();
+	end
+
+	read_SliceH_cabac_init_idc_done: action ==>
+	guard
+		vld_end()
+	do
+		cabac_init_idc := vld_ue();
+		start_vld();
+	end
+
+	//else 
+	read_SliceH_skip_cabac_init_idc: action ==>
+	guard
+		entropy_coding_mode_flag[pps_id] = 0 or slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
+	do
+		start_vld();
+	end
+	//end if
+
+	read_SliceH_slice_qp_delta_done: action ==>
+	guard
+		vld_end()
+	do
+		slice_qp_delta := vld_se();
+		val_QP := 26 + pic_init_qp_minus26[pps_id] + slice_qp_delta;
+		val_QP_Cb := qP_tab[val_QP + chroma_qp_index_offset[pps_id]];
+		val_QP_Cr := qP_tab[val_QP + second_chroma_qp_index_offset[pps_id]];
+	end
+
+	// if ( slice_type == SP || slice_type == SI )
+	read_SliceH_sp_for_switch_flag: action ==>
+	guard
+		slice_type = SLICE_TYPE_SP or slice_type = SLICE_TYPE_SI 
+	do
+		if slice_type = SLICE_TYPE_SP then set_bits_to_read(1); else start_vld(); end
+	end
+
+	// if ( slice_type == SP )
+	read_SliceH_sp_for_switch_flag_done: action ==>
+	guard
+		slice_type = SLICE_TYPE_SP,
+		done_reading_bits()
+	do
+		sp_for_switch_flag := read_result();
+		start_vld();
+	end
+	// end if
+
+	read_SliceH_slice_qs_delta_done: action ==>
+	guard
+		vld_end()
+	do
+		slice_qs_delta := vld_se();
+	end
+
+	// else (slice_type != SP && slice_type != SI)
+	read_SliceH_skip_sp_for_switch_flag: action ==>
+	guard
+		slice_type != SLICE_TYPE_SP and slice_type != SLICE_TYPE_SI 
+	end
+	//end if
+
+	// if ( deblocking_filter_control_present_flag )
+	read_SliceH_disable_deblocking_filter_idc: action ==>
+	guard
+		deblocking_filter_control_present_flag[pps_id] = 1
+	do
+		start_vld();
+	end
+
+	// if ( disable_deblocking_filter_idc != 1 )
+	read_SliceH_slice_alpha_c0_offset_div2: action ==> 
+	guard
+		vld_end(),
+		vld_ue() != 1
+	do
+		disable_deblocking_filter_idc := vld_ue();
+		start_vld();
+	end
+
+	read_SliceH_slice_beta_offset_div2: action ==>  
+	guard
+		vld_end()
+	do
+		slice_alpha_c0_offset_div2 := vld_se();
+		val_slice_alpha_c0_offset:=lshift(slice_alpha_c0_offset_div2,1);
+		start_vld();
+	end
+
+	read_SliceH_slice_beta_offset_div2_done: action ==> 
+	guard
+		vld_end()
+	do
+		slice_beta_offset_div2 := vld_se();
+		val_slice_beta_offset:=lshift(slice_beta_offset_div2,1);
+	end
+
+	// else
+	read_SliceH_skip_slice_alpha_c0_offset_div2: action ==>
+	guard
+		vld_end(),
+		vld_ue() = 1
+	do
+		disable_deblocking_filter_idc := vld_ue();
+		val_slice_alpha_c0_offset:=0;
+		val_slice_beta_offset:=0;
+	end
+	// end if
+
+	// else (!deblocking_filter_control_present_flag )
+	read_SliceH_skip_disable_deblocking_filter_idc: action ==>
+	guard
+		deblocking_filter_control_present_flag[pps_id] = 0
+	do
+		val_slice_alpha_c0_offset:=0;
+		val_slice_beta_offset:=0;
+	end
+	//end if
+
+	//if ( num_slice_groups_minus1 > 0 && slice_group_map_type >= 3 && slice_group_map_type <= 5 )
+	read_SliceH_slice_group_change_cycle: action ==>
+	guard
+		num_slice_groups_minus1[pps_id] > 0,
+		slice_group_map_type[pps_id] >= 3,
+		slice_group_map_type[pps_id] <= 5
+	var 
+		int x, 
+		int n
+	do
+		x := (pic_width_in_mbs_minus1[sps_id] + 1) * (pic_height_in_map_units_minus1[sps_id] +1) / slice_group_change_rate_minus1[pps_id] +1;
+		//n := log_base2( x )
+		x := x -1;
+		n:= 0;
+		while x>0 do
+			x := rshift( x, 1);
+			n := n+1;
+		end
+		set_bits_to_read( n );
+	end
+
+	read_SliceH_slice_group_change_cycle_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		slice_group_change_cycle := read_result();
+		//println("read Slice header done");
+	end
+
+	//else
+	read_SliceH_skip_slice_group_change_cycle: action ==>
+	//do
+	//println("read Slice header done");
+	end
+	//end if
+
+	//******* End of Slice HEADER  ********/
+
+	/*************************************************************
+	*************************************************************
+	********       Slice DATA 	  	      *********
+	*************************************************************
+	*************************************************************/
+ 
+	procedure NextMbAddress()
+	begin
+		val_CurrMbAddr := val_CurrMbAddr + 1;
+		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
+		Mb_y := val_CurrMbAddr / PicWidthInMbs;
+	end
+
+
+	//if (entropy_coding_mode_flag) : CABAC
+	//while( !byte_aligned())
+	read_SliceD_CABAC_alignement: action ==>
+	guard
+		entropy_coding_mode_flag[pps_id] = 1
+	do
+		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
+	end
+
+	read_SliceD_skip_CABAC_alignement: action ==>
+	guard
+		entropy_coding_mode_flag[pps_id] = 0
+	end
+
+	SliceD_init: action ==>
+	guard
+		(entropy_coding_mode_flag[pps_id] = 1 and done_reading_bits()) or entropy_coding_mode_flag[pps_id] = 0
+	do
+		val_CurrMbAddr := first_mb_in_slice;
+		PicWidthInMbs := (pic_width_in_mbs_minus1[sps_id] +1);
+		PicSizeInMbs := PicWidthInMbs * (pic_height_in_map_units_minus1[sps_id] +1);
+		NonZeroCount := [ 0 : for int i in Integers(0, 4 * 99*16-1)]; //FIXME ! size is not right
+		NonZeroCountCb := [ 0 : for int i in Integers(0, 4 * 99*4-1)]; //FIXME ! size is not right
+		NonZeroCountCr := [ 0 : for int i in Integers(0, 4 * 99*4-1)]; //FIXME ! size is not right
+
+		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
+		Mb_y := val_CurrMbAddr / PicWidthInMbs;
+
+		moreDataFlag := 1;
+		prevMbSkipped := 0;
+		if field_pic_flag = 0 and mb_adaptive_frame_field_flag[sps_id] = 1 then MbaffFrameFlag := 1; else MbaffFrameFlag := 0; end
+	end
+
+	//do
+	send_data_position_information: action 
+		==> 
+			CurrMbAddr:[val_CurrMbAddr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[if val_CurrMbAddr = first_mb_in_slice then 1 else 0 end],slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc]
+	end
+
+	//if (slice_type != I && slice_type != SI)
+	//  if (!entropy_coding_mode_flag) : CAVLC
+	read_SliceD_mb_skip_run: action ==>
+	guard
+		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
+		entropy_coding_mode_flag[pps_id] = 0
+	do
+		start_vld();
+	end
+
+	read_SliceD_mb_skip_run_done0: action ==>
+	guard
+		vld_end()
+	do
+		mb_skip_run := vld_ue();
+		if mb_skip_run >0 then 
+			prevMbSkipped := 1; 
+		else 
+			prevMbSkipped := 0; end
+		end
+
+	read_SliceD_mb_skip_run_done1: action 
+		==> 
+			MbIntraFlag:[0], 
+			MbPartIdx:[1], 
+			RefIdx:[0], 
+			MbPartWidth:[16], 
+			MbPartHeigth:[16], 
+			MvRes:[0,0], 
+			QP:[0], 
+			QP_Cb:[0], 
+			QP_Cr:[0], 
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			LAST:[[true: for int t in Integers(0,26) ]] repeat 27,
+			CurrMbAddr:[val_CurrMbAddr], 
+			PicWidthInMb:[PicWidthInMbs], 
+			PicSizeInMb:[PicSizeInMbs], 
+			FirstMbInSlice:[if val_CurrMbAddr = first_mb_in_slice then 1 else 0 end]
+	guard
+		prevMbSkipped = 1 and val_CurrMbAddr < PicSizeInMbs-1
+	do
+		NextMbAddress();
+		mb_skip_run := mb_skip_run -1;
+		if mb_skip_run = 0 then prevMbSkipped := 0; end
+	end
+
+	read_SliceD_mb_skip_run_done1_lastmb: action 
+		==> 
+			MbIntraFlag:[0], 
+			MbPartIdx:[1], 
+			RefIdx:[0], 
+			MbPartWidth:[16], 
+			MbPartHeigth:[16], 
+			MvRes:[0,0], 
+			QP:[0],
+			QP_Cb:[0],
+			QP_Cr:[0],
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16,
+			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+	guard
+		prevMbSkipped = 1 and val_CurrMbAddr = PicSizeInMbs-1
+	do
+		NextMbAddress();
+		mb_skip_run := mb_skip_run -1;
+		if mb_skip_run = 0 then prevMbSkipped := 0; end
+	end
+
+	read_SliceD_mb_skip_run_done2: action ==>
+	guard
+		prevMbSkipped = 0
+	do
+		moreDataFlag := more_rbsp_data();
+		if moreDataFlag = 1 and val_CurrMbAddr >= PicSizeInMbs then moreDataFlag := 0; end
+	end
+
+	// else if(CABAC && (slice_type != I && slice_type != SI))
+	read_SliceD_mb_skip_flag: action ==>
+	guard
+		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
+		entropy_coding_mode_flag[pps_id] = 1
+	do
+		println("read_SliceD_mb_skip_flag : CABAC not yet implemented");
+		// mb_skip_flag   ae(v)
+		// moreDataFlag = !mb_skip_flag
+	end
+
+	//else (slice_type = I || slice_type = SI)
+	read_SliceD_skip_mb_skip: action ==>
+	guard
+		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
+	end
+	//end if
+
+	//if (moreDataFlag)
+	//if( MbaffFrameFlag && ( val_CurrMbAddr % 2 = = 0 || ( val_CurrMbAddr % 2 = = 1 && prevMbSkipped ) ) ) : interleaved
+	read_SliceD_mb_field_decoding_flag: action ==>
+	guard
+		moreDataFlag = 1,
+		MbaffFrameFlag = 1,
+		(( val_CurrMbAddr mod 2) = 0 or ( (val_CurrMbAddr mod 2) = 1 and prevMbSkipped = 1) )
+	do
+		println("read_SliceD_mb_field_decoding_flag : interleaved not implemented");
+	end
+
+	// else
+	read_SliceD_skip_mb_field_decoding_flag: action ==>
+	guard
+		moreDataFlag = 1
+	end
+	//end if
+	// --> macrobloc_layer()
+	//end if
+
+	//if( !entropy_coding_mode_flag ) : CAVLC
+	SliceD_update_CAVLC: action ==>
+	guard
+		entropy_coding_mode_flag[pps_id] = 0
+	do
+		moreDataFlag := more_rbsp_data();
+		NextMbAddress();
+		if moreDataFlag = 1 and val_CurrMbAddr >= PicSizeInMbs then moreDataFlag := 0; end
+	end
+
+	//else (CABAC)
+	SliceD_update_CABAC: action ==>
+	guard
+		entropy_coding_mode_flag[pps_id] = 1
+	do
+		println("SliceD_update_CABAC : CABAC not yet implemented");
+		//if( slice_type != I && slice_type != SI )
+		if slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI then prevMbSkipped := mb_skip_flag; end
+		//end if
+		//if( MbaffFrameFlag && val_CurrMbAddr % 2 = = 0 )
+		if MbaffFrameFlag = 1 and (val_CurrMbAddr mod 2) = 0 then 
+			moreDataFlag := 1; 
+			//else 
+			// end_of_slice_flag 2 ae(v)
+			// moreDataFlag = !end_of_slice_flag end
+			//println("read ae end_of_slice_flag");
+		end
+		//end if
+		NextMbAddress();
+		if moreDataFlag = 1 and val_CurrMbAddr = PicSizeInMbs then moreDataFlag := 0; end     
+	end
+
+	//while( moreDataFlag )
+	SliceD_while_moreDataFlag: action ==>
+	guard
+		moreDataFlag = 1
+	end
+
+	SliceD_end: action ==>
+	guard
+		moreDataFlag = 0
+	//do
+	//println("read Slice Data done");
+	//println("");
+	end
+	//******* End of Slice DATA  ********/
+ 
+	/*************************************************************
+	*************************************************************
+	********       Macroblock layer    	    *********
+	*************************************************************
+	*************************************************************/
+
+
+
+	function NumMbPart() --> uint(size=3) : if mb_intra_flag = 0 then if slice_type = SLICE_TYPE_B then B_tab[mb_type][0] else P_tab[mb_type][0] end else 0 end end
+	function MbPartPredMode(uint(size=1) x) --> uint(size=3) : 
+		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then 
+			P_tab[mb_type][3+x] 
+		else 
+			if slice_type = SLICE_TYPE_B then 
+				B_tab[mb_type][3+x] 
+			else 
+				7 
+			end 
+		end 
+	end
+	function IS_MBPred_L0(uint(size=1) x) --> bool : MbPartPredMode(x) = 0 end
+	function IS_MBPred_L1(uint(size=1) x) --> bool : MbPartPredMode(x) = 1 end
+	function IS_MBBiPred(uint(size=1) x) --> bool : MbPartPredMode(x) = 2 end
+	function IS_MBDirect(uint(size=1) x) --> bool : MbPartPredMode(x) = 3 end
+	function IS_MBNA(uint(size=1) x) --> bool : MbPartPredMode(x) = 7 end
+	function MbPartWidthHeigth(uint(size=1) x) --> uint(size=5) : 
+		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then 
+			P_tab[mb_type][1+x] 
+		else 
+			if slice_type = SLICE_TYPE_B then B_tab[mb_type][1+x] else 1 end 
+		end 
+	end
+
+
+	read_MB_layer_mb_type: action ==>
+	do
+		start_vld();
+	end
+
+	read_MB_layer_mb_type_done: action ==> MbIntraFlag:[mb_intra_flag]//,MVskip:[0]
+	guard
+		vld_end()
+	do
+		mb_type := vld_ue();
+		if slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI then mb_intra_flag := 1; end
+		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then if mb_type < 5 then mb_intra_flag := 0; else mb_type:= mb_type - 5; mb_intra_flag := 1; end end
+		if slice_type = SLICE_TYPE_B then if mb_type < 23 then mb_intra_flag := 0; else mb_type:= mb_type -23; mb_intra_flag := 1; end end
+	end
+
+	//if( mb_type = = I_PCM )
+	// while( !byte_aligned( ) )
+	read_MB_layer_I_PCM_alignement: action ==>
+	guard
+		IS_I_PCM()
+	do
+		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
+	end
+
+	//for( i = 0; i < 256; i++ )
+	read_MB_layer_pcm_sample_luma0: action ==> 
+	guard
+		done_reading_bits()
+	var 
+		int CurrMb4x4Addr
+	do
+		MB_inc := 0;
+		set_bits_to_read(bit_depth_luma_minus8[sps_id]+8);
+		foreach int i in Integers (0, 15) do
+			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,4) + lshift(val_CurrMbAddr mod PicWidthInMbs,2) + InverseScan4x4(i,lshift( PicWidthInMbs,2));
+			NonZeroCount[CurrMb4x4Addr] := 16;
+		end
+	end
+
+	read_MB_layer_pcm_sample_luma1: action  ==> /*pix_I_PCM:[ v ]*/
+	guard
+		done_reading_bits(),
+		MB_inc < 256
+	var 
+		int v
+	do
+		v := read_result();
+		MB_inc := MB_inc + 1;
+		if MB_inc < 256 then set_bits_to_read(bit_depth_luma_minus8[sps_id]+8); end 
+	end
+
+	// for( i = 0; i < 2 * MbWidthC * MbHeightC; i++ )
+	read_MB_layer_pcm_sample_chroma0: action   ==> 
+	guard
+		MB_inc = 256
+	var 
+		int CurrMb4x4Addr
+	do
+		MB_inc := 0;
+		set_bits_to_read(bit_depth_chroma_minus8[sps_id]+8);
+		foreach  int i in Integers(0, 3) do
+			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,2) + lshift(val_CurrMbAddr mod PicWidthInMbs,1) + InverseScan4x4(i,lshift( PicWidthInMbs,1));
+			NonZeroCountCb[CurrMb4x4Addr] := 16;
+			NonZeroCountCr[CurrMb4x4Addr] := 16;
+		end
+	end
+
+	read_MB_layer_pcm_sample_chroma1: action  ==> /*pix_I_PCM:[ v ]*/
+	guard
+	done_reading_bits(),
+		MB_inc < 2*64
+	var 
+		int v
+	do
+		v := read_result();
+		MB_inc := MB_inc + 1;
+		if MB_inc < 2*64 then set_bits_to_read(bit_depth_chroma_minus8[sps_id]+8); end 
+	end
+
+	read_MB_layer_pcm_sample_done: action  ==> 
+	guard
+		MB_inc = 2*64
+	end
+
+	//} else {
+	read_MB_layer_not_I_PCM: action ==>
+	guard
+		not IS_I_PCM()
+	do
+		noSubMbPartSizeLessThan8x8Flag := 1;
+	end
+
+	//if( mb_type != I_NxN && MbPartPredMode( mb_type, 0 ) != Intra_16x16 && NumMbPart( mb_type ) = = 4 )
+	read_MB_layer_sub_mb_pred: action ==>
+	guard
+		NumMbPart() = 4 // NumMbPart() tests the slice_type and return 0 if slice_type is I or SI
+	end
+	// --> sub_mb_pred( mb_type )
+
+	read_MB_layer_sub_mb_pred_done: action ==>
+	do
+	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
+		foreach int i in Integers(0,3) do
+			mbPartIdx := i;
+			//  if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 )
+			if not IS_B_Direct_8x8() then
+				//    if( NumSubMbPart( sub_mb_type[ mbPartIdx ] ) > 1 )
+				if NumSubMbPart() >1 then noSubMbPartSizeLessThan8x8Flag := 0; end
+			else 
+				if direct_8x8_interference_flag[sps_id] = 0 then noSubMbPartSizeLessThan8x8Flag := 0; end
+			end
+		end
+	end
+
+	// else (! ( mb_type != I_NxN && MbPartPredMode( mb_type, 0 ) != Intra_16x16 && NumMbPart( mb_type ) = = 4 ) )
+	// if( transform_8x8_mode_flag && mb_type = = I_NxN )
+	read_MB_layer_transform_size_8x8_flag: action ==>
+	guard
+		NumMbPart() != 4, // NumMbPart() tests the slice_type and return 0 if slice_type is I or SI
+		transform_8x8_mode_flag[pps_id] = 1 and IS_Intra_4x4()
+	do
+		set_bits_to_read(1);
+	end
+
+	read_MB_layer_transform_size_8x8_flag_done: action ==>
+	guard
+		NumMbPart() != 4,
+		done_reading_bits()
+	do
+		transform_size_8x8_flag := read_result();
+	end
+
+	// else
+	read_MB_layer_skip_transform_size_8x8_flag: action ==>
+	guard
+		NumMbPart() != 4
+	end
+	// end if 
+	// --> mb_pred( mb_type )
+	// end if
+
+	// if( MbPartPredMode( mb_type, 0 ) != Intra_16x16 )
+	read_MB_layer_coded_block_pattern: action ==>
+	guard
+	not IS_Intra_16x16()
+	do
+	start_vld();
+	end
+
+	read_MB_layer_coded_block_pattern_done: action ==> CodedBlockPattern:[coded_block_pattern]
+	guard
+		vld_end()
+	var 
+		uint(size=6) coded_block_pattern
+	do
+		coded_block_pattern := vld_me();
+		val_CodedBlockPatternLuma := coded_block_pattern mod 16;
+		CodedBlockPatternChroma := coded_block_pattern / 16;
+		if( val_CodedBlockPatternLuma > 0 and 
+			transform_8x8_mode_flag[pps_id]=1 and 
+			slice_type != SLICE_TYPE_I and
+			noSubMbPartSizeLessThan8x8Flag =1 and
+			(( slice_type = SLICE_TYPE_B and mb_type = 0) or direct_8x8_interference_flag[sps_id]=1 ) )then 
+				set_bits_to_read(1); 
+		end
+	end
+
+	//if( val_CodedBlockPatternLuma > 0 && transform_8x8_mode_flag && mb_type != I_NxN && noSubMbPartSizeLessThan8x8Flag && ( mb_type != B_Direct_16x16 | | direct_8x8_inference_flag ) ) 
+	read_MB_layer_cbp_transform_size_8x8_flag_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		if( val_CodedBlockPatternLuma > 0 and transform_8x8_mode_flag[pps_id]=1 and not IS_Intra_4x4()and not IS_Intra_8x8() and noSubMbPartSizeLessThan8x8Flag =1 and (( slice_type = SLICE_TYPE_B and mb_type = 0) or direct_8x8_interference_flag[sps_id]=1 ) )then
+		transform_size_8x8_flag := read_result(); end 
+	end
+	//end if
+
+	//else ( MbPartPredMode( mb_type, 0 ) == Intra_16x16 )
+	read_MB_layer_skip_coded_block_pattern: action ==> CodedBlockPattern:[CodedBlockPatternChroma*16+val_CodedBlockPatternLuma]
+	guard
+		IS_Intra_16x16()
+	do
+		val_CodedBlockPatternLuma := Intra_16x16_tab[mb_type][2];
+		CodedBlockPatternChroma := Intra_16x16_tab[mb_type][1];
+	end
+	//end if
+
+	//if( val_CodedBlockPatternLuma > 0 || CodedBlockPatternChroma > 0 | | MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
+	read_MB_layer_mb_qp_delta: action ==>
+	guard
+		val_CodedBlockPatternLuma > 0 or CodedBlockPatternChroma > 0 or IS_Intra_16x16()
+	do
+		start_vld();
+	end
+
+	read_MB_layer_mb_qp_delta_done: action 
+		==> 
+			QP:[val_QP], 
+			QP_Cb:[val_QP_Cb], 
+			QP_Cr:[val_QP_Cr], 
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16
+	guard
+		vld_end()
+	do
+		mb_qp_delta := vld_se();
+		val_QP := (val_QP + mb_qp_delta + 52) mod 52;
+		val_QP_Cb := qP_tab[val_QP + chroma_qp_index_offset[pps_id]];
+		val_QP_Cr := qP_tab[val_QP + second_chroma_qp_index_offset[pps_id]];
+	end
+	// --> residual( )
+
+	//else
+	read_MB_layer_skip_mb_qp_delta: action 
+		==> 
+			QP:[0], 
+			QP_Cb:[0], 
+			QP_Cr:[0], 
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+	guard
+		val_CodedBlockPatternLuma = 0, CodedBlockPatternChroma = 0, not IS_Intra_16x16()
+	end
+	//end if
+
+	//end if
+	//******* End of Macroblock layer  ********/
+
+	/*************************************************************
+	*************************************************************
+	********       	Sub Mb Pred    	    *********
+	*************************************************************
+	*************************************************************/
+	List ( type: List ( type: uint(size=5), size=4), size=4 ) P_tab_sub = //[sub_mb_type[mbPartIdx]][NumSubMbPart / MbPartWidth / MbPartHeight / SubMbPredMode]
+		[ [1,8,8,0], [2,8,4,0], [2,4,8,0], [4,4,4,0] ];
+
+	List ( type: List ( type: uint(size=5), size=4), size=13 ) B_tab_sub = //[sub_mb_type[mbPartIdx]][NumSubMbPart / MbPartWidth / MbPartHeight / SubMbPredMode]
+		[ [4,4,4,3], [1,8,8,0], [1,8,8,1], [1,8,8,2], [2,8,4,0], [2,4,8,0], [2,8,4,1], [2,4,8,1], [2,8,4,2], [2,4,8,2], [4,4,4,0], [4,4,4,1], [4,4,4,2] ];
+	//*************************************************************/
+
+
+	function NumSubMbPart() --> uint(size=3) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[sub_mb_type[mbPartIdx]][0] else if slice_type = SLICE_TYPE_B then B_tab_sub[sub_mb_type[mbPartIdx]][0] else 0 end end end
+	function SubMbPredMode() --> uint(size=3) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[sub_mb_type[mbPartIdx]][3] else if slice_type = SLICE_TYPE_B then B_tab_sub[sub_mb_type[mbPartIdx]][3] else 7 end end end
+	function IS_SubMBPred_L0() --> bool : SubMbPredMode() = 0 end
+	function IS_SubMBPred_L1() --> bool : SubMbPredMode() = 1 end
+	function IS_SubMBBiPred() --> bool : SubMbPredMode() = 2 end
+	function IS_SubMBDirect() --> bool : SubMbPredMode() = 3 end
+	function IS_SubMBNA() --> bool : SubMbPredMode() = 7 end
+	function SubMbPartWidthHeigth(uint(size=1) x) --> uint(size=5) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[sub_mb_type[mbPartIdx]][1+x] else if slice_type = SLICE_TYPE_B then B_tab_sub[sub_mb_type[mbPartIdx]][1+x] else 1 end end end
+
+
+
+	sub_MB_pred_init_sub_mb_type: action ==> 
+	do
+		mbPartIdx := 0;
+		start_vld();
+	end
+
+	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
+	read_sub_MB_pred_sub_mb_type: action ==> 
+	guard
+		vld_end(),
+		mbPartIdx < 4
+	do
+		sub_mb_type[mbPartIdx] := vld_ue();
+		mbPartIdx := mbPartIdx +1;
+		if mbPartIdx < 4 then start_vld(); end
+	end
+	//end for
+
+	sub_MB_pred_init_ref_idx_l0: action ==>
+	guard 
+		mbPartIdx = 4
+	do
+		mbPartIdx := 0;
+	end
+
+	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
+	//if( ( num_ref_idx_l0_active_minus1 > 0 | | mb_field_decoding_flag ) && mb_type != P_8x8ref0 && sub_mb_type[ mbPartIdx ] != B_Direct_8x8 && SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L1 )
+	read_sub_MB_pred_ref_idx_l0: action ==> 
+	guard
+		mbPartIdx < 4,
+		(slice_num_ref_idx_l0_active_minus1 > 0 or mb_field_decoding_flag = 1),
+		not IS_B_Direct_8x8(), not IS_P_8x8ref0(), not IS_SubMBPred_L1(), not IS_SubMBNA()
+	do
+		if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+	end
+
+	read_sub_MB_pred_ref_idx_l0_done: action ==> 
+	guard
+		vld_end()
+	do
+		ref_idx_l0[mbPartIdx] := if slice_num_ref_idx_l0_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		mbPartIdx := mbPartIdx +1;
+	end
+
+	//else
+	read_sub_MB_pred_skip_ref_idx_l0: action ==> 
+	guard
+		mbPartIdx < 4
+	do
+		ref_idx_l0[mbPartIdx] := 0;
+		mbPartIdx := mbPartIdx +1;
+	end
+	//end if
+	//end for
+
+	sub_MB_pred_init_ref_idx_l1: action ==>
+	guard 
+		mbPartIdx = 4
+	do
+		mbPartIdx := 0;
+	end
+
+	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
+	//if( ( num_ref_idx_l0_active_minus1 > 0 | | mb_field_decoding_flag ) && mb_type != P_8x8ref0 && sub_mb_type[ mbPartIdx ] != B_Direct_8x8 && SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L0 )
+	read_sub_MB_pred_ref_idx_l1: action ==> 
+	guard
+		mbPartIdx < 4,
+		(slice_num_ref_idx_l1_active_minus1 > 0 or mb_field_decoding_flag = 1),
+		not IS_B_Direct_8x8(), not IS_P_8x8ref0(), not IS_SubMBPred_L0(), not IS_SubMBNA()
+	do
+		if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+	end
+
+	read_sub_MB_pred_ref_idx_l1_done: action ==> 
+	guard
+		(slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())
+	do
+		ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		mbPartIdx := mbPartIdx +1;
+	end
+
+	//else
+	read_sub_MB_pred_skip_ref_idx_l1: action ==> 
+	guard
+		mbPartIdx < 4
+	do
+		ref_idx_l1[mbPartIdx] := 0;
+		mbPartIdx := mbPartIdx +1;
+	end
+	//end if
+	//end for
+
+	sub_MB_pred_init_mvd_l0: action ==>
+	guard 
+		mbPartIdx = 4
+	do
+		mbPartIdx := 0;
+	end
+	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
+	// if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 && SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L1 )
+	read_sub_MB_pred_mvd_l0: action ==> 
+	guard
+		mbPartIdx < 4,
+		not IS_B_Direct_8x8(), not IS_SubMBPred_L1(), not IS_SubMBNA()
+	do
+		subMbPartIdx := 0;
+	end
+	//   for( subMbPartIdx = 0; subMbPartIdx < NumSubMbPart( sub_mb_type[ mbPartIdx ] ); subMbPartIdx++)
+	//     for( compIdx = 0; compIdx < 2; compIdx++ )
+	read_sub_MB_pred_mvd_l0_done0: action ==> MbPartIdx:[subMbPartIdx], RefIdx:[ref_idx_l0[mbPartIdx]], MbPartWidth:[SubMbPartWidthHeigth(0)], MbPartHeigth:[SubMbPartWidthHeigth(1)]
+	guard
+		subMbPartIdx < NumSubMbPart()
+	do
+		start_vld();
+	end
+
+	read_sub_MB_pred_mvd_l0_done1: action ==> MvRes:[mvd_l0]
+	guard
+		vld_end()
+	do
+		mvd_l0 := vld_se();
+		start_vld();
+	end
+
+	read_sub_MB_pred_mvd_l0_done2: action ==> MvRes:[mvd_l0] 
+	guard
+		vld_end()
+	do
+		mvd_l0 := vld_se();
+		subMbPartIdx := subMbPartIdx +1;
+	end
+	//end for
+
+	read_sub_MB_pred_skip_mvd_l0_done0: action ==> 
+	guard
+		subMbPartIdx = NumSubMbPart()
+	do
+		mbPartIdx := mbPartIdx+1;
+	end
+
+	//else
+	read_sub_MB_pred_skip_mvd_l0: action ==> 
+	guard
+		mbPartIdx < 4,
+		IS_B_Direct_8x8() or IS_SubMBPred_L1() or IS_SubMBNA()
+	do
+		mbPartIdx := mbPartIdx+1;
+	end
+	//end if
+	//end for
+
+	sub_MB_pred_init_mvd_l1: action ==>
+	guard 
+		mbPartIdx = 4
+	do
+		mbPartIdx := 0;
+	end
+
+	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
+	// if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 && SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L0 )
+	read_sub_MB_pred_mvd_l1: action ==> 
+	guard
+		mbPartIdx < 4,
+		not IS_B_Direct_8x8(), not IS_SubMBPred_L0(), not IS_SubMBNA()
+	do
+		subMbPartIdx := 0;
+	end
+	//   for( subMbPartIdx = 0; subMbPartIdx < NumSubMbPart( sub_mb_type[ mbPartIdx ] ); subMbPartIdx++)
+	//     for( compIdx = 0; compIdx < 2; compIdx++ )
+	read_sub_MB_pred_mvd_l1_done0: action ==> 
+	guard
+		subMbPartIdx < NumSubMbPart()
+	do
+		start_vld();
+	end
+
+	read_sub_MB_pred_mvd_l1_done1: action ==> 
+	guard
+		vld_end()
+	do
+		mvd_l1 := vld_se();
+		start_vld();
+	end
+
+	read_sub_MB_pred_mvd_l1_done2: action ==> 
+	guard
+		vld_end()
+	do
+		mvd_l1 := vld_se();
+		subMbPartIdx := subMbPartIdx +1;
+	end
+	//end for
+
+	read_sub_MB_pred_skip_mvd_l1_done0: action ==> 
+	guard
+		subMbPartIdx = NumSubMbPart()
+	do
+		mbPartIdx := mbPartIdx+1;
+	end
+
+	//else
+	read_sub_MB_pred_skip_mvd_l1: action ==> 
+	guard
+		mbPartIdx < 4,
+		IS_B_Direct_8x8() or IS_SubMBPred_L0() or IS_SubMBNA()
+	do
+		mbPartIdx := mbPartIdx+1;
+	end
+	//end if
+	//end for
+
+	sub_MB_pred_done: action ==>
+	guard 
+		mbPartIdx = 4
+	end
+	//******* End of Sub Mb pred  ********/
+ 
+	/*************************************************************
+	*************************************************************
+	********       	Mb Pred    	    *********
+	*************************************************************
+	*************************************************************/
+
+	//if( MbPartPredMode( mb_type, 0 ) = = Intra_4x4 )
+	MB_pred_init_Intra_4x4: action ==> IntraPredMode: [ 1 ]
+	guard
+		IS_Intra_4x4()
+	do
+		luma4x4BlkIdx := 0;
+		set_bits_to_read(1);
+	end
+
+	//for( luma4x4BlkIdx=0; luma4x4BlkIdx<16; luma4x4BlkIdx++ )
+	read_MB_pred_rem_intra4x4_pred_mode: action ==>
+	guard
+		done_reading_bits(),
+		luma4x4BlkIdx < 16
+	do
+		prev_intra4x4_pred_mode_flag := read_result();
+		if prev_intra4x4_pred_mode_flag = 0 then set_bits_to_read(3); end
+	end
+
+	//if( !prev_intra4x4_pred_mode_flag[ luma4x4BlkIdx ] )
+	read_MB_pred_rem_intra4x4_pred_mode_done: action ==>
+	guard
+		done_reading_bits(),
+		prev_intra4x4_pred_mode_flag = 0
+	do
+		rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
+		luma4x4BlkIdx := luma4x4BlkIdx +1;
+		if luma4x4BlkIdx < 16 then set_bits_to_read(1); end
+	end
+
+	//else
+	read_MB_pred_skip_rem_intra4x4_pred_mode_done: action ==>
+	guard
+		prev_intra4x4_pred_mode_flag = 1
+	do
+		rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
+		luma4x4BlkIdx := luma4x4BlkIdx +1;
+		if luma4x4BlkIdx < 16 then set_bits_to_read(1); end
+	end
+	//end if
+
+	read_MB_pred_skip_rem_intra4x4_pred_mode: action ==> IntraPredMode: [ [ rem_intra4x4_pred_mode[ s ] :for int s in Integers(0,15)] ] repeat 16
+	guard
+		luma4x4BlkIdx = 16
+	end
+	//end for
+
+	//else if( MbPartPredMode( mb_type, 0 ) = = Intra_8x8 )
+	MB_pred_init_Intra_8x8: action ==> IntraPredMode :[ 2 ]
+	guard
+		IS_Intra_8x8()
+	do
+		luma4x4BlkIdx := 0;
+		set_bits_to_read(1);
+	end
+
+	//for( luma8x8BlkIdx=0; luma8x8BlkIdx<4; luma8x8BlkIdx++ )
+	read_MB_pred_rem_intra8x8_pred_mode: action ==>
+	guard
+		done_reading_bits(),
+		luma4x4BlkIdx < 4
+	do
+		prev_intra4x4_pred_mode_flag := read_result();
+		if prev_intra4x4_pred_mode_flag = 0 then set_bits_to_read(3); end
+	end
+
+	//if( !prev_intra8x8_pred_mode_flag[ luma8x8BlkIdx ] )
+	read_MB_pred_rem_intra8x8_pred_mode_done: action ==>
+	guard
+		done_reading_bits(),
+		prev_intra4x4_pred_mode_flag = 0
+	do
+		rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
+		luma4x4BlkIdx := luma4x4BlkIdx +1;
+		if luma4x4BlkIdx < 4 then set_bits_to_read(1); end
+	end
+
+	//else
+	read_MB_pred_skip_rem_intra8x8_pred_mode_done: action ==>
+	guard
+		prev_intra4x4_pred_mode_flag = 1
+	do
+		rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
+		luma4x4BlkIdx := luma4x4BlkIdx +1;
+		if luma4x4BlkIdx < 4 then set_bits_to_read(1); end
+	end
+	//end if
+
+	read_MB_pred_skip_rem_intra8x8_pred_mode: action ==> IntraPredMode: [ [ rem_intra4x4_pred_mode[ s ] :for int s in Integers(0,3)] ] repeat 4
+	guard
+		luma4x4BlkIdx = 4
+	end
+	//end for
+
+	//else
+	MB_pred_init_Intra_16x16: action ==> IntraPredMode: [ 3, Intra_16x16_tab[mb_type][0] ]
+	guard
+		IS_Intra_16x16()
+	end
+	//end if
+
+	//if( ChromaArrayType = = 1 | | ChromaArrayType = = 2 )
+	read_MB_pred_intra_chroma_pred_mode: action ==>
+	guard
+		IS_Intra_4x4() or IS_Intra_8x8() or IS_Intra_16x16(),
+		chroma_format_idc[sps_id] = 1 or chroma_format_idc[sps_id] = 2
+	do
+		start_vld();
+	end
+
+	read_MB_pred_intra_chroma_pred_mode_done: action ==> IntraPredModeC: [intra_chroma_pred_mode]
+	guard
+		vld_end()
+	do
+		intra_chroma_pred_mode := vld_ue();
+	end
+
+	//else
+	read_MB_pred_skip_intra_chroma_pred_mode: action ==>
+	guard
+		IS_Intra_4x4() or IS_Intra_8x8() or IS_Intra_16x16(),
+		chroma_format_idc[sps_id] = 0
+	end
+	// end if
+
+	// else (INTER pred)
+	// if( MbPartPredMode( mb_type, 0 ) != Direct ) {
+	MB_pred_Inter_not_direct: action ==>
+	guard
+		not IS_MBDirect(0), not IS_Intra_4x4(), not IS_Intra_16x16(), not IS_Intra_8x8()
+	do
+		mbPartIdx := 0;
+	end
+
+	//  for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
+	//    if( ( num_ref_idx_l0_active_minus1 > 0 || mb_field_decoding_flag ) && MbPartPredMode( mb_type, mbPartIdx ) != Pred_L1 )
+	read_MB_pred_ref_idx_l0: action ==> 
+	guard
+		mbPartIdx < NumMbPart(),
+		(slice_num_ref_idx_l0_active_minus1 > 0 or mb_field_decoding_flag = 1),
+		not IS_MBPred_L1(mbPartIdx), not IS_MBNA(mbPartIdx)
+	do
+		if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+	end
+
+	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	guard
+		(slice_num_ref_idx_l0_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l0_active_minus1 > 1 and vld_end())
+	do
+		ref_idx_l0[mbPartIdx] := if slice_num_ref_idx_l0_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		mbPartIdx := mbPartIdx +1;
+	end
+
+	//else
+	read_MB_pred_skip_ref_idx_l0: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	guard
+		mbPartIdx < NumMbPart()
+	do
+		ref_idx_l0[mbPartIdx] := 0;
+		mbPartIdx := mbPartIdx +1;
+	end
+	//end if
+	//end for
+
+	MB_pred_init_ref_idx_l1: action ==> 
+	guard
+		mbPartIdx = NumMbPart()
+	do
+		mbPartIdx := 0;
+	end
+
+	//  for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
+	//    if( ( num_ref_idx_l1_active_minus1 > 0 || mb_field_decoding_flag ) && MbPartPredMode( mb_type, mbPartIdx ) != Pred_L0 )
+	read_MB_pred_ref_idx_l1: action ==> 
+	guard
+		mbPartIdx < NumMbPart(),
+		(slice_num_ref_idx_l1_active_minus1 > 0 or mb_field_decoding_flag = 1),
+		not IS_MBPred_L0(mbPartIdx), not IS_MBNA(mbPartIdx)
+	do
+		if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+	end
+
+	read_MB_pred_ref_idx_l1_done: action ==> 
+	guard
+		(slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())
+	do
+		ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		mbPartIdx := mbPartIdx +1;
+	end
+
+	//else
+	read_MB_pred_skip_ref_idx_l1: action ==> 
+	guard
+		mbPartIdx < NumMbPart()
+	do
+		ref_idx_l1[mbPartIdx] := 0;
+		mbPartIdx := mbPartIdx +1;
+	end
+	//end if
+	//end for
+
+	MB_pred_init_mvd_l0: action ==> 
+	guard
+		mbPartIdx = NumMbPart()
+	do
+		mbPartIdx := 0;
+	end
+
+	//  for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
+	//    if( MbPartPredMode ( mb_type, mbPartIdx ) != Pred_L1 )
+	read_MB_pred_mvd_l0: action ==> 
+	guard
+		mbPartIdx < NumMbPart(),
+		not IS_MBPred_L1(mbPartIdx), not IS_MBNA(mbPartIdx)
+	do
+		start_vld();
+	end
+
+	read_MB_pred_mvd_l0_done0: action ==> MvRes:[mvd_l0]
+	guard
+		vld_end()
+	do
+		mvd_l0 := vld_se();
+		start_vld();
+	end
+
+	read_MB_pred_mvd_l0_done1: action ==> MvRes:[mvd_l0]
+	guard
+		vld_end()
+	do
+		mvd_l0 := vld_se();
+		mbPartIdx := mbPartIdx +1;
+	end
+
+	//else
+	read_MB_pred_skip_mvd_l0: action ==> 
+	guard
+		mbPartIdx < NumMbPart()
+	do
+		mbPartIdx := mbPartIdx+1;
+	end
+	//end if
+	//end for
+
+	MB_pred_init_mvd_l1: action ==> 
+	guard
+		mbPartIdx = NumMbPart()
+	do
+		mbPartIdx := 0;
+	end
+
+	// for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
+	//   if( MbPartPredMode( mb_type, mbPartIdx ) != Pred_L0 )
+	read_MB_pred_mvd_l1: action ==> 
+	guard
+		mbPartIdx < NumMbPart(),
+		not IS_MBPred_L0(mbPartIdx), not IS_MBNA(mbPartIdx)
+	do
+		start_vld();
+	end
+
+	read_MB_pred_mvd_l1_done0: action ==> 
+	guard
+		vld_end()
+	do
+		mvd_l1 := vld_se();
+		start_vld();
+	end
+
+	read_MB_pred_mvd_l1_done1: action ==> 
+	guard
+		vld_end()
+	do
+		mvd_l1 := vld_se();
+		mbPartIdx := mbPartIdx +1;
+	end
+
+	//else
+	read_MB_pred_skip_mvd_l1: action ==> 
+	guard
+		mbPartIdx < NumMbPart()
+	do
+		mbPartIdx := mbPartIdx+1;
+	end
+	//end if
+	//end for
+
+	MB_pred_done: action ==> 
+	guard
+		mbPartIdx = NumMbPart()
+	end
+
+	//else (INTER pred, MbPartPredMode( mb_type, 0 ) == Direct ) )
+	MB_pred_Inter_direct: action ==>
+	guard
+		IS_MBDirect(0)
+	end 
+	//******* End of Mb pred  ********/
+
+	/*************************************************************
+	*************************************************************
+	********       Residual    	    *********
+	*************************************************************
+	*************************************************************/
+
+	//*************************************************************/
+	// Only CAVLC decoding process is implemented
+	Residual_init: action ==>
+	do
+		bmFlag := 0;
+		startIdx := 0;
+		endIdx := 15;
+	end
+
+	//if( !bmFlag && startIdx = = 0 && MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
+	Residual_luma_DC_init: action ==>
+	guard
+		bmFlag = 0,
+		startIdx = 0,
+		IS_Intra_16x16()
+	do
+		block_startIdx := 0;
+		block_endIdx := 15;
+		maxNumCoeff := 16;
+		leveltype := 0; 
+	end
+	// --> residual_block( i16x16DClevel, 0, 15, 16 )
+
+	Residual_return_luma_DC: action ==> LAST:[true]
+	guard
+		leveltype=0
+	end
+
+	//else
+	Residual_luma_skip_DC_init: action ==> LAST:[true]
+	guard
+		bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16()
+	end
+	//end if
+
+	Residual_luma_AC_init: action ==>
+	do
+		leveltype := 1;
+		i8x8 := 0;
+		i4x4 := 0; 
+	end
+
+	// for( i8x8 = 0; i8x8 < 4; i8x8++ )
+	// if( !transform_size_8x8_flag || !entropy_coding_mode_flag )
+	Residual_luma_AC_CAVLC: action ==>
+	guard
+		i8x8 < 4,
+		transform_size_8x8_flag = 0 or entropy_coding_mode_flag[pps_id] = 0 // bloc4x4 or CAVLC
+	end
+
+	// for( i4x4 = 0; i4x4 < 4; i4x4++ ) {
+	// if( val_CodedBlockPatternLuma & ( 1 << i8x8 ) )
+	Residual_luma_AC_CodedBlock8x8: action ==>
+	guard
+		i4x4 < 4,
+		rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 1 // MB sub part 8x8 != 0
+	do
+		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
+		//if( !bmFlag && endIdx > 0 &&  MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
+		if bmFlag = 0 and endIdx > 0 and  IS_Intra_16x16() then 
+			block_startIdx := if startIdx - 1 > 0 then startIdx - 1 else 0 end ;
+			block_endIdx := endIdx -1;
+			maxNumCoeff := 15;
+			// --> residual_block( i16x16AClevel[i8x8*4+ i4x4],max( 0, startIdx1 ), endIdx1, 15)
+		else
+			block_startIdx := startIdx;
+			block_endIdx := endIdx;
+			maxNumCoeff := 16;
+			// --> residual_block( level[ i8x8 * 4 + i4x4 ], startIdx, endIdx, 16)
+		end
+		//end if
+	end
+
+	Residual_return_luma_AC: action ==> LAST: [true]
+	guard
+		leveltype = 1
+	end
+
+	// else 
+	Residual_luma_skip_AC_CodedBlock8x8: action ==>  LAST: [true]
+	guard
+		i4x4 < 4,
+		rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 // MB sub part 8x8 == 0
+	do
+		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
+		/*
+		// if( !bmFlag && MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
+		for( i = 0; i < 15; i++ )
+		i16x16AClevel[ i8x8 * 4 + i4x4 ][ i ] = 0
+		// else
+		for( i = 0; i < 16; i++ )
+		level[ i8x8 * 4 + i4x4 ][ i ] = 0
+		// end if
+		*/
+	end
+	// end if
+
+	/*
+	if( !entropy_coding_mode_flag && transform_size_8x8_flag )
+	for( i = 0; i < 16; i++ )
+	level8x8[ i8x8 ][ 4 * i + i4x4 ] = level[ i8x8 * 4 + i4x4 ][ i ]
+	*/
+	Residual_luma_inc_AC_4x4: action ==>
+	do
+		i4x4 := i4x4 +1;
+		if i4x4 = 4 then i4x4 := 0; i8x8 := i8x8+1; end
+	end
+	//end for
+
+	// else ( transform_size_8x8_flag = 1 && entropy_coding_mode_flag = 1 ) <==> CABAC && 8x8
+	/* if( val_CodedBlockPatternLuma & ( 1 << i8x8 ) )
+	residual_block( level8x8[ i8x8 ], 4 * startIdx, 4 * endIdx + 3, 64 ) 3 | 4
+	else
+	for( i = 0; i < 64; i++ )
+	level8x8[ i8x8 ][ i ] = 0
+	//end if
+	*/
+
+	Residual_luma_skip_AC_CAVLC: action ==>
+	guard
+		i8x8 = 4
+	end
+	//end for
+
+	//if( ChromaArrayType = = 1 | | ChromaArrayType = = 2 )
+	Residual_ChromaArrayType_1_2_init: action ==>
+	guard
+		(chroma_format_idc[sps_id] = 1 or chroma_format_idc[sps_id] = 2) and separate_colour_plane_flag[sps_id] = 0 
+	do
+		if chroma_format_idc[sps_id] = 1 then 
+			NumC8x8 := 1;
+		else 
+			NumC8x8 := 2;
+		end
+		iCbCr := 0;
+		leveltype := 2;
+		luma4x4BlkIdx := 0;
+	end
+
+	// for( iCbCr = 0; iCbCr < 2; iCbCr++ )
+	//if( ( CodedBlockPatternChroma & 3 ) && startIdx = = 0 ) // chroma DC residual present
+	Residual_chroma_DC_init: action ==>
+	guard
+		iCbCr < 2,
+		bitand(CodedBlockPatternChroma, 3) != 0 and startIdx = 0
+	do
+		block_startIdx := 0;
+		block_endIdx := 4 * NumC8x8 - 1;
+		maxNumCoeff := 4 * NumC8x8;
+	end 
+	//--> residual_block( ChromaDCLevel[ iCbCr ], 0, 4 * NumC8x8 - 1, 4 * NumC8x8 )
+
+	Residual_return_chroma_DC: action ==> LAST: [true]
+	guard
+		leveltype = 2
+	do
+		iCbCr := iCbCr +1; 
+	end
+
+	// else
+	Residual_skip_chroma_DC_init: action ==> LAST: [true]
+	guard
+		iCbCr < 2,
+		bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0
+	do
+		//for( i = 0; i < 4 * NumC8x8; i++ )
+		//ChromaDCLevel[ iCbCr ][ i ] = 0
+		iCbCr := iCbCr +1; 
+	end   
+	//end if
+
+	Residual_skip_chroma_DC: action ==>
+	guard
+		iCbCr = 2
+	end
+	//end for  
+
+	Residual_chroma_AC_init: action ==>
+	do
+		leveltype := 3;
+		iCbCr := 0;
+		i8x8 := 0;
+		i4x4 := 0;
+		luma4x4BlkIdx := 0;
+	end
+
+	//for( iCbCr = 0; iCbCr < 2; iCbCr++ )
+	//  for( i8x8 = 0; i8x8 < NumC8x8; i8x8++ )
+	//    for( i4x4 = 0; i4x4 < 4; i4x4++ )
+	//      if( ( CodedBlockPatternChroma & 2 ) && endIdx > 0 ) // chroma AC residual present
+	Residual_chroma_AC_CodedBlock4x4: action ==>
+	guard
+		iCbCr < 2,
+		bitand(CodedBlockPatternChroma, 2) = 2 and endIdx > 0
+	do
+		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
+		block_startIdx := if startIdx - 1 > 0 then startIdx - 1 else 0 end ;
+		block_endIdx := endIdx - 1;
+		maxNumCoeff := 15;
+	end
+	// --> residual_block( ChromaACLevel[ iCbCr ][ i8x8*4+i4x4 ], max( 0, startIdx1 ), endIdx1, 15)
+
+	Residual_return_chroma_AC: action ==> LAST:[true]
+	guard
+		leveltype = 3
+	do
+		i4x4 := i4x4 +1;
+		if i4x4 = 4 then i4x4 := 0; i8x8 := i8x8 +1; end
+		if i8x8 = NumC8x8 then i8x8 := 0; iCbCr := iCbCr +1; end
+	end
+
+	// else
+	Residual_chroma_AC_skip_CodedBlock4x4: action ==> LAST: [true]
+	guard
+		iCbCr < 2,
+		bitand(CodedBlockPatternChroma, 2) != 2 or endIdx <= 0
+	do
+		/* for( i = 0; i < 15; i++ )
+		ChromaACLevel[ iCbCr ][ i8x8*4+i4x4 ][ i ] = 0
+		*/
+		i4x4 := i4x4 +1;
+		if i4x4 = 4 then i4x4 := 0; i8x8 := i8x8 +1; end
+		if i8x8 = NumC8x8 then i8x8:=0; iCbCr := iCbCr +1; end
+		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
+	end
+	//end if
+
+	Residual_skip_chroma_AC: action ==>
+	guard
+		iCbCr = 2
+	end
+	//end for
+	//end for
+	//end for
+
+	// else if( ChromaArrayType = = 3 ) ==> Profile HP not yet implemented
+	// else ( ChromaArrayType = = 0 ) ==> Profile HP not yet implemented
+
+	//******* End of Residual  ********/
+
+	/*************************************************************
+	*************************************************************
+	********       Residual Block CAVLC   	    *********
+	*************************************************************
+	*************************************************************/
+
+	function InverseScan4x4(uint(size=4) index, uint stride) --> uint : (InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4) end
+
+	Residual_block_init_coeff_token: action ==>
+	var 
+		uint CurrMb4x4Addr,
+		uint(size=1) top, uint(size=1) left,//= 1 if MB not available
+		uint(size=5) nA, 
+		uint(size=5) nB
+	do
+		if leveltype = 2 then //chromaDC
+			nc := -1;
+		else
+			top :=1; left :=1;
+			if leveltype = 0 then luma4x4BlkIdx := 0; end
+			if leveltype < 2 then //luma
+				CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,4) + lshift(val_CurrMbAddr mod PicWidthInMbs,2) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,2));
+				if (CurrMb4x4Addr / lshift( PicWidthInMbs,2)) = 0 then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
+					nB :=0; top:=0;
+				else
+					nB := NonZeroCount[CurrMb4x4Addr - lshift(PicWidthInMbs,2)];
+				end
+				if (CurrMb4x4Addr mod lshift( PicWidthInMbs,2)) = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
+					nA :=0; left:=0;
+				else
+					nA := NonZeroCount[CurrMb4x4Addr - 1];
+				end
+			else //chroma
+				CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,2) + lshift(val_CurrMbAddr mod PicWidthInMbs,1) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,1));
+				if (CurrMb4x4Addr / lshift( PicWidthInMbs,1)) = 0 then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
+					nB :=0; top:=0;
+				else
+					nB := if iCbCr = 0 then NonZeroCountCb[CurrMb4x4Addr - lshift(PicWidthInMbs,1)] else NonZeroCountCr[CurrMb4x4Addr - lshift(PicWidthInMbs,1)] end;
+				end
+				if (CurrMb4x4Addr mod lshift( PicWidthInMbs,1)) = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
+					nA :=0; left:=0;
+				else
+					nA := if iCbCr = 0 then NonZeroCountCb[CurrMb4x4Addr - 1] else NonZeroCountCr[CurrMb4x4Addr - 1] end;
+				end
+			end
+			if top = 1 and left = 1 then nc := rshift(nA + nB +1, 1); else nc := nA + nB ; end
+		end
+		start_CAVLC(0);
+		level := [0 : for int i in Integers(0,15)];
+	end
+
+	//if( TotalCoeff( coeff_token ) > 0 ) 
+	Residual_block_read_suffixLength: action ==>
+	guard
+		CAVLC_end(),
+		TotalCoeff() >0
+	var
+		uint CurrMb4x4Addr
+	do
+		if leveltype < 2 then //luma
+			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,4) + lshift(val_CurrMbAddr mod PicWidthInMbs,2) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,2));
+			NonZeroCount[CurrMb4x4Addr] := TotalCoeff();
+		else //chroma
+			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,2) + lshift(val_CurrMbAddr mod PicWidthInMbs,1) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,1));
+			if iCbCr = 0 then NonZeroCountCb[CurrMb4x4Addr] := TotalCoeff(); else NonZeroCountCr[CurrMb4x4Addr] := TotalCoeff(); end
+		end
+		if TotalCoeff() > 10 and TrailingOnes() < 3 then suffixLength := 1; else suffixLength := 0; end
+		inc_nb_coeff := 0;
+	end
+
+	// for( i = 0; i < TotalCoeff( coeff_token ); i++ )
+	//if( i < TrailingOnes( coeff_token ) )
+	Residual_block_read_trailing_ones_sign_flag: action ==>
+	guard
+		inc_nb_coeff < TotalCoeff(),
+		inc_nb_coeff < TrailingOnes()
+	do
+		set_bits_to_read(1);
+	end
+
+	Residual_block_read_trailing_ones_sign_flag_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		level[ inc_nb_coeff ] := 1 - 2 * read_result();
+		inc_nb_coeff := inc_nb_coeff +1 ;
+	end
+
+	//else
+	Residual_block_read_level_prefix: action ==>
+	guard
+		inc_nb_coeff < TotalCoeff(),
+		inc_nb_coeff >= TrailingOnes()
+	do
+		set_bits_to_read(1);
+		level_prefix := 0;
+	end
+
+	Residual_block_read_level_prefix_done0: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 0
+	do
+		level_prefix := level_prefix +1;
+		set_bits_to_read(1);
+	end
+
+	Residual_block_read_level_prefix_done1: action ==>
+	guard
+		done_reading_bits(),
+		read_result() = 1
+	var
+		uint levelSuffixSize
+	do
+		levelCode := lshift( if level_prefix < 15 then level_prefix else 15 end, suffixLength );
+		if level_prefix = 14 and suffixLength = 0 then levelSuffixSize := 4;
+		else if level_prefix >=15 then levelSuffixSize := level_prefix - 3;
+		else levelSuffixSize := suffixLength; end end
+		if levelSuffixSize > 0 then set_bits_to_read(levelSuffixSize); end
+	end
+
+	Residual_block_read_level_suffix_done: action ==>
+	guard
+		done_reading_bits()
+	do
+		//if( suffixLength > 0 | | level_prefix >= 14 )
+		if suffixLength > 0 or level_prefix >= 14 then levelCode := levelCode + read_result(); end
+
+		// if( level_prefix > = 15 && suffixLength = = 0 )
+		if level_prefix >= 15 and  suffixLength = 0 then levelCode := levelCode +15; end
+
+		// if( level_prefix > = 16 )
+		if level_prefix >= 16 then levelCode := levelCode + lshift( 1,level_prefix - 3 ) - 4096; end
+
+		// if( i = = TrailingOnes( coeff_token ) &&	TrailingOnes( coeff_token ) < 3 )
+		if inc_nb_coeff = TrailingOnes() and	TrailingOnes() < 3 then levelCode := levelCode + 2; end
+
+		// if( levelCode % 2 = = 0 )
+		if (levelCode mod 2) = 0 then level[ inc_nb_coeff ] := rshift( levelCode + 2, 1);
+		else	level[ inc_nb_coeff ] := rshift( -levelCode - 1, 1); end
+
+		// if( suffixLength = = 0 )
+		if suffixLength = 0 then suffixLength := 1; end
+
+		//if( Abs( level[ i ] ) > ( 3 << ( suffixLength 1 ) ) &&	suffixLength < 6 )
+		if  Abs(level[ inc_nb_coeff ]) > lshift(3,suffixLength - 1) and suffixLength < 6 then suffixLength := suffixLength +1; end
+		inc_nb_coeff := inc_nb_coeff +1 ;
+	end
+	//end if
+
+	// end if
+	//end for 
+	Residual_block_read_TotalCoeff_done: action ==>
+	guard
+		inc_nb_coeff = TotalCoeff()
+	do
+		//if( TotalCoeff( coeff_token ) < endIdx startIdx + 1 )
+		if TotalCoeff() < block_endIdx - block_startIdx +1 then start_CAVLC(1); end
+		run := [0 : for int i in Integers(0,15)];
+	end
+
+	Residual_block_read_total_zeros_done: action ==>
+	guard
+		CAVLC_end()
+	do
+		//if( TotalCoeff( coeff_token ) < endIdx startIdx + 1 )
+		if TotalCoeff() < block_endIdx - block_startIdx +1 then zerosLeft := total_zeros; else zerosLeft := 0; end
+		inc_nb_coeff := 0;
+	end
+
+	//for( i = 0; i < TotalCoeff( coeff_token ) 1; i++ )
+	Residual_block_read_run_before: action ==>
+	guard
+		inc_nb_coeff < TotalCoeff()-1,
+		zerosLeft > 0
+	do
+		start_CAVLC(2);
+	end
+
+	Residual_block_read_run_before_done: action ==>
+	guard
+		CAVLC_end()
+	do
+		run[inc_nb_coeff] := run_before;
+		zerosLeft := zerosLeft - run_before;
+		inc_nb_coeff := inc_nb_coeff+1;
+	end
+
+	Residual_block_skip_read_run_before: action ==>
+	guard
+		inc_nb_coeff < TotalCoeff()-1,
+		zerosLeft = 0
+	do
+		run[inc_nb_coeff] := 0;
+		inc_nb_coeff := inc_nb_coeff+1;
+	end
+
+	//end for
+	Residual_block_read_run_done: action ==> 
+	guard
+		inc_nb_coeff = TotalCoeff()-1
+	do
+		run[TotalCoeff()-1] := zerosLeft;
+		if (IS_Intra_16x16() and leveltype = 1) or leveltype = 3 then run[TotalCoeff()-1] := run[TotalCoeff()-1] +1; end//the first coeffAC will be replaced by coeffDC
+		coeff_sent := -1;
+	end
+	// --> residual_return
+
+	//end for
+	Residual_block_send_run: action ==> LAST:[false], RUN:[run[coeff_sent]], VALUE:[level[coeff_sent]]
+	guard
+		coeff_sent < TotalCoeff()-1
+	do
+		coeff_sent := coeff_sent+1;
+	end
+
+	//end for
+	Residual_block_send_done: action ==> 
+	guard
+		coeff_sent = TotalCoeff()-1
+	end
+
+
+
+	//else ( TotalCoeff( coeff_token ) = 0 )
+	Residual_block_skip_read_suffixLength: action ==>
+	guard
+		CAVLC_end(),
+		TotalCoeff() = 0
+	var
+		uint CurrMb4x4Addr
+	do
+		if leveltype < 2 then //luma
+			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,4) + lshift(val_CurrMbAddr mod PicWidthInMbs,2) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,2));
+			NonZeroCount[CurrMb4x4Addr] := 0;
+		else //chroma
+			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,2) + lshift(val_CurrMbAddr mod PicWidthInMbs,1) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,1));
+			if iCbCr = 0 then NonZeroCountCb[CurrMb4x4Addr] := 0; else NonZeroCountCr[CurrMb4x4Addr] := 0; end
+		end
+	end 
+	// --> residual return
+
+	//******* End of Residual Block CAVLC ********  
+
+	test_one_byte: action ==>
+	guard
+		done_reading_bits(),
+		bitand( read_result(), 255 ) = 1
+    end
+
+	test_zero_byte: action ==>
+	guard
+		done_reading_bits(),
+		bitand( read_result(), 255 ) = 0
+    end
+
+	request_byte: action ==>
+	guard
+		done_reading_bits()
+	do
+		set_bits_to_read( 8 );
+	end
+	
+	generic_done: action ==>
+	guard
+		done_reading_bits()
+	end
+
+	byte_align: action ==>
+	do
+		set_bits_to_read( 8 - bitand( bit_count, 7 ) );
+	end
+	
+	
+//********************************************************************************************************************************** 
+	schedule fsm look_for_Sequence_Header :
+		look_for_Sequence_Header						( look_for_Sequence_Header							) --> search_start_code;
+		search_start_code ( search_start_code  ) --> stuck;
+
+	    // FIXME: add minimal error resilience.
+	    // byte align, then look for a starting on any byte boundary.
+	    // is hex 00000100.
+	    stuck    ( byte_align     ) --> stuck_1a;
+	
+	    stuck_1a ( request_byte   ) --> stuck_1b;
+	    stuck_1b ( test_zero_byte ) --> stuck_2a;
+	    stuck_1b ( generic_done   ) --> stuck_1a;
+	
+	    stuck_2a ( request_byte   ) --> stuck_2b;
+	    stuck_2b ( test_zero_byte ) --> stuck_3a;
+	    stuck_2b ( generic_done   ) --> stuck_1a;
+	
+	    stuck_3a ( request_byte   ) --> stuck_3b;
+	    stuck_3b ( test_zero_byte ) --> stuck_3a;
+	    stuck_3b ( test_one_byte  ) --> read_Nal_unit_header;
+	    stuck_3b ( generic_done   ) --> stuck_1a;
+	    
+
+		// read Nal Unit header
+		read_Nal_unit_header							( read_Nal_unit_header								) --> look_for_which_Header;
+
+		//
+		look_for_which_Header                         	( look_for_which_Header								) --> find_header;
+		find_header	  									( look_for_other_header								) --> search_start_code;
+		find_header	  									( look_for_Sps_header	  							) --> read_Sps_id;
+		find_header	  									( look_for_Pps_header	  							) --> read_Pps_seq_parameter_set_id;
+		find_header	  									( look_for_Slice_header	  							) --> read_SliceH_slice_type;
+
+		// read Sps header
+		read_Sps_id	  										( read_Sps_id	    								) --> read_Sps_id_done;
+		read_Sps_id_done	 								( read_Sps_id_done	    							) --> read_Sps_check_profile_idc;
+		read_Sps_check_profile_idc	 						( read_Sps_chroma_format_idc	  					) --> search_start_code; //not yet realized
+		read_Sps_check_profile_idc	 						( read_Sps_log2_max_frame_num_minus4				) --> read_Sps_pic_order_cnt_type;
+		read_Sps_pic_order_cnt_type	 						( read_Sps_pic_order_cnt_type	   					) --> read_Sps_check_pic_order_cnt_type; 
+		read_Sps_check_pic_order_cnt_type	 				( read_Sps_pic_order_cnt_type_skip01				) --> read_Sps_num_ref_frames; 
+		read_Sps_check_pic_order_cnt_type	 				( read_Sps_log2_max_pic_order_cnt_lsb_minus4		) --> read_Sps_log2_max_pic_order_cnt_lsb_minus4_done;
+		read_Sps_log2_max_pic_order_cnt_lsb_minus4_done		( read_Sps_log2_max_pic_order_cnt_lsb_minus4_done 	) --> read_Sps_num_ref_frames;
+		read_Sps_check_pic_order_cnt_type	 				( read_Sps_delta_pic_order_always_zero_flag			) --> read_Sps_offset_for_non_ref_pic;   
+		read_Sps_offset_for_non_ref_pic						( read_Sps_offset_for_non_ref_pic					) --> read_Sps_offset_for_top_to_bottom_field;	
+		read_Sps_offset_for_top_to_bottom_field				( read_Sps_offset_for_top_to_bottom_field	        ) --> read_Sps_num_ref_frames_in_pic_order_cnt_cycle;
+		read_Sps_num_ref_frames_in_pic_order_cnt_cycle		( read_Sps_num_ref_frames_in_pic_order_cnt_cycle	) --> read_Sps_offset_for_ref_frame0;
+		read_Sps_offset_for_ref_frame0						( read_Sps_offset_for_ref_frame0	                ) --> read_Sps_offset_for_ref_frame1;
+		read_Sps_offset_for_ref_frame1						( read_Sps_offset_for_ref_frame1 	                ) --> read_Sps_offset_for_ref_frame1;
+		read_Sps_offset_for_ref_frame1						( read_Sps_skip_offset_for_ref_frame1				) --> read_Sps_num_ref_frames;      
+		read_Sps_num_ref_frames 							( read_Sps_num_ref_frames  	                        ) --> read_Sps_gaps_in_frame_num_value_allowed_flag;
+		read_Sps_gaps_in_frame_num_value_allowed_flag		( read_Sps_gaps_in_frame_num_value_allowed_flag  	) --> read_Sps_pic_width_in_mbs_minus1;
+		read_Sps_pic_width_in_mbs_minus1	 				( read_Sps_pic_width_in_mbs_minus1              	) --> read_Sps_pic_height_in_map_units_minus1;
+		read_Sps_pic_height_in_map_units_minus1 			( read_Sps_pic_height_in_map_units_minus1 	        ) --> read_Sps_frame_mbs_only_flag;
+		read_Sps_frame_mbs_only_flag 						( read_Sps_frame_mbs_only_flag	  	                ) --> read_Sps_mb_adaptive_frame_field_flag;
+		read_Sps_mb_adaptive_frame_field_flag				( read_Sps_mb_adaptive_frame_field_flag  	        ) --> read_Sps_mb_adaptive_frame_field_flag_done;
+		read_Sps_mb_adaptive_frame_field_flag_done			( read_Sps_mb_adaptive_frame_field_flag_done        ) --> read_Sps_direct_8x8_interference_flag;
+		read_Sps_mb_adaptive_frame_field_flag				( read_Sps_skip_mb_adaptive_frame_field_flag        ) --> read_Sps_direct_8x8_interference_flag;
+		read_Sps_direct_8x8_interference_flag 				( read_Sps_direct_8x8_interference_flag             ) --> read_Sps_frame_cropping_flag;    
+		read_Sps_frame_cropping_flag						( read_Sps_frame_cropping_flag	  	                ) --> read_Sps_frame_crop_left_offset;
+
+		read_Sps_frame_crop_left_offset						( read_Sps_frame_crop_left_offset  	                ) --> read_Sps_frame_crop_right_offset;
+		read_Sps_frame_crop_right_offset					( read_Sps_frame_crop_right_offset				  	) --> read_Sps_frame_crop_top_offset;
+		read_Sps_frame_crop_top_offset						( read_Sps_frame_crop_top_offset  	                ) --> read_Sps_frame_crop_bottom_offset;
+		read_Sps_frame_crop_bottom_offset					( read_Sps_frame_crop_bottom_offset				  	) --> read_Sps_frame_crop_bottom_offset_done;
+		read_Sps_frame_crop_bottom_offset_done				( read_Sps_frame_crop_bottom_offset_done	        ) --> read_Sps_vui_parameters_present_flag;    
+		read_Sps_frame_crop_left_offset						( read_Sps_skip_frame_crop_left_offset	  	        ) --> read_Sps_vui_parameters_present_flag; 
+		read_Sps_vui_parameters_present_flag				( read_Sps_vui_parameters_present_flag	  	        ) --> read_Sps_vui_parameters_present_flag_done;
+		read_Sps_vui_parameters_present_flag_done			( read_Sps_vui_parameters_present_flag_done	  		) --> search_start_code; //end of Sps
+
+		// read Pps header
+		read_Pps_seq_parameter_set_id 						( read_Pps_seq_parameter_set_id                     ) --> read_Pps_entropy_coding_mode_pic_order_flag;
+		read_Pps_entropy_coding_mode_pic_order_flag  		( read_Pps_entropy_coding_mode_pic_order_flag	  	) --> read_Pps_num_slice_groups_minus1;
+		read_Pps_num_slice_groups_minus1					( read_Pps_num_slice_groups_minus1				  	) --> look_Pps_slice_group_map_type; 			  
+		look_Pps_slice_group_map_type						( read_Pps_slice_group_map_type                     ) --> read_Pps_check_slice_group_map_type;
+		read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type0;
+		read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type1;
+		read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type2;
+		read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type345;
+		read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type6;
+		read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_num_ref_idx_l0_active_minus1;
+		read_Pps_check_slice_group_map_type0				( read_Pps_run_length_minus1						) --> read_Pps_check_slice_group_map_type0;
+		read_Pps_check_slice_group_map_type0				( read_Pps_run_length_minus1						) --> read_Pps_num_ref_idx_l0_active_minus1;
+		read_Pps_check_slice_group_map_type1				( read_Pps_check_slice_group_map_type1				) --> read_Pps_num_ref_idx_l0_active_minus1;
+		read_Pps_check_slice_group_map_type2				( read_Pps_top_left	                                ) --> read_Pps_bottom_right;
+		read_Pps_bottom_right								( read_Pps_bottom_right								) --> read_Pps_check_slice_group_map_type2;
+		read_Pps_bottom_right								( read_Pps_bottom_right								) --> read_Pps_num_ref_idx_l0_active_minus1;
+		read_Pps_check_slice_group_map_type345				( read_Pps_slice_group_change_direction_flag		) --> read_Pps_slice_group_change_rate_minus1;
+		read_Pps_slice_group_change_rate_minus1			    ( read_Pps_slice_group_change_rate_minus1	        ) --> read_Pps_num_ref_idx_l0_active_minus1;
+		read_Pps_check_slice_group_map_type6				( read_Pps_pic_size_in_map_units_minus1				) --> search_start_code; //not yet realized
+		  	
+		look_Pps_slice_group_map_type					    ( read_Pps_slice_group_map_type_skip 	  	        ) --> read_Pps_num_ref_idx_l0_active_minus1;
+		read_Pps_num_ref_idx_l0_active_minus1				( read_Pps_num_ref_idx_l0_active_minus1	 	        ) --> read_Pps_num_ref_idx_l1_active_minus1;
+		read_Pps_num_ref_idx_l1_active_minus1				( read_Pps_num_ref_idx_l1_active_minus1             ) --> read_Pps_weighted_pred_bipred;
+		read_Pps_weighted_pred_bipred						( read_Pps_weighted_pred_bipred   	                ) --> read_Pps_pic_init_qp_minus26;
+		read_Pps_pic_init_qp_minus26						( read_Pps_pic_init_qp_minus26	  	                ) --> read_Pps_pic_init_qs_minus26;
+		read_Pps_pic_init_qs_minus26						( read_Pps_pic_init_qs_minus26	  	                ) --> read_Pps_chroma_qp_index_offset;
+		read_Pps_chroma_qp_index_offset						( read_Pps_chroma_qp_index_offset 	                ) --> read_Pps_flag_deblocking_constrained_redundant;
+		read_Pps_flag_deblocking_constrained_redundant		( read_Pps_flag_deblocking_constrained_redundant	) --> read_Pps_check_High_Profile;
+		read_Pps_check_High_Profile							( read_Pps_check_High_Profile					  	) --> read_Pps_not_High_Profile;
+		read_Pps_not_High_Profile							( read_Pps_not_High_Profile						  	) --> search_start_code;
+		//read_Pps_not_High_Profile							( read_Pps_pic_scaling_matrix_present_flag		  	) --> read_Nal_unit_header; //not yet realized
+
+		// read Slice header
+		read_SliceH_slice_type								( read_SliceH_slice_type  	                        ) --> read_SliceH_pps_id;
+		read_SliceH_pps_id									( read_SliceH_pps_id						  		) --> read_SliceH_check_separate_colour_plane_flag;
+		read_SliceH_check_separate_colour_plane_flag		( read_SliceH_check_separate_colour_plane_flag	 	) --> read_SliceH_check_separate_colour_plane_flag_done; 
+		read_SliceH_check_separate_colour_plane_flag_done	( read_SliceH_separate_colour_plane_flag_done		) --> read_SliceH_read_colour_plane_id;
+		read_SliceH_check_separate_colour_plane_flag_done	( read_SliceH_skip_separate_colour_plane_flag	  	) --> read_SliceH_frame_num;	
+		read_SliceH_read_colour_plane_id					( read_SliceH_read_colour_plane_id				  	) --> read_SliceH_frame_num;
+		read_SliceH_frame_num								( read_SliceH_frame_num	  	                        ) --> read_SliceH_field_pic_flag;
+		read_SliceH_field_pic_flag							( read_SliceH_field_pic_flag						) --> read_SliceH_bottom_field_flag;
+		read_SliceH_field_pic_flag							( read_SliceH_skip_field_pic_flag					) --> read_SliceH_idr_pic_id;
+		read_SliceH_bottom_field_flag						( read_SliceH_bottom_field_flag						) --> read_SliceH_bottom_field_flag_done;
+		read_SliceH_bottom_field_flag						( read_SliceH_skip_bottom_field_flag				) --> read_SliceH_idr_pic_id;
+		read_SliceH_bottom_field_flag_done					( read_SliceH_bottom_field_flag_done				) --> read_SliceH_idr_pic_id;
+
+		read_SliceH_idr_pic_id								( read_SliceH_idr_pic_id  	                        ) --> read_SliceH_idr_pic_id_done;
+		read_SliceH_idr_pic_id								( read_SliceH_skip_idr_pic_id                       ) --> read_SliceH_pic_order_cnt_lsb;
+		read_SliceH_idr_pic_id_done							( read_SliceH_idr_pic_id_done		  				) --> read_SliceH_pic_order_cnt_lsb;	
+		
+		read_SliceH_pic_order_cnt_lsb						( read_SliceH_pic_order_cnt_lsb  					) --> read_SliceH_pic_order_cnt_lsb_start;
+		read_SliceH_pic_order_cnt_lsb_start					( read_SliceH_pic_order_cnt_lsb_done  				) --> read_SliceH_pic_order_cnt_lsb_done;
+		read_SliceH_pic_order_cnt_lsb						( read_SliceH_skip_pic_order_cnt_lsb  				) --> read_SliceH_delta_pic_order_cnt_bottom_done;
+
+		read_SliceH_pic_order_cnt_lsb_done					( read_SliceH_delta_pic_order_cnt_bottom			) --> read_SliceH_delta_pic_order_cnt_bottom_start;
+		read_SliceH_delta_pic_order_cnt_bottom_start		( read_SliceH_delta_pic_order_cnt_bottom_done		) --> CalcPOC;
+		read_SliceH_pic_order_cnt_lsb_done					( read_SliceH_skip_delta_pic_order_cnt_bottom		) --> CalcPOC;    
+
+		read_SliceH_delta_pic_order_cnt_bottom_done			( read_SliceH_delta_pic_order_cnt0					) --> read_SliceH_delta_pic_order_cnt0_start;
+		read_SliceH_delta_pic_order_cnt0_start				( read_SliceH_delta_pic_order_cnt0_done				) --> read_SliceH_delta_pic_order_cnt0_done;
+		read_SliceH_delta_pic_order_cnt_bottom_done			( read_SliceH_skip_delta_pic_order_cnt0				) --> CalcPOC;
+
+		read_SliceH_delta_pic_order_cnt0_done				( read_SliceH_delta_pic_order_cnt1		 	        ) --> read_SliceH_delta_pic_order_cnt1_start;	
+		read_SliceH_delta_pic_order_cnt1_start				( read_SliceH_delta_pic_order_cnt1_done 		    ) --> CalcPOC;	
+		read_SliceH_delta_pic_order_cnt0_done				( read_SliceH_skip_delta_pic_order_cnt1				) --> CalcPOC;
+
+		CalcPOC												( CalcPOC	                                        ) --> read_SliceH_redundant_pic_cnt;
+		read_SliceH_redundant_pic_cnt						( read_SliceH_redundant_pic_cnt                     ) --> read_SliceH_redundant_pic_cnt_done;
+		read_SliceH_redundant_pic_cnt_done					( read_SliceH_redundant_pic_cnt_done  				) --> read_SliceH_direct_spatial_mv_pred_flag;
+		read_SliceH_redundant_pic_cnt						( read_SliceH_skip_redundant_pic_cnt                ) --> read_SliceH_direct_spatial_mv_pred_flag;
+
+		read_SliceH_direct_spatial_mv_pred_flag				( read_SliceH_direct_spatial_mv_pred_flag	        ) --> read_SliceH_direct_spatial_mv_pred_flag_done;
+		read_SliceH_direct_spatial_mv_pred_flag_done		( read_SliceH_direct_spatial_mv_pred_flag_done		) --> read_SliceH_num_ref_idx_active_override_flag;
+		read_SliceH_direct_spatial_mv_pred_flag				( read_SliceH_skip_direct_spatial_mv_pred_flag		) --> read_SliceH_num_ref_idx_active_override_flag;
+
+		read_SliceH_num_ref_idx_active_override_flag		( read_SliceH_num_ref_idx_active_override_flag		) --> read_SliceH_num_ref_idx_l0_active_minus1;
+		read_SliceH_num_ref_idx_l0_active_minus1			( read_SliceH_num_ref_idx_l0_active_minus1			) --> read_SliceH_num_ref_idx_l1_active_minus1;
+		read_SliceH_num_ref_idx_l1_active_minus1			( read_SliceH_num_ref_idx_l1_active_minus1			) --> read_SliceH_num_ref_idx_l1_active_minus1_done;
+		read_SliceH_num_ref_idx_l1_active_minus1_done		( read_SliceH_num_ref_idx_l1_active_minus1_done		) --> read_SliceH_ref_pic_list_reordering;
+		read_SliceH_num_ref_idx_l1_active_minus1			( read_SliceH_skip_num_ref_idx_l1_active_minus1		) --> read_SliceH_ref_pic_list_reordering;
+		read_SliceH_num_ref_idx_l0_active_minus1			( read_SliceH_skip_num_ref_idx_l0_active_minus1		) --> read_SliceH_ref_pic_list_reordering;
+		read_SliceH_num_ref_idx_active_override_flag		( read_SliceH_skip_num_ref_idx_active_override_flag	) --> read_SliceH_ref_pic_list_reordering;
+
+		//ref_pic_list_reordering
+		read_SliceH_ref_pic_list_reordering					( read_SliceH_ref_pic_list_reordering_flag_l0		) --> read_SliceH_ref_pic_list_reordering_flag_l0_done;
+		read_SliceH_ref_pic_list_reordering					( read_SliceH_skip_ref_pic_list_reordering			) --> read_SliceH_pred_weight_table;
+		read_SliceH_ref_pic_list_reordering_flag_l0_done	( read_SliceH_ref_pic_list_reordering_flag_l0_done	) --> read_SliceH_reordering_of_pic_nums_idc;
+		read_SliceH_reordering_of_pic_nums_idc 				( read_SliceH_reordering_of_pic_nums_idc	        ) --> read_SliceH_reordering_of_pic_nums_idc_done;
+		read_SliceH_reordering_of_pic_nums_idc				( read_SliceH_skip_reordering_of_pic_nums_idc		) --> read_SliceH_ref_pic_list_reordering_flag_l1;	
+		read_SliceH_reordering_of_pic_nums_idc_done			( read_SliceH_reordering_of_pic_nums_idc_done		) --> look_SliceH_reordering_of_pic_nums_idc;	
+		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_abs_diff_pic_num_minus1_done	        ) --> read_SliceH_reordering_of_pic_nums_idc;	
+		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_long_term_pic_num_done_idc2				) --> read_SliceH_reordering_of_pic_nums_idc;
+		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_skip_reordering_of_pic_nums_idc3		) --> read_SliceH_ref_pic_list_reordering_flag_l1;
+		read_SliceH_ref_pic_list_reordering_flag_l1			( read_SliceH_ref_pic_list_reordering_flag_l1		) --> read_SliceH_ref_pic_list_reordering_flag_l1_done;
+		read_SliceH_ref_pic_list_reordering_flag_l1_done	( read_SliceH_ref_pic_list_reordering_flag_l1_done	) --> read_SliceH_reordering_of_pic_nums_idc;
+		read_SliceH_ref_pic_list_reordering_flag_l1			( read_SliceH_skip_ref_pic_list_reordering_flag_l1	) --> read_SliceH_pred_weight_table;
+		//pred_weight_table
+		read_SliceH_pred_weight_table						( read_SliceH_pred_weight_table						) --> read_SliceH_dec_ref_pic_marking; //not yet realised
+		read_SliceH_pred_weight_table						( read_SliceH_skip_pred_weight_table				) --> read_SliceH_dec_ref_pic_marking;
+		//dec_ref_pic_marking
+		read_SliceH_dec_ref_pic_marking						( read_SliceH_dec_ref_pic_marking	                ) --> read_SliceH_check_IdrPicFlag;
+		read_SliceH_check_IdrPicFlag						( read_SliceH_no_output_of_prior_pics_flag_done		) --> read_SliceH_cabac_init_idc;
+		read_SliceH_check_IdrPicFlag						( read_SliceH_adaptative_ref_pic_marking_mode_flag_done) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco								( read_SliceH_skip_memory_management_control_operation_done ) --> read_SliceH_cabac_init_idc;
+		read_SliceH_check_mmco								( read_SliceH_memory_management_control_operation_done) --> read_SliceH_check_mmco_done;
+		read_SliceH_check_mmco_done							( read_SliceH_mmco_0								) --> read_SliceH_cabac_init_idc;
+		read_SliceH_check_mmco_done							( read_SliceH_difference_of_pic_nums_minus1_done	) --> read_SliceH_check_mmco_36;
+		read_SliceH_check_mmco_done							( read_SliceH_long_term_pic_num_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_done							( read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_36							( read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_36							( read_SliceH_long_not_term_frame_idx_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_done							( read_SliceH_max_long_term_frame_idx_plus1_done	) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_done							( read_SliceH_mmco_5								) --> read_SliceH_check_mmco;
+		read_SliceH_dec_ref_pic_marking						( read_SliceH_skip_dec_ref_pic_marking				) --> read_SliceH_cabac_init_idc;
+
+		read_SliceH_cabac_init_idc							( read_SliceH_cabac_init_idc						) --> read_SliceH_cabac_init_idc_done;
+		read_SliceH_cabac_init_idc_done						( read_SliceH_cabac_init_idc_done	                ) --> read_SliceH_slice_qp_delta_done;
+		read_SliceH_cabac_init_idc							( read_SliceH_skip_cabac_init_idc					) --> read_SliceH_slice_qp_delta_done;
+
+		read_SliceH_slice_qp_delta_done						( read_SliceH_slice_qp_delta_done	                ) --> read_SliceH_sp_for_switch_flag;
+
+		read_SliceH_sp_for_switch_flag						( read_SliceH_sp_for_switch_flag	                ) --> read_SliceH_sp_for_switch_flag_done;
+		read_SliceH_sp_for_switch_flag_done					( read_SliceH_sp_for_switch_flag_done				) --> read_SliceH_slice_qs_delta_done;
+		read_SliceH_slice_qs_delta_done						( read_SliceH_slice_qs_delta_done	                ) --> read_SliceH_disable_deblocking_filter_idc;
+		read_SliceH_sp_for_switch_flag						( read_SliceH_skip_sp_for_switch_flag				) --> read_SliceH_disable_deblocking_filter_idc;
+
+		read_SliceH_disable_deblocking_filter_idc			( read_SliceH_disable_deblocking_filter_idc 		) --> read_SliceH_slice_alpha_c0_offset_div2;		
+		read_SliceH_slice_alpha_c0_offset_div2				( read_SliceH_slice_alpha_c0_offset_div2	        ) --> read_SliceH_slice_beta_offset_div2;
+		read_SliceH_slice_beta_offset_div2					( read_SliceH_slice_beta_offset_div2				) --> read_SliceH_slice_beta_offset_div2_done;
+		read_SliceH_slice_beta_offset_div2_done				( read_SliceH_slice_beta_offset_div2_done	        ) --> read_SliceH_slice_group_change_cycle;
+		read_SliceH_slice_alpha_c0_offset_div2				( read_SliceH_skip_slice_alpha_c0_offset_div2		) --> read_SliceH_slice_group_change_cycle;
+		read_SliceH_disable_deblocking_filter_idc			( read_SliceH_skip_disable_deblocking_filter_idc 	) --> read_SliceH_slice_group_change_cycle;
+
+		read_SliceH_slice_group_change_cycle				( read_SliceH_slice_group_change_cycle				) --> read_SliceH_slice_group_change_cycle_done;
+		read_SliceH_slice_group_change_cycle_done			( read_SliceH_slice_group_change_cycle_done			) --> read_SliceD_CABAC_alignement;
+		read_SliceH_slice_group_change_cycle				( read_SliceH_skip_slice_group_change_cycle	) --> read_SliceD_CABAC_alignement;
+
+		// read Slice Data     only decoding CAVLC process is implemented
+		read_SliceD_CABAC_alignement						( read_SliceD_CABAC_alignement						) --> read_SliceD_init;
+		read_SliceD_CABAC_alignement						( read_SliceD_skip_CABAC_alignement	                ) --> read_SliceD_init;
+		read_SliceD_init									( SliceD_init										) --> send_data_position_information;
+		send_data_position_information						( send_data_position_information	                ) --> read_SliceD_mb_skip;
+		read_SliceD_mb_skip									( read_SliceD_mb_skip_run							) --> read_SliceD_mb_skip_run_done0;
+		read_SliceD_mb_skip_run_done0						( read_SliceD_mb_skip_run_done0						) --> read_SliceD_mb_skip_run_done1;
+		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1						) --> read_SliceD_mb_skip_run_done1;
+		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1_lastmb				) --> read_SliceD_mb_skip_run_done1;
+		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done2						) --> read_SliceD_mb_field_decoding_flag;
+		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag 							) --> read_SliceD_mb_field_decoding_flag; // CABAC : not yet implemented
+		read_SliceD_mb_skip									( read_SliceD_skip_mb_skip 							) --> read_SliceD_mb_field_decoding_flag;
+		read_SliceD_mb_field_decoding_flag					( read_SliceD_mb_field_decoding_flag				) --> read_MB_layer_mb_type; // interleaved not implemented
+		read_SliceD_mb_field_decoding_flag					( read_SliceD_skip_mb_field_decoding_flag			) --> read_MB_layer_mb_type;
+		// --> macrobloc_layer()
+		SliceD_update										( SliceD_update_CAVLC								) --> SliceD_while_moreDataFlag;
+		SliceD_update										( SliceD_update_CABAC								) --> SliceD_while_moreDataFlag;
+		SliceD_while_moreDataFlag							( SliceD_while_moreDataFlag							) --> send_data_position_information;
+		SliceD_while_moreDataFlag							( SliceD_end										) --> search_start_code;
+		read_SliceD_mb_field_decoding_flag					( SliceD_end										) --> search_start_code;
+
+		// macrobloc_layer
+		read_MB_layer_mb_type								( read_MB_layer_mb_type								) --> read_MB_layer_mb_type_done;
+		read_MB_layer_mb_type_done							( read_MB_layer_mb_type_done						) --> read_MB_layer_check_I_PCM;
+		read_MB_layer_check_I_PCM							( read_MB_layer_I_PCM_alignement					) --> read_MB_layer_pcm_sample_luma0;
+		read_MB_layer_pcm_sample_luma0					    ( read_MB_layer_pcm_sample_luma0	                ) --> read_MB_layer_pcm_sample_luma1;
+		read_MB_layer_pcm_sample_luma1						( read_MB_layer_pcm_sample_luma1	                ) --> read_MB_layer_pcm_sample_chroma0;	
+		read_MB_layer_pcm_sample_chroma0					( read_MB_layer_pcm_sample_chroma0					) --> read_MB_layer_pcm_sample_chroma1;	
+		read_MB_layer_pcm_sample_chroma1					( read_MB_layer_pcm_sample_chroma1					) --> read_MB_layer_pcm_sample_chroma1;
+		read_MB_layer_pcm_sample_chroma1					( read_MB_layer_pcm_sample_done						) --> SliceD_update;	
+		read_MB_layer_check_I_PCM							( read_MB_layer_not_I_PCM							) --> read_MB_layer_check_pred;
+		read_MB_layer_check_pred							( read_MB_layer_sub_mb_pred							) --> Sub_mb_pred; //--> sub_mb_pred
+		read_MB_layer_sub_mb_pred_done				        ( read_MB_layer_sub_mb_pred_done	                ) --> read_MB_layer_coded_block_pattern;
+		read_MB_layer_check_pred							( read_MB_layer_transform_size_8x8_flag				) --> read_MB_layer_transform_size_8x8_flag_done;
+		read_MB_layer_transform_size_8x8_flag_done			( read_MB_layer_transform_size_8x8_flag_done		) --> MB_pred; //--> mb_pred 
+		read_MB_layer_check_pred							( read_MB_layer_skip_transform_size_8x8_flag		) --> MB_pred; 
+		// --> mb_pred()	
+
+		read_MB_layer_coded_block_pattern					( read_MB_layer_coded_block_pattern					) --> read_MB_layer_coded_block_pattern_done;
+		read_MB_layer_coded_block_pattern_done			    ( read_MB_layer_coded_block_pattern_done	        ) --> read_MB_layer_cbp_transform_size_8x8_flag_done;
+		read_MB_layer_cbp_transform_size_8x8_flag_done		( read_MB_layer_cbp_transform_size_8x8_flag_done	) --> read_MB_layer_mb_qp_delta;
+		read_MB_layer_coded_block_pattern					( read_MB_layer_skip_coded_block_pattern			) --> read_MB_layer_mb_qp_delta;
+		read_MB_layer_mb_qp_delta							( read_MB_layer_mb_qp_delta							) --> read_MB_layer_mb_qp_delta_done;
+		read_MB_layer_mb_qp_delta_done						( read_MB_layer_mb_qp_delta_done	                ) --> Residual_init; 
+		// --> residual ()
+		read_MB_layer_mb_qp_delta							( read_MB_layer_skip_mb_qp_delta					) --> SliceD_update;
+
+		// sub_mb_pred
+		Sub_mb_pred											( sub_MB_pred_init_sub_mb_type						) --> read_sub_MB_pred_sub_mb_type;
+		read_sub_MB_pred_sub_mb_type						( read_sub_MB_pred_sub_mb_type						) --> read_sub_MB_pred_sub_mb_type;
+		read_sub_MB_pred_sub_mb_type						( sub_MB_pred_init_ref_idx_l0						) --> read_sub_MB_pred_ref_idx_l0;
+		read_sub_MB_pred_ref_idx_l0							( read_sub_MB_pred_ref_idx_l0						) --> read_sub_MB_pred_ref_idx_l0_done;
+		read_sub_MB_pred_ref_idx_l0_done					( read_sub_MB_pred_ref_idx_l0_done					) --> read_sub_MB_pred_ref_idx_l0;
+		read_sub_MB_pred_ref_idx_l0							( read_sub_MB_pred_skip_ref_idx_l0					) --> read_sub_MB_pred_ref_idx_l0;
+		read_sub_MB_pred_ref_idx_l0							( sub_MB_pred_init_ref_idx_l1						) --> read_sub_MB_pred_ref_idx_l1;
+		read_sub_MB_pred_ref_idx_l1							( read_sub_MB_pred_ref_idx_l1						) --> read_sub_MB_pred_ref_idx_l1_done;
+		read_sub_MB_pred_ref_idx_l1_done					( read_sub_MB_pred_ref_idx_l1_done					) --> read_sub_MB_pred_ref_idx_l1;
+		read_sub_MB_pred_ref_idx_l1							( read_sub_MB_pred_skip_ref_idx_l1					) --> read_sub_MB_pred_ref_idx_l1;
+		read_sub_MB_pred_ref_idx_l1							( sub_MB_pred_init_mvd_l0							) --> read_sub_MB_pred_mvd_l0;
+		read_sub_MB_pred_mvd_l0								( read_sub_MB_pred_mvd_l0	                        ) --> read_sub_MB_pred_mvd_l0_done0;
+		read_sub_MB_pred_mvd_l0_done0						( read_sub_MB_pred_mvd_l0_done0						) --> read_sub_MB_pred_mvd_l0_done1;
+		read_sub_MB_pred_mvd_l0_done1						( read_sub_MB_pred_mvd_l0_done1						) --> read_sub_MB_pred_mvd_l0_done2;
+		read_sub_MB_pred_mvd_l0_done2						( read_sub_MB_pred_mvd_l0_done2						) --> read_sub_MB_pred_mvd_l0_done0;
+		read_sub_MB_pred_mvd_l0_done0						( read_sub_MB_pred_skip_mvd_l0_done0				) --> read_sub_MB_pred_mvd_l0;
+		read_sub_MB_pred_mvd_l0								( read_sub_MB_pred_skip_mvd_l0						) --> read_sub_MB_pred_mvd_l0;
+		read_sub_MB_pred_mvd_l0								( sub_MB_pred_init_mvd_l1							) --> read_sub_MB_pred_mvd_l1;
+		read_sub_MB_pred_mvd_l1								( read_sub_MB_pred_mvd_l1							) --> read_sub_MB_pred_mvd_l1_done0;
+		read_sub_MB_pred_mvd_l1_done0						( read_sub_MB_pred_mvd_l1_done0						) --> read_sub_MB_pred_mvd_l1_done1;
+		read_sub_MB_pred_mvd_l1_done1						( read_sub_MB_pred_mvd_l1_done1						) --> read_sub_MB_pred_mvd_l1_done2;
+		read_sub_MB_pred_mvd_l1_done2						( read_sub_MB_pred_mvd_l1_done2						) --> read_sub_MB_pred_mvd_l1_done0;
+		read_sub_MB_pred_mvd_l1_done0						( read_sub_MB_pred_skip_mvd_l1_done0				) --> read_sub_MB_pred_mvd_l1;
+		read_sub_MB_pred_mvd_l1								( read_sub_MB_pred_skip_mvd_l1						) --> read_sub_MB_pred_mvd_l1;
+		read_sub_MB_pred_mvd_l1								( sub_MB_pred_done									) --> read_MB_layer_sub_mb_pred_done; // --> macrobloc_layer()	
+
+		// mb_pred
+		MB_pred												( MB_pred_init_Intra_4x4							) --> read_MB_pred_rem_intra4x4_pred_mode;
+		read_MB_pred_rem_intra4x4_pred_mode					( read_MB_pred_rem_intra4x4_pred_mode				) --> read_MB_pred_rem_intra4x4_pred_mode_done;
+		read_MB_pred_rem_intra4x4_pred_mode_done			( read_MB_pred_rem_intra4x4_pred_mode_done			) --> read_MB_pred_rem_intra4x4_pred_mode;
+		read_MB_pred_rem_intra4x4_pred_mode_done			( read_MB_pred_skip_rem_intra4x4_pred_mode_done		) --> read_MB_pred_rem_intra4x4_pred_mode;	
+		read_MB_pred_rem_intra4x4_pred_mode					( read_MB_pred_skip_rem_intra4x4_pred_mode			) --> read_MB_pred_intra_chroma_pred_mode;
+		MB_pred												( MB_pred_init_Intra_8x8							) --> read_MB_pred_rem_intra8x8_pred_mode;
+		read_MB_pred_rem_intra8x8_pred_mode					( read_MB_pred_rem_intra8x8_pred_mode				) --> read_MB_pred_rem_intra8x8_pred_mode_done;
+		read_MB_pred_rem_intra8x8_pred_mode_done			( read_MB_pred_rem_intra8x8_pred_mode_done			) --> read_MB_pred_rem_intra8x8_pred_mode;
+		read_MB_pred_rem_intra8x8_pred_mode_done			( read_MB_pred_skip_rem_intra8x8_pred_mode_done		) --> read_MB_pred_rem_intra8x8_pred_mode;	
+		read_MB_pred_rem_intra8x8_pred_mode					( read_MB_pred_skip_rem_intra8x8_pred_mode			) --> read_MB_pred_intra_chroma_pred_mode;
+		MB_pred												( MB_pred_init_Intra_16x16							) --> read_MB_pred_intra_chroma_pred_mode;
+		read_MB_pred_intra_chroma_pred_mode					( read_MB_pred_intra_chroma_pred_mode				) --> read_MB_pred_intra_chroma_pred_mode_done;
+		read_MB_pred_intra_chroma_pred_mode_done			( read_MB_pred_intra_chroma_pred_mode_done			) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer()
+		read_MB_pred_intra_chroma_pred_mode					( read_MB_pred_skip_intra_chroma_pred_mode			) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer()
+		MB_pred												( MB_pred_Inter_not_direct							) --> read_MB_pred_ref_idx_l0;
+		read_MB_pred_ref_idx_l0								( read_MB_pred_ref_idx_l0							) --> read_MB_pred_ref_idx_l0_done;
+		read_MB_pred_ref_idx_l0_done						( read_MB_pred_ref_idx_l0_done						) --> read_MB_pred_ref_idx_l0;
+		read_MB_pred_ref_idx_l0								( read_MB_pred_skip_ref_idx_l0						) --> read_MB_pred_ref_idx_l0;
+		read_MB_pred_ref_idx_l0								( MB_pred_init_ref_idx_l1							) --> read_MB_pred_ref_idx_l1;
+		read_MB_pred_ref_idx_l1								( read_MB_pred_ref_idx_l1							) --> read_MB_pred_ref_idx_l1_done;
+		read_MB_pred_ref_idx_l1_done						( read_MB_pred_ref_idx_l1_done						) --> read_MB_pred_ref_idx_l1;
+		read_MB_pred_ref_idx_l1								( read_MB_pred_skip_ref_idx_l1						) --> read_MB_pred_ref_idx_l1;
+		read_MB_pred_ref_idx_l1								( MB_pred_init_mvd_l0								) --> read_MB_pred_mvd_l0;
+		read_MB_pred_mvd_l0									( read_MB_pred_mvd_l0								) --> read_MB_pred_mvd_l0_done0;
+		read_MB_pred_mvd_l0_done0							( read_MB_pred_mvd_l0_done0							) --> read_MB_pred_mvd_l0_done1;
+		read_MB_pred_mvd_l0_done1							( read_MB_pred_mvd_l0_done1							) --> read_MB_pred_mvd_l0;
+		read_MB_pred_mvd_l0									( read_MB_pred_skip_mvd_l0							) --> read_MB_pred_mvd_l0;
+		read_MB_pred_mvd_l0									( MB_pred_init_mvd_l1								) --> read_MB_pred_mvd_l1;
+		read_MB_pred_mvd_l1									( read_MB_pred_mvd_l1								) --> read_MB_pred_mvd_l1_done0;
+		read_MB_pred_mvd_l1_done0							( read_MB_pred_mvd_l1_done0							) --> read_MB_pred_mvd_l1_done1;
+		read_MB_pred_mvd_l1_done1							( read_MB_pred_mvd_l1_done1							) --> read_MB_pred_mvd_l1;
+		read_MB_pred_mvd_l1									( read_MB_pred_skip_mvd_l1							) --> read_MB_pred_mvd_l1;
+		read_MB_pred_mvd_l1									( MB_pred_done										) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer()	
+		MB_pred												( MB_pred_Inter_direct								) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer()
+
+		// residual
+		Residual_init										( Residual_init										) --> Residual_luma_DC_init;
+		Residual_luma_DC_init								( Residual_luma_DC_init								) --> Residual_block; // --> residual_block()
+		Residual_return										( Residual_return_luma_DC							) --> Residual_luma_AC_init;
+		Residual_luma_DC_init								( Residual_luma_skip_DC_init						) --> Residual_luma_AC_init;
+		Residual_luma_AC_init								( Residual_luma_AC_init								) --> Residual_luma_AC_CAVLC;
+		Residual_luma_AC_CAVLC								( Residual_luma_AC_CAVLC							) --> Residual_luma_AC_CodedBlock8x8;
+		Residual_luma_AC_CodedBlock8x8						( Residual_luma_AC_CodedBlock8x8					) --> Residual_block; // --> residual_block()
+		Residual_return										( Residual_return_luma_AC							) --> Residual_luma_inc_AC_4x4;
+		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8				) --> Residual_luma_inc_AC_4x4;
+		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
+		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma; 
+		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
+		Residual_chroma_DC_init								( Residual_chroma_DC_init							) --> Residual_block; // --> residual_block()
+		Residual_return										( Residual_return_chroma_DC							) --> Residual_chroma_DC_init;
+		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init						) --> Residual_chroma_DC_init;
+		Residual_chroma_DC_init								( Residual_skip_chroma_DC							) --> Residual_chroma_AC_init;
+		Residual_chroma_AC_init								( Residual_chroma_AC_init							) --> Residual_chroma_AC_CodedBlock4x4;
+		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_CodedBlock4x4 					) --> Residual_block; // --> residual_block()
+		Residual_return										( Residual_return_chroma_AC							) --> Residual_chroma_AC_CodedBlock4x4;
+		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4 			) --> Residual_chroma_AC_CodedBlock4x4;
+		Residual_chroma_AC_CodedBlock4x4					( Residual_skip_chroma_AC							) --> SliceD_update; 
+		// --> macrobloc_layer / --> Slice_data
+
+		// residual_block
+		Residual_block										( Residual_block_init_coeff_token					) --> Residual_block_read_suffixLength;
+		Residual_block_read_suffixLength					( Residual_block_read_suffixLength					) --> Residual_block_read_non_zero_coeff;
+		Residual_block_read_non_zero_coeff					( Residual_block_read_trailing_ones_sign_flag		) --> Residual_block_read_trailing_ones_sign_flag_done;
+		Residual_block_read_trailing_ones_sign_flag_done	( Residual_block_read_trailing_ones_sign_flag_done  ) --> Residual_block_read_non_zero_coeff;
+		Residual_block_read_non_zero_coeff					( Residual_block_read_level_prefix					) --> Residual_block_read_level_prefix_done;
+		Residual_block_read_level_prefix_done				( Residual_block_read_level_prefix_done0			) --> Residual_block_read_level_prefix_done;
+		Residual_block_read_level_prefix_done				( Residual_block_read_level_prefix_done1			) --> Residual_block_read_level_suffix_done;
+		Residual_block_read_level_suffix_done				( Residual_block_read_level_suffix_done				) --> Residual_block_read_non_zero_coeff;
+		Residual_block_read_non_zero_coeff					( Residual_block_read_TotalCoeff_done				) --> Residual_block_read_total_zeros_done;
+		Residual_block_read_total_zeros_done				( Residual_block_read_total_zeros_done				) --> Residual_block_read_run_before;
+		Residual_block_read_run_before						( Residual_block_read_run_before					) --> Residual_block_read_run_before_done;
+		Residual_block_read_run_before_done					( Residual_block_read_run_before_done				) --> Residual_block_read_run_before;
+		Residual_block_read_run_before						( Residual_block_skip_read_run_before				) --> Residual_block_read_run_before;
+		Residual_block_read_run_before						( Residual_block_read_run_done						) --> Residual_block_send_run;
+		Residual_block_send_run								( Residual_block_send_run							) --> Residual_block_send_run;
+		Residual_block_send_run								( Residual_block_send_done							) --> Residual_return;
+		Residual_block_read_suffixLength					( Residual_block_skip_read_suffixLength				) --> Residual_return;
+
+	end
+
+	priority
+		read_Sps_chroma_format_idc > read_Sps_log2_max_frame_num_minus4 ;
+		read_SliceH_read_colour_plane_id > read_SliceH_frame_num ;
+		read_SliceH_pred_weight_table > read_SliceH_skip_pred_weight_table;
+		read_SliceH_difference_of_pic_nums_minus1_done > read_SliceH_long_term_frame_idx_done > read_SliceH_memory_management_control_operation_done;
+		read_SliceH_sp_for_switch_flag_done > read_SliceH_slice_qs_delta_done ;
+		read_SliceH_slice_group_change_cycle > read_SliceH_skip_slice_group_change_cycle;
+		read_SliceD_mb_field_decoding_flag > read_SliceD_skip_mb_field_decoding_flag;
+		read_MB_layer_transform_size_8x8_flag > read_MB_layer_skip_transform_size_8x8_flag;
+		read_sub_MB_pred_ref_idx_l0 > read_sub_MB_pred_skip_ref_idx_l0;
+		read_sub_MB_pred_ref_idx_l1 > read_sub_MB_pred_skip_ref_idx_l1;
+		MB_pred_init_ref_idx_l1 > read_MB_pred_ref_idx_l0 > read_MB_pred_skip_ref_idx_l0;
+		MB_pred_init_mvd_l0 > read_MB_pred_ref_idx_l1 > read_MB_pred_skip_ref_idx_l1;
+		MB_pred_init_mvd_l1 >  read_MB_pred_mvd_l0 > read_MB_pred_skip_mvd_l0;
+		MB_pred_done  > read_MB_pred_mvd_l1 > read_MB_pred_skip_mvd_l1;
+		test_zero_byte > generic_done;
+		test_one_byte  > generic_done;
+	end
+
+end

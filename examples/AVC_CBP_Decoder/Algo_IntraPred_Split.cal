@@ -1,0 +1,170 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Florian Decologne (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
+  uint(size=1) MbIntraFlag, uint(size=4) IntraPredMode, 
+  uint(size=13) CurrMbAddr, uint(size=7) PicWidthInMb
+    ==>
+      int(size=PREDTYPE_SIZE) Intra_DC_flag, uint(size=4)PredMode,
+      uint (size=8) Mb_Type, uint (size=8) Mb_TypeC : 
+ 
+  uint(size=2) intratype := 0; // Intra4x4 1, Intra8x8 2, Intra16x16 3
+  uint(size=5) count := 16;
+  uint x:= 0;
+  uint y:= 0;
+  uint picW;
+  
+  List ( type: int(size=5), size= rshift(1920*1080,4)) intra4x4predmode;
+  List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
+  
+  // initialize intra4x4predmode to a huge list of 2's
+  initialize ==>
+  do
+    intra4x4predmode := [ 2 : for int i in Integers(0, rshift(1920*1080,4) - 1) ];
+  end
+  
+  function InverseScan4x4(uint(size=4) index, uint stride) --> uint :
+    (InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4)
+  end
+  
+  get_intratype.inter: action CurrMbAddr: [b], PicWidthInMb: [c], MbIntraFlag:[d] ==> Intra_DC_flag:[0], Mb_Type:[2], Mb_TypeC:[2]
+  guard
+    d=0 and count >= 16
+  do
+    picW := c; 
+    if b = 0 then intra4x4predmode := [ 2 : for int i in Integers( 0, rshift(1920*1080,4) - 1)]; end
+    x := b mod picW;
+    y := b / picW;
+  end
+    
+  get_intratype.intra: action IntraPredMode:[a], CurrMbAddr: [b], PicWidthInMb: [c], MbIntraFlag:[d] ==> Intra_DC_flag:[ if a = 3 then 1 else 0 end ], Mb_Type:[if a = 3 then 1 else 0 end], Mb_TypeC:[1]
+  guard
+    d=1 and count >= 16
+  do
+    intratype := a;
+    picW := c; 
+    if b = 0 then intra4x4predmode := [ 2 : for int i in Integers( 0, rshift(1920*1080,4) - 1 )]; end
+    x := b mod picW;
+    y := b / picW;
+    count := 0;
+  end
+  
+  get_intra4x4: action IntraPredMode:[a] ==> PredMode:[val]
+  guard
+    intratype = 1 and count <16
+  var 
+    uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2) + InverseScan4x4(count,lshift( picW,2)),
+    int(size=5) top, 
+	int(size=5) left, 
+	int(size=5) predicted, 
+	int(size=5) val    
+  do
+    if (CurrMb4x4Addr / lshift( picW,2)) = 0 then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
+         top:= -1;
+    else
+         top := intra4x4predmode[CurrMb4x4Addr - lshift(picW,2)];
+    end
+    if (CurrMb4x4Addr mod lshift( picW,2)) = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
+       left:= -1;
+    else
+       left := intra4x4predmode[CurrMb4x4Addr - 1];
+    end
+    if left < top then predicted := left; else predicted := top; end
+    if predicted < 0 then predicted := 2; end //INTRA_4x4_DC
+    if a < predicted then val := a; else val := a+1; end
+    if a = 15 then val := predicted; end
+    intra4x4predmode[CurrMb4x4Addr] := val;
+    count := count +1;
+  end
+  
+  get_intra8x8: action IntraPredMode:[a] ==> PredMode:[val] // Not yet tested
+  guard
+    intratype = 2 and count <16
+  var 
+    uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2) + InverseScan4x4(count,lshift( picW,2)),
+    uint CurrMb8x8Addr :=0,
+    int(size=5) top, 
+	int(size=5) left, 
+	int(size=5) predicted, 
+	int(size=5) val    
+  do
+    if (CurrMb4x4Addr / lshift( picW,2)) = 0 then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
+         top:= -1;
+    else
+         top := intra4x4predmode[CurrMb4x4Addr - lshift(picW,2)];
+    end
+    if (CurrMb4x4Addr mod lshift( picW,2)) = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
+       left:= -1;
+    else
+       left := intra4x4predmode[CurrMb4x4Addr - 1];
+    end
+    if left < top then predicted := left; else predicted := top; end
+    if predicted < 0 then predicted := 2; end //INTRA_4x4_DC
+    if a < predicted then val := a+1; else val := a; end
+    if a = 15 then val := predicted; end
+    println("Prediction : Intra8x8 "+CurrMb4x4Addr+" get "+a+" pred "+predicted+" --> val = "+val);
+    foreach int i in Integers(0,3) do
+      CurrMb8x8Addr := y * lshift( picW,4) + lshift(x,2) + InverseScan4x4(count+i,lshift( picW,2));
+      intra4x4predmode[CurrMb8x8Addr] := val;
+    end
+    count := count +4;
+  end
+  
+  get_intra16x16: action IntraPredMode:[a] ==> PredMode:[a]
+  guard
+    intratype = 3 and count <16    
+  do
+    count := 16;
+  end
+  
+end

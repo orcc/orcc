@@ -42,7 +42,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
         <Parameter name="doCompare">
-            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+            <Expr kind="Literal" literal-kind="Integer" value="0"/>
         </Parameter>
         <Parameter name="file">
             <Expr kind="Literal" literal-kind="String" value="D:/Projects/RVC/Cal2C_delivery/data/foreman_qcif_30.yuv"/>
@@ -60,6 +60,18 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="decoder" dst-port="bits" src="source" src-port="O"/>
-    <Connection dst="display" dst-port="B" src="decoder" src-port="VID"/>
+    <Connection dst="decoder" dst-port="bits" src="source" src-port="O">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="100"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="display" dst-port="B" src="decoder" src-port="VID">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="BinOpSeq">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                <Op name="*"/>
+                <Expr kind="Literal" literal-kind="Integer" value="64"/>
+            </Expr>
+        </Attribute>
+    </Connection>
 </XDF>
