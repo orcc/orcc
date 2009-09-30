@@ -216,11 +216,28 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		for (PhiAssignment phi : phis){
 			Map<VarDef, LabelNode> assignements = new HashMap<VarDef, LabelNode>();
 			VarDef varDef = phi.getVarDef();
+			AbstractType varType = varDef.getType();
 			List<VarUse> vars =  phi.getVars();
 			
 			VarDef trueVar = vars.get(0).getVarDef();
 			VarDef falseVar = vars.get(1).getVarDef();
-	
+
+			//Force varDef's type to phiNode type to prevent cast problem
+			if (varType instanceof IntType){
+				IntType intType = (IntType)varType;
+				if (trueVar.getType() instanceof IntType){
+					((IntType)trueVar.getType()).setSize(intType.getSize());
+				}else{		
+					trueVar.setType(varType);
+				}
+				
+				if (falseVar.getType() instanceof IntType){
+					((IntType)falseVar.getType()).setSize(intType.getSize());
+				}else{
+					falseVar.setType(varType);
+				}
+			}
+			
 			assignements.put(trueVar, labelTrueNode);
 			assignements.put(falseVar, labelFalseNode);
 
@@ -247,13 +264,8 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 					Map<VarDef, LabelNode> sourceAssignements = sourceNode.getAssignements();
 					for(Map.Entry<VarDef,LabelNode> sourceAssignement : sourceAssignements.entrySet()){
 						VarDef keyVar = sourceAssignement.getKey();
-						AbstractType keyVarType = keyVar.getType();
-						LabelNode valueLab = sourceAssignement.getValue();
-						
-						if ((targetType instanceof IntType) && (keyVarType instanceof IntType)){
-							((IntType)keyVarType).setSize(((IntType)targetType).getSize());
-						}
-
+						LabelNode valueLab = sourceAssignement.getValue();					
+						keyVar.setType(targetType);
 						
 						targetAssignements.put(keyVar, valueLab);
 					}
