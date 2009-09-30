@@ -43,6 +43,10 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.consts.AbstractConst;
+import net.sf.orcc.ir.consts.IntConst;
+import net.sf.orcc.ir.consts.ListConst;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.ListType;
@@ -249,22 +253,36 @@ public class LLVMActorPrinter {
 			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar.getDef());
 			stateTempl.setAttribute("vardef", varDefMap);
 
-			// initial value of state var (if any)
-			if (stateVar.hasInit()) {
-				AbstractType type;
-				VarDef varDef = stateVar.getDef();
+			//Get type of stateVar
+			AbstractType type;
+			VarDef varDef = stateVar.getDef();
+			
+			if (varDef.getType() instanceof PointType) {
+				PointType iType = (PointType) varDef.getType();
+				type = iType.getType();
+			} else {
+				type = varDef.getType();
+			}			
 				
-				if (varDef.getType() instanceof PointType) {
-					PointType iType = (PointType) varDef.getType();
-					type = iType.getType();
-				} else {
-					type = varDef.getType();
+			if (type instanceof ListType){
+				ListType listType = (ListType)type;
+				IntExpr listSize = (IntExpr)listType.getSize();
+				int size = listSize.getValue();
+				
+				if (!stateVar.hasInit()){
+					
+					List<AbstractConst> init = new ArrayList<AbstractConst>(listSize.getValue());
+					for (int i=0; i < size; i++){
+						init.add(new IntConst(0));
+					}
+					stateVar.setInit(new ListConst(init));
 				}
-				
 				constPrinter.setTemplate(stateTempl);
-				if (type instanceof ListType){
-					stateVar.getInit().accept(constPrinter, type);
-				}else {
+				stateVar.getInit().accept(constPrinter, type);
+			}else {
+				// initial value of state var (if any)
+				if (stateVar.hasInit()) {
+					constPrinter.setTemplate(stateTempl);
 					stateVar.getInit().accept(constPrinter);
 				}
 			}
