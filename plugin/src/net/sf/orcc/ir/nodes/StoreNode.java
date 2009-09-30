@@ -84,4 +84,8 @@ public class StoreNode extends AbstractNode {
 		return target.toString() + indexes + " = " + value;
 	}
 
+	public void setIndexes(List<IExpr> indexes) {
+		this.indexes = indexes;
+	}
+
 }

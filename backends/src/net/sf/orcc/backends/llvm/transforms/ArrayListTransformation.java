@@ -40,9 +40,12 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.LoadNode;
+import net.sf.orcc.ir.nodes.StoreNode;
+import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.ListType;
 
 /**
@@ -70,9 +73,46 @@ public class ArrayListTransformation extends AbstractNodeVisitor {
 		}
 	}
 
+	private VarDef varDefCreate(VarDef varDef, AbstractType type) {
+		int index = varDef.getIndex();
+		String name = varDef.getName();
+		int suffix;
+		if (varDef.hasSuffix()){
+			suffix=varDef.getSuffix();
+		}else{
+			suffix=0;
+		}
+		
+		
+		return new  VarDef(false, false, index + 1,
+				new Location(), name, null, null, suffix, new PointType(type));
+	}
+	
 	@SuppressWarnings("unchecked")
-	public void visit(LoadNode node, Object... args) {
+	public VarUse getElementPtrNodeCreate(VarUse varList, List<IExpr> indexes, Object... args){
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		
+		it.previous();
+
+		// Adding the getElementPtrNode
+		VarDef varDefList = varList.getVarDef();
+		ListType listType = (ListType) varDefList.getType();
+
+		VarDef varDef = varDefCreate (varDefList, listType.getType());
+		VarUse varUse = new VarUse(varDef, null);
+
+		// Create and insert the new node
+		GetElementPtrNode elementPtrNode = new GetElementPtrNode(0,
+				new Location(), varDef, varList, indexes);
+
+		it.add(elementPtrNode);
+		it.next();
+		
+		return varUse;
+	}
+	
+	
+	public void visit(LoadNode node, Object... args) {
 
 		List<IExpr> indexes = node.getIndexes();
 
@@ -86,29 +126,31 @@ public class ArrayListTransformation extends AbstractNodeVisitor {
 				}
 			} catch (NumberFormatException e) {
 			}
-
-			it.previous();
-
-			// Adding the getElementPtrNode
-			VarUse sourceUse = node.getSource();
-			VarDef sourceVar = sourceUse.getVarDef();
-			ListType sourceType = (ListType) sourceVar.getType();
-			VarDef targetVar = node.getTarget();
-
-			VarDef varDef = new VarDef(false, false, targetVar.getIndex() + 1,
-					new Location(), targetVar.getName(), null, null, targetVar
-							.getSuffix(), new PointType(sourceType.getType()));
-			VarUse varUse = new VarUse(varDef, node);
-
-			// Create and insert the new node
-			GetElementPtrNode elementPtrNode = new GetElementPtrNode(0,
-					new Location(), varDef, node.getSource(), indexes);
-
-			it.add(elementPtrNode);
-			it.next();
-
+			
 			// Insert the new VarDef in the load node
-			node.setSource(varUse);
+			node.setSource(getElementPtrNodeCreate(node.getSource(), indexes, args));
+		}
+	}
+	
+	public void visit(StoreNode node, Object... args) {
+
+		List<IExpr> indexes = node.getIndexes();
+
+		if (indexes.size() > 0) {
+			IExpr expr = indexes.get(0);
+			try {
+				// Check if the array is an only value
+				if ((Integer.parseInt(expr.toString()) == 0)
+						&& (indexes.size() == 1)) {
+					return;
+				}
+			} catch (NumberFormatException e) {
+			}
+			
+			VarUse targetVar = node.getTarget();
+			
+			// Insert the new VarDef in the store node
+			node.setTarget(getElementPtrNodeCreate(targetVar, node.getIndexes(), args));
 		}
 	}
 

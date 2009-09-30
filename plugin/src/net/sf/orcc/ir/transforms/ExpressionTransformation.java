@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.transforms;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -44,6 +45,7 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.type.AbstractType;
 
@@ -137,6 +139,25 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<IExpr> splitIndex(List<IExpr> indexes, Object... args){
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];		
+		List<IExpr> tmpIndexes = new ArrayList<IExpr>();
+		
+		for (IExpr index : indexes){
+			if (index instanceof BinaryExpr){
+				VarExpr expr = splitBinaryExpr((BinaryExpr)index, it);
+				tmpIndexes.add(expr);
+			}
+			else{
+				tmpIndexes.add(index);
+			}
+		}
+		
+		return tmpIndexes;
+		
+	}
+	
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -146,6 +167,21 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 		if (node.getValue() instanceof BinaryExpr) {			
 			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getValue(), it);
 			node.setValue(expr);
+		}
+		
+		List<IExpr> indexes = node.getIndexes();
+		if (!indexes.isEmpty()) {			
+			node.setIndexes(splitIndex(indexes,args));
+		}
+	}
+	
+	
+	@Override
+	public void visit(LoadNode node, Object... args) {
+		List<IExpr> indexes = node.getIndexes();
+	
+		if (!indexes.isEmpty()) {			
+			node.setIndexes(splitIndex(indexes,args));
 		}
 	}
 
