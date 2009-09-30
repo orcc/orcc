@@ -91,9 +91,9 @@ actor MemoryManager (
   int BLOCKBITS       = 4;
 
   int COMPSHIFT     = BLOCKBITS;
-  int XSHIFT        = 7;
-  int YSHIFT        = 13;
-  int FRAMESHIFT    = 18;
+  int XSHIFT        = COMPSHIFT + COMPBITS;
+  int YSHIFT        = XSHIFT + XBITS;
+  int FRAMESHIFT    = YSHIFT + YBITS;
 
   int(size=COMPBITS+1)  comp := 0;
   int(size=YBITS+1)     this_mby;

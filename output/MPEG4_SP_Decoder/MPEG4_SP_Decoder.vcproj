@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\runtime\libapr\include;..\..\runtime\liborcc\scheduler;&quot;..\..\runtime\SDL-1.2.13\include&quot;;&quot;..\..\runtime\SDL_image-1.2.7\include&quot;"
+				AdditionalIncludeDirectories="..\..\runtime\libapr\include;..\..\runtime\liborcc\include;&quot;..\..\runtime\SDL-1.2.13\include&quot;;&quot;..\..\runtime\SDL_image-1.2.7\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -120,7 +120,7 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
-				AdditionalIncludeDirectories="..\..\runtime\libapr\include;..\..\runtime\liborcc\scheduler;&quot;..\..\runtime\SDL-1.2.13\include&quot;;&quot;..\..\runtime\SDL_image-1.2.7\include&quot;"
+				AdditionalIncludeDirectories="..\..\runtime\libapr\include;..\..\runtime\liborcc\include;&quot;..\..\runtime\SDL-1.2.13\include&quot;;&quot;..\..\runtime\SDL_image-1.2.7\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -313,11 +313,15 @@
 				Name="orcc runtime"
 				>
 				<File
-					RelativePath="..\..\runtime\liborcc\actors\display.c"
+					RelativePath="..\..\runtime\liborcc\src\actors\display.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\runtime\liborcc\actors\source.c"
+					RelativePath="..\..\runtime\liborcc\src\orcc_util.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\runtime\liborcc\src\actors\source.c"
 					>
 				</File>
 			</Filter>
@@ -328,7 +332,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\runtime\liborcc\scheduler\fifo.h"
+				RelativePath="..\..\runtime\liborcc\include\fifo.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\runtime\liborcc\include\orcc_util.h"
 				>
 			</File>
 		</Filter>
