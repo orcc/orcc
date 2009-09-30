@@ -176,7 +176,9 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 				thenLabelNode = nextLabelNode;			
 			}else if (elseNodes.isEmpty()){
 				elseLabelNode = nextLabelNode;
-			} 
+			} else {
+				thenNodes.add(new BrLabelNode(0, new Location(),nextLabelNode));
+			}
 			
 		}else{
 			
