@@ -149,6 +149,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	@Override
 	public void visit(BrNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("brNode");
+		List<AbstractNode> conditionNodes = node.getConditionNodes();
 		List<AbstractNode> thenNodes = node.getThenNodes();
 		List<AbstractNode> elseNodes = node.getElseNodes();
 		List<PhiNode> phiNodes = node.getPhiNodes();
@@ -164,6 +165,11 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		String previousAttrName = attrName;
 		template = nodeTmpl;
 
+		attrName = "conditionNodes";
+		for (AbstractNode subNode : conditionNodes) {
+			subNode.accept(this, args);
+		}
+		
 		attrName = "thenNodes";
 		for (AbstractNode subNode : thenNodes) {
 			subNode.accept(this, args);

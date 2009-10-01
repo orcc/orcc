@@ -46,7 +46,7 @@ public abstract class AbstractLLVMNode extends AbstractNode {
 
 	public void accept(NodeVisitor visitor, Object... args) {
 		if (visitor instanceof LLVMNodeVisitor) {
-			accept((LLVMNodeVisitor) visitor);
+			accept((LLVMNodeVisitor) visitor, args);
 		}
 	}
 

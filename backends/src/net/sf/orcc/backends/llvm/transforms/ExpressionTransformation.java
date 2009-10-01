@@ -26,28 +26,28 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.transforms;
+package net.sf.orcc.backends.llvm.transforms;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
+import net.sf.orcc.backends.llvm.nodes.BrNode;
+import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
-import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.AbstractType;
 
 
@@ -57,7 +57,7 @@ import net.sf.orcc.ir.type.AbstractType;
  * @author Jérôme GORIN
  * 
  */
-public class ExpressionTransformation extends AbstractNodeVisitor {
+public class ExpressionTransformation extends AbstractLLVMNodeVisitor {
 
 	int exprCounter;
 
@@ -79,20 +79,29 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(IfNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
-		
+	public void visit(BrNode node, Object... args) {
+	
 		if (node.getCondition() instanceof BinaryExpr) {
-			
-			BinaryExpr binExpr = (BinaryExpr)node.getCondition();
-			VarExpr expr = splitBinaryExpr(binExpr, it);
+			ListIterator<AbstractNode> itConditionNodes = node.getConditionNodes().listIterator();	
+			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getCondition(), itConditionNodes);
 
 			node.setCondition(expr);
 		}
 
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void visit(SelectNode node, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
+		if (node.getCondition() instanceof BinaryExpr) {
+			it.previous();
+			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getCondition(), args);
+			it.next();
+			node.setCondition(expr);
+		}
 	}
 	
 	@Override
@@ -102,6 +111,7 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 		IExpr value = node.getValue();
 		
 		if (value instanceof BinaryExpr){
+			it.previous();
 			BinaryExpr expr = (BinaryExpr)value;
 			if (expr.getE1() instanceof BinaryExpr){
 				expr.setE1(splitBinaryExpr((BinaryExpr)expr.getE1(), it));
@@ -110,6 +120,7 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 			if (expr.getE2() instanceof BinaryExpr){
 				expr.setE2(splitBinaryExpr((BinaryExpr)expr.getE2(), it));
 			}
+			it.next();
 		}
 	}
 	
@@ -132,9 +143,7 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 		AssignVarNode assignNode = new AssignVarNode(0, new Location(),
 				vardef, expr);
 		
-		it.previous();
-		it.add(assignNode);
-		it.next();
+			it.add(assignNode);
 		
 		return varexpr;
 		
@@ -164,39 +173,32 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 	@SuppressWarnings("unchecked")
 	public void visit(StoreNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-
-		if (node.getValue() instanceof BinaryExpr) {			
+		
+		if (node.getValue() instanceof BinaryExpr) {
+			it.previous();
 			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getValue(), it);
+			it.next();
 			node.setValue(expr);
 		}
 		
 		List<IExpr> indexes = node.getIndexes();
-		if (!indexes.isEmpty()) {			
+		if (!indexes.isEmpty()) {
+			it.previous();
 			node.setIndexes(splitIndex(indexes,args));
+			it.next();
 		}
 	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(WhileNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		
-		if (node.getCondition() instanceof BinaryExpr) {
-			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getCondition(), it);
-			node.setCondition(expr);
-		}
-		
-		visitNodes(node.getNodes());
-		
-	}
-
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(LoadNode node, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		List<IExpr> indexes = node.getIndexes();
 	
-		if (!indexes.isEmpty()) {			
+		if (!indexes.isEmpty()) {
+			it.previous();
 			node.setIndexes(splitIndex(indexes,args));
+			it.next();
 		}
 	}
 

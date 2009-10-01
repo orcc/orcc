@@ -51,6 +51,10 @@ public class SelectNode extends AbstractLLVMNode {
 		this.phis = phis;
 	}
 
+	public void setCondition(IExpr condition) {
+		this.condition = condition;
+	}
+
 	@Override
 	public void accept(LLVMNodeVisitor visitor, Object... args) {
 		visitor.visit(this, args);

@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Location;
@@ -42,6 +43,8 @@ import net.sf.orcc.ir.nodes.IfNode;
 public class BrNode extends AbstractLLVMNode {
 
 	private IExpr condition;
+	
+	private List<AbstractNode> conditionNodes;
 
 	private List<AbstractNode> elseNodes;
 
@@ -63,6 +66,7 @@ public class BrNode extends AbstractLLVMNode {
 			LabelNode labelTrueNode, LabelNode labelFalseNode,
 			LabelNode labelEndNode) {
 		super(node.getId(), node.getLocation());
+		this.conditionNodes = new ArrayList<AbstractNode>();
 		this.condition = node.getCondition();
 		this.elseNodes = node.getElseNodes();
 		this.thenNodes = node.getThenNodes();
@@ -73,11 +77,12 @@ public class BrNode extends AbstractLLVMNode {
 		this.phiNodes = phiNodes;
 	}
 
-	public BrNode(int id, Location location, IExpr condition,
+	public BrNode(int id, Location location, IExpr condition, List<AbstractNode> conditionNodes,
 			List<AbstractNode> thenNodes, List<AbstractNode> elseNodes, List<PhiNode> phiNodes,
 			LabelNode labelEntryNode, LabelNode labelTrueNode, LabelNode labelFalseNode,
 			LabelNode labelEndNode) {
 		super(id, location);
+		this.conditionNodes = conditionNodes;
 		this.condition = condition;
 		this.phiNodes = phiNodes;
 		this.elseNodes = elseNodes;
@@ -162,6 +167,14 @@ public class BrNode extends AbstractLLVMNode {
 	public String toString() {
 		return "br i1 " + condition + ", label " + labelTrueNode + ", label "
 				+ labelFalseNode;
+	}
+
+	public void setConditionNodes(List<AbstractNode> conditionNodes) {
+		this.conditionNodes = conditionNodes;
+	}
+
+	public List<AbstractNode> getConditionNodes() {
+		return conditionNodes;
 	}
 
 }

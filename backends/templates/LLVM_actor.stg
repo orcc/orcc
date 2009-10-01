@@ -115,7 +115,8 @@ SextNode(var, type, expr) ::= <<
 >>
 
 // brnode
-brNode(expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
+brNode(conditionNodes, expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
+$conditionNodes$
 	br $expr$, label %$thenLabelNode$, label %$elseLabelNode$
 
 $if(thenNodes)$

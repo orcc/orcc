@@ -97,6 +97,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		int id = node.getId();
 		Location location = node.getLocation();
 		IExpr condition = node.getCondition();
+		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
 		List<AbstractNode> thenNodes = node.getThenNodes();
 		List<AbstractNode> elseNodes = node.getElseNodes();
 		JoinNode joinNode = node.getJoinNode();
@@ -204,7 +205,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			}
 		}
 			
-		return new BrNode(id, location, condition, thenNodes, elseNodes, phiNodes,
+		return new BrNode(id, location, condition, conditionNodes, thenNodes, elseNodes, phiNodes,
 				entryLabelNode, thenLabelNode, elseLabelNode,
 				endLabelNode);
 	}
@@ -360,6 +361,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		int id = node.getId();
 		Location location= node.getLocation();
 		IExpr condition = node.getCondition();
+		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
 		List<AbstractNode> thenNodes = node.getNodes();
 		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
 		JoinNode joinNode = node.getJoinNode();
@@ -378,7 +380,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		for (PhiNode phiNode : phiNodes){
 			it.add(phiNode);
 		}
-		joinNode.getPhis().clear();
+		phiNodes.clear();
 		
 		//Store current iterator and branch label
 		ListIterator<AbstractNode> itTmp = it;
@@ -400,7 +402,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		
 		
 		//Add BrNode into the current function
-		it.add(new BrNode(id, location, condition, thenNodes, elseNodes, phiNodes,
+		it.add(new BrNode(id, location, condition, conditionNodes, thenNodes, elseNodes, phiNodes,
 				entryLabelNode, thenLabelNode, elseLabelNode, endLabelNode));
 		
 	}

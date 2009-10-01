@@ -35,6 +35,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.llvm.transforms.ArrayListTransformation;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
+import net.sf.orcc.backends.llvm.transforms.ExpressionTransformation;
 import net.sf.orcc.backends.llvm.transforms.TypeTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
@@ -43,7 +44,6 @@ import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.AssignPeephole;
 import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
 import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
-import net.sf.orcc.ir.transforms.ExpressionTransformation;
 
 /**
  * LLVM back-end.
@@ -83,10 +83,10 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		new EmptyNodeRemoval(actor);
-		new ExpressionTransformation(actor);
 		new CorrectBinaryExpressionType(actor);
 		new AssignPeephole(actor);
 		new ControlFlowTransformation(actor);
+		new ExpressionTransformation(actor);
 		new AddInstantationProcedure(actor);
 		new ArrayListTransformation(actor);
 		new TypeTransformation(actor);
