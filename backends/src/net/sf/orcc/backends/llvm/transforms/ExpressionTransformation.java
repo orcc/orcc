@@ -47,6 +47,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.LoadNode;
+import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.type.AbstractType;
 
@@ -101,6 +102,18 @@ public class ExpressionTransformation extends AbstractLLVMNodeVisitor {
 			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getCondition(), args);
 			it.next();
 			node.setCondition(expr);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void visit(ReturnNode node, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
+		if (node.getValue() instanceof BinaryExpr) {
+			it.previous();
+			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getValue(), args);
+			it.next();
+			node.setValue(expr);
 		}
 	}
 	
