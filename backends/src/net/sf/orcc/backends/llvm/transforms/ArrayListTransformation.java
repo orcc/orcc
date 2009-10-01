@@ -31,6 +31,8 @@ package net.sf.orcc.backends.llvm.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
+import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.Location;
@@ -40,9 +42,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.type.AbstractType;
@@ -54,7 +54,7 @@ import net.sf.orcc.ir.type.ListType;
  * @author Jérôme GORIN
  * 
  */
-public class ArrayListTransformation extends AbstractNodeVisitor {
+public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 
 	public ArrayListTransformation(Actor actor) {
 
@@ -111,6 +111,11 @@ public class ArrayListTransformation extends AbstractNodeVisitor {
 		return varUse;
 	}
 	
+	@Override
+	public void visit(BrNode node, Object... args) {
+		visitNodes(node.getThenNodes());
+		visitNodes(node.getElseNodes());
+	}
 	
 	public void visit(LoadNode node, Object... args) {
 
