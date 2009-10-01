@@ -354,6 +354,9 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 	@Override
 	public void visit(WhileNode node, Object... args) {
 		
+		it.remove();
+		
+		//Get whileNode information
 		int id = node.getId();
 		Location location= node.getLocation();
 		IExpr condition = node.getCondition();
@@ -361,16 +364,42 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
 		JoinNode joinNode = node.getJoinNode();
 		LabelNode entryLabelNode = labelNode;
+		LabelNode conditionLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
 		LabelNode thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		
+		//Create PhiNode
+		List<PhiNode> phiNodes = phiNodeCreate(joinNode, entryLabelNode, thenLabelNode);
+		
+		it.add(new BrLabelNode(0, new Location(), conditionLabelNode));
+		
+		it.add(conditionLabelNode);
+		
+		//Add PhiNodes
+		for (PhiNode phiNode : phiNodes){
+			it.add(phiNode);
+		}
+		joinNode.getPhis().clear();
+		
+		//Store current iterator and branch label
+		ListIterator<AbstractNode> itTmp = it;
+		labelNode = thenLabelNode;
+		
+		// Continue transformation on thenNode
+		visitNodes(thenNodes, node);
+		
+		//Restore current iterator
+		it = itTmp;
+		
+		//Add branch to first conditions
+		thenNodes.add(new BrLabelNode(0, new Location(), conditionLabelNode));
+		
+		//Set endNode
 		LabelNode elseLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
 		LabelNode endLabelNode = elseLabelNode;
-		thenNodes.add(new BrLabelNode(0, new Location(), endLabelNode));
 		labelNode = endLabelNode;
 		
 		
-		List<PhiNode> phiNodes = phiNodeCreate(joinNode, entryLabelNode, thenLabelNode);	
-		
-		it.remove();
+		//Add BrNode into the current function
 		it.add(new BrNode(id, location, condition, thenNodes, elseNodes, phiNodes,
 				entryLabelNode, thenLabelNode, elseLabelNode, endLabelNode));
 		

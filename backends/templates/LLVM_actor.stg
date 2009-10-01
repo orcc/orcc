@@ -453,13 +453,17 @@ $if(initializes)$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Initializes
 $initializes$
-void $name$_initialize() {
-	int res = 1;
-	int i = 0;
-
+define internal void @$name$_initialize() {
+entry:
+	%i = alloca i32
+	store i32 0, i32* %i
+	br label %bb
+	
+bb:  
 $if(initialize)$
 $schedulingTest(actorName=name, actions=initialize)$
 $endif$
+	ret void
 }
 
 $endif$
