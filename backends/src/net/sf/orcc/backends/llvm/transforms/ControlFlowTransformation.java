@@ -55,6 +55,7 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.ReturnNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.VoidType;
@@ -348,6 +349,31 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			it.add(brNode);
 		}
 
+	}
+	
+	@Override
+	public void visit(WhileNode node, Object... args) {
+		
+		int id = node.getId();
+		Location location= node.getLocation();
+		IExpr condition = node.getCondition();
+		List<AbstractNode> thenNodes = node.getNodes();
+		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
+		JoinNode joinNode = node.getJoinNode();
+		LabelNode entryLabelNode = labelNode;
+		LabelNode thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		LabelNode elseLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		LabelNode endLabelNode = elseLabelNode;
+		thenNodes.add(new BrLabelNode(0, new Location(), endLabelNode));
+		labelNode = endLabelNode;
+		
+		
+		List<PhiNode> phiNodes = phiNodeCreate(joinNode, entryLabelNode, thenLabelNode);	
+		
+		it.remove();
+		it.add(new BrNode(id, location, condition, thenNodes, elseNodes, phiNodes,
+				entryLabelNode, thenLabelNode, elseLabelNode, endLabelNode));
+		
 	}
 
 	private void visitNodes(List<AbstractNode> nodes, Object... args) {

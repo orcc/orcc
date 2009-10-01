@@ -56,6 +56,8 @@ import net.sf.orcc.ir.type.ListType;
  */
 public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 
+	int indexName;
+	
 	public ArrayListTransformation(Actor actor) {
 
 		for (Procedure proc : actor.getProcs()) {
@@ -75,7 +77,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 
 	private VarDef varDefCreate(VarDef varDef, AbstractType type) {
 		int index = varDef.getIndex();
-		String name = varDef.getName();
+		String name = varDef.getName()+ Integer.toString(indexName++);
 		int suffix;
 		if (varDef.hasSuffix()){
 			suffix=varDef.getSuffix();
@@ -83,8 +85,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 			suffix=0;
 		}
 		
-		
-		return new  VarDef(false, false, index + 1,
+		return new  VarDef(false, false, index,
 				new Location(), name, null, null, suffix, new PointType(type));
 	}
 	
@@ -168,6 +169,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 	}
 
 	private void visitProc(Procedure proc) {
+		indexName = 0;
 		List<AbstractNode> nodes = proc.getNodes();
 
 		visitNodes(nodes);

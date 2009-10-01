@@ -202,13 +202,6 @@ storeNode(var, expr) ::= <<
 
 >>
 
-// while node
-whileNode(expr, nodes) ::= <<
-while ($expr$) {
-	$nodes$}
-
->>
-
 // hasRoom node
 hasRoomNode(var, expr, token) ::= <<
 	%$var$ =  call i1 @lff_hasRoom(%struct.lff_t* $expr$, i32 $token$)
@@ -457,16 +450,16 @@ $procs$
 ; Actions
 $actions$
 $if(initializes)$
-////////////////////////////////////////////////////////////////////////////////
-// Initializes
+;////////////////////////////////////////////////////////////////////////////////
+;// Initializes
 $initializes$
 void $name$_initialize() {
 	int res = 1;
 	int i = 0;
 
-	$if(initialize)$
-	$schedulingTest(actorName=name, actions=initialize)$
-	$endif$
+$if(initialize)$
+$schedulingTest(actorName=name, actions=initialize)$
+$endif$
 }
 
 $endif$

@@ -47,6 +47,7 @@ import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.AbstractType;
 
 
@@ -174,7 +175,21 @@ public class ExpressionTransformation extends AbstractNodeVisitor {
 			node.setIndexes(splitIndex(indexes,args));
 		}
 	}
-	
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(WhileNode node, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		
+		if (node.getCondition() instanceof BinaryExpr) {
+			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getCondition(), it);
+			node.setCondition(expr);
+		}
+		
+		visitNodes(node.getNodes());
+		
+	}
+
 	
 	@Override
 	public void visit(LoadNode node, Object... args) {
