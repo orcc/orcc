@@ -332,7 +332,7 @@ $if(nextState.action.outputPattern)$
 	br i1 %sched_$nextState.action.tag$, label %$nextState.action.tag$, label %$br$
 
 $nextState.action.tag$:
-$nextState.action.outputPattern.keys:{port|$outputPattern(actorName=actorName, pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator)$}$
+$first(nextState.action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator)$}$ $rest(nextState.action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator.nextNodeIndex)$}$
 	br i1 %$iterator.nextNodeIndex.lastIndex$, label %n_$nextState.action.tag$, label %$br$
 
 n_$nextState.action.tag$:
