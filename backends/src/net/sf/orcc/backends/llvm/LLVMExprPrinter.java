@@ -29,11 +29,11 @@
 package net.sf.orcc.backends.llvm;
 
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.ExprVisitor;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -42,7 +42,6 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.AbstractType;
-import net.sf.orcc.ir.type.BoolType;
 
 /**
  * 
@@ -146,8 +145,9 @@ public class LLVMExprPrinter implements ExprVisitor {
 	public void visit(BooleanExpr expr, Object... args ) {
 		
 		if (args[0] instanceof AbstractType){
-			String type = typePrinter.toString(new BoolType());
-			builder.append(type+" ");
+			AbstractType type = (AbstractType)args[0];
+			String typeStr = typePrinter.toString(type);
+			builder.append(typeStr+" ");
 		}
 		builder.append(expr.getValue() ? "1" : "0");
 	}

@@ -136,7 +136,7 @@ public class LLVMActorPrinter {
 
 		// body
 		LLVMNodePrinter printer = new LLVMNodePrinter(group, procTmpl,
-				actorName, varDefPrinter, exprPrinter, typePrinter);
+				actorName, proc, varDefPrinter, exprPrinter, typePrinter);
 		for (AbstractNode node : proc.getNodes()) {
 			node.accept(printer);
 		}
@@ -226,7 +226,7 @@ public class LLVMActorPrinter {
 
 			// body
 			LLVMNodePrinter printer = new LLVMNodePrinter(group, instTmpl,
-					actorName, varDefPrinter, exprPrinter, typePrinter);
+					actorName, proc, varDefPrinter, exprPrinter, typePrinter);
 
 			for (AbstractNode node : proc.getNodes()) {
 				node.accept(printer, count);

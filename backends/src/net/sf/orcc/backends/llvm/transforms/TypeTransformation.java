@@ -389,7 +389,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(IntExpr expr, Object... args) {
-
+		
 	}
 
 	@Override
@@ -475,7 +475,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	public void visit(StringExpr expr, Object... args) {
 
 	}
-
+	
 	@Override
 	public void visit(TypeExpr expr, Object... args) {
 

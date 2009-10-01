@@ -94,12 +94,15 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	private LLVMTypePrinter typeToString;
 
 	private LLVMVarDefPrinter varDefPrinter;
+	
+	private Procedure procedure;
 
 	public LLVMNodePrinter(StringTemplateGroup group, StringTemplate template,
-			String actorName, LLVMVarDefPrinter varDefPrinter,
+			String actorName, Procedure procedure, LLVMVarDefPrinter varDefPrinter,
 			LLVMExprPrinter exprPrinter, LLVMTypePrinter typeToString) {
 		attrName = "nodes";
 		this.actorName = actorName;
+		this.procedure = procedure;
 		this.group = group;
 		this.template = template;
 		this.varDefPrinter = varDefPrinter;
@@ -373,7 +376,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	public void visit(ReturnNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("returnNode");
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
-				new IntType(new IntExpr(new Location(), 32))));
+				procedure.getReturnType()));
 		template.setAttribute(attrName, nodeTmpl);
 	}
 
