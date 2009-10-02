@@ -38,6 +38,7 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
  * Removes empty nodes from procedure.
@@ -67,6 +68,11 @@ public class EmptyNodeRemoval extends AbstractNodeVisitor {
 	public void visit(IfNode node, Object... args) {
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
+	}
+	
+	@Override
+	public void visit(WhileNode node, Object... args) {
+		visitNodes(node.getNodes());
 	}
 
 	@Override

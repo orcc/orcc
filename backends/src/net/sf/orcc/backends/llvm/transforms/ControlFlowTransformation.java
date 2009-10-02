@@ -366,40 +366,53 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
 		JoinNode joinNode = node.getJoinNode();
 		LabelNode entryLabelNode = labelNode;
-		LabelNode conditionLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		LabelNode conditionLabelNode = entryLabelNode;
+		
+		if (args.length == 0 ) {
+			conditionLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+			it.add(new BrLabelNode(0, new Location(), conditionLabelNode));
+	
+			it.add(conditionLabelNode);
+			
+		}else if (args[0] instanceof WhileNode){
+			conditionLabelNode = entryLabelNode;
+		}	
+		
 		LabelNode thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
 		
-		//Create PhiNode
-		List<PhiNode> phiNodes = phiNodeCreate(joinNode, entryLabelNode, thenLabelNode);
-		
-		it.add(new BrLabelNode(0, new Location(), conditionLabelNode));
-		
-		it.add(conditionLabelNode);
-		
-		//Add PhiNodes
-		for (PhiNode phiNode : phiNodes){
-			it.add(phiNode);
-		}
-		phiNodes.clear();
 		
 		//Store current iterator and branch label
 		ListIterator<AbstractNode> itTmp = it;
-		labelNode = thenLabelNode;
-		
+				
 		// Continue transformation on thenNode
 		visitNodes(thenNodes, node);
 		
 		//Restore current iterator
 		it = itTmp;
 		
-		//Add branch to first conditions
-		thenNodes.add(new BrLabelNode(0, new Location(), conditionLabelNode));
+		labelNode = thenLabelNode;
+		
+
+		
+		
 		
 		//Set endNode
 		LabelNode elseLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
 		LabelNode endLabelNode = elseLabelNode;
 		labelNode = endLabelNode;
 		
+		//Create PhiNode
+		List<PhiNode> phiNodes = phiNodeCreate(joinNode, entryLabelNode, elseLabelNode);
+		
+		//Move PhiNodes in current node 
+		for (PhiNode phiNode : phiNodes){
+			it.add(phiNode);
+		}
+		
+		phiNodes.clear();
+		
+		//Add branch to first conditions
+		thenNodes.add(new BrLabelNode(0, new Location(), entryLabelNode));	
 		
 		//Add BrNode into the current function
 		it.add(new BrNode(id, location, condition, conditionNodes, thenNodes, elseNodes, phiNodes,

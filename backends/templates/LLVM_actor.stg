@@ -40,7 +40,7 @@ stateVar(vardef, value) ::= <<
 $if(value)$
 $vardef(vardef)$ $value$$\n$
 $else$
-$vardef(vardef)$ 0$\n$
+$vardef(vardef)$ zeroinitializer$\n$
 $endif$
 >>
 
@@ -65,7 +65,7 @@ call $return$ @$name$($parameters; separator=", "$)
 
 // getElementPtrNode node
 getElementPtrNode(target, source, indexes) ::= <<
-	$target$ = getelementptr $source$, i32 0, $indexes : {$it; separator=", "$}$
+	$target$ = getelementptr $source$, i32 0, $indexes; separator=", "$
 
 >>
 
