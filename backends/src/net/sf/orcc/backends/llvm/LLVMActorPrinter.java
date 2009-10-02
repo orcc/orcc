@@ -43,14 +43,9 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
-import net.sf.orcc.ir.consts.AbstractConst;
-import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.ir.consts.StringConst;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.AbstractType;
-import net.sf.orcc.ir.type.ListType;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;

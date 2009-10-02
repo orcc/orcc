@@ -95,11 +95,16 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 		
 		it.previous();
 
+		AbstractType listType;
+		
 		// Adding the getElementPtrNode
 		VarDef varDefList = varList.getVarDef();
-		ListType listType = (ListType) varDefList.getType();
+		listType= varDefList.getType();
+		while (listType instanceof ListType){
+			listType = ((ListType) listType).getType();
+		}
 
-		VarDef varDef = varDefCreate (varDefList, listType.getType());
+		VarDef varDef = varDefCreate (varDefList, listType);
 		VarUse varUse = new VarUse(varDef, null);
 
 		// Create and insert the new node

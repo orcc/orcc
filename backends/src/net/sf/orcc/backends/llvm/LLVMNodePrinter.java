@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -233,10 +234,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef,
 				true));
 
-		List<IExpr> indexes = node.getIndexes();
-		for (IExpr index : indexes) {
-			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index, varDef
-					.getType()));
+		for (IExpr index : node.getIndexes()) {
+			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index, new IntType(new IntExpr(new Location(), 32))));		
 		}
 
 		template.setAttribute(attrName, nodeTmpl);
