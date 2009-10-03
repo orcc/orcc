@@ -139,11 +139,11 @@ List(type:uint(size=SAMPLE_SZ), size=MB_WIDTH) upFifo_cbp_blk :=  [0: for int l 
 
 List(type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) upFifo_valQP :=  [0: for int l in Integers( 0, MB_WIDTH-1)];
 
-List(type:List(type:uint(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_MV0 :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
-List(type:List(type:uint(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_MV1 :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
+List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_MV0 :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
+List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_MV1 :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
 
-List(type:List(type:uint(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_ref_pic_id :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
-List(type:List(type:uint(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_refPicIDX :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
+List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_ref_pic_id :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
+List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_refPicIDX :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
 
 ////////////////
 // ROM Tables //
@@ -299,6 +299,13 @@ StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>
       up_list0_ref_pic_id := [ upFifo_list0_ref_pic_id[mb_x][i] : for int i in Integers(0, 16-1) ];
       up_list0_refPicIDX :=  [ upFifo_list0_refPicIDX[mb_x][i] : for int i in Integers(0, 16-1) ];
     else
+      up_mb_type :=0;
+      up_cbp_blk:=0;
+      up_QP:=0;
+      up_list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
+      up_list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
+      up_list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
+      up_list0_refPicIDX :=  [ 0 : for int i in Integers(0, 16-1) ];
       up_mb := [[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)];     
     end      
     if (mb_x != 0) then
@@ -315,6 +322,13 @@ StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>
       left_list0_ref_pic_id := [ upFifo_list0_ref_pic_id[mb_x-1][i] : for int i in Integers(0, 16-1) ];
       left_list0_refPicIDX :=  [ upFifo_list0_refPicIDX[mb_x-1][i] : for int i in Integers(0, 16-1) ];
     else
+      left_mb_type :=0;
+      left_cbp_blk:=0;
+      left_QP:=0;
+      left_list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
+      left_list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
+      left_list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
+      left_list0_refPicIDX :=  [ 0 : for int i in Integers(0, 16-1) ];      left_mb := [[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)]; 
       left_mb := [[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)]; 
     end
   end    
