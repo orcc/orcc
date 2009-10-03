@@ -79,13 +79,13 @@ actor Mgnt_MVR ( int MV_SZ, int Idx_SZ, int MODE_SZ)
     refidx := [ -2 : for int i in Integers(0, rshift(1920*1080, 4) - 1) ];
   end
   
-  get_pos.intra: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c] ==>
+  get_pos_intra: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c] ==>
   guard
   	count >= 16,
     c = 1
   end
   
-  get_pos.inter: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c] ==>  
+  get_pos_inter: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c] ==>  
   guard
     count >= 16,
     c = 0
@@ -255,16 +255,17 @@ actor Mgnt_MVR ( int MV_SZ, int Idx_SZ, int MODE_SZ)
   
   
   schedule fsm get_pos :
-    get_pos     ( get_pos  	) --> get_pos;
-    get_pos		( get_part 	) --> send_part;
+    get_pos     ( get_pos_intra) --> get_pos;
+    get_pos     ( get_pos_inter) --> get_part;
+    get_part	( get_part 	) --> send_part;
     send_part   ( send_part ) --> get_mv;
-    get_mv		( get_mv 	) --> get_pos;
-    get_pos     ( a_mv_out	) --> get_pos;
+    get_mv		( get_mv 	) --> get_part;
+    get_part     ( a_mv_out	) --> get_pos;
   end
 
   priority
 	get_mv.part4x8 > get_mv.part8x16 > get_mv.others;
-	a_mv_out>get_pos;
+	a_mv_out>get_part;
   end
     
 end
