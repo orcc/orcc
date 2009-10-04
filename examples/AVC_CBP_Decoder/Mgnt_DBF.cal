@@ -61,7 +61,7 @@ actor Mgnt_DBF (int LUMA_CHROMA, int QUANT_SZ, int MV_SZ, int Idx_SZ)
 // Constants //
 ///////////////
 int MB_WIDTH=22; //number of MB per lines
-int SAMPLE_SZ = 8; 
+int SAMPLE_SZ = 16; 
 int MB_BLOCK_SIZE = LUMA_CHROMA;
 int INT64_MIN = -32768;
 int MIN_QP =  0;

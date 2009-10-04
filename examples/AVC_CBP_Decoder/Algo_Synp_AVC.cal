@@ -3207,7 +3207,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//end for
 
 	//if( ChromaArrayType = = 1 | | ChromaArrayType = = 2 )
-	Residual_ChromaArrayType_1_2_init: action ==>
+	Residual_ChromaArrayType_1_2_init: action ==>cbp_blk:[val_cbp_blk]
 	guard
 		(chroma_format_idc[sps_id] = 1 or chroma_format_idc[sps_id] = 2) and separate_colour_plane_flag[sps_id] = 0 
 	do
@@ -3309,7 +3309,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	//end if
 
-	Residual_skip_chroma_AC: action ==> cbp_blk:[val_cbp_blk]
+	Residual_skip_chroma_AC: action ==> 
 	guard
 		iCbCr = 2
 	end

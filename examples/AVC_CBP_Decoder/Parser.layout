@@ -39,7 +39,10 @@
       <vertex id="slice_alpha_c0_offset" x="686" y="2093"/>
       <vertex id="slice_beta_offset" x="686" y="2186"/>
       <vertex id="LFDisable" x="686" y="2279"/>
-      <vertex id="CodedBlockPattern" x="686" y="2372"/>
+      <vertex id="CodedBlockPattern" x="781" y="1736"/>
+      <vertex id="mv_out" x="1011" y="2747"/>
+      <vertex id="ref_idx" x="1027" y="2792"/>
+      <vertex id="MB_intra_flag" x="765" y="1936"/>
       <vertex id="byte2bit" x="318" y="1739"/>
       <vertex id="Algo_NALU" x="160" y="1796"/>
       <vertex id="Algo_Synp_AVC" x="438" y="1562"/>
@@ -48,7 +51,5 @@
       <vertex id="Algo_IntraPred_Split" x="686" y="2465"/>
       <vertex id="MVReconstruct" x="686" y="2630"/>
       <vertex id="Algo_MMCO" x="686" y="2867"/>
-      <vertex id="mv_out" x="1011" y="2747"/>
-      <vertex id="ref_idx" x="1027" y="2792"/>
    </vertices>
 </layout>

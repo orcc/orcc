@@ -293,6 +293,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="MB_intra_flag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -448,7 +455,7 @@
     </Connection>
     <Connection dst="Algo_Synp_AVC" dst-port="bits" src="byte2bit" src-port="out">
         <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="10000"/>
+            <Expr kind="Literal" literal-kind="Integer" value="100000"/>
         </Attribute>
     </Connection>
     <Connection dst="Algo_Synp_AVC" dst-port="nb_rbsp_bytes"
@@ -508,7 +515,8 @@
         src="Algo_Synp_AVC" src-port="slice_alpha_c0_offset"/>
     <Connection dst="" dst-port="slice_beta_offset" src="Algo_Synp_AVC" src-port="slice_beta_offset"/>
     <Connection dst="" dst-port="LFDisable" src="Algo_Synp_AVC" src-port="LFDisable"/>
-    <Connection dst="" dst-port="CodedBlockPattern" src="Algo_Synp_AVC" src-port="CodedBlockPattern"/>
     <Connection dst="" dst-port="mv_out" src="MVReconstruct" src-port="mv_out"/>
     <Connection dst="" dst-port="ref_idx" src="MVReconstruct" src-port="ref_idx"/>
+    <Connection dst="" dst-port="CodedBlockPattern" src="Algo_Synp_AVC" src-port="cbp_blk"/>
+    <Connection dst="" dst-port="MB_intra_flag" src="Algo_Synp_AVC" src-port="MbIntraFlag"/>
 </XDF>

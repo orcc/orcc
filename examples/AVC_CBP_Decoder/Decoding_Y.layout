@@ -25,10 +25,11 @@
       <vertex id="LFDisable" x="499" y="623"/>
       <vertex id="slice_alpha_c0_offset" x="481" y="663"/>
       <vertex id="slice_beta_offset" x="499" y="546"/>
+      <vertex id="ref_idx_in" x="360" y="493"/>
+      <vertex id="mv_in" x="354" y="531"/>
       <vertex id="Display_L" x="848" y="214"/>
       <vertex id="TEX_L" x="621" y="118"/>
       <vertex id="RES_L" x="273" y="57"/>
-      <vertex id="ref_idx_in" x="360" y="493"/>
-      <vertex id="mv_in" x="354" y="531"/>
+      <vertex id="MB_intra_flag" x="448" y="149"/>
    </vertices>
 </layout>

@@ -24,6 +24,7 @@
       <vertex id="CodedBlockPattern" x="826" y="799"/>
       <vertex id="ref_idx_in" x="762" y="738"/>
       <vertex id="mv_in" x="828" y="658"/>
+      <vertex id="MB_intra_flag" x="797" y="621"/>
       <vertex id="Display_L" x="1314" y="343"/>
       <vertex id="Inter" x="527" y="657"/>
       <vertex id="Buffer_inter" x="1112" y="328"/>
