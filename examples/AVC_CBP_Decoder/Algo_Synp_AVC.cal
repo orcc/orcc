@@ -2098,7 +2098,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			CurrMbAddr:[val_CurrMbAddr],
 			PicWidthInMb:[PicWidthInMbs],
 			PicSizeInMb:[PicSizeInMbs],
-			FirstMbInSlice:[if val_CurrMbAddr = first_mb_in_slice then 1 else 0 end],slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc]
+			FirstMbInSlice:[if val_CurrMbAddr = first_mb_in_slice then 1 else 0 end]
 	end
 
 	//if (slice_type != I && slice_type != SI)
@@ -2135,10 +2135,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			QP_Cr:[val_QP_Cr], 
 			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
 			LAST:[[true: for int t in Integers(0,26) ]] repeat 27,
-			CurrMbAddr:[val_CurrMbAddr], 
-			PicWidthInMb:[PicWidthInMbs], 
-			PicSizeInMb:[PicSizeInMbs], 
-			FirstMbInSlice:[if val_CurrMbAddr = first_mb_in_slice then 1 else 0 end]
+			CurrMbAddr:[val_CurrMbAddr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[if val_CurrMbAddr = first_mb_in_slice then 1 else 0 end],
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc],
+			cbp_blk:[0]
 	guard
 		prevMbSkipped = 1 and val_CurrMbAddr < PicSizeInMbs-1
 	do
@@ -2159,7 +2161,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			QP_Cb:[val_QP_Cb],
 			QP_Cr:[val_QP_Cr],
 			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16,
-			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+			LAST:[[true: for int t in Integers(0,26) ]] repeat 27,
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc],
+			cbp_blk:[0]
 	guard
 		prevMbSkipped = 1 and val_CurrMbAddr = PicSizeInMbs-1
 	do
@@ -2496,7 +2500,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16,
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc]
 	guard
 		vld_end()
 	do
@@ -2515,6 +2520,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			QP_Cr:[val_QP_Cr], 
 			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
 			LAST:[[true: for int t in Integers(0,26) ]] repeat 27,
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc],
 			cbp_blk:[0]
 	guard
 		val_CodedBlockPatternLuma = 0, CodedBlockPatternChroma = 0, not IS_Intra_16x16()
