@@ -31,10 +31,12 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
+import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -43,6 +45,8 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.JoinNode;
+import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
@@ -53,6 +57,8 @@ import net.sf.orcc.ir.nodes.WhileNode;
  */
 public class AssignPeephole extends AbstractNodeVisitor {
 
+	private Procedure procedure;
+	
 	public AssignPeephole(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
@@ -89,14 +95,35 @@ public class AssignPeephole extends AbstractNodeVisitor {
 	}
 
 	@Override
+	public void visit(JoinNode node, Object... args) {
+		List<PhiAssignment> phis = node.getPhis();
+		if (!phis.isEmpty()) {
+			for (PhiAssignment phi : phis) {
+				VarDef source = phi.getVars().get(0).getVarDef();
+				// if source is a local variable with index = 0, we remove it
+				// from the procedure and translate the PHI by an assignment of
+				// 0 (zero) to target.
+				// Otherwise, we just create an assignment target = source.
+				List<VarDef> parameters = procedure.getParameters();
+				if (source.getIndex() == 0 && !parameters.contains(source)) {
+					IntExpr expr = new IntExpr(new Location(), 0);
+					source.setConstant(expr);
+				}
+			}
+		}
+	}
+	
+	@Override
 	public void visit(IfNode node, Object... args) {
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
+		visit(node.getJoinNode(), args);
 	}
 	
 	@Override
 	public void visit(WhileNode node, Object... args) {
 		visitNodes(node.getNodes());
+		visit(node.getJoinNode(), args);
 	}
 
 	private void visitNodes(List<AbstractNode> nodes) {
@@ -107,6 +134,7 @@ public class AssignPeephole extends AbstractNodeVisitor {
 	}
 
 	private void visitProc(Procedure proc) {
+		this.procedure = proc;
 		List<AbstractNode> nodes = proc.getNodes();
 		visitNodes(nodes);
 	}
