@@ -102,7 +102,7 @@ public class CActorPrinter {
 	 *            a procedure
 	 * @return a string template
 	 */
-	private StringTemplate applyProc(String actorName, Procedure proc) {
+	protected StringTemplate applyProc(String actorName, Procedure proc) {
 		StringTemplate procTmpl = group.getInstanceOf("proc");
 
 		// name
@@ -236,5 +236,4 @@ public class CActorPrinter {
 			}
 		}
 	}
-
 }

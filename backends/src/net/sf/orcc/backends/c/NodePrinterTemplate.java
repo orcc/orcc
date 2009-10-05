@@ -62,17 +62,22 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class NodePrinterTemplate implements CNodeVisitor {
 
-	private String actorName;
+	/**
+	 * Variable member access switch from private to protected.
+	 * @see net.sf.orcc.backend.cpp.CppNodePrinter
+	 */
+	
+	protected String actorName;
 
-	private String attrName;
+	protected String attrName;
 
-	private ExprToString exprPrinter;
+	protected ExprToString exprPrinter;
 
-	private StringTemplateGroup group;
+	protected StringTemplateGroup group;
 
-	private StringTemplate template;
+	protected StringTemplate template;
 
-	private VarDefPrinter varDefPrinter;
+	protected VarDefPrinter varDefPrinter;
 
 	public NodePrinterTemplate(StringTemplateGroup group,
 			StringTemplate template, String actorName,

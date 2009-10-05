@@ -1,0 +1,46 @@
+group Cpp_networkImpl;
+
+setFifo(fifo) ::= <<
+actor_$fifo.source$.connect(ACTOR_PORT_OUT, $fifo.source$_$fifo.src_port$, fifo_$fifo.count$);
+actor_$fifo.target$.connect(ACTOR_PORT_IN, $fifo.target$_$fifo.tgt_port$, fifo_$fifo.count$);
+
+>>
+
+network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+/**
+ * Generated from "$name$"
+ */
+ 
+#include "Network_$name$.h"
+
+$connections:{ fifo | FifoAPI * Network_$name$::fifo_$fifo.count$ = (FifoAPI *)new CalOrientedBoundedFifo<$fifo.type$>($fifo.size$);}; separator="\n"$
+
+Network_$name$::Network_$name$()
+{
+	$connections:setFifo()$
+}
+
+Network_$name$::~Network_$name$(){}
+
+void Network_$name$::start(std::string &strErr)
+{
+	$instances: {inst |actor_$inst$.startActorExecution();}; separator="\n"$
+}
+
+void Network_$name$::stop(std::string &strErr)
+{
+	$instances: {inst |actor_$inst$.stop();}; separator="\n"$
+}
+
+void Network_$name$::schedule() {
+	$initializes: { init | actor_$init$.initialize();}; separator="\n"$
+
+	while (1) {
+		$instances: { inst | actor_$inst$.process();$\n$}$
+		$broadcasts: { bcast | actor_$bcast.id$.schedule();}; separator="\n"$
+
+	}
+}
+
+>>
+

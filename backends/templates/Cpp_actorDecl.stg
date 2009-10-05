@@ -1,0 +1,224 @@
+group Cpp_actor : C_actor;
+
+///////////////////////////////////////////////////////////////////////////////
+// FIFO declaration
+///////////////////////////////////////////////////////////////////////////////
+
+fifo(portName) ::= <<
+$name$_$portName$,
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Types and variables
+///////////////////////////////////////////////////////////////////////////////
+
+// the dimensions of a list: [][]...[]
+// does not output anything if $value$ is empty
+// differs from inherited listSize because this one does not print any size
+// information.
+listDim(value) ::= <<
+$value : {[]} $
+>>
+
+// a variable definition
+// called by "function parameter", or "state variable with value"
+vardef(var) ::= <<
+$var.type$ $var.name$$if(var.size)$$listSize(var.size)$
+$endif$
+>>
+
+// a variable definition with initialization
+// called by "local variable", or "state variable with no value"
+vardefInit(var) ::= <<
+$if(var.isPort)$
+$var.type$ $var.name$$listSize(var.size)$
+$else$
+$var.type$ $var.name$$if(var.size)$$listSize(var.size)$
+$endif$
+$endif$>>
+
+// a state variable
+stateVar(vardef, value) ::= <<
+static $vardef(vardef)$;$\n\n$
+>>
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Procedure and actions
+///////////////////////////////////////////////////////////////////////////////
+
+proc(actorname, name, type, parameters, locals, nodes) ::= <<
+
+$type$ $name$($parameters:vardef(); wrap, anchor, separator=", "$);
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action scheduler
+///////////////////////////////////////////////////////////////////////////////
+
+outputPattern(pattern) ::= <<
+$pattern.keys:{port|fifo_$port$.hasRoom($pattern.(port)$)}; separator=" && "$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler without FSM
+
+actionCall(action) ::= <<
+$action.tag$();
+res = true;
+i++;
+>>
+
+actionTest(action) ::= <<
+if (isSchedulable_$action.tag$()) {
+	$if(action.outputPattern)$
+	if ($outputPattern(action.outputPattern)$) {
+		$actionCall(action)$
+	}
+	$else$
+	$actionCall(action)$
+	$endif$
+}>>
+
+schedulingTest(actions) ::= <<
+$actions: actionTest(); separator=" else "$
+>>
+
+scheduler(actions) ::= <<
+
+void process();
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler with FSM
+
+actionCallState(nextState) ::= <<
+$nextState.action.tag$();
+_FSM_state = States.s_$nextState.targetState$;
+res = true;
+>>
+
+actionTestState(nextState) ::= <<
+if (isSchedulable_$nextState.action.tag$()) {
+	$if(nextState.action.outputPattern)$
+	if ($outputPattern(nextState.action.outputPattern)$) {
+		$actionCallState(nextState)$
+	}
+	$else$
+	$actionCallState(nextState)$
+	$endif$
+}>>
+
+schedulingTestState(nextStates) ::= <<
+$nextStates: actionTestState(); separator=" else "$
+>>
+
+stateScheduler(transition) ::= <<
+bool $transition.sourceState$_state_scheduler();
+
+>>
+
+switch(transitions) ::= <<
+switch (_FSM_state) {
+$transitions: {case s_$it.sourceState$:
+	res = $it.sourceState$_state_scheduler();
+	if (res) {
+		i++;
+	}
+	break;
+}$
+default:
+	std::cout << "unknown state: %s\n" + _FSM_state << std::endl;
+	break;
+}
+>>
+
+schedulerFSM(actions, fsm) ::= <<
+$if(actions)$
+bool outside_FSM_scheduler();
+
+$endif$
+$fsm.transitions: stateScheduler(); separator="\n"$
+public:
+	void process();
+
+>>
+
+FSMdecl(actions, fsm) ::= <<
+enum States {
+	$fsm.states : {s_$it$}; separator=",\n"$
+};
+
+int _FSM_state;
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor
+///////////////////////////////////////////////////////////////////////////////
+
+actor(name, inputs, outputs, stateVars, procs,
+      actions, initializes, scheduler, initialize) ::= <<
+/**
+ * Generated from "$name$"
+ */
+#ifndef __ACTOR_$name$_H__
+#define __ACTOR_$name$_H__
+
+#include "actoraka.h"
+
+
+enum $name$_Iports{
+$inputs: fifo()$$name$_IPORT_SIZE
+};
+
+enum $name$_Oports{
+$outputs: fifo()$$name$_OPORT_SIZE
+};
+
+class Actor_$name$ : public ActorGen 
+{
+
+	// State variables of the actor
+private:
+	$stateVars$
+	$if(scheduler.fsm)$	
+	$FSMdecl(actions=scheduler.actions, fsm=scheduler.fsm)$
+	$endif$
+public:
+	// Default constructor
+	Actor_$name$();
+	
+/*	// Init
+	init();*/
+	
+private:
+	// Functions/procedures
+	$procs$
+	// Actions
+	$actions$
+$if(initializes)$
+	// Initializes
+	$initializes$
+$endif$
+public:
+	void initialize();
+	
+	// Action scheduler
+$if(scheduler.fsm)$
+	$schedulerFSM(actions=scheduler.actions, fsm=scheduler.fsm)$
+$else$
+	$scheduler(scheduler.actions)$
+$endif$
+
+};
+
+#endif
+
+>>
+

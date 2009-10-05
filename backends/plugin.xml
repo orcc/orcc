@@ -7,7 +7,11 @@
             class="net.sf.orcc.backends.c.CBackendImpl"
             name="C">
       </backend>
-		<backend class="net.sf.orcc.backends.cllvm.CLLVMBackendImpl" name="C (LLVM-compatible)"/>
+      <backend
+               class="net.sf.orcc.backends.cpp.CppBackendImpl"
+               name="Cpp">
+      </backend>
+         <backend class="net.sf.orcc.backends.cllvm.CLLVMBackendImpl" name="C (LLVM-compatible)"/>
   <backend
         class="net.sf.orcc.backends.multicore.MultiCoreBackendImpl"
         name="C (multicore)">
