@@ -195,6 +195,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(CallNode node, Object... args) {
+		int index =0;
+		
 		StringTemplate nodeTmpl = group.getInstanceOf("callNode");
 
 		if (node.hasRes()) {
@@ -204,13 +206,15 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		}
 
 		Procedure proc = node.getProcedure();
+		List<VarDef> procParameters = proc.getParameters();
 
 		nodeTmpl.setAttribute("return", typeToString.toString(proc
 				.getReturnType()));
 		nodeTmpl.setAttribute("name", proc.getName());
 		for (IExpr parameter : node.getParameters()) {
 			nodeTmpl.setAttribute("parameters", exprPrinter.toString(parameter,
-					new IntType(new IntExpr(new Location(), 32))));
+					procParameters.get(index).getType()));
+			index++;
 		}
 
 		template.setAttribute(attrName, nodeTmpl);
