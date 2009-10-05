@@ -76,6 +76,7 @@ import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.ReadNode;
+import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.type.AbstractType;
@@ -98,6 +99,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	private int nodeCount;
 
 	private Hashtable<String, Integer> portIndex;
+	
+	private Procedure procedure;
 
 	public TypeTransformation(Actor actor) {
 
@@ -353,6 +356,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 
 	}
+	
+	@Override
+	public void visit(ReturnNode node, Object... args) {
+		node.getValue().accept(this, procedure.getReturnType());
+	}
 
 	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
@@ -542,7 +550,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	private void visitProc(Procedure proc) {
 		nodeCount = 0;
-
+		this.procedure = proc;
 		visitLocals(proc.getLocals());
 		clearPorts();
 		visitNodes(proc.getNodes());
