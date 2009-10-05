@@ -36,7 +36,6 @@ import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;

@@ -48,7 +48,6 @@ import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -318,11 +317,8 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			}else {
 				phiVar = varUses.get(1).getVarDef();
 			}
-			
-			VarUse varuse = new VarUse(varDef, null);
-			VarExpr expr = new VarExpr(new Location(), varuse);
-			
-			phiVar.setConstant(expr);
+					
+			varDef.duplicate(phiVar);
 		}
 		
 		return nodes;

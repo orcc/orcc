@@ -41,8 +41,8 @@ import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
-import net.sf.orcc.ir.transforms.AssignPeephole;
 import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
+import net.sf.orcc.ir.transforms.AssignPeephole;
 import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
 
 /**
