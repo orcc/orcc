@@ -450,7 +450,7 @@
     <Connection dst="" dst-port="PredMode" src="Algo_IntraPred_Split" src-port="PredMode"/>
     <Connection dst="byte2bit" dst-port="in8" src="Algo_NALU" src-port="bits_rbsp8">
         <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="20000"/>
+            <Expr kind="Literal" literal-kind="Integer" value="200000"/>
         </Attribute>
     </Connection>
     <Connection dst="Algo_Synp_AVC" dst-port="bits" src="byte2bit" src-port="out">

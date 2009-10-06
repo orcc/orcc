@@ -60,7 +60,8 @@ actor Mgnt_DBF (int LUMA_CHROMA, int QUANT_SZ, int MV_SZ, int Idx_SZ)
 ///////////////
 // Constants //
 ///////////////
-int MB_WIDTH=22; //number of MB per lines
+//FIXME! number of MB per line of picture
+int PICWIDTH=45; //number of MB per lines
 int SAMPLE_SZ = 16; 
 int MB_BLOCK_SIZE = LUMA_CHROMA;
 int INT64_MIN = -32768;
@@ -131,19 +132,19 @@ int mb_type_p := 0;
 int cbp_blk_p := 0;
 List( type:uint(size=3), size=32 ) Strength := [ 0 : for int i in Integers(0, 32-1) ];
 
-List(type:List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE), size=MB_WIDTH ) upFifo_mb :=  [[[0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1)]: for int l in Integers( 0, MB_WIDTH-1)];
+List(type:List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE), size=PICWIDTH ) upFifo_mb :=  [[[0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1)]: for int l in Integers( 0, PICWIDTH-1)];
 
-List(type:uint(size=SAMPLE_SZ), size=MB_WIDTH) upFifo_mb_type :=  [0: for int l in Integers( 0, MB_WIDTH-1)];
+List(type:uint(size=SAMPLE_SZ), size=PICWIDTH) upFifo_mb_type :=  [0: for int l in Integers( 0, PICWIDTH-1)];
 
-List(type:uint(size=SAMPLE_SZ), size=MB_WIDTH) upFifo_cbp_blk :=  [0: for int l in Integers( 0, MB_WIDTH-1)];
+List(type:uint(size=SAMPLE_SZ), size=PICWIDTH) upFifo_cbp_blk :=  [0: for int l in Integers( 0, PICWIDTH-1)];
 
-List(type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) upFifo_valQP :=  [0: for int l in Integers( 0, MB_WIDTH-1)];
+List(type:uint(size=SAMPLE_SZ), size=PICWIDTH ) upFifo_valQP :=  [0: for int l in Integers( 0, PICWIDTH-1)];
 
-List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_MV0 :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
-List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_MV1 :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
+List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=PICWIDTH) upFifo_list0_MV0 :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, PICWIDTH-1)];
+List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=PICWIDTH) upFifo_list0_MV1 :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, PICWIDTH-1)];
 
-List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_ref_pic_id :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
-List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=MB_WIDTH) upFifo_list0_refPicIDX :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, MB_WIDTH-1)];
+List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=PICWIDTH) upFifo_list0_ref_pic_id :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, PICWIDTH-1)];
+List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=PICWIDTH) upFifo_list0_refPicIDX :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, PICWIDTH-1)];
 
 ////////////////
 // ROM Tables //

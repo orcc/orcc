@@ -33,6 +33,9 @@ actor Mgnt_DPB ( int SAMPLE_SZ, int MB_WIDTH, int NB_PIC )
 		int(size=9) Display,
 		bool Write_Done
 :  
+//FIXME! number of MB per line of picture
+int PICWIDTH=45; //number of MB per lines
+int PICHEIGHT=36; //number of MB per columns
   uint(size=7) picwidth :=0;
   uint(size=13) picsize := 0;
   List(type:uint,size=NB_PIC) poc := [0 :for int s in Integers(0,NB_PIC-1)];
@@ -41,7 +44,7 @@ actor Mgnt_DPB ( int SAMPLE_SZ, int MB_WIDTH, int NB_PIC )
   uint(size=11) wa_H;
   uint(size=11) wa_x := 0;
   uint(size=11) wa_y := 0;
-  List(type :List( type:int(size=SAMPLE_SZ), size=352*288 ), size=NB_PIC) pic;
+  List(type :List( type:int(size=SAMPLE_SZ), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
   uint(size=4) pic_curr_idx := 0;
   List(type:uint(size=4),size=NB_PIC) pic_ref_idx := [0 :for int s in Integers(0,NB_PIC-1)];
   List(type:uint(size=1),size=NB_PIC) flag_picture_end := [1 : for int s in Integers(0,NB_PIC-1)];
@@ -63,7 +66,7 @@ actor Mgnt_DPB ( int SAMPLE_SZ, int MB_WIDTH, int NB_PIC )
   
   initialize ==>
   do
-    pic := [ [-1 : for int i in Integers( 0, 352*288-1)]: for int j in Integers( 0, NB_PIC-1) ];
+    pic := [ [-1 : for int i in Integers( 0, PICWIDTH*PICHEIGHT*256-1)]: for int j in Integers( 0, NB_PIC-1) ];
   end
 
     

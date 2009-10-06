@@ -5,6 +5,5 @@
       <vertex id="AVCDecoder" x="169" y="70"/>
       <vertex id="Merger" x="330" y="70"/>
       <vertex id="display" x="527" y="70"/>
-      <vertex id="Compare" x="451" y="261"/>
    </vertices>
 </layout>

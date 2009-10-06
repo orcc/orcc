@@ -269,6 +269,8 @@
         src="FUN_Parser" src-port="slice_beta_offset"/>
     <Connection dst="Decoding_Y" dst-port="mv_in" src="FUN_Parser" src-port="mv_out"/>
     <Connection dst="Decoding_Y" dst-port="ref_idx_in" src="FUN_Parser" src-port="ref_idx"/>
+    <Connection dst="Decoding_Y" dst-port="MB_intra_flag"
+        src="FUN_Parser" src-port="MB_intra_flag"/>
     <Connection dst="Decode_U" dst-port="mv_in" src="FUN_Parser" src-port="mv_out"/>
     <Connection dst="Decode_U" dst-port="ref_idx_in" src="FUN_Parser" src-port="ref_idx"/>
     <Connection dst="Decode_U" dst-port="slice_beta_offset"
@@ -287,4 +289,6 @@
         src="FUN_Parser" src-port="CodedBlockPattern"/>
     <Connection dst="Decode_V" dst-port="mv_in" src="FUN_Parser" src-port="mv_out"/>
     <Connection dst="Decode_V" dst-port="ref_idx_in" src="FUN_Parser" src-port="ref_idx"/>
+    <Connection dst="Decode_U" dst-port="MB_intra_flag" src="FUN_Parser" src-port="MB_intra_flag"/>
+    <Connection dst="Decode_V" dst-port="MB_intra_flag" src="FUN_Parser" src-port="MB_intra_flag"/>
 </XDF>

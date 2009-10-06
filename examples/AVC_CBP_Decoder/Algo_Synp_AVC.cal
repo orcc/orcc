@@ -89,7 +89,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			int(size=16) WIDTH, 
 			int(size=16) HEIGHT
 		:
-
+  	// FIXME! Maximum size of a line in macroclock
+  	uint(size=7) PICWIDTH =45;
+	uint(size=7) PICHEIGHT=36;
 	// ********** Read bits ********** //  
 	int(size=9) bits_to_read_count := -1;
 	int(size=41) read_result_in_progress; 
@@ -378,9 +380,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	*************************************************************
 	*************************************************************/
 	int(size=6) nc;
-	List ( type: uint(size=4),size=4 * 99*16) NonZeroCount; // FIXME those numbers should be independent of the size
-	List ( type: uint(size=4),size=4 * 99*4) NonZeroCountCb; // FIXME those numbers should be independent of the size
-	List ( type: uint(size=4),size=4 * 99*4) NonZeroCountCr; // FIXME those numbers should be independent of the size
+	List ( type: uint(size=4),size=4 * PICHEIGHT*PICWIDTH*16) NonZeroCount; // FIXME those numbers should be independent of the size
+	List ( type: uint(size=4),size=4 * PICHEIGHT*PICWIDTH*4) NonZeroCountCb; // FIXME those numbers should be independent of the size
+	List ( type: uint(size=4),size=4 * PICHEIGHT*PICWIDTH*4) NonZeroCountCr; // FIXME those numbers should be independent of the size
 	uint(size=3) suffixLength;
 	uint(size=5) inc_nb_coeff;
 	uint level_prefix;
@@ -1491,9 +1493,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				end
 				if abs_frame_num > 0 then
 					expectedpoc := expected_delta_per_poc_cycle * ((abs_frame_num - 1) / num_ref_frames_in_pic_order_cnt_cycle[sps_id]);
-					foreach int i in Integers(0, ((abs_frame_num - 1) / num_ref_frames_in_pic_order_cnt_cycle[sps_id])) do
+					foreach int i in Integers(0, ((abs_frame_num - 1) mod num_ref_frames_in_pic_order_cnt_cycle[sps_id])) do
 						expectedpoc := expectedpoc + offset_for_ref_frame[sps_id][ i ];
 					end
+				else
+					expectedpoc :=0;
 				end
 				if nal_ref_idc = 0 then expectedpoc := expectedpoc + offset_for_non_ref_pic[sps_id]; end
 				TopFieldOrderCnt := expectedpoc + delta_pic_order_cnt[0];
@@ -2080,9 +2084,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		val_CurrMbAddr := first_mb_in_slice;
 		PicWidthInMbs := (pic_width_in_mbs_minus1[sps_id] +1);
 		PicSizeInMbs := PicWidthInMbs * (pic_height_in_map_units_minus1[sps_id] +1);
-		NonZeroCount := [ 0 : for int i in Integers(0, 4 * 99*16-1)]; //FIXME ! size is not right
-		NonZeroCountCb := [ 0 : for int i in Integers(0, 4 * 99*4-1)]; //FIXME ! size is not right
-		NonZeroCountCr := [ 0 : for int i in Integers(0, 4 * 99*4-1)]; //FIXME ! size is not right
+		NonZeroCount := [ 0 : for int i in Integers(0, 4 * PICHEIGHT*PICWIDTH*16-1)]; //FIXME ! size is not right
+		NonZeroCountCb := [ 0 : for int i in Integers(0, 4 * PICHEIGHT*PICWIDTH*4-1)]; //FIXME ! size is not right
+		NonZeroCountCr := [ 0 : for int i in Integers(0, 4 * PICHEIGHT*PICWIDTH*4-1)]; //FIXME ! size is not right
 
 		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 		Mb_y := val_CurrMbAddr / PicWidthInMbs;

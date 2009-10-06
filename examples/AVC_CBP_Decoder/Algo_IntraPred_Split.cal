@@ -58,19 +58,23 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
       int(size=PREDTYPE_SIZE) Intra_DC_flag, uint(size=4)PredMode,
       uint (size=8) Mb_Type, uint (size=8) Mb_TypeC : 
  
+//FIXME! number of MB per line of picture
+int PICWIDTH=45; //number of MB per lines
+int PICHEIGHT=36; //number of MB per columns
+
   uint(size=2) intratype := 0; // Intra4x4 1, Intra8x8 2, Intra16x16 3
   uint(size=5) count := 16;
   uint x:= 0;
   uint y:= 0;
   uint picW;
   
-  List ( type: int(size=5), size= rshift(1920*1080,4)) intra4x4predmode;
+  List ( type: int(size=5), size= rshift(PICWIDTH*PICHEIGHT*256,4)) intra4x4predmode;
   List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
   
   // initialize intra4x4predmode to a huge list of 2's
   initialize ==>
   do
-    intra4x4predmode := [ 2 : for int i in Integers(0, rshift(1920*1080,4) - 1) ];
+    intra4x4predmode := [ 2 : for int i in Integers(0, rshift(PICWIDTH*PICHEIGHT*256,4) - 1) ];
   end
   
   function InverseScan4x4(uint(size=4) index, uint stride) --> uint :
@@ -82,7 +86,7 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
     d=0 and count >= 16
   do
     picW := c; 
-    if b = 0 then intra4x4predmode := [ 2 : for int i in Integers( 0, rshift(1920*1080,4) - 1)]; end
+    if b = 0 then intra4x4predmode := [ 2 : for int i in Integers( 0, rshift(PICWIDTH*PICHEIGHT*256,4) - 1)]; end
     x := b mod picW;
     y := b / picW;
   end
@@ -93,7 +97,7 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
   do
     intratype := a;
     picW := c; 
-    if b = 0 then intra4x4predmode := [ 2 : for int i in Integers( 0, rshift(1920*1080,4) - 1 )]; end
+    if b = 0 then intra4x4predmode := [ 2 : for int i in Integers( 0, rshift(PICWIDTH*PICHEIGHT*256,4) - 1 )]; end
     x := b mod picW;
     y := b / picW;
     count := 0;

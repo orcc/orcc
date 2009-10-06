@@ -164,6 +164,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="Mb_intra_flag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -325,7 +332,7 @@
     <Connection dst="Deblocking Filter" dst-port="QP" src="" src-port="QP"/>
     <Connection dst="Deblocking Filter" dst-port="RefIdx" src="" src-port="ref_idx_in"/>
     <Connection dst="Deblocking Filter" dst-port="MV" src="" src-port="mv_in"/>
-    <Connection dst="Deblocking Filter" dst-port="MbIntraFlag" src="" src-port="Mb_TypeC"/>
     <Connection dst="Deblocking Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Deblocking Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
+    <Connection dst="Deblocking Filter" dst-port="MbIntraFlag" src="" src-port="Mb_intra_flag"/>
 </XDF>

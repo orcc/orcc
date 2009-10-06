@@ -25,6 +25,9 @@ uint (size=8) Mb_Type, uint(size=13) CurrMbAddr, int(size=9) MB_IN, uint(size=7)
 uint(size=SAMPLE_SZ) EDGE 
 :
 
+  	//FIXME! Maximum size of a line in macroclock
+  	uint(size=7) PICWIDTH =45;
+
   	//Flag	
   	uint (size = 1) ReadFlag := 0;
   	uint (size = 1) SendFlag := 0;
@@ -32,15 +35,13 @@ uint(size=SAMPLE_SZ) EDGE
   	// Index of the macroblock in the current line
   	uint(size=13) mb_Index := 0;
   	
-  	// Maximum size of a line in macroclock
-  	uint(size=7) picwidth =11;
   	
 	//List containing edge pixel value 
-	List( type:uint(size=SAMPLE_SZ), size=picwidth * MB_WIDTH) top_edge := [0 : for int i in Integers( 0, picwidth * MB_WIDTH-1)];
+	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH) top_edge := [0 : for int i in Integers( 0, PICWIDTH * MB_WIDTH-1)];
 	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) left_edge := [ 0 : for int i in Integers( 0, MB_WIDTH-1)];
 	uint(size=SAMPLE_SZ) topLeft_edge := 0;
 	
-	List( type:uint(size=SAMPLE_SZ), size=picwidth * MB_WIDTH) result := [0 : for int i in Integers( 0, picwidth * MB_WIDTH-1)];
+	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH) result := [0 : for int i in Integers( 0, PICWIDTH * MB_WIDTH-1)];
 	
   	//Mb_Type_NOK : Store pixel value of the bottom and left edge of the current decoded macroblock 
   	MbIndexNOK:action Mb_Type:[a], PicWidthInMb:[b], CurrMbAddr:[c] ==>
@@ -104,7 +105,7 @@ uint(size=SAMPLE_SZ) EDGE
   	CalEdge1:action ==> EDGE:[ result	] repeat 2*MB_WIDTH+5
   	guard 
   		SendFlag = 1,
-  		mb_Index < picwidth-1
+  		mb_Index < PICWIDTH-1
   	var 
   		int temp,
   		int temp2
@@ -133,7 +134,7 @@ uint(size=SAMPLE_SZ) EDGE
   	CalEdge2:action ==> EDGE:[ result	] repeat 2*MB_WIDTH+5
   	guard 
   		SendFlag = 1,
-		mb_Index = picwidth-1
+		mb_Index = PICWIDTH-1
 	var
 		int temp,
 		int temp2

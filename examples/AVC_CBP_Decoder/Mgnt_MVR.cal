@@ -56,6 +56,9 @@ actor Mgnt_MVR ( int MV_SZ, int Idx_SZ, int MODE_SZ)
   ==> 
   uint(size=11)Location , uint(size=MODE_SZ) PartSZ, uint(size=Idx_SZ) refIdxLXN, int(size=MV_SZ) mvLX,  int(size=MV_SZ) mv_out ,uint(size=Idx_SZ) refidx_out
   :
+//FIXME! number of MB per line of picture
+int PICWIDTH=45; //number of MB per lines
+int PICHEIGHT=36; //number of MB per columns
  
   uint(size=5) count := 16;
   uint currmb:= 0;
@@ -68,15 +71,15 @@ actor Mgnt_MVR ( int MV_SZ, int Idx_SZ, int MODE_SZ)
   uint(size=5) mbpart_h;
   bool mvdone:=true;
   
-  List(type: List(type:int(size=14), size=2), size=rshift(1920*1080, 4)) mv;
-  List(type: int(size=5), size=rshift(1920*1080, 4)) refidx;
+  List(type: List(type:int(size=14), size=2), size=rshift(PICWIDTH*PICHEIGHT*256, 4)) mv;
+  List(type: int(size=5), size=rshift(PICWIDTH*PICHEIGHT*256, 4)) refidx;
   List(type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
   
   // initialize mv to a huge list of [0, 0]s, and refidx to a huge list of -2's
   initialize ==>
   do
-    mv := [ [0, 0] : for int i in Integers(0, rshift(1920*1080, 4) - 1) ];
-    refidx := [ -2 : for int i in Integers(0, rshift(1920*1080, 4) - 1) ];
+    mv := [ [0, 0] : for int i in Integers(0, rshift(PICWIDTH*PICHEIGHT*256, 4) - 1) ];
+    refidx := [ -2 : for int i in Integers(0, rshift(PICWIDTH*PICHEIGHT*256, 4) - 1) ];
   end
   
   get_pos_intra: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c] ==>
@@ -95,11 +98,11 @@ actor Mgnt_MVR ( int MV_SZ, int Idx_SZ, int MODE_SZ)
     picW := b; 
     if a <= x + y *picW then 
       foreach int i in Integers(0, 1) do
-          foreach int j in Integers (0,  rshift(1920*1080,4) - 1 ) do 
+          foreach int j in Integers (0,  rshift(PICWIDTH*PICHEIGHT*256,4) - 1 ) do 
           	mv[j,i] := 0; 
           end
       end
-      refidx := [ -2 : for int i in Integers( 0, rshift(1920*1080,4) - 1)];
+      refidx := [ -2 : for int i in Integers( 0, rshift(PICWIDTH*PICHEIGHT*256,4) - 1)];
     else
       if a - currmb > 1 then
         foreach int i in Integers((currmb+1), (a-1)) do
