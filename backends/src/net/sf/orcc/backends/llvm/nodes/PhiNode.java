@@ -44,9 +44,9 @@ public class PhiNode extends AbstractLLVMNode {
 	
 	private AbstractType type;
 
-	private Map<VarDef, LabelNode> assignements;
+	private Map<LabelNode, VarDef> assignements;
 
-	public PhiNode(int id, Location location, VarDef varDef, AbstractType type, Map<VarDef, LabelNode> assignements) {
+	public PhiNode(int id, Location location, VarDef varDef, AbstractType type, Map<LabelNode, VarDef> assignements) {
 		super(id, location);	
 		this.varDef = varDef;
 		this.assignements = assignements;
@@ -62,11 +62,11 @@ public class PhiNode extends AbstractLLVMNode {
 		return varDef;
 	}
 
-	public Map<VarDef, LabelNode> getAssignements() {
+	public Map<LabelNode, VarDef> getAssignements() {
 		return assignements;
 	}
 	
-	public void setAssignements(Map<VarDef, LabelNode> assignements) {
+	public void setAssignements(Map<LabelNode, VarDef> assignements) {
 		this.assignements= assignements;
 	}
 

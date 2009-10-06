@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
@@ -216,7 +217,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		List<PhiNode> PhiNodes = new ArrayList<PhiNode>();
 		
 		for (PhiAssignment phi : phis){
-			Map<VarDef, LabelNode> assignements = new HashMap<VarDef, LabelNode>();
+			Map<LabelNode, VarDef> assignements = new HashMap<LabelNode, VarDef>();
 			VarDef varDef = phi.getVarDef();
 			AbstractType varType = varDef.getType();
 			List<VarUse> vars =  phi.getVars();
@@ -240,8 +241,8 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 				}
 			}
 			
-			assignements.put(trueVar, labelTrueNode);
-			assignements.put(falseVar, labelFalseNode);
+			assignements.put(labelTrueNode, trueVar);
+			assignements.put(labelFalseNode, falseVar);
 
 			PhiNodes.add(new PhiNode(0, new Location(), varDef, varDef.getType(), assignements));
 		}
@@ -254,36 +255,44 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		
 		// Match and merge a couple vardef/brLabel into imbricated brNode
 		for (PhiNode sourceNode : sourceNodes){
+
 			Boolean varDefFound = false;		
 			VarDef varDef = sourceNode.getVarDef();
 			
 			for (PhiNode targetNode : targetNodes){
-				Map<VarDef, LabelNode> targetAssignements = targetNode.getAssignements();
-				if (targetAssignements.containsKey(varDef)){
-					AbstractType targetType = targetNode.getType();
-					targetAssignements.remove(varDef);
-					
-					Map<VarDef, LabelNode> sourceAssignements = sourceNode.getAssignements();
-					for(Map.Entry<VarDef,LabelNode> sourceAssignement : sourceAssignements.entrySet()){
-						VarDef keyVar = sourceAssignement.getKey();
-						LabelNode valueLab = sourceAssignement.getValue();					
-						keyVar.setType(targetType);
+				Map<LabelNode, VarDef> targetAssignements = targetNode.getAssignements();
+				if (targetAssignements.containsValue(varDef)){
+					LabelNode labelNode=null;
+					AbstractType targetType = targetNode.getType();					
+					for (Entry<LabelNode, VarDef> targetAssignement : targetAssignements.entrySet()){
 						
-						targetAssignements.put(keyVar, valueLab);
+						if (targetAssignement.getValue().equals(varDef)){
+							labelNode = targetAssignement.getKey();
+						}
+					}
+					
+					targetAssignements.remove(labelNode);
+				
+					Map<LabelNode, VarDef> sourceAssignements = sourceNode.getAssignements();
+					for(Entry<LabelNode, VarDef> sourceAssignement : sourceAssignements.entrySet()){
+						
+						LabelNode labKey = sourceAssignement.getKey();					
+						VarDef varVal = sourceAssignement.getValue();
+						varVal.setType(targetType);
+						
+						targetAssignements.put(labKey, varVal);
 					}
 
 					varDefFound = true;
 				}
 			}
-			
+		
 			if (varDefFound== false){
 				targetNodes.add(sourceNode);
 			}
-			
 		}
-		sourceNodes.clear();
-		
 	}
+
 	
 	private SelectNode selectNodeCreate(IfNode node) {
 		int id = node.getId();

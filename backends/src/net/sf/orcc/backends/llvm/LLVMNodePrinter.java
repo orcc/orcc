@@ -336,7 +336,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(PhiNode node, Object... args) {
-		Map<VarDef, LabelNode> assignements = node.getAssignements();
+		Map<LabelNode, VarDef> assignements = node.getAssignements();
 
 		StringTemplate nodeTmpl = group.getInstanceOf("phiNode");
 
@@ -345,13 +345,13 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 				.getVarDef(), false));
 		nodeTmpl.setAttribute("type", typeToString.toString(node.getType()));
 
-		for (Entry<VarDef, LabelNode> assignement : assignements.entrySet()) {
+		for (Entry<LabelNode, VarDef> assignement : assignements.entrySet()) {
 			StringTemplate phiTmpl = group.getInstanceOf("phiPair");
 
-			VarDef varDef = assignement.getKey();
-			phiTmpl.setAttribute("value", varDefPrinter.getVarDefName(varDef,
+
+			phiTmpl.setAttribute("value", varDefPrinter.getVarDefName(assignement.getValue(),
 					false));
-			phiTmpl.setAttribute("label", assignement.getValue());
+			phiTmpl.setAttribute("label", assignement.getKey());
 
 			nodeTmpl.setAttribute("assignements", phiTmpl);
 		}
