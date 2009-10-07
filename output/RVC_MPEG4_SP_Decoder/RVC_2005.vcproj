@@ -40,8 +40,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\..\liborcc\SDL-1.2.13\include&quot;;..\..\runtime\liborcc\scheduler"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\runtime\libapr\include;..\..\runtime\liborcc\include;&quot;..\..\runtime\SDL-1.2.13\include&quot;;&quot;..\..\runtime\SDL_image-1.2.7\include&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\runtime\SDL-1.2.13\lib\SDL.lib ..\..\runtime\SDL-1.2.13\lib\SDLmain.lib"
+				AdditionalDependencies="..\..\runtime\libapr\lib\libapr-1.lib ..\..\runtime\SDL-1.2.13\lib\SDL.lib ..\..\runtime\SDL-1.2.13\lib\SDLmain.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -116,19 +116,22 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/vmg"
-				Optimization="2"
+				Optimization="3"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
+				OmitFramePointers="true"
 				EnableFiberSafeOptimizations="true"
-				AdditionalIncludeDirectories="&quot;..\..\liborcc\SDL-1.2.13\include&quot;;..\..\runtime\liborcc\scheduler"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\runtime\libapr\include;..\..\runtime\liborcc\include;&quot;..\..\runtime\SDL-1.2.13\include&quot;;&quot;..\..\runtime\SDL_image-1.2.7\include&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="0"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -141,9 +144,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\runtime\SDL-1.2.13\lib\SDL.lib ..\..\runtime\SDL-1.2.13\lib\SDLmain.lib"
+				AdditionalDependencies="..\..\runtime\libapr\lib\libapr-1.lib ..\..\runtime\SDL-1.2.13\lib\SDL.lib ..\..\runtime\SDL-1.2.13\lib\SDLmain.lib"
 				LinkIncremental="1"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -233,10 +236,6 @@
 			</File>
 			<File
 				RelativePath=".\src\buffer_02.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\cg_testbed.c"
 				>
 			</File>
 			<File
@@ -348,6 +347,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\orcc_testbed.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\parseheaders.c"
 				>
 			</File>
@@ -376,7 +379,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\scale.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\scale_01.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\scale_02.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\serialize.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\shift.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\shift_01.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\shift_02.c"
 				>
 			</File>
 			<File
@@ -407,15 +434,15 @@
 				Name="orcc"
 				>
 				<File
-					RelativePath="..\..\runtime\liborcc\actors\lff_display.c"
+					RelativePath="..\..\runtime\liborcc\src\actors\display.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\runtime\liborcc\actors\lff_source.c"
+					RelativePath="..\..\runtime\liborcc\src\orcc_util.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\runtime\liborcc\scheduler\lock_free_fifo.c"
+					RelativePath="..\..\runtime\liborcc\src\actors\source.c"
 					>
 				</File>
 			</Filter>
@@ -426,7 +453,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\runtime\liborcc\scheduler\fifo.h"
+				RelativePath="..\..\runtime\liborcc\include\fifo.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\runtime\liborcc\include\orcc_util.h"
 				>
 			</File>
 		</Filter>
