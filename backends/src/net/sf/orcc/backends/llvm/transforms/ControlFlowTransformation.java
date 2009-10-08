@@ -71,6 +71,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 	private int BrCounter;
 	private LabelNode labelNode;
 	private LabelNode entryNode;
+	private LabelNode mergeNode;
 	List<PhiNode> tmpPhiNodes;
 	
 	ListIterator<AbstractNode> it;
@@ -110,7 +111,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 
 		// Create LabelNode
 		LabelNode entryLabelNode = labelNode;
-
+		
 		if (!thenNodes.isEmpty()) {
 			// Create thenLabelNode
 			thenLabelNode = new LabelNode(node.getId(), node
@@ -133,11 +134,11 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 			// Create elseLabelNode
 			elseLabelNode = new LabelNode(node.getId(), node
 					.getLocation(), "bb" + Integer.toString(BrCounter++));
+			labelNode = elseLabelNode;
 			
 			//Store current iterator and branch label
 			ListIterator<AbstractNode> itTmp = it;
-			labelNode = elseLabelNode;
-			
+ 
 			// Continue transformation on elseNode
 			visitNodes(elseNodes, node);
 			
@@ -168,6 +169,7 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 		
 		// Detect if phiNode can be simplify
 		if ((args.length != 0)&&(!it.hasNext())){ 
+			mergeNode = entryLabelNode;
 			tmpPhiNodes = phiNodes;
 			phiNodes = new ArrayList<PhiNode>();
 			LabelNode nextLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
@@ -286,9 +288,23 @@ public class ControlFlowTransformation extends AbstractNodeVisitor {
 					varDefFound = true;
 				}
 			}
-		
-			if (varDefFound== false){
+					
+			//If merge not dones, add the phiNode into the list of target PhiNode
+			if (varDefFound== false){				
 				targetNodes.add(sourceNode);
+			}
+			
+			//Add undefined LabelNode branch into every targeted PhiNode		
+			for (Entry<LabelNode, VarDef> sourceAssignement : sourceNode.getAssignements().entrySet()){
+				for (PhiNode targetNode : targetNodes){
+					Map<LabelNode, VarDef> targetAssignements = targetNode.getAssignements();
+					if (!targetAssignements.containsKey(sourceAssignement.getKey())){
+						VarDef vardef = targetAssignements.get(mergeNode);
+						if (vardef != null){
+							targetAssignements.put(sourceAssignement.getKey(), vardef);
+						}
+					}
+				}
 			}
 		}
 	}
