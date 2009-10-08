@@ -51,7 +51,6 @@ import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
@@ -460,7 +459,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 			}
 		} else {
 			
-			BrNode brNode = brNodeCreate(node, args);
+			BrNode brNode = brNodeCreate(node);
 			List<LabelNode> label = brNode.getLabelEndNode().getPrecedence();
 			List<PhiNode> phiNodes = phiNodeCreate(joinNode, label.get(0), label.get(1)); 
 			brNode.setPhiNodes(phiNodes);
