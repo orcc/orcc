@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.ir.Location;
 
 /**
@@ -37,19 +40,18 @@ import net.sf.orcc.ir.Location;
 public class LabelNode extends AbstractLLVMNode {
 
 	private String labelName;
+	
+	private List<LabelNode> precedence;
 
 	public LabelNode(int id, Location location, String labelName) {
 		super(id, location);
+		precedence = new ArrayList<LabelNode>();
 		this.labelName = labelName;
 	}
 
 	@Override
 	public void accept(LLVMNodeVisitor visitor, Object... args) {
 		visitor.visit(this, args);
-	}
-
-	public String getLabelName() {
-		return labelName;
 	}
 
 	@Override
@@ -59,6 +61,26 @@ public class LabelNode extends AbstractLLVMNode {
 		} else {
 			return false;
 		}
+	}
+
+	public String getLabelName() {
+		return labelName;
+	}
+
+	public List<LabelNode> getPrecedence() {
+		return precedence;
+	}
+	
+	public void addPrecedence(LabelNode precedence) {
+		this.precedence.add(precedence);
+	}
+
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
+	}
+
+	public void setPrecedence(List<LabelNode> precedence) {
+		this.precedence = precedence;
 	}
 	
 	@Override
