@@ -345,9 +345,17 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		int tmpCnt = 0;
 
 		Procedure proc = node.getProcedure();
+		AbstractType returnType = proc.getReturnType();
+		VarDef returnVar = node.getRes();
 		List<VarDef> procParams = proc.getParameters();
 		List<IExpr> parameters = node.getParameters();
-
+		if (returnVar != null){
+			if (!returnType.equals(returnVar.getType())){
+				VarDef castVar = varDefCreate(returnType);
+				node.setRes(castVar);
+				it.add(castNodeCreate(castVar, returnVar));
+			}
+		}
 		for (IExpr parameter : parameters) {
 			VarDef procParam = procParams.get(tmpCnt);
 			parameter.accept(this, procParam.getType());
