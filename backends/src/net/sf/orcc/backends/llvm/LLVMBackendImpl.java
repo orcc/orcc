@@ -35,6 +35,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.llvm.transforms.ArrayListTransformation;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
+import net.sf.orcc.backends.llvm.transforms.CorrectLabelNameTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.backends.llvm.transforms.TypeTransformation;
 import net.sf.orcc.ir.NameTransformer;
@@ -90,6 +91,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 		new AddInstantationProcedure(actor);
 		new ArrayListTransformation(actor);
 		new TypeTransformation(actor);
+		new CorrectLabelNameTransformation(actor);
 		String outputName = path + File.separator + id + ".s";
 		printer.printActor(outputName, actor);
 	}
