@@ -288,6 +288,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		case SHIFT_LEFT:
 		case SHIFT_RIGHT:
 		case BXOR:
+		case DIV:
+		case DIV_INT:
 			// recover the reference type from the current node
 			AbstractType refType = (AbstractType) args[0];
 
@@ -312,8 +314,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 			}
 			return;
 
-		case DIV:
-		case DIV_INT:
 		case MOD:
 		case EXP:
 

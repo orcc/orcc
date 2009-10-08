@@ -60,7 +60,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 		case DIV:
 			return "/";
 		case DIV_INT:
-			return "/";
+			return "sdiv";
 		case EQ:
 			return "icmp eq";
 		case EXP:
