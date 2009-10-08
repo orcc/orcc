@@ -35,7 +35,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.llvm.transforms.ArrayListTransformation;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
-import net.sf.orcc.backends.llvm.transforms.ExpressionTransformation;
+import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.backends.llvm.transforms.TypeTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
@@ -86,7 +86,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 		new CorrectBinaryExpressionType(actor);
 		new AssignPeephole(actor);
 		new ControlFlowTransformation(actor);
-		new ExpressionTransformation(actor);
+		new ThreeAddressCodeTransformation(actor);
 		new AddInstantationProcedure(actor);
 		new ArrayListTransformation(actor);
 		new TypeTransformation(actor);

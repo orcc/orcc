@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
@@ -42,7 +43,9 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
@@ -51,6 +54,8 @@ import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
 
 
 /**
@@ -59,11 +64,11 @@ import net.sf.orcc.ir.type.AbstractType;
  * @author Jérôme GORIN
  * 
  */
-public class ExpressionTransformation extends AbstractLLVMNodeVisitor {
+public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 
 	int exprCounter;
 
-	public ExpressionTransformation(Actor actor) {
+	public ThreeAddressCodeTransformation(Actor actor) {
 		
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
@@ -165,7 +170,8 @@ public class ExpressionTransformation extends AbstractLLVMNodeVisitor {
 			expr.setE2(splitBinaryExpr((BinaryExpr)expr.getE2(), it));
 		}
 		
-		VarDef vardef = varDefCreate (expr.getType());
+		
+		VarDef vardef = varDefCreate (checkType(expr));
 		VarUse varuse = new VarUse(vardef, null);
 		VarExpr varexpr = new VarExpr(new Location(), varuse);
 		
@@ -176,6 +182,58 @@ public class ExpressionTransformation extends AbstractLLVMNodeVisitor {
 		
 		return varexpr;
 		
+	}
+	
+	//Add a second pass to check the binary expression type cohesion
+	//This pass will be useless when the IR associate the correct type to a binary expression
+	public AbstractType checkType(BinaryExpr expr){
+		AbstractType type;
+
+		if ((expr.getOp() == BinaryOp.EQ) || (expr.getOp() == BinaryOp.GE)
+				|| (expr.getOp() == BinaryOp.GT)
+				|| (expr.getOp() == BinaryOp.LE)
+				|| (expr.getOp() == BinaryOp.LT)
+				|| (expr.getOp() == BinaryOp.NE)) {
+			type = new BoolType();
+		} else if ((expr.getE1() instanceof VarExpr)
+				&& (expr.getE2() instanceof VarExpr)) {
+			AbstractType typeE1 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+					.getType();
+			AbstractType typeE2 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+					.getType();
+
+			if (sizeOf(typeE1) > sizeOf(typeE2)) {
+				type = typeE1;
+			} else {
+				type = typeE2;
+			}
+
+		} else if (expr.getE1() instanceof VarExpr) {
+			type = ((VarExpr) expr.getE1()).getVar().getVarDef().getType();
+		} else if (expr.getE2() instanceof VarExpr) {
+			type = ((VarExpr) expr.getE2()).getVar().getVarDef().getType();
+		} else {
+			type = expr.getType();
+		}
+
+		return type;
+	}
+	
+	private int sizeOf(AbstractType type) {
+		int size = 0;
+
+		if (type instanceof IntType) {
+			try {
+				return Util.evaluateAsInteger(((IntType) type).getSize());
+			} catch (OrccException e) {
+				e.printStackTrace();
+				return 32;
+			}
+		} else if (type instanceof BoolType) {
+			size = 1;
+		}
+
+		return size;
 	}
 	
 	@SuppressWarnings("unchecked")
