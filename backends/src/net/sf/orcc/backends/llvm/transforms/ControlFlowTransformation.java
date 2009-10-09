@@ -486,27 +486,14 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		LabelNode conditionLabelNode = null;
 		LabelNode thenLabelNode = null;
 		
-		if (args.length == 0 ) {
-			entryLabelNode = labelNode;
+		entryLabelNode = labelNode;
+		conditionLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		it.add(new BrLabelNode(0, new Location(), conditionLabelNode, entryLabelNode));
+		it.add(conditionLabelNode);
+		
+		thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		labelNode = thenLabelNode;
 			
-			conditionLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
-			it.add(new BrLabelNode(0, new Location(), conditionLabelNode, entryLabelNode));
-	
-			it.add(conditionLabelNode);
-			thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
-			entryNode = conditionLabelNode;
-			labelNode = thenLabelNode;
-			
-		}else if (args[0] instanceof WhileNode){
-			entryLabelNode = entryNode;
-			conditionLabelNode = labelNode;
-			entryNode = labelNode;
-			thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
-			labelNode = thenLabelNode;
-		}	
-		
-		
-		
 		//Store current iterator and branch label
 		ListIterator<AbstractNode> itTmp = it;
 				
@@ -516,25 +503,27 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		//Restore current iterator
 		it = itTmp;
 		
-		//Create PhiNode
-		List<PhiNode> phiNodes = phiNodeCreate(joinNode, entryLabelNode, labelNode);
+		//Add branch to first conditions
+		thenNodes.add(new BrLabelNode(0, new Location(), conditionLabelNode, labelNode));
 		
 		//Set endNode
 		LabelNode elseLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
 		LabelNode endLabelNode = elseLabelNode;
 		labelNode = endLabelNode;
-		
+			
 
 		
+		List<LabelNode>  conditionPrecedence = conditionLabelNode.getPrecedence();
+		
+		//Create PhiNode
+		List<PhiNode> phiNodes = phiNodeCreate(joinNode, conditionPrecedence.get(0), conditionPrecedence.get(1));
+			
 		//Move PhiNodes in current node 
 		for (PhiNode phiNode : phiNodes){
 			it.add(phiNode);
 		}
 		
 		phiNodes.clear();
-		
-		//Add branch to first conditions
-		thenNodes.add(new BrLabelNode(0, new Location(), conditionLabelNode, thenLabelNode));
 		
 		//Add BrNode into the current function
 		it.add(new BrNode(id, location, condition, conditionNodes, thenNodes, elseNodes, phiNodes,

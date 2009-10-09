@@ -91,7 +91,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 		new AddInstantationProcedure(actor);
 		new ArrayListTransformation(actor);
 		new TypeTransformation(actor);
-		new CorrectLabelNameTransformation(actor);
+		//new CorrectLabelNameTransformation(actor);
 		String outputName = path + File.separator + id + ".s";
 		printer.printActor(outputName, actor);
 	}
