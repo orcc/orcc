@@ -284,6 +284,33 @@ hasNoRoom_$action.tag$:
 
 $else$
 $actionCall(action)$
+	br label %return
+$endif$
+
+skip_$action.tag$:
+
+>>
+
+outside_FSM_actionTest(actorName, action, iterator) ::= <<
+	%$action.tag$ = call i1 @isSchedulable_$action.tag$()
+	br i1 %$action.tag$, label %fire_$action.tag$, label %skip_$action.tag$
+
+fire_$action.tag$:
+$if(action.outputPattern)$
+$first(action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
+$first(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
+$rest(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
+$andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$$\n$}$
+	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
+
+hasRoom_$action.tag$:
+$actionCall(action)$
+	br label %bb
+hasNoRoom_$action.tag$:
+	br label %return
+
+$else$
+$actionCall(action)$
 ret i1 1
 $endif$
 
@@ -293,6 +320,10 @@ skip_$action.tag$:
 
 schedulingTest(actorName, actions, iterator) ::= <<
 $actions: actionTest(actorName=actorName, action=it, iterator = iterator)$
+>>
+
+outside_FSM_schedulingTest(actorName, actions, iterator) ::= <<
+$actions: outside_FSM_actionTest(actorName=actorName, action=it, iterator = iterator)$
 >>
 
 scheduler(actorName, actions, iterator) ::= <<
@@ -384,7 +415,7 @@ schedulerFSM(actorName, actions, fsm, iterator) ::= <<
 $if(actions)$
 define i1 @outside_FSM_scheduler() {
 entry:
-	$schedulingTest(actorName=actorName, actions=actions, iterator = iterator)$
+	$outside_FSM_schedulingTest(actorName=actorName, actions=actions, iterator = iterator)$
 	ret i1 0
 }
 
