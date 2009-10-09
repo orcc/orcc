@@ -499,6 +499,9 @@ bb:
 $if(initialize)$
 $schedulingTest(actorName=name, actions=initialize)$
 $endif$
+	br label %return
+	
+return:
 	ret void
 }
 
