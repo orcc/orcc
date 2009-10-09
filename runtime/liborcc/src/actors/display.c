@@ -77,17 +77,13 @@ void print_fps_avg(void) {
 		1000.0f * (float)num_images_end / (float)t);
 }
 
+static Uint32 t;
+
 void display_show_image(void) {
-	static Uint32 t;
 	SDL_Rect rect = { 0, 0, m_width, m_height };
 
 	int t2;
 	SDL_Event event;
-
-	if (t == 0) {
-		start_time = SDL_GetTicks();
-		t = start_time;
-	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef NO_DISPLAY
@@ -221,6 +217,9 @@ static void display_init() {
 
 	SDL_WM_SetCaption("display", NULL);
 
+	start_time = SDL_GetTicks();
+	t = start_time;
+
 #ifdef BENCHMARK
 	{
 		char sFile [80];	
@@ -291,12 +290,10 @@ int display_scheduler() {
 		}
 
 		if (hasTokens(display_B, 384)) {
-			if (init) {
-				display_write_mb(getReadPtr(display_B, 384));
-				//display_show_image();
-			} else {
+			if (!init) {
 				display_init();
 			}
+			display_write_mb(getReadPtr(display_B, 384));
 			res = 1;
 		} else {
 			res = 0;
