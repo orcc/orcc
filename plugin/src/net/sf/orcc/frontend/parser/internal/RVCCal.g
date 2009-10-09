@@ -34,12 +34,38 @@ options {
   output = AST;
 }
 
-tokens {
+tokens {  
   // actor structure
   ACTOR;
   INPUTS;
   OUTPUTS;
-  PORT;
+  
+  // actor parameters
+  PARAMETER;
+  PARAMETERS;
+  
+  // actor declarations
+  ACTOR_DECLS;
+  FUNCTION;
+  PROCEDURE;
+  STATE_VAR;
+  
+  // FSM
+  SCHEDULE;
+  TRANSITION;
+  TRANSITIONS;
+      
+  // priority
+  INEQUALITY;
+  PRIORITY;
+    
+  // action
+  GUARDS;
+  TAG;
+  
+  // statements
+  STATEMENTS;
+  VARS;
 
   // expressions  
   EXPR;
@@ -66,15 +92,8 @@ tokens {
   EXPR_INT;
   EXPR_STRING;
   
-  // actor declarations
-  ACTOR_DECLS;
-  FUNCTION;
-  PROCEDURE;
-  STATE_VAR;
-
-  // actor parameters
-  PARAMETER;
-  PARAMETERS;
+  // variable
+  VAR;
 
   // type definitions
   TYPE;
@@ -83,6 +102,9 @@ tokens {
   // variable declarations
   ASSIGNABLE;
   NON_ASSIGNABLE;
+  
+  // others
+  QID;
 }
 
 @lexer::header {
@@ -97,37 +119,28 @@ package net.sf.orcc.frontend.parser.internal;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-actionChannelSelector:
-  'all' { System.out.println("TODO: throw exception channel selectors"); }
-| 'any' { System.out.println("TODO: throw exception channel selectors"); }
-| 'at' { System.out.println("TODO: throw exception channel selectors"); }
-| 'at*' { System.out.println("TODO: throw exception channel selectors"); };
-
-actionDelay: 'delay' expression
-	{ System.out.println("TODO: throw exception no delay"); };
-
-actionGuards: 'guard' expressions { };
+actionGuards: 'guard' expressions -> expressions;
 
 actionInput:
-	(ID ':')? '[' idents ']' actionRepeat? actionChannelSelector?
+	(ID ':')? '[' idents ']' actionRepeat?
 	{ };
 
-actionInputs: actionInput (',' actionInput)* { };
+actionInputs: actionInput (',' actionInput)* -> actionInput+;
 
 actionOutput:
-	(ID ':')? '[' expressions ']' actionRepeat? actionChannelSelector?
+	(ID ':')? '[' expressions ']' actionRepeat?
 	{ };
 
-actionOutputs: actionOutput (',' actionOutput)* { };
+actionOutputs: actionOutput (',' actionOutput)* -> actionOutput+;
 
-actionRepeat: 'repeat' expression { };
+actionRepeat: 'repeat' expression -> expression;
 
-actionStatements: 'do' statement* { };
+actionStatements: 'do' statement* -> statement*;
 
 /***************************************************************************/
 /* a CAL actor. */
 
-actor: actorImport* 'actor' id=ID ('[' typePars? ']')? '(' actorParameters? ')'
+actor: actorImport* 'actor' id=ID ('[' ']')? '(' actorParameters? ')'
 	inputs=actorPortDecls? '==>' outputs=actorPortDecls? ':'
 	actorDeclarations 'end' EOF
 	-> 'actor' $id
@@ -145,17 +158,18 @@ actorDeclaration:
   // parsing "action a.b:" would be much easier than parsing "a.b: action"
 
   ID (
-    (('.' ID)* ':'
-      ('action' actionInputs? '==>' actionOutputs? actionGuards? actionDelay? ('var' varDecls)? actionStatements? 'end'
-        { }
+    ((('.' tag=ID)* -> $tag*) ':'
+      ('action' inputs=actionInputs? '==>' outputs=actionOutputs? guards=actionGuards? ('var' varDecls)? actionStatements? 'end'
+        -> ^('action' ^(TAG ID $tag*) ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 
-    | 'initialize' '==>' actionOutputs? actionGuards? actionDelay? ('var' varDecls)? actionStatements? 'end'
-        { })
+    | 'initialize' '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
+        -> ^('initialize' ^(TAG ID $tag*) INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 	)
+    )
 
   // a variable declaration.
   // NOTE: a variable declared with no initial value is assignable (hence the last line)
-  | ('[' typePars ']' | '(' attrs=typeAttrs ')')?
+  | ('(' attrs=typeAttrs ')')?
     varName=ID
     (  '=' expression -> ^(STATE_VAR ^(TYPE ID ^(TYPE_ATTRS $attrs?)) $varName NON_ASSIGNABLE expression)
      | ':=' expression -> ^(STATE_VAR ^(TYPE ID ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE expression)
@@ -163,14 +177,14 @@ actorDeclaration:
   )
 
 // anonymous action
-| 'action' actionInputs? '==>' actionOutputs? actionGuards? actionDelay? ('var' varDecls)? actionStatements? 'end'
-  { }
+| 'action' actionInputs? '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
+  -> ^('action' TAG ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 
 // anonymous initialize
-| 'initialize' '==>' actionOutputs? actionGuards? actionDelay? ('var' varDecls)? actionStatements? 'end'
-  { }
+| 'initialize' '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
+  -> ^('initialize' TAG INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 
-| priorityOrder { }
+| priorityOrder -> priorityOrder
 
 | 'function' ID '(' (varDeclNoExpr (',' varDeclNoExpr)*)? ')' '-->' typeDef
     ('var' varDecls)? ':'
@@ -202,12 +216,7 @@ actorParameters: actorParameter (',' actorParameter)* -> actorParameter+;
 /*****************************************************************************/
 /* actor ports */
 
-actorPortDecl:
-	'multi' typeDef ID
-	{ System.out.println("RVC-CAL does not permit the use of multi ports."); }
-| typeDef ID -> ^(PORT typeDef ID);
-
-actorPortDecls: actorPortDecl (',' actorPortDecl)* -> actorPortDecl+;
+actorPortDecls: varDeclNoExpr (',' varDeclNoExpr)* -> varDeclNoExpr+;
 
 /*****************************************************************************/
 /* expressions */
@@ -274,33 +283,29 @@ idents: ID (',' ID)* { };
 /*****************************************************************************/
 /* priorities */
 
-priorityInequality: qualifiedIdent ('>' qualifiedIdent)+ ';' { };
+priorityInequality: qualifiedIdent ('>' qualifiedIdent)+ ';' -> ^(INEQUALITY qualifiedIdent qualifiedIdent+);
 	
-priorityOrder: 'priority' (priorityInequality)* 'end' { };
+priorityOrder: 'priority' priorityInequality* 'end' -> ^(PRIORITY priorityInequality*);
 
 /*****************************************************************************/
 /* qualified ident */
 
-qualifiedIdent: ID ('.' ID)* { };
+qualifiedIdent: ID ('.' ID)* -> ^(QID ID+);
 
 /*****************************************************************************/
 /* schedule */
 
 schedule:
-  'schedule'
-    ('fsm' ID ':' stateTransition* 'end' { }
-    | 'regexp' { System.out.println("RVC-CAL does not support \"regexp\" schedules."); } );
+  'schedule' 'fsm' ID ':' stateTransition* 'end' -> ^(SCHEDULE ID ^(TRANSITIONS stateTransition*));
 
 stateTransition:
-	ID '(' qualifiedIdent ')' '-->' ID ';' { };
+	ID '(' qualifiedIdent ')' '-->' ID ';' -> ^(TRANSITION ID qualifiedIdent ID);
 
 /*****************************************************************************/
 /* statements */
 
 statement:
   'begin' ('var' varDecls 'do')? statement* 'end' { }
-| 'choose' { System.out.println("RVC-CAL does not support the \"choose\" statement."); }
-| 'for' { System.out.println("RVC-CAL does not support the \"for\" statement, please use \"foreach\" instead."); }
 | 'foreach' varDeclNoExpr 'in' (expression ('..' expression)?) ('var' varDecls)? 'do' statement* 'end' { }
 | 'if' expression 'then' statement* ('else' statement*)? 'end' {  }
 | 'while' expression ('var' varDecls)? 'do' statement* 'end' {  }
@@ -321,16 +326,7 @@ typeAttr: ID (':' typeDef -> ^(TYPE ID typeDef) | '=' expression -> ^(EXPR ID ex
 typeAttrs: typeAttr (',' typeAttr)* -> typeAttr+;
 
 /* a type definition: bool, int(size=5), list(type:int, size=10)... */	
-typeDef: ID
-  ('[' typePars ']'
-  | '(' attrs=typeAttrs ')')? -> ^(TYPE ID ^(TYPE_ATTRS $attrs?));
-
-/*****************************************************************************/
-/* type parameters */
-
-typePar: ID ('<' typeDef)? { System.out.println("RVC-CAL does not support type parameters."); };
-
-typePars: typePar (',' typePar)* -> typePar+;
+typeDef: ID ('(' attrs=typeAttrs ')')? -> ^(TYPE ID ^(TYPE_ATTRS $attrs?));
 
 /*****************************************************************************/
 /* variable declarations */
@@ -338,9 +334,9 @@ typePars: typePar (',' typePar)* -> typePar+;
 /* simple variable declarations */
 varDecl: typeDef ID ('=' expression | ':=' expression)? { };
 
-varDeclNoExpr: typeDef ID { };
+varDeclNoExpr: typeDef ID -> ^(VAR typeDef ID);
 
-varDecls: varDecl (',' varDecl)* { };
+varDecls: varDecl (',' varDecl)* -> varDecl+;
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOKENS

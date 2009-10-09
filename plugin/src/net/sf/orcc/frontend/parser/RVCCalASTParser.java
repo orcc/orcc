@@ -34,11 +34,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.frontend.ActionList;
+import net.sf.orcc.frontend.Scope;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.consts.AbstractConst;
@@ -74,26 +78,49 @@ import org.antlr.runtime.tree.Tree;
 public class RVCCalASTParser {
 
 	public static void main(String[] args) throws OrccException {
-		new RVCCalASTParser(args[0]).parse();
+		for (String arg : args) {
+			new RVCCalASTParser(arg).parse();
+		}
 	}
 
+	/**
+	 * list of actions
+	 */
+	private ActionList actions;
+
+	/**
+	 * Contains the current scope of variables
+	 */
+	private Scope<VarDef> currentScope;
+
+	/**
+	 * absolute name of input file
+	 */
 	private String file;
 
 	/**
-	 * input ports
+	 * scope of input ports
 	 */
-	private List<VarDef> inputs;
+	private Scope<VarDef> inputs;
 
 	/**
-	 * output ports
+	 * scope of output ports
 	 */
-	private List<VarDef> outputs;
+	private Scope<VarDef> outputs;
 
 	/**
-	 * parameters
+	 * list of actor parameters
 	 */
 	private List<VarDef> parameters;
 
+	/**
+	 * Contains the current scope of procedures
+	 */
+	private Scope<Procedure> procedures;
+
+	/**
+	 * list of state variables
+	 */
 	private List<StateVar> stateVars;
 
 	/**
@@ -130,33 +157,89 @@ public class RVCCalASTParser {
 			throw new OrccException("I/O error", e);
 		} catch (RecognitionException e) {
 			throw new OrccException("parse error", e);
+		} catch (OrccException e) {
+			throw e;
 		}
 	}
 
+	private Action parseAction(Tree tree) {
+		Tree tagTree = tree.getChild(0);
+		Location location = parseLocation(tree);
+		List<String> tag = parseActionTag(tagTree);
+		return new Action(location, tag, null, null, null, null);
+	}
+
+	private List<String> parseActionTag(Tree tree) {
+		List<String> tag = new ArrayList<String>();
+		int n = tree.getChildCount();
+		for (int i = 0; i < n; i++) {
+			Tree child = tree.getChild(i);
+			tag.add(child.getText());
+		}
+
+		return tag;
+	}
+
 	/**
-	 * children = actor, id, parameters, inputs, outputs
+	 * parse tree. children are: actor, id, parameters, inputs, outputs
 	 * 
 	 * @param tree
-	 * @return
+	 * @return an actor
 	 */
 	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
-		parameters = parseVarDefs(tree.getChild(2));
-		inputs = parseVarDefs(tree.getChild(3));
-		outputs = parseVarDefs(tree.getChild(4));
+		currentScope = new Scope<VarDef>();
+		procedures = new Scope<Procedure>();
+
+		// TODO remove when scopeProcedures are actually used
+		procedures.toString();
+
+		parameters = parseVarDefs(currentScope, tree.getChild(2));
+
+		inputs = new Scope<VarDef>();
+		parseVarDefs(inputs, tree.getChild(3));
+
+		outputs = new Scope<VarDef>();
+		parseVarDefs(outputs, tree.getChild(4));
+
+		actions = new ActionList();
+		stateVars = new ArrayList<StateVar>();
 		parseActorDecls(tree.getChild(5));
-		return new Actor(name, file, parameters, inputs, outputs, stateVars,
-				null, null, null, null, null);
+
+		return new Actor(name, file, parameters, inputs.getList(), outputs
+				.getList(), stateVars, null, null, null, null, null);
 	}
 
+	/**
+	 * parse actor declarations.
+	 * 
+	 * @param actorDecls
+	 * @throws OrccException
+	 */
 	private void parseActorDecls(Tree actorDecls) throws OrccException {
-		stateVars = new ArrayList<StateVar>();
+		// actor declarations are in a new scope
+		currentScope = new Scope<VarDef>(currentScope);
+
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree child = actorDecls.getChild(i);
 			String declType = child.getText();
-			if (declType.equals("STATE_VAR")) {
-				stateVars.add(parseStateVar(child));
+			if (declType.equals("action")) {
+				Action action = parseAction(child);
+				actions.register(file, action.getLocation(), action.getTag(),
+						action);
+			} else if (declType.equals("PRIORITY")) {
+				parsePriority(child);
+			} else if (declType.equals("SCHEDULE")) {
+				parseSchedule(child);
+			} else if (declType.equals("STATE_VAR")) {
+				StateVar stateVar = parseStateVar(child);
+				VarDef varDef = stateVar.getDef();
+				currentScope.register(file, varDef.getLoc(), varDef.getName(),
+						varDef);
+				stateVars.add(stateVar);
+			} else {
+				throw new OrccException("not yet implemented");
 			}
 		}
 	}
@@ -198,6 +281,16 @@ public class RVCCalASTParser {
 		int endColumn = startColumn + tree.getText().length();
 
 		return new Location(lineNumber, startColumn, endColumn);
+	}
+
+	private void parsePriority(Tree tree) {
+		// TODO parse priority
+
+	}
+
+	private void parseSchedule(Tree tree) {
+		// TODO parse schedule
+
 	}
 
 	private StateVar parseStateVar(Tree stateVar) throws OrccException {
@@ -254,8 +347,8 @@ public class RVCCalASTParser {
 		int n = typeAttrs.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
-			if (attr.getText().equals("EXPR")) {
-				// TODO check type attribute id
+			if (attr.getText().equals("EXPR")
+					&& attr.getChild(0).getText().equals("size")) {
 				return parseExpression(attr.getChild(1));
 			}
 		}
@@ -275,13 +368,13 @@ public class RVCCalASTParser {
 		int n = typeAttrs.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
-			if (attr.getText().equals("TYPE")) {
-				// TODO check type attribute id
+			if (attr.getText().equals("TYPE")
+					&& attr.getChild(0).getText().equals("type")) {
 				return parseType(attr.getChild(1));
 			}
 		}
 
-		// size attribute not found, and no default size given => error
+		// type attribute not found, and no default type given => error
 		throw new OrccException(file, location, "missing \"type\" attribute");
 	}
 
@@ -313,15 +406,20 @@ public class RVCCalASTParser {
 	/**
 	 * children = vardef 1, ..., vardef n
 	 * 
+	 * @param scope
+	 *            a scope
 	 * @param tree
-	 * @return
+	 *            a tree
 	 */
-	private List<VarDef> parseVarDefs(Tree tree) throws OrccException {
+	private List<VarDef> parseVarDefs(Scope<VarDef> scope, Tree tree)
+			throws OrccException {
 		List<VarDef> varDefs = new ArrayList<VarDef>();
 		int numPorts = tree.getChildCount();
 		for (int i = 0; i < numPorts; i++) {
 			Tree child = tree.getChild(i);
-			varDefs.add(parseVarDef(child, false, true, 0, null));
+			VarDef varDef = parseVarDef(child, false, true, 0, null);
+			scope.register(file, varDef.getLoc(), varDef.getName(), varDef);
+			varDefs.add(varDef);
 		}
 
 		return varDefs;

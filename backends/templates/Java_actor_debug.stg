@@ -86,11 +86,11 @@ public int schedule() {
 // Scheduler without FSM
 
 actionCall_DEBUG(action) ::= <<
-return "$action.tag$";
+return "$action$";
 >>
 
 actionTest_DEBUG(action) ::= <<
-if (isSchedulable_$action.tag$()) {
+if (isSchedulable_$action$()) {
 	$if(action.outputPattern)$
 	if ($outputPattern(action.outputPattern)$) {
 		$actionCall_DEBUG(action)$
@@ -120,11 +120,11 @@ public String getNextSchedulableAction() {
 // Scheduler with FSM
 
 actionCallState_DEBUG(nextState) ::= <<
-return "$nextState.action.tag$";
+return "$nextState.action$";
 >>
 
 actionTestState_DEBUG(nextState) ::= <<
-if (isSchedulable_$nextState.action.tag$()) {
+if (isSchedulable_$nextState.action$()) {
 	$if(nextState.action.outputPattern)$
 	if ($outputPattern(nextState.action.outputPattern)$) {
 		$actionCallState_DEBUG(nextState)$

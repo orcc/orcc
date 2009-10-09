@@ -130,13 +130,13 @@ $pattern.keys:{port|m_poTabOut[$name$_$port$]->hasRooms($pattern.(port)$)}; sepa
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-$action.tag$();
+$action$();
 res = true;
 i++;
 >>
 
 actionTest(action) ::= <<
-if (isSchedulable_$action.tag$()) {
+if (isSchedulable_$action$()) {
 	$if(action.outputPattern)$
 	if ($outputPattern(action.outputPattern)$) {
 		$actionCall(action)$
@@ -172,13 +172,13 @@ void Actor_$actorname$::process() {
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-$nextState.action.tag$();
+$nextState.action$();
 _FSM_state = s_$nextState.targetState$;
 res = true;
 >>
 
 actionTestState(nextState) ::= <<
-if (isSchedulable_$nextState.action.tag$()) {
+if (isSchedulable_$nextState.action$()) {
 	$if(nextState.action.outputPattern)$
 	if ($outputPattern(nextState.action.outputPattern)$) {
 		$actionCallState(nextState)$

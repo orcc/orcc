@@ -108,13 +108,13 @@ $pattern.keys:{port|fifo_$port$.hasRoom($pattern.(port)$)}; separator=" && "$
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-$action.tag$();
+$action$();
 res = true;
 i++;
 >>
 
 actionTest(action) ::= <<
-if (isSchedulable_$action.tag$()) {
+if (isSchedulable_$action$()) {
 	$if(action.outputPattern)$
 	if ($outputPattern(action.outputPattern)$) {
 		$actionCall(action)$
@@ -150,13 +150,13 @@ public int schedule() {
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-$nextState.action.tag$();
+$nextState.action$();
 _FSM_state = States.s_$nextState.targetState$;
 res = true;
 >>
 
 actionTestState(nextState) ::= <<
-if (isSchedulable_$nextState.action.tag$()) {
+if (isSchedulable_$nextState.action$()) {
 	$if(nextState.action.outputPattern)$
 	if ($outputPattern(nextState.action.outputPattern)$) {
 		$actionCallState(nextState)$

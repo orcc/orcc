@@ -261,25 +261,25 @@ $loadFifoTmp(var=iterator.index, actorName= actorName, fifoName=pattern)$ $hasRo
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-	call void @$action.tag$()
+	call void @$action$()
 >>
 
 actionTest(actorName, action, iterator) ::= <<
-	%$action.tag$ = call i1 @isSchedulable_$action.tag$()
-	br i1 %$action.tag$, label %fire_$action.tag$, label %skip_$action.tag$
+	%$action$ = call i1 @isSchedulable_$action$()
+	br i1 %$action$, label %fire_$action$, label %skip_$action$
 
-fire_$action.tag$:
+fire_$action$:
 $if(action.outputPattern)$
 $first(action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
 $first(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
 $rest(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
 $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$$\n$}$
-	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
+	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action$, label %hasNoRoom_$action$
 
-hasRoom_$action.tag$:
+hasRoom_$action$:
 $actionCall(action)$
 	br label %bb
-hasNoRoom_$action.tag$:
+hasNoRoom_$action$:
 	br label %return
 
 $else$
@@ -287,26 +287,26 @@ $actionCall(action)$
 	br label %return
 $endif$
 
-skip_$action.tag$:
+skip_$action$:
 
 >>
 
 outside_FSM_actionTest(actorName, action, iterator) ::= <<
-	%$action.tag$ = call i1 @isSchedulable_$action.tag$()
-	br i1 %$action.tag$, label %fire_$action.tag$, label %skip_$action.tag$
+	%$action$ = call i1 @isSchedulable_$action$()
+	br i1 %$action$, label %fire_$action$, label %skip_$action$
 
-fire_$action.tag$:
+fire_$action$:
 $if(action.outputPattern)$
 $first(action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
 $first(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
 $rest(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
 $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$$\n$}$
-	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action.tag$, label %hasNoRoom_$action.tag$
+	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action$, label %hasNoRoom_$action$
 
-hasRoom_$action.tag$:
+hasRoom_$action$:
 $actionCall(action)$
 	br label %bb
-hasNoRoom_$action.tag$:
+hasNoRoom_$action$:
 	br label %return
 
 $else$
@@ -314,7 +314,7 @@ $actionCall(action)$
 ret i1 1
 $endif$
 
-skip_$action.tag$:
+skip_$action$:
 
 >>
 
@@ -350,7 +350,7 @@ return:
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-	call void @$nextState.action.tag$()
+	call void @$nextState.action$()
 	store i32 $nextState.targetIntState$, i32* @_FSM_state
 	ret i1 1
 
@@ -359,21 +359,21 @@ actionCallState(nextState) ::= <<
 actionTestState(actorName, nextState, br, iterator) ::= <<
 
 $if(nextState.action.outputPattern)$
-	%sched_$nextState.action.tag$ = call i1 @isSchedulable_$nextState.action.tag$()
-	br i1 %sched_$nextState.action.tag$, label %$nextState.action.tag$, label %$br$
+	%sched_$nextState.action$ = call i1 @isSchedulable_$nextState.action$()
+	br i1 %sched_$nextState.action$, label %$nextState.action$, label %$br$
 
-$nextState.action.tag$:
+$nextState.action$:
 $first(nextState.action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator)$}$ $rest(nextState.action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator.nextNodeIndex)$}$
-	br i1 %$iterator.nextNodeIndex.lastIndex$, label %n_$nextState.action.tag$, label %$br$
+	br i1 %$iterator.nextNodeIndex.lastIndex$, label %n_$nextState.action$, label %$br$
 
-n_$nextState.action.tag$:
+n_$nextState.action$:
 $actionCallState(nextState)$
 $br$:
 $else$
-	%sched_$nextState.action.tag$ = call i1 @isSchedulable_$nextState.action.tag$()
-	br i1 %sched_$nextState.action.tag$, label %$nextState.action.tag$, label %$br$
+	%sched_$nextState.action$ = call i1 @isSchedulable_$nextState.action$()
+	br i1 %sched_$nextState.action$, label %$nextState.action$, label %$br$
 
-$nextState.action.tag$:
+$nextState.action$:
 $actionCallState(nextState)$
 
 $br$:

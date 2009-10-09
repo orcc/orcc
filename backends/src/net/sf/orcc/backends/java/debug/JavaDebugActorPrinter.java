@@ -133,7 +133,7 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 			list.add(location.getStartLine());
 			list.add(location.getStartColumn());
 			list.add(location.getEndColumn());
-			locationMap.put(action.getTag(), list);
+			locationMap.put(action.toString(), list);
 		}
 
 		template.setAttribute("actionLoc", locationMap);

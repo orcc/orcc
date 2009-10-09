@@ -31,6 +31,7 @@ package net.sf.orcc.ir.actor;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.VarDef;
 
@@ -44,13 +45,16 @@ public class Action {
 
 	private Map<VarDef, Integer> inputPattern;
 
+	private Location location;
+
 	private Map<VarDef, Integer> outputPattern;
 
 	private Procedure scheduler;
 
 	private List<String> tag;
 
-	public Action(List<String> tag, Map<VarDef, Integer> inputPattern,
+	public Action(Location location, List<String> tag,
+			Map<VarDef, Integer> inputPattern,
 			Map<VarDef, Integer> outputPattern, Procedure scheduler,
 			Procedure body) {
 		this.body = body;
@@ -68,6 +72,10 @@ public class Action {
 		return inputPattern;
 	}
 
+	public Location getLocation() {
+		return location;
+	}
+
 	public Map<VarDef, Integer> getOutputPattern() {
 		return outputPattern;
 	}
@@ -76,7 +84,17 @@ public class Action {
 		return scheduler;
 	}
 
-	public String getTag() {
+	/**
+	 * Returns the tag of this action as a string list.
+	 * 
+	 * @return the tag of this action as a string list
+	 */
+	public List<String> getTag() {
+		return tag;
+	}
+
+	@Override
+	public String toString() {
 		if (tag.isEmpty()) {
 			return body.getName();
 		} else {

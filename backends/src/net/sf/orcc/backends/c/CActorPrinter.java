@@ -176,7 +176,7 @@ public class CActorPrinter {
 			StringTemplate procTmpl = applyProc(actorName, action.getBody());
 			template.setAttribute(tmplName, procTmpl);
 			Procedure proc = action.getScheduler();
-			proc.setName("isSchedulable_" + action.getTag());
+			proc.setName("isSchedulable_" + action);
 			procTmpl = applyProc(actorName, proc);
 			template.setAttribute(tmplName, procTmpl);
 		}

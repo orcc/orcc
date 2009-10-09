@@ -205,7 +205,8 @@ public class IrParser {
 		Procedure scheduler = parseProc(array.getJSONArray(3));
 		Procedure body = parseProc(array.getJSONArray(4));
 
-		Action action = new Action(tag, ip, op, scheduler, body);
+		Action action = new Action(body.getLocation(), tag, ip, op, scheduler,
+				body);
 		putAction(tag, action);
 		return action;
 	}

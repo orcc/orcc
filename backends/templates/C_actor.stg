@@ -168,13 +168,13 @@ $pattern.keys:{port|hasRoom($actorName$_$port$, $pattern.(port)$)}; separator=" 
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-$action.tag$();
+$action$();
 res = 1;
 i++;
 >>
 
 actionTest(actorName, action) ::= <<
-if (isSchedulable_$action.tag$()) {
+if (isSchedulable_$action$()) {
 	$if(action.outputPattern)$
 	if ($outputPattern(actorName=actorName, pattern=action.outputPattern)$) {
 		$actionCall(action)$
@@ -209,13 +209,13 @@ int $actorName$_scheduler() {
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-$nextState.action.tag$();
+$nextState.action$();
 _FSM_state = s_$nextState.targetState$;
 res = 1;
 >>
 
 actionTestState(actorName, nextState) ::= <<
-if (isSchedulable_$nextState.action.tag$()) {
+if (isSchedulable_$nextState.action$()) {
 	$if(nextState.action.outputPattern)$
 	if ($outputPattern(actorName=actorName, pattern=nextState.action.outputPattern)$) {
 		$actionCallState(nextState)$
