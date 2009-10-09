@@ -32,6 +32,8 @@ import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.util.TreeMap;
@@ -100,6 +102,8 @@ public class Actor_display extends AbstractActorDebug implements ActionListener 
 
 	private BufferedImage image;
 
+	private int numImages;
+
 	private Timer timer;
 
 	public int width;
@@ -107,6 +111,8 @@ public class Actor_display extends AbstractActorDebug implements ActionListener 
 	public int x;
 
 	public int y;
+
+	private long startTime;
 
 	public Actor_display() {
 		super("Actor_display.java");
@@ -117,7 +123,16 @@ public class Actor_display extends AbstractActorDebug implements ActionListener 
 		frame.add(canvas);
 		frame.setVisible(true);
 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				long t = System.currentTimeMillis() - startTime;
+				System.out.println(numImages + " in " + t);
+				System.exit(0);
+			}
+
+		});
 
 		timer = new Timer(40, this);
 		timer.start();
@@ -161,6 +176,10 @@ public class Actor_display extends AbstractActorDebug implements ActionListener 
 	public int schedule() {
 		boolean res = !suspended;
 		int i = 0;
+
+		if (startTime == 0L) {
+			startTime = System.currentTimeMillis();
+		}
 
 		while (res) {
 			res = false;
@@ -252,6 +271,7 @@ public class Actor_display extends AbstractActorDebug implements ActionListener 
 		if (y == height) {
 			x = 0;
 			y = 0;
+			numImages++;
 		}
 	}
 
