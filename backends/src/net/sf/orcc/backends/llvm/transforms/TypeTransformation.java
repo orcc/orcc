@@ -66,7 +66,6 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
@@ -197,30 +196,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 	}
 
-	public IExpr removeUnaryExpr(UnaryExpr expr) {
-		// Unary expression doesn't exists in LLVM
-		Location loc = expr.getLocation();
-		AbstractType type = expr.getType();
-		IExpr exprE1 = expr.getExpr();
-		UnaryOp op = expr.getOp();
-		IntExpr constExpr = new IntExpr(new Location(), 0);
-		BinaryExpr varExpr;
-		
-		switch (op) {
-		case MINUS:
-			varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS,
-					exprE1, type);
-			return varExpr;
-		case LNOT:
-			varExpr = new BinaryExpr(loc, exprE1,
-					BinaryOp.NE, constExpr, type);
-			return varExpr;
-		default:
-
-		}
-		return expr;
-	}
-
 	private int sizeOf(AbstractType type) {
 		if (type instanceof IntType) {
 			try {
@@ -258,12 +233,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	@Override
 	public void visit(AssignVarNode node, Object... args) {
 		VarDef varDef = node.getVar();
-		IExpr expr = node.getValue();
-
-		// Change unary expression into binary expression
-		if (expr instanceof UnaryExpr) {
-			node.setValue(removeUnaryExpr((UnaryExpr) expr));
-		}
 
 		// Visit expr
 		node.getValue().accept(this, varDef.getType());
@@ -332,6 +301,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	public void visit(BrNode node, Object... args) {
 
 		ListIterator<AbstractNode> tmpit = it;
+		visitNodes(node.getConditionNodes());
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
 		it = tmpit;

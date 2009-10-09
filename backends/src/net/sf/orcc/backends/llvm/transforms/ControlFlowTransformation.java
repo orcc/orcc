@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
@@ -70,8 +69,6 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 
 	private int BrCounter;
 	private LabelNode labelNode;
-	private LabelNode entryNode;
-	private LabelNode mergeNode;
 	List<PhiNode> tmpPhiNodes;
 	
 	ListIterator<AbstractNode> it;
@@ -342,7 +339,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		return PhiNodes;
 		
 	}
-	
+	/*
 	private void mergePhiNode(List<PhiNode> sourceNodes, List<PhiNode> targetNodes){
 		
 		// Match and merge a couple vardef/brLabel into imbricated brNode
@@ -399,7 +396,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		}
 	}
 
-	
+	*/
 	private SelectNode selectNodeCreate(IfNode node) {
 		int id = node.getId();
 		Location location = node.getLocation();
