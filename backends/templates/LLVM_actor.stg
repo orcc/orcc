@@ -262,8 +262,6 @@ $loadFifoTmp(var=iterator.index, actorName= actorName, fifoName=pattern)$ $hasRo
 
 actionCall(action) ::= <<
 	call void @$action.tag$()
-	br label %bb
-	
 >>
 
 actionTest(actorName, action, iterator) ::= <<
@@ -280,11 +278,13 @@ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+i
 
 hasRoom_$action.tag$:
 $actionCall(action)$
+	br label %bb
 hasNoRoom_$action.tag$:
 	br label %return
 
 $else$
 $actionCall(action)$
+ret i1 1
 $endif$
 
 skip_$action.tag$:
@@ -382,11 +382,10 @@ schedulerFSM(actorName, actions, fsm, iterator) ::= <<
 @_FSM_state = internal global i32 $fsm.initialIntState$
 
 $if(actions)$
-static int outside_FSM_scheduler() {
-	int res = 0;
-	int i = 0;
+define i1 @outside_FSM_scheduler() {
+entry:
 	$schedulingTest(actorName=actorName, actions=actions, iterator = iterator)$
-	return res;
+	ret i1 0
 }
 
 
@@ -400,12 +399,17 @@ entry:
 	
 bb:  
 $if(actions)$
-if (outside_FSM_scheduler()) {
-res = 1;
-i++;
-} else {
+	%out = call i1 @outside_FSM_scheduler()
+	br i1 %out, label %bb1, label %bb2
+
+bb1:
+	%0 = load i32* %i
+	%1 = add i32 %0, 1
+	store i32 %1, i32* %i
+	br label %bb
+	
+bb2:
 $switch(fsm.transitions)$
-}
 $else$ $switch(fsm.transitions)$
 $endif$
 
