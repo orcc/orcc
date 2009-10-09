@@ -227,10 +227,18 @@
             <Expr kind="Literal" literal-kind="Integer" value="100"/>
         </Attribute>
     </Connection>
-    <Connection dst="buffer" dst-port="RA" src="address" src-port="RA"/>
+    <Connection dst="buffer" dst-port="RA" src="address" src-port="RA">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="100"/>
+        </Attribute>
+    </Connection>
     <Connection dst="interpolation" dst-port="halfpel" src="address" src-port="halfpel"/>
     <Connection dst="interpolation" dst-port="RD" src="buffer" src-port="RD"/>
     <Connection dst="add" dst-port="MOT" src="interpolation" src-port="MOT"/>
-    <Connection dst="buffer" dst-port="WD" src="add" src-port="VID"/>
+    <Connection dst="buffer" dst-port="WD" src="add" src-port="VID">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="100"/>
+        </Attribute>
+    </Connection>
     <Connection dst="" dst-port="VID" src="add" src-port="VID"/>
 </XDF>
