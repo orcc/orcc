@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.nodes.AbstractNode;
 
 /**
  * @author Jérôme GORIN
@@ -42,16 +43,23 @@ public class LabelNode extends AbstractLLVMNode {
 	private String labelName;
 	
 	private List<LabelNode> precedence;
+	
+	private AbstractNode successor;
 
 	public LabelNode(int id, Location location, String labelName) {
 		super(id, location);
 		precedence = new ArrayList<LabelNode>();
 		this.labelName = labelName;
+		this.successor = null;
 	}
 
 	@Override
 	public void accept(LLVMNodeVisitor visitor, Object... args) {
 		visitor.visit(this, args);
+	}
+
+	public void addPrecedence(LabelNode precedence) {
+		this.precedence.add(precedence);
 	}
 
 	@Override
@@ -70,17 +78,21 @@ public class LabelNode extends AbstractLLVMNode {
 	public List<LabelNode> getPrecedence() {
 		return precedence;
 	}
-	
-	public void addPrecedence(LabelNode precedence) {
-		this.precedence.add(precedence);
-	}
 
+	public AbstractNode getSuccessor() {
+		return successor;
+	}
+	
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
 	}
 
 	public void setPrecedence(List<LabelNode> precedence) {
 		this.precedence = precedence;
+	}
+
+	public void setSuccessor(AbstractNode successor) {
+		this.successor = successor;
 	}
 	
 	@Override

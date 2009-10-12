@@ -91,6 +91,7 @@ public class BrNode extends AbstractLLVMNode {
 		this.labelTrueNode = labelTrueNode;
 		this.labelFalseNode = labelFalseNode;
 		this.labelEndNode = labelEndNode;
+		labelEntryNode.setSuccessor(this);
 	}
 
 	@Override

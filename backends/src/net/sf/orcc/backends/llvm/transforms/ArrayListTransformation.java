@@ -75,20 +75,6 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 		}
 	}
 
-	private VarDef varDefCreate(VarDef varDef, AbstractType type) {
-		int index = varDef.getIndex();
-		String name = varDef.getName()+ Integer.toString(indexName++);
-		int suffix;
-		if (varDef.hasSuffix()){
-			suffix=varDef.getSuffix();
-		}else{
-			suffix=0;
-		}
-		
-		return new  VarDef(false, false, index,
-				new Location(), name, null, null, suffix, new PointType(type));
-	}
-	
 	@SuppressWarnings("unchecked")
 	public VarUse getElementPtrNodeCreate(VarUse varList, List<IExpr> indexes, Object... args){
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
@@ -115,6 +101,20 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 		it.next();
 		
 		return varUse;
+	}
+	
+	private VarDef varDefCreate(VarDef varDef, AbstractType type) {
+		int index = varDef.getIndex();
+		String name = varDef.getName()+ Integer.toString(indexName++);
+		int suffix;
+		if (varDef.hasSuffix()){
+			suffix=varDef.getSuffix();
+		}else{
+			suffix=0;
+		}
+		
+		return new  VarDef(false, false, index,
+				new Location(), name, null, null, suffix, new PointType(type));
 	}
 	
 	@Override

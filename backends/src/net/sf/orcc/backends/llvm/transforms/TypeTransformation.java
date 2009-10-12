@@ -337,11 +337,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	}
 	
 	@Override
-	public void visit(ReturnNode node, Object... args) {
-		node.getValue().accept(this, procedure.getReturnType());
-	}
-
-	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
 		// Set every index to i32 (mandatory in llvm)
 		for (IExpr index : node.getIndexes()) {
@@ -426,6 +421,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		portIndex.remove(fifoName);
 		portIndex.put(fifoName, new Integer(++index));
 
+	}
+
+	@Override
+	public void visit(ReturnNode node, Object... args) {
+		node.getValue().accept(this, procedure.getReturnType());
 	}
 
 	@Override

@@ -43,6 +43,7 @@ public class BrLabelNode extends AbstractLLVMNode {
 		super(id, location);
 		this.labelNode = labelNode;
 		labelNode.addPrecedence(precedence);
+		precedence.setSuccessor(this);
 	}
 
 	@Override
@@ -52,6 +53,10 @@ public class BrLabelNode extends AbstractLLVMNode {
 
 	public LabelNode getLabelNode() {
 		return labelNode;
+	}
+
+	public void setLabelNode(LabelNode labelNode) {
+		this.labelNode = labelNode;
 	}
 
 	@Override
