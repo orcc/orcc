@@ -178,6 +178,49 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 				endLabelNode);
 	}
 	
+	private BrNode brNodeCreate(WhileNode node, Object... args) {
+
+		//Get whileNode information
+		int id = node.getId();
+		Location location= node.getLocation();
+		IExpr condition = node.getCondition();
+		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
+		List<AbstractNode> thenNodes = node.getNodes();
+		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
+		LabelNode entryLabelNode = labelNode;
+		LabelNode thenLabelNode = null;
+		List<PhiNode> phiNodes= new ArrayList<PhiNode>();
+		
+
+		
+		thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		labelNode = thenLabelNode;
+			
+		//Store current iterator and branch label
+		ListIterator<AbstractNode> itTmp = it;
+				
+		// Continue transformation on thenNode
+		visitNodes(thenNodes, node);
+		
+		//Restore current iterator
+		it = itTmp;
+		
+		//Add branch to first conditions
+		thenNodes.add(new BrLabelNode(0, new Location(), entryLabelNode, labelNode));
+		
+		//Set endNode
+		LabelNode elseLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		elseLabelNode.addPrecedence(entryLabelNode);
+		LabelNode endLabelNode = elseLabelNode;
+		labelNode = endLabelNode;
+		
+		return new BrNode(id, location, condition, conditionNodes, thenNodes, elseNodes, phiNodes,
+				entryLabelNode, thenLabelNode, elseLabelNode,
+				endLabelNode);
+	}
+	
+	
+	//Remove ifNode in case of a constant condition 
 	private List<AbstractNode> clearIfNode(IfNode node){
 		BooleanExpr condition = (BooleanExpr)node.getCondition();
 		List<AbstractNode> nodes;
@@ -187,7 +230,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		if (value == true){
 			nodes = node.getThenNodes();
 		}else{
-			nodes = node.getThenNodes();
+			nodes = node.getElseNodes();
 		}
 		
 		for (PhiAssignment phi : phis){
@@ -207,6 +250,8 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		return nodes;
 	}
 	
+	
+	//Return a list of PhiNode supported by the LLVM backend from JoinNode
 	private List<PhiNode> phiNodeCreate(JoinNode node, LabelNode labelTrueNode, LabelNode labelFalseNode) {
 		List<PhiAssignment> phis = node.getPhis();
 		List<PhiNode> PhiNodes = new ArrayList<PhiNode>();
@@ -246,6 +291,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		
 	}
 	
+	//Return a selectNode
 	private SelectNode selectNodeCreate(IfNode node) {
 		int id = node.getId();
 		Location location = node.getLocation();
@@ -262,6 +308,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		List<AbstractNode> elseNodes = node.getElseNodes();
 		JoinNode joinNode = node.getJoinNode();
 
+		//Select the appropriate llvm Node to describe the current IfNode
 		if ((thenNodes.isEmpty())
 				&& (elseNodes.isEmpty())) {
 
@@ -288,53 +335,23 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 	
 	@Override
 	public void visit(WhileNode node, Object... args) {
+
+		//Store current label node
+		LabelNode entryLabelNode = labelNode;
 		
 		it.remove();
 		
-		//Get whileNode information
-		int id = node.getId();
-		Location location= node.getLocation();
-		IExpr condition = node.getCondition();
-		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
-		List<AbstractNode> thenNodes = node.getNodes();
-		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
-		JoinNode joinNode = node.getJoinNode();
-		LabelNode entryLabelNode = null;
-		LabelNode conditionLabelNode = null;
-		LabelNode thenLabelNode = null;
-		
-		entryLabelNode = labelNode;
-		conditionLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		LabelNode conditionLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
 		it.add(new BrLabelNode(0, new Location(), conditionLabelNode, entryLabelNode));
 		it.add(conditionLabelNode);
-		
-		thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
-		labelNode = thenLabelNode;
+		labelNode = conditionLabelNode;
 			
-		//Store current iterator and branch label
-		ListIterator<AbstractNode> itTmp = it;
-				
-		// Continue transformation on thenNode
-		visitNodes(thenNodes, node);
+		BrNode brNode = brNodeCreate(node);
+		List<LabelNode> label = brNode.getLabelEntryNode().getPrecedence();
+		List<PhiNode> phiNodes = phiNodeCreate(node.getJoinNode(), label.get(0), label.get(1)); 
+					
 		
-		//Restore current iterator
-		it = itTmp;
 		
-		//Add branch to first conditions
-		thenNodes.add(new BrLabelNode(0, new Location(), conditionLabelNode, labelNode));
-		
-		//Set endNode
-		LabelNode elseLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
-		LabelNode endLabelNode = elseLabelNode;
-		labelNode = endLabelNode;
-			
-
-		
-		List<LabelNode>  conditionPrecedence = conditionLabelNode.getPrecedence();
-		
-		//Create PhiNode
-		List<PhiNode> phiNodes = phiNodeCreate(joinNode, conditionPrecedence.get(0), conditionPrecedence.get(1));
-			
 		//Move PhiNodes in current node 
 		for (PhiNode phiNode : phiNodes){
 			it.add(phiNode);
@@ -343,8 +360,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		phiNodes.clear();
 		
 		//Add BrNode into the current function
-		it.add(new BrNode(id, location, condition, conditionNodes, thenNodes, elseNodes, phiNodes,
-				entryLabelNode, thenLabelNode, elseLabelNode, endLabelNode));
+		it.add(brNode);
 		
 	}
 

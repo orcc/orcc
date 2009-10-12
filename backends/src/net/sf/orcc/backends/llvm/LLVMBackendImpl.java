@@ -35,7 +35,6 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.llvm.transforms.ArrayListTransformation;
 import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
-import net.sf.orcc.backends.llvm.transforms.CorrectLabelNameTransformation;
 import net.sf.orcc.backends.llvm.transforms.JoinNodeTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.backends.llvm.transforms.TypeTransformation;
@@ -89,7 +88,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 		new AssignPeephole(actor);
 		new ControlFlowTransformation(actor);
 		new JoinNodeTransformation(actor);
-		new CorrectLabelNameTransformation(actor);
+		//new CorrectLabelNameTransformation(actor);
 		new ThreeAddressCodeTransformation(actor);
 		new AddInstantationProcedure(actor);
 		new ArrayListTransformation(actor);
