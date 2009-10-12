@@ -179,7 +179,7 @@ public class LLVMActorPrinter {
 			StringTemplate procTmpl = applyProc(actorName, action.getBody());
 			template.setAttribute(tmplName, procTmpl);
 			Procedure proc = action.getScheduler();
-			proc.setName("isSchedulable_" + action);
+			proc.setName("isSchedulable_" + action.getTag());
 			procTmpl = applyProc(actorName, proc);
 			template.setAttribute(tmplName, procTmpl);
 		}
