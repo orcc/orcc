@@ -26,43 +26,58 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.network;
+package net.sf.orcc.network;
 
-import java.util.HashMap;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.VarDef;
 
 /**
- * An Instance is an {@link Actor} with parameters.
- * 
  * @author Matthieu Wipliez
  * 
  */
-public class Broadcast extends Instance {
+public class Connection {
 
-	public static final String CLASS = "";
+	private Integer size;
 
-	private int numOutput;
+	private VarDef source;
 
-	private AbstractType type;
+	private VarDef target;
 
-	public Broadcast(String actorName, String portName, int numOutput,
-			AbstractType type) throws OrccException {
-		super(null, "broadcast_" + actorName + "_" + portName, CLASS,
-				new HashMap<String, IExpr>());
-		this.numOutput = numOutput;
-		this.type = type;
+	public Connection(VarDef source, VarDef target, Integer size) {
+		this.size = size;
+		this.source = source;
+		this.target = target;
 	}
 
-	public int getNumOutput() {
-		return numOutput;
+	public int getSize() {
+		return size;
 	}
 
-	public AbstractType getType() {
-		return type;
+	public Integer getSizeInteger() {
+		return size;
+	}
+
+	public VarDef getSource() {
+		return source;
+	}
+
+	public VarDef getTarget() {
+		return target;
+	}
+
+	public boolean hasSize() {
+		return (size != null);
+	}
+
+	public void setSize(Integer size) {
+		this.size = size;
+	}
+
+	public void setSource(VarDef source) {
+		this.source = source;
+	}
+
+	public void setTarget(VarDef target) {
+		this.target = target;
 	}
 
 }

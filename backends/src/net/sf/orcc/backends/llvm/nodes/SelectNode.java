@@ -51,10 +51,6 @@ public class SelectNode extends AbstractLLVMNode {
 		this.phis = phis;
 	}
 
-	public void setCondition(IExpr condition) {
-		this.condition = condition;
-	}
-
 	@Override
 	public void accept(LLVMNodeVisitor visitor, Object... args) {
 		visitor.visit(this, args);
@@ -66,6 +62,10 @@ public class SelectNode extends AbstractLLVMNode {
 
 	public List<PhiAssignment> getPhis() {
 		return phis;
+	}
+
+	public void setCondition(IExpr condition) {
+		this.condition = condition;
 	}
 
 	public void setPhis(List<PhiAssignment> phis) {

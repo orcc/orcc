@@ -62,14 +62,15 @@ public class LLVMConstPrinter implements ConstVisitor {
 	private StringTemplate template;
 
 	private LLVMTypePrinter typeVisitor;
-	
+
 	/**
 	 * Creates a new const printer from the given template group.
 	 * 
 	 * @param group
 	 *            template group
 	 */
-	public LLVMConstPrinter(StringTemplateGroup group, LLVMTypePrinter typeVisitor) {
+	public LLVMConstPrinter(StringTemplateGroup group,
+			LLVMTypePrinter typeVisitor) {
 		this.group = group;
 		this.typeVisitor = typeVisitor;
 	}
@@ -86,35 +87,37 @@ public class LLVMConstPrinter implements ConstVisitor {
 
 	@Override
 	public void visit(BoolConst constant, Object... args) {
-		if (args.length == 1){
-			template.setAttribute("type", typeVisitor.toString((AbstractType)args[0]));
+		if (args.length == 1) {
+			template.setAttribute("type", typeVisitor
+					.toString((AbstractType) args[0]));
 		}
 		template.setAttribute("value", constant.getValue() ? "1" : "0");
 	}
 
 	@Override
 	public void visit(IntConst constant, Object... args) {
-		if (args.length == 1){
-			template.setAttribute("value", typeVisitor.toString((AbstractType)args[0]) + " " +constant.getValue());
+		if (args.length == 1) {
+			template.setAttribute("value", typeVisitor
+					.toString((AbstractType) args[0])
+					+ " " + constant.getValue());
 		} else {
 			template.setAttribute("value", constant.getValue());
 		}
-		
-			
+
 	}
 
 	@Override
 	public void visit(ListConst constant, Object... args) {
 		ListType listType = (ListType) args[0];
 		AbstractType type = listType.getType();
-				
+
 		// save current template
 		StringTemplate previousTempl = template;
 
 		// set instance of list template as current template
 		StringTemplate listTempl = group.getInstanceOf("listValue");
 		template = listTempl;
-		
+
 		List<AbstractConst> list = constant.getValue();
 		for (AbstractConst cst : list) {
 			cst.accept(this, type);
@@ -131,8 +134,9 @@ public class LLVMConstPrinter implements ConstVisitor {
 		// escape backslashes
 		String val = constant.getValue();
 		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
-		if (args.length == 1){
-		template.setAttribute("type", typeVisitor.toString((AbstractType)args[0]));
+		if (args.length == 1) {
+			template.setAttribute("type", typeVisitor
+					.toString((AbstractType) args[0]));
 		}
 		template.setAttribute("value", res);
 	}

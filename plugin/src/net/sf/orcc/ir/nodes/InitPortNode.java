@@ -57,12 +57,12 @@ public class InitPortNode extends AbstractNode {
 		return fifoName;
 	}
 	
-	public void setFifoName(String fifoName) {
-		this.fifoName = fifoName;
-	}
-	
 	public VarExpr getValue() {
 		return value;
+	}
+	
+	public void setFifoName(String fifoName) {
+		this.fifoName = fifoName;
 	}
 	
 	@Override

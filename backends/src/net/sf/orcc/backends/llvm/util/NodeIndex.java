@@ -38,35 +38,33 @@ public class NodeIndex {
 
 	protected int index;
 
-
-	public NodeIndex(int index){
+	public NodeIndex(int index) {
 		index = 0;
 	}
-	
-	public String getIndex(){
+
+	public String getFirstIndex() {
+		return Integer.toString(index - 3);
+	}
+
+	public String getIndex() {
 		return Integer.toString(index);
 	}
-	
-	public String getLastIndex(){
-		return Integer.toString(index-1);
-	}
-	
-	
-	public String getFirstIndex(){
-		return Integer.toString(index-3);
-	}
-	
-	public String getSecondIndex(){
-		return Integer.toString(index-1);
-	}
-			
-	public NodeIndex getNextNodeIndex(){
-		index = index+1;
-		return this;
-	}	
-	
-	public NodeIndex getInit(){
+
+	public NodeIndex getInit() {
 		index = 0;
 		return this;
-	}	
+	}
+
+	public String getLastIndex() {
+		return Integer.toString(index - 1);
+	}
+
+	public NodeIndex getNextNodeIndex() {
+		index = index + 1;
+		return this;
+	}
+
+	public String getSecondIndex() {
+		return Integer.toString(index - 1);
+	}
 }

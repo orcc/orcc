@@ -40,11 +40,11 @@ import java.util.TreeSet;
 
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.network.Broadcast;
-import net.sf.orcc.ir.network.Connection;
-import net.sf.orcc.ir.network.Instance;
-import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.network.Broadcast;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;

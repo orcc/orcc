@@ -49,11 +49,11 @@ public abstract class LLVMAbstractTypeVisitor implements LLVMTypeVisitor {
 	public void visit(IntType type) {
 	}
 
-	public void visit(PointType type) {
-	}
-
 	@Override
 	public void visit(ListType type) {
+	}
+
+	public void visit(PointType type) {
 	}
 
 	@Override
@@ -67,5 +67,5 @@ public abstract class LLVMAbstractTypeVisitor implements LLVMTypeVisitor {
 	@Override
 	public void visit(VoidType type) {
 	}
-	
+
 }

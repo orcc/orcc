@@ -98,7 +98,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	private int nodeCount;
 
 	private Hashtable<String, Integer> portIndex;
-	
+
 	private Procedure procedure;
 
 	public TypeTransformation(Actor actor) {
@@ -325,9 +325,9 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 			tmpCnt++;
 		}
-		
-		if (returnVar != null){
-			if (!returnType.equals(returnVar.getType())){
+
+		if (returnVar != null) {
+			if (!returnType.equals(returnVar.getType())) {
 				VarDef castVar = varDefCreate(returnType);
 				node.setRes(castVar);
 				it.add(castNodeCreate(castVar, returnVar));
@@ -335,7 +335,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 
 	}
-	
+
 	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
 		// Set every index to i32 (mandatory in llvm)
@@ -371,7 +371,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(IntExpr expr, Object... args) {
-		
+
 	}
 
 	@Override
@@ -408,7 +408,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(PhiNode node, Object... args) {
-	
+
 	}
 
 	@Override
@@ -462,7 +462,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	public void visit(StringExpr expr, Object... args) {
 
 	}
-	
+
 	@Override
 	public void visit(TypeExpr expr, Object... args) {
 

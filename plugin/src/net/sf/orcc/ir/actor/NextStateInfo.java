@@ -38,9 +38,9 @@ public class NextStateInfo {
 
 	private Action action;
 
-	private String targetState;
-	
 	private int targetIntState;
+	
+	private String targetState;
 	
 	public NextStateInfo(int targetIntState, Action action, String targetState) {
 		this.targetIntState = targetIntState;
@@ -52,6 +52,10 @@ public class NextStateInfo {
 		return action;
 	}
 
+	public int getTargetIntState() {
+		return targetIntState;
+	}
+
 	public String getTargetState() {
 		return targetState;
 	}
@@ -59,16 +63,12 @@ public class NextStateInfo {
 	public void setAction(Action action) {
 		this.action = action;
 	}
-
-	public void setTargetState(String targetState) {
-		this.targetState = targetState;
-	}
-	
-	public int getTargetIntState() {
-		return targetIntState;
-	}
 	
 	public void setTargetIntState(int targetIntState) {
 		this.targetIntState = targetIntState;
+	}
+	
+	public void setTargetState(String targetState) {
+		this.targetState = targetState;
 	}
 }

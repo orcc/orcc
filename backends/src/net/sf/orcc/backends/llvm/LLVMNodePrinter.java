@@ -89,17 +89,18 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	private StringTemplateGroup group;
 
+	private Procedure procedure;
+
 	private StringTemplate template;
 
 	private LLVMTypePrinter typeToString;
 
 	private LLVMVarDefPrinter varDefPrinter;
-	
-	private Procedure procedure;
 
 	public LLVMNodePrinter(StringTemplateGroup group, StringTemplate template,
-			String actorName, Procedure procedure, LLVMVarDefPrinter varDefPrinter,
-			LLVMExprPrinter exprPrinter, LLVMTypePrinter typeToString) {
+			String actorName, Procedure procedure,
+			LLVMVarDefPrinter varDefPrinter, LLVMExprPrinter exprPrinter,
+			LLVMTypePrinter typeToString) {
 		attrName = "nodes";
 		this.actorName = actorName;
 		this.procedure = procedure;
@@ -172,7 +173,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		for (AbstractNode subNode : conditionNodes) {
 			subNode.accept(this, args);
 		}
-		
+
 		attrName = "thenNodes";
 		for (AbstractNode subNode : thenNodes) {
 			subNode.accept(this, args);
@@ -195,8 +196,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(CallNode node, Object... args) {
-		int index =0;
-		
+		int index = 0;
+
 		StringTemplate nodeTmpl = group.getInstanceOf("callNode");
 
 		if (node.hasRes()) {
@@ -238,7 +239,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 				true));
 
 		for (IExpr index : node.getIndexes()) {
-			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index, new IntType(new IntExpr(new Location(), 32))));		
+			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index,
+					new IntType(new IntExpr(new Location(), 32))));
 		}
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -348,9 +350,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		for (Entry<LabelNode, VarDef> assignement : assignements.entrySet()) {
 			StringTemplate phiTmpl = group.getInstanceOf("phiPair");
 
-
-			phiTmpl.setAttribute("value", varDefPrinter.getVarDefName(assignement.getValue(),
-					false));
+			phiTmpl.setAttribute("value", varDefPrinter.getVarDefName(
+					assignement.getValue(), false));
 			phiTmpl.setAttribute("label", assignement.getKey());
 
 			nodeTmpl.setAttribute("assignements", phiTmpl);

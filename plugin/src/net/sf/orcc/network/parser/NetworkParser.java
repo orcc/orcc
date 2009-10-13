@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.parser;
+package net.sf.orcc.network.parser;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -44,10 +44,10 @@ import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.network.Connection;
-import net.sf.orcc.ir.network.Instance;
-import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
 
 import org.jgrapht.graph.DirectedMultigraph;
 import org.w3c.dom.DOMConfiguration;

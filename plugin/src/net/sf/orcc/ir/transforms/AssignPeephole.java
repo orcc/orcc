@@ -94,6 +94,13 @@ public class AssignPeephole extends AbstractNodeVisitor {
 	}
 
 	@Override
+	public void visit(IfNode node, Object... args) {
+		visitNodes(node.getThenNodes());
+		visitNodes(node.getElseNodes());
+		visit(node.getJoinNode(), args);
+	}
+	
+	@Override
 	public void visit(JoinNode node, Object... args) {
 		List<PhiAssignment> phis = node.getPhis();
 		if (!phis.isEmpty()) {
@@ -110,13 +117,6 @@ public class AssignPeephole extends AbstractNodeVisitor {
 				}
 			}
 		}
-	}
-	
-	@Override
-	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
-		visit(node.getJoinNode(), args);
 	}
 	
 	@Override

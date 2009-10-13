@@ -43,15 +43,11 @@ import net.sf.orcc.ir.nodes.IfNode;
 public class BrNode extends AbstractLLVMNode {
 
 	private IExpr condition;
-	
+
 	private List<AbstractNode> conditionNodes;
 
 	private List<AbstractNode> elseNodes;
 
-	private List<AbstractNode> thenNodes;
-
-	private List<PhiNode> phiNodes;
-	
 	private LabelNode labelEndNode;
 
 	private LabelNode labelEntryNode;
@@ -60,11 +56,13 @@ public class BrNode extends AbstractLLVMNode {
 
 	private LabelNode labelTrueNode;
 
-	
+	private List<PhiNode> phiNodes;
 
-	public BrNode(IfNode node, List<PhiNode> phiNodes, LabelNode labelEntryNode,
-			LabelNode labelTrueNode, LabelNode labelFalseNode,
-			LabelNode labelEndNode) {
+	private List<AbstractNode> thenNodes;
+
+	public BrNode(IfNode node, List<PhiNode> phiNodes,
+			LabelNode labelEntryNode, LabelNode labelTrueNode,
+			LabelNode labelFalseNode, LabelNode labelEndNode) {
 		super(node.getId(), node.getLocation());
 		this.conditionNodes = new ArrayList<AbstractNode>();
 		this.condition = node.getCondition();
@@ -77,10 +75,11 @@ public class BrNode extends AbstractLLVMNode {
 		this.phiNodes = phiNodes;
 	}
 
-	public BrNode(int id, Location location, IExpr condition, List<AbstractNode> conditionNodes,
-			List<AbstractNode> thenNodes, List<AbstractNode> elseNodes, List<PhiNode> phiNodes,
-			LabelNode labelEntryNode, LabelNode labelTrueNode, LabelNode labelFalseNode,
-			LabelNode labelEndNode) {
+	public BrNode(int id, Location location, IExpr condition,
+			List<AbstractNode> conditionNodes, List<AbstractNode> thenNodes,
+			List<AbstractNode> elseNodes, List<PhiNode> phiNodes,
+			LabelNode labelEntryNode, LabelNode labelTrueNode,
+			LabelNode labelFalseNode, LabelNode labelEndNode) {
 		super(id, location);
 		this.conditionNodes = conditionNodes;
 		this.condition = condition;
@@ -103,6 +102,10 @@ public class BrNode extends AbstractLLVMNode {
 		return condition;
 	}
 
+	public List<AbstractNode> getConditionNodes() {
+		return conditionNodes;
+	}
+
 	public List<AbstractNode> getElseNodes() {
 		return elseNodes;
 	}
@@ -122,13 +125,9 @@ public class BrNode extends AbstractLLVMNode {
 	public LabelNode getLabelTrueNode() {
 		return labelTrueNode;
 	}
-	
+
 	public List<PhiNode> getPhiNodes() {
 		return phiNodes;
-	}
-
-	public void setPhiNodes(List<PhiNode> phiNodes) {
-		this.phiNodes =  phiNodes;
 	}
 
 	public List<AbstractNode> getThenNodes() {
@@ -138,14 +137,13 @@ public class BrNode extends AbstractLLVMNode {
 	public void setCondition(IExpr condition) {
 		this.condition = condition;
 	}
-	
-	
-	public void setElseNodes(List<AbstractNode> elseNodes) {
-		this.elseNodes = elseNodes;
+
+	public void setConditionNodes(List<AbstractNode> conditionNodes) {
+		this.conditionNodes = conditionNodes;
 	}
 
-	public void setThenNodes(List<AbstractNode> thenNodes) {
-		this.thenNodes = thenNodes;
+	public void setElseNodes(List<AbstractNode> elseNodes) {
+		this.elseNodes = elseNodes;
 	}
 
 	public void setLabelEndNode(LabelNode labelEndNode) {
@@ -164,18 +162,18 @@ public class BrNode extends AbstractLLVMNode {
 		this.labelTrueNode = labelTrueNode;
 	}
 
+	public void setPhiNodes(List<PhiNode> phiNodes) {
+		this.phiNodes = phiNodes;
+	}
+
+	public void setThenNodes(List<AbstractNode> thenNodes) {
+		this.thenNodes = thenNodes;
+	}
+
 	@Override
 	public String toString() {
 		return "br i1 " + condition + ", label " + labelTrueNode + ", label "
 				+ labelFalseNode;
-	}
-
-	public void setConditionNodes(List<AbstractNode> conditionNodes) {
-		this.conditionNodes = conditionNodes;
-	}
-
-	public List<AbstractNode> getConditionNodes() {
-		return conditionNodes;
 	}
 
 }

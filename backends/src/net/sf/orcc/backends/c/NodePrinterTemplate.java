@@ -64,9 +64,10 @@ public class NodePrinterTemplate implements CNodeVisitor {
 
 	/**
 	 * Variable member access switch from private to protected.
+	 * 
 	 * @see net.sf.orcc.backend.cpp.CppNodePrinter
 	 */
-	
+
 	protected String actorName;
 
 	protected String attrName;
@@ -185,6 +186,11 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 
 		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(InitPortNode node, Object... args) {
+
 	}
 
 	@Override
@@ -307,11 +313,6 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
-	}
-
-	@Override
-	public void visit(InitPortNode node, Object... args) {
-		
 	}
 
 }

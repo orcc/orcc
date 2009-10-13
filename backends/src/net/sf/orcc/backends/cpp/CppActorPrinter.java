@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.antlr.stringtemplate.StringTemplate;
-
 import net.sf.orcc.backends.c.CActorPrinter;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
@@ -43,6 +41,8 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.AbstractType;
+
+import org.antlr.stringtemplate.StringTemplate;
 
 /**
  * Actor printer.
@@ -66,12 +66,6 @@ public class CppActorPrinter extends CActorPrinter {
 		varDefPrinter = new VarDefPrinter(typePrinter);
 		exprPrinter = new CppExprPrinter(varDefPrinter);
 	}
-
-	@Override
-	protected void setAttributes(Actor actor) {
-		super.setAttributes(actor);
-	}
-
 
 	protected StringTemplate applyProc(String actorName, Procedure proc) {
 		StringTemplate procTmpl = group.getInstanceOf("proc");
@@ -107,5 +101,10 @@ public class CppActorPrinter extends CActorPrinter {
 			node.accept(printer);
 		}
 		return procTmpl;
+	}
+
+	@Override
+	protected void setAttributes(Actor actor) {
+		super.setAttributes(actor);
 	}
 }

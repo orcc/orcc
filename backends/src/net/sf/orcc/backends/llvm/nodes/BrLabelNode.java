@@ -39,7 +39,8 @@ public class BrLabelNode extends AbstractLLVMNode {
 
 	private LabelNode labelNode;
 
-	public BrLabelNode(int id, Location location, LabelNode labelNode, LabelNode precedence) {
+	public BrLabelNode(int id, Location location, LabelNode labelNode,
+			LabelNode precedence) {
 		super(id, location);
 		this.labelNode = labelNode;
 		labelNode.addPrecedence(precedence);

@@ -65,21 +65,21 @@ public class EmptyNodeRemoval extends AbstractNodeVisitor {
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
-	}
-	
-	@Override
-	public void visit(WhileNode node, Object... args) {
-		visitNodes(node.getNodes());
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(EmptyNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>)args[0];
 		it.remove();
+	}
+	
+	@Override
+	public void visit(IfNode node, Object... args) {
+		visitNodes(node.getThenNodes());
+		visitNodes(node.getElseNodes());
+	}
+
+	@Override
+	public void visit(WhileNode node, Object... args) {
+		visitNodes(node.getNodes());
 	}
 
 

@@ -50,17 +50,17 @@ public class IntExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws OrccException {
-		return this;
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof IntExpr) {
 			return (value == ((IntExpr) obj).value);
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public IExpr evaluate() throws OrccException {
+		return this;
 	}
 	
 	@Override

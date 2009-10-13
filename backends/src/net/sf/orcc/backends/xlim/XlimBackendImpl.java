@@ -33,10 +33,10 @@ import java.io.FileInputStream;
 import java.util.Set;
 
 import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.ir.network.Instance;
-import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.parser.NetworkParser;
 import net.sf.orcc.ir.transforms.BroadcastAdder;
+import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
+import net.sf.orcc.network.parser.NetworkParser;
 
 /**
  * C back-end.

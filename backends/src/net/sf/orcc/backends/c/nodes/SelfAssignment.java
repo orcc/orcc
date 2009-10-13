@@ -30,8 +30,8 @@ package net.sf.orcc.backends.c.nodes;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * @author Matthieu Wipliez

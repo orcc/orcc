@@ -44,6 +44,8 @@ public interface NodeVisitor {
 
 	public void visit(IfNode node, Object... args);
 
+	public void visit(InitPortNode node, Object... args);
+
 	public void visit(JoinNode node, Object... args);
 
 	public void visit(LoadNode node, Object... args);
@@ -59,7 +61,5 @@ public interface NodeVisitor {
 	public void visit(WhileNode node, Object... args);
 
 	public void visit(WriteNode node, Object... args);
-
-	public void visit(InitPortNode node, Object... args);
 
 }

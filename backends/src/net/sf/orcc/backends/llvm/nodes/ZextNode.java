@@ -71,8 +71,7 @@ public class ZextNode extends AbstractLLVMNode {
 
 	@Override
 	public String toString() {
-		return var + " = bitcast " + value.toString() + " to "
-				+ var.getType();
+		return var + " = bitcast " + value.toString() + " to " + var.getType();
 	}
 
 }

@@ -46,7 +46,7 @@ public class LLVMVarDefPrinter {
 	protected LLVMExprPrinter exprPrinter;
 
 	private List<String> ports;
-	
+
 	private LLVMTypePrinter typeVisitor;
 
 	public LLVMVarDefPrinter(LLVMTypePrinter typeVisitor) {
@@ -65,16 +65,16 @@ public class LLVMVarDefPrinter {
 	public Map<String, Object> applyVarDef(VarDef varDef) {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
 		varDefMap.put("name", getVarDefName(varDef, false));
-		
+
 		AbstractType type;
-		
+
 		if (varDef.getType() instanceof PointType) {
 			PointType iType = (PointType) varDef.getType();
 			type = iType.getType();
 		} else {
 			type = varDef.getType();
 		}
-		
+
 		varDefMap.put("type", typeVisitor.toString(type));
 
 		varDefMap.put("isPort", ports.contains(varDef.getName()));
@@ -91,15 +91,13 @@ public class LLVMVarDefPrinter {
 	 * @return a string with its full name
 	 */
 	public String getVarDefName(VarDef varDef, Object... args) {
-		Boolean showType= (Boolean)args[0];
+		Boolean showType = (Boolean) args[0];
 		String name = "";
-		
-		if (showType)
-		{
+
+		if (showType) {
 			name = typeVisitor.toString(varDef.getType());
 			name += " ";
 		}
-		
 
 		if (varDef.isConstant()) {
 			name += exprPrinter.toString(varDef.getConstant(), false);
@@ -112,11 +110,11 @@ public class LLVMVarDefPrinter {
 			name += "%";
 		}
 		name += varDef.getName();
-	
+
 		if (varDef.hasSuffix()) {
 			name += varDef.getSuffix();
 		}
-	
+
 		if (!varDef.isGlobal()) {
 			int index = varDef.getIndex();
 			if (index != 0) {
@@ -125,9 +123,9 @@ public class LLVMVarDefPrinter {
 		}
 		return name;
 	}
-	
+
 	public void setPortList(List<String> ports) {
 		this.ports = ports;
 	}
-	
+
 }

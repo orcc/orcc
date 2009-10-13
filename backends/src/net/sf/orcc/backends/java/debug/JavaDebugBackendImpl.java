@@ -36,8 +36,8 @@ import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Network;
 
 /**
  * C back-end.
@@ -65,9 +65,9 @@ public class JavaDebugBackendImpl extends AbstractBackend implements IBackend {
 		}
 	}
 
-	private JavaDebugActorPrinter printer;
-
 	private String outputPath;
+
+	private JavaDebugActorPrinter printer;
 
 	@Override
 	protected void init() throws IOException {

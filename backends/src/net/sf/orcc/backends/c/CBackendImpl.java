@@ -37,8 +37,8 @@ import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.network.Network;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Network;
 
 /**
  * C back-end.
@@ -70,7 +70,7 @@ public class CBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void init() throws IOException {
 		printer = new CActorPrinter();
-		
+
 		// register transformations
 		NameTransformer.names.clear();
 		NameTransformer.names.put("abs", "abs_");

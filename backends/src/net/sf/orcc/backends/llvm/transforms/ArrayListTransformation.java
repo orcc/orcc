@@ -57,7 +57,7 @@ import net.sf.orcc.ir.type.ListType;
 public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 
 	int indexName;
-	
+
 	public ArrayListTransformation(Actor actor) {
 
 		for (Procedure proc : actor.getProcs()) {
@@ -76,21 +76,22 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 	}
 
 	@SuppressWarnings("unchecked")
-	public VarUse getElementPtrNodeCreate(VarUse varList, List<IExpr> indexes, Object... args){
+	public VarUse getElementPtrNodeCreate(VarUse varList, List<IExpr> indexes,
+			Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		
+
 		it.previous();
 
 		AbstractType listType;
-		
+
 		// Adding the getElementPtrNode
 		VarDef varDefList = varList.getVarDef();
-		listType= varDefList.getType();
-		while (listType instanceof ListType){
+		listType = varDefList.getType();
+		while (listType instanceof ListType) {
 			listType = ((ListType) listType).getType();
 		}
 
-		VarDef varDef = varDefCreate (varDefList, listType);
+		VarDef varDef = varDefCreate(varDefList, listType);
 		VarUse varUse = new VarUse(varDef, null);
 
 		// Create and insert the new node
@@ -99,30 +100,30 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 
 		it.add(elementPtrNode);
 		it.next();
-		
+
 		return varUse;
 	}
-	
+
 	private VarDef varDefCreate(VarDef varDef, AbstractType type) {
 		int index = varDef.getIndex();
-		String name = varDef.getName()+ Integer.toString(indexName++);
+		String name = varDef.getName() + Integer.toString(indexName++);
 		int suffix;
-		if (varDef.hasSuffix()){
-			suffix=varDef.getSuffix();
-		}else{
-			suffix=0;
+		if (varDef.hasSuffix()) {
+			suffix = varDef.getSuffix();
+		} else {
+			suffix = 0;
 		}
-		
-		return new  VarDef(false, false, index,
-				new Location(), name, null, null, suffix, new PointType(type));
+
+		return new VarDef(false, false, index, new Location(), name, null,
+				null, suffix, new PointType(type));
 	}
-	
+
 	@Override
 	public void visit(BrNode node, Object... args) {
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
 	}
-	
+
 	public void visit(LoadNode node, Object... args) {
 
 		List<IExpr> indexes = node.getIndexes();
@@ -137,12 +138,13 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 				}
 			} catch (NumberFormatException e) {
 			}
-			
+
 			// Insert the new VarDef in the load node
-			node.setSource(getElementPtrNodeCreate(node.getSource(), indexes, args));
+			node.setSource(getElementPtrNodeCreate(node.getSource(), indexes,
+					args));
 		}
 	}
-	
+
 	public void visit(StoreNode node, Object... args) {
 
 		List<IExpr> indexes = node.getIndexes();
@@ -157,11 +159,12 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 				}
 			} catch (NumberFormatException e) {
 			}
-			
+
 			VarUse targetVar = node.getTarget();
-			
+
 			// Insert the new VarDef in the store node
-			node.setTarget(getElementPtrNodeCreate(targetVar, node.getIndexes(), args));
+			node.setTarget(getElementPtrNodeCreate(targetVar,
+					node.getIndexes(), args));
 		}
 	}
 

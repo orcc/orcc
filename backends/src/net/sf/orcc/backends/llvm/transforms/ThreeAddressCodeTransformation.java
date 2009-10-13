@@ -60,7 +60,6 @@ import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 
-
 /**
  * Split expression and effective node.
  * 
@@ -72,7 +71,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 	int exprCounter;
 
 	public ThreeAddressCodeTransformation(Actor actor) {
-		
+
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -88,9 +87,10 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 		}
 	}
 
-	//Add a second pass to check the binary expression type cohesion
-	//This pass will be useless when the IR associate the correct type to a binary expression
-	public AbstractType checkType(BinaryExpr expr){
+	// Add a second pass to check the binary expression type cohesion
+	// This pass will be useless when the IR associate the correct type to a
+	// binary expression
+	public AbstractType checkType(BinaryExpr expr) {
 		AbstractType type;
 
 		if ((expr.getOp() == BinaryOp.EQ) || (expr.getOp() == BinaryOp.GE)
@@ -122,7 +122,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 
 		return type;
 	}
-	
+
 	public IExpr removeUnaryExpr(UnaryExpr expr) {
 		// Unary expression doesn't exists in LLVM
 		Location loc = expr.getLocation();
@@ -130,30 +130,28 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 		IExpr exprE1 = expr.getExpr();
 		UnaryOp op = expr.getOp();
 		IntExpr constExpr;
-		
+
 		BinaryExpr varExpr;
-		
+
 		switch (op) {
 		case MINUS:
 			constExpr = new IntExpr(new Location(), 0);
-			varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS,
-					exprE1, type);
+			varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS, exprE1,
+					type);
 			return varExpr;
 		case LNOT:
 			constExpr = new IntExpr(new Location(), 0);
-			varExpr = new BinaryExpr(loc, exprE1,
-					BinaryOp.NE, constExpr, type);
+			varExpr = new BinaryExpr(loc, exprE1, BinaryOp.NE, constExpr, type);
 			return varExpr;
-			
+
 		case BNOT:
-			varExpr = new BinaryExpr(loc, exprE1,
-					BinaryOp.BXOR, exprE1, type);
+			varExpr = new BinaryExpr(loc, exprE1, BinaryOp.BXOR, exprE1, type);
 			return varExpr;
 		default:
 			throw new NullPointerException();
 		}
 	}
-	
+
 	private int sizeOf(AbstractType type) {
 		int size = 0;
 
@@ -170,93 +168,94 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 
 		return size;
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public VarExpr splitBinaryExpr(BinaryExpr expr, Object... args){
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];		
-		
-		if (expr.getE1() instanceof BinaryExpr){ 
-			expr.setE1(splitBinaryExpr((BinaryExpr)expr.getE1(), it));
+	public VarExpr splitBinaryExpr(BinaryExpr expr, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+
+		if (expr.getE1() instanceof BinaryExpr) {
+			expr.setE1(splitBinaryExpr((BinaryExpr) expr.getE1(), it));
 		}
-		
-		if (expr.getE2() instanceof BinaryExpr){
-			expr.setE2(splitBinaryExpr((BinaryExpr)expr.getE2(), it));
+
+		if (expr.getE2() instanceof BinaryExpr) {
+			expr.setE2(splitBinaryExpr((BinaryExpr) expr.getE2(), it));
 		}
-		
-		
-		VarDef vardef = varDefCreate (checkType(expr));
+
+		VarDef vardef = varDefCreate(checkType(expr));
 		VarUse varuse = new VarUse(vardef, null);
 		VarExpr varexpr = new VarExpr(new Location(), varuse);
-		
-		AssignVarNode assignNode = new AssignVarNode(0, new Location(),
-				vardef, expr);
-		
-			it.add(assignNode);
-		
+
+		AssignVarNode assignNode = new AssignVarNode(0, new Location(), vardef,
+				expr);
+
+		it.add(assignNode);
+
 		return varexpr;
-		
+
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public List<IExpr> splitIndex(List<IExpr> indexes, Object... args){
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];		
+	public List<IExpr> splitIndex(List<IExpr> indexes, Object... args) {
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		List<IExpr> tmpIndexes = new ArrayList<IExpr>();
-		
-		for (IExpr index : indexes){
-			if (index instanceof BinaryExpr){
-				VarExpr expr = splitBinaryExpr((BinaryExpr)index, it);
+
+		for (IExpr index : indexes) {
+			if (index instanceof BinaryExpr) {
+				VarExpr expr = splitBinaryExpr((BinaryExpr) index, it);
 				tmpIndexes.add(expr);
-			}
-			else{
+			} else {
 				tmpIndexes.add(index);
 			}
 		}
-		
+
 		return tmpIndexes;
-		
+
 	}
-	
-	private VarDef varDefCreate(AbstractType type){
-		return new VarDef(false, false, exprCounter++, new Location(), "expr", null, null, 0, type);
+
+	private VarDef varDefCreate(AbstractType type) {
+		return new VarDef(false, false, exprCounter++, new Location(), "expr",
+				null, null, 0, type);
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(AssignVarNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		IExpr value = node.getValue();
-		
+
 		// Change unary expression into binary expression
 		if (node.getValue() instanceof UnaryExpr) {
 			node.setValue(removeUnaryExpr((UnaryExpr) node.getValue()));
 		}
-		
-		if (value instanceof BinaryExpr){
+
+		if (value instanceof BinaryExpr) {
 			it.previous();
-			BinaryExpr expr = (BinaryExpr)value;
-			if (expr.getE1() instanceof BinaryExpr){
-				expr.setE1(splitBinaryExpr((BinaryExpr)expr.getE1(), it));
+			BinaryExpr expr = (BinaryExpr) value;
+			if (expr.getE1() instanceof BinaryExpr) {
+				expr.setE1(splitBinaryExpr((BinaryExpr) expr.getE1(), it));
 			}
-			
-			if (expr.getE2() instanceof BinaryExpr){
-				expr.setE2(splitBinaryExpr((BinaryExpr)expr.getE2(), it));
+
+			if (expr.getE2() instanceof BinaryExpr) {
+				expr.setE2(splitBinaryExpr((BinaryExpr) expr.getE2(), it));
 			}
 			it.next();
 		}
 	}
-	
+
 	@Override
 	public void visit(BrNode node, Object... args) {
-	
+
 		node.getCondition();
 		// Change unary expression into binary expression
 		if (node.getCondition() instanceof UnaryExpr) {
 			node.setCondition(removeUnaryExpr((UnaryExpr) node.getCondition()));
 		}
-		
+
 		if (node.getCondition() instanceof BinaryExpr) {
-			ListIterator<AbstractNode> itConditionNodes = node.getConditionNodes().listIterator();	
-			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getCondition(), itConditionNodes);
+			ListIterator<AbstractNode> itConditionNodes = node
+					.getConditionNodes().listIterator();
+			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getCondition(),
+					itConditionNodes);
 
 			node.setCondition(expr);
 		}
@@ -264,69 +263,70 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(CallNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		List<IExpr> exprs = node.getParameters();
-		for (IExpr expr : exprs){
+		for (IExpr expr : exprs) {
 			if (expr instanceof UnaryExpr) {
-				exprs.set(exprs.indexOf(expr),removeUnaryExpr((UnaryExpr) expr));
+				exprs.set(exprs.indexOf(expr),
+						removeUnaryExpr((UnaryExpr) expr));
 			}
-			
-			if (expr instanceof BinaryExpr){
+
+			if (expr instanceof BinaryExpr) {
 				it.previous();
-				VarExpr varExpr = splitBinaryExpr((BinaryExpr)expr, args);
+				VarExpr varExpr = splitBinaryExpr((BinaryExpr) expr, args);
 				it.next();
 				exprs.set(exprs.indexOf(expr), varExpr);
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(LoadNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		List<IExpr> indexes = node.getIndexes();
-	
+
 		if (!indexes.isEmpty()) {
 			it.previous();
-			node.setIndexes(splitIndex(indexes,args));
+			node.setIndexes(splitIndex(indexes, args));
 			it.next();
 		}
 	}
-	
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(ReturnNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		// Change unary expression into binary expression
 		if (node.getValue() instanceof UnaryExpr) {
 			node.setValue(removeUnaryExpr((UnaryExpr) node.getValue()));
 		}
-		
+
 		if (node.getValue() instanceof BinaryExpr) {
 			it.previous();
-			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getValue(), args);
+			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getValue(), args);
 			it.next();
 			node.setValue(expr);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(SelectNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];	
+		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		// Change unary expression into binary expression
 		if (node.getCondition() instanceof UnaryExpr) {
 			node.setCondition(removeUnaryExpr((UnaryExpr) node.getCondition()));
 		}
-		
+
 		if (node.getCondition() instanceof BinaryExpr) {
 			it.previous();
-			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getCondition(), args);
+			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getCondition(),
+					args);
 			it.next();
 			node.setCondition(expr);
 		}
@@ -336,27 +336,27 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 	@SuppressWarnings("unchecked")
 	public void visit(StoreNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		
+
 		// Change unary expression into binary expression
 		if (node.getValue() instanceof UnaryExpr) {
 			node.setValue(removeUnaryExpr((UnaryExpr) node.getValue()));
 		}
-		
+
 		if (node.getValue() instanceof BinaryExpr) {
 			it.previous();
-			VarExpr expr = splitBinaryExpr((BinaryExpr)node.getValue(), it);
+			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getValue(), it);
 			it.next();
 			node.setValue(expr);
 		}
-		
+
 		List<IExpr> indexes = node.getIndexes();
 		if (!indexes.isEmpty()) {
 			it.previous();
-			node.setIndexes(splitIndex(indexes,args));
+			node.setIndexes(splitIndex(indexes, args));
 			it.next();
 		}
 	}
-	
+
 	private void visitNodes(List<AbstractNode> nodes) {
 		ListIterator<AbstractNode> it = nodes.listIterator();
 

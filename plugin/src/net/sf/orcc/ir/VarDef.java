@@ -129,24 +129,6 @@ public class VarDef implements Comparable<VarDef> {
 		return name.compareTo(varDef.name);
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof VarDef) {
-			VarDef varDef = (VarDef) obj;
-			boolean name = varDef.name.equals(this.name);
-			boolean suffix = hasSuffix() && varDef.hasSuffix()
-					&& getSuffix() == varDef.getSuffix() || !hasSuffix()
-					&& !varDef.hasSuffix();
-			boolean index = (this.index == varDef.index);
-			return name && suffix && index;
-		}
-		return false;
-	}
-
-	public IExpr getConstant() {
-		return constantExpr;
-	}
-	
 	public void duplicate(VarDef varDef) {
 		assignable = varDef.isAssignable();
 		global = varDef.isGlobal();
@@ -163,6 +145,24 @@ public class VarDef implements Comparable<VarDef> {
 		type = varDef.getType();
 		this.constant = varDef.isConstant();
 		constantExpr = varDef.getConstant();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof VarDef) {
+			VarDef varDef = (VarDef) obj;
+			boolean name = varDef.name.equals(this.name);
+			boolean suffix = hasSuffix() && varDef.hasSuffix()
+					&& getSuffix() == varDef.getSuffix() || !hasSuffix()
+					&& !varDef.hasSuffix();
+			boolean index = (this.index == varDef.index);
+			return name && suffix && index;
+		}
+		return false;
+	}
+	
+	public IExpr getConstant() {
+		return constantExpr;
 	}
 
 	public int getIndex() {

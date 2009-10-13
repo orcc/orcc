@@ -29,11 +29,11 @@
 package net.sf.orcc.backends.c;
 
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.ExprVisitor;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;

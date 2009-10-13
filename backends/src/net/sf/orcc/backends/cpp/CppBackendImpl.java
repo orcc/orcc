@@ -38,10 +38,10 @@ import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.network.Instance;
-import net.sf.orcc.ir.network.Network;
-import net.sf.orcc.ir.parser.NetworkParser;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
+import net.sf.orcc.network.parser.NetworkParser;
 
 /**
  * C++ back-end.
@@ -65,10 +65,14 @@ public class CppBackendImpl extends AbstractBackend implements IBackend {
 				e.printStackTrace();
 			}
 		} else {
-			System.err
-					.println("Usage: CppBackendImpl <flattened XDF network>");
+			System.err.println("Usage: CppBackendImpl <flattened XDF network>");
 		}
 	}
+
+	private CppActorPrinter impl_printer;
+
+	private String outputPath;
+	private CppActorPrinter printer;
 
 	@Override
 	public void generateCode(String fileName, int fifoSize) throws Exception {
@@ -96,11 +100,6 @@ public class CppBackendImpl extends AbstractBackend implements IBackend {
 		// print network
 		printNetwork(network);
 	}
-	
-	private CppActorPrinter printer;
-	private CppActorPrinter impl_printer;
-
-	private String outputPath;
 
 	@Override
 	protected void init() throws IOException {
@@ -135,8 +134,10 @@ public class CppBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
-		CppNetworkPrinter networkPrinter = new CppNetworkPrinter("Cpp_networkDecl");
-		CppNetworkPrinter networkImplPrinter = new CppNetworkPrinter("Cpp_networkImpl");
+		CppNetworkPrinter networkPrinter = new CppNetworkPrinter(
+				"Cpp_networkDecl");
+		CppNetworkPrinter networkImplPrinter = new CppNetworkPrinter(
+				"Cpp_networkImpl");
 
 		String name = network.getName();
 		String outputName = outputPath + "Network_" + name + ".h";

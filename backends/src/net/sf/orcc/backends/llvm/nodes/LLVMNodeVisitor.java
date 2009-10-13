@@ -43,22 +43,22 @@ public interface LLVMNodeVisitor extends NodeVisitor {
 
 	public void visit(BrNode node, Object... args);
 
+	public void visit(GetElementPtrNode node, Object... args);
+
+	public void visit(InitPortNode node, Object... args);
+
 	public void visit(LabelNode node, Object... args);
 
 	public void visit(LoadFifo node, Object... args);
 
-	public void visit(SelectNode node, Object... args);
-	
-	public void visit(TruncNode node, Object... args);
-	
-	public void visit(ZextNode node, Object... args);
-	
-	public void visit(SextNode node, Object... args);
-	
-	public void visit(GetElementPtrNode node, Object... args);
-	
-	public void visit(InitPortNode node, Object... args);
-	
 	public void visit(PhiNode node, Object... args);
+
+	public void visit(SelectNode node, Object... args);
+
+	public void visit(SextNode node, Object... args);
+
+	public void visit(TruncNode node, Object... args);
+
+	public void visit(ZextNode node, Object... args);
 
 }

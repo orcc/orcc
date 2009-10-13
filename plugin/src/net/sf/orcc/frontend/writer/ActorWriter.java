@@ -30,6 +30,14 @@ import org.json.JSONObject;
 
 public class ActorWriter {
 
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) throws OrccException {
+		Actor actor = new RVCCalASTParser(args[0]).parse();
+		new ActorWriter(actor).write(args[1]);
+	}
+
 	private Actor actor;
 
 	/**
@@ -69,38 +77,23 @@ public class ActorWriter {
 		return obj;
 	}
 
+	private JSONArray writeLocation(Location location) {
+		JSONArray array = new JSONArray();
+		array.put(location.getStartLine());
+		array.put(location.getStartColumn());
+
+		// TODO remove when frontend done
+		array.put(42);
+		array.put(location.getEndColumn());
+
+		return array;
+	}
+
 	private JSONArray writePorts(List<VarDef> ports) throws OrccException {
 		JSONArray array = new JSONArray();
 		for (VarDef varDef : ports) {
 			array.put(writeVarDef(varDef));
 		}
-
-		return array;
-	}
-
-	private JSONArray writeVarDef(VarDef varDef) throws OrccException {
-		JSONArray array = new JSONArray();
-
-		JSONArray details = new JSONArray();
-		details.put(varDef.getName());
-		details.put(varDef.isAssignable());
-		details.put(varDef.isGlobal());
-		if (varDef.hasSuffix()) {
-			details.put(varDef.getSuffix());
-		} else {
-			details.put((Object) null);
-		}
-		details.put(varDef.getIndex());
-
-		// TODO write node id
-		details.put(42); // node Id
-
-		array.put(details);
-		array.put(writeLocation(varDef.getLoc()));
-		array.put(writeType(varDef.getType()));
-
-		// TODO write def-use chains
-		array.put(new JSONArray());
 
 		return array;
 	}
@@ -136,24 +129,31 @@ public class ActorWriter {
 		}
 	}
 
-	private JSONArray writeLocation(Location location) {
+	private JSONArray writeVarDef(VarDef varDef) throws OrccException {
 		JSONArray array = new JSONArray();
-		array.put(location.getStartLine());
-		array.put(location.getStartColumn());
 
-		// TODO remove when frontend done
-		array.put(42);
-		array.put(location.getEndColumn());
+		JSONArray details = new JSONArray();
+		details.put(varDef.getName());
+		details.put(varDef.isAssignable());
+		details.put(varDef.isGlobal());
+		if (varDef.hasSuffix()) {
+			details.put(varDef.getSuffix());
+		} else {
+			details.put((Object) null);
+		}
+		details.put(varDef.getIndex());
+
+		// TODO write node id
+		details.put(42); // node Id
+
+		array.put(details);
+		array.put(writeLocation(varDef.getLoc()));
+		array.put(writeType(varDef.getType()));
+
+		// TODO write def-use chains
+		array.put(new JSONArray());
 
 		return array;
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws OrccException {
-		Actor actor = new RVCCalASTParser(args[0]).parse();
-		new ActorWriter(actor).write(args[1]);
 	}
 
 }

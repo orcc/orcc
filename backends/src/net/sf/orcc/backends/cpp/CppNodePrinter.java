@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.backends.cpp;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
-
 import net.sf.orcc.backends.c.ExprToString;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
@@ -39,34 +36,21 @@ import net.sf.orcc.ir.nodes.PeekNode;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
+
 /**
  * @author Ghislain Roquier
- *
+ * 
  */
 
 public class CppNodePrinter extends NodePrinterTemplate {
-	
-	
-	public CppNodePrinter (StringTemplateGroup group,
-			StringTemplate template, String actorName,
-			VarDefPrinter varDefPrinter, ExprToString exprPrinter) {
-		
+
+	public CppNodePrinter(StringTemplateGroup group, StringTemplate template,
+			String actorName, VarDefPrinter varDefPrinter,
+			ExprToString exprPrinter) {
+
 		super(group, template, actorName, varDefPrinter, exprPrinter);
-	}
-
-	@Override
-	public void visit(ReadNode node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
-
-		// varDef contains the variable (with the same name as the port)
-		VarDef varDef = node.getVarDef();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
-		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
-		if(node.getNumTokens() > 1) {
-			nodeTmpl.setAttribute("numTokens", node.getNumTokens());
-		}
-		template.setAttribute(attrName, nodeTmpl);
 	}
 
 	@Override
@@ -78,7 +62,22 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
-		if(node.getNumTokens() > 1) {
+		if (node.getNumTokens() > 1) {
+			nodeTmpl.setAttribute("numTokens", node.getNumTokens());
+		}
+		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(ReadNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
+
+		// varDef contains the variable (with the same name as the port)
+		VarDef varDef = node.getVarDef();
+		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("actorName", actorName);
+		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		if (node.getNumTokens() > 1) {
 			nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 		}
 		template.setAttribute(attrName, nodeTmpl);
@@ -93,9 +92,9 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
-		if(node.getNumTokens() > 1) {
+		if (node.getNumTokens() > 1) {
 			nodeTmpl.setAttribute("numTokens", node.getNumTokens());
-		}	
+		}
 		template.setAttribute(attrName, nodeTmpl);
 	}
 }

@@ -55,9 +55,9 @@ import net.sf.orcc.ir.type.AbstractType;
 public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
 
 	List<AbstractNode> abstractNodes;
-	
+
 	public JoinNodeTransformation(Actor actor) {
-			
+
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}
@@ -73,27 +73,26 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
 		}
 	}
 
-	
-	private void mergeBrNode(BrNode node){
+	private void mergeBrNode(BrNode node) {
 		LabelNode labelNode = node.getLabelEndNode();
-		
-		//Successor of a phiNode Branch can only be of type BrLabelNode
-		BrLabelNode tmpLabelNode = (BrLabelNode)labelNode.getSuccessor();
+
+		// Successor of a phiNode Branch can only be of type BrLabelNode
+		BrLabelNode tmpLabelNode = (BrLabelNode) labelNode.getSuccessor();
 		abstractNodes.remove(tmpLabelNode);
-		
+
 		List<LabelNode> precedences = labelNode.getPrecedence();
-		for (LabelNode precedence : precedences){
+		for (LabelNode precedence : precedences) {
 			AbstractNode successorNode = precedence.getSuccessor();
-			
-			if (successorNode instanceof BrLabelNode){
-				BrLabelNode brLabelNode = (BrLabelNode)successorNode;
+
+			if (successorNode instanceof BrLabelNode) {
+				BrLabelNode brLabelNode = (BrLabelNode) successorNode;
 				brLabelNode.setLabelNode(tmpLabelNode.getLabelNode());
-			}else if (successorNode instanceof BrNode){
-				BrNode brNode = (BrNode)successorNode;
-				if (brNode.getLabelTrueNode().equals(labelNode)){
+			} else if (successorNode instanceof BrNode) {
+				BrNode brNode = (BrNode) successorNode;
+				if (brNode.getLabelTrueNode().equals(labelNode)) {
 					brNode.setLabelTrueNode(tmpLabelNode.getLabelNode());
 				}
-				if (brNode.getLabelTrueNode().equals(labelNode)){
+				if (brNode.getLabelTrueNode().equals(labelNode)) {
 					brNode.setLabelFalseNode(tmpLabelNode.getLabelNode());
 				}
 			}
@@ -101,75 +100,75 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
 		node.setLabelEndNode(null);
 	}
 
-	private void mergePhiNode(PhiNode sourceNode, Map<LabelNode, VarDef> assignements, AbstractType phiNodeType){
-		// Match and merge a couple vardef/brLabel into imbricated brNode	
-		LabelNode labelNode = null;	
+	private void mergePhiNode(PhiNode sourceNode,
+			Map<LabelNode, VarDef> assignements, AbstractType phiNodeType) {
+		// Match and merge a couple vardef/brLabel into imbricated brNode
+		LabelNode labelNode = null;
 		VarDef varDef = sourceNode.getVarDef();
-	
-		
-		for (Entry<LabelNode, VarDef> targetAssignement : assignements.entrySet()){
-					
-			if (targetAssignement.getValue().equals(varDef)){
+
+		for (Entry<LabelNode, VarDef> targetAssignement : assignements
+				.entrySet()) {
+
+			if (targetAssignement.getValue().equals(varDef)) {
 				labelNode = targetAssignement.getKey();
 			}
 		}
-			
+
 		assignements.remove(labelNode);
-				
-		Map<LabelNode, VarDef> sourceAssignements = sourceNode.getAssignements();
-		for(Entry<LabelNode, VarDef> sourceAssignement : sourceAssignements.entrySet()){
-						
-				LabelNode labKey = sourceAssignement.getKey();					
-				VarDef varVal = sourceAssignement.getValue();
-				varVal.setType(phiNodeType);
-						
-				assignements.put(labKey, varVal);
+
+		Map<LabelNode, VarDef> sourceAssignements = sourceNode
+				.getAssignements();
+		for (Entry<LabelNode, VarDef> sourceAssignement : sourceAssignements
+				.entrySet()) {
+
+			LabelNode labKey = sourceAssignement.getKey();
+			VarDef varVal = sourceAssignement.getValue();
+			varVal.setType(phiNodeType);
+
+			assignements.put(labKey, varVal);
 		}
 
-/*			
-			//Add undefined LabelNode branch into every targeted PhiNode		
-			for (Entry<LabelNode, VarDef> sourceAssignement : sourceNode.getAssignements().entrySet()){
-				for (PhiNode targetNode : targetNodes){
-					Map<LabelNode, VarDef> targetAssignements = targetNode.getAssignements();
-					if (!targetAssignements.containsKey(sourceAssignement.getKey())){
-						VarDef vardef = targetAssignements.get(mergeNode);
-						if (vardef != null){
-							targetAssignements.put(sourceAssignement.getKey(), vardef);
-						}
-					}
-				}
-			}
-		}*/
+		/*
+		 * //Add undefined LabelNode branch into every targeted PhiNode for
+		 * (Entry<LabelNode, VarDef> sourceAssignement :
+		 * sourceNode.getAssignements().entrySet()){ for (PhiNode targetNode :
+		 * targetNodes){ Map<LabelNode, VarDef> targetAssignements =
+		 * targetNode.getAssignements(); if
+		 * (!targetAssignements.containsKey(sourceAssignement.getKey())){ VarDef
+		 * vardef = targetAssignements.get(mergeNode); if (vardef != null){
+		 * targetAssignements.put(sourceAssignement.getKey(), vardef); } } } } }
+		 */
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(BrNode node, Object... args) {
-		
+
 		List<PhiNode> phiNodes;
 		List<PhiNode> phiNodesSource = node.getPhiNodes();
-		
-		
-		//Chech if Br Node are imbricated
-		if (args.length != 1){
-			//if not
+
+		// Chech if Br Node are imbricated
+		if (args.length != 1) {
+			// if not
 			phiNodes = new ArrayList<PhiNode>();
 			phiNodes.addAll(node.getPhiNodes());
-		}else{
-			//Else check for joinNode that can be merged
-			phiNodes = (List<PhiNode>)args[0];
-			
+		} else {
+			// Else check for joinNode that can be merged
+			phiNodes = (List<PhiNode>) args[0];
+
 			ListIterator<PhiNode> it = phiNodesSource.listIterator();
-			while (it.hasNext()){
+			while (it.hasNext()) {
 				PhiNode phiNodeSource = it.next();
 				VarDef varDef = phiNodeSource.getVarDef();
-				
-				for(PhiNode phiNode : phiNodes){
-					Map<LabelNode, VarDef> assignements = phiNode.getAssignements();
-					if (assignements.containsValue(varDef)){
-						mergePhiNode(phiNodeSource, assignements, phiNode.getType());
+
+				for (PhiNode phiNode : phiNodes) {
+					Map<LabelNode, VarDef> assignements = phiNode
+							.getAssignements();
+					if (assignements.containsValue(varDef)) {
+						mergePhiNode(phiNodeSource, assignements, phiNode
+								.getType());
 						it.remove();
-						if (phiNodesSource.size() == 0){
+						if (phiNodesSource.size() == 0) {
 							mergeBrNode(node);
 						}
 					}

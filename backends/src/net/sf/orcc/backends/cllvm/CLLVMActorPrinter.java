@@ -45,7 +45,6 @@ import net.sf.orcc.backends.multicore.MultiCoreActorPrinter;
  */
 public class CLLVMActorPrinter extends MultiCoreActorPrinter {
 
-
 	/**
 	 * Creates a new network printer with the template "C.st".
 	 * 

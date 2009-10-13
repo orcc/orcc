@@ -97,7 +97,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 	}
 
 	public static String toString(UnaryOp op, Object... args) {
-		
+
 		switch (op) {
 		case BNOT:
 			return "~";
@@ -111,25 +111,25 @@ public class LLVMExprPrinter implements ExprVisitor {
 			throw new NullPointerException();
 		}
 	}
-	
+
 	private StringBuilder builder;
-	
+
 	private LLVMTypePrinter typePrinter;
 
 	private LLVMVarDefPrinter varDefPrinter;
 
-	public LLVMExprPrinter(LLVMTypePrinter typePrinter, LLVMVarDefPrinter varDefPrinter) {
+	public LLVMExprPrinter(LLVMTypePrinter typePrinter,
+			LLVMVarDefPrinter varDefPrinter) {
 		this.varDefPrinter = varDefPrinter;
 		this.typePrinter = typePrinter;
 	}
-
 
 	public String toString(IExpr expr, Object... args) {
 		builder = new StringBuilder();
 		expr.accept(this, args);
 		return builder.toString();
 	}
-	
+
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
@@ -142,12 +142,12 @@ public class LLVMExprPrinter implements ExprVisitor {
 	}
 
 	@Override
-	public void visit(BooleanExpr expr, Object... args ) {
-		
-		if (args[0] instanceof AbstractType){
-			AbstractType type = (AbstractType)args[0];
+	public void visit(BooleanExpr expr, Object... args) {
+
+		if (args[0] instanceof AbstractType) {
+			AbstractType type = (AbstractType) args[0];
 			String typeStr = typePrinter.toString(type);
-			builder.append(typeStr+" ");
+			builder.append(typeStr + " ");
 		}
 		builder.append(expr.getValue() ? "1" : "0");
 	}
@@ -155,12 +155,11 @@ public class LLVMExprPrinter implements ExprVisitor {
 	@Override
 	public void visit(IntExpr expr, Object... args) {
 
-		
-		if (args[0] instanceof AbstractType){
-			String type = typePrinter.toString((AbstractType)args[0]);
-			builder.append(type+" ");
+		if (args[0] instanceof AbstractType) {
+			String type = typePrinter.toString((AbstractType) args[0]);
+			builder.append(type + " ");
 		}
-		
+
 		builder.append(expr.getValue());
 	}
 
@@ -189,13 +188,13 @@ public class LLVMExprPrinter implements ExprVisitor {
 	@Override
 	public void visit(VarExpr expr, Object... args) {
 		Boolean showType = false;
-		
-		if (args[0] instanceof AbstractType){
+
+		if (args[0] instanceof AbstractType) {
 			showType = true;
 		}
-		
+
 		VarDef varDef = expr.getVar().getVarDef();
-		builder.append(varDefPrinter.getVarDefName(varDef, showType));	
+		builder.append(varDefPrinter.getVarDefName(varDef, showType));
 	}
 
 }

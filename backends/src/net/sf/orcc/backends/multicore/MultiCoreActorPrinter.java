@@ -43,7 +43,7 @@ import net.sf.orcc.backends.c.VarDefPrinter;
  * @author Jérôme GORIN
  * 
  */
-public class MultiCoreActorPrinter extends CActorPrinter{
+public class MultiCoreActorPrinter extends CActorPrinter {
 
 	/**
 	 * Creates a new network printer with the template "C.st".

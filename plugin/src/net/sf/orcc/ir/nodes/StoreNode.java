@@ -71,6 +71,10 @@ public class StoreNode extends AbstractNode {
 		return value;
 	}
 
+	public void setIndexes(List<IExpr> indexes) {
+		this.indexes = indexes;
+	}
+
 	public void setTarget(VarUse target) {
 		this.target = target;
 	}
@@ -82,10 +86,6 @@ public class StoreNode extends AbstractNode {
 	@Override
 	public String toString() {
 		return target.toString() + indexes + " = " + value;
-	}
-
-	public void setIndexes(List<IExpr> indexes) {
-		this.indexes = indexes;
 	}
 
 }

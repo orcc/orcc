@@ -38,10 +38,10 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.network.Broadcast;
-import net.sf.orcc.ir.network.Connection;
-import net.sf.orcc.ir.network.Instance;
-import net.sf.orcc.ir.network.Network;
+import net.sf.orcc.network.Broadcast;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
 
 import org.jgrapht.graph.DirectedMultigraph;
 

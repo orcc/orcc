@@ -41,8 +41,8 @@ public interface CNodeVisitor extends NodeVisitor {
 
 	public void visit(IncrementNode node, Object... args);
 
-	public void visit(SelfAssignment node, Object... args);
-	
 	public void visit(InitPortNode node, Object... args);
-	
+
+	public void visit(SelfAssignment node, Object... args);
+
 }

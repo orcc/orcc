@@ -55,6 +55,10 @@ public abstract class AbstractNodeVisitor implements NodeVisitor {
 	}
 
 	@Override
+	public void visit(InitPortNode node, Object... args) {
+	}
+
+	@Override
 	public void visit(JoinNode node, Object... args) {
 	}
 
@@ -81,13 +85,9 @@ public abstract class AbstractNodeVisitor implements NodeVisitor {
 	@Override
 	public void visit(WhileNode node, Object... args) {
 	}
-
-	@Override
-	public void visit(WriteNode node, Object... args) {
-	}
 	
 	@Override
-	public void visit(InitPortNode node, Object... args) {
+	public void visit(WriteNode node, Object... args) {
 	}
 
 }

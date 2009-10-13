@@ -70,7 +70,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 	private int BrCounter;
 	ListIterator<AbstractNode> it;
 	private LabelNode labelNode;
-	
+
 	List<PhiNode> tmpPhiNodes;
 
 	public ControlFlowTransformation(Actor actor) {
@@ -90,10 +90,8 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		}
 	}
 
-	
 	private BrNode brNodeCreate(IfNode node, Object... args) {
 
-		
 		// Get IfNode attributes
 		int id = node.getId();
 		Location location = node.getLocation();
@@ -101,197 +99,197 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
 		List<AbstractNode> thenNodes = node.getThenNodes();
 		List<AbstractNode> elseNodes = node.getElseNodes();
-		
+
 		LabelNode thenLabelNode = null;
-		LabelNode elseLabelNode= null;
+		LabelNode elseLabelNode = null;
 		LabelNode endThenLabelNode = null;
-		LabelNode endElseLabelNode= null;
-		LabelNode endLabelNode= null;
-		List<PhiNode> phiNodes= null;
-		
+		LabelNode endElseLabelNode = null;
+		LabelNode endLabelNode = null;
+		List<PhiNode> phiNodes = null;
+
 		// Create entry LabelNode
 		LabelNode entryLabelNode = labelNode;
-		
-		//Set labelNode inside thenNodes
+
+		// Set labelNode inside thenNodes
 		if (!thenNodes.isEmpty()) {
 			// Create thenLabelNode
-			thenLabelNode = new LabelNode(node.getId(), node
-					.getLocation(), "bb" + Integer.toString(BrCounter++));
-			
-			
-			//Store current iterator and branch label
+			thenLabelNode = new LabelNode(node.getId(), node.getLocation(),
+					"bb" + Integer.toString(BrCounter++));
+
+			// Store current iterator and branch label
 			ListIterator<AbstractNode> itTmp = it;
 			labelNode = thenLabelNode;
-			
+
 			// Continue transformation on thenNode
 			visitNodes(thenNodes, node);
-			
-			//Restore current iterator
+
+			// Restore current iterator
 			it = itTmp;
 		}
-		
+
 		endThenLabelNode = labelNode;
-		
-		//Set labelNode inside elseNodes
+
+		// Set labelNode inside elseNodes
 		if (!(elseNodes.isEmpty())) {
-			
+
 			// Create elseLabelNode
-			elseLabelNode = new LabelNode(node.getId(), node
-					.getLocation(), "bb" + Integer.toString(BrCounter++));
+			elseLabelNode = new LabelNode(node.getId(), node.getLocation(),
+					"bb" + Integer.toString(BrCounter++));
 			labelNode = elseLabelNode;
-			
-			//Store current iterator and branch label
+
+			// Store current iterator and branch label
 			ListIterator<AbstractNode> itTmp = it;
- 
+
 			// Continue transformation on elseNode
 			visitNodes(elseNodes, node);
-			
-			//Restore current iterator
+
+			// Restore current iterator
 			it = itTmp;
 		}
-		
+
 		endElseLabelNode = labelNode;
-		
+
 		// Create elseLabelNode
-		endLabelNode = new LabelNode(node.getId(), node
-				.getLocation(), "bb" + Integer.toString(BrCounter++));
+		endLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
+				+ Integer.toString(BrCounter++));
 		labelNode = endLabelNode;
-		
+
 		if (!thenNodes.isEmpty()) {
-			thenNodes.add(new BrLabelNode(0, new Location(), endLabelNode, endThenLabelNode));
-		}else{
+			thenNodes.add(new BrLabelNode(0, new Location(), endLabelNode,
+					endThenLabelNode));
+		} else {
 			thenLabelNode = endLabelNode;
 			thenLabelNode.addPrecedence(entryLabelNode);
 		}
-		
+
 		if (!elseNodes.isEmpty()) {
-			elseNodes.add(new BrLabelNode(0, new Location(), endLabelNode, endElseLabelNode));
-		}else{
+			elseNodes.add(new BrLabelNode(0, new Location(), endLabelNode,
+					endElseLabelNode));
+		} else {
 			elseLabelNode = endLabelNode;
 			elseLabelNode.addPrecedence(entryLabelNode);
 		}
-		
-		
-		
-		return new BrNode(id, location, condition, conditionNodes, thenNodes, elseNodes, phiNodes,
-				entryLabelNode, thenLabelNode, elseLabelNode,
-				endLabelNode);
+
+		return new BrNode(id, location, condition, conditionNodes, thenNodes,
+				elseNodes, phiNodes, entryLabelNode, thenLabelNode,
+				elseLabelNode, endLabelNode);
 	}
-	
+
 	private BrNode brNodeCreate(WhileNode node, Object... args) {
 
-		//Get whileNode information
+		// Get whileNode information
 		int id = node.getId();
-		Location location= node.getLocation();
+		Location location = node.getLocation();
 		IExpr condition = node.getCondition();
 		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
 		List<AbstractNode> thenNodes = node.getNodes();
 		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
 		LabelNode entryLabelNode = labelNode;
 		LabelNode thenLabelNode = null;
-		List<PhiNode> phiNodes= new ArrayList<PhiNode>();
-		
+		List<PhiNode> phiNodes = new ArrayList<PhiNode>();
 
-		
-		thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+		thenLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb"
+				+ Integer.toString(BrCounter++));
 		labelNode = thenLabelNode;
-			
-		//Store current iterator and branch label
+
+		// Store current iterator and branch label
 		ListIterator<AbstractNode> itTmp = it;
-				
+
 		// Continue transformation on thenNode
 		visitNodes(thenNodes, node);
-		
-		//Restore current iterator
+
+		// Restore current iterator
 		it = itTmp;
-		
-		//Add branch to first conditions
-		thenNodes.add(new BrLabelNode(0, new Location(), entryLabelNode, labelNode));
-		
-		//Set endNode
-		LabelNode elseLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
+
+		// Add branch to first conditions
+		thenNodes.add(new BrLabelNode(0, new Location(), entryLabelNode,
+				labelNode));
+
+		// Set endNode
+		LabelNode elseLabelNode = new LabelNode(node.getId(), node
+				.getLocation(), "bb" + Integer.toString(BrCounter++));
 		elseLabelNode.addPrecedence(entryLabelNode);
 		LabelNode endLabelNode = elseLabelNode;
 		labelNode = endLabelNode;
-		
-		return new BrNode(id, location, condition, conditionNodes, thenNodes, elseNodes, phiNodes,
-				entryLabelNode, thenLabelNode, elseLabelNode,
-				endLabelNode);
+
+		return new BrNode(id, location, condition, conditionNodes, thenNodes,
+				elseNodes, phiNodes, entryLabelNode, thenLabelNode,
+				elseLabelNode, endLabelNode);
 	}
-	
-	
-	//Remove ifNode in case of a constant condition 
-	private List<AbstractNode> clearIfNode(IfNode node){
-		BooleanExpr condition = (BooleanExpr)node.getCondition();
+
+	// Remove ifNode in case of a constant condition
+	private List<AbstractNode> clearIfNode(IfNode node) {
+		BooleanExpr condition = (BooleanExpr) node.getCondition();
 		List<AbstractNode> nodes;
 		List<PhiAssignment> phis = node.getJoinNode().getPhis();
 		boolean value = condition.getValue();
-		
-		if (value == true){
+
+		if (value == true) {
 			nodes = node.getThenNodes();
-		}else{
+		} else {
 			nodes = node.getElseNodes();
 		}
-		
-		for (PhiAssignment phi : phis){
+
+		for (PhiAssignment phi : phis) {
 			VarDef varDef = phi.getVarDef();
 			List<VarUse> varUses = phi.getVars();
 			VarDef phiVar;
 			if (value == true) {
 				phiVar = varUses.get(0).getVarDef();
-				
-			}else {
+
+			} else {
 				phiVar = varUses.get(1).getVarDef();
 			}
-					
+
 			varDef.duplicate(phiVar);
 		}
-		
+
 		return nodes;
 	}
-	
-	
-	//Return a list of PhiNode supported by the LLVM backend from JoinNode
-	private List<PhiNode> phiNodeCreate(JoinNode node, LabelNode labelTrueNode, LabelNode labelFalseNode) {
+
+	// Return a list of PhiNode supported by the LLVM backend from JoinNode
+	private List<PhiNode> phiNodeCreate(JoinNode node, LabelNode labelTrueNode,
+			LabelNode labelFalseNode) {
 		List<PhiAssignment> phis = node.getPhis();
 		List<PhiNode> PhiNodes = new ArrayList<PhiNode>();
-		
-		for (PhiAssignment phi : phis){
+
+		for (PhiAssignment phi : phis) {
 			Map<LabelNode, VarDef> assignements = new HashMap<LabelNode, VarDef>();
 			VarDef varDef = phi.getVarDef();
 			AbstractType varType = varDef.getType();
-			List<VarUse> vars =  phi.getVars();
-			
+			List<VarUse> vars = phi.getVars();
+
 			VarDef trueVar = vars.get(0).getVarDef();
 			VarDef falseVar = vars.get(1).getVarDef();
 
-			//Force varDef's type to phiNode type to prevent cast problem
-			if (varType instanceof IntType){
-				IntType intType = (IntType)varType;
-				if (trueVar.getType() instanceof IntType){
-					((IntType)trueVar.getType()).setSize(intType.getSize());
-				}else{		
+			// Force varDef's type to phiNode type to prevent cast problem
+			if (varType instanceof IntType) {
+				IntType intType = (IntType) varType;
+				if (trueVar.getType() instanceof IntType) {
+					((IntType) trueVar.getType()).setSize(intType.getSize());
+				} else {
 					trueVar.setType(varType);
 				}
-				
-				if (falseVar.getType() instanceof IntType){
-					((IntType)falseVar.getType()).setSize(intType.getSize());
-				}else{
+
+				if (falseVar.getType() instanceof IntType) {
+					((IntType) falseVar.getType()).setSize(intType.getSize());
+				} else {
 					falseVar.setType(varType);
 				}
 			}
-			
+
 			assignements.put(labelTrueNode, trueVar);
 			assignements.put(labelFalseNode, falseVar);
 
-			PhiNodes.add(new PhiNode(0, new Location(), varDef, varDef.getType(), assignements));
+			PhiNodes.add(new PhiNode(0, new Location(), varDef, varDef
+					.getType(), assignements));
 		}
-		
+
 		return PhiNodes;
-		
+
 	}
-	
-	//Return a selectNode
+
+	// Return a selectNode
 	private SelectNode selectNodeCreate(IfNode node) {
 		int id = node.getId();
 		Location location = node.getLocation();
@@ -308,60 +306,61 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		List<AbstractNode> elseNodes = node.getElseNodes();
 		JoinNode joinNode = node.getJoinNode();
 
-		//Select the appropriate llvm Node to describe the current IfNode
-		if ((thenNodes.isEmpty())
-				&& (elseNodes.isEmpty())) {
+		// Select the appropriate llvm Node to describe the current IfNode
+		if ((thenNodes.isEmpty()) && (elseNodes.isEmpty())) {
 
 			SelectNode selectNode = selectNodeCreate(node);
 			it.remove();
 			it.add(selectNode);
-		}else if (node.getCondition() instanceof BooleanExpr){
+		} else if (node.getCondition() instanceof BooleanExpr) {
 			List<AbstractNode> brNodes = clearIfNode(node);
 			it.remove();
-			for (AbstractNode brNode: brNodes){
+			for (AbstractNode brNode : brNodes) {
 				it.add(brNode);
 			}
 		} else {
-			
+
 			BrNode brNode = brNodeCreate(node);
 			List<LabelNode> label = brNode.getLabelEndNode().getPrecedence();
-			List<PhiNode> phiNodes = phiNodeCreate(joinNode, label.get(0), label.get(1)); 
+			List<PhiNode> phiNodes = phiNodeCreate(joinNode, label.get(0),
+					label.get(1));
 			brNode.setPhiNodes(phiNodes);
 			it.remove();
 			it.add(brNode);
 		}
 
 	}
-	
+
 	@Override
 	public void visit(WhileNode node, Object... args) {
 
-		//Store current label node
+		// Store current label node
 		LabelNode entryLabelNode = labelNode;
-		
+
 		it.remove();
-		
-		LabelNode conditionLabelNode = new LabelNode(node.getId(), node.getLocation(), "bb" + Integer.toString(BrCounter++));
-		it.add(new BrLabelNode(0, new Location(), conditionLabelNode, entryLabelNode));
+
+		LabelNode conditionLabelNode = new LabelNode(node.getId(), node
+				.getLocation(), "bb" + Integer.toString(BrCounter++));
+		it.add(new BrLabelNode(0, new Location(), conditionLabelNode,
+				entryLabelNode));
 		it.add(conditionLabelNode);
 		labelNode = conditionLabelNode;
-			
+
 		BrNode brNode = brNodeCreate(node);
 		List<LabelNode> label = brNode.getLabelEntryNode().getPrecedence();
-		List<PhiNode> phiNodes = phiNodeCreate(node.getJoinNode(), label.get(0), label.get(1)); 
-					
-		
-		
-		//Move PhiNodes in current node 
-		for (PhiNode phiNode : phiNodes){
+		List<PhiNode> phiNodes = phiNodeCreate(node.getJoinNode(),
+				label.get(0), label.get(1));
+
+		// Move PhiNodes in current node
+		for (PhiNode phiNode : phiNodes) {
 			it.add(phiNode);
 		}
-		
+
 		phiNodes.clear();
-		
-		//Add BrNode into the current function
+
+		// Add BrNode into the current function
 		it.add(brNode);
-		
+
 	}
 
 	private void visitNodes(List<AbstractNode> nodes, Object... args) {
@@ -379,8 +378,8 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		labelNode = new LabelNode(0, null, "entry");
 
 		visitNodes(nodes);
-		
-		//Add void return
+
+		// Add void return
 		if (proc.getReturnType() instanceof VoidType) {
 			TypeExpr expr = new TypeExpr(null, new VoidType());
 			nodes.add(new ReturnNode(0, null, expr));

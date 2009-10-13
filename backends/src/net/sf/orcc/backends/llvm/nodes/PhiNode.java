@@ -40,14 +40,15 @@ import net.sf.orcc.ir.type.AbstractType;
  */
 public class PhiNode extends AbstractLLVMNode {
 
-	private VarDef varDef;
-	
-	private AbstractType type;
-
 	private Map<LabelNode, VarDef> assignements;
 
-	public PhiNode(int id, Location location, VarDef varDef, AbstractType type, Map<LabelNode, VarDef> assignements) {
-		super(id, location);	
+	private AbstractType type;
+
+	private VarDef varDef;
+
+	public PhiNode(int id, Location location, VarDef varDef, AbstractType type,
+			Map<LabelNode, VarDef> assignements) {
+		super(id, location);
 		this.varDef = varDef;
 		this.assignements = assignements;
 		this.type = type;
@@ -58,28 +59,28 @@ public class PhiNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public VarDef getVarDef() {
-		return varDef;
-	}
-
 	public Map<LabelNode, VarDef> getAssignements() {
 		return assignements;
-	}
-	
-	public void setAssignements(Map<LabelNode, VarDef> assignements) {
-		this.assignements= assignements;
-	}
-
-	public void setVarDef(VarDef varDef) {
-		this.varDef = varDef;
 	}
 
 	public AbstractType getType() {
 		return type;
 	}
 
+	public VarDef getVarDef() {
+		return varDef;
+	}
+
+	public void setAssignements(Map<LabelNode, VarDef> assignements) {
+		this.assignements = assignements;
+	}
+
 	public void setType(AbstractType type) {
 		this.type = type;
+	}
+
+	public void setVarDef(VarDef varDef) {
+		this.varDef = varDef;
 	}
 
 }

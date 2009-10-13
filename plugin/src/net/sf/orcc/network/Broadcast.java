@@ -26,18 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.network;
+package net.sf.orcc.network;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Map;
+import java.util.HashMap;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.parser.IrParser;
+import net.sf.orcc.ir.type.AbstractType;
 
 /**
  * An Instance is an {@link Actor} with parameters.
@@ -45,85 +41,28 @@ import net.sf.orcc.ir.parser.IrParser;
  * @author Matthieu Wipliez
  * 
  */
-public class Instance implements Comparable<Instance> {
+public class Broadcast extends Instance {
 
-	private Actor actor;
+	public static final String CLASS = "";
 
-	private String clasz;
+	private int numOutput;
 
-	private File file;
+	private AbstractType type;
 
-	private String id;
-
-	private Map<String, IExpr> parameters;
-
-	public Instance(String path, String id, String clasz,
-			Map<String, IExpr> parameters) throws OrccException {
-		this.clasz = clasz;
-		this.id = id;
-		this.parameters = parameters;
-
-		if (!isBroadcast()) {
-			// parse actor
-			try {
-				String fileName = path + File.separator + id + ".json";
-				file = new File(fileName);
-				InputStream in = new FileInputStream(file);
-				actor = new IrParser().parseActor(in);
-			} catch (OrccException e) {
-				throw new OrccException("Could not parse instance \"" + id
-						+ "\" because: " + e.getLocalizedMessage(), e);
-			} catch (FileNotFoundException e) {
-				throw new OrccException(
-						"I/O error when parsing \"" + id + "\"", e);
-			}
-		}
+	public Broadcast(String actorName, String portName, int numOutput,
+			AbstractType type) throws OrccException {
+		super(null, "broadcast_" + actorName + "_" + portName, CLASS,
+				new HashMap<String, IExpr>());
+		this.numOutput = numOutput;
+		this.type = type;
 	}
 
-	@Override
-	public int compareTo(Instance instance) {
-		return id.compareTo(instance.id);
+	public int getNumOutput() {
+		return numOutput;
 	}
 
-	public Actor getActor() {
-		return actor;
-	}
-
-	public String getClasz() {
-		return clasz;
-	}
-
-	public File getFile() {
-		return file;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public Map<String, IExpr> getParameters() {
-		return parameters;
-	}
-
-	public boolean hasActor() {
-		return (actor != null);
-	}
-
-	public boolean isBroadcast() {
-		return clasz.equals(Broadcast.CLASS);
-	}
-
-	public void setClasz(String clasz) {
-		this.clasz = clasz;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	@Override
-	public String toString() {
-		return "\"" + id + "\" instance of \"" + clasz + "\"";
+	public AbstractType getType() {
+		return type;
 	}
 
 }

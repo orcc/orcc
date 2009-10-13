@@ -48,7 +48,7 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 public class CorrectLabelNameTransformation extends AbstractLLVMNodeVisitor {
 
 	int brCount;
-	
+
 	public CorrectLabelNameTransformation(Actor actor) {
 
 		for (Procedure proc : actor.getProcs()) {
@@ -71,10 +71,10 @@ public class CorrectLabelNameTransformation extends AbstractLLVMNodeVisitor {
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
 	}
-	
+
 	@Override
 	public void visit(LabelNode node, Object... args) {
-		node.setLabelName("bb"+ Integer.toString(brCount++));
+		node.setLabelName("bb" + Integer.toString(brCount++));
 	}
 
 	private void visitNodes(List<AbstractNode> nodes) {

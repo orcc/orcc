@@ -51,7 +51,12 @@ public class FSM {
 		this.transitions = transitions;
 	}
 
-// String state
+// Int state
+	public int getInitialIntState() {
+		return states.indexOf(initialState);
+	}
+
+	// String state
 	public String getInitialState() {
 		return initialState;
 	}
@@ -66,11 +71,6 @@ public class FSM {
 
 	public void setInitialState(String initialState) {
 		this.initialState = initialState;
-	}
-
-	// Int state
-	public int getInitialIntState() {
-		return states.indexOf(initialState);
 	}
 	
 }

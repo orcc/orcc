@@ -38,17 +38,21 @@ import java.util.List;
  */
 public class Transition {
 
+	private int indexState;
+
 	private List<NextStateInfo> nextStateInfo;
 
 	private String sourceState;
-
-	private int indexState;
 	
 	public Transition(int indexState, String sourceState, List<NextStateInfo> nextStateInfo) {
 		this.indexState = indexState;
 		this.sourceState = sourceState;
 		this.nextStateInfo = nextStateInfo;
 		
+	}
+
+	public int getIndexState() {
+		return indexState;
 	}
 
 	public List<NextStateInfo> getNextStateInfo() {
@@ -58,17 +62,13 @@ public class Transition {
 	public String getSourceState() {
 		return sourceState;
 	}
+	
+	public void setIndexState(int indexState) {
+		this.indexState = indexState;
+	}
 
 	public void setSourceState(String sourceState) {
 		this.sourceState = sourceState;
-	}
-	
-	public int getIndexState() {
-		return indexState;
-	}
-
-	public void setIndexState(int indexState) {
-		this.indexState = indexState;
 	}
 
 }

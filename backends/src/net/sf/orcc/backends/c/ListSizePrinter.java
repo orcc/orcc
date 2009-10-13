@@ -52,6 +52,12 @@ public class ListSizePrinter extends AbstractTypeVisitor {
 		sizeList = new ArrayList<Integer>();
 	}
 
+	public List<Integer> getSize() {
+		List<Integer> list = new ArrayList<Integer>(sizeList);
+		sizeList.clear();
+		return list;
+	}
+
 	public void visit(ListType type) {
 		try {
 			IExpr expr = type.getSize().evaluate();
@@ -64,12 +70,6 @@ public class ListSizePrinter extends AbstractTypeVisitor {
 		} catch (OrccException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public List<Integer> getSize() {
-		List<Integer> list = new ArrayList<Integer>(sizeList);
-		sizeList.clear();
-		return list;
 	}
 
 }

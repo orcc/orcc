@@ -41,9 +41,9 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 public class LabelNode extends AbstractLLVMNode {
 
 	private String labelName;
-	
+
 	private List<LabelNode> precedence;
-	
+
 	private AbstractNode successor;
 
 	public LabelNode(int id, Location location, String labelName) {
@@ -82,7 +82,7 @@ public class LabelNode extends AbstractLLVMNode {
 	public AbstractNode getSuccessor() {
 		return successor;
 	}
-	
+
 	public void setLabelName(String labelName) {
 		this.labelName = labelName;
 	}
@@ -94,7 +94,7 @@ public class LabelNode extends AbstractLLVMNode {
 	public void setSuccessor(AbstractNode successor) {
 		this.successor = successor;
 	}
-	
+
 	@Override
 	public String toString() {
 		return labelName;

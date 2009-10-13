@@ -64,24 +64,24 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 		return indexs;
 	}
 
-	public void setIndexs(List<IExpr> indexs) {
-		this.indexs = indexs;
+	public VarUse getSource() {
+		return source;
 	}
 
 	public VarDef getVarDef() {
 		return varDef;
 	}
 
-	public void setVar(VarDef varDef) {
-		this.varDef = varDef;
-	}
-
-	public VarUse getSource() {
-		return source;
+	public void setIndexs(List<IExpr> indexs) {
+		this.indexs = indexs;
 	}
 
 	public void setSource(VarUse source) {
 		this.source = source;
+	}
+
+	public void setVar(VarDef varDef) {
+		this.varDef = varDef;
 	}
 
 	@Override
