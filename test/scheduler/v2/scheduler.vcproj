@@ -125,6 +125,7 @@
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
+				AssemblerOutput="2"
 				WarningLevel="3"
 				DebugInformationFormat="0"
 			/>
@@ -182,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\scheduler_v0.c"
+				>
+			</File>
+			<File
 				RelativePath=".\scheduler_v1.c"
 				>
 			</File>
@@ -193,12 +198,20 @@
 				RelativePath=".\scheduler_v3.c"
 				>
 			</File>
+			<File
+				RelativePath=".\scheduler_vSDF.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\defs.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

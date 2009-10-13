@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include "defs.h"
+
 static struct fifo_s {
 	int elt_size;
 	int size;
@@ -76,11 +78,6 @@ static struct fifo_s *source_O = &fifo_0;
 static struct fifo_s *compute_I = &fifo_0;
 static struct fifo_s *compute_O = &fifo_1;
 static struct fifo_s *sink_I = &fifo_1;
-
-// number of iterations to do
-#define N 100000
-
-extern int source_X;
 
 static void action_source() {
 	int *ptr = getWritePtr(source_O, 1);
