@@ -70,9 +70,28 @@ import org.w3c.dom.ls.LSParser;
 public class NetworkParser {
 
 	/**
+	 * Calls the parser with args[0] as the file name.
+	 * 
+	 * @param args
+	 *            arguments
+	 * @throws OrccException
+	 *             if the file could not be parsed
+	 */
+	public static void main(String[] args) throws OrccException {
+		if (args.length == 1) {
+			new NetworkParser(args[0]).parseNetwork();
+		} else {
+			System.err.println("Usage: NetworkParser "
+					+ "<absolute path of top-level XDF network>");
+		}
+	}
+
+	/**
 	 * absolute file name of the XDF file
 	 */
 	private File file;
+
+	private DirectedGraph<Instance, Connection> graph;
 
 	/**
 	 * list of input ports
@@ -98,8 +117,6 @@ public class NetworkParser {
 	 * parent path of {@link #file}
 	 */
 	private String path;
-
-	private DirectedGraph<Instance, Connection> graph;
 
 	/**
 	 * Creates a new network parser.
@@ -143,6 +160,15 @@ public class NetworkParser {
 		}
 	}
 
+	private void checkNetwork() throws OrccException {
+		if (instances.isEmpty()) {
+			throw new OrccException(
+					"A valid network must contain at least one instance");
+		}
+
+		checkConnections();
+	}
+
 	private void checkPorts(String src, String src_port, String dst,
 			String dst_port) throws OrccException {
 		if (src.isEmpty()) {
@@ -172,8 +198,44 @@ public class NetworkParser {
 		}
 	}
 
-	private void parseConnection(Node node) throws OrccException {
-		Element connection = (Element) node;
+	/**
+	 * Parses the body of the XDF document. The body can contain any element
+	 * among the supported elements. Supported elements are: Connection, Decl
+	 * (kind=Param or kind=Var), Instance, Package, Port.
+	 * 
+	 * @param root
+	 * @throws OrccException
+	 */
+	private void parseBody(Element root) throws OrccException {
+		Node node = root.getFirstChild();
+		while (node != null) {
+			// this test allows us to skip stupid #text nodes
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element) node;
+				String name = node.getNodeName();
+				if (name.equals("Connection")) {
+					parseConnection(element);
+				} else if (name.equals("Decl")) {
+					parseDecl(element);
+				} else if (name.equals("Instance")) {
+					Instance instance = parseInstance(element);
+					instances.put(instance.getId(), instance);
+					graph.addVertex(instance);
+				} else if (name.equals("Package")) {
+					throw new OrccException(
+							"Package elements are not supported by Orcc yet");
+				} else if (name.equals("Port")) {
+					parsePort(element);
+				} else {
+					throw new OrccException("invalid node \"" + name + "\"");
+				}
+			}
+
+			node = node.getNextSibling();
+		}
+	}
+
+	private void parseConnection(Element connection) throws OrccException {
 		String src = connection.getAttribute("src");
 		String src_port = connection.getAttribute("src-port");
 		String dst = connection.getAttribute("dst");
@@ -195,6 +257,11 @@ public class NetworkParser {
 
 		Connection conn = new Connection(srcPort, dstPort, size);
 		graph.addEdge(source, target, conn);
+	}
+
+	private void parseDecl(Element decl) throws OrccException {
+		// TODO parse Decl
+		throw new OrccException("Decl not yet implemented");
 	}
 
 	private IExpr parseExpr(Node node) throws OrccException {
@@ -246,43 +313,17 @@ public class NetworkParser {
 	}
 
 	/**
-	 * Parses the body of the XDF document. The body can contain any element
-	 * among the supported elements. Supported elements are: Connection, Decl
-	 * (kind=Param or kind=Var), Instance, Package, Port.
+	 * Parses an "Instance" element and returns an {@link Instance}.
 	 * 
-	 * @param root
+	 * @param instance
+	 *            a DOM element named "Instance".
+	 * @return an instance
 	 * @throws OrccException
+	 *             if the instance is not well-formed
 	 */
-	private void parseBody(Element root) throws OrccException {
-		Node node = root.getFirstChild();
-		while (node != null) {
-			// this test allows us to skip stupid #text nodes
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				String name = node.getNodeName();
-				if (name.equals("Instance")) {
-					Instance instance = parseInstance(node);
-					instances.put(instance.getId(), instance);
-					graph.addVertex(instance);
-				} else if (name.equals("Connection")) {
-					parseConnection(node);
-				} else {
-					throw new OrccException("node \"" + name
-							+ "\" not yet implemented");
-				}
-			}
-
-			node = node.getNextSibling();
-		}
-
-		if (instances.isEmpty()) {
-			throw new OrccException(
-					"A valid network must contain at least one instance");
-		}
-	}
-
-	private Instance parseInstance(Node node) throws OrccException {
+	private Instance parseInstance(Element instance) throws OrccException {
 		// instance id
-		String id = ((Element) node).getAttribute("id");
+		String id = instance.getAttribute("id");
 		if (id.isEmpty()) {
 			throw new OrccException("An Instance element "
 					+ "must have a valid \"id\" attribute");
@@ -290,7 +331,7 @@ public class NetworkParser {
 
 		// instance class
 		String clasz = null;
-		Node child = node.getFirstChild();
+		Node child = instance.getFirstChild();
 		while (child != null) {
 			if (child.getNodeName().equals("Class")) {
 				clasz = ((Element) child).getAttribute("name");
@@ -370,6 +411,32 @@ public class NetworkParser {
 		return parameters;
 	}
 
+	/**
+	 * Parses a port.
+	 * 
+	 * @param port
+	 *            a DOM element named "Port"
+	 * @throws OrccException
+	 */
+	private void parsePort(Element port) throws OrccException {
+		// TODO parse port
+
+		String name = port.getAttribute("name");
+		if (name.isEmpty()) {
+			throw new OrccException("A Port has an empty name");
+		}
+
+		String kind = port.getAttribute("kind");
+		if (kind.equals("Input")) {
+
+		} else if (kind.equals("Output")) {
+
+		} else {
+			throw new OrccException("Port \"" + name + "\", invalid kind: \""
+					+ kind + "\"");
+		}
+	}
+
 	private Integer parseSize(Node node) throws OrccException {
 		while (node != null) {
 			if (node.getNodeName().equals("Attribute")) {
@@ -419,8 +486,7 @@ public class NetworkParser {
 		parameters = new OrderedMap<VarDef>();
 
 		parseBody(root);
-
-		checkConnections();
+		checkNetwork();
 
 		return new Network(name, inputs, outputs, parameters, graph);
 	}
