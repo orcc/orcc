@@ -25,7 +25,7 @@
 #include "llvm/Transforms/Utils/Cloning.h"
 #include "llvm/TypeSymbolTable.h"
 #include "llvm/Transforms/Utils/ValueMapper.h"
-
+#include "llvm/Target/TargetOptions.h"
 
 
 using namespace llvm;
@@ -147,8 +147,9 @@ void* initModule(std::string moduleName, lff_t **fifoIn, lff_t **fifoOut)
 	  (moduleName.compare("dcsplit")==0)||(moduleName.compare("final")==0)||(moduleName.compare("zzaddr")==0)||
 	  (moduleName.compare("interpolate")==0)||(moduleName.compare("retrans")==0)||
 	  (moduleName.compare("add")==0)||(moduleName.compare("fairmerge")==0)||(moduleName.compare("trans")==0)||
-	  (moduleName.compare("combine")==0)||(moduleName.compare("rowsort")==0))
+	  (moduleName.compare("combine")==0)||(moduleName.compare("rowsort")==0)||(moduleName.compare("scale")==0))
   {
+	  
 	buffer = MemoryBuffer::getFile("D:\\Projets\\orcc\\trunk\\runtime\\liborcc\\include\\lock_free_fifo.bc", &error);
 	Module* mod = ParseBitcodeFile(buffer, &error);
 	Linker::LinkModules(jit, mod, 0 );

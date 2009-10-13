@@ -156,7 +156,7 @@ public class LLVMActorPrinter {
 	 * @throws IOException
 	 */
 	public void printActor(String fileName, Actor actor) throws IOException {
-
+		
 		template = group.getInstanceOf("actor");
 
 		// fill port names list
@@ -179,13 +179,14 @@ public class LLVMActorPrinter {
 			StringTemplate procTmpl = applyProc(actorName, action.getBody());
 			template.setAttribute(tmplName, procTmpl);
 			Procedure proc = action.getScheduler();
-			proc.setName("isSchedulable_" + action.getTag());
+			proc.setName("isSchedulable_" + action);
 			procTmpl = applyProc(actorName, proc);
 			template.setAttribute(tmplName, procTmpl);
 		}
 	}
 
 	private void setAttributes(Actor actor) {
+		
 
 		String actorName = actor.getName();
 		template.setAttribute("name", actorName);
@@ -200,7 +201,7 @@ public class LLVMActorPrinter {
 		template.setAttribute("iterator", new NodeIndex(0));
 		template.setAttribute("initialize", actor.getInitializes());
 	}
-
+	
 	private void setFifos(String attribute, List<VarDef> ports) {
 		int size = ports.size();
 		List<String> names = new ArrayList<String>(size);
@@ -214,7 +215,7 @@ public class LLVMActorPrinter {
 	private void setInstantations(String actorName, List<Procedure> procs) {
 		for (Procedure proc : procs) {
 			int count = 0;
-
+			
 			StringTemplate instTmpl = group.getInstanceOf("inst");
 			// name
 			instTmpl.setAttribute("name", proc.getName());
@@ -227,11 +228,11 @@ public class LLVMActorPrinter {
 				node.accept(printer, count);
 				count++;
 			}
-
+			
 			template.setAttribute("insts", instTmpl);
 		}
 	}
-
+	
 	private void setProcedures(String actorName, List<Procedure> procs) {
 		for (Procedure proc : procs) {
 			if (!proc.isExternal()) {
@@ -245,19 +246,20 @@ public class LLVMActorPrinter {
 			StringTemplate stateTempl = group.getInstanceOf("stateVar");
 			template.setAttribute("stateVars", stateTempl);
 
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar
-					.getDef());
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar.getDef());
 			stateTempl.setAttribute("vardef", varDefMap);
 
+		
+				
 			// initial value of state var (if any)
 			if (stateVar.hasInit()) {
 				VarDef varDef = stateVar.getDef();
 				constPrinter.setTemplate(stateTempl);
-
-				if (stateVar.getInit() instanceof ListConst) {
-					stateVar.getInit().accept(constPrinter,
-							((PointType) varDef.getType()).getType());
-				} else {
+				
+				if (stateVar.getInit() instanceof ListConst)
+				{
+					stateVar.getInit().accept(constPrinter, ((PointType)varDef.getType()).getType());
+				}else{
 					stateVar.getInit().accept(constPrinter);
 				}
 			}
