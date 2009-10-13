@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.cllvm;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Set;
 
 import net.sf.orcc.backends.IBackend;
@@ -71,8 +70,7 @@ public class CLLVMBackendImpl implements IBackend {
 	public void generateCode(String fileName, int fifoSize) throws Exception {
 		File file = new File(fileName);
 		String path = file.getParent();
-		Network network = new NetworkParser().parseNetwork(path,
-				new FileInputStream(file));
+		Network network = new NetworkParser(fileName).parseNetwork();
 
 		Set<Instance> instances = network.getGraph().vertexSet();
 		for (Instance instance : instances) {

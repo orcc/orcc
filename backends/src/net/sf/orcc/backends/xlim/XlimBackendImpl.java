@@ -28,15 +28,11 @@
  */
 package net.sf.orcc.backends.xlim;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Set;
+import java.io.IOException;
 
-import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.ir.transforms.BroadcastAdder;
-import net.sf.orcc.network.Instance;
+import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.parser.NetworkParser;
 
 /**
  * C back-end.
@@ -44,7 +40,7 @@ import net.sf.orcc.network.parser.NetworkParser;
  * @author Matthieu Wipliez
  * 
  */
-public class XlimBackendImpl implements IBackend {
+public class XlimBackendImpl extends AbstractBackend {
 
 	/**
 	 * 
@@ -65,30 +61,15 @@ public class XlimBackendImpl implements IBackend {
 	}
 
 	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
-		File file = new File(fileName);
-		String path = file.getParent();
-		Network network = new NetworkParser().parseNetwork(path,
-				new FileInputStream(file));
-
-		Set<Instance> instances = network.getGraph().vertexSet();
-		for (Instance instance : instances) {
-			if (instance.hasActor()) {
-				// Actor actor = instance.getActor();
-
-				// prints actor
-				// String outputName = path + File.separator + instance.getId()
-				// + ".xlim";
-				// new ActorPrinter(outputName, actor);
-			}
-		}
-
-		// add broadcasts
-		new BroadcastAdder(network);
-
-		// print network
-		// CNetworkPrinter networkPrinter = new CNetworkPrinter();
-		// String outputName = path + File.separator + network.getName() + ".c";
-		// networkPrinter.printNetwork(outputName, network, false);
+	protected void init() throws IOException {
 	}
+
+	@Override
+	protected void printActor(String id, Actor actor) throws Exception {
+	}
+
+	@Override
+	protected void printNetwork(Network network) throws Exception {
+	}
+
 }

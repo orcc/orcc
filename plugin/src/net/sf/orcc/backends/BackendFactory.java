@@ -39,6 +39,10 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
 /**
+ * A factory class that contains a list of back-ends. The back-ends are classes
+ * that implement the {@link IBackend} interface and are declared in the
+ * <code>net.sf.orcc.plugin.backend</code> extension point.
+ * 
  * @author Matthieu Wipliez
  * 
  */
@@ -46,12 +50,24 @@ public class BackendFactory {
 
 	private static final BackendFactory instance = new BackendFactory();
 
+	/**
+	 * Returns the single instance of this factory
+	 * 
+	 * @return the single instance of this factory
+	 */
 	public static BackendFactory getInstance() {
 		return instance;
 	}
 
+	/**
+	 * list of back-ends.
+	 */
 	private final Map<String, IBackend> backends;
 
+	/**
+	 * private constructor called when this class is loaded and instance is
+	 * initialized
+	 */
 	private BackendFactory() {
 		backends = new TreeMap<String, IBackend>();
 
@@ -69,10 +85,27 @@ public class BackendFactory {
 		}
 	}
 
+	/**
+	 * Returns the list of the names of registered back-ends
+	 * 
+	 * @return the list of the names of registered back-ends
+	 */
 	public List<String> listBackends() {
 		return new ArrayList<String>(backends.keySet());
 	}
 
+	/**
+	 * Runs the given back-end on the given input file with the given FIFO size.
+	 * 
+	 * @param name
+	 *            back-end name. Must belong to the list returned by
+	 *            {@link #listBackends()}
+	 * @param fileName
+	 *            name of top-level input network
+	 * @param fifoSize
+	 *            default size of FIFOs
+	 * @throws Exception
+	 */
 	public void runBackend(String name, String fileName, int fifoSize)
 			throws Exception {
 		IBackend backend = backends.get(name);

@@ -29,7 +29,6 @@
 package net.sf.orcc.backends;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Set;
 
@@ -64,8 +63,7 @@ public abstract class AbstractBackend implements IBackend {
 		init();
 
 		// parses top network
-		Network network = new NetworkParser().parseNetwork(path,
-				new FileInputStream(file));
+		Network network = new NetworkParser(fileName).parseNetwork();
 
 		Set<Instance> instances = network.getGraph().vertexSet();
 		for (Instance instance : instances) {

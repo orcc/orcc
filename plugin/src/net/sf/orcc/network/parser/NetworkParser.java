@@ -28,7 +28,9 @@
  */
 package net.sf.orcc.network.parser;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,9 +67,28 @@ import org.w3c.dom.ls.LSParser;
  */
 public class NetworkParser {
 
+	/**
+	 * absolute file name of the XDF file
+	 */
+	private File file;
+
 	private Map<String, Instance> instances;
 
+	/**
+	 * parent path of {@link #file}
+	 */
 	private String path;
+
+	/**
+	 * Creates a new network parser.
+	 * 
+	 * @param fileName
+	 *            absolute file name of an XDF file
+	 */
+	public NetworkParser(String fileName) {
+		file = new File(fileName);
+		path = file.getParent();
+	}
 
 	private void checkConnections(DirectedMultigraph<Instance, Connection> graph)
 			throws OrccException {
@@ -277,10 +298,14 @@ public class NetworkParser {
 		return node;
 	}
 
-	public Network parseNetwork(String path, InputStream in)
-			throws OrccException {
-		this.path = path;
-
+	/**
+	 * Parses the file given to the constructor of this class.
+	 * 
+	 * @return a network
+	 * @throws OrccException
+	 *             if the file could not be parsed
+	 */
+	public Network parseNetwork() throws OrccException {
 		try {
 			// input
 			DOMImplementationRegistry registry = DOMImplementationRegistry
@@ -288,7 +313,7 @@ public class NetworkParser {
 			DOMImplementationLS impl = (DOMImplementationLS) registry
 					.getDOMImplementation("Core 3.0 XML 3.0 LS");
 			LSInput input = impl.createLSInput();
-			input.setByteStream(in);
+			input.setByteStream(new FileInputStream(file));
 
 			// parse without comments and whitespace
 			LSParser builder = impl.createLSParser(
@@ -299,6 +324,8 @@ public class NetworkParser {
 
 			// returns the document parsed from the input
 			return parseXDF(builder.parse(input));
+		} catch (FileNotFoundException e) {
+			throw new OrccException("I/O error when parsing network", e);
 		} catch (ClassCastException e) {
 			throw new OrccException("could not initialize DOM parser", e);
 		} catch (ClassNotFoundException e) {

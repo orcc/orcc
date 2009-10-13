@@ -20,6 +20,7 @@ import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
 import org.antlr.runtime.tree.RewriteRuleTokenStream;
 import org.antlr.runtime.tree.TreeAdaptor;
 
+@SuppressWarnings("unused")
 public class RVCCalParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ACTOR", "INPUTS", "OUTPUTS", "PARAMETER", "PARAMETERS", "ACTOR_DECLS", "FUNCTION", "PROCEDURE", "STATE_VAR", "SCHEDULE", "TRANSITION", "TRANSITIONS", "INEQUALITY", "PRIORITY", "GUARDS", "TAG", "STATEMENTS", "VARS", "EXPR", "EXPR_OR", "EXPR_AND", "EXPR_BITOR", "EXPR_BITAND", "EXPR_EQ", "EXPR_REL", "EXPR_SHIFT", "EXPR_ADD", "EXPR_MUL", "EXPR_EXP", "EXPR_UN", "EXPR_LIST", "EXPR_IF", "EXPR_CALL", "EXPR_IDX", "EXPR_VAR", "EXPR_BOOL", "EXPR_FLOAT", "EXPR_INT", "EXPR_STRING", "VAR", "TYPE", "TYPE_ATTRS", "ASSIGNABLE", "NON_ASSIGNABLE", "QID", "ID", "FLOAT", "INTEGER", "STRING", "LETTER", "Exponent", "EscapeSequence", "OctalEscape", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "'guard'", "':'", "'['", "']'", "','", "'repeat'", "'do'", "'actor'", "'('", "')'", "'==>'", "'end'", "'.'", "'action'", "'var'", "'initialize'", "'='", "':='", "';'", "'function'", "'-->'", "'procedure'", "'begin'", "'import'", "'all'", "'or'", "'||'", "'and'", "'&&'", "'|'", "'&'", "'!='", "'<'", "'>'", "'<='", "'>='", "'<<'", "'>>'", "'+'", "'-'", "'div'", "'mod'", "'*'", "'/'", "'^'", "'not'", "'#'", "'if'", "'then'", "'else'", "'true'", "'false'", "'for'", "'in'", "'priority'", "'schedule'", "'fsm'", "'foreach'", "'..'", "'while'"
