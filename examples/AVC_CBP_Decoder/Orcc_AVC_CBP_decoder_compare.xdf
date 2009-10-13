@@ -51,6 +51,24 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Compare">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="orcc_CompYUV"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="file">
+            <Expr kind="Literal" literal-kind="String" value="D:\sequences\AVC\CAVLC\general\AVCNL-3\NL2_Sony_H.yuv"/>
+        </Parameter>
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+        </Parameter>
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -61,4 +79,7 @@
     <Connection dst="display" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
     <Connection dst="display" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
     <Connection dst="Merger" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
+    <Connection dst="Compare" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="Compare" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
+    <Connection dst="Compare" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
 </XDF>
