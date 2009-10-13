@@ -28,29 +28,94 @@
  */
 package net.sf.orcc.network;
 
-import org.jgrapht.graph.DirectedMultigraph;
+import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.util.OrderedMap;
+
+import org.jgrapht.DirectedGraph;
 
 /**
+ * An XDF network.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class Network {
 
-	private DirectedMultigraph<Instance, Connection> graph;
+	private DirectedGraph<Instance, Connection> graph;
+
+	private OrderedMap<VarDef> inputs;
 
 	private String name;
 
-	public Network(String name, DirectedMultigraph<Instance, Connection> graph) {
+	private OrderedMap<VarDef> outputs;
+
+	private OrderedMap<VarDef> parameters;
+
+	/**
+	 * Creates a new network with the given name, inputs, outputs, and graph.
+	 * 
+	 * @param name
+	 *            network name
+	 * @param inputs
+	 *            list of input ports
+	 * @param outputs
+	 *            list of output ports
+	 * @param graph
+	 *            graph representing the network's contents
+	 */
+	public Network(String name, OrderedMap<VarDef> inputs,
+			OrderedMap<VarDef> outputs, OrderedMap<VarDef> parameters,
+			DirectedGraph<Instance, Connection> graph) {
 		this.name = name;
+		this.inputs = inputs;
+		this.outputs = outputs;
+		this.parameters = parameters;
 		this.graph = graph;
 	}
 
-	public DirectedMultigraph<Instance, Connection> getGraph() {
+	/**
+	 * Returns a graph representing the network's contents
+	 * 
+	 * @return a graph representing the network's contents
+	 */
+	public DirectedGraph<Instance, Connection> getGraph() {
 		return graph;
 	}
 
+	/**
+	 * Returns the list of this network's input ports
+	 * 
+	 * @return the list of this network's input ports
+	 */
+	public OrderedMap<VarDef> getInputs() {
+		return inputs;
+	}
+
+	/**
+	 * Returns the name of this network
+	 * 
+	 * @return the name of this network
+	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Returns the list of this network's output ports
+	 * 
+	 * @return the list of this network's output ports
+	 */
+	public OrderedMap<VarDef> getOutputs() {
+		return outputs;
+	}
+
+	/**
+	 * Returns the list of this network's parameters
+	 * 
+	 * @return the list of this network's parameters
+	 */
+	public OrderedMap<VarDef> getParameters() {
+		return parameters;
 	}
 
 }

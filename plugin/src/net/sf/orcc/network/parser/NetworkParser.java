@@ -50,7 +50,9 @@ import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.OrderedMap;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
@@ -72,12 +74,32 @@ public class NetworkParser {
 	 */
 	private File file;
 
+	/**
+	 * list of input ports
+	 */
+	private OrderedMap<VarDef> inputs;
+
+	/**
+	 * map of string -> instances
+	 */
 	private Map<String, Instance> instances;
+
+	/**
+	 * list of output ports
+	 */
+	private OrderedMap<VarDef> outputs;
+
+	/**
+	 * list of parameters
+	 */
+	private OrderedMap<VarDef> parameters;
 
 	/**
 	 * parent path of {@link #file}
 	 */
 	private String path;
+
+	private DirectedGraph<Instance, Connection> graph;
 
 	/**
 	 * Creates a new network parser.
@@ -90,8 +112,7 @@ public class NetworkParser {
 		path = file.getParent();
 	}
 
-	private void checkConnections(DirectedMultigraph<Instance, Connection> graph)
-			throws OrccException {
+	private void checkConnections() throws OrccException {
 		Set<Connection> connections = graph.edgeSet();
 		for (Connection connection : connections) {
 			Instance source = graph.getEdgeSource(connection);
@@ -379,6 +400,15 @@ public class NetworkParser {
 		return null;
 	}
 
+	/**
+	 * Parses the given document as an XDF network.
+	 * 
+	 * @param doc
+	 *            a DOM document that supposedly represent an XDF network
+	 * @return a Network
+	 * @throws OrccException
+	 *             if the DOM document is not a well-formed XDF network
+	 */
 	private Network parseXDF(Document doc) throws OrccException {
 		Element root = doc.getDocumentElement();
 		if (!root.getNodeName().equals("XDF")) {
@@ -391,10 +421,11 @@ public class NetworkParser {
 		}
 
 		instances = new HashMap<String, Instance>();
-		DirectedMultigraph<Instance, Connection> graph = parseGraph(root);
+		graph = new DirectedMultigraph<Instance, Connection>(Connection.class);
 
-		checkConnections(graph);
+		parseGraph(root);
+		checkConnections();
 
-		return new Network(name, graph);
+		return new Network(name, inputs, outputs, parameters, graph);
 	}
 }

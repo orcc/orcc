@@ -26,79 +26,81 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.frontend;
+package net.sf.orcc.util;
 
-import net.sf.orcc.util.OrderedMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Location;
 
 /**
- * A scope is an ordered map of <string, object> extended with the notion of
- * hierarchy.
+ * An ordered map maintains mapping of string to object as well as the order in
+ * which those mappings were inserted.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Scope<T> extends OrderedMap<T> {
+public class OrderedMap<T> {
 
-	private Scope<T> parent;
+	private Map<String, T> map;
+
+	private List<T> objects;
 
 	/**
-	 * Creates a top-level scope.
+	 * Creates an empty ordered map.
 	 */
-	public Scope() {
-		this(null);
+	public OrderedMap() {
+		objects = new ArrayList<T>();
+		map = new HashMap<String, T>();
 	}
 
 	/**
-	 * Creates a scope with the given parent.
+	 * Returns the list of objects of this scope
 	 * 
-	 * @param parent
-	 *            the parent scope
+	 * @return the list of objects of this scope
 	 */
-	public Scope(Scope<T> parent) {
-		this.parent = parent;
+	public List<T> getList() {
+		return objects;
 	}
 
 	/**
-	 * Returns the parent of this scope
+	 * Registers an object with the given name.
 	 * 
-	 * @return a scope, or <code>null</code> if this scope has no parent
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 * @throws OrccException
+	 *             if the object is already defined
 	 */
-	public Scope<T> getParent() {
-		return parent;
+	public void register(String file, Location location, String name, T object)
+			throws OrccException {
+		if (map.containsKey(name)) {
+			throw new OrccException(file, location, "\"" + name
+					+ "\" already defined in this scope");
+		}
+		objects.add(object);
+		map.put(name, object);
 	}
 
 	/**
-	 * Returns the object that has the given name. If the object is not found in
-	 * the current scope, the parent scope is queried.
+	 * Returns the object that has the given name.
 	 * 
 	 * @param name
 	 *            the name of an object.
-	 * @return the object that has the given name, or <code>null</code>
+	 * @return the object that has the given name, or if it could not be found,
+	 *         <code>null</code>
 	 */
-	@Override
 	public T resolveName(String name) {
-		T object = super.resolveName(name);
-		if (object == null) {
-			if (parent == null) {
-				// top-level scope, no object
-				return null;
-			} else {
-				// child scope, query parent
-				return parent.resolveName(name);
-			}
-		} else {
-			// object found
-			return object;
-		}
+		return map.get(name);
 	}
 
 	@Override
 	public String toString() {
-		String res = super.toString();
-		if (parent != null) {
-			res += "\n" + parent;
-		}
-		return res;
+		return objects.toString();
 	}
 
 }

@@ -43,7 +43,7 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
-import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.DirectedGraph;
 
 /**
  * Adds broadcast actors when needed.
@@ -57,7 +57,7 @@ public class BroadcastAdder {
 		addBroadcast(network.getGraph());
 	}
 
-	private void addBroadcast(DirectedMultigraph<Instance, Connection> graph)
+	private void addBroadcast(DirectedGraph<Instance, Connection> graph)
 			throws OrccException {
 		Set<Connection> toBeRemoved = new HashSet<Connection>();
 

@@ -33,4 +33,5 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.ir.type,
  net.sf.orcc.network,
  net.sf.orcc.network.parser,
+ org.jgrapht,
  org.jgrapht.graph

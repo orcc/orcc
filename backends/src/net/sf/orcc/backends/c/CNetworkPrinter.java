@@ -48,7 +48,7 @@ import net.sf.orcc.network.Network;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
-import org.jgrapht.graph.DirectedMultigraph;
+import org.jgrapht.DirectedGraph;
 
 /**
  * Network printer.
@@ -131,7 +131,7 @@ public class CNetworkPrinter {
 		template.setAttribute("name", network.getName());
 		template.setAttribute("size", fifoSize);
 
-		DirectedMultigraph<Instance, Connection> graph = network.getGraph();
+		DirectedGraph<Instance, Connection> graph = network.getGraph();
 		Set<Instance> instances = new TreeSet<Instance>(graph.vertexSet());
 		Set<Connection> connections = graph.edgeSet();
 
@@ -177,7 +177,7 @@ public class CNetworkPrinter {
 	 * @param connections
 	 *            The graph's connection.
 	 */
-	private void setConnections(DirectedMultigraph<Instance, Connection> graph,
+	private void setConnections(DirectedGraph<Instance, Connection> graph,
 			Set<Connection> connections) {
 		List<Map<String, Object>> conn = new ArrayList<Map<String, Object>>();
 		int fifoCount = 0;
