@@ -172,37 +172,29 @@ public class NetworkParser {
 		}
 	}
 
-	private void parseConnections(
-			DirectedMultigraph<Instance, Connection> graph, Node node)
-			throws OrccException {
-		while (node != null) {
-			if (node.getNodeName().equals("Connection")) {
-				Element connection = (Element) node;
-				String src = connection.getAttribute("src");
-				String src_port = connection.getAttribute("src-port");
-				String dst = connection.getAttribute("dst");
-				String dst_port = connection.getAttribute("dst-port");
+	private void parseConnection(Node node) throws OrccException {
+		Element connection = (Element) node;
+		String src = connection.getAttribute("src");
+		String src_port = connection.getAttribute("src-port");
+		String dst = connection.getAttribute("dst");
+		String dst_port = connection.getAttribute("dst-port");
 
-				checkPorts(src, src_port, dst, dst_port);
+		checkPorts(src, src_port, dst, dst_port);
 
-				Instance source = instances.get(src);
-				Instance target = instances.get(dst);
+		Instance source = instances.get(src);
+		Instance target = instances.get(dst);
 
-				checkInstances(source, src, target, dst);
+		checkInstances(source, src, target, dst);
 
-				VarDef srcPort = source.getActor().getOutput(src_port);
-				VarDef dstPort = target.getActor().getInput(dst_port);
+		VarDef srcPort = source.getActor().getOutput(src_port);
+		VarDef dstPort = target.getActor().getInput(dst_port);
 
-				checkPortsVarDef(srcPort, src_port, dstPort, dst_port);
+		checkPortsVarDef(srcPort, src_port, dstPort, dst_port);
 
-				Integer size = parseSize(connection.getFirstChild());
+		Integer size = parseSize(connection.getFirstChild());
 
-				Connection conn = new Connection(srcPort, dstPort, size);
-				graph.addEdge(source, target, conn);
-			}
-
-			node = node.getNextSibling();
-		}
+		Connection conn = new Connection(srcPort, dstPort, size);
+		graph.addEdge(source, target, conn);
 	}
 
 	private IExpr parseExpr(Node node) throws OrccException {
@@ -253,21 +245,39 @@ public class NetworkParser {
 		return exprs;
 	}
 
-	private DirectedMultigraph<Instance, Connection> parseGraph(Element root)
-			throws OrccException {
-		DirectedMultigraph<Instance, Connection> graph = new DirectedMultigraph<Instance, Connection>(
-				Connection.class);
+	/**
+	 * Parses the body of the XDF document. The body can contain any element
+	 * among the supported elements. Supported elements are: Connection, Decl
+	 * (kind=Param or kind=Var), Instance, Package, Port.
+	 * 
+	 * @param root
+	 * @throws OrccException
+	 */
+	private void parseBody(Element root) throws OrccException {
+		Node node = root.getFirstChild();
+		while (node != null) {
+			// this test allows us to skip stupid #text nodes
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				String name = node.getNodeName();
+				if (name.equals("Instance")) {
+					Instance instance = parseInstance(node);
+					instances.put(instance.getId(), instance);
+					graph.addVertex(instance);
+				} else if (name.equals("Connection")) {
+					parseConnection(node);
+				} else {
+					throw new OrccException("node \"" + name
+							+ "\" not yet implemented");
+				}
+			}
 
-		Node node = parseInstances(graph, root);
+			node = node.getNextSibling();
+		}
 
 		if (instances.isEmpty()) {
 			throw new OrccException(
 					"A valid network must contain at least one instance");
 		}
-
-		parseConnections(graph, node);
-
-		return graph;
 	}
 
 	private Instance parseInstance(Node node) throws OrccException {
@@ -299,24 +309,6 @@ public class NetworkParser {
 		Map<String, IExpr> parameters = parseParameters(child);
 
 		return new Instance(path, id, clasz, parameters);
-	}
-
-	private Node parseInstances(DirectedMultigraph<Instance, Connection> graph,
-			Element root) throws OrccException {
-		Node node = root.getFirstChild();
-		while (node != null) {
-			if (node.getNodeName().equals("Instance")) {
-				Instance instance = parseInstance(node);
-				instances.put(instance.getId(), instance);
-				graph.addVertex(instance);
-			} else if (node.getNodeName().equals("Connection")) {
-				break;
-			}
-
-			node = node.getNextSibling();
-		}
-
-		return node;
 	}
 
 	/**
@@ -420,10 +412,14 @@ public class NetworkParser {
 			throw new OrccException("Expected a \"name\" attribute");
 		}
 
-		instances = new HashMap<String, Instance>();
 		graph = new DirectedMultigraph<Instance, Connection>(Connection.class);
+		inputs = new OrderedMap<VarDef>();
+		instances = new HashMap<String, Instance>();
+		outputs = new OrderedMap<VarDef>();
+		parameters = new OrderedMap<VarDef>();
 
-		parseGraph(root);
+		parseBody(root);
+
 		checkConnections();
 
 		return new Network(name, inputs, outputs, parameters, graph);
