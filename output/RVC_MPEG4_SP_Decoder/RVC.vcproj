@@ -234,30 +234,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\clip.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\clip_01.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\clip_02.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\column.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\column_01.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\column_02.c"
-				>
-			</File>
-			<File
 				RelativePath=".\src\DCsplit.c"
 				>
 			</File>
@@ -283,6 +259,18 @@
 			</File>
 			<File
 				RelativePath=".\src\IAP_02.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\idct2d.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\idct2d_01.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\idct2d_02.c"
 				>
 			</File>
 			<File
@@ -350,30 +338,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\retranspose.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\retranspose_01.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\retranspose_02.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\row.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\row_01.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\row_02.c"
-				>
-			</File>
-			<File
 				RelativePath=".\src\serialize.c"
 				>
 			</File>
@@ -387,18 +351,6 @@
 			</File>
 			<File
 				RelativePath=".\src\splitter_MV.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\transpose.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\transpose_01.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\transpose_02.c"
 				>
 			</File>
 			<Filter
