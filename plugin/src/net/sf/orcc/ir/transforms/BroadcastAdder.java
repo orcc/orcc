@@ -42,6 +42,7 @@ import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.attributes.IAttribute;
 
 import org.jgrapht.DirectedGraph;
 
@@ -93,8 +94,11 @@ public class BroadcastAdder {
 						// from source to broadcast
 						VarDef tgt = new VarDef(connection.getTarget());
 						tgt.setName("input");
-						Connection c1 = new Connection(src, tgt, connection
-								.getSizeInteger());
+
+						IAttribute size = connection
+								.getAttribute(Connection.BUFFER_SIZE);
+						Connection c1 = new Connection(src, tgt,
+								Connection.BUFFER_SIZE, size);
 						graph.addEdge(instance, bcast, c1);
 
 						// from broadcast to targets
@@ -106,8 +110,9 @@ public class BroadcastAdder {
 							src.setName("output_" + i);
 							i++;
 
+							size = conn.getAttribute(Connection.BUFFER_SIZE);
 							Connection c2 = new Connection(src, conn
-									.getTarget(), conn.getSizeInteger());
+									.getTarget(), Connection.BUFFER_SIZE, size);
 							graph.addEdge(bcast, target, c2);
 
 							// source == null => we don't check it again
@@ -122,4 +127,5 @@ public class BroadcastAdder {
 		// removes old connections
 		graph.removeAllEdges(toBeRemoved);
 	}
+
 }

@@ -38,13 +38,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.ir.actor.Action;
+import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.attributes.IAttribute;
+import net.sf.orcc.network.attributes.IValueAttribute;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -101,19 +106,23 @@ public class CNetworkPrinter {
 	 *            Whether debug information should be printed about FIFOs.
 	 * @param fifoSize
 	 *            Default FIFO size.
-	 * @throws IOException
-	 *             If the output file could not be written.
+	 * @throws OrccException
+	 *             if something goes wrong
 	 */
 	public void printNetwork(String fileName, Network network,
-			boolean debugFifos, int fifoSize) throws IOException {
+			boolean debugFifos, int fifoSize) throws OrccException {
 		template = group.getInstanceOf("network");
 
 		setAttributes(network, debugFifos, fifoSize);
 
 		byte[] b = template.toString(80).getBytes();
-		OutputStream os = new FileOutputStream(fileName);
-		os.write(b);
-		os.close();
+		try {
+			OutputStream os = new FileOutputStream(fileName);
+			os.write(b);
+			os.close();
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	/**
@@ -125,8 +134,10 @@ public class CNetworkPrinter {
 	 *            Whether debug information should be printed about FIFOs.
 	 * @param fifoSize
 	 *            Default FIFO size.
+	 * @throws OrccException
 	 */
-	private void setAttributes(Network network, boolean debugFifos, int fifoSize) {
+	private void setAttributes(Network network, boolean debugFifos, int fifoSize)
+			throws OrccException {
 		template.setAttribute("debugFifos", debugFifos);
 		template.setAttribute("name", network.getName());
 		template.setAttribute("size", fifoSize);
@@ -176,9 +187,10 @@ public class CNetworkPrinter {
 	 *            The network's graph.
 	 * @param connections
 	 *            The graph's connection.
+	 * @throws OrccException
 	 */
 	private void setConnections(DirectedGraph<Instance, Connection> graph,
-			Set<Connection> connections) {
+			Set<Connection> connections) throws OrccException {
 		List<Map<String, Object>> conn = new ArrayList<Map<String, Object>>();
 		int fifoCount = 0;
 
@@ -194,8 +206,10 @@ public class CNetworkPrinter {
 			}
 
 			String size;
-			if (connection.hasSize()) {
-				size = Integer.toString(connection.getSize());
+			IAttribute attr = connection.getAttribute(Connection.BUFFER_SIZE);
+			if (attr != null && attr.getType() == IAttribute.VALUE) {
+				IExpr expr = ((IValueAttribute) attr).getValue();
+				size = Integer.toString(Util.evaluateAsInteger(expr));
 			} else {
 				size = "SIZE";
 			}

@@ -26,78 +26,20 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Location;
+package net.sf.orcc.network.attributes;
 
 /**
+ * This interface represents an attribute that is a flag. A flag attribute has
+ * no value.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class IntExpr extends AbstractExpr {
-
-	private int value;
+public interface IFlagAttribute extends IAttribute {
 
 	/**
-	 * Creates a new integer expression with a dummy location.
-	 * 
-	 * @param value
-	 *            an integer value.
+	 * flag attribute name.
 	 */
-	public IntExpr(int value) {
-		super(new Location());
-		this.value = value;
-	}
-
-	/**
-	 * Creates a new integer expression with a location.
-	 * 
-	 * @param location
-	 *            a location
-	 * @param value
-	 *            an integer value.
-	 */
-	public IntExpr(Location location, int value) {
-		super(location);
-		this.value = value;
-	}
-
-	@Override
-	public void accept(ExprVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof IntExpr) {
-			return (value == ((IntExpr) obj).value);
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public IExpr evaluate() throws OrccException {
-		return this;
-	}
-
-	@Override
-	public int getType() {
-		return INT;
-	}
-
-	public int getValue() {
-		return value;
-	}
-
-	public void setValue(int value) {
-		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return Integer.toString(value);
-	}
+	public static final String NAME = "Flag";
 
 }

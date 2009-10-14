@@ -28,54 +28,167 @@
  */
 package net.sf.orcc.network;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.Util;
+import net.sf.orcc.network.attributes.ValueAttribute;
+import net.sf.orcc.network.attributes.IAttribute;
+import net.sf.orcc.network.attributes.IValueAttribute;
 
 /**
+ * This class represents a connection in a network. A connection can have a
+ * number of attributes, that can be types or expressions.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class Connection {
 
-	private Integer size;
+	/**
+	 * the bufferSize attribute can be attached to a FIFO to specify its size
+	 */
+	public static final String BUFFER_SIZE = "bufferSize";
 
+	/**
+	 * attributes
+	 */
+	private Map<String, IAttribute> attributes;
+
+	/**
+	 * source port
+	 */
 	private VarDef source;
 
+	/**
+	 * target port
+	 */
 	private VarDef target;
 
-	public Connection(VarDef source, VarDef target, Integer size) {
-		this.size = size;
+	/**
+	 * Creates a connection from source port to target port with the given size.
+	 * This will create a connection with the {@link #BUFFER_SIZE} attribute set
+	 * to size.
+	 * 
+	 * @param source
+	 *            source port
+	 * @param target
+	 *            target port
+	 * @param size
+	 *            the size of this FIFO
+	 */
+	public Connection(VarDef source, VarDef target, int size) {
+		this.attributes = new HashMap<String, IAttribute>();
+		attributes.put(BUFFER_SIZE, new ValueAttribute(new IntExpr(size)));
 		this.source = source;
 		this.target = target;
 	}
 
-	public int getSize() {
-		return size;
+	/**
+	 * Creates a connection from source port to target port with the given
+	 * attributes.
+	 * 
+	 * @param source
+	 *            source port
+	 * @param target
+	 *            target port
+	 * @param attributes
+	 *            a map of attributes
+	 */
+	public Connection(VarDef source, VarDef target,
+			Map<String, IAttribute> attributes) {
+		this.attributes = attributes;
+		this.source = source;
+		this.target = target;
 	}
 
-	public Integer getSizeInteger() {
-		return size;
+	/**
+	 * Creates a connection from source port to target port with a single given
+	 * attribute.
+	 * 
+	 * @param source
+	 *            source port
+	 * @param target
+	 *            target port
+	 * @param name
+	 *            the attribute name
+	 * @param attribute
+	 *            an attribute
+	 */
+	public Connection(VarDef source, VarDef target, String name,
+			IAttribute attribute) {
+		this.attributes = new HashMap<String, IAttribute>();
+		attributes.put(name, attribute);
+		this.source = source;
+		this.target = target;
 	}
 
+	/**
+	 * Returns the attribute associated with the given name.
+	 * 
+	 * @param name
+	 *            an attribute name
+	 * @return the attribute associated with the given name, or if not found,
+	 *         <code>null</code>
+	 */
+	public IAttribute getAttribute(String name) {
+		return attributes.get(name);
+	}
+
+	/**
+	 * Returns the size of this connection.
+	 * 
+	 * @return the size of this connection
+	 * @throws OrccException
+	 */
+	public int getSize() throws OrccException {
+		IAttribute attr = getAttribute(Connection.BUFFER_SIZE);
+		if (attr != null && attr.getType() == IAttribute.VALUE) {
+			IExpr expr = ((IValueAttribute) attr).getValue();
+			return Util.evaluateAsInteger(expr);
+		} else {
+			throw new OrccException("could not get the size of this connection");
+		}
+	}
+
+	/**
+	 * Returns this connection's source port.
+	 * 
+	 * @return this connection's source port
+	 */
 	public VarDef getSource() {
 		return source;
 	}
 
+	/**
+	 * Returns this connection's target port.
+	 * 
+	 * @return this connection's target port
+	 */
 	public VarDef getTarget() {
 		return target;
 	}
 
-	public boolean hasSize() {
-		return (size != null);
-	}
-
-	public void setSize(Integer size) {
-		this.size = size;
-	}
-
+	/**
+	 * Sets the source of this connection to the given port
+	 * 
+	 * @param source
+	 *            a port
+	 */
 	public void setSource(VarDef source) {
 		this.source = source;
 	}
 
+	/**
+	 * Sets the target of this connection to the given port
+	 * 
+	 * @param target
+	 *            a port
+	 */
 	public void setTarget(VarDef target) {
 		this.target = target;
 	}

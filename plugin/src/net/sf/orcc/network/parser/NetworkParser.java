@@ -50,6 +50,17 @@ import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.attributes.CustomAttribute;
+import net.sf.orcc.network.attributes.FlagAttribute;
+import net.sf.orcc.network.attributes.ICustomAttribute;
+import net.sf.orcc.network.attributes.IFlagAttribute;
+import net.sf.orcc.network.attributes.IStringAttribute;
+import net.sf.orcc.network.attributes.ITypeAttribute;
+import net.sf.orcc.network.attributes.IValueAttribute;
+import net.sf.orcc.network.attributes.StringAttribute;
+import net.sf.orcc.network.attributes.TypeAttribute;
+import net.sf.orcc.network.attributes.ValueAttribute;
+import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -199,6 +210,56 @@ public class NetworkParser {
 	}
 
 	/**
+	 * Returns a map of attribute names -> values by parsing the "Attribute"
+	 * nodes.
+	 * 
+	 * @param node
+	 *            the first node of a node list, or <code>null</code> if the
+	 *            caller had no children.
+	 * @return a (possibly empty) map of attributes
+	 * @throws OrccException
+	 *             if an attribute could not be parsed
+	 */
+	private Map<String, IAttribute> parseAttributes(Node node)
+			throws OrccException {
+		Map<String, IAttribute> attributes = new HashMap<String, IAttribute>();
+
+		while (node != null) {
+			// only parses Attribute nodes, other nodes are ignored.
+			if (node.getNodeName().equals("Attribute")) {
+				Element attribute = (Element) node;
+				String kind = attribute.getAttribute("kind");
+				String attrName = attribute.getAttribute("name");
+
+				IAttribute attr;
+				if (kind.equals(ICustomAttribute.NAME)) {
+					attr = new CustomAttribute(attribute.getChildNodes());
+				} else if (kind.equals(IFlagAttribute.NAME)) {
+					attr = new FlagAttribute();
+				} else if (kind.equals(IStringAttribute.NAME)) {
+					String value = attribute.getAttribute("value");
+					attr = new StringAttribute(value);
+				} else if (kind.equals(ITypeAttribute.NAME)) {
+					IType type = parseType(attribute.getFirstChild());
+					attr = new TypeAttribute(type);
+				} else if (kind.equals(IValueAttribute.NAME)) {
+					IExpr expr = parseExpr(attribute.getFirstChild());
+					attr = new ValueAttribute(expr);
+				} else {
+					throw new OrccException("unsupported attribute kind: \""
+							+ kind + "\"");
+				}
+
+				attributes.put(attrName, attr);
+			}
+
+			node = node.getNextSibling();
+		}
+
+		return attributes;
+	}
+
+	/**
 	 * Parses the body of the XDF document. The body can contain any element
 	 * among the supported elements. Supported elements are: Connection, Decl
 	 * (kind=Param or kind=Var), Instance, Package, Port.
@@ -209,7 +270,7 @@ public class NetworkParser {
 	private void parseBody(Element root) throws OrccException {
 		Node node = root.getFirstChild();
 		while (node != null) {
-			// this test allows us to skip stupid #text nodes
+			// this test allows us to skip #text nodes
 			if (node.getNodeType() == Node.ELEMENT_NODE) {
 				Element element = (Element) node;
 				String name = node.getNodeName();
@@ -253,9 +314,9 @@ public class NetworkParser {
 
 		checkPortsVarDef(srcPort, src_port, dstPort, dst_port);
 
-		Integer size = parseSize(connection.getFirstChild());
-
-		Connection conn = new Connection(srcPort, dstPort, size);
+		Node child = connection.getFirstChild();
+		Map<String, IAttribute> attributes = parseAttributes(child);
+		Connection conn = new Connection(srcPort, dstPort, attributes);
 		graph.addEdge(source, target, conn);
 	}
 
@@ -435,25 +496,15 @@ public class NetworkParser {
 		}
 	}
 
-	private Integer parseSize(Node node) throws OrccException {
-		while (node != null) {
-			if (node.getNodeName().equals("Attribute")) {
-				Element attribute = (Element) node;
-				if (attribute.getAttribute("kind").equals("Value")
-						&& attribute.getAttribute("name").equals("bufferSize")) {
-					IExpr expr = parseExpr(attribute.getFirstChild());
-					if (expr.getType() == IExpr.INT) {
-						return ((IntExpr) expr).getValue();
-					} else {
-						throw new OrccException(
-								"FIFO size: expected an integer, got: " + expr);
-					}
-				}
-			}
-
-			node = node.getNextSibling();
-		}
-
+	/**
+	 * Parses the given node as an IType.
+	 * 
+	 * @param node
+	 *            the node to parse as a type.
+	 * @return a type
+	 */
+	private IType parseType(Node node) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
