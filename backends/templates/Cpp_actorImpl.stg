@@ -38,7 +38,7 @@ $var.type$ $var.name$$listSize(var.size)$
 
 // a static variable definition 
 // called by "function parameter", or "state variable with value"
-vardef2(var) ::= <<
+staticvardef(var) ::= <<
 $var.type$ Actor_$name$::$var.name$$listSize(var.size)$
 >>
 
@@ -51,16 +51,16 @@ $else$
 $var.type$ $var.name$$listSize(var.size)$
 $endif$>>
 
-vardefInit2(var) ::= <<
+StaticvardefInit(var) ::= <<
 $var.type$ Actor_$name$::$var.name$$listSize(var.size)$
 $endif$>>
 
 // a state variable
 stateVar(vardef, value) ::= <<
 $if(value)$
-$vardef2(vardef)$ = $value$;$\n$
+$staticvardef(vardef)$ = $value$;$\n$
 $else$
-$vardefInit2(vardef)$;$\n$
+$StaticvardefInit(vardef)$;$\n$
 $endif$
 >>
 
@@ -77,10 +77,11 @@ $var$ = m_poTabIn[$actorName$_$fifoName$]->hasTokens($numTokens$);
 // peek node
 peekNode(var, actorName, fifoName, numTokens) ::= <<
 $if(numTokens)$
-m_poTabIn[$actorName$_$fifoName$]->peek($var$, $numTokens$);
+m_poTabIn[$actorName$_$fifoName$]->peek($var$, $numTokens$);$\n$
 $else$
-m_poTabIn[$actorName$_$fifoName$]->peek($var$);
+m_poTabIn[$actorName$_$fifoName$]->peek($var$);$\n$
 $endif$
+
 >>
 
 // read node

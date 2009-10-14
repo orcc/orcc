@@ -37,7 +37,6 @@ import net.sf.orcc.backends.c.CActorPrinter;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.AbstractType;
@@ -101,10 +100,5 @@ public class CppActorPrinter extends CActorPrinter {
 			node.accept(printer);
 		}
 		return procTmpl;
-	}
-
-	@Override
-	protected void setAttributes(Actor actor) {
-		super.setAttributes(actor);
 	}
 }

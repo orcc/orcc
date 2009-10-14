@@ -30,7 +30,6 @@ package net.sf.orcc.backends.cpp;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
@@ -38,9 +37,7 @@ import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.transforms.PhiRemoval;
-import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.parser.NetworkParser;
 
 /**
  * C++ back-end.
@@ -73,32 +70,6 @@ public class CppBackendImpl extends AbstractBackend implements IBackend {
 	private String outputPath;
 	private CppActorPrinter printer;
 
-	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
-		// set FIFO size
-		this.fifoSize = fifoSize;
-
-		// set output path
-		File file = new File(fileName);
-		path = file.getParent();
-
-		// initializes stuff
-		init();
-
-		// parses top network
-		Network network = new NetworkParser(fileName).parseNetwork();
-
-		Set<Instance> instances = network.getGraph().vertexSet();
-		for (Instance instance : instances) {
-			if (instance.hasActor()) {
-				Actor actor = instance.getActor();
-				printActor(instance.getId(), actor);
-			}
-		}
-
-		// print network
-		printNetwork(network);
-	}
 
 	@Override
 	protected void init() throws IOException {
@@ -128,7 +99,6 @@ public class CppBackendImpl extends AbstractBackend implements IBackend {
 
 		outputName = outputPath + "Actor_" + id + ".cpp";
 		impl_printer.printActor(outputName, actor);
-
 	}
 
 	@Override

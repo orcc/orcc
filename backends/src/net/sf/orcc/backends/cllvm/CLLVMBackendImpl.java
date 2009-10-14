@@ -99,6 +99,10 @@ public class CLLVMBackendImpl implements IBackend {
 
 		// print network
 		CLLVMNetworkPrinter networkPrinter = new CLLVMNetworkPrinter();
+		
+		// Add broadcasts before printing 
+		new BroadcastAdder(network);
+
 		String outputName = path + File.separator + network.getName() + ".cpp";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}

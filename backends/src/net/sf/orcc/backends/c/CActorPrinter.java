@@ -170,7 +170,7 @@ public class CActorPrinter {
 		os.close();
 	}
 
-	private void setActions(String tmplName, String actorName,
+	protected void setActions(String tmplName, String actorName,
 			List<Action> actions) {
 		for (Action action : actions) {
 			StringTemplate procTmpl = applyProc(actorName, action.getBody());

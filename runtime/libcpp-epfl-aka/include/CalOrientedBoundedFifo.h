@@ -67,7 +67,7 @@ private:
 template <typename T>
 CalOrientedBoundedFifo<T>::CalOrientedBoundedFifo( unsigned uSize )
 {
-	m_poFifo		= NULL;
+	m_poFifo	= NULL;
 	m_poFifoPut = NULL;
 	m_poFifoGet = NULL;
 	m_poFifoEnd = NULL;

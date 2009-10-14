@@ -36,6 +36,7 @@ import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.transforms.BroadcastAdder;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 
@@ -98,6 +99,9 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void printNetwork(Network network) throws Exception {
 		JavaNetworkPrinter networkPrinter = new JavaNetworkPrinter();
+
+		// Add broadcasts before printing 
+		new BroadcastAdder(network);
 
 		String name = network.getName();
 		String outputName = outputPath + "Network_" + name + ".java";
