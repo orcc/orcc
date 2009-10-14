@@ -256,7 +256,7 @@ public class LLVMActorPrinter {
 
 				if (stateVar.getInit() instanceof ListConst) {
 					stateVar.getInit().accept(constPrinter,
-							((PointType) varDef.getType()).getType());
+							((PointType) varDef.getType()).getElementType());
 				} else {
 					stateVar.getInit().accept(constPrinter);
 				}

@@ -73,7 +73,7 @@ public class ListType extends AbstractType {
 
 	@Override
 	public int getType() {
-		return UINT;
+		return LIST;
 	}
 
 	public void setSize(IExpr size) {
