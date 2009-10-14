@@ -36,9 +36,8 @@ import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
@@ -57,7 +56,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
 public class AssignPeephole extends AbstractNodeVisitor {
 
 	private Procedure procedure;
-	
+
 	public AssignPeephole(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
@@ -78,16 +77,16 @@ public class AssignPeephole extends AbstractNodeVisitor {
 	@SuppressWarnings("unchecked")
 	public void visit(AssignVarNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		if ((node.getValue() instanceof BooleanExpr)
-				|| (node.getValue() instanceof IntExpr)
-				|| (node.getValue() instanceof StringExpr)) {
+		if ((node.getValue().getType() == IExpr.BOOLEAN)
+				|| (node.getValue().getType() == IExpr.INT)
+				|| (node.getValue().getType() == IExpr.STRING)) {
 			VarDef vardef = node.getVar();
 			vardef.setConstant(node.getValue());
 			it.remove();
-		}else if (node.getValue() instanceof VarExpr){
+		} else if (node.getValue().getType() == IExpr.VAR) {
 			VarDef vardef = node.getVar();
 			VarExpr expr = (VarExpr) node.getValue();
-			
+
 			vardef.duplicate(expr.getVar().getVarDef());
 			it.remove();
 		}
@@ -99,7 +98,7 @@ public class AssignPeephole extends AbstractNodeVisitor {
 		visitNodes(node.getElseNodes());
 		visit(node.getJoinNode(), args);
 	}
-	
+
 	@Override
 	public void visit(JoinNode node, Object... args) {
 		List<PhiAssignment> phis = node.getPhis();
@@ -118,7 +117,7 @@ public class AssignPeephole extends AbstractNodeVisitor {
 			}
 		}
 	}
-	
+
 	@Override
 	public void visit(WhileNode node, Object... args) {
 		visitNodes(node.getNodes());

@@ -30,7 +30,7 @@ package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 /**
  * @author Jérôme GORIN
@@ -38,9 +38,9 @@ import net.sf.orcc.ir.type.AbstractType;
  */
 public class TypeExpr extends AbstractExpr {
 
-	private AbstractType type;
+	private IType type;
 
-	public TypeExpr(Location location, AbstractType type) {
+	public TypeExpr(Location location, IType type) {
 		super(location);
 		this.type = type;
 	}
@@ -56,15 +56,15 @@ public class TypeExpr extends AbstractExpr {
 	}
 
 	@Override
-	public int getExprType() {
+	public int getType() {
 		return TYPE;
 	}
 
-	public AbstractType getType() {
+	public IType getUnderlyingType() {
 		return type;
 	}
 
-	public void setType(AbstractType type) {
+	public void setType(IType type) {
 		this.type = type;
 	}
 

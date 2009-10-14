@@ -85,7 +85,7 @@ public abstract class AbstractNodeVisitor implements NodeVisitor {
 	@Override
 	public void visit(WhileNode node, Object... args) {
 	}
-	
+
 	@Override
 	public void visit(WriteNode node, Object... args) {
 	}

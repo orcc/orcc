@@ -127,8 +127,8 @@ import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.nodes.WriteNode;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -302,7 +302,7 @@ public class IrParser {
 		String name = array.getString(0);
 		IExpr e1 = parseExpr(array.getJSONArray(1));
 		IExpr e2 = parseExpr(array.getJSONArray(2));
-		AbstractType type = parseType(array.get(3));
+		IType type = parseType(array.get(3));
 		BinaryOp op = null;
 
 		if (name.equals(BOP_BAND)) {
@@ -655,7 +655,7 @@ public class IrParser {
 		boolean external = array1.getBoolean(1);
 
 		Location location = parseLocation(array.getJSONArray(1));
-		AbstractType returnType = parseType(array.get(2));
+		IType returnType = parseType(array.get(2));
 		List<VarDef> parameters = parseVarDefs(array.getJSONArray(3));
 		List<VarDef> locals = parseVarDefs(array.getJSONArray(4));
 
@@ -749,12 +749,11 @@ public class IrParser {
 	 *            A YAML-encoded type definition. This is either a
 	 *            {@link String} for simple types (bool, String, void) or a
 	 *            {@link List} for types with parameters (int, uint, List).
-	 * @return An {@link AbstractType}.
+	 * @return An {@link IType}.
 	 * @throws JSONException
 	 */
-	private AbstractType parseType(Object obj) throws JSONException,
-			OrccException {
-		AbstractType type = null;
+	private IType parseType(Object obj) throws JSONException, OrccException {
+		IType type = null;
 
 		if (obj instanceof String) {
 			String name = (String) obj;
@@ -781,7 +780,7 @@ public class IrParser {
 			} else if (name.equals(ListType.NAME)) {
 				int size = array.getInt(1);
 				IExpr expr = new IntExpr(new Location(), size);
-				AbstractType subType = parseType(array.get(2));
+				IType subType = parseType(array.get(2));
 				type = new ListType(expr, subType);
 			} else {
 				throw new OrccException("Unknown type: " + name);
@@ -798,7 +797,7 @@ public class IrParser {
 			throws JSONException, OrccException {
 		String name = array.getString(0);
 		IExpr expr = parseExpr(array.getJSONArray(1));
-		AbstractType type = parseType(array.get(2));
+		IType type = parseType(array.get(2));
 		UnaryOp op = null;
 
 		if (name.equals(UOP_BNOT)) {
@@ -840,7 +839,7 @@ public class IrParser {
 		details.getInt(5);
 
 		Location loc = parseLocation(array.getJSONArray(1));
-		AbstractType type = parseType(array.get(2));
+		IType type = parseType(array.get(2));
 
 		AbstractNode node = null;
 		List<VarUse> refs = parseRefs(array.getJSONArray(3));

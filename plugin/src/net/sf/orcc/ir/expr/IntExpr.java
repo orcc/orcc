@@ -62,9 +62,9 @@ public class IntExpr extends AbstractExpr {
 	public IExpr evaluate() throws OrccException {
 		return this;
 	}
-	
+
 	@Override
-	public int getExprType() {
+	public int getType() {
 		return INT;
 	}
 

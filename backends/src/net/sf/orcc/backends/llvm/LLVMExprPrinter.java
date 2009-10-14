@@ -41,7 +41,7 @@ import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 /**
  * 
@@ -135,7 +135,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 		BinaryOp op = expr.getOp();
 
 		builder.append(toString(op) + " ");
-		expr.getE1().accept(this, expr.getType());
+		expr.getE1().accept(this, expr.getUnderlyingType());
 		builder.append(", ");
 		expr.getE2().accept(this, false);
 
@@ -143,20 +143,19 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(BooleanExpr expr, Object... args) {
-
-		if (args[0] instanceof AbstractType) {
-			AbstractType type = (AbstractType) args[0];
+		if (args[0] instanceof IType) {
+			IType type = (IType) args[0];
 			String typeStr = typePrinter.toString(type);
 			builder.append(typeStr + " ");
 		}
+
 		builder.append(expr.getValue() ? "1" : "0");
 	}
 
 	@Override
 	public void visit(IntExpr expr, Object... args) {
-
-		if (args[0] instanceof AbstractType) {
-			String type = typePrinter.toString((AbstractType) args[0]);
+		if (args[0] instanceof IType) {
+			String type = typePrinter.toString((IType) args[0]);
 			builder.append(type + " ");
 		}
 
@@ -177,7 +176,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(TypeExpr expr, Object... args) {
-		builder.append(expr.getType());
+		builder.append(expr.getUnderlyingType());
 	}
 
 	@Override
@@ -189,7 +188,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 	public void visit(VarExpr expr, Object... args) {
 		Boolean showType = false;
 
-		if (args[0] instanceof AbstractType) {
+		if (args[0] instanceof IType) {
 			showType = true;
 		}
 

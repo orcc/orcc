@@ -37,9 +37,9 @@ import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.transforms.BroadcastAdder;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.ir.transforms.BroadcastAdder;
 
 /**
  * C back-end.
@@ -68,7 +68,6 @@ public class CBackendImpl extends AbstractBackend implements IBackend {
 
 	private CActorPrinter printer;
 
-	
 	@Override
 	protected void init() throws IOException {
 		printer = new CActorPrinter();
@@ -93,10 +92,10 @@ public class CBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void printNetwork(Network network) throws Exception {
 		CNetworkPrinter networkPrinter = new CNetworkPrinter();
-		
-		// Add broadcasts before printing 
+
+		// Add broadcasts before printing
 		new BroadcastAdder(network);
-		
+
 		String outputName = path + File.separator + network.getName() + ".c";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}

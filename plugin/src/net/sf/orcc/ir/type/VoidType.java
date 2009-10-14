@@ -50,4 +50,9 @@ public class VoidType extends AbstractType {
 		return (obj instanceof VoidType);
 	}
 
+	@Override
+	public int getType() {
+		return VOID;
+	}
+
 }

@@ -45,7 +45,7 @@ import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -112,7 +112,7 @@ public class LLVMActorPrinter {
 		procTmpl.setAttribute("name", proc.getName());
 
 		// return type
-		AbstractType type = proc.getReturnType();
+		IType type = proc.getReturnType();
 		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters

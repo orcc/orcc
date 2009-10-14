@@ -36,6 +36,8 @@ import net.sf.orcc.ir.type.AbstractType;
  */
 public abstract class LLVMAbstractType extends AbstractType {
 
+	public static final int POINT = 7;
+
 	protected LLVMAbstractType(String name) {
 		super(name);
 	}

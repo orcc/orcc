@@ -36,7 +36,7 @@ import net.sf.orcc.ir.consts.ConstVisitor;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.ListType;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -88,8 +88,8 @@ public class LLVMConstPrinter implements ConstVisitor {
 	@Override
 	public void visit(BoolConst constant, Object... args) {
 		if (args.length == 1) {
-			template.setAttribute("type", typeVisitor
-					.toString((AbstractType) args[0]));
+			template
+					.setAttribute("type", typeVisitor.toString((IType) args[0]));
 		}
 		template.setAttribute("value", constant.getValue() ? "1" : "0");
 	}
@@ -98,7 +98,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 	public void visit(IntConst constant, Object... args) {
 		if (args.length == 1) {
 			template.setAttribute("value", typeVisitor
-					.toString((AbstractType) args[0])
+					.toString((IType) args[0])
 					+ " " + constant.getValue());
 		} else {
 			template.setAttribute("value", constant.getValue());
@@ -109,7 +109,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 	@Override
 	public void visit(ListConst constant, Object... args) {
 		ListType listType = (ListType) args[0];
-		AbstractType type = listType.getType();
+		IType type = listType.getElementType();
 
 		// save current template
 		StringTemplate previousTempl = template;
@@ -135,8 +135,8 @@ public class LLVMConstPrinter implements ConstVisitor {
 		String val = constant.getValue();
 		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
 		if (args.length == 1) {
-			template.setAttribute("type", typeVisitor
-					.toString((AbstractType) args[0]));
+			template
+					.setAttribute("type", typeVisitor.toString((IType) args[0]));
 		}
 		template.setAttribute("value", res);
 	}

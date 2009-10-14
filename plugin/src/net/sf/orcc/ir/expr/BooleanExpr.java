@@ -55,7 +55,7 @@ public class BooleanExpr extends AbstractExpr {
 	}
 
 	@Override
-	public int getExprType() {
+	public int getType() {
 		return BOOLEAN;
 	}
 

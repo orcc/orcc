@@ -70,7 +70,6 @@ public class CppBackendImpl extends AbstractBackend implements IBackend {
 	private String outputPath;
 	private CppActorPrinter printer;
 
-
 	@Override
 	protected void init() throws IOException {
 		printer = new CppActorPrinter("Cpp_actorDecl");

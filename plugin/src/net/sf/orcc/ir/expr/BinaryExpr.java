@@ -30,7 +30,7 @@ package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 /**
  * @author Matthieu Wipliez
@@ -44,10 +44,10 @@ public class BinaryExpr extends AbstractExpr {
 
 	private BinaryOp op;
 
-	private AbstractType type;
+	private IType type;
 
 	public BinaryExpr(Location location, IExpr e1, BinaryOp op, IExpr e2,
-			AbstractType type) {
+			IType type) {
 		super(location);
 		this.e1 = e1;
 		this.e2 = e2;
@@ -66,8 +66,8 @@ public class BinaryExpr extends AbstractExpr {
 		case BAND:
 			IExpr expr1 = e1.evaluate();
 			IExpr expr2 = e2.evaluate();
-			if (expr1.getExprType() == IExpr.BOOLEAN
-					&& expr2.getExprType() == IExpr.BOOLEAN) {
+			if (expr1.getType() == IExpr.BOOLEAN
+					&& expr2.getType() == IExpr.BOOLEAN) {
 				boolean b1 = ((BooleanExpr) expr1).getValue();
 				boolean b2 = ((BooleanExpr) expr2).getValue();
 				return new BooleanExpr(getLocation(), b1 && b2);
@@ -124,16 +124,16 @@ public class BinaryExpr extends AbstractExpr {
 		return e2;
 	}
 
-	@Override
-	public int getExprType() {
-		return BINARY;
-	}
-
 	public BinaryOp getOp() {
 		return op;
 	}
 
-	public AbstractType getType() {
+	@Override
+	public int getType() {
+		return BINARY;
+	}
+
+	public IType getUnderlyingType() {
 		return type;
 	}
 
@@ -149,7 +149,7 @@ public class BinaryExpr extends AbstractExpr {
 		this.op = op;
 	}
 
-	public void setType(AbstractType type) {
+	public void setType(IType type) {
 		this.type = type;
 	}
 

@@ -32,9 +32,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 /**
  * 
@@ -66,11 +67,11 @@ public class LLVMVarDefPrinter {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
 		varDefMap.put("name", getVarDefName(varDef, false));
 
-		AbstractType type;
+		IType type;
 
-		if (varDef.getType() instanceof PointType) {
+		if (varDef.getType().getType() == LLVMAbstractType.POINT) {
 			PointType iType = (PointType) varDef.getType();
-			type = iType.getType();
+			type = iType.getElementType();
 		} else {
 			type = varDef.getType();
 		}

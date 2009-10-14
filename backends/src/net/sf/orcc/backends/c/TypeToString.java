@@ -31,8 +31,8 @@ package net.sf.orcc.backends.c;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.Util;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -73,9 +73,9 @@ public class TypeToString implements TypeVisitor {
 	 * given type. Returns the text representation.
 	 * 
 	 * @param type
-	 *            An {@link AbstractType}.
+	 *            An {@link IType}.
 	 */
-	public String toString(AbstractType type) {
+	public String toString(IType type) {
 		builder = new StringBuilder();
 		type.accept(this);
 		return builder.toString();
@@ -95,7 +95,7 @@ public class TypeToString implements TypeVisitor {
 	@Override
 	public void visit(ListType type) {
 		// size will be printed later
-		type.getType().accept(this);
+		type.getElementType().accept(this);
 	}
 
 	@Override

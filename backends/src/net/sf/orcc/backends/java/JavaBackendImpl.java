@@ -100,7 +100,7 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 	protected void printNetwork(Network network) throws Exception {
 		JavaNetworkPrinter networkPrinter = new JavaNetworkPrinter();
 
-		// Add broadcasts before printing 
+		// Add broadcasts before printing
 		new BroadcastAdder(network);
 
 		String name = network.getName();

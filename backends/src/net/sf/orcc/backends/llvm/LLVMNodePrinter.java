@@ -44,6 +44,7 @@ import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.backends.llvm.nodes.SextNode;
 import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
+import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
@@ -67,8 +68,8 @@ import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.nodes.WriteNode;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -443,10 +444,9 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		VarDef varDef = node.getTarget().getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, true));
 
-		AbstractType type = varDef.getType();
-
-		if (type instanceof PointType) {
-			type = ((PointType) type).getType();
+		IType type = varDef.getType();
+		if (type.getType() == LLVMAbstractType.POINT) {
+			type = ((PointType) type).getElementType();
 		}
 
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),

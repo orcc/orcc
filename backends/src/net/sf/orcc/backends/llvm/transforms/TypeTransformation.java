@@ -78,8 +78,7 @@ import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WriteNode;
-import net.sf.orcc.ir.type.AbstractType;
-import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.UintType;
@@ -156,7 +155,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 		// Get source size and target size
 		int sourceSize = sizeOf(var.getType());
-		AbstractType targetType = targetVar.getType();
+		IType targetType = targetVar.getType();
 		int targetSize = sizeOf(targetType);
 
 		// Create target expr for bitcast
@@ -165,7 +164,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 		// Select the type of cast (trunc if smaller, zext otherwise)
 		if (sourceSize < targetSize) {
-			if (var.getType() instanceof UintType) {
+			if (var.getType().getType() == IType.UINT) {
 				return new ZextNode(0, new Location(), targetVar, expr);
 			} else {
 				return new SextNode(0, new Location(), targetVar, expr);
@@ -196,31 +195,31 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 	}
 
-	private int sizeOf(AbstractType type) {
-		if (type instanceof IntType) {
+	private int sizeOf(IType type) {
+		if (type.getType() == IType.INT) {
 			try {
 				return Util.evaluateAsInteger(((IntType) type).getSize());
 			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;
 			}
-		} else if (type instanceof UintType) {
+		} else if (type.getType() == IType.UINT) {
 			try {
 				return Util.evaluateAsInteger(((UintType) type).getSize());
 			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;
 			}
-		} else if (type instanceof ListType) {
-			return sizeOf(((ListType) type).getType());
-		} else if (type instanceof BoolType) {
+		} else if (type.getType() == IType.LIST) {
+			return sizeOf(((ListType) type).getElementType());
+		} else if (type.getType() == IType.BOOLEAN) {
 			return 1;
 		} else {
 			throw new NullPointerException();
 		}
 	}
 
-	private VarDef varDefCreate(AbstractType type) {
+	private VarDef varDefCreate(IType type) {
 		return new VarDef(false, false, 0, new Location(), "", null, null,
 				nodeCount++, type);
 	}
@@ -260,7 +259,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		case DIV:
 		case DIV_INT:
 			// recover the reference type from the current node
-			AbstractType refType = (AbstractType) args[0];
+			IType refType = (IType) args[0];
 
 			expr.getE1().accept(this, args);
 			expr.getE2().accept(this, args);
@@ -274,10 +273,10 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		case LT:
 		case NE:
 
-			if ((expr.getE1() instanceof VarExpr)) {
+			if ((expr.getE1().getType() == IExpr.VAR)) {
 				VarExpr e1 = (VarExpr) expr.getE1();
 				expr.getE2().accept(this, e1.getVar().getVarDef().getType());
-			} else if (expr.getE1() instanceof VarExpr) {
+			} else if (expr.getE2().getType() == IExpr.VAR) {
 				VarExpr e2 = (VarExpr) expr.getE2();
 				expr.getE2().accept(this, e2.getVar().getVarDef().getType());
 			}
@@ -315,7 +314,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		int tmpCnt = 0;
 
 		Procedure proc = node.getProcedure();
-		AbstractType returnType = proc.getReturnType();
+		IType returnType = proc.getReturnType();
 		VarDef returnVar = node.getRes();
 		List<VarDef> procParams = proc.getParameters();
 		List<IExpr> parameters = node.getParameters();
@@ -340,13 +339,13 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	public void visit(GetElementPtrNode node, Object... args) {
 		// Set every index to i32 (mandatory in llvm)
 		for (IExpr index : node.getIndexes()) {
-			if (index instanceof VarExpr) {
+			if (index.getType() == IExpr.VAR) {
 				VarExpr indExpr = (VarExpr) index;
 				VarUse indUse = indExpr.getVar();
 				VarDef indVar = indUse.getVarDef();
-				AbstractType indType = indVar.getType();
+				IType indType = indVar.getType();
 
-				if (indType instanceof IntType) {
+				if (indType.getType() == IType.INT) {
 					IntType type = (IntType) indType;
 					try {
 						int size = Util.evaluateAsInteger(type.getSize());
@@ -384,18 +383,18 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		VarDef sourceVar = node.getSource().getVarDef();
 		VarDef targetVar = node.getTarget();
 
-		AbstractType targetType = targetVar.getType();
+		IType targetType = targetVar.getType();
 		PointType sourceType = (PointType) sourceVar.getType();
-		AbstractType type;
+		IType type;
 
-		if (sourceType.getType() instanceof ListType) {
-			type = ((ListType) sourceType.getType()).getType();
+		if (sourceType.getElementType().getType() == IType.LIST) {
+			type = ((ListType) sourceType.getElementType()).getElementType();
 		} else {
-			type = sourceType.getType();
+			type = sourceType.getElementType();
 		}
 
 		if (!(targetType.equals(type))) {
-			VarDef castVar = varDefCreate(sourceType.getType());
+			VarDef castVar = varDefCreate(sourceType.getElementType());
 			node.setTarget(castVar);
 			it.add(castNodeCreate(castVar, targetVar));
 		}
@@ -433,11 +432,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		List<PhiAssignment> phis = node.getPhis();
 		for (PhiAssignment phi : phis) {
 			VarDef varDef = phi.getVarDef();
-			AbstractType typeRef = varDef.getType();
+			IType typeRef = varDef.getType();
 			List<VarUse> varUses = phi.getVars();
 
 			for (VarUse varUse : varUses) {
-				AbstractType type = varUse.getVarDef().getType();
+				IType type = varUse.getVarDef().getType();
 
 				if (!(type.equals(typeRef))) {
 					it.previous();
@@ -475,9 +474,9 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	public void visit(VarExpr expr, Object... args) {
 		// recover the reference type from the current node
-		AbstractType refType = (AbstractType) args[0];
+		IType refType = (IType) args[0];
 		VarDef var = expr.getVar().getVarDef();
-		AbstractType varType = var.getType();
+		IType varType = var.getType();
 
 		if (!(refType.equals(varType))) {
 			// Add cast node before the current expression

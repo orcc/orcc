@@ -57,7 +57,7 @@ public class ListExpr extends AbstractExpr {
 	}
 
 	@Override
-	public int getExprType() {
+	public int getType() {
 		return LIST;
 	}
 

@@ -46,8 +46,7 @@ public class OrccDebugLaunchConfigurationTabGroup extends
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
 				new DebugSettingsTab(), new ParametersTab(), new OptionsTab(),
-				new SourceLookupTab(),
-				new CommonTab() };
+				new SourceLookupTab(), new CommonTab() };
 		setTabs(tabs);
 	}
 

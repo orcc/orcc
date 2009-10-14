@@ -41,8 +41,8 @@ public class InitPortNode extends AbstractNode {
 
 	private VarExpr value;
 
-	public InitPortNode(int id, Location location, String fifoName,
-			int index, VarExpr value) {
+	public InitPortNode(int id, Location location, String fifoName, int index,
+			VarExpr value) {
 		super(id, location);
 		this.fifoName = fifoName;
 		this.value = value;
@@ -56,18 +56,18 @@ public class InitPortNode extends AbstractNode {
 	public String getFifoName() {
 		return fifoName;
 	}
-	
+
 	public VarExpr getValue() {
 		return value;
 	}
-	
+
 	public void setFifoName(String fifoName) {
 		this.fifoName = fifoName;
 	}
-	
+
 	@Override
 	public String toString() {
-		return fifoName + " = " + value ;
+		return fifoName + " = " + value;
 	}
 
 }

@@ -26,50 +26,58 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.type.AbstractTypeVisitor;
-import net.sf.orcc.ir.type.ListType;
+package net.sf.orcc.ir.type;
 
 /**
- * Sets the "size" attribute of the given top-level template to the type
- * visited. If it is a list, the element type is visited.
+ * This interface defines a type.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class ListSizePrinter extends AbstractTypeVisitor {
+public interface IType {
 
-	private List<Integer> sizeList;
+	/**
+	 * boolean type
+	 */
+	public static final int BOOLEAN = 1;
 
-	public ListSizePrinter() {
-		sizeList = new ArrayList<Integer>();
-	}
+	/**
+	 * integer type
+	 */
+	public static final int INT = 2;
 
-	public List<Integer> getSize() {
-		List<Integer> list = new ArrayList<Integer>(sizeList);
-		sizeList.clear();
-		return list;
-	}
+	/**
+	 * list type
+	 */
+	public static final int LIST = 3;
 
-	public void visit(ListType type) {
-		try {
-			IExpr expr = type.getSize().evaluate();
-			if (expr.getType() == IExpr.INT) {
-				sizeList.add(((IntExpr) expr).getValue());
-				type.getElementType().accept(this);
-			} else {
-				throw new OrccException("expected int");
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
-	}
+	/**
+	 * string type
+	 */
+	public static final int STRING = 4;
+
+	/**
+	 * unsigned integer type
+	 */
+	public static final int UINT = 5;
+
+	/**
+	 * void type
+	 */
+	public static final int VOID = 6;
+
+	/**
+	 * Accepts a visitor.
+	 * 
+	 * @param visitor
+	 */
+	public void accept(TypeVisitor visitor);
+
+	/**
+	 * Returns the type of this type.
+	 * 
+	 * @return the type of this type
+	 */
+	public int getType();
 
 }

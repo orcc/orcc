@@ -55,7 +55,7 @@ public class StringExpr extends AbstractExpr {
 	}
 
 	@Override
-	public int getExprType() {
+	public int getType() {
 		return STRING;
 	}
 

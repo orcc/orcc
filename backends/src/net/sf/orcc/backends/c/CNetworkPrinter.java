@@ -40,7 +40,7 @@ import java.util.TreeSet;
 
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -153,7 +153,7 @@ public class CNetworkPrinter {
 				Broadcast bcast = (Broadcast) instance;
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("id", bcast.getId());
-				AbstractType type = bcast.getType();
+				IType type = bcast.getType();
 				attrs.put("type", typeVisitor.toString(type));
 
 				List<Integer> num = new ArrayList<Integer>();
@@ -186,7 +186,7 @@ public class CNetworkPrinter {
 			Instance source = graph.getEdgeSource(connection);
 			Instance target = graph.getEdgeTarget(connection);
 
-			AbstractType type;
+			IType type;
 			if (source.isBroadcast()) {
 				type = connection.getTarget().getType();
 			} else {

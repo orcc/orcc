@@ -29,10 +29,12 @@
 package net.sf.orcc.ir.type;
 
 /**
+ * This class is an abstract implementation of {@link IType}.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractType {
+public abstract class AbstractType implements IType {
 
 	private String name;
 

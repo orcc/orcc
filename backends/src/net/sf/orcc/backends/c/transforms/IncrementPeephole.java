@@ -88,13 +88,13 @@ public class IncrementPeephole extends Peephole {
 				if (varDef == store.getTarget().getVarDef()
 						&& load.getIndexes().isEmpty()) {
 					IExpr expr = store.getValue();
-					if (expr instanceof BinaryExpr) {
+					if (expr.getType() == IExpr.BINARY) {
 						BinaryExpr binExpr = (BinaryExpr) expr;
 						BinaryOp op = binExpr.getOp();
 						IExpr e1 = binExpr.getE1();
 						IExpr e2 = binExpr.getE2();
 
-						if (e1 instanceof VarExpr) {
+						if (e1.getType() == IExpr.VAR) {
 							VarExpr v1 = (VarExpr) e1;
 							if (v1.getVar().getVarDef() == varDefTmp) {
 								res = replaceSelfAssignment(proc.getLocals(),
@@ -117,10 +117,10 @@ public class IncrementPeephole extends Peephole {
 			ListIterator<AbstractNode> it, VarDef varDefTmp, VarDef varDef,
 			VarExpr v1, BinaryOp op, IExpr e2) {
 		AbstractNode node;
-		if (op == BinaryOp.PLUS && e2 instanceof IntExpr
+		if (op == BinaryOp.PLUS && e2.getType() == IExpr.INT
 				&& ((IntExpr) e2).getValue() == 1) {
 			node = new IncrementNode(0, new Location(), varDef);
-		} else if (op == BinaryOp.MINUS && e2 instanceof IntExpr
+		} else if (op == BinaryOp.MINUS && e2.getType() == IExpr.INT
 				&& ((IntExpr) e2).getValue() == 1) {
 			node = new DecrementNode(0, new Location(), varDef);
 		} else if (op == BinaryOp.BAND || op == BinaryOp.BOR

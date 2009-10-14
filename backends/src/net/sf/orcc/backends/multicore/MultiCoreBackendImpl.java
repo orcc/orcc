@@ -93,8 +93,8 @@ public class MultiCoreBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void printNetwork(Network network) throws Exception {
 		CNetworkPrinter networkPrinter = new CNetworkPrinter();
-		
-		// Add broadcasts before printing 
+
+		// Add broadcasts before printing
 		new BroadcastAdder(network);
 
 		String outputName = path + File.separator + network.getName() + ".c";

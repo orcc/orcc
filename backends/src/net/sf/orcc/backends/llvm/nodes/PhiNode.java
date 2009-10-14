@@ -32,7 +32,7 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 /**
  * @author Jérôme GORIN
@@ -42,11 +42,11 @@ public class PhiNode extends AbstractLLVMNode {
 
 	private Map<LabelNode, VarDef> assignements;
 
-	private AbstractType type;
+	private IType type;
 
 	private VarDef varDef;
 
-	public PhiNode(int id, Location location, VarDef varDef, AbstractType type,
+	public PhiNode(int id, Location location, VarDef varDef, IType type,
 			Map<LabelNode, VarDef> assignements) {
 		super(id, location);
 		this.varDef = varDef;
@@ -63,7 +63,7 @@ public class PhiNode extends AbstractLLVMNode {
 		return assignements;
 	}
 
-	public AbstractType getType() {
+	public IType getType() {
 		return type;
 	}
 
@@ -75,7 +75,7 @@ public class PhiNode extends AbstractLLVMNode {
 		this.assignements = assignements;
 	}
 
-	public void setType(AbstractType type) {
+	public void setType(IType type) {
 		this.type = type;
 	}
 

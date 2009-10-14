@@ -44,7 +44,7 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 /**
  * Change every load on array into getElementPtrNode.
@@ -101,7 +101,7 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
 	}
 
 	private void mergePhiNode(PhiNode sourceNode,
-			Map<LabelNode, VarDef> assignements, AbstractType phiNodeType) {
+			Map<LabelNode, VarDef> assignements, IType phiNodeType) {
 		// Match and merge a couple vardef/brLabel into imbricated brNode
 		LabelNode labelNode = null;
 		VarDef varDef = sourceNode.getVarDef();

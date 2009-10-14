@@ -241,7 +241,7 @@ public class ExprToString implements ExprVisitor {
 
 	@Override
 	public void visit(TypeExpr expr, Object... args) {
-		builder.append(expr.getType());
+		builder.append(expr.getUnderlyingType());
 	}
 
 	@Override

@@ -43,8 +43,8 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.StateVar;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -64,9 +64,9 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 
 		private StringBuilder builder;
 
-		private AbstractType type;
+		private IType type;
 
-		public TypeConstructor(AbstractType type) {
+		public TypeConstructor(IType type) {
 			this.type = type;
 		}
 
@@ -90,7 +90,7 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 		@Override
 		public void visit(ListType type) {
 			builder.append("new ListType(" + type.getSize() + ", ");
-			type.getType().accept(this);
+			type.getElementType().accept(this);
 			builder.append(")");
 		}
 
@@ -153,7 +153,7 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 		Map<String, TypeVisitor> vars = new TreeMap<String, TypeVisitor>();
 		for (StateVar var : stateVars) {
 			String name = var.getDef().getName();
-			AbstractType type = var.getDef().getType();
+			IType type = var.getDef().getType();
 			vars.put(name, new TypeConstructor(type));
 		}
 

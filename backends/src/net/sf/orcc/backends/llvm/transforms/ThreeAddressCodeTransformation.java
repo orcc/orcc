@@ -56,8 +56,8 @@ import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 
 /**
@@ -90,8 +90,8 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 	// Add a second pass to check the binary expression type cohesion
 	// This pass will be useless when the IR associate the correct type to a
 	// binary expression
-	public AbstractType checkType(BinaryExpr expr) {
-		AbstractType type;
+	public IType checkType(BinaryExpr expr) {
+		IType type;
 
 		if ((expr.getOp() == BinaryOp.EQ) || (expr.getOp() == BinaryOp.GE)
 				|| (expr.getOp() == BinaryOp.GT)
@@ -99,11 +99,11 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 				|| (expr.getOp() == BinaryOp.LT)
 				|| (expr.getOp() == BinaryOp.NE)) {
 			type = new BoolType();
-		} else if ((expr.getE1() instanceof VarExpr)
-				&& (expr.getE2() instanceof VarExpr)) {
-			AbstractType typeE1 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+		} else if ((expr.getE1().getType() == IExpr.VAR)
+				&& (expr.getE2().getType() == IExpr.VAR)) {
+			IType typeE1 = ((VarExpr) expr.getE1()).getVar().getVarDef()
 					.getType();
-			AbstractType typeE2 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+			IType typeE2 = ((VarExpr) expr.getE1()).getVar().getVarDef()
 					.getType();
 
 			if (sizeOf(typeE1) > sizeOf(typeE2)) {
@@ -112,12 +112,12 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 				type = typeE2;
 			}
 
-		} else if (expr.getE1() instanceof VarExpr) {
+		} else if (expr.getE1().getType() == IExpr.VAR) {
 			type = ((VarExpr) expr.getE1()).getVar().getVarDef().getType();
-		} else if (expr.getE2() instanceof VarExpr) {
+		} else if (expr.getE2().getType() == IExpr.VAR) {
 			type = ((VarExpr) expr.getE2()).getVar().getVarDef().getType();
 		} else {
-			type = expr.getType();
+			type = expr.getUnderlyingType();
 		}
 
 		return type;
@@ -126,7 +126,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 	public IExpr removeUnaryExpr(UnaryExpr expr) {
 		// Unary expression doesn't exists in LLVM
 		Location loc = expr.getLocation();
-		AbstractType type = expr.getType();
+		IType type = expr.getUnderlyingType();
 		IExpr exprE1 = expr.getExpr();
 		UnaryOp op = expr.getOp();
 		IntExpr constExpr;
@@ -152,17 +152,17 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 		}
 	}
 
-	private int sizeOf(AbstractType type) {
+	private int sizeOf(IType type) {
 		int size = 0;
 
-		if (type instanceof IntType) {
+		if (type.getType() == IType.INT) {
 			try {
 				return Util.evaluateAsInteger(((IntType) type).getSize());
 			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;
 			}
-		} else if (type instanceof BoolType) {
+		} else if (type.getType() == IType.BOOLEAN) {
 			size = 1;
 		}
 
@@ -173,11 +173,11 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 	public VarExpr splitBinaryExpr(BinaryExpr expr, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 
-		if (expr.getE1() instanceof BinaryExpr) {
+		if (expr.getE1().getType() == IExpr.BINARY) {
 			expr.setE1(splitBinaryExpr((BinaryExpr) expr.getE1(), it));
 		}
 
-		if (expr.getE2() instanceof BinaryExpr) {
+		if (expr.getE2().getType() == IExpr.BINARY) {
 			expr.setE2(splitBinaryExpr((BinaryExpr) expr.getE2(), it));
 		}
 
@@ -200,7 +200,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 		List<IExpr> tmpIndexes = new ArrayList<IExpr>();
 
 		for (IExpr index : indexes) {
-			if (index instanceof BinaryExpr) {
+			if (index.getType() == IExpr.BINARY) {
 				VarExpr expr = splitBinaryExpr((BinaryExpr) index, it);
 				tmpIndexes.add(expr);
 			} else {
@@ -212,7 +212,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 
 	}
 
-	private VarDef varDefCreate(AbstractType type) {
+	private VarDef varDefCreate(IType type) {
 		return new VarDef(false, false, exprCounter++, new Location(), "expr",
 				null, null, 0, type);
 	}
@@ -224,18 +224,18 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 		IExpr value = node.getValue();
 
 		// Change unary expression into binary expression
-		if (node.getValue() instanceof UnaryExpr) {
+		if (node.getValue().getType() == IExpr.UNARY) {
 			node.setValue(removeUnaryExpr((UnaryExpr) node.getValue()));
 		}
 
-		if (value instanceof BinaryExpr) {
+		if (value.getType() == IExpr.BINARY) {
 			it.previous();
 			BinaryExpr expr = (BinaryExpr) value;
-			if (expr.getE1() instanceof BinaryExpr) {
+			if (expr.getE1().getType() == IExpr.BINARY) {
 				expr.setE1(splitBinaryExpr((BinaryExpr) expr.getE1(), it));
 			}
 
-			if (expr.getE2() instanceof BinaryExpr) {
+			if (expr.getE2().getType() == IExpr.BINARY) {
 				expr.setE2(splitBinaryExpr((BinaryExpr) expr.getE2(), it));
 			}
 			it.next();
@@ -247,11 +247,11 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 
 		node.getCondition();
 		// Change unary expression into binary expression
-		if (node.getCondition() instanceof UnaryExpr) {
+		if (node.getCondition().getType() == IExpr.UNARY) {
 			node.setCondition(removeUnaryExpr((UnaryExpr) node.getCondition()));
 		}
 
-		if (node.getCondition() instanceof BinaryExpr) {
+		if (node.getCondition().getType() == IExpr.BINARY) {
 			ListIterator<AbstractNode> itConditionNodes = node
 					.getConditionNodes().listIterator();
 			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getCondition(),
@@ -270,12 +270,12 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		List<IExpr> exprs = node.getParameters();
 		for (IExpr expr : exprs) {
-			if (expr instanceof UnaryExpr) {
+			if (expr.getType() == IExpr.UNARY) {
 				exprs.set(exprs.indexOf(expr),
 						removeUnaryExpr((UnaryExpr) expr));
 			}
 
-			if (expr instanceof BinaryExpr) {
+			if (expr.getType() == IExpr.BINARY) {
 				it.previous();
 				VarExpr varExpr = splitBinaryExpr((BinaryExpr) expr, args);
 				it.next();
@@ -302,11 +302,11 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 	public void visit(ReturnNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		// Change unary expression into binary expression
-		if (node.getValue() instanceof UnaryExpr) {
+		if (node.getValue().getType() == IExpr.UNARY) {
 			node.setValue(removeUnaryExpr((UnaryExpr) node.getValue()));
 		}
 
-		if (node.getValue() instanceof BinaryExpr) {
+		if (node.getValue().getType() == IExpr.BINARY) {
 			it.previous();
 			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getValue(), args);
 			it.next();
@@ -319,11 +319,11 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 	public void visit(SelectNode node, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 		// Change unary expression into binary expression
-		if (node.getCondition() instanceof UnaryExpr) {
+		if (node.getCondition().getType() == IExpr.UNARY) {
 			node.setCondition(removeUnaryExpr((UnaryExpr) node.getCondition()));
 		}
 
-		if (node.getCondition() instanceof BinaryExpr) {
+		if (node.getCondition().getType() == IExpr.BINARY) {
 			it.previous();
 			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getCondition(),
 					args);
@@ -338,11 +338,11 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 
 		// Change unary expression into binary expression
-		if (node.getValue() instanceof UnaryExpr) {
+		if (node.getValue().getType() == IExpr.UNARY) {
 			node.setValue(removeUnaryExpr((UnaryExpr) node.getValue()));
 		}
 
-		if (node.getValue() instanceof BinaryExpr) {
+		if (node.getValue().getType() == IExpr.BINARY) {
 			it.previous();
 			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getValue(), it);
 			it.next();

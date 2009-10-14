@@ -46,7 +46,7 @@ import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -137,8 +137,8 @@ public class NetworkParser {
 			Actor srcActor = source.getActor();
 			Actor tgtActor = target.getActor();
 
-			AbstractType srcType = connection.getSource().getType();
-			AbstractType dstType = connection.getTarget().getType();
+			IType srcType = connection.getSource().getType();
+			IType dstType = connection.getTarget().getType();
 			if (!srcType.equals(dstType)) {
 				throw new OrccException("Type error: " + srcActor + "."
 						+ connection.getSource() + " is " + srcType + ", "
@@ -419,8 +419,6 @@ public class NetworkParser {
 	 * @throws OrccException
 	 */
 	private void parsePort(Element port) throws OrccException {
-		// TODO parse port
-
 		String name = port.getAttribute("name");
 		if (name.isEmpty()) {
 			throw new OrccException("A Port has an empty name");
@@ -444,7 +442,7 @@ public class NetworkParser {
 				if (attribute.getAttribute("kind").equals("Value")
 						&& attribute.getAttribute("name").equals("bufferSize")) {
 					IExpr expr = parseExpr(attribute.getFirstChild());
-					if (expr instanceof IntExpr) {
+					if (expr.getType() == IExpr.INT) {
 						return ((IntExpr) expr).getValue();
 					} else {
 						throw new OrccException(

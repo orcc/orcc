@@ -45,8 +45,8 @@ import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 
 /**
@@ -73,8 +73,8 @@ public class CorrectBinaryExpressionType extends AbstractNodeVisitor {
 		}
 	}
 
-	public AbstractType checkType(BinaryExpr expr, Object... args) {
-		AbstractType type;
+	public IType checkType(BinaryExpr expr, Object... args) {
+		IType type;
 
 		if ((expr.getOp() == BinaryOp.EQ) || (expr.getOp() == BinaryOp.GE)
 				|| (expr.getOp() == BinaryOp.GT)
@@ -82,11 +82,11 @@ public class CorrectBinaryExpressionType extends AbstractNodeVisitor {
 				|| (expr.getOp() == BinaryOp.LT)
 				|| (expr.getOp() == BinaryOp.NE)) {
 			type = new BoolType();
-		} else if ((expr.getE1() instanceof VarExpr)
-				&& (expr.getE2() instanceof VarExpr)) {
-			AbstractType typeE1 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+		} else if ((expr.getE1().getType() == IExpr.VAR)
+				&& (expr.getE2().getType() == IExpr.VAR)) {
+			IType typeE1 = ((VarExpr) expr.getE1()).getVar().getVarDef()
 					.getType();
-			AbstractType typeE2 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+			IType typeE2 = ((VarExpr) expr.getE1()).getVar().getVarDef()
 					.getType();
 
 			if (sizeOf(typeE1) > sizeOf(typeE2)) {
@@ -95,28 +95,28 @@ public class CorrectBinaryExpressionType extends AbstractNodeVisitor {
 				type = typeE2;
 			}
 
-		} else if (expr.getE1() instanceof VarExpr) {
+		} else if (expr.getE1().getType() == IExpr.VAR) {
 			type = ((VarExpr) expr.getE1()).getVar().getVarDef().getType();
-		} else if (expr.getE2() instanceof VarExpr) {
+		} else if (expr.getE2().getType() == IExpr.VAR) {
 			type = ((VarExpr) expr.getE2()).getVar().getVarDef().getType();
 		} else {
-			type = expr.getType();
+			type = expr.getUnderlyingType();
 		}
 
 		return type;
 	}
 
-	private int sizeOf(AbstractType type) {
+	private int sizeOf(IType type) {
 		int size = 0;
 
-		if (type instanceof IntType) {
+		if (type.getType() == IType.INT) {
 			try {
 				return Util.evaluateAsInteger(((IntType) type).getSize());
 			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;
 			}
-		} else if (type instanceof BoolType) {
+		} else if (type.getType() == IType.BOOLEAN) {
 			size = 1;
 		}
 
@@ -127,9 +127,9 @@ public class CorrectBinaryExpressionType extends AbstractNodeVisitor {
 	public void visit(AssignVarNode node, Object... args) {
 		IExpr value = node.getValue();
 
-		if (value instanceof BinaryExpr) {
+		if (value.getType() == IExpr.BINARY) {
 			BinaryExpr expr = (BinaryExpr) value;
-			AbstractType type = checkType(expr);
+			IType type = checkType(expr);
 			expr.setType(type);
 			node.getVar().setType(type);
 		}
@@ -140,7 +140,7 @@ public class CorrectBinaryExpressionType extends AbstractNodeVisitor {
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
 	}
-	
+
 	@Override
 	public void visit(WhileNode node, Object... args) {
 		visitNodes(node.getNodes());

@@ -50,4 +50,9 @@ public class StringType extends AbstractType {
 		return (obj instanceof StringType);
 	}
 
+	@Override
+	public int getType() {
+		return STRING;
+	}
+
 }

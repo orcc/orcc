@@ -34,7 +34,7 @@ import java.util.List;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 /**
  * @author Matthieu Wipliez
@@ -92,11 +92,11 @@ public class VarDef implements Comparable<VarDef> {
 	/**
 	 * type of this variable.
 	 */
-	private AbstractType type;
+	private IType type;
 
 	public VarDef(boolean assignable, boolean global, int index, Location loc,
 			String name, AbstractNode node, List<VarUse> references,
-			Integer suffix, AbstractType type) {
+			Integer suffix, IType type) {
 		this.assignable = assignable;
 		this.global = global;
 		this.index = index;
@@ -137,11 +137,12 @@ public class VarDef implements Comparable<VarDef> {
 		name = varDef.getName();
 		node = varDef.getNode();
 		references = varDef.getReferences();
-		if (varDef.hasSuffix()){
+		if (varDef.hasSuffix()) {
 			suffix = varDef.getSuffix();
-		}else{
+		} else {
 			suffix = null;
 		}
+
 		type = varDef.getType();
 		this.constant = varDef.isConstant();
 		constantExpr = varDef.getConstant();
@@ -160,7 +161,7 @@ public class VarDef implements Comparable<VarDef> {
 		}
 		return false;
 	}
-	
+
 	public IExpr getConstant() {
 		return constantExpr;
 	}
@@ -186,11 +187,11 @@ public class VarDef implements Comparable<VarDef> {
 	}
 
 	public int getSuffix() {
-		
+
 		return suffix;
 	}
-	
-	public AbstractType getType() {
+
+	public IType getType() {
 		return type;
 	}
 
@@ -247,7 +248,7 @@ public class VarDef implements Comparable<VarDef> {
 		this.suffix = suffix;
 	}
 
-	public void setType(AbstractType type) {
+	public void setType(IType type) {
 		this.type = type;
 	}
 

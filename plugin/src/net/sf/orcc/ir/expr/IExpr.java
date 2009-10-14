@@ -31,25 +31,51 @@ package net.sf.orcc.ir.expr;
 import net.sf.orcc.OrccException;
 
 /**
+ * This interface defines an expression.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public interface IExpr {
 
+	/**
+	 * binary expression
+	 */
 	public static final int BINARY = 1;
 
+	/**
+	 * boolean expression
+	 */
 	public static final int BOOLEAN = 2;
 
+	/**
+	 * integer expression
+	 */
 	public static final int INT = 3;
 
+	/**
+	 * list expression
+	 */
 	public static final int LIST = 4;
 
+	/**
+	 * string expression
+	 */
 	public static final int STRING = 5;
 
+	/**
+	 * type expression
+	 */
 	public static final int TYPE = 6;
 
+	/**
+	 * unary expression
+	 */
 	public static final int UNARY = 7;
 
+	/**
+	 * variable reference expression
+	 */
 	public static final int VAR = 8;
 
 	/**
@@ -74,6 +100,6 @@ public interface IExpr {
 	 * 
 	 * @return the type of this expression
 	 */
-	public int getExprType();
+	public int getType();
 
 }

@@ -53,7 +53,7 @@ public class IntType extends AbstractType {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof IntType) {
-			return size.equals(((IntType)obj).size);
+			return size.equals(((IntType) obj).size);
 		} else {
 			return false;
 		}
@@ -61,6 +61,11 @@ public class IntType extends AbstractType {
 
 	public IExpr getSize() {
 		return size;
+	}
+
+	@Override
+	public int getType() {
+		return INT;
 	}
 
 	public void setSize(IExpr size) {

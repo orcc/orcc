@@ -40,9 +40,9 @@ public class ListType extends AbstractType {
 
 	private IExpr size;
 
-	private AbstractType type;
+	private IType type;
 
-	public ListType(IExpr size, AbstractType type) {
+	public ListType(IExpr size, IType type) {
 		super(NAME);
 		setSize(size);
 		setType(type);
@@ -63,19 +63,24 @@ public class ListType extends AbstractType {
 		}
 	}
 
+	public IType getElementType() {
+		return type;
+	}
+
 	public IExpr getSize() {
 		return size;
 	}
 
-	public AbstractType getType() {
-		return type;
+	@Override
+	public int getType() {
+		return UINT;
 	}
 
 	public void setSize(IExpr size) {
 		this.size = size;
 	}
 
-	public void setType(AbstractType type) {
+	public void setType(IType type) {
 		if (type == null) {
 			throw new NullPointerException();
 		}

@@ -53,7 +53,7 @@ public class UintType extends AbstractType {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof UintType) {
-			return size.equals(((UintType)obj).size);
+			return size.equals(((UintType) obj).size);
 		} else {
 			return false;
 		}
@@ -61,6 +61,11 @@ public class UintType extends AbstractType {
 
 	public IExpr getSize() {
 		return size;
+	}
+
+	@Override
+	public int getType() {
+		return UINT;
 	}
 
 	public void setSize(IExpr size) {

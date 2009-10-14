@@ -33,8 +33,8 @@ import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.Util;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -65,9 +65,9 @@ public class LLVMTypePrinter implements LLVMTypeVisitor {
 	 * given type. Returns the text representation.
 	 * 
 	 * @param type
-	 *            An {@link AbstractType}.
+	 *            An {@link IType}.
 	 */
-	public String toString(AbstractType type) {
+	public String toString(IType type) {
 		builder = new StringBuilder();
 		type.accept(this);
 		return builder.toString();
@@ -90,13 +90,13 @@ public class LLVMTypePrinter implements LLVMTypeVisitor {
 		builder.append("[ ");
 		printInt(type.getSize());
 		builder.append(" x ");
-		type.getType().accept(this);
+		type.getElementType().accept(this);
 		builder.append(" ]");
 	}
 
 	@Override
 	public void visit(PointType type) {
-		type.getType().accept(this);
+		type.getElementType().accept(this);
 		builder.append("*");
 	}
 

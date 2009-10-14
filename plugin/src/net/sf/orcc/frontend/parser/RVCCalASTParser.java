@@ -53,8 +53,8 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -311,11 +311,11 @@ public class RVCCalASTParser {
 	 * @return
 	 * @throws RVCCalParseException
 	 */
-	private AbstractType parseType(Tree tree) throws OrccException {
+	private IType parseType(Tree tree) throws OrccException {
 		Tree typeTree = tree.getChild(0);
 		Location location = parseLocation(typeTree);
 		String typeName = typeTree.getText();
-		AbstractType type;
+		IType type;
 
 		if (typeName.equals(BoolType.NAME)) {
 			type = new BoolType();
@@ -332,8 +332,7 @@ public class RVCCalASTParser {
 		} else if (typeName.equals(ListType.NAME)) {
 			IExpr size = parseTypeAttributeSize(location, tree.getChild(1),
 					null);
-			AbstractType subType = parseTypeAttributeType(location, tree
-					.getChild(1));
+			IType subType = parseTypeAttributeType(location, tree.getChild(1));
 			type = new ListType(size, subType);
 		} else {
 			throw new OrccException(file, location, "Unknown type: " + typeName);
@@ -363,8 +362,8 @@ public class RVCCalASTParser {
 		}
 	}
 
-	private AbstractType parseTypeAttributeType(Location location,
-			Tree typeAttrs) throws OrccException {
+	private IType parseTypeAttributeType(Location location, Tree typeAttrs)
+			throws OrccException {
 		int n = typeAttrs.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
@@ -390,7 +389,7 @@ public class RVCCalASTParser {
 	 */
 	private VarDef parseVarDef(Tree tree, boolean assignable, boolean global,
 			int index, Integer suffix) throws OrccException {
-		AbstractType type = parseType(tree.getChild(0));
+		IType type = parseType(tree.getChild(0));
 		Tree nameTree = tree.getChild(1);
 		String name = nameTree.getText();
 

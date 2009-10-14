@@ -39,7 +39,7 @@ import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 import org.antlr.stringtemplate.StringTemplate;
 
@@ -74,7 +74,7 @@ public class CppActorPrinter extends CActorPrinter {
 		procTmpl.setAttribute("name", proc.getName());
 
 		// return type
-		AbstractType type = proc.getReturnType();
+		IType type = proc.getReturnType();
 		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters

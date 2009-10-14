@@ -16,8 +16,8 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.Util;
-import net.sf.orcc.ir.type.AbstractType;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -98,28 +98,28 @@ public class ActorWriter {
 		return array;
 	}
 
-	private Object writeType(AbstractType type) throws OrccException {
-		if (type instanceof BoolType) {
+	private Object writeType(IType type) throws OrccException {
+		if (type.getType() == IType.BOOLEAN) {
 			return BoolType.NAME;
-		} else if (type instanceof StringType) {
+		} else if (type.getType() == IType.STRING) {
 			return StringType.NAME;
-		} else if (type instanceof VoidType) {
+		} else if (type.getType() == IType.VOID) {
 			return VoidType.NAME;
 		} else {
 			JSONArray array = new JSONArray();
-			if (type instanceof IntType) {
+			if (type.getType() == IType.INT) {
 				array.put(IntType.NAME);
 				int size = Util.evaluateAsInteger(((IntType) type).getSize());
 				array.put(size);
-			} else if (type instanceof UintType) {
+			} else if (type.getType() == IType.UINT) {
 				array.put(UintType.NAME);
 				int size = Util.evaluateAsInteger(((UintType) type).getSize());
 				array.put(size);
-			} else if (type instanceof ListType) {
+			} else if (type.getType() == IType.LIST) {
 				array.put(ListType.NAME);
 				int size = Util.evaluateAsInteger(((ListType) type).getSize());
 				array.put(size);
-				array.put(writeType(((ListType) type).getType()));
+				array.put(writeType(((ListType) type).getElementType()));
 			} else {
 				throw new OrccException("Invalid type definition: "
 						+ type.toString());

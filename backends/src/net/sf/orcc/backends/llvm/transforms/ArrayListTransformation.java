@@ -45,7 +45,7 @@ import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.ListType;
 
 /**
@@ -82,13 +82,13 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 
 		it.previous();
 
-		AbstractType listType;
+		IType listType;
 
 		// Adding the getElementPtrNode
 		VarDef varDefList = varList.getVarDef();
 		listType = varDefList.getType();
-		while (listType instanceof ListType) {
-			listType = ((ListType) listType).getType();
+		while (listType.getType() == IType.LIST) {
+			listType = ((ListType) listType).getElementType();
 		}
 
 		VarDef varDef = varDefCreate(varDefList, listType);
@@ -104,7 +104,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 		return varUse;
 	}
 
-	private VarDef varDefCreate(VarDef varDef, AbstractType type) {
+	private VarDef varDefCreate(VarDef varDef, IType type) {
 		int index = varDef.getIndex();
 		String name = varDef.getName() + Integer.toString(indexName++);
 		int suffix;

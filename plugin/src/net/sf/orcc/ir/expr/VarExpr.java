@@ -56,7 +56,7 @@ public class VarExpr extends AbstractExpr {
 	}
 
 	@Override
-	public int getExprType() {
+	public int getType() {
 		return VAR;
 	}
 

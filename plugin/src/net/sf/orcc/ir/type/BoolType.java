@@ -50,4 +50,9 @@ public class BoolType extends AbstractType {
 		return (obj instanceof BoolType);
 	}
 
+	@Override
+	public int getType() {
+		return BOOLEAN;
+	}
+
 }

@@ -34,7 +34,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 
 /**
  * @author Matthieu Wipliez
@@ -54,7 +54,7 @@ public class Procedure {
 
 	private List<VarDef> parameters;
 
-	private AbstractType returnType;
+	private IType returnType;
 
 	/**
 	 * Construcs a new procedure.
@@ -73,8 +73,8 @@ public class Procedure {
 	 *            The procedure local variables.
 	 */
 	public Procedure(String name, boolean external, Location location,
-			AbstractType returnType, List<VarDef> parameters,
-			List<VarDef> locals, List<AbstractNode> nodes) {
+			IType returnType, List<VarDef> parameters, List<VarDef> locals,
+			List<AbstractNode> nodes) {
 		this.external = external;
 		this.nodes = nodes;
 		this.locals = locals;
@@ -104,7 +104,7 @@ public class Procedure {
 		return parameters;
 	}
 
-	public AbstractType getReturnType() {
+	public IType getReturnType() {
 		return returnType;
 	}
 
@@ -124,7 +124,7 @@ public class Procedure {
 		this.name = name;
 	}
 
-	public void setReturnType(AbstractType returnType) {
+	public void setReturnType(IType returnType) {
 		this.returnType = returnType;
 	}
 

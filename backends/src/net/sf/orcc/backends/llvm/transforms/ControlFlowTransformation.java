@@ -55,7 +55,7 @@ import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.type.AbstractType;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.VoidType;
 
@@ -256,22 +256,22 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		for (PhiAssignment phi : phis) {
 			Map<LabelNode, VarDef> assignements = new HashMap<LabelNode, VarDef>();
 			VarDef varDef = phi.getVarDef();
-			AbstractType varType = varDef.getType();
+			IType varType = varDef.getType();
 			List<VarUse> vars = phi.getVars();
 
 			VarDef trueVar = vars.get(0).getVarDef();
 			VarDef falseVar = vars.get(1).getVarDef();
 
 			// Force varDef's type to phiNode type to prevent cast problem
-			if (varType instanceof IntType) {
+			if (varType.getType() == IType.INT) {
 				IntType intType = (IntType) varType;
-				if (trueVar.getType() instanceof IntType) {
+				if (trueVar.getType().getType() == IType.INT) {
 					((IntType) trueVar.getType()).setSize(intType.getSize());
 				} else {
 					trueVar.setType(varType);
 				}
 
-				if (falseVar.getType() instanceof IntType) {
+				if (falseVar.getType().getType() == IType.INT) {
 					((IntType) falseVar.getType()).setSize(intType.getSize());
 				} else {
 					falseVar.setType(varType);
@@ -312,7 +312,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 			SelectNode selectNode = selectNodeCreate(node);
 			it.remove();
 			it.add(selectNode);
-		} else if (node.getCondition() instanceof BooleanExpr) {
+		} else if (node.getCondition().getType() == IExpr.BOOLEAN) {
 			List<AbstractNode> brNodes = clearIfNode(node);
 			it.remove();
 			for (AbstractNode brNode : brNodes) {
@@ -380,7 +380,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		visitNodes(nodes);
 
 		// Add void return
-		if (proc.getReturnType() instanceof VoidType) {
+		if (proc.getReturnType().getType() == IType.VOID) {
 			TypeExpr expr = new TypeExpr(null, new VoidType());
 			nodes.add(new ReturnNode(0, null, expr));
 		}

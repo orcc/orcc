@@ -42,8 +42,7 @@ public class AssignVarNode extends AbstractNode {
 
 	private VarDef var;
 
-	public AssignVarNode(int id, Location location, VarDef var,
-			IExpr value) {
+	public AssignVarNode(int id, Location location, VarDef var, IExpr value) {
 		super(id, location);
 		this.var = var;
 		this.value = value;

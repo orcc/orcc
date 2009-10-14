@@ -55,36 +55,36 @@ public class AddInstantationProcedure {
 		List<Procedure> instations = new ArrayList<Procedure>();
 		this.actorName = actor.getName();
 		Procedure inputInit = createInitProcedure("Input", actor.getInputs());
-		Procedure inputOutput = createInitProcedure("Output", actor.getOutputs());
+		Procedure inputOutput = createInitProcedure("Output", actor
+				.getOutputs());
 		instations.add(inputInit);
 		instations.add(inputOutput);
 		actor.setInstantations(instations);
 	}
 
 	private Procedure createInitProcedure(String Attributs, List<VarDef> ports) {
-		List<VarDef> parameters = new ArrayList<VarDef> ();
-		List<VarDef> locals = new ArrayList<VarDef> ();
-		List<AbstractNode> nodes = new ArrayList<AbstractNode> ();
-		
-		VarDef parameter = new VarDef(false, false, 0, new Location(),
-				"fifo", null, null,	null, new VoidType());
-		
+		List<VarDef> parameters = new ArrayList<VarDef>();
+		List<VarDef> locals = new ArrayList<VarDef>();
+		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
+
+		VarDef parameter = new VarDef(false, false, 0, new Location(), "fifo",
+				null, null, null, new VoidType());
+
 		parameters.add(parameter);
-		for (VarDef port : ports){ 
-			
+		for (VarDef port : ports) {
+
 			VarUse varuse = new VarUse(parameter, null);
 			VarExpr expr = new VarExpr(new Location(), varuse);
-			
-			InitPortNode node = new InitPortNode(0, new Location(), port.getName(),
-					0, expr);
-			
+
+			InitPortNode node = new InitPortNode(0, new Location(), port
+					.getName(), 0, expr);
+
 			nodes.add(node);
 		}
-		
-		return new Procedure(actorName+"_init"+Attributs, false, new Location(),
-				new VoidType(), parameters,	locals, nodes);
-		
-		}
 
-	
+		return new Procedure(actorName + "_init" + Attributs, false,
+				new Location(), new VoidType(), parameters, locals, nodes);
+
+	}
+
 }

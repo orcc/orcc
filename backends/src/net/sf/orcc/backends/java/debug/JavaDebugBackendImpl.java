@@ -100,7 +100,7 @@ public class JavaDebugBackendImpl extends AbstractBackend implements IBackend {
 	protected void printNetwork(Network network) throws Exception {
 		JavaDebugNetworkPrinter networkPrinter = new JavaDebugNetworkPrinter();
 
-		// Add broadcasts before printing 
+		// Add broadcasts before printing
 		new BroadcastAdder(network);
 
 		String name = network.getName();
