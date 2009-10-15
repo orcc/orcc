@@ -99,14 +99,9 @@ public class ActorWriter {
 	 */
 	private JSONArray writePort(Port port) throws OrccException {
 		JSONArray array = new JSONArray();
-
-		JSONArray details = new JSONArray();
-		details.put(port.getName());
-
-		array.put(details);
 		array.put(writeLocation(port.getLocation()));
 		array.put(writeType(port.getType()));
-
+		array.put(port.getName());
 		return array;
 	}
 

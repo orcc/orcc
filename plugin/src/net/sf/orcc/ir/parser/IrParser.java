@@ -164,6 +164,10 @@ public class IrParser {
 
 	private Map<String, VarDef> varDefs;
 
+	private OrderedMap<Port> inputs;
+
+	private OrderedMap<Port> outputs;
+
 	private Action getAction(JSONArray array) throws JSONException {
 		if (array.length() == 0) {
 			// removes the first untagged action found
@@ -201,8 +205,8 @@ public class IrParser {
 			tag.add(tagArray.getString(i));
 		}
 
-		Map<VarDef, Integer> ip = parsePattern(array.getJSONArray(1));
-		Map<VarDef, Integer> op = parsePattern(array.getJSONArray(2));
+		Map<Port, Integer> ip = parsePattern(inputs, array.getJSONArray(1));
+		Map<Port, Integer> op = parsePattern(outputs, array.getJSONArray(2));
 
 		Procedure scheduler = parseProc(array.getJSONArray(3));
 		Procedure body = parseProc(array.getJSONArray(4));
@@ -257,8 +261,8 @@ public class IrParser {
 
 			file = obj.getString(KEY_SOURCE_FILE);
 			String name = obj.getString(KEY_NAME);
-			OrderedMap<Port> inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
-			OrderedMap<Port> outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
+			inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
+			outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
 
 			JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
 			List<StateVar> stateVars = parseStateVars(array);
@@ -600,15 +604,16 @@ public class IrParser {
 		return nodes;
 	}
 
-	private Map<VarDef, Integer> parsePattern(JSONArray array)
-			throws JSONException, OrccException {
-		Map<VarDef, Integer> pattern = new HashMap<VarDef, Integer>();
+	private Map<Port, Integer> parsePattern(OrderedMap<Port> ports,
+			JSONArray array) throws JSONException, OrccException {
+		Map<Port, Integer> pattern = new HashMap<Port, Integer>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray patternArray = array.getJSONArray(i);
-			VarDef port = getVarDef(patternArray.getJSONArray(0));
+			Port port = ports.resolveName(patternArray.getString(0));
 			int numTokens = patternArray.getInt(1);
 			pattern.put(port, numTokens);
 		}
+
 		return pattern;
 	}
 
@@ -646,9 +651,9 @@ public class IrParser {
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray port = array.getJSONArray(i);
 
-			String name = port.getJSONArray(0).getString(0);
-			Location location = parseLocation(port.getJSONArray(1));
-			IType type = parseType(port.get(2));
+			Location location = parseLocation(port.getJSONArray(0));
+			IType type = parseType(port.get(1));
+			String name = port.getString(2);
 
 			Port po = new Port(location, type, name);
 			ports.register(file, location, name, po);

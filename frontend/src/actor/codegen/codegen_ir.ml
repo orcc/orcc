@@ -156,7 +156,13 @@ let mk_var_def var_def =
 		mk_uses var_def.v_refs]
 
 let mk_ports ports =
-	array (List.map (fun port -> mk_var_def port) ports)
+	array
+		(List.map
+			(fun port ->
+				array
+					[ mk_loc port.v_loc;
+						mk_type port.v_type;
+						string port.v_name]) ports)
 
 let mk_state_vars globals =
 	array
@@ -286,7 +292,7 @@ let mk_pattern pattern =
 	array
 		(List.map
 			(fun (port, num_tokens) ->
-				array [mk_var_ref port; int num_tokens])
+				array [string port.v_name; int num_tokens])
 		pattern)
 
 let mk_action action =

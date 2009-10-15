@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.NameTransformer;
-import net.sf.orcc.ir.VarDef;
 
 /**
  * @author Matthieu Wipliez
@@ -43,20 +43,19 @@ public class Action {
 
 	private Procedure body;
 
-	private Map<VarDef, Integer> inputPattern;
+	private Map<Port, Integer> inputPattern;
 
 	private Location location;
 
-	private Map<VarDef, Integer> outputPattern;
+	private Map<Port, Integer> outputPattern;
 
 	private Procedure scheduler;
 
 	private List<String> tag;
 
 	public Action(Location location, List<String> tag,
-			Map<VarDef, Integer> inputPattern,
-			Map<VarDef, Integer> outputPattern, Procedure scheduler,
-			Procedure body) {
+			Map<Port, Integer> inputPattern, Map<Port, Integer> outputPattern,
+			Procedure scheduler, Procedure body) {
 		this.body = body;
 		this.inputPattern = inputPattern;
 		this.outputPattern = outputPattern;
@@ -68,7 +67,7 @@ public class Action {
 		return body;
 	}
 
-	public Map<VarDef, Integer> getInputPattern() {
+	public Map<Port, Integer> getInputPattern() {
 		return inputPattern;
 	}
 
@@ -76,7 +75,7 @@ public class Action {
 		return location;
 	}
 
-	public Map<VarDef, Integer> getOutputPattern() {
+	public Map<Port, Integer> getOutputPattern() {
 		return outputPattern;
 	}
 
