@@ -34,11 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.frontend.ActionList;
-import net.sf.orcc.frontend.Scope;
+import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
@@ -60,6 +59,9 @@ import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.util.ActionList;
+import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.Scope;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CharStream;
@@ -101,12 +103,12 @@ public class RVCCalASTParser {
 	/**
 	 * scope of input ports
 	 */
-	private Scope<VarDef> inputs;
+	private OrderedMap<Port> inputs;
 
 	/**
 	 * scope of output ports
 	 */
-	private Scope<VarDef> outputs;
+	private OrderedMap<Port> outputs;
 
 	/**
 	 * list of actor parameters
@@ -116,7 +118,7 @@ public class RVCCalASTParser {
 	/**
 	 * Contains the current scope of procedures
 	 */
-	private Scope<Procedure> procedures;
+	private OrderedMap<Procedure> procedures;
 
 	/**
 	 * list of state variables
@@ -189,25 +191,22 @@ public class RVCCalASTParser {
 	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
 		currentScope = new Scope<VarDef>();
-		procedures = new Scope<Procedure>();
+		procedures = new OrderedMap<Procedure>();
 
 		// TODO remove when scopeProcedures are actually used
 		procedures.toString();
 
 		parameters = parseVarDefs(currentScope, tree.getChild(2));
 
-		inputs = new Scope<VarDef>();
-		parseVarDefs(inputs, tree.getChild(3));
-
-		outputs = new Scope<VarDef>();
-		parseVarDefs(outputs, tree.getChild(4));
+		inputs = parsePorts(tree.getChild(3));
+		outputs = parsePorts(tree.getChild(4));
 
 		actions = new ActionList();
 		stateVars = new ArrayList<StateVar>();
 		parseActorDecls(tree.getChild(5));
 
-		return new Actor(name, file, parameters, inputs.getList(), outputs
-				.getList(), stateVars, null, null, null, null, null);
+		return new Actor(name, file, parameters, inputs, outputs, stateVars,
+				null, null, null, null, null);
 	}
 
 	/**
@@ -281,6 +280,31 @@ public class RVCCalASTParser {
 		int endColumn = startColumn + tree.getText().length();
 
 		return new Location(lineNumber, startColumn, endColumn);
+	}
+
+	/**
+	 * Returns an ordered map of ports parsed from the given tree.
+	 * 
+	 * @param tree
+	 *            a tree
+	 * @return an ordered map of ports
+	 */
+	private OrderedMap<Port> parsePorts(Tree tree) throws OrccException {
+		OrderedMap<Port> ports = new OrderedMap<Port>();
+		int numPorts = tree.getChildCount();
+		for (int i = 0; i < numPorts; i++) {
+			Tree child = tree.getChild(i);
+
+			IType type = parseType(child.getChild(0));
+			Tree nameTree = child.getChild(1);
+			String name = nameTree.getText();
+			Location location = parseLocation(nameTree);
+
+			Port port = new Port(location, type, name);
+			ports.register(file, location, name, port);
+		}
+
+		return ports;
 	}
 
 	private void parsePriority(Tree tree) {
@@ -410,7 +434,7 @@ public class RVCCalASTParser {
 	 * @param tree
 	 *            a tree
 	 */
-	private List<VarDef> parseVarDefs(Scope<VarDef> scope, Tree tree)
+	private List<VarDef> parseVarDefs(OrderedMap<VarDef> scope, Tree tree)
 			throws OrccException {
 		List<VarDef> varDefs = new ArrayList<VarDef>();
 		int numPorts = tree.getChildCount();

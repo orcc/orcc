@@ -7,13 +7,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.frontend.parser.RVCCalASTParser;
 import net.sf.orcc.ir.IrConstants;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.BoolType;
@@ -23,6 +22,7 @@ import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.util.OrderedMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,10 +89,31 @@ public class ActorWriter {
 		return array;
 	}
 
-	private JSONArray writePorts(List<VarDef> ports) throws OrccException {
+	/**
+	 * Writes the given port.
+	 * 
+	 * @param port
+	 *            a port
+	 * @return a JSON array
+	 * @throws OrccException
+	 */
+	private JSONArray writePort(Port port) throws OrccException {
 		JSONArray array = new JSONArray();
-		for (VarDef varDef : ports) {
-			array.put(writeVarDef(varDef));
+
+		JSONArray details = new JSONArray();
+		details.put(port.getName());
+
+		array.put(details);
+		array.put(writeLocation(port.getLocation()));
+		array.put(writeType(port.getType()));
+
+		return array;
+	}
+
+	private JSONArray writePorts(OrderedMap<Port> ports) throws OrccException {
+		JSONArray array = new JSONArray();
+		for (Port port : ports) {
+			array.put(writePort(port));
 		}
 
 		return array;
@@ -129,31 +150,31 @@ public class ActorWriter {
 		}
 	}
 
-	private JSONArray writeVarDef(VarDef varDef) throws OrccException {
-		JSONArray array = new JSONArray();
-
-		JSONArray details = new JSONArray();
-		details.put(varDef.getName());
-		details.put(varDef.isAssignable());
-		details.put(varDef.isGlobal());
-		if (varDef.hasSuffix()) {
-			details.put(varDef.getSuffix());
-		} else {
-			details.put((Object) null);
-		}
-		details.put(varDef.getIndex());
-
-		// TODO write node id
-		details.put(42); // node Id
-
-		array.put(details);
-		array.put(writeLocation(varDef.getLoc()));
-		array.put(writeType(varDef.getType()));
-
-		// TODO write def-use chains
-		array.put(new JSONArray());
-
-		return array;
-	}
+	// private JSONArray writeVarDef(VarDef varDef) throws OrccException {
+	// JSONArray array = new JSONArray();
+	//
+	// JSONArray details = new JSONArray();
+	// details.put(varDef.getName());
+	// details.put(varDef.isAssignable());
+	// details.put(varDef.isGlobal());
+	// if (varDef.hasSuffix()) {
+	// details.put(varDef.getSuffix());
+	// } else {
+	// details.put((Object) null);
+	// }
+	// details.put(varDef.getIndex());
+	//
+	// // TODO write node id
+	// details.put(42); // node Id
+	//
+	// array.put(details);
+	// array.put(writeLocation(varDef.getLoc()));
+	// array.put(writeType(varDef.getType()));
+	//
+	// // TODO write def-use chains
+	// array.put(new JSONArray());
+	//
+	// return array;
+	// }
 
 }

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.PluginGroupLoader;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
@@ -43,6 +44,7 @@ import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.util.OrderedMap;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -138,8 +140,8 @@ public class CActorPrinter {
 		return procTmpl;
 	}
 
-	private void fillPorts(List<String> portNames, List<VarDef> ports) {
-		for (VarDef port : ports) {
+	private void fillPorts(List<String> portNames, OrderedMap<Port> ports) {
+		for (Port port : ports) {
 			portNames.add(port.getName());
 		}
 	}
@@ -202,10 +204,10 @@ public class CActorPrinter {
 		template.setAttribute("initialize", actor.getInitializes());
 	}
 
-	private void setFifos(String attribute, List<VarDef> ports) {
+	private void setFifos(String attribute, OrderedMap<Port> ports) {
 		int size = ports.size();
 		List<String> names = new ArrayList<String>(size);
-		for (VarDef port : ports) {
+		for (Port port : ports) {
 			names.add(port.getName());
 		}
 

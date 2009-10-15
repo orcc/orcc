@@ -26,78 +26,93 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.type.IType;
 
 /**
- * @author Jérôme GORIN
+ * This class represents a port.
+ * 
+ * @author Matthieu Wipliez
  * 
  */
-public class LabelNode extends AbstractLLVMNode {
+public class Port {
 
-	private String labelName;
+	/**
+	 * port location
+	 */
+	private Location location;
 
-	private List<LabelNode> precedence;
+	/**
+	 * port name
+	 */
+	private String name;
 
-	private AbstractNode successor;
+	/**
+	 * port type
+	 */
+	private IType type;
 
-	public LabelNode(int id, Location location, String labelName) {
-		super(id, location);
-		precedence = new ArrayList<LabelNode>();
-		this.labelName = labelName;
-		this.successor = null;
+	/**
+	 * Creates a new port with the given location, type, and name.
+	 * 
+	 * @param location
+	 *            the port location
+	 * @param type
+	 *            the port type
+	 * @param name
+	 *            the port name
+	 */
+	public Port(Location location, IType type, String name) {
+		this.location = location;
+		this.type = type;
+		this.name = name;
 	}
 
-	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	/**
+	 * Creates a new port from the given port
+	 */
+	public Port(Port port) {
+		this.location = port.location;
+		this.type = port.type;
+		this.name = port.name;
 	}
 
-	public void addPrecedence(LabelNode precedence) {
-		this.precedence.add(precedence);
+	/**
+	 * Returns the location of this port;
+	 * 
+	 * @return the location of this port
+	 */
+	public Location getLocation() {
+		return location;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof LabelNode) {
-			return (labelName.compareTo(((LabelNode) obj).getLabelName()) == 0);
-		} else {
-			return false;
-		}
+	/**
+	 * Returns the name of this port.
+	 * 
+	 * @return the name of this port
+	 */
+	public String getName() {
+		return name;
 	}
 
-	public String getLabelName() {
-		return labelName;
+	/**
+	 * Returns the type of this port.
+	 * 
+	 * @return the type of this port
+	 */
+	public IType getType() {
+		return type;
 	}
 
-	public List<LabelNode> getPrecedence() {
-		return precedence;
-	}
-
-	public AbstractNode getSuccessor() {
-		return successor;
-	}
-
-	public void setLabelName(String labelName) {
-		this.labelName = labelName;
-	}
-
-	public void setPrecedence(List<LabelNode> precedence) {
-		this.precedence = precedence;
-	}
-
-	public void setSuccessor(AbstractNode successor) {
-		this.successor = successor;
-	}
-
-	@Override
-	public String toString() {
-		return labelName;
+	/**
+	 * Sets the name of this port.
+	 * 
+	 * @param name
+	 *            the new name of this port
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

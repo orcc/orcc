@@ -87,7 +87,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.ActionScheduler;
@@ -134,6 +135,7 @@ import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.util.OrderedMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -255,8 +257,8 @@ public class IrParser {
 
 			file = obj.getString(KEY_SOURCE_FILE);
 			String name = obj.getString(KEY_NAME);
-			List<VarDef> inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
-			List<VarDef> outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
+			OrderedMap<Port> inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
+			OrderedMap<Port> outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
 
 			JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
 			List<StateVar> stateVars = parseStateVars(array);
@@ -638,11 +640,18 @@ public class IrParser {
 	 * @return A {@link List}&lt;{@link VarDef}&gt;.
 	 * @throws JSONException
 	 */
-	private List<VarDef> parsePorts(JSONArray array) throws JSONException,
+	private OrderedMap<Port> parsePorts(JSONArray array) throws JSONException,
 			OrccException {
-		List<VarDef> ports = new ArrayList<VarDef>();
+		OrderedMap<Port> ports = new OrderedMap<Port>();
 		for (int i = 0; i < array.length(); i++) {
-			ports.add(parseVarDef(array.getJSONArray(i)));
+			JSONArray port = array.getJSONArray(i);
+
+			String name = port.getJSONArray(0).getString(0);
+			Location location = parseLocation(port.getJSONArray(1));
+			IType type = parseType(port.get(2));
+
+			Port po = new Port(location, type, name);
+			ports.register(file, location, name, po);
 		}
 
 		return ports;

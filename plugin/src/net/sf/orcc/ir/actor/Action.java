@@ -31,7 +31,7 @@ package net.sf.orcc.ir.actor;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.VarDef;
 

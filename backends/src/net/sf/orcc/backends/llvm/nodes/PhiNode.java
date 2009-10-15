@@ -30,7 +30,7 @@ package net.sf.orcc.backends.llvm.nodes;
 
 import java.util.Map;
 
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.type.IType;
 

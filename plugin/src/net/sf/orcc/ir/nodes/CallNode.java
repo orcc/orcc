@@ -30,7 +30,7 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.IExpr;

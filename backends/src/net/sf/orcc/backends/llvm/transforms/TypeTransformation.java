@@ -49,7 +49,8 @@ import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
@@ -82,6 +83,7 @@ import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * Verify coherence type for every nodes.
@@ -189,8 +191,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	 * Store ports of the current actor
 	 * 
 	 */
-	private void fillPorts(List<VarDef> ports) {
-		for (VarDef port : ports) {
+	private void fillPorts(OrderedMap<Port> ports) {
+		for (Port port : ports) {
 			portIndex.put(port.getName(), new Integer(0));
 		}
 	}

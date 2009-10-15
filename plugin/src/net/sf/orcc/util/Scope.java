@@ -26,60 +26,77 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.util;
+
 
 /**
+ * A scope is an ordered map of <string, object> extended with the notion of
+ * hierarchy.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class Location {
+public class Scope<T> extends OrderedMap<T> {
 
-	private int endColumn;
-
-	private int startColumn;
-
-	private int startLine;
+	private Scope<T> parent;
 
 	/**
-	 * Constructs a dummy location.
+	 * Creates a top-level scope.
 	 */
-	public Location() {
+	public Scope() {
+		this(null);
 	}
 
 	/**
-	 * Constructs a location from the specified start line, start column, end
-	 * column.
+	 * Creates a scope with the given parent.
 	 * 
-	 * @param file
-	 *            The file name.
-	 * @param startLine
-	 *            The line where the location starts.
-	 * @param startColumn
-	 *            The column where the location starts.
-	 * @param endColumn
-	 *            The column where the location ends.
+	 * @param parent
+	 *            the parent scope
 	 */
-	public Location(int startLine, int startColumn, int endColumn) {
-		this.startLine = startLine;
-		this.startColumn = startColumn;
-		this.endColumn = endColumn;
+	public Scope(Scope<T> parent) {
+		this.parent = parent;
 	}
 
-	public int getEndColumn() {
-		return endColumn;
+	/**
+	 * Returns the parent of this scope
+	 * 
+	 * @return a scope, or <code>null</code> if this scope has no parent
+	 */
+	public Scope<T> getParent() {
+		return parent;
 	}
 
-	public int getStartColumn() {
-		return startColumn;
+	/**
+	 * Returns the object that has the given name. If the object is not found in
+	 * the current scope, the parent scope is queried.
+	 * 
+	 * @param name
+	 *            the name of an object.
+	 * @return the object that has the given name, or <code>null</code>
+	 */
+	@Override
+	public T resolveName(String name) {
+		T object = super.resolveName(name);
+		if (object == null) {
+			if (parent == null) {
+				// top-level scope, no object
+				return null;
+			} else {
+				// child scope, query parent
+				return parent.resolveName(name);
+			}
+		} else {
+			// object found
+			return object;
+		}
 	}
 
-	public int getStartLine() {
-		return startLine;
-	}
-
+	@Override
 	public String toString() {
-		String res = "line " + startLine + ", characters " + startColumn + "-"
-				+ endColumn;
+		String res = super.toString();
+		if (parent != null) {
+			res += "\n" + parent;
+		}
 		return res;
 	}
 

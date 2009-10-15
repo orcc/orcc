@@ -30,7 +30,9 @@ package net.sf.orcc.ir.actor;
 
 import java.util.List;
 
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * @author Matthieu Wipliez
@@ -49,13 +51,13 @@ public class Actor {
 
 	private List<Action> initializes;
 
-	private List<VarDef> inputs;
+	private OrderedMap<Port> inputs;
 
 	private List<Procedure> instantations;
 
 	private String name;
 
-	private List<VarDef> outputs;
+	private OrderedMap<Port> outputs;
 
 	private List<VarDef> parameters;
 
@@ -64,7 +66,7 @@ public class Actor {
 	private List<StateVar> stateVars;
 
 	public Actor(String name, String file, List<VarDef> parameters,
-			List<VarDef> inputs, List<VarDef> outputs,
+			OrderedMap<Port> inputs, OrderedMap<Port> outputs,
 			List<StateVar> stateVars, List<Procedure> procs,
 			List<Action> actions, List<Action> initializes,
 			ActionScheduler scheduler, List<Procedure> instantations) {
@@ -102,17 +104,23 @@ public class Actor {
 		return initializes;
 	}
 
-	public VarDef getInput(String port) {
-		for (VarDef varDef : inputs) {
-			if (varDef.getName().equals(port)) {
-				return varDef;
-			}
-		}
-
-		return null;
+	/**
+	 * Returns the input port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an input port whose name matches the given name
+	 */
+	public Port getInput(String name) {
+		return inputs.resolveName(name);
 	}
 
-	public List<VarDef> getInputs() {
+	/**
+	 * Returns the ordered map of input ports.
+	 * 
+	 * @return the ordered map of input ports
+	 */
+	public OrderedMap<Port> getInputs() {
 		return inputs;
 	}
 
@@ -124,17 +132,23 @@ public class Actor {
 		return name;
 	}
 
-	public VarDef getOutput(String port) {
-		for (VarDef varDef : outputs) {
-			if (varDef.getName().equals(port)) {
-				return varDef;
-			}
-		}
-
-		return null;
+	/**
+	 * Returns the output port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an output port whose name matches the given name
+	 */
+	public Port getOutput(String name) {
+		return outputs.resolveName(name);
 	}
 
-	public List<VarDef> getOutputs() {
+	/**
+	 * Returns the ordered map of output ports.
+	 * 
+	 * @return the ordered map of output ports
+	 */
+	public OrderedMap<Port> getOutputs() {
 		return outputs;
 	}
 

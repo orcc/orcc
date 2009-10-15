@@ -31,6 +31,7 @@ package net.sf.orcc.ir;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;

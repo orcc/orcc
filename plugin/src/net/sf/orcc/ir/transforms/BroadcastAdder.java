@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
@@ -69,9 +69,9 @@ public class BroadcastAdder {
 					.outgoingEdgesOf(instance));
 
 			// create a (port => list of connections) map
-			Map<VarDef, List<Connection>> outMap = new HashMap<VarDef, List<Connection>>();
+			Map<Port, List<Connection>> outMap = new HashMap<Port, List<Connection>>();
 			for (Connection connection : connections) {
-				VarDef src = connection.getSource();
+				Port src = connection.getSource();
 				List<Connection> outList = outMap.get(src);
 				if (outList == null) {
 					outList = new ArrayList<Connection>();
@@ -82,7 +82,7 @@ public class BroadcastAdder {
 
 			Actor srcActor = instance.getActor();
 			for (Connection connection : connections) {
-				VarDef src = connection.getSource();
+				Port src = connection.getSource();
 				if (src != null) {
 					List<Connection> outList = outMap.get(src);
 					int numOutput = outList.size();
@@ -92,7 +92,7 @@ public class BroadcastAdder {
 						graph.addVertex(bcast);
 
 						// from source to broadcast
-						VarDef tgt = new VarDef(connection.getTarget());
+						Port tgt = new Port(connection.getTarget());
 						tgt.setName("input");
 
 						IAttribute size = connection
@@ -106,7 +106,7 @@ public class BroadcastAdder {
 						for (Connection conn : outList) {
 							// new connection
 							Instance target = graph.getEdgeTarget(conn);
-							src = new VarDef(conn.getSource());
+							src = new Port(conn.getSource());
 							src.setName("output_" + i);
 							i++;
 

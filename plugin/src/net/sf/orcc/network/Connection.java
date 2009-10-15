@@ -32,13 +32,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.Util;
-import net.sf.orcc.network.attributes.ValueAttribute;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
+import net.sf.orcc.network.attributes.ValueAttribute;
 
 /**
  * This class represents a connection in a network. A connection can have a
@@ -62,12 +62,12 @@ public class Connection {
 	/**
 	 * source port
 	 */
-	private VarDef source;
+	private Port source;
 
 	/**
 	 * target port
 	 */
-	private VarDef target;
+	private Port target;
 
 	/**
 	 * Creates a connection from source port to target port with the given size.
@@ -81,7 +81,7 @@ public class Connection {
 	 * @param size
 	 *            the size of this FIFO
 	 */
-	public Connection(VarDef source, VarDef target, int size) {
+	public Connection(Port source, Port target, int size) {
 		this.attributes = new HashMap<String, IAttribute>();
 		attributes.put(BUFFER_SIZE, new ValueAttribute(new IntExpr(size)));
 		this.source = source;
@@ -99,7 +99,7 @@ public class Connection {
 	 * @param attributes
 	 *            a map of attributes
 	 */
-	public Connection(VarDef source, VarDef target,
+	public Connection(Port source, Port target,
 			Map<String, IAttribute> attributes) {
 		this.attributes = attributes;
 		this.source = source;
@@ -119,7 +119,7 @@ public class Connection {
 	 * @param attribute
 	 *            an attribute
 	 */
-	public Connection(VarDef source, VarDef target, String name,
+	public Connection(Port source, Port target, String name,
 			IAttribute attribute) {
 		this.attributes = new HashMap<String, IAttribute>();
 		attributes.put(name, attribute);
@@ -160,7 +160,7 @@ public class Connection {
 	 * 
 	 * @return this connection's source port
 	 */
-	public VarDef getSource() {
+	public Port getSource() {
 		return source;
 	}
 
@@ -169,7 +169,7 @@ public class Connection {
 	 * 
 	 * @return this connection's target port
 	 */
-	public VarDef getTarget() {
+	public Port getTarget() {
 		return target;
 	}
 
@@ -179,7 +179,7 @@ public class Connection {
 	 * @param source
 	 *            a port
 	 */
-	public void setSource(VarDef source) {
+	public void setSource(Port source) {
 		this.source = source;
 	}
 
@@ -189,7 +189,7 @@ public class Connection {
 	 * @param target
 	 *            a port
 	 */
-	public void setTarget(VarDef target) {
+	public void setTarget(Port target) {
 		this.target = target;
 	}
 

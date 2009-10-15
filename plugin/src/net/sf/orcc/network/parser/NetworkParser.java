@@ -38,7 +38,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -197,8 +198,8 @@ public class NetworkParser {
 		}
 	}
 
-	private void checkPortsVarDef(VarDef srcPort, String src_port,
-			VarDef dstPort, String dst_port) throws OrccException {
+	private void checkPortsVarDef(Port srcPort, String src_port,
+			Port dstPort, String dst_port) throws OrccException {
 		if (srcPort == null) {
 			throw new OrccException("A Connection refers to "
 					+ "a non-existent source port: \"" + src_port + "\"");
@@ -309,8 +310,8 @@ public class NetworkParser {
 
 		checkInstances(source, src, target, dst);
 
-		VarDef srcPort = source.getActor().getOutput(src_port);
-		VarDef dstPort = target.getActor().getInput(dst_port);
+		Port srcPort = source.getActor().getOutput(src_port);
+		Port dstPort = target.getActor().getInput(dst_port);
 
 		checkPortsVarDef(srcPort, src_port, dstPort, dst_port);
 

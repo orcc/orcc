@@ -41,7 +41,7 @@ import java.util.TreeSet;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.backends.c.TypeToString;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.Util;
@@ -260,11 +260,10 @@ public class LLVMNetworkPrinter {
 					count = 0;
 					attrs.put("id", instance.getId());
 					size = instance.getActor().getInputs().size();
-					attrs
-							.put("nbInput", instance.getActor().getInputs()
-									.size());
+					int nb = instance.getActor().getInputs().size();
+					attrs.put("nbInput", nb);
 
-					for (VarDef input : instance.getActor().getInputs()) {
+					for (Port input : instance.getActor().getInputs()) {
 						if (count == size - 1)
 							inputName.add(input.getName());
 						else
@@ -278,7 +277,7 @@ public class LLVMNetworkPrinter {
 					size = instance.getActor().getOutputs().size();
 					attrs.put("nbOutput", instance.getActor().getOutputs()
 							.size());
-					for (VarDef output : instance.getActor().getOutputs()) {
+					for (Port output : instance.getActor().getOutputs()) {
 						if (count == size - 1)
 							outputName.add(output.getName());
 						else

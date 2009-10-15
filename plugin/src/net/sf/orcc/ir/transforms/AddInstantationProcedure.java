@@ -31,7 +31,8 @@ package net.sf.orcc.ir.transforms;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -40,6 +41,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * Adds control flow.
@@ -62,7 +64,8 @@ public class AddInstantationProcedure {
 		actor.setInstantations(instations);
 	}
 
-	private Procedure createInitProcedure(String Attributs, List<VarDef> ports) {
+	private Procedure createInitProcedure(String Attributs,
+			OrderedMap<Port> ports) {
 		List<VarDef> parameters = new ArrayList<VarDef>();
 		List<VarDef> locals = new ArrayList<VarDef>();
 		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
@@ -71,8 +74,7 @@ public class AddInstantationProcedure {
 				null, null, null, new VoidType());
 
 		parameters.add(parameter);
-		for (VarDef port : ports) {
-
+		for (Port port : ports) {
 			VarUse varuse = new VarUse(parameter, null);
 			VarExpr expr = new VarExpr(new Location(), varuse);
 

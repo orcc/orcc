@@ -39,7 +39,7 @@ import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.backends.java.JavaConstPrinter;
 import net.sf.orcc.backends.java.JavaExprPrinter;
 import net.sf.orcc.backends.java.JavaTypePrinter;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.StateVar;

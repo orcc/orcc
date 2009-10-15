@@ -31,7 +31,7 @@ package net.sf.orcc.ir.expr;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
 
 /**
  * @author Matthieu Wipliez

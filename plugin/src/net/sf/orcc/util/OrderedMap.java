@@ -30,11 +30,12 @@ package net.sf.orcc.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
 
 /**
  * An ordered map maintains mapping of string to object as well as the order in
@@ -43,7 +44,7 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class OrderedMap<T> {
+public class OrderedMap<T> implements Iterable<T> {
 
 	private Map<String, T> map;
 
@@ -64,6 +65,11 @@ public class OrderedMap<T> {
 	 */
 	public List<T> getList() {
 		return objects;
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		return objects.iterator();
 	}
 
 	/**
@@ -96,6 +102,15 @@ public class OrderedMap<T> {
 	 */
 	public T resolveName(String name) {
 		return map.get(name);
+	}
+
+	/**
+	 * Returns the number of elements in this ordered map.
+	 * 
+	 * @return the number of elements in this ordered map
+	 */
+	public int size() {
+		return objects.size();
 	}
 
 	@Override

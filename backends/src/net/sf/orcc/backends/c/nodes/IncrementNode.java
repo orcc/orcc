@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.c.nodes;
 
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.VarDef;
 
 /**

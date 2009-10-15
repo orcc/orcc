@@ -26,78 +26,80 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.frontend;
-
-import net.sf.orcc.util.OrderedMap;
+package net.sf.orcc.common;
 
 /**
- * A scope is an ordered map of <string, object> extended with the notion of
- * hierarchy.
+ * This class represents a location. A location keeps track of where a
+ * particular element was in the original file. It contains the line, and
+ * starting and ending columns.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Scope<T> extends OrderedMap<T> {
+public class Location {
 
-	private Scope<T> parent;
+	private int endColumn;
+
+	private int startColumn;
+
+	private int startLine;
 
 	/**
-	 * Creates a top-level scope.
+	 * Constructs a dummy location.
 	 */
-	public Scope() {
-		this(null);
+	public Location() {
 	}
 
 	/**
-	 * Creates a scope with the given parent.
+	 * Constructs a location from the specified start line, start column, end
+	 * column.
 	 * 
-	 * @param parent
-	 *            the parent scope
+	 * @param file
+	 *            The file name.
+	 * @param startLine
+	 *            The line where the location starts.
+	 * @param startColumn
+	 *            The column where the location starts.
+	 * @param endColumn
+	 *            The column where the location ends.
 	 */
-	public Scope(Scope<T> parent) {
-		this.parent = parent;
+	public Location(int startLine, int startColumn, int endColumn) {
+		this.startLine = startLine;
+		this.startColumn = startColumn;
+		this.endColumn = endColumn;
 	}
 
 	/**
-	 * Returns the parent of this scope
+	 * Returns the ending column of this location.
 	 * 
-	 * @return a scope, or <code>null</code> if this scope has no parent
+	 * @return the ending column of this location
 	 */
-	public Scope<T> getParent() {
-		return parent;
+	public int getEndColumn() {
+		return endColumn;
 	}
 
 	/**
-	 * Returns the object that has the given name. If the object is not found in
-	 * the current scope, the parent scope is queried.
+	 * Returns the starting column of this location.
 	 * 
-	 * @param name
-	 *            the name of an object.
-	 * @return the object that has the given name, or <code>null</code>
+	 * @return the starting column of this location
 	 */
-	@Override
-	public T resolveName(String name) {
-		T object = super.resolveName(name);
-		if (object == null) {
-			if (parent == null) {
-				// top-level scope, no object
-				return null;
-			} else {
-				// child scope, query parent
-				return parent.resolveName(name);
-			}
-		} else {
-			// object found
-			return object;
-		}
+	public int getStartColumn() {
+		return startColumn;
+	}
+
+	/**
+	 * Returns the starting line of this location.
+	 * 
+	 * @return the starting line of this location
+	 */
+	public int getStartLine() {
+		return startLine;
 	}
 
 	@Override
 	public String toString() {
-		String res = super.toString();
-		if (parent != null) {
-			res += "\n" + parent;
-		}
+		String res = "line " + startLine + ", characters " + startColumn + "-"
+				+ endColumn;
 		return res;
 	}
 

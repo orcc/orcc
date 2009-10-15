@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.frontend;
+package net.sf.orcc.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,11 +35,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.Action;
 
 /**
- * Action list.
+ * A list of action is like an ordered map, except keys are tags (list of
+ * strings).
  * 
  * @author Matthieu Wipliez
  * 
