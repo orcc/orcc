@@ -237,7 +237,7 @@ let mk_type_name name children =
 	mk_elt "Type" [mk_attribute "name" name] children
 
 let mk_entry_size size =
-	mk_elt "Entry" [mk_attribute "name" "size"]
+	mk_elt "Entry" [mk_attribute "kind" "Expr"; mk_attribute "name" "size"]
 		[mk_expr (Calast.ExprInt (dummy_loc, size))]
 
 let rec mk_type = function
@@ -251,7 +251,8 @@ let rec mk_type = function
 	| Calir.TypeVoid -> failwith "type void not supported"
 
 and mk_entry_type typ =
-	mk_elt "Entry" [mk_attribute "name" "type"] [mk_type typ]
+	mk_elt "Entry" [mk_attribute "kind" "Type"; mk_attribute "name" "type"]
+		[mk_type typ]
 
 let mk_parameters parameters existing =
 	List.fold_left

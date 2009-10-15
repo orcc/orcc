@@ -31,12 +31,11 @@ package net.sf.orcc.network;
 import java.util.HashMap;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.type.IType;
 
 /**
- * An Instance is an {@link Actor} with parameters.
+ * This class defines a broadcast as a particular instance.
  * 
  * @author Matthieu Wipliez
  * 
@@ -51,7 +50,7 @@ public class Broadcast extends Instance {
 
 	public Broadcast(String actorName, String portName, int numOutput,
 			IType type) throws OrccException {
-		super(null, "broadcast_" + actorName + "_" + portName, CLASS,
+		super("broadcast_" + actorName + "_" + portName, CLASS,
 				new HashMap<String, IExpr>());
 		this.numOutput = numOutput;
 		this.type = type;
