@@ -47,7 +47,13 @@ import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.Entry;
 import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -108,7 +114,7 @@ public class NetworkParser {
 	/**
 	 * list of input ports
 	 */
-	private OrderedMap<VarDef> inputs;
+	private OrderedMap<Port> inputs;
 
 	/**
 	 * map of string -> instances
@@ -118,7 +124,7 @@ public class NetworkParser {
 	/**
 	 * list of output ports
 	 */
-	private OrderedMap<VarDef> outputs;
+	private OrderedMap<Port> outputs;
 
 	/**
 	 * list of parameters
@@ -198,8 +204,8 @@ public class NetworkParser {
 		}
 	}
 
-	private void checkPortsVarDef(Port srcPort, String src_port,
-			Port dstPort, String dst_port) throws OrccException {
+	private void checkPortsVarDef(Port srcPort, String src_port, Port dstPort,
+			String dst_port) throws OrccException {
 		if (srcPort == null) {
 			throw new OrccException("A Connection refers to "
 					+ "a non-existent source port: \"" + src_port + "\"");
@@ -326,7 +332,15 @@ public class NetworkParser {
 		throw new OrccException("Decl not yet implemented");
 	}
 
+	/**
+	 * Parses expressions.
+	 * 
+	 * @param node
+	 * @return
+	 * @throws OrccException
+	 */
 	private IExpr parseExpr(Node node) throws OrccException {
+		// TODO add support for unary/binary expressions
 		while (node != null) {
 			if (node.getNodeName().equals("Expr")) {
 				Element elt = (Element) node;
@@ -474,23 +488,30 @@ public class NetworkParser {
 	}
 
 	/**
-	 * Parses a port.
+	 * Parses a port, and adds it to {@link #inputs} or {@link #outputs},
+	 * depending on the port's kind attribute.
 	 * 
-	 * @param port
+	 * @param eltPort
 	 *            a DOM element named "Port"
 	 * @throws OrccException
 	 */
-	private void parsePort(Element port) throws OrccException {
-		String name = port.getAttribute("name");
+	private void parsePort(Element eltPort) throws OrccException {
+		Location location = new Location();
+		IType type = parseType(eltPort.getFirstChild());
+		String name = eltPort.getAttribute("name");
 		if (name.isEmpty()) {
-			throw new OrccException("A Port has an empty name");
+			throw new OrccException("A port has an empty name");
 		}
 
-		String kind = port.getAttribute("kind");
+		// creates a port
+		Port port = new Port(location, type, name);
+
+		// adds the port to inputs or outputs depending on its kind
+		String kind = eltPort.getAttribute("kind");
 		if (kind.equals("Input")) {
-
+			inputs.register(file.toString(), location, name, port);
 		} else if (kind.equals("Output")) {
-
+			outputs.register(file.toString(), location, name, port);
 		} else {
 			throw new OrccException("Port \"" + name + "\", invalid kind: \""
 					+ kind + "\"");
@@ -503,10 +524,82 @@ public class NetworkParser {
 	 * @param node
 	 *            the node to parse as a type.
 	 * @return a type
+	 * @throws OrccException
+	 *             if the node could not be parsed as a type
 	 */
-	private IType parseType(Node node) {
-		// TODO Auto-generated method stub
-		return null;
+	private IType parseType(Node node) throws OrccException {
+		while (node != null) {
+			if (node.getNodeName().equals("Type")) {
+				Element eltType = (Element) node;
+				String name = eltType.getAttribute("name");
+				if (name.equals(BoolType.NAME)) {
+					return new BoolType();
+				} else if (name.equals(IntType.NAME)) {
+					Map<String, Entry> entries = parseTypeEntries(node
+							.getFirstChild());
+					IExpr size = entries.get("size").getEntryAsExpr();
+					return new IntType(size);
+				} else if (name.equals(ListType.NAME)) {
+					Map<String, Entry> entries = parseTypeEntries(node
+							.getFirstChild());
+					IExpr size = entries.get("size").getEntryAsExpr();
+					IType type = entries.get("type").getEntryAsType();
+					return new ListType(size, type);
+				} else if (name.equals(StringType.NAME)) {
+					return new StringType();
+				} else if (name.equals(UintType.NAME)) {
+					Map<String, Entry> entries = parseTypeEntries(node
+							.getFirstChild());
+					IExpr size = entries.get("size").getEntryAsExpr();
+					return new UintType(size);
+				} else {
+					throw new OrccException("unknown type name: \"" + name
+							+ "\"");
+				}
+			}
+
+			node = node.getNextSibling();
+		}
+
+		throw new OrccException("type not found");
+	}
+
+	/**
+	 * Parses the node and its siblings as type entries, and returns a map of
+	 * entry names to contents.
+	 * 
+	 * @param node
+	 *            The first node susceptible to be an entry, or
+	 *            <code>null</code>.
+	 * @return A map of entry names to contents.
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	private Map<String, Entry> parseTypeEntries(Node node) throws OrccException {
+		Map<String, Entry> entries = new HashMap<String, Entry>();
+		while (node != null) {
+			if (node.getNodeName().equals("Entry")) {
+				Element element = (Element) node;
+				String name = element.getAttribute("name");
+				String kind = element.getAttribute("kind");
+
+				Entry entry = null;
+				if (kind.equals("Expr")) {
+					entry = new Entry(parseExpr(node.getFirstChild()));
+				} else if (kind.equals("Type")) {
+					entry = new Entry(parseType(node.getFirstChild()));
+				} else {
+					throw new OrccException("unsupported entry type: \"" + kind
+							+ "\"");
+				}
+
+				entries.put(name, entry);
+			}
+
+			node = node.getNextSibling();
+		}
+
+		return entries;
 	}
 
 	/**
@@ -530,9 +623,9 @@ public class NetworkParser {
 		}
 
 		graph = new DirectedMultigraph<Instance, Connection>(Connection.class);
-		inputs = new OrderedMap<VarDef>();
+		inputs = new OrderedMap<Port>();
 		instances = new HashMap<String, Instance>();
-		outputs = new OrderedMap<VarDef>();
+		outputs = new OrderedMap<Port>();
 		parameters = new OrderedMap<VarDef>();
 
 		parseBody(root);

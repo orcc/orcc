@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.network;
 
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.util.OrderedMap;
 
@@ -43,11 +44,11 @@ public class Network {
 
 	private DirectedGraph<Instance, Connection> graph;
 
-	private OrderedMap<VarDef> inputs;
+	private OrderedMap<Port> inputs;
 
 	private String name;
 
-	private OrderedMap<VarDef> outputs;
+	private OrderedMap<Port> outputs;
 
 	private OrderedMap<VarDef> parameters;
 
@@ -63,8 +64,8 @@ public class Network {
 	 * @param graph
 	 *            graph representing the network's contents
 	 */
-	public Network(String name, OrderedMap<VarDef> inputs,
-			OrderedMap<VarDef> outputs, OrderedMap<VarDef> parameters,
+	public Network(String name, OrderedMap<Port> inputs,
+			OrderedMap<Port> outputs, OrderedMap<VarDef> parameters,
 			DirectedGraph<Instance, Connection> graph) {
 		this.name = name;
 		this.inputs = inputs;
@@ -87,7 +88,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's input ports
 	 */
-	public OrderedMap<VarDef> getInputs() {
+	public OrderedMap<Port> getInputs() {
 		return inputs;
 	}
 
@@ -105,7 +106,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's output ports
 	 */
-	public OrderedMap<VarDef> getOutputs() {
+	public OrderedMap<Port> getOutputs() {
 		return outputs;
 	}
 

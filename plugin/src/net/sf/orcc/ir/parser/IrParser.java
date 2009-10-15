@@ -609,7 +609,7 @@ public class IrParser {
 		Map<Port, Integer> pattern = new HashMap<Port, Integer>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray patternArray = array.getJSONArray(i);
-			Port port = ports.resolveName(patternArray.getString(0));
+			Port port = ports.get(patternArray.getString(0));
 			int numTokens = patternArray.getInt(1);
 			pattern.put(port, numTokens);
 		}

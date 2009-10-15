@@ -112,7 +112,7 @@ public class Actor {
 	 * @return an input port whose name matches the given name
 	 */
 	public Port getInput(String name) {
-		return inputs.resolveName(name);
+		return inputs.get(name);
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class Actor {
 	 * @return an output port whose name matches the given name
 	 */
 	public Port getOutput(String name) {
-		return outputs.resolveName(name);
+		return outputs.get(name);
 	}
 
 	/**

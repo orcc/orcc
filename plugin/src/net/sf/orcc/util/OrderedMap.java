@@ -59,6 +59,18 @@ public class OrderedMap<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Returns the object that has the given name.
+	 * 
+	 * @param name
+	 *            the name of an object.
+	 * @return the object that has the given name, or if it could not be found,
+	 *         <code>null</code>
+	 */
+	public T get(String name) {
+		return map.get(name);
+	}
+
+	/**
 	 * Returns the list of objects of this scope
 	 * 
 	 * @return the list of objects of this scope
@@ -90,18 +102,6 @@ public class OrderedMap<T> implements Iterable<T> {
 		}
 		objects.add(object);
 		map.put(name, object);
-	}
-
-	/**
-	 * Returns the object that has the given name.
-	 * 
-	 * @param name
-	 *            the name of an object.
-	 * @return the object that has the given name, or if it could not be found,
-	 *         <code>null</code>
-	 */
-	public T resolveName(String name) {
-		return map.get(name);
 	}
 
 	/**

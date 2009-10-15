@@ -26,78 +26,98 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.util;
+package net.sf.orcc.ir.type;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
- * A scope is an ordered map of <string, object> extended with the notion of
- * hierarchy.
+ * This class defines a type entry.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Scope<T> extends OrderedMap<T> {
-
-	private Scope<T> parent;
+public class Entry {
 
 	/**
-	 * Creates a top-level scope.
+	 * expression entry
 	 */
-	public Scope() {
-		this(null);
+	public static final int EXPR = 1;
+
+	/**
+	 * type entry
+	 */
+	public static final int TYPE = 2;
+
+	/**
+	 * the contents of this entry: expression or type.
+	 */
+	private Object content;
+
+	/**
+	 * the type of this entry
+	 */
+	private int type;
+
+	/**
+	 * Creates a new expression entry
+	 * 
+	 * @param expr
+	 *            an expression
+	 */
+	public Entry(IExpr expr) {
+		this.content = expr;
+		this.type = EXPR;
 	}
 
 	/**
-	 * Creates a scope with the given parent.
+	 * Creates a new type entry
 	 * 
-	 * @param parent
-	 *            the parent scope
+	 * @param type
+	 *            a type
 	 */
-	public Scope(Scope<T> parent) {
-		this.parent = parent;
+	public Entry(IType type) {
+		this.content = type;
+		this.type = TYPE;
 	}
 
 	/**
-	 * Returns the object that has the given name. If the object is not found in
-	 * the current scope, the parent scope is queried.
+	 * Returns this entry's content as an expression
 	 * 
-	 * @param name
-	 *            the name of an object.
-	 * @return the object that has the given name, or <code>null</code>
+	 * @return this entry's content as an expression
+	 * @throws OrccException
+	 *             if this entry does not contain an expression
 	 */
-	@Override
-	public T get(String name) {
-		T object = super.get(name);
-		if (object == null) {
-			if (parent == null) {
-				// top-level scope, no object
-				return null;
-			} else {
-				// child scope, query parent
-				return parent.get(name);
-			}
+	public IExpr getEntryAsExpr() throws OrccException {
+		if (getType() == EXPR) {
+			return (IExpr) content;
 		} else {
-			// object found
-			return object;
+			throw new OrccException("this entry does not contain an expression");
 		}
 	}
 
 	/**
-	 * Returns the parent of this scope
+	 * Returns this entry's content as a type
 	 * 
-	 * @return a scope, or <code>null</code> if this scope has no parent
+	 * @return this entry's content as a type
+	 * @throws OrccException
+	 *             if this entry does not contain a type
 	 */
-	public Scope<T> getParent() {
-		return parent;
+	public IType getEntryAsType() throws OrccException {
+		if (getType() == TYPE) {
+			return (IType) content;
+		} else {
+			throw new OrccException("this entry does not contain a type");
+		}
 	}
 
-	@Override
-	public String toString() {
-		String res = super.toString();
-		if (parent != null) {
-			res += "\n" + parent;
-		}
-		return res;
+	/**
+	 * Returns the type of this entry.
+	 * 
+	 * @return the type of this entry
+	 */
+	public int getType() {
+		return type;
 	}
 
 }
