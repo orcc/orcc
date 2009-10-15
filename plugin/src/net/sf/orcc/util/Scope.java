@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.util;
 
-
 /**
  * A scope is an ordered map of <string, object> extended with the notion of
  * hierarchy.

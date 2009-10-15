@@ -31,14 +31,24 @@ package net.sf.orcc.ir.consts;
 import java.util.List;
 
 /**
+ * This class defines a list constant.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class ListConst extends AbstractConst {
+public class ListConst implements IConst {
 
-	private List<AbstractConst> value;
+	private List<IConst> value;
 
-	public ListConst(List<AbstractConst> value) {
+	/**
+	 * Creates a new list constant with the given value.
+	 * 
+	 * @param value
+	 *            the value of the constant
+	 * @throws NullPointerException
+	 *             if value is <code>null</code>
+	 */
+	public ListConst(List<IConst> value) {
 		if (value == null) {
 			throw new NullPointerException();
 		}
@@ -51,7 +61,17 @@ public class ListConst extends AbstractConst {
 		visitor.visit(this, args);
 	}
 
-	public List<AbstractConst> getValue() {
+	@Override
+	public int getType() {
+		return LIST;
+	}
+
+	/**
+	 * Returns the value of this constant. The list returned is a reference.
+	 * 
+	 * @return the value of this constant
+	 */
+	public List<IConst> getValue() {
 		return value;
 	}
 

@@ -44,7 +44,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.consts.AbstractConst;
+import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -321,7 +321,7 @@ public class RVCCalASTParser {
 		boolean assignable = stateVar.getChild(2).getText()
 				.equals("ASSIGNABLE");
 		VarDef def = parseVarDef(stateVar, assignable, true, 0, null);
-		AbstractConst init = null;
+		IConst init = null;
 		if (stateVar.getChildCount() == 4) {
 		}
 

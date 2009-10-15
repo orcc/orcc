@@ -29,13 +29,21 @@
 package net.sf.orcc.ir.consts;
 
 /**
+ * This class defines a boolean constant.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class BoolConst extends AbstractConst {
+public class BoolConst implements IConst {
 
 	private boolean value;
 
+	/**
+	 * Creates a new boolean constant with the given value.
+	 * 
+	 * @param value
+	 *            the value of the constant
+	 */
 	public BoolConst(boolean value) {
 		this.value = value;
 	}
@@ -45,12 +53,18 @@ public class BoolConst extends AbstractConst {
 		visitor.visit(this, args);
 	}
 
-	public boolean getValue() {
-		return value;
+	@Override
+	public int getType() {
+		return BOOLEAN;
 	}
 
-	public void setValue(boolean value) {
-		this.value = value;
+	/**
+	 * Returns the value of this constant.
+	 * 
+	 * @return the value of this constant
+	 */
+	public boolean getValue() {
+		return value;
 	}
 
 	@Override

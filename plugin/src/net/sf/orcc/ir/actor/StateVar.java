@@ -29,7 +29,7 @@
 package net.sf.orcc.ir.actor;
 
 import net.sf.orcc.ir.VarDef;
-import net.sf.orcc.ir.consts.AbstractConst;
+import net.sf.orcc.ir.consts.IConst;
 
 /**
  * @author Matthieu Wipliez
@@ -39,9 +39,9 @@ public class StateVar {
 
 	private VarDef def;
 
-	private AbstractConst init;
+	private IConst init;
 
-	public StateVar(VarDef def, AbstractConst init) {
+	public StateVar(VarDef def, IConst init) {
 		this.def = def;
 		this.init = init;
 	}
@@ -50,7 +50,7 @@ public class StateVar {
 		return def;
 	}
 
-	public AbstractConst getInit() {
+	public IConst getInit() {
 		return init;
 	}
 
@@ -62,7 +62,7 @@ public class StateVar {
 		this.def = def;
 	}
 
-	public void setInit(AbstractConst init) {
+	public void setInit(IConst init) {
 		this.init = init;
 	}
 

@@ -28,54 +28,87 @@
  */
 package net.sf.orcc.common;
 
+import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.type.IType;
 
 /**
- * This class represents a port.
+ * This class represents a global variable. A global variable may have a
+ * constant value.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Port {
+public class GlobalVariable {
 
 	/**
-	 * port location
+	 * variable location
 	 */
 	private Location location;
 
 	/**
-	 * port name
+	 * variable name
 	 */
 	private String name;
 
 	/**
-	 * port type
+	 * variable type
 	 */
 	private IType type;
 
 	/**
-	 * Creates a new port with the given location, type, and name.
+	 * variable constant value
+	 */
+	private IConst value;
+
+	/**
+	 * Creates a new global variable from the given global variable.
+	 * 
+	 * @param var
+	 *            a global variable
+	 */
+	public GlobalVariable(GlobalVariable var) {
+		this.location = var.location;
+		this.type = var.type;
+		this.name = var.name;
+		this.value = var.value;
+	}
+
+	/**
+	 * Creates a new global variable with the given location, type, and name.
+	 * The global variable created will have no value.
 	 * 
 	 * @param location
-	 *            the port location
+	 *            the global variable location
 	 * @param type
-	 *            the port type
+	 *            the global variable type
 	 * @param name
-	 *            the port name
+	 *            the global variable name
 	 */
-	public Port(Location location, IType type, String name) {
+	public GlobalVariable(Location location, IType type, String name) {
 		this.location = location;
 		this.type = type;
 		this.name = name;
 	}
 
 	/**
-	 * Creates a new port from the given port
+	 * Creates a new global variable with the given location, type, and name.
+	 * The global variable created will have no value.
+	 * 
+	 * @param location
+	 *            the global variable location
+	 * @param type
+	 *            the global variable type
+	 * @param name
+	 *            the global variable name
+	 * @param value
+	 *            the constant value of the global variable
 	 */
-	public Port(Port port) {
-		this.location = port.location;
-		this.type = port.type;
-		this.name = port.name;
+	public GlobalVariable(Location location, IType type, String name,
+			IConst value) {
+		this.location = location;
+		this.type = type;
+		this.name = name;
+		this.value = value;
 	}
 
 	/**
@@ -106,6 +139,15 @@ public class Port {
 	}
 
 	/**
+	 * Returns the value of this global variable as a constant.
+	 * 
+	 * @return a constant, or <code>null</code> if this variable has no value
+	 */
+	public IConst getValue() {
+		return value;
+	}
+
+	/**
 	 * Sets the name of this port.
 	 * 
 	 * @param name
@@ -113,6 +155,16 @@ public class Port {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Sets the value of this global variable to the given constant.
+	 * 
+	 * @param value
+	 *            a constant value
+	 */
+	public void setValue(IConst value) {
+		this.value = value;
 	}
 
 	@Override

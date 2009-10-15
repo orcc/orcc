@@ -29,11 +29,45 @@
 package net.sf.orcc.ir.consts;
 
 /**
+ * This interface defines a constant.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractConst {
+public interface IConst {
 
+	/**
+	 * boolean constant
+	 */
+	public static final int BOOLEAN = 1;
+
+	/**
+	 * integer constant
+	 */
+	public static final int INT = 2;
+
+	/**
+	 * list constant
+	 */
+	public static final int LIST = 3;
+
+	/**
+	 * string constant
+	 */
+	public static final int STRING = 4;
+
+	/**
+	 * Accepts a visitor.
+	 * 
+	 * @param visitor
+	 */
 	public abstract void accept(ConstVisitor visitor, Object... args);
+
+	/**
+	 * Returns the type of this constant.
+	 * 
+	 * @return the type of this constant
+	 */
+	public int getType();
 
 }

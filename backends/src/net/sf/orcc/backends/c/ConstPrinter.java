@@ -30,9 +30,9 @@ package net.sf.orcc.backends.c;
 
 import java.util.List;
 
-import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ConstVisitor;
+import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
@@ -98,8 +98,8 @@ public class ConstPrinter implements ConstVisitor {
 		StringTemplate listTempl = group.getInstanceOf("listValue");
 		template = listTempl;
 
-		List<AbstractConst> list = constant.getValue();
-		for (AbstractConst cst : list) {
+		List<IConst> list = constant.getValue();
+		for (IConst cst : list) {
 			cst.accept(this);
 		}
 

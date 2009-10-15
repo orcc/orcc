@@ -99,8 +99,8 @@ import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.Transition;
 import net.sf.orcc.ir.actor.VarUse;
-import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.BoolConst;
+import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
@@ -154,7 +154,11 @@ public class IrParser {
 
 	private String file;
 
+	private OrderedMap<Port> inputs;
+
 	private boolean isInitialize;
+
+	private OrderedMap<Port> outputs;
 
 	private AbstractNode previousNode;
 
@@ -163,10 +167,6 @@ public class IrParser {
 	private List<Action> untaggedActions;
 
 	private Map<String, VarDef> varDefs;
-
-	private OrderedMap<Port> inputs;
-
-	private OrderedMap<Port> outputs;
 
 	private Action getAction(JSONArray array) throws JSONException {
 		if (array.length() == 0) {
@@ -379,9 +379,9 @@ public class IrParser {
 	 * @return An {@link AbstractConst} created from the given object.
 	 * @throws JSONException
 	 */
-	private AbstractConst parseConstant(Object obj) throws JSONException,
+	private IConst parseConstant(Object obj) throws JSONException,
 			OrccException {
-		AbstractConst constant = null;
+		IConst constant = null;
 
 		if (obj instanceof Boolean) {
 			constant = new BoolConst((Boolean) obj);
@@ -389,7 +389,7 @@ public class IrParser {
 			constant = new IntConst((Integer) obj);
 		} else if (obj instanceof JSONArray) {
 			JSONArray array = (JSONArray) obj;
-			List<AbstractConst> cstList = new ArrayList<AbstractConst>();
+			List<IConst> cstList = new ArrayList<IConst>();
 			for (int i = 0; i < array.length(); i++) {
 				cstList.add(parseConstant(array.get(i)));
 			}
@@ -735,7 +735,7 @@ public class IrParser {
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray varDefArray = array.getJSONArray(i);
 			VarDef def = parseVarDef(varDefArray.getJSONArray(0));
-			AbstractConst init = null;
+			IConst init = null;
 			if (!varDefArray.isNull(1)) {
 				init = parseConstant(varDefArray.get(1));
 			}

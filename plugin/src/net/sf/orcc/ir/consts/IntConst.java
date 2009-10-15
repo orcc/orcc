@@ -29,13 +29,21 @@
 package net.sf.orcc.ir.consts;
 
 /**
+ * This class defines an integer constant.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class IntConst extends AbstractConst {
+public class IntConst implements IConst {
 
 	private int value;
 
+	/**
+	 * Creates a new integer constant with the given value.
+	 * 
+	 * @param value
+	 *            the value of the constant
+	 */
 	public IntConst(int value) {
 		this.value = value;
 	}
@@ -45,12 +53,18 @@ public class IntConst extends AbstractConst {
 		visitor.visit(this, args);
 	}
 
-	public int getValue() {
-		return value;
+	@Override
+	public int getType() {
+		return INT;
 	}
 
-	public void setValue(int value) {
-		this.value = value;
+	/**
+	 * Returns the value of this constant.
+	 * 
+	 * @return the value of this constant
+	 */
+	public int getValue() {
+		return value;
 	}
 
 	@Override

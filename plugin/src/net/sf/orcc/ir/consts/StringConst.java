@@ -29,15 +29,29 @@
 package net.sf.orcc.ir.consts;
 
 /**
+ * This class defines a string constant.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class StringConst extends AbstractConst {
+public class StringConst implements IConst {
 
 	private String value;
 
+	/**
+	 * Creates a new string constant with the given value.
+	 * 
+	 * @param value
+	 *            the value of the constant
+	 * @throws NullPointerException
+	 *             if value is <code>null</code>
+	 */
 	public StringConst(String value) {
-		setValue(value);
+		if (value == null) {
+			throw new NullPointerException();
+		}
+
+		this.value = value;
 	}
 
 	@Override
@@ -45,16 +59,18 @@ public class StringConst extends AbstractConst {
 		visitor.visit(this, args);
 	}
 
-	public String getValue() {
-		return value;
+	@Override
+	public int getType() {
+		return STRING;
 	}
 
-	public void setValue(String value) {
-		if (value == null) {
-			throw new NullPointerException();
-		}
-
-		this.value = value;
+	/**
+	 * Returns the value of this constant.
+	 * 
+	 * @return the value of this constant
+	 */
+	public String getValue() {
+		return value;
 	}
 
 	@Override
