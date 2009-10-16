@@ -55,18 +55,6 @@ public class Variable {
 	private IType type;
 
 	/**
-	 * Creates a new variable from the given variable.
-	 * 
-	 * @param var
-	 *            a variable
-	 */
-	public Variable(Variable var) {
-		this.location = var.location;
-		this.type = var.type;
-		this.name = var.name;
-	}
-
-	/**
 	 * Creates a new variable with the given location, type, and name.
 	 * 
 	 * @param location
@@ -80,6 +68,18 @@ public class Variable {
 		this.location = location;
 		this.type = type;
 		this.name = name;
+	}
+
+	/**
+	 * Creates a new variable from the given variable.
+	 * 
+	 * @param var
+	 *            a variable
+	 */
+	public Variable(Variable var) {
+		this.location = var.location;
+		this.type = var.type;
+		this.name = var.name;
 	}
 
 	/**

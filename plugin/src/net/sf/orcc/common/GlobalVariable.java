@@ -28,12 +28,16 @@
  */
 package net.sf.orcc.common;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.IConst;
+import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.type.IType;
 
 /**
  * This class represents a global variable. A global variable is a variable that
- * may have a constant value.
+ * is not assignable, may have a value as an expression, which should be
+ * constant when evaluated.
  * 
  * @author Matthieu Wipliez
  * 
@@ -41,9 +45,14 @@ import net.sf.orcc.ir.type.IType;
 public class GlobalVariable extends Variable {
 
 	/**
-	 * variable constant value
+	 * variable constant value.
 	 */
-	private IConst value;
+	private IConst constantValue;
+
+	/**
+	 * variable value
+	 */
+	private IExpr value;
 
 	/**
 	 * Creates a new global variable from the given global variable.
@@ -53,6 +62,7 @@ public class GlobalVariable extends Variable {
 	 */
 	public GlobalVariable(GlobalVariable var) {
 		super(var);
+		this.constantValue = var.constantValue;
 		this.value = var.value;
 	}
 
@@ -72,8 +82,8 @@ public class GlobalVariable extends Variable {
 	}
 
 	/**
-	 * Creates a new global variable with the given location, type, and name.
-	 * The global variable created will have no value.
+	 * Creates a new global variable with the given location, type, name, and
+	 * initial value.
 	 * 
 	 * @param location
 	 *            the global variable location
@@ -82,30 +92,56 @@ public class GlobalVariable extends Variable {
 	 * @param name
 	 *            the global variable name
 	 * @param value
-	 *            the constant value of the global variable
+	 *            the value of the global variable
 	 */
 	public GlobalVariable(Location location, IType type, String name,
-			IConst value) {
+			IExpr value) {
 		super(location, type, name);
 		this.value = value;
 	}
 
 	/**
-	 * Returns the value of this global variable as a constant.
+	 * Evaluates this variable's value to a constant.
 	 * 
-	 * @return a constant, or <code>null</code> if this variable has no value
+	 * @throws OrccException
+	 *             if the value could not be evaluated to a constant
 	 */
-	public IConst getValue() {
+	public void evaluate() throws OrccException {
+		IExpr expr = value.evaluate();
+		constantValue = AbstractConst.evaluate(expr);
+	}
+
+	/**
+	 * Returns the constant value of this global variable. If this variable has
+	 * no constant value, {@link #evaluate()} is called first.
+	 * 
+	 * @return a constant, or <code>null</code> if this variable has no constant
+	 *         value.
+	 */
+	public IConst getConstantValue() throws OrccException {
+		if (constantValue == null) {
+			evaluate();
+		}
+
+		return constantValue;
+	}
+
+	/**
+	 * Returns the value of this global variable.
+	 * 
+	 * @return an expression, or <code>null</code> if this variable has no value
+	 */
+	public IExpr getValue() {
 		return value;
 	}
 
 	/**
-	 * Sets the value of this global variable to the given constant.
+	 * Sets the value of this global variable to the given expression.
 	 * 
 	 * @param value
-	 *            a constant value
+	 *            an expression
 	 */
-	public void setValue(IConst value) {
+	public void setValue(IExpr value) {
 		this.value = value;
 	}
 

@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.GlobalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
@@ -136,12 +136,17 @@ public class NetworkParser {
 	/**
 	 * list of parameters
 	 */
-	private OrderedMap<LocalVariable> parameters;
+	private OrderedMap<GlobalVariable> parameters;
 
 	/**
 	 * parent path of {@link #file}
 	 */
 	private String path;
+
+	/**
+	 * list of variables
+	 */
+	private OrderedMap<GlobalVariable> variables;
 
 	/**
 	 * Creates a new network parser.
@@ -341,12 +346,16 @@ public class NetworkParser {
 			throw new OrccException("Decl has an empty name");
 		}
 
-		// TODO store parameters and variables somewhere
+		Location location = new Location();
 		if (kind.equals("Param")) {
-			// IType type = parseType(decl.getFirstChild());
+			IType type = parseType(decl.getFirstChild());
+			GlobalVariable var = new GlobalVariable(location, type, name);
+			parameters.register(file.getAbsolutePath(), location, name, var);
 		} else if (kind.equals("Variable")) {
-			// IType type = parseType(decl.getFirstChild());
-			// IExpr expr = parseExpr(decl.getFirstChild());
+			IType type = parseType(decl.getFirstChild());
+			IExpr expr = parseExpr(decl.getFirstChild());
+			GlobalVariable var = new GlobalVariable(location, type, name, expr);
+			parameters.register(file.getAbsolutePath(), location, name, var);
 		} else {
 			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
 		}
@@ -688,11 +697,12 @@ public class NetworkParser {
 		inputs = new OrderedMap<Port>();
 		instances = new HashMap<String, Instance>();
 		outputs = new OrderedMap<Port>();
-		parameters = new OrderedMap<LocalVariable>();
+		parameters = new OrderedMap<GlobalVariable>();
+		variables = new OrderedMap<GlobalVariable>();
 
 		parseBody(root);
 		checkNetwork();
 
-		return new Network(name, inputs, outputs, parameters, graph);
+		return new Network(name, inputs, outputs, parameters, variables, graph);
 	}
 }

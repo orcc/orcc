@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.network;
 
+import net.sf.orcc.common.GlobalVariable;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -50,7 +50,9 @@ public class Network {
 
 	private OrderedMap<Port> outputs;
 
-	private OrderedMap<LocalVariable> parameters;
+	private OrderedMap<GlobalVariable> parameters;
+
+	private OrderedMap<GlobalVariable> variables;
 
 	/**
 	 * Creates a new network with the given name, inputs, outputs, and graph.
@@ -65,12 +67,14 @@ public class Network {
 	 *            graph representing the network's contents
 	 */
 	public Network(String name, OrderedMap<Port> inputs,
-			OrderedMap<Port> outputs, OrderedMap<LocalVariable> parameters,
+			OrderedMap<Port> outputs, OrderedMap<GlobalVariable> parameters,
+			OrderedMap<GlobalVariable> variables,
 			DirectedGraph<Instance, Connection> graph) {
 		this.name = name;
 		this.inputs = inputs;
 		this.outputs = outputs;
 		this.parameters = parameters;
+		this.variables = variables;
 		this.graph = graph;
 	}
 
@@ -115,8 +119,22 @@ public class Network {
 	 * 
 	 * @return the list of this network's parameters
 	 */
-	public OrderedMap<LocalVariable> getParameters() {
+	public OrderedMap<GlobalVariable> getParameters() {
 		return parameters;
+	}
+
+	/**
+	 * Returns the list of this network's variables
+	 * 
+	 * @return the list of this network's variables
+	 */
+	public OrderedMap<GlobalVariable> getVariables() {
+		return variables;
+	}
+
+	@Override
+	public String toString() {
+		return name;
 	}
 
 }
