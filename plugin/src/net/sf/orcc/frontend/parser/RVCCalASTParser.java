@@ -36,9 +36,9 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
-import net.sf.orcc.ir.VarDef;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -93,7 +93,7 @@ public class RVCCalASTParser {
 	/**
 	 * Contains the current scope of variables
 	 */
-	private Scope<VarDef> currentScope;
+	private Scope<LocalVariable> currentScope;
 
 	/**
 	 * absolute name of input file
@@ -113,7 +113,7 @@ public class RVCCalASTParser {
 	/**
 	 * list of actor parameters
 	 */
-	private List<VarDef> parameters;
+	private List<LocalVariable> parameters;
 
 	/**
 	 * Contains the current scope of procedures
@@ -190,7 +190,7 @@ public class RVCCalASTParser {
 	 */
 	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
-		currentScope = new Scope<VarDef>();
+		currentScope = new Scope<LocalVariable>();
 		procedures = new OrderedMap<Procedure>();
 
 		// TODO remove when scopeProcedures are actually used
@@ -217,7 +217,7 @@ public class RVCCalASTParser {
 	 */
 	private void parseActorDecls(Tree actorDecls) throws OrccException {
 		// actor declarations are in a new scope
-		currentScope = new Scope<VarDef>(currentScope);
+		currentScope = new Scope<LocalVariable>(currentScope);
 
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
@@ -233,9 +233,9 @@ public class RVCCalASTParser {
 				parseSchedule(child);
 			} else if (declType.equals("STATE_VAR")) {
 				StateVar stateVar = parseStateVar(child);
-				VarDef varDef = stateVar.getDef();
-				currentScope.register(file, varDef.getLoc(), varDef.getName(),
-						varDef);
+				LocalVariable varDef = stateVar.getDef();
+				currentScope.register(file, varDef.getLocation(), varDef
+						.getName(), varDef);
 				stateVars.add(stateVar);
 			} else {
 				throw new OrccException("not yet implemented");
@@ -320,7 +320,7 @@ public class RVCCalASTParser {
 	private StateVar parseStateVar(Tree stateVar) throws OrccException {
 		boolean assignable = stateVar.getChild(2).getText()
 				.equals("ASSIGNABLE");
-		VarDef def = parseVarDef(stateVar, assignable, true, 0, null);
+		LocalVariable def = parseVarDef(stateVar, assignable, true, 0, null);
 		IConst init = null;
 		if (stateVar.getChildCount() == 4) {
 		}
@@ -411,8 +411,8 @@ public class RVCCalASTParser {
 	 * @param suffix
 	 * @return
 	 */
-	private VarDef parseVarDef(Tree tree, boolean assignable, boolean global,
-			int index, Integer suffix) throws OrccException {
+	private LocalVariable parseVarDef(Tree tree, boolean assignable,
+			boolean global, int index, Integer suffix) throws OrccException {
 		IType type = parseType(tree.getChild(0));
 		Tree nameTree = tree.getChild(1);
 		String name = nameTree.getText();
@@ -422,7 +422,7 @@ public class RVCCalASTParser {
 		List<VarUse> references = new ArrayList<VarUse>();
 		AbstractNode node = new EmptyNode(0, new Location());
 
-		return new VarDef(assignable, global, index, loc, name, node,
+		return new LocalVariable(assignable, global, index, loc, name, node,
 				references, suffix, type);
 	}
 
@@ -434,14 +434,16 @@ public class RVCCalASTParser {
 	 * @param tree
 	 *            a tree
 	 */
-	private List<VarDef> parseVarDefs(OrderedMap<VarDef> scope, Tree tree)
-			throws OrccException {
-		List<VarDef> varDefs = new ArrayList<VarDef>();
+	private List<LocalVariable> parseVarDefs(OrderedMap<LocalVariable> scope,
+			Tree tree) throws OrccException {
+		List<LocalVariable> varDefs = new ArrayList<LocalVariable>();
 		int numPorts = tree.getChildCount();
 		for (int i = 0; i < numPorts; i++) {
 			Tree child = tree.getChild(i);
-			VarDef varDef = parseVarDef(child, false, true, 0, null);
-			scope.register(file, varDef.getLoc(), varDef.getName(), varDef);
+			LocalVariable varDef = parseVarDef(child, false, true, 0, null);
+			scope
+					.register(file, varDef.getLocation(), varDef.getName(),
+							varDef);
 			varDefs.add(varDef);
 		}
 

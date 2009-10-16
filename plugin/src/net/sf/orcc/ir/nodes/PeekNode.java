@@ -29,7 +29,7 @@
 package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 
 /**
  * @author Matthieu Wipliez
@@ -41,10 +41,10 @@ public class PeekNode extends AbstractNode {
 
 	private int numTokens;
 
-	private VarDef varDef;
+	private LocalVariable varDef;
 
 	public PeekNode(int id, Location location, String fifoName, int numTokens,
-			VarDef varDef) {
+			LocalVariable varDef) {
 		super(id, location);
 		this.fifoName = fifoName;
 		this.numTokens = numTokens;
@@ -64,7 +64,7 @@ public class PeekNode extends AbstractNode {
 		return numTokens;
 	}
 
-	public VarDef getVarDef() {
+	public LocalVariable getVarDef() {
 		return varDef;
 	}
 
@@ -76,7 +76,7 @@ public class PeekNode extends AbstractNode {
 		this.numTokens = numTokens;
 	}
 
-	public void setVar(VarDef varDef) {
+	public void setVar(LocalVariable varDef) {
 		this.varDef = varDef;
 	}
 

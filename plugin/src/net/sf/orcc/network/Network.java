@@ -29,7 +29,7 @@
 package net.sf.orcc.network;
 
 import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -50,7 +50,7 @@ public class Network {
 
 	private OrderedMap<Port> outputs;
 
-	private OrderedMap<VarDef> parameters;
+	private OrderedMap<LocalVariable> parameters;
 
 	/**
 	 * Creates a new network with the given name, inputs, outputs, and graph.
@@ -65,7 +65,7 @@ public class Network {
 	 *            graph representing the network's contents
 	 */
 	public Network(String name, OrderedMap<Port> inputs,
-			OrderedMap<Port> outputs, OrderedMap<VarDef> parameters,
+			OrderedMap<Port> outputs, OrderedMap<LocalVariable> parameters,
 			DirectedGraph<Instance, Connection> graph) {
 		this.name = name;
 		this.inputs = inputs;
@@ -115,7 +115,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's parameters
 	 */
-	public OrderedMap<VarDef> getParameters() {
+	public OrderedMap<LocalVariable> getParameters() {
 		return parameters;
 	}
 

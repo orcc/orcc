@@ -26,106 +26,117 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.actor;
+package net.sf.orcc.common;
 
-import java.util.List;
-
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.ir.NameTransformer;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
 
 /**
+ * This class represents a variable. A variable has a location, a type and a
+ * name.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class Procedure {
-
-	private boolean external;
-
-	private List<LocalVariable> locals;
-
-	private Location location;
-
-	private String name;
-
-	private List<AbstractNode> nodes;
-
-	private List<LocalVariable> parameters;
-
-	private IType returnType;
+public class Variable {
 
 	/**
-	 * Construcs a new procedure.
-	 * 
-	 * @param name
-	 *            The procedure name.
-	 * @param external
-	 *            Whether it is external or not.
-	 * @param location
-	 *            The procedure location.
-	 * @param returnType
-	 *            The procedure return type.
-	 * @param parameters
-	 *            The procedure parameters.
-	 * @param locals
-	 *            The procedure local variables.
+	 * variable location
 	 */
-	public Procedure(String name, boolean external, Location location,
-			IType returnType, List<LocalVariable> parameters, List<LocalVariable> locals,
-			List<AbstractNode> nodes) {
-		this.external = external;
-		this.nodes = nodes;
-		this.locals = locals;
+	private Location location;
+
+	/**
+	 * variable name
+	 */
+	private String name;
+
+	/**
+	 * variable type
+	 */
+	private IType type;
+
+	/**
+	 * Creates a new variable from the given variable.
+	 * 
+	 * @param var
+	 *            a variable
+	 */
+	public Variable(Variable var) {
+		this.location = var.location;
+		this.type = var.type;
+		this.name = var.name;
+	}
+
+	/**
+	 * Creates a new variable with the given location, type, and name.
+	 * 
+	 * @param location
+	 *            the variable location
+	 * @param type
+	 *            the variable type
+	 * @param name
+	 *            the variable name
+	 */
+	public Variable(Location location, IType type, String name) {
 		this.location = location;
+		this.type = type;
 		this.name = name;
-		this.parameters = parameters;
-		this.returnType = returnType;
 	}
 
-	public List<LocalVariable> getLocals() {
-		return locals;
-	}
-
+	/**
+	 * Returns the location of this variable.
+	 * 
+	 * @return the location of this variable
+	 */
 	public Location getLocation() {
 		return location;
 	}
 
+	/**
+	 * Returns the name of this variable.
+	 * 
+	 * @return the name of this variable
+	 */
 	public String getName() {
-		return NameTransformer.transform(name);
+		return name;
 	}
 
-	public List<AbstractNode> getNodes() {
-		return nodes;
+	/**
+	 * Returns the type of this variable.
+	 * 
+	 * @return the type of this variable
+	 */
+	public IType getType() {
+		return type;
 	}
 
-	public List<LocalVariable> getParameters() {
-		return parameters;
-	}
-
-	public IType getReturnType() {
-		return returnType;
-	}
-
-	public boolean isExternal() {
-		return external;
-	}
-
-	public void setExternal(boolean external) {
-		this.external = external;
-	}
-
+	/**
+	 * Sets the location of this variable.
+	 * 
+	 * @param name
+	 *            the new location of this variable
+	 */
 	public void setLocation(Location location) {
 		this.location = location;
 	}
 
+	/**
+	 * Sets the name of this variable.
+	 * 
+	 * @param name
+	 *            the new name of this variable
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public void setReturnType(IType returnType) {
-		this.returnType = returnType;
+	/**
+	 * Sets the type of this variable.
+	 * 
+	 * @param type
+	 *            the new type of this variable
+	 */
+	public void setType(IType type) {
+		this.type = type;
 	}
 
 	@Override

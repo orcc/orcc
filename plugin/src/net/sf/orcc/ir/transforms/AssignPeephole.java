@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -80,11 +80,11 @@ public class AssignPeephole extends AbstractNodeVisitor {
 		if ((node.getValue().getType() == IExpr.BOOLEAN)
 				|| (node.getValue().getType() == IExpr.INT)
 				|| (node.getValue().getType() == IExpr.STRING)) {
-			VarDef vardef = node.getVar();
+			LocalVariable vardef = node.getVar();
 			vardef.setConstant(node.getValue());
 			it.remove();
 		} else if (node.getValue().getType() == IExpr.VAR) {
-			VarDef vardef = node.getVar();
+			LocalVariable vardef = node.getVar();
 			VarExpr expr = (VarExpr) node.getValue();
 
 			vardef.duplicate(expr.getVar().getVarDef());
@@ -104,12 +104,12 @@ public class AssignPeephole extends AbstractNodeVisitor {
 		List<PhiAssignment> phis = node.getPhis();
 		if (!phis.isEmpty()) {
 			for (PhiAssignment phi : phis) {
-				VarDef source = phi.getVars().get(0).getVarDef();
+				LocalVariable source = phi.getVars().get(0).getVarDef();
 				// if source is a local variable with index = 0, we remove it
 				// from the procedure and translate the PHI by an assignment of
 				// 0 (zero) to target.
 				// Otherwise, we just create an assignment target = source.
-				List<VarDef> parameters = procedure.getParameters();
+				List<LocalVariable> parameters = procedure.getParameters();
 				if (source.getIndex() == 0 && !parameters.contains(source)) {
 					IntExpr expr = new IntExpr(new Location(), 0);
 					source.setConstant(expr);

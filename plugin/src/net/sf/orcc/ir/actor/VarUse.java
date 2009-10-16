@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.actor;
 
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.nodes.AbstractNode;
 
 /**
@@ -39,9 +39,9 @@ public class VarUse {
 
 	private AbstractNode node;
 
-	private VarDef varDef;
+	private LocalVariable varDef;
 
-	public VarUse(VarDef varDef, AbstractNode node) {
+	public VarUse(LocalVariable varDef, AbstractNode node) {
 		this.node = node;
 		this.varDef = varDef;
 	}
@@ -50,7 +50,7 @@ public class VarUse {
 		return node;
 	}
 
-	public VarDef getVarDef() {
+	public LocalVariable getVarDef() {
 		return varDef;
 	}
 
@@ -58,7 +58,7 @@ public class VarUse {
 		this.node = node;
 	}
 
-	public void setVarDef(VarDef varDef) {
+	public void setVarDef(LocalVariable varDef) {
 		this.varDef = varDef;
 	}
 

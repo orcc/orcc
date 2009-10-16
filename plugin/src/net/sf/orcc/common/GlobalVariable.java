@@ -32,28 +32,13 @@ import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.type.IType;
 
 /**
- * This class represents a global variable. A global variable may have a
- * constant value.
+ * This class represents a global variable. A global variable is a variable that
+ * may have a constant value.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class GlobalVariable {
-
-	/**
-	 * variable location
-	 */
-	private Location location;
-
-	/**
-	 * variable name
-	 */
-	private String name;
-
-	/**
-	 * variable type
-	 */
-	private IType type;
+public class GlobalVariable extends Variable {
 
 	/**
 	 * variable constant value
@@ -67,9 +52,7 @@ public class GlobalVariable {
 	 *            a global variable
 	 */
 	public GlobalVariable(GlobalVariable var) {
-		this.location = var.location;
-		this.type = var.type;
-		this.name = var.name;
+		super(var);
 		this.value = var.value;
 	}
 
@@ -85,9 +68,7 @@ public class GlobalVariable {
 	 *            the global variable name
 	 */
 	public GlobalVariable(Location location, IType type, String name) {
-		this.location = location;
-		this.type = type;
-		this.name = name;
+		super(location, type, name);
 	}
 
 	/**
@@ -105,37 +86,8 @@ public class GlobalVariable {
 	 */
 	public GlobalVariable(Location location, IType type, String name,
 			IConst value) {
-		this.location = location;
-		this.type = type;
-		this.name = name;
+		super(location, type, name);
 		this.value = value;
-	}
-
-	/**
-	 * Returns the location of this port;
-	 * 
-	 * @return the location of this port
-	 */
-	public Location getLocation() {
-		return location;
-	}
-
-	/**
-	 * Returns the name of this port.
-	 * 
-	 * @return the name of this port
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Returns the type of this port.
-	 * 
-	 * @return the type of this port
-	 */
-	public IType getType() {
-		return type;
 	}
 
 	/**
@@ -145,16 +97,6 @@ public class GlobalVariable {
 	 */
 	public IConst getValue() {
 		return value;
-	}
-
-	/**
-	 * Sets the name of this port.
-	 * 
-	 * @param name
-	 *            the new name of this port
-	 */
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	/**
@@ -169,7 +111,7 @@ public class GlobalVariable {
 
 	@Override
 	public String toString() {
-		return name;
+		return getName();
 	}
 
 }

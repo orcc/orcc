@@ -29,7 +29,7 @@
 package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 
 /**
  * @author Matthieu Wipliez
@@ -41,10 +41,10 @@ public class WriteNode extends AbstractNode {
 
 	private int numTokens;
 
-	private VarDef varDef;
+	private LocalVariable varDef;
 
 	public WriteNode(int id, Location location, String fifoName, int numTokens,
-			VarDef varDef) {
+			LocalVariable varDef) {
 		super(id, location);
 		this.fifoName = fifoName;
 		this.numTokens = numTokens;
@@ -64,7 +64,7 @@ public class WriteNode extends AbstractNode {
 		return numTokens;
 	}
 
-	public VarDef getVarDef() {
+	public LocalVariable getVarDef() {
 		return varDef;
 	}
 
@@ -76,7 +76,7 @@ public class WriteNode extends AbstractNode {
 		this.numTokens = numTokens;
 	}
 
-	public void setVarDef(VarDef varDef) {
+	public void setVarDef(LocalVariable varDef) {
 		this.varDef = varDef;
 	}
 

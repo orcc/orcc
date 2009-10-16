@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.actor;
 
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.consts.IConst;
 
 /**
@@ -37,16 +37,16 @@ import net.sf.orcc.ir.consts.IConst;
  */
 public class StateVar {
 
-	private VarDef def;
+	private LocalVariable def;
 
 	private IConst init;
 
-	public StateVar(VarDef def, IConst init) {
+	public StateVar(LocalVariable def, IConst init) {
 		this.def = def;
 		this.init = init;
 	}
 
-	public VarDef getDef() {
+	public LocalVariable getDef() {
 		return def;
 	}
 
@@ -58,7 +58,7 @@ public class StateVar {
 		return (init != null);
 	}
 
-	public void setDef(VarDef def) {
+	public void setDef(LocalVariable def) {
 		this.def = def;
 	}
 

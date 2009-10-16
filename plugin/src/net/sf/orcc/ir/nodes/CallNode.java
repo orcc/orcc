@@ -31,7 +31,7 @@ package net.sf.orcc.ir.nodes;
 import java.util.List;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.IExpr;
 
@@ -45,9 +45,9 @@ public class CallNode extends AbstractNode {
 
 	private Procedure procedure;
 
-	private VarDef res;
+	private LocalVariable res;
 
-	public CallNode(int id, Location location, VarDef res, Procedure procedure,
+	public CallNode(int id, Location location, LocalVariable res, Procedure procedure,
 			List<IExpr> parameters) {
 		super(id, location);
 		this.parameters = parameters;
@@ -68,7 +68,7 @@ public class CallNode extends AbstractNode {
 		return procedure;
 	}
 
-	public VarDef getRes() {
+	public LocalVariable getRes() {
 		return res;
 	}
 
@@ -84,7 +84,7 @@ public class CallNode extends AbstractNode {
 		this.procedure = procedure;
 	}
 
-	public void setRes(VarDef res) {
+	public void setRes(LocalVariable res) {
 		this.res = res;
 	}
 

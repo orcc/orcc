@@ -31,27 +31,12 @@ package net.sf.orcc.common;
 import net.sf.orcc.ir.type.IType;
 
 /**
- * This class represents a port.
+ * This class represents a port. A port is a variable.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Port {
-
-	/**
-	 * port location
-	 */
-	private Location location;
-
-	/**
-	 * port name
-	 */
-	private String name;
-
-	/**
-	 * port type
-	 */
-	private IType type;
+public class Port extends Variable {
 
 	/**
 	 * Creates a new port with the given location, type, and name.
@@ -64,60 +49,14 @@ public class Port {
 	 *            the port name
 	 */
 	public Port(Location location, IType type, String name) {
-		this.location = location;
-		this.type = type;
-		this.name = name;
+		super(location, type, name);
 	}
 
 	/**
 	 * Creates a new port from the given port
 	 */
 	public Port(Port port) {
-		this.location = port.location;
-		this.type = port.type;
-		this.name = port.name;
-	}
-
-	/**
-	 * Returns the location of this port;
-	 * 
-	 * @return the location of this port
-	 */
-	public Location getLocation() {
-		return location;
-	}
-
-	/**
-	 * Returns the name of this port.
-	 * 
-	 * @return the name of this port
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Returns the type of this port.
-	 * 
-	 * @return the type of this port
-	 */
-	public IType getType() {
-		return type;
-	}
-
-	/**
-	 * Sets the name of this port.
-	 * 
-	 * @param name
-	 *            the new name of this port
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@Override
-	public String toString() {
-		return name;
+		super(port);
 	}
 
 }

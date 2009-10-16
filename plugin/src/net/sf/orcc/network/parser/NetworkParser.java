@@ -40,7 +40,7 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
@@ -136,7 +136,7 @@ public class NetworkParser {
 	/**
 	 * list of parameters
 	 */
-	private OrderedMap<VarDef> parameters;
+	private OrderedMap<LocalVariable> parameters;
 
 	/**
 	 * parent path of {@link #file}
@@ -688,7 +688,7 @@ public class NetworkParser {
 		inputs = new OrderedMap<Port>();
 		instances = new HashMap<String, Instance>();
 		outputs = new OrderedMap<Port>();
-		parameters = new OrderedMap<VarDef>();
+		parameters = new OrderedMap<LocalVariable>();
 
 		parseBody(root);
 		checkNetwork();

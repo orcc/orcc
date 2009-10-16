@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -97,14 +97,14 @@ public class PhiRemoval extends AbstractNodeVisitor {
 			int phiIndex = (Integer) args[1];
 
 			for (PhiAssignment phi : phis) {
-				VarDef target = phi.getVarDef();
-				VarDef source = phi.getVars().get(phiIndex).getVarDef();
+				LocalVariable target = phi.getVarDef();
+				LocalVariable source = phi.getVars().get(phiIndex).getVarDef();
 
 				// if source is a local variable with index = 0, we remove it
 				// from the procedure and translate the PHI by an assignment of
 				// 0 (zero) to target.
 				// Otherwise, we just create an assignment target = source.
-				List<VarDef> parameters = procedure.getParameters();
+				List<LocalVariable> parameters = procedure.getParameters();
 				AssignVarNode assign;
 				if (source.getIndex() == 0 && !parameters.contains(source)) {
 					procedure.getLocals().remove(source);

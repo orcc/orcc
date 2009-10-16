@@ -33,7 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;
@@ -66,11 +66,11 @@ public class AddInstantationProcedure {
 
 	private Procedure createInitProcedure(String Attributs,
 			OrderedMap<Port> ports) {
-		List<VarDef> parameters = new ArrayList<VarDef>();
-		List<VarDef> locals = new ArrayList<VarDef>();
+		List<LocalVariable> parameters = new ArrayList<LocalVariable>();
+		List<LocalVariable> locals = new ArrayList<LocalVariable>();
 		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
 
-		VarDef parameter = new VarDef(false, false, 0, new Location(), "fifo",
+		LocalVariable parameter = new LocalVariable(false, false, 0, new Location(), "fifo",
 				null, null, null, new VoidType());
 
 		parameters.add(parameter);

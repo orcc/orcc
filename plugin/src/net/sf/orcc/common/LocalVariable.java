@@ -26,12 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.common;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
@@ -41,7 +40,7 @@ import net.sf.orcc.ir.type.IType;
  * @author Matthieu Wipliez
  * 
  */
-public class VarDef implements Comparable<VarDef> {
+public class LocalVariable extends Variable implements Comparable<LocalVariable> {
 
 	/**
 	 * whether the variable is assignable.
@@ -66,16 +65,6 @@ public class VarDef implements Comparable<VarDef> {
 	private int index;
 
 	/**
-	 * location of variable.
-	 */
-	private Location loc;
-
-	/**
-	 * name of variable.
-	 */
-	private String name;
-
-	/**
 	 * the node where the variable is assigned.
 	 */
 	private AbstractNode node;
@@ -90,52 +79,43 @@ public class VarDef implements Comparable<VarDef> {
 	 */
 	private Integer suffix;
 
-	/**
-	 * type of this variable.
-	 */
-	private IType type;
-
-	public VarDef(boolean assignable, boolean global, int index, Location loc,
+	public LocalVariable(boolean assignable, boolean global, int index, Location loc,
 			String name, AbstractNode node, List<VarUse> references,
 			Integer suffix, IType type) {
+		super(loc, type, name);
 		this.assignable = assignable;
 		this.global = global;
 		this.index = index;
-		this.loc = loc;
-		this.name = name;
 		this.node = node;
 		this.references = references;
 		this.suffix = suffix;
-		this.type = type;
 		this.constant = false;
 		constantExpr = null;
 	}
 
-	public VarDef(VarDef other) {
+	public LocalVariable(LocalVariable other) {
+		super(other);
 		assignable = other.assignable;
 		global = other.global;
 		index = other.index;
-		loc = new Location();
-		name = other.name;
 		node = null;
 		references = new ArrayList<VarUse>();
 		suffix = other.suffix;
-		type = other.type;
 		this.constant = false;
 		constantExpr = null;
 	}
 
 	@Override
-	public int compareTo(VarDef varDef) {
-		return name.compareTo(varDef.name);
+	public int compareTo(LocalVariable varDef) {
+		return getName().compareTo(varDef.getName());
 	}
 
-	public void duplicate(VarDef varDef) {
+	public void duplicate(LocalVariable varDef) {
 		assignable = varDef.isAssignable();
 		global = varDef.isGlobal();
 		index = varDef.getIndex();
-		loc = varDef.getLoc();
-		name = varDef.getName();
+		setLocation(varDef.getLocation());
+		setName(varDef.getName());
 		node = varDef.getNode();
 		references = varDef.getReferences();
 		if (varDef.hasSuffix()) {
@@ -144,16 +124,16 @@ public class VarDef implements Comparable<VarDef> {
 			suffix = null;
 		}
 
-		type = varDef.getType();
+		setType(varDef.getType());
 		this.constant = varDef.isConstant();
 		constantExpr = varDef.getConstant();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof VarDef) {
-			VarDef varDef = (VarDef) obj;
-			boolean name = varDef.name.equals(this.name);
+		if (obj instanceof LocalVariable) {
+			LocalVariable varDef = (LocalVariable) obj;
+			boolean name = varDef.getName().equals(this.getName());
 			boolean suffix = hasSuffix() && varDef.hasSuffix()
 					&& getSuffix() == varDef.getSuffix() || !hasSuffix()
 					&& !varDef.hasSuffix();
@@ -171,14 +151,6 @@ public class VarDef implements Comparable<VarDef> {
 		return index;
 	}
 
-	public Location getLoc() {
-		return loc;
-	}
-
-	public String getName() {
-		return name;
-	}
-
 	public AbstractNode getNode() {
 		return node;
 	}
@@ -190,10 +162,6 @@ public class VarDef implements Comparable<VarDef> {
 	public int getSuffix() {
 
 		return suffix;
-	}
-
-	public IType getType() {
-		return type;
 	}
 
 	public boolean hasSuffix() {
@@ -229,14 +197,6 @@ public class VarDef implements Comparable<VarDef> {
 		this.index = index;
 	}
 
-	public void setLoc(Location loc) {
-		this.loc = loc;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public void setNode(AbstractNode node) {
 		this.node = node;
 	}
@@ -247,14 +207,5 @@ public class VarDef implements Comparable<VarDef> {
 
 	public void setSuffix(int suffix) {
 		this.suffix = suffix;
-	}
-
-	public void setType(IType type) {
-		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return name;
 	}
 }
