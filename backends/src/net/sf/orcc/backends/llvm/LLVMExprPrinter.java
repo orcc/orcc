@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -192,7 +192,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 			showType = true;
 		}
 
-		VarDef varDef = expr.getVar().getVarDef();
+		LocalVariable varDef = expr.getVar().getVarDef();
 		builder.append(varDefPrinter.getVarDefName(varDef, showType));
 	}
 

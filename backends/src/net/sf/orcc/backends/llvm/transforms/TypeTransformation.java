@@ -51,7 +51,7 @@ import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -128,14 +128,14 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	}
 
 	// VarDef must be cast into i8* for accessing fifo
-	public VarDef castFifo(VarDef readVar, String fifoName) {
+	public LocalVariable castFifo(LocalVariable readVar, String fifoName) {
 		int index = (Integer) portIndex.get(fifoName);
 		LLVMAbstractType addrType = new PointType(new IntType(new IntExpr(
 				new Location(), 8)));
 
 		it.previous();
 
-		VarDef varDef = varDefCreate(addrType);
+		LocalVariable varDef = varDefCreate(addrType);
 
 		// Create bitcast node
 		BitcastNode bitcast = new BitcastNode(0, new Location(), varDef,
@@ -153,7 +153,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	}
 
-	private AbstractLLVMNode castNodeCreate(VarDef var, VarDef targetVar) {
+	private AbstractLLVMNode castNodeCreate(LocalVariable var, LocalVariable targetVar) {
 
 		// Get source size and target size
 		int sourceSize = sizeOf(var.getType());
@@ -221,8 +221,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 	}
 
-	private VarDef varDefCreate(IType type) {
-		return new VarDef(false, false, 0, new Location(), "", null, null,
+	private LocalVariable varDefCreate(IType type) {
+		return new LocalVariable(false, false, 0, new Location(), "", null, null,
 				nodeCount++, type);
 	}
 
@@ -233,7 +233,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(AssignVarNode node, Object... args) {
-		VarDef varDef = node.getVar();
+		LocalVariable varDef = node.getVar();
 
 		// Visit expr
 		node.getValue().accept(this, varDef.getType());
@@ -317,11 +317,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 		Procedure proc = node.getProcedure();
 		IType returnType = proc.getReturnType();
-		VarDef returnVar = node.getRes();
-		List<VarDef> procParams = proc.getParameters();
+		LocalVariable returnVar = node.getRes();
+		List<LocalVariable> procParams = proc.getParameters();
 		List<IExpr> parameters = node.getParameters();
 		for (IExpr parameter : parameters) {
-			VarDef procParam = procParams.get(tmpCnt);
+			LocalVariable procParam = procParams.get(tmpCnt);
 			parameter.accept(this, procParam.getType());
 
 			tmpCnt++;
@@ -329,7 +329,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 		if (returnVar != null) {
 			if (!returnType.equals(returnVar.getType())) {
-				VarDef castVar = varDefCreate(returnType);
+				LocalVariable castVar = varDefCreate(returnType);
 				node.setRes(castVar);
 				it.add(castNodeCreate(castVar, returnVar));
 			}
@@ -344,7 +344,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 			if (index.getType() == IExpr.VAR) {
 				VarExpr indExpr = (VarExpr) index;
 				VarUse indUse = indExpr.getVar();
-				VarDef indVar = indUse.getVarDef();
+				LocalVariable indVar = indUse.getVarDef();
 				IType indType = indVar.getType();
 
 				if (indType.getType() == IType.INT) {
@@ -354,7 +354,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 						if (size != 32) {
 							it.previous();
 
-							VarDef vardef = varDefCreate(new IntType(
+							LocalVariable vardef = varDefCreate(new IntType(
 									new IntExpr(new Location(), 32)));
 							it.add(castNodeCreate(indVar, vardef));
 
@@ -382,8 +382,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(LoadNode node, Object... args) {
-		VarDef sourceVar = node.getSource().getVarDef();
-		VarDef targetVar = node.getTarget();
+		LocalVariable sourceVar = node.getSource().getVarDef();
+		LocalVariable targetVar = node.getTarget();
 
 		IType targetType = targetVar.getType();
 		PointType sourceType = (PointType) sourceVar.getType();
@@ -396,7 +396,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 
 		if (!(targetType.equals(type))) {
-			VarDef castVar = varDefCreate(sourceType.getElementType());
+			LocalVariable castVar = varDefCreate(sourceType.getElementType());
 			node.setTarget(castVar);
 			it.add(castNodeCreate(castVar, targetVar));
 		}
@@ -433,7 +433,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	public void visit(SelectNode node, Object... args) {
 		List<PhiAssignment> phis = node.getPhis();
 		for (PhiAssignment phi : phis) {
-			VarDef varDef = phi.getVarDef();
+			LocalVariable varDef = phi.getVarDef();
 			IType typeRef = varDef.getType();
 			List<VarUse> varUses = phi.getVars();
 
@@ -442,7 +442,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 				if (!(type.equals(typeRef))) {
 					it.previous();
-					VarDef castVar = varDefCreate(typeRef);
+					LocalVariable castVar = varDefCreate(typeRef);
 					it.add(castNodeCreate(varUse.getVarDef(), castVar));
 					varUse.setVarDef(castVar);
 					it.next();
@@ -477,14 +477,14 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	public void visit(VarExpr expr, Object... args) {
 		// recover the reference type from the current node
 		IType refType = (IType) args[0];
-		VarDef var = expr.getVar().getVarDef();
+		LocalVariable var = expr.getVar().getVarDef();
 		IType varType = var.getType();
 
 		if (!(refType.equals(varType))) {
 			// Add cast node before the current expression
 			it.previous();
 
-			VarDef vardef = varDefCreate(refType);
+			LocalVariable vardef = varDefCreate(refType);
 			it.add(castNodeCreate(var, vardef));
 			VarUse varUse = new VarUse(vardef, null);
 			expr.setVar(varUse);
@@ -510,8 +510,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	 * 
 	 */
 
-	private void visitLocals(List<VarDef> locals) {
-		for (VarDef local : locals) {
+	private void visitLocals(List<LocalVariable> locals) {
+		for (LocalVariable local : locals) {
 			if (portIndex.containsKey(local.getName())) {
 				// PointType newType = new PointType(local.getType());
 				PointType newType = new PointType(new IntType(new IntExpr(
@@ -538,7 +538,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	private void visitStateVars(List<StateVar> stateVars) {
 		for (StateVar stateVar : stateVars) {
-			VarDef vardef = stateVar.getDef();
+			LocalVariable vardef = stateVar.getDef();
 
 			PointType newType = new PointType(vardef.getType());
 			vardef.setType(newType);

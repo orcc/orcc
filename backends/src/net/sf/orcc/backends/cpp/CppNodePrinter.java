@@ -31,7 +31,7 @@ package net.sf.orcc.backends.cpp;
 import net.sf.orcc.backends.c.ExprToString;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.nodes.PeekNode;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.WriteNode;
@@ -58,7 +58,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("peekNode");
 
 		// varDef contains the variable (with the same name as the port)
-		VarDef varDef = node.getVarDef();
+		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
@@ -73,7 +73,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
-		VarDef varDef = node.getVarDef();
+		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());
@@ -88,7 +88,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)
-		VarDef varDef = node.getVarDef();
+		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getFifoName());

@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.llvm.nodes;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 
 /**
  * @author Jérôme GORIN
@@ -37,11 +37,11 @@ import net.sf.orcc.ir.VarDef;
  */
 public class BitcastNode extends AbstractLLVMNode {
 
-	private VarDef value;
+	private LocalVariable value;
 
-	private VarDef var;
+	private LocalVariable var;
 
-	public BitcastNode(int id, Location location, VarDef var, VarDef value) {
+	public BitcastNode(int id, Location location, LocalVariable var, LocalVariable value) {
 		super(id, location);
 		this.var = var;
 		this.value = value;
@@ -52,19 +52,19 @@ public class BitcastNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public VarDef getValue() {
+	public LocalVariable getValue() {
 		return value;
 	}
 
-	public VarDef getVar() {
+	public LocalVariable getVar() {
 		return var;
 	}
 
-	public void setValue(VarDef value) {
+	public void setValue(LocalVariable value) {
 		this.value = value;
 	}
 
-	public void setVar(VarDef var) {
+	public void setVar(LocalVariable var) {
 		this.var = var;
 	}
 

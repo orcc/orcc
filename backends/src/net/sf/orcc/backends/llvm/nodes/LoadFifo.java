@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.llvm.nodes;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 
 /**
  * @author Jérôme GORIN
@@ -43,9 +43,9 @@ public class LoadFifo extends AbstractLLVMNode {
 
 	private int numTokens;
 
-	private VarDef varDef;
+	private LocalVariable varDef;
 
-	public LoadFifo(int id, Location location, String fifoName, VarDef varDef,
+	public LoadFifo(int id, Location location, String fifoName, LocalVariable varDef,
 			int index) {
 		super(id, location);
 		this.fifoName = fifoName;
@@ -70,7 +70,7 @@ public class LoadFifo extends AbstractLLVMNode {
 		return numTokens;
 	}
 
-	public VarDef getVarDef() {
+	public LocalVariable getVarDef() {
 		return varDef;
 	}
 
@@ -86,7 +86,7 @@ public class LoadFifo extends AbstractLLVMNode {
 		this.numTokens = numTokens;
 	}
 
-	public void setVar(VarDef varDef) {
+	public void setVar(LocalVariable varDef) {
 		this.varDef = varDef;
 	}
 

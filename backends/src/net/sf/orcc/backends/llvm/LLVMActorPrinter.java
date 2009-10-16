@@ -39,7 +39,7 @@ import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.util.NodeIndex;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -119,14 +119,14 @@ public class LLVMActorPrinter {
 
 		// parameters
 		List<String> parameters = new ArrayList<String>();
-		for (VarDef param : proc.getParameters()) {
+		for (LocalVariable param : proc.getParameters()) {
 			parameters.add(varDefPrinter.getVarDefName(param, true));
 		}
 		procTmpl.setAttribute("parameters", parameters);
 
 		// locals
 		List<Object> varDefs = new ArrayList<Object>();
-		for (VarDef local : proc.getLocals()) {
+		for (LocalVariable local : proc.getLocals()) {
 			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
 			varDefs.add(varDefMap);
 		}
@@ -252,7 +252,7 @@ public class LLVMActorPrinter {
 
 			// initial value of state var (if any)
 			if (stateVar.hasInit()) {
-				VarDef varDef = stateVar.getDef();
+				LocalVariable varDef = stateVar.getDef();
 				constPrinter.setTemplate(stateTempl);
 
 				if (stateVar.getInit() instanceof ListConst) {

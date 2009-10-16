@@ -32,8 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.NameTransformer;
-import net.sf.orcc.ir.VarDef;
 
 /**
  * 
@@ -61,7 +61,7 @@ public class VarDefPrinter {
 	 *            a variable definition
 	 * @return a string template
 	 */
-	public Map<String, Object> applyVarDef(VarDef varDef) {
+	public Map<String, Object> applyVarDef(LocalVariable varDef) {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
 		varDefMap.put("name", getVarDefName(varDef));
 		varDefMap.put("type", typeVisitor.toString(varDef.getType()));
@@ -83,7 +83,7 @@ public class VarDefPrinter {
 	 *            the variable definition
 	 * @return a string with its full name
 	 */
-	public String getVarDefName(VarDef varDef) {
+	public String getVarDefName(LocalVariable varDef) {
 		String name = NameTransformer.transform(varDef.getName());
 		if (varDef.hasSuffix()) {
 			name += varDef.getSuffix();

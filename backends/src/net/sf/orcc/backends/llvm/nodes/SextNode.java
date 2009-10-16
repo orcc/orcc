@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.llvm.nodes;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
@@ -40,9 +40,9 @@ public class SextNode extends AbstractLLVMNode {
 
 	private IExpr value;
 
-	private VarDef var;
+	private LocalVariable var;
 
-	public SextNode(int id, Location location, VarDef var, IExpr value) {
+	public SextNode(int id, Location location, LocalVariable var, IExpr value) {
 		super(id, location);
 		this.var = var;
 		this.value = value;
@@ -57,7 +57,7 @@ public class SextNode extends AbstractLLVMNode {
 		return value;
 	}
 
-	public VarDef getVar() {
+	public LocalVariable getVar() {
 		return var;
 	}
 
@@ -65,7 +65,7 @@ public class SextNode extends AbstractLLVMNode {
 		this.value = value;
 	}
 
-	public void setVar(VarDef var) {
+	public void setVar(LocalVariable var) {
 		this.var = var;
 	}
 

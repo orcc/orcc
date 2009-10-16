@@ -36,7 +36,7 @@ import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -85,13 +85,13 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 		IType listType;
 
 		// Adding the getElementPtrNode
-		VarDef varDefList = varList.getVarDef();
+		LocalVariable varDefList = varList.getVarDef();
 		listType = varDefList.getType();
 		while (listType.getType() == IType.LIST) {
 			listType = ((ListType) listType).getElementType();
 		}
 
-		VarDef varDef = varDefCreate(varDefList, listType);
+		LocalVariable varDef = varDefCreate(varDefList, listType);
 		VarUse varUse = new VarUse(varDef, null);
 
 		// Create and insert the new node
@@ -104,7 +104,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 		return varUse;
 	}
 
-	private VarDef varDefCreate(VarDef varDef, IType type) {
+	private LocalVariable varDefCreate(LocalVariable varDef, IType type) {
 		int index = varDef.getIndex();
 		String name = varDef.getName() + Integer.toString(indexName++);
 		int suffix;
@@ -114,7 +114,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 			suffix = 0;
 		}
 
-		return new VarDef(false, false, index, new Location(), name, null,
+		return new LocalVariable(false, false, index, new Location(), name, null,
 				null, suffix, new PointType(type));
 	}
 

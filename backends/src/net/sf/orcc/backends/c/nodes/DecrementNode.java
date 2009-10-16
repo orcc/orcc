@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.c.nodes;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 
 /**
  * @author Matthieu Wipliez
@@ -37,9 +37,9 @@ import net.sf.orcc.ir.VarDef;
  */
 public class DecrementNode extends AbstractCNode {
 
-	private VarDef var;
+	private LocalVariable var;
 
-	public DecrementNode(int id, Location location, VarDef var) {
+	public DecrementNode(int id, Location location, LocalVariable var) {
 		super(id, location);
 		this.var = var;
 	}
@@ -49,11 +49,11 @@ public class DecrementNode extends AbstractCNode {
 		visitor.visit(this, args);
 	}
 
-	public VarDef getVar() {
+	public LocalVariable getVar() {
 		return var;
 	}
 
-	public void setVar(VarDef var) {
+	public void setVar(LocalVariable var) {
 		this.var = var;
 	}
 

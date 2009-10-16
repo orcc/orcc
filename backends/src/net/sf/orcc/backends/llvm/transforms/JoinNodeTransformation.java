@@ -39,7 +39,7 @@ import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.PhiNode;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -101,12 +101,12 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
 	}
 
 	private void mergePhiNode(PhiNode sourceNode,
-			Map<LabelNode, VarDef> assignements, IType phiNodeType) {
+			Map<LabelNode, LocalVariable> assignements, IType phiNodeType) {
 		// Match and merge a couple vardef/brLabel into imbricated brNode
 		LabelNode labelNode = null;
-		VarDef varDef = sourceNode.getVarDef();
+		LocalVariable varDef = sourceNode.getVarDef();
 
-		for (Entry<LabelNode, VarDef> targetAssignement : assignements
+		for (Entry<LabelNode, LocalVariable> targetAssignement : assignements
 				.entrySet()) {
 
 			if (targetAssignement.getValue().equals(varDef)) {
@@ -116,13 +116,13 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
 
 		assignements.remove(labelNode);
 
-		Map<LabelNode, VarDef> sourceAssignements = sourceNode
+		Map<LabelNode, LocalVariable> sourceAssignements = sourceNode
 				.getAssignements();
-		for (Entry<LabelNode, VarDef> sourceAssignement : sourceAssignements
+		for (Entry<LabelNode, LocalVariable> sourceAssignement : sourceAssignements
 				.entrySet()) {
 
 			LabelNode labKey = sourceAssignement.getKey();
-			VarDef varVal = sourceAssignement.getValue();
+			LocalVariable varVal = sourceAssignement.getValue();
 			varVal.setType(phiNodeType);
 
 			assignements.put(labKey, varVal);
@@ -159,10 +159,10 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
 			ListIterator<PhiNode> it = phiNodesSource.listIterator();
 			while (it.hasNext()) {
 				PhiNode phiNodeSource = it.next();
-				VarDef varDef = phiNodeSource.getVarDef();
+				LocalVariable varDef = phiNodeSource.getVarDef();
 
 				for (PhiNode phiNode : phiNodes) {
-					Map<LabelNode, VarDef> assignements = phiNode
+					Map<LabelNode, LocalVariable> assignements = phiNode
 							.getAssignements();
 					if (assignements.containsValue(varDef)) {
 						mergePhiNode(phiNodeSource, assignements, phiNode

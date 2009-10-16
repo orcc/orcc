@@ -31,7 +31,7 @@ package net.sf.orcc.backends.llvm.nodes;
 import java.util.Map;
 
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.type.IType;
 
 /**
@@ -40,14 +40,14 @@ import net.sf.orcc.ir.type.IType;
  */
 public class PhiNode extends AbstractLLVMNode {
 
-	private Map<LabelNode, VarDef> assignements;
+	private Map<LabelNode, LocalVariable> assignements;
 
 	private IType type;
 
-	private VarDef varDef;
+	private LocalVariable varDef;
 
-	public PhiNode(int id, Location location, VarDef varDef, IType type,
-			Map<LabelNode, VarDef> assignements) {
+	public PhiNode(int id, Location location, LocalVariable varDef, IType type,
+			Map<LabelNode, LocalVariable> assignements) {
 		super(id, location);
 		this.varDef = varDef;
 		this.assignements = assignements;
@@ -59,7 +59,7 @@ public class PhiNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public Map<LabelNode, VarDef> getAssignements() {
+	public Map<LabelNode, LocalVariable> getAssignements() {
 		return assignements;
 	}
 
@@ -67,11 +67,11 @@ public class PhiNode extends AbstractLLVMNode {
 		return type;
 	}
 
-	public VarDef getVarDef() {
+	public LocalVariable getVarDef() {
 		return varDef;
 	}
 
-	public void setAssignements(Map<LabelNode, VarDef> assignements) {
+	public void setAssignements(Map<LabelNode, LocalVariable> assignements) {
 		this.assignements = assignements;
 	}
 
@@ -79,7 +79,7 @@ public class PhiNode extends AbstractLLVMNode {
 		this.type = type;
 	}
 
-	public void setVarDef(VarDef varDef) {
+	public void setVarDef(LocalVariable varDef) {
 		this.varDef = varDef;
 	}
 

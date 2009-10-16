@@ -37,7 +37,7 @@ import java.util.Map;
 
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -116,7 +116,7 @@ public class CActorPrinter {
 
 		// parameters
 		List<Object> varDefs = new ArrayList<Object>();
-		for (VarDef param : proc.getParameters()) {
+		for (LocalVariable param : proc.getParameters()) {
 			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
 			varDefs.add(varDefMap);
 		}
@@ -124,7 +124,7 @@ public class CActorPrinter {
 
 		// locals
 		varDefs = new ArrayList<Object>();
-		for (VarDef local : proc.getLocals()) {
+		for (LocalVariable local : proc.getLocals()) {
 			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
 			varDefs.add(varDefMap);
 		}
@@ -227,7 +227,7 @@ public class CActorPrinter {
 			StringTemplate stateTempl = group.getInstanceOf("stateVar");
 			template.setAttribute("stateVars", stateTempl);
 
-			VarDef varDef = stateVar.getDef();
+			LocalVariable varDef = stateVar.getDef();
 			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(varDef);
 			stateTempl.setAttribute("vardef", varDefMap);
 

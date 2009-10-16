@@ -34,7 +34,7 @@ import java.util.Map;
 
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.type.IType;
 
 /**
@@ -63,7 +63,7 @@ public class LLVMVarDefPrinter {
 	 *            a variable definition
 	 * @return a string template
 	 */
-	public Map<String, Object> applyVarDef(VarDef varDef) {
+	public Map<String, Object> applyVarDef(LocalVariable varDef) {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
 		varDefMap.put("name", getVarDefName(varDef, false));
 
@@ -91,7 +91,7 @@ public class LLVMVarDefPrinter {
 	 *            the variable definition
 	 * @return a string with its full name
 	 */
-	public String getVarDefName(VarDef varDef, Object... args) {
+	public String getVarDefName(LocalVariable varDef, Object... args) {
 		Boolean showType = (Boolean) args[0];
 		String name = "";
 

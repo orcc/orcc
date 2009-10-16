@@ -37,7 +37,7 @@ import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.VarDef;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -181,7 +181,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 			expr.setE2(splitBinaryExpr((BinaryExpr) expr.getE2(), it));
 		}
 
-		VarDef vardef = varDefCreate(checkType(expr));
+		LocalVariable vardef = varDefCreate(checkType(expr));
 		VarUse varuse = new VarUse(vardef, null);
 		VarExpr varexpr = new VarExpr(new Location(), varuse);
 
@@ -212,8 +212,8 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 
 	}
 
-	private VarDef varDefCreate(IType type) {
-		return new VarDef(false, false, exprCounter++, new Location(), "expr",
+	private LocalVariable varDefCreate(IType type) {
+		return new LocalVariable(false, false, exprCounter++, new Location(), "expr",
 				null, null, 0, type);
 	}
 
