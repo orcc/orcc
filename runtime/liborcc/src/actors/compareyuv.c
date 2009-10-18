@@ -34,6 +34,10 @@
 /* Ignore Microsoft's interpretation of secure development
  * and the POSIX string handling API
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 #ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE
@@ -62,8 +66,111 @@ static unsigned char img_buf_v[MAX_WIDTH * MAX_HEIGHT / 4];
 static unsigned char Y[MAX_WIDTH * MAX_HEIGHT];
 static unsigned char U[MAX_WIDTH * MAX_HEIGHT / 4];
 static unsigned char V[MAX_WIDTH * MAX_HEIGHT / 4];
+static FILE *ptfile ;
+static char *ARG_INPUTFILE=0;
+static int  xsize_int ;
+static int  ysize_int ;
+static int  numberofframes = 0 ;
+static int  images = 0 ;
+static int  time_0 = 0, time_1 = 0 ;
+
+static void Read_YUV_init (int xsize, int ysize, char * filename )
+{
+    if((ptfile = fopen(filename, "rb")) == NULL){
+        printf("Cannot open yuv_file concatenated input file '%s' for reading\n"
+         , filename);
+      exit( -1);
+	}
 
 
+   if ( (xsize_int = xsize) == 0 ) 
+   {
+      printf("xsize %d invalid\n", xsize);
+      exit( -2);
+   }
+   if ( (ysize_int = ysize) == 0 ) 
+   {
+      printf("ysize %d invalid\n", ysize);
+      exit( -3);
+   }
+
+  numberofframes = Filesize(ptfile) / (xsize * ysize + xsize * ysize / 2);
+  time_0 = timeGetTime();
+}
+
+int Filesize ( FILE *f )
+{
+   long  oldfp, fsize ;
+   
+   oldfp = ftell(f);
+   if ( oldfp < 0L ) 
+      return -1 ;
+   if ( 0 != fseek(f, 0, SEEK_END) ) 
+      return -1 ;
+   fsize = ftell(f);
+   if ( fsize < 0 ) 
+      return -1 ;
+   if ( 0 != fseek(f, oldfp, SEEK_SET) ) 
+      return -1 ;
+   return fsize ;
+}
+
+void Read_YUV ( unsigned char *Y, unsigned char *U, unsigned char *V )
+{
+
+    /***********************/
+    /*  Declare variables  */
+    /***********************/
+
+    /***********************/
+    /* Function's Body     */
+    /***********************/
+
+    fread(Y, sizeof(unsigned char), xsize_int * ysize_int, ptfile);
+    fread(U, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
+    fread(V, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
+    images++ ;
+
+    if ( images == numberofframes ) {
+       time_1 = timeGetTime();
+       printf("numberofframes %d temps %d\n", numberofframes, time_1 - time_0);
+       time_0 = timeGetTime();
+       fseek(ptfile, 0, SEEK_SET);
+       images = 0 ;
+       exit(0);
+    }
+
+}
+
+static void DiffUcharImage ( const int x_size, const int y_size, const unsigned char *img1_uchar, const unsigned char *img2_uchar )
+{
+	/*Mes variables locales*/
+   int   i,j ;
+   int   error = 0 ;
+   
+   for ( j = 0 ; j < y_size ; j++ ) {
+
+	   for ( i = 0 ; i < x_size; i++ ) 
+	   {
+		   if ( abs(img1_uchar [j * x_size + i ] - img2_uchar [j * x_size + i])!=0  ) 
+		   {
+			   error++ ;
+
+			   if( error < 100)
+				   printf("error %d instead of %d at position : i= %d, j= %d, mb_x= %d, mb_y= %d \n", img1_uchar [j * x_size + i] , img2_uchar [j * x_size + i], i, j, i/16,j/16);
+
+		   }
+	   }
+   }
+
+   if ( error != 0 ) {
+      printf("error %d !!!!!!!!!!!!!\n", error);
+      system("pause");
+   }
+ //  else
+   //   printf("OK\n");
+
+}
 
 void Compare_write_mb(short tokens[384]) {
 	int i, j, x, y, cnt, base, idx;
@@ -137,8 +244,8 @@ void Compare_write_mb(short tokens[384]) {
 		m_y = 0;
 		printf("Frame number %d \n", FrameCounter);
 		Read_YUV(Y, U, V);
-		//DiffUcharImage(m_width, m_height, Y, img_buf_y);
-		DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u);
+		DiffUcharImage(m_width, m_height, Y, img_buf_y);
+		//DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u);
 		//DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v);
 		FrameCounter ++;
 		if ( NumberOfFrames == FrameCounter){
@@ -147,16 +254,14 @@ void Compare_write_mb(short tokens[384]) {
 	}
 }
 
-static int init = 0;
+
+
 
 static void Compare_init(int width, int height) {
 
-	if ( !init){
-		m_width = width;
-		m_height = height;
-		NumberOfFrames = Read_YUV_init_with_input_filename (width, height, yuv_file);
-		init = 1;
-	}
+	m_width = width;
+	m_height = height;
+	Read_YUV_init (width, height, yuv_file);
 }
 
 

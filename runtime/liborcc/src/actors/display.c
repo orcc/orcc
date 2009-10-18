@@ -45,7 +45,7 @@ extern struct fifo_s *display_HEIGHT;
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
 
-#define MAX_WIDTH 704
+#define MAX_WIDTH 720
 #define MAX_HEIGHT 576
 
 
