@@ -57,7 +57,7 @@ FU realizing Syntax Parsing for AVC
 // This FU has been modified by Mickaël Raulet (INSA of Rennes) July 2009
 
 actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
-		bool bits, 
+		uint(size=1) bits, 
 		uint nb_rbsp_bytes 
 		==> /*uint(size=16) pix_I_PCM,*/ 
 			uint(size=4) IntraPredMode,
@@ -536,7 +536,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	function done_reading_bits() --> bool : bits_to_read_count < 0 end
 	function read_result() --> int : read_result_in_progress end
 	function more_rbsp_data() --> uint(size=1) : 
-		if bit_count / 8 + if (bit_count mod 8) = 0 then 0 else 1 end < val_nb_rbsp_bytes then 1 else 0 end 
+		if (bit_count + 8)/ 8  < val_nb_rbsp_bytes - 1 then 1 else 0 end 
 	end
 	
   
@@ -1266,6 +1266,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		set_bits_to_read(2);
 	end
 
+	// if(separate_colour_plane_flag ==1)
+	read_SliceH_read_colour_plane_id: action ==>
+	guard
+		done_reading_bits()
+	do
+		colour_plane_id := read_result();
+		set_bits_to_read(4+log2_max_frame_num_minus4[sps_id]);
+	end
+	//end if 
+
 	read_SliceH_skip_separate_colour_plane_flag: action ==> 
 	guard
 		separate_colour_plane_flag[sps_id] != 1
@@ -1273,16 +1283,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		set_bits_to_read(4+log2_max_frame_num_minus4[sps_id]);
 	end
 
-	// if(separate_colour_plane_flag ==1)
-	read_SliceH_read_colour_plane_id: action ==>
-	guard
-		done_reading_bits(),
-		separate_colour_plane_flag[sps_id] = 1
-	do
-		colour_plane_id := read_result();
-		set_bits_to_read(4+log2_max_frame_num_minus4[sps_id]);
-	end
-	//end if 
 
 	read_SliceH_frame_num: action ==>
 	guard
@@ -2097,13 +2097,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 
 	//do
-	send_data_position_information: action 
+	sync_do_mb_layer: action
 		==> 
-			CurrMbAddr:[val_CurrMbAddr],
-			PicWidthInMb:[PicWidthInMbs],
-			PicSizeInMb:[PicSizeInMbs],
-			FirstMbInSlice:[if val_CurrMbAddr = first_mb_in_slice then 1 else 0 end]
 	end
+
 
 	//if (slice_type != I && slice_type != SI)
 	//  if (!entropy_coding_mode_flag) : CAVLC
@@ -2123,65 +2120,75 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		if mb_skip_run >0 then 
 			prevMbSkipped := 1; 
 		else 
-			prevMbSkipped := 0; end
+			prevMbSkipped := 0; 
+		end
 		end
 
 	read_SliceD_mb_skip_run_done1: action 
 		==> 
-			MbIntraFlag:[0], 
-			MbPartIdx:[1], 
-			RefIdx:[0], 
-			MbPartWidth:[16], 
-			MbPartHeigth:[16], 
-			MvRes:[0,0], 
+			CurrMbAddr:[mb_addr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[if mb_addr = first_mb_in_slice - 1 then 1 else 0 end],
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
+			slice_beta_offset:[val_slice_beta_offset],
+			LFDisable:[disable_deblocking_filter_idc],
+			cbp_blk:[0],
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
 			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
-			LAST:[[true: for int t in Integers(0,26) ]] repeat 27,
-			CurrMbAddr:[val_CurrMbAddr],
-			PicWidthInMb:[PicWidthInMbs],
-			PicSizeInMb:[PicSizeInMbs],
-			FirstMbInSlice:[if val_CurrMbAddr = first_mb_in_slice then 1 else 0 end],
-			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc],
-			cbp_blk:[0]
-	guard
-		prevMbSkipped = 1 and val_CurrMbAddr < PicSizeInMbs-1
-	do
-		NextMbAddress();
-		mb_skip_run := mb_skip_run -1;
-		if mb_skip_run = 0 then prevMbSkipped := 0; end
-	end
-
-	read_SliceD_mb_skip_run_done1_lastmb: action 
-		==> 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0], 
-			QP:[val_QP],
-			QP_Cb:[val_QP_Cb],
-			QP_Cr:[val_QP_Cr],
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16,
-			LAST:[[true: for int t in Integers(0,26) ]] repeat 27,
-			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc],
-			cbp_blk:[0]
+			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
 	guard
-		prevMbSkipped = 1 and val_CurrMbAddr = PicSizeInMbs-1
+		prevMbSkipped = 1
+	var 
+		int mb_addr
 	do
+		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
 		mb_skip_run := mb_skip_run -1;
-		if mb_skip_run = 0 then prevMbSkipped := 0; end
+		if mb_skip_run = 0 then 
+			prevMbSkipped := 0; 
+			moreDataFlag := more_rbsp_data();
+		end
 	end
 
 	read_SliceD_mb_skip_run_done2: action ==>
 	guard
 		prevMbSkipped = 0
+	end
+
+	read_SliceD_mb_skip_run_done2_moredata_1: action ==>
+	guard moreDataFlag = 1
+	end
+
+	read_SliceD_mb_skip_run_done2_moredata_0: action ==>
+	guard moreDataFlag = 0
+	end
+
+	read_SliceD_mb_skip_run_done2_stop_crt_1: action bits:[crt_bit] ==>
+	guard
+		crt_bit=1
 	do
-		moreDataFlag := more_rbsp_data();
-		if moreDataFlag = 1 and val_CurrMbAddr >= PicSizeInMbs then moreDataFlag := 0; end
+		bit_count:=bit_count+1;
+		if (bit_count mod 8 = 0) then set_bits_to_read(0); else set_bits_to_read(8-bit_count mod 8); end
+	end
+	
+	read_SliceD_mb_skip_run_done2_stop_crt_0: action==>
+	do
+		moreDataFlag:=1;
+	end
+
+
+	read_SliceD_mb_skip_run_done2_stop_byte_align: action==> 
+	guard
+		done_reading_bits()
 	end
 
 	// else if(CABAC && (slice_type != I && slice_type != SI))
@@ -2221,15 +2228,63 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//end if
 	// --> macrobloc_layer()
 	//end if
-
 	//if( !entropy_coding_mode_flag ) : CAVLC
 	SliceD_update_CAVLC: action ==>
 	guard
 		entropy_coding_mode_flag[pps_id] = 0
 	do
 		moreDataFlag := more_rbsp_data();
+	end
+
+	send_data_position_information: action 
+		==> 
+			CurrMbAddr:[mb_addr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[if mb_addr = first_mb_in_slice - 1 then 1 else 0 end],
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
+			slice_beta_offset:[val_slice_beta_offset],
+			LFDisable:[disable_deblocking_filter_idc],
+			cbp_blk:[val_cbp_blk],
+			QP:[val_QP], 
+			QP_Cb:[val_QP_Cb], 
+			QP_Cr:[val_QP_Cr], 
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16
+	var 
+		int mb_addr
+	do
+		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
-		if moreDataFlag = 1 and val_CurrMbAddr >= PicSizeInMbs then moreDataFlag := 0; end
+	end
+	
+	syncSliceD_endwhile: action ==>
+	end
+
+	SliceD_moredata_1: action ==>
+	guard moreDataFlag = 1
+	do
+	end
+
+	SliceD_moredata_0: action ==>
+	guard moreDataFlag = 0
+	end
+
+	SliceD_stop_crt_1: action bits:[crt_bit]==>
+	guard
+		crt_bit=1
+	do
+		bit_count:=bit_count+1;
+		if (bit_count mod 8 = 0) then set_bits_to_read(0); else set_bits_to_read(8-bit_count mod 8); end
+	end
+	
+	SliceD_stop_crt_0: action ==>
+	do
+		moreDataFlag:=1;
+	end
+
+	SliceD_stop_byte_align: action==> 
+	guard
+		done_reading_bits()
 	end
 
 	//else (CABAC)
@@ -2251,7 +2306,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 		//end if
 		NextMbAddress();
-		if moreDataFlag = 1 and val_CurrMbAddr = PicSizeInMbs then moreDataFlag := 0; end     
 	end
 
 	//while( moreDataFlag )
@@ -2382,7 +2436,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		if MB_inc < 2*64 then set_bits_to_read(bit_depth_chroma_minus8[sps_id]+8); end 
 	end
 
-	read_MB_layer_pcm_sample_done: action  ==> cbp_blk:[0]
+	read_MB_layer_pcm_sample_done: action  ==> 
 	guard
 		MB_inc = 2*64
 	end
@@ -2501,11 +2555,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_MB_layer_mb_qp_delta_done: action 
 		==> 
-			QP:[val_QP], 
-			QP_Cb:[val_QP_Cb], 
-			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16,
-			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc]
 	guard
 		vld_end()
 	do
@@ -2519,13 +2568,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//else
 	read_MB_layer_skip_mb_qp_delta: action 
 		==> 
-			QP:[val_QP], 
-			QP_Cb:[val_QP_Cb], 
-			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
-			LAST:[[true: for int t in Integers(0,26) ]] repeat 27,
-			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],slice_beta_offset:[val_slice_beta_offset],LFDisable:[disable_deblocking_filter_idc],
-			cbp_blk:[0]
+			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
 	guard
 		val_CodedBlockPatternLuma = 0, CodedBlockPatternChroma = 0, not IS_Intra_16x16()
 	end
@@ -3211,7 +3254,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//end for
 
 	//if( ChromaArrayType = = 1 | | ChromaArrayType = = 2 )
-	Residual_ChromaArrayType_1_2_init: action ==>cbp_blk:[val_cbp_blk]
+	Residual_ChromaArrayType_1_2_init: action ==>
 	guard
 		(chroma_format_idc[sps_id] = 1 or chroma_format_idc[sps_id] = 2) and separate_colour_plane_flag[sps_id] = 0 
 	do
@@ -3638,7 +3681,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		// read Sps header
 		read_Sps_id	  										( read_Sps_id	    								) --> read_Sps_id_done;
 		read_Sps_id_done	 								( read_Sps_id_done	    							) --> read_Sps_check_profile_idc;
-		read_Sps_check_profile_idc	 						( read_Sps_chroma_format_idc	  					) --> search_start_code; //not yet realized
+		read_Sps_check_profile_idc	 						( read_Sps_chroma_format_idc	  					) --> undefined; //not yet realized
 		read_Sps_check_profile_idc	 						( read_Sps_log2_max_frame_num_minus4				) --> read_Sps_pic_order_cnt_type;
 		read_Sps_pic_order_cnt_type	 						( read_Sps_pic_order_cnt_type	   					) --> read_Sps_check_pic_order_cnt_type; 
 		read_Sps_check_pic_order_cnt_type	 				( read_Sps_pic_order_cnt_type_skip01				) --> read_Sps_num_ref_frames; 
@@ -3812,24 +3855,37 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		// read Slice Data     only decoding CAVLC process is implemented
 		read_SliceD_CABAC_alignement						( read_SliceD_CABAC_alignement						) --> read_SliceD_init;
 		read_SliceD_CABAC_alignement						( read_SliceD_skip_CABAC_alignement	                ) --> read_SliceD_init;
-		read_SliceD_init									( SliceD_init										) --> send_data_position_information;
-		send_data_position_information						( send_data_position_information	                ) --> read_SliceD_mb_skip;
+		read_SliceD_init									( SliceD_init										) --> sync_do_mb_layer;
+		sync_do_mb_layer 									( sync_do_mb_layer										) --> read_SliceD_mb_skip;
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_run							) --> read_SliceD_mb_skip_run_done0;
 		read_SliceD_mb_skip_run_done0						( read_SliceD_mb_skip_run_done0						) --> read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1						) --> read_SliceD_mb_skip_run_done1;
-		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1_lastmb				) --> read_SliceD_mb_skip_run_done1;
-		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done2						) --> read_SliceD_mb_field_decoding_flag;
-		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag 							) --> read_SliceD_mb_field_decoding_flag; // CABAC : not yet implemented
+		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done2						) --> read_SliceD_mb_skip_run_done2_moredata;
+		read_SliceD_mb_skip_run_done2_moredata              ( read_SliceD_mb_skip_run_done2_moredata_1          ) --> read_SliceD_mb_field_decoding_flag;
+		read_SliceD_mb_skip_run_done2_moredata 				( read_SliceD_mb_skip_run_done2_moredata_0			) --> read_SliceD_mb_skip_run_done2_moredata_0_done;
+		read_SliceD_mb_skip_run_done2_moredata_0_done 		( read_SliceD_mb_skip_run_done2_stop_crt_1			) --> read_SliceD_mb_skip_run_done2_stop_crt_1_done;
+		read_SliceD_mb_skip_run_done2_moredata_0_done 		( read_SliceD_mb_skip_run_done2_stop_crt_0			) --> read_SliceD_mb_field_decoding_flag;
+		read_SliceD_mb_skip_run_done2_stop_crt_1_done		( read_SliceD_mb_skip_run_done2_stop_byte_align     ) --> syncSliceD_endwhile;
+		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag 							) --> undefined; // CABAC : not yet implemented
 		read_SliceD_mb_skip									( read_SliceD_skip_mb_skip 							) --> read_SliceD_mb_field_decoding_flag;
-		read_SliceD_mb_field_decoding_flag					( read_SliceD_mb_field_decoding_flag				) --> read_MB_layer_mb_type; // interleaved not implemented
+		read_SliceD_mb_field_decoding_flag					( read_SliceD_mb_field_decoding_flag				) --> undefined; // interleaved not implemented
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_skip_mb_field_decoding_flag			) --> read_MB_layer_mb_type;
 		// --> macrobloc_layer()
-		SliceD_update										( SliceD_update_CAVLC								) --> SliceD_while_moreDataFlag;
+		SliceD_update										( SliceD_update_CAVLC								) --> SliceD_moredata;
+		SliceD_moredata                                     ( SliceD_moredata_1                                 ) --> SliceD_moredata_1_done;
+		SliceD_moredata_1_done								( send_data_position_information	                ) --> syncSliceD_endwhile;
+		SliceD_moredata 									( SliceD_moredata_0									) --> SliceD_moredata_0_done;
+		SliceD_moredata_0_done 								( SliceD_stop_crt_1									) --> SliceD_stop_crt_1_done;
+		SliceD_moredata_0_done 								( SliceD_stop_crt_0									) --> SliceD_stop_byte_align_done;
+		SliceD_stop_crt_1_done								( SliceD_stop_byte_align 							) --> SliceD_stop_byte_align_done;
+		SliceD_stop_byte_align_done							( send_data_position_information	                ) --> syncSliceD_endwhile;
+		syncSliceD_endwhile									( syncSliceD_endwhile								) --> SliceD_while_moreDataFlag;
+		
 		SliceD_update										( SliceD_update_CABAC								) --> SliceD_while_moreDataFlag;
-		SliceD_while_moreDataFlag							( SliceD_while_moreDataFlag							) --> send_data_position_information;
+		SliceD_while_moreDataFlag							( SliceD_while_moreDataFlag							) --> sync_do_mb_layer;
 		SliceD_while_moreDataFlag							( SliceD_end										) --> search_start_code;
 		read_SliceD_mb_field_decoding_flag					( SliceD_end										) --> search_start_code;
-
+		
 		// macrobloc_layer
 		read_MB_layer_mb_type								( read_MB_layer_mb_type								) --> read_MB_layer_mb_type_done;
 		read_MB_layer_mb_type_done							( read_MB_layer_mb_type_done						) --> read_MB_layer_check_I_PCM;
@@ -3981,6 +4037,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		MB_pred_done  > read_MB_pred_mvd_l1 > read_MB_pred_skip_mvd_l1;
 		test_zero_byte > generic_done;
 		test_one_byte  > generic_done;
+		read_SliceD_mb_skip_run_done2_stop_crt_1>read_SliceD_mb_skip_run_done2_stop_crt_0;
+		SliceD_stop_crt_1 > SliceD_stop_crt_0;
 	end
 
 end
