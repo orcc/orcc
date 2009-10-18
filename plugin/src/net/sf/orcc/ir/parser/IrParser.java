@@ -784,16 +784,13 @@ public class IrParser {
 			JSONArray array = (JSONArray) obj;
 			String name = array.getString(0);
 			if (name.equals(IntType.NAME)) {
-				int size = array.getInt(1);
-				IExpr expr = new IntExpr(new Location(), size);
+				IExpr expr = parseExpr(array.getJSONArray(1));
 				type = new IntType(expr);
 			} else if (name.equals(UintType.NAME)) {
-				int size = array.getInt(1);
-				IExpr expr = new IntExpr(new Location(), size);
+				IExpr expr = parseExpr(array.getJSONArray(1));
 				type = new UintType(expr);
 			} else if (name.equals(ListType.NAME)) {
-				int size = array.getInt(1);
-				IExpr expr = new IntExpr(new Location(), size);
+				IExpr expr = parseExpr(array.getJSONArray(1));
 				IType subType = parseType(array.get(2));
 				type = new ListType(expr, subType);
 			} else {

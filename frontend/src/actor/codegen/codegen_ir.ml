@@ -53,18 +53,6 @@ let rec mk_cst cst =
 	| CList list -> array (List.map (fun cst -> mk_cst cst) list)
 	| CStr s -> string s
 
-(** [mk_type typ] returns a single element that can be "boolType", "intType",
-"listType", "stringType", "uintType", or "voidType". *)
-let rec mk_type = function
-	| TypeBool -> string "bool"
-	| TypeInt size -> array [string "int"; int size]
-  | TypeList (typ, size) ->
-		array [string "List"; int size; mk_type typ]
-	| TypeStr -> string "String"
-	| TypeUint size -> array [string "uint"; int size]
-	| TypeUnknown -> failwith "unknown type"
-	| TypeVoid -> string "void"
-
 (** [mk_suffix suffix]. *)
 let mk_suffix = function
 	| None -> null
@@ -132,6 +120,20 @@ let rec mk_expr expr =
 				array [string (string_of_bop bop); mk_expr e1; mk_expr e2; mk_type t] ])
 	in
 	array [mk_loc loc; node]
+
+and 
+
+(** [mk_type typ] returns a single element that can be "boolType", "intType",
+"listType", "stringType", "uintType", or "voidType". *)
+ mk_type = function
+	| TypeBool -> string "bool"
+	| TypeInt size -> array [string "int"; mk_expr (ExprInt (dummy_loc, size))]
+  | TypeList (typ, size) ->
+		array [string "List"; mk_expr (ExprInt (dummy_loc, size)); mk_type typ]
+	| TypeStr -> string "String"
+	| TypeUint size -> array [string "uint"; mk_expr (ExprInt (dummy_loc, size))]
+	| TypeUnknown -> failwith "unknown type"
+	| TypeVoid -> string "void"
 
 let mk_uses ref_list =
 	array

@@ -14,7 +14,10 @@ import net.sf.orcc.common.Port;
 import net.sf.orcc.frontend.parser.RVCCalASTParser;
 import net.sf.orcc.ir.IrConstants;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.expr.Util;
+import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
@@ -125,16 +128,16 @@ public class ActorWriter {
 			JSONArray array = new JSONArray();
 			if (type.getType() == IType.INT) {
 				array.put(IntType.NAME);
-				int size = Util.evaluateAsInteger(((IntType) type).getSize());
-				array.put(size);
+				IExpr expr = ((IntType) type).getSize();
+				array.put(writeExpr(expr));
 			} else if (type.getType() == IType.UINT) {
 				array.put(UintType.NAME);
-				int size = Util.evaluateAsInteger(((UintType) type).getSize());
-				array.put(size);
+				IExpr expr = ((UintType) type).getSize();
+				array.put(writeExpr(expr));
 			} else if (type.getType() == IType.LIST) {
 				array.put(ListType.NAME);
-				int size = Util.evaluateAsInteger(((ListType) type).getSize());
-				array.put(size);
+				IExpr expr = ((ListType) type).getSize();
+				array.put(writeExpr(expr));
 				array.put(writeType(((ListType) type).getElementType()));
 			} else {
 				throw new OrccException("Invalid type definition: "
@@ -143,6 +146,34 @@ public class ActorWriter {
 
 			return array;
 		}
+	}
+
+	private JSONArray writeExpr(IExpr expr) {
+		JSONArray array = new JSONArray();
+		array.put(writeLocation(expr.getLocation()));
+		switch (expr.getType()) {
+		case IExpr.BINARY:
+			break;
+		case IExpr.BOOLEAN:
+			array.put(((BooleanExpr) expr).getValue());
+			break;
+		case IExpr.INT:
+			array.put(((IntExpr) expr).getValue());
+			break;
+		case IExpr.LIST:
+			break;
+		case IExpr.STRING:
+			array.put(((StringExpr) expr).getValue());
+			break;
+		case IExpr.TYPE:
+			break;
+		case IExpr.UNARY:
+			break;
+		case IExpr.VAR:
+			break;
+		}
+		
+		return array;
 	}
 
 	// private JSONArray writeVarDef(VarDef varDef) throws OrccException {
