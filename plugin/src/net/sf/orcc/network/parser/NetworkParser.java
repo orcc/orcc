@@ -35,13 +35,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.common.GlobalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -159,25 +157,6 @@ public class NetworkParser {
 		path = file.getParent();
 	}
 
-	private void checkConnections() throws OrccException {
-		Set<Connection> connections = graph.edgeSet();
-		for (Connection connection : connections) {
-			Instance source = graph.getEdgeSource(connection);
-			Instance target = graph.getEdgeTarget(connection);
-			Actor srcActor = source.getActor();
-			Actor tgtActor = target.getActor();
-
-			IType srcType = connection.getSource().getType();
-			IType dstType = connection.getTarget().getType();
-			if (!srcType.equals(dstType)) {
-				throw new OrccException("Type error: " + srcActor + "."
-						+ connection.getSource() + " is " + srcType + ", "
-						+ tgtActor + "." + connection.getTarget() + " is "
-						+ dstType);
-			}
-		}
-	}
-
 	private void checkInstances(Instance source, String src, Instance target,
 			String dst) throws OrccException {
 		if (source == null) {
@@ -195,8 +174,6 @@ public class NetworkParser {
 			throw new OrccException(
 					"A valid network must contain at least one instance");
 		}
-
-		checkConnections();
 	}
 
 	private void checkPorts(String src, String src_port, String dst,
@@ -213,18 +190,6 @@ public class NetworkParser {
 		} else if (dst_port.isEmpty()) {
 			throw new OrccException("An Connection element "
 					+ "must have a valid non-empty \"dst-port\" " + "attribute");
-		}
-	}
-
-	private void checkPortsVarDef(Port srcPort, String src_port, Port dstPort,
-			String dst_port) throws OrccException {
-		if (srcPort == null) {
-			throw new OrccException("A Connection refers to "
-					+ "a non-existent source port: \"" + src_port + "\"");
-		}
-		if (dstPort == null) {
-			throw new OrccException("A Connection refers to "
-					+ "a non-existent target port: \"" + dst_port + "\"");
 		}
 	}
 
@@ -315,6 +280,14 @@ public class NetworkParser {
 		}
 	}
 
+	/**
+	 * Parses the given DOM element as a connection, and adds a matching
+	 * Connection to the graph of the network being parsed.
+	 * 
+	 * @param connection
+	 *            a DOM element named "Connection"
+	 * @throws OrccException
+	 */
 	private void parseConnection(Element connection) throws OrccException {
 		String src = connection.getAttribute("src");
 		String src_port = connection.getAttribute("src-port");
@@ -328,10 +301,8 @@ public class NetworkParser {
 
 		checkInstances(source, src, target, dst);
 
-		Port srcPort = source.getActor().getOutput(src_port);
-		Port dstPort = target.getActor().getInput(dst_port);
-
-		checkPortsVarDef(srcPort, src_port, dstPort, dst_port);
+		Port srcPort = new Port(new Location(), null, src_port);
+		Port dstPort = new Port(new Location(), null, dst_port);
 
 		Node child = connection.getFirstChild();
 		Map<String, IAttribute> attributes = parseAttributes(child);

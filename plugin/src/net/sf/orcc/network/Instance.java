@@ -83,6 +83,11 @@ public class Instance implements Comparable<Instance> {
 	private Map<String, IExpr> parameters;
 
 	/**
+	 * the absolute path of the parent of the file this instance is defined in
+	 */
+	private File path;
+
+	/**
 	 * Creates a new virtual instance. Only used by subclass Broadcast.
 	 * 
 	 * @param id
@@ -118,36 +123,16 @@ public class Instance implements Comparable<Instance> {
 		this.clasz = clasz;
 		this.id = id;
 		this.parameters = parameters;
+		this.path = new File(path);
 
-		String fileName = path + File.separator + clasz + ".xdf";
-		file = new File(fileName);
+		file = new File(path, clasz + ".xdf");
 		if (file.exists()) {
 			// cool, we got a network
-			NetworkParser parser = new NetworkParser(fileName);
+			NetworkParser parser = new NetworkParser(file.getAbsolutePath());
 			network = parser.parseNetwork();
 		} else {
-			fileName = path + File.separator + clasz + ".json";
-			file = new File(fileName);
-			try {
-				if (file.exists()) {
-					// TODO when new front end is ready, add instantiation
-					// here?
-					InputStream in = new FileInputStream(file);
-					actor = new IrParser().parseActor(in);
-				} else {
-					fileName = path + File.separator + id + ".json";
-					file = new File(fileName);
-					// this may cause a FileNotFoundException
-					InputStream in = new FileInputStream(file);
-					actor = new IrParser().parseActor(in);
-				}
-			} catch (OrccException e) {
-				throw new OrccException("Could not parse instance \"" + id
-						+ "\" because: " + e.getLocalizedMessage(), e);
-			} catch (FileNotFoundException e) {
-				throw new OrccException(
-						"I/O error when parsing \"" + id + "\"", e);
-			}
+			// not a network => will load later when the instantiate method is
+			// called
 		}
 	}
 
@@ -217,7 +202,7 @@ public class Instance implements Comparable<Instance> {
 	 * 
 	 * @return true if this instance references an actor.
 	 */
-	public boolean hasActor() {
+	public boolean isActor() {
 		return (actor != null);
 	}
 
@@ -228,6 +213,41 @@ public class Instance implements Comparable<Instance> {
 	 */
 	public boolean isBroadcast() {
 		return isBroadcast;
+	}
+
+	/**
+	 * Returns true if this instance references a network.
+	 * 
+	 * @return true if this instance references a network.
+	 */
+	public boolean isNetwork() {
+		return (network != null);
+	}
+
+	/**
+	 * Tries to load this instance as an actor.
+	 * 
+	 * @throws OrccException
+	 */
+	public void instantiate() throws OrccException {
+		file = new File(path, clasz + ".json");
+		try {
+			if (file.exists()) {
+				// TODO when new front end is ready, add instantiation here
+				InputStream in = new FileInputStream(file);
+				actor = new IrParser().parseActor(in);
+			} else {
+				file = new File(path, id + ".json");
+				// this may cause a FileNotFoundException
+				InputStream in = new FileInputStream(file);
+				actor = new IrParser().parseActor(in);
+			}
+		} catch (OrccException e) {
+			throw new OrccException("Could not parse instance \"" + id
+					+ "\" because: " + e.getLocalizedMessage(), e);
+		} catch (FileNotFoundException e) {
+			throw new OrccException("I/O error when parsing \"" + id + "\"", e);
+		}
 	}
 
 	public void setClasz(String clasz) {

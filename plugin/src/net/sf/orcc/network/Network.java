@@ -28,8 +28,10 @@
  */
 package net.sf.orcc.network;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.common.GlobalVariable;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -132,9 +134,89 @@ public class Network {
 		return variables;
 	}
 
+	/**
+	 * Walks through the hierarchy, instantiate actors, and checks that
+	 * connections actually point to ports defined in actors. Instantiating an
+	 * actor implies first loading it and then giving it the right parameters.
+	 * 
+	 * @throws OrccException
+	 *             if an actor could not be instantiated, or a connection is
+	 *             wrong
+	 */
+	public void instantiate() throws OrccException {
+		for (Instance instance : graph.vertexSet()) {
+			if (instance.isNetwork()) {
+				// instantiate the child network
+				instance.getNetwork().instantiate();
+			} else if (!instance.isBroadcast()) {
+				// instantiate the child actor
+				instance.instantiate();
+			}
+		}
+
+		updateConnections();
+	}
+
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	/**
+	 * Updates the given connection's source and target port by getting the
+	 * ports from the source and target instances, after checking the ports
+	 * exist and have compatible types.
+	 * 
+	 * @param connection
+	 *            a connection
+	 * @throws OrccException
+	 */
+	private void updateConnection(Connection connection) throws OrccException {
+		Instance source = graph.getEdgeSource(connection);
+		Instance target = graph.getEdgeTarget(connection);
+
+		String srcPortName = connection.getSource().getName();
+		Port srcPort = source.getActor().getOutput(srcPortName);
+
+		String dstPortName = connection.getTarget().getName();
+		Port dstPort = target.getActor().getInput(dstPortName);
+
+		// check ports exist
+		if (srcPort == null) {
+			throw new OrccException("A Connection refers to "
+					+ "a non-existent source port: \"" + srcPortName + "\"");
+		} else if (dstPort == null) {
+			throw new OrccException("A Connection refers to "
+					+ "a non-existent target port: \"" + dstPortName + "\"");
+		}
+
+		// check port types match
+		IType srcType = srcPort.getType();
+		IType dstType = dstPort.getType();
+		if (!srcType.equals(dstType)) {
+			throw new OrccException("Type error: " + source.getActor() + "."
+					+ srcPort + " is " + srcType + ", " + target.getActor()
+					+ "." + dstPort + " is " + dstType);
+		}
+
+		// update connection
+		connection.setSource(srcPort);
+		connection.setTarget(srcPort);
+	}
+
+	/**
+	 * Updates the connections of this network. Must be called after actors have
+	 * been instantiated.
+	 * 
+	 * @throws OrccException
+	 *             if a connection could not be updated because it references a
+	 *             port that does not exist or have source and target ports that
+	 *             have incompatible types
+	 */
+	private void updateConnections() throws OrccException {
+		for (Connection connection : graph.edgeSet()) {
+			updateConnection(connection);
+		}
 	}
 
 }
