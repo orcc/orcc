@@ -44,6 +44,7 @@ public abstract class AbstractExpr implements IExpr {
 		this.location = location;
 	}
 
+	@Override
 	public Location getLocation() {
 		return location;
 	}

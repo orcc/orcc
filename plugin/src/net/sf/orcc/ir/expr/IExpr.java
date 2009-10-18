@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.Location;
 
 /**
  * This interface defines an expression.
@@ -94,6 +95,13 @@ public interface IExpr {
 	 *             if the expression cannot be evaluated.
 	 */
 	public IExpr evaluate() throws OrccException;
+
+	/**
+	 * Returns the location of this expression.
+	 * 
+	 * @return the location of this expression
+	 */
+	public Location getLocation();
 
 	/**
 	 * Returns the type of this expression.
