@@ -29,18 +29,17 @@
 package net.sf.orcc.frontend;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.Set;
+import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.RVCCalASTParser;
 import net.sf.orcc.frontend.writer.ActorWriter;
 import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
+import net.sf.orcc.network.parser.NetworkParser;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -51,93 +50,6 @@ import net.sf.orcc.ir.actor.Actor;
 public class Frontend {
 
 	/**
-	 * This class implements a file filter that returns true for existing,
-	 * non-hidden sub-folders, *.cal, *.xdf files.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class CalFileFilter implements FileFilter {
-
-		@Override
-		public boolean accept(File pathname) {
-			if (pathname.exists() && !pathname.isHidden()) {
-				String name = pathname.getName();
-				return (pathname.isDirectory() || name.endsWith(".cal") || name
-						.endsWith(".xdf"));
-			} else {
-				return false;
-			}
-		}
-	}
-
-	private File outputFolder;
-
-	/**
-	 * Creates a front-end that compiles RVC-CAL actors present in the given
-	 * input folder into IR form and serializes IR actors into the given output
-	 * folder. The networks are just copied to the output folder.
-	 * 
-	 * @param inputFolder
-	 * @param outputFolder
-	 * @throws OrccException
-	 */
-	public Frontend(String inputFolder, String outputFolder)
-			throws OrccException {
-		try {
-			this.outputFolder = new File(outputFolder).getCanonicalFile();
-			parseFilesInFolder(new File(inputFolder));
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
-	}
-
-	private void parseFilesInFolder(File folder) throws IOException,
-			OrccException {
-		File[] files = folder.listFiles(new CalFileFilter());
-		for (File file : files) {
-			if (file.isDirectory()) {
-				parseFilesInFolder(file);
-			} else {
-				String name = file.getName();
-				if (name.endsWith(".cal")) {
-					// *.cal file
-					Actor actor = new RVCCalASTParser(file.getCanonicalPath())
-							.parse();
-					new ActorWriter(actor).write(outputFolder.toString());
-				} else {
-					// *.xdf file
-					copy(file);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Copy the given file to the output folder.
-	 * 
-	 * @param file
-	 *            a file
-	 * @throws IOException
-	 *             if file could not be found, or there is a I/O error
-	 */
-	private void copy(File file) throws IOException {
-		InputStream in = new FileInputStream(file);
-		OutputStream out = new FileOutputStream(outputFolder + File.separator
-				+ file.getName());
-
-		byte[] buf = new byte[8192];
-		int len = in.read(buf);
-		while (len > 0) {
-			out.write(buf, 0, len);
-			len = in.read(buf);
-		}
-
-		in.close();
-		out.close();
-	}
-
-	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws OrccException {
@@ -145,8 +57,80 @@ public class Frontend {
 			new Frontend(args[0], args[1]);
 		} else {
 			System.err.println("Usage: Frontend "
-					+ "<absolute path of input folder> "
+					+ "<absolute path of top-level network> "
 					+ "<absolute path of output folder>");
+		}
+	}
+
+	/**
+	 * a set of file names that contain actors
+	 */
+	private Set<String> actors;
+
+	/**
+	 * output folder
+	 */
+	private File outputFolder;
+
+	/**
+	 * Creates a front-end that parses the given top-level network, compiles
+	 * RVC-CAL actors referenced by networks into IR form and serializes IR
+	 * actors into the given output folder. The networks are just copied to the
+	 * output folder.
+	 * 
+	 * @param inputFolder
+	 * @param outputFolder
+	 * @throws OrccException
+	 */
+	public Frontend(String topLevelNetwork, String outputFolder)
+			throws OrccException {
+		String fileName;
+		try {
+			this.outputFolder = new File(outputFolder).getCanonicalFile();
+			fileName = new File(topLevelNetwork).getCanonicalPath();
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
+
+		actors = new TreeSet<String>();
+
+		NetworkParser parser = new NetworkParser(fileName);
+		Network network = parser.parseNetwork();
+		getActors(network);
+		processActors();
+	}
+
+	/**
+	 * Gets the actors referenced by the given network, and add the path where
+	 * they can be loaded from to the actors set.
+	 * 
+	 * @param network
+	 *            a network
+	 */
+	private void getActors(Network network) {
+		for (Instance instance : network.getGraph().vertexSet()) {
+			if (instance.isNetwork()) {
+				getActors(instance.getNetwork());
+			} else {
+				String parent = instance.getFile().getParent();
+				String clasz = instance.getClasz();
+				actors.add(parent + File.separator + clasz + ".cal");
+			}
+		}
+	}
+
+	/**
+	 * Parses all the actors in the actors set, translates them to IR, and
+	 * writes them to the output folder.
+	 */
+	private void processActors() {
+		for (String path : actors) {
+			try {
+				Actor actor = new RVCCalASTParser(path).parse();
+				new ActorWriter(actor).write(outputFolder.toString());
+			} catch (OrccException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
