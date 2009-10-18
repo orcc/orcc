@@ -201,7 +201,7 @@ public class Network {
 
 		// update connection
 		connection.setSource(srcPort);
-		connection.setTarget(srcPort);
+		connection.setTarget(dstPort);
 	}
 
 	/**
