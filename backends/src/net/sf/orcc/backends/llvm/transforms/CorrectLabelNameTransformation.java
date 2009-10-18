@@ -38,6 +38,7 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.transforms.IActorTransformation;
 
 /**
  * Verify Branch Name coherence
@@ -45,12 +46,13 @@ import net.sf.orcc.ir.nodes.AbstractNode;
  * @author Jérôme GORIN
  * 
  */
-public class CorrectLabelNameTransformation extends AbstractLLVMNodeVisitor {
+public class CorrectLabelNameTransformation extends AbstractLLVMNodeVisitor
+		implements IActorTransformation {
 
 	int brCount;
 
-	public CorrectLabelNameTransformation(Actor actor) {
-
+	@Override
+	public void transform(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
 			visitProc(proc);
 		}

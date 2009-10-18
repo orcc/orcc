@@ -31,16 +31,12 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
@@ -50,28 +46,11 @@ import net.sf.orcc.ir.nodes.WhileNode;
 /**
  * Move writes to the beginning of an action (because we use pointers).
  * 
- * @author Jérôme GORIN
+ * @author Jérôme Gorin
+ * @author Matthieu Wipliez
  * 
  */
-public class AssignPeephole extends AbstractNodeVisitor {
-
-	private Procedure procedure;
-
-	public AssignPeephole(Actor actor) {
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-	}
+public class AssignPeephole extends AbstractActorTransformation {
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -124,16 +103,4 @@ public class AssignPeephole extends AbstractNodeVisitor {
 		visit(node.getJoinNode(), args);
 	}
 
-	private void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
-		while (it.hasNext()) {
-			it.next().accept(this, it);
-		}
-	}
-
-	private void visitProc(Procedure proc) {
-		this.procedure = proc;
-		List<AbstractNode> nodes = proc.getNodes();
-		visitNodes(nodes);
-	}
 }

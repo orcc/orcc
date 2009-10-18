@@ -26,35 +26,21 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.transforms;
+package net.sf.orcc.network.transforms;
 
-import java.util.List;
-import java.util.ListIterator;
-
-import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.network.Network;
 
 /**
+ * This class defines a transformation that flattens a given network in-place.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class Peephole {
+public class NetworkFlattener implements INetworkTransformation {
 
-	/**
-	 * Examines the node(s) at the given list iterator and see if they can be
-	 * replaced by better code.
-	 * 
-	 * @param it
-	 *            The iterator.
-	 */
-	public abstract void examine(Procedure proc, ListIterator<AbstractNode> it);
-
-	public void visitNodes(Procedure proc) {
-		List<AbstractNode> nodes = proc.getNodes();
-		ListIterator<AbstractNode> it = nodes.listIterator();
-		while (it.hasNext()) {
-			examine(proc, it);
-		}
+	@Override
+	public void transform(Network network) {
+		// do nothing at this time
 	}
 
 }

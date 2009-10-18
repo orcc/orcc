@@ -44,25 +44,14 @@ import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * Adds control flow.
+ * Adds instantiation procedure.
  * 
- * @author Jérôme GORIN
+ * @author Jérôme Gorin
  * 
  */
-public class AddInstantationProcedure {
+public class AddInstantationProcedure implements IActorTransformation {
 
 	private String actorName;
-
-	public AddInstantationProcedure(Actor actor) {
-		List<Procedure> instations = new ArrayList<Procedure>();
-		this.actorName = actor.getName();
-		Procedure inputInit = createInitProcedure("Input", actor.getInputs());
-		Procedure inputOutput = createInitProcedure("Output", actor
-				.getOutputs());
-		instations.add(inputInit);
-		instations.add(inputOutput);
-		actor.setInstantations(instations);
-	}
 
 	private Procedure createInitProcedure(String Attributs,
 			OrderedMap<Port> ports) {
@@ -70,8 +59,8 @@ public class AddInstantationProcedure {
 		List<LocalVariable> locals = new ArrayList<LocalVariable>();
 		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
 
-		LocalVariable parameter = new LocalVariable(false, false, 0, new Location(), "fifo",
-				null, null, null, new VoidType());
+		LocalVariable parameter = new LocalVariable(false, false, 0,
+				new Location(), "fifo", null, null, null, new VoidType());
 
 		parameters.add(parameter);
 		for (Port port : ports) {
@@ -87,6 +76,18 @@ public class AddInstantationProcedure {
 		return new Procedure(actorName + "_init" + Attributs, false,
 				new Location(), new VoidType(), parameters, locals, nodes);
 
+	}
+
+	@Override
+	public void transform(Actor actor) {
+		List<Procedure> instations = new ArrayList<Procedure>();
+		this.actorName = actor.getName();
+		Procedure inputInit = createInitProcedure("Input", actor.getInputs());
+		Procedure inputOutput = createInitProcedure("Output", actor
+				.getOutputs());
+		instations.add(inputInit);
+		instations.add(inputOutput);
+		actor.setInstantations(instations);
 	}
 
 }

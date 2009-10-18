@@ -31,16 +31,12 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
@@ -53,25 +49,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * @author Matthieu Wipliez
  * 
  */
-public class PhiRemoval extends AbstractNodeVisitor {
-
-	private Procedure procedure;
-
-	public PhiRemoval(Actor actor) {
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-	}
+public class PhiRemoval extends AbstractActorTransformation {
 
 	@Override
 	public void visit(IfNode node, Object... args) {
@@ -138,18 +116,6 @@ public class PhiRemoval extends AbstractNodeVisitor {
 		node.getJoinNode().accept(this, it, 1);
 		node.getJoinNode().getPhis().clear();
 		visitNodes(node.getNodes());
-	}
-
-	private void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
-		while (it.hasNext()) {
-			it.next().accept(this, it);
-		}
-	}
-
-	private void visitProc(Procedure proc) {
-		this.procedure = proc;
-		visitNodes(proc.getNodes());
 	}
 
 }

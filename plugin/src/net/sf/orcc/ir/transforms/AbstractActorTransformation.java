@@ -28,38 +28,67 @@
  */
 package net.sf.orcc.ir.transforms;
 
+import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.actor.Action;
+import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.EmptyNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 
 /**
- * Removes empty nodes from procedure.
+ * This abstract class implements an no-op transformation on an actor. This
+ * class should be extended by classes that implement actor transformations.
  * 
- * @author Jérôme Gorin
  * @author Matthieu Wipliez
  * 
  */
-public class EmptyNodeRemoval extends AbstractActorTransformation {
+public class AbstractActorTransformation extends AbstractNodeVisitor implements
+		IActorTransformation {
+
+	protected Procedure procedure;
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(EmptyNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		it.remove();
+	public void transform(Actor actor) {
+		for (Procedure proc : actor.getProcs()) {
+			visitProc(proc);
+		}
+
+		for (Action action : actor.getActions()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+
+		for (Action action : actor.getInitializes()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
 	}
 
-	@Override
-	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
+	/**
+	 * Visits the nodes of the given node list.
+	 * 
+	 * @param nodes
+	 *            a list of nodes that belong to a procedure
+	 */
+	protected void visitNodes(List<AbstractNode> nodes) {
+		ListIterator<AbstractNode> it = nodes.listIterator();
+		while (it.hasNext()) {
+			it.next().accept(this, it);
+		}
 	}
 
-	@Override
-	public void visit(WhileNode node, Object... args) {
-		visitNodes(node.getNodes());
+	/**
+	 * Visits the given procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
+	private void visitProc(Procedure procedure) {
+		this.procedure = procedure;
+		List<AbstractNode> nodes = procedure.getNodes();
+		visitNodes(nodes);
 	}
 
 }

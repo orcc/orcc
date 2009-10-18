@@ -28,20 +28,12 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.List;
-import java.util.ListIterator;
-
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
@@ -52,26 +44,10 @@ import net.sf.orcc.ir.type.IntType;
 /**
  * Split expression and effective node.
  * 
- * @author Jérôme GORIN
+ * @author Jérôme Gorin
  * 
  */
-public class CorrectBinaryExpressionType extends AbstractNodeVisitor {
-
-	public CorrectBinaryExpressionType(Actor actor) {
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-	}
+public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 
 	public IType checkType(BinaryExpr expr, Object... args) {
 		IType type;
@@ -146,16 +122,4 @@ public class CorrectBinaryExpressionType extends AbstractNodeVisitor {
 		visitNodes(node.getNodes());
 	}
 
-	private void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
-
-		while (it.hasNext()) {
-			it.next().accept(this, it);
-		}
-	}
-
-	private void visitProc(Procedure proc) {
-		List<AbstractNode> nodes = proc.getNodes();
-		visitNodes(nodes);
-	}
 }

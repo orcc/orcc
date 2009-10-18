@@ -34,11 +34,8 @@ import java.util.ListIterator;
 import net.sf.orcc.backends.c.nodes.DecrementNode;
 import net.sf.orcc.backends.c.nodes.IncrementNode;
 import net.sf.orcc.backends.c.nodes.SelfAssignment;
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IExpr;
@@ -47,7 +44,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.transforms.Peephole;
+import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
  * Replaces nodes by specific C nodes where appropriate.
@@ -55,26 +52,9 @@ import net.sf.orcc.ir.transforms.Peephole;
  * @author Matthieu Wipliez
  * 
  */
-public class IncrementPeephole extends Peephole {
+public class IncrementPeephole extends AbstractActorTransformation {
 
-	public IncrementPeephole(Actor actor) {
-		for (Procedure proc : actor.getProcs()) {
-			visitNodes(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitNodes(action.getBody());
-			visitNodes(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitNodes(action.getBody());
-			visitNodes(action.getScheduler());
-		}
-	}
-
-	@Override
-	public void examine(Procedure proc, ListIterator<AbstractNode> it) {
+	private void examine(ListIterator<AbstractNode> it) {
 		AbstractNode node1 = it.next();
 		if (it.hasNext()) {
 			AbstractNode node2 = it.next();
@@ -97,8 +77,9 @@ public class IncrementPeephole extends Peephole {
 						if (e1.getType() == IExpr.VAR) {
 							VarExpr v1 = (VarExpr) e1;
 							if (v1.getVar().getVarDef() == varDefTmp) {
-								res = replaceSelfAssignment(proc.getLocals(),
-										it, varDefTmp, varDef, v1, op, e2);
+								res = replaceSelfAssignment(procedure
+										.getLocals(), it, varDefTmp, varDef,
+										v1, op, e2);
 							}
 						}
 					}
@@ -114,8 +95,8 @@ public class IncrementPeephole extends Peephole {
 	}
 
 	private boolean replaceSelfAssignment(List<LocalVariable> locals,
-			ListIterator<AbstractNode> it, LocalVariable varDefTmp, LocalVariable varDef,
-			VarExpr v1, BinaryOp op, IExpr e2) {
+			ListIterator<AbstractNode> it, LocalVariable varDefTmp,
+			LocalVariable varDef, VarExpr v1, BinaryOp op, IExpr e2) {
 		AbstractNode node;
 		if (op == BinaryOp.PLUS && e2.getType() == IExpr.INT
 				&& ((IntExpr) e2).getValue() == 1) {
@@ -144,6 +125,14 @@ public class IncrementPeephole extends Peephole {
 		locals.remove(varDefTmp);
 
 		return true;
+	}
+
+	@Override
+	protected void visitNodes(List<AbstractNode> nodes) {
+		ListIterator<AbstractNode> it = nodes.listIterator();
+		while (it.hasNext()) {
+			examine(it);
+		}
 	}
 
 }

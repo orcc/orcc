@@ -79,6 +79,7 @@ import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -92,7 +93,7 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class TypeTransformation extends AbstractLLVMNodeVisitor implements
-		ExprVisitor {
+		ExprVisitor, IActorTransformation {
 
 	ListIterator<AbstractNode> it;
 
@@ -101,31 +102,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	private Hashtable<String, Integer> portIndex;
 
 	private Procedure procedure;
-
-	public TypeTransformation(Actor actor) {
-
-		portIndex = new Hashtable<String, Integer>();
-		fillPorts(actor.getInputs());
-		fillPorts(actor.getOutputs());
-
-		visitStateVars(actor.getStateVars());
-
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		portIndex.clear();
-	}
 
 	// VarDef must be cast into i8* for accessing fifo
 	public LocalVariable castFifo(LocalVariable readVar, String fifoName) {
@@ -153,7 +129,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	}
 
-	private AbstractLLVMNode castNodeCreate(LocalVariable var, LocalVariable targetVar) {
+	private AbstractLLVMNode castNodeCreate(LocalVariable var,
+			LocalVariable targetVar) {
 
 		// Get source size and target size
 		int sourceSize = sizeOf(var.getType());
@@ -221,9 +198,35 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 	}
 
+	@Override
+	public void transform(Actor actor) {
+		portIndex = new Hashtable<String, Integer>();
+
+		fillPorts(actor.getInputs());
+		fillPorts(actor.getOutputs());
+
+		visitStateVars(actor.getStateVars());
+
+		for (Procedure proc : actor.getProcs()) {
+			visitProc(proc);
+		}
+
+		for (Action action : actor.getActions()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+
+		for (Action action : actor.getInitializes()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+
+		portIndex.clear();
+	}
+
 	private LocalVariable varDefCreate(IType type) {
-		return new LocalVariable(false, false, 0, new Location(), "", null, null,
-				nodeCount++, type);
+		return new LocalVariable(false, false, 0, new Location(), "", null,
+				null, nodeCount++, type);
 	}
 
 	/**

@@ -55,6 +55,7 @@ import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.VoidType;
@@ -65,30 +66,16 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
+public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
+		implements IActorTransformation {
 
 	private int BrCounter;
+	
 	ListIterator<AbstractNode> it;
+	
 	private LabelNode labelNode;
 
 	List<PhiNode> tmpPhiNodes;
-
-	public ControlFlowTransformation(Actor actor) {
-
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-	}
 
 	private BrNode brNodeCreate(IfNode node, Object... args) {
 
@@ -298,6 +285,23 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor {
 		List<PhiAssignment> phis = joinNode.getPhis();
 
 		return new SelectNode(id, location, condition, phis);
+	}
+
+	@Override
+	public void transform(Actor actor) {
+		for (Procedure proc : actor.getProcs()) {
+			visitProc(proc);
+		}
+
+		for (Action action : actor.getActions()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+
+		for (Action action : actor.getInitializes()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
 	}
 
 	@Override

@@ -44,6 +44,7 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.type.IType;
 
 /**
@@ -52,26 +53,10 @@ import net.sf.orcc.ir.type.IType;
  * @author Jérôme GORIN
  * 
  */
-public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
+public class JoinNodeTransformation extends AbstractLLVMNodeVisitor implements
+		IActorTransformation {
 
 	List<AbstractNode> abstractNodes;
-
-	public JoinNodeTransformation(Actor actor) {
-
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-	}
 
 	private void mergeBrNode(BrNode node) {
 		LabelNode labelNode = node.getLabelEndNode();
@@ -140,10 +125,25 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor {
 		 */
 	}
 
+	public void transform(Actor actor) {
+		for (Procedure proc : actor.getProcs()) {
+			visitProc(proc);
+		}
+
+		for (Action action : actor.getActions()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+
+		for (Action action : actor.getInitializes()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(BrNode node, Object... args) {
-
 		List<PhiNode> phiNodes;
 		List<PhiNode> phiNodesSource = node.getPhiNodes();
 

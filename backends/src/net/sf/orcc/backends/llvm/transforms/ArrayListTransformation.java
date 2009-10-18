@@ -45,6 +45,7 @@ import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
+import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.ListType;
 
@@ -54,26 +55,10 @@ import net.sf.orcc.ir.type.ListType;
  * @author Jérôme GORIN
  * 
  */
-public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
+public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
+		IActorTransformation {
 
 	int indexName;
-
-	public ArrayListTransformation(Actor actor) {
-
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-	}
 
 	@SuppressWarnings("unchecked")
 	public VarUse getElementPtrNodeCreate(VarUse varList, List<IExpr> indexes,
@@ -104,6 +89,23 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 		return varUse;
 	}
 
+	@Override
+	public void transform(Actor actor) {
+		for (Procedure proc : actor.getProcs()) {
+			visitProc(proc);
+		}
+
+		for (Action action : actor.getActions()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+
+		for (Action action : actor.getInitializes()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+	}
+
 	private LocalVariable varDefCreate(LocalVariable varDef, IType type) {
 		int index = varDef.getIndex();
 		String name = varDef.getName() + Integer.toString(indexName++);
@@ -114,8 +116,8 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor {
 			suffix = 0;
 		}
 
-		return new LocalVariable(false, false, index, new Location(), name, null,
-				null, suffix, new PointType(type));
+		return new LocalVariable(false, false, index, new Location(), name,
+				null, null, suffix, new PointType(type));
 	}
 
 	@Override

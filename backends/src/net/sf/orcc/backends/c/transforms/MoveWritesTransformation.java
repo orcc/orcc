@@ -32,11 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
  * Move writes to the beginning of an action (because we use pointers).
@@ -44,19 +42,12 @@ import net.sf.orcc.ir.nodes.WriteNode;
  * @author Matthieu Wipliez
  * 
  */
-public class MoveWritesTransformation extends AbstractNodeVisitor {
+public class MoveWritesTransformation extends AbstractActorTransformation {
 
 	private List<AbstractNode> writes;
 
-	public MoveWritesTransformation(Actor actor) {
+	public MoveWritesTransformation() {
 		writes = new ArrayList<AbstractNode>();
-		for (Action action : actor.getActions()) {
-			visitNodes(action.getBody().getNodes());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitNodes(action.getBody().getNodes());
-		}
 	}
 
 	@Override
@@ -67,12 +58,12 @@ public class MoveWritesTransformation extends AbstractNodeVisitor {
 		it.remove();
 	}
 
-	private void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
-		while (it.hasNext()) {
-			it.next().accept(this, it);
-		}
+	@Override
+	protected void visitNodes(List<AbstractNode> nodes) {
+		// visit nodes
+		super.visitNodes(nodes);
 
+		// add writes at the end of the node list, and clears the write list
 		nodes.addAll(0, writes);
 		writes.clear();
 	}

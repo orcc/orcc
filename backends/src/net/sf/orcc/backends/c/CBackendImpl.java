@@ -38,6 +38,7 @@ import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.transforms.BroadcastAdder;
+import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 
@@ -82,9 +83,13 @@ public class CBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		new PhiRemoval(actor);
-		new IncrementPeephole(actor);
-		new MoveWritesTransformation(actor);
+		IActorTransformation[] transformations = { new PhiRemoval(),
+				new IncrementPeephole(), new MoveWritesTransformation() };
+
+		for (IActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+
 		String outputName = path + File.separator + id + ".c";
 		printer.printActor(outputName, actor);
 	}

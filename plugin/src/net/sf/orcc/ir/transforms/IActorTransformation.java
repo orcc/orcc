@@ -28,38 +28,22 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.ListIterator;
-
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.EmptyNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.actor.Actor;
 
 /**
- * Removes empty nodes from procedure.
+ * This interface defines how a transformation can be applied on an actor.
  * 
- * @author Jérôme Gorin
  * @author Matthieu Wipliez
  * 
  */
-public class EmptyNodeRemoval extends AbstractActorTransformation {
+public interface IActorTransformation {
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(EmptyNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		it.remove();
-	}
-
-	@Override
-	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
-	}
-
-	@Override
-	public void visit(WhileNode node, Object... args) {
-		visitNodes(node.getNodes());
-	}
+	/**
+	 * Transforms the given actor in-place.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public void transform(Actor actor);
 
 }

@@ -44,6 +44,7 @@ import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.AssignPeephole;
 import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
 import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
+import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.network.Network;
 
 /**
@@ -83,16 +84,19 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		new EmptyNodeRemoval(actor);
-		new CorrectBinaryExpressionType(actor);
-		new AssignPeephole(actor);
-		new ControlFlowTransformation(actor);
-		new JoinNodeTransformation(actor);
-		// new CorrectLabelNameTransformation(actor);
-		new ThreeAddressCodeTransformation(actor);
-		new AddInstantationProcedure(actor);
-		new ArrayListTransformation(actor);
-		new TypeTransformation(actor);
+		IActorTransformation[] transformations = { new EmptyNodeRemoval(),
+				new CorrectBinaryExpressionType(), new AssignPeephole(),
+				new ControlFlowTransformation(),
+				new JoinNodeTransformation(),
+				// new CorrectLabelNameTransformation(),
+				new ThreeAddressCodeTransformation(),
+				new AddInstantationProcedure(), new ArrayListTransformation(),
+				new TypeTransformation() };
+
+		for (IActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+
 		String outputName = path + File.separator + id + ".s";
 		printer.printActor(outputName, actor);
 	}

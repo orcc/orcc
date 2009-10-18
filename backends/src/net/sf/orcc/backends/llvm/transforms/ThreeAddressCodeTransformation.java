@@ -56,6 +56,7 @@ import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
+import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
@@ -66,26 +67,10 @@ import net.sf.orcc.ir.type.IntType;
  * @author Jérôme GORIN
  * 
  */
-public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
+public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
+		implements IActorTransformation {
 
 	int exprCounter;
-
-	public ThreeAddressCodeTransformation(Actor actor) {
-
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-	}
 
 	// Add a second pass to check the binary expression type cohesion
 	// This pass will be useless when the IR associate the correct type to a
@@ -212,9 +197,26 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor {
 
 	}
 
+	@Override
+	public void transform(Actor actor) {
+		for (Procedure proc : actor.getProcs()) {
+			visitProc(proc);
+		}
+
+		for (Action action : actor.getActions()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+
+		for (Action action : actor.getInitializes()) {
+			visitProc(action.getBody());
+			visitProc(action.getScheduler());
+		}
+	}
+
 	private LocalVariable varDefCreate(IType type) {
-		return new LocalVariable(false, false, exprCounter++, new Location(), "expr",
-				null, null, 0, type);
+		return new LocalVariable(false, false, exprCounter++, new Location(),
+				"expr", null, null, 0, type);
 	}
 
 	@Override
