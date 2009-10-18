@@ -64,9 +64,13 @@ public abstract class AbstractBackend implements IBackend {
 		// parses top network
 		Network network = new NetworkParser(fileName).parseNetwork();
 
+		// instantiate the network
+		network.instantiate();
+
+		// print actors of the network
 		Set<Instance> instances = network.getGraph().vertexSet();
 		for (Instance instance : instances) {
-			if (instance.hasActor()) {
+			if (instance.isActor()) {
 				Actor actor = instance.getActor();
 				printActor(instance.getId(), actor);
 			}
