@@ -33,6 +33,8 @@ import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.type.IType;
 
 /**
+ * This class defines a unary expression.
+ * 
  * @author Matthieu Wipliez
  * 
  */

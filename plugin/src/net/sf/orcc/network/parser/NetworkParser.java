@@ -31,27 +31,15 @@ package net.sf.orcc.network.parser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.common.GlobalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.Entry;
 import net.sf.orcc.ir.type.IType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
-import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -88,11 +76,6 @@ import org.w3c.dom.ls.LSParser;
 public class NetworkParser {
 
 	/**
-	 * Default size of an signed/unsigned integer.
-	 */
-	private static final int defaultSize = 32;
-
-	/**
 	 * Calls the parser with args[0] as the file name.
 	 * 
 	 * @param args
@@ -108,6 +91,11 @@ public class NetworkParser {
 					+ "<absolute path of top-level XDF network>");
 		}
 	}
+
+	/**
+	 * XDF expression parser.
+	 */
+	private final ExprParser exprParser;
 
 	/**
 	 * absolute file name of the XDF file
@@ -142,6 +130,11 @@ public class NetworkParser {
 	private String path;
 
 	/**
+	 * XDF type parser.
+	 */
+	private final TypeParser typeParser;
+
+	/**
 	 * list of variables
 	 */
 	private OrderedMap<GlobalVariable> variables;
@@ -155,6 +148,8 @@ public class NetworkParser {
 	public NetworkParser(String fileName) {
 		file = new File(fileName);
 		path = file.getParent();
+		exprParser = new ExprParser();
+		typeParser = new TypeParser(exprParser);
 	}
 
 	private void checkInstances(Instance source, String src, Instance target,
@@ -224,10 +219,11 @@ public class NetworkParser {
 					String value = attribute.getAttribute("value");
 					attr = new StringAttribute(value);
 				} else if (kind.equals(ITypeAttribute.NAME)) {
-					IType type = parseType(attribute.getFirstChild());
+					IType type = typeParser
+							.parseType(attribute.getFirstChild()).getResult();
 					attr = new TypeAttribute(type);
 				} else if (kind.equals(IValueAttribute.NAME)) {
-					IExpr expr = parseExpr(attribute.getFirstChild());
+					IExpr expr = exprParser.parseExpr(node.getFirstChild());
 					attr = new ValueAttribute(expr);
 				} else {
 					throw new OrccException("unsupported attribute kind: \""
@@ -319,73 +315,21 @@ public class NetworkParser {
 
 		Location location = new Location();
 		if (kind.equals("Param")) {
-			IType type = parseType(decl.getFirstChild());
+			ParseContinuation<IType> cont = typeParser.parseType(decl
+					.getFirstChild());
+			IType type = cont.getResult();
 			GlobalVariable var = new GlobalVariable(location, type, name);
 			parameters.register(file.getAbsolutePath(), location, name, var);
 		} else if (kind.equals("Variable")) {
-			IType type = parseType(decl.getFirstChild());
-			IExpr expr = parseExpr(decl.getFirstChild());
+			ParseContinuation<IType> cont = typeParser.parseType(decl
+					.getFirstChild());
+			IType type = cont.getResult();
+			IExpr expr = exprParser.parseExpr(cont.getNode());
 			GlobalVariable var = new GlobalVariable(location, type, name, expr);
 			parameters.register(file.getAbsolutePath(), location, name, var);
 		} else {
 			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
 		}
-	}
-
-	/**
-	 * Parses expressions.
-	 * 
-	 * @param node
-	 * @return
-	 * @throws OrccException
-	 */
-	private IExpr parseExpr(Node node) throws OrccException {
-		// TODO add support for unary/binary expressions
-		while (node != null) {
-			if (node.getNodeName().equals("Expr")) {
-				Element elt = (Element) node;
-				String kind = elt.getAttribute("kind");
-				if (kind.equals("Literal")) {
-					kind = elt.getAttribute("literal-kind");
-					String value = elt.getAttribute("value");
-					if (kind.equals("Boolean")) {
-						return new BooleanExpr(new Location(), Boolean
-								.parseBoolean(value));
-					} else if (kind.equals("Integer")) {
-						return new IntExpr(new Location(), Integer
-								.parseInt(value));
-					} else if (kind.equals("String")) {
-						return new StringExpr(new Location(), value);
-					} else {
-						throw new OrccException("Unsupported Expr "
-								+ "literal kind: \"" + kind + "\"");
-					}
-				} else if (kind.equals("List")) {
-					List<IExpr> exprs = parseExprs(node.getFirstChild());
-					return new ListExpr(new Location(), exprs);
-				} else {
-					throw new OrccException("Unsupported Expr kind: \"" + kind
-							+ "\"");
-				}
-			}
-
-			node = node.getNextSibling();
-		}
-
-		throw new OrccException("Expected an Expr element");
-	}
-
-	private List<IExpr> parseExprs(Node node) throws OrccException {
-		List<IExpr> exprs = new ArrayList<IExpr>();
-		while (node != null) {
-			if (node.getNodeName().equals("Expr")) {
-				exprs.add(parseExpr(node));
-			}
-
-			node = node.getNextSibling();
-		}
-
-		return exprs;
 	}
 
 	/**
@@ -477,7 +421,7 @@ public class NetworkParser {
 							+ "must have a valid \"name\" attribute");
 				}
 
-				IExpr expr = parseExpr(node.getFirstChild());
+				IExpr expr = exprParser.parseExpr(node.getFirstChild());
 				parameters.put(name, expr);
 			}
 
@@ -497,7 +441,7 @@ public class NetworkParser {
 	 */
 	private void parsePort(Element eltPort) throws OrccException {
 		Location location = new Location();
-		IType type = parseType(eltPort.getFirstChild());
+		IType type = typeParser.parseType(eltPort.getFirstChild()).getResult();
 		String name = eltPort.getAttribute("name");
 		if (name.isEmpty()) {
 			throw new OrccException("Port has an empty name");
@@ -515,132 +459,6 @@ public class NetworkParser {
 		} else {
 			throw new OrccException("Port \"" + name + "\", invalid kind: \""
 					+ kind + "\"");
-		}
-	}
-
-	/**
-	 * Parses the given node as an IType.
-	 * 
-	 * @param node
-	 *            the node to parse as a type.
-	 * @return a type
-	 * @throws OrccException
-	 *             if the node could not be parsed as a type
-	 */
-	private IType parseType(Node node) throws OrccException {
-		while (node != null) {
-			if (node.getNodeName().equals("Type")) {
-				Element eltType = (Element) node;
-				String name = eltType.getAttribute("name");
-				if (name.equals(BoolType.NAME)) {
-					return new BoolType();
-				} else if (name.equals(IntType.NAME)) {
-					Map<String, Entry> entries = parseTypeEntries(node
-							.getFirstChild());
-					IExpr size = parseTypeSize(entries);
-					return new IntType(size);
-				} else if (name.equals(ListType.NAME)) {
-					return parseTypeList(node);
-				} else if (name.equals(StringType.NAME)) {
-					return new StringType();
-				} else if (name.equals(UintType.NAME)) {
-					Map<String, Entry> entries = parseTypeEntries(node
-							.getFirstChild());
-					IExpr size = parseTypeSize(entries);
-					return new UintType(size);
-				} else {
-					throw new OrccException("unknown type name: \"" + name
-							+ "\"");
-				}
-			}
-
-			node = node.getNextSibling();
-		}
-
-		throw new OrccException("Expected a Type element");
-	}
-
-	/**
-	 * Parses the node and its siblings as type entries, and returns a map of
-	 * entry names to contents.
-	 * 
-	 * @param node
-	 *            The first node susceptible to be an entry, or
-	 *            <code>null</code>.
-	 * @return A map of entry names to contents.
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	private Map<String, Entry> parseTypeEntries(Node node) throws OrccException {
-		Map<String, Entry> entries = new HashMap<String, Entry>();
-		while (node != null) {
-			if (node.getNodeName().equals("Entry")) {
-				Element element = (Element) node;
-				String name = element.getAttribute("name");
-				String kind = element.getAttribute("kind");
-
-				Entry entry = null;
-				if (kind.equals("Expr")) {
-					entry = new Entry(parseExpr(node.getFirstChild()));
-				} else if (kind.equals("Type")) {
-					entry = new Entry(parseType(node.getFirstChild()));
-				} else {
-					throw new OrccException("unsupported entry type: \"" + kind
-							+ "\"");
-				}
-
-				entries.put(name, entry);
-			}
-
-			node = node.getNextSibling();
-		}
-
-		return entries;
-	}
-
-	/**
-	 * Parses a List type.
-	 * 
-	 * @param node
-	 *            the Type node where this List is defined
-	 * @return a ListType
-	 * @throws OrccException
-	 *             if something is wrong, like a missing entry
-	 */
-	private IType parseTypeList(Node node) throws OrccException {
-		Map<String, Entry> entries = parseTypeEntries(node.getFirstChild());
-		Entry entry = entries.get("size");
-		if (entry == null) {
-			throw new OrccException("List type must have a \"size\" entry");
-		}
-		IExpr size = entry.getEntryAsExpr();
-
-		entry = entries.get("type");
-		if (entry == null) {
-			throw new OrccException("List type must have a \"type\" entry");
-		}
-		IType type = entry.getEntryAsType();
-
-		return new ListType(size, type);
-	}
-
-	/**
-	 * Gets a "size" entry from the given entry map, if found return its value,
-	 * otherwise return {@link #defaultSize}.
-	 * 
-	 * @param entries
-	 *            a map of entries
-	 * @return an expression
-	 * @throws OrccException
-	 *             if the "size" entry does not contain an expression
-	 */
-	private IExpr parseTypeSize(Map<String, Entry> entries)
-			throws OrccException {
-		Entry entry = entries.get("size");
-		if (entry == null) {
-			return new IntExpr(defaultSize);
-		} else {
-			return entry.getEntryAsExpr();
 		}
 	}
 
@@ -676,4 +494,5 @@ public class NetworkParser {
 
 		return new Network(name, inputs, outputs, parameters, variables, graph);
 	}
+
 }

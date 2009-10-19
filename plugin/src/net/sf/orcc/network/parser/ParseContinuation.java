@@ -26,34 +26,54 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.network.parser;
+
+import org.w3c.dom.Node;
 
 /**
- * This class defines a unary operator.
+ * This class defines a parse continuation, by storing the next node that shall
+ * be parsed along with the result already computed.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public enum UnaryOp {
+public class ParseContinuation<T> {
+
+	final private Node node;
+
+	final private T result;
 
 	/**
-	 * a binary not (~ in C)
+	 * Creates a new parse continuation with the given DOM node and result. The
+	 * constructor stores the next sibling of node.
+	 * 
+	 * @param node
+	 *            a node that will be used to resume parsing after the result
+	 *            has been stored
+	 * @param result
+	 *            the result
 	 */
-	BNOT,
+	public ParseContinuation(Node node, T result) {
+		this.node = node.getNextSibling();
+		this.result = result;
+	}
 
 	/**
-	 * a logical not (! in C)
+	 * Returns the node stored in this continuation.
+	 * 
+	 * @return the node stored in this continuation
 	 */
-	LNOT,
+	public Node getNode() {
+		return node;
+	}
 
 	/**
-	 * unary minus
+	 * Returns the result stored in this continuation.
+	 * 
+	 * @return the result stored in this continuation
 	 */
-	MINUS,
-
-	/**
-	 * number of elements (# in CAL)
-	 */
-	NUM_ELTS;
+	public T getResult() {
+		return result;
+	}
 
 }
