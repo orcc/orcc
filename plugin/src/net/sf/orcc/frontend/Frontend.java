@@ -40,6 +40,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.parser.NetworkParser;
 
 /**
@@ -115,9 +116,14 @@ public class Frontend {
 				if (instance.isNetwork()) {
 					getActors(instance.getNetwork());
 				} else {
-					String parent = instance.getFile().getParent();
-					String clasz = instance.getClasz();
-					actors.add(parent + File.separator + clasz + ".cal");
+					IAttribute attr = instance.getAttribute("skip");
+					if (attr == null || attr.getType() != IAttribute.FLAG) {
+						// generate code if the "skip" attribute is not present
+						// or is not a flag
+						String parent = instance.getFile().getParent();
+						String clasz = instance.getClasz();
+						actors.add(parent + File.separator + clasz + ".cal");
+					}
 				}
 			}
 		}
