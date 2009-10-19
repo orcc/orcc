@@ -531,7 +531,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\Orcc_AVC_CBP_decoder.c"
+				RelativePath=".\src\Orcc_AVC_CBP_decoder_compare.c"
 				>
 			</File>
 			<File
@@ -554,19 +554,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\..\..\..\Bib_m4\lib_TestandMeasure\src\DiffUcharImage.c"
-					>
-				</File>
-				<File
 					RelativePath="..\..\runtime\liborcc\src\actors\display.c"
 					>
 				</File>
 				<File
 					RelativePath="..\..\runtime\liborcc\src\orcc_util.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\..\Bib_m4\lib_avformat\src\Read_YUV.c"
 					>
 				</File>
 				<File

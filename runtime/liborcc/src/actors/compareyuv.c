@@ -245,8 +245,8 @@ void Compare_write_mb(short tokens[384]) {
 		printf("Frame number %d \n", FrameCounter);
 		Read_YUV(Y, U, V);
 		DiffUcharImage(m_width, m_height, Y, img_buf_y);
-		//DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u);
-		//DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v);
+		DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u);
+		DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v);
 		FrameCounter ++;
 		if ( NumberOfFrames == FrameCounter){
 			exit(666);
