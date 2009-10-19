@@ -96,11 +96,6 @@ public class Vertex {
 		}
 	}
 
-	@Override
-	public int hashCode() {
-		return contents.hashCode();
-	}
-
 	/**
 	 * Returns the instance contained in this vertex.
 	 * 
@@ -111,6 +106,11 @@ public class Vertex {
 	 */
 	public Instance getInstance() {
 		return (Instance) contents;
+	}
+
+	@Override
+	public int hashCode() {
+		return contents.hashCode();
 	}
 
 	/**

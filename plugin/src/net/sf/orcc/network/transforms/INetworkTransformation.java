@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.network.transforms;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Network;
 
 /**
@@ -44,6 +45,6 @@ public interface INetworkTransformation {
 	 * @param network
 	 *            a network
 	 */
-	public void transform(Network network);
+	public void transform(Network network) throws OrccException;
 
 }
