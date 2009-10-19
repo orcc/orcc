@@ -380,7 +380,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	*************************************************************
 	*************************************************************/
 	int(size=6) nc;
-	List ( type: uint(size=4),size=4 * PICHEIGHT*PICWIDTH*16) NonZeroCount; // FIXME those numbers should be independent of the size
+	List ( type: List(type: uint(size=4), size=16), size = PICHEIGHT*PICWIDTH) NonZeroCount; // FIXME those numbers should be independent of the size
 	List ( type: uint(size=4),size=4 * PICHEIGHT*PICWIDTH*4) NonZeroCountCb; // FIXME those numbers should be independent of the size
 	List ( type: uint(size=4),size=4 * PICHEIGHT*PICWIDTH*4) NonZeroCountCr; // FIXME those numbers should be independent of the size
 	uint(size=3) suffixLength;
@@ -2084,7 +2084,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		val_CurrMbAddr := first_mb_in_slice;
 		PicWidthInMbs := (pic_width_in_mbs_minus1[sps_id] +1);
 		PicSizeInMbs := PicWidthInMbs * (pic_height_in_map_units_minus1[sps_id] +1);
-		NonZeroCount := [ 0 : for int i in Integers(0, 4 * PICHEIGHT*PICWIDTH*16-1)]; //FIXME ! size is not right
+		NonZeroCount := [[ 0 : for int j in Integers(0, 16-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
 		NonZeroCountCb := [ 0 : for int i in Integers(0, 4 * PICHEIGHT*PICWIDTH*4-1)]; //FIXME ! size is not right
 		NonZeroCountCr := [ 0 : for int i in Integers(0, 4 * PICHEIGHT*PICWIDTH*4-1)]; //FIXME ! size is not right
 
@@ -2391,8 +2391,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		MB_inc := 0;
 		set_bits_to_read(bit_depth_luma_minus8[sps_id]+8);
 		foreach int i in Integers (0, 15) do
-			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,4) + lshift(val_CurrMbAddr mod PicWidthInMbs,2) + InverseScan4x4(i,lshift( PicWidthInMbs,2));
-			NonZeroCount[CurrMb4x4Addr] := 16;
+			NonZeroCount[val_CurrMbAddr,i] := 16;
 		end
 	end
 
@@ -3390,16 +3389,23 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			top :=1; left :=1;
 			if leveltype = 0 then luma4x4BlkIdx := 0; end
 			if leveltype < 2 then //luma
-				CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,4) + lshift(val_CurrMbAddr mod PicWidthInMbs,2) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,2));
-				if (CurrMb4x4Addr / lshift( PicWidthInMbs,2)) = 0 then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
+				if (val_CurrMbAddr<PicWidthInMbs and InverseScan4x4Tab[luma4x4BlkIdx]<4) then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
 					nB :=0; top:=0;
 				else
-					nB := NonZeroCount[CurrMb4x4Addr - lshift(PicWidthInMbs,2)];
+					if(InverseScan4x4Tab[luma4x4BlkIdx]<4) then
+						nB := NonZeroCount[val_CurrMbAddr-PicWidthInMbs,12+InverseScan4x4Tab[luma4x4BlkIdx]]; 
+					else
+						nB := NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]-4];
+					end					
 				end
-				if (CurrMb4x4Addr mod lshift( PicWidthInMbs,2)) = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
+				if (val_CurrMbAddr mod PicWidthInMbs = 0 and InverseScan4x4Tab[luma4x4BlkIdx] mod 4 = 0)  then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
 					nA :=0; left:=0;
 				else
-					nA := NonZeroCount[CurrMb4x4Addr - 1];
+					if(InverseScan4x4Tab[luma4x4BlkIdx] mod 4 = 0) then
+						nA := NonZeroCount[val_CurrMbAddr-1,3+InverseScan4x4Tab[luma4x4BlkIdx]]; 
+					else
+						nA := NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]-1];
+					end
 				end
 			else //chroma
 				CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,2) + lshift(val_CurrMbAddr mod PicWidthInMbs,1) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,1));
@@ -3407,7 +3413,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 					nB :=0; top:=0;
 				else
 					nB := if iCbCr = 0 then NonZeroCountCb[CurrMb4x4Addr - lshift(PicWidthInMbs,1)] else NonZeroCountCr[CurrMb4x4Addr - lshift(PicWidthInMbs,1)] end;
-				end
+						end					
 				if (CurrMb4x4Addr mod lshift( PicWidthInMbs,1)) = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
 					nA :=0; left:=0;
 				else
@@ -3429,9 +3435,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		uint CurrMb4x4Addr
 	do
 		if leveltype < 2 then //luma
-			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,4) + lshift(val_CurrMbAddr mod PicWidthInMbs,2) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,2));
     		val_cbp_blk:=(1<<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
-			NonZeroCount[CurrMb4x4Addr] := TotalCoeff();
+			NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]] := TotalCoeff();
 		else //chroma
 			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,2) + lshift(val_CurrMbAddr mod PicWidthInMbs,1) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,1));
 			if iCbCr = 0 then NonZeroCountCb[CurrMb4x4Addr] := TotalCoeff(); else NonZeroCountCr[CurrMb4x4Addr] := TotalCoeff(); end
@@ -3603,8 +3608,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		uint CurrMb4x4Addr
 	do
 		if leveltype < 2 then //luma
-			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,4) + lshift(val_CurrMbAddr mod PicWidthInMbs,2) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,2));
-			NonZeroCount[CurrMb4x4Addr] := 0;
+			NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]] := 0;
 		else //chroma
 			CurrMb4x4Addr := (val_CurrMbAddr / PicWidthInMbs)* lshift( PicWidthInMbs,2) + lshift(val_CurrMbAddr mod PicWidthInMbs,1) + InverseScan4x4(luma4x4BlkIdx,lshift( PicWidthInMbs,1));
 			if iCbCr = 0 then NonZeroCountCb[CurrMb4x4Addr] := 0; else NonZeroCountCr[CurrMb4x4Addr] := 0; end
