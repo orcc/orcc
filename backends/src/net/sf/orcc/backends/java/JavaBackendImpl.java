@@ -106,7 +106,7 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 		JavaNetworkPrinter networkPrinter = new JavaNetworkPrinter();
 
 		// Add broadcasts before printing
-		new BroadcastAdder(network);
+		new BroadcastAdder().transform(network);
 
 		String name = network.getName();
 		String outputName = outputPath + "Network_" + name + ".java";

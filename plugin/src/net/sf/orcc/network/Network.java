@@ -44,7 +44,7 @@ import org.jgrapht.DirectedGraph;
  */
 public class Network {
 
-	private DirectedGraph<Instance, Connection> graph;
+	private DirectedGraph<Vertex, Connection> graph;
 
 	private OrderedMap<Port> inputs;
 
@@ -71,7 +71,7 @@ public class Network {
 	public Network(String name, OrderedMap<Port> inputs,
 			OrderedMap<Port> outputs, OrderedMap<GlobalVariable> parameters,
 			OrderedMap<GlobalVariable> variables,
-			DirectedGraph<Instance, Connection> graph) {
+			DirectedGraph<Vertex, Connection> graph) {
 		this.name = name;
 		this.inputs = inputs;
 		this.outputs = outputs;
@@ -85,7 +85,7 @@ public class Network {
 	 * 
 	 * @return a graph representing the network's contents
 	 */
-	public DirectedGraph<Instance, Connection> getGraph() {
+	public DirectedGraph<Vertex, Connection> getGraph() {
 		return graph;
 	}
 
@@ -144,13 +144,16 @@ public class Network {
 	 *             wrong
 	 */
 	public void instantiate() throws OrccException {
-		for (Instance instance : graph.vertexSet()) {
-			if (instance.isNetwork()) {
-				// instantiate the child network
-				instance.getNetwork().instantiate();
-			} else if (!instance.isBroadcast()) {
-				// instantiate the child actor
-				instance.instantiate();
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isNetwork()) {
+					// instantiate the child network
+					instance.getNetwork().instantiate();
+				} else if (!instance.isBroadcast()) {
+					// instantiate the child actor
+					instance.instantiate();
+				}
 			}
 		}
 
@@ -172,36 +175,41 @@ public class Network {
 	 * @throws OrccException
 	 */
 	private void updateConnection(Connection connection) throws OrccException {
-		Instance source = graph.getEdgeSource(connection);
-		Instance target = graph.getEdgeTarget(connection);
+		Vertex srcVertex = graph.getEdgeSource(connection);
+		Vertex tgtVertex = graph.getEdgeTarget(connection);
 
-		String srcPortName = connection.getSource().getName();
-		Port srcPort = source.getActor().getOutput(srcPortName);
+		if (srcVertex.isInstance() && tgtVertex.isInstance()) {
+			Instance source = srcVertex.getInstance();
+			Instance target = tgtVertex.getInstance();
 
-		String dstPortName = connection.getTarget().getName();
-		Port dstPort = target.getActor().getInput(dstPortName);
+			String srcPortName = connection.getSource().getName();
+			Port srcPort = source.getActor().getOutput(srcPortName);
 
-		// check ports exist
-		if (srcPort == null) {
-			throw new OrccException("A Connection refers to "
-					+ "a non-existent source port: \"" + srcPortName + "\"");
-		} else if (dstPort == null) {
-			throw new OrccException("A Connection refers to "
-					+ "a non-existent target port: \"" + dstPortName + "\"");
+			String dstPortName = connection.getTarget().getName();
+			Port dstPort = target.getActor().getInput(dstPortName);
+
+			// check ports exist
+			if (srcPort == null) {
+				throw new OrccException("A Connection refers to "
+						+ "a non-existent source port: \"" + srcPortName + "\"");
+			} else if (dstPort == null) {
+				throw new OrccException("A Connection refers to "
+						+ "a non-existent target port: \"" + dstPortName + "\"");
+			}
+
+			// check port types match
+			IType srcType = srcPort.getType();
+			IType dstType = dstPort.getType();
+			if (!srcType.equals(dstType)) {
+				throw new OrccException("Type error: " + source.getActor()
+						+ "." + srcPort + " is " + srcType + ", "
+						+ target.getActor() + "." + dstPort + " is " + dstType);
+			}
+
+			// update connection
+			connection.setSource(srcPort);
+			connection.setTarget(dstPort);
 		}
-
-		// check port types match
-		IType srcType = srcPort.getType();
-		IType dstType = dstPort.getType();
-		if (!srcType.equals(dstType)) {
-			throw new OrccException("Type error: " + source.getActor() + "."
-					+ srcPort + " is " + srcType + ", " + target.getActor()
-					+ "." + dstPort + " is " + dstType);
-		}
-
-		// update connection
-		connection.setSource(srcPort);
-		connection.setTarget(dstPort);
 	}
 
 	/**

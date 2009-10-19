@@ -100,7 +100,7 @@ public class MultiCoreBackendImpl extends AbstractBackend implements IBackend {
 		CNetworkPrinter networkPrinter = new CNetworkPrinter();
 
 		// Add broadcasts before printing
-		new BroadcastAdder(network);
+		new BroadcastAdder().transform(network);
 
 		String outputName = path + File.separator + network.getName() + ".c";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);

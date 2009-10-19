@@ -31,6 +31,7 @@ package net.sf.orcc.network.parser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.CustomAttribute;
 import net.sf.orcc.network.attributes.FlagAttribute;
 import net.sf.orcc.network.attributes.IAttribute;
@@ -102,7 +104,10 @@ public class NetworkParser {
 	 */
 	private File file;
 
-	private DirectedGraph<Instance, Connection> graph;
+	/**
+	 * the graph representing the network we are parsing
+	 */
+	private DirectedGraph<Vertex, Connection> graph;
 
 	/**
 	 * list of input ports
@@ -152,39 +157,55 @@ public class NetworkParser {
 		typeParser = new TypeParser(exprParser);
 	}
 
-	private void checkInstances(Instance source, String src, Instance target,
-			String dst) throws OrccException {
-		if (source == null) {
-			throw new OrccException("A Connection refers to "
-					+ "a non-existent Instance: \"" + src + "\"");
-		}
-		if (target == null) {
-			throw new OrccException("A Connection refers to "
-					+ "a non-existent Instance: \"" + dst + "\"");
+	/**
+	 * If vertexName is not empty, returns a new Port whose name is set to
+	 * portName.
+	 * 
+	 * @param vertexName
+	 *            the name of a vertex
+	 * @param portName
+	 *            the name of a port
+	 * @return a port, or <code>null</code> if no port should be returned
+	 */
+	private Port getPort(String vertexName, String portName) {
+		if (vertexName.isEmpty()) {
+			return null;
+		} else {
+			return new Port(new Location(), null, portName);
 		}
 	}
 
-	private void checkNetwork() throws OrccException {
-		if (instances.isEmpty()) {
-			throw new OrccException(
-					"A valid network must contain at least one instance");
-		}
-	}
+	/**
+	 * If vertexName is empty, returns a new Vertex that contains a port from
+	 * the ports map that has the name portName. If vertexName is not empty,
+	 * returns a new Vertex that contains an instance from the instances map.
+	 * 
+	 * @param vertexName
+	 *            the name of a vertex
+	 * @param portName
+	 *            the name of a port
+	 * @param ports
+	 *            a map of input ports "exclusive or" output ports
+	 * @return a vertex that contains a port or an instance
+	 */
+	private Vertex getVertex(String vertexName, String portName, String kind,
+			OrderedMap<Port> ports) throws OrccException {
+		if (vertexName.isEmpty()) {
+			Port port = ports.get(portName);
+			if (port == null) {
+				throw new OrccException("An Connection element has an invalid"
+						+ " \"src-port\" " + "attribute");
+			}
 
-	private void checkPorts(String src, String src_port, String dst,
-			String dst_port) throws OrccException {
-		if (src.isEmpty()) {
-			throw new OrccException("A Connection element "
-					+ "must have a valid non-empty \"src\" attribute");
-		} else if (src_port.isEmpty()) {
-			throw new OrccException("An Connection element "
-					+ "must have a valid non-empty \"src-port\" " + "attribute");
-		} else if (dst.isEmpty()) {
-			throw new OrccException("An Connection element "
-					+ "must have a valid non-empty \"dst\" attribute");
-		} else if (dst_port.isEmpty()) {
-			throw new OrccException("An Connection element "
-					+ "must have a valid non-empty \"dst-port\" " + "attribute");
+			return new Vertex(kind, port);
+		} else {
+			Instance instance = instances.get(vertexName);
+			if (instance == null) {
+				throw new OrccException("An Connection element has an invalid"
+						+ " \"src-port\" " + "attribute");
+			}
+
+			return new Vertex(instance);
 		}
 	}
 
@@ -261,7 +282,7 @@ public class NetworkParser {
 				} else if (name.equals("Instance")) {
 					Instance instance = parseInstance(element);
 					instances.put(instance.getId(), instance);
-					graph.addVertex(instance);
+					graph.addVertex(new Vertex(instance));
 				} else if (name.equals("Package")) {
 					throw new OrccException(
 							"Package elements are not supported by Orcc yet");
@@ -290,15 +311,10 @@ public class NetworkParser {
 		String dst = connection.getAttribute("dst");
 		String dst_port = connection.getAttribute("dst-port");
 
-		checkPorts(src, src_port, dst, dst_port);
-
-		Instance source = instances.get(src);
-		Instance target = instances.get(dst);
-
-		checkInstances(source, src, target, dst);
-
-		Port srcPort = new Port(new Location(), null, src_port);
-		Port dstPort = new Port(new Location(), null, dst_port);
+		Vertex source = getVertex(src, src_port, "Output", outputs);
+		Port srcPort = getPort(src, src_port);
+		Vertex target = getVertex(dst, dst_port, "Input", inputs);
+		Port dstPort = getPort(dst, dst_port);
 
 		Node child = connection.getFirstChild();
 		Map<String, IAttribute> attributes = parseAttributes(child);
@@ -460,6 +476,8 @@ public class NetworkParser {
 			throw new OrccException("Port \"" + name + "\", invalid kind: \""
 					+ kind + "\"");
 		}
+
+		graph.addVertex(new Vertex(kind, port));
 	}
 
 	/**
@@ -482,7 +500,7 @@ public class NetworkParser {
 			throw new OrccException("Expected a \"name\" attribute");
 		}
 
-		graph = new DirectedMultigraph<Instance, Connection>(Connection.class);
+		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
 		inputs = new OrderedMap<Port>();
 		instances = new HashMap<String, Instance>();
 		outputs = new OrderedMap<Port>();
@@ -490,7 +508,11 @@ public class NetworkParser {
 		variables = new OrderedMap<GlobalVariable>();
 
 		parseBody(root);
-		checkNetwork();
+
+		if (instances.isEmpty()) {
+			throw new OrccException(
+					"A valid network must contain at least one instance");
+		}
 
 		return new Network(name, inputs, outputs, parameters, variables, graph);
 	}

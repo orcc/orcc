@@ -98,7 +98,7 @@ public class CLLVMBackendImpl extends AbstractBackend {
 		CLLVMNetworkPrinter networkPrinter = new CLLVMNetworkPrinter();
 
 		// Add broadcasts before printing
-		new BroadcastAdder(network);
+		new BroadcastAdder().transform(network);
 
 		String outputName = path + File.separator + network.getName() + ".cpp";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);

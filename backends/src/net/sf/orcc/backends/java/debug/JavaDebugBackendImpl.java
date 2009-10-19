@@ -106,7 +106,7 @@ public class JavaDebugBackendImpl extends AbstractBackend implements IBackend {
 		JavaDebugNetworkPrinter networkPrinter = new JavaDebugNetworkPrinter();
 
 		// Add broadcasts before printing
-		new BroadcastAdder(network);
+		new BroadcastAdder().transform(network);
 
 		String name = network.getName();
 		String outputName = outputPath + "Network_" + name + ".java";

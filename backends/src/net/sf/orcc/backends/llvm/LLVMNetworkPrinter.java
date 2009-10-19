@@ -50,6 +50,7 @@ import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 
@@ -144,8 +145,14 @@ public class LLVMNetworkPrinter {
 		template.setAttribute("name", network.getName());
 		template.setAttribute("size", fifoSize);
 
-		DirectedGraph<Instance, Connection> graph = network.getGraph();
-		Set<Instance> instances = new TreeSet<Instance>(graph.vertexSet());
+		DirectedGraph<Vertex, Connection> graph = network.getGraph();
+		Set<Instance> instances = new TreeSet<Instance>();
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				instances.add(vertex.getInstance());
+			}
+		}
+
 		Set<Connection> connections = graph.edgeSet();
 
 		setBroadcasts(instances);
@@ -191,43 +198,49 @@ public class LLVMNetworkPrinter {
 	 *            The graph's connection.
 	 * @throws OrccException
 	 */
-	private void setConnections(DirectedGraph<Instance, Connection> graph,
+	private void setConnections(DirectedGraph<Vertex, Connection> graph,
 			Set<Connection> connections) throws OrccException {
 		List<Map<String, Object>> conn = new ArrayList<Map<String, Object>>();
 		int fifoCount = 0;
 
 		for (Connection connection : connections) {
-			Instance source = graph.getEdgeSource(connection);
-			Instance target = graph.getEdgeTarget(connection);
+			Vertex srcVertex = graph.getEdgeSource(connection);
+			Vertex tgtVertex = graph.getEdgeTarget(connection);
 
-			IType type;
-			if (source.isBroadcast()) {
-				type = connection.getTarget().getType();
-			} else {
-				type = connection.getSource().getType();
+			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
+				Instance source = srcVertex.getInstance();
+				Instance target = tgtVertex.getInstance();
+
+				IType type;
+				if (source.isBroadcast()) {
+					type = connection.getTarget().getType();
+				} else {
+					type = connection.getSource().getType();
+				}
+
+				String size;
+				IAttribute attr = connection
+						.getAttribute(Connection.BUFFER_SIZE);
+				if (attr != null && attr.getType() == IAttribute.VALUE) {
+					IExpr expr = ((IValueAttribute) attr).getValue();
+					size = Integer.toString(Util.evaluateAsInteger(expr));
+				} else {
+					size = "SIZE";
+				}
+
+				Map<String, Object> attrs = new HashMap<String, Object>();
+				attrs.put("count", fifoCount);
+				attrs.put("size", size);
+				attrs.put("type", typeVisitor.toString(type));
+				attrs.put("source", source.getId());
+				attrs.put("src_port", connection.getSource().getName());
+				attrs.put("target", target.getId());
+				attrs.put("tgt_port", connection.getTarget().getName());
+
+				conn.add(attrs);
+
+				fifoCount++;
 			}
-
-			String size;
-			IAttribute attr = connection.getAttribute(Connection.BUFFER_SIZE);
-			if (attr != null && attr.getType() == IAttribute.VALUE) {
-				IExpr expr = ((IValueAttribute) attr).getValue();
-				size = Integer.toString(Util.evaluateAsInteger(expr));
-			} else {
-				size = "SIZE";
-			}
-
-			Map<String, Object> attrs = new HashMap<String, Object>();
-			attrs.put("count", fifoCount);
-			attrs.put("size", size);
-			attrs.put("type", typeVisitor.toString(type));
-			attrs.put("source", source.getId());
-			attrs.put("src_port", connection.getSource().getName());
-			attrs.put("target", target.getId());
-			attrs.put("tgt_port", connection.getTarget().getName());
-
-			conn.add(attrs);
-
-			fifoCount++;
 		}
 
 		template.setAttribute("connections", conn);

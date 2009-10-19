@@ -30,7 +30,6 @@ package net.sf.orcc.network;
 
 import java.util.HashMap;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.type.IType;
 
@@ -49,7 +48,7 @@ public class Broadcast extends Instance {
 	private IType type;
 
 	public Broadcast(String actorName, String portName, int numOutput,
-			IType type) throws OrccException {
+			IType type) {
 		super("broadcast_" + actorName + "_" + portName, CLASS,
 				new HashMap<String, IExpr>());
 		this.numOutput = numOutput;

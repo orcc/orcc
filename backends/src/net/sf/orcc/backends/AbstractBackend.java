@@ -30,11 +30,11 @@ package net.sf.orcc.backends;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.parser.NetworkParser;
 
 /**
@@ -68,11 +68,13 @@ public abstract class AbstractBackend implements IBackend {
 		network.instantiate();
 
 		// print actors of the network
-		Set<Instance> instances = network.getGraph().vertexSet();
-		for (Instance instance : instances) {
-			if (instance.isActor()) {
-				Actor actor = instance.getActor();
-				printActor(instance.getId(), actor);
+		for (Vertex vertex : network.getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isActor()) {
+					Actor actor = instance.getActor();
+					printActor(instance.getId(), actor);
+				}
 			}
 		}
 

@@ -39,6 +39,7 @@ import net.sf.orcc.frontend.writer.ActorWriter;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.parser.NetworkParser;
 
 /**
@@ -108,13 +109,16 @@ public class Frontend {
 	 *            a network
 	 */
 	private void getActors(Network network) {
-		for (Instance instance : network.getGraph().vertexSet()) {
-			if (instance.isNetwork()) {
-				getActors(instance.getNetwork());
-			} else {
-				String parent = instance.getFile().getParent();
-				String clasz = instance.getClasz();
-				actors.add(parent + File.separator + clasz + ".cal");
+		for (Vertex vertex : network.getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isNetwork()) {
+					getActors(instance.getNetwork());
+				} else {
+					String parent = instance.getFile().getParent();
+					String clasz = instance.getClasz();
+					actors.add(parent + File.separator + clasz + ".cal");
+				}
 			}
 		}
 	}
