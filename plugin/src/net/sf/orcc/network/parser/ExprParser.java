@@ -69,7 +69,13 @@ public class ExprParser {
 	 *             expression
 	 */
 	public IExpr parseExpr(Node node) throws OrccException {
-		return parseExprCont(node).getResult();
+		ParseContinuation<IExpr> cont = parseExprCont(node);
+		IExpr expr = cont.getResult();
+		if (expr == null) {
+			throw new OrccException("Expected an Expr element");
+		} else {
+			return expr;
+		}
 	}
 
 	/**
@@ -129,7 +135,7 @@ public class ExprParser {
 			node = node.getNextSibling();
 		}
 
-		throw new OrccException("Expected an Op element");
+		return new ParseContinuation<BinaryOp>(node, null);
 	}
 
 	/**
@@ -152,12 +158,20 @@ public class ExprParser {
 		node = cont.getNode();
 		while (node != null) {
 			cont = parseExprBinaryOp(node);
-			args.add(cont.getResult());
+			BinaryOp op = (BinaryOp) cont.getResult();
 			node = cont.getNode();
+			if (op != null) {
+				args.add(op);
 
-			cont = parseExprCont(node);
-			args.add(cont.getResult());
-			node = cont.getNode();
+				cont = parseExprCont(node);
+				IExpr expr = (IExpr) cont.getResult();
+				if (expr == null) {
+					throw new OrccException("Expected an Expr element");
+				}
+
+				args.add(expr);
+				node = cont.getNode();
+			}
 		}
 
 		// TODO one more time, apply operator priority to stupid binary
@@ -179,6 +193,7 @@ public class ExprParser {
 	 */
 	private ParseContinuation<IExpr> parseExprCont(Node node)
 			throws OrccException {
+		IExpr expr = null;
 		while (node != null) {
 			if (node.getNodeName().equals("Expr")) {
 				Element elt = (Element) node;
@@ -186,26 +201,26 @@ public class ExprParser {
 				if (kind.equals("BinOpSeq")) {
 					return parseExprBinOpSeq(elt.getFirstChild());
 				} else if (kind.equals("Literal")) {
-					return new ParseContinuation<IExpr>(node,
-							parseExprLiteral(elt));
+					expr = parseExprLiteral(elt);
+					break;
 				} else if (kind.equals("List")) {
 					List<IExpr> exprs = parseExprs(node.getFirstChild());
-					return new ParseContinuation<IExpr>(node, new ListExpr(
-							new Location(), exprs));
+					expr = new ListExpr(new Location(), exprs);
+					break;
 				} else if (kind.equals("UnaryOp")) {
 					ParseContinuation<UnaryOp> cont = parseExprUnaryOp(node
 							.getFirstChild());
 					UnaryOp op = cont.getResult();
-					IExpr expr = parseExpr(cont.getNode());
-					return new ParseContinuation<IExpr>(node, new UnaryExpr(
-							new Location(), op, expr, null));
+					IExpr unaryExpr = parseExpr(cont.getNode());
+					expr = new UnaryExpr(new Location(), op, unaryExpr, null);
+					break;
 				} else if (kind.equals("Var")) {
 					String name = elt.getAttribute("name");
 					LocalVariable varDef = new LocalVariable(false, false, 0,
 							null, name, null, null, null, null);
 					VarUse varUse = new VarUse(varDef, null);
-					return new ParseContinuation<IExpr>(node, new VarExpr(
-							new Location(), varUse));
+					expr = new VarExpr(new Location(), varUse);
+					break;
 				} else {
 					throw new OrccException("Unsupported Expr kind: \"" + kind
 							+ "\"");
@@ -215,7 +230,7 @@ public class ExprParser {
 			node = node.getNextSibling();
 		}
 
-		throw new OrccException("Expected an Expr element");
+		return new ParseContinuation<IExpr>(node, expr);
 	}
 
 	/**

@@ -310,9 +310,9 @@ public class NetworkParser {
 		String dst = connection.getAttribute("dst");
 		String dst_port = connection.getAttribute("dst-port");
 
-		Vertex source = getVertex(src, src_port, "Output", outputs);
+		Vertex source = getVertex(src, src_port, "Input", inputs);
 		Port srcPort = getPort(src, src_port);
-		Vertex target = getVertex(dst, dst_port, "Input", inputs);
+		Vertex target = getVertex(dst, dst_port, "Output", outputs);
 		Port dstPort = getPort(dst, dst_port);
 
 		Node child = connection.getFirstChild();

@@ -54,7 +54,11 @@ public class ParseContinuation<T> {
 	 *            the result
 	 */
 	public ParseContinuation(Node node, T result) {
-		this.node = node.getNextSibling();
+		if (node == null) {
+			this.node = null;
+		} else {
+			this.node = node.getNextSibling();
+		}
 		this.result = result;
 	}
 
