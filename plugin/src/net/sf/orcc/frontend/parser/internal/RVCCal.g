@@ -46,18 +46,14 @@ tokens {
   
   // actor declarations
   ACTOR_DECLS;
-  FUNCTION;
-  PROCEDURE;
   STATE_VAR;
   
   // FSM
-  SCHEDULE;
   TRANSITION;
   TRANSITIONS;
       
   // priority
   INEQUALITY;
-  PRIORITY;
     
   // action
   GUARDS;
@@ -69,17 +65,8 @@ tokens {
 
   // expressions  
   EXPR;
-  EXPR_OR;
-  EXPR_AND;
-  EXPR_BITOR;
-  EXPR_BITAND;
-  EXPR_EQ;
-  EXPR_REL;
-  EXPR_SHIFT;
-  EXPR_ADD;
-  EXPR_MUL;
-  EXPR_EXP;
-  EXPR_UN;
+  EXPR_BINARY;
+  EXPR_UNARY;
   
   EXPR_LIST;
   EXPR_IF;
@@ -159,11 +146,11 @@ actorDeclaration:
 
   ID (
     ((('.' tag=ID)* -> $tag*) ':'
-      ('action' inputs=actionInputs? '==>' outputs=actionOutputs? guards=actionGuards? ('var' varDecls)? actionStatements? 'end'
-        -> ^('action' ^(TAG ID $tag*) ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
+      (ACTION inputs=actionInputs? '==>' outputs=actionOutputs? guards=actionGuards? ('var' varDecls)? actionStatements? 'end'
+        -> ^(ACTION ^(TAG ID $tag*) ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 
-    | 'initialize' '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
-        -> ^('initialize' ^(TAG ID $tag*) INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
+    | INITIALIZE '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
+        -> ^(INITIALIZE ^(TAG ID $tag*) INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 	)
     )
 
@@ -177,22 +164,22 @@ actorDeclaration:
   )
 
 // anonymous action
-| 'action' actionInputs? '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
-  -> ^('action' TAG ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
+| ACTION actionInputs? '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
+  -> ^(ACTION TAG ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 
 // anonymous initialize
-| 'initialize' '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
-  -> ^('initialize' TAG INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
+| INITIALIZE '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
+  -> ^(INITIALIZE TAG INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 
 | priorityOrder -> priorityOrder
 
-| 'function' ID '(' (varDeclNoExpr (',' varDeclNoExpr)*)? ')' '-->' typeDef
+| FUNCTION ID '(' (varDeclNoExpr (',' varDeclNoExpr)*)? ')' '-->' typeDef
     ('var' varDecls)? ':'
       expression
     'end'
 	-> FUNCTION
 
-| 'procedure' ID '(' (varDeclNoExpr (',' varDeclNoExpr)*)? ')'
+| PROCEDURE ID '(' (varDeclNoExpr (',' varDeclNoExpr)*)? ')'
     ('var' varDecls)?
     'begin' statement* 'end'
 	-> PROCEDURE;
@@ -225,30 +212,28 @@ actorPortDecls: varDeclNoExpr (',' varDeclNoExpr)* -> varDeclNoExpr+;
 // that's why rules have the form X: y1=Y ((op y2=Y)+ -> EXPR_X (y1 y2+) | -> y1)
 // this way if X is really only Y, then we just return the tree from Y.
 
-expression: e1=and_expr ((('or' | '||') e2=and_expr)+ -> ^(EXPR_OR $e1 $e2+) | -> $e1 );
+expression: e1=and_expr ((OR e2=and_expr)+ -> ^(EXPR_BINARY $e1 (OR $e2)+) | -> $e1 );
 
-and_expr: e1=bitor_expr ((('and' | '&&') e2=bitor_expr)+ -> ^(EXPR_AND $e1 $e2+) | -> $e1 );
+and_expr: e1=bitor_expr ((AND e2=bitor_expr)+ -> ^(EXPR_BINARY $e1 (AND $e2)+) | -> $e1 );
 
-bitor_expr: e1=bitand_expr (('|' e2=bitand_expr)+ -> ^(EXPR_BITOR $e1 $e2+) | -> $e1 );
+bitor_expr: e1=bitand_expr ((BITOR e2=bitand_expr)+ -> ^(EXPR_BINARY $e1 (BITOR $e2)+) | -> $e1 );
 
-bitand_expr: e1=eq_expr (('&' e2=eq_expr)+ -> ^(EXPR_BITAND $e1 $e2+) | -> $e1 );
+bitand_expr: e1=eq_expr ((BITAND e2=eq_expr)+ -> ^(EXPR_BINARY $e1 (BITAND $e2)+) | -> $e1 );
 
-eq_expr: e1=rel_expr (((op='=' | op='!=') e2=rel_expr)+ -> ^(EXPR_EQ $e1 ($op $e2)+) | -> $e1 );
+eq_expr: e1=rel_expr (((op=EQ | op=NE) e2=rel_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
 
-rel_expr: e1=shift_expr (((op='<' | op='>' | op='<=' | op='>=') e2=shift_expr)+ -> ^(EXPR_REL $e1 ($op $e2)+) | -> $e1);
+rel_expr: e1=shift_expr (((op=LT | op=GT | op=LE | op=GE) e2=shift_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1);
 
-shift_expr: e1=add_expr (((op='<<' | op='>>') e2=add_expr)+ -> ^(EXPR_SHIFT $e1 ($op $e2)+) | -> $e1 );
+shift_expr: e1=add_expr (((op=SHIFT_LEFT | op=SHIFT_RIGHT) e2=add_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
 
-add_expr: e1=mul_expr (((op='+' | op='-') e2=mul_expr)+ -> ^(EXPR_ADD $e1 ($op $e2)+) | -> $e1 );
+add_expr: e1=mul_expr (((op=PLUS | op=MINUS) e2=mul_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
 
-mul_expr: e1=exp_expr (((op='div' | op='mod' | op='*' | op='/') e2=exp_expr)+ -> ^(EXPR_MUL $e1 ($op $e2)+) | -> $e1 );
+mul_expr: e1=exp_expr (((op=DIV | op=DIV_INT | op=MOD | op=TIMES) e2=exp_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
 
-exp_expr: e1=un_expr (('^' e2=un_expr)+ -> ^(EXPR_EXP $e1 $e2+) | -> $e1 );
+exp_expr: e1=un_expr ((EXP e2=un_expr)+ -> ^(EXPR_BINARY $e1 (EXP $e2)+) | -> $e1 );
 
 un_expr: postfix_expression -> postfix_expression
-	| '-' un_expr -> ^(EXPR_UN '-' un_expr)
-	| 'not' un_expr -> ^(EXPR_UN 'not' un_expr)
-	| '#' un_expr  -> ^(EXPR_UN '#' un_expr);
+	| (op=MINUS | op=NOT | op=NUM_ELTS) un_expr -> ^(EXPR_UNARY $op un_expr);
 
 postfix_expression:
   '[' e=expressions (':' g=expressionGenerators)? ']' -> ^(EXPR_LIST $e $g?)
@@ -285,7 +270,7 @@ idents: ID (',' ID)* { };
 
 priorityInequality: qualifiedIdent ('>' qualifiedIdent)+ ';' -> ^(INEQUALITY qualifiedIdent qualifiedIdent+);
 	
-priorityOrder: 'priority' priorityInequality* 'end' -> ^(PRIORITY priorityInequality*);
+priorityOrder: PRIORITY priorityInequality* 'end' -> ^(PRIORITY priorityInequality*);
 
 /*****************************************************************************/
 /* qualified ident */
@@ -296,7 +281,7 @@ qualifiedIdent: ID ('.' ID)* -> ^(QID ID+);
 /* schedule */
 
 schedule:
-  'schedule' 'fsm' ID ':' stateTransition* 'end' -> ^(SCHEDULE ID ^(TRANSITIONS stateTransition*));
+  SCHEDULE 'fsm' ID ':' stateTransition* 'end' -> ^(SCHEDULE ID ^(TRANSITIONS stateTransition*));
 
 stateTransition:
 	ID '(' qualifiedIdent ')' '-->' ID ';' -> ^(TRANSITION ID qualifiedIdent ID);
@@ -340,6 +325,49 @@ varDecls: varDecl (',' varDecl)* -> varDecl+;
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOKENS
+
+// operators
+OR: 'or' | '||';
+
+AND: 'and' | '&&';
+
+BITOR: '|';
+
+BITAND: '&';
+
+EQ: '=';
+NE: '!=';
+
+LT: '<';
+GT: '>';
+LE: '<=';
+GE: '>=';
+
+SHIFT_LEFT: '<<';
+SHIFT_RIGHT: '>>';
+
+PLUS: '+';
+MINUS: '-';
+
+DIV: '/';
+DIV_INT: 'div';
+MOD: 'mod';
+TIMES: '*';
+
+EXP: '^';
+
+NOT: 'not';
+NUM_ELTS: '#';
+
+// actor declarations
+ACTION: 'action';
+FUNCTION: 'function';
+INITIALIZE: 'initialize';
+PRIORITY: 'priority';
+PROCEDURE: 'procedure';
+SCHEDULE: 'schedule';
+
+// literals
 
 ID: LETTER (LETTER | '0'..'9')*;
 	

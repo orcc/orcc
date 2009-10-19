@@ -34,9 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.ir.actor.Action;
@@ -45,11 +45,8 @@ import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.consts.IConst;
-import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.type.BoolType;
@@ -77,7 +74,7 @@ import org.antlr.runtime.tree.Tree;
  * @author Matthieu Wipliez
  * 
  */
-public class RVCCalASTParser {
+public class RVCCalASTParser extends CommonParser {
 
 	public static void main(String[] args) throws OrccException {
 		for (String arg : args) {
@@ -94,6 +91,11 @@ public class RVCCalASTParser {
 	 * Contains the current scope of variables
 	 */
 	private Scope<LocalVariable> currentScope;
+
+	/**
+	 * expression parser.
+	 */
+	private ExprParser exprParser;
 
 	/**
 	 * absolute name of input file
@@ -134,6 +136,7 @@ public class RVCCalASTParser {
 	public RVCCalASTParser(String fileName) throws OrccException {
 		try {
 			this.file = new File(fileName).getCanonicalPath();
+			exprParser = new ExprParser();
 		} catch (IOException e) {
 			String msg = "could not solve the path \"" + fileName + "\"";
 			throw new OrccException(msg, e);
@@ -222,64 +225,31 @@ public class RVCCalASTParser {
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree child = actorDecls.getChild(i);
-			String declType = child.getText();
-			if (declType.equals("action")) {
+			switch (child.getType()) {
+			case RVCCalLexer.ACTION: {
 				Action action = parseAction(child);
 				actions.register(file, action.getLocation(), action.getTag(),
 						action);
-			} else if (declType.equals("PRIORITY")) {
+				break;
+			}
+			case RVCCalLexer.PRIORITY:
 				parsePriority(child);
-			} else if (declType.equals("SCHEDULE")) {
+				break;
+			case RVCCalLexer.SCHEDULE:
 				parseSchedule(child);
-			} else if (declType.equals("STATE_VAR")) {
+				break;
+			case RVCCalLexer.STATE_VAR: {
 				StateVar stateVar = parseStateVar(child);
 				LocalVariable varDef = stateVar.getDef();
 				currentScope.register(file, varDef.getLocation(), varDef
 						.getName(), varDef);
 				stateVars.add(stateVar);
-			} else {
+				break;
+			}
+			default:
 				throw new OrccException("not yet implemented");
 			}
 		}
-	}
-
-	private IExpr parseExpression(Tree expr) throws OrccException {
-		String type = expr.getText();
-		if (type.equals("EXPR_BOOL")) {
-			expr = expr.getChild(0);
-			boolean value = Boolean.parseBoolean(expr.getText());
-			return new BooleanExpr(parseLocation(expr), value);
-		} else if (type.equals("EXPR_FLOAT")) {
-			throw new OrccException("not yet implemented!");
-		} else if (type.equals("EXPR_INT")) {
-			expr = expr.getChild(0);
-			int value = Integer.parseInt(expr.getText());
-			return new IntExpr(parseLocation(expr), value);
-		} else if (type.equals("EXPR_STRING")) {
-			expr = expr.getChild(0);
-			return new StringExpr(parseLocation(expr), expr.getText());
-		} else if (type.equals("EXPR_VAR")) {
-			expr = expr.getChild(0);
-			VarUse varUse = new VarUse(null, null);
-			return new VarExpr(parseLocation(expr), varUse);
-		} else {
-			throw new OrccException("not yet implemented");
-		}
-	}
-
-	/**
-	 * Returns a location from a tree that contains a real token.
-	 * 
-	 * @param tree
-	 *            a tree
-	 * @return a location
-	 */
-	private Location parseLocation(Tree tree) {
-		int lineNumber = tree.getLine();
-		int startColumn = tree.getCharPositionInLine();
-		int endColumn = startColumn + tree.getText().length();
-
-		return new Location(lineNumber, startColumn, endColumn);
 	}
 
 	/**
@@ -318,8 +288,7 @@ public class RVCCalASTParser {
 	}
 
 	private StateVar parseStateVar(Tree stateVar) throws OrccException {
-		boolean assignable = stateVar.getChild(2).getText()
-				.equals("ASSIGNABLE");
+		boolean assignable = (stateVar.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
 		LocalVariable def = parseVarDef(stateVar, assignable, true, 0, null);
 		IConst init = null;
 		if (stateVar.getChildCount() == 4) {
@@ -370,9 +339,9 @@ public class RVCCalASTParser {
 		int n = typeAttrs.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
-			if (attr.getText().equals("EXPR")
+			if (attr.getType() == RVCCalLexer.EXPR
 					&& attr.getChild(0).getText().equals("size")) {
-				return parseExpression(attr.getChild(1));
+				return exprParser.parseExpression(attr.getChild(1));
 			}
 		}
 
@@ -391,7 +360,7 @@ public class RVCCalASTParser {
 		int n = typeAttrs.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
-			if (attr.getText().equals("TYPE")
+			if (attr.getType() == RVCCalLexer.TYPE
 					&& attr.getChild(0).getText().equals("type")) {
 				return parseType(attr.getChild(1));
 			}

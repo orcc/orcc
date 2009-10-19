@@ -58,7 +58,7 @@ public class ActorWriter {
 			OutputStream os = new FileOutputStream(outputDir + File.separator
 					+ actor.getName() + "_2.json");
 			JSONObject obj = writeActor();
-			os.write(obj.toString().getBytes("UTF-8"));
+			os.write(obj.toString(2).getBytes("UTF-8"));
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		} catch (JSONException e) {
@@ -78,6 +78,34 @@ public class ActorWriter {
 		obj.put(IrConstants.KEY_INITIALIZES, new JSONArray());
 		obj.put(IrConstants.KEY_ACTION_SCHED, new JSONArray());
 		return obj;
+	}
+
+	private JSONArray writeExpr(IExpr expr) {
+		JSONArray array = new JSONArray();
+		array.put(writeLocation(expr.getLocation()));
+		switch (expr.getType()) {
+		case IExpr.BINARY:
+			break;
+		case IExpr.BOOLEAN:
+			array.put(((BooleanExpr) expr).getValue());
+			break;
+		case IExpr.INT:
+			array.put(((IntExpr) expr).getValue());
+			break;
+		case IExpr.LIST:
+			break;
+		case IExpr.STRING:
+			array.put(((StringExpr) expr).getValue());
+			break;
+		case IExpr.TYPE:
+			break;
+		case IExpr.UNARY:
+			break;
+		case IExpr.VAR:
+			break;
+		}
+
+		return array;
 	}
 
 	private JSONArray writeLocation(Location location) {
@@ -146,34 +174,6 @@ public class ActorWriter {
 
 			return array;
 		}
-	}
-
-	private JSONArray writeExpr(IExpr expr) {
-		JSONArray array = new JSONArray();
-		array.put(writeLocation(expr.getLocation()));
-		switch (expr.getType()) {
-		case IExpr.BINARY:
-			break;
-		case IExpr.BOOLEAN:
-			array.put(((BooleanExpr) expr).getValue());
-			break;
-		case IExpr.INT:
-			array.put(((IntExpr) expr).getValue());
-			break;
-		case IExpr.LIST:
-			break;
-		case IExpr.STRING:
-			array.put(((StringExpr) expr).getValue());
-			break;
-		case IExpr.TYPE:
-			break;
-		case IExpr.UNARY:
-			break;
-		case IExpr.VAR:
-			break;
-		}
-		
-		return array;
 	}
 
 	// private JSONArray writeVarDef(VarDef varDef) throws OrccException {
