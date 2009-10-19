@@ -381,10 +381,11 @@ public class NetworkParser {
 					+ "must have a valid \"Class\" child.");
 		}
 
-		// instance parameters
+		// instance parameters and attributes
 		Map<String, IExpr> parameters = parseParameters(child);
+		Map<String, IAttribute> attributes = parseAttributes(child);
 
-		return new Instance(path, id, clasz, parameters);
+		return new Instance(path, id, clasz, parameters, attributes);
 	}
 
 	/**

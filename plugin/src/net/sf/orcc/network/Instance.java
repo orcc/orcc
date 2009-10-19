@@ -32,12 +32,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.parser.IrParser;
+import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.parser.NetworkParser;
 
 /**
@@ -53,6 +55,11 @@ public class Instance implements Comparable<Instance> {
 	 * instance references a network.
 	 */
 	private Actor actor;
+
+	/**
+	 * attributes
+	 */
+	private Map<String, IAttribute> attributes;
 
 	/**
 	 * the class of this instance
@@ -98,6 +105,7 @@ public class Instance implements Comparable<Instance> {
 	 *            parameters of this instance
 	 */
 	protected Instance(String id, String clasz, Map<String, IExpr> parameters) {
+		this.attributes = new HashMap<String, IAttribute>();
 		this.clasz = clasz;
 		this.id = id;
 		this.isBroadcast = true;
@@ -116,10 +124,14 @@ public class Instance implements Comparable<Instance> {
 	 *            the instance class
 	 * @param parameters
 	 *            parameters of this instance
+	 * @param attributes
+	 *            a map of attributes
 	 * @throws OrccException
 	 */
 	public Instance(String path, String id, String clasz,
-			Map<String, IExpr> parameters) throws OrccException {
+			Map<String, IExpr> parameters, Map<String, IAttribute> attributes)
+			throws OrccException {
+		this.attributes = attributes;
 		this.clasz = clasz;
 		this.id = id;
 		this.parameters = parameters;
@@ -149,6 +161,18 @@ public class Instance implements Comparable<Instance> {
 	 */
 	public Actor getActor() {
 		return actor;
+	}
+
+	/**
+	 * Returns the attribute associated with the given name.
+	 * 
+	 * @param name
+	 *            an attribute name
+	 * @return the attribute associated with the given name, or if not found,
+	 *         <code>null</code>
+	 */
+	public IAttribute getAttribute(String name) {
+		return attributes.get(name);
 	}
 
 	/**
