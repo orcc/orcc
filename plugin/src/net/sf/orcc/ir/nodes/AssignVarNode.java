@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
@@ -42,7 +42,8 @@ public class AssignVarNode extends AbstractNode {
 
 	private LocalVariable var;
 
-	public AssignVarNode(int id, Location location, LocalVariable var, IExpr value) {
+	public AssignVarNode(int id, Location location, LocalVariable var,
+			IExpr value) {
 		super(id, location);
 		this.var = var;
 		this.value = value;

@@ -31,9 +31,9 @@ package net.sf.orcc.ir.transforms;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.VarUse;

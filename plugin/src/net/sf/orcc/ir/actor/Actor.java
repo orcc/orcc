@@ -30,8 +30,8 @@ package net.sf.orcc.ir.actor;
 
 import java.util.List;
 
-import net.sf.orcc.common.Port;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.util.OrderedMap;
 
 /**

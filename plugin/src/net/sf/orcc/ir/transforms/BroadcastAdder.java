@@ -59,22 +59,6 @@ public class BroadcastAdder implements INetworkTransformation {
 
 	private Set<Connection> toBeRemoved;
 
-	@Override
-	public void transform(Network network) {
-		graph = network.getGraph();
-		toBeRemoved = new HashSet<Connection>();
-
-		Set<Vertex> vertices = new HashSet<Vertex>(graph.vertexSet());
-		for (Vertex vertex : vertices) {
-			if (vertex.isInstance()) {
-				goForIt(vertex);
-			}
-		}
-
-		// removes old connections
-		graph.removeAllEdges(toBeRemoved);
-	}
-
 	private void goForIt(Vertex vertex) {
 		// make a copy of connections
 		Set<Connection> connections = new HashSet<Connection>(graph
@@ -136,5 +120,21 @@ public class BroadcastAdder implements INetworkTransformation {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void transform(Network network) {
+		graph = network.getGraph();
+		toBeRemoved = new HashSet<Connection>();
+
+		Set<Vertex> vertices = new HashSet<Vertex>(graph.vertexSet());
+		for (Vertex vertex : vertices) {
+			if (vertex.isInstance()) {
+				goForIt(vertex);
+			}
+		}
+
+		// removes old connections
+		graph.removeAllEdges(toBeRemoved);
 	}
 }

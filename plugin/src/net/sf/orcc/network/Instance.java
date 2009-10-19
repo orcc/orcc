@@ -198,6 +198,32 @@ public class Instance implements Comparable<Instance> {
 	}
 
 	/**
+	 * Tries to load this instance as an actor.
+	 * 
+	 * @throws OrccException
+	 */
+	public void instantiate() throws OrccException {
+		file = new File(path, clasz + ".json");
+		try {
+			if (file.exists()) {
+				// TODO when new front end is ready, add instantiation here
+				InputStream in = new FileInputStream(file);
+				actor = new IrParser().parseActor(in);
+			} else {
+				file = new File(path, id + ".json");
+				// this may cause a FileNotFoundException
+				InputStream in = new FileInputStream(file);
+				actor = new IrParser().parseActor(in);
+			}
+		} catch (OrccException e) {
+			throw new OrccException("Could not parse instance \"" + id
+					+ "\" because: " + e.getLocalizedMessage(), e);
+		} catch (FileNotFoundException e) {
+			throw new OrccException("I/O error when parsing \"" + id + "\"", e);
+		}
+	}
+
+	/**
 	 * Returns true if this instance references an actor.
 	 * 
 	 * @return true if this instance references an actor.
@@ -222,32 +248,6 @@ public class Instance implements Comparable<Instance> {
 	 */
 	public boolean isNetwork() {
 		return (network != null);
-	}
-
-	/**
-	 * Tries to load this instance as an actor.
-	 * 
-	 * @throws OrccException
-	 */
-	public void instantiate() throws OrccException {
-		file = new File(path, clasz + ".json");
-		try {
-			if (file.exists()) {
-				// TODO when new front end is ready, add instantiation here
-				InputStream in = new FileInputStream(file);
-				actor = new IrParser().parseActor(in);
-			} else {
-				file = new File(path, id + ".json");
-				// this may cause a FileNotFoundException
-				InputStream in = new FileInputStream(file);
-				actor = new IrParser().parseActor(in);
-			}
-		} catch (OrccException e) {
-			throw new OrccException("Could not parse instance \"" + id
-					+ "\" because: " + e.getLocalizedMessage(), e);
-		} catch (FileNotFoundException e) {
-			throw new OrccException("I/O error when parsing \"" + id + "\"", e);
-		}
 	}
 
 	public void setClasz(String clasz) {

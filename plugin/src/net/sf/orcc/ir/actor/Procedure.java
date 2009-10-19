@@ -30,8 +30,8 @@ package net.sf.orcc.ir.actor;
 
 import java.util.List;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
@@ -73,8 +73,8 @@ public class Procedure {
 	 *            The procedure local variables.
 	 */
 	public Procedure(String name, boolean external, Location location,
-			IType returnType, List<LocalVariable> parameters, List<LocalVariable> locals,
-			List<AbstractNode> nodes) {
+			IType returnType, List<LocalVariable> parameters,
+			List<LocalVariable> locals, List<AbstractNode> nodes) {
 		this.external = external;
 		this.nodes = nodes;
 		this.locals = locals;

@@ -30,8 +30,8 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
 
@@ -47,8 +47,8 @@ public class LoadNode extends AbstractNode {
 
 	private LocalVariable target;
 
-	public LoadNode(int id, Location location, LocalVariable target, VarUse source,
-			List<IExpr> indexes) {
+	public LoadNode(int id, Location location, LocalVariable target,
+			VarUse source, List<IExpr> indexes) {
 		super(id, location);
 		this.indexes = indexes;
 		this.source = source;

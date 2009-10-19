@@ -54,8 +54,6 @@ public class Location {
 	 * Constructs a location from the specified start line, start column, end
 	 * column.
 	 * 
-	 * @param file
-	 *            The file name.
 	 * @param startLine
 	 *            The line where the location starts.
 	 * @param startColumn
@@ -67,6 +65,18 @@ public class Location {
 		this.startLine = startLine;
 		this.startColumn = startColumn;
 		this.endColumn = endColumn;
+	}
+
+	/**
+	 * Constructs a location from two given locations.
+	 * 
+	 * @param start
+	 *            starting location
+	 * @param end
+	 *            ending location
+	 */
+	public Location(Location start, Location end) {
+		this.startLine = start.startLine;
 	}
 
 	/**

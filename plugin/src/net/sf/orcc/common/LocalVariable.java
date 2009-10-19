@@ -40,7 +40,8 @@ import net.sf.orcc.ir.type.IType;
  * @author Matthieu Wipliez
  * 
  */
-public class LocalVariable extends Variable implements Comparable<LocalVariable> {
+public class LocalVariable extends Variable implements
+		Comparable<LocalVariable> {
 
 	/**
 	 * whether the variable is assignable.
@@ -79,9 +80,9 @@ public class LocalVariable extends Variable implements Comparable<LocalVariable>
 	 */
 	private Integer suffix;
 
-	public LocalVariable(boolean assignable, boolean global, int index, Location loc,
-			String name, AbstractNode node, List<VarUse> references,
-			Integer suffix, IType type) {
+	public LocalVariable(boolean assignable, boolean global, int index,
+			Location loc, String name, AbstractNode node,
+			List<VarUse> references, Integer suffix, IType type) {
 		super(loc, type, name);
 		this.assignable = assignable;
 		this.global = global;

@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 
 /**
  * @author Matthieu Wipliez

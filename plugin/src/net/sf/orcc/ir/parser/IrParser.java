@@ -87,9 +87,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
@@ -99,6 +99,7 @@ import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
 import net.sf.orcc.ir.actor.Transition;
 import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.consts.IntConst;
@@ -721,8 +722,8 @@ public class IrParser {
 
 	/**
 	 * Parses the given list as a list of state variables. A {@link StateVar} is
-	 * a {@link LocalVariable} with an optional reference to an {@link AbstractConst}
-	 * that contain the variable's initial value.
+	 * a {@link LocalVariable} with an optional reference to an
+	 * {@link AbstractConst} that contain the variable's initial value.
 	 * 
 	 * @param list
 	 *            A list of YAML-encoded {@link LocalVariable}.
@@ -855,8 +856,8 @@ public class IrParser {
 		AbstractNode node = null;
 		List<VarUse> refs = parseRefs(array.getJSONArray(3));
 
-		LocalVariable varDef = new LocalVariable(assignable, global, index, loc, name, node,
-				refs, suffix, type);
+		LocalVariable varDef = new LocalVariable(assignable, global, index,
+				loc, name, node, refs, suffix, type);
 
 		// register the variable definition
 		varDefs.put(stringOfVar(name, suffix, index), varDef);
@@ -864,8 +865,8 @@ public class IrParser {
 		return varDef;
 	}
 
-	private List<LocalVariable> parseVarDefs(JSONArray array) throws JSONException,
-			OrccException {
+	private List<LocalVariable> parseVarDefs(JSONArray array)
+			throws JSONException, OrccException {
 		List<LocalVariable> variables = new ArrayList<LocalVariable>();
 		for (int i = 0; i < array.length(); i++) {
 			variables.add(parseVarDef(array.getJSONArray(i)));

@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.network.transforms;
 
-import org.jgrapht.DirectedGraph;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.type.IType;
@@ -37,6 +35,8 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+
+import org.jgrapht.DirectedGraph;
 
 /**
  * This class defines a network transformation that instantiates a network.
