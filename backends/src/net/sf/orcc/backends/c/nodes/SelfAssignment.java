@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.c.nodes;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IExpr;
 
@@ -45,8 +45,8 @@ public class SelfAssignment extends AbstractCNode {
 
 	private LocalVariable var;
 
-	public SelfAssignment(int id, Location location, LocalVariable var, BinaryOp op,
-			IExpr value) {
+	public SelfAssignment(int id, Location location, LocalVariable var,
+			BinaryOp op, IExpr value) {
 		super(id, location);
 		this.op = op;
 		this.value = value;

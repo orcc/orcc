@@ -60,9 +60,9 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 			type = new BoolType();
 		} else if ((expr.getE1().getType() == IExpr.VAR)
 				&& (expr.getE2().getType() == IExpr.VAR)) {
-			IType typeE1 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+			IType typeE1 = ((VarExpr) expr.getE1()).getVar().getLocalVariable()
 					.getType();
-			IType typeE2 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+			IType typeE2 = ((VarExpr) expr.getE1()).getVar().getLocalVariable()
 					.getType();
 
 			if (sizeOf(typeE1) > sizeOf(typeE2)) {
@@ -72,9 +72,11 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 			}
 
 		} else if (expr.getE1().getType() == IExpr.VAR) {
-			type = ((VarExpr) expr.getE1()).getVar().getVarDef().getType();
+			type = ((VarExpr) expr.getE1()).getVar().getLocalVariable()
+					.getType();
 		} else if (expr.getE2().getType() == IExpr.VAR) {
-			type = ((VarExpr) expr.getE2()).getVar().getVarDef().getType();
+			type = ((VarExpr) expr.getE2()).getVar().getLocalVariable()
+					.getType();
 		} else {
 			type = expr.getUnderlyingType();
 		}

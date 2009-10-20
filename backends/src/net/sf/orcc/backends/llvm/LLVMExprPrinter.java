@@ -192,7 +192,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 			showType = true;
 		}
 
-		LocalVariable varDef = expr.getVar().getVarDef();
+		LocalVariable varDef = expr.getVar().getLocalVariable();
 		builder.append(varDefPrinter.getVarDefName(varDef, showType));
 	}
 

@@ -28,10 +28,8 @@
  */
 package net.sf.orcc.common;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
@@ -71,24 +69,18 @@ public class LocalVariable extends Variable implements
 	private AbstractNode node;
 
 	/**
-	 * references to this variable.
-	 */
-	private List<VarUse> references;
-
-	/**
 	 * when local variables have the same name but different scopes.
 	 */
 	private Integer suffix;
 
 	public LocalVariable(boolean assignable, boolean global, int index,
 			Location loc, String name, AbstractNode node,
-			List<VarUse> references, Integer suffix, IType type) {
+			List<LocalUse> references, Integer suffix, IType type) {
 		super(loc, type, name);
 		this.assignable = assignable;
 		this.global = global;
 		this.index = index;
 		this.node = node;
-		this.references = references;
 		this.suffix = suffix;
 		this.constant = false;
 		constantExpr = null;
@@ -100,7 +92,6 @@ public class LocalVariable extends Variable implements
 		global = other.global;
 		index = other.index;
 		node = null;
-		references = new ArrayList<VarUse>();
 		suffix = other.suffix;
 		this.constant = false;
 		constantExpr = null;
@@ -118,7 +109,6 @@ public class LocalVariable extends Variable implements
 		setLocation(varDef.getLocation());
 		setName(varDef.getName());
 		node = varDef.getNode();
-		references = varDef.getReferences();
 		if (varDef.hasSuffix()) {
 			suffix = varDef.getSuffix();
 		} else {
@@ -154,10 +144,6 @@ public class LocalVariable extends Variable implements
 
 	public AbstractNode getNode() {
 		return node;
-	}
-
-	public List<VarUse> getReferences() {
-		return references;
 	}
 
 	public int getSuffix() {
@@ -200,10 +186,6 @@ public class LocalVariable extends Variable implements
 
 	public void setNode(AbstractNode node) {
 		this.node = node;
-	}
-
-	public void setReferences(List<VarUse> references) {
-		this.references = references;
 	}
 
 	public void setSuffix(int suffix) {

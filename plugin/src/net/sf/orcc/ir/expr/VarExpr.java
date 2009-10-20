@@ -29,8 +29,8 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.actor.VarUse;
 
 /**
  * @author Matthieu Wipliez
@@ -38,11 +38,11 @@ import net.sf.orcc.ir.actor.VarUse;
  */
 public class VarExpr extends AbstractExpr {
 
-	private VarUse varUse;
+	private LocalUse localUse;
 
-	public VarExpr(Location location, VarUse varUse) {
+	public VarExpr(Location location, LocalUse localUse) {
 		super(location);
-		this.varUse = varUse;
+		this.localUse = localUse;
 	}
 
 	@Override
@@ -60,17 +60,17 @@ public class VarExpr extends AbstractExpr {
 		return VAR;
 	}
 
-	public VarUse getVar() {
-		return varUse;
+	public LocalUse getVar() {
+		return localUse;
 	}
 
-	public void setVar(VarUse varUse) {
-		this.varUse = varUse;
+	public void setVar(LocalUse localUse) {
+		this.localUse = localUse;
 	}
 
 	@Override
 	public String toString() {
-		return varUse.toString();
+		return localUse.toString();
 	}
 
 }

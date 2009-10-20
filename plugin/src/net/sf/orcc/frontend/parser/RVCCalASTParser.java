@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
@@ -43,7 +44,6 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -388,7 +388,7 @@ public class RVCCalASTParser extends CommonParser {
 
 		Location loc = parseLocation(nameTree);
 
-		List<VarUse> references = new ArrayList<VarUse>();
+		List<LocalUse> references = new ArrayList<LocalUse>();
 		AbstractNode node = new EmptyNode(0, new Location());
 
 		return new LocalVariable(assignable, global, index, loc, name, node,

@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.ir.type.IType;
 
 /**
@@ -55,6 +58,11 @@ public class Variable {
 	private IType type;
 
 	/**
+	 * uses of this variable.
+	 */
+	private List<Use> uses;
+
+	/**
 	 * Creates a new variable with the given location, type, and name.
 	 * 
 	 * @param location
@@ -68,6 +76,7 @@ public class Variable {
 		this.location = location;
 		this.type = type;
 		this.name = name;
+		this.uses = new ArrayList<Use>();
 	}
 
 	/**
@@ -80,6 +89,17 @@ public class Variable {
 		this.location = var.location;
 		this.type = var.type;
 		this.name = var.name;
+		this.uses = var.uses;
+	}
+
+	/**
+	 * Adds the given use of this variable to this variable's use list.
+	 * 
+	 * @param use
+	 *            a use of this variable
+	 */
+	public void addUse(Use use) {
+		uses.add(use);
 	}
 
 	/**
@@ -107,6 +127,16 @@ public class Variable {
 	 */
 	public IType getType() {
 		return type;
+	}
+
+	/**
+	 * Removes the given use of this variable from this variable's use list.
+	 * 
+	 * @param use
+	 *            a use of this variable
+	 */
+	public void removeUse(Use use) {
+		uses.remove(use);
 	}
 
 	/**

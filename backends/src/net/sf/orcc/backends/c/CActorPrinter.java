@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.PluginGroupLoader;
-import net.sf.orcc.common.Port;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;

@@ -263,7 +263,7 @@ public class ExprToString implements ExprVisitor {
 
 	@Override
 	public void visit(VarExpr expr, Object... args) {
-		LocalVariable varDef = expr.getVar().getVarDef();
+		LocalVariable varDef = expr.getVar().getLocalVariable();
 		builder.append(varDefPrinter.getVarDefName(varDef));
 	}
 

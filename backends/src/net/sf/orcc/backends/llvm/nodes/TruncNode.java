@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**

@@ -30,8 +30,8 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
@@ -42,11 +42,11 @@ public class StoreNode extends AbstractNode {
 
 	private List<IExpr> indexes;
 
-	private VarUse target;
+	private LocalUse target;
 
 	private IExpr value;
 
-	public StoreNode(int id, Location location, VarUse target,
+	public StoreNode(int id, Location location, LocalUse target,
 			List<IExpr> indexes, IExpr value) {
 		super(id, location);
 		this.indexes = indexes;
@@ -63,7 +63,7 @@ public class StoreNode extends AbstractNode {
 		return indexes;
 	}
 
-	public VarUse getTarget() {
+	public LocalUse getTarget() {
 		return target;
 	}
 
@@ -75,7 +75,7 @@ public class StoreNode extends AbstractNode {
 		this.indexes = indexes;
 	}
 
-	public void setTarget(VarUse target) {
+	public void setTarget(LocalUse target) {
 		this.target = target;
 	}
 

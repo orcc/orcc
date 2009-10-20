@@ -26,45 +26,59 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.actor;
-
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.ir.nodes.AbstractNode;
+package net.sf.orcc.common;
 
 /**
+ * This class defines a use of a variable.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class VarUse {
+public class Use {
 
-	private AbstractNode node;
+	/**
+	 * the variable referenced
+	 */
+	private Variable variable;
 
-	private LocalVariable varDef;
-
-	public VarUse(LocalVariable varDef, AbstractNode node) {
-		this.node = node;
-		this.varDef = varDef;
+	/**
+	 * Creates a new use of the given variable.
+	 * 
+	 * @param variable
+	 *            a variable
+	 */
+	public Use(Variable variable) {
+		this.variable = variable;
 	}
 
-	public AbstractNode getNode() {
-		return node;
+	/**
+	 * Returns the variable referenced by this use.
+	 * 
+	 * @return the variable referenced by this use
+	 */
+	public Variable getVariable() {
+		return variable;
 	}
 
-	public LocalVariable getVarDef() {
-		return varDef;
-	}
-
-	public void setNode(AbstractNode node) {
-		this.node = node;
-	}
-
-	public void setVarDef(LocalVariable varDef) {
-		this.varDef = varDef;
+	/**
+	 * Sets the variable referenced by this use to the given variable. This use
+	 * is removed from the use list of the previously referenced variable, and
+	 * added to the use list of the newly referenced variable.
+	 * 
+	 * @param variable
+	 *            a variable that this use will reference
+	 */
+	public void setVariable(Variable variable) {
+		if (this.variable != null) {
+			this.variable.removeUse(this);
+		}
+		this.variable = variable;
+		variable.addUse(this);
 	}
 
 	@Override
 	public String toString() {
-		return varDef.toString();
+		return variable.toString();
 	}
 
 }

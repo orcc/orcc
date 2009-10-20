@@ -63,9 +63,9 @@ public class IncrementPeephole extends AbstractActorTransformation {
 			if (node1 instanceof LoadNode && node2 instanceof StoreNode) {
 				LoadNode load = (LoadNode) node1;
 				StoreNode store = (StoreNode) node2;
-				LocalVariable varDef = load.getSource().getVarDef();
+				LocalVariable varDef = load.getSource().getLocalVariable();
 				LocalVariable varDefTmp = load.getTarget();
-				if (varDef == store.getTarget().getVarDef()
+				if (varDef == store.getTarget().getLocalVariable()
 						&& load.getIndexes().isEmpty()) {
 					IExpr expr = store.getValue();
 					if (expr.getType() == IExpr.BINARY) {
@@ -76,7 +76,7 @@ public class IncrementPeephole extends AbstractActorTransformation {
 
 						if (e1.getType() == IExpr.VAR) {
 							VarExpr v1 = (VarExpr) e1;
-							if (v1.getVar().getVarDef() == varDefTmp) {
+							if (v1.getVar().getLocalVariable() == varDefTmp) {
 								res = replaceSelfAssignment(procedure
 										.getLocals(), it, varDefTmp, varDef,
 										v1, op, e2);

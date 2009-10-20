@@ -35,12 +35,12 @@ import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.common.Location;
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.LoadNode;
@@ -61,8 +61,8 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 	int indexName;
 
 	@SuppressWarnings("unchecked")
-	public VarUse getElementPtrNodeCreate(VarUse varList, List<IExpr> indexes,
-			Object... args) {
+	public LocalUse getElementPtrNodeCreate(LocalUse varList,
+			List<IExpr> indexes, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 
 		it.previous();
@@ -70,14 +70,14 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 		IType listType;
 
 		// Adding the getElementPtrNode
-		LocalVariable varDefList = varList.getVarDef();
+		LocalVariable varDefList = varList.getLocalVariable();
 		listType = varDefList.getType();
 		while (listType.getType() == IType.LIST) {
 			listType = ((ListType) listType).getElementType();
 		}
 
 		LocalVariable varDef = varDefCreate(varDefList, listType);
-		VarUse varUse = new VarUse(varDef, null);
+		LocalUse localUse = new LocalUse(varDef, null);
 
 		// Create and insert the new node
 		GetElementPtrNode elementPtrNode = new GetElementPtrNode(0,
@@ -86,7 +86,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 		it.add(elementPtrNode);
 		it.next();
 
-		return varUse;
+		return localUse;
 	}
 
 	@Override
@@ -162,7 +162,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 			} catch (NumberFormatException e) {
 			}
 
-			VarUse targetVar = node.getTarget();
+			LocalUse targetVar = node.getTarget();
 
 			// Insert the new VarDef in the store node
 			node.setTarget(getElementPtrNodeCreate(targetVar,

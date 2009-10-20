@@ -29,10 +29,10 @@
 package net.sf.orcc.frontend.parser;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -174,8 +174,8 @@ public class ExprParser extends CommonParser {
 			return new StringExpr(parseLocation(expr), expr.getText());
 		case RVCCalLexer.EXPR_VAR:
 			expr = expr.getChild(0);
-			VarUse varUse = new VarUse(null, null);
-			return new VarExpr(parseLocation(expr), varUse);
+			LocalUse localUse = new LocalUse(null, null);
+			return new VarExpr(parseLocation(expr), localUse);
 		default:
 			throw new OrccException("not yet implemented");
 		}

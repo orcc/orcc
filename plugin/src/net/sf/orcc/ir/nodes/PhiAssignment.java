@@ -30,8 +30,8 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.ir.actor.VarUse;
 
 /**
  * @author Matthieu Wipliez
@@ -39,21 +39,21 @@ import net.sf.orcc.ir.actor.VarUse;
  */
 public class PhiAssignment {
 
+	private List<LocalUse> localUses;
+
 	private LocalVariable varDef;
 
-	private List<VarUse> varUses;
-
-	public PhiAssignment(LocalVariable varDef, List<VarUse> vars) {
+	public PhiAssignment(LocalVariable varDef, List<LocalUse> vars) {
 		this.varDef = varDef;
-		this.varUses = vars;
+		this.localUses = vars;
 	}
 
 	public LocalVariable getVarDef() {
 		return varDef;
 	}
 
-	public List<VarUse> getVars() {
-		return varUses;
+	public List<LocalUse> getVars() {
+		return localUses;
 	}
 
 	public void setVarDef(LocalVariable varDef) {

@@ -66,7 +66,7 @@ public class AssignPeephole extends AbstractActorTransformation {
 			LocalVariable vardef = node.getVar();
 			VarExpr expr = (VarExpr) node.getValue();
 
-			vardef.duplicate(expr.getVar().getVarDef());
+			vardef.duplicate(expr.getVar().getLocalVariable());
 			it.remove();
 		}
 	}
@@ -83,7 +83,7 @@ public class AssignPeephole extends AbstractActorTransformation {
 		List<PhiAssignment> phis = node.getPhis();
 		if (!phis.isEmpty()) {
 			for (PhiAssignment phi : phis) {
-				LocalVariable source = phi.getVars().get(0).getVarDef();
+				LocalVariable source = phi.getVars().get(0).getLocalVariable();
 				// if source is a local variable with index = 0, we remove it
 				// from the procedure and translate the PHI by an assignment of
 				// 0 (zero) to target.

@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.common.Location;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 
 /**
  * @author Jérôme GORIN
@@ -45,8 +45,8 @@ public class LoadFifo extends AbstractLLVMNode {
 
 	private LocalVariable varDef;
 
-	public LoadFifo(int id, Location location, String fifoName, LocalVariable varDef,
-			int index) {
+	public LoadFifo(int id, Location location, String fifoName,
+			LocalVariable varDef, int index) {
 		super(id, location);
 		this.fifoName = fifoName;
 		this.varDef = varDef;

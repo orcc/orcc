@@ -36,12 +36,12 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
-import net.sf.orcc.common.Location;
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IExpr;
@@ -86,9 +86,9 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 			type = new BoolType();
 		} else if ((expr.getE1().getType() == IExpr.VAR)
 				&& (expr.getE2().getType() == IExpr.VAR)) {
-			IType typeE1 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+			IType typeE1 = ((VarExpr) expr.getE1()).getVar().getLocalVariable()
 					.getType();
-			IType typeE2 = ((VarExpr) expr.getE1()).getVar().getVarDef()
+			IType typeE2 = ((VarExpr) expr.getE1()).getVar().getLocalVariable()
 					.getType();
 
 			if (sizeOf(typeE1) > sizeOf(typeE2)) {
@@ -98,9 +98,11 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 			}
 
 		} else if (expr.getE1().getType() == IExpr.VAR) {
-			type = ((VarExpr) expr.getE1()).getVar().getVarDef().getType();
+			type = ((VarExpr) expr.getE1()).getVar().getLocalVariable()
+					.getType();
 		} else if (expr.getE2().getType() == IExpr.VAR) {
-			type = ((VarExpr) expr.getE2()).getVar().getVarDef().getType();
+			type = ((VarExpr) expr.getE2()).getVar().getLocalVariable()
+					.getType();
 		} else {
 			type = expr.getUnderlyingType();
 		}
@@ -167,7 +169,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 		}
 
 		LocalVariable vardef = varDefCreate(checkType(expr));
-		VarUse varuse = new VarUse(vardef, null);
+		LocalUse varuse = new LocalUse(vardef, null);
 		VarExpr varexpr = new VarExpr(new Location(), varuse);
 
 		AssignVarNode assignNode = new AssignVarNode(0, new Location(), vardef,

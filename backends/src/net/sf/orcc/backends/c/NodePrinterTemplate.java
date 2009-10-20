@@ -205,7 +205,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef));
 
-		varDef = node.getSource().getVarDef();
+		varDef = node.getSource().getLocalVariable();
 		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef));
 
 		List<IExpr> indexes = node.getIndexes();
@@ -267,7 +267,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	public void visit(StoreNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("storeNode");
 
-		LocalVariable varDef = node.getTarget().getVarDef();
+		LocalVariable varDef = node.getTarget().getLocalVariable();
 		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef));
 
 		List<IExpr> indexes = node.getIndexes();

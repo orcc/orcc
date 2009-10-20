@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
@@ -218,8 +218,8 @@ public class ExprParser {
 					String name = elt.getAttribute("name");
 					LocalVariable varDef = new LocalVariable(false, false, 0,
 							null, name, null, null, null, null);
-					VarUse varUse = new VarUse(varDef, null);
-					expr = new VarExpr(new Location(), varUse);
+					LocalUse localUse = new LocalUse(varDef, null);
+					expr = new VarExpr(new Location(), localUse);
 					break;
 				} else {
 					throw new OrccException("Unsupported Expr kind: \"" + kind

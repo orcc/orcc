@@ -31,12 +31,12 @@ package net.sf.orcc.ir.transforms;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.InitPortNode;
@@ -64,7 +64,7 @@ public class AddInstantationProcedure implements IActorTransformation {
 
 		parameters.add(parameter);
 		for (Port port : ports) {
-			VarUse varuse = new VarUse(parameter, null);
+			LocalUse varuse = new LocalUse(parameter, null);
 			VarExpr expr = new VarExpr(new Location(), varuse);
 
 			InitPortNode node = new InitPortNode(0, new Location(), port

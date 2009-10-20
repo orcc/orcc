@@ -30,9 +30,9 @@ package net.sf.orcc.backends.llvm.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.common.Location;
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.ir.actor.VarUse;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
@@ -43,12 +43,12 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 
 	List<IExpr> indexs;
 
-	private VarUse source;
+	private LocalUse source;
 
 	private LocalVariable varDef;
 
 	public GetElementPtrNode(int id, Location location, LocalVariable varDef,
-			VarUse source, List<IExpr> indexs) {
+			LocalUse source, List<IExpr> indexs) {
 		super(id, location);
 		this.varDef = varDef;
 		this.source = source;
@@ -64,7 +64,7 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 		return indexs;
 	}
 
-	public VarUse getSource() {
+	public LocalUse getSource() {
 		return source;
 	}
 
@@ -76,7 +76,7 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 		this.indexs = indexs;
 	}
 
-	public void setSource(VarUse source) {
+	public void setSource(LocalUse source) {
 		this.source = source;
 	}
 

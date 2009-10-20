@@ -40,12 +40,12 @@ import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.PhiNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
-import net.sf.orcc.common.Location;
+import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.VarUse;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.TypeExpr;
@@ -70,9 +70,9 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 		implements IActorTransformation {
 
 	private int BrCounter;
-	
+
 	ListIterator<AbstractNode> it;
-	
+
 	private LabelNode labelNode;
 
 	List<PhiNode> tmpPhiNodes;
@@ -219,13 +219,13 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 
 		for (PhiAssignment phi : phis) {
 			LocalVariable varDef = phi.getVarDef();
-			List<VarUse> varUses = phi.getVars();
+			List<LocalUse> localUses = phi.getVars();
 			LocalVariable phiVar;
 			if (value == true) {
-				phiVar = varUses.get(0).getVarDef();
+				phiVar = localUses.get(0).getLocalVariable();
 
 			} else {
-				phiVar = varUses.get(1).getVarDef();
+				phiVar = localUses.get(1).getLocalVariable();
 			}
 
 			varDef.duplicate(phiVar);
@@ -244,10 +244,10 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 			Map<LabelNode, LocalVariable> assignements = new HashMap<LabelNode, LocalVariable>();
 			LocalVariable varDef = phi.getVarDef();
 			IType varType = varDef.getType();
-			List<VarUse> vars = phi.getVars();
+			List<LocalUse> vars = phi.getVars();
 
-			LocalVariable trueVar = vars.get(0).getVarDef();
-			LocalVariable falseVar = vars.get(1).getVarDef();
+			LocalVariable trueVar = vars.get(0).getLocalVariable();
+			LocalVariable falseVar = vars.get(1).getLocalVariable();
 
 			// Force varDef's type to phiNode type to prevent cast problem
 			if (varType.getType() == IType.INT) {

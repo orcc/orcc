@@ -26,52 +26,39 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.common;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.nodes.AbstractNode;
 
 /**
- * @author Jérôme GORIN
+ * This class defines a use of a local variable.
+ * 
+ * @author Matthieu Wipliez
  * 
  */
-public class SextNode extends AbstractLLVMNode {
+public class LocalUse extends Use {
 
-	private IExpr value;
+	private AbstractNode node;
 
-	private LocalVariable var;
-
-	public SextNode(int id, Location location, LocalVariable var, IExpr value) {
-		super(id, location);
-		this.var = var;
-		this.value = value;
+	public LocalUse(LocalVariable variable, AbstractNode node) {
+		super(variable);
+		this.node = node;
 	}
 
-	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public LocalVariable getLocalVariable() {
+		return (LocalVariable) getVariable();
 	}
 
-	public IExpr getValue() {
-		return value;
+	public AbstractNode getNode() {
+		return node;
 	}
 
-	public LocalVariable getVar() {
-		return var;
+	public void setLocalVariable(LocalVariable variable) {
+		super.setVariable(variable);
 	}
 
-	public void setTarget(IExpr value) {
-		this.value = value;
-	}
-
-	public void setVar(LocalVariable var) {
-		this.var = var;
-	}
-
-	@Override
-	public String toString() {
-		return var + " = bitcast " + value.toString() + " to " + var.getType();
+	public void setNode(AbstractNode node) {
+		this.node = node;
 	}
 
 }
