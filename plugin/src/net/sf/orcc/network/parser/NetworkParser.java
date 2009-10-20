@@ -31,15 +31,33 @@ package net.sf.orcc.network.parser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.common.GlobalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Use;
+import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.Entry;
 import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -56,6 +74,7 @@ import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.attributes.TypeAttribute;
 import net.sf.orcc.network.attributes.ValueAttribute;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.Scope;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
@@ -75,6 +94,440 @@ import org.w3c.dom.ls.LSParser;
  * 
  */
 public class NetworkParser {
+
+	/**
+	 * This class defines a parser of XDF expressions.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ExprParser {
+
+		/**
+		 * Parses the given node as an expression and returns the matching IExpr
+		 * expression.
+		 * 
+		 * @param node
+		 *            a node whose expected to be, or whose sibling is expected
+		 *            to be, a DOM element named "Expr".
+		 * @return an expression
+		 * @throws OrccException
+		 *             if the given node or its siblings could not be parsed as
+		 *             an expression
+		 */
+		public IExpr parseExpr(Node node) throws OrccException {
+			ParseContinuation<IExpr> cont = parseExprCont(node);
+			IExpr expr = cont.getResult();
+			if (expr == null) {
+				throw new OrccException("Expected an Expr element");
+			} else {
+				return expr;
+			}
+		}
+
+		/**
+		 * Parses the given node as a binary operator and returns a parse
+		 * continuation with the operator parsed.
+		 * 
+		 * @param node
+		 *            a node that is expected, or whose sibling is expected, to
+		 *            be a DOM element named "Op".
+		 * @return a parse continuation with the operator parsed
+		 * @throws OrccException
+		 *             if the binary operator could not be parsed
+		 */
+		private ParseContinuation<BinaryOp> parseExprBinaryOp(Node node)
+				throws OrccException {
+			while (node != null) {
+				if (node.getNodeName().equals("Op")) {
+					Element op = (Element) node;
+					String name = op.getAttribute("name");
+					if (name.equals("and")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.LAND);
+					} else if (name.equals("/")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.DIV);
+					} else if (name.equals("div")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.DIV_INT);
+					} else if (name.equals("=")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.EQ);
+					} else if (name.equals("^")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.EXP);
+					} else if (name.equals(">=")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.GE);
+					} else if (name.equals(">")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.GT);
+					} else if (name.equals("<=")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.LE);
+					} else if (name.equals("<")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.LT);
+					} else if (name.equals("-")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.MINUS);
+					} else if (name.equals("mod")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.MOD);
+					} else if (name.equals("!=")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.NE);
+					} else if (name.equals("or")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.LOR);
+					} else if (name.equals("+")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.PLUS);
+					} else if (name.equals("*")) {
+						return new ParseContinuation<BinaryOp>(node,
+								BinaryOp.TIMES);
+					} else {
+						throw new OrccException("Unknown binary operator \""
+								+ name + "\"");
+					}
+				}
+
+				node = node.getNextSibling();
+			}
+
+			return new ParseContinuation<BinaryOp>(node, null);
+		}
+
+		/**
+		 * Parses the given node and its siblings as a sequence of binary
+		 * operations, aka "BinOpSeq". A BinOpSeq is a sequence of expr, op,
+		 * expr, op, expr...
+		 * 
+		 * @param node
+		 *            the first child node of a Expr kind="BinOpSeq" element
+		 * @return a parse continuation with a BinaryExpr
+		 * @throws OrccException
+		 *             if something goes wrong
+		 */
+		private ParseContinuation<IExpr> parseExprBinOpSeq(Node node)
+				throws OrccException {
+			List<Object> args = new ArrayList<Object>();
+
+			ParseContinuation<? extends Object> cont = parseExprCont(node);
+			args.add(cont.getResult());
+			node = cont.getNode();
+			while (node != null) {
+				cont = parseExprBinaryOp(node);
+				BinaryOp op = (BinaryOp) cont.getResult();
+				node = cont.getNode();
+				if (op != null) {
+					args.add(op);
+
+					cont = parseExprCont(node);
+					IExpr expr = (IExpr) cont.getResult();
+					if (expr == null) {
+						throw new OrccException("Expected an Expr element");
+					}
+
+					args.add(expr);
+					node = cont.getNode();
+				}
+			}
+
+			// TODO one more time, apply operator priority to stupid binary
+			// operation sequence...
+			return new ParseContinuation<IExpr>(node, new IntExpr(42));
+		}
+
+		/**
+		 * Parses the given node as an expression and returns the matching IExpr
+		 * expression.
+		 * 
+		 * @param node
+		 *            a node whose sibling is expected to be a DOM element named
+		 *            "Expr".
+		 * @return an expression
+		 * @throws OrccException
+		 *             if the given node or its siblings could not be parsed as
+		 *             an expression
+		 */
+		private ParseContinuation<IExpr> parseExprCont(Node node)
+				throws OrccException {
+			IExpr expr = null;
+			while (node != null) {
+				if (node.getNodeName().equals("Expr")) {
+					Element elt = (Element) node;
+					String kind = elt.getAttribute("kind");
+					if (kind.equals("BinOpSeq")) {
+						return parseExprBinOpSeq(elt.getFirstChild());
+					} else if (kind.equals("Literal")) {
+						expr = parseExprLiteral(elt);
+						break;
+					} else if (kind.equals("List")) {
+						List<IExpr> exprs = parseExprs(node.getFirstChild());
+						expr = new ListExpr(new Location(), exprs);
+						break;
+					} else if (kind.equals("UnaryOp")) {
+						ParseContinuation<UnaryOp> cont = parseExprUnaryOp(node
+								.getFirstChild());
+						UnaryOp op = cont.getResult();
+						IExpr unaryExpr = parseExpr(cont.getNode());
+						expr = new UnaryExpr(new Location(), op, unaryExpr,
+								null);
+						break;
+					} else if (kind.equals("Var")) {
+						String name = elt.getAttribute("name");
+						// look up variable, in variables scope, and if not
+						// found in parameters scope
+						Variable variable = variables.get(name);
+						Use use = new Use(variable);
+						expr = new VarExpr(new Location(), use);
+						break;
+					} else {
+						throw new OrccException("Unsupported Expr kind: \""
+								+ kind + "\"");
+					}
+				}
+
+				node = node.getNextSibling();
+			}
+
+			return new ParseContinuation<IExpr>(node, expr);
+		}
+
+		/**
+		 * Parses the given "Expr" element as a literal and returns the matching
+		 * IExpr expression.
+		 * 
+		 * @param elt
+		 *            a DOM element named "Expr"
+		 * @return an expression
+		 * @throws OrccException
+		 *             if the literal could not be parsed
+		 */
+		private IExpr parseExprLiteral(Element elt) throws OrccException {
+			String kind = elt.getAttribute("literal-kind");
+			String value = elt.getAttribute("value");
+			if (kind.equals("Boolean")) {
+				return new BooleanExpr(new Location(), Boolean
+						.parseBoolean(value));
+			} else if (kind.equals("Character")) {
+				throw new OrccException("Characters not supported yet");
+			} else if (kind.equals("Integer")) {
+				return new IntExpr(new Location(), Integer.parseInt(value));
+			} else if (kind.equals("Real")) {
+				throw new OrccException("Reals not supported yet");
+			} else if (kind.equals("String")) {
+				return new StringExpr(new Location(), value);
+			} else {
+				throw new OrccException("Unsupported Expr "
+						+ "literal kind: \"" + kind + "\"");
+			}
+		}
+
+		private List<IExpr> parseExprs(Node node) throws OrccException {
+			List<IExpr> exprs = new ArrayList<IExpr>();
+			while (node != null) {
+				if (node.getNodeName().equals("Expr")) {
+					exprs.add(parseExpr(node));
+				}
+
+				node = node.getNextSibling();
+			}
+
+			return exprs;
+		}
+
+		/**
+		 * Parses the given node as a unary operator and returns a parse
+		 * continuation with the operator parsed.
+		 * 
+		 * @param node
+		 *            a node that is expected, or whose sibling is expected, to
+		 *            be a DOM element named "Op".
+		 * @return a parse continuation with the operator parsed
+		 * @throws OrccException
+		 *             if the unary operator could not be parsed
+		 */
+		private ParseContinuation<UnaryOp> parseExprUnaryOp(Node node)
+				throws OrccException {
+			while (node != null) {
+				if (node.getNodeName().equals("Op")) {
+					Element op = (Element) node;
+					String name = op.getAttribute("name");
+					if (name.equals("#")) {
+						return new ParseContinuation<UnaryOp>(node,
+								UnaryOp.NUM_ELTS);
+					} else if (name.equals("not")) {
+						return new ParseContinuation<UnaryOp>(node,
+								UnaryOp.LNOT);
+					} else if (name.equals("-")) {
+						return new ParseContinuation<UnaryOp>(node,
+								UnaryOp.MINUS);
+					} else {
+						throw new OrccException("Unknown unary operator \""
+								+ name + "\"");
+					}
+				}
+
+				node = node.getNextSibling();
+			}
+
+			throw new OrccException("Expected an Op element");
+		}
+
+	}
+
+	/**
+	 * This class defines a parser of XDF types.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	public class TypeParser {
+
+		/**
+		 * Default size of an signed/unsigned integer.
+		 */
+		private static final int defaultSize = 32;
+
+		/**
+		 * Parses the given node as an IType.
+		 * 
+		 * @param node
+		 *            the node to parse as a type.
+		 * @return a type
+		 * @throws OrccException
+		 *             if the node could not be parsed as a type
+		 */
+		public ParseContinuation<IType> parseType(Node node)
+				throws OrccException {
+			while (node != null) {
+				if (node.getNodeName().equals("Type")) {
+					Element eltType = (Element) node;
+					String name = eltType.getAttribute("name");
+					if (name.equals(BoolType.NAME)) {
+						return new ParseContinuation<IType>(node,
+								new BoolType());
+					} else if (name.equals(IntType.NAME)) {
+						Map<String, Entry> entries = parseTypeEntries(node
+								.getFirstChild());
+						IExpr size = parseTypeSize(entries);
+						return new ParseContinuation<IType>(node, new IntType(
+								size));
+					} else if (name.equals(ListType.NAME)) {
+						return new ParseContinuation<IType>(node,
+								parseTypeList(node));
+					} else if (name.equals(StringType.NAME)) {
+						return new ParseContinuation<IType>(node,
+								new StringType());
+					} else if (name.equals(UintType.NAME)) {
+						Map<String, Entry> entries = parseTypeEntries(node
+								.getFirstChild());
+						IExpr size = parseTypeSize(entries);
+						return new ParseContinuation<IType>(node, new UintType(
+								size));
+					} else {
+						throw new OrccException("unknown type name: \"" + name
+								+ "\"");
+					}
+				}
+
+				node = node.getNextSibling();
+			}
+
+			throw new OrccException("Expected a Type element");
+		}
+
+		/**
+		 * Parses the node and its siblings as type entries, and returns a map
+		 * of entry names to contents.
+		 * 
+		 * @param node
+		 *            The first node susceptible to be an entry, or
+		 *            <code>null</code>.
+		 * @return A map of entry names to contents.
+		 * @throws OrccException
+		 *             if something goes wrong
+		 */
+		private Map<String, Entry> parseTypeEntries(Node node)
+				throws OrccException {
+			Map<String, Entry> entries = new HashMap<String, Entry>();
+			while (node != null) {
+				if (node.getNodeName().equals("Entry")) {
+					Element element = (Element) node;
+					String name = element.getAttribute("name");
+					String kind = element.getAttribute("kind");
+
+					Entry entry = null;
+					if (kind.equals("Expr")) {
+						IExpr expr = exprParser.parseExpr(node.getFirstChild());
+						entry = new Entry(expr);
+					} else if (kind.equals("Type")) {
+						entry = new Entry(parseType(node.getFirstChild())
+								.getResult());
+					} else {
+						throw new OrccException("unsupported entry type: \""
+								+ kind + "\"");
+					}
+
+					entries.put(name, entry);
+				}
+
+				node = node.getNextSibling();
+			}
+
+			return entries;
+		}
+
+		/**
+		 * Parses a List type.
+		 * 
+		 * @param node
+		 *            the Type node where this List is defined
+		 * @return a ListType
+		 * @throws OrccException
+		 *             if something is wrong, like a missing entry
+		 */
+		private IType parseTypeList(Node node) throws OrccException {
+			Map<String, Entry> entries = parseTypeEntries(node.getFirstChild());
+			Entry entry = entries.get("size");
+			if (entry == null) {
+				throw new OrccException("List type must have a \"size\" entry");
+			}
+			IExpr size = entry.getEntryAsExpr();
+
+			entry = entries.get("type");
+			if (entry == null) {
+				throw new OrccException("List type must have a \"type\" entry");
+			}
+			IType type = entry.getEntryAsType();
+
+			return new ListType(size, type);
+		}
+
+		/**
+		 * Gets a "size" entry from the given entry map, if found return its
+		 * value, otherwise return {@link #defaultSize}.
+		 * 
+		 * @param entries
+		 *            a map of entries
+		 * @return an expression
+		 * @throws OrccException
+		 *             if the "size" entry does not contain an expression
+		 */
+		private IExpr parseTypeSize(Map<String, Entry> entries)
+				throws OrccException {
+			Entry entry = entries.get("size");
+			if (entry == null) {
+				return new IntExpr(defaultSize);
+			} else {
+				return entry.getEntryAsExpr();
+			}
+		}
+
+	}
 
 	/**
 	 * Calls the parser with args[0] as the file name.
@@ -101,7 +554,7 @@ public class NetworkParser {
 	/**
 	 * absolute file name of the XDF file
 	 */
-	private File file;
+	private final File file;
 
 	/**
 	 * the graph representing the network we are parsing
@@ -126,12 +579,12 @@ public class NetworkParser {
 	/**
 	 * list of parameters
 	 */
-	private OrderedMap<GlobalVariable> parameters;
+	private Scope<GlobalVariable> parameters;
 
 	/**
 	 * parent path of {@link #file}
 	 */
-	private String path;
+	private final String path;
 
 	/**
 	 * XDF type parser.
@@ -141,7 +594,7 @@ public class NetworkParser {
 	/**
 	 * list of variables
 	 */
-	private OrderedMap<GlobalVariable> variables;
+	private Scope<GlobalVariable> variables;
 
 	/**
 	 * Creates a new network parser.
@@ -153,7 +606,7 @@ public class NetworkParser {
 		file = new File(fileName);
 		path = file.getParent();
 		exprParser = new ExprParser();
-		typeParser = new TypeParser(exprParser);
+		typeParser = new TypeParser();
 	}
 
 	/**
@@ -504,8 +957,8 @@ public class NetworkParser {
 		inputs = new OrderedMap<Port>();
 		instances = new HashMap<String, Instance>();
 		outputs = new OrderedMap<Port>();
-		parameters = new OrderedMap<GlobalVariable>();
-		variables = new OrderedMap<GlobalVariable>();
+		parameters = new Scope<GlobalVariable>();
+		variables = new Scope<GlobalVariable>(parameters);
 
 		parseBody(root);
 

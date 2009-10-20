@@ -42,13 +42,14 @@ public class Use {
 	private Variable variable;
 
 	/**
-	 * Creates a new use of the given variable.
+	 * Creates a new use of the given variable. This use is added to the use
+	 * list of the newly referenced variable.
 	 * 
 	 * @param variable
 	 *            a variable
 	 */
 	public Use(Variable variable) {
-		this.variable = variable;
+		setVariable(variable);
 	}
 
 	/**
