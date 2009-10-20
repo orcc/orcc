@@ -171,7 +171,9 @@ public class Variable {
 
 	@Override
 	public String toString() {
-		return name + " (" + uses.size() + " uses)";
+		// WARNING: this is used as-is by templates, etc. BE CAREFUL when
+		// changing this function!
+		return name;
 	}
 
 }
