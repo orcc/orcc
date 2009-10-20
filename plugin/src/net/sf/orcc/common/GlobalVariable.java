@@ -145,9 +145,4 @@ public class GlobalVariable extends Variable {
 		this.value = value;
 	}
 
-	@Override
-	public String toString() {
-		return getName();
-	}
-
 }
