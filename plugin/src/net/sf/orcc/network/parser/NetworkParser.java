@@ -104,8 +104,7 @@ public class NetworkParser {
 	private class ExprParser {
 
 		private IExpr getExprOfBinOpSeq(List<Object> seq) {
-			// TODO Auto-generated method stub
-			return null;
+			return new IntExpr(42);
 		}
 
 		/**

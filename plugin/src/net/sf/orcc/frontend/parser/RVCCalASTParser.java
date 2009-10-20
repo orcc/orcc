@@ -40,6 +40,7 @@ import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
+import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -118,6 +119,12 @@ public class RVCCalASTParser extends CommonParser {
 	private List<LocalVariable> parameters;
 
 	/**
+	 * Priorities are a list of priority relations. A priority relation is a
+	 * partial order between several tags.
+	 */
+	private List<List<List<String>>> priorities;
+
+	/**
 	 * Contains the current scope of procedures
 	 */
 	private OrderedMap<Procedure> procedures;
@@ -175,8 +182,8 @@ public class RVCCalASTParser extends CommonParser {
 	}
 
 	private List<String> parseActionTag(Tree tree) {
-		List<String> tag = new ArrayList<String>();
 		int n = tree.getChildCount();
+		List<String> tag = new ArrayList<String>(n);
 		for (int i = 0; i < n; i++) {
 			Tree child = tree.getChild(i);
 			tag.add(child.getText());
@@ -205,8 +212,12 @@ public class RVCCalASTParser extends CommonParser {
 		outputs = parsePorts(tree.getChild(4));
 
 		actions = new ActionList();
+		priorities = new ArrayList<List<List<String>>>();
 		stateVars = new ArrayList<StateVar>();
+
 		parseActorDecls(tree.getChild(5));
+		
+		new ActionSorter().applyPriority(priorities, actions);
 
 		return new Actor(name, file, parameters, inputs, outputs, stateVars,
 				null, null, null, null, null);
@@ -277,9 +288,24 @@ public class RVCCalASTParser extends CommonParser {
 		return ports;
 	}
 
+	/**
+	 * Parses a priority declaration.
+	 * 
+	 * @param tree
+	 *            a tree whose root node is PRIORITY
+	 */
 	private void parsePriority(Tree tree) {
-		// TODO parse priority
-
+		int numInequalities = tree.getChildCount();
+		for (int i = 0; i < numInequalities; i++) {
+			Tree inequality = tree.getChild(i);
+			int numTags = inequality.getChildCount();
+			List<List<String>> list = new ArrayList<List<String>>(numTags);
+			for (int j = 0; j < numTags; j++) {
+				List<String> tag = parseActionTag(inequality.getChild(j));
+				list.add(tag);
+			}
+			priorities.add(list);
+		}
 	}
 
 	private void parseSchedule(Tree tree) {

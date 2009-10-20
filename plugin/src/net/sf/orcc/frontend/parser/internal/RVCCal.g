@@ -101,7 +101,7 @@ package net.sf.orcc.frontend.parser.internal;
 @parser::header {
 package net.sf.orcc.frontend.parser.internal;
 
-// @SuppressWarnings("unused")
+// @SuppressWarnings({"unchecked", "unused"})
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@ actorDeclaration:
   // parsing "action a.b:" would be much easier than parsing "a.b: action"
 
   ID (
-    ((('.' tag=ID)* -> $tag*) ':'
+    ((('.' tag+=ID)*) ':'
       (ACTION inputs=actionInputs? '==>' outputs=actionOutputs? guards=actionGuards? ('var' varDecls)? actionStatements? 'end'
         -> ^(ACTION ^(TAG ID $tag*) ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
 

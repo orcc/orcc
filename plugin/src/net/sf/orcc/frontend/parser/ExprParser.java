@@ -174,7 +174,7 @@ public class ExprParser extends CommonParser {
 			return new StringExpr(parseLocation(expr), expr.getText());
 		case RVCCalLexer.EXPR_VAR:
 			expr = expr.getChild(0);
-			LocalUse localUse = new LocalUse(null, null);
+			LocalUse localUse = null;
 			return new VarExpr(parseLocation(expr), localUse);
 		default:
 			throw new OrccException("not yet implemented");
