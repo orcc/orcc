@@ -49,6 +49,7 @@ import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -231,12 +232,12 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	public void visit(GetElementPtrNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("getElementPtrNode");
 
-		LocalVariable varDef = node.getVarDef();
-		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef,
+		LocalVariable local = node.getTarget();
+		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(local,
 				false));
 
-		varDef = node.getSource().getLocalVariable();
-		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef,
+		Variable variable = node.getSource().getVariable();
+		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(variable,
 				true));
 
 		for (IExpr index : node.getIndexes()) {
@@ -245,7 +246,6 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		}
 
 		template.setAttribute(attrName, nodeTmpl);
-
 	}
 
 	@Override
@@ -309,12 +309,12 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	public void visit(LoadNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("loadNode");
 
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef,
+		LocalVariable target = node.getTarget();
+		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(target,
 				false));
 
-		varDef = node.getSource().getLocalVariable();
-		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef,
+		Variable source = node.getSource().getVariable();
+		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(source,
 				true));
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -442,10 +442,11 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	public void visit(StoreNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("storeNode");
 
-		LocalVariable varDef = node.getTarget().getLocalVariable();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, true));
+		Variable variable = node.getTarget().getVariable();
+		nodeTmpl.setAttribute("var", varDefPrinter
+				.getVarDefName(variable, true));
 
-		IType type = varDef.getType();
+		IType type = variable.getType();
 		if (type.getType() == LLVMAbstractType.POINT) {
 			type = ((PointType) type).getElementType();
 		}

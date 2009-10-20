@@ -38,6 +38,8 @@ import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -61,8 +63,8 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 	int indexName;
 
 	@SuppressWarnings("unchecked")
-	public LocalUse getElementPtrNodeCreate(LocalUse varList,
-			List<IExpr> indexes, Object... args) {
+	public LocalUse getElementPtrNodeCreate(Use varList, List<IExpr> indexes,
+			Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 
 		it.previous();
@@ -70,13 +72,15 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 		IType listType;
 
 		// Adding the getElementPtrNode
-		LocalVariable varDefList = varList.getLocalVariable();
+		Variable varDefList = varList.getVariable();
 		listType = varDefList.getType();
 		while (listType.getType() == IType.LIST) {
 			listType = ((ListType) listType).getElementType();
 		}
 
-		LocalVariable varDef = varDefCreate(varDefList, listType);
+		String name = varDefList.getName();
+		LocalVariable varDef = new LocalVariable(false, false, indexName++,
+				new Location(), name, null, null, null, new PointType(listType));
 		LocalUse localUse = new LocalUse(varDef, null);
 
 		// Create and insert the new node
@@ -106,20 +110,6 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 		}
 	}
 
-	private LocalVariable varDefCreate(LocalVariable varDef, IType type) {
-		int index = varDef.getIndex();
-		String name = varDef.getName() + Integer.toString(indexName++);
-		int suffix;
-		if (varDef.hasSuffix()) {
-			suffix = varDef.getSuffix();
-		} else {
-			suffix = 0;
-		}
-
-		return new LocalVariable(false, false, index, new Location(), name,
-				null, null, suffix, new PointType(type));
-	}
-
 	@Override
 	public void visit(BrNode node, Object... args) {
 		visitNodes(node.getThenNodes());
@@ -127,7 +117,6 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 	}
 
 	public void visit(LoadNode node, Object... args) {
-
 		List<IExpr> indexes = node.getIndexes();
 
 		if (indexes.size() > 0) {
@@ -162,11 +151,9 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 			} catch (NumberFormatException e) {
 			}
 
-			LocalUse targetVar = node.getTarget();
-
 			// Insert the new VarDef in the store node
-			node.setTarget(getElementPtrNodeCreate(targetVar,
-					node.getIndexes(), args));
+			node.setTarget(getElementPtrNodeCreate(node.getTarget(), node
+					.getIndexes(), args));
 		}
 	}
 

@@ -30,12 +30,15 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
+ * This class defines a node that Loads data from memory to a local variable.
+ * The source can be a global (scalar or array), or a local array.
+ * 
  * @author Matthieu Wipliez
  * 
  */
@@ -43,12 +46,12 @@ public class LoadNode extends AbstractNode {
 
 	private List<IExpr> indexes;
 
-	private LocalUse source;
+	private Use source;
 
 	private LocalVariable target;
 
 	public LoadNode(int id, Location location, LocalVariable target,
-			LocalUse source, List<IExpr> indexes) {
+			Use source, List<IExpr> indexes) {
 		super(id, location);
 		this.indexes = indexes;
 		this.source = source;
@@ -64,10 +67,21 @@ public class LoadNode extends AbstractNode {
 		return indexes;
 	}
 
-	public LocalUse getSource() {
+	/**
+	 * Returns the source of this Load. The source is a Use because it may be a
+	 * local.
+	 * 
+	 * @return the source of this Load
+	 */
+	public Use getSource() {
 		return source;
 	}
 
+	/**
+	 * Returns the target of this Load. The target is a {@link LocalVariable}.
+	 * 
+	 * @return the target of this Load
+	 */
 	public LocalVariable getTarget() {
 		return target;
 	}
@@ -76,7 +90,7 @@ public class LoadNode extends AbstractNode {
 		this.indexes = indexes;
 	}
 
-	public void setSource(LocalUse source) {
+	public void setSource(Use source) {
 		this.source = source;
 	}
 

@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
@@ -41,18 +42,18 @@ import net.sf.orcc.ir.expr.IExpr;
  */
 public class GetElementPtrNode extends AbstractLLVMNode {
 
-	List<IExpr> indexs;
+	private List<IExpr> indexes;
 
-	private LocalUse source;
+	private Use source;
 
-	private LocalVariable varDef;
+	private LocalVariable target;
 
-	public GetElementPtrNode(int id, Location location, LocalVariable varDef,
-			LocalUse source, List<IExpr> indexs) {
+	public GetElementPtrNode(int id, Location location, LocalVariable target,
+			Use source, List<IExpr> indexs) {
 		super(id, location);
-		this.varDef = varDef;
+		this.target = target;
 		this.source = source;
-		this.indexs = indexs;
+		this.indexes = indexs;
 	}
 
 	@Override
@@ -61,19 +62,19 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 	}
 
 	public List<IExpr> getIndexes() {
-		return indexs;
+		return indexes;
 	}
 
-	public LocalUse getSource() {
+	public Use getSource() {
 		return source;
 	}
 
-	public LocalVariable getVarDef() {
-		return varDef;
+	public LocalVariable getTarget() {
+		return target;
 	}
 
 	public void setIndexs(List<IExpr> indexs) {
-		this.indexs = indexs;
+		this.indexes = indexs;
 	}
 
 	public void setSource(LocalUse source) {
@@ -81,12 +82,12 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 	}
 
 	public void setVar(LocalVariable varDef) {
-		this.varDef = varDef;
+		this.target = varDef;
 	}
 
 	@Override
 	public String toString() {
-		return varDef + " = getelementptr(" + source + ", " + indexs + ")";
+		return target + " = getelementptr(" + source + ", " + indexes + ")";
 	}
 
 }

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.NameTransformer;
 
 /**
@@ -83,16 +84,19 @@ public class VarDefPrinter {
 	 *            the variable definition
 	 * @return a string with its full name
 	 */
-	public String getVarDefName(LocalVariable varDef) {
-		String name = NameTransformer.transform(varDef.getName());
-		if (varDef.hasSuffix()) {
-			name += varDef.getSuffix();
-		}
+	public String getVarDefName(Variable variable) {
+		String name = NameTransformer.transform(variable.getName());
+		if (variable instanceof LocalVariable) {
+			LocalVariable local = (LocalVariable) variable;
+			if (local.hasSuffix()) {
+				name += local.getSuffix();
+			}
 
-		if (!varDef.isGlobal()) {
-			int index = varDef.getIndex();
-			if (index != 0) {
-				name += "_" + varDef.getIndex();
+			if (!local.isGlobal()) {
+				int index = local.getIndex();
+				if (index != 0) {
+					name += "_" + local.getIndex();
+				}
 			}
 		}
 

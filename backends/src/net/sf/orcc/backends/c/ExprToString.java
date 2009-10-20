@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.c;
 
-import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -263,8 +263,8 @@ public class ExprToString implements ExprVisitor {
 
 	@Override
 	public void visit(VarExpr expr, Object... args) {
-		LocalVariable varDef = expr.getVar().getLocalVariable();
-		builder.append(varDefPrinter.getVarDefName(varDef));
+		Variable variable = expr.getVar().getVariable();
+		builder.append(varDefPrinter.getVarDefName(variable));
 	}
 
 }

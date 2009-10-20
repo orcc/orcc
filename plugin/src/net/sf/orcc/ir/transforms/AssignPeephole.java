@@ -66,7 +66,9 @@ public class AssignPeephole extends AbstractActorTransformation {
 			LocalVariable vardef = node.getVar();
 			VarExpr expr = (VarExpr) node.getValue();
 
-			vardef.duplicate(expr.getVar().getLocalVariable());
+			// we can safely cast because in a VarExpr in an actor, only local
+			// variables are used (globals must be load'ed first)
+			vardef.duplicate((LocalVariable) expr.getVar().getVariable());
 			it.remove();
 		}
 	}

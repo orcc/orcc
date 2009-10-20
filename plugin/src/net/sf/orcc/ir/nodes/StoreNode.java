@@ -32,9 +32,13 @@ import java.util.List;
 
 import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
+ * This class defines a node that Stores data to memory from an expression. The
+ * target can be a global (scalar or array), or a local array.
+ * 
  * @author Matthieu Wipliez
  * 
  */
@@ -42,11 +46,11 @@ public class StoreNode extends AbstractNode {
 
 	private List<IExpr> indexes;
 
-	private LocalUse target;
+	private Use target;
 
 	private IExpr value;
 
-	public StoreNode(int id, Location location, LocalUse target,
+	public StoreNode(int id, Location location, Use target,
 			List<IExpr> indexes, IExpr value) {
 		super(id, location);
 		this.indexes = indexes;
@@ -63,7 +67,12 @@ public class StoreNode extends AbstractNode {
 		return indexes;
 	}
 
-	public LocalUse getTarget() {
+	/**
+	 * Returns the target of this Store. The target is a {@link Use}.
+	 * 
+	 * @return the target of this Store
+	 */
+	public Use getTarget() {
 		return target;
 	}
 

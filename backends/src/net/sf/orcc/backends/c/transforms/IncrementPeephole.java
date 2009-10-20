@@ -36,6 +36,7 @@ import net.sf.orcc.backends.c.nodes.IncrementNode;
 import net.sf.orcc.backends.c.nodes.SelfAssignment;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IExpr;
@@ -63,9 +64,9 @@ public class IncrementPeephole extends AbstractActorTransformation {
 			if (node1 instanceof LoadNode && node2 instanceof StoreNode) {
 				LoadNode load = (LoadNode) node1;
 				StoreNode store = (StoreNode) node2;
-				LocalVariable varDef = load.getSource().getLocalVariable();
+				Variable varDef = load.getSource().getVariable();
 				LocalVariable varDefTmp = load.getTarget();
-				if (varDef == store.getTarget().getLocalVariable()
+				if (varDef == store.getTarget().getVariable()
 						&& load.getIndexes().isEmpty()) {
 					IExpr expr = store.getValue();
 					if (expr.getType() == IExpr.BINARY) {
@@ -76,7 +77,7 @@ public class IncrementPeephole extends AbstractActorTransformation {
 
 						if (e1.getType() == IExpr.VAR) {
 							VarExpr v1 = (VarExpr) e1;
-							if (v1.getVar().getLocalVariable() == varDefTmp) {
+							if (v1.getVar().getVariable() == varDefTmp) {
 								res = replaceSelfAssignment(procedure
 										.getLocals(), it, varDefTmp, varDef,
 										v1, op, e2);
@@ -96,7 +97,7 @@ public class IncrementPeephole extends AbstractActorTransformation {
 
 	private boolean replaceSelfAssignment(List<LocalVariable> locals,
 			ListIterator<AbstractNode> it, LocalVariable varDefTmp,
-			LocalVariable varDef, VarExpr v1, BinaryOp op, IExpr e2) {
+			Variable varDef, VarExpr v1, BinaryOp op, IExpr e2) {
 		AbstractNode node;
 		if (op == BinaryOp.PLUS && e2.getType() == IExpr.INT
 				&& ((IntExpr) e2).getValue() == 1) {

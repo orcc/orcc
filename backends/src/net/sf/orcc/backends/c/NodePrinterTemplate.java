@@ -35,6 +35,7 @@ import net.sf.orcc.backends.c.nodes.DecrementNode;
 import net.sf.orcc.backends.c.nodes.IncrementNode;
 import net.sf.orcc.backends.c.nodes.SelfAssignment;
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
@@ -123,8 +124,8 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	@Override
 	public void visit(DecrementNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("decrementNode");
-		LocalVariable varDef = node.getVar();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		Variable variable = node.getVar();
+		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(variable));
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -182,8 +183,8 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	@Override
 	public void visit(IncrementNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("incrementNode");
-		LocalVariable varDef = node.getVar();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		Variable variable = node.getVar();
+		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(variable));
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -202,11 +203,11 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	public void visit(LoadNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("loadNode");
 
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef));
+		LocalVariable target = node.getTarget();
+		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(target));
 
-		varDef = node.getSource().getLocalVariable();
-		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(varDef));
+		Variable source = node.getSource().getVariable();
+		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(source));
 
 		List<IExpr> indexes = node.getIndexes();
 		for (IExpr index : indexes) {
@@ -255,7 +256,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	public void visit(SelfAssignment node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("selfAssignmentNode");
 
-		LocalVariable varDef = node.getVar();
+		Variable varDef = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("op", ExprToString.toString(node.getOp()));
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue()));
@@ -267,8 +268,8 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	public void visit(StoreNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("storeNode");
 
-		LocalVariable varDef = node.getTarget().getLocalVariable();
-		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(varDef));
+		Variable variable = node.getTarget().getVariable();
+		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(variable));
 
 		List<IExpr> indexes = node.getIndexes();
 		for (IExpr index : indexes) {

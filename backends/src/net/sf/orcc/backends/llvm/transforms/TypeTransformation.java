@@ -53,6 +53,7 @@ import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -280,12 +281,10 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 			if ((expr.getE1().getType() == IExpr.VAR)) {
 				VarExpr e1 = (VarExpr) expr.getE1();
-				expr.getE2().accept(this,
-						e1.getVar().getLocalVariable().getType());
+				expr.getE2().accept(this, e1.getVar().getVariable().getType());
 			} else if (expr.getE2().getType() == IExpr.VAR) {
 				VarExpr e2 = (VarExpr) expr.getE2();
-				expr.getE2().accept(this,
-						e2.getVar().getLocalVariable().getType());
+				expr.getE2().accept(this, e2.getVar().getVariable().getType());
 			}
 			return;
 
@@ -348,7 +347,11 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		for (IExpr index : node.getIndexes()) {
 			if (index.getType() == IExpr.VAR) {
 				VarExpr indExpr = (VarExpr) index;
-				LocalUse indUse = indExpr.getVar();
+
+				// we can safely cast because in a VarExpr in an actor, only local
+				// variables are used (globals must be load'ed first)
+				LocalUse indUse = (LocalUse) indExpr.getVar();
+				
 				LocalVariable indVar = indUse.getLocalVariable();
 				IType indType = indVar.getType();
 
@@ -387,7 +390,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(LoadNode node, Object... args) {
-		LocalVariable sourceVar = node.getSource().getLocalVariable();
+		Variable sourceVar = node.getSource().getVariable();
 		LocalVariable targetVar = node.getTarget();
 
 		IType targetType = targetVar.getType();
@@ -462,8 +465,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(StoreNode node, Object... args) {
-		PointType type = (PointType) node.getTarget().getLocalVariable()
-				.getType();
+		PointType type = (PointType) node.getTarget().getVariable().getType();
 		node.getValue().accept(this, type.getElementType());
 	}
 
@@ -485,7 +487,10 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	public void visit(VarExpr expr, Object... args) {
 		// recover the reference type from the current node
 		IType refType = (IType) args[0];
-		LocalVariable var = expr.getVar().getLocalVariable();
+
+		// we can safely cast because in a VarExpr in an actor, only local
+		// variables are used (globals must be load'ed first)
+		LocalVariable var = (LocalVariable) expr.getVar().getVariable();
 		IType varType = var.getType();
 
 		if (!(refType.equals(varType))) {

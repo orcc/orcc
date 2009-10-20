@@ -28,20 +28,23 @@
  */
 package net.sf.orcc.backends.c.nodes;
 
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Variable;
 
 /**
+ * This class defines an Increment node that increments a Variable, global or
+ * local.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class IncrementNode extends AbstractCNode {
 
-	private LocalVariable var;
+	private Variable variable;
 
-	public IncrementNode(int id, Location location, LocalVariable var) {
+	public IncrementNode(int id, Location location, Variable variable) {
 		super(id, location);
-		this.var = var;
+		this.variable = variable;
 	}
 
 	@Override
@@ -49,12 +52,12 @@ public class IncrementNode extends AbstractCNode {
 		visitor.visit(this, args);
 	}
 
-	public LocalVariable getVar() {
-		return var;
+	public Variable getVar() {
+		return variable;
 	}
 
-	public void setVar(LocalVariable var) {
-		this.var = var;
+	public void setVar(Variable variable) {
+		this.variable = variable;
 	}
 
 }

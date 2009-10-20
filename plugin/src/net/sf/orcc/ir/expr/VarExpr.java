@@ -31,18 +31,23 @@ package net.sf.orcc.ir.expr;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 
 /**
+ * This class defines an expression that references a variable. The variable is
+ * referenced by an instance of the {@link Use} class. When the reference is
+ * local, it is expected the reference uses the {@link LocalUse} class.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class VarExpr extends AbstractExpr {
 
-	private LocalUse localUse;
+	private Use use;
 
-	public VarExpr(Location location, LocalUse localUse) {
+	public VarExpr(Location location, Use use) {
 		super(location);
-		this.localUse = localUse;
+		this.use = use;
 	}
 
 	@Override
@@ -60,17 +65,17 @@ public class VarExpr extends AbstractExpr {
 		return VAR;
 	}
 
-	public LocalUse getVar() {
-		return localUse;
+	public Use getVar() {
+		return use;
 	}
 
-	public void setVar(LocalUse localUse) {
-		this.localUse = localUse;
+	public void setVar(Use use) {
+		this.use = use;
 	}
 
 	@Override
 	public String toString() {
-		return localUse.toString();
+		return use.toString();
 	}
 
 }
