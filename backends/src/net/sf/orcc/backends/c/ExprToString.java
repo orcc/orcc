@@ -119,67 +119,6 @@ public class ExprToString implements ExprVisitor {
 		this.varDefPrinter = varDefPrinter;
 	}
 
-	protected int getPriority(BinaryOp op) {
-		switch (op) {
-		case LOR:
-			return 1;
-		case LAND:
-			return 2;
-		case BOR:
-			return 3;
-		case BXOR:
-			return 4;
-		case BAND:
-			return 5;
-
-		case EQ:
-		case NE:
-			return 6;
-
-		case GE:
-		case GT:
-		case LE:
-		case LT:
-			return 7;
-
-		case SHIFT_LEFT:
-		case SHIFT_RIGHT:
-			return 8;
-
-		case MINUS:
-		case PLUS:
-			return 9;
-
-		case DIV:
-		case DIV_INT:
-		case MOD:
-		case TIMES:
-			return 10;
-
-		case EXP:
-			return 11;
-
-		default:
-			throw new NullPointerException();
-		}
-	}
-
-	protected int getPriority(UnaryOp op) {
-		switch (op) {
-		case NUM_ELTS:
-			return 12;
-
-		case BNOT:
-		case LNOT:
-			return 13;
-
-		case MINUS:
-			return 14;
-		default:
-			throw new NullPointerException();
-		}
-	}
-
 	public String toString(IExpr expr) {
 		builder = new StringBuilder();
 		expr.accept(this, 0);
@@ -189,7 +128,7 @@ public class ExprToString implements ExprVisitor {
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
 		int oldPrec = (Integer) args[0];
-		int currentPrec = getPriority(expr.getOp());
+		int currentPrec = expr.getOp().getPriority();
 
 		if (currentPrec < oldPrec) {
 			builder.append("(");
@@ -247,7 +186,7 @@ public class ExprToString implements ExprVisitor {
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
 		int oldPrec = (Integer) args[0];
-		int currentPrec = getPriority(expr.getOp());
+		int currentPrec = expr.getOp().getPriority();
 
 		if (oldPrec > currentPrec) {
 			builder.append("(");

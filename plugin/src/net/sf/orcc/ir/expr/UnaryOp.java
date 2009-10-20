@@ -29,7 +29,7 @@
 package net.sf.orcc.ir.expr;
 
 /**
- * This class defines a unary operator.
+ * This class defines the unary operators of the IR.
  * 
  * @author Matthieu Wipliez
  * 
@@ -55,5 +55,14 @@ public enum UnaryOp {
 	 * number of elements (# in CAL)
 	 */
 	NUM_ELTS;
+
+	/**
+	 * Returns this operator's priority.
+	 * 
+	 * @return this operator's priority
+	 */
+	public int getPriority() {
+		return 12;
+	}
 
 }

@@ -29,6 +29,8 @@
 package net.sf.orcc.ir.expr;
 
 /**
+ * This class defines the binary operators of the IR.
+ * 
  * @author Matthieu Wipliez
  * 
  */
@@ -37,101 +39,125 @@ public enum BinaryOp {
 	/**
 	 * binary and.
 	 */
-	BAND,
+	BAND(5),
 
 	/**
 	 * binary inclusive or.
 	 */
-	BOR,
+	BOR(3),
 
 	/**
 	 * binary exclusive or.
 	 */
-	BXOR,
+	BXOR(4),
 
 	/**
 	 * division.
 	 */
-	DIV,
+	DIV(10),
 
 	/**
 	 * integer division.
 	 */
-	DIV_INT,
+	DIV_INT(10),
 
 	/**
 	 * equal.
 	 */
-	EQ,
+	EQ(6),
 
 	/**
 	 * exponentiation.
 	 */
-	EXP,
+	EXP(11),
 
 	/**
 	 * greater than or equal.
 	 */
-	GE,
+	GE(7),
 
 	/**
 	 * greater than.
 	 */
-	GT,
+	GT(7),
 
 	/**
 	 * logical and.
 	 */
-	LAND,
+	LAND(2),
 
 	/**
 	 * less than or equal.
 	 */
-	LE,
+	LE(7),
 
 	/**
 	 * logical or.
 	 */
-	LOR,
+	LOR(1),
 
 	/**
 	 * less than.
 	 */
-	LT,
+	LT(7),
 
 	/**
 	 * minus.
 	 */
-	MINUS,
+	MINUS(9),
 
 	/**
 	 * modulo.
 	 */
-	MOD,
+	MOD(10),
 
 	/**
 	 * not equal.
 	 */
-	NE,
+	NE(6),
 
 	/**
 	 * plus.
 	 */
-	PLUS,
+	PLUS(9),
 
 	/**
 	 * shift left.
 	 */
-	SHIFT_LEFT,
+	SHIFT_LEFT(8),
 
 	/**
 	 * shift right.
 	 */
-	SHIFT_RIGHT,
+	SHIFT_RIGHT(8),
 
 	/**
 	 * times.
 	 */
-	TIMES;
+	TIMES(10);
+
+	/**
+	 * priority of this operator
+	 */
+	private int priority;
+
+	/**
+	 * Creates a new binary operator with the given priority.
+	 * 
+	 * @param priority
+	 *            the operator's priority
+	 */
+	private BinaryOp(int priority) {
+		this.priority = priority;
+	}
+
+	/**
+	 * Returns this operator's priority.
+	 * 
+	 * @return this operator's priority
+	 */
+	public int getPriority() {
+		return priority;
+	}
 
 }

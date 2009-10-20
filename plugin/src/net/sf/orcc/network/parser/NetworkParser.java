@@ -103,6 +103,11 @@ public class NetworkParser {
 	 */
 	private class ExprParser {
 
+		private IExpr getExprOfBinOpSeq(List<Object> seq) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 		/**
 		 * Parses the given node as an expression and returns the matching IExpr
 		 * expression.
@@ -212,17 +217,17 @@ public class NetworkParser {
 		 */
 		private ParseContinuation<IExpr> parseExprBinOpSeq(Node node)
 				throws OrccException {
-			List<Object> args = new ArrayList<Object>();
+			List<Object> seq = new ArrayList<Object>();
 
 			ParseContinuation<? extends Object> cont = parseExprCont(node);
-			args.add(cont.getResult());
+			seq.add(cont.getResult());
 			node = cont.getNode();
 			while (node != null) {
 				cont = parseExprBinaryOp(node);
 				BinaryOp op = (BinaryOp) cont.getResult();
 				node = cont.getNode();
 				if (op != null) {
-					args.add(op);
+					seq.add(op);
 
 					cont = parseExprCont(node);
 					IExpr expr = (IExpr) cont.getResult();
@@ -230,14 +235,13 @@ public class NetworkParser {
 						throw new OrccException("Expected an Expr element");
 					}
 
-					args.add(expr);
+					seq.add(expr);
 					node = cont.getNode();
 				}
 			}
 
-			// TODO one more time, apply operator priority to stupid binary
-			// operation sequence...
-			return new ParseContinuation<IExpr>(node, new IntExpr(42));
+			IExpr expr = getExprOfBinOpSeq(seq);
+			return new ParseContinuation<IExpr>(node, expr);
 		}
 
 		/**
