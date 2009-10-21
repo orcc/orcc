@@ -1,0 +1,134 @@
+/*
+ * Copyright (c) 2009, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+package net.sf.orcc.util;
+
+import java.util.List;
+
+import net.sf.orcc.OrccException;
+import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.IExpr;
+
+/**
+ * This class defines a parser of binary operation sequences. This parser
+ * translates expressions such as "e(1) op(1) e(2) ... op(n-1) e(n)" to a binary
+ * expression tree with respect to operator precedence.
+ * 
+ * <p>
+ * This code is modified from code written by Sam Harwell.
+ * </p>
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
+public class BinOpSeqParser {
+
+	/**
+	 * Creates the precedence tree from the given list of expressions,
+	 * operators, and the start and stop indexes.
+	 * 
+	 * @param expressions
+	 *            a list of expressions
+	 * @param operators
+	 *            a list of binary operators
+	 * @param startIndex
+	 *            start index
+	 * @param stopIndex
+	 *            stop index
+	 * @return an expression
+	 * @throws OrccException
+	 */
+	private static IExpr createPrecedenceTree(List<IExpr> expressions,
+			List<BinaryOp> operators, int startIndex, int stopIndex)
+			throws OrccException {
+		if (stopIndex == startIndex) {
+			return expressions.get(startIndex);
+		}
+
+		int pivot = findPivot(operators, startIndex, stopIndex - 1);
+		BinaryOp op = operators.get(pivot);
+		IExpr e1 = createPrecedenceTree(expressions, operators, startIndex,
+				pivot);
+		IExpr e2 = createPrecedenceTree(expressions, operators, pivot + 1,
+				stopIndex);
+		Location location = new Location(e1.getLocation(), e2.getLocation());
+
+		return new BinaryExpr(location, e1, op, e2, null);
+	}
+
+	/**
+	 * Returns the index of the pivot, which is the operator that has the lowest
+	 * priority between start index and stop index.
+	 * 
+	 * @param operators
+	 *            a list of operators
+	 * @param startIndex
+	 *            start index
+	 * @param stopIndex
+	 *            stop index
+	 * @return the index of the pivot operator
+	 * @throws OrccException
+	 */
+	private static int findPivot(List<BinaryOp> operators, int startIndex,
+			int stopIndex) throws OrccException {
+		int pivot = startIndex;
+		BinaryOp bop = operators.get(pivot);
+		int pivotRank = bop.getPriority();
+		for (int i = startIndex + 1; i <= stopIndex; i++) {
+			bop = operators.get(i);
+			int current = bop.getPriority();
+			boolean rtl = bop.isRightAssociative();
+			if (current < pivotRank || (current == pivotRank && rtl)) {
+				pivot = i;
+				pivotRank = current;
+			}
+		}
+
+		return pivot;
+	}
+
+	/**
+	 * Parses a sequence of expressions and binary operators to a binary
+	 * expression tree.
+	 * 
+	 * @param expressions
+	 *            a list of expressions
+	 * @param operators
+	 *            a list of binary operators
+	 * @return a binary expression tree
+	 * @throws OrccException
+	 */
+	public static IExpr parse(List<IExpr> expressions, List<BinaryOp> operators)
+			throws OrccException {
+		return createPrecedenceTree(expressions, operators, 0, expressions
+				.size() - 1);
+	}
+
+}

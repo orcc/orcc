@@ -28,18 +28,20 @@
  */
 package net.sf.orcc.frontend.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.common.LocalUse;
-import net.sf.orcc.common.Location;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
-import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.util.BinOpSeqParser;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
@@ -112,6 +114,34 @@ public class ExprParser extends CommonParser {
 	}
 
 	/**
+	 * Parses a sequence of binary operations represented by an ANTLR tree, and
+	 * transforms it to a binary expression tree using the operators'
+	 * precedences.
+	 * 
+	 * @param expr
+	 *            a tree that contains a binary operation sequence
+	 * @return an expression
+	 * @throws OrccException
+	 */
+	private IExpr parseBinOpSeq(Tree expr) throws OrccException {
+		Tree treeExprs = expr.getChild(0);
+		int numExprs = treeExprs.getChildCount();
+		List<IExpr> expressions = new ArrayList<IExpr>(numExprs);
+		for (int i = 0; i < numExprs; i++) {
+			expressions.add(parseExpression(treeExprs.getChild(i)));
+		}
+
+		Tree treeOps = expr.getChild(1);
+		int numOps = treeOps.getChildCount();
+		List<BinaryOp> operators = new ArrayList<BinaryOp>(numOps);
+		for (int i = 0; i < numOps; i++) {
+			operators.add(parseBinaryOp(treeOps.getChild(i)));
+		}
+
+		return BinOpSeqParser.parse(expressions, operators);
+	}
+
+	/**
 	 * Parses the given input as an expression.
 	 * 
 	 * @param input
@@ -144,20 +174,8 @@ public class ExprParser extends CommonParser {
 	 */
 	IExpr parseExpression(Tree expr) throws OrccException {
 		switch (expr.getType()) {
-		case RVCCalLexer.EXPR_BINARY: {
-			IExpr e1 = parseExpression(expr.getChild(0));
-			int n = expr.getChildCount();
-			int i = 1;
-			while (i < n) {
-				BinaryOp op = parseBinaryOp(expr.getChild(i++));
-				IExpr e2 = parseExpression(expr.getChild(i++));
-				Location location = new Location(e1.getLocation(), e2
-						.getLocation());
-				e1 = new BinaryExpr(location, e1, op, e2, null);
-			}
-
-			return e1;
-		}
+		case RVCCalLexer.EXPR_BINARY:
+			return parseBinOpSeq(expr);
 		case RVCCalLexer.EXPR_BOOL: {
 			expr = expr.getChild(0);
 			boolean value = Boolean.parseBoolean(expr.getText());

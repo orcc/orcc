@@ -67,6 +67,7 @@ tokens {
   EXPR;
   EXPR_BINARY;
   EXPR_UNARY;
+  OP;
   
   EXPR_LIST;
   EXPR_IF;
@@ -208,29 +209,20 @@ actorPortDecls: varDeclNoExpr (',' varDeclNoExpr)* -> varDeclNoExpr+;
 /*****************************************************************************/
 /* expressions */
 
-// what we want here is to avoid useless derivations in the AST
-// that's why rules have the form X: y1=Y ((op y2=Y)+ -> EXPR_X (y1 y2+) | -> y1)
-// this way if X is really only Y, then we just return the tree from Y.
+// we use an operator precedence parser in the Java code to correctly apply precedence
 
-expression: e1=and_expr ((OR e2=and_expr)+ -> ^(EXPR_BINARY $e1 (OR $e2)+) | -> $e1 );
+expression: un_expr ((bop un_expr)+ -> ^(EXPR_BINARY ^(EXPR un_expr+) ^(OP bop+)) | -> un_expr );
 
-and_expr: e1=bitor_expr ((AND e2=bitor_expr)+ -> ^(EXPR_BINARY $e1 (AND $e2)+) | -> $e1 );
-
-bitor_expr: e1=bitand_expr ((BITOR e2=bitand_expr)+ -> ^(EXPR_BINARY $e1 (BITOR $e2)+) | -> $e1 );
-
-bitand_expr: e1=eq_expr ((BITAND e2=eq_expr)+ -> ^(EXPR_BINARY $e1 (BITAND $e2)+) | -> $e1 );
-
-eq_expr: e1=rel_expr (((op=EQ | op=NE) e2=rel_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
-
-rel_expr: e1=shift_expr (((op=LT | op=GT | op=LE | op=GE) e2=shift_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1);
-
-shift_expr: e1=add_expr (((op=SHIFT_LEFT | op=SHIFT_RIGHT) e2=add_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
-
-add_expr: e1=mul_expr (((op=PLUS | op=MINUS) e2=mul_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
-
-mul_expr: e1=exp_expr (((op=DIV | op=DIV_INT | op=MOD | op=TIMES) e2=exp_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
-
-exp_expr: e1=un_expr ((EXP e2=un_expr)+ -> ^(EXPR_BINARY $e1 (EXP $e2)+) | -> $e1 );
+bop: OR
+| AND
+| BITOR
+| BITAND
+| EQ | NE
+| LT | GT | LE | GE
+| SHIFT_LEFT | SHIFT_RIGHT
+| PLUS | MINUS
+| DIV | DIV_INT | MOD | TIMES
+| EXP;
 
 un_expr: postfix_expression -> postfix_expression
 	| (op=MINUS | op=NOT | op=NUM_ELTS) un_expr -> ^(EXPR_UNARY $op un_expr);

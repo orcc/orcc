@@ -39,102 +39,102 @@ public enum BinaryOp {
 	/**
 	 * binary and.
 	 */
-	BAND(5),
+	BAND(5, false),
 
 	/**
 	 * binary inclusive or.
 	 */
-	BOR(3),
+	BOR(3, false),
 
 	/**
 	 * binary exclusive or.
 	 */
-	BXOR(4),
+	BXOR(4, false),
 
 	/**
 	 * division.
 	 */
-	DIV(10),
+	DIV(10, false),
 
 	/**
 	 * integer division.
 	 */
-	DIV_INT(10),
+	DIV_INT(10, false),
 
 	/**
 	 * equal.
 	 */
-	EQ(6),
+	EQ(6, false),
 
 	/**
 	 * exponentiation.
 	 */
-	EXP(11),
+	EXP(11, true),
 
 	/**
 	 * greater than or equal.
 	 */
-	GE(7),
+	GE(7, false),
 
 	/**
 	 * greater than.
 	 */
-	GT(7),
+	GT(7, false),
 
 	/**
 	 * logical and.
 	 */
-	LAND(2),
+	LAND(2, false),
 
 	/**
 	 * less than or equal.
 	 */
-	LE(7),
+	LE(7, false),
 
 	/**
 	 * logical or.
 	 */
-	LOR(1),
+	LOR(1, false),
 
 	/**
 	 * less than.
 	 */
-	LT(7),
+	LT(7, false),
 
 	/**
 	 * minus.
 	 */
-	MINUS(9),
+	MINUS(9, false),
 
 	/**
 	 * modulo.
 	 */
-	MOD(10),
+	MOD(10, false),
 
 	/**
 	 * not equal.
 	 */
-	NE(6),
+	NE(6, false),
 
 	/**
 	 * plus.
 	 */
-	PLUS(9),
+	PLUS(9, false),
 
 	/**
 	 * shift left.
 	 */
-	SHIFT_LEFT(8),
+	SHIFT_LEFT(8, false),
 
 	/**
 	 * shift right.
 	 */
-	SHIFT_RIGHT(8),
+	SHIFT_RIGHT(8, false),
 
 	/**
 	 * times.
 	 */
-	TIMES(10);
+	TIMES(10, false);
 
 	/**
 	 * priority of this operator
@@ -142,13 +142,19 @@ public enum BinaryOp {
 	private int priority;
 
 	/**
+	 * true if this operator is right-to-left associative.
+	 */
+	private boolean rightAssociative;
+
+	/**
 	 * Creates a new binary operator with the given priority.
 	 * 
 	 * @param priority
 	 *            the operator's priority
 	 */
-	private BinaryOp(int priority) {
+	private BinaryOp(int priority, boolean rightAssociative) {
 		this.priority = priority;
+		this.rightAssociative = rightAssociative;
 	}
 
 	/**
@@ -158,6 +164,15 @@ public enum BinaryOp {
 	 */
 	public int getPriority() {
 		return priority;
+	}
+
+	/**
+	 * Returns true if this operator is right-to-left associative.
+	 * 
+	 * @return true if this operator is right-to-left associative
+	 */
+	public boolean isRightAssociative() {
+		return rightAssociative;
 	}
 
 }

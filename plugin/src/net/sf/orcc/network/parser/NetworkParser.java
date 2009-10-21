@@ -73,6 +73,7 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.attributes.TypeAttribute;
 import net.sf.orcc.network.attributes.ValueAttribute;
+import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
@@ -102,10 +103,6 @@ public class NetworkParser {
 	 * 
 	 */
 	private class ExprParser {
-
-		private IExpr getExprOfBinOpSeq(List<Object> seq) {
-			return new IntExpr(42);
-		}
 
 		/**
 		 * Parses the given node as an expression and returns the matching IExpr
@@ -216,30 +213,31 @@ public class NetworkParser {
 		 */
 		private ParseContinuation<IExpr> parseExprBinOpSeq(Node node)
 				throws OrccException {
-			List<Object> seq = new ArrayList<Object>();
+			List<IExpr> expressions = new ArrayList<IExpr>();
+			List<BinaryOp> operators = new ArrayList<BinaryOp>();
 
-			ParseContinuation<? extends Object> cont = parseExprCont(node);
-			seq.add(cont.getResult());
-			node = cont.getNode();
+			ParseContinuation<IExpr> contE = parseExprCont(node);
+			expressions.add(contE.getResult());
+			node = contE.getNode();
 			while (node != null) {
-				cont = parseExprBinaryOp(node);
-				BinaryOp op = (BinaryOp) cont.getResult();
-				node = cont.getNode();
+				ParseContinuation<BinaryOp> contO = parseExprBinaryOp(node);
+				BinaryOp op = contO.getResult();
+				node = contO.getNode();
 				if (op != null) {
-					seq.add(op);
+					operators.add(op);
 
-					cont = parseExprCont(node);
-					IExpr expr = (IExpr) cont.getResult();
+					contE = parseExprCont(node);
+					IExpr expr = contE.getResult();
 					if (expr == null) {
 						throw new OrccException("Expected an Expr element");
 					}
 
-					seq.add(expr);
-					node = cont.getNode();
+					expressions.add(expr);
+					node = contE.getNode();
 				}
 			}
 
-			IExpr expr = getExprOfBinOpSeq(seq);
+			IExpr expr = BinOpSeqParser.parse(expressions, operators);
 			return new ParseContinuation<IExpr>(node, expr);
 		}
 
