@@ -20,7 +20,7 @@ gorinje@gmail.com
 *****************************************************************************/
 
 actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
-uint (size=8) Mb_Type, 		 uint(size=1) FirstMbInSlice, 	uint(size=7) PicWidthInMb, 		uint(size=13) CurrMbAddr, 
+uint (size=8) Mb_Type, 		 uint(size=13) FirstMbInSlice, 	uint(size=7) PicWidthInMb, 		uint(size=13) CurrMbAddr, 
 uint(size=4) PredMode,		 uint(size=SAMPLE_SZ) EDGE, 	int(size=9) MB_4X4, 	int(size=SAMPLE_SZ) Coef_ACR 
 ==> 
 uint(size=1) Avail, 		 uint(size=4) PredMode4x4,		int(size=SAMPLE_SZ) Coef_ACR_4X4,
@@ -99,7 +99,7 @@ int(size=SAMPLE_SZ) Y_Left4, int(size=SAMPLE_SZ) Y_Up4,		int(size=SAMPLE_SZ) Y_U
 	picwidth := c;
 	
     //Store the position of the First Macroblock in the current slice
-    if b = 1 then 
+    if b = d then 
     	first_mb_addr := d;
     end  
   	
@@ -115,10 +115,10 @@ int(size=SAMPLE_SZ) Y_Left4, int(size=SAMPLE_SZ) Y_Up4,		int(size=SAMPLE_SZ) Y_U
   	 Neighbourg_readFlag := 1;
   	 
   	 //Set 16x16 the available edge
-  	 left_16x16_avail := if (mbcurr = first_mb_addr) or ((mbcurr mod picwidth) = 0) then 0 else 1 end;
-	 top_16x16_avail := if (mbcurr - first_mb_addr < picwidth) then 0 else 1 end;
-	 topRight_16x16_avail := if (mbcurr - first_mb_addr < picwidth - 1)or (((mbcurr+1) mod picwidth) = 0) then 0 else 1 end;
-	 topLeft_16x16_avail := if (left_16x16_avail = 1) and (top_16x16_avail=1) then 1 else 0 end;
+  	 left_16x16_avail := if (mbcurr = first_mb_in_slice) or ((mbcurr mod picwidth) = 0) then 0 else 1 end;
+	 top_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth) then 0 else 1 end;
+	 topRight_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth - 1)or (((mbcurr+1) mod picwidth) = 0) then 0 else 1 end;
+	 topLeft_16x16_avail :=  if (mbcurr - first_mb_in_slice < picwidth +1) then 0 else 1 end;
 	 
 	 
 	 //Set available edge for each 4x4 mb

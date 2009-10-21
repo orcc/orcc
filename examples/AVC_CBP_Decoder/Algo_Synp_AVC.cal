@@ -72,7 +72,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			uint(size=13) CurrMbAddr, 
 			uint(size=7) PicWidthInMb, 
 			uint(size=13) PicSizeInMb, 
-			uint(size=1) FirstMbInSlice, 
+			uint(size=13) FirstMbInSlice, 
 			uint POC, 
 			uint(size=Idx_SZ) MbPartIdx, 
 			uint(size=Idx_SZ) RefIdx, 
@@ -548,7 +548,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard 
 		not done_reading_bits()
 	do
-		read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b then 1 else 0 end );
+		read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b = 1 then 1 else 0 end );
 		bits_to_read_count := bits_to_read_count - 1;
 		bit_count := bit_count + 1;
 	end
@@ -558,7 +558,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		NewVLD,
 		First_part
 	do
-		if b then
+		if b = 1 then
 			First_part := false;
 			CodeLen := VLD_Counter;
 			if CodeLen = 0 then NewVLD := false; end
@@ -574,7 +574,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		not First_part
 	do
 		VLD_Counter := VLD_Counter - 1;
-		Codeword := bitor( lshift( Codeword, 1), if b then 1 else 0 end);
+		Codeword := bitor( lshift( Codeword, 1), if b = 1 then 1 else 0 end);
 		bit_count := bit_count + 1;
 		if   VLD_Counter = 0 then NewVLD := false; end
 	end  
@@ -600,7 +600,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	NewCoeff
 	do
 		VLD_Counter := VLD_Counter + 1;
-		Codeword := bitor( lshift( Codeword, 1), if b then 1 else 0 end);
+		Codeword := bitor( lshift( Codeword, 1), if b = 1 then 1 else 0 end);
 		if CAVLC_type =0 then // coeff_token
 			foreach int i in Integers(0,61) do
 				if nc >=0 and nc < 2 then
@@ -2129,7 +2129,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			CurrMbAddr:[mb_addr],
 			PicWidthInMb:[PicWidthInMbs],
 			PicSizeInMb:[PicSizeInMbs],
-			FirstMbInSlice:[if mb_addr = first_mb_in_slice - 1 then 1 else 0 end],
+			FirstMbInSlice:[first_mb_in_slice],
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
 			LFDisable:[disable_deblocking_filter_idc],
@@ -2241,7 +2241,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			CurrMbAddr:[mb_addr],
 			PicWidthInMb:[PicWidthInMbs],
 			PicSizeInMb:[PicSizeInMbs],
-			FirstMbInSlice:[if mb_addr = first_mb_in_slice - 1 then 1 else 0 end],
+			FirstMbInSlice:[first_mb_in_slice],
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
 			LFDisable:[disable_deblocking_filter_idc],
@@ -2262,7 +2262,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	SliceD_moredata_1: action ==>
 	guard moreDataFlag = 1
-	do
 	end
 
 	SliceD_moredata_0: action ==>

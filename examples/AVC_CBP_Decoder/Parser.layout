@@ -45,7 +45,7 @@
       <vertex id="MB_intra_flag" x="765" y="1936"/>
       <vertex id="byte2bit" x="318" y="1739"/>
       <vertex id="Algo_NALU" x="160" y="1796"/>
-      <vertex id="Algo_Synp_AVC" x="438" y="1562"/>
+      <vertex id="Algo_Synp_AVC" x="430" y="1569"/>
       <vertex id="Algo_BlockExpand_AVC" x="686" y="1574"/>
       <vertex id="Algo_BlockSplit_AVC" x="911" y="1547"/>
       <vertex id="Algo_IntraPred_Split" x="686" y="2465"/>

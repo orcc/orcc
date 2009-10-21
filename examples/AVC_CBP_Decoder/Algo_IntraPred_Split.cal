@@ -52,54 +52,75 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
-  uint(size=1) MbIntraFlag, uint(size=4) IntraPredMode, 
-  uint(size=13) CurrMbAddr, uint(size=7) PicWidthInMb
+  uint(size=1) MbIntraFlag, 
+  uint(size=4) IntraPredMode, 
+  uint(size=13) CurrMbAddr,
+  uint(size=7) PicWidthInMb,
+  uint(size=13) FirstMBInSlice
     ==>
-      int(size=PREDTYPE_SIZE) Intra_DC_flag, uint(size=4)PredMode,
-      uint (size=8) Mb_Type, uint (size=8) Mb_TypeC : 
+      int(size=PREDTYPE_SIZE) Intra_DC_flag,
+      uint(size=4)PredMode,
+      uint (size=8) Mb_Type,
+      uint (size=8) Mb_TypeC
+      : 
  
-//FIXME! number of MB per line of picture
-int PICWIDTH=45; //number of MB per lines
-int PICHEIGHT=36; //number of MB per columns
+	//FIXME! number of MB per line of picture
+	int PICWIDTH=45; //number of MB per lines
 
   uint(size=2) intratype := 0; // Intra4x4 1, Intra8x8 2, Intra16x16 3
   uint(size=5) count := 16;
-  uint x:= 0;
-  uint y:= 0;
-  uint picW;
+  uint mb_x:= 0;
+  uint mb_y:= 0;
+  uint pic_w_in_mb;
+  uint(size=13) curr_mb;
+  uint(size=13) first_mb_in_slice;
   
-  List ( type: int(size=5), size= rshift(PICWIDTH*PICHEIGHT*256,4)) intra4x4predmode;
+  List ( type: List (type:int(size=5), size=16), size= PICWIDTH) intra4x4predmode;
   List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
   
   // initialize intra4x4predmode to a huge list of 2's
   initialize ==>
   do
-    intra4x4predmode := [ 2 : for int i in Integers(0, rshift(PICWIDTH*PICHEIGHT*256,4) - 1) ];
-  end
-  
-  function InverseScan4x4(uint(size=4) index, uint stride) --> uint :
-    (InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4)
-  end
-  
-  get_intratype.inter: action CurrMbAddr: [b], PicWidthInMb: [c], MbIntraFlag:[d] ==> Intra_DC_flag:[0], Mb_Type:[2], Mb_TypeC:[2]
-  guard
-    d=0 and count >= 16
-  do
-    picW := c; 
-    if b = 0 then intra4x4predmode := [ 2 : for int i in Integers( 0, rshift(PICWIDTH*PICHEIGHT*256,4) - 1)]; end
-    x := b mod picW;
-    y := b / picW;
+    intra4x4predmode := [[ 2 : for int j in Integers(0,15)]: for int i in Integers( 0, PICWIDTH - 1)];
   end
     
-  get_intratype.intra: action IntraPredMode:[a], CurrMbAddr: [b], PicWidthInMb: [c], MbIntraFlag:[d] ==> Intra_DC_flag:[ if a = 3 then 1 else 0 end ], Mb_Type:[if a = 3 then 1 else 0 end], Mb_TypeC:[1]
+  get_intratype.inter: action 
+  					CurrMbAddr: [t_curr_mb],
+  					PicWidthInMb: [t_pic_w_in_mb],
+  					MbIntraFlag:[t_mb_intra_flag],
+  					FirstMBInSlice:[t_first_mb_in_slice] 
+  						==> 
+  						Intra_DC_flag:[0],
+  						Mb_Type:[2],
+  						Mb_TypeC:[2]
   guard
-    d=1 and count >= 16
+    t_mb_intra_flag=0 and count >= 16
   do
-    intratype := a;
-    picW := c; 
-    if b = 0 then intra4x4predmode := [ 2 : for int i in Integers( 0, rshift(PICWIDTH*PICHEIGHT*256,4) - 1 )]; end
-    x := b mod picW;
-    y := b / picW;
+    pic_w_in_mb := t_pic_w_in_mb; 
+    curr_mb:=t_curr_mb;
+    first_mb_in_slice:=t_first_mb_in_slice;
+    mb_x := curr_mb mod pic_w_in_mb;
+    intra4x4predmode[mb_x] := [ 2 : for int j in Integers(0,15)];
+  end
+    
+  get_intratype.intra: action 
+  					IntraPredMode:[t_mb_type], 
+  					CurrMbAddr: [t_curr_mb],
+  					PicWidthInMb: [t_pic_w_in_mb],
+  					MbIntraFlag:[t_mb_intra_flag],
+  					FirstMBInSlice:[t_first_mb_in_slice] 
+  					==> 
+  						Intra_DC_flag:[ if intratype = 3 then 1 else 0 end ],
+  						Mb_Type:[if intratype = 3 then 1 else 0 end],
+  						Mb_TypeC:[1]
+  guard
+    t_mb_intra_flag=1 and count >= 16
+  do
+    intratype := t_mb_type;
+    pic_w_in_mb := t_pic_w_in_mb; 
+    first_mb_in_slice:=t_first_mb_in_slice;
+    curr_mb:=t_curr_mb;
+    mb_x := curr_mb mod pic_w_in_mb;
     count := 0;
   end
   
@@ -107,31 +128,38 @@ int PICHEIGHT=36; //number of MB per columns
   guard
     intratype = 1 and count <16
   var 
-    uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2) + InverseScan4x4(count,lshift( picW,2)),
     int(size=5) top, 
 	int(size=5) left, 
 	int(size=5) predicted, 
 	int(size=5) val    
   do
-    if (CurrMb4x4Addr / lshift( picW,2)) = 0 then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
+    if curr_mb < first_mb_in_slice + pic_w_in_mb and InverseScan4x4Tab[count]<4 then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
          top:= -1;
     else
-         top := intra4x4predmode[CurrMb4x4Addr - lshift(picW,2)];
+         if InverseScan4x4Tab[count]<4 then
+         	top := intra4x4predmode[mb_x, 12 + InverseScan4x4Tab[count]];
+         else
+         	top := intra4x4predmode[mb_x, InverseScan4x4Tab[count]-4];
+         end
     end
-    if (CurrMb4x4Addr mod lshift( picW,2)) = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
+    if (curr_mb = first_mb_in_slice or mb_x = 0) and InverseScan4x4Tab[count] mod 4 = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
        left:= -1;
     else
-       left := intra4x4predmode[CurrMb4x4Addr - 1];
+    	if InverseScan4x4Tab[count] mod 4 = 0 then
+    		left := intra4x4predmode[mb_x - 1, 3 + InverseScan4x4Tab[count]];
+    	else
+    		left := intra4x4predmode[mb_x, InverseScan4x4Tab[count]- 1];
+    	end
     end
     if left < top then predicted := left; else predicted := top; end
     if predicted < 0 then predicted := 2; end //INTRA_4x4_DC
     if a < predicted then val := a; else val := a+1; end
     if a = 15 then val := predicted; end
-    intra4x4predmode[CurrMb4x4Addr] := val;
+    intra4x4predmode[mb_x, InverseScan4x4Tab[count]] := val;
     count := count +1;
   end
   
-  get_intra8x8: action IntraPredMode:[a] ==> PredMode:[val] // Not yet tested
+/*  get_intra8x8: action IntraPredMode:[a] ==> PredMode:[val] // Not yet tested
   guard
     intratype = 2 and count <16
   var 
@@ -162,13 +190,14 @@ int PICHEIGHT=36; //number of MB per columns
       intra4x4predmode[CurrMb8x8Addr] := val;
     end
     count := count +4;
-  end
+  end */
   
   get_intra16x16: action IntraPredMode:[a] ==> PredMode:[a]
   guard
     intratype = 3 and count <16    
   do
     count := 16;
+    intra4x4predmode[mb_x] := [ 2 : for int j in Integers(0,15)];
   end
   
 end

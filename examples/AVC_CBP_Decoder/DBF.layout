@@ -12,8 +12,8 @@
       <vertex id="MV" x="57" y="814"/>
       <vertex id="RefIdx" x="57" y="907"/>
       <vertex id="LFDisable" x="57" y="1000"/>
-      <vertex id="WD" x="617" y="479"/>
       <vertex id="Algo_DBF" x="407" y="619"/>
       <vertex id="Mgnt_DBF" x="202" y="427"/>
+      <vertex id="WD" x="529" y="430"/>
    </vertices>
 </layout>

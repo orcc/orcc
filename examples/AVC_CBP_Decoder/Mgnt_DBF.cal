@@ -498,7 +498,7 @@ end
 SkipOut: action ==> end
 
 
-OutMB: action ==> WD:[buff] repeat MB_BLOCK_SIZE * MB_BLOCK_SIZE
+OutMB: action ==>  WD:[buff] repeat MB_BLOCK_SIZE * MB_BLOCK_SIZE
   guard (mb_y>0) and mb_y<MB_Height
   var 
       List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE * MB_BLOCK_SIZE) buff = [ 0 :for int s in Integers(0,MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ] 
@@ -544,7 +544,7 @@ DB_done: action  ==>
     mb_x:=0;      
 end 
 
-flush_fifo: action  ==> WD:[buff] repeat MB_BLOCK_SIZE * MB_BLOCK_SIZE
+flush_fifo: action  ==>  WD:[buff] repeat MB_BLOCK_SIZE * MB_BLOCK_SIZE 
   var 
       List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE * MB_BLOCK_SIZE) buff = [ 0 :for int s in Integers(0,MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ] 
   do    

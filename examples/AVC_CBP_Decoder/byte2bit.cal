@@ -32,7 +32,7 @@ actor byte2bit () int(size=8) in8 ==> uint(size=1) out :
   guard
     count != 0
   var
-    bool bit = bitand( buf, 128) != 0
+    uint(size=1) bit = if bitand( buf, 128) != 0 then 1 else 0 end
   do
     count := count - 1;
     buf := lshift( buf, 1 );
