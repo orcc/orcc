@@ -130,12 +130,12 @@ actionStatements: 'do' statement* -> statement*;
 
 actor: actorImport* 'actor' id=ID ('[' ']')? '(' actorParameters? ')'
 	inputs=actorPortDecls? '==>' outputs=actorPortDecls? ':'
-	actorDeclarations 'end' EOF
+	actorDeclarations? 'end' EOF
 	-> 'actor' $id
 	^(PARAMETERS actorParameters?)
 	^(INPUTS $inputs?)
 	^(OUTPUTS $outputs?)
-	^(ACTOR_DECLS actorDeclarations);
+	^(ACTOR_DECLS actorDeclarations?);
 
 /*****************************************************************************/
 /* actor declarations */
@@ -185,7 +185,8 @@ actorDeclaration:
     'begin' statement* 'end'
 	-> PROCEDURE;
 
-actorDeclarations: actorDeclaration* (schedule actorDeclaration*)? -> actorDeclaration* schedule?;
+actorDeclarations: actorDeclaration+ (schedule actorDeclaration*)? -> actorDeclaration+ schedule?
+  | schedule actorDeclaration* -> actorDeclaration* schedule;
 
 /*****************************************************************************/
 
