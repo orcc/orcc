@@ -129,7 +129,7 @@ int PICHEIGHT=36; //number of MB per columns
   	write_done = 0
   do
     pic[pic_curr_idx,wa + wa_x + wa_y * picwidth * MB_WIDTH] := v;
-     wa_x := wa_x +1;
+    wa_x := wa_x +1;
     if wa_x = wa_W then
       wa_y := wa_y +1;
       if wa_y != wa_H then wa_x := 0; else write_done :=1; end
@@ -209,7 +209,7 @@ int PICHEIGHT=36; //number of MB per columns
       	pic_display_idx := 0;
       end
       println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
-    end      
+    end
   end
 
 
