@@ -136,7 +136,14 @@ public class Frontend {
 	private void processActors() {
 		for (String path : actors) {
 			try {
-				Actor actor = new RVCCalASTParser(path).parse();
+				RVCCalASTParser parser = new RVCCalASTParser(path);
+				Actor actor = parser.parse();
+
+				// prints priority graph
+				String fileName = outputFolder + File.separator
+						+ actor.getName() + ".dot";
+				parser.printPriorityGraph(fileName);
+
 				new ActorWriter(actor).write(outputFolder.toString());
 			} catch (OrccException e) {
 				e.printStackTrace();

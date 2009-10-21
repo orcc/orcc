@@ -28,10 +28,14 @@
  */
 package net.sf.orcc.frontend.schedule;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.List;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -48,8 +52,28 @@ import net.sf.orcc.util.ActionList;
  */
 public class ActionSorter {
 
+	/**
+	 * This class defines a {@link VertexNameProvider} for actions. The
+	 * {@link #getVertexName(Action)} simply calls the <code>toString</code>
+	 * method of the given action.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ActionNameProvider implements VertexNameProvider<Action> {
+
+		@Override
+		public String getVertexName(Action action) {
+			return action.toString();
+		}
+
+	}
+
 	private DirectedGraph<Action, DefaultEdge> graph;
 
+	/**
+	 * Creates a new action sorter.
+	 */
 	public ActionSorter() {
 		graph = new DefaultDirectedGraph<Action, DefaultEdge>(DefaultEdge.class);
 	}
@@ -87,7 +111,10 @@ public class ActionSorter {
 	 * </p>
 	 * 
 	 * @param priorities
+	 *            a list of inequalities, an inequality being a list of tags
+	 *            (and a tag is a list of strings)
 	 * @param actionList
+	 *            an action list
 	 */
 	private void buildGraph(List<List<List<String>>> priorities,
 			ActionList actionList) {
@@ -112,4 +139,16 @@ public class ActionSorter {
 		}
 	}
 
+	/**
+	 * Prints the priority graph to the given output stream
+	 * 
+	 * @param out
+	 *            an output stream
+	 */
+	public void printGraph(OutputStream out) {
+		VertexNameProvider<Action> provider = new ActionNameProvider();
+		DOTExporter<Action, DefaultEdge> exporter = new DOTExporter<Action, DefaultEdge>(
+				provider, null, null);
+		exporter.export(new OutputStreamWriter(out), graph);
+	}
 }

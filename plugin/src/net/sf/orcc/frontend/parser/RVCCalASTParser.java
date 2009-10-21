@@ -29,6 +29,7 @@
 package net.sf.orcc.frontend.parser;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,12 +78,6 @@ import org.antlr.runtime.tree.Tree;
  */
 public class RVCCalASTParser extends CommonParser {
 
-	public static void main(String[] args) throws OrccException {
-		for (String arg : args) {
-			new RVCCalASTParser(arg).parse();
-		}
-	}
-
 	/**
 	 * list of actions
 	 */
@@ -129,6 +124,8 @@ public class RVCCalASTParser extends CommonParser {
 	 */
 	private OrderedMap<Procedure> procedures;
 
+	private ActionSorter sorter;
+
 	/**
 	 * list of state variables
 	 */
@@ -143,7 +140,9 @@ public class RVCCalASTParser extends CommonParser {
 	public RVCCalASTParser(String fileName) throws OrccException {
 		try {
 			this.file = new File(fileName).getCanonicalPath();
+
 			exprParser = new ExprParser();
+			sorter = new ActionSorter();
 		} catch (IOException e) {
 			String msg = "could not solve the path \"" + fileName + "\"";
 			throw new OrccException(msg, e);
@@ -216,8 +215,8 @@ public class RVCCalASTParser extends CommonParser {
 		stateVars = new ArrayList<StateVar>();
 
 		parseActorDecls(tree.getChild(5));
-		
-		new ActionSorter().applyPriority(priorities, actions);
+
+		sorter.applyPriority(priorities, actions);
 
 		return new Actor(name, file, parameters, inputs, outputs, stateVars,
 				null, null, null, null, null);
@@ -443,6 +442,22 @@ public class RVCCalASTParser extends CommonParser {
 		}
 
 		return varDefs;
+	}
+
+	/**
+	 * Prints the graph that represents the priorities.
+	 * 
+	 * @param fileName
+	 *            output file name
+	 * @throws OrccException
+	 *             if something goes wrong (most probably I/O error)
+	 */
+	public void printPriorityGraph(String fileName) throws OrccException {
+		try {
+			sorter.printGraph(new FileOutputStream(fileName));
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 }
