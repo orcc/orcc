@@ -142,7 +142,6 @@ public class RVCCalASTParser extends CommonParser {
 			this.file = new File(fileName).getCanonicalPath();
 
 			exprParser = new ExprParser();
-			sorter = new ActionSorter();
 		} catch (IOException e) {
 			String msg = "could not solve the path \"" + fileName + "\"";
 			throw new OrccException(msg, e);
@@ -173,11 +172,12 @@ public class RVCCalASTParser extends CommonParser {
 		}
 	}
 
-	private Action parseAction(Tree tree) {
+	private void parseAction(Tree tree) {
 		Tree tagTree = tree.getChild(0);
 		Location location = parseLocation(tree);
 		List<String> tag = parseActionTag(tagTree);
-		return new Action(location, tag, null, null, null, null);
+		Action action = new Action(location, tag, null, null, null, null);
+		actions.add(action);
 	}
 
 	private List<String> parseActionTag(Tree tree) {
@@ -200,17 +200,13 @@ public class RVCCalASTParser extends CommonParser {
 	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
 		currentScope = new Scope<LocalVariable>();
-		procedures = new OrderedMap<Procedure>();
-
-		// TODO remove when scopeProcedures are actually used
-		procedures.toString();
-
-		parameters = parseVarDefs(currentScope, tree.getChild(2));
-
-		inputs = parsePorts(tree.getChild(3));
-		outputs = parsePorts(tree.getChild(4));
+		sorter = new ActionSorter();
 
 		actions = new ActionList();
+		parameters = parseVarDefs(currentScope, tree.getChild(2));
+		procedures = new OrderedMap<Procedure>();
+		inputs = parsePorts(tree.getChild(3));
+		outputs = parsePorts(tree.getChild(4));
 		priorities = new ArrayList<List<List<String>>>();
 		stateVars = new ArrayList<StateVar>();
 
@@ -219,7 +215,7 @@ public class RVCCalASTParser extends CommonParser {
 		sorter.applyPriority(priorities, actions);
 
 		return new Actor(name, file, parameters, inputs, outputs, stateVars,
-				null, null, null, null, null);
+				procedures, null, null, null, null);
 	}
 
 	/**
@@ -236,13 +232,20 @@ public class RVCCalASTParser extends CommonParser {
 		for (int i = 0; i < n; i++) {
 			Tree child = actorDecls.getChild(i);
 			switch (child.getType()) {
-			case RVCCalLexer.ACTION: {
-				Action action = parseAction(child);
-				actions.add(action);
+			case RVCCalLexer.ACTION:
+				parseAction(child);
 				break;
-			}
+			case RVCCalLexer.FUNCTION:
+				parseFunction(child);
+				break;
+			case RVCCalLexer.INITIALIZE:
+				parseInitialize(child);
+				break;
 			case RVCCalLexer.PRIORITY:
 				parsePriority(child);
+				break;
+			case RVCCalLexer.PROCEDURE:
+				parseProcedure(child);
 				break;
 			case RVCCalLexer.SCHEDULE:
 				parseSchedule(child);
@@ -259,6 +262,12 @@ public class RVCCalASTParser extends CommonParser {
 				throw new OrccException("not yet implemented");
 			}
 		}
+	}
+
+	private void parseFunction(Tree tree) {
+	}
+
+	private void parseInitialize(Tree tree) {
 	}
 
 	/**
@@ -304,6 +313,9 @@ public class RVCCalASTParser extends CommonParser {
 			}
 			priorities.add(list);
 		}
+	}
+
+	private void parseProcedure(Tree tree) {
 	}
 
 	private void parseSchedule(Tree tree) {

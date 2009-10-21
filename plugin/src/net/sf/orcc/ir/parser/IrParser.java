@@ -161,7 +161,7 @@ public class IrParser {
 
 	private AbstractNode previousNode;
 
-	private Map<String, Procedure> procs;
+	private OrderedMap<Procedure> procs;
 
 	private List<Action> untaggedActions;
 
@@ -251,7 +251,7 @@ public class IrParser {
 	public Actor parseActor(InputStream in) throws OrccException {
 		try {
 			actions = new HashMap<List<String>, Action>();
-			procs = new HashMap<String, Procedure>();
+			procs = new OrderedMap<Procedure>();
 			untaggedActions = new ArrayList<Action>();
 			varDefs = new HashMap<String, LocalVariable>();
 
@@ -267,7 +267,9 @@ public class IrParser {
 			List<StateVar> stateVars = parseStateVars(array);
 
 			array = obj.getJSONArray(KEY_PROCEDURES);
-			List<Procedure> procs = parseProcs(array);
+			for (int i = 0; i < array.length(); i++) {
+				parseProc(array.getJSONArray(i));
+			}
 
 			array = obj.getJSONArray(KEY_ACTIONS);
 			List<Action> actions = parseActions(array);
@@ -662,26 +664,8 @@ public class IrParser {
 
 		Procedure proc = new Procedure(name, external, location, returnType,
 				parameters, locals, nodes);
-		procs.put(name, proc);
+		procs.register(file, location, name, proc);
 		return proc;
-	}
-
-	/**
-	 * Parses the given list as a list of procedures.
-	 * 
-	 * @param list
-	 *            A list of YAML-encoded {@link Procedure}s.
-	 * @return A {@link List}&lt;{@link Procedure}&gt;.
-	 * @throws JSONException
-	 */
-	private List<Procedure> parseProcs(JSONArray array) throws JSONException,
-			OrccException {
-		List<Procedure> procs = new ArrayList<Procedure>();
-		for (int i = 0; i < array.length(); i++) {
-			procs.add(parseProc(array.getJSONArray(i)));
-		}
-
-		return procs;
 	}
 
 	private ReadNode parseReadNode(int id, Location loc, JSONArray array)

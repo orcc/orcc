@@ -233,7 +233,7 @@ public class LLVMActorPrinter {
 		}
 	}
 
-	private void setProcedures(String actorName, List<Procedure> procs) {
+	private void setProcedures(String actorName, OrderedMap<Procedure> procs) {
 		for (Procedure proc : procs) {
 			if (!proc.isExternal()) {
 				template.setAttribute("procs", applyProc(actorName, proc));
