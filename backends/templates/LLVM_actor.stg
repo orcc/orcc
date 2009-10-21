@@ -351,7 +351,7 @@ return:
 
 actionCallState(nextState) ::= <<
 	call void @$nextState.action$()
-	store i32 $nextState.targetIntState$, i32* @_FSM_state
+	store i32 $nextState.targetState.index$, i32* @_FSM_state
 	ret i1 1
 
 >>
@@ -410,7 +410,7 @@ default:
 
 schedulerFSM(actorName, actions, fsm, iterator) ::= <<
 
-@_FSM_state = internal global i32 $fsm.initialIntState$
+@_FSM_state = internal global i32 $fsm.initialState.index$
 
 $if(actions)$
 define i1 @outside_FSM_scheduler() {

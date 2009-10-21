@@ -95,10 +95,8 @@ import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.FSM;
-import net.sf.orcc.ir.actor.NextStateInfo;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
-import net.sf.orcc.ir.actor.Transition;
 import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.IConst;
@@ -229,7 +227,7 @@ public class IrParser {
 	}
 
 	private ActionScheduler parseActionScheduler(JSONArray array)
-			throws JSONException {
+			throws JSONException, OrccException {
 		JSONArray actionArray = array.getJSONArray(0);
 		List<Action> actions = new ArrayList<Action>();
 		for (int i = 0; i < actionArray.length(); i++) {
@@ -450,46 +448,32 @@ public class IrParser {
 		return exprs;
 	}
 
-	private FSM parseFSM(JSONArray array) throws JSONException {
+	private FSM parseFSM(JSONArray array) throws JSONException, OrccException {
 		String initialState = array.getString(0);
-		List<String> states = new ArrayList<String>();
+		FSM fsm = new FSM();
 		JSONArray stateArray = array.getJSONArray(1);
 		for (int i = 0; i < stateArray.length(); i++) {
-			states.add(stateArray.getString(i));
+			fsm.addState(stateArray.getString(i));
 		}
 
-		List<Transition> transitions = parseFSMTransitions(states, array
-				.getJSONArray(2));
-		return new FSM(initialState, states, transitions);
-	}
+		// set the initial state *after* initializing the states to get a
+		// prettier order
+		fsm.setInitialState(initialState);
 
-	private List<NextStateInfo> parseFSMNextStates(List<String> states,
-			JSONArray array) throws JSONException {
-		List<NextStateInfo> nextStates = new ArrayList<NextStateInfo>();
-		for (int i = 0; i < array.length(); i++) {
-			JSONArray stateArray = array.getJSONArray(i);
-			Action action = getAction(stateArray.getJSONArray(0));
-			String targetState = stateArray.getString(1);
-			nextStates.add(new NextStateInfo(states.indexOf(targetState),
-					action, targetState));
+		JSONArray transitionsArray = array.getJSONArray(2);
+		for (int i = 0; i < transitionsArray.length(); i++) {
+			JSONArray transitionArray = transitionsArray.getJSONArray(i);
+			String source = transitionArray.getString(0);
+			JSONArray targetsArray = transitionArray.getJSONArray(1);
+			for (int j = 0; j < targetsArray.length(); j++) {
+				JSONArray targetArray = targetsArray.getJSONArray(j);
+				Action action = getAction(targetArray.getJSONArray(0));
+				String target = targetArray.getString(1);
+				fsm.addTransition(source, target, action);
+			}
 		}
-		return nextStates;
-	}
 
-	private List<Transition> parseFSMTransitions(List<String> states,
-			JSONArray array) throws JSONException {
-		List<Transition> transitions = new ArrayList<Transition>();
-		for (int i = 0; i < array.length(); i++) {
-			JSONArray transitionArray = array.getJSONArray(i);
-
-			String sourceState = transitionArray.getString(0);
-			List<NextStateInfo> nextStates = parseFSMNextStates(states,
-					transitionArray.getJSONArray(1));
-
-			transitions.add(new Transition(states.indexOf(sourceState),
-					sourceState, nextStates));
-		}
-		return transitions;
+		return fsm;
 	}
 
 	private HasTokensNode parseHasTokensNode(int id, Location loc,

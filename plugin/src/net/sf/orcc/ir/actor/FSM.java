@@ -28,49 +28,290 @@
  */
 package net.sf.orcc.ir.actor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.DirectedMultigraph;
 
 /**
- * A Finite State Machine.
+ * This class defines a Finite State Machine (FSM). A FSM is a directed
+ * multi-graph, where a vertex is a state, and an edge is a list of actions.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class FSM {
 
-	private String initialState;
+	/**
+	 * Action associated to the next state.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	public class NextStateInfo {
 
-	private List<String> states;
+		private Action action;
 
-	private List<Transition> transitions;
+		private State targetState;
 
-	public FSM(String initialState, List<String> states,
-			List<Transition> transitions) {
-		this.initialState = initialState;
-		this.states = states;
-		this.transitions = transitions;
+		private NextStateInfo(Action action, State targetState) {
+			this.action = action;
+			this.targetState = targetState;
+		}
+
+		public Action getAction() {
+			return action;
+		}
+
+		public State getTargetState() {
+			return targetState;
+		}
+
 	}
 
-	// Int state
-	public int getInitialIntState() {
-		return states.indexOf(initialState);
+	/**
+	 * This class defines a state of a Finite State Machine.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	public class State implements Comparable<State> {
+
+		private int index;
+
+		private String name;
+
+		/**
+		 * Creates a new state with the given name and index.
+		 * 
+		 * @param name
+		 *            name of this state
+		 * @param index
+		 *            index of this state
+		 */
+		private State(String name, int index) {
+			this.index = index;
+			this.name = name;
+		}
+
+		@Override
+		public int compareTo(State o) {
+			if (index < o.index) {
+				return -1;
+			} else if (index > o.index) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof State) {
+				return index == ((State) obj).index;
+			} else {
+				return false;
+			}
+		}
+
+		/**
+		 * Returns the index of this state.
+		 * 
+		 * @return the index of this state
+		 */
+		public int getIndex() {
+			return index;
+		}
+
+		/**
+		 * Returns the name of this state.
+		 * 
+		 * @return the name of this state
+		 */
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public int hashCode() {
+			return index;
+		}
+
+		@Override
+		public String toString() {
+			return getName();
+		}
+
 	}
 
-	// String state
-	public String getInitialState() {
+	/**
+	 * A transition in the FSM.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	public class Transition {
+
+		private List<NextStateInfo> nextStateInfo;
+
+		private State sourceState;
+
+		/**
+		 * Creates a transition from a source state.
+		 * 
+		 * @param sourceState
+		 *            source state
+		 */
+		private Transition(State sourceState) {
+			this.sourceState = sourceState;
+			this.nextStateInfo = new ArrayList<NextStateInfo>();
+		}
+
+		public List<NextStateInfo> getNextStateInfo() {
+			return nextStateInfo;
+		}
+
+		public State getSourceState() {
+			return sourceState;
+		}
+
+	}
+
+	/**
+	 * index of last state added to the state map
+	 */
+	private int index;
+
+	/**
+	 * initial state
+	 */
+	private State initialState;
+
+	/**
+	 * map of state name to state
+	 */
+	private Map<String, State> states;
+
+	/**
+	 * list of transitions. This is specified as an array list because we
+	 * reference transitions by number.
+	 */
+	private ArrayList<Transition> transitions;
+
+	/**
+	 * Creates an FSM with the given state as an initial state.
+	 * 
+	 * @param state
+	 *            name of the initial state
+	 */
+	public FSM() {
+		states = new HashMap<String, State>();
+		transitions = new ArrayList<Transition>();
+	}
+
+	/**
+	 * Adds a state with the given name only if the given state is not already
+	 * present.
+	 * 
+	 * @param name
+	 *            name of a state
+	 * @return the state created
+	 */
+	public State addState(String name) {
+		State state = states.get(name);
+		if (state == null) {
+			state = new State(name, index++);
+			states.put(name, state);
+			transitions.add(new Transition(state));
+		}
+
+		return state;
+	}
+
+	/**
+	 * Adds a transition between two state with the given action.
+	 * 
+	 * @param source
+	 *            name of the source state
+	 * @param target
+	 *            name of the target state
+	 * @param action
+	 *            an action
+	 */
+	public void addTransition(String source, String target, Action action) {
+		State srcState = states.get(source);
+		State tgtState = states.get(target);
+
+		int index = srcState.getIndex();
+		Transition transition = transitions.get(index);
+		List<NextStateInfo> nextState = transition.getNextStateInfo();
+		nextState.add(new NextStateInfo(action, tgtState));
+	}
+
+	/**
+	 * Returns a graph representation of this FSM.
+	 * 
+	 * @return a graph representation of this FSM
+	 */
+	public DirectedGraph<State, Action> getGraph() {
+		DirectedGraph<State, Action> graph = new DirectedMultigraph<State, Action>(
+				Action.class);
+		for (State source : states.values()) {
+			graph.addVertex(source);
+			int index = source.getIndex();
+			Transition transition = transitions.get(index);
+			List<NextStateInfo> nextState = transition.getNextStateInfo();
+			for (NextStateInfo info : nextState) {
+				State target = info.getTargetState();
+				graph.addVertex(target);
+				graph.addEdge(source, target, info.getAction());
+			}
+		}
+
+		return graph;
+	}
+
+	/**
+	 * Returns the initial state.
+	 * 
+	 * @return the initial state
+	 */
+	public State getInitialState() {
 		return initialState;
 	}
 
+	/**
+	 * Returns the list of states sorted by alphabetical order.
+	 * 
+	 * @return the list of states sorted by alphabetical order
+	 */
 	public List<String> getStates() {
-		return states;
+		return new ArrayList<String>(new TreeSet<String>(states.keySet()));
 	}
 
+	/**
+	 * Returns the list of transitions of this FSM as a list of
+	 * {@link Transition}.
+	 * 
+	 * @return the list of transitions of this FSM as a list of
+	 *         {@link Transition}
+	 */
 	public List<Transition> getTransitions() {
 		return transitions;
 	}
 
-	public void setInitialState(String initialState) {
-		this.initialState = initialState;
+	/**
+	 * Sets the initial state of this FSM to the given state.
+	 * 
+	 * @param state
+	 *            a state name
+	 */
+	public void setInitialState(String state) {
+		initialState = addState(state);
 	}
 
 }

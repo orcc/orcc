@@ -30,12 +30,11 @@ package net.sf.orcc.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.Action;
 
 /**
@@ -45,7 +44,7 @@ import net.sf.orcc.ir.actor.Action;
  * @author Matthieu Wipliez
  * 
  */
-public class ActionList {
+public class ActionList implements Iterable<Action> {
 
 	private List<Action> actionList;
 
@@ -60,39 +59,15 @@ public class ActionList {
 	}
 
 	/**
-	 * Returns the list of actions that match the given tag.
+	 * Adds the given action to this action list.
 	 * 
-	 * @param tag
-	 *            a tag
-	 * @return the list of actions that match the given tag
+	 * @param action
+	 *            an action
 	 */
-	public List<Action> getActions(List<String> tag) {
-		return tagMap.get(tag);
-	}
-
-	/**
-	 * Returns the list of objects of this scope
-	 * 
-	 * @return the list of objects of this scope
-	 */
-	public List<Action> getList() {
-		return actionList;
-	}
-
-	/**
-	 * Registers an object with the given name.
-	 * 
-	 * @param name
-	 *            the name of an object
-	 * @param object
-	 *            an object
-	 * @throws OrccException
-	 *             if the object is already defined
-	 */
-	public void register(String file, Location location, List<String> tag,
-			Action action) {
+	public void add(Action action) {
 		actionList.add(action);
 
+		List<String> tag = action.getTag();
 		if (!tag.isEmpty()) {
 			// a tag has the form a.b.c
 			// we add the action to the tagMap for entries:
@@ -120,6 +95,31 @@ public class ActionList {
 				currentTag = newTagList;
 			}
 		}
+	}
+
+	/**
+	 * Returns the list of actions that match the given tag.
+	 * 
+	 * @param tag
+	 *            a tag
+	 * @return the list of actions that match the given tag
+	 */
+	public List<Action> getActions(List<String> tag) {
+		return tagMap.get(tag);
+	}
+
+	/**
+	 * Returns the list of objects of this scope
+	 * 
+	 * @return the list of objects of this scope
+	 */
+	public List<Action> getList() {
+		return actionList;
+	}
+
+	@Override
+	public Iterator<Action> iterator() {
+		return actionList.iterator();
 	}
 
 	@Override

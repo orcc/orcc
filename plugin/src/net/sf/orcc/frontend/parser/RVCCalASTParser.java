@@ -238,8 +238,7 @@ public class RVCCalASTParser extends CommonParser {
 			switch (child.getType()) {
 			case RVCCalLexer.ACTION: {
 				Action action = parseAction(child);
-				actions.register(file, action.getLocation(), action.getTag(),
-						action);
+				actions.add(action);
 				break;
 			}
 			case RVCCalLexer.PRIORITY:
