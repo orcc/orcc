@@ -29,6 +29,7 @@
 package net.sf.orcc.frontend.parser;
 
 import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.actor.Tag;
 
 import org.antlr.runtime.tree.Tree;
 
@@ -38,7 +39,7 @@ import org.antlr.runtime.tree.Tree;
  * @author Matthieu Wipliez
  * 
  */
-public class CommonParser {
+public final class Util {
 
 	/**
 	 * Returns a location from a tree that contains a real token.
@@ -47,12 +48,23 @@ public class CommonParser {
 	 *            a tree
 	 * @return a location
 	 */
-	protected Location parseLocation(Tree tree) {
+	public static Location parseLocation(Tree tree) {
 		int lineNumber = tree.getLine();
 		int startColumn = tree.getCharPositionInLine();
 		int endColumn = startColumn + tree.getText().length();
 
 		return new Location(lineNumber, startColumn, endColumn);
+	}
+
+	public static Tag parseActionTag(Tree tree) {
+		int n = tree.getChildCount();
+		Tag tag = new Tag(n);
+		for (int i = 0; i < n; i++) {
+			Tree child = tree.getChild(i);
+			tag.add(child.getText());
+		}
+
+		return tag;
 	}
 
 }

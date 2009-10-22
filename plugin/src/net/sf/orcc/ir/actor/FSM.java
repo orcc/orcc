@@ -28,13 +28,22 @@
  */
 package net.sf.orcc.ir.actor;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import net.sf.orcc.OrccException;
+
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.StringEdgeNameProvider;
+import org.jgrapht.ext.StringNameProvider;
 import org.jgrapht.graph.DirectedMultigraph;
 
 /**
@@ -302,6 +311,26 @@ public class FSM {
 	 */
 	public List<Transition> getTransitions() {
 		return transitions;
+	}
+
+	/**
+	 * Prints a graph representation of this FSM.
+	 * 
+	 * @param fileName
+	 *            output file name
+	 * @throws OrccException
+	 *             if something goes wrong (most probably I/O error)
+	 */
+	public void printFSMGraph(String fileName) throws OrccException {
+		try {
+			OutputStream out = new FileOutputStream(fileName);
+			DOTExporter<State, Action> exporter = new DOTExporter<State, Action>(
+					new StringNameProvider<State>(), null,
+					new StringEdgeNameProvider<Action>());
+			exporter.export(new OutputStreamWriter(out), getGraph());
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	/**

@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.frontend.parser;
 
+import static net.sf.orcc.frontend.parser.Util.parseLocation;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +59,7 @@ import org.antlr.runtime.tree.Tree;
  * @author Matthieu Wipliez
  * 
  */
-public class ExprParser extends CommonParser {
+public class ExprParser {
 
 	/**
 	 * Returns the binary operator that match the type of the given tree.

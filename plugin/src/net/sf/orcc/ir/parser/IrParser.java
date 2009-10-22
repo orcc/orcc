@@ -97,6 +97,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.FSM;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.Tag;
 import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.IConst;
@@ -149,7 +150,7 @@ import org.json.JSONTokener;
  */
 public class IrParser {
 
-	private Map<List<String>, Action> actions;
+	private Map<Tag, Action> actions;
 
 	private String file;
 
@@ -199,7 +200,7 @@ public class IrParser {
 	private Action parseAction(JSONArray array) throws JSONException,
 			OrccException {
 		JSONArray tagArray = array.getJSONArray(0);
-		List<String> tag = new ArrayList<String>();
+		Tag tag = new Tag();
 		for (int i = 0; i < tagArray.length(); i++) {
 			tag.add(tagArray.getString(i));
 		}
@@ -250,7 +251,7 @@ public class IrParser {
 	 */
 	public Actor parseActor(InputStream in) throws OrccException {
 		try {
-			actions = new HashMap<List<String>, Action>();
+			actions = new HashMap<Tag, Action>();
 			procs = new OrderedMap<Procedure>();
 			untaggedActions = new ArrayList<Action>();
 			varDefs = new HashMap<String, LocalVariable>();
@@ -870,7 +871,7 @@ public class IrParser {
 		return new WriteNode(id, loc, fifoName, numTokens, varDef);
 	}
 
-	private void putAction(List<String> tag, Action action) {
+	private void putAction(Tag tag, Action action) {
 		if (!isInitialize) {
 			if (tag.isEmpty()) {
 				untaggedActions.add(action);

@@ -32,15 +32,19 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.actor.Action;
+import net.sf.orcc.ir.actor.Tag;
 import net.sf.orcc.util.ActionList;
 
 /**
@@ -69,13 +73,19 @@ public class ActionSorter {
 
 	}
 
+	private ActionList actionList;
+
 	private DirectedGraph<Action, DefaultEdge> graph;
 
 	/**
 	 * Creates a new action sorter.
+	 * 
+	 * @param actionList
+	 *            an action list
 	 */
-	public ActionSorter() {
+	public ActionSorter(ActionList actionList) {
 		graph = new DefaultDirectedGraph<Action, DefaultEdge>(DefaultEdge.class);
+		this.actionList = actionList;
 	}
 
 	/**
@@ -83,11 +93,24 @@ public class ActionSorter {
 	 * 
 	 * @param priorities
 	 */
-	public ActionList applyPriority(List<List<List<String>>> priorities,
-			ActionList actionList) throws OrccException {
-		buildGraph(priorities, actionList);
+	public ActionList applyPriority(List<List<Tag>> priorities)
+			throws OrccException {
+		buildGraph(priorities);
+		CycleDetector<Action, DefaultEdge> cycleDetector = new CycleDetector<Action, DefaultEdge>(
+				graph);
+		Set<Action> cycle = cycleDetector.findCycles();
+		if (!cycle.isEmpty()) {
+			throw new OrccException("cycle detected in priorities: " + cycle);
+		}
 
-		return null;
+		ActionList actions = new ActionList();
+		TopologicalOrderIterator<Action, DefaultEdge> it = new TopologicalOrderIterator<Action, DefaultEdge>(
+				graph);
+		while (it.hasNext()) {
+			actions.add(it.next());
+		}
+
+		return actions;
 	}
 
 	/**
@@ -113,22 +136,19 @@ public class ActionSorter {
 	 * @param priorities
 	 *            a list of inequalities, an inequality being a list of tags
 	 *            (and a tag is a list of strings)
-	 * @param actionList
-	 *            an action list
 	 */
-	private void buildGraph(List<List<List<String>>> priorities,
-			ActionList actionList) {
-		for (List<List<String>> inequality : priorities) {
+	private void buildGraph(List<List<Tag>> priorities) {
+		for (List<Tag> inequality : priorities) {
 			// the grammar requires there be at least two tags
-			Iterator<List<String>> it = inequality.iterator();
-			List<String> previousTag = it.next();
+			Iterator<Tag> it = inequality.iterator();
+			Tag previousTag = it.next();
 			while (it.hasNext()) {
-				List<String> tag = it.next();
+				Tag tag = it.next();
 				List<Action> sources = actionList.getActions(previousTag);
 				List<Action> targets = actionList.getActions(tag);
 				for (Action source : sources) {
+					graph.addVertex(source);
 					for (Action target : targets) {
-						graph.addVertex(source);
 						graph.addVertex(target);
 						graph.addEdge(source, target);
 					}
@@ -151,4 +171,5 @@ public class ActionSorter {
 				provider, null, null);
 		exporter.export(new OutputStreamWriter(out), graph);
 	}
+
 }

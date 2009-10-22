@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.ir.actor.Action;
+import net.sf.orcc.ir.actor.Tag;
 
 /**
  * A list of action is like an ordered map, except keys are tags (list of
@@ -48,14 +49,14 @@ public class ActionList implements Iterable<Action> {
 
 	private List<Action> actionList;
 
-	private Map<List<String>, List<Action>> tagMap;
+	private Map<Tag, List<Action>> tagMap;
 
 	/**
 	 * Creates an empty action list.
 	 */
 	public ActionList() {
 		actionList = new ArrayList<Action>();
-		tagMap = new HashMap<List<String>, List<Action>>();
+		tagMap = new HashMap<Tag, List<Action>>();
 	}
 
 	/**
@@ -67,14 +68,14 @@ public class ActionList implements Iterable<Action> {
 	public void add(Action action) {
 		actionList.add(action);
 
-		List<String> tag = action.getTag();
+		Tag tag = action.getTag();
 		if (!tag.isEmpty()) {
 			// a tag has the form a.b.c
 			// we add the action to the tagMap for entries:
 			// [a]; [a, b]; [a, b, c]
 
 			int tagLength = 1;
-			List<String> currentTag = new ArrayList<String>(tagLength);
+			Tag currentTag = new Tag(tagLength);
 			for (String id : tag) {
 				currentTag.add(id);
 
@@ -90,9 +91,7 @@ public class ActionList implements Iterable<Action> {
 
 				// creates a new list and copies the tag in it
 				tagLength++;
-				List<String> newTagList = new ArrayList<String>(tagLength);
-				newTagList.addAll(currentTag);
-				currentTag = newTagList;
+				currentTag = new Tag(tagLength, currentTag);
 			}
 		}
 	}
@@ -104,7 +103,7 @@ public class ActionList implements Iterable<Action> {
 	 *            a tag
 	 * @return the list of actions that match the given tag
 	 */
-	public List<Action> getActions(List<String> tag) {
+	public List<Action> getActions(Tag tag) {
 		return tagMap.get(tag);
 	}
 
@@ -125,7 +124,7 @@ public class ActionList implements Iterable<Action> {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for (Entry<List<String>, List<Action>> entry : tagMap.entrySet()) {
+		for (Entry<Tag, List<Action>> entry : tagMap.entrySet()) {
 			builder.append(entry.getKey().toString());
 			builder.append(": ");
 			builder.append(entry.getValue().toString());

@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.frontend.parser;
 
+import static net.sf.orcc.frontend.parser.Util.parseActionTag;
+import static net.sf.orcc.frontend.parser.Util.parseLocation;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,10 +45,14 @@ import net.sf.orcc.common.Port;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.frontend.schedule.ActionSorter;
+import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.actor.Action;
+import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.actor.FSM;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.Tag;
 import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -76,7 +83,7 @@ import org.antlr.runtime.tree.Tree;
  * @author Matthieu Wipliez
  * 
  */
-public class RVCCalASTParser extends CommonParser {
+public class RVCCalASTParser {
 
 	/**
 	 * list of actions
@@ -99,6 +106,11 @@ public class RVCCalASTParser extends CommonParser {
 	private String file;
 
 	/**
+	 * FSM builder.
+	 */
+	private FSMBuilder fsmBuilder;
+
+	/**
 	 * scope of input ports
 	 */
 	private OrderedMap<Port> inputs;
@@ -117,13 +129,16 @@ public class RVCCalASTParser extends CommonParser {
 	 * Priorities are a list of priority relations. A priority relation is a
 	 * partial order between several tags.
 	 */
-	private List<List<List<String>>> priorities;
+	private List<List<Tag>> priorities;
 
 	/**
 	 * Contains the current scope of procedures
 	 */
 	private OrderedMap<Procedure> procedures;
 
+	/**
+	 * action sorter
+	 */
 	private ActionSorter sorter;
 
 	/**
@@ -175,20 +190,9 @@ public class RVCCalASTParser extends CommonParser {
 	private void parseAction(Tree tree) {
 		Tree tagTree = tree.getChild(0);
 		Location location = parseLocation(tree);
-		List<String> tag = parseActionTag(tagTree);
+		Tag tag = parseActionTag(tagTree);
 		Action action = new Action(location, tag, null, null, null, null);
 		actions.add(action);
-	}
-
-	private List<String> parseActionTag(Tree tree) {
-		int n = tree.getChildCount();
-		List<String> tag = new ArrayList<String>(n);
-		for (int i = 0; i < n; i++) {
-			Tree child = tree.getChild(i);
-			tag.add(child.getText());
-		}
-
-		return tag;
 	}
 
 	/**
@@ -200,22 +204,25 @@ public class RVCCalASTParser extends CommonParser {
 	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
 		currentScope = new Scope<LocalVariable>();
-		sorter = new ActionSorter();
 
 		actions = new ActionList();
 		parameters = parseVarDefs(currentScope, tree.getChild(2));
 		procedures = new OrderedMap<Procedure>();
 		inputs = parsePorts(tree.getChild(3));
 		outputs = parsePorts(tree.getChild(4));
-		priorities = new ArrayList<List<List<String>>>();
+		priorities = new ArrayList<List<Tag>>();
 		stateVars = new ArrayList<StateVar>();
 
 		parseActorDecls(tree.getChild(5));
 
-		sorter.applyPriority(priorities, actions);
+		sorter = new ActionSorter(actions);
+		ActionList actions = sorter.applyPriority(priorities);
+
+		FSM fsm = (fsmBuilder == null) ? null : fsmBuilder.buildFSM(actions);
+		ActionScheduler scheduler = new ActionScheduler(actions.getList(), fsm);
 
 		return new Actor(name, file, parameters, inputs, outputs, stateVars,
-				procedures, null, null, null, null);
+				procedures, null, null, scheduler, null);
 	}
 
 	/**
@@ -248,7 +255,8 @@ public class RVCCalASTParser extends CommonParser {
 				parseProcedure(child);
 				break;
 			case RVCCalLexer.SCHEDULE:
-				parseSchedule(child);
+				// there is at most one schedule in an actor
+				fsmBuilder = new FSMBuilder(child);
 				break;
 			case RVCCalLexer.STATE_VAR: {
 				StateVar stateVar = parseStateVar(child);
@@ -306,9 +314,9 @@ public class RVCCalASTParser extends CommonParser {
 		for (int i = 0; i < numInequalities; i++) {
 			Tree inequality = tree.getChild(i);
 			int numTags = inequality.getChildCount();
-			List<List<String>> list = new ArrayList<List<String>>(numTags);
+			List<Tag> list = new ArrayList<Tag>(numTags);
 			for (int j = 0; j < numTags; j++) {
-				List<String> tag = parseActionTag(inequality.getChild(j));
+				Tag tag = parseActionTag(inequality.getChild(j));
 				list.add(tag);
 			}
 			priorities.add(list);
@@ -316,11 +324,6 @@ public class RVCCalASTParser extends CommonParser {
 	}
 
 	private void parseProcedure(Tree tree) {
-	}
-
-	private void parseSchedule(Tree tree) {
-		// TODO parse schedule
-
 	}
 
 	private StateVar parseStateVar(Tree stateVar) throws OrccException {

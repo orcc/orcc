@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.actor;
 
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.common.Location;
@@ -51,11 +50,11 @@ public class Action {
 
 	private Procedure scheduler;
 
-	private List<String> tag;
+	private Tag tag;
 
-	public Action(Location location, List<String> tag,
-			Map<Port, Integer> inputPattern, Map<Port, Integer> outputPattern,
-			Procedure scheduler, Procedure body) {
+	public Action(Location location, Tag tag, Map<Port, Integer> inputPattern,
+			Map<Port, Integer> outputPattern, Procedure scheduler,
+			Procedure body) {
 		this.body = body;
 		this.inputPattern = inputPattern;
 		this.outputPattern = outputPattern;
@@ -84,11 +83,11 @@ public class Action {
 	}
 
 	/**
-	 * Returns the tag of this action as a string list.
+	 * Returns the tag of this action.
 	 * 
-	 * @return the tag of this action as a string list
+	 * @return the tag of this action
 	 */
-	public List<String> getTag() {
+	public Tag getTag() {
 		return tag;
 	}
 

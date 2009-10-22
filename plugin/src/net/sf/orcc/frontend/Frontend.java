@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.RVCCalASTParser;
 import net.sf.orcc.frontend.writer.ActorWriter;
+import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -140,9 +141,17 @@ public class Frontend {
 				Actor actor = parser.parse();
 
 				// prints priority graph
-				String fileName = outputFolder + File.separator
+				String fileName = outputFolder + File.separator + "priority_"
 						+ actor.getName() + ".dot";
 				parser.printPriorityGraph(fileName);
+
+				// prints priority graph
+				ActionScheduler scheduler = actor.getActionScheduler();
+				if (scheduler.hasFsm()) {
+					fileName = outputFolder + File.separator + "fsm_"
+							+ actor.getName() + ".dot";
+					scheduler.getFsm().printFSMGraph(fileName);
+				}
 
 				new ActorWriter(actor).write(outputFolder.toString());
 			} catch (OrccException e) {
