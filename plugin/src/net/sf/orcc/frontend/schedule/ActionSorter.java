@@ -127,10 +127,9 @@ public class ActionSorter {
 	 * A tag that references no action is an error.
 	 * </p>
 	 * <p>
-	 * Since the specification is not clear about what should be done with named
-	 * actions (ie whose tag is not empty) that are in the action list but are
-	 * not referenced by priorities, we consider this bad design and throw an
-	 * exception.
+	 * Named actions (ie whose tag is not empty) that are in the action list but
+	 * are not referenced by priorities are added to the priority graph but are
+	 * not linked to any other action, therefore their order will be unknown.
 	 * </p>
 	 * 
 	 * @param priorities
@@ -138,6 +137,12 @@ public class ActionSorter {
 	 *            (and a tag is a list of strings)
 	 */
 	private void buildGraph(List<List<Tag>> priorities) {
+		for (Action action : actionList) {
+			if (!action.getTag().isEmpty()) {
+				graph.addVertex(action);
+			}
+		}
+
 		for (List<Tag> inequality : priorities) {
 			// the grammar requires there be at least two tags
 			Iterator<Tag> it = inequality.iterator();
@@ -147,9 +152,7 @@ public class ActionSorter {
 				List<Action> sources = actionList.getActions(previousTag);
 				List<Action> targets = actionList.getActions(tag);
 				for (Action source : sources) {
-					graph.addVertex(source);
 					for (Action target : targets) {
-						graph.addVertex(target);
 						graph.addEdge(source, target);
 					}
 				}

@@ -153,8 +153,8 @@ public class Frontend {
 				// prints FSM after priorities have been applied
 				ActionScheduler scheduler = actor.getActionScheduler();
 				if (scheduler.hasFsm()) {
-					fileName = outputFolder + File.separator + "fsm2_"
-							+ actor.getName() + ".dot";
+					fileName = outputFolder + File.separator + "fsm_"
+							+ actor.getName() + "_2.dot";
 					scheduler.getFsm().printGraph(fileName);
 				}
 
