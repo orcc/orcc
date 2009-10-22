@@ -80,6 +80,11 @@ public class FSM {
 			return targetState;
 		}
 
+		@Override
+		public String toString() {
+			return "(" + action + ") --> " + targetState;
+		}
+
 	}
 
 	/**
@@ -186,6 +191,18 @@ public class FSM {
 
 		public State getSourceState() {
 			return sourceState;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			for (NextStateInfo info : nextStateInfo) {
+				builder.append(sourceState);
+				builder.append(' ');
+				builder.append(info.toString());
+				builder.append('\n');
+			}
+			return builder.toString();
 		}
 
 	}
@@ -321,7 +338,7 @@ public class FSM {
 	 * @throws OrccException
 	 *             if something goes wrong (most probably I/O error)
 	 */
-	public void printFSMGraph(String fileName) throws OrccException {
+	public void printGraph(String fileName) throws OrccException {
 		try {
 			OutputStream out = new FileOutputStream(fileName);
 			DOTExporter<State, Action> exporter = new DOTExporter<State, Action>(
@@ -341,6 +358,20 @@ public class FSM {
 	 */
 	public void setInitialState(String state) {
 		initialState = addState(state);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("schedule fsm ");
+		builder.append(initialState);
+		builder.append(" : \n");
+		for (Transition transition : transitions) {
+			builder.append(transition.toString());
+			builder.append('\n');
+		}
+		builder.append("end");
+		return builder.toString();
 	}
 
 }

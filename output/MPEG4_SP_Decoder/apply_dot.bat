@@ -1,0 +1,1 @@
+for %%f in (src\*.dot) do dot -Tpng -o %%f.png %%f

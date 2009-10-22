@@ -145,12 +145,17 @@ public class Frontend {
 						+ actor.getName() + ".dot";
 				parser.printPriorityGraph(fileName);
 
-				// prints priority graph
+				// prints FSM
+				fileName = outputFolder + File.separator + "fsm_"
+						+ actor.getName() + ".dot";
+				parser.printFSMGraph(fileName);
+
+				// prints FSM after priorities have been applied
 				ActionScheduler scheduler = actor.getActionScheduler();
 				if (scheduler.hasFsm()) {
-					fileName = outputFolder + File.separator + "fsm_"
+					fileName = outputFolder + File.separator + "fsm2_"
 							+ actor.getName() + ".dot";
-					scheduler.getFsm().printFSMGraph(fileName);
+					scheduler.getFsm().printGraph(fileName);
 				}
 
 				new ActorWriter(actor).write(outputFolder.toString());
@@ -159,5 +164,4 @@ public class Frontend {
 			}
 		}
 	}
-
 }

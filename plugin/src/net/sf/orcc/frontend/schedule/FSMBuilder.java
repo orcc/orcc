@@ -30,15 +30,27 @@ package net.sf.orcc.frontend.schedule;
 
 import static net.sf.orcc.frontend.parser.Util.parseActionTag;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.FSM;
 import net.sf.orcc.ir.actor.Tag;
 import net.sf.orcc.util.ActionList;
 
 import org.antlr.runtime.tree.Tree;
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.StringEdgeNameProvider;
+import org.jgrapht.ext.StringNameProvider;
 import org.jgrapht.graph.DirectedMultigraph;
 
 /**
@@ -48,6 +60,8 @@ import org.jgrapht.graph.DirectedMultigraph;
  * 
  */
 public class FSMBuilder {
+
+	private Map<Action, Integer> actionRank;
 
 	private DirectedGraph<String, Tag> graph;
 
@@ -66,20 +80,104 @@ public class FSMBuilder {
 	}
 
 	/**
+	 * Add transitions from source to each (action, state) couple from targets.
+	 * The transitions are ordered by descending priority of the actions.
 	 * 
-	 * @param actions
-	 * @return
+	 * @param fsm
+	 *            the FSM being created
+	 * @param source
+	 *            source state
+	 * @param targets
+	 *            an (action, state) map of targets
 	 */
-	public FSM buildFSM(ActionList actions) {
-		Set<String> states = new TreeSet<String>(graph.vertexSet());
-		FSM fsm = new FSM();
-		for (String state : states) {
-			fsm.addState(state);
+	private void addTransitions(FSM fsm, String source,
+			Map<Action, String> targets) {
+		// Note: The higher the priority the lower the rank
+		List<Action> nextActions = new ArrayList<Action>(targets.keySet());
+		Collections.sort(nextActions, new Comparator<Action>() {
+
+			@Override
+			public int compare(Action a1, Action a2) {
+				// compare the ranks
+				return actionRank.get(a1).compareTo(actionRank.get(a2));
+			}
+
+		});
+
+		// add the transitions in the right order
+		for (Action action : nextActions) {
+			String target = targets.get(action);
+			fsm.addTransition(source, target, action);
+		}
+	}
+
+	/**
+	 * Builds an FSM from the FSM graph and the given sorted action list. The
+	 * action list must be obtained from the ActionSorter.
+	 * 
+	 * @param actionList
+	 *            a sorted action list
+	 * @return an FSM
+	 */
+	public FSM buildFSM(ActionList actionList) {
+		actionRank = new HashMap<Action, Integer>();
+		int rank = 0;
+		for (Action action : actionList) {
+			actionRank.put(action, rank++);
 		}
 
+		Set<String> states = new TreeSet<String>(graph.vertexSet());
+		FSM fsm = new FSM();
+
+		// adds states by alphabetical order
+		for (String source : states) {
+			fsm.addState(source);
+		}
+
+		// adds transitions
+		for (String source : states) {
+			Map<Action, String> targets = getTargets(fsm, source, actionList);
+			addTransitions(fsm, source, targets);
+		}
+
+		// set initial state
 		fsm.setInitialState(initialState);
 
 		return fsm;
+	}
+
+	/**
+	 * Returns an (action, target state) map. The map is created as follows:
+	 * 
+	 * <pre>
+	 * for each outgoing edge of source
+	 *   let &quot;tag&quot; be the edge label
+	 *   let &quot;target&quot; be the edge target
+	 *   let &quot;actions&quot; be the list of actions matching &quot;tag&quot;
+	 *   for each action in &quot;actions&quot;
+	 *     add (action, target) to the map
+	 * </pre>
+	 * 
+	 * @param fsm
+	 *            the FSM being created
+	 * @param source
+	 *            source state
+	 * @param actionList
+	 *            a list of actions
+	 * @return an (action, target state) map
+	 */
+	private Map<Action, String> getTargets(FSM fsm, String source,
+			ActionList actionList) {
+		Map<Action, String> targets = new HashMap<Action, String>();
+		Set<Tag> tags = graph.outgoingEdgesOf(source);
+		for (Tag tag : tags) {
+			String target = graph.getEdgeTarget(tag);
+			List<Action> actions = actionList.getActions(tag);
+			for (Action action : actions) {
+				targets.put(action, target);
+			}
+		}
+		return targets;
 	}
 
 	/**
@@ -100,6 +198,19 @@ public class FSMBuilder {
 			graph.addVertex(target);
 			graph.addEdge(source, target, tag);
 		}
+	}
+
+	/**
+	 * Prints the graph representation built.
+	 * 
+	 * @param out
+	 *            output stream
+	 */
+	public void printGraph(OutputStream out) {
+		DOTExporter<String, Tag> exporter = new DOTExporter<String, Tag>(
+				new StringNameProvider<String>(), null,
+				new StringEdgeNameProvider<Tag>());
+		exporter.export(new OutputStreamWriter(out), graph);
 	}
 
 }
