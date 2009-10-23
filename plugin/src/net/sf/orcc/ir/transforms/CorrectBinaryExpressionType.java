@@ -107,7 +107,7 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 			BinaryExpr expr = (BinaryExpr) value;
 			IType type = checkType(expr);
 			expr.setType(type);
-			node.getVar().setType(type);
+			node.getTarget().setType(type);
 		}
 	}
 

@@ -33,20 +33,23 @@ import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
+ * This class defines an Assign node.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class AssignVarNode extends AbstractNode {
+public class AssignVarNode extends AbstractNode implements ITargetContainer,
+		IValueContainer {
+
+	private LocalVariable target;
 
 	private IExpr value;
 
-	private LocalVariable var;
-
-	public AssignVarNode(int id, Location location, LocalVariable var,
+	public AssignVarNode(int id, Location location, LocalVariable target,
 			IExpr value) {
 		super(id, location);
-		this.var = var;
-		this.value = value;
+		setTarget(target);
+		setValue(value);
 	}
 
 	@Override
@@ -54,20 +57,39 @@ public class AssignVarNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
+	@Override
+	public LocalVariable getTarget() {
+		return target;
+	}
+
+	@Override
 	public IExpr getValue() {
 		return value;
 	}
 
-	public LocalVariable getVar() {
-		return var;
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
 	}
 
+	@Override
+	public void setTargetSimple(LocalVariable target) {
+		this.target = target;
+	}
+
+	@Override
 	public void setValue(IExpr value) {
+		CommonNodeOperations.setValue(this, value);
+	}
+
+	@Override
+	public void setValueSimple(IExpr value) {
 		this.value = value;
 	}
 
-	public void setVar(LocalVariable var) {
-		this.var = var;
+	@Override
+	public String toString() {
+		return target + " = " + getValue();
 	}
 
 }

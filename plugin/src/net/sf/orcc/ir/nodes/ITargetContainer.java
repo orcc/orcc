@@ -29,31 +29,36 @@
 package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
 
 /**
- * This class defines a Peek node.
+ * This interface defines a node that has a target local variable.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class PeekNode extends AbstractFifoNode {
+public interface ITargetContainer {
 
-	public PeekNode(int id, Location location, Port port, int numTokens,
-			LocalVariable varDef) {
-		super(id, location, port, numTokens, varDef);
-	}
+	/**
+	 * Returns the target of this node.
+	 * 
+	 * @return the target of this node
+	 */
+	public LocalVariable getTarget();
 
-	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
+	/**
+	 * Sets the target of this node. Uses are updated to point to this node.
+	 * 
+	 * @param target
+	 *            a local variable
+	 */
+	public void setTarget(LocalVariable target);
 
-	@Override
-	public String toString() {
-		return getTarget() + " = peek(" + getPort() + ", " + getNumTokens()
-				+ ")";
-	}
+	/**
+	 * Sets the target of this node without updating the use list.
+	 * 
+	 * @param target
+	 *            a local variable
+	 */
+	public void setTargetSimple(LocalVariable target);
 
 }

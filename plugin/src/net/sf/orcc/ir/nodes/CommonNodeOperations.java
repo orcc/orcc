@@ -29,31 +29,61 @@
 package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Use;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
- * This class defines a Peek node.
+ * This class defines operations common to nodes.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class PeekNode extends AbstractFifoNode {
+public class CommonNodeOperations {
 
-	public PeekNode(int id, Location location, Port port, int numTokens,
-			LocalVariable varDef) {
-		super(id, location, port, numTokens, varDef);
+	/**
+	 * Sets the local variable assigned by this node. Uses are updated to point
+	 * to this node.
+	 * 
+	 * @param node
+	 *            an {@link AbstractNode} that implements
+	 *            {@link ITargetContainer}
+	 * @param target
+	 *            a local variable
+	 */
+	public static void setTarget(ITargetContainer node,
+			LocalVariable target) {
+		LocalVariable thisTarget = node.getTarget();
+		if (thisTarget != null) {
+			thisTarget.removeUse((AbstractNode) node);
+		}
+
+		if (target != null) {
+			target.addUse((AbstractNode) node);
+		}
+
+		node.setTargetSimple(target);
 	}
 
-	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
+	/**
+	 * Sets the value of this node. Uses are updated to point to this node.
+	 * 
+	 * @param node
+	 *            an {@link AbstractNode} that implements
+	 *            {@link IValueContainer}
+	 * @param value
+	 *            an expression
+	 */
+	public static void setValue(IValueContainer node, IExpr value) {
+		IExpr thisValue = node.getValue();
+		if (thisValue != null) {
+			Use.removeUses((AbstractNode) node, thisValue);
+		}
 
-	@Override
-	public String toString() {
-		return getTarget() + " = peek(" + getPort() + ", " + getNumTokens()
-				+ ")";
+		if (value != null) {
+			Use.addUses((AbstractNode) node, value);
+		}
+
+		node.setValueSimple(value);
 	}
 
 }

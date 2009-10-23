@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.llvm.transforms;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -180,21 +179,20 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<IExpr> splitIndex(List<IExpr> indexes, Object... args) {
+	public void splitIndex(List<IExpr> indexes, Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
-		List<IExpr> tmpIndexes = new ArrayList<IExpr>();
+		ListIterator<IExpr> itIndex = indexes.listIterator();
 
-		for (IExpr index : indexes) {
+		while (itIndex.hasNext()) {
+			IExpr index = itIndex.next();
 			if (index.getType() == IExpr.BINARY) {
+				// if the index is a binary expression, replace it with a
+				// variable expression returned by splitBinaryExpr
 				VarExpr expr = splitBinaryExpr((BinaryExpr) index, it);
-				tmpIndexes.add(expr);
-			} else {
-				tmpIndexes.add(index);
+				itIndex.remove();
+				itIndex.add(expr);
 			}
 		}
-
-		return tmpIndexes;
-
 	}
 
 	@Override
@@ -216,7 +214,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 
 	private LocalVariable varDefCreate(IType type) {
 		return new LocalVariable(false, false, exprCounter++, new Location(),
-				"expr", null, null, 0, type);
+				"expr", null, 0, type);
 	}
 
 	@Override
@@ -294,7 +292,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 
 		if (!indexes.isEmpty()) {
 			it.previous();
-			node.setIndexes(splitIndex(indexes, args));
+			splitIndex(indexes, args);
 			it.next();
 		}
 	}
@@ -354,7 +352,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 		List<IExpr> indexes = node.getIndexes();
 		if (!indexes.isEmpty()) {
 			it.previous();
-			node.setIndexes(splitIndex(indexes, args));
+			splitIndex(indexes, args);
 			it.next();
 		}
 	}

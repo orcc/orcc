@@ -59,11 +59,11 @@ public class AssignPeephole extends AbstractActorTransformation {
 		if ((node.getValue().getType() == IExpr.BOOLEAN)
 				|| (node.getValue().getType() == IExpr.INT)
 				|| (node.getValue().getType() == IExpr.STRING)) {
-			LocalVariable vardef = node.getVar();
+			LocalVariable vardef = node.getTarget();
 			vardef.setConstant(node.getValue());
 			it.remove();
 		} else if (node.getValue().getType() == IExpr.VAR) {
-			LocalVariable vardef = node.getVar();
+			LocalVariable vardef = node.getTarget();
 			VarExpr expr = (VarExpr) node.getValue();
 
 			// we can safely cast because in a VarExpr in an actor, only local

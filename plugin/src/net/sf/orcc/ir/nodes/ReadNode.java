@@ -52,7 +52,7 @@ public class ReadNode extends AbstractFifoNode {
 
 	@Override
 	public String toString() {
-		return getVarDef() + " = read(" + getPort() + ", " + getNumTokens()
+		return getTarget() + " = read(" + getPort() + ", " + getNumTokens()
 				+ ")";
 	}
 

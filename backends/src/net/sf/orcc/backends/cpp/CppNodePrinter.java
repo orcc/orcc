@@ -58,7 +58,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("peekNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
@@ -73,7 +73,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
@@ -88,7 +88,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());

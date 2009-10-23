@@ -42,7 +42,7 @@ import net.sf.orcc.ir.expr.IExpr;
  * @author Matthieu Wipliez
  * 
  */
-public class LoadNode extends AbstractNode {
+public class LoadNode extends AbstractNode implements ITargetContainer {
 
 	private List<IExpr> indexes;
 
@@ -53,9 +53,9 @@ public class LoadNode extends AbstractNode {
 	public LoadNode(int id, Location location, LocalVariable target,
 			Use source, List<IExpr> indexes) {
 		super(id, location);
-		this.indexes = indexes;
-		this.source = source;
-		this.target = target;
+		setIndexes(indexes);
+		setSource(source);
+		setTarget(target);
 	}
 
 	@Override
@@ -77,24 +77,34 @@ public class LoadNode extends AbstractNode {
 		return source;
 	}
 
-	/**
-	 * Returns the target of this Load. The target is a {@link LocalVariable}.
-	 * 
-	 * @return the target of this Load
-	 */
+	@Override
 	public LocalVariable getTarget() {
 		return target;
 	}
 
 	public void setIndexes(List<IExpr> indexes) {
+		if (this.indexes != null) {
+			Use.removeUses(this, this.indexes);
+		}
 		this.indexes = indexes;
+		Use.addUses(this, indexes);
 	}
 
 	public void setSource(Use source) {
+		if (this.source != null) {
+			this.source.remove();
+		}
 		this.source = source;
+		source.setNode(this);
 	}
 
+	@Override
 	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
+	}
+
+	@Override
+	public void setTargetSimple(LocalVariable target) {
 		this.target = target;
 	}
 

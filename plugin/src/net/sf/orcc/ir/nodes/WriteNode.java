@@ -52,7 +52,7 @@ public class WriteNode extends AbstractFifoNode {
 
 	@Override
 	public String toString() {
-		return getVarDef() + " = write(" + getPort() + ", " + getNumTokens()
+		return getTarget() + " = write(" + getPort() + ", " + getNumTokens()
 				+ ")";
 	}
 

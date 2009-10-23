@@ -26,34 +26,44 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.nodes;
-
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
+package net.sf.orcc.ir.expr;
 
 /**
- * This class defines a Peek node.
+ * This class is an abstract implementation of {@link ExprVisitor}.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class PeekNode extends AbstractFifoNode {
+public abstract class AbstractExprVisitor implements ExprVisitor {
 
-	public PeekNode(int id, Location location, Port port, int numTokens,
-			LocalVariable varDef) {
-		super(id, location, port, numTokens, varDef);
+	public void visit(BinaryExpr expr, Object... args) {
+		expr.getE1().accept(this, args);
+		expr.getE2().accept(this, args);
 	}
 
-	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public void visit(BooleanExpr expr, Object... args) {
 	}
 
-	@Override
-	public String toString() {
-		return getTarget() + " = peek(" + getPort() + ", " + getNumTokens()
-				+ ")";
+	public void visit(IntExpr expr, Object... args) {
+	}
+
+	public void visit(ListExpr expr, Object... args) {
+		for (IExpr subExpr : expr.getValue()) {
+			subExpr.accept(this, args);
+		}
+	}
+
+	public void visit(StringExpr expr, Object... args) {
+	}
+
+	public void visit(TypeExpr expr, Object... args) {
+	}
+
+	public void visit(UnaryExpr expr, Object... args) {
+		expr.getExpr().accept(this, args);
+	}
+
+	public void visit(VarExpr expr, Object... args) {
 	}
 
 }

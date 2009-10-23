@@ -52,7 +52,7 @@ public class HasTokensNode extends AbstractFifoNode {
 
 	@Override
 	public String toString() {
-		return getVarDef() + " = hasTokens(" + getPort() + ", "
+		return getTarget() + " = hasTokens(" + getPort() + ", "
 				+ getNumTokens() + ")";
 	}
 

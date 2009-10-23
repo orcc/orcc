@@ -41,7 +41,7 @@ import net.sf.orcc.ir.expr.IExpr;
  * @author Matthieu Wipliez
  * 
  */
-public class StoreNode extends AbstractNode {
+public class StoreNode extends AbstractNode implements IValueContainer {
 
 	private List<IExpr> indexes;
 
@@ -52,9 +52,9 @@ public class StoreNode extends AbstractNode {
 	public StoreNode(int id, Location location, Use target,
 			List<IExpr> indexes, IExpr value) {
 		super(id, location);
-		this.indexes = indexes;
-		this.target = target;
-		this.value = value;
+		setIndexes(indexes);
+		setTarget(target);
+		setValue(value);
 	}
 
 	@Override
@@ -75,25 +75,47 @@ public class StoreNode extends AbstractNode {
 		return target;
 	}
 
+	@Override
 	public IExpr getValue() {
 		return value;
 	}
 
-	public void setIndexes(List<IExpr> indexes) {
+	/**
+	 * Sets the indexes of this store node. Uses are updated to point to this
+	 * node.
+	 * 
+	 * @param indexes
+	 *            a list of expressions
+	 */
+	private void setIndexes(List<IExpr> indexes) {
+		if (this.indexes != null) {
+			Use.removeUses(this, this.indexes);
+		}
 		this.indexes = indexes;
+		Use.addUses(this, indexes);
 	}
 
 	public void setTarget(Use target) {
+		if (this.target != null) {
+			this.target.remove();
+		}
 		this.target = target;
+		target.setNode(this);
 	}
 
+	@Override
 	public void setValue(IExpr value) {
+		CommonNodeOperations.setValue(this, value);
+	}
+
+	@Override
+	public void setValueSimple(IExpr value) {
 		this.value = value;
 	}
 
 	@Override
 	public String toString() {
-		return target.toString() + indexes + " = " + value;
+		return target.toString() + indexes + " = " + getValue();
 	}
 
 }

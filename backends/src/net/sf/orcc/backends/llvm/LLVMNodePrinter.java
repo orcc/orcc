@@ -118,7 +118,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("assignVarNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVar();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl
 				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
@@ -202,8 +202,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 		StringTemplate nodeTmpl = group.getInstanceOf("callNode");
 
-		if (node.hasRes()) {
-			LocalVariable varDef = node.getRes();
+		if (node.hasResult()) {
+			LocalVariable varDef = node.getTarget();
 			nodeTmpl.setAttribute("res", varDefPrinter.getVarDefName(varDef,
 					false));
 		}
@@ -253,7 +253,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("hasTokensNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl
 				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("actorName", actorName);
@@ -325,7 +325,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("peekNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("typevar", typeToString
 				.toString(varDef.getType()));
 		nodeTmpl
@@ -367,7 +367,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl
 				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("actorName", actorName);
@@ -479,7 +479,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	public void visit(WhileNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("whileNode");
 
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getCondition(),
+		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
 				new BoolType()));
 
 		// save current template
@@ -503,7 +503,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, true));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());

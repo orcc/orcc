@@ -34,12 +34,13 @@ import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
+ * This class defines an If node. An if node is a node with a value used in its
+ * condition.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class IfNode extends AbstractNode {
-
-	private IExpr condition;
+public class IfNode extends AbstractNode implements IValueContainer {
 
 	private List<AbstractNode> elseNodes;
 
@@ -47,23 +48,21 @@ public class IfNode extends AbstractNode {
 
 	private List<AbstractNode> thenNodes;
 
+	private IExpr value;
+
 	public IfNode(int id, Location location, IExpr condition,
 			List<AbstractNode> thenNodes, List<AbstractNode> elseNodes,
 			JoinNode joinNode) {
 		super(id, location);
-		this.condition = condition;
 		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
 		this.thenNodes = thenNodes;
+		setValue(condition);
 	}
 
 	@Override
 	public void accept(NodeVisitor visitor, Object... args) {
 		visitor.visit(this, args);
-	}
-
-	public IExpr getCondition() {
-		return condition;
 	}
 
 	public List<AbstractNode> getElseNodes() {
@@ -78,8 +77,9 @@ public class IfNode extends AbstractNode {
 		return thenNodes;
 	}
 
-	public void setCondition(IExpr condition) {
-		this.condition = condition;
+	@Override
+	public IExpr getValue() {
+		return value;
 	}
 
 	public void setJoinNode(JoinNode joinNode) {
@@ -87,8 +87,18 @@ public class IfNode extends AbstractNode {
 	}
 
 	@Override
+	public void setValue(IExpr value) {
+		CommonNodeOperations.setValue(this, value);
+	}
+
+	@Override
+	public void setValueSimple(IExpr value) {
+		this.value = value;
+	}
+
+	@Override
 	public String toString() {
-		return "if (" + condition + ")";
+		return "if (" + getValue() + ")";
 	}
 
 }

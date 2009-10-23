@@ -693,12 +693,6 @@ public class IrParser {
 		return new ReadNode(id, loc, port, numTokens, varDef);
 	}
 
-	private List<Use> parseRefs(JSONArray array) {
-		// TODO parse references
-		List<Use> refs = new ArrayList<Use>();
-		return refs;
-	}
-
 	private ReturnNode parseReturnNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		IExpr expr = parseExpr(array);
@@ -833,18 +827,13 @@ public class IrParser {
 		Integer suffix = details.isNull(3) ? null : details.getInt(3);
 		int index = details.getInt(4);
 
-		// TODO parse node in VarDef
-		// int nodeId =
-		details.getInt(5);
-
 		Location loc = parseLocation(array.getJSONArray(1));
 		IType type = parseType(array.get(2));
 
 		AbstractNode node = null;
-		List<Use> refs = parseRefs(array.getJSONArray(3));
 
 		LocalVariable varDef = new LocalVariable(assignable, global, index,
-				loc, name, node, refs, suffix, type);
+				loc, name, node, suffix, type);
 
 		// register the variable definition
 		varDefs.put(stringOfVar(name, suffix, index), varDef);
@@ -865,11 +854,6 @@ public class IrParser {
 	private Use parseVarUse(JSONArray array) throws JSONException,
 			OrccException {
 		LocalVariable varDef = getVarDef(array.getJSONArray(0));
-
-		// TODO parse node in VarUse
-		// int nodeId =
-		array.getInt(1);
-
 		return new Use(varDef, null);
 	}
 

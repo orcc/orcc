@@ -30,6 +30,7 @@ package net.sf.orcc.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
@@ -154,6 +155,22 @@ public class Variable {
 	 */
 	public List<Use> getUses() {
 		return uses;
+	}
+
+	/**
+	 * Removes the uses of this variable that reference the given node.
+	 * 
+	 * @param node
+	 *            a node
+	 */
+	public void removeUse(AbstractNode node) {
+		ListIterator<Use> it = uses.listIterator();
+		while (it.hasNext()) {
+			Use use = it.next();
+			if (use.getNode().equals(node)) {
+				it.remove();
+			}
+		}
 	}
 
 	/**

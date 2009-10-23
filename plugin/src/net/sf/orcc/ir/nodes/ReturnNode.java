@@ -32,16 +32,18 @@ import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
+ * This class defines a Return node.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class ReturnNode extends AbstractNode {
+public class ReturnNode extends AbstractNode implements IValueContainer {
 
 	private IExpr value;
 
-	public ReturnNode(int id, Location location, IExpr expr) {
+	public ReturnNode(int id, Location location, IExpr value) {
 		super(id, location);
-		this.value = expr;
+		setValue(value);
 	}
 
 	@Override
@@ -49,17 +51,24 @@ public class ReturnNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
+	@Override
 	public IExpr getValue() {
 		return value;
 	}
 
+	@Override
 	public void setValue(IExpr value) {
+		CommonNodeOperations.setValue(this, value);
+	}
+
+	@Override
+	public void setValueSimple(IExpr value) {
 		this.value = value;
 	}
 
 	@Override
 	public String toString() {
-		return "return " + value;
+		return "return " + getValue();
 	}
 
 }

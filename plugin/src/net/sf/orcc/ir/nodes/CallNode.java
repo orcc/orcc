@@ -32,27 +32,30 @@ import java.util.List;
 
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
+ * This class defines a Call node.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class CallNode extends AbstractNode {
+public class CallNode extends AbstractNode implements ITargetContainer {
 
 	private List<IExpr> parameters;
 
 	private Procedure procedure;
 
-	private LocalVariable res;
+	private LocalVariable target;
 
-	public CallNode(int id, Location location, LocalVariable res,
+	public CallNode(int id, Location location, LocalVariable target,
 			Procedure procedure, List<IExpr> parameters) {
 		super(id, location);
-		this.parameters = parameters;
+		setParameters(parameters);
+		setTarget(target);
 		this.procedure = procedure;
-		this.res = res;
 	}
 
 	@Override
@@ -68,29 +71,53 @@ public class CallNode extends AbstractNode {
 		return procedure;
 	}
 
-	public LocalVariable getRes() {
-		return res;
+	@Override
+	public LocalVariable getTarget() {
+		return target;
 	}
 
-	public boolean hasRes() {
-		return (res != null);
+	public boolean hasResult() {
+		return (getTarget() != null);
 	}
 
-	public void setParameters(List<IExpr> parameters) {
+	/**
+	 * Sets the parameters of this call node. Uses are updated to point to this
+	 * node.
+	 * 
+	 * @param parameters
+	 *            a list of expressions
+	 */
+	private void setParameters(List<IExpr> parameters) {
+		if (this.parameters != null) {
+			Use.removeUses(this, this.parameters);
+		}
 		this.parameters = parameters;
+		Use.addUses(this, parameters);
 	}
 
+	/**
+	 * Sets the procedure referenced by this call node.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
 	public void setProcedure(Procedure procedure) {
 		this.procedure = procedure;
 	}
 
-	public void setRes(LocalVariable res) {
-		this.res = res;
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
+	}
+
+	@Override
+	public void setTargetSimple(LocalVariable target) {
+		this.target = target;
 	}
 
 	@Override
 	public String toString() {
-		String str = hasRes() ? res + " = " : "";
+		String str = hasResult() ? getTarget() + " = " : "";
 		return str + procedure + "(" + parameters + ")";
 	}
 

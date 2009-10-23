@@ -97,7 +97,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("assignVarNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVar();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue()));
 
@@ -107,8 +107,8 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	@Override
 	public void visit(CallNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("callNode");
-		if (node.hasRes()) {
-			LocalVariable varDef = node.getRes();
+		if (node.hasResult()) {
+			LocalVariable varDef = node.getTarget();
 			nodeTmpl.setAttribute("res", varDefPrinter.getVarDefName(varDef));
 		}
 
@@ -140,7 +140,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("hasTokensNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
@@ -153,7 +153,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	public void visit(IfNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("ifNode");
 
-		IExpr expr = node.getCondition();
+		IExpr expr = node.getValue();
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(expr));
 
 		// save current template
@@ -222,7 +222,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("peekNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
@@ -236,7 +236,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
@@ -283,7 +283,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	@Override
 	public void visit(WhileNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("whileNode");
-		IExpr expr = node.getCondition();
+		IExpr expr = node.getValue();
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(expr));
 
 		// save current template
@@ -307,7 +307,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getVarDef();
+		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());

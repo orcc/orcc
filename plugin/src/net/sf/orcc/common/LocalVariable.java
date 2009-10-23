@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.common;
 
-import java.util.List;
-
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
@@ -78,8 +76,8 @@ public class LocalVariable extends Variable implements
 	private Integer suffix;
 
 	public LocalVariable(boolean assignable, boolean global, int index,
-			Location loc, String name, AbstractNode node,
-			List<Use> references, Integer suffix, IType type) {
+			Location loc, String name, AbstractNode node, Integer suffix,
+			IType type) {
 		super(loc, type, name);
 		this.assignable = assignable;
 		this.global = global;
@@ -195,4 +193,5 @@ public class LocalVariable extends Variable implements
 	public void setSuffix(int suffix) {
 		this.suffix = suffix;
 	}
+
 }

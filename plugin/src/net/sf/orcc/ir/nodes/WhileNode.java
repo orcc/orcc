@@ -34,32 +34,31 @@ import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.expr.IExpr;
 
 /**
+ * This class defines a While node. A while node is a node with a value used in
+ * its condition.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class WhileNode extends AbstractNode {
-
-	private IExpr condition;
+public class WhileNode extends AbstractNode implements IValueContainer {
 
 	private JoinNode joinNode;
 
 	private List<AbstractNode> nodes;
 
+	private IExpr value;
+
 	public WhileNode(int id, Location location, IExpr condition,
 			List<AbstractNode> nodes, JoinNode joinNode) {
 		super(id, location);
-		this.condition = condition;
 		this.joinNode = joinNode;
 		this.nodes = nodes;
+		setValue(condition);
 	}
 
 	@Override
 	public void accept(NodeVisitor visitor, Object... args) {
 		visitor.visit(this, args);
-	}
-
-	public IExpr getCondition() {
-		return condition;
 	}
 
 	public JoinNode getJoinNode() {
@@ -70,8 +69,9 @@ public class WhileNode extends AbstractNode {
 		return nodes;
 	}
 
-	public void setCondition(IExpr condition) {
-		this.condition = condition;
+	@Override
+	public IExpr getValue() {
+		return value;
 	}
 
 	public void setJoinNode(JoinNode joinNode) {
@@ -79,8 +79,18 @@ public class WhileNode extends AbstractNode {
 	}
 
 	@Override
+	public void setValue(IExpr value) {
+		CommonNodeOperations.setValue(this, value);
+	}
+
+	@Override
+	public void setValueSimple(IExpr value) {
+		this.value = value;
+	}
+
+	@Override
 	public String toString() {
-		return "while (" + condition + ")";
+		return "while (" + getValue() + ")";
 	}
 
 }

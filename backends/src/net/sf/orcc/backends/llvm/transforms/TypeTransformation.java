@@ -227,7 +227,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	private LocalVariable varDefCreate(IType type) {
 		return new LocalVariable(false, false, 0, new Location(), "", null,
-				null, nodeCount++, type);
+				nodeCount++, type);
 	}
 
 	/**
@@ -237,7 +237,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(AssignVarNode node, Object... args) {
-		LocalVariable varDef = node.getVar();
+		LocalVariable varDef = node.getTarget();
 
 		// Visit expr
 		node.getValue().accept(this, varDef.getType());
@@ -321,7 +321,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 		Procedure proc = node.getProcedure();
 		IType returnType = proc.getReturnType();
-		LocalVariable returnVar = node.getRes();
+		LocalVariable returnVar = node.getTarget();
 		List<LocalVariable> procParams = proc.getParameters();
 		List<IExpr> parameters = node.getParameters();
 		for (IExpr parameter : parameters) {
@@ -334,7 +334,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		if (returnVar != null) {
 			if (!returnType.equals(returnVar.getType())) {
 				LocalVariable castVar = varDefCreate(returnType);
-				node.setRes(castVar);
+				node.setTarget(castVar);
 				it.add(castNodeCreate(castVar, returnVar));
 			}
 		}

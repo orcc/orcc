@@ -28,6 +28,11 @@
  */
 package net.sf.orcc.common;
 
+import java.util.List;
+
+import net.sf.orcc.ir.expr.AbstractExprVisitor;
+import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
 
 /**
@@ -37,6 +42,120 @@ import net.sf.orcc.ir.nodes.AbstractNode;
  * 
  */
 public class Use {
+
+	/**
+	 * This class adds uses of variables used in a given node.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private static class UseAdder extends AbstractExprVisitor {
+
+		private AbstractNode node;
+
+		/**
+		 * Creates a new use adder with the given node.
+		 * 
+		 * @param node
+		 *            a node
+		 */
+		public UseAdder(AbstractNode node) {
+			this.node = node;
+		}
+
+		@Override
+		public void visit(VarExpr expr, Object... args) {
+			Use use = expr.getVar();
+			use.setNode(node);
+		}
+
+	}
+
+	/**
+	 * This class removes uses of variables used in a given node.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private static class UseRemover extends AbstractExprVisitor {
+
+		private AbstractNode node;
+
+		/**
+		 * Creates a new use remover with the given node.
+		 * 
+		 * @param node
+		 *            a node
+		 */
+		public UseRemover(AbstractNode node) {
+			this.node = node;
+		}
+
+		@Override
+		public void visit(VarExpr expr, Object... args) {
+			Use use = expr.getVar();
+			if (use.getNode().equals(node)) {
+				use.remove();
+			}
+		}
+
+	}
+
+	/**
+	 * Visits the given expression, and sets the node of all uses to the given
+	 * node.
+	 * 
+	 * @param node
+	 *            a node
+	 * @param value
+	 *            an expression
+	 */
+	public static void addUses(AbstractNode node, IExpr value) {
+		value.accept(new UseAdder(node));
+	}
+
+	/**
+	 * Visits the given expressions, and sets the node of all uses to the given
+	 * node.
+	 * 
+	 * @param node
+	 *            a node
+	 * @param values
+	 *            a list of expressions
+	 */
+	public static void addUses(AbstractNode node, List<IExpr> values) {
+		for (IExpr value : values) {
+			addUses(node, value);
+		}
+	}
+
+	/**
+	 * Visits the given expression, and removes the uses that reference the
+	 * given node.
+	 * 
+	 * @param node
+	 *            a node
+	 * @param value
+	 *            an expression
+	 */
+	public static void removeUses(AbstractNode node, IExpr value) {
+		value.accept(new UseRemover(node));
+	}
+
+	/**
+	 * Visits the given expressions, and removes the uses that reference the
+	 * given node.
+	 * 
+	 * @param node
+	 *            a node
+	 * @param values
+	 *            a list of expressions
+	 */
+	public static void removeUses(AbstractNode node, List<IExpr> values) {
+		for (IExpr value : values) {
+			removeUses(node, value);
+		}
+	}
 
 	/**
 	 * the node where the variable referenced is used. May be <code>null</code>
@@ -89,6 +208,13 @@ public class Use {
 	 */
 	public Variable getVariable() {
 		return variable;
+	}
+
+	/**
+	 * Removes this variable use from the variable referenced.
+	 */
+	public void remove() {
+		getVariable().removeUse(this);
 	}
 
 	/**

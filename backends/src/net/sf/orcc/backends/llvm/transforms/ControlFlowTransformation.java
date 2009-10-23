@@ -82,7 +82,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 		// Get IfNode attributes
 		int id = node.getId();
 		Location location = node.getLocation();
-		IExpr condition = node.getCondition();
+		IExpr condition = node.getValue();
 		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
 		List<AbstractNode> thenNodes = node.getThenNodes();
 		List<AbstractNode> elseNodes = node.getElseNodes();
@@ -167,7 +167,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 		// Get whileNode information
 		int id = node.getId();
 		Location location = node.getLocation();
-		IExpr condition = node.getCondition();
+		IExpr condition = node.getValue();
 		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
 		List<AbstractNode> thenNodes = node.getNodes();
 		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
@@ -206,7 +206,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 
 	// Remove ifNode in case of a constant condition
 	private List<AbstractNode> clearIfNode(IfNode node) {
-		BooleanExpr condition = (BooleanExpr) node.getCondition();
+		BooleanExpr condition = (BooleanExpr) node.getValue();
 		List<AbstractNode> nodes;
 		List<PhiAssignment> phis = node.getJoinNode().getPhis();
 		boolean value = condition.getValue();
@@ -279,7 +279,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 	private SelectNode selectNodeCreate(IfNode node) {
 		int id = node.getId();
 		Location location = node.getLocation();
-		IExpr condition = node.getCondition();
+		IExpr condition = node.getValue();
 		JoinNode joinNode = node.getJoinNode();
 		List<PhiAssignment> phis = joinNode.getPhis();
 
@@ -315,7 +315,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 			SelectNode selectNode = selectNodeCreate(node);
 			it.remove();
 			it.add(selectNode);
-		} else if (node.getCondition().getType() == IExpr.BOOLEAN) {
+		} else if (node.getValue().getType() == IExpr.BOOLEAN) {
 			List<AbstractNode> brNodes = clearIfNode(node);
 			it.remove();
 			for (AbstractNode brNode : brNodes) {

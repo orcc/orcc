@@ -39,22 +39,21 @@ import net.sf.orcc.common.Port;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractFifoNode extends AbstractNode {
+public abstract class AbstractFifoNode extends AbstractNode implements
+		ITargetContainer {
 
 	private int numTokens;
 
 	private Port port;
 
-	private LocalVariable varDef;
+	private LocalVariable target;
 
 	public AbstractFifoNode(int id, Location location, Port port,
-			int numTokens, LocalVariable varDef) {
+			int numTokens, LocalVariable target) {
 		super(id, location);
 		this.numTokens = numTokens;
-		this.port = port;
-		port.addUse(this);
-		this.varDef = varDef;
-		varDef.addUse(this);
+		setPort(port);
+		setTarget(target);
 	}
 
 	public int getNumTokens() {
@@ -65,8 +64,9 @@ public abstract class AbstractFifoNode extends AbstractNode {
 		return port;
 	}
 
-	public LocalVariable getVarDef() {
-		return varDef;
+	@Override
+	public LocalVariable getTarget() {
+		return target;
 	}
 
 	public void setNumTokens(int numTokens) {
@@ -74,16 +74,26 @@ public abstract class AbstractFifoNode extends AbstractNode {
 	}
 
 	public void setPort(Port port) {
+		if (this.port != null) {
+			port.removeUse(this);
+		}
 		this.port = port;
+		port.addUse(this);
 	}
 
-	public void setVar(LocalVariable varDef) {
-		this.varDef = varDef;
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
+	}
+
+	@Override
+	public void setTargetSimple(LocalVariable target) {
+		this.target = target;
 	}
 
 	@Override
 	public String toString() {
-		return varDef + " = read(" + port + ", " + numTokens + ")";
+		return getTarget() + " = read(" + port + ", " + numTokens + ")";
 	}
 
 }

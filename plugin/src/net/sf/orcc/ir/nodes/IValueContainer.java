@@ -28,32 +28,37 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
+import net.sf.orcc.ir.expr.IExpr;
 
 /**
- * This class defines a Peek node.
+ * This interface defines a node that contains or uses a value.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class PeekNode extends AbstractFifoNode {
+public interface IValueContainer {
 
-	public PeekNode(int id, Location location, Port port, int numTokens,
-			LocalVariable varDef) {
-		super(id, location, port, numTokens, varDef);
-	}
+	/**
+	 * Returns the value of this node.
+	 * 
+	 * @return the value of this node
+	 */
+	public IExpr getValue();
 
-	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
+	/**
+	 * Sets the value of this node. Uses are updated to point to this node.
+	 * 
+	 * @param value
+	 *            an expression
+	 */
+	public void setValue(IExpr value);
 
-	@Override
-	public String toString() {
-		return getTarget() + " = peek(" + getPort() + ", " + getNumTokens()
-				+ ")";
-	}
+	/**
+	 * Sets the value of this node without updating the use list.
+	 * 
+	 * @param value
+	 *            an expression
+	 */
+	public void setValueSimple(IExpr value);
 
 }

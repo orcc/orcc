@@ -65,7 +65,7 @@ public class BrNode extends AbstractLLVMNode {
 			LabelNode labelFalseNode, LabelNode labelEndNode) {
 		super(node.getId(), node.getLocation());
 		this.conditionNodes = new ArrayList<AbstractNode>();
-		this.condition = node.getCondition();
+		this.condition = node.getValue();
 		this.elseNodes = node.getElseNodes();
 		this.thenNodes = node.getThenNodes();
 		this.labelEntryNode = labelEntryNode;
