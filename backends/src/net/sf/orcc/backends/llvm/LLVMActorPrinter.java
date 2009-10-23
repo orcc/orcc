@@ -43,7 +43,7 @@ import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
@@ -142,12 +142,6 @@ public class LLVMActorPrinter {
 		return procTmpl;
 	}
 
-	private void fillPorts(List<String> portNames, OrderedMap<Port> ports) {
-		for (Port port : ports) {
-			portNames.add(port.getName());
-		}
-	}
-
 	/**
 	 * Prints the given actor to a file whose name is given.
 	 * 
@@ -158,14 +152,7 @@ public class LLVMActorPrinter {
 	 * @throws IOException
 	 */
 	public void printActor(String fileName, Actor actor) throws IOException {
-
 		template = group.getInstanceOf("actor");
-
-		// fill port names list
-		List<String> ports = new ArrayList<String>();
-		fillPorts(ports, actor.getInputs());
-		fillPorts(ports, actor.getOutputs());
-		varDefPrinter.setPortList(ports);
 
 		setAttributes(actor);
 
@@ -241,23 +228,21 @@ public class LLVMActorPrinter {
 		}
 	}
 
-	private void setStateVars(List<StateVar> stateVars) {
-		for (StateVar stateVar : stateVars) {
+	private void setStateVars(List<StateVariable> stateVars) {
+		for (StateVariable stateVar : stateVars) {
 			StringTemplate stateTempl = group.getInstanceOf("stateVar");
 			template.setAttribute("stateVars", stateTempl);
 
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar
-					.getDef());
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar);
 			stateTempl.setAttribute("vardef", varDefMap);
 
 			// initial value of state var (if any)
 			if (stateVar.hasInit()) {
-				LocalVariable varDef = stateVar.getDef();
 				constPrinter.setTemplate(stateTempl);
 
 				if (stateVar.getInit() instanceof ListConst) {
 					stateVar.getInit().accept(constPrinter,
-							((PointType) varDef.getType()).getElementType());
+							((PointType) stateVar.getType()).getElementType());
 				} else {
 					stateVar.getInit().accept(constPrinter);
 				}

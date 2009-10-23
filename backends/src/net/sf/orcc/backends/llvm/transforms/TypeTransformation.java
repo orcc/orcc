@@ -57,7 +57,7 @@ import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -549,12 +549,10 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		visitNodes(proc.getNodes());
 	}
 
-	private void visitStateVars(List<StateVar> stateVars) {
-		for (StateVar stateVar : stateVars) {
-			LocalVariable vardef = stateVar.getDef();
-
-			PointType newType = new PointType(vardef.getType());
-			vardef.setType(newType);
+	private void visitStateVars(List<StateVariable> stateVars) {
+		for (StateVariable stateVar : stateVars) {
+			PointType newType = new PointType(stateVar.getType());
+			stateVar.setType(newType);
 		}
 	}
 

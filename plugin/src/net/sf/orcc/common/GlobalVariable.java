@@ -47,7 +47,7 @@ public class GlobalVariable extends Variable {
 	/**
 	 * variable constant value.
 	 */
-	private IConst constantValue;
+	protected IConst constantValue;
 
 	/**
 	 * variable value

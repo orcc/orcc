@@ -41,7 +41,7 @@ import net.sf.orcc.common.Port;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.util.OrderedMap;
@@ -140,12 +140,6 @@ public class CActorPrinter {
 		return procTmpl;
 	}
 
-	private void fillPorts(List<String> portNames, OrderedMap<Port> ports) {
-		for (Port port : ports) {
-			portNames.add(port.getName());
-		}
-	}
-
 	/**
 	 * Prints the given actor to a file whose name is given.
 	 * 
@@ -157,12 +151,6 @@ public class CActorPrinter {
 	 */
 	public void printActor(String fileName, Actor actor) throws IOException {
 		template = group.getInstanceOf("actor");
-
-		// fill port names list
-		List<String> ports = new ArrayList<String>();
-		fillPorts(ports, actor.getInputs());
-		fillPorts(ports, actor.getOutputs());
-		varDefPrinter.setPortList(ports);
 
 		setAttributes(actor);
 
@@ -222,13 +210,12 @@ public class CActorPrinter {
 		}
 	}
 
-	private void setStateVars(List<StateVar> stateVars) {
-		for (StateVar stateVar : stateVars) {
+	private void setStateVars(List<StateVariable> stateVars) {
+		for (StateVariable stateVar : stateVars) {
 			StringTemplate stateTempl = group.getInstanceOf("stateVar");
 			template.setAttribute("stateVars", stateTempl);
 
-			LocalVariable varDef = stateVar.getDef();
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(varDef);
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar);
 			stateTempl.setAttribute("vardef", varDefMap);
 
 			// initial value of state var (if any)

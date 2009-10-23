@@ -63,11 +63,11 @@ public class Actor {
 
 	private OrderedMap<Procedure> procs;
 
-	private List<StateVar> stateVars;
+	private List<StateVariable> stateVars;
 
 	public Actor(String name, String file, List<LocalVariable> parameters,
 			OrderedMap<Port> inputs, OrderedMap<Port> outputs,
-			List<StateVar> stateVars, OrderedMap<Procedure> procs,
+			List<StateVariable> stateVars, OrderedMap<Procedure> procs,
 			List<Action> actions, List<Action> initializes,
 			ActionScheduler scheduler, List<Procedure> instantations) {
 		this.actions = actions;
@@ -160,7 +160,7 @@ public class Actor {
 		return procs;
 	}
 
-	public List<StateVar> getStateVars() {
+	public List<StateVariable> getStateVars() {
 		return stateVars;
 	}
 

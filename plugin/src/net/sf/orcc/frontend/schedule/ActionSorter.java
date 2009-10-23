@@ -34,6 +34,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.actor.Action;
+import net.sf.orcc.ir.actor.Tag;
+import net.sf.orcc.util.ActionList;
+
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.ext.DOTExporter;
@@ -41,11 +46,6 @@ import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Tag;
-import net.sf.orcc.util.ActionList;
 
 /**
  * This class defines a function to sort actions based on the priorities

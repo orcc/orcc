@@ -29,10 +29,10 @@
 package net.sf.orcc.backends.c;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Port;
 import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.NameTransformer;
 
@@ -44,8 +44,6 @@ import net.sf.orcc.ir.NameTransformer;
 public class VarDefPrinter {
 
 	private ListSizePrinter listSizePrinter;
-
-	private List<String> ports;
 
 	private TypeToString typeVisitor;
 
@@ -62,7 +60,7 @@ public class VarDefPrinter {
 	 *            a variable definition
 	 * @return a string template
 	 */
-	public Map<String, Object> applyVarDef(LocalVariable varDef) {
+	public Map<String, Object> applyVarDef(Variable varDef) {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
 		varDefMap.put("name", getVarDefName(varDef));
 		varDefMap.put("type", typeVisitor.toString(varDef.getType()));
@@ -71,7 +69,7 @@ public class VarDefPrinter {
 		varDef.getType().accept(listSizePrinter);
 
 		varDefMap.put("size", listSizePrinter.getSize());
-		varDefMap.put("isPort", ports.contains(varDef.getName()));
+		varDefMap.put("isPort", varDef instanceof Port);
 
 		return varDefMap;
 	}
@@ -103,7 +101,4 @@ public class VarDefPrinter {
 		return name;
 	}
 
-	public void setPortList(List<String> ports) {
-		this.ports = ports;
-	}
 }

@@ -96,7 +96,7 @@ import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.FSM;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.actor.Tag;
 import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.BoolConst;
@@ -265,7 +265,7 @@ public class IrParser {
 			outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
 
 			JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
-			List<StateVar> stateVars = parseStateVars(array);
+			List<StateVariable> stateVars = parseStateVars(array);
 
 			array = obj.getJSONArray(KEY_PROCEDURES);
 			for (int i = 0; i < array.length(); i++) {
@@ -703,18 +703,19 @@ public class IrParser {
 	}
 
 	/**
-	 * Parses the given list as a list of state variables. A {@link StateVar} is
-	 * a {@link LocalVariable} with an optional reference to an
-	 * {@link AbstractConst} that contain the variable's initial value.
+	 * Parses the given list as a list of state variables. A
+	 * {@link StateVariable} is a {@link LocalVariable} with an optional
+	 * reference to an {@link AbstractConst} that contain the variable's initial
+	 * value.
 	 * 
 	 * @param list
 	 *            A list of YAML-encoded {@link LocalVariable}.
-	 * @return A {@link List}&lt;{@link StateVar}&gt;.
+	 * @return A {@link List}&lt;{@link StateVariable}&gt;.
 	 * @throws JSONException
 	 */
-	private List<StateVar> parseStateVars(JSONArray array)
+	private List<StateVariable> parseStateVars(JSONArray array)
 			throws JSONException, OrccException {
-		List<StateVar> stateVars = new ArrayList<StateVar>();
+		List<StateVariable> stateVars = new ArrayList<StateVariable>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray varDefArray = array.getJSONArray(i);
 			LocalVariable def = parseVarDef(varDefArray.getJSONArray(0));
@@ -723,7 +724,8 @@ public class IrParser {
 				init = parseConstant(varDefArray.get(1));
 			}
 
-			StateVar stateVar = new StateVar(def, init);
+			StateVariable stateVar = new StateVariable(def.getLocation(), def
+					.getType(), def.getName(), init);
 			stateVars.add(stateVar);
 		}
 

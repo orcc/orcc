@@ -98,11 +98,6 @@ public class Tag implements Comparable<Tag>, Iterable<String> {
 		}
 	}
 
-	@Override
-	public int hashCode() {
-		return identifiers.hashCode();
-	}
-
 	/**
 	 * Returns the identifier at the given index.
 	 * 
@@ -112,6 +107,11 @@ public class Tag implements Comparable<Tag>, Iterable<String> {
 	 */
 	public String get(int index) {
 		return identifiers.get(index);
+	}
+
+	@Override
+	public int hashCode() {
+		return identifiers.hashCode();
 	}
 
 	/**

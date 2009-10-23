@@ -28,42 +28,45 @@
  */
 package net.sf.orcc.ir.actor;
 
-import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.GlobalVariable;
+import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.consts.IConst;
+import net.sf.orcc.ir.type.IType;
 
 /**
+ * This class represents a state variable. A state variable is a global variable
+ * that can be assigned.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class StateVar {
+public class StateVariable extends GlobalVariable {
 
-	private LocalVariable def;
-
-	private IConst init;
-
-	public StateVar(LocalVariable def, IConst init) {
-		this.def = def;
-		this.init = init;
-	}
-
-	public LocalVariable getDef() {
-		return def;
+	/**
+	 * Creates a new state variable with the given location, type, name and
+	 * initial value.
+	 * 
+	 * @param location
+	 *            the state variable location
+	 * @param type
+	 *            the state variable type
+	 * @param name
+	 *            the state variable name
+	 * @param value
+	 *            initial value
+	 */
+	public StateVariable(Location location, IType type, String name,
+			IConst value) {
+		super(location, type, name);
+		this.constantValue = value;
 	}
 
 	public IConst getInit() {
-		return init;
+		return constantValue;
 	}
 
 	public boolean hasInit() {
-		return (init != null);
-	}
-
-	public void setDef(LocalVariable def) {
-		this.def = def;
-	}
-
-	public void setInit(IConst init) {
-		this.init = init;
+		return (constantValue != null);
 	}
 
 }

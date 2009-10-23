@@ -41,6 +41,17 @@ import org.antlr.runtime.tree.Tree;
  */
 public final class Util {
 
+	public static Tag parseActionTag(Tree tree) {
+		int n = tree.getChildCount();
+		Tag tag = new Tag(n);
+		for (int i = 0; i < n; i++) {
+			Tree child = tree.getChild(i);
+			tag.add(child.getText());
+		}
+
+		return tag;
+	}
+
 	/**
 	 * Returns a location from a tree that contains a real token.
 	 * 
@@ -54,17 +65,6 @@ public final class Util {
 		int endColumn = startColumn + tree.getText().length();
 
 		return new Location(lineNumber, startColumn, endColumn);
-	}
-
-	public static Tag parseActionTag(Tree tree) {
-		int n = tree.getChildCount();
-		Tag tag = new Tag(n);
-		for (int i = 0; i < n; i++) {
-			Tree child = tree.getChild(i);
-			tag.add(child.getText());
-		}
-
-		return tag;
 	}
 
 }

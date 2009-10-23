@@ -42,7 +42,7 @@ import net.sf.orcc.backends.java.JavaTypePrinter;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
@@ -149,11 +149,11 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 		setStateVariables(actor.getStateVars());
 	}
 
-	private void setStateVariables(List<StateVar> stateVars) {
+	private void setStateVariables(List<StateVariable> stateVars) {
 		Map<String, TypeVisitor> vars = new TreeMap<String, TypeVisitor>();
-		for (StateVar var : stateVars) {
-			String name = var.getDef().getName();
-			IType type = var.getDef().getType();
+		for (StateVariable var : stateVars) {
+			String name = var.getName();
+			IType type = var.getType();
 			vars.put(name, new TypeConstructor(type));
 		}
 

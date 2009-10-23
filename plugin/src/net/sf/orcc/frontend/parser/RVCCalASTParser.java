@@ -42,6 +42,7 @@ import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.frontend.schedule.ActionSorter;
@@ -51,7 +52,7 @@ import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.FSM;
 import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.actor.StateVar;
+import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.actor.Tag;
 import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.expr.IExpr;
@@ -93,7 +94,7 @@ public class RVCCalASTParser {
 	/**
 	 * Contains the current scope of variables
 	 */
-	private Scope<LocalVariable> currentScope;
+	private Scope<Variable> currentScope;
 
 	/**
 	 * expression parser.
@@ -144,7 +145,7 @@ public class RVCCalASTParser {
 	/**
 	 * list of state variables
 	 */
-	private List<StateVar> stateVars;
+	private List<StateVariable> stateVars;
 
 	/**
 	 * creates a new parser from the given file name.
@@ -203,7 +204,7 @@ public class RVCCalASTParser {
 	 */
 	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
-		currentScope = new Scope<LocalVariable>();
+		currentScope = new Scope<Variable>();
 
 		actions = new ActionList();
 		parameters = parseVarDefs(currentScope, tree.getChild(2));
@@ -211,7 +212,7 @@ public class RVCCalASTParser {
 		inputs = parsePorts(tree.getChild(3));
 		outputs = parsePorts(tree.getChild(4));
 		priorities = new ArrayList<List<Tag>>();
-		stateVars = new ArrayList<StateVar>();
+		stateVars = new ArrayList<StateVariable>();
 
 		parseActorDecls(tree.getChild(5));
 
@@ -233,7 +234,7 @@ public class RVCCalASTParser {
 	 */
 	private void parseActorDecls(Tree actorDecls) throws OrccException {
 		// actor declarations are in a new scope
-		currentScope = new Scope<LocalVariable>(currentScope);
+		currentScope = new Scope<Variable>(currentScope);
 
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
@@ -259,10 +260,9 @@ public class RVCCalASTParser {
 				fsmBuilder = new FSMBuilder(child);
 				break;
 			case RVCCalLexer.STATE_VAR: {
-				StateVar stateVar = parseStateVar(child);
-				LocalVariable varDef = stateVar.getDef();
-				currentScope.register(file, varDef.getLocation(), varDef
-						.getName(), varDef);
+				StateVariable stateVar = parseStateVar(child);
+				currentScope.register(file, stateVar.getLocation(), stateVar
+						.getName(), stateVar);
 				stateVars.add(stateVar);
 				break;
 			}
@@ -326,14 +326,15 @@ public class RVCCalASTParser {
 	private void parseProcedure(Tree tree) {
 	}
 
-	private StateVar parseStateVar(Tree stateVar) throws OrccException {
+	private StateVariable parseStateVar(Tree stateVar) throws OrccException {
 		boolean assignable = (stateVar.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
 		LocalVariable def = parseVarDef(stateVar, assignable, true, 0, null);
 		IConst init = null;
 		if (stateVar.getChildCount() == 4) {
 		}
 
-		return new StateVar(def, init);
+		return new StateVariable(def.getLocation(), def.getType(), def
+				.getName(), init);
 	}
 
 	/**
@@ -442,7 +443,7 @@ public class RVCCalASTParser {
 	 * @param tree
 	 *            a tree
 	 */
-	private List<LocalVariable> parseVarDefs(OrderedMap<LocalVariable> scope,
+	private List<LocalVariable> parseVarDefs(OrderedMap<Variable> scope,
 			Tree tree) throws OrccException {
 		List<LocalVariable> varDefs = new ArrayList<LocalVariable>();
 		int numPorts = tree.getChildCount();

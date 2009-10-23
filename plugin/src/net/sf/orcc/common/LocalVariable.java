@@ -35,6 +35,10 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
 
 /**
+ * This class represents a local variable. A local variable is a variable that
+ * can be assigned, has a SSA index, and a reference to the node where it is
+ * defined.
+ * 
  * @author Matthieu Wipliez
  * 
  */

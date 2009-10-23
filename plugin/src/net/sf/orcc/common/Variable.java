@@ -34,8 +34,8 @@ import java.util.List;
 import net.sf.orcc.ir.type.IType;
 
 /**
- * This class represents a variable. A variable has a location, a type and a
- * name.
+ * This class represents a variable. A variable has a location, a type, a name
+ * and a list of uses.
  * 
  * @author Matthieu Wipliez
  * 
