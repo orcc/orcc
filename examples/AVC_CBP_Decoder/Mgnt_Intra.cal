@@ -20,26 +20,21 @@ gorinje@gmail.com
 *****************************************************************************/
 
 actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
-uint(size=13) FirstMbInSlice, uint (size=8) Mb_Type,  		uint(size=7) PicWidthInMb, 		uint(size=13) CurrMbAddr, 
-uint(size=4) PredMode,		 uint(size=SAMPLE_SZ) EDGE, 	int(size=SAMPLE_SZ) Coef_ACR 
-==> 
-uint(size=1) Avail, 		 uint(size=4) PredMode_I,		int(size=SAMPLE_SZ) Coef_ACR_I,
-int(size=SAMPLE_SZ) Y_Left, int(size=SAMPLE_SZ) Y_Up,		int(size=SAMPLE_SZ) Y_UpLeft 
-:  
-
-	// Flag
-	uint (size = 1) mb_type_Ok := 0;
-	int Neighbourg_readFlag := 0;
-	
-	//Token value
-  	uint(size=13) mbcurr := 0;
-  	uint(size=13) first_mb_addr := 0;
-  	uint(size=1) first_mb_in_slice := 0;
-  	uint(size=7) picwidth:=0;
-  	
-  	
-	//Token counter
-	uint (size = 9) CoefAC_counter := MB_WIDTH*MB_WIDTH;
+	uint(size=13) FirstMbInSlice,
+	uint (size=8) Mb_Type,
+	uint(size=7) PicWidthInMb,
+	uint(size=13) CurrMbAddr,
+	uint(size=4) PredMode,
+	uint(size=SAMPLE_SZ) EDGE, 
+	int(size=SAMPLE_SZ) Coef_ACR 
+		==> 
+		uint(size=1) Avail,
+		uint(size=4) PredMode_I,
+		int(size=SAMPLE_SZ) Coef_ACR_I,
+		int(size=SAMPLE_SZ) Y_Left,
+		int(size=SAMPLE_SZ) Y_Up,
+		int(size=SAMPLE_SZ) Y_UpLeft 
+		:  
 	
 	//List that contains the neighbouring pixel of the current 16x16 Mb, from bottom to top then left to right 
 	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) left_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH-1)];
@@ -59,120 +54,107 @@ int(size=SAMPLE_SZ) Y_Left, int(size=SAMPLE_SZ) Y_Up,		int(size=SAMPLE_SZ) Y_UpL
   //******************************* Enable or not Prediction management ********************************************
   
   
-  //Mb_Type_NOK : Consume the token from prediction 4x4 
-  MbTypeNok:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH, PredMode:[f] repeat MB_WIDTH==>
-  guard
-  	a = 0,
-  	mb_type_Ok = 0
-  end
+	//Mb_Type_NOK : Consume the token from prediction 4x4 
+	MbTypeNOK_intra4x4:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH, PredMode:[f] repeat MB_WIDTH==>
+	guard
+		a = 0
+	end
   
-  //Mb_Type_NOK : Consume the token from inter prediction 
-  MbTypeOk:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH ==>
-  guard
-  	a = 2,
-  	mb_type_Ok = 0
-  end
+	//Mb_Type_NOK : Consume the token from inter prediction 
+	MbTypeNOK_inter:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH ==>
+	guard
+		a = 2
+	end
   
-  //Mb_Type_OK : Enable the prediction 
-  InitNeigh:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], CurrMbAddr:[d], PredMode:[v] ==> PredMode_I:[v]
-  guard
-  	a = 1,
-  	mb_type_Ok = 0,
-  	avail[0] = 0,
-  	avail[1] = 0,
-  	avail[2] = 0,
-  	CoefAC_counter = MB_WIDTH*MB_WIDTH
-  do
-  	 //Store token value
-	mbcurr := d;
-	first_mb_in_slice := b;
-	picwidth := c;
-	  	 
-  	 //Enable Manager's action
-  	 mb_type_Ok := 1;
-  	 
-  	 //Initialize counter
-  	 CoefAC_counter := 0;
-  	 
-  	 //Set read flag
-  	 Neighbourg_readFlag := 1;
-  	 
-  	 //Set 16x16 the available edge
-  	 left_16x16_avail := if (mbcurr = first_mb_in_slice) or ((mbcurr mod picwidth) = 0) then 0 else 1 end;
-	 top_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth) then 0 else 1 end;
-	 topRight_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth - 1)or (((mbcurr+1) mod picwidth) = 0) then 0 else 1 end;
-	 topLeft_16x16_avail :=  if (mbcurr - first_mb_in_slice < picwidth +1) then 0 else 1 end;
-	 
-  end
+	//Mb_Type_OK : Enable the prediction 
+	MbTypeOK:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH*MB_WIDTH ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH*MB_WIDTH
+	guard
+		a = 1
+	var
+	  	uint(size=13) first_mb_in_slice,
+	  	uint(size=13) mbcurr,
+	  	uint(size=7) picwidth
+	do
+		//Store token value
+		mbcurr := d;
+		first_mb_in_slice := b;
+		picwidth := c; 
+				 
+		//Set 16x16 the available edge
+		left_16x16_avail := if (mbcurr = first_mb_in_slice) or ((mbcurr mod picwidth) = 0) then 0 else 1 end;
+		top_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth) then 0 else 1 end;
+		topRight_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth - 1)or (((mbcurr+1) mod picwidth) = 0) then 0 else 1 end;
+		topLeft_16x16_avail :=  if (mbcurr - first_mb_in_slice < picwidth +1) then 0 else 1 end;
+	end
 
-  //******************************* Receiving required token ********************************************
+	//******************************* Receiving required token ********************************************
   
-  
-  //Send the residu for the 16x16 prediction
-  CoeffCounter:action Coef_ACR:[v] ==> Coef_ACR_I:[v]
-  guard 
-  	CoefAC_counter < MB_WIDTH*MB_WIDTH
-  do
- 	CoefAC_counter := CoefAC_counter + 1;
-  end
- 
-  //Receive the value of the 16x16 Mb neighbouring pixel from bottom to top, then corner, then left to right 
-  InitEdge:action EDGE:[v] repeat 2*MB_WIDTH+1 ==> 
-  guard 
-  	Neighbourg_readFlag = 1 
-  do
-  	//Store left, top and top left border
-  	left_16x16_edge := [v[s]:for int s in Integers(0,MB_WIDTH-1)];
-  	topLeft_16x16_edge := v[MB_WIDTH];
-  	top_16x16_edge := [v[s]:for int s in Integers(MB_WIDTH+1,2*MB_WIDTH)];
-  	
-  	//Read done
-  	Neighbourg_readFlag := 0;
-  end
+	//Receive the value of the 16x16 Mb neighbouring pixel from bottom to top, then corner, then left to right 
+	InitEdge:action EDGE:[v] repeat 2*MB_WIDTH+1 ==> 
+	do
+		//Store left, top and top left border
+		left_16x16_edge := [v[s]:for int s in Integers(0,MB_WIDTH-1)];
+		topLeft_16x16_edge := v[MB_WIDTH];
+		top_16x16_edge := [v[s]:for int s in Integers(MB_WIDTH+1,2*MB_WIDTH)];
+	end
    
-  //******************************* Processing ********************************************
+	//******************************* Processing ********************************************
  
- //**** Select and send available edge ****
-  InitAvail:action ==> Avail:[ [ avail[s] : for int s in Integers(0,2) ] ] repeat 3
-  guard
-  	mb_type_Ok = 1,
-  	Neighbourg_readFlag = 0
-  do
-  	//edge available for left
-  	avail[0] := left_16x16_avail;
-    //edge available for top
-    avail[1] := top_16x16_avail;
-    //edge available for top left
-   	avail[2] := topLeft_16x16_avail;
+	//**** Select and send available edge ****
+	InitAvail:action ==> Avail:[ [ avail[s] : for int s in Integers(0,2) ] ] repeat 3
+	do
+		//edge available for left
+		avail[0] := left_16x16_avail;
+		//edge available for top
+		avail[1] := top_16x16_avail;
+		//edge available for top left
+		avail[2] := topLeft_16x16_avail;
+  	end
   
-   	//End of process, wait for the next mb_type
-   	mb_type_Ok := 0;
-  end
+	//**** Send neighbouring pixel value ****
   
-  //**** Send neighbouring pixel value ****
+	ResetNone:action ==> 
+	guard 
+		avail[0] = 0,
+		avail[1] = 0,
+		avail[2] = 0
+	end 
+
+	//Left neighbour from 16x16 edge
+	Reset.AvailLeft:action ==> Y_Left:[left_16x16_edge]repeat MB_WIDTH
+	guard 
+		avail[0] = 1
+	do
+		avail[0] := 0;
+	end 
   
-  //Left neighbour from 16x16 edge
-  ResetAvailLeft:action ==> Y_Left:[left_16x16_edge]repeat MB_WIDTH
-  guard 
-  	avail[0] = 1
-  do
-  	avail[0] := 0;
-  end 
+	//Top and right neighbour from 16x16 edge
+	Reset.AvailTop:action ==> Y_Up:[top_16x16_edge]repeat MB_WIDTH
+	guard 
+		avail[1] = 1
+	do
+		avail[1] := 0;
+	end
   
-  //Top and right neighbour from 16x16 edge
-  ResetAvailTop:action ==> Y_Up:[top_16x16_edge]repeat MB_WIDTH
-  guard 
-  	avail[1] = 1
-  do
-  	avail[1] := 0;
-  end
-  
-  //Up Left neighbour
-  ResetAvailTopLeft:action ==> Y_UpLeft:[topLeft_16x16_edge]
-  guard 
-  	avail[2] = 1
-  do
- 	avail[2] := 0;
- end
-   
+	//Up Left neighbour
+	Reset.AvailTopLeft:action ==> Y_UpLeft:[topLeft_16x16_edge]
+	guard 
+		avail[2] = 1
+	do
+		avail[2] := 0;
+	end
+	
+	schedule fsm Mb_Type:
+		Mb_Type     (MbTypeNOK_inter	)--> Mb_Type;
+		Mb_Type     (MbTypeNOK_intra4x4	)--> Mb_Type;
+		Mb_Type     (MbTypeOK			)--> InitEdge;
+		InitEdge    (InitEdge			)--> InitAvail;
+		InitAvail	(InitAvail			)--> Reset;
+		Reset    	(ResetNone			)--> Mb_Type;
+		Reset    	(Reset				)--> Reset;
+	end
+	
+	priority
+		ResetNone > Reset.AvailLeft > Reset.AvailTopLeft> Reset.AvailTopLeft;
+	end
 end

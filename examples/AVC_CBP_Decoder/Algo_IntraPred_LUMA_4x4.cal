@@ -97,8 +97,6 @@ actor Algo_IntraPred_LUMA_4x4 ( int PIX_SZ )
     left_avail    := avail[0];
     up_avail      := avail[1];
     up_left_avail := avail[2];
-    //println("");
-    //println("read avail "+avail); 
   end
 
   readpix.l.av: action Y_LEFT:[x] repeat 4 ==>
@@ -196,12 +194,6 @@ actor Algo_IntraPred_LUMA_4x4 ( int PIX_SZ )
 	      		end;
 	  	 end
 	  end
-      	 
-     /* y_uur := y_up + [y_up[7]];
-      mpr := [
-        rshift( y_uur[i+j+1 -1] + 2*y_uur[i+j+1 ] + y_uur[i+j+1 +1] +2, 2) :
-        for int i in  Integers(0,3), for int j in Integers(0,3)
-      ];*/
 	end
 	
    write.mode4: action PredMode:[mode] ==>
