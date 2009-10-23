@@ -90,10 +90,9 @@ public class PhiRemoval extends AbstractActorTransformation {
 					IntExpr expr = new IntExpr(new Location(), 0);
 					assign = new AssignVarNode(0, new Location(), target, expr);
 				} else {
-					Use localUse = new Use(source, null);
+					Use localUse = new Use(source);
 					VarExpr expr = new VarExpr(new Location(), localUse);
 					assign = new AssignVarNode(0, new Location(), target, expr);
-					localUse.setNode(assign);
 				}
 
 				it.add(assign);

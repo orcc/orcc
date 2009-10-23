@@ -28,66 +28,30 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
-import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.type.VoidType;
-import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.ir.actor.StateVariable;
 
 /**
- * Adds instantiation procedure.
+ * This class defines a very simple Dead Global Elimination.
  * 
- * @author Jérôme Gorin
+ * @author Matthieu Wipliez
  * 
  */
-public class AddInstantationProcedure implements IActorTransformation {
-
-	private String actorName;
-
-	private Procedure createInitProcedure(String Attributs,
-			OrderedMap<Port> ports) {
-		List<LocalVariable> parameters = new ArrayList<LocalVariable>();
-		List<LocalVariable> locals = new ArrayList<LocalVariable>();
-		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
-
-		LocalVariable parameter = new LocalVariable(false, false, 0,
-				new Location(), "fifo", null, null, new VoidType());
-
-		parameters.add(parameter);
-		for (Port port : ports) {
-			Use varUse = new Use(parameter);
-			VarExpr expr = new VarExpr(new Location(), varUse);
-
-			InitPortNode node = new InitPortNode(0, new Location(), port
-					.getName(), 0, expr);
-
-			nodes.add(node);
-		}
-
-		return new Procedure(actorName + "_init" + Attributs, false,
-				new Location(), new VoidType(), parameters, locals, nodes);
-
-	}
+public class DeadGlobalElimination implements IActorTransformation {
 
 	@Override
 	public void transform(Actor actor) {
-		List<Procedure> instations = new ArrayList<Procedure>();
-		this.actorName = actor.getName();
-		Procedure inputInit = createInitProcedure("Input", actor.getInputs());
-		Procedure inputOutput = createInitProcedure("Output", actor
-				.getOutputs());
-		instations.add(inputInit);
-		instations.add(inputOutput);
-		actor.setInstantations(instations);
+		List<StateVariable> stateVariables = actor.getStateVars();
+		ListIterator<StateVariable> it = stateVariables.listIterator();
+		while (it.hasNext()) {
+			StateVariable variable = it.next();
+			if (!variable.isUsed()) {
+				it.remove();
+			}
+		}
 	}
 
 }

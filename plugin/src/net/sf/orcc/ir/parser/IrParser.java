@@ -91,6 +91,7 @@ import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
 import net.sf.orcc.common.Use;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
@@ -136,6 +137,7 @@ import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.Scope;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -166,7 +168,7 @@ public class IrParser {
 
 	private List<Action> untaggedActions;
 
-	private Map<String, LocalVariable> varDefs;
+	private Scope<Variable> variables;
 
 	private Action getAction(JSONArray array) throws JSONException {
 		if (array.length() == 0) {
@@ -182,14 +184,14 @@ public class IrParser {
 		}
 	}
 
-	private LocalVariable getVarDef(JSONArray array) throws JSONException,
+	private Variable getVariable(JSONArray array) throws JSONException,
 			OrccException {
 		String name = array.getString(0);
 		Integer suffix = array.isNull(1) ? null : array.getInt(1);
 		int index = array.getInt(2);
 
 		// retrieve the variable definition
-		LocalVariable varDef = varDefs.get(stringOfVar(name, suffix, index));
+		Variable varDef = variables.get(stringOfVar(name, suffix, index));
 		if (varDef == null) {
 			throw new OrccException("unknown variable: " + name + suffix + "_"
 					+ index);
@@ -254,7 +256,7 @@ public class IrParser {
 			actions = new HashMap<Tag, Action>();
 			procs = new OrderedMap<Procedure>();
 			untaggedActions = new ArrayList<Action>();
-			varDefs = new HashMap<String, LocalVariable>();
+			variables = new Scope<Variable>();
 
 			JSONTokener tokener = new JSONTokener(new InputStreamReader(in));
 			JSONObject obj = new JSONObject(tokener);
@@ -300,9 +302,9 @@ public class IrParser {
 
 	private AssignVarNode parseAssignVarNode(int id, Location loc,
 			JSONArray array) throws JSONException, OrccException {
-		LocalVariable var = getVarDef(array.getJSONArray(0));
+		Variable var = getVariable(array.getJSONArray(0));
 		IExpr value = parseExpr(array.getJSONArray(1));
-		return new AssignVarNode(id, loc, var, value);
+		return new AssignVarNode(id, loc, (LocalVariable) var, value);
 	}
 
 	private BinaryExpr parseBinaryExpr(Location location, JSONArray array)
@@ -365,7 +367,7 @@ public class IrParser {
 		LocalVariable res = null;
 		String procName = array.getString(0);
 		if (!array.isNull(1)) {
-			res = getVarDef(array.getJSONArray(1));
+			res = (LocalVariable) getVariable(array.getJSONArray(1));
 		}
 
 		List<IExpr> parameters = parseExprs(array.getJSONArray(2));
@@ -481,7 +483,8 @@ public class IrParser {
 
 	private HasTokensNode parseHasTokensNode(int id, Location loc,
 			JSONArray array) throws JSONException, OrccException {
-		LocalVariable varDef = getVarDef(array.getJSONArray(0));
+		LocalVariable varDef = (LocalVariable) getVariable(array
+				.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
@@ -508,7 +511,8 @@ public class IrParser {
 
 	private LoadNode parseLoadNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		LocalVariable target = getVarDef(array.getJSONArray(0));
+		LocalVariable target = (LocalVariable) getVariable(array
+				.getJSONArray(0));
 		Use source = parseVarUse(array.getJSONArray(1));
 		List<IExpr> indexes = parseExprs(array.getJSONArray(2));
 
@@ -611,13 +615,15 @@ public class IrParser {
 		String fifoName = array.getString(0);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(1);
-		LocalVariable varDef = getVarDef(array.getJSONArray(2));
+		LocalVariable varDef = (LocalVariable) getVariable(array
+				.getJSONArray(2));
 		return new PeekNode(id, loc, port, numTokens, varDef);
 	}
 
 	private PhiAssignment parsePhiNode(JSONArray array) throws JSONException,
 			OrccException {
-		LocalVariable varDef = getVarDef(array.getJSONArray(0));
+		LocalVariable varDef = (LocalVariable) getVariable(array
+				.getJSONArray(0));
 		List<Use> vars = new ArrayList<Use>();
 		array = array.getJSONArray(1);
 		for (int i = 0; i < array.length(); i++) {
@@ -671,10 +677,14 @@ public class IrParser {
 
 		Location location = parseLocation(array.getJSONArray(1));
 		IType returnType = parseType(array.get(2));
+		variables = new Scope<Variable>(variables);
 		List<LocalVariable> parameters = parseVarDefs(array.getJSONArray(3));
 		List<LocalVariable> locals = parseVarDefs(array.getJSONArray(4));
 
 		List<AbstractNode> nodes = parseNodes(array.getJSONArray(5));
+
+		// go back to previous scope
+		variables = variables.getParent();
 
 		Procedure proc = new Procedure(name, external, location, returnType,
 				parameters, locals, nodes);
@@ -689,7 +699,8 @@ public class IrParser {
 		String fifoName = array.getString(0);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(1);
-		LocalVariable varDef = getVarDef(array.getJSONArray(2));
+		LocalVariable varDef = (LocalVariable) getVariable(array
+				.getJSONArray(2));
 		return new ReadNode(id, loc, port, numTokens, varDef);
 	}
 
@@ -714,16 +725,26 @@ public class IrParser {
 			throws JSONException, OrccException {
 		List<StateVariable> stateVars = new ArrayList<StateVariable>();
 		for (int i = 0; i < array.length(); i++) {
-			JSONArray varDefArray = array.getJSONArray(i);
-			LocalVariable def = parseVarDef(varDefArray.getJSONArray(0));
+			JSONArray stateArray = array.getJSONArray(i);
+
+			JSONArray varDefArray = stateArray.getJSONArray(0);
+			JSONArray details = varDefArray.getJSONArray(0);
+			String name = details.getString(0);
+			// boolean assignable = details.getBoolean(1);
+
+			Location loc = parseLocation(varDefArray.getJSONArray(1));
+			IType type = parseType(varDefArray.get(2));
+
 			IConst init = null;
-			if (!varDefArray.isNull(1)) {
-				init = parseConstant(varDefArray.get(1));
+			if (!stateArray.isNull(1)) {
+				init = parseConstant(stateArray.get(1));
 			}
 
-			StateVariable stateVar = new StateVariable(def.getLocation(), def
-					.getType(), def.getName(), init);
+			StateVariable stateVar = new StateVariable(loc, type, name, init);
 			stateVars.add(stateVar);
+			
+			// register the state variable
+			variables.register(file, loc, name + "_0", stateVar);
 		}
 
 		return stateVars;
@@ -836,7 +857,7 @@ public class IrParser {
 				loc, name, node, suffix, type);
 
 		// register the variable definition
-		varDefs.put(stringOfVar(name, suffix, index), varDef);
+		variables.register(file, loc, stringOfVar(name, suffix, index), varDef);
 
 		return varDef;
 	}
@@ -853,8 +874,8 @@ public class IrParser {
 
 	private Use parseVarUse(JSONArray array) throws JSONException,
 			OrccException {
-		LocalVariable varDef = getVarDef(array.getJSONArray(0));
-		return new Use(varDef, null);
+		Variable varDef = getVariable(array.getJSONArray(0));
+		return new Use(varDef);
 	}
 
 	private WhileNode parseWhileNode(int id, Location loc, JSONArray array)
@@ -870,7 +891,8 @@ public class IrParser {
 		String fifoName = array.getString(0);
 		Port port = outputs.get(fifoName);
 		int numTokens = array.getInt(1);
-		LocalVariable varDef = getVarDef(array.getJSONArray(2));
+		LocalVariable varDef = (LocalVariable) getVariable(array
+				.getJSONArray(2));
 		return new WriteNode(id, loc, port, numTokens, varDef);
 	}
 

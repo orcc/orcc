@@ -80,7 +80,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 		String name = varDefList.getName();
 		LocalVariable varDef = new LocalVariable(false, false, indexName++,
 				new Location(), name, null, null, new PointType(listType));
-		Use localUse = new Use(varDef, null);
+		Use localUse = new Use(varDef);
 
 		// Create and insert the new node
 		GetElementPtrNode elementPtrNode = new GetElementPtrNode(0,

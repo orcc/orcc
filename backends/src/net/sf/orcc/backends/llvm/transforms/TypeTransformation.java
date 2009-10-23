@@ -139,7 +139,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		int targetSize = sizeOf(targetType);
 
 		// Create target expr for bitcast
-		Use localUse = new Use(var, null);
+		Use localUse = new Use(var);
 		VarExpr expr = new VarExpr(new Location(), localUse);
 
 		// Select the type of cast (trunc if smaller, zext otherwise)
@@ -498,7 +498,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 			LocalVariable vardef = varDefCreate(refType);
 			it.add(castNodeCreate(var, vardef));
-			Use localUse = new Use(vardef, null);
+			Use localUse = new Use(vardef);
 			expr.setVar(localUse);
 
 			it.next();

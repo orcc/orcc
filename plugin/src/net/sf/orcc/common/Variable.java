@@ -98,7 +98,7 @@ public class Variable {
 	 * Adds a new use of this variable.
 	 */
 	public void addUse() {
-		addUse(new Use(this, null));
+		new Use(this);
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class Variable {
 	 *            a node that uses this variable
 	 */
 	public void addUse(AbstractNode node) {
-		addUse(new Use(this, node));
+		new Use(this, node);
 	}
 
 	/**
@@ -155,6 +155,15 @@ public class Variable {
 	 */
 	public List<Use> getUses() {
 		return uses;
+	}
+
+	/**
+	 * Returns true if this variable is used at least once.
+	 * 
+	 * @return true if this variable is used at least once.
+	 */
+	public boolean isUsed() {
+		return !uses.isEmpty();
 	}
 
 	/**

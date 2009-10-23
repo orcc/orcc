@@ -166,15 +166,15 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 		}
 
 		LocalVariable vardef = varDefCreate(checkType(expr));
-		Use varuse = new Use(vardef, null);
-		VarExpr varexpr = new VarExpr(new Location(), varuse);
+		Use varUse = new Use(vardef);
+		VarExpr varExpr = new VarExpr(new Location(), varUse);
 
 		AssignVarNode assignNode = new AssignVarNode(0, new Location(), vardef,
 				expr);
 
 		it.add(assignNode);
 
-		return varexpr;
+		return varExpr;
 
 	}
 

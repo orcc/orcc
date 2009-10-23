@@ -181,12 +181,21 @@ public class Use {
 
 	/**
 	 * Creates a new use of the given variable. This use is added to the use
-	 * list of the newly referenced variable.
+	 * list of the newly referenced variable. The node parameter must not be
+	 * <code>null</code>, if you want to create a use with no node, use the
+	 * other constructor.
 	 * 
 	 * @param variable
 	 *            a variable
+	 * @param node
+	 *            a node
+	 * @throws NullPointerException
+	 *             if node is null.
 	 */
 	public Use(Variable variable, AbstractNode node) {
+		if (node == null) {
+			throw new NullPointerException();
+		}
 		setVariable(variable);
 		this.node = node;
 	}

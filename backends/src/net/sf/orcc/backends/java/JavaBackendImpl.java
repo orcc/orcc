@@ -37,6 +37,7 @@ import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.transforms.BroadcastAdder;
+import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
@@ -90,8 +91,8 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		IActorTransformation[] transformations = { new PhiRemoval(),
-				new IncrementPeephole() };
+		IActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new PhiRemoval(), new IncrementPeephole() };
 
 		for (IActorTransformation transformation : transformations) {
 			transformation.transform(actor);
