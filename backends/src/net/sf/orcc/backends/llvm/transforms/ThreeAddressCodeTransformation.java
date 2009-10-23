@@ -36,9 +36,9 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -167,7 +167,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 		}
 
 		LocalVariable vardef = varDefCreate(checkType(expr));
-		LocalUse varuse = new LocalUse(vardef, null);
+		Use varuse = new Use(vardef, null);
 		VarExpr varexpr = new VarExpr(new Location(), varuse);
 
 		AssignVarNode assignNode = new AssignVarNode(0, new Location(), vardef,

@@ -79,7 +79,7 @@ public class LocalVariable extends Variable implements
 
 	public LocalVariable(boolean assignable, boolean global, int index,
 			Location loc, String name, AbstractNode node,
-			List<LocalUse> references, Integer suffix, IType type) {
+			List<Use> references, Integer suffix, IType type) {
 		super(loc, type, name);
 		this.assignable = assignable;
 		this.global = global;

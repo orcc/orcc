@@ -30,25 +30,19 @@ package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 
 /**
+ * This class defines a Peek node.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class PeekNode extends AbstractNode {
+public class PeekNode extends AbstractFifoNode {
 
-	private String fifoName;
-
-	private int numTokens;
-
-	private LocalVariable varDef;
-
-	public PeekNode(int id, Location location, String fifoName, int numTokens,
+	public PeekNode(int id, Location location, Port port, int numTokens,
 			LocalVariable varDef) {
-		super(id, location);
-		this.fifoName = fifoName;
-		this.numTokens = numTokens;
-		this.varDef = varDef;
+		super(id, location, port, numTokens, varDef);
 	}
 
 	@Override
@@ -56,33 +50,10 @@ public class PeekNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public String getFifoName() {
-		return fifoName;
-	}
-
-	public int getNumTokens() {
-		return numTokens;
-	}
-
-	public LocalVariable getVarDef() {
-		return varDef;
-	}
-
-	public void setFifoName(String fifoName) {
-		this.fifoName = fifoName;
-	}
-
-	public void setNumTokens(int numTokens) {
-		this.numTokens = numTokens;
-	}
-
-	public void setVar(LocalVariable varDef) {
-		this.varDef = varDef;
-	}
-
 	@Override
 	public String toString() {
-		return varDef + " = peek(" + fifoName + ", " + numTokens + ")";
+		return getVarDef() + " = peek(" + getPort() + ", " + getNumTokens()
+				+ ")";
 	}
 
 }

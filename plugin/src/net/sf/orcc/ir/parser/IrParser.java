@@ -87,10 +87,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
@@ -425,7 +425,7 @@ public class IrParser {
 			array = (JSONArray) obj;
 			String name = array.getString(0);
 			if (name.equals(VAR_EXPR)) {
-				LocalUse var = parseVarUse(array.getJSONArray(1));
+				Use var = parseVarUse(array.getJSONArray(1));
 				expr = new VarExpr(location, var);
 			} else if (name.equals(UNARY_EXPR)) {
 				return parseUnaryExpr(location, array.getJSONArray(1));
@@ -483,8 +483,9 @@ public class IrParser {
 			JSONArray array) throws JSONException, OrccException {
 		LocalVariable varDef = getVarDef(array.getJSONArray(0));
 		String fifoName = array.getString(1);
+		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new HasTokensNode(id, loc, fifoName, numTokens, varDef);
+		return new HasTokensNode(id, loc, port, numTokens, varDef);
 	}
 
 	private IfNode parseIfNode(int id, Location loc, JSONArray array)
@@ -508,7 +509,7 @@ public class IrParser {
 	private LoadNode parseLoadNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		LocalVariable target = getVarDef(array.getJSONArray(0));
-		LocalUse source = parseVarUse(array.getJSONArray(1));
+		Use source = parseVarUse(array.getJSONArray(1));
 		List<IExpr> indexes = parseExprs(array.getJSONArray(2));
 
 		return new LoadNode(id, loc, target, source, indexes);
@@ -608,15 +609,16 @@ public class IrParser {
 	private PeekNode parsePeekNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
+		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(1);
 		LocalVariable varDef = getVarDef(array.getJSONArray(2));
-		return new PeekNode(id, loc, fifoName, numTokens, varDef);
+		return new PeekNode(id, loc, port, numTokens, varDef);
 	}
 
 	private PhiAssignment parsePhiNode(JSONArray array) throws JSONException,
 			OrccException {
 		LocalVariable varDef = getVarDef(array.getJSONArray(0));
-		List<LocalUse> vars = new ArrayList<LocalUse>();
+		List<Use> vars = new ArrayList<Use>();
 		array = array.getJSONArray(1);
 		for (int i = 0; i < array.length(); i++) {
 			vars.add(parseVarUse(array.getJSONArray(i)));
@@ -685,14 +687,15 @@ public class IrParser {
 	private ReadNode parseReadNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
+		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(1);
 		LocalVariable varDef = getVarDef(array.getJSONArray(2));
-		return new ReadNode(id, loc, fifoName, numTokens, varDef);
+		return new ReadNode(id, loc, port, numTokens, varDef);
 	}
 
-	private List<LocalUse> parseRefs(JSONArray array) {
+	private List<Use> parseRefs(JSONArray array) {
 		// TODO parse references
-		List<LocalUse> refs = new ArrayList<LocalUse>();
+		List<Use> refs = new ArrayList<Use>();
 		return refs;
 	}
 
@@ -734,7 +737,7 @@ public class IrParser {
 
 	private StoreNode parseStoreNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		LocalUse target = parseVarUse(array.getJSONArray(0));
+		Use target = parseVarUse(array.getJSONArray(0));
 		List<IExpr> indexes = parseExprs(array.getJSONArray(1));
 		IExpr value = parseExpr(array.getJSONArray(2));
 
@@ -838,7 +841,7 @@ public class IrParser {
 		IType type = parseType(array.get(2));
 
 		AbstractNode node = null;
-		List<LocalUse> refs = parseRefs(array.getJSONArray(3));
+		List<Use> refs = parseRefs(array.getJSONArray(3));
 
 		LocalVariable varDef = new LocalVariable(assignable, global, index,
 				loc, name, node, refs, suffix, type);
@@ -859,7 +862,7 @@ public class IrParser {
 		return variables;
 	}
 
-	private LocalUse parseVarUse(JSONArray array) throws JSONException,
+	private Use parseVarUse(JSONArray array) throws JSONException,
 			OrccException {
 		LocalVariable varDef = getVarDef(array.getJSONArray(0));
 
@@ -867,7 +870,7 @@ public class IrParser {
 		// int nodeId =
 		array.getInt(1);
 
-		return new LocalUse(varDef, null);
+		return new Use(varDef, null);
 	}
 
 	private WhileNode parseWhileNode(int id, Location loc, JSONArray array)
@@ -881,9 +884,10 @@ public class IrParser {
 	private WriteNode parseWriteNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
+		Port port = outputs.get(fifoName);
 		int numTokens = array.getInt(1);
 		LocalVariable varDef = getVarDef(array.getJSONArray(2));
-		return new WriteNode(id, loc, fifoName, numTokens, varDef);
+		return new WriteNode(id, loc, port, numTokens, varDef);
 	}
 
 	private void putAction(Tag tag, Action action) {

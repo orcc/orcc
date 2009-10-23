@@ -31,9 +31,9 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
@@ -76,8 +76,8 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 			for (PhiAssignment phi : phis) {
 				LocalVariable target = phi.getVarDef();
-				LocalVariable source = phi.getVars().get(phiIndex)
-						.getLocalVariable();
+				LocalVariable source = (LocalVariable) phi.getVars().get(
+						phiIndex).getVariable();
 
 				// if source is a local variable with index = 0, we remove it
 				// from the procedure and translate the PHI by an assignment of
@@ -90,7 +90,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 					IntExpr expr = new IntExpr(new Location(), 0);
 					assign = new AssignVarNode(0, new Location(), target, expr);
 				} else {
-					LocalUse localUse = new LocalUse(source, null);
+					Use localUse = new Use(source, null);
 					VarExpr expr = new VarExpr(new Location(), localUse);
 					assign = new AssignVarNode(0, new Location(), target, expr);
 					localUse.setNode(assign);

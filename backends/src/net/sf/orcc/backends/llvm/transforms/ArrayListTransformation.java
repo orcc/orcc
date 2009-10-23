@@ -35,7 +35,6 @@ import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Use;
@@ -63,7 +62,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 	int indexName;
 
 	@SuppressWarnings("unchecked")
-	public LocalUse getElementPtrNodeCreate(Use varList, List<IExpr> indexes,
+	public Use getElementPtrNodeCreate(Use varList, List<IExpr> indexes,
 			Object... args) {
 		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 
@@ -81,7 +80,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 		String name = varDefList.getName();
 		LocalVariable varDef = new LocalVariable(false, false, indexName++,
 				new Location(), name, null, null, null, new PointType(listType));
-		LocalUse localUse = new LocalUse(varDef, null);
+		Use localUse = new Use(varDef, null);
 
 		// Create and insert the new node
 		GetElementPtrNode elementPtrNode = new GetElementPtrNode(0,

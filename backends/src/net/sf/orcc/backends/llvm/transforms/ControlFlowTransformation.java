@@ -40,9 +40,9 @@ import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.PhiNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -219,13 +219,12 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 
 		for (PhiAssignment phi : phis) {
 			LocalVariable varDef = phi.getVarDef();
-			List<LocalUse> localUses = phi.getVars();
+			List<Use> localUses = phi.getVars();
 			LocalVariable phiVar;
 			if (value == true) {
-				phiVar = localUses.get(0).getLocalVariable();
-
+				phiVar = (LocalVariable) localUses.get(0).getVariable();
 			} else {
-				phiVar = localUses.get(1).getLocalVariable();
+				phiVar = (LocalVariable) localUses.get(1).getVariable();
 			}
 
 			varDef.duplicate(phiVar);
@@ -244,10 +243,10 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 			Map<LabelNode, LocalVariable> assignements = new HashMap<LabelNode, LocalVariable>();
 			LocalVariable varDef = phi.getVarDef();
 			IType varType = varDef.getType();
-			List<LocalUse> vars = phi.getVars();
+			List<Use> vars = phi.getVars();
 
-			LocalVariable trueVar = vars.get(0).getLocalVariable();
-			LocalVariable falseVar = vars.get(1).getLocalVariable();
+			LocalVariable trueVar = (LocalVariable) vars.get(0).getVariable();
+			LocalVariable falseVar = (LocalVariable) vars.get(1).getVariable();
 
 			// Force varDef's type to phiNode type to prevent cast problem
 			if (varType.getType() == IType.INT) {

@@ -49,10 +49,10 @@ import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
@@ -139,7 +139,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		int targetSize = sizeOf(targetType);
 
 		// Create target expr for bitcast
-		LocalUse localUse = new LocalUse(var, null);
+		Use localUse = new Use(var, null);
 		VarExpr expr = new VarExpr(new Location(), localUse);
 
 		// Select the type of cast (trunc if smaller, zext otherwise)
@@ -348,11 +348,12 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 			if (index.getType() == IExpr.VAR) {
 				VarExpr indExpr = (VarExpr) index;
 
-				// we can safely cast because in a VarExpr in an actor, only local
+				// we can safely cast because in a VarExpr in an actor, only
+				// local
 				// variables are used (globals must be load'ed first)
-				LocalUse indUse = (LocalUse) indExpr.getVar();
-				
-				LocalVariable indVar = indUse.getLocalVariable();
+				Use indUse = (Use) indExpr.getVar();
+
+				LocalVariable indVar = (LocalVariable) indUse.getVariable();
 				IType indType = indVar.getType();
 
 				if (indType.getType() == IType.INT) {
@@ -368,7 +369,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 							it.next();
 
-							indUse.setLocalVariable(vardef);
+							indUse.setVariable(vardef);
 						}
 					} catch (OrccException e) {
 						e.printStackTrace();
@@ -412,7 +413,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(PeekNode node, Object... args) {
-		node.setVar(castFifo(node.getVarDef(), node.getFifoName()));
+		throw new IllegalArgumentException("visitPeekNode: TODO");
+		// node.setVar(castFifo(node.getVarDef(), node.getPort()));
 	}
 
 	@Override
@@ -422,14 +424,14 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(ReadNode node, Object... args) {
-		String fifoName = node.getFifoName();
-
-		node.setVar(castFifo(node.getVarDef(), fifoName));
-		int index = (Integer) portIndex.get(fifoName);
-		node.setFifoName(fifoName + "_" + Integer.toString(index));
-		portIndex.remove(fifoName);
-		portIndex.put(fifoName, new Integer(++index));
-
+		throw new IllegalArgumentException("visitReadNode: TODO");
+		// String fifoName = node.getFifoName();
+		//
+		// node.setVar(castFifo(node.getVarDef(), fifoName));
+		// int index = (Integer) portIndex.get(fifoName);
+		// node.setFifoName(fifoName + "_" + Integer.toString(index));
+		// portIndex.remove(fifoName);
+		// portIndex.put(fifoName, new Integer(++index));
 	}
 
 	@Override
@@ -443,23 +445,20 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		for (PhiAssignment phi : phis) {
 			LocalVariable varDef = phi.getVarDef();
 			IType typeRef = varDef.getType();
-			List<LocalUse> localUses = phi.getVars();
+			List<Use> localUses = phi.getVars();
 
-			for (LocalUse localUse : localUses) {
-				IType type = localUse.getLocalVariable().getType();
+			for (Use localUse : localUses) {
+				IType type = localUse.getVariable().getType();
 
 				if (!(type.equals(typeRef))) {
 					it.previous();
 					LocalVariable castVar = varDefCreate(typeRef);
-					it
-							.add(castNodeCreate(localUse.getLocalVariable(),
-									castVar));
-					localUse.setLocalVariable(castVar);
+					it.add(castNodeCreate((LocalVariable) localUse
+							.getVariable(), castVar));
+					localUse.setVariable(castVar);
 					it.next();
 				}
-
 			}
-
 		}
 	}
 
@@ -499,7 +498,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 			LocalVariable vardef = varDefCreate(refType);
 			it.add(castNodeCreate(var, vardef));
-			LocalUse localUse = new LocalUse(vardef, null);
+			Use localUse = new Use(vardef, null);
 			expr.setVar(localUse);
 
 			it.next();
@@ -508,13 +507,14 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(WriteNode node, Object... args) {
-		String fifoName = node.getFifoName();
-
-		node.setVarDef(castFifo(node.getVarDef(), fifoName));
-		int index = (Integer) portIndex.get(fifoName);
-		node.setFifoName(fifoName + "_" + Integer.toString(index));
-		portIndex.remove(fifoName);
-		portIndex.put(fifoName, new Integer(++index));
+		throw new IllegalArgumentException("visitWriteNode: TODO");
+		// String fifoName = node.getFifoName();
+		//
+		// node.setVarDef(castFifo(node.getVarDef(), fifoName));
+		// int index = (Integer) portIndex.get(fifoName);
+		// node.setFifoName(fifoName + "_" + Integer.toString(index));
+		// portIndex.remove(fifoName);
+		// portIndex.put(fifoName, new Integer(++index));
 
 	}
 

@@ -35,8 +35,9 @@ import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.common.GlobalVariable;
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.nodes.AbstractFifoNode;
 import net.sf.orcc.ir.type.IType;
 
 /**
@@ -77,9 +78,20 @@ public class LLVMVarDefPrinter {
 		}
 
 		varDefMap.put("type", typeVisitor.toString(type));
-
-		varDefMap.put("isPort", varDef instanceof Port);
 		varDefMap.put("isGlobal", varDef instanceof GlobalVariable);
+
+		boolean isPort = false;
+		for (Use use : varDef.getUses()) {
+			if (use.getNode() instanceof AbstractFifoNode) {
+				AbstractFifoNode fifoNode = (AbstractFifoNode) use.getNode();
+				if (fifoNode.getPort().getName().equals(varDef.getName())) {
+					isPort = true;
+					break;
+				}
+			}
+		}
+		varDefMap.put("isPort", isPort);
+
 		return varDefMap;
 	}
 

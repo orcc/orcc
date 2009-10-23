@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.common;
 
+import net.sf.orcc.ir.nodes.AbstractNode;
+
 /**
  * This class defines a use of a variable.
  * 
@@ -35,6 +37,12 @@ package net.sf.orcc.common;
  * 
  */
 public class Use {
+
+	/**
+	 * the node where the variable referenced is used. May be <code>null</code>
+	 * if the information is not available or has no meaning.
+	 */
+	private AbstractNode node;
 
 	/**
 	 * the variable referenced
@@ -53,12 +61,44 @@ public class Use {
 	}
 
 	/**
+	 * Creates a new use of the given variable. This use is added to the use
+	 * list of the newly referenced variable.
+	 * 
+	 * @param variable
+	 *            a variable
+	 */
+	public Use(Variable variable, AbstractNode node) {
+		setVariable(variable);
+		this.node = node;
+	}
+
+	/**
+	 * Returns the node referenced by this use.May be <code>null</code> if the
+	 * information is not available.
+	 * 
+	 * @return the node referenced by this use
+	 */
+	public AbstractNode getNode() {
+		return node;
+	}
+
+	/**
 	 * Returns the variable referenced by this use.
 	 * 
 	 * @return the variable referenced by this use
 	 */
 	public Variable getVariable() {
 		return variable;
+	}
+
+	/**
+	 * Sets the node referenced by this use.
+	 * 
+	 * @param node
+	 *            node referenced by this use
+	 */
+	public void setNode(AbstractNode node) {
+		this.node = node;
 	}
 
 	/**

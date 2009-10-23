@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.LocalUse;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -194,7 +194,7 @@ public class ExprParser {
 			return new StringExpr(parseLocation(expr), expr.getText());
 		case RVCCalLexer.EXPR_VAR:
 			expr = expr.getChild(0);
-			LocalUse localUse = null;
+			Use localUse = null;
 			return new VarExpr(parseLocation(expr), localUse);
 		default:
 			throw new OrccException("not yet implemented");

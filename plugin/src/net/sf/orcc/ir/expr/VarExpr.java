@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Use;
 

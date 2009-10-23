@@ -31,6 +31,7 @@ package net.sf.orcc.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
 
 /**
@@ -93,6 +94,23 @@ public class Variable {
 	}
 
 	/**
+	 * Adds a new use of this variable.
+	 */
+	public void addUse() {
+		addUse(new Use(this, null));
+	}
+
+	/**
+	 * Adds a new use of this variable in the given node.
+	 * 
+	 * @param node
+	 *            a node that uses this variable
+	 */
+	public void addUse(AbstractNode node) {
+		addUse(new Use(this, node));
+	}
+
+	/**
 	 * Adds the given use of this variable to this variable's use list.
 	 * 
 	 * @param use
@@ -127,6 +145,15 @@ public class Variable {
 	 */
 	public IType getType() {
 		return type;
+	}
+
+	/**
+	 * Returns the list of uses of this variable. The list is a reference.
+	 * 
+	 * @return the list of uses of this variable.
+	 */
+	public List<Use> getUses() {
+		return uses;
 	}
 
 	/**

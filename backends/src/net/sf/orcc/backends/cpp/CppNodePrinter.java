@@ -61,7 +61,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		if (node.getNumTokens() > 1) {
 			nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 		}
@@ -76,7 +76,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		if (node.getNumTokens() > 1) {
 			nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 		}
@@ -91,7 +91,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		if (node.getNumTokens() > 1) {
 			nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 		}

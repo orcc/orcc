@@ -143,7 +143,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -225,7 +225,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -239,7 +239,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -310,7 +310,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);

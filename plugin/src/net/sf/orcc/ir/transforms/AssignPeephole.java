@@ -85,7 +85,8 @@ public class AssignPeephole extends AbstractActorTransformation {
 		List<PhiAssignment> phis = node.getPhis();
 		if (!phis.isEmpty()) {
 			for (PhiAssignment phi : phis) {
-				LocalVariable source = phi.getVars().get(0).getLocalVariable();
+				LocalVariable source = (LocalVariable) phi.getVars().get(0)
+						.getVariable();
 				// if source is a local variable with index = 0, we remove it
 				// from the procedure and translate the PHI by an assignment of
 				// 0 (zero) to target.

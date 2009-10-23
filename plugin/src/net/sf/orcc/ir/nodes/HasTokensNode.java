@@ -30,25 +30,19 @@ package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 
 /**
+ * This class defines a HasTokens node.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class HasTokensNode extends AbstractNode {
+public class HasTokensNode extends AbstractFifoNode {
 
-	private String fifoName;
-
-	private int numTokens;
-
-	private LocalVariable varDef;
-
-	public HasTokensNode(int id, Location location, String fifoName,
-			int numTokens, LocalVariable varDef) {
-		super(id, location);
-		this.fifoName = fifoName;
-		this.numTokens = numTokens;
-		this.varDef = varDef;
+	public HasTokensNode(int id, Location location, Port port, int numTokens,
+			LocalVariable varDef) {
+		super(id, location, port, numTokens, varDef);
 	}
 
 	@Override
@@ -56,33 +50,10 @@ public class HasTokensNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public String getFifoName() {
-		return fifoName;
-	}
-
-	public int getNumTokens() {
-		return numTokens;
-	}
-
-	public LocalVariable getVarDef() {
-		return varDef;
-	}
-
-	public void setFifoName(String fifoName) {
-		this.fifoName = fifoName;
-	}
-
-	public void setNumTokens(int numTokens) {
-		this.numTokens = numTokens;
-	}
-
-	public void setVarDef(LocalVariable varDef) {
-		this.varDef = varDef;
-	}
-
 	@Override
 	public String toString() {
-		return varDef + " = hasTokens(" + fifoName + ", " + numTokens + ")";
+		return getVarDef() + " = hasTokens(" + getPort() + ", "
+				+ getNumTokens() + ")";
 	}
 
 }

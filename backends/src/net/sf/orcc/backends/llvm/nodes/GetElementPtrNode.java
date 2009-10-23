@@ -30,7 +30,6 @@ package net.sf.orcc.backends.llvm.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Use;
@@ -77,7 +76,7 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 		this.indexes = indexs;
 	}
 
-	public void setSource(LocalUse source) {
+	public void setSource(Use source) {
 		this.source = source;
 	}
 

@@ -46,9 +46,9 @@ import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.common.LocalUse;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.IExpr;
@@ -257,7 +257,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		nodeTmpl
 				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -331,7 +331,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		nodeTmpl
 				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -371,7 +371,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		nodeTmpl
 				.setAttribute("var", varDefPrinter.getVarDefName(varDef, false));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -396,7 +396,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 			for (PhiAssignment phi : phis) {
 
 				LocalVariable varDef = phi.getVarDef();
-				List<LocalUse> varuses = phi.getVars();
+				List<Use> varuses = phi.getVars();
 
 				StringTemplate nodeTmpl = group.getInstanceOf("selectNode");
 
@@ -409,8 +409,10 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 				nodeTmpl.setAttribute("expr", exprPrinter.toString(condition,
 						new BoolType()));
 
-				LocalVariable varDefTrue = varuses.get(0).getLocalVariable();
-				LocalVariable varDefFalse = varuses.get(1).getLocalVariable();
+				LocalVariable varDefTrue = (LocalVariable) varuses.get(0)
+						.getVariable();
+				LocalVariable varDefFalse = (LocalVariable) varuses.get(1)
+						.getVariable();
 
 				nodeTmpl.setAttribute("trueVar", varDefPrinter.getVarDefName(
 						varDefTrue, true));
@@ -504,7 +506,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		LocalVariable varDef = node.getVarDef();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef, true));
 		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);

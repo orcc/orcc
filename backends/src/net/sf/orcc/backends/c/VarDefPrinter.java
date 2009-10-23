@@ -32,9 +32,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Use;
 import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.NameTransformer;
+import net.sf.orcc.ir.nodes.AbstractFifoNode;
 
 /**
  * 
@@ -69,7 +70,17 @@ public class VarDefPrinter {
 		varDef.getType().accept(listSizePrinter);
 
 		varDefMap.put("size", listSizePrinter.getSize());
-		varDefMap.put("isPort", varDef instanceof Port);
+		boolean isPort = false;
+		for (Use use : varDef.getUses()) {
+			if (use.getNode() instanceof AbstractFifoNode) {
+				AbstractFifoNode fifoNode = (AbstractFifoNode) use.getNode();
+				if (fifoNode.getPort().getName().equals(varDef.getName())) {
+					isPort = true;
+					break;
+				}
+			}
+		}
+		varDefMap.put("isPort", isPort);
 
 		return varDefMap;
 	}

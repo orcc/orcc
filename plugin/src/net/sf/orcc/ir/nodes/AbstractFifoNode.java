@@ -26,39 +26,64 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.common;
+package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Port;
 
 /**
- * This class defines a use of a local variable.
+ * This class defines a node that performs an operation on a port. This can be a
+ * Peek, a Read or a Write.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class LocalUse extends Use {
+public abstract class AbstractFifoNode extends AbstractNode {
 
-	private AbstractNode node;
+	private int numTokens;
 
-	public LocalUse(LocalVariable variable, AbstractNode node) {
-		super(variable);
-		this.node = node;
+	private Port port;
+
+	private LocalVariable varDef;
+
+	public AbstractFifoNode(int id, Location location, Port port,
+			int numTokens, LocalVariable varDef) {
+		super(id, location);
+		this.numTokens = numTokens;
+		this.port = port;
+		port.addUse(this);
+		this.varDef = varDef;
+		varDef.addUse(this);
 	}
 
-	public LocalVariable getLocalVariable() {
-		return (LocalVariable) getVariable();
+	public int getNumTokens() {
+		return numTokens;
 	}
 
-	public AbstractNode getNode() {
-		return node;
+	public Port getPort() {
+		return port;
 	}
 
-	public void setLocalVariable(LocalVariable variable) {
-		super.setVariable(variable);
+	public LocalVariable getVarDef() {
+		return varDef;
 	}
 
-	public void setNode(AbstractNode node) {
-		this.node = node;
+	public void setNumTokens(int numTokens) {
+		this.numTokens = numTokens;
+	}
+
+	public void setPort(Port port) {
+		this.port = port;
+	}
+
+	public void setVar(LocalVariable varDef) {
+		this.varDef = varDef;
+	}
+
+	@Override
+	public String toString() {
+		return varDef + " = read(" + port + ", " + numTokens + ")";
 	}
 
 }
