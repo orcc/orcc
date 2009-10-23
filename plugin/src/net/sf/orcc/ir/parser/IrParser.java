@@ -173,12 +173,12 @@ public class IrParser {
 			// removes the first untagged action found
 			return untaggedActions.remove(0);
 		} else {
-			List<String> tagList = new ArrayList<String>();
+			Tag tag = new Tag();
 			for (int i = 0; i < array.length(); i++) {
-				tagList.add(array.getString(i));
+				tag.add(array.getString(i));
 			}
 
-			return actions.get(tagList);
+			return actions.get(tag);
 		}
 	}
 
@@ -208,8 +208,8 @@ public class IrParser {
 		Map<Port, Integer> ip = parsePattern(inputs, array.getJSONArray(1));
 		Map<Port, Integer> op = parsePattern(outputs, array.getJSONArray(2));
 
-		Procedure scheduler = parseProc(array.getJSONArray(3));
-		Procedure body = parseProc(array.getJSONArray(4));
+		Procedure scheduler = parseProc(array.getJSONArray(3), false);
+		Procedure body = parseProc(array.getJSONArray(4), false);
 
 		Action action = new Action(body.getLocation(), tag, ip, op, scheduler,
 				body);
@@ -269,7 +269,7 @@ public class IrParser {
 
 			array = obj.getJSONArray(KEY_PROCEDURES);
 			for (int i = 0; i < array.length(); i++) {
-				parseProc(array.getJSONArray(i));
+				parseProc(array.getJSONArray(i), true);
 			}
 
 			array = obj.getJSONArray(KEY_ACTIONS);
@@ -650,8 +650,19 @@ public class IrParser {
 		return ports;
 	}
 
-	private Procedure parseProc(JSONArray array) throws JSONException,
-			OrccException {
+	/**
+	 * Parses a procedure and optionally adds it to the {@link #procs} map.
+	 * 
+	 * @param array
+	 *            a JSON array
+	 * @param register
+	 *            if true, add this procedure to the {@link #procs} map.
+	 * @return the procedure parsed
+	 * @throws JSONException
+	 * @throws OrccException
+	 */
+	private Procedure parseProc(JSONArray array, boolean register)
+			throws JSONException, OrccException {
 		JSONArray array1 = array.getJSONArray(0);
 		String name = array1.getString(0);
 		boolean external = array1.getBoolean(1);
@@ -665,7 +676,9 @@ public class IrParser {
 
 		Procedure proc = new Procedure(name, external, location, returnType,
 				parameters, locals, nodes);
-		procs.register(file, location, name, proc);
+		if (register) {
+			procs.register(file, location, name, proc);
+		}
 		return proc;
 	}
 
