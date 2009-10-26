@@ -549,8 +549,9 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		visitNodes(proc.getNodes());
 	}
 
-	private void visitStateVars(List<StateVariable> stateVars) {
-		for (StateVariable stateVar : stateVars) {
+	private void visitStateVars(OrderedMap<Variable> stateVars) {
+		for (Variable variable : stateVars) {
+			StateVariable stateVar = (StateVariable) variable;
 			PointType newType = new PointType(stateVar.getType());
 			stateVar.setType(newType);
 		}

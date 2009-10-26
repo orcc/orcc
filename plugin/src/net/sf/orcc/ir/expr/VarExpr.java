@@ -34,8 +34,7 @@ import net.sf.orcc.common.Use;
 
 /**
  * This class defines an expression that references a variable. The variable is
- * referenced by an instance of the {@link Use} class. When the reference is
- * local, it is expected the reference uses the {@link LocalUse} class.
+ * referenced by an instance of the {@link Use} class.
  * 
  * @author Matthieu Wipliez
  * 

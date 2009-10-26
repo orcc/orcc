@@ -28,11 +28,12 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.List;
-import java.util.ListIterator;
+import java.util.Iterator;
 
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.StateVariable;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a very simple Dead Global Elimination.
@@ -44,10 +45,10 @@ public class DeadGlobalElimination implements IActorTransformation {
 
 	@Override
 	public void transform(Actor actor) {
-		List<StateVariable> stateVariables = actor.getStateVars();
-		ListIterator<StateVariable> it = stateVariables.listIterator();
+		OrderedMap<Variable> stateVariables = actor.getStateVars();
+		Iterator<Variable> it = stateVariables.iterator();
 		while (it.hasNext()) {
-			StateVariable variable = it.next();
+			StateVariable variable = (StateVariable) it.next();
 			if (!variable.isUsed()) {
 				it.remove();
 			}

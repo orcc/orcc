@@ -231,8 +231,6 @@ public class FSM {
 	/**
 	 * Creates an FSM with the given state as an initial state.
 	 * 
-	 * @param state
-	 *            name of the initial state
 	 */
 	public FSM() {
 		states = new HashMap<String, State>();

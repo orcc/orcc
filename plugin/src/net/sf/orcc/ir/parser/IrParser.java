@@ -267,7 +267,7 @@ public class IrParser {
 			outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
 
 			JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
-			List<StateVariable> stateVars = parseStateVars(array);
+			OrderedMap<Variable> stateVars = parseStateVars(array);
 
 			array = obj.getJSONArray(KEY_PROCEDURES);
 			for (int i = 0; i < array.length(); i++) {
@@ -287,7 +287,7 @@ public class IrParser {
 			ActionScheduler sched = parseActionScheduler(array);
 
 			// no parameters at this point.
-			List<LocalVariable> parameters = new ArrayList<LocalVariable>();
+			OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 
 			Actor actor = new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procs, actions, initializes, sched, null);
@@ -721,9 +721,9 @@ public class IrParser {
 	 * @return A {@link List}&lt;{@link StateVariable}&gt;.
 	 * @throws JSONException
 	 */
-	private List<StateVariable> parseStateVars(JSONArray array)
+	private OrderedMap<Variable> parseStateVars(JSONArray array)
 			throws JSONException, OrccException {
-		List<StateVariable> stateVars = new ArrayList<StateVariable>();
+		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray stateArray = array.getJSONArray(i);
 
@@ -732,7 +732,7 @@ public class IrParser {
 			String name = details.getString(0);
 			// boolean assignable = details.getBoolean(1);
 
-			Location loc = parseLocation(varDefArray.getJSONArray(1));
+			Location location = parseLocation(varDefArray.getJSONArray(1));
 			IType type = parseType(varDefArray.get(2));
 
 			IConst init = null;
@@ -740,11 +740,12 @@ public class IrParser {
 				init = parseConstant(stateArray.get(1));
 			}
 
-			StateVariable stateVar = new StateVariable(loc, type, name, init);
-			stateVars.add(stateVar);
-			
+			StateVariable stateVar = new StateVariable(location, type, name,
+					init);
+			stateVars.register(file, location, name, stateVar);
+
 			// register the state variable
-			variables.register(file, loc, name + "_0", stateVar);
+			variables.register(file, location, name + "_0", stateVar);
 		}
 
 		return stateVars;

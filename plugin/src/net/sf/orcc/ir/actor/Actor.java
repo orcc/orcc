@@ -30,8 +30,8 @@ package net.sf.orcc.ir.actor;
 
 import java.util.List;
 
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -59,15 +59,15 @@ public class Actor {
 
 	private OrderedMap<Port> outputs;
 
-	private List<LocalVariable> parameters;
+	private OrderedMap<Variable> parameters;
 
 	private OrderedMap<Procedure> procs;
 
-	private List<StateVariable> stateVars;
+	private OrderedMap<Variable> stateVars;
 
-	public Actor(String name, String file, List<LocalVariable> parameters,
+	public Actor(String name, String file, OrderedMap<Variable> parameters,
 			OrderedMap<Port> inputs, OrderedMap<Port> outputs,
-			List<StateVariable> stateVars, OrderedMap<Procedure> procs,
+			OrderedMap<Variable> stateVars, OrderedMap<Procedure> procs,
 			List<Action> actions, List<Action> initializes,
 			ActionScheduler scheduler, List<Procedure> instantations) {
 		this.actions = actions;
@@ -152,7 +152,7 @@ public class Actor {
 		return outputs;
 	}
 
-	public List<LocalVariable> getParameters() {
+	public OrderedMap<Variable> getParameters() {
 		return parameters;
 	}
 
@@ -160,7 +160,7 @@ public class Actor {
 		return procs;
 	}
 
-	public List<StateVariable> getStateVars() {
+	public OrderedMap<Variable> getStateVars() {
 		return stateVars;
 	}
 

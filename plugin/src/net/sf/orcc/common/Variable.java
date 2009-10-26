@@ -195,7 +195,7 @@ public class Variable {
 	/**
 	 * Sets the location of this variable.
 	 * 
-	 * @param name
+	 * @param location
 	 *            the new location of this variable
 	 */
 	public void setLocation(Location location) {

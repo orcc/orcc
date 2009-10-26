@@ -89,7 +89,7 @@ public class VarDefPrinter {
 	 * Returns the full name of the given variable definition, with index and
 	 * suffix.
 	 * 
-	 * @param varDef
+	 * @param variable
 	 *            the variable definition
 	 * @return a string with its full name
 	 */

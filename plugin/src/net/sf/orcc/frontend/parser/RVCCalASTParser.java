@@ -123,7 +123,7 @@ public class RVCCalASTParser {
 	/**
 	 * list of actor parameters
 	 */
-	private List<LocalVariable> parameters;
+	private Scope<Variable> parameters;
 
 	/**
 	 * Priorities are a list of priority relations. A priority relation is a
@@ -144,7 +144,7 @@ public class RVCCalASTParser {
 	/**
 	 * list of state variables
 	 */
-	private List<StateVariable> stateVars;
+	private Scope<Variable> stateVars;
 
 	/**
 	 * creates a new parser from the given file name.
@@ -166,7 +166,7 @@ public class RVCCalASTParser {
 	/**
 	 * parses the file this parser was created with and return an actor.
 	 * 
-	 * @return
+	 * @return an actor
 	 * @throws IOException
 	 * @throws RVCCalParseException
 	 */
@@ -206,13 +206,14 @@ public class RVCCalASTParser {
 		currentScope = new Scope<Variable>();
 
 		actions = new ActionList();
-		parameters = parseVarDefs(currentScope, tree.getChild(2));
+		parameters = new Scope<Variable>();
 		procedures = new OrderedMap<Procedure>();
 		inputs = parsePorts(tree.getChild(3));
 		outputs = parsePorts(tree.getChild(4));
 		priorities = new ArrayList<List<Tag>>();
-		stateVars = new ArrayList<StateVariable>();
+		stateVars = new Scope<Variable>();
 
+		parseVarDefs(parameters, tree.getChild(2));
 		parseActorDecls(tree.getChild(5));
 
 		sorter = new ActionSorter(actions);
@@ -262,7 +263,6 @@ public class RVCCalASTParser {
 				StateVariable stateVar = parseStateVar(child);
 				currentScope.register(file, stateVar.getLocation(), stateVar
 						.getName(), stateVar);
-				stateVars.add(stateVar);
 				break;
 			}
 			default:

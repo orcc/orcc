@@ -40,6 +40,7 @@ import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.util.NodeIndex;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Port;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
@@ -228,8 +229,10 @@ public class LLVMActorPrinter {
 		}
 	}
 
-	private void setStateVars(List<StateVariable> stateVars) {
-		for (StateVariable stateVar : stateVars) {
+	private void setStateVars(OrderedMap<Variable> stateVars) {
+		for (Variable variable : stateVars) {
+			StateVariable stateVar = (StateVariable) variable;
+
 			StringTemplate stateTempl = group.getInstanceOf("stateVar");
 			template.setAttribute("stateVars", stateTempl);
 

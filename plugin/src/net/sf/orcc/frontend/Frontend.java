@@ -81,8 +81,10 @@ public class Frontend {
 	 * actors into the given output folder. The networks are just copied to the
 	 * output folder.
 	 * 
-	 * @param inputFolder
+	 * @param topLevelNetwork
+	 *            absolute file name of top-level network
 	 * @param outputFolder
+	 *            absolute file name of output folder
 	 * @throws OrccException
 	 */
 	public Frontend(String topLevelNetwork, String outputFolder)
