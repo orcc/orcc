@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-runtime-3.1.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jgrapht-jdk1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jgrapht-jdk1.6.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.jgrapht.org/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry excluding=".svn/|net/.svn/|net/sf/.svn/|net/sf/orcc/.svn/|net/sf/orcc/backends/.svn/|net/sf/orcc/frontend/.svn/|net/sf/orcc/frontend/parser/.svn/|net/sf/orcc/frontend/parser/internal/.svn/|net/sf/orcc/frontend/writer/.svn/|net/sf/orcc/ir/.svn/|net/sf/orcc/ir/actor/.svn/|net/sf/orcc/ir/consts/.svn/|net/sf/orcc/ir/expr/.svn/|net/sf/orcc/ir/network/.svn/|net/sf/orcc/ir/nodes/.svn/|net/sf/orcc/ir/parser/.svn/|net/sf/orcc/ir/transforms/.svn/|net/sf/orcc/ir/type/.svn/|net/sf/orcc/network/.svn/|net/sf/orcc/network/parser/.svn/|net/sf/orcc/ui/.svn/|net/sf/orcc/ui/launching/.svn/|org/.svn/|org/json/.svn/" kind="src" path="src"/>

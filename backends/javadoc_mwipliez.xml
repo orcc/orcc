@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="public"
+        	author="true"
+        	classpath="C:\eclipse\plugins\org.eclipse.ui.workbench.texteditor_3.5.0.v20090603.jar;D:\repositories\mwipliez\orcc\trunk\plugin\lib\antlr-runtime-3.1.3.jar;C:\eclipse\plugins\org.eclipse.core.resources_3.5.0.v20090512.jar;C:\eclipse\plugins\org.eclipse.ui_3.5.0.I20090604-2000.jar;C:\eclipse\plugins\org.eclipse.ui.workbench_3.5.0.I20090603-2000.jar;C:\eclipse\plugins\org.eclipse.debug.ui_3.5.0.v20090603.jar;D:\repositories\mwipliez\orcc\trunk\plugin\lib\jgrapht-jdk1.6.jar;C:\eclipse\plugins\org.eclipse.core.filebuffers_3.5.0.v20090526-2000.jar;C:\eclipse\plugins\org.eclipse.equinox.preferences_3.2.300.v20090520-1800.jar;lib/stringtemplate.jar;C:\eclipse\plugins\org.eclipse.jdt.ui_3.5.0.v20090604.jar;C:\eclipse\plugins\org.eclipse.core.runtime_3.5.0.v20090525.jar;C:\eclipse\plugins\org.eclipse.jdt.compiler.apt_1.0.200.v20090528-1135.jar;C:\eclipse\plugins\org.eclipse.equinox.registry_3.4.100.v20090520-1800.jar;C:\eclipse\plugins\org.eclipse.ui.console_3.4.0.v20090513.jar;C:\eclipse\plugins\org.eclipse.swt.win32.win32.x86_3.5.0.v3550b.jar;C:\eclipse\plugins\org.eclipse.core.jobs_3.4.100.v20090429-1800.jar;C:\eclipse\plugins\org.eclipse.core.runtime.compatibility.registry_3.2.200.v20090429-1800\runtime_registry_compatibility.jar;C:\eclipse\plugins\org.eclipse.ui.views_3.4.0.I20090525-2000.jar;C:\eclipse\plugins\org.eclipse.ui.editors_3.5.0.v20090527-2000.jar;C:\eclipse\plugins\org.eclipse.text_3.5.0.v20090513-2000.jar;D:\repositories\FAT\opendf trunk\contrib\eclipse\OpendfDebuggerPlugin\bin;C:\eclipse\plugins\org.eclipse.jface.text_3.5.0.v20090602.jar;C:\eclipse\plugins\org.eclipse.core.expressions_3.4.100.v20090429-1800.jar;C:\eclipse\plugins\org.eclipse.jdt.launching_3.5.0.v20090527.jar;D:\repositories\mwipliez\orcc\trunk\plugin\bin;C:\eclipse\plugins\org.eclipse.jdt.compiler.tool_1.0.100.v_963.jar;lib/antlr-2.7.7.jar;C:\eclipse\plugins\org.eclipse.ui.ide_3.5.0.I20090525-2000.jar;C:\eclipse\plugins\org.eclipse.equinox.app_1.2.0.v20090520-1800.jar;C:\eclipse\plugins\org.eclipse.osgi_3.5.0.v20090520.jar;C:\eclipse\plugins\org.eclipse.core.commands_3.5.0.I20090525-2000.jar;C:\eclipse\plugins\org.eclipse.debug.core_3.5.0.v20090526-1600.jar;C:\eclipse\plugins\org.eclipse.jdt.core_3.5.0.v_963.jar;C:\eclipse\plugins\org.eclipse.swt_3.5.0.v3550b.jar;C:\eclipse\plugins\org.eclipse.jface_3.5.0.I20090525-2000.jar;C:\eclipse\plugins\org.eclipse.core.contenttype_3.4.0.v20090429-1800.jar;C:\eclipse\plugins\org.eclipse.equinox.common_3.5.0.v20090520-1800.jar"
+        	destdir="javadoc"
+        	doctitle="Orcc"
+        	nodeprecated="false"
+        	nodeprecatedlist="false"
+        	noindex="false"
+        	nonavbar="false"
+        	notree="false"
+        	packagenames="net.sf.orcc.backends.llvm.nodes,net.sf.orcc.backends.llvm.transforms,net.sf.orcc.backends.llvm,net.sf.orcc.backends.c.nodes,net.sf.orcc.backends.java.debug,net.sf.orcc.backends.cpp,net.sf.orcc.backends.llvm.util,net.sf.orcc.backends.java,net.sf.orcc.backends,net.sf.orcc.backends.llvm.type,net.sf.orcc.backends.c,net.sf.orcc.backends.c.transforms,net.sf.orcc.backends.cllvm,net.sf.orcc.backends.multicore,net.sf.orcc.backends.xlim"
+        	source="1.6"
+        	sourcepath="src"
+        	splitindex="true"
+        	use="true"
+        	version="true">
+
+            <link href="http://orcc.sourceforge.net/javadoc/plugin/"/>
+            <link href="jar:file:/C:/eclipse/plugins/org.eclipse.jdt.doc.isv_3.5.0.v20090603-1530.jar!/reference/api"/>
+            <link href="jar:file:/C:/eclipse/plugins/org.eclipse.platform.doc.isv_3.5.0.v20090611.jar!/reference/api"/>
+            <link href="http://www.jgrapht.org/javadoc/"/>
+            <link href="http://orcc.sourceforge.net/javadoc/backends/"/>
+            <link href="http://java.sun.com/javase/6/docs/api/"/>
+
+        	<!-- if behind the INSA proxy -->
+        	<arg value="-J-Dhttp.proxyHost=proxy.insa-rennes.fr"/>
+        	<arg value="-J-Dhttp.proxyPort=8080"/>
+        </javadoc>
+    </target>
+</project>
