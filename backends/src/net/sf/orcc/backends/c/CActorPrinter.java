@@ -36,14 +36,14 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.PluginGroupLoader;
-import net.sf.orcc.common.Port;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVariable;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.util.OrderedMap;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -133,7 +133,7 @@ public class CActorPrinter {
 		// body
 		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
 				actorName, varDefPrinter, exprPrinter);
-		for (AbstractNode node : proc.getNodes()) {
+		for (INode node : proc.getNodes()) {
 			node.accept(printer);
 		}
 

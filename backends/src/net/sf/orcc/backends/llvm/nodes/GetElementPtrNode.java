@@ -30,10 +30,10 @@ package net.sf.orcc.backends.llvm.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Use;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Use;
 
 /**
  * @author Jérôme GORIN

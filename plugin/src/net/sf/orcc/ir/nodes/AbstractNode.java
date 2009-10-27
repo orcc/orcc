@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.nodes;
 
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -36,7 +37,7 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractNode {
+public abstract class AbstractNode implements INode {
 
 	private int id;
 
@@ -47,12 +48,11 @@ public abstract class AbstractNode {
 		this.location = location;
 	}
 
-	public abstract void accept(NodeVisitor visitor, Object... args);
-
 	public int getId() {
 		return id;
 	}
 
+	@Override
 	public Location getLocation() {
 		return location;
 	}

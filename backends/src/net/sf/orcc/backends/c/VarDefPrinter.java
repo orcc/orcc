@@ -31,9 +31,9 @@ package net.sf.orcc.backends.c;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.common.Use;
-import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.NameTransformer;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.nodes.AbstractFifoNode;
 
 /**

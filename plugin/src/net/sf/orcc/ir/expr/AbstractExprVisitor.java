@@ -30,7 +30,6 @@ package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.IExpr;
 
-
 /**
  * This class is an abstract implementation of {@link ExprVisitor}.
  * 

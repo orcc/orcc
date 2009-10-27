@@ -34,15 +34,15 @@ import java.util.ListIterator;
 import net.sf.orcc.backends.c.nodes.DecrementNode;
 import net.sf.orcc.backends.c.nodes.IncrementNode;
 import net.sf.orcc.backends.c.nodes.SelfAssignment;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
@@ -56,10 +56,10 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class IncrementPeephole extends AbstractActorTransformation {
 
-	private void examine(ListIterator<AbstractNode> it) {
-		AbstractNode node1 = it.next();
+	private void examine(ListIterator<INode> it) {
+		INode node1 = it.next();
 		if (it.hasNext()) {
-			AbstractNode node2 = it.next();
+			INode node2 = it.next();
 			boolean res = false;
 
 			if (node1 instanceof LoadNode && node2 instanceof StoreNode) {
@@ -97,9 +97,9 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	}
 
 	private boolean replaceSelfAssignment(OrderedMap<Variable> locals,
-			ListIterator<AbstractNode> it, LocalVariable varDefTmp,
-			Variable varDef, VarExpr v1, BinaryOp op, IExpr e2) {
-		AbstractNode node;
+			ListIterator<INode> it, LocalVariable varDefTmp, Variable varDef,
+			VarExpr v1, BinaryOp op, IExpr e2) {
+		INode node;
 		if (op == BinaryOp.PLUS && e2.getType() == IExpr.INT
 				&& ((IntExpr) e2).getValue() == 1) {
 			node = new IncrementNode(0, new Location(), varDef);
@@ -130,8 +130,8 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	}
 
 	@Override
-	protected void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
+	protected void visitNodes(List<INode> nodes) {
+		ListIterator<INode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			examine(it);
 		}

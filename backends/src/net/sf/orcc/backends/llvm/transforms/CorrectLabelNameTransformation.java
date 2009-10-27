@@ -34,11 +34,11 @@ import java.util.ListIterator;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
+import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.transforms.IActorTransformation;
 
 /**
  * Verify Branch Name coherence
@@ -79,8 +79,8 @@ public class CorrectLabelNameTransformation extends AbstractLLVMNodeVisitor
 		node.setLabelName("bb" + Integer.toString(brCount++));
 	}
 
-	private void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
+	private void visitNodes(List<INode> nodes) {
+		ListIterator<INode> it = nodes.listIterator();
 
 		while (it.hasNext()) {
 			it.next().accept(this, it);
@@ -89,7 +89,7 @@ public class CorrectLabelNameTransformation extends AbstractLLVMNodeVisitor
 
 	private void visitProc(Procedure proc) {
 		brCount = 0;
-		List<AbstractNode> nodes = proc.getNodes();
+		List<INode> nodes = proc.getNodes();
 
 		visitNodes(nodes);
 	}

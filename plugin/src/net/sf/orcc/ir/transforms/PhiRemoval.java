@@ -31,13 +31,13 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
@@ -55,8 +55,8 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 	@Override
 	public void visit(IfNode node, Object... args) {
-		List<AbstractNode> nodes = node.getThenNodes();
-		ListIterator<AbstractNode> it = nodes.listIterator(nodes.size());
+		List<INode> nodes = node.getThenNodes();
+		ListIterator<INode> it = nodes.listIterator(nodes.size());
 		node.getJoinNode().accept(this, it, 0);
 
 		nodes = node.getElseNodes();
@@ -73,7 +73,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 	public void visit(JoinNode node, Object... args) {
 		List<PhiAssignment> phis = node.getPhiAssignments();
 		if (!phis.isEmpty()) {
-			ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+			ListIterator<INode> it = (ListIterator<INode>) args[0];
 			int phiIndex = (Integer) args[1];
 
 			for (PhiAssignment phi : phis) {
@@ -105,7 +105,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(WhileNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 
 		// the node before the while.
 		it.previous();

@@ -35,19 +35,19 @@ import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Use;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.transforms.IActorTransformation;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.ListType;
 
 /**
@@ -64,7 +64,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 	@SuppressWarnings("unchecked")
 	public Use getElementPtrNodeCreate(Use varList, List<IExpr> indexes,
 			Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 
 		it.previous();
 
@@ -156,8 +156,8 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 		}
 	}
 
-	private void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
+	private void visitNodes(List<INode> nodes) {
+		ListIterator<INode> it = nodes.listIterator();
 
 		while (it.hasNext()) {
 			it.next().accept(this, it);
@@ -166,7 +166,7 @@ public class ArrayListTransformation extends AbstractLLVMNodeVisitor implements
 
 	private void visitProc(Procedure proc) {
 		indexName = 0;
-		List<AbstractNode> nodes = proc.getNodes();
+		List<INode> nodes = proc.getNodes();
 
 		visitNodes(nodes);
 	}

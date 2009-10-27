@@ -38,15 +38,15 @@ import java.util.Map;
 import net.sf.orcc.backends.PluginGroupLoader;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.util.NodeIndex;
-import net.sf.orcc.common.Port;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.util.OrderedMap;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -135,7 +135,7 @@ public class LLVMActorPrinter {
 		// body
 		LLVMNodePrinter printer = new LLVMNodePrinter(group, procTmpl,
 				actorName, proc, varDefPrinter, exprPrinter, typePrinter);
-		for (AbstractNode node : proc.getNodes()) {
+		for (INode node : proc.getNodes()) {
 			node.accept(printer);
 		}
 
@@ -211,7 +211,7 @@ public class LLVMActorPrinter {
 			LLVMNodePrinter printer = new LLVMNodePrinter(group, instTmpl,
 					actorName, proc, varDefPrinter, exprPrinter, typePrinter);
 
-			for (AbstractNode node : proc.getNodes()) {
+			for (INode node : proc.getNodes()) {
 				node.accept(printer, count);
 				count++;
 			}

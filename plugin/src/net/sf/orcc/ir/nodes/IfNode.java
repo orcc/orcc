@@ -31,6 +31,7 @@ package net.sf.orcc.ir.nodes;
 import java.util.List;
 
 import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -42,17 +43,16 @@ import net.sf.orcc.ir.Location;
  */
 public class IfNode extends AbstractNode implements IValueContainer {
 
-	private List<AbstractNode> elseNodes;
+	private List<INode> elseNodes;
 
 	private JoinNode joinNode;
 
-	private List<AbstractNode> thenNodes;
+	private List<INode> thenNodes;
 
 	private IExpr value;
 
 	public IfNode(int id, Location location, IExpr condition,
-			List<AbstractNode> thenNodes, List<AbstractNode> elseNodes,
-			JoinNode joinNode) {
+			List<INode> thenNodes, List<INode> elseNodes, JoinNode joinNode) {
 		super(id, location);
 		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
@@ -65,7 +65,7 @@ public class IfNode extends AbstractNode implements IValueContainer {
 		visitor.visit(this, args);
 	}
 
-	public List<AbstractNode> getElseNodes() {
+	public List<INode> getElseNodes() {
 		return elseNodes;
 	}
 
@@ -73,7 +73,7 @@ public class IfNode extends AbstractNode implements IValueContainer {
 		return joinNode;
 	}
 
-	public List<AbstractNode> getThenNodes() {
+	public List<INode> getThenNodes() {
 		return thenNodes;
 	}
 

@@ -30,9 +30,9 @@ package net.sf.orcc.backends.c;
 
 import java.util.List;
 
+import net.sf.orcc.ir.IConst;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ConstVisitor;
-import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;

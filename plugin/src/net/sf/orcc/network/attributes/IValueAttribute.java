@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.network.attributes;
 
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
 
 /**
  * This interface represents an attribute whose value is an expression.

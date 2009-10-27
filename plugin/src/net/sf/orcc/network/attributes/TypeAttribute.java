@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.network.attributes;
 
-import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.IType;
 
 /**
  * This class is the implementation of {@link ITypeAttribute}.

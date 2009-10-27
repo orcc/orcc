@@ -34,9 +34,9 @@ import java.io.IOException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
+import net.sf.orcc.ir.IActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 

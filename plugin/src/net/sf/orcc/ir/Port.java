@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-
-
 /**
  * This class represents a port. A port is a variable.
  * 

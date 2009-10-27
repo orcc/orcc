@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.c.nodes;
 
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Variable;
 
 /**
  * This class defines an Increment node that increments a Variable, global or

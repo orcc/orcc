@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.java;
 
 import net.sf.orcc.backends.c.TypeToString;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.TypeVisitor;

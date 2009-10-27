@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Use;
 
@@ -45,19 +46,18 @@ public class CommonNodeOperations {
 	 * to this node.
 	 * 
 	 * @param node
-	 *            an {@link AbstractNode} that implements
-	 *            {@link ITargetContainer}
+	 *            an {@link INode} that implements {@link ITargetContainer}
 	 * @param target
 	 *            a local variable
 	 */
 	public static void setTarget(ITargetContainer node, LocalVariable target) {
 		LocalVariable thisTarget = node.getTarget();
 		if (thisTarget != null) {
-			thisTarget.removeUse((AbstractNode) node);
+			thisTarget.removeUse((INode) node);
 		}
 
 		if (target != null) {
-			target.addUse((AbstractNode) node);
+			target.addUse((INode) node);
 		}
 
 		node.setTargetSimple(target);
@@ -67,19 +67,18 @@ public class CommonNodeOperations {
 	 * Sets the value of this node. Uses are updated to point to this node.
 	 * 
 	 * @param node
-	 *            an {@link AbstractNode} that implements
-	 *            {@link IValueContainer}
+	 *            an {@link INode} that implements {@link IValueContainer}
 	 * @param value
 	 *            an expression
 	 */
 	public static void setValue(IValueContainer node, IExpr value) {
 		IExpr thisValue = node.getValue();
 		if (thisValue != null) {
-			Use.removeUses((AbstractNode) node, thisValue);
+			Use.removeUses((INode) node, thisValue);
 		}
 
 		if (value != null) {
-			Use.addUses((AbstractNode) node, value);
+			Use.addUses((INode) node, value);
 		}
 
 		node.setValueSimple(value);

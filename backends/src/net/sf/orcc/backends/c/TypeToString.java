@@ -29,10 +29,10 @@
 package net.sf.orcc.backends.c;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;

@@ -35,29 +35,29 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Use;
+import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
-import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 
 /**
@@ -155,7 +155,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 
 	@SuppressWarnings("unchecked")
 	public VarExpr splitBinaryExpr(BinaryExpr expr, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 
 		if (expr.getE1().getType() == IExpr.BINARY) {
 			expr.setE1(splitBinaryExpr((BinaryExpr) expr.getE1(), it));
@@ -180,7 +180,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 
 	@SuppressWarnings("unchecked")
 	public void splitIndex(List<IExpr> indexes, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		ListIterator<IExpr> itIndex = indexes.listIterator();
 
 		while (itIndex.hasNext()) {
@@ -220,7 +220,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(AssignVarNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		IExpr value = node.getValue();
 
 		// Change unary expression into binary expression
@@ -252,8 +252,8 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 		}
 
 		if (node.getCondition().getType() == IExpr.BINARY) {
-			ListIterator<AbstractNode> itConditionNodes = node
-					.getConditionNodes().listIterator();
+			ListIterator<INode> itConditionNodes = node.getConditionNodes()
+					.listIterator();
 			VarExpr expr = splitBinaryExpr((BinaryExpr) node.getCondition(),
 					itConditionNodes);
 
@@ -267,7 +267,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(CallNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		List<IExpr> exprs = node.getParameters();
 		for (IExpr expr : exprs) {
 			if (expr.getType() == IExpr.UNARY) {
@@ -287,7 +287,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(LoadNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		List<IExpr> indexes = node.getIndexes();
 
 		if (!indexes.isEmpty()) {
@@ -300,7 +300,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(ReturnNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		// Change unary expression into binary expression
 		if (node.getValue().getType() == IExpr.UNARY) {
 			node.setValue(removeUnaryExpr((UnaryExpr) node.getValue()));
@@ -317,7 +317,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(SelectNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		// Change unary expression into binary expression
 		if (node.getCondition().getType() == IExpr.UNARY) {
 			node.setCondition(removeUnaryExpr((UnaryExpr) node.getCondition()));
@@ -335,7 +335,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(StoreNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 
 		// Change unary expression into binary expression
 		if (node.getValue().getType() == IExpr.UNARY) {
@@ -357,8 +357,8 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 		}
 	}
 
-	private void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
+	private void visitNodes(List<INode> nodes) {
+		ListIterator<INode> it = nodes.listIterator();
 
 		while (it.hasNext()) {
 			it.next().accept(this, it);
@@ -368,7 +368,7 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	private void visitProc(Procedure proc) {
 		exprCounter = 0;
 
-		List<AbstractNode> nodes = proc.getNodes();
+		List<INode> nodes = proc.getNodes();
 		visitNodes(nodes);
 	}
 }

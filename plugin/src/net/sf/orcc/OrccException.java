@@ -28,7 +28,7 @@
  */
 package net.sf.orcc;
 
-import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.Location;
 
 /**
  * An exception raised in Orcc.

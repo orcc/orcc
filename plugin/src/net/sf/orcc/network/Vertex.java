@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.network;
 
-import net.sf.orcc.common.Port;
+import net.sf.orcc.ir.Port;
 
 /**
  * This class defines a vertex in an XDF network. A vertex is either an input

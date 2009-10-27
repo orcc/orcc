@@ -89,6 +89,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.IConst;
 import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -115,7 +116,6 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
@@ -162,7 +162,7 @@ public class IrParser {
 
 	private OrderedMap<Port> outputs;
 
-	private AbstractNode previousNode;
+	private INode previousNode;
 
 	private OrderedMap<Procedure> procs;
 
@@ -494,8 +494,8 @@ public class IrParser {
 	private IfNode parseIfNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		IExpr condition = parseExpr(array.getJSONArray(0));
-		List<AbstractNode> thenNodes = parseNodes(array.getJSONArray(1));
-		List<AbstractNode> elseNodes = parseNodes(array.getJSONArray(2));
+		List<INode> thenNodes = parseNodes(array.getJSONArray(1));
+		List<INode> elseNodes = parseNodes(array.getJSONArray(2));
 
 		return new IfNode(id, loc, condition, thenNodes, elseNodes, null);
 	}
@@ -535,12 +535,12 @@ public class IrParser {
 		}
 	}
 
-	private AbstractNode parseNode(JSONArray array) throws JSONException,
+	private INode parseNode(JSONArray array) throws JSONException,
 			OrccException {
 		String name = array.getString(0);
 		int id = array.getInt(1);
 		Location loc = parseLocation(array.getJSONArray(2));
-		AbstractNode node = null;
+		INode node = null;
 
 		if (name.equals(NAME_ASSIGN)) {
 			node = parseAssignVarNode(id, loc, array.getJSONArray(3));
@@ -586,11 +586,11 @@ public class IrParser {
 		return node;
 	}
 
-	private List<AbstractNode> parseNodes(JSONArray array)
-			throws JSONException, OrccException {
-		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
+	private List<INode> parseNodes(JSONArray array) throws JSONException,
+			OrccException {
+		List<INode> nodes = new ArrayList<INode>();
 		for (int i = 0; i < array.length(); i++) {
-			AbstractNode node = parseNode(array.getJSONArray(i));
+			INode node = parseNode(array.getJSONArray(i));
 			if (node != null) {
 				nodes.add(node);
 			}
@@ -686,7 +686,7 @@ public class IrParser {
 		OrderedMap<Variable> locals = variables;
 		parseVarDefs(array.getJSONArray(4));
 
-		List<AbstractNode> nodes = parseNodes(array.getJSONArray(5));
+		List<INode> nodes = parseNodes(array.getJSONArray(5));
 
 		// go back to previous scope
 		variables = variables.getParent();
@@ -856,7 +856,7 @@ public class IrParser {
 		Location loc = parseLocation(array.getJSONArray(1));
 		IType type = parseType(array.get(2));
 
-		AbstractNode node = null;
+		INode node = null;
 
 		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
 				node, suffix, type);
@@ -883,7 +883,7 @@ public class IrParser {
 	private WhileNode parseWhileNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		IExpr condition = parseExpr(array.getJSONArray(0));
-		List<AbstractNode> nodes = parseNodes(array.getJSONArray(1));
+		List<INode> nodes = parseNodes(array.getJSONArray(1));
 		JoinNode joinNode = (JoinNode) nodes.remove(0);
 		return new WhileNode(id, loc, condition, nodes, joinNode);
 	}

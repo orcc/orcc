@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.Location;
 
 /**
  * An ordered map maintains mapping of string to object as well as the order in

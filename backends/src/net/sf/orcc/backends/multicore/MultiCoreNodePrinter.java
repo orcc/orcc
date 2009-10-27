@@ -116,19 +116,19 @@ public class MultiCoreNodePrinter {
 	// pp.print(") {");
 	//
 	// pp.indent();
-	// for (AbstractNode subNode : node.getThenNodes()) {
+	// for (INode subNode : node.getThenNodes()) {
 	// subNode.accept(this, args);
 	// }
 	// pp.unindent();
 	// pp.println();
 	// pp.print("}");
 	//
-	// List<AbstractNode> elseNodes = node.getElseNodes();
+	// List<INode> elseNodes = node.getElseNodes();
 	// if (!(elseNodes.size() == 1 && elseNodes.get(0) instanceof EmptyNode)) {
 	// pp.print(" else {");
 	// pp.indent();
 	//
-	// for (AbstractNode subNode : elseNodes) {
+	// for (INode subNode : elseNodes) {
 	// subNode.accept(this, args);
 	// }
 	//
@@ -249,7 +249,7 @@ public class MultiCoreNodePrinter {
 	// pp.print(") {");
 	//
 	// pp.indent();
-	// for (AbstractNode subNode : node.getNodes()) {
+	// for (INode subNode : node.getNodes()) {
 	// subNode.accept(this, args);
 	// }
 	// pp.unindent();

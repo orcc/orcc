@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
@@ -44,22 +44,22 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class MoveWritesTransformation extends AbstractActorTransformation {
 
-	private List<AbstractNode> writes;
+	private List<INode> writes;
 
 	public MoveWritesTransformation() {
-		writes = new ArrayList<AbstractNode>();
+		writes = new ArrayList<INode>();
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(WriteNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		writes.add(node);
 		it.remove();
 	}
 
 	@Override
-	protected void visitNodes(List<AbstractNode> nodes) {
+	protected void visitNodes(List<INode> nodes) {
 		// visit nodes
 		super.visitNodes(nodes);
 

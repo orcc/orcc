@@ -32,8 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Port;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.network.attributes.IAttribute;

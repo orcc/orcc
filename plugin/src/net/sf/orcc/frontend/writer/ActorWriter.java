@@ -37,16 +37,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.IrConstants;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -121,8 +121,6 @@ public class ActorWriter {
 			break;
 		case IExpr.STRING:
 			array.put(((StringExpr) expr).getValue());
-			break;
-		case IExpr.TYPE:
 			break;
 		case IExpr.UNARY:
 			break;

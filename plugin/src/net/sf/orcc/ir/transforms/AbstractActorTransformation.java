@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 
 /**
@@ -73,8 +73,8 @@ public class AbstractActorTransformation extends AbstractNodeVisitor implements
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	protected void visitNodes(List<AbstractNode> nodes) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
+	protected void visitNodes(List<INode> nodes) {
+		ListIterator<INode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			it.next().accept(this, it);
 		}
@@ -88,7 +88,7 @@ public class AbstractActorTransformation extends AbstractNodeVisitor implements
 	 */
 	private void visitProc(Procedure procedure) {
 		this.procedure = procedure;
-		List<AbstractNode> nodes = procedure.getNodes();
+		List<INode> nodes = procedure.getNodes();
 		visitNodes(nodes);
 	}
 

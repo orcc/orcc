@@ -28,16 +28,15 @@
  */
 package net.sf.orcc.backends.c;
 
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.ExprVisitor;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.TypeExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -176,11 +175,6 @@ public class ExprToString implements ExprVisitor {
 		builder.append('"');
 		builder.append(expr.getValue().replaceAll("\\\\", "\\\\\\\\"));
 		builder.append('"');
-	}
-
-	@Override
-	public void visit(TypeExpr expr, Object... args) {
-		builder.append(expr.getUnderlyingType());
 	}
 
 	@Override

@@ -34,12 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Use;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;

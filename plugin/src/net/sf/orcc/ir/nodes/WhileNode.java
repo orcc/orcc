@@ -31,6 +31,7 @@ package net.sf.orcc.ir.nodes;
 import java.util.List;
 
 import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -44,12 +45,12 @@ public class WhileNode extends AbstractNode implements IValueContainer {
 
 	private JoinNode joinNode;
 
-	private List<AbstractNode> nodes;
+	private List<INode> nodes;
 
 	private IExpr value;
 
 	public WhileNode(int id, Location location, IExpr condition,
-			List<AbstractNode> nodes, JoinNode joinNode) {
+			List<INode> nodes, JoinNode joinNode) {
 		super(id, location);
 		this.joinNode = joinNode;
 		this.nodes = nodes;
@@ -65,7 +66,7 @@ public class WhileNode extends AbstractNode implements IValueContainer {
 		return joinNode;
 	}
 
-	public List<AbstractNode> getNodes() {
+	public List<INode> getNodes() {
 		return nodes;
 	}
 

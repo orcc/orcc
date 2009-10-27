@@ -30,9 +30,9 @@ package net.sf.orcc.backends.llvm.nodes;
 
 import java.util.Map;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
 
 /**
  * @author Jérôme GORIN

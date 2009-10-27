@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
@@ -41,7 +42,6 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
@@ -62,7 +62,7 @@ public class AddInstantationProcedure implements IActorTransformation {
 			OrderedMap<Port> ports) throws OrccException {
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 		OrderedMap<Variable> locals = new OrderedMap<Variable>();
-		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
+		List<INode> nodes = new ArrayList<INode>();
 
 		Location location = new Location();
 		LocalVariable parameter = new LocalVariable(false, 0, location, "fifo",

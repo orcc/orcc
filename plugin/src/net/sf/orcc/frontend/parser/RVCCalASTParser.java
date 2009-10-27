@@ -38,28 +38,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
-import net.sf.orcc.common.Variable;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
+import net.sf.orcc.ir.IConst;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.FSM;
-import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.actor.Tag;
-import net.sf.orcc.ir.consts.IConst;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -427,7 +427,7 @@ public class RVCCalASTParser {
 
 		Location loc = parseLocation(nameTree);
 
-		AbstractNode node = new EmptyNode(0, new Location());
+		INode node = new EmptyNode(0, new Location());
 
 		return new LocalVariable(assignable, index, loc, name, node, suffix,
 				type);

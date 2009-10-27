@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.util.INameable;
 
 /**
@@ -114,7 +113,7 @@ public abstract class Variable implements INameable {
 	 * @param node
 	 *            a node that uses this variable
 	 */
-	public void addUse(AbstractNode node) {
+	public void addUse(INode node) {
 		new Use(this, node);
 	}
 
@@ -189,7 +188,7 @@ public abstract class Variable implements INameable {
 	 * @param node
 	 *            a node
 	 */
-	public void removeUse(AbstractNode node) {
+	public void removeUse(INode node) {
 		ListIterator<Use> it = uses.listIterator();
 		while (it.hasNext()) {
 			Use use = it.next();

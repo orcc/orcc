@@ -26,37 +26,20 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.common;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.nodes.NodeVisitor;
 
 /**
- * This class represents a port. A port is a variable.
+ * This class defines a node in the CFG.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Port extends Variable {
+public interface INode {
 
-	/**
-	 * Creates a new port with the given location, type, and name.
-	 * 
-	 * @param location
-	 *            the port location
-	 * @param type
-	 *            the port type
-	 * @param name
-	 *            the port name
-	 */
-	public Port(Location location, IType type, String name) {
-		super(location, type, name, true);
-	}
+	public void accept(NodeVisitor visitor, Object... args);
 
-	/**
-	 * Creates a new port from the given port
-	 */
-	public Port(Port port) {
-		super(port);
-	}
+	public Location getLocation();
 
 }

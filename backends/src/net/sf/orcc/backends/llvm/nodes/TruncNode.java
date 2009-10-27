@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
 
 /**
  * @author Jérôme GORIN

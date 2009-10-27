@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.nodes.AbstractNode;
-
 /**
  * This class represents a local variable. A local variable is a variable that
  * can be assigned, has a SSA index, and a reference to the node where it is
@@ -61,7 +59,7 @@ public class LocalVariable extends Variable implements
 	/**
 	 * the node where the variable is assigned.
 	 */
-	private AbstractNode node;
+	private INode node;
 
 	/**
 	 * when local variables have the same name but different scopes.
@@ -69,7 +67,7 @@ public class LocalVariable extends Variable implements
 	private Integer suffix;
 
 	public LocalVariable(boolean assignable, int index, Location loc,
-			String name, AbstractNode node, Integer suffix, IType type) {
+			String name, INode node, Integer suffix, IType type) {
 		super(loc, type, name, false);
 		this.assignable = assignable;
 		this.index = index;
@@ -121,7 +119,7 @@ public class LocalVariable extends Variable implements
 		return super.getName() + (suffix == null ? "" : suffix) + "_" + index;
 	}
 
-	public AbstractNode getNode() {
+	public INode getNode() {
 		return node;
 	}
 
@@ -154,7 +152,7 @@ public class LocalVariable extends Variable implements
 		this.index = index;
 	}
 
-	public void setNode(AbstractNode node) {
+	public void setNode(INode node) {
 		this.node = node;
 	}
 

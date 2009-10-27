@@ -30,7 +30,6 @@ package net.sf.orcc.ir.type;
 
 import net.sf.orcc.ir.IType;
 
-
 /**
  * This class is an abstract implementation of {@link IType}.
  * 

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.type;
 
-import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.type.TypeVisitor;
 
 /**

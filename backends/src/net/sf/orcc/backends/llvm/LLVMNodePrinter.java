@@ -47,14 +47,15 @@ import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Use;
-import net.sf.orcc.common.Variable;
-import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
@@ -71,7 +72,6 @@ import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.util.OrderedMap;
 
@@ -157,9 +157,9 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	@Override
 	public void visit(BrNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("brNode");
-		List<AbstractNode> conditionNodes = node.getConditionNodes();
-		List<AbstractNode> thenNodes = node.getThenNodes();
-		List<AbstractNode> elseNodes = node.getElseNodes();
+		List<INode> conditionNodes = node.getConditionNodes();
+		List<INode> thenNodes = node.getThenNodes();
+		List<INode> elseNodes = node.getElseNodes();
 		List<PhiNode> phiNodes = node.getPhiNodes();
 
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getCondition(),
@@ -174,17 +174,17 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		template = nodeTmpl;
 
 		attrName = "conditionNodes";
-		for (AbstractNode subNode : conditionNodes) {
+		for (INode subNode : conditionNodes) {
 			subNode.accept(this, args);
 		}
 
 		attrName = "thenNodes";
-		for (AbstractNode subNode : thenNodes) {
+		for (INode subNode : thenNodes) {
 			subNode.accept(this, args);
 		}
 
 		attrName = "elseNodes";
-		for (AbstractNode subNode : elseNodes) {
+		for (INode subNode : elseNodes) {
 			subNode.accept(this, args);
 		}
 
@@ -488,7 +488,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		template = nodeTmpl;
 		attrName = "nodes";
 
-		for (AbstractNode subNode : node.getNodes()) {
+		for (INode subNode : node.getNodes()) {
 			subNode.accept(this, args);
 		}
 

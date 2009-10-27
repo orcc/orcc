@@ -39,13 +39,13 @@ import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.PhiNode;
-import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.transforms.IActorTransformation;
-import net.sf.orcc.ir.type.IType;
 
 /**
  * Change every load on array into getElementPtrNode.
@@ -56,7 +56,7 @@ import net.sf.orcc.ir.type.IType;
 public class JoinNodeTransformation extends AbstractLLVMNodeVisitor implements
 		IActorTransformation {
 
-	List<AbstractNode> abstractNodes;
+	List<INode> abstractNodes;
 
 	private void mergeBrNode(BrNode node) {
 		LabelNode labelNode = node.getLabelEndNode();
@@ -67,7 +67,7 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor implements
 
 		List<LabelNode> precedences = labelNode.getPrecedence();
 		for (LabelNode precedence : precedences) {
-			AbstractNode successorNode = precedence.getSuccessor();
+			INode successorNode = precedence.getSuccessor();
 
 			if (successorNode instanceof BrLabelNode) {
 				BrLabelNode brLabelNode = (BrLabelNode) successorNode;
@@ -176,14 +176,14 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor implements
 			}
 		}
 
-		List<AbstractNode> tmpNode = abstractNodes;
+		List<INode> tmpNode = abstractNodes;
 		visitNodes(node.getThenNodes(), phiNodes);
 		visitNodes(node.getElseNodes(), phiNodes);
 		abstractNodes = tmpNode;
 	}
 
-	private void visitNodes(List<AbstractNode> nodes, Object... args) {
-		ListIterator<AbstractNode> it = nodes.listIterator();
+	private void visitNodes(List<INode> nodes, Object... args) {
+		ListIterator<INode> it = nodes.listIterator();
 		abstractNodes = nodes;
 		while (it.hasNext()) {
 			it.next().accept(this, args);
@@ -191,7 +191,7 @@ public class JoinNodeTransformation extends AbstractLLVMNodeVisitor implements
 	}
 
 	private void visitProc(Procedure proc) {
-		List<AbstractNode> nodes = proc.getNodes();
+		List<INode> nodes = proc.getNodes();
 
 		visitNodes(nodes);
 	}

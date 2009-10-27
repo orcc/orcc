@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.AbstractTypeVisitor;
 import net.sf.orcc.ir.type.ListType;

@@ -31,10 +31,10 @@ package net.sf.orcc.util;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * This class defines a parser of binary operation sequences. This parser

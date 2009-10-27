@@ -30,7 +30,6 @@ package net.sf.orcc.ir;
 
 import net.sf.orcc.ir.type.TypeVisitor;
 
-
 /**
  * This interface defines a type.
  * 

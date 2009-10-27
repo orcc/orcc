@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.Location;
 
 /**
  * @author Jérôme GORIN

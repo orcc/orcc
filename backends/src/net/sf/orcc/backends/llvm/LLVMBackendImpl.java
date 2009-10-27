@@ -38,13 +38,13 @@ import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
 import net.sf.orcc.backends.llvm.transforms.JoinNodeTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.backends.llvm.transforms.TypeTransformation;
+import net.sf.orcc.ir.IActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.AssignPeephole;
 import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
 import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
-import net.sf.orcc.ir.transforms.IActorTransformation;
 import net.sf.orcc.network.Network;
 
 /**

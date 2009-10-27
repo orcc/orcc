@@ -30,13 +30,13 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.List;
 
+import net.sf.orcc.ir.IConst;
+import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ConstVisitor;
-import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.ListType;
 
 import org.antlr.stringtemplate.StringTemplate;

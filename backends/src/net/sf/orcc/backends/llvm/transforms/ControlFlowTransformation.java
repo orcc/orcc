@@ -40,25 +40,23 @@ import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.PhiNode;
 import net.sf.orcc.backends.llvm.nodes.SelectNode;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Use;
+import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.expr.TypeExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transforms.IActorTransformation;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.VoidType;
 
 /**
  * Adds control flow.
@@ -71,7 +69,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 
 	private int BrCounter;
 
-	ListIterator<AbstractNode> it;
+	ListIterator<INode> it;
 
 	private LabelNode labelNode;
 
@@ -83,9 +81,9 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 		int id = node.getId();
 		Location location = node.getLocation();
 		IExpr condition = node.getValue();
-		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
-		List<AbstractNode> thenNodes = node.getThenNodes();
-		List<AbstractNode> elseNodes = node.getElseNodes();
+		List<INode> conditionNodes = new ArrayList<INode>();
+		List<INode> thenNodes = node.getThenNodes();
+		List<INode> elseNodes = node.getElseNodes();
 
 		LabelNode thenLabelNode = null;
 		LabelNode elseLabelNode = null;
@@ -104,7 +102,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 					"bb" + Integer.toString(BrCounter++));
 
 			// Store current iterator and branch label
-			ListIterator<AbstractNode> itTmp = it;
+			ListIterator<INode> itTmp = it;
 			labelNode = thenLabelNode;
 
 			// Continue transformation on thenNode
@@ -125,7 +123,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 			labelNode = elseLabelNode;
 
 			// Store current iterator and branch label
-			ListIterator<AbstractNode> itTmp = it;
+			ListIterator<INode> itTmp = it;
 
 			// Continue transformation on elseNode
 			visitNodes(elseNodes, node);
@@ -168,9 +166,9 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 		int id = node.getId();
 		Location location = node.getLocation();
 		IExpr condition = node.getValue();
-		List<AbstractNode> conditionNodes = new ArrayList<AbstractNode>();
-		List<AbstractNode> thenNodes = node.getNodes();
-		List<AbstractNode> elseNodes = new ArrayList<AbstractNode>();
+		List<INode> conditionNodes = new ArrayList<INode>();
+		List<INode> thenNodes = node.getNodes();
+		List<INode> elseNodes = new ArrayList<INode>();
 		LabelNode entryLabelNode = labelNode;
 		LabelNode thenLabelNode = null;
 		List<PhiNode> phiNodes = new ArrayList<PhiNode>();
@@ -180,7 +178,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 		labelNode = thenLabelNode;
 
 		// Store current iterator and branch label
-		ListIterator<AbstractNode> itTmp = it;
+		ListIterator<INode> itTmp = it;
 
 		// Continue transformation on thenNode
 		visitNodes(thenNodes, node);
@@ -205,9 +203,9 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 	}
 
 	// Remove ifNode in case of a constant condition
-	private List<AbstractNode> clearIfNode(IfNode node) {
+	private List<INode> clearIfNode(IfNode node) {
 		BooleanExpr condition = (BooleanExpr) node.getValue();
-		List<AbstractNode> nodes;
+		List<INode> nodes;
 		List<PhiAssignment> phis = node.getJoinNode().getPhiAssignments();
 		boolean value = condition.getValue();
 
@@ -304,8 +302,8 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 
 	@Override
 	public void visit(IfNode node, Object... args) {
-		List<AbstractNode> thenNodes = node.getThenNodes();
-		List<AbstractNode> elseNodes = node.getElseNodes();
+		List<INode> thenNodes = node.getThenNodes();
+		List<INode> elseNodes = node.getElseNodes();
 		JoinNode joinNode = node.getJoinNode();
 
 		// Select the appropriate llvm Node to describe the current IfNode
@@ -315,9 +313,9 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 			it.remove();
 			it.add(selectNode);
 		} else if (node.getValue().getType() == IExpr.BOOLEAN) {
-			List<AbstractNode> brNodes = clearIfNode(node);
+			List<INode> brNodes = clearIfNode(node);
 			it.remove();
-			for (AbstractNode brNode : brNodes) {
+			for (INode brNode : brNodes) {
 				it.add(brNode);
 			}
 		} else {
@@ -365,7 +363,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 
 	}
 
-	private void visitNodes(List<AbstractNode> nodes, Object... args) {
+	private void visitNodes(List<INode> nodes, Object... args) {
 		it = nodes.listIterator();
 
 		while (it.hasNext()) {
@@ -374,7 +372,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 	}
 
 	private void visitProc(Procedure proc) {
-		List<AbstractNode> nodes = proc.getNodes();
+		List<INode> nodes = proc.getNodes();
 		BrCounter = 0;
 		tmpPhiNodes = null;
 		labelNode = new LabelNode(0, null, "entry");
@@ -383,8 +381,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 
 		// Add void return
 		if (proc.getReturnType().getType() == IType.VOID) {
-			TypeExpr expr = new TypeExpr(null, new VoidType());
-			nodes.add(new ReturnNode(0, null, expr));
+			nodes.add(new ReturnNode(0, null, null));
 		}
 	}
 }

@@ -34,10 +34,10 @@ import net.sf.orcc.backends.c.nodes.CNodeVisitor;
 import net.sf.orcc.backends.c.nodes.DecrementNode;
 import net.sf.orcc.backends.c.nodes.IncrementNode;
 import net.sf.orcc.backends.c.nodes.SelfAssignment;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Variable;
-import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.EmptyNode;
@@ -162,14 +162,14 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		template = nodeTmpl;
 		attrName = "thenNodes";
 
-		for (AbstractNode subNode : node.getThenNodes()) {
+		for (INode subNode : node.getThenNodes()) {
 			subNode.accept(this, args);
 		}
 
-		List<AbstractNode> elseNodes = node.getElseNodes();
+		List<INode> elseNodes = node.getElseNodes();
 		if (!(elseNodes.size() == 1 && elseNodes.get(0) instanceof EmptyNode)) {
 			attrName = "elseNodes";
-			for (AbstractNode subNode : elseNodes) {
+			for (INode subNode : elseNodes) {
 				subNode.accept(this, args);
 			}
 		}
@@ -292,7 +292,7 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		template = nodeTmpl;
 		attrName = "nodes";
 
-		for (AbstractNode subNode : node.getNodes()) {
+		for (INode subNode : node.getNodes()) {
 			subNode.accept(this, args);
 		}
 

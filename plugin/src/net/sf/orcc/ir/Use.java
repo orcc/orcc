@@ -32,7 +32,6 @@ import java.util.List;
 
 import net.sf.orcc.ir.expr.AbstractExprVisitor;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 
 /**
  * This class defines a use of a variable.
@@ -50,7 +49,7 @@ public class Use {
 	 */
 	private static class UseAdder extends AbstractExprVisitor {
 
-		private AbstractNode node;
+		private INode node;
 
 		/**
 		 * Creates a new use adder with the given node.
@@ -58,7 +57,7 @@ public class Use {
 		 * @param node
 		 *            a node
 		 */
-		public UseAdder(AbstractNode node) {
+		public UseAdder(INode node) {
 			this.node = node;
 		}
 
@@ -78,7 +77,7 @@ public class Use {
 	 */
 	private static class UseRemover extends AbstractExprVisitor {
 
-		private AbstractNode node;
+		private INode node;
 
 		/**
 		 * Creates a new use remover with the given node.
@@ -86,7 +85,7 @@ public class Use {
 		 * @param node
 		 *            a node
 		 */
-		public UseRemover(AbstractNode node) {
+		public UseRemover(INode node) {
 			this.node = node;
 		}
 
@@ -109,7 +108,7 @@ public class Use {
 	 * @param value
 	 *            an expression
 	 */
-	public static void addUses(AbstractNode node, IExpr value) {
+	public static void addUses(INode node, IExpr value) {
 		value.accept(new UseAdder(node));
 	}
 
@@ -122,7 +121,7 @@ public class Use {
 	 * @param values
 	 *            a list of expressions
 	 */
-	public static void addUses(AbstractNode node, List<IExpr> values) {
+	public static void addUses(INode node, List<IExpr> values) {
 		for (IExpr value : values) {
 			addUses(node, value);
 		}
@@ -137,7 +136,7 @@ public class Use {
 	 * @param value
 	 *            an expression
 	 */
-	public static void removeUses(AbstractNode node, IExpr value) {
+	public static void removeUses(INode node, IExpr value) {
 		value.accept(new UseRemover(node));
 	}
 
@@ -150,7 +149,7 @@ public class Use {
 	 * @param values
 	 *            a list of expressions
 	 */
-	public static void removeUses(AbstractNode node, List<IExpr> values) {
+	public static void removeUses(INode node, List<IExpr> values) {
 		for (IExpr value : values) {
 			removeUses(node, value);
 		}
@@ -160,7 +159,7 @@ public class Use {
 	 * the node where the variable referenced is used. May be <code>null</code>
 	 * if the information is not available or has no meaning.
 	 */
-	private AbstractNode node;
+	private INode node;
 
 	/**
 	 * the variable referenced
@@ -191,7 +190,7 @@ public class Use {
 	 * @throws NullPointerException
 	 *             if node is null.
 	 */
-	public Use(Variable variable, AbstractNode node) {
+	public Use(Variable variable, INode node) {
 		if (node == null) {
 			throw new NullPointerException();
 		}
@@ -205,7 +204,7 @@ public class Use {
 	 * 
 	 * @return the node referenced by this use
 	 */
-	public AbstractNode getNode() {
+	public INode getNode() {
 		return node;
 	}
 
@@ -231,7 +230,7 @@ public class Use {
 	 * @param node
 	 *            node referenced by this use
 	 */
-	public void setNode(AbstractNode node) {
+	public void setNode(INode node) {
 		this.node = node;
 	}
 

@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.backends.c.nodes;
 
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.IExpr;
 
 /**
  * This class defines a SelfAssignment node that implements a self-assignment. A

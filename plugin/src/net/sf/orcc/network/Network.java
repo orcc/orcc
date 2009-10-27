@@ -29,8 +29,8 @@
 package net.sf.orcc.network;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.GlobalVariable;
-import net.sf.orcc.common.Port;
+import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.transforms.Instantiator;
 import net.sf.orcc.network.transforms.NetworkFlattener;
 import net.sf.orcc.util.OrderedMap;

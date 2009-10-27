@@ -30,7 +30,7 @@ package net.sf.orcc.ir.transforms;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
@@ -47,7 +47,7 @@ public class EmptyNodeRemoval extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(EmptyNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		it.remove();
 	}
 

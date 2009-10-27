@@ -30,8 +30,8 @@ package net.sf.orcc.network;
 
 import java.util.HashMap;
 
-import net.sf.orcc.ir.expr.IExpr;
-import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IType;
 
 /**
  * This class defines a broadcast as a particular instance.

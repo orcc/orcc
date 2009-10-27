@@ -30,7 +30,6 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.util.INameable;
 import net.sf.orcc.util.OrderedMap;
 
@@ -62,7 +61,7 @@ public class Procedure implements INameable {
 	 */
 	private String name;
 
-	private List<AbstractNode> nodes;
+	private List<INode> nodes;
 
 	/**
 	 * ordered map of parameters
@@ -92,7 +91,7 @@ public class Procedure implements INameable {
 	 */
 	public Procedure(String name, boolean external, Location location,
 			IType returnType, OrderedMap<Variable> parameters,
-			OrderedMap<Variable> locals, List<AbstractNode> nodes) {
+			OrderedMap<Variable> locals, List<INode> nodes) {
 		this.external = external;
 		this.nodes = nodes;
 		this.locals = locals;
@@ -120,7 +119,7 @@ public class Procedure implements INameable {
 		return NameTransformer.transform(name);
 	}
 
-	public List<AbstractNode> getNodes() {
+	public List<INode> getNodes() {
 		return nodes;
 	}
 

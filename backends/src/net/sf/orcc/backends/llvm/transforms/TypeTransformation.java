@@ -49,28 +49,25 @@ import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
-import net.sf.orcc.common.Use;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.actor.StateVariable;
+import net.sf.orcc.ir.expr.AbstractExprVisitor;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.ExprVisitor;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.TypeExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.CallNode;
 import net.sf.orcc.ir.nodes.LoadNode;
@@ -80,8 +77,6 @@ import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WriteNode;
-import net.sf.orcc.ir.transforms.IActorTransformation;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.UintType;
@@ -94,15 +89,99 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class TypeTransformation extends AbstractLLVMNodeVisitor implements
-		ExprVisitor, IActorTransformation {
+		IActorTransformation {
 
-	ListIterator<AbstractNode> it;
+	private class TypeExprVisitor extends AbstractExprVisitor {
+
+		@Override
+		public void visit(BinaryExpr expr, Object... args) {
+			BinaryOp op = expr.getOp();
+			switch (op) {
+			case BAND:
+			case LAND:
+			case BOR:
+			case LOR:
+			case MINUS:
+			case TIMES:
+			case PLUS:
+			case SHIFT_LEFT:
+			case SHIFT_RIGHT:
+			case BXOR:
+			case DIV:
+			case DIV_INT:
+				// recover the reference type from the current node
+				IType refType = (IType) args[0];
+
+				expr.getE1().accept(exprVisitor, args);
+				expr.getE2().accept(exprVisitor, args);
+				expr.setType(refType);
+				break;
+
+			case EQ:
+			case GE:
+			case GT:
+			case LE:
+			case LT:
+			case NE:
+				if ((expr.getE1().getType() == IExpr.VAR)) {
+					VarExpr e1 = (VarExpr) expr.getE1();
+					expr.getE2().accept(this,
+							e1.getVar().getVariable().getType());
+				} else if (expr.getE2().getType() == IExpr.VAR) {
+					VarExpr e2 = (VarExpr) expr.getE2();
+					expr.getE2().accept(this,
+							e2.getVar().getVariable().getType());
+				}
+				break;
+
+			case MOD:
+			case EXP:
+
+			default:
+			}
+		}
+
+		@Override
+		public void visit(VarExpr expr, Object... args) {
+			// recover the reference type from the current node
+			IType refType = (IType) args[0];
+
+			// we can safely cast because in a VarExpr in an actor, only local
+			// variables are used (globals must be load'ed first)
+			LocalVariable var = (LocalVariable) expr.getVar().getVariable();
+			IType varType = var.getType();
+
+			if (!(refType.equals(varType))) {
+				// Add cast node before the current expression
+				it.previous();
+
+				LocalVariable vardef = varDefCreate(refType);
+				it.add(castNodeCreate(var, vardef));
+				Use localUse = new Use(vardef);
+				expr.setVar(localUse);
+
+				it.next();
+			}
+		}
+
+	}
+
+	private final TypeExprVisitor exprVisitor;
+
+	ListIterator<INode> it;
 
 	private int nodeCount;
 
 	private Hashtable<String, Integer> portIndex;
 
 	private Procedure procedure;
+
+	/**
+	 * Creates a new type transformation.
+	 */
+	public TypeTransformation() {
+		exprVisitor = new TypeExprVisitor();
+	}
 
 	// VarDef must be cast into i8* for accessing fifo
 	public LocalVariable castFifo(LocalVariable readVar, String fifoName) {
@@ -240,72 +319,12 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		LocalVariable varDef = node.getTarget();
 
 		// Visit expr
-		node.getValue().accept(this, varDef.getType());
-
-	}
-
-	/**
-	 * Expressions visitor.
-	 * 
-	 */
-
-	public void visit(BinaryExpr expr, Object... args) {
-		BinaryOp op = expr.getOp();
-		switch (op) {
-		case BAND:
-		case LAND:
-		case BOR:
-		case LOR:
-		case MINUS:
-		case TIMES:
-		case PLUS:
-		case SHIFT_LEFT:
-		case SHIFT_RIGHT:
-		case BXOR:
-		case DIV:
-		case DIV_INT:
-			// recover the reference type from the current node
-			IType refType = (IType) args[0];
-
-			expr.getE1().accept(this, args);
-			expr.getE2().accept(this, args);
-			expr.setType(refType);
-			return;
-
-		case EQ:
-		case GE:
-		case GT:
-		case LE:
-		case LT:
-		case NE:
-
-			if ((expr.getE1().getType() == IExpr.VAR)) {
-				VarExpr e1 = (VarExpr) expr.getE1();
-				expr.getE2().accept(this, e1.getVar().getVariable().getType());
-			} else if (expr.getE2().getType() == IExpr.VAR) {
-				VarExpr e2 = (VarExpr) expr.getE2();
-				expr.getE2().accept(this, e2.getVar().getVariable().getType());
-			}
-			return;
-
-		case MOD:
-		case EXP:
-
-		default:
-
-		}
-
-	}
-
-	@Override
-	public void visit(BooleanExpr expr, Object... args) {
-
+		node.getValue().accept(exprVisitor, varDef.getType());
 	}
 
 	@Override
 	public void visit(BrNode node, Object... args) {
-
-		ListIterator<AbstractNode> tmpit = it;
+		ListIterator<INode> tmpit = it;
 		visitNodes(node.getConditionNodes());
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
@@ -324,7 +343,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		List<IExpr> parameters = node.getParameters();
 		for (IExpr parameter : parameters) {
 			IType type = it.next().getType();
-			parameter.accept(this, type.getType());
+			parameter.accept(exprVisitor, type.getType());
 		}
 
 		if (returnVar != null) {
@@ -375,16 +394,6 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	}
 
 	@Override
-	public void visit(IntExpr expr, Object... args) {
-
-	}
-
-	@Override
-	public void visit(ListExpr expr, Object... args) {
-
-	}
-
-	@Override
 	public void visit(LoadNode node, Object... args) {
 		Variable sourceVar = node.getSource().getVariable();
 		LocalVariable targetVar = node.getTarget();
@@ -431,7 +440,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(ReturnNode node, Object... args) {
-		node.getValue().accept(this, procedure.getReturnType());
+		node.getValue().accept(exprVisitor, procedure.getReturnType());
 	}
 
 	@Override
@@ -460,44 +469,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	@Override
 	public void visit(StoreNode node, Object... args) {
 		PointType type = (PointType) node.getTarget().getVariable().getType();
-		node.getValue().accept(this, type.getElementType());
-	}
-
-	@Override
-	public void visit(StringExpr expr, Object... args) {
-
-	}
-
-	@Override
-	public void visit(TypeExpr expr, Object... args) {
-
-	}
-
-	@Override
-	public void visit(UnaryExpr expr, Object... args) {
-
-	}
-
-	public void visit(VarExpr expr, Object... args) {
-		// recover the reference type from the current node
-		IType refType = (IType) args[0];
-
-		// we can safely cast because in a VarExpr in an actor, only local
-		// variables are used (globals must be load'ed first)
-		LocalVariable var = (LocalVariable) expr.getVar().getVariable();
-		IType varType = var.getType();
-
-		if (!(refType.equals(varType))) {
-			// Add cast node before the current expression
-			it.previous();
-
-			LocalVariable vardef = varDefCreate(refType);
-			it.add(castNodeCreate(var, vardef));
-			Use localUse = new Use(vardef);
-			expr.setVar(localUse);
-
-			it.next();
-		}
+		node.getValue().accept(exprVisitor, type.getElementType());
 	}
 
 	@Override
@@ -528,7 +500,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		}
 	}
 
-	private void visitNodes(List<AbstractNode> nodes) {
+	private void visitNodes(List<INode> nodes) {
 		it = nodes.listIterator();
 		while (it.hasNext()) {
 			it.next().accept(this);

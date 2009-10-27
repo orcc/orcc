@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
@@ -57,7 +57,7 @@ public class AssignPeephole extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(AssignVarNode node, Object... args) {
-		ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
+		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		if ((node.getValue().getType() == IExpr.BOOLEAN)
 				|| (node.getValue().getType() == IExpr.INT)
 				|| (node.getValue().getType() == IExpr.STRING)) {

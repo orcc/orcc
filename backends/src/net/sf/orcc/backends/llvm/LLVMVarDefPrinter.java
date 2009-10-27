@@ -33,12 +33,12 @@ import java.util.Map;
 
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.common.GlobalVariable;
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Use;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.nodes.AbstractFifoNode;
-import net.sf.orcc.ir.type.IType;
 
 /**
  * 

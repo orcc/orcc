@@ -31,8 +31,8 @@ package net.sf.orcc.backends.llvm.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.nodes.AbstractNode;
+import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.Location;
 
 /**
  * @author Jérôme GORIN
@@ -44,7 +44,7 @@ public class LabelNode extends AbstractLLVMNode {
 
 	private List<LabelNode> precedence;
 
-	private AbstractNode successor;
+	private INode successor;
 
 	public LabelNode(int id, Location location, String labelName) {
 		super(id, location);
@@ -79,7 +79,7 @@ public class LabelNode extends AbstractLLVMNode {
 		return precedence;
 	}
 
-	public AbstractNode getSuccessor() {
+	public INode getSuccessor() {
 		return successor;
 	}
 
@@ -91,7 +91,7 @@ public class LabelNode extends AbstractLLVMNode {
 		this.precedence = precedence;
 	}
 
-	public void setSuccessor(AbstractNode successor) {
+	public void setSuccessor(INode successor) {
 		this.successor = successor;
 	}
 

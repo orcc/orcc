@@ -31,7 +31,7 @@ package net.sf.orcc.backends.cpp;
 import net.sf.orcc.backends.c.ExprToString;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.nodes.PeekNode;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.WriteNode;
