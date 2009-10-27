@@ -46,7 +46,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * Move writes to the beginning of an action (because we use pointers).
+ * This class defines a transformation. But what does it do??
  * 
  * @author Jérôme Gorin
  * @author Matthieu Wipliez
@@ -65,12 +65,12 @@ public class AssignPeephole extends AbstractActorTransformation {
 			vardef.setConstant(node.getValue());
 			it.remove();
 		} else if (node.getValue().getType() == IExpr.VAR) {
-			LocalVariable vardef = node.getTarget();
 			VarExpr expr = (VarExpr) node.getValue();
 
 			// we can safely cast because in a VarExpr in an actor, only local
 			// variables are used (globals must be load'ed first)
-			vardef.duplicate((LocalVariable) expr.getVar().getVariable());
+			LocalVariable other = (LocalVariable) expr.getVar().getVariable();
+			node.setTarget(new LocalVariable(other));
 			it.remove();
 		}
 	}

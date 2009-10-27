@@ -56,11 +56,6 @@ public class LocalVariable extends Variable implements
 	private IExpr constantExpr;
 
 	/**
-	 * if the variable is global.
-	 */
-	private boolean global;
-
-	/**
 	 * if the variable is local, index for SSA. Meaningless otherwise.
 	 */
 	private int index;
@@ -75,12 +70,10 @@ public class LocalVariable extends Variable implements
 	 */
 	private Integer suffix;
 
-	public LocalVariable(boolean assignable, boolean global, int index,
-			Location loc, String name, AbstractNode node, Integer suffix,
-			IType type) {
-		super(loc, type, name);
+	public LocalVariable(boolean assignable, int index, Location loc,
+			String name, AbstractNode node, Integer suffix, IType type) {
+		super(loc, type, name, false);
 		this.assignable = assignable;
-		this.global = global;
 		this.index = index;
 		this.node = node;
 		this.suffix = suffix;
@@ -91,7 +84,6 @@ public class LocalVariable extends Variable implements
 	public LocalVariable(LocalVariable other) {
 		super(other);
 		assignable = other.assignable;
-		global = other.global;
 		index = other.index;
 		node = null;
 		suffix = other.suffix;
@@ -102,24 +94,6 @@ public class LocalVariable extends Variable implements
 	@Override
 	public int compareTo(LocalVariable varDef) {
 		return getName().compareTo(varDef.getName());
-	}
-
-	public void duplicate(LocalVariable varDef) {
-		assignable = varDef.isAssignable();
-		global = varDef.isGlobal();
-		index = varDef.getIndex();
-		setLocation(varDef.getLocation());
-		setName(varDef.getName());
-		node = varDef.getNode();
-		if (varDef.hasSuffix()) {
-			suffix = varDef.getSuffix();
-		} else {
-			suffix = null;
-		}
-
-		setType(varDef.getType());
-		this.constant = varDef.isConstant();
-		constantExpr = varDef.getConstant();
 	}
 
 	@Override
@@ -169,10 +143,6 @@ public class LocalVariable extends Variable implements
 		return constant;
 	}
 
-	public boolean isGlobal() {
-		return global;
-	}
-
 	public void setAssignable(boolean assignable) {
 		this.assignable = assignable;
 	}
@@ -180,10 +150,6 @@ public class LocalVariable extends Variable implements
 	public void setConstant(IExpr expr) {
 		constantExpr = expr;
 		constant = true;
-	}
-
-	public void setGlobal(boolean global) {
-		this.global = global;
 	}
 
 	public void setIndex(int index) {

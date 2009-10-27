@@ -64,8 +64,8 @@ public class AddInstantationProcedure implements IActorTransformation {
 		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
 
 		Location location = new Location();
-		LocalVariable parameter = new LocalVariable(false, false, 0, location,
-				"fifo", null, null, new VoidType());
+		LocalVariable parameter = new LocalVariable(false, 0, location, "fifo",
+				null, null, new VoidType());
 
 		parameters.add(file, location, "fifo", parameter);
 		for (Port port : ports) {

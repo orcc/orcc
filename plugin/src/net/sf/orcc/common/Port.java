@@ -49,7 +49,7 @@ public class Port extends Variable {
 	 *            the port name
 	 */
 	public Port(Location location, IType type, String name) {
-		super(location, type, name);
+		super(location, type, name, true);
 	}
 
 	/**

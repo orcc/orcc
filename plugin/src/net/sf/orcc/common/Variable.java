@@ -43,7 +43,12 @@ import net.sf.orcc.util.INameable;
  * @author Matthieu Wipliez
  * 
  */
-public class Variable implements INameable {
+public abstract class Variable implements INameable {
+
+	/**
+	 * true if this variable is global
+	 */
+	private boolean global;
 
 	/**
 	 * variable location
@@ -74,8 +79,10 @@ public class Variable implements INameable {
 	 *            the variable type
 	 * @param name
 	 *            the variable name
+	 * @param global
+	 *            whether this variable is global
 	 */
-	public Variable(Location location, IType type, String name) {
+	public Variable(Location location, IType type, String name, boolean global) {
 		this.location = location;
 		this.type = type;
 		this.name = name;
@@ -157,6 +164,15 @@ public class Variable implements INameable {
 	 */
 	public List<Use> getUses() {
 		return uses;
+	}
+
+	/**
+	 * Returns <code>true</code> if this variable is global.
+	 * 
+	 * @return <code>true</code> if this variable is global
+	 */
+	public boolean isGlobal() {
+		return global;
 	}
 
 	/**

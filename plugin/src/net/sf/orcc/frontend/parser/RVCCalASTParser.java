@@ -327,7 +327,7 @@ public class RVCCalASTParser {
 
 	private StateVariable parseStateVar(Tree stateVar) throws OrccException {
 		boolean assignable = (stateVar.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
-		LocalVariable def = parseVarDef(stateVar, assignable, true, 0, null);
+		LocalVariable def = parseVarDef(stateVar, assignable, 0, null);
 		IConst init = null;
 		if (stateVar.getChildCount() == 4) {
 		}
@@ -419,8 +419,8 @@ public class RVCCalASTParser {
 	 * @param suffix
 	 * @return
 	 */
-	private LocalVariable parseVarDef(Tree tree, boolean assignable,
-			boolean global, int index, Integer suffix) throws OrccException {
+	private LocalVariable parseVarDef(Tree tree, boolean assignable, int index,
+			Integer suffix) throws OrccException {
 		IType type = parseType(tree.getChild(0));
 		Tree nameTree = tree.getChild(1);
 		String name = nameTree.getText();
@@ -429,8 +429,8 @@ public class RVCCalASTParser {
 
 		AbstractNode node = new EmptyNode(0, new Location());
 
-		return new LocalVariable(assignable, global, index, loc, name, node,
-				suffix, type);
+		return new LocalVariable(assignable, index, loc, name, node, suffix,
+				type);
 	}
 
 	/**
@@ -447,10 +447,8 @@ public class RVCCalASTParser {
 		int numPorts = tree.getChildCount();
 		for (int i = 0; i < numPorts; i++) {
 			Tree child = tree.getChild(i);
-			LocalVariable varDef = parseVarDef(child, false, true, 0, null);
-			scope
-					.add(file, varDef.getLocation(), varDef.getName(),
-							varDef);
+			LocalVariable varDef = parseVarDef(child, false, 0, null);
+			scope.add(file, varDef.getLocation(), varDef.getName(), varDef);
 			varDefs.add(varDef);
 		}
 

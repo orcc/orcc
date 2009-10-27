@@ -218,7 +218,6 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 		}
 
 		for (PhiAssignment phi : phis) {
-			LocalVariable varDef = phi.getVarDef();
 			List<Use> localUses = phi.getVars();
 			LocalVariable phiVar;
 			if (value == true) {
@@ -227,7 +226,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 				phiVar = (LocalVariable) localUses.get(1).getVariable();
 			}
 
-			varDef.duplicate(phiVar);
+			phi.setVarDef(new LocalVariable(phiVar));
 		}
 
 		return nodes;

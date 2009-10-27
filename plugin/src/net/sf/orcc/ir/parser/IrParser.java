@@ -848,7 +848,6 @@ public class IrParser {
 		JSONArray details = array.getJSONArray(0);
 		String name = details.getString(0);
 		boolean assignable = details.getBoolean(1);
-		boolean global = details.getBoolean(2);
 		Integer suffix = details.isNull(3) ? null : details.getInt(3);
 		int index = details.getInt(4);
 
@@ -857,8 +856,8 @@ public class IrParser {
 
 		AbstractNode node = null;
 
-		LocalVariable varDef = new LocalVariable(assignable, global, index,
-				loc, name, node, suffix, type);
+		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
+				node, suffix, type);
 
 		// register the variable definition
 		variables.add(file, loc, varDef.getName(), varDef);

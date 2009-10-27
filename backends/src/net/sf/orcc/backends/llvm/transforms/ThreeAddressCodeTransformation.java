@@ -213,8 +213,8 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 	}
 
 	private LocalVariable varDefCreate(IType type) {
-		return new LocalVariable(false, false, exprCounter++, new Location(),
-				"expr", null, 0, type);
+		return new LocalVariable(false, exprCounter++, new Location(), "expr",
+				null, 0, type);
 	}
 
 	@Override

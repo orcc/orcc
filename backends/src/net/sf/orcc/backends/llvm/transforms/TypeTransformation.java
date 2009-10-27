@@ -226,7 +226,7 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	}
 
 	private LocalVariable varDefCreate(IType type) {
-		return new LocalVariable(false, false, 0, new Location(), "", null,
+		return new LocalVariable(false, 0, new Location(), "", null,
 				nodeCount++, type);
 	}
 

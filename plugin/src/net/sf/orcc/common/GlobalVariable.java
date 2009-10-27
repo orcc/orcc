@@ -58,13 +58,13 @@ public class GlobalVariable extends Variable implements INameable {
 	/**
 	 * Creates a new global variable from the given global variable.
 	 * 
-	 * @param var
+	 * @param variable
 	 *            a global variable
 	 */
-	public GlobalVariable(GlobalVariable var) {
-		super(var);
-		this.constantValue = var.constantValue;
-		this.value = var.value;
+	public GlobalVariable(GlobalVariable variable) {
+		super(variable);
+		this.constantValue = variable.constantValue;
+		this.value = variable.value;
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 *            the global variable name
 	 */
 	public GlobalVariable(Location location, IType type, String name) {
-		super(location, type, name);
+		this(location, type, name, null);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 */
 	public GlobalVariable(Location location, IType type, String name,
 			IExpr value) {
-		super(location, type, name);
+		super(location, type, name, true);
 		this.value = value;
 	}
 
