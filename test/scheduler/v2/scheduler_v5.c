@@ -13,17 +13,16 @@ static struct fifo_s {
 	int end_read;
 	int write_ind;
 	int end_write;
-	char* malloc_ptrW;
-	char* malloc_ptrR;
-	char* malloc_ptrP;
 };
 
 #define SIZE 10000
 
+int tabW[NTOKEN];
+int tabR[NTOKEN];
 
 #define contents(fifo, ptr) (& (fifo)->contents[(ptr) * (fifo)->elt_size])
 
-static void *getPeekPtr(struct fifo_s *fifo, int n) {
+static void *getPeekPtr(struct fifo_s *fifo, void *data, int n) {
 	int end_read;
 	end_read = fifo->read_ind + n;
 
@@ -37,32 +36,22 @@ static void *getPeekPtr(struct fifo_s *fifo, int n) {
 		//Size of the data in the end of the fifo
 		nEltSize = (unsigned int) ((fifo->size - fifo->read_ind) * fifo->elt_size) ;
 
-		//Allocate the data out
-		fifo->malloc_ptrP = malloc(fifo->elt_size * n);
-
 		//Copy the end of the fifo
-		memcpy (fifo->malloc_ptrP,((char *)fifo->contents) + (fifo->read_ind * fifo->elt_size),
+		memcpy ((char *)data,((char *)fifo->contents) + (fifo->read_ind * fifo->elt_size),
 			 nEltSize);
 		
 		//Copy the rest of the data in the fifo 's beginning
-		memcpy (((char *)fifo->malloc_ptrP) + nEltSize, ((char *)fifo->contents),
+		memcpy (((char *)data) + nEltSize, ((char *)fifo->contents),
 			 fifo->elt_size * end_read );
 
-		return fifo->malloc_ptrP;
+		return data;
 
 	} else {
-		fifo->malloc_ptrP = NULL;
 		return contents(fifo, fifo->read_ind);
 	}
 }
 
-static void setEndPeek(struct fifo_s *fifo) {
-	if (fifo->malloc_ptrP != NULL){
-		free(fifo->malloc_ptrP);
-	}
-}
-
-static void *getReadPtr(struct fifo_s *fifo, int n) {
+static void *getReadPtr(struct fifo_s *fifo, void *data, int n) {
 	
 	//Set the next read index
 	fifo->end_read = fifo->read_ind + n;
@@ -77,23 +66,19 @@ static void *getReadPtr(struct fifo_s *fifo, int n) {
 		//Size of the data in the end of the fifo
 		nEltSize = (unsigned int) ((fifo->size - fifo->read_ind) * fifo->elt_size) ;
 
-		//Allocate the data out
-		fifo->malloc_ptrR = malloc(fifo->elt_size * n);
-
 		//Copy the end of the fifo
-		memcpy (fifo->malloc_ptrR,((char *)fifo->contents) + (fifo->read_ind * fifo->elt_size),
+		memcpy (((char *)data),((char *)fifo->contents) + (fifo->read_ind * fifo->elt_size),
 			 nEltSize);
 		
 		//Copy the rest of the data in the fifo 's beginning
-		memcpy (((char *)fifo->malloc_ptrR) + nEltSize, ((char *)fifo->contents),
+		memcpy (((char *)data) + nEltSize, ((char *)fifo->contents),
 			 fifo->elt_size * fifo->end_read );
 
-		return fifo->malloc_ptrR;
+		return data;
 
 	}else {
 		
 		//Return data
-		fifo->malloc_ptrR = NULL;
 		return contents(fifo, fifo->read_ind);
 	}
 }
@@ -102,10 +87,6 @@ static void *getReadPtr(struct fifo_s *fifo, int n) {
 static void setEndRead(struct fifo_s *fifo) {
 	//Update read index
 	fifo->read_ind = fifo->end_read;
-	
-	if (fifo->malloc_ptrR != NULL){
-		free(fifo->malloc_ptrR);
-	}
 }
 
 static int hasRoom(struct fifo_s *fifo, int n) {
@@ -126,43 +107,36 @@ static int hasTokens(struct fifo_s *fifo, int n) {
 	}
 }
 
-static void *getWritePtr(struct fifo_s *fifo, int n) {
+static void *getWritePtr(struct fifo_s *fifo, void *data, int n) {
 	//Set the next write index
 	fifo->end_write = fifo->write_ind + n;
 	
 	if (fifo->end_write > fifo->size){
-	
-		//Set the location to the begin of the fifo
-		fifo->end_write = fifo->end_write - fifo->size;
-
-		//Allocate the data out
-		fifo->malloc_ptrW = malloc(fifo->elt_size * n);
-
-		return fifo->malloc_ptrW;
+		return data;
 	}else {
 		//Return fifo adress for data
-		fifo->malloc_ptrW = NULL;
 		return contents(fifo, fifo->write_ind);
 	}
 }
 
-static void setEndWrite(struct fifo_s *fifo) {
-	if (fifo->malloc_ptrW != NULL) {
+static void setEndWrite(struct fifo_s *fifo, void *data) {
+	if (fifo->end_write > fifo->size) {
 		//Data access end of the fifo size
 		unsigned int nEltSize;
+
+
+		//Set the location to the begin of the fifo
+		fifo->end_write = fifo->end_write - fifo->size;
 
 		//Size of the data in the end of the fifo
 		nEltSize = (unsigned int) ((fifo->size - fifo->write_ind) * fifo->elt_size) ;
 			
 		//Copy data int the end of the fifo
 		memcpy (((char *)fifo->contents) + (fifo->write_ind * fifo->elt_size),
-			fifo->malloc_ptrW, nEltSize);
+			data, nEltSize);
 		
 		//Copy the rest of data in the fifo's beginning
-		memcpy ((char *)fifo->contents, ((char *)fifo->malloc_ptrW) + nEltSize, fifo->elt_size * fifo->end_write);
-
-		//Free malloc
-		free(fifo->malloc_ptrW);
+		memcpy ((char *)fifo->contents, ((char *)data) + nEltSize, fifo->elt_size * fifo->end_write);
 	}
 
 	//Update write index
@@ -183,12 +157,12 @@ static struct fifo_s *sink_I = &fifo_1;
 
 static void action_source() {
 	int i;
-	int *ptr = getWritePtr(source_O, n_token);
+	int *ptr = getWritePtr(source_O, tabW, n_token);
 	
 	for (i=0; i < n_token; i++) {
 		ptr[i] = source_X;
 	}
-	setEndWrite(source_O);
+	setEndWrite(source_O, tabW);
 	source_X++;
 }
 
@@ -210,14 +184,14 @@ static int source_scheduler() {
 
 static void action_compute() {
 	int i;
-	int *rptr = getReadPtr(compute_I, n_token);
-	int *wptr = getWritePtr(compute_O, n_token);
+	int *rptr = getReadPtr(compute_I, tabR, n_token);
+	int *wptr = getWritePtr(compute_O, tabW, n_token);
 	
 	for (i=0; i <n_token; i++){
 		wptr[i] = rptr[i] + i;
 	}
 	setEndRead(compute_I);
-	setEndWrite(compute_O);
+	setEndWrite(compute_O, tabW);
 }
 
 static int compute_scheduler() {
@@ -237,7 +211,7 @@ static int compute_scheduler() {
 }
 
 static void action_sink() {
-	getReadPtr(sink_I,1);
+	getReadPtr(sink_I, tabR, 1);
 	setEndRead(sink_I);
 }
 
