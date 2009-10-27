@@ -30,30 +30,52 @@ package net.sf.orcc.ir.actor;
 
 import java.util.List;
 
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.util.INameable;
+import net.sf.orcc.util.OrderedMap;
 
 /**
+ * This class defines a procedure.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class Procedure {
+public class Procedure implements INameable {
 
+	/**
+	 * whether this procedure is external.
+	 */
 	private boolean external;
 
-	private List<LocalVariable> locals;
+	/**
+	 * ordered map of local variables
+	 */
+	private OrderedMap<Variable> locals;
 
+	/**
+	 * the location of this procedure
+	 */
 	private Location location;
 
+	/**
+	 * the name of this procedure
+	 */
 	private String name;
 
 	private List<AbstractNode> nodes;
 
-	private List<LocalVariable> parameters;
+	/**
+	 * ordered map of parameters
+	 */
+	private OrderedMap<Variable> parameters;
 
+	/**
+	 * the return type of this procedure
+	 */
 	private IType returnType;
 
 	/**
@@ -73,8 +95,8 @@ public class Procedure {
 	 *            The procedure local variables.
 	 */
 	public Procedure(String name, boolean external, Location location,
-			IType returnType, List<LocalVariable> parameters,
-			List<LocalVariable> locals, List<AbstractNode> nodes) {
+			IType returnType, OrderedMap<Variable> parameters,
+			OrderedMap<Variable> locals, List<AbstractNode> nodes) {
 		this.external = external;
 		this.nodes = nodes;
 		this.locals = locals;
@@ -84,7 +106,7 @@ public class Procedure {
 		this.returnType = returnType;
 	}
 
-	public List<LocalVariable> getLocals() {
+	public OrderedMap<Variable> getLocals() {
 		return locals;
 	}
 
@@ -92,6 +114,12 @@ public class Procedure {
 		return location;
 	}
 
+	/**
+	 * Returns the name of this procedure.
+	 * 
+	 * @return the name of this procedure
+	 */
+	@Override
 	public String getName() {
 		return NameTransformer.transform(name);
 	}
@@ -100,7 +128,7 @@ public class Procedure {
 		return nodes;
 	}
 
-	public List<LocalVariable> getParameters() {
+	public OrderedMap<Variable> getParameters() {
 		return parameters;
 	}
 

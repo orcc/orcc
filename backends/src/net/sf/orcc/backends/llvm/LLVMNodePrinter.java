@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -72,6 +73,7 @@ import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.util.OrderedMap;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -198,8 +200,6 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(CallNode node, Object... args) {
-		int index = 0;
-
 		StringTemplate nodeTmpl = group.getInstanceOf("callNode");
 
 		if (node.hasResult()) {
@@ -209,15 +209,16 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		}
 
 		Procedure proc = node.getProcedure();
-		List<LocalVariable> procParameters = proc.getParameters();
+		OrderedMap<Variable> procParameters = proc.getParameters();
 
 		nodeTmpl.setAttribute("return", typeToString.toString(proc
 				.getReturnType()));
 		nodeTmpl.setAttribute("name", proc.getName());
+		Iterator<Variable> it = procParameters.iterator();
 		for (IExpr parameter : node.getParameters()) {
+			IType type = it.next().getType();
 			nodeTmpl.setAttribute("parameters", exprPrinter.toString(parameter,
-					procParameters.get(index).getType()));
-			index++;
+					type));
 		}
 
 		template.setAttribute(attrName, nodeTmpl);

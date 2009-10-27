@@ -33,6 +33,7 @@ import java.util.ListIterator;
 
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -42,6 +43,7 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * Move writes to the beginning of an action (because we use pointers).
@@ -91,7 +93,7 @@ public class AssignPeephole extends AbstractActorTransformation {
 				// from the procedure and translate the PHI by an assignment of
 				// 0 (zero) to target.
 				// Otherwise, we just create an assignment target = source.
-				List<LocalVariable> parameters = procedure.getParameters();
+				OrderedMap<Variable> parameters = procedure.getParameters();
 				if (source.getIndex() == 0 && !parameters.contains(source)) {
 					IntExpr expr = new IntExpr(new Location(), 0);
 					source.setConstant(expr);

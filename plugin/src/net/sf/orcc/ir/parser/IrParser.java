@@ -652,7 +652,7 @@ public class IrParser {
 			String name = port.getString(2);
 
 			Port po = new Port(location, type, name);
-			ports.register(file, location, name, po);
+			ports.add(file, location, name, po);
 		}
 
 		return ports;
@@ -678,8 +678,11 @@ public class IrParser {
 		Location location = parseLocation(array.getJSONArray(1));
 		IType returnType = parseType(array.get(2));
 		variables = new Scope<Variable>(variables);
-		List<LocalVariable> parameters = parseVarDefs(array.getJSONArray(3));
-		List<LocalVariable> locals = parseVarDefs(array.getJSONArray(4));
+		OrderedMap<Variable> parameters = variables;
+		parseVarDefs(array.getJSONArray(3));
+		variables = new Scope<Variable>(variables);
+		OrderedMap<Variable> locals = variables;
+		parseVarDefs(array.getJSONArray(4));
 
 		List<AbstractNode> nodes = parseNodes(array.getJSONArray(5));
 
@@ -689,7 +692,7 @@ public class IrParser {
 		Procedure proc = new Procedure(name, external, location, returnType,
 				parameters, locals, nodes);
 		if (register) {
-			procs.register(file, location, name, proc);
+			procs.add(file, location, name, proc);
 		}
 		return proc;
 	}
@@ -742,10 +745,10 @@ public class IrParser {
 
 			StateVariable stateVar = new StateVariable(location, type, name,
 					init);
-			stateVars.register(file, location, name, stateVar);
+			stateVars.add(file, location, name, stateVar);
 
 			// register the state variable
-			variables.register(file, location, name + "_0", stateVar);
+			variables.add(file, location, name + "_0", stateVar);
 		}
 
 		return stateVars;
@@ -858,19 +861,16 @@ public class IrParser {
 				loc, name, node, suffix, type);
 
 		// register the variable definition
-		variables.register(file, loc, stringOfVar(name, suffix, index), varDef);
+		variables.add(file, loc, varDef.getName(), varDef);
 
 		return varDef;
 	}
 
-	private List<LocalVariable> parseVarDefs(JSONArray array)
-			throws JSONException, OrccException {
-		List<LocalVariable> variables = new ArrayList<LocalVariable>();
+	private void parseVarDefs(JSONArray array) throws JSONException,
+			OrccException {
 		for (int i = 0; i < array.length(); i++) {
-			variables.add(parseVarDef(array.getJSONArray(i)));
+			parseVarDef(array.getJSONArray(i));
 		}
-
-		return variables;
 	}
 
 	private Use parseVarUse(JSONArray array) throws JSONException,

@@ -31,10 +31,12 @@ package net.sf.orcc.ir.transforms;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Port;
 import net.sf.orcc.common.Use;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -53,16 +55,19 @@ public class AddInstantationProcedure implements IActorTransformation {
 
 	private String actorName;
 
+	private String file;
+
 	private Procedure createInitProcedure(String Attributs,
-			OrderedMap<Port> ports) {
-		List<LocalVariable> parameters = new ArrayList<LocalVariable>();
-		List<LocalVariable> locals = new ArrayList<LocalVariable>();
+			OrderedMap<Port> ports) throws OrccException {
+		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
+		OrderedMap<Variable> locals = new OrderedMap<Variable>();
 		List<AbstractNode> nodes = new ArrayList<AbstractNode>();
 
-		LocalVariable parameter = new LocalVariable(false, false, 0,
-				new Location(), "fifo", null, null, new VoidType());
+		Location location = new Location();
+		LocalVariable parameter = new LocalVariable(false, false, 0, location,
+				"fifo", null, null, new VoidType());
 
-		parameters.add(parameter);
+		parameters.add(file, location, "fifo", parameter);
 		for (Port port : ports) {
 			Use varUse = new Use(parameter);
 			VarExpr expr = new VarExpr(new Location(), varUse);
@@ -79,15 +84,18 @@ public class AddInstantationProcedure implements IActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
-		List<Procedure> instations = new ArrayList<Procedure>();
+	public void transform(Actor actor) throws OrccException {
 		this.actorName = actor.getName();
+		this.file = actor.getFile();
+
+		List<Procedure> instantiations = new ArrayList<Procedure>();
 		Procedure inputInit = createInitProcedure("Input", actor.getInputs());
+		instantiations.add(inputInit);
 		Procedure inputOutput = createInitProcedure("Output", actor
 				.getOutputs());
-		instations.add(inputInit);
-		instations.add(inputOutput);
-		actor.setInstantations(instations);
+		instantiations.add(inputOutput);
+
+		actor.setInstantations(instantiations);
 	}
 
 }

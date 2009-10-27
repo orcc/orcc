@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.PluginGroupLoader;
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Port;
 import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.actor.Action;
@@ -117,7 +116,7 @@ public class CActorPrinter {
 
 		// parameters
 		List<Object> varDefs = new ArrayList<Object>();
-		for (LocalVariable param : proc.getParameters()) {
+		for (Variable param : proc.getParameters()) {
 			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
 			varDefs.add(varDefMap);
 		}
@@ -125,7 +124,7 @@ public class CActorPrinter {
 
 		// locals
 		varDefs = new ArrayList<Object>();
-		for (LocalVariable local : proc.getLocals()) {
+		for (Variable local : proc.getLocals()) {
 			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
 			varDefs.add(varDefMap);
 		}

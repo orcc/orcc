@@ -261,7 +261,7 @@ public class RVCCalASTParser {
 				break;
 			case RVCCalLexer.STATE_VAR: {
 				StateVariable stateVar = parseStateVar(child);
-				currentScope.register(file, stateVar.getLocation(), stateVar
+				currentScope.add(file, stateVar.getLocation(), stateVar
 						.getName(), stateVar);
 				break;
 			}
@@ -296,7 +296,7 @@ public class RVCCalASTParser {
 			Location location = parseLocation(nameTree);
 
 			Port port = new Port(location, type, name);
-			ports.register(file, location, name, port);
+			ports.add(file, location, name, port);
 		}
 
 		return ports;
@@ -449,7 +449,7 @@ public class RVCCalASTParser {
 			Tree child = tree.getChild(i);
 			LocalVariable varDef = parseVarDef(child, false, true, 0, null);
 			scope
-					.register(file, varDef.getLocation(), varDef.getName(),
+					.add(file, varDef.getLocation(), varDef.getName(),
 							varDef);
 			varDefs.add(varDef);
 		}

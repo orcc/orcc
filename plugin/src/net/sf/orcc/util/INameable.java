@@ -26,27 +26,21 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.transforms;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.actor.Actor;
+package net.sf.orcc.util;
 
 /**
- * This interface defines how a transformation can be applied on an actor.
+ * This interface defines an object that can return its name.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface IActorTransformation {
+public interface INameable {
 
 	/**
-	 * Transforms the given actor in-place.
+	 * Returns the name of this object.
 	 * 
-	 * @param actor
-	 *            an actor
-	 * @throws OrccException
-	 *             if the transformation fails
+	 * @return the name of this object
 	 */
-	public void transform(Actor actor) throws OrccException;
+	public String getName();
 
 }

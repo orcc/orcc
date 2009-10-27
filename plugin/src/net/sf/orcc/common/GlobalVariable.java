@@ -33,6 +33,7 @@ import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.IConst;
 import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.util.INameable;
 
 /**
  * This class represents a global variable. A global variable is a variable that
@@ -42,7 +43,7 @@ import net.sf.orcc.ir.type.IType;
  * @author Matthieu Wipliez
  * 
  */
-public class GlobalVariable extends Variable {
+public class GlobalVariable extends Variable implements INameable {
 
 	/**
 	 * variable constant value.

@@ -144,12 +144,16 @@ public class LocalVariable extends Variable implements
 		return index;
 	}
 
+	@Override
+	public String getName() {
+		return super.getName() + (suffix == null ? "" : suffix) + "_" + index;
+	}
+
 	public AbstractNode getNode() {
 		return node;
 	}
 
 	public int getSuffix() {
-
 		return suffix;
 	}
 

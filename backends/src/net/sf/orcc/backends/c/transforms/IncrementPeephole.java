@@ -46,6 +46,7 @@ import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * Replaces nodes by specific C nodes where appropriate.
@@ -95,7 +96,7 @@ public class IncrementPeephole extends AbstractActorTransformation {
 		}
 	}
 
-	private boolean replaceSelfAssignment(List<LocalVariable> locals,
+	private boolean replaceSelfAssignment(OrderedMap<Variable> locals,
 			ListIterator<AbstractNode> it, LocalVariable varDefTmp,
 			Variable varDef, VarExpr v1, BinaryOp op, IExpr e2) {
 		AbstractNode node;

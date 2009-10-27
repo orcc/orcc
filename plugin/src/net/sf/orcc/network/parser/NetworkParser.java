@@ -788,14 +788,14 @@ public class NetworkParser {
 					.getFirstChild());
 			IType type = cont.getResult();
 			GlobalVariable var = new GlobalVariable(location, type, name);
-			parameters.register(file.getAbsolutePath(), location, name, var);
+			parameters.add(file.getAbsolutePath(), location, name, var);
 		} else if (kind.equals("Variable")) {
 			ParseContinuation<IType> cont = typeParser.parseType(decl
 					.getFirstChild());
 			IType type = cont.getResult();
 			IExpr expr = exprParser.parseExpr(cont.getNode());
 			GlobalVariable var = new GlobalVariable(location, type, name, expr);
-			parameters.register(file.getAbsolutePath(), location, name, var);
+			parameters.add(file.getAbsolutePath(), location, name, var);
 		} else {
 			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
 		}
@@ -923,9 +923,9 @@ public class NetworkParser {
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");
 		if (kind.equals("Input")) {
-			inputs.register(file.toString(), location, name, port);
+			inputs.add(file.toString(), location, name, port);
 		} else if (kind.equals("Output")) {
-			outputs.register(file.toString(), location, name, port);
+			outputs.add(file.toString(), location, name, port);
 		} else {
 			throw new OrccException("Port \"" + name + "\", invalid kind: \""
 					+ kind + "\"");

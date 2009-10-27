@@ -35,7 +35,7 @@ package net.sf.orcc.util;
  * @author Matthieu Wipliez
  * 
  */
-public class Scope<T> extends OrderedMap<T> {
+public class Scope<T extends INameable> extends OrderedMap<T> {
 
 	private Scope<T> parent;
 

@@ -44,7 +44,52 @@ import net.sf.orcc.common.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class OrderedMap<T> implements Iterable<T> {
+public class OrderedMap<T extends INameable> implements Iterable<T> {
+
+	private class Itr implements Iterator<T> {
+
+		/**
+		 * Index of element to be returned by subsequent call to next.
+		 */
+		private int cursor = 0;
+
+		/**
+		 * Index of element returned by most recent call to next or previous.
+		 * Reset to -1 if this element is deleted by a call to remove.
+		 */
+		int lastRet = -1;
+
+		@Override
+		public boolean hasNext() {
+			return cursor != size();
+		}
+
+		@Override
+		public T next() {
+			T next = objects.get(cursor);
+			lastRet = cursor++;
+			return next;
+		}
+
+		@Override
+		public void remove() {
+			if (lastRet == -1) {
+				throw new IllegalStateException();
+			}
+
+			// remove the object at the given index
+			T next = objects.remove(lastRet);
+
+			// remove the object from the map
+			map.remove(next.getName());
+
+			if (lastRet < cursor) {
+				cursor--;
+			}
+			lastRet = -1;
+		}
+
+	}
 
 	private Map<String, T> map;
 
@@ -56,6 +101,46 @@ public class OrderedMap<T> implements Iterable<T> {
 	public OrderedMap() {
 		objects = new ArrayList<T>();
 		map = new HashMap<String, T>();
+	}
+
+	/**
+	 * Adds an object to this ordered map with the given name. The file and
+	 * location information are only used for error reporting if the object is
+	 * already present in the map.
+	 * 
+	 * @param file
+	 *            the file where the object located
+	 * @param location
+	 *            the location of the object
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 * @throws OrccException
+	 *             if the object is already defined
+	 */
+	public void add(String file, Location location, String name, T object)
+			throws OrccException {
+		if (map.containsKey(name)) {
+			throw new OrccException(file, location, "\"" + name
+					+ "\" already defined in this scope");
+		}
+
+		objects.add(object);
+		map.put(name, object);
+	}
+
+	/**
+	 * Returns <code>true</code> if this map contains a mapping for
+	 * <code>object.getName()</code>.
+	 * 
+	 * @param object
+	 *            an object whose name we are looking for in this map.
+	 * @return <code>true</code> if this map contains this object,
+	 *         <code>false</code> otherwise.
+	 */
+	public boolean contains(T object) {
+		return map.containsKey(object.getName());
 	}
 
 	/**
@@ -71,7 +156,12 @@ public class OrderedMap<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns the list of objects of this scope
+	 * Returns the list of objects of this scope. Warning: DO NOT modify the
+	 * list returned! Indeed, the list is returned by reference for efficiency,
+	 * should you want to add objects to this ordered map, please do so using
+	 * {@link #add(String, Location, String, INameable)}; to remove objects, we
+	 * advise you to use an iterator wherever possible, and
+	 * {@link #remove(INameable)} elsewhere.
 	 * 
 	 * @return the list of objects of this scope
 	 */
@@ -81,27 +171,21 @@ public class OrderedMap<T> implements Iterable<T> {
 
 	@Override
 	public Iterator<T> iterator() {
-		return objects.iterator();
+		return new Itr();
 	}
 
 	/**
-	 * Registers an object with the given name.
+	 * Removes the given object from this ordered map. Note: This method removes
+	 * the object from both the map in O(1) and the list in O(n) on the order of
+	 * the number of objects present, so depending on your needs you might want
+	 * to use an iterator to remove variables from this map.
 	 * 
-	 * @param name
-	 *            the name of an object
 	 * @param object
-	 *            an object
-	 * @throws OrccException
-	 *             if the object is already defined
+	 *            the object to remove
 	 */
-	public void register(String file, Location location, String name, T object)
-			throws OrccException {
-		if (map.containsKey(name)) {
-			throw new OrccException(file, location, "\"" + name
-					+ "\" already defined in this scope");
-		}
-		objects.add(object);
-		map.put(name, object);
+	public void remove(T object) {
+		map.remove(object.getName());
+		objects.remove(object);
 	}
 
 	/**

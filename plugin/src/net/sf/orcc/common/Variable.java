@@ -34,6 +34,7 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.util.INameable;
 
 /**
  * This class represents a variable. A variable has a location, a type, a name
@@ -42,7 +43,7 @@ import net.sf.orcc.ir.type.IType;
  * @author Matthieu Wipliez
  * 
  */
-public class Variable {
+public class Variable implements INameable {
 
 	/**
 	 * variable location
@@ -135,6 +136,7 @@ public class Variable {
 	 * 
 	 * @return the name of this variable
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}

@@ -34,6 +34,7 @@ import java.util.ListIterator;
 import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Location;
 import net.sf.orcc.common.Use;
+import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;
@@ -42,6 +43,7 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * Removes phi assignments and translates them to copies.
@@ -83,7 +85,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 				// from the procedure and translate the PHI by an assignment of
 				// 0 (zero) to target.
 				// Otherwise, we just create an assignment target = source.
-				List<LocalVariable> parameters = procedure.getParameters();
+				OrderedMap<Variable> parameters = procedure.getParameters();
 				AssignVarNode assign;
 				if (source.getIndex() == 0 && !parameters.contains(source)) {
 					procedure.getLocals().remove(source);

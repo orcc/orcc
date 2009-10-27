@@ -317,28 +317,23 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 
 	@Override
 	public void visit(CallNode node, Object... args) {
-		int tmpCnt = 0;
-
 		Procedure proc = node.getProcedure();
 		IType returnType = proc.getReturnType();
 		LocalVariable returnVar = node.getTarget();
-		List<LocalVariable> procParams = proc.getParameters();
+		Iterator<Variable> it = proc.getParameters().iterator();
 		List<IExpr> parameters = node.getParameters();
 		for (IExpr parameter : parameters) {
-			LocalVariable procParam = procParams.get(tmpCnt);
-			parameter.accept(this, procParam.getType());
-
-			tmpCnt++;
+			IType type = it.next().getType();
+			parameter.accept(this, type.getType());
 		}
 
 		if (returnVar != null) {
 			if (!returnType.equals(returnVar.getType())) {
 				LocalVariable castVar = varDefCreate(returnType);
 				node.setTarget(castVar);
-				it.add(castNodeCreate(castVar, returnVar));
+				this.it.add(castNodeCreate(castVar, returnVar));
 			}
 		}
-
 	}
 
 	@Override
@@ -522,14 +517,13 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	 * Variable visitor.
 	 * 
 	 */
-
-	private void visitLocals(List<LocalVariable> locals) {
-		for (LocalVariable local : locals) {
-			if (portIndex.containsKey(local.getName())) {
+	private void visitLocals(OrderedMap<Variable> locals) {
+		for (Variable variable : locals) {
+			if (portIndex.containsKey(variable.getName())) {
 				// PointType newType = new PointType(local.getType());
 				PointType newType = new PointType(new IntType(new IntExpr(
 						new Location(), 32)));
-				local.setType(newType);
+				variable.setType(newType);
 			}
 		}
 	}
