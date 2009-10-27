@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Use;
 import net.sf.orcc.common.Variable;
 import net.sf.orcc.ir.NameTransformer;
@@ -74,7 +73,7 @@ public class VarDefPrinter {
 		for (Use use : varDef.getUses()) {
 			if (use.getNode() instanceof AbstractFifoNode) {
 				AbstractFifoNode fifoNode = (AbstractFifoNode) use.getNode();
-				if (fifoNode.getPort().getName().equals(varDef.getName())) {
+				if (varDef.getName().startsWith(fifoNode.getPort().getName())) {
 					isPort = true;
 					break;
 				}
@@ -94,22 +93,7 @@ public class VarDefPrinter {
 	 * @return a string with its full name
 	 */
 	public String getVarDefName(Variable variable) {
-		String name = NameTransformer.transform(variable.getName());
-		if (variable instanceof LocalVariable) {
-			LocalVariable local = (LocalVariable) variable;
-			if (local.hasSuffix()) {
-				name += local.getSuffix();
-			}
-
-			if (!local.isGlobal()) {
-				int index = local.getIndex();
-				if (index != 0) {
-					name += "_" + local.getIndex();
-				}
-			}
-		}
-
-		return name;
+		return NameTransformer.transform(variable.getName());
 	}
 
 }
