@@ -28,11 +28,15 @@
  */
 package net.sf.orcc.ir.nodes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.common.Location;
 
 /**
+ * This class defines a join node. A join node is a node that contains a list of
+ * <code>phi</code> assignments.
+ * 
  * @author Matthieu Wipliez
  * 
  */
@@ -40,9 +44,17 @@ public class JoinNode extends AbstractNode {
 
 	private List<PhiAssignment> phis;
 
-	public JoinNode(int id, Location location, List<PhiAssignment> phis) {
+	/**
+	 * Creates a new join node with the given id and location
+	 * 
+	 * @param id
+	 *            node id
+	 * @param location
+	 *            location
+	 */
+	public JoinNode(int id, Location location) {
 		super(id, location);
-		this.phis = phis;
+		this.phis = new ArrayList<PhiAssignment>();
 	}
 
 	@Override
@@ -50,7 +62,12 @@ public class JoinNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	public List<PhiAssignment> getPhis() {
+	/**
+	 * Returns the list of phi assignments present in this node.
+	 * 
+	 * @return the list of phi assignments present in this node
+	 */
+	public List<PhiAssignment> getPhiAssignments() {
 		return phis;
 	}
 

@@ -438,8 +438,8 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 	public void visit(SelectNode node, Object... args) {
 		List<PhiAssignment> phis = node.getPhis();
 		for (PhiAssignment phi : phis) {
-			LocalVariable varDef = phi.getVarDef();
-			IType typeRef = varDef.getType();
+			LocalVariable target = phi.getTarget();
+			IType typeRef = target.getType();
 			List<Use> localUses = phi.getVars();
 
 			for (Use localUse : localUses) {

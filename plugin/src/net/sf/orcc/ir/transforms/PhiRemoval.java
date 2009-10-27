@@ -62,7 +62,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 		nodes = node.getElseNodes();
 		it = nodes.listIterator(nodes.size());
 		node.getJoinNode().accept(this, it, 1);
-		node.getJoinNode().getPhis().clear();
+		node.getJoinNode().getPhiAssignments().clear();
 
 		visitNodes(node.getThenNodes());
 		visitNodes(node.getElseNodes());
@@ -71,13 +71,13 @@ public class PhiRemoval extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(JoinNode node, Object... args) {
-		List<PhiAssignment> phis = node.getPhis();
+		List<PhiAssignment> phis = node.getPhiAssignments();
 		if (!phis.isEmpty()) {
 			ListIterator<AbstractNode> it = (ListIterator<AbstractNode>) args[0];
 			int phiIndex = (Integer) args[1];
 
 			for (PhiAssignment phi : phis) {
-				LocalVariable target = phi.getVarDef();
+				LocalVariable target = phi.getTarget();
 				LocalVariable source = (LocalVariable) phi.getVars().get(
 						phiIndex).getVariable();
 
@@ -116,7 +116,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 		it = node.getNodes().listIterator(node.getNodes().size());
 		node.getJoinNode().accept(this, it, 1);
-		node.getJoinNode().getPhis().clear();
+		node.getJoinNode().getPhiAssignments().clear();
 		visitNodes(node.getNodes());
 	}
 

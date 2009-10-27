@@ -395,16 +395,15 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 		if (!phis.isEmpty()) {
 			for (PhiAssignment phi : phis) {
-
-				LocalVariable varDef = phi.getVarDef();
+				LocalVariable target = phi.getTarget();
 				List<Use> varuses = phi.getVars();
 
 				StringTemplate nodeTmpl = group.getInstanceOf("selectNode");
 
 				// varDef contains the variable (with the same name as the port)
 				nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(
-						varDef, false));
-				nodeTmpl.setAttribute("type", typeToString.toString(varDef
+						target, false));
+				nodeTmpl.setAttribute("type", typeToString.toString(target
 						.getType()));
 
 				nodeTmpl.setAttribute("expr", exprPrinter.toString(condition,

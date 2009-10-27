@@ -50,8 +50,7 @@ public class CommonNodeOperations {
 	 * @param target
 	 *            a local variable
 	 */
-	public static void setTarget(ITargetContainer node,
-			LocalVariable target) {
+	public static void setTarget(ITargetContainer node, LocalVariable target) {
 		LocalVariable thisTarget = node.getTarget();
 		if (thisTarget != null) {
 			thisTarget.removeUse((AbstractNode) node);

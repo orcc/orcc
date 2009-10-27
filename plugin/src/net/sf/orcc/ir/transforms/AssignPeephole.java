@@ -84,7 +84,7 @@ public class AssignPeephole extends AbstractActorTransformation {
 
 	@Override
 	public void visit(JoinNode node, Object... args) {
-		List<PhiAssignment> phis = node.getPhis();
+		List<PhiAssignment> phis = node.getPhiAssignments();
 		if (!phis.isEmpty()) {
 			for (PhiAssignment phi : phis) {
 				LocalVariable source = (LocalVariable) phi.getVars().get(0)

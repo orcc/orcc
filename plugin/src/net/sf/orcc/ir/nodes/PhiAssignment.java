@@ -34,30 +34,49 @@ import net.sf.orcc.common.LocalVariable;
 import net.sf.orcc.common.Use;
 
 /**
+ * This class defines an assignment of the result of a <code>phi</code> function
+ * to a target local variable.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class PhiAssignment {
+public class PhiAssignment implements ITargetContainer {
 
 	private List<Use> localUses;
 
-	private LocalVariable varDef;
+	private LocalVariable target;
 
-	public PhiAssignment(LocalVariable varDef, List<Use> vars) {
-		this.varDef = varDef;
+	/**
+	 * Creates a new <code>phi</code> assignment with the given target and list
+	 * of uses.
+	 * 
+	 * @param target
+	 *            a local variable
+	 * @param vars
+	 *            a list of uses
+	 */
+	public PhiAssignment(LocalVariable target, List<Use> vars) {
+		setTarget(target);
 		this.localUses = vars;
 	}
 
-	public LocalVariable getVarDef() {
-		return varDef;
+	@Override
+	public LocalVariable getTarget() {
+		return target;
 	}
 
 	public List<Use> getVars() {
 		return localUses;
 	}
 
-	public void setVarDef(LocalVariable varDef) {
-		this.varDef = varDef;
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
+	}
+
+	@Override
+	public void setTargetSimple(LocalVariable target) {
+		this.target = target;
 	}
 
 }

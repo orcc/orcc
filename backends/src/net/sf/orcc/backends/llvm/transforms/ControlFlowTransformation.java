@@ -208,7 +208,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 	private List<AbstractNode> clearIfNode(IfNode node) {
 		BooleanExpr condition = (BooleanExpr) node.getValue();
 		List<AbstractNode> nodes;
-		List<PhiAssignment> phis = node.getJoinNode().getPhis();
+		List<PhiAssignment> phis = node.getJoinNode().getPhiAssignments();
 		boolean value = condition.getValue();
 
 		if (value == true) {
@@ -226,7 +226,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 				phiVar = (LocalVariable) localUses.get(1).getVariable();
 			}
 
-			phi.setVarDef(new LocalVariable(phiVar));
+			phi.setTarget(new LocalVariable(phiVar));
 		}
 
 		return nodes;
@@ -235,13 +235,13 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 	// Return a list of PhiNode supported by the LLVM backend from JoinNode
 	private List<PhiNode> phiNodeCreate(JoinNode node, LabelNode labelTrueNode,
 			LabelNode labelFalseNode) {
-		List<PhiAssignment> phis = node.getPhis();
+		List<PhiAssignment> phis = node.getPhiAssignments();
 		List<PhiNode> PhiNodes = new ArrayList<PhiNode>();
 
 		for (PhiAssignment phi : phis) {
 			Map<LabelNode, LocalVariable> assignements = new HashMap<LabelNode, LocalVariable>();
-			LocalVariable varDef = phi.getVarDef();
-			IType varType = varDef.getType();
+			LocalVariable target = phi.getTarget();
+			IType varType = target.getType();
 			List<Use> vars = phi.getVars();
 
 			LocalVariable trueVar = (LocalVariable) vars.get(0).getVariable();
@@ -266,7 +266,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 			assignements.put(labelTrueNode, trueVar);
 			assignements.put(labelFalseNode, falseVar);
 
-			PhiNodes.add(new PhiNode(0, new Location(), varDef, varDef
+			PhiNodes.add(new PhiNode(0, new Location(), target, target
 					.getType(), assignements));
 		}
 
@@ -280,7 +280,7 @@ public class ControlFlowTransformation extends AbstractLLVMNodeVisitor
 		Location location = node.getLocation();
 		IExpr condition = node.getValue();
 		JoinNode joinNode = node.getJoinNode();
-		List<PhiAssignment> phis = joinNode.getPhis();
+		List<PhiAssignment> phis = joinNode.getPhiAssignments();
 
 		return new SelectNode(id, location, condition, phis);
 	}

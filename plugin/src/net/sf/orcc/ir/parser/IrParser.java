@@ -502,11 +502,13 @@ public class IrParser {
 
 	private JoinNode parseJoinNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		List<PhiAssignment> phis = new ArrayList<PhiAssignment>();
+		JoinNode join = new JoinNode(id, loc);
+		List<PhiAssignment> phis = join.getPhiAssignments();
 		for (int i = 0; i < array.length(); i++) {
 			phis.add(parsePhiNode(array.getJSONArray(i)));
 		}
-		return new JoinNode(id, loc, phis);
+
+		return join;
 	}
 
 	private LoadNode parseLoadNode(int id, Location loc, JSONArray array)
