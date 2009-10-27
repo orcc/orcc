@@ -3,6 +3,7 @@
 #include <windows.h>
 
 
+#include "defs.h"
 
 extern void scheduler_v0();
 extern void scheduler_v1();
@@ -19,14 +20,10 @@ typedef void (*func_t)();
 #ifdef _DEBUG
 #define COUNTER 10
 #else
-#define COUNTER 2000
+#define COUNTER 1000
 #endif
 
-#define NTOKEN 2
-
-int n_token = NTOKEN;
-
-int source_X;
+n_token = NTOKEN;
 
 float measure_time(func_t scheduling_func) {
 	int i;
