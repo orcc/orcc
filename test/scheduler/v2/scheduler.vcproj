@@ -199,6 +199,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\scheduler_v4.c"
+				>
+			</File>
+			<File
+				RelativePath=".\scheduler_v5.c"
+				>
+			</File>
+			<File
 				RelativePath=".\scheduler_vSDF.c"
 				>
 			</File>

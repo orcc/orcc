@@ -80,8 +80,12 @@ static struct fifo_s *compute_O = &fifo_1;
 static struct fifo_s *sink_I = &fifo_1;
 
 static void action_source() {
-	int *ptr = getWritePtr(source_O, 1);
-	ptr[0] = source_X;
+	int i;
+	int *ptr = getWritePtr(source_O, n_token);
+	
+	for (i = 0; i < n_token; i++) {
+		ptr[i] = source_X;
+	}
 	source_X++;
 }
 
@@ -90,7 +94,7 @@ static int source_scheduler() {
 	while (res) {
 		res = 0;
 		if (source_X < N) {
-			if (hasRoom(source_O, 1)) {
+			if (hasRoom(source_O, n_token)) {
 				action_source();
 				res = 1;
 				i++;
@@ -102,17 +106,22 @@ static int source_scheduler() {
 }
 
 static void action_compute() {
-	int *rptr = getReadPtr(compute_I, 1);
-	int *wptr = getWritePtr(compute_O, 1);
-	wptr[0] = rptr[0] + 1;
+	int i;
+
+	int *rptr = getReadPtr(compute_I, n_token);
+	int *wptr = getWritePtr(compute_O, n_token);
+	
+	for ( i =0; i <n_token; i++) {
+		wptr[i] = rptr[i] + i;
+	}
 }
 
 static int compute_scheduler() {
 	int res = 1, i = 0;
 	while (res) {
 		res = 0;
-		if (hasTokens(compute_I, 1)) {
-			if (hasRoom(compute_O, 1)) {
+		if (hasTokens(compute_I, n_token)) {
+			if (hasRoom(compute_O, n_token)) {
 				action_compute();
 				res = 1;
 				i++;
@@ -124,14 +133,14 @@ static int compute_scheduler() {
 }
 
 static void action_sink() {
-	getReadPtr(sink_I, 1);
+	getReadPtr(sink_I, n_token);
 }
 
 static int sink_scheduler() {
 	int res = 1, i = 0;
 	while (res) {
 		res = 0;
-		if (hasTokens(sink_I, 1)) {
+		if (hasTokens(sink_I, n_token)) {
 			action_sink();			
 			res = 1;
 			i++;

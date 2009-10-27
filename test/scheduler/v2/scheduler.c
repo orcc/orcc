@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <windows.h>
 
-int source_X;
+
 
 extern void scheduler_v0();
 extern void scheduler_v1();
 extern void scheduler_v2();
 extern void scheduler_v3();
+extern void scheduler_v4();
+extern void scheduler_v5();
 extern void scheduler_vSDF();
 
 LARGE_INTEGER freq;
@@ -17,8 +19,14 @@ typedef void (*func_t)();
 #ifdef _DEBUG
 #define COUNTER 10
 #else
-#define COUNTER 1000
+#define COUNTER 2000
 #endif
+
+#define NTOKEN 2
+
+int n_token = NTOKEN;
+
+int source_X;
 
 float measure_time(func_t scheduling_func) {
 	int i;
@@ -48,6 +56,10 @@ int main(int argc, char *argv[]) {
 	printf("elapsed time v2: %f ms\n", elapsedTime);
 	elapsedTime = measure_time(scheduler_v3);
 	printf("elapsed time v3: %f ms\n", elapsedTime);
+	elapsedTime = measure_time(scheduler_v4);
+	printf("elapsed time v4: %f ms\n", elapsedTime);
+	elapsedTime = measure_time(scheduler_v5);
+	printf("elapsed time v5: %f ms\n", elapsedTime);
 	elapsedTime = measure_time(scheduler_vSDF);
 	printf("elapsed time SDF: %f ms\n", elapsedTime);
 
