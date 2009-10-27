@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.common.LocalVariable;
+import net.sf.orcc.ir.LocalVariable;
 
 /**
  * This interface defines a node that has a target local variable.

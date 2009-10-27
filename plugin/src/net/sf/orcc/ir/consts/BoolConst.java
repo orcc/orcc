@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.consts;
 
+import net.sf.orcc.ir.IConst;
+
 /**
  * This class defines a boolean constant.
  * 

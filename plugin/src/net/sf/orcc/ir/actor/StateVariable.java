@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.ir.actor;
 
-import net.sf.orcc.common.GlobalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.consts.IConst;
-import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.IConst;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Location;
 
 /**
  * This class represents a state variable. A state variable is a global variable

@@ -28,9 +28,11 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.Location;
 
 /**
+ * This class defines an abstract node.
+ * 
  * @author Matthieu Wipliez
  * 
  */

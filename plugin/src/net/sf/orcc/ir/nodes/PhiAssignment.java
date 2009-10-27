@@ -30,8 +30,8 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Use;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Use;
 
 /**
  * This class defines an assignment of the result of a <code>phi</code> function

@@ -26,27 +26,61 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.transforms;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.type.TypeVisitor;
+
 
 /**
- * This interface defines how a transformation can be applied on an actor.
+ * This interface defines a type.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface IActorTransformation {
+public interface IType {
 
 	/**
-	 * Transforms the given actor in-place.
-	 * 
-	 * @param actor
-	 *            an actor
-	 * @throws OrccException
-	 *             if the transformation fails
+	 * boolean type
 	 */
-	public void transform(Actor actor) throws OrccException;
+	public static final int BOOLEAN = 1;
+
+	/**
+	 * integer type
+	 */
+	public static final int INT = 2;
+
+	/**
+	 * list type
+	 */
+	public static final int LIST = 3;
+
+	/**
+	 * string type
+	 */
+	public static final int STRING = 4;
+
+	/**
+	 * unsigned integer type
+	 */
+	public static final int UINT = 5;
+
+	/**
+	 * void type
+	 */
+	public static final int VOID = 6;
+
+	/**
+	 * Accepts a visitor.
+	 * 
+	 * @param visitor
+	 */
+	public void accept(TypeVisitor visitor);
+
+	/**
+	 * Returns the type of this type.
+	 * 
+	 * @return the type of this type
+	 */
+	public int getType();
 
 }

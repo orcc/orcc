@@ -31,10 +31,10 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Use;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AbstractNode;

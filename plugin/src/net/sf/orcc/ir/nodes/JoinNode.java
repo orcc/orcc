@@ -31,7 +31,7 @@ package net.sf.orcc.ir.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.Location;
 
 /**
  * This class defines a join node. A join node is a node that contains a list of

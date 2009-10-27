@@ -26,15 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.actor;
+package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Variable;
-import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.util.INameable;
 import net.sf.orcc.util.OrderedMap;
 

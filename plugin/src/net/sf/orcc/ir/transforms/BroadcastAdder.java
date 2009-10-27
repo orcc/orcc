@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.orcc.common.Port;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;

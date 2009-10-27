@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.Location;
 
 /**
  * @author Matthieu Wipliez

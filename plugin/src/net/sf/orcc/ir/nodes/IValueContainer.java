@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
 
 /**
  * This interface defines a node that contains or uses a value.

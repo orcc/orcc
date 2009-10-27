@@ -30,7 +30,8 @@ package net.sf.orcc.ir.transforms;
 
 import java.util.Iterator;
 
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.util.OrderedMap;

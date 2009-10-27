@@ -26,57 +26,82 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir;
+
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.expr.ExprVisitor;
 
 /**
- * This interface defines a type.
+ * This interface defines an expression.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface IType {
+public interface IExpr {
 
 	/**
-	 * boolean type
+	 * binary expression
 	 */
-	public static final int BOOLEAN = 1;
+	public static final int BINARY = 1;
 
 	/**
-	 * integer type
+	 * boolean expression
 	 */
-	public static final int INT = 2;
+	public static final int BOOLEAN = 2;
 
 	/**
-	 * list type
+	 * integer expression
 	 */
-	public static final int LIST = 3;
+	public static final int INT = 3;
 
 	/**
-	 * string type
+	 * list expression
 	 */
-	public static final int STRING = 4;
+	public static final int LIST = 4;
 
 	/**
-	 * unsigned integer type
+	 * string expression
 	 */
-	public static final int UINT = 5;
+	public static final int STRING = 5;
 
 	/**
-	 * void type
+	 * unary expression
 	 */
-	public static final int VOID = 6;
+	public static final int UNARY = 6;
+
+	/**
+	 * variable reference expression
+	 */
+	public static final int VAR = 7;
 
 	/**
 	 * Accepts a visitor.
 	 * 
 	 * @param visitor
+	 * @param args
 	 */
-	public void accept(TypeVisitor visitor);
+	public void accept(ExprVisitor visitor, Object... args);
 
 	/**
-	 * Returns the type of this type.
+	 * Evaluates this expression.
 	 * 
-	 * @return the type of this type
+	 * @return an expression.
+	 * @throws ExprEvaluateException
+	 *             if the expression cannot be evaluated.
+	 */
+	public IExpr evaluate() throws OrccException;
+
+	/**
+	 * Returns the location of this expression.
+	 * 
+	 * @return the location of this expression
+	 */
+	public Location getLocation();
+
+	/**
+	 * Returns the type of this expression.
+	 * 
+	 * @return the type of this expression
 	 */
 	public int getType();
 

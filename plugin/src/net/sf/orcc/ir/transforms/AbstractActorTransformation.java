@@ -31,9 +31,10 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.Procedure;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
 

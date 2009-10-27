@@ -26,51 +26,50 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.consts.ConstVisitor;
 
 /**
- * @author Jérôme GORIN
+ * This interface defines a constant.
+ * 
+ * @author Matthieu Wipliez
  * 
  */
-public class TypeExpr extends AbstractExpr {
+public interface IConst {
 
-	private IType type;
+	/**
+	 * boolean constant
+	 */
+	public static final int BOOLEAN = 1;
 
-	public TypeExpr(Location location, IType type) {
-		super(location);
-		this.type = type;
-	}
+	/**
+	 * integer constant
+	 */
+	public static final int INT = 2;
 
-	@Override
-	public void accept(ExprVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
+	/**
+	 * list constant
+	 */
+	public static final int LIST = 3;
 
-	@Override
-	public IExpr evaluate() throws OrccException {
-		return this;
-	}
+	/**
+	 * string constant
+	 */
+	public static final int STRING = 4;
 
-	@Override
-	public int getType() {
-		return TYPE;
-	}
+	/**
+	 * Accepts a visitor.
+	 * 
+	 * @param visitor
+	 */
+	public abstract void accept(ConstVisitor visitor, Object... args);
 
-	public IType getUnderlyingType() {
-		return type;
-	}
-
-	public void setType(IType type) {
-		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return type.toString();
-	}
+	/**
+	 * Returns the type of this constant.
+	 * 
+	 * @return the type of this constant
+	 */
+	public int getType();
 
 }

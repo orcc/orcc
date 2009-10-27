@@ -26,88 +26,37 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Location;
+
 
 /**
- * This interface defines an expression.
+ * This class represents a port. A port is a variable.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface IExpr {
+public class Port extends Variable {
 
 	/**
-	 * binary expression
-	 */
-	public static final int BINARY = 1;
-
-	/**
-	 * boolean expression
-	 */
-	public static final int BOOLEAN = 2;
-
-	/**
-	 * integer expression
-	 */
-	public static final int INT = 3;
-
-	/**
-	 * list expression
-	 */
-	public static final int LIST = 4;
-
-	/**
-	 * string expression
-	 */
-	public static final int STRING = 5;
-
-	/**
-	 * type expression
-	 */
-	public static final int TYPE = 6;
-
-	/**
-	 * unary expression
-	 */
-	public static final int UNARY = 7;
-
-	/**
-	 * variable reference expression
-	 */
-	public static final int VAR = 8;
-
-	/**
-	 * Accepts a visitor.
+	 * Creates a new port with the given location, type, and name.
 	 * 
-	 * @param visitor
-	 * @param args
+	 * @param location
+	 *            the port location
+	 * @param type
+	 *            the port type
+	 * @param name
+	 *            the port name
 	 */
-	public void accept(ExprVisitor visitor, Object... args);
+	public Port(Location location, IType type, String name) {
+		super(location, type, name, true);
+	}
 
 	/**
-	 * Evaluates this expression.
-	 * 
-	 * @return an expression.
-	 * @throws ExprEvaluateException
-	 *             if the expression cannot be evaluated.
+	 * Creates a new port from the given port
 	 */
-	public IExpr evaluate() throws OrccException;
-
-	/**
-	 * Returns the location of this expression.
-	 * 
-	 * @return the location of this expression
-	 */
-	public Location getLocation();
-
-	/**
-	 * Returns the type of this expression.
-	 * 
-	 * @return the type of this expression
-	 */
-	public int getType();
+	public Port(Port port) {
+		super(port);
+	}
 
 }

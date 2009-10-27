@@ -30,9 +30,10 @@ package net.sf.orcc.ir.actor;
 
 import java.util.Map;
 
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.NameTransformer;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
 
 /**
  * @author Matthieu Wipliez

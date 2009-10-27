@@ -26,55 +26,27 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.actor.Actor;
 
 /**
+ * This interface defines how a transformation can be applied on an actor.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class IntType extends AbstractType {
+public interface IActorTransformation {
 
-	public static final String NAME = "int";
-
-	private IExpr size;
-
-	public IntType(IExpr size) {
-		super(NAME);
-		setSize(size);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof IntType) {
-			return size.equals(((IntType) obj).size);
-		} else {
-			return false;
-		}
-	}
-
-	public IExpr getSize() {
-		return size;
-	}
-
-	@Override
-	public int getType() {
-		return INT;
-	}
-
-	public void setSize(IExpr size) {
-		this.size = size;
-	}
-
-	@Override
-	public String toString() {
-		return NAME + "(size=" + size + ")";
-	}
+	/**
+	 * Transforms the given actor in-place.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @throws OrccException
+	 *             if the transformation fails
+	 */
+	public void transform(Actor actor) throws OrccException;
 
 }

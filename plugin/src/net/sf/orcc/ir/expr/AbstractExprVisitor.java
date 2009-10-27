@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.ir.IExpr;
+
+
 /**
  * This class is an abstract implementation of {@link ExprVisitor}.
  * 
@@ -54,9 +57,6 @@ public abstract class AbstractExprVisitor implements ExprVisitor {
 	}
 
 	public void visit(StringExpr expr, Object... args) {
-	}
-
-	public void visit(TypeExpr expr, Object... args) {
 	}
 
 	public void visit(UnaryExpr expr, Object... args) {

@@ -28,7 +28,8 @@
  */
 package net.sf.orcc.ir.type;
 
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IType;
 
 /**
  * @author Matthieu Wipliez

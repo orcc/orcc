@@ -28,7 +28,8 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.common.Location;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Location;
 
 /**
  * This class is an abstract implementation of {@link IExpr}.

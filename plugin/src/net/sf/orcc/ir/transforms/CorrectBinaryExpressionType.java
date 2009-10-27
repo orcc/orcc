@@ -29,16 +29,16 @@
 package net.sf.orcc.ir.transforms;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.IExpr;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AssignVarNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IType;
 import net.sf.orcc.ir.type.IntType;
 
 /**

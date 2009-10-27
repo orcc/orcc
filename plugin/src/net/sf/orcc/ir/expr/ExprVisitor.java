@@ -44,8 +44,6 @@ public interface ExprVisitor {
 
 	public void visit(StringExpr expr, Object... args);
 
-	public void visit(TypeExpr expr, Object... args);
-
 	public void visit(UnaryExpr expr, Object... args);
 
 	public void visit(VarExpr expr, Object... args);

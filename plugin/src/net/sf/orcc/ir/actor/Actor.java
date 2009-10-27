@@ -30,8 +30,9 @@ package net.sf.orcc.ir.actor;
 
 import java.util.List;
 
-import net.sf.orcc.common.Port;
-import net.sf.orcc.common.Variable;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.util.OrderedMap;
 
 /**

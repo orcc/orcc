@@ -26,48 +26,91 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.consts;
+package net.sf.orcc.ir;
 
 /**
- * This interface defines a constant.
+ * This class represents a location. A location keeps track of where a
+ * particular element was in the original file. It contains the line, and
+ * starting and ending columns.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface IConst {
+public class Location {
+
+	private int endColumn;
+
+	private int startColumn;
+
+	private int startLine;
 
 	/**
-	 * boolean constant
+	 * Constructs a dummy location.
 	 */
-	public static final int BOOLEAN = 1;
+	public Location() {
+	}
 
 	/**
-	 * integer constant
-	 */
-	public static final int INT = 2;
-
-	/**
-	 * list constant
-	 */
-	public static final int LIST = 3;
-
-	/**
-	 * string constant
-	 */
-	public static final int STRING = 4;
-
-	/**
-	 * Accepts a visitor.
+	 * Constructs a location from the specified start line, start column, end
+	 * column.
 	 * 
-	 * @param visitor
+	 * @param startLine
+	 *            The line where the location starts.
+	 * @param startColumn
+	 *            The column where the location starts.
+	 * @param endColumn
+	 *            The column where the location ends.
 	 */
-	public abstract void accept(ConstVisitor visitor, Object... args);
+	public Location(int startLine, int startColumn, int endColumn) {
+		this.startLine = startLine;
+		this.startColumn = startColumn;
+		this.endColumn = endColumn;
+	}
 
 	/**
-	 * Returns the type of this constant.
+	 * Constructs a location from two given locations.
 	 * 
-	 * @return the type of this constant
+	 * @param start
+	 *            starting location
+	 * @param end
+	 *            ending location
 	 */
-	public int getType();
+	public Location(Location start, Location end) {
+		this.startLine = start.startLine;
+	}
+
+	/**
+	 * Returns the ending column of this location.
+	 * 
+	 * @return the ending column of this location
+	 */
+	public int getEndColumn() {
+		return endColumn;
+	}
+
+	/**
+	 * Returns the starting column of this location.
+	 * 
+	 * @return the starting column of this location
+	 */
+	public int getStartColumn() {
+		return startColumn;
+	}
+
+	/**
+	 * Returns the starting line of this location.
+	 * 
+	 * @return the starting line of this location
+	 */
+	public int getStartLine() {
+		return startLine;
+	}
+
+	@Override
+	public String toString() {
+		String res = "line " + startLine + ", characters " + startColumn + "-"
+				+ endColumn;
+		return res;
+	}
 
 }

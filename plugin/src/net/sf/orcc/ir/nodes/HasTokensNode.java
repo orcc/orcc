@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.common.LocalVariable;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.common.Port;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Port;
 
 /**
  * This class defines a HasTokens node.

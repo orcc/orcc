@@ -30,8 +30,8 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Location;
 
 /**
  * This class defines an If node. An if node is a node with a value used in its

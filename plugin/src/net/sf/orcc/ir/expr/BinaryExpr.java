@@ -29,8 +29,9 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.common.Location;
-import net.sf.orcc.ir.type.IType;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Location;
 
 /**
  * @author Matthieu Wipliez

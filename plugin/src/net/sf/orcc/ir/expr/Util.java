@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.IExpr;
 
 /**
  * This class defines a bunch of stuff, at the moment only a naive evaluator.

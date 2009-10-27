@@ -29,7 +29,8 @@
 package net.sf.orcc.ir.type;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.expr.IExpr;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IType;
 
 /**
  * This class defines a type entry.
