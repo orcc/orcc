@@ -43,6 +43,11 @@ import net.sf.orcc.ir.Location;
 public class StateVariable extends GlobalVariable {
 
 	/**
+	 * whether the variable is assignable.
+	 */
+	private boolean assignable;
+
+	/**
 	 * Creates a new state variable with the given location, type, name and
 	 * initial value.
 	 * 
@@ -56,8 +61,9 @@ public class StateVariable extends GlobalVariable {
 	 *            initial value
 	 */
 	public StateVariable(Location location, IType type, String name,
-			IConst value) {
+			boolean assignable, IConst value) {
 		super(location, type, name);
+		this.assignable = assignable;
 		this.constantValue = value;
 	}
 
@@ -67,6 +73,15 @@ public class StateVariable extends GlobalVariable {
 
 	public boolean hasInit() {
 		return (constantValue != null);
+	}
+
+	/**
+	 * Returns <code>true</code> if this state variable can be assigned.
+	 * 
+	 * @return <code>true</code> if this state variable can be assigned
+	 */
+	public boolean isAssignable() {
+		return assignable;
 	}
 
 }

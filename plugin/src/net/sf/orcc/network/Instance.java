@@ -38,7 +38,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.parser.IrParser;
+import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.parser.NetworkParser;
 
@@ -232,12 +232,12 @@ public class Instance implements Comparable<Instance> {
 			if (file.exists()) {
 				// TODO when new front end is ready, add instantiation here
 				InputStream in = new FileInputStream(file);
-				actor = new IrParser().parseActor(in);
+				actor = new IRParser().parseActor(in);
 			} else {
 				file = new File(path, id + ".json");
 				// this may cause a FileNotFoundException
 				InputStream in = new FileInputStream(file);
-				actor = new IrParser().parseActor(in);
+				actor = new IRParser().parseActor(in);
 			}
 		} catch (OrccException e) {
 			throw new OrccException("Could not parse instance \"" + id

@@ -35,9 +35,9 @@ import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.RVCCalASTParser;
-import net.sf.orcc.frontend.writer.ActorWriter;
 import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.serialize.IRWriter;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
@@ -160,10 +160,11 @@ public class Frontend {
 					scheduler.getFsm().printGraph(fileName);
 				}
 
-				new ActorWriter(actor).write(outputFolder.toString());
+				new IRWriter(actor).write(outputFolder.toString());
 			} catch (OrccException e) {
 				e.printStackTrace();
 			}
 		}
 	}
+
 }

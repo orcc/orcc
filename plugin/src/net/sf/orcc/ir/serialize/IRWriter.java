@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.frontend.writer;
+package net.sf.orcc.ir.serialize;
 
 import static net.sf.orcc.ir.IrConstants.KEY_NAME;
 import static net.sf.orcc.ir.IrConstants.KEY_SOURCE_FILE;
@@ -64,7 +64,7 @@ import org.json.JSONObject;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorWriter {
+public class IRWriter {
 
 	private Actor actor;
 
@@ -74,7 +74,7 @@ public class ActorWriter {
 	 * @param actor
 	 *            an actor
 	 */
-	public ActorWriter(Actor actor) {
+	public IRWriter(Actor actor) {
 		this.actor = actor;
 	}
 

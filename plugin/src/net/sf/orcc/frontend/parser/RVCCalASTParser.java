@@ -42,6 +42,7 @@ import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IConst;
 import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.INode;
@@ -196,29 +197,48 @@ public class RVCCalASTParser {
 	}
 
 	/**
-	 * parse tree. children are: actor, id, parameters, inputs, outputs
+	 * Parse the given tree as an actor. The method:
+	 * <ul>
+	 * <li>initializes fields</li>
+	 * <li>parses ports</li>
+	 * <li>parses parameters</li>
+	 * <li>parse actor declarations</li>
+	 * <li>sort actions by priority</li>
+	 * <li>build FSM (if the actor contains an FSM)</li>
+	 * </ul>
 	 * 
 	 * @param tree
+	 *            an ANTLR tree whose root is ACTOR
 	 * @return an actor
 	 */
 	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
-		currentScope = new Scope<Variable>();
 
+		// parameters is top-level scope, state variables extend the scope
+
+		// actions, procedures, priorities
 		actions = new ActionList();
-		parameters = new Scope<Variable>();
 		procedures = new OrderedMap<Procedure>();
+		priorities = new ArrayList<List<Tag>>();
+
+		// parse ports and return them as ordered maps
 		inputs = parsePorts(tree.getChild(3));
 		outputs = parsePorts(tree.getChild(4));
-		priorities = new ArrayList<List<Tag>>();
-		stateVars = new Scope<Variable>();
 
-		parseVarDefs(parameters, tree.getChild(2));
+		// parse parameters
+		parameters = new Scope<Variable>();
+		parseParameters(tree.getChild(2));
+
+		// parse actor declarations
+		stateVars = new Scope<Variable>(parameters);
+		currentScope = stateVars;
 		parseActorDecls(tree.getChild(5));
 
+		// sort actions by priority
 		sorter = new ActionSorter(actions);
 		ActionList actions = sorter.applyPriority(priorities);
 
+		// builds FSM
 		FSM fsm = (fsmBuilder == null) ? null : fsmBuilder.buildFSM(actions);
 		ActionScheduler scheduler = new ActionScheduler(actions.getList(), fsm);
 
@@ -260,9 +280,7 @@ public class RVCCalASTParser {
 				fsmBuilder = new FSMBuilder(child);
 				break;
 			case RVCCalLexer.STATE_VAR: {
-				StateVariable stateVar = parseStateVar(child);
-				currentScope.add(file, stateVar.getLocation(), stateVar
-						.getName(), stateVar);
+				parseStateVariable(child);
 				break;
 			}
 			default:
@@ -275,6 +293,58 @@ public class RVCCalASTParser {
 	}
 
 	private void parseInitialize(Tree tree) {
+	}
+
+	/**
+	 * tree = PORT/PARAMETER, children = TYPE, ID
+	 * 
+	 * @param tree
+	 * @param assignable
+	 * @param global
+	 * @param index
+	 * @param suffix
+	 * @return
+	 */
+	private LocalVariable parseLocalVariable(Tree tree, boolean assignable,
+			int index, Integer suffix) throws OrccException {
+		IType type = parseType(tree.getChild(0));
+		Tree nameTree = tree.getChild(1);
+		String name = nameTree.getText();
+
+		Location loc = parseLocation(nameTree);
+
+		INode node = new EmptyNode(0, new Location());
+
+		return new LocalVariable(assignable, index, loc, name, node, suffix,
+				type);
+	}
+
+	/**
+	 * Parses the given tree as a list of parameters. Each child of the tree is
+	 * parsed as a parameter represented by a {@link GlobalVariable}, and added
+	 * to {@link #parameters}.
+	 * 
+	 * @param tree
+	 *            a tree
+	 */
+	private void parseParameters(Tree tree) throws OrccException {
+		int numParameters = tree.getChildCount();
+		for (int i = 0; i < numParameters; i++) {
+			Tree child = tree.getChild(i);
+			IType type = parseType(child.getChild(0));
+			Tree nameTree = child.getChild(1);
+			Location location = parseLocation(nameTree);
+			String name = nameTree.getText();
+
+			IExpr init = null;
+			if (child.getChildCount() == 3) {
+				init = exprParser.parseExpression(child.getChild(2));
+			}
+
+			GlobalVariable globalVariable = new GlobalVariable(location, type,
+					name, init);
+			parameters.add(file, location, name, globalVariable);
+		}
 	}
 
 	/**
@@ -325,15 +395,28 @@ public class RVCCalASTParser {
 	private void parseProcedure(Tree tree) {
 	}
 
-	private StateVariable parseStateVar(Tree stateVar) throws OrccException {
-		boolean assignable = (stateVar.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
-		LocalVariable def = parseVarDef(stateVar, assignable, 0, null);
+	/**
+	 * Parses the given tree as a state variable. The state variable is added to
+	 * {@link #stateVars}.
+	 * 
+	 * @param tree
+	 *            a tree whose root is STATE_VAR
+	 * @throws OrccException
+	 */
+	private void parseStateVariable(Tree tree) throws OrccException {
+		IType type = parseType(tree.getChild(0));
+		Tree nameTree = tree.getChild(1);
+		Location location = parseLocation(nameTree);
+		String name = nameTree.getText();
+		boolean assignable = (tree.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
+
 		IConst init = null;
-		if (stateVar.getChildCount() == 4) {
+		if (tree.getChildCount() == 4) {
 		}
 
-		return new StateVariable(def.getLocation(), def.getType(), def
-				.getName(), init);
+		StateVariable stateVariable = new StateVariable(location, type, name,
+				assignable, init);
+		stateVars.add(file, location, name, stateVariable);
 	}
 
 	/**
@@ -407,52 +490,6 @@ public class RVCCalASTParser {
 
 		// type attribute not found, and no default type given => error
 		throw new OrccException(file, location, "missing \"type\" attribute");
-	}
-
-	/**
-	 * tree = PORT/PARAMETER, children = TYPE, ID
-	 * 
-	 * @param tree
-	 * @param assignable
-	 * @param global
-	 * @param index
-	 * @param suffix
-	 * @return
-	 */
-	private LocalVariable parseVarDef(Tree tree, boolean assignable, int index,
-			Integer suffix) throws OrccException {
-		IType type = parseType(tree.getChild(0));
-		Tree nameTree = tree.getChild(1);
-		String name = nameTree.getText();
-
-		Location loc = parseLocation(nameTree);
-
-		INode node = new EmptyNode(0, new Location());
-
-		return new LocalVariable(assignable, index, loc, name, node, suffix,
-				type);
-	}
-
-	/**
-	 * children = vardef 1, ..., vardef n
-	 * 
-	 * @param scope
-	 *            a scope
-	 * @param tree
-	 *            a tree
-	 */
-	private List<LocalVariable> parseVarDefs(OrderedMap<Variable> scope,
-			Tree tree) throws OrccException {
-		List<LocalVariable> varDefs = new ArrayList<LocalVariable>();
-		int numPorts = tree.getChildCount();
-		for (int i = 0; i < numPorts; i++) {
-			Tree child = tree.getChild(i);
-			LocalVariable varDef = parseVarDef(child, false, 0, null);
-			scope.add(file, varDef.getLocation(), varDef.getName(), varDef);
-			varDefs.add(varDef);
-		}
-
-		return varDefs;
 	}
 
 	/**

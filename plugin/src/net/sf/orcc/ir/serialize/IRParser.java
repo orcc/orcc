@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.parser;
+package net.sf.orcc.ir.serialize;
 
 import static net.sf.orcc.ir.IrConstants.BINARY_EXPR;
 import static net.sf.orcc.ir.IrConstants.BOP_BAND;
@@ -145,12 +145,13 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 /**
- * This class provides a parser for orcc's IR.
+ * This class defines a parser that loads an actor in IR form serialized in JSON
+ * in memory.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class IrParser {
+public class IRParser {
 
 	private Map<Tag, Action> actions;
 
@@ -735,7 +736,7 @@ public class IrParser {
 			JSONArray varDefArray = stateArray.getJSONArray(0);
 			JSONArray details = varDefArray.getJSONArray(0);
 			String name = details.getString(0);
-			// boolean assignable = details.getBoolean(1);
+			boolean assignable = details.getBoolean(1);
 
 			Location location = parseLocation(varDefArray.getJSONArray(1));
 			IType type = parseType(varDefArray.get(2));
@@ -746,7 +747,7 @@ public class IrParser {
 			}
 
 			StateVariable stateVar = new StateVariable(location, type, name,
-					init);
+					assignable, init);
 			stateVars.add(file, location, name, stateVar);
 
 			// register the state variable
