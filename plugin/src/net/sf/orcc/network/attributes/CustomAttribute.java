@@ -28,6 +28,13 @@
  */
 package net.sf.orcc.network.attributes;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.orcc.OrccException;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -41,16 +48,25 @@ public class CustomAttribute implements ICustomAttribute {
 	/**
 	 * the value of this attribute
 	 */
-	private NodeList value;
+	private List<XmlElement> value;
 
 	/**
 	 * Creates a new custom attribute with the given DOM child nodes.
 	 * 
 	 * @param value
 	 *            the children of this attribute as a {@link NodeList}
+	 * @throws OrccException
 	 */
-	public CustomAttribute(NodeList value) {
-		this.value = value;
+	public CustomAttribute(NodeList list) throws OrccException {
+		value = new ArrayList<XmlElement>();
+		if (list.getLength() > 0) {
+			Node node = list.item(0);
+			while (node != null) {
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					value.add(new XmlElement((Element) node));
+				}
+			}
+		}
 	}
 
 	@Override
@@ -59,7 +75,7 @@ public class CustomAttribute implements ICustomAttribute {
 	}
 
 	@Override
-	public NodeList getValue() {
+	public List<XmlElement> getValue() {
 		return value;
 	}
 

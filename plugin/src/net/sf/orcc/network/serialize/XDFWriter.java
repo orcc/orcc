@@ -31,9 +31,31 @@ package net.sf.orcc.network.serialize;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.attributes.IAttribute;
+import net.sf.orcc.network.attributes.ICustomAttribute;
+import net.sf.orcc.network.attributes.IFlagAttribute;
+import net.sf.orcc.network.attributes.IStringAttribute;
+import net.sf.orcc.network.attributes.ITypeAttribute;
+import net.sf.orcc.network.attributes.IValueAttribute;
+import net.sf.orcc.network.attributes.XmlElement;
+import net.sf.orcc.util.OrderedMap;
 
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -52,32 +74,25 @@ import org.w3c.dom.ls.LSSerializer;
 public class XDFWriter {
 
 	/**
-	 * the path of the output directory where XDF files should be written
+	 * the document being created by this writer.
 	 */
-	private File path;
+	private Document document;
 
 	/**
-	 * Creates a new network writer with the given output directory.
+	 * Creates a new network writer with the given output directory and writes
+	 * the given network to the directory this network writer was built with.
+	 * This method recursively writes the networks that are children of the
+	 * given network.
 	 * 
 	 * @param path
 	 *            a file that represents the absolute path of the output
 	 *            directory
-	 */
-	public XDFWriter(File path) {
-		this.path = path;
-	}
-
-	/**
-	 * Writes the given network to the directory this network writer was built
-	 * with. This method recursively writes the networks that are children of
-	 * the given network.
-	 * 
 	 * @param network
 	 *            a network
 	 * @throws OrccException
-	 *             if something goes wrong
+	 *             if the network could not be written
 	 */
-	public void writeNetwork(Network network) throws OrccException {
+	public XDFWriter(File path, Network network) throws OrccException {
 		try {
 			// output
 			DOMImplementationRegistry registry = DOMImplementationRegistry
@@ -86,8 +101,8 @@ public class XDFWriter {
 					.getDOMImplementation("Core 3.0 XML 3.0 LS");
 
 			// create document
-			Document document = ((DOMImplementation) impl).createDocument("",
-					"XDF", null);
+			document = ((DOMImplementation) impl).createDocument("", "XDF",
+					null);
 			writeXDF(document.getDocumentElement(), network);
 
 			// serialize to XML
@@ -115,15 +130,268 @@ public class XDFWriter {
 	}
 
 	/**
+	 * Appends Attribute elements to the given parent element. Each attribute of
+	 * the attributes map is transformed to an Attribute DOM element.
+	 * 
+	 * @param parent
+	 *            the parent element
+	 * @param attributes
+	 *            a map of attributes
+	 * @throws OrccException
+	 */
+	private void writeAttributes(Element parent,
+			Map<String, IAttribute> attributes) throws OrccException {
+		// sort attributes by alphabetical order
+		attributes = new TreeMap<String, IAttribute>(attributes);
+
+		for (Entry<String, IAttribute> entry : attributes.entrySet()) {
+			Element attributeElt = document.createElement("Attribute");
+			attributeElt.setAttribute("name", entry.getKey());
+
+			IAttribute attribute = entry.getValue();
+			String kind;
+			switch (attribute.getType()) {
+			case IAttribute.CUSTOM: {
+				kind = ICustomAttribute.NAME;
+				List<XmlElement> children = ((ICustomAttribute) attribute)
+						.getValue();
+				for (XmlElement element : children) {
+					attributeElt.appendChild(element.getDOMElement(document));
+				}
+				break;
+			}
+			case IAttribute.FLAG:
+				kind = IFlagAttribute.NAME;
+				break;
+			case IAttribute.STRING: {
+				kind = IStringAttribute.NAME;
+				String value = ((IStringAttribute) attribute).getValue();
+				attributeElt.setAttribute("value", value);
+				break;
+			}
+			case IAttribute.TYPE: {
+				kind = ITypeAttribute.NAME;
+				IType type = ((ITypeAttribute) attribute).getValue();
+				attributeElt.appendChild(writeType(type));
+				break;
+			}
+			case IAttribute.VALUE: {
+				kind = IValueAttribute.NAME;
+				IExpr expr = ((IValueAttribute) attribute).getValue();
+				attributeElt.appendChild(writeExpr(expr));
+				break;
+			}
+			default:
+				throw new OrccException("unknown attribute type");
+			}
+
+			attributeElt.setAttribute("kind", kind);
+			parent.appendChild(attributeElt);
+		}
+	}
+
+	private Element writeConnection(Connection connection) {
+		return document.createElement("Connection");
+	}
+
+	/**
+	 * Appends Decl elements to the given parent element with the given kind.
+	 * Each declaration of the variables map is transformed to a Decl DOM
+	 * element.
+	 * 
+	 * @param parent
+	 *            the parent element
+	 * @param kind
+	 *            the kind of declarations
+	 * @param variables
+	 *            an ordered map of global variables
+	 * @throws OrccException
+	 */
+	private void writeDecls(Element parent, String kind,
+			OrderedMap<GlobalVariable> variables) throws OrccException {
+		for (GlobalVariable variable : variables) {
+			Element decl = document.createElement("Decl");
+			parent.appendChild(decl);
+
+			decl.setAttribute("kind", kind);
+			decl.setAttribute("name", variable.getName());
+			decl.appendChild(writeType(variable.getType()));
+
+			if (variable.hasValue()) {
+				decl.appendChild(writeExpr(variable.getValue()));
+			}
+		}
+	}
+
+	/**
+	 * Returns an Entry element that represents the given expression entry.
+	 * 
+	 * @param name
+	 *            the entry name
+	 * @param expr
+	 *            the entry value as an expression
+	 * @return an Entry DOM element
+	 * @throws OrccException
+	 */
+	private Element writeEntry(String name, IExpr expr) {
+		Element entry = document.createElement("Entry");
+		entry.setAttribute("kind", "Expr");
+		entry.setAttribute("name", name);
+		entry.appendChild(writeExpr(expr));
+		return entry;
+	}
+
+	/**
+	 * Returns an Entry element that represents the given type entry.
+	 * 
+	 * @param name
+	 *            the entry name
+	 * @param type
+	 *            the entry value as a type
+	 * @return an Entry DOM element
+	 * @throws OrccException
+	 */
+	private Element writeEntry(String name, IType type) throws OrccException {
+		Element entry = document.createElement("Entry");
+		entry.setAttribute("kind", "Type");
+		entry.setAttribute("name", name);
+		entry.appendChild(writeType(type));
+		return entry;
+	}
+
+	private Element writeExpr(IExpr expr) {
+		return document.createElement("Expr");
+	}
+
+	/**
+	 * Returns an Instance element that represents the given instance.
+	 * 
+	 * @param instance
+	 *            an instance
+	 * @return an Instance DOM element
+	 * @throws OrccException
+	 */
+	private Element writeInstance(Instance instance) throws OrccException {
+		Element instanceElt = document.createElement("Instance");
+		instanceElt.setAttribute("id", instance.getId());
+
+		// class
+		Element classElt = document.createElement("Class");
+		classElt.setAttribute("name", instance.getClasz());
+		instanceElt.appendChild(classElt);
+
+		// parameters
+		for (Entry<String, IExpr> parameter : instance.getParameters()
+				.entrySet()) {
+			Element parameterElt = document.createElement("Parameter");
+			parameterElt.setAttribute("name", parameter.getKey());
+			parameterElt.appendChild(writeExpr(parameter.getValue()));
+			instanceElt.appendChild(parameterElt);
+		}
+
+		// attributes
+		writeAttributes(instanceElt, instance.getAttributes());
+
+		return instanceElt;
+	}
+
+	/**
+	 * Appends Port elements to the given parent element with the given kind.
+	 * Each port of the ports map is transformed to a Port DOM element.
+	 * 
+	 * @param parent
+	 *            the parent element
+	 * @param kind
+	 *            the kind of ports
+	 * @param ports
+	 *            an ordered map of ports
+	 * @throws OrccException
+	 */
+	private void writePorts(Element parent, String kind, OrderedMap<Port> ports)
+			throws OrccException {
+		for (Port port : ports) {
+			Element portElt = document.createElement("Port");
+			parent.appendChild(portElt);
+
+			portElt.setAttribute("kind", kind);
+			portElt.setAttribute("name", port.getName());
+			portElt.appendChild(writeType(port.getType()));
+		}
+	}
+
+	/**
+	 * Returns a Type element that represents the given type.
+	 * 
+	 * @param type
+	 *            a type
+	 * @return a Type DOM element
+	 * @throws OrccException
+	 */
+	private Element writeType(IType type) throws OrccException {
+		Element typeElt = document.createElement("Type");
+
+		String name;
+		IExpr size;
+
+		switch (type.getType()) {
+		case IType.BOOLEAN:
+			name = "bool";
+			break;
+		case IType.INT:
+			name = "int";
+			size = ((IntType) type).getSize();
+			typeElt.appendChild(writeEntry("size", size));
+			break;
+		case IType.LIST:
+			name = "List";
+			size = ((ListType) type).getSize();
+			type = ((ListType) type).getElementType();
+			typeElt.appendChild(writeEntry("type", type));
+			typeElt.appendChild(writeEntry("size", size));
+			break;
+		case IType.STRING:
+			name = "String";
+			break;
+		case IType.UINT:
+			name = "uint";
+			size = ((UintType) type).getSize();
+			typeElt.appendChild(writeEntry("size", size));
+			break;
+		case IType.VOID:
+			throw new OrccException("void type is invalid in XDF");
+		default:
+			throw new OrccException("unknown type");
+		}
+
+		typeElt.setAttribute("name", name);
+		return typeElt;
+	}
+
+	/**
 	 * Writes the top-level XDF element.
 	 * 
 	 * @param xdf
 	 *            the XDF element
 	 * @param network
 	 *            the network
+	 * @throws OrccException
 	 */
-	private void writeXDF(Element xdf, Network network) {
+	private void writeXDF(Element xdf, Network network) throws OrccException {
 		xdf.setAttribute("name", network.getName());
+		writePorts(xdf, "Input", network.getInputs());
+		writePorts(xdf, "Output", network.getOutputs());
+		writeDecls(xdf, "Param", network.getParameters());
+		writeDecls(xdf, "Variable", network.getVariables());
+
+		for (Vertex vertex : network.getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				xdf.appendChild(writeInstance(vertex.getInstance()));
+			}
+		}
+
+		for (Connection connection : network.getGraph().edgeSet()) {
+			xdf.appendChild(writeConnection(connection));
+		}
 	}
 
 }

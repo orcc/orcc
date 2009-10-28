@@ -28,27 +28,31 @@
  */
 package net.sf.orcc.network.attributes;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * This interface represents a custom attribute, which is an attribute with any
- * kind of information attached to it.
+ * This interface defines an object that contains attributes.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface ICustomAttribute extends IAttribute {
+public interface IAttributeContainer {
 
 	/**
-	 * custom attribute name.
-	 */
-	public static final String NAME = "Custom";
-
-	/**
-	 * Returns the children of this attribute as a list of {@link XmlElement}s.
+	 * Returns the attribute associated with the given name.
 	 * 
-	 * @return the children of this attribute as a list of {@link XmlElement}s
+	 * @param name
+	 *            an attribute name
+	 * @return the attribute associated with the given name, or if not found,
+	 *         <code>null</code>
 	 */
-	public List<XmlElement> getValue();
+	public IAttribute getAttribute(String name);
+
+	/**
+	 * Returns the map of attributes contained in this object.
+	 * 
+	 * @return the map of attributes contained in this object
+	 */
+	public Map<String, IAttribute> getAttributes();
 
 }

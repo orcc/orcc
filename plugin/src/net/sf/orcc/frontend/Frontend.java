@@ -144,7 +144,7 @@ public class Frontend {
 			boolean printPriorities, boolean printFSM) throws OrccException {
 		this.printPriorities = printPriorities;
 		this.printFSM = printFSM;
-		
+
 		String fileName;
 		try {
 			this.outputFolder = new File(outputFolder).getCanonicalFile();
@@ -159,8 +159,7 @@ public class Frontend {
 		Network network = parser.parseNetwork();
 		getActors(network);
 
-		XDFWriter writer = new XDFWriter(this.outputFolder);
-		writer.writeNetwork(network);
+		new XDFWriter(this.outputFolder, network);
 
 		processActors();
 	}

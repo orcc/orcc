@@ -104,6 +104,26 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	}
 
 	/**
+	 * Adds an object to this ordered map with the given name.
+	 * 
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 * @throws OrccException
+	 *             if the object is already defined
+	 */
+	public void add(String name, T object) throws OrccException {
+		if (map.containsKey(name)) {
+			throw new OrccException("\"" + name
+					+ "\" already defined in this scope");
+		}
+
+		objects.add(object);
+		map.put(name, object);
+	}
+
+	/**
 	 * Adds an object to this ordered map with the given name. The file and
 	 * location information are only used for error reporting if the object is
 	 * already present in the map.

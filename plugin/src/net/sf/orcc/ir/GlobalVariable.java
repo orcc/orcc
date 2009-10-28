@@ -134,6 +134,15 @@ public class GlobalVariable extends Variable implements INameable {
 	}
 
 	/**
+	 * Returns <code>true</code> if this global variable has a value.
+	 * 
+	 * @return <code>true</code> if this global variable has a value
+	 */
+	public boolean hasValue() {
+		return (value != null);
+	}
+
+	/**
 	 * Sets the value of this global variable to the given expression.
 	 * 
 	 * @param value

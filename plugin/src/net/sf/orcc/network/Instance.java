@@ -40,15 +40,17 @@ import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.attributes.IAttribute;
+import net.sf.orcc.network.attributes.IAttributeContainer;
 import net.sf.orcc.network.serialize.XDFParser;
 
 /**
- * An Instance is an {@link Actor} with parameters.
+ * This class defines an instance. An instance has an id, a class, parameters
+ * and attributes. The class of the instance points to an actor or a network.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Instance implements Comparable<Instance> {
+public class Instance implements Comparable<Instance>, IAttributeContainer {
 
 	/**
 	 * the actor referenced by this instance. May be <code>null</code> if this
@@ -163,16 +165,14 @@ public class Instance implements Comparable<Instance> {
 		return actor;
 	}
 
-	/**
-	 * Returns the attribute associated with the given name.
-	 * 
-	 * @param name
-	 *            an attribute name
-	 * @return the attribute associated with the given name, or if not found,
-	 *         <code>null</code>
-	 */
+	@Override
 	public IAttribute getAttribute(String name) {
 		return attributes.get(name);
+	}
+
+	@Override
+	public Map<String, IAttribute> getAttributes() {
+		return attributes;
 	}
 
 	/**

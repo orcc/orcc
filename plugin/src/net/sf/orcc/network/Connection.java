@@ -37,6 +37,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.network.attributes.IAttribute;
+import net.sf.orcc.network.attributes.IAttributeContainer;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.ValueAttribute;
 
@@ -47,7 +48,7 @@ import net.sf.orcc.network.attributes.ValueAttribute;
  * @author Matthieu Wipliez
  * 
  */
-public class Connection {
+public class Connection implements IAttributeContainer {
 
 	/**
 	 * the bufferSize attribute can be attached to a FIFO to specify its size
@@ -127,16 +128,14 @@ public class Connection {
 		this.target = target;
 	}
 
-	/**
-	 * Returns the attribute associated with the given name.
-	 * 
-	 * @param name
-	 *            an attribute name
-	 * @return the attribute associated with the given name, or if not found,
-	 *         <code>null</code>
-	 */
+	@Override
 	public IAttribute getAttribute(String name) {
 		return attributes.get(name);
+	}
+
+	@Override
+	public Map<String, IAttribute> getAttributes() {
+		return attributes;
 	}
 
 	/**
