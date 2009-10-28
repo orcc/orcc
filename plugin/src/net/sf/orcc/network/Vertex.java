@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.network;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Port;
 
 /**
@@ -100,12 +101,32 @@ public class Vertex {
 	 * Returns the instance contained in this vertex.
 	 * 
 	 * @return the instance contained in this vertex.
-	 * @throws ClassCastException
+	 * @throws OrccException
 	 *             if {@link #isInstance()} returns <code>false</code> and this
 	 *             method is called.
 	 */
-	public Instance getInstance() {
-		return (Instance) contents;
+	public Instance getInstance() throws OrccException {
+		if (isInstance()) {
+			return (Instance) contents;
+		} else {
+			throw new OrccException("expected an Instance");
+		}
+	}
+
+	/**
+	 * Returns the port contained in this vertex.
+	 * 
+	 * @return the port contained in this vertex.
+	 * @throws OrccException
+	 *             if {@link #isPort()} returns <code>false</code> and this
+	 *             method is called.
+	 */
+	public Port getPort() throws OrccException {
+		if (isPort()) {
+			return (Port) contents;
+		} else {
+			throw new OrccException("expected a Port");
+		}
 	}
 
 	@Override
@@ -114,14 +135,27 @@ public class Vertex {
 	}
 
 	/**
-	 * Returns true if this vertex contains an instance, and false otherwise.
-	 * This method must be called to ensure a vertex is an instance before
-	 * calling {@link #getInstance()}.
+	 * Returns <code>true</code> if this vertex contains an instance, and
+	 * <code>false</code> otherwise. This method must be called to ensure a
+	 * vertex is an instance before calling {@link #getInstance()}.
 	 * 
-	 * @return true if this vertex contains an instance, and false otherwise
+	 * @return <code>true</code> if this vertex contains an instance, and
+	 *         <code>false</code> otherwise
 	 */
 	public boolean isInstance() {
 		return (type == Type.INSTANCE);
+	}
+
+	/**
+	 * Returns <code>true</code> if this vertex contains a port, and
+	 * <code>false</code> otherwise. This method must be called to ensure a
+	 * vertex is a port before calling {@link #getPort()}.
+	 * 
+	 * @return <code>true</code> if this vertex contains a port, and
+	 *         <code>false</code> otherwise
+	 */
+	public boolean isPort() {
+		return (type != Type.INSTANCE);
 	}
 
 	@Override

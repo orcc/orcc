@@ -134,7 +134,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 			Map<String, IExpr> parameters, Map<String, IAttribute> attributes)
 			throws OrccException {
 		this.attributes = attributes;
-		this.clasz = clasz;
 		this.id = id;
 		this.parameters = parameters;
 		this.path = new File(path);
@@ -144,9 +143,13 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 			// cool, we got a network
 			XDFParser parser = new XDFParser(file.getAbsolutePath());
 			network = parser.parseNetwork();
+
+			// update the class from the network declared name
+			this.clasz = network.getName();
 		} else {
 			// not a network => will load later when the instantiate method is
 			// called
+			this.clasz = clasz;
 		}
 	}
 

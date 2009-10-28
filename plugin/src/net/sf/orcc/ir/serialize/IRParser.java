@@ -246,7 +246,7 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the input stream that this parser's constructor was given as YAML,
+	 * Parses the input stream that this parser's constructor was given as JSON,
 	 * and returns an actor from it.
 	 * 
 	 * @return An {@link Actor}.

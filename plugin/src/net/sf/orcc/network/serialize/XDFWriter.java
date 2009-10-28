@@ -57,6 +57,7 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.XmlElement;
 import net.sf.orcc.util.OrderedMap;
 
+import org.jgrapht.DirectedGraph;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -76,7 +77,12 @@ public class XDFWriter {
 	/**
 	 * the document being created by this writer.
 	 */
-	private Document document;
+	private final Document document;
+
+	/**
+	 * the graph of the network being written.
+	 */
+	private final DirectedGraph<Vertex, Connection> graph;
 
 	/**
 	 * Creates a new network writer with the given output directory and writes
@@ -93,6 +99,8 @@ public class XDFWriter {
 	 *             if the network could not be written
 	 */
 	public XDFWriter(File path, Network network) throws OrccException {
+		graph = network.getGraph();
+
 		try {
 			// output
 			DOMImplementationRegistry registry = DOMImplementationRegistry
@@ -114,8 +122,9 @@ public class XDFWriter {
 			LSSerializer serializer = impl.createLSSerializer();
 			serializer.getDomConfig().setParameter("format-pretty-print", true);
 			serializer.write(document, output);
-
 			output.getByteStream().close();
+
+			writeChildren(path);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		} catch (ClassCastException e) {
@@ -190,8 +199,76 @@ public class XDFWriter {
 		}
 	}
 
-	private Element writeConnection(Connection connection) {
-		return document.createElement("Connection");
+	/**
+	 * Writes the children of the network's graph to the output path
+	 * 
+	 * @param path
+	 *            output path
+	 * @throws OrccException
+	 */
+	private void writeChildren(File path) throws OrccException {
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isNetwork()) {
+					// writes the network
+					Network child = instance.getNetwork();
+					new XDFWriter(path, child);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns a Connection element that represents the given connection.
+	 * 
+	 * @param connection
+	 *            a connection
+	 * @return a Connection DOM element
+	 * @throws OrccException
+	 *             if the connection could not be written
+	 */
+	private Element writeConnection(Connection connection) throws OrccException {
+		Element connectionElt = document.createElement("Connection");
+		Vertex source = graph.getEdgeSource(connection);
+		Vertex target = graph.getEdgeTarget(connection);
+		Port srcPort = connection.getSource();
+		Port tgtPort = connection.getTarget();
+
+		writeConnectionEndpoint(connectionElt, "src", source, srcPort);
+		writeConnectionEndpoint(connectionElt, "dst", target, tgtPort);
+
+		writeAttributes(connectionElt, connection.getAttributes());
+
+		return connectionElt;
+	}
+
+	/**
+	 * Writes a connection end-point. An end-point is identified by two
+	 * attributes, <code>name</code>, and <code>name + "-port"</code>.
+	 * <code>name</code> can be "src" or "dst".
+	 * 
+	 * @param connection
+	 *            a connection
+	 * @return a Connection DOM element
+	 * @throws OrccException
+	 *             if the connection could not be written
+	 */
+	private void writeConnectionEndpoint(Element connectionElt, String name,
+			Vertex vertex, Port port) throws OrccException {
+		String portAttr;
+		String vertexAttr;
+
+		if (port == null) {
+			vertexAttr = "";
+			portAttr = vertex.getPort().getName();
+		} else {
+			vertexAttr = vertex.getInstance().getId();
+			portAttr = port.getName();
+		}
+
+		connectionElt.setAttribute(name, vertexAttr);
+		connectionElt.setAttribute(name + "-port", portAttr);
 	}
 
 	/**
@@ -383,13 +460,13 @@ public class XDFWriter {
 		writeDecls(xdf, "Param", network.getParameters());
 		writeDecls(xdf, "Variable", network.getVariables());
 
-		for (Vertex vertex : network.getGraph().vertexSet()) {
+		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
 				xdf.appendChild(writeInstance(vertex.getInstance()));
 			}
 		}
 
-		for (Connection connection : network.getGraph().edgeSet()) {
+		for (Connection connection : graph.edgeSet()) {
 			xdf.appendChild(writeConnection(connection));
 		}
 	}

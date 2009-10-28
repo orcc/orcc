@@ -170,8 +170,9 @@ public class Frontend {
 	 * 
 	 * @param network
 	 *            a network
+	 * @throws OrccException
 	 */
-	private void getActors(Network network) {
+	private void getActors(Network network) throws OrccException {
 		for (Vertex vertex : network.getGraph().vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();

@@ -795,7 +795,7 @@ public class XDFParser {
 			IType type = cont.getResult();
 			IExpr expr = exprParser.parseExpr(cont.getNode());
 			GlobalVariable var = new GlobalVariable(location, type, name, expr);
-			parameters.add(file.getAbsolutePath(), location, name, var);
+			variables.add(file.getAbsolutePath(), location, name, var);
 		} else {
 			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
 		}
