@@ -41,6 +41,13 @@ import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.UintType;
@@ -310,7 +317,7 @@ public class XDFWriter {
 	 * @return an Entry DOM element
 	 * @throws OrccException
 	 */
-	private Element writeEntry(String name, IExpr expr) {
+	private Element writeEntry(String name, IExpr expr) throws OrccException {
 		Element entry = document.createElement("Entry");
 		entry.setAttribute("kind", "Expr");
 		entry.setAttribute("name", name);
@@ -336,8 +343,75 @@ public class XDFWriter {
 		return entry;
 	}
 
-	private Element writeExpr(IExpr expr) {
-		return document.createElement("Expr");
+	/**
+	 * Returns an Expr element that represents the given expression. This method
+	 * is a big switch on the expression type. Expressions are written directly
+	 * in this method, except binary and unary expressions, which are written by
+	 * {@link #writeExprBinOpSeq(Element, BinaryExpr)} and
+	 * {@link #writeExprUnaryOp(Element, UnaryExpr)} respectively.
+	 * 
+	 * @param expr
+	 *            an expression
+	 * @return an Expr DOM element
+	 * @throws OrccException
+	 */
+	private Element writeExpr(IExpr expr) throws OrccException {
+		Element exprElt = document.createElement("Expr");
+		String kind;
+		String value;
+
+		switch (expr.getType()) {
+		case IExpr.BINARY:
+			kind = "BinOpSeq";
+			writeExprBinOpSeq(exprElt, (BinaryExpr) expr);
+			break;
+		case IExpr.BOOLEAN:
+			kind = "Literal";
+			value = Boolean.toString(((BooleanExpr) expr).getValue());
+			exprElt.setAttribute("literal-kind", "Boolean");
+			exprElt.setAttribute("value", value);
+			break;
+		case IExpr.INT:
+			kind = "Literal";
+			value = Integer.toString(((IntExpr) expr).getValue());
+			exprElt.setAttribute("literal-kind", "Integer");
+			exprElt.setAttribute("value", value);
+			break;
+		case IExpr.LIST:
+			kind = "List";
+			for (IExpr childExpr : ((ListExpr) expr).getValue()) {
+				exprElt.appendChild(writeExpr(childExpr));
+			}
+			break;
+		case IExpr.STRING:
+			kind = "Literal";
+			value = ((StringExpr) expr).getValue();
+			exprElt.setAttribute("literal-kind", "String");
+			exprElt.setAttribute("value", value);
+			break;
+		case IExpr.UNARY:
+			kind = "UnaryOp";
+			writeExprUnaryOp(exprElt, (UnaryExpr) expr);
+			break;
+		case IExpr.VAR:
+			kind = "Var";
+			value = ((VarExpr) expr).getVar().getVariable().getName();
+			exprElt.setAttribute("name", value);
+			break;
+		default:
+			throw new OrccException("unknown expression type");
+		}
+
+		exprElt.setAttribute("kind", kind);
+		return exprElt;
+	}
+
+	private void writeExprBinOpSeq(Element exprElt, BinaryExpr expr) {
+
+	}
+
+	private void writeExprUnaryOp(Element exprElt, UnaryExpr expr) {
+
 	}
 
 	/**
