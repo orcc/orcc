@@ -28,6 +28,11 @@
  */
 package net.sf.orcc.ir.expr;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import net.sf.orcc.OrccException;
+
 /**
  * This class defines the unary operators of the IR.
  * 
@@ -55,6 +60,32 @@ public enum UnaryOp {
 	 * number of elements (# in CAL)
 	 */
 	NUM_ELTS("#");
+
+	private static final Map<String, UnaryOp> operators = new HashMap<String, UnaryOp>();
+
+	static {
+		for (UnaryOp op : UnaryOp.values()) {
+			operators.put(op.text, op);
+		}
+	}
+
+	/**
+	 * Returns the unary operator that has the given name.
+	 * 
+	 * @param name
+	 *            an operator name
+	 * @return a unary operator
+	 * @throws OrccException
+	 *             if there is no operator with the given name
+	 */
+	public static UnaryOp getOperator(String name) throws OrccException {
+		UnaryOp op = operators.get(name);
+		if (op == null) {
+			throw new OrccException("unknown operator \"" + name + "\"");
+		} else {
+			return op;
+		}
+	}
 
 	/**
 	 * textual representation of this operator

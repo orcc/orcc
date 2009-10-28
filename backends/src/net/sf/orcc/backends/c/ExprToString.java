@@ -50,63 +50,24 @@ public class ExprToString implements ExprVisitor {
 
 	public static String toString(BinaryOp op) {
 		switch (op) {
-		case BITAND:
-			return "&";
-		case BITOR:
-			return "|";
-		case BITXOR:
-			return "^";
-		case DIV:
-			return "/";
 		case DIV_INT:
-			return "/";
-		case EQ:
-			return "==";
+			throw new IllegalArgumentException(
+					"integer division operator not supported");
 		case EXP:
-			return "pow";
-		case GE:
-			return ">=";
-		case GT:
-			return ">";
-		case LOGIC_AND:
-			return "&&";
-		case LE:
-			return "<=";
-		case LOGIC_OR:
-			return "||";
-		case LT:
-			return "<";
-		case MINUS:
-			return "-";
-		case MOD:
-			return "%";
-		case NE:
-			return "!=";
-		case PLUS:
-			return "+";
-		case SHIFT_LEFT:
-			return "<<";
-		case SHIFT_RIGHT:
-			return ">>";
-		case TIMES:
-			return "*";
+			throw new IllegalArgumentException(
+					"exponentiation operator not supported");
 		default:
-			throw new NullPointerException();
+			return op.getText();
 		}
 	}
 
 	public static String toString(UnaryOp op) {
 		switch (op) {
-		case BITNOT:
-			return "~";
-		case LOGIC_NOT:
-			return "!";
-		case MINUS:
-			return "-";
 		case NUM_ELTS:
-			return "sizeof";
+			throw new IllegalArgumentException(
+					"number of elements operator not supported");
 		default:
-			throw new NullPointerException();
+			return op.getText();
 		}
 	}
 
@@ -129,7 +90,7 @@ public class ExprToString implements ExprVisitor {
 		int parentPrec = (Integer) args[0];
 		BinaryOp op = expr.getOp();
 		int currentPrec = op.getPrecedence();
-		
+
 		int nextPrec;
 		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
 			// special case, for shifts always put parentheses because compilers
@@ -141,8 +102,8 @@ public class ExprToString implements ExprVisitor {
 
 		// if the parent precedence is lower than the precedence of this
 		// operator, the current operation must be parenthesized to prevent the
-		// first operand from being interpreted by the parent operator rather
-		// than with the current one
+		// first operand from being used by the parent operator instead of the
+		// current one
 		if (parentPrec < currentPrec) {
 			builder.append("(");
 			expr.getE1().accept(this, nextPrec);

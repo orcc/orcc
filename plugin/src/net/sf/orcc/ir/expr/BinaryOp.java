@@ -28,6 +28,11 @@
  */
 package net.sf.orcc.ir.expr;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import net.sf.orcc.OrccException;
+
 /**
  * This class defines the binary operators of the IR.
  * 
@@ -231,6 +236,32 @@ public enum BinaryOp {
 	 */
 	TIMES(5, "*", false);
 
+	private static final Map<String, BinaryOp> operators = new HashMap<String, BinaryOp>();
+
+	static {
+		for (BinaryOp op : BinaryOp.values()) {
+			operators.put(op.text, op);
+		}
+	}
+
+	/**
+	 * Returns the binary operator that has the given name.
+	 * 
+	 * @param name
+	 *            an operator name
+	 * @return a binary operator
+	 * @throws OrccException
+	 *             if there is no operator with the given name
+	 */
+	public static BinaryOp getOperator(String name) throws OrccException {
+		BinaryOp op = operators.get(name);
+		if (op == null) {
+			throw new OrccException("unknown operator \"" + name + "\"");
+		} else {
+			return op;
+		}
+	}
+
 	/**
 	 * precedence of this operator
 	 */
@@ -290,5 +321,4 @@ public enum BinaryOp {
 	public boolean isRightAssociative() {
 		return rightAssociative;
 	}
-
 }

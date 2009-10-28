@@ -42,6 +42,7 @@ import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.ExprVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -94,20 +95,26 @@ public class XDFWriter {
 
 		@Override
 		public void visit(BinaryExpr expr, Object... args) {
-			Element exprElt = document.createElement("Expr");
-			((Element) args[0]).appendChild(exprElt);
-			exprElt.setAttribute("kind", "UnaryOp");
+			Element parent = ((Element) args[0]);
 
-			// visit the first expression of this binary expression
-			expr.getE1().accept(this, exprElt);
+			int parentPrec = (Integer) args[1];
+			int currentPrec = expr.getOp().getPrecedence();
 
-			// operator
-			Element op = document.createElement("Op");
-			op.setAttribute("name", expr.getOp().getText());
-			exprElt.appendChild(op);
+			if (parentPrec < currentPrec) {
+				// create a new Expr element
+				Element exprElt = document.createElement("Expr");
+				parent.appendChild(exprElt);
+				exprElt.setAttribute("kind", "BinOpSeq");
 
-			// visit the first expression of this binary expression
-			expr.getE2().accept(this, exprElt);
+				expr.getE1().accept(this, exprElt, currentPrec);
+				writeOperator(expr.getOp(), exprElt);
+				expr.getE2().accept(this, exprElt, currentPrec);
+			} else {
+				// append expression 1, operator, expression 2 to the parent
+				expr.getE1().accept(this, parent, currentPrec);
+				writeOperator(expr.getOp(), parent);
+				expr.getE2().accept(this, parent, currentPrec);
+			}
 		}
 
 		@Override
@@ -159,7 +166,7 @@ public class XDFWriter {
 			exprElt.appendChild(op);
 
 			// visit the expression of this unary expression
-			expr.getExpr().accept(this, exprElt);
+			expr.getExpr().accept(this, exprElt, Integer.MIN_VALUE);
 
 			((Element) args[0]).appendChild(exprElt);
 		}
@@ -171,6 +178,12 @@ public class XDFWriter {
 			exprElt.setAttribute("kind", "Var");
 			exprElt.setAttribute("name", value);
 			((Element) args[0]).appendChild(exprElt);
+		}
+
+		private void writeOperator(BinaryOp op, Element parent) {
+			Element opElt = document.createElement("Op");
+			opElt.setAttribute("name", op.getText());
+			parent.appendChild(opElt);
 		}
 
 	}
@@ -449,7 +462,7 @@ public class XDFWriter {
 	 * @throws OrccException
 	 */
 	private void writeExpr(Element parent, IExpr expr) throws OrccException {
-		expr.accept(new BinOpSeqWriter(), parent);
+		expr.accept(new BinOpSeqWriter(), parent, Integer.MIN_VALUE);
 	}
 
 	/**
