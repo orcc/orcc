@@ -56,13 +56,4 @@ public enum UnaryOp {
 	 */
 	NUM_ELTS;
 
-	/**
-	 * Returns this operator's priority.
-	 * 
-	 * @return this operator's priority
-	 */
-	public int getPriority() {
-		return 12;
-	}
-
 }

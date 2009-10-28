@@ -120,38 +120,43 @@ public class ExprToString implements ExprVisitor {
 
 	public String toString(IExpr expr) {
 		builder = new StringBuilder();
-		expr.accept(this, 0);
+		expr.accept(this, Integer.MIN_VALUE);
 		return builder.toString();
 	}
 
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
-		int oldPrec = (Integer) args[0];
-		int currentPrec = expr.getOp().getPriority();
-
-		if (currentPrec < oldPrec) {
-			builder.append("(");
-		}
-
+		int parentPrec = (Integer) args[0];
 		BinaryOp op = expr.getOp();
+		int currentPrec = op.getPrecedence();
+		
+		int nextPrec;
 		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
-			expr.getE1().accept(this, Integer.MAX_VALUE);
+			// special case, for shifts always put parentheses because compilers
+			// often issue warnings
+			nextPrec = Integer.MIN_VALUE;
 		} else {
-			expr.getE1().accept(this, currentPrec);
+			nextPrec = currentPrec;
 		}
 
-		builder.append(" ");
-		builder.append(toString(op));
-		builder.append(" ");
-
-		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
-			expr.getE2().accept(this, Integer.MAX_VALUE);
-		} else {
-			expr.getE2().accept(this, currentPrec);
-		}
-
-		if (currentPrec < oldPrec) {
+		// if the parent precedence is lower than the precedence of this
+		// operator, the current operation must be parenthesized to prevent the
+		// first operand from being interpreted by the parent operator rather
+		// than with the current one
+		if (parentPrec < currentPrec) {
+			builder.append("(");
+			expr.getE1().accept(this, nextPrec);
+			builder.append(" ");
+			builder.append(toString(op));
+			builder.append(" ");
+			expr.getE2().accept(this, nextPrec);
 			builder.append(")");
+		} else {
+			expr.getE1().accept(this, nextPrec);
+			builder.append(" ");
+			builder.append(toString(op));
+			builder.append(" ");
+			expr.getE2().accept(this, nextPrec);
 		}
 	}
 
@@ -179,19 +184,8 @@ public class ExprToString implements ExprVisitor {
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		int oldPrec = (Integer) args[0];
-		int currentPrec = expr.getOp().getPriority();
-
-		if (oldPrec > currentPrec) {
-			builder.append("(");
-		}
-
 		builder.append(toString(expr.getOp()));
-		expr.getExpr().accept(this, args);
-
-		if (oldPrec > currentPrec) {
-			builder.append(")");
-		}
+		expr.getExpr().accept(this, Integer.MIN_VALUE);
 	}
 
 	@Override

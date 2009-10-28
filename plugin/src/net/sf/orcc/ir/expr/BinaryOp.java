@@ -31,115 +31,210 @@ package net.sf.orcc.ir.expr;
 /**
  * This class defines the binary operators of the IR.
  * 
+ * <p>
+ * Below is a table of the operators sorted by increasing precedence. The higher
+ * the precedence, the lower the operator "binds" to its operands.
+ * </p>
+ * 
+ * <table border="1">
+ * <tr>
+ * <th>precedence level</th>
+ * <th>operator</th>
+ * </tr>
+ * 
+ * <tr>
+ * <td>4</td>
+ * <td>{@link #EXP}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td rowspan="4">5</td>
+ * <td>{@link #TIMES}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #DIV}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #DIV_INT}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #MOD}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td rowspan="2">6</td>
+ * <td>{@link #PLUS}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #MINUS}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td rowspan="2">7</td>
+ * <td>{@link #SHIFT_LEFT}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #SHIFT_RIGHT}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td rowspan="4">8</td>
+ * <td>{@link #LT}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #LE}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #GT}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #GE}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td rowspan="2">9</td>
+ * <td>{@link #EQ}</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #NE}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>10</td>
+ * <td>{@link #BAND}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>11</td>
+ * <td>{@link #BXOR}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>12</td>
+ * <td>{@link #BOR}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>13</td>
+ * <td>{@link #LAND}</td>
+ * </tr>
+ * 
+ * <tr>
+ * <td>14</td>
+ * <td>{@link #LOR}</td>
+ * </tr>
+ * 
+ * </table>
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public enum BinaryOp {
 
 	/**
-	 * binary and.
+	 * bitand.
 	 */
-	BAND(5, false),
+	BAND(10, false),
 
 	/**
-	 * binary inclusive or.
+	 * bitor.
 	 */
-	BOR(3, false),
+	BOR(12, false),
 
 	/**
-	 * binary exclusive or.
+	 * bitxor.
 	 */
-	BXOR(4, false),
+	BXOR(11, false),
 
 	/**
 	 * division.
 	 */
-	DIV(10, false),
+	DIV(5, false),
 
 	/**
 	 * integer division.
 	 */
-	DIV_INT(10, false),
+	DIV_INT(5, false),
 
 	/**
 	 * equal.
 	 */
-	EQ(6, false),
+	EQ(9, false),
 
 	/**
 	 * exponentiation.
 	 */
-	EXP(11, true),
+	EXP(3, true),
 
 	/**
 	 * greater than or equal.
 	 */
-	GE(7, false),
+	GE(8, false),
 
 	/**
 	 * greater than.
 	 */
-	GT(7, false),
+	GT(8, false),
 
 	/**
 	 * logical and.
 	 */
-	LAND(2, false),
+	LAND(13, false),
 
 	/**
 	 * less than or equal.
 	 */
-	LE(7, false),
+	LE(8, false),
 
 	/**
 	 * logical or.
 	 */
-	LOR(1, false),
+	LOR(14, false),
 
 	/**
 	 * less than.
 	 */
-	LT(7, false),
+	LT(8, false),
 
 	/**
 	 * minus.
 	 */
-	MINUS(9, false),
+	MINUS(6, false),
 
 	/**
 	 * modulo.
 	 */
-	MOD(10, false),
+	MOD(5, false),
 
 	/**
 	 * not equal.
 	 */
-	NE(6, false),
+	NE(9, false),
 
 	/**
 	 * plus.
 	 */
-	PLUS(9, false),
+	PLUS(6, false),
 
 	/**
 	 * shift left.
 	 */
-	SHIFT_LEFT(8, false),
+	SHIFT_LEFT(7, false),
 
 	/**
 	 * shift right.
 	 */
-	SHIFT_RIGHT(8, false),
+	SHIFT_RIGHT(7, false),
 
 	/**
 	 * times.
 	 */
-	TIMES(10, false);
+	TIMES(5, false);
 
 	/**
-	 * priority of this operator
+	 * precedence of this operator
 	 */
-	private int priority;
+	private int precedence;
 
 	/**
 	 * true if this operator is right-to-left associative.
@@ -147,23 +242,25 @@ public enum BinaryOp {
 	private boolean rightAssociative;
 
 	/**
-	 * Creates a new binary operator with the given priority.
+	 * Creates a new binary operator with the given precedence.
 	 * 
-	 * @param priority
-	 *            the operator's priority
+	 * @param precedence
+	 *            the operator's precedence
 	 */
-	private BinaryOp(int priority, boolean rightAssociative) {
-		this.priority = priority;
+	private BinaryOp(int precedence, boolean rightAssociative) {
+		this.precedence = precedence;
 		this.rightAssociative = rightAssociative;
 	}
 
 	/**
-	 * Returns this operator's priority.
+	 * Returns this operator's precedence. An operator O1 that has a lower
+	 * precedence than another operator O2 means that the operation involving O1
+	 * is to be evaluated first.
 	 * 
-	 * @return this operator's priority
+	 * @return this operator's precedence
 	 */
-	public int getPriority() {
-		return priority;
+	public int getPrecedence() {
+		return precedence;
 	}
 
 	/**

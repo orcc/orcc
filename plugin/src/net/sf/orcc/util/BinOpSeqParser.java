@@ -84,8 +84,9 @@ public class BinOpSeqParser {
 	}
 
 	/**
-	 * Returns the index of the pivot, which is the operator that has the lowest
-	 * priority between start index and stop index.
+	 * Returns the index of the pivot, which is the operator that has the
+	 * highest precedence between start index and stop index. The pivot is
+	 * therefore the operator that binds the least with its operands.
 	 * 
 	 * @param operators
 	 *            a list of operators
@@ -100,12 +101,12 @@ public class BinOpSeqParser {
 			int stopIndex) throws OrccException {
 		int pivot = startIndex;
 		BinaryOp bop = operators.get(pivot);
-		int pivotRank = bop.getPriority();
+		int pivotRank = bop.getPrecedence();
 		for (int i = startIndex + 1; i <= stopIndex; i++) {
 			bop = operators.get(i);
-			int current = bop.getPriority();
+			int current = bop.getPrecedence();
 			boolean rtl = bop.isRightAssociative();
-			if (current < pivotRank || (current == pivotRank && rtl)) {
+			if (pivotRank < current || (current == pivotRank && rtl)) {
 				pivot = i;
 				pivotRank = current;
 			}
