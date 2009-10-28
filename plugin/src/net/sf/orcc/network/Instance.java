@@ -40,7 +40,7 @@ import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.attributes.IAttribute;
-import net.sf.orcc.network.parser.NetworkParser;
+import net.sf.orcc.network.serialize.XDFParser;
 
 /**
  * An Instance is an {@link Actor} with parameters.
@@ -140,7 +140,7 @@ public class Instance implements Comparable<Instance> {
 		file = new File(path, clasz + ".xdf");
 		if (file.exists()) {
 			// cool, we got a network
-			NetworkParser parser = new NetworkParser(file.getAbsolutePath());
+			XDFParser parser = new XDFParser(file.getAbsolutePath());
 			network = parser.parseNetwork();
 		} else {
 			// not a network => will load later when the instantiate method is

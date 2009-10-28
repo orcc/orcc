@@ -33,7 +33,7 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.ir.type,
  net.sf.orcc.network,
  net.sf.orcc.network.attributes,
- net.sf.orcc.network.parser,
+ net.sf.orcc.network.serialize,
  net.sf.orcc.util,
  org.jgrapht,
  org.jgrapht.graph

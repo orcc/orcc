@@ -42,7 +42,8 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
-import net.sf.orcc.network.parser.NetworkParser;
+import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.network.serialize.XDFWriter;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -56,12 +57,17 @@ public class Frontend {
 	 * @param args
 	 */
 	public static void main(String[] args) throws OrccException {
-		if (args.length == 2) {
+		if (args.length == 4) {
+			boolean printPrio = Boolean.parseBoolean(args[2]);
+			boolean printFSM = Boolean.parseBoolean(args[3]);
+			new Frontend(args[0], args[1], printPrio, printFSM);
+		} else if (args.length == 2) {
 			new Frontend(args[0], args[1]);
 		} else {
 			System.err.println("Usage: Frontend "
 					+ "<absolute path of top-level network> "
-					+ "<absolute path of output folder>");
+					+ "<absolute path of output folder> "
+					+ "[<priorities print flag> <FSM print flag>]");
 		}
 	}
 
@@ -76,10 +82,27 @@ public class Frontend {
 	private File outputFolder;
 
 	/**
-	 * Creates a front-end that parses the given top-level network, compiles
-	 * RVC-CAL actors referenced by networks into IR form and serializes IR
-	 * actors into the given output folder. The networks are just copied to the
-	 * output folder.
+	 * print FSM flag
+	 */
+	private boolean printFSM;
+
+	/**
+	 * print priorities flag
+	 */
+	private boolean printPriorities;
+
+	/**
+	 * Creates a front-end that parses the network hierarchy starting from the
+	 * top-level network, compiles RVC-CAL actors referenced by networks into IR
+	 * form and serializes IR actors into the given output folder. The networks
+	 * are serialized back to XDF to the output folder.
+	 * 
+	 * <p>
+	 * The load/save cycle of XDF networks ensures that any reference to
+	 * relative folders is solved, which means that the networks saved in the
+	 * output folder are self-contained, i.e. only reference networks present in
+	 * the same folder.
+	 * </p>
 	 * 
 	 * @param topLevelNetwork
 	 *            absolute file name of top-level network
@@ -89,6 +112,39 @@ public class Frontend {
 	 */
 	public Frontend(String topLevelNetwork, String outputFolder)
 			throws OrccException {
+		this(topLevelNetwork, outputFolder, false, false);
+	}
+
+	/**
+	 * Creates a front-end that parses the network hierarchy starting from the
+	 * top-level network, compiles RVC-CAL actors referenced by networks into IR
+	 * form and serializes IR actors into the given output folder. The networks
+	 * are serialized back to XDF to the output folder.
+	 * 
+	 * <p>
+	 * The load/save cycle of XDF networks ensures that any reference to
+	 * relative folders is solved, which means that the networks saved in the
+	 * output folder are self-contained, i.e. only reference networks present in
+	 * the same folder.
+	 * </p>
+	 * 
+	 * @param topLevelNetwork
+	 *            absolute file name of top-level network
+	 * @param outputFolder
+	 *            absolute file name of output folder
+	 * @param printPriorities
+	 *            if <code>true</code>, the front-end will print a DOT file with
+	 *            the priority graph
+	 * @param printFSM
+	 *            if <code>true</code>, the front-end will print a DOT file with
+	 *            the FSM graph
+	 * @throws OrccException
+	 */
+	public Frontend(String topLevelNetwork, String outputFolder,
+			boolean printPriorities, boolean printFSM) throws OrccException {
+		this.printPriorities = printPriorities;
+		this.printFSM = printFSM;
+		
 		String fileName;
 		try {
 			this.outputFolder = new File(outputFolder).getCanonicalFile();
@@ -99,9 +155,13 @@ public class Frontend {
 
 		actors = new TreeSet<String>();
 
-		NetworkParser parser = new NetworkParser(fileName);
+		XDFParser parser = new XDFParser(fileName);
 		Network network = parser.parseNetwork();
 		getActors(network);
+
+		XDFWriter writer = new XDFWriter(this.outputFolder);
+		writer.writeNetwork(network);
+
 		processActors();
 	}
 
@@ -142,22 +202,26 @@ public class Frontend {
 				RVCCalASTParser parser = new RVCCalASTParser(path);
 				Actor actor = parser.parse();
 
-				// prints priority graph
-				String fileName = outputFolder + File.separator + "priority_"
-						+ actor.getName() + ".dot";
-				parser.printPriorityGraph(fileName);
+				if (printPriorities) {
+					// prints priority graph
+					String fileName = "priority_" + actor.getName() + ".dot";
+					File file = new File(outputFolder, fileName);
+					parser.printPriorityGraph(file);
+				}
 
-				// prints FSM
-				fileName = outputFolder + File.separator + "fsm_"
-						+ actor.getName() + ".dot";
-				parser.printFSMGraph(fileName);
+				if (printFSM) {
+					// prints FSM
+					String fileName = "fsm_" + actor.getName() + ".dot";
+					File file = new File(outputFolder, fileName);
+					parser.printFSMGraph(file);
 
-				// prints FSM after priorities have been applied
-				ActionScheduler scheduler = actor.getActionScheduler();
-				if (scheduler.hasFsm()) {
-					fileName = outputFolder + File.separator + "fsm_"
-							+ actor.getName() + "_2.dot";
-					scheduler.getFsm().printGraph(fileName);
+					// prints FSM after priorities have been applied
+					ActionScheduler scheduler = actor.getActionScheduler();
+					if (scheduler.hasFsm()) {
+						fileName = "fsm_" + actor.getName() + "_2.dot";
+						file = new File(outputFolder, fileName);
+						scheduler.getFsm().printGraph(file);
+					}
 				}
 
 				new IRWriter(actor).write(outputFolder.toString());

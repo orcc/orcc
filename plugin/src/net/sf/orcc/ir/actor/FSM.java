@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.actor;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -331,14 +332,14 @@ public class FSM {
 	/**
 	 * Prints a graph representation of this FSM.
 	 * 
-	 * @param fileName
-	 *            output file name
+	 * @param file
+	 *            output file
 	 * @throws OrccException
 	 *             if something goes wrong (most probably I/O error)
 	 */
-	public void printGraph(String fileName) throws OrccException {
+	public void printGraph(File file) throws OrccException {
 		try {
-			OutputStream out = new FileOutputStream(fileName);
+			OutputStream out = new FileOutputStream(file);
 			DOTExporter<State, Action> exporter = new DOTExporter<State, Action>(
 					new StringNameProvider<State>(), null,
 					new StringEdgeNameProvider<Action>());

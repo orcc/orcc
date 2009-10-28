@@ -35,7 +35,7 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
-import net.sf.orcc.network.parser.NetworkParser;
+import net.sf.orcc.network.serialize.XDFParser;
 
 /**
  * Abstract implementation of {@link IBackend}.
@@ -62,7 +62,7 @@ public abstract class AbstractBackend implements IBackend {
 		init();
 
 		// parses top network
-		Network network = new NetworkParser(fileName).parseNetwork();
+		Network network = new XDFParser(fileName).parseNetwork();
 
 		// instantiate the network
 		network.instantiate();

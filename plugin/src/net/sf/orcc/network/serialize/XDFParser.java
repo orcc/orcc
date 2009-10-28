@@ -26,11 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.network.parser;
+package net.sf.orcc.network.serialize;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +94,7 @@ import org.w3c.dom.ls.LSParser;
  * @author Matthieu Wipliez
  * 
  */
-public class NetworkParser {
+public class XDFParser {
 
 	/**
 	 * This class defines a parser of XDF expressions.
@@ -540,9 +540,9 @@ public class NetworkParser {
 	 */
 	public static void main(String[] args) throws OrccException {
 		if (args.length == 1) {
-			new NetworkParser(args[0]).parseNetwork();
+			new XDFParser(args[0]).parseNetwork();
 		} else {
-			System.err.println("Usage: NetworkParser "
+			System.err.println("Usage: XDFParser "
 					+ "<absolute path of top-level XDF network>");
 		}
 	}
@@ -603,7 +603,7 @@ public class NetworkParser {
 	 * @param fileName
 	 *            absolute file name of an XDF file
 	 */
-	public NetworkParser(String fileName) {
+	public XDFParser(String fileName) {
 		file = new File(fileName);
 		path = file.getParent();
 		exprParser = new ExprParser();
@@ -866,9 +866,11 @@ public class NetworkParser {
 			config.setParameter("comments", false);
 			config.setParameter("element-content-whitespace", false);
 
-			// returns the document parsed from the input
-			return parseXDF(builder.parse(input));
-		} catch (FileNotFoundException e) {
+			// parse the input, close the stream, return the network
+			Network network = parseXDF(builder.parse(input));
+			input.getByteStream().close();
+			return network;
+		} catch (IOException e) {
 			throw new OrccException("I/O error when parsing network", e);
 		} catch (ClassCastException e) {
 			throw new OrccException("could not initialize DOM parser", e);

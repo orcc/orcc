@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.network.parser;
+package net.sf.orcc.network.serialize;
 
 import org.w3c.dom.Node;
 

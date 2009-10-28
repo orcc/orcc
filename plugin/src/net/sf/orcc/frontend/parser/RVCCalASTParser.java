@@ -495,15 +495,15 @@ public class RVCCalASTParser {
 	/**
 	 * Prints the graph that represents the FSM.
 	 * 
-	 * @param fileName
-	 *            output file name
+	 * @param file
+	 *            output file
 	 * @throws OrccException
 	 *             if something goes wrong (most probably I/O error)
 	 */
-	public void printFSMGraph(String fileName) throws OrccException {
+	public void printFSMGraph(File file) throws OrccException {
 		try {
 			if (fsmBuilder != null) {
-				fsmBuilder.printGraph(new FileOutputStream(fileName));
+				fsmBuilder.printGraph(new FileOutputStream(file));
 			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
@@ -513,14 +513,14 @@ public class RVCCalASTParser {
 	/**
 	 * Prints the graph that represents the priorities.
 	 * 
-	 * @param fileName
-	 *            output file name
+	 * @param file
+	 *            output file
 	 * @throws OrccException
 	 *             if something goes wrong (most probably I/O error)
 	 */
-	public void printPriorityGraph(String fileName) throws OrccException {
+	public void printPriorityGraph(File file) throws OrccException {
 		try {
-			sorter.printGraph(new FileOutputStream(fileName));
+			sorter.printGraph(new FileOutputStream(file));
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
