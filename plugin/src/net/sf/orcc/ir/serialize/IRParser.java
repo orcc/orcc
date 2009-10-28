@@ -317,11 +317,11 @@ public class IRParser {
 		BinaryOp op = null;
 
 		if (name.equals(BOP_BAND)) {
-			op = BinaryOp.BAND;
+			op = BinaryOp.BITAND;
 		} else if (name.equals(BOP_BOR)) {
-			op = BinaryOp.BOR;
+			op = BinaryOp.BITOR;
 		} else if (name.equals(BOP_BXOR)) {
-			op = BinaryOp.BXOR;
+			op = BinaryOp.BITXOR;
 		} else if (name.equals(BOP_DIV)) {
 			op = BinaryOp.DIV;
 		} else if (name.equals(BOP_DIV_INT)) {
@@ -335,11 +335,11 @@ public class IRParser {
 		} else if (name.equals(BOP_GT)) {
 			op = BinaryOp.GT;
 		} else if (name.equals(BOP_LAND)) {
-			op = BinaryOp.LAND;
+			op = BinaryOp.LOGIC_AND;
 		} else if (name.equals(BOP_LE)) {
 			op = BinaryOp.LE;
 		} else if (name.equals(BOP_LOR)) {
-			op = BinaryOp.LOR;
+			op = BinaryOp.LOGIC_OR;
 		} else if (name.equals(BOP_LT)) {
 			op = BinaryOp.LT;
 		} else if (name.equals(BOP_MINUS)) {
@@ -822,9 +822,9 @@ public class IRParser {
 		UnaryOp op = null;
 
 		if (name.equals(UOP_BNOT)) {
-			op = UnaryOp.BNOT;
+			op = UnaryOp.BITNOT;
 		} else if (name.equals(UOP_LNOT)) {
-			op = UnaryOp.LNOT;
+			op = UnaryOp.LOGIC_NOT;
 		} else if (name.equals(UOP_MINUS)) {
 			op = UnaryOp.MINUS;
 		} else if (name.equals(UOP_NUM_ELTS)) {

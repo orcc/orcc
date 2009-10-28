@@ -106,8 +106,8 @@ public class IncrementPeephole extends AbstractActorTransformation {
 		} else if (op == BinaryOp.MINUS && e2.getType() == IExpr.INT
 				&& ((IntExpr) e2).getValue() == 1) {
 			node = new DecrementNode(0, new Location(), varDef);
-		} else if (op == BinaryOp.BAND || op == BinaryOp.BOR
-				|| op == BinaryOp.BXOR || op == BinaryOp.DIV
+		} else if (op == BinaryOp.BITAND || op == BinaryOp.BITOR
+				|| op == BinaryOp.BITXOR || op == BinaryOp.DIV
 				|| op == BinaryOp.MINUS || op == BinaryOp.MOD
 				|| op == BinaryOp.PLUS || op == BinaryOp.SHIFT_LEFT
 				|| op == BinaryOp.SHIFT_RIGHT || op == BinaryOp.TIMES) {

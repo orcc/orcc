@@ -62,9 +62,9 @@ public class UnaryExpr extends AbstractExpr {
 	@Override
 	public IExpr evaluate() throws OrccException {
 		switch (op) {
-		case BNOT:
+		case BITNOT:
 			break;
-		case LNOT:
+		case LOGIC_NOT:
 			break;
 		case MINUS:
 			break;

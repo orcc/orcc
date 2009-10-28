@@ -39,21 +39,45 @@ public enum UnaryOp {
 	/**
 	 * a binary not (~ in C)
 	 */
-	BNOT,
+	BITNOT("~"),
 
 	/**
 	 * a logical not (! in C)
 	 */
-	LNOT,
+	LOGIC_NOT("!"),
 
 	/**
 	 * unary minus
 	 */
-	MINUS,
+	MINUS("-"),
 
 	/**
 	 * number of elements (# in CAL)
 	 */
-	NUM_ELTS;
+	NUM_ELTS("#");
+
+	/**
+	 * textual representation of this operator
+	 */
+	private String text;
+
+	/**
+	 * Creates an operator with the given textual representation.
+	 * 
+	 * @param text
+	 *            the operator textual representation
+	 */
+	private UnaryOp(String text) {
+		this.text = text;
+	}
+
+	/**
+	 * Returns the textual representation of this operator.
+	 * 
+	 * @return the textual representation of this operator
+	 */
+	public String getText() {
+		return text;
+	}
 
 }

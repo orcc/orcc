@@ -101,27 +101,27 @@ package net.sf.orcc.ir.expr;
  * 
  * <tr>
  * <td>10</td>
- * <td>{@link #BAND}</td>
+ * <td>{@link #BITAND}</td>
  * </tr>
  * 
  * <tr>
  * <td>11</td>
- * <td>{@link #BXOR}</td>
+ * <td>{@link #BITXOR}</td>
  * </tr>
  * 
  * <tr>
  * <td>12</td>
- * <td>{@link #BOR}</td>
+ * <td>{@link #BITOR}</td>
  * </tr>
  * 
  * <tr>
  * <td>13</td>
- * <td>{@link #LAND}</td>
+ * <td>{@link #LOGIC_AND}</td>
  * </tr>
  * 
  * <tr>
  * <td>14</td>
- * <td>{@link #LOR}</td>
+ * <td>{@link #LOGIC_OR}</td>
  * </tr>
  * 
  * </table>
@@ -132,104 +132,104 @@ package net.sf.orcc.ir.expr;
 public enum BinaryOp {
 
 	/**
-	 * bitand.
+	 * bitand <code>&</code>
 	 */
-	BAND(10, false),
+	BITAND(10, "&", false),
 
 	/**
-	 * bitor.
+	 * bitor <code>|</code>
 	 */
-	BOR(12, false),
+	BITOR(12, "|", false),
 
 	/**
-	 * bitxor.
+	 * bitxor <code>^</code>
 	 */
-	BXOR(11, false),
+	BITXOR(11, "^", false),
 
 	/**
-	 * division.
+	 * division <code>/</code>
 	 */
-	DIV(5, false),
+	DIV(5, "/", false),
 
 	/**
-	 * integer division.
+	 * integer division <code>div</code>
 	 */
-	DIV_INT(5, false),
+	DIV_INT(5, "div", false),
 
 	/**
-	 * equal.
+	 * equal <code>==</code>
 	 */
-	EQ(9, false),
+	EQ(9, "==", false),
 
 	/**
-	 * exponentiation.
+	 * exponentiation <code>**</code>
 	 */
-	EXP(3, true),
+	EXP(3, "**", true),
 
 	/**
-	 * greater than or equal.
+	 * greater than or equal <code>&gt;=</code>
 	 */
-	GE(8, false),
+	GE(8, ">=", false),
 
 	/**
-	 * greater than.
+	 * greater than <code>&gt;</code>
 	 */
-	GT(8, false),
+	GT(8, ">", false),
 
 	/**
-	 * logical and.
+	 * less than or equal <code>&lt;=</code>
 	 */
-	LAND(13, false),
+	LE(8, "<=", false),
 
 	/**
-	 * less than or equal.
+	 * logical and <code>&&</code>
 	 */
-	LE(8, false),
+	LOGIC_AND(13, "&&", false),
 
 	/**
-	 * logical or.
+	 * logical or <code>||</code>
 	 */
-	LOR(14, false),
+	LOGIC_OR(14, "||", false),
 
 	/**
-	 * less than.
+	 * less than <code>&lt;</code>
 	 */
-	LT(8, false),
+	LT(8, "<", false),
 
 	/**
-	 * minus.
+	 * minus <code>-</code>
 	 */
-	MINUS(6, false),
+	MINUS(6, "-", false),
 
 	/**
-	 * modulo.
+	 * modulo <code>%</code>
 	 */
-	MOD(5, false),
+	MOD(5, "%", false),
 
 	/**
-	 * not equal.
+	 * not equal <code>!=</code>
 	 */
-	NE(9, false),
+	NE(9, "!=", false),
 
 	/**
-	 * plus.
+	 * plus <code>+</code>
 	 */
-	PLUS(6, false),
+	PLUS(6, "+", false),
 
 	/**
-	 * shift left.
+	 * shift left <code>&lt;&lt;</code>
 	 */
-	SHIFT_LEFT(7, false),
+	SHIFT_LEFT(7, "<<", false),
 
 	/**
-	 * shift right.
+	 * shift right <code>&gt;&gt;</code>
 	 */
-	SHIFT_RIGHT(7, false),
+	SHIFT_RIGHT(7, ">>", false),
 
 	/**
-	 * times.
+	 * times <code>*</code>
 	 */
-	TIMES(5, false);
+	TIMES(5, "*", false);
 
 	/**
 	 * precedence of this operator
@@ -242,13 +242,23 @@ public enum BinaryOp {
 	private boolean rightAssociative;
 
 	/**
+	 * textual representation of this operator
+	 */
+	private String text;
+
+	/**
 	 * Creates a new binary operator with the given precedence.
 	 * 
 	 * @param precedence
 	 *            the operator's precedence
+	 * @param text
+	 *            textual representation of this operator
+	 * @param rightAssociative
+	 *            <code>true</code> if this operator is right-associative.
 	 */
-	private BinaryOp(int precedence, boolean rightAssociative) {
+	private BinaryOp(int precedence, String text, boolean rightAssociative) {
 		this.precedence = precedence;
+		this.text = text;
 		this.rightAssociative = rightAssociative;
 	}
 
@@ -261,6 +271,15 @@ public enum BinaryOp {
 	 */
 	public int getPrecedence() {
 		return precedence;
+	}
+
+	/**
+	 * Returns the textual representation of this operator.
+	 * 
+	 * @return the textual representation of this operator
+	 */
+	public String getText() {
+		return text;
 	}
 
 	/**

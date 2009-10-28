@@ -50,11 +50,11 @@ import net.sf.orcc.ir.expr.VarExpr;
 public class LLVMExprPrinter implements ExprVisitor {
 	public static String toString(BinaryOp op) {
 		switch (op) {
-		case BAND:
+		case BITAND:
 			return "and";
-		case BOR:
+		case BITOR:
 			return "or";
-		case BXOR:
+		case BITXOR:
 			return "xor";
 		case DIV:
 			return "/";
@@ -68,11 +68,11 @@ public class LLVMExprPrinter implements ExprVisitor {
 			return "icmp sge";
 		case GT:
 			return "icmp sgt";
-		case LAND:
+		case LOGIC_AND:
 			return "and";
 		case LE:
 			return "icmp sle";
-		case LOR:
+		case LOGIC_OR:
 			return "or";
 		case LT:
 			return "icmp slt";
@@ -98,9 +98,9 @@ public class LLVMExprPrinter implements ExprVisitor {
 	public static String toString(UnaryOp op, Object... args) {
 
 		switch (op) {
-		case BNOT:
+		case BITNOT:
 			return "~";
-		case LNOT:
+		case LOGIC_NOT:
 			return "!";
 		case MINUS:
 			return "-";

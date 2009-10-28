@@ -97,16 +97,16 @@ public class TypeTransformation extends AbstractLLVMNodeVisitor implements
 		public void visit(BinaryExpr expr, Object... args) {
 			BinaryOp op = expr.getOp();
 			switch (op) {
-			case BAND:
-			case LAND:
-			case BOR:
-			case LOR:
+			case BITAND:
+			case LOGIC_AND:
+			case BITOR:
+			case LOGIC_OR:
 			case MINUS:
 			case TIMES:
 			case PLUS:
 			case SHIFT_LEFT:
 			case SHIFT_RIGHT:
-			case BXOR:
+			case BITXOR:
 			case DIV:
 			case DIV_INT:
 				// recover the reference type from the current node

@@ -50,11 +50,11 @@ public class ExprToString implements ExprVisitor {
 
 	public static String toString(BinaryOp op) {
 		switch (op) {
-		case BAND:
+		case BITAND:
 			return "&";
-		case BOR:
+		case BITOR:
 			return "|";
-		case BXOR:
+		case BITXOR:
 			return "^";
 		case DIV:
 			return "/";
@@ -68,11 +68,11 @@ public class ExprToString implements ExprVisitor {
 			return ">=";
 		case GT:
 			return ">";
-		case LAND:
+		case LOGIC_AND:
 			return "&&";
 		case LE:
 			return "<=";
-		case LOR:
+		case LOGIC_OR:
 			return "||";
 		case LT:
 			return "<";
@@ -97,9 +97,9 @@ public class ExprToString implements ExprVisitor {
 
 	public static String toString(UnaryOp op) {
 		switch (op) {
-		case BNOT:
+		case BITNOT:
 			return "~";
-		case LNOT:
+		case LOGIC_NOT:
 			return "!";
 		case MINUS:
 			return "-";

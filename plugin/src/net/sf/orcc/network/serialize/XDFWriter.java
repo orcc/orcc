@@ -43,6 +43,7 @@ import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.ExprVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -80,6 +81,99 @@ import org.w3c.dom.ls.LSSerializer;
  * 
  */
 public class XDFWriter {
+
+	/**
+	 * This class defines a writer of binary operation sequences. This writer
+	 * translates a binary expression tree to a binary operation sequence with
+	 * respect to operator precedence.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class BinOpSeqWriter implements ExprVisitor {
+
+		@Override
+		public void visit(BinaryExpr expr, Object... args) {
+			Element exprElt = document.createElement("Expr");
+			((Element) args[0]).appendChild(exprElt);
+			exprElt.setAttribute("kind", "UnaryOp");
+
+			// visit the first expression of this binary expression
+			expr.getE1().accept(this, exprElt);
+
+			// operator
+			Element op = document.createElement("Op");
+			op.setAttribute("name", expr.getOp().getText());
+			exprElt.appendChild(op);
+
+			// visit the first expression of this binary expression
+			expr.getE2().accept(this, exprElt);
+		}
+
+		@Override
+		public void visit(BooleanExpr expr, Object... args) {
+			Element exprElt = document.createElement("Expr");
+			String value = Boolean.toString(expr.getValue());
+			exprElt.setAttribute("kind", "Literal");
+			exprElt.setAttribute("literal-kind", "Boolean");
+			exprElt.setAttribute("value", value);
+			((Element) args[0]).appendChild(exprElt);
+		}
+
+		@Override
+		public void visit(IntExpr expr, Object... args) {
+			Element exprElt = document.createElement("Expr");
+			String value = Integer.toString(expr.getValue());
+			exprElt.setAttribute("kind", "Literal");
+			exprElt.setAttribute("literal-kind", "Integer");
+			exprElt.setAttribute("value", value);
+			((Element) args[0]).appendChild(exprElt);
+		}
+
+		@Override
+		public void visit(ListExpr expr, Object... args) {
+			Element exprElt = document.createElement("Expr");
+			exprElt.setAttribute("kind", "List");
+			for (IExpr childExpr : expr.getValue()) {
+				childExpr.accept(this, args[0]);
+			}
+		}
+
+		@Override
+		public void visit(StringExpr expr, Object... args) {
+			Element exprElt = document.createElement("Expr");
+			String value = expr.getValue();
+			exprElt.setAttribute("kind", "Literal");
+			exprElt.setAttribute("literal-kind", "String");
+			exprElt.setAttribute("value", value);
+			((Element) args[0]).appendChild(exprElt);
+		}
+
+		@Override
+		public void visit(UnaryExpr expr, Object... args) {
+			Element exprElt = document.createElement("Expr");
+			exprElt.setAttribute("kind", "UnaryOp");
+
+			Element op = document.createElement("Op");
+			op.setAttribute("name", expr.getOp().getText());
+			exprElt.appendChild(op);
+
+			// visit the expression of this unary expression
+			expr.getExpr().accept(this, exprElt);
+
+			((Element) args[0]).appendChild(exprElt);
+		}
+
+		@Override
+		public void visit(VarExpr expr, Object... args) {
+			Element exprElt = document.createElement("Expr");
+			String value = expr.getVar().getVariable().getName();
+			exprElt.setAttribute("kind", "Var");
+			exprElt.setAttribute("name", value);
+			((Element) args[0]).appendChild(exprElt);
+		}
+
+	}
 
 	/**
 	 * the document being created by this writer.
@@ -146,11 +240,11 @@ public class XDFWriter {
 	}
 
 	/**
-	 * Appends Attribute elements to the given parent element. Each attribute of
-	 * the attributes map is transformed to an Attribute DOM element.
+	 * Appends Attribute elements to the given parent parent. Each attribute of
+	 * the attributes map is transformed to an Attribute DOM parent.
 	 * 
 	 * @param parent
-	 *            the parent element
+	 *            the parent parent
 	 * @param attributes
 	 *            a map of attributes
 	 * @throws OrccException
@@ -194,7 +288,7 @@ public class XDFWriter {
 			case IAttribute.VALUE: {
 				kind = IValueAttribute.NAME;
 				IExpr expr = ((IValueAttribute) attribute).getValue();
-				attributeElt.appendChild(writeExpr(expr));
+				writeExpr(attributeElt, expr);
 				break;
 			}
 			default:
@@ -227,11 +321,11 @@ public class XDFWriter {
 	}
 
 	/**
-	 * Returns a Connection element that represents the given connection.
+	 * Returns a Connection parent that represents the given connection.
 	 * 
 	 * @param connection
 	 *            a connection
-	 * @return a Connection DOM element
+	 * @return a Connection DOM parent
 	 * @throws OrccException
 	 *             if the connection could not be written
 	 */
@@ -257,7 +351,7 @@ public class XDFWriter {
 	 * 
 	 * @param connection
 	 *            a connection
-	 * @return a Connection DOM element
+	 * @return a Connection DOM parent
 	 * @throws OrccException
 	 *             if the connection could not be written
 	 */
@@ -279,12 +373,12 @@ public class XDFWriter {
 	}
 
 	/**
-	 * Appends Decl elements to the given parent element with the given kind.
+	 * Appends Decl elements to the given parent parent with the given kind.
 	 * Each declaration of the variables map is transformed to a Decl DOM
-	 * element.
+	 * parent.
 	 * 
 	 * @param parent
-	 *            the parent element
+	 *            the parent parent
 	 * @param kind
 	 *            the kind of declarations
 	 * @param variables
@@ -302,37 +396,37 @@ public class XDFWriter {
 			decl.appendChild(writeType(variable.getType()));
 
 			if (variable.hasValue()) {
-				decl.appendChild(writeExpr(variable.getValue()));
+				writeExpr(decl, variable.getValue());
 			}
 		}
 	}
 
 	/**
-	 * Returns an Entry element that represents the given expression entry.
+	 * Returns an Entry parent that represents the given expression entry.
 	 * 
 	 * @param name
 	 *            the entry name
 	 * @param expr
 	 *            the entry value as an expression
-	 * @return an Entry DOM element
+	 * @return an Entry DOM parent
 	 * @throws OrccException
 	 */
 	private Element writeEntry(String name, IExpr expr) throws OrccException {
 		Element entry = document.createElement("Entry");
 		entry.setAttribute("kind", "Expr");
 		entry.setAttribute("name", name);
-		entry.appendChild(writeExpr(expr));
+		writeExpr(entry, expr);
 		return entry;
 	}
 
 	/**
-	 * Returns an Entry element that represents the given type entry.
+	 * Returns an Entry parent that represents the given type entry.
 	 * 
 	 * @param name
 	 *            the entry name
 	 * @param type
 	 *            the entry value as a type
-	 * @return an Entry DOM element
+	 * @return an Entry DOM parent
 	 * @throws OrccException
 	 */
 	private Element writeEntry(String name, IType type) throws OrccException {
@@ -344,82 +438,26 @@ public class XDFWriter {
 	}
 
 	/**
-	 * Returns an Expr element that represents the given expression. This method
-	 * is a big switch on the expression type. Expressions are written directly
-	 * in this method, except binary and unary expressions, which are written by
-	 * {@link #writeExprBinOpSeq(Element, BinaryExpr)} and
-	 * {@link #writeExprUnaryOp(Element, UnaryExpr)} respectively.
+	 * Appends an Expr parent that represents the given expression to the given
+	 * parent. This method just creates a {@link BinOpSeqWriter} to fill the
+	 * Expr parent.
 	 * 
+	 * @param parent
+	 *            the parent parent to which an Expr parent should be added
 	 * @param expr
 	 *            an expression
-	 * @return an Expr DOM element
 	 * @throws OrccException
 	 */
-	private Element writeExpr(IExpr expr) throws OrccException {
-		Element exprElt = document.createElement("Expr");
-		String kind;
-		String value;
-
-		switch (expr.getType()) {
-		case IExpr.BINARY:
-			kind = "BinOpSeq";
-			writeExprBinOpSeq(exprElt, (BinaryExpr) expr);
-			break;
-		case IExpr.BOOLEAN:
-			kind = "Literal";
-			value = Boolean.toString(((BooleanExpr) expr).getValue());
-			exprElt.setAttribute("literal-kind", "Boolean");
-			exprElt.setAttribute("value", value);
-			break;
-		case IExpr.INT:
-			kind = "Literal";
-			value = Integer.toString(((IntExpr) expr).getValue());
-			exprElt.setAttribute("literal-kind", "Integer");
-			exprElt.setAttribute("value", value);
-			break;
-		case IExpr.LIST:
-			kind = "List";
-			for (IExpr childExpr : ((ListExpr) expr).getValue()) {
-				exprElt.appendChild(writeExpr(childExpr));
-			}
-			break;
-		case IExpr.STRING:
-			kind = "Literal";
-			value = ((StringExpr) expr).getValue();
-			exprElt.setAttribute("literal-kind", "String");
-			exprElt.setAttribute("value", value);
-			break;
-		case IExpr.UNARY:
-			kind = "UnaryOp";
-			writeExprUnaryOp(exprElt, (UnaryExpr) expr);
-			break;
-		case IExpr.VAR:
-			kind = "Var";
-			value = ((VarExpr) expr).getVar().getVariable().getName();
-			exprElt.setAttribute("name", value);
-			break;
-		default:
-			throw new OrccException("unknown expression type");
-		}
-
-		exprElt.setAttribute("kind", kind);
-		return exprElt;
-	}
-
-	private void writeExprBinOpSeq(Element exprElt, BinaryExpr expr) {
-
-	}
-
-	private void writeExprUnaryOp(Element exprElt, UnaryExpr expr) {
-
+	private void writeExpr(Element parent, IExpr expr) throws OrccException {
+		expr.accept(new BinOpSeqWriter(), parent);
 	}
 
 	/**
-	 * Returns an Instance element that represents the given instance.
+	 * Returns an Instance parent that represents the given instance.
 	 * 
 	 * @param instance
 	 *            an instance
-	 * @return an Instance DOM element
+	 * @return an Instance DOM parent
 	 * @throws OrccException
 	 */
 	private Element writeInstance(Instance instance) throws OrccException {
@@ -436,7 +474,7 @@ public class XDFWriter {
 				.entrySet()) {
 			Element parameterElt = document.createElement("Parameter");
 			parameterElt.setAttribute("name", parameter.getKey());
-			parameterElt.appendChild(writeExpr(parameter.getValue()));
+			writeExpr(parameterElt, parameter.getValue());
 			instanceElt.appendChild(parameterElt);
 		}
 
@@ -447,11 +485,11 @@ public class XDFWriter {
 	}
 
 	/**
-	 * Appends Port elements to the given parent element with the given kind.
-	 * Each port of the ports map is transformed to a Port DOM element.
+	 * Appends Port elements to the given parent parent with the given kind.
+	 * Each port of the ports map is transformed to a Port DOM parent.
 	 * 
 	 * @param parent
-	 *            the parent element
+	 *            the parent parent
 	 * @param kind
 	 *            the kind of ports
 	 * @param ports
@@ -471,11 +509,11 @@ public class XDFWriter {
 	}
 
 	/**
-	 * Returns a Type element that represents the given type.
+	 * Returns a Type parent that represents the given type.
 	 * 
 	 * @param type
 	 *            a type
-	 * @return a Type DOM element
+	 * @return a Type DOM parent
 	 * @throws OrccException
 	 */
 	private Element writeType(IType type) throws OrccException {
@@ -519,10 +557,10 @@ public class XDFWriter {
 	}
 
 	/**
-	 * Writes the top-level XDF element.
+	 * Writes the top-level XDF parent.
 	 * 
 	 * @param xdf
-	 *            the XDF element
+	 *            the XDF parent
 	 * @param network
 	 *            the network
 	 * @throws OrccException

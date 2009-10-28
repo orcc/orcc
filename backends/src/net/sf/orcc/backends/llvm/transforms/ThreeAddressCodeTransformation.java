@@ -123,13 +123,13 @@ public class ThreeAddressCodeTransformation extends AbstractLLVMNodeVisitor
 			varExpr = new BinaryExpr(loc, constExpr, BinaryOp.MINUS, exprE1,
 					type);
 			return varExpr;
-		case LNOT:
+		case LOGIC_NOT:
 			constExpr = new IntExpr(new Location(), 0);
 			varExpr = new BinaryExpr(loc, exprE1, BinaryOp.NE, constExpr, type);
 			return varExpr;
 
-		case BNOT:
-			varExpr = new BinaryExpr(loc, exprE1, BinaryOp.BXOR, exprE1, type);
+		case BITNOT:
+			varExpr = new BinaryExpr(loc, exprE1, BinaryOp.BITXOR, exprE1, type);
 			return varExpr;
 		default:
 			throw new NullPointerException();

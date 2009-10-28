@@ -73,11 +73,11 @@ public class ExprParser {
 	private BinaryOp parseBinaryOp(Tree op) throws OrccException {
 		switch (op.getType()) {
 		case RVCCalLexer.AND:
-			return BinaryOp.LAND;
+			return BinaryOp.LOGIC_AND;
 		case RVCCalLexer.BITAND:
-			return BinaryOp.BAND;
+			return BinaryOp.BITAND;
 		case RVCCalLexer.BITOR:
-			return BinaryOp.BOR;
+			return BinaryOp.BITOR;
 		case RVCCalLexer.DIV:
 			return BinaryOp.DIV;
 		case RVCCalLexer.DIV_INT:
@@ -101,7 +101,7 @@ public class ExprParser {
 		case RVCCalLexer.NE:
 			return BinaryOp.NE;
 		case RVCCalLexer.OR:
-			return BinaryOp.LOR;
+			return BinaryOp.LOGIC_OR;
 		case RVCCalLexer.PLUS:
 			return BinaryOp.PLUS;
 		case RVCCalLexer.SHIFT_LEFT:

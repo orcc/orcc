@@ -42,7 +42,7 @@ import net.sf.orcc.ir.expr.BinaryOp;
  * expression tree with respect to operator precedence.
  * 
  * <p>
- * This code is modified from code written by Sam Harwell.
+ * This code is based on code written by Sam Harwell found on the site of ANTLR.
  * </p>
  * 
  * @author Matthieu Wipliez

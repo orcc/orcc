@@ -64,7 +64,7 @@ public class BinaryExpr extends AbstractExpr {
 	@Override
 	public IExpr evaluate() throws OrccException {
 		switch (op) {
-		case BAND:
+		case BITAND:
 			IExpr expr1 = e1.evaluate();
 			IExpr expr2 = e2.evaluate();
 			if (expr1.getType() == IExpr.BOOLEAN
@@ -74,9 +74,9 @@ public class BinaryExpr extends AbstractExpr {
 				return new BooleanExpr(getLocation(), b1 && b2);
 			}
 			break;
-		case BOR:
+		case BITOR:
 			break;
-		case BXOR:
+		case BITXOR:
 			break;
 		case DIV:
 			break;
@@ -90,11 +90,11 @@ public class BinaryExpr extends AbstractExpr {
 			break;
 		case GT:
 			break;
-		case LAND:
+		case LOGIC_AND:
 			break;
 		case LE:
 			break;
-		case LOR:
+		case LOGIC_OR:
 			break;
 		case LT:
 			break;

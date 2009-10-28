@@ -145,7 +145,7 @@ public class XDFParser {
 					String name = op.getAttribute("name");
 					if (name.equals("and")) {
 						return new ParseContinuation<BinaryOp>(node,
-								BinaryOp.LAND);
+								BinaryOp.LOGIC_AND);
 					} else if (name.equals("/")) {
 						return new ParseContinuation<BinaryOp>(node,
 								BinaryOp.DIV);
@@ -181,7 +181,7 @@ public class XDFParser {
 								BinaryOp.NE);
 					} else if (name.equals("or")) {
 						return new ParseContinuation<BinaryOp>(node,
-								BinaryOp.LOR);
+								BinaryOp.LOGIC_OR);
 					} else if (name.equals("+")) {
 						return new ParseContinuation<BinaryOp>(node,
 								BinaryOp.PLUS);
@@ -357,15 +357,19 @@ public class XDFParser {
 				if (node.getNodeName().equals("Op")) {
 					Element op = (Element) node;
 					String name = op.getAttribute("name");
-					if (name.equals("#")) {
-						return new ParseContinuation<UnaryOp>(node,
-								UnaryOp.NUM_ELTS);
-					} else if (name.equals("not")) {
-						return new ParseContinuation<UnaryOp>(node,
-								UnaryOp.LNOT);
-					} else if (name.equals("-")) {
+					if (name.equals(UnaryOp.MINUS.getText())) {
 						return new ParseContinuation<UnaryOp>(node,
 								UnaryOp.MINUS);
+					} else if (name.equals(UnaryOp.NUM_ELTS.getText())) {
+						return new ParseContinuation<UnaryOp>(node,
+								UnaryOp.NUM_ELTS);
+					} else if (name.equals(UnaryOp.BITNOT.getText())) {
+						return new ParseContinuation<UnaryOp>(node,
+								UnaryOp.BITNOT);
+					} else if (name.equals(UnaryOp.LOGIC_NOT.getText())
+							|| name.equals("not")) {
+						return new ParseContinuation<UnaryOp>(node,
+								UnaryOp.LOGIC_NOT);
 					} else {
 						throw new OrccException("Unknown unary operator \""
 								+ name + "\"");
