@@ -37,7 +37,7 @@ let _ =
 			("at", AT);
 			("begin", BEGIN);
 			("choose", CHOOSE);
-			("div", DIV);
+			("div", DIV_INT);
 			("do", DO);
 			("delay", DELAY);
 			("else", ELSE);

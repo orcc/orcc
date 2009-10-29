@@ -208,7 +208,7 @@ let var assignable global loc name t v =
 %token BEGIN
 %token CHOOSE
 %token DELAY
-%token DIV
+%token DIV_INT
 %token DO
 %token ELSE
 %token END
@@ -529,10 +529,10 @@ expression:
 | expression PLUS expression { bop (loc ()) $1 Calast.BOpPlus $3 }
 | expression MINUS expression { bop (loc ()) $1 Calast.BOpMinus $3 }
 
-| expression DIV expression { bop (loc ()) $1 Calast.BOpDivInt $3 }
+| expression DIV_INT expression { bop (loc ()) $1 Calast.BOpDivInt $3 }
 | expression MOD expression { bop (loc ()) $1 Calast.BOpMod $3 }
 | expression TIMES expression { bop (loc ()) $1 Calast.BOpTimes $3 }
-| expression SLASH expression { bop (loc ()) $1 Calast.BOpDiv $3 }
+| expression DIV expression { bop (loc ()) $1 Calast.BOpDiv $3 }
 
 | expression EXP expression { bop (loc ()) $1 Calast.BOpExp $3 }
 
