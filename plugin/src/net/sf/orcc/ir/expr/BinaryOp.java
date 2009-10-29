@@ -321,4 +321,47 @@ public enum BinaryOp {
 	public boolean isRightAssociative() {
 		return rightAssociative;
 	}
+
+	/**
+	 * Returns true if a binary expression involving this operator needs
+	 * parentheses, given the precedence of the parent expression and the
+	 * associativity of this operator.
+	 * 
+	 * @param args
+	 *            arguments such that <code>args[0]</code> is the precedence of
+	 *            the parent expression, and <code>args[1]</code> is the branch
+	 *            if the parent expression is a binary expression
+	 * @return <code>true</code> if a binary expression involving this operator
+	 *         needs parentheses
+	 */
+	public boolean needsParentheses(Object[] args) {
+		int parentPrec = (Integer) args[0];
+		int currentPrec = getPrecedence();
+		if (parentPrec < currentPrec) {
+			// if the parent precedence is lower than the precedence of this
+			// operator, the current expression must be parenthesized to prevent
+			// the first operand from being used by the parent operator instead
+			// of the current one
+
+			return true;
+		} else if (parentPrec == currentPrec) {
+			// if the parent precedence is the same as the precedence of this
+			// operator, the current expression must be parenthesized if the
+			// expression tree contradicts the normal operator precedence as
+			// implemented by the test below
+
+			// parent is a binary expression, so args[1] is defined
+			Object thisBranch = args[1];
+			boolean res;
+			if (isRightAssociative()) {
+				res = (thisBranch == BinaryExpr.LEFT);
+			} else {
+				res = (thisBranch == BinaryExpr.RIGHT);
+			}
+			return res;
+		} else {
+			return false;
+		}
+	}
+
 }

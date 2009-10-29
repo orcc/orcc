@@ -107,7 +107,6 @@ public class ExprToString implements ExprVisitor {
 
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
-		int parentPrec = (Integer) args[0];
 		BinaryOp op = expr.getOp();
 		int currentPrec = op.getPrecedence();
 
@@ -120,24 +119,20 @@ public class ExprToString implements ExprVisitor {
 			nextPrec = currentPrec;
 		}
 
-		// if the parent precedence is lower than the precedence of this
-		// operator, the current operation must be parenthesized to prevent the
-		// first operand from being used by the parent operator instead of the
-		// current one
-		if (parentPrec < currentPrec) {
+		if (op.needsParentheses(args)) {
 			builder.append("(");
-			expr.getE1().accept(this, nextPrec);
+			expr.getE1().accept(this, nextPrec, BinaryExpr.LEFT);
 			builder.append(" ");
 			builder.append(toString(op));
 			builder.append(" ");
-			expr.getE2().accept(this, nextPrec);
+			expr.getE2().accept(this, nextPrec, BinaryExpr.RIGHT);
 			builder.append(")");
 		} else {
-			expr.getE1().accept(this, nextPrec);
+			expr.getE1().accept(this, nextPrec, BinaryExpr.LEFT);
 			builder.append(" ");
 			builder.append(toString(op));
 			builder.append(" ");
-			expr.getE2().accept(this, nextPrec);
+			expr.getE2().accept(this, nextPrec, BinaryExpr.RIGHT);
 		}
 	}
 

@@ -34,10 +34,22 @@ import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.Location;
 
 /**
+ * This class defines a binary expression.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class BinaryExpr extends AbstractExpr {
+
+	/**
+	 * Constant indicating left branch of a binary expression.
+	 */
+	public static final Object LEFT = new Object();
+
+	/**
+	 * Constant indicating right branch of a binary expression.
+	 */
+	public static final Object RIGHT = new Object();
 
 	private IExpr e1;
 
