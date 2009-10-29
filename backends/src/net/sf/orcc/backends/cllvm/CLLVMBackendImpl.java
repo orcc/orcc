@@ -90,7 +90,7 @@ public class CLLVMBackendImpl extends AbstractBackend {
 		}
 
 		String outputName = path + File.separator + id + ".c";
-		printer.printActor(outputName, actor);
+		printer.printActor(outputName, id, actor);
 	}
 
 	@Override

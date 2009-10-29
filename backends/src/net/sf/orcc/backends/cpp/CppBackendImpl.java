@@ -99,10 +99,10 @@ public class CppBackendImpl extends AbstractBackend implements IBackend {
 		}
 
 		String outputName = outputPath + "Actor_" + id + ".h";
-		printer.printActor(outputName, actor);
+		printer.printActor(outputName, id, actor);
 
 		outputName = outputPath + "Actor_" + id + ".cpp";
-		impl_printer.printActor(outputName, actor);
+		impl_printer.printActor(outputName, id, actor);
 	}
 
 	@Override

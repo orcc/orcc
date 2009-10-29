@@ -82,10 +82,10 @@ public class NodePrinterTemplate implements CNodeVisitor {
 	protected VarDefPrinter varDefPrinter;
 
 	public NodePrinterTemplate(StringTemplateGroup group,
-			StringTemplate template, String actorName,
+			StringTemplate template, String id,
 			VarDefPrinter varDefPrinter, ExprToString exprPrinter) {
 		attrName = "nodes";
-		this.actorName = actorName;
+		this.actorName = id;
 		this.exprPrinter = exprPrinter;
 		this.group = group;
 		this.template = template;

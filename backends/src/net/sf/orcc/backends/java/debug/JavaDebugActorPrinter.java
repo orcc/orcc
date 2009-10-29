@@ -142,8 +142,8 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 	}
 
 	@Override
-	protected void setAttributes(Actor actor) {
-		super.setAttributes(actor);
+	protected void setAttributes(String id, Actor actor) {
+		super.setAttributes(id, actor);
 		String res = actor.getFile().replaceAll("\\\\", "\\\\\\\\");
 		template.setAttribute("file", res);
 

@@ -92,7 +92,7 @@ public class MultiCoreBackendImpl extends AbstractBackend implements IBackend {
 		}
 
 		String outputName = path + File.separator + id + ".c";
-		printer.printActor(outputName, actor);
+		printer.printActor(outputName, id, actor);
 	}
 
 	@Override

@@ -50,9 +50,9 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
- * Actor printer.
+ * This class defines a C actor printer.
  * 
- * @author Mathieu Wippliez
+ * @author Matthieu Wipliez
  * 
  */
 public class CActorPrinter {
@@ -104,7 +104,7 @@ public class CActorPrinter {
 	 *            a procedure
 	 * @return a string template
 	 */
-	protected StringTemplate applyProc(String actorName, Procedure proc) {
+	protected StringTemplate applyProc(String id, Procedure proc) {
 		StringTemplate procTmpl = group.getInstanceOf("proc");
 
 		// name
@@ -132,7 +132,7 @@ public class CActorPrinter {
 
 		// body
 		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
-				actorName, varDefPrinter, exprPrinter);
+				id, varDefPrinter, exprPrinter);
 		for (INode node : proc.getNodes()) {
 			node.accept(printer);
 		}
@@ -145,14 +145,17 @@ public class CActorPrinter {
 	 * 
 	 * @param fileName
 	 *            output file name
+	 * @param id
+	 *            the instance id
 	 * @param actor
 	 *            actor to print
 	 * @throws IOException
 	 */
-	public void printActor(String fileName, Actor actor) throws IOException {
+	public void printActor(String fileName, String id, Actor actor)
+			throws IOException {
 		template = group.getInstanceOf("actor");
 
-		setAttributes(actor);
+		setAttributes(id, actor);
 
 		byte[] b = template.toString(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
@@ -160,14 +163,14 @@ public class CActorPrinter {
 		os.close();
 	}
 
-	protected void setActions(String tmplName, String actorName,
+	protected void setActions(String tmplName, String id,
 			List<Action> actions) {
 		for (Action action : actions) {
-			StringTemplate procTmpl = applyProc(actorName, action.getBody());
+			StringTemplate procTmpl = applyProc(id, action.getBody());
 			template.setAttribute(tmplName, procTmpl);
 			Procedure proc = action.getScheduler();
 			proc.setName("isSchedulable_" + action);
-			procTmpl = applyProc(actorName, proc);
+			procTmpl = applyProc(id, proc);
 			template.setAttribute(tmplName, procTmpl);
 		}
 	}
@@ -179,15 +182,14 @@ public class CActorPrinter {
 	 * @param actor
 	 *            An actor
 	 */
-	protected void setAttributes(Actor actor) {
-		String actorName = actor.getName();
-		template.setAttribute("name", actorName);
+	protected void setAttributes(String id, Actor actor) {
+		template.setAttribute("name", id);
 		setFifos("inputs", actor.getInputs());
 		setFifos("outputs", actor.getOutputs());
 		setStateVars(actor.getStateVars());
-		setProcedures(actorName, actor.getProcs());
-		setActions("actions", actorName, actor.getActions());
-		setActions("initializes", actorName, actor.getInitializes());
+		setProcedures(id, actor.getProcs());
+		setActions("actions", id, actor.getActions());
+		setActions("initializes", id, actor.getInitializes());
 		template.setAttribute("scheduler", actor.getActionScheduler());
 		template.setAttribute("initialize", actor.getInitializes());
 	}
@@ -202,10 +204,10 @@ public class CActorPrinter {
 		template.setAttribute(attribute, names);
 	}
 
-	private void setProcedures(String actorName, OrderedMap<Procedure> procs) {
+	private void setProcedures(String id, OrderedMap<Procedure> procs) {
 		for (Procedure proc : procs) {
 			if (!proc.isExternal()) {
-				template.setAttribute("procs", applyProc(actorName, proc));
+				template.setAttribute("procs", applyProc(id, proc));
 			}
 		}
 	}

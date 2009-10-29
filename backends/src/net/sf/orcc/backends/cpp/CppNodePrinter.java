@@ -47,10 +47,10 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 public class CppNodePrinter extends NodePrinterTemplate {
 
 	public CppNodePrinter(StringTemplateGroup group, StringTemplate template,
-			String actorName, VarDefPrinter varDefPrinter,
+			String id, VarDefPrinter varDefPrinter,
 			ExprToString exprPrinter) {
 
-		super(group, template, actorName, varDefPrinter, exprPrinter);
+		super(group, template, id, varDefPrinter, exprPrinter);
 	}
 
 	@Override

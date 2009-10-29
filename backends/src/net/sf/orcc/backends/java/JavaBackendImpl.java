@@ -99,7 +99,7 @@ public class JavaBackendImpl extends AbstractBackend implements IBackend {
 		}
 
 		String outputName = outputPath + "Actor_" + id + ".java";
-		printer.printActor(outputName, actor);
+		printer.printActor(outputName, id, actor);
 	}
 
 	@Override
