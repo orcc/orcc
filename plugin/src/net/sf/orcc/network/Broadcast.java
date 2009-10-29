@@ -47,6 +47,20 @@ public class Broadcast extends Instance {
 
 	private IType type;
 
+	/**
+	 * Creates a new broadcast whose name is composed from the given actor name
+	 * and port name. The broadcast will have the number of outputs given and
+	 * the given type.
+	 * 
+	 * @param actorName
+	 *            name of the source actor
+	 * @param portName
+	 *            name of the source output port connected to this broadcast
+	 * @param numOutput
+	 *            number of outputs
+	 * @param type
+	 *            type of this broadcast
+	 */
 	public Broadcast(String actorName, String portName, int numOutput,
 			IType type) {
 		super("broadcast_" + actorName + "_" + portName, CLASS,

@@ -29,7 +29,8 @@
 package net.sf.orcc.ir;
 
 /**
- * This class represents a port. A port is a variable.
+ * This class defines a port. A port is just a variable, with a location, a
+ * type, a name.
  * 
  * @author Matthieu Wipliez
  * 

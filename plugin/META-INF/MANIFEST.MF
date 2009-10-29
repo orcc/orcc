@@ -34,6 +34,7 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.network,
  net.sf.orcc.network.attributes,
  net.sf.orcc.network.serialize,
+ net.sf.orcc.network.transforms,
  net.sf.orcc.util,
  org.jgrapht,
  org.jgrapht.graph

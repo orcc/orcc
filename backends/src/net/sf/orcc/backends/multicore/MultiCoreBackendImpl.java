@@ -39,9 +39,9 @@ import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
 import net.sf.orcc.ir.IActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.transforms.BroadcastAdder;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.transforms.BroadcastAdder;
 
 /**
  * C MultiCore back-end.
