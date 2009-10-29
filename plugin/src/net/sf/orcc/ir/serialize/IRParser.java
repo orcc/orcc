@@ -85,6 +85,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.IConst;
@@ -602,7 +603,7 @@ public class IRParser {
 
 	private Map<Port, Integer> parsePattern(OrderedMap<Port> ports,
 			JSONArray array) throws JSONException, OrccException {
-		Map<Port, Integer> pattern = new HashMap<Port, Integer>();
+		Map<Port, Integer> pattern = new TreeMap<Port, Integer>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray patternArray = array.getJSONArray(i);
 			Port port = ports.get(patternArray.getString(0));
@@ -751,7 +752,7 @@ public class IRParser {
 			stateVars.add(file, location, name, stateVar);
 
 			// register the state variable
-			variables.add(file, location, name + "_0", stateVar);
+			variables.add(file, location, name, stateVar);
 		}
 
 		return stateVars;
@@ -910,7 +911,8 @@ public class IRParser {
 	}
 
 	private String stringOfVar(String name, Integer suffix, int index) {
-		return name + (suffix == null ? "" : suffix) + "_" + index;
+		String indexStr = (index == 0) ? "" : "_" + index;
+		return name + (suffix == null ? "" : suffix) + indexStr;
 	}
 
 }

@@ -35,7 +35,7 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public class Port extends Variable {
+public class Port extends Variable implements Comparable<Port> {
 
 	/**
 	 * Creates a new port with the given location, type, and name.
@@ -56,6 +56,11 @@ public class Port extends Variable {
 	 */
 	public Port(Port port) {
 		super(port);
+	}
+
+	@Override
+	public int compareTo(Port port) {
+		return getName().compareTo(port.getName());
 	}
 
 }

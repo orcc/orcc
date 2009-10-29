@@ -116,7 +116,8 @@ public class LocalVariable extends Variable implements
 
 	@Override
 	public String getName() {
-		return super.getName() + (suffix == null ? "" : suffix) + "_" + index;
+		String indexStr = (index == 0) ? "" : "_" + index;
+		return super.getName() + (suffix == null ? "" : suffix) + indexStr;
 	}
 
 	public INode getNode() {
