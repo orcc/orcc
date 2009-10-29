@@ -230,14 +230,14 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @throws OrccException
 	 */
 	public void instantiate() throws OrccException {
-		file = new File(path, clasz + ".json");
+		file = new File(path, id + ".json");
 		try {
 			if (file.exists()) {
-				// TODO when new front end is ready, add instantiation here
 				InputStream in = new FileInputStream(file);
 				actor = new IRParser().parseActor(in);
 			} else {
-				file = new File(path, id + ".json");
+				// TODO when new front end is ready, add instantiation here
+				file = new File(path, clasz + ".json");
 				// this may cause a FileNotFoundException
 				InputStream in = new FileInputStream(file);
 				actor = new IRParser().parseActor(in);
