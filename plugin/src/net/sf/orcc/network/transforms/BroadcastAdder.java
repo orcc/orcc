@@ -37,7 +37,6 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -129,8 +128,6 @@ public class BroadcastAdder implements INetworkTransformation {
 	private void examineConnections(Vertex vertex, Set<Connection> connections,
 			Map<Port, List<Connection>> outMap) throws OrccException {
 		Instance instance = vertex.getInstance();
-		Actor srcActor = instance.getActor();
-
 		for (Connection connection : connections) {
 			Port srcPort = connection.getSource();
 			if (srcPort != null) {
@@ -138,7 +135,7 @@ public class BroadcastAdder implements INetworkTransformation {
 				int numOutput = outList.size();
 				if (numOutput > 1) {
 					// add broadcast vertex
-					Broadcast bcast = new Broadcast(srcActor.getName(), srcPort
+					Broadcast bcast = new Broadcast(instance.getId(), srcPort
 							.getName(), numOutput, srcPort.getType());
 					Vertex vertexBCast = new Vertex(bcast);
 					graph.addVertex(vertexBCast);
