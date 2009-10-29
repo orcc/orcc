@@ -42,6 +42,9 @@ import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 
 /**
+ * This class defines an expression visitor that builds a textual representation
+ * of an expression. Precedence is correctly handled for binary expressions by
+ * passing the precedence of the parent expression as a parameter.
  * 
  * @author Matthieu Wipliez
  * 
@@ -75,13 +78,30 @@ public class ExprToString implements ExprVisitor {
 
 	protected final VarDefPrinter varDefPrinter;
 
+	/**
+	 * Creates a new expression printer with the given variable printer.
+	 * 
+	 * @param varDefPrinter
+	 *            a variable printer
+	 */
 	public ExprToString(VarDefPrinter varDefPrinter) {
 		this.varDefPrinter = varDefPrinter;
 	}
 
+	/**
+	 * Returns the string representation of the given expression.
+	 * 
+	 * @param expr
+	 *            an expression
+	 * @return the string representation of the given expression
+	 */
 	public String toString(IExpr expr) {
 		builder = new StringBuilder();
-		expr.accept(this, Integer.MIN_VALUE);
+
+		// parent precedence is the highest possible to prevent top-level binary
+		// expression from being parenthesized
+		expr.accept(this, Integer.MAX_VALUE);
+
 		return builder.toString();
 	}
 
