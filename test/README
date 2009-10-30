@@ -1,12 +1,16 @@
-Test cases that end with "_fail.cal" are expected to make Cal2C fail.
-They contain semantic errors, such as references to undeclared variables, or assignment to a non-assignable variable, etc.
-Some of these tests are labeled "opendf_ok_cal2c_fail" because the case is not accepted by Cal2C, which I believe is the correct behavior, but passes with OpenDF.
+This file describes how to run the testsuite of Orcc.
 
-scope01_opendf_ok_cal2c_fail.cal: two input ports have the same name
-scope02_opendf_ok_cal2c_fail.cal: an input port has the same name as an output port
-scope03_succeed: a parameter and an input have same names
-scope04_fail: a parameter has the same name as an actor variable
-scope05_fail: two actor variables with the same name
-...
-scope20_fail: a variable b is declared in a block and another variable is declared in an inner block that is also named b
-scope21_fail: two procedures with the same name
+-------------------------------------------------------------------------------
+Prerequisites
+
+The tests are written with DejaGnu, so you must install it for the tests to
+run. DejaGnu is available for every major platform, including Windows
+(in Cygwin).
+
+-------------------------------------------------------------------------------
+Testing
+
+Just type:
+  runtest
+
+Wait for the tests to complete.

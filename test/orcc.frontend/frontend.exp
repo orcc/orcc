@@ -1,0 +1,7 @@
+print "front-end test\n"
+
+pass "expected success"
+xfail "expected failure"
+
+# fail "unexpected failure"
+# xpass "unexpected success"

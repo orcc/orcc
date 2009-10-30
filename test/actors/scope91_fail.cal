@@ -1,8 +1,0 @@
-/* OpenDF detects an error here, but does not in scope01. */
-
-actor scope91() bool Port1, int Port1 ==> :
-
-  a: action Port1:[a], Port1:[b] ==> 
-  end
-
-end

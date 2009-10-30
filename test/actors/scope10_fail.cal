@@ -1,8 +1,0 @@
-actor scope10() bool Port1 ==> int Port2, int Port3:
-  
-  a: action [a] ==> Port2:[b], [c]
-  var
-    int b = a, int c = a
-  end
-
-end
