@@ -1,0 +1,9 @@
+puts "initializing orcc.exp"
+
+set cmd_frontend "java -cp \"../plugin/lib/antlr-runtime-3.1.3.jar;../plugin/lib/jgrapht-jdk1.6.jar;../plugin/bin\" net.sf.orcc.frontend.Frontend "
+
+proc frontend {network outputDir} {
+  global cmd_frontend
+  set retval [ catch { eval exec -keepnewline -- $cmd_frontend $network $outputDir } errmsg ]
+  puts "network=$network outputDir=$outputDir retval=$retval errmsg=$errmsg"
+}
