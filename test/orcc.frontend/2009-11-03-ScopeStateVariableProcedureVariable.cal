@@ -1,0 +1,13 @@
+// PASS: in a procedure, a local variable may override a state variable.
+
+actor Actor () ==> :
+
+  int var_xyz := 42;
+
+  procedure X()
+  var
+    int var_xyz
+  begin
+  end
+
+end

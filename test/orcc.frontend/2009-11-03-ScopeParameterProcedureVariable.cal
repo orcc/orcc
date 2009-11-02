@@ -1,0 +1,11 @@
+// PASS: a procedure's local variable may override an actor's parameter
+
+actor Actor (int PARAM) ==> :
+
+  procedure X()
+  var
+    int PARAM
+  begin
+  end
+
+end

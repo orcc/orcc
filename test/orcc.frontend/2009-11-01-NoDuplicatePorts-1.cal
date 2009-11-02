@@ -1,0 +1,5 @@
+// XFAIL: input ports must be unique
+
+actor Actor () int(size=3) DuplicatePort, int(size=5) DuplicatePort ==> :
+
+end

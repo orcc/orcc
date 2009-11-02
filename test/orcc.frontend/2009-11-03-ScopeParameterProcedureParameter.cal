@@ -1,0 +1,9 @@
+// PASS: a procedure's parameter may override an actor's parameter
+
+actor Actor (int PARAM) ==> :
+
+  procedure X(int PARAM)
+  begin
+  end
+
+end

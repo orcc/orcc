@@ -1,6 +1,6 @@
-// XFAIL
+// XFAIL: a state variable may not override a parameter
 
-actor ScopeParameterStateVariable (int PARAM) ==> :
+actor Actor (int PARAM) ==> :
 
   int PARAM := 5;
 
