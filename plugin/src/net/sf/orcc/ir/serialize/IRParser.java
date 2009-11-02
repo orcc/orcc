@@ -681,10 +681,10 @@ public class IRParser {
 
 		Location location = parseLocation(array.getJSONArray(1));
 		IType returnType = parseType(array.get(2));
-		variables = new Scope<Variable>(variables);
+		variables = new Scope<Variable>(variables, true);
 		OrderedMap<Variable> parameters = variables;
 		parseVarDefs(array.getJSONArray(3));
-		variables = new Scope<Variable>(variables);
+		variables = new Scope<Variable>(variables, false);
 		OrderedMap<Variable> locals = variables;
 		parseVarDefs(array.getJSONArray(4));
 

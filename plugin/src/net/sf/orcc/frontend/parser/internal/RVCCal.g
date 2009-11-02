@@ -34,15 +34,16 @@ options {
   output = AST;
 }
 
-tokens {  
-  // actor structure
+tokens {
   ACTOR;
+
+  // common
   INPUTS;
   OUTPUTS;
-  
-  // actor parameters
-  PARAMETER;
   PARAMETERS;
+  STATEMENTS;
+  VARIABLE;
+  VARIABLES;
   
   // actor declarations
   ACTOR_DECLS;
@@ -58,10 +59,6 @@ tokens {
   // action
   GUARDS;
   TAG;
-  
-  // statements
-  STATEMENTS;
-  VARS;
 
   // expressions  
   EXPR;
@@ -79,9 +76,6 @@ tokens {
   EXPR_FLOAT;
   EXPR_INT;
   EXPR_STRING;
-  
-  // variable
-  VAR;
 
   // type definitions
   TYPE;
@@ -102,7 +96,7 @@ package net.sf.orcc.frontend.parser.internal;
 @parser::header {
 package net.sf.orcc.frontend.parser.internal;
 
-// @SuppressWarnings({"unchecked", "unused"})
+// @SuppressWarnings("unused")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,10 +122,10 @@ actionStatements: 'do' statement* -> statement*;
 /***************************************************************************/
 /* a CAL actor. */
 
-actor: actorImport* 'actor' id=ID ('[' ']')? '(' actorParameters? ')'
+actor: actorImport* 'actor' ID ('[' ']')? '(' actorParameters? ')'
 	inputs=actorPortDecls? '==>' outputs=actorPortDecls? ':'
 	actorDeclarations? 'end' EOF
-	-> 'actor' $id
+	-> 'actor' ID
 	^(PARAMETERS actorParameters?)
 	^(INPUTS $inputs?)
 	^(OUTPUTS $outputs?)
@@ -140,18 +134,25 @@ actor: actorImport* 'actor' id=ID ('[' ']')? '(' actorParameters? ')'
 /*****************************************************************************/
 /* actor declarations */
 
+// trick to differentiate the first ID from the others in the rule below
+// allows the parser to use a stream for this id and a stream for other IDs
+
+id: ID;
+
 actorDeclaration:
   // hack so grammar can be expressed as LL(1)
   // why is the keyword "action" *after* the identifier of the action?
   // parsing "action a.b:" would be much easier than parsing "a.b: action"
 
-  ID (
-    ((('.' tag+=ID)*) ':'
+  id (
+    ((('.' ID)*) ':'
       (ACTION inputs=actionInputs? '==>' outputs=actionOutputs? guards=actionGuards? ('var' varDecls)? actionStatements? 'end'
-        -> ^(ACTION ^(TAG ID $tag*) ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
+        -> ^(ACTION ^(TAG id ID*) ^(INPUTS $inputs?) ^(OUTPUTS $outputs?)
+        ^(GUARDS $guards?) ^(VARIABLES varDecls?) ^(STATEMENTS actionStatements?))
 
     | INITIALIZE '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
-        -> ^(INITIALIZE ^(TAG ID $tag*) INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
+        -> ^(INITIALIZE ^(TAG id ID*) INPUTS ^(OUTPUTS $outputs?)
+        ^(GUARDS $guards?) ^(VARIABLES varDecls?) ^(STATEMENTS actionStatements?))
 	)
     )
 
@@ -159,18 +160,18 @@ actorDeclaration:
   // NOTE: a variable declared with no initial value is assignable (hence the last line)
   | ('(' attrs=typeAttrs ')')?
     varName=ID
-    (  '=' expression -> ^(STATE_VAR ^(TYPE ID ^(TYPE_ATTRS $attrs?)) $varName NON_ASSIGNABLE expression)
-     | ':=' expression -> ^(STATE_VAR ^(TYPE ID ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE expression)
-     | -> ^(STATE_VAR ^(TYPE ID ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE)) ';'
+    (  '=' expression -> ^(STATE_VAR ^(TYPE id ^(TYPE_ATTRS $attrs?)) $varName NON_ASSIGNABLE expression)
+     | ':=' expression -> ^(STATE_VAR ^(TYPE id ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE expression)
+     | -> ^(STATE_VAR ^(TYPE id ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE)) ';'
   )
 
 // anonymous action
 | ACTION actionInputs? '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
-  -> ^(ACTION TAG ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
+  -> ^(ACTION TAG ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARIABLES varDecls?) ^(STATEMENTS actionStatements?))
 
 // anonymous initialize
 | INITIALIZE '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
-  -> ^(INITIALIZE TAG INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARS varDecls?) ^(STATEMENTS actionStatements?))
+  -> ^(INITIALIZE TAG INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARIABLES varDecls?) ^(STATEMENTS actionStatements?))
 
 | priorityOrder -> priorityOrder
 
@@ -178,12 +179,12 @@ actorDeclaration:
     ('var' varDecls)? ':'
       expression
     'end'
-	-> FUNCTION
+	-> ^(FUNCTION ID ^(PARAMETERS varDeclNoExpr*) ^(VARIABLES varDecls?) expression)
 
 | PROCEDURE ID '(' (varDeclNoExpr (',' varDeclNoExpr)*)? ')'
     ('var' varDecls)?
     'begin' statement* 'end'
-	-> PROCEDURE;
+	-> ^(PROCEDURE ID ^(PARAMETERS varDeclNoExpr*) ^(VARIABLES varDecls?) ^(STATEMENTS statement*));
 
 actorDeclarations: actorDeclaration+ (schedule actorDeclaration*)? -> actorDeclaration+ schedule?
   | schedule actorDeclaration* -> actorDeclaration* schedule;
@@ -198,7 +199,7 @@ actorImport: 'import'
 /*****************************************************************************/
 /* actor parameters: type name (= expression)? */
 actorParameter:
-	typeDef ID ('=' expression)? -> ^(PARAMETER typeDef ID expression?);
+	typeDef ID ('=' expression)? -> ^(VARIABLE typeDef ID expression?);
 
 actorParameters: actorParameter (',' actorParameter)* -> actorParameter+;
 
@@ -256,7 +257,7 @@ expressions: expression (',' expression)* -> expression+;
 /*****************************************************************************/
 /* identifiers */
 
-idents: ID (',' ID)* { };
+idents: ID (',' ID)* -> ID+;
 
 /*****************************************************************************/
 /* priorities */
@@ -310,9 +311,12 @@ typeDef: ID ('(' attrs=typeAttrs ')')? -> ^(TYPE ID ^(TYPE_ATTRS $attrs?));
 /* variable declarations */
 
 /* simple variable declarations */
-varDecl: typeDef ID ('=' expression | ':=' expression)? { };
+varDecl: typeDef ID
+  ('=' expression -> ^(VARIABLE typeDef ID NON_ASSIGNABLE expression)
+  | ':=' expression -> ^(VARIABLE typeDef ID ASSIGNABLE expression)
+  | -> ^(VARIABLE typeDef ID ASSIGNABLE));
 
-varDeclNoExpr: typeDef ID -> ^(VAR typeDef ID);
+varDeclNoExpr: typeDef ID -> ^(VARIABLE typeDef ID ASSIGNABLE);
 
 varDecls: varDecl (',' varDecl)* -> varDecl+;
 

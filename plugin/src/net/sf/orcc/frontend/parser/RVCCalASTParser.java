@@ -230,7 +230,7 @@ public class RVCCalASTParser {
 		parseParameters(tree.getChild(2));
 
 		// parse actor declarations
-		stateVars = new Scope<Variable>(parameters);
+		stateVars = new Scope<Variable>(parameters, false);
 		currentScope = stateVars;
 		parseActorDecls(tree.getChild(5));
 
@@ -253,9 +253,6 @@ public class RVCCalASTParser {
 	 * @throws OrccException
 	 */
 	private void parseActorDecls(Tree actorDecls) throws OrccException {
-		// actor declarations are in a new scope
-		currentScope = new Scope<Variable>(currentScope);
-
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree child = actorDecls.getChild(i);
@@ -296,26 +293,26 @@ public class RVCCalASTParser {
 	}
 
 	/**
-	 * tree = PORT/PARAMETER, children = TYPE, ID
+	 * Parses the given tree as a local parameter/local variable.
 	 * 
 	 * @param tree
-	 * @param assignable
-	 * @param global
-	 * @param index
-	 * @param suffix
-	 * @return
+	 *            a tree whose root is VARIABLE.
+	 * @return a local variable
+	 * @throws OrccException
 	 */
-	private LocalVariable parseLocalVariable(Tree tree, boolean assignable,
-			int index, Integer suffix) throws OrccException {
+	private LocalVariable parseLocalVariable(Tree tree) throws OrccException {
 		IType type = parseType(tree.getChild(0));
 		Tree nameTree = tree.getChild(1);
+		Location location = parseLocation(nameTree);
 		String name = nameTree.getText();
+		boolean assignable = (tree.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
 
-		Location loc = parseLocation(nameTree);
+		if (tree.getChildCount() == 4) {
+		}
 
 		INode node = new EmptyNode(0, new Location());
 
-		return new LocalVariable(assignable, index, loc, name, node, suffix,
+		return new LocalVariable(assignable, 0, location, name, node, null,
 				type);
 	}
 
@@ -392,7 +389,32 @@ public class RVCCalASTParser {
 		}
 	}
 
-	private void parseProcedure(Tree tree) {
+	private void parseProcedure(Tree tree) throws OrccException {
+		Scope<Variable> parameters = new Scope<Variable>(currentScope, true);
+		currentScope = parameters;
+		Tree nameTree = tree.getChild(0);
+		String name = nameTree.getText();
+		name.toString();
+
+		Tree child = tree.getChild(1);
+		int numChildren = child.getChildCount();
+		for (int i = 0; i < numChildren; i++) {
+			LocalVariable parameter = parseLocalVariable(child.getChild(i));
+			parameters.add(file, parameter.getLocation(), parameter.getName(),
+					parameter);
+		}
+
+		Scope<Variable> variables = new Scope<Variable>(currentScope, false);
+		currentScope = variables;
+		child = tree.getChild(2);
+		numChildren = child.getChildCount();
+		for (int i = 0; i < numChildren; i++) {
+			LocalVariable parameter = parseLocalVariable(child.getChild(i));
+			parameters.add(file, parameter.getLocation(), parameter.getName(),
+					parameter);
+		}
+		
+		currentScope = currentScope.getParent().getParent();
 	}
 
 	/**
@@ -462,7 +484,7 @@ public class RVCCalASTParser {
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
 			if (attr.getType() == RVCCalLexer.EXPR
-					&& attr.getChild(0).getText().equals("size")) {
+					&& attr.getChild(0).getText().equals(AST.SIZE)) {
 				return exprParser.parseExpression(attr.getChild(1));
 			}
 		}
@@ -483,7 +505,7 @@ public class RVCCalASTParser {
 		for (int i = 0; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
 			if (attr.getType() == RVCCalLexer.TYPE
-					&& attr.getChild(0).getText().equals("type")) {
+					&& attr.getChild(0).getText().equals(AST.TYPE)) {
 				return parseType(attr.getChild(1));
 			}
 		}

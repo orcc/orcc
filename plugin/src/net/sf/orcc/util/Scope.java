@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.util;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Location;
+
 /**
  * A scope is an ordered map of <string, object> extended with the notion of
  * hierarchy.
@@ -37,13 +40,22 @@ package net.sf.orcc.util;
  */
 public class Scope<T extends INameable> extends OrderedMap<T> {
 
+	/**
+	 * if <code>true</code>, a variable is allowed to override a variable with
+	 * the same name
+	 */
+	private boolean allowOverride;
+
+	/**
+	 * parent scope
+	 */
 	private Scope<T> parent;
 
 	/**
 	 * Creates a top-level scope.
 	 */
 	public Scope() {
-		this(null);
+		this(null, true);
 	}
 
 	/**
@@ -51,9 +63,60 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 * 
 	 * @param parent
 	 *            the parent scope
+	 * @param allowOverride
+	 *            if <code>true</code>, a variable is allowed to override a
+	 *            variable with the same name
 	 */
-	public Scope(Scope<T> parent) {
+	public Scope(Scope<T> parent, boolean allowOverride) {
 		this.parent = parent;
+		this.allowOverride = allowOverride;
+	}
+
+	/**
+	 * Adds an object to this ordered map with the given name. The file and
+	 * location information are only used for error reporting if the object is
+	 * already present in the map and {@link #isOverrideAllowed()} is
+	 * <code>true</code>.
+	 * 
+	 * @param file
+	 *            the file where the object located
+	 * @param location
+	 *            the location of the object
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 * @throws OrccException
+	 *             if the object is already defined
+	 */
+	@Override
+	public void add(String file, Location location, String name, T object)
+			throws OrccException {
+		if (allowOverride) {
+			// a variable is allowed to override a variable defined in a
+			// different scope
+			super.add(file, location, name, object);
+		} else {
+			// check if there already is a variable with the same name in this
+			// scope or parent scopes
+			T existingObject = super.get(name);
+			if (existingObject == null) {
+				// no existing variable in this scope, check parent's
+				if (parent != null) {
+					existingObject = parent.get(name);
+					if (existingObject != null) {
+						throw new OrccException(file, location, "\"" + name
+								+ "\" already defined in parent scope");
+					}
+				}
+			} else {
+				throw new OrccException(file, location, "\"" + name
+						+ "\" already defined in this scope");
+			}
+
+			// no existing object in this scope, nor in parent's => we're cool
+			add(name, object);
+		}
 	}
 
 	/**
@@ -88,6 +151,17 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 */
 	public Scope<T> getParent() {
 		return parent;
+	}
+
+	/**
+	 * Returns <code>true</code> if a variable is allowed to override a variable
+	 * with the same name.
+	 * 
+	 * @return <code>true</code> if a variable is allowed to override a variable
+	 *         with the same name
+	 */
+	public boolean isOverrideAllowed() {
+		return allowOverride;
 	}
 
 	@Override

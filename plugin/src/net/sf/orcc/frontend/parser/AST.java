@@ -28,50 +28,16 @@
  */
 package net.sf.orcc.frontend.parser;
 
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.actor.Tag;
-
-import org.antlr.runtime.tree.Tree;
-
 /**
- * This class defines methods to parse rules that are common to several parsers.
+ * This interface defines constants that are the names of the AST nodes.
  * 
  * @author Matthieu Wipliez
- * 
+ *
  */
-public final class Util {
-
-	/**
-	 * Returns a tag from a tree whose children are identifiers.
-	 * 
-	 * @param tree
-	 *            a tree
-	 * @return a tag
-	 */
-	public static Tag parseActionTag(Tree tree) {
-		int n = tree.getChildCount();
-		Tag tag = new Tag(n);
-		for (int i = 0; i < n; i++) {
-			Tree child = tree.getChild(i);
-			tag.add(child.getText());
-		}
-
-		return tag;
-	}
-
-	/**
-	 * Returns a location from a tree that contains a real token.
-	 * 
-	 * @param tree
-	 *            a tree
-	 * @return a location
-	 */
-	public static Location parseLocation(Tree tree) {
-		int lineNumber = tree.getLine();
-		int startColumn = tree.getCharPositionInLine();
-		int endColumn = startColumn + tree.getText().length();
-
-		return new Location(lineNumber, startColumn, endColumn);
-	}
+public interface AST {
+	
+	public static final String SIZE = "size";
+	
+	public static final String TYPE = "type";
 
 }

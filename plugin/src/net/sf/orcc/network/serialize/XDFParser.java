@@ -903,7 +903,7 @@ public class XDFParser {
 		instances = new HashMap<String, Instance>();
 		outputs = new OrderedMap<Port>();
 		parameters = new Scope<GlobalVariable>();
-		variables = new Scope<GlobalVariable>(parameters);
+		variables = new Scope<GlobalVariable>(parameters, false);
 
 		parseBody(root);
 
