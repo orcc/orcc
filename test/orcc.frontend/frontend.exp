@@ -1,11 +1,3 @@
 load_lib orcc.exp
 
-puts "front-end test\n"
-
-pass "expected success"
-xfail "expected failure"
-
-# fail "unexpected failure"
-# xpass "unexpected success"
-
-frontend "orcc.frontend/toto.xdf" "out"
+frontendTest [lsort [glob $srcdir/$subdir/*.cal]]

@@ -1,9 +1,97 @@
 puts "initializing orcc.exp"
 
+# front-end command-line
 set cmd_frontend "java -cp \"../plugin/lib/antlr-runtime-3.1.3.jar;../plugin/lib/jgrapht-jdk1.6.jar;../plugin/bin\" net.sf.orcc.frontend.Frontend "
 
-proc frontend {network outputDir} {
-  global cmd_frontend
+# initialize output path
+set path "output"
+if { ![file exists path] } {
+  file mkdir $path
+}
+
+# createNetwork
+#
+#	Creates an XDF that has the given name, and contains an instance whose class is given.
+#
+# Arguments:
+#   outputFile	output file.
+#   name		name of the network.
+#	clasz		class of the unique instance.
+
+proc createNetwork {outputFile name clasz} {
+  global emptyNetwork
+
+  set chan [open $outputFile w]
+  puts $chan "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<XDF name=\"$name\">
+    <Instance id=\"inst\">
+        <Class name=\"$clasz\"/>
+    </Instance>
+</XDF>"
+  close $chan
+}
+
+# frontend
+#
+#	Calls the front-end on the given actor.
+#
+# Arguments:
+#   actor a source file that contains an actor
+
+proc frontendOneActor {actor} {
+  global cmd_frontend path
+  
+  regsub {(.*)\.cal} $actor {\1} clasz
+  regsub {.*/(.*)} $clasz {\1} network
+  createNetwork "$path/$network.xdf" "output-$network" "../$clasz"
+  
+  set network "$path/$network.xdf"
+  set outputDir $path
+  
+  # read the actor    
+  set chan [open $actor r]
+  set data [split [read $chan] \n]
+  close $chan
+
+  # get expected test result
+  set firstLine [lrange $data 0 0]
+  if {[regexp PASS $firstLine]} {
+    set expected PASS
+  } elseif {[regexp XFAIL $firstLine]} {
+    set expected XFAIL
+  } else {
+    warning "Test case must begin with // PASS or // XFAIL: $clasz"
+  }
+
+  # execute the front-end
   set retval [ catch { eval exec -keepnewline -- $cmd_frontend $network $outputDir } errmsg ]
-  puts "network=$network outputDir=$outputDir retval=$retval errmsg=$errmsg"
+
+  if {$retval == 0} {
+    if {$expected == "PASS"} {
+      pass "$actor"
+    } else {
+      xpass "$actor"
+    }
+  } else {
+    if {$expected == "XFAIL"} {
+      xfail "$actor"
+    } else {
+      fail "$actor: $errmsg"
+    }
+  }
+}
+
+# frontendTest
+#
+#	Calls the front-end on each actor in the given actors list
+#
+# Arguments:
+#	actors		a list of actors.
+
+proc frontendTest {actors} {
+  # test each actor of the actors list
+  foreach actor $actors {
+    # call front-end
+    frontendOneActor $actor
+  }
 }

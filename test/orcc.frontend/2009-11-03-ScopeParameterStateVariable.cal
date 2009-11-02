@@ -1,0 +1,7 @@
+// XFAIL
+
+actor ScopeParameterStateVariable (int PARAM) ==> :
+
+  int PARAM := 5;
+
+end
