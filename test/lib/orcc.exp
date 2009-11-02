@@ -50,17 +50,18 @@ proc frontendOneActor {actor} {
   
   # read the actor    
   set chan [open $actor r]
-  set data [split [read $chan] \n]
+  set data [read $chan]
   close $chan
 
   # get expected test result
-  set firstLine [lrange $data 0 0]
-  if {[regexp PASS $firstLine]} {
+  set reason []
+  if {[regexp {PASS: ([^\n]*)} $data dummy reason]} {
     set expected PASS
-  } elseif {[regexp XFAIL $firstLine]} {
+  } elseif {[regexp {XFAIL: ([^\n]*)} $data dummy reason]} {
     set expected XFAIL
   } else {
     warning "Test case must begin with // PASS or // XFAIL: $clasz"
+    return
   }
 
   # execute the front-end
@@ -68,15 +69,15 @@ proc frontendOneActor {actor} {
 
   if {$retval == 0} {
     if {$expected == "PASS"} {
-      pass "$actor"
+      pass "$actor: $reason"
     } else {
-      xpass "$actor"
+      xpass "ERROR: $actor was expected to fail because: $reason"
     }
   } else {
     if {$expected == "XFAIL"} {
-      xfail "$actor"
+      xfail "$actor: $reason"
     } else {
-      fail "$actor: $errmsg"
+      fail "ERROR: $actor was expected to succeed because: $reason"
     }
   }
 }
