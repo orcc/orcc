@@ -1,0 +1,13 @@
+// XFAIL: any two procedures may not have the same name
+
+actor Actor () ==> :
+
+  procedure X()
+  begin
+  end
+
+  procedure X()
+  begin
+  end
+
+end

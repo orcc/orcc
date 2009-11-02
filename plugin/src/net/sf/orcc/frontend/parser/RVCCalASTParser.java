@@ -394,7 +394,7 @@ public class RVCCalASTParser {
 		currentScope = parameters;
 		Tree nameTree = tree.getChild(0);
 		String name = nameTree.getText();
-		name.toString();
+		Location location = parseLocation(nameTree);
 
 		Tree child = tree.getChild(1);
 		int numChildren = child.getChildCount();
@@ -413,7 +413,11 @@ public class RVCCalASTParser {
 			parameters.add(file, parameter.getLocation(), parameter.getName(),
 					parameter);
 		}
-		
+
+		Procedure procedure = new Procedure(name, false, location,
+				new VoidType(), parameters, variables, null);
+
+		procedures.add(file, location, name, procedure);
 		currentScope = currentScope.getParent().getParent();
 	}
 
