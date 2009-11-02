@@ -7,6 +7,9 @@ The tests are written with DejaGnu, so you must install it for the tests to
 run. DejaGnu is available for every major platform, including Windows
 (in Cygwin).
 
+Note: if DejaGnu complains that there are no global config file, just create an
+empty "site.exp" file in /usr/share/dejagnu
+
 -------------------------------------------------------------------------------
 Testing
 
