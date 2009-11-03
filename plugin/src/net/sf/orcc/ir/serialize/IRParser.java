@@ -691,7 +691,7 @@ public class IRParser {
 		List<INode> nodes = parseNodes(array.getJSONArray(5));
 
 		// go back to previous scope
-		variables = variables.getParent();
+		variables = variables.getParent().getParent();
 
 		Procedure proc = new Procedure(name, external, location, returnType,
 				parameters, locals, nodes);
