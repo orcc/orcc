@@ -12,17 +12,18 @@ actor Actor (bool PARAM) (int(3) input1, int input2 ==> int(5) output1) {
     float k;
 
     return
-      if (x > 3) g + h * i else if (x < 0) g - h / i else 0;
+      if (x > 3) { g + h * i } else { if (x < 0) { g - h / i } else { 0 } };
   }
   
   void proc(float m) {
-    uint(2) h;
-    return h + m;
+    unsigned int(2) h;
+    h = h + m;
   }
     
   action a.a ( ==> ) {
     int(22) dummy[3][2] = {{1, 2}, {2, 3}, {3, 4}};
-    int(29 + 3) dummy2[5] = {for (int i = 0; i < 5; i++) dummy[i / 2][i % 2]};
+    int(29 + 3) dummy2[5] = for (int i : 0 .. 5) { dummy[i / 2][i % 2] };
+	unsigned short aaz;
 
     if (a == 5) {
       f();
