@@ -287,6 +287,8 @@ int display_scheduler() {
 			height = ptr[0] * 16;
 
 			display_set_video(width, height);
+			setReadEnd(display_WIDTH);
+			setReadEnd(display_HEIGHT);
 		}
 
 		if (hasTokens(display_B, 384)) {
@@ -294,6 +296,7 @@ int display_scheduler() {
 				display_init();
 			}
 			display_write_mb(getReadPtr(display_B, 384));
+			setReadEnd(display_B);
 			res = 1;
 		} else {
 			res = 0;

@@ -12,7 +12,10 @@ int $bcast.id$_scheduler() {
 }$
 		$bcast.num: { n | *tok_output_$n$ = *tok_input;
 }$	}
-  
+	
+	setReadEnd($bcast.id$_input);
+	$bcast.num: { n | setWriteEnd($bcast.id$_output_$n$);
+}$
 	return 0;
 }
 

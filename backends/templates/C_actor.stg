@@ -112,7 +112,7 @@ $var$ = getReadPtr($actorName$_$fifoName$, $numTokens$);
 
 // readEnd node
 readEndNode(actorName, fifoName) ::= <<
-readEnd($actorName$_$fifoName$);
+setReadEnd($actorName$_$fifoName$);
 
 >>
 
@@ -149,7 +149,7 @@ $var$ = getWritePtr($actorName$_$fifoName$, $numTokens$);
 
 // writeEnd node
 writeEndNode(actorName, fifoName) ::= <<
-writeEnd($actorName$_$fifoName$);
+setWriteEnd($actorName$_$fifoName$);
 
 >>
 

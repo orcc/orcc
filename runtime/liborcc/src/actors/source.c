@@ -87,6 +87,7 @@ int source_scheduler() {
 			n = fread(ptr, 1, 1, F);
 		}
 		cnt++;
+		setWriteEnd(source_O);
 	}
 
 	return 0;

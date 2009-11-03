@@ -221,7 +221,7 @@ public class CNetworkPrinter {
 						.getAttribute(Connection.BUFFER_SIZE);
 				if (attr != null && attr.getType() == IAttribute.VALUE) {
 					IExpr expr = ((IValueAttribute) attr).getValue();
-					size = Integer.toString(Util.evaluateAsInteger(expr));
+					size = Integer.toString(Util.evaluateAsInteger(expr)+1);
 				} else {
 					size = "SIZE";
 				}

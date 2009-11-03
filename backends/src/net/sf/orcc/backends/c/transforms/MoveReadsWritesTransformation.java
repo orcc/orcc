@@ -47,8 +47,8 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 
-	private List<INode> writes;
 	private List<INode> readEnds;
+	private List<INode> writes;
 
 	public MoveReadsWritesTransformation() {
 		writes = new ArrayList<INode>();
@@ -56,16 +56,16 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(ReadNode node, Object... args) {
+		readEnds.add(new ReadEndNode(node));
+	}
+	
+	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(WriteNode node, Object... args) {
 		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		writes.add(node);
 		it.set(new WriteEndNode(node));
-	}
-	
-	@Override
-	public void visit(ReadNode node, Object... args) {
-		readEnds.add(new ReadEndNode(node));
 	}
 
 	@Override
