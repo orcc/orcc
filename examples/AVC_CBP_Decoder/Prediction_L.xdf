@@ -372,7 +372,6 @@
     <Connection dst="Inter" dst-port="Write_done" src="Buffer_inter" src-port="Write_Done"/>
     <Connection dst="" dst-port="Display_L" src="Buffer_inter" src-port="Display"/>
     <Connection dst="Deblocking Filter" dst-port="Z" src="Select" src-port="X"/>
-    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking Filter" src-port="WD"/>
     <Connection dst="Deblocking Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Deblocking Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Deblocking Filter" dst-port="QP" src="" src-port="QP"/>
@@ -383,4 +382,6 @@
     <Connection dst="Deblocking Filter" dst-port="MV" src="" src-port="mv_in"/>
     <Connection dst="Deblocking Filter" dst-port="RefIdx" src="" src-port="ref_idx_in"/>
     <Connection dst="Deblocking Filter" dst-port="MbIntraFlag" src="" src-port="MB_intra_flag"/>
+    <Connection dst="Deblocking Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
+    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking Filter" src-port="WD"/>
 </XDF>

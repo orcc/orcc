@@ -4,7 +4,7 @@
       <vertex id="CurrMbAddr" x="57" y="635"/>
       <vertex id="PicWidthInMb" x="57" y="542"/>
       <vertex id="PredMode" x="419" y="1391"/>
-      <vertex id="FirstMbInSlice" x="419" y="1484"/>
+      <vertex id="FirstMbInSlice" x="411" y="924"/>
       <vertex id="PicSizeInMb" x="57" y="242"/>
       <vertex id="MbPartHeigth" x="57" y="728"/>
       <vertex id="MbPartWidth" x="57" y="821"/>
@@ -24,12 +24,12 @@
       <vertex id="QP" x="419" y="599"/>
       <vertex id="ref_idx_in" x="419" y="692"/>
       <vertex id="mv_in" x="419" y="785"/>
+      <vertex id="Mb_intra_flag" x="200" y="541"/>
       <vertex id="Display_C" x="1005" y="905"/>
-      <vertex id="Intra8x8" x="603" y="1152"/>
+      <vertex id="Intra8x8" x="602" y="1159"/>
       <vertex id="Inter" x="202" y="962"/>
       <vertex id="Buffer_inter" x="805" y="815"/>
       <vertex id="Select_chroma" x="419" y="1181"/>
-      <vertex id="Deblocking Filter" x="603" y="500"/>
-      <vertex id="Mb_intra_flag" x="200" y="541"/>
+      <vertex id="Deblocking Filter" x="586" y="505"/>
    </vertices>
 </layout>

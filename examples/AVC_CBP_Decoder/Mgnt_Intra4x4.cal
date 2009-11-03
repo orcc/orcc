@@ -115,7 +115,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 		picwidth := c;
 		
 		//Initialize counter
-		mb_counter := -1;
+		mb_counter := 0;
 		 		 
 		//Set 16x16 the available edge
 		left_16x16_avail := if (mbcurr = first_mb_in_slice) or ((mbcurr mod picwidth) = 0) then 0 else 1 end;
@@ -162,6 +162,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 			bottom_4x4_edge[s+ (mb_counter mod 4)*4]:= v[s+3*4];
 		end
 		right_4x4_edge :=  [v[s*4-1]:for int s in Integers(1,4)];
+		mb_counter := mb_counter +1;  
 	end
   
 	//******************************* Processing ********************************************
@@ -169,9 +170,8 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	//**** Select and send available edge ****
 	AvailEdge:action ==> Avail:[ avail ] repeat 3
 	guard
-		mb_counter< MB_WIDTH - 1
+		mb_counter< MB_WIDTH
 	do
-		mb_counter := mb_counter +1;  
 		 	
 		//4x4 edge available for left
 		avail[0] := if (mb_counter mod 4) = 0 then left_16x16_avail else 1 end;
@@ -292,7 +292,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	//End of every process, wait for the next mb_type
 	EndEdge:action ==>
 	guard
-		mb_counter = MB_WIDTH - 1,
+		mb_counter = MB_WIDTH,
 		avail[0] = 0,
 		avail[1] = 0,
 		avail[2] = 0,

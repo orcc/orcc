@@ -31,6 +31,6 @@
       <vertex id="Select" x="850" y="417"/>
       <vertex id="Intra_16x16" x="580" y="47"/>
       <vertex id="Intra_4x4" x="521" y="424"/>
-      <vertex id="Deblocking Filter" x="998" y="622"/>
+      <vertex id="Deblocking Filter" x="979" y="598"/>
    </vertices>
 </layout>

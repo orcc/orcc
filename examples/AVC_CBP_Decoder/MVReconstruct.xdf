@@ -59,6 +59,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="FirstMbInSlice">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -189,4 +196,5 @@
     <Connection dst="Mgnt_MVR" dst-port="MbIntraFlag" src="" src-port="MbIntraFlag"/>
     <Connection dst="" dst-port="mv_out" src="Mgnt_MVR" src-port="mv_out"/>
     <Connection dst="" dst-port="ref_idx" src="Mgnt_MVR" src-port="refidx_out"/>
+    <Connection dst="Mgnt_MVR" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
 </XDF>

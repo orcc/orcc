@@ -43,6 +43,7 @@ actor Mgnt_DBF (int LUMA_CHROMA, int QUANT_SZ, int MV_SZ, int Idx_SZ)
 	int(size=9) Z,
 	uint(size=7) PicWidthInMb,
 	uint(size=13) PicSizeInMb,
+	uint(size=13) FirstMbInSlice,
 	uint(size=1) MbIntraFlag,
 	uint(size=16) Cbp_blk,
 	int(size=6) Alpha_offset,
@@ -236,8 +237,8 @@ read_pic_parameters: action  ==>
     mb_x:=0;
     mb_y:=0;
   end
-  
-ReadMB.Inter: action PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g] repeat 32,LFDisable:[j]==> 
+
+ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g] repeat 32,LFDisable:[j]==> 
   guard a=0
   var   
   	uint cbp1,
@@ -261,7 +262,7 @@ ReadMB.Inter: action PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a]
     valLFDisable := j;        
   end
 
-ReadMB.Intra: action PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
+ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
   guard a!=0 
   do         
     MB_Width := width;          
@@ -284,12 +285,12 @@ StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>
       foreach int x in Integers(0,MB_BLOCK_SIZE-1) do 
         curr_mb[y,x]:=v[y*MB_BLOCK_SIZE+x]; 
       end   
-    end	
+    end
     if (interlace != FRAME) then  mvlimit := 2;  else  mvlimit := 4;  end   
     if (mb_y != 0) then
 	  foreach int y in Integers(0,MB_BLOCK_SIZE-1) do
 	    foreach int x in Integers(0,MB_BLOCK_SIZE-1) do  
-	  	  up_mb[y,x]:= upFifo_mb[mb_x][y][x];  
+	  	  up_mb[y,x]:= upFifo_mb[mb_x][y][x];
 	  	end
       end        
       up_mb_type := upFifo_mb_type[mb_x];

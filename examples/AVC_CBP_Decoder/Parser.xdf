@@ -521,4 +521,6 @@
     <Connection dst="" dst-port="MB_intra_flag" src="Algo_Synp_AVC" src-port="MbIntraFlag"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="FirstMBInSlice"
         src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
+    <Connection dst="MVReconstruct" dst-port="FirstMbInSlice"
+        src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
 </XDF>

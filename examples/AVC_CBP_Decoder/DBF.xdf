@@ -80,6 +80,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="FirstMbInSlice">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -158,5 +165,6 @@
     <Connection dst="Mgnt_DBF" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="Mgnt_DBF" dst-port="RefIdx" src="" src-port="RefIdx"/>
     <Connection dst="Mgnt_DBF" dst-port="LFDisable" src="" src-port="LFDisable"/>
+    <Connection dst="Mgnt_DBF" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="" dst-port="WD" src="Mgnt_DBF" src-port="WD"/>
 </XDF>
