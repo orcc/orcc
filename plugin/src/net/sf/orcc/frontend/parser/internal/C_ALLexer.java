@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 C_AL__.g 2009-11-03 18:21:35
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 C_AL__.g 2009-11-03 18:52:19
 
 package net.sf.orcc.frontend.parser.internal;
 
@@ -63,9 +63,7 @@ public class C_ALLexer extends Lexer {
     public static final int T__86=86;
     public static final int T__89=89;
     public static final int T__88=88;
-    public static final int T__126=126;
     public static final int SHIFT_LEFT=46;
-    public static final int T__125=125;
     public static final int SHIFT_RIGHT=47;
     public static final int BITOR=37;
     public static final int PRIORITY=59;
@@ -125,7 +123,7 @@ public class C_ALLexer extends Lexer {
     public static final int T__100=100;
     public static final int MINUS=65;
     public static final int EXPR_IF=22;
-    public static final int Tokens=127;
+    public static final int Tokens=125;
     public static final int PROCEDURE=60;
     public static final int MULTI_LINE_COMMENT=77;
     public static final int QID=34;
@@ -851,10 +849,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__113;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:41:8: ( 'if' )
-            // C_AL__.g:41:10: 'if'
+            // C_AL__.g:41:8: ( 'true' )
+            // C_AL__.g:41:10: 'true'
             {
-            match("if"); 
+            match("true"); 
 
 
             }
@@ -872,10 +870,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__114;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:42:8: ( 'else' )
-            // C_AL__.g:42:10: 'else'
+            // C_AL__.g:42:8: ( 'false' )
+            // C_AL__.g:42:10: 'false'
             {
-            match("else"); 
+            match("false"); 
 
 
             }
@@ -893,10 +891,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__115;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:43:8: ( 'true' )
-            // C_AL__.g:43:10: 'true'
+            // C_AL__.g:43:8: ( 'for' )
+            // C_AL__.g:43:10: 'for'
             {
-            match("true"); 
+            match("for"); 
 
 
             }
@@ -914,10 +912,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__116;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:44:8: ( 'false' )
-            // C_AL__.g:44:10: 'false'
+            // C_AL__.g:44:8: ( 'in' )
+            // C_AL__.g:44:10: 'in'
             {
-            match("false"); 
+            match("in"); 
 
 
             }
@@ -935,10 +933,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__117;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:45:8: ( 'for' )
-            // C_AL__.g:45:10: 'for'
+            // C_AL__.g:45:8: ( 'end' )
+            // C_AL__.g:45:10: 'end'
             {
-            match("for"); 
+            match("end"); 
 
 
             }
@@ -956,11 +954,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__118;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:46:8: ( 'in' )
-            // C_AL__.g:46:10: 'in'
+            // C_AL__.g:46:8: ( '.' )
+            // C_AL__.g:46:10: '.'
             {
-            match("in"); 
-
+            match('.'); 
 
             }
 
@@ -977,10 +974,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__119;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:47:8: ( 'end' )
-            // C_AL__.g:47:10: 'end'
+            // C_AL__.g:47:8: ( 'fsm' )
+            // C_AL__.g:47:10: 'fsm'
             {
-            match("end"); 
+            match("fsm"); 
 
 
             }
@@ -998,10 +995,11 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__120;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:48:8: ( '.' )
-            // C_AL__.g:48:10: '.'
+            // C_AL__.g:48:8: ( '-->' )
+            // C_AL__.g:48:10: '-->'
             {
-            match('.'); 
+            match("-->"); 
+
 
             }
 
@@ -1018,10 +1016,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__121;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:49:8: ( 'fsm' )
-            // C_AL__.g:49:10: 'fsm'
+            // C_AL__.g:49:8: ( 'int' )
+            // C_AL__.g:49:10: 'int'
             {
-            match("fsm"); 
+            match("int"); 
 
 
             }
@@ -1039,10 +1037,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__122;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:50:8: ( '-->' )
-            // C_AL__.g:50:10: '-->'
+            // C_AL__.g:50:8: ( 'uint' )
+            // C_AL__.g:50:10: 'uint'
             {
-            match("-->"); 
+            match("uint"); 
 
 
             }
@@ -1060,10 +1058,10 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__123;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:51:8: ( 'int' )
-            // C_AL__.g:51:10: 'int'
+            // C_AL__.g:51:8: ( 'bool' )
+            // C_AL__.g:51:10: 'bool'
             {
-            match("int"); 
+            match("bool"); 
 
 
             }
@@ -1081,50 +1079,8 @@ public class C_ALLexer extends Lexer {
         try {
             int _type = T__124;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:52:8: ( 'uint' )
-            // C_AL__.g:52:10: 'uint'
-            {
-            match("uint"); 
-
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__124"
-
-    // $ANTLR start "T__125"
-    public final void mT__125() throws RecognitionException {
-        try {
-            int _type = T__125;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:53:8: ( 'bool' )
-            // C_AL__.g:53:10: 'bool'
-            {
-            match("bool"); 
-
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__125"
-
-    // $ANTLR start "T__126"
-    public final void mT__126() throws RecognitionException {
-        try {
-            int _type = T__126;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // C_AL__.g:54:8: ( 'float' )
-            // C_AL__.g:54:10: 'float'
+            // C_AL__.g:52:8: ( 'float' )
+            // C_AL__.g:52:10: 'float'
             {
             match("float"); 
 
@@ -1137,11 +1093,11 @@ public class C_ALLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end "T__126"
+    // $ANTLR end "T__124"
 
     public void mTokens() throws RecognitionException {
-        // C_AL__.g:1:8: ( T__79 | T__80 | T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | T__96 | T__97 | T__98 | T__99 | T__100 | T__101 | T__102 | T__103 | T__104 | T__105 | T__106 | T__107 | T__108 | T__109 | T__110 | T__111 | T__112 | T__113 | T__114 | T__115 | T__116 | T__117 | T__118 | T__119 | T__120 | T__121 | T__122 | T__123 | T__124 | T__125 | T__126 | ALBaseLexer. Tokens )
-        int alt1=49;
+        // C_AL__.g:1:8: ( T__79 | T__80 | T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | T__96 | T__97 | T__98 | T__99 | T__100 | T__101 | T__102 | T__103 | T__104 | T__105 | T__106 | T__107 | T__108 | T__109 | T__110 | T__111 | T__112 | T__113 | T__114 | T__115 | T__116 | T__117 | T__118 | T__119 | T__120 | T__121 | T__122 | T__123 | T__124 | ALBaseLexer. Tokens )
+        int alt1=47;
         alt1 = dfa1.predict(input);
         switch (alt1) {
             case 1 :
@@ -1467,21 +1423,7 @@ public class C_ALLexer extends Lexer {
                 }
                 break;
             case 47 :
-                // C_AL__.g:1:311: T__125
-                {
-                mT__125(); 
-
-                }
-                break;
-            case 48 :
-                // C_AL__.g:1:318: T__126
-                {
-                mT__126(); 
-
-                }
-                break;
-            case 49 :
-                // C_AL__.g:1:325: ALBaseLexer. Tokens
+                // C_AL__.g:1:311: ALBaseLexer. Tokens
                 {
                 gALBaseLexer.mTokens(); 
 
@@ -1495,50 +1437,46 @@ public class C_ALLexer extends Lexer {
 
     protected DFA1 dfa1 = new DFA1(this);
     static final String DFA1_eotS =
-        "\7\uffff\1\43\2\uffff\1\41\1\uffff\4\41\1\54\1\56\1\uffff\1\60"+
-        "\1\63\1\66\1\uffff\1\41\2\uffff\3\41\1\77\3\41\1\uffff\1\104\1\uffff"+
-        "\4\41\1\111\1\113\1\41\15\uffff\7\41\2\uffff\2\41\2\uffff\4\41\1"+
-        "\uffff\1\132\1\uffff\1\133\1\41\1\135\2\41\1\140\1\141\5\41\1\147"+
-        "\1\41\2\uffff\1\151\1\uffff\1\152\1\41\2\uffff\1\41\1\155\1\156"+
-        "\1\157\1\41\1\uffff\1\41\2\uffff\1\162\1\163\3\uffff\1\164\1\165"+
-        "\4\uffff";
+        "\7\uffff\1\43\2\uffff\1\41\1\uffff\4\41\1\53\1\55\1\uffff\1\57"+
+        "\1\62\1\65\1\uffff\1\41\2\uffff\3\41\1\75\3\41\1\uffff\1\102\1\uffff"+
+        "\4\41\1\110\1\41\15\uffff\6\41\2\uffff\2\41\2\uffff\4\41\1\126\1"+
+        "\uffff\1\127\2\41\1\132\1\133\1\41\1\135\4\41\1\142\1\41\2\uffff"+
+        "\1\144\1\41\2\uffff\1\41\1\uffff\1\147\1\150\1\151\1\41\1\uffff"+
+        "\1\41\1\uffff\1\154\1\155\3\uffff\1\156\1\157\4\uffff";
     static final String DFA1_eofS =
-        "\166\uffff";
+        "\160\uffff";
     static final String DFA1_minS =
-        "\1\11\6\uffff\1\75\2\uffff\1\157\1\uffff\1\145\1\157\1\146\1\154"+
-        "\1\174\1\46\1\uffff\1\75\1\74\1\75\1\uffff\1\52\2\uffff\1\154\1"+
-        "\162\1\141\1\60\1\55\1\151\1\157\1\uffff\1\76\1\uffff\1\156\1\164"+
-        "\1\151\1\160\2\44\1\154\15\uffff\1\163\1\144\1\165\1\154\1\162\1"+
-        "\155\1\157\2\uffff\1\156\1\157\2\uffff\1\163\1\165\1\144\1\157\1"+
-        "\uffff\1\44\1\uffff\1\44\1\145\1\44\1\145\1\163\2\44\1\141\1\164"+
-        "\1\154\1\164\1\162\1\44\1\162\2\uffff\1\44\1\uffff\1\44\1\145\2"+
-        "\uffff\1\164\3\44\1\156\1\uffff\1\164\2\uffff\2\44\3\uffff\2\44"+
-        "\4\uffff";
+        "\1\11\6\uffff\1\75\2\uffff\1\157\1\uffff\1\145\1\157\1\155\1\154"+
+        "\1\174\1\46\1\uffff\1\75\1\74\1\75\1\uffff\1\52\2\uffff\1\162\1"+
+        "\141\1\156\1\60\1\55\1\151\1\157\1\uffff\1\76\1\uffff\1\156\1\164"+
+        "\1\151\1\160\1\44\1\154\15\uffff\1\165\1\154\1\162\1\155\1\157\1"+
+        "\144\2\uffff\1\156\1\157\2\uffff\1\163\1\165\1\144\1\157\1\44\1"+
+        "\uffff\1\44\1\145\1\163\2\44\1\141\1\44\1\164\1\154\1\164\1\162"+
+        "\1\44\1\162\2\uffff\1\44\1\145\2\uffff\1\164\1\uffff\3\44\1\156"+
+        "\1\uffff\1\164\1\uffff\2\44\3\uffff\2\44\4\uffff";
     static final String DFA1_maxS =
         "\1\176\6\uffff\1\75\2\uffff\1\157\1\uffff\1\145\1\157\1\156\1\154"+
-        "\1\174\1\46\1\uffff\2\75\1\76\1\uffff\1\52\2\uffff\1\156\1\162\1"+
-        "\163\1\71\1\55\1\151\1\157\1\uffff\1\76\1\uffff\1\156\1\164\1\151"+
-        "\1\160\2\172\1\154\15\uffff\1\163\1\144\1\165\1\154\1\162\1\155"+
-        "\1\157\2\uffff\1\156\1\157\2\uffff\1\163\1\165\1\144\1\157\1\uffff"+
-        "\1\172\1\uffff\1\172\1\145\1\172\1\145\1\163\2\172\1\141\1\164\1"+
-        "\154\1\164\1\162\1\172\1\162\2\uffff\1\172\1\uffff\1\172\1\145\2"+
-        "\uffff\1\164\3\172\1\156\1\uffff\1\164\2\uffff\2\172\3\uffff\2\172"+
-        "\4\uffff";
+        "\1\174\1\46\1\uffff\2\75\1\76\1\uffff\1\52\2\uffff\1\162\1\163\1"+
+        "\156\1\71\1\55\1\151\1\157\1\uffff\1\76\1\uffff\1\156\1\164\1\151"+
+        "\1\160\1\172\1\154\15\uffff\1\165\1\154\1\162\1\155\1\157\1\144"+
+        "\2\uffff\1\156\1\157\2\uffff\1\163\1\165\1\144\1\157\1\172\1\uffff"+
+        "\1\172\1\145\1\163\2\172\1\141\1\172\1\164\1\154\1\164\1\162\1\172"+
+        "\1\162\2\uffff\1\172\1\145\2\uffff\1\164\1\uffff\3\172\1\156\1\uffff"+
+        "\1\164\1\uffff\2\172\3\uffff\2\172\4\uffff";
     static final String DFA1_acceptS =
         "\1\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\uffff\1\10\1\11\1\uffff\1\14"+
-        "\6\uffff\1\24\3\uffff\1\36\1\uffff\1\40\1\42\7\uffff\1\61\1\uffff"+
-        "\1\13\7\uffff\1\21\1\23\1\22\1\25\1\27\1\41\1\32\1\34\1\30\1\33"+
-        "\1\35\1\31\1\37\7\uffff\1\52\1\54\2\uffff\1\7\1\26\4\uffff\1\43"+
-        "\1\uffff\1\50\16\uffff\1\55\1\20\1\uffff\1\51\2\uffff\1\47\1\53"+
-        "\5\uffff\1\16\1\uffff\1\44\1\45\2\uffff\1\56\1\57\1\12\2\uffff\1"+
-        "\46\1\60\1\15\1\17";
+        "\6\uffff\1\24\3\uffff\1\36\1\uffff\1\40\1\42\7\uffff\1\57\1\uffff"+
+        "\1\13\6\uffff\1\21\1\23\1\22\1\25\1\27\1\41\1\32\1\34\1\30\1\33"+
+        "\1\35\1\31\1\37\6\uffff\1\50\1\52\2\uffff\1\7\1\26\5\uffff\1\46"+
+        "\15\uffff\1\53\1\20\2\uffff\1\45\1\51\1\uffff\1\47\4\uffff\1\16"+
+        "\1\uffff\1\43\2\uffff\1\54\1\55\1\12\2\uffff\1\44\1\56\1\15\1\17";
     static final String DFA1_specialS =
-        "\166\uffff}>";
+        "\160\uffff}>";
     static final String[] DFA1_transitionS = {
             "\2\41\1\uffff\2\41\22\uffff\1\41\1\23\1\41\1\31\1\41\1\26\1"+
             "\21\1\uffff\1\5\1\6\1\27\1\41\1\4\1\36\1\35\13\41\1\1\1\13\1"+
             "\24\1\7\1\25\2\uffff\32\41\1\2\1\uffff\1\3\1\22\1\41\1\uffff"+
-            "\1\17\1\40\1\12\1\41\1\32\1\34\2\41\1\16\10\41\1\14\1\41\1\33"+
+            "\1\17\1\40\1\12\1\41\1\34\1\33\2\41\1\16\10\41\1\14\1\41\1\32"+
             "\1\37\1\15\4\41\1\10\1\20\1\11\1\30",
             "",
             "",
@@ -1553,71 +1491,73 @@ public class C_ALLexer extends Lexer {
             "",
             "\1\45",
             "\1\46",
-            "\1\50\6\uffff\1\47\1\51",
+            "\1\47\1\50",
+            "\1\51",
             "\1\52",
-            "\1\53",
-            "\1\55",
+            "\1\54",
             "",
-            "\1\57",
-            "\1\62\1\61",
-            "\1\64\1\65",
+            "\1\56",
+            "\1\61\1\60",
+            "\1\63\1\64",
+            "",
+            "\1\66",
+            "",
             "",
             "\1\67",
-            "",
-            "",
-            "\1\70\1\uffff\1\71",
-            "\1\72",
-            "\1\73\12\uffff\1\76\2\uffff\1\74\3\uffff\1\75",
+            "\1\70\12\uffff\1\73\2\uffff\1\71\3\uffff\1\72",
+            "\1\74",
             "\12\41",
+            "\1\76",
+            "\1\77",
             "\1\100",
+            "",
             "\1\101",
-            "\1\102",
             "",
             "\1\103",
-            "",
+            "\1\104",
             "\1\105",
             "\1\106",
-            "\1\107",
-            "\1\110",
-            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
-            "\41",
             "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\23"+
-            "\41\1\112\6\41",
+            "\41\1\107\6\41",
+            "\1\111",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\1\112",
+            "\1\113",
             "\1\114",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
             "\1\115",
             "\1\116",
             "\1\117",
+            "",
+            "",
             "\1\120",
             "\1\121",
+            "",
+            "",
             "\1\122",
             "\1\123",
-            "",
-            "",
             "\1\124",
             "\1\125",
-            "",
-            "",
-            "\1\126",
-            "\1\127",
-            "\1\130",
-            "\1\131",
-            "",
             "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
             "\41",
             "",
+            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
+            "\41",
+            "\1\130",
+            "\1\131",
+            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
+            "\41",
             "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
             "\41",
             "\1\134",
@@ -1625,39 +1565,29 @@ public class C_ALLexer extends Lexer {
             "\41",
             "\1\136",
             "\1\137",
+            "\1\140",
+            "\1\141",
             "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
             "\41",
-            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
-            "\41",
-            "\1\142",
             "\1\143",
-            "\1\144",
+            "",
+            "",
+            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
+            "\41",
             "\1\145",
+            "",
+            "",
             "\1\146",
-            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
-            "\41",
-            "\1\150",
-            "",
             "",
             "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
             "\41",
-            "",
             "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
             "\41",
+            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
+            "\41",
+            "\1\152",
+            "",
             "\1\153",
-            "",
-            "",
-            "\1\154",
-            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
-            "\41",
-            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
-            "\41",
-            "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
-            "\41",
-            "\1\160",
-            "",
-            "\1\161",
-            "",
             "",
             "\1\41\13\uffff\12\41\7\uffff\32\41\4\uffff\1\41\1\uffff\32"+
             "\41",
@@ -1706,7 +1636,7 @@ public class C_ALLexer extends Lexer {
             this.transition = DFA1_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T__79 | T__80 | T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | T__96 | T__97 | T__98 | T__99 | T__100 | T__101 | T__102 | T__103 | T__104 | T__105 | T__106 | T__107 | T__108 | T__109 | T__110 | T__111 | T__112 | T__113 | T__114 | T__115 | T__116 | T__117 | T__118 | T__119 | T__120 | T__121 | T__122 | T__123 | T__124 | T__125 | T__126 | ALBaseLexer. Tokens );";
+            return "1:1: Tokens : ( T__79 | T__80 | T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | T__96 | T__97 | T__98 | T__99 | T__100 | T__101 | T__102 | T__103 | T__104 | T__105 | T__106 | T__107 | T__108 | T__109 | T__110 | T__111 | T__112 | T__113 | T__114 | T__115 | T__116 | T__117 | T__118 | T__119 | T__120 | T__121 | T__122 | T__123 | T__124 | ALBaseLexer. Tokens );";
         }
     }
  

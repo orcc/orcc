@@ -189,8 +189,8 @@ un_expr: postfix_expression -> postfix_expression
 
 postfix_expression:
   '{' e=expressions (':' g=expressionGenerators)? '}' -> ^(EXPR_LIST $e $g?)
-| 'if' e1=expression  e2=expression 'else' e3=expression -> ^(EXPR_IF $e1 $e2 $e3)
-| constant -> constant
+| /* 'if' e1=expression  e2=expression 'else' e3=expression -> ^(EXPR_IF $e1 $e2 $e3)
+| */ constant -> constant
 | '(' expression ')' -> expression
 | var=ID (
     '(' expressions? ')' -> ^(EXPR_CALL $var expressions?)
@@ -264,8 +264,8 @@ ID ';';
 /* type attributes and definitions */
 
 typeDef:
-  'int' ('<' expression '>')? -> ^(TYPE 'int' ^(TYPE_ATTRS ^(EXPR SIZE expression))?)
-| 'uint' ('<' expression '>')? -> ^(TYPE 'uint' ^(TYPE_ATTRS ^(EXPR SIZE expression))?)
+  'int' ('(' expression ')')? -> ^(TYPE 'int' ^(TYPE_ATTRS ^(EXPR SIZE expression))?)
+| 'uint' ('(' expression ')')? -> ^(TYPE 'uint' ^(TYPE_ATTRS ^(EXPR SIZE expression))?)
 | 'bool' -> ^(TYPE 'bool')
 | 'float' -> ^(TYPE 'float');
 

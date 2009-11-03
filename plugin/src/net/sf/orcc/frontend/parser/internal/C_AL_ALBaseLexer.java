@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 ALBaseLexer.g 2009-11-03 18:21:35
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 ALBaseLexer.g 2009-11-03 18:52:19
 
 package net.sf.orcc.frontend.parser.internal;
 
@@ -66,9 +66,7 @@ public class C_AL_ALBaseLexer extends Lexer {
     public static final int T__86=86;
     public static final int T__89=89;
     public static final int T__88=88;
-    public static final int T__126=126;
     public static final int SHIFT_LEFT=46;
-    public static final int T__125=125;
     public static final int SHIFT_RIGHT=47;
     public static final int BITOR=37;
     public static final int PRIORITY=59;
@@ -128,7 +126,7 @@ public class C_AL_ALBaseLexer extends Lexer {
     public static final int T__100=100;
     public static final int MINUS=65;
     public static final int EXPR_IF=22;
-    public static final int Tokens=127;
+    public static final int Tokens=125;
     public static final int PROCEDURE=60;
     public static final int MULTI_LINE_COMMENT=77;
     public static final int QID=34;

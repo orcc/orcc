@@ -1,13 +1,13 @@
 // PASS: syntactically correct C-AL actor
 
-actor Actor (bool PARAM) (int<3> input1, int input2 ==> int<5> output1) {
+actor Actor (bool PARAM) (int(3) input1, int input2 ==> int(5) output1) {
 
-  int<4> y; // state variable
-  const int<4> x = 5; // state variable with constant value
+  int(4) y; // state variable
+  const int(4) x = 5; // state variable with constant value
   int z = 5; // state variable with initial value
     
-  int f(int<3> g, int<3> h) {
-    int<4> i;
+  int f(int(3) g, int(3) h) {
+    int(4) i;
     bool j;
     float k;
 
@@ -16,11 +16,14 @@ actor Actor (bool PARAM) (int<3> input1, int input2 ==> int<5> output1) {
   }
   
   void proc(float m) {
-    unsigned int<2> h;
+    uint(2) h;
     return h + m;
   }
     
   action a.a ( ==> ) {
+    int(22) dummy[3][2] = {{1, 2}, {2, 3}, {3, 4}};
+    int(29 + 3) dummy2[5] = {for (int i = 0; i < 5; i++) dummy[i / 2][i % 2]};
+
     if (a == 5) {
       f();
     } else {
