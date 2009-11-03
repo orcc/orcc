@@ -93,10 +93,10 @@ static void *getWritePtr(struct fifo_s *fifo, int n) {
 	return contents(fifo, ptr);
 }
 
-static void writeEnd(struct fifo_s *fifo) {
+static void setWriteEnd(struct fifo_s *fifo) {
 }
 
-static void readEnd(struct fifo_s *fifo) {
+static void setReadEnd(struct fifo_s *fifo) {
 }
 
 #endif
