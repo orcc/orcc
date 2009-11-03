@@ -41,7 +41,7 @@ proc createNetwork {outputFile name clasz} {
 proc frontendOneActor {actor} {
   global cmd_frontend path
   
-  regsub {(.*)\.cal} $actor {\1} clasz
+  regsub {(.*)\.c(al)?} $actor {\1} clasz
   regsub {.*/(.*)} $clasz {\1} network
   createNetwork "$path/$network.xdf" "output-$network" "../$clasz"
   
@@ -71,13 +71,13 @@ proc frontendOneActor {actor} {
     if {$expected == "PASS"} {
       pass "$actor: $reason"
     } else {
-      xpass "ERROR: $actor was expected to fail because: $reason"
+      xpass "ERROR: $actor was expected to fail because: $reason\n$errmsg"
     }
   } else {
     if {$expected == "XFAIL"} {
       xfail "$actor: $reason"
     } else {
-      fail "ERROR: $actor was expected to succeed because: $reason"
+      fail "ERROR: $actor was expected to succeed because: $reason\n$errmsg"
     }
   }
 }

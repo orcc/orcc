@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.frontend.parser.internal.C_ALLexer;
+import net.sf.orcc.frontend.parser.internal.C_ALParser;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.frontend.schedule.ActionSorter;
@@ -84,7 +86,7 @@ import org.antlr.runtime.tree.Tree;
  * @author Matthieu Wipliez
  * 
  */
-public class RVCCalASTParser {
+public class ALAstParser {
 
 	/**
 	 * list of actions
@@ -153,7 +155,7 @@ public class RVCCalASTParser {
 	 * @param fileName
 	 * @throws IOException
 	 */
-	public RVCCalASTParser(String fileName) throws OrccException {
+	public ALAstParser(String fileName) throws OrccException {
 		try {
 			this.file = new File(fileName).getCanonicalPath();
 
@@ -173,18 +175,34 @@ public class RVCCalASTParser {
 	 */
 	public Actor parse() throws OrccException {
 		try {
-			CharStream stream = new ANTLRFileStream(file);
-			Lexer lexer = new RVCCalLexer(stream);
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			RVCCalParser parser = new RVCCalParser(tokens);
-			RVCCalParser.actor_return ret = parser.actor();
-			return parseActor((Tree) ret.getTree());
+			Tree tree;
+			File file = new File(this.file + ".cal");
+			if (file.exists()) {
+				CharStream stream = new ANTLRFileStream(file.toString());
+				Lexer lexer = new RVCCalLexer(stream);
+				CommonTokenStream tokens = new CommonTokenStream(lexer);
+				RVCCalParser parser = new RVCCalParser(tokens);
+				RVCCalParser.actor_return ret = parser.actor();
+				tree = (Tree) ret.getTree();
+			} else {
+				file = new File(this.file + ".c");
+				if (file.exists()) {
+					CharStream stream = new ANTLRFileStream(file.toString());
+					Lexer lexer = new C_ALLexer(stream);
+					CommonTokenStream tokens = new CommonTokenStream(lexer);
+					C_ALParser parser = new C_ALParser(tokens);
+					C_ALParser.actor_return ret = parser.actor();
+					tree = (Tree) ret.getTree();
+				} else {
+					throw new OrccException("unknown actor file extension");
+				}
+			}
+
+			return parseActor(tree);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		} catch (RecognitionException e) {
 			throw new OrccException("parse error", e);
-		} catch (OrccException e) {
-			throw e;
 		}
 	}
 

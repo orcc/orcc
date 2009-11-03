@@ -1,3 +1,4 @@
 load_lib orcc.exp
 
 frontendTest [lsort [glob $srcdir/$subdir/*.cal]]
+frontendTest [lsort [glob $srcdir/$subdir/*.c]]

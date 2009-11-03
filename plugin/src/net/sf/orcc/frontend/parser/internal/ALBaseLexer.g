@@ -112,6 +112,7 @@ PRIORITY: 'priority';
 PROCEDURE: 'procedure';
 REPEAT: 'repeat';
 SCHEDULE: 'schedule';
+SIZE: 'size';
 
 // core binary operators
 PLUS: '+';

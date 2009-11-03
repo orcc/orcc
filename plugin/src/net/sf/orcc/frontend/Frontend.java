@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.frontend.parser.RVCCalASTParser;
+import net.sf.orcc.frontend.parser.ALAstParser;
 import net.sf.orcc.ir.actor.ActionScheduler;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
@@ -185,7 +185,7 @@ public class Frontend {
 						// or is not a flag
 						String parent = instance.getFile().getParent();
 						String clasz = instance.getClasz();
-						actors.add(parent + File.separator + clasz + ".cal");
+						actors.add(parent + File.separator + clasz);
 					}
 				}
 			}
@@ -199,7 +199,7 @@ public class Frontend {
 	private void processActors() {
 		for (String path : actors) {
 			try {
-				RVCCalASTParser parser = new RVCCalASTParser(path);
+				ALAstParser parser = new ALAstParser(path);
 				Actor actor = parser.parse();
 
 				if (printPriorities) {
