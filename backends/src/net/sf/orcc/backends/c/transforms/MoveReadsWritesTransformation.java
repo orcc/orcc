@@ -33,6 +33,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.nodes.ReadEndNode;
+import net.sf.orcc.ir.nodes.ReadNode;
+import net.sf.orcc.ir.nodes.WriteEndNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
@@ -42,12 +45,14 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * @author Matthieu Wipliez
  * 
  */
-public class MoveWritesTransformation extends AbstractActorTransformation {
+public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 
 	private List<INode> writes;
+	private List<INode> readEnds;
 
-	public MoveWritesTransformation() {
+	public MoveReadsWritesTransformation() {
 		writes = new ArrayList<INode>();
+		readEnds = new ArrayList<INode>();
 	}
 
 	@Override
@@ -55,7 +60,12 @@ public class MoveWritesTransformation extends AbstractActorTransformation {
 	public void visit(WriteNode node, Object... args) {
 		ListIterator<INode> it = (ListIterator<INode>) args[0];
 		writes.add(node);
-		it.remove();
+		it.set(new WriteEndNode(node));
+	}
+	
+	@Override
+	public void visit(ReadNode node, Object... args) {
+		readEnds.add(new ReadEndNode(node));
 	}
 
 	@Override
@@ -65,7 +75,9 @@ public class MoveWritesTransformation extends AbstractActorTransformation {
 
 		// add writes at the end of the node list, and clears the write list
 		nodes.addAll(0, writes);
+		nodes.addAll(readEnds);
 		writes.clear();
+		readEnds.clear();
 	}
 
 }

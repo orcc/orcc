@@ -61,5 +61,9 @@ public interface NodeVisitor {
 	public void visit(WhileNode node, Object... args);
 
 	public void visit(WriteNode node, Object... args);
+	
+	public void visit(WriteEndNode node, Object... args);
+	
+	public void visit(ReadEndNode node, Object... args);
 
 }

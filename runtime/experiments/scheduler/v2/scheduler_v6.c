@@ -26,7 +26,7 @@ static struct fifo_s {
 static void *getPeekPtr(struct fifo_s *fifo, int n) {
 	int end_read;
 	end_read = fifo->read_ind + n;
-
+	
 	if (end_read > fifo->size) {
 		//Data access end of the fifo size
 		unsigned int nEltSize;
@@ -37,6 +37,10 @@ static void *getPeekPtr(struct fifo_s *fifo, int n) {
 		//Size of the data in the end of the fifo
 		nEltSize = (unsigned int) ((fifo->size - fifo->read_ind) * fifo->elt_size) ;
 
+		//Free previous allocation of peek
+		if (fifo->malloc_ptrP != NULL){
+			free (fifo->malloc_ptrP);
+		}
 		//Allocate the data out
 		fifo->malloc_ptrP = malloc(fifo->elt_size * n);
 
@@ -51,14 +55,7 @@ static void *getPeekPtr(struct fifo_s *fifo, int n) {
 		return fifo->malloc_ptrP;
 
 	} else {
-		fifo->malloc_ptrP = NULL;
 		return contents(fifo, fifo->read_ind);
-	}
-}
-
-static void setEndPeek(struct fifo_s *fifo) {
-	if (fifo->malloc_ptrP != NULL){
-		free(fifo->malloc_ptrP);
 	}
 }
 

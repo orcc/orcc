@@ -110,6 +110,12 @@ $var$ = getReadPtr($actorName$_$fifoName$, $numTokens$);
 
 >>
 
+// readEnd node
+readEndNode(actorName, fifoName) ::= <<
+readEnd($actorName$_$fifoName$);
+
+>>
+
 // return node
 returnNode(expr) ::= <<
 return $expr$;
@@ -138,6 +144,12 @@ while ($expr$) {
 // write node
 writeNode(var, actorName, fifoName, numTokens) ::= <<
 $var$ = getWritePtr($actorName$_$fifoName$, $numTokens$);
+
+>>
+
+// writeEnd node
+writeEndNode(actorName, fifoName) ::= <<
+writeEnd($actorName$_$fifoName$);
 
 >>
 

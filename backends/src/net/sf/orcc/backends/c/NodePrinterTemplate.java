@@ -47,10 +47,12 @@ import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
+import net.sf.orcc.ir.nodes.ReadEndNode;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.WriteEndNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -312,6 +314,26 @@ public class NodePrinterTemplate implements CNodeVisitor {
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
+
+		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(WriteEndNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("writeEndNode");
+
+		nodeTmpl.setAttribute("actorName", actorName);
+		nodeTmpl.setAttribute("fifoName", node.getPort());
+
+		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(ReadEndNode node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("readEndNode");
+
+		nodeTmpl.setAttribute("actorName", actorName);
+		nodeTmpl.setAttribute("fifoName", node.getPort());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}

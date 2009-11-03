@@ -34,7 +34,7 @@ import java.io.IOException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
-import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
+import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.IActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
@@ -86,7 +86,7 @@ public class CBackendImpl extends AbstractBackend implements IBackend {
 	protected void printActor(String id, Actor actor) throws Exception {
 		IActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new PhiRemoval(), new IncrementPeephole(),
-				new MoveWritesTransformation() };
+				new MoveReadsWritesTransformation() };
 
 		for (IActorTransformation transformation : transformations) {
 			transformation.transform(actor);

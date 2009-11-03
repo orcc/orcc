@@ -66,10 +66,12 @@ import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.PeekNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
+import net.sf.orcc.ir.nodes.ReadEndNode;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.ReturnNode;
 import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.WriteEndNode;
 import net.sf.orcc.ir.nodes.WriteNode;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -526,5 +528,15 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 		template.setAttribute(attrName, nodeTmpl);
 
+	}
+
+	@Override
+	public void visit(WriteEndNode node, Object... args) {
+		
+	}
+
+	@Override
+	public void visit(ReadEndNode node, Object... args) {
+		
 	}
 }

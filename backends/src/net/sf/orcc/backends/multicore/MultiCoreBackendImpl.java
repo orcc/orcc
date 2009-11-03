@@ -35,7 +35,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.CNetworkPrinter;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
-import net.sf.orcc.backends.c.transforms.MoveWritesTransformation;
+import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.IActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
@@ -85,7 +85,7 @@ public class MultiCoreBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		IActorTransformation[] transformations = { new PhiRemoval(),
-				new IncrementPeephole(), new MoveWritesTransformation() };
+				new IncrementPeephole(), new MoveReadsWritesTransformation() };
 
 		for (IActorTransformation transformation : transformations) {
 			transformation.transform(actor);

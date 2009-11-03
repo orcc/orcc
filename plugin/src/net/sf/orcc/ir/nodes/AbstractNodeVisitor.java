@@ -89,5 +89,13 @@ public abstract class AbstractNodeVisitor implements NodeVisitor {
 	@Override
 	public void visit(WriteNode node, Object... args) {
 	}
+	
+	@Override
+	public void visit(WriteEndNode node, Object... args) {
+	}
+	
+	@Override
+	public void visit(ReadEndNode node, Object... args) {
+	}
 
 }
