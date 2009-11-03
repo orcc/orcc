@@ -11,6 +11,7 @@ extern void scheduler_v2();
 extern void scheduler_v3();
 extern void scheduler_v4();
 extern void scheduler_v5();
+extern void scheduler_v6();
 extern void scheduler_vSDF();
 
 LARGE_INTEGER freq;
@@ -56,6 +57,8 @@ int main(int argc, char *argv[]) {
 	elapsedTime = measure_time(scheduler_v4);
 	printf("elapsed time v4: %f ms\n", elapsedTime);
 	elapsedTime = measure_time(scheduler_v5);
+	printf("elapsed time v5: %f ms\n", elapsedTime);
+	elapsedTime = measure_time(scheduler_v6);
 	printf("elapsed time v5: %f ms\n", elapsedTime);
 	elapsedTime = measure_time(scheduler_vSDF);
 	printf("elapsed time SDF: %f ms\n", elapsedTime);

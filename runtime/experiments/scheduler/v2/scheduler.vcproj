@@ -207,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\scheduler_v6.c"
+				>
+			</File>
+			<File
 				RelativePath=".\scheduler_vSDF.c"
 				>
 			</File>
