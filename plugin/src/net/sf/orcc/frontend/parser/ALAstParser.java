@@ -483,16 +483,18 @@ public class ALAstParser {
 		} else if (typeName.equals(VoidType.NAME)) {
 			type = new VoidType();
 		} else if (typeName.equals(IntType.NAME)) {
-			IExpr size = parseTypeAttributeSize(location, tree.getChild(1), 32);
+			IExpr size = parseTypeAttributeSize(location, tree, 32);
 			type = new IntType(size);
 		} else if (typeName.equals(UintType.NAME)) {
-			IExpr size = parseTypeAttributeSize(location, tree.getChild(1), 32);
+			IExpr size = parseTypeAttributeSize(location, tree, 32);
 			type = new UintType(size);
 		} else if (typeName.equals(ListType.NAME)) {
-			IExpr size = parseTypeAttributeSize(location, tree.getChild(1),
-					null);
-			IType subType = parseTypeAttributeType(location, tree.getChild(1));
+			IExpr size = parseTypeAttributeSize(location, tree, null);
+			IType subType = parseTypeAttributeType(location, tree);
 			type = new ListType(size, subType);
+		} else if (typeName.equals("float") || typeName.equals("unsigned")) {
+			System.out.println("TODO: " + typeName);
+			type = new VoidType();
 		} else {
 			throw new OrccException(file, location, "Unknown type: " + typeName);
 		}
@@ -500,14 +502,19 @@ public class ALAstParser {
 		return type;
 	}
 
-	private IExpr parseTypeAttributeSize(Location location, Tree typeAttrs,
+	private IExpr parseTypeAttributeSize(Location location, Tree type,
 			Integer defaultSize) throws OrccException {
-		int n = typeAttrs.getChildCount();
-		for (int i = 0; i < n; i++) {
-			Tree attr = typeAttrs.getChild(i);
-			if (attr.getType() == RVCCalLexer.EXPR
-					&& attr.getChild(0).getText().equals(AST.SIZE)) {
-				return exprParser.parseExpression(attr.getChild(1));
+		int n = type.getChildCount();
+		for (int i = 1; i < n; i++) {
+			Tree attr = type.getChild(i);
+			if (attr.getType() == RVCCalLexer.EXPR) {
+				if (attr.getChildCount() > 1
+						&& !attr.getChild(1).getText().equals(AST.SIZE)) {
+					throw new OrccException(file, location, "unknown \""
+							+ attr.getChild(1).getText() + "\" attribute");
+				}
+
+				return exprParser.parseExpression(attr.getChild(0));
 			}
 		}
 
@@ -524,11 +531,16 @@ public class ALAstParser {
 	private IType parseTypeAttributeType(Location location, Tree typeAttrs)
 			throws OrccException {
 		int n = typeAttrs.getChildCount();
-		for (int i = 0; i < n; i++) {
+		for (int i = 1; i < n; i++) {
 			Tree attr = typeAttrs.getChild(i);
-			if (attr.getType() == RVCCalLexer.TYPE
-					&& attr.getChild(0).getText().equals(AST.TYPE)) {
-				return parseType(attr.getChild(1));
+			if (attr.getType() == RVCCalLexer.TYPE) {
+				if (attr.getChildCount() > 1
+						&& !attr.getChild(1).getText().equals(AST.TYPE)) {
+					throw new OrccException(file, location, "unknown \""
+							+ attr.getChild(1).getText() + "\" attribute");
+				}
+
+				return parseType(attr.getChild(0));
 			}
 		}
 

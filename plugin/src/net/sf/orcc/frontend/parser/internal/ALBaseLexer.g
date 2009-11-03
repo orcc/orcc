@@ -75,13 +75,11 @@ tokens {
   // type definitions
   TYPE;
   TYPE_ATTRS;
+  TYPE_LIST;
   
   // variable declarations
   ASSIGNABLE;
   NON_ASSIGNABLE;
-  
-  // others
-  QID;
   
   // binary operators
   LOGIC_OR;
@@ -112,7 +110,6 @@ PRIORITY: 'priority';
 PROCEDURE: 'procedure';
 REPEAT: 'repeat';
 SCHEDULE: 'schedule';
-SIZE: 'size';
 
 // core binary operators
 PLUS: '+';

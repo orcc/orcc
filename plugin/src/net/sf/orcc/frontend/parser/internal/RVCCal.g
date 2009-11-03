@@ -107,9 +107,9 @@ actorDeclaration:
   // NOTE: a variable declared with no initial value is assignable (hence the last line)
   | ('(' attrs=typeAttrs ')')?
     varName=ID
-    (  '=' expression -> ^(STATE_VAR ^(TYPE id ^(TYPE_ATTRS $attrs?)) $varName NON_ASSIGNABLE expression)
-     | ':=' expression -> ^(STATE_VAR ^(TYPE id ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE expression)
-     | -> ^(STATE_VAR ^(TYPE id ^(TYPE_ATTRS $attrs?)) $varName ASSIGNABLE)) ';'
+    (  '=' expression -> ^(STATE_VAR ^(TYPE id $attrs?) $varName NON_ASSIGNABLE expression)
+     | ':=' expression -> ^(STATE_VAR ^(TYPE id $attrs?) $varName ASSIGNABLE expression)
+     | -> ^(STATE_VAR ^(TYPE id $attrs?) $varName ASSIGNABLE)) ';'
   )
 
 // anonymous action
@@ -213,14 +213,14 @@ idents: ID (',' ID)* -> ID+;
 /*****************************************************************************/
 /* priorities */
 
-priorityInequality: qualifiedIdent ('>' qualifiedIdent)+ ';' -> ^(INEQUALITY qualifiedIdent qualifiedIdent+);
+priorityInequality: qualifiedIdent ('>' qualifiedIdent)+ ';' -> ^(INEQUALITY qualifiedIdent+);
 	
 priorityOrder: PRIORITY priorityInequality* 'end' -> ^(PRIORITY priorityInequality*);
 
 /*****************************************************************************/
 /* qualified ident */
 
-qualifiedIdent: ID ('.' ID)* -> ^(QID ID+);
+qualifiedIdent: ID ('.' ID)* -> ^(TAG ID+);
 
 /*****************************************************************************/
 /* schedule */
@@ -251,12 +251,12 @@ statement:
 // thanks to the language designers, there is no specific name for type attributes.
 // even though only type and expr attributes are taken into account.
 
-typeAttr: ID (':' typeDef -> ^(TYPE ID typeDef) | '=' expression -> ^(EXPR ID expression)) ;
+typeAttr: ID (':' typeDef -> ^(TYPE typeDef ID) | '=' expression -> ^(EXPR expression ID)) ;
 
 typeAttrs: typeAttr (',' typeAttr)* -> typeAttr+;
 
 /* a type definition: bool, int(size=5), list(type:int, size=10)... */	
-typeDef: ID ('(' attrs=typeAttrs ')')? -> ^(TYPE ID ^(TYPE_ATTRS $attrs?));
+typeDef: ID ('(' attrs=typeAttrs ')')? -> ^(TYPE ID $attrs?);
 
 /*****************************************************************************/
 /* variable declarations */

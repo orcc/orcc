@@ -1,31 +1,21 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g 2009-11-03 18:52:19
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g 2009-11-03 22:45:48
 
 package net.sf.orcc.frontend.parser.internal;
 
 // @SuppressWarnings("unused")
 
 
-import org.antlr.runtime.BaseRecognizer;
-import org.antlr.runtime.BitSet;
-import org.antlr.runtime.DFA;
-import org.antlr.runtime.EarlyExitException;
-import org.antlr.runtime.NoViableAltException;
-import org.antlr.runtime.Parser;
-import org.antlr.runtime.ParserRuleReturnScope;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.RecognizerSharedState;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenStream;
-import org.antlr.runtime.tree.CommonTreeAdaptor;
-import org.antlr.runtime.tree.RewriteEarlyExitException;
-import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
-import org.antlr.runtime.tree.RewriteRuleTokenStream;
-import org.antlr.runtime.tree.TreeAdaptor;
+import org.antlr.runtime.*;
+import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
 
-@SuppressWarnings("unused")
+
+import org.antlr.runtime.tree.*;
+
 public class C_ALParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "INPUTS", "OUTPUTS", "PARAMETERS", "STATEMENTS", "VARIABLE", "VARIABLES", "ACTOR_DECLS", "STATE_VAR", "TRANSITION", "TRANSITIONS", "INEQUALITY", "GUARDS", "TAG", "EXPR", "EXPR_BINARY", "EXPR_UNARY", "OP", "EXPR_LIST", "EXPR_IF", "EXPR_CALL", "EXPR_IDX", "EXPR_VAR", "EXPR_BOOL", "EXPR_FLOAT", "EXPR_INT", "EXPR_STRING", "TYPE", "TYPE_ATTRS", "ASSIGNABLE", "NON_ASSIGNABLE", "QID", "LOGIC_OR", "LOGIC_AND", "BITOR", "BITXOR", "BITAND", "EQ", "NE", "LT", "GT", "LE", "GE", "SHIFT_LEFT", "SHIFT_RIGHT", "DIV_INT", "MOD", "EXP", "BITNOT", "LOGIC_NOT", "NUM_ELTS", "ACTION", "ACTOR", "FUNCTION", "GUARD", "INITIALIZE", "PRIORITY", "PROCEDURE", "REPEAT", "SCHEDULE", "SIZE", "PLUS", "MINUS", "TIMES", "DIV", "LETTER", "ID", "Exponent", "FLOAT", "INTEGER", "EscapeSequence", "STRING", "OctalEscape", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "':'", "'['", "']'", "','", "'('", "')'", "'==>'", "'{'", "'}'", "'const'", "'='", "';'", "'return'", "'void'", "'import'", "'all'", "'||'", "'&&'", "'|'", "'^'", "'&'", "'=='", "'!='", "'<'", "'>'", "'<='", "'>='", "'<<'", "'>>'", "'%'", "'**'", "'~'", "'!'", "'#'", "'true'", "'false'", "'for'", "'in'", "'end'", "'.'", "'fsm'", "'-->'", "'int'", "'uint'", "'bool'", "'float'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "INPUTS", "OUTPUTS", "PARAMETERS", "STATEMENTS", "VARIABLE", "VARIABLES", "ACTOR_DECLS", "STATE_VAR", "TRANSITION", "TRANSITIONS", "INEQUALITY", "GUARDS", "TAG", "EXPR", "EXPR_BINARY", "EXPR_UNARY", "OP", "EXPR_LIST", "EXPR_IF", "EXPR_CALL", "EXPR_IDX", "EXPR_VAR", "EXPR_BOOL", "EXPR_FLOAT", "EXPR_INT", "EXPR_STRING", "TYPE", "TYPE_ATTRS", "TYPE_LIST", "ASSIGNABLE", "NON_ASSIGNABLE", "LOGIC_OR", "LOGIC_AND", "BITOR", "BITXOR", "BITAND", "EQ", "NE", "LT", "GT", "LE", "GE", "SHIFT_LEFT", "SHIFT_RIGHT", "DIV_INT", "MOD", "EXP", "BITNOT", "LOGIC_NOT", "NUM_ELTS", "ACTION", "ACTOR", "FUNCTION", "GUARD", "INITIALIZE", "PRIORITY", "PROCEDURE", "REPEAT", "SCHEDULE", "PLUS", "MINUS", "TIMES", "DIV", "LETTER", "ID", "Exponent", "FLOAT", "INTEGER", "EscapeSequence", "STRING", "OctalEscape", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "':'", "'['", "']'", "','", "'('", "')'", "'==>'", "'{'", "'}'", "'const'", "'='", "';'", "'return'", "'void'", "'import'", "'all'", "'||'", "'&&'", "'|'", "'^'", "'&'", "'=='", "'!='", "'<'", "'>'", "'<='", "'>='", "'<<'", "'>>'", "'%'", "'**'", "'~'", "'!'", "'#'", "'for'", "'if'", "'else'", "'true'", "'false'", "'..'", "'end'", "'.'", "'fsm'", "'-->'", "'while'", "'bool'", "'char'", "'short'", "'int'", "'unsigned'", "'float'"
     };
     public static final int FUNCTION=56;
     public static final int EXPR_BOOL=26;
@@ -35,7 +25,7 @@ public class C_ALParser extends Parser {
     public static final int TRANSITION=12;
     public static final int EXPR_VAR=25;
     public static final int LOGIC_NOT=52;
-    public static final int LETTER=68;
+    public static final int LETTER=67;
     public static final int MOD=49;
     public static final int EXPR_CALL=23;
     public static final int INPUTS=4;
@@ -57,21 +47,21 @@ public class C_ALParser extends Parser {
     public static final int T__98=98;
     public static final int T__97=97;
     public static final int T__96=96;
-    public static final int T__95=95;
     public static final int NE=41;
-    public static final int ASSIGNABLE=32;
+    public static final int T__95=95;
+    public static final int ASSIGNABLE=33;
     public static final int GE=45;
     public static final int T__80=80;
     public static final int INITIALIZE=58;
     public static final int T__81=81;
     public static final int T__82=82;
     public static final int T__83=83;
-    public static final int LINE_COMMENT=76;
+    public static final int LINE_COMMENT=75;
     public static final int DIV_INT=48;
     public static final int LOGIC_OR=35;
-    public static final int WHITESPACE=78;
+    public static final int WHITESPACE=77;
     public static final int INEQUALITY=14;
-    public static final int NON_ASSIGNABLE=33;
+    public static final int NON_ASSIGNABLE=34;
     public static final int T__85=85;
     public static final int T__84=84;
     public static final int EXPR_IDX=24;
@@ -79,7 +69,11 @@ public class C_ALParser extends Parser {
     public static final int T__86=86;
     public static final int T__89=89;
     public static final int T__88=88;
+    public static final int T__126=126;
     public static final int SHIFT_LEFT=46;
+    public static final int T__125=125;
+    public static final int T__128=128;
+    public static final int T__127=127;
     public static final int SHIFT_RIGHT=47;
     public static final int BITOR=37;
     public static final int PRIORITY=59;
@@ -87,13 +81,13 @@ public class C_ALParser extends Parser {
     public static final int ACTOR_DECLS=10;
     public static final int OP=20;
     public static final int ACTOR=55;
-    public static final int STATEMENTS=7;
     public static final int GT=43;
+    public static final int STATEMENTS=7;
     public static final int REPEAT=61;
     public static final int GUARD=57;
-    public static final int EscapeSequence=73;
-    public static final int SIZE=63;
+    public static final int EscapeSequence=72;
     public static final int T__79=79;
+    public static final int T__78=78;
     public static final int PARAMETERS=6;
     public static final int EXPR_BINARY=18;
     public static final int T__118=118;
@@ -105,14 +99,15 @@ public class C_ALParser extends Parser {
     public static final int T__115=115;
     public static final int T__124=124;
     public static final int T__123=123;
-    public static final int Exponent=70;
+    public static final int Exponent=69;
     public static final int T__122=122;
     public static final int T__121=121;
-    public static final int FLOAT=71;
+    public static final int FLOAT=70;
     public static final int T__120=120;
+    public static final int TYPE_LIST=32;
     public static final int EXPR_FLOAT=27;
     public static final int LOGIC_AND=36;
-    public static final int ID=69;
+    public static final int ID=68;
     public static final int BITAND=39;
     public static final int EXPR_LIST=21;
     public static final int EXPR=17;
@@ -129,26 +124,25 @@ public class C_ALParser extends Parser {
     public static final int T__111=111;
     public static final int T__110=110;
     public static final int T__113=113;
-    public static final int PLUS=64;
+    public static final int PLUS=63;
     public static final int T__112=112;
     public static final int EXPR_INT=28;
-    public static final int INTEGER=72;
+    public static final int INTEGER=71;
     public static final int TRANSITIONS=13;
     public static final int T__102=102;
     public static final int T__101=101;
     public static final int T__100=100;
-    public static final int MINUS=65;
+    public static final int MINUS=64;
     public static final int EXPR_IF=22;
-    public static final int MULTI_LINE_COMMENT=77;
+    public static final int MULTI_LINE_COMMENT=76;
     public static final int PROCEDURE=60;
     public static final int TAG=16;
-    public static final int QID=34;
     public static final int VARIABLES=9;
-    public static final int DIV=67;
-    public static final int TIMES=66;
-    public static final int OctalEscape=75;
+    public static final int DIV=66;
+    public static final int TIMES=65;
+    public static final int OctalEscape=74;
     public static final int LE=44;
-    public static final int STRING=74;
+    public static final int STRING=73;
 
     // delegates
     // delegators
@@ -172,7 +166,7 @@ public class C_ALParser extends Parser {
     }
 
     public String[] getTokenNames() { return C_ALParser.tokenNames; }
-    public String getGrammarFileName() { return "D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g"; }
+    public String getGrammarFileName() { return "D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g"; }
 
 
     public static class actionGuards_return extends ParserRuleReturnScope {
@@ -181,7 +175,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actionGuards"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:55:1: actionGuards : GUARD expressions -> expressions ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:55:1: actionGuards : GUARD expressions -> expressions ;
     public final C_ALParser.actionGuards_return actionGuards() throws RecognitionException {
         C_ALParser.actionGuards_return retval = new C_ALParser.actionGuards_return();
         retval.start = input.LT(1);
@@ -196,8 +190,8 @@ public class C_ALParser extends Parser {
         RewriteRuleTokenStream stream_GUARD=new RewriteRuleTokenStream(adaptor,"token GUARD");
         RewriteRuleSubtreeStream stream_expressions=new RewriteRuleSubtreeStream(adaptor,"rule expressions");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:55:13: ( GUARD expressions -> expressions )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:55:15: GUARD expressions
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:55:13: ( GUARD expressions -> expressions )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:55:15: GUARD expressions
             {
             GUARD1=(Token)match(input,GUARD,FOLLOW_GUARD_in_actionGuards65);  
             stream_GUARD.add(GUARD1);
@@ -254,7 +248,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actionInput"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:57:1: actionInput : ( ID ':' )? '[' idents ']' ( actionRepeat )? ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:57:1: actionInput : ( ID ':' )? '[' idents ']' ( actionRepeat )? ;
     public final C_ALParser.actionInput_return actionInput() throws RecognitionException {
         C_ALParser.actionInput_return retval = new C_ALParser.actionInput_return();
         retval.start = input.LT(1);
@@ -276,12 +270,12 @@ public class C_ALParser extends Parser {
         Object char_literal7_tree=null;
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:57:12: ( ( ID ':' )? '[' idents ']' ( actionRepeat )? )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:2: ( ID ':' )? '[' idents ']' ( actionRepeat )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:57:12: ( ( ID ':' )? '[' idents ']' ( actionRepeat )? )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:2: ( ID ':' )? '[' idents ']' ( actionRepeat )?
             {
             root_0 = (Object)adaptor.nil();
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:2: ( ID ':' )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:2: ( ID ':' )?
             int alt1=2;
             int LA1_0 = input.LA(1);
 
@@ -290,13 +284,13 @@ public class C_ALParser extends Parser {
             }
             switch (alt1) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:3: ID ':'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:3: ID ':'
                     {
                     ID3=(Token)match(input,ID,FOLLOW_ID_in_actionInput80); 
                     ID3_tree = (Object)adaptor.create(ID3);
                     adaptor.addChild(root_0, ID3_tree);
 
-                    char_literal4=(Token)match(input,79,FOLLOW_79_in_actionInput82); 
+                    char_literal4=(Token)match(input,78,FOLLOW_78_in_actionInput82); 
                     char_literal4_tree = (Object)adaptor.create(char_literal4);
                     adaptor.addChild(root_0, char_literal4_tree);
 
@@ -306,7 +300,7 @@ public class C_ALParser extends Parser {
 
             }
 
-            char_literal5=(Token)match(input,80,FOLLOW_80_in_actionInput86); 
+            char_literal5=(Token)match(input,79,FOLLOW_79_in_actionInput86); 
             char_literal5_tree = (Object)adaptor.create(char_literal5);
             adaptor.addChild(root_0, char_literal5_tree);
 
@@ -316,11 +310,11 @@ public class C_ALParser extends Parser {
             state._fsp--;
 
             adaptor.addChild(root_0, idents6.getTree());
-            char_literal7=(Token)match(input,81,FOLLOW_81_in_actionInput90); 
+            char_literal7=(Token)match(input,80,FOLLOW_80_in_actionInput90); 
             char_literal7_tree = (Object)adaptor.create(char_literal7);
             adaptor.addChild(root_0, char_literal7_tree);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:27: ( actionRepeat )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:27: ( actionRepeat )?
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -329,7 +323,7 @@ public class C_ALParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:27: actionRepeat
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:58:27: actionRepeat
                     {
                     pushFollow(FOLLOW_actionRepeat_in_actionInput92);
                     actionRepeat8=actionRepeat();
@@ -371,7 +365,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actionInputs"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:1: actionInputs : actionInput ( ',' actionInput )* -> ( actionInput )+ ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:1: actionInputs : actionInput ( ',' actionInput )* -> ( actionInput )+ ;
     public final C_ALParser.actionInputs_return actionInputs() throws RecognitionException {
         C_ALParser.actionInputs_return retval = new C_ALParser.actionInputs_return();
         retval.start = input.LT(1);
@@ -385,11 +379,11 @@ public class C_ALParser extends Parser {
 
 
         Object char_literal10_tree=null;
-        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
+        RewriteRuleTokenStream stream_81=new RewriteRuleTokenStream(adaptor,"token 81");
         RewriteRuleSubtreeStream stream_actionInput=new RewriteRuleSubtreeStream(adaptor,"rule actionInput");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:13: ( actionInput ( ',' actionInput )* -> ( actionInput )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:15: actionInput ( ',' actionInput )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:13: ( actionInput ( ',' actionInput )* -> ( actionInput )+ )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:15: actionInput ( ',' actionInput )*
             {
             pushFollow(FOLLOW_actionInput_in_actionInputs103);
             actionInput9=actionInput();
@@ -397,23 +391,23 @@ public class C_ALParser extends Parser {
             state._fsp--;
 
             stream_actionInput.add(actionInput9.getTree());
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:27: ( ',' actionInput )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:27: ( ',' actionInput )*
             loop3:
             do {
                 int alt3=2;
                 int LA3_0 = input.LA(1);
 
-                if ( (LA3_0==82) ) {
+                if ( (LA3_0==81) ) {
                     alt3=1;
                 }
 
 
                 switch (alt3) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:28: ',' actionInput
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:61:28: ',' actionInput
             	    {
-            	    char_literal10=(Token)match(input,82,FOLLOW_82_in_actionInputs106);  
-            	    stream_82.add(char_literal10);
+            	    char_literal10=(Token)match(input,81,FOLLOW_81_in_actionInputs106);  
+            	    stream_81.add(char_literal10);
 
             	    pushFollow(FOLLOW_actionInput_in_actionInputs108);
             	    actionInput11=actionInput();
@@ -483,7 +477,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actionOutput"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:63:1: actionOutput : ( ID ':' )? '[' expressions ']' ( actionRepeat )? ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:63:1: actionOutput : ( ID ':' )? '[' expressions ']' ( actionRepeat )? ;
     public final C_ALParser.actionOutput_return actionOutput() throws RecognitionException {
         C_ALParser.actionOutput_return retval = new C_ALParser.actionOutput_return();
         retval.start = input.LT(1);
@@ -505,12 +499,12 @@ public class C_ALParser extends Parser {
         Object char_literal16_tree=null;
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:63:13: ( ( ID ':' )? '[' expressions ']' ( actionRepeat )? )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:2: ( ID ':' )? '[' expressions ']' ( actionRepeat )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:63:13: ( ( ID ':' )? '[' expressions ']' ( actionRepeat )? )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:2: ( ID ':' )? '[' expressions ']' ( actionRepeat )?
             {
             root_0 = (Object)adaptor.nil();
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:2: ( ID ':' )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:2: ( ID ':' )?
             int alt4=2;
             int LA4_0 = input.LA(1);
 
@@ -519,13 +513,13 @@ public class C_ALParser extends Parser {
             }
             switch (alt4) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:3: ID ':'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:3: ID ':'
                     {
                     ID12=(Token)match(input,ID,FOLLOW_ID_in_actionOutput124); 
                     ID12_tree = (Object)adaptor.create(ID12);
                     adaptor.addChild(root_0, ID12_tree);
 
-                    char_literal13=(Token)match(input,79,FOLLOW_79_in_actionOutput126); 
+                    char_literal13=(Token)match(input,78,FOLLOW_78_in_actionOutput126); 
                     char_literal13_tree = (Object)adaptor.create(char_literal13);
                     adaptor.addChild(root_0, char_literal13_tree);
 
@@ -535,7 +529,7 @@ public class C_ALParser extends Parser {
 
             }
 
-            char_literal14=(Token)match(input,80,FOLLOW_80_in_actionOutput130); 
+            char_literal14=(Token)match(input,79,FOLLOW_79_in_actionOutput130); 
             char_literal14_tree = (Object)adaptor.create(char_literal14);
             adaptor.addChild(root_0, char_literal14_tree);
 
@@ -545,11 +539,11 @@ public class C_ALParser extends Parser {
             state._fsp--;
 
             adaptor.addChild(root_0, expressions15.getTree());
-            char_literal16=(Token)match(input,81,FOLLOW_81_in_actionOutput134); 
+            char_literal16=(Token)match(input,80,FOLLOW_80_in_actionOutput134); 
             char_literal16_tree = (Object)adaptor.create(char_literal16);
             adaptor.addChild(root_0, char_literal16_tree);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:32: ( actionRepeat )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:32: ( actionRepeat )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -558,7 +552,7 @@ public class C_ALParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:32: actionRepeat
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:64:32: actionRepeat
                     {
                     pushFollow(FOLLOW_actionRepeat_in_actionOutput136);
                     actionRepeat17=actionRepeat();
@@ -600,7 +594,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actionOutputs"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:1: actionOutputs : actionOutput ( ',' actionOutput )* -> ( actionOutput )+ ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:1: actionOutputs : actionOutput ( ',' actionOutput )* -> ( actionOutput )+ ;
     public final C_ALParser.actionOutputs_return actionOutputs() throws RecognitionException {
         C_ALParser.actionOutputs_return retval = new C_ALParser.actionOutputs_return();
         retval.start = input.LT(1);
@@ -614,11 +608,11 @@ public class C_ALParser extends Parser {
 
 
         Object char_literal19_tree=null;
-        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
+        RewriteRuleTokenStream stream_81=new RewriteRuleTokenStream(adaptor,"token 81");
         RewriteRuleSubtreeStream stream_actionOutput=new RewriteRuleSubtreeStream(adaptor,"rule actionOutput");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:14: ( actionOutput ( ',' actionOutput )* -> ( actionOutput )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:16: actionOutput ( ',' actionOutput )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:14: ( actionOutput ( ',' actionOutput )* -> ( actionOutput )+ )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:16: actionOutput ( ',' actionOutput )*
             {
             pushFollow(FOLLOW_actionOutput_in_actionOutputs147);
             actionOutput18=actionOutput();
@@ -626,23 +620,23 @@ public class C_ALParser extends Parser {
             state._fsp--;
 
             stream_actionOutput.add(actionOutput18.getTree());
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:29: ( ',' actionOutput )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:29: ( ',' actionOutput )*
             loop6:
             do {
                 int alt6=2;
                 int LA6_0 = input.LA(1);
 
-                if ( (LA6_0==82) ) {
+                if ( (LA6_0==81) ) {
                     alt6=1;
                 }
 
 
                 switch (alt6) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:30: ',' actionOutput
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:67:30: ',' actionOutput
             	    {
-            	    char_literal19=(Token)match(input,82,FOLLOW_82_in_actionOutputs150);  
-            	    stream_82.add(char_literal19);
+            	    char_literal19=(Token)match(input,81,FOLLOW_81_in_actionOutputs150);  
+            	    stream_81.add(char_literal19);
 
             	    pushFollow(FOLLOW_actionOutput_in_actionOutputs152);
             	    actionOutput20=actionOutput();
@@ -712,7 +706,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actionRepeat"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:69:1: actionRepeat : REPEAT expression -> expression ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:69:1: actionRepeat : REPEAT expression -> expression ;
     public final C_ALParser.actionRepeat_return actionRepeat() throws RecognitionException {
         C_ALParser.actionRepeat_return retval = new C_ALParser.actionRepeat_return();
         retval.start = input.LT(1);
@@ -727,8 +721,8 @@ public class C_ALParser extends Parser {
         RewriteRuleTokenStream stream_REPEAT=new RewriteRuleTokenStream(adaptor,"token REPEAT");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:69:13: ( REPEAT expression -> expression )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:69:15: REPEAT expression
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:69:13: ( REPEAT expression -> expression )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:69:15: REPEAT expression
             {
             REPEAT21=(Token)match(input,REPEAT,FOLLOW_REPEAT_in_actionRepeat166);  
             stream_REPEAT.add(REPEAT21);
@@ -785,7 +779,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actor"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:71:1: actor : ( actorImport )* ACTOR ID '(' ( actorParameters )? ')' '(' (inputs= parameters )? '==>' (outputs= parameters )? ')' '{' ( actorDeclarations )? '}' EOF -> ACTOR ID ^( PARAMETERS ( actorParameters )? ) ^( INPUTS ( $inputs)? ) ^( OUTPUTS ( $outputs)? ) ^( ACTOR_DECLS ( actorDeclarations )? ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:71:1: actor : ( actorImport )* ACTOR ID '(' ( actorParameters )? ')' '(' (inputs= parameters )? '==>' (outputs= parameters )? ')' '{' ( actorDeclarations )? '}' EOF -> ACTOR ID ^( PARAMETERS ( actorParameters )? ) ^( INPUTS ( $inputs)? ) ^( OUTPUTS ( $outputs)? ) ^( ACTOR_DECLS ( actorDeclarations )? ) ;
     public final C_ALParser.actor_return actor() throws RecognitionException {
         C_ALParser.actor_return retval = new C_ALParser.actor_return();
         retval.start = input.LT(1);
@@ -824,11 +818,11 @@ public class C_ALParser extends Parser {
         Object char_literal34_tree=null;
         Object EOF35_tree=null;
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_EOF=new RewriteRuleTokenStream(adaptor,"token EOF");
+        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
         RewriteRuleTokenStream stream_83=new RewriteRuleTokenStream(adaptor,"token 83");
+        RewriteRuleTokenStream stream_EOF=new RewriteRuleTokenStream(adaptor,"token EOF");
         RewriteRuleTokenStream stream_86=new RewriteRuleTokenStream(adaptor,"token 86");
         RewriteRuleTokenStream stream_ACTOR=new RewriteRuleTokenStream(adaptor,"token ACTOR");
-        RewriteRuleTokenStream stream_87=new RewriteRuleTokenStream(adaptor,"token 87");
         RewriteRuleTokenStream stream_84=new RewriteRuleTokenStream(adaptor,"token 84");
         RewriteRuleTokenStream stream_85=new RewriteRuleTokenStream(adaptor,"token 85");
         RewriteRuleSubtreeStream stream_actorImport=new RewriteRuleSubtreeStream(adaptor,"rule actorImport");
@@ -836,23 +830,23 @@ public class C_ALParser extends Parser {
         RewriteRuleSubtreeStream stream_actorDeclarations=new RewriteRuleSubtreeStream(adaptor,"rule actorDeclarations");
         RewriteRuleSubtreeStream stream_actorParameters=new RewriteRuleSubtreeStream(adaptor,"rule actorParameters");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:6: ( ( actorImport )* ACTOR ID '(' ( actorParameters )? ')' '(' (inputs= parameters )? '==>' (outputs= parameters )? ')' '{' ( actorDeclarations )? '}' EOF -> ACTOR ID ^( PARAMETERS ( actorParameters )? ) ^( INPUTS ( $inputs)? ) ^( OUTPUTS ( $outputs)? ) ^( ACTOR_DECLS ( actorDeclarations )? ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:8: ( actorImport )* ACTOR ID '(' ( actorParameters )? ')' '(' (inputs= parameters )? '==>' (outputs= parameters )? ')' '{' ( actorDeclarations )? '}' EOF
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:6: ( ( actorImport )* ACTOR ID '(' ( actorParameters )? ')' '(' (inputs= parameters )? '==>' (outputs= parameters )? ')' '{' ( actorDeclarations )? '}' EOF -> ACTOR ID ^( PARAMETERS ( actorParameters )? ) ^( INPUTS ( $inputs)? ) ^( OUTPUTS ( $outputs)? ) ^( ACTOR_DECLS ( actorDeclarations )? ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:8: ( actorImport )* ACTOR ID '(' ( actorParameters )? ')' '(' (inputs= parameters )? '==>' (outputs= parameters )? ')' '{' ( actorDeclarations )? '}' EOF
             {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:8: ( actorImport )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:8: ( actorImport )*
             loop7:
             do {
                 int alt7=2;
                 int LA7_0 = input.LA(1);
 
-                if ( (LA7_0==93) ) {
+                if ( (LA7_0==92) ) {
                     alt7=1;
                 }
 
 
                 switch (alt7) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:8: actorImport
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:8: actorImport
             	    {
             	    pushFollow(FOLLOW_actorImport_in_actor184);
             	    actorImport23=actorImport();
@@ -875,19 +869,19 @@ public class C_ALParser extends Parser {
             ID25=(Token)match(input,ID,FOLLOW_ID_in_actor189);  
             stream_ID.add(ID25);
 
-            char_literal26=(Token)match(input,83,FOLLOW_83_in_actor191);  
-            stream_83.add(char_literal26);
+            char_literal26=(Token)match(input,82,FOLLOW_82_in_actor191);  
+            stream_82.add(char_literal26);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:34: ( actorParameters )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:34: ( actorParameters )?
             int alt8=2;
             int LA8_0 = input.LA(1);
 
-            if ( ((LA8_0>=121 && LA8_0<=124)) ) {
+            if ( (LA8_0==ID||(LA8_0>=123 && LA8_0<=128)) ) {
                 alt8=1;
             }
             switch (alt8) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:34: actorParameters
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:74:34: actorParameters
                     {
                     pushFollow(FOLLOW_actorParameters_in_actor193);
                     actorParameters27=actorParameters();
@@ -901,22 +895,22 @@ public class C_ALParser extends Parser {
 
             }
 
-            char_literal28=(Token)match(input,84,FOLLOW_84_in_actor196);  
-            stream_84.add(char_literal28);
+            char_literal28=(Token)match(input,83,FOLLOW_83_in_actor196);  
+            stream_83.add(char_literal28);
 
-            char_literal29=(Token)match(input,83,FOLLOW_83_in_actor199);  
-            stream_83.add(char_literal29);
+            char_literal29=(Token)match(input,82,FOLLOW_82_in_actor199);  
+            stream_82.add(char_literal29);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:75:12: (inputs= parameters )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:75:12: (inputs= parameters )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
-            if ( ((LA9_0>=121 && LA9_0<=124)) ) {
+            if ( (LA9_0==ID||(LA9_0>=123 && LA9_0<=128)) ) {
                 alt9=1;
             }
             switch (alt9) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:75:12: inputs= parameters
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:75:12: inputs= parameters
                     {
                     pushFollow(FOLLOW_parameters_in_actor203);
                     inputs=parameters();
@@ -930,19 +924,19 @@ public class C_ALParser extends Parser {
 
             }
 
-            string_literal30=(Token)match(input,85,FOLLOW_85_in_actor206);  
-            stream_85.add(string_literal30);
+            string_literal30=(Token)match(input,84,FOLLOW_84_in_actor206);  
+            stream_84.add(string_literal30);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:75:38: (outputs= parameters )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:75:38: (outputs= parameters )?
             int alt10=2;
             int LA10_0 = input.LA(1);
 
-            if ( ((LA10_0>=121 && LA10_0<=124)) ) {
+            if ( (LA10_0==ID||(LA10_0>=123 && LA10_0<=128)) ) {
                 alt10=1;
             }
             switch (alt10) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:75:38: outputs= parameters
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:75:38: outputs= parameters
                     {
                     pushFollow(FOLLOW_parameters_in_actor210);
                     outputs=parameters();
@@ -956,22 +950,22 @@ public class C_ALParser extends Parser {
 
             }
 
-            char_literal31=(Token)match(input,84,FOLLOW_84_in_actor213);  
-            stream_84.add(char_literal31);
+            char_literal31=(Token)match(input,83,FOLLOW_83_in_actor213);  
+            stream_83.add(char_literal31);
 
-            char_literal32=(Token)match(input,86,FOLLOW_86_in_actor215);  
-            stream_86.add(char_literal32);
+            char_literal32=(Token)match(input,85,FOLLOW_85_in_actor215);  
+            stream_85.add(char_literal32);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:76:2: ( actorDeclarations )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:76:2: ( actorDeclarations )?
             int alt11=2;
             int LA11_0 = input.LA(1);
 
-            if ( (LA11_0==ACTION||(LA11_0>=INITIALIZE && LA11_0<=PRIORITY)||LA11_0==SCHEDULE||LA11_0==88||LA11_0==92||(LA11_0>=121 && LA11_0<=124)) ) {
+            if ( (LA11_0==ACTION||(LA11_0>=INITIALIZE && LA11_0<=PRIORITY)||LA11_0==SCHEDULE||LA11_0==ID||LA11_0==87||LA11_0==91||(LA11_0>=123 && LA11_0<=128)) ) {
                 alt11=1;
             }
             switch (alt11) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:76:2: actorDeclarations
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:76:2: actorDeclarations
                     {
                     pushFollow(FOLLOW_actorDeclarations_in_actor218);
                     actorDeclarations33=actorDeclarations();
@@ -985,8 +979,8 @@ public class C_ALParser extends Parser {
 
             }
 
-            char_literal34=(Token)match(input,87,FOLLOW_87_in_actor221);  
-            stream_87.add(char_literal34);
+            char_literal34=(Token)match(input,86,FOLLOW_86_in_actor221);  
+            stream_86.add(char_literal34);
 
             EOF35=(Token)match(input,EOF,FOLLOW_EOF_in_actor223);  
             stream_EOF.add(EOF35);
@@ -994,7 +988,7 @@ public class C_ALParser extends Parser {
 
 
             // AST REWRITE
-            // elements: actorDeclarations, inputs, ID, outputs, actorParameters, ACTOR
+            // elements: ID, inputs, actorDeclarations, actorParameters, ACTOR, outputs
             // token labels: 
             // rule labels: retval, inputs, outputs
             // token list labels: 
@@ -1010,12 +1004,12 @@ public class C_ALParser extends Parser {
             {
                 adaptor.addChild(root_0, stream_ACTOR.nextNode());
                 adaptor.addChild(root_0, stream_ID.nextNode());
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:78:2: ^( PARAMETERS ( actorParameters )? )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:78:2: ^( PARAMETERS ( actorParameters )? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(PARAMETERS, "PARAMETERS"), root_1);
 
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:78:15: ( actorParameters )?
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:78:15: ( actorParameters )?
                 if ( stream_actorParameters.hasNext() ) {
                     adaptor.addChild(root_1, stream_actorParameters.nextTree());
 
@@ -1024,12 +1018,12 @@ public class C_ALParser extends Parser {
 
                 adaptor.addChild(root_0, root_1);
                 }
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:79:2: ^( INPUTS ( $inputs)? )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:79:2: ^( INPUTS ( $inputs)? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(INPUTS, "INPUTS"), root_1);
 
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:79:11: ( $inputs)?
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:79:11: ( $inputs)?
                 if ( stream_inputs.hasNext() ) {
                     adaptor.addChild(root_1, stream_inputs.nextTree());
 
@@ -1038,12 +1032,12 @@ public class C_ALParser extends Parser {
 
                 adaptor.addChild(root_0, root_1);
                 }
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:80:2: ^( OUTPUTS ( $outputs)? )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:80:2: ^( OUTPUTS ( $outputs)? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(OUTPUTS, "OUTPUTS"), root_1);
 
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:80:12: ( $outputs)?
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:80:12: ( $outputs)?
                 if ( stream_outputs.hasNext() ) {
                     adaptor.addChild(root_1, stream_outputs.nextTree());
 
@@ -1052,12 +1046,12 @@ public class C_ALParser extends Parser {
 
                 adaptor.addChild(root_0, root_1);
                 }
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:81:2: ^( ACTOR_DECLS ( actorDeclarations )? )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:81:2: ^( ACTOR_DECLS ( actorDeclarations )? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(ACTOR_DECLS, "ACTOR_DECLS"), root_1);
 
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:81:16: ( actorDeclarations )?
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:81:16: ( actorDeclarations )?
                 if ( stream_actorDeclarations.hasNext() ) {
                     adaptor.addChild(root_1, stream_actorDeclarations.nextTree());
 
@@ -1096,7 +1090,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actionOrInitialize"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:83:1: actionOrInitialize : ( ACTION ( qualifiedIdent )? '(' ( actionInputs )? '==>' ( actionOutputs )? ')' ( actionGuards )? '{' ( varDecl )* ( statement )* '}' -> ^( ACTION ^( TAG ( qualifiedIdent )? ) ^( INPUTS ( actionInputs )? ) ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) ) | INITIALIZE ( qualifiedIdent )? '(' ( actionOutputs )? ')' ( actionGuards )? '{' ( varDecl )* ( statement )* '}' -> ^( INITIALIZE ^( TAG ( qualifiedIdent )? ) INPUTS ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) ) );
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:83:1: actionOrInitialize : ( ACTION ( qualifiedIdent )? '(' ( actionInputs )? '==>' ( actionOutputs )? ')' ( actionGuards )? statement_block -> ^( ACTION ( qualifiedIdent )? ^( INPUTS ( actionInputs )? ) ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) statement_block ) | INITIALIZE ( qualifiedIdent )? '(' ( actionOutputs )? ')' ( actionGuards )? statement_block -> ^( INITIALIZE ( qualifiedIdent )? INPUTS ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) statement_block ) );
     public final C_ALParser.actionOrInitialize_return actionOrInitialize() throws RecognitionException {
         C_ALParser.actionOrInitialize_return retval = new C_ALParser.actionOrInitialize_return();
         retval.start = input.LT(1);
@@ -1107,13 +1101,9 @@ public class C_ALParser extends Parser {
         Token char_literal38=null;
         Token string_literal40=null;
         Token char_literal42=null;
-        Token char_literal44=null;
+        Token INITIALIZE45=null;
         Token char_literal47=null;
-        Token INITIALIZE48=null;
-        Token char_literal50=null;
-        Token char_literal52=null;
-        Token char_literal54=null;
-        Token char_literal57=null;
+        Token char_literal49=null;
         C_ALParser.qualifiedIdent_return qualifiedIdent37 = null;
 
         C_ALParser.actionInputs_return actionInputs39 = null;
@@ -1122,70 +1112,59 @@ public class C_ALParser extends Parser {
 
         C_ALParser.actionGuards_return actionGuards43 = null;
 
-        C_ALParser.varDecl_return varDecl45 = null;
+        C_ALParser.statement_block_return statement_block44 = null;
 
-        C_ALParser.statement_return statement46 = null;
+        C_ALParser.qualifiedIdent_return qualifiedIdent46 = null;
 
-        C_ALParser.qualifiedIdent_return qualifiedIdent49 = null;
+        C_ALParser.actionOutputs_return actionOutputs48 = null;
 
-        C_ALParser.actionOutputs_return actionOutputs51 = null;
+        C_ALParser.actionGuards_return actionGuards50 = null;
 
-        C_ALParser.actionGuards_return actionGuards53 = null;
-
-        C_ALParser.varDecl_return varDecl55 = null;
-
-        C_ALParser.statement_return statement56 = null;
+        C_ALParser.statement_block_return statement_block51 = null;
 
 
         Object ACTION36_tree=null;
         Object char_literal38_tree=null;
         Object string_literal40_tree=null;
         Object char_literal42_tree=null;
-        Object char_literal44_tree=null;
+        Object INITIALIZE45_tree=null;
         Object char_literal47_tree=null;
-        Object INITIALIZE48_tree=null;
-        Object char_literal50_tree=null;
-        Object char_literal52_tree=null;
-        Object char_literal54_tree=null;
-        Object char_literal57_tree=null;
+        Object char_literal49_tree=null;
         RewriteRuleTokenStream stream_INITIALIZE=new RewriteRuleTokenStream(adaptor,"token INITIALIZE");
+        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
         RewriteRuleTokenStream stream_83=new RewriteRuleTokenStream(adaptor,"token 83");
         RewriteRuleTokenStream stream_ACTION=new RewriteRuleTokenStream(adaptor,"token ACTION");
-        RewriteRuleTokenStream stream_86=new RewriteRuleTokenStream(adaptor,"token 86");
-        RewriteRuleTokenStream stream_87=new RewriteRuleTokenStream(adaptor,"token 87");
         RewriteRuleTokenStream stream_84=new RewriteRuleTokenStream(adaptor,"token 84");
-        RewriteRuleTokenStream stream_85=new RewriteRuleTokenStream(adaptor,"token 85");
-        RewriteRuleSubtreeStream stream_statement=new RewriteRuleSubtreeStream(adaptor,"rule statement");
+        RewriteRuleSubtreeStream stream_statement_block=new RewriteRuleSubtreeStream(adaptor,"rule statement_block");
         RewriteRuleSubtreeStream stream_actionOutputs=new RewriteRuleSubtreeStream(adaptor,"rule actionOutputs");
         RewriteRuleSubtreeStream stream_actionInputs=new RewriteRuleSubtreeStream(adaptor,"rule actionInputs");
         RewriteRuleSubtreeStream stream_actionGuards=new RewriteRuleSubtreeStream(adaptor,"rule actionGuards");
-        RewriteRuleSubtreeStream stream_varDecl=new RewriteRuleSubtreeStream(adaptor,"rule varDecl");
         RewriteRuleSubtreeStream stream_qualifiedIdent=new RewriteRuleSubtreeStream(adaptor,"rule qualifiedIdent");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:89:19: ( ACTION ( qualifiedIdent )? '(' ( actionInputs )? '==>' ( actionOutputs )? ')' ( actionGuards )? '{' ( varDecl )* ( statement )* '}' -> ^( ACTION ^( TAG ( qualifiedIdent )? ) ^( INPUTS ( actionInputs )? ) ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) ) | INITIALIZE ( qualifiedIdent )? '(' ( actionOutputs )? ')' ( actionGuards )? '{' ( varDecl )* ( statement )* '}' -> ^( INITIALIZE ^( TAG ( qualifiedIdent )? ) INPUTS ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) ) )
-            int alt23=2;
-            int LA23_0 = input.LA(1);
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:89:19: ( ACTION ( qualifiedIdent )? '(' ( actionInputs )? '==>' ( actionOutputs )? ')' ( actionGuards )? statement_block -> ^( ACTION ( qualifiedIdent )? ^( INPUTS ( actionInputs )? ) ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) statement_block ) | INITIALIZE ( qualifiedIdent )? '(' ( actionOutputs )? ')' ( actionGuards )? statement_block -> ^( INITIALIZE ( qualifiedIdent )? INPUTS ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) statement_block ) )
+            int alt19=2;
+            int LA19_0 = input.LA(1);
 
-            if ( (LA23_0==ACTION) ) {
-                alt23=1;
+            if ( (LA19_0==ACTION) ) {
+                alt19=1;
             }
-            else if ( (LA23_0==INITIALIZE) ) {
-                alt23=2;
+            else if ( (LA19_0==INITIALIZE) ) {
+                alt19=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 23, 0, input);
+                    new NoViableAltException("", 19, 0, input);
 
                 throw nvae;
             }
-            switch (alt23) {
+            switch (alt19) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:3: ACTION ( qualifiedIdent )? '(' ( actionInputs )? '==>' ( actionOutputs )? ')' ( actionGuards )? '{' ( varDecl )* ( statement )* '}'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:3: ACTION ( qualifiedIdent )? '(' ( actionInputs )? '==>' ( actionOutputs )? ')' ( actionGuards )? statement_block
                     {
                     ACTION36=(Token)match(input,ACTION,FOLLOW_ACTION_in_actionOrInitialize284);  
                     stream_ACTION.add(ACTION36);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:10: ( qualifiedIdent )?
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:10: ( qualifiedIdent )?
                     int alt12=2;
                     int LA12_0 = input.LA(1);
 
@@ -1194,7 +1173,7 @@ public class C_ALParser extends Parser {
                     }
                     switch (alt12) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:10: qualifiedIdent
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:10: qualifiedIdent
                             {
                             pushFollow(FOLLOW_qualifiedIdent_in_actionOrInitialize286);
                             qualifiedIdent37=qualifiedIdent();
@@ -1208,19 +1187,19 @@ public class C_ALParser extends Parser {
 
                     }
 
-                    char_literal38=(Token)match(input,83,FOLLOW_83_in_actionOrInitialize289);  
-                    stream_83.add(char_literal38);
+                    char_literal38=(Token)match(input,82,FOLLOW_82_in_actionOrInitialize289);  
+                    stream_82.add(char_literal38);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:30: ( actionInputs )?
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:30: ( actionInputs )?
                     int alt13=2;
                     int LA13_0 = input.LA(1);
 
-                    if ( (LA13_0==ID||LA13_0==80) ) {
+                    if ( (LA13_0==ID||LA13_0==79) ) {
                         alt13=1;
                     }
                     switch (alt13) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:30: actionInputs
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:30: actionInputs
                             {
                             pushFollow(FOLLOW_actionInputs_in_actionOrInitialize291);
                             actionInputs39=actionInputs();
@@ -1234,19 +1213,19 @@ public class C_ALParser extends Parser {
 
                     }
 
-                    string_literal40=(Token)match(input,85,FOLLOW_85_in_actionOrInitialize294);  
-                    stream_85.add(string_literal40);
+                    string_literal40=(Token)match(input,84,FOLLOW_84_in_actionOrInitialize294);  
+                    stream_84.add(string_literal40);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:50: ( actionOutputs )?
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:50: ( actionOutputs )?
                     int alt14=2;
                     int LA14_0 = input.LA(1);
 
-                    if ( (LA14_0==ID||LA14_0==80) ) {
+                    if ( (LA14_0==ID||LA14_0==79) ) {
                         alt14=1;
                     }
                     switch (alt14) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:50: actionOutputs
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:91:50: actionOutputs
                             {
                             pushFollow(FOLLOW_actionOutputs_in_actionOrInitialize296);
                             actionOutputs41=actionOutputs();
@@ -1260,10 +1239,10 @@ public class C_ALParser extends Parser {
 
                     }
 
-                    char_literal42=(Token)match(input,84,FOLLOW_84_in_actionOrInitialize299);  
-                    stream_84.add(char_literal42);
+                    char_literal42=(Token)match(input,83,FOLLOW_83_in_actionOrInitialize299);  
+                    stream_83.add(char_literal42);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:92:5: ( actionGuards )?
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:92:5: ( actionGuards )?
                     int alt15=2;
                     int LA15_0 = input.LA(1);
 
@@ -1272,7 +1251,7 @@ public class C_ALParser extends Parser {
                     }
                     switch (alt15) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:92:5: actionGuards
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:92:5: actionGuards
                             {
                             pushFollow(FOLLOW_actionGuards_in_actionOrInitialize305);
                             actionGuards43=actionGuards();
@@ -1286,76 +1265,16 @@ public class C_ALParser extends Parser {
 
                     }
 
-                    char_literal44=(Token)match(input,86,FOLLOW_86_in_actionOrInitialize308);  
-                    stream_86.add(char_literal44);
+                    pushFollow(FOLLOW_statement_block_in_actionOrInitialize312);
+                    statement_block44=statement_block();
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:93:7: ( varDecl )*
-                    loop16:
-                    do {
-                        int alt16=2;
-                        int LA16_0 = input.LA(1);
+                    state._fsp--;
 
-                        if ( (LA16_0==88||(LA16_0>=121 && LA16_0<=124)) ) {
-                            alt16=1;
-                        }
-
-
-                        switch (alt16) {
-                    	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:93:7: varDecl
-                    	    {
-                    	    pushFollow(FOLLOW_varDecl_in_actionOrInitialize316);
-                    	    varDecl45=varDecl();
-
-                    	    state._fsp--;
-
-                    	    stream_varDecl.add(varDecl45.getTree());
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop16;
-                        }
-                    } while (true);
-
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:94:7: ( statement )*
-                    loop17:
-                    do {
-                        int alt17=2;
-                        int LA17_0 = input.LA(1);
-
-                        if ( (LA17_0==ID) ) {
-                            alt17=1;
-                        }
-
-
-                        switch (alt17) {
-                    	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:94:7: statement
-                    	    {
-                    	    pushFollow(FOLLOW_statement_in_actionOrInitialize325);
-                    	    statement46=statement();
-
-                    	    state._fsp--;
-
-                    	    stream_statement.add(statement46.getTree());
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop17;
-                        }
-                    } while (true);
-
-                    char_literal47=(Token)match(input,87,FOLLOW_87_in_actionOrInitialize332);  
-                    stream_87.add(char_literal47);
-
+                    stream_statement_block.add(statement_block44.getTree());
 
 
                     // AST REWRITE
-                    // elements: statement, actionOutputs, qualifiedIdent, actionGuards, varDecl, ACTION, actionInputs
+                    // elements: statement_block, actionOutputs, actionInputs, ACTION, qualifiedIdent, actionGuards
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -1365,33 +1284,25 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 95:9: -> ^( ACTION ^( TAG ( qualifiedIdent )? ) ^( INPUTS ( actionInputs )? ) ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) )
+                    // 93:21: -> ^( ACTION ( qualifiedIdent )? ^( INPUTS ( actionInputs )? ) ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) statement_block )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:96:7: ^( ACTION ^( TAG ( qualifiedIdent )? ) ^( INPUTS ( actionInputs )? ) ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:94:7: ^( ACTION ( qualifiedIdent )? ^( INPUTS ( actionInputs )? ) ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) statement_block )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot(stream_ACTION.nextNode(), root_1);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:96:16: ^( TAG ( qualifiedIdent )? )
-                        {
-                        Object root_2 = (Object)adaptor.nil();
-                        root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(TAG, "TAG"), root_2);
-
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:96:22: ( qualifiedIdent )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:94:16: ( qualifiedIdent )?
                         if ( stream_qualifiedIdent.hasNext() ) {
-                            adaptor.addChild(root_2, stream_qualifiedIdent.nextTree());
+                            adaptor.addChild(root_1, stream_qualifiedIdent.nextTree());
 
                         }
                         stream_qualifiedIdent.reset();
-
-                        adaptor.addChild(root_1, root_2);
-                        }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:96:39: ^( INPUTS ( actionInputs )? )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:94:32: ^( INPUTS ( actionInputs )? )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(INPUTS, "INPUTS"), root_2);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:96:48: ( actionInputs )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:94:41: ( actionInputs )?
                         if ( stream_actionInputs.hasNext() ) {
                             adaptor.addChild(root_2, stream_actionInputs.nextTree());
 
@@ -1400,12 +1311,12 @@ public class C_ALParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:96:63: ^( OUTPUTS ( actionOutputs )? )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:94:56: ^( OUTPUTS ( actionOutputs )? )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(OUTPUTS, "OUTPUTS"), root_2);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:96:73: ( actionOutputs )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:94:66: ( actionOutputs )?
                         if ( stream_actionOutputs.hasNext() ) {
                             adaptor.addChild(root_2, stream_actionOutputs.nextTree());
 
@@ -1414,12 +1325,12 @@ public class C_ALParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:97:7: ^( GUARDS ( actionGuards )? )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:95:7: ^( GUARDS ( actionGuards )? )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(GUARDS, "GUARDS"), root_2);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:97:16: ( actionGuards )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:95:16: ( actionGuards )?
                         if ( stream_actionGuards.hasNext() ) {
                             adaptor.addChild(root_2, stream_actionGuards.nextTree());
 
@@ -1428,34 +1339,7 @@ public class C_ALParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:98:7: ^( VARIABLES ( varDecl )* )
-                        {
-                        Object root_2 = (Object)adaptor.nil();
-                        root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLES, "VARIABLES"), root_2);
-
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:98:19: ( varDecl )*
-                        while ( stream_varDecl.hasNext() ) {
-                            adaptor.addChild(root_2, stream_varDecl.nextTree());
-
-                        }
-                        stream_varDecl.reset();
-
-                        adaptor.addChild(root_1, root_2);
-                        }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:99:7: ^( STATEMENTS ( statement )* )
-                        {
-                        Object root_2 = (Object)adaptor.nil();
-                        root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATEMENTS, "STATEMENTS"), root_2);
-
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:99:20: ( statement )*
-                        while ( stream_statement.hasNext() ) {
-                            adaptor.addChild(root_2, stream_statement.nextTree());
-
-                        }
-                        stream_statement.reset();
-
-                        adaptor.addChild(root_1, root_2);
-                        }
+                        adaptor.addChild(root_1, stream_statement_block.nextTree());
 
                         adaptor.addChild(root_0, root_1);
                         }
@@ -1466,156 +1350,96 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:3: INITIALIZE ( qualifiedIdent )? '(' ( actionOutputs )? ')' ( actionGuards )? '{' ( varDecl )* ( statement )* '}'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:99:3: INITIALIZE ( qualifiedIdent )? '(' ( actionOutputs )? ')' ( actionGuards )? statement_block
                     {
-                    INITIALIZE48=(Token)match(input,INITIALIZE,FOLLOW_INITIALIZE_in_actionOrInitialize418);  
-                    stream_INITIALIZE.add(INITIALIZE48);
+                    INITIALIZE45=(Token)match(input,INITIALIZE,FOLLOW_INITIALIZE_in_actionOrInitialize376);  
+                    stream_INITIALIZE.add(INITIALIZE45);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:14: ( qualifiedIdent )?
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:99:14: ( qualifiedIdent )?
+                    int alt16=2;
+                    int LA16_0 = input.LA(1);
+
+                    if ( (LA16_0==ID) ) {
+                        alt16=1;
+                    }
+                    switch (alt16) {
+                        case 1 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:99:14: qualifiedIdent
+                            {
+                            pushFollow(FOLLOW_qualifiedIdent_in_actionOrInitialize378);
+                            qualifiedIdent46=qualifiedIdent();
+
+                            state._fsp--;
+
+                            stream_qualifiedIdent.add(qualifiedIdent46.getTree());
+
+                            }
+                            break;
+
+                    }
+
+                    char_literal47=(Token)match(input,82,FOLLOW_82_in_actionOrInitialize381);  
+                    stream_82.add(char_literal47);
+
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:99:34: ( actionOutputs )?
+                    int alt17=2;
+                    int LA17_0 = input.LA(1);
+
+                    if ( (LA17_0==ID||LA17_0==79) ) {
+                        alt17=1;
+                    }
+                    switch (alt17) {
+                        case 1 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:99:34: actionOutputs
+                            {
+                            pushFollow(FOLLOW_actionOutputs_in_actionOrInitialize383);
+                            actionOutputs48=actionOutputs();
+
+                            state._fsp--;
+
+                            stream_actionOutputs.add(actionOutputs48.getTree());
+
+                            }
+                            break;
+
+                    }
+
+                    char_literal49=(Token)match(input,83,FOLLOW_83_in_actionOrInitialize386);  
+                    stream_83.add(char_literal49);
+
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:100:5: ( actionGuards )?
                     int alt18=2;
                     int LA18_0 = input.LA(1);
 
-                    if ( (LA18_0==ID) ) {
+                    if ( (LA18_0==GUARD) ) {
                         alt18=1;
                     }
                     switch (alt18) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:14: qualifiedIdent
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:100:5: actionGuards
                             {
-                            pushFollow(FOLLOW_qualifiedIdent_in_actionOrInitialize420);
-                            qualifiedIdent49=qualifiedIdent();
+                            pushFollow(FOLLOW_actionGuards_in_actionOrInitialize392);
+                            actionGuards50=actionGuards();
 
                             state._fsp--;
 
-                            stream_qualifiedIdent.add(qualifiedIdent49.getTree());
+                            stream_actionGuards.add(actionGuards50.getTree());
 
                             }
                             break;
 
                     }
 
-                    char_literal50=(Token)match(input,83,FOLLOW_83_in_actionOrInitialize423);  
-                    stream_83.add(char_literal50);
+                    pushFollow(FOLLOW_statement_block_in_actionOrInitialize400);
+                    statement_block51=statement_block();
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:34: ( actionOutputs )?
-                    int alt19=2;
-                    int LA19_0 = input.LA(1);
+                    state._fsp--;
 
-                    if ( (LA19_0==ID||LA19_0==80) ) {
-                        alt19=1;
-                    }
-                    switch (alt19) {
-                        case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:34: actionOutputs
-                            {
-                            pushFollow(FOLLOW_actionOutputs_in_actionOrInitialize425);
-                            actionOutputs51=actionOutputs();
-
-                            state._fsp--;
-
-                            stream_actionOutputs.add(actionOutputs51.getTree());
-
-                            }
-                            break;
-
-                    }
-
-                    char_literal52=(Token)match(input,84,FOLLOW_84_in_actionOrInitialize428);  
-                    stream_84.add(char_literal52);
-
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:103:5: ( actionGuards )?
-                    int alt20=2;
-                    int LA20_0 = input.LA(1);
-
-                    if ( (LA20_0==GUARD) ) {
-                        alt20=1;
-                    }
-                    switch (alt20) {
-                        case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:103:5: actionGuards
-                            {
-                            pushFollow(FOLLOW_actionGuards_in_actionOrInitialize434);
-                            actionGuards53=actionGuards();
-
-                            state._fsp--;
-
-                            stream_actionGuards.add(actionGuards53.getTree());
-
-                            }
-                            break;
-
-                    }
-
-                    char_literal54=(Token)match(input,86,FOLLOW_86_in_actionOrInitialize437);  
-                    stream_86.add(char_literal54);
-
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:104:7: ( varDecl )*
-                    loop21:
-                    do {
-                        int alt21=2;
-                        int LA21_0 = input.LA(1);
-
-                        if ( (LA21_0==88||(LA21_0>=121 && LA21_0<=124)) ) {
-                            alt21=1;
-                        }
-
-
-                        switch (alt21) {
-                    	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:104:7: varDecl
-                    	    {
-                    	    pushFollow(FOLLOW_varDecl_in_actionOrInitialize445);
-                    	    varDecl55=varDecl();
-
-                    	    state._fsp--;
-
-                    	    stream_varDecl.add(varDecl55.getTree());
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop21;
-                        }
-                    } while (true);
-
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:105:7: ( statement )*
-                    loop22:
-                    do {
-                        int alt22=2;
-                        int LA22_0 = input.LA(1);
-
-                        if ( (LA22_0==ID) ) {
-                            alt22=1;
-                        }
-
-
-                        switch (alt22) {
-                    	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:105:7: statement
-                    	    {
-                    	    pushFollow(FOLLOW_statement_in_actionOrInitialize454);
-                    	    statement56=statement();
-
-                    	    state._fsp--;
-
-                    	    stream_statement.add(statement56.getTree());
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop22;
-                        }
-                    } while (true);
-
-                    char_literal57=(Token)match(input,87,FOLLOW_87_in_actionOrInitialize461);  
-                    stream_87.add(char_literal57);
-
+                    stream_statement_block.add(statement_block51.getTree());
 
 
                     // AST REWRITE
-                    // elements: statement, actionGuards, INITIALIZE, actionOutputs, varDecl, qualifiedIdent
+                    // elements: statement_block, INITIALIZE, actionGuards, qualifiedIdent, actionOutputs
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -1625,34 +1449,26 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 106:9: -> ^( INITIALIZE ^( TAG ( qualifiedIdent )? ) INPUTS ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) )
+                    // 101:21: -> ^( INITIALIZE ( qualifiedIdent )? INPUTS ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) statement_block )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:107:7: ^( INITIALIZE ^( TAG ( qualifiedIdent )? ) INPUTS ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:7: ^( INITIALIZE ( qualifiedIdent )? INPUTS ^( OUTPUTS ( actionOutputs )? ) ^( GUARDS ( actionGuards )? ) statement_block )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot(stream_INITIALIZE.nextNode(), root_1);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:107:20: ^( TAG ( qualifiedIdent )? )
-                        {
-                        Object root_2 = (Object)adaptor.nil();
-                        root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(TAG, "TAG"), root_2);
-
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:107:26: ( qualifiedIdent )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:20: ( qualifiedIdent )?
                         if ( stream_qualifiedIdent.hasNext() ) {
-                            adaptor.addChild(root_2, stream_qualifiedIdent.nextTree());
+                            adaptor.addChild(root_1, stream_qualifiedIdent.nextTree());
 
                         }
                         stream_qualifiedIdent.reset();
-
-                        adaptor.addChild(root_1, root_2);
-                        }
                         adaptor.addChild(root_1, (Object)adaptor.create(INPUTS, "INPUTS"));
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:107:50: ^( OUTPUTS ( actionOutputs )? )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:43: ^( OUTPUTS ( actionOutputs )? )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(OUTPUTS, "OUTPUTS"), root_2);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:107:60: ( actionOutputs )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:102:53: ( actionOutputs )?
                         if ( stream_actionOutputs.hasNext() ) {
                             adaptor.addChild(root_2, stream_actionOutputs.nextTree());
 
@@ -1661,12 +1477,12 @@ public class C_ALParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:108:7: ^( GUARDS ( actionGuards )? )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:103:7: ^( GUARDS ( actionGuards )? )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(GUARDS, "GUARDS"), root_2);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:108:16: ( actionGuards )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:103:16: ( actionGuards )?
                         if ( stream_actionGuards.hasNext() ) {
                             adaptor.addChild(root_2, stream_actionGuards.nextTree());
 
@@ -1675,34 +1491,7 @@ public class C_ALParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:109:7: ^( VARIABLES ( varDecl )* )
-                        {
-                        Object root_2 = (Object)adaptor.nil();
-                        root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLES, "VARIABLES"), root_2);
-
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:109:19: ( varDecl )*
-                        while ( stream_varDecl.hasNext() ) {
-                            adaptor.addChild(root_2, stream_varDecl.nextTree());
-
-                        }
-                        stream_varDecl.reset();
-
-                        adaptor.addChild(root_1, root_2);
-                        }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:110:7: ^( STATEMENTS ( statement )* )
-                        {
-                        Object root_2 = (Object)adaptor.nil();
-                        root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATEMENTS, "STATEMENTS"), root_2);
-
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:110:20: ( statement )*
-                        while ( stream_statement.hasNext() ) {
-                            adaptor.addChild(root_2, stream_statement.nextTree());
-
-                        }
-                        stream_statement.reset();
-
-                        adaptor.addChild(root_1, root_2);
-                        }
+                        adaptor.addChild(root_1, stream_statement_block.nextTree());
 
                         adaptor.addChild(root_0, root_1);
                         }
@@ -1738,279 +1527,225 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actorDeclaration"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:118:1: actorDeclaration : ( actionOrInitialize | priorityOrder | 'const' typeDef ID '=' expression ';' -> ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression ) | typeDef ID ( '=' expression ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE expression ) | ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE ) | '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}' -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression ) ) | 'void' ID '(' ( parameters )? ')' '{' ( varDecl )* ( statement )* '}' -> ^( PROCEDURE ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) ) );
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:112:1: actorDeclaration : ( actionOrInitialize | priorityOrder | 'const' typeDef ID ( '=' expression ';' -> ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression ) | typeListSpec '=' expression ';' -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID NON_ASSIGNABLE expression ) ) | typeDef ID ( ( '=' expression )? ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE ( expression )? ) | typeListSpec ( '=' expression )? ';' -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID ASSIGNABLE ( expression )? ) | '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}' -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression ) ) | 'void' ID '(' ( parameters )? ')' statement_block -> ^( PROCEDURE ID ^( PARAMETERS ( parameters )? ) statement_block ) );
     public final C_ALParser.actorDeclaration_return actorDeclaration() throws RecognitionException {
         C_ALParser.actorDeclaration_return retval = new C_ALParser.actorDeclaration_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal60=null;
-        Token ID62=null;
+        Token string_literal54=null;
+        Token ID56=null;
+        Token char_literal57=null;
+        Token char_literal59=null;
+        Token char_literal61=null;
         Token char_literal63=null;
-        Token char_literal65=null;
-        Token ID67=null;
+        Token ID65=null;
+        Token char_literal66=null;
         Token char_literal68=null;
         Token char_literal70=null;
-        Token char_literal71=null;
         Token char_literal72=null;
-        Token char_literal74=null;
+        Token char_literal73=null;
         Token char_literal75=null;
-        Token string_literal77=null;
-        Token char_literal79=null;
+        Token char_literal76=null;
+        Token string_literal78=null;
         Token char_literal80=null;
-        Token string_literal81=null;
-        Token ID82=null;
-        Token char_literal83=null;
-        Token char_literal85=null;
+        Token char_literal81=null;
+        Token string_literal82=null;
+        Token ID83=null;
+        Token char_literal84=null;
         Token char_literal86=null;
-        Token char_literal89=null;
-        C_ALParser.actionOrInitialize_return actionOrInitialize58 = null;
+        C_ALParser.actionOrInitialize_return actionOrInitialize52 = null;
 
-        C_ALParser.priorityOrder_return priorityOrder59 = null;
+        C_ALParser.priorityOrder_return priorityOrder53 = null;
 
-        C_ALParser.typeDef_return typeDef61 = null;
+        C_ALParser.typeDef_return typeDef55 = null;
 
-        C_ALParser.expression_return expression64 = null;
+        C_ALParser.expression_return expression58 = null;
 
-        C_ALParser.typeDef_return typeDef66 = null;
+        C_ALParser.typeListSpec_return typeListSpec60 = null;
 
-        C_ALParser.expression_return expression69 = null;
+        C_ALParser.expression_return expression62 = null;
 
-        C_ALParser.parameters_return parameters73 = null;
+        C_ALParser.typeDef_return typeDef64 = null;
 
-        C_ALParser.varDecl_return varDecl76 = null;
+        C_ALParser.expression_return expression67 = null;
 
-        C_ALParser.expression_return expression78 = null;
+        C_ALParser.typeListSpec_return typeListSpec69 = null;
 
-        C_ALParser.parameters_return parameters84 = null;
+        C_ALParser.expression_return expression71 = null;
 
-        C_ALParser.varDecl_return varDecl87 = null;
+        C_ALParser.parameters_return parameters74 = null;
 
-        C_ALParser.statement_return statement88 = null;
+        C_ALParser.varDecl_return varDecl77 = null;
+
+        C_ALParser.expression_return expression79 = null;
+
+        C_ALParser.parameters_return parameters85 = null;
+
+        C_ALParser.statement_block_return statement_block87 = null;
 
 
-        Object string_literal60_tree=null;
-        Object ID62_tree=null;
+        Object string_literal54_tree=null;
+        Object ID56_tree=null;
+        Object char_literal57_tree=null;
+        Object char_literal59_tree=null;
+        Object char_literal61_tree=null;
         Object char_literal63_tree=null;
-        Object char_literal65_tree=null;
-        Object ID67_tree=null;
+        Object ID65_tree=null;
+        Object char_literal66_tree=null;
         Object char_literal68_tree=null;
         Object char_literal70_tree=null;
-        Object char_literal71_tree=null;
         Object char_literal72_tree=null;
-        Object char_literal74_tree=null;
+        Object char_literal73_tree=null;
         Object char_literal75_tree=null;
-        Object string_literal77_tree=null;
-        Object char_literal79_tree=null;
+        Object char_literal76_tree=null;
+        Object string_literal78_tree=null;
         Object char_literal80_tree=null;
-        Object string_literal81_tree=null;
-        Object ID82_tree=null;
-        Object char_literal83_tree=null;
-        Object char_literal85_tree=null;
+        Object char_literal81_tree=null;
+        Object string_literal82_tree=null;
+        Object ID83_tree=null;
+        Object char_literal84_tree=null;
         Object char_literal86_tree=null;
-        Object char_literal89_tree=null;
-        RewriteRuleTokenStream stream_92=new RewriteRuleTokenStream(adaptor,"token 92");
         RewriteRuleTokenStream stream_91=new RewriteRuleTokenStream(adaptor,"token 91");
-        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
+        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
         RewriteRuleTokenStream stream_90=new RewriteRuleTokenStream(adaptor,"token 90");
+        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_83=new RewriteRuleTokenStream(adaptor,"token 83");
         RewriteRuleTokenStream stream_86=new RewriteRuleTokenStream(adaptor,"token 86");
         RewriteRuleTokenStream stream_87=new RewriteRuleTokenStream(adaptor,"token 87");
-        RewriteRuleTokenStream stream_84=new RewriteRuleTokenStream(adaptor,"token 84");
         RewriteRuleTokenStream stream_88=new RewriteRuleTokenStream(adaptor,"token 88");
+        RewriteRuleTokenStream stream_85=new RewriteRuleTokenStream(adaptor,"token 85");
         RewriteRuleTokenStream stream_89=new RewriteRuleTokenStream(adaptor,"token 89");
-        RewriteRuleSubtreeStream stream_statement=new RewriteRuleSubtreeStream(adaptor,"rule statement");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
+        RewriteRuleSubtreeStream stream_statement_block=new RewriteRuleSubtreeStream(adaptor,"rule statement_block");
+        RewriteRuleSubtreeStream stream_typeListSpec=new RewriteRuleSubtreeStream(adaptor,"rule typeListSpec");
         RewriteRuleSubtreeStream stream_varDecl=new RewriteRuleSubtreeStream(adaptor,"rule varDecl");
         RewriteRuleSubtreeStream stream_typeDef=new RewriteRuleSubtreeStream(adaptor,"rule typeDef");
         RewriteRuleSubtreeStream stream_parameters=new RewriteRuleSubtreeStream(adaptor,"rule parameters");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:118:17: ( actionOrInitialize | priorityOrder | 'const' typeDef ID '=' expression ';' -> ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression ) | typeDef ID ( '=' expression ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE expression ) | ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE ) | '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}' -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression ) ) | 'void' ID '(' ( parameters )? ')' '{' ( varDecl )* ( statement )* '}' -> ^( PROCEDURE ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) ) )
-            int alt30=5;
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:112:17: ( actionOrInitialize | priorityOrder | 'const' typeDef ID ( '=' expression ';' -> ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression ) | typeListSpec '=' expression ';' -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID NON_ASSIGNABLE expression ) ) | typeDef ID ( ( '=' expression )? ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE ( expression )? ) | typeListSpec ( '=' expression )? ';' -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID ASSIGNABLE ( expression )? ) | '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}' -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression ) ) | 'void' ID '(' ( parameters )? ')' statement_block -> ^( PROCEDURE ID ^( PARAMETERS ( parameters )? ) statement_block ) )
+            int alt27=5;
             switch ( input.LA(1) ) {
             case ACTION:
             case INITIALIZE:
                 {
-                alt30=1;
+                alt27=1;
                 }
                 break;
             case PRIORITY:
                 {
-                alt30=2;
+                alt27=2;
                 }
                 break;
-            case 88:
+            case 87:
                 {
-                alt30=3;
+                alt27=3;
                 }
                 break;
-            case 121:
-            case 122:
+            case ID:
             case 123:
             case 124:
+            case 125:
+            case 126:
+            case 127:
+            case 128:
                 {
-                alt30=4;
+                alt27=4;
                 }
                 break;
-            case 92:
+            case 91:
                 {
-                alt30=5;
+                alt27=5;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("", 30, 0, input);
+                    new NoViableAltException("", 27, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt30) {
+            switch (alt27) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:119:3: actionOrInitialize
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:113:3: actionOrInitialize
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_actionOrInitialize_in_actorDeclaration543);
-                    actionOrInitialize58=actionOrInitialize();
+                    pushFollow(FOLLOW_actionOrInitialize_in_actorDeclaration460);
+                    actionOrInitialize52=actionOrInitialize();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, actionOrInitialize58.getTree());
+                    adaptor.addChild(root_0, actionOrInitialize52.getTree());
 
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:120:3: priorityOrder
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:114:3: priorityOrder
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_priorityOrder_in_actorDeclaration547);
-                    priorityOrder59=priorityOrder();
+                    pushFollow(FOLLOW_priorityOrder_in_actorDeclaration464);
+                    priorityOrder53=priorityOrder();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, priorityOrder59.getTree());
+                    adaptor.addChild(root_0, priorityOrder53.getTree());
 
                     }
                     break;
                 case 3 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:122:3: 'const' typeDef ID '=' expression ';'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:116:3: 'const' typeDef ID ( '=' expression ';' -> ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression ) | typeListSpec '=' expression ';' -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID NON_ASSIGNABLE expression ) )
                     {
-                    string_literal60=(Token)match(input,88,FOLLOW_88_in_actorDeclaration552);  
-                    stream_88.add(string_literal60);
+                    string_literal54=(Token)match(input,87,FOLLOW_87_in_actorDeclaration469);  
+                    stream_87.add(string_literal54);
 
-                    pushFollow(FOLLOW_typeDef_in_actorDeclaration554);
-                    typeDef61=typeDef();
+                    pushFollow(FOLLOW_typeDef_in_actorDeclaration471);
+                    typeDef55=typeDef();
 
                     state._fsp--;
 
-                    stream_typeDef.add(typeDef61.getTree());
-                    ID62=(Token)match(input,ID,FOLLOW_ID_in_actorDeclaration556);  
-                    stream_ID.add(ID62);
+                    stream_typeDef.add(typeDef55.getTree());
+                    ID56=(Token)match(input,ID,FOLLOW_ID_in_actorDeclaration473);  
+                    stream_ID.add(ID56);
 
-                    char_literal63=(Token)match(input,89,FOLLOW_89_in_actorDeclaration558);  
-                    stream_89.add(char_literal63);
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:117:3: ( '=' expression ';' -> ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression ) | typeListSpec '=' expression ';' -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID NON_ASSIGNABLE expression ) )
+                    int alt20=2;
+                    int LA20_0 = input.LA(1);
 
-                    pushFollow(FOLLOW_expression_in_actorDeclaration560);
-                    expression64=expression();
-
-                    state._fsp--;
-
-                    stream_expression.add(expression64.getTree());
-                    char_literal65=(Token)match(input,90,FOLLOW_90_in_actorDeclaration562);  
-                    stream_90.add(char_literal65);
-
-
-
-                    // AST REWRITE
-                    // elements: typeDef, ID, expression
-                    // token labels: 
-                    // rule labels: retval
-                    // token list labels: 
-                    // rule list labels: 
-                    // wildcard labels: 
-                    retval.tree = root_0;
-                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
-
-                    root_0 = (Object)adaptor.nil();
-                    // 122:41: -> ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression )
-                    {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:122:44: ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression )
-                        {
-                        Object root_1 = (Object)adaptor.nil();
-                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATE_VAR, "STATE_VAR"), root_1);
-
-                        adaptor.addChild(root_1, stream_typeDef.nextTree());
-                        adaptor.addChild(root_1, stream_ID.nextNode());
-                        adaptor.addChild(root_1, (Object)adaptor.create(NON_ASSIGNABLE, "NON_ASSIGNABLE"));
-                        adaptor.addChild(root_1, stream_expression.nextTree());
-
-                        adaptor.addChild(root_0, root_1);
-                        }
-
+                    if ( (LA20_0==88) ) {
+                        alt20=1;
                     }
-
-                    retval.tree = root_0;
+                    else if ( (LA20_0==79) ) {
+                        alt20=2;
                     }
-                    break;
-                case 4 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:125:3: typeDef ID ( '=' expression ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE expression ) | ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE ) | '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}' -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression ) )
-                    {
-                    pushFollow(FOLLOW_typeDef_in_actorDeclaration584);
-                    typeDef66=typeDef();
-
-                    state._fsp--;
-
-                    stream_typeDef.add(typeDef66.getTree());
-                    ID67=(Token)match(input,ID,FOLLOW_ID_in_actorDeclaration586);  
-                    stream_ID.add(ID67);
-
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:126:3: ( '=' expression ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE expression ) | ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE ) | '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}' -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression ) )
-                    int alt26=3;
-                    switch ( input.LA(1) ) {
-                    case 89:
-                        {
-                        alt26=1;
-                        }
-                        break;
-                    case 90:
-                        {
-                        alt26=2;
-                        }
-                        break;
-                    case 83:
-                        {
-                        alt26=3;
-                        }
-                        break;
-                    default:
+                    else {
                         NoViableAltException nvae =
-                            new NoViableAltException("", 26, 0, input);
+                            new NoViableAltException("", 20, 0, input);
 
                         throw nvae;
                     }
-
-                    switch (alt26) {
+                    switch (alt20) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:126:5: '=' expression ';'
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:117:5: '=' expression ';'
                             {
-                            char_literal68=(Token)match(input,89,FOLLOW_89_in_actorDeclaration592);  
-                            stream_89.add(char_literal68);
+                            char_literal57=(Token)match(input,88,FOLLOW_88_in_actorDeclaration479);  
+                            stream_88.add(char_literal57);
 
-                            pushFollow(FOLLOW_expression_in_actorDeclaration594);
-                            expression69=expression();
+                            pushFollow(FOLLOW_expression_in_actorDeclaration481);
+                            expression58=expression();
 
                             state._fsp--;
 
-                            stream_expression.add(expression69.getTree());
-                            char_literal70=(Token)match(input,90,FOLLOW_90_in_actorDeclaration596);  
-                            stream_90.add(char_literal70);
+                            stream_expression.add(expression58.getTree());
+                            char_literal59=(Token)match(input,89,FOLLOW_89_in_actorDeclaration483);  
+                            stream_89.add(char_literal59);
 
 
 
                             // AST REWRITE
-                            // elements: ID, typeDef, expression
+                            // elements: expression, ID, typeDef
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -2020,16 +1755,16 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 126:24: -> ^( STATE_VAR typeDef ID ASSIGNABLE expression )
+                            // 117:24: -> ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression )
                             {
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:126:27: ^( STATE_VAR typeDef ID ASSIGNABLE expression )
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:117:27: ^( STATE_VAR typeDef ID NON_ASSIGNABLE expression )
                                 {
                                 Object root_1 = (Object)adaptor.nil();
                                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATE_VAR, "STATE_VAR"), root_1);
 
                                 adaptor.addChild(root_1, stream_typeDef.nextTree());
                                 adaptor.addChild(root_1, stream_ID.nextNode());
-                                adaptor.addChild(root_1, (Object)adaptor.create(ASSIGNABLE, "ASSIGNABLE"));
+                                adaptor.addChild(root_1, (Object)adaptor.create(NON_ASSIGNABLE, "NON_ASSIGNABLE"));
                                 adaptor.addChild(root_1, stream_expression.nextTree());
 
                                 adaptor.addChild(root_0, root_1);
@@ -2041,15 +1776,30 @@ public class C_ALParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:127:5: ';'
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:118:5: typeListSpec '=' expression ';'
                             {
-                            char_literal71=(Token)match(input,90,FOLLOW_90_in_actorDeclaration616);  
-                            stream_90.add(char_literal71);
+                            pushFollow(FOLLOW_typeListSpec_in_actorDeclaration503);
+                            typeListSpec60=typeListSpec();
+
+                            state._fsp--;
+
+                            stream_typeListSpec.add(typeListSpec60.getTree());
+                            char_literal61=(Token)match(input,88,FOLLOW_88_in_actorDeclaration505);  
+                            stream_88.add(char_literal61);
+
+                            pushFollow(FOLLOW_expression_in_actorDeclaration507);
+                            expression62=expression();
+
+                            state._fsp--;
+
+                            stream_expression.add(expression62.getTree());
+                            char_literal63=(Token)match(input,89,FOLLOW_89_in_actorDeclaration509);  
+                            stream_89.add(char_literal63);
 
 
 
                             // AST REWRITE
-                            // elements: typeDef, ID
+                            // elements: typeListSpec, ID, typeDef, expression
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -2059,9 +1809,128 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 127:9: -> ^( STATE_VAR typeDef ID ASSIGNABLE )
+                            // 118:37: -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID NON_ASSIGNABLE expression )
                             {
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:127:12: ^( STATE_VAR typeDef ID ASSIGNABLE )
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:118:40: ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID NON_ASSIGNABLE expression )
+                                {
+                                Object root_1 = (Object)adaptor.nil();
+                                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATE_VAR, "STATE_VAR"), root_1);
+
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:118:52: ^( TYPE_LIST typeDef typeListSpec )
+                                {
+                                Object root_2 = (Object)adaptor.nil();
+                                root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE_LIST, "TYPE_LIST"), root_2);
+
+                                adaptor.addChild(root_2, stream_typeDef.nextTree());
+                                adaptor.addChild(root_2, stream_typeListSpec.nextTree());
+
+                                adaptor.addChild(root_1, root_2);
+                                }
+                                adaptor.addChild(root_1, stream_ID.nextNode());
+                                adaptor.addChild(root_1, (Object)adaptor.create(NON_ASSIGNABLE, "NON_ASSIGNABLE"));
+                                adaptor.addChild(root_1, stream_expression.nextTree());
+
+                                adaptor.addChild(root_0, root_1);
+                                }
+
+                            }
+
+                            retval.tree = root_0;
+                            }
+                            break;
+
+                    }
+
+
+                    }
+                    break;
+                case 4 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:121:3: typeDef ID ( ( '=' expression )? ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE ( expression )? ) | typeListSpec ( '=' expression )? ';' -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID ASSIGNABLE ( expression )? ) | '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}' -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression ) )
+                    {
+                    pushFollow(FOLLOW_typeDef_in_actorDeclaration539);
+                    typeDef64=typeDef();
+
+                    state._fsp--;
+
+                    stream_typeDef.add(typeDef64.getTree());
+                    ID65=(Token)match(input,ID,FOLLOW_ID_in_actorDeclaration541);  
+                    stream_ID.add(ID65);
+
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:122:3: ( ( '=' expression )? ';' -> ^( STATE_VAR typeDef ID ASSIGNABLE ( expression )? ) | typeListSpec ( '=' expression )? ';' -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID ASSIGNABLE ( expression )? ) | '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}' -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression ) )
+                    int alt25=3;
+                    switch ( input.LA(1) ) {
+                    case 88:
+                    case 89:
+                        {
+                        alt25=1;
+                        }
+                        break;
+                    case 79:
+                        {
+                        alt25=2;
+                        }
+                        break;
+                    case 82:
+                        {
+                        alt25=3;
+                        }
+                        break;
+                    default:
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 25, 0, input);
+
+                        throw nvae;
+                    }
+
+                    switch (alt25) {
+                        case 1 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:122:5: ( '=' expression )? ';'
+                            {
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:122:5: ( '=' expression )?
+                            int alt21=2;
+                            int LA21_0 = input.LA(1);
+
+                            if ( (LA21_0==88) ) {
+                                alt21=1;
+                            }
+                            switch (alt21) {
+                                case 1 :
+                                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:122:6: '=' expression
+                                    {
+                                    char_literal66=(Token)match(input,88,FOLLOW_88_in_actorDeclaration548);  
+                                    stream_88.add(char_literal66);
+
+                                    pushFollow(FOLLOW_expression_in_actorDeclaration550);
+                                    expression67=expression();
+
+                                    state._fsp--;
+
+                                    stream_expression.add(expression67.getTree());
+
+                                    }
+                                    break;
+
+                            }
+
+                            char_literal68=(Token)match(input,89,FOLLOW_89_in_actorDeclaration554);  
+                            stream_89.add(char_literal68);
+
+
+
+                            // AST REWRITE
+                            // elements: typeDef, ID, expression
+                            // token labels: 
+                            // rule labels: retval
+                            // token list labels: 
+                            // rule list labels: 
+                            // wildcard labels: 
+                            retval.tree = root_0;
+                            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                            root_0 = (Object)adaptor.nil();
+                            // 122:27: -> ^( STATE_VAR typeDef ID ASSIGNABLE ( expression )? )
+                            {
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:122:30: ^( STATE_VAR typeDef ID ASSIGNABLE ( expression )? )
                                 {
                                 Object root_1 = (Object)adaptor.nil();
                                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATE_VAR, "STATE_VAR"), root_1);
@@ -2069,6 +1938,97 @@ public class C_ALParser extends Parser {
                                 adaptor.addChild(root_1, stream_typeDef.nextTree());
                                 adaptor.addChild(root_1, stream_ID.nextNode());
                                 adaptor.addChild(root_1, (Object)adaptor.create(ASSIGNABLE, "ASSIGNABLE"));
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:122:64: ( expression )?
+                                if ( stream_expression.hasNext() ) {
+                                    adaptor.addChild(root_1, stream_expression.nextTree());
+
+                                }
+                                stream_expression.reset();
+
+                                adaptor.addChild(root_0, root_1);
+                                }
+
+                            }
+
+                            retval.tree = root_0;
+                            }
+                            break;
+                        case 2 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:123:5: typeListSpec ( '=' expression )? ';'
+                            {
+                            pushFollow(FOLLOW_typeListSpec_in_actorDeclaration575);
+                            typeListSpec69=typeListSpec();
+
+                            state._fsp--;
+
+                            stream_typeListSpec.add(typeListSpec69.getTree());
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:123:18: ( '=' expression )?
+                            int alt22=2;
+                            int LA22_0 = input.LA(1);
+
+                            if ( (LA22_0==88) ) {
+                                alt22=1;
+                            }
+                            switch (alt22) {
+                                case 1 :
+                                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:123:19: '=' expression
+                                    {
+                                    char_literal70=(Token)match(input,88,FOLLOW_88_in_actorDeclaration578);  
+                                    stream_88.add(char_literal70);
+
+                                    pushFollow(FOLLOW_expression_in_actorDeclaration580);
+                                    expression71=expression();
+
+                                    state._fsp--;
+
+                                    stream_expression.add(expression71.getTree());
+
+                                    }
+                                    break;
+
+                            }
+
+                            char_literal72=(Token)match(input,89,FOLLOW_89_in_actorDeclaration584);  
+                            stream_89.add(char_literal72);
+
+
+
+                            // AST REWRITE
+                            // elements: ID, typeListSpec, typeDef, expression
+                            // token labels: 
+                            // rule labels: retval
+                            // token list labels: 
+                            // rule list labels: 
+                            // wildcard labels: 
+                            retval.tree = root_0;
+                            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                            root_0 = (Object)adaptor.nil();
+                            // 123:40: -> ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID ASSIGNABLE ( expression )? )
+                            {
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:123:43: ^( STATE_VAR ^( TYPE_LIST typeDef typeListSpec ) ID ASSIGNABLE ( expression )? )
+                                {
+                                Object root_1 = (Object)adaptor.nil();
+                                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATE_VAR, "STATE_VAR"), root_1);
+
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:123:55: ^( TYPE_LIST typeDef typeListSpec )
+                                {
+                                Object root_2 = (Object)adaptor.nil();
+                                root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE_LIST, "TYPE_LIST"), root_2);
+
+                                adaptor.addChild(root_2, stream_typeDef.nextTree());
+                                adaptor.addChild(root_2, stream_typeListSpec.nextTree());
+
+                                adaptor.addChild(root_1, root_2);
+                                }
+                                adaptor.addChild(root_1, stream_ID.nextNode());
+                                adaptor.addChild(root_1, (Object)adaptor.create(ASSIGNABLE, "ASSIGNABLE"));
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:123:103: ( expression )?
+                                if ( stream_expression.hasNext() ) {
+                                    adaptor.addChild(root_1, stream_expression.nextTree());
+
+                                }
+                                stream_expression.reset();
 
                                 adaptor.addChild(root_0, root_1);
                                 }
@@ -2079,89 +2039,89 @@ public class C_ALParser extends Parser {
                             }
                             break;
                         case 3 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:129:5: '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}'
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:125:5: '(' ( parameters )? ')' '{' ( varDecl )* 'return' expression ';' '}'
                             {
-                            char_literal72=(Token)match(input,83,FOLLOW_83_in_actorDeclaration635);  
-                            stream_83.add(char_literal72);
+                            char_literal73=(Token)match(input,82,FOLLOW_82_in_actorDeclaration612);  
+                            stream_82.add(char_literal73);
 
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:129:9: ( parameters )?
-                            int alt24=2;
-                            int LA24_0 = input.LA(1);
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:125:9: ( parameters )?
+                            int alt23=2;
+                            int LA23_0 = input.LA(1);
 
-                            if ( ((LA24_0>=121 && LA24_0<=124)) ) {
-                                alt24=1;
+                            if ( (LA23_0==ID||(LA23_0>=123 && LA23_0<=128)) ) {
+                                alt23=1;
                             }
-                            switch (alt24) {
+                            switch (alt23) {
                                 case 1 :
-                                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:129:9: parameters
+                                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:125:9: parameters
                                     {
-                                    pushFollow(FOLLOW_parameters_in_actorDeclaration637);
-                                    parameters73=parameters();
+                                    pushFollow(FOLLOW_parameters_in_actorDeclaration614);
+                                    parameters74=parameters();
 
                                     state._fsp--;
 
-                                    stream_parameters.add(parameters73.getTree());
+                                    stream_parameters.add(parameters74.getTree());
 
                                     }
                                     break;
 
                             }
 
-                            char_literal74=(Token)match(input,84,FOLLOW_84_in_actorDeclaration640);  
-                            stream_84.add(char_literal74);
+                            char_literal75=(Token)match(input,83,FOLLOW_83_in_actorDeclaration617);  
+                            stream_83.add(char_literal75);
 
-                            char_literal75=(Token)match(input,86,FOLLOW_86_in_actorDeclaration642);  
-                            stream_86.add(char_literal75);
+                            char_literal76=(Token)match(input,85,FOLLOW_85_in_actorDeclaration619);  
+                            stream_85.add(char_literal76);
 
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:130:7: ( varDecl )*
-                            loop25:
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:126:7: ( varDecl )*
+                            loop24:
                             do {
-                                int alt25=2;
-                                int LA25_0 = input.LA(1);
+                                int alt24=2;
+                                int LA24_0 = input.LA(1);
 
-                                if ( (LA25_0==88||(LA25_0>=121 && LA25_0<=124)) ) {
-                                    alt25=1;
+                                if ( (LA24_0==ID||LA24_0==87||(LA24_0>=123 && LA24_0<=128)) ) {
+                                    alt24=1;
                                 }
 
 
-                                switch (alt25) {
+                                switch (alt24) {
                             	case 1 :
-                            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:130:7: varDecl
+                            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:126:7: varDecl
                             	    {
-                            	    pushFollow(FOLLOW_varDecl_in_actorDeclaration650);
-                            	    varDecl76=varDecl();
+                            	    pushFollow(FOLLOW_varDecl_in_actorDeclaration627);
+                            	    varDecl77=varDecl();
 
                             	    state._fsp--;
 
-                            	    stream_varDecl.add(varDecl76.getTree());
+                            	    stream_varDecl.add(varDecl77.getTree());
 
                             	    }
                             	    break;
 
                             	default :
-                            	    break loop25;
+                            	    break loop24;
                                 }
                             } while (true);
 
-                            string_literal77=(Token)match(input,91,FOLLOW_91_in_actorDeclaration659);  
-                            stream_91.add(string_literal77);
+                            string_literal78=(Token)match(input,90,FOLLOW_90_in_actorDeclaration636);  
+                            stream_90.add(string_literal78);
 
-                            pushFollow(FOLLOW_expression_in_actorDeclaration661);
-                            expression78=expression();
+                            pushFollow(FOLLOW_expression_in_actorDeclaration638);
+                            expression79=expression();
 
                             state._fsp--;
 
-                            stream_expression.add(expression78.getTree());
-                            char_literal79=(Token)match(input,90,FOLLOW_90_in_actorDeclaration663);  
-                            stream_90.add(char_literal79);
+                            stream_expression.add(expression79.getTree());
+                            char_literal80=(Token)match(input,89,FOLLOW_89_in_actorDeclaration640);  
+                            stream_89.add(char_literal80);
 
-                            char_literal80=(Token)match(input,87,FOLLOW_87_in_actorDeclaration669);  
-                            stream_87.add(char_literal80);
+                            char_literal81=(Token)match(input,86,FOLLOW_86_in_actorDeclaration646);  
+                            stream_86.add(char_literal81);
 
 
 
                             // AST REWRITE
-                            // elements: parameters, expression, varDecl, ID
+                            // elements: parameters, ID, varDecl, expression
                             // token labels: 
                             // rule labels: retval
                             // token list labels: 
@@ -2171,20 +2131,20 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 132:9: -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression )
+                            // 128:9: -> ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression )
                             {
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:132:12: ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression )
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:128:12: ^( FUNCTION ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) expression )
                                 {
                                 Object root_1 = (Object)adaptor.nil();
                                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(FUNCTION, "FUNCTION"), root_1);
 
                                 adaptor.addChild(root_1, stream_ID.nextNode());
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:132:26: ^( PARAMETERS ( parameters )? )
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:128:26: ^( PARAMETERS ( parameters )? )
                                 {
                                 Object root_2 = (Object)adaptor.nil();
                                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(PARAMETERS, "PARAMETERS"), root_2);
 
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:132:39: ( parameters )?
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:128:39: ( parameters )?
                                 if ( stream_parameters.hasNext() ) {
                                     adaptor.addChild(root_2, stream_parameters.nextTree());
 
@@ -2193,12 +2153,12 @@ public class C_ALParser extends Parser {
 
                                 adaptor.addChild(root_1, root_2);
                                 }
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:132:52: ^( VARIABLES ( varDecl )* )
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:128:52: ^( VARIABLES ( varDecl )* )
                                 {
                                 Object root_2 = (Object)adaptor.nil();
                                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLES, "VARIABLES"), root_2);
 
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:132:64: ( varDecl )*
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:128:64: ( varDecl )*
                                 while ( stream_varDecl.hasNext() ) {
                                     adaptor.addChild(root_2, stream_varDecl.nextTree());
 
@@ -2224,113 +2184,53 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:135:3: 'void' ID '(' ( parameters )? ')' '{' ( varDecl )* ( statement )* '}'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:131:3: 'void' ID '(' ( parameters )? ')' statement_block
                     {
-                    string_literal81=(Token)match(input,92,FOLLOW_92_in_actorDeclaration702);  
-                    stream_92.add(string_literal81);
+                    string_literal82=(Token)match(input,91,FOLLOW_91_in_actorDeclaration679);  
+                    stream_91.add(string_literal82);
 
-                    ID82=(Token)match(input,ID,FOLLOW_ID_in_actorDeclaration704);  
-                    stream_ID.add(ID82);
+                    ID83=(Token)match(input,ID,FOLLOW_ID_in_actorDeclaration681);  
+                    stream_ID.add(ID83);
 
-                    char_literal83=(Token)match(input,83,FOLLOW_83_in_actorDeclaration706);  
-                    stream_83.add(char_literal83);
+                    char_literal84=(Token)match(input,82,FOLLOW_82_in_actorDeclaration683);  
+                    stream_82.add(char_literal84);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:135:17: ( parameters )?
-                    int alt27=2;
-                    int LA27_0 = input.LA(1);
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:131:17: ( parameters )?
+                    int alt26=2;
+                    int LA26_0 = input.LA(1);
 
-                    if ( ((LA27_0>=121 && LA27_0<=124)) ) {
-                        alt27=1;
+                    if ( (LA26_0==ID||(LA26_0>=123 && LA26_0<=128)) ) {
+                        alt26=1;
                     }
-                    switch (alt27) {
+                    switch (alt26) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:135:17: parameters
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:131:17: parameters
                             {
-                            pushFollow(FOLLOW_parameters_in_actorDeclaration708);
-                            parameters84=parameters();
+                            pushFollow(FOLLOW_parameters_in_actorDeclaration685);
+                            parameters85=parameters();
 
                             state._fsp--;
 
-                            stream_parameters.add(parameters84.getTree());
+                            stream_parameters.add(parameters85.getTree());
 
                             }
                             break;
 
                     }
 
-                    char_literal85=(Token)match(input,84,FOLLOW_84_in_actorDeclaration711);  
-                    stream_84.add(char_literal85);
+                    char_literal86=(Token)match(input,83,FOLLOW_83_in_actorDeclaration688);  
+                    stream_83.add(char_literal86);
 
-                    char_literal86=(Token)match(input,86,FOLLOW_86_in_actorDeclaration713);  
-                    stream_86.add(char_literal86);
+                    pushFollow(FOLLOW_statement_block_in_actorDeclaration690);
+                    statement_block87=statement_block();
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:136:7: ( varDecl )*
-                    loop28:
-                    do {
-                        int alt28=2;
-                        int LA28_0 = input.LA(1);
+                    state._fsp--;
 
-                        if ( (LA28_0==88||(LA28_0>=121 && LA28_0<=124)) ) {
-                            alt28=1;
-                        }
-
-
-                        switch (alt28) {
-                    	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:136:7: varDecl
-                    	    {
-                    	    pushFollow(FOLLOW_varDecl_in_actorDeclaration721);
-                    	    varDecl87=varDecl();
-
-                    	    state._fsp--;
-
-                    	    stream_varDecl.add(varDecl87.getTree());
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop28;
-                        }
-                    } while (true);
-
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:137:7: ( statement )*
-                    loop29:
-                    do {
-                        int alt29=2;
-                        int LA29_0 = input.LA(1);
-
-                        if ( (LA29_0==ID) ) {
-                            alt29=1;
-                        }
-
-
-                        switch (alt29) {
-                    	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:137:7: statement
-                    	    {
-                    	    pushFollow(FOLLOW_statement_in_actorDeclaration730);
-                    	    statement88=statement();
-
-                    	    state._fsp--;
-
-                    	    stream_statement.add(statement88.getTree());
-
-                    	    }
-                    	    break;
-
-                    	default :
-                    	    break loop29;
-                        }
-                    } while (true);
-
-                    char_literal89=(Token)match(input,87,FOLLOW_87_in_actorDeclaration737);  
-                    stream_87.add(char_literal89);
-
+                    stream_statement_block.add(statement_block87.getTree());
 
 
                     // AST REWRITE
-                    // elements: varDecl, statement, parameters, ID
+                    // elements: statement_block, ID, parameters
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -2340,20 +2240,20 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 138:9: -> ^( PROCEDURE ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) )
+                    // 131:49: -> ^( PROCEDURE ID ^( PARAMETERS ( parameters )? ) statement_block )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:138:12: ^( PROCEDURE ID ^( PARAMETERS ( parameters )? ) ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:131:52: ^( PROCEDURE ID ^( PARAMETERS ( parameters )? ) statement_block )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(PROCEDURE, "PROCEDURE"), root_1);
 
                         adaptor.addChild(root_1, stream_ID.nextNode());
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:138:27: ^( PARAMETERS ( parameters )? )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:131:67: ^( PARAMETERS ( parameters )? )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(PARAMETERS, "PARAMETERS"), root_2);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:138:40: ( parameters )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:131:80: ( parameters )?
                         if ( stream_parameters.hasNext() ) {
                             adaptor.addChild(root_2, stream_parameters.nextTree());
 
@@ -2362,34 +2262,7 @@ public class C_ALParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:138:53: ^( VARIABLES ( varDecl )* )
-                        {
-                        Object root_2 = (Object)adaptor.nil();
-                        root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLES, "VARIABLES"), root_2);
-
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:138:65: ( varDecl )*
-                        while ( stream_varDecl.hasNext() ) {
-                            adaptor.addChild(root_2, stream_varDecl.nextTree());
-
-                        }
-                        stream_varDecl.reset();
-
-                        adaptor.addChild(root_1, root_2);
-                        }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:138:75: ^( STATEMENTS ( statement )* )
-                        {
-                        Object root_2 = (Object)adaptor.nil();
-                        root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATEMENTS, "STATEMENTS"), root_2);
-
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:138:88: ( statement )*
-                        while ( stream_statement.hasNext() ) {
-                            adaptor.addChild(root_2, stream_statement.nextTree());
-
-                        }
-                        stream_statement.reset();
-
-                        adaptor.addChild(root_1, root_2);
-                        }
+                        adaptor.addChild(root_1, stream_statement_block.nextTree());
 
                         adaptor.addChild(root_0, root_1);
                         }
@@ -2425,12 +2298,16 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actorDeclarations"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:1: actorDeclarations : ( ( actorDeclaration )+ ( schedule ( actorDeclaration )* )? -> ( actorDeclaration )+ ( schedule )? | schedule ( actorDeclaration )* -> ( actorDeclaration )* schedule );
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:1: actorDeclarations : ( ( actorDeclaration )+ ( schedule ( actorDeclaration )* )? -> ( actorDeclaration )+ ( schedule )? | schedule ( actorDeclaration )* -> ( actorDeclaration )* schedule );
     public final C_ALParser.actorDeclarations_return actorDeclarations() throws RecognitionException {
         C_ALParser.actorDeclarations_return retval = new C_ALParser.actorDeclarations_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
+
+        C_ALParser.actorDeclaration_return actorDeclaration88 = null;
+
+        C_ALParser.schedule_return schedule89 = null;
 
         C_ALParser.actorDeclaration_return actorDeclaration90 = null;
 
@@ -2438,113 +2315,109 @@ public class C_ALParser extends Parser {
 
         C_ALParser.actorDeclaration_return actorDeclaration92 = null;
 
-        C_ALParser.schedule_return schedule93 = null;
-
-        C_ALParser.actorDeclaration_return actorDeclaration94 = null;
-
 
         RewriteRuleSubtreeStream stream_schedule=new RewriteRuleSubtreeStream(adaptor,"rule schedule");
         RewriteRuleSubtreeStream stream_actorDeclaration=new RewriteRuleSubtreeStream(adaptor,"rule actorDeclaration");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:18: ( ( actorDeclaration )+ ( schedule ( actorDeclaration )* )? -> ( actorDeclaration )+ ( schedule )? | schedule ( actorDeclaration )* -> ( actorDeclaration )* schedule )
-            int alt35=2;
-            int LA35_0 = input.LA(1);
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:18: ( ( actorDeclaration )+ ( schedule ( actorDeclaration )* )? -> ( actorDeclaration )+ ( schedule )? | schedule ( actorDeclaration )* -> ( actorDeclaration )* schedule )
+            int alt32=2;
+            int LA32_0 = input.LA(1);
 
-            if ( (LA35_0==ACTION||(LA35_0>=INITIALIZE && LA35_0<=PRIORITY)||LA35_0==88||LA35_0==92||(LA35_0>=121 && LA35_0<=124)) ) {
-                alt35=1;
+            if ( (LA32_0==ACTION||(LA32_0>=INITIALIZE && LA32_0<=PRIORITY)||LA32_0==ID||LA32_0==87||LA32_0==91||(LA32_0>=123 && LA32_0<=128)) ) {
+                alt32=1;
             }
-            else if ( (LA35_0==SCHEDULE) ) {
-                alt35=2;
+            else if ( (LA32_0==SCHEDULE) ) {
+                alt32=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 35, 0, input);
+                    new NoViableAltException("", 32, 0, input);
 
                 throw nvae;
             }
-            switch (alt35) {
+            switch (alt32) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:20: ( actorDeclaration )+ ( schedule ( actorDeclaration )* )?
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:20: ( actorDeclaration )+ ( schedule ( actorDeclaration )* )?
                     {
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:20: ( actorDeclaration )+
-                    int cnt31=0;
-                    loop31:
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:20: ( actorDeclaration )+
+                    int cnt28=0;
+                    loop28:
                     do {
-                        int alt31=2;
-                        int LA31_0 = input.LA(1);
+                        int alt28=2;
+                        int LA28_0 = input.LA(1);
 
-                        if ( (LA31_0==ACTION||(LA31_0>=INITIALIZE && LA31_0<=PRIORITY)||LA31_0==88||LA31_0==92||(LA31_0>=121 && LA31_0<=124)) ) {
-                            alt31=1;
+                        if ( (LA28_0==ACTION||(LA28_0>=INITIALIZE && LA28_0<=PRIORITY)||LA28_0==ID||LA28_0==87||LA28_0==91||(LA28_0>=123 && LA28_0<=128)) ) {
+                            alt28=1;
                         }
 
 
-                        switch (alt31) {
+                        switch (alt28) {
                     	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:20: actorDeclaration
+                    	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:20: actorDeclaration
                     	    {
-                    	    pushFollow(FOLLOW_actorDeclaration_in_actorDeclarations779);
-                    	    actorDeclaration90=actorDeclaration();
+                    	    pushFollow(FOLLOW_actorDeclaration_in_actorDeclarations720);
+                    	    actorDeclaration88=actorDeclaration();
 
                     	    state._fsp--;
 
-                    	    stream_actorDeclaration.add(actorDeclaration90.getTree());
+                    	    stream_actorDeclaration.add(actorDeclaration88.getTree());
 
                     	    }
                     	    break;
 
                     	default :
-                    	    if ( cnt31 >= 1 ) break loop31;
+                    	    if ( cnt28 >= 1 ) break loop28;
                                 EarlyExitException eee =
-                                    new EarlyExitException(31, input);
+                                    new EarlyExitException(28, input);
                                 throw eee;
                         }
-                        cnt31++;
+                        cnt28++;
                     } while (true);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:38: ( schedule ( actorDeclaration )* )?
-                    int alt33=2;
-                    int LA33_0 = input.LA(1);
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:38: ( schedule ( actorDeclaration )* )?
+                    int alt30=2;
+                    int LA30_0 = input.LA(1);
 
-                    if ( (LA33_0==SCHEDULE) ) {
-                        alt33=1;
+                    if ( (LA30_0==SCHEDULE) ) {
+                        alt30=1;
                     }
-                    switch (alt33) {
+                    switch (alt30) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:39: schedule ( actorDeclaration )*
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:39: schedule ( actorDeclaration )*
                             {
-                            pushFollow(FOLLOW_schedule_in_actorDeclarations783);
-                            schedule91=schedule();
+                            pushFollow(FOLLOW_schedule_in_actorDeclarations724);
+                            schedule89=schedule();
 
                             state._fsp--;
 
-                            stream_schedule.add(schedule91.getTree());
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:48: ( actorDeclaration )*
-                            loop32:
+                            stream_schedule.add(schedule89.getTree());
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:48: ( actorDeclaration )*
+                            loop29:
                             do {
-                                int alt32=2;
-                                int LA32_0 = input.LA(1);
+                                int alt29=2;
+                                int LA29_0 = input.LA(1);
 
-                                if ( (LA32_0==ACTION||(LA32_0>=INITIALIZE && LA32_0<=PRIORITY)||LA32_0==88||LA32_0==92||(LA32_0>=121 && LA32_0<=124)) ) {
-                                    alt32=1;
+                                if ( (LA29_0==ACTION||(LA29_0>=INITIALIZE && LA29_0<=PRIORITY)||LA29_0==ID||LA29_0==87||LA29_0==91||(LA29_0>=123 && LA29_0<=128)) ) {
+                                    alt29=1;
                                 }
 
 
-                                switch (alt32) {
+                                switch (alt29) {
                             	case 1 :
-                            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:48: actorDeclaration
+                            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:48: actorDeclaration
                             	    {
-                            	    pushFollow(FOLLOW_actorDeclaration_in_actorDeclarations785);
-                            	    actorDeclaration92=actorDeclaration();
+                            	    pushFollow(FOLLOW_actorDeclaration_in_actorDeclarations726);
+                            	    actorDeclaration90=actorDeclaration();
 
                             	    state._fsp--;
 
-                            	    stream_actorDeclaration.add(actorDeclaration92.getTree());
+                            	    stream_actorDeclaration.add(actorDeclaration90.getTree());
 
                             	    }
                             	    break;
 
                             	default :
-                            	    break loop32;
+                            	    break loop29;
                                 }
                             } while (true);
 
@@ -2567,7 +2440,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 146:68: -> ( actorDeclaration )+ ( schedule )?
+                    // 139:68: -> ( actorDeclaration )+ ( schedule )?
                     {
                         if ( !(stream_actorDeclaration.hasNext()) ) {
                             throw new RewriteEarlyExitException();
@@ -2577,7 +2450,7 @@ public class C_ALParser extends Parser {
 
                         }
                         stream_actorDeclaration.reset();
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:89: ( schedule )?
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:139:89: ( schedule )?
                         if ( stream_schedule.hasNext() ) {
                             adaptor.addChild(root_0, stream_schedule.nextTree());
 
@@ -2590,48 +2463,48 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:147:5: schedule ( actorDeclaration )*
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:140:5: schedule ( actorDeclaration )*
                     {
-                    pushFollow(FOLLOW_schedule_in_actorDeclarations802);
-                    schedule93=schedule();
+                    pushFollow(FOLLOW_schedule_in_actorDeclarations743);
+                    schedule91=schedule();
 
                     state._fsp--;
 
-                    stream_schedule.add(schedule93.getTree());
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:147:14: ( actorDeclaration )*
-                    loop34:
+                    stream_schedule.add(schedule91.getTree());
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:140:14: ( actorDeclaration )*
+                    loop31:
                     do {
-                        int alt34=2;
-                        int LA34_0 = input.LA(1);
+                        int alt31=2;
+                        int LA31_0 = input.LA(1);
 
-                        if ( (LA34_0==ACTION||(LA34_0>=INITIALIZE && LA34_0<=PRIORITY)||LA34_0==88||LA34_0==92||(LA34_0>=121 && LA34_0<=124)) ) {
-                            alt34=1;
+                        if ( (LA31_0==ACTION||(LA31_0>=INITIALIZE && LA31_0<=PRIORITY)||LA31_0==ID||LA31_0==87||LA31_0==91||(LA31_0>=123 && LA31_0<=128)) ) {
+                            alt31=1;
                         }
 
 
-                        switch (alt34) {
+                        switch (alt31) {
                     	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:147:14: actorDeclaration
+                    	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:140:14: actorDeclaration
                     	    {
-                    	    pushFollow(FOLLOW_actorDeclaration_in_actorDeclarations804);
-                    	    actorDeclaration94=actorDeclaration();
+                    	    pushFollow(FOLLOW_actorDeclaration_in_actorDeclarations745);
+                    	    actorDeclaration92=actorDeclaration();
 
                     	    state._fsp--;
 
-                    	    stream_actorDeclaration.add(actorDeclaration94.getTree());
+                    	    stream_actorDeclaration.add(actorDeclaration92.getTree());
 
                     	    }
                     	    break;
 
                     	default :
-                    	    break loop34;
+                    	    break loop31;
                         }
                     } while (true);
 
 
 
                     // AST REWRITE
-                    // elements: actorDeclaration, schedule
+                    // elements: schedule, actorDeclaration
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -2641,9 +2514,9 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 147:32: -> ( actorDeclaration )* schedule
+                    // 140:32: -> ( actorDeclaration )* schedule
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:147:35: ( actorDeclaration )*
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:140:35: ( actorDeclaration )*
                         while ( stream_actorDeclaration.hasNext() ) {
                             adaptor.addChild(root_0, stream_actorDeclaration.nextTree());
 
@@ -2682,87 +2555,87 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actorImport"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:149:1: actorImport : 'import' ( 'all' qualifiedIdent ';' | qualifiedIdent ';' ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:142:1: actorImport : 'import' ( 'all' qualifiedIdent ';' | qualifiedIdent ';' ) ;
     public final C_ALParser.actorImport_return actorImport() throws RecognitionException {
         C_ALParser.actorImport_return retval = new C_ALParser.actorImport_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal95=null;
-        Token string_literal96=null;
+        Token string_literal93=null;
+        Token string_literal94=null;
+        Token char_literal96=null;
         Token char_literal98=null;
-        Token char_literal100=null;
+        C_ALParser.qualifiedIdent_return qualifiedIdent95 = null;
+
         C_ALParser.qualifiedIdent_return qualifiedIdent97 = null;
 
-        C_ALParser.qualifiedIdent_return qualifiedIdent99 = null;
 
-
-        Object string_literal95_tree=null;
-        Object string_literal96_tree=null;
+        Object string_literal93_tree=null;
+        Object string_literal94_tree=null;
+        Object char_literal96_tree=null;
         Object char_literal98_tree=null;
-        Object char_literal100_tree=null;
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:152:12: ( 'import' ( 'all' qualifiedIdent ';' | qualifiedIdent ';' ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:152:14: 'import' ( 'all' qualifiedIdent ';' | qualifiedIdent ';' )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:145:12: ( 'import' ( 'all' qualifiedIdent ';' | qualifiedIdent ';' ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:145:14: 'import' ( 'all' qualifiedIdent ';' | qualifiedIdent ';' )
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal95=(Token)match(input,93,FOLLOW_93_in_actorImport824); 
-            string_literal95_tree = (Object)adaptor.create(string_literal95);
-            adaptor.addChild(root_0, string_literal95_tree);
+            string_literal93=(Token)match(input,92,FOLLOW_92_in_actorImport765); 
+            string_literal93_tree = (Object)adaptor.create(string_literal93);
+            adaptor.addChild(root_0, string_literal93_tree);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:153:3: ( 'all' qualifiedIdent ';' | qualifiedIdent ';' )
-            int alt36=2;
-            int LA36_0 = input.LA(1);
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:3: ( 'all' qualifiedIdent ';' | qualifiedIdent ';' )
+            int alt33=2;
+            int LA33_0 = input.LA(1);
 
-            if ( (LA36_0==94) ) {
-                alt36=1;
+            if ( (LA33_0==93) ) {
+                alt33=1;
             }
-            else if ( (LA36_0==ID) ) {
-                alt36=2;
+            else if ( (LA33_0==ID) ) {
+                alt33=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 36, 0, input);
+                    new NoViableAltException("", 33, 0, input);
 
                 throw nvae;
             }
-            switch (alt36) {
+            switch (alt33) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:153:4: 'all' qualifiedIdent ';'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:146:4: 'all' qualifiedIdent ';'
                     {
-                    string_literal96=(Token)match(input,94,FOLLOW_94_in_actorImport829); 
-                    string_literal96_tree = (Object)adaptor.create(string_literal96);
-                    adaptor.addChild(root_0, string_literal96_tree);
+                    string_literal94=(Token)match(input,93,FOLLOW_93_in_actorImport770); 
+                    string_literal94_tree = (Object)adaptor.create(string_literal94);
+                    adaptor.addChild(root_0, string_literal94_tree);
 
-                    pushFollow(FOLLOW_qualifiedIdent_in_actorImport831);
-                    qualifiedIdent97=qualifiedIdent();
+                    pushFollow(FOLLOW_qualifiedIdent_in_actorImport772);
+                    qualifiedIdent95=qualifiedIdent();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, qualifiedIdent97.getTree());
-                    char_literal98=(Token)match(input,90,FOLLOW_90_in_actorImport833); 
-                    char_literal98_tree = (Object)adaptor.create(char_literal98);
-                    adaptor.addChild(root_0, char_literal98_tree);
+                    adaptor.addChild(root_0, qualifiedIdent95.getTree());
+                    char_literal96=(Token)match(input,89,FOLLOW_89_in_actorImport774); 
+                    char_literal96_tree = (Object)adaptor.create(char_literal96);
+                    adaptor.addChild(root_0, char_literal96_tree);
 
                      
 
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:154:3: qualifiedIdent ';'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:147:3: qualifiedIdent ';'
                     {
-                    pushFollow(FOLLOW_qualifiedIdent_in_actorImport839);
-                    qualifiedIdent99=qualifiedIdent();
+                    pushFollow(FOLLOW_qualifiedIdent_in_actorImport780);
+                    qualifiedIdent97=qualifiedIdent();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, qualifiedIdent99.getTree());
-                    char_literal100=(Token)match(input,90,FOLLOW_90_in_actorImport841); 
-                    char_literal100_tree = (Object)adaptor.create(char_literal100);
-                    adaptor.addChild(root_0, char_literal100_tree);
+                    adaptor.addChild(root_0, qualifiedIdent97.getTree());
+                    char_literal98=(Token)match(input,89,FOLLOW_89_in_actorImport782); 
+                    char_literal98_tree = (Object)adaptor.create(char_literal98);
+                    adaptor.addChild(root_0, char_literal98_tree);
 
                      
 
@@ -2798,59 +2671,59 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actorParameter"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:156:1: actorParameter : typeDef ID ( '=' expression )? -> ^( VARIABLE typeDef ID ( expression )? ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:149:1: actorParameter : typeDef ID ( '=' expression )? -> ^( VARIABLE typeDef ID ( expression )? ) ;
     public final C_ALParser.actorParameter_return actorParameter() throws RecognitionException {
         C_ALParser.actorParameter_return retval = new C_ALParser.actorParameter_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token ID102=null;
-        Token char_literal103=null;
-        C_ALParser.typeDef_return typeDef101 = null;
+        Token ID100=null;
+        Token char_literal101=null;
+        C_ALParser.typeDef_return typeDef99 = null;
 
-        C_ALParser.expression_return expression104 = null;
+        C_ALParser.expression_return expression102 = null;
 
 
-        Object ID102_tree=null;
-        Object char_literal103_tree=null;
+        Object ID100_tree=null;
+        Object char_literal101_tree=null;
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_89=new RewriteRuleTokenStream(adaptor,"token 89");
+        RewriteRuleTokenStream stream_88=new RewriteRuleTokenStream(adaptor,"token 88");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_typeDef=new RewriteRuleSubtreeStream(adaptor,"rule typeDef");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:158:15: ( typeDef ID ( '=' expression )? -> ^( VARIABLE typeDef ID ( expression )? ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:159:2: typeDef ID ( '=' expression )?
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:151:15: ( typeDef ID ( '=' expression )? -> ^( VARIABLE typeDef ID ( expression )? ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:152:2: typeDef ID ( '=' expression )?
             {
-            pushFollow(FOLLOW_typeDef_in_actorParameter856);
-            typeDef101=typeDef();
+            pushFollow(FOLLOW_typeDef_in_actorParameter797);
+            typeDef99=typeDef();
 
             state._fsp--;
 
-            stream_typeDef.add(typeDef101.getTree());
-            ID102=(Token)match(input,ID,FOLLOW_ID_in_actorParameter858);  
-            stream_ID.add(ID102);
+            stream_typeDef.add(typeDef99.getTree());
+            ID100=(Token)match(input,ID,FOLLOW_ID_in_actorParameter799);  
+            stream_ID.add(ID100);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:159:13: ( '=' expression )?
-            int alt37=2;
-            int LA37_0 = input.LA(1);
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:152:13: ( '=' expression )?
+            int alt34=2;
+            int LA34_0 = input.LA(1);
 
-            if ( (LA37_0==89) ) {
-                alt37=1;
+            if ( (LA34_0==88) ) {
+                alt34=1;
             }
-            switch (alt37) {
+            switch (alt34) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:159:14: '=' expression
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:152:14: '=' expression
                     {
-                    char_literal103=(Token)match(input,89,FOLLOW_89_in_actorParameter861);  
-                    stream_89.add(char_literal103);
+                    char_literal101=(Token)match(input,88,FOLLOW_88_in_actorParameter802);  
+                    stream_88.add(char_literal101);
 
-                    pushFollow(FOLLOW_expression_in_actorParameter863);
-                    expression104=expression();
+                    pushFollow(FOLLOW_expression_in_actorParameter804);
+                    expression102=expression();
 
                     state._fsp--;
 
-                    stream_expression.add(expression104.getTree());
+                    stream_expression.add(expression102.getTree());
 
                     }
                     break;
@@ -2860,7 +2733,7 @@ public class C_ALParser extends Parser {
 
 
             // AST REWRITE
-            // elements: expression, typeDef, ID
+            // elements: typeDef, ID, expression
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2870,16 +2743,16 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 159:31: -> ^( VARIABLE typeDef ID ( expression )? )
+            // 152:31: -> ^( VARIABLE typeDef ID ( expression )? )
             {
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:159:34: ^( VARIABLE typeDef ID ( expression )? )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:152:34: ^( VARIABLE typeDef ID ( expression )? )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLE, "VARIABLE"), root_1);
 
                 adaptor.addChild(root_1, stream_typeDef.nextTree());
                 adaptor.addChild(root_1, stream_ID.nextNode());
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:159:56: ( expression )?
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:152:56: ( expression )?
                 if ( stream_expression.hasNext() ) {
                     adaptor.addChild(root_1, stream_expression.nextTree());
 
@@ -2918,62 +2791,62 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "actorParameters"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:161:1: actorParameters : actorParameter ( ',' actorParameter )* -> ( actorParameter )+ ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:154:1: actorParameters : actorParameter ( ',' actorParameter )* -> ( actorParameter )+ ;
     public final C_ALParser.actorParameters_return actorParameters() throws RecognitionException {
         C_ALParser.actorParameters_return retval = new C_ALParser.actorParameters_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token char_literal106=null;
+        Token char_literal104=null;
+        C_ALParser.actorParameter_return actorParameter103 = null;
+
         C_ALParser.actorParameter_return actorParameter105 = null;
 
-        C_ALParser.actorParameter_return actorParameter107 = null;
 
-
-        Object char_literal106_tree=null;
-        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
+        Object char_literal104_tree=null;
+        RewriteRuleTokenStream stream_81=new RewriteRuleTokenStream(adaptor,"token 81");
         RewriteRuleSubtreeStream stream_actorParameter=new RewriteRuleSubtreeStream(adaptor,"rule actorParameter");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:161:16: ( actorParameter ( ',' actorParameter )* -> ( actorParameter )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:161:18: actorParameter ( ',' actorParameter )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:154:16: ( actorParameter ( ',' actorParameter )* -> ( actorParameter )+ )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:154:18: actorParameter ( ',' actorParameter )*
             {
-            pushFollow(FOLLOW_actorParameter_in_actorParameters885);
-            actorParameter105=actorParameter();
+            pushFollow(FOLLOW_actorParameter_in_actorParameters826);
+            actorParameter103=actorParameter();
 
             state._fsp--;
 
-            stream_actorParameter.add(actorParameter105.getTree());
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:161:33: ( ',' actorParameter )*
-            loop38:
+            stream_actorParameter.add(actorParameter103.getTree());
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:154:33: ( ',' actorParameter )*
+            loop35:
             do {
-                int alt38=2;
-                int LA38_0 = input.LA(1);
+                int alt35=2;
+                int LA35_0 = input.LA(1);
 
-                if ( (LA38_0==82) ) {
-                    alt38=1;
+                if ( (LA35_0==81) ) {
+                    alt35=1;
                 }
 
 
-                switch (alt38) {
+                switch (alt35) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:161:34: ',' actorParameter
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:154:34: ',' actorParameter
             	    {
-            	    char_literal106=(Token)match(input,82,FOLLOW_82_in_actorParameters888);  
-            	    stream_82.add(char_literal106);
+            	    char_literal104=(Token)match(input,81,FOLLOW_81_in_actorParameters829);  
+            	    stream_81.add(char_literal104);
 
-            	    pushFollow(FOLLOW_actorParameter_in_actorParameters890);
-            	    actorParameter107=actorParameter();
+            	    pushFollow(FOLLOW_actorParameter_in_actorParameters831);
+            	    actorParameter105=actorParameter();
 
             	    state._fsp--;
 
-            	    stream_actorParameter.add(actorParameter107.getTree());
+            	    stream_actorParameter.add(actorParameter105.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop38;
+            	    break loop35;
                 }
             } while (true);
 
@@ -2990,7 +2863,7 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 161:55: -> ( actorParameter )+
+            // 154:55: -> ( actorParameter )+
             {
                 if ( !(stream_actorParameter.hasNext()) ) {
                     throw new RewriteEarlyExitException();
@@ -3030,97 +2903,97 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "expression"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:163:1: expression : un_expr ( ( bop un_expr )+ -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) ) | -> un_expr ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:156:1: expression : un_expr ( ( bop un_expr )+ -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) ) | -> un_expr ) ;
     public final C_ALParser.expression_return expression() throws RecognitionException {
         C_ALParser.expression_return retval = new C_ALParser.expression_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
+        C_ALParser.un_expr_return un_expr106 = null;
+
+        C_ALParser.bop_return bop107 = null;
+
         C_ALParser.un_expr_return un_expr108 = null;
-
-        C_ALParser.bop_return bop109 = null;
-
-        C_ALParser.un_expr_return un_expr110 = null;
 
 
         RewriteRuleSubtreeStream stream_bop=new RewriteRuleSubtreeStream(adaptor,"rule bop");
         RewriteRuleSubtreeStream stream_un_expr=new RewriteRuleSubtreeStream(adaptor,"rule un_expr");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:168:11: ( un_expr ( ( bop un_expr )+ -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) ) | -> un_expr ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:168:13: un_expr ( ( bop un_expr )+ -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) ) | -> un_expr )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:161:11: ( un_expr ( ( bop un_expr )+ -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) ) | -> un_expr ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:161:13: un_expr ( ( bop un_expr )+ -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) ) | -> un_expr )
             {
-            pushFollow(FOLLOW_un_expr_in_expression911);
-            un_expr108=un_expr();
+            pushFollow(FOLLOW_un_expr_in_expression852);
+            un_expr106=un_expr();
 
             state._fsp--;
 
-            stream_un_expr.add(un_expr108.getTree());
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:169:3: ( ( bop un_expr )+ -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) ) | -> un_expr )
-            int alt40=2;
-            int LA40_0 = input.LA(1);
+            stream_un_expr.add(un_expr106.getTree());
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:162:3: ( ( bop un_expr )+ -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) ) | -> un_expr )
+            int alt37=2;
+            int LA37_0 = input.LA(1);
 
-            if ( ((LA40_0>=PLUS && LA40_0<=DIV)||(LA40_0>=95 && LA40_0<=109)) ) {
-                alt40=1;
+            if ( ((LA37_0>=PLUS && LA37_0<=DIV)||(LA37_0>=94 && LA37_0<=108)) ) {
+                alt37=1;
             }
-            else if ( (LA40_0==79||(LA40_0>=81 && LA40_0<=82)||(LA40_0>=84 && LA40_0<=87)||LA40_0==90) ) {
-                alt40=2;
+            else if ( ((LA37_0>=80 && LA37_0<=81)||(LA37_0>=83 && LA37_0<=86)||LA37_0==89||LA37_0==117) ) {
+                alt37=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 40, 0, input);
+                    new NoViableAltException("", 37, 0, input);
 
                 throw nvae;
             }
-            switch (alt40) {
+            switch (alt37) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:169:4: ( bop un_expr )+
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:162:4: ( bop un_expr )+
                     {
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:169:4: ( bop un_expr )+
-                    int cnt39=0;
-                    loop39:
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:162:4: ( bop un_expr )+
+                    int cnt36=0;
+                    loop36:
                     do {
-                        int alt39=2;
-                        int LA39_0 = input.LA(1);
+                        int alt36=2;
+                        int LA36_0 = input.LA(1);
 
-                        if ( ((LA39_0>=PLUS && LA39_0<=DIV)||(LA39_0>=95 && LA39_0<=109)) ) {
-                            alt39=1;
+                        if ( ((LA36_0>=PLUS && LA36_0<=DIV)||(LA36_0>=94 && LA36_0<=108)) ) {
+                            alt36=1;
                         }
 
 
-                        switch (alt39) {
+                        switch (alt36) {
                     	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:169:5: bop un_expr
+                    	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:162:5: bop un_expr
                     	    {
-                    	    pushFollow(FOLLOW_bop_in_expression917);
-                    	    bop109=bop();
+                    	    pushFollow(FOLLOW_bop_in_expression858);
+                    	    bop107=bop();
 
                     	    state._fsp--;
 
-                    	    stream_bop.add(bop109.getTree());
-                    	    pushFollow(FOLLOW_un_expr_in_expression919);
-                    	    un_expr110=un_expr();
+                    	    stream_bop.add(bop107.getTree());
+                    	    pushFollow(FOLLOW_un_expr_in_expression860);
+                    	    un_expr108=un_expr();
 
                     	    state._fsp--;
 
-                    	    stream_un_expr.add(un_expr110.getTree());
+                    	    stream_un_expr.add(un_expr108.getTree());
 
                     	    }
                     	    break;
 
                     	default :
-                    	    if ( cnt39 >= 1 ) break loop39;
+                    	    if ( cnt36 >= 1 ) break loop36;
                                 EarlyExitException eee =
-                                    new EarlyExitException(39, input);
+                                    new EarlyExitException(36, input);
                                 throw eee;
                         }
-                        cnt39++;
+                        cnt36++;
                     } while (true);
 
 
 
                     // AST REWRITE
-                    // elements: bop, un_expr
+                    // elements: un_expr, bop
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -3130,14 +3003,14 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 169:19: -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) )
+                    // 162:19: -> ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:169:22: ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:162:22: ^( EXPR_BINARY ^( EXPR ( un_expr )+ ) ^( OP ( bop )+ ) )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_BINARY, "EXPR_BINARY"), root_1);
 
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:169:36: ^( EXPR ( un_expr )+ )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:162:36: ^( EXPR ( un_expr )+ )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR, "EXPR"), root_2);
@@ -3153,7 +3026,7 @@ public class C_ALParser extends Parser {
 
                         adaptor.addChild(root_1, root_2);
                         }
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:169:53: ^( OP ( bop )+ )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:162:53: ^( OP ( bop )+ )
                         {
                         Object root_2 = (Object)adaptor.nil();
                         root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(OP, "OP"), root_2);
@@ -3179,7 +3052,7 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:170:5: 
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:163:5: 
                     {
 
                     // AST REWRITE
@@ -3193,7 +3066,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 170:5: -> un_expr
+                    // 163:5: -> un_expr
                     {
                         adaptor.addChild(root_0, stream_un_expr.nextTree());
 
@@ -3232,62 +3105,62 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "bop"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:172:1: bop : ( '||' -> LOGIC_OR | '&&' -> LOGIC_AND | '|' -> BITOR | '^' -> BITXOR | '&' -> BITAND | '==' -> EQ | '!=' -> NE | '<' -> LT | '>' -> GT | '<=' -> LE | '>=' -> GE | '<<' -> SHIFT_LEFT | '>>' -> SHIFT_RIGHT | PLUS -> PLUS | MINUS -> MINUS | DIV -> DIV | '%' -> MOD | TIMES -> TIMES | '**' -> EXP );
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:165:1: bop : ( '||' -> LOGIC_OR | '&&' -> LOGIC_AND | '|' -> BITOR | '^' -> BITXOR | '&' -> BITAND | '==' -> EQ | '!=' -> NE | '<' -> LT | '>' -> GT | '<=' -> LE | '>=' -> GE | '<<' -> SHIFT_LEFT | '>>' -> SHIFT_RIGHT | PLUS -> PLUS | MINUS -> MINUS | DIV -> DIV | '%' -> MOD | TIMES -> TIMES | '**' -> EXP );
     public final C_ALParser.bop_return bop() throws RecognitionException {
         C_ALParser.bop_return retval = new C_ALParser.bop_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal111=null;
-        Token string_literal112=null;
+        Token string_literal109=null;
+        Token string_literal110=null;
+        Token char_literal111=null;
+        Token char_literal112=null;
         Token char_literal113=null;
-        Token char_literal114=null;
-        Token char_literal115=null;
-        Token string_literal116=null;
-        Token string_literal117=null;
-        Token char_literal118=null;
-        Token char_literal119=null;
+        Token string_literal114=null;
+        Token string_literal115=null;
+        Token char_literal116=null;
+        Token char_literal117=null;
+        Token string_literal118=null;
+        Token string_literal119=null;
         Token string_literal120=null;
         Token string_literal121=null;
-        Token string_literal122=null;
-        Token string_literal123=null;
-        Token PLUS124=null;
-        Token MINUS125=null;
-        Token DIV126=null;
-        Token char_literal127=null;
-        Token TIMES128=null;
-        Token string_literal129=null;
+        Token PLUS122=null;
+        Token MINUS123=null;
+        Token DIV124=null;
+        Token char_literal125=null;
+        Token TIMES126=null;
+        Token string_literal127=null;
 
-        Object string_literal111_tree=null;
-        Object string_literal112_tree=null;
+        Object string_literal109_tree=null;
+        Object string_literal110_tree=null;
+        Object char_literal111_tree=null;
+        Object char_literal112_tree=null;
         Object char_literal113_tree=null;
-        Object char_literal114_tree=null;
-        Object char_literal115_tree=null;
-        Object string_literal116_tree=null;
-        Object string_literal117_tree=null;
-        Object char_literal118_tree=null;
-        Object char_literal119_tree=null;
+        Object string_literal114_tree=null;
+        Object string_literal115_tree=null;
+        Object char_literal116_tree=null;
+        Object char_literal117_tree=null;
+        Object string_literal118_tree=null;
+        Object string_literal119_tree=null;
         Object string_literal120_tree=null;
         Object string_literal121_tree=null;
-        Object string_literal122_tree=null;
-        Object string_literal123_tree=null;
-        Object PLUS124_tree=null;
-        Object MINUS125_tree=null;
-        Object DIV126_tree=null;
-        Object char_literal127_tree=null;
-        Object TIMES128_tree=null;
-        Object string_literal129_tree=null;
+        Object PLUS122_tree=null;
+        Object MINUS123_tree=null;
+        Object DIV124_tree=null;
+        Object char_literal125_tree=null;
+        Object TIMES126_tree=null;
+        Object string_literal127_tree=null;
         RewriteRuleTokenStream stream_98=new RewriteRuleTokenStream(adaptor,"token 98");
         RewriteRuleTokenStream stream_97=new RewriteRuleTokenStream(adaptor,"token 97");
         RewriteRuleTokenStream stream_96=new RewriteRuleTokenStream(adaptor,"token 96");
         RewriteRuleTokenStream stream_95=new RewriteRuleTokenStream(adaptor,"token 95");
+        RewriteRuleTokenStream stream_94=new RewriteRuleTokenStream(adaptor,"token 94");
         RewriteRuleTokenStream stream_PLUS=new RewriteRuleTokenStream(adaptor,"token PLUS");
-        RewriteRuleTokenStream stream_109=new RewriteRuleTokenStream(adaptor,"token 109");
         RewriteRuleTokenStream stream_108=new RewriteRuleTokenStream(adaptor,"token 108");
+        RewriteRuleTokenStream stream_107=new RewriteRuleTokenStream(adaptor,"token 107");
         RewriteRuleTokenStream stream_DIV=new RewriteRuleTokenStream(adaptor,"token DIV");
         RewriteRuleTokenStream stream_MINUS=new RewriteRuleTokenStream(adaptor,"token MINUS");
-        RewriteRuleTokenStream stream_107=new RewriteRuleTokenStream(adaptor,"token 107");
         RewriteRuleTokenStream stream_TIMES=new RewriteRuleTokenStream(adaptor,"token TIMES");
         RewriteRuleTokenStream stream_106=new RewriteRuleTokenStream(adaptor,"token 106");
         RewriteRuleTokenStream stream_105=new RewriteRuleTokenStream(adaptor,"token 105");
@@ -3299,15 +3172,15 @@ public class C_ALParser extends Parser {
         RewriteRuleTokenStream stream_100=new RewriteRuleTokenStream(adaptor,"token 100");
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:172:4: ( '||' -> LOGIC_OR | '&&' -> LOGIC_AND | '|' -> BITOR | '^' -> BITXOR | '&' -> BITAND | '==' -> EQ | '!=' -> NE | '<' -> LT | '>' -> GT | '<=' -> LE | '>=' -> GE | '<<' -> SHIFT_LEFT | '>>' -> SHIFT_RIGHT | PLUS -> PLUS | MINUS -> MINUS | DIV -> DIV | '%' -> MOD | TIMES -> TIMES | '**' -> EXP )
-            int alt41=19;
-            alt41 = dfa41.predict(input);
-            switch (alt41) {
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:165:4: ( '||' -> LOGIC_OR | '&&' -> LOGIC_AND | '|' -> BITOR | '^' -> BITXOR | '&' -> BITAND | '==' -> EQ | '!=' -> NE | '<' -> LT | '>' -> GT | '<=' -> LE | '>=' -> GE | '<<' -> SHIFT_LEFT | '>>' -> SHIFT_RIGHT | PLUS -> PLUS | MINUS -> MINUS | DIV -> DIV | '%' -> MOD | TIMES -> TIMES | '**' -> EXP )
+            int alt38=19;
+            alt38 = dfa38.predict(input);
+            switch (alt38) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:172:6: '||'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:165:6: '||'
                     {
-                    string_literal111=(Token)match(input,95,FOLLOW_95_in_bop957);  
-                    stream_95.add(string_literal111);
+                    string_literal109=(Token)match(input,94,FOLLOW_94_in_bop898);  
+                    stream_94.add(string_literal109);
 
 
 
@@ -3322,7 +3195,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 172:11: -> LOGIC_OR
+                    // 165:11: -> LOGIC_OR
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(LOGIC_OR, "LOGIC_OR"));
 
@@ -3332,10 +3205,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:173:3: '&&'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:166:3: '&&'
                     {
-                    string_literal112=(Token)match(input,96,FOLLOW_96_in_bop965);  
-                    stream_96.add(string_literal112);
+                    string_literal110=(Token)match(input,95,FOLLOW_95_in_bop906);  
+                    stream_95.add(string_literal110);
 
 
 
@@ -3350,7 +3223,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 173:8: -> LOGIC_AND
+                    // 166:8: -> LOGIC_AND
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(LOGIC_AND, "LOGIC_AND"));
 
@@ -3360,10 +3233,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:174:3: '|'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:167:3: '|'
                     {
-                    char_literal113=(Token)match(input,97,FOLLOW_97_in_bop973);  
-                    stream_97.add(char_literal113);
+                    char_literal111=(Token)match(input,96,FOLLOW_96_in_bop914);  
+                    stream_96.add(char_literal111);
 
 
 
@@ -3378,7 +3251,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 174:7: -> BITOR
+                    // 167:7: -> BITOR
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(BITOR, "BITOR"));
 
@@ -3388,10 +3261,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:175:3: '^'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:168:3: '^'
                     {
-                    char_literal114=(Token)match(input,98,FOLLOW_98_in_bop981);  
-                    stream_98.add(char_literal114);
+                    char_literal112=(Token)match(input,97,FOLLOW_97_in_bop922);  
+                    stream_97.add(char_literal112);
 
 
 
@@ -3406,7 +3279,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 175:7: -> BITXOR
+                    // 168:7: -> BITXOR
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(BITXOR, "BITXOR"));
 
@@ -3416,10 +3289,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:176:3: '&'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:169:3: '&'
                     {
-                    char_literal115=(Token)match(input,99,FOLLOW_99_in_bop989);  
-                    stream_99.add(char_literal115);
+                    char_literal113=(Token)match(input,98,FOLLOW_98_in_bop930);  
+                    stream_98.add(char_literal113);
 
 
 
@@ -3434,7 +3307,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 176:7: -> BITAND
+                    // 169:7: -> BITAND
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(BITAND, "BITAND"));
 
@@ -3444,10 +3317,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 6 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:177:3: '=='
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:170:3: '=='
                     {
-                    string_literal116=(Token)match(input,100,FOLLOW_100_in_bop997);  
-                    stream_100.add(string_literal116);
+                    string_literal114=(Token)match(input,99,FOLLOW_99_in_bop938);  
+                    stream_99.add(string_literal114);
 
 
 
@@ -3462,7 +3335,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 177:8: -> EQ
+                    // 170:8: -> EQ
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(EQ, "EQ"));
 
@@ -3472,10 +3345,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 7 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:177:16: '!='
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:170:16: '!='
                     {
-                    string_literal117=(Token)match(input,101,FOLLOW_101_in_bop1005);  
-                    stream_101.add(string_literal117);
+                    string_literal115=(Token)match(input,100,FOLLOW_100_in_bop946);  
+                    stream_100.add(string_literal115);
 
 
 
@@ -3490,7 +3363,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 177:21: -> NE
+                    // 170:21: -> NE
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(NE, "NE"));
 
@@ -3500,10 +3373,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 8 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:3: '<'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:171:3: '<'
                     {
-                    char_literal118=(Token)match(input,102,FOLLOW_102_in_bop1013);  
-                    stream_102.add(char_literal118);
+                    char_literal116=(Token)match(input,101,FOLLOW_101_in_bop954);  
+                    stream_101.add(char_literal116);
 
 
 
@@ -3518,7 +3391,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 178:7: -> LT
+                    // 171:7: -> LT
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(LT, "LT"));
 
@@ -3528,10 +3401,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 9 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:15: '>'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:171:15: '>'
                     {
-                    char_literal119=(Token)match(input,103,FOLLOW_103_in_bop1021);  
-                    stream_103.add(char_literal119);
+                    char_literal117=(Token)match(input,102,FOLLOW_102_in_bop962);  
+                    stream_102.add(char_literal117);
 
 
 
@@ -3546,7 +3419,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 178:19: -> GT
+                    // 171:19: -> GT
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(GT, "GT"));
 
@@ -3556,10 +3429,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 10 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:27: '<='
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:171:27: '<='
                     {
-                    string_literal120=(Token)match(input,104,FOLLOW_104_in_bop1029);  
-                    stream_104.add(string_literal120);
+                    string_literal118=(Token)match(input,103,FOLLOW_103_in_bop970);  
+                    stream_103.add(string_literal118);
 
 
 
@@ -3574,7 +3447,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 178:32: -> LE
+                    // 171:32: -> LE
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(LE, "LE"));
 
@@ -3584,10 +3457,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 11 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:40: '>='
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:171:40: '>='
                     {
-                    string_literal121=(Token)match(input,105,FOLLOW_105_in_bop1037);  
-                    stream_105.add(string_literal121);
+                    string_literal119=(Token)match(input,104,FOLLOW_104_in_bop978);  
+                    stream_104.add(string_literal119);
 
 
 
@@ -3602,7 +3475,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 178:45: -> GE
+                    // 171:45: -> GE
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(GE, "GE"));
 
@@ -3612,10 +3485,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 12 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:179:3: '<<'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:172:3: '<<'
                     {
-                    string_literal122=(Token)match(input,106,FOLLOW_106_in_bop1045);  
-                    stream_106.add(string_literal122);
+                    string_literal120=(Token)match(input,105,FOLLOW_105_in_bop986);  
+                    stream_105.add(string_literal120);
 
 
 
@@ -3630,7 +3503,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 179:8: -> SHIFT_LEFT
+                    // 172:8: -> SHIFT_LEFT
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(SHIFT_LEFT, "SHIFT_LEFT"));
 
@@ -3640,10 +3513,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 13 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:179:24: '>>'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:172:24: '>>'
                     {
-                    string_literal123=(Token)match(input,107,FOLLOW_107_in_bop1053);  
-                    stream_107.add(string_literal123);
+                    string_literal121=(Token)match(input,106,FOLLOW_106_in_bop994);  
+                    stream_106.add(string_literal121);
 
 
 
@@ -3658,7 +3531,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 179:29: -> SHIFT_RIGHT
+                    // 172:29: -> SHIFT_RIGHT
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(SHIFT_RIGHT, "SHIFT_RIGHT"));
 
@@ -3668,10 +3541,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 14 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:180:3: PLUS
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:173:3: PLUS
                     {
-                    PLUS124=(Token)match(input,PLUS,FOLLOW_PLUS_in_bop1061);  
-                    stream_PLUS.add(PLUS124);
+                    PLUS122=(Token)match(input,PLUS,FOLLOW_PLUS_in_bop1002);  
+                    stream_PLUS.add(PLUS122);
 
 
 
@@ -3686,7 +3559,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 180:8: -> PLUS
+                    // 173:8: -> PLUS
                     {
                         adaptor.addChild(root_0, stream_PLUS.nextNode());
 
@@ -3696,10 +3569,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 15 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:180:18: MINUS
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:173:18: MINUS
                     {
-                    MINUS125=(Token)match(input,MINUS,FOLLOW_MINUS_in_bop1069);  
-                    stream_MINUS.add(MINUS125);
+                    MINUS123=(Token)match(input,MINUS,FOLLOW_MINUS_in_bop1010);  
+                    stream_MINUS.add(MINUS123);
 
 
 
@@ -3714,7 +3587,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 180:24: -> MINUS
+                    // 173:24: -> MINUS
                     {
                         adaptor.addChild(root_0, stream_MINUS.nextNode());
 
@@ -3724,10 +3597,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 16 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:181:3: DIV
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:174:3: DIV
                     {
-                    DIV126=(Token)match(input,DIV,FOLLOW_DIV_in_bop1077);  
-                    stream_DIV.add(DIV126);
+                    DIV124=(Token)match(input,DIV,FOLLOW_DIV_in_bop1018);  
+                    stream_DIV.add(DIV124);
 
 
 
@@ -3742,7 +3615,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 181:7: -> DIV
+                    // 174:7: -> DIV
                     {
                         adaptor.addChild(root_0, stream_DIV.nextNode());
 
@@ -3752,10 +3625,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 17 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:181:16: '%'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:174:16: '%'
                     {
-                    char_literal127=(Token)match(input,108,FOLLOW_108_in_bop1085);  
-                    stream_108.add(char_literal127);
+                    char_literal125=(Token)match(input,107,FOLLOW_107_in_bop1026);  
+                    stream_107.add(char_literal125);
 
 
 
@@ -3770,7 +3643,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 181:20: -> MOD
+                    // 174:20: -> MOD
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(MOD, "MOD"));
 
@@ -3780,10 +3653,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 18 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:181:29: TIMES
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:174:29: TIMES
                     {
-                    TIMES128=(Token)match(input,TIMES,FOLLOW_TIMES_in_bop1093);  
-                    stream_TIMES.add(TIMES128);
+                    TIMES126=(Token)match(input,TIMES,FOLLOW_TIMES_in_bop1034);  
+                    stream_TIMES.add(TIMES126);
 
 
 
@@ -3798,7 +3671,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 181:35: -> TIMES
+                    // 174:35: -> TIMES
                     {
                         adaptor.addChild(root_0, stream_TIMES.nextNode());
 
@@ -3808,10 +3681,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 19 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:182:3: '**'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:175:3: '**'
                     {
-                    string_literal129=(Token)match(input,109,FOLLOW_109_in_bop1101);  
-                    stream_109.add(string_literal129);
+                    string_literal127=(Token)match(input,108,FOLLOW_108_in_bop1042);  
+                    stream_108.add(string_literal127);
 
 
 
@@ -3826,7 +3699,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 182:8: -> EXP
+                    // 175:8: -> EXP
                     {
                         adaptor.addChild(root_0, (Object)adaptor.create(EXP, "EXP"));
 
@@ -3861,7 +3734,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "un_expr"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:184:1: un_expr : ( postfix_expression -> postfix_expression | (op= ( MINUS -> MINUS ) | op= ( '~' -> BITNOT ) | op= ( '!' -> LOGIC_NOT ) | op= ( '#' -> NUM_ELTS ) ) un_expr -> ^( EXPR_UNARY $op un_expr ) );
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:177:1: un_expr : ( postfix_expression -> postfix_expression | (op= ( MINUS -> MINUS ) | op= ( '~' -> BITNOT ) | op= ( '!' -> LOGIC_NOT ) | op= ( '#' -> NUM_ELTS ) ) un_expr -> ^( EXPR_UNARY $op un_expr ) );
     public final C_ALParser.un_expr_return un_expr() throws RecognitionException {
         C_ALParser.un_expr_return retval = new C_ALParser.un_expr_return();
         retval.start = input.LT(1);
@@ -3869,53 +3742,53 @@ public class C_ALParser extends Parser {
         Object root_0 = null;
 
         Token op=null;
-        Token MINUS131=null;
+        Token MINUS129=null;
+        Token char_literal130=null;
+        Token char_literal131=null;
         Token char_literal132=null;
-        Token char_literal133=null;
-        Token char_literal134=null;
-        C_ALParser.postfix_expression_return postfix_expression130 = null;
+        C_ALParser.postfix_expression_return postfix_expression128 = null;
 
-        C_ALParser.un_expr_return un_expr135 = null;
+        C_ALParser.un_expr_return un_expr133 = null;
 
 
         Object op_tree=null;
-        Object MINUS131_tree=null;
+        Object MINUS129_tree=null;
+        Object char_literal130_tree=null;
+        Object char_literal131_tree=null;
         Object char_literal132_tree=null;
-        Object char_literal133_tree=null;
-        Object char_literal134_tree=null;
-        RewriteRuleTokenStream stream_112=new RewriteRuleTokenStream(adaptor,"token 112");
+        RewriteRuleTokenStream stream_109=new RewriteRuleTokenStream(adaptor,"token 109");
         RewriteRuleTokenStream stream_110=new RewriteRuleTokenStream(adaptor,"token 110");
         RewriteRuleTokenStream stream_MINUS=new RewriteRuleTokenStream(adaptor,"token MINUS");
         RewriteRuleTokenStream stream_111=new RewriteRuleTokenStream(adaptor,"token 111");
         RewriteRuleSubtreeStream stream_postfix_expression=new RewriteRuleSubtreeStream(adaptor,"rule postfix_expression");
         RewriteRuleSubtreeStream stream_un_expr=new RewriteRuleSubtreeStream(adaptor,"rule un_expr");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:184:8: ( postfix_expression -> postfix_expression | (op= ( MINUS -> MINUS ) | op= ( '~' -> BITNOT ) | op= ( '!' -> LOGIC_NOT ) | op= ( '#' -> NUM_ELTS ) ) un_expr -> ^( EXPR_UNARY $op un_expr ) )
-            int alt43=2;
-            int LA43_0 = input.LA(1);
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:177:8: ( postfix_expression -> postfix_expression | (op= ( MINUS -> MINUS ) | op= ( '~' -> BITNOT ) | op= ( '!' -> LOGIC_NOT ) | op= ( '#' -> NUM_ELTS ) ) un_expr -> ^( EXPR_UNARY $op un_expr ) )
+            int alt40=2;
+            int LA40_0 = input.LA(1);
 
-            if ( (LA43_0==ID||(LA43_0>=FLOAT && LA43_0<=INTEGER)||LA43_0==STRING||LA43_0==83||LA43_0==86||(LA43_0>=113 && LA43_0<=114)) ) {
-                alt43=1;
+            if ( (LA40_0==ID||(LA40_0>=FLOAT && LA40_0<=INTEGER)||LA40_0==STRING||LA40_0==82||LA40_0==85||(LA40_0>=112 && LA40_0<=113)||(LA40_0>=115 && LA40_0<=116)) ) {
+                alt40=1;
             }
-            else if ( (LA43_0==MINUS||(LA43_0>=110 && LA43_0<=112)) ) {
-                alt43=2;
+            else if ( (LA40_0==MINUS||(LA40_0>=109 && LA40_0<=111)) ) {
+                alt40=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 43, 0, input);
+                    new NoViableAltException("", 40, 0, input);
 
                 throw nvae;
             }
-            switch (alt43) {
+            switch (alt40) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:184:10: postfix_expression
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:177:10: postfix_expression
                     {
-                    pushFollow(FOLLOW_postfix_expression_in_un_expr1112);
-                    postfix_expression130=postfix_expression();
+                    pushFollow(FOLLOW_postfix_expression_in_un_expr1053);
+                    postfix_expression128=postfix_expression();
 
                     state._fsp--;
 
-                    stream_postfix_expression.add(postfix_expression130.getTree());
+                    stream_postfix_expression.add(postfix_expression128.getTree());
 
 
                     // AST REWRITE
@@ -3929,7 +3802,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 184:29: -> postfix_expression
+                    // 177:29: -> postfix_expression
                     {
                         adaptor.addChild(root_0, stream_postfix_expression.nextTree());
 
@@ -3939,47 +3812,47 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:185:5: (op= ( MINUS -> MINUS ) | op= ( '~' -> BITNOT ) | op= ( '!' -> LOGIC_NOT ) | op= ( '#' -> NUM_ELTS ) ) un_expr
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:5: (op= ( MINUS -> MINUS ) | op= ( '~' -> BITNOT ) | op= ( '!' -> LOGIC_NOT ) | op= ( '#' -> NUM_ELTS ) ) un_expr
                     {
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:185:5: (op= ( MINUS -> MINUS ) | op= ( '~' -> BITNOT ) | op= ( '!' -> LOGIC_NOT ) | op= ( '#' -> NUM_ELTS ) )
-                    int alt42=4;
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:5: (op= ( MINUS -> MINUS ) | op= ( '~' -> BITNOT ) | op= ( '!' -> LOGIC_NOT ) | op= ( '#' -> NUM_ELTS ) )
+                    int alt39=4;
                     switch ( input.LA(1) ) {
                     case MINUS:
                         {
-                        alt42=1;
+                        alt39=1;
+                        }
+                        break;
+                    case 109:
+                        {
+                        alt39=2;
                         }
                         break;
                     case 110:
                         {
-                        alt42=2;
+                        alt39=3;
                         }
                         break;
                     case 111:
                         {
-                        alt42=3;
-                        }
-                        break;
-                    case 112:
-                        {
-                        alt42=4;
+                        alt39=4;
                         }
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("", 42, 0, input);
+                            new NoViableAltException("", 39, 0, input);
 
                         throw nvae;
                     }
 
-                    switch (alt42) {
+                    switch (alt39) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:185:6: op= ( MINUS -> MINUS )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:6: op= ( MINUS -> MINUS )
                             {
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:185:9: ( MINUS -> MINUS )
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:185:10: MINUS
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:9: ( MINUS -> MINUS )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:178:10: MINUS
                             {
-                            MINUS131=(Token)match(input,MINUS,FOLLOW_MINUS_in_un_expr1126);  
-                            stream_MINUS.add(MINUS131);
+                            MINUS129=(Token)match(input,MINUS,FOLLOW_MINUS_in_un_expr1067);  
+                            stream_MINUS.add(MINUS129);
 
 
 
@@ -3994,7 +3867,7 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 185:16: -> MINUS
+                            // 178:16: -> MINUS
                             {
                                 adaptor.addChild(root_0, stream_MINUS.nextNode());
 
@@ -4007,13 +3880,13 @@ public class C_ALParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:186:7: op= ( '~' -> BITNOT )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:179:7: op= ( '~' -> BITNOT )
                             {
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:186:10: ( '~' -> BITNOT )
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:186:11: '~'
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:179:10: ( '~' -> BITNOT )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:179:11: '~'
                             {
-                            char_literal132=(Token)match(input,110,FOLLOW_110_in_un_expr1142);  
-                            stream_110.add(char_literal132);
+                            char_literal130=(Token)match(input,109,FOLLOW_109_in_un_expr1083);  
+                            stream_109.add(char_literal130);
 
 
 
@@ -4028,7 +3901,7 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 186:15: -> BITNOT
+                            // 179:15: -> BITNOT
                             {
                                 adaptor.addChild(root_0, (Object)adaptor.create(BITNOT, "BITNOT"));
 
@@ -4041,13 +3914,13 @@ public class C_ALParser extends Parser {
                             }
                             break;
                         case 3 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:187:7: op= ( '!' -> LOGIC_NOT )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:180:7: op= ( '!' -> LOGIC_NOT )
                             {
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:187:10: ( '!' -> LOGIC_NOT )
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:187:11: '!'
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:180:10: ( '!' -> LOGIC_NOT )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:180:11: '!'
                             {
-                            char_literal133=(Token)match(input,111,FOLLOW_111_in_un_expr1158);  
-                            stream_111.add(char_literal133);
+                            char_literal131=(Token)match(input,110,FOLLOW_110_in_un_expr1099);  
+                            stream_110.add(char_literal131);
 
 
 
@@ -4062,7 +3935,7 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 187:15: -> LOGIC_NOT
+                            // 180:15: -> LOGIC_NOT
                             {
                                 adaptor.addChild(root_0, (Object)adaptor.create(LOGIC_NOT, "LOGIC_NOT"));
 
@@ -4075,13 +3948,13 @@ public class C_ALParser extends Parser {
                             }
                             break;
                         case 4 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:188:7: op= ( '#' -> NUM_ELTS )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:181:7: op= ( '#' -> NUM_ELTS )
                             {
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:188:10: ( '#' -> NUM_ELTS )
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:188:11: '#'
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:181:10: ( '#' -> NUM_ELTS )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:181:11: '#'
                             {
-                            char_literal134=(Token)match(input,112,FOLLOW_112_in_un_expr1174);  
-                            stream_112.add(char_literal134);
+                            char_literal132=(Token)match(input,111,FOLLOW_111_in_un_expr1115);  
+                            stream_111.add(char_literal132);
 
 
 
@@ -4096,7 +3969,7 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 188:15: -> NUM_ELTS
+                            // 181:15: -> NUM_ELTS
                             {
                                 adaptor.addChild(root_0, (Object)adaptor.create(NUM_ELTS, "NUM_ELTS"));
 
@@ -4111,12 +3984,12 @@ public class C_ALParser extends Parser {
 
                     }
 
-                    pushFollow(FOLLOW_un_expr_in_un_expr1182);
-                    un_expr135=un_expr();
+                    pushFollow(FOLLOW_un_expr_in_un_expr1123);
+                    un_expr133=un_expr();
 
                     state._fsp--;
 
-                    stream_un_expr.add(un_expr135.getTree());
+                    stream_un_expr.add(un_expr133.getTree());
 
 
                     // AST REWRITE
@@ -4131,9 +4004,9 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 188:37: -> ^( EXPR_UNARY $op un_expr )
+                    // 181:37: -> ^( EXPR_UNARY $op un_expr )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:188:40: ^( EXPR_UNARY $op un_expr )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:181:40: ^( EXPR_UNARY $op un_expr )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_UNARY, "EXPR_UNARY"), root_1);
@@ -4175,7 +4048,7 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "postfix_expression"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:190:1: postfix_expression : ( '{' e= expressions ( ':' g= expressionGenerators )? '}' -> ^( EXPR_LIST $e ( $g)? ) | constant -> constant | '(' expression ')' -> expression | var= ID ( '(' ( expressions )? ')' -> ^( EXPR_CALL $var ( expressions )? ) | ( '[' expression ']' )+ -> ^( EXPR_IDX $var ( expression )+ ) | -> ^( EXPR_VAR $var) ) );
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:183:1: postfix_expression : ( '{' e= expressions '}' -> ^( EXPR_LIST $e) | 'for' '(' generatorDecls ')' '{' expression '}' | 'if' e1= expression '{' e2= expression '}' 'else' '{' e3= expression '}' -> ^( EXPR_IF $e1 $e2 $e3) | constant -> constant | '(' expression ')' -> expression | var= ID ( '(' ( expressions )? ')' -> ^( EXPR_CALL $var ( expressions )? ) | ( '[' expression ']' )+ -> ^( EXPR_IDX $var ( expression )+ ) | -> ^( EXPR_VAR $var) ) );
     public final C_ALParser.postfix_expression_return postfix_expression() throws RecognitionException {
         C_ALParser.postfix_expression_return retval = new C_ALParser.postfix_expression_return();
         retval.start = input.LT(1);
@@ -4183,156 +4056,161 @@ public class C_ALParser extends Parser {
         Object root_0 = null;
 
         Token var=null;
-        Token char_literal136=null;
+        Token char_literal134=null;
+        Token char_literal135=null;
+        Token string_literal136=null;
         Token char_literal137=null;
-        Token char_literal138=null;
+        Token char_literal139=null;
         Token char_literal140=null;
         Token char_literal142=null;
-        Token char_literal143=null;
+        Token string_literal143=null;
+        Token char_literal144=null;
         Token char_literal145=null;
-        Token char_literal146=null;
+        Token string_literal146=null;
+        Token char_literal147=null;
         Token char_literal148=null;
+        Token char_literal150=null;
+        Token char_literal152=null;
+        Token char_literal153=null;
+        Token char_literal155=null;
+        Token char_literal156=null;
+        Token char_literal158=null;
         C_ALParser.expressions_return e = null;
 
-        C_ALParser.expressionGenerators_return g = null;
+        C_ALParser.expression_return e1 = null;
 
-        C_ALParser.constant_return constant139 = null;
+        C_ALParser.expression_return e2 = null;
+
+        C_ALParser.expression_return e3 = null;
+
+        C_ALParser.generatorDecls_return generatorDecls138 = null;
 
         C_ALParser.expression_return expression141 = null;
 
-        C_ALParser.expressions_return expressions144 = null;
+        C_ALParser.constant_return constant149 = null;
 
-        C_ALParser.expression_return expression147 = null;
+        C_ALParser.expression_return expression151 = null;
+
+        C_ALParser.expressions_return expressions154 = null;
+
+        C_ALParser.expression_return expression157 = null;
 
 
         Object var_tree=null;
-        Object char_literal136_tree=null;
+        Object char_literal134_tree=null;
+        Object char_literal135_tree=null;
+        Object string_literal136_tree=null;
         Object char_literal137_tree=null;
-        Object char_literal138_tree=null;
+        Object char_literal139_tree=null;
         Object char_literal140_tree=null;
         Object char_literal142_tree=null;
-        Object char_literal143_tree=null;
+        Object string_literal143_tree=null;
+        Object char_literal144_tree=null;
         Object char_literal145_tree=null;
-        Object char_literal146_tree=null;
+        Object string_literal146_tree=null;
+        Object char_literal147_tree=null;
         Object char_literal148_tree=null;
+        Object char_literal150_tree=null;
+        Object char_literal152_tree=null;
+        Object char_literal153_tree=null;
+        Object char_literal155_tree=null;
+        Object char_literal156_tree=null;
+        Object char_literal158_tree=null;
         RewriteRuleTokenStream stream_79=new RewriteRuleTokenStream(adaptor,"token 79");
+        RewriteRuleTokenStream stream_114=new RewriteRuleTokenStream(adaptor,"token 114");
+        RewriteRuleTokenStream stream_113=new RewriteRuleTokenStream(adaptor,"token 113");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
+        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
         RewriteRuleTokenStream stream_83=new RewriteRuleTokenStream(adaptor,"token 83");
         RewriteRuleTokenStream stream_80=new RewriteRuleTokenStream(adaptor,"token 80");
-        RewriteRuleTokenStream stream_81=new RewriteRuleTokenStream(adaptor,"token 81");
         RewriteRuleTokenStream stream_86=new RewriteRuleTokenStream(adaptor,"token 86");
-        RewriteRuleTokenStream stream_87=new RewriteRuleTokenStream(adaptor,"token 87");
-        RewriteRuleTokenStream stream_84=new RewriteRuleTokenStream(adaptor,"token 84");
+        RewriteRuleTokenStream stream_85=new RewriteRuleTokenStream(adaptor,"token 85");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_constant=new RewriteRuleSubtreeStream(adaptor,"rule constant");
-        RewriteRuleSubtreeStream stream_expressionGenerators=new RewriteRuleSubtreeStream(adaptor,"rule expressionGenerators");
         RewriteRuleSubtreeStream stream_expressions=new RewriteRuleSubtreeStream(adaptor,"rule expressions");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:190:19: ( '{' e= expressions ( ':' g= expressionGenerators )? '}' -> ^( EXPR_LIST $e ( $g)? ) | constant -> constant | '(' expression ')' -> expression | var= ID ( '(' ( expressions )? ')' -> ^( EXPR_CALL $var ( expressions )? ) | ( '[' expression ']' )+ -> ^( EXPR_IDX $var ( expression )+ ) | -> ^( EXPR_VAR $var) ) )
-            int alt48=4;
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:183:19: ( '{' e= expressions '}' -> ^( EXPR_LIST $e) | 'for' '(' generatorDecls ')' '{' expression '}' | 'if' e1= expression '{' e2= expression '}' 'else' '{' e3= expression '}' -> ^( EXPR_IF $e1 $e2 $e3) | constant -> constant | '(' expression ')' -> expression | var= ID ( '(' ( expressions )? ')' -> ^( EXPR_CALL $var ( expressions )? ) | ( '[' expression ']' )+ -> ^( EXPR_IDX $var ( expression )+ ) | -> ^( EXPR_VAR $var) ) )
+            int alt44=6;
             switch ( input.LA(1) ) {
-            case 86:
+            case 85:
                 {
-                alt48=1;
+                alt44=1;
+                }
+                break;
+            case 112:
+                {
+                alt44=2;
+                }
+                break;
+            case 113:
+                {
+                alt44=3;
                 }
                 break;
             case FLOAT:
             case INTEGER:
             case STRING:
-            case 113:
-            case 114:
+            case 115:
+            case 116:
                 {
-                alt48=2;
+                alt44=4;
                 }
                 break;
-            case 83:
+            case 82:
                 {
-                alt48=3;
+                alt44=5;
                 }
                 break;
             case ID:
                 {
-                alt48=4;
+                alt44=6;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("", 48, 0, input);
+                    new NoViableAltException("", 44, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt48) {
+            switch (alt44) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:3: '{' e= expressions ( ':' g= expressionGenerators )? '}'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:184:3: '{' e= expressions '}'
                     {
-                    char_literal136=(Token)match(input,86,FOLLOW_86_in_postfix_expression1202);  
-                    stream_86.add(char_literal136);
+                    char_literal134=(Token)match(input,85,FOLLOW_85_in_postfix_expression1143);  
+                    stream_85.add(char_literal134);
 
-                    pushFollow(FOLLOW_expressions_in_postfix_expression1206);
+                    pushFollow(FOLLOW_expressions_in_postfix_expression1147);
                     e=expressions();
 
                     state._fsp--;
 
                     stream_expressions.add(e.getTree());
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:21: ( ':' g= expressionGenerators )?
-                    int alt44=2;
-                    int LA44_0 = input.LA(1);
-
-                    if ( (LA44_0==79) ) {
-                        alt44=1;
-                    }
-                    switch (alt44) {
-                        case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:22: ':' g= expressionGenerators
-                            {
-                            char_literal137=(Token)match(input,79,FOLLOW_79_in_postfix_expression1209);  
-                            stream_79.add(char_literal137);
-
-                            pushFollow(FOLLOW_expressionGenerators_in_postfix_expression1213);
-                            g=expressionGenerators();
-
-                            state._fsp--;
-
-                            stream_expressionGenerators.add(g.getTree());
-
-                            }
-                            break;
-
-                    }
-
-                    char_literal138=(Token)match(input,87,FOLLOW_87_in_postfix_expression1217);  
-                    stream_87.add(char_literal138);
+                    char_literal135=(Token)match(input,86,FOLLOW_86_in_postfix_expression1149);  
+                    stream_86.add(char_literal135);
 
 
 
                     // AST REWRITE
-                    // elements: e, g
+                    // elements: e
                     // token labels: 
-                    // rule labels: g, retval, e
+                    // rule labels: retval, e
                     // token list labels: 
                     // rule list labels: 
                     // wildcard labels: 
                     retval.tree = root_0;
-                    RewriteRuleSubtreeStream stream_g=new RewriteRuleSubtreeStream(adaptor,"rule g",g!=null?g.tree:null);
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
                     RewriteRuleSubtreeStream stream_e=new RewriteRuleSubtreeStream(adaptor,"rule e",e!=null?e.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 191:55: -> ^( EXPR_LIST $e ( $g)? )
+                    // 184:25: -> ^( EXPR_LIST $e)
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:58: ^( EXPR_LIST $e ( $g)? )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:184:28: ^( EXPR_LIST $e)
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_LIST, "EXPR_LIST"), root_1);
 
                         adaptor.addChild(root_1, stream_e.nextTree());
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:73: ( $g)?
-                        if ( stream_g.hasNext() ) {
-                            adaptor.addChild(root_1, stream_g.nextTree());
-
-                        }
-                        stream_g.reset();
 
                         adaptor.addChild(root_0, root_1);
                         }
@@ -4343,14 +4221,128 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:193:6: constant
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:185:3: 'for' '(' generatorDecls ')' '{' expression '}'
                     {
-                    pushFollow(FOLLOW_constant_in_postfix_expression1236);
-                    constant139=constant();
+                    root_0 = (Object)adaptor.nil();
+
+                    string_literal136=(Token)match(input,112,FOLLOW_112_in_postfix_expression1162); 
+                    string_literal136_tree = (Object)adaptor.create(string_literal136);
+                    adaptor.addChild(root_0, string_literal136_tree);
+
+                    char_literal137=(Token)match(input,82,FOLLOW_82_in_postfix_expression1164); 
+                    char_literal137_tree = (Object)adaptor.create(char_literal137);
+                    adaptor.addChild(root_0, char_literal137_tree);
+
+                    pushFollow(FOLLOW_generatorDecls_in_postfix_expression1166);
+                    generatorDecls138=generatorDecls();
 
                     state._fsp--;
 
-                    stream_constant.add(constant139.getTree());
+                    adaptor.addChild(root_0, generatorDecls138.getTree());
+                    char_literal139=(Token)match(input,83,FOLLOW_83_in_postfix_expression1168); 
+                    char_literal139_tree = (Object)adaptor.create(char_literal139);
+                    adaptor.addChild(root_0, char_literal139_tree);
+
+                    char_literal140=(Token)match(input,85,FOLLOW_85_in_postfix_expression1170); 
+                    char_literal140_tree = (Object)adaptor.create(char_literal140);
+                    adaptor.addChild(root_0, char_literal140_tree);
+
+                    pushFollow(FOLLOW_expression_in_postfix_expression1172);
+                    expression141=expression();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, expression141.getTree());
+                    char_literal142=(Token)match(input,86,FOLLOW_86_in_postfix_expression1174); 
+                    char_literal142_tree = (Object)adaptor.create(char_literal142);
+                    adaptor.addChild(root_0, char_literal142_tree);
+
+
+                    }
+                    break;
+                case 3 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:186:3: 'if' e1= expression '{' e2= expression '}' 'else' '{' e3= expression '}'
+                    {
+                    string_literal143=(Token)match(input,113,FOLLOW_113_in_postfix_expression1178);  
+                    stream_113.add(string_literal143);
+
+                    pushFollow(FOLLOW_expression_in_postfix_expression1182);
+                    e1=expression();
+
+                    state._fsp--;
+
+                    stream_expression.add(e1.getTree());
+                    char_literal144=(Token)match(input,85,FOLLOW_85_in_postfix_expression1184);  
+                    stream_85.add(char_literal144);
+
+                    pushFollow(FOLLOW_expression_in_postfix_expression1188);
+                    e2=expression();
+
+                    state._fsp--;
+
+                    stream_expression.add(e2.getTree());
+                    char_literal145=(Token)match(input,86,FOLLOW_86_in_postfix_expression1190);  
+                    stream_86.add(char_literal145);
+
+                    string_literal146=(Token)match(input,114,FOLLOW_114_in_postfix_expression1192);  
+                    stream_114.add(string_literal146);
+
+                    char_literal147=(Token)match(input,85,FOLLOW_85_in_postfix_expression1194);  
+                    stream_85.add(char_literal147);
+
+                    pushFollow(FOLLOW_expression_in_postfix_expression1198);
+                    e3=expression();
+
+                    state._fsp--;
+
+                    stream_expression.add(e3.getTree());
+                    char_literal148=(Token)match(input,86,FOLLOW_86_in_postfix_expression1200);  
+                    stream_86.add(char_literal148);
+
+
+
+                    // AST REWRITE
+                    // elements: e2, e3, e1
+                    // token labels: 
+                    // rule labels: e3, retval, e1, e2
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_e3=new RewriteRuleSubtreeStream(adaptor,"rule e3",e3!=null?e3.tree:null);
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+                    RewriteRuleSubtreeStream stream_e1=new RewriteRuleSubtreeStream(adaptor,"rule e1",e1!=null?e1.tree:null);
+                    RewriteRuleSubtreeStream stream_e2=new RewriteRuleSubtreeStream(adaptor,"rule e2",e2!=null?e2.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 186:73: -> ^( EXPR_IF $e1 $e2 $e3)
+                    {
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:186:76: ^( EXPR_IF $e1 $e2 $e3)
+                        {
+                        Object root_1 = (Object)adaptor.nil();
+                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_IF, "EXPR_IF"), root_1);
+
+                        adaptor.addChild(root_1, stream_e1.nextTree());
+                        adaptor.addChild(root_1, stream_e2.nextTree());
+                        adaptor.addChild(root_1, stream_e3.nextTree());
+
+                        adaptor.addChild(root_0, root_1);
+                        }
+
+                    }
+
+                    retval.tree = root_0;
+                    }
+                    break;
+                case 4 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:187:3: constant
+                    {
+                    pushFollow(FOLLOW_constant_in_postfix_expression1219);
+                    constant149=constant();
+
+                    state._fsp--;
+
+                    stream_constant.add(constant149.getTree());
 
 
                     // AST REWRITE
@@ -4364,7 +4356,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 193:15: -> constant
+                    // 187:12: -> constant
                     {
                         adaptor.addChild(root_0, stream_constant.nextTree());
 
@@ -4373,20 +4365,20 @@ public class C_ALParser extends Parser {
                     retval.tree = root_0;
                     }
                     break;
-                case 3 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:194:3: '(' expression ')'
+                case 5 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:188:3: '(' expression ')'
                     {
-                    char_literal140=(Token)match(input,83,FOLLOW_83_in_postfix_expression1244);  
-                    stream_83.add(char_literal140);
+                    char_literal150=(Token)match(input,82,FOLLOW_82_in_postfix_expression1227);  
+                    stream_82.add(char_literal150);
 
-                    pushFollow(FOLLOW_expression_in_postfix_expression1246);
-                    expression141=expression();
+                    pushFollow(FOLLOW_expression_in_postfix_expression1229);
+                    expression151=expression();
 
                     state._fsp--;
 
-                    stream_expression.add(expression141.getTree());
-                    char_literal142=(Token)match(input,84,FOLLOW_84_in_postfix_expression1248);  
-                    stream_84.add(char_literal142);
+                    stream_expression.add(expression151.getTree());
+                    char_literal152=(Token)match(input,83,FOLLOW_83_in_postfix_expression1231);  
+                    stream_83.add(char_literal152);
 
 
 
@@ -4401,7 +4393,7 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 194:22: -> expression
+                    // 188:22: -> expression
                     {
                         adaptor.addChild(root_0, stream_expression.nextTree());
 
@@ -4410,37 +4402,37 @@ public class C_ALParser extends Parser {
                     retval.tree = root_0;
                     }
                     break;
-                case 4 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:195:3: var= ID ( '(' ( expressions )? ')' -> ^( EXPR_CALL $var ( expressions )? ) | ( '[' expression ']' )+ -> ^( EXPR_IDX $var ( expression )+ ) | -> ^( EXPR_VAR $var) )
+                case 6 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:189:3: var= ID ( '(' ( expressions )? ')' -> ^( EXPR_CALL $var ( expressions )? ) | ( '[' expression ']' )+ -> ^( EXPR_IDX $var ( expression )+ ) | -> ^( EXPR_VAR $var) )
                     {
-                    var=(Token)match(input,ID,FOLLOW_ID_in_postfix_expression1258);  
+                    var=(Token)match(input,ID,FOLLOW_ID_in_postfix_expression1241);  
                     stream_ID.add(var);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:195:10: ( '(' ( expressions )? ')' -> ^( EXPR_CALL $var ( expressions )? ) | ( '[' expression ']' )+ -> ^( EXPR_IDX $var ( expression )+ ) | -> ^( EXPR_VAR $var) )
-                    int alt47=3;
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:189:10: ( '(' ( expressions )? ')' -> ^( EXPR_CALL $var ( expressions )? ) | ( '[' expression ']' )+ -> ^( EXPR_IDX $var ( expression )+ ) | -> ^( EXPR_VAR $var) )
+                    int alt43=3;
                     switch ( input.LA(1) ) {
-                    case 83:
+                    case 82:
                         {
-                        alt47=1;
+                        alt43=1;
                         }
                         break;
-                    case 80:
+                    case 79:
                         {
-                        alt47=2;
+                        alt43=2;
                         }
                         break;
                     case PLUS:
                     case MINUS:
                     case TIMES:
                     case DIV:
-                    case 79:
+                    case 80:
                     case 81:
-                    case 82:
+                    case 83:
                     case 84:
                     case 85:
                     case 86:
-                    case 87:
-                    case 90:
+                    case 89:
+                    case 94:
                     case 95:
                     case 96:
                     case 97:
@@ -4455,50 +4447,50 @@ public class C_ALParser extends Parser {
                     case 106:
                     case 107:
                     case 108:
-                    case 109:
+                    case 117:
                         {
-                        alt47=3;
+                        alt43=3;
                         }
                         break;
                     default:
                         NoViableAltException nvae =
-                            new NoViableAltException("", 47, 0, input);
+                            new NoViableAltException("", 43, 0, input);
 
                         throw nvae;
                     }
 
-                    switch (alt47) {
+                    switch (alt43) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:196:5: '(' ( expressions )? ')'
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:190:5: '(' ( expressions )? ')'
                             {
-                            char_literal143=(Token)match(input,83,FOLLOW_83_in_postfix_expression1266);  
-                            stream_83.add(char_literal143);
+                            char_literal153=(Token)match(input,82,FOLLOW_82_in_postfix_expression1249);  
+                            stream_82.add(char_literal153);
 
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:196:9: ( expressions )?
-                            int alt45=2;
-                            int LA45_0 = input.LA(1);
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:190:9: ( expressions )?
+                            int alt41=2;
+                            int LA41_0 = input.LA(1);
 
-                            if ( (LA45_0==MINUS||LA45_0==ID||(LA45_0>=FLOAT && LA45_0<=INTEGER)||LA45_0==STRING||LA45_0==83||LA45_0==86||(LA45_0>=110 && LA45_0<=114)) ) {
-                                alt45=1;
+                            if ( (LA41_0==MINUS||LA41_0==ID||(LA41_0>=FLOAT && LA41_0<=INTEGER)||LA41_0==STRING||LA41_0==82||LA41_0==85||(LA41_0>=109 && LA41_0<=113)||(LA41_0>=115 && LA41_0<=116)) ) {
+                                alt41=1;
                             }
-                            switch (alt45) {
+                            switch (alt41) {
                                 case 1 :
-                                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:196:9: expressions
+                                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:190:9: expressions
                                     {
-                                    pushFollow(FOLLOW_expressions_in_postfix_expression1268);
-                                    expressions144=expressions();
+                                    pushFollow(FOLLOW_expressions_in_postfix_expression1251);
+                                    expressions154=expressions();
 
                                     state._fsp--;
 
-                                    stream_expressions.add(expressions144.getTree());
+                                    stream_expressions.add(expressions154.getTree());
 
                                     }
                                     break;
 
                             }
 
-                            char_literal145=(Token)match(input,84,FOLLOW_84_in_postfix_expression1271);  
-                            stream_84.add(char_literal145);
+                            char_literal155=(Token)match(input,83,FOLLOW_83_in_postfix_expression1254);  
+                            stream_83.add(char_literal155);
 
 
 
@@ -4514,15 +4506,15 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 196:26: -> ^( EXPR_CALL $var ( expressions )? )
+                            // 190:26: -> ^( EXPR_CALL $var ( expressions )? )
                             {
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:196:29: ^( EXPR_CALL $var ( expressions )? )
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:190:29: ^( EXPR_CALL $var ( expressions )? )
                                 {
                                 Object root_1 = (Object)adaptor.nil();
                                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_CALL, "EXPR_CALL"), root_1);
 
                                 adaptor.addChild(root_1, stream_var.nextNode());
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:196:46: ( expressions )?
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:190:46: ( expressions )?
                                 if ( stream_expressions.hasNext() ) {
                                     adaptor.addChild(root_1, stream_expressions.nextTree());
 
@@ -4538,53 +4530,53 @@ public class C_ALParser extends Parser {
                             }
                             break;
                         case 2 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:197:6: ( '[' expression ']' )+
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:6: ( '[' expression ']' )+
                             {
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:197:6: ( '[' expression ']' )+
-                            int cnt46=0;
-                            loop46:
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:6: ( '[' expression ']' )+
+                            int cnt42=0;
+                            loop42:
                             do {
-                                int alt46=2;
-                                int LA46_0 = input.LA(1);
+                                int alt42=2;
+                                int LA42_0 = input.LA(1);
 
-                                if ( (LA46_0==80) ) {
-                                    alt46=1;
+                                if ( (LA42_0==79) ) {
+                                    alt42=1;
                                 }
 
 
-                                switch (alt46) {
+                                switch (alt42) {
                             	case 1 :
-                            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:197:7: '[' expression ']'
+                            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:7: '[' expression ']'
                             	    {
-                            	    char_literal146=(Token)match(input,80,FOLLOW_80_in_postfix_expression1291);  
-                            	    stream_80.add(char_literal146);
+                            	    char_literal156=(Token)match(input,79,FOLLOW_79_in_postfix_expression1274);  
+                            	    stream_79.add(char_literal156);
 
-                            	    pushFollow(FOLLOW_expression_in_postfix_expression1293);
-                            	    expression147=expression();
+                            	    pushFollow(FOLLOW_expression_in_postfix_expression1276);
+                            	    expression157=expression();
 
                             	    state._fsp--;
 
-                            	    stream_expression.add(expression147.getTree());
-                            	    char_literal148=(Token)match(input,81,FOLLOW_81_in_postfix_expression1295);  
-                            	    stream_81.add(char_literal148);
+                            	    stream_expression.add(expression157.getTree());
+                            	    char_literal158=(Token)match(input,80,FOLLOW_80_in_postfix_expression1278);  
+                            	    stream_80.add(char_literal158);
 
 
                             	    }
                             	    break;
 
                             	default :
-                            	    if ( cnt46 >= 1 ) break loop46;
+                            	    if ( cnt42 >= 1 ) break loop42;
                                         EarlyExitException eee =
-                                            new EarlyExitException(46, input);
+                                            new EarlyExitException(42, input);
                                         throw eee;
                                 }
-                                cnt46++;
+                                cnt42++;
                             } while (true);
 
 
 
                             // AST REWRITE
-                            // elements: var, expression
+                            // elements: expression, var
                             // token labels: var
                             // rule labels: retval
                             // token list labels: 
@@ -4595,9 +4587,9 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 197:28: -> ^( EXPR_IDX $var ( expression )+ )
+                            // 191:28: -> ^( EXPR_IDX $var ( expression )+ )
                             {
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:197:31: ^( EXPR_IDX $var ( expression )+ )
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:191:31: ^( EXPR_IDX $var ( expression )+ )
                                 {
                                 Object root_1 = (Object)adaptor.nil();
                                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_IDX, "EXPR_IDX"), root_1);
@@ -4621,7 +4613,7 @@ public class C_ALParser extends Parser {
                             }
                             break;
                         case 3 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:198:5: 
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:192:5: 
                             {
 
                             // AST REWRITE
@@ -4636,9 +4628,9 @@ public class C_ALParser extends Parser {
                             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                             root_0 = (Object)adaptor.nil();
-                            // 198:5: -> ^( EXPR_VAR $var)
+                            // 192:5: -> ^( EXPR_VAR $var)
                             {
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:198:8: ^( EXPR_VAR $var)
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:192:8: ^( EXPR_VAR $var)
                                 {
                                 Object root_1 = (Object)adaptor.nil();
                                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_VAR, "EXPR_VAR"), root_1);
@@ -4685,77 +4677,77 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "constant"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:200:1: constant : ( 'true' -> ^( EXPR_BOOL 'true' ) | 'false' -> ^( EXPR_BOOL 'false' ) | FLOAT -> ^( EXPR_FLOAT FLOAT ) | INTEGER -> ^( EXPR_INT INTEGER ) | STRING -> ^( EXPR_STRING STRING ) );
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:194:1: constant : ( 'true' -> ^( EXPR_BOOL 'true' ) | 'false' -> ^( EXPR_BOOL 'false' ) | FLOAT -> ^( EXPR_FLOAT FLOAT ) | INTEGER -> ^( EXPR_INT INTEGER ) | STRING -> ^( EXPR_STRING STRING ) );
     public final C_ALParser.constant_return constant() throws RecognitionException {
         C_ALParser.constant_return retval = new C_ALParser.constant_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal149=null;
-        Token string_literal150=null;
-        Token FLOAT151=null;
-        Token INTEGER152=null;
-        Token STRING153=null;
+        Token string_literal159=null;
+        Token string_literal160=null;
+        Token FLOAT161=null;
+        Token INTEGER162=null;
+        Token STRING163=null;
 
-        Object string_literal149_tree=null;
-        Object string_literal150_tree=null;
-        Object FLOAT151_tree=null;
-        Object INTEGER152_tree=null;
-        Object STRING153_tree=null;
+        Object string_literal159_tree=null;
+        Object string_literal160_tree=null;
+        Object FLOAT161_tree=null;
+        Object INTEGER162_tree=null;
+        Object STRING163_tree=null;
         RewriteRuleTokenStream stream_INTEGER=new RewriteRuleTokenStream(adaptor,"token INTEGER");
-        RewriteRuleTokenStream stream_114=new RewriteRuleTokenStream(adaptor,"token 114");
+        RewriteRuleTokenStream stream_116=new RewriteRuleTokenStream(adaptor,"token 116");
+        RewriteRuleTokenStream stream_115=new RewriteRuleTokenStream(adaptor,"token 115");
         RewriteRuleTokenStream stream_FLOAT=new RewriteRuleTokenStream(adaptor,"token FLOAT");
-        RewriteRuleTokenStream stream_113=new RewriteRuleTokenStream(adaptor,"token 113");
         RewriteRuleTokenStream stream_STRING=new RewriteRuleTokenStream(adaptor,"token STRING");
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:200:9: ( 'true' -> ^( EXPR_BOOL 'true' ) | 'false' -> ^( EXPR_BOOL 'false' ) | FLOAT -> ^( EXPR_FLOAT FLOAT ) | INTEGER -> ^( EXPR_INT INTEGER ) | STRING -> ^( EXPR_STRING STRING ) )
-            int alt49=5;
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:194:9: ( 'true' -> ^( EXPR_BOOL 'true' ) | 'false' -> ^( EXPR_BOOL 'false' ) | FLOAT -> ^( EXPR_FLOAT FLOAT ) | INTEGER -> ^( EXPR_INT INTEGER ) | STRING -> ^( EXPR_STRING STRING ) )
+            int alt45=5;
             switch ( input.LA(1) ) {
-            case 113:
+            case 115:
                 {
-                alt49=1;
+                alt45=1;
                 }
                 break;
-            case 114:
+            case 116:
                 {
-                alt49=2;
+                alt45=2;
                 }
                 break;
             case FLOAT:
                 {
-                alt49=3;
+                alt45=3;
                 }
                 break;
             case INTEGER:
                 {
-                alt49=4;
+                alt45=4;
                 }
                 break;
             case STRING:
                 {
-                alt49=5;
+                alt45=5;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("", 49, 0, input);
+                    new NoViableAltException("", 45, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt49) {
+            switch (alt45) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:201:3: 'true'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:195:3: 'true'
                     {
-                    string_literal149=(Token)match(input,113,FOLLOW_113_in_constant1332);  
-                    stream_113.add(string_literal149);
+                    string_literal159=(Token)match(input,115,FOLLOW_115_in_constant1315);  
+                    stream_115.add(string_literal159);
 
 
 
                     // AST REWRITE
-                    // elements: 113
+                    // elements: 115
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -4765,14 +4757,14 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 201:10: -> ^( EXPR_BOOL 'true' )
+                    // 195:10: -> ^( EXPR_BOOL 'true' )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:201:13: ^( EXPR_BOOL 'true' )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:195:13: ^( EXPR_BOOL 'true' )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_BOOL, "EXPR_BOOL"), root_1);
 
-                        adaptor.addChild(root_1, stream_113.nextNode());
+                        adaptor.addChild(root_1, stream_115.nextNode());
 
                         adaptor.addChild(root_0, root_1);
                         }
@@ -4783,15 +4775,15 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:202:3: 'false'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:196:3: 'false'
                     {
-                    string_literal150=(Token)match(input,114,FOLLOW_114_in_constant1344);  
-                    stream_114.add(string_literal150);
+                    string_literal160=(Token)match(input,116,FOLLOW_116_in_constant1327);  
+                    stream_116.add(string_literal160);
 
 
 
                     // AST REWRITE
-                    // elements: 114
+                    // elements: 116
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -4801,14 +4793,14 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 202:11: -> ^( EXPR_BOOL 'false' )
+                    // 196:11: -> ^( EXPR_BOOL 'false' )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:202:14: ^( EXPR_BOOL 'false' )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:196:14: ^( EXPR_BOOL 'false' )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_BOOL, "EXPR_BOOL"), root_1);
 
-                        adaptor.addChild(root_1, stream_114.nextNode());
+                        adaptor.addChild(root_1, stream_116.nextNode());
 
                         adaptor.addChild(root_0, root_1);
                         }
@@ -4819,10 +4811,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 3 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:203:3: FLOAT
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:197:3: FLOAT
                     {
-                    FLOAT151=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_constant1356);  
-                    stream_FLOAT.add(FLOAT151);
+                    FLOAT161=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_constant1339);  
+                    stream_FLOAT.add(FLOAT161);
 
 
 
@@ -4837,9 +4829,9 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 203:9: -> ^( EXPR_FLOAT FLOAT )
+                    // 197:9: -> ^( EXPR_FLOAT FLOAT )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:203:12: ^( EXPR_FLOAT FLOAT )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:197:12: ^( EXPR_FLOAT FLOAT )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_FLOAT, "EXPR_FLOAT"), root_1);
@@ -4855,10 +4847,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 4 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:204:3: INTEGER
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:198:3: INTEGER
                     {
-                    INTEGER152=(Token)match(input,INTEGER,FOLLOW_INTEGER_in_constant1368);  
-                    stream_INTEGER.add(INTEGER152);
+                    INTEGER162=(Token)match(input,INTEGER,FOLLOW_INTEGER_in_constant1351);  
+                    stream_INTEGER.add(INTEGER162);
 
 
 
@@ -4873,9 +4865,9 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 204:11: -> ^( EXPR_INT INTEGER )
+                    // 198:11: -> ^( EXPR_INT INTEGER )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:204:14: ^( EXPR_INT INTEGER )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:198:14: ^( EXPR_INT INTEGER )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_INT, "EXPR_INT"), root_1);
@@ -4891,10 +4883,10 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 5 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:205:3: STRING
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:199:3: STRING
                     {
-                    STRING153=(Token)match(input,STRING,FOLLOW_STRING_in_constant1380);  
-                    stream_STRING.add(STRING153);
+                    STRING163=(Token)match(input,STRING,FOLLOW_STRING_in_constant1363);  
+                    stream_STRING.add(STRING163);
 
 
 
@@ -4909,9 +4901,9 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 205:10: -> ^( EXPR_STRING STRING )
+                    // 199:10: -> ^( EXPR_STRING STRING )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:205:13: ^( EXPR_STRING STRING )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:199:13: ^( EXPR_STRING STRING )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR_STRING, "EXPR_STRING"), root_1);
@@ -4946,56 +4938,63 @@ public class C_ALParser extends Parser {
     }
     // $ANTLR end "constant"
 
-    public static class expressionGenerator_return extends ParserRuleReturnScope {
+    public static class generatorDecl_return extends ParserRuleReturnScope {
         Object tree;
         public Object getTree() { return tree; }
     };
 
-    // $ANTLR start "expressionGenerator"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:207:1: expressionGenerator : 'for' parameter 'in' expression ;
-    public final C_ALParser.expressionGenerator_return expressionGenerator() throws RecognitionException {
-        C_ALParser.expressionGenerator_return retval = new C_ALParser.expressionGenerator_return();
+    // $ANTLR start "generatorDecl"
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:201:1: generatorDecl : parameter ':' expression '..' expression ;
+    public final C_ALParser.generatorDecl_return generatorDecl() throws RecognitionException {
+        C_ALParser.generatorDecl_return retval = new C_ALParser.generatorDecl_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal154=null;
-        Token string_literal156=null;
-        C_ALParser.parameter_return parameter155 = null;
+        Token char_literal165=null;
+        Token string_literal167=null;
+        C_ALParser.parameter_return parameter164 = null;
 
-        C_ALParser.expression_return expression157 = null;
+        C_ALParser.expression_return expression166 = null;
+
+        C_ALParser.expression_return expression168 = null;
 
 
-        Object string_literal154_tree=null;
-        Object string_literal156_tree=null;
+        Object char_literal165_tree=null;
+        Object string_literal167_tree=null;
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:207:20: ( 'for' parameter 'in' expression )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:208:2: 'for' parameter 'in' expression
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:201:14: ( parameter ':' expression '..' expression )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:201:16: parameter ':' expression '..' expression
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal154=(Token)match(input,115,FOLLOW_115_in_expressionGenerator1396); 
-            string_literal154_tree = (Object)adaptor.create(string_literal154);
-            adaptor.addChild(root_0, string_literal154_tree);
-
-            pushFollow(FOLLOW_parameter_in_expressionGenerator1398);
-            parameter155=parameter();
+            pushFollow(FOLLOW_parameter_in_generatorDecl1378);
+            parameter164=parameter();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, parameter155.getTree());
-            string_literal156=(Token)match(input,116,FOLLOW_116_in_expressionGenerator1400); 
-            string_literal156_tree = (Object)adaptor.create(string_literal156);
-            adaptor.addChild(root_0, string_literal156_tree);
+            adaptor.addChild(root_0, parameter164.getTree());
+            char_literal165=(Token)match(input,78,FOLLOW_78_in_generatorDecl1380); 
+            char_literal165_tree = (Object)adaptor.create(char_literal165);
+            adaptor.addChild(root_0, char_literal165_tree);
 
-            pushFollow(FOLLOW_expression_in_expressionGenerator1402);
-            expression157=expression();
+            pushFollow(FOLLOW_expression_in_generatorDecl1382);
+            expression166=expression();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, expression157.getTree());
-             
+            adaptor.addChild(root_0, expression166.getTree());
+            string_literal167=(Token)match(input,117,FOLLOW_117_in_generatorDecl1384); 
+            string_literal167_tree = (Object)adaptor.create(string_literal167);
+            adaptor.addChild(root_0, string_literal167_tree);
+
+            pushFollow(FOLLOW_expression_in_generatorDecl1386);
+            expression168=expression();
+
+            state._fsp--;
+
+            adaptor.addChild(root_0, expression168.getTree());
 
             }
 
@@ -5015,100 +5014,76 @@ public class C_ALParser extends Parser {
         }
         return retval;
     }
-    // $ANTLR end "expressionGenerator"
+    // $ANTLR end "generatorDecl"
 
-    public static class expressionGenerators_return extends ParserRuleReturnScope {
+    public static class generatorDecls_return extends ParserRuleReturnScope {
         Object tree;
         public Object getTree() { return tree; }
     };
 
-    // $ANTLR start "expressionGenerators"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:211:1: expressionGenerators : expressionGenerator ( ',' expressionGenerator )* -> ( expressionGenerator )+ ;
-    public final C_ALParser.expressionGenerators_return expressionGenerators() throws RecognitionException {
-        C_ALParser.expressionGenerators_return retval = new C_ALParser.expressionGenerators_return();
+    // $ANTLR start "generatorDecls"
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:203:1: generatorDecls : generatorDecl ( ',' generatorDecl )* ;
+    public final C_ALParser.generatorDecls_return generatorDecls() throws RecognitionException {
+        C_ALParser.generatorDecls_return retval = new C_ALParser.generatorDecls_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token char_literal159=null;
-        C_ALParser.expressionGenerator_return expressionGenerator158 = null;
+        Token char_literal170=null;
+        C_ALParser.generatorDecl_return generatorDecl169 = null;
 
-        C_ALParser.expressionGenerator_return expressionGenerator160 = null;
+        C_ALParser.generatorDecl_return generatorDecl171 = null;
 
 
-        Object char_literal159_tree=null;
-        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
-        RewriteRuleSubtreeStream stream_expressionGenerator=new RewriteRuleSubtreeStream(adaptor,"rule expressionGenerator");
+        Object char_literal170_tree=null;
+
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:211:21: ( expressionGenerator ( ',' expressionGenerator )* -> ( expressionGenerator )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:211:23: expressionGenerator ( ',' expressionGenerator )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:203:15: ( generatorDecl ( ',' generatorDecl )* )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:203:17: generatorDecl ( ',' generatorDecl )*
             {
-            pushFollow(FOLLOW_expressionGenerator_in_expressionGenerators1412);
-            expressionGenerator158=expressionGenerator();
+            root_0 = (Object)adaptor.nil();
+
+            pushFollow(FOLLOW_generatorDecl_in_generatorDecls1393);
+            generatorDecl169=generatorDecl();
 
             state._fsp--;
 
-            stream_expressionGenerator.add(expressionGenerator158.getTree());
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:211:43: ( ',' expressionGenerator )*
-            loop50:
+            adaptor.addChild(root_0, generatorDecl169.getTree());
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:203:31: ( ',' generatorDecl )*
+            loop46:
             do {
-                int alt50=2;
-                int LA50_0 = input.LA(1);
+                int alt46=2;
+                int LA46_0 = input.LA(1);
 
-                if ( (LA50_0==82) ) {
-                    alt50=1;
+                if ( (LA46_0==81) ) {
+                    alt46=1;
                 }
 
 
-                switch (alt50) {
+                switch (alt46) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:211:44: ',' expressionGenerator
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:203:32: ',' generatorDecl
             	    {
-            	    char_literal159=(Token)match(input,82,FOLLOW_82_in_expressionGenerators1415);  
-            	    stream_82.add(char_literal159);
+            	    char_literal170=(Token)match(input,81,FOLLOW_81_in_generatorDecls1396); 
+            	    char_literal170_tree = (Object)adaptor.create(char_literal170);
+            	    adaptor.addChild(root_0, char_literal170_tree);
 
-            	    pushFollow(FOLLOW_expressionGenerator_in_expressionGenerators1417);
-            	    expressionGenerator160=expressionGenerator();
+            	    pushFollow(FOLLOW_generatorDecl_in_generatorDecls1398);
+            	    generatorDecl171=generatorDecl();
 
             	    state._fsp--;
 
-            	    stream_expressionGenerator.add(expressionGenerator160.getTree());
+            	    adaptor.addChild(root_0, generatorDecl171.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop50;
+            	    break loop46;
                 }
             } while (true);
 
 
-
-            // AST REWRITE
-            // elements: expressionGenerator
-            // token labels: 
-            // rule labels: retval
-            // token list labels: 
-            // rule list labels: 
-            // wildcard labels: 
-            retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
-
-            root_0 = (Object)adaptor.nil();
-            // 211:70: -> ( expressionGenerator )+
-            {
-                if ( !(stream_expressionGenerator.hasNext()) ) {
-                    throw new RewriteEarlyExitException();
-                }
-                while ( stream_expressionGenerator.hasNext() ) {
-                    adaptor.addChild(root_0, stream_expressionGenerator.nextTree());
-
-                }
-                stream_expressionGenerator.reset();
-
-            }
-
-            retval.tree = root_0;
             }
 
             retval.stop = input.LT(-1);
@@ -5127,7 +5102,7 @@ public class C_ALParser extends Parser {
         }
         return retval;
     }
-    // $ANTLR end "expressionGenerators"
+    // $ANTLR end "generatorDecls"
 
     public static class expressions_return extends ParserRuleReturnScope {
         Object tree;
@@ -5135,62 +5110,62 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "expressions"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:213:1: expressions : expression ( ',' expression )* -> ( expression )+ ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:205:1: expressions : expression ( ',' expression )* -> ( expression )+ ;
     public final C_ALParser.expressions_return expressions() throws RecognitionException {
         C_ALParser.expressions_return retval = new C_ALParser.expressions_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token char_literal162=null;
-        C_ALParser.expression_return expression161 = null;
+        Token char_literal173=null;
+        C_ALParser.expression_return expression172 = null;
 
-        C_ALParser.expression_return expression163 = null;
+        C_ALParser.expression_return expression174 = null;
 
 
-        Object char_literal162_tree=null;
-        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
+        Object char_literal173_tree=null;
+        RewriteRuleTokenStream stream_81=new RewriteRuleTokenStream(adaptor,"token 81");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:213:12: ( expression ( ',' expression )* -> ( expression )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:213:14: expression ( ',' expression )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:205:12: ( expression ( ',' expression )* -> ( expression )+ )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:205:14: expression ( ',' expression )*
             {
-            pushFollow(FOLLOW_expression_in_expressions1431);
-            expression161=expression();
+            pushFollow(FOLLOW_expression_in_expressions1407);
+            expression172=expression();
 
             state._fsp--;
 
-            stream_expression.add(expression161.getTree());
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:213:25: ( ',' expression )*
-            loop51:
+            stream_expression.add(expression172.getTree());
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:205:25: ( ',' expression )*
+            loop47:
             do {
-                int alt51=2;
-                int LA51_0 = input.LA(1);
+                int alt47=2;
+                int LA47_0 = input.LA(1);
 
-                if ( (LA51_0==82) ) {
-                    alt51=1;
+                if ( (LA47_0==81) ) {
+                    alt47=1;
                 }
 
 
-                switch (alt51) {
+                switch (alt47) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:213:26: ',' expression
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:205:26: ',' expression
             	    {
-            	    char_literal162=(Token)match(input,82,FOLLOW_82_in_expressions1434);  
-            	    stream_82.add(char_literal162);
+            	    char_literal173=(Token)match(input,81,FOLLOW_81_in_expressions1410);  
+            	    stream_81.add(char_literal173);
 
-            	    pushFollow(FOLLOW_expression_in_expressions1436);
-            	    expression163=expression();
+            	    pushFollow(FOLLOW_expression_in_expressions1412);
+            	    expression174=expression();
 
             	    state._fsp--;
 
-            	    stream_expression.add(expression163.getTree());
+            	    stream_expression.add(expression174.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop51;
+            	    break loop47;
                 }
             } while (true);
 
@@ -5207,7 +5182,7 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 213:43: -> ( expression )+
+            // 205:43: -> ( expression )+
             {
                 if ( !(stream_expression.hasNext()) ) {
                     throw new RewriteEarlyExitException();
@@ -5247,57 +5222,57 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "idents"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:215:1: idents : ID ( ',' ID )* -> ( ID )+ ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:207:1: idents : ID ( ',' ID )* -> ( ID )+ ;
     public final C_ALParser.idents_return idents() throws RecognitionException {
         C_ALParser.idents_return retval = new C_ALParser.idents_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token ID164=null;
-        Token char_literal165=null;
-        Token ID166=null;
+        Token ID175=null;
+        Token char_literal176=null;
+        Token ID177=null;
 
-        Object ID164_tree=null;
-        Object char_literal165_tree=null;
-        Object ID166_tree=null;
-        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
+        Object ID175_tree=null;
+        Object char_literal176_tree=null;
+        Object ID177_tree=null;
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
+        RewriteRuleTokenStream stream_81=new RewriteRuleTokenStream(adaptor,"token 81");
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:218:7: ( ID ( ',' ID )* -> ( ID )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:218:9: ID ( ',' ID )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:210:7: ( ID ( ',' ID )* -> ( ID )+ )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:210:9: ID ( ',' ID )*
             {
-            ID164=(Token)match(input,ID,FOLLOW_ID_in_idents1455);  
-            stream_ID.add(ID164);
+            ID175=(Token)match(input,ID,FOLLOW_ID_in_idents1431);  
+            stream_ID.add(ID175);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:218:12: ( ',' ID )*
-            loop52:
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:210:12: ( ',' ID )*
+            loop48:
             do {
-                int alt52=2;
-                int LA52_0 = input.LA(1);
+                int alt48=2;
+                int LA48_0 = input.LA(1);
 
-                if ( (LA52_0==82) ) {
-                    alt52=1;
+                if ( (LA48_0==81) ) {
+                    alt48=1;
                 }
 
 
-                switch (alt52) {
+                switch (alt48) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:218:13: ',' ID
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:210:13: ',' ID
             	    {
-            	    char_literal165=(Token)match(input,82,FOLLOW_82_in_idents1458);  
-            	    stream_82.add(char_literal165);
+            	    char_literal176=(Token)match(input,81,FOLLOW_81_in_idents1434);  
+            	    stream_81.add(char_literal176);
 
-            	    ID166=(Token)match(input,ID,FOLLOW_ID_in_idents1460);  
-            	    stream_ID.add(ID166);
+            	    ID177=(Token)match(input,ID,FOLLOW_ID_in_idents1436);  
+            	    stream_ID.add(ID177);
 
 
             	    }
             	    break;
 
             	default :
-            	    break loop52;
+            	    break loop48;
                 }
             } while (true);
 
@@ -5314,7 +5289,7 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 218:22: -> ( ID )+
+            // 210:22: -> ( ID )+
             {
                 if ( !(stream_ID.hasNext()) ) {
                     throw new RewriteEarlyExitException();
@@ -5354,37 +5329,31 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "parameter"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:220:1: parameter : typeDef ID -> ^( VARIABLE typeDef ID ASSIGNABLE ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:212:1: parameter : typeDefId -> ^( VARIABLE typeDefId ASSIGNABLE ) ;
     public final C_ALParser.parameter_return parameter() throws RecognitionException {
         C_ALParser.parameter_return retval = new C_ALParser.parameter_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token ID168=null;
-        C_ALParser.typeDef_return typeDef167 = null;
+        C_ALParser.typeDefId_return typeDefId178 = null;
 
 
-        Object ID168_tree=null;
-        RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleSubtreeStream stream_typeDef=new RewriteRuleSubtreeStream(adaptor,"rule typeDef");
+        RewriteRuleSubtreeStream stream_typeDefId=new RewriteRuleSubtreeStream(adaptor,"rule typeDefId");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:223:10: ( typeDef ID -> ^( VARIABLE typeDef ID ASSIGNABLE ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:223:12: typeDef ID
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:215:10: ( typeDefId -> ^( VARIABLE typeDefId ASSIGNABLE ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:215:12: typeDefId
             {
-            pushFollow(FOLLOW_typeDef_in_parameter1479);
-            typeDef167=typeDef();
+            pushFollow(FOLLOW_typeDefId_in_parameter1455);
+            typeDefId178=typeDefId();
 
             state._fsp--;
 
-            stream_typeDef.add(typeDef167.getTree());
-            ID168=(Token)match(input,ID,FOLLOW_ID_in_parameter1481);  
-            stream_ID.add(ID168);
-
+            stream_typeDefId.add(typeDefId178.getTree());
 
 
             // AST REWRITE
-            // elements: typeDef, ID
+            // elements: typeDefId
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -5394,15 +5363,14 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 223:23: -> ^( VARIABLE typeDef ID ASSIGNABLE )
+            // 215:22: -> ^( VARIABLE typeDefId ASSIGNABLE )
             {
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:223:26: ^( VARIABLE typeDef ID ASSIGNABLE )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:215:25: ^( VARIABLE typeDefId ASSIGNABLE )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLE, "VARIABLE"), root_1);
 
-                adaptor.addChild(root_1, stream_typeDef.nextTree());
-                adaptor.addChild(root_1, stream_ID.nextNode());
+                adaptor.addChild(root_1, stream_typeDefId.nextTree());
                 adaptor.addChild(root_1, (Object)adaptor.create(ASSIGNABLE, "ASSIGNABLE"));
 
                 adaptor.addChild(root_0, root_1);
@@ -5437,62 +5405,62 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "parameters"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:225:1: parameters : parameter ( ',' parameter )* -> ( parameter )+ ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:217:1: parameters : parameter ( ',' parameter )* -> ( parameter )+ ;
     public final C_ALParser.parameters_return parameters() throws RecognitionException {
         C_ALParser.parameters_return retval = new C_ALParser.parameters_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token char_literal170=null;
-        C_ALParser.parameter_return parameter169 = null;
+        Token char_literal180=null;
+        C_ALParser.parameter_return parameter179 = null;
 
-        C_ALParser.parameter_return parameter171 = null;
+        C_ALParser.parameter_return parameter181 = null;
 
 
-        Object char_literal170_tree=null;
-        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
+        Object char_literal180_tree=null;
+        RewriteRuleTokenStream stream_81=new RewriteRuleTokenStream(adaptor,"token 81");
         RewriteRuleSubtreeStream stream_parameter=new RewriteRuleSubtreeStream(adaptor,"rule parameter");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:225:11: ( parameter ( ',' parameter )* -> ( parameter )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:225:13: parameter ( ',' parameter )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:217:11: ( parameter ( ',' parameter )* -> ( parameter )+ )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:217:13: parameter ( ',' parameter )*
             {
-            pushFollow(FOLLOW_parameter_in_parameters1500);
-            parameter169=parameter();
+            pushFollow(FOLLOW_parameter_in_parameters1472);
+            parameter179=parameter();
 
             state._fsp--;
 
-            stream_parameter.add(parameter169.getTree());
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:225:23: ( ',' parameter )*
-            loop53:
+            stream_parameter.add(parameter179.getTree());
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:217:23: ( ',' parameter )*
+            loop49:
             do {
-                int alt53=2;
-                int LA53_0 = input.LA(1);
+                int alt49=2;
+                int LA49_0 = input.LA(1);
 
-                if ( (LA53_0==82) ) {
-                    alt53=1;
+                if ( (LA49_0==81) ) {
+                    alt49=1;
                 }
 
 
-                switch (alt53) {
+                switch (alt49) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:225:24: ',' parameter
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:217:24: ',' parameter
             	    {
-            	    char_literal170=(Token)match(input,82,FOLLOW_82_in_parameters1503);  
-            	    stream_82.add(char_literal170);
+            	    char_literal180=(Token)match(input,81,FOLLOW_81_in_parameters1475);  
+            	    stream_81.add(char_literal180);
 
-            	    pushFollow(FOLLOW_parameter_in_parameters1505);
-            	    parameter171=parameter();
+            	    pushFollow(FOLLOW_parameter_in_parameters1477);
+            	    parameter181=parameter();
 
             	    state._fsp--;
 
-            	    stream_parameter.add(parameter171.getTree());
+            	    stream_parameter.add(parameter181.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop53;
+            	    break loop49;
                 }
             } while (true);
 
@@ -5509,7 +5477,7 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 225:40: -> ( parameter )+
+            // 217:40: -> ( parameter )+
             {
                 if ( !(stream_parameter.hasNext()) ) {
                     throw new RewriteEarlyExitException();
@@ -5549,80 +5517,80 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "priorityInequality"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:227:1: priorityInequality : qualifiedIdent ( '>' qualifiedIdent )+ ';' -> ^( INEQUALITY qualifiedIdent ( qualifiedIdent )+ ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:219:1: priorityInequality : qualifiedIdent ( '>' qualifiedIdent )+ ';' -> ^( INEQUALITY ( qualifiedIdent )+ ) ;
     public final C_ALParser.priorityInequality_return priorityInequality() throws RecognitionException {
         C_ALParser.priorityInequality_return retval = new C_ALParser.priorityInequality_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token char_literal173=null;
-        Token char_literal175=null;
-        C_ALParser.qualifiedIdent_return qualifiedIdent172 = null;
+        Token char_literal183=null;
+        Token char_literal185=null;
+        C_ALParser.qualifiedIdent_return qualifiedIdent182 = null;
 
-        C_ALParser.qualifiedIdent_return qualifiedIdent174 = null;
+        C_ALParser.qualifiedIdent_return qualifiedIdent184 = null;
 
 
-        Object char_literal173_tree=null;
-        Object char_literal175_tree=null;
-        RewriteRuleTokenStream stream_90=new RewriteRuleTokenStream(adaptor,"token 90");
-        RewriteRuleTokenStream stream_103=new RewriteRuleTokenStream(adaptor,"token 103");
+        Object char_literal183_tree=null;
+        Object char_literal185_tree=null;
+        RewriteRuleTokenStream stream_102=new RewriteRuleTokenStream(adaptor,"token 102");
+        RewriteRuleTokenStream stream_89=new RewriteRuleTokenStream(adaptor,"token 89");
         RewriteRuleSubtreeStream stream_qualifiedIdent=new RewriteRuleSubtreeStream(adaptor,"rule qualifiedIdent");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:230:19: ( qualifiedIdent ( '>' qualifiedIdent )+ ';' -> ^( INEQUALITY qualifiedIdent ( qualifiedIdent )+ ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:230:21: qualifiedIdent ( '>' qualifiedIdent )+ ';'
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:222:19: ( qualifiedIdent ( '>' qualifiedIdent )+ ';' -> ^( INEQUALITY ( qualifiedIdent )+ ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:222:21: qualifiedIdent ( '>' qualifiedIdent )+ ';'
             {
-            pushFollow(FOLLOW_qualifiedIdent_in_priorityInequality1524);
-            qualifiedIdent172=qualifiedIdent();
+            pushFollow(FOLLOW_qualifiedIdent_in_priorityInequality1496);
+            qualifiedIdent182=qualifiedIdent();
 
             state._fsp--;
 
-            stream_qualifiedIdent.add(qualifiedIdent172.getTree());
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:230:36: ( '>' qualifiedIdent )+
-            int cnt54=0;
-            loop54:
+            stream_qualifiedIdent.add(qualifiedIdent182.getTree());
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:222:36: ( '>' qualifiedIdent )+
+            int cnt50=0;
+            loop50:
             do {
-                int alt54=2;
-                int LA54_0 = input.LA(1);
+                int alt50=2;
+                int LA50_0 = input.LA(1);
 
-                if ( (LA54_0==103) ) {
-                    alt54=1;
+                if ( (LA50_0==102) ) {
+                    alt50=1;
                 }
 
 
-                switch (alt54) {
+                switch (alt50) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:230:37: '>' qualifiedIdent
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:222:37: '>' qualifiedIdent
             	    {
-            	    char_literal173=(Token)match(input,103,FOLLOW_103_in_priorityInequality1527);  
-            	    stream_103.add(char_literal173);
+            	    char_literal183=(Token)match(input,102,FOLLOW_102_in_priorityInequality1499);  
+            	    stream_102.add(char_literal183);
 
-            	    pushFollow(FOLLOW_qualifiedIdent_in_priorityInequality1529);
-            	    qualifiedIdent174=qualifiedIdent();
+            	    pushFollow(FOLLOW_qualifiedIdent_in_priorityInequality1501);
+            	    qualifiedIdent184=qualifiedIdent();
 
             	    state._fsp--;
 
-            	    stream_qualifiedIdent.add(qualifiedIdent174.getTree());
+            	    stream_qualifiedIdent.add(qualifiedIdent184.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    if ( cnt54 >= 1 ) break loop54;
+            	    if ( cnt50 >= 1 ) break loop50;
                         EarlyExitException eee =
-                            new EarlyExitException(54, input);
+                            new EarlyExitException(50, input);
                         throw eee;
                 }
-                cnt54++;
+                cnt50++;
             } while (true);
 
-            char_literal175=(Token)match(input,90,FOLLOW_90_in_priorityInequality1533);  
-            stream_90.add(char_literal175);
+            char_literal185=(Token)match(input,89,FOLLOW_89_in_priorityInequality1505);  
+            stream_89.add(char_literal185);
 
 
 
             // AST REWRITE
-            // elements: qualifiedIdent, qualifiedIdent
+            // elements: qualifiedIdent
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -5632,14 +5600,13 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 230:62: -> ^( INEQUALITY qualifiedIdent ( qualifiedIdent )+ )
+            // 222:62: -> ^( INEQUALITY ( qualifiedIdent )+ )
             {
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:230:65: ^( INEQUALITY qualifiedIdent ( qualifiedIdent )+ )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:222:65: ^( INEQUALITY ( qualifiedIdent )+ )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(INEQUALITY, "INEQUALITY"), root_1);
 
-                adaptor.addChild(root_1, stream_qualifiedIdent.nextTree());
                 if ( !(stream_qualifiedIdent.hasNext()) ) {
                     throw new RewriteEarlyExitException();
                 }
@@ -5681,62 +5648,62 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "priorityOrder"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:232:1: priorityOrder : PRIORITY ( priorityInequality )* 'end' -> ^( PRIORITY ( priorityInequality )* ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:224:1: priorityOrder : PRIORITY ( priorityInequality )* 'end' -> ^( PRIORITY ( priorityInequality )* ) ;
     public final C_ALParser.priorityOrder_return priorityOrder() throws RecognitionException {
         C_ALParser.priorityOrder_return retval = new C_ALParser.priorityOrder_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token PRIORITY176=null;
-        Token string_literal178=null;
-        C_ALParser.priorityInequality_return priorityInequality177 = null;
+        Token PRIORITY186=null;
+        Token string_literal188=null;
+        C_ALParser.priorityInequality_return priorityInequality187 = null;
 
 
-        Object PRIORITY176_tree=null;
-        Object string_literal178_tree=null;
-        RewriteRuleTokenStream stream_117=new RewriteRuleTokenStream(adaptor,"token 117");
+        Object PRIORITY186_tree=null;
+        Object string_literal188_tree=null;
         RewriteRuleTokenStream stream_PRIORITY=new RewriteRuleTokenStream(adaptor,"token PRIORITY");
+        RewriteRuleTokenStream stream_118=new RewriteRuleTokenStream(adaptor,"token 118");
         RewriteRuleSubtreeStream stream_priorityInequality=new RewriteRuleSubtreeStream(adaptor,"rule priorityInequality");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:232:14: ( PRIORITY ( priorityInequality )* 'end' -> ^( PRIORITY ( priorityInequality )* ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:232:16: PRIORITY ( priorityInequality )* 'end'
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:224:14: ( PRIORITY ( priorityInequality )* 'end' -> ^( PRIORITY ( priorityInequality )* ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:224:16: PRIORITY ( priorityInequality )* 'end'
             {
-            PRIORITY176=(Token)match(input,PRIORITY,FOLLOW_PRIORITY_in_priorityOrder1552);  
-            stream_PRIORITY.add(PRIORITY176);
+            PRIORITY186=(Token)match(input,PRIORITY,FOLLOW_PRIORITY_in_priorityOrder1522);  
+            stream_PRIORITY.add(PRIORITY186);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:232:25: ( priorityInequality )*
-            loop55:
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:224:25: ( priorityInequality )*
+            loop51:
             do {
-                int alt55=2;
-                int LA55_0 = input.LA(1);
+                int alt51=2;
+                int LA51_0 = input.LA(1);
 
-                if ( (LA55_0==ID) ) {
-                    alt55=1;
+                if ( (LA51_0==ID) ) {
+                    alt51=1;
                 }
 
 
-                switch (alt55) {
+                switch (alt51) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:232:25: priorityInequality
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:224:25: priorityInequality
             	    {
-            	    pushFollow(FOLLOW_priorityInequality_in_priorityOrder1554);
-            	    priorityInequality177=priorityInequality();
+            	    pushFollow(FOLLOW_priorityInequality_in_priorityOrder1524);
+            	    priorityInequality187=priorityInequality();
 
             	    state._fsp--;
 
-            	    stream_priorityInequality.add(priorityInequality177.getTree());
+            	    stream_priorityInequality.add(priorityInequality187.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop55;
+            	    break loop51;
                 }
             } while (true);
 
-            string_literal178=(Token)match(input,117,FOLLOW_117_in_priorityOrder1557);  
-            stream_117.add(string_literal178);
+            string_literal188=(Token)match(input,118,FOLLOW_118_in_priorityOrder1527);  
+            stream_118.add(string_literal188);
 
 
 
@@ -5751,14 +5718,14 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 232:51: -> ^( PRIORITY ( priorityInequality )* )
+            // 224:51: -> ^( PRIORITY ( priorityInequality )* )
             {
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:232:54: ^( PRIORITY ( priorityInequality )* )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:224:54: ^( PRIORITY ( priorityInequality )* )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(stream_PRIORITY.nextNode(), root_1);
 
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:232:65: ( priorityInequality )*
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:224:65: ( priorityInequality )*
                 while ( stream_priorityInequality.hasNext() ) {
                     adaptor.addChild(root_1, stream_priorityInequality.nextTree());
 
@@ -5797,57 +5764,57 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "qualifiedIdent"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:234:1: qualifiedIdent : ID ( '.' ID )* -> ( ID )+ ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:226:1: qualifiedIdent : ID ( '.' ID )* -> ^( TAG ( ID )+ ) ;
     public final C_ALParser.qualifiedIdent_return qualifiedIdent() throws RecognitionException {
         C_ALParser.qualifiedIdent_return retval = new C_ALParser.qualifiedIdent_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token ID179=null;
-        Token char_literal180=null;
-        Token ID181=null;
+        Token ID189=null;
+        Token char_literal190=null;
+        Token ID191=null;
 
-        Object ID179_tree=null;
-        Object char_literal180_tree=null;
-        Object ID181_tree=null;
+        Object ID189_tree=null;
+        Object char_literal190_tree=null;
+        Object ID191_tree=null;
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_118=new RewriteRuleTokenStream(adaptor,"token 118");
+        RewriteRuleTokenStream stream_119=new RewriteRuleTokenStream(adaptor,"token 119");
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:237:15: ( ID ( '.' ID )* -> ( ID )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:237:17: ID ( '.' ID )*
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:229:15: ( ID ( '.' ID )* -> ^( TAG ( ID )+ ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:229:17: ID ( '.' ID )*
             {
-            ID179=(Token)match(input,ID,FOLLOW_ID_in_qualifiedIdent1578);  
-            stream_ID.add(ID179);
+            ID189=(Token)match(input,ID,FOLLOW_ID_in_qualifiedIdent1548);  
+            stream_ID.add(ID189);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:237:20: ( '.' ID )*
-            loop56:
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:229:20: ( '.' ID )*
+            loop52:
             do {
-                int alt56=2;
-                int LA56_0 = input.LA(1);
+                int alt52=2;
+                int LA52_0 = input.LA(1);
 
-                if ( (LA56_0==118) ) {
-                    alt56=1;
+                if ( (LA52_0==119) ) {
+                    alt52=1;
                 }
 
 
-                switch (alt56) {
+                switch (alt52) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:237:21: '.' ID
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:229:21: '.' ID
             	    {
-            	    char_literal180=(Token)match(input,118,FOLLOW_118_in_qualifiedIdent1581);  
-            	    stream_118.add(char_literal180);
+            	    char_literal190=(Token)match(input,119,FOLLOW_119_in_qualifiedIdent1551);  
+            	    stream_119.add(char_literal190);
 
-            	    ID181=(Token)match(input,ID,FOLLOW_ID_in_qualifiedIdent1583);  
-            	    stream_ID.add(ID181);
+            	    ID191=(Token)match(input,ID,FOLLOW_ID_in_qualifiedIdent1553);  
+            	    stream_ID.add(ID191);
 
 
             	    }
             	    break;
 
             	default :
-            	    break loop56;
+            	    break loop52;
                 }
             } while (true);
 
@@ -5864,16 +5831,24 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 237:30: -> ( ID )+
+            // 229:30: -> ^( TAG ( ID )+ )
             {
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:229:33: ^( TAG ( ID )+ )
+                {
+                Object root_1 = (Object)adaptor.nil();
+                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TAG, "TAG"), root_1);
+
                 if ( !(stream_ID.hasNext()) ) {
                     throw new RewriteEarlyExitException();
                 }
                 while ( stream_ID.hasNext() ) {
-                    adaptor.addChild(root_0, stream_ID.nextNode());
+                    adaptor.addChild(root_1, stream_ID.nextNode());
 
                 }
                 stream_ID.reset();
+
+                adaptor.addChild(root_0, root_1);
+                }
 
             }
 
@@ -5904,85 +5879,85 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "schedule"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:239:1: schedule : SCHEDULE 'fsm' ID ':' ( stateTransition )* 'end' -> ^( SCHEDULE ID ^( TRANSITIONS ( stateTransition )* ) ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:231:1: schedule : SCHEDULE 'fsm' ID ':' ( stateTransition )* 'end' -> ^( SCHEDULE ID ^( TRANSITIONS ( stateTransition )* ) ) ;
     public final C_ALParser.schedule_return schedule() throws RecognitionException {
         C_ALParser.schedule_return retval = new C_ALParser.schedule_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token SCHEDULE182=null;
-        Token string_literal183=null;
-        Token ID184=null;
-        Token char_literal185=null;
-        Token string_literal187=null;
-        C_ALParser.stateTransition_return stateTransition186 = null;
+        Token SCHEDULE192=null;
+        Token string_literal193=null;
+        Token ID194=null;
+        Token char_literal195=null;
+        Token string_literal197=null;
+        C_ALParser.stateTransition_return stateTransition196 = null;
 
 
-        Object SCHEDULE182_tree=null;
-        Object string_literal183_tree=null;
-        Object ID184_tree=null;
-        Object char_literal185_tree=null;
-        Object string_literal187_tree=null;
-        RewriteRuleTokenStream stream_79=new RewriteRuleTokenStream(adaptor,"token 79");
-        RewriteRuleTokenStream stream_117=new RewriteRuleTokenStream(adaptor,"token 117");
+        Object SCHEDULE192_tree=null;
+        Object string_literal193_tree=null;
+        Object ID194_tree=null;
+        Object char_literal195_tree=null;
+        Object string_literal197_tree=null;
+        RewriteRuleTokenStream stream_78=new RewriteRuleTokenStream(adaptor,"token 78");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
+        RewriteRuleTokenStream stream_120=new RewriteRuleTokenStream(adaptor,"token 120");
         RewriteRuleTokenStream stream_SCHEDULE=new RewriteRuleTokenStream(adaptor,"token SCHEDULE");
-        RewriteRuleTokenStream stream_119=new RewriteRuleTokenStream(adaptor,"token 119");
+        RewriteRuleTokenStream stream_118=new RewriteRuleTokenStream(adaptor,"token 118");
         RewriteRuleSubtreeStream stream_stateTransition=new RewriteRuleSubtreeStream(adaptor,"rule stateTransition");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:242:9: ( SCHEDULE 'fsm' ID ':' ( stateTransition )* 'end' -> ^( SCHEDULE ID ^( TRANSITIONS ( stateTransition )* ) ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:243:3: SCHEDULE 'fsm' ID ':' ( stateTransition )* 'end'
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:234:9: ( SCHEDULE 'fsm' ID ':' ( stateTransition )* 'end' -> ^( SCHEDULE ID ^( TRANSITIONS ( stateTransition )* ) ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:235:3: SCHEDULE 'fsm' ID ':' ( stateTransition )* 'end'
             {
-            SCHEDULE182=(Token)match(input,SCHEDULE,FOLLOW_SCHEDULE_in_schedule1604);  
-            stream_SCHEDULE.add(SCHEDULE182);
+            SCHEDULE192=(Token)match(input,SCHEDULE,FOLLOW_SCHEDULE_in_schedule1578);  
+            stream_SCHEDULE.add(SCHEDULE192);
 
-            string_literal183=(Token)match(input,119,FOLLOW_119_in_schedule1606);  
-            stream_119.add(string_literal183);
+            string_literal193=(Token)match(input,120,FOLLOW_120_in_schedule1580);  
+            stream_120.add(string_literal193);
 
-            ID184=(Token)match(input,ID,FOLLOW_ID_in_schedule1608);  
-            stream_ID.add(ID184);
+            ID194=(Token)match(input,ID,FOLLOW_ID_in_schedule1582);  
+            stream_ID.add(ID194);
 
-            char_literal185=(Token)match(input,79,FOLLOW_79_in_schedule1610);  
-            stream_79.add(char_literal185);
+            char_literal195=(Token)match(input,78,FOLLOW_78_in_schedule1584);  
+            stream_78.add(char_literal195);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:243:25: ( stateTransition )*
-            loop57:
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:235:25: ( stateTransition )*
+            loop53:
             do {
-                int alt57=2;
-                int LA57_0 = input.LA(1);
+                int alt53=2;
+                int LA53_0 = input.LA(1);
 
-                if ( (LA57_0==ID) ) {
-                    alt57=1;
+                if ( (LA53_0==ID) ) {
+                    alt53=1;
                 }
 
 
-                switch (alt57) {
+                switch (alt53) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:243:25: stateTransition
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:235:25: stateTransition
             	    {
-            	    pushFollow(FOLLOW_stateTransition_in_schedule1612);
-            	    stateTransition186=stateTransition();
+            	    pushFollow(FOLLOW_stateTransition_in_schedule1586);
+            	    stateTransition196=stateTransition();
 
             	    state._fsp--;
 
-            	    stream_stateTransition.add(stateTransition186.getTree());
+            	    stream_stateTransition.add(stateTransition196.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop57;
+            	    break loop53;
                 }
             } while (true);
 
-            string_literal187=(Token)match(input,117,FOLLOW_117_in_schedule1615);  
-            stream_117.add(string_literal187);
+            string_literal197=(Token)match(input,118,FOLLOW_118_in_schedule1589);  
+            stream_118.add(string_literal197);
 
 
 
             // AST REWRITE
-            // elements: stateTransition, SCHEDULE, ID
+            // elements: ID, SCHEDULE, stateTransition
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -5992,20 +5967,20 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 243:48: -> ^( SCHEDULE ID ^( TRANSITIONS ( stateTransition )* ) )
+            // 235:48: -> ^( SCHEDULE ID ^( TRANSITIONS ( stateTransition )* ) )
             {
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:243:51: ^( SCHEDULE ID ^( TRANSITIONS ( stateTransition )* ) )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:235:51: ^( SCHEDULE ID ^( TRANSITIONS ( stateTransition )* ) )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot(stream_SCHEDULE.nextNode(), root_1);
 
                 adaptor.addChild(root_1, stream_ID.nextNode());
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:243:65: ^( TRANSITIONS ( stateTransition )* )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:235:65: ^( TRANSITIONS ( stateTransition )* )
                 {
                 Object root_2 = (Object)adaptor.nil();
                 root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(TRANSITIONS, "TRANSITIONS"), root_2);
 
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:243:79: ( stateTransition )*
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:235:79: ( stateTransition )*
                 while ( stream_stateTransition.hasNext() ) {
                     adaptor.addChild(root_2, stream_stateTransition.nextTree());
 
@@ -6047,66 +6022,66 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "stateTransition"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:245:1: stateTransition : ID '(' qualifiedIdent ')' '-->' ID ';' -> ^( TRANSITION ID qualifiedIdent ID ) ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:237:1: stateTransition : ID '(' qualifiedIdent ')' '-->' ID ';' -> ^( TRANSITION ID qualifiedIdent ID ) ;
     public final C_ALParser.stateTransition_return stateTransition() throws RecognitionException {
         C_ALParser.stateTransition_return retval = new C_ALParser.stateTransition_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token ID188=null;
-        Token char_literal189=null;
-        Token char_literal191=null;
-        Token string_literal192=null;
-        Token ID193=null;
-        Token char_literal194=null;
-        C_ALParser.qualifiedIdent_return qualifiedIdent190 = null;
+        Token ID198=null;
+        Token char_literal199=null;
+        Token char_literal201=null;
+        Token string_literal202=null;
+        Token ID203=null;
+        Token char_literal204=null;
+        C_ALParser.qualifiedIdent_return qualifiedIdent200 = null;
 
 
-        Object ID188_tree=null;
-        Object char_literal189_tree=null;
-        Object char_literal191_tree=null;
-        Object string_literal192_tree=null;
-        Object ID193_tree=null;
-        Object char_literal194_tree=null;
+        Object ID198_tree=null;
+        Object char_literal199_tree=null;
+        Object char_literal201_tree=null;
+        Object string_literal202_tree=null;
+        Object ID203_tree=null;
+        Object char_literal204_tree=null;
+        RewriteRuleTokenStream stream_121=new RewriteRuleTokenStream(adaptor,"token 121");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_90=new RewriteRuleTokenStream(adaptor,"token 90");
+        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
         RewriteRuleTokenStream stream_83=new RewriteRuleTokenStream(adaptor,"token 83");
-        RewriteRuleTokenStream stream_120=new RewriteRuleTokenStream(adaptor,"token 120");
-        RewriteRuleTokenStream stream_84=new RewriteRuleTokenStream(adaptor,"token 84");
+        RewriteRuleTokenStream stream_89=new RewriteRuleTokenStream(adaptor,"token 89");
         RewriteRuleSubtreeStream stream_qualifiedIdent=new RewriteRuleSubtreeStream(adaptor,"rule qualifiedIdent");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:245:16: ( ID '(' qualifiedIdent ')' '-->' ID ';' -> ^( TRANSITION ID qualifiedIdent ID ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:246:2: ID '(' qualifiedIdent ')' '-->' ID ';'
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:237:16: ( ID '(' qualifiedIdent ')' '-->' ID ';' -> ^( TRANSITION ID qualifiedIdent ID ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:238:2: ID '(' qualifiedIdent ')' '-->' ID ';'
             {
-            ID188=(Token)match(input,ID,FOLLOW_ID_in_stateTransition1638);  
-            stream_ID.add(ID188);
+            ID198=(Token)match(input,ID,FOLLOW_ID_in_stateTransition1612);  
+            stream_ID.add(ID198);
 
-            char_literal189=(Token)match(input,83,FOLLOW_83_in_stateTransition1640);  
-            stream_83.add(char_literal189);
+            char_literal199=(Token)match(input,82,FOLLOW_82_in_stateTransition1614);  
+            stream_82.add(char_literal199);
 
-            pushFollow(FOLLOW_qualifiedIdent_in_stateTransition1642);
-            qualifiedIdent190=qualifiedIdent();
+            pushFollow(FOLLOW_qualifiedIdent_in_stateTransition1616);
+            qualifiedIdent200=qualifiedIdent();
 
             state._fsp--;
 
-            stream_qualifiedIdent.add(qualifiedIdent190.getTree());
-            char_literal191=(Token)match(input,84,FOLLOW_84_in_stateTransition1644);  
-            stream_84.add(char_literal191);
+            stream_qualifiedIdent.add(qualifiedIdent200.getTree());
+            char_literal201=(Token)match(input,83,FOLLOW_83_in_stateTransition1618);  
+            stream_83.add(char_literal201);
 
-            string_literal192=(Token)match(input,120,FOLLOW_120_in_stateTransition1646);  
-            stream_120.add(string_literal192);
+            string_literal202=(Token)match(input,121,FOLLOW_121_in_stateTransition1620);  
+            stream_121.add(string_literal202);
 
-            ID193=(Token)match(input,ID,FOLLOW_ID_in_stateTransition1648);  
-            stream_ID.add(ID193);
+            ID203=(Token)match(input,ID,FOLLOW_ID_in_stateTransition1622);  
+            stream_ID.add(ID203);
 
-            char_literal194=(Token)match(input,90,FOLLOW_90_in_stateTransition1650);  
-            stream_90.add(char_literal194);
+            char_literal204=(Token)match(input,89,FOLLOW_89_in_stateTransition1624);  
+            stream_89.add(char_literal204);
 
 
 
             // AST REWRITE
-            // elements: ID, qualifiedIdent, ID
+            // elements: qualifiedIdent, ID, ID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -6116,9 +6091,9 @@ public class C_ALParser extends Parser {
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (Object)adaptor.nil();
-            // 246:41: -> ^( TRANSITION ID qualifiedIdent ID )
+            // 238:41: -> ^( TRANSITION ID qualifiedIdent ID )
             {
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:246:44: ^( TRANSITION ID qualifiedIdent ID )
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:238:44: ^( TRANSITION ID qualifiedIdent ID )
                 {
                 Object root_1 = (Object)adaptor.nil();
                 root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TRANSITION, "TRANSITION"), root_1);
@@ -6159,36 +6134,419 @@ public class C_ALParser extends Parser {
     };
 
     // $ANTLR start "statement"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:248:1: statement : ID ';' ;
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:240:1: statement : ( statement_block | 'for' '(' parameter ':' e1= expression '..' e2= expression ')' statement_block | 'if' '(' expression ')' s1= statement_block ( 'else' s2= statement_block )? | 'while' '(' expression ')' statement_block | ID ( ( ( '[' expression ']' )* '=' expression ';' ) | '(' ( expressions )? ')' ';' ) );
     public final C_ALParser.statement_return statement() throws RecognitionException {
         C_ALParser.statement_return retval = new C_ALParser.statement_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token ID195=null;
-        Token char_literal196=null;
+        Token string_literal206=null;
+        Token char_literal207=null;
+        Token char_literal209=null;
+        Token string_literal210=null;
+        Token char_literal211=null;
+        Token string_literal213=null;
+        Token char_literal214=null;
+        Token char_literal216=null;
+        Token string_literal217=null;
+        Token string_literal218=null;
+        Token char_literal219=null;
+        Token char_literal221=null;
+        Token ID223=null;
+        Token char_literal224=null;
+        Token char_literal226=null;
+        Token char_literal227=null;
+        Token char_literal229=null;
+        Token char_literal230=null;
+        Token char_literal232=null;
+        Token char_literal233=null;
+        C_ALParser.expression_return e1 = null;
 
-        Object ID195_tree=null;
-        Object char_literal196_tree=null;
+        C_ALParser.expression_return e2 = null;
+
+        C_ALParser.statement_block_return s1 = null;
+
+        C_ALParser.statement_block_return s2 = null;
+
+        C_ALParser.statement_block_return statement_block205 = null;
+
+        C_ALParser.parameter_return parameter208 = null;
+
+        C_ALParser.statement_block_return statement_block212 = null;
+
+        C_ALParser.expression_return expression215 = null;
+
+        C_ALParser.expression_return expression220 = null;
+
+        C_ALParser.statement_block_return statement_block222 = null;
+
+        C_ALParser.expression_return expression225 = null;
+
+        C_ALParser.expression_return expression228 = null;
+
+        C_ALParser.expressions_return expressions231 = null;
+
+
+        Object string_literal206_tree=null;
+        Object char_literal207_tree=null;
+        Object char_literal209_tree=null;
+        Object string_literal210_tree=null;
+        Object char_literal211_tree=null;
+        Object string_literal213_tree=null;
+        Object char_literal214_tree=null;
+        Object char_literal216_tree=null;
+        Object string_literal217_tree=null;
+        Object string_literal218_tree=null;
+        Object char_literal219_tree=null;
+        Object char_literal221_tree=null;
+        Object ID223_tree=null;
+        Object char_literal224_tree=null;
+        Object char_literal226_tree=null;
+        Object char_literal227_tree=null;
+        Object char_literal229_tree=null;
+        Object char_literal230_tree=null;
+        Object char_literal232_tree=null;
+        Object char_literal233_tree=null;
 
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:251:10: ( ID ';' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:261:1: ID ';'
-            {
-            root_0 = (Object)adaptor.nil();
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:243:10: ( statement_block | 'for' '(' parameter ':' e1= expression '..' e2= expression ')' statement_block | 'if' '(' expression ')' s1= statement_block ( 'else' s2= statement_block )? | 'while' '(' expression ')' statement_block | ID ( ( ( '[' expression ']' )* '=' expression ';' ) | '(' ( expressions )? ')' ';' ) )
+            int alt58=5;
+            switch ( input.LA(1) ) {
+            case 85:
+                {
+                alt58=1;
+                }
+                break;
+            case 112:
+                {
+                alt58=2;
+                }
+                break;
+            case 113:
+                {
+                alt58=3;
+                }
+                break;
+            case 122:
+                {
+                alt58=4;
+                }
+                break;
+            case ID:
+                {
+                alt58=5;
+                }
+                break;
+            default:
+                NoViableAltException nvae =
+                    new NoViableAltException("", 58, 0, input);
 
-            ID195=(Token)match(input,ID,FOLLOW_ID_in_statement1684); 
-            ID195_tree = (Object)adaptor.create(ID195);
-            adaptor.addChild(root_0, ID195_tree);
-
-            char_literal196=(Token)match(input,90,FOLLOW_90_in_statement1686); 
-            char_literal196_tree = (Object)adaptor.create(char_literal196);
-            adaptor.addChild(root_0, char_literal196_tree);
-
-
+                throw nvae;
             }
 
+            switch (alt58) {
+                case 1 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:244:3: statement_block
+                    {
+                    root_0 = (Object)adaptor.nil();
+
+                    pushFollow(FOLLOW_statement_block_in_statement1650);
+                    statement_block205=statement_block();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, statement_block205.getTree());
+
+                    }
+                    break;
+                case 2 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:245:3: 'for' '(' parameter ':' e1= expression '..' e2= expression ')' statement_block
+                    {
+                    root_0 = (Object)adaptor.nil();
+
+                    string_literal206=(Token)match(input,112,FOLLOW_112_in_statement1654); 
+                    string_literal206_tree = (Object)adaptor.create(string_literal206);
+                    adaptor.addChild(root_0, string_literal206_tree);
+
+                    char_literal207=(Token)match(input,82,FOLLOW_82_in_statement1656); 
+                    char_literal207_tree = (Object)adaptor.create(char_literal207);
+                    adaptor.addChild(root_0, char_literal207_tree);
+
+                    pushFollow(FOLLOW_parameter_in_statement1658);
+                    parameter208=parameter();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, parameter208.getTree());
+                    char_literal209=(Token)match(input,78,FOLLOW_78_in_statement1660); 
+                    char_literal209_tree = (Object)adaptor.create(char_literal209);
+                    adaptor.addChild(root_0, char_literal209_tree);
+
+                    pushFollow(FOLLOW_expression_in_statement1664);
+                    e1=expression();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, e1.getTree());
+                    string_literal210=(Token)match(input,117,FOLLOW_117_in_statement1666); 
+                    string_literal210_tree = (Object)adaptor.create(string_literal210);
+                    adaptor.addChild(root_0, string_literal210_tree);
+
+                    pushFollow(FOLLOW_expression_in_statement1670);
+                    e2=expression();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, e2.getTree());
+                    char_literal211=(Token)match(input,83,FOLLOW_83_in_statement1672); 
+                    char_literal211_tree = (Object)adaptor.create(char_literal211);
+                    adaptor.addChild(root_0, char_literal211_tree);
+
+                    pushFollow(FOLLOW_statement_block_in_statement1674);
+                    statement_block212=statement_block();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, statement_block212.getTree());
+                     
+
+                    }
+                    break;
+                case 3 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:246:3: 'if' '(' expression ')' s1= statement_block ( 'else' s2= statement_block )?
+                    {
+                    root_0 = (Object)adaptor.nil();
+
+                    string_literal213=(Token)match(input,113,FOLLOW_113_in_statement1680); 
+                    string_literal213_tree = (Object)adaptor.create(string_literal213);
+                    adaptor.addChild(root_0, string_literal213_tree);
+
+                    char_literal214=(Token)match(input,82,FOLLOW_82_in_statement1682); 
+                    char_literal214_tree = (Object)adaptor.create(char_literal214);
+                    adaptor.addChild(root_0, char_literal214_tree);
+
+                    pushFollow(FOLLOW_expression_in_statement1684);
+                    expression215=expression();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, expression215.getTree());
+                    char_literal216=(Token)match(input,83,FOLLOW_83_in_statement1686); 
+                    char_literal216_tree = (Object)adaptor.create(char_literal216);
+                    adaptor.addChild(root_0, char_literal216_tree);
+
+                    pushFollow(FOLLOW_statement_block_in_statement1690);
+                    s1=statement_block();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, s1.getTree());
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:246:46: ( 'else' s2= statement_block )?
+                    int alt54=2;
+                    int LA54_0 = input.LA(1);
+
+                    if ( (LA54_0==114) ) {
+                        alt54=1;
+                    }
+                    switch (alt54) {
+                        case 1 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:246:47: 'else' s2= statement_block
+                            {
+                            string_literal217=(Token)match(input,114,FOLLOW_114_in_statement1693); 
+                            string_literal217_tree = (Object)adaptor.create(string_literal217);
+                            adaptor.addChild(root_0, string_literal217_tree);
+
+                            pushFollow(FOLLOW_statement_block_in_statement1697);
+                            s2=statement_block();
+
+                            state._fsp--;
+
+                            adaptor.addChild(root_0, s2.getTree());
+
+                            }
+                            break;
+
+                    }
+
+                     
+
+                    }
+                    break;
+                case 4 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:247:3: 'while' '(' expression ')' statement_block
+                    {
+                    root_0 = (Object)adaptor.nil();
+
+                    string_literal218=(Token)match(input,122,FOLLOW_122_in_statement1705); 
+                    string_literal218_tree = (Object)adaptor.create(string_literal218);
+                    adaptor.addChild(root_0, string_literal218_tree);
+
+                    char_literal219=(Token)match(input,82,FOLLOW_82_in_statement1707); 
+                    char_literal219_tree = (Object)adaptor.create(char_literal219);
+                    adaptor.addChild(root_0, char_literal219_tree);
+
+                    pushFollow(FOLLOW_expression_in_statement1709);
+                    expression220=expression();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, expression220.getTree());
+                    char_literal221=(Token)match(input,83,FOLLOW_83_in_statement1711); 
+                    char_literal221_tree = (Object)adaptor.create(char_literal221);
+                    adaptor.addChild(root_0, char_literal221_tree);
+
+                    pushFollow(FOLLOW_statement_block_in_statement1713);
+                    statement_block222=statement_block();
+
+                    state._fsp--;
+
+                    adaptor.addChild(root_0, statement_block222.getTree());
+                     
+
+                    }
+                    break;
+                case 5 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:249:3: ID ( ( ( '[' expression ']' )* '=' expression ';' ) | '(' ( expressions )? ')' ';' )
+                    {
+                    root_0 = (Object)adaptor.nil();
+
+                    ID223=(Token)match(input,ID,FOLLOW_ID_in_statement1720); 
+                    ID223_tree = (Object)adaptor.create(ID223);
+                    adaptor.addChild(root_0, ID223_tree);
+
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:249:6: ( ( ( '[' expression ']' )* '=' expression ';' ) | '(' ( expressions )? ')' ';' )
+                    int alt57=2;
+                    int LA57_0 = input.LA(1);
+
+                    if ( (LA57_0==79||LA57_0==88) ) {
+                        alt57=1;
+                    }
+                    else if ( (LA57_0==82) ) {
+                        alt57=2;
+                    }
+                    else {
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 57, 0, input);
+
+                        throw nvae;
+                    }
+                    switch (alt57) {
+                        case 1 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:250:5: ( ( '[' expression ']' )* '=' expression ';' )
+                            {
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:250:5: ( ( '[' expression ']' )* '=' expression ';' )
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:250:6: ( '[' expression ']' )* '=' expression ';'
+                            {
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:250:6: ( '[' expression ']' )*
+                            loop55:
+                            do {
+                                int alt55=2;
+                                int LA55_0 = input.LA(1);
+
+                                if ( (LA55_0==79) ) {
+                                    alt55=1;
+                                }
+
+
+                                switch (alt55) {
+                            	case 1 :
+                            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:250:7: '[' expression ']'
+                            	    {
+                            	    char_literal224=(Token)match(input,79,FOLLOW_79_in_statement1730); 
+                            	    char_literal224_tree = (Object)adaptor.create(char_literal224);
+                            	    adaptor.addChild(root_0, char_literal224_tree);
+
+                            	    pushFollow(FOLLOW_expression_in_statement1732);
+                            	    expression225=expression();
+
+                            	    state._fsp--;
+
+                            	    adaptor.addChild(root_0, expression225.getTree());
+                            	    char_literal226=(Token)match(input,80,FOLLOW_80_in_statement1734); 
+                            	    char_literal226_tree = (Object)adaptor.create(char_literal226);
+                            	    adaptor.addChild(root_0, char_literal226_tree);
+
+
+                            	    }
+                            	    break;
+
+                            	default :
+                            	    break loop55;
+                                }
+                            } while (true);
+
+                            char_literal227=(Token)match(input,88,FOLLOW_88_in_statement1738); 
+                            char_literal227_tree = (Object)adaptor.create(char_literal227);
+                            adaptor.addChild(root_0, char_literal227_tree);
+
+                            pushFollow(FOLLOW_expression_in_statement1740);
+                            expression228=expression();
+
+                            state._fsp--;
+
+                            adaptor.addChild(root_0, expression228.getTree());
+                            char_literal229=(Token)match(input,89,FOLLOW_89_in_statement1742); 
+                            char_literal229_tree = (Object)adaptor.create(char_literal229);
+                            adaptor.addChild(root_0, char_literal229_tree);
+
+
+                            }
+
+                             
+
+                            }
+                            break;
+                        case 2 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:251:6: '(' ( expressions )? ')' ';'
+                            {
+                            char_literal230=(Token)match(input,82,FOLLOW_82_in_statement1752); 
+                            char_literal230_tree = (Object)adaptor.create(char_literal230);
+                            adaptor.addChild(root_0, char_literal230_tree);
+
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:251:10: ( expressions )?
+                            int alt56=2;
+                            int LA56_0 = input.LA(1);
+
+                            if ( (LA56_0==MINUS||LA56_0==ID||(LA56_0>=FLOAT && LA56_0<=INTEGER)||LA56_0==STRING||LA56_0==82||LA56_0==85||(LA56_0>=109 && LA56_0<=113)||(LA56_0>=115 && LA56_0<=116)) ) {
+                                alt56=1;
+                            }
+                            switch (alt56) {
+                                case 1 :
+                                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:251:10: expressions
+                                    {
+                                    pushFollow(FOLLOW_expressions_in_statement1754);
+                                    expressions231=expressions();
+
+                                    state._fsp--;
+
+                                    adaptor.addChild(root_0, expressions231.getTree());
+
+                                    }
+                                    break;
+
+                            }
+
+                            char_literal232=(Token)match(input,83,FOLLOW_83_in_statement1757); 
+                            char_literal232_tree = (Object)adaptor.create(char_literal232);
+                            adaptor.addChild(root_0, char_literal232_tree);
+
+                            char_literal233=(Token)match(input,89,FOLLOW_89_in_statement1759); 
+                            char_literal233_tree = (Object)adaptor.create(char_literal233);
+                            adaptor.addChild(root_0, char_literal233_tree);
+
+                             
+
+                            }
+                            break;
+
+                    }
+
+
+                    }
+                    break;
+
+            }
             retval.stop = input.LT(-1);
 
             retval.tree = (Object)adaptor.rulePostProcessing(root_0);
@@ -6207,260 +6565,275 @@ public class C_ALParser extends Parser {
     }
     // $ANTLR end "statement"
 
+    public static class statement_block_return extends ParserRuleReturnScope {
+        Object tree;
+        public Object getTree() { return tree; }
+    };
+
+    // $ANTLR start "statement_block"
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:1: statement_block : '{' ( varDecl )* ( statement )* '}' -> ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) ;
+    public final C_ALParser.statement_block_return statement_block() throws RecognitionException {
+        C_ALParser.statement_block_return retval = new C_ALParser.statement_block_return();
+        retval.start = input.LT(1);
+
+        Object root_0 = null;
+
+        Token char_literal234=null;
+        Token char_literal237=null;
+        C_ALParser.varDecl_return varDecl235 = null;
+
+        C_ALParser.statement_return statement236 = null;
+
+
+        Object char_literal234_tree=null;
+        Object char_literal237_tree=null;
+        RewriteRuleTokenStream stream_86=new RewriteRuleTokenStream(adaptor,"token 86");
+        RewriteRuleTokenStream stream_85=new RewriteRuleTokenStream(adaptor,"token 85");
+        RewriteRuleSubtreeStream stream_statement=new RewriteRuleSubtreeStream(adaptor,"rule statement");
+        RewriteRuleSubtreeStream stream_varDecl=new RewriteRuleSubtreeStream(adaptor,"rule varDecl");
+        try {
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:16: ( '{' ( varDecl )* ( statement )* '}' -> ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:18: '{' ( varDecl )* ( statement )* '}'
+            {
+            char_literal234=(Token)match(input,85,FOLLOW_85_in_statement_block1770);  
+            stream_85.add(char_literal234);
+
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:22: ( varDecl )*
+            loop59:
+            do {
+                int alt59=2;
+                alt59 = dfa59.predict(input);
+                switch (alt59) {
+            	case 1 :
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:22: varDecl
+            	    {
+            	    pushFollow(FOLLOW_varDecl_in_statement_block1772);
+            	    varDecl235=varDecl();
+
+            	    state._fsp--;
+
+            	    stream_varDecl.add(varDecl235.getTree());
+
+            	    }
+            	    break;
+
+            	default :
+            	    break loop59;
+                }
+            } while (true);
+
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:31: ( statement )*
+            loop60:
+            do {
+                int alt60=2;
+                int LA60_0 = input.LA(1);
+
+                if ( (LA60_0==ID||LA60_0==85||(LA60_0>=112 && LA60_0<=113)||LA60_0==122) ) {
+                    alt60=1;
+                }
+
+
+                switch (alt60) {
+            	case 1 :
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:31: statement
+            	    {
+            	    pushFollow(FOLLOW_statement_in_statement_block1775);
+            	    statement236=statement();
+
+            	    state._fsp--;
+
+            	    stream_statement.add(statement236.getTree());
+
+            	    }
+            	    break;
+
+            	default :
+            	    break loop60;
+                }
+            } while (true);
+
+            char_literal237=(Token)match(input,86,FOLLOW_86_in_statement_block1778);  
+            stream_86.add(char_literal237);
+
+
+
+            // AST REWRITE
+            // elements: varDecl, statement
+            // token labels: 
+            // rule labels: retval
+            // token list labels: 
+            // rule list labels: 
+            // wildcard labels: 
+            retval.tree = root_0;
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+            root_0 = (Object)adaptor.nil();
+            // 253:46: -> ^( VARIABLES ( varDecl )* ) ^( STATEMENTS ( statement )* )
+            {
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:49: ^( VARIABLES ( varDecl )* )
+                {
+                Object root_1 = (Object)adaptor.nil();
+                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLES, "VARIABLES"), root_1);
+
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:61: ( varDecl )*
+                while ( stream_varDecl.hasNext() ) {
+                    adaptor.addChild(root_1, stream_varDecl.nextTree());
+
+                }
+                stream_varDecl.reset();
+
+                adaptor.addChild(root_0, root_1);
+                }
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:71: ^( STATEMENTS ( statement )* )
+                {
+                Object root_1 = (Object)adaptor.nil();
+                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(STATEMENTS, "STATEMENTS"), root_1);
+
+                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:253:84: ( statement )*
+                while ( stream_statement.hasNext() ) {
+                    adaptor.addChild(root_1, stream_statement.nextTree());
+
+                }
+                stream_statement.reset();
+
+                adaptor.addChild(root_0, root_1);
+                }
+
+            }
+
+            retval.tree = root_0;
+            }
+
+            retval.stop = input.LT(-1);
+
+            retval.tree = (Object)adaptor.rulePostProcessing(root_0);
+            adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+    	retval.tree = (Object)adaptor.errorNode(input, retval.start, input.LT(-1), re);
+
+        }
+        finally {
+        }
+        return retval;
+    }
+    // $ANTLR end "statement_block"
+
     public static class typeDef_return extends ParserRuleReturnScope {
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "typeDef"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:263:1: typeDef : ( 'int' ( '(' expression ')' )? -> ^( TYPE 'int' ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )? ) | 'uint' ( '(' expression ')' )? -> ^( TYPE 'uint' ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )? ) | 'bool' -> ^( TYPE 'bool' ) | 'float' -> ^( TYPE 'float' ) );
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:255:1: typeDef : ( | 'bool' -> ^( TYPE 'bool' ) | 'char' -> ^( TYPE 'char' ) | 'short' -> ^( TYPE 'short' ) | 'int' ( '(' expression ')' )? -> ^( TYPE 'int' ( ^( EXPR expression ) )? ) | 'unsigned' ( 'char' -> ^( TYPE 'unsigned' 'char' ) | 'short' -> ^( TYPE 'unsigned' 'short' ) | 'int' ( '(' expression ')' )? -> ^( TYPE 'unsigned' 'int' ( ^( EXPR expression ) )? ) ) | 'float' -> ^( TYPE 'float' ) );
     public final C_ALParser.typeDef_return typeDef() throws RecognitionException {
         C_ALParser.typeDef_return retval = new C_ALParser.typeDef_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal197=null;
-        Token char_literal198=null;
-        Token char_literal200=null;
-        Token string_literal201=null;
-        Token char_literal202=null;
-        Token char_literal204=null;
-        Token string_literal205=null;
-        Token string_literal206=null;
-        C_ALParser.expression_return expression199 = null;
+        Token string_literal238=null;
+        Token string_literal239=null;
+        Token string_literal240=null;
+        Token string_literal241=null;
+        Token char_literal242=null;
+        Token char_literal244=null;
+        Token string_literal245=null;
+        Token string_literal246=null;
+        Token string_literal247=null;
+        Token string_literal248=null;
+        Token char_literal249=null;
+        Token char_literal251=null;
+        Token string_literal252=null;
+        C_ALParser.expression_return expression243 = null;
 
-        C_ALParser.expression_return expression203 = null;
+        C_ALParser.expression_return expression250 = null;
 
 
-        Object string_literal197_tree=null;
-        Object char_literal198_tree=null;
-        Object char_literal200_tree=null;
-        Object string_literal201_tree=null;
-        Object char_literal202_tree=null;
-        Object char_literal204_tree=null;
-        Object string_literal205_tree=null;
-        Object string_literal206_tree=null;
-        RewriteRuleTokenStream stream_121=new RewriteRuleTokenStream(adaptor,"token 121");
-        RewriteRuleTokenStream stream_122=new RewriteRuleTokenStream(adaptor,"token 122");
+        Object string_literal238_tree=null;
+        Object string_literal239_tree=null;
+        Object string_literal240_tree=null;
+        Object string_literal241_tree=null;
+        Object char_literal242_tree=null;
+        Object char_literal244_tree=null;
+        Object string_literal245_tree=null;
+        Object string_literal246_tree=null;
+        Object string_literal247_tree=null;
+        Object string_literal248_tree=null;
+        Object char_literal249_tree=null;
+        Object char_literal251_tree=null;
+        Object string_literal252_tree=null;
+        RewriteRuleTokenStream stream_125=new RewriteRuleTokenStream(adaptor,"token 125");
+        RewriteRuleTokenStream stream_126=new RewriteRuleTokenStream(adaptor,"token 126");
+        RewriteRuleTokenStream stream_127=new RewriteRuleTokenStream(adaptor,"token 127");
+        RewriteRuleTokenStream stream_128=new RewriteRuleTokenStream(adaptor,"token 128");
         RewriteRuleTokenStream stream_123=new RewriteRuleTokenStream(adaptor,"token 123");
         RewriteRuleTokenStream stream_124=new RewriteRuleTokenStream(adaptor,"token 124");
+        RewriteRuleTokenStream stream_82=new RewriteRuleTokenStream(adaptor,"token 82");
         RewriteRuleTokenStream stream_83=new RewriteRuleTokenStream(adaptor,"token 83");
-        RewriteRuleTokenStream stream_84=new RewriteRuleTokenStream(adaptor,"token 84");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:266:8: ( 'int' ( '(' expression ')' )? -> ^( TYPE 'int' ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )? ) | 'uint' ( '(' expression ')' )? -> ^( TYPE 'uint' ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )? ) | 'bool' -> ^( TYPE 'bool' ) | 'float' -> ^( TYPE 'float' ) )
-            int alt60=4;
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:258:8: ( | 'bool' -> ^( TYPE 'bool' ) | 'char' -> ^( TYPE 'char' ) | 'short' -> ^( TYPE 'short' ) | 'int' ( '(' expression ')' )? -> ^( TYPE 'int' ( ^( EXPR expression ) )? ) | 'unsigned' ( 'char' -> ^( TYPE 'unsigned' 'char' ) | 'short' -> ^( TYPE 'unsigned' 'short' ) | 'int' ( '(' expression ')' )? -> ^( TYPE 'unsigned' 'int' ( ^( EXPR expression ) )? ) ) | 'float' -> ^( TYPE 'float' ) )
+            int alt64=7;
             switch ( input.LA(1) ) {
-            case 121:
+            case ID:
                 {
-                alt60=1;
-                }
-                break;
-            case 122:
-                {
-                alt60=2;
+                alt64=1;
                 }
                 break;
             case 123:
                 {
-                alt60=3;
+                alt64=2;
                 }
                 break;
             case 124:
                 {
-                alt60=4;
+                alt64=3;
+                }
+                break;
+            case 125:
+                {
+                alt64=4;
+                }
+                break;
+            case 126:
+                {
+                alt64=5;
+                }
+                break;
+            case 127:
+                {
+                alt64=6;
+                }
+                break;
+            case 128:
+                {
+                alt64=7;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("", 60, 0, input);
+                    new NoViableAltException("", 64, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt60) {
+            switch (alt64) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:3: 'int' ( '(' expression ')' )?
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:259:1: 
                     {
-                    string_literal197=(Token)match(input,121,FOLLOW_121_in_typeDef1700);  
-                    stream_121.add(string_literal197);
-
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:9: ( '(' expression ')' )?
-                    int alt58=2;
-                    int LA58_0 = input.LA(1);
-
-                    if ( (LA58_0==83) ) {
-                        alt58=1;
-                    }
-                    switch (alt58) {
-                        case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:10: '(' expression ')'
-                            {
-                            char_literal198=(Token)match(input,83,FOLLOW_83_in_typeDef1703);  
-                            stream_83.add(char_literal198);
-
-                            pushFollow(FOLLOW_expression_in_typeDef1705);
-                            expression199=expression();
-
-                            state._fsp--;
-
-                            stream_expression.add(expression199.getTree());
-                            char_literal200=(Token)match(input,84,FOLLOW_84_in_typeDef1707);  
-                            stream_84.add(char_literal200);
-
-
-                            }
-                            break;
-
-                    }
-
-
-
-                    // AST REWRITE
-                    // elements: 121, expression
-                    // token labels: 
-                    // rule labels: retval
-                    // token list labels: 
-                    // rule list labels: 
-                    // wildcard labels: 
-                    retval.tree = root_0;
-                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
-
                     root_0 = (Object)adaptor.nil();
-                    // 267:31: -> ^( TYPE 'int' ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )? )
-                    {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:34: ^( TYPE 'int' ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )? )
-                        {
-                        Object root_1 = (Object)adaptor.nil();
-                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
 
-                        adaptor.addChild(root_1, stream_121.nextNode());
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:47: ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )?
-                        if ( stream_expression.hasNext() ) {
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:47: ^( TYPE_ATTRS ^( EXPR SIZE expression ) )
-                            {
-                            Object root_2 = (Object)adaptor.nil();
-                            root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE_ATTRS, "TYPE_ATTRS"), root_2);
-
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:60: ^( EXPR SIZE expression )
-                            {
-                            Object root_3 = (Object)adaptor.nil();
-                            root_3 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR, "EXPR"), root_3);
-
-                            adaptor.addChild(root_3, (Object)adaptor.create(SIZE, "SIZE"));
-                            adaptor.addChild(root_3, stream_expression.nextTree());
-
-                            adaptor.addChild(root_2, root_3);
-                            }
-
-                            adaptor.addChild(root_1, root_2);
-                            }
-
-                        }
-                        stream_expression.reset();
-
-                        adaptor.addChild(root_0, root_1);
-                        }
-
-                    }
-
-                    retval.tree = root_0;
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:268:3: 'uint' ( '(' expression ')' )?
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:259:3: 'bool'
                     {
-                    string_literal201=(Token)match(input,122,FOLLOW_122_in_typeDef1734);  
-                    stream_122.add(string_literal201);
-
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:268:10: ( '(' expression ')' )?
-                    int alt59=2;
-                    int LA59_0 = input.LA(1);
-
-                    if ( (LA59_0==83) ) {
-                        alt59=1;
-                    }
-                    switch (alt59) {
-                        case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:268:11: '(' expression ')'
-                            {
-                            char_literal202=(Token)match(input,83,FOLLOW_83_in_typeDef1737);  
-                            stream_83.add(char_literal202);
-
-                            pushFollow(FOLLOW_expression_in_typeDef1739);
-                            expression203=expression();
-
-                            state._fsp--;
-
-                            stream_expression.add(expression203.getTree());
-                            char_literal204=(Token)match(input,84,FOLLOW_84_in_typeDef1741);  
-                            stream_84.add(char_literal204);
-
-
-                            }
-                            break;
-
-                    }
-
-
-
-                    // AST REWRITE
-                    // elements: expression, 122
-                    // token labels: 
-                    // rule labels: retval
-                    // token list labels: 
-                    // rule list labels: 
-                    // wildcard labels: 
-                    retval.tree = root_0;
-                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
-
-                    root_0 = (Object)adaptor.nil();
-                    // 268:32: -> ^( TYPE 'uint' ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )? )
-                    {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:268:35: ^( TYPE 'uint' ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )? )
-                        {
-                        Object root_1 = (Object)adaptor.nil();
-                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
-
-                        adaptor.addChild(root_1, stream_122.nextNode());
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:268:49: ( ^( TYPE_ATTRS ^( EXPR SIZE expression ) ) )?
-                        if ( stream_expression.hasNext() ) {
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:268:49: ^( TYPE_ATTRS ^( EXPR SIZE expression ) )
-                            {
-                            Object root_2 = (Object)adaptor.nil();
-                            root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE_ATTRS, "TYPE_ATTRS"), root_2);
-
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:268:62: ^( EXPR SIZE expression )
-                            {
-                            Object root_3 = (Object)adaptor.nil();
-                            root_3 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR, "EXPR"), root_3);
-
-                            adaptor.addChild(root_3, (Object)adaptor.create(SIZE, "SIZE"));
-                            adaptor.addChild(root_3, stream_expression.nextTree());
-
-                            adaptor.addChild(root_2, root_3);
-                            }
-
-                            adaptor.addChild(root_1, root_2);
-                            }
-
-                        }
-                        stream_expression.reset();
-
-                        adaptor.addChild(root_0, root_1);
-                        }
-
-                    }
-
-                    retval.tree = root_0;
-                    }
-                    break;
-                case 3 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:269:3: 'bool'
-                    {
-                    string_literal205=(Token)match(input,123,FOLLOW_123_in_typeDef1768);  
-                    stream_123.add(string_literal205);
+                    string_literal238=(Token)match(input,123,FOLLOW_123_in_typeDef1808);  
+                    stream_123.add(string_literal238);
 
 
 
@@ -6475,9 +6848,9 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 269:10: -> ^( TYPE 'bool' )
+                    // 259:10: -> ^( TYPE 'bool' )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:269:13: ^( TYPE 'bool' )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:259:13: ^( TYPE 'bool' )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
@@ -6492,11 +6865,11 @@ public class C_ALParser extends Parser {
                     retval.tree = root_0;
                     }
                     break;
-                case 4 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:270:3: 'float'
+                case 3 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:260:3: 'char'
                     {
-                    string_literal206=(Token)match(input,124,FOLLOW_124_in_typeDef1780);  
-                    stream_124.add(string_literal206);
+                    string_literal239=(Token)match(input,124,FOLLOW_124_in_typeDef1820);  
+                    stream_124.add(string_literal239);
 
 
 
@@ -6511,14 +6884,357 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 270:11: -> ^( TYPE 'float' )
+                    // 260:10: -> ^( TYPE 'char' )
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:270:14: ^( TYPE 'float' )
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:260:13: ^( TYPE 'char' )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
 
                         adaptor.addChild(root_1, stream_124.nextNode());
+
+                        adaptor.addChild(root_0, root_1);
+                        }
+
+                    }
+
+                    retval.tree = root_0;
+                    }
+                    break;
+                case 4 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:261:3: 'short'
+                    {
+                    string_literal240=(Token)match(input,125,FOLLOW_125_in_typeDef1832);  
+                    stream_125.add(string_literal240);
+
+
+
+                    // AST REWRITE
+                    // elements: 125
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 261:11: -> ^( TYPE 'short' )
+                    {
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:261:14: ^( TYPE 'short' )
+                        {
+                        Object root_1 = (Object)adaptor.nil();
+                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
+
+                        adaptor.addChild(root_1, stream_125.nextNode());
+
+                        adaptor.addChild(root_0, root_1);
+                        }
+
+                    }
+
+                    retval.tree = root_0;
+                    }
+                    break;
+                case 5 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:262:3: 'int' ( '(' expression ')' )?
+                    {
+                    string_literal241=(Token)match(input,126,FOLLOW_126_in_typeDef1844);  
+                    stream_126.add(string_literal241);
+
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:262:9: ( '(' expression ')' )?
+                    int alt61=2;
+                    int LA61_0 = input.LA(1);
+
+                    if ( (LA61_0==82) ) {
+                        alt61=1;
+                    }
+                    switch (alt61) {
+                        case 1 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:262:10: '(' expression ')'
+                            {
+                            char_literal242=(Token)match(input,82,FOLLOW_82_in_typeDef1847);  
+                            stream_82.add(char_literal242);
+
+                            pushFollow(FOLLOW_expression_in_typeDef1849);
+                            expression243=expression();
+
+                            state._fsp--;
+
+                            stream_expression.add(expression243.getTree());
+                            char_literal244=(Token)match(input,83,FOLLOW_83_in_typeDef1851);  
+                            stream_83.add(char_literal244);
+
+
+                            }
+                            break;
+
+                    }
+
+
+
+                    // AST REWRITE
+                    // elements: expression, 126
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 262:31: -> ^( TYPE 'int' ( ^( EXPR expression ) )? )
+                    {
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:262:34: ^( TYPE 'int' ( ^( EXPR expression ) )? )
+                        {
+                        Object root_1 = (Object)adaptor.nil();
+                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
+
+                        adaptor.addChild(root_1, stream_126.nextNode());
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:262:47: ( ^( EXPR expression ) )?
+                        if ( stream_expression.hasNext() ) {
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:262:47: ^( EXPR expression )
+                            {
+                            Object root_2 = (Object)adaptor.nil();
+                            root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR, "EXPR"), root_2);
+
+                            adaptor.addChild(root_2, stream_expression.nextTree());
+
+                            adaptor.addChild(root_1, root_2);
+                            }
+
+                        }
+                        stream_expression.reset();
+
+                        adaptor.addChild(root_0, root_1);
+                        }
+
+                    }
+
+                    retval.tree = root_0;
+                    }
+                    break;
+                case 6 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:263:3: 'unsigned' ( 'char' -> ^( TYPE 'unsigned' 'char' ) | 'short' -> ^( TYPE 'unsigned' 'short' ) | 'int' ( '(' expression ')' )? -> ^( TYPE 'unsigned' 'int' ( ^( EXPR expression ) )? ) )
+                    {
+                    string_literal245=(Token)match(input,127,FOLLOW_127_in_typeDef1872);  
+                    stream_127.add(string_literal245);
+
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:264:3: ( 'char' -> ^( TYPE 'unsigned' 'char' ) | 'short' -> ^( TYPE 'unsigned' 'short' ) | 'int' ( '(' expression ')' )? -> ^( TYPE 'unsigned' 'int' ( ^( EXPR expression ) )? ) )
+                    int alt63=3;
+                    switch ( input.LA(1) ) {
+                    case 124:
+                        {
+                        alt63=1;
+                        }
+                        break;
+                    case 125:
+                        {
+                        alt63=2;
+                        }
+                        break;
+                    case 126:
+                        {
+                        alt63=3;
+                        }
+                        break;
+                    default:
+                        NoViableAltException nvae =
+                            new NoViableAltException("", 63, 0, input);
+
+                        throw nvae;
+                    }
+
+                    switch (alt63) {
+                        case 1 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:264:4: 'char'
+                            {
+                            string_literal246=(Token)match(input,124,FOLLOW_124_in_typeDef1877);  
+                            stream_124.add(string_literal246);
+
+
+
+                            // AST REWRITE
+                            // elements: 124, 127
+                            // token labels: 
+                            // rule labels: retval
+                            // token list labels: 
+                            // rule list labels: 
+                            // wildcard labels: 
+                            retval.tree = root_0;
+                            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                            root_0 = (Object)adaptor.nil();
+                            // 264:11: -> ^( TYPE 'unsigned' 'char' )
+                            {
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:264:14: ^( TYPE 'unsigned' 'char' )
+                                {
+                                Object root_1 = (Object)adaptor.nil();
+                                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
+
+                                adaptor.addChild(root_1, stream_127.nextNode());
+                                adaptor.addChild(root_1, stream_124.nextNode());
+
+                                adaptor.addChild(root_0, root_1);
+                                }
+
+                            }
+
+                            retval.tree = root_0;
+                            }
+                            break;
+                        case 2 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:265:5: 'short'
+                            {
+                            string_literal247=(Token)match(input,125,FOLLOW_125_in_typeDef1893);  
+                            stream_125.add(string_literal247);
+
+
+
+                            // AST REWRITE
+                            // elements: 125, 127
+                            // token labels: 
+                            // rule labels: retval
+                            // token list labels: 
+                            // rule list labels: 
+                            // wildcard labels: 
+                            retval.tree = root_0;
+                            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                            root_0 = (Object)adaptor.nil();
+                            // 265:13: -> ^( TYPE 'unsigned' 'short' )
+                            {
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:265:16: ^( TYPE 'unsigned' 'short' )
+                                {
+                                Object root_1 = (Object)adaptor.nil();
+                                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
+
+                                adaptor.addChild(root_1, stream_127.nextNode());
+                                adaptor.addChild(root_1, stream_125.nextNode());
+
+                                adaptor.addChild(root_0, root_1);
+                                }
+
+                            }
+
+                            retval.tree = root_0;
+                            }
+                            break;
+                        case 3 :
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:266:5: 'int' ( '(' expression ')' )?
+                            {
+                            string_literal248=(Token)match(input,126,FOLLOW_126_in_typeDef1909);  
+                            stream_126.add(string_literal248);
+
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:266:11: ( '(' expression ')' )?
+                            int alt62=2;
+                            int LA62_0 = input.LA(1);
+
+                            if ( (LA62_0==82) ) {
+                                alt62=1;
+                            }
+                            switch (alt62) {
+                                case 1 :
+                                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:266:12: '(' expression ')'
+                                    {
+                                    char_literal249=(Token)match(input,82,FOLLOW_82_in_typeDef1912);  
+                                    stream_82.add(char_literal249);
+
+                                    pushFollow(FOLLOW_expression_in_typeDef1914);
+                                    expression250=expression();
+
+                                    state._fsp--;
+
+                                    stream_expression.add(expression250.getTree());
+                                    char_literal251=(Token)match(input,83,FOLLOW_83_in_typeDef1916);  
+                                    stream_83.add(char_literal251);
+
+
+                                    }
+                                    break;
+
+                            }
+
+
+
+                            // AST REWRITE
+                            // elements: 126, expression, 127
+                            // token labels: 
+                            // rule labels: retval
+                            // token list labels: 
+                            // rule list labels: 
+                            // wildcard labels: 
+                            retval.tree = root_0;
+                            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                            root_0 = (Object)adaptor.nil();
+                            // 266:33: -> ^( TYPE 'unsigned' 'int' ( ^( EXPR expression ) )? )
+                            {
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:266:36: ^( TYPE 'unsigned' 'int' ( ^( EXPR expression ) )? )
+                                {
+                                Object root_1 = (Object)adaptor.nil();
+                                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
+
+                                adaptor.addChild(root_1, stream_127.nextNode());
+                                adaptor.addChild(root_1, stream_126.nextNode());
+                                // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:266:60: ( ^( EXPR expression ) )?
+                                if ( stream_expression.hasNext() ) {
+                                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:266:60: ^( EXPR expression )
+                                    {
+                                    Object root_2 = (Object)adaptor.nil();
+                                    root_2 = (Object)adaptor.becomeRoot((Object)adaptor.create(EXPR, "EXPR"), root_2);
+
+                                    adaptor.addChild(root_2, stream_expression.nextTree());
+
+                                    adaptor.addChild(root_1, root_2);
+                                    }
+
+                                }
+                                stream_expression.reset();
+
+                                adaptor.addChild(root_0, root_1);
+                                }
+
+                            }
+
+                            retval.tree = root_0;
+                            }
+                            break;
+
+                    }
+
+
+                    }
+                    break;
+                case 7 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:3: 'float'
+                    {
+                    string_literal252=(Token)match(input,128,FOLLOW_128_in_typeDef1940);  
+                    stream_128.add(string_literal252);
+
+
+
+                    // AST REWRITE
+                    // elements: 128
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 267:11: -> ^( TYPE 'float' )
+                    {
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:267:14: ^( TYPE 'float' )
+                        {
+                        Object root_1 = (Object)adaptor.nil();
+                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE, "TYPE"), root_1);
+
+                        adaptor.addChild(root_1, stream_128.nextNode());
 
                         adaptor.addChild(root_0, root_1);
                         }
@@ -6548,99 +7264,65 @@ public class C_ALParser extends Parser {
     }
     // $ANTLR end "typeDef"
 
-    public static class varDecl_return extends ParserRuleReturnScope {
+    public static class typeDefId_return extends ParserRuleReturnScope {
         Object tree;
         public Object getTree() { return tree; }
     };
 
-    // $ANTLR start "varDecl"
-    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:272:1: varDecl : ( 'const' typeDef ID '=' expression ';' -> ^( VARIABLE typeDef ID NON_ASSIGNABLE expression ) | typeDef ID ( '=' expression ';' -> ^( VARIABLE typeDef ID ASSIGNABLE expression ) | ';' -> ^( VARIABLE typeDef ID ASSIGNABLE ) ) );
-    public final C_ALParser.varDecl_return varDecl() throws RecognitionException {
-        C_ALParser.varDecl_return retval = new C_ALParser.varDecl_return();
+    // $ANTLR start "typeDefId"
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:269:1: typeDefId : typeDef ID ( -> typeDef ID | typeListSpec -> ^( TYPE_LIST typeDef typeListSpec ) ID ) ;
+    public final C_ALParser.typeDefId_return typeDefId() throws RecognitionException {
+        C_ALParser.typeDefId_return retval = new C_ALParser.typeDefId_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal207=null;
-        Token ID209=null;
-        Token char_literal210=null;
-        Token char_literal212=null;
-        Token ID214=null;
-        Token char_literal215=null;
-        Token char_literal217=null;
-        Token char_literal218=null;
-        C_ALParser.typeDef_return typeDef208 = null;
+        Token ID254=null;
+        C_ALParser.typeDef_return typeDef253 = null;
 
-        C_ALParser.expression_return expression211 = null;
-
-        C_ALParser.typeDef_return typeDef213 = null;
-
-        C_ALParser.expression_return expression216 = null;
+        C_ALParser.typeListSpec_return typeListSpec255 = null;
 
 
-        Object string_literal207_tree=null;
-        Object ID209_tree=null;
-        Object char_literal210_tree=null;
-        Object char_literal212_tree=null;
-        Object ID214_tree=null;
-        Object char_literal215_tree=null;
-        Object char_literal217_tree=null;
-        Object char_literal218_tree=null;
+        Object ID254_tree=null;
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
-        RewriteRuleTokenStream stream_90=new RewriteRuleTokenStream(adaptor,"token 90");
-        RewriteRuleTokenStream stream_88=new RewriteRuleTokenStream(adaptor,"token 88");
-        RewriteRuleTokenStream stream_89=new RewriteRuleTokenStream(adaptor,"token 89");
-        RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
+        RewriteRuleSubtreeStream stream_typeListSpec=new RewriteRuleSubtreeStream(adaptor,"rule typeListSpec");
         RewriteRuleSubtreeStream stream_typeDef=new RewriteRuleSubtreeStream(adaptor,"rule typeDef");
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:276:8: ( 'const' typeDef ID '=' expression ';' -> ^( VARIABLE typeDef ID NON_ASSIGNABLE expression ) | typeDef ID ( '=' expression ';' -> ^( VARIABLE typeDef ID ASSIGNABLE expression ) | ';' -> ^( VARIABLE typeDef ID ASSIGNABLE ) ) )
-            int alt62=2;
-            int LA62_0 = input.LA(1);
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:269:10: ( typeDef ID ( -> typeDef ID | typeListSpec -> ^( TYPE_LIST typeDef typeListSpec ) ID ) )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:270:3: typeDef ID ( -> typeDef ID | typeListSpec -> ^( TYPE_LIST typeDef typeListSpec ) ID )
+            {
+            pushFollow(FOLLOW_typeDef_in_typeDefId1957);
+            typeDef253=typeDef();
 
-            if ( (LA62_0==88) ) {
-                alt62=1;
+            state._fsp--;
+
+            stream_typeDef.add(typeDef253.getTree());
+            ID254=(Token)match(input,ID,FOLLOW_ID_in_typeDefId1959);  
+            stream_ID.add(ID254);
+
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:271:3: ( -> typeDef ID | typeListSpec -> ^( TYPE_LIST typeDef typeListSpec ) ID )
+            int alt65=2;
+            int LA65_0 = input.LA(1);
+
+            if ( (LA65_0==78||LA65_0==81||(LA65_0>=83 && LA65_0<=84)||(LA65_0>=88 && LA65_0<=89)) ) {
+                alt65=1;
             }
-            else if ( ((LA62_0>=121 && LA62_0<=124)) ) {
-                alt62=2;
+            else if ( (LA65_0==79) ) {
+                alt65=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 62, 0, input);
+                    new NoViableAltException("", 65, 0, input);
 
                 throw nvae;
             }
-            switch (alt62) {
+            switch (alt65) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:277:3: 'const' typeDef ID '=' expression ';'
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:271:5: 
                     {
-                    string_literal207=(Token)match(input,88,FOLLOW_88_in_varDecl1804);  
-                    stream_88.add(string_literal207);
-
-                    pushFollow(FOLLOW_typeDef_in_varDecl1806);
-                    typeDef208=typeDef();
-
-                    state._fsp--;
-
-                    stream_typeDef.add(typeDef208.getTree());
-                    ID209=(Token)match(input,ID,FOLLOW_ID_in_varDecl1808);  
-                    stream_ID.add(ID209);
-
-                    char_literal210=(Token)match(input,89,FOLLOW_89_in_varDecl1810);  
-                    stream_89.add(char_literal210);
-
-                    pushFollow(FOLLOW_expression_in_varDecl1812);
-                    expression211=expression();
-
-                    state._fsp--;
-
-                    stream_expression.add(expression211.getTree());
-                    char_literal212=(Token)match(input,90,FOLLOW_90_in_varDecl1814);  
-                    stream_90.add(char_literal212);
-
-
 
                     // AST REWRITE
-                    // elements: expression, ID, typeDef
+                    // elements: typeDef, ID
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -6650,15 +7332,296 @@ public class C_ALParser extends Parser {
                     RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
                     root_0 = (Object)adaptor.nil();
-                    // 277:41: -> ^( VARIABLE typeDef ID NON_ASSIGNABLE expression )
+                    // 271:5: -> typeDef ID
                     {
-                        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:277:44: ^( VARIABLE typeDef ID NON_ASSIGNABLE expression )
+                        adaptor.addChild(root_0, stream_typeDef.nextTree());
+                        adaptor.addChild(root_0, stream_ID.nextNode());
+
+                    }
+
+                    retval.tree = root_0;
+                    }
+                    break;
+                case 2 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:272:5: typeListSpec
+                    {
+                    pushFollow(FOLLOW_typeListSpec_in_typeDefId1975);
+                    typeListSpec255=typeListSpec();
+
+                    state._fsp--;
+
+                    stream_typeListSpec.add(typeListSpec255.getTree());
+
+
+                    // AST REWRITE
+                    // elements: typeListSpec, ID, typeDef
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 272:18: -> ^( TYPE_LIST typeDef typeListSpec ) ID
+                    {
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:272:21: ^( TYPE_LIST typeDef typeListSpec )
+                        {
+                        Object root_1 = (Object)adaptor.nil();
+                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(TYPE_LIST, "TYPE_LIST"), root_1);
+
+                        adaptor.addChild(root_1, stream_typeDef.nextTree());
+                        adaptor.addChild(root_1, stream_typeListSpec.nextTree());
+
+                        adaptor.addChild(root_0, root_1);
+                        }
+                        adaptor.addChild(root_0, stream_ID.nextNode());
+
+                    }
+
+                    retval.tree = root_0;
+                    }
+                    break;
+
+            }
+
+
+            }
+
+            retval.stop = input.LT(-1);
+
+            retval.tree = (Object)adaptor.rulePostProcessing(root_0);
+            adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+    	retval.tree = (Object)adaptor.errorNode(input, retval.start, input.LT(-1), re);
+
+        }
+        finally {
+        }
+        return retval;
+    }
+    // $ANTLR end "typeDefId"
+
+    public static class typeListSpec_return extends ParserRuleReturnScope {
+        Object tree;
+        public Object getTree() { return tree; }
+    };
+
+    // $ANTLR start "typeListSpec"
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:274:1: typeListSpec : ( '[' expression ']' )+ -> ( expression )+ ;
+    public final C_ALParser.typeListSpec_return typeListSpec() throws RecognitionException {
+        C_ALParser.typeListSpec_return retval = new C_ALParser.typeListSpec_return();
+        retval.start = input.LT(1);
+
+        Object root_0 = null;
+
+        Token char_literal256=null;
+        Token char_literal258=null;
+        C_ALParser.expression_return expression257 = null;
+
+
+        Object char_literal256_tree=null;
+        Object char_literal258_tree=null;
+        RewriteRuleTokenStream stream_79=new RewriteRuleTokenStream(adaptor,"token 79");
+        RewriteRuleTokenStream stream_80=new RewriteRuleTokenStream(adaptor,"token 80");
+        RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
+        try {
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:274:13: ( ( '[' expression ']' )+ -> ( expression )+ )
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:274:15: ( '[' expression ']' )+
+            {
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:274:15: ( '[' expression ']' )+
+            int cnt66=0;
+            loop66:
+            do {
+                int alt66=2;
+                int LA66_0 = input.LA(1);
+
+                if ( (LA66_0==79) ) {
+                    alt66=1;
+                }
+
+
+                switch (alt66) {
+            	case 1 :
+            	    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:274:16: '[' expression ']'
+            	    {
+            	    char_literal256=(Token)match(input,79,FOLLOW_79_in_typeListSpec1996);  
+            	    stream_79.add(char_literal256);
+
+            	    pushFollow(FOLLOW_expression_in_typeListSpec1998);
+            	    expression257=expression();
+
+            	    state._fsp--;
+
+            	    stream_expression.add(expression257.getTree());
+            	    char_literal258=(Token)match(input,80,FOLLOW_80_in_typeListSpec2000);  
+            	    stream_80.add(char_literal258);
+
+
+            	    }
+            	    break;
+
+            	default :
+            	    if ( cnt66 >= 1 ) break loop66;
+                        EarlyExitException eee =
+                            new EarlyExitException(66, input);
+                        throw eee;
+                }
+                cnt66++;
+            } while (true);
+
+
+
+            // AST REWRITE
+            // elements: expression
+            // token labels: 
+            // rule labels: retval
+            // token list labels: 
+            // rule list labels: 
+            // wildcard labels: 
+            retval.tree = root_0;
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+            root_0 = (Object)adaptor.nil();
+            // 274:37: -> ( expression )+
+            {
+                if ( !(stream_expression.hasNext()) ) {
+                    throw new RewriteEarlyExitException();
+                }
+                while ( stream_expression.hasNext() ) {
+                    adaptor.addChild(root_0, stream_expression.nextTree());
+
+                }
+                stream_expression.reset();
+
+            }
+
+            retval.tree = root_0;
+            }
+
+            retval.stop = input.LT(-1);
+
+            retval.tree = (Object)adaptor.rulePostProcessing(root_0);
+            adaptor.setTokenBoundaries(retval.tree, retval.start, retval.stop);
+
+        }
+        catch (RecognitionException re) {
+            reportError(re);
+            recover(input,re);
+    	retval.tree = (Object)adaptor.errorNode(input, retval.start, input.LT(-1), re);
+
+        }
+        finally {
+        }
+        return retval;
+    }
+    // $ANTLR end "typeListSpec"
+
+    public static class varDecl_return extends ParserRuleReturnScope {
+        Object tree;
+        public Object getTree() { return tree; }
+    };
+
+    // $ANTLR start "varDecl"
+    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:276:1: varDecl : ( 'const' typeDefId '=' expression ';' -> ^( VARIABLE typeDefId NON_ASSIGNABLE expression ) | typeDefId ( '=' expression )? ';' -> ^( VARIABLE typeDefId ASSIGNABLE ( expression )? ) );
+    public final C_ALParser.varDecl_return varDecl() throws RecognitionException {
+        C_ALParser.varDecl_return retval = new C_ALParser.varDecl_return();
+        retval.start = input.LT(1);
+
+        Object root_0 = null;
+
+        Token string_literal259=null;
+        Token char_literal261=null;
+        Token char_literal263=null;
+        Token char_literal265=null;
+        Token char_literal267=null;
+        C_ALParser.typeDefId_return typeDefId260 = null;
+
+        C_ALParser.expression_return expression262 = null;
+
+        C_ALParser.typeDefId_return typeDefId264 = null;
+
+        C_ALParser.expression_return expression266 = null;
+
+
+        Object string_literal259_tree=null;
+        Object char_literal261_tree=null;
+        Object char_literal263_tree=null;
+        Object char_literal265_tree=null;
+        Object char_literal267_tree=null;
+        RewriteRuleTokenStream stream_87=new RewriteRuleTokenStream(adaptor,"token 87");
+        RewriteRuleTokenStream stream_88=new RewriteRuleTokenStream(adaptor,"token 88");
+        RewriteRuleTokenStream stream_89=new RewriteRuleTokenStream(adaptor,"token 89");
+        RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
+        RewriteRuleSubtreeStream stream_typeDefId=new RewriteRuleSubtreeStream(adaptor,"rule typeDefId");
+        try {
+            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:280:8: ( 'const' typeDefId '=' expression ';' -> ^( VARIABLE typeDefId NON_ASSIGNABLE expression ) | typeDefId ( '=' expression )? ';' -> ^( VARIABLE typeDefId ASSIGNABLE ( expression )? ) )
+            int alt68=2;
+            int LA68_0 = input.LA(1);
+
+            if ( (LA68_0==87) ) {
+                alt68=1;
+            }
+            else if ( (LA68_0==ID||(LA68_0>=123 && LA68_0<=128)) ) {
+                alt68=2;
+            }
+            else {
+                NoViableAltException nvae =
+                    new NoViableAltException("", 68, 0, input);
+
+                throw nvae;
+            }
+            switch (alt68) {
+                case 1 :
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:281:3: 'const' typeDefId '=' expression ';'
+                    {
+                    string_literal259=(Token)match(input,87,FOLLOW_87_in_varDecl2023);  
+                    stream_87.add(string_literal259);
+
+                    pushFollow(FOLLOW_typeDefId_in_varDecl2025);
+                    typeDefId260=typeDefId();
+
+                    state._fsp--;
+
+                    stream_typeDefId.add(typeDefId260.getTree());
+                    char_literal261=(Token)match(input,88,FOLLOW_88_in_varDecl2027);  
+                    stream_88.add(char_literal261);
+
+                    pushFollow(FOLLOW_expression_in_varDecl2029);
+                    expression262=expression();
+
+                    state._fsp--;
+
+                    stream_expression.add(expression262.getTree());
+                    char_literal263=(Token)match(input,89,FOLLOW_89_in_varDecl2031);  
+                    stream_89.add(char_literal263);
+
+
+
+                    // AST REWRITE
+                    // elements: typeDefId, expression
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 281:40: -> ^( VARIABLE typeDefId NON_ASSIGNABLE expression )
+                    {
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:281:43: ^( VARIABLE typeDefId NON_ASSIGNABLE expression )
                         {
                         Object root_1 = (Object)adaptor.nil();
                         root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLE, "VARIABLE"), root_1);
 
-                        adaptor.addChild(root_1, stream_typeDef.nextTree());
-                        adaptor.addChild(root_1, stream_ID.nextNode());
+                        adaptor.addChild(root_1, stream_typeDefId.nextTree());
                         adaptor.addChild(root_1, (Object)adaptor.create(NON_ASSIGNABLE, "NON_ASSIGNABLE"));
                         adaptor.addChild(root_1, stream_expression.nextTree());
 
@@ -6671,124 +7634,78 @@ public class C_ALParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:278:3: typeDef ID ( '=' expression ';' -> ^( VARIABLE typeDef ID ASSIGNABLE expression ) | ';' -> ^( VARIABLE typeDef ID ASSIGNABLE ) )
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:282:3: typeDefId ( '=' expression )? ';'
                     {
-                    pushFollow(FOLLOW_typeDef_in_varDecl1832);
-                    typeDef213=typeDef();
+                    pushFollow(FOLLOW_typeDefId_in_varDecl2047);
+                    typeDefId264=typeDefId();
 
                     state._fsp--;
 
-                    stream_typeDef.add(typeDef213.getTree());
-                    ID214=(Token)match(input,ID,FOLLOW_ID_in_varDecl1834);  
-                    stream_ID.add(ID214);
+                    stream_typeDefId.add(typeDefId264.getTree());
+                    // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:282:13: ( '=' expression )?
+                    int alt67=2;
+                    int LA67_0 = input.LA(1);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:279:3: ( '=' expression ';' -> ^( VARIABLE typeDef ID ASSIGNABLE expression ) | ';' -> ^( VARIABLE typeDef ID ASSIGNABLE ) )
-                    int alt61=2;
-                    int LA61_0 = input.LA(1);
-
-                    if ( (LA61_0==89) ) {
-                        alt61=1;
+                    if ( (LA67_0==88) ) {
+                        alt67=1;
                     }
-                    else if ( (LA61_0==90) ) {
-                        alt61=2;
-                    }
-                    else {
-                        NoViableAltException nvae =
-                            new NoViableAltException("", 61, 0, input);
-
-                        throw nvae;
-                    }
-                    switch (alt61) {
+                    switch (alt67) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:279:5: '=' expression ';'
+                            // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:282:14: '=' expression
                             {
-                            char_literal215=(Token)match(input,89,FOLLOW_89_in_varDecl1840);  
-                            stream_89.add(char_literal215);
+                            char_literal265=(Token)match(input,88,FOLLOW_88_in_varDecl2050);  
+                            stream_88.add(char_literal265);
 
-                            pushFollow(FOLLOW_expression_in_varDecl1842);
-                            expression216=expression();
+                            pushFollow(FOLLOW_expression_in_varDecl2052);
+                            expression266=expression();
 
                             state._fsp--;
 
-                            stream_expression.add(expression216.getTree());
-                            char_literal217=(Token)match(input,90,FOLLOW_90_in_varDecl1844);  
-                            stream_90.add(char_literal217);
+                            stream_expression.add(expression266.getTree());
 
-
-
-                            // AST REWRITE
-                            // elements: typeDef, expression, ID
-                            // token labels: 
-                            // rule labels: retval
-                            // token list labels: 
-                            // rule list labels: 
-                            // wildcard labels: 
-                            retval.tree = root_0;
-                            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
-
-                            root_0 = (Object)adaptor.nil();
-                            // 279:24: -> ^( VARIABLE typeDef ID ASSIGNABLE expression )
-                            {
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:279:27: ^( VARIABLE typeDef ID ASSIGNABLE expression )
-                                {
-                                Object root_1 = (Object)adaptor.nil();
-                                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLE, "VARIABLE"), root_1);
-
-                                adaptor.addChild(root_1, stream_typeDef.nextTree());
-                                adaptor.addChild(root_1, stream_ID.nextNode());
-                                adaptor.addChild(root_1, (Object)adaptor.create(ASSIGNABLE, "ASSIGNABLE"));
-                                adaptor.addChild(root_1, stream_expression.nextTree());
-
-                                adaptor.addChild(root_0, root_1);
-                                }
-
-                            }
-
-                            retval.tree = root_0;
-                            }
-                            break;
-                        case 2 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:280:5: ';'
-                            {
-                            char_literal218=(Token)match(input,90,FOLLOW_90_in_varDecl1864);  
-                            stream_90.add(char_literal218);
-
-
-
-                            // AST REWRITE
-                            // elements: ID, typeDef
-                            // token labels: 
-                            // rule labels: retval
-                            // token list labels: 
-                            // rule list labels: 
-                            // wildcard labels: 
-                            retval.tree = root_0;
-                            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
-
-                            root_0 = (Object)adaptor.nil();
-                            // 280:9: -> ^( VARIABLE typeDef ID ASSIGNABLE )
-                            {
-                                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:280:12: ^( VARIABLE typeDef ID ASSIGNABLE )
-                                {
-                                Object root_1 = (Object)adaptor.nil();
-                                root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLE, "VARIABLE"), root_1);
-
-                                adaptor.addChild(root_1, stream_typeDef.nextTree());
-                                adaptor.addChild(root_1, stream_ID.nextNode());
-                                adaptor.addChild(root_1, (Object)adaptor.create(ASSIGNABLE, "ASSIGNABLE"));
-
-                                adaptor.addChild(root_0, root_1);
-                                }
-
-                            }
-
-                            retval.tree = root_0;
                             }
                             break;
 
                     }
 
+                    char_literal267=(Token)match(input,89,FOLLOW_89_in_varDecl2056);  
+                    stream_89.add(char_literal267);
 
+
+
+                    // AST REWRITE
+                    // elements: typeDefId, expression
+                    // token labels: 
+                    // rule labels: retval
+                    // token list labels: 
+                    // rule list labels: 
+                    // wildcard labels: 
+                    retval.tree = root_0;
+                    RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+
+                    root_0 = (Object)adaptor.nil();
+                    // 282:35: -> ^( VARIABLE typeDefId ASSIGNABLE ( expression )? )
+                    {
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:282:38: ^( VARIABLE typeDefId ASSIGNABLE ( expression )? )
+                        {
+                        Object root_1 = (Object)adaptor.nil();
+                        root_1 = (Object)adaptor.becomeRoot((Object)adaptor.create(VARIABLE, "VARIABLE"), root_1);
+
+                        adaptor.addChild(root_1, stream_typeDefId.nextTree());
+                        adaptor.addChild(root_1, (Object)adaptor.create(ASSIGNABLE, "ASSIGNABLE"));
+                        // D:\\Prog\\repositories\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\C_AL.g:282:70: ( expression )?
+                        if ( stream_expression.hasNext() ) {
+                            adaptor.addChild(root_1, stream_expression.nextTree());
+
+                        }
+                        stream_expression.reset();
+
+                        adaptor.addChild(root_0, root_1);
+                        }
+
+                    }
+
+                    retval.tree = root_0;
                     }
                     break;
 
@@ -6814,21 +7731,22 @@ public class C_ALParser extends Parser {
     // Delegated rules
 
 
-    protected DFA41 dfa41 = new DFA41(this);
-    static final String DFA41_eotS =
+    protected DFA38 dfa38 = new DFA38(this);
+    protected DFA59 dfa59 = new DFA59(this);
+    static final String DFA38_eotS =
         "\24\uffff";
-    static final String DFA41_eofS =
+    static final String DFA38_eofS =
         "\24\uffff";
-    static final String DFA41_minS =
-        "\1\100\23\uffff";
-    static final String DFA41_maxS =
-        "\1\155\23\uffff";
-    static final String DFA41_acceptS =
+    static final String DFA38_minS =
+        "\1\77\23\uffff";
+    static final String DFA38_maxS =
+        "\1\154\23\uffff";
+    static final String DFA38_acceptS =
         "\1\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1\13\1\14\1"+
         "\15\1\16\1\17\1\20\1\21\1\22\1\23";
-    static final String DFA41_specialS =
+    static final String DFA38_specialS =
         "\24\uffff}>";
-    static final String[] DFA41_transitionS = {
+    static final String[] DFA38_transitionS = {
             "\1\16\1\17\1\22\1\20\33\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1"+
             "\10\1\11\1\12\1\13\1\14\1\15\1\21\1\23",
             "",
@@ -6852,263 +7770,380 @@ public class C_ALParser extends Parser {
             ""
     };
 
-    static final short[] DFA41_eot = DFA.unpackEncodedString(DFA41_eotS);
-    static final short[] DFA41_eof = DFA.unpackEncodedString(DFA41_eofS);
-    static final char[] DFA41_min = DFA.unpackEncodedStringToUnsignedChars(DFA41_minS);
-    static final char[] DFA41_max = DFA.unpackEncodedStringToUnsignedChars(DFA41_maxS);
-    static final short[] DFA41_accept = DFA.unpackEncodedString(DFA41_acceptS);
-    static final short[] DFA41_special = DFA.unpackEncodedString(DFA41_specialS);
-    static final short[][] DFA41_transition;
+    static final short[] DFA38_eot = DFA.unpackEncodedString(DFA38_eotS);
+    static final short[] DFA38_eof = DFA.unpackEncodedString(DFA38_eofS);
+    static final char[] DFA38_min = DFA.unpackEncodedStringToUnsignedChars(DFA38_minS);
+    static final char[] DFA38_max = DFA.unpackEncodedStringToUnsignedChars(DFA38_maxS);
+    static final short[] DFA38_accept = DFA.unpackEncodedString(DFA38_acceptS);
+    static final short[] DFA38_special = DFA.unpackEncodedString(DFA38_specialS);
+    static final short[][] DFA38_transition;
 
     static {
-        int numStates = DFA41_transitionS.length;
-        DFA41_transition = new short[numStates][];
+        int numStates = DFA38_transitionS.length;
+        DFA38_transition = new short[numStates][];
         for (int i=0; i<numStates; i++) {
-            DFA41_transition[i] = DFA.unpackEncodedString(DFA41_transitionS[i]);
+            DFA38_transition[i] = DFA.unpackEncodedString(DFA38_transitionS[i]);
         }
     }
 
-    class DFA41 extends DFA {
+    class DFA38 extends DFA {
 
-        public DFA41(BaseRecognizer recognizer) {
+        public DFA38(BaseRecognizer recognizer) {
             this.recognizer = recognizer;
-            this.decisionNumber = 41;
-            this.eot = DFA41_eot;
-            this.eof = DFA41_eof;
-            this.min = DFA41_min;
-            this.max = DFA41_max;
-            this.accept = DFA41_accept;
-            this.special = DFA41_special;
-            this.transition = DFA41_transition;
+            this.decisionNumber = 38;
+            this.eot = DFA38_eot;
+            this.eof = DFA38_eof;
+            this.min = DFA38_min;
+            this.max = DFA38_max;
+            this.accept = DFA38_accept;
+            this.special = DFA38_special;
+            this.transition = DFA38_transition;
         }
         public String getDescription() {
-            return "172:1: bop : ( '||' -> LOGIC_OR | '&&' -> LOGIC_AND | '|' -> BITOR | '^' -> BITXOR | '&' -> BITAND | '==' -> EQ | '!=' -> NE | '<' -> LT | '>' -> GT | '<=' -> LE | '>=' -> GE | '<<' -> SHIFT_LEFT | '>>' -> SHIFT_RIGHT | PLUS -> PLUS | MINUS -> MINUS | DIV -> DIV | '%' -> MOD | TIMES -> TIMES | '**' -> EXP );";
+            return "165:1: bop : ( '||' -> LOGIC_OR | '&&' -> LOGIC_AND | '|' -> BITOR | '^' -> BITXOR | '&' -> BITAND | '==' -> EQ | '!=' -> NE | '<' -> LT | '>' -> GT | '<=' -> LE | '>=' -> GE | '<<' -> SHIFT_LEFT | '>>' -> SHIFT_RIGHT | PLUS -> PLUS | MINUS -> MINUS | DIV -> DIV | '%' -> MOD | TIMES -> TIMES | '**' -> EXP );";
+        }
+    }
+    static final String DFA59_eotS =
+        "\16\uffff";
+    static final String DFA59_eofS =
+        "\16\uffff";
+    static final String DFA59_minS =
+        "\1\104\15\uffff";
+    static final String DFA59_maxS =
+        "\1\u0080\15\uffff";
+    static final String DFA59_acceptS =
+        "\1\uffff\1\2\3\uffff\1\1\1\uffff\1\1\6\uffff";
+    static final String DFA59_specialS =
+        "\16\uffff}>";
+    static final String[] DFA59_transitionS = {
+            "\1\5\20\uffff\2\1\1\7\30\uffff\2\1\10\uffff\1\1\6\7",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+    };
+
+    static final short[] DFA59_eot = DFA.unpackEncodedString(DFA59_eotS);
+    static final short[] DFA59_eof = DFA.unpackEncodedString(DFA59_eofS);
+    static final char[] DFA59_min = DFA.unpackEncodedStringToUnsignedChars(DFA59_minS);
+    static final char[] DFA59_max = DFA.unpackEncodedStringToUnsignedChars(DFA59_maxS);
+    static final short[] DFA59_accept = DFA.unpackEncodedString(DFA59_acceptS);
+    static final short[] DFA59_special = DFA.unpackEncodedString(DFA59_specialS);
+    static final short[][] DFA59_transition;
+
+    static {
+        int numStates = DFA59_transitionS.length;
+        DFA59_transition = new short[numStates][];
+        for (int i=0; i<numStates; i++) {
+            DFA59_transition[i] = DFA.unpackEncodedString(DFA59_transitionS[i]);
+        }
+    }
+
+    class DFA59 extends DFA {
+
+        public DFA59(BaseRecognizer recognizer) {
+            this.recognizer = recognizer;
+            this.decisionNumber = 59;
+            this.eot = DFA59_eot;
+            this.eof = DFA59_eof;
+            this.min = DFA59_min;
+            this.max = DFA59_max;
+            this.accept = DFA59_accept;
+            this.special = DFA59_special;
+            this.transition = DFA59_transition;
+        }
+        public String getDescription() {
+            return "()* loopback of 253:22: ( varDecl )*";
         }
     }
  
 
-    public static final BitSet FOLLOW_GUARD_in_actionGuards65 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
+    public static final BitSet FOLLOW_GUARD_in_actionGuards65 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
     public static final BitSet FOLLOW_expressions_in_actionGuards67 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_actionInput80 = new BitSet(new long[]{0x0000000000000000L,0x0000000000008000L});
-    public static final BitSet FOLLOW_79_in_actionInput82 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010000L});
-    public static final BitSet FOLLOW_80_in_actionInput86 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_idents_in_actionInput88 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020000L});
-    public static final BitSet FOLLOW_81_in_actionInput90 = new BitSet(new long[]{0x2000000000000002L});
+    public static final BitSet FOLLOW_ID_in_actionInput80 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_78_in_actionInput82 = new BitSet(new long[]{0x0000000000000000L,0x0000000000008000L});
+    public static final BitSet FOLLOW_79_in_actionInput86 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_idents_in_actionInput88 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010000L});
+    public static final BitSet FOLLOW_80_in_actionInput90 = new BitSet(new long[]{0x2000000000000002L});
     public static final BitSet FOLLOW_actionRepeat_in_actionInput92 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_actionInput_in_actionInputs103 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_82_in_actionInputs106 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010020L});
-    public static final BitSet FOLLOW_actionInput_in_actionInputs108 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_ID_in_actionOutput124 = new BitSet(new long[]{0x0000000000000000L,0x0000000000008000L});
-    public static final BitSet FOLLOW_79_in_actionOutput126 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010000L});
-    public static final BitSet FOLLOW_80_in_actionOutput130 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expressions_in_actionOutput132 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020000L});
-    public static final BitSet FOLLOW_81_in_actionOutput134 = new BitSet(new long[]{0x2000000000000002L});
+    public static final BitSet FOLLOW_actionInput_in_actionInputs103 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_81_in_actionInputs106 = new BitSet(new long[]{0x0000000000000000L,0x0000000000008010L});
+    public static final BitSet FOLLOW_actionInput_in_actionInputs108 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_ID_in_actionOutput124 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_78_in_actionOutput126 = new BitSet(new long[]{0x0000000000000000L,0x0000000000008000L});
+    public static final BitSet FOLLOW_79_in_actionOutput130 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expressions_in_actionOutput132 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010000L});
+    public static final BitSet FOLLOW_80_in_actionOutput134 = new BitSet(new long[]{0x2000000000000002L});
     public static final BitSet FOLLOW_actionRepeat_in_actionOutput136 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_actionOutput_in_actionOutputs147 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_82_in_actionOutputs150 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010020L});
-    public static final BitSet FOLLOW_actionOutput_in_actionOutputs152 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_REPEAT_in_actionRepeat166 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
+    public static final BitSet FOLLOW_actionOutput_in_actionOutputs147 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_81_in_actionOutputs150 = new BitSet(new long[]{0x0000000000000000L,0x0000000000008010L});
+    public static final BitSet FOLLOW_actionOutput_in_actionOutputs152 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_REPEAT_in_actionRepeat166 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
     public static final BitSet FOLLOW_expression_in_actionRepeat168 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_actorImport_in_actor184 = new BitSet(new long[]{0x0080000000000000L,0x0000000020000000L});
-    public static final BitSet FOLLOW_ACTOR_in_actor187 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_actor189 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
-    public static final BitSet FOLLOW_83_in_actor191 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000100000L});
-    public static final BitSet FOLLOW_actorParameters_in_actor193 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_actor196 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
-    public static final BitSet FOLLOW_83_in_actor199 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000200000L});
-    public static final BitSet FOLLOW_parameters_in_actor203 = new BitSet(new long[]{0x0000000000000000L,0x0000000000200000L});
-    public static final BitSet FOLLOW_85_in_actor206 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000100000L});
-    public static final BitSet FOLLOW_parameters_in_actor210 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_actor213 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
-    public static final BitSet FOLLOW_86_in_actor215 = new BitSet(new long[]{0x4C40000000000000L,0x1E00000011800000L});
-    public static final BitSet FOLLOW_actorDeclarations_in_actor218 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_87_in_actor221 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_actorImport_in_actor184 = new BitSet(new long[]{0x0080000000000000L,0x0000000010000000L});
+    public static final BitSet FOLLOW_ACTOR_in_actor187 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_actor189 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_actor191 = new BitSet(new long[]{0x0000000000000000L,0xF800000000080010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_actorParameters_in_actor193 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_actor196 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_actor199 = new BitSet(new long[]{0x0000000000000000L,0xF800000000100010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_parameters_in_actor203 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
+    public static final BitSet FOLLOW_84_in_actor206 = new BitSet(new long[]{0x0000000000000000L,0xF800000000080010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_parameters_in_actor210 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_actor213 = new BitSet(new long[]{0x0000000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_85_in_actor215 = new BitSet(new long[]{0x4C40000000000000L,0xF800000008C00010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_actorDeclarations_in_actor218 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_86_in_actor221 = new BitSet(new long[]{0x0000000000000000L});
     public static final BitSet FOLLOW_EOF_in_actor223 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ACTION_in_actionOrInitialize284 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080020L});
-    public static final BitSet FOLLOW_qualifiedIdent_in_actionOrInitialize286 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
-    public static final BitSet FOLLOW_83_in_actionOrInitialize289 = new BitSet(new long[]{0x0000000000000000L,0x0000000000210020L});
-    public static final BitSet FOLLOW_actionInputs_in_actionOrInitialize291 = new BitSet(new long[]{0x0000000000000000L,0x0000000000200000L});
-    public static final BitSet FOLLOW_85_in_actionOrInitialize294 = new BitSet(new long[]{0x0000000000000000L,0x0000000000110020L});
-    public static final BitSet FOLLOW_actionOutputs_in_actionOrInitialize296 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_actionOrInitialize299 = new BitSet(new long[]{0x0200000000000000L,0x0000000000400000L});
-    public static final BitSet FOLLOW_actionGuards_in_actionOrInitialize305 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
-    public static final BitSet FOLLOW_86_in_actionOrInitialize308 = new BitSet(new long[]{0x0000000000000000L,0x1E00000001800020L});
-    public static final BitSet FOLLOW_varDecl_in_actionOrInitialize316 = new BitSet(new long[]{0x0000000000000000L,0x1E00000001800020L});
-    public static final BitSet FOLLOW_statement_in_actionOrInitialize325 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800020L});
-    public static final BitSet FOLLOW_87_in_actionOrInitialize332 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INITIALIZE_in_actionOrInitialize418 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080020L});
-    public static final BitSet FOLLOW_qualifiedIdent_in_actionOrInitialize420 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
-    public static final BitSet FOLLOW_83_in_actionOrInitialize423 = new BitSet(new long[]{0x0000000000000000L,0x0000000000110020L});
-    public static final BitSet FOLLOW_actionOutputs_in_actionOrInitialize425 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_actionOrInitialize428 = new BitSet(new long[]{0x0200000000000000L,0x0000000000400000L});
-    public static final BitSet FOLLOW_actionGuards_in_actionOrInitialize434 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
-    public static final BitSet FOLLOW_86_in_actionOrInitialize437 = new BitSet(new long[]{0x0000000000000000L,0x1E00000001800020L});
-    public static final BitSet FOLLOW_varDecl_in_actionOrInitialize445 = new BitSet(new long[]{0x0000000000000000L,0x1E00000001800020L});
-    public static final BitSet FOLLOW_statement_in_actionOrInitialize454 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800020L});
-    public static final BitSet FOLLOW_87_in_actionOrInitialize461 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_actionOrInitialize_in_actorDeclaration543 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_priorityOrder_in_actorDeclaration547 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_88_in_actorDeclaration552 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000000000L});
-    public static final BitSet FOLLOW_typeDef_in_actorDeclaration554 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_actorDeclaration556 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
-    public static final BitSet FOLLOW_89_in_actorDeclaration558 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_actorDeclaration560 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_actorDeclaration562 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeDef_in_actorDeclaration584 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_actorDeclaration586 = new BitSet(new long[]{0x0000000000000000L,0x0000000006080000L});
-    public static final BitSet FOLLOW_89_in_actorDeclaration592 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_actorDeclaration594 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_actorDeclaration596 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_90_in_actorDeclaration616 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_83_in_actorDeclaration635 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000100000L});
-    public static final BitSet FOLLOW_parameters_in_actorDeclaration637 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_actorDeclaration640 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
-    public static final BitSet FOLLOW_86_in_actorDeclaration642 = new BitSet(new long[]{0x0000000000000000L,0x1E00000009000000L});
-    public static final BitSet FOLLOW_varDecl_in_actorDeclaration650 = new BitSet(new long[]{0x0000000000000000L,0x1E00000009000000L});
-    public static final BitSet FOLLOW_91_in_actorDeclaration659 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_actorDeclaration661 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_actorDeclaration663 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_87_in_actorDeclaration669 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_92_in_actorDeclaration702 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_actorDeclaration704 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
-    public static final BitSet FOLLOW_83_in_actorDeclaration706 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000100000L});
-    public static final BitSet FOLLOW_parameters_in_actorDeclaration708 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_actorDeclaration711 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
-    public static final BitSet FOLLOW_86_in_actorDeclaration713 = new BitSet(new long[]{0x0000000000000000L,0x1E00000001800020L});
-    public static final BitSet FOLLOW_varDecl_in_actorDeclaration721 = new BitSet(new long[]{0x0000000000000000L,0x1E00000001800020L});
-    public static final BitSet FOLLOW_statement_in_actorDeclaration730 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800020L});
-    public static final BitSet FOLLOW_87_in_actorDeclaration737 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_actorDeclaration_in_actorDeclarations779 = new BitSet(new long[]{0x4C40000000000002L,0x1E00000011000000L});
-    public static final BitSet FOLLOW_schedule_in_actorDeclarations783 = new BitSet(new long[]{0x0C40000000000002L,0x1E00000011000000L});
-    public static final BitSet FOLLOW_actorDeclaration_in_actorDeclarations785 = new BitSet(new long[]{0x0C40000000000002L,0x1E00000011000000L});
-    public static final BitSet FOLLOW_schedule_in_actorDeclarations802 = new BitSet(new long[]{0x0C40000000000002L,0x1E00000011000000L});
-    public static final BitSet FOLLOW_actorDeclaration_in_actorDeclarations804 = new BitSet(new long[]{0x0C40000000000002L,0x1E00000011000000L});
-    public static final BitSet FOLLOW_93_in_actorImport824 = new BitSet(new long[]{0x0000000000000000L,0x0000000040000020L});
-    public static final BitSet FOLLOW_94_in_actorImport829 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_qualifiedIdent_in_actorImport831 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_actorImport833 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_qualifiedIdent_in_actorImport839 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_actorImport841 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeDef_in_actorParameter856 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_actorParameter858 = new BitSet(new long[]{0x0000000000000002L,0x0000000002000000L});
-    public static final BitSet FOLLOW_89_in_actorParameter861 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_actorParameter863 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_actorParameter_in_actorParameters885 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_82_in_actorParameters888 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000000000L});
-    public static final BitSet FOLLOW_actorParameter_in_actorParameters890 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_un_expr_in_expression911 = new BitSet(new long[]{0x0000000000000002L,0x00003FFF8000000FL});
-    public static final BitSet FOLLOW_bop_in_expression917 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_un_expr_in_expression919 = new BitSet(new long[]{0x0000000000000002L,0x00003FFF8000000FL});
-    public static final BitSet FOLLOW_95_in_bop957 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_96_in_bop965 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_97_in_bop973 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_98_in_bop981 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_99_in_bop989 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_100_in_bop997 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_101_in_bop1005 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_102_in_bop1013 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_103_in_bop1021 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_104_in_bop1029 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_105_in_bop1037 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_106_in_bop1045 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_107_in_bop1053 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PLUS_in_bop1061 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_bop1069 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DIV_in_bop1077 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_108_in_bop1085 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TIMES_in_bop1093 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_109_in_bop1101 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_postfix_expression_in_un_expr1112 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_un_expr1126 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_110_in_un_expr1142 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_111_in_un_expr1158 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_112_in_un_expr1174 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_un_expr_in_un_expr1182 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_86_in_postfix_expression1202 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expressions_in_postfix_expression1206 = new BitSet(new long[]{0x0000000000000000L,0x0000000000808000L});
-    public static final BitSet FOLLOW_79_in_postfix_expression1209 = new BitSet(new long[]{0x0000000000000000L,0x0008000000000000L});
-    public static final BitSet FOLLOW_expressionGenerators_in_postfix_expression1213 = new BitSet(new long[]{0x0000000000000000L,0x0000000000800000L});
-    public static final BitSet FOLLOW_87_in_postfix_expression1217 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_constant_in_postfix_expression1236 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_83_in_postfix_expression1244 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_postfix_expression1246 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_postfix_expression1248 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_postfix_expression1258 = new BitSet(new long[]{0x0000000000000002L,0x0000000000090000L});
-    public static final BitSet FOLLOW_83_in_postfix_expression1266 = new BitSet(new long[]{0x0000000000000000L,0x0007C000005805A2L});
-    public static final BitSet FOLLOW_expressions_in_postfix_expression1268 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_postfix_expression1271 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_80_in_postfix_expression1291 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_postfix_expression1293 = new BitSet(new long[]{0x0000000000000000L,0x0000000000020000L});
-    public static final BitSet FOLLOW_81_in_postfix_expression1295 = new BitSet(new long[]{0x0000000000000002L,0x0000000000010000L});
-    public static final BitSet FOLLOW_113_in_constant1332 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_114_in_constant1344 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FLOAT_in_constant1356 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INTEGER_in_constant1368 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_in_constant1380 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_115_in_expressionGenerator1396 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000000000L});
-    public static final BitSet FOLLOW_parameter_in_expressionGenerator1398 = new BitSet(new long[]{0x0000000000000000L,0x0010000000000000L});
-    public static final BitSet FOLLOW_116_in_expressionGenerator1400 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_expressionGenerator1402 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expressionGenerator_in_expressionGenerators1412 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_82_in_expressionGenerators1415 = new BitSet(new long[]{0x0000000000000000L,0x0008000000000000L});
-    public static final BitSet FOLLOW_expressionGenerator_in_expressionGenerators1417 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_expression_in_expressions1431 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_82_in_expressions1434 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_expressions1436 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_ID_in_idents1455 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_82_in_idents1458 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_idents1460 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_typeDef_in_parameter1479 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_parameter1481 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_parameter_in_parameters1500 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_82_in_parameters1503 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000000000L});
-    public static final BitSet FOLLOW_parameter_in_parameters1505 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
-    public static final BitSet FOLLOW_qualifiedIdent_in_priorityInequality1524 = new BitSet(new long[]{0x0000000000000000L,0x0000008000000000L});
-    public static final BitSet FOLLOW_103_in_priorityInequality1527 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_qualifiedIdent_in_priorityInequality1529 = new BitSet(new long[]{0x0000000000000000L,0x0000008004000000L});
-    public static final BitSet FOLLOW_90_in_priorityInequality1533 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PRIORITY_in_priorityOrder1552 = new BitSet(new long[]{0x0000000000000000L,0x0020000000000020L});
-    public static final BitSet FOLLOW_priorityInequality_in_priorityOrder1554 = new BitSet(new long[]{0x0000000000000000L,0x0020000000000020L});
-    public static final BitSet FOLLOW_117_in_priorityOrder1557 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_qualifiedIdent1578 = new BitSet(new long[]{0x0000000000000002L,0x0040000000000000L});
-    public static final BitSet FOLLOW_118_in_qualifiedIdent1581 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_qualifiedIdent1583 = new BitSet(new long[]{0x0000000000000002L,0x0040000000000000L});
-    public static final BitSet FOLLOW_SCHEDULE_in_schedule1604 = new BitSet(new long[]{0x0000000000000000L,0x0080000000000000L});
-    public static final BitSet FOLLOW_119_in_schedule1606 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_schedule1608 = new BitSet(new long[]{0x0000000000000000L,0x0000000000008000L});
-    public static final BitSet FOLLOW_79_in_schedule1610 = new BitSet(new long[]{0x0000000000000000L,0x0020000000000020L});
-    public static final BitSet FOLLOW_stateTransition_in_schedule1612 = new BitSet(new long[]{0x0000000000000000L,0x0020000000000020L});
-    public static final BitSet FOLLOW_117_in_schedule1615 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_stateTransition1638 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
-    public static final BitSet FOLLOW_83_in_stateTransition1640 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_qualifiedIdent_in_stateTransition1642 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_stateTransition1644 = new BitSet(new long[]{0x0000000000000000L,0x0100000000000000L});
-    public static final BitSet FOLLOW_120_in_stateTransition1646 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_stateTransition1648 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_stateTransition1650 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_statement1684 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_statement1686 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_121_in_typeDef1700 = new BitSet(new long[]{0x0000000000000002L,0x0000000000080000L});
-    public static final BitSet FOLLOW_83_in_typeDef1703 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_typeDef1705 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_typeDef1707 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_122_in_typeDef1734 = new BitSet(new long[]{0x0000000000000002L,0x0000000000080000L});
-    public static final BitSet FOLLOW_83_in_typeDef1737 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_typeDef1739 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
-    public static final BitSet FOLLOW_84_in_typeDef1741 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_123_in_typeDef1768 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_124_in_typeDef1780 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_88_in_varDecl1804 = new BitSet(new long[]{0x0000000000000000L,0x1E00000000000000L});
-    public static final BitSet FOLLOW_typeDef_in_varDecl1806 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_varDecl1808 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
-    public static final BitSet FOLLOW_89_in_varDecl1810 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_varDecl1812 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_varDecl1814 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeDef_in_varDecl1832 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000020L});
-    public static final BitSet FOLLOW_ID_in_varDecl1834 = new BitSet(new long[]{0x0000000000000000L,0x0000000006000000L});
-    public static final BitSet FOLLOW_89_in_varDecl1840 = new BitSet(new long[]{0x0000000000000000L,0x0007C000004805A2L});
-    public static final BitSet FOLLOW_expression_in_varDecl1842 = new BitSet(new long[]{0x0000000000000000L,0x0000000004000000L});
-    public static final BitSet FOLLOW_90_in_varDecl1844 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_90_in_varDecl1864 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ACTION_in_actionOrInitialize284 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040010L});
+    public static final BitSet FOLLOW_qualifiedIdent_in_actionOrInitialize286 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_actionOrInitialize289 = new BitSet(new long[]{0x0000000000000000L,0x0000000000108010L});
+    public static final BitSet FOLLOW_actionInputs_in_actionOrInitialize291 = new BitSet(new long[]{0x0000000000000000L,0x0000000000100000L});
+    public static final BitSet FOLLOW_84_in_actionOrInitialize294 = new BitSet(new long[]{0x0000000000000000L,0x0000000000088010L});
+    public static final BitSet FOLLOW_actionOutputs_in_actionOrInitialize296 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_actionOrInitialize299 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_actionGuards_in_actionOrInitialize305 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_statement_block_in_actionOrInitialize312 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INITIALIZE_in_actionOrInitialize376 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040010L});
+    public static final BitSet FOLLOW_qualifiedIdent_in_actionOrInitialize378 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_actionOrInitialize381 = new BitSet(new long[]{0x0000000000000000L,0x0000000000088010L});
+    public static final BitSet FOLLOW_actionOutputs_in_actionOrInitialize383 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_actionOrInitialize386 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_actionGuards_in_actionOrInitialize392 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_statement_block_in_actionOrInitialize400 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_actionOrInitialize_in_actorDeclaration460 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_priorityOrder_in_actorDeclaration464 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_87_in_actorDeclaration469 = new BitSet(new long[]{0x0000000000000000L,0xF800000000000010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_typeDef_in_actorDeclaration471 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_actorDeclaration473 = new BitSet(new long[]{0x0000000000000000L,0x0000000001008000L});
+    public static final BitSet FOLLOW_88_in_actorDeclaration479 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_actorDeclaration481 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_actorDeclaration483 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeListSpec_in_actorDeclaration503 = new BitSet(new long[]{0x0000000000000000L,0x0000000001000000L});
+    public static final BitSet FOLLOW_88_in_actorDeclaration505 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_actorDeclaration507 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_actorDeclaration509 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeDef_in_actorDeclaration539 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_actorDeclaration541 = new BitSet(new long[]{0x0000000000000000L,0x0000000003048000L});
+    public static final BitSet FOLLOW_88_in_actorDeclaration548 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_actorDeclaration550 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_actorDeclaration554 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeListSpec_in_actorDeclaration575 = new BitSet(new long[]{0x0000000000000000L,0x0000000003000000L});
+    public static final BitSet FOLLOW_88_in_actorDeclaration578 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_actorDeclaration580 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_actorDeclaration584 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_82_in_actorDeclaration612 = new BitSet(new long[]{0x0000000000000000L,0xF800000000080010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_parameters_in_actorDeclaration614 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_actorDeclaration617 = new BitSet(new long[]{0x0000000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_85_in_actorDeclaration619 = new BitSet(new long[]{0x0000000000000000L,0xF800000004800010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_varDecl_in_actorDeclaration627 = new BitSet(new long[]{0x0000000000000000L,0xF800000004800010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_90_in_actorDeclaration636 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_actorDeclaration638 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_actorDeclaration640 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_86_in_actorDeclaration646 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_91_in_actorDeclaration679 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_actorDeclaration681 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_actorDeclaration683 = new BitSet(new long[]{0x0000000000000000L,0xF800000000080010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_parameters_in_actorDeclaration685 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_actorDeclaration688 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_statement_block_in_actorDeclaration690 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_actorDeclaration_in_actorDeclarations720 = new BitSet(new long[]{0x4C40000000000002L,0xF800000008800010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_schedule_in_actorDeclarations724 = new BitSet(new long[]{0x0C40000000000002L,0xF800000008800010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_actorDeclaration_in_actorDeclarations726 = new BitSet(new long[]{0x0C40000000000002L,0xF800000008800010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_schedule_in_actorDeclarations743 = new BitSet(new long[]{0x0C40000000000002L,0xF800000008800010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_actorDeclaration_in_actorDeclarations745 = new BitSet(new long[]{0x0C40000000000002L,0xF800000008800010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_92_in_actorImport765 = new BitSet(new long[]{0x0000000000000000L,0x0000000020000010L});
+    public static final BitSet FOLLOW_93_in_actorImport770 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_qualifiedIdent_in_actorImport772 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_actorImport774 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_qualifiedIdent_in_actorImport780 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_actorImport782 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeDef_in_actorParameter797 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_actorParameter799 = new BitSet(new long[]{0x0000000000000002L,0x0000000001000000L});
+    public static final BitSet FOLLOW_88_in_actorParameter802 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_actorParameter804 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_actorParameter_in_actorParameters826 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_81_in_actorParameters829 = new BitSet(new long[]{0x0000000000000000L,0xF800000000000010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_actorParameter_in_actorParameters831 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_un_expr_in_expression852 = new BitSet(new long[]{0x8000000000000002L,0x00001FFFC0000007L});
+    public static final BitSet FOLLOW_bop_in_expression858 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_un_expr_in_expression860 = new BitSet(new long[]{0x8000000000000002L,0x00001FFFC0000007L});
+    public static final BitSet FOLLOW_94_in_bop898 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_95_in_bop906 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_96_in_bop914 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_97_in_bop922 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_98_in_bop930 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_99_in_bop938 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_100_in_bop946 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_101_in_bop954 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_102_in_bop962 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_103_in_bop970 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_104_in_bop978 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_105_in_bop986 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_106_in_bop994 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PLUS_in_bop1002 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MINUS_in_bop1010 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DIV_in_bop1018 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_107_in_bop1026 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TIMES_in_bop1034 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_108_in_bop1042 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_postfix_expression_in_un_expr1053 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MINUS_in_un_expr1067 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_109_in_un_expr1083 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_110_in_un_expr1099 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_111_in_un_expr1115 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_un_expr_in_un_expr1123 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_85_in_postfix_expression1143 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expressions_in_postfix_expression1147 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_86_in_postfix_expression1149 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_112_in_postfix_expression1162 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_postfix_expression1164 = new BitSet(new long[]{0x0000000000000000L,0xF800000000000010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_generatorDecls_in_postfix_expression1166 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_postfix_expression1168 = new BitSet(new long[]{0x0000000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_85_in_postfix_expression1170 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression1172 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_86_in_postfix_expression1174 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_113_in_postfix_expression1178 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression1182 = new BitSet(new long[]{0x0000000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_85_in_postfix_expression1184 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression1188 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_86_in_postfix_expression1190 = new BitSet(new long[]{0x0000000000000000L,0x0004000000000000L});
+    public static final BitSet FOLLOW_114_in_postfix_expression1192 = new BitSet(new long[]{0x0000000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_85_in_postfix_expression1194 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression1198 = new BitSet(new long[]{0x0000000000000000L,0x0000000000400000L});
+    public static final BitSet FOLLOW_86_in_postfix_expression1200 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_constant_in_postfix_expression1219 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_82_in_postfix_expression1227 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression1229 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_postfix_expression1231 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_postfix_expression1241 = new BitSet(new long[]{0x0000000000000002L,0x0000000000048000L});
+    public static final BitSet FOLLOW_82_in_postfix_expression1249 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002C02D1L});
+    public static final BitSet FOLLOW_expressions_in_postfix_expression1251 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_postfix_expression1254 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_79_in_postfix_expression1274 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_postfix_expression1276 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010000L});
+    public static final BitSet FOLLOW_80_in_postfix_expression1278 = new BitSet(new long[]{0x0000000000000002L,0x0000000000008000L});
+    public static final BitSet FOLLOW_115_in_constant1315 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_116_in_constant1327 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FLOAT_in_constant1339 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INTEGER_in_constant1351 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_in_constant1363 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_parameter_in_generatorDecl1378 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_78_in_generatorDecl1380 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_generatorDecl1382 = new BitSet(new long[]{0x0000000000000000L,0x0020000000000000L});
+    public static final BitSet FOLLOW_117_in_generatorDecl1384 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_generatorDecl1386 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_generatorDecl_in_generatorDecls1393 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_81_in_generatorDecls1396 = new BitSet(new long[]{0x0000000000000000L,0xF800000000000010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_generatorDecl_in_generatorDecls1398 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_expression_in_expressions1407 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_81_in_expressions1410 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_expressions1412 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_ID_in_idents1431 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_81_in_idents1434 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_idents1436 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_typeDefId_in_parameter1455 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_parameter_in_parameters1472 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_81_in_parameters1475 = new BitSet(new long[]{0x0000000000000000L,0xF800000000000010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_parameter_in_parameters1477 = new BitSet(new long[]{0x0000000000000002L,0x0000000000020000L});
+    public static final BitSet FOLLOW_qualifiedIdent_in_priorityInequality1496 = new BitSet(new long[]{0x0000000000000000L,0x0000004000000000L});
+    public static final BitSet FOLLOW_102_in_priorityInequality1499 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_qualifiedIdent_in_priorityInequality1501 = new BitSet(new long[]{0x0000000000000000L,0x0000004002000000L});
+    public static final BitSet FOLLOW_89_in_priorityInequality1505 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PRIORITY_in_priorityOrder1522 = new BitSet(new long[]{0x0000000000000000L,0x0040000000000010L});
+    public static final BitSet FOLLOW_priorityInequality_in_priorityOrder1524 = new BitSet(new long[]{0x0000000000000000L,0x0040000000000010L});
+    public static final BitSet FOLLOW_118_in_priorityOrder1527 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_qualifiedIdent1548 = new BitSet(new long[]{0x0000000000000002L,0x0080000000000000L});
+    public static final BitSet FOLLOW_119_in_qualifiedIdent1551 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_qualifiedIdent1553 = new BitSet(new long[]{0x0000000000000002L,0x0080000000000000L});
+    public static final BitSet FOLLOW_SCHEDULE_in_schedule1578 = new BitSet(new long[]{0x0000000000000000L,0x0100000000000000L});
+    public static final BitSet FOLLOW_120_in_schedule1580 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_schedule1582 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_78_in_schedule1584 = new BitSet(new long[]{0x0000000000000000L,0x0040000000000010L});
+    public static final BitSet FOLLOW_stateTransition_in_schedule1586 = new BitSet(new long[]{0x0000000000000000L,0x0040000000000010L});
+    public static final BitSet FOLLOW_118_in_schedule1589 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_stateTransition1612 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_stateTransition1614 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_qualifiedIdent_in_stateTransition1616 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_stateTransition1618 = new BitSet(new long[]{0x0000000000000000L,0x0200000000000000L});
+    public static final BitSet FOLLOW_121_in_stateTransition1620 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_stateTransition1622 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_stateTransition1624 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_statement_block_in_statement1650 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_112_in_statement1654 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_statement1656 = new BitSet(new long[]{0x0000000000000000L,0xF800000000000010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_parameter_in_statement1658 = new BitSet(new long[]{0x0000000000000000L,0x0000000000004000L});
+    public static final BitSet FOLLOW_78_in_statement1660 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_statement1664 = new BitSet(new long[]{0x0000000000000000L,0x0020000000000000L});
+    public static final BitSet FOLLOW_117_in_statement1666 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_statement1670 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_statement1672 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_statement_block_in_statement1674 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_113_in_statement1680 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_statement1682 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_statement1684 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_statement1686 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_statement_block_in_statement1690 = new BitSet(new long[]{0x0000000000000002L,0x0004000000000000L});
+    public static final BitSet FOLLOW_114_in_statement1693 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_statement_block_in_statement1697 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_122_in_statement1705 = new BitSet(new long[]{0x0000000000000000L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_statement1707 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_statement1709 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_statement1711 = new BitSet(new long[]{0x0200000000000000L,0x0000000000200000L});
+    public static final BitSet FOLLOW_statement_block_in_statement1713 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_statement1720 = new BitSet(new long[]{0x0000000000000000L,0x0000000001048000L});
+    public static final BitSet FOLLOW_79_in_statement1730 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_statement1732 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010000L});
+    public static final BitSet FOLLOW_80_in_statement1734 = new BitSet(new long[]{0x0000000000000000L,0x0000000001008000L});
+    public static final BitSet FOLLOW_88_in_statement1738 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_statement1740 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_statement1742 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_82_in_statement1752 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002C02D1L});
+    public static final BitSet FOLLOW_expressions_in_statement1754 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_statement1757 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_statement1759 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_85_in_statement_block1770 = new BitSet(new long[]{0x0200000000000000L,0xFC03000000E00010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_varDecl_in_statement_block1772 = new BitSet(new long[]{0x0200000000000000L,0xFC03000000E00010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_statement_in_statement_block1775 = new BitSet(new long[]{0x0200000000000000L,0x0403000000600010L});
+    public static final BitSet FOLLOW_86_in_statement_block1778 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_123_in_typeDef1808 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_124_in_typeDef1820 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_125_in_typeDef1832 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_126_in_typeDef1844 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_typeDef1847 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_typeDef1849 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_typeDef1851 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_127_in_typeDef1872 = new BitSet(new long[]{0x0000000000000000L,0x7000000000000000L});
+    public static final BitSet FOLLOW_124_in_typeDef1877 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_125_in_typeDef1893 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_126_in_typeDef1909 = new BitSet(new long[]{0x0000000000000002L,0x0000000000040000L});
+    public static final BitSet FOLLOW_82_in_typeDef1912 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_typeDef1914 = new BitSet(new long[]{0x0000000000000000L,0x0000000000080000L});
+    public static final BitSet FOLLOW_83_in_typeDef1916 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_128_in_typeDef1940 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeDef_in_typeDefId1957 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+    public static final BitSet FOLLOW_ID_in_typeDefId1959 = new BitSet(new long[]{0x0000000000000002L,0x0000000001008000L});
+    public static final BitSet FOLLOW_typeListSpec_in_typeDefId1975 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_79_in_typeListSpec1996 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_typeListSpec1998 = new BitSet(new long[]{0x0000000000000000L,0x0000000000010000L});
+    public static final BitSet FOLLOW_80_in_typeListSpec2000 = new BitSet(new long[]{0x0000000000000002L,0x0000000000008000L});
+    public static final BitSet FOLLOW_87_in_varDecl2023 = new BitSet(new long[]{0x0000000000000000L,0xF800000000000010L,0x0000000000000001L});
+    public static final BitSet FOLLOW_typeDefId_in_varDecl2025 = new BitSet(new long[]{0x0000000000000000L,0x0000000001000000L});
+    public static final BitSet FOLLOW_88_in_varDecl2027 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_varDecl2029 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_varDecl2031 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeDefId_in_varDecl2047 = new BitSet(new long[]{0x0000000000000000L,0x0000000003000000L});
+    public static final BitSet FOLLOW_88_in_varDecl2050 = new BitSet(new long[]{0x0000000000000000L,0x001BE000002402D1L});
+    public static final BitSet FOLLOW_expression_in_varDecl2052 = new BitSet(new long[]{0x0000000000000000L,0x0000000002000000L});
+    public static final BitSet FOLLOW_89_in_varDecl2056 = new BitSet(new long[]{0x0000000000000002L});
 
 }
