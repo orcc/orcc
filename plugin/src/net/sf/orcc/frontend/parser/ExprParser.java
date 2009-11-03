@@ -34,8 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
-import net.sf.orcc.frontend.parser.internal.RVCCalParser;
+import net.sf.orcc.frontend.parser.internal.ALBaseLexer;
 import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -45,16 +44,11 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.util.BinOpSeqParser;
 
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.Lexer;
-import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.Tree;
 
 /**
  * This class defines a parser that can parse RVC-CAL expressions and translate
- * them to IR expressions. The parser can parse both ANTLR trees or Strings.
+ * them to IR expressions.
  * 
  * @author Matthieu Wipliez
  * 
@@ -72,43 +66,43 @@ public class ExprParser {
 	 */
 	private BinaryOp parseBinaryOp(Tree op) throws OrccException {
 		switch (op.getType()) {
-		case RVCCalLexer.AND:
+		case ALBaseLexer.LOGIC_AND:
 			return BinaryOp.LOGIC_AND;
-		case RVCCalLexer.BITAND:
+		case ALBaseLexer.BITAND:
 			return BinaryOp.BITAND;
-		case RVCCalLexer.BITOR:
+		case ALBaseLexer.BITOR:
 			return BinaryOp.BITOR;
-		case RVCCalLexer.DIV:
+		case ALBaseLexer.DIV:
 			return BinaryOp.DIV;
-		case RVCCalLexer.DIV_INT:
+		case ALBaseLexer.DIV_INT:
 			return BinaryOp.DIV_INT;
-		case RVCCalLexer.EQ:
+		case ALBaseLexer.EQ:
 			return BinaryOp.EQ;
-		case RVCCalLexer.EXP:
+		case ALBaseLexer.EXP:
 			return BinaryOp.EXP;
-		case RVCCalLexer.GE:
+		case ALBaseLexer.GE:
 			return BinaryOp.GE;
-		case RVCCalLexer.GT:
+		case ALBaseLexer.GT:
 			return BinaryOp.GT;
-		case RVCCalLexer.LE:
+		case ALBaseLexer.LE:
 			return BinaryOp.LE;
-		case RVCCalLexer.LT:
+		case ALBaseLexer.LT:
 			return BinaryOp.LT;
-		case RVCCalLexer.MINUS:
+		case ALBaseLexer.MINUS:
 			return BinaryOp.MINUS;
-		case RVCCalLexer.MOD:
+		case ALBaseLexer.MOD:
 			return BinaryOp.MOD;
-		case RVCCalLexer.NE:
+		case ALBaseLexer.NE:
 			return BinaryOp.NE;
-		case RVCCalLexer.OR:
+		case ALBaseLexer.LOGIC_OR:
 			return BinaryOp.LOGIC_OR;
-		case RVCCalLexer.PLUS:
+		case ALBaseLexer.PLUS:
 			return BinaryOp.PLUS;
-		case RVCCalLexer.SHIFT_LEFT:
+		case ALBaseLexer.SHIFT_LEFT:
 			return BinaryOp.SHIFT_LEFT;
-		case RVCCalLexer.SHIFT_RIGHT:
+		case ALBaseLexer.SHIFT_RIGHT:
 			return BinaryOp.SHIFT_RIGHT;
-		case RVCCalLexer.TIMES:
+		case ALBaseLexer.TIMES:
 			return BinaryOp.TIMES;
 		default:
 			throw new OrccException("Unknown operator: " + op.getText());
@@ -144,28 +138,6 @@ public class ExprParser {
 	}
 
 	/**
-	 * Parses the given input as an expression.
-	 * 
-	 * @param input
-	 *            a string that supposedly represents a valid RVC-CAL expression
-	 * @return an {@link IExpr}
-	 * @throws OrccException
-	 *             if there was a parse error.
-	 */
-	public IExpr parseExpression(String input) throws OrccException {
-		try {
-			CharStream stream = new ANTLRStringStream(input);
-			Lexer lexer = new RVCCalLexer(stream);
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
-			RVCCalParser parser = new RVCCalParser(tokens);
-			RVCCalParser.expression_return ret = parser.expression();
-			return parseExpression((Tree) ret.getTree());
-		} catch (RecognitionException e) {
-			throw new OrccException("parse error", e);
-		}
-	}
-
-	/**
 	 * Parses the given tree as an expression. This method is package because it
 	 * should be called from {@link RVCCalASTParser} only.
 	 * 
@@ -176,23 +148,23 @@ public class ExprParser {
 	 */
 	IExpr parseExpression(Tree expr) throws OrccException {
 		switch (expr.getType()) {
-		case RVCCalLexer.EXPR_BINARY:
+		case ALBaseLexer.EXPR_BINARY:
 			return parseBinOpSeq(expr);
-		case RVCCalLexer.EXPR_BOOL: {
+		case ALBaseLexer.EXPR_BOOL: {
 			expr = expr.getChild(0);
 			boolean value = Boolean.parseBoolean(expr.getText());
 			return new BooleanExpr(parseLocation(expr), value);
 		}
-		case RVCCalLexer.EXPR_FLOAT:
+		case ALBaseLexer.EXPR_FLOAT:
 			throw new OrccException("not yet implemented!");
-		case RVCCalLexer.EXPR_INT:
+		case ALBaseLexer.EXPR_INT:
 			expr = expr.getChild(0);
 			int value = Integer.parseInt(expr.getText());
 			return new IntExpr(parseLocation(expr), value);
-		case RVCCalLexer.EXPR_STRING:
+		case ALBaseLexer.EXPR_STRING:
 			expr = expr.getChild(0);
 			return new StringExpr(parseLocation(expr), expr.getText());
-		case RVCCalLexer.EXPR_VAR:
+		case ALBaseLexer.EXPR_VAR:
 			expr = expr.getChild(0);
 			Use localUse = null;
 			return new VarExpr(parseLocation(expr), localUse);

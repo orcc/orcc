@@ -27,7 +27,11 @@
  * SUCH DAMAGE.
  */
 
-grammar RVCCal;
+// this grammar defines a grammar for C-AL (C Actor Language).
+// C-AL has the same semantics as CAL (CAL Actor Language), but with
+// a C-like syntax.
+
+grammar C_AL;
 
 options {
   k = 1;
@@ -69,9 +73,9 @@ actionStatements: 'do' statement* -> statement*;
 /***************************************************************************/
 /* a CAL actor. */
 
-actor: actorImport* ACTOR ID ('[' ']')? '(' actorParameters? ')'
-	inputs=actorPortDecls? '==>' outputs=actorPortDecls? ':'
-	actorDeclarations? 'end' EOF
+actor: actorImport* ACTOR ID '(' actorParameters? ')'
+	inputs=actorPortDecls? '==>' outputs=actorPortDecls? '{'
+	actorDeclarations? '}' EOF
 	-> ACTOR ID
 	^(PARAMETERS actorParameters?)
 	^(INPUTS $inputs?)
@@ -164,21 +168,23 @@ expression: un_expr
   ((bop un_expr)+ -> ^(EXPR_BINARY ^(EXPR un_expr+) ^(OP bop+))
   | -> un_expr);
 
-bop: ('or' | '||') -> LOGIC_OR
-| ('and' | '&&') -> LOGIC_AND
+bop: '||' -> LOGIC_OR
+| '&&' -> LOGIC_AND
 | '|' -> BITOR
+| '^' -> BITXOR
 | '&' -> BITAND
-| '=' -> EQ | '!=' -> NE
+| '==' -> EQ | '!=' -> NE
 | '<' -> LT | '>' -> GT | '<=' -> LE | '>=' -> GE
 | '<<' -> SHIFT_LEFT | '>>' -> SHIFT_RIGHT
 | PLUS -> PLUS | MINUS -> MINUS
-| DIV -> DIV | 'div' -> DIV_INT | 'mod' -> MOD | TIMES -> TIMES
-| '^' -> EXP;
+| DIV -> DIV | '%' -> MOD | TIMES -> TIMES
+| '**' -> EXP;
 
 un_expr: postfix_expression -> postfix_expression
-  | un_op un_expr -> ^(EXPR_UNARY un_op un_expr);
-
-un_op: MINUS -> MINUS | 'not' -> LOGIC_NOT | '#' -> NUM_ELTS;
+  | (op=(MINUS -> MINUS)
+    | op=('~' -> BITNOT)
+    | op=('!' -> LOGIC_NOT)
+    | op=('#' -> NUM_ELTS)) un_expr -> ^(EXPR_UNARY $op un_expr);
 
 postfix_expression:
   '[' e=expressions (':' g=expressionGenerators)? ']' -> ^(EXPR_LIST $e $g?)
@@ -246,10 +252,6 @@ statement:
 
 /*****************************************************************************/
 /* type attributes and definitions */
-
-/* a type attribute, such as "type:" and "size=" */
-// thanks to the language designers, there is no specific name for type attributes.
-// even though only type and expr attributes are taken into account.
 
 typeAttr: ID (':' typeDef -> ^(TYPE ID typeDef) | '=' expression -> ^(EXPR ID expression)) ;
 
