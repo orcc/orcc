@@ -1,12 +1,14 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 C_AL__.g 2009-11-03 22:45:49
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 C_AL__.g 2009-11-04 13:16:01
 
 package net.sf.orcc.frontend.parser.internal;
 
 
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.DFA;
+import org.antlr.runtime.Lexer;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
 
 public class C_ALLexer extends Lexer {
     public static final int FUNCTION=56;

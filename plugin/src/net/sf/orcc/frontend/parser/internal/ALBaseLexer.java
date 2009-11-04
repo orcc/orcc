@@ -1,6 +1,6 @@
 package net.sf.orcc.frontend.parser.internal;
 
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g 2009-11-03 16:28:16
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g 2009-11-04 13:15:57
 
 import org.antlr.runtime.BaseRecognizer;
 import org.antlr.runtime.CharStream;
@@ -29,6 +29,7 @@ public class ALBaseLexer extends Lexer {
     public static final int EXPR_CALL=23;
     public static final int Exponent=69;
     public static final int FLOAT=70;
+    public static final int TYPE_LIST=32;
     public static final int INPUTS=4;
     public static final int EXPR_FLOAT=27;
     public static final int EXPR_UNARY=19;
@@ -52,7 +53,7 @@ public class ALBaseLexer extends Lexer {
     public static final int EQ=40;
     public static final int NE=41;
     public static final int INTEGER=71;
-    public static final int ASSIGNABLE=32;
+    public static final int ASSIGNABLE=33;
     public static final int GE=45;
     public static final int INITIALIZE=58;
     public static final int LINE_COMMENT=75;
@@ -61,14 +62,13 @@ public class ALBaseLexer extends Lexer {
     public static final int LOGIC_OR=35;
     public static final int WHITESPACE=77;
     public static final int INEQUALITY=14;
-    public static final int NON_ASSIGNABLE=33;
+    public static final int NON_ASSIGNABLE=34;
     public static final int MINUS=64;
     public static final int EXPR_IF=22;
     public static final int EXPR_IDX=24;
     public static final int MULTI_LINE_COMMENT=76;
     public static final int PROCEDURE=60;
     public static final int TAG=16;
-    public static final int QID=34;
     public static final int SHIFT_LEFT=46;
     public static final int SHIFT_RIGHT=47;
     public static final int BITOR=37;
@@ -100,15 +100,15 @@ public class ALBaseLexer extends Lexer {
         super(input,state);
 
     }
-    public String getGrammarFileName() { return "D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g"; }
+    public String getGrammarFileName() { return "D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g"; }
 
     // $ANTLR start "ACTION"
     public final void mACTION() throws RecognitionException {
         try {
             int _type = ACTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:106:7: ( 'action' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:106:9: 'action'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:104:7: ( 'action' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:104:9: 'action'
             {
             match("action"); 
 
@@ -128,8 +128,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = ACTOR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:107:6: ( 'actor' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:107:8: 'actor'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:105:6: ( 'actor' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:105:8: 'actor'
             {
             match("actor"); 
 
@@ -149,8 +149,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = FUNCTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:108:9: ( 'function' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:108:11: 'function'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:106:9: ( 'function' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:106:11: 'function'
             {
             match("function"); 
 
@@ -170,8 +170,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = GUARD;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:109:6: ( 'guard' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:109:8: 'guard'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:107:6: ( 'guard' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:107:8: 'guard'
             {
             match("guard"); 
 
@@ -191,8 +191,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = INITIALIZE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:110:11: ( 'initialize' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:110:13: 'initialize'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:108:11: ( 'initialize' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:108:13: 'initialize'
             {
             match("initialize"); 
 
@@ -212,8 +212,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = PRIORITY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:111:9: ( 'priority' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:111:11: 'priority'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:109:9: ( 'priority' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:109:11: 'priority'
             {
             match("priority"); 
 
@@ -233,8 +233,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = PROCEDURE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:112:10: ( 'procedure' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:112:12: 'procedure'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:110:10: ( 'procedure' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:110:12: 'procedure'
             {
             match("procedure"); 
 
@@ -254,8 +254,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = REPEAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:113:7: ( 'repeat' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:113:9: 'repeat'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:111:7: ( 'repeat' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:111:9: 'repeat'
             {
             match("repeat"); 
 
@@ -275,8 +275,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = SCHEDULE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:114:9: ( 'schedule' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:114:11: 'schedule'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:112:9: ( 'schedule' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:112:11: 'schedule'
             {
             match("schedule"); 
 
@@ -296,8 +296,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = PLUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:117:5: ( '+' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:117:7: '+'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:115:5: ( '+' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:115:7: '+'
             {
             match('+'); 
 
@@ -316,8 +316,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = MINUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:118:6: ( '-' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:118:8: '-'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:116:6: ( '-' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:116:8: '-'
             {
             match('-'); 
 
@@ -336,8 +336,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = TIMES;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:119:6: ( '*' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:119:8: '*'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:117:6: ( '*' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:117:8: '*'
             {
             match('*'); 
 
@@ -356,8 +356,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = DIV;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:120:4: ( '/' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:120:6: '/'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:118:4: ( '/' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:118:6: '/'
             {
             match('/'); 
 
@@ -376,11 +376,11 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:123:3: ( LETTER ( LETTER | '0' .. '9' )* )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:123:5: LETTER ( LETTER | '0' .. '9' )*
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:121:3: ( LETTER ( LETTER | '0' .. '9' )* )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:121:5: LETTER ( LETTER | '0' .. '9' )*
             {
             mLETTER(); 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:123:12: ( LETTER | '0' .. '9' )*
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:121:12: ( LETTER | '0' .. '9' )*
             loop1:
             do {
                 int alt1=2;
@@ -393,7 +393,7 @@ public class ALBaseLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:
+            	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:
             	    {
             	    if ( input.LA(1)=='$'||(input.LA(1)>='0' && input.LA(1)<='9')||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
             	        input.consume();
@@ -427,8 +427,8 @@ public class ALBaseLexer extends Lexer {
     // $ANTLR start "LETTER"
     public final void mLETTER() throws RecognitionException {
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:7: ( '$' | 'A' .. 'Z' | 'a' .. 'z' | '_' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:124:7: ( '$' | 'A' .. 'Z' | 'a' .. 'z' | '_' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:
             {
             if ( input.LA(1)=='$'||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
                 input.consume();
@@ -453,17 +453,17 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = FLOAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:6: ( ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:6: ( ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent ) )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
             {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
             int alt8=3;
             alt8 = dfa8.predict(input);
             switch (alt8) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )?
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )?
                     {
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:9: ( '0' .. '9' )+
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:9: ( '0' .. '9' )+
                     int cnt2=0;
                     loop2:
                     do {
@@ -477,7 +477,7 @@ public class ALBaseLexer extends Lexer {
 
                         switch (alt2) {
                     	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:10: '0' .. '9'
+                    	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:10: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -494,7 +494,7 @@ public class ALBaseLexer extends Lexer {
                     } while (true);
 
                     match('.'); 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:25: ( '0' .. '9' )*
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:25: ( '0' .. '9' )*
                     loop3:
                     do {
                         int alt3=2;
@@ -507,7 +507,7 @@ public class ALBaseLexer extends Lexer {
 
                         switch (alt3) {
                     	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:26: '0' .. '9'
+                    	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:26: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -519,7 +519,7 @@ public class ALBaseLexer extends Lexer {
                         }
                     } while (true);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:37: ( Exponent )?
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:37: ( Exponent )?
                     int alt4=2;
                     int LA4_0 = input.LA(1);
 
@@ -528,7 +528,7 @@ public class ALBaseLexer extends Lexer {
                     }
                     switch (alt4) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:37: Exponent
+                            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:126:37: Exponent
                             {
                             mExponent(); 
 
@@ -541,10 +541,10 @@ public class ALBaseLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:129:4: '.' ( '0' .. '9' )+ ( Exponent )?
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:127:4: '.' ( '0' .. '9' )+ ( Exponent )?
                     {
                     match('.'); 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:129:8: ( '0' .. '9' )+
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:127:8: ( '0' .. '9' )+
                     int cnt5=0;
                     loop5:
                     do {
@@ -558,7 +558,7 @@ public class ALBaseLexer extends Lexer {
 
                         switch (alt5) {
                     	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:129:9: '0' .. '9'
+                    	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:127:9: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -574,7 +574,7 @@ public class ALBaseLexer extends Lexer {
                         cnt5++;
                     } while (true);
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:129:20: ( Exponent )?
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:127:20: ( Exponent )?
                     int alt6=2;
                     int LA6_0 = input.LA(1);
 
@@ -583,7 +583,7 @@ public class ALBaseLexer extends Lexer {
                     }
                     switch (alt6) {
                         case 1 :
-                            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:129:20: Exponent
+                            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:127:20: Exponent
                             {
                             mExponent(); 
 
@@ -596,9 +596,9 @@ public class ALBaseLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:130:4: ( '0' .. '9' )+ Exponent
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:4: ( '0' .. '9' )+ Exponent
                     {
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:130:4: ( '0' .. '9' )+
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:4: ( '0' .. '9' )+
                     int cnt7=0;
                     loop7:
                     do {
@@ -612,7 +612,7 @@ public class ALBaseLexer extends Lexer {
 
                         switch (alt7) {
                     	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:130:5: '0' .. '9'
+                    	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:128:5: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -649,8 +649,8 @@ public class ALBaseLexer extends Lexer {
     // $ANTLR start "Exponent"
     public final void mExponent() throws RecognitionException {
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:131:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:131:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -661,7 +661,7 @@ public class ALBaseLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:22: ( '+' | '-' )?
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:131:22: ( '+' | '-' )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -670,7 +670,7 @@ public class ALBaseLexer extends Lexer {
             }
             switch (alt9) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:
                     {
                     if ( input.LA(1)=='+'||input.LA(1)=='-' ) {
                         input.consume();
@@ -687,7 +687,7 @@ public class ALBaseLexer extends Lexer {
 
             }
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:33: ( '0' .. '9' )+
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:131:33: ( '0' .. '9' )+
             int cnt10=0;
             loop10:
             do {
@@ -701,7 +701,7 @@ public class ALBaseLexer extends Lexer {
 
                 switch (alt10) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:34: '0' .. '9'
+            	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:131:34: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -731,10 +731,10 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = INTEGER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:8: ( ( '0' | '1' .. '9' ( '0' .. '9' )* ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:10: ( '0' | '1' .. '9' ( '0' .. '9' )* )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:8: ( ( '0' | '1' .. '9' ( '0' .. '9' )* ) )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:10: ( '0' | '1' .. '9' ( '0' .. '9' )* )
             {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:10: ( '0' | '1' .. '9' ( '0' .. '9' )* )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:10: ( '0' | '1' .. '9' ( '0' .. '9' )* )
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -752,17 +752,17 @@ public class ALBaseLexer extends Lexer {
             }
             switch (alt12) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:11: '0'
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:11: '0'
                     {
                     match('0'); 
 
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:17: '1' .. '9' ( '0' .. '9' )*
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:17: '1' .. '9' ( '0' .. '9' )*
                     {
                     matchRange('1','9'); 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:26: ( '0' .. '9' )*
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:26: ( '0' .. '9' )*
                     loop11:
                     do {
                         int alt11=2;
@@ -775,7 +775,7 @@ public class ALBaseLexer extends Lexer {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:26: '0' .. '9'
+                    	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:133:26: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -809,11 +809,11 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:137:7: ( '\"' ( EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:137:9: '\"' ( EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:7: ( '\"' ( EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:9: '\"' ( EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:137:13: ( EscapeSequence | ~ ( '\\\\' | '\"' ) )*
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:13: ( EscapeSequence | ~ ( '\\\\' | '\"' ) )*
             loop13:
             do {
                 int alt13=3;
@@ -829,14 +829,14 @@ public class ALBaseLexer extends Lexer {
 
                 switch (alt13) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:137:15: EscapeSequence
+            	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:15: EscapeSequence
             	    {
             	    mEscapeSequence(); 
 
             	    }
             	    break;
             	case 2 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:137:32: ~ ( '\\\\' | '\"' )
+            	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:135:32: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -871,7 +871,7 @@ public class ALBaseLexer extends Lexer {
     // $ANTLR start "EscapeSequence"
     public final void mEscapeSequence() throws RecognitionException {
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:141:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | OctalEscape )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:139:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | OctalEscape )
             int alt14=2;
             int LA14_0 = input.LA(1);
 
@@ -899,7 +899,7 @@ public class ALBaseLexer extends Lexer {
             }
             switch (alt14) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:141:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:139:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
                     {
                     match('\\'); 
                     if ( input.LA(1)=='\"'||input.LA(1)=='\''||input.LA(1)=='\\'||input.LA(1)=='b'||input.LA(1)=='f'||input.LA(1)=='n'||input.LA(1)=='r'||input.LA(1)=='t' ) {
@@ -915,7 +915,7 @@ public class ALBaseLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:142:9: OctalEscape
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:140:9: OctalEscape
                     {
                     mOctalEscape(); 
 
@@ -932,7 +932,7 @@ public class ALBaseLexer extends Lexer {
     // $ANTLR start "OctalEscape"
     public final void mOctalEscape() throws RecognitionException {
         try {
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:145:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
             int alt15=3;
             int LA15_0 = input.LA(1);
 
@@ -978,25 +978,25 @@ public class ALBaseLexer extends Lexer {
             }
             switch (alt15) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:145:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:14: ( '0' .. '3' )
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:15: '0' .. '3'
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:145:14: ( '0' .. '3' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:145:15: '0' .. '3'
                     {
                     matchRange('0','3'); 
 
                     }
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:25: ( '0' .. '7' )
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:26: '0' .. '7'
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:145:25: ( '0' .. '7' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:145:26: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
                     }
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:36: ( '0' .. '7' )
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:37: '0' .. '7'
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:145:36: ( '0' .. '7' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:145:37: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1006,18 +1006,18 @@ public class ALBaseLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:148:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:146:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:148:14: ( '0' .. '7' )
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:148:15: '0' .. '7'
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:146:14: ( '0' .. '7' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:146:15: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
                     }
 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:148:25: ( '0' .. '7' )
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:148:26: '0' .. '7'
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:146:25: ( '0' .. '7' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:146:26: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1027,11 +1027,11 @@ public class ALBaseLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:149:9: '\\\\' ( '0' .. '7' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:9: '\\\\' ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:149:14: ( '0' .. '7' )
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:149:15: '0' .. '7'
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:14: ( '0' .. '7' )
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:147:15: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1053,12 +1053,12 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:152:13: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:152:15: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:150:13: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:150:15: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
             {
             match("//"); 
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:152:20: (~ ( '\\n' | '\\r' ) )*
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:150:20: (~ ( '\\n' | '\\r' ) )*
             loop16:
             do {
                 int alt16=2;
@@ -1071,7 +1071,7 @@ public class ALBaseLexer extends Lexer {
 
                 switch (alt16) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:152:20: ~ ( '\\n' | '\\r' )
+            	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:150:20: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1091,7 +1091,7 @@ public class ALBaseLexer extends Lexer {
                 }
             } while (true);
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:152:34: ( '\\r' )?
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:150:34: ( '\\r' )?
             int alt17=2;
             int LA17_0 = input.LA(1);
 
@@ -1100,7 +1100,7 @@ public class ALBaseLexer extends Lexer {
             }
             switch (alt17) {
                 case 1 :
-                    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:152:34: '\\r'
+                    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:150:34: '\\r'
                     {
                     match('\r'); 
 
@@ -1127,12 +1127,12 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = MULTI_LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:153:19: ( '/*' ( . )* '*/' )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:153:21: '/*' ( . )* '*/'
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:151:19: ( '/*' ( . )* '*/' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:151:21: '/*' ( . )* '*/'
             {
             match("/*"); 
 
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:153:26: ( . )*
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:151:26: ( . )*
             loop18:
             do {
                 int alt18=2;
@@ -1157,7 +1157,7 @@ public class ALBaseLexer extends Lexer {
 
                 switch (alt18) {
             	case 1 :
-            	    // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:153:26: .
+            	    // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:151:26: .
             	    {
             	    matchAny(); 
 
@@ -1188,8 +1188,8 @@ public class ALBaseLexer extends Lexer {
         try {
             int _type = WHITESPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:154:11: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
-            // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:154:13: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:152:11: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
+            // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:152:13: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
             {
             if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
                 input.consume();
@@ -1213,145 +1213,145 @@ public class ALBaseLexer extends Lexer {
     // $ANTLR end "WHITESPACE"
 
     public void mTokens() throws RecognitionException {
-        // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:8: ( ACTION | ACTOR | FUNCTION | GUARD | INITIALIZE | PRIORITY | PROCEDURE | REPEAT | SCHEDULE | PLUS | MINUS | TIMES | DIV | ID | FLOAT | INTEGER | STRING | LINE_COMMENT | MULTI_LINE_COMMENT | WHITESPACE )
+        // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:8: ( ACTION | ACTOR | FUNCTION | GUARD | INITIALIZE | PRIORITY | PROCEDURE | REPEAT | SCHEDULE | PLUS | MINUS | TIMES | DIV | ID | FLOAT | INTEGER | STRING | LINE_COMMENT | MULTI_LINE_COMMENT | WHITESPACE )
         int alt19=20;
         alt19 = dfa19.predict(input);
         switch (alt19) {
             case 1 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:10: ACTION
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:10: ACTION
                 {
                 mACTION(); 
 
                 }
                 break;
             case 2 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:17: ACTOR
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:17: ACTOR
                 {
                 mACTOR(); 
 
                 }
                 break;
             case 3 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:23: FUNCTION
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:23: FUNCTION
                 {
                 mFUNCTION(); 
 
                 }
                 break;
             case 4 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:32: GUARD
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:32: GUARD
                 {
                 mGUARD(); 
 
                 }
                 break;
             case 5 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:38: INITIALIZE
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:38: INITIALIZE
                 {
                 mINITIALIZE(); 
 
                 }
                 break;
             case 6 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:49: PRIORITY
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:49: PRIORITY
                 {
                 mPRIORITY(); 
 
                 }
                 break;
             case 7 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:58: PROCEDURE
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:58: PROCEDURE
                 {
                 mPROCEDURE(); 
 
                 }
                 break;
             case 8 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:68: REPEAT
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:68: REPEAT
                 {
                 mREPEAT(); 
 
                 }
                 break;
             case 9 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:75: SCHEDULE
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:75: SCHEDULE
                 {
                 mSCHEDULE(); 
 
                 }
                 break;
             case 10 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:84: PLUS
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:84: PLUS
                 {
                 mPLUS(); 
 
                 }
                 break;
             case 11 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:89: MINUS
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:89: MINUS
                 {
                 mMINUS(); 
 
                 }
                 break;
             case 12 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:95: TIMES
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:95: TIMES
                 {
                 mTIMES(); 
 
                 }
                 break;
             case 13 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:101: DIV
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:101: DIV
                 {
                 mDIV(); 
 
                 }
                 break;
             case 14 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:105: ID
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:105: ID
                 {
                 mID(); 
 
                 }
                 break;
             case 15 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:108: FLOAT
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:108: FLOAT
                 {
                 mFLOAT(); 
 
                 }
                 break;
             case 16 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:114: INTEGER
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:114: INTEGER
                 {
                 mINTEGER(); 
 
                 }
                 break;
             case 17 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:122: STRING
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:122: STRING
                 {
                 mSTRING(); 
 
                 }
                 break;
             case 18 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:129: LINE_COMMENT
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:129: LINE_COMMENT
                 {
                 mLINE_COMMENT(); 
 
                 }
                 break;
             case 19 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:142: MULTI_LINE_COMMENT
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:142: MULTI_LINE_COMMENT
                 {
                 mMULTI_LINE_COMMENT(); 
 
                 }
                 break;
             case 20 :
-                // D:\\repositories\\mwipliez\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:161: WHITESPACE
+                // D:\\orcc\\trunk\\plugin\\src\\net\\sf\\orcc\\frontend\\parser\\internal\\ALBaseLexer.g:1:161: WHITESPACE
                 {
                 mWHITESPACE(); 
 
@@ -1415,7 +1415,7 @@ public class ALBaseLexer extends Lexer {
             this.transition = DFA8_transition;
         }
         public String getDescription() {
-            return "128:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )";
+            return "126:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )";
         }
     }
     static final String DFA19_eotS =

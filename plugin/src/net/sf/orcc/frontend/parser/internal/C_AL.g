@@ -256,7 +256,7 @@ statement_block: '{' varDecl* statement* '}' -> ^(VARIABLES varDecl*) ^(STATEMEN
 /* type attributes and definitions */
 
 typeDef:
-| 'bool' -> ^(TYPE 'bool')
+  'bool' -> ^(TYPE 'bool')
 | 'char' -> ^(TYPE 'char')
 | 'short' -> ^(TYPE 'short')
 | 'int' ('(' expression ')')? -> ^(TYPE 'int' ^(EXPR expression)?)
