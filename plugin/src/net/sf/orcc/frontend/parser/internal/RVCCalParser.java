@@ -5,14 +5,24 @@ package net.sf.orcc.frontend.parser.internal;
 // @SuppressWarnings("unused")
 
 
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.DFA;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.Parser;
+import org.antlr.runtime.ParserRuleReturnScope;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.RewriteEarlyExitException;
+import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
+import org.antlr.runtime.tree.RewriteRuleTokenStream;
+import org.antlr.runtime.tree.TreeAdaptor;
 
-
-import org.antlr.runtime.tree.*;
-
+@SuppressWarnings("unused")
 public class RVCCalParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "INPUTS", "OUTPUTS", "PARAMETERS", "STATEMENTS", "VARIABLE", "VARIABLES", "ACTOR_DECLS", "STATE_VAR", "TRANSITION", "TRANSITIONS", "INEQUALITY", "GUARDS", "TAG", "EXPR", "EXPR_BINARY", "EXPR_UNARY", "OP", "EXPR_LIST", "EXPR_IF", "EXPR_CALL", "EXPR_IDX", "EXPR_VAR", "EXPR_BOOL", "EXPR_FLOAT", "EXPR_INT", "EXPR_STRING", "TYPE", "TYPE_ATTRS", "TYPE_LIST", "ASSIGNABLE", "NON_ASSIGNABLE", "LOGIC_OR", "LOGIC_AND", "BITOR", "BITXOR", "BITAND", "EQ", "NE", "LT", "GT", "LE", "GE", "SHIFT_LEFT", "SHIFT_RIGHT", "DIV_INT", "MOD", "EXP", "BITNOT", "LOGIC_NOT", "NUM_ELTS", "ASSIGN", "CALL", "EXPRESSIONS", "ACTION", "ACTOR", "FUNCTION", "GUARD", "INITIALIZE", "PRIORITY", "PROCEDURE", "REPEAT", "SCHEDULE", "PLUS", "MINUS", "TIMES", "DIV", "LETTER", "ID", "Exponent", "FLOAT", "INTEGER", "EscapeSequence", "STRING", "OctalEscape", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "':'", "'['", "']'", "','", "'do'", "'('", "')'", "'==>'", "'end'", "'.'", "'var'", "'='", "':='", "';'", "'-->'", "'begin'", "'import'", "'all'", "'or'", "'||'", "'and'", "'&&'", "'|'", "'&'", "'!='", "'<'", "'>'", "'<='", "'>='", "'<<'", "'>>'", "'div'", "'mod'", "'^'", "'not'", "'#'", "'if'", "'then'", "'else'", "'true'", "'false'", "'for'", "'in'", "'fsm'", "'foreach'", "'..'", "'while'"
