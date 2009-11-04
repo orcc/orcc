@@ -1,15 +1,23 @@
-group main; 
+group C_network;
 
 broadcast(bcast) ::= <<
 int $bcast.id$_scheduler() {
-	$bcast.type$ tok_input[1];
-
-	while (lff_hasTokens($bcast.id$_input, 1)
-		$bcast.num:{ && lff_hasRoom($bcast.id$_output_$i0$, 1)}$) {
-		lff_read($bcast.id$_input, tok_input);
-		$bcast.num: { n | lff_write($bcast.id$_output_$n$, tok_input);
+	$bcast.type$ *tok_input;
+	$bcast.num: { n | $bcast.type$ *tok_output_$n$;
+}$
+	while (hasTokens($bcast.id$_input, 1)
+		$bcast.num:{ && hasRoom($bcast.id$_output_$i0$, 1)}$) {
+		tok_input = getReadPtr($bcast.id$_input, 1);
+		$bcast.num: { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
+}$
+		$bcast.num: { n | *tok_output_$n$ = *tok_input;
+}$	
+		setReadEnd($bcast.id$_input);
+		$bcast.num: { n | setWriteEnd($bcast.id$_output_$n$);
 }$	}
-  
+	
+	
+
 	return 0;
 }
 
@@ -17,25 +25,15 @@ int $bcast.id$_scheduler() {
 >>
 
 struct_fifo(fifo) ::= <<
-static void* array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
-static struct lock_free_fifo fifo_$fifo.count$ = { $fifo.size$, (char *)array_$fifo.count$, sizeof($fifo.type$), 0, 0 };
+static $fifo.type$ array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
+static struct fifo_s fifo_$fifo.count$ = { sizeof($fifo.type$), $fifo.size$, (char *)array_$fifo.count$, 0, 0 };
 
 >>
 
 ptr_fifo(fifo) ::= <<
-lff_t *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
-lff_t *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
+struct fifo_s *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
+struct fifo_s *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
 
->>
-
-struct_actor(inst) ::= <<
-lff_t*  $inst.id$_In[$inst.nbInput$] = {$inst.input:{name|$inst.id$_$name$}$};
-lff_t*  $inst.id$_Out[$inst.nbOutput$] = {$inst.output:{name|$inst.id$_$name$}$};
-
->>
-
-action_scheduler(inst) ::= <<
-int (*$inst.id$_scheduler)();
 >>
 
 network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
@@ -45,11 +43,7 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lock_free_fifo.h"
-#include "OrccLLVM.h"
-
-extern "C"{
-
+#include "fifo.h"
 #include "orcc_util.h"
 
 #define SIZE $size$
@@ -62,65 +56,28 @@ $connections:struct_fifo()$
 $connections:ptr_fifo()$
 
 ////////////////////////////////////////////////////////////////////////////////
-// Actor structure
-$instances: struct_actor()$
-
-////////////////////////////////////////////////////////////////////////////////
 $broadcasts:broadcast()$////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
-extern int source_scheduler();
 $initializes: { init | extern void $init$_initialize(); 
 }$
-$instances: { inst | int (*$inst.id$_scheduler)();
+$instances: { inst | extern int $inst$_scheduler();
 }$
-extern int display_scheduler();
-
-////////////////////////////////////////////////////////////////////////////////
-// Init
-void init() {
-		$instances: { inst | $inst.id$_scheduler = (int(*)())initModule("$inst.id$", $inst.id$_In, $inst.id$_Out);
-}$
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
 static void scheduler() {
 	$initializes: { init | $init$_initialize();
 }$	while (1) {
-	source_scheduler();
-		$instances: { inst | $inst.id$_scheduler();
+		$instances: { inst | $inst$_scheduler();
 }$
 		$broadcasts: { bcast | $bcast.id$_scheduler();
-}$	
-	display_scheduler();
-}
-	
+}$	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int __cdecl main(int argc, char *argv[], char *env[]) {
+int main(int argc, char *argv[], char *env[]) {
 	init_orcc(argc, argv, env);
 
-	printf("Load actors...\n");
-	
-	// Create destination module
-	mod = new Module(std::string("body"));
-
-	// Create the JIT
-	mp = new ExistingModuleProvider(new Module(std::string("body")));
-	engine = ExecutionEngine::create(mp);
-
-	init();
-
-	// Verify module conformance
-	verifyModule(*mod, PrintMessageAction);
-	
-	// Run these optimizations on our Module
-	//initPasses(*jit, 3);
-	
-	printf("Actors loaded...\n");
-	
 	scheduler();
 
 	printf("End of simulation! Press a key to continue\n");
@@ -128,6 +85,6 @@ int __cdecl main(int argc, char *argv[], char *env[]) {
 
 	return 0;
 }
-}
+
 >>
 
