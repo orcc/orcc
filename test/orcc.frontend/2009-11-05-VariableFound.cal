@@ -1,0 +1,12 @@
+// PASS: variable exists in current scope
+
+actor Actor () ==> :
+
+  procedure X(int source)
+  var
+    int target
+  begin
+    target := source + 1;
+  end
+
+end
