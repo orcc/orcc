@@ -615,6 +615,9 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     start_vld_engine( if btype_is_INTRA then COEFF_INTRA_START_INDEX else COEFF_INTER_START_INDEX end );
   end
 
+  int VLD_TABLE_ADDR_BITS       = 12;
+  int VLD_TABLE_DATA_BITS       = 20;
+
   vld_code: action bits:[sign] ==> VALUE:[if sign then -level else level end], RUN:[run], LAST:[ last ]
   guard
     vld_success(),
@@ -882,9 +885,6 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   do
     mvcomp := mvcomp + 1;
   end
-
-  int VLD_TABLE_ADDR_BITS       = 12;
-  int VLD_TABLE_DATA_BITS       = 20;
 
   List( type:int( size=VLD_TABLE_DATA_BITS ), size=760 ) vld_table = [
 
