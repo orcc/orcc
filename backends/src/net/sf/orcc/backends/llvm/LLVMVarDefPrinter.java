@@ -49,9 +49,9 @@ public class LLVMVarDefPrinter {
 
 	protected LLVMExprPrinter exprPrinter;
 
-	private LLVMTypePrinter typeVisitor;
+	private TypeToString typeVisitor;
 
-	public LLVMVarDefPrinter(LLVMTypePrinter typeVisitor) {
+	public LLVMVarDefPrinter(TypeToString typeVisitor) {
 		this.typeVisitor = typeVisitor;
 		exprPrinter = new LLVMExprPrinter(typeVisitor, this);
 	}

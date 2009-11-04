@@ -31,7 +31,7 @@ package net.sf.orcc.backends.llvm.type;
 import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
 public interface LLVMTypeVisitor extends TypeVisitor {

@@ -61,7 +61,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 	 */
 	private StringTemplate template;
 
-	private LLVMTypePrinter typeVisitor;
+	private TypeToString typeVisitor;
 
 	/**
 	 * Creates a new const printer from the given template group.
@@ -70,7 +70,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 	 *            template group
 	 */
 	public LLVMConstPrinter(StringTemplateGroup group,
-			LLVMTypePrinter typeVisitor) {
+			TypeToString typeVisitor) {
 		this.group = group;
 		this.typeVisitor = typeVisitor;
 	}

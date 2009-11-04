@@ -47,17 +47,13 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMTypePrinter implements LLVMTypeVisitor {
+public class TypeToString implements LLVMTypeVisitor {
 
 	private StringBuilder builder;
 
-	private void printInt(IExpr expr) {
-		try {
-			int size = Util.evaluateAsInteger(expr);
-			builder.append(size);
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
+	private void printSize(IType type) {
+		int size = sizeOf(type);
+		builder.append(Integer.toString(size));
 	}
 
 	/**
@@ -72,23 +68,49 @@ public class LLVMTypePrinter implements LLVMTypeVisitor {
 		type.accept(this);
 		return builder.toString();
 	}
+	
+	/**
+	 * Creates a string buffer and fills it with the text representation of the
+	 * given type. Returns the text representation.
+	 * 
+	 * @param type
+	 *            An {@link IType}.
+	 */
+	public int sizeOf(IType type) {
+		try {
+			if (type instanceof BoolType){
+				return 1;
+			}else if (type instanceof IntType){
+				IExpr exprSize = ((IntType)type).getSize();
+				return Util.evaluateAsInteger(exprSize);
+			}else if (type instanceof StringType){
+				return 8;
+			}else{
+				throw new OrccException("Can't size type");
+			}
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 
 	@Override
 	public void visit(BoolType type) {
 		// boolean is a 1-bit integer.
-		builder.append("i1");
+		builder.append("i");
+		printSize(type);
 	}
 
 	@Override
 	public void visit(IntType type) {
 		builder.append('i');
-		printInt(type.getSize());
+		printSize(type);
 	}
 
 	@Override
 	public void visit(ListType type) {
 		builder.append("[ ");
-		printInt(type.getSize());
+		printSize(type);
 		builder.append(" x ");
 		type.getElementType().accept(this);
 		builder.append(" ]");
@@ -102,13 +124,15 @@ public class LLVMTypePrinter implements LLVMTypeVisitor {
 
 	@Override
 	public void visit(StringType type) {
-		builder.append("u8 *");
+		builder.append("i");
+		printSize(type);
+		builder.append(" *");
 	}
 
 	@Override
 	public void visit(UintType type) {
 		builder.append('i');
-		printInt(type.getSize());
+		printSize(type);
 	}
 
 	@Override

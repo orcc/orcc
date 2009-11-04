@@ -68,7 +68,7 @@ public class LLVMActorPrinter {
 
 	protected StringTemplate template;
 
-	protected LLVMTypePrinter typePrinter;
+	protected TypeToString typePrinter;
 
 	protected LLVMVarDefPrinter varDefPrinter;
 
@@ -80,7 +80,7 @@ public class LLVMActorPrinter {
 	 */
 	public LLVMActorPrinter() throws IOException {
 		this("LLVM_actor");
-		typePrinter = new LLVMTypePrinter();
+		typePrinter = new TypeToString();
 		constPrinter = new LLVMConstPrinter(group, typePrinter);
 		varDefPrinter = new LLVMVarDefPrinter(typePrinter);
 		exprPrinter = new LLVMExprPrinter(typePrinter, varDefPrinter);

@@ -40,10 +40,9 @@ import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.PluginGroupLoader;
-import net.sf.orcc.backends.c.TypeToString;
+import net.sf.orcc.backends.llvm.TypeToString;
 import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.IType;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.network.Broadcast;
@@ -73,13 +72,13 @@ public class LLVMNetworkPrinter {
 	private TypeToString typeVisitor;
 
 	/**
-	 * Creates a new network printer with the template "LLVM.st".
+	 * Creates a new network printer with the template "C.st".
 	 * 
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
 	public LLVMNetworkPrinter() throws IOException {
-		this("LLVM", new TypeToString());
+		this("LLVM_network", new TypeToString());
 	}
 
 	/**
@@ -118,7 +117,7 @@ public class LLVMNetworkPrinter {
 
 		setAttributes(network, debugFifos, fifoSize);
 
-		byte[] b = template.toString().getBytes();
+		byte[] b = template.toString(80).getBytes();
 		try {
 			OutputStream os = new FileOutputStream(fileName);
 			os.write(b);
@@ -157,7 +156,7 @@ public class LLVMNetworkPrinter {
 
 		setBroadcasts(instances);
 		setInstances(instances);
-		setConnections(graph, connections);
+		setConnections(graph, connections, fifoSize);
 	}
 
 	/**
@@ -199,7 +198,7 @@ public class LLVMNetworkPrinter {
 	 * @throws OrccException
 	 */
 	private void setConnections(DirectedGraph<Vertex, Connection> graph,
-			Set<Connection> connections) throws OrccException {
+			Set<Connection> connections, int fifoSize) throws OrccException {
 		List<Map<String, Object>> conn = new ArrayList<Map<String, Object>>();
 		int fifoCount = 0;
 
@@ -223,14 +222,15 @@ public class LLVMNetworkPrinter {
 						.getAttribute(Connection.BUFFER_SIZE);
 				if (attr != null && attr.getType() == IAttribute.VALUE) {
 					IExpr expr = ((IValueAttribute) attr).getValue();
-					size = Integer.toString(Util.evaluateAsInteger(expr));
+					size = Integer.toString(Util.evaluateAsInteger(expr)+1);
 				} else {
-					size = "SIZE";
+					size = Integer.toString(fifoSize);
 				}
 
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("count", fifoCount);
 				attrs.put("size", size);
+				attrs.put("elt_size", type.getType());
 				attrs.put("type", typeVisitor.toString(type));
 				attrs.put("source", source.getId());
 				attrs.put("src_port", connection.getSource().getName());
@@ -254,9 +254,7 @@ public class LLVMNetworkPrinter {
 	 */
 	private void setInstances(Set<Instance> instances) {
 		List<String> init = new ArrayList<String>();
-		List<Map<String, Object>> inst = new ArrayList<Map<String, Object>>();
-
-		int size, count;
+		List<String> inst = new ArrayList<String>();
 
 		for (Instance instance : instances) {
 			if (!instance.isBroadcast()) {
@@ -264,43 +262,8 @@ public class LLVMNetworkPrinter {
 				if (!initializes.isEmpty()) {
 					init.add(instance.getId());
 				}
-				if (instance.getId().compareTo("source") != 0
-						&& instance.getId().compareTo("display") != 0) {
-					Map<String, Object> attrs = new HashMap<String, Object>();
-					List<String> inputName = new ArrayList<String>();
-					List<String> outputName = new ArrayList<String>();
 
-					count = 0;
-					attrs.put("id", instance.getId());
-					size = instance.getActor().getInputs().size();
-					int nb = instance.getActor().getInputs().size();
-					attrs.put("nbInput", nb);
-
-					for (Port input : instance.getActor().getInputs()) {
-						if (count == size - 1)
-							inputName.add(input.getName());
-						else
-							inputName.add(input.getName() + ",");
-
-						count++;
-					}
-
-					count = 0;
-					attrs.put("input", inputName);
-					size = instance.getActor().getOutputs().size();
-					attrs.put("nbOutput", instance.getActor().getOutputs()
-							.size());
-					for (Port output : instance.getActor().getOutputs()) {
-						if (count == size - 1)
-							outputName.add(output.getName());
-						else
-							outputName.add(output.getName() + ",");
-
-						count++;
-					}
-					attrs.put("output", outputName);
-					inst.add(attrs);
-				}
+				inst.add(instance.getId());
 			}
 		}
 

@@ -33,19 +33,10 @@ import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
-import net.sf.orcc.backends.llvm.transforms.ArrayListTransformation;
-import net.sf.orcc.backends.llvm.transforms.ControlFlowTransformation;
-import net.sf.orcc.backends.llvm.transforms.JoinNodeTransformation;
-import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
-import net.sf.orcc.backends.llvm.transforms.TypeTransformation;
-import net.sf.orcc.ir.IActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.transforms.AddInstantationProcedure;
-import net.sf.orcc.ir.transforms.AssignPeephole;
-import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
-import net.sf.orcc.ir.transforms.EmptyNodeRemoval;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.transforms.BroadcastAdder;
 
 /**
  * LLVM back-end.
@@ -68,8 +59,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 				e.printStackTrace();
 			}
 		} else {
-			System.err
-					.println("Usage: LLVMBackendImpl <flattened XDF network>");
+			System.err.println("Usage: LLVMBackendImpl <flattened XDF network>");
 		}
 	}
 
@@ -84,7 +74,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		IActorTransformation[] transformations = { new EmptyNodeRemoval(),
+	/*	IActorTransformation[] transformations = { new EmptyNodeRemoval(),
 				new CorrectBinaryExpressionType(), new AssignPeephole(),
 				new ControlFlowTransformation(),
 				new JoinNodeTransformation(),
@@ -98,15 +88,17 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 		}
 
 		String outputName = path + File.separator + id + ".s";
-		printer.printActor(outputName, actor);
+		printer.printActor(outputName,id, actor);*/
 	}
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
-		/*
-		 * NetworkPrinter networkPrinter = new NetworkPrinter(); String
-		 * outputName = path + File.separator + network.getName() + ".cpp";
-		 * networkPrinter.printNetwork(outputName, network, false, fifoSize);
-		 */
+		LLVMNetworkPrinter networkPrinter = new LLVMNetworkPrinter();
+
+		// Add broadcasts before printing
+		new BroadcastAdder().transform(network);
+
+		String outputName = path + File.separator + network.getName() + ".s";
+		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 }

@@ -113,11 +113,11 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	private StringBuilder builder;
 
-	private LLVMTypePrinter typePrinter;
+	private TypeToString typePrinter;
 
 	private LLVMVarDefPrinter varDefPrinter;
 
-	public LLVMExprPrinter(LLVMTypePrinter typePrinter,
+	public LLVMExprPrinter(TypeToString typePrinter,
 			LLVMVarDefPrinter varDefPrinter) {
 		this.varDefPrinter = varDefPrinter;
 		this.typePrinter = typePrinter;

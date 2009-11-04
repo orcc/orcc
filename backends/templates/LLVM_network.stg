@@ -25,7 +25,7 @@ int $bcast.id$_scheduler() {
 >>
 
 struct_fifo(fifo) ::= <<
-static $fifo.type$ array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
+@array_$fifo.count$ = internal global %struct.fifo_s [$fifo.size$ x $fifo.type$] zeroinitializer
 static struct fifo_s fifo_$fifo.count$ = { sizeof($fifo.type$), $fifo.size$, (char *)array_$fifo.count$, 0, 0 };
 
 >>

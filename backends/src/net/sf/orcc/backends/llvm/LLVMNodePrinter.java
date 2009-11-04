@@ -99,14 +99,14 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	private StringTemplate template;
 
-	private LLVMTypePrinter typeToString;
+	private TypeToString typeToString;
 
 	private LLVMVarDefPrinter varDefPrinter;
 
 	public LLVMNodePrinter(StringTemplateGroup group, StringTemplate template,
 			String actorName, Procedure procedure,
 			LLVMVarDefPrinter varDefPrinter, LLVMExprPrinter exprPrinter,
-			LLVMTypePrinter typeToString) {
+			TypeToString typeToString) {
 		attrName = "nodes";
 		this.actorName = actorName;
 		this.procedure = procedure;
