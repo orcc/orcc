@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="orcc_testbed_compare">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="decoder">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="orcc_decoder"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="orcc_fread"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="fname">
+            <Expr kind="Literal" literal-kind="String" value="D:/Projects/RVC/OpenDF/models/MPEG4_SP_Decoder/data/foreman_qcif_30.bit"/>
+        </Parameter>
+    </Instance>
+    <Instance id="display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="orcc_DispYUV"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="MAX_HEIGHT">
+            <Expr kind="Literal" literal-kind="Integer" value="576"/>
+        </Parameter>
+        <Parameter name="MAX_WIDTH">
+            <Expr kind="Literal" literal-kind="Integer" value="704"/>
+        </Parameter>
+    </Instance>
+    <Instance id="ddr">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DDRModel"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="MAXH_IN_MB">
+            <Expr kind="Literal" literal-kind="Integer" value="69"/>
+        </Parameter>
+        <Parameter name="MAXW_IN_MB">
+            <Expr kind="Literal" literal-kind="Integer" value="121"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Compare">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="orcc_CompYUV"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="decoder" dst-port="bits" src="source" src-port="O"/>
+    <Connection dst="display" dst-port="B" src="decoder" src-port="VIDEO">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="BinOpSeq">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                <Op name="*"/>
+                <Expr kind="Literal" literal-kind="Integer" value="64"/>
+            </Expr>
+        </Attribute>
+    </Connection>
+    <Connection dst="decoder" dst-port="MCD" src="ddr" src-port="RD"/>
+    <Connection dst="ddr" dst-port="WD" src="decoder" src-port="MBD"/>
+    <Connection dst="ddr" dst-port="WA" src="decoder" src-port="MBA"/>
+    <Connection dst="ddr" dst-port="RA" src="decoder" src-port="MCA">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="9"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="display" dst-port="WIDTH" src="decoder" src-port="WIDTH">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="display" dst-port="HEIGHT" src="decoder" src-port="HEIGHT">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="Compare" dst-port="B" src="decoder" src-port="VIDEO"/>
+    <Connection dst="Compare" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
+    <Connection dst="Compare" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
+</XDF>

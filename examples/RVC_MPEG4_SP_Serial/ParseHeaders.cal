@@ -71,9 +71,8 @@ actor ParseHeaders (
   int VO_NO_SHORT_HEADER    = 8;
   int VO_ID_LENGTH          = 5;
 
-  int VOL_START_CODE_LENGTH               = 28;
-  int VOL_START_CODE                      = 18;
-  int VOL_ID_LENGTH                       = 5;
+  int VOL_START_CODE                      = 32; //0x20
+  int VOL_ID_LENGTH                       = 1;
   int VIDEO_OBJECT_TYPE_INDICATION_LENGTH = 8;
   int VISUAL_OBJECT_LAYER_VERID_LENGTH    = 4;
   int VISUAL_OBJECT_LAYER_PRIORITY_LENGTH = 3;
@@ -114,9 +113,7 @@ actor ParseHeaders (
   //       does not do a conditional read of reversible_vlc_enable
   int MISC_BIT_LENGTH = 9;
 
-  int VOP_START_CODE_LENGTH           = 32;
-  int VO_START_CODE                  = 257;
-  int VOP_START_CODE                  = 438;
+  int VOP_START_CODE                  = 182;
   int VOP_PREDICTION_LENGTH           = 2;
   int B_VOP                           = 2;
   int P_VOP                           = 1;
@@ -140,7 +137,7 @@ actor ParseHeaders (
   // with read_result(). Use the done function in a guard to wait for the
   // reading to be complete.
   int(size=7) bits_to_read_count := -1;
-  int(size=33) read_result_in_progress;
+  int(size=32) read_result_in_progress;
   procedure set_bits_to_read( int count )
   begin
     bits_to_read_count := count - 1;
@@ -165,35 +162,6 @@ actor ParseHeaders (
  *************************************************************
  *************************************************************/
 
-  look_for_vo: action ==>
-  do
-    set_bits_to_read( VO_HEADER_LENGTH );
-  end
-
-  // We can only handle VOL without short header
-  vo_header.good: action ==>
-  guard
-    done_reading_bits(),
-    mask_bits( read_result(), VO_HEADER_LENGTH ) = VO_NO_SHORT_HEADER
-  do
-    set_bits_to_read( VO_ID_LENGTH );
-  end
-
-  vo_skip_id_field: action ==>
-  guard
-    done_reading_bits()
-  do
-    set_bits_to_read( VOL_START_CODE_LENGTH );
-  end
-
-  vol_startcode.good: action ==>
-  guard
-    done_reading_bits(),
-    mask_bits( read_result(), VOL_START_CODE_LENGTH ) = VOL_START_CODE
-  do
-    // Ignore the next two fields
-    set_bits_to_read( VOL_ID_LENGTH + VIDEO_OBJECT_TYPE_INDICATION_LENGTH );
-  end
 
   vol_object_layer_identification: action bits:[b] ==>
   guard
@@ -321,59 +289,23 @@ actor ParseHeaders (
 
   // Note: no check for correct bit stuffing
 
-  get_vop_code: action ==>
-  guard
-    done_reading_bits()
-  do
-    set_bits_to_read( VOP_START_CODE_LENGTH );
-  end
-
-  // Note: the model does not support user data here
-  vop_code.done: action ==>
-  guard
-    done_reading_bits(),
-    read_result() = 1
-  do
-    bit_count := 0;
-  end
-
   int(size=MB_COORD_SZ) mbx;
   int(size=MB_COORD_SZ) mby;
 
-  vop_code.start: action ==>
-  guard
-    done_reading_bits(),
-    read_result() = VOP_START_CODE
-  do
-    mbx     := 0;
-    mby     := 0;
-    set_bits_to_read( VOP_PREDICTION_LENGTH );
-  end
-
-  vo_code.start: action ==>
-  guard
-    done_reading_bits(),
-    read_result() = VO_START_CODE
-  end
-
-  // int(size=2) prediction_type;
-
-  // vop_predict.supported: action ==>
-  // guard
-  //   done_reading_bits(),
-  //   mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = I_VOP or
-  //   mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = P_VOP
-  // do
-  //   prediction_type := read_result();
-  // end
 
   bool prediction_is_IVOP;
+  bool prediction_is_PVOP;
+  bool prediction_is_BVOP;
 
-  vop_predict: action ==>
+  vop_predict.supported: action ==>
   guard
-    done_reading_bits()
+    done_reading_bits(), 
+    mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = I_VOP or
+    mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = P_VOP
   do
     prediction_is_IVOP := mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = I_VOP;
+    prediction_is_PVOP := mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = P_VOP;
+    prediction_is_BVOP := mask_bits( read_result(), VOP_PREDICTION_LENGTH ) = B_VOP;
   end
  
   // Note: the model does not support time_base. It just skips over the right number of bits.
@@ -683,6 +615,9 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     start_vld_engine( if btype_is_INTRA then COEFF_INTRA_START_INDEX else COEFF_INTER_START_INDEX end );
   end
 
+  int VLD_TABLE_ADDR_BITS       = 12;
+  int VLD_TABLE_DATA_BITS       = 20;
+
   vld_code: action bits:[sign] ==> VALUE:[if sign then -level else level end], RUN:[run], LAST:[ last ]
   guard
     vld_success(),
@@ -927,7 +862,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   var
     int (size=VLD_TABLE_DATA_BITS) mvval = vld_result()
   do
-    set_bits_to_read( if fcode <= 1 or mvval = 0 then 0 else fcode end );
+    set_bits_to_read( if fcode <= 1 or mvval = 0 then 0 else fcode-1 end );
   end
 
   get_residual_x: action ==> MV:[ read_result() ]
@@ -950,9 +885,6 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   do
     mvcomp := mvcomp + 1;
   end
-
-  int VLD_TABLE_ADDR_BITS       = 12;
-  int VLD_TABLE_DATA_BITS       = 20;
 
   List( type:int( size=VLD_TABLE_DATA_BITS ), size=760 ) vld_table = [
 
@@ -1148,24 +1080,57 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     bit_count := bit_count + 1;
   end
 
-  // stuck: action ==>
-  // do
-  //   set_bits_to_read(0);
-  //   reset_texture();
-    // println("Stuck at bit_count " + bit_count);
-  // end
+  test_zero_byte: action ==>
+  guard
+    done_reading_bits(),
+    bitand( read_result(), 255 ) = 0
+  end
 
-  schedule fsm look_for_vo :
+  test_vo_byte: action ==>
+  guard
+    done_reading_bits(),
+    bitand( read_result(), 254 ) = 0
+  end
 
+  test_vol_byte: action ==>
+  guard
+    done_reading_bits(),
+    read_result() = VOL_START_CODE  // 0X20
+  do
+    // Ignore the next two fields
+    set_bits_to_read( VOL_ID_LENGTH + VIDEO_OBJECT_TYPE_INDICATION_LENGTH );
+  end
+  
+  test_vop_byte: action ==>
+  guard
+    done_reading_bits(),
+    read_result() = VOP_START_CODE
+  do
+    mbx     := 0;
+    mby     := 0;
+    set_bits_to_read( VOP_PREDICTION_LENGTH );
+  end
+  
+
+
+  test_one_byte: action ==>
+  guard
+    done_reading_bits(),
+    bitand( read_result(), 255 ) = 1
+  end
+
+  request_byte: action ==>
+  guard
+    done_reading_bits()
+  do
+    set_bits_to_read( 8 );
+  end
+
+
+  schedule fsm stuck_1a /* look_for_vo */ :
+
+ 
     // Process a new VOL
-    look_for_vo        ( look_for_vo                      ) --> vo_header;
-    vo_header          ( generic_done                     ) --> stuck;
-    vo_header          ( vo_header.good                   ) --> vo_skip_id_field;
-    vo_skip_id_field   ( vo_skip_id_field                 ) --> look_for_vol;
-
-    // Process a new VOL
-    look_for_vol       ( generic_done                     ) --> stuck;
-    look_for_vol       ( vol_startcode.good               ) --> vol_object;
     vol_object         ( vol_object_layer_identification  ) --> vol_aspect;
     vol_aspect         ( vol_aspect.detailed              ) --> vol_control;
     vol_aspect         ( generic_done                     ) --> vol_control;
@@ -1178,27 +1143,21 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     vol_width          ( set_vol_width                    ) --> vol_height;
     vol_height         ( set_vol_height                   ) --> vol_misc;
     // vol_misc           ( vol_misc.unsupported             ) --> stuck;
-    vol_misc           ( generic_done                     ) --> look_for_vop;
+    vol_misc           ( generic_done                     ) --> stuck;
 
     // Process a new VOP
-    look_for_vop       ( byte_align                       ) --> get_vop_code;
-    get_vop_code       ( get_vop_code                     ) --> vop_code;
-    vop_code           ( vop_code.done                    ) --> look_for_vol;
-    vop_code           ( vo_code.start                    ) --> vo_skip_id_field;
-    vop_code           ( vop_code.start                   ) --> vop_predict;
-    vop_code           ( generic_done                     ) --> vo_skip_id_field;
-    vop_predict        ( vop_predict /* .supported */     ) --> vop_timebase;
-    // vop_predict        ( generic_done                     ) --> stuck;
+    vop_predict        ( vop_predict.supported      ) --> vop_timebase;
+    vop_predict        ( generic_done                     ) --> stuck;
     vop_timebase       ( vop_timebase.one                 ) --> vop_timebase;
     vop_timebase       ( vop_timebase.zero                ) --> vop_coding;
-    vop_coding         ( vop_coding.uncoded               ) --> look_for_vop;
+    vop_coding         ( vop_coding.uncoded               ) --> stuck;
 	vop_coding         ( vop_coding.coded                 ) --> send_new_vop_info;
 	send_new_vop_info  ( send_new_vop_cmd                 ) --> send_new_vop_width;
 	send_new_vop_width ( send_new_vop_width               ) --> send_new_vop_height;
 	send_new_vop_height( send_new_vop_height              ) --> mb;
 
     // Start MB
-    mb          ( mb_done                    ) --> look_for_vop;
+    mb          ( mb_done                    ) --> stuck;
 	mb            ( mcbpc_pvop_uncoded         ) --> pvop_uncoded1;
 	pvop_uncoded1 ( mcbpc_pvop_uncoded1        ) --> pvop_uncoded2;
 	pvop_uncoded2 ( mcbpc_pvop_uncoded1        ) --> pvop_uncoded3;
@@ -1254,19 +1213,43 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     get_residual_y  ( get_residual_y    ) -->  mv;
 
     // stuck( stuck ) --> stuck_for_good;
+
+    // DBP: add minimal error resilience.
+    // byte align, then look for a VO header starting on any byte boundary.
+    // Can't handle bit insertion or deletion, obviously. The VO header
+    // is hex 00000100.
+    stuck    ( byte_align     ) --> stuck_1a;
+
+    stuck_1a ( request_byte   ) --> stuck_1b;
+    stuck_1b ( test_zero_byte ) --> stuck_2a;
+    stuck_1b ( generic_done   ) --> stuck_1a;
+
+    stuck_2a ( request_byte   ) --> stuck_2b;
+    stuck_2b ( test_zero_byte ) --> stuck_3a;
+    stuck_2b ( generic_done   ) --> stuck_1a;
+
+    stuck_3a ( request_byte   ) --> stuck_3b;
+    stuck_3b ( test_zero_byte ) --> stuck_3a;
+    stuck_3b ( test_one_byte  ) --> stuck_4a;
+    stuck_3b ( generic_done   ) --> stuck_1a;
+
+    stuck_4a ( request_byte   ) --> stuck_4b;
+    stuck_4b ( test_vop_byte ) --> vop_predict; 
+    stuck_4b ( test_vo_byte ) --> stuck_1a; // Found a good VO header (Assumes VO ID field=0)
+    stuck_4b ( test_vol_byte ) --> vol_object; 
+    stuck_4b ( generic_done   ) --> stuck_1a;
+
+
   end
 
   priority
 
-    vo_header.good         >  generic_done;
-//    vol_start_code.good    >  generic_done;   // JWJ: vol_start_code.good does not exist
     vol_aspect.detailed    >  generic_done;
     vol_control.detailed   >  generic_done_with_bitread;
     vol_vbv.detailed       >  generic_done_with_bitread;
     // vol_misc.unsupported   >  generic_done;
 
-    vo_code.start > vop_code.done          >  vop_code.start         >  generic_done;
-    // vop_predict.supported  >  generic_done;
+    vop_predict.supported  >  generic_done;
     vop_timebase.one       >  vop_timebase.zero;
     vop_coding.uncoded     >  vop_coding.coded;
 
@@ -1288,6 +1271,10 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     vld_start_inter.ac_coded > vld_start_inter.not_ac_coded;
 
     mvcode_done > mvcode;
+
+    test_zero_byte > generic_done;
+    test_one_byte  > generic_done;
+    test_vo_byte>test_vol_byte>test_vop_byte>generic_done;
   end
 
 end

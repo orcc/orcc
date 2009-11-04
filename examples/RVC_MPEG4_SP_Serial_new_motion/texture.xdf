@@ -204,9 +204,9 @@
             <Expr kind="Literal" literal-kind="Integer" value="378"/>
         </Attribute>
     </Connection>
-    <Connection dst="idct2d" dst-port="in" src="IQ" src-port="OUT"/>
-    <Connection dst="" dst-port="f" src="idct2d" src-port="out"/>
-    <Connection dst="idct2d" dst-port="signed" src="DCRecontruction" src-port="SIGNED"/>
+    <Connection dst="idct2d" dst-port="IN" src="IQ" src-port="OUT"/>
+    <Connection dst="" dst-port="f" src="idct2d" src-port="OUT"/>
+    <Connection dst="idct2d" dst-port="SIGNED" src="DCRecontruction" src-port="SIGNED"/>
     <Connection dst="IQ" dst-port="QP" src="DCRecontruction" src-port="QUANT"/>
     <Connection dst="IQ" dst-port="DC" src="DCRecontruction" src-port="QF_DC"/>
     <Connection dst="IAP" dst-port="PTR" src="DCRecontruction" src-port="PTR">

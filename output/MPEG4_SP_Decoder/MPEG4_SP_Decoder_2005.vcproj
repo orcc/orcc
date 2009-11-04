@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="8,00"
 	Name="MPEG4_SP_Decoder"
 	ProjectGUID="{13C8B2FF-8D11-4684-B2AE-138EA34478D8}"
 	RootNamespace="MPEG4_SP_Decoder"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -84,6 +83,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -169,6 +171,9 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -250,10 +255,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\orcc_testbed.c"
-				>
-			</File>
-			<File
 				RelativePath=".\src\parseheaders.c"
 				>
 			</File>
@@ -313,7 +314,15 @@
 				Name="orcc runtime"
 				>
 				<File
+					RelativePath="..\..\runtime\liborcc\src\actors\compareyuv.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\runtime\liborcc\src\actors\display.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\orcc_testbed_compare.c"
 					>
 				</File>
 				<File

@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="Windows-1252"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="MPEG4_SP_Decoder"
-	ProjectGUID="{13C8B2FF-8D11-4684-B2AE-138EA34478D8}"
-	RootNamespace="MPEG4_SP_Decoder"
+	Name="RVC_MPEG4_SP_Decoder_Serial"
+	ProjectGUID="{A8677512-4CDA-4D95-870E-09D996BCEEAF}"
+	RootNamespace="RVC"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -18,7 +18,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="bin"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="1"
@@ -182,11 +182,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\src\acpred.c"
+				RelativePath=".\src\add.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\add.c"
+				RelativePath=".\src\address.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\addressing.c"
 				>
 			</File>
 			<File
@@ -194,51 +198,39 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\buffer.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\clip.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\combine.c"
+				RelativePath=".\src\column.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\dcpred.c"
+				RelativePath=".\src\DCsplit.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\dcsplit.c"
+				RelativePath=".\src\IAP.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\ddr.c"
+				RelativePath=".\src\interpolation.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\dequant.c"
+				RelativePath=".\src\invpred.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\downsample.c"
+				RelativePath=".\src\IQ.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\fairmerge.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\final.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\interpolate.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\mbpack.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\memorymanager.c"
+				RelativePath=".\src\IS.c"
 				>
 			</File>
 			<File
@@ -258,27 +250,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\retrans.c"
+				RelativePath=".\src\retranspose.c"
 				>
 			</File>
 			<File
-				RelativePath=".\src\rowsort.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\scale.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\searchwin.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\sep.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\seq.c"
+				RelativePath=".\src\row.c"
 				>
 			</File>
 			<File
@@ -286,31 +262,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\shuffle.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\shufflefly.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\trans.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\unpack.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\zigzag.c"
-				>
-			</File>
-			<File
-				RelativePath=".\src\zzaddr.c"
+				RelativePath=".\src\transpose.c"
 				>
 			</File>
 			<Filter
-				Name="orcc runtime"
+				Name="orcc"
 				>
 				<File
 					RelativePath="..\..\runtime\liborcc\src\actors\display.c"
