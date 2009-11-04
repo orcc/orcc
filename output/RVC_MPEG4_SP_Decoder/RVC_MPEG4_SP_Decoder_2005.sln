@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RVC_2005", "RVC_2005.vcproj", "{A8677512-4CDA-4D95-870E-09D996BCEEAF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RVC_MPEG4_SP_Decoder_2005", "RVC_MPEG4_SP_Decoder_2005.vcproj", "{A8677512-4CDA-4D95-870E-09D996BCEEAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

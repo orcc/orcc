@@ -165,7 +165,7 @@ static void DiffUcharImage ( const int x_size, const int y_size, const unsigned 
 
    if ( error != 0 ) {
       printf("error %d !!!!!!!!!!!!!\n", error);
-      system("pause");
+//      system("pause");
    }
  //  else
    //   printf("OK\n");
@@ -263,7 +263,7 @@ static void Compare_init(int width, int height) {
 	m_height = height;
 	Read_YUV_init (width, height, yuv_file);
 }
-
+static int init=1;
 
 int Compare_scheduler() {
 	int res = 1;
@@ -274,7 +274,10 @@ int Compare_scheduler() {
 			width = ptr[0] * 16;
 			ptr = getReadPtr(Compare_HEIGHT, 1);
 			height = ptr[0] * 16;
-			Compare_init(width, height);
+			if (init==1){
+				Compare_init(width, height);
+				init=0;
+			}
 		}
 
 		if (hasTokens(Compare_B, 384)) {
