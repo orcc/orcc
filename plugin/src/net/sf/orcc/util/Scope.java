@@ -103,7 +103,7 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 			if (existingObject == null) {
 				// no existing variable in this scope, check parent's
 				if (parent != null) {
-					existingObject = parent.get(name);
+					existingObject = parent.get(name, false);
 					if (existingObject != null) {
 						throw new OrccException(file, location, "\"" + name
 								+ "\" already defined in parent scope");
@@ -129,14 +129,28 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 */
 	@Override
 	public T get(String name) {
+		return get(name, true);
+	}
+
+	/**
+	 * Returns the object that has the given name. If the object is not found in
+	 * the current scope and checkParent is <code>true</code>, the parent scope
+	 * is queried.
+	 * 
+	 * @param name
+	 *            the name of an object.
+	 * @param checkParent
+	 *            if <code>true</code>, the parent is checked
+	 * @return the object that has the given name, or <code>null</code>
+	 */
+	public T get(String name, boolean checkParent) {
 		T object = super.get(name);
 		if (object == null) {
-			if (parent == null) {
-				// top-level scope, no object
-				return null;
-			} else {
-				// child scope, query parent
+			if (parent != null && checkParent) {
+				// query parent
 				return parent.get(name);
+			} else {
+				return null;
 			}
 		} else {
 			// object found

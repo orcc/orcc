@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.frontend.parser.internal.ALBaseLexer;
 import net.sf.orcc.frontend.parser.internal.C_ALLexer;
 import net.sf.orcc.frontend.parser.internal.C_ALParser;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
@@ -53,6 +54,7 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.ActionScheduler;
@@ -60,7 +62,11 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.actor.FSM;
 import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.actor.Tag;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -69,6 +75,7 @@ import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.ActionList;
+import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
@@ -89,6 +96,359 @@ import org.antlr.runtime.tree.Tree;
 public class ALAstParser {
 
 	/**
+	 * This class defines a block. A block contains variables and nodes.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class Block {
+
+		private INode node;
+
+		private Scope<Variable> variables;
+
+		/**
+		 * Creates a new block with the given variables and node.
+		 * 
+		 * @param variables
+		 *            a scope of variables
+		 * @param node
+		 *            a node
+		 */
+		public Block(Scope<Variable> variables, INode node) {
+			this.variables = variables;
+			this.node = node;
+		}
+
+		public INode getNode() {
+			return node;
+		}
+
+		public Scope<Variable> getVariables() {
+			return variables;
+		}
+
+		@Override
+		public String toString() {
+			return String.valueOf(getNode());
+		}
+
+	}
+
+	/**
+	 * This class defines a parser that can parse AL expressions and translate
+	 * them to IR expressions.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ExprParser {
+
+		/**
+		 * Returns the binary operator that match the type of the given tree.
+		 * 
+		 * @param op
+		 *            a Tree that represents an operator
+		 * @return a binary operator
+		 * @throws OrccException
+		 *             if the operator is not valid
+		 */
+		private BinaryOp parseBinaryOp(Tree op) throws OrccException {
+			switch (op.getType()) {
+			case ALBaseLexer.LOGIC_AND:
+				return BinaryOp.LOGIC_AND;
+			case ALBaseLexer.BITAND:
+				return BinaryOp.BITAND;
+			case ALBaseLexer.BITOR:
+				return BinaryOp.BITOR;
+			case ALBaseLexer.DIV:
+				return BinaryOp.DIV;
+			case ALBaseLexer.DIV_INT:
+				return BinaryOp.DIV_INT;
+			case ALBaseLexer.EQ:
+				return BinaryOp.EQ;
+			case ALBaseLexer.EXP:
+				return BinaryOp.EXP;
+			case ALBaseLexer.GE:
+				return BinaryOp.GE;
+			case ALBaseLexer.GT:
+				return BinaryOp.GT;
+			case ALBaseLexer.LE:
+				return BinaryOp.LE;
+			case ALBaseLexer.LT:
+				return BinaryOp.LT;
+			case ALBaseLexer.MINUS:
+				return BinaryOp.MINUS;
+			case ALBaseLexer.MOD:
+				return BinaryOp.MOD;
+			case ALBaseLexer.NE:
+				return BinaryOp.NE;
+			case ALBaseLexer.LOGIC_OR:
+				return BinaryOp.LOGIC_OR;
+			case ALBaseLexer.PLUS:
+				return BinaryOp.PLUS;
+			case ALBaseLexer.SHIFT_LEFT:
+				return BinaryOp.SHIFT_LEFT;
+			case ALBaseLexer.SHIFT_RIGHT:
+				return BinaryOp.SHIFT_RIGHT;
+			case ALBaseLexer.TIMES:
+				return BinaryOp.TIMES;
+			default:
+				throw new OrccException("Unknown operator: " + op.getText());
+			}
+		}
+
+		/**
+		 * Parses a sequence of binary operations represented by an ANTLR tree,
+		 * and transforms it to a binary expression tree using the operators'
+		 * precedences.
+		 * 
+		 * @param expr
+		 *            a tree that contains a binary operation sequence
+		 * @return an expression
+		 * @throws OrccException
+		 */
+		private IExpr parseBinOpSeq(Tree expr) throws OrccException {
+			Tree treeExprs = expr.getChild(0);
+			int numExprs = treeExprs.getChildCount();
+			List<IExpr> expressions = new ArrayList<IExpr>(numExprs);
+			for (int i = 0; i < numExprs; i++) {
+				expressions.add(parseExpression(treeExprs.getChild(i)));
+			}
+
+			Tree treeOps = expr.getChild(1);
+			int numOps = treeOps.getChildCount();
+			List<BinaryOp> operators = new ArrayList<BinaryOp>(numOps);
+			for (int i = 0; i < numOps; i++) {
+				operators.add(parseBinaryOp(treeOps.getChild(i)));
+			}
+
+			return BinOpSeqParser.parse(expressions, operators);
+		}
+
+		/**
+		 * Parses the given tree as an expression. This method is package
+		 * because it should be called from {@link RVCCalASTParser} only.
+		 * 
+		 * @param expr
+		 *            a tree that contains an expression
+		 * @return an {@link IExpr}.
+		 * @throws OrccException
+		 */
+		IExpr parseExpression(Tree expr) throws OrccException {
+			switch (expr.getType()) {
+			case ALBaseLexer.EXPR_BINARY:
+				return parseBinOpSeq(expr);
+			case ALBaseLexer.EXPR_BOOL: {
+				expr = expr.getChild(0);
+				boolean value = Boolean.parseBoolean(expr.getText());
+				return new BooleanExpr(parseLocation(expr), value);
+			}
+			case ALBaseLexer.EXPR_FLOAT:
+				throw new OrccException("not yet implemented!");
+			case ALBaseLexer.EXPR_INT:
+				expr = expr.getChild(0);
+				int value = Integer.parseInt(expr.getText());
+				return new IntExpr(parseLocation(expr), value);
+			case ALBaseLexer.EXPR_STRING:
+				expr = expr.getChild(0);
+				return new StringExpr(parseLocation(expr), expr.getText());
+			case ALBaseLexer.EXPR_VAR:
+				return parseExprVar(expr.getChild(0));
+			default:
+				throw new OrccException("not yet implemented");
+			}
+		}
+
+		private IExpr parseExprVar(Tree tree) throws OrccException {
+			Location location = parseLocation(tree);
+
+			Variable variable = currentScope.get(tree.getText());
+			if (variable == null) {
+				throw new OrccException(file, location, "unknown variable: "
+						+ variable);
+			}
+			Use localUse = new Use(variable);
+			return new VarExpr(location, localUse);
+		}
+
+	}
+
+	private class StatementParser {
+
+		private Block parseBlock(Tree tree, int start) throws OrccException {
+			Scope<Variable> variables = new Scope<Variable>(currentScope, false);
+			currentScope = variables;
+			parseLocalVariables(variables, tree.getChild(start));
+
+			// parse nodes
+			INode node = null;
+			currentScope = currentScope.getParent();
+
+			return new Block(variables, node);
+		}
+
+		/**
+		 * Parses the given tree as a local parameter/local variable.
+		 * 
+		 * @param tree
+		 *            a tree whose root is VARIABLE.
+		 * @return a local variable
+		 * @throws OrccException
+		 */
+		private LocalVariable parseLocalVariable(Tree tree)
+				throws OrccException {
+			IType type = typeParser.parseType(tree.getChild(0));
+			Tree nameTree = tree.getChild(1);
+			Location location = parseLocation(nameTree);
+			String name = nameTree.getText();
+			boolean assignable = (tree.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
+
+			if (tree.getChildCount() == 4) {
+				exprParser.parseExpression(tree.getChild(3));
+			}
+
+			INode node = new EmptyNode(0, new Location());
+
+			return new LocalVariable(assignable, 0, location, name, node, null,
+					type);
+		}
+
+		private void parseLocalVariables(Scope<Variable> variables, Tree tree)
+				throws OrccException {
+			int numChildren = tree.getChildCount();
+			for (int i = 0; i < numChildren; i++) {
+				LocalVariable variable = parseLocalVariable(tree.getChild(i));
+				variables.add(file, variable.getLocation(), variable.getName(),
+						variable);
+			}
+		}
+	}
+
+	/**
+	 * This class defines a parser that can parse AL types and translate them to
+	 * IR types;
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class TypeParser {
+
+		/**
+		 * Parses the given tree as an {@link IType}.
+		 * 
+		 * @param tree
+		 *            a tree whose root is TYPE or TYPE_LIST.
+		 * @return a type
+		 * @throws OrccException
+		 */
+		private IType parseType(Tree tree) throws OrccException {
+			if (tree.getType() == ALBaseLexer.TYPE) {
+				return parseTYPE(tree);
+			} else if (tree.getType() == ALBaseLexer.TYPE_LIST) {
+				return parseTypeList(tree);
+			} else {
+				throw new OrccException("unknown type node: " + tree.getType());
+			}
+		}
+
+		private IType parseTYPE(Tree tree) throws OrccException {
+			Tree typeTree = tree.getChild(0);
+			Location location = parseLocation(typeTree);
+			String typeName = typeTree.getText();
+
+			if (typeName.equals(BoolType.NAME)) {
+				return new BoolType();
+			} else if (typeName.equals(StringType.NAME)) {
+				return new StringType();
+			} else if (typeName.equals(VoidType.NAME)) {
+				return new VoidType();
+			} else if (typeName.equals(IntType.NAME)) {
+				IExpr size = parseTypeAttributeSize(location, tree, 32);
+				return new IntType(size);
+			} else if (typeName.equals(UintType.NAME)) {
+				IExpr size = parseTypeAttributeSize(location, tree, 32);
+				return new UintType(size);
+			} else if (typeName.equals(ListType.NAME)) {
+				IExpr size = parseTypeAttributeSize(location, tree, null);
+				IType subType = parseTypeAttributeType(location, tree);
+				return new ListType(size, subType);
+			} else if (typeName.equals("float") || typeName.equals("unsigned")) {
+				System.out.println("TODO: " + typeName);
+				return new VoidType();
+			} else {
+				throw new OrccException(file, location, "Unknown type: "
+						+ typeName);
+			}
+		}
+
+		private IExpr parseTypeAttributeSize(Location location, Tree type,
+				Integer defaultSize) throws OrccException {
+			int n = type.getChildCount();
+			for (int i = 1; i < n; i++) {
+				Tree attr = type.getChild(i);
+				if (attr.getType() == RVCCalLexer.EXPR) {
+					if (attr.getChildCount() > 1
+							&& !attr.getChild(1).getText().equals(AST.SIZE)) {
+						throw new OrccException(file, location, "unknown \""
+								+ attr.getChild(1).getText() + "\" attribute");
+					}
+
+					return exprParser.parseExpression(attr.getChild(0));
+				}
+			}
+
+			// if there is a default size, return it
+			if (defaultSize == null) {
+				// size attribute not found, and no default size given => error
+				throw new OrccException(file, location,
+						"missing \"size\" attribute");
+			} else {
+				return new IntExpr(location, defaultSize);
+			}
+		}
+
+		private IType parseTypeAttributeType(Location location, Tree typeAttrs)
+				throws OrccException {
+			int n = typeAttrs.getChildCount();
+			for (int i = 1; i < n; i++) {
+				Tree attr = typeAttrs.getChild(i);
+				if (attr.getType() == RVCCalLexer.TYPE) {
+					if (attr.getChildCount() > 1
+							&& !attr.getChild(1).getText().equals(AST.TYPE)) {
+						throw new OrccException(file, location, "unknown \""
+								+ attr.getChild(1).getText() + "\" attribute");
+					}
+
+					return parseType(attr.getChild(0));
+				}
+			}
+
+			// type attribute not found, and no default type given => error
+			throw new OrccException(file, location,
+					"missing \"type\" attribute");
+		}
+
+		/**
+		 * Parses a TYPE_LIST tree and return a {@link ListType}.
+		 * 
+		 * @param tree
+		 *            a tree whose root is TYPE_LIST
+		 * @return an {@link IType}
+		 * @throws OrccException
+		 */
+		private IType parseTypeList(Tree tree) throws OrccException {
+			IType type = parseType(tree.getChild(0));
+			for (int i = tree.getChildCount() - 1; i > 0; i--) {
+				IExpr size = exprParser.parseExpression(tree.getChild(i));
+				type = new ListType(size, type);
+			}
+
+			return type;
+		}
+	}
+
+	/**
 	 * list of actions
 	 */
 	private ActionList actions;
@@ -101,12 +461,12 @@ public class ALAstParser {
 	/**
 	 * expression parser.
 	 */
-	private ExprParser exprParser;
+	private final ExprParser exprParser;
 
 	/**
 	 * absolute name of input file
 	 */
-	private String file;
+	private final String file;
 
 	/**
 	 * FSM builder.
@@ -150,6 +510,16 @@ public class ALAstParser {
 	private Scope<Variable> stateVars;
 
 	/**
+	 * statement parser
+	 */
+	private final StatementParser stmtParser;
+
+	/**
+	 * type parser
+	 */
+	private final TypeParser typeParser;
+
+	/**
 	 * creates a new parser from the given file name.
 	 * 
 	 * @param fileName
@@ -160,6 +530,8 @@ public class ALAstParser {
 			this.file = new File(fileName).getCanonicalPath();
 
 			exprParser = new ExprParser();
+			stmtParser = new StatementParser();
+			typeParser = new TypeParser();
 		} catch (IOException e) {
 			String msg = "could not solve the path \"" + fileName + "\"";
 			throw new OrccException(msg, e);
@@ -206,10 +578,17 @@ public class ALAstParser {
 		}
 	}
 
-	private void parseAction(Tree tree) {
+	private void parseAction(Tree tree) throws OrccException {
 		Tree tagTree = tree.getChild(0);
 		Location location = parseLocation(tree);
 		Tag tag = parseActionTag(tagTree);
+
+		Scope<Variable> tokens = new Scope<Variable>(currentScope, true);
+		currentScope = tokens;
+
+		stmtParser.parseBlock(tree, 4);
+		currentScope = currentScope.getParent();
+
 		Action action = new Action(location, tag, null, null, null, null);
 		actions.add(action);
 	}
@@ -232,25 +611,24 @@ public class ALAstParser {
 	private Actor parseActor(Tree tree) throws OrccException {
 		String name = tree.getChild(1).getText();
 
-		// parameters is top-level scope, state variables extend the scope
-
-		// actions, procedures, priorities
+		// create actions, procedures, priorities
 		actions = new ActionList();
 		procedures = new OrderedMap<Procedure>();
 		priorities = new ArrayList<List<Tag>>();
+
+		// parse parameters
+		parameters = new Scope<Variable>();
+		currentScope = parameters;
+		parseActorParameters(tree.getChild(2));
 
 		// parse ports and return them as ordered maps
 		inputs = parsePorts(tree.getChild(3));
 		outputs = parsePorts(tree.getChild(4));
 
-		// parse parameters
-		parameters = new Scope<Variable>();
-		parseParameters(tree.getChild(2));
-
 		// parse actor declarations
 		stateVars = new Scope<Variable>(parameters, false);
 		currentScope = stateVars;
-		parseActorDecls(tree.getChild(5));
+		parseActorDeclarations(tree.getChild(5));
 
 		// sort actions by priority
 		sorter = new ActionSorter(actions);
@@ -270,7 +648,7 @@ public class ALAstParser {
 	 * @param actorDecls
 	 * @throws OrccException
 	 */
-	private void parseActorDecls(Tree actorDecls) throws OrccException {
+	private void parseActorDeclarations(Tree actorDecls) throws OrccException {
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
 			Tree child = actorDecls.getChild(i);
@@ -304,36 +682,6 @@ public class ALAstParser {
 		}
 	}
 
-	private void parseFunction(Tree tree) {
-	}
-
-	private void parseInitialize(Tree tree) {
-	}
-
-	/**
-	 * Parses the given tree as a local parameter/local variable.
-	 * 
-	 * @param tree
-	 *            a tree whose root is VARIABLE.
-	 * @return a local variable
-	 * @throws OrccException
-	 */
-	private LocalVariable parseLocalVariable(Tree tree) throws OrccException {
-		IType type = parseType(tree.getChild(0));
-		Tree nameTree = tree.getChild(1);
-		Location location = parseLocation(nameTree);
-		String name = nameTree.getText();
-		boolean assignable = (tree.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
-
-		if (tree.getChildCount() == 4) {
-		}
-
-		INode node = new EmptyNode(0, new Location());
-
-		return new LocalVariable(assignable, 0, location, name, node, null,
-				type);
-	}
-
 	/**
 	 * Parses the given tree as a list of parameters. Each child of the tree is
 	 * parsed as a parameter represented by a {@link GlobalVariable}, and added
@@ -342,11 +690,11 @@ public class ALAstParser {
 	 * @param tree
 	 *            a tree
 	 */
-	private void parseParameters(Tree tree) throws OrccException {
+	private void parseActorParameters(Tree tree) throws OrccException {
 		int numParameters = tree.getChildCount();
 		for (int i = 0; i < numParameters; i++) {
 			Tree child = tree.getChild(i);
-			IType type = parseType(child.getChild(0));
+			IType type = typeParser.parseType(child.getChild(0));
 			Tree nameTree = child.getChild(1);
 			Location location = parseLocation(nameTree);
 			String name = nameTree.getText();
@@ -362,6 +710,12 @@ public class ALAstParser {
 		}
 	}
 
+	private void parseFunction(Tree tree) {
+	}
+
+	private void parseInitialize(Tree tree) {
+	}
+
 	/**
 	 * Returns an ordered map of ports parsed from the given tree.
 	 * 
@@ -375,7 +729,7 @@ public class ALAstParser {
 		for (int i = 0; i < numPorts; i++) {
 			Tree child = tree.getChild(i);
 
-			IType type = parseType(child.getChild(0));
+			IType type = typeParser.parseType(child.getChild(0));
 			Tree nameTree = child.getChild(1);
 			String name = nameTree.getText();
 			Location location = parseLocation(nameTree);
@@ -414,29 +768,15 @@ public class ALAstParser {
 		String name = nameTree.getText();
 		Location location = parseLocation(nameTree);
 
-		Tree child = tree.getChild(1);
-		int numChildren = child.getChildCount();
-		for (int i = 0; i < numChildren; i++) {
-			LocalVariable parameter = parseLocalVariable(child.getChild(i));
-			parameters.add(file, parameter.getLocation(), parameter.getName(),
-					parameter);
-		}
+		stmtParser.parseLocalVariables(parameters, tree.getChild(1));
 
-		Scope<Variable> variables = new Scope<Variable>(currentScope, false);
-		currentScope = variables;
-		child = tree.getChild(2);
-		numChildren = child.getChildCount();
-		for (int i = 0; i < numChildren; i++) {
-			LocalVariable parameter = parseLocalVariable(child.getChild(i));
-			parameters.add(file, parameter.getLocation(), parameter.getName(),
-					parameter);
-		}
+		Block block = stmtParser.parseBlock(tree, 2);
+		currentScope = currentScope.getParent();
 
 		Procedure procedure = new Procedure(name, false, location,
-				new VoidType(), parameters, variables, null);
+				new VoidType(), parameters, block.getVariables(), null);
 
 		procedures.add(file, location, name, procedure);
-		currentScope = currentScope.getParent().getParent();
 	}
 
 	/**
@@ -448,7 +788,7 @@ public class ALAstParser {
 	 * @throws OrccException
 	 */
 	private void parseStateVariable(Tree tree) throws OrccException {
-		IType type = parseType(tree.getChild(0));
+		IType type = typeParser.parseType(tree.getChild(0));
 		Tree nameTree = tree.getChild(1);
 		Location location = parseLocation(nameTree);
 		String name = nameTree.getText();
@@ -461,91 +801,6 @@ public class ALAstParser {
 		StateVariable stateVariable = new StateVariable(location, type, name,
 				assignable, init);
 		stateVars.add(file, location, name, stateVariable);
-	}
-
-	/**
-	 * tree = TYPE, children = type name (ID), TYPE_ATTRS
-	 * 
-	 * @param tree
-	 * @return
-	 * @throws RVCCalParseException
-	 */
-	private IType parseType(Tree tree) throws OrccException {
-		Tree typeTree = tree.getChild(0);
-		Location location = parseLocation(typeTree);
-		String typeName = typeTree.getText();
-		IType type;
-
-		if (typeName.equals(BoolType.NAME)) {
-			type = new BoolType();
-		} else if (typeName.equals(StringType.NAME)) {
-			type = new StringType();
-		} else if (typeName.equals(VoidType.NAME)) {
-			type = new VoidType();
-		} else if (typeName.equals(IntType.NAME)) {
-			IExpr size = parseTypeAttributeSize(location, tree, 32);
-			type = new IntType(size);
-		} else if (typeName.equals(UintType.NAME)) {
-			IExpr size = parseTypeAttributeSize(location, tree, 32);
-			type = new UintType(size);
-		} else if (typeName.equals(ListType.NAME)) {
-			IExpr size = parseTypeAttributeSize(location, tree, null);
-			IType subType = parseTypeAttributeType(location, tree);
-			type = new ListType(size, subType);
-		} else if (typeName.equals("float") || typeName.equals("unsigned")) {
-			System.out.println("TODO: " + typeName);
-			type = new VoidType();
-		} else {
-			throw new OrccException(file, location, "Unknown type: " + typeName);
-		}
-
-		return type;
-	}
-
-	private IExpr parseTypeAttributeSize(Location location, Tree type,
-			Integer defaultSize) throws OrccException {
-		int n = type.getChildCount();
-		for (int i = 1; i < n; i++) {
-			Tree attr = type.getChild(i);
-			if (attr.getType() == RVCCalLexer.EXPR) {
-				if (attr.getChildCount() > 1
-						&& !attr.getChild(1).getText().equals(AST.SIZE)) {
-					throw new OrccException(file, location, "unknown \""
-							+ attr.getChild(1).getText() + "\" attribute");
-				}
-
-				return exprParser.parseExpression(attr.getChild(0));
-			}
-		}
-
-		// if there is a default size, return it
-		if (defaultSize == null) {
-			// size attribute not found, and no default size given => error
-			throw new OrccException(file, location,
-					"missing \"size\" attribute");
-		} else {
-			return new IntExpr(location, defaultSize);
-		}
-	}
-
-	private IType parseTypeAttributeType(Location location, Tree typeAttrs)
-			throws OrccException {
-		int n = typeAttrs.getChildCount();
-		for (int i = 1; i < n; i++) {
-			Tree attr = typeAttrs.getChild(i);
-			if (attr.getType() == RVCCalLexer.TYPE) {
-				if (attr.getChildCount() > 1
-						&& !attr.getChild(1).getText().equals(AST.TYPE)) {
-					throw new OrccException(file, location, "unknown \""
-							+ attr.getChild(1).getText() + "\" attribute");
-				}
-
-				return parseType(attr.getChild(0));
-			}
-		}
-
-		// type attribute not found, and no default type given => error
-		throw new OrccException(file, location, "missing \"type\" attribute");
 	}
 
 	/**
