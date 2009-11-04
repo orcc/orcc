@@ -1,20 +1,15 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 ALBaseLexer.g 2009-11-04 13:16:06
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 ALBaseLexer.g 2009-11-04 15:18:42
 
 package net.sf.orcc.frontend.parser.internal;
 
 
-import org.antlr.runtime.BaseRecognizer;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.DFA;
-import org.antlr.runtime.EarlyExitException;
-import org.antlr.runtime.Lexer;
-import org.antlr.runtime.MismatchedSetException;
-import org.antlr.runtime.NoViableAltException;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.*;
+import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
 
 public class RVCCal_ALBaseLexer extends Lexer {
-    public static final int FUNCTION=56;
+    public static final int FUNCTION=59;
     public static final int EXPR_BOOL=26;
     public static final int LT=42;
     public static final int BITNOT=51;
@@ -22,13 +17,13 @@ public class RVCCal_ALBaseLexer extends Lexer {
     public static final int TRANSITION=12;
     public static final int EXPR_VAR=25;
     public static final int LOGIC_NOT=52;
-    public static final int LETTER=67;
+    public static final int LETTER=70;
     public static final int MOD=49;
     public static final int EXPR_CALL=23;
     public static final int INPUTS=4;
     public static final int EXPR_UNARY=19;
     public static final int EOF=-1;
-    public static final int ACTION=54;
+    public static final int ACTION=57;
     public static final int TYPE=30;
     public static final int T__93=93;
     public static final int TYPE_ATTRS=31;
@@ -48,17 +43,17 @@ public class RVCCal_ALBaseLexer extends Lexer {
     public static final int T__95=95;
     public static final int ASSIGNABLE=33;
     public static final int GE=45;
-    public static final int T__80=80;
     public static final int T__81=81;
-    public static final int INITIALIZE=58;
+    public static final int INITIALIZE=61;
     public static final int T__82=82;
     public static final int T__83=83;
-    public static final int LINE_COMMENT=75;
+    public static final int LINE_COMMENT=78;
     public static final int DIV_INT=48;
     public static final int LOGIC_OR=35;
-    public static final int WHITESPACE=77;
+    public static final int WHITESPACE=80;
     public static final int INEQUALITY=14;
     public static final int NON_ASSIGNABLE=34;
+    public static final int EXPRESSIONS=56;
     public static final int T__85=85;
     public static final int T__84=84;
     public static final int EXPR_IDX=24;
@@ -66,25 +61,27 @@ public class RVCCal_ALBaseLexer extends Lexer {
     public static final int T__86=86;
     public static final int T__89=89;
     public static final int T__88=88;
+    public static final int T__126=126;
     public static final int SHIFT_LEFT=46;
+    public static final int T__125=125;
+    public static final int T__127=127;
     public static final int SHIFT_RIGHT=47;
     public static final int BITOR=37;
-    public static final int PRIORITY=59;
+    public static final int PRIORITY=62;
     public static final int VARIABLE=8;
     public static final int ACTOR_DECLS=10;
     public static final int OP=20;
-    public static final int ACTOR=55;
+    public static final int ACTOR=58;
     public static final int STATEMENTS=7;
     public static final int GT=43;
-    public static final int REPEAT=61;
-    public static final int GUARD=57;
-    public static final int EscapeSequence=72;
-    public static final int T__79=79;
-    public static final int T__78=78;
+    public static final int REPEAT=64;
+    public static final int GUARD=60;
+    public static final int CALL=55;
+    public static final int EscapeSequence=75;
     public static final int PARAMETERS=6;
     public static final int EXPR_BINARY=18;
     public static final int T__118=118;
-    public static final int SCHEDULE=62;
+    public static final int SCHEDULE=65;
     public static final int T__119=119;
     public static final int T__116=116;
     public static final int T__117=117;
@@ -92,15 +89,15 @@ public class RVCCal_ALBaseLexer extends Lexer {
     public static final int T__115=115;
     public static final int T__124=124;
     public static final int T__123=123;
-    public static final int Exponent=69;
+    public static final int Exponent=72;
     public static final int T__122=122;
     public static final int T__121=121;
-    public static final int FLOAT=70;
+    public static final int FLOAT=73;
     public static final int T__120=120;
     public static final int TYPE_LIST=32;
     public static final int EXPR_FLOAT=27;
     public static final int LOGIC_AND=36;
-    public static final int ID=68;
+    public static final int ID=71;
     public static final int BITAND=39;
     public static final int EXPR_LIST=21;
     public static final int EXPR=17;
@@ -118,25 +115,26 @@ public class RVCCal_ALBaseLexer extends Lexer {
     public static final int T__110=110;
     public static final int T__113=113;
     public static final int T__112=112;
-    public static final int PLUS=63;
+    public static final int PLUS=66;
     public static final int EXPR_INT=28;
-    public static final int INTEGER=71;
+    public static final int INTEGER=74;
     public static final int TRANSITIONS=13;
     public static final int T__102=102;
     public static final int T__101=101;
     public static final int T__100=100;
-    public static final int MINUS=64;
+    public static final int MINUS=67;
     public static final int EXPR_IF=22;
-    public static final int Tokens=125;
-    public static final int PROCEDURE=60;
-    public static final int MULTI_LINE_COMMENT=76;
+    public static final int Tokens=128;
+    public static final int PROCEDURE=63;
+    public static final int MULTI_LINE_COMMENT=79;
     public static final int TAG=16;
     public static final int VARIABLES=9;
-    public static final int DIV=66;
-    public static final int TIMES=65;
-    public static final int OctalEscape=74;
+    public static final int ASSIGN=54;
+    public static final int DIV=69;
+    public static final int TIMES=68;
+    public static final int OctalEscape=77;
     public static final int LE=44;
-    public static final int STRING=73;
+    public static final int STRING=76;
 
     // delegates
     // delegators
@@ -160,8 +158,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = ACTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:104:7: ( 'action' )
-            // ALBaseLexer.g:104:9: 'action'
+            // ALBaseLexer.g:109:7: ( 'action' )
+            // ALBaseLexer.g:109:9: 'action'
             {
             match("action"); 
 
@@ -181,8 +179,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = ACTOR;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:105:6: ( 'actor' )
-            // ALBaseLexer.g:105:8: 'actor'
+            // ALBaseLexer.g:110:6: ( 'actor' )
+            // ALBaseLexer.g:110:8: 'actor'
             {
             match("actor"); 
 
@@ -202,8 +200,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = FUNCTION;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:106:9: ( 'function' )
-            // ALBaseLexer.g:106:11: 'function'
+            // ALBaseLexer.g:111:9: ( 'function' )
+            // ALBaseLexer.g:111:11: 'function'
             {
             match("function"); 
 
@@ -223,8 +221,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = GUARD;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:107:6: ( 'guard' )
-            // ALBaseLexer.g:107:8: 'guard'
+            // ALBaseLexer.g:112:6: ( 'guard' )
+            // ALBaseLexer.g:112:8: 'guard'
             {
             match("guard"); 
 
@@ -244,8 +242,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = INITIALIZE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:108:11: ( 'initialize' )
-            // ALBaseLexer.g:108:13: 'initialize'
+            // ALBaseLexer.g:113:11: ( 'initialize' )
+            // ALBaseLexer.g:113:13: 'initialize'
             {
             match("initialize"); 
 
@@ -265,8 +263,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = PRIORITY;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:109:9: ( 'priority' )
-            // ALBaseLexer.g:109:11: 'priority'
+            // ALBaseLexer.g:114:9: ( 'priority' )
+            // ALBaseLexer.g:114:11: 'priority'
             {
             match("priority"); 
 
@@ -286,8 +284,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = PROCEDURE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:110:10: ( 'procedure' )
-            // ALBaseLexer.g:110:12: 'procedure'
+            // ALBaseLexer.g:115:10: ( 'procedure' )
+            // ALBaseLexer.g:115:12: 'procedure'
             {
             match("procedure"); 
 
@@ -307,8 +305,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = REPEAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:111:7: ( 'repeat' )
-            // ALBaseLexer.g:111:9: 'repeat'
+            // ALBaseLexer.g:116:7: ( 'repeat' )
+            // ALBaseLexer.g:116:9: 'repeat'
             {
             match("repeat"); 
 
@@ -328,8 +326,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = SCHEDULE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:112:9: ( 'schedule' )
-            // ALBaseLexer.g:112:11: 'schedule'
+            // ALBaseLexer.g:117:9: ( 'schedule' )
+            // ALBaseLexer.g:117:11: 'schedule'
             {
             match("schedule"); 
 
@@ -349,8 +347,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = PLUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:115:5: ( '+' )
-            // ALBaseLexer.g:115:7: '+'
+            // ALBaseLexer.g:120:5: ( '+' )
+            // ALBaseLexer.g:120:7: '+'
             {
             match('+'); 
 
@@ -369,8 +367,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = MINUS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:116:6: ( '-' )
-            // ALBaseLexer.g:116:8: '-'
+            // ALBaseLexer.g:121:6: ( '-' )
+            // ALBaseLexer.g:121:8: '-'
             {
             match('-'); 
 
@@ -389,8 +387,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = TIMES;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:117:6: ( '*' )
-            // ALBaseLexer.g:117:8: '*'
+            // ALBaseLexer.g:122:6: ( '*' )
+            // ALBaseLexer.g:122:8: '*'
             {
             match('*'); 
 
@@ -409,8 +407,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = DIV;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:118:4: ( '/' )
-            // ALBaseLexer.g:118:6: '/'
+            // ALBaseLexer.g:123:4: ( '/' )
+            // ALBaseLexer.g:123:6: '/'
             {
             match('/'); 
 
@@ -429,11 +427,11 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:121:3: ( LETTER ( LETTER | '0' .. '9' )* )
-            // ALBaseLexer.g:121:5: LETTER ( LETTER | '0' .. '9' )*
+            // ALBaseLexer.g:126:3: ( LETTER ( LETTER | '0' .. '9' )* )
+            // ALBaseLexer.g:126:5: LETTER ( LETTER | '0' .. '9' )*
             {
             mLETTER(); 
-            // ALBaseLexer.g:121:12: ( LETTER | '0' .. '9' )*
+            // ALBaseLexer.g:126:12: ( LETTER | '0' .. '9' )*
             loop1:
             do {
                 int alt1=2;
@@ -480,7 +478,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
     // $ANTLR start "LETTER"
     public final void mLETTER() throws RecognitionException {
         try {
-            // ALBaseLexer.g:124:7: ( '$' | 'A' .. 'Z' | 'a' .. 'z' | '_' )
+            // ALBaseLexer.g:129:7: ( '$' | 'A' .. 'Z' | 'a' .. 'z' | '_' )
             // ALBaseLexer.g:
             {
             if ( input.LA(1)=='$'||(input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
@@ -506,17 +504,17 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = FLOAT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:126:6: ( ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent ) )
-            // ALBaseLexer.g:126:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
+            // ALBaseLexer.g:131:6: ( ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent ) )
+            // ALBaseLexer.g:131:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
             {
-            // ALBaseLexer.g:126:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
+            // ALBaseLexer.g:131:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
             int alt8=3;
             alt8 = dfa8.predict(input);
             switch (alt8) {
                 case 1 :
-                    // ALBaseLexer.g:126:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )?
+                    // ALBaseLexer.g:131:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )?
                     {
-                    // ALBaseLexer.g:126:9: ( '0' .. '9' )+
+                    // ALBaseLexer.g:131:9: ( '0' .. '9' )+
                     int cnt2=0;
                     loop2:
                     do {
@@ -530,7 +528,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                         switch (alt2) {
                     	case 1 :
-                    	    // ALBaseLexer.g:126:10: '0' .. '9'
+                    	    // ALBaseLexer.g:131:10: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -547,7 +545,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
                     } while (true);
 
                     match('.'); 
-                    // ALBaseLexer.g:126:25: ( '0' .. '9' )*
+                    // ALBaseLexer.g:131:25: ( '0' .. '9' )*
                     loop3:
                     do {
                         int alt3=2;
@@ -560,7 +558,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                         switch (alt3) {
                     	case 1 :
-                    	    // ALBaseLexer.g:126:26: '0' .. '9'
+                    	    // ALBaseLexer.g:131:26: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -572,7 +570,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
                         }
                     } while (true);
 
-                    // ALBaseLexer.g:126:37: ( Exponent )?
+                    // ALBaseLexer.g:131:37: ( Exponent )?
                     int alt4=2;
                     int LA4_0 = input.LA(1);
 
@@ -581,7 +579,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
                     }
                     switch (alt4) {
                         case 1 :
-                            // ALBaseLexer.g:126:37: Exponent
+                            // ALBaseLexer.g:131:37: Exponent
                             {
                             mExponent(); 
 
@@ -594,10 +592,10 @@ public class RVCCal_ALBaseLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // ALBaseLexer.g:127:4: '.' ( '0' .. '9' )+ ( Exponent )?
+                    // ALBaseLexer.g:132:4: '.' ( '0' .. '9' )+ ( Exponent )?
                     {
                     match('.'); 
-                    // ALBaseLexer.g:127:8: ( '0' .. '9' )+
+                    // ALBaseLexer.g:132:8: ( '0' .. '9' )+
                     int cnt5=0;
                     loop5:
                     do {
@@ -611,7 +609,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                         switch (alt5) {
                     	case 1 :
-                    	    // ALBaseLexer.g:127:9: '0' .. '9'
+                    	    // ALBaseLexer.g:132:9: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -627,7 +625,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
                         cnt5++;
                     } while (true);
 
-                    // ALBaseLexer.g:127:20: ( Exponent )?
+                    // ALBaseLexer.g:132:20: ( Exponent )?
                     int alt6=2;
                     int LA6_0 = input.LA(1);
 
@@ -636,7 +634,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
                     }
                     switch (alt6) {
                         case 1 :
-                            // ALBaseLexer.g:127:20: Exponent
+                            // ALBaseLexer.g:132:20: Exponent
                             {
                             mExponent(); 
 
@@ -649,9 +647,9 @@ public class RVCCal_ALBaseLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // ALBaseLexer.g:128:4: ( '0' .. '9' )+ Exponent
+                    // ALBaseLexer.g:133:4: ( '0' .. '9' )+ Exponent
                     {
-                    // ALBaseLexer.g:128:4: ( '0' .. '9' )+
+                    // ALBaseLexer.g:133:4: ( '0' .. '9' )+
                     int cnt7=0;
                     loop7:
                     do {
@@ -665,7 +663,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                         switch (alt7) {
                     	case 1 :
-                    	    // ALBaseLexer.g:128:5: '0' .. '9'
+                    	    // ALBaseLexer.g:133:5: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -702,8 +700,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
     // $ANTLR start "Exponent"
     public final void mExponent() throws RecognitionException {
         try {
-            // ALBaseLexer.g:131:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // ALBaseLexer.g:131:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // ALBaseLexer.g:136:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // ALBaseLexer.g:136:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             if ( input.LA(1)=='E'||input.LA(1)=='e' ) {
                 input.consume();
@@ -714,7 +712,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
                 recover(mse);
                 throw mse;}
 
-            // ALBaseLexer.g:131:22: ( '+' | '-' )?
+            // ALBaseLexer.g:136:22: ( '+' | '-' )?
             int alt9=2;
             int LA9_0 = input.LA(1);
 
@@ -740,7 +738,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
             }
 
-            // ALBaseLexer.g:131:33: ( '0' .. '9' )+
+            // ALBaseLexer.g:136:33: ( '0' .. '9' )+
             int cnt10=0;
             loop10:
             do {
@@ -754,7 +752,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                 switch (alt10) {
             	case 1 :
-            	    // ALBaseLexer.g:131:34: '0' .. '9'
+            	    // ALBaseLexer.g:136:34: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -784,10 +782,10 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = INTEGER;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:133:8: ( ( '0' | '1' .. '9' ( '0' .. '9' )* ) )
-            // ALBaseLexer.g:133:10: ( '0' | '1' .. '9' ( '0' .. '9' )* )
+            // ALBaseLexer.g:138:8: ( ( '0' | '1' .. '9' ( '0' .. '9' )* ) )
+            // ALBaseLexer.g:138:10: ( '0' | '1' .. '9' ( '0' .. '9' )* )
             {
-            // ALBaseLexer.g:133:10: ( '0' | '1' .. '9' ( '0' .. '9' )* )
+            // ALBaseLexer.g:138:10: ( '0' | '1' .. '9' ( '0' .. '9' )* )
             int alt12=2;
             int LA12_0 = input.LA(1);
 
@@ -805,17 +803,17 @@ public class RVCCal_ALBaseLexer extends Lexer {
             }
             switch (alt12) {
                 case 1 :
-                    // ALBaseLexer.g:133:11: '0'
+                    // ALBaseLexer.g:138:11: '0'
                     {
                     match('0'); 
 
                     }
                     break;
                 case 2 :
-                    // ALBaseLexer.g:133:17: '1' .. '9' ( '0' .. '9' )*
+                    // ALBaseLexer.g:138:17: '1' .. '9' ( '0' .. '9' )*
                     {
                     matchRange('1','9'); 
-                    // ALBaseLexer.g:133:26: ( '0' .. '9' )*
+                    // ALBaseLexer.g:138:26: ( '0' .. '9' )*
                     loop11:
                     do {
                         int alt11=2;
@@ -828,7 +826,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                         switch (alt11) {
                     	case 1 :
-                    	    // ALBaseLexer.g:133:26: '0' .. '9'
+                    	    // ALBaseLexer.g:138:26: '0' .. '9'
                     	    {
                     	    matchRange('0','9'); 
 
@@ -862,11 +860,11 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = STRING;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:135:7: ( '\"' ( EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"' )
-            // ALBaseLexer.g:135:9: '\"' ( EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"'
+            // ALBaseLexer.g:140:7: ( '\"' ( EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"' )
+            // ALBaseLexer.g:140:9: '\"' ( EscapeSequence | ~ ( '\\\\' | '\"' ) )* '\"'
             {
             match('\"'); 
-            // ALBaseLexer.g:135:13: ( EscapeSequence | ~ ( '\\\\' | '\"' ) )*
+            // ALBaseLexer.g:140:13: ( EscapeSequence | ~ ( '\\\\' | '\"' ) )*
             loop13:
             do {
                 int alt13=3;
@@ -882,14 +880,14 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                 switch (alt13) {
             	case 1 :
-            	    // ALBaseLexer.g:135:15: EscapeSequence
+            	    // ALBaseLexer.g:140:15: EscapeSequence
             	    {
             	    mEscapeSequence(); 
 
             	    }
             	    break;
             	case 2 :
-            	    // ALBaseLexer.g:135:32: ~ ( '\\\\' | '\"' )
+            	    // ALBaseLexer.g:140:32: ~ ( '\\\\' | '\"' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='!')||(input.LA(1)>='#' && input.LA(1)<='[')||(input.LA(1)>=']' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -924,7 +922,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
     // $ANTLR start "EscapeSequence"
     public final void mEscapeSequence() throws RecognitionException {
         try {
-            // ALBaseLexer.g:139:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | OctalEscape )
+            // ALBaseLexer.g:144:5: ( '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' ) | OctalEscape )
             int alt14=2;
             int LA14_0 = input.LA(1);
 
@@ -952,7 +950,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
             }
             switch (alt14) {
                 case 1 :
-                    // ALBaseLexer.g:139:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
+                    // ALBaseLexer.g:144:9: '\\\\' ( 'b' | 't' | 'n' | 'f' | 'r' | '\\\"' | '\\'' | '\\\\' )
                     {
                     match('\\'); 
                     if ( input.LA(1)=='\"'||input.LA(1)=='\''||input.LA(1)=='\\'||input.LA(1)=='b'||input.LA(1)=='f'||input.LA(1)=='n'||input.LA(1)=='r'||input.LA(1)=='t' ) {
@@ -968,7 +966,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // ALBaseLexer.g:140:9: OctalEscape
+                    // ALBaseLexer.g:145:9: OctalEscape
                     {
                     mOctalEscape(); 
 
@@ -985,7 +983,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
     // $ANTLR start "OctalEscape"
     public final void mOctalEscape() throws RecognitionException {
         try {
-            // ALBaseLexer.g:145:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
+            // ALBaseLexer.g:150:5: ( '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) ( '0' .. '7' ) | '\\\\' ( '0' .. '7' ) )
             int alt15=3;
             int LA15_0 = input.LA(1);
 
@@ -1031,25 +1029,25 @@ public class RVCCal_ALBaseLexer extends Lexer {
             }
             switch (alt15) {
                 case 1 :
-                    // ALBaseLexer.g:145:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
+                    // ALBaseLexer.g:150:9: '\\\\' ( '0' .. '3' ) ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // ALBaseLexer.g:145:14: ( '0' .. '3' )
-                    // ALBaseLexer.g:145:15: '0' .. '3'
+                    // ALBaseLexer.g:150:14: ( '0' .. '3' )
+                    // ALBaseLexer.g:150:15: '0' .. '3'
                     {
                     matchRange('0','3'); 
 
                     }
 
-                    // ALBaseLexer.g:145:25: ( '0' .. '7' )
-                    // ALBaseLexer.g:145:26: '0' .. '7'
+                    // ALBaseLexer.g:150:25: ( '0' .. '7' )
+                    // ALBaseLexer.g:150:26: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
                     }
 
-                    // ALBaseLexer.g:145:36: ( '0' .. '7' )
-                    // ALBaseLexer.g:145:37: '0' .. '7'
+                    // ALBaseLexer.g:150:36: ( '0' .. '7' )
+                    // ALBaseLexer.g:150:37: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1059,18 +1057,18 @@ public class RVCCal_ALBaseLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // ALBaseLexer.g:146:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
+                    // ALBaseLexer.g:151:9: '\\\\' ( '0' .. '7' ) ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // ALBaseLexer.g:146:14: ( '0' .. '7' )
-                    // ALBaseLexer.g:146:15: '0' .. '7'
+                    // ALBaseLexer.g:151:14: ( '0' .. '7' )
+                    // ALBaseLexer.g:151:15: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
                     }
 
-                    // ALBaseLexer.g:146:25: ( '0' .. '7' )
-                    // ALBaseLexer.g:146:26: '0' .. '7'
+                    // ALBaseLexer.g:151:25: ( '0' .. '7' )
+                    // ALBaseLexer.g:151:26: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1080,11 +1078,11 @@ public class RVCCal_ALBaseLexer extends Lexer {
                     }
                     break;
                 case 3 :
-                    // ALBaseLexer.g:147:9: '\\\\' ( '0' .. '7' )
+                    // ALBaseLexer.g:152:9: '\\\\' ( '0' .. '7' )
                     {
                     match('\\'); 
-                    // ALBaseLexer.g:147:14: ( '0' .. '7' )
-                    // ALBaseLexer.g:147:15: '0' .. '7'
+                    // ALBaseLexer.g:152:14: ( '0' .. '7' )
+                    // ALBaseLexer.g:152:15: '0' .. '7'
                     {
                     matchRange('0','7'); 
 
@@ -1106,12 +1104,12 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:150:13: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
-            // ALBaseLexer.g:150:15: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
+            // ALBaseLexer.g:155:13: ( '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n' )
+            // ALBaseLexer.g:155:15: '//' (~ ( '\\n' | '\\r' ) )* ( '\\r' )? '\\n'
             {
             match("//"); 
 
-            // ALBaseLexer.g:150:20: (~ ( '\\n' | '\\r' ) )*
+            // ALBaseLexer.g:155:20: (~ ( '\\n' | '\\r' ) )*
             loop16:
             do {
                 int alt16=2;
@@ -1124,7 +1122,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                 switch (alt16) {
             	case 1 :
-            	    // ALBaseLexer.g:150:20: ~ ( '\\n' | '\\r' )
+            	    // ALBaseLexer.g:155:20: ~ ( '\\n' | '\\r' )
             	    {
             	    if ( (input.LA(1)>='\u0000' && input.LA(1)<='\t')||(input.LA(1)>='\u000B' && input.LA(1)<='\f')||(input.LA(1)>='\u000E' && input.LA(1)<='\uFFFF') ) {
             	        input.consume();
@@ -1144,7 +1142,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
                 }
             } while (true);
 
-            // ALBaseLexer.g:150:34: ( '\\r' )?
+            // ALBaseLexer.g:155:34: ( '\\r' )?
             int alt17=2;
             int LA17_0 = input.LA(1);
 
@@ -1153,7 +1151,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
             }
             switch (alt17) {
                 case 1 :
-                    // ALBaseLexer.g:150:34: '\\r'
+                    // ALBaseLexer.g:155:34: '\\r'
                     {
                     match('\r'); 
 
@@ -1180,12 +1178,12 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = MULTI_LINE_COMMENT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:151:19: ( '/*' ( . )* '*/' )
-            // ALBaseLexer.g:151:21: '/*' ( . )* '*/'
+            // ALBaseLexer.g:156:19: ( '/*' ( . )* '*/' )
+            // ALBaseLexer.g:156:21: '/*' ( . )* '*/'
             {
             match("/*"); 
 
-            // ALBaseLexer.g:151:26: ( . )*
+            // ALBaseLexer.g:156:26: ( . )*
             loop18:
             do {
                 int alt18=2;
@@ -1210,7 +1208,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
 
                 switch (alt18) {
             	case 1 :
-            	    // ALBaseLexer.g:151:26: .
+            	    // ALBaseLexer.g:156:26: .
             	    {
             	    matchAny(); 
 
@@ -1241,8 +1239,8 @@ public class RVCCal_ALBaseLexer extends Lexer {
         try {
             int _type = WHITESPACE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // ALBaseLexer.g:152:11: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
-            // ALBaseLexer.g:152:13: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
+            // ALBaseLexer.g:157:11: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' ) )
+            // ALBaseLexer.g:157:13: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )
             {
             if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
                 input.consume();
@@ -1468,7 +1466,7 @@ public class RVCCal_ALBaseLexer extends Lexer {
             this.transition = DFA8_transition;
         }
         public String getDescription() {
-            return "126:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )";
+            return "131:8: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( Exponent )? | '.' ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )";
         }
     }
     static final String DFA19_eotS =

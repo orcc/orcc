@@ -241,8 +241,8 @@ statement:
 | 'while' expression ('var' varDecls)? 'do' statement* 'end' {  }
 
 | ID (
-    (('[' expressions ']')? ':=' expression ';') { }
-  |  '(' expressions? ')' ';' { } );
+    (('[' expressions ']')? ':=' expression ';') -> ^(ASSIGN ID ^(EXPRESSIONS expressions?) expression)
+  |  '(' expressions? ')' ';' -> ^(CALL ID ^(EXPRESSIONS expressions?)) );
 
 /*****************************************************************************/
 /* type attributes and definitions */

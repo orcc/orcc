@@ -95,6 +95,11 @@ tokens {
 
   // unary operators
   BITNOT; LOGIC_NOT; NUM_ELTS;
+  
+  // statement
+  ASSIGN;
+  CALL;
+  EXPRESSIONS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
