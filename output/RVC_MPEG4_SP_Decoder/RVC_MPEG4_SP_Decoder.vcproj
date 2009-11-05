@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="RVC"
+	Name="RVC_MPEG4_SP_Decoder"
 	ProjectGUID="{A8677512-4CDA-4D95-870E-09D996BCEEAF}"
 	RootNamespace="RVC"
 	Keyword="Win32Proj"
