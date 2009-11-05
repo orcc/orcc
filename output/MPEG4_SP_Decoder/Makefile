@@ -1,68 +1,20 @@
-# C target variables
-
-ACTORS = $(shell ls src/*.c | sed -e "s/src\/display\.c//" -e "s/src\/source\.c//" | xargs)
+ACTORS = $(shell ls src/*.c | sed -e "s/src\/display\.c//" -e "s/src\/Compare\.c//" -e "s/src\/source\.c//" | xargs)
 SOURCES = ../../runtime/liborcc/src/actors/display.c ../../runtime/liborcc/src/actors/source.c ../../runtime/liborcc/src/orcc_util.c
 
-CFLAGS = -O5 -I ../../runtime/liborcc/include `sdl-config --cflags` `apr-config --includes`
-CPPFLAGS = `apr-config --cppflags`
-LDFLAGS = `apr-config --link-ld`
+CFLAGS = -O3 -I ../../runtime/liborcc/include `apr-1-config --cflags`
+LDFLAGS =
 
-all: c llvm
+all: $(ACTORS:src/%.c=bin/%.o) $(SOURCES:%.c=%.o)
+	$(CC) $(LDFLAGS) -o bin/MPEG4_SP_Decoder $^ `sdl-config --libs` `apr-1-config --link-ld --libs`
 
-# LLVM target variables
+bin:
+	mkdir bin
 
-# Core target
-NETWORK = $(shell ls llvm_src/*.cpp)
-CXX = g++
-LFF_SOURCES = ../../runtime/liborcc/src/actors/lff_display.c ../../runtime/liborcc/src/actors/lff_source.c ../../runtime/liborcc/src/orcc_util.c
+bin/%.o : src/%.c bin
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
-# VTL target
-LLVM_CC = llvm-gcc
-LLVM_ACTORS = $(shell ls llvm_src/*.c | sed -e "s/llvm_src\/display\.c//" -e "s/llvm_src\/source\.c//" | xargs)
-
-
-# C target
-
-c: $(ACTORS:src/%.c=src/%.o) $(SOURCES:%.c=%.o)
-	$(CC) $(LDFLAGS) -o testbed $^ `sdl-config --libs`
+%.o : %.c
+	$(CC) -c $(CFLAGS) `sdl-config --cflags` $(CPPFLAGS) $< -o $@
 
 clean:
-	rm -rf src/*.o
-	rm -rf $(SOURCES:%.c=%.o)
-	rm -rf llvm_bin/*.o
-	rm -rf VTL/*.bc
-
-diff:
-	for i in $(ACTORS); do \
-		FILE=`echo $$i | sed -e "s/src\///"`; \
-		echo Diffing file $$FILE; \
-		diff reference/$$FILE src/$$FILE ; \
-	done
-
-%.diff: src/%.c
-	FILE=`echo $^ | sed -e "s/src\///"`; \
-	diff reference/$$FILE src/$$FILE
-
-
-# LLVM target
-
-llvm: vtl llvm_core
-
-llvm_bin:
-	mkdir llvm_bin
-
-
-llvm_core: $(NETWORK:llvm_src/%.cpp=llvm_bin/%.o) $(LFF_SOURCES:%.c=%.o)
-	$(CXX) $(CFLAGS)  -o llvm_testbed $^ `llvm-config --cxxflags --ldflags --libs all` `sdl-config --libs --cflags`
-
-llvm_bin/%.o : llvm_src/%.cpp llvm_bin
-	$(CXX) -c $(CFLAGS) $(CPPFLAGS) $< -o $@ `llvm-config --cxxflags --ldflags`
-
-# VTL target
-vtl: $(LLVM_ACTORS:llvm_src/%.c=VTL/%.bc)
-
-VTL:
-	mkdir VTL
-
-VTL/%.bc : llvm_src/%.c  VTL
-	$(LLVM_CC) --emit-llvm  $(CFLAGS) $(CPPFLAGS) -c $< -o $@
+	rm -rf bin/*.o

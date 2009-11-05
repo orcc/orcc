@@ -255,6 +255,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\orcc_testbed.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\parseheaders.c"
 				>
 			</File>
@@ -314,15 +318,7 @@
 				Name="orcc runtime"
 				>
 				<File
-					RelativePath="..\..\runtime\liborcc\src\actors\compareyuv.c"
-					>
-				</File>
-				<File
 					RelativePath="..\..\runtime\liborcc\src\actors\display.c"
-					>
-				</File>
-				<File
-					RelativePath=".\src\orcc_testbed_compare.c"
 					>
 				</File>
 				<File
