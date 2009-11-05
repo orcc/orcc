@@ -29,7 +29,6 @@
 package net.sf.orcc.backends;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -77,7 +76,9 @@ public class TemplateGroupLoader implements StringTemplateGroupLoader {
 
 				is = PluginGroupLoader.getInputStream(groupName);
 			} catch (ClassNotFoundException e) {
-				is = new FileInputStream("templates/" + groupName + ".stg");
+				ClassLoader loader = ClassLoader.getSystemClassLoader();
+				is = loader.getResourceAsStream("net/sf/orcc/templates/"
+						+ groupName + ".stg");
 			}
 
 			InputStreamReader isr = new InputStreamReader(is);

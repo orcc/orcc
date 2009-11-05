@@ -50,7 +50,7 @@ public class PluginGroupLoader {
 	public static InputStream getInputStream(String groupName)
 			throws IOException {
 		Bundle bundle = Activator.getDefault().getBundle();
-		IPath file = new Path("templates/" + groupName + ".stg");
+		IPath file = new Path("bin/net/sf/orcc/templates/" + groupName + ".stg");
 		return FileLocator.openStream(bundle, file, false);
 	}
 
