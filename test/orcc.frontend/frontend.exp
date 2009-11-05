@@ -1,4 +1,11 @@
 load_lib orcc.exp
 
-frontendTest [lsort [glob $srcdir/$subdir/*.cal]]
-frontendTest [lsort [glob $srcdir/$subdir/*.c]]
+set outputDir "output"
+
+foreach actor [lsort [glob $srcdir/$subdir/*.cal]] {
+  frontendOneActor $actor
+}
+
+foreach actor [lsort [glob $srcdir/$subdir/*.c]] {
+  frontendOneActor $actor
+}

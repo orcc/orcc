@@ -3,10 +3,13 @@ puts "initializing orcc.exp"
 # front-end command-line
 set cmd_frontend "java -cp \"../plugin/lib/antlr-runtime-3.1.3.jar;../plugin/lib/jgrapht-jdk1.6.jar;../plugin/bin\" net.sf.orcc.frontend.Frontend "
 
+# back-end command-line
+set cmd_backend "java -cp \"../plugin/lib/jgrapht-jdk1.6.jar;../plugin/bin;../backends/lib/antlr-2.7.7.jar;../backends/lib/stringtemplate.jar;../backends/bin\" net.sf.orcc.backends.c."
+
 # initialize output path
-set path "output"
-if { ![file exists path] } {
-  file mkdir $path
+set outputDir "output"
+if { ![file exists outputDir] } {
+  file mkdir $outputDir
 }
 
 # createNetwork
@@ -31,7 +34,7 @@ proc createNetwork {outputFile name clasz} {
   close $chan
 }
 
-# frontend
+# frontendOneActor
 #
 #	Calls the front-end on the given actor.
 #
@@ -39,14 +42,13 @@ proc createNetwork {outputFile name clasz} {
 #   actor a source file that contains an actor
 
 proc frontendOneActor {actor} {
-  global cmd_frontend path
+  global cmd_frontend outputDir
   
   regsub {(.*)\.c(al)?} $actor {\1} clasz
   regsub {.*/(.*)} $clasz {\1} network
-  createNetwork "$path/$network.xdf" "output-$network" "../$clasz"
+  createNetwork "$outputDir/$network.xdf" "output-$network" "../$clasz"
   
-  set network "$path/$network.xdf"
-  set outputDir $path
+  set network "$outputDir/$network.xdf"
   
   # read the actor    
   set chan [open $actor r]
@@ -82,17 +84,39 @@ proc frontendOneActor {actor} {
   }
 }
 
-# frontendTest
+# frontend
 #
-#	Calls the front-end on each actor in the given actors list
+#	Calls the front-end on the given network.
 #
 # Arguments:
-#	actors		a list of actors.
+#   inputNetwork top-level XDF network
 
-proc frontendTest {actors} {
-  # test each actor of the actors list
-  foreach actor $actors {
-    # call front-end
-    frontendOneActor $actor
+proc frontend {inputNetwork} {
+  global cmd_frontend outputDir
+
+  # execute the front-end
+  set retval [ catch { eval exec -keepnewline -- $cmd_frontend $inputNetwork $outputDir } errmsg ]
+
+  if {$retval != 0} {
+      fail "ERROR when compiling $inputNetwork: $errmsg"
+  }
+}
+
+# backend
+#
+#	Calls the back-end on the given network.
+#
+# Arguments:
+#   name name of the back-end
+#   inputNetwork top-level XDF network
+
+proc backend {name inputNetwork} {
+  global cmd_backend
+
+  # execute the back-end
+  set retval [ catch { eval exec -keepnewline -- "$cmd_backend$name" $inputNetwork } errmsg ]
+
+  if {$retval != 0} {
+      fail "ERROR when compiling $inputNetwork: $errmsg"
   }
 }

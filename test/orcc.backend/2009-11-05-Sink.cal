@@ -1,0 +1,8 @@
+actor Sink() int IN ==> :
+
+  a.b: action IN:[x] ==>
+  do
+    println("a.b executed");
+  end
+
+end

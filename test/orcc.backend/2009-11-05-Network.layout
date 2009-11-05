@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="src" x="24" y="21"/>
+      <vertex id="snk" x="149" y="25"/>
+   </vertices>
+</layout>

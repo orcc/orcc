@@ -1,1 +1,10 @@
-print "C back-end\n"
+load_lib orcc.exp
+
+set outputDir "$subdir"
+
+foreach network [lsort [glob $srcdir/$subdir/../*.xdf]] {#*/
+  regsub {(.*)/(.*)} $network {\1/C/\2} outputNetwork
+
+  frontend $network
+  backend "CBackendImpl" $outputNetwork
+}
