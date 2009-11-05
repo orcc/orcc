@@ -30,8 +30,6 @@ package net.sf.orcc.frontend;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.ALAstParser;
@@ -70,11 +68,6 @@ public class Frontend {
 					+ "[<priorities print flag> <FSM print flag>]");
 		}
 	}
-
-	/**
-	 * a set of file names that contain actors
-	 */
-	private Set<String> actors;
 
 	/**
 	 * output folder
@@ -153,15 +146,11 @@ public class Frontend {
 			throw new OrccException("I/O error", e);
 		}
 
-		actors = new TreeSet<String>();
-
 		XDFParser parser = new XDFParser(fileName);
 		Network network = parser.parseNetwork();
 		getActors(network);
 
 		new XDFWriter(this.outputFolder, network);
-
-		processActors();
 	}
 
 	/**
@@ -185,50 +174,44 @@ public class Frontend {
 						// or is not a flag
 						String parent = instance.getFile().getParent();
 						String clasz = instance.getClasz();
-						actors.add(parent + File.separator + clasz);
+
+						String actorPath = parent + File.separator + clasz;
+						Actor actor = processActor(actorPath);
+						instance.setClasz(actor.getName());
 					}
 				}
 			}
 		}
 	}
 
-	/**
-	 * Parses all the actors in the actors set, translates them to IR, and
-	 * writes them to the output folder.
-	 */
-	private void processActors() {
-		for (String path : actors) {
-			try {
-				ALAstParser parser = new ALAstParser(path);
-				Actor actor = parser.parse();
+	private Actor processActor(String actorPath) throws OrccException {
+		ALAstParser parser = new ALAstParser(actorPath);
+		Actor actor = parser.parse();
 
-				if (printPriorities) {
-					// prints priority graph
-					String fileName = "priority_" + actor.getName() + ".dot";
-					File file = new File(outputFolder, fileName);
-					parser.printPriorityGraph(file);
-				}
+		if (printPriorities) {
+			// prints priority graph
+			String fileName = "priority_" + actor.getName() + ".dot";
+			File file = new File(outputFolder, fileName);
+			parser.printPriorityGraph(file);
+		}
 
-				if (printFSM) {
-					// prints FSM
-					String fileName = "fsm_" + actor.getName() + ".dot";
-					File file = new File(outputFolder, fileName);
-					parser.printFSMGraph(file);
+		if (printFSM) {
+			// prints FSM
+			String fileName = "fsm_" + actor.getName() + ".dot";
+			File file = new File(outputFolder, fileName);
+			parser.printFSMGraph(file);
 
-					// prints FSM after priorities have been applied
-					ActionScheduler scheduler = actor.getActionScheduler();
-					if (scheduler.hasFsm()) {
-						fileName = "fsm_" + actor.getName() + "_2.dot";
-						file = new File(outputFolder, fileName);
-						scheduler.getFsm().printGraph(file);
-					}
-				}
-
-				new IRWriter(actor).write(outputFolder.toString());
-			} catch (OrccException e) {
-				e.printStackTrace();
+			// prints FSM after priorities have been applied
+			ActionScheduler scheduler = actor.getActionScheduler();
+			if (scheduler.hasFsm()) {
+				fileName = "fsm_" + actor.getName() + "_2.dot";
+				file = new File(outputFolder, fileName);
+				scheduler.getFsm().printGraph(file);
 			}
 		}
+
+		new IRWriter(actor).write(outputFolder.toString());
+		return actor;
 	}
 
 }

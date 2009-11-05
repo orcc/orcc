@@ -237,7 +237,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				actor = new IRParser().parseActor(in);
 			} else {
 				// TODO when new front end is ready, add instantiation here
-				file = new File(path, clasz + ".json");
+				file = new File(path, clasz + "_2.json");
 				// this may cause a FileNotFoundException
 				InputStream in = new FileInputStream(file);
 				actor = new IRParser().parseActor(in);
