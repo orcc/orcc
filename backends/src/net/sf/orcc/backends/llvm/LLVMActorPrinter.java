@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.backends.PluginGroupLoader;
+import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.util.NodeIndex;
 import net.sf.orcc.ir.INode;
@@ -95,7 +95,7 @@ public class LLVMActorPrinter {
 	 *             If the template file could not be read.
 	 */
 	protected LLVMActorPrinter(String name) throws IOException {
-		group = new PluginGroupLoader().loadGroup(name);
+		group = new TemplateGroupLoader().loadGroup(name);
 	}
 
 	/**

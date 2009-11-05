@@ -39,7 +39,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.PluginGroupLoader;
+import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.actor.Action;
@@ -90,7 +90,7 @@ public class CNetworkPrinter {
 	 */
 	protected CNetworkPrinter(String name, TypeToString typeVisitor)
 			throws IOException {
-		group = new PluginGroupLoader().loadGroup(name);
+		group = new TemplateGroupLoader().loadGroup(name);
 		this.typeVisitor = typeVisitor;
 	}
 

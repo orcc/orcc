@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.backends.PluginGroupLoader;
+import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.Port;
@@ -93,7 +93,7 @@ public class CActorPrinter {
 	 *             If the template file could not be read.
 	 */
 	protected CActorPrinter(String name) throws IOException {
-		group = new PluginGroupLoader().loadGroup(name);
+		group = new TemplateGroupLoader().loadGroup(name);
 	}
 
 	/**
