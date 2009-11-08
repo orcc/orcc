@@ -17,6 +17,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="QP">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -201,4 +208,5 @@
     <Connection dst="idct2d" dst-port="IN" src="IQ" src-port="OUT"/>
     <Connection dst="idct2d" dst-port="SIGNED" src="DCRecontruction" src-port="SIGNED"/>
     <Connection dst="" dst-port="f" src="idct2d" src-port="OUT"/>
+    <Connection dst="DCRecontruction" dst-port="QP" src="" src-port="QP"/>
 </XDF>

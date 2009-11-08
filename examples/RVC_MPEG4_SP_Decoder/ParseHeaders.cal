@@ -63,7 +63,7 @@ actor ParseHeaders (
   int SAMPLE_COUNT_SZ,
   int SAMPLE_SZ
  ) bool bits ==> int(size=BTYPE_SZ) BTYPE, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
-  bool LAST, int(size=16) WIDTH, int(size=16) HEIGHT :
+  bool LAST, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BITS_QUANT+1) QP :
 
   // Constants for various field lengths (bits) and special values.
 
@@ -342,7 +342,7 @@ actor ParseHeaders (
   do
     set_bits_to_read(
        if not prediction_is_IVOP then
-         // round_type, intra_dc_vlc_thr[3], vop_quant[5], vop_fcode_for[3]
+         // round_type, intra_dc_vlc_thr[3], vop_[5], vop_fcode_for[3]
          1 + INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH
        else
          // intra_dc_vlc_thr[3], vop_quant[5]
@@ -353,21 +353,28 @@ actor ParseHeaders (
 
   // int(size=10) resync_marker_length;
   int(size=VOP_FCODE_FOR_LENGTH+1) fcode;
+  
+  int(size=BITS_QUANT+1) vop_quant;
+  int(size=BITS_QUANT+1) prev_quant;
+  int(size=INTRA_DC_VLC_THR_LENGTH+1) intra_dc_vlc_thr;
 
+	
   send_new_vop_cmd: action ==> BTYPE:[ cmd ]
   guard
     done_reading_bits()
   var
     bool round := false,
     int(size=BTYPE_SZ) cmd := bitor( NEWVOP, if prediction_is_IVOP then INTRA else INTER end ),
-    int(size=BITS_QUANT+1) vop_quant
+    List( type:int( size=6), size=8 ) intra_dc_threshold_table = [ 32, 13, 15, 17, 19, 21, 23, 1]
   do
     if not prediction_is_IVOP then
       round := bitand( rshift( read_result(), INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 1 ) = 1;
+	  intra_dc_vlc_thr := intra_dc_threshold_table[ bitand( rshift( read_result(), BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 7 ) ];
       vop_quant := bitand( rshift( read_result(), VOP_FCODE_FOR_LENGTH ), BITS_QUANT_MASK );
       fcode := bitand( read_result(), VOP_FCODE_FOR_MASK );
       // resync_marker_length := 16 + fcode;
     else
+	  intra_dc_vlc_thr := intra_dc_threshold_table[ bitand( rshift( read_result(), BITS_QUANT ), 7 ) ];
       vop_quant := bitand( read_result(), BITS_QUANT_MASK );
       fcode := 0;
       // resync_marker_length := 17;
@@ -425,7 +432,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
 
   // Nothing to do - uncoded
   mcbpc_pvop_uncoded: action bits:[b] ==>
-      BTYPE:[ INTER ]
+      BTYPE:[ INTER ], QP:[vop_quant]
   guard
     not prediction_is_IVOP
   do
@@ -434,11 +441,12 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   end
 
   mcbpc_pvop_uncoded1: action ==>
-      BTYPE:[ INTER ]
+      BTYPE:[ INTER ], QP:[vop_quant]
   end
 
   bool acpredflag;
   bool btype_is_INTRA;
+  bool btype_is_Q;
   int(size=CBP_SZ) cbpc;
   bool fourmvflag;
 
@@ -452,6 +460,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     int type = bitand( mcbpc, 7 )
   do
     btype_is_INTRA := type >= 3;
+	btype_is_Q:= (type = 4) or (type = 1);
     fourmvflag := (type = 2);
     cbpc := bitand( rshift( mcbpc, 4 ), 3 );
     acpredflag := false;
@@ -466,6 +475,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     int type = bitand( mcbpc, 7 )
   do
     btype_is_INTRA := true;
+	btype_is_Q:= (type = 4) or (type = 1);
     cbpc := bitand( rshift( mcbpc, 4 ), 3 );
     acpredflag := b;
     bit_count := bit_count + 1;
@@ -486,6 +496,9 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     comp := 0;
     mvcomp := 0;
     cbp := bitor( lshift( cbpy, 2), cbpc );
+	if (btype_is_Q) then
+		set_bits_to_read(2);
+	end
   end
 
   final_cbpy_intra: action ==>
@@ -496,8 +509,30 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   do
     comp := 0;
     cbp := bitor( lshift(cbpy, 2), cbpc );
+	if (btype_is_Q) then
+		set_bits_to_read(2);
+	end
   end
+  
+  List( type:int( size=3), size=4 ) dquant_table = [ -1, -2, 1, 2 ];
 
+  
+  final_dquant: action ==>
+  guard 
+	done_reading_bits()
+  do
+	if (btype_is_Q) then
+		prev_quant:=vop_quant;
+		vop_quant:=vop_quant+dquant_table[read_result()];
+        if ( vop_quant > 31 ) then 
+            vop_quant := 31 ;
+		end
+        if ( vop_quant < 1 ) then
+            vop_quant := 1 ;
+		end
+	end
+  end
+  
   mb_dispatch_done: action ==>
   guard
     comp = 6
@@ -505,7 +540,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     next_mbxy();
   end
 
-  mb_dispatch_intra: action ==> BTYPE:[ cmd ]
+  mb_dispatch_intra: action ==> BTYPE:[ cmd ], QP:[vop_quant]
   guard
     btype_is_INTRA
   var
@@ -516,7 +551,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     cmd := bitor( cmd, if acpredflag then ACPRED else 0 end );
   end
 
-  mb_dispatch_inter_no_ac: action ==> BTYPE:[ bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ]
+  mb_dispatch_inter_no_ac: action ==> BTYPE:[ bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], QP:[vop_quant]
   guard
     bitand( cbp, lshift( 1,  5 - comp)) = 0
   do
@@ -524,20 +559,34 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     comp := comp + 1;
   end
 
-  mb_dispatch_inter_ac_coded: action ==> BTYPE:[ bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ]
+  mb_dispatch_inter_ac_coded: action ==> BTYPE:[ bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], QP:[vop_quant]
   do
     ac_coded := true;
   end
 
 
-  vld_start_intra: action ==>
+  vld_start_intra.dc: action ==>
   guard
-    btype_is_INTRA
+    btype_is_INTRA, prev_quant<intra_dc_vlc_thr
   do
     start_vld_engine( if comp < 4 then DCBITS_Y_START_INDEX else DCBITS_UV_START_INDEX end );
     b_last := false;
   end
 
+  vld_start_intra.nodc.ac_coded: action ==>
+  guard
+    btype_is_INTRA, prev_quant>=intra_dc_vlc_thr,ac_coded
+  do
+    b_last := false;
+  end
+
+  vld_start_intra.nodc.no_ac_coded: action ==> RUN:[0], VALUE:[0], LAST:[true]
+  guard
+    btype_is_INTRA, prev_quant>=intra_dc_vlc_thr, not ac_coded
+  do
+    b_last := true;
+  end
+  
   // There are AC coefficients
   vld_start_inter.ac_coded: action ==>
   guard
@@ -1168,8 +1217,10 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     get_mbtype  ( do_vld_failure             ) --> stuck;
     get_mbtype  ( get_mbtype                 ) --> final_cbpy;
     final_cbpy  ( do_vld_failure             ) --> stuck;
-    final_cbpy  ( final_cbpy_intra           ) --> block;
-    final_cbpy  ( final_cbpy_inter           ) --> mv;
+    final_cbpy  ( final_cbpy_intra           ) --> dquant_intra;
+	dquant_intra( final_dquant	 			 ) --> block;
+    final_cbpy  ( final_cbpy_inter           ) --> dquant_inter;
+	dquant_inter( final_dquant	 			 ) --> mv;
 
     // process all blocks in an MB
     block      ( mb_dispatch_done           ) --> mb;
@@ -1178,7 +1229,8 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     block      ( mb_dispatch_inter_no_ac    ) --> block;
 
     // Start texture
-    texture    ( vld_start_intra            ) --> get_dc_bits;
+    texture    ( vld_start_intra.dc            ) --> get_dc_bits;
+    texture    ( vld_start_intra.nodc          ) --> texac;
     texture    ( vld_start_inter            ) --> texac;
     get_dc_bits ( get_dc_bits.none          ) --> texac;
     get_dc_bits ( get_dc_bits.some          ) --> get_dc;

@@ -17,6 +17,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="QP">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -201,4 +208,5 @@
     <Connection dst="IAP" dst-port="PTR" src="DCRecontruction" src-port="PTR"/>
     <Connection dst="IAP" dst-port="AC_PRED_DIR" src="DCRecontruction" src-port="AC_PRED_DIR"/>
     <Connection dst="IS" dst-port="AC_PRED_DIR" src="DCRecontruction" src-port="AC_PRED_DIR"/>
+    <Connection dst="DCRecontruction" dst-port="QP" src="" src-port="QP"/>
 </XDF>

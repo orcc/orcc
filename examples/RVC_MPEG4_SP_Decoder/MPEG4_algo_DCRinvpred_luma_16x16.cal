@@ -87,7 +87,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
  int ACPRED,
  int QUANT_SZ
 )
- int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ+2) A, int(size=MB_COORD_SZ+2) B, int(size=MB_COORD_SZ+2) C, int(size=SAMPLE_SZ) QFS_DC ==>
+ int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ+2) A, int(size=MB_COORD_SZ+2) B, int(size=MB_COORD_SZ+2) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
    int(size=SAMPLE_SZ) QF_DC, int(size=MB_COORD_SZ+2) PTR, int(size=3) AC_PRED_DIR, bool SIGNED, int(size=QUANT_SZ) QUANT :
 
   // Use 3 address lines for component index to save address calculation effort
@@ -96,7 +96,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
   // since pointer values are passed on ports A, B, C.     
    
   int SCALER_SZ = 7;                    // Bitwidth needed for 'dc_scalar' - see ISO/IEC 14496-2
-  int( size=QUANT_SZ ) QP;              // Decoded 'quantiser_scale' - see ISO/IEC 14496-2
+  int( size=QUANT_SZ ) s_qp;              // Decoded 'quantiser_scale' - see ISO/IEC 14496-2
   int( size=2 ) round;                  // Flag to indicate whether 'quantiser_scale' is even or odd
   int BUF_SIZE = (MAXW_IN_MB + 2) * 4;  // Have 4 8x8 blocks per MB
   int ptr := 4;                         // Pointer to current 8x8 block on current row
@@ -118,8 +118,6 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
   do
     comp  := 0;
     ptr   := 4; 
-    QP    := bitand( cmd, QUANT_MASK);
-    round := bitxor( bitand( QP, 1 ), 1 );
   end
 
   // Used to skip BTYPE tokens where necessary
@@ -127,20 +125,25 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
   end
 
   // Check for an INTER block with coded AC coefficients
-  read.inter_ac: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[QP]
+  read.inter_ac: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[s_qp]
   guard
     bitand( cmd, INTER   ) != 0,
     bitand( cmd, ACCODED ) != 0
   do
+    s_qp:=qp;
+    round := bitxor( bitand( s_qp, 1 ), 1 );
     is_signed := true;
   end
 
   // Any other block except INTRA
-  read.other: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ -1 ]
+  read.other: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ -1 ]
   guard
     bitand( cmd, ACCODED ) = 0,
     bitand( cmd, INTRA ) = 0,
     bitand( cmd, NEWVOP ) = 0
+  do
+    s_qp:=qp;
+    round := bitxor( bitand( s_qp, 1 ), 1 );
   end
 
   // Function to return absolute value
@@ -152,15 +155,15 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
   // Note that this function is specific to luminance 8x8 blocks!!!
   function dc_scaler( ) --> int(size=SCALER_SZ):
     // Y component
-    if QP > 0 and QP < 5 then 8 else
-      if QP > 4 and QP < 9 then 2 * QP else
-        if QP > 8 and QP < 25 then QP + 8 else (2 * QP) - 16 end
+    if s_qp > 0 and s_qp < 5 then 8 else
+      if s_qp > 4 and s_qp < 9 then 2 * s_qp else
+        if s_qp > 8 and s_qp < 25 then s_qp + 8 else (2 * s_qp) - 16 end
       end
     end
   end
 
   // Read an INTRA block
-  read.intra: action BTYPE:[ cmd ], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[QP]
+  read.intra: action BTYPE:[ cmd ], QP:[qp], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[s_qp]
   guard
     bitand( cmd, INTRA ) != 0
   var
@@ -173,6 +176,8 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
     int(size=3) s,
     bool ac = bitand(cmd,ACPRED) != 0
   do
+    s_qp:=qp;
+    round := bitxor( bitand( s_qp, 1 ), 1 );
     scaler    := dc_scaler();                                                      // Retrieve 'dc_scalar'. See ISO/IEC 14496-2 Table 7-1.
     dc_pred   := ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;   // See ISO/IEC 14496-2 Section 7.4.3.2.
     s         := if not ac then 0 else if top then 2 else 1 end end;               // Set 'ac_pred_dir'
@@ -182,7 +187,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
   // Do inverse prediction and dequant on INTER block DC
   getdc.inter: action QFS_DC:[ dc ] ==>
   var
-    int(size=SAMPLE_SZ) v = ( QP * (lshift( abs(dc), 1) + 1) ) - round   // See ISO/IEC 14496-2 Section 7.4.4.2.1 (H.263).
+    int(size=SAMPLE_SZ) v = ( s_qp * (lshift( abs(dc), 1) + 1) ) - round   // See ISO/IEC 14496-2 Section 7.4.4.2.1 (H.263).
   do
     dc_val := if dc = 0 then 0 else
                 if not is_signed then dc else

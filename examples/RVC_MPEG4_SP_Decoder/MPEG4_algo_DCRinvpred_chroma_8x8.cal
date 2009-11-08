@@ -87,7 +87,7 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
  int ACPRED,
  int QUANT_SZ
 )
- int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B, int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC ==>
+ int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B, int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
    int(size=SAMPLE_SZ) QF_DC, int(size=MB_COORD_SZ) PTR, int(size=3) AC_PRED_DIR, bool SIGNED, int(size=QUANT_SZ) QUANT :
 
   // Use 3 address lines for component index to save address calculation effort
@@ -96,7 +96,7 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   // values are passed on ports A, B, C.   
    
   int SCALER_SZ = 7;                 // Bitwidth needed for 'dc_scalar' - see ISO/IEC 14496-2
-  int( size=QUANT_SZ ) QP;           // Decoded 'quantiser_scale' - see ISO/IEC 14496-2 
+  int( size=QUANT_SZ ) s_qp;           // Decoded 'quantiser_scale' - see ISO/IEC 14496-2 
   int( size=2 ) round;               // Flag to indicate whether 'quantiser_scale' is even or odd            
   int BUF_SIZE = (MAXW_IN_MB + 2);   // Have 4 8x8 blocks per MB                                             
   int ptr := 1;                      // Pointer to current 8x8 block on current row                          
@@ -116,8 +116,6 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
     bitand( cmd, NEWVOP ) != 0
   do
     ptr   := 1;
-    QP    := bitand( cmd, QUANT_MASK);
-    round := bitxor( bitand( QP, 1 ), 1 );
   end
 
   // Used to skip BTYPE tokens where necessary
@@ -125,18 +123,23 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   end
 
   // Check for an INTER block with coded AC coefficients
-  read.inter_ac: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[QP]
+  read.inter_ac: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[s_qp]
   guard
     bitand( cmd, INTER   ) != 0,
     bitand( cmd, ACCODED ) != 0
   do
+    s_qp:=qp;
+    round := bitxor( bitand( s_qp, 1 ), 1 );
     is_signed := true;
   end
 
   // Any other block except INTRA
-  read.other: action BTYPE:[ cmd ] ==> AC_PRED_DIR:[ -1 ]
+  read.other: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ -1 ]
   guard
     bitand( cmd, INTRA ) = 0
+  do
+    s_qp:=qp;
+    round := bitxor( bitand( s_qp, 1 ), 1 );
   end
 
   // Function to return absolute value
@@ -148,13 +151,13 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   // Note that this function is specific to chrominance 8x8 blocks!!!
   function dc_scaler( ) --> int(size=SCALER_SZ):
     // UV component
-    if QP > 0 and QP < 5 then 8 else
-      if QP > 4 and QP < 25 then rshift(QP + 13, 1) else QP - 6 end
+    if s_qp > 0 and s_qp < 5 then 8 else
+      if s_qp > 4 and s_qp < 25 then rshift(s_qp + 13, 1) else s_qp - 6 end
     end
   end
 
   // Read an INTRA block
-  read.intra: action BTYPE:[ cmd ], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[QP]
+  read.intra: action BTYPE:[ cmd ], QP:[qp], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[s_qp]
   var
     int(size=SAMPLE_SZ) dca = dc_buf[ a ],
     int(size=SAMPLE_SZ) dcb = dc_buf[ b ],
@@ -165,6 +168,8 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
     int(size=3) s,
     bool ac = bitand(cmd,ACPRED) != 0
   do
+    s_qp:=qp;
+    round := bitxor( bitand( s_qp, 1 ), 1 );
     scaler  := dc_scaler();
     dc_pred := ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;
     s := if not ac then 0 else if top then 2 else 1 end end;
@@ -174,7 +179,7 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   // Do dequant on INTER block DC
   getdc.inter: action QFS_DC:[ dc ] ==>
   var
-    int(size=SAMPLE_SZ) v = ( QP * (lshift( abs(dc), 1) + 1) ) - round
+    int(size=SAMPLE_SZ) v = ( s_qp * (lshift( abs(dc), 1) + 1) ) - round
   do
     dc_val := if dc = 0 then 0 else
                 if not is_signed then dc else

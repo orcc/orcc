@@ -535,4 +535,7 @@
     </Connection>
     <Connection dst="" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
     <Connection dst="" dst-port="HEIGHT" src="parser" src-port="HEIGHT"/>
+    <Connection dst="texture_Y" dst-port="QP" src="parser" src-port="QUANT_Y"/>
+    <Connection dst="texture_V" dst-port="QP" src="parser" src-port="QUANT_V"/>
+    <Connection dst="texture_U" dst-port="QP" src="parser" src-port="QUANT_U"/>
 </XDF>

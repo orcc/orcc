@@ -90,6 +90,27 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="QUANT_Y">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QUANT_U">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QUANT_V">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -357,6 +378,18 @@
             <Expr kind="Var" name="SAMPLE_SZ"/>
         </Parameter>
     </Instance>
+    <Instance id="splitter_Qp">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="splitter_Qp"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="QUANT_SZ">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+        </Parameter>
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -384,4 +417,8 @@
     <Connection dst="" dst-port="B_V" src="splitter_420_B" src-port="V"/>
     <Connection dst="" dst-port="WIDTH" src="parseheaders" src-port="WIDTH"/>
     <Connection dst="" dst-port="HEIGHT" src="parseheaders" src-port="HEIGHT"/>
+    <Connection dst="splitter_Qp" dst-port="QP" src="parseheaders" src-port="QP"/>
+    <Connection dst="" dst-port="QUANT_Y" src="splitter_Qp" src-port="QUANT_Y"/>
+    <Connection dst="" dst-port="QUANT_U" src="splitter_Qp" src-port="QUANT_U"/>
+    <Connection dst="" dst-port="QUANT_V" src="splitter_Qp" src-port="QUANT_V"/>
 </XDF>

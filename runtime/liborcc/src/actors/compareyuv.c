@@ -70,9 +70,7 @@ static FILE *ptfile ;
 static char *ARG_INPUTFILE=0;
 static int  xsize_int ;
 static int  ysize_int ;
-static int  numberofframes = 0 ;
 static int  images = 0 ;
-static int  time_0 = 0, time_1 = 0 ;
 
 static void Read_YUV_init (int xsize, int ysize, char * filename )
 {
@@ -94,8 +92,7 @@ static void Read_YUV_init (int xsize, int ysize, char * filename )
       exit( -3);
    }
 
-  numberofframes = Filesize(ptfile) / (xsize * ysize + xsize * ysize / 2);
-  time_0 = timeGetTime();
+  NumberOfFrames = Filesize(ptfile) / (xsize * ysize + xsize * ysize / 2);
 }
 
 int Filesize ( FILE *f )
@@ -131,13 +128,9 @@ void Read_YUV ( unsigned char *Y, unsigned char *U, unsigned char *V )
     fread(V, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
     images++ ;
 
-    if ( images == numberofframes ) {
-       time_1 = timeGetTime();
-       printf("numberofframes %d temps %d\n", numberofframes, time_1 - time_0);
-       time_0 = timeGetTime();
+    if ( images == NumberOfFrames ) {
        fseek(ptfile, 0, SEEK_SET);
        images = 0 ;
-       exit(0);
     }
 
 }
@@ -165,7 +158,7 @@ static void DiffUcharImage ( const int x_size, const int y_size, const unsigned 
 
    if ( error != 0 ) {
       printf("error %d !!!!!!!!!!!!!\n", error);
-//      system("pause");
+      //system("pause");
    }
  //  else
    //   printf("OK\n");
@@ -247,10 +240,10 @@ void Compare_write_mb(short tokens[384]) {
 		DiffUcharImage(m_width, m_height, Y, img_buf_y);
 		DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u);
 		DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v);
-		FrameCounter ++;
-		if ( NumberOfFrames == FrameCounter){
+		if (NumberOfFrames == FrameCounter){
 			exit(666);
 		}
+		FrameCounter ++;
 	}
 }
 

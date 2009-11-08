@@ -419,6 +419,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\splitter_Qp.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\transpose.c"
 				>
 			</File>
