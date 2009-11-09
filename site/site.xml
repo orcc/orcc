@@ -3,5 +3,9 @@
    <feature url="features/net.sf.orcc_0.5.0.jar" id="net.sf.orcc" version="0.5.0">
       <category name="Orc Compiler"/>
    </feature>
-   <category-def name="Orc Compiler" label="Orc Compiler"/>
+   <category-def name="Orc Compiler" label="Orc Compiler">
+      <description>
+         The Orc Compiler is a compiler for the RVC-CAL language.
+      </description>
+   </category-def>
 </site>

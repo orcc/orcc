@@ -6,7 +6,7 @@
       provider-name="IETR/INSA of Rennes">
 
    <description url="http://orcc.sf.net">
-      The Orc Compiler is a compiler created by IETR/INSA Rennes for the RVC-CAL language that can generate code for C and LLVM languages. Please consult the wiki for information on how to install and run the Orc compiler.
+      The Orc Compiler is a compiler for the RVC-CAL language.
    </description>
 
    <copyright>
