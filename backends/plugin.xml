@@ -9,7 +9,7 @@
       </backend>
       <backend
                class="net.sf.orcc.backends.cpp.CppBackendImpl"
-               name="Cpp">
+               name="C++">
       </backend>
    <backend
         class="net.sf.orcc.backends.java.JavaBackendImpl"
