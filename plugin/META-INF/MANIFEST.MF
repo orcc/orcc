@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: ORCC plug-in
+Bundle-Name: Orc Compiler plug-in
 Bundle-SymbolicName: net.sf.orcc.plugin;singleton:=true
-Bundle-Version: 0.2.0
+Bundle-Version: 0.5.0
 Bundle-Activator: net.sf.orcc.ui.OrccActivator
 Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.core.runtime,
@@ -10,11 +10,7 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.debug.ui,
  org.eclipse.ui,
  org.eclipse.ui.console,
- org.eclipse.ui.ide,
- net.sf.opendf.eclipse.debug,
- org.eclipse.jdt.core,
- org.eclipse.jdt.ui,
- org.eclipse.jdt.launching
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,

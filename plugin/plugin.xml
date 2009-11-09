@@ -11,15 +11,6 @@
             name="Orcc compilation"
             public="true">
       </launchConfigurationType>
-      <launchConfigurationType
-            delegate="net.sf.orcc.ui.launching.OrccDebugLaunchDelegate"
-            id="net.sf.orcc.debugLaunchConfigurationType"
-            modes="debug"
-            name="Orcc debug simulation"
-            public="true"
-            sourceLocatorId="opendf.CALSourceLocator"
-            sourcePathComputerId="opendf.CALSourcePathComputer">
-      </launchConfigurationType>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
@@ -52,35 +43,6 @@
             </enablement>
          </contextualLaunch>
       </shortcut>
-      <shortcut
-            class="net.sf.orcc.ui.launching.OrccDebugLaunchShortcut"
-            icon="icons/orcc_debug.gif"
-            id="net.sf.orcc.debugLaunchShortcut"
-            label="Orcc debug simulation"
-            modes="debug">
-         <configurationType
-               id="net.sf.orcc.debugLaunchConfigurationType">
-         </configurationType>
-         <description
-               description="Debugs a dataflow program with Orcc"
-               mode="debug">
-         </description>
-         <contextualLaunch>
-            <enablement>
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <test
-                           property="net.sf.orcc.isXDF">
-                     </test>
-                  </iterate>
-               </with>
-            </enablement>
-         </contextualLaunch>
-      </shortcut>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
@@ -91,15 +53,6 @@
             type="net.sf.orcc.runLaunchConfigurationType">
          <launchMode
                mode="run">
-         </launchMode>
-      </launchConfigurationTabGroup>
-      <launchConfigurationTabGroup
-            class="net.sf.orcc.ui.launching.OrccDebugLaunchConfigurationTabGroup"
-            description="Debugs a dataflow program with Orcc."
-            id="net.sf.orcc.debugLaunchConfigurationTabGroup"
-            type="net.sf.orcc.debugLaunchConfigurationType">
-         <launchMode
-               mode="debug">
          </launchMode>
       </launchConfigurationTabGroup>
    </extension>
@@ -119,11 +72,6 @@
             configTypeID="net.sf.orcc.runLaunchConfigurationType"
             icon="icons/orcc_run.gif"
             id="net.sf.orcc.runLaunchConfigurationTypeImage">
-      </launchConfigurationTypeImage>
-      <launchConfigurationTypeImage
-            configTypeID="net.sf.orcc.debugLaunchConfigurationType"
-            icon="icons/orcc_debug.gif"
-            id="net.sf.orcc.debugLaunchConfigurationTypeImage">
       </launchConfigurationTypeImage>
    </extension>
 

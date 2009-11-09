@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.sf.orcc"
-      label="Open RVC-CAL Compiler ORCC"
-      version="0.2.0"
+      label="Orc Compiler"
+      version="0.5.0"
       provider-name="IETR/INSA of Rennes">
 
    <description url="http://orcc.sf.net">
-      A suite of compilers for RVC-CAL.
+      The Orc Compiler is a compiler created by IETR/INSA Rennes for the RVC-CAL language that can generate code for C and LLVM languages. Please consult the wiki for information on how to install and run the Orc compiler.
    </description>
 
    <copyright>
@@ -90,6 +90,13 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 
    <plugin
          id="net.sf.orcc.plugin"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.orcc.backends"
          download-size="0"
          install-size="0"
          version="0.0.0"
