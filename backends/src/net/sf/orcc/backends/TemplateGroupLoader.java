@@ -63,23 +63,9 @@ public class TemplateGroupLoader implements StringTemplateGroupLoader {
 		StringTemplateGroup group = null;
 
 		try {
-			InputStream is;
-			try {
-				// check if Eclipse framework is in the classpath
-				Class.forName("org.eclipse.core.runtime.Plugin");
-
-				// if it is, check that the plug-in is loaded
-				Activator activator = Activator.getDefault();
-				if (activator == null) {
-					throw new ClassNotFoundException();
-				}
-
-				is = PluginGroupLoader.getInputStream(groupName);
-			} catch (ClassNotFoundException e) {
-				ClassLoader loader = ClassLoader.getSystemClassLoader();
-				is = loader.getResourceAsStream("net/sf/orcc/templates/"
-						+ groupName + ".stg");
-			}
+			String groupPath = "/net/sf/orcc/templates/" + groupName + ".stg";
+			Class<?> clasz = this.getClass();
+			InputStream is = clasz.getResourceAsStream(groupPath);
 
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
