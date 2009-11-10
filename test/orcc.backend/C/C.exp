@@ -7,4 +7,5 @@ foreach network [lsort [glob $srcdir/$subdir/../*.xdf]] {#*/
 
   frontend $network
   backend "CBackendImpl" $outputNetwork
+  exec sh -c "cd $srcdir/$subdir/ && make clean && make"
 }
