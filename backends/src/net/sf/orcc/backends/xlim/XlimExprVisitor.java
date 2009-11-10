@@ -78,18 +78,18 @@ public class XlimExprVisitor implements ExprVisitor {
 	{
 		// Binary operators
 		opString = new TreeMap<BinaryOp, String>();
-		opString.put(BinaryOp.BITAND, "$and");
-		opString.put(BinaryOp.BITOR, "$or");
-		opString.put(BinaryOp.BITXOR, "$xor");
+		opString.put(BinaryOp.BITAND, "bitand");
+		opString.put(BinaryOp.BITOR, "bitor");
+		opString.put(BinaryOp.BITXOR, "bitxor");
 		opString.put(BinaryOp.DIV, "$div");
 		opString.put(BinaryOp.DIV_INT, "$idiv");
 		opString.put(BinaryOp.EQ, "$eq");
 		opString.put(BinaryOp.EXP, "$exp");
 		opString.put(BinaryOp.GE, "$ge");
 		opString.put(BinaryOp.GT, "$gt");
-		opString.put(BinaryOp.LOGIC_AND, "$land");
+		opString.put(BinaryOp.LOGIC_AND, "$and");
 		opString.put(BinaryOp.LE, "$le");
-		opString.put(BinaryOp.LOGIC_OR, "$lor");
+		opString.put(BinaryOp.LOGIC_OR, "$or");
 		opString.put(BinaryOp.LT, "$lt");
 		opString.put(BinaryOp.MINUS, "$sub");
 		opString.put(BinaryOp.MOD, "$mod");
@@ -101,8 +101,8 @@ public class XlimExprVisitor implements ExprVisitor {
 
 		// Unary operators
 		uopString = new TreeMap<UnaryOp, String>();
-		uopString.put(UnaryOp.BITNOT, "$not");
-		uopString.put(UnaryOp.LOGIC_NOT, "$lnot");
+		uopString.put(UnaryOp.BITNOT, "bitnot");
+		uopString.put(UnaryOp.LOGIC_NOT, "$not");
 		uopString.put(UnaryOp.MINUS, "$negate");
 		uopString.put(UnaryOp.NUM_ELTS, "$elts");
 	}
