@@ -33,18 +33,10 @@ Build a release of ORCC
 Upload javadoc to Orcc SF.net website
 
 Windows-specific:
-  download cwrsync from https://sourceforge.net/projects/sereds/
-  set PATH=%PATH%;C:\Program Files\cwRsync\bin
+  under Cygwin, install rsync and openssh
 
 in the trunk:
-  cd plugin/javadoc
-  rsync -avP --chmod=+rx -e ssh . mwipliez,orcc@web.sourceforge.net:htdocs/javadoc/plugin
-  cd ../../backends/javadoc
-  rsync -avP --chmod=+rx -e ssh . mwipliez,orcc@web.sourceforge.net:htdocs/javadoc/backends
-
-Note: The --chmod is necessary on Windows to ensure the files will be readable
-and executable (for directories) on the web site. Not sure if it is needed
-on Linux.
+  ./rsync_javadoc_mwipliez.sh
 
 -------------------------------------------------------------------------------
 Troubleshooting
