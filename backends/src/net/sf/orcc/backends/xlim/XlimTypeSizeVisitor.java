@@ -40,9 +40,10 @@ import org.w3c.dom.Element;
 
 /**
  * XlimTypeSizeVisitor prints typeName and size of types
+ * 
  * @author Samuel Keller EPFL
  */
-public class XlimTypeSizeVisitor implements TypeVisitor{
+public class XlimTypeSizeVisitor implements TypeVisitor {
 
 	/**
 	 * Element to modify
@@ -51,59 +52,69 @@ public class XlimTypeSizeVisitor implements TypeVisitor{
 
 	/**
 	 * XlimTypeSizeVisitor constructor with element
-	 * @param element Element to modify
+	 * 
+	 * @param element
+	 *            Element to modify
 	 */
-	public XlimTypeSizeVisitor(Element element){
+	public XlimTypeSizeVisitor(Element element) {
 		this.element = element;
 	}
 
 	/**
 	 * Add typeName and size for boolean type
-	 * @param type Boolean type
+	 * 
+	 * @param type
+	 *            Boolean type
 	 */
 	public void visit(BoolType type) {
 		element.setAttribute("size", "1");
-		element.setAttribute("typeName","bool");
+		element.setAttribute("typeName", "bool");
 	}
 
 	/**
 	 * Add typeName and size for integer type
-	 * @param type Integer type
+	 * 
+	 * @param type
+	 *            Integer type
 	 */
 	public void visit(IntType type) {
 		String size;
-		try{
+		try {
 			size = type.getSize().toString();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			size = "";
 		}
 		element.setAttribute("size", size);
-		element.setAttribute("typeName","int");
+		element.setAttribute("typeName", "int");
 	}
 
 	/**
 	 * Add typeName and size for list type
-	 * @param type List type
+	 * 
+	 * @param type
+	 *            List type
 	 */
 	public void visit(ListType type) {
-		element.setAttribute("typeName","List");
-		
+		element.setAttribute("typeName", "List");
+
 		/*
-		type.getElementType().accept(new XlimTypeSizeVisitor(element));
-		
-		try {
-			
-			element.setAttribute("size","SIZE"+Util.evaluateAsInteger(type.getSize()));
-		} catch (OrccException e) {
-			// TODO Auto-generated catch block
-			e.AddStackTrace();
-		}*/
+		 * type.getElementType().accept(new XlimTypeSizeVisitor(element));
+		 * 
+		 * try {
+		 * 
+		 * 
+		 * 
+		 * element.setAttribute("size","SIZE"+Util.evaluateAsInteger(type.getSize
+		 * ())); } catch (OrccException e) { // TODO Auto-generated catch block
+		 * e.AddStackTrace(); }
+		 */
 	}
 
 	/**
 	 * Add typeName and size for string type
-	 * @param type String type
+	 * 
+	 * @param type
+	 *            String type
 	 */
 	public void visit(StringType type) {
 		// TODO Auto-generated method stub
@@ -112,24 +123,27 @@ public class XlimTypeSizeVisitor implements TypeVisitor{
 
 	/**
 	 * Add typeName and size for unsigned integer type
-	 * @param type Unsigned integer type
+	 * 
+	 * @param type
+	 *            Unsigned integer type
 	 */
 	public void visit(UintType type) {
 		String size;
-		try{
+		try {
 			size = type.getSize().toString();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			size = "";
 		}
 		element.setAttribute("size", size);
 		// TODO Check the type name
-		element.setAttribute("typeName","uint");
+		element.setAttribute("typeName", "uint");
 	}
 
 	/**
 	 * Add no typeName and size for void type
-	 * @param type Void type
+	 * 
+	 * @param type
+	 *            Void type
 	 */
 	public void visit(VoidType type) {
 	}

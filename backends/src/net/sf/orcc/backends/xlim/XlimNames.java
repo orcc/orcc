@@ -32,68 +32,136 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 
 public class XlimNames {
-	
-	
-	
-	public XlimNames(){
+
+	/**
+	 * Decision id
+	 */
+	private static int decision = -1;
+
+	/**
+	 * Temp ip
+	 */
+	private static int temp = -1;
+
+	/**
+	 * Parameters map
+	 */
+	private Map<String, String> params;
+
+	/**
+	 * XlimNames default constructor
+	 */
+	public XlimNames() {
 		params = new TreeMap<String, String>();
 	}
-	
-	public XlimNames(XlimNames parent, Map<String, String> params){
+
+	/**
+	 * XlimNames full constructor to be used in function call
+	 * 
+	 * @param parent
+	 *            Parents XlimNames
+	 * @param params
+	 *            Parameters sended
+	 */
+	public XlimNames(XlimNames parent, Map<String, String> params) {
 		this.params = params;
 	}
-	
-	private static int temp = -1;
-	private static int decision = -1;
-	
-	//private static Map<String, Integer> varcounts = new TreeMap<String, Integer>();
-	private Map<String, String> params;
-	
-	public String getVarName(Variable var){
-		/*Integer count = varcounts.get(var.getName());
-		if(count == null){
-			count = 0;
-		}
-		else{
-			count++;
-		}
-		varcounts.put(var.getName(),count);*/
-		return getVarTemplate(var);
+
+	/**
+	 * Get the name of a port (port name + action name)
+	 * 
+	 * @param port
+	 *            Port to print
+	 * @param actionName
+	 *            Action containing the Port
+	 * @return Formatted name
+	 */
+	public String getPortName(Port port, String actionName) {
+		return "port_" + port.getName() + "_" + actionName;
 	}
-	
-	public String getVarName(Use use){
+
+	/**
+	 * Get the name of a port (port name + action name)
+	 * 
+	 * @param use
+	 *            Use of Port to print
+	 * @param actionName
+	 *            Action containing the Port
+	 * @return Formatted name
+	 */
+	public String getPortName(Use use, String actionName) {
+		return "port_" + use.toString() + "_" + actionName;
+	}
+
+	/**
+	 * Get current temporary name
+	 * 
+	 * @return current temporary name
+	 */
+	public String getTempName() {
+		return "temp_" + (temp);
+	}
+
+	/**
+	 * Get the name of a variable
+	 * 
+	 * @param use
+	 *            Use of Variable
+	 * @return Variable name
+	 */
+	public String getVarName(Use use) {
 		String var = use.getVariable().getName();
-		if(params.containsKey(var)){
+		if (params.containsKey(var)) {
 			return params.get(var);
 		}
 		return getVarTemplate(use.getVariable());
 	}
-	
-	private String getVarTemplate(Variable var){
+
+	/**
+	 * Get the name of a variable
+	 * 
+	 * @param var
+	 *            Variable
+	 * @return Variable name
+	 */
+	public String getVarName(Variable var) {
+		/*
+		 * Integer count = varcounts.get(var.getName()); if(count == null){
+		 * count = 0; } else{ count++; } varcounts.put(var.getName(),count);
+		 */
+		return getVarTemplate(var);
+	}
+
+	/**
+	 * Template for getting the name of a variable
+	 * 
+	 * @param var
+	 *            Variable
+	 * @return Variable name
+	 */
+	private String getVarTemplate(Variable var) {
 		return "var_" + var.getName();// + "_" + varcounts.get(var.getName());
 	}
-	
-	public String putTempName(){
-		return "temp_" + (++temp);
-	}
-	
-	public String getTempName(){
-		return "temp_" + (temp);
-	}
-	
-	public String putDecision(){
+
+	/**
+	 * Get decision name (based on decision unique id)
+	 * 
+	 * @return decision name
+	 */
+	public String putDecision() {
 		return "decision_" + (++decision);
 	}
-	
-	public String getPortName(Use use, String actionName){
-		return "port_" + use.toString() + "_" + actionName;
-	}
-	
-	public String getPortName(Port port, String actionName){
-		return "port_" + port.getName() + "_" + actionName;
+
+	/**
+	 * Get new temporary name
+	 * 
+	 * @return new temporary name
+	 */
+	public String putTempName() {
+		return "temp_" + (++temp);
 	}
 }

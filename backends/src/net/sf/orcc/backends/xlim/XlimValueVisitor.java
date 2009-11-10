@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.xlim;
 
-import net.sf.orcc.ir.IConst;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ConstVisitor;
 import net.sf.orcc.ir.consts.IntConst;
@@ -40,15 +39,16 @@ import org.w3c.dom.Element;
 
 /**
  * XlimValueVisitor prints constant values in XLIM
+ * 
  * @author Samuel Keller EPFL
  */
-public class XlimValueVisitor implements ConstVisitor{
+public class XlimValueVisitor implements ConstVisitor {
 
 	/**
 	 * Element to modify
 	 */
 	private Element element;
-	
+
 	/**
 	 * Document for new element creation
 	 */
@@ -56,59 +56,72 @@ public class XlimValueVisitor implements ConstVisitor{
 
 	/**
 	 * XlimValueVisitor constructor with element and document initialization
-	 * @param element Element to modify
+	 * 
+	 * @param element
+	 *            Element to modify
 	 */
-	XlimValueVisitor(Element element){
+	XlimValueVisitor(Element element) {
 		this.element = element;
 		this.xlim = element.getOwnerDocument();
 	}
-	
+
 	/**
 	 * Add a boolean constant
-	 * @param constant Boolean constant to be Added
-	 * @param args Arguments sent (not used)
+	 * 
+	 * @param constant
+	 *            Boolean constant to be Added
+	 * @param args
+	 *            Arguments sent (not used)
 	 */
 	public void visit(BoolConst constant, Object... args) {
-		element.setAttribute("value", constant.getValue()?"1":"0");
+		element.setAttribute("value", constant.getValue() ? "1" : "0");
 	}
 
 	/**
 	 * Add an integer constant
-	 * @param constant Integer constant to be Added
-	 * @param args Arguments sent (not used)
+	 * 
+	 * @param constant
+	 *            Integer constant to be Added
+	 * @param args
+	 *            Arguments sent (not used)
 	 */
 	public void visit(IntConst constant, Object... args) {
-		element.setAttribute("value",constant.toString());
+		element.setAttribute("value", constant.toString());
 	}
 
 	/**
 	 * Add a list constant
-	 * @param constant List constant to be Added
-	 * @param args Arguments sent (not used)
+	 * 
+	 * @param constant
+	 *            List constant to be Added
+	 * @param args
+	 *            Arguments sent (not used)
 	 */
 	public void visit(ListConst constant, Object... args) {
 		// TODO Change this
-		Element init =  xlim.createElement("initValue");
+		Element init = xlim.createElement("initValue");
 		init.setAttribute("typeName", "List");
 		element.appendChild(init);
 
 		/*
-		for(IConst value : constant.getValue()){
-			Element sub =  xlim.createElement("initValue");
-			//sub.setAttribute("typeName", "List");
-			init.appendChild(sub);
-
-			value.accept(new XlimValueVisitor(sub, xlim));
-		}*/
+		 * for(IConst value : constant.getValue()){ Element sub =
+		 * xlim.createElement("initValue"); //sub.setAttribute("typeName",
+		 * "List"); init.appendChild(sub);
+		 * 
+		 * value.accept(new XlimValueVisitor(sub, xlim)); }
+		 */
 	}
 
 	/**
 	 * Add a string constant
-	 * @param constant String constant to be added
-	 * @param args Arguments sent (not used)
+	 * 
+	 * @param constant
+	 *            String constant to be added
+	 * @param args
+	 *            Arguments sent (not used)
 	 */
 	public void visit(StringConst constant, Object... args) {
-		element.setAttribute("value",constant.toString());
+		element.setAttribute("value", constant.toString());
 	}
 
 }

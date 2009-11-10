@@ -37,15 +37,17 @@ import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Network;
 
 /**
- * XLIM back-end.
- * XlimBackendImpl manages JSON to XLIM transformation
- * @author Matthieu Wipliez, Samuel Keller 
+ * XLIM back-end. XlimBackendImpl manages JSON to XLIM transformation
+ * 
+ * @author Matthieu Wipliez, Samuel Keller
  */
 public class XlimBackendImpl extends AbstractBackend {
 
 	/**
 	 * Command line to generate XLIM
-	 * @param args First argument used only: XDF location
+	 * 
+	 * @param args
+	 *            First argument used only: XDF location
 	 */
 	public static void main(String[] args) {
 		if (args.length == 1) {
@@ -62,7 +64,7 @@ public class XlimBackendImpl extends AbstractBackend {
 					.println("Usage: XlimBackendImpl <flattened XDF network>");
 		}
 	}
-	
+
 	/**
 	 * Printer for XLIM
 	 */
@@ -77,8 +79,11 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	/**
 	 * Print one actor
-	 * @param id Actor id
-	 * @param actor Actor structure
+	 * 
+	 * @param id
+	 *            Actor id
+	 * @param actor
+	 *            Actor structure
 	 */
 	protected void printActor(String id, Actor actor) throws Exception {
 		String outputName = path + File.separator + id + ".xlim";
@@ -87,7 +92,9 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	/**
 	 * Print the network
-	 * @param network Network structure
+	 * 
+	 * @param network
+	 *            Network structure
 	 */
 	protected void printNetwork(Network network) throws Exception {
 	}

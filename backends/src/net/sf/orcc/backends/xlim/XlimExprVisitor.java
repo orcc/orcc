@@ -31,9 +31,6 @@ package net.sf.orcc.backends.xlim;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -45,93 +42,41 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 public class XlimExprVisitor implements ExprVisitor {
-	
-	private Document xlim;
-	private XlimNames names;
-	private Element root;
-	
+
+	/**
+	 * Binary operators XLIM mapping
+	 */
 	private static Map<BinaryOp, String> opString;
+
+	/**
+	 * Unary operators XLIM mapping
+	 */
 	private static Map<UnaryOp, String> uopString;
-	
-	public XlimExprVisitor(XlimNames names, Element root){
-		this.xlim = root.getOwnerDocument();
-		this.names = names;
-		this.root = root;
-	}
 
-	@Override
-	public void visit(BinaryExpr expr, Object... args) {
-		
-		Element operationE = xlim.createElement("operation");
-		//expr.getOp() == BinaryOp.PLUS;
-		operationE.setAttribute("kind", opString.get(expr.getOp()));
-		
-		expr.getE1().accept(this, root);
-		
-		XlimNodeTemplate.newInPort(operationE, names.getTempName());
-		
-		expr.getE2().accept(this, root);
-		
-		XlimNodeTemplate.newInPort(operationE, names.getTempName());
-		
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), null, null);
-		//expr.getUnderlyingType().accept(new XlimTypeSizeVisitor(portO));
-		root.appendChild(operationE);
-	}
+	/**
+	 * XLIM naming
+	 */
+	private XlimNames names;
 
-	@Override
-	public void visit(BooleanExpr expr, Object... args) {
-		Element operationE = XlimNodeTemplate.newValueOperation(root, "$literal_Integer", expr.getValue()?"1":"0");
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), "1", "int");
-	}
+	/**
+	 * Root element where to add everything
+	 */
+	private Element root;
 
-	@Override
-	public void visit(IntExpr expr, Object... args) {
-		Element operationE = XlimNodeTemplate.newValueOperation(root, "$literal_Integer", expr.toString());
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), null, "int");
-		// TODO Add size
+	/**
+	 * XLIM base document
+	 */
+	private Document xlim;
 
-	}
-
-	@Override
-	public void visit(ListExpr expr, Object... args) {
-		System.out.println("CHECK LIST EXPR");
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void visit(StringExpr expr, Object... args) {
-		System.out.println("CHECK STRING EXPR");
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void visit(UnaryExpr expr, Object... args) {
-		System.out.println("CHECK UNARY EXPR");
-		// TODO Auto-generated method stub
-		
-		expr.getExpr().accept(this, root);
-		
-		Element operationE = XlimNodeTemplate.newOperation(root, uopString.get(expr.getOp()));
-		
-		XlimNodeTemplate.newInPort(operationE, names.getTempName());
-		
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), null, null);
-	}
-
-	@Override
-	public void visit(VarExpr expr, Object... args) {
-		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
-		
-		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar()));
-		
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), null, null);
-	}
-	
+	/**
+	 * Initialization: filling of Unary and Binary Map
+	 */
 	{
+		// Binary operators
 		opString = new TreeMap<BinaryOp, String>();
 		opString.put(BinaryOp.BITAND, "$and");
 		opString.put(BinaryOp.BITOR, "$or");
@@ -153,12 +98,155 @@ public class XlimExprVisitor implements ExprVisitor {
 		opString.put(BinaryOp.SHIFT_LEFT, "lshift");
 		opString.put(BinaryOp.SHIFT_RIGHT, "rshift");
 		opString.put(BinaryOp.TIMES, "$mul");
-		
+
+		// Unary operators
 		uopString = new TreeMap<UnaryOp, String>();
-		uopString.put(UnaryOp.BITNOT,"$not");
-		uopString.put(UnaryOp.LOGIC_NOT,"$lnot");
-		uopString.put(UnaryOp.MINUS,"$negate");
-		uopString.put(UnaryOp.NUM_ELTS,"$elts");
+		uopString.put(UnaryOp.BITNOT, "$not");
+		uopString.put(UnaryOp.LOGIC_NOT, "$lnot");
+		uopString.put(UnaryOp.MINUS, "$negate");
+		uopString.put(UnaryOp.NUM_ELTS, "$elts");
+	}
+
+	/**
+	 * XlimExprVisitor constructor
+	 * 
+	 * @param names
+	 *            XLIM naming
+	 * @param root
+	 *            Root element where to add everything
+	 */
+	public XlimExprVisitor(XlimNames names, Element root) {
+		this.xlim = root.getOwnerDocument();
+		this.names = names;
+		this.root = root;
+	}
+
+	/**
+	 * Add binary expression
+	 * 
+	 * @param expr
+	 *            Binary expression node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(BinaryExpr expr, Object... args) {
+
+		Element operationE = xlim.createElement("operation");
+		// expr.getOp() == BinaryOp.PLUS;
+		operationE.setAttribute("kind", opString.get(expr.getOp()));
+
+		expr.getE1().accept(this, root);
+
+		XlimNodeTemplate.newInPort(operationE, names.getTempName());
+
+		expr.getE2().accept(this, root);
+
+		XlimNodeTemplate.newInPort(operationE, names.getTempName());
+
+		XlimNodeTemplate
+				.newOutPort(operationE, names.putTempName(), null, null);
+		// expr.getUnderlyingType().accept(new XlimTypeSizeVisitor(portO));
+		root.appendChild(operationE);
+	}
+
+	/**
+	 * Add boolean expression
+	 * 
+	 * @param expr
+	 *            Boolean expression node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(BooleanExpr expr, Object... args) {
+		Element operationE = XlimNodeTemplate.newValueOperation(root,
+				"$literal_Integer", expr.getValue() ? "1" : "0");
+		XlimNodeTemplate
+				.newOutPort(operationE, names.putTempName(), "1", "int");
+	}
+
+	/**
+	 * Add integer expression
+	 * 
+	 * @param expr
+	 *            Integer expression node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(IntExpr expr, Object... args) {
+		Element operationE = XlimNodeTemplate.newValueOperation(root,
+				"$literal_Integer", expr.toString());
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), null,
+				"int");
+		// TODO Add size
+
+	}
+
+	/**
+	 * Add list expression
+	 * 
+	 * @param expr
+	 *            List expression node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(ListExpr expr, Object... args) {
+		System.out.println("CHECK LIST EXPR");
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * Add string expression
+	 * 
+	 * @param expr
+	 *            String expression node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(StringExpr expr, Object... args) {
+		System.out.println("CHECK STRING EXPR");
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * Add unary expression
+	 * 
+	 * @param expr
+	 *            Unary expression node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(UnaryExpr expr, Object... args) {
+		System.out.println("CHECK UNARY EXPR");
+		// TODO Auto-generated method stub
+
+		expr.getExpr().accept(this, root);
+
+		Element operationE = XlimNodeTemplate.newOperation(root, uopString
+				.get(expr.getOp()));
+
+		XlimNodeTemplate.newInPort(operationE, names.getTempName());
+
+		XlimNodeTemplate
+				.newOutPort(operationE, names.putTempName(), null, null);
+	}
+
+	/**
+	 * Add variable expression
+	 * 
+	 * @param expr
+	 *            Variable expression node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(VarExpr expr, Object... args) {
+		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
+
+		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar()));
+
+		XlimNodeTemplate
+				.newOutPort(operationE, names.putTempName(), null, null);
 	}
 
 }
