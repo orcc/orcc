@@ -53,7 +53,7 @@ public class CustomAttribute implements ICustomAttribute {
 	/**
 	 * Creates a new custom attribute with the given DOM child nodes.
 	 * 
-	 * @param value
+	 * @param list
 	 *            the children of this attribute as a {@link NodeList}
 	 * @throws OrccException
 	 */
