@@ -64,7 +64,15 @@ ActorGen::ActorGen(unsigned uNbrPortIn, unsigned uNbrPortOut)
 	m_uNbrPortOut = uNbrPortOut;
 	m_bStarted = false;
 	m_bExit = false;
-	m_poFifoFanOut = NULL;
+	
+	if (uNbrPortOut != 0)
+	{
+		m_poFifoFanOut  = (FifoFanOut **)malloc(uNbrPortOut * sizeof(FifoFanOut *));
+		for(unsigned i = 0; i < uNbrPortOut; i++)
+		{
+			m_poFifoFanOut[i] = NULL;
+		}
+	}
 }
 
 ActorGen::~ActorGen()
@@ -87,7 +95,11 @@ ActorGen::~ActorGen()
 	}
 	if (m_poFifoFanOut != NULL)
 	{
-		delete(m_poFifoFanOut);
+		for(unsigned i=0; i<m_uNbrPortOut; i++)
+		{
+			m_poFifoFanOut[i]=NULL;
+		}
+		free(m_poFifoFanOut);
 	}
 }
 
@@ -112,17 +124,17 @@ void ActorGen::connect(ACTOR_PORT_DIR ePortDir, unsigned uIdx, FifoAPI *poFifo)
 		else
 		{
 			// if the module that manage the Fan Out does not exist then create it
-			if ( m_poFifoFanOut == NULL)
+			if ( m_poFifoFanOut[uIdx] == NULL)
 			{
 				// Create Fan Out manager
-				m_poFifoFanOut = new FifoFanOut();
+				m_poFifoFanOut[uIdx] = new FifoFanOut();
 				// Backup previous port that was connected to the fifo in the module
-				m_poFifoFanOut->addOut(m_poTabOut[uIdx]);
+				m_poFifoFanOut[uIdx]->addOut(m_poTabOut[uIdx]);
 				// Now the port is connected to the fifo throught the Fan Out Manager
-				m_poTabOut[uIdx]=m_poFifoFanOut;
+				m_poTabOut[uIdx]=m_poFifoFanOut[uIdx];
 			}
 			// Save the new connection
-			m_poFifoFanOut->addOut(poFifo);
+			m_poFifoFanOut[uIdx]->addOut(poFifo);
 		}
 	}
 }

@@ -26,7 +26,6 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
 #ifndef __ACTOR_AKA_H__
 #define __ACTOR_AKA_H__
 
@@ -64,7 +63,7 @@ private:
 	unsigned m_uNbrPortIn;
 	unsigned m_uNbrPortOut;
 
-	FifoFanOut *m_poFifoFanOut;
+	FifoFanOut ** m_poFifoFanOut;
 
 };
 
