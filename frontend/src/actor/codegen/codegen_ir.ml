@@ -277,8 +277,8 @@ let rec mk_nodes graph node join =
 (** [mk_proc proc] returns a "procedure" element that defines the given [proc]. *)
 let mk_proc proc =
 	array
-		[ array
-				[ string proc.p_name; bool proc.p_external ];
+		[ string proc.p_name;
+			bool proc.p_external;
 			mk_loc proc.p_loc;
 			mk_type proc.p_return;
 			mk_var_defs proc.p_params;

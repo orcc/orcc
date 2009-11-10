@@ -675,20 +675,19 @@ public class IRParser {
 	 */
 	private Procedure parseProc(JSONArray array, boolean register)
 			throws JSONException, OrccException {
-		JSONArray array1 = array.getJSONArray(0);
-		String name = array1.getString(0);
-		boolean external = array1.getBoolean(1);
+		String name = array.getString(0);
+		boolean external = array.getBoolean(1);
 
-		Location location = parseLocation(array.getJSONArray(1));
-		IType returnType = parseType(array.get(2));
+		Location location = parseLocation(array.getJSONArray(2));
+		IType returnType = parseType(array.get(3));
 		variables = new Scope<Variable>(variables, true);
 		OrderedMap<Variable> parameters = variables;
-		parseVarDefs(array.getJSONArray(3));
+		parseVarDefs(array.getJSONArray(4));
 		variables = new Scope<Variable>(variables, false);
 		OrderedMap<Variable> locals = variables;
-		parseVarDefs(array.getJSONArray(4));
+		parseVarDefs(array.getJSONArray(5));
 
-		List<INode> nodes = parseNodes(array.getJSONArray(5));
+		List<INode> nodes = parseNodes(array.getJSONArray(6));
 
 		// go back to previous scope
 		variables = variables.getParent().getParent();
