@@ -35,6 +35,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -474,6 +477,11 @@ public class ALAstParser {
 	private FSMBuilder fsmBuilder;
 
 	/**
+	 * list of initialize actions
+	 */
+	private ActionList initializes;
+
+	/**
 	 * scope of input ports
 	 */
 	private OrderedMap<Port> inputs;
@@ -520,6 +528,11 @@ public class ALAstParser {
 	private final TypeParser typeParser;
 
 	/**
+	 * this integer is used to give a name to untagged actions.
+	 */
+	private int untaggedCounter;
+
+	/**
 	 * creates a new parser from the given file name.
 	 * 
 	 * @param fileName
@@ -536,6 +549,45 @@ public class ALAstParser {
 			String msg = "could not solve the path \"" + fileName + "\"";
 			throw new OrccException(msg, e);
 		}
+	}
+
+	/**
+	 * Returns a name from the given tag. Location information is used only when
+	 * reporting an exception.
+	 * 
+	 * @param location
+	 *            location of the action
+	 * @param tag
+	 *            tag of the action, possibly empty
+	 * @return an action name
+	 * @throws OrccException
+	 *             if there are too many unnamed actions.
+	 */
+	private String getActionName(Location location, Tag tag)
+			throws OrccException {
+		StringBuilder builder = new StringBuilder();
+		if (tag.isEmpty()) {
+			builder.append("untagged");
+
+			untaggedCounter++;
+			if (untaggedCounter >= 100) {
+				final String message = "Whoa, this actor contains more than 100 anonymous actions. If you are "
+						+ "sure there is no other way for you to do what you want with less, "
+						+ "please contact us and we will see what we can do.";
+				throw new OrccException(file, location, message);
+			}
+
+			new Formatter(builder).format("%02d", untaggedCounter);
+		} else {
+			Iterator<String> it = tag.iterator();
+			builder.append(it.next());
+			while (it.hasNext()) {
+				builder.append('_');
+				builder.append(it.next());
+			}
+		}
+
+		return builder.toString();
 	}
 
 	/**
@@ -589,7 +641,16 @@ public class ALAstParser {
 		stmtParser.parseBlock(tree, 4);
 		currentScope = currentScope.getParent();
 
-		Action action = new Action(location, tag, null, null, null, null);
+		String name = getActionName(location, tag);
+		Procedure scheduler = new Procedure("isSchedulable_" + name, false,
+				location, new BoolType(), tokens, new OrderedMap<Variable>(),
+				new ArrayList<INode>());
+
+		Procedure body = new Procedure(name, false, location, new VoidType(),
+				tokens, new OrderedMap<Variable>(), new ArrayList<INode>());
+
+		Action action = new Action(location, tag, new HashMap<Port, Integer>(),
+				new HashMap<Port, Integer>(), scheduler, body);
 		actions.add(action);
 	}
 
@@ -613,6 +674,7 @@ public class ALAstParser {
 
 		// create actions, procedures, priorities
 		actions = new ActionList();
+		initializes = new ActionList();
 		procedures = new OrderedMap<Procedure>();
 		priorities = new ArrayList<List<Tag>>();
 
@@ -639,7 +701,8 @@ public class ALAstParser {
 		ActionScheduler scheduler = new ActionScheduler(actions.getList(), fsm);
 
 		return new Actor(name, file, parameters, inputs, outputs, stateVars,
-				procedures, null, null, scheduler, null);
+				procedures, actions.getList(), initializes.getList(),
+				scheduler, null);
 	}
 
 	/**
