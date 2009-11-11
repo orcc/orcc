@@ -79,12 +79,12 @@ public class XlimNodeVisitor implements NodeVisitor {
 	 * Root element where to add everything
 	 */
 	private Element root;
-	
+
 	/**
 	 * Map for input type
 	 */
 	private Map<String, Element> readMap;
-	
+
 	/**
 	 * Map for output type
 	 */
@@ -104,8 +104,8 @@ public class XlimNodeVisitor implements NodeVisitor {
 		this.names = names;
 		this.root = root;
 		this.actionName = actionName;
-		readMap  = new TreeMap<String, Element>();
-		writeMap  = new TreeMap<String, Element>();
+		readMap = new TreeMap<String, Element>();
+		writeMap = new TreeMap<String, Element>();
 	}
 
 	/**
@@ -206,7 +206,8 @@ public class XlimNodeVisitor implements NodeVisitor {
 
 		Element moduleY = XlimNodeTemplate.newModule(moduleB, "then");
 
-		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY, actionName);
+		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
+				actionName);
 		for (INode operations : node.getThenNodes()) {
 			operations.accept(visitor);
 		}
@@ -278,10 +279,11 @@ public class XlimNodeVisitor implements NodeVisitor {
 		XlimNodeTemplate.newInPort(operationE, name);
 
 		LocalVariable local = node.getTarget();
-		Element port = XlimNodeTemplate.newOutPort(operationE, names.getVarName(local));
+		Element port = XlimNodeTemplate.newOutPort(operationE, names
+				.getVarName(local));
 		IType outtype = node.getTarget().getType();
 		outtype.accept(new XlimTypeSizeVisitor(port));
-		outtype.accept(new XlimTypeSizeVisitor(readMap.get(name))); 
+		outtype.accept(new XlimTypeSizeVisitor(readMap.get(name)));
 	}
 
 	/**
@@ -318,7 +320,7 @@ public class XlimNodeVisitor implements NodeVisitor {
 		operationE.setAttribute("removable", "no");
 		operationE.setAttribute("style", "simple");
 
-		String name =  names.getVarName(node.getTarget());
+		String name = names.getVarName(node.getTarget());
 		Element port = XlimNodeTemplate.newOutPort(operationE, name);
 		readMap.put(name, port);
 	}
@@ -356,7 +358,7 @@ public class XlimNodeVisitor implements NodeVisitor {
 
 		String name = names.getVarName(node.getTarget());
 		Element port = XlimNodeTemplate.newOutPort(operationE, name);
-		
+
 		writeMap.put(name, port);
 	}
 
@@ -386,7 +388,8 @@ public class XlimNodeVisitor implements NodeVisitor {
 
 		Element moduleY = XlimNodeTemplate.newModule(moduleB, "body");
 
-		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY, actionName);
+		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
+				actionName);
 		for (INode operations : node.getNodes()) {
 			operations.accept(visitor);
 		}
@@ -415,7 +418,8 @@ public class XlimNodeVisitor implements NodeVisitor {
 		operationE.setAttribute("style", "simple");
 		String name = names.getVarName(node.getTarget());
 		XlimNodeTemplate.newInPort(operationE, name);
-		
-		node.getPort().getType().accept(new XlimTypeSizeVisitor(writeMap.get(name)));
+
+		node.getPort().getType().accept(
+				new XlimTypeSizeVisitor(writeMap.get(name)));
 	}
 }

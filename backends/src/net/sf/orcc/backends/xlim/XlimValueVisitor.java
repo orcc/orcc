@@ -92,9 +92,9 @@ public class XlimValueVisitor implements ConstVisitor {
 	 */
 	public void visit(ListConst constant, Object... args) {
 		// TODO Change this
-		
+
 		XlimNodeTemplate.newInitValue(element, "List");
-		
+
 		/*
 		 * for(IConst value : constant.getValue()){ Element sub =
 		 * xlim.createElement("initValue"); //sub.setAttribute("typeName",
