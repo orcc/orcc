@@ -3,6 +3,7 @@
    <vertices>
       <vertex id="BTYPE" x="57" y="340"/>
       <vertex id="QFS_DC" x="167" y="136"/>
+      <vertex id="QP" x="55" y="410"/>
       <vertex id="PTR" x="494" y="70"/>
       <vertex id="AC_PRED_DIR" x="494" y="163"/>
       <vertex id="SIGNED" x="494" y="256"/>
@@ -10,6 +11,6 @@
       <vertex id="QUANT" x="494" y="442"/>
       <vertex id="addressing" x="167" y="229"/>
       <vertex id="invpred" x="299" y="211"/>
-      <vertex id="QP" x="55" y="410"/>
+      <vertex id="PREV_QUANT" x="486" y="502"/>
    </vertices>
 </layout>

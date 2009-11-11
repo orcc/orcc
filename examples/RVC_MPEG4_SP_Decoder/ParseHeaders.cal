@@ -379,7 +379,6 @@ actor ParseHeaders (
       fcode := 0;
       // resync_marker_length := 17;
     end
-    cmd := bitor( cmd, bitand(vop_quant,QUANT_MASK) );
     cmd := bitor( cmd, if round then ROUND_TYPE else 0 end );
     cmd := bitor( cmd, bitand( lshift( fcode, FCODE_SHIFT), FCODE_MASK) );
 end

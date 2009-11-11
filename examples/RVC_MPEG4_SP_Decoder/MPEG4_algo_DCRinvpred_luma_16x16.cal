@@ -88,7 +88,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
  int QUANT_SZ
 )
  int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ+2) A, int(size=MB_COORD_SZ+2) B, int(size=MB_COORD_SZ+2) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
-   int(size=SAMPLE_SZ) QF_DC, int(size=MB_COORD_SZ+2) PTR, int(size=3) AC_PRED_DIR, bool SIGNED, int(size=QUANT_SZ) QUANT :
+   int(size=SAMPLE_SZ) QF_DC, int(size=MB_COORD_SZ+2) PTR, int(size=3) AC_PRED_DIR, bool SIGNED, int(size=QUANT_SZ) QUANT, int(size=QUANT_SZ) PREV_QUANT :
 
   // Use 3 address lines for component index to save address calculation effort
   // Also, location 0 is reserved for all uncoded blocks. This protocol must
@@ -97,6 +97,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
    
   int SCALER_SZ = 7;                    // Bitwidth needed for 'dc_scalar' - see ISO/IEC 14496-2
   int( size=QUANT_SZ ) s_qp;              // Decoded 'quantiser_scale' - see ISO/IEC 14496-2
+  int( size=QUANT_SZ ) s_prev_qp;         // previous Decoded 'quantiser_scale'
   int( size=2 ) round;                  // Flag to indicate whether 'quantiser_scale' is even or odd
   int BUF_SIZE = (MAXW_IN_MB + 2) * 4;  // Have 4 8x8 blocks per MB
   int ptr := 4;                         // Pointer to current 8x8 block on current row
@@ -109,6 +110,10 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
   bool is_signed;                       // Flag to indicate INTER or INTRA block
   int(size=SAMPLE_SZ) dc_val;           // Reconstructed DC coefficient  
 
+  List( type:int(size=QUANT_SZ), size=BUF_SIZE*4 ) buf_qp := [ 0 : for int k in Integers(1, BUF_SIZE*4)  ];
+  int(size=MB_COORD_SZ) mbwidth   := 0;           // Macroblock width of current vop
+  int cnt := 0;                         // Pointer to current 8x8 block
+
 
   // Check for NEWVOP flag
   // A -ve flag  means there is no data, so the inverse zigzag may flush its buffer
@@ -120,19 +125,27 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
     ptr   := 4; 
   end
 
+  // Used to get Width BTYPE token
+  getw: action BTYPE:[ x ] ==>
+  do
+  	mbwidth:=x;
+  end
+
   // Used to skip BTYPE tokens where necessary
   skip: action BTYPE:[ x ] ==>
   end
 
   // Check for an INTER block with coded AC coefficients
-  read.inter_ac: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[s_qp]
+  read.inter_ac: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[s_qp], PREV_QUANT:[s_prev_qp]
   guard
     bitand( cmd, INTER   ) != 0,
     bitand( cmd, ACCODED ) != 0
   do
-    s_qp:=qp;
+    s_qp		:= qp;
     round := bitxor( bitand( s_qp, 1 ), 1 );
     is_signed := true;
+    s_prev_qp:=s_qp;
+	buf_qp[cnt]	:= s_qp;
   end
 
   // Any other block except INTRA
@@ -141,9 +154,6 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
     bitand( cmd, ACCODED ) = 0,
     bitand( cmd, INTRA ) = 0,
     bitand( cmd, NEWVOP ) = 0
-  do
-    s_qp:=qp;
-    round := bitxor( bitand( s_qp, 1 ), 1 );
   end
 
   // Function to return absolute value
@@ -163,7 +173,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
   end
 
   // Read an INTRA block
-  read.intra: action BTYPE:[ cmd ], QP:[qp], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[s_qp]
+  read.intra: action BTYPE:[ cmd ], QP:[qp], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[s_qp], PREV_QUANT:[s_prev_qp]
   guard
     bitand( cmd, INTRA ) != 0
   var
@@ -176,12 +186,31 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
     int(size=3) s,
     bool ac = bitand(cmd,ACPRED) != 0
   do
-    s_qp:=qp;
-    round := bitxor( bitand( s_qp, 1 ), 1 );
-    scaler    := dc_scaler();                                                      // Retrieve 'dc_scalar'. See ISO/IEC 14496-2 Table 7-1.
-    dc_pred   := ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;   // See ISO/IEC 14496-2 Section 7.4.3.2.
-    s         := if not ac then 0 else if top then 2 else 1 end end;               // Set 'ac_pred_dir'
-    is_signed := scaler=0;                                                         // Will never be true!
+    s_qp		:= qp;
+    round 		:= bitxor( bitand( s_qp, 1 ), 1 );
+    scaler    	:= dc_scaler();                                                      // Retrieve 'dc_scalar'. See ISO/IEC 14496-2 Table 7-1.
+    dc_pred   	:= ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;   // See ISO/IEC 14496-2 Section 7.4.3.2.
+    s         	:= if not ac then 0 else if top then 2 else 1 end end;               // Set 'ac_pred_dir'
+    is_signed 	:= scaler=0;                                                         // Will never be true!
+	if (s=2) then
+		if (comp=0) or (comp=1) then 
+			s_prev_qp:= buf_qp[cnt+2];
+		else
+			if (comp=2) or (comp=3) then 
+				s_prev_qp:= buf_qp[cnt-2];
+			end
+		end
+	end
+	if (s=1) then
+		if (comp=0) or (comp=2) then 
+			s_prev_qp:= buf_qp[cnt-3];
+		else
+			if (comp=1) or (comp=3) then 
+				s_prev_qp:= buf_qp[cnt-1];
+			end
+		end
+	end
+	buf_qp[cnt]	:= s_qp;
   end
 
   // Do inverse prediction and dequant on INTER block DC
@@ -216,6 +245,10 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
 
   advance: action ==>
   do
+    cnt := cnt + 1;
+    if (cnt=mbwidth*4) then
+    	cnt:=0;
+    end
     comp := comp + 1;
     if comp = 4 then   
       comp := 0;
@@ -229,7 +262,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
     read          ( read.intra     ) --> intra;
     read          ( read.other     ) --> advance;
 
-    getw          ( skip           ) --> geth;
+    getw          ( getw           ) --> geth;
     geth          ( skip           ) --> read;
 
     intra         ( getdc.intra    ) --> sat;

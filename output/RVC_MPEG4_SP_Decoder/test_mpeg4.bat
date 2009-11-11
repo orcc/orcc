@@ -1,33 +1,35 @@
-rem intraQ
-rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\jvc012.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\jvc012.yuv
-
-rem intraQ
-rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san013.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san013.yuv
-
-rem intraQ
-rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san015.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san015.yuv
-
-rem intraQ
-rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san016.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san016.yuv
-
-rem intraQ
-rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san017.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san017.yuv
-
-rem intraQ
-rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san018.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san018.yuv
-
-rem intraQ
-rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san019.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san019.yuv
-
-rem intraQ
-rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san020.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san020.yuv
-
-rem parser not ok call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\jvc013.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\jvc013.yuv
+rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\jvc013.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\jvc013.yuv
 
 rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\hit012.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\hit012.yuv
 rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san008.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san008.yuv
 
 rem call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san014.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san014.yuv
+
+
+rem intraQ
+call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\jvc012.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\jvc012.yuv
+
+rem intraQ
+call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san013.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san013.yuv
+
+rem intraQ
+call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san015.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san015.yuv
+
+rem intraQ
+call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san016.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san016.yuv
+
+rem intraQ
+call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san017.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san017.yuv
+
+rem intraQ
+call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san018.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san018.yuv
+
+rem intraQ
+call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san019.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san019.yuv
+
+rem intraQ
+call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san020.m4v --yuv D:\sequences\MPEG4\SIMPLE\P-VOP\san020.yuv
+
 
 rem parser not ok HEC and resync_marker call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\Error\hit025.m4v --yuv D:\sequences\MPEG4\SIMPLE\Error\hit025.yuv
 rem parser not ok HEC and resync_marker call bin\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\Error\hit026.m4v --yuv D:\sequences\MPEG4\SIMPLE\Error\hit026.yuv

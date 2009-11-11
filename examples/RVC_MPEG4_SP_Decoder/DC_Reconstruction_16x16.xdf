@@ -62,6 +62,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="PREV_QUANT">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -192,4 +199,5 @@
     <Connection dst="" dst-port="QF_DC" src="invpred" src-port="QF_DC"/>
     <Connection dst="" dst-port="QUANT" src="invpred" src-port="QUANT"/>
     <Connection dst="invpred" dst-port="QP" src="" src-port="QP"/>
+    <Connection dst="" dst-port="PREV_QUANT" src="invpred" src-port="PREV_QUANT"/>
 </XDF>

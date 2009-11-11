@@ -209,4 +209,6 @@
     <Connection dst="IAP" dst-port="AC_PRED_DIR" src="DCRecontruction" src-port="AC_PRED_DIR"/>
     <Connection dst="IS" dst-port="AC_PRED_DIR" src="DCRecontruction" src-port="AC_PRED_DIR"/>
     <Connection dst="DCRecontruction" dst-port="QP" src="" src-port="QP"/>
+    <Connection dst="IAP" dst-port="QP" src="DCRecontruction" src-port="QUANT"/>
+    <Connection dst="IAP" dst-port="PREV_QP" src="DCRecontruction" src-port="PREV_QUANT"/>
 </XDF>

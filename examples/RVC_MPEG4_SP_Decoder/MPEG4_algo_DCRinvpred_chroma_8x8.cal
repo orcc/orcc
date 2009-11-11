@@ -88,7 +88,7 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
  int QUANT_SZ
 )
  int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B, int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
-   int(size=SAMPLE_SZ) QF_DC, int(size=MB_COORD_SZ) PTR, int(size=3) AC_PRED_DIR, bool SIGNED, int(size=QUANT_SZ) QUANT :
+   int(size=SAMPLE_SZ) QF_DC, int(size=MB_COORD_SZ) PTR, int(size=3) AC_PRED_DIR, bool SIGNED, int(size=QUANT_SZ) QUANT, int(size=QUANT_SZ) PREV_QUANT  :
 
   // Use 3 address lines for component index to save address calculation effort
   // Also, location 0 is reserved for all uncoded blocks. This protocol must
@@ -97,6 +97,7 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
    
   int SCALER_SZ = 7;                 // Bitwidth needed for 'dc_scalar' - see ISO/IEC 14496-2
   int( size=QUANT_SZ ) s_qp;           // Decoded 'quantiser_scale' - see ISO/IEC 14496-2 
+  int( size=QUANT_SZ ) s_prev_qp;      // Decoded previous 'quantiser_scale' 
   int( size=2 ) round;               // Flag to indicate whether 'quantiser_scale' is even or odd            
   int BUF_SIZE = (MAXW_IN_MB + 2);   // Have 4 8x8 blocks per MB                                             
   int ptr := 1;                      // Pointer to current 8x8 block on current row                          
@@ -108,6 +109,10 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   bool is_signed;                    // Flag to indicate INTER or INTRA block
   int(size=SAMPLE_SZ) dc_val;        // Reconstructed DC coefficient  
 
+  List( type:int(size=QUANT_SZ), size=BUF_SIZE ) buf_qp := [ 0 : for int k in Integers(1, BUF_SIZE)  ];
+  int(size=MB_COORD_SZ) mbwidth   := 0;           // Macroblock width of current vop
+  int cnt := 0;                         // Pointer to current 8x8 block
+
   
   // Check for NEWVOP flag
   // A -ve means there is no data, so the inverse zigzag may flush its buffer
@@ -117,29 +122,34 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   do
     ptr   := 1;
   end
+  
+  // Used to get Width BTYPE token
+  getw: action BTYPE:[ x ] ==>
+  do
+  	mbwidth:=x;
+  end
 
   // Used to skip BTYPE tokens where necessary
   skip: action BTYPE:[ x ] ==>
   end
 
   // Check for an INTER block with coded AC coefficients
-  read.inter_ac: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[s_qp]
+  read.inter_ac: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[s_qp], PREV_QUANT:[s_prev_qp]
   guard
     bitand( cmd, INTER   ) != 0,
     bitand( cmd, ACCODED ) != 0
   do
-    s_qp:=qp;
+    s_qp		:= qp;
     round := bitxor( bitand( s_qp, 1 ), 1 );
     is_signed := true;
+    s_prev_qp:=s_qp;
+	buf_qp[cnt]	:= s_qp;
   end
 
   // Any other block except INTRA
   read.other: action BTYPE:[ cmd ], QP:[qp] ==> AC_PRED_DIR:[ -1 ]
   guard
     bitand( cmd, INTRA ) = 0
-  do
-    s_qp:=qp;
-    round := bitxor( bitand( s_qp, 1 ), 1 );
   end
 
   // Function to return absolute value
@@ -157,7 +167,8 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   end
 
   // Read an INTRA block
-  read.intra: action BTYPE:[ cmd ], QP:[qp], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[s_qp]
+  read.intra: action BTYPE:[ cmd ], QP:[qp], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[s_qp], PREV_QUANT:[s_prev_qp]
+
   var
     int(size=SAMPLE_SZ) dca = dc_buf[ a ],
     int(size=SAMPLE_SZ) dcb = dc_buf[ b ],
@@ -168,12 +179,19 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
     int(size=3) s,
     bool ac = bitand(cmd,ACPRED) != 0
   do
-    s_qp:=qp;
+    s_qp		:= qp;
     round := bitxor( bitand( s_qp, 1 ), 1 );
     scaler  := dc_scaler();
     dc_pred := ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;
     s := if not ac then 0 else if top then 2 else 1 end end;
     is_signed := scaler=0;
+	if (s=2) then
+		s_prev_qp:= buf_qp[cnt];
+	end
+	if (s=1) then
+		s_prev_qp:= buf_qp[cnt-1];
+	end
+	buf_qp[cnt]	:= s_qp;
   end
  
   // Do dequant on INTER block DC
@@ -209,6 +227,10 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
   advance: action ==>
   do
     ptr := if ptr = 1 then BUF_SIZE-1 else ptr-1 end;
+    cnt := cnt + 1;
+    if (cnt=mbwidth) then
+    	cnt:=0;
+    end
   end
 
   schedule fsm read :
@@ -217,7 +239,7 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
     read          ( read.intra     ) --> intra;
     read          ( read.other     ) --> advance;
 
-    getw          ( skip           ) --> geth;
+    getw          ( getw           ) --> geth;
     geth          ( skip           ) --> read;
 
     intra         ( getdc.intra    ) --> sat;

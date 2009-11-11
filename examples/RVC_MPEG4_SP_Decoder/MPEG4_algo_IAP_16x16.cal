@@ -50,7 +50,7 @@ actor MPEG4_algo_IAP_16x16 (
  int MB_COORD_SZ,
  int SAMPLE_SZ
 )
-  int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ+2) PTR, int(size=3) AC_PRED_DIR ==> int(size=SAMPLE_SZ) QF_AC :
+  int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ+2) PTR, int(size=3) AC_PRED_DIR, int(size=6) QP, int(size=6) PREV_QP ==> int(size=SAMPLE_SZ) QF_AC :
 
   // Use 3 address lines for component index to save address calculation effort
   // Also, location 0 is reserved for all uncoded blocks. This protocol must
@@ -69,7 +69,18 @@ actor MPEG4_algo_IAP_16x16 (
   int(size=4) comp;                    // 8x8 block component in macroblock index
   bool top;
   bool acpred_flag;
+  int(size=6) s_quant;
+  int(size=6) s_prev_quant;
+  
 
+  function divroundnearest( int i, int iDenom ) --> int:
+	if(i>=0) then
+		(i+(iDenom>>1))/iDenom
+	else
+		(i-(iDenom>>1))/iDenom
+	end
+  end
+    
   newvop: action AC_PRED_DIR:[ s ] ==>
   guard s = -2
   do
@@ -83,8 +94,10 @@ actor MPEG4_algo_IAP_16x16 (
     count := 64;
   end
 
-  start: action AC_PRED_DIR:[ s ], PTR:[ p ] ==>
+  start: action AC_PRED_DIR:[ s ], PTR:[ p ], QP:[qp], PREV_QP:[prev_qp] ==>
   do
+    s_quant		:= qp;
+    s_prev_quant:= prev_qp;
     count       := 1;
     pred_ptr    := p;
     top         := s = 2;
@@ -112,7 +125,11 @@ actor MPEG4_algo_IAP_16x16 (
     int(size=5) index = if top_edge then v else bitor( h, 8 ) end
   do
     if acpred_flag and ( (top and top_edge) or ((not top) and left_edge) ) then
-      pred := pred + buf[ bitor( lshift( pred_ptr, 4 ), index ) ];
+      if(s_prev_quant=s_quant) then
+      	pred := pred + buf[ bitor( lshift( pred_ptr, 4 ), index ) ];
+      else
+      	pred := pred + divroundnearest(buf[ bitor( lshift( pred_ptr, 4 ), index )] * s_prev_quant, s_quant);
+      end
     end
     if left_edge or top_edge then
       buf[ bitor( lshift( bitor( ptr, comp ), 4 ), index ) ] := pred;
