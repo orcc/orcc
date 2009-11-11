@@ -1,0 +1,167 @@
+actor Parser() uint(size=8) I ==> :
+
+  // to save next bits when needed
+  int next_bits;
+
+  // sequence characteristics
+  uint(size=12) horizontal_size;
+  uint(size=12) vertical_size;
+  
+  uint(size=4) aspect_ratio;
+  int frame_rate; // TODO: use float
+  
+  uint(size=30) bit_rate;
+  uint(size=18) vbv_buffer_size;
+  bool load_intra_quantiser_matrix;
+  
+  // sequence extension stuff
+  uint(size=4) extension_start_code_identifier;
+  bool escape_bit;
+  uint(size=3) profile;
+  
+  // constants
+  uint(size=8) SEQUENCE_HEADER_CODE = 0xB3;
+  uint(size=8) EXTENSION_START_CODE = 0xB5;
+  
+  // TODO: use float
+  List(type:int, size=16) FRAME_RATE_CODE =
+    [ -1, 23 /*.976*/, 24, 25, 29 /*.97*/, 30, 50, 59 /*.94*/, 60,
+    -1, -1, -1, -1, -1, -1, -1 ]; 
+
+  /** detect next start code, or execute zero_byte_stuffing */
+  next_start_code: action I:[ b0, b1, b2 ] ==>
+  guard
+    b0 = 0 and b1 = 0 and b2 = 0x01
+  end
+  
+  zero_byte_stuffing: action I:[ b ] ==>
+  guard
+    b = 0
+  end
+  
+  /** sequence header */
+  sequence_header: action I:[ bytes ] repeat 9 ==>
+  var
+    uint(size=8) byte, uint(size=24) size,
+    uint(size=4) frame_rate_code, uint(size=1) constrained_parameters_flag
+  do
+    size := bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+    horizontal_size := size >> 12;
+    vertical_size := size & 0x0fff;
+    
+    byte := bytes[4];
+    aspect_ratio := byte >> 4;
+    frame_rate_code := byte & 0x0f;
+
+    frame_rate := FRAME_RATE_CODE[frame_rate_code];
+    // TODO: check frame rate when println are implemented
+    /* if frame_rate = -1 then
+    println("exit");
+    end */
+    
+    bit_rate := bytes[5] << 10 | bytes[6] << 2 | bytes[7] >> 6;
+    
+     // TODO: check bit rate when println are implemented
+    /* if bit_rate = 0 then
+    println("exit");
+    end */
+    
+    // TODO: check marker bit when println are implemented
+    /* if byte & 0x20 = 0 then
+    println("exit");
+    end */
+    
+    vbv_buffer_size := (bytes[7] & 0x1F) << 5 | bytes[8] >> 3;
+    
+    constrained_parameters_flag := bytes[8] & 0x04;
+    // TODO: check constrained_parameters_flag when println are implemented
+    /* if constrained_parameters_flag != 0 then
+    println("exit");
+    end */
+    
+    load_intra_quantiser_matrix := (bytes[8] & 0x02) != 0;
+    next_bits := bytes[8] & 0x01;
+  end
+  
+  /** invalid sequence header */
+  sequence_header_invalid: action I:[ header_code ] ==>
+  guard
+    header_code != SEQUENCE_HEADER_CODE
+  end
+  
+  /** sequence header with load_intra_quantiser_matrix */
+  load_intra_quantiser_matrix.yes: action I:[ matrix ] repeat 64 ==>
+  do
+    // TODO: copy quant matrix
+
+    // set next_bit 
+    next_bits := matrix[8 * 64 - 1] & 0x01;
+  end
+  
+  load_intra_quantiser_matrix.no: action ==>
+  guard
+    not load_intra_quantiser_matrix
+  end
+  
+  /** sequence header with load_non_intra_quantiser_matrix */
+  load_non_intra_quantiser_matrix.yes: action I:[ matrix ] repeat 64 ==>
+    // TODO: copy quant matrix
+
+    // Note: we are byte-aligned after this
+  end
+  
+  load_non_intra_quantiser_matrix.no: action ==>
+  guard
+    next_bits = 0
+  end
+  
+  /** extension_start_code */
+  other_start_code: action I: [ start_code ] ==>
+  guard
+    start_code != EXTENSION_START_CODE
+  end
+  
+  sequence_extension: action I:[ bytes ] repeat 7 ==>
+  var
+    uint(size=8) profile_and_level_indication
+  do
+    extension_start_code_identifier := bytes[1] >> 4;
+    profile_and_level_indication := (bytes[1] & 0x0F) << 4 | bytes[2] >> 4;
+    escape_bit := (profile_and_level_indication >> 7) != 0;
+    profile := (profile_and_level_indication & 0x78) >> 4;
+  end
+  
+  // priorities
+  priority
+    next_start_code > zero_byte_stuffing;
+    sequence_header_invalid > sequence_header;
+    load_intra_quantiser_matrix.no > load_intra_quantiser_matrix.yes;
+    load_non_intra_quantiser_matrix.no > load_non_intra_quantiser_matrix.yes;
+    
+    other_start_code > sequence_extension;
+  end
+  
+  // FSM
+  // state "oops" is dead-end state when encountering an invalid sequence or when parser is lost
+  schedule fsm video_sequence_start:
+    video_sequence_start (next_start_code) --> sequence_header;
+    video_sequence_start (zero_byte_stuffing) --> video_sequence_start;
+    
+    sequence_header (sequence_header) --> sequence_header_intra_matrix_or_not;
+    sequence_header (sequence_header_invalid) --> oops;
+    
+    sequence_header_intra_matrix_or_not (load_intra_quantiser_matrix) --> sequence_header_non_intra_matrix_or_not;
+    
+    sequence_header_non_intra_matrix_or_not (load_non_intra_quantiser_matrix) --> sequence_body_start_code;
+    
+    sequence_body_start_code (next_start_code) --> sequence_body;
+    sequence_body (other_start_code) --> oops;
+    sequence_body (sequence_extension) --> sequence_start;
+    
+    // TODO sequence_start
+    
+    // just so we do not have warnings
+    oops (oops) --> oops;
+  end
+
+end
