@@ -37,7 +37,8 @@ ActorGen::ActorGen(unsigned uNbrPortIn, unsigned uNbrPortOut)
 	// Allocate Table for Port In addresses
 	if (uNbrPortIn != 0)
 	{
-		m_poTabIn = (FifoAPI **)malloc(uNbrPortIn * sizeof(FifoAPI *));
+//		create an array of FifoAPI pointers
+		m_poTabIn = new FifoAPI *[uNbrPortIn];
 		for(unsigned i=0; i<uNbrPortIn; i++)
 		{
 			m_poTabIn[i]=NULL;
@@ -50,7 +51,8 @@ ActorGen::ActorGen(unsigned uNbrPortIn, unsigned uNbrPortOut)
 	// Allocate Table for Port In addresses
 	if (uNbrPortOut != 0)
 	{
-		m_poTabOut = (FifoAPI **)malloc(uNbrPortOut * sizeof(FifoAPI *));
+//		create an array of FifoAPI pointers
+		m_poTabOut = new FifoAPI *[uNbrPortOut];
 		for(unsigned i=0; i<uNbrPortOut; i++)
 		{
 			m_poTabOut[i]=NULL;
@@ -67,10 +69,12 @@ ActorGen::ActorGen(unsigned uNbrPortIn, unsigned uNbrPortOut)
 	
 	if (uNbrPortOut != 0)
 	{
-		m_poFifoFanOut  = (FifoFanOut **)malloc(uNbrPortOut * sizeof(FifoFanOut *));
+//		create an array of FifoFanOut pointers
+		m_poFifoFanOut  = new FifoFanOut *[uNbrPortOut];
+
 		for(unsigned i = 0; i < uNbrPortOut; i++)
 		{
-			m_poFifoFanOut[i] = NULL;
+			m_poFifoFanOut[i]=NULL;
 		}
 	}
 }
@@ -83,15 +87,16 @@ ActorGen::~ActorGen()
 		{
 			m_poTabIn[i]=NULL;
 		}
-		free(m_poTabIn);
+		delete [] m_poTabIn;
 	}
 	if (m_poTabOut != NULL)
 	{
 		for(unsigned i=0; i<m_uNbrPortOut; i++)
 		{
 			m_poTabOut[i]=NULL;
+
 		}
-		free(m_poTabOut);
+		delete [] m_poTabOut;
 	}
 	if (m_poFifoFanOut != NULL)
 	{
@@ -99,7 +104,7 @@ ActorGen::~ActorGen()
 		{
 			m_poFifoFanOut[i]=NULL;
 		}
-		free(m_poFifoFanOut);
+		delete [] m_poFifoFanOut;
 	}
 }
 
