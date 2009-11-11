@@ -34,7 +34,6 @@ import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -50,11 +49,6 @@ public class XlimValueVisitor implements ConstVisitor {
 	private Element element;
 
 	/**
-	 * Document for new element creation
-	 */
-	private Document xlim;
-
-	/**
 	 * XlimValueVisitor constructor with element and document initialization
 	 * 
 	 * @param element
@@ -62,7 +56,6 @@ public class XlimValueVisitor implements ConstVisitor {
 	 */
 	XlimValueVisitor(Element element) {
 		this.element = element;
-		this.xlim = element.getOwnerDocument();
 	}
 
 	/**
@@ -99,10 +92,9 @@ public class XlimValueVisitor implements ConstVisitor {
 	 */
 	public void visit(ListConst constant, Object... args) {
 		// TODO Change this
-		Element init = xlim.createElement("initValue");
-		init.setAttribute("typeName", "List");
-		element.appendChild(init);
-
+		
+		XlimNodeTemplate.newInitValue(element, "List");
+		
 		/*
 		 * for(IConst value : constant.getValue()){ Element sub =
 		 * xlim.createElement("initValue"); //sub.setAttribute("typeName",

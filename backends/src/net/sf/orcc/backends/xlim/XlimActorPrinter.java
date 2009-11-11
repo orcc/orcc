@@ -105,10 +105,13 @@ public class XlimActorPrinter {
 		String actionName = action.toString();
 
 		Element actionE = XlimNodeTemplate.newModule(root, "action", "false",
-				actionName, null, null);
+				actionName);
+		
+		//action.getOutputPattern();
 
+		XlimNodeVisitor visitor = new XlimNodeVisitor(names, actionE, actionName);
 		for (INode nodes : action.getBody().getNodes()) {
-			nodes.accept(new XlimNodeVisitor(names, actionE, actionName));
+			nodes.accept(visitor);
 		}
 	}
 
@@ -136,8 +139,7 @@ public class XlimActorPrinter {
 
 		// Inputs
 
-		Element guardE = xlim.createElement("operation");
-		guardE.setAttribute("kind", "$and");
+		Element guardE = XlimNodeTemplate.newDiffOperation(body, "$and");
 		String name = action.toString();
 
 		Map<Port, Integer> input = action.getInputPattern();
@@ -155,8 +157,7 @@ public class XlimActorPrinter {
 					portname);
 
 			XlimNodeTemplate.newInPort(peekE, index);
-			Element peekO = XlimNodeTemplate.newOutPort(peekE, index, null,
-					null);
+			Element peekO = XlimNodeTemplate.newOutPort(peekE, index);
 			port.getType().accept(new XlimTypeSizeVisitor(peekO));
 
 			Element statusE = XlimNodeTemplate.newPortOperation(body,
@@ -174,8 +175,7 @@ public class XlimActorPrinter {
 
 		// Outputs
 
-		Element fireE = xlim.createElement("operation");
-		fireE.setAttribute("kind", "$and");
+		Element fireE = XlimNodeTemplate.newDiffOperation(body, "$and");
 
 		Map<Port, Integer> output = action.getOutputPattern();
 		for (Entry<Port, Integer> entry : output.entrySet()) {
@@ -322,7 +322,7 @@ public class XlimActorPrinter {
 
 		XlimNodeTemplate.newInPort(oguardE, guard);
 
-		XlimNodeTemplate.newOutPort(oguardE, initialguard, null, null);
+		XlimNodeTemplate.newOutPort(oguardE, initialguard);
 
 		Element then1E = XlimNodeTemplate.newModule(if1E, "then");
 
@@ -334,7 +334,7 @@ public class XlimActorPrinter {
 
 		XlimNodeTemplate.newInPort(ofireE, fire);
 
-		XlimNodeTemplate.newOutPort(ofireE, finalfire, null, null);
+		XlimNodeTemplate.newOutPort(ofireE, finalfire);
 
 		Element then2E = XlimNodeTemplate.newModule(if2E, "then");
 
@@ -384,16 +384,12 @@ public class XlimActorPrinter {
 
 				Element fsmState = XlimNodeTemplate.newStateVar(root, fsmname);
 
-				Element init = xlim.createElement("initValue");
-				init.setAttribute("size", "1");
-				init.setAttribute("typeName", "bool");
-				init.setAttribute("value", start.equals(state) ? "1" : "0");
-				fsmState.appendChild(init);
+				XlimNodeTemplate.newInitValue(fsmState, "1", "bool", start.equals(state) ? "1" : "0");
 			}
 		}
 
 		Element schedE = XlimNodeTemplate.newModule(root, "action-scheduler",
-				"true", "action-scheduler", "action-scheduler", null);
+				"true", "action-scheduler", "action-scheduler");
 
 		Element operationE = XlimNodeTemplate.newValueOperation(schedE,
 				"$literal_Integer", "1");
@@ -446,11 +442,9 @@ public class XlimActorPrinter {
 
 				StateVariable state = (StateVariable) stateVar;
 				// if (state.hasInit()) {
-				Element init = xlim.createElement("initValue");
-				init.setAttribute("typeName", "Let");
-				newState.appendChild(init);
+				Element init = XlimNodeTemplate.newInitValue(newState, "Let");
 
-				Element init2 = xlim.createElement("initValue");
+				Element init2 = XlimNodeTemplate.newInitValue(init);
 
 				stateVar.getType().accept(new XlimTypeSizeVisitor(init2));
 
@@ -460,7 +454,6 @@ public class XlimActorPrinter {
 				} else {
 					System.out.println("STATE: " + state.getUses());
 				}
-				init.appendChild(init2);
 				// }
 
 				System.out.println(state.getInit());
@@ -536,8 +529,7 @@ public class XlimActorPrinter {
 		String name = "fsm" + source;
 		String decision = "decision_" + name;
 
-		Element testE = XlimNodeTemplate.newModule(ifE, "test", null, null,
-				null, decision);
+		Element testE = XlimNodeTemplate.newTestModule(ifE, decision);
 
 		Element opE = XlimNodeTemplate.newOperation(testE, "noop");
 
