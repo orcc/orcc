@@ -194,7 +194,14 @@ public class CActorPrinter {
 		template.setAttribute("initialize", actor.getInitializes());
 	}
 
-	private void setFifos(String attribute, OrderedMap<Port> ports) {
+	/**
+	 * visibility has been changed to <code>protected</code> in order to be visible to 
+	 * <code>CQuasiStaticActorPrinter</code>
+	 * 
+	 * @param attribute
+	 * @param ports
+	 */
+	protected void setFifos(String attribute, OrderedMap<Port> ports) {
 		int size = ports.size();
 		List<String> names = new ArrayList<String>(size);
 		for (Port port : ports) {
@@ -204,7 +211,14 @@ public class CActorPrinter {
 		template.setAttribute(attribute, names);
 	}
 
-	private void setProcedures(String id, OrderedMap<Procedure> procs) {
+	/**
+	 * visibility has been changed to <code>protected</code> in order to be visible to 
+	 * <code>CQuasiStaticActorPrinter</code>
+	 * 
+	 * @param id
+	 * @param procs
+	 */
+	protected void setProcedures(String id, OrderedMap<Procedure> procs) {
 		for (Procedure proc : procs) {
 			if (!proc.isExternal()) {
 				template.setAttribute("procs", applyProc(id, proc));
@@ -212,7 +226,14 @@ public class CActorPrinter {
 		}
 	}
 
-	private void setStateVars(OrderedMap<Variable> stateVars) {
+	/**
+	 * 
+	 * visibility has been changed to <code>protected</code> in order to be visible to 
+	 * <code>CQuasiStaticActorPrinter</code>
+	 * 
+	 * @param stateVars
+	 */
+	protected void setStateVars(OrderedMap<Variable> stateVars) {
 		for (Variable variable : stateVars) {
 			StateVariable stateVar = (StateVariable) variable;
 
