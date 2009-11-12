@@ -29,10 +29,29 @@
 
 package net.sf.orcc.backends.xlim;
 
+import net.sf.orcc.ir.IType;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class XlimNodeTemplate {
+
+	/**
+	 * Calculate value size
+	 * 
+	 * @param value
+	 *            value to evaluate
+	 * @return Value size
+	 */
+	private static String calcSize(int value) {
+		int size = 1;
+		value >>= 1;
+		while (value > 0) {
+			value >>= 1;
+			size++;
+		}
+		return Integer.toString(size + 1);
+	}
 
 	/**
 	 * Create actor port
@@ -257,14 +276,34 @@ public class XlimNodeTemplate {
 	 *            Root Element
 	 * @param source
 	 *            Source of the port
-	 * @param typeName
+	 * @param type
 	 *            Type of data
 	 * @return New Out Port
 	 */
+	public static Element newOutPort(Element root, String source, IType type) {
+		Element port = newOutPort(root, source);
+		type.accept(new XlimTypeSizeVisitor(port));
+		return port;
+	}
+
+	/**
+	 * New Out Port
+	 * 
+	 * @param root
+	 *            Root Element
+	 * @param source
+	 *            Source of the port
+	 * @param typeName
+	 *            Type of data
+	 * @param value
+	 *            Integer value
+	 * @return New Out Port
+	 */
 	public static Element newOutPort(Element root, String source,
-			String typeName) {
+			String typeName, int value) {
 		Element port = newOutPort(root, source);
 		port.setAttribute("typeName", typeName);
+		port.setAttribute("size", calcSize(value));
 		return port;
 	}
 
@@ -283,7 +322,8 @@ public class XlimNodeTemplate {
 	 */
 	public static Element newOutPort(Element root, String source, String size,
 			String typeName) {
-		Element port = newOutPort(root, source, typeName);
+		Element port = newOutPort(root, source);
+		port.setAttribute("typeName", typeName);
 		port.setAttribute("size", size);
 		return port;
 	}

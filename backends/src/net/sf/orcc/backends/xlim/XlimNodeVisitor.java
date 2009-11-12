@@ -76,14 +76,14 @@ public class XlimNodeVisitor implements NodeVisitor {
 	private XlimNames names;
 
 	/**
-	 * Root element where to add everything
-	 */
-	private Element root;
-
-	/**
 	 * Map for input type
 	 */
 	private Map<String, Element> readMap;
+
+	/**
+	 * Root element where to add everything
+	 */
+	private Element root;
 
 	/**
 	 * Map for output type
@@ -151,7 +151,8 @@ public class XlimNodeVisitor implements NodeVisitor {
 		if (target != null) {
 			Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
-			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target));
+			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target),
+					target.getType());
 		}
 	}
 
@@ -202,7 +203,7 @@ public class XlimNodeVisitor implements NodeVisitor {
 
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
-		XlimNodeTemplate.newOutPort(operationE, decision);
+		XlimNodeTemplate.newOutPort(operationE, decision, "1", "bool");
 
 		Element moduleY = XlimNodeTemplate.newModule(moduleB, "then");
 
@@ -259,7 +260,7 @@ public class XlimNodeVisitor implements NodeVisitor {
 					.get(1)), "else");
 
 			Element portO = XlimNodeTemplate.newOutPort(phiE, names
-					.getVarName(phi.getTarget()));
+					.getVarName(phi.getTarget()), phi.getTarget().getType());
 			phi.getTarget().getType().accept(new XlimTypeSizeVisitor(portO));
 		}
 	}
@@ -279,11 +280,13 @@ public class XlimNodeVisitor implements NodeVisitor {
 		XlimNodeTemplate.newInPort(operationE, name);
 
 		LocalVariable local = node.getTarget();
-		Element port = XlimNodeTemplate.newOutPort(operationE, names
-				.getVarName(local));
 		IType outtype = node.getTarget().getType();
-		outtype.accept(new XlimTypeSizeVisitor(port));
-		outtype.accept(new XlimTypeSizeVisitor(readMap.get(name)));
+		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local),
+				outtype);
+
+		if (readMap.containsKey(name)) {
+			outtype.accept(new XlimTypeSizeVisitor(readMap.get(name)));
+		}
 	}
 
 	/**
@@ -300,7 +303,14 @@ public class XlimNodeVisitor implements NodeVisitor {
 
 	}
 
-	@Override
+	/**
+	 * Add read end node
+	 * 
+	 * @param node
+	 *            Read end node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
 	public void visit(ReadEndNode node, Object... args) {
 		// TODO Auto-generated method stub
 		System.out.println("READ END");
@@ -384,7 +394,7 @@ public class XlimNodeVisitor implements NodeVisitor {
 
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
-		XlimNodeTemplate.newOutPort(operationE, decision);
+		XlimNodeTemplate.newOutPort(operationE, decision, "1", "bool");
 
 		Element moduleY = XlimNodeTemplate.newModule(moduleB, "body");
 
@@ -398,7 +408,14 @@ public class XlimNodeVisitor implements NodeVisitor {
 				new XlimNodeVisitor(names, moduleB, actionName));
 	}
 
-	@Override
+	/**
+	 * Add write end node
+	 * 
+	 * @param node
+	 *            Write end node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
 	public void visit(WriteEndNode node, Object... args) {
 		// TODO Auto-generated method stub.
 		System.out.println("WRITE END");

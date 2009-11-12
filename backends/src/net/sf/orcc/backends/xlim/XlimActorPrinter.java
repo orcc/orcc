@@ -106,10 +106,11 @@ public class XlimActorPrinter {
 
 		Element actionE = XlimNodeTemplate.newModule(root, "action", "false",
 				actionName);
-		
-		//action.getOutputPattern();
 
-		XlimNodeVisitor visitor = new XlimNodeVisitor(names, actionE, actionName);
+		// action.getOutputPattern();
+
+		XlimNodeVisitor visitor = new XlimNodeVisitor(names, actionE,
+				actionName);
 		for (INode nodes : action.getBody().getNodes()) {
 			nodes.accept(visitor);
 		}
@@ -157,8 +158,7 @@ public class XlimActorPrinter {
 					portname);
 
 			XlimNodeTemplate.newInPort(peekE, index);
-			Element peekO = XlimNodeTemplate.newOutPort(peekE, index);
-			port.getType().accept(new XlimTypeSizeVisitor(peekO));
+			XlimNodeTemplate.newOutPort(peekE, index, port.getType());
 
 			Element statusE = XlimNodeTemplate.newPortOperation(body,
 					"pinStatus", portname);
@@ -322,7 +322,7 @@ public class XlimActorPrinter {
 
 		XlimNodeTemplate.newInPort(oguardE, guard);
 
-		XlimNodeTemplate.newOutPort(oguardE, initialguard);
+		XlimNodeTemplate.newOutPort(oguardE, initialguard, "1", "bool");
 
 		Element then1E = XlimNodeTemplate.newModule(if1E, "then");
 
@@ -334,7 +334,7 @@ public class XlimActorPrinter {
 
 		XlimNodeTemplate.newInPort(ofireE, fire);
 
-		XlimNodeTemplate.newOutPort(ofireE, finalfire);
+		XlimNodeTemplate.newOutPort(ofireE, finalfire, "1", "bool");
 
 		Element then2E = XlimNodeTemplate.newModule(if2E, "then");
 
@@ -384,7 +384,8 @@ public class XlimActorPrinter {
 
 				Element fsmState = XlimNodeTemplate.newStateVar(root, fsmname);
 
-				XlimNodeTemplate.newInitValue(fsmState, "1", "bool", start.equals(state) ? "1" : "0");
+				XlimNodeTemplate.newInitValue(fsmState, "1", "bool", start
+						.equals(state) ? "1" : "0");
 			}
 		}
 

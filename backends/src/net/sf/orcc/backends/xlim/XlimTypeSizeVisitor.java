@@ -105,6 +105,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor {
 		 * 
 		 * 
 		 * 
+		 * 
 		 * element.setAttribute("size","SIZE"+Util.evaluateAsInteger(type.getSize
 		 * ())); } catch (OrccException e) { // TODO Auto-generated catch block
 		 * e.AddStackTrace(); }

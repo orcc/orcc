@@ -135,8 +135,9 @@ public class XlimExprVisitor implements ExprVisitor {
 
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName());
-		// expr.getUnderlyingType().accept(new XlimTypeSizeVisitor(portO));
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
+				.getUnderlyingType());
+
 		root.appendChild(operationE);
 	}
 
@@ -166,7 +167,8 @@ public class XlimExprVisitor implements ExprVisitor {
 	public void visit(IntExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root,
 				"$literal_Integer", expr.toString());
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), "int");
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), "int",
+				expr.getValue());
 		// TODO Add size
 
 	}
@@ -218,7 +220,8 @@ public class XlimExprVisitor implements ExprVisitor {
 
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName());
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
+				.getUnderlyingType());
 	}
 
 	/**
@@ -234,10 +237,8 @@ public class XlimExprVisitor implements ExprVisitor {
 
 		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar()));
 
-		Element port = XlimNodeTemplate.newOutPort(operationE, names
-				.putTempName());
-		expr.getVar().getVariable().getType().accept(
-				new XlimTypeSizeVisitor(port));
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
+				.getVar().getVariable().getType());
 	}
 
 }
