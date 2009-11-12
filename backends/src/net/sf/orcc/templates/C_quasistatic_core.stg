@@ -1,0 +1,33 @@
+group C_scheduled_core;
+
+inputTmpl(methodName) ::= <<
+extern void $methodName$(void);
+
+>>
+
+statementTmpl(statement) ::= <<
+	$statement$();$\n$
+>>
+
+btype_method(btypeName, statements) ::= <<
+
+///////////////////////////////////////////////////////////////////////////////
+// Schedule code for $btypeName$
+void $btypeName$_s(void){
+$statements: statementTmpl(statement=it)$
+}
+
+>>
+
+scheduling(declarations, scheduleCode) ::= <<
+
+///////////////////////////////////////////////////////////////////////////////
+// INPUT declaration
+$declarations$
+
+///////////////////////////////////////////////////////////////////////////////
+// Schedule code 
+
+$scheduleCode$
+
+>>

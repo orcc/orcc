@@ -1,0 +1,235 @@
+group C_scheduled_network;
+
+broadcast_scheduler(bcast) ::= <<
+int $bcast.id$_scheduler() {
+	$bcast.type$ *tok_input;
+	$bcast.num: { n | $bcast.type$ *tok_output_$n$;
+}$
+	while (hasTokens($bcast.id$_input, 1)
+		$bcast.num:{ && hasRoom($bcast.id$_output_$i0$, 1)}$) {
+		tok_input = getReadPtr($bcast.id$_input, 1);
+		$bcast.num: { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
+}$
+		$bcast.num: { n | *tok_output_$n$ = *tok_input;
+}$	
+	$if( !bcast.isAddActor )$
+		return *tok_input;
+	$endif$
+	}
+  
+	return 0;
+}
+
+>>
+
+broadcast(bcast) ::= <<
+$if( bcast.isAddActor )$
+void $bcast.id$() {
+	$bcast.type$ *tok_input;
+	$bcast.num: { n | $bcast.type$ *tok_output_$n$;
+}$
+	
+	tok_input = getReadPtr($bcast.id$_input, 1);
+	$bcast.num: { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
+}$
+	$bcast.num: { n | *tok_output_$n$ = *tok_input;
+}$	
+}
+$endif$
+>>
+
+broadcast_do(bcast) ::= <<
+$if( bcast.isAddActor )$
+void $bcast.id$_do() {
+	hasTokens($bcast.id$_input, 1);
+	$bcast.num: { n | hasRoom($bcast.id$_output_$n$, 1);
+}$
+	$bcast.id$();
+}
+$endif$
+>>
+
+struct_fifo(fifo) ::= <<
+static $fifo.type$ array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
+static struct fifo_s fifo_$fifo.count$ = { sizeof($fifo.type$), $fifo.size$, (char *)array_$fifo.count$, 0, 0 };
+
+>>
+
+ptr_fifo(fifo) ::= <<
+struct fifo_s *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
+struct fifo_s *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
+
+>>
+
+pause() ::= <<
+void pause() {
+#ifndef _WIN32
+  struct termios oldT, newT;
+  char c;
+#endif
+  printf("Press a key to continue\n");
+
+#ifdef _WIN32
+  _getch();
+#else
+  ioctl(0, TCGETS, &oldT);
+  newT.c_lflag &= ~ICANON; // one char @ a time
+  ioctl(0, TCSETS, &newT); // set new terminal mode
+  read(0, &c, 1); // read 1 char @ a time from stdin
+  ioctl(0, TCSETS, &oldT); // restore previous terminal mode
+#endif
+}
+>>
+
+qs_scheduler() ::= <<
+
+////////////////////////////////////////////////////////////////////////////////
+// Actor quasi-static scheduler
+static void qs_scheduler() {
+	int btype = 0;
+	int btype_phase = 0;
+
+  while (1) {
+	restart:
+
+    // THE ACTORS BETWEEN THIS ...
+
+    source_scheduler();
+	display_scheduler();
+    serialize_scheduler();
+    parseheaders_scheduler();
+    mvrecon_scheduler();
+    mvseq_scheduler();
+    blkexp_scheduler();
+	if(btype < 500 || btype > 1100)
+		btype = broadcast_parseheaders_BTYPE_scheduler();
+
+	// ... AND THIS POINT ARE NOT SCHEDULED
+
+	if(btype == 0)
+		goto restart;
+
+	if(btype >= 1024 && btype <= 1027)
+	{
+		if(hasTokens(DCsplit_IN, 64) == 0)
+			goto restart;
+	}
+	
+	else if(btype == 522)
+	{
+		if(hasTokens(DCsplit_IN, 64) == 0)
+			goto restart;
+		if(hasTokens(address_MV, 2) == 0)
+			goto restart;
+	}
+	else if(btype == 520)
+	{
+		if(hasTokens(address_MV, 2) == 0)
+			goto restart;
+	}
+	else	// btype == 512
+	{
+		
+	}
+
+	if(btype >= 2048)						// newvop
+	{
+		btype_phase0_s();
+		btype_phase = 1;
+	}
+	else if(btype < 50)						
+	{
+		if(btype_phase == 2)				// screen size y
+		{
+			btype_phase2_s();
+			btype_phase = 0;
+		}
+		else if(btype_phase == 1)			// screen size x
+		{
+			btype_phase1_s();
+			btype_phase = 2;
+		}
+	}
+	else if(btype >= 1024 && btype <= 1027)	// intra
+		intra_s();
+	else if(btype == 522)					// intra and inter
+		combined_s();
+	else if(btype == 512)					// zeromv
+		zeromv_s();
+	else if(btype == 520)					// inter
+		inter_s();
+
+	btype = 0;
+  }
+}
+
+>>
+
+network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+// Generated from "$name$"
+
+#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _WIN32
+  #include <conio.h>
+#else
+  #include <termio.h>
+#endif
+
+#include "fifo.h"
+#include "orcc_util.h"
+
+#define SIZE $size$
+
+////////////////////////////////////////////////////////////////////////////////
+// FIFO allocation
+$connections:struct_fifo()$
+////////////////////////////////////////////////////////////////////////////////
+// FIFO pointer assignments
+$connections:ptr_fifo()$
+
+////////////////////////////////////////////////////////////////////////////////
+$broadcasts:broadcast_scheduler()$
+$broadcasts:broadcast()$
+$broadcasts:broadcast_do()$
+////////////////////////////////////////////////////////////////////////////////
+// Action schedulers
+$initializes: { init | extern void $init$_initialize(); 
+}$
+$instances: { inst | extern int $inst$_scheduler();
+}$
+////////////////////////////////////////////////////////////////////////////////
+// Actor scheduler
+
+static void scheduler() {
+	$initializes: { init | $init$_initialize();
+}$	while (1) {
+		$instances: { inst | $inst$_scheduler();
+}$
+		$broadcasts: { bcast | $bcast.id$_scheduler();
+}$	}
+}
+
+$qs_scheduler()$
+
+////////////////////////////////////////////////////////////////////////////////
+
+$pause()$
+
+extern void source_set_file_name(const char *file_name);
+
+int main(int argc, char *argv[], char *env[]) {
+	init_orcc(argc, argv, env);
+
+	qs_scheduler();
+
+	printf("End of simulation! Press a key to continue\n");
+	pause();
+
+	return 0;
+}
+
+>>
+
