@@ -30,9 +30,9 @@ To install OCaml, you can either:
       This is not necessary on Cygwin because flexdll uses cygpath to get the path to the libraries.
 
 
-- ocamlgraph, available from http://ocamlgraph.lri.fr/index.en.html
+- ocamlgraph version 1.1, available from http://ocamlgraph.lri.fr/index.en.html
 Compile ocamlgraph (with the classic ./configure, make, make install)
-Note: "make install" of ocamlgraph-1.0 is currently broken on Windows because it assumes a OCaml MSVC port.
+Note: "make install" of ocamlgraph-1.1 is currently broken on Windows because it assumes a OCaml MSVC port.
 You will need to type one of:
   - if you use Cygwin/MinGW
       cp graph.a $OCAMLLIB
