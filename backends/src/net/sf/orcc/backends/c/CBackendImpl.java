@@ -68,7 +68,10 @@ public class CBackendImpl extends AbstractBackend implements IBackend {
 		}
 	}
 
-	private CActorPrinter printer;
+	/**
+	 * printer is protected in order to be visible to CQuasiBackendImpl
+	 */
+	protected CActorPrinter printer;
 
 	@Override
 	protected void init() throws IOException {
