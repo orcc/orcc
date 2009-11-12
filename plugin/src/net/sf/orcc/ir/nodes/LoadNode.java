@@ -42,7 +42,7 @@ import net.sf.orcc.ir.Use;
  * @author Matthieu Wipliez
  * 
  */
-public class LoadNode extends AbstractNode implements ITargetContainer {
+public class LoadNode extends AbstractInstruction implements ITargetContainer {
 
 	private List<IExpr> indexes;
 
@@ -50,16 +50,16 @@ public class LoadNode extends AbstractNode implements ITargetContainer {
 
 	private LocalVariable target;
 
-	public LoadNode(int id, Location location, LocalVariable target,
+	public LoadNode(BlockNode block, Location location, LocalVariable target,
 			Use source, List<IExpr> indexes) {
-		super(id, location);
+		super(block, location);
 		setIndexes(indexes);
 		setSource(source);
 		setTarget(target);
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

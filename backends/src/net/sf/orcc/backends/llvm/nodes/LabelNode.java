@@ -31,8 +31,9 @@ package net.sf.orcc.backends.llvm.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.IInstruction;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
@@ -44,10 +45,10 @@ public class LabelNode extends AbstractLLVMNode {
 
 	private List<LabelNode> precedence;
 
-	private INode successor;
+	private IInstruction successor;
 
-	public LabelNode(int id, Location location, String labelName) {
-		super(id, location);
+	public LabelNode(BlockNode block, Location location, String labelName) {
+		super(block, location);
 		precedence = new ArrayList<LabelNode>();
 		this.labelName = labelName;
 		this.successor = null;
@@ -79,7 +80,7 @@ public class LabelNode extends AbstractLLVMNode {
 		return precedence;
 	}
 
-	public INode getSuccessor() {
+	public IInstruction getSuccessor() {
 		return successor;
 	}
 
@@ -91,7 +92,7 @@ public class LabelNode extends AbstractLLVMNode {
 		this.precedence = precedence;
 	}
 
-	public void setSuccessor(INode successor) {
+	public void setSuccessor(IInstruction successor) {
 		this.successor = successor;
 	}
 

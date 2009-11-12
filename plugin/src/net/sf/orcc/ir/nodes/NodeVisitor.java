@@ -29,41 +29,17 @@
 package net.sf.orcc.ir.nodes;
 
 /**
+ * This interface defines a node visitor.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public interface NodeVisitor {
 
-	public void visit(AssignVarNode node, Object... args);
-
-	public void visit(CallNode node, Object... args);
-
-	public void visit(EmptyNode node, Object... args);
-
-	public void visit(HasTokensNode node, Object... args);
+	public void visit(BlockNode node, Object... args);
 
 	public void visit(IfNode node, Object... args);
-
-	public void visit(InitPortNode node, Object... args);
-
-	public void visit(JoinNode node, Object... args);
-
-	public void visit(LoadNode node, Object... args);
-
-	public void visit(PeekNode node, Object... args);
-
-	public void visit(ReadNode node, Object... args);
-
-	public void visit(ReturnNode node, Object... args);
-
-	public void visit(StoreNode node, Object... args);
-
+	
 	public void visit(WhileNode node, Object... args);
-
-	public void visit(WriteNode node, Object... args);
-	
-	public void visit(WriteEndNode node, Object... args);
-	
-	public void visit(ReadEndNode node, Object... args);
 
 }

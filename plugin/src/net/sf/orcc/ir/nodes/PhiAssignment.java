@@ -30,7 +30,6 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
@@ -42,7 +41,8 @@ import net.sf.orcc.ir.Use;
  * @author Matthieu Wipliez
  * 
  */
-public class PhiAssignment implements INode, ITargetContainer {
+public class PhiAssignment extends AbstractInstruction implements
+		ITargetContainer {
 
 	private List<Use> localUses;
 
@@ -57,9 +57,16 @@ public class PhiAssignment implements INode, ITargetContainer {
 	 * @param vars
 	 *            a list of uses
 	 */
-	public PhiAssignment(LocalVariable target, List<Use> vars) {
+	public PhiAssignment(BlockNode block, Location location,
+			LocalVariable target, List<Use> vars) {
+		super(block, location);
 		setTarget(target);
 		this.localUses = vars;
+	}
+
+	@Override
+	public void accept(InstructionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
 	@Override
@@ -79,16 +86,6 @@ public class PhiAssignment implements INode, ITargetContainer {
 	@Override
 	public void setTargetSimple(LocalVariable target) {
 		this.target = target;
-	}
-
-	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		// TODO what about phi assignments join node etc.?
-	}
-
-	@Override
-	public Location getLocation() {
-		return new Location();
 	}
 
 }

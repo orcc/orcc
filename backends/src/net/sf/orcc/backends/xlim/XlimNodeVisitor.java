@@ -38,12 +38,12 @@ import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.CallNode;
-import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.nodes.JoinNode;
+import net.sf.orcc.ir.nodes.InstructionVisitor;
 import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.PeekNode;
@@ -63,7 +63,7 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimNodeVisitor implements NodeVisitor {
+public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 
 	/**
 	 * Current action name
@@ -123,6 +123,12 @@ public class XlimNodeVisitor implements NodeVisitor {
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 	}
 
+	@Override
+	public void visit(BlockNode node, Object... args) {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
 	 * Add call node
 	 * 
@@ -154,18 +160,6 @@ public class XlimNodeVisitor implements NodeVisitor {
 			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target),
 					target.getType());
 		}
-	}
-
-	/**
-	 * Add empty node
-	 * 
-	 * @param node
-	 *            Empty node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(EmptyNode node, Object... args) {
-		System.out.println("CHECK EMPTY");
 	}
 
 	/**
@@ -239,33 +233,6 @@ public class XlimNodeVisitor implements NodeVisitor {
 	}
 
 	/**
-	 * Add join node
-	 * 
-	 * @param node
-	 *            Join node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(JoinNode node, Object... args) {
-		System.out.println("CHECK JOIN");
-
-		Element phiE = XlimNodeTemplate.newPHI(root);
-
-		for (PhiAssignment phi : node.getPhiAssignments()) {
-			System.out.println("CHECK PHIS");
-
-			XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars()
-					.get(0)), "then");
-			XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars()
-					.get(1)), "else");
-
-			Element portO = XlimNodeTemplate.newOutPort(phiE, names
-					.getVarName(phi.getTarget()), phi.getTarget().getType());
-			phi.getTarget().getType().accept(new XlimTypeSizeVisitor(portO));
-		}
-	}
-
-	/**
 	 * Add load node
 	 * 
 	 * @param node
@@ -301,6 +268,21 @@ public class XlimNodeVisitor implements NodeVisitor {
 		System.out.println("CHECK PEEK");
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void visit(PhiAssignment phi, Object... args) {
+		Element phiE = XlimNodeTemplate.newPHI(root);
+		System.out.println("CHECK PHIS");
+
+		XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars().get(
+				0)), "then");
+		XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars().get(
+				1)), "else");
+
+		Element portO = XlimNodeTemplate.newOutPort(phiE, names.getVarName(phi
+				.getTarget()), phi.getTarget().getType());
+		phi.getTarget().getType().accept(new XlimTypeSizeVisitor(portO));
 	}
 
 	/**

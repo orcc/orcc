@@ -31,30 +31,34 @@ package net.sf.orcc.ir.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.ir.IInstruction;
+import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.Location;
 
 /**
- * This class defines a join node. A join node is a node that contains a list of
- * <code>phi</code> assignments.
+ * This class defines a Block node. A block node is a node that contains
+ * instructions.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class JoinNode extends AbstractNode {
-
-	private List<PhiAssignment> phis;
+public class BlockNode extends ArrayList<IInstruction> implements
+		Iterable<IInstruction>, INode {
 
 	/**
-	 * Creates a new join node with the given id and location
 	 * 
-	 * @param id
-	 *            node id
-	 * @param location
-	 *            location
 	 */
-	public JoinNode(int id, Location location) {
-		super(id, location);
-		this.phis = new ArrayList<PhiAssignment>();
+	private static final long serialVersionUID = 1L;
+
+	private Location location;
+
+	public BlockNode() {
+		this(new Location());
+	}
+
+	public BlockNode(Location location) {
+		super();
+		this.location = location;
 	}
 
 	@Override
@@ -62,13 +66,45 @@ public class JoinNode extends AbstractNode {
 		visitor.visit(this, args);
 	}
 
-	/**
-	 * Returns the list of phi assignments present in this node.
-	 * 
-	 * @return the list of phi assignments present in this node
-	 */
-	public List<PhiAssignment> getPhiAssignments() {
-		return phis;
+	@Override
+	public Location getLocation() {
+		return location;
+	}
+
+	public static BlockNode first(List<INode> nodes) {
+		BlockNode block;
+		if (nodes.isEmpty()) {
+			block = new BlockNode();
+			nodes.add(block);
+		} else {
+			INode node = nodes.get(0);
+			if (node instanceof BlockNode) {
+				block = (BlockNode) node;
+			} else {
+				block = new BlockNode();
+				nodes.add(0, block);
+			}
+		}
+
+		return block;
+	}
+
+	public static BlockNode last(List<INode> nodes) {
+		BlockNode block;
+		if (nodes.isEmpty()) {
+			block = new BlockNode();
+			nodes.add(block);
+		} else {
+			INode node = nodes.get(nodes.size() - 1);
+			if (node instanceof BlockNode) {
+				block = (BlockNode) node;
+			} else {
+				block = new BlockNode();
+				nodes.add(block);
+			}
+		}
+
+		return block;
 	}
 
 }

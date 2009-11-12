@@ -41,7 +41,7 @@ import net.sf.orcc.ir.Use;
  * @author Matthieu Wipliez
  * 
  */
-public class StoreNode extends AbstractNode implements IValueContainer {
+public class StoreNode extends AbstractInstruction implements IValueContainer {
 
 	private List<IExpr> indexes;
 
@@ -49,16 +49,16 @@ public class StoreNode extends AbstractNode implements IValueContainer {
 
 	private IExpr value;
 
-	public StoreNode(int id, Location location, Use target,
+	public StoreNode(BlockNode block, Location location, Use target,
 			List<IExpr> indexes, IExpr value) {
-		super(id, location);
+		super(block, location);
 		setIndexes(indexes);
 		setTarget(target);
 		setValue(value);
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

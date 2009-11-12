@@ -36,8 +36,16 @@ import net.sf.orcc.ir.nodes.NodeVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public interface INode {
+public interface INode extends User {
 
+	/**
+	 * Accepts the given node visitor.
+	 * 
+	 * @param visitor
+	 *            a visitor
+	 * @param args
+	 *            arguments
+	 */
 	public void accept(NodeVisitor visitor, Object... args);
 
 	public Location getLocation();

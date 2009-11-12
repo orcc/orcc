@@ -32,27 +32,28 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 
 /**
- * This class defines a ReadEnd node defining the end of the current fifo's access.
+ * This class defines a ReadEnd node defining the end of the current fifo's
+ * access.
  * 
  * @author Jérôme GORIN
  * 
  */
-public class ReadEndNode extends AbstractNode {
+public class ReadEndNode extends AbstractInstruction {
 
 	private Port port;
-	
-	public ReadEndNode(int id, Location location, Port port) {
-		super(id, location);
+
+	public ReadEndNode(BlockNode block, Location location, Port port) {
+		super(block, location);
 		setPort(port);
 	}
-	
+
 	public ReadEndNode(ReadNode node) {
-		super(node.getId(), node.getLocation());
+		super(node.getBlock(), node.getLocation());
 		setPort(node.getPort());
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 
@@ -66,7 +67,7 @@ public class ReadEndNode extends AbstractNode {
 
 	@Override
 	public String toString() {
-		return "writeEnd(" + getPort() + ")";
+		return "readEnd(" + getPort() + ")";
 	}
 
 }

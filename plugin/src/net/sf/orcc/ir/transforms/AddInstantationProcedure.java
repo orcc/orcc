@@ -42,6 +42,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
@@ -62,9 +63,12 @@ public class AddInstantationProcedure implements IActorTransformation {
 			OrderedMap<Port> ports) throws OrccException {
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 		OrderedMap<Variable> locals = new OrderedMap<Variable>();
-		List<INode> nodes = new ArrayList<INode>();
-
 		Location location = new Location();
+
+		BlockNode block = new BlockNode(location);
+		List<INode> nodes = new ArrayList<INode>();
+		nodes.add(block);
+
 		LocalVariable parameter = new LocalVariable(false, 0, location, "fifo",
 				null, null, new VoidType());
 
@@ -73,15 +77,14 @@ public class AddInstantationProcedure implements IActorTransformation {
 			Use varUse = new Use(parameter);
 			VarExpr expr = new VarExpr(new Location(), varUse);
 
-			InitPortNode node = new InitPortNode(0, new Location(), port
+			InitPortNode node = new InitPortNode(null, new Location(), port
 					.getName(), 0, expr);
 
-			nodes.add(node);
+			block.add(node);
 		}
 
 		return new Procedure(actorName + "_init" + Attributs, false,
 				new Location(), new VoidType(), parameters, locals, nodes);
-
 	}
 
 	@Override

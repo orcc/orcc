@@ -59,7 +59,7 @@ public class LocalVariable extends Variable implements
 	/**
 	 * the node where the variable is assigned.
 	 */
-	private INode node;
+	private IInstruction node;
 
 	/**
 	 * when local variables have the same name but different scopes.
@@ -67,7 +67,7 @@ public class LocalVariable extends Variable implements
 	private Integer suffix;
 
 	public LocalVariable(boolean assignable, int index, Location loc,
-			String name, INode node, Integer suffix, IType type) {
+			String name, IInstruction node, Integer suffix, IType type) {
 		super(loc, type, name, false);
 		this.assignable = assignable;
 		this.index = index;
@@ -120,7 +120,7 @@ public class LocalVariable extends Variable implements
 		return super.getName() + (suffix == null ? "" : suffix) + indexStr;
 	}
 
-	public INode getNode() {
+	public IInstruction getNode() {
 		return node;
 	}
 
@@ -153,7 +153,7 @@ public class LocalVariable extends Variable implements
 		this.index = index;
 	}
 
-	public void setNode(INode node) {
+	public void setNode(IInstruction node) {
 		this.node = node;
 	}
 

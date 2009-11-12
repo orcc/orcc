@@ -39,7 +39,7 @@ import net.sf.orcc.ir.Port;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractFifoNode extends AbstractNode implements
+public abstract class AbstractFifoNode extends AbstractInstruction implements
 		ITargetContainer {
 
 	private int numTokens;
@@ -48,9 +48,9 @@ public abstract class AbstractFifoNode extends AbstractNode implements
 
 	private LocalVariable target;
 
-	public AbstractFifoNode(int id, Location location, Port port,
+	public AbstractFifoNode(BlockNode block, Location location, Port port,
 			int numTokens, LocalVariable target) {
-		super(id, location);
+		super(block, location);
 		this.numTokens = numTokens;
 		setPort(port);
 		setTarget(target);

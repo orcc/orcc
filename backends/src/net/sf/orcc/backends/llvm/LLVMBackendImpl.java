@@ -68,6 +68,7 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 	@Override
 	protected void init() throws IOException {
 		printer = new LLVMActorPrinter();
+		printer.toString();
 
 		NameTransformer.names.clear();
 	}

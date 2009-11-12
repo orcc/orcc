@@ -29,13 +29,13 @@
 package net.sf.orcc.backends.c.nodes;
 
 import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.nodes.InstructionVisitor;
 
 /**
  * @author Matthieu Wipliez
  * 
  */
-public interface CNodeVisitor extends NodeVisitor {
+public interface CNodeVisitor extends InstructionVisitor {
 
 	public void visit(DecrementNode node, Object... args);
 

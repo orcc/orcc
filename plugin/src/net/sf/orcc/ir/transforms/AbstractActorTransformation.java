@@ -32,11 +32,29 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.IInstruction;
 import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.actor.Action;
 import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
+import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.CallNode;
+import net.sf.orcc.ir.nodes.HasTokensNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.InitPortNode;
+import net.sf.orcc.ir.nodes.InstructionVisitor;
+import net.sf.orcc.ir.nodes.LoadNode;
+import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.nodes.PeekNode;
+import net.sf.orcc.ir.nodes.PhiAssignment;
+import net.sf.orcc.ir.nodes.ReadEndNode;
+import net.sf.orcc.ir.nodes.ReadNode;
+import net.sf.orcc.ir.nodes.ReturnNode;
+import net.sf.orcc.ir.nodes.StoreNode;
+import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.WriteEndNode;
+import net.sf.orcc.ir.nodes.WriteNode;
 
 /**
  * This abstract class implements an no-op transformation on an actor. This
@@ -45,26 +63,57 @@ import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
  * @author Matthieu Wipliez
  * 
  */
-public class AbstractActorTransformation extends AbstractNodeVisitor implements
-		IActorTransformation {
+public class AbstractActorTransformation implements NodeVisitor,
+		InstructionVisitor, IActorTransformation {
 
 	protected Procedure procedure;
 
 	@Override
 	public void transform(Actor actor) {
 		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
+			visitProcedure(proc);
 		}
 
 		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
+			visitProcedure(action.getBody());
+			visitProcedure(action.getScheduler());
 		}
 
 		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
+			visitProcedure(action.getBody());
+			visitProcedure(action.getScheduler());
 		}
+	}
+
+	@Override
+	public void visit(AssignVarNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(BlockNode node, Object... args) {
+		ListIterator<IInstruction> it = node.listIterator();
+		while (it.hasNext()) {
+			it.next().accept(this, it);
+		}
+	}
+
+	@Override
+	public void visit(CallNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(HasTokensNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(IfNode node, Object... args) {
+		visit(node.getThenNodes());
+		visit(node.getElseNodes());
+		visit(node.getJoinNode());
+	}
+
+	@Override
+	public void visit(InitPortNode node, Object... args) {
 	}
 
 	/**
@@ -73,11 +122,52 @@ public class AbstractActorTransformation extends AbstractNodeVisitor implements
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	protected void visitNodes(List<INode> nodes) {
+	protected void visit(List<INode> nodes) {
 		ListIterator<INode> it = nodes.listIterator();
 		while (it.hasNext()) {
-			it.next().accept(this, it);
+			INode node = it.next();
+			node.accept(this, it);
 		}
+	}
+
+	@Override
+	public void visit(LoadNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(PeekNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(PhiAssignment node, Object... args) {
+	}
+
+	@Override
+	public void visit(ReadEndNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(ReadNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(ReturnNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(StoreNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(WhileNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(WriteEndNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(WriteNode node, Object... args) {
 	}
 
 	/**
@@ -86,10 +176,10 @@ public class AbstractActorTransformation extends AbstractNodeVisitor implements
 	 * @param procedure
 	 *            a procedure
 	 */
-	private void visitProc(Procedure procedure) {
+	private void visitProcedure(Procedure procedure) {
 		this.procedure = procedure;
 		List<INode> nodes = procedure.getNodes();
-		visitNodes(nodes);
+		visit(nodes);
 	}
 
 }

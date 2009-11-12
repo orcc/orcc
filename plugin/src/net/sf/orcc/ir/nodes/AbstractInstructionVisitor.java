@@ -28,26 +28,64 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.ir.Location;
-
 /**
+ * This abstract class defines a no-op instruction visitor.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class EmptyNode extends AbstractNode {
+public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 
-	public EmptyNode(int id, Location location) {
-		super(id, location);
+	@Override
+	public void visit(AssignVarNode node, Object... args) {
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public void visit(CallNode node, Object... args) {
 	}
 
 	@Override
-	public String toString() {
-		return "/* empty */";
+	public void visit(HasTokensNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(InitPortNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(LoadNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(PeekNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(PhiAssignment node, Object... args) {
+	}
+
+	@Override
+	public void visit(ReadEndNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(ReadNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(ReturnNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(StoreNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(WriteEndNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(WriteNode node, Object... args) {
 	}
 
 }

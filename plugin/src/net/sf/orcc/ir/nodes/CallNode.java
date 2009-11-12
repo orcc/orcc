@@ -42,7 +42,7 @@ import net.sf.orcc.ir.Use;
  * @author Matthieu Wipliez
  * 
  */
-public class CallNode extends AbstractNode implements ITargetContainer {
+public class CallNode extends AbstractInstruction implements ITargetContainer {
 
 	private List<IExpr> parameters;
 
@@ -50,16 +50,16 @@ public class CallNode extends AbstractNode implements ITargetContainer {
 
 	private LocalVariable target;
 
-	public CallNode(int id, Location location, LocalVariable target,
+	public CallNode(BlockNode block, Location location, LocalVariable target,
 			Procedure procedure, List<IExpr> parameters) {
-		super(id, location);
+		super(block, location);
 		setParameters(parameters);
 		setTarget(target);
 		this.procedure = procedure;
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

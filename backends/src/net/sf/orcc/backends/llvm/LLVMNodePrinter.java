@@ -57,13 +57,13 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.CallNode;
-import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.LoadNode;
+import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.PeekNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.ReadEndNode;
@@ -85,7 +85,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMNodePrinter implements LLVMNodeVisitor {
+public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 
 	private String actorName;
 
@@ -227,11 +227,6 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 	}
 
 	@Override
-	public void visit(EmptyNode node, Object... args) {
-		// nothing to print
-	}
-
-	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("getElementPtrNode");
 
@@ -282,11 +277,6 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 		nodeTmpl.setAttribute("index", (Integer) args[0]);
 
 		template.setAttribute(attrName, nodeTmpl);
-	}
-
-	@Override
-	public void visit(JoinNode node, Object... args) {
-		// Not supported in llvm's backend
 	}
 
 	public void visit(LabelNode node, Object... args) {
@@ -532,11 +522,23 @@ public class LLVMNodePrinter implements LLVMNodeVisitor {
 
 	@Override
 	public void visit(WriteEndNode node, Object... args) {
-		
+
 	}
 
 	@Override
 	public void visit(ReadEndNode node, Object... args) {
-		
+
+	}
+
+	@Override
+	public void visit(PhiAssignment node, Object... args) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void visit(BlockNode node, Object... args) {
+		// TODO Auto-generated method stub
+
 	}
 }

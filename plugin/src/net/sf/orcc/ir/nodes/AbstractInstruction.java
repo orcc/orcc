@@ -26,71 +26,40 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.transforms;
+package net.sf.orcc.ir.nodes;
 
-import java.util.List;
-import java.util.ListIterator;
-
-import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
-import net.sf.orcc.backends.llvm.nodes.BrNode;
-import net.sf.orcc.backends.llvm.nodes.LabelNode;
-import net.sf.orcc.ir.IActorTransformation;
-import net.sf.orcc.ir.INode;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.IInstruction;
+import net.sf.orcc.ir.Location;
 
 /**
- * Verify Branch Name coherence
+ * This class defines an abstract instruction.
  * 
- * @author Jérôme GORIN
+ * @author Matthieu Wipliez
  * 
  */
-public class CorrectLabelNameTransformation extends AbstractLLVMNodeVisitor
-		implements IActorTransformation {
+public abstract class AbstractInstruction implements IInstruction {
 
-	int brCount;
+	private BlockNode block;
 
-	@Override
-	public void transform(Actor actor) {
-		for (Procedure proc : actor.getProcs()) {
-			visitProc(proc);
-		}
+	private Location location;
 
-		for (Action action : actor.getActions()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProc(action.getBody());
-			visitProc(action.getScheduler());
-		}
+	protected AbstractInstruction(BlockNode block, Location location) {
+		this.block = block;
+		this.location = location;
 	}
 
 	@Override
-	public void visit(BrNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
+	public BlockNode getBlock() {
+		return block;
 	}
 
 	@Override
-	public void visit(LabelNode node, Object... args) {
-		node.setLabelName("bb" + Integer.toString(brCount++));
+	public Location getLocation() {
+		return location;
 	}
 
-	private void visitNodes(List<INode> nodes) {
-		ListIterator<INode> it = nodes.listIterator();
-
-		while (it.hasNext()) {
-			it.next().accept(this, it);
-		}
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
-	private void visitProc(Procedure proc) {
-		brCount = 0;
-		List<INode> nodes = proc.getNodes();
-
-		visitNodes(nodes);
-	}
 }

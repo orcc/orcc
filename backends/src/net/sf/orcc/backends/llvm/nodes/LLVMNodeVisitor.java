@@ -28,14 +28,13 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.nodes.InstructionVisitor;
 
 /**
  * @author Matthieu Wipliez
  * 
  */
-public interface LLVMNodeVisitor extends NodeVisitor {
+public interface LLVMNodeVisitor extends InstructionVisitor {
 
 	public void visit(BitcastNode node, Object... args);
 
@@ -44,8 +43,6 @@ public interface LLVMNodeVisitor extends NodeVisitor {
 	public void visit(BrNode node, Object... args);
 
 	public void visit(GetElementPtrNode node, Object... args);
-
-	public void visit(InitPortNode node, Object... args);
 
 	public void visit(LabelNode node, Object... args);
 

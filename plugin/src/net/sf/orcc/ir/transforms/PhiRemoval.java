@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.IInstruction;
 import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -39,8 +39,8 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
@@ -54,52 +54,51 @@ import net.sf.orcc.util.OrderedMap;
 public class PhiRemoval extends AbstractActorTransformation {
 
 	@Override
-	public void visit(IfNode node, Object... args) {
-		List<INode> nodes = node.getThenNodes();
-		ListIterator<INode> it = nodes.listIterator(nodes.size());
-		node.getJoinNode().accept(this, it, 0);
-
-		nodes = node.getElseNodes();
-		it = nodes.listIterator(nodes.size());
-		node.getJoinNode().accept(this, it, 1);
-		node.getJoinNode().getPhiAssignments().clear();
-
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
+	public void visit(BlockNode node, Object... args) {
+		for (IInstruction instruction : node) {
+			instruction.accept(this, args);
+		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(JoinNode node, Object... args) {
-		List<PhiAssignment> phis = node.getPhiAssignments();
-		if (!phis.isEmpty()) {
-			ListIterator<INode> it = (ListIterator<INode>) args[0];
-			int phiIndex = (Integer) args[1];
+	public void visit(IfNode node, Object... args) {
+		// visit then nodes
+		node.getJoinNode().accept(this, BlockNode.last(node.getThenNodes()), 0);
+		node.getJoinNode().accept(this, BlockNode.last(node.getElseNodes()), 1);
+		node.getJoinNode().clear();
 
-			for (PhiAssignment phi : phis) {
-				LocalVariable target = phi.getTarget();
-				LocalVariable source = (LocalVariable) phi.getVars().get(
-						phiIndex).getVariable();
+		visit(node.getThenNodes());
+		visit(node.getElseNodes());
+	}
 
-				// if source is a local variable with index = 0, we remove it
-				// from the procedure and translate the PHI by an assignment of
-				// 0 (zero) to target.
-				// Otherwise, we just create an assignment target = source.
-				OrderedMap<Variable> parameters = procedure.getParameters();
-				AssignVarNode assign;
-				if (source.getIndex() == 0 && !parameters.contains(source)) {
-					procedure.getLocals().remove(source);
-					IntExpr expr = new IntExpr(new Location(), 0);
-					assign = new AssignVarNode(0, new Location(), target, expr);
-				} else {
-					Use localUse = new Use(source);
-					VarExpr expr = new VarExpr(new Location(), localUse);
-					assign = new AssignVarNode(0, new Location(), target, expr);
-				}
+	@Override
+	public void visit(PhiAssignment phi, Object... args) {
+		BlockNode targetBlock = (BlockNode) args[0];
 
-				it.add(assign);
-			}
+		int phiIndex = (Integer) args[1];
+
+		LocalVariable target = phi.getTarget();
+		LocalVariable source = (LocalVariable) phi.getVars().get(phiIndex)
+				.getVariable();
+
+		// if source is a local variable with index = 0, we remove it from the
+		// procedure and translate the PHI by an assignment of 0 (zero) to
+		// target. Otherwise, we just create an assignment target = source.
+		OrderedMap<Variable> parameters = procedure.getParameters();
+		AssignVarNode assign;
+		if (source.getIndex() == 0 && !parameters.contains(source)) {
+			procedure.getLocals().remove(source);
+			IntExpr expr = new IntExpr(new Location(), 0);
+			assign = new AssignVarNode(targetBlock, new Location(), target,
+					expr);
+		} else {
+			Use localUse = new Use(source);
+			VarExpr expr = new VarExpr(new Location(), localUse);
+			assign = new AssignVarNode(targetBlock, new Location(), target,
+					expr);
 		}
+
+		targetBlock.add(assign);
 	}
 
 	@Override
@@ -108,16 +107,29 @@ public class PhiRemoval extends AbstractActorTransformation {
 		ListIterator<INode> it = (ListIterator<INode>) args[0];
 
 		// the node before the while.
-		it.previous();
-		node.getJoinNode().accept(this, it, 0);
+		BlockNode block;
+		if (it.hasPrevious()) {
+			INode previousNode = it.previous();
+			if (previousNode instanceof BlockNode) {
+				block = (BlockNode) previousNode;
+			} else {
+				block = new BlockNode();
+				it.add(block);
+			}
+		} else {
+			block = new BlockNode();
+			it.add(block);
+		}
+		node.getJoinNode().accept(this, block, 0);
 
 		// go back to the while
 		it.next();
 
-		it = node.getNodes().listIterator(node.getNodes().size());
-		node.getJoinNode().accept(this, it, 1);
-		node.getJoinNode().getPhiAssignments().clear();
-		visitNodes(node.getNodes());
+		// last node of the while
+		block = BlockNode.last(node.getNodes());
+		node.getJoinNode().accept(this, block, 1);
+		node.getJoinNode().clear();
+		visit(node.getNodes());
 	}
 
 }

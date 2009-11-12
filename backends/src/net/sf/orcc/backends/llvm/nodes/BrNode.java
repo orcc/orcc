@@ -63,7 +63,7 @@ public class BrNode extends AbstractLLVMNode {
 	public BrNode(IfNode node, List<PhiNode> phiNodes,
 			LabelNode labelEntryNode, LabelNode labelTrueNode,
 			LabelNode labelFalseNode, LabelNode labelEndNode) {
-		super(node.getId(), node.getLocation());
+		super(null, node.getLocation());
 		this.conditionNodes = new ArrayList<INode>();
 		this.condition = node.getValue();
 		this.elseNodes = node.getElseNodes();
@@ -75,12 +75,12 @@ public class BrNode extends AbstractLLVMNode {
 		this.phiNodes = phiNodes;
 	}
 
-	public BrNode(int id, Location location, IExpr condition,
+	public BrNode(Location location, IExpr condition,
 			List<INode> conditionNodes, List<INode> thenNodes,
 			List<INode> elseNodes, List<PhiNode> phiNodes,
 			LabelNode labelEntryNode, LabelNode labelTrueNode,
 			LabelNode labelFalseNode, LabelNode labelEndNode) {
-		super(id, location);
+		super(null, location);
 		this.conditionNodes = conditionNodes;
 		this.condition = condition;
 		this.phiNodes = phiNodes;

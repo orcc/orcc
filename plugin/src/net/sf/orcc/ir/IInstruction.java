@@ -26,40 +26,28 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.transforms;
+package net.sf.orcc.ir;
 
-import java.util.ListIterator;
-
-import net.sf.orcc.ir.INode;
-import net.sf.orcc.ir.nodes.EmptyNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.InstructionVisitor;
 
 /**
- * Removes empty nodes from procedure.
+ * This class defines an instruction.
  * 
- * @author Jérôme Gorin
  * @author Matthieu Wipliez
  * 
  */
-public class EmptyNodeRemoval extends AbstractActorTransformation {
+public interface IInstruction extends User {
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(EmptyNode node, Object... args) {
-		ListIterator<INode> it = (ListIterator<INode>) args[0];
-		it.remove();
-	}
+	public void accept(InstructionVisitor visitor, Object... args);
 
-	@Override
-	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
-	}
+	/**
+	 * Returns the block that contains this instruction.
+	 * 
+	 * @return the block that contains this instruction
+	 */
+	public BlockNode getBlock();
 
-	@Override
-	public void visit(WhileNode node, Object... args) {
-		visitNodes(node.getNodes());
-	}
+	public Location getLocation();
 
 }

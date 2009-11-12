@@ -38,22 +38,22 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class AssignVarNode extends AbstractNode implements ITargetContainer,
-		IValueContainer {
+public class AssignVarNode extends AbstractInstruction implements
+		ITargetContainer, IValueContainer {
 
 	private LocalVariable target;
 
 	private IExpr value;
 
-	public AssignVarNode(int id, Location location, LocalVariable target,
-			IExpr value) {
-		super(id, location);
+	public AssignVarNode(BlockNode block, Location location,
+			LocalVariable target, IExpr value) {
+		super(block, location);
 		setTarget(target);
 		setValue(value);
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

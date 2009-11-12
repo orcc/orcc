@@ -32,6 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 
 /**
@@ -44,9 +45,9 @@ public class SelectNode extends AbstractLLVMNode {
 
 	private List<PhiAssignment> phis;
 
-	public SelectNode(int id, Location location, IExpr condition,
+	public SelectNode(BlockNode block, Location location, IExpr condition,
 			List<PhiAssignment> phis) {
-		super(id, location);
+		super(block, location);
 		this.condition = condition;
 		this.phis = phis;
 	}

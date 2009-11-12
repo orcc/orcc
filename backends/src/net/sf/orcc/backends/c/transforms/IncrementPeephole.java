@@ -130,7 +130,7 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	}
 
 	@Override
-	protected void visitNodes(List<INode> nodes) {
+	protected void visit(List<INode> nodes) {
 		ListIterator<INode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			examine(it);

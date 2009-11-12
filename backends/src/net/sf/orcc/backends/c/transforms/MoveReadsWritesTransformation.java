@@ -32,7 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.IInstruction;
 import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.ReadEndNode;
 import net.sf.orcc.ir.nodes.ReadNode;
 import net.sf.orcc.ir.nodes.WriteEndNode;
@@ -47,35 +49,38 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 
-	private List<INode> readEnds;
-	private List<INode> writes;
+	private List<IInstruction> readEnds;
+
+	private List<IInstruction> writes;
 
 	public MoveReadsWritesTransformation() {
-		writes = new ArrayList<INode>();
-		readEnds = new ArrayList<INode>();
+		writes = new ArrayList<IInstruction>();
+		readEnds = new ArrayList<IInstruction>();
 	}
 
 	@Override
 	public void visit(ReadNode node, Object... args) {
 		readEnds.add(new ReadEndNode(node));
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(WriteNode node, Object... args) {
-		ListIterator<INode> it = (ListIterator<INode>) args[0];
+		ListIterator<IInstruction> it = (ListIterator<IInstruction>) args[0];
 		writes.add(node);
 		it.set(new WriteEndNode(node));
 	}
 
 	@Override
-	protected void visitNodes(List<INode> nodes) {
+	protected void visit(List<INode> nodes) {
 		// visit nodes
-		super.visitNodes(nodes);
+		super.visit(nodes);
 
-		// add writes at the end of the node list, and clears the write list
-		nodes.addAll(0, writes);
-		nodes.addAll(readEnds);
+		// add writes at the beginning of the node list, and read at the ends
+		BlockNode.first(nodes).addAll(0, writes);
+		BlockNode.last(nodes).addAll(readEnds);
+		
+		// clears the lists
 		writes.clear();
 		readEnds.clear();
 	}

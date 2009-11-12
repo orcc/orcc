@@ -31,6 +31,7 @@ package net.sf.orcc.backends.llvm.nodes;
 import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
@@ -42,8 +43,9 @@ public class ZextNode extends AbstractLLVMNode {
 
 	private LocalVariable var;
 
-	public ZextNode(int id, Location location, LocalVariable var, IExpr value) {
-		super(id, location);
+	public ZextNode(BlockNode block, Location location, LocalVariable var,
+			IExpr value) {
+		super(block, location);
 		this.var = var;
 		this.value = value;
 	}

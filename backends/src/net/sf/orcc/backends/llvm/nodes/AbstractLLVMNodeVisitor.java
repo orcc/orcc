@@ -28,62 +28,57 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.ir.nodes.AbstractNodeVisitor;
-import net.sf.orcc.ir.nodes.InitPortNode;
+import net.sf.orcc.ir.nodes.AbstractInstructionVisitor;
 
 /**
  * @author Jérôme GORIN
  * 
  */
-public abstract class AbstractLLVMNodeVisitor extends AbstractNodeVisitor
-		implements LLVMNodeVisitor {
+public abstract class AbstractLLVMNodeVisitor extends
+		AbstractInstructionVisitor implements LLVMNodeVisitor {
 
+	@Override
 	public void visit(BitcastNode node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(BrLabelNode node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(BrNode node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(GetElementPtrNode node, Object... args) {
-
 	}
 
-	public void visit(InitPortNode node, Object... args) {
-
-	}
-
+	@Override
 	public void visit(LabelNode node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(LoadFifo node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(PhiNode node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(SelectNode node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(SextNode node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(TruncNode node, Object... args) {
-
 	}
 
+	@Override
 	public void visit(ZextNode node, Object... args) {
-
 	}
 
 }

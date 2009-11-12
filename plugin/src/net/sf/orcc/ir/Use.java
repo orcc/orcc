@@ -49,7 +49,7 @@ public class Use {
 	 */
 	private static class UseAdder extends AbstractExprVisitor {
 
-		private INode node;
+		private User node;
 
 		/**
 		 * Creates a new use adder with the given node.
@@ -57,7 +57,7 @@ public class Use {
 		 * @param node
 		 *            a node
 		 */
-		public UseAdder(INode node) {
+		public UseAdder(User node) {
 			this.node = node;
 		}
 
@@ -77,7 +77,7 @@ public class Use {
 	 */
 	private static class UseRemover extends AbstractExprVisitor {
 
-		private INode node;
+		private User node;
 
 		/**
 		 * Creates a new use remover with the given node.
@@ -85,7 +85,7 @@ public class Use {
 		 * @param node
 		 *            a node
 		 */
-		public UseRemover(INode node) {
+		public UseRemover(User node) {
 			this.node = node;
 		}
 
@@ -108,7 +108,7 @@ public class Use {
 	 * @param value
 	 *            an expression
 	 */
-	public static void addUses(INode node, IExpr value) {
+	public static void addUses(User node, IExpr value) {
 		value.accept(new UseAdder(node));
 	}
 
@@ -121,7 +121,7 @@ public class Use {
 	 * @param values
 	 *            a list of expressions
 	 */
-	public static void addUses(INode node, List<IExpr> values) {
+	public static void addUses(User node, List<IExpr> values) {
 		for (IExpr value : values) {
 			addUses(node, value);
 		}
@@ -136,7 +136,7 @@ public class Use {
 	 * @param value
 	 *            an expression
 	 */
-	public static void removeUses(INode node, IExpr value) {
+	public static void removeUses(User node, IExpr value) {
 		value.accept(new UseRemover(node));
 	}
 
@@ -149,7 +149,7 @@ public class Use {
 	 * @param values
 	 *            a list of expressions
 	 */
-	public static void removeUses(INode node, List<IExpr> values) {
+	public static void removeUses(User node, List<IExpr> values) {
 		for (IExpr value : values) {
 			removeUses(node, value);
 		}
@@ -159,7 +159,7 @@ public class Use {
 	 * the node where the variable referenced is used. May be <code>null</code>
 	 * if the information is not available or has no meaning.
 	 */
-	private INode node;
+	private User node;
 
 	/**
 	 * the variable referenced
@@ -190,7 +190,7 @@ public class Use {
 	 * @throws NullPointerException
 	 *             if node is null.
 	 */
-	public Use(Variable variable, INode node) {
+	public Use(Variable variable, User node) {
 		if (node == null) {
 			throw new NullPointerException();
 		}
@@ -204,7 +204,7 @@ public class Use {
 	 * 
 	 * @return the node referenced by this use
 	 */
-	public INode getNode() {
+	public User getNode() {
 		return node;
 	}
 
@@ -230,7 +230,7 @@ public class Use {
 	 * @param node
 	 *            node referenced by this use
 	 */
-	public void setNode(INode node) {
+	public void setNode(User node) {
 		this.node = node;
 	}
 

@@ -35,21 +35,21 @@ import net.sf.orcc.ir.expr.VarExpr;
  * @author Jérôme GORIN
  * 
  */
-public class InitPortNode extends AbstractNode {
+public class InitPortNode extends AbstractInstruction {
 
 	private String fifoName;
 
 	private VarExpr value;
 
-	public InitPortNode(int id, Location location, String fifoName, int index,
-			VarExpr value) {
-		super(id, location);
+	public InitPortNode(BlockNode block, Location location, String fifoName,
+			int index, VarExpr value) {
+		super(block, location);
 		this.fifoName = fifoName;
 		this.value = value;
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IInstruction;
 import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -39,8 +39,8 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.JoinNode;
 import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
@@ -77,20 +77,22 @@ public class AssignPeephole extends AbstractActorTransformation {
 
 	@Override
 	public void visit(IfNode node, Object... args) {
-		visitNodes(node.getThenNodes());
-		visitNodes(node.getElseNodes());
+		visit(node.getThenNodes());
+		visit(node.getElseNodes());
 		visit(node.getJoinNode(), args);
 	}
 
 	@Override
-	public void visit(JoinNode node, Object... args) {
-		List<PhiAssignment> phis = node.getPhiAssignments();
-		if (!phis.isEmpty()) {
-			for (PhiAssignment phi : phis) {
+	public void visit(BlockNode node, Object... args) {
+		for (IInstruction instruction : node) {
+			if (instruction instanceof PhiAssignment) {
+				PhiAssignment phi = (PhiAssignment) instruction;
 				LocalVariable source = (LocalVariable) phi.getVars().get(0)
 						.getVariable();
-				// if source is a local variable with index = 0, we remove it
-				// from the procedure and translate the PHI by an assignment of
+				// if source is a local variable with index = 0, we remove
+				// it
+				// from the procedure and translate the PHI by an assignment
+				// of
 				// 0 (zero) to target.
 				// Otherwise, we just create an assignment target = source.
 				OrderedMap<Variable> parameters = procedure.getParameters();
@@ -104,7 +106,7 @@ public class AssignPeephole extends AbstractActorTransformation {
 
 	@Override
 	public void visit(WhileNode node, Object... args) {
-		visitNodes(node.getNodes());
+		visit(node.getNodes());
 		visit(node.getJoinNode(), args);
 	}
 

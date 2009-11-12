@@ -26,44 +26,40 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
-
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.BlockNode;
+package net.sf.orcc.ir.nodes;
 
 /**
- * @author Jérôme GORIN
+ * This interface defines an instruction visitor.
+ * 
+ * @author Matthieu Wipliez
  * 
  */
+public interface InstructionVisitor {
 
-public class BrLabelNode extends AbstractLLVMNode {
+	public void visit(AssignVarNode node, Object... args);
 
-	private LabelNode labelNode;
+	public void visit(CallNode node, Object... args);
 
-	public BrLabelNode(BlockNode block, Location location, LabelNode labelNode,
-			LabelNode precedence) {
-		super(block, location);
-		this.labelNode = labelNode;
-		labelNode.addPrecedence(precedence);
-		precedence.setSuccessor(this);
-	}
+	public void visit(HasTokensNode node, Object... args);
 
-	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
+	public void visit(InitPortNode node, Object... args);
 
-	public LabelNode getLabelNode() {
-		return labelNode;
-	}
+	public void visit(LoadNode node, Object... args);
 
-	public void setLabelNode(LabelNode labelNode) {
-		this.labelNode = labelNode;
-	}
+	public void visit(PeekNode node, Object... args);
 
-	@Override
-	public String toString() {
-		return "br label %" + labelNode.toString();
-	}
+	public void visit(PhiAssignment node, Object... args);
+
+	public void visit(ReadEndNode node, Object... args);
+
+	public void visit(ReadNode node, Object... args);
+
+	public void visit(ReturnNode node, Object... args);
+
+	public void visit(StoreNode node, Object... args);
+
+	public void visit(WriteEndNode node, Object... args);
+
+	public void visit(WriteNode node, Object... args);
 
 }

@@ -37,17 +37,17 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class ReturnNode extends AbstractNode implements IValueContainer {
+public class ReturnNode extends AbstractInstruction implements IValueContainer {
 
 	private IExpr value;
 
-	public ReturnNode(int id, Location location, IExpr value) {
-		super(id, location);
+	public ReturnNode(BlockNode block, Location location, IExpr value) {
+		super(block, location);
 		setValue(value);
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

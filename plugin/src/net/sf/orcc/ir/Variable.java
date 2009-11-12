@@ -113,7 +113,7 @@ public abstract class Variable implements INameable {
 	 * @param node
 	 *            a node that uses this variable
 	 */
-	public void addUse(INode node) {
+	public void addUse(IInstruction node) {
 		new Use(this, node);
 	}
 
@@ -188,7 +188,7 @@ public abstract class Variable implements INameable {
 	 * @param node
 	 *            a node
 	 */
-	public void removeUse(INode node) {
+	public void removeUse(IInstruction node) {
 		ListIterator<Use> it = uses.listIterator();
 		while (it.hasNext()) {
 			Use use = it.next();

@@ -51,6 +51,7 @@ import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IConst;
 import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IInstruction;
 import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.LocalVariable;
@@ -70,7 +71,6 @@ import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.EmptyNode;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -311,10 +311,9 @@ public class ALAstParser {
 				exprParser.parseExpression(tree.getChild(3));
 			}
 
-			INode node = new EmptyNode(0, new Location());
-
-			return new LocalVariable(assignable, 0, location, name, node, null,
-					type);
+			IInstruction instruction = null;
+			return new LocalVariable(assignable, 0, location, name,
+					instruction, null, type);
 		}
 
 		private void parseLocalVariables(Scope<Variable> variables, Tree tree)

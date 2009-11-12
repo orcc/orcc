@@ -33,6 +33,7 @@ import java.util.Map;
 import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
@@ -46,9 +47,9 @@ public class PhiNode extends AbstractLLVMNode {
 
 	private LocalVariable varDef;
 
-	public PhiNode(int id, Location location, LocalVariable varDef, IType type,
-			Map<LabelNode, LocalVariable> assignements) {
-		super(id, location);
+	public PhiNode(BlockNode block, Location location, LocalVariable varDef,
+			IType type, Map<LabelNode, LocalVariable> assignements) {
+		super(block, location);
 		this.varDef = varDef;
 		this.assignements = assignements;
 		this.type = type;

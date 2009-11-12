@@ -32,27 +32,28 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 
 /**
- * This class defines a WriteEnd node defining the end of the current fifo's access.
+ * This class defines a WriteEnd node defining the end of the current fifo's
+ * access.
  * 
  * @author Jérôme GORIN
  * 
  */
-public class WriteEndNode extends AbstractNode {
+public class WriteEndNode extends AbstractInstruction {
 
 	private Port port;
-	
-	public WriteEndNode(int id, Location location, Port port) {
-		super(id, location);
+
+	public WriteEndNode(BlockNode block, Location location, Port port) {
+		super(block, location);
 		setPort(port);
 	}
-	
+
 	public WriteEndNode(WriteNode node) {
-		super(node.getId(), node.getLocation());
+		super(node.getBlock(), node.getLocation());
 		setPort(node.getPort());
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

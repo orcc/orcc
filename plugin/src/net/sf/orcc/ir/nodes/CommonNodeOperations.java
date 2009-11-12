@@ -29,9 +29,11 @@
 package net.sf.orcc.ir.nodes;
 
 import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.IInstruction;
 import net.sf.orcc.ir.INode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.User;
 
 /**
  * This class defines operations common to nodes.
@@ -53,11 +55,11 @@ public class CommonNodeOperations {
 	public static void setTarget(ITargetContainer node, LocalVariable target) {
 		LocalVariable thisTarget = node.getTarget();
 		if (thisTarget != null) {
-			thisTarget.removeUse((INode) node);
+			thisTarget.removeUse((IInstruction) node);
 		}
 
 		if (target != null) {
-			target.addUse((INode) node);
+			target.addUse((IInstruction) node);
 		}
 
 		node.setTargetSimple(target);
@@ -74,11 +76,11 @@ public class CommonNodeOperations {
 	public static void setValue(IValueContainer node, IExpr value) {
 		IExpr thisValue = node.getValue();
 		if (thisValue != null) {
-			Use.removeUses((INode) node, thisValue);
+			Use.removeUses((User) node, thisValue);
 		}
 
 		if (value != null) {
-			Use.addUses((INode) node, value);
+			Use.addUses((User) node, value);
 		}
 
 		node.setValueSimple(value);

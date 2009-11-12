@@ -34,6 +34,7 @@ import net.sf.orcc.ir.IExpr;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
@@ -47,9 +48,9 @@ public class GetElementPtrNode extends AbstractLLVMNode {
 
 	private LocalVariable target;
 
-	public GetElementPtrNode(int id, Location location, LocalVariable target,
-			Use source, List<IExpr> indexs) {
-		super(id, location);
+	public GetElementPtrNode(BlockNode block, Location location,
+			LocalVariable target, Use source, List<IExpr> indexs) {
+		super(block, location);
 		this.target = target;
 		this.source = source;
 		this.indexes = indexs;

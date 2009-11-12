@@ -43,14 +43,14 @@ import net.sf.orcc.ir.Location;
  */
 public class WhileNode extends AbstractNode implements IValueContainer {
 
-	private JoinNode joinNode;
+	private BlockNode joinNode;
 
 	private List<INode> nodes;
 
 	private IExpr value;
 
 	public WhileNode(int id, Location location, IExpr condition,
-			List<INode> nodes, JoinNode joinNode) {
+			List<INode> nodes, BlockNode joinNode) {
 		super(id, location);
 		this.joinNode = joinNode;
 		this.nodes = nodes;
@@ -62,7 +62,7 @@ public class WhileNode extends AbstractNode implements IValueContainer {
 		visitor.visit(this, args);
 	}
 
-	public JoinNode getJoinNode() {
+	public BlockNode getJoinNode() {
 		return joinNode;
 	}
 
@@ -75,7 +75,7 @@ public class WhileNode extends AbstractNode implements IValueContainer {
 		return value;
 	}
 
-	public void setJoinNode(JoinNode joinNode) {
+	public void setJoinNode(BlockNode joinNode) {
 		this.joinNode = joinNode;
 	}
 

@@ -45,14 +45,14 @@ public class IfNode extends AbstractNode implements IValueContainer {
 
 	private List<INode> elseNodes;
 
-	private JoinNode joinNode;
+	private BlockNode joinNode;
 
 	private List<INode> thenNodes;
 
 	private IExpr value;
 
 	public IfNode(int id, Location location, IExpr condition,
-			List<INode> thenNodes, List<INode> elseNodes, JoinNode joinNode) {
+			List<INode> thenNodes, List<INode> elseNodes, BlockNode joinNode) {
 		super(id, location);
 		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
@@ -69,7 +69,7 @@ public class IfNode extends AbstractNode implements IValueContainer {
 		return elseNodes;
 	}
 
-	public JoinNode getJoinNode() {
+	public BlockNode getJoinNode() {
 		return joinNode;
 	}
 
@@ -82,7 +82,7 @@ public class IfNode extends AbstractNode implements IValueContainer {
 		return value;
 	}
 
-	public void setJoinNode(JoinNode joinNode) {
+	public void setJoinNode(BlockNode joinNode) {
 		this.joinNode = joinNode;
 	}
 

@@ -29,25 +29,15 @@
 package net.sf.orcc.ir.nodes;
 
 /**
+ * This abstract class defines a no-op node visitor.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public abstract class AbstractNodeVisitor implements NodeVisitor {
 
 	@Override
-	public void visit(AssignVarNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(CallNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(EmptyNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(HasTokensNode node, Object... args) {
+	public void visit(BlockNode node, Object... args) {
 	}
 
 	@Override
@@ -55,47 +45,7 @@ public abstract class AbstractNodeVisitor implements NodeVisitor {
 	}
 
 	@Override
-	public void visit(InitPortNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(JoinNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(LoadNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(PeekNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(ReadNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(ReturnNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(StoreNode node, Object... args) {
-	}
-
-	@Override
 	public void visit(WhileNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(WriteNode node, Object... args) {
-	}
-	
-	@Override
-	public void visit(WriteEndNode node, Object... args) {
-	}
-	
-	@Override
-	public void visit(ReadEndNode node, Object... args) {
 	}
 
 }

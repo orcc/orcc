@@ -40,13 +40,13 @@ import net.sf.orcc.ir.Port;
  */
 public class ReadNode extends AbstractFifoNode {
 
-	public ReadNode(int id, Location location, Port port, int numTokens,
-			LocalVariable varDef) {
-		super(id, location, port, numTokens, varDef);
+	public ReadNode(BlockNode block, Location location, Port port,
+			int numTokens, LocalVariable varDef) {
+		super(block, location, port, numTokens, varDef);
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 
