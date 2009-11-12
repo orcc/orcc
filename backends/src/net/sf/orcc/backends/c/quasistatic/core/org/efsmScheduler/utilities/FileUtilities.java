@@ -35,8 +35,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sf.opendf.cal.main.Cal2CalML;
-import net.sf.opendf.nl.NL2XNL;
 
 /**
  * 
@@ -104,15 +102,17 @@ public class FileUtilities {
 			int format) {
 		for (int i = 0; i < inputFiles.length; i++) {
 			try {
-				File sourceFile = inputFiles[i];
-				//String sourceName = sourceFile.getName();
+				// File sourceFile = inputFiles[i];
+				// String sourceName = sourceFile.getName();
 				switch (format) {
 				case CAL_TO_CALML:
-					Cal2CalML.parseSource(sourceFile, outputDirectory);
-					break;
+					// Cal2CalML.parseSource(sourceFile, outputDirectory);
+					throw new UnsupportedOperationException(
+							"Cal2CalML.parseSource");
 				case NL_TO_XNL:
-					NL2XNL.parseSource(sourceFile, outputDirectory);
-					break;
+					// NL2XNL.parseSource(sourceFile, outputDirectory);
+					throw new UnsupportedOperationException(
+							"NL2XNL.parseSource");
 				case XDF_TO_XNL:
 					break;
 
