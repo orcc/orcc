@@ -66,9 +66,15 @@ public class CNetworkPrinter {
 
 	private StringTemplateGroup group;
 
-	private StringTemplate template;
+	/**
+	 * template is protected in order to be visible to CQuasiStaticNetworkPrinter
+	 */
+	protected StringTemplate template;
 
-	private TypeToString typeVisitor;
+	/**
+	 * typeVisitor is protected in order to be visible to CQuasiStaticNetworkPrinter
+	 */
+	protected TypeToString typeVisitor;
 
 	/**
 	 * Creates a new network printer with the template "C.st".
@@ -161,10 +167,12 @@ public class CNetworkPrinter {
 	/**
 	 * Sets the broadcasts attribute.
 	 * 
+	 * setBroadcasts is protected due to has been overwritten by CQuasiStaticNetworkPrinter
+	 * 
 	 * @param instances
 	 *            The list of instances.
 	 */
-	private void setBroadcasts(Set<Instance> instances) {
+	protected void setBroadcasts(Set<Instance> instances) {
 		List<Map<String, Object>> broadcasts = new ArrayList<Map<String, Object>>();
 		for (Instance instance : instances) {
 			if (instance.isBroadcast()) {
@@ -190,13 +198,15 @@ public class CNetworkPrinter {
 	/**
 	 * Sets the connections attribute.
 	 * 
+	 * setConnections is protected due to has been overwritten by CQuasiStaticNetworkPrinter
+	 * 
 	 * @param graph
 	 *            The network's graph.
 	 * @param connections
 	 *            The graph's connection.
 	 * @throws OrccException
 	 */
-	private void setConnections(DirectedGraph<Vertex, Connection> graph,
+	protected void setConnections(DirectedGraph<Vertex, Connection> graph,
 			Set<Connection> connections) throws OrccException {
 		List<Map<String, Object>> conn = new ArrayList<Map<String, Object>>();
 		int fifoCount = 0;
