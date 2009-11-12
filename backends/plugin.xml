@@ -24,6 +24,10 @@
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
             name="XLIM (TODO)">
       </backend>
+      <backend
+            class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
+            name="C *quasi-static*">
+      </backend>
    </extension>
 
 </plugin>
