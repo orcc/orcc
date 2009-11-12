@@ -34,6 +34,7 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.IInstruction;
 import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.ReadEndNode;
 import net.sf.orcc.ir.nodes.ReadNode;
@@ -70,12 +71,13 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 		writes.add(node);
 		it.set(new WriteEndNode(node));
 	}
-
+	
 	@Override
-	protected void visit(List<INode> nodes) {
-		// visit nodes
-		super.visit(nodes);
-
+	protected void visitProcedure(Procedure procedure) {
+		super.visitProcedure(procedure);
+		
+		List<INode> nodes = procedure.getNodes();
+		
 		// add writes at the beginning of the node list, and read at the ends
 		BlockNode.first(nodes).addAll(0, writes);
 		BlockNode.last(nodes).addAll(readEnds);

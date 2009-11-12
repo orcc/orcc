@@ -176,7 +176,7 @@ public class AbstractActorTransformation implements NodeVisitor,
 	 * @param procedure
 	 *            a procedure
 	 */
-	private void visitProcedure(Procedure procedure) {
+	protected void visitProcedure(Procedure procedure) {
 		this.procedure = procedure;
 		List<INode> nodes = procedure.getNodes();
 		visit(nodes);
