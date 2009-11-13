@@ -38,8 +38,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines a node that Stores data to memory from an expression. The
- * target can be a global (scalar or array), or a local array.
+ * This class defines a instruction that Stores data to memory from an
+ * expression. The target can be a global (scalar or array), or a local array.
  * 
  * @author Matthieu Wipliez
  * 

@@ -45,16 +45,16 @@ import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.nodes.WriteBegin;
-import net.sf.orcc.ir.nodes.WriteEnd;
 
 /**
  * This abstract class implements an no-op transformation on an actor. This
@@ -143,7 +143,7 @@ public class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(ReadBegin node, Object... args) {
+	public void visit(Read node, Object... args) {
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(WriteBegin node, Object... args) {
+	public void visit(Write node, Object... args) {
 	}
 
 	@Override

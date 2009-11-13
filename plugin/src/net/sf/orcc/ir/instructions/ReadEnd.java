@@ -33,8 +33,8 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
- * This class defines a ReadEnd node defining the end of the current fifo's
- * access.
+ * This class defines a ReadEnd instruction. This instruction is used in code
+ * generation to signal that an action has finished reading from a FIFO.
  * 
  * @author Jérôme GORIN
  * 
@@ -48,7 +48,7 @@ public class ReadEnd extends AbstractInstruction {
 		setPort(port);
 	}
 
-	public ReadEnd(ReadBegin node) {
+	public ReadEnd(Read node) {
 		super(node.getBlock(), node.getLocation());
 		setPort(node.getPort());
 	}

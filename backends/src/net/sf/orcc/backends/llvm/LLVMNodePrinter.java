@@ -63,16 +63,16 @@ import net.sf.orcc.ir.instructions.InitPort;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.nodes.WriteBegin;
-import net.sf.orcc.ir.nodes.WriteEnd;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.util.OrderedMap;
@@ -368,7 +368,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(ReadBegin node, Object... args) {
+	public void visit(Read node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
@@ -508,7 +508,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(WriteBegin node, Object... args) {
+	public void visit(Write node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)

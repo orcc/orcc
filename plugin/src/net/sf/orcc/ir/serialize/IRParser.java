@@ -124,13 +124,13 @@ import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.nodes.WriteBegin;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -708,14 +708,14 @@ public class IRParser {
 		return proc;
 	}
 
-	private ReadBegin parseReadNode(Location loc, JSONArray array)
+	private Read parseReadNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(1);
 		LocalVariable varDef = (LocalVariable) getVariable(array
 				.getJSONArray(2));
-		return new ReadBegin(block, loc, port, numTokens, varDef);
+		return new Read(block, loc, port, numTokens, varDef);
 	}
 
 	private Return parseReturnNode(Location loc, JSONArray array)
@@ -895,14 +895,14 @@ public class IRParser {
 		return new WhileNode(id, loc, condition, nodes, joinNode);
 	}
 
-	private WriteBegin parseWriteNode(Location loc, JSONArray array)
+	private Write parseWriteNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
 		Port port = outputs.get(fifoName);
 		int numTokens = array.getInt(1);
 		LocalVariable varDef = (LocalVariable) getVariable(array
 				.getJSONArray(2));
-		return new WriteBegin(block, loc, port, numTokens, varDef);
+		return new Write(block, loc, port, numTokens, varDef);
 	}
 
 	private void putAction(Tag tag, Action action) {

@@ -34,7 +34,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
- * This class defines a HasTokens node.
+ * This class defines a HasTokens instruction.
  * 
  * @author Matthieu Wipliez
  * 

@@ -26,24 +26,23 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.nodes;
+package net.sf.orcc.ir.instructions;
 
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.instructions.AbstractFifo;
-import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
- * This class defines a WriteBegin node.
+ * This class defines a Read instruction.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class WriteBegin extends AbstractFifo {
+public class Read extends AbstractFifo {
 
-	public WriteBegin(BlockNode block, Location location, Port port,
-			int numTokens, LocalVariable varDef) {
+	public Read(BlockNode block, Location location, Port port, int numTokens,
+			LocalVariable varDef) {
 		super(block, location, port, numTokens, varDef);
 	}
 
@@ -54,7 +53,7 @@ public class WriteBegin extends AbstractFifo {
 
 	@Override
 	public String toString() {
-		return getTarget() + " = write(" + getPort() + ", " + getNumTokens()
+		return getTarget() + " = read(" + getPort() + ", " + getNumTokens()
 				+ ")";
 	}
 

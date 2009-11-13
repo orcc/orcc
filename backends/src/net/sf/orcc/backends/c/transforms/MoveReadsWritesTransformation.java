@@ -35,11 +35,11 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.ReadEnd;
+import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.WriteBegin;
-import net.sf.orcc.ir.nodes.WriteEnd;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -60,13 +60,13 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(ReadBegin node, Object... args) {
+	public void visit(Read node, Object... args) {
 		readEnds.add(new ReadEnd(node));
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void visit(WriteBegin node, Object... args) {
+	public void visit(Write node, Object... args) {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		writes.add(node);
 		it.set(new WriteEnd(node));

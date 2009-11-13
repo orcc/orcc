@@ -39,8 +39,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines a node that Loads data from memory to a local variable.
- * The source can be a global (scalar or array), or a local array.
+ * This class defines an instruction that Loads data from memory to a local
+ * variable. The source can be a global (scalar or array), or a local array.
  * 
  * @author Matthieu Wipliez
  * 

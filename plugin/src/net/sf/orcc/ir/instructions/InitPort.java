@@ -33,6 +33,8 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
+ * This class does something, but only Jérôme knows what it is :D
+ * 
  * @author Jérôme GORIN
  * 
  */

@@ -28,22 +28,29 @@
  */
 package net.sf.orcc.ir.instructions;
 
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
- * This class defines a Read node.
+ * This class defines a WriteEnd instruction. This node is used in code
+ * generation to signal that an action has finished writing to a FIFO.
  * 
- * @author Matthieu Wipliez
+ * @author Jérôme GORIN
  * 
  */
-public class ReadBegin extends AbstractFifo {
+public class WriteEnd extends AbstractInstruction {
 
-	public ReadBegin(BlockNode block, Location location, Port port,
-			int numTokens, LocalVariable varDef) {
-		super(block, location, port, numTokens, varDef);
+	private Port port;
+
+	public WriteEnd(BlockNode block, Location location, Port port) {
+		super(block, location);
+		setPort(port);
+	}
+
+	public WriteEnd(Write node) {
+		super(node.getBlock(), node.getLocation());
+		setPort(node.getPort());
 	}
 
 	@Override
@@ -51,10 +58,17 @@ public class ReadBegin extends AbstractFifo {
 		visitor.visit(this, args);
 	}
 
+	public Port getPort() {
+		return port;
+	}
+
+	public void setPort(Port port) {
+		this.port = port;
+	}
+
 	@Override
 	public String toString() {
-		return getTarget() + " = read(" + getPort() + ", " + getNumTokens()
-				+ ")";
+		return "writeEnd(" + getPort() + ")";
 	}
 
 }

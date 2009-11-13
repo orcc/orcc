@@ -35,7 +35,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines a Return node.
+ * This class defines a Return instruction.
  * 
  * @author Matthieu Wipliez
  * 

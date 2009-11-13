@@ -37,7 +37,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines an Assign node.
+ * This class defines an Assign instruction. The target is a local variable, and
+ * the value an expression.
  * 
  * @author Matthieu Wipliez
  * 

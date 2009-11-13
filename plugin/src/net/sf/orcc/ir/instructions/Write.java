@@ -26,32 +26,24 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.nodes;
+package net.sf.orcc.ir.instructions;
 
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.instructions.AbstractInstruction;
-import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
- * This class defines a WriteEnd node defining the end of the current fifo's
- * access.
+ * This class defines a Write instruction.
  * 
- * @author Jérôme GORIN
+ * @author Matthieu Wipliez
  * 
  */
-public class WriteEnd extends AbstractInstruction {
+public class Write extends AbstractFifo {
 
-	private Port port;
-
-	public WriteEnd(BlockNode block, Location location, Port port) {
-		super(block, location);
-		setPort(port);
-	}
-
-	public WriteEnd(WriteBegin node) {
-		super(node.getBlock(), node.getLocation());
-		setPort(node.getPort());
+	public Write(BlockNode block, Location location, Port port, int numTokens,
+			LocalVariable varDef) {
+		super(block, location, port, numTokens, varDef);
 	}
 
 	@Override
@@ -59,17 +51,10 @@ public class WriteEnd extends AbstractInstruction {
 		visitor.visit(this, args);
 	}
 
-	public Port getPort() {
-		return port;
-	}
-
-	public void setPort(Port port) {
-		this.port = port;
-	}
-
 	@Override
 	public String toString() {
-		return "writeEnd(" + getPort() + ")";
+		return getTarget() + " = write(" + getPort() + ", " + getNumTokens()
+				+ ")";
 	}
 
 }

@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.ir.instructions;
 
-import net.sf.orcc.ir.nodes.WriteBegin;
-import net.sf.orcc.ir.nodes.WriteEnd;
-
 /**
  * This interface defines an instruction visitor.
  * 
@@ -117,7 +114,7 @@ public interface InstructionVisitor {
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(ReadBegin node, Object... args);
+	public void visit(Read node, Object... args);
 
 	/**
 	 * Visits a readEnd instruction.
@@ -157,7 +154,7 @@ public interface InstructionVisitor {
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(WriteBegin node, Object... args);
+	public void visit(Write node, Object... args);
 
 	/**
 	 * Visits a writeEnd instruction.

@@ -45,16 +45,16 @@ import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.nodes.WriteBegin;
-import net.sf.orcc.ir.nodes.WriteEnd;
 
 import org.w3c.dom.Element;
 
@@ -293,7 +293,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(ReadBegin node, Object... args) {
+	public void visit(Read node, Object... args) {
 		Element operationE = XlimNodeTemplate.newPortOperation(root, "pinRead",
 				node.getPort().getName());
 		operationE.setAttribute("removable", "no");
@@ -398,7 +398,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(WriteBegin node, Object... args) {
+	public void visit(Write node, Object... args) {
 		Element operationE = XlimNodeTemplate.newPortOperation(root,
 				"pinWrite", node.getPort().getName());
 		operationE.setAttribute("style", "simple");

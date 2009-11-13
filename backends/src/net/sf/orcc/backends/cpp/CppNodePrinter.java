@@ -33,8 +33,8 @@ import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.instructions.ReadBegin;
-import net.sf.orcc.ir.nodes.WriteBegin;
+import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Write;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -68,7 +68,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 	}
 
 	@Override
-	public void visit(ReadBegin node, Object... args) {
+	public void visit(Read node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
@@ -83,7 +83,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 	}
 
 	@Override
-	public void visit(WriteBegin node, Object... args) {
+	public void visit(Write node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)

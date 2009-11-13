@@ -40,7 +40,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines a Call node.
+ * This class defines a Call instruction, which possibly stores the result to a
+ * local variable.
  * 
  * @author Matthieu Wipliez
  * 
