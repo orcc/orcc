@@ -1,4 +1,4 @@
-group C_scheduled_network;
+group C_quasistatic_network;
 
 broadcast_scheduler(bcast) ::= <<
 int $bcast.id$_scheduler() {
