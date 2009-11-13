@@ -38,14 +38,14 @@ import java.util.Map;
 import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.util.NodeIndex;
-import net.sf.orcc.ir.INode;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.util.OrderedMap;
 
@@ -114,7 +114,7 @@ public class LLVMActorPrinter {
 		procTmpl.setAttribute("name", proc.getName());
 
 		// return type
-		IType type = proc.getReturnType();
+		Type type = proc.getReturnType();
 		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters
@@ -135,7 +135,7 @@ public class LLVMActorPrinter {
 		// body
 		LLVMNodePrinter printer = new LLVMNodePrinter(group, procTmpl,
 				actorName, proc, varDefPrinter, exprPrinter, typePrinter);
-		for (INode node : proc.getNodes()) {
+		for (CFGNode node : proc.getNodes()) {
 			node.accept(printer);
 		}
 
@@ -211,7 +211,7 @@ public class LLVMActorPrinter {
 			LLVMNodePrinter printer = new LLVMNodePrinter(group, instTmpl,
 					actorName, proc, varDefPrinter, exprPrinter, typePrinter);
 
-			for (INode node : proc.getNodes()) {
+			for (CFGNode node : proc.getNodes()) {
 				node.accept(printer, count);
 				count++;
 			}

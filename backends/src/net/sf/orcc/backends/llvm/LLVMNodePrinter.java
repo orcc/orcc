@@ -47,32 +47,32 @@ import net.sf.orcc.backends.llvm.nodes.TruncNode;
 import net.sf.orcc.backends.llvm.nodes.ZextNode;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.INode;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.InitPort;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.ReadEnd;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.CallNode;
-import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.nodes.PeekNode;
-import net.sf.orcc.ir.nodes.PhiAssignment;
-import net.sf.orcc.ir.nodes.ReadEndNode;
-import net.sf.orcc.ir.nodes.ReadNode;
-import net.sf.orcc.ir.nodes.ReturnNode;
-import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.nodes.WriteEndNode;
-import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.nodes.WriteBegin;
+import net.sf.orcc.ir.nodes.WriteEnd;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.util.OrderedMap;
@@ -118,7 +118,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(AssignVarNode node, Object... args) {
+	public void visit(Assign node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("assignVarNode");
 
 		// varDef contains the variable (with the same name as the port)
@@ -146,6 +146,12 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 		template.setAttribute(attrName, nodeTmpl);
 	}
 
+	@Override
+	public void visit(BlockNode node, Object... args) {
+		// TODO Auto-generated method stub
+
+	}
+
 	public void visit(BrLabelNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("brlabelNode");
 
@@ -159,9 +165,9 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	@Override
 	public void visit(BrNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("brNode");
-		List<INode> conditionNodes = node.getConditionNodes();
-		List<INode> thenNodes = node.getThenNodes();
-		List<INode> elseNodes = node.getElseNodes();
+		List<CFGNode> conditionNodes = node.getConditionNodes();
+		List<CFGNode> thenNodes = node.getThenNodes();
+		List<CFGNode> elseNodes = node.getElseNodes();
 		List<PhiNode> phiNodes = node.getPhiNodes();
 
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getCondition(),
@@ -176,17 +182,17 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 		template = nodeTmpl;
 
 		attrName = "conditionNodes";
-		for (INode subNode : conditionNodes) {
+		for (CFGNode subNode : conditionNodes) {
 			subNode.accept(this, args);
 		}
 
 		attrName = "thenNodes";
-		for (INode subNode : thenNodes) {
+		for (CFGNode subNode : thenNodes) {
 			subNode.accept(this, args);
 		}
 
 		attrName = "elseNodes";
-		for (INode subNode : elseNodes) {
+		for (CFGNode subNode : elseNodes) {
 			subNode.accept(this, args);
 		}
 
@@ -201,7 +207,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(CallNode node, Object... args) {
+	public void visit(Call node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("callNode");
 
 		if (node.hasResult()) {
@@ -217,8 +223,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 				.getReturnType()));
 		nodeTmpl.setAttribute("name", proc.getName());
 		Iterator<Variable> it = procParameters.iterator();
-		for (IExpr parameter : node.getParameters()) {
-			IType type = it.next().getType();
+		for (Expression parameter : node.getParameters()) {
+			Type type = it.next().getType();
 			nodeTmpl.setAttribute("parameters", exprPrinter.toString(parameter,
 					type));
 		}
@@ -238,7 +244,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(variable,
 				true));
 
-		for (IExpr index : node.getIndexes()) {
+		for (Expression index : node.getIndexes()) {
 			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index,
 					new IntType(new IntExpr(new Location(), 32))));
 		}
@@ -247,7 +253,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(HasTokensNode node, Object... args) {
+	public void visit(HasTokens node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("hasTokensNode");
 
 		// varDef contains the variable (with the same name as the port)
@@ -267,7 +273,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(InitPortNode node, Object... args) {
+	public void visit(InitPort node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("initPortNode");
 
 		nodeTmpl.setAttribute("actorName", actorName);
@@ -287,19 +293,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(LoadFifo node, Object... args) {
-		StringTemplate nodeTmpl = group.getInstanceOf("loadFifo");
-
-		// varDef contains the variable (with the same name as the port)
-		nodeTmpl.setAttribute("actorName", actorName);
-		nodeTmpl.setAttribute("fifoName", node.getFifoName());
-		nodeTmpl.setAttribute("index", node.getIndex());
-
-		template.setAttribute(attrName, nodeTmpl);
-	}
-
-	@Override
-	public void visit(LoadNode node, Object... args) {
+	public void visit(Load node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("loadNode");
 
 		LocalVariable target = node.getTarget();
@@ -314,7 +308,19 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(PeekNode node, Object... args) {
+	public void visit(LoadFifo node, Object... args) {
+		StringTemplate nodeTmpl = group.getInstanceOf("loadFifo");
+
+		// varDef contains the variable (with the same name as the port)
+		nodeTmpl.setAttribute("actorName", actorName);
+		nodeTmpl.setAttribute("fifoName", node.getFifoName());
+		nodeTmpl.setAttribute("index", node.getIndex());
+
+		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(Peek node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("peekNode");
 
 		// varDef contains the variable (with the same name as the port)
@@ -328,6 +334,12 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(PhiAssignment node, Object... args) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -356,7 +368,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(ReadNode node, Object... args) {
+	public void visit(ReadBegin node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
@@ -371,7 +383,12 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(ReturnNode node, Object... args) {
+	public void visit(ReadEnd node, Object... args) {
+
+	}
+
+	@Override
+	public void visit(Return node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("returnNode");
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
 				procedure.getReturnType()));
@@ -383,7 +400,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 
 		// there is nothing to print.
 		List<PhiAssignment> phis = node.getPhis();
-		IExpr condition = node.getCondition();
+		Expression condition = node.getCondition();
 
 		if (!phis.isEmpty()) {
 			for (PhiAssignment phi : phis) {
@@ -433,14 +450,14 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(StoreNode node, Object... args) {
+	public void visit(Store node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("storeNode");
 
 		Variable variable = node.getTarget().getVariable();
 		nodeTmpl.setAttribute("var", varDefPrinter
 				.getVarDefName(variable, true));
 
-		IType type = variable.getType();
+		Type type = variable.getType();
 		if (type.getType() == LLVMAbstractType.POINT) {
 			type = ((PointType) type).getElementType();
 		}
@@ -480,7 +497,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 		template = nodeTmpl;
 		attrName = "nodes";
 
-		for (INode subNode : node.getNodes()) {
+		for (CFGNode subNode : node.getNodes()) {
 			subNode.accept(this, args);
 		}
 
@@ -491,7 +508,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(WriteNode node, Object... args) {
+	public void visit(WriteBegin node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)
@@ -502,6 +519,11 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
 
 		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(WriteEnd node, Object... args) {
+
 	}
 
 	@Override
@@ -517,28 +539,6 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 				varDef.getType()));
 
 		template.setAttribute(attrName, nodeTmpl);
-
-	}
-
-	@Override
-	public void visit(WriteEndNode node, Object... args) {
-
-	}
-
-	@Override
-	public void visit(ReadEndNode node, Object... args) {
-
-	}
-
-	@Override
-	public void visit(PhiAssignment node, Object... args) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void visit(BlockNode node, Object... args) {
-		// TODO Auto-generated method stub
 
 	}
 }

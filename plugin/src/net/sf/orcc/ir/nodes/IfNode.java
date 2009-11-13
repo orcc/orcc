@@ -30,9 +30,11 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines an If node. An if node is a node with a value used in its
@@ -41,18 +43,18 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class IfNode extends AbstractNode implements IValueContainer {
+public class IfNode extends AbstractNode implements ValueContainer {
 
-	private List<INode> elseNodes;
+	private List<CFGNode> elseNodes;
 
 	private BlockNode joinNode;
 
-	private List<INode> thenNodes;
+	private List<CFGNode> thenNodes;
 
-	private IExpr value;
+	private Expression value;
 
-	public IfNode(int id, Location location, IExpr condition,
-			List<INode> thenNodes, List<INode> elseNodes, BlockNode joinNode) {
+	public IfNode(int id, Location location, Expression condition,
+			List<CFGNode> thenNodes, List<CFGNode> elseNodes, BlockNode joinNode) {
 		super(id, location);
 		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
@@ -65,7 +67,7 @@ public class IfNode extends AbstractNode implements IValueContainer {
 		visitor.visit(this, args);
 	}
 
-	public List<INode> getElseNodes() {
+	public List<CFGNode> getElseNodes() {
 		return elseNodes;
 	}
 
@@ -73,12 +75,12 @@ public class IfNode extends AbstractNode implements IValueContainer {
 		return joinNode;
 	}
 
-	public List<INode> getThenNodes() {
+	public List<CFGNode> getThenNodes() {
 		return thenNodes;
 	}
 
 	@Override
-	public IExpr getValue() {
+	public Expression getValue() {
 		return value;
 	}
 
@@ -87,12 +89,12 @@ public class IfNode extends AbstractNode implements IValueContainer {
 	}
 
 	@Override
-	public void setValue(IExpr value) {
+	public void setValue(Expression value) {
 		CommonNodeOperations.setValue(this, value);
 	}
 
 	@Override
-	public void setValueSimple(IExpr value) {
+	public void setValueSimple(Expression value) {
 		this.value = value;
 	}
 

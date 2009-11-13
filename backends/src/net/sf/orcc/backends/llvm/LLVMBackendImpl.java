@@ -33,8 +33,8 @@ import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.NameTransformer;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
@@ -59,7 +59,8 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Usage: LLVMBackendImpl <flattened XDF network>");
+			System.err
+					.println("Usage: LLVMBackendImpl <flattened XDF network>");
 		}
 	}
 
@@ -75,21 +76,20 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-	/*	IActorTransformation[] transformations = { new EmptyNodeRemoval(),
-				new CorrectBinaryExpressionType(), new AssignPeephole(),
-				new ControlFlowTransformation(),
-				new JoinNodeTransformation(),
-				// new CorrectLabelNameTransformation(),
-				new ThreeAddressCodeTransformation(),
-				new AddInstantationProcedure(), new ArrayListTransformation(),
-				new TypeTransformation() };
-
-		for (IActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
-
-		String outputName = path + File.separator + id + ".s";
-		printer.printActor(outputName,id, actor);*/
+		/*
+		 * ActorTransformation[] transformations = { new EmptyNodeRemoval(), new
+		 * CorrectBinaryExpressionType(), new AssignPeephole(), new
+		 * ControlFlowTransformation(), new JoinNodeTransformation(), // new
+		 * CorrectLabelNameTransformation(), new
+		 * ThreeAddressCodeTransformation(), new AddInstantationProcedure(), new
+		 * ArrayListTransformation(), new TypeTransformation() };
+		 * 
+		 * for (ActorTransformation transformation : transformations) {
+		 * transformation.transform(actor); }
+		 * 
+		 * String outputName = path + File.separator + id + ".s";
+		 * printer.printActor(outputName,id, actor);
+		 */
 	}
 
 	@Override

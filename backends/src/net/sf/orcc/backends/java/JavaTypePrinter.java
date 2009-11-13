@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.java;
 
 import net.sf.orcc.backends.c.TypeToString;
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.TypeVisitor;
@@ -43,7 +43,7 @@ import net.sf.orcc.ir.type.UintType;
  */
 public class JavaTypePrinter extends TypeToString implements TypeVisitor {
 
-	protected void printInt(IExpr expr) {
+	protected void printInt(Expression expr) {
 		builder.append("int");
 	}
 

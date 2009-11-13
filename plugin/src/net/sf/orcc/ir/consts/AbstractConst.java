@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IConst;
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -56,22 +56,22 @@ public abstract class AbstractConst {
 	 * @throws OrccException
 	 *             if the expression could not be evaluated to a constant
 	 */
-	public static IConst evaluate(IExpr expr) throws OrccException {
-		if (expr.getType() == IExpr.BOOLEAN) {
+	public static Constant evaluate(Expression expr) throws OrccException {
+		if (expr.getType() == Expression.BOOLEAN) {
 			boolean value = ((BooleanExpr) expr).getValue();
 			return new BoolConst(value);
-		} else if (expr.getType() == IExpr.INT) {
+		} else if (expr.getType() == Expression.INT) {
 			int value = ((IntExpr) expr).getValue();
 			return new IntConst(value);
-		} else if (expr.getType() == IExpr.LIST) {
-			List<IExpr> value = ((ListExpr) expr).getValue();
-			List<IConst> list = new ArrayList<IConst>(value.size());
-			for (IExpr subExpr : value) {
+		} else if (expr.getType() == Expression.LIST) {
+			List<Expression> value = ((ListExpr) expr).getValue();
+			List<Constant> list = new ArrayList<Constant>(value.size());
+			for (Expression subExpr : value) {
 				list.add(evaluate(subExpr));
 			}
 
 			return new ListConst(list);
-		} else if (expr.getType() == IExpr.STRING) {
+		} else if (expr.getType() == Expression.STRING) {
 			String value = ((StringExpr) expr).getValue();
 			return new StringConst(value);
 		} else {

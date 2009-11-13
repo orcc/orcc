@@ -30,9 +30,9 @@ package net.sf.orcc.backends.llvm.nodes;
 
 import java.util.Map;
 
-import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
@@ -43,12 +43,12 @@ public class PhiNode extends AbstractLLVMNode {
 
 	private Map<LabelNode, LocalVariable> assignements;
 
-	private IType type;
+	private Type type;
 
 	private LocalVariable varDef;
 
 	public PhiNode(BlockNode block, Location location, LocalVariable varDef,
-			IType type, Map<LabelNode, LocalVariable> assignements) {
+			Type type, Map<LabelNode, LocalVariable> assignements) {
 		super(block, location);
 		this.varDef = varDef;
 		this.assignements = assignements;
@@ -64,7 +64,7 @@ public class PhiNode extends AbstractLLVMNode {
 		return assignements;
 	}
 
-	public IType getType() {
+	public Type getType() {
 		return type;
 	}
 
@@ -76,7 +76,7 @@ public class PhiNode extends AbstractLLVMNode {
 		this.assignements = assignements;
 	}
 
-	public void setType(IType type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 

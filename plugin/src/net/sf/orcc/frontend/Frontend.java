@@ -33,8 +33,8 @@ import java.io.IOException;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.ALAstParser;
-import net.sf.orcc.ir.actor.ActionScheduler;
-import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.ActionScheduler;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;

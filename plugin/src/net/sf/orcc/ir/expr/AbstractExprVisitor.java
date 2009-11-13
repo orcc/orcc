@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 
 /**
  * This class is an abstract implementation of {@link ExprVisitor}.
@@ -50,7 +50,7 @@ public abstract class AbstractExprVisitor implements ExprVisitor {
 	}
 
 	public void visit(ListExpr expr, Object... args) {
-		for (IExpr subExpr : expr.getValue()) {
+		for (Expression subExpr : expr.getValue()) {
 			subExpr.accept(this, args);
 		}
 	}

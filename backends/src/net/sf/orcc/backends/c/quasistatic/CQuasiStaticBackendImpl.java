@@ -39,8 +39,8 @@ import net.sf.orcc.backends.c.quasistatic.core.org.efsmScheduler.utilities.FileU
 import net.sf.orcc.backends.c.quasistatic.utils.CQuasiStaticConstants;
 import net.sf.orcc.backends.c.quasistatic.parsers.CQuasiStaticActorParser;
 import net.sf.orcc.backends.c.quasistatic.parsers.CQuasiStaticNetworksParser;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.NameTransformer;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.network.Network;
 
 /*

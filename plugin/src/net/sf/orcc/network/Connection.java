@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.Util;
@@ -147,7 +147,7 @@ public class Connection implements IAttributeContainer {
 	public int getSize() throws OrccException {
 		IAttribute attr = getAttribute(Connection.BUFFER_SIZE);
 		if (attr != null && attr.getType() == IAttribute.VALUE) {
-			IExpr expr = ((IValueAttribute) attr).getValue();
+			Expression expr = ((IValueAttribute) attr).getValue();
 			return Util.evaluateAsInteger(expr);
 		} else {
 			throw new OrccException("could not get the size of this connection");

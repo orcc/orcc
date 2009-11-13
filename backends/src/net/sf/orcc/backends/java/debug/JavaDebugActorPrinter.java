@@ -39,12 +39,12 @@ import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.backends.java.JavaConstPrinter;
 import net.sf.orcc.backends.java.JavaExprPrinter;
 import net.sf.orcc.backends.java.JavaTypePrinter;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -66,9 +66,9 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 
 		private StringBuilder builder;
 
-		private IType type;
+		private Type type;
 
-		public TypeConstructor(IType type) {
+		public TypeConstructor(Type type) {
 			this.type = type;
 		}
 
@@ -157,7 +157,7 @@ public class JavaDebugActorPrinter extends CActorPrinter {
 			StateVariable stateVar = (StateVariable) variable;
 
 			String name = stateVar.getName();
-			IType type = stateVar.getType();
+			Type type = stateVar.getType();
 			vars.put(name, new TypeConstructor(type));
 		}
 

@@ -30,18 +30,18 @@ package net.sf.orcc.ir.transforms;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.IInstruction;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
 
@@ -55,7 +55,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 	@Override
 	public void visit(BlockNode node, Object... args) {
-		for (IInstruction instruction : node) {
+		for (Instruction instruction : node) {
 			instruction.accept(this, args);
 		}
 	}
@@ -85,17 +85,15 @@ public class PhiRemoval extends AbstractActorTransformation {
 		// procedure and translate the PHI by an assignment of 0 (zero) to
 		// target. Otherwise, we just create an assignment target = source.
 		OrderedMap<Variable> parameters = procedure.getParameters();
-		AssignVarNode assign;
+		Assign assign;
 		if (source.getIndex() == 0 && !parameters.contains(source)) {
 			procedure.getLocals().remove(source);
 			IntExpr expr = new IntExpr(new Location(), 0);
-			assign = new AssignVarNode(targetBlock, new Location(), target,
-					expr);
+			assign = new Assign(targetBlock, new Location(), target, expr);
 		} else {
 			Use localUse = new Use(source);
 			VarExpr expr = new VarExpr(new Location(), localUse);
-			assign = new AssignVarNode(targetBlock, new Location(), target,
-					expr);
+			assign = new Assign(targetBlock, new Location(), target, expr);
 		}
 
 		targetBlock.add(assign);
@@ -104,12 +102,12 @@ public class PhiRemoval extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(WhileNode node, Object... args) {
-		ListIterator<INode> it = (ListIterator<INode>) args[0];
+		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
 
 		// the node before the while.
 		BlockNode block;
 		if (it.hasPrevious()) {
-			INode previousNode = it.previous();
+			CFGNode previousNode = it.previous();
 			if (previousNode instanceof BlockNode) {
 				block = (BlockNode) previousNode;
 			} else {

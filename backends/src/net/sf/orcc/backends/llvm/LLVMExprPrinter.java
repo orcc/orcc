@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -123,7 +123,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 		this.typePrinter = typePrinter;
 	}
 
-	public String toString(IExpr expr, Object... args) {
+	public String toString(Expression expr, Object... args) {
 		builder = new StringBuilder();
 		expr.accept(this, args);
 		return builder.toString();
@@ -142,8 +142,8 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(BooleanExpr expr, Object... args) {
-		if (args[0] instanceof IType) {
-			IType type = (IType) args[0];
+		if (args[0] instanceof Type) {
+			Type type = (Type) args[0];
 			String typeStr = typePrinter.toString(type);
 			builder.append(typeStr + " ");
 		}
@@ -153,8 +153,8 @@ public class LLVMExprPrinter implements ExprVisitor {
 
 	@Override
 	public void visit(IntExpr expr, Object... args) {
-		if (args[0] instanceof IType) {
-			String type = typePrinter.toString((IType) args[0]);
+		if (args[0] instanceof Type) {
+			String type = typePrinter.toString((Type) args[0]);
 			builder.append(type + " ");
 		}
 
@@ -182,7 +182,7 @@ public class LLVMExprPrinter implements ExprVisitor {
 	public void visit(VarExpr expr, Object... args) {
 		Boolean showType = false;
 
-		if (args[0] instanceof IType) {
+		if (args[0] instanceof Type) {
 			showType = true;
 		}
 

@@ -30,8 +30,8 @@ package net.sf.orcc.network;
 
 import java.util.HashMap;
 
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 
 /**
  * This class defines a broadcast as a particular instance.
@@ -45,7 +45,7 @@ public class Broadcast extends Instance {
 
 	private int numOutput;
 
-	private IType type;
+	private Type type;
 
 	/**
 	 * Creates a new broadcast whose name is composed from the given actor name
@@ -61,10 +61,9 @@ public class Broadcast extends Instance {
 	 * @param type
 	 *            type of this broadcast
 	 */
-	public Broadcast(String actorName, String portName, int numOutput,
-			IType type) {
+	public Broadcast(String actorName, String portName, int numOutput, Type type) {
 		super("broadcast_" + actorName + "_" + portName, CLASS,
-				new HashMap<String, IExpr>());
+				new HashMap<String, Expression>());
 		this.numOutput = numOutput;
 		this.type = type;
 	}
@@ -73,7 +72,7 @@ public class Broadcast extends Instance {
 		return numOutput;
 	}
 
-	public IType getType() {
+	public Type getType() {
 		return type;
 	}
 

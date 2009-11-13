@@ -31,30 +31,30 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.IActorTransformation;
-import net.sf.orcc.ir.IInstruction;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.InitPort;
+import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.ReadEnd;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.CallNode;
-import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.nodes.InstructionVisitor;
-import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.nodes.PeekNode;
-import net.sf.orcc.ir.nodes.PhiAssignment;
-import net.sf.orcc.ir.nodes.ReadEndNode;
-import net.sf.orcc.ir.nodes.ReadNode;
-import net.sf.orcc.ir.nodes.ReturnNode;
-import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.nodes.WriteEndNode;
-import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.nodes.WriteBegin;
+import net.sf.orcc.ir.nodes.WriteEnd;
 
 /**
  * This abstract class implements an no-op transformation on an actor. This
@@ -64,7 +64,7 @@ import net.sf.orcc.ir.nodes.WriteNode;
  * 
  */
 public class AbstractActorTransformation implements NodeVisitor,
-		InstructionVisitor, IActorTransformation {
+		InstructionVisitor, ActorTransformation {
 
 	protected Procedure procedure;
 
@@ -86,23 +86,23 @@ public class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(AssignVarNode node, Object... args) {
+	public void visit(Assign node, Object... args) {
 	}
 
 	@Override
 	public void visit(BlockNode node, Object... args) {
-		ListIterator<IInstruction> it = node.listIterator();
+		ListIterator<Instruction> it = node.listIterator();
 		while (it.hasNext()) {
 			it.next().accept(this, it);
 		}
 	}
 
 	@Override
-	public void visit(CallNode node, Object... args) {
+	public void visit(Call node, Object... args) {
 	}
 
 	@Override
-	public void visit(HasTokensNode node, Object... args) {
+	public void visit(HasTokens node, Object... args) {
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(InitPortNode node, Object... args) {
+	public void visit(InitPort node, Object... args) {
 	}
 
 	/**
@@ -122,20 +122,20 @@ public class AbstractActorTransformation implements NodeVisitor,
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
 	 */
-	protected void visit(List<INode> nodes) {
-		ListIterator<INode> it = nodes.listIterator();
+	protected void visit(List<CFGNode> nodes) {
+		ListIterator<CFGNode> it = nodes.listIterator();
 		while (it.hasNext()) {
-			INode node = it.next();
+			CFGNode node = it.next();
 			node.accept(this, it);
 		}
 	}
 
 	@Override
-	public void visit(LoadNode node, Object... args) {
+	public void visit(Load node, Object... args) {
 	}
 
 	@Override
-	public void visit(PeekNode node, Object... args) {
+	public void visit(Peek node, Object... args) {
 	}
 
 	@Override
@@ -143,19 +143,19 @@ public class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(ReadEndNode node, Object... args) {
+	public void visit(ReadBegin node, Object... args) {
 	}
 
 	@Override
-	public void visit(ReadNode node, Object... args) {
+	public void visit(ReadEnd node, Object... args) {
 	}
 
 	@Override
-	public void visit(ReturnNode node, Object... args) {
+	public void visit(Return node, Object... args) {
 	}
 
 	@Override
-	public void visit(StoreNode node, Object... args) {
+	public void visit(Store node, Object... args) {
 	}
 
 	@Override
@@ -163,11 +163,11 @@ public class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(WriteEndNode node, Object... args) {
+	public void visit(WriteBegin node, Object... args) {
 	}
 
 	@Override
-	public void visit(WriteNode node, Object... args) {
+	public void visit(WriteEnd node, Object... args) {
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class AbstractActorTransformation implements NodeVisitor,
 	 */
 	protected void visitProcedure(Procedure procedure) {
 		this.procedure = procedure;
-		List<INode> nodes = procedure.getNodes();
+		List<CFGNode> nodes = procedure.getNodes();
 		visit(nodes);
 	}
 

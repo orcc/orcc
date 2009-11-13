@@ -29,9 +29,9 @@
 package net.sf.orcc.backends.llvm.nodes;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.AbstractInstruction;
+import net.sf.orcc.ir.instructions.AbstractInstruction;
+import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.InstructionVisitor;
 
 /**
  * @author Jérôme GORIN
@@ -43,12 +43,12 @@ public abstract class AbstractLLVMNode extends AbstractInstruction {
 		super(block, location);
 	}
 
-	public abstract void accept(LLVMNodeVisitor visitor, Object... args);
-
 	public void accept(InstructionVisitor visitor, Object... args) {
 		if (visitor instanceof LLVMNodeVisitor) {
 			accept((LLVMNodeVisitor) visitor, args);
 		}
 	}
+
+	public abstract void accept(LLVMNodeVisitor visitor, Object... args);
 
 }

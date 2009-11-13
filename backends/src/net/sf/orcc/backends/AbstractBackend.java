@@ -31,7 +31,7 @@ package net.sf.orcc.backends;
 import java.io.File;
 import java.io.IOException;
 
-import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;

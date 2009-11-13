@@ -88,23 +88,23 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IConst;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IInstruction;
-import net.sf.orcc.ir.INode;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Tag;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.ActionScheduler;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.FSM;
-import net.sf.orcc.ir.actor.StateVariable;
-import net.sf.orcc.ir.actor.Tag;
 import net.sf.orcc.ir.consts.AbstractConst;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.IntConst;
@@ -118,19 +118,19 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.CallNode;
-import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.LoadNode;
-import net.sf.orcc.ir.nodes.PeekNode;
-import net.sf.orcc.ir.nodes.PhiAssignment;
-import net.sf.orcc.ir.nodes.ReadNode;
-import net.sf.orcc.ir.nodes.ReturnNode;
-import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.nodes.WriteBegin;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -166,7 +166,7 @@ public class IRParser {
 
 	private OrderedMap<Port> outputs;
 
-	private INode previousNode;
+	private CFGNode previousNode;
 
 	private OrderedMap<Procedure> procs;
 
@@ -304,19 +304,19 @@ public class IRParser {
 		}
 	}
 
-	private AssignVarNode parseAssignVarNode(Location loc, JSONArray array)
+	private Assign parseAssignVarNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		Variable var = getVariable(array.getJSONArray(0));
-		IExpr value = parseExpr(array.getJSONArray(1));
-		return new AssignVarNode(block, loc, (LocalVariable) var, value);
+		Expression value = parseExpr(array.getJSONArray(1));
+		return new Assign(block, loc, (LocalVariable) var, value);
 	}
 
 	private BinaryExpr parseBinaryExpr(Location location, JSONArray array)
 			throws JSONException, OrccException {
 		String name = array.getString(0);
-		IExpr e1 = parseExpr(array.getJSONArray(1));
-		IExpr e2 = parseExpr(array.getJSONArray(2));
-		IType type = parseType(array.get(3));
+		Expression e1 = parseExpr(array.getJSONArray(1));
+		Expression e2 = parseExpr(array.getJSONArray(2));
+		Type type = parseType(array.get(3));
 		BinaryOp op = null;
 
 		if (name.equals(BOP_BAND)) {
@@ -366,7 +366,7 @@ public class IRParser {
 		return new BinaryExpr(location, e1, op, e2, type);
 	}
 
-	private CallNode parseCallNode(Location loc, JSONArray array)
+	private Call parseCallNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		LocalVariable res = null;
 		String procName = array.getString(0);
@@ -374,8 +374,8 @@ public class IRParser {
 			res = (LocalVariable) getVariable(array.getJSONArray(1));
 		}
 
-		List<IExpr> parameters = parseExprs(array.getJSONArray(2));
-		return new CallNode(block, loc, res, procs.get(procName), parameters);
+		List<Expression> parameters = parseExprs(array.getJSONArray(2));
+		return new Call(block, loc, res, procs.get(procName), parameters);
 	}
 
 	/**
@@ -387,9 +387,9 @@ public class IRParser {
 	 * @return An {@link AbstractConst} created from the given object.
 	 * @throws JSONException
 	 */
-	private IConst parseConstant(Object obj) throws JSONException,
+	private Constant parseConstant(Object obj) throws JSONException,
 			OrccException {
-		IConst constant = null;
+		Constant constant = null;
 
 		if (obj instanceof Boolean) {
 			constant = new BoolConst((Boolean) obj);
@@ -397,7 +397,7 @@ public class IRParser {
 			constant = new IntConst((Integer) obj);
 		} else if (obj instanceof JSONArray) {
 			JSONArray array = (JSONArray) obj;
-			List<IConst> cstList = new ArrayList<IConst>();
+			List<Constant> cstList = new ArrayList<Constant>();
 			for (int i = 0; i < array.length(); i++) {
 				cstList.add(parseConstant(array.get(i)));
 			}
@@ -411,11 +411,11 @@ public class IRParser {
 		return constant;
 	}
 
-	private IExpr parseExpr(JSONArray array) throws JSONException,
+	private Expression parseExpr(JSONArray array) throws JSONException,
 			OrccException {
 		Location location = parseLocation(array.getJSONArray(0));
 		Object obj = array.get(1);
-		IExpr expr = null;
+		Expression expr = null;
 
 		if (obj instanceof Boolean) {
 			expr = new BooleanExpr(location, (Boolean) obj);
@@ -443,9 +443,9 @@ public class IRParser {
 		return expr;
 	}
 
-	private List<IExpr> parseExprs(JSONArray array) throws JSONException,
+	private List<Expression> parseExprs(JSONArray array) throws JSONException,
 			OrccException {
-		List<IExpr> exprs = new ArrayList<IExpr>();
+		List<Expression> exprs = new ArrayList<Expression>();
 		for (int i = 0; i < array.length(); i++) {
 			exprs.add(parseExpr(array.getJSONArray(i)));
 		}
@@ -481,21 +481,21 @@ public class IRParser {
 		return fsm;
 	}
 
-	private HasTokensNode parseHasTokensNode(Location loc, JSONArray array)
+	private HasTokens parseHasTokensNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		LocalVariable varDef = (LocalVariable) getVariable(array
 				.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new HasTokensNode(block, loc, port, numTokens, varDef);
+		return new HasTokens(block, loc, port, numTokens, varDef);
 	}
 
 	private IfNode parseIfNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		IExpr condition = parseExpr(array.getJSONArray(0));
-		List<INode> thenNodes = parseNodes(array.getJSONArray(1));
-		List<INode> elseNodes = parseNodes(array.getJSONArray(2));
+		Expression condition = parseExpr(array.getJSONArray(0));
+		List<CFGNode> thenNodes = parseNodes(array.getJSONArray(1));
+		List<CFGNode> elseNodes = parseNodes(array.getJSONArray(2));
 
 		return new IfNode(id, loc, condition, thenNodes, elseNodes, null);
 	}
@@ -511,14 +511,14 @@ public class IRParser {
 		return join;
 	}
 
-	private LoadNode parseLoadNode(Location loc, JSONArray array)
+	private Load parseLoadNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
 		Use source = parseVarUse(array.getJSONArray(1));
-		List<IExpr> indexes = parseExprs(array.getJSONArray(2));
+		List<Expression> indexes = parseExprs(array.getJSONArray(2));
 
-		return new LoadNode(block, loc, target, source, indexes);
+		return new Load(block, loc, target, source, indexes);
 	}
 
 	private Location parseLocation(JSONArray array) throws JSONException {
@@ -535,12 +535,12 @@ public class IRParser {
 		}
 	}
 
-	private INode parseNode(JSONArray array) throws JSONException,
+	private CFGNode parseNode(JSONArray array) throws JSONException,
 			OrccException {
 		String name = array.getString(0);
 		int id = array.getInt(1);
 		Location loc = parseLocation(array.getJSONArray(2));
-		INode node = null;
+		CFGNode node = null;
 
 		if (name.equals(NAME_IF)) {
 			node = parseIfNode(id, loc, array.getJSONArray(3));
@@ -560,7 +560,7 @@ public class IRParser {
 			node = parseWhileNode(id, loc, array.getJSONArray(3));
 		} else {
 			block = new BlockNode(loc);
-			IInstruction instr = null;
+			Instruction instr = null;
 
 			if (name.equals(NAME_ASSIGN)) {
 				instr = parseAssignVarNode(loc, array.getJSONArray(3));
@@ -596,11 +596,11 @@ public class IRParser {
 		return node;
 	}
 
-	private List<INode> parseNodes(JSONArray array) throws JSONException,
+	private List<CFGNode> parseNodes(JSONArray array) throws JSONException,
 			OrccException {
-		List<INode> nodes = new ArrayList<INode>();
+		List<CFGNode> nodes = new ArrayList<CFGNode>();
 		for (int i = 0; i < array.length(); i++) {
-			INode node = parseNode(array.getJSONArray(i));
+			CFGNode node = parseNode(array.getJSONArray(i));
 			if (node != null) {
 				nodes.add(node);
 			}
@@ -622,14 +622,14 @@ public class IRParser {
 		return pattern;
 	}
 
-	private PeekNode parsePeekNode(Location loc, JSONArray array)
+	private Peek parsePeekNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(1);
 		LocalVariable varDef = (LocalVariable) getVariable(array
 				.getJSONArray(2));
-		return new PeekNode(block, loc, port, numTokens, varDef);
+		return new Peek(block, loc, port, numTokens, varDef);
 	}
 
 	private PhiAssignment parsePhiNode(Location loc, JSONArray array)
@@ -660,7 +660,7 @@ public class IRParser {
 			JSONArray port = array.getJSONArray(i);
 
 			Location location = parseLocation(port.getJSONArray(0));
-			IType type = parseType(port.get(1));
+			Type type = parseType(port.get(1));
 			String name = port.getString(2);
 
 			Port po = new Port(location, type, name);
@@ -687,7 +687,7 @@ public class IRParser {
 		boolean external = array.getBoolean(1);
 
 		Location location = parseLocation(array.getJSONArray(2));
-		IType returnType = parseType(array.get(3));
+		Type returnType = parseType(array.get(3));
 		variables = new Scope<Variable>(variables, true);
 		OrderedMap<Variable> parameters = variables;
 		parseVarDefs(array.getJSONArray(4));
@@ -695,7 +695,7 @@ public class IRParser {
 		OrderedMap<Variable> locals = variables;
 		parseVarDefs(array.getJSONArray(5));
 
-		List<INode> nodes = parseNodes(array.getJSONArray(6));
+		List<CFGNode> nodes = parseNodes(array.getJSONArray(6));
 
 		// go back to previous scope
 		variables = variables.getParent().getParent();
@@ -708,20 +708,20 @@ public class IRParser {
 		return proc;
 	}
 
-	private ReadNode parseReadNode(Location loc, JSONArray array)
+	private ReadBegin parseReadNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(1);
 		LocalVariable varDef = (LocalVariable) getVariable(array
 				.getJSONArray(2));
-		return new ReadNode(block, loc, port, numTokens, varDef);
+		return new ReadBegin(block, loc, port, numTokens, varDef);
 	}
 
-	private ReturnNode parseReturnNode(Location loc, JSONArray array)
+	private Return parseReturnNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		IExpr expr = parseExpr(array);
-		return new ReturnNode(block, loc, expr);
+		Expression expr = parseExpr(array);
+		return new Return(block, loc, expr);
 	}
 
 	/**
@@ -747,9 +747,9 @@ public class IRParser {
 			boolean assignable = details.getBoolean(1);
 
 			Location location = parseLocation(varDefArray.getJSONArray(1));
-			IType type = parseType(varDefArray.get(2));
+			Type type = parseType(varDefArray.get(2));
 
-			IConst init = null;
+			Constant init = null;
 			if (!stateArray.isNull(1)) {
 				init = parseConstant(stateArray.get(1));
 			}
@@ -765,13 +765,13 @@ public class IRParser {
 		return stateVars;
 	}
 
-	private StoreNode parseStoreNode(Location loc, JSONArray array)
+	private Store parseStoreNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		Use target = parseVarUse(array.getJSONArray(0));
-		List<IExpr> indexes = parseExprs(array.getJSONArray(1));
-		IExpr value = parseExpr(array.getJSONArray(2));
+		List<Expression> indexes = parseExprs(array.getJSONArray(1));
+		Expression value = parseExpr(array.getJSONArray(2));
 
-		return new StoreNode(block, loc, target, indexes, value);
+		return new Store(block, loc, target, indexes, value);
 	}
 
 	/**
@@ -781,11 +781,11 @@ public class IRParser {
 	 *            A YAML-encoded type definition. This is either a
 	 *            {@link String} for simple types (bool, String, void) or a
 	 *            {@link List} for types with parameters (int, uint, List).
-	 * @return An {@link IType}.
+	 * @return An {@link Type}.
 	 * @throws JSONException
 	 */
-	private IType parseType(Object obj) throws JSONException, OrccException {
-		IType type = null;
+	private Type parseType(Object obj) throws JSONException, OrccException {
+		Type type = null;
 
 		if (obj instanceof String) {
 			String name = (String) obj;
@@ -802,14 +802,14 @@ public class IRParser {
 			JSONArray array = (JSONArray) obj;
 			String name = array.getString(0);
 			if (name.equals(IntType.NAME)) {
-				IExpr expr = parseExpr(array.getJSONArray(1));
+				Expression expr = parseExpr(array.getJSONArray(1));
 				type = new IntType(expr);
 			} else if (name.equals(UintType.NAME)) {
-				IExpr expr = parseExpr(array.getJSONArray(1));
+				Expression expr = parseExpr(array.getJSONArray(1));
 				type = new UintType(expr);
 			} else if (name.equals(ListType.NAME)) {
-				IExpr expr = parseExpr(array.getJSONArray(1));
-				IType subType = parseType(array.get(2));
+				Expression expr = parseExpr(array.getJSONArray(1));
+				Type subType = parseType(array.get(2));
 				type = new ListType(expr, subType);
 			} else {
 				throw new OrccException("Unknown type: " + name);
@@ -825,8 +825,8 @@ public class IRParser {
 	private UnaryExpr parseUnaryExpr(Location location, JSONArray array)
 			throws JSONException, OrccException {
 		String name = array.getString(0);
-		IExpr expr = parseExpr(array.getJSONArray(1));
-		IType type = parseType(array.get(2));
+		Expression expr = parseExpr(array.getJSONArray(1));
+		Type type = parseType(array.get(2));
 		UnaryOp op = null;
 
 		if (name.equals(UOP_BNOT)) {
@@ -863,7 +863,7 @@ public class IRParser {
 		int index = details.getInt(4);
 
 		Location loc = parseLocation(array.getJSONArray(1));
-		IType type = parseType(array.get(2));
+		Type type = parseType(array.get(2));
 
 		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
 				null, suffix, type);
@@ -889,20 +889,20 @@ public class IRParser {
 
 	private WhileNode parseWhileNode(int id, Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		IExpr condition = parseExpr(array.getJSONArray(0));
-		List<INode> nodes = parseNodes(array.getJSONArray(1));
+		Expression condition = parseExpr(array.getJSONArray(0));
+		List<CFGNode> nodes = parseNodes(array.getJSONArray(1));
 		BlockNode joinNode = (BlockNode) nodes.remove(0);
 		return new WhileNode(id, loc, condition, nodes, joinNode);
 	}
 
-	private WriteNode parseWriteNode(Location loc, JSONArray array)
+	private WriteBegin parseWriteNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		String fifoName = array.getString(0);
 		Port port = outputs.get(fifoName);
 		int numTokens = array.getInt(1);
 		LocalVariable varDef = (LocalVariable) getVariable(array
 				.getJSONArray(2));
-		return new WriteNode(block, loc, port, numTokens, varDef);
+		return new WriteBegin(block, loc, port, numTokens, varDef);
 	}
 
 	private void putAction(Tag tag, Action action) {

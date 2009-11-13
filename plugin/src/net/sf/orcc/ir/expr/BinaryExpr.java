@@ -29,9 +29,10 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.AbstractLocalizable;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
 
 /**
  * This class defines a binary expression.
@@ -39,7 +40,7 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class BinaryExpr extends AbstractExpr {
+public class BinaryExpr extends AbstractLocalizable implements Expression {
 
 	/**
 	 * Constant indicating left branch of a binary expression.
@@ -51,16 +52,16 @@ public class BinaryExpr extends AbstractExpr {
 	 */
 	public static final Object RIGHT = new Object();
 
-	private IExpr e1;
+	private Expression e1;
 
-	private IExpr e2;
+	private Expression e2;
 
 	private BinaryOp op;
 
-	private IType type;
+	private Type type;
 
-	public BinaryExpr(Location location, IExpr e1, BinaryOp op, IExpr e2,
-			IType type) {
+	public BinaryExpr(Location location, Expression e1, BinaryOp op,
+			Expression e2, Type type) {
 		super(location);
 		this.e1 = e1;
 		this.e2 = e2;
@@ -74,13 +75,13 @@ public class BinaryExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws OrccException {
+	public Expression evaluate() throws OrccException {
 		switch (op) {
 		case BITAND:
-			IExpr expr1 = e1.evaluate();
-			IExpr expr2 = e2.evaluate();
-			if (expr1.getType() == IExpr.BOOLEAN
-					&& expr2.getType() == IExpr.BOOLEAN) {
+			Expression expr1 = e1.evaluate();
+			Expression expr2 = e2.evaluate();
+			if (expr1.getType() == Expression.BOOLEAN
+					&& expr2.getType() == Expression.BOOLEAN) {
 				boolean b1 = ((BooleanExpr) expr1).getValue();
 				boolean b2 = ((BooleanExpr) expr2).getValue();
 				return new BooleanExpr(getLocation(), b1 && b2);
@@ -129,11 +130,11 @@ public class BinaryExpr extends AbstractExpr {
 		throw new OrccException("could not evaluate");
 	}
 
-	public IExpr getE1() {
+	public Expression getE1() {
 		return e1;
 	}
 
-	public IExpr getE2() {
+	public Expression getE2() {
 		return e2;
 	}
 
@@ -146,15 +147,15 @@ public class BinaryExpr extends AbstractExpr {
 		return BINARY;
 	}
 
-	public IType getUnderlyingType() {
+	public Type getUnderlyingType() {
 		return type;
 	}
 
-	public void setE1(IExpr e1) {
+	public void setE1(Expression e1) {
 		this.e1 = e1;
 	}
 
-	public void setE2(IExpr e2) {
+	public void setE2(Expression e2) {
 		this.e2 = e2;
 	}
 
@@ -162,7 +163,7 @@ public class BinaryExpr extends AbstractExpr {
 		this.op = op;
 	}
 
-	public void setType(IType type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 

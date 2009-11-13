@@ -61,7 +61,7 @@ public abstract class Variable implements INameable {
 	/**
 	 * variable type
 	 */
-	private IType type;
+	private Type type;
 
 	/**
 	 * uses of this variable.
@@ -80,7 +80,7 @@ public abstract class Variable implements INameable {
 	 * @param global
 	 *            whether this variable is global
 	 */
-	public Variable(Location location, IType type, String name, boolean global) {
+	public Variable(Location location, Type type, String name, boolean global) {
 		this.location = location;
 		this.type = type;
 		this.name = name;
@@ -113,7 +113,7 @@ public abstract class Variable implements INameable {
 	 * @param node
 	 *            a node that uses this variable
 	 */
-	public void addUse(IInstruction node) {
+	public void addUse(Instruction node) {
 		new Use(this, node);
 	}
 
@@ -151,7 +151,7 @@ public abstract class Variable implements INameable {
 	 * 
 	 * @return the type of this variable
 	 */
-	public IType getType() {
+	public Type getType() {
 		return type;
 	}
 
@@ -188,7 +188,7 @@ public abstract class Variable implements INameable {
 	 * @param node
 	 *            a node
 	 */
-	public void removeUse(IInstruction node) {
+	public void removeUse(Instruction node) {
 		ListIterator<Use> it = uses.listIterator();
 		while (it.hasNext()) {
 			Use use = it.next();
@@ -234,7 +234,7 @@ public abstract class Variable implements INameable {
 	 * @param type
 	 *            the new type of this variable
 	 */
-	public void setType(IType type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.type;
 
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 
 /**
  * @author Matthieu Wipliez
@@ -38,9 +38,9 @@ public class UintType extends AbstractType {
 
 	public static final String NAME = "uint";
 
-	private IExpr size;
+	private Expression size;
 
-	public UintType(IExpr size) {
+	public UintType(Expression size) {
 		super(NAME);
 		setSize(size);
 	}
@@ -59,7 +59,7 @@ public class UintType extends AbstractType {
 		}
 	}
 
-	public IExpr getSize() {
+	public Expression getSize() {
 		return size;
 	}
 
@@ -68,7 +68,7 @@ public class UintType extends AbstractType {
 		return UINT;
 	}
 
-	public void setSize(IExpr size) {
+	public void setSize(Expression size) {
 		this.size = size;
 	}
 

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.c.nodes;
 
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -47,12 +47,12 @@ public class SelfAssignment extends AbstractCNode {
 
 	private BinaryOp op;
 
-	private IExpr value;
+	private Expression value;
 
 	private Variable variable;
 
 	public SelfAssignment(int id, Location location, Variable variable,
-			BinaryOp op, IExpr value) {
+			BinaryOp op, Expression value) {
 		super(id, location);
 		this.op = op;
 		this.value = value;
@@ -68,7 +68,7 @@ public class SelfAssignment extends AbstractCNode {
 		return op;
 	}
 
-	public IExpr getValue() {
+	public Expression getValue() {
 		return value;
 	}
 
@@ -80,7 +80,7 @@ public class SelfAssignment extends AbstractCNode {
 		this.op = op;
 	}
 
-	public void setValue(IExpr value) {
+	public void setValue(Expression value) {
 		this.value = value;
 	}
 

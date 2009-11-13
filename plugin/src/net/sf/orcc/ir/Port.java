@@ -47,7 +47,7 @@ public class Port extends Variable implements Comparable<Port> {
 	 * @param name
 	 *            the port name
 	 */
-	public Port(Location location, IType type, String name) {
+	public Port(Location location, Type type, String name) {
 		super(location, type, name, true);
 	}
 

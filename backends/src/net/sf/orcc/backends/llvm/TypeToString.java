@@ -31,8 +31,8 @@ package net.sf.orcc.backends.llvm;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -51,7 +51,7 @@ public class TypeToString implements LLVMTypeVisitor {
 
 	private StringBuilder builder;
 
-	private void printSize(IType type) {
+	private void printSize(Type type) {
 		int size = sizeOf(type);
 		builder.append(Integer.toString(size));
 	}
@@ -61,37 +61,37 @@ public class TypeToString implements LLVMTypeVisitor {
 	 * given type. Returns the text representation.
 	 * 
 	 * @param type
-	 *            An {@link IType}.
+	 *            An {@link Type}.
 	 */
-	public String toString(IType type) {
-		builder = new StringBuilder();
-		type.accept(this);
-		return builder.toString();
-	}
-	
-	/**
-	 * Creates a string buffer and fills it with the text representation of the
-	 * given type. Returns the text representation.
-	 * 
-	 * @param type
-	 *            An {@link IType}.
-	 */
-	public int sizeOf(IType type) {
+	public int sizeOf(Type type) {
 		try {
-			if (type instanceof BoolType){
+			if (type instanceof BoolType) {
 				return 1;
-			}else if (type instanceof IntType){
-				IExpr exprSize = ((IntType)type).getSize();
+			} else if (type instanceof IntType) {
+				Expression exprSize = ((IntType) type).getSize();
 				return Util.evaluateAsInteger(exprSize);
-			}else if (type instanceof StringType){
+			} else if (type instanceof StringType) {
 				return 8;
-			}else{
+			} else {
 				throw new OrccException("Can't size type");
 			}
 		} catch (OrccException e) {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+
+	/**
+	 * Creates a string buffer and fills it with the text representation of the
+	 * given type. Returns the text representation.
+	 * 
+	 * @param type
+	 *            An {@link Type}.
+	 */
+	public String toString(Type type) {
+		builder = new StringBuilder();
+		type.accept(this);
+		return builder.toString();
 	}
 
 	@Override

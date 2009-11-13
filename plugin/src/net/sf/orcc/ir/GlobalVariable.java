@@ -45,12 +45,12 @@ public class GlobalVariable extends Variable implements INameable {
 	/**
 	 * variable constant value.
 	 */
-	protected IConst constantValue;
+	protected Constant constantValue;
 
 	/**
 	 * variable value
 	 */
-	private IExpr value;
+	private Expression value;
 
 	/**
 	 * Creates a new global variable from the given global variable.
@@ -75,7 +75,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 * @param name
 	 *            the global variable name
 	 */
-	public GlobalVariable(Location location, IType type, String name) {
+	public GlobalVariable(Location location, Type type, String name) {
 		this(location, type, name, null);
 	}
 
@@ -92,8 +92,8 @@ public class GlobalVariable extends Variable implements INameable {
 	 * @param value
 	 *            the value of the global variable
 	 */
-	public GlobalVariable(Location location, IType type, String name,
-			IExpr value) {
+	public GlobalVariable(Location location, Type type, String name,
+			Expression value) {
 		super(location, type, name, true);
 		this.value = value;
 	}
@@ -105,7 +105,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 *             if the value could not be evaluated to a constant
 	 */
 	public void evaluate() throws OrccException {
-		IExpr expr = value.evaluate();
+		Expression expr = value.evaluate();
 		constantValue = AbstractConst.evaluate(expr);
 	}
 
@@ -116,7 +116,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 * @return a constant, or <code>null</code> if this variable has no constant
 	 *         value.
 	 */
-	public IConst getConstantValue() throws OrccException {
+	public Constant getConstantValue() throws OrccException {
 		if (constantValue == null) {
 			evaluate();
 		}
@@ -129,7 +129,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 * 
 	 * @return an expression, or <code>null</code> if this variable has no value
 	 */
-	public IExpr getValue() {
+	public Expression getValue() {
 		return value;
 	}
 
@@ -148,7 +148,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 * @param value
 	 *            an expression
 	 */
-	public void setValue(IExpr value) {
+	public void setValue(Expression value) {
 		this.value = value;
 	}
 

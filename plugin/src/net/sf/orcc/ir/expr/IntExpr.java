@@ -29,14 +29,15 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.AbstractLocalizable;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 
 /**
  * @author Matthieu Wipliez
  * 
  */
-public class IntExpr extends AbstractExpr {
+public class IntExpr extends AbstractLocalizable implements Expression {
 
 	private int value;
 
@@ -79,7 +80,7 @@ public class IntExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws OrccException {
+	public Expression evaluate() throws OrccException {
 		return this;
 	}
 

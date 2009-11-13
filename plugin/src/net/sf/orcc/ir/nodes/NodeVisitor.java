@@ -36,10 +36,34 @@ package net.sf.orcc.ir.nodes;
  */
 public interface NodeVisitor {
 
+	/**
+	 * Visits a block node.
+	 * 
+	 * @param node
+	 *            a block node
+	 * @param args
+	 *            arguments
+	 */
 	public void visit(BlockNode node, Object... args);
 
+	/**
+	 * Visits an if node.
+	 * 
+	 * @param node
+	 *            an if node
+	 * @param args
+	 *            arguments
+	 */
 	public void visit(IfNode node, Object... args);
-	
+
+	/**
+	 * Visits a while node.
+	 * 
+	 * @param node
+	 *            a while node
+	 * @param args
+	 *            arguments
+	 */
 	public void visit(WhileNode node, Object... args);
 
 }

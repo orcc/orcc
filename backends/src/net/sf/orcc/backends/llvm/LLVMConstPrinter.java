@@ -30,8 +30,8 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.List;
 
-import net.sf.orcc.ir.IConst;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ConstVisitor;
 import net.sf.orcc.ir.consts.IntConst;
@@ -69,8 +69,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 	 * @param group
 	 *            template group
 	 */
-	public LLVMConstPrinter(StringTemplateGroup group,
-			TypeToString typeVisitor) {
+	public LLVMConstPrinter(StringTemplateGroup group, TypeToString typeVisitor) {
 		this.group = group;
 		this.typeVisitor = typeVisitor;
 	}
@@ -88,8 +87,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 	@Override
 	public void visit(BoolConst constant, Object... args) {
 		if (args.length == 1) {
-			template
-					.setAttribute("type", typeVisitor.toString((IType) args[0]));
+			template.setAttribute("type", typeVisitor.toString((Type) args[0]));
 		}
 		template.setAttribute("value", constant.getValue() ? "1" : "0");
 	}
@@ -97,8 +95,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 	@Override
 	public void visit(IntConst constant, Object... args) {
 		if (args.length == 1) {
-			template.setAttribute("value", typeVisitor
-					.toString((IType) args[0])
+			template.setAttribute("value", typeVisitor.toString((Type) args[0])
 					+ " " + constant.getValue());
 		} else {
 			template.setAttribute("value", constant.getValue());
@@ -109,7 +106,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 	@Override
 	public void visit(ListConst constant, Object... args) {
 		ListType listType = (ListType) args[0];
-		IType type = listType.getElementType();
+		Type type = listType.getElementType();
 
 		// save current template
 		StringTemplate previousTempl = template;
@@ -118,8 +115,8 @@ public class LLVMConstPrinter implements ConstVisitor {
 		StringTemplate listTempl = group.getInstanceOf("listValue");
 		template = listTempl;
 
-		List<IConst> list = constant.getValue();
-		for (IConst cst : list) {
+		List<Constant> list = constant.getValue();
+		for (Constant cst : list) {
 			cst.accept(this, type);
 		}
 
@@ -135,8 +132,7 @@ public class LLVMConstPrinter implements ConstVisitor {
 		String val = constant.getValue();
 		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
 		if (args.length == 1) {
-			template
-					.setAttribute("type", typeVisitor.toString((IType) args[0]));
+			template.setAttribute("type", typeVisitor.toString((Type) args[0]));
 		}
 		template.setAttribute("value", res);
 	}

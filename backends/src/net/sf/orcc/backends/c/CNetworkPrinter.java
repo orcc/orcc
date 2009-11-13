@@ -40,9 +40,9 @@ import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.TemplateGroupLoader;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
-import net.sf.orcc.ir.actor.Action;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
@@ -67,12 +67,14 @@ public class CNetworkPrinter {
 	private StringTemplateGroup group;
 
 	/**
-	 * template is protected in order to be visible to CQuasiStaticNetworkPrinter
+	 * template is protected in order to be visible to
+	 * CQuasiStaticNetworkPrinter
 	 */
 	protected StringTemplate template;
 
 	/**
-	 * typeVisitor is protected in order to be visible to CQuasiStaticNetworkPrinter
+	 * typeVisitor is protected in order to be visible to
+	 * CQuasiStaticNetworkPrinter
 	 */
 	protected TypeToString typeVisitor;
 
@@ -167,7 +169,8 @@ public class CNetworkPrinter {
 	/**
 	 * Sets the broadcasts attribute.
 	 * 
-	 * setBroadcasts is protected due to has been overwritten by CQuasiStaticNetworkPrinter
+	 * setBroadcasts is protected due to has been overwritten by
+	 * CQuasiStaticNetworkPrinter
 	 * 
 	 * @param instances
 	 *            The list of instances.
@@ -179,7 +182,7 @@ public class CNetworkPrinter {
 				Broadcast bcast = (Broadcast) instance;
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("id", bcast.getId());
-				IType type = bcast.getType();
+				Type type = bcast.getType();
 				attrs.put("type", typeVisitor.toString(type));
 
 				List<Integer> num = new ArrayList<Integer>();
@@ -198,7 +201,8 @@ public class CNetworkPrinter {
 	/**
 	 * Sets the connections attribute.
 	 * 
-	 * setConnections is protected due to has been overwritten by CQuasiStaticNetworkPrinter
+	 * setConnections is protected due to has been overwritten by
+	 * CQuasiStaticNetworkPrinter
 	 * 
 	 * @param graph
 	 *            The network's graph.
@@ -219,7 +223,7 @@ public class CNetworkPrinter {
 				Instance source = srcVertex.getInstance();
 				Instance target = tgtVertex.getInstance();
 
-				IType type;
+				Type type;
 				if (source.isBroadcast()) {
 					type = connection.getTarget().getType();
 				} else {
@@ -230,8 +234,8 @@ public class CNetworkPrinter {
 				IAttribute attr = connection
 						.getAttribute(Connection.BUFFER_SIZE);
 				if (attr != null && attr.getType() == IAttribute.VALUE) {
-					IExpr expr = ((IValueAttribute) attr).getValue();
-					size = Integer.toString(Util.evaluateAsInteger(expr)+1);
+					Expression expr = ((IValueAttribute) attr).getValue();
+					size = Integer.toString(Util.evaluateAsInteger(expr) + 1);
 				} else {
 					size = "SIZE";
 				}

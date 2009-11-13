@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.ir.nodes.InstructionVisitor;
+import net.sf.orcc.ir.instructions.InstructionVisitor;
 
 /**
  * @author Matthieu Wipliez

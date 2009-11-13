@@ -29,9 +29,10 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.AbstractLocalizable;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
 
 /**
  * This class defines a unary expression.
@@ -39,15 +40,15 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class UnaryExpr extends AbstractExpr {
+public class UnaryExpr extends AbstractLocalizable implements Expression {
 
-	private IExpr expr;
+	private Expression expr;
 
 	private UnaryOp op;
 
-	private IType type;
+	private Type type;
 
-	public UnaryExpr(Location location, UnaryOp op, IExpr expr, IType type) {
+	public UnaryExpr(Location location, UnaryOp op, Expression expr, Type type) {
 		super(location);
 		this.expr = expr;
 		this.op = op;
@@ -60,7 +61,7 @@ public class UnaryExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws OrccException {
+	public Expression evaluate() throws OrccException {
 		switch (op) {
 		case BITNOT:
 			break;
@@ -75,7 +76,7 @@ public class UnaryExpr extends AbstractExpr {
 		throw new OrccException("could not evaluate");
 	}
 
-	public IExpr getExpr() {
+	public Expression getExpr() {
 		return expr;
 	}
 
@@ -88,11 +89,11 @@ public class UnaryExpr extends AbstractExpr {
 		return UNARY;
 	}
 
-	public IType getUnderlyingType() {
+	public Type getUnderlyingType() {
 		return type;
 	}
 
-	public void setExpr(IExpr expr) {
+	public void setExpr(Expression expr) {
 		this.expr = expr;
 	}
 
@@ -100,7 +101,7 @@ public class UnaryExpr extends AbstractExpr {
 		this.op = op;
 	}
 
-	public void setType(IType type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 

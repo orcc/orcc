@@ -29,8 +29,8 @@
 package net.sf.orcc.network.transforms;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -108,8 +108,8 @@ public class Instantiator implements INetworkTransformation {
 			}
 
 			// check port types match
-			IType srcType = srcPort.getType();
-			IType dstType = dstPort.getType();
+			Type srcType = srcPort.getType();
+			Type dstType = dstPort.getType();
 			if (!srcType.equals(dstType)) {
 				throw new OrccException("Type error: " + source.getActor()
 						+ "." + srcPort + " is " + srcType + ", "

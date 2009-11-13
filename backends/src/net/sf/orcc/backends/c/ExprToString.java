@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.c;
 
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -95,7 +95,7 @@ public class ExprToString implements ExprVisitor {
 	 *            an expression
 	 * @return the string representation of the given expression
 	 */
-	public String toString(IExpr expr) {
+	public String toString(Expression expr) {
 		builder = new StringBuilder();
 
 		// parent precedence is the highest possible to prevent top-level binary

@@ -36,9 +36,9 @@ import java.util.Map;
 import net.sf.orcc.backends.c.CActorPrinter;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.INode;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -74,7 +74,7 @@ public class CppActorPrinter extends CActorPrinter {
 		procTmpl.setAttribute("name", proc.getName());
 
 		// return type
-		IType type = proc.getReturnType();
+		Type type = proc.getReturnType();
 		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters
@@ -96,7 +96,7 @@ public class CppActorPrinter extends CActorPrinter {
 		// body
 		NodePrinterTemplate printer = new CppNodePrinter(group, procTmpl,
 				actorName, varDefPrinter, exprPrinter);
-		for (INode node : proc.getNodes()) {
+		for (CFGNode node : proc.getNodes()) {
 			node.accept(printer);
 		}
 		return procTmpl;

@@ -17,8 +17,8 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.Util;
 
 /*
@@ -91,7 +91,7 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter{
 			Instance source = graph.getEdgeSource(connection);
 			Instance target = graph.getEdgeTarget(connection);
 
-			IType type;
+			Type type;
 			if (source.isBroadcast()) {
 				type = connection.getTarget().getType();
 			} else {
@@ -104,7 +104,7 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter{
 			if(customBuffersSize.containsKey(source.getId() + "_" + connection.getSource().getName()))
 				size = customBuffersSize.get(source.getId() + "_" + connection.getSource().getName());
 			else if (attr != null && attr.getType() == IAttribute.VALUE) {
-				IExpr expr = ((IValueAttribute) attr).getValue();
+				Expression expr = ((IValueAttribute) attr).getValue();
 				size = Integer.toString(Util.evaluateAsInteger(expr)+1);
 			} else {
 				size = "SIZE";
@@ -140,7 +140,7 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter{
 				Broadcast bcast = (Broadcast) instance;
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("id", bcast.getId());
-				IType type = bcast.getType();
+				Type type = bcast.getType();
 				attrs.put("type", typeVisitor.toString(type));
 
 				List<Integer> num = new ArrayList<Integer>();

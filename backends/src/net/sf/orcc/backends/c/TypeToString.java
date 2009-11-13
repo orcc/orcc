@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.c;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -50,7 +50,7 @@ public class TypeToString implements TypeVisitor {
 
 	protected StringBuilder builder;
 
-	protected void printInt(IExpr expr) {
+	protected void printInt(Expression expr) {
 		try {
 			int size = Util.evaluateAsInteger(expr);
 
@@ -73,9 +73,9 @@ public class TypeToString implements TypeVisitor {
 	 * given type. Returns the text representation.
 	 * 
 	 * @param type
-	 *            An {@link IType}.
+	 *            An {@link Type}.
 	 */
-	public String toString(IType type) {
+	public String toString(Type type) {
 		builder = new StringBuilder();
 		type.accept(this);
 		return builder.toString();

@@ -29,13 +29,13 @@
 package net.sf.orcc.ir.transforms;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.Util;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.BoolType;
@@ -49,8 +49,8 @@ import net.sf.orcc.ir.type.IntType;
  */
 public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 
-	public IType checkType(BinaryExpr expr, Object... args) {
-		IType type;
+	public Type checkType(BinaryExpr expr, Object... args) {
+		Type type;
 
 		if ((expr.getOp() == BinaryOp.EQ) || (expr.getOp() == BinaryOp.GE)
 				|| (expr.getOp() == BinaryOp.GT)
@@ -58,11 +58,11 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 				|| (expr.getOp() == BinaryOp.LT)
 				|| (expr.getOp() == BinaryOp.NE)) {
 			type = new BoolType();
-		} else if ((expr.getE1().getType() == IExpr.VAR)
-				&& (expr.getE2().getType() == IExpr.VAR)) {
-			IType typeE1 = ((VarExpr) expr.getE1()).getVar().getVariable()
+		} else if ((expr.getE1().getType() == Expression.VAR)
+				&& (expr.getE2().getType() == Expression.VAR)) {
+			Type typeE1 = ((VarExpr) expr.getE1()).getVar().getVariable()
 					.getType();
-			IType typeE2 = ((VarExpr) expr.getE1()).getVar().getVariable()
+			Type typeE2 = ((VarExpr) expr.getE1()).getVar().getVariable()
 					.getType();
 
 			if (sizeOf(typeE1) > sizeOf(typeE2)) {
@@ -71,9 +71,9 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 				type = typeE2;
 			}
 
-		} else if (expr.getE1().getType() == IExpr.VAR) {
+		} else if (expr.getE1().getType() == Expression.VAR) {
 			type = ((VarExpr) expr.getE1()).getVar().getVariable().getType();
-		} else if (expr.getE2().getType() == IExpr.VAR) {
+		} else if (expr.getE2().getType() == Expression.VAR) {
 			type = ((VarExpr) expr.getE2()).getVar().getVariable().getType();
 		} else {
 			type = expr.getUnderlyingType();
@@ -82,17 +82,17 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 		return type;
 	}
 
-	private int sizeOf(IType type) {
+	private int sizeOf(Type type) {
 		int size = 0;
 
-		if (type.getType() == IType.INT) {
+		if (type.getType() == Type.INT) {
 			try {
 				return Util.evaluateAsInteger(((IntType) type).getSize());
 			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;
 			}
-		} else if (type.getType() == IType.BOOLEAN) {
+		} else if (type.getType() == Type.BOOLEAN) {
 			size = 1;
 		}
 
@@ -100,12 +100,12 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(AssignVarNode node, Object... args) {
-		IExpr value = node.getValue();
+	public void visit(Assign node, Object... args) {
+		Expression value = node.getValue();
 
-		if (value.getType() == IExpr.BINARY) {
+		if (value.getType() == Expression.BINARY) {
 			BinaryExpr expr = (BinaryExpr) value;
-			IType type = checkType(expr);
+			Type type = checkType(expr);
 			expr.setType(type);
 			node.getTarget().setType(type);
 		}

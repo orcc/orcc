@@ -34,11 +34,11 @@ import java.util.Map;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.nodes.AbstractFifoNode;
+import net.sf.orcc.ir.instructions.AbstractFifo;
 
 /**
  * 
@@ -68,7 +68,7 @@ public class LLVMVarDefPrinter {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
 		varDefMap.put("name", getVarDefName(varDef, false));
 
-		IType type;
+		Type type;
 
 		if (varDef.getType().getType() == LLVMAbstractType.POINT) {
 			PointType iType = (PointType) varDef.getType();
@@ -82,8 +82,8 @@ public class LLVMVarDefPrinter {
 
 		boolean isPort = false;
 		for (Use use : varDef.getUses()) {
-			if (use.getNode() instanceof AbstractFifoNode) {
-				AbstractFifoNode fifoNode = (AbstractFifoNode) use.getNode();
+			if (use.getNode() instanceof AbstractFifo) {
+				AbstractFifo fifoNode = (AbstractFifo) use.getNode();
 				if (fifoNode.getPort().getName().equals(varDef.getName())) {
 					isPort = true;
 					break;

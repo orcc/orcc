@@ -30,10 +30,10 @@ package net.sf.orcc.ir.transforms;
 
 import java.util.Iterator;
 
-import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.StateVariable;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -42,7 +42,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadGlobalElimination implements IActorTransformation {
+public class DeadGlobalElimination implements ActorTransformation {
 
 	@Override
 	public void transform(Actor actor) {

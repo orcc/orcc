@@ -32,18 +32,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IActorTransformation;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.InitPort;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.InitPortNode;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
 
@@ -53,7 +53,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Jérôme Gorin
  * 
  */
-public class AddInstantationProcedure implements IActorTransformation {
+public class AddInstantationProcedure implements ActorTransformation {
 
 	private String actorName;
 
@@ -66,7 +66,7 @@ public class AddInstantationProcedure implements IActorTransformation {
 		Location location = new Location();
 
 		BlockNode block = new BlockNode(location);
-		List<INode> nodes = new ArrayList<INode>();
+		List<CFGNode> nodes = new ArrayList<CFGNode>();
 		nodes.add(block);
 
 		LocalVariable parameter = new LocalVariable(false, 0, location, "fifo",
@@ -77,8 +77,8 @@ public class AddInstantationProcedure implements IActorTransformation {
 			Use varUse = new Use(parameter);
 			VarExpr expr = new VarExpr(new Location(), varUse);
 
-			InitPortNode node = new InitPortNode(null, new Location(), port
-					.getName(), 0, expr);
+			InitPort node = new InitPort(null, new Location(), port.getName(),
+					0, expr);
 
 			block.add(node);
 		}

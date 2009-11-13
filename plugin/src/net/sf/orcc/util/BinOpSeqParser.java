@@ -31,7 +31,7 @@ package net.sf.orcc.util;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -65,18 +65,18 @@ public class BinOpSeqParser {
 	 * @return an expression
 	 * @throws OrccException
 	 */
-	private static IExpr createPrecedenceTree(List<IExpr> expressions,
-			List<BinaryOp> operators, int startIndex, int stopIndex)
-			throws OrccException {
+	private static Expression createPrecedenceTree(
+			List<Expression> expressions, List<BinaryOp> operators,
+			int startIndex, int stopIndex) throws OrccException {
 		if (stopIndex == startIndex) {
 			return expressions.get(startIndex);
 		}
 
 		int pivot = findPivot(operators, startIndex, stopIndex - 1);
 		BinaryOp op = operators.get(pivot);
-		IExpr e1 = createPrecedenceTree(expressions, operators, startIndex,
-				pivot);
-		IExpr e2 = createPrecedenceTree(expressions, operators, pivot + 1,
+		Expression e1 = createPrecedenceTree(expressions, operators,
+				startIndex, pivot);
+		Expression e2 = createPrecedenceTree(expressions, operators, pivot + 1,
 				stopIndex);
 		Location location = new Location(e1.getLocation(), e2.getLocation());
 
@@ -126,8 +126,8 @@ public class BinOpSeqParser {
 	 * @return a binary expression tree
 	 * @throws OrccException
 	 */
-	public static IExpr parse(List<IExpr> expressions, List<BinaryOp> operators)
-			throws OrccException {
+	public static Expression parse(List<Expression> expressions,
+			List<BinaryOp> operators) throws OrccException {
 		return createPrecedenceTree(expressions, operators, 0, expressions
 				.size() - 1);
 	}

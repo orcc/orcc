@@ -32,14 +32,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.IInstruction;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.ReadEndNode;
-import net.sf.orcc.ir.nodes.ReadNode;
-import net.sf.orcc.ir.nodes.WriteEndNode;
-import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.nodes.WriteBegin;
+import net.sf.orcc.ir.nodes.WriteEnd;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -50,38 +50,38 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 
-	private List<IInstruction> readEnds;
+	private List<Instruction> readEnds;
 
-	private List<IInstruction> writes;
+	private List<Instruction> writes;
 
 	public MoveReadsWritesTransformation() {
-		writes = new ArrayList<IInstruction>();
-		readEnds = new ArrayList<IInstruction>();
+		writes = new ArrayList<Instruction>();
+		readEnds = new ArrayList<Instruction>();
 	}
 
 	@Override
-	public void visit(ReadNode node, Object... args) {
-		readEnds.add(new ReadEndNode(node));
+	public void visit(ReadBegin node, Object... args) {
+		readEnds.add(new ReadEnd(node));
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void visit(WriteNode node, Object... args) {
-		ListIterator<IInstruction> it = (ListIterator<IInstruction>) args[0];
+	public void visit(WriteBegin node, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		writes.add(node);
-		it.set(new WriteEndNode(node));
+		it.set(new WriteEnd(node));
 	}
-	
+
 	@Override
 	protected void visitProcedure(Procedure procedure) {
 		super.visitProcedure(procedure);
-		
-		List<INode> nodes = procedure.getNodes();
-		
+
+		List<CFGNode> nodes = procedure.getNodes();
+
 		// add writes at the beginning of the node list, and read at the ends
 		BlockNode.first(nodes).addAll(0, writes);
 		BlockNode.last(nodes).addAll(readEnds);
-		
+
 		// clears the lists
 		writes.clear();
 		readEnds.clear();

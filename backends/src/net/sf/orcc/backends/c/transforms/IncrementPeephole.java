@@ -34,8 +34,8 @@ import java.util.ListIterator;
 import net.sf.orcc.backends.c.nodes.DecrementNode;
 import net.sf.orcc.backends.c.nodes.IncrementNode;
 import net.sf.orcc.backends.c.nodes.SelfAssignment;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
@@ -43,8 +43,8 @@ import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.LoadNode;
-import net.sf.orcc.ir.nodes.StoreNode;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
@@ -56,27 +56,27 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class IncrementPeephole extends AbstractActorTransformation {
 
-	private void examine(ListIterator<INode> it) {
-		INode node1 = it.next();
+	private void examine(ListIterator<CFGNode> it) {
+		CFGNode node1 = it.next();
 		if (it.hasNext()) {
-			INode node2 = it.next();
+			CFGNode node2 = it.next();
 			boolean res = false;
 
-			if (node1 instanceof LoadNode && node2 instanceof StoreNode) {
-				LoadNode load = (LoadNode) node1;
-				StoreNode store = (StoreNode) node2;
+			if (node1 instanceof Load && node2 instanceof Store) {
+				Load load = (Load) node1;
+				Store store = (Store) node2;
 				Variable varDef = load.getSource().getVariable();
 				LocalVariable varDefTmp = load.getTarget();
 				if (varDef == store.getTarget().getVariable()
 						&& load.getIndexes().isEmpty()) {
-					IExpr expr = store.getValue();
-					if (expr.getType() == IExpr.BINARY) {
+					Expression expr = store.getValue();
+					if (expr.getType() == Expression.BINARY) {
 						BinaryExpr binExpr = (BinaryExpr) expr;
 						BinaryOp op = binExpr.getOp();
-						IExpr e1 = binExpr.getE1();
-						IExpr e2 = binExpr.getE2();
+						Expression e1 = binExpr.getE1();
+						Expression e2 = binExpr.getE2();
 
-						if (e1.getType() == IExpr.VAR) {
+						if (e1.getType() == Expression.VAR) {
 							VarExpr v1 = (VarExpr) e1;
 							if (v1.getVar().getVariable() == varDefTmp) {
 								res = replaceSelfAssignment(procedure
@@ -97,13 +97,13 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	}
 
 	private boolean replaceSelfAssignment(OrderedMap<Variable> locals,
-			ListIterator<INode> it, LocalVariable varDefTmp, Variable varDef,
-			VarExpr v1, BinaryOp op, IExpr e2) {
-		INode node;
-		if (op == BinaryOp.PLUS && e2.getType() == IExpr.INT
+			ListIterator<CFGNode> it, LocalVariable varDefTmp, Variable varDef,
+			VarExpr v1, BinaryOp op, Expression e2) {
+		CFGNode node;
+		if (op == BinaryOp.PLUS && e2.getType() == Expression.INT
 				&& ((IntExpr) e2).getValue() == 1) {
 			node = new IncrementNode(0, new Location(), varDef);
-		} else if (op == BinaryOp.MINUS && e2.getType() == IExpr.INT
+		} else if (op == BinaryOp.MINUS && e2.getType() == Expression.INT
 				&& ((IntExpr) e2).getValue() == 1) {
 			node = new DecrementNode(0, new Location(), varDef);
 		} else if (op == BinaryOp.BITAND || op == BinaryOp.BITOR
@@ -130,8 +130,8 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	}
 
 	@Override
-	protected void visit(List<INode> nodes) {
-		ListIterator<INode> it = nodes.listIterator();
+	protected void visit(List<CFGNode> nodes) {
+		ListIterator<CFGNode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			examine(it);
 		}

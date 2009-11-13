@@ -31,8 +31,8 @@ package net.sf.orcc.backends.llvm.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.nodes.IfNode;
 
@@ -42,11 +42,11 @@ import net.sf.orcc.ir.nodes.IfNode;
  */
 public class BrNode extends AbstractLLVMNode {
 
-	private IExpr condition;
+	private Expression condition;
 
-	private List<INode> conditionNodes;
+	private List<CFGNode> conditionNodes;
 
-	private List<INode> elseNodes;
+	private List<CFGNode> elseNodes;
 
 	private LabelNode labelEndNode;
 
@@ -58,13 +58,13 @@ public class BrNode extends AbstractLLVMNode {
 
 	private List<PhiNode> phiNodes;
 
-	private List<INode> thenNodes;
+	private List<CFGNode> thenNodes;
 
 	public BrNode(IfNode node, List<PhiNode> phiNodes,
 			LabelNode labelEntryNode, LabelNode labelTrueNode,
 			LabelNode labelFalseNode, LabelNode labelEndNode) {
 		super(null, node.getLocation());
-		this.conditionNodes = new ArrayList<INode>();
+		this.conditionNodes = new ArrayList<CFGNode>();
 		this.condition = node.getValue();
 		this.elseNodes = node.getElseNodes();
 		this.thenNodes = node.getThenNodes();
@@ -75,9 +75,9 @@ public class BrNode extends AbstractLLVMNode {
 		this.phiNodes = phiNodes;
 	}
 
-	public BrNode(Location location, IExpr condition,
-			List<INode> conditionNodes, List<INode> thenNodes,
-			List<INode> elseNodes, List<PhiNode> phiNodes,
+	public BrNode(Location location, Expression condition,
+			List<CFGNode> conditionNodes, List<CFGNode> thenNodes,
+			List<CFGNode> elseNodes, List<PhiNode> phiNodes,
 			LabelNode labelEntryNode, LabelNode labelTrueNode,
 			LabelNode labelFalseNode, LabelNode labelEndNode) {
 		super(null, location);
@@ -98,15 +98,15 @@ public class BrNode extends AbstractLLVMNode {
 		visitor.visit(this, args);
 	}
 
-	public IExpr getCondition() {
+	public Expression getCondition() {
 		return condition;
 	}
 
-	public List<INode> getConditionNodes() {
+	public List<CFGNode> getConditionNodes() {
 		return conditionNodes;
 	}
 
-	public List<INode> getElseNodes() {
+	public List<CFGNode> getElseNodes() {
 		return elseNodes;
 	}
 
@@ -130,19 +130,19 @@ public class BrNode extends AbstractLLVMNode {
 		return phiNodes;
 	}
 
-	public List<INode> getThenNodes() {
+	public List<CFGNode> getThenNodes() {
 		return thenNodes;
 	}
 
-	public void setCondition(IExpr condition) {
+	public void setCondition(Expression condition) {
 		this.condition = condition;
 	}
 
-	public void setConditionNodes(List<INode> conditionNodes) {
+	public void setConditionNodes(List<CFGNode> conditionNodes) {
 		this.conditionNodes = conditionNodes;
 	}
 
-	public void setElseNodes(List<INode> elseNodes) {
+	public void setElseNodes(List<CFGNode> elseNodes) {
 		this.elseNodes = elseNodes;
 	}
 
@@ -166,7 +166,7 @@ public class BrNode extends AbstractLLVMNode {
 		this.phiNodes = phiNodes;
 	}
 
-	public void setThenNodes(List<INode> thenNodes) {
+	public void setThenNodes(List<CFGNode> thenNodes) {
 		this.thenNodes = thenNodes;
 	}
 

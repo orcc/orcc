@@ -30,18 +30,18 @@ package net.sf.orcc.ir.transforms;
 
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IInstruction;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.PhiAssignment;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
 
@@ -56,15 +56,15 @@ public class AssignPeephole extends AbstractActorTransformation {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void visit(AssignVarNode node, Object... args) {
-		ListIterator<INode> it = (ListIterator<INode>) args[0];
-		if ((node.getValue().getType() == IExpr.BOOLEAN)
-				|| (node.getValue().getType() == IExpr.INT)
-				|| (node.getValue().getType() == IExpr.STRING)) {
+	public void visit(Assign node, Object... args) {
+		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
+		if ((node.getValue().getType() == Expression.BOOLEAN)
+				|| (node.getValue().getType() == Expression.INT)
+				|| (node.getValue().getType() == Expression.STRING)) {
 			LocalVariable vardef = node.getTarget();
 			vardef.setConstant(node.getValue());
 			it.remove();
-		} else if (node.getValue().getType() == IExpr.VAR) {
+		} else if (node.getValue().getType() == Expression.VAR) {
 			VarExpr expr = (VarExpr) node.getValue();
 
 			// we can safely cast because in a VarExpr in an actor, only local
@@ -76,15 +76,8 @@ public class AssignPeephole extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
-		visit(node.getThenNodes());
-		visit(node.getElseNodes());
-		visit(node.getJoinNode(), args);
-	}
-
-	@Override
 	public void visit(BlockNode node, Object... args) {
-		for (IInstruction instruction : node) {
+		for (Instruction instruction : node) {
 			if (instruction instanceof PhiAssignment) {
 				PhiAssignment phi = (PhiAssignment) instruction;
 				LocalVariable source = (LocalVariable) phi.getVars().get(0)
@@ -102,6 +95,13 @@ public class AssignPeephole extends AbstractActorTransformation {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void visit(IfNode node, Object... args) {
+		visit(node.getThenNodes());
+		visit(node.getElseNodes());
+		visit(node.getJoinNode(), args);
 	}
 
 	@Override

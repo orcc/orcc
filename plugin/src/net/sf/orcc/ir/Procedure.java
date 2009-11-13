@@ -61,7 +61,7 @@ public class Procedure implements INameable {
 	 */
 	private String name;
 
-	private List<INode> nodes;
+	private List<CFGNode> nodes;
 
 	/**
 	 * ordered map of parameters
@@ -71,7 +71,7 @@ public class Procedure implements INameable {
 	/**
 	 * the return type of this procedure
 	 */
-	private IType returnType;
+	private Type returnType;
 
 	/**
 	 * Construcs a new procedure.
@@ -90,8 +90,8 @@ public class Procedure implements INameable {
 	 *            The procedure local variables.
 	 */
 	public Procedure(String name, boolean external, Location location,
-			IType returnType, OrderedMap<Variable> parameters,
-			OrderedMap<Variable> locals, List<INode> nodes) {
+			Type returnType, OrderedMap<Variable> parameters,
+			OrderedMap<Variable> locals, List<CFGNode> nodes) {
 		this.external = external;
 		this.nodes = nodes;
 		this.locals = locals;
@@ -119,7 +119,7 @@ public class Procedure implements INameable {
 		return NameTransformer.transform(name);
 	}
 
-	public List<INode> getNodes() {
+	public List<CFGNode> getNodes() {
 		return nodes;
 	}
 
@@ -127,7 +127,7 @@ public class Procedure implements INameable {
 		return parameters;
 	}
 
-	public IType getReturnType() {
+	public Type getReturnType() {
 		return returnType;
 	}
 
@@ -147,7 +147,7 @@ public class Procedure implements INameable {
 		this.name = name;
 	}
 
-	public void setReturnType(IType returnType) {
+	public void setReturnType(Type returnType) {
 		this.returnType = returnType;
 	}
 

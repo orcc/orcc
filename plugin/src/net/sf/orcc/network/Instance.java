@@ -36,8 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
@@ -89,7 +89,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	/**
 	 * the parameters of this instance
 	 */
-	private Map<String, IExpr> parameters;
+	private Map<String, Expression> parameters;
 
 	/**
 	 * the absolute path of the parent of the file this instance is defined in
@@ -106,7 +106,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @param parameters
 	 *            parameters of this instance
 	 */
-	protected Instance(String id, String clasz, Map<String, IExpr> parameters) {
+	protected Instance(String id, String clasz,
+			Map<String, Expression> parameters) {
 		this.attributes = new HashMap<String, IAttribute>();
 		this.clasz = clasz;
 		this.id = id;
@@ -131,8 +132,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @throws OrccException
 	 */
 	public Instance(String path, String id, String clasz,
-			Map<String, IExpr> parameters, Map<String, IAttribute> attributes)
-			throws OrccException {
+			Map<String, Expression> parameters,
+			Map<String, IAttribute> attributes) throws OrccException {
 		this.attributes = attributes;
 		this.id = id;
 		this.parameters = parameters;
@@ -220,7 +221,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * 
 	 * @return the parameters of this instance
 	 */
-	public Map<String, IExpr> getParameters() {
+	public Map<String, Expression> getParameters() {
 		return parameters;
 	}
 

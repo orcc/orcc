@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.c.nodes;
 
-import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.nodes.InstructionVisitor;
+import net.sf.orcc.ir.instructions.InitPort;
+import net.sf.orcc.ir.instructions.InstructionVisitor;
 
 /**
  * @author Matthieu Wipliez
@@ -41,7 +41,7 @@ public interface CNodeVisitor extends InstructionVisitor {
 
 	public void visit(IncrementNode node, Object... args);
 
-	public void visit(InitPortNode node, Object... args);
+	public void visit(InitPort node, Object... args);
 
 	public void visit(SelfAssignment node, Object... args);
 

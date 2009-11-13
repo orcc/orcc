@@ -46,17 +46,17 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.orcc.ir.IConst;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.ActionScheduler;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.FSM;
-import net.sf.orcc.ir.actor.StateVariable;
-import net.sf.orcc.ir.actor.FSM.NextStateInfo;
-import net.sf.orcc.ir.actor.FSM.Transition;
+import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.FSM.Transition;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -111,7 +111,7 @@ public class XlimActorPrinter {
 
 		XlimNodeVisitor visitor = new XlimNodeVisitor(names, actionE,
 				actionName);
-		for (INode nodes : action.getBody().getNodes()) {
+		for (CFGNode nodes : action.getBody().getNodes()) {
 			nodes.accept(visitor);
 		}
 	}
@@ -449,7 +449,7 @@ public class XlimActorPrinter {
 
 				Element init2 = XlimNodeTemplate.newInitValue(init);
 
-				IConst value = state.getInit();
+				Constant value = state.getInit();
 				if (value != null) {
 					value.accept(new XlimValueVisitor(init2, state.getType()));
 				} else {

@@ -30,7 +30,7 @@ package net.sf.orcc.ir.consts;
 
 import java.util.List;
 
-import net.sf.orcc.ir.IConst;
+import net.sf.orcc.ir.Constant;
 
 /**
  * This class defines a list constant.
@@ -38,9 +38,9 @@ import net.sf.orcc.ir.IConst;
  * @author Matthieu Wipliez
  * 
  */
-public class ListConst implements IConst {
+public class ListConst implements Constant {
 
-	private List<IConst> value;
+	private List<Constant> value;
 
 	/**
 	 * Creates a new list constant with the given value.
@@ -50,7 +50,7 @@ public class ListConst implements IConst {
 	 * @throws NullPointerException
 	 *             if value is <code>null</code>
 	 */
-	public ListConst(List<IConst> value) {
+	public ListConst(List<Constant> value) {
 		if (value == null) {
 			throw new NullPointerException();
 		}
@@ -73,7 +73,7 @@ public class ListConst implements IConst {
 	 * 
 	 * @return the value of this constant
 	 */
-	public List<IConst> getValue() {
+	public List<Constant> getValue() {
 		return value;
 	}
 

@@ -28,7 +28,8 @@
  */
 package net.sf.orcc.ir.nodes;
 
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.AbstractLocalizable;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -37,32 +38,22 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractNode implements INode {
+public abstract class AbstractNode extends AbstractLocalizable implements
+		CFGNode {
 
 	private int id;
 
-	private Location location;
-
 	protected AbstractNode(int id, Location location) {
+		super(location);
 		this.id = id;
-		this.location = location;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	@Override
-	public Location getLocation() {
-		return location;
-	}
-
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public void setLocation(Location location) {
-		this.location = location;
 	}
 
 }

@@ -37,10 +37,10 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
@@ -141,7 +141,7 @@ public class XDFWriter {
 		public void visit(ListExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "List");
-			for (IExpr childExpr : expr.getValue()) {
+			for (Expression childExpr : expr.getValue()) {
 				childExpr.accept(this, args[0]);
 			}
 		}
@@ -294,13 +294,13 @@ public class XDFWriter {
 			}
 			case IAttribute.TYPE: {
 				kind = ITypeAttribute.NAME;
-				IType type = ((ITypeAttribute) attribute).getValue();
+				Type type = ((ITypeAttribute) attribute).getValue();
 				attributeElt.appendChild(writeType(type));
 				break;
 			}
 			case IAttribute.VALUE: {
 				kind = IValueAttribute.NAME;
-				IExpr expr = ((IValueAttribute) attribute).getValue();
+				Expression expr = ((IValueAttribute) attribute).getValue();
 				writeExpr(attributeElt, expr);
 				break;
 			}
@@ -424,7 +424,8 @@ public class XDFWriter {
 	 * @return an Entry DOM parent
 	 * @throws OrccException
 	 */
-	private Element writeEntry(String name, IExpr expr) throws OrccException {
+	private Element writeEntry(String name, Expression expr)
+			throws OrccException {
 		Element entry = document.createElement("Entry");
 		entry.setAttribute("kind", "Expr");
 		entry.setAttribute("name", name);
@@ -442,7 +443,7 @@ public class XDFWriter {
 	 * @return an Entry DOM parent
 	 * @throws OrccException
 	 */
-	private Element writeEntry(String name, IType type) throws OrccException {
+	private Element writeEntry(String name, Type type) throws OrccException {
 		Element entry = document.createElement("Entry");
 		entry.setAttribute("kind", "Type");
 		entry.setAttribute("name", name);
@@ -461,7 +462,8 @@ public class XDFWriter {
 	 *            an expression
 	 * @throws OrccException
 	 */
-	private void writeExpr(Element parent, IExpr expr) throws OrccException {
+	private void writeExpr(Element parent, Expression expr)
+			throws OrccException {
 		expr.accept(new BinOpSeqWriter(), parent, Integer.MIN_VALUE);
 	}
 
@@ -483,7 +485,7 @@ public class XDFWriter {
 		instanceElt.appendChild(classElt);
 
 		// parameters
-		for (Entry<String, IExpr> parameter : instance.getParameters()
+		for (Entry<String, Expression> parameter : instance.getParameters()
 				.entrySet()) {
 			Element parameterElt = document.createElement("Parameter");
 			parameterElt.setAttribute("name", parameter.getKey());
@@ -529,37 +531,37 @@ public class XDFWriter {
 	 * @return a Type DOM parent
 	 * @throws OrccException
 	 */
-	private Element writeType(IType type) throws OrccException {
+	private Element writeType(Type type) throws OrccException {
 		Element typeElt = document.createElement("Type");
 
 		String name;
-		IExpr size;
+		Expression size;
 
 		switch (type.getType()) {
-		case IType.BOOLEAN:
+		case Type.BOOLEAN:
 			name = "bool";
 			break;
-		case IType.INT:
+		case Type.INT:
 			name = "int";
 			size = ((IntType) type).getSize();
 			typeElt.appendChild(writeEntry("size", size));
 			break;
-		case IType.LIST:
+		case Type.LIST:
 			name = "List";
 			size = ((ListType) type).getSize();
 			type = ((ListType) type).getElementType();
 			typeElt.appendChild(writeEntry("type", type));
 			typeElt.appendChild(writeEntry("size", size));
 			break;
-		case IType.STRING:
+		case Type.STRING:
 			name = "String";
 			break;
-		case IType.UINT:
+		case Type.UINT:
 			name = "uint";
 			size = ((UintType) type).getSize();
 			typeElt.appendChild(writeEntry("size", size));
 			break;
-		case IType.VOID:
+		case Type.VOID:
 			throw new OrccException("void type is invalid in XDF");
 		default:
 			throw new OrccException("unknown type");

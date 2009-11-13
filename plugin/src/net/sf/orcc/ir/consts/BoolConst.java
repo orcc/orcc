@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.consts;
 
-import net.sf.orcc.ir.IConst;
+import net.sf.orcc.ir.Constant;
 
 /**
  * This class defines a boolean constant.
@@ -36,7 +36,7 @@ import net.sf.orcc.ir.IConst;
  * @author Matthieu Wipliez
  * 
  */
-public class BoolConst implements IConst {
+public class BoolConst implements Constant {
 
 	private boolean value;
 

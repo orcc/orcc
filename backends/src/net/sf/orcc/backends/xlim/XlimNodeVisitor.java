@@ -32,29 +32,29 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.INode;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.nodes.AssignVarNode;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.InitPort;
+import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.ReadBegin;
+import net.sf.orcc.ir.instructions.ReadEnd;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.CallNode;
-import net.sf.orcc.ir.nodes.HasTokensNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.InitPortNode;
-import net.sf.orcc.ir.nodes.InstructionVisitor;
-import net.sf.orcc.ir.nodes.LoadNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.nodes.PeekNode;
-import net.sf.orcc.ir.nodes.PhiAssignment;
-import net.sf.orcc.ir.nodes.ReadEndNode;
-import net.sf.orcc.ir.nodes.ReadNode;
-import net.sf.orcc.ir.nodes.ReturnNode;
-import net.sf.orcc.ir.nodes.StoreNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.nodes.WriteEndNode;
-import net.sf.orcc.ir.nodes.WriteNode;
+import net.sf.orcc.ir.nodes.WriteBegin;
+import net.sf.orcc.ir.nodes.WriteEnd;
 
 import org.w3c.dom.Element;
 
@@ -116,7 +116,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(AssignVarNode node, Object... args) {
+	public void visit(Assign node, Object... args) {
 		node.getValue().accept(new XlimExprVisitor(names, root));
 		Element operationE = XlimNodeTemplate.newTargetOperation(root,
 				"assign", names.getVarName(node.getTarget()));
@@ -137,19 +137,19 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(CallNode node, Object... args) {
+	public void visit(Call node, Object... args) {
 		Map<String, String> params = new TreeMap<String, String>();
 		Iterator<Variable> it = node.getProcedure().getParameters().getList()
 				.iterator();
 
-		for (IExpr param : node.getParameters()) {
+		for (Expression param : node.getParameters()) {
 			param.accept(new XlimExprVisitor(names, root));
 			params.put(it.next().getName(), names.getTempName());
 		}
 
 		XlimNames newname = new XlimNames(names, params);
 		XlimNodeVisitor visitor = new XlimNodeVisitor(newname, root, actionName);
-		for (INode nodei : node.getProcedure().getNodes()) {
+		for (CFGNode nodei : node.getProcedure().getNodes()) {
 			nodei.accept(visitor);
 		}
 
@@ -170,7 +170,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(HasTokensNode node, Object... args) {
+	public void visit(HasTokens node, Object... args) {
 		System.out.println("CHECK HASTOKEN");
 		// TODO I don't know
 
@@ -203,13 +203,13 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 
 		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
 				actionName);
-		for (INode operations : node.getThenNodes()) {
+		for (CFGNode operations : node.getThenNodes()) {
 			operations.accept(visitor);
 		}
 
 		Element moduleN = XlimNodeTemplate.newModule(moduleB, "else");
 
-		for (INode operations : node.getElseNodes()) {
+		for (CFGNode operations : node.getElseNodes()) {
 			operations.accept(new XlimNodeVisitor(names, moduleN, actionName));
 		}
 
@@ -226,7 +226,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(InitPortNode node, Object... args) {
+	public void visit(InitPort node, Object... args) {
 		System.out.println("CHECK INIT PORT");
 		// TODO Let's see when it happens
 
@@ -240,14 +240,14 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(LoadNode node, Object... args) {
+	public void visit(Load node, Object... args) {
 		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 
 		String name = names.getVarName(node.getSource());
 		XlimNodeTemplate.newInPort(operationE, name);
 
 		LocalVariable local = node.getTarget();
-		IType outtype = node.getTarget().getType();
+		Type outtype = node.getTarget().getType();
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local),
 				outtype);
 
@@ -264,7 +264,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(PeekNode node, Object... args) {
+	public void visit(Peek node, Object... args) {
 		System.out.println("CHECK PEEK");
 		// TODO Auto-generated method stub
 
@@ -286,19 +286,6 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	}
 
 	/**
-	 * Add read end node
-	 * 
-	 * @param node
-	 *            Read end node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(ReadEndNode node, Object... args) {
-		// TODO Auto-generated method stub
-		System.out.println("READ END");
-	}
-
-	/**
 	 * Add read node
 	 * 
 	 * @param node
@@ -306,7 +293,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(ReadNode node, Object... args) {
+	public void visit(ReadBegin node, Object... args) {
 		Element operationE = XlimNodeTemplate.newPortOperation(root, "pinRead",
 				node.getPort().getName());
 		operationE.setAttribute("removable", "no");
@@ -318,6 +305,19 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	}
 
 	/**
+	 * Add read end node
+	 * 
+	 * @param node
+	 *            Read end node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(ReadEnd node, Object... args) {
+		// TODO Auto-generated method stub
+		System.out.println("READ END");
+	}
+
+	/**
 	 * Add return node
 	 * 
 	 * @param node
@@ -325,7 +325,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(ReturnNode node, Object... args) {
+	public void visit(Return node, Object... args) {
 		node.getValue().accept(new XlimExprVisitor(names, root));
 
 		System.out.println("CHECK RETURN");
@@ -341,7 +341,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(StoreNode node, Object... args) {
+	public void visit(Store node, Object... args) {
 		node.getValue().accept(new XlimExprVisitor(names, root));
 
 		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
@@ -382,25 +382,12 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 
 		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
 				actionName);
-		for (INode operations : node.getNodes()) {
+		for (CFGNode operations : node.getNodes()) {
 			operations.accept(visitor);
 		}
 
 		node.getJoinNode().accept(
 				new XlimNodeVisitor(names, moduleB, actionName));
-	}
-
-	/**
-	 * Add write end node
-	 * 
-	 * @param node
-	 *            Write end node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(WriteEndNode node, Object... args) {
-		// TODO Auto-generated method stub.
-		System.out.println("WRITE END");
 	}
 
 	/**
@@ -411,7 +398,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(WriteNode node, Object... args) {
+	public void visit(WriteBegin node, Object... args) {
 		Element operationE = XlimNodeTemplate.newPortOperation(root,
 				"pinWrite", node.getPort().getName());
 		operationE.setAttribute("style", "simple");
@@ -420,5 +407,18 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 
 		node.getPort().getType().accept(
 				new XlimTypeSizeVisitor(writeMap.get(name)));
+	}
+
+	/**
+	 * Add write end node
+	 * 
+	 * @param node
+	 *            Write end node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
+	public void visit(WriteEnd node, Object... args) {
+		// TODO Auto-generated method stub.
+		System.out.println("WRITE END");
 	}
 }

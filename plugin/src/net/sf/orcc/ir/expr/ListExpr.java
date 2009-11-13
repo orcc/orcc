@@ -31,18 +31,19 @@ package net.sf.orcc.ir.expr;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.AbstractLocalizable;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 
 /**
  * @author Matthieu Wipliez
  * 
  */
-public class ListExpr extends AbstractExpr {
+public class ListExpr extends AbstractLocalizable implements Expression {
 
-	private List<IExpr> value;
+	private List<Expression> value;
 
-	public ListExpr(Location location, List<IExpr> value) {
+	public ListExpr(Location location, List<Expression> value) {
 		super(location);
 		this.value = value;
 	}
@@ -53,7 +54,7 @@ public class ListExpr extends AbstractExpr {
 	}
 
 	@Override
-	public IExpr evaluate() throws OrccException {
+	public Expression evaluate() throws OrccException {
 		throw new OrccException("could not evaluate");
 	}
 
@@ -62,7 +63,7 @@ public class ListExpr extends AbstractExpr {
 		return LIST;
 	}
 
-	public List<IExpr> getValue() {
+	public List<Expression> getValue() {
 		return value;
 	}
 

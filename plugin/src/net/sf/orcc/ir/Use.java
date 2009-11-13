@@ -108,7 +108,7 @@ public class Use {
 	 * @param value
 	 *            an expression
 	 */
-	public static void addUses(User node, IExpr value) {
+	public static void addUses(User node, Expression value) {
 		value.accept(new UseAdder(node));
 	}
 
@@ -121,8 +121,8 @@ public class Use {
 	 * @param values
 	 *            a list of expressions
 	 */
-	public static void addUses(User node, List<IExpr> values) {
-		for (IExpr value : values) {
+	public static void addUses(User node, List<Expression> values) {
+		for (Expression value : values) {
 			addUses(node, value);
 		}
 	}
@@ -136,7 +136,7 @@ public class Use {
 	 * @param value
 	 *            an expression
 	 */
-	public static void removeUses(User node, IExpr value) {
+	public static void removeUses(User node, Expression value) {
 		value.accept(new UseRemover(node));
 	}
 
@@ -149,8 +149,8 @@ public class Use {
 	 * @param values
 	 *            a list of expressions
 	 */
-	public static void removeUses(User node, List<IExpr> values) {
-		for (IExpr value : values) {
+	public static void removeUses(User node, List<Expression> values) {
+		for (Expression value : values) {
 			removeUses(node, value);
 		}
 	}

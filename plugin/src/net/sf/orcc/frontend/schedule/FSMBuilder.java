@@ -41,9 +41,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.FSM;
-import net.sf.orcc.ir.actor.Tag;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 
 import org.antlr.runtime.tree.Tree;

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.type;
 
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
@@ -39,9 +39,9 @@ public class PointType extends LLVMAbstractType {
 
 	public static final String NAME = "i*";
 
-	private IType type;
+	private Type type;
 
-	public PointType(IType type) {
+	public PointType(Type type) {
 		super(NAME);
 		this.type = type;
 	}
@@ -54,7 +54,7 @@ public class PointType extends LLVMAbstractType {
 		((LLVMTypeVisitor) visitor).visit(this);
 	}
 
-	public IType getElementType() {
+	public Type getElementType() {
 		return type;
 	}
 
@@ -63,7 +63,7 @@ public class PointType extends LLVMAbstractType {
 		return POINT;
 	}
 
-	public void setType(IType type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 

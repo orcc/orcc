@@ -34,9 +34,9 @@ import java.io.IOException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
-import net.sf.orcc.ir.IActorTransformation;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
-import net.sf.orcc.ir.actor.Actor;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 
@@ -91,10 +91,10 @@ public class CppBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		IActorTransformation[] transformations = { new PhiRemoval(),
+		ActorTransformation[] transformations = { new PhiRemoval(),
 				new IncrementPeephole() };
 
-		for (IActorTransformation transformation : transformations) {
+		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
 

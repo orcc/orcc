@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.network.attributes;
 
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 
 /**
  * This interface represents an attribute whose value is an expression.
@@ -48,6 +48,6 @@ public interface IValueAttribute extends IAttribute {
 	 * 
 	 * @return the expression of this attribute
 	 */
-	public IExpr getValue();
+	public Expression getValue();
 
 }

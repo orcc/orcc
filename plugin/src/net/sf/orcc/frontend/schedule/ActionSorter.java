@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Tag;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 
 import org.jgrapht.DirectedGraph;

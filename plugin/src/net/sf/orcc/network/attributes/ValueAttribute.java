@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.network.attributes;
 
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 
 /**
  * This class is the implementation of {@link IValueAttribute}.
@@ -41,15 +41,15 @@ public class ValueAttribute implements IValueAttribute {
 	/**
 	 * the value of this attribute
 	 */
-	private IExpr value;
+	private Expression value;
 
 	/**
 	 * Creates a new expr attribute with the given value.
 	 * 
 	 * @param value
-	 *            an {@link IExpr} that represents this value
+	 *            an {@link Expression} that represents this value
 	 */
-	public ValueAttribute(IExpr value) {
+	public ValueAttribute(Expression value) {
 		this.value = value;
 	}
 
@@ -59,7 +59,7 @@ public class ValueAttribute implements IValueAttribute {
 	}
 
 	@Override
-	public IExpr getValue() {
+	public Expression getValue() {
 		return value;
 	}
 

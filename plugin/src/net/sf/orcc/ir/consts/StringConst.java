@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir.consts;
 
-import net.sf.orcc.ir.IConst;
+import net.sf.orcc.ir.Constant;
 
 /**
  * This class defines a string constant.
@@ -36,7 +36,7 @@ import net.sf.orcc.ir.IConst;
  * @author Matthieu Wipliez
  * 
  */
-public class StringConst implements IConst {
+public class StringConst implements Constant {
 
 	private String value;
 

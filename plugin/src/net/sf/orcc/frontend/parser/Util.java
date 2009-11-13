@@ -29,7 +29,7 @@
 package net.sf.orcc.frontend.parser;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.actor.Tag;
+import net.sf.orcc.ir.Tag;
 
 import org.antlr.runtime.tree.Tree;
 

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.network.attributes;
 
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Type;
 
 /**
  * This class is the implementation of {@link ITypeAttribute}.
@@ -41,15 +41,15 @@ public class TypeAttribute implements ITypeAttribute {
 	/**
 	 * the value of this attribute
 	 */
-	private IType type;
+	private Type type;
 
 	/**
 	 * Creates a new type attribute with the given type.
 	 * 
 	 * @param type
-	 *            the {@link IType} of this attribute
+	 *            the {@link Type} of this attribute
 	 */
-	public TypeAttribute(IType type) {
+	public TypeAttribute(Type type) {
 		this.type = type;
 	}
 
@@ -59,7 +59,7 @@ public class TypeAttribute implements ITypeAttribute {
 	}
 
 	@Override
-	public IType getValue() {
+	public Type getValue() {
 		return type;
 	}
 

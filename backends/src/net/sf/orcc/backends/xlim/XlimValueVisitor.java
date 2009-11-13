@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends.xlim;
 
-import net.sf.orcc.ir.IConst;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ConstVisitor;
 import net.sf.orcc.ir.consts.IntConst;
@@ -50,11 +50,11 @@ public class XlimValueVisitor implements ConstVisitor {
 	 * Element to modify
 	 */
 	private Element element;
-	
+
 	/**
 	 * Type of Value
 	 */
-	private IType type;
+	private Type type;
 
 	/**
 	 * XlimValueVisitor constructor with element and document initialization
@@ -64,7 +64,7 @@ public class XlimValueVisitor implements ConstVisitor {
 	 * @param type
 	 *            Type of Value
 	 */
-	XlimValueVisitor(Element element, IType type) {
+	XlimValueVisitor(Element element, Type type) {
 		this.element = element;
 		this.type = type;
 	}
@@ -105,9 +105,10 @@ public class XlimValueVisitor implements ConstVisitor {
 	 */
 	public void visit(ListConst constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		for(IConst value : constant.getValue()){ 
-			 Element sub = XlimNodeTemplate.newInitValue(element);
-			 value.accept(new XlimValueVisitor(sub,((ListType)type).getElementType()));
+		for (Constant value : constant.getValue()) {
+			Element sub = XlimNodeTemplate.newInitValue(element);
+			value.accept(new XlimValueVisitor(sub, ((ListType) type)
+					.getElementType()));
 		}
 	}
 

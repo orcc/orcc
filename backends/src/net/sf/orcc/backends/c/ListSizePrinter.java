@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.AbstractTypeVisitor;
 import net.sf.orcc.ir.type.ListType;
@@ -60,8 +60,8 @@ public class ListSizePrinter extends AbstractTypeVisitor {
 
 	public void visit(ListType type) {
 		try {
-			IExpr expr = type.getSize().evaluate();
-			if (expr.getType() == IExpr.INT) {
+			Expression expr = type.getSize().evaluate();
+			if (expr.getType() == Expression.INT) {
 				sizeList.add(((IntExpr) expr).getValue());
 				type.getElementType().accept(this);
 			} else {

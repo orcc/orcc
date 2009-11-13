@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Tag;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Tag;
 
 /**
  * A list of action is like an ordered map, except keys are tags (list of

@@ -49,7 +49,7 @@ public class LocalVariable extends Variable implements
 	 */
 	private boolean constant;
 
-	private IExpr constantExpr;
+	private Expression constantExpr;
 
 	/**
 	 * if the variable is local, index for SSA. Meaningless otherwise.
@@ -59,7 +59,7 @@ public class LocalVariable extends Variable implements
 	/**
 	 * the node where the variable is assigned.
 	 */
-	private IInstruction node;
+	private Instruction node;
 
 	/**
 	 * when local variables have the same name but different scopes.
@@ -67,7 +67,7 @@ public class LocalVariable extends Variable implements
 	private Integer suffix;
 
 	public LocalVariable(boolean assignable, int index, Location loc,
-			String name, IInstruction node, Integer suffix, IType type) {
+			String name, Instruction node, Integer suffix, Type type) {
 		super(loc, type, name, false);
 		this.assignable = assignable;
 		this.index = index;
@@ -106,7 +106,7 @@ public class LocalVariable extends Variable implements
 		return false;
 	}
 
-	public IExpr getConstant() {
+	public Expression getConstant() {
 		return constantExpr;
 	}
 
@@ -120,7 +120,7 @@ public class LocalVariable extends Variable implements
 		return super.getName() + (suffix == null ? "" : suffix) + indexStr;
 	}
 
-	public IInstruction getNode() {
+	public Instruction getNode() {
 		return node;
 	}
 
@@ -144,7 +144,7 @@ public class LocalVariable extends Variable implements
 		this.assignable = assignable;
 	}
 
-	public void setConstant(IExpr expr) {
+	public void setConstant(Expression expr) {
 		constantExpr = expr;
 		constant = true;
 	}
@@ -153,7 +153,7 @@ public class LocalVariable extends Variable implements
 		this.index = index;
 	}
 
-	public void setNode(IInstruction node) {
+	public void setNode(Instruction node) {
 		this.node = node;
 	}
 

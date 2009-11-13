@@ -31,8 +31,8 @@ package net.sf.orcc.ir.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.IInstruction;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -42,13 +42,49 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class BlockNode extends ArrayList<IInstruction> implements
-		Iterable<IInstruction>, INode {
+public class BlockNode extends ArrayList<Instruction> implements
+		Iterable<Instruction>, CFGNode {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+
+	public static BlockNode first(List<CFGNode> nodes) {
+		BlockNode block;
+		if (nodes.isEmpty()) {
+			block = new BlockNode();
+			nodes.add(block);
+		} else {
+			CFGNode node = nodes.get(0);
+			if (node instanceof BlockNode) {
+				block = (BlockNode) node;
+			} else {
+				block = new BlockNode();
+				nodes.add(0, block);
+			}
+		}
+
+		return block;
+	}
+
+	public static BlockNode last(List<CFGNode> nodes) {
+		BlockNode block;
+		if (nodes.isEmpty()) {
+			block = new BlockNode();
+			nodes.add(block);
+		} else {
+			CFGNode node = nodes.get(nodes.size() - 1);
+			if (node instanceof BlockNode) {
+				block = (BlockNode) node;
+			} else {
+				block = new BlockNode();
+				nodes.add(block);
+			}
+		}
+
+		return block;
+	}
 
 	private Location location;
 
@@ -69,42 +105,6 @@ public class BlockNode extends ArrayList<IInstruction> implements
 	@Override
 	public Location getLocation() {
 		return location;
-	}
-
-	public static BlockNode first(List<INode> nodes) {
-		BlockNode block;
-		if (nodes.isEmpty()) {
-			block = new BlockNode();
-			nodes.add(block);
-		} else {
-			INode node = nodes.get(0);
-			if (node instanceof BlockNode) {
-				block = (BlockNode) node;
-			} else {
-				block = new BlockNode();
-				nodes.add(0, block);
-			}
-		}
-
-		return block;
-	}
-
-	public static BlockNode last(List<INode> nodes) {
-		BlockNode block;
-		if (nodes.isEmpty()) {
-			block = new BlockNode();
-			nodes.add(block);
-		} else {
-			INode node = nodes.get(nodes.size() - 1);
-			if (node instanceof BlockNode) {
-				block = (BlockNode) node;
-			} else {
-				block = new BlockNode();
-				nodes.add(block);
-			}
-		}
-
-		return block;
 	}
 
 }

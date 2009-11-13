@@ -48,24 +48,24 @@ import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.IConst;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IInstruction;
-import net.sf.orcc.ir.INode;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Tag;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.ActionScheduler;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.FSM;
-import net.sf.orcc.ir.actor.StateVariable;
-import net.sf.orcc.ir.actor.Tag;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -106,7 +106,7 @@ public class ALAstParser {
 	 */
 	private class Block {
 
-		private INode node;
+		private CFGNode node;
 
 		private Scope<Variable> variables;
 
@@ -118,12 +118,12 @@ public class ALAstParser {
 		 * @param node
 		 *            a node
 		 */
-		public Block(Scope<Variable> variables, INode node) {
+		public Block(Scope<Variable> variables, CFGNode node) {
 			this.variables = variables;
 			this.node = node;
 		}
 
-		public INode getNode() {
+		public CFGNode getNode() {
 			return node;
 		}
 
@@ -211,10 +211,10 @@ public class ALAstParser {
 		 * @return an expression
 		 * @throws OrccException
 		 */
-		private IExpr parseBinOpSeq(Tree expr) throws OrccException {
+		private Expression parseBinOpSeq(Tree expr) throws OrccException {
 			Tree treeExprs = expr.getChild(0);
 			int numExprs = treeExprs.getChildCount();
-			List<IExpr> expressions = new ArrayList<IExpr>(numExprs);
+			List<Expression> expressions = new ArrayList<Expression>(numExprs);
 			for (int i = 0; i < numExprs; i++) {
 				expressions.add(parseExpression(treeExprs.getChild(i)));
 			}
@@ -235,10 +235,10 @@ public class ALAstParser {
 		 * 
 		 * @param expr
 		 *            a tree that contains an expression
-		 * @return an {@link IExpr}.
+		 * @return an {@link Expression}.
 		 * @throws OrccException
 		 */
-		IExpr parseExpression(Tree expr) throws OrccException {
+		Expression parseExpression(Tree expr) throws OrccException {
 			switch (expr.getType()) {
 			case ALBaseLexer.EXPR_BINARY:
 				return parseBinOpSeq(expr);
@@ -263,7 +263,7 @@ public class ALAstParser {
 			}
 		}
 
-		private IExpr parseExprVar(Tree tree) throws OrccException {
+		private Expression parseExprVar(Tree tree) throws OrccException {
 			Location location = parseLocation(tree);
 
 			Variable variable = currentScope.get(tree.getText());
@@ -285,7 +285,7 @@ public class ALAstParser {
 			parseLocalVariables(variables, tree.getChild(start));
 
 			// parse nodes
-			INode node = null;
+			CFGNode node = null;
 			currentScope = currentScope.getParent();
 
 			return new Block(variables, node);
@@ -301,7 +301,7 @@ public class ALAstParser {
 		 */
 		private LocalVariable parseLocalVariable(Tree tree)
 				throws OrccException {
-			IType type = typeParser.parseType(tree.getChild(0));
+			Type type = typeParser.parseType(tree.getChild(0));
 			Tree nameTree = tree.getChild(1);
 			Location location = parseLocation(nameTree);
 			String name = nameTree.getText();
@@ -311,7 +311,7 @@ public class ALAstParser {
 				exprParser.parseExpression(tree.getChild(3));
 			}
 
-			IInstruction instruction = null;
+			Instruction instruction = null;
 			return new LocalVariable(assignable, 0, location, name,
 					instruction, null, type);
 		}
@@ -337,14 +337,14 @@ public class ALAstParser {
 	private class TypeParser {
 
 		/**
-		 * Parses the given tree as an {@link IType}.
+		 * Parses the given tree as an {@link Type}.
 		 * 
 		 * @param tree
 		 *            a tree whose root is TYPE or TYPE_LIST.
 		 * @return a type
 		 * @throws OrccException
 		 */
-		private IType parseType(Tree tree) throws OrccException {
+		private Type parseType(Tree tree) throws OrccException {
 			if (tree.getType() == ALBaseLexer.TYPE) {
 				return parseTYPE(tree);
 			} else if (tree.getType() == ALBaseLexer.TYPE_LIST) {
@@ -354,7 +354,7 @@ public class ALAstParser {
 			}
 		}
 
-		private IType parseTYPE(Tree tree) throws OrccException {
+		private Type parseTYPE(Tree tree) throws OrccException {
 			Tree typeTree = tree.getChild(0);
 			Location location = parseLocation(typeTree);
 			String typeName = typeTree.getText();
@@ -366,14 +366,14 @@ public class ALAstParser {
 			} else if (typeName.equals(VoidType.NAME)) {
 				return new VoidType();
 			} else if (typeName.equals(IntType.NAME)) {
-				IExpr size = parseTypeAttributeSize(location, tree, 32);
+				Expression size = parseTypeAttributeSize(location, tree, 32);
 				return new IntType(size);
 			} else if (typeName.equals(UintType.NAME)) {
-				IExpr size = parseTypeAttributeSize(location, tree, 32);
+				Expression size = parseTypeAttributeSize(location, tree, 32);
 				return new UintType(size);
 			} else if (typeName.equals(ListType.NAME)) {
-				IExpr size = parseTypeAttributeSize(location, tree, null);
-				IType subType = parseTypeAttributeType(location, tree);
+				Expression size = parseTypeAttributeSize(location, tree, null);
+				Type subType = parseTypeAttributeType(location, tree);
 				return new ListType(size, subType);
 			} else if (typeName.equals("float") || typeName.equals("unsigned")) {
 				System.out.println("TODO: " + typeName);
@@ -384,7 +384,7 @@ public class ALAstParser {
 			}
 		}
 
-		private IExpr parseTypeAttributeSize(Location location, Tree type,
+		private Expression parseTypeAttributeSize(Location location, Tree type,
 				Integer defaultSize) throws OrccException {
 			int n = type.getChildCount();
 			for (int i = 1; i < n; i++) {
@@ -410,7 +410,7 @@ public class ALAstParser {
 			}
 		}
 
-		private IType parseTypeAttributeType(Location location, Tree typeAttrs)
+		private Type parseTypeAttributeType(Location location, Tree typeAttrs)
 				throws OrccException {
 			int n = typeAttrs.getChildCount();
 			for (int i = 1; i < n; i++) {
@@ -436,13 +436,13 @@ public class ALAstParser {
 		 * 
 		 * @param tree
 		 *            a tree whose root is TYPE_LIST
-		 * @return an {@link IType}
+		 * @return an {@link Type}
 		 * @throws OrccException
 		 */
-		private IType parseTypeList(Tree tree) throws OrccException {
-			IType type = parseType(tree.getChild(0));
+		private Type parseTypeList(Tree tree) throws OrccException {
+			Type type = parseType(tree.getChild(0));
 			for (int i = tree.getChildCount() - 1; i > 0; i--) {
-				IExpr size = exprParser.parseExpression(tree.getChild(i));
+				Expression size = exprParser.parseExpression(tree.getChild(i));
 				type = new ListType(size, type);
 			}
 
@@ -643,10 +643,10 @@ public class ALAstParser {
 		String name = getActionName(location, tag);
 		Procedure scheduler = new Procedure("isSchedulable_" + name, false,
 				location, new BoolType(), tokens, new OrderedMap<Variable>(),
-				new ArrayList<INode>());
+				new ArrayList<CFGNode>());
 
 		Procedure body = new Procedure(name, false, location, new VoidType(),
-				tokens, new OrderedMap<Variable>(), new ArrayList<INode>());
+				tokens, new OrderedMap<Variable>(), new ArrayList<CFGNode>());
 
 		Action action = new Action(location, tag, new HashMap<Port, Integer>(),
 				new HashMap<Port, Integer>(), scheduler, body);
@@ -756,12 +756,12 @@ public class ALAstParser {
 		int numParameters = tree.getChildCount();
 		for (int i = 0; i < numParameters; i++) {
 			Tree child = tree.getChild(i);
-			IType type = typeParser.parseType(child.getChild(0));
+			Type type = typeParser.parseType(child.getChild(0));
 			Tree nameTree = child.getChild(1);
 			Location location = parseLocation(nameTree);
 			String name = nameTree.getText();
 
-			IExpr init = null;
+			Expression init = null;
 			if (child.getChildCount() == 3) {
 				init = exprParser.parseExpression(child.getChild(2));
 			}
@@ -791,7 +791,7 @@ public class ALAstParser {
 		for (int i = 0; i < numPorts; i++) {
 			Tree child = tree.getChild(i);
 
-			IType type = typeParser.parseType(child.getChild(0));
+			Type type = typeParser.parseType(child.getChild(0));
 			Tree nameTree = child.getChild(1);
 			String name = nameTree.getText();
 			Location location = parseLocation(nameTree);
@@ -850,13 +850,13 @@ public class ALAstParser {
 	 * @throws OrccException
 	 */
 	private void parseStateVariable(Tree tree) throws OrccException {
-		IType type = typeParser.parseType(tree.getChild(0));
+		Type type = typeParser.parseType(tree.getChild(0));
 		Tree nameTree = tree.getChild(1);
 		Location location = parseLocation(nameTree);
 		String name = nameTree.getText();
 		boolean assignable = (tree.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
 
-		IConst init = null;
+		Constant init = null;
 		if (tree.getChildCount() == 4) {
 		}
 

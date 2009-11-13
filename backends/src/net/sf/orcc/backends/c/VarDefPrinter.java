@@ -34,7 +34,7 @@ import java.util.Map;
 import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.nodes.AbstractFifoNode;
+import net.sf.orcc.ir.instructions.AbstractFifo;
 
 /**
  * 
@@ -71,8 +71,8 @@ public class VarDefPrinter {
 		varDefMap.put("size", listSizePrinter.getSize());
 		boolean isPort = false;
 		for (Use use : varDef.getUses()) {
-			if (use.getNode() instanceof AbstractFifoNode) {
-				AbstractFifoNode fifoNode = (AbstractFifoNode) use.getNode();
+			if (use.getNode() instanceof AbstractFifo) {
+				AbstractFifo fifoNode = (AbstractFifo) use.getNode();
 				if (varDef.getName().startsWith(fifoNode.getPort().getName())) {
 					isPort = true;
 					break;

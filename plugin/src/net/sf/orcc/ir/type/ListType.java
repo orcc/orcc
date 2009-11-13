@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ir.type;
 
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 
 /**
  * @author Matthieu Wipliez
@@ -39,11 +39,11 @@ public class ListType extends AbstractType {
 
 	public static final String NAME = "List";
 
-	private IExpr size;
+	private Expression size;
 
-	private IType type;
+	private Type type;
 
-	public ListType(IExpr size, IType type) {
+	public ListType(Expression size, Type type) {
 		super(NAME);
 		setSize(size);
 		setType(type);
@@ -64,11 +64,11 @@ public class ListType extends AbstractType {
 		}
 	}
 
-	public IType getElementType() {
+	public Type getElementType() {
 		return type;
 	}
 
-	public IExpr getSize() {
+	public Expression getSize() {
 		return size;
 	}
 
@@ -77,11 +77,11 @@ public class ListType extends AbstractType {
 		return LIST;
 	}
 
-	public void setSize(IExpr size) {
+	public void setSize(Expression size) {
 		this.size = size;
 	}
 
-	public void setType(IType type) {
+	public void setType(Type type) {
 		if (type == null) {
 			throw new NullPointerException();
 		}

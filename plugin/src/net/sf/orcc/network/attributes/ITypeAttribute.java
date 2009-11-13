@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.network.attributes;
 
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Type;
 
 /**
  * This interface represents an attribute whose value is a type.
@@ -48,6 +48,6 @@ public interface ITypeAttribute extends IAttribute {
 	 * 
 	 * @return the type of this attribute
 	 */
-	public IType getValue();
+	public Type getValue();
 
 }

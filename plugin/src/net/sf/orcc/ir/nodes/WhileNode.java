@@ -30,9 +30,11 @@ package net.sf.orcc.ir.nodes;
 
 import java.util.List;
 
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.INode;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines a While node. A while node is a node with a value used in
@@ -41,16 +43,16 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class WhileNode extends AbstractNode implements IValueContainer {
+public class WhileNode extends AbstractNode implements ValueContainer {
 
 	private BlockNode joinNode;
 
-	private List<INode> nodes;
+	private List<CFGNode> nodes;
 
-	private IExpr value;
+	private Expression value;
 
-	public WhileNode(int id, Location location, IExpr condition,
-			List<INode> nodes, BlockNode joinNode) {
+	public WhileNode(int id, Location location, Expression condition,
+			List<CFGNode> nodes, BlockNode joinNode) {
 		super(id, location);
 		this.joinNode = joinNode;
 		this.nodes = nodes;
@@ -66,12 +68,12 @@ public class WhileNode extends AbstractNode implements IValueContainer {
 		return joinNode;
 	}
 
-	public List<INode> getNodes() {
+	public List<CFGNode> getNodes() {
 		return nodes;
 	}
 
 	@Override
-	public IExpr getValue() {
+	public Expression getValue() {
 		return value;
 	}
 
@@ -80,12 +82,12 @@ public class WhileNode extends AbstractNode implements IValueContainer {
 	}
 
 	@Override
-	public void setValue(IExpr value) {
+	public void setValue(Expression value) {
 		CommonNodeOperations.setValue(this, value);
 	}
 
 	@Override
-	public void setValueSimple(IExpr value) {
+	public void setValueSimple(Expression value) {
 		this.value = value;
 	}
 

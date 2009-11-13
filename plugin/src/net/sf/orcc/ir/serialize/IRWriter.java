@@ -40,17 +40,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.IrConstants;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.ActionScheduler;
-import net.sf.orcc.ir.actor.Actor;
-import net.sf.orcc.ir.actor.FSM;
-import net.sf.orcc.ir.actor.Tag;
+import net.sf.orcc.ir.Tag;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BooleanExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -219,26 +219,26 @@ public class IRWriter {
 		return obj;
 	}
 
-	private JSONArray writeExpr(IExpr expr) {
+	private JSONArray writeExpr(Expression expr) {
 		JSONArray array = new JSONArray();
 		array.put(writeLocation(expr.getLocation()));
 		switch (expr.getType()) {
-		case IExpr.BINARY:
+		case Expression.BINARY:
 			break;
-		case IExpr.BOOLEAN:
+		case Expression.BOOLEAN:
 			array.put(((BooleanExpr) expr).getValue());
 			break;
-		case IExpr.INT:
+		case Expression.INT:
 			array.put(((IntExpr) expr).getValue());
 			break;
-		case IExpr.LIST:
+		case Expression.LIST:
 			break;
-		case IExpr.STRING:
+		case Expression.STRING:
 			array.put(((StringExpr) expr).getValue());
 			break;
-		case IExpr.UNARY:
+		case Expression.UNARY:
 			break;
-		case IExpr.VAR:
+		case Expression.VAR:
 			break;
 		}
 
@@ -309,26 +309,26 @@ public class IRWriter {
 		return array;
 	}
 
-	private Object writeType(IType type) throws OrccException {
-		if (type.getType() == IType.BOOLEAN) {
+	private Object writeType(Type type) throws OrccException {
+		if (type.getType() == Type.BOOLEAN) {
 			return BoolType.NAME;
-		} else if (type.getType() == IType.STRING) {
+		} else if (type.getType() == Type.STRING) {
 			return StringType.NAME;
-		} else if (type.getType() == IType.VOID) {
+		} else if (type.getType() == Type.VOID) {
 			return VoidType.NAME;
 		} else {
 			JSONArray array = new JSONArray();
-			if (type.getType() == IType.INT) {
+			if (type.getType() == Type.INT) {
 				array.put(IntType.NAME);
-				IExpr expr = ((IntType) type).getSize();
+				Expression expr = ((IntType) type).getSize();
 				array.put(writeExpr(expr));
-			} else if (type.getType() == IType.UINT) {
+			} else if (type.getType() == Type.UINT) {
 				array.put(UintType.NAME);
-				IExpr expr = ((UintType) type).getSize();
+				Expression expr = ((UintType) type).getSize();
 				array.put(writeExpr(expr));
-			} else if (type.getType() == IType.LIST) {
+			} else if (type.getType() == Type.LIST) {
 				array.put(ListType.NAME);
-				IExpr expr = ((ListType) type).getSize();
+				Expression expr = ((ListType) type).getSize();
 				array.put(writeExpr(expr));
 				array.put(writeType(((ListType) type).getElementType()));
 			} else {

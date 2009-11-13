@@ -10,8 +10,8 @@ import net.sf.orcc.backends.c.ConstPrinter;
 import net.sf.orcc.backends.c.ExprToString;
 import net.sf.orcc.backends.c.TypeToString;
 import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.actor.Action;
-import net.sf.orcc.ir.actor.Actor;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 
 import org.antlr.stringtemplate.StringTemplate;
 

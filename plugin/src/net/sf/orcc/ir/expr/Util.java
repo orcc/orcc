@@ -29,7 +29,7 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
+import net.sf.orcc.ir.Expression;
 
 /**
  * This class defines a bunch of stuff, at the moment only a naive evaluator.
@@ -39,9 +39,9 @@ import net.sf.orcc.ir.IExpr;
  */
 public class Util {
 
-	public static int evaluateAsInteger(IExpr expr) throws OrccException {
+	public static int evaluateAsInteger(Expression expr) throws OrccException {
 		expr = expr.evaluate();
-		if (expr.getType() != IExpr.INT) {
+		if (expr.getType() != Expression.INT) {
 			// evaluated ok, but not as an integer
 			throw new OrccException("expected integer expression");
 		}

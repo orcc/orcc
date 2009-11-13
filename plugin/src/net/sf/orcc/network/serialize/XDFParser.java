@@ -37,11 +37,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -105,8 +105,8 @@ public class XDFParser {
 	private class ExprParser {
 
 		/**
-		 * Parses the given node as an expression and returns the matching IExpr
-		 * expression.
+		 * Parses the given node as an expression and returns the matching
+		 * Expression expression.
 		 * 
 		 * @param node
 		 *            a node whose expected to be, or whose sibling is expected
@@ -116,9 +116,9 @@ public class XDFParser {
 		 *             if the given node or its siblings could not be parsed as
 		 *             an expression
 		 */
-		public IExpr parseExpr(Node node) throws OrccException {
-			ParseContinuation<IExpr> cont = parseExprCont(node);
-			IExpr expr = cont.getResult();
+		public Expression parseExpr(Node node) throws OrccException {
+			ParseContinuation<Expression> cont = parseExprCont(node);
+			Expression expr = cont.getResult();
 			if (expr == null) {
 				throw new OrccException("Expected an Expr element");
 			} else {
@@ -164,12 +164,12 @@ public class XDFParser {
 		 * @throws OrccException
 		 *             if something goes wrong
 		 */
-		private ParseContinuation<IExpr> parseExprBinOpSeq(Node node)
+		private ParseContinuation<Expression> parseExprBinOpSeq(Node node)
 				throws OrccException {
-			List<IExpr> expressions = new ArrayList<IExpr>();
+			List<Expression> expressions = new ArrayList<Expression>();
 			List<BinaryOp> operators = new ArrayList<BinaryOp>();
 
-			ParseContinuation<IExpr> contE = parseExprCont(node);
+			ParseContinuation<Expression> contE = parseExprCont(node);
 			expressions.add(contE.getResult());
 			node = contE.getNode();
 			while (node != null) {
@@ -180,7 +180,7 @@ public class XDFParser {
 					operators.add(op);
 
 					contE = parseExprCont(node);
-					IExpr expr = contE.getResult();
+					Expression expr = contE.getResult();
 					if (expr == null) {
 						throw new OrccException("Expected an Expr element");
 					}
@@ -190,13 +190,13 @@ public class XDFParser {
 				}
 			}
 
-			IExpr expr = BinOpSeqParser.parse(expressions, operators);
-			return new ParseContinuation<IExpr>(node, expr);
+			Expression expr = BinOpSeqParser.parse(expressions, operators);
+			return new ParseContinuation<Expression>(node, expr);
 		}
 
 		/**
-		 * Parses the given node as an expression and returns the matching IExpr
-		 * expression.
+		 * Parses the given node as an expression and returns the matching
+		 * Expression expression.
 		 * 
 		 * @param node
 		 *            a node whose sibling is expected to be a DOM element named
@@ -206,9 +206,9 @@ public class XDFParser {
 		 *             if the given node or its siblings could not be parsed as
 		 *             an expression
 		 */
-		private ParseContinuation<IExpr> parseExprCont(Node node)
+		private ParseContinuation<Expression> parseExprCont(Node node)
 				throws OrccException {
-			IExpr expr = null;
+			Expression expr = null;
 			while (node != null) {
 				if (node.getNodeName().equals("Expr")) {
 					Element elt = (Element) node;
@@ -219,14 +219,15 @@ public class XDFParser {
 						expr = parseExprLiteral(elt);
 						break;
 					} else if (kind.equals("List")) {
-						List<IExpr> exprs = parseExprs(node.getFirstChild());
+						List<Expression> exprs = parseExprs(node
+								.getFirstChild());
 						expr = new ListExpr(new Location(), exprs);
 						break;
 					} else if (kind.equals("UnaryOp")) {
 						ParseContinuation<UnaryOp> cont = parseExprUnaryOp(node
 								.getFirstChild());
 						UnaryOp op = cont.getResult();
-						IExpr unaryExpr = parseExpr(cont.getNode());
+						Expression unaryExpr = parseExpr(cont.getNode());
 						expr = new UnaryExpr(new Location(), op, unaryExpr,
 								null);
 						break;
@@ -247,12 +248,12 @@ public class XDFParser {
 				node = node.getNextSibling();
 			}
 
-			return new ParseContinuation<IExpr>(node, expr);
+			return new ParseContinuation<Expression>(node, expr);
 		}
 
 		/**
 		 * Parses the given "Expr" element as a literal and returns the matching
-		 * IExpr expression.
+		 * Expression expression.
 		 * 
 		 * @param elt
 		 *            a DOM element named "Expr"
@@ -260,7 +261,7 @@ public class XDFParser {
 		 * @throws OrccException
 		 *             if the literal could not be parsed
 		 */
-		private IExpr parseExprLiteral(Element elt) throws OrccException {
+		private Expression parseExprLiteral(Element elt) throws OrccException {
 			String kind = elt.getAttribute("literal-kind");
 			String value = elt.getAttribute("value");
 			if (kind.equals("Boolean")) {
@@ -280,8 +281,8 @@ public class XDFParser {
 			}
 		}
 
-		private List<IExpr> parseExprs(Node node) throws OrccException {
-			List<IExpr> exprs = new ArrayList<IExpr>();
+		private List<Expression> parseExprs(Node node) throws OrccException {
+			List<Expression> exprs = new ArrayList<Expression>();
 			while (node != null) {
 				if (node.getNodeName().equals("Expr")) {
 					exprs.add(parseExpr(node));
@@ -336,7 +337,7 @@ public class XDFParser {
 		private static final int defaultSize = 32;
 
 		/**
-		 * Parses the given node as an IType.
+		 * Parses the given node as an Type.
 		 * 
 		 * @param node
 		 *            the node to parse as a type.
@@ -344,32 +345,31 @@ public class XDFParser {
 		 * @throws OrccException
 		 *             if the node could not be parsed as a type
 		 */
-		public ParseContinuation<IType> parseType(Node node)
+		public ParseContinuation<Type> parseType(Node node)
 				throws OrccException {
 			while (node != null) {
 				if (node.getNodeName().equals("Type")) {
 					Element eltType = (Element) node;
 					String name = eltType.getAttribute("name");
 					if (name.equals(BoolType.NAME)) {
-						return new ParseContinuation<IType>(node,
-								new BoolType());
+						return new ParseContinuation<Type>(node, new BoolType());
 					} else if (name.equals(IntType.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
-						IExpr size = parseTypeSize(entries);
-						return new ParseContinuation<IType>(node, new IntType(
+						Expression size = parseTypeSize(entries);
+						return new ParseContinuation<Type>(node, new IntType(
 								size));
 					} else if (name.equals(ListType.NAME)) {
-						return new ParseContinuation<IType>(node,
+						return new ParseContinuation<Type>(node,
 								parseTypeList(node));
 					} else if (name.equals(StringType.NAME)) {
-						return new ParseContinuation<IType>(node,
+						return new ParseContinuation<Type>(node,
 								new StringType());
 					} else if (name.equals(UintType.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
-						IExpr size = parseTypeSize(entries);
-						return new ParseContinuation<IType>(node, new UintType(
+						Expression size = parseTypeSize(entries);
+						return new ParseContinuation<Type>(node, new UintType(
 								size));
 					} else {
 						throw new OrccException("unknown type name: \"" + name
@@ -405,7 +405,8 @@ public class XDFParser {
 
 					Entry entry = null;
 					if (kind.equals("Expr")) {
-						IExpr expr = exprParser.parseExpr(node.getFirstChild());
+						Expression expr = exprParser.parseExpr(node
+								.getFirstChild());
 						entry = new Entry(expr);
 					} else if (kind.equals("Type")) {
 						entry = new Entry(parseType(node.getFirstChild())
@@ -433,19 +434,19 @@ public class XDFParser {
 		 * @throws OrccException
 		 *             if something is wrong, like a missing entry
 		 */
-		private IType parseTypeList(Node node) throws OrccException {
+		private Type parseTypeList(Node node) throws OrccException {
 			Map<String, Entry> entries = parseTypeEntries(node.getFirstChild());
 			Entry entry = entries.get("size");
 			if (entry == null) {
 				throw new OrccException("List type must have a \"size\" entry");
 			}
-			IExpr size = entry.getEntryAsExpr();
+			Expression size = entry.getEntryAsExpr();
 
 			entry = entries.get("type");
 			if (entry == null) {
 				throw new OrccException("List type must have a \"type\" entry");
 			}
-			IType type = entry.getEntryAsType();
+			Type type = entry.getEntryAsType();
 
 			return new ListType(size, type);
 		}
@@ -460,7 +461,7 @@ public class XDFParser {
 		 * @throws OrccException
 		 *             if the "size" entry does not contain an expression
 		 */
-		private IExpr parseTypeSize(Map<String, Entry> entries)
+		private Expression parseTypeSize(Map<String, Entry> entries)
 				throws OrccException {
 			Entry entry = entries.get("size");
 			if (entry == null) {
@@ -635,11 +636,12 @@ public class XDFParser {
 					String value = attribute.getAttribute("value");
 					attr = new StringAttribute(value);
 				} else if (kind.equals(ITypeAttribute.NAME)) {
-					IType type = typeParser
-							.parseType(attribute.getFirstChild()).getResult();
+					Type type = typeParser.parseType(attribute.getFirstChild())
+							.getResult();
 					attr = new TypeAttribute(type);
 				} else if (kind.equals(IValueAttribute.NAME)) {
-					IExpr expr = exprParser.parseExpr(node.getFirstChild());
+					Expression expr = exprParser
+							.parseExpr(node.getFirstChild());
 					attr = new ValueAttribute(expr);
 				} else {
 					throw new OrccException("unsupported attribute kind: \""
@@ -726,16 +728,16 @@ public class XDFParser {
 
 		Location location = new Location();
 		if (kind.equals("Param")) {
-			ParseContinuation<IType> cont = typeParser.parseType(decl
+			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
-			IType type = cont.getResult();
+			Type type = cont.getResult();
 			GlobalVariable var = new GlobalVariable(location, type, name);
 			parameters.add(file.getAbsolutePath(), location, name, var);
 		} else if (kind.equals("Variable")) {
-			ParseContinuation<IType> cont = typeParser.parseType(decl
+			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
-			IType type = cont.getResult();
-			IExpr expr = exprParser.parseExpr(cont.getNode());
+			Type type = cont.getResult();
+			Expression expr = exprParser.parseExpr(cont.getNode());
 			GlobalVariable var = new GlobalVariable(location, type, name, expr);
 			variables.add(file.getAbsolutePath(), location, name, var);
 		} else {
@@ -778,7 +780,7 @@ public class XDFParser {
 		}
 
 		// instance parameters and attributes
-		Map<String, IExpr> parameters = parseParameters(child);
+		Map<String, Expression> parameters = parseParameters(child);
 		Map<String, IAttribute> attributes = parseAttributes(child);
 
 		return new Instance(path, id, clasz, parameters, attributes);
@@ -825,8 +827,9 @@ public class XDFParser {
 		}
 	}
 
-	private Map<String, IExpr> parseParameters(Node node) throws OrccException {
-		Map<String, IExpr> parameters = new HashMap<String, IExpr>();
+	private Map<String, Expression> parseParameters(Node node)
+			throws OrccException {
+		Map<String, Expression> parameters = new HashMap<String, Expression>();
 		while (node != null) {
 			if (node.getNodeName().equals("Parameter")) {
 				String name = ((Element) node).getAttribute("name");
@@ -835,7 +838,7 @@ public class XDFParser {
 							+ "must have a valid \"name\" attribute");
 				}
 
-				IExpr expr = exprParser.parseExpr(node.getFirstChild());
+				Expression expr = exprParser.parseExpr(node.getFirstChild());
 				parameters.put(name, expr);
 			}
 
@@ -855,7 +858,7 @@ public class XDFParser {
 	 */
 	private void parsePort(Element eltPort) throws OrccException {
 		Location location = new Location();
-		IType type = typeParser.parseType(eltPort.getFirstChild()).getResult();
+		Type type = typeParser.parseType(eltPort.getFirstChild()).getResult();
 		String name = eltPort.getAttribute("name");
 		if (name.isEmpty()) {
 			throw new OrccException("Port has an empty name");

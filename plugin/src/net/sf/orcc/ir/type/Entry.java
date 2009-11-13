@@ -29,8 +29,8 @@
 package net.sf.orcc.ir.type;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.IExpr;
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 
 /**
  * This class defines a type entry.
@@ -66,7 +66,7 @@ public class Entry {
 	 * @param expr
 	 *            an expression
 	 */
-	public Entry(IExpr expr) {
+	public Entry(Expression expr) {
 		this.content = expr;
 		this.type = EXPR;
 	}
@@ -77,7 +77,7 @@ public class Entry {
 	 * @param type
 	 *            a type
 	 */
-	public Entry(IType type) {
+	public Entry(Type type) {
 		this.content = type;
 		this.type = TYPE;
 	}
@@ -89,9 +89,9 @@ public class Entry {
 	 * @throws OrccException
 	 *             if this entry does not contain an expression
 	 */
-	public IExpr getEntryAsExpr() throws OrccException {
+	public Expression getEntryAsExpr() throws OrccException {
 		if (getType() == EXPR) {
-			return (IExpr) content;
+			return (Expression) content;
 		} else {
 			throw new OrccException("this entry does not contain an expression");
 		}
@@ -104,9 +104,9 @@ public class Entry {
 	 * @throws OrccException
 	 *             if this entry does not contain a type
 	 */
-	public IType getEntryAsType() throws OrccException {
+	public Type getEntryAsType() throws OrccException {
 		if (getType() == TYPE) {
-			return (IType) content;
+			return (Type) content;
 		} else {
 			throw new OrccException("this entry does not contain a type");
 		}

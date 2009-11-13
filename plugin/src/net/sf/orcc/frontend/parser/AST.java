@@ -32,12 +32,12 @@ package net.sf.orcc.frontend.parser;
  * This interface defines constants that are the names of the AST nodes.
  * 
  * @author Matthieu Wipliez
- *
+ * 
  */
 public interface AST {
-	
+
 	public static final String SIZE = "size";
-	
+
 	public static final String TYPE = "type";
 
 }

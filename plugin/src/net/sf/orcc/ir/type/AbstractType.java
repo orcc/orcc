@@ -28,15 +28,15 @@
  */
 package net.sf.orcc.ir.type;
 
-import net.sf.orcc.ir.IType;
+import net.sf.orcc.ir.Type;
 
 /**
- * This class is an abstract implementation of {@link IType}.
+ * This class is an abstract implementation of {@link Type}.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractType implements IType {
+public abstract class AbstractType implements Type {
 
 	private String name;
 

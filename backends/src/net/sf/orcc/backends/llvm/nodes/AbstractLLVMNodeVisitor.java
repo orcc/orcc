@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.nodes;
 
-import net.sf.orcc.ir.nodes.AbstractInstructionVisitor;
+import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
 
 /**
  * @author Jérôme GORIN
