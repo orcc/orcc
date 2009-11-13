@@ -458,7 +458,9 @@ public class DSEScheduler {
             if(operationMode == STEP3){
             	String actionName = actor.getActionName().replace('.','_').split("#")[0];
 	            String visualActorName = Scheduler_Simulator.getInstance().getNetwórk().getVisualActorName(actor.getShortActorName().split("@")[0]);
-	            String context = visualActorName + "_" + (actionName.matches("act[0-9]")?"untagged0" + (Integer.parseInt(actionName.substring(3))+1):actionName);
+	            String visualActionName = (actionName.matches("act[0-9]")?"untagged0" + (Integer.parseInt(actionName.substring(3))+1):actionName);
+	            Integer index = Integer.parseInt(actor.getShortActorName().split("@")[1]);
+	            String context = visualActorName + (index == 0? "":"_0"+index) + "_" + visualActionName;
 	            List<String> array = scheduleMap.get(switchName.toLowerCase());
 	            array.add(context);
 	        }
