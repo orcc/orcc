@@ -1,4 +1,4 @@
-group C_scheduled_core;
+group C_quasistatic_core;
 
 inputTmpl(methodName) ::= <<
 extern void $methodName$(void);
