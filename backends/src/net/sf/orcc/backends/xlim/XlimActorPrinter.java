@@ -434,6 +434,8 @@ public class XlimActorPrinter {
 	 *            Actor to analyze
 	 */
 	private void addStateVars(Actor actor) {
+		// TODO Add initialize code execution to obtain missing init values
+
 		for (Variable stateVar : actor.getStateVars()) {
 			if (stateVar.isUsed()) {
 
@@ -447,11 +449,9 @@ public class XlimActorPrinter {
 
 				Element init2 = XlimNodeTemplate.newInitValue(init);
 
-				stateVar.getType().accept(new XlimTypeSizeVisitor(init2));
-
 				IConst value = state.getInit();
 				if (value != null) {
-					value.accept(new XlimValueVisitor(init2));
+					value.accept(new XlimValueVisitor(init2, state.getType()));
 				} else {
 					System.out.println("STATE: " + state.getUses());
 				}
