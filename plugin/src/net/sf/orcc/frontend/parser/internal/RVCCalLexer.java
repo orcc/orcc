@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 RVCCal__.g 2009-11-04 15:18:42
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 RVCCal__.g 2009-11-14 17:11:52
 
 package net.sf.orcc.frontend.parser.internal;
 
@@ -22,6 +22,7 @@ public class RVCCalLexer extends Lexer {
     public static final int LETTER=70;
     public static final int MOD=49;
     public static final int EXPR_CALL=23;
+    public static final int Decimal=74;
     public static final int INPUTS=4;
     public static final int EXPR_UNARY=19;
     public static final int EOF=-1;
@@ -45,14 +46,12 @@ public class RVCCalLexer extends Lexer {
     public static final int T__95=95;
     public static final int ASSIGNABLE=33;
     public static final int GE=45;
-    public static final int T__81=81;
+    public static final int Hexadecimal=76;
     public static final int INITIALIZE=61;
-    public static final int T__82=82;
-    public static final int T__83=83;
-    public static final int LINE_COMMENT=78;
+    public static final int LINE_COMMENT=81;
     public static final int DIV_INT=48;
     public static final int LOGIC_OR=35;
-    public static final int WHITESPACE=80;
+    public static final int WHITESPACE=83;
     public static final int INEQUALITY=14;
     public static final int NON_ASSIGNABLE=34;
     public static final int EXPRESSIONS=56;
@@ -66,8 +65,10 @@ public class RVCCalLexer extends Lexer {
     public static final int T__126=126;
     public static final int SHIFT_LEFT=46;
     public static final int T__125=125;
+    public static final int T__128=128;
     public static final int T__127=127;
     public static final int SHIFT_RIGHT=47;
+    public static final int T__129=129;
     public static final int BITOR=37;
     public static final int PRIORITY=62;
     public static final int VARIABLE=8;
@@ -79,7 +80,8 @@ public class RVCCalLexer extends Lexer {
     public static final int REPEAT=64;
     public static final int GUARD=60;
     public static final int CALL=55;
-    public static final int EscapeSequence=75;
+    public static final int T__130=130;
+    public static final int EscapeSequence=78;
     public static final int PARAMETERS=6;
     public static final int EXPR_BINARY=18;
     public static final int T__118=118;
@@ -100,6 +102,7 @@ public class RVCCalLexer extends Lexer {
     public static final int EXPR_FLOAT=27;
     public static final int LOGIC_AND=36;
     public static final int ID=71;
+    public static final int HexDigit=75;
     public static final int BITAND=39;
     public static final int EXPR_LIST=21;
     public static final int EXPR=17;
@@ -119,24 +122,24 @@ public class RVCCalLexer extends Lexer {
     public static final int T__112=112;
     public static final int PLUS=66;
     public static final int EXPR_INT=28;
-    public static final int INTEGER=74;
+    public static final int INTEGER=77;
     public static final int TRANSITIONS=13;
     public static final int T__102=102;
     public static final int T__101=101;
     public static final int T__100=100;
     public static final int MINUS=67;
     public static final int EXPR_IF=22;
-    public static final int Tokens=128;
+    public static final int Tokens=131;
     public static final int PROCEDURE=63;
-    public static final int MULTI_LINE_COMMENT=79;
+    public static final int MULTI_LINE_COMMENT=82;
     public static final int TAG=16;
     public static final int VARIABLES=9;
     public static final int ASSIGN=54;
     public static final int DIV=69;
     public static final int TIMES=68;
-    public static final int OctalEscape=77;
+    public static final int OctalEscape=80;
     public static final int LE=44;
-    public static final int STRING=76;
+    public static final int STRING=79;
 
     // delegates
     public RVCCal_ALBaseLexer gALBaseLexer;
@@ -152,75 +155,15 @@ public class RVCCalLexer extends Lexer {
     }
     public String getGrammarFileName() { return "RVCCal__.g"; }
 
-    // $ANTLR start "T__81"
-    public final void mT__81() throws RecognitionException {
-        try {
-            int _type = T__81;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:7:7: ( ':' )
-            // RVCCal__.g:7:9: ':'
-            {
-            match(':'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__81"
-
-    // $ANTLR start "T__82"
-    public final void mT__82() throws RecognitionException {
-        try {
-            int _type = T__82;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:8:7: ( '[' )
-            // RVCCal__.g:8:9: '['
-            {
-            match('['); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__82"
-
-    // $ANTLR start "T__83"
-    public final void mT__83() throws RecognitionException {
-        try {
-            int _type = T__83;
-            int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:9:7: ( ']' )
-            // RVCCal__.g:9:9: ']'
-            {
-            match(']'); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally {
-        }
-    }
-    // $ANTLR end "T__83"
-
     // $ANTLR start "T__84"
     public final void mT__84() throws RecognitionException {
         try {
             int _type = T__84;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:10:7: ( ',' )
-            // RVCCal__.g:10:9: ','
+            // RVCCal__.g:7:7: ( ':' )
+            // RVCCal__.g:7:9: ':'
             {
-            match(','); 
+            match(':'); 
 
             }
 
@@ -237,11 +180,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__85;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:11:7: ( 'do' )
-            // RVCCal__.g:11:9: 'do'
+            // RVCCal__.g:8:7: ( '[' )
+            // RVCCal__.g:8:9: '['
             {
-            match("do"); 
-
+            match('['); 
 
             }
 
@@ -258,10 +200,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__86;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:12:7: ( '(' )
-            // RVCCal__.g:12:9: '('
+            // RVCCal__.g:9:7: ( ']' )
+            // RVCCal__.g:9:9: ']'
             {
-            match('('); 
+            match(']'); 
 
             }
 
@@ -278,10 +220,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__87;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:13:7: ( ')' )
-            // RVCCal__.g:13:9: ')'
+            // RVCCal__.g:10:7: ( ',' )
+            // RVCCal__.g:10:9: ','
             {
-            match(')'); 
+            match(','); 
 
             }
 
@@ -298,10 +240,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__88;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:14:7: ( '==>' )
-            // RVCCal__.g:14:9: '==>'
+            // RVCCal__.g:11:7: ( 'do' )
+            // RVCCal__.g:11:9: 'do'
             {
-            match("==>"); 
+            match("do"); 
 
 
             }
@@ -319,11 +261,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__89;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:15:7: ( 'end' )
-            // RVCCal__.g:15:9: 'end'
+            // RVCCal__.g:12:7: ( '(' )
+            // RVCCal__.g:12:9: '('
             {
-            match("end"); 
-
+            match('('); 
 
             }
 
@@ -340,10 +281,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__90;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:16:7: ( '.' )
-            // RVCCal__.g:16:9: '.'
+            // RVCCal__.g:13:7: ( ')' )
+            // RVCCal__.g:13:9: ')'
             {
-            match('.'); 
+            match(')'); 
 
             }
 
@@ -360,10 +301,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__91;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:17:7: ( 'var' )
-            // RVCCal__.g:17:9: 'var'
+            // RVCCal__.g:14:7: ( '==>' )
+            // RVCCal__.g:14:9: '==>'
             {
-            match("var"); 
+            match("==>"); 
 
 
             }
@@ -381,10 +322,11 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__92;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:18:7: ( '=' )
-            // RVCCal__.g:18:9: '='
+            // RVCCal__.g:15:7: ( 'end' )
+            // RVCCal__.g:15:9: 'end'
             {
-            match('='); 
+            match("end"); 
+
 
             }
 
@@ -401,11 +343,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__93;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:19:7: ( ':=' )
-            // RVCCal__.g:19:9: ':='
+            // RVCCal__.g:16:7: ( '.' )
+            // RVCCal__.g:16:9: '.'
             {
-            match(":="); 
-
+            match('.'); 
 
             }
 
@@ -422,10 +363,11 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__94;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:20:7: ( ';' )
-            // RVCCal__.g:20:9: ';'
+            // RVCCal__.g:17:7: ( 'var' )
+            // RVCCal__.g:17:9: 'var'
             {
-            match(';'); 
+            match("var"); 
+
 
             }
 
@@ -442,11 +384,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__95;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:21:7: ( '-->' )
-            // RVCCal__.g:21:9: '-->'
+            // RVCCal__.g:18:7: ( '=' )
+            // RVCCal__.g:18:9: '='
             {
-            match("-->"); 
-
+            match('='); 
 
             }
 
@@ -463,10 +404,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__96;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:22:7: ( 'begin' )
-            // RVCCal__.g:22:9: 'begin'
+            // RVCCal__.g:19:7: ( ':=' )
+            // RVCCal__.g:19:9: ':='
             {
-            match("begin"); 
+            match(":="); 
 
 
             }
@@ -484,11 +425,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__97;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:23:7: ( 'import' )
-            // RVCCal__.g:23:9: 'import'
+            // RVCCal__.g:20:7: ( ';' )
+            // RVCCal__.g:20:9: ';'
             {
-            match("import"); 
-
+            match(';'); 
 
             }
 
@@ -505,10 +445,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__98;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:24:7: ( 'all' )
-            // RVCCal__.g:24:9: 'all'
+            // RVCCal__.g:21:7: ( '-->' )
+            // RVCCal__.g:21:9: '-->'
             {
-            match("all"); 
+            match("-->"); 
 
 
             }
@@ -526,10 +466,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__99;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:25:7: ( 'or' )
-            // RVCCal__.g:25:9: 'or'
+            // RVCCal__.g:22:7: ( 'begin' )
+            // RVCCal__.g:22:9: 'begin'
             {
-            match("or"); 
+            match("begin"); 
 
 
             }
@@ -547,10 +487,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__100;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:26:8: ( '||' )
-            // RVCCal__.g:26:10: '||'
+            // RVCCal__.g:23:8: ( 'import' )
+            // RVCCal__.g:23:10: 'import'
             {
-            match("||"); 
+            match("import"); 
 
 
             }
@@ -568,10 +508,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__101;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:27:8: ( 'and' )
-            // RVCCal__.g:27:10: 'and'
+            // RVCCal__.g:24:8: ( 'all' )
+            // RVCCal__.g:24:10: 'all'
             {
-            match("and"); 
+            match("all"); 
 
 
             }
@@ -589,10 +529,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__102;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:28:8: ( '&&' )
-            // RVCCal__.g:28:10: '&&'
+            // RVCCal__.g:25:8: ( 'or' )
+            // RVCCal__.g:25:10: 'or'
             {
-            match("&&"); 
+            match("or"); 
 
 
             }
@@ -610,10 +550,11 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__103;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:29:8: ( '|' )
-            // RVCCal__.g:29:10: '|'
+            // RVCCal__.g:26:8: ( '||' )
+            // RVCCal__.g:26:10: '||'
             {
-            match('|'); 
+            match("||"); 
+
 
             }
 
@@ -630,10 +571,11 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__104;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:30:8: ( '&' )
-            // RVCCal__.g:30:10: '&'
+            // RVCCal__.g:27:8: ( 'and' )
+            // RVCCal__.g:27:10: 'and'
             {
-            match('&'); 
+            match("and"); 
+
 
             }
 
@@ -650,10 +592,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__105;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:31:8: ( '!=' )
-            // RVCCal__.g:31:10: '!='
+            // RVCCal__.g:28:8: ( '&&' )
+            // RVCCal__.g:28:10: '&&'
             {
-            match("!="); 
+            match("&&"); 
 
 
             }
@@ -671,10 +613,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__106;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:32:8: ( '<' )
-            // RVCCal__.g:32:10: '<'
+            // RVCCal__.g:29:8: ( '|' )
+            // RVCCal__.g:29:10: '|'
             {
-            match('<'); 
+            match('|'); 
 
             }
 
@@ -691,10 +633,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__107;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:33:8: ( '>' )
-            // RVCCal__.g:33:10: '>'
+            // RVCCal__.g:30:8: ( '&' )
+            // RVCCal__.g:30:10: '&'
             {
-            match('>'); 
+            match('&'); 
 
             }
 
@@ -711,10 +653,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__108;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:34:8: ( '<=' )
-            // RVCCal__.g:34:10: '<='
+            // RVCCal__.g:31:8: ( '!=' )
+            // RVCCal__.g:31:10: '!='
             {
-            match("<="); 
+            match("!="); 
 
 
             }
@@ -732,11 +674,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__109;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:35:8: ( '>=' )
-            // RVCCal__.g:35:10: '>='
+            // RVCCal__.g:32:8: ( '<' )
+            // RVCCal__.g:32:10: '<'
             {
-            match(">="); 
-
+            match('<'); 
 
             }
 
@@ -753,11 +694,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__110;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:36:8: ( '<<' )
-            // RVCCal__.g:36:10: '<<'
+            // RVCCal__.g:33:8: ( '>' )
+            // RVCCal__.g:33:10: '>'
             {
-            match("<<"); 
-
+            match('>'); 
 
             }
 
@@ -774,10 +714,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__111;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:37:8: ( '>>' )
-            // RVCCal__.g:37:10: '>>'
+            // RVCCal__.g:34:8: ( '<=' )
+            // RVCCal__.g:34:10: '<='
             {
-            match(">>"); 
+            match("<="); 
 
 
             }
@@ -795,10 +735,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__112;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:38:8: ( 'div' )
-            // RVCCal__.g:38:10: 'div'
+            // RVCCal__.g:35:8: ( '>=' )
+            // RVCCal__.g:35:10: '>='
             {
-            match("div"); 
+            match(">="); 
 
 
             }
@@ -816,10 +756,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__113;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:39:8: ( 'mod' )
-            // RVCCal__.g:39:10: 'mod'
+            // RVCCal__.g:36:8: ( '<<' )
+            // RVCCal__.g:36:10: '<<'
             {
-            match("mod"); 
+            match("<<"); 
 
 
             }
@@ -837,10 +777,11 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__114;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:40:8: ( '^' )
-            // RVCCal__.g:40:10: '^'
+            // RVCCal__.g:37:8: ( '>>' )
+            // RVCCal__.g:37:10: '>>'
             {
-            match('^'); 
+            match(">>"); 
+
 
             }
 
@@ -857,10 +798,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__115;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:41:8: ( 'not' )
-            // RVCCal__.g:41:10: 'not'
+            // RVCCal__.g:38:8: ( 'div' )
+            // RVCCal__.g:38:10: 'div'
             {
-            match("not"); 
+            match("div"); 
 
 
             }
@@ -878,10 +819,11 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__116;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:42:8: ( '#' )
-            // RVCCal__.g:42:10: '#'
+            // RVCCal__.g:39:8: ( 'mod' )
+            // RVCCal__.g:39:10: 'mod'
             {
-            match('#'); 
+            match("mod"); 
+
 
             }
 
@@ -898,11 +840,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__117;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:43:8: ( 'if' )
-            // RVCCal__.g:43:10: 'if'
+            // RVCCal__.g:40:8: ( '^' )
+            // RVCCal__.g:40:10: '^'
             {
-            match("if"); 
-
+            match('^'); 
 
             }
 
@@ -919,10 +860,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__118;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:44:8: ( 'then' )
-            // RVCCal__.g:44:10: 'then'
+            // RVCCal__.g:41:8: ( 'not' )
+            // RVCCal__.g:41:10: 'not'
             {
-            match("then"); 
+            match("not"); 
 
 
             }
@@ -940,11 +881,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__119;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:45:8: ( 'else' )
-            // RVCCal__.g:45:10: 'else'
+            // RVCCal__.g:42:8: ( '#' )
+            // RVCCal__.g:42:10: '#'
             {
-            match("else"); 
-
+            match('#'); 
 
             }
 
@@ -961,10 +901,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__120;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:46:8: ( 'true' )
-            // RVCCal__.g:46:10: 'true'
+            // RVCCal__.g:43:8: ( 'if' )
+            // RVCCal__.g:43:10: 'if'
             {
-            match("true"); 
+            match("if"); 
 
 
             }
@@ -982,10 +922,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__121;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:47:8: ( 'false' )
-            // RVCCal__.g:47:10: 'false'
+            // RVCCal__.g:44:8: ( 'then' )
+            // RVCCal__.g:44:10: 'then'
             {
-            match("false"); 
+            match("then"); 
 
 
             }
@@ -1003,10 +943,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__122;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:48:8: ( 'for' )
-            // RVCCal__.g:48:10: 'for'
+            // RVCCal__.g:45:8: ( 'else' )
+            // RVCCal__.g:45:10: 'else'
             {
-            match("for"); 
+            match("else"); 
 
 
             }
@@ -1024,10 +964,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__123;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:49:8: ( 'in' )
-            // RVCCal__.g:49:10: 'in'
+            // RVCCal__.g:46:8: ( 'true' )
+            // RVCCal__.g:46:10: 'true'
             {
-            match("in"); 
+            match("true"); 
 
 
             }
@@ -1045,10 +985,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__124;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:50:8: ( 'fsm' )
-            // RVCCal__.g:50:10: 'fsm'
+            // RVCCal__.g:47:8: ( 'false' )
+            // RVCCal__.g:47:10: 'false'
             {
-            match("fsm"); 
+            match("false"); 
 
 
             }
@@ -1066,10 +1006,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__125;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:51:8: ( 'foreach' )
-            // RVCCal__.g:51:10: 'foreach'
+            // RVCCal__.g:48:8: ( 'for' )
+            // RVCCal__.g:48:10: 'for'
             {
-            match("foreach"); 
+            match("for"); 
 
 
             }
@@ -1087,10 +1027,10 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__126;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // RVCCal__.g:52:8: ( '..' )
-            // RVCCal__.g:52:10: '..'
+            // RVCCal__.g:49:8: ( 'in' )
+            // RVCCal__.g:49:10: 'in'
             {
-            match(".."); 
+            match("in"); 
 
 
             }
@@ -1108,6 +1048,69 @@ public class RVCCalLexer extends Lexer {
         try {
             int _type = T__127;
             int _channel = DEFAULT_TOKEN_CHANNEL;
+            // RVCCal__.g:50:8: ( 'fsm' )
+            // RVCCal__.g:50:10: 'fsm'
+            {
+            match("fsm"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "T__127"
+
+    // $ANTLR start "T__128"
+    public final void mT__128() throws RecognitionException {
+        try {
+            int _type = T__128;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // RVCCal__.g:51:8: ( 'foreach' )
+            // RVCCal__.g:51:10: 'foreach'
+            {
+            match("foreach"); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "T__128"
+
+    // $ANTLR start "T__129"
+    public final void mT__129() throws RecognitionException {
+        try {
+            int _type = T__129;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
+            // RVCCal__.g:52:8: ( '..' )
+            // RVCCal__.g:52:10: '..'
+            {
+            match(".."); 
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally {
+        }
+    }
+    // $ANTLR end "T__129"
+
+    // $ANTLR start "T__130"
+    public final void mT__130() throws RecognitionException {
+        try {
+            int _type = T__130;
+            int _channel = DEFAULT_TOKEN_CHANNEL;
             // RVCCal__.g:53:8: ( 'while' )
             // RVCCal__.g:53:10: 'while'
             {
@@ -1122,344 +1125,344 @@ public class RVCCalLexer extends Lexer {
         finally {
         }
     }
-    // $ANTLR end "T__127"
+    // $ANTLR end "T__130"
 
     public void mTokens() throws RecognitionException {
-        // RVCCal__.g:1:8: ( T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | T__96 | T__97 | T__98 | T__99 | T__100 | T__101 | T__102 | T__103 | T__104 | T__105 | T__106 | T__107 | T__108 | T__109 | T__110 | T__111 | T__112 | T__113 | T__114 | T__115 | T__116 | T__117 | T__118 | T__119 | T__120 | T__121 | T__122 | T__123 | T__124 | T__125 | T__126 | T__127 | ALBaseLexer. Tokens )
+        // RVCCal__.g:1:8: ( T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | T__96 | T__97 | T__98 | T__99 | T__100 | T__101 | T__102 | T__103 | T__104 | T__105 | T__106 | T__107 | T__108 | T__109 | T__110 | T__111 | T__112 | T__113 | T__114 | T__115 | T__116 | T__117 | T__118 | T__119 | T__120 | T__121 | T__122 | T__123 | T__124 | T__125 | T__126 | T__127 | T__128 | T__129 | T__130 | ALBaseLexer. Tokens )
         int alt1=48;
         alt1 = dfa1.predict(input);
         switch (alt1) {
             case 1 :
-                // RVCCal__.g:1:10: T__81
-                {
-                mT__81(); 
-
-                }
-                break;
-            case 2 :
-                // RVCCal__.g:1:16: T__82
-                {
-                mT__82(); 
-
-                }
-                break;
-            case 3 :
-                // RVCCal__.g:1:22: T__83
-                {
-                mT__83(); 
-
-                }
-                break;
-            case 4 :
-                // RVCCal__.g:1:28: T__84
+                // RVCCal__.g:1:10: T__84
                 {
                 mT__84(); 
 
                 }
                 break;
-            case 5 :
-                // RVCCal__.g:1:34: T__85
+            case 2 :
+                // RVCCal__.g:1:16: T__85
                 {
                 mT__85(); 
 
                 }
                 break;
-            case 6 :
-                // RVCCal__.g:1:40: T__86
+            case 3 :
+                // RVCCal__.g:1:22: T__86
                 {
                 mT__86(); 
 
                 }
                 break;
-            case 7 :
-                // RVCCal__.g:1:46: T__87
+            case 4 :
+                // RVCCal__.g:1:28: T__87
                 {
                 mT__87(); 
 
                 }
                 break;
-            case 8 :
-                // RVCCal__.g:1:52: T__88
+            case 5 :
+                // RVCCal__.g:1:34: T__88
                 {
                 mT__88(); 
 
                 }
                 break;
-            case 9 :
-                // RVCCal__.g:1:58: T__89
+            case 6 :
+                // RVCCal__.g:1:40: T__89
                 {
                 mT__89(); 
 
                 }
                 break;
-            case 10 :
-                // RVCCal__.g:1:64: T__90
+            case 7 :
+                // RVCCal__.g:1:46: T__90
                 {
                 mT__90(); 
 
                 }
                 break;
-            case 11 :
-                // RVCCal__.g:1:70: T__91
+            case 8 :
+                // RVCCal__.g:1:52: T__91
                 {
                 mT__91(); 
 
                 }
                 break;
-            case 12 :
-                // RVCCal__.g:1:76: T__92
+            case 9 :
+                // RVCCal__.g:1:58: T__92
                 {
                 mT__92(); 
 
                 }
                 break;
-            case 13 :
-                // RVCCal__.g:1:82: T__93
+            case 10 :
+                // RVCCal__.g:1:64: T__93
                 {
                 mT__93(); 
 
                 }
                 break;
-            case 14 :
-                // RVCCal__.g:1:88: T__94
+            case 11 :
+                // RVCCal__.g:1:70: T__94
                 {
                 mT__94(); 
 
                 }
                 break;
-            case 15 :
-                // RVCCal__.g:1:94: T__95
+            case 12 :
+                // RVCCal__.g:1:76: T__95
                 {
                 mT__95(); 
 
                 }
                 break;
-            case 16 :
-                // RVCCal__.g:1:100: T__96
+            case 13 :
+                // RVCCal__.g:1:82: T__96
                 {
                 mT__96(); 
 
                 }
                 break;
-            case 17 :
-                // RVCCal__.g:1:106: T__97
+            case 14 :
+                // RVCCal__.g:1:88: T__97
                 {
                 mT__97(); 
 
                 }
                 break;
-            case 18 :
-                // RVCCal__.g:1:112: T__98
+            case 15 :
+                // RVCCal__.g:1:94: T__98
                 {
                 mT__98(); 
 
                 }
                 break;
-            case 19 :
-                // RVCCal__.g:1:118: T__99
+            case 16 :
+                // RVCCal__.g:1:100: T__99
                 {
                 mT__99(); 
 
                 }
                 break;
-            case 20 :
-                // RVCCal__.g:1:124: T__100
+            case 17 :
+                // RVCCal__.g:1:106: T__100
                 {
                 mT__100(); 
 
                 }
                 break;
-            case 21 :
-                // RVCCal__.g:1:131: T__101
+            case 18 :
+                // RVCCal__.g:1:113: T__101
                 {
                 mT__101(); 
 
                 }
                 break;
-            case 22 :
-                // RVCCal__.g:1:138: T__102
+            case 19 :
+                // RVCCal__.g:1:120: T__102
                 {
                 mT__102(); 
 
                 }
                 break;
-            case 23 :
-                // RVCCal__.g:1:145: T__103
+            case 20 :
+                // RVCCal__.g:1:127: T__103
                 {
                 mT__103(); 
 
                 }
                 break;
-            case 24 :
-                // RVCCal__.g:1:152: T__104
+            case 21 :
+                // RVCCal__.g:1:134: T__104
                 {
                 mT__104(); 
 
                 }
                 break;
-            case 25 :
-                // RVCCal__.g:1:159: T__105
+            case 22 :
+                // RVCCal__.g:1:141: T__105
                 {
                 mT__105(); 
 
                 }
                 break;
-            case 26 :
-                // RVCCal__.g:1:166: T__106
+            case 23 :
+                // RVCCal__.g:1:148: T__106
                 {
                 mT__106(); 
 
                 }
                 break;
-            case 27 :
-                // RVCCal__.g:1:173: T__107
+            case 24 :
+                // RVCCal__.g:1:155: T__107
                 {
                 mT__107(); 
 
                 }
                 break;
-            case 28 :
-                // RVCCal__.g:1:180: T__108
+            case 25 :
+                // RVCCal__.g:1:162: T__108
                 {
                 mT__108(); 
 
                 }
                 break;
-            case 29 :
-                // RVCCal__.g:1:187: T__109
+            case 26 :
+                // RVCCal__.g:1:169: T__109
                 {
                 mT__109(); 
 
                 }
                 break;
-            case 30 :
-                // RVCCal__.g:1:194: T__110
+            case 27 :
+                // RVCCal__.g:1:176: T__110
                 {
                 mT__110(); 
 
                 }
                 break;
-            case 31 :
-                // RVCCal__.g:1:201: T__111
+            case 28 :
+                // RVCCal__.g:1:183: T__111
                 {
                 mT__111(); 
 
                 }
                 break;
-            case 32 :
-                // RVCCal__.g:1:208: T__112
+            case 29 :
+                // RVCCal__.g:1:190: T__112
                 {
                 mT__112(); 
 
                 }
                 break;
-            case 33 :
-                // RVCCal__.g:1:215: T__113
+            case 30 :
+                // RVCCal__.g:1:197: T__113
                 {
                 mT__113(); 
 
                 }
                 break;
-            case 34 :
-                // RVCCal__.g:1:222: T__114
+            case 31 :
+                // RVCCal__.g:1:204: T__114
                 {
                 mT__114(); 
 
                 }
                 break;
-            case 35 :
-                // RVCCal__.g:1:229: T__115
+            case 32 :
+                // RVCCal__.g:1:211: T__115
                 {
                 mT__115(); 
 
                 }
                 break;
-            case 36 :
-                // RVCCal__.g:1:236: T__116
+            case 33 :
+                // RVCCal__.g:1:218: T__116
                 {
                 mT__116(); 
 
                 }
                 break;
-            case 37 :
-                // RVCCal__.g:1:243: T__117
+            case 34 :
+                // RVCCal__.g:1:225: T__117
                 {
                 mT__117(); 
 
                 }
                 break;
-            case 38 :
-                // RVCCal__.g:1:250: T__118
+            case 35 :
+                // RVCCal__.g:1:232: T__118
                 {
                 mT__118(); 
 
                 }
                 break;
-            case 39 :
-                // RVCCal__.g:1:257: T__119
+            case 36 :
+                // RVCCal__.g:1:239: T__119
                 {
                 mT__119(); 
 
                 }
                 break;
-            case 40 :
-                // RVCCal__.g:1:264: T__120
+            case 37 :
+                // RVCCal__.g:1:246: T__120
                 {
                 mT__120(); 
 
                 }
                 break;
-            case 41 :
-                // RVCCal__.g:1:271: T__121
+            case 38 :
+                // RVCCal__.g:1:253: T__121
                 {
                 mT__121(); 
 
                 }
                 break;
-            case 42 :
-                // RVCCal__.g:1:278: T__122
+            case 39 :
+                // RVCCal__.g:1:260: T__122
                 {
                 mT__122(); 
 
                 }
                 break;
-            case 43 :
-                // RVCCal__.g:1:285: T__123
+            case 40 :
+                // RVCCal__.g:1:267: T__123
                 {
                 mT__123(); 
 
                 }
                 break;
-            case 44 :
-                // RVCCal__.g:1:292: T__124
+            case 41 :
+                // RVCCal__.g:1:274: T__124
                 {
                 mT__124(); 
 
                 }
                 break;
-            case 45 :
-                // RVCCal__.g:1:299: T__125
+            case 42 :
+                // RVCCal__.g:1:281: T__125
                 {
                 mT__125(); 
 
                 }
                 break;
-            case 46 :
-                // RVCCal__.g:1:306: T__126
+            case 43 :
+                // RVCCal__.g:1:288: T__126
                 {
                 mT__126(); 
 
                 }
                 break;
-            case 47 :
-                // RVCCal__.g:1:313: T__127
+            case 44 :
+                // RVCCal__.g:1:295: T__127
                 {
                 mT__127(); 
 
                 }
                 break;
+            case 45 :
+                // RVCCal__.g:1:302: T__128
+                {
+                mT__128(); 
+
+                }
+                break;
+            case 46 :
+                // RVCCal__.g:1:309: T__129
+                {
+                mT__129(); 
+
+                }
+                break;
+            case 47 :
+                // RVCCal__.g:1:316: T__130
+                {
+                mT__130(); 
+
+                }
+                break;
             case 48 :
-                // RVCCal__.g:1:320: ALBaseLexer. Tokens
+                // RVCCal__.g:1:323: ALBaseLexer. Tokens
                 {
                 gALBaseLexer.mTokens(); 
 
@@ -1692,7 +1695,7 @@ public class RVCCalLexer extends Lexer {
             this.transition = DFA1_transition;
         }
         public String getDescription() {
-            return "1:1: Tokens : ( T__81 | T__82 | T__83 | T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | T__96 | T__97 | T__98 | T__99 | T__100 | T__101 | T__102 | T__103 | T__104 | T__105 | T__106 | T__107 | T__108 | T__109 | T__110 | T__111 | T__112 | T__113 | T__114 | T__115 | T__116 | T__117 | T__118 | T__119 | T__120 | T__121 | T__122 | T__123 | T__124 | T__125 | T__126 | T__127 | ALBaseLexer. Tokens );";
+            return "1:1: Tokens : ( T__84 | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | T__94 | T__95 | T__96 | T__97 | T__98 | T__99 | T__100 | T__101 | T__102 | T__103 | T__104 | T__105 | T__106 | T__107 | T__108 | T__109 | T__110 | T__111 | T__112 | T__113 | T__114 | T__115 | T__116 | T__117 | T__118 | T__119 | T__120 | T__121 | T__122 | T__123 | T__124 | T__125 | T__126 | T__127 | T__128 | T__129 | T__130 | ALBaseLexer. Tokens );";
         }
     }
  

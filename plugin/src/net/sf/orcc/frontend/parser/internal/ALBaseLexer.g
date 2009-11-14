@@ -135,7 +135,16 @@ FLOAT: (('0'..'9')+ '.' ('0'..'9')* Exponent?
 fragment
 Exponent : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
 
-INTEGER: ('0' | '1'..'9' '0'..'9'*);
+fragment
+Decimal: ('0' | '1'..'9' '0'..'9'*);
+
+fragment
+HexDigit: ('0'..'9'|'a'..'f'|'A'..'F');
+
+fragment
+Hexadecimal: '0' ('x'|'X') HexDigit+;
+
+INTEGER: Decimal | Hexadecimal;
 
 STRING: '"' ( EscapeSequence | ~('\\'|'"') )* '"';
 
