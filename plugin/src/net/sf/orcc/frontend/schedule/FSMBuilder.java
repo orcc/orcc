@@ -196,18 +196,15 @@ public class FSMBuilder {
 	 */
 	private void parseTransitions(Tree tree) {
 		int n = tree.getChildCount();
-		boolean b1 = false;
 		for (int i = 0; i < n; i++) {
 			Tree transition = tree.getChild(i);
 			String source = transition.getChild(0).getText();
 			Tag tag = parseActionTag(transition.getChild(1));
 			String target = transition.getChild(2).getText();
-			b1 = graph.addVertex(source);
-			b1 = graph.addVertex(target);
-			b1 = graph.addEdge(source, target, new UniqueEdge(tag));
+			graph.addVertex(source);
+			graph.addVertex(target);
+			graph.addEdge(source, target, new UniqueEdge(tag));
 		}
-
-		System.out.println(b1);
 	}
 
 	/**
