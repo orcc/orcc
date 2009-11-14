@@ -14,19 +14,50 @@ actor Parser() uint(size=8) I ==> :
   uint(size=18) vbv_buffer_size;
   bool load_intra_quantiser_matrix;
   
+  /////////////////////////////////////////////////////////////////////////////
   // sequence extension stuff
-  uint(size=4) extension_start_code_identifier;
   bool escape_bit;
   uint(size=3) profile;
+
+  /////////////////////////////////////////////////////////////////////////////
+  // GOP data
+
+  /////////////////////////////////////////////////////////////////////////////
+  // picture header
+  uint(size=10) temporal_reference;
+  uint(size=3) picture_coding_type;
+  uint(size=16) vbv_delay;
   
+  /////////////////////////////////////////////////////////////////////////////
+  // picture coding extension
+  List(type:List(type:uint(size=4), size=2), size=2) f_code := [[0, 0], [0, 0]];
+
+  /////////////////////////////////////////////////////////////////////////////
   // constants
+
+  // start code values
+  uint(size=8) PICTURE_START_CODE = 0x00;
+  uint(size=8) USER_DATA_START_CODE = 0xB2;
   uint(size=8) SEQUENCE_HEADER_CODE = 0xB3;
   uint(size=8) EXTENSION_START_CODE = 0xB5;
+  uint(size=8) GROUP_START_CODE = 0xB8;
   
+  // extension identifiers
+  uint(size=4) SEQUENCE_EXTENSION = 0x01;
+  uint(size=4) PICTURE_CODING_EXTENSION = 0x08;
+    
   // TODO: use float
   List(type:int, size=16) FRAME_RATE_CODE =
     [ -1, 23 /*.976*/, 24, 25, 29 /*.97*/, 30, 50, 59 /*.94*/, 60,
-    -1, -1, -1, -1, -1, -1, -1 ]; 
+    -1, -1, -1, -1, -1, -1, -1 ];
+
+  // picture coding type
+  uint(size=3) INTRA = 1;
+  uint(size=3) PRED = 2;
+  uint(size=3) BIPRED = 3;
+
+  /////////////////////////////////////////////////////////////////////////////
+  // start code detection
 
   /** detect next start code, or execute zero_byte_stuffing */
   next_start_code: action I:[ b0, b1, b2 ] ==>
@@ -34,13 +65,23 @@ actor Parser() uint(size=8) I ==> :
     b0 = 0 and b1 = 0 and b2 = 0x01
   end
   
-  zero_byte_stuffing: action I:[ b ] ==>
+  byte_stuffing.zero: action I:[ b ] ==>
   guard
     b = 0
   end
   
+  byte_stuffing.whatever: action I:[ b ] ==>
+  end
+  
+  // when expected start code value not there
+  other_start_code: action I:[ byte ] ==>
+  end
+
+  ///////////////////////////////////////////////////////////////////////////
   /** sequence header */
   sequence_header: action I:[ bytes ] repeat 9 ==>
+  guard
+    bytes[0] = SEQUENCE_HEADER_CODE
   var
     uint(size=8) byte, uint(size=24) size,
     uint(size=4) frame_rate_code, uint(size=1) constrained_parameters_flag
@@ -83,12 +124,6 @@ actor Parser() uint(size=8) I ==> :
     next_bits := bytes[8] & 0x01;
   end
   
-  /** invalid sequence header */
-  sequence_header_invalid: action I:[ header_code ] ==>
-  guard
-    header_code != SEQUENCE_HEADER_CODE
-  end
-  
   /** sequence header with load_intra_quantiser_matrix */
   load_intra_quantiser_matrix.yes: action I:[ matrix ] repeat 64 ==>
   do
@@ -114,52 +149,179 @@ actor Parser() uint(size=8) I ==> :
   guard
     next_bits = 0
   end
-  
+
+  ///////////////////////////////////////////////////////////////////////////
   /** extension_start_code */
-  other_start_code: action I: [ start_code ] ==>
-  guard
-    start_code != EXTENSION_START_CODE
-  end
-  
   sequence_extension: action I:[ bytes ] repeat 7 ==>
+  guard
+    bytes[0] = EXTENSION_START_CODE and bytes[1] >> 4 = SEQUENCE_EXTENSION
   var
     uint(size=8) profile_and_level_indication
   do
-    extension_start_code_identifier := bytes[1] >> 4;
     profile_and_level_indication := (bytes[1] & 0x0F) << 4 | bytes[2] >> 4;
     escape_bit := (profile_and_level_indication >> 7) != 0;
     profile := (profile_and_level_indication & 0x78) >> 4;
   end
-  
-  // priorities
-  priority
-    next_start_code > zero_byte_stuffing;
-    sequence_header_invalid > sequence_header;
-    load_intra_quantiser_matrix.no > load_intra_quantiser_matrix.yes;
-    load_non_intra_quantiser_matrix.no > load_non_intra_quantiser_matrix.yes;
-    
-    other_start_code > sequence_extension;
+
+  /** user_data */
+  user_data: action I:[ start_code ] ==>
+  guard
+    start_code = USER_DATA_START_CODE
+  end
+
+  ///////////////////////////////////////////////////////////////////////////
+  /** gop_header */
+  gop_header: action I:[ bytes ] repeat 5 ==>
+  guard
+    bytes[0] = GROUP_START_CODE
+  end
+
+  ///////////////////////////////////////////////////////////////////////////
+  /** picture_header */
+  picture_header: action I:[ bytes ] repeat 5 ==>
+  guard
+    bytes[0] = PICTURE_START_CODE
+  do
+    temporal_reference := bytes[1] << 2 | bytes[2] & 0xC0;
+    picture_coding_type := (bytes[2] & 0x38) >> 3;
+    vbv_delay := (bytes[2] & 0x07) << 13 | bytes[3] | bytes[4] >> 3;
+    next_bits := bytes[4] & 0x07;
   end
   
+  picture_P: action I:[ byte ] ==>
+  guard
+    picture_coding_type = PRED
+  do
+    // not used in MPEG-2
+    // full_pel_forward_vector := next_bits >> 2;
+    // forward_f_code := next_bits & 0x03 | byte >> 7;
+    next_bits := byte & 0x7F;
+  end
+
+  picture_B: action I:[ byte ] ==>
+  guard
+    picture_coding_type = BIPRED
+  do
+    // not used in MPEG-2
+    // full_pel_forward_vector := next_bits >> 2;
+    // forward_f_code := next_bits & 0x03 | byte >> 7;
+    // full_pel_backward_vector := (byte & 0x40) >> 6;
+    // backward_f_code := (byte & 0x38) >> 3;
+    next_bits := byte & 0x07;
+  end
+
+  picture_other: action ==>
+  end
+  
+  ///////////////////////////////////////////////////////////////////////////
+  /** picture_coding_extension */
+  picture_coding_extension: action I:[ bytes ] repeat 6 ==>
+  guard
+    bytes[0] = EXTENSION_START_CODE and bytes[1] >> 4 = PICTURE_CODING_EXTENSION
+  do
+    f_code[0, 0] := bytes[1] & 0x0F;
+    f_code[0, 1] := bytes[2] >> 4;
+    f_code[1, 0] := bytes[2] & 0x0F;
+    f_code[1, 1] := bytes[3] >> 4;
+  end
+  
+  ///////////////////////////////////////////////////////////////////////////
+  // priorities
+  priority
+    next_start_code > byte_stuffing.zero > byte_stuffing.whatever;
+    
+    sequence_header > other_start_code;
+    load_intra_quantiser_matrix.no > load_intra_quantiser_matrix.yes;
+    load_non_intra_quantiser_matrix.no > load_non_intra_quantiser_matrix.yes;
+
+    sequence_extension > other_start_code;
+    user_data > other_start_code;
+    gop_header > other_start_code;
+    picture_header > other_start_code;
+    
+    picture_P > picture_other;
+    picture_B > picture_other;
+  end
+  
+  ///////////////////////////////////////////////////////////////////////////
   // FSM
   // state "oops" is dead-end state when encountering an invalid sequence or when parser is lost
   schedule fsm video_sequence_start:
+    video_sequence_start (byte_stuffing.zero) --> video_sequence_start;
+    video_sequence_start (byte_stuffing.whatever) --> oops;
     video_sequence_start (next_start_code) --> sequence_header;
-    video_sequence_start (zero_byte_stuffing) --> video_sequence_start;
-    
+
+	// sequence_header
     sequence_header (sequence_header) --> sequence_header_intra_matrix_or_not;
-    sequence_header (sequence_header_invalid) --> oops;
-    
+    sequence_header (other_start_code) --> oops;
+
     sequence_header_intra_matrix_or_not (load_intra_quantiser_matrix) --> sequence_header_non_intra_matrix_or_not;
+    sequence_header_non_intra_matrix_or_not (load_non_intra_quantiser_matrix) --> sequence_body;
+
+	// sequence_body: if ( nextbits() == extension_start_code ) { sequence_extension; sequence_loop }
+    sequence_body (byte_stuffing.zero) --> sequence_body;
+    sequence_body (byte_stuffing.whatever) --> oops;
+    sequence_body (next_start_code) --> sequence_body_after_SC;
+
+    sequence_body_after_SC (sequence_extension) --> sequence_loop;
+    sequence_body_after_SC (other_start_code) --> oops;
+
+    // sequence_loop: do { ... } while ( nextbits() != sequence_end_code )
+    sequence_loop (byte_stuffing.zero) --> sequence_loop;
+    sequence_loop (byte_stuffing.whatever) --> oops;
+    sequence_loop (next_start_code) --> sequence_loop_after_SC;
+
+    // extension data
+    sequence_loop_after_SC (sequence_extension) --> sequence_loop_after_SC;
+
+	// user data
+	sequence_loop_after_SC (user_data) --> sequence_loop_user_data;
+	sequence_loop_user_data (byte_stuffing.whatever) --> sequence_loop_user_data;
+	sequence_loop_user_data (next_start_code) --> sequence_loop_after_SC;
+
+    // GOP, or picture, or OOPS!
+    sequence_loop_after_SC (gop_header) --> gop;
+    sequence_loop_after_SC (picture_header) --> picture_header;
+    sequence_loop_after_SC (other_start_code) --> oops;
+
+    ///////////////////////////////////////////////////////////////////////////
+	// we got a GOP, look for the next start code
+    gop (byte_stuffing.zero) --> gop;
+    gop (byte_stuffing.whatever) --> oops;
+    gop (next_start_code) --> gop_after_SC;
+
+    // extension data
+    gop_after_SC (sequence_extension) --> gop_after_SC;
+
+    // user data
+    gop_after_SC (user_data) --> gop_user_data;
+    gop_user_data (byte_stuffing.whatever) --> gop_user_data;
+    gop_user_data (next_start_code) --> gop_after_SC;
     
-    sequence_header_non_intra_matrix_or_not (load_non_intra_quantiser_matrix) --> sequence_body_start_code;
+    // picture header
+    gop_after_SC (picture_header) --> picture_header;
     
-    sequence_body_start_code (next_start_code) --> sequence_body;
-    sequence_body (other_start_code) --> oops;
-    sequence_body (sequence_extension) --> sequence_start;
+    ///////////////////////////////////////////////////////////////////////////
+	// picture_header extra info, not used in MPEG-2
+	picture_header (picture_P) --> picture_header_extra;
+	picture_header (picture_B) --> picture_header_extra;
+	picture_header (picture_other) --> picture_header_no_extra;
+	
+	picture_header_no_extra (byte_stuffing.zero) --> picture_header_no_extra;
+	picture_header_no_extra (byte_stuffing.whatever) --> oops;
+	picture_header_no_extra (next_start_code) --> picture_header_done;
+
+	// ok bit of an optimization here, because this information is not used anyway
+	// so we just look for the next start code (I know this is not strictly compliant,
+	// but who cares?)
+    picture_header_extra (byte_stuffing.whatever) --> picture_header_extra;
+    picture_header_extra (next_start_code) --> picture_header_done;
     
-    // TODO sequence_start
-    
+    ///////////////////////////////////////////////////////////////////////////
+	// picture_coding_extension
+	picture_header_done (picture_coding_extension) --> picture_extension_done;
+	picture_header_done (other_start_code) --> oops;
+
     // just so we do not have warnings
     oops (oops) --> oops;
   end
