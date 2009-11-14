@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.DOTExporter;
@@ -282,9 +283,9 @@ public class FSM {
 	 * 
 	 * @return a graph representation of this FSM
 	 */
-	public DirectedGraph<State, Action> getGraph() {
-		DirectedGraph<State, Action> graph = new DirectedMultigraph<State, Action>(
-				Action.class);
+	private DirectedGraph<State, UniqueEdge> getGraph() {
+		DirectedGraph<State, UniqueEdge> graph = new DirectedMultigraph<State, UniqueEdge>(
+				UniqueEdge.class);
 		for (State source : states.values()) {
 			graph.addVertex(source);
 			int index = source.getIndex();
@@ -293,7 +294,7 @@ public class FSM {
 			for (NextStateInfo info : nextState) {
 				State target = info.getTargetState();
 				graph.addVertex(target);
-				graph.addEdge(source, target, info.getAction());
+				graph.addEdge(source, target, new UniqueEdge(info.getAction()));
 			}
 		}
 
@@ -340,9 +341,9 @@ public class FSM {
 	public void printGraph(File file) throws OrccException {
 		try {
 			OutputStream out = new FileOutputStream(file);
-			DOTExporter<State, Action> exporter = new DOTExporter<State, Action>(
+			DOTExporter<State, UniqueEdge> exporter = new DOTExporter<State, UniqueEdge>(
 					new StringNameProvider<State>(), null,
-					new StringEdgeNameProvider<Action>());
+					new StringEdgeNameProvider<UniqueEdge>());
 			exporter.export(new OutputStreamWriter(out), getGraph());
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);

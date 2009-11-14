@@ -45,6 +45,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
+import net.sf.orcc.util.UniqueEdge;
 
 import org.antlr.runtime.tree.Tree;
 import org.jgrapht.DirectedGraph;
@@ -63,7 +64,7 @@ public class FSMBuilder {
 
 	private Map<Action, Integer> actionRank;
 
-	private DirectedGraph<String, Tag> graph;
+	private DirectedGraph<String, UniqueEdge> graph;
 
 	private String initialState;
 
@@ -74,7 +75,7 @@ public class FSMBuilder {
 	 *            an ANTLR tree that represents the AST of an FSM.
 	 */
 	public FSMBuilder(Tree tree) {
-		graph = new DirectedMultigraph<String, Tag>(Tag.class);
+		graph = new DirectedMultigraph<String, UniqueEdge>(UniqueEdge.class);
 		initialState = tree.getChild(0).getText();
 		parseTransitions(tree.getChild(1));
 	}
@@ -169,12 +170,18 @@ public class FSMBuilder {
 	private Map<Action, String> getTargets(FSM fsm, String source,
 			ActionList actionList) {
 		Map<Action, String> targets = new HashMap<Action, String>();
-		Set<Tag> tags = graph.outgoingEdgesOf(source);
-		for (Tag tag : tags) {
-			String target = graph.getEdgeTarget(tag);
+		Set<UniqueEdge> edges = graph.outgoingEdgesOf(source);
+		for (UniqueEdge edge : edges) {
+			String target = graph.getEdgeTarget(edge);
+			Tag tag = (Tag) edge.getObject();
 			List<Action> actions = actionList.getActions(tag);
-			for (Action action : actions) {
-				targets.put(action, target);
+			if (actions == null) {
+				// non-existent target state
+				System.out.println("non-existent target state: " + edge);
+			} else {
+				for (Action action : actions) {
+					targets.put(action, target);
+				}
 			}
 		}
 		return targets;
@@ -189,15 +196,18 @@ public class FSMBuilder {
 	 */
 	private void parseTransitions(Tree tree) {
 		int n = tree.getChildCount();
+		boolean b1 = false;
 		for (int i = 0; i < n; i++) {
 			Tree transition = tree.getChild(i);
 			String source = transition.getChild(0).getText();
 			Tag tag = parseActionTag(transition.getChild(1));
 			String target = transition.getChild(2).getText();
-			graph.addVertex(source);
-			graph.addVertex(target);
-			graph.addEdge(source, target, tag);
+			b1 = graph.addVertex(source);
+			b1 = graph.addVertex(target);
+			b1 = graph.addEdge(source, target, new UniqueEdge(tag));
 		}
+
+		System.out.println(b1);
 	}
 
 	/**
@@ -207,9 +217,9 @@ public class FSMBuilder {
 	 *            output stream
 	 */
 	public void printGraph(OutputStream out) {
-		DOTExporter<String, Tag> exporter = new DOTExporter<String, Tag>(
+		DOTExporter<String, UniqueEdge> exporter = new DOTExporter<String, UniqueEdge>(
 				new StringNameProvider<String>(), null,
-				new StringEdgeNameProvider<Tag>());
+				new StringEdgeNameProvider<UniqueEdge>());
 		exporter.export(new OutputStreamWriter(out), graph);
 	}
 
