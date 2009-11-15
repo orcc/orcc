@@ -28,6 +28,20 @@
  */
 package net.sf.orcc.ir;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import net.sf.orcc.OrccException;
+
+import org.jgrapht.ext.DOTExporter;
+import org.jgrapht.ext.StringEdgeNameProvider;
+import org.jgrapht.ext.StringNameProvider;
+import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
 /**
@@ -36,15 +50,60 @@ import org.jgrapht.graph.DefaultDirectedGraph;
  * @author Matthieu Wipliez
  * 
  */
-public class CFG extends DefaultDirectedGraph<CFGNode, Object> {
+public class CFG extends DefaultDirectedGraph<CFGNode, CFGEdge> {
+
+	private class CFGNodeNameProvider implements VertexNameProvider<CFGNode> {
+
+		private int nodeCount;
+
+		private Map<CFGNode, Integer> nodeMap;
+
+		public CFGNodeNameProvider() {
+			nodeMap = new HashMap<CFGNode, Integer>();
+		}
+
+		@Override
+		public String getVertexName(CFGNode node) {
+			Integer id = nodeMap.get(node);
+			if (id == null) {
+				nodeCount++;
+				id = nodeCount;
+				nodeMap.put(node, id);
+			}
+
+			return id.toString();
+		}
+
+	}
 
 	/**
-	 * 
+	 * default serial version UID
 	 */
 	private static final long serialVersionUID = 1L;
 
 	public CFG() {
-		super(Object.class);
+		super(CFGEdge.class);
+	}
+
+	/**
+	 * Prints a graph representation of this CFG.
+	 * 
+	 * @param file
+	 *            output file
+	 * @throws OrccException
+	 *             if something goes wrong (most probably I/O error)
+	 */
+	public void printGraph(File file) throws OrccException {
+		try {
+			OutputStream out = new FileOutputStream(file);
+			DOTExporter<CFGNode, CFGEdge> exporter = new DOTExporter<CFGNode, CFGEdge>(
+					new CFGNodeNameProvider(),
+					new StringNameProvider<CFGNode>(),
+					new StringEdgeNameProvider<CFGEdge>());
+			exporter.export(new OutputStreamWriter(out), this);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 }
