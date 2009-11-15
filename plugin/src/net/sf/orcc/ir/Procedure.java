@@ -45,14 +45,28 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class Procedure extends AbstractLocalizable implements INameable {
 
+	/**
+	 * This class defines a CFG builder.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
 	private class CFGBuilder implements NodeVisitor {
 
 		private CFG graph;
 
+		/**
+		 * Creates a new CFG builder.
+		 */
 		public CFGBuilder() {
 			graph = new CFG();
 		}
 
+		/**
+		 * Returns the CFG built.
+		 * 
+		 * @return the CFG built
+		 */
 		public CFG getCFG() {
 			return graph;
 		}
@@ -77,26 +91,49 @@ public class Procedure extends AbstractLocalizable implements INameable {
 			}
 
 			CFGNode join = node.getJoinNode();
+			graph.addVertex(join);
 
-			CFGNode last = (CFGNode) visit(node.getThenNodes());
+			CFGNode last = (CFGNode) visit(node.getThenNodes(), node);
 			graph.addEdge(last, join);
 
-			last = (CFGNode) visit(node.getElseNodes());
+			last = (CFGNode) visit(node.getElseNodes(), node);
 			graph.addEdge(last, join);
 
 			return join;
 		}
 
-		public Object visit(List<CFGNode> nodes) {
-			Object last = null;
+		/**
+		 * Visits the given node list.
+		 * 
+		 * @param nodes
+		 *            a list of nodes
+		 * @param previous
+		 *            the previous node, or <code>null</code> if there is none
+		 * @return the last node of the node list
+		 */
+		public Object visit(List<CFGNode> nodes, CFGNode previous) {
+			Object last = previous;
 			for (CFGNode node : nodes) {
-				last = node.accept(this);
+				last = node.accept(this, last);
 			}
 			return last;
 		}
 
 		@Override
 		public Object visit(WhileNode node, Object... args) {
+			CFGNode previous = (CFGNode) args[0];
+			graph.addVertex(node);
+			if (previous != null) {
+				graph.addEdge(previous, node);
+			}
+
+			CFGNode join = node.getJoinNode();
+			graph.addVertex(join);
+			graph.addEdge(node, join);
+			
+			CFGNode last = (CFGNode) visit(node.getNodes(), join);
+			graph.addEdge(last, node);
+
 			return node;
 		}
 
@@ -160,9 +197,14 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		this.returnType = returnType;
 	}
 
+	/**
+	 * Builds and returns the CFG of this procedure.
+	 * 
+	 * @return the CFG built
+	 */
 	public CFG buildCFG() {
 		CFGBuilder builder = new CFGBuilder();
-		builder.visit(nodes);
+		builder.visit(nodes, null);
 		return builder.getCFG();
 	}
 
