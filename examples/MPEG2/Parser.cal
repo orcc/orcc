@@ -1,7 +1,14 @@
 actor Parser() uint(size=8) I ==> :
 
   // to save next bits when needed
-  int next_bits;
+  uint(size=32) next_bits;
+  uint(size=5) next_shift; // from 0 to 31
+  uint(size=2) i_want_a_refill;
+
+  // this is the maximum size of a chunk
+  int MAX_CHUNK_SIZE = 1 << 16;
+  List(type:int(size=32), size=MAX_CHUNK_SIZE) chunk;
+  int chunk_ptr;
 
   // sequence characteristics
   uint(size=12) horizontal_size;
@@ -45,12 +52,19 @@ actor Parser() uint(size=8) I ==> :
   bool chroma_420_type;
   bool progressive_frame;
   bool composite_display_flag;
+  
+  /////////////////////////////////////////////////////////////////////////////
+  // slice
+  uint(size=3) slice_vertical_position_extension;
+  uint(size=5) quantiser_scale_code;
 
   /////////////////////////////////////////////////////////////////////////////
   // constants
 
   // start code values
   uint(size=8) PICTURE_START_CODE = 0x00;
+  uint(size=8) SLICE_BEGIN_START_CODE = 0x01;
+  uint(size=8) SLICE_END_START_CODE = 0xAF;
   uint(size=8) USER_DATA_START_CODE = 0xB2;
   uint(size=8) SEQUENCE_HEADER_CODE = 0xB3;
   uint(size=8) EXTENSION_START_CODE = 0xB5;
@@ -73,6 +87,12 @@ actor Parser() uint(size=8) I ==> :
   /////////////////////////////////////////////////////////////////////////////
   // start code detection
 
+  chunk_b1: action I:[ b ] ==>
+  do
+    chunk[chunk_ptr] := b;
+    chunk_ptr := chunk_ptr + 1;
+  end
+
   /** detect next start code, or execute zero_byte_stuffing */
   next_start_code: action I:[ b0, b1, b2 ] ==>
   guard
@@ -89,6 +109,12 @@ actor Parser() uint(size=8) I ==> :
   
   // when expected start code value not there
   other_start_code: action I:[ byte ] ==>
+  end
+  
+  
+  initialize ==>
+  do
+    chunk := [ 0 : for int i in Integers(0, MAX_CHUNK_SIZE - 1) ];
   end
 
   ///////////////////////////////////////////////////////////////////////////
@@ -275,7 +301,39 @@ actor Parser() uint(size=8) I ==> :
   
   ///////////////////////////////////////////////////////////////////////////
   /** slice */
-  slice: action ==>
+  slice: action I:[ bytes ] repeat 2 ==>
+  guard
+    bytes[0] >= SLICE_BEGIN_START_CODE and bytes[0] <= SLICE_END_START_CODE
+  do
+    next_bits := bytes[1];
+    if vertical_size > 2800 then
+      // somehow, I think it is quite unlikely, but... who knows? 
+      slice_vertical_position_extension := next_bits >> 5; // 3 highest bits
+      quantiser_scale_code := next_bits & 0x1F; // 5 lowest bits
+      next_bits := bytes[2];
+      next_shift := 7;
+    else
+      quantiser_scale_code := next_bits >> 3; // 5 highest bits
+      next_bits := ((next_bits & 0x07) << 8) | bytes[2];
+      next_shift := 10;
+    end
+
+    // TODO: scalable extension
+  end
+  
+  slice_intra_flag.yes: action I:[ byte ] ==>
+  end
+  
+  slice_intra_flag.no: action ==>
+  guard
+    ((next_bits >> next_shift) & 0x01) = 0
+  do
+    next_shift := next_shift - 1;
+  end
+  
+  ///////////////////////////////////////////////////////////////////////////
+  /** macroblock */
+  mb: action I:[ byte ] ==>
   end
 
   ///////////////////////////////////////////////////////////////////////////
@@ -291,8 +349,10 @@ actor Parser() uint(size=8) I ==> :
     user_data > other_start_code;
     gop_header > other_start_code;
     picture_header > other_start_code;
+    slice > other_start_code;
     
     composite_flag.no > composite_flag.yes;
+    slice_intra_flag.no > slice_intra_flag.yes;
   end
   
   ///////////////////////////////////////////////////////////////////////////
@@ -392,9 +452,12 @@ actor Parser() uint(size=8) I ==> :
     
     // slice
     extension_user_data_2 (slice) --> slice_start;
+    extension_user_data_2 (other_start_code) --> oops;
     
     ///////////////////////////////////////////////////////////////////////////
 	// slice
+	slice_start (slice_intra_flag.yes) --> oops; // TODO
+	slice_start (slice_intra_flag.no) --> MB;
 
     // just so we do not have warnings
     oops (oops) --> oops;
