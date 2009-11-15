@@ -107,4 +107,15 @@ public class BlockNode extends ArrayList<Instruction> implements
 		return location;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (Instruction instruction : this) {
+			sb.append(instruction.toString());
+			sb.append("\\n");
+		}
+		
+		return sb.toString();
+	}
+
 }

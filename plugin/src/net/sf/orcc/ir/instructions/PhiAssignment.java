@@ -91,4 +91,9 @@ public class PhiAssignment extends AbstractInstruction implements
 		this.target = target;
 	}
 
+	@Override
+	public String toString() {
+		return getTarget() + " = phi(" + localUses + ")";
+	}
+
 }
