@@ -26,43 +26,20 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
-
-import net.sf.orcc.ir.Expression;
+package net.sf.orcc.ir.consts;
 
 /**
- * This class is an abstract implementation of {@link ExprVisitor}.
- * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractExprVisitor implements ExprVisitor {
+public interface ConstantVisitor {
 
-	public void visit(BinaryExpr expr, Object... args) {
-		expr.getE1().accept(this, args);
-		expr.getE2().accept(this, args);
-	}
+	public void visit(BoolConst constant, Object... args);
 
-	public void visit(BooleanExpr expr, Object... args) {
-	}
+	public void visit(IntConst constant, Object... args);
 
-	public void visit(IntExpr expr, Object... args) {
-	}
+	public void visit(ListConst constant, Object... args);
 
-	public void visit(ListExpr expr, Object... args) {
-		for (Expression subExpr : expr.getValue()) {
-			subExpr.accept(this, args);
-		}
-	}
-
-	public void visit(StringExpr expr, Object... args) {
-	}
-
-	public void visit(UnaryExpr expr, Object... args) {
-		expr.getExpr().accept(this, args);
-	}
-
-	public void visit(VarExpr expr, Object... args) {
-	}
+	public void visit(StringConst constant, Object... args);
 
 }

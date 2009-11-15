@@ -30,7 +30,7 @@ package net.sf.orcc.backends.java;
 
 import net.sf.orcc.backends.c.ConstPrinter;
 import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstVisitor;
+import net.sf.orcc.ir.consts.ConstantVisitor;
 
 import org.antlr.stringtemplate.StringTemplateGroup;
 
@@ -41,7 +41,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Matthieu Wipliez
  * 
  */
-public class JavaConstPrinter extends ConstPrinter implements ConstVisitor {
+public class JavaConstPrinter extends ConstPrinter implements ConstantVisitor {
 
 	/**
 	 * Creates a new const printer from the given template group.

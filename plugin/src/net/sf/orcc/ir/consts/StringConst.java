@@ -57,7 +57,7 @@ public class StringConst implements Constant {
 	}
 
 	@Override
-	public void accept(ConstVisitor visitor, Object... args) {
+	public void accept(ConstantVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

@@ -43,8 +43,9 @@ public interface NodeVisitor {
 	 *            a block node
 	 * @param args
 	 *            arguments
+	 * @return an object
 	 */
-	public void visit(BlockNode node, Object... args);
+	public Object visit(BlockNode node, Object... args);
 
 	/**
 	 * Visits an if node.
@@ -53,8 +54,9 @@ public interface NodeVisitor {
 	 *            an if node
 	 * @param args
 	 *            arguments
+	 * @return an object
 	 */
-	public void visit(IfNode node, Object... args);
+	public Object visit(IfNode node, Object... args);
 
 	/**
 	 * Visits a while node.
@@ -63,7 +65,8 @@ public interface NodeVisitor {
 	 *            a while node
 	 * @param args
 	 *            arguments
+	 * @return an object
 	 */
-	public void visit(WhileNode node, Object... args);
+	public Object visit(WhileNode node, Object... args);
 
 }

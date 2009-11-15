@@ -54,14 +54,15 @@ import net.sf.orcc.util.OrderedMap;
 public class PhiRemoval extends AbstractActorTransformation {
 
 	@Override
-	public void visit(BlockNode node, Object... args) {
+	public Object visit(BlockNode node, Object... args) {
 		for (Instruction instruction : node) {
 			instruction.accept(this, args);
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
+	public Object visit(IfNode node, Object... args) {
 		// visit then nodes
 		node.getJoinNode().accept(this, BlockNode.last(node.getThenNodes()), 0);
 		node.getJoinNode().accept(this, BlockNode.last(node.getElseNodes()), 1);
@@ -69,6 +70,8 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 		visit(node.getThenNodes());
 		visit(node.getElseNodes());
+		
+		return null;
 	}
 
 	@Override
@@ -101,7 +104,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void visit(WhileNode node, Object... args) {
+	public Object visit(WhileNode node, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
 
 		// the node before the while.
@@ -128,6 +131,8 @@ public class PhiRemoval extends AbstractActorTransformation {
 		node.getJoinNode().accept(this, block, 1);
 		node.getJoinNode().clear();
 		visit(node.getNodes());
+		
+		return null;
 	}
 
 }

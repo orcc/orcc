@@ -32,7 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstVisitor;
+import net.sf.orcc.ir.consts.ConstantVisitor;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
@@ -47,7 +47,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Matthieu Wipliez
  * 
  */
-public class ConstPrinter implements ConstVisitor {
+public class ConstPrinter implements ConstantVisitor {
 
 	/**
 	 * template group

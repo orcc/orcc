@@ -30,7 +30,7 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.ir.expr.AbstractExprVisitor;
+import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.expr.VarExpr;
 
 /**
@@ -47,7 +47,7 @@ public class Use {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private static class UseAdder extends AbstractExprVisitor {
+	private static class UseAdder extends AbstractExpressionVisitor {
 
 		private User node;
 
@@ -62,9 +62,10 @@ public class Use {
 		}
 
 		@Override
-		public void visit(VarExpr expr, Object... args) {
+		public Object visit(VarExpr expr, Object... args) {
 			Use use = expr.getVar();
 			use.setNode(node);
+			return null;
 		}
 
 	}
@@ -75,7 +76,7 @@ public class Use {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private static class UseRemover extends AbstractExprVisitor {
+	private static class UseRemover extends AbstractExpressionVisitor {
 
 		private User node;
 
@@ -90,11 +91,12 @@ public class Use {
 		}
 
 		@Override
-		public void visit(VarExpr expr, Object... args) {
+		public Object visit(VarExpr expr, Object... args) {
 			Use use = expr.getVar();
 			if (use.getNode().equals(node)) {
 				use.remove();
 			}
+			return null;
 		}
 
 	}

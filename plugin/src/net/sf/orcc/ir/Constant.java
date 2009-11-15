@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.consts.ConstVisitor;
+import net.sf.orcc.ir.consts.ConstantVisitor;
 
 /**
  * This interface defines a constant.
@@ -63,7 +63,7 @@ public interface Constant {
 	 * 
 	 * @param visitor
 	 */
-	public abstract void accept(ConstVisitor visitor, Object... args);
+	public abstract void accept(ConstantVisitor visitor, Object... args);
 
 	/**
 	 * Returns the type of this constant.

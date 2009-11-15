@@ -30,6 +30,10 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.INameable;
 import net.sf.orcc.util.OrderedMap;
 
@@ -39,7 +43,64 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class Procedure implements INameable {
+public class Procedure extends AbstractLocalizable implements INameable {
+
+	private class CFGBuilder implements NodeVisitor {
+
+		private CFG graph;
+
+		public CFGBuilder() {
+			graph = new CFG();
+		}
+
+		public CFG getCFG() {
+			return graph;
+		}
+
+		@Override
+		public Object visit(BlockNode node, Object... args) {
+			CFGNode previous = (CFGNode) args[0];
+			graph.addVertex(node);
+			if (previous != null) {
+				graph.addEdge(previous, node);
+			}
+
+			return node;
+		}
+
+		@Override
+		public Object visit(IfNode node, Object... args) {
+			CFGNode previous = (CFGNode) args[0];
+			graph.addVertex(node);
+			if (previous != null) {
+				graph.addEdge(previous, node);
+			}
+
+			CFGNode join = node.getJoinNode();
+
+			CFGNode last = (CFGNode) visit(node.getThenNodes());
+			graph.addEdge(last, join);
+
+			last = (CFGNode) visit(node.getElseNodes());
+			graph.addEdge(last, join);
+
+			return join;
+		}
+
+		public Object visit(List<CFGNode> nodes) {
+			Object last = null;
+			for (CFGNode node : nodes) {
+				last = node.accept(this);
+			}
+			return last;
+		}
+
+		@Override
+		public Object visit(WhileNode node, Object... args) {
+			return node;
+		}
+
+	}
 
 	/**
 	 * whether this procedure is external.
@@ -52,15 +113,13 @@ public class Procedure implements INameable {
 	private OrderedMap<Variable> locals;
 
 	/**
-	 * the location of this procedure
-	 */
-	private Location location;
-
-	/**
 	 * the name of this procedure
 	 */
 	private String name;
 
+	/**
+	 * the list of nodes of this procedure
+	 */
 	private List<CFGNode> nodes;
 
 	/**
@@ -92,21 +151,28 @@ public class Procedure implements INameable {
 	public Procedure(String name, boolean external, Location location,
 			Type returnType, OrderedMap<Variable> parameters,
 			OrderedMap<Variable> locals, List<CFGNode> nodes) {
+		super(location);
 		this.external = external;
 		this.nodes = nodes;
 		this.locals = locals;
-		this.location = location;
 		this.name = name;
 		this.parameters = parameters;
 		this.returnType = returnType;
 	}
 
-	public OrderedMap<Variable> getLocals() {
-		return locals;
+	public CFG buildCFG() {
+		CFGBuilder builder = new CFGBuilder();
+		builder.visit(nodes);
+		return builder.getCFG();
 	}
 
-	public Location getLocation() {
-		return location;
+	/**
+	 * Returns the local variables of this procedure as an ordered map.
+	 * 
+	 * @return the local variables of this procedure as an ordered map
+	 */
+	public OrderedMap<Variable> getLocals() {
+		return locals;
 	}
 
 	/**
@@ -119,14 +185,29 @@ public class Procedure implements INameable {
 		return NameTransformer.transform(name);
 	}
 
+	/**
+	 * Returns the list of nodes of this procedure.
+	 * 
+	 * @return the list of nodes of this procedure
+	 */
 	public List<CFGNode> getNodes() {
 		return nodes;
 	}
 
+	/**
+	 * Returns the parameters of this procedure as an ordered map.
+	 * 
+	 * @return the parameters of this procedure as an ordered map
+	 */
 	public OrderedMap<Variable> getParameters() {
 		return parameters;
 	}
 
+	/**
+	 * Returns the return type of this procedure.
+	 * 
+	 * @return the return type of this procedure
+	 */
 	public Type getReturnType() {
 		return returnType;
 	}
@@ -139,14 +220,22 @@ public class Procedure implements INameable {
 		this.external = external;
 	}
 
-	public void setLocation(Location location) {
-		this.location = location;
-	}
-
+	/**
+	 * Sets the name of this procedure.
+	 * 
+	 * @param name
+	 *            the new name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Sets the return type of this procedure
+	 * 
+	 * @param returnType
+	 *            a type
+	 */
 	public void setReturnType(Type returnType) {
 		this.returnType = returnType;
 	}

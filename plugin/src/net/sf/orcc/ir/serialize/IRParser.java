@@ -105,7 +105,7 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.consts.AbstractConst;
+import net.sf.orcc.ir.consts.AbstractConstant;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
@@ -384,7 +384,7 @@ public class IRParser {
 	 * @param obj
 	 *            A YAML-encoded constant that may be a {@link Boolean}, an
 	 *            {@link Integer}, a {@link List} or a {@link String}.
-	 * @return An {@link AbstractConst} created from the given object.
+	 * @return An {@link AbstractConstant} created from the given object.
 	 * @throws JSONException
 	 */
 	private Constant parseConstant(Object obj) throws JSONException,
@@ -727,7 +727,7 @@ public class IRParser {
 	/**
 	 * Parses the given list as a list of state variables. A
 	 * {@link StateVariable} is a {@link LocalVariable} with an optional
-	 * reference to an {@link AbstractConst} that contain the variable's initial
+	 * reference to an {@link AbstractConstant} that contain the variable's initial
 	 * value.
 	 * 
 	 * @param list

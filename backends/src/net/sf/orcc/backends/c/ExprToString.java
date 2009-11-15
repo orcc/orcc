@@ -33,7 +33,7 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.ExprVisitor;
+import net.sf.orcc.ir.expr.ExpressionVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -49,7 +49,7 @@ import net.sf.orcc.ir.expr.VarExpr;
  * @author Matthieu Wipliez
  * 
  */
-public class ExprToString implements ExprVisitor {
+public class ExprToString implements ExpressionVisitor {
 
 	public static String toString(BinaryOp op) {
 		switch (op) {
@@ -106,7 +106,7 @@ public class ExprToString implements ExprVisitor {
 	}
 
 	@Override
-	public void visit(BinaryExpr expr, Object... args) {
+	public Object visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
 		int currentPrec = op.getPrecedence();
 
@@ -134,40 +134,47 @@ public class ExprToString implements ExprVisitor {
 			builder.append(" ");
 			expr.getE2().accept(this, nextPrec, BinaryExpr.RIGHT);
 		}
+		
+		return null;
 	}
 
 	@Override
-	public void visit(BooleanExpr expr, Object... args) {
+	public Object visit(BooleanExpr expr, Object... args) {
 		builder.append(expr.getValue() ? "1" : "0");
+		return null;
 	}
 
 	@Override
-	public void visit(IntExpr expr, Object... args) {
+	public Object visit(IntExpr expr, Object... args) {
 		builder.append(expr.getValue());
+		return null;
 	}
 
 	@Override
-	public void visit(ListExpr expr, Object... args) {
+	public Object visit(ListExpr expr, Object... args) {
 		throw new IllegalArgumentException("List expression not supported");
 	}
 
 	@Override
-	public void visit(StringExpr expr, Object... args) {
+	public Object visit(StringExpr expr, Object... args) {
 		builder.append('"');
 		builder.append(expr.getValue().replaceAll("\\\\", "\\\\\\\\"));
 		builder.append('"');
+		return null;
 	}
 
 	@Override
-	public void visit(UnaryExpr expr, Object... args) {
+	public Object visit(UnaryExpr expr, Object... args) {
 		builder.append(toString(expr.getOp()));
 		expr.getExpr().accept(this, Integer.MIN_VALUE);
+		return null;
 	}
 
 	@Override
-	public void visit(VarExpr expr, Object... args) {
+	public Object visit(VarExpr expr, Object... args) {
 		Variable variable = expr.getVar().getVariable();
 		builder.append(varDefPrinter.getVarDefName(variable));
+		return null;
 	}
 
 }

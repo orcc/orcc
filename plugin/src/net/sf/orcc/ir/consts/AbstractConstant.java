@@ -45,7 +45,7 @@ import net.sf.orcc.ir.expr.StringExpr;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractConst {
+public abstract class AbstractConstant {
 
 	/**
 	 * Returns a constant created by evaluating the given expression.

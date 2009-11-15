@@ -70,8 +70,8 @@ public class BinaryExpr extends AbstractLocalizable implements Expression {
 	}
 
 	@Override
-	public void accept(ExprVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public Object accept(ExpressionVisitor visitor, Object... args) {
+		return visitor.visit(this, args);
 	}
 
 	@Override

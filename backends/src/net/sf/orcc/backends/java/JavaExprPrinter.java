@@ -31,22 +31,23 @@ package net.sf.orcc.backends.java;
 import net.sf.orcc.backends.c.ExprToString;
 import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.ExprVisitor;
+import net.sf.orcc.ir.expr.ExpressionVisitor;
 
 /**
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class JavaExprPrinter extends ExprToString implements ExprVisitor {
+public class JavaExprPrinter extends ExprToString implements ExpressionVisitor {
 
 	public JavaExprPrinter(VarDefPrinter varDefPrinter) {
 		super(varDefPrinter);
 	}
 
 	@Override
-	public void visit(BooleanExpr expr, Object... args) {
+	public Object visit(BooleanExpr expr, Object... args) {
 		builder.append(expr.getValue() ? "true" : "false");
+		return null;
 	}
 
 }

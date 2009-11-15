@@ -31,7 +31,7 @@ package net.sf.orcc.backends.xlim;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstVisitor;
+import net.sf.orcc.ir.consts.ConstantVisitor;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
@@ -44,7 +44,7 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimValueVisitor implements ConstVisitor {
+public class XlimValueVisitor implements ConstantVisitor {
 
 	/**
 	 * Element to modify

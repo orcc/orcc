@@ -124,9 +124,8 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(BlockNode node, Object... args) {
-		// TODO Auto-generated method stub
-
+	public Object visit(BlockNode node, Object... args) {
+		return null;
 	}
 
 	/**
@@ -184,8 +183,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(IfNode node, Object... args) {
-
+	public Object visit(IfNode node, Object... args) {
 		Element moduleB = XlimNodeTemplate.newModule(root, "if");
 
 		String decision = names.putDecision();
@@ -216,6 +214,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 		node.getJoinNode().accept(
 				new XlimNodeVisitor(names, moduleB, actionName));
 
+		return null;
 	}
 
 	/**
@@ -362,7 +361,7 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(WhileNode node, Object... args) {
+	public Object visit(WhileNode node, Object... args) {
 		// TODO Wait for "while" example to check this
 		System.out.println("CHECK WHILE");
 
@@ -388,6 +387,8 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 
 		node.getJoinNode().accept(
 				new XlimNodeVisitor(names, moduleB, actionName));
+
+		return null;
 	}
 
 	/**

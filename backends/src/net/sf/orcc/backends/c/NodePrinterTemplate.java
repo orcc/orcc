@@ -109,10 +109,12 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(BlockNode node, Object... args) {
+	public Object visit(BlockNode node, Object... args) {
 		for (Instruction instruction : node) {
 			instruction.accept(this, args);
 		}
+		
+		return null;
 	}
 
 	@Override
@@ -156,7 +158,7 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
+	public Object visit(IfNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("ifNode");
 
 		Expression expr = node.getValue();
@@ -184,6 +186,8 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 		attrName = previousAttrName;
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
+		
+		return null;
 	}
 
 	@Override
@@ -296,7 +300,7 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
+	public Object visit(WhileNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("whileNode");
 		Expression expr = node.getValue();
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(expr));
@@ -315,6 +319,8 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 		attrName = previousAttrName;
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
+		
+		return null;
 	}
 
 	@Override

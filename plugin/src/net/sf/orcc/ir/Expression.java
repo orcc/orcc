@@ -29,7 +29,7 @@
 package net.sf.orcc.ir;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.expr.ExprVisitor;
+import net.sf.orcc.ir.expr.ExpressionVisitor;
 
 /**
  * This interface defines an expression.
@@ -78,9 +78,12 @@ public interface Expression extends Localizable {
 	 * Accepts a visitor.
 	 * 
 	 * @param visitor
+	 *            an expression visitor
 	 * @param args
+	 *            arguments
+	 * @return an object
 	 */
-	public void accept(ExprVisitor visitor, Object... args);
+	public Object accept(ExpressionVisitor visitor, Object... args);
 
 	/**
 	 * Evaluates this expression.

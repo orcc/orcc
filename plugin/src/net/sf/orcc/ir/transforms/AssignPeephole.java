@@ -76,7 +76,7 @@ public class AssignPeephole extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(BlockNode node, Object... args) {
+	public Object visit(BlockNode node, Object... args) {
 		for (Instruction instruction : node) {
 			if (instruction instanceof PhiAssignment) {
 				PhiAssignment phi = (PhiAssignment) instruction;
@@ -95,19 +95,22 @@ public class AssignPeephole extends AbstractActorTransformation {
 				}
 			}
 		}
+		return null;
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
+	public Object visit(IfNode node, Object... args) {
 		visit(node.getThenNodes());
 		visit(node.getElseNodes());
 		visit(node.getJoinNode(), args);
+		return null;
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
+	public Object visit(WhileNode node, Object... args) {
 		visit(node.getNodes());
 		visit(node.getJoinNode(), args);
+		return null;
 	}
 
 }

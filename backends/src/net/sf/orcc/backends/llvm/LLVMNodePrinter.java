@@ -147,9 +147,9 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(BlockNode node, Object... args) {
+	public Object visit(BlockNode node, Object... args) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	public void visit(BrLabelNode node, Object... args) {
@@ -268,8 +268,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
-
+	public Object visit(IfNode node, Object... args) {
+		return null;
 	}
 
 	@Override
@@ -485,7 +485,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
+	public Object visit(WhileNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("whileNode");
 
 		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue(),
@@ -505,6 +505,8 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 		attrName = previousAttrName;
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
+		
+		return null;
 	}
 
 	@Override

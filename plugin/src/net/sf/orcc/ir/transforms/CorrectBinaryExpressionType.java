@@ -112,14 +112,16 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
+	public Object visit(IfNode node, Object... args) {
 		visit(node.getThenNodes());
 		visit(node.getElseNodes());
+		return null;
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
+	public Object visit(WhileNode node, Object... args) {
 		visit(node.getNodes());
+		return null;
 	}
 
 }

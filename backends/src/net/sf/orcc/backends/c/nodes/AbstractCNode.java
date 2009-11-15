@@ -44,10 +44,12 @@ public abstract class AbstractCNode extends AbstractNode {
 
 	public abstract void accept(CNodeVisitor visitor, Object... args);
 
-	public void accept(NodeVisitor visitor, Object... args) {
+	public Object accept(NodeVisitor visitor, Object... args) {
 		if (visitor instanceof CNodeVisitor) {
 			accept((CNodeVisitor) visitor);
 		}
+		
+		return null;
 	}
 
 }

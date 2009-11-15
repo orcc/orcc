@@ -26,20 +26,28 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.consts;
+package net.sf.orcc.ir.expr;
 
 /**
+ * This class defines an expression visitor.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public interface ConstVisitor {
+public interface ExpressionVisitor {
 
-	public void visit(BoolConst constant, Object... args);
+	public Object visit(BinaryExpr expr, Object... args);
 
-	public void visit(IntConst constant, Object... args);
+	public Object visit(BooleanExpr expr, Object... args);
 
-	public void visit(ListConst constant, Object... args);
+	public Object visit(IntExpr expr, Object... args);
 
-	public void visit(StringConst constant, Object... args);
+	public Object visit(ListExpr expr, Object... args);
+
+	public Object visit(StringExpr expr, Object... args);
+
+	public Object visit(UnaryExpr expr, Object... args);
+
+	public Object visit(VarExpr expr, Object... args);
 
 }

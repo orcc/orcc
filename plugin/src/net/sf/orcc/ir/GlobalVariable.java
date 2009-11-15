@@ -29,7 +29,7 @@
 package net.sf.orcc.ir;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.consts.AbstractConst;
+import net.sf.orcc.ir.consts.AbstractConstant;
 import net.sf.orcc.util.INameable;
 
 /**
@@ -106,7 +106,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 */
 	public void evaluate() throws OrccException {
 		Expression expr = value.evaluate();
-		constantValue = AbstractConst.evaluate(expr);
+		constantValue = AbstractConstant.evaluate(expr);
 	}
 
 	/**

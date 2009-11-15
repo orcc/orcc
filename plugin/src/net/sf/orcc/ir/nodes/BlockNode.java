@@ -98,8 +98,8 @@ public class BlockNode extends ArrayList<Instruction> implements
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public Object accept(NodeVisitor visitor, Object... args) {
+		return visitor.visit(this, args);
 	}
 
 	@Override

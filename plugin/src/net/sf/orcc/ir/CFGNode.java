@@ -45,7 +45,8 @@ public interface CFGNode extends User {
 	 *            a visitor
 	 * @param args
 	 *            arguments
+	 * @return an object
 	 */
-	public void accept(NodeVisitor visitor, Object... args);
+	public Object accept(NodeVisitor visitor, Object... args);
 
 }

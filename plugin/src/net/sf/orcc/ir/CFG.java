@@ -26,51 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.consts;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.Constant;
+import org.jgrapht.graph.DefaultDirectedGraph;
 
 /**
- * This class defines a boolean constant.
+ * This class defines a Control Flow Graph.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class BoolConst implements Constant {
-
-	private boolean value;
+public class CFG extends DefaultDirectedGraph<CFGNode, Object> {
 
 	/**
-	 * Creates a new boolean constant with the given value.
 	 * 
-	 * @param value
-	 *            the value of the constant
 	 */
-	public BoolConst(boolean value) {
-		this.value = value;
+	private static final long serialVersionUID = 1L;
+
+	public CFG() {
+		super(Object.class);
 	}
 
-	@Override
-	public void accept(ConstantVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
-
-	@Override
-	public int getType() {
-		return BOOLEAN;
-	}
-
-	/**
-	 * Returns the value of this constant.
-	 * 
-	 * @return the value of this constant
-	 */
-	public boolean getValue() {
-		return value;
-	}
-
-	@Override
-	public String toString() {
-		return Boolean.toString(value);
-	}
 }
