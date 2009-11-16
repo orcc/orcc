@@ -33,11 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.BitcastNode;
 import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
 import net.sf.orcc.backends.llvm.nodes.BrNode;
 import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
-import net.sf.orcc.backends.llvm.nodes.LLVMNodeVisitor;
 import net.sf.orcc.backends.llvm.nodes.LabelNode;
 import net.sf.orcc.backends.llvm.nodes.LoadFifo;
 import net.sf.orcc.backends.llvm.nodes.PhiNode;
@@ -85,7 +85,8 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
+public class LLVMNodePrinter extends AbstractLLVMNodeVisitor implements
+		NodeVisitor {
 
 	private String actorName;
 
@@ -505,7 +506,7 @@ public class LLVMNodePrinter implements LLVMNodeVisitor, NodeVisitor {
 		attrName = previousAttrName;
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
-		
+
 		return null;
 	}
 

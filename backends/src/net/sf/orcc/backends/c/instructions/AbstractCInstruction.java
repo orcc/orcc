@@ -26,38 +26,34 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.nodes;
+package net.sf.orcc.backends.c.instructions;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
- * This class defines an Increment node that increments a Variable, global or
- * local.
+ * This class defines a C instruction. A C instruction is a
+ * {@link SpecificInstruction} with a method that accepts a
+ * {@link CInstructionVisitor}.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class IncrementNode extends AbstractCNode {
+public abstract class AbstractCInstruction extends SpecificInstruction {
 
-	private Variable variable;
-
-	public IncrementNode(int id, Location location, Variable variable) {
-		super(id, location);
-		this.variable = variable;
+	protected AbstractCInstruction(BlockNode block, Location location) {
+		super(block, location);
 	}
 
-	@Override
-	public void accept(CNodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
-
-	public Variable getVar() {
-		return variable;
-	}
-
-	public void setVar(Variable variable) {
-		this.variable = variable;
-	}
+	/**
+	 * Accepts the given {@link CInstructionVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor
+	 * @param args
+	 *            arguments
+	 */
+	public abstract void accept(CInstructionVisitor visitor, Object... args);
 
 }

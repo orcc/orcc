@@ -26,23 +26,22 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.nodes;
+package net.sf.orcc.backends.c.instructions;
 
-import net.sf.orcc.ir.instructions.InitPort;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 
 /**
+ * This class defines an instruction visitor for C-specific instructions.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public interface CNodeVisitor extends InstructionVisitor {
+public interface CInstructionVisitor extends InstructionVisitor {
 
-	public void visit(DecrementNode node, Object... args);
+	public void visit(Decrement instruction, Object... args);
 
-	public void visit(IncrementNode node, Object... args);
+	public void visit(Increment instruction, Object... args);
 
-	public void visit(InitPort node, Object... args);
-
-	public void visit(SelfAssignment node, Object... args);
+	public void visit(SelfAssignment instruction, Object... args);
 
 }

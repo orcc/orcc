@@ -26,30 +26,67 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.nodes;
+package net.sf.orcc.backends.c.instructions;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
+ * This class defines a SelfAssignment instruction that implements a
+ * self-assignment. A self-assignment is an assignment of a binary expression to
+ * a Variable, global or local, where one term of the expression is the target
+ * variable. Example: <code>x := x * 3;</code> could be replaced by a
+ * self-assigment <code>x *= 3;</code>
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractCNode extends AbstractNode {
+public class SelfAssignment extends AbstractCInstruction {
 
-	protected AbstractCNode(int id, Location location) {
-		super(id, location);
+	private BinaryOp op;
+
+	private Expression value;
+
+	private Variable variable;
+
+	public SelfAssignment(BlockNode block, Location location,
+			Variable variable, BinaryOp op, Expression value) {
+		super(block, location);
+		this.op = op;
+		this.value = value;
+		this.variable = variable;
 	}
 
-	public abstract void accept(CNodeVisitor visitor, Object... args);
+	@Override
+	public void accept(CInstructionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
 
-	public Object accept(NodeVisitor visitor, Object... args) {
-		if (visitor instanceof CNodeVisitor) {
-			accept((CNodeVisitor) visitor);
-		}
-		
-		return null;
+	public BinaryOp getOp() {
+		return op;
+	}
+
+	public Expression getValue() {
+		return value;
+	}
+
+	public Variable getVar() {
+		return variable;
+	}
+
+	public void setOp(BinaryOp op) {
+		this.op = op;
+	}
+
+	public void setValue(Expression value) {
+		this.value = value;
+	}
+
+	public void setVar(Variable variable) {
+		this.variable = variable;
 	}
 
 }

@@ -26,62 +26,35 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.nodes;
+package net.sf.orcc.backends.c.instructions;
 
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
- * This class defines a SelfAssignment node that implements a self-assignment. A
- * self-assignment is an assignment of a binary expression to a Variable, global
- * or local, where one term of the expression is the target variable. Example:
- * <code>x := x * 3;</code> could be replaced by a self-assigment
- * <code>x *= 3;</code>
+ * This class defines an Increment instruction that increments a Variable,
+ * global or local.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class SelfAssignment extends AbstractCNode {
-
-	private BinaryOp op;
-
-	private Expression value;
+public class Increment extends AbstractCInstruction {
 
 	private Variable variable;
 
-	public SelfAssignment(int id, Location location, Variable variable,
-			BinaryOp op, Expression value) {
-		super(id, location);
-		this.op = op;
-		this.value = value;
+	public Increment(BlockNode block, Location location, Variable variable) {
+		super(block, location);
 		this.variable = variable;
 	}
 
 	@Override
-	public void accept(CNodeVisitor visitor, Object... args) {
+	public void accept(CInstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
-	}
-
-	public BinaryOp getOp() {
-		return op;
-	}
-
-	public Expression getValue() {
-		return value;
 	}
 
 	public Variable getVar() {
 		return variable;
-	}
-
-	public void setOp(BinaryOp op) {
-		this.op = op;
-	}
-
-	public void setValue(Expression value) {
-		this.value = value;
 	}
 
 	public void setVar(Variable variable) {

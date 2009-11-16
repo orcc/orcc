@@ -28,14 +28,14 @@
  */
 package net.sf.orcc.backends.c.transforms;
 
-import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.backends.c.nodes.DecrementNode;
-import net.sf.orcc.backends.c.nodes.IncrementNode;
-import net.sf.orcc.backends.c.nodes.SelfAssignment;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.backends.c.instructions.AbstractCInstruction;
+import net.sf.orcc.backends.c.instructions.Decrement;
+import net.sf.orcc.backends.c.instructions.Increment;
+import net.sf.orcc.backends.c.instructions.SelfAssignment;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
@@ -45,6 +45,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
@@ -56,10 +57,12 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class IncrementPeephole extends AbstractActorTransformation {
 
-	private void examine(ListIterator<CFGNode> it) {
-		CFGNode node1 = it.next();
+	private BlockNode block;
+
+	private void examine(ListIterator<Instruction> it) {
+		Instruction node1 = it.next();
 		if (it.hasNext()) {
-			CFGNode node2 = it.next();
+			Instruction node2 = it.next();
 			boolean res = false;
 
 			if (node1 instanceof Load && node2 instanceof Store) {
@@ -97,21 +100,21 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	}
 
 	private boolean replaceSelfAssignment(OrderedMap<Variable> locals,
-			ListIterator<CFGNode> it, LocalVariable varDefTmp, Variable varDef,
-			VarExpr v1, BinaryOp op, Expression e2) {
-		CFGNode node;
+			ListIterator<Instruction> it, LocalVariable varDefTmp,
+			Variable varDef, VarExpr v1, BinaryOp op, Expression e2) {
+		AbstractCInstruction node;
 		if (op == BinaryOp.PLUS && e2.getType() == Expression.INT
 				&& ((IntExpr) e2).getValue() == 1) {
-			node = new IncrementNode(0, new Location(), varDef);
+			node = new Increment(block, new Location(), varDef);
 		} else if (op == BinaryOp.MINUS && e2.getType() == Expression.INT
 				&& ((IntExpr) e2).getValue() == 1) {
-			node = new DecrementNode(0, new Location(), varDef);
+			node = new Decrement(block, new Location(), varDef);
 		} else if (op == BinaryOp.BITAND || op == BinaryOp.BITOR
 				|| op == BinaryOp.BITXOR || op == BinaryOp.DIV
 				|| op == BinaryOp.MINUS || op == BinaryOp.MOD
 				|| op == BinaryOp.PLUS || op == BinaryOp.SHIFT_LEFT
 				|| op == BinaryOp.SHIFT_RIGHT || op == BinaryOp.TIMES) {
-			node = new SelfAssignment(0, new Location(), varDef, op, e2);
+			node = new SelfAssignment(block, new Location(), varDef, op, e2);
 		} else {
 			// nothing for us, just return
 			return false;
@@ -130,11 +133,13 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	}
 
 	@Override
-	protected void visit(List<CFGNode> nodes) {
-		ListIterator<CFGNode> it = nodes.listIterator();
+	public Object visit(BlockNode node, Object... args) {
+		block = node;
+		ListIterator<Instruction> it = node.listIterator();
 		while (it.hasNext()) {
 			examine(it);
 		}
+		return null;
 	}
 
 }

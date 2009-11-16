@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.llvm.nodes;
 
 import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 
 /**
  * @author Jérôme GORIN
@@ -71,6 +72,11 @@ public abstract class AbstractLLVMNodeVisitor extends
 
 	@Override
 	public void visit(SextNode node, Object... args) {
+	}
+
+	@Override
+	public void visit(SpecificInstruction instruction, Object... args) {
+		instruction.accept(this, args);
 	}
 
 	@Override

@@ -48,6 +48,7 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.instructions.WriteEnd;
@@ -330,6 +331,11 @@ public class XlimNodeVisitor implements InstructionVisitor, NodeVisitor {
 		System.out.println("CHECK RETURN");
 		// TODO Wait for "return" example
 
+	}
+
+	@Override
+	public void visit(SpecificInstruction node, Object... args) {
+		// there is no specific XLIM instruction
 	}
 
 	/**

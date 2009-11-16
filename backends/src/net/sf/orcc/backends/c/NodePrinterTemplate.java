@@ -30,10 +30,11 @@ package net.sf.orcc.backends.c;
 
 import java.util.List;
 
-import net.sf.orcc.backends.c.nodes.CNodeVisitor;
-import net.sf.orcc.backends.c.nodes.DecrementNode;
-import net.sf.orcc.backends.c.nodes.IncrementNode;
-import net.sf.orcc.backends.c.nodes.SelfAssignment;
+import net.sf.orcc.backends.c.instructions.AbstractCInstruction;
+import net.sf.orcc.backends.c.instructions.CInstructionVisitor;
+import net.sf.orcc.backends.c.instructions.Decrement;
+import net.sf.orcc.backends.c.instructions.Increment;
+import net.sf.orcc.backends.c.instructions.SelfAssignment;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -49,6 +50,7 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.instructions.WriteEnd;
@@ -61,11 +63,12 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
+ * This class defines a node printer template.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
+public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 
 	/**
 	 * Variable member access switch from private to protected.
@@ -113,7 +116,7 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 		for (Instruction instruction : node) {
 			instruction.accept(this, args);
 		}
-		
+
 		return null;
 	}
 
@@ -135,7 +138,7 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(DecrementNode node, Object... args) {
+	public void visit(Decrement node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("decrementNode");
 		Variable variable = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(variable));
@@ -186,12 +189,12 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 		attrName = previousAttrName;
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
-		
+
 		return null;
 	}
 
 	@Override
-	public void visit(IncrementNode node, Object... args) {
+	public void visit(Increment node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("incrementNode");
 		Variable variable = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(variable));
@@ -319,7 +322,7 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 		attrName = previousAttrName;
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
-		
+
 		return null;
 	}
 
@@ -345,6 +348,11 @@ public class NodePrinterTemplate implements CNodeVisitor, NodeVisitor {
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 
 		template.setAttribute(attrName, nodeTmpl);
+	}
+
+	@Override
+	public void visit(SpecificInstruction instruction, Object... args) {
+		((AbstractCInstruction) instruction).accept(this, args);
 	}
 
 }

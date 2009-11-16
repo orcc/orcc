@@ -26,29 +26,30 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.nodes;
+package net.sf.orcc.backends.c.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
- * This class defines a Decrement node that increments a Variable, global or
- * local.
+ * This class defines a Decrement instruction that increments a Variable, global
+ * or local.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class DecrementNode extends AbstractCNode {
+public class Decrement extends AbstractCInstruction {
 
 	private Variable variable;
 
-	public DecrementNode(int id, Location location, Variable variable) {
-		super(id, location);
+	public Decrement(BlockNode block, Location location, Variable variable) {
+		super(block, location);
 		this.variable = variable;
 	}
 
 	@Override
-	public void accept(CNodeVisitor visitor, Object... args) {
+	public void accept(CInstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 
