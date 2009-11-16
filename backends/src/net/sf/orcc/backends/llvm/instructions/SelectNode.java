@@ -26,44 +26,51 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
+import java.util.List;
+
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
  * 
  */
+public class SelectNode extends AbstractLLVMInstruction {
 
-public class BrLabelNode extends AbstractLLVMNode {
+	private Expression condition;
 
-	private LabelNode labelNode;
+	private List<PhiAssignment> phis;
 
-	public BrLabelNode(BlockNode block, Location location, LabelNode labelNode,
-			LabelNode precedence) {
+	public SelectNode(BlockNode block, Location location, Expression condition,
+			List<PhiAssignment> phis) {
 		super(block, location);
-		this.labelNode = labelNode;
-		labelNode.addPrecedence(precedence);
-		precedence.setSuccessor(this);
+		this.condition = condition;
+		this.phis = phis;
 	}
 
 	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
+	public void accept(LLVMInstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 
-	public LabelNode getLabelNode() {
-		return labelNode;
+	public Expression getCondition() {
+		return condition;
 	}
 
-	public void setLabelNode(LabelNode labelNode) {
-		this.labelNode = labelNode;
+	public List<PhiAssignment> getPhis() {
+		return phis;
 	}
 
-	@Override
-	public String toString() {
-		return "br label %" + labelNode.toString();
+	public void setCondition(Expression condition) {
+		this.condition = condition;
+	}
+
+	public void setPhis(List<PhiAssignment> phis) {
+		this.phis = phis;
 	}
 
 }

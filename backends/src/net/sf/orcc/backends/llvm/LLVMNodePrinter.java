@@ -33,18 +33,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.orcc.backends.llvm.nodes.AbstractLLVMNodeVisitor;
-import net.sf.orcc.backends.llvm.nodes.BitcastNode;
-import net.sf.orcc.backends.llvm.nodes.BrLabelNode;
-import net.sf.orcc.backends.llvm.nodes.BrNode;
-import net.sf.orcc.backends.llvm.nodes.GetElementPtrNode;
-import net.sf.orcc.backends.llvm.nodes.LabelNode;
-import net.sf.orcc.backends.llvm.nodes.LoadFifo;
-import net.sf.orcc.backends.llvm.nodes.PhiNode;
-import net.sf.orcc.backends.llvm.nodes.SelectNode;
-import net.sf.orcc.backends.llvm.nodes.SextNode;
-import net.sf.orcc.backends.llvm.nodes.TruncNode;
-import net.sf.orcc.backends.llvm.nodes.ZextNode;
+import net.sf.orcc.backends.llvm.instructions.AbstractLLVMInstruction;
+import net.sf.orcc.backends.llvm.instructions.BitcastNode;
+import net.sf.orcc.backends.llvm.instructions.BrLabelNode;
+import net.sf.orcc.backends.llvm.instructions.BrNode;
+import net.sf.orcc.backends.llvm.instructions.GetElementPtrNode;
+import net.sf.orcc.backends.llvm.instructions.LLVMInstructionVisitor;
+import net.sf.orcc.backends.llvm.instructions.LabelNode;
+import net.sf.orcc.backends.llvm.instructions.LoadFifo;
+import net.sf.orcc.backends.llvm.instructions.PhiNode;
+import net.sf.orcc.backends.llvm.instructions.SelectNode;
+import net.sf.orcc.backends.llvm.instructions.SextNode;
+import net.sf.orcc.backends.llvm.instructions.TruncNode;
+import net.sf.orcc.backends.llvm.instructions.ZextNode;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.CFGNode;
@@ -66,6 +67,7 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.instructions.WriteEnd;
@@ -85,8 +87,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMNodePrinter extends AbstractLLVMNodeVisitor implements
-		NodeVisitor {
+public class LLVMNodePrinter implements LLVMInstructionVisitor, NodeVisitor {
 
 	private String actorName;
 
@@ -448,6 +449,11 @@ public class LLVMNodePrinter extends AbstractLLVMNodeVisitor implements
 
 		template.setAttribute(attrName, nodeTmpl);
 
+	}
+
+	@Override
+	public void visit(SpecificInstruction node, Object... args) {
+		((AbstractLLVMInstruction) node).accept(this, args);
 	}
 
 	@Override

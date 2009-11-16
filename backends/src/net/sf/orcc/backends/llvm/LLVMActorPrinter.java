@@ -147,14 +147,17 @@ public class LLVMActorPrinter {
 	 * 
 	 * @param fileName
 	 *            output file name
+	 * @param id
+	 *            the instance id
 	 * @param actor
 	 *            actor to print
 	 * @throws IOException
 	 */
-	public void printActor(String fileName, Actor actor) throws IOException {
+	public void printActor(String fileName, String id, Actor actor)
+			throws IOException {
 		template = group.getInstanceOf("actor");
 
-		setAttributes(actor);
+		setAttributes(id, actor);
 
 		byte[] b = template.toString(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
@@ -174,7 +177,14 @@ public class LLVMActorPrinter {
 		}
 	}
 
-	private void setAttributes(Actor actor) {
+	/**
+	 * Sets attributes of the template from the given actor. Classes may extend,
+	 * but should call super.setAttributes(actor) first.
+	 * 
+	 * @param actor
+	 *            An actor
+	 */
+	private void setAttributes(String id, Actor actor) {
 		String actorName = actor.getName();
 		template.setAttribute("name", actorName);
 		setFifos("inputs", actor.getInputs());
@@ -243,8 +253,8 @@ public class LLVMActorPrinter {
 				constPrinter.setTemplate(stateTempl);
 
 				if (stateVar.getInit() instanceof ListConst) {
-					stateVar.getInit().accept(constPrinter,
-							((PointType) stateVar.getType()).getElementType());
+					//stateVar.getInit().accept(constPrinter,
+					//		((PointType) stateVar.getType()).getElementType());
 				} else {
 					stateVar.getInit().accept(constPrinter);
 				}

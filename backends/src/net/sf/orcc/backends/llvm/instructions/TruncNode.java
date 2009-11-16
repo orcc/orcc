@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
@@ -37,13 +37,13 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Jérôme GORIN
  * 
  */
-public class ZextNode extends AbstractLLVMNode {
+public class TruncNode extends AbstractLLVMInstruction {
 
 	private Expression value;
 
 	private LocalVariable var;
 
-	public ZextNode(BlockNode block, Location location, LocalVariable var,
+	public TruncNode(BlockNode block, Location location, LocalVariable var,
 			Expression value) {
 		super(block, location);
 		this.var = var;
@@ -51,7 +51,7 @@ public class ZextNode extends AbstractLLVMNode {
 	}
 
 	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
+	public void accept(LLVMInstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

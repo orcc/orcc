@@ -26,29 +26,62 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
+import java.util.Map;
+
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.instructions.AbstractInstruction;
-import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
  * 
  */
-public abstract class AbstractLLVMNode extends AbstractInstruction {
+public class PhiNode extends AbstractLLVMInstruction {
 
-	protected AbstractLLVMNode(BlockNode block, Location location) {
+	private Map<LabelNode, LocalVariable> assignements;
+
+	private Type type;
+
+	private LocalVariable varDef;
+
+	public PhiNode(BlockNode block, Location location, LocalVariable varDef,
+			Type type, Map<LabelNode, LocalVariable> assignements) {
 		super(block, location);
+		this.varDef = varDef;
+		this.assignements = assignements;
+		this.type = type;
 	}
 
-	public void accept(InstructionVisitor visitor, Object... args) {
-		if (visitor instanceof LLVMNodeVisitor) {
-			accept((LLVMNodeVisitor) visitor, args);
-		}
+	@Override
+	public void accept(LLVMInstructionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
-	public abstract void accept(LLVMNodeVisitor visitor, Object... args);
+	public Map<LabelNode, LocalVariable> getAssignements() {
+		return assignements;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public LocalVariable getVarDef() {
+		return varDef;
+	}
+
+	public void setAssignements(Map<LabelNode, LocalVariable> assignements) {
+		this.assignements = assignements;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
+	}
+
+	public void setVarDef(LocalVariable varDef) {
+		this.varDef = varDef;
+	}
 
 }

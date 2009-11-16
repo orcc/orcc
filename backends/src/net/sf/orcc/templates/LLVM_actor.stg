@@ -397,7 +397,8 @@ $schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo, i
 
 switch(transitions) ::= <<
 	%_FSM_state = load i32* @_FSM_state
-	switch i32 %_FSM_state, label %default [$\n$$transitions:{$\t\t$i32 $it.indexState$, label %s_$it.sourceState$$\n$}$$\t$]
+	switch i32 %_FSM_state, label %default [
+$transitions:{$\t\t$i32 $it.sourceState.index$, label %s_$it.sourceState$$\n$}$$\t$]
 $transitions: {
 s_$it.sourceState$:
 	%$it.sourceState$_res = call i1 @$it.sourceState$_state_scheduler();

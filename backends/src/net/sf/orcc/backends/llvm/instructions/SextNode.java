@@ -26,65 +26,54 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
-import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
  * 
  */
-public abstract class AbstractLLVMNodeVisitor extends
-		AbstractInstructionVisitor implements LLVMNodeVisitor {
+public class SextNode extends AbstractLLVMInstruction {
 
-	@Override
-	public void visit(BitcastNode node, Object... args) {
+	private Expression value;
+
+	private LocalVariable var;
+
+	public SextNode(BlockNode block, Location location, LocalVariable var,
+			Expression value) {
+		super(block, location);
+		this.var = var;
+		this.value = value;
 	}
 
 	@Override
-	public void visit(BrLabelNode node, Object... args) {
+	public void accept(LLVMInstructionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
+
+	public Expression getValue() {
+		return value;
+	}
+
+	public LocalVariable getVar() {
+		return var;
+	}
+
+	public void setTarget(Expression value) {
+		this.value = value;
+	}
+
+	public void setVar(LocalVariable var) {
+		this.var = var;
 	}
 
 	@Override
-	public void visit(BrNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(GetElementPtrNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(LabelNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(LoadFifo node, Object... args) {
-	}
-
-	@Override
-	public void visit(PhiNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(SelectNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(SextNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(SpecificInstruction instruction, Object... args) {
-		instruction.accept(this, args);
-	}
-
-	@Override
-	public void visit(TruncNode node, Object... args) {
-	}
-
-	@Override
-	public void visit(ZextNode node, Object... args) {
+	public String toString() {
+		return var + " = bitcast " + value.toString() + " to " + var.getType();
 	}
 
 }

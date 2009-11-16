@@ -26,51 +26,35 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
-import java.util.List;
-
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
+ * This class defines an LLVM instruction. An LLVM instruction is a
+ * {@link SpecificInstruction} with a method that accepts a
+ * {@link LLVMInstructionVisitor}.
+ * 
  * @author Jérôme GORIN
+ * @author Matthieu Wipliez
  * 
  */
-public class SelectNode extends AbstractLLVMNode {
+public abstract class AbstractLLVMInstruction extends SpecificInstruction {
 
-	private Expression condition;
-
-	private List<PhiAssignment> phis;
-
-	public SelectNode(BlockNode block, Location location, Expression condition,
-			List<PhiAssignment> phis) {
+	protected AbstractLLVMInstruction(BlockNode block, Location location) {
 		super(block, location);
-		this.condition = condition;
-		this.phis = phis;
 	}
 
-	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
-
-	public Expression getCondition() {
-		return condition;
-	}
-
-	public List<PhiAssignment> getPhis() {
-		return phis;
-	}
-
-	public void setCondition(Expression condition) {
-		this.condition = condition;
-	}
-
-	public void setPhis(List<PhiAssignment> phis) {
-		this.phis = phis;
-	}
+	/**
+	 * Accepts the given {@link LLVMInstructionVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor
+	 * @param args
+	 *            arguments
+	 */
+	public abstract void accept(LLVMInstructionVisitor visitor, Object... args);
 
 }

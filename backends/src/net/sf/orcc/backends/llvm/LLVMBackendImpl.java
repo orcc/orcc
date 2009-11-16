@@ -34,7 +34,11 @@ import java.io.IOException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
+import net.sf.orcc.ir.transforms.AddInstantationProcedure;
+import net.sf.orcc.ir.transforms.BlockCombine;
+import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
@@ -76,20 +80,22 @@ public class LLVMBackendImpl extends AbstractBackend implements IBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
+		ActorTransformation[] transformations = { new BlockCombine(),
+				new AddInstantationProcedure(),
+				new CorrectBinaryExpressionType() };
 		/*
-		 * ActorTransformation[] transformations = { new EmptyNodeRemoval(), new
-		 * CorrectBinaryExpressionType(), new AssignPeephole(), new
-		 * ControlFlowTransformation(), new JoinNodeTransformation(), // new
-		 * CorrectLabelNameTransformation(), new
-		 * ThreeAddressCodeTransformation(), new AddInstantationProcedure(), new
-		 * ArrayListTransformation(), new TypeTransformation() };
-		 * 
-		 * for (ActorTransformation transformation : transformations) {
-		 * transformation.transform(actor); }
-		 * 
-		 * String outputName = path + File.separator + id + ".s";
-		 * printer.printActor(outputName,id, actor);
+		 * new AssignPeephole(), new ControlFlowTransformation(), new
+		 * JoinNodeTransformation(), // new CorrectLabelNameTransformation(),
+		 * new ThreeAddressCodeTransformation(), new AddInstantationProcedure(),
+		 * new ArrayListTransformation(), new TypeTransformation() };
 		 */
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+
+		String outputName = path + File.separator + id + ".s";
+		printer.printActor(outputName, id, actor);
 	}
 
 	@Override

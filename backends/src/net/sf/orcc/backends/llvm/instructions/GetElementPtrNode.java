@@ -26,79 +26,68 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
  * 
  */
-public class LabelNode extends AbstractLLVMNode {
+public class GetElementPtrNode extends AbstractLLVMInstruction {
 
-	private String labelName;
+	private List<Expression> indexes;
 
-	private List<LabelNode> precedence;
+	private Use source;
 
-	private Instruction successor;
+	private LocalVariable target;
 
-	public LabelNode(BlockNode block, Location location, String labelName) {
+	public GetElementPtrNode(BlockNode block, Location location,
+			LocalVariable target, Use source, List<Expression> indexs) {
 		super(block, location);
-		precedence = new ArrayList<LabelNode>();
-		this.labelName = labelName;
-		this.successor = null;
+		this.target = target;
+		this.source = source;
+		this.indexes = indexs;
 	}
 
 	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
+	public void accept(LLVMInstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 
-	public void addPrecedence(LabelNode precedence) {
-		this.precedence.add(precedence);
+	public List<Expression> getIndexes() {
+		return indexes;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof LabelNode) {
-			return (labelName.compareTo(((LabelNode) obj).getLabelName()) == 0);
-		} else {
-			return false;
-		}
+	public Use getSource() {
+		return source;
 	}
 
-	public String getLabelName() {
-		return labelName;
+	public LocalVariable getTarget() {
+		return target;
 	}
 
-	public List<LabelNode> getPrecedence() {
-		return precedence;
+	public void setIndexs(List<Expression> indexs) {
+		this.indexes = indexs;
 	}
 
-	public Instruction getSuccessor() {
-		return successor;
+	public void setSource(Use source) {
+		this.source = source;
 	}
 
-	public void setLabelName(String labelName) {
-		this.labelName = labelName;
-	}
-
-	public void setPrecedence(List<LabelNode> precedence) {
-		this.precedence = precedence;
-	}
-
-	public void setSuccessor(Instruction successor) {
-		this.successor = successor;
+	public void setVar(LocalVariable varDef) {
+		this.target = varDef;
 	}
 
 	@Override
 	public String toString() {
-		return labelName;
+		return target + " = getelementptr(" + source + ", " + indexes + ")";
 	}
 
 }

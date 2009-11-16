@@ -26,74 +26,36 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
-import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.instructions.InstructionVisitor;
 
 /**
- * @author Jérôme GORIN
+ * @author Matthieu Wipliez
  * 
  */
-public class LoadFifo extends AbstractLLVMNode {
+public interface LLVMInstructionVisitor extends InstructionVisitor {
 
-	private String fifoName;
+	public void visit(BitcastNode node, Object... args);
 
-	private int index;
+	public void visit(BrLabelNode node, Object... args);
 
-	private int numTokens;
+	public void visit(BrNode node, Object... args);
 
-	private LocalVariable varDef;
+	public void visit(GetElementPtrNode node, Object... args);
 
-	public LoadFifo(BlockNode block, Location location, String fifoName,
-			LocalVariable varDef, int index) {
-		super(block, location);
-		this.fifoName = fifoName;
-		this.varDef = varDef;
-		this.index = index;
-	}
+	public void visit(LabelNode node, Object... args);
 
-	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
+	public void visit(LoadFifo node, Object... args);
 
-	public String getFifoName() {
-		return fifoName;
-	}
+	public void visit(PhiNode node, Object... args);
 
-	public int getIndex() {
-		return index;
-	}
+	public void visit(SelectNode node, Object... args);
 
-	public int getNumTokens() {
-		return numTokens;
-	}
+	public void visit(SextNode node, Object... args);
 
-	public LocalVariable getVarDef() {
-		return varDef;
-	}
+	public void visit(TruncNode node, Object... args);
 
-	public void setFifoName(String fifoName) {
-		this.fifoName = fifoName;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
-	}
-
-	public void setNumTokens(int numTokens) {
-		this.numTokens = numTokens;
-	}
-
-	public void setVar(LocalVariable varDef) {
-		this.varDef = varDef;
-	}
-
-	@Override
-	public String toString() {
-		return varDef + " = loadFifo(" + fifoName + ", " + numTokens + ")";
-	}
+	public void visit(ZextNode node, Object... args);
 
 }

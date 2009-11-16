@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ import net.sf.orcc.ir.nodes.IfNode;
  * @author Jérôme GORIN
  * 
  */
-public class BrNode extends AbstractLLVMNode {
+public class BrNode extends AbstractLLVMInstruction {
 
 	private Expression condition;
 
@@ -94,7 +94,7 @@ public class BrNode extends AbstractLLVMNode {
 	}
 
 	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
+	public void accept(LLVMInstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 

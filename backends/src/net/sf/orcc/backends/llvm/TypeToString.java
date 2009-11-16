@@ -65,14 +65,24 @@ public class TypeToString implements LLVMTypeVisitor {
 	 */
 	public int sizeOf(Type type) {
 		try {
-			if (type instanceof BoolType) {
+			switch (type.getType()) {
+			case Type.BOOLEAN:
 				return 1;
-			} else if (type instanceof IntType) {
+			case Type.INT: {
 				Expression exprSize = ((IntType) type).getSize();
 				return Util.evaluateAsInteger(exprSize);
-			} else if (type instanceof StringType) {
+			}
+			case Type.LIST: {
+				Expression exprSize = ((ListType) type).getSize();
+				return Util.evaluateAsInteger(exprSize);
+			}
+			case Type.STRING:
 				return 8;
-			} else {
+			case Type.UINT: {
+				Expression exprSize = ((UintType) type).getSize();
+				return Util.evaluateAsInteger(exprSize);
+			}
+			default:
 				throw new OrccException("Can't size type");
 			}
 		} catch (OrccException e) {

@@ -26,9 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.nodes.BlockNode;
 
@@ -36,43 +35,35 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Jérôme GORIN
  * 
  */
-public class BitcastNode extends AbstractLLVMNode {
 
-	private LocalVariable value;
+public class BrLabelNode extends AbstractLLVMInstruction {
 
-	private LocalVariable var;
+	private LabelNode labelNode;
 
-	public BitcastNode(BlockNode block, Location location, LocalVariable var,
-			LocalVariable value) {
+	public BrLabelNode(BlockNode block, Location location, LabelNode labelNode,
+			LabelNode precedence) {
 		super(block, location);
-		this.var = var;
-		this.value = value;
+		this.labelNode = labelNode;
+		labelNode.addPrecedence(precedence);
+		precedence.setSuccessor(this);
 	}
 
 	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
+	public void accept(LLVMInstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 
-	public LocalVariable getValue() {
-		return value;
+	public LabelNode getLabelNode() {
+		return labelNode;
 	}
 
-	public LocalVariable getVar() {
-		return var;
-	}
-
-	public void setValue(LocalVariable value) {
-		this.value = value;
-	}
-
-	public void setVar(LocalVariable var) {
-		this.var = var;
+	public void setLabelNode(LabelNode labelNode) {
+		this.labelNode = labelNode;
 	}
 
 	@Override
 	public String toString() {
-		return var + " = bitcast " + value + " to " + var.getType();
+		return "br label %" + labelNode.toString();
 	}
 
 }

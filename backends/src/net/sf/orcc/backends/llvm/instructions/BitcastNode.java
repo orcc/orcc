@@ -26,9 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.llvm.nodes;
+package net.sf.orcc.backends.llvm.instructions;
 
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -37,25 +36,25 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Jérôme GORIN
  * 
  */
-public class TruncNode extends AbstractLLVMNode {
+public class BitcastNode extends AbstractLLVMInstruction {
 
-	private Expression value;
+	private LocalVariable value;
 
 	private LocalVariable var;
 
-	public TruncNode(BlockNode block, Location location, LocalVariable var,
-			Expression value) {
+	public BitcastNode(BlockNode block, Location location, LocalVariable var,
+			LocalVariable value) {
 		super(block, location);
 		this.var = var;
 		this.value = value;
 	}
 
 	@Override
-	public void accept(LLVMNodeVisitor visitor, Object... args) {
+	public void accept(LLVMInstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 
-	public Expression getValue() {
+	public LocalVariable getValue() {
 		return value;
 	}
 
@@ -63,7 +62,7 @@ public class TruncNode extends AbstractLLVMNode {
 		return var;
 	}
 
-	public void setTarget(Expression value) {
+	public void setValue(LocalVariable value) {
 		this.value = value;
 	}
 
@@ -73,7 +72,7 @@ public class TruncNode extends AbstractLLVMNode {
 
 	@Override
 	public String toString() {
-		return var + " = bitcast " + value.toString() + " to " + var.getType();
+		return var + " = bitcast " + value + " to " + var.getType();
 	}
 
 }
