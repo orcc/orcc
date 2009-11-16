@@ -137,6 +137,16 @@ public interface InstructionVisitor {
 	public void visit(Return node, Object... args);
 
 	/**
+	 * Visits a specific instruction.
+	 * 
+	 * @param node
+	 *            a specific instruction
+	 * @param args
+	 *            arguments
+	 */
+	public void visit(SpecificInstruction node, Object... args);
+
+	/**
 	 * Visits a store instruction.
 	 * 
 	 * @param node

@@ -48,6 +48,7 @@ import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.instructions.WriteEnd;
@@ -63,7 +64,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * @author Matthieu Wipliez
  * 
  */
-public class AbstractActorTransformation implements NodeVisitor,
+public abstract class AbstractActorTransformation implements NodeVisitor,
 		InstructionVisitor, ActorTransformation {
 
 	protected Procedure procedure;
@@ -110,7 +111,7 @@ public class AbstractActorTransformation implements NodeVisitor,
 	public Object visit(IfNode node, Object... args) {
 		visit(node.getThenNodes());
 		visit(node.getElseNodes());
-		visit(node.getJoinNode());
+		visit(node.getJoinNode(), args);
 		return null;
 	}
 
@@ -123,8 +124,10 @@ public class AbstractActorTransformation implements NodeVisitor,
 	 * 
 	 * @param nodes
 	 *            a list of nodes that belong to a procedure
+	 * @param args
+	 *            arguments
 	 */
-	protected void visit(List<CFGNode> nodes) {
+	protected void visit(List<CFGNode> nodes, Object... args) {
 		ListIterator<CFGNode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			CFGNode node = it.next();
@@ -157,11 +160,18 @@ public class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
+	public void visit(SpecificInstruction node, Object... args) {
+		// default implementation does nothing
+	}
+
+	@Override
 	public void visit(Store node, Object... args) {
 	}
 
 	@Override
 	public Object visit(WhileNode node, Object... args) {
+		visit(node.getNodes());
+		visit(node.getJoinNode(), args);
 		return null;
 	}
 

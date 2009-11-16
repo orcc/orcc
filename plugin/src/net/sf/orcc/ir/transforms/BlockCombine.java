@@ -26,68 +26,51 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.instructions;
+package net.sf.orcc.ir.transforms;
+
+import java.util.ListIterator;
+
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
- * This abstract class defines a no-op instruction visitor. It does not
- * implement {@link #visit(SpecificInstruction, Object...)} because it is
- * specific to back-ends.
+ * Removes phi assignments and translates them to copies.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractInstructionVisitor implements InstructionVisitor {
+public class BlockCombine extends AbstractActorTransformation {
+
+	private BlockNode previous;
 
 	@Override
-	public void visit(Assign node, Object... args) {
+	public Object visit(BlockNode node, Object... args) {
+		if (previous == null) {
+			previous = node;
+		} else {
+			// add instructions of this block after previous block's
+			// instructions
+			previous.addAll(node);
+
+			// remove this block
+			ListIterator<?> it = (ListIterator<?>) args[0];
+			it.remove();
+		}
+		
+		return null;
 	}
 
 	@Override
-	public void visit(Call node, Object... args) {
+	public Object visit(IfNode node, Object... args) {
+		previous = null;
+		return super.visit(node, args);
 	}
 
 	@Override
-	public void visit(HasTokens node, Object... args) {
-	}
-
-	@Override
-	public void visit(InitPort node, Object... args) {
-	}
-
-	@Override
-	public void visit(Load node, Object... args) {
-	}
-
-	@Override
-	public void visit(Peek node, Object... args) {
-	}
-
-	@Override
-	public void visit(PhiAssignment node, Object... args) {
-	}
-
-	@Override
-	public void visit(Read node, Object... args) {
-	}
-
-	@Override
-	public void visit(ReadEnd node, Object... args) {
-	}
-
-	@Override
-	public void visit(Return node, Object... args) {
-	}
-
-	@Override
-	public void visit(Store node, Object... args) {
-	}
-
-	@Override
-	public void visit(Write node, Object... args) {
-	}
-
-	@Override
-	public void visit(WriteEnd node, Object... args) {
+	public Object visit(WhileNode node, Object... args) {
+		previous = null;
+		return super.visit(node, args);
 	}
 
 }

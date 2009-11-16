@@ -75,7 +75,6 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	 * 
 	 * @see net.sf.orcc.backend.cpp.CppNodePrinter
 	 */
-
 	protected String actorName;
 
 	protected String attrName;

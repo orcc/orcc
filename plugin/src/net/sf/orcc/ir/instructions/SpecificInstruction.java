@@ -28,66 +28,24 @@
  */
 package net.sf.orcc.ir.instructions;
 
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.nodes.BlockNode;
+
 /**
- * This abstract class defines a no-op instruction visitor. It does not
- * implement {@link #visit(SpecificInstruction, Object...)} because it is
- * specific to back-ends.
+ * This class defines a back-end specific instruction.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractInstructionVisitor implements InstructionVisitor {
+public class SpecificInstruction extends AbstractInstruction {
 
-	@Override
-	public void visit(Assign node, Object... args) {
+	protected SpecificInstruction(BlockNode block, Location location) {
+		super(block, location);
 	}
 
 	@Override
-	public void visit(Call node, Object... args) {
-	}
-
-	@Override
-	public void visit(HasTokens node, Object... args) {
-	}
-
-	@Override
-	public void visit(InitPort node, Object... args) {
-	}
-
-	@Override
-	public void visit(Load node, Object... args) {
-	}
-
-	@Override
-	public void visit(Peek node, Object... args) {
-	}
-
-	@Override
-	public void visit(PhiAssignment node, Object... args) {
-	}
-
-	@Override
-	public void visit(Read node, Object... args) {
-	}
-
-	@Override
-	public void visit(ReadEnd node, Object... args) {
-	}
-
-	@Override
-	public void visit(Return node, Object... args) {
-	}
-
-	@Override
-	public void visit(Store node, Object... args) {
-	}
-
-	@Override
-	public void visit(Write node, Object... args) {
-	}
-
-	@Override
-	public void visit(WriteEnd node, Object... args) {
+	public void accept(InstructionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
 }
