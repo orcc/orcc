@@ -187,6 +187,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
     bool ac = bitand(cmd,ACPRED) != 0
   do
     s_qp		:= qp;
+    s_prev_qp   := qp;
     round 		:= bitxor( bitand( s_qp, 1 ), 1 );
     scaler    	:= dc_scaler();                                                      // Retrieve 'dc_scalar'. See ISO/IEC 14496-2 Table 7-1.
     dc_pred   	:= ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;   // See ISO/IEC 14496-2 Section 7.4.3.2.
@@ -201,7 +202,7 @@ actor MPEG4_algo_DCRinvpred_luma_16x16 (
 			end
 		end
 	end
-	if (s=1) then
+	if (s=1) and (cnt >=3) then
 		if (comp=0) or (comp=2) then 
 			s_prev_qp:= buf_qp[cnt-3];
 		else

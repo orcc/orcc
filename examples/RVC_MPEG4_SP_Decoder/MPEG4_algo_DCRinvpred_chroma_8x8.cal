@@ -180,6 +180,7 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
     bool ac = bitand(cmd,ACPRED) != 0
   do
     s_qp		:= qp;
+    s_prev_qp   := s_qp;
     round := bitxor( bitand( s_qp, 1 ), 1 );
     scaler  := dc_scaler();
     dc_pred := ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;
@@ -188,7 +189,7 @@ actor MPEG4_algo_DCRinvpred_chroma_8x8 (
 	if (s=2) then
 		s_prev_qp:= buf_qp[cnt];
 	end
-	if (s=1) then
+	if (s=1) and (cnt >=1) then
 		s_prev_qp:= buf_qp[cnt-1];
 	end
 	buf_qp[cnt]	:= s_qp;
