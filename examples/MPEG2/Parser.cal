@@ -1,14 +1,44 @@
-actor Parser() uint(size=8) I ==> :
+/*
+ * Copyright (c) 2009, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+ 
+ // Author: Matthieu Wipliez
+ 
+ actor Parser() uint(size=8) I ==> :
 
-  // to save next bits when needed
-  uint(size=32) next_bits;
-  uint(size=5) next_shift; // from 0 to 31
-  uint(size=2) i_want_a_refill;
-
-  // this is the maximum size of a chunk
-  int MAX_CHUNK_SIZE = 1 << 16;
-  List(type:int(size=32), size=MAX_CHUNK_SIZE) chunk;
-  int chunk_ptr;
+  // maximum chunk size in bytes
+  int MAX_CHUNK_SIZE = 64;
+  
+  // chunk
+  List(type:uint(size=8), size=MAX_CHUNK_SIZE) chunk := [0 : for int i in Integers(1, MAX_CHUNK_SIZE - 1) ];
+  int byte_index; // index of the current byte in the chunk
+  int byte_count; // number of bytes left in the current chunk
+  int bits_count; // number of bits left in the current byte
 
   // sequence characteristics
   uint(size=12) horizontal_size;
@@ -85,36 +115,96 @@ actor Parser() uint(size=8) I ==> :
   uint(size=3) BIPRED = 3;
 
   /////////////////////////////////////////////////////////////////////////////
-  // start code detection
-
-  chunk_b1: action I:[ b ] ==>
-  do
-    chunk[chunk_ptr] := b;
-    chunk_ptr := chunk_ptr + 1;
+  // intrinsics
+  
+  // exit function
+  procedure exit()
+  begin
+    println("exit");
   end
 
+  /////////////////////////////////////////////////////////////////////////////
+  // bit management
+  
+  uint(size=1) nextbit;
+  uint(size=32) nextbits;
+  uint(size=8) nextbyte;
+  
+  procedure compute_nextbit()
+  begin
+    if bits_count = 0 then
+      // circular byte buffer
+      if byte_index = MAX_CHUNK_SIZE - 1 then
+        byte_index := 0;
+      else
+        byte_index := byte_index + 1;
+      end
+
+      byte_count := byte_count - 1;
+      bits_count := 7;
+    else
+      bits_count := bits_count - 1;
+    end
+
+    nextbit := (chunk[byte_index] >> bits_count) & 0x01;
+  end
+
+  procedure compute_nextbits(int num)
+  var
+    uint(size=32) res := 0
+  begin
+    foreach int i in Integers(1, num) do
+      compute_nextbit();
+      res := res << 1 | nextbit;
+    end
+    nextbits := res;
+  end
+
+  // "mod 8" true hardware style, dood! ^^
+  // Note to self: needs to add this case as a simple optimization so I will never have to do this trick again
+  function bytealigned() --> bool :
+    (bits_count & 0x07) = 0
+  end
+
+  action I:[ bytes ] repeat MAX_CHUNK_SIZE / 2 ==>
+  guard
+    byte_count <= MAX_CHUNK_SIZE / 2
+  var
+    int i
+  do
+    i := 0;
+    while i < MAX_CHUNK_SIZE / 2 do
+      chunk[i] := bytes[i];
+    end
+
+    byte_count := byte_count + MAX_CHUNK_SIZE / 2;
+  end
+
+  ///////////////////////////////////////////////////////////////////////////
   /** detect next start code, or execute zero_byte_stuffing */
-  next_start_code: action I:[ b0, b1, b2 ] ==>
+  next_start_code: action ==>
   guard
-    b0 = 0 and b1 = 0 and b2 = 0x01
-  end
-  
-  byte_stuffing.zero: action I:[ b ] ==>
-  guard
-    b = 0
-  end
-  
-  byte_stuffing.whatever: action I:[ b ] ==>
-  end
-  
-  // when expected start code value not there
-  other_start_code: action I:[ byte ] ==>
-  end
-  
-  
-  initialize ==>
+    nextbits = 0
   do
-    chunk := [ 0 : for int i in Integers(0, MAX_CHUNK_SIZE - 1) ];
+    while (not byte_aligned()) do
+      read_nextbit(1);
+      if nextbit != 0 then
+        error();
+      end
+    end
+    compute_nextbits(24);
+    //if nextbits != 0x000001 then
+    //  
+    //end
+  end
+  
+  byte_stuffing.zero: action ==>
+  end
+
+  byte_stuffing.whatever: action ==>
+  end
+
+  other_start_code: action ==>
   end
 
   ///////////////////////////////////////////////////////////////////////////
@@ -161,7 +251,7 @@ actor Parser() uint(size=8) I ==> :
     end */
     
     load_intra_quantiser_matrix := (bytes[8] & 0x02) != 0;
-    next_bits := bytes[8] & 0x01;
+    // next_bits := bytes[8] & 0x01;
   end
   
   /** sequence header with load_intra_quantiser_matrix */
@@ -170,7 +260,7 @@ actor Parser() uint(size=8) I ==> :
     // TODO: copy quant matrix
 
     // set next_bit 
-    next_bits := matrix[8 * 64 - 1] & 0x01;
+    // next_bits := matrix[8 * 64 - 1] & 0x01;
   end
   
   load_intra_quantiser_matrix.no: action ==>
@@ -186,8 +276,8 @@ actor Parser() uint(size=8) I ==> :
   end
   
   load_non_intra_quantiser_matrix.no: action ==>
-  guard
-    next_bits = 0
+  //guard
+    //next_bits = 0
   end
 
   ///////////////////////////////////////////////////////////////////////////
@@ -225,7 +315,7 @@ actor Parser() uint(size=8) I ==> :
     temporal_reference := bytes[1] << 2 | bytes[2] & 0xC0;
     picture_coding_type := (bytes[2] & 0x38) >> 3;
     vbv_delay := (bytes[2] & 0x07) << 13 | bytes[3] | bytes[4] >> 3;
-    next_bits := bytes[4] & 0x07;
+    // next_bits := bytes[4] & 0x07;
   end
 
   picture.intra: action ==>
@@ -240,7 +330,7 @@ actor Parser() uint(size=8) I ==> :
     // not used in MPEG-2
     // full_pel_forward_vector := next_bits >> 2;
     // forward_f_code := next_bits & 0x03 | byte >> 7;
-    next_bits := byte & 0x7F;
+    // next_bits := byte & 0x7F;
   end
 
   picture.pred.B: action I:[ byte ] ==>
@@ -252,7 +342,7 @@ actor Parser() uint(size=8) I ==> :
     // forward_f_code := next_bits & 0x03 | byte >> 7;
     // full_pel_backward_vector := (byte & 0x40) >> 6;
     // backward_f_code := (byte & 0x38) >> 3;
-    next_bits := byte & 0x07;
+    // next_bits := byte & 0x07;
   end
   
   ///////////////////////////////////////////////////////////////////////////
@@ -282,16 +372,16 @@ actor Parser() uint(size=8) I ==> :
     repeat_first_field := (byte & 0x02) != 0;
     chroma_420_type := (byte & 0x01) != 0;
 
-    next_bits := bytes[5];
+    // next_bits := bytes[5];
 
-    progressive_frame := (next_bits & 0x80) != 0;
-    composite_display_flag := (next_bits & 0x40) != 0;
+    // progressive_frame := (next_bits & 0x80) != 0;
+    // composite_display_flag := (next_bits & 0x40) != 0;
   end
 
   // TODO: decode information here
   composite_flag.yes: action I:[ bytes ] repeat 2 ==>
-  do
-    next_bits := 0;
+  //do
+  //  next_bits := 0;
   end
 
   composite_flag.no: action ==>
@@ -304,19 +394,19 @@ actor Parser() uint(size=8) I ==> :
   slice: action I:[ bytes ] repeat 2 ==>
   guard
     bytes[0] >= SLICE_BEGIN_START_CODE and bytes[0] <= SLICE_END_START_CODE
-  do
-    next_bits := bytes[1];
-    if vertical_size > 2800 then
+  //do
+    //next_bits := bytes[1];
+    //if vertical_size > 2800 then
       // somehow, I think it is quite unlikely, but... who knows? 
-      slice_vertical_position_extension := next_bits >> 5; // 3 highest bits
-      quantiser_scale_code := next_bits & 0x1F; // 5 lowest bits
-      next_bits := bytes[2];
-      next_shift := 7;
-    else
-      quantiser_scale_code := next_bits >> 3; // 5 highest bits
-      next_bits := ((next_bits & 0x07) << 8) | bytes[2];
-      next_shift := 10;
-    end
+      //slice_vertical_position_extension := next_bits >> 5; // 3 highest bits
+      //quantiser_scale_code := next_bits & 0x1F; // 5 lowest bits
+      //next_bits := bytes[2];
+      //next_shift := 7;
+    //else
+      //quantiser_scale_code := next_bits >> 3; // 5 highest bits
+      //next_bits := ((next_bits & 0x07) << 8) | bytes[2];
+      //next_shift := 10;
+    //end
 
     // TODO: scalable extension
   end
@@ -325,10 +415,10 @@ actor Parser() uint(size=8) I ==> :
   end
   
   slice_intra_flag.no: action ==>
-  guard
-    ((next_bits >> next_shift) & 0x01) = 0
-  do
-    next_shift := next_shift - 1;
+  //guard
+  //  ((next_bits >> next_shift) & 0x01) = 0
+  //do
+  //  next_shift := next_shift - 1;
   end
   
   ///////////////////////////////////////////////////////////////////////////
