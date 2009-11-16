@@ -28,17 +28,16 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.io.File;
 import java.util.ListIterator;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
- * Removes phi assignments and translates them to copies.
+ * This class defines an actor transformation that combines blocks of
+ * instructions together.
  * 
  * @author Matthieu Wipliez
  * 
@@ -60,36 +59,47 @@ public class BlockCombine extends AbstractActorTransformation {
 			ListIterator<?> it = (ListIterator<?>) args[0];
 			it.remove();
 		}
-		
+
 		return null;
 	}
 
 	@Override
 	public Object visit(IfNode node, Object... args) {
+		// so that previous blocks are not linked to then branch
 		previous = null;
 		visit(node.getThenNodes());
+
+		// so that previous blocks are not linked to else branch
 		previous = null;
 		visit(node.getElseNodes());
+
+		// so that neither then nor else branch are linked to this join
+		// as a matter of fact, this also ensures correctness in nested ifs
 		previous = null;
 		visit(node.getJoinNode(), args);
-		previous = null;
+
+		// we do not set previous to null again, because join may be combined
+		// with next blocks (actually it needs to be).
+
 		return null;
 	}
 
 	@Override
 	public Object visit(WhileNode node, Object... args) {
+		// previous blocks are not linked to the body of the while
 		previous = null;
 		visit(node.getNodes());
+
+		// no previous block to be linked to
 		previous = null;
-		visit(node.getJoinNode(), args);
-		previous = null;
+
 		return null;
 	}
 
 	@Override
 	protected void visitProcedure(Procedure procedure) {
-		super.visitProcedure(procedure);
 		previous = null;
+		super.visitProcedure(procedure);
 	}
 
 }

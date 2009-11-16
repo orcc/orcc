@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
-import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.backends.llvm.util.NodeIndex;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;

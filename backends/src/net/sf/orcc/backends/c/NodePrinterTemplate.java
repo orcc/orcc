@@ -172,22 +172,20 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		template = nodeTmpl;
 		attrName = "thenNodes";
 
-		for (CFGNode subNode : node.getThenNodes()) {
-			subNode.accept(this, args);
-		}
+		visit(node.getThenNodes(), args);
 
 		List<CFGNode> elseNodes = node.getElseNodes();
 		if (elseNodes.size() > 0) {
 			attrName = "elseNodes";
-			for (CFGNode subNode : elseNodes) {
-				subNode.accept(this, args);
-			}
+			visit(elseNodes, args);
 		}
 
 		// restore previous template and attribute name
 		attrName = previousAttrName;
 		template = previousTempl;
 		template.setAttribute(attrName, nodeTmpl);
+
+		node.getJoinNode().accept(this, args);
 
 		return null;
 	}
@@ -204,6 +202,12 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	@Override
 	public void visit(InitPort node, Object... args) {
 		// nothing to print
+	}
+
+	private void visit(List<CFGNode> nodes, Object... args) {
+		for (CFGNode node : nodes) {
+			node.accept(this, args);
+		}
 	}
 
 	@Override
@@ -286,6 +290,11 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	}
 
 	@Override
+	public void visit(SpecificInstruction instruction, Object... args) {
+		((AbstractCInstruction) instruction).accept(this, args);
+	}
+
+	@Override
 	public void visit(Store node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("storeNode");
 
@@ -313,9 +322,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		template = nodeTmpl;
 		attrName = "nodes";
 
-		for (CFGNode subNode : node.getNodes()) {
-			subNode.accept(this, args);
-		}
+		visit(node.getNodes(), args);
 
 		// restore previous template
 		attrName = previousAttrName;
@@ -347,11 +354,6 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 
 		template.setAttribute(attrName, nodeTmpl);
-	}
-
-	@Override
-	public void visit(SpecificInstruction instruction, Object... args) {
-		((AbstractCInstruction) instruction).accept(this, args);
 	}
 
 }

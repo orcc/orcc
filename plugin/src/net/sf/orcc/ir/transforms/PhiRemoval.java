@@ -38,20 +38,52 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * Removes phi assignments and translates them to copies.
+ * This class removes phi assignments and transforms them to copies.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class PhiRemoval extends AbstractActorTransformation {
+
+	private class PhiRemover extends AbstractInstructionVisitor {
+
+		@Override
+		public void visit(PhiAssignment instruction, Object... args) {
+			((ListIterator<?>) args[0]).remove();
+		}
+
+		@Override
+		public void visit(SpecificInstruction node, Object... args) {
+			// nothing to do here
+		}
+
+	}
+
+	private PhiRemover visitor;
+
+	/**
+	 * Creates a new phi removal pass.
+	 */
+	public PhiRemoval() {
+		visitor = new PhiRemover();
+	}
+
+	private void removePhis(BlockNode join) {
+		ListIterator<Instruction> it = join.listIterator();
+		while (it.hasNext()) {
+			it.next().accept(visitor, it);
+		}
+	}
 
 	@Override
 	public Object visit(BlockNode node, Object... args) {
@@ -63,14 +95,14 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 	@Override
 	public Object visit(IfNode node, Object... args) {
-		// visit then nodes
-		node.getJoinNode().accept(this, BlockNode.last(node.getThenNodes()), 0);
-		node.getJoinNode().accept(this, BlockNode.last(node.getElseNodes()), 1);
-		node.getJoinNode().clear();
+		BlockNode join = node.getJoinNode();
+		join.accept(this, BlockNode.last(node.getThenNodes()), 0);
+		join.accept(this, BlockNode.last(node.getElseNodes()), 1);
+		removePhis(join);
 
 		visit(node.getThenNodes());
 		visit(node.getElseNodes());
-		
+
 		return null;
 	}
 
@@ -121,17 +153,19 @@ public class PhiRemoval extends AbstractActorTransformation {
 			block = new BlockNode();
 			it.add(block);
 		}
-		node.getJoinNode().accept(this, block, 0);
+
+		BlockNode join = node.getJoinNode();
+		join.accept(this, block, 0);
 
 		// go back to the while
 		it.next();
 
 		// last node of the while
 		block = BlockNode.last(node.getNodes());
-		node.getJoinNode().accept(this, block, 1);
-		node.getJoinNode().clear();
+		join.accept(this, block, 1);
+		removePhis(join);
 		visit(node.getNodes());
-		
+
 		return null;
 	}
 
