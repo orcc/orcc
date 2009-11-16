@@ -28,8 +28,11 @@
  */
 package net.sf.orcc.ir.transforms;
 
+import java.io.File;
 import java.util.ListIterator;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
@@ -64,13 +67,29 @@ public class BlockCombine extends AbstractActorTransformation {
 	@Override
 	public Object visit(IfNode node, Object... args) {
 		previous = null;
-		return super.visit(node, args);
+		visit(node.getThenNodes());
+		previous = null;
+		visit(node.getElseNodes());
+		previous = null;
+		visit(node.getJoinNode(), args);
+		previous = null;
+		return null;
 	}
 
 	@Override
 	public Object visit(WhileNode node, Object... args) {
 		previous = null;
-		return super.visit(node, args);
+		visit(node.getNodes());
+		previous = null;
+		visit(node.getJoinNode(), args);
+		previous = null;
+		return null;
+	}
+
+	@Override
+	protected void visitProcedure(Procedure procedure) {
+		super.visitProcedure(procedure);
+		previous = null;
 	}
 
 }
