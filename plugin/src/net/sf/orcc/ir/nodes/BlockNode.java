@@ -29,7 +29,9 @@
 package net.sf.orcc.ir.nodes;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
@@ -42,13 +44,10 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class BlockNode extends ArrayList<Instruction> implements
-		Iterable<Instruction>, CFGNode {
+public class BlockNode extends AbstractNode implements Iterable<Instruction>,
+		CFGNode {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static int globalLabel;
 
 	public static BlockNode first(List<CFGNode> nodes) {
 		BlockNode block;
@@ -86,20 +85,24 @@ public class BlockNode extends ArrayList<Instruction> implements
 		return block;
 	}
 
-	private Location location;
-	
-	private int label;
+	/**
+	 * the list of instructions of this block node.
+	 */
+	private List<Instruction> instructions;
 
-	private static int globalLabel;
-
+	/**
+	 * Creates a new empty block node.
+	 */
 	public BlockNode() {
 		this(new Location());
 	}
 
+	/**
+	 * Creates a new empty block node with the given location.
+	 */
 	public BlockNode(Location location) {
-		super();
-		this.label = globalLabel++;
-		this.location = location;
+		super(globalLabel++, location);
+		instructions = new ArrayList<Instruction>();
 	}
 
 	@Override
@@ -107,9 +110,39 @@ public class BlockNode extends ArrayList<Instruction> implements
 		return visitor.visit(this, args);
 	}
 
+	/**
+	 * Appends the specified instruction to the end of this block.
+	 * 
+	 * @param instruction
+	 *            an instruction
+	 */
+	public void add(Instruction instruction) {
+		instructions.add(instruction);
+	}
+
+	/**
+	 * Returns the instructions of this block node.
+	 * 
+	 * @return the instructions of this block node
+	 */
+	public List<Instruction> getInstructions() {
+		return instructions;
+	}
+
 	@Override
-	public Location getLocation() {
-		return location;
+	public Iterator<Instruction> iterator() {
+		return instructions.iterator();
+	}
+
+	/**
+	 * Returns a list iterator over the elements in this list (in proper
+	 * sequence).
+	 * 
+	 * @return a list iterator over the elements in this list (in proper
+	 *         sequence)
+	 */
+	public ListIterator<Instruction> listIterator() {
+		return instructions.listIterator();
 	}
 
 	@Override
@@ -121,11 +154,6 @@ public class BlockNode extends ArrayList<Instruction> implements
 		}
 
 		return sb.toString();
-	}
-
-	@Override
-	public int getLabel() {
-		return label;
 	}
 
 }

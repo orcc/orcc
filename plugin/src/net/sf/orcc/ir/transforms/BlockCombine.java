@@ -53,7 +53,7 @@ public class BlockCombine extends AbstractActorTransformation {
 		} else {
 			// add instructions of this block after previous block's
 			// instructions
-			previous.addAll(node);
+			previous.getInstructions().addAll(node.getInstructions());
 
 			// remove this block
 			ListIterator<?> it = (ListIterator<?>) args[0];
