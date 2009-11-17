@@ -34,7 +34,7 @@ import java.util.Map;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -66,7 +66,7 @@ public class LLVMVarDefPrinter {
 	 */
 	public Map<String, Object> applyVarDef(Variable varDef) {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
-		varDefMap.put("name", getVarDefName(varDef, false));
+		varDefMap.put("name", getVarDefName(varDef));
 
 		Type type;
 
@@ -103,43 +103,8 @@ public class LLVMVarDefPrinter {
 	 *            the variable definition
 	 * @return a string with its full name
 	 */
-	public String getVarDefName(Variable variable, Object... args) {
-		Boolean showType = (Boolean) args[0];
-		String name = "";
-
-		if (showType) {
-			name = typeVisitor.toString(variable.getType());
-			name += " ";
-		}
-
-		if (variable instanceof LocalVariable) {
-			LocalVariable local = (LocalVariable) variable;
-
-			if (local.isConstant()) {
-				name += exprPrinter.toString(local.getConstant(), false);
-				return name;
-			}
-
-			if (local.isGlobal()) {
-				name += "@";
-			} else {
-				name += "%";
-			}
-			name += local.getName();
-
-			if (local.hasSuffix()) {
-				name += local.getSuffix();
-			}
-
-			if (!local.isGlobal()) {
-				int index = local.getIndex();
-				if (index != 0) {
-					name += "_" + local.getIndex();
-				}
-			}
-		}
-
-		return name;
+	public String getVarDefName(Variable variable) {
+		return NameTransformer.transform(variable.getName());
 	}
 
 }

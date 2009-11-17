@@ -1,4 +1,4 @@
-group main;
+group LLVM_actor;
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO declaration
@@ -27,10 +27,10 @@ phiPair(value, label) ::= <<
 // a variable definition
 vardef(var) ::= <<
 $if(var.isGlobal)$
-$var.name$ = internal global $var.type$
+@$var.name$ = internal global $var.type$
 $else$
 $if(var.isPort)$
-$var.name$ = alloca $var.type$
+%$var.name$ = alloca $var.type$
 
 $endif$
 $endif$>>
@@ -46,6 +46,16 @@ $endif$
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+// block node
+blockNode(label, instructions) ::= <<
+$label$:
+	$instructions$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
 // assignment node
@@ -187,8 +197,11 @@ loadFifoTmp(var, actorName, fifoName) ::= <<
 
 // return node
 returnNode(expr) ::= <<
-	ret $expr$
-
+$if(expr)$
+ret $expr$
+$else$
+ret void
+$endif$
 >>
 
 // self-assignment node

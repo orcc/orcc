@@ -185,14 +185,8 @@ public class LLVMExprPrinter implements ExpressionVisitor {
 
 	@Override
 	public Object visit(VarExpr expr, Object... args) {
-		Boolean showType = false;
-
-		if (args[0] instanceof Type) {
-			showType = true;
-		}
-
 		Variable variable = expr.getVar().getVariable();
-		builder.append(varDefPrinter.getVarDefName(variable, showType));
+		builder.append(varDefPrinter.getVarDefName(variable));
 		return null;
 	}
 

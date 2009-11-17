@@ -41,19 +41,16 @@ import net.sf.orcc.ir.Location;
 public abstract class AbstractNode extends AbstractLocalizable implements
 		CFGNode {
 
-	private int id;
+	private int label;
 
-	protected AbstractNode(int id, Location location) {
+	protected AbstractNode(int label, Location location) {
 		super(location);
-		this.id = id;
+		this.label = label;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
+	@Override
+	public int getLabel() {
+		return label;
 	}
 
 }

@@ -117,9 +117,10 @@ public class LLVMActorPrinter {
 		procTmpl.setAttribute("type", typePrinter.toString(type));
 
 		// parameters
-		List<String> parameters = new ArrayList<String>();
+		List<Object> parameters = new ArrayList<Object>();
 		for (Variable param : proc.getParameters()) {
-			parameters.add(varDefPrinter.getVarDefName(param, true));
+			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
+			parameters.add(varDefMap);
 		}
 		procTmpl.setAttribute("parameters", parameters);
 
@@ -252,8 +253,8 @@ public class LLVMActorPrinter {
 				constPrinter.setTemplate(stateTempl);
 
 				if (stateVar.getInit() instanceof ListConst) {
-					//stateVar.getInit().accept(constPrinter,
-					//		((PointType) stateVar.getType()).getElementType());
+					// stateVar.getInit().accept(constPrinter,
+					// ((PointType) stateVar.getType()).getElementType());
 				} else {
 					stateVar.getInit().accept(constPrinter);
 				}

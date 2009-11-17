@@ -87,6 +87,10 @@ public class BlockNode extends ArrayList<Instruction> implements
 	}
 
 	private Location location;
+	
+	private int label;
+
+	private static int globalLabel;
 
 	public BlockNode() {
 		this(new Location());
@@ -94,6 +98,7 @@ public class BlockNode extends ArrayList<Instruction> implements
 
 	public BlockNode(Location location) {
 		super();
+		this.label = globalLabel++;
 		this.location = location;
 	}
 
@@ -114,8 +119,13 @@ public class BlockNode extends ArrayList<Instruction> implements
 			sb.append(instruction.toString());
 			sb.append("\\n");
 		}
-		
+
 		return sb.toString();
+	}
+
+	@Override
+	public int getLabel() {
+		return label;
 	}
 
 }

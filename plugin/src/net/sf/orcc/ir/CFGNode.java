@@ -49,4 +49,11 @@ public interface CFGNode extends User {
 	 */
 	public Object accept(NodeVisitor visitor, Object... args);
 
+	/**
+	 * Returns the label of this node as an integer.
+	 * 
+	 * @return the label of this node as an integer
+	 */
+	public int getLabel();
+
 }
