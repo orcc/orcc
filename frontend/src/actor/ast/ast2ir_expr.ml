@@ -221,7 +221,13 @@ and ir_of_call env vars graph node (parent, target) loc name parameters =
 						(sprintf "The builtin function \"%s\" takes two parameters" name)
 		with Not_builtin ->
 			(* not a built-in function *)
-			let proc = get_binding_proc env name in
+			let proc =
+				try
+					get_binding_proc env name
+				with Not_found -> 
+					Asthelper.failwith loc
+						(sprintf "reference to undefined function/procedure \"%s\"!" name)
+			in
 			let (env, vars, node, parameters) =
 				ir_of_expr_list env vars graph node (Some POther, target) parameters
 			in
