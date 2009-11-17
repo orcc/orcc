@@ -28,80 +28,36 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Printer;
 
 /**
- * This class defines a unary expression.
+ * This interface defines an expression.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class UnaryExpr extends AbstractExpression {
+public abstract class AbstractExpression extends AbstractLocalizable implements
+		Expression {
 
-	private Expression expr;
-
-	private UnaryOp op;
-
-	private Type type;
-
-	public UnaryExpr(Location location, UnaryOp op, Expression expr, Type type) {
+	/**
+	 * Creates an abstract expression with the given location.
+	 * 
+	 * @param location
+	 *            the location of this abstract expression
+	 */
+	public AbstractExpression(Location location) {
 		super(location);
-		this.expr = expr;
-		this.op = op;
-		this.type = type;
 	}
 
 	@Override
-	public Object accept(ExpressionVisitor visitor, Object... args) {
-		return visitor.visit(this, args);
-	}
+	public abstract Object accept(ExpressionVisitor visitor, Object... args);
 
 	@Override
-	public Expression evaluate() throws OrccException {
-		switch (op) {
-		case BITNOT:
-			break;
-		case LOGIC_NOT:
-			break;
-		case MINUS:
-			break;
-		case NUM_ELTS:
-			break;
-		}
-
-		throw new OrccException("could not evaluate");
-	}
-
-	public Expression getExpr() {
-		return expr;
-	}
-
-	public UnaryOp getOp() {
-		return op;
-	}
-
-	@Override
-	public int getType() {
-		return UNARY;
-	}
-
-	public Type getUnderlyingType() {
-		return type;
-	}
-
-	public void setExpr(Expression expr) {
-		this.expr = expr;
-	}
-
-	public void setOp(UnaryOp op) {
-		this.op = op;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
+	public String toString() {
+		return Printer.getInstance().toString(this);
 	}
 
 }

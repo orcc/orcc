@@ -26,82 +26,74 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ir.printers;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 
 /**
- * This class defines a unary expression.
+ * This class defines the default type printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class UnaryExpr extends AbstractExpression {
+public class DefaultTypePrinter implements TypeVisitor {
 
-	private Expression expr;
+	protected StringBuilder builder;
 
-	private UnaryOp op;
-
-	private Type type;
-
-	public UnaryExpr(Location location, UnaryOp op, Expression expr, Type type) {
-		super(location);
-		this.expr = expr;
-		this.op = op;
-		this.type = type;
+	/**
+	 * Creates a new type printer.
+	 */
+	public DefaultTypePrinter() {
+		builder = new StringBuilder();
 	}
 
 	@Override
-	public Object accept(ExpressionVisitor visitor, Object... args) {
-		return visitor.visit(this, args);
+	public String toString() {
+		return builder.toString();
 	}
 
 	@Override
-	public Expression evaluate() throws OrccException {
-		switch (op) {
-		case BITNOT:
-			break;
-		case LOGIC_NOT:
-			break;
-		case MINUS:
-			break;
-		case NUM_ELTS:
-			break;
-		}
-
-		throw new OrccException("could not evaluate");
-	}
-
-	public Expression getExpr() {
-		return expr;
-	}
-
-	public UnaryOp getOp() {
-		return op;
+	public void visit(BoolType type) {
+		builder.append("bool");
 	}
 
 	@Override
-	public int getType() {
-		return UNARY;
+	public void visit(IntType type) {
+		builder.append("int(size=");
+		builder.append(type.getSize().toString());
+		builder.append(")");
 	}
 
-	public Type getUnderlyingType() {
-		return type;
+	@Override
+	public void visit(ListType type) {
+		builder.append("List(type:");
+		builder.append(type.getElementType().toString());
+		builder.append(", size=");
+		builder.append(type.getSize().toString());
+		builder.append(")");
 	}
 
-	public void setExpr(Expression expr) {
-		this.expr = expr;
+	@Override
+	public void visit(StringType type) {
+		builder.append("String");
 	}
 
-	public void setOp(UnaryOp op) {
-		this.op = op;
+	@Override
+	public void visit(UintType type) {
+		builder.append("uint(size=");
+		builder.append(type.getSize().toString());
+		builder.append(")");
 	}
 
-	public void setType(Type type) {
-		this.type = type;
+	@Override
+	public void visit(VoidType type) {
+		builder.append("void");
 	}
 
 }

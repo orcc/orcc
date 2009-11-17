@@ -29,15 +29,16 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 
 /**
+ * This class defines a boolean expression.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class BooleanExpr extends AbstractLocalizable implements Expression {
+public class BooleanExpr extends AbstractExpression {
 
 	private boolean value;
 
@@ -67,11 +68,6 @@ public class BooleanExpr extends AbstractLocalizable implements Expression {
 
 	public void setValue(boolean value) {
 		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return Boolean.toString(value);
 	}
 
 }

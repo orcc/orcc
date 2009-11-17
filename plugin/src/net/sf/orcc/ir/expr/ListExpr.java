@@ -31,15 +31,17 @@ package net.sf.orcc.ir.expr;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 
 /**
+ * This class defines a list expression. This kind of expression is only present
+ * at the network level.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class ListExpr extends AbstractLocalizable implements Expression {
+public class ListExpr extends AbstractExpression {
 
 	private List<Expression> value;
 
@@ -65,11 +67,6 @@ public class ListExpr extends AbstractLocalizable implements Expression {
 
 	public List<Expression> getValue() {
 		return value;
-	}
-
-	@Override
-	public String toString() {
-		return value.toString();
 	}
 
 }

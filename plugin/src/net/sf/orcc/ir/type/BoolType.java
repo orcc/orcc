@@ -29,16 +29,14 @@
 package net.sf.orcc.ir.type;
 
 /**
+ * This class defines a boolean type.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class BoolType extends AbstractType {
 
 	public static final String NAME = "bool";
-
-	public BoolType() {
-		super(NAME);
-	}
 
 	@Override
 	public void accept(TypeVisitor visitor) {

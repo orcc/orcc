@@ -42,7 +42,6 @@ public class PointType extends LLVMAbstractType {
 	private Type type;
 
 	public PointType(Type type) {
-		super(NAME);
 		this.type = type;
 	}
 

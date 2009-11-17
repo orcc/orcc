@@ -29,15 +29,16 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 
 /**
+ * This class defines an integer expression.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class IntExpr extends AbstractLocalizable implements Expression {
+public class IntExpr extends AbstractExpression {
 
 	private int value;
 
@@ -95,11 +96,6 @@ public class IntExpr extends AbstractLocalizable implements Expression {
 
 	public void setValue(int value) {
 		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return Integer.toString(value);
 	}
 
 }

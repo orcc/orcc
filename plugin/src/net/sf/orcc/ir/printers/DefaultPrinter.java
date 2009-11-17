@@ -26,82 +26,68 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ir.printers;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Printer;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Variable;
 
 /**
- * This class defines a unary expression.
+ * This class defines a default IR printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class UnaryExpr extends AbstractExpression {
+public class DefaultPrinter extends Printer {
 
-	private Expression expr;
-
-	private UnaryOp op;
-
-	private Type type;
-
-	public UnaryExpr(Location location, UnaryOp op, Expression expr, Type type) {
-		super(location);
-		this.expr = expr;
-		this.op = op;
-		this.type = type;
+	@Override
+	public String toString(CFGNode node) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public Object accept(ExpressionVisitor visitor, Object... args) {
-		return visitor.visit(this, args);
+	public String toString(Constant constant) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	public Expression evaluate() throws OrccException {
-		switch (op) {
-		case BITNOT:
-			break;
-		case LOGIC_NOT:
-			break;
-		case MINUS:
-			break;
-		case NUM_ELTS:
-			break;
-		}
-
-		throw new OrccException("could not evaluate");
-	}
-
-	public Expression getExpr() {
-		return expr;
-	}
-
-	public UnaryOp getOp() {
-		return op;
+	public String toString(Expression expression) {
+		// parent precedence is the highest possible to prevent top-level binary
+		// expression from being parenthesized
+		DefaultExpressionPrinter printer = new DefaultExpressionPrinter();
+		expression.accept(printer, Integer.MAX_VALUE);
+		return printer.toString();
 	}
 
 	@Override
-	public int getType() {
-		return UNARY;
+	public String toString(Instruction instruction) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public Type getUnderlyingType() {
-		return type;
+	@Override
+	public String toString(Procedure procedure) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public void setExpr(Expression expr) {
-		this.expr = expr;
+	@Override
+	public String toString(Type type) {
+		DefaultTypePrinter printer = new DefaultTypePrinter();
+		type.accept(printer);
+		return printer.toString();
 	}
 
-	public void setOp(UnaryOp op) {
-		this.op = op;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
+	@Override
+	public String toString(Variable variable) {
+		return variable.getName();
 	}
 
 }

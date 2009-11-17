@@ -29,16 +29,14 @@
 package net.sf.orcc.ir.type;
 
 /**
+ * This class defines a String type.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class StringType extends AbstractType {
 
 	public static final String NAME = "String";
-
-	public StringType() {
-		super(NAME);
-	}
 
 	@Override
 	public void accept(TypeVisitor visitor) {

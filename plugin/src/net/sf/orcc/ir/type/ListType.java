@@ -32,6 +32,8 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 
 /**
+ * This class defines a List type.
+ * 
  * @author Matthieu Wipliez
  * 
  */
@@ -43,8 +45,15 @@ public class ListType extends AbstractType {
 
 	private Type type;
 
+	/**
+	 * Creates a new list type with the given size and element type.
+	 * 
+	 * @param size
+	 *            the size of this list type
+	 * @param type
+	 *            the type of this list's elements
+	 */
 	public ListType(Expression size, Type type) {
-		super(NAME);
 		setSize(size);
 		setType(type);
 	}
@@ -58,7 +67,7 @@ public class ListType extends AbstractType {
 	public boolean equals(Object obj) {
 		if (obj instanceof UintType) {
 			ListType list = (ListType) obj;
-			return (size == list.size && type.equals(list.type));
+			return (size.equals(list.size) && type.equals(list.type));
 		} else {
 			return false;
 		}
@@ -87,11 +96,6 @@ public class ListType extends AbstractType {
 		}
 
 		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return NAME + "(type:" + type + ", size=" + size + ")";
 	}
 
 }

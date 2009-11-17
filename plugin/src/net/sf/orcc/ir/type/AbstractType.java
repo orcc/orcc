@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
 
 /**
@@ -38,17 +39,12 @@ import net.sf.orcc.ir.Type;
  */
 public abstract class AbstractType implements Type {
 
-	private String name;
-
-	protected AbstractType(String name) {
-		this.name = name;
-	}
-
+	@Override
 	public abstract void accept(TypeVisitor visitor);
 
 	@Override
 	public String toString() {
-		return name;
+		return Printer.getInstance().toString(this);
 	}
 
 }

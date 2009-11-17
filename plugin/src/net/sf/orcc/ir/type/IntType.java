@@ -31,6 +31,8 @@ package net.sf.orcc.ir.type;
 import net.sf.orcc.ir.Expression;
 
 /**
+ * This class defines an integer type.
+ * 
  * @author Matthieu Wipliez
  * 
  */
@@ -40,8 +42,13 @@ public class IntType extends AbstractType {
 
 	private Expression size;
 
+	/**
+	 * Creates a new integer with the given size.
+	 * 
+	 * @param size
+	 *            the size of this integer type
+	 */
 	public IntType(Expression size) {
-		super(NAME);
 		setSize(size);
 	}
 
@@ -70,11 +77,6 @@ public class IntType extends AbstractType {
 
 	public void setSize(Expression size) {
 		this.size = size;
-	}
-
-	@Override
-	public String toString() {
-		return NAME + "(size=" + size + ")";
 	}
 
 }

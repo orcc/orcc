@@ -38,10 +38,6 @@ public abstract class LLVMAbstractType extends AbstractType {
 
 	public static final int POINT = 7;
 
-	protected LLVMAbstractType(String name) {
-		super(name);
-	}
-
 	public abstract void accept(LLVMTypeVisitor visitor);
 
 }

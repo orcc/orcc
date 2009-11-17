@@ -29,16 +29,14 @@
 package net.sf.orcc.ir.type;
 
 /**
+ * This class defines a void type.
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class VoidType extends AbstractType {
 
 	public static final String NAME = "void";
-
-	public VoidType() {
-		super(NAME);
-	}
 
 	@Override
 	public void accept(TypeVisitor visitor) {

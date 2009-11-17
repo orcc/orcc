@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
@@ -40,7 +39,7 @@ import net.sf.orcc.ir.Type;
  * @author Matthieu Wipliez
  * 
  */
-public class BinaryExpr extends AbstractLocalizable implements Expression {
+public class BinaryExpr extends AbstractExpression {
 
 	/**
 	 * Constant indicating left branch of a binary expression.
@@ -165,11 +164,6 @@ public class BinaryExpr extends AbstractLocalizable implements Expression {
 
 	public void setType(Type type) {
 		this.type = type;
-	}
-
-	@Override
-	public String toString() {
-		return e1 + " " + op.toString() + " " + e2;
 	}
 
 }
