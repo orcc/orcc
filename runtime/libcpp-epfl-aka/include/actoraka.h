@@ -32,6 +32,13 @@
 #include "fifoapi.h"
 #include "fifoFanOut.h"
 
+#ifdef __TRACE_TOKENS__
+#include "traceaka.h"
+#include "stringaka.h"
+extern TraceAka g_oTracer;
+#endif
+
+
 typedef enum
 {
 	ACTOR_PORT_IN = 0,

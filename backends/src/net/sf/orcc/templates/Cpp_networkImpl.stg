@@ -30,7 +30,9 @@ Network_$name$::~Network_$name$(){}
 
 void Network_$name$::start(std::string &strErr)
 {
-	$instances: {inst |actor_$inst$.startActorExecution();}; separator="\n"$
+	$instances: {actor_$it$.initializeActor();}; separator="\n"$
+	
+	$instances: {actor_$it$.startActorExecution();}; separator="\n"$
 }
 
 void Network_$name$::stop(std::string &strErr)
@@ -43,10 +45,12 @@ void Network_$name$::schedule() {
 
 	while (1) {
 		$instances: { inst | actor_$inst$.process();$\n$}$
-		$broadcasts: { bcast | actor_$bcast.id$.schedule();}; separator="\n"$
-
 	}
 }
+
+#ifdef __TRACE_TOKENS__
+TraceAka g_oTracer;
+#endif
 
 int main(int argc, char *argv[]) {
 

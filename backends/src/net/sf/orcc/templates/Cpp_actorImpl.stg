@@ -279,8 +279,22 @@ Actor_$name$::Actor_$name$():ActorGen($name$_IPORT_SIZE, $name$_OPORT_SIZE)
 	$FSMinitState(fsm=scheduler.fsm)$
 	$endif$}
 		
-/*Actor_$name$::init(){
-	$stateVarsInit$}*/
+		
+void Actor_$name$::initializeActor()
+{
+#ifdef __TRACE_TOKENS__
+	std::string strTrace("");
+	strTrace = __FILE__;
+	unsigned uDesc = g_oTracer.createFileDescriptor(strTrace);
+
+	for(unsigned uIdx = 0; uIdx < $name$_IPORT_SIZE; uIdx++)
+	{
+	  strTrace = "m_poTabIn[" + toString(uIdx) + "] = " + toString((unsigned)m_poTabIn[uIdx]);
+	  g_oTracer.addPort(uDesc, strTrace);
+	}
+#endif
+}
+
 
 	// Functions/procedures
 $procs$

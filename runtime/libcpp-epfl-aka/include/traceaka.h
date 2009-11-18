@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne / AKATECH SA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *   * Neither the name of theEcole Polytechnique Fédérale de Lausanne / AKATECH SA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,38 +26,54 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.cpp;
 
-import net.sf.orcc.backends.c.ExprToString;
-import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
+#ifndef __TRACE_AKA_H__
+#define __TRACE_AKA_H__
 
-/**
- * 
- * @author Matthieu Wipliez
- * 
- */
-public class CppExprPrinter extends ExprToString implements ExpressionVisitor {
+#include "fifoapi.h"
 
-	public CppExprPrinter(VarDefPrinter varDefPrinter) {
-		super(varDefPrinter);
-	}
-	
-	public static String toString(BinaryOp op) {
-		switch (op) {
-		case DIV_INT:
-			return "/";
-		default:
-			return op.getText();
-		}
-	}
+#include <map>
+#include <string>
+#include <list>
 
-	@Override
-	public Object visit(BooleanExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "true" : "false");
-		return null;
-	}
+#define TRACE_CACHE_THRESHOLD 1000
+#define TRACE_FIFO_SIZE (TRACE_CACHE_THRESHOLD<<2)
 
-}
+#define TRACE_MSG_MAX_LENGTH 1024
+
+class TraceAka
+{
+public:
+	TraceAka();
+	~TraceAka();
+
+
+	// Created an actor port descriptor (return an index on the created descriptor)
+	unsigned createFileDescriptor(std::string &msg);
+
+	// Add a port to the file descriptor
+	void addPort(unsigned uIdx, std::string &msg);
+
+	// Capture token
+	void captureToken(FifoAPI* poFifo, std::string &msg);
+
+
+private:
+
+	// Files Descriptors (Keys correspond to names of the file of the actor source code and pointers to the associated ports descriptors)
+	std::map<unsigned,FILE*> m_poFileList;
+
+	// Tokens Map (Keys correspond to Fifo @ and pointers to the associatred File of captured tokens)
+	std::map<unsigned,FILE*> m_oMapFile;
+
+
+	unsigned m_uDescId;
+
+	unsigned m_uVirtualTime;
+
+//	std::map<unsigned, std::list<std::string>*> m_oMapMsgList;
+
+};
+
+
+#endif

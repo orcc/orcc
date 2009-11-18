@@ -194,9 +194,9 @@ public:
 	// Default constructor
 	Actor_$name$();
 	
-/*	// Init
-	init();*/
-	
+	void initializeActor();
+
+
 private:
 	// Functions/procedures
 	$procs$

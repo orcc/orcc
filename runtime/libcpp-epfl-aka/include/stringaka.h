@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne / AKATECH SA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *   * Neither the name of theEcole Polytechnique Fédérale de Lausanne / AKATECH SA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,38 +26,72 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.cpp;
 
-import net.sf.orcc.backends.c.ExprToString;
-import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
+#ifndef __STRING_AKA_H__
+#define __STRING_AKA_H__
 
-/**
- * 
- * @author Matthieu Wipliez
- * 
- */
-public class CppExprPrinter extends ExprToString implements ExpressionVisitor {
+#include <sstream>
 
-	public CppExprPrinter(VarDefPrinter varDefPrinter) {
-		super(varDefPrinter);
-	}
-	
-	public static String toString(BinaryOp op) {
-		switch (op) {
-		case DIV_INT:
-			return "/";
-		default:
-			return op.getText();
-		}
-	}
-
-	@Override
-	public Object visit(BooleanExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "true" : "false");
-		return null;
-	}
-
+template <class T>
+inline std::string toString(const T& t)
+{
+	std::ostringstream o;
+	o << t;
+	return o.str();
 }
+
+
+template <typename T> 
+bool fromString(const std::string& s, T* pValue)
+{
+    std::stringstream ss(s);
+    ss >> *pValue;
+	if (ss.rdstate()==std::ios_base::failbit) return false;
+    return true;
+}
+
+/*template<class T>
+inline std::string toHexString(const T& t)
+{
+	std::ostringstream stream;
+
+	stream << std::hex << (unsigned)t;
+	std::string str(8-stream.str().length(), '0');
+	return str.append(stream.str());
+}*/
+
+template<class T>
+inline std::string toHexString(const T& t)
+{
+	char tmp[9] = "";
+	unsigned uVal = (unsigned) t;
+	sprintf(tmp, "%08x", uVal);
+	std::string str(tmp);
+	return str;
+}
+
+
+template <typename T> 
+inline std::string toStringHeightChar(const T& d)
+{
+	std::string strTmp="";
+	unsigned size = sizeof(unsigned)<<1;
+	unsigned uTmp = (unsigned)d;
+	char cChar = 0;
+
+	for(unsigned uIdx = 0; uIdx < size; uIdx++)
+	{
+		cChar = (char)((uTmp>>((size - (uIdx+1))<<2)) & 0x0F);
+		if (cChar < 0x0a)
+		{
+			cChar += 0x30;
+		}
+		else
+		{
+			cChar = cChar - 0x0a + 0x61;
+		}
+		strTmp.append(1, cChar);
+	}
+	return strTmp.c_str();
+}
+#endif

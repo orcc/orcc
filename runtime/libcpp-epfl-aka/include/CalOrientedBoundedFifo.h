@@ -131,11 +131,13 @@ inline void CalOrientedBoundedFifo<T>::get(void * poVal)
 {
 	T * pVal = (T *)poVal;
 
-/*	if( hasTokens(1) == false)
-	{
-		// TODO: Error
-		return;
-	}*/
+#ifdef __TRACE_TOKENS__
+{
+	std::string strDummy(toHexString(*m_poFifoGet));
+	g_oTracer.captureToken((FifoAPI*)this, strDummy);
+}
+#endif
+
 
 		*pVal = *m_poFifoGet;
 		m_poFifoGet ++;
@@ -153,13 +155,17 @@ inline void CalOrientedBoundedFifo<T>::get(void * poVal, unsigned int uNbVal)
 {
 	T * pVal = (T *)poVal;
 
-/*	if( hasTokens(uNbVal) == false)
+#ifdef __TRACE_TOKENS__
+{
+	for(unsigned uIdx = 0; uIdx < uNbVal; uIdx++)
 	{
-		// TODO: Error
-		return;
-	}*/
+		std::string strDummy(toHexString(*(m_poFifoGet+uIdx)));
+		g_oTracer.captureToken((FifoAPI*)this, strDummy);
+	}
+}
+#endif
 
-	// Two case:
+// Two case:
 	// - There are too few data to get from the end of the circular buffer. The segment should be read in two packets.
 	if ( (m_poFifoGet + uNbVal) > m_poFifoEnd)
 	{

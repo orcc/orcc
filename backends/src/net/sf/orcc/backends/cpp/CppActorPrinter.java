@@ -46,7 +46,7 @@ import org.antlr.stringtemplate.StringTemplate;
 /**
  * Actor printer.
  * 
- * @author Mathieu Wippliez
+ * @author Matthieu Wipliez
  * @author Ghislain Roquier
  * 
  */
