@@ -58,6 +58,11 @@ public class UintType extends AbstractType {
 	}
 
 	@Override
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof UintType) {
 			return size.equals(((UintType) obj).size);

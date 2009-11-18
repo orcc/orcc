@@ -169,6 +169,16 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 */
 	private Type returnType;
 
+	
+	private Expression result;
+	public void setResult(Expression result) {
+		this.result = result;
+	}
+	
+	public Expression getResult() {
+		return result;
+	}
+	
 	/**
 	 * Construcs a new procedure.
 	 * 

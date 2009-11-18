@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
@@ -55,24 +54,13 @@ public class UnaryExpr extends AbstractExpression {
 	}
 
 	@Override
-	public Object accept(ExpressionVisitor visitor, Object... args) {
-		return visitor.visit(this, args);
+	public void accept(ExpressionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
 	@Override
-	public Expression evaluate() throws OrccException {
-		switch (op) {
-		case BITNOT:
-			break;
-		case LOGIC_NOT:
-			break;
-		case MINUS:
-			break;
-		case NUM_ELTS:
-			break;
-		}
-
-		throw new OrccException("could not evaluate");
+	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
 	}
 
 	public Expression getExpr() {

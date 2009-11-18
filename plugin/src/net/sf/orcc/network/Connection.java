@@ -35,7 +35,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.Util;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
 import net.sf.orcc.network.attributes.IValueAttribute;
@@ -148,7 +148,7 @@ public class Connection implements IAttributeContainer {
 		IAttribute attr = getAttribute(Connection.BUFFER_SIZE);
 		if (attr != null && attr.getType() == IAttribute.VALUE) {
 			Expression expr = ((IValueAttribute) attr).getValue();
-			return Util.evaluateAsInteger(expr);
+			return new ExpressionEvaluator().evaluateAsInteger(expr);
 		} else {
 			throw new OrccException("could not get the size of this connection");
 		}

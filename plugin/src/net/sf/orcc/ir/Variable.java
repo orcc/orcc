@@ -64,10 +64,40 @@ public abstract class Variable implements INameable {
 	private Type type;
 
 	/**
+	 * variable possible assign expression
+	 */
+	protected Expression expression;
+
+	/**
+	 * variable value
+	 */
+	private Object value;
+	
+	/**
 	 * uses of this variable.
 	 */
 	private List<Use> uses;
 
+	/**
+	 * Creates a new variable with the given location, type, and name.
+	 * 
+	 * @param location
+	 *            the variable location
+	 * @param type
+	 *            the variable type
+	 * @param name
+	 *            the variable name
+	 * @param global
+	 *            whether this variable is global
+	 */
+	public Variable(Location location, Type type, String name, boolean global, Expression expression) {
+		this.location = location;
+		this.type = type;
+		this.name = name;
+		this.uses = new ArrayList<Use>();
+		this.expression = expression;
+	}
+	
 	/**
 	 * Creates a new variable with the given location, type, and name.
 	 * 
@@ -238,6 +268,42 @@ public abstract class Variable implements INameable {
 		this.type = type;
 	}
 
+	/**
+	 * Gets the current valuing expression of this variable.
+	 * 
+	 */
+	public Expression getExpression() {
+		return expression;
+	}
+	
+	/**
+	 * Sets the valuing expression of this variable.
+	 * 
+	 * @param expression
+	 *            the valuing expression of this variable
+	 */
+	public void setExpression(Expression expression) {
+		this.expression = expression;
+	}
+
+	/**
+	 * Gets the current value of this variable.
+	 * 
+	 */
+	public Object getValue() {
+		return value;
+	}
+	
+	/**
+	 * Sets the value of this variable.
+	 * 
+	 * @param value
+	 *            the typed value of this variable
+	 */
+	public void setValue(Object value) {
+		this.value = value;
+	}
+	
 	@Override
 	public String toString() {
 		// WARNING: this is used as-is by templates, etc. BE CAREFUL when

@@ -33,7 +33,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.Util;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -87,7 +87,8 @@ public class CorrectBinaryExpressionType extends AbstractActorTransformation {
 
 		if (type.getType() == Type.INT) {
 			try {
-				return Util.evaluateAsInteger(((IntType) type).getSize());
+				return new ExpressionEvaluator()
+						.evaluateAsInteger(((IntType) type).getSize());
 			} catch (OrccException e) {
 				e.printStackTrace();
 				return 32;

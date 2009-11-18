@@ -28,44 +28,26 @@
  */
 package net.sf.orcc.ir.expr;
 
-import java.util.List;
-
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
-
 /**
- * This class defines a list expression. This kind of expression is only present
- * at the network level.
+ * This class defines an expression visitor.
  * 
- * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ListExpr extends AbstractExpression {
+public interface ExpressionInterpreter {
 
-	private List<Expression> value;
+	public Object interpret(BinaryExpr expr, Object... args);
 
-	public ListExpr(Location location, List<Expression> value) {
-		super(location);
-		this.value = value;
-	}
+	public Object interpret(BooleanExpr expr, Object... args);
 
-	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
+	public Object interpret(IntExpr expr, Object... args);
 
-	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
+	public Object interpret(ListExpr expr, Object... args);
 
-	@Override
-	public int getType() {
-		return LIST;
-	}
+	public Object interpret(StringExpr expr, Object... args);
 
-	public List<Expression> getValue() {
-		return value;
-	}
+	public Object interpret(UnaryExpr expr, Object... args);
+
+	public Object interpret(VarExpr expr, Object... args);
 
 }

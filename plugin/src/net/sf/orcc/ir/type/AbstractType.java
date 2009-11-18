@@ -41,6 +41,9 @@ public abstract class AbstractType implements Type {
 
 	@Override
 	public abstract void accept(TypeVisitor visitor);
+	
+	@Override
+	public abstract Object accept(TypeInterpreter interpreter);
 
 	@Override
 	public String toString() {

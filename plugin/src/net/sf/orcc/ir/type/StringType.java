@@ -44,6 +44,11 @@ public class StringType extends AbstractType {
 	}
 
 	@Override
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof StringType);
 	}

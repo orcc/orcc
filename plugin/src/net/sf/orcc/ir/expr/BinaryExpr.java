@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
@@ -69,64 +68,13 @@ public class BinaryExpr extends AbstractExpression {
 	}
 
 	@Override
-	public Object accept(ExpressionVisitor visitor, Object... args) {
-		return visitor.visit(this, args);
+	public void accept(ExpressionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
 	@Override
-	public Expression evaluate() throws OrccException {
-		switch (op) {
-		case BITAND:
-			Expression expr1 = e1.evaluate();
-			Expression expr2 = e2.evaluate();
-			if (expr1.getType() == Expression.BOOLEAN
-					&& expr2.getType() == Expression.BOOLEAN) {
-				boolean b1 = ((BooleanExpr) expr1).getValue();
-				boolean b2 = ((BooleanExpr) expr2).getValue();
-				return new BooleanExpr(getLocation(), b1 && b2);
-			}
-			break;
-		case BITOR:
-			break;
-		case BITXOR:
-			break;
-		case DIV:
-			break;
-		case DIV_INT:
-			break;
-		case EQ:
-			break;
-		case EXP:
-			break;
-		case GE:
-			break;
-		case GT:
-			break;
-		case LOGIC_AND:
-			break;
-		case LE:
-			break;
-		case LOGIC_OR:
-			break;
-		case LT:
-			break;
-		case MINUS:
-			break;
-		case MOD:
-			break;
-		case NE:
-			break;
-		case PLUS:
-			break;
-		case SHIFT_LEFT:
-			break;
-		case SHIFT_RIGHT:
-			break;
-		case TIMES:
-			break;
-		}
-
-		throw new OrccException("could not evaluate");
+	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
 	}
 
 	public Expression getE1() {

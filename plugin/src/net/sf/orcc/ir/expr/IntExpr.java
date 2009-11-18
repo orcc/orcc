@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -67,8 +65,13 @@ public class IntExpr extends AbstractExpression {
 	}
 
 	@Override
-	public Object accept(ExpressionVisitor visitor, Object... args) {
-		return visitor.visit(this, args);
+	public void accept(ExpressionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
+	}
+
+	@Override
+	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
 	}
 
 	@Override
@@ -78,11 +81,6 @@ public class IntExpr extends AbstractExpression {
 		} else {
 			return false;
 		}
-	}
-
-	@Override
-	public Expression evaluate() throws OrccException {
-		return this;
 	}
 
 	@Override

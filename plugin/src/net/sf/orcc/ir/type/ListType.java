@@ -64,6 +64,11 @@ public class ListType extends AbstractType {
 	}
 
 	@Override
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof UintType) {
 			ListType list = (ListType) obj;

@@ -115,7 +115,7 @@ public class XDFWriter {
 				writeOperator(expr.getOp(), parent);
 				expr.getE2().accept(this, parent, currentPrec);
 			}
-			
+
 			return null;
 		}
 
@@ -416,8 +416,8 @@ public class XDFWriter {
 			decl.setAttribute("name", variable.getName());
 			decl.appendChild(writeType(variable.getType()));
 
-			if (variable.hasValue()) {
-				writeExpr(decl, variable.getValue());
+			if (variable.hasExpression()) {
+				writeExpr(decl, variable.getExpression());
 			}
 		}
 	}

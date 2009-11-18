@@ -26,46 +26,61 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
-
-import java.util.List;
-
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
+package net.sf.orcc.ir;
 
 /**
- * This class defines a list expression. This kind of expression is only present
- * at the network level.
+ * This interface defines a communication FIFO to be connected to each port.
  * 
- * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ListExpr extends AbstractExpression {
+public interface ICommunicationFifo {
 
-	private List<Expression> value;
+	/**
+	 * Returns true if FIFO free space can contain 'n' Tokens.
+	 * 
+	 * @param n
+	 *            number of tokens to be copied into FIFO
+	 * @return true if FIFO free space can contain 'n' Tokens.
+	 */
+	public boolean hasRoom(int n);
 
-	public ListExpr(Location location, List<Expression> value) {
-		super(location);
-		this.value = value;
-	}
+	/**
+	 * Returns true if FIFO has at least 'n' Tokens left.
+	 * 
+	 * @param n
+	 *            number of tokens to be read from FIFO
+	 * @return true if FIFO has at least 'n' Tokens left.
+	 */
+	public boolean hasTokens(int n);
 
-	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
+	/**
+	 * Copy source array to free rooms in FIFO as required by "hasRooms".
+	 * 
+	 * @param source
+	 *            source array to be copied to FIFO
+	 */
+	public void put(int[] source);	
+	//public void put(boolean[] source);	
 
-	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public int getType() {
-		return LIST;
-	}
-
-	public List<Expression> getValue() {
-		return value;
-	}
-
+	/**
+	 * Feeds target array with next tokens as required by "hasTokens" 
+	 * without flushing them.
+	 * 
+	 * @param target
+	 *            target array for receiving next FIFO tokens
+	 */
+	public void peek(int[] target);
+	//public void peek(boolean[] target);
+	
+	
+	/**
+	 * Feeds target array with next tokens as required by "hasTokens" 
+	 * without and flush them.
+	 * 
+	 * @param target
+	 *            target array for receiving next FIFO tokens
+	 */
+	public void get(int[] target);
+	//public void get(boolean[] target);
 }

@@ -26,46 +26,42 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
-
-import java.util.List;
-
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
+package net.sf.orcc.ir.type;
 
 /**
- * This class defines a list expression. This kind of expression is only present
- * at the network level.
- * 
- * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ListExpr extends AbstractExpression {
+public abstract class AbstractTypeInterpreter implements TypeInterpreter {
 
-	private List<Expression> value;
-
-	public ListExpr(Location location, List<Expression> value) {
-		super(location);
-		this.value = value;
+	@Override
+	public Object interpret(BoolType type) {
+		return null;
 	}
 
 	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public Object interpret(IntType type) {
+		return null;
 	}
 
 	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
+	public Object interpret(ListType type) {
+		return null;
 	}
 
 	@Override
-	public int getType() {
-		return LIST;
+	public Object interpret(StringType type) {
+		return null;
 	}
 
-	public List<Expression> getValue() {
-		return value;
+	@Override
+	public Object interpret(UintType type) {
+		return null;
+	}
+
+	@Override
+	public Object interpret(VoidType type) {
+		return null;
 	}
 
 }

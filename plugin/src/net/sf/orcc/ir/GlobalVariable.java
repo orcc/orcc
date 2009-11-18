@@ -48,11 +48,6 @@ public class GlobalVariable extends Variable implements INameable {
 	protected Constant constantValue;
 
 	/**
-	 * variable value
-	 */
-	private Expression value;
-
-	/**
 	 * Creates a new global variable from the given global variable.
 	 * 
 	 * @param variable
@@ -61,7 +56,6 @@ public class GlobalVariable extends Variable implements INameable {
 	public GlobalVariable(GlobalVariable variable) {
 		super(variable);
 		this.constantValue = variable.constantValue;
-		this.value = variable.value;
 	}
 
 	/**
@@ -94,8 +88,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 */
 	public GlobalVariable(Location location, Type type, String name,
 			Expression value) {
-		super(location, type, name, true);
-		this.value = value;
+		super(location, type, name, true, value);
 	}
 
 	/**
@@ -105,8 +98,7 @@ public class GlobalVariable extends Variable implements INameable {
 	 *             if the value could not be evaluated to a constant
 	 */
 	public void evaluate() throws OrccException {
-		Expression expr = value.evaluate();
-		constantValue = AbstractConstant.evaluate(expr);
+		constantValue = AbstractConstant.evaluate(expression);
 	}
 
 	/**
@@ -125,31 +117,12 @@ public class GlobalVariable extends Variable implements INameable {
 	}
 
 	/**
-	 * Returns the value of this global variable.
-	 * 
-	 * @return an expression, or <code>null</code> if this variable has no value
-	 */
-	public Expression getValue() {
-		return value;
-	}
-
-	/**
 	 * Returns <code>true</code> if this global variable has a value.
 	 * 
 	 * @return <code>true</code> if this global variable has a value
 	 */
-	public boolean hasValue() {
-		return (value != null);
-	}
-
-	/**
-	 * Sets the value of this global variable to the given expression.
-	 * 
-	 * @param value
-	 *            an expression
-	 */
-	public void setValue(Expression value) {
-		this.value = value;
+	public boolean hasExpression() {
+		return (expression != null);
 	}
 
 }

@@ -26,27 +26,28 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ui.launching;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Expression;
+import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
+import org.eclipse.debug.ui.CommonTab;
+import org.eclipse.debug.ui.ILaunchConfigurationDialog;
+import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 
 /**
- * This class defines a bunch of stuff, at the moment only a naive evaluator.
  * 
- * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
-public class Util {
+public class OrccSimuLaunchConfigurationTabGroup extends
+		AbstractLaunchConfigurationTabGroup {
 
-	public static int evaluateAsInteger(Expression expr) throws OrccException {
-		expr = expr.evaluate();
-		if (expr.getType() != Expression.INT) {
-			// evaluated ok, but not as an integer
-			throw new OrccException("expected integer expression");
-		}
-
-		return ((IntExpr) expr).getValue();
+	@Override
+	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
+		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
+				new SimuSettingsTab(), new ParametersTab(), new OptionsTab(),
+				new SourceLookupTab(), new CommonTab() };
+		setTabs(tabs);
 	}
 
 }

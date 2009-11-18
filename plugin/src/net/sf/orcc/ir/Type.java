@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
@@ -75,6 +76,15 @@ public interface Type {
 	 */
 	public void accept(TypeVisitor visitor);
 
+	/**
+	 * Accepts a visitor.
+	 * 
+	 * @param interpreter
+	 * 
+	 * @return an object
+	 */
+	public Object accept(TypeInterpreter interpreter);
+	
 	/**
 	 * Returns the type of this type.
 	 * 

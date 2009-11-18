@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.orcc.ir.ICommunicationFifo;
+
 /**
  * This class defines a port. A port is just a variable, with a location, a
  * type, a name.
@@ -36,7 +38,9 @@ package net.sf.orcc.ir;
  * 
  */
 public class Port extends Variable implements Comparable<Port> {
-
+	
+	private ICommunicationFifo fifo_binding;
+	
 	/**
 	 * Creates a new port with the given location, type, and name.
 	 * 
@@ -62,5 +66,36 @@ public class Port extends Variable implements Comparable<Port> {
 	public int compareTo(Port port) {
 		return getName().compareTo(port.getName());
 	}
+
+	/**
+	 * Bind the current port to a communication FIFO interface.
+	 * 
+	 * @param location
+	 *            the port location
+	 */
+	public void bind(ICommunicationFifo fifo) {
+		this.fifo_binding = fifo;
+	}
+
+	/**
+	 * Returns the communication FIFO interface corresponding to this Port.
+	 * 
+	 * @return fifo_binding
+	 *            the communication FIFO implemented interface
+	 */
+	public ICommunicationFifo fifo() {
+		return fifo_binding;
+	}
+	
+
+	//@Override
+	//public IExpr getValue() {
+	//	throw new UnsupportedOperationException("getValue");
+	//}
+
+	//@Override
+	//public void setValue(IExpr value) {
+	//	throw new UnsupportedOperationException("setValue");
+	//}
 
 }
