@@ -95,8 +95,11 @@ public class InterpretedActor {
 		// Get initializing procedure if any
 		for (Action action : actor.getInitializes()) {
 			System.out.println("Initialize actor " + name);
-			if (interpretProc(action.getScheduler()) > 0) {
-				interpretProc(action.getBody());
+			Object isSchedulable = interpretProc(action.getScheduler());
+			if (isSchedulable instanceof Boolean) {
+				if ((Boolean)isSchedulable) {
+					interpretProc(action.getBody());
+				}
 			}
 		}
 	}
@@ -106,7 +109,7 @@ public class InterpretedActor {
 	 * 
 	 */
 	public Integer schedule() {
-		Integer running = 0;
+		Object running;
 		ActionScheduler sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
 			// FSM fsm = sched.getFsm();
@@ -114,16 +117,16 @@ public class InterpretedActor {
 		} else {
 			for (Action action : sched.getActions()) {
 				running = interpretProc(action.getScheduler());
-				if (running > 0) {
+				if ((running instanceof Boolean) && ((Boolean)running)) {
 					if (checkOutputPattern(action.getOutputPattern())) {
 						interpretProc(action.getBody());
 					}
 					// Execute 1 action only per actor scheduler cycle
-					break;
+					return 1;
 				}
 			}
 		}
-		return running;
+		return 0;
 	}
 
 	private boolean checkOutputPattern(Map<Port, Integer> outputPattern) {
@@ -149,8 +152,10 @@ public class InterpretedActor {
 	 * 
 	 * @param procedure
 	 *            a procedure
+	 *            
+	 * @return an object which contains procedure returned value
 	 */
-	private int interpretProc(Procedure procedure) {
+	private Object interpretProc(Procedure procedure) {
 		// Don't mind about procedure parameters => already allocated
 
 		// Declare local variables in case of List type
@@ -170,14 +175,9 @@ public class InterpretedActor {
 		Object result = interpret.getReturnValue();
 		// TODO : check return type
 		// Type type = procedure.getReturnType();
-		// Return the result as an integer
-		if ((result != null) && (result instanceof Integer)) {
-			return (Integer) result;
-		} else if ((result != null) && (result instanceof Boolean)) {
-			return ((Boolean)result ? 1 : 0);
-		} else {
-			return 0;
-		}
+		
+		// Return the result object
+		return result;
 	}
 
 }

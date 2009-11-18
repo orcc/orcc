@@ -107,6 +107,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 				}
 			}
 		}
+		node.getJoinNode().accept(this, args);
 		return null;
 	}
 
@@ -126,7 +127,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 			// expr = exprInterpreter.interpret(node.getValue());
 			condition = node.getValue().accept(exprInterpreter);
 		}
-
 		return null;
 	}
 
@@ -137,11 +137,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		while (it.hasNext()) {
 			Instruction instr = it.next();
 			instr.accept(this, args);
-			if (block_return) {
-				return return_value;
-			}
 		}
-
 		return null;
 	}
 

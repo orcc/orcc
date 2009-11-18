@@ -50,7 +50,7 @@ import net.sf.orcc.ir.type.VoidType;
  */
 public class ListAllocator extends AbstractTypeInterpreter {
 
-	private List<Integer> sizeList;
+	private ArrayList<Integer> sizeList;
 	private ExpressionEvaluator expressionEvaluator;
 
 	public ListAllocator() {
@@ -86,11 +86,42 @@ public class ListAllocator extends AbstractTypeInterpreter {
 
 	public Object interpret(ListType type) {
 		try {
-			Object size = type.getSize().accept(expressionEvaluator);			
+			Object size = type.getSize().accept(expressionEvaluator);
 			if (size instanceof Integer) {
-				return Array.newInstance((Class<?>)type.getElementType().accept(this), (Integer)size);
+				sizeList.add((Integer) size);
+				return (Class<?>) type.getElementType().accept(this);
 			} else {
 				throw new OrccException("expected int");
+			}
+		} catch (OrccException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public Object allocate(ListType type) {
+		Class<?> classType = (Class<?>) type.getElementType().accept(this);
+		try {
+			switch (sizeList.size()) {
+			case 1:
+				return Array.newInstance(classType, (Integer) sizeList.get(0));
+			case 2:
+				return Array.newInstance(classType, (Integer) sizeList.get(0),
+						(Integer) sizeList.get(1));
+			case 3:
+				return Array.newInstance(classType, (Integer) sizeList.get(0),
+						(Integer) sizeList.get(1), (Integer) sizeList.get(2));
+			case 4:
+				return Array.newInstance(classType, (Integer) sizeList.get(0),
+						(Integer) sizeList.get(1), (Integer) sizeList.get(2),
+						(Integer) sizeList.get(3));
+			case 5:
+				return Array.newInstance(classType, (Integer) sizeList.get(0),
+						(Integer) sizeList.get(1), (Integer) sizeList.get(2),
+						(Integer) sizeList.get(3), (Integer) sizeList.get(4));
+			default:
+				throw new OrccException(
+						"unsupported arrays of multi-dimension upper than 5");
 			}
 		} catch (OrccException e) {
 			e.printStackTrace();
