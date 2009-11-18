@@ -39,7 +39,7 @@ import net.sf.orcc.ir.ICommunicationFifo;
  */
 public class Port extends Variable implements Comparable<Port> {
 	
-	private ICommunicationFifo fifo_binding;
+	private ICommunicationFifo fifoBinding;
 	
 	/**
 	 * Creates a new port with the given location, type, and name.
@@ -74,7 +74,7 @@ public class Port extends Variable implements Comparable<Port> {
 	 *            the port location
 	 */
 	public void bind(ICommunicationFifo fifo) {
-		this.fifo_binding = fifo;
+		this.fifoBinding = fifo;
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class Port extends Variable implements Comparable<Port> {
 	 *            the communication FIFO implemented interface
 	 */
 	public ICommunicationFifo fifo() {
-		return fifo_binding;
+		return fifoBinding;
 	}
 	
 
