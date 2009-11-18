@@ -26,51 +26,58 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c;
+package net.sf.orcc.backends.interpreter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.type.AbstractTypeVisitor;
-import net.sf.orcc.ir.type.ListType;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Sets the "size" attribute of the given top-level template to the type
- * visited. If it is a list, the element type is visited.
+ * A FIFO of integers.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class ListSizePrinter extends AbstractTypeVisitor {
+public class FifoManager {
 
-	private List<Integer> sizeList;
-	private ExpressionEvaluator expressionEvaluator;
-
-	public ListSizePrinter() {
-		sizeList = new ArrayList<Integer>();
-		expressionEvaluator = new ExpressionEvaluator();
+	private static FifoManager instance = new FifoManager();
+	
+	public static FifoManager getInstance() {
+		return instance;
 	}
+	
+	private Set<IntFifo> emptyFifos;
+	
+	private Set<IntFifo> fullFifos;
 
-	public List<Integer> getSize() {
-		List<Integer> list = new ArrayList<Integer>(sizeList);
-		sizeList.clear();
-		return list;
+	private FifoManager() {
+		emptyFifos = new HashSet<IntFifo>();
+		fullFifos = new HashSet<IntFifo>();
 	}
-
-	public void visit(ListType type) {
-		try {
-			Object size = type.getSize().accept(expressionEvaluator);
-			if (size instanceof Integer) {
-				sizeList.add((Integer) size);
-				type.getElementType().accept(this);
-			} else {
-				throw new OrccException("expected int");
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
+	
+	public void addEmptyFifo(IntFifo fifo) {
+		if (!emptyFifos.contains(fifo)) {
+			emptyFifos.add(fifo);
 		}
 	}
 
+	public void addFullFifo(IntFifo fifo) {
+		if (!fullFifos.contains(fifo)) {
+			fullFifos.add(fifo);
+		}
+	}
+
+	public void emptyFifos() {
+		for (IntFifo fifo : emptyFifos) {
+			fifo.moveTokens();
+		}
+		
+		emptyFifos.clear();
+		
+		for (IntFifo fifo : fullFifos) {
+			fifo.moveTokens();
+		}
+		
+		fullFifos.clear();
+	}
+	
 }

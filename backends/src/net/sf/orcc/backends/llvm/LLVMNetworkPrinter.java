@@ -43,7 +43,7 @@ import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.Util;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -221,7 +221,8 @@ public class LLVMNetworkPrinter {
 						.getAttribute(Connection.BUFFER_SIZE);
 				if (attr != null && attr.getType() == IAttribute.VALUE) {
 					Expression expr = ((IValueAttribute) attr).getValue();
-					size = Integer.toString(Util.evaluateAsInteger(expr) + 1);
+					size = Integer.toString(new ExpressionEvaluator()
+							.evaluateAsInteger(expr) + 1);
 				} else {
 					size = Integer.toString(fifoSize);
 				}

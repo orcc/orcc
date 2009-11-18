@@ -31,7 +31,7 @@ package net.sf.orcc.backends.c;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.Util;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -52,7 +52,7 @@ public class TypeToString implements TypeVisitor {
 
 	protected void printInt(Expression expr) {
 		try {
-			int size = Util.evaluateAsInteger(expr);
+			int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
 			if (size <= 8) {
 				builder.append("char");

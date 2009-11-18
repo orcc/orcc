@@ -33,7 +33,7 @@ import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.Util;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -70,17 +70,17 @@ public class TypeToString implements LLVMTypeVisitor {
 				return 1;
 			case Type.INT: {
 				Expression exprSize = ((IntType) type).getSize();
-				return Util.evaluateAsInteger(exprSize);
+				return new ExpressionEvaluator().evaluateAsInteger(exprSize);
 			}
 			case Type.LIST: {
 				Expression exprSize = ((ListType) type).getSize();
-				return Util.evaluateAsInteger(exprSize);
+				return new ExpressionEvaluator().evaluateAsInteger(exprSize);
 			}
 			case Type.STRING:
 				return 8;
 			case Type.UINT: {
 				Expression exprSize = ((UintType) type).getSize();
-				return Util.evaluateAsInteger(exprSize);
+				return new ExpressionEvaluator().evaluateAsInteger(exprSize);
 			}
 			default:
 				throw new OrccException("Can't size type");

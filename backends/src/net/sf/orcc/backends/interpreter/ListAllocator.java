@@ -26,29 +26,34 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c;
+package net.sf.orcc.backends.interpreter;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.type.AbstractTypeVisitor;
+import net.sf.orcc.ir.type.AbstractTypeInterpreter;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 
 /**
- * Sets the "size" attribute of the given top-level template to the type
- * visited. If it is a list, the element type is visited.
+ * Allocates a List of any dimension
  * 
- * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ListSizePrinter extends AbstractTypeVisitor {
+public class ListAllocator extends AbstractTypeInterpreter {
 
 	private List<Integer> sizeList;
 	private ExpressionEvaluator expressionEvaluator;
 
-	public ListSizePrinter() {
+	public ListAllocator() {
 		sizeList = new ArrayList<Integer>();
 		expressionEvaluator = new ExpressionEvaluator();
 	}
@@ -59,18 +64,37 @@ public class ListSizePrinter extends AbstractTypeVisitor {
 		return list;
 	}
 
-	public void visit(ListType type) {
+	public Object interpret(BoolType type) {
+		return Boolean.class;
+	}
+
+	public Object interpret(IntType type) {
+		return Integer.class;
+	}
+
+	public Object interpret(UintType type) {
+		return Integer.class;
+	}
+
+	public Object interpret(VoidType type) {
+		return null;
+	}
+
+	public Object interpret(StringType type) {
+		return String.class;
+	}
+
+	public Object interpret(ListType type) {
 		try {
-			Object size = type.getSize().accept(expressionEvaluator);
+			Object size = type.getSize().accept(expressionEvaluator);			
 			if (size instanceof Integer) {
-				sizeList.add((Integer) size);
-				type.getElementType().accept(this);
+				return Array.newInstance((Class<?>)type.getElementType().accept(this), (Integer)size);
 			} else {
 				throw new OrccException("expected int");
 			}
 		} catch (OrccException e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
-
 }

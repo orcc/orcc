@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.llvm.type;
 
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
@@ -51,6 +52,11 @@ public class PointType extends LLVMAbstractType {
 
 	public void accept(TypeVisitor visitor) {
 		((LLVMTypeVisitor) visitor).visit(this);
+	}
+
+	@Override
+	public Object accept(TypeInterpreter interpreter) {
+		return null;
 	}
 
 	public Type getElementType() {
