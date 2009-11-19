@@ -30,7 +30,7 @@ package net.sf.orcc.backends.java;
 
 import net.sf.orcc.backends.c.ExprToString;
 import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
 
 /**
@@ -45,7 +45,7 @@ public class JavaExprPrinter extends ExprToString implements ExpressionVisitor {
 	}
 
 	@Override
-	public Object visit(BooleanExpr expr, Object... args) {
+	public Object visit(BoolExpr expr, Object... args) {
 		builder.append(expr.getValue() ? "true" : "false");
 		return null;
 	}

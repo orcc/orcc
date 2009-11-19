@@ -45,7 +45,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -265,7 +265,7 @@ public class XDFParser {
 			String kind = elt.getAttribute("literal-kind");
 			String value = elt.getAttribute("value");
 			if (kind.equals("Boolean")) {
-				return new BooleanExpr(new Location(), Boolean
+				return new BoolExpr(new Location(), Boolean
 						.parseBoolean(value));
 			} else if (kind.equals("Character")) {
 				throw new OrccException("Characters not supported yet");

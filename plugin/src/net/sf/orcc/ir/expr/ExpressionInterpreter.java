@@ -40,7 +40,7 @@ public interface ExpressionInterpreter {
 
 	public Object interpret(BinaryExpr expr, Object... args) throws OrccException;
 
-	public Object interpret(BooleanExpr expr, Object... args) throws OrccException;
+	public Object interpret(BoolExpr expr, Object... args) throws OrccException;
 
 	public Object interpret(IntExpr expr, Object... args) throws OrccException;
 

@@ -44,7 +44,7 @@ public abstract class AbstractExpressionVisitor implements ExpressionVisitor {
 		return null;
 	}
 
-	public Object visit(BooleanExpr expr, Object... args) {
+	public Object visit(BoolExpr expr, Object... args) {
 		return null;
 	}
 

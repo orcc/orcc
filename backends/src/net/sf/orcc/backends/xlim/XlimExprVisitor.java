@@ -33,7 +33,7 @@ import java.util.TreeMap;
 
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -154,7 +154,7 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(BooleanExpr expr, Object... args) {
+	public Object visit(BoolExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root,
 				"$literal_Integer", expr.getValue() ? "1" : "0");
 		XlimNodeTemplate

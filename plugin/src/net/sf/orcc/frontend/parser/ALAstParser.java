@@ -67,7 +67,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -245,7 +245,7 @@ public class ALAstParser {
 			case ALBaseLexer.EXPR_BOOL: {
 				expr = expr.getChild(0);
 				boolean value = Boolean.parseBoolean(expr.getText());
-				return new BooleanExpr(parseLocation(expr), value);
+				return new BoolExpr(parseLocation(expr), value);
 			}
 			case ALBaseLexer.EXPR_FLOAT:
 				throw new OrccException("not yet implemented!");

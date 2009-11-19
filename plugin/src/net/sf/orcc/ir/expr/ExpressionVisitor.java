@@ -38,7 +38,7 @@ public interface ExpressionVisitor {
 
 	public Object visit(BinaryExpr expr, Object... args);
 
-	public Object visit(BooleanExpr expr, Object... args);
+	public Object visit(BoolExpr expr, Object... args);
 
 	public Object visit(IntExpr expr, Object... args);
 

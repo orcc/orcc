@@ -43,7 +43,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -120,7 +120,7 @@ public class XDFWriter {
 		}
 
 		@Override
-		public Object visit(BooleanExpr expr, Object... args) {
+		public Object visit(BoolExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			String value = Boolean.toString(expr.getValue());
 			exprElt.setAttribute("kind", "Literal");

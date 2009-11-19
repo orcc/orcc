@@ -37,11 +37,11 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class BooleanExpr extends AbstractExpression {
+public class BoolExpr extends AbstractExpression {
 
 	private boolean value;
 
-	public BooleanExpr(Location location, boolean value) {
+	public BoolExpr(Location location, boolean value) {
 		super(location);
 		this.value = value;
 	}

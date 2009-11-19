@@ -51,7 +51,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.type.BoolType;
@@ -226,7 +226,7 @@ public class IRWriter {
 		case Expression.BINARY:
 			break;
 		case Expression.BOOLEAN:
-			array.put(((BooleanExpr) expr).getValue());
+			array.put(((BoolExpr) expr).getValue());
 			break;
 		case Expression.INT:
 			array.put(((IntExpr) expr).getValue());

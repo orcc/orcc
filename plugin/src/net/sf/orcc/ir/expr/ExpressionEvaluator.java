@@ -188,7 +188,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(BooleanExpr expr, Object... args) {
+	public Object interpret(BoolExpr expr, Object... args) {
 		return expr.getValue();
 	}
 

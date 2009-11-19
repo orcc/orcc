@@ -35,7 +35,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -99,7 +99,7 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 	}
 
 	@Override
-	public Object visit(BooleanExpr expr, Object... args) {
+	public Object visit(BoolExpr expr, Object... args) {
 		builder.append(expr.getValue());
 		return null;
 	}

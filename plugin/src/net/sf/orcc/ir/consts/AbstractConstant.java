@@ -34,7 +34,7 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -58,7 +58,7 @@ public abstract class AbstractConstant {
 	 */
 	public static Constant evaluate(Expression expr) throws OrccException {
 		if (expr.getType() == Expression.BOOLEAN) {
-			boolean value = ((BooleanExpr) expr).getValue();
+			boolean value = ((BoolExpr) expr).getValue();
 			return new BoolConst(value);
 		} else if (expr.getType() == Expression.INT) {
 			int value = ((IntExpr) expr).getValue();

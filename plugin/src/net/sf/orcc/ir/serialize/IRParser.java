@@ -112,7 +112,7 @@ import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BooleanExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
@@ -418,7 +418,7 @@ public class IRParser {
 		Expression expr = null;
 
 		if (obj instanceof Boolean) {
-			expr = new BooleanExpr(location, (Boolean) obj);
+			expr = new BoolExpr(location, (Boolean) obj);
 		} else if (obj instanceof Integer) {
 			expr = new IntExpr(location, (Integer) obj);
 		} else if (obj instanceof String) {
