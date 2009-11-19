@@ -10,14 +10,17 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Orcc_SOURCE_DIR}/modules)
 # Common packages required
 find_package(APR REQUIRED)
 find_package(SDL REQUIRED)
+find_package(SDL_image REQUIRED)
 
 # Common include directories
-include_directories(${APR_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
+include_directories(${APR_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
 
 # Orcc library
 include_directories(${Orcc_SOURCE_DIR}/include/liborcc )
 add_library (liborcc
 ${Orcc_SOURCE_DIR}/lib/liborcc/actors/display.c
+${Orcc_SOURCE_DIR}/lib/liborcc/actors/img_display.c
+${Orcc_SOURCE_DIR}/lib/liborcc/actors/img_read.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/actors/source.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/orcc_util.c
 )
@@ -41,5 +44,38 @@ ${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/actors/Actor_source.cpp
 )
 
 # projects in sub folders
-add_subdirectory (AVC_CBP_Decoder)
-add_subdirectory (MPEG4_SP_Decoder)
+option(BUILD_AVC "whether AVC should be built" true)
+option(BUILD_MPEG2 "whether MPEG-2 should be built" true)
+option(BUILD_MPEG4 "whether MPEG-4 should be built" true)
+option(BUILD_MPEG4_SERIAL "whether MPEG-4 serial version should be built" true)
+option(BUILD_MPEG4_SERIAL_MOTION "whether MPEG-4 serial with new motion version should be built" true)
+option(BUILD_RVC_MPEG4 "whether RVC MPEG-4 should be built" true)
+option(BUILD_SEAM_CARVING "whether Seam carving should be built" true)
+
+if(BUILD_AVC)
+  add_subdirectory (AVC_CBP_Decoder)
+endif(BUILD_AVC)
+
+if(BUILD_MPEG2)
+  add_subdirectory (MPEG2)
+endif(BUILD_MPEG2)
+
+if(BUILD_MPEG4)
+  add_subdirectory (MPEG4_SP_Decoder)
+endif(BUILD_MPEG4)
+
+if(BUILD_MPEG4_SERIAL)
+  add_subdirectory (MPEG4_SP_Decoder_Serial)
+endif(BUILD_MPEG4_SERIAL)
+
+if(BUILD_MPEG4_SERIAL_MOTION)
+  add_subdirectory (MPEG4_SP_Decoder_Serial_new_motion)
+endif(BUILD_MPEG4_SERIAL_MOTION)
+
+if(BUILD_RVC_MPEG4)
+  add_subdirectory (RVC_MPEG4_SP_Decoder)
+endif(BUILD_RVC_MPEG4)
+
+if(BUILD_SEAM_CARVING)
+  add_subdirectory (Seam_carving)
+endif(BUILD_SEAM_CARVING)
