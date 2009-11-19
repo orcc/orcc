@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 2.8)
 project (Orcc)
 
 # Add path for custom modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${Orcc_SOURCE_DIR}/modules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Orcc_SOURCE_DIR}/modules)
 
 # Common packages required
 find_package(APR REQUIRED)
@@ -15,28 +15,29 @@ find_package(SDL REQUIRED)
 include_directories(${APR_INCLUDE_DIR} ${SDL_INCLUDE_DIR})
 
 # Orcc library
-include_directories(
-${Orcc_SOURCE_DIR}/include/liborcc
-${Orcc_SOURCE_DIR}/include/liborcc/mjson
-)
+include_directories(${Orcc_SOURCE_DIR}/include/liborcc )
 add_library (liborcc
-lib/liborcc/mjson/json.c
-lib/liborcc/mjson/json_helper.c
+${Orcc_SOURCE_DIR}/lib/liborcc/actors/display.c
+${Orcc_SOURCE_DIR}/lib/liborcc/actors/source.c
+${Orcc_SOURCE_DIR}/lib/liborcc/orcc_util.c
+)
 
-lib/liborcc/src/actors/display.c
-lib/liborcc/src/actors/source.c
-lib/liborcc/src/orcc_util.c
+# C JSON library
+include_directories(${Orcc_SOURCE_DIR}/include/libcjson)
+add_library (libcjson
+${Orcc_SOURCE_DIR}/lib/libcjson/cJSON.c
 )
 
 # EPFL AKA library
-include_directories(${Orcc_SOURCE_DIR}/include/libcpp-epfl-aka)
-add_library (libcpp-epfl-aka
-lib/libcpp-epfl-aka/actoraka.cpp
-lib/libcpp-epfl-aka/fifoFanOut.cpp
-lib/libcpp-epfl-aka/traceaka.cpp
+include_directories(${Orcc_SOURCE_DIR}/include/libcpp-epfl-aka ${Orcc_SOURCE_DIR}/include/libcpp-epfl-aka/actors)
 
-lib/libcpp-epfl-aka/actors/Actor_display.cpp
-lib/libcpp-epfl-aka/actors/Actor_source.cpp
+add_library (libcpp-epfl-aka
+${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/actoraka.cpp
+${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/fifoFanOut.cpp
+${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/traceaka.cpp
+
+${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/actors/Actor_display.cpp
+${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/actors/Actor_source.cpp
 )
 
 # projects in sub folders
