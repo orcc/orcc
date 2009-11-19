@@ -1,0 +1,19 @@
+This file describes how to use the CMake build system.
+
+1) install CMake
+
+(Windows specific)
+if you are using Visual Studio under Windows, you need to execute vcvars32.bat
+to set the necessary environment variables (look in the folder where Visual C is installed)
+
+2) run cmake-gui
+3) set "source code folder" to the folder projects/CMake
+4) set "build folder" to the folder projects/CMake/build
+
+(Windows specific)
+download the dependencies and extract them in projects/CMake/dependencies
+add a new path entry CMAKE_PREFIX_PATH set to projects/CMake/dependencies
+
+5) hit configure
+6) hit build
+7) your projects are located in the build folder
