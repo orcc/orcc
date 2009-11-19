@@ -41,4 +41,5 @@ ${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/actors/Actor_source.cpp
 )
 
 # projects in sub folders
+add_subdirectory (AVC_CBP_Decoder)
 add_subdirectory (MPEG4_SP_Decoder)
