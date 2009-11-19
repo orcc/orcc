@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.OrccException;
+
 /**
  * This class defines an expression visitor.
  * 
@@ -36,18 +38,18 @@ package net.sf.orcc.ir.expr;
  */
 public interface ExpressionInterpreter {
 
-	public Object interpret(BinaryExpr expr, Object... args);
+	public Object interpret(BinaryExpr expr, Object... args) throws OrccException;
 
-	public Object interpret(BooleanExpr expr, Object... args);
+	public Object interpret(BooleanExpr expr, Object... args) throws OrccException;
 
-	public Object interpret(IntExpr expr, Object... args);
+	public Object interpret(IntExpr expr, Object... args) throws OrccException;
 
-	public Object interpret(ListExpr expr, Object... args);
+	public Object interpret(ListExpr expr, Object... args) throws OrccException;
 
-	public Object interpret(StringExpr expr, Object... args);
+	public Object interpret(StringExpr expr, Object... args) throws OrccException;
 
-	public Object interpret(UnaryExpr expr, Object... args);
+	public Object interpret(UnaryExpr expr, Object... args) throws OrccException;
 
-	public Object interpret(VarExpr expr, Object... args);
+	public Object interpret(VarExpr expr, Object... args) throws OrccException;
 
 }

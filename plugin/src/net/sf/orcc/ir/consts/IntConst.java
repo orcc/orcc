@@ -56,6 +56,11 @@ public class IntConst implements Constant {
 	}
 
 	@Override
+	public Object accept(ConstantInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+	
+	@Override
 	public int getType() {
 		return INT;
 	}

@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
 
@@ -53,7 +54,8 @@ public class VarExpr extends AbstractExpression {
 	}
 
 	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+	public Object accept(ExpressionInterpreter interpreter, Object... args)
+			throws OrccException {
 		return interpreter.interpret(this, args);
 	}
 

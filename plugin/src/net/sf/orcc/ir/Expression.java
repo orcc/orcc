@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
 
@@ -93,7 +94,7 @@ public interface Expression extends Localizable {
 	 *            arguments
 	 * @return an object
 	 */
-	public Object accept(ExpressionInterpreter interpreter, Object... args);
+	public Object accept(ExpressionInterpreter interpreter, Object... args) throws OrccException;
 
 	/**
 	 * Returns the type of this expression.

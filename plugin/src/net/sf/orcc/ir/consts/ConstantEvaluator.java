@@ -26,42 +26,28 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.AbstractLocalizable;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Printer;
+package net.sf.orcc.ir.consts;
 
 /**
- * This interface defines an expression.
- * 
- * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
-public abstract class AbstractExpression extends AbstractLocalizable implements
-		Expression {
+public class ConstantEvaluator implements ConstantInterpreter {
 
-	/**
-	 * Creates an abstract expression with the given location.
-	 * 
-	 * @param location
-	 *            the location of this abstract expression
-	 */
-	public AbstractExpression(Location location) {
-		super(location);
+	public Object interpret(BoolConst constant, Object... args) {
+		return constant.getValue();
 	}
 
-	@Override
-	public abstract void accept(ExpressionVisitor visitor, Object... args);
+	public Object interpret(IntConst constant, Object... args) {
+		return constant.getValue();
+	}
 
-	@Override
-	public abstract Object accept(ExpressionInterpreter interpreter, Object... args) throws OrccException;
-	
-	@Override
-	public String toString() {
-		return Printer.getInstance().toString(this);
+	public Object interpret(ListConst constant, Object... args) {
+		return constant.getValue();
+	}
+
+	public Object interpret(StringConst constant, Object... args) {
+		return constant.getValue();
 	}
 
 }

@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.orcc.ir.consts.ConstantInterpreter;
 import net.sf.orcc.ir.consts.ConstantVisitor;
 
 /**
@@ -64,6 +65,13 @@ public interface Constant {
 	 * @param visitor
 	 */
 	public abstract void accept(ConstantVisitor visitor, Object... args);
+
+	/**
+	 * Accepts an interpreter.
+	 * 
+	 * @param interpreter
+	 */
+	public abstract Object accept(ConstantInterpreter interpreter, Object... args);
 
 	/**
 	 * Returns the type of this constant.

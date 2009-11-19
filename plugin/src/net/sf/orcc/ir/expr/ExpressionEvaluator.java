@@ -40,29 +40,30 @@ import net.sf.orcc.ir.Expression;
 public class ExpressionEvaluator implements ExpressionInterpreter {
 
 	@Override
-	public Object interpret(BinaryExpr expr, Object... args) {
+	public Object interpret(BinaryExpr expr, Object... args)
+			throws OrccException {
 		Object val1 = expr.getE1().accept(this);
 		Object val2 = expr.getE2().accept(this);
 		switch (expr.getOp()) {
 		case BITAND:
-			if (val1 instanceof Boolean && val2 instanceof Boolean) {
-				boolean b1 = (Boolean)val1;
-				boolean b2 = (Boolean)val2;
-				return b1 && b2;
+			if (val1 instanceof Integer && val2 instanceof Integer) {
+				int i1 = (Integer) val1;
+				int i2 = (Integer) val2;
+				return i1 & i2;
 			}
 			break;
 		case BITOR:
-			if (val1 instanceof Boolean && val2 instanceof Boolean) {
-				boolean b1 = (Boolean)val1;
-				boolean b2 = (Boolean)val2;
-				return b1 || b2;
+			if (val1 instanceof Integer && val2 instanceof Integer) {
+				int i1 = (Integer) val1;
+				int i2 = (Integer) val2;
+				return i1 | i2;
 			}
 			break;
 		case BITXOR:
-			if (val1 instanceof Boolean && val2 instanceof Boolean) {
-				boolean b1 = (Boolean)val1;
-				boolean b2 = (Boolean)val2;
-				return (b1 && b2) || (!b1 && !b2);
+			if (val1 instanceof Integer && val2 instanceof Integer) {
+				int i1 = (Integer) val1;
+				int i2 = (Integer) val2;
+				return i1 ^ i2;
 			}
 			break;
 		case DIV:
@@ -103,10 +104,10 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case LOGIC_AND:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
-				return i1 & i2;
+			if (val1 instanceof Boolean && val2 instanceof Boolean) {
+				boolean b1 = (Boolean) val1;
+				boolean b2 = (Boolean) val2;
+				return b1 && b2;
 			}
 			break;
 		case LE:
@@ -117,10 +118,10 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case LOGIC_OR:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
-				return i1 | i2;
+			if (val1 instanceof Boolean && val2 instanceof Boolean) {
+				boolean b1 = (Boolean) val1;
+				boolean b2 = (Boolean) val2;
+				return b1 || b2;
 			}
 			break;
 		case LT:
@@ -181,8 +182,9 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			break;
 		}
 
-		// TODO : throw new OrccException("could not evaluate");
-		return null;
+		throw new OrccException("could not evaluate binary expression with OP="
+				+ expr.getOp().toString() + "(" + expr.getOp().getText()
+				+ ") and E1=" + val1 + "; E2=" + val2);
 	}
 
 	@Override
@@ -196,9 +198,8 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(ListExpr expr, Object... args) {
-		//TODO throw new OrccException("could not evaluate");
-		return null;
+	public Object interpret(ListExpr expr, Object... args) throws OrccException {
+		throw new OrccException("can not evaluate List expression");
 	}
 
 	@Override
@@ -207,33 +208,34 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(UnaryExpr expr, Object... args) {
+	public Object interpret(UnaryExpr expr, Object... args)
+			throws OrccException {
 		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
 		switch (expr.getOp()) {
 		case BITNOT:
-			if (value instanceof Boolean) {
-				boolean b = (Boolean)value;
-				return !b;
+			if (value instanceof Integer) {
+				int i = (Integer) value;
+				return ~i;
 			}
 			break;
 		case LOGIC_NOT:
 			if (value instanceof Boolean) {
-				boolean b = (Boolean)value;
+				boolean b = (Boolean) value;
 				return !b;
 			}
 			break;
 		case MINUS:
 			if (value instanceof Integer) {
-				int b = (Integer)value;
-				return -b;
+				int i = (Integer) value;
+				return -i;
 			}
 			break;
 		case NUM_ELTS:
 			break;
 		}
 
-		// TODO : throw new OrccException("could not evaluate");
-		return null;
+		throw new OrccException("could not evaluate unary expression with OP="
+				+ expr.getOp().toString() + "(" + expr.getOp().getText() + ")");
 	}
 
 	@Override
@@ -244,7 +246,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	public int evaluateAsInteger(Expression expr) throws OrccException {
 		Object value = expr.accept(this, Integer.MIN_VALUE);
 		if (value instanceof Integer) {
-			return (Integer)value;
+			return (Integer) value;
 		}
 		// evaluated ok, but not as an integer
 		throw new OrccException("expected integer expression");

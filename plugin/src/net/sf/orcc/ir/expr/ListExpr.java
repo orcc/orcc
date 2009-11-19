@@ -30,6 +30,7 @@ package net.sf.orcc.ir.expr;
 
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 
@@ -55,7 +56,8 @@ public class ListExpr extends AbstractExpression {
 	}
 
 	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+	public Object accept(ExpressionInterpreter interpreter, Object... args)
+			throws OrccException {
 		return interpreter.interpret(this, args);
 	}
 
