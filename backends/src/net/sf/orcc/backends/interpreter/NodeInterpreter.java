@@ -31,6 +31,7 @@ package net.sf.orcc.backends.interpreter;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.ICommunicationFifo;
 import net.sf.orcc.ir.Instruction;
@@ -90,42 +91,47 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@Override
 	public Object visit(IfNode node, Object... args) {
 		/* Interpret first expression ("if" condition) */
-		// Expression expr = exprInterpreter.interpret(node.getValue());
-		Object condition = node.getValue().accept(exprInterpreter);
+		try {
+			Object condition = node.getValue().accept(exprInterpreter);
 
-		/* if (condition si true) then */
-		if ((Boolean) condition) {
-			for (CFGNode subNode : node.getThenNodes()) {
-				subNode.accept(this, args);
-			}
-			/* else */
-		} else {
-			List<CFGNode> elseNodes = node.getElseNodes();
-			if (elseNodes.size() != 1) {
-				for (CFGNode subNode : elseNodes) {
+			/* if (condition si true) then */
+			if ((Boolean) condition) {
+				for (CFGNode subNode : node.getThenNodes()) {
 					subNode.accept(this, args);
 				}
+				/* else */
+			} else {
+				List<CFGNode> elseNodes = node.getElseNodes();
+				if (elseNodes.size() != 1) {
+					for (CFGNode subNode : elseNodes) {
+						subNode.accept(this, args);
+					}
+				}
 			}
+			node.getJoinNode().accept(this, args);
+		} catch (OrccException e) {
+			e.printStackTrace();
 		}
-		node.getJoinNode().accept(this, args);
+
 		return null;
 	}
 
 	@Override
 	public Object visit(WhileNode node, Object... args) {
 		/* Interpret first expression ("while" condition) */
-		// Expression expr = exprInterpreter.interpret(node.getValue());
-		Object condition = node.getValue().accept(exprInterpreter);
-
-		/* while (condition is true) do */
-		while ((Boolean) condition) {
-			/* control flow sub-statements */
-			for (CFGNode subNode : node.getNodes()) {
-				subNode.accept(this, args);
+		try {
+			Object condition = node.getValue().accept(exprInterpreter);
+			/* while (condition is true) do */
+			while ((Boolean) condition) {
+				/* control flow sub-statements */
+				for (CFGNode subNode : node.getNodes()) {
+					subNode.accept(this, args);
+				}
+				/* Interpret next value of "while" condition */
+				condition = node.getValue().accept(exprInterpreter);
 			}
-			/* Interpret next value of "while" condition */
-			// expr = exprInterpreter.interpret(node.getValue());
-			condition = node.getValue().accept(exprInterpreter);
+		} catch (OrccException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -195,15 +201,23 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@Override
 	public void visit(Assign instr, Object... args) {
 		LocalVariable target = instr.getTarget();
-		target.setValue(instr.getValue().accept(exprInterpreter));
+		try {
+			target.setValue(instr.getValue().accept(exprInterpreter));
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void visit(PhiAssignment instr, Object... args) {
 		LocalVariable target = instr.getTarget();
-		for (Use use : instr.getVars()) {
-			Variable var = use.getVariable();
-			target.setValue(var.getExpression().accept(exprInterpreter));
+		try {
+			for (Use use : instr.getVars()) {
+				Variable var = use.getVariable();
+				target.setValue(var.getExpression().accept(exprInterpreter));
+			}
+		} catch (OrccException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -217,7 +231,11 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@Override
 	public void visit(Store instr, Object... args) {
 		Variable variable = instr.getTarget().getVariable();
-		variable.setValue(instr.getValue().accept(exprInterpreter));
+		try {
+			variable.setValue(instr.getValue().accept(exprInterpreter));
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -233,8 +251,12 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(Return instr, Object... args) {
-		this.return_value = instr.getValue().accept(exprInterpreter);
-		this.block_return = true;
+		try {
+			this.return_value = instr.getValue().accept(exprInterpreter);
+			this.block_return = true;
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

@@ -32,14 +32,18 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.backends.interpreter.FsmManager.TransitionManager;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.consts.ConstantEvaluator;
 
 /**
  * Interpreted actors made of an IR Actor, an FSM state and a scheduling state.
@@ -52,24 +56,30 @@ public class InterpretedActor {
 	private String name;
 	private Actor actor;
 	private String fsmState;
+	private FsmManager fsmMgr;
 	private ListAllocator listAllocator;
 	private NodeInterpreter interpret;
+	private ConstantEvaluator constEval;
+	private ActionScheduler sched;
 
 	// private List<Actor> schedPred;
 
 	public InterpretedActor(String id, Actor actor) {
 		this.name = id;
 		this.actor = actor;
-		ActionScheduler sched = actor.getActionScheduler();
+		sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
 			this.fsmState = sched.getFsm().getInitialState().getName();
+			fsmMgr = new FsmManager(sched.getFsm());
 		}
 		// TODO : get scheduling predecessors
-		
+
 		// Create the List allocator for state and procedure local vars
 		listAllocator = new ListAllocator();
 		// Build a node interpreter for visiting CFG and instructions
 		interpret = new NodeInterpreter(name);
+		// Creates an expression evaluator for state and local variables init
+		this.constEval = new ConstantEvaluator();
 	}
 
 	public String getFsmState() {
@@ -84,12 +94,16 @@ public class InterpretedActor {
 	 * Launch initializing actions for each network actor.
 	 * 
 	 */
-	public void initialize() {
-		// Check for List state variables which need to be allocated 
+	public void initialize() throws OrccException {
+		// Check for List state variables which need to be allocated or
+		// initialized
 		for (Variable stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
 			if (type.getType() == Type.LIST) {
 				stateVar.setValue(type.accept(listAllocator));
+			} else if (((StateVariable) stateVar).hasInit()) {
+				stateVar.setValue(((StateVariable) stateVar).getInit().accept(
+						constEval));
 			}
 		}
 		// Get initializing procedure if any
@@ -97,7 +111,7 @@ public class InterpretedActor {
 			System.out.println("Initialize actor " + name);
 			Object isSchedulable = interpretProc(action.getScheduler());
 			if (isSchedulable instanceof Boolean) {
-				if ((Boolean)isSchedulable) {
+				if ((Boolean) isSchedulable) {
 					interpretProc(action.getBody());
 				}
 			}
@@ -108,25 +122,41 @@ public class InterpretedActor {
 	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
 	 * 
 	 */
-	public Integer schedule() {
-		Object running;
-		ActionScheduler sched = actor.getActionScheduler();
+	public Integer schedule() throws OrccException {
 		if (sched.hasFsm()) {
-			// FSM fsm = sched.getFsm();
-			// TODO manage FSM
+			Iterator<TransitionManager> it = fsmMgr.getIt(fsmState);
+
+			while (it.hasNext()) {
+				TransitionManager transMgr = it.next();
+				Action action = transMgr.transitionAction;
+				if (isSchedulable(action)) {
+					interpretProc(action.getBody());
+					// Update FSM state
+					fsmState = transMgr.targetState;
+					// Execute 1 action only per actor scheduler cycle
+					return 1;
+				}
+			}
 		} else {
 			for (Action action : sched.getActions()) {
-				running = interpretProc(action.getScheduler());
-				if ((running instanceof Boolean) && ((Boolean)running)) {
-					if (checkOutputPattern(action.getOutputPattern())) {
-						interpretProc(action.getBody());
-					}
+				if (isSchedulable(action)) {
+					interpretProc(action.getBody());
 					// Execute 1 action only per actor scheduler cycle
 					return 1;
 				}
 			}
 		}
 		return 0;
+	}
+
+	private boolean isSchedulable(Action action) throws OrccException {
+		Object isSchedulable = interpretProc(action.getScheduler());
+		if ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable)) {
+			if (checkOutputPattern(action.getOutputPattern())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean checkOutputPattern(Map<Port, Integer> outputPattern) {
@@ -152,13 +182,13 @@ public class InterpretedActor {
 	 * 
 	 * @param procedure
 	 *            a procedure
-	 *            
+	 * 
 	 * @return an object which contains procedure returned value
 	 */
-	private Object interpretProc(Procedure procedure) {
+	private Object interpretProc(Procedure procedure) throws OrccException {
 		// Don't mind about procedure parameters => already allocated
 
-		// Declare local variables in case of List type
+		// Allocate local List variables
 		for (Variable local : procedure.getLocals()) {
 			Type type = local.getType();
 			if (type.getType() == Type.LIST) {
@@ -175,7 +205,7 @@ public class InterpretedActor {
 		Object result = interpret.getReturnValue();
 		// TODO : check return type
 		// Type type = procedure.getReturnType();
-		
+
 		// Return the result object
 		return result;
 	}

@@ -32,15 +32,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.transforms.BlockCombine;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
-import net.sf.orcc.ir.transforms.BlockCombine;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -90,8 +91,7 @@ public class InterpreterBackend implements IBackend {
 					Actor actor = instance.getActor();
 					// Apply some simplification transformations
 					ActorTransformation[] transformations = {
-							new DeadGlobalElimination(), 
-							new BlockCombine(),
+							new DeadGlobalElimination(), new BlockCombine(),
 							new PhiRemoval() };
 
 					for (ActorTransformation transformation : transformations) {
@@ -124,7 +124,8 @@ public class InterpreterBackend implements IBackend {
 							.getAttribute(Connection.BUFFER_SIZE);
 					if (attr != null && attr.getType() == IAttribute.VALUE) {
 						Expression expr = ((IValueAttribute) attr).getValue();
-						size = new ExpressionEvaluator().evaluateAsInteger(expr) + 1;
+						size = new ExpressionEvaluator()
+								.evaluateAsInteger(expr) + 1;
 					} else {
 						size = fifoSize;
 					}
@@ -159,8 +160,10 @@ public class InterpreterBackend implements IBackend {
 
 	/**
 	 * Initialize each network actor if initializing function exists
+	 * 
+	 * @throws OrccException
 	 */
-	private void initialize() {
+	private void initialize() throws OrccException {
 		// init actors of the network
 		for (InterpretedActor actor : actorQueue) {
 			actor.initialize();
