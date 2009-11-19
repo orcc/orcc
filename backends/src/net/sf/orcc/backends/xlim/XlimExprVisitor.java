@@ -44,6 +44,11 @@ import net.sf.orcc.ir.expr.VarExpr;
 
 import org.w3c.dom.Element;
 
+/**
+ * XlimExprVisitor exports Expressions
+ * 
+ * @author Samuel Keller
+ */
 public class XlimExprVisitor implements ExpressionVisitor {
 
 	/**

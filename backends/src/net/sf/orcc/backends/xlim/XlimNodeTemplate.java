@@ -34,6 +34,11 @@ import net.sf.orcc.ir.Type;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * XlimNodeTemplate groups elements templates for XLIM output
+ * 
+ * @author Samuel Keller
+ */
 public class XlimNodeTemplate {
 
 	/**

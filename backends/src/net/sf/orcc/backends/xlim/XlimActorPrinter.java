@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -57,10 +58,16 @@ import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.type.ListType;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * XlimActorPrinter manages transformation of an Actor
+ * 
+ * @author Samuel Keller
+ */
 public class XlimActorPrinter {
 
 	/**
@@ -434,7 +441,15 @@ public class XlimActorPrinter {
 	 *            Actor to analyze
 	 */
 	private void addStateVars(Actor actor) {
-		// TODO Add initialize code execution to obtain missing init values
+
+		// Executes initialize code execution to obtain missing init values
+		XlimNodeExecutor exec = new XlimNodeExecutor();
+		for (Action action : actor.getInitializes()) {
+			for (CFGNode node : action.getBody().getNodes()) {
+				node.accept(exec);
+			}
+		}
+		Map<String, List<Integer>> tables = exec.getTables();
 
 		for (Variable stateVar : actor.getStateVars()) {
 			if (stateVar.isUsed()) {
@@ -444,7 +459,6 @@ public class XlimActorPrinter {
 						.getVarName(stateVar), sourceName);
 
 				StateVariable state = (StateVariable) stateVar;
-				// if (state.hasInit()) {
 				Element init = XlimNodeTemplate.newInitValue(newState, "Let");
 
 				Element init2 = XlimNodeTemplate.newInitValue(init);
@@ -453,11 +467,19 @@ public class XlimActorPrinter {
 				if (value != null) {
 					value.accept(new XlimValueVisitor(init2, state.getType()));
 				} else {
-					System.out.println("STATE: " + state.getUses());
+					state.getType().accept(new XlimTypeSizeVisitor(init2));
+					if (tables.containsKey(state.getName())) {
+						for (Integer initvalue : tables.get(state.getName())) {
+							Element el = XlimNodeTemplate.newInitValue(init2,
+									"int");
+							el.setAttribute("value", initvalue.toString());
+							((ListType) state.getType()).getElementType()
+									.accept(new XlimTypeSizeVisitor(el));
+						}
+					} else {
+						System.out.println("STATE: " + state.getUses());
+					}
 				}
-				// }
-
-				System.out.println(state.getInit());
 			}
 		}
 	}

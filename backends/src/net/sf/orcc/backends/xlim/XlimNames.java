@@ -35,6 +35,11 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 
+/**
+ * XlimNames provides additional naming
+ * 
+ * @author Samuel Keller
+ */
 public class XlimNames {
 
 	/**
