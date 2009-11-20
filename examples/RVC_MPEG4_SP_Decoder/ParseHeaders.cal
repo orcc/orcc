@@ -136,7 +136,7 @@ actor ParseHeaders (
   // completion with the boolean done_reading_bits() and get the value
   // with read_result(). Use the done function in a guard to wait for the
   // reading to be complete.
-  int(size=7) bits_to_read_count := -1;
+  int(size=8) bits_to_read_count := -1;
   int(size=32) read_result_in_progress;
   procedure set_bits_to_read( int count )
   begin
