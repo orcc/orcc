@@ -34,7 +34,6 @@ import java.io.IOException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.BlockCombine;
 import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
@@ -73,8 +72,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void init() throws IOException {
 		printer = new LLVMActorPrinter();
 		printer.toString();
-
-		NameTransformer.names.clear();
 	}
 
 	@Override

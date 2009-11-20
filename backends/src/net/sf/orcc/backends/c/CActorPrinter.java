@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +66,8 @@ public class CActorPrinter extends Printer {
 
 	protected StringTemplate template;
 
+	private Map<String, String> transformations;
+
 	protected VarDefPrinter varDefPrinter;
 
 	/**
@@ -77,6 +80,12 @@ public class CActorPrinter extends Printer {
 		this("C_actor");
 
 		varDefPrinter = new VarDefPrinter();
+
+		transformations = new HashMap<String, String>();
+		transformations.put("abs", "abs_");
+		transformations.put("index", "index_");
+		transformations.put("getw", "getw_");
+		transformations.put("select", "select_");
 	}
 
 	/**
@@ -278,7 +287,7 @@ public class CActorPrinter extends Printer {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	@Override
 	public String toString(Type type) {
 		CTypePrinter printer = new CTypePrinter();
@@ -288,7 +297,12 @@ public class CActorPrinter extends Printer {
 
 	@Override
 	public String toString(Variable variable) {
-		return variable.getName();
+		String name = variable.getName();
+		if (transformations.containsKey(name)) {
+			return transformations.get(name);
+		} else {
+			return name;
+		}
 	}
 
 }

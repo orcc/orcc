@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.AbstractFifo;
@@ -90,7 +89,7 @@ public class VarDefPrinter {
 	 * @return a string with its full name
 	 */
 	public String getVarDefName(Variable variable) {
-		return NameTransformer.transform(variable.getName());
+		return variable.getName();
 	}
 
 }

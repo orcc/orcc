@@ -40,7 +40,6 @@ import net.sf.orcc.backends.c.quasistatic.parsers.CQuasiStaticActorParser;
 import net.sf.orcc.backends.c.quasistatic.parsers.CQuasiStaticNetworksParser;
 import net.sf.orcc.backends.c.quasistatic.utils.CQuasiStaticConstants;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
@@ -82,16 +81,8 @@ public class CQuasiStaticBackendImpl extends CBackendImpl {
 	protected void init() throws IOException {
 		printer = new CQuasiStaticActorPrinter();
 
-		// register transformations
-		NameTransformer.names.clear();
-		NameTransformer.names.put("abs", "abs_");
-		NameTransformer.names.put("index", "index_");
-		NameTransformer.names.put("getw", "getw_");
-		NameTransformer.names.put("select", "select_");
-
 		// Init scheduler's stuff
 		prepareScheduler();
-
 	}
 
 	/**

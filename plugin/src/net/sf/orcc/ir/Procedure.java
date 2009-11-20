@@ -234,7 +234,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 */
 	@Override
 	public String getName() {
-		return NameTransformer.transform(name);
+		return name;
 	}
 
 	/**

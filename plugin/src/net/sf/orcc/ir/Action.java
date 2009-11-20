@@ -98,7 +98,7 @@ public class Action {
 			}
 
 			str += tag.get(tag.size() - 1);
-			return NameTransformer.transform(str);
+			return str;
 		}
 	}
 

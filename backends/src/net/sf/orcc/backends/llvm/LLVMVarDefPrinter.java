@@ -34,7 +34,6 @@ import java.util.Map;
 import net.sf.orcc.backends.llvm.type.LLVMAbstractType;
 import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -104,7 +103,7 @@ public class LLVMVarDefPrinter {
 	 * @return a string with its full name
 	 */
 	public String getVarDefName(Variable variable) {
-		return NameTransformer.transform(variable.getName());
+		return variable.getName();
 	}
 
 }

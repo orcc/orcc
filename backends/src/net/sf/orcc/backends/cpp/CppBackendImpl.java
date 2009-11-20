@@ -35,7 +35,6 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.NameTransformer;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 
@@ -74,8 +73,6 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void init() throws IOException {
 		printer = new CppActorPrinter("Cpp_actorDecl");
 		impl_printer = new CppActorPrinter("Cpp_actorImpl");
-
-		NameTransformer.names.clear();
 
 		String sep = File.separator;
 
