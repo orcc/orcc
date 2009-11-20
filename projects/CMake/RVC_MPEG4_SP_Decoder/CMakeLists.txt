@@ -47,12 +47,20 @@ retranspose_02.c
 row.c
 row_01.c
 row_02.c
+scale.c
+scale_01.c
+scale_02.c
 serialize.c
+shift.c
+shift_01.c
+shift_02.c
 splitter_420_B.c
 splitter_BTYPE.c
 splitter_MV.c
+splitter_Qp.c
 transpose.c
 transpose_01.c
+transpose_02.c
 )
 
 target_link_libraries(RVC_MPEG4_SP_Decoder liborcc ${APR_LIBRARY} ${SDL_LIBRARY})

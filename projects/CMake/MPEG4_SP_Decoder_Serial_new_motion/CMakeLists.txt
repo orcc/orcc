@@ -7,7 +7,6 @@ column.c
 DCsplit.c
 framebuf_interp_add.c
 IAP.c
-interpolation.c
 invpred.c
 IQ.c
 IS.c
