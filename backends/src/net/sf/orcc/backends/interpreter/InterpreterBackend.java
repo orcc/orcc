@@ -64,7 +64,7 @@ public class InterpreterBackend implements IBackend {
 
 	protected String path;
 
-	private List<InterpretedActor> actorQueue;
+	private List<AbstractInterpretedActor> actorQueue;
 
 	@Override
 	public void generateCode(String fileName, int fifoSize) throws Exception {
@@ -81,27 +81,6 @@ public class InterpreterBackend implements IBackend {
 
 		// get network graph
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
-
-		// build an actor queue with network graph vertexes
-		actorQueue = new ArrayList<InterpretedActor>();
-		for (Vertex vertex : graph.vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isActor()) {
-					Actor actor = instance.getActor();
-					// Apply some simplification transformations
-					ActorTransformation[] transformations = {
-							new DeadGlobalElimination(), new BlockCombine(),
-							new PhiRemoval() };
-
-					for (ActorTransformation transformation : transformations) {
-						transformation.transform(actor);
-					}
-					actorQueue
-							.add(new InterpretedActor(instance.getId(), actor));
-				}
-			}
-		}
 
 		// connect network actors to FIFOs thanks to their port names
 		Set<Connection> connections = graph.edgeSet();
@@ -149,6 +128,33 @@ public class InterpreterBackend implements IBackend {
 				}
 			}
 		}
+		
+		// build an actor queue with network graph vertexes
+		actorQueue = new ArrayList<AbstractInterpretedActor>();
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isActor()) {
+					Actor actor = instance.getActor();
+					if ("source".equals(actor.getName())) {
+						actorQueue.add(new SourceActor(instance.getId(), actor));
+					}else if ("display".equals(actor.getName())) {
+						actorQueue.add(new DisplayActor(instance.getId(), actor));						
+					} else {
+						// Apply some simplification transformations
+						ActorTransformation[] transformations = {
+								new DeadGlobalElimination(),
+								new BlockCombine(), new PhiRemoval() };
+
+						for (ActorTransformation transformation : transformations) {
+							transformation.transform(actor);
+						}
+						actorQueue.add(new InterpretedActor(instance.getId(),
+								actor));
+					}
+				}
+			}
+		}
 
 		// Call network initializer main function
 		initialize();
@@ -163,9 +169,9 @@ public class InterpreterBackend implements IBackend {
 	 * 
 	 * @throws OrccException
 	 */
-	private void initialize() throws OrccException {
+	private void initialize() throws Exception {
 		// init actors of the network
-		for (InterpretedActor actor : actorQueue) {
+		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.initialize();
 		}
 	}
@@ -182,7 +188,7 @@ public class InterpreterBackend implements IBackend {
 		// While at least one actor is running
 		while (running > 0) {
 			running = 0;
-			for (InterpretedActor actor : actorQueue) {
+			for (AbstractInterpretedActor actor : actorQueue) {
 				System.out.println("Schedule actor " + actor.getName());
 				running += actor.schedule();
 			}

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.type.AbstractTypeInterpreter;
 import net.sf.orcc.ir.type.BoolType;
@@ -98,34 +99,15 @@ public class ListAllocator extends AbstractTypeInterpreter {
 			return null;
 		}
 	}
-
-	public Object allocate(ListType type) {
-		Class<?> classType = (Class<?>) type.getElementType().accept(this);
-		try {
-			switch (sizeList.size()) {
-			case 1:
-				return Array.newInstance(classType, (Integer) sizeList.get(0));
-			case 2:
-				return Array.newInstance(classType, (Integer) sizeList.get(0),
-						(Integer) sizeList.get(1));
-			case 3:
-				return Array.newInstance(classType, (Integer) sizeList.get(0),
-						(Integer) sizeList.get(1), (Integer) sizeList.get(2));
-			case 4:
-				return Array.newInstance(classType, (Integer) sizeList.get(0),
-						(Integer) sizeList.get(1), (Integer) sizeList.get(2),
-						(Integer) sizeList.get(3));
-			case 5:
-				return Array.newInstance(classType, (Integer) sizeList.get(0),
-						(Integer) sizeList.get(1), (Integer) sizeList.get(2),
-						(Integer) sizeList.get(3), (Integer) sizeList.get(4));
-			default:
-				throw new OrccException(
-						"unsupported arrays of multi-dimension upper than 5");
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
-			return null;
+		
+	public Object allocate(Type type) {
+		Class<?> classType = (Class<?>) type.accept(this);
+		int[] dimensions = new int[sizeList.size()];
+		for (int i = 0; i < sizeList.size(); i++) {
+			dimensions[i] = (Integer) sizeList.get(i);
 		}
+		sizeList.clear();
+
+		return Array.newInstance(classType, dimensions);
 	}
 }

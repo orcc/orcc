@@ -33,9 +33,12 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.ICommunicationFifo;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
@@ -67,12 +70,16 @@ import net.sf.orcc.ir.nodes.WhileNode;
 public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	// private String actorName;
+	private ListAllocator listAllocator;
 	private ExpressionEvaluator exprInterpreter;
 	private Object return_value;
 	private boolean block_return = false;
 
 	public NodeInterpreter(String id) {
 		// this.actorName = id;
+		// Create the List allocator for called procedure local vars
+		listAllocator = new ListAllocator();
+		// Create the expression evaluator
 		this.exprInterpreter = new ExpressionEvaluator();
 	}
 
@@ -164,9 +171,17 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		instr.getTarget().setValue(hasTok);
 	}
 
+	// private int[] toIntArray(List<Integer> integerList) {
+	// int[] intArray = new int[integerList.size()];
+	// for (int i = 0; i < integerList.size(); i++) {
+	// intArray[i] = integerList.get(i);
+	// }
+	// return intArray;
+	// }
+
 	@Override
 	public void visit(Peek instr, Object... args) {
-		int[] target = (int[]) instr.getTarget().getValue();
+		int[] target = (int[]) (instr.getTarget().getValue());
 
 		ICommunicationFifo fifo = instr.getPort().fifo();
 		fifo.peek(target);
@@ -240,10 +255,35 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(Call instr, Object... args) {
-		for (CFGNode node : instr.getProcedure().getNodes()) {
+		// Get called procedure
+		Procedure proc = instr.getProcedure();
+
+		// Set the input parameters of the called procedure if any
+		try {
+			List<Expression> callParams = instr.getParameters();
+			List<Variable> procParams = proc.getParameters().getList();
+			for (int i = 0; i < callParams.size(); i++) {
+				Variable procVar = procParams.get(i);
+				procVar.setValue(callParams.get(i).accept(exprInterpreter));
+			}
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
+
+		// Allocate procedure local List variables
+		for (Variable local : proc.getLocals()) {
+			Type type = local.getType();
+			if (type.getType() == Type.LIST) {
+				local.setValue(listAllocator.allocate(type));
+			}
+		}
+
+		// Interpret procedure body
+		for (CFGNode node : proc.getNodes()) {
 			node.accept(this);
 		}
 
+		// Get procedure result if any
 		if (instr.hasResult()) {
 			instr.getTarget().setValue(return_value);
 		}

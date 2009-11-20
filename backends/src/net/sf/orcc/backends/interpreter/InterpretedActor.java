@@ -51,10 +51,8 @@ import net.sf.orcc.ir.consts.ConstantEvaluator;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class InterpretedActor {
+public class InterpretedActor extends AbstractInterpretedActor {
 
-	private String name;
-	private Actor actor;
 	private String fsmState;
 	private FsmManager fsmMgr;
 	private ListAllocator listAllocator;
@@ -65,8 +63,7 @@ public class InterpretedActor {
 	// private List<Actor> schedPred;
 
 	public InterpretedActor(String id, Actor actor) {
-		this.name = id;
-		this.actor = actor;
+		super(id, actor);
 		sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
 			this.fsmState = sched.getFsm().getInitialState().getName();
@@ -86,21 +83,17 @@ public class InterpretedActor {
 		return fsmState;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 	/**
 	 * Launch initializing actions for each network actor.
 	 * 
 	 */
-	public void initialize() throws OrccException {
+	public void initialize() throws Exception {
 		// Check for List state variables which need to be allocated or
 		// initialized
 		for (Variable stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
 			if (type.getType() == Type.LIST) {
-				stateVar.setValue(type.accept(listAllocator));
+				stateVar.setValue(listAllocator.allocate(type));
 			} else if (((StateVariable) stateVar).hasInit()) {
 				stateVar.setValue(((StateVariable) stateVar).getInit().accept(
 						constEval));
@@ -122,7 +115,7 @@ public class InterpretedActor {
 	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
 	 * 
 	 */
-	public Integer schedule() throws OrccException {
+	public Integer schedule() throws Exception {
 		if (sched.hasFsm()) {
 			Iterator<TransitionManager> it = fsmMgr.getIt(fsmState);
 
@@ -186,13 +179,13 @@ public class InterpretedActor {
 	 * @return an object which contains procedure returned value
 	 */
 	private Object interpretProc(Procedure procedure) throws OrccException {
-		// Don't mind about procedure parameters => already allocated
+		// Don't mind about procedure parameters (already set)
 
 		// Allocate local List variables
 		for (Variable local : procedure.getLocals()) {
 			Type type = local.getType();
 			if (type.getType() == Type.LIST) {
-				local.setValue(type.accept(listAllocator));
+				local.setValue(listAllocator.allocate(type));
 			}
 		}
 
