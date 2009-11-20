@@ -64,10 +64,10 @@ actor MPEG4_mgnt_Address (
   // Properties of the current VOP
   int(size=MB_COORD_SZ) vop_width;
   int(size=MB_COORD_SZ) vop_height;
-  int(size=9) vop_luma_width;
-  int(size=9) vop_luma_height;
-  int(size=9) vop_chroma_width;
-  int(size=9) vop_chroma_height;
+  int(size=16) vop_luma_width;
+  int(size=16) vop_luma_height;
+  int(size=16) vop_chroma_width;
+  int(size=16) vop_chroma_height;
 
   // Expected coordinates of the next macroblock in VOP
   int(size=9) next_mbx;
