@@ -442,7 +442,7 @@ public class Scheduler_Simulator {
 		this.mode = mode;
 	}
 
-	public Network getNetwórk() {
+	public Network getNetwork() {
 		return net;
 	}
 
