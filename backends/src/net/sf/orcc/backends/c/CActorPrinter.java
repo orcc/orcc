@@ -48,7 +48,9 @@ import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.AbstractFifo;
 import net.sf.orcc.util.OrderedMap;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -64,11 +66,15 @@ public class CActorPrinter extends Printer {
 
 	protected StringTemplateGroup group;
 
+	private ListSizePrinter listSizePrinter;
+
+	private boolean printVariableInit;
+
+	private boolean printVariableType;
+
 	protected StringTemplate template;
 
 	private Map<String, String> transformations;
-
-	protected VarDefPrinter varDefPrinter;
 
 	/**
 	 * Creates a new network printer with the template "C.st".
@@ -79,7 +85,7 @@ public class CActorPrinter extends Printer {
 	public CActorPrinter() throws IOException {
 		this("C_actor");
 
-		varDefPrinter = new VarDefPrinter();
+		listSizePrinter = new ListSizePrinter();
 
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_");
@@ -122,24 +128,22 @@ public class CActorPrinter extends Printer {
 		procTmpl.setAttribute("type", type.toString());
 
 		// parameters
-		List<Object> varDefs = new ArrayList<Object>();
 		for (Variable param : proc.getParameters()) {
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
-			varDefs.add(varDefMap);
+			printVariableType = true;
+			printVariableInit = false;
+			procTmpl.setAttribute("parameters", param.toString());
 		}
-		procTmpl.setAttribute("parameters", varDefs);
 
 		// locals
-		varDefs = new ArrayList<Object>();
 		for (Variable local : proc.getLocals()) {
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
-			varDefs.add(varDefMap);
+			printVariableType = true;
+			printVariableInit = true;
+			procTmpl.setAttribute("locals", local.toString());
 		}
-		procTmpl.setAttribute("locals", varDefs);
 
 		// body
 		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
-				id, varDefPrinter);
+				id);
 		for (CFGNode node : proc.getNodes()) {
 			node.accept(printer);
 		}
@@ -246,8 +250,9 @@ public class CActorPrinter extends Printer {
 			StringTemplate stateTempl = group.getInstanceOf("stateVar");
 			template.setAttribute("stateVars", stateTempl);
 
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar);
-			stateTempl.setAttribute("vardef", varDefMap);
+			printVariableType = true;
+			printVariableInit = true;
+			stateTempl.setAttribute("vardef", stateVar.toString());
 
 			// initial value of state var (if any)
 			if (stateVar.hasInit()) {
@@ -287,7 +292,7 @@ public class CActorPrinter extends Printer {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public String toString(Type type) {
 		CTypePrinter printer = new CTypePrinter();
@@ -297,12 +302,58 @@ public class CActorPrinter extends Printer {
 
 	@Override
 	public String toString(Variable variable) {
-		String name = variable.getName();
-		if (transformations.containsKey(name)) {
-			return transformations.get(name);
+		if (printVariableType) {
+			StringTemplate template;
+			if (printVariableInit) {
+				template = group.getInstanceOf("vardefInit");
+			} else {
+				template = group.getInstanceOf("vardef");
+			}
+
+			printVariableType = false;
+			printVariableInit = false;
+
+			return toString(variable, template);
 		} else {
-			return name;
+			String name = variable.getName();
+			if (transformations.containsKey(name)) {
+				return transformations.get(name);
+			} else {
+				return name;
+			}
 		}
+	}
+
+	/**
+	 * Returns a string representation of variable with the given template.
+	 * 
+	 * @param variable
+	 *            a variable definition
+	 * @param template
+	 *            a template
+	 * @return a string
+	 */
+	public String toString(Variable variable, StringTemplate template) {
+		template.setAttribute("name", variable.toString());
+		template.setAttribute("type", variable.getType().toString());
+
+		// if varDef is a list, => list of dimensions
+		variable.getType().accept(listSizePrinter);
+
+		template.setAttribute("size", listSizePrinter.getSize());
+		boolean isPort = false;
+		for (Use use : variable.getUses()) {
+			if (use.getNode() instanceof AbstractFifo) {
+				AbstractFifo fifoNode = (AbstractFifo) use.getNode();
+				if (variable.getName().startsWith(fifoNode.getPort().getName())) {
+					isPort = true;
+					break;
+				}
+			}
+		}
+		template.setAttribute("isPort", isPort);
+
+		return template.toString();
 	}
 
 }

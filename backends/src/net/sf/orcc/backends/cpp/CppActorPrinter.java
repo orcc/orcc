@@ -29,13 +29,9 @@
 package net.sf.orcc.backends.cpp;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.backends.c.CActorPrinter;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
-import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
@@ -62,7 +58,6 @@ public class CppActorPrinter extends CActorPrinter {
 	 */
 	public CppActorPrinter(String tmpl_name) throws IOException {
 		super(tmpl_name);
-		varDefPrinter = new VarDefPrinter();
 	}
 
 	protected StringTemplate applyProc(String actorName, Procedure proc) {
@@ -76,24 +71,18 @@ public class CppActorPrinter extends CActorPrinter {
 		procTmpl.setAttribute("type", proc.getReturnType().toString());
 
 		// parameters
-		List<Object> varDefs = new ArrayList<Object>();
 		for (Variable param : proc.getParameters()) {
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
-			varDefs.add(varDefMap);
+			procTmpl.setAttribute("parameters", param);
 		}
-		procTmpl.setAttribute("parameters", varDefs);
 
 		// locals
-		varDefs = new ArrayList<Object>();
 		for (Variable local : proc.getLocals()) {
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
-			varDefs.add(varDefMap);
+			procTmpl.setAttribute("locals", local);
 		}
-		procTmpl.setAttribute("locals", varDefs);
 
 		// body
 		NodePrinterTemplate printer = new CppNodePrinter(group, procTmpl,
-				actorName, varDefPrinter);
+				actorName);
 		for (CFGNode node : proc.getNodes()) {
 			node.accept(printer);
 		}

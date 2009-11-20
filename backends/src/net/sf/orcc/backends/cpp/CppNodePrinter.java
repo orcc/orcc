@@ -29,8 +29,6 @@
 package net.sf.orcc.backends.cpp;
 
 import net.sf.orcc.backends.c.NodePrinterTemplate;
-import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Write;
@@ -46,8 +44,8 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 public class CppNodePrinter extends NodePrinterTemplate {
 
 	public CppNodePrinter(StringTemplateGroup group, StringTemplate template,
-			String id, VarDefPrinter varDefPrinter) {
-		super(group, template, id, varDefPrinter);
+			String id) {
+		super(group, template, id);
 	}
 
 	@Override
@@ -55,8 +53,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("peekNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", node.getTarget().toString());
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 		if (node.getNumTokens() > 1) {
@@ -70,8 +67,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", node.getTarget().toString());
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 		if (node.getNumTokens() > 1) {
@@ -85,8 +81,7 @@ public class CppNodePrinter extends NodePrinterTemplate {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", node.getTarget().toString());
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 		if (node.getNumTokens() > 1) {

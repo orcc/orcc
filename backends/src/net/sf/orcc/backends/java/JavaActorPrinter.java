@@ -31,7 +31,6 @@ package net.sf.orcc.backends.java;
 import java.io.IOException;
 
 import net.sf.orcc.backends.c.CActorPrinter;
-import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.backends.cpp.CppConstPrinter;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.ir.Constant;
@@ -54,7 +53,6 @@ public class JavaActorPrinter extends CActorPrinter {
 	 */
 	public JavaActorPrinter() throws IOException {
 		super("Java_actor");
-		varDefPrinter = new VarDefPrinter();
 	}
 
 	@Override

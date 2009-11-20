@@ -38,8 +38,6 @@ import net.sf.orcc.backends.c.instructions.SelfAssignment;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
@@ -83,15 +81,12 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 
 	protected StringTemplate template;
 
-	protected VarDefPrinter varDefPrinter;
-
 	public NodePrinterTemplate(StringTemplateGroup group,
-			StringTemplate template, String id, VarDefPrinter varDefPrinter) {
+			StringTemplate template, String id) {
 		attrName = "nodes";
 		this.actorName = id;
 		this.group = group;
 		this.template = template;
-		this.varDefPrinter = varDefPrinter;
 	}
 
 	@Override
@@ -99,9 +94,8 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("assignVarNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
-		nodeTmpl.setAttribute("expr", node.getValue().toString());
+		nodeTmpl.setAttribute("var", node.getTarget());
+		nodeTmpl.setAttribute("expr", node.getValue());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -119,8 +113,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	public void visit(Call node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("callNode");
 		if (node.hasResult()) {
-			LocalVariable varDef = node.getTarget();
-			nodeTmpl.setAttribute("res", varDefPrinter.getVarDefName(varDef));
+			nodeTmpl.setAttribute("res", node.getTarget().toString());
 		}
 
 		nodeTmpl.setAttribute("name", node.getProcedure().getName());
@@ -134,8 +127,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	@Override
 	public void visit(Decrement node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("decrementNode");
-		Variable variable = node.getVar();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(variable));
+		nodeTmpl.setAttribute("var", node.getVar().toString());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -145,8 +137,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("hasTokensNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", node.getTarget());
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
@@ -188,8 +179,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	@Override
 	public void visit(Increment node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("incrementNode");
-		Variable variable = node.getVar();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(variable));
+		nodeTmpl.setAttribute("var", node.getVar().toString());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -209,11 +199,8 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	public void visit(Load node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("loadNode");
 
-		LocalVariable target = node.getTarget();
-		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(target));
-
-		Variable source = node.getSource().getVariable();
-		nodeTmpl.setAttribute("source", varDefPrinter.getVarDefName(source));
+		nodeTmpl.setAttribute("target", node.getTarget());
+		nodeTmpl.setAttribute("source", node.getSource().getVariable());
 
 		List<Expression> indexes = node.getIndexes();
 		for (Expression index : indexes) {
@@ -228,8 +215,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("peekNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", node.getTarget());
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
@@ -246,8 +232,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("readNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", node.getTarget());
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
@@ -276,8 +261,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	public void visit(SelfAssignment node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("selfAssignmentNode");
 
-		Variable varDef = node.getVar();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", node.getVar());
 		nodeTmpl.setAttribute("op", node.getOp().getText());
 		nodeTmpl.setAttribute("expr", node.getValue().toString());
 
@@ -293,8 +277,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	public void visit(Store node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("storeNode");
 
-		Variable variable = node.getTarget().getVariable();
-		nodeTmpl.setAttribute("target", varDefPrinter.getVarDefName(variable));
+		nodeTmpl.setAttribute("target", node.getTarget().getVariable());
 
 		List<Expression> indexes = node.getIndexes();
 		for (Expression index : indexes) {
@@ -332,8 +315,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("writeNode");
 
 		// varDef contains the variable (with the same name as the port)
-		LocalVariable varDef = node.getTarget();
-		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
+		nodeTmpl.setAttribute("var", node.getTarget());
 		nodeTmpl.setAttribute("actorName", actorName);
 		nodeTmpl.setAttribute("fifoName", node.getPort());
 		nodeTmpl.setAttribute("numTokens", node.getNumTokens());
