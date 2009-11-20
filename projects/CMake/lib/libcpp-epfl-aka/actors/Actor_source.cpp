@@ -57,4 +57,3 @@ void Actor_source::process() {
 		cnt++;
 	}
 }
-

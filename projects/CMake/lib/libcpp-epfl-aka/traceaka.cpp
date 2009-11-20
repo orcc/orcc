@@ -184,4 +184,3 @@ void TraceAka::captureToken(FifoAPI* poFifo, std::string &msg)
 	fflush(poFile);
 #endif
 }
-
