@@ -425,13 +425,31 @@ public class XlimNodeTemplate {
 	 * @param kind
 	 *            Kind of operation
 	 * @param target
-	 *            Target of operation (optional)
+	 *            Target of operation
 	 * @return New created operation
 	 */
 	public static Element newTargetOperation(Element root, String kind,
 			String target) {
 		Element operation = newOperation(root, kind);
 		operation.setAttribute("target", target);
+		return operation;
+	}
+	
+	/**
+	 * New Operation
+	 * 
+	 * @param root
+	 *            Root Element
+	 * @param kind
+	 *            Kind of operation
+	 * @param name
+	 *            Name of operation
+	 * @return New created operation
+	 */
+	public static Element newNameOperation(Element root, String kind,
+			String name) {
+		Element operation = newOperation(root, kind);
+		operation.setAttribute("name", name);
 		return operation;
 	}
 

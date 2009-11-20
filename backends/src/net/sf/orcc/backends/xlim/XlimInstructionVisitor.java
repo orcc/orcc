@@ -198,17 +198,26 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	 *            Arguments sent (not used)
 	 */
 	public void visit(Load node, Object... args) {
-		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
-
-		String name = names.getVarName(node.getSource());
-		XlimNodeTemplate.newInPort(operationE, name);
-
+		Element operationE;
+		String name = null;
+		if(node.getSource().getVariable().getType().getType() == Type.LIST){
+			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root));
+			operationE = XlimNodeTemplate.newNameOperation(root, "var_ref", names.getVarName(node.getSource()));
+			XlimNodeTemplate.newInPort(operationE, names.getTempName());
+		}
+		else{
+			operationE = XlimNodeTemplate.newOperation(root, "noop");
+	
+			name = names.getVarName(node.getSource());
+			XlimNodeTemplate.newInPort(operationE, name);
+		}
+	
 		LocalVariable local = node.getTarget();
 		Type outtype = node.getTarget().getType();
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local),
 				outtype);
-
-		if (readMap.containsKey(name)) {
+	
+		if (name != null && readMap.containsKey(name)) {
 			outtype.accept(new XlimTypeSizeVisitor(readMap.get(name)));
 		}
 	}
