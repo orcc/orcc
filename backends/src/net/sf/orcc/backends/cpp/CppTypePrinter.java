@@ -28,20 +28,21 @@
  */
 package net.sf.orcc.backends.cpp;
 
-import net.sf.orcc.backends.c.TypeToString;
+import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
- * C++ type printer.
+ * This class defines a C++ type printer. It extends the C type printer by
+ * printing booleans as <code>bool</code>s, not <code>int</code>s.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CppTypePrinter extends TypeToString implements TypeVisitor {
+public class CppTypePrinter extends CTypePrinter {
 
 	@Override
 	public void visit(BoolType type) {
 		builder.append("bool");
 	}
+
 }

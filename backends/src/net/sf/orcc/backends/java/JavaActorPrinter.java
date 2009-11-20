@@ -32,6 +32,11 @@ import java.io.IOException;
 
 import net.sf.orcc.backends.c.CActorPrinter;
 import net.sf.orcc.backends.c.VarDefPrinter;
+import net.sf.orcc.backends.cpp.CppConstPrinter;
+import net.sf.orcc.backends.cpp.CppExprPrinter;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 
 /**
  * Actor printer.
@@ -49,10 +54,28 @@ public class JavaActorPrinter extends CActorPrinter {
 	 */
 	public JavaActorPrinter() throws IOException {
 		super("Java_actor");
-		constPrinter = new JavaConstPrinter(group);
-		typePrinter = new JavaTypePrinter();
-		varDefPrinter = new VarDefPrinter(typePrinter);
-		exprPrinter = new JavaExprPrinter(varDefPrinter);
+		varDefPrinter = new VarDefPrinter();
+	}
+
+	@Override
+	public String toString(Constant constant) {
+		CppConstPrinter printer = new CppConstPrinter(group);
+		constant.accept(printer);
+		return printer.toString();
+	}
+
+	@Override
+	public String toString(Expression expression) {
+		CppExprPrinter printer = new CppExprPrinter();
+		expression.accept(printer, Integer.MAX_VALUE);
+		return printer.toString();
+	}
+
+	@Override
+	public String toString(Type type) {
+		JavaTypePrinter printer = new JavaTypePrinter();
+		type.accept(printer);
+		return printer.toString();
 	}
 
 }

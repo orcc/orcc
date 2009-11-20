@@ -45,11 +45,8 @@ public class VarDefPrinter {
 
 	private ListSizePrinter listSizePrinter;
 
-	private TypeToString typeVisitor;
-
-	public VarDefPrinter(TypeToString typeVisitor) {
+	public VarDefPrinter() {
 		this.listSizePrinter = new ListSizePrinter();
-		this.typeVisitor = typeVisitor;
 	}
 
 	/**
@@ -63,7 +60,7 @@ public class VarDefPrinter {
 	public Map<String, Object> applyVarDef(Variable varDef) {
 		Map<String, Object> varDefMap = new HashMap<String, Object>();
 		varDefMap.put("name", getVarDefName(varDef));
-		varDefMap.put("type", typeVisitor.toString(varDef.getType()));
+		varDefMap.put("type", varDef.getType().toString());
 
 		// if varDef is a list, => list of dimensions
 		varDef.getType().accept(listSizePrinter);

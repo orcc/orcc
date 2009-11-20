@@ -306,9 +306,7 @@ public abstract class Variable implements INameable {
 	
 	@Override
 	public String toString() {
-		// WARNING: this is used as-is by templates, etc. BE CAREFUL when
-		// changing this function!
-		return name;
+		return Printer.getInstance().toString(this);
 	}
 
 }

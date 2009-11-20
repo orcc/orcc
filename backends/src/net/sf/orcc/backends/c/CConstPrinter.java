@@ -26,29 +26,59 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.java.debug;
+package net.sf.orcc.backends.c;
 
-import java.io.IOException;
+import java.util.List;
 
-import net.sf.orcc.backends.c.CNetworkPrinter;
-import net.sf.orcc.backends.java.JavaTypePrinter;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.consts.BoolConst;
+import net.sf.orcc.ir.consts.ListConst;
+import net.sf.orcc.ir.printers.DefaultConstantPrinter;
+
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
- * Network printer.
+ * This class defines a C constant printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class JavaDebugNetworkPrinter extends CNetworkPrinter {
+public class CConstPrinter extends DefaultConstantPrinter {
 
 	/**
-	 * Creates a new network printer with the template "Java_network.stg".
-	 * 
-	 * @throws IOException
-	 *             If the template file could not be read.
+	 * template group
 	 */
-	public JavaDebugNetworkPrinter() throws IOException {
-		super("Java_network_debug", new JavaTypePrinter());
+	private StringTemplateGroup group;
+
+	/**
+	 * Creates a new const printer from the given template group.
+	 * 
+	 * @param group
+	 *            template group
+	 */
+	public CConstPrinter(StringTemplateGroup group) {
+		this.group = group;
+	}
+
+	@Override
+	public void visit(BoolConst constant, Object... args) {
+		builder.append(constant.getValue() ? '1' : '0');
+	}
+
+	@Override
+	public void visit(ListConst constant, Object... args) {
+		// set instance of list template as current template
+		StringTemplate template = group.getInstanceOf("listValue");
+
+		List<Constant> list = constant.getValue();
+		for (Constant cst : list) {
+			template.setAttribute("value", cst.toString());
+		}
+
+		// restore previous template as current template, and set attribute
+		// "value" to the instance of the list template
+		builder.append(template.toString(80));
 	}
 
 }

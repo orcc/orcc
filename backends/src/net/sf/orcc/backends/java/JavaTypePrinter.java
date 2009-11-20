@@ -28,28 +28,28 @@
  */
 package net.sf.orcc.backends.java;
 
-import net.sf.orcc.backends.c.TypeToString;
-import net.sf.orcc.ir.Expression;
+import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.StringType;
-import net.sf.orcc.ir.type.TypeVisitor;
 import net.sf.orcc.ir.type.UintType;
 
 /**
- * Java type printer.
+ * This class defines a Java type printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class JavaTypePrinter extends TypeToString implements TypeVisitor {
-
-	protected void printInt(Expression expr) {
-		builder.append("int");
-	}
+public class JavaTypePrinter extends CTypePrinter {
 
 	@Override
 	public void visit(BoolType type) {
 		builder.append("boolean");
+	}
+
+	@Override
+	public void visit(IntType type) {
+		builder.append("int");
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class JavaTypePrinter extends TypeToString implements TypeVisitor {
 	@Override
 	public void visit(UintType type) {
 		// no unsigned in Java, and size is not taken in consideration anyway
-		printInt(null);
+		builder.append("int");
 	}
 
 }

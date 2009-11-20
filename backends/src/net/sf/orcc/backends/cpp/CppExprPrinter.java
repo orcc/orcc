@@ -28,31 +28,18 @@
  */
 package net.sf.orcc.backends.cpp;
 
-import net.sf.orcc.backends.c.ExprToString;
-import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.backends.c.CExpressionPrinter;
 import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
 
 /**
+ * This class defines a C++ expression printer. It refines the C expression
+ * printer by printing booleans as <code>true</code> and <code>false</code>
+ * rather than <code>1</code> and <code>0</code>.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CppExprPrinter extends ExprToString implements ExpressionVisitor {
-
-	public CppExprPrinter(VarDefPrinter varDefPrinter) {
-		super(varDefPrinter);
-	}
-	
-	public static String toString(BinaryOp op) {
-		switch (op) {
-		case DIV_INT:
-			return "/";
-		default:
-			return op.getText();
-		}
-	}
+public class CppExprPrinter extends CExpressionPrinter {
 
 	@Override
 	public Object visit(BoolExpr expr, Object... args) {

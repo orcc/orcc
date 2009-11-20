@@ -33,7 +33,7 @@ import java.io.IOException;
 import net.sf.orcc.backends.c.CNetworkPrinter;
 
 /**
- * Network printer.
+ * This class defines a C++ network printer.
  * 
  * @author Matthieu Wipliez
  * 
@@ -41,12 +41,15 @@ import net.sf.orcc.backends.c.CNetworkPrinter;
 public class CppNetworkPrinter extends CNetworkPrinter {
 
 	/**
-	 * Creates a new network printer with the template "Java_network.stg".
+	 * Creates a new network printer with the given template.
 	 * 
+	 * @param tmplName
+	 *            template name
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public CppNetworkPrinter(String tmpl_name) throws IOException {
-		super(tmpl_name, new CppTypePrinter());
+	public CppNetworkPrinter(String tmplName) throws IOException {
+		super(tmplName);
 	}
+
 }

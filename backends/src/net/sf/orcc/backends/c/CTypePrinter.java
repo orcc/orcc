@@ -26,28 +26,76 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.java;
+package net.sf.orcc.backends.c;
 
-import net.sf.orcc.backends.c.ExprToString;
-import net.sf.orcc.backends.c.VarDefPrinter;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.printers.DefaultTypePrinter;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 
 /**
+ * This class defines a C type printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class JavaExprPrinter extends ExprToString implements ExpressionVisitor {
+public class CTypePrinter extends DefaultTypePrinter {
 
-	public JavaExprPrinter(VarDefPrinter varDefPrinter) {
-		super(varDefPrinter);
+	private void printInt(Expression expr) {
+		try {
+			int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+
+			if (size <= 8) {
+				builder.append("char");
+			} else if (size <= 16) {
+				builder.append("short");
+			} else if (size <= 32) {
+				builder.append("int");
+			} else if (size <= 64) {
+				builder.append("long long");
+			}
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public Object visit(BoolExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "true" : "false");
-		return null;
+	public void visit(BoolType type) {
+		// boolean is a C int.
+		builder.append("int");
+	}
+
+	@Override
+	public void visit(IntType type) {
+		printInt(type.getSize());
+	}
+
+	@Override
+	public void visit(ListType type) {
+		// size will be printed later
+		type.getElementType().accept(this);
+	}
+
+	@Override
+	public void visit(StringType type) {
+		builder.append("char *");
+	}
+
+	@Override
+	public void visit(UintType type) {
+		builder.append("unsigned ");
+		printInt(type.getSize());
+	}
+
+	@Override
+	public void visit(VoidType type) {
+		builder.append("void");
 	}
 
 }

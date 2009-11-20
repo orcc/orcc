@@ -9,7 +9,6 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.c.CNetworkPrinter;
-import net.sf.orcc.backends.c.TypeToString;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
@@ -52,7 +51,7 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 	private HashMap<String, String> customBuffersSize;
 
 	public CQuasiStaticNetworkPrinter() throws IOException {
-		super("C_quasistatic_network", new TypeToString());
+		super("C_quasistatic_network");
 		initBuffersMap();
 	}
 
@@ -86,8 +85,7 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 				Broadcast bcast = (Broadcast) instance;
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("id", bcast.getId());
-				Type type = bcast.getType();
-				attrs.put("type", typeVisitor.toString(type));
+				attrs.put("type", bcast.getType().toString());
 
 				List<Integer> num = new ArrayList<Integer>();
 				for (int i = 0; i < bcast.getNumOutput(); i++) {
@@ -145,7 +143,7 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 			Map<String, Object> attrs = new HashMap<String, Object>();
 			attrs.put("count", fifoCount);
 			attrs.put("size", size);
-			attrs.put("type", typeVisitor.toString(type));
+			attrs.put("type", type.toString());
 			attrs.put("source", source.getId());
 			attrs.put("src_port", connection.getSource().getName());
 			attrs.put("target", target.getId());

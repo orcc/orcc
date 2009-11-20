@@ -28,20 +28,18 @@
  */
 package net.sf.orcc.backends.cpp;
 
-import net.sf.orcc.backends.c.ConstPrinter;
+import net.sf.orcc.backends.c.CConstPrinter;
 import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstantVisitor;
 
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
- * Sets the "value" attribute of the given top-level template to the value of
- * the constant visited. If it is a list, uses the "listValue" template.
+ * This class defines a C++ constant printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CppConstPrinter extends ConstPrinter implements ConstantVisitor {
+public class CppConstPrinter extends CConstPrinter {
 
 	/**
 	 * Creates a new const printer from the given template group.
@@ -55,7 +53,7 @@ public class CppConstPrinter extends ConstPrinter implements ConstantVisitor {
 
 	@Override
 	public void visit(BoolConst constant, Object... args) {
-		template.setAttribute("value", constant.getValue() ? "true" : "false");
+		builder.append(constant.getValue() ? "true" : "false");
 	}
 
 }

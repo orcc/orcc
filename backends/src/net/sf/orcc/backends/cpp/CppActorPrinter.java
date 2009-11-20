@@ -37,6 +37,8 @@ import net.sf.orcc.backends.c.CActorPrinter;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
@@ -60,10 +62,7 @@ public class CppActorPrinter extends CActorPrinter {
 	 */
 	public CppActorPrinter(String tmpl_name) throws IOException {
 		super(tmpl_name);
-		constPrinter = new CppConstPrinter(group);
-		typePrinter = new CppTypePrinter();
-		varDefPrinter = new VarDefPrinter(typePrinter);
-		exprPrinter = new CppExprPrinter(varDefPrinter);
+		varDefPrinter = new VarDefPrinter();
 	}
 
 	protected StringTemplate applyProc(String actorName, Procedure proc) {
@@ -74,8 +73,7 @@ public class CppActorPrinter extends CActorPrinter {
 		procTmpl.setAttribute("name", proc.getName());
 
 		// return type
-		Type type = proc.getReturnType();
-		procTmpl.setAttribute("type", typePrinter.toString(type));
+		procTmpl.setAttribute("type", proc.getReturnType().toString());
 
 		// parameters
 		List<Object> varDefs = new ArrayList<Object>();
@@ -95,10 +93,31 @@ public class CppActorPrinter extends CActorPrinter {
 
 		// body
 		NodePrinterTemplate printer = new CppNodePrinter(group, procTmpl,
-				actorName, varDefPrinter, exprPrinter);
+				actorName, varDefPrinter);
 		for (CFGNode node : proc.getNodes()) {
 			node.accept(printer);
 		}
 		return procTmpl;
+	}
+
+	@Override
+	public String toString(Constant constant) {
+		CppConstPrinter printer = new CppConstPrinter(group);
+		constant.accept(printer);
+		return printer.toString();
+	}
+
+	@Override
+	public String toString(Expression expression) {
+		CppExprPrinter printer = new CppExprPrinter();
+		expression.accept(printer, Integer.MAX_VALUE);
+		return printer.toString();
+	}
+
+	@Override
+	public String toString(Type type) {
+		CppTypePrinter printer = new CppTypePrinter();
+		type.accept(printer);
+		return printer.toString();
 	}
 }

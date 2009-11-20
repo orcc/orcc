@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.cpp;
 
-import net.sf.orcc.backends.c.ExprToString;
 import net.sf.orcc.backends.c.NodePrinterTemplate;
 import net.sf.orcc.backends.c.VarDefPrinter;
 import net.sf.orcc.ir.LocalVariable;
@@ -47,9 +46,8 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 public class CppNodePrinter extends NodePrinterTemplate {
 
 	public CppNodePrinter(StringTemplateGroup group, StringTemplate template,
-			String id, VarDefPrinter varDefPrinter, ExprToString exprPrinter) {
-
-		super(group, template, id, varDefPrinter, exprPrinter);
+			String id, VarDefPrinter varDefPrinter) {
+		super(group, template, id, varDefPrinter);
 	}
 
 	@Override

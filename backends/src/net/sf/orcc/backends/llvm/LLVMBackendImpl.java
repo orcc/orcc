@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.NameTransformer;
@@ -48,7 +47,7 @@ import net.sf.orcc.network.transforms.BroadcastAdder;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMBackendImpl extends AbstractBackend implements IBackend {
+public class LLVMBackendImpl extends AbstractBackend {
 
 	/**
 	 * 

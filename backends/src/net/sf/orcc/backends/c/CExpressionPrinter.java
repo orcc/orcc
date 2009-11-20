@@ -26,36 +26,29 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.java;
+package net.sf.orcc.backends.c;
 
-import net.sf.orcc.backends.c.ConstPrinter;
-import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstantVisitor;
-
-import org.antlr.stringtemplate.StringTemplateGroup;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 
 /**
- * Sets the "value" attribute of the given top-level template to the value of
- * the constant visited. If it is a list, uses the "listValue" template.
+ * This class defines a C expression printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class JavaConstPrinter extends ConstPrinter implements ConstantVisitor {
+public class CExpressionPrinter extends DefaultExpressionPrinter {
 
-	/**
-	 * Creates a new const printer from the given template group.
-	 * 
-	 * @param group
-	 *            template group
-	 */
-	public JavaConstPrinter(StringTemplateGroup group) {
-		super(group);
+	@Override
+	public Object visit(BoolExpr expr, Object... args) {
+		builder.append(expr.getValue() ? '1' : '0');
+		return null;
 	}
 
 	@Override
-	public void visit(BoolConst constant, Object... args) {
-		template.setAttribute("value", constant.getValue() ? "true" : "false");
+	public Object visit(ListExpr expr, Object... args) {
+		throw new IllegalArgumentException("List expression not supported");
 	}
 
 }

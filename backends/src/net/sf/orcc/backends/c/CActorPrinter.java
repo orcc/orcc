@@ -39,7 +39,11 @@ import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
@@ -55,17 +59,11 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Matthieu Wipliez
  * 
  */
-public class CActorPrinter {
-
-	protected ConstPrinter constPrinter;
-
-	protected ExprToString exprPrinter;
+public class CActorPrinter extends Printer {
 
 	protected StringTemplateGroup group;
 
 	protected StringTemplate template;
-
-	protected TypeToString typePrinter;
 
 	protected VarDefPrinter varDefPrinter;
 
@@ -78,10 +76,7 @@ public class CActorPrinter {
 	public CActorPrinter() throws IOException {
 		this("C_actor");
 
-		constPrinter = new ConstPrinter(group);
-		typePrinter = new TypeToString();
-		varDefPrinter = new VarDefPrinter(typePrinter);
-		exprPrinter = new ExprToString(varDefPrinter);
+		varDefPrinter = new VarDefPrinter();
 	}
 
 	/**
@@ -94,6 +89,9 @@ public class CActorPrinter {
 	 */
 	protected CActorPrinter(String name) throws IOException {
 		group = new TemplateGroupLoader().loadGroup(name);
+
+		// registers this printer as the default printer
+		Printer.register(this);
 	}
 
 	/**
@@ -112,7 +110,7 @@ public class CActorPrinter {
 
 		// return type
 		Type type = proc.getReturnType();
-		procTmpl.setAttribute("type", typePrinter.toString(type));
+		procTmpl.setAttribute("type", type.toString());
 
 		// parameters
 		List<Object> varDefs = new ArrayList<Object>();
@@ -132,7 +130,7 @@ public class CActorPrinter {
 
 		// body
 		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
-				id, varDefPrinter, exprPrinter);
+				id, varDefPrinter);
 		for (CFGNode node : proc.getNodes()) {
 			node.accept(printer);
 		}
@@ -244,9 +242,53 @@ public class CActorPrinter {
 
 			// initial value of state var (if any)
 			if (stateVar.hasInit()) {
-				constPrinter.setTemplate(stateTempl);
-				stateVar.getInit().accept(constPrinter);
+				stateTempl.setAttribute("value", stateVar.getInit().toString());
 			}
 		}
 	}
+
+	@Override
+	public String toString(CFGNode node) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toString(Constant constant) {
+		CConstPrinter printer = new CConstPrinter(group);
+		constant.accept(printer);
+		return printer.toString();
+	}
+
+	@Override
+	public String toString(Expression expression) {
+		CExpressionPrinter printer = new CExpressionPrinter();
+		expression.accept(printer, Integer.MAX_VALUE);
+		return printer.toString();
+	}
+
+	@Override
+	public String toString(Instruction instruction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toString(Procedure procedure) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String toString(Type type) {
+		CTypePrinter printer = new CTypePrinter();
+		type.accept(printer);
+		return printer.toString();
+	}
+
+	@Override
+	public String toString(Variable variable) {
+		return variable.getName();
+	}
+
 }

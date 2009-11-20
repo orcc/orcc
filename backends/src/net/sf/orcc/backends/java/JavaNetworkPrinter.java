@@ -47,7 +47,7 @@ public class JavaNetworkPrinter extends CNetworkPrinter {
 	 *             If the template file could not be read.
 	 */
 	public JavaNetworkPrinter() throws IOException {
-		super("Java_network", new JavaTypePrinter());
+		super("Java_network");
 	}
 
 }

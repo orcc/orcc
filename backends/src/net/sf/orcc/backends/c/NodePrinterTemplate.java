@@ -79,8 +79,6 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 
 	protected String attrName;
 
-	protected ExprToString exprPrinter;
-
 	protected StringTemplateGroup group;
 
 	protected StringTemplate template;
@@ -88,11 +86,9 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	protected VarDefPrinter varDefPrinter;
 
 	public NodePrinterTemplate(StringTemplateGroup group,
-			StringTemplate template, String id, VarDefPrinter varDefPrinter,
-			ExprToString exprPrinter) {
+			StringTemplate template, String id, VarDefPrinter varDefPrinter) {
 		attrName = "nodes";
 		this.actorName = id;
-		this.exprPrinter = exprPrinter;
 		this.group = group;
 		this.template = template;
 		this.varDefPrinter = varDefPrinter;
@@ -105,7 +101,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		// varDef contains the variable (with the same name as the port)
 		LocalVariable varDef = node.getTarget();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue()));
+		nodeTmpl.setAttribute("expr", node.getValue().toString());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -129,8 +125,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 
 		nodeTmpl.setAttribute("name", node.getProcedure().getName());
 		for (Expression parameter : node.getParameters()) {
-			nodeTmpl
-					.setAttribute("parameters", exprPrinter.toString(parameter));
+			nodeTmpl.setAttribute("parameters", parameter.toString());
 		}
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -164,7 +159,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 		StringTemplate nodeTmpl = group.getInstanceOf("ifNode");
 
 		Expression expr = node.getValue();
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(expr));
+		nodeTmpl.setAttribute("expr", expr.toString());
 
 		// save current template
 		StringTemplate previousTempl = template;
@@ -222,7 +217,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 
 		List<Expression> indexes = node.getIndexes();
 		for (Expression index : indexes) {
-			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index));
+			nodeTmpl.setAttribute("indexes", index.toString());
 		}
 
 		template.setAttribute(attrName, nodeTmpl);
@@ -273,7 +268,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	@Override
 	public void visit(Return node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("returnNode");
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue()));
+		nodeTmpl.setAttribute("expr", node.getValue().toString());
 		template.setAttribute(attrName, nodeTmpl);
 	}
 
@@ -283,8 +278,8 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 
 		Variable varDef = node.getVar();
 		nodeTmpl.setAttribute("var", varDefPrinter.getVarDefName(varDef));
-		nodeTmpl.setAttribute("op", ExprToString.toString(node.getOp()));
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue()));
+		nodeTmpl.setAttribute("op", node.getOp().getText());
+		nodeTmpl.setAttribute("expr", node.getValue().toString());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -303,9 +298,9 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 
 		List<Expression> indexes = node.getIndexes();
 		for (Expression index : indexes) {
-			nodeTmpl.setAttribute("indexes", exprPrinter.toString(index));
+			nodeTmpl.setAttribute("indexes", index.toString());
 		}
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(node.getValue()));
+		nodeTmpl.setAttribute("expr", node.getValue().toString());
 
 		template.setAttribute(attrName, nodeTmpl);
 	}
@@ -314,7 +309,7 @@ public class NodePrinterTemplate implements CInstructionVisitor, NodeVisitor {
 	public Object visit(WhileNode node, Object... args) {
 		StringTemplate nodeTmpl = group.getInstanceOf("whileNode");
 		Expression expr = node.getValue();
-		nodeTmpl.setAttribute("expr", exprPrinter.toString(expr));
+		nodeTmpl.setAttribute("expr", expr.toString());
 
 		// save current template
 		StringTemplate previousTempl = template;

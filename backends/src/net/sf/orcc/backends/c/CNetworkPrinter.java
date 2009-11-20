@@ -57,7 +57,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import org.jgrapht.DirectedGraph;
 
 /**
- * Network printer.
+ * This class defines a C network printer.
  * 
  * @author Matthieu Wipliez
  * 
@@ -73,19 +73,13 @@ public class CNetworkPrinter {
 	protected StringTemplate template;
 
 	/**
-	 * typeVisitor is protected in order to be visible to
-	 * CQuasiStaticNetworkPrinter
-	 */
-	protected TypeToString typeVisitor;
-
-	/**
 	 * Creates a new network printer with the template "C.st".
 	 * 
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
 	public CNetworkPrinter() throws IOException {
-		this("C_network", new TypeToString());
+		this("C_network");
 	}
 
 	/**
@@ -96,10 +90,8 @@ public class CNetworkPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected CNetworkPrinter(String name, TypeToString typeVisitor)
-			throws IOException {
+	protected CNetworkPrinter(String name) throws IOException {
 		group = new TemplateGroupLoader().loadGroup(name);
-		this.typeVisitor = typeVisitor;
 	}
 
 	/**
@@ -182,8 +174,7 @@ public class CNetworkPrinter {
 				Broadcast bcast = (Broadcast) instance;
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("id", bcast.getId());
-				Type type = bcast.getType();
-				attrs.put("type", typeVisitor.toString(type));
+				attrs.put("type", bcast.getType().toString());
 
 				List<Integer> num = new ArrayList<Integer>();
 				for (int i = 0; i < bcast.getNumOutput(); i++) {
@@ -244,7 +235,7 @@ public class CNetworkPrinter {
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("count", fifoCount);
 				attrs.put("size", size);
-				attrs.put("type", typeVisitor.toString(type));
+				attrs.put("type", type.toString());
 				attrs.put("source", source.getId());
 				attrs.put("src_port", connection.getSource().getName());
 				attrs.put("target", target.getId());
