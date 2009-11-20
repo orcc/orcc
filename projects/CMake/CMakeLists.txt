@@ -8,12 +8,11 @@ project (Orcc)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${Orcc_SOURCE_DIR}/modules)
 
 # Common packages required
-find_package(APR REQUIRED)
 find_package(SDL REQUIRED)
 find_package(SDL_image REQUIRED)
 
 # Common include directories
-include_directories(${APR_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
+include_directories(${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
 
 # Orcc library
 include_directories(${Orcc_SOURCE_DIR}/include/liborcc )
@@ -23,6 +22,7 @@ ${Orcc_SOURCE_DIR}/lib/liborcc/actors/img_display.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/actors/img_read.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/actors/source.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/orcc_util.c
+${Orcc_SOURCE_DIR}/lib/liborcc/getopt.c
 )
 
 # C JSON library

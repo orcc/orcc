@@ -22,4 +22,4 @@ serialize.c
 transpose.c
 )
 
-target_link_libraries(MPEG4_SP_Decoder_Serial liborcc ${APR_LIBRARY} ${SDL_LIBRARY})
+target_link_libraries(MPEG4_SP_Decoder_Serial liborcc ${SDL_LIBRARY})

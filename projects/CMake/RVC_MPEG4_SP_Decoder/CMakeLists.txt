@@ -63,4 +63,4 @@ transpose_01.c
 transpose_02.c
 )
 
-target_link_libraries(RVC_MPEG4_SP_Decoder liborcc ${APR_LIBRARY} ${SDL_LIBRARY})
+target_link_libraries(RVC_MPEG4_SP_Decoder liborcc ${SDL_LIBRARY})

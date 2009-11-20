@@ -29,8 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <apr_lib.h>
-#include <apr_getopt.h>
+#include <string.h>
 
 // define to 1 if your system has the termios.h header
 #define HAS_TERMIOS 0
@@ -43,15 +42,14 @@
 	#endif
 #endif
 
+extern char	*optarg;
+extern int getopt(int nargc, char * const *nargv, const char *ostr);
+
 // input file
 char *input_file;
 
 // output YUV file
 char *yuv_file;
-
-// option structure
-// static, but could be made global if deemed necessary
-static apr_getopt_t *os;
 
 // Pause function
 void pause() {
@@ -85,99 +83,45 @@ void pause() {
 }
 
 // print APR error and exit
-void print_and_exit(apr_status_t statcode) {
-	char buf[1024];
-	apr_strerror(statcode, buf, 1024);
-	puts(buf);
+void print_and_exit(const char *msg) {
 	pause();
 	exit(1);
 }
 
 static const char *usage = "%s: -i <file> ...\n";
-static struct apr_getopt_option_t options[] = {
-	{ "input", 'i', 1, "INPUT\tSets the input file" },
-	{ "yuv", 256, 1, "YUV\t\tSets the YUV file to compare the video against" }
-};
-static int num_options = sizeof(options) / sizeof(struct apr_getopt_option_t);
 
-// print_usage prints msg and the different options.
 void print_usage() {
-	int i;
-	
-	printf(usage, apr_filepath_name_get(os->argv[0]));
-
-	for (i = 0; i < num_options; i++) {
-		struct apr_getopt_option_t option = options[i];
-		if (option.optch < 256) {
-			if (option.name == NULL) {
-				printf("  -%c ", option.optch);
-			} else {
-				printf("  -%c, --%s", option.optch, option.name);
-				if (option.has_arg) {
-					printf("=");
-				} else {
-					printf(" ");
-				}
-			}
-		} else {
-			printf("      --%s", option.name);
-			if (option.has_arg) {
-				printf("=");
-			} else {
-				printf(" ");
-			}
-		}
-
-		printf("%s\n", option.description);
-	}
-}
-
-// Parses command-line options: -i, --yuv
-static void parse_options() {
-	int option_ch;
-	char *option_arg;
-	apr_status_t statcode;
-
-	statcode = apr_getopt_long(os, options, &option_ch, &option_arg);
-	while (statcode == APR_SUCCESS) {
-		if (option_ch == 'i') {
-			input_file = strdup(option_arg);
-		} else if (option_ch == 256) {
-			yuv_file = strdup(option_arg);
-		}
-
-		statcode = apr_getopt_long(os, options, &option_ch, &option_arg);
-	}
-
-	if (statcode == APR_BADCH || statcode == APR_BADARG) {
-		print_usage();
-		print_and_exit(statcode);
-	}
+	printf(usage);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[], char *env[]) {
-	apr_pool_t *pool;
-	apr_status_t statcode;
-	
-	statcode = apr_app_initialize(&argc, &argv, &env);
-	if (statcode != APR_SUCCESS) {
-		print_and_exit(statcode);
+	int c;
+
+	c = getopt(argc, argv, "i:y:");
+	while (c != -1) {
+		switch (c) {
+		case '?': // BADCH
+			fprintf(stderr, "unknown argument\n");
+			exit(1);
+		case ':': // BADARG
+			fprintf(stderr, "missing argument\n");
+			exit(1);
+		case 'i':
+			input_file = _strdup(optarg);
+			break;
+		case 'o':
+			yuv_file = _strdup(optarg);
+			break;
+		default:
+			if (optarg != NULL)
+				printf(" -%c %s", c, optarg);
+			else
+				printf(" -%c", c);
+			break;
+		}
+
+		c = getopt(argc, argv, argv[1]);
 	}
-
-	// will call apr_terminate when program exits
-	atexit(apr_terminate);
-
-	statcode = apr_pool_create(&pool, NULL);
-	if (statcode != APR_SUCCESS) {
-		print_and_exit(statcode);
-	}
-
-	statcode = apr_getopt_init(&os, pool, argc, argv);
-	if (statcode != APR_SUCCESS) {
-		print_and_exit(statcode);
-	}
-
-	parse_options();
 }

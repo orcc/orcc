@@ -33,4 +33,4 @@ zigzag.c
 zzaddr.c
 )
 
-target_link_libraries(MPEG4_SP_Decoder liborcc ${APR_LIBRARY} ${SDL_LIBRARY})
+target_link_libraries(MPEG4_SP_Decoder liborcc ${SDL_LIBRARY})

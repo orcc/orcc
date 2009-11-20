@@ -5,4 +5,4 @@ Top_sobel.c
 y2rgb.c
 )
 
-target_link_libraries(Seam_carving liborcc ${APR_LIBRARY} ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY})
+target_link_libraries(Seam_carving liborcc ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY})
