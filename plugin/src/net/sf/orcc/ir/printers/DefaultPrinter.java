@@ -53,8 +53,9 @@ public class DefaultPrinter extends Printer {
 
 	@Override
 	public String toString(Constant constant) {
-		// TODO Auto-generated method stub
-		return null;
+		DefaultConstantPrinter printer = new DefaultConstantPrinter();
+		constant.accept(printer);
+		return printer.toString();
 	}
 
 	@Override

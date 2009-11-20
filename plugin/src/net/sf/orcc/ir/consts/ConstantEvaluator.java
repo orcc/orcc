@@ -29,6 +29,8 @@
 package net.sf.orcc.ir.consts;
 
 /**
+ * This class defines a constant evaluator.
+ * 
  * @author Pierre-Laurent Lagalaye
  * 
  */

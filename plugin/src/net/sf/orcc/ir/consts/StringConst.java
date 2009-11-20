@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.consts;
 
-import net.sf.orcc.ir.Constant;
 
 /**
  * This class defines a string constant.
@@ -36,7 +35,7 @@ import net.sf.orcc.ir.Constant;
  * @author Matthieu Wipliez
  * 
  */
-public class StringConst implements Constant {
+public class StringConst extends AbstractConstant {
 
 	private String value;
 
@@ -78,11 +77,6 @@ public class StringConst implements Constant {
 	 */
 	public String getValue() {
 		return value;
-	}
-
-	@Override
-	public String toString() {
-		return "\"" + value + "\"";
 	}
 
 }

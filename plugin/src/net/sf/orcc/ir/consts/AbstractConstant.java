@@ -34,6 +34,7 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -45,7 +46,7 @@ import net.sf.orcc.ir.expr.StringExpr;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractConstant {
+public abstract class AbstractConstant implements Constant {
 
 	/**
 	 * Returns a constant created by evaluating the given expression.
@@ -77,6 +78,11 @@ public abstract class AbstractConstant {
 		} else {
 			throw new OrccException("this expression is not constant");
 		}
+	}
+
+	@Override
+	public String toString() {
+		return Printer.getInstance().toString(this);
 	}
 
 }

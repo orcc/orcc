@@ -29,6 +29,8 @@
 package net.sf.orcc.ir.consts;
 
 /**
+ * This interface defines a constant visitor.
+ * 
  * @author Matthieu Wipliez
  * 
  */

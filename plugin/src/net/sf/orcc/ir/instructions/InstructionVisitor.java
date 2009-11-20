@@ -39,141 +39,141 @@ public interface InstructionVisitor {
 	/**
 	 * Visits an assign instruction.
 	 * 
-	 * @param node
+	 * @param assign
 	 *            an assign instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(Assign node, Object... args);
+	public void visit(Assign assign, Object... args);
 
 	/**
 	 * Visits a call instruction.
 	 * 
-	 * @param node
+	 * @param call
 	 *            a call instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(Call node, Object... args);
+	public void visit(Call call, Object... args);
 
 	/**
 	 * Visits a hasTokens instruction.
 	 * 
-	 * @param node
-	 *            a hasTokens instruction
+	 * @param hasTokens
+	 *            an hasTokens instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(HasTokens node, Object... args);
+	public void visit(HasTokens hasTokens, Object... args);
 
 	/**
 	 * Visits an initPort instruction.
 	 * 
-	 * @param node
+	 * @param initPort
 	 *            an initPort instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(InitPort node, Object... args);
+	public void visit(InitPort initPort, Object... args);
 
 	/**
 	 * Visits a load instruction.
 	 * 
-	 * @param node
+	 * @param load
 	 *            a load instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(Load node, Object... args);
+	public void visit(Load load, Object... args);
 
 	/**
 	 * Visits a peek instruction.
 	 * 
-	 * @param node
+	 * @param peek
 	 *            a peek instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(Peek node, Object... args);
+	public void visit(Peek peek, Object... args);
 
 	/**
 	 * Visits a phi assignment instruction.
 	 * 
-	 * @param node
+	 * @param phi
 	 *            a phi assignment instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(PhiAssignment node, Object... args);
+	public void visit(PhiAssignment phi, Object... args);
 
 	/**
-	 * Visits a readBegin instruction.
+	 * Visits a read instruction.
 	 * 
-	 * @param node
-	 *            a readBegin instruction
+	 * @param read
+	 *            a read instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(Read node, Object... args);
+	public void visit(Read read, Object... args);
 
 	/**
 	 * Visits a readEnd instruction.
 	 * 
-	 * @param node
+	 * @param readEnd
 	 *            a readEnd instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(ReadEnd node, Object... args);
+	public void visit(ReadEnd readEnd, Object... args);
 
 	/**
 	 * Visits a return instruction.
 	 * 
-	 * @param node
+	 * @param returnInst
 	 *            a return instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(Return node, Object... args);
+	public void visit(Return returnInst, Object... args);
 
 	/**
 	 * Visits a specific instruction.
 	 * 
-	 * @param node
+	 * @param specific
 	 *            a specific instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(SpecificInstruction node, Object... args);
+	public void visit(SpecificInstruction specific, Object... args);
 
 	/**
 	 * Visits a store instruction.
 	 * 
-	 * @param node
+	 * @param store
 	 *            a store instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(Store node, Object... args);
+	public void visit(Store store, Object... args);
 
 	/**
-	 * Visits a writeBegin instruction.
+	 * Visits a write instruction.
 	 * 
-	 * @param node
-	 *            a writeBegin instruction
+	 * @param write
+	 *            a write instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(Write node, Object... args);
+	public void visit(Write write, Object... args);
 
 	/**
 	 * Visits a writeEnd instruction.
 	 * 
-	 * @param node
+	 * @param writeEnd
 	 *            a writeEnd instruction
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(WriteEnd node, Object... args);
+	public void visit(WriteEnd writeEnd, Object... args);
 
 }

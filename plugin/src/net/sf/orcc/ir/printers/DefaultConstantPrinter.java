@@ -26,51 +26,72 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.consts;
+package net.sf.orcc.ir.printers;
 
+import java.util.Iterator;
+import java.util.List;
+
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.consts.BoolConst;
+import net.sf.orcc.ir.consts.ConstantVisitor;
+import net.sf.orcc.ir.consts.IntConst;
+import net.sf.orcc.ir.consts.ListConst;
+import net.sf.orcc.ir.consts.StringConst;
 
 /**
- * This class defines an integer constant.
+ * This class defines the default constant printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class IntConst extends AbstractConstant {
+public class DefaultConstantPrinter implements ConstantVisitor {
 
-	private int value;
-
-	/**
-	 * Creates a new integer constant with the given value.
-	 * 
-	 * @param value
-	 *            the value of the constant
-	 */
-	public IntConst(int value) {
-		this.value = value;
-	}
-
-	@Override
-	public void accept(ConstantVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
-
-	@Override
-	public Object accept(ConstantInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-	
-	@Override
-	public int getType() {
-		return INT;
-	}
+	protected StringBuilder builder;
 
 	/**
-	 * Returns the value of this constant.
-	 * 
-	 * @return the value of this constant
+	 * Creates a new expression printer.
 	 */
-	public int getValue() {
-		return value;
+	public DefaultConstantPrinter() {
+		builder = new StringBuilder();
+	}
+
+	@Override
+	public String toString() {
+		return builder.toString();
+	}
+
+	@Override
+	public void visit(BoolConst constant, Object... args) {
+		builder.append(constant.getValue());
+	}
+
+	@Override
+	public void visit(IntConst constant, Object... args) {
+		builder.append(constant.getValue());
+	}
+
+	@Override
+	public void visit(ListConst constant, Object... args) {
+		List<Constant> list = constant.getValue();
+		if (list.isEmpty()) {
+			builder.append("[]");
+		} else {
+			Iterator<Constant> it = list.iterator();
+			builder.append('[');
+			builder.append(it.next().toString());
+			while (it.hasNext()) {
+				builder.append(", ");
+				builder.append(it.next().toString());
+			}
+			builder.append(']');
+		}
+	}
+
+	@Override
+	public void visit(StringConst constant, Object... args) {
+		builder.append('"');
+		builder.append(constant.getValue().replaceAll("\\\\", "\\\\\\\\"));
+		builder.append('"');
 	}
 
 }

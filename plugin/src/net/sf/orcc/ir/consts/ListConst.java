@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Constant;
  * @author Matthieu Wipliez
  * 
  */
-public class ListConst implements Constant {
+public class ListConst extends AbstractConstant {
 
 	private List<Constant> value;
 
@@ -80,11 +80,6 @@ public class ListConst implements Constant {
 	 */
 	public List<Constant> getValue() {
 		return value;
-	}
-
-	@Override
-	public String toString() {
-		return value.toString();
 	}
 
 }

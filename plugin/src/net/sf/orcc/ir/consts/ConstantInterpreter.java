@@ -29,7 +29,9 @@
 package net.sf.orcc.ir.consts;
 
 /**
- * @author Pierre-Laurent Lagalaye Wipliez
+ * This interface defines an interpreter for constants.
+ * 
+ * @author Pierre-Laurent Lagalaye
  * 
  */
 public interface ConstantInterpreter {
