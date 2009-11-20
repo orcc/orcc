@@ -138,4 +138,5 @@ bool FifoFanOut::hasTokens(unsigned pVal)
 {
 	// Force an exception while this method should not be called
 	assert(false);
+	return false;
 }
