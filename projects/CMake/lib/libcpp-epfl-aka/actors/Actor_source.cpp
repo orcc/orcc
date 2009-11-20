@@ -8,6 +8,7 @@ extern "C" {
 #include "orcc_util.h"
 };
 
+#include <stdlib.h>
 
 Actor_source::Actor_source():ActorGen(source_IPORT_SIZE, source_OPORT_SIZE)
 {
@@ -26,7 +27,7 @@ void Actor_source::initialize() {
 	F = fopen(input_file, "rb");
 	if (F == NULL) {
 		if (input_file == NULL) {
-			input_file = "<null>";
+			input_file = (char *) "<null>";
 		}
 
 		fprintf(stderr, "could not open file \"%s\"\n", fname);

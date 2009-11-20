@@ -6,6 +6,8 @@
 
 #include "actoraka.h"
 
+#include <stdio.h>
+
 enum source_Iports{
 source_IPORT_SIZE
 };

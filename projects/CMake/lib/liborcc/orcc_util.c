@@ -109,10 +109,10 @@ void init_orcc(int argc, char *argv[], char *env[]) {
 			fprintf(stderr, "missing argument\n");
 			exit(1);
 		case 'i':
-			input_file = _strdup(optarg);
+			input_file = strdup(optarg);
 			break;
 		case 'o':
-			yuv_file = _strdup(optarg);
+			yuv_file = strdup(optarg);
 			break;
 		default:
 			if (optarg != NULL)

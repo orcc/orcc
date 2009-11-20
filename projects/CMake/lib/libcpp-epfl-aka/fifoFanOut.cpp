@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne / AKATECH SA
+ * Copyright (c) 2009, Ecole Polytechnique Fï¿½dï¿½rale de Lausanne / AKATECH SA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne / AKATECH SA nor the names of its
+ *   * Neither the name of the Ecole Polytechnique Fï¿½dï¿½rale de Lausanne / AKATECH SA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -28,6 +28,8 @@
  */
 
 #include "fifoFanOut.h"
+
+#include <assert.h>
 
 FifoFanOut::FifoFanOut()
 {
@@ -64,26 +66,26 @@ void FifoFanOut::put(void *pVal, unsigned uNbVal)
 void FifoFanOut::get(void *pVal)
 {
 	// Force an exception while this method should not be called
-	_ASSERT(0);
+	assert(false);
 }
 
 void FifoFanOut::get(void *pVal, unsigned uNbVal)
 {
 	// Force an exception while this method should not be called
-	_ASSERT(0);
+	assert(false);
 }
 
 
 void FifoFanOut::peek(void *pVal)
 {
 	// Force an exception while this method should not be called
-	_ASSERT(0);
+	assert(false);
 }
 
 void FifoFanOut::peek(void *pVal, unsigned uNbVal)
 {
 	// Force an exception while this method should not be called
-	_ASSERT(0);
+	assert(false);
 }
 
 
@@ -134,7 +136,6 @@ bool FifoFanOut::hasRooms(unsigned uNbVal)
 
 bool FifoFanOut::hasTokens(unsigned pVal)
 {
-		// Force an exception while this method should not be called
-	_ASSERT(0);
-	return false;
+	// Force an exception while this method should not be called
+	assert(false);
 }
