@@ -41,11 +41,11 @@ import net.sf.orcc.ir.nodes.BlockNode;
  */
 public class Increment extends AbstractCInstruction {
 
-	private Variable variable;
+	private Variable target;
 
-	public Increment(BlockNode block, Location location, Variable variable) {
+	public Increment(BlockNode block, Location location, Variable target) {
 		super(block, location);
-		this.variable = variable;
+		this.target = target;
 	}
 
 	@Override
@@ -53,12 +53,12 @@ public class Increment extends AbstractCInstruction {
 		visitor.visit(this, args);
 	}
 
-	public Variable getVar() {
-		return variable;
+	public Variable getTarget() {
+		return target;
 	}
 
-	public void setVar(Variable variable) {
-		this.variable = variable;
+	public void setTarget(Variable target) {
+		this.target = target;
 	}
 
 }

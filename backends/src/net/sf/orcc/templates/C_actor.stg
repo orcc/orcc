@@ -4,8 +4,8 @@ group C_actor;
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-fifo(actorName, portName) ::= <<
-extern struct fifo_s *$actorName$_$portName$;
+fifo(actorName, port) ::= <<
+extern struct fifo_s *$actorName$_$port.name$;
 
 >>
 
@@ -39,12 +39,18 @@ $else$
 $type$ $name$$listSize(size)$
 $endif$>>
 
-// a state variable
-stateVar(vardef, value) ::= <<
-$if(value)$
-static $vardef$ = $value$;$\n$
+variableDeclaration(variable) ::= <<
+$variable.type$ $variable$$listSize(variable.type.dimensions)$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// State variables
+///////////////////////////////////////////////////////////////////////////////
+stateVar(variable) ::= <<
+$if(variable.init)$
+static $variableDeclaration(variable)$ = $variable.init$;$\n$
 $else$
-static $vardef$;$\n$
+static $variableDeclaration(variable)$;$\n$
 $endif$
 >>
 
@@ -52,120 +58,131 @@ $endif$
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-// assignment node
-assignVarNode(var, expr) ::= <<
-$var$ = $expr$;
-
+instructions(instructions) ::= <<
+$instructions: {$(it.class.simpleName)(it)$}$
 >>
 
-// call node
-callNode(res, name, parameters) ::= <<
-$if(res)$
-$res$ = 
-$endif$
-$name$($parameters; separator=", "$);
-
->>
-
-// decrement node
-decrementNode(var) ::= <<
-$var$--;
-
->>
-
-// hasTokens node
-hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = hasTokens($actorName$_$fifoName$, $numTokens$);
-
+nodes(nodes) ::= <<
+$nodes: {$(it.class.simpleName)(it)$}$
 >>
 
 // if node
-ifNode(expr, thenNodes, elseNodes) ::= <<
-if ($expr$) {
-	$thenNodes$}$if(elseNodes)$ else {
-	$elseNodes$}$endif$$\n$
+BlockNode(blockNode) ::= <<
+$instructions(blockNode.instructions)$
 >>
 
-// increment node
-incrementNode(var) ::= <<
-$var$++;
-
->>
-
-// load node
-loadNode(target, source, indexes) ::= <<
-$target$ = $source$$indexes : {[$it$]}$;
-
->>
-
-// peek node
-peekNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getPeekPtr($actorName$_$fifoName$, $numTokens$);
-
->>
-
-// read node
-readNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getReadPtr($actorName$_$fifoName$, $numTokens$);
-
->>
-
-// readEnd node
-readEndNode(actorName, fifoName) ::= <<
-setReadEnd($actorName$_$fifoName$);
-
->>
-
-// return node
-returnNode(expr) ::= <<
-return $expr$;
-
->>
-
-// self-assignment node
-selfAssignmentNode(var, op, expr) ::= <<
-$var$ $op$= $expr$;
-
->>
-
-// store node
-storeNode(target, indexes, expr) ::= <<
-$target$$indexes : {[$it$]}$ = $expr$;
-
+// if node
+IfNode(ifNode) ::= <<
+if ($ifNode.value$) {
+	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$ else {
+	$nodes(ifNode.elseNodes)$}$endif$$\n$
 >>
 
 // while node
-whileNode(expr, nodes) ::= <<
-while ($expr$) {
-	$nodes$}
-
->>
-
-// write node
-writeNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = getWritePtr($actorName$_$fifoName$, $numTokens$);
-
->>
-
-// writeEnd node
-writeEndNode(actorName, fifoName) ::= <<
-setWriteEnd($actorName$_$fifoName$);
+WhileNode(whileNode) ::= <<
+while ($whileNode.value$) {
+	$nodes(whileNode.nodes)$}
 
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Procedure and actions
+// Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-proc(name, type, parameters, locals, nodes) ::= <<
+Assign(assign) ::= <<
+$assign.target$ = $assign.value$;
 
-static $type$ $name$($parameters: {$it$}; wrap, anchor, separator=", "$) {
-$if(locals)$
-	$locals: {$it$;$\n$}$
+>>
+
+Call(call) ::= <<
+$if(call.target)$
+$call.target$ = 
+$endif$
+$call.procedure$($call.parameters; separator=", "$);
+
+>>
+
+Decrement(decrement) ::= <<
+$decrement.target$--;
+
+>>
+
+HasTokens(hasTokens) ::= <<
+$hasTokens.target$ = hasTokens(actorName_$hasTokens.port$, $hasTokens.numTokens$);
+
+>>
+
+Increment(increment) ::= <<
+$increment.target$++;
+
+>>
+
+Load(load) ::= <<
+$load.target$ = $load.source$$load.indexes : {[$it$]}$;
+
+>>
+
+Peek(peek) ::= <<
+$peek.target$ = getPeekPtr(actorName_$peek.port$, $peek.numTokens$);
+
+>>
+
+Read(read) ::= <<
+$read.target$ = getReadPtr(actorName_$read.port$, $read.numTokens$);
+
+>>
+
+ReadEnd(readEnd) ::= <<
+setReadEnd(actorName_$readEnd.port$);
+
+>>
+
+Return(return) ::= <<
+return $return.value$;
+
+>>
+
+SelfAssignment(selfAssign) ::= <<
+$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
+
+>>
+
+Store(store) ::= <<
+$store.target$$store.indexes : {[$it$]}$ = $store.value$;
+
+>>
+
+Write(write) ::= <<
+$write.target$ = getWritePtr(actorName_$write.port$, $write.numTokens$);
+
+>>
+
+WriteEnd(writeEnd) ::= <<
+setWriteEnd(actorName_$writeEnd.port$);
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Procedure
+///////////////////////////////////////////////////////////////////////////////
+
+procedure(procedure) ::= <<
+
+static $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
+$if(procedure.locals.list)$
+	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
 
 $endif$
-	$nodes$}
+	$procedure.nodes: {$(it.class.simpleName)(it)$}$}
 
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+action(action) ::= <<
+$procedure(action.body)$$procedure(action.scheduler)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -312,9 +329,8 @@ int $actorName$_scheduler() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(name, inputs, outputs, stateVars, procs,
-      actions, initializes, scheduler, initialize) ::= <<
-// Generated from "$name$"
+actor(name, actor) ::= <<
+// Generated from "$actor.name$"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -323,38 +339,39 @@ actor(name, inputs, outputs, stateVars, procs,
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-$inputs: fifo(actorName=name, portName=it)$
+$actor.inputs.list: fifo(actorName=name, port=it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-$outputs: fifo(actorName=name, portName=it)$
+$actor.outputs.list: fifo(actorName=name, port=it)$
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
-$stateVars$
+$actor.stateVars.list: stateVar(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-$procs$
+$actor.procs.list: procedure(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-$actions$
-$if(initializes)$
+$actor.actions: action(it)$
+$if(actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-$initializes$
+$actor.initializes: action(it)$
 void $name$_initialize() {
 	int res = 1;
 	int i = 0;
 
-	$if(initialize)$
-	$schedulingTest(actorName=name, actions=initialize)$
+	$if(actor.initializes)$
+	$schedulingTest(actorName=name, actions=actor.initializes)$
 	$endif$
 }
 
 $endif$
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
-$if(scheduler.fsm)$
-$schedulerFSM(actorName=name, actions=scheduler.actions, fsm=scheduler.fsm)$
+$if(actor.actionScheduler.fsm)$
+$schedulerFSM(actorName=name, actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 $else$
-$scheduler(actorName=name, actions=scheduler.actions)$
+$scheduler(actorName=name, actions=actor.actionScheduler.actions)$
 $endif$
+
 >>

@@ -28,18 +28,20 @@
  */
 package net.sf.orcc.backends.cpp;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import net.sf.orcc.backends.c.CActorPrinter;
-import net.sf.orcc.backends.c.NodePrinterTemplate;
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.util.INameable;
 
 import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * Actor printer.
@@ -48,7 +50,9 @@ import org.antlr.stringtemplate.StringTemplate;
  * @author Ghislain Roquier
  * 
  */
-public class CppActorPrinter extends CActorPrinter {
+public class CppActorPrinter extends Printer {
+
+	private StringTemplateGroup group;
 
 	/**
 	 * Creates a new actor printer with the template "Cpp_actor.stg".
@@ -56,37 +60,35 @@ public class CppActorPrinter extends CActorPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public CppActorPrinter(String tmpl_name) throws IOException {
-		super(tmpl_name);
+	public CppActorPrinter(String name) throws IOException {
+		group = new TemplateGroupLoader().loadGroup(name);
+
+		// registers this printer as the default printer
+		Printer.register(this);
 	}
 
-	protected StringTemplate applyProc(String actorName, Procedure proc) {
-		StringTemplate procTmpl = group.getInstanceOf("proc");
+	/**
+	 * Prints the given actor to a file whose name is given.
+	 * 
+	 * @param fileName
+	 *            output file name
+	 * @param id
+	 *            the instance id
+	 * @param actor
+	 *            actor to print
+	 * @throws IOException
+	 */
+	public void printActor(String fileName, String id, Actor actor)
+			throws IOException {
+		StringTemplate template = group.getInstanceOf("actor");
 
-		procTmpl.setAttribute("actorname", actorName);
-		// name
-		procTmpl.setAttribute("name", proc.getName());
+		template.setAttribute("name", id);
+		template.setAttribute("actor", actor);
 
-		// return type
-		procTmpl.setAttribute("type", proc.getReturnType().toString());
-
-		// parameters
-		for (Variable param : proc.getParameters()) {
-			procTmpl.setAttribute("parameters", param);
-		}
-
-		// locals
-		for (Variable local : proc.getLocals()) {
-			procTmpl.setAttribute("locals", local);
-		}
-
-		// body
-		NodePrinterTemplate printer = new CppNodePrinter(group, procTmpl,
-				actorName);
-		for (CFGNode node : proc.getNodes()) {
-			node.accept(printer);
-		}
-		return procTmpl;
+		byte[] b = template.toString(80).getBytes();
+		OutputStream os = new FileOutputStream(fileName);
+		os.write(b);
+		os.close();
 	}
 
 	@Override
@@ -101,6 +103,11 @@ public class CppActorPrinter extends CActorPrinter {
 		CppExprPrinter printer = new CppExprPrinter();
 		expression.accept(printer, Integer.MAX_VALUE);
 		return printer.toString();
+	}
+
+	@Override
+	public String toString(INameable nameable) {
+		return nameable.getName();
 	}
 
 	@Override

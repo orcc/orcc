@@ -30,9 +30,11 @@ package net.sf.orcc.backends.c.instructions;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines a SelfAssignment instruction that implements a
@@ -44,20 +46,21 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Matthieu Wipliez
  * 
  */
-public class SelfAssignment extends AbstractCInstruction {
+public class SelfAssignment extends AbstractCInstruction implements
+		ValueContainer {
 
 	private BinaryOp op;
 
 	private Expression value;
 
-	private Variable variable;
+	private Variable target;
 
-	public SelfAssignment(BlockNode block, Location location,
-			Variable variable, BinaryOp op, Expression value) {
+	public SelfAssignment(BlockNode block, Location location, Variable target,
+			BinaryOp op, Expression value) {
 		super(block, location);
 		this.op = op;
 		this.value = value;
-		this.variable = variable;
+		this.target = target;
 	}
 
 	@Override
@@ -69,24 +72,31 @@ public class SelfAssignment extends AbstractCInstruction {
 		return op;
 	}
 
+	@Override
 	public Expression getValue() {
 		return value;
 	}
 
-	public Variable getVar() {
-		return variable;
+	public Variable getTarget() {
+		return target;
 	}
 
 	public void setOp(BinaryOp op) {
 		this.op = op;
 	}
 
+	@Override
 	public void setValue(Expression value) {
+		CommonNodeOperations.setValue(this, value);
+	}
+
+	@Override
+	public void setValueSimple(Expression value) {
 		this.value = value;
 	}
 
-	public void setVar(Variable variable) {
-		this.variable = variable;
+	public void setTarget(Variable target) {
+		this.target = target;
 	}
 
 }

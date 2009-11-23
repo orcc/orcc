@@ -86,7 +86,7 @@ public class CQuasiStaticActorPrinter extends CActorPrinter{
 		 *            An actor
 		 */
 		protected void setAttributes(String id, Actor actor) {
-			super.setAttributes(id,actor);
+			// TODO: super.setAttributes(id,actor);
 			setScheduleActions("scheduleActions", id, actor.getActions());
 		}
 		
@@ -105,6 +105,7 @@ public class CQuasiStaticActorPrinter extends CActorPrinter{
 				throws IOException {
 			OutputStream os = new FileOutputStream(fileName);
 			
+			StringTemplate template;
 			if(actor.getName().equals("display")){
 				template = extensionGroup.getInstanceOf("display_actor");
 				byte[] b = template.toString(80).getBytes();

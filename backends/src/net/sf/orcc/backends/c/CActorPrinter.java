@@ -31,27 +31,16 @@ package net.sf.orcc.backends.c;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
-import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Printer;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.instructions.AbstractFifo;
-import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.INameable;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -66,14 +55,6 @@ public class CActorPrinter extends Printer {
 
 	protected StringTemplateGroup group;
 
-	private ListSizePrinter listSizePrinter;
-
-	private boolean printVariableInit;
-
-	private boolean printVariableType;
-
-	protected StringTemplate template;
-
 	private Map<String, String> transformations;
 
 	/**
@@ -84,8 +65,6 @@ public class CActorPrinter extends Printer {
 	 */
 	public CActorPrinter() throws IOException {
 		this("C_actor");
-
-		listSizePrinter = new ListSizePrinter();
 
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_");
@@ -110,48 +89,6 @@ public class CActorPrinter extends Printer {
 	}
 
 	/**
-	 * Returns an instance of the "proc" template with attributes set using the
-	 * given Procedure proc.
-	 * 
-	 * @param proc
-	 *            a procedure
-	 * @return a string template
-	 */
-	protected StringTemplate applyProc(String id, Procedure proc) {
-		StringTemplate procTmpl = group.getInstanceOf("proc");
-
-		// name
-		procTmpl.setAttribute("name", proc.getName());
-
-		// return type
-		Type type = proc.getReturnType();
-		procTmpl.setAttribute("type", type.toString());
-
-		// parameters
-		for (Variable param : proc.getParameters()) {
-			printVariableType = true;
-			printVariableInit = false;
-			procTmpl.setAttribute("parameters", param.toString());
-		}
-
-		// locals
-		for (Variable local : proc.getLocals()) {
-			printVariableType = true;
-			printVariableInit = true;
-			procTmpl.setAttribute("locals", local.toString());
-		}
-
-		// body
-		NodePrinterTemplate printer = new NodePrinterTemplate(group, procTmpl,
-				id);
-		for (CFGNode node : proc.getNodes()) {
-			node.accept(printer);
-		}
-
-		return procTmpl;
-	}
-
-	/**
 	 * Prints the given actor to a file whose name is given.
 	 * 
 	 * @param fileName
@@ -164,107 +101,15 @@ public class CActorPrinter extends Printer {
 	 */
 	public void printActor(String fileName, String id, Actor actor)
 			throws IOException {
-		template = group.getInstanceOf("actor");
+		StringTemplate template = group.getInstanceOf("actor");
 
-		setAttributes(id, actor);
+		template.setAttribute("name", id);
+		template.setAttribute("actor", actor);
 
 		byte[] b = template.toString(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();
-	}
-
-	protected void setActions(String tmplName, String id, List<Action> actions) {
-		for (Action action : actions) {
-			StringTemplate procTmpl = applyProc(id, action.getBody());
-			template.setAttribute(tmplName, procTmpl);
-			Procedure proc = action.getScheduler();
-			proc.setName("isSchedulable_" + action);
-			procTmpl = applyProc(id, proc);
-			template.setAttribute(tmplName, procTmpl);
-		}
-	}
-
-	/**
-	 * Sets attributes of the template from the given actor. Classes may extend,
-	 * but should call super.setAttributes(actor) first.
-	 * 
-	 * @param actor
-	 *            An actor
-	 */
-	protected void setAttributes(String id, Actor actor) {
-		template.setAttribute("name", id);
-		setFifos("inputs", actor.getInputs());
-		setFifos("outputs", actor.getOutputs());
-		setStateVars(actor.getStateVars());
-		setProcedures(id, actor.getProcs());
-		setActions("actions", id, actor.getActions());
-		setActions("initializes", id, actor.getInitializes());
-		template.setAttribute("scheduler", actor.getActionScheduler());
-		template.setAttribute("initialize", actor.getInitializes());
-	}
-
-	/**
-	 * visibility has been changed to <code>protected</code> in order to be
-	 * visible to <code>CQuasiStaticActorPrinter</code>
-	 * 
-	 * @param attribute
-	 * @param ports
-	 */
-	protected void setFifos(String attribute, OrderedMap<Port> ports) {
-		int size = ports.size();
-		List<String> names = new ArrayList<String>(size);
-		for (Port port : ports) {
-			names.add(port.getName());
-		}
-
-		template.setAttribute(attribute, names);
-	}
-
-	/**
-	 * visibility has been changed to <code>protected</code> in order to be
-	 * visible to <code>CQuasiStaticActorPrinter</code>
-	 * 
-	 * @param id
-	 * @param procs
-	 */
-	protected void setProcedures(String id, OrderedMap<Procedure> procs) {
-		for (Procedure proc : procs) {
-			if (!proc.isExternal()) {
-				template.setAttribute("procs", applyProc(id, proc));
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * visibility has been changed to <code>protected</code> in order to be
-	 * visible to <code>CQuasiStaticActorPrinter</code>
-	 * 
-	 * @param stateVars
-	 */
-	protected void setStateVars(OrderedMap<Variable> stateVars) {
-		for (Variable variable : stateVars) {
-			StateVariable stateVar = (StateVariable) variable;
-
-			StringTemplate stateTempl = group.getInstanceOf("stateVar");
-			template.setAttribute("stateVars", stateTempl);
-
-			printVariableType = true;
-			printVariableInit = true;
-			stateTempl.setAttribute("vardef", stateVar.toString());
-
-			// initial value of state var (if any)
-			if (stateVar.hasInit()) {
-				stateTempl.setAttribute("value", stateVar.getInit().toString());
-			}
-		}
-	}
-
-	@Override
-	public String toString(CFGNode node) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -282,15 +127,25 @@ public class CActorPrinter extends Printer {
 	}
 
 	@Override
-	public String toString(Instruction instruction) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String toString(Procedure procedure) {
-		// TODO Auto-generated method stub
-		return null;
+	public String toString(INameable nameable) {
+//		boolean isPort = false;
+//		for (Use use : variable.getUses()) {
+//			if (use.getNode() instanceof AbstractFifo) {
+//				AbstractFifo fifoNode = (AbstractFifo) use.getNode();
+//				if (variable.getName().startsWith(fifoNode.getPort().getName())) {
+//					isPort = true;
+//					break;
+//				}
+//			}
+//		}
+//		template.setAttribute("isPort", isPort);
+		
+		String name = nameable.getName();
+		if (transformations.containsKey(name)) {
+			return transformations.get(name);
+		} else {
+			return name;
+		}
 	}
 
 	@Override
@@ -298,62 +153,6 @@ public class CActorPrinter extends Printer {
 		CTypePrinter printer = new CTypePrinter();
 		type.accept(printer);
 		return printer.toString();
-	}
-
-	@Override
-	public String toString(Variable variable) {
-		if (printVariableType) {
-			StringTemplate template;
-			if (printVariableInit) {
-				template = group.getInstanceOf("vardefInit");
-			} else {
-				template = group.getInstanceOf("vardef");
-			}
-
-			printVariableType = false;
-			printVariableInit = false;
-
-			return toString(variable, template);
-		} else {
-			String name = variable.getName();
-			if (transformations.containsKey(name)) {
-				return transformations.get(name);
-			} else {
-				return name;
-			}
-		}
-	}
-
-	/**
-	 * Returns a string representation of variable with the given template.
-	 * 
-	 * @param variable
-	 *            a variable definition
-	 * @param template
-	 *            a template
-	 * @return a string
-	 */
-	public String toString(Variable variable, StringTemplate template) {
-		template.setAttribute("name", variable.toString());
-		template.setAttribute("type", variable.getType().toString());
-
-		// if varDef is a list, => list of dimensions
-		variable.getType().accept(listSizePrinter);
-
-		template.setAttribute("size", listSizePrinter.getSize());
-		boolean isPort = false;
-		for (Use use : variable.getUses()) {
-			if (use.getNode() instanceof AbstractFifo) {
-				AbstractFifo fifoNode = (AbstractFifo) use.getNode();
-				if (variable.getName().startsWith(fifoNode.getPort().getName())) {
-					isPort = true;
-					break;
-				}
-			}
-		}
-		template.setAttribute("isPort", isPort);
-
-		return template.toString();
 	}
 
 }
