@@ -43,15 +43,22 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.consts.BoolConst;
+import net.sf.orcc.ir.consts.ConstantInterpreter;
+import net.sf.orcc.ir.consts.IntConst;
+import net.sf.orcc.ir.consts.ListConst;
+import net.sf.orcc.ir.consts.StringConst;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -82,6 +89,41 @@ import org.json.JSONObject;
  * 
  */
 public class IRWriter {
+
+	/**
+	 * This class defines a constant writer that serializes a constant to JSON.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ConstantWriter implements ConstantInterpreter {
+
+		@Override
+		public Object interpret(BoolConst constant, Object... args) {
+			return constant.getValue();
+		}
+
+		@Override
+		public Object interpret(IntConst constant, Object... args) {
+			return constant.getValue();
+		}
+
+		@Override
+		public Object interpret(ListConst constant, Object... args) {
+			JSONArray array = new JSONArray();
+			List<Constant> constants = constant.getValue();
+			for (Constant cst : constants) {
+				array.put(cst.accept(this));
+			}
+			return array;
+		}
+
+		@Override
+		public Object interpret(StringConst constant, Object... args) {
+			return constant.getValue();
+		}
+
+	}
 
 	/**
 	 * This class defines an expression writer that serializes an expression to
@@ -419,12 +461,13 @@ public class IRWriter {
 		obj.put(KEY_NAME, actor.getName());
 		obj.put(IRConstants.KEY_INPUTS, writePorts(actor.getInputs()));
 		obj.put(IRConstants.KEY_OUTPUTS, writePorts(actor.getOutputs()));
-		obj.put(IRConstants.KEY_STATE_VARS, new JSONArray());
-		obj.put(IRConstants.KEY_PROCEDURES, new JSONArray());
+		obj.put(IRConstants.KEY_STATE_VARS, writeStateVariables(actor
+				.getStateVars()));
+		obj.put(IRConstants.KEY_PROCEDURES, writeProcedures(actor.getProcs()));
 
-		array = writeActions(actor.getActions());
-		obj.put(IRConstants.KEY_ACTIONS, array);
-		obj.put(IRConstants.KEY_INITIALIZES, new JSONArray());
+		obj.put(IRConstants.KEY_ACTIONS, writeActions(actor.getActions()));
+		obj.put(IRConstants.KEY_INITIALIZES, writeActions(actor
+				.getInitializes()));
 
 		array = writeActionScheduler(actor.getActionScheduler());
 		obj.put(IRConstants.KEY_ACTION_SCHED, array);
@@ -447,6 +490,51 @@ public class IRWriter {
 
 	private JSONArray writeFSM(FSM fsm) {
 		return null;
+	}
+
+	/**
+	 * Serializes the given variable declaration to JSON.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return
+	 * @throws OrccException
+	 */
+	private JSONArray writeLocalVariable(LocalVariable variable)
+			throws OrccException {
+		JSONArray array = new JSONArray();
+
+		JSONArray details = new JSONArray();
+		array.put(details);
+		details.put(variable.getBaseName());
+		details.put(variable.isAssignable());
+		details.put(42); // TODO remove when front-end done
+		Object suffix = variable.hasSuffix() ? variable.getSuffix()
+				: JSONObject.NULL;
+		details.put(suffix);
+		details.put(variable.getIndex());
+
+		array.put(writeLocation(variable.getLocation()));
+		array.put(writeType(variable.getType()));
+
+		return array;
+	}
+
+	/**
+	 * Writes the given ordered map of local variables.
+	 * 
+	 * @param variables
+	 *            an ordered map of variables
+	 * @return a JSON array
+	 * @throws OrccException
+	 */
+	private JSONArray writeLocalVariables(OrderedMap<Variable> variables)
+			throws OrccException {
+		JSONArray array = new JSONArray();
+		for (Variable variable : variables) {
+			array.put(writeLocalVariable((LocalVariable) variable));
+		}
+		return array;
 	}
 
 	private JSONArray writeLocation(Location location) {
@@ -502,10 +590,80 @@ public class IRWriter {
 		array.put(writeLocation(procedure.getLocation()));
 		array.put(writeType(procedure.getReturnType()));
 
-		array.put(new JSONArray()); // parameters
-		array.put(new JSONArray()); // local variables
+		array.put(writeLocalVariables(procedure.getParameters()));
+		array.put(writeLocalVariables(procedure.getLocals()));
 		array.put(new JSONArray()); // nodes
 
+		return array;
+	}
+
+	/**
+	 * Serializes the given procedures to a JSON array.
+	 * 
+	 * @param procedures
+	 *            an ordered map of procedures
+	 * @return a JSON array
+	 * @throws OrccException
+	 */
+	private JSONArray writeProcedures(OrderedMap<Procedure> procedures)
+			throws OrccException {
+		JSONArray array = new JSONArray();
+		for (Procedure procedure : procedures) {
+			array.put(writeProcedure(procedure));
+		}
+		return array;
+	}
+
+	/**
+	 * Serializes the given variable declaration to JSON.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return
+	 * @throws OrccException
+	 */
+	private JSONArray writeStateVariable(StateVariable variable)
+			throws OrccException {
+		JSONArray array = new JSONArray();
+
+		// variable
+		JSONArray variableArray = new JSONArray();
+		array.put(variableArray);
+
+		JSONArray details = new JSONArray();
+		variableArray.put(details);
+
+		details.put(variable.getName());
+		details.put(variable.isAssignable());
+		details.put(42); // TODO remove when front-end done
+		details.put(JSONObject.NULL);
+		details.put(0);
+
+		variableArray.put(writeLocation(variable.getLocation()));
+		variableArray.put(writeType(variable.getType()));
+
+		// value
+		JSONArray constantArray = (JSONArray) variable.getConstantValue()
+				.accept(new ConstantWriter());
+		array.put(constantArray);
+
+		return array;
+	}
+
+	/**
+	 * Writes the given ordered map of state variables.
+	 * 
+	 * @param variables
+	 *            an ordered map of variables
+	 * @return a JSON array
+	 * @throws OrccException
+	 */
+	private JSONArray writeStateVariables(OrderedMap<Variable> variables)
+			throws OrccException {
+		JSONArray array = new JSONArray();
+		for (Variable variable : variables) {
+			array.put(writeStateVariable((StateVariable) variable));
+		}
 		return array;
 	}
 
@@ -536,32 +694,12 @@ public class IRWriter {
 			array.put(0);
 		} else {
 			LocalVariable local = (LocalVariable) variable;
+			array.put(local.getBaseName());
 			array.put(local.hasSuffix() ? local.getSuffix() : JSONObject.NULL);
 			array.put(local.getIndex());
 		}
 
 		return array;
 	}
-
-	// private JSONArray writeVarDef(VarDef varDef) throws OrccException {
-	// JSONArray array = new JSONArray();
-	//
-	// JSONArray details = new JSONArray();
-	// details.put(varDef.getName());
-	// details.put(varDef.isAssignable());
-	// details.put(varDef.isGlobal());
-	// if (varDef.hasSuffix()) {
-	// details.put(varDef.getSuffix());
-	// } else {
-	// details.put((Object) null);
-	// }
-	// details.put(varDef.getIndex());
-	//
-	// array.put(details);
-	// array.put(writeLocation(varDef.getLoc()));
-	// array.put(writeType(varDef.getType()));
-	//
-	// return array;
-	// }
 
 }
