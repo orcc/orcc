@@ -23,6 +23,9 @@
 // cJSON
 // JSON parser in C.
 
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NONSTDC_NO_WARNINGS
+
 #include <string.h>
 #include <stdio.h>
 #include <math.h>

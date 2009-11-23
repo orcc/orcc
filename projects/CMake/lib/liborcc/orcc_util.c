@@ -93,9 +93,10 @@ void print_and_exit(const char *msg) {
 }
 
 static const char *usage = "%s: -i <file> ...\n";
+static char *program;
 
 void print_usage() {
-	printf(usage);
+	printf(usage, program);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,6 +104,7 @@ void print_usage() {
 void init_orcc(int argc, char *argv[], char *env[]) {
 	int c;
 
+	program = argv[0];
 	c = getopt(argc, argv, "i:y:");
 	while (c != -1) {
 		switch (c) {
@@ -119,10 +121,7 @@ void init_orcc(int argc, char *argv[], char *env[]) {
 			yuv_file = strdup(optarg);
 			break;
 		default:
-			if (optarg != NULL)
-				printf(" -%c %s", c, optarg);
-			else
-				printf(" -%c", c);
+			fprintf(stderr, "skipping option -%c\n", c);
 			break;
 		}
 
