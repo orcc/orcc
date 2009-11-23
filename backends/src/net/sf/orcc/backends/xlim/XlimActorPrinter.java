@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.xlim;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,16 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -59,6 +51,7 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.util.DomUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -572,26 +565,13 @@ public class XlimActorPrinter {
 	 *            Actor to analyze (get the name)
 	 */
 	private void createXlimDocument(Actor actor) {
-		// get an instance of factory
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
-			// get an instance of builder
-			DocumentBuilder db = dbf.newDocumentBuilder();
-
-			// create an instance of DOM
-			xlim = db.newDocument();
-
-		} catch (ParserConfigurationException pce) {
-			// dump it
-			System.out
-					.println("Error while trying to instantiate DocumentBuilder "
-							+ pce);
-			System.exit(1);
+			xlim = DomUtil.createDocument("design");
+		} catch (OrccException e) {
+			e.printStackTrace();
 		}
-
-		xlim.setXmlVersion("1.0");
-		// create the root element <design>
-		root = XlimNodeTemplate.newDesign(xlim, actor.getName());
+		root = xlim.getDocumentElement();
+		XlimNodeTemplate.newDesign(root, actor.getName());
 	}
 
 	/**
@@ -619,25 +599,21 @@ public class XlimActorPrinter {
 	 *            File to be printed
 	 */
 	private void printXlimFile(File file) {
-		TransformerFactory xff = TransformerFactory.newInstance();
-		Transformer serializer = null;
+		OutputStream os;
 		try {
-			serializer = xff.newTransformer();
-		} catch (TransformerConfigurationException te) {
-			throw new RuntimeException("Could not create transformer. "
-					+ te.getMessage());
+			os = new FileOutputStream(file);
+			DomUtil.writeDocument(os, xlim);
+			os.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (OrccException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		serializer.setOutputProperty(OutputKeys.INDENT, "yes");
-		serializer
-				.setOutputProperty("{http://saxon.sf.net/}indent-spaces", "4");
-		serializer.setOutputProperty(OutputKeys.METHOD, "xml");
-		try {
-			OutputStream os = new FileOutputStream(file);
-			serializer.transform(new DOMSource(xlim), new StreamResult(os));
-			os.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Could not create transformer.", e);
-		}
 	}
 }

@@ -31,7 +31,6 @@ package net.sf.orcc.backends.xlim;
 
 import net.sf.orcc.ir.Type;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -86,10 +85,8 @@ public class XlimNodeTemplate {
 	 *            Name of the design
 	 * @return Created design
 	 */
-	public static Element newDesign(Document document, String name) {
-		Element design = document.createElement("design");
+	public static Element newDesign(Element design, String name) {
 		design.setAttribute("name", name);
-		document.appendChild(design);
 		return design;
 	}
 
@@ -245,6 +242,24 @@ public class XlimNodeTemplate {
 		Element module = newModule(root, kind, autostart, name);
 		module.setAttribute("sourcename", sourcename);
 		return (module);
+	}
+
+	/**
+	 * New Operation
+	 * 
+	 * @param root
+	 *            Root Element
+	 * @param kind
+	 *            Kind of operation
+	 * @param name
+	 *            Name of operation
+	 * @return New created operation
+	 */
+	public static Element newNameOperation(Element root, String kind,
+			String name) {
+		Element operation = newOperation(root, kind);
+		operation.setAttribute("name", name);
+		return operation;
 	}
 
 	/**
@@ -432,24 +447,6 @@ public class XlimNodeTemplate {
 			String target) {
 		Element operation = newOperation(root, kind);
 		operation.setAttribute("target", target);
-		return operation;
-	}
-	
-	/**
-	 * New Operation
-	 * 
-	 * @param root
-	 *            Root Element
-	 * @param kind
-	 *            Kind of operation
-	 * @param name
-	 *            Name of operation
-	 * @return New created operation
-	 */
-	public static Element newNameOperation(Element root, String kind,
-			String name) {
-		Element operation = newOperation(root, kind);
-		operation.setAttribute("name", name);
 		return operation;
 	}
 
