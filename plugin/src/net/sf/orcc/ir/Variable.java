@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.instructions.AbstractFifo;
 import net.sf.orcc.util.INameable;
 
 /**
@@ -42,6 +43,11 @@ import net.sf.orcc.util.INameable;
  * 
  */
 public abstract class Variable implements INameable {
+
+	/**
+	 * variable possible assign expression
+	 */
+	protected Expression expression;
 
 	/**
 	 * true if this variable is global
@@ -64,40 +70,15 @@ public abstract class Variable implements INameable {
 	private Type type;
 
 	/**
-	 * variable possible assign expression
-	 */
-	protected Expression expression;
-
-	/**
-	 * variable value
-	 */
-	private Object value;
-	
-	/**
 	 * uses of this variable.
 	 */
 	private List<Use> uses;
 
 	/**
-	 * Creates a new variable with the given location, type, and name.
-	 * 
-	 * @param location
-	 *            the variable location
-	 * @param type
-	 *            the variable type
-	 * @param name
-	 *            the variable name
-	 * @param global
-	 *            whether this variable is global
+	 * variable value
 	 */
-	public Variable(Location location, Type type, String name, boolean global, Expression expression) {
-		this.location = location;
-		this.type = type;
-		this.name = name;
-		this.uses = new ArrayList<Use>();
-		this.expression = expression;
-	}
-	
+	private Object value;
+
 	/**
 	 * Creates a new variable with the given location, type, and name.
 	 * 
@@ -115,6 +96,27 @@ public abstract class Variable implements INameable {
 		this.type = type;
 		this.name = name;
 		this.uses = new ArrayList<Use>();
+	}
+
+	/**
+	 * Creates a new variable with the given location, type, and name.
+	 * 
+	 * @param location
+	 *            the variable location
+	 * @param type
+	 *            the variable type
+	 * @param name
+	 *            the variable name
+	 * @param global
+	 *            whether this variable is global
+	 */
+	public Variable(Location location, Type type, String name, boolean global,
+			Expression expression) {
+		this.location = location;
+		this.type = type;
+		this.name = name;
+		this.uses = new ArrayList<Use>();
+		this.expression = expression;
 	}
 
 	/**
@@ -158,6 +160,14 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
+	 * Gets the current valuing expression of this variable.
+	 * 
+	 */
+	public Expression getExpression() {
+		return expression;
+	}
+
+	/**
 	 * Returns the location of this variable.
 	 * 
 	 * @return the location of this variable
@@ -195,12 +205,42 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
+	 * Gets the current value of this variable.
+	 * 
+	 */
+	public Object getValue() {
+		return value;
+	}
+
+	/**
 	 * Returns <code>true</code> if this variable is global.
 	 * 
 	 * @return <code>true</code> if this variable is global
 	 */
 	public boolean isGlobal() {
 		return global;
+	}
+
+	/**
+	 * Returns true if this variable is used by at least one instruction that
+	 * reads from/writes to a port.
+	 * 
+	 * @return true if this variable is used by at least one instruction that
+	 *         reads from/writes to a port
+	 */
+	public boolean isPort() {
+		boolean isPort = false;
+		for (Use use : getUses()) {
+			if (use.getNode() instanceof AbstractFifo) {
+				AbstractFifo fifoNode = (AbstractFifo) use.getNode();
+				if (getName().startsWith(fifoNode.getPort().getName())) {
+					isPort = true;
+					break;
+				}
+			}
+		}
+
+		return isPort;
 	}
 
 	/**
@@ -239,6 +279,16 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
+	 * Sets the valuing expression of this variable.
+	 * 
+	 * @param expression
+	 *            the valuing expression of this variable
+	 */
+	public void setExpression(Expression expression) {
+		this.expression = expression;
+	}
+
+	/**
 	 * Sets the location of this variable.
 	 * 
 	 * @param location
@@ -269,32 +319,6 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
-	 * Gets the current valuing expression of this variable.
-	 * 
-	 */
-	public Expression getExpression() {
-		return expression;
-	}
-	
-	/**
-	 * Sets the valuing expression of this variable.
-	 * 
-	 * @param expression
-	 *            the valuing expression of this variable
-	 */
-	public void setExpression(Expression expression) {
-		this.expression = expression;
-	}
-
-	/**
-	 * Gets the current value of this variable.
-	 * 
-	 */
-	public Object getValue() {
-		return value;
-	}
-	
-	/**
 	 * Sets the value of this variable.
 	 * 
 	 * @param value
@@ -303,7 +327,7 @@ public abstract class Variable implements INameable {
 	public void setValue(Object value) {
 		this.value = value;
 	}
-	
+
 	@Override
 	public String toString() {
 		return Printer.getInstance().toString(this);
