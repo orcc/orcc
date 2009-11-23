@@ -103,7 +103,7 @@ public class CActorPrinter extends Printer {
 			throws IOException {
 		StringTemplate template = group.getInstanceOf("actor");
 
-		template.setAttribute("name", id);
+		template.setAttribute("actorName", id);
 		template.setAttribute("actor", actor);
 
 		byte[] b = template.toString(80).getBytes();
@@ -128,18 +128,6 @@ public class CActorPrinter extends Printer {
 
 	@Override
 	public String toString(INameable nameable) {
-//		boolean isPort = false;
-//		for (Use use : variable.getUses()) {
-//			if (use.getNode() instanceof AbstractFifo) {
-//				AbstractFifo fifoNode = (AbstractFifo) use.getNode();
-//				if (variable.getName().startsWith(fifoNode.getPort().getName())) {
-//					isPort = true;
-//					break;
-//				}
-//			}
-//		}
-//		template.setAttribute("isPort", isPort);
-		
 		String name = nameable.getName();
 		if (transformations.containsKey(name)) {
 			return transformations.get(name);

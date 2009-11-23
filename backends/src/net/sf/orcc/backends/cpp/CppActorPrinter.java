@@ -82,7 +82,7 @@ public class CppActorPrinter extends Printer {
 			throws IOException {
 		StringTemplate template = group.getInstanceOf("actor");
 
-		template.setAttribute("name", id);
+		template.setAttribute("actorName", id);
 		template.setAttribute("actor", actor);
 
 		byte[] b = template.toString(80).getBytes();
