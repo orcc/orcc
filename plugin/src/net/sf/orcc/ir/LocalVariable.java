@@ -106,10 +106,26 @@ public class LocalVariable extends Variable implements
 		return false;
 	}
 
+	/**
+	 * Returns the base name of this variable, which is the original name of the
+	 * variable, without suffix nor index.
+	 * 
+	 * @return the base name of this variable
+	 */
+	public String getBaseName() {
+		return super.getName();
+	}
+
 	public Expression getConstant() {
 		return constantExpr;
 	}
 
+	/**
+	 * Returns the SSA index of this variable. This information is added when
+	 * translating CAL to SSA form.
+	 * 
+	 * @return the SSA index of this variable
+	 */
 	public int getIndex() {
 		return index;
 	}
@@ -117,13 +133,19 @@ public class LocalVariable extends Variable implements
 	@Override
 	public String getName() {
 		String indexStr = (index == 0) ? "" : "_" + index;
-		return super.getName() + (suffix == null ? "" : suffix) + indexStr;
+		return getBaseName() + (suffix == null ? "" : suffix) + indexStr;
 	}
 
 	public Instruction getNode() {
 		return node;
 	}
 
+	/**
+	 * Returns the suffix of this variable. This information is used to
+	 * disambiguate variables declared with similar names in different scopes.
+	 * 
+	 * @return the suffix of this variable
+	 */
 	public int getSuffix() {
 		return suffix;
 	}

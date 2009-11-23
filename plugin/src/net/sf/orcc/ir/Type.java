@@ -73,18 +73,19 @@ public interface Type {
 	 * Accepts a visitor.
 	 * 
 	 * @param visitor
+	 *            a visitor
 	 */
 	public void accept(TypeVisitor visitor);
 
 	/**
-	 * Accepts a visitor.
+	 * Accepts an interpreter.
 	 * 
 	 * @param interpreter
-	 * 
+	 *            an interpreter
 	 * @return an object
 	 */
 	public Object accept(TypeInterpreter interpreter);
-	
+
 	/**
 	 * Returns the type of this type.
 	 * 
