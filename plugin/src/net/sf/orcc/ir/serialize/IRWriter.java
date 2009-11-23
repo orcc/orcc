@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ir.serialize;
 
-import static net.sf.orcc.ir.IrConstants.KEY_NAME;
-import static net.sf.orcc.ir.IrConstants.KEY_SOURCE_FILE;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_NAME;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_SOURCE_FILE;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,19 +45,28 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrConstants;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
@@ -73,6 +82,209 @@ import org.json.JSONObject;
  * 
  */
 public class IRWriter {
+
+	/**
+	 * This class defines an expression writer that serializes an expression to
+	 * JSON.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ExpressionWriter implements ExpressionInterpreter {
+
+		@Override
+		public Object interpret(BinaryExpr expr, Object... args)
+				throws OrccException {
+			JSONArray array = new JSONArray();
+			array.put(writeLocation(expr.getLocation()));
+			array.put(IRConstants.BINARY_EXPR);
+			array.put(writeBinaryOp(expr.getOp()));
+			array.put(expr.getE1().accept(this));
+			array.put(expr.getE2().accept(this));
+			array.put(expr.getUnderlyingType().accept(new TypeWriter()));
+			return array;
+		}
+
+		@Override
+		public Object interpret(BoolExpr expr, Object... args) {
+			JSONArray array = new JSONArray();
+			array.put(writeLocation(expr.getLocation()));
+			array.put(expr.getValue());
+			return array;
+		}
+
+		@Override
+		public Object interpret(IntExpr expr, Object... args) {
+			JSONArray array = new JSONArray();
+			array.put(writeLocation(expr.getLocation()));
+			array.put(expr.getValue());
+			return array;
+		}
+
+		@Override
+		public Object interpret(ListExpr expr, Object... args)
+				throws OrccException {
+			throw new OrccException("unsupported expression: List");
+		}
+
+		@Override
+		public Object interpret(StringExpr expr, Object... args) {
+			JSONArray array = new JSONArray();
+			array.put(writeLocation(expr.getLocation()));
+			array.put(expr.getValue());
+			return array;
+		}
+
+		@Override
+		public Object interpret(UnaryExpr expr, Object... args)
+				throws OrccException {
+			JSONArray array = new JSONArray();
+			array.put(writeLocation(expr.getLocation()));
+			array.put(IRConstants.UNARY_EXPR);
+			array.put(writeUnaryOp(expr.getOp()));
+			array.put(expr.getExpr().accept(this));
+			array.put(expr.getUnderlyingType().accept(new TypeWriter()));
+			return array;
+		}
+
+		@Override
+		public Object interpret(VarExpr expr, Object... args) {
+			JSONArray array = new JSONArray();
+			array.put(writeLocation(expr.getLocation()));
+			array.put(writeVariable(expr.getVar().getVariable()));
+			return array;
+		}
+
+		private String writeBinaryOp(BinaryOp op) {
+			switch (op) {
+			case BITAND:
+				return IRConstants.BOP_BAND;
+			case BITOR:
+				return IRConstants.BOP_BOR;
+			case BITXOR:
+				return IRConstants.BOP_BXOR;
+			case DIV:
+				return IRConstants.BOP_DIV;
+			case DIV_INT:
+				return IRConstants.BOP_DIV_INT;
+			case EQ:
+				return IRConstants.BOP_EQ;
+			case EXP:
+				return IRConstants.BOP_EXP;
+			case GE:
+				return IRConstants.BOP_GE;
+			case GT:
+				return IRConstants.BOP_GT;
+			case LE:
+				return IRConstants.BOP_LE;
+			case LOGIC_AND:
+				return IRConstants.BOP_LAND;
+			case LOGIC_OR:
+				return IRConstants.BOP_LOR;
+			case LT:
+				return IRConstants.BOP_LT;
+			case MINUS:
+				return IRConstants.BOP_MINUS;
+			case MOD:
+				return IRConstants.BOP_MOD;
+			case NE:
+				return IRConstants.BOP_NE;
+			case PLUS:
+				return IRConstants.BOP_PLUS;
+			case SHIFT_LEFT:
+				return IRConstants.BOP_SHIFT_LEFT;
+			case SHIFT_RIGHT:
+				return IRConstants.BOP_SHIFT_RIGHT;
+			case TIMES:
+				return IRConstants.BOP_TIMES;
+			default:
+				// never happens
+				throw new IllegalArgumentException();
+			}
+		}
+
+		private String writeUnaryOp(UnaryOp op) {
+			switch (op) {
+			case BITNOT:
+				return IRConstants.UOP_BNOT;
+			case LOGIC_NOT:
+				return IRConstants.UOP_LNOT;
+			case MINUS:
+				return IRConstants.UOP_MINUS;
+			case NUM_ELTS:
+				return IRConstants.UOP_NUM_ELTS;
+			default:
+				// never happens
+				throw new IllegalArgumentException();
+			}
+		}
+
+	}
+
+	/**
+	 * This class defines a type writer that serializes a type to JSON.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class TypeWriter implements TypeInterpreter {
+
+		@Override
+		public Object interpret(BoolType type) {
+			return BoolType.NAME;
+		}
+
+		@Override
+		public Object interpret(IntType type) {
+			JSONArray array = new JSONArray();
+			array.put(IntType.NAME);
+			Expression expr = type.getSize();
+			try {
+				array.put(writeExpression(expr));
+			} catch (OrccException e) {
+				e.printStackTrace();
+			}
+			return array;
+		}
+
+		@Override
+		public Object interpret(ListType type) {
+			JSONArray array = new JSONArray();
+			array.put(ListType.NAME);
+			Expression expr = type.getSize();
+			try {
+				array.put(writeExpression(expr));
+				array.put(writeType(type.getElementType()));
+			} catch (OrccException e) {
+				e.printStackTrace();
+			}
+			return array;
+		}
+
+		@Override
+		public Object interpret(StringType type) {
+			return StringType.NAME;
+		}
+
+		@Override
+		public Object interpret(UintType type) {
+			JSONArray array = new JSONArray();
+			array.put(UintType.NAME);
+			Expression expr = type.getSize();
+			try {
+				array.put(writeExpression(expr));
+			} catch (OrccException e) {
+				e.printStackTrace();
+			}
+			return array;
+		}
+
+		@Override
+		public Object interpret(VoidType type) {
+			return VoidType.NAME;
+		}
+
+	}
 
 	private Actor actor;
 
@@ -205,44 +417,32 @@ public class IRWriter {
 
 		obj.put(KEY_SOURCE_FILE, actor.getFile());
 		obj.put(KEY_NAME, actor.getName());
-		obj.put(IrConstants.KEY_INPUTS, writePorts(actor.getInputs()));
-		obj.put(IrConstants.KEY_OUTPUTS, writePorts(actor.getOutputs()));
-		obj.put(IrConstants.KEY_STATE_VARS, new JSONArray());
-		obj.put(IrConstants.KEY_PROCEDURES, new JSONArray());
+		obj.put(IRConstants.KEY_INPUTS, writePorts(actor.getInputs()));
+		obj.put(IRConstants.KEY_OUTPUTS, writePorts(actor.getOutputs()));
+		obj.put(IRConstants.KEY_STATE_VARS, new JSONArray());
+		obj.put(IRConstants.KEY_PROCEDURES, new JSONArray());
 
 		array = writeActions(actor.getActions());
-		obj.put(IrConstants.KEY_ACTIONS, array);
-		obj.put(IrConstants.KEY_INITIALIZES, new JSONArray());
+		obj.put(IRConstants.KEY_ACTIONS, array);
+		obj.put(IRConstants.KEY_INITIALIZES, new JSONArray());
 
 		array = writeActionScheduler(actor.getActionScheduler());
-		obj.put(IrConstants.KEY_ACTION_SCHED, array);
+		obj.put(IRConstants.KEY_ACTION_SCHED, array);
 		return obj;
 	}
 
-	private JSONArray writeExpr(Expression expr) {
-		JSONArray array = new JSONArray();
-		array.put(writeLocation(expr.getLocation()));
-		switch (expr.getType()) {
-		case Expression.BINARY:
-			break;
-		case Expression.BOOLEAN:
-			array.put(((BoolExpr) expr).getValue());
-			break;
-		case Expression.INT:
-			array.put(((IntExpr) expr).getValue());
-			break;
-		case Expression.LIST:
-			break;
-		case Expression.STRING:
-			array.put(((StringExpr) expr).getValue());
-			break;
-		case Expression.UNARY:
-			break;
-		case Expression.VAR:
-			break;
-		}
-
-		return array;
+	/**
+	 * Writes the given expression as JSON.
+	 * 
+	 * @param expression
+	 *            an expression
+	 * @return a JSON array
+	 * @throws OrccException
+	 */
+	private JSONArray writeExpression(Expression expression)
+			throws OrccException {
+		ExpressionWriter writer = new ExpressionWriter();
+		return (JSONArray) expression.accept(writer);
 	}
 
 	private JSONArray writeFSM(FSM fsm) {
@@ -309,35 +509,38 @@ public class IRWriter {
 		return array;
 	}
 
+	/**
+	 * Writes the given type as JSON.
+	 * 
+	 * @param type
+	 *            a type
+	 * @return JSON content, as a string or an array
+	 * @throws OrccException
+	 */
 	private Object writeType(Type type) throws OrccException {
-		if (type.getType() == Type.BOOLEAN) {
-			return BoolType.NAME;
-		} else if (type.getType() == Type.STRING) {
-			return StringType.NAME;
-		} else if (type.getType() == Type.VOID) {
-			return VoidType.NAME;
-		} else {
-			JSONArray array = new JSONArray();
-			if (type.getType() == Type.INT) {
-				array.put(IntType.NAME);
-				Expression expr = ((IntType) type).getSize();
-				array.put(writeExpr(expr));
-			} else if (type.getType() == Type.UINT) {
-				array.put(UintType.NAME);
-				Expression expr = ((UintType) type).getSize();
-				array.put(writeExpr(expr));
-			} else if (type.getType() == Type.LIST) {
-				array.put(ListType.NAME);
-				Expression expr = ((ListType) type).getSize();
-				array.put(writeExpr(expr));
-				array.put(writeType(((ListType) type).getElementType()));
-			} else {
-				throw new OrccException("Invalid type definition: "
-						+ type.toString());
-			}
+		return type.accept(new TypeWriter());
+	}
 
-			return array;
+	/**
+	 * Serializes the given variable to JSON.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return
+	 */
+	private JSONArray writeVariable(Variable variable) {
+		JSONArray array = new JSONArray();
+		if (variable.isGlobal()) {
+			array.put(variable.getName());
+			array.put(JSONObject.NULL);
+			array.put(0);
+		} else {
+			LocalVariable local = (LocalVariable) variable;
+			array.put(local.hasSuffix() ? local.getSuffix() : JSONObject.NULL);
+			array.put(local.getIndex());
 		}
+
+		return array;
 	}
 
 	// private JSONArray writeVarDef(VarDef varDef) throws OrccException {

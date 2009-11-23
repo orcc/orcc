@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.ir.serialize;
 
 /**
  * Constants IR fields.
@@ -34,7 +34,7 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public interface IrConstants {
+public interface IRConstants {
 
 	public static final String BINARY_EXPR = "2 op";
 
