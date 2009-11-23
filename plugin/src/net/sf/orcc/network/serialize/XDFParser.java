@@ -31,6 +31,7 @@ package net.sf.orcc.network.serialize;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,19 +75,15 @@ import net.sf.orcc.network.attributes.StringAttribute;
 import net.sf.orcc.network.attributes.TypeAttribute;
 import net.sf.orcc.network.attributes.ValueAttribute;
 import net.sf.orcc.util.BinOpSeqParser;
+import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
-import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.bootstrap.DOMImplementationRegistry;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSInput;
-import org.w3c.dom.ls.LSParser;
 
 /**
  * This class defines an XDF network parser.
@@ -796,34 +793,15 @@ public class XDFParser {
 	public Network parseNetwork() throws OrccException {
 		try {
 			// input
-			DOMImplementationRegistry registry = DOMImplementationRegistry
-					.newInstance();
-			DOMImplementationLS impl = (DOMImplementationLS) registry
-					.getDOMImplementation("Core 3.0 XML 3.0 LS");
-			LSInput input = impl.createLSInput();
-			input.setByteStream(new FileInputStream(file));
-
-			// parse without comments and whitespace
-			LSParser builder = impl.createLSParser(
-					DOMImplementationLS.MODE_SYNCHRONOUS, null);
-			DOMConfiguration config = builder.getDomConfig();
-			config.setParameter("comments", false);
-			config.setParameter("element-content-whitespace", false);
+			InputStream is = new FileInputStream(file);
+			Document document = DomUtil.parseDocument(is);
 
 			// parse the input, close the stream, return the network
-			Network network = parseXDF(builder.parse(input));
-			input.getByteStream().close();
+			Network network = parseXDF(document);
+			is.close();
 			return network;
 		} catch (IOException e) {
 			throw new OrccException("I/O error when parsing network", e);
-		} catch (ClassCastException e) {
-			throw new OrccException("could not initialize DOM parser", e);
-		} catch (ClassNotFoundException e) {
-			throw new OrccException("could not initialize DOM parser", e);
-		} catch (InstantiationException e) {
-			throw new OrccException("could not initialize DOM parser", e);
-		} catch (IllegalAccessException e) {
-			throw new OrccException("could not initialize DOM parser", e);
 		}
 	}
 

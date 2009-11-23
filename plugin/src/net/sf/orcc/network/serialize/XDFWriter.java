@@ -31,6 +31,7 @@ package net.sf.orcc.network.serialize;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -65,15 +66,11 @@ import net.sf.orcc.network.attributes.ITypeAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.XmlElement;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.DomUtil;
 
 import org.jgrapht.DirectedGraph;
-import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.bootstrap.DOMImplementationRegistry;
-import org.w3c.dom.ls.DOMImplementationLS;
-import org.w3c.dom.ls.LSOutput;
-import org.w3c.dom.ls.LSSerializer;
 
 /**
  * This class defines an XDF network writer.
@@ -223,41 +220,19 @@ public class XDFWriter {
 	public XDFWriter(File path, Network network) throws OrccException {
 		graph = network.getGraph();
 
+		document = DomUtil.createDocument("XDF");
+		writeXDF(document.getDocumentElement(), network);
+
+		File file = new File(path, network.getName() + ".xdf");
 		try {
-			// output
-			DOMImplementationRegistry registry = DOMImplementationRegistry
-					.newInstance();
-			DOMImplementationLS impl = (DOMImplementationLS) registry
-					.getDOMImplementation("Core 3.0 XML 3.0 LS");
-
-			// create document
-			document = ((DOMImplementation) impl).createDocument("", "XDF",
-					null);
-			writeXDF(document.getDocumentElement(), network);
-
-			// serialize to XML
-			LSOutput output = impl.createLSOutput();
-			File file = new File(path, network.getName() + ".xdf");
-			output.setByteStream(new FileOutputStream(file));
-
-			// serialize the document, close the stream
-			LSSerializer serializer = impl.createLSSerializer();
-			serializer.getDomConfig().setParameter("format-pretty-print", true);
-			serializer.write(document, output);
-			output.getByteStream().close();
-
-			writeChildren(path);
+			OutputStream os = new FileOutputStream(file);
+			DomUtil.writeDocument(os, document);
+			os.close();
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
-		} catch (ClassCastException e) {
-			throw new OrccException("DOM error", e);
-		} catch (ClassNotFoundException e) {
-			throw new OrccException("DOM error", e);
-		} catch (InstantiationException e) {
-			throw new OrccException("DOM error", e);
-		} catch (IllegalAccessException e) {
-			throw new OrccException("DOM error", e);
 		}
+
+		writeChildren(path);
 	}
 
 	/**
