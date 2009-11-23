@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import java.util.List;
+
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypeVisitor;
 
@@ -85,6 +87,14 @@ public interface Type {
 	 * @return an object
 	 */
 	public Object accept(TypeInterpreter interpreter);
+
+	/**
+	 * Returns a list of dimensions of this type. Returns an empty list if the
+	 * type is not a list.
+	 * 
+	 * @return the list of dimensions of this type if it is a list
+	 */
+	public List<Integer> getDimensions();
 
 	/**
 	 * Returns the type of this type.
