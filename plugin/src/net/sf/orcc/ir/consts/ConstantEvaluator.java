@@ -28,6 +28,10 @@
  */
 package net.sf.orcc.ir.consts;
 
+import java.util.List;
+
+import net.sf.orcc.ir.Constant;
+
 /**
  * This class defines a constant evaluator.
  * 
@@ -45,7 +49,15 @@ public class ConstantEvaluator implements ConstantInterpreter {
 	}
 
 	public Object interpret(ListConst constant, Object... args) {
-		return constant.getValue();
+		List<Constant> list = constant.getValue();
+		Object[] array = new Object[list.size()];
+		int i = 0;
+		for (Constant cst : list) {
+			array[i] = cst.accept(this);
+			i++;
+		}
+
+		return array;
 	}
 
 	public Object interpret(StringConst constant, Object... args) {

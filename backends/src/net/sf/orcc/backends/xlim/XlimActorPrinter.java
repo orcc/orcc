@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.backends.interpreter.InterpretedActor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -47,9 +48,11 @@ import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.util.DomUtil;
 
@@ -434,6 +437,29 @@ public class XlimActorPrinter {
 	 *            Actor to analyze
 	 */
 	private void addStateVars(Actor actor) {
+		// removes phi assignments on the initialize actions
+		PhiRemoval phiRemoval = new PhiRemoval();
+		for (Action action : actor.getInitializes()) {
+			phiRemoval.visitProcedure(action.getBody());
+		}
+		
+		// initializes the actor
+		InterpretedActor interpreted = new InterpretedActor("xxx", actor);
+		try {
+			interpreted.initialize();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		for (Variable stateVar : actor.getStateVars()) {
+			if (stateVar.getType().getType() == Type.LIST) {
+				Object[] value = (Object[]) stateVar.getValue();
+				for (Object obj : value) {
+					System.out.print(obj + " ");
+				}
+				System.out.println();
+			}
+		}
 
 		// Executes initialize code execution to obtain missing init values
 		XlimNodeExecutor exec = new XlimNodeExecutor();

@@ -35,13 +35,8 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.type.AbstractTypeInterpreter;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.AbstractTypeVisitor;
 import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
-import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
 
 /**
  * Allocates a List of any dimension
@@ -49,14 +44,25 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ListAllocator extends AbstractTypeInterpreter {
+public class ListAllocator extends AbstractTypeVisitor {
 
-	private ArrayList<Integer> sizeList;
 	private ExpressionEvaluator expressionEvaluator;
+	private ArrayList<Integer> sizeList;
 
 	public ListAllocator() {
 		sizeList = new ArrayList<Integer>();
 		expressionEvaluator = new ExpressionEvaluator();
+	}
+
+	public Object allocate(Type type) {
+		type.accept(this);
+		int[] dimensions = new int[sizeList.size()];
+		for (int i = 0; i < sizeList.size(); i++) {
+			dimensions[i] = (Integer) sizeList.get(i);
+		}
+		sizeList.clear();
+
+		return Array.newInstance(Object.class, dimensions);
 	}
 
 	public List<Integer> getSize() {
@@ -65,74 +71,18 @@ public class ListAllocator extends AbstractTypeInterpreter {
 		return list;
 	}
 
-	public Object interpret(BoolType type) {
-		return Boolean.class;
-	}
-
-	public Object interpret(IntType type) {
-		return Integer.class;
-	}
-
-	public Object interpret(UintType type) {
-		return Integer.class;
-	}
-
-	public Object interpret(VoidType type) {
-		return null;
-	}
-
-	public Object interpret(StringType type) {
-		return String.class;
-	}
-
-	public Object interpret(ListType type) {
+	@Override
+	public void visit(ListType type) {
 		try {
 			Object size = type.getSize().accept(expressionEvaluator);
 			if (size instanceof Integer) {
 				sizeList.add((Integer) size);
-				return (Class<?>) type.getElementType().accept(this);
+				type.getElementType().accept(this);
 			} else {
 				throw new OrccException("expected int");
 			}
 		} catch (OrccException e) {
 			e.printStackTrace();
-			return null;
 		}
 	}
-		
-	public Object allocate(Type type) {
-		Class<?> classType = (Class<?>) type.accept(this);
-		int[] dimensions = new int[sizeList.size()];
-		for (int i = 0; i < sizeList.size(); i++) {
-			dimensions[i] = (Integer) sizeList.get(i);
-		}
-		sizeList.clear();
-
-		return Array.newInstance(classType, dimensions);
-	}
-
-//	public Object allocateAndInitialize(Type type, List<Object> init) {
-//		Class<?> classType = (Class<?>) type.accept(this);
-//		int[] dimensions = new int[sizeList.size()];
-//		for (int i = 0; i < sizeList.size(); i++) {
-//			dimensions[i] = (Integer) sizeList.get(i);
-//		}
-//		sizeList.clear();
-//
-//		Object array = Array.newInstance(classType, dimensions);
-//		if (init != null) {
-//			array=init;
-////			Object prevArray=array;
-////			Object newArray=array;
-////			int lastDim=dimensions[0];
-////			for (int dim : dimensions) {
-////				prevArray = newArray;
-////				lastDim=dimensions[i];
-////				newArray = Array.get(prevArray, i);
-////				
-////				System.arraycopy(init, 0, prevArray, 0, );
-//		}
-//		
-//		return array;
-//	}
 }
