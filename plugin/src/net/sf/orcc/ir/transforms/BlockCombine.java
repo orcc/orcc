@@ -97,7 +97,7 @@ public class BlockCombine extends AbstractActorTransformation {
 	}
 
 	@Override
-	protected void visitProcedure(Procedure procedure) {
+	public void visitProcedure(Procedure procedure) {
 		previous = null;
 		super.visitProcedure(procedure);
 	}

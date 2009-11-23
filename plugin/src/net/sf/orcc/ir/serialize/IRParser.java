@@ -131,6 +131,7 @@ import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.transforms.BlockCombine;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -296,6 +297,10 @@ public class IRParser {
 			Actor actor = new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procs, actions, initializes, sched, null);
 			in.close();
+
+			// combine basic blocks
+			new BlockCombine().transform(actor);
+
 			return actor;
 		} catch (JSONException e) {
 			throw new OrccException("JSON error", e);
@@ -727,8 +732,8 @@ public class IRParser {
 	/**
 	 * Parses the given list as a list of state variables. A
 	 * {@link StateVariable} is a {@link LocalVariable} with an optional
-	 * reference to an {@link AbstractConstant} that contain the variable's initial
-	 * value.
+	 * reference to an {@link AbstractConstant} that contain the variable's
+	 * initial value.
 	 * 
 	 * @param list
 	 *            A list of YAML-encoded {@link LocalVariable}.

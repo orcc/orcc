@@ -73,7 +73,7 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	protected void visitProcedure(Procedure procedure) {
+	public void visitProcedure(Procedure procedure) {
 		super.visitProcedure(procedure);
 
 		List<CFGNode> nodes = procedure.getNodes();

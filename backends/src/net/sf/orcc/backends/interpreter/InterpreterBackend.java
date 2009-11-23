@@ -39,7 +39,6 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.transforms.BlockCombine;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Connection;
@@ -128,7 +127,7 @@ public class InterpreterBackend implements IBackend {
 				}
 			}
 		}
-		
+
 		// build an actor queue with network graph vertexes
 		actorQueue = new ArrayList<AbstractInterpretedActor>();
 		for (Vertex vertex : graph.vertexSet()) {
@@ -137,14 +136,15 @@ public class InterpreterBackend implements IBackend {
 				if (instance.isActor()) {
 					Actor actor = instance.getActor();
 					if ("source".equals(actor.getName())) {
-						actorQueue.add(new SourceActor(instance.getId(), actor));
-					}else if ("display".equals(actor.getName())) {
-						actorQueue.add(new DisplayActor(instance.getId(), actor));						
+						actorQueue
+								.add(new SourceActor(instance.getId(), actor));
+					} else if ("display".equals(actor.getName())) {
+						actorQueue
+								.add(new DisplayActor(instance.getId(), actor));
 					} else {
 						// Apply some simplification transformations
 						ActorTransformation[] transformations = {
-								new DeadGlobalElimination(),
-								new BlockCombine(), new PhiRemoval() };
+								new DeadGlobalElimination(), new PhiRemoval() };
 
 						for (ActorTransformation transformation : transformations) {
 							transformation.transform(actor);

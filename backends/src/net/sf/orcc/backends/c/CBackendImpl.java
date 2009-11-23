@@ -36,7 +36,6 @@ import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.transforms.BlockCombine;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
@@ -80,7 +79,7 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new BlockCombine(), new PhiRemoval(), new IncrementPeephole(),
+				new PhiRemoval(), new IncrementPeephole(),
 				new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
