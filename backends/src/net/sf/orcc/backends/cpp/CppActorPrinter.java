@@ -55,7 +55,7 @@ public class CppActorPrinter extends Printer {
 	private StringTemplateGroup group;
 
 	/**
-	 * Creates a new actor printer with the template "Cpp_actor.stg".
+	 * Creates a new actor printer with the given template.
 	 * 
 	 * @throws IOException
 	 *             If the template file could not be read.
@@ -116,4 +116,5 @@ public class CppActorPrinter extends Printer {
 		type.accept(printer);
 		return printer.toString();
 	}
+
 }

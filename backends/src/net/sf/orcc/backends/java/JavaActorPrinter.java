@@ -28,22 +28,32 @@
  */
 package net.sf.orcc.backends.java;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import net.sf.orcc.backends.c.CActorPrinter;
+import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.backends.cpp.CppConstPrinter;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.util.INameable;
+
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * Actor printer.
  * 
- * @author Mathieu Wippliez
+ * @author Mathieu Wipliez
  * 
  */
-public class JavaActorPrinter extends CActorPrinter {
+public class JavaActorPrinter extends Printer {
+
+	private StringTemplateGroup group;
 
 	/**
 	 * Creates a new network printer with the template "Java_actor.stg".
@@ -52,7 +62,34 @@ public class JavaActorPrinter extends CActorPrinter {
 	 *             If the template file could not be read.
 	 */
 	public JavaActorPrinter() throws IOException {
-		super("Java_actor");
+		group = new TemplateGroupLoader().loadGroup("Java_actor");
+
+		// registers this printer as the default printer
+		Printer.register(this);
+	}
+
+	/**
+	 * Prints the given actor to a file whose name is given.
+	 * 
+	 * @param fileName
+	 *            output file name
+	 * @param id
+	 *            the instance id
+	 * @param actor
+	 *            actor to print
+	 * @throws IOException
+	 */
+	public void printActor(String fileName, String id, Actor actor)
+			throws IOException {
+		StringTemplate template = group.getInstanceOf("actor");
+
+		template.setAttribute("actorName", id);
+		template.setAttribute("actor", actor);
+
+		byte[] b = template.toString(80).getBytes();
+		OutputStream os = new FileOutputStream(fileName);
+		os.write(b);
+		os.close();
 	}
 
 	@Override
@@ -67,6 +104,11 @@ public class JavaActorPrinter extends CActorPrinter {
 		CppExprPrinter printer = new CppExprPrinter();
 		expression.accept(printer, Integer.MAX_VALUE);
 		return printer.toString();
+	}
+
+	@Override
+	public String toString(INameable nameable) {
+		return nameable.getName();
 	}
 
 	@Override

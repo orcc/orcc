@@ -28,9 +28,10 @@
  */
 package net.sf.orcc.backends.java;
 
-import net.sf.orcc.backends.c.CTypePrinter;
+import net.sf.orcc.ir.printers.DefaultTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
 
@@ -40,7 +41,7 @@ import net.sf.orcc.ir.type.UintType;
  * @author Matthieu Wipliez
  * 
  */
-public class JavaTypePrinter extends CTypePrinter {
+public class JavaTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(BoolType type) {
@@ -50,6 +51,12 @@ public class JavaTypePrinter extends CTypePrinter {
 	@Override
 	public void visit(IntType type) {
 		builder.append("int");
+	}
+
+	@Override
+	public void visit(ListType type) {
+		// size will be printed later
+		type.getElementType().accept(this);
 	}
 
 	@Override
