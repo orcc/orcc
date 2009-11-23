@@ -28,14 +28,11 @@
  */
 package net.sf.orcc.ir.printers;
 
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Printer;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.util.INameable;
 
 /**
  * This class defines a default IR printer.
@@ -44,12 +41,6 @@ import net.sf.orcc.ir.Variable;
  * 
  */
 public class DefaultPrinter extends Printer {
-
-	@Override
-	public String toString(CFGNode node) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public String toString(Constant constant) {
@@ -68,18 +59,6 @@ public class DefaultPrinter extends Printer {
 	}
 
 	@Override
-	public String toString(Instruction instruction) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String toString(Procedure procedure) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String toString(Type type) {
 		DefaultTypePrinter printer = new DefaultTypePrinter();
 		type.accept(printer);
@@ -87,8 +66,8 @@ public class DefaultPrinter extends Printer {
 	}
 
 	@Override
-	public String toString(Variable variable) {
-		return variable.getName();
+	public String toString(INameable nameable) {
+		return nameable.getName();
 	}
 
 }

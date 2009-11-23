@@ -29,6 +29,7 @@
 package net.sf.orcc.ir;
 
 import net.sf.orcc.ir.printers.DefaultPrinter;
+import net.sf.orcc.util.INameable;
 
 /**
  * This class defines an IR printer.
@@ -67,15 +68,6 @@ public abstract class Printer {
 	}
 
 	/**
-	 * Returns a string representation of the given CFG node.
-	 * 
-	 * @param node
-	 *            a CFG node
-	 * @return a string representation of the given CFG node
-	 */
-	public abstract String toString(CFGNode node);
-
-	/**
 	 * Returns a string representation of the given constant.
 	 * 
 	 * @param constant
@@ -94,22 +86,13 @@ public abstract class Printer {
 	public abstract String toString(Expression expression);
 
 	/**
-	 * Returns a string representation of the given instruction.
+	 * Returns a string representation of the given nameable object.
 	 * 
-	 * @param instruction
-	 *            an instruction
-	 * @return a string representation of the given instruction
+	 * @param nameable
+	 *            a nameable object
+	 * @return a string representation of the given nameable object
 	 */
-	public abstract String toString(Instruction instruction);
-
-	/**
-	 * Returns a string representation of the given procedure.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @return a string representation of the given procedure
-	 */
-	public abstract String toString(Procedure procedure);
+	public abstract String toString(INameable nameable);
 
 	/**
 	 * Returns a string representation of the given type.
@@ -119,14 +102,5 @@ public abstract class Printer {
 	 * @return a string representation of the given type
 	 */
 	public abstract String toString(Type type);
-
-	/**
-	 * Returns a string representation of the given variable.
-	 * 
-	 * @param variable
-	 *            a variable
-	 * @return a string representation of the given variable
-	 */
-	public abstract String toString(Variable variable);
 
 }

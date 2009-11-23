@@ -294,7 +294,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 
 	@Override
 	public String toString() {
-		return name;
+		return Printer.getInstance().toString(this);
 	}
 
 }

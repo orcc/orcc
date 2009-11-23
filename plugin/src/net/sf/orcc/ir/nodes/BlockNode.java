@@ -44,8 +44,7 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class BlockNode extends AbstractNode implements Iterable<Instruction>,
-		CFGNode {
+public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 
 	private static int globalLabel;
 

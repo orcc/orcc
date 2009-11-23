@@ -30,7 +30,6 @@ package net.sf.orcc.ir;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.consts.AbstractConstant;
-import net.sf.orcc.util.INameable;
 
 /**
  * This class represents a global variable. A global variable is a variable that
@@ -40,7 +39,7 @@ import net.sf.orcc.util.INameable;
  * @author Matthieu Wipliez
  * 
  */
-public class GlobalVariable extends Variable implements INameable {
+public class GlobalVariable extends Variable {
 
 	/**
 	 * variable constant value.
