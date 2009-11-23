@@ -38,7 +38,7 @@ import net.sf.orcc.ir.ICommunicationFifo;
  */
 public class IntFifo implements ICommunicationFifo {
 
-	private int[] contents;
+	private Object[] contents;
 
 	private int read;
 
@@ -48,15 +48,11 @@ public class IntFifo implements ICommunicationFifo {
 
 	public IntFifo(int size) {
 		this.size = size;
-		contents = new int[size];
+		contents = new Object[size];
 	}
 
-	//public void get(boolean[] target) {
-	//	peek(target);
-	//	read += target.length;
-	//}
-
-	public void get(int[] target) {
+	public void get(Object[] target) {
+		System.out.println("Get from FIFO object : " + target);
 		peek(target);
 		read += target.length;
 	}
@@ -97,28 +93,15 @@ public class IntFifo implements ICommunicationFifo {
 		}
 	}
 
-	//public void peek(boolean[] target) {
-	//	int n = target.length;
-	//	for (int i = 0; i < n; i++) {
-	//		target[i] = (contents[read + i] != 0);
-	//	}
-	//}
-
-	public void peek(int[] target) {
+	public void peek(Object[] target) {
 		int n = target.length;
+		System.out.println("Peek from FIFO object : " + target);
 		System.arraycopy(contents, read, target, 0, n);
 	}
 
-	//public void put(boolean[] source) {
-	//	int n = source.length;
-	//	for (int i = 0; i < n; i++) {
-	//		contents[write + i] = source[i] ? 1 : 0;
-	//	}
-	//	write += n;
-	//}
-
-	public void put(int[] source) {
+	public void put(Object[] source) {
 		int n = source.length;
+		System.out.println("Put in FIFO object : " + source);
 		System.arraycopy(source, 0, contents, write, n);
 		write += n;
 	}

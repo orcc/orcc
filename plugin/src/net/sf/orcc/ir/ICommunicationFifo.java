@@ -60,8 +60,7 @@ public interface ICommunicationFifo {
 	 * @param source
 	 *            source array to be copied to FIFO
 	 */
-	public void put(int[] source);	
-	//public void put(boolean[] source);	
+	public void put(Object[] source);
 
 	/**
 	 * Feeds target array with next tokens as required by "hasTokens" 
@@ -70,9 +69,7 @@ public interface ICommunicationFifo {
 	 * @param target
 	 *            target array for receiving next FIFO tokens
 	 */
-	public void peek(int[] target);
-	//public void peek(boolean[] target);
-	
+	public void peek(Object[] target);	
 	
 	/**
 	 * Feeds target array with next tokens as required by "hasTokens" 
@@ -81,6 +78,5 @@ public interface ICommunicationFifo {
 	 * @param target
 	 *            target array for receiving next FIFO tokens
 	 */
-	public void get(int[] target);
-	//public void get(boolean[] target);
+	public void get(Object[] target);
 }

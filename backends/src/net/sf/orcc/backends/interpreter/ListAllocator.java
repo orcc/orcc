@@ -110,4 +110,29 @@ public class ListAllocator extends AbstractTypeInterpreter {
 
 		return Array.newInstance(classType, dimensions);
 	}
+
+//	public Object allocateAndInitialize(Type type, List<Object> init) {
+//		Class<?> classType = (Class<?>) type.accept(this);
+//		int[] dimensions = new int[sizeList.size()];
+//		for (int i = 0; i < sizeList.size(); i++) {
+//			dimensions[i] = (Integer) sizeList.get(i);
+//		}
+//		sizeList.clear();
+//
+//		Object array = Array.newInstance(classType, dimensions);
+//		if (init != null) {
+//			array=init;
+////			Object prevArray=array;
+////			Object newArray=array;
+////			int lastDim=dimensions[0];
+////			for (int dim : dimensions) {
+////				prevArray = newArray;
+////				lastDim=dimensions[i];
+////				newArray = Array.get(prevArray, i);
+////				
+////				System.arraycopy(init, 0, prevArray, 0, );
+//		}
+//		
+//		return array;
+//	}
 }

@@ -38,6 +38,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
@@ -68,6 +69,8 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		if (sched.hasFsm()) {
 			this.fsmState = sched.getFsm().getInitialState().getName();
 			fsmMgr = new FsmManager(sched.getFsm());
+		} else {
+			fsmState = "IDLE";
 		}
 		// TODO : get scheduling predecessors
 
@@ -92,11 +95,14 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		// initialized
 		for (Variable stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
-			if (type.getType() == Type.LIST) {
+			// Initialize variables with constant values
+			if (((StateVariable) stateVar).hasInit()) {
+				Constant initConst = ((StateVariable) stateVar).getInit();
+				Object initVal = initConst.accept(constEval);
+				stateVar.setValue(initVal);
+			} else if (type.getType() == Type.LIST) {
+				// Allocate empty array variable
 				stateVar.setValue(listAllocator.allocate(type));
-			} else if (((StateVariable) stateVar).hasInit()) {
-				stateVar.setValue(((StateVariable) stateVar).getInit().accept(
-						constEval));
 			}
 		}
 		// Get initializing procedure if any
@@ -116,7 +122,23 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * 
 	 */
 	public Integer schedule() throws Exception {
+
 		if (sched.hasFsm()) {
+			if (name.equals("parseheaders")) {
+				System.out.println("Current FSM state is : " + fsmState);
+			}
+
+			// Check for untagged actions first
+			for (Action action : sched.getActions()) {
+				if (isSchedulable(action)) {
+					interpretProc(action.getBody());
+					if (name.equals("parseheaders")) {
+						System.out.println("Executing action : "
+								+ action.getBody().getName());
+					}
+				}
+			}
+			// Then check for next FSM transition
 			Iterator<TransitionManager> it = fsmMgr.getIt(fsmState);
 
 			while (it.hasNext()) {
@@ -124,6 +146,10 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				Action action = transMgr.transitionAction;
 				if (isSchedulable(action)) {
 					interpretProc(action.getBody());
+					if (name.equals("parseheaders")) {
+						System.out.println("Executing action : "
+								+ action.getBody().getName());
+					}
 					// Update FSM state
 					fsmState = transMgr.targetState;
 					// Execute 1 action only per actor scheduler cycle
@@ -134,6 +160,9 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			for (Action action : sched.getActions()) {
 				if (isSchedulable(action)) {
 					interpretProc(action.getBody());
+					if (name.equals("parseheaders")) {
+						System.out.println("WRONG !");
+					}
 					// Execute 1 action only per actor scheduler cycle
 					return 1;
 				}

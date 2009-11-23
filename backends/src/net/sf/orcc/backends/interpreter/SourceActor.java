@@ -60,7 +60,7 @@ public class SourceActor extends AbstractInterpretedActor {
 
 	@Override
 	public Integer schedule() throws Exception {
-		int[] source = new int[1];
+		Object[] source = (Object[])new Integer[1];
 		int running = 0;
 
 		try {
@@ -68,6 +68,7 @@ public class SourceActor extends AbstractInterpretedActor {
 				int byteRead = in.read();
 				if (byteRead != -1) {
 					source[0] = byteRead;
+					//System.out.println("Next bitstream byte = "+source[0]);
 					fifo_O.put(source);
 					running = 1;
 				}

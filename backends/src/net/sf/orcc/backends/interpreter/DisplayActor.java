@@ -156,14 +156,14 @@ public class DisplayActor extends AbstractInterpretedActor {
 	}
 
 	private void setVideoSize() {
-		int[] width = new int[1];
-		int[] height = new int[1];
+		Object[] width = (Object[])new Integer[1];
+		Object[] height = (Object[])new Integer[1];
 
 		fifo_WIDTH.get(width);
 		fifo_HEIGHT.get(height);
 
-		int newWidth = width[0] << 4;
-		int newHeight = height[0] << 4;
+		int newWidth = (Integer)width[0] << 4;
+		int newHeight = (Integer)height[0] << 4;
 
 		if (newWidth != this.width || newHeight != this.height) {
 			this.width = newWidth;
@@ -181,19 +181,19 @@ public class DisplayActor extends AbstractInterpretedActor {
 	}
 
 	private void writeMB() {
-		int[] mb = new int[384];
+		Object[] mb = (Object[])new Integer[384];
 		fifo_B.get(mb);
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				int index = 8 * j + i;
 
-				int u = mb[256 + index];
-				int v = mb[320 + index];
+				int u = (Integer)mb[256 + index];
+				int v = (Integer)mb[320 + index];
 
 				for (int ym = 0; ym < 2; ym++) {
 					for (int xm = 0; xm < 2; xm++) {
-						int y = mb[64 * (xm + 2 * ym) + index];
+						int y = (Integer)mb[64 * (xm + 2 * ym) + index];
 
 						int rgb = convertYCbCrtoRGB(y, u, v);
 

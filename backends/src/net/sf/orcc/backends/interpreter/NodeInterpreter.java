@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.interpreter;
 
+import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.List;
 
@@ -101,7 +102,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		try {
 			Object condition = node.getValue().accept(exprInterpreter);
 
-			/* if (condition si true) then */
+			/* if (condition is true) then */
 			if ((Boolean) condition) {
 				for (CFGNode subNode : node.getThenNodes()) {
 					subNode.accept(this, args);
@@ -109,7 +110,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 				/* else */
 			} else {
 				List<CFGNode> elseNodes = node.getElseNodes();
-				if (elseNodes.size() != 1) {
+				if (!elseNodes.isEmpty()) {
 					for (CFGNode subNode : elseNodes) {
 						subNode.accept(this, args);
 					}
@@ -181,7 +182,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(Peek instr, Object... args) {
-		int[] target = (int[]) (instr.getTarget().getValue());
+		Object[] target = (Object[]) (instr.getTarget().getValue());
 
 		ICommunicationFifo fifo = instr.getPort().fifo();
 		fifo.peek(target);
@@ -189,7 +190,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(Read instr, Object... args) {
-		int[] target = (int[]) instr.getTarget().getValue();
+		Object[] target = (Object[]) instr.getTarget().getValue();
 
 		ICommunicationFifo fifo = instr.getPort().fifo();
 		fifo.get(target);
@@ -202,7 +203,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(Write instr, Object... args) {
-		int[] target = (int[]) instr.getTarget().getValue();
+		Object[] target = (Object[]) instr.getTarget().getValue();
 
 		ICommunicationFifo fifo = instr.getPort().fifo();
 		fifo.put(target);
@@ -240,14 +241,39 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	public void visit(Load instr, Object... args) {
 		LocalVariable target = instr.getTarget();
 		Variable source = instr.getSource().getVariable();
-		target.setValue(source.getValue());
+		try {
+			if (instr.getIndexes().isEmpty()) {
+				target.setValue(source.getValue());				
+			} else {
+				Object obj = source.getValue();
+				for (Expression index : instr.getIndexes()) {
+					obj = Array.get(obj, (Integer)index
+							.accept(exprInterpreter));
+				}
+				target.setValue(obj);		
+			}
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void visit(Store instr, Object... args) {
 		Variable variable = instr.getTarget().getVariable();
 		try {
-			variable.setValue(instr.getValue().accept(exprInterpreter));
+			if (instr.getIndexes().isEmpty()) {
+				variable.setValue(instr.getValue().accept(exprInterpreter));				
+			} else {
+				Object obj = variable.getValue();
+				Object objPrev=obj;
+				Integer lastIndex=0;
+				for (Expression index : instr.getIndexes()) {
+					objPrev = obj;
+					lastIndex = (Integer)index.accept(exprInterpreter);
+					obj = Array.get(objPrev, lastIndex);
+				}
+				Array.set(objPrev, lastIndex, instr.getValue().accept(exprInterpreter));
+			}
 		} catch (OrccException e) {
 			e.printStackTrace();
 		}
