@@ -134,10 +134,6 @@ public class XlimNames {
 	 * @return Variable name
 	 */
 	public String getVarName(Variable var) {
-		/*
-		 * Integer count = varcounts.get(var.getName()); if(count == null){
-		 * count = 0; } else{ count++; } varcounts.put(var.getName(),count);
-		 */
 		return getVarTemplate(var);
 	}
 
@@ -149,7 +145,7 @@ public class XlimNames {
 	 * @return Variable name
 	 */
 	private String getVarTemplate(Variable var) {
-		return "var_" + var.getName();// + "_" + varcounts.get(var.getName());
+		return "var_" + var.getName();
 	}
 
 	/**

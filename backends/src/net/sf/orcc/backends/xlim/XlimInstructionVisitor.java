@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Assign;
@@ -121,10 +122,17 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	 *            Arguments sent (not used)
 	 */
 	public void visit(Assign node, Object... args) {
+		/*
+		 * node.getValue().accept(new XlimExprVisitor(names, root)); Element
+		 * operationE = XlimNodeTemplate.newTargetOperation(root, "assign",
+		 * names.getVarName(node.getTarget()));
+		 * XlimNodeTemplate.newInPort(operationE, names.getTempName());
+		 */
 		node.getValue().accept(new XlimExprVisitor(names, root));
-		Element operationE = XlimNodeTemplate.newTargetOperation(root,
-				"assign", names.getVarName(node.getTarget()));
+		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
+		XlimNodeTemplate.newOutPort(operationE, names.getVarName(node
+				.getTarget()));
 	}
 
 	/**
@@ -200,23 +208,23 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	public void visit(Load node, Object... args) {
 		Element operationE;
 		String name = null;
-		if(node.getSource().getVariable().getType().getType() == Type.LIST){
+		if (node.getSource().getVariable().getType().getType() == Type.LIST) {
 			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root));
-			operationE = XlimNodeTemplate.newNameOperation(root, "var_ref", names.getVarName(node.getSource()));
+			operationE = XlimNodeTemplate.newNameOperation(root, "var_ref",
+					names.getVarName(node.getSource()));
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
-		}
-		else{
+		} else {
 			operationE = XlimNodeTemplate.newOperation(root, "noop");
-	
+
 			name = names.getVarName(node.getSource());
 			XlimNodeTemplate.newInPort(operationE, name);
 		}
-	
+
 		LocalVariable local = node.getTarget();
 		Type outtype = node.getTarget().getType();
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local),
 				outtype);
-	
+
 		if (name != null && readMap.containsKey(name)) {
 			outtype.accept(new XlimTypeSizeVisitor(readMap.get(name)));
 		}
@@ -315,14 +323,30 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	public void visit(Store node, Object... args) {
 		node.getValue().accept(new XlimExprVisitor(names, root));
 
-		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
+		Variable var = node.getTarget().getVariable();
+		if (var instanceof StateVariable) {
+			Element operationE = XlimNodeTemplate.newDiffOperation(root,
+					"assign");
+			operationE.setAttribute("target", names
+					.getVarName(node.getTarget()));
+			String data = names.getTempName();
 
-		XlimNodeTemplate.newInPort(operationE, names.getTempName());
+			for (Expression expr : node.getIndexes()) {
+				expr.accept(new XlimExprVisitor(names, root));
+				XlimNodeTemplate.newInPort(operationE, names.getTempName());
+			}
+			XlimNodeTemplate.newInPort(operationE, data);
+			root.appendChild(operationE);
+		} else {
+			Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 
-		String name = names.getVarName(node.getTarget());
-		Element port = XlimNodeTemplate.newOutPort(operationE, name);
+			XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
-		writeMap.put(name, port);
+			String name = names.getVarName(node.getTarget());
+			Element port = XlimNodeTemplate.newOutPort(operationE, name);
+
+			writeMap.put(name, port);
+		}
 	}
 
 	/**
