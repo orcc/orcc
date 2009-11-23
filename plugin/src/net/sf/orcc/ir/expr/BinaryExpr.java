@@ -79,14 +79,29 @@ public class BinaryExpr extends AbstractExpression {
 		return interpreter.interpret(this, args);
 	}
 
+	/**
+	 * Returns the first operand of this binary expression as an expression.
+	 * 
+	 * @return the first operand of this binary expression
+	 */
 	public Expression getE1() {
 		return e1;
 	}
 
+	/**
+	 * Returns the second operand of this binary expression as an expression.
+	 * 
+	 * @return the second operand of this binary expression
+	 */
 	public Expression getE2() {
 		return e2;
 	}
 
+	/**
+	 * Returns the operator of this binary expression.
+	 * 
+	 * @return the operator of this binary expression
+	 */
 	public BinaryOp getOp() {
 		return op;
 	}

@@ -29,6 +29,8 @@
 package net.sf.orcc.ir.type;
 
 /**
+ * This class defines a type interpreter.
+ * 
  * @author Pierre-Laurent Lagalaye
  * 
  */

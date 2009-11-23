@@ -78,6 +78,11 @@ public class UnaryExpr extends AbstractExpression {
 		return UNARY;
 	}
 
+	/**
+	 * Returns the type of this expression as a {@link Type}.
+	 * 
+	 * @return the type of this expression as a {@link Type}
+	 */
 	public Type getUnderlyingType() {
 		return type;
 	}
