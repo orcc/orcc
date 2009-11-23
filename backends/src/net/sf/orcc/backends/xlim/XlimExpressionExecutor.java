@@ -35,7 +35,9 @@ public class XlimExpressionExecutor extends ExpressionEvaluator {
 	 * @return Value of the variable
 	 */
 	public Object interpret(VarExpr expr, Object... args) {
-		return datas.get(expr.getVar().getVariable().toString());
+		String name = expr.getVar().getVariable().toString();
+		name = name.substring(0, name.lastIndexOf('_'));
+		return datas.get(name);
 	}
 
 }

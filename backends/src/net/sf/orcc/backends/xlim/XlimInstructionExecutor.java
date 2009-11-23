@@ -72,8 +72,10 @@ public class XlimInstructionExecutor implements InstructionVisitor {
 	 *            Assign node
 	 */
 	public void visit(Assign node, Object... args) {
+		String name = node.getTarget().toString();
+		name = name.substring(0, name.lastIndexOf('_'));
 		try {
-			datas.put(node.getTarget().toString(), node.getValue().accept(
+			datas.put(name, node.getValue().accept(
 					new XlimExpressionExecutor(datas)));
 		} catch (OrccException e) {
 			e.printStackTrace();
