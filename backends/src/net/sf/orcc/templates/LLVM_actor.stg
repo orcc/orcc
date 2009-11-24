@@ -4,8 +4,8 @@ group LLVM_actor;
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-fifo(actorName, portName) ::= <<
-@$actorName$_$portName$ = common global %struct.lff_t* null
+fifo(port) ::= <<
+@$actorName$_$port.name$ = common global %struct.lff_t* null
 
 >>
 
@@ -23,78 +23,32 @@ phiPair(value, label) ::= <<
 [$value$, %$label$]
 >>
 
+variableDeclaration(variable) ::= <<
+$if(variable.port)$
+%$variable$ = alloca $variable.type$
+%local_$variable$ = load %struct.lff_t** @$actorName$_$variable$
 
-// a variable definition
-vardef(var) ::= <<
-$if(var.isGlobal)$
-@$var.name$ = internal global $var.type$
-$else$
-$if(var.isPort)$
-%$var.name$ = alloca $var.type$
-
-$endif$
-$endif$>>
-
-// a state variable
-stateVar(vardef, value) ::= <<
-$if(value)$
-$vardef(vardef)$ $value$$\n$
-$else$
-$vardef(vardef)$ zeroinitializer$\n$
 $endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Nodes
+// State variables
 ///////////////////////////////////////////////////////////////////////////////
+stateVar(variable) ::= <<
+$if(variable.init)$
+@$variable$ = internal global $variable.type$ $variable.init$
 
-// block node
-blockNode(label, instructions) ::= <<
-$label$:
-	$instructions$
+$else$
+@$variable$ = internal global $variable.type$ zeroinitializer
+
+$endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-// assignment node
-assignVarNode(var, expr) ::= <<
-	$var$ = $expr$
-
->>
-
-// call node
-callNode(res, name, return, parameters) ::= <<
-$if(res)$
-	$res$ = 
-$endif$
-call $return$ @$name$($parameters; separator=", "$)
-
->>
-
-// getElementPtrNode node
-getElementPtrNode(target, source, indexes) ::= <<
-	$target$ = getelementptr $source$, i32 0, $indexes; separator=", "$
-
->>
-
-// initialization port node
-initPortNode(actorName, fifoName, expr, index) ::= <<
-	%$fifoName$_ptr = getelementptr %struct.lff_t** $expr$, i32 $index$
-	%$fifoName$_val = load %struct.lff_t** %$fifoName$_ptr
-	store %struct.lff_t* %$fifoName$_val, %struct.lff_t** @$actorName$_$fifoName$
-
->>
-
-// hasTokens node
-hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
-	%$actorName$_$fifoName$ = load %struct.lff_t** @$actorName$_$fifoName$
-	$var$ = call i1 @lff_hasTokens(%struct.lff_t* %$actorName$_$fifoName$, i32 $numTokens$)
-
->>
-
-// selectnode
+/* // selectnode
 selectNode(var, type, expr, trueVar, falseVar) ::= <<
 	$var$ = select $expr$, $trueVar$, $falseVar$
 
@@ -124,113 +78,120 @@ SextNode(var, type, expr) ::= <<
 
 >>
 
-// brnode
-brNode(conditionNodes, expr, thenLabelNode, thenNodes, elseLabelNode, elseNodes, endLabelNode) ::= <<
-$conditionNodes$
-	br $expr$, label %$thenLabelNode$, label %$elseLabelNode$
+// getElementPtrNode node
+getElementPtrNode(target, source, indexes) ::= <<
+	$target$ = getelementptr $source$, i32 0, $indexes; separator=", "$
 
-$if(thenNodes)$
-$thenLabelNode$:
+>>
 
-$thenNodes$
+// initialization port node
+initPortNode(fifoName, expr, index) ::= <<
+	%$fifoName$_ptr = getelementptr %struct.lff_t** $expr$, i32 $index$
+	%$fifoName$_val = load %struct.lff_t** %$fifoName$_ptr
+	store %struct.lff_t* %$fifoName$_val, %struct.lff_t** @$actorName$_$fifoName$
+
+>>
+
+>> */
+
+///////////////////////////////////////////////////////////////////////////////
+// Instructions
+///////////////////////////////////////////////////////////////////////////////
+
+Assign(assign) ::= <<
+$assign.target$ = $assign.value$
+
+>>
+
+Call(call) ::= <<
+$if(call.target)$
+$call.target$ = 
 $endif$
-
-$if(elseNodes)$
-$elseLabelNode$:
-	
-$elseNodes$
-$endif$
-
-$if(endLabelNode)$
-$endLabelNode$:
-
-$endif$
->>
-
-
-// label node
-labelNode(name) ::= <<
-$name$:
+call $call.procedure.returnType$ @$call.procedure$($call.parameters; separator=", "$)
 
 >>
 
-// phi node
-phiNode(target, type, assignements) ::= <<
-	$target$ = phi $type$ $assignements: {$it$}; separator=", "$
+HasTokens(hasTokens) ::= <<
+%$hasTokens.target$ = call i1 @lff_hasTokens(%struct.lff_t* %local_$actorName$_$hasTokens.port$, i32 $hasTokens.numTokens$)
 
 >>
 
-// brlabel node
-brlabelNode(name) ::= <<
-	br label %$name$
+Load(load) ::= <<
+$load.target$ = load $load.source$
 
 >>
 
-// load node
-loadNode(target, source) ::= <<
-	$target$ = load $source$
-
->>
-
-// peek node
-peekNode(typevar, var, actorName, fifoName, numTokens) ::= <<
-	call void @lff_peek(%struct.lff_t* %$actorName$_$fifoName$, $typevar$ $var$)
+Peek(peek) ::= <<
+call void @lff_peek(%struct.lff_t* %$actorName$_$peek.port$, $peek.target.type$ $peek.target$)
 	
 >>
 
-// read node
-readNode(var, actorName, fifoName, numTokens) ::= <<
-	call void @lff_read(%struct.lff_t* %$actorName$_$fifoName$, i8* $var$)
+PhiAssignment(phi) ::= <<
+$phi.target$ = phi $phi.target.type$ $phi.vars: {$it$}; separator=", "$
 
 >>
 
-// loadfifo node
-loadFifo(actorName, fifoName, index) ::= <<
-	%$actorName$_$fifoName$_$index$ = load %struct.lff_t** @$actorName$_$fifoName$
-
->>
-
-loadFifoTmp(var, actorName, fifoName) ::= <<
-	%$var$ = load %struct.lff_t** @$actorName$_$fifoName$
+Read(read) ::= <<
+%$read.target$_$read.block.label$ = getelementptr $read.target.type$* %$read.target$
+%$read.target$_$read.block.label$_cast = bitcast $read.target.type$* %$read.target$_$read.block.label$ to i8*
+call void @lff_read(%struct.lff_t* %local_$read.target$, i8* %$read.target$_$read.block.label$_cast)
 
 >>
 
 // return node
-returnNode(expr) ::= <<
-$if(expr)$
-ret $expr$
+Return(return) ::= <<
+$if(return.value)$
+ret $return.value$
 $else$
 ret void
 $endif$
->>
-
-// self-assignment node
-selfAssignmentNode(var, op, expr) ::= <<
-$var$ $op$= $expr$;
 
 >>
 
-// store node
-storeNode(var, expr) ::= <<
-	store $expr$, $var$
+Store(store) ::= <<
+store $store.value$, $store.target$
 
->>
-
-// hasRoom node
-hasRoomNode(var, expr, token) ::= <<
-	%$var$ =  call i1 @lff_hasRoom(%struct.lff_t* $expr$, i32 $token$)
-	
->>
-
-// andNode node
-andNode(var, e1, e2) ::= <<
-	%$var$ = and i1 $e1$, $e2$
 >>
 
 // write node
-writeNode(var, actorName, fifoName, numTokens) ::= <<
-	call void @lff_write(%struct.lff_t* %$actorName$_$fifoName$, $var$)
+Write(write) ::= <<
+call void @lff_write(%struct.lff_t* %$actorName$_$write.port$, $write.target$)
 
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
+
+instructions(instructions) ::= <<
+$instructions: {$(it.class.simpleName)(it)$}$
+>>
+
+nodes(nodes) ::= <<
+$nodes: {$(it.class.simpleName)(it)$}$
+>>
+
+// if node
+BlockNode(blockNode) ::= <<
+b$blockNode.label$:
+	$instructions(blockNode.instructions)$
+>>
+
+// if node
+IfNode(ifNode) ::= <<
+br i1 $ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
+$nodes(ifNode.thenNodes)$	br %b$ifNode.joinNode.label$
+$nodes(ifNode.elseNodes)$	br %b$ifNode.joinNode.label$
+$BlockNode(ifNode.joinNode)$
+>>
+
+// while node
+WhileNode(whileNode) ::= <<
+while ($whileNode.value$) {
+	$nodes(whileNode.nodes)$}
+$BlockNode(whileNode.joinNode)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -246,27 +207,35 @@ $nodes$	ret void
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Procedure and actions
+// Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
-proc(name, type, parameters, locals, nodes) ::= <<
+procedure(procedure) ::= <<
 
-define internal $type$ @$name$($parameters; wrap, anchor, separator=", "$) {
+define internal $procedure.returnType$ @$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
 entry:
-$if(locals)$
-	$locals: {$vardef(it)$}$
+$if(procedure.locals.list)$
+	$procedure.locals.list: variableDeclaration(it)$	br label %b$first(procedure.nodes).label$
 
 $endif$
-$nodes$
-}
+$procedure.nodes: {$(it.class.simpleName)(it)$}$}
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+action(action) ::= <<
+$procedure(action.body)$$procedure(action.scheduler)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-outputPattern(actorName, pattern, token, iterator) ::= <<
-$loadFifoTmp(var=iterator.index, actorName= actorName, fifoName=pattern)$ $hasRoomNode(var=iterator.nextNodeIndex.index, expr="%"+iterator.lastIndex, token=token)$
+outputPattern(pattern, token, iterator) ::= <<
+$loadFifoTmp(var=iterator.index, fifoName=pattern)$ $hasRoomNode(var=iterator.nextNodeIndex.index, expr="%"+iterator.lastIndex, token=token)$
 >>
 
 
@@ -277,15 +246,15 @@ actionCall(action) ::= <<
 	call void @$action$()
 >>
 
-actionTest(actorName, action, iterator) ::= <<
+actionTest(action, iterator) ::= <<
 	%$action$ = call i1 @isSchedulable_$action$()
 	br i1 %$action$, label %fire_$action$, label %skip_$action$
 
 fire_$action$:
 $if(action.outputPattern)$
-$first(action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
-$first(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
-$rest(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
+$first(action.outputPattern.keys):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
+$first(rest(action.outputPattern.keys)):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
+$rest(rest(action.outputPattern.keys)):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
 $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$$\n$}$
 	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action$, label %hasNoRoom_$action$
 
@@ -304,15 +273,15 @@ skip_$action$:
 
 >>
 
-outside_FSM_actionTest(actorName, action, iterator) ::= <<
+outside_FSM_actionTest(action, iterator) ::= <<
 	%$action$ = call i1 @isSchedulable_$action$()
 	br i1 %$action$, label %fire_$action$, label %skip_$action$
 
 fire_$action$:
 $if(action.outputPattern)$
-$first(action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
-$first(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
-$rest(rest(action.outputPattern.keys)):{port|$outputPattern(actorName=actorName, pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
+$first(action.outputPattern.keys):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
+$first(rest(action.outputPattern.keys)):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
+$rest(rest(action.outputPattern.keys)):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
 $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$$\n$}$
 	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action$, label %hasNoRoom_$action$
 
@@ -331,15 +300,15 @@ skip_$action$:
 
 >>
 
-schedulingTest(actorName, actions, iterator) ::= <<
-$actions: actionTest(actorName=actorName, action=it, iterator = iterator)$
+schedulingTest(actions, iterator) ::= <<
+$actions: actionTest(action=it, iterator = iterator)$
 >>
 
-outside_FSM_schedulingTest(actorName, actions, iterator) ::= <<
-$actions: outside_FSM_actionTest(actorName=actorName, action=it, iterator = iterator)$
+outside_FSM_schedulingTest(actions, iterator) ::= <<
+$actions: outside_FSM_actionTest(action=it, iterator = iterator)$
 >>
 
-scheduler(actorName, actions, iterator) ::= <<
+scheduler(actions, iterator) ::= <<
 define i32 @$actorName$_scheduler() {
 entry:
 	%i = alloca i32
@@ -348,7 +317,7 @@ entry:
 	
 bb:  
 $if(actions)$
-$schedulingTest(actorName=actorName, actions=actions, iterator = iterator)$
+$schedulingTest(actions=actions, iterator = iterator)$
 $endif$
 	br label %return
 
@@ -369,14 +338,14 @@ actionCallState(nextState) ::= <<
 
 >>
 
-actionTestState(actorName, nextState, br, iterator) ::= <<
+actionTestState(nextState, br, iterator) ::= <<
 
 $if(nextState.action.outputPattern)$
 	%sched_$nextState.action$ = call i1 @isSchedulable_$nextState.action$()
 	br i1 %sched_$nextState.action$, label %$nextState.action$, label %$br$
 
 $nextState.action$:
-$first(nextState.action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator)$}$ $rest(nextState.action.outputPattern.keys):{port|$outputPattern(actorName=actorName, pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator.nextNodeIndex)$}$
+$first(nextState.action.outputPattern.keys):{port|$outputPattern(pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator)$}$ $rest(nextState.action.outputPattern.keys):{port|$outputPattern(pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator.nextNodeIndex)$}$
 	br i1 %$iterator.nextNodeIndex.lastIndex$, label %n_$nextState.action$, label %$br$
 
 n_$nextState.action$:
@@ -394,15 +363,15 @@ $endif$
 
 >>
 
-schedulingTestState(actorName, nextStates, iterator) ::= <<
-$trunc(nextStates): actionTestState(actorName=actorName, nextState=it, br = "bb"+i0, iterator = iterator)$
-$last(nextStates): actionTestState(actorName=actorName, nextState=it, br = "return", iterator = iterator)$
+schedulingTestState(nextStates, iterator) ::= <<
+$trunc(nextStates): actionTestState(nextState=it, br = "bb"+i0, iterator = iterator)$
+$last(nextStates): actionTestState(nextState=it, br = "return", iterator = iterator)$
 >>
 
-stateScheduler(actorName, transition, iterator) ::= <<
+stateScheduler(transition, iterator) ::= <<
 define internal i1 @$transition.sourceState$_state_scheduler() {
 entry:
-$schedulingTestState(actorName=actorName, nextStates=transition.nextStateInfo, iterator = iterator.init)$
+$schedulingTestState(nextStates=transition.nextStateInfo, iterator = iterator.init)$
 	ret i1 0
 }
 
@@ -422,20 +391,20 @@ default:
 
 >>
 
-schedulerFSM(actorName, actions, fsm, iterator) ::= <<
+schedulerFSM(actions, fsm, iterator) ::= <<
 
 @_FSM_state = internal global i32 $fsm.initialState.index$
 
 $if(actions)$
 define i1 @outside_FSM_scheduler() {
 entry:
-	$outside_FSM_schedulingTest(actorName=actorName, actions=actions, iterator = iterator)$
+	$outside_FSM_schedulingTest(actions=actions, iterator = iterator)$
 	ret i1 0
 }
 
 
 $endif$
-$fsm.transitions: stateScheduler(actorName=actorName, transition=it, iterator = iterator); separator="\n"$
+$fsm.transitions: stateScheduler(transition=it, iterator = iterator); separator="\n"$
 define i32 @$actorName$_scheduler() {
 entry:
 	%i = alloca i32
@@ -469,36 +438,42 @@ return:
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(name, inputs, outputs, stateVars, insts, procs,  
-      actions, initializes, scheduler, initialize, iterator) ::= <<
-; Generated from "$name$"
+actor(actorName, actor) ::= <<
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Generated from "$actor.name$"
 
 %struct.lff_t = type { i32, i8*, i32, i32, i32 }
 
-;function declaration
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; FIFO functions declarations
 declare void @lff_read(%struct.lff_t* %lff, i8* %data)
 declare i1 @lff_hasTokens(%struct.lff_t* %lff, i32 %nbTokens)
 declare i1 @lff_hasRoom(%struct.lff_t* %lff, i32 %room)
 declare void @lff_peek(%struct.lff_t* %lff, i8* %data)
 declare void @lff_write(%struct.lff_t* %lff, i8* %data)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Input FIFOs
+$actor.inputs.list: fifo(it)$
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Output FIFOs
+$actor.outputs.list: fifo(it)$
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; State variables of the actor
+$actor.stateVars.list: stateVar(it)$
 
-;Input FIFOs
-$inputs: fifo(actorName=name, portName=it)$
+$! TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO !$
+$! $insts$ !$
+$! TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO !$
 
-;Output FIFOs
-$outputs: fifo(actorName=name, portName=it)$
-
-
-;State variables of the actor
-$stateVars$
-
-$insts$
-
-$procs$
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Functions/procedures
+$actor.procs.list: procedure(it)$
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-$actions$
+$actor.actions: action(it)$
+
+$!
 $if(initializes)$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Initializes
@@ -511,7 +486,7 @@ entry:
 	
 bb:  
 $if(initialize)$
-$schedulingTest(actorName=name, actions=initialize)$
+$schedulingTest(initialize)$
 $endif$
 	br label %return
 	
@@ -524,8 +499,8 @@ $endif$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Action scheduler
 $if(scheduler.fsm)$
-$schedulerFSM(actorName=name, actions=scheduler.actions, fsm=scheduler.fsm, iterator = iterator)$
+$schedulerFSM(actions=scheduler.actions, fsm=scheduler.fsm, iterator = iterator)$
 $else$
-$scheduler(actorName=name, actions=scheduler.actions, iterator= iterator)$
-$endif$
+$scheduler(actions=scheduler.actions, iterator= iterator)$
+$endif$ !$
 >>
