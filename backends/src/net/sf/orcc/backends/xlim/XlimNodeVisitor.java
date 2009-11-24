@@ -30,6 +30,7 @@ package net.sf.orcc.backends.xlim;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
@@ -58,9 +59,9 @@ public class XlimNodeVisitor implements NodeVisitor {
 	private XlimNames names;
 
 	/**
-	 * Map for input type
+	 * Vector of inputs names
 	 */
-	private Map<String, Element> readMap;
+	private Vector<String> inputs;
 
 	/**
 	 * Root element where to add everything
@@ -86,7 +87,7 @@ public class XlimNodeVisitor implements NodeVisitor {
 		this.names = names;
 		this.root = root;
 		this.actionName = actionName;
-		this.readMap = new TreeMap<String, Element>();
+		this.inputs = new Vector<String>();
 		this.writeMap = new TreeMap<String, Element>();
 	}
 
@@ -99,24 +100,24 @@ public class XlimNodeVisitor implements NodeVisitor {
 	 *            Root element where to add everything
 	 * @param actionName
 	 *            Current action name
-	 * @param readMap
-	 *            Temporary mapping for inputs
+	 * @param inputs
+	 *            Vector of inputs names
 	 * @param writeMap
 	 *            Temporary mapping for outputs
 	 */
 	public XlimNodeVisitor(XlimNames names, Element root, String actionName,
-			Map<String, Element> readMap, Map<String, Element> writeMap) {
+			Vector<String> inputs, Map<String, Element> writeMap) {
 		this.names = names;
 		this.root = root;
 		this.actionName = actionName;
-		this.readMap = readMap;
+		this.inputs = inputs;
 		this.writeMap = writeMap;
 	}
 
 	@Override
 	public Object visit(BlockNode node, Object... args) {
 		XlimInstructionVisitor iv = new XlimInstructionVisitor(names, root,
-				actionName, readMap, writeMap);
+				actionName, inputs, writeMap);
 		for (Instruction instruction : node) {
 			instruction.accept(iv, args);
 		}
@@ -149,7 +150,7 @@ public class XlimNodeVisitor implements NodeVisitor {
 		Element moduleY = XlimNodeTemplate.newModule(moduleB, "then");
 
 		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
-				actionName, readMap, writeMap);
+				actionName, inputs, writeMap);
 		for (CFGNode operations : node.getThenNodes()) {
 			operations.accept(visitor);
 		}
@@ -158,11 +159,11 @@ public class XlimNodeVisitor implements NodeVisitor {
 
 		for (CFGNode operations : node.getElseNodes()) {
 			operations.accept(new XlimNodeVisitor(names, moduleN, actionName,
-					readMap, writeMap));
+					inputs, writeMap));
 		}
 
 		node.getJoinNode().accept(
-				new XlimNodeVisitor(names, moduleB, actionName, readMap,
+				new XlimNodeVisitor(names, moduleB, actionName, inputs,
 						writeMap));
 		return null;
 	}
@@ -194,13 +195,13 @@ public class XlimNodeVisitor implements NodeVisitor {
 		Element moduleY = XlimNodeTemplate.newModule(moduleB, "body");
 
 		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
-				actionName, readMap, writeMap);
+				actionName, inputs, writeMap);
 		for (CFGNode operations : node.getNodes()) {
 			operations.accept(visitor);
 		}
 
 		node.getJoinNode().accept(
-				new XlimNodeVisitor(names, moduleB, actionName, readMap,
+				new XlimNodeVisitor(names, moduleB, actionName, inputs,
 						writeMap));
 
 		return null;

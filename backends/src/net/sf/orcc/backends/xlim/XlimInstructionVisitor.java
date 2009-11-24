@@ -32,6 +32,7 @@ package net.sf.orcc.backends.xlim;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -75,9 +76,9 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	private XlimNames names;
 
 	/**
-	 * Map for input type
+	 * Vector of inputs names
 	 */
-	private Map<String, Element> readMap;
+	private Vector<String> inputs;
 
 	/**
 	 * Root element where to add everything
@@ -98,18 +99,18 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	 *            Root element where to add everything
 	 * @param actionName
 	 *            Current action name
-	 * @param readMap
-	 *            Temporary mapping for inputs
+	 * @param inputs
+	 *            Vector of inputs names
 	 * @param writeMap
 	 *            Temporary mapping for outputs
 	 */
 	public XlimInstructionVisitor(XlimNames names, Element root,
-			String actionName, Map<String, Element> readMap,
+			String actionName, Vector<String> inputs,
 			Map<String, Element> writeMap) {
 		this.names = names;
 		this.root = root;
 		this.actionName = actionName;
-		this.readMap = readMap;
+		this.inputs = inputs;
 		this.writeMap = writeMap;
 	}
 
@@ -155,7 +156,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 
 		XlimNames newname = new XlimNames(names, params);
 		XlimNodeVisitor visitor = new XlimNodeVisitor(newname, root,
-				actionName, readMap, writeMap);
+				actionName, inputs, writeMap);
 		for (CFGNode nodei : node.getProcedure().getNodes()) {
 			nodei.accept(visitor);
 		}
@@ -208,8 +209,9 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	public void visit(Load node, Object... args) {
 		Element operationE;
 		String name = names.getVarName(node.getSource());
-		boolean inport = readMap.containsKey(name);
-		if (node.getSource().getVariable().getType().getType() == Type.LIST && !inport) {
+		boolean inport = inputs.contains(name);
+		if (node.getSource().getVariable().getType().getType() == Type.LIST
+				&& !inport) {
 			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root));
 			operationE = XlimNodeTemplate.newNameOperation(root, "var_ref",
 					names.getVarName(node.getSource()));
@@ -225,10 +227,6 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		Type outtype = node.getTarget().getType();
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local),
 				outtype);
-
-		if (inport) {
-			outtype.accept(new XlimTypeSizeVisitor(readMap.get(name)));
-		}
 	}
 
 	/**
@@ -276,7 +274,8 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 
 		String name = names.getVarName(node.getTarget());
 		Element port = XlimNodeTemplate.newOutPort(operationE, name);
-		readMap.put(name, port);
+		node.getPort().getType().accept(new XlimTypeSizeVisitor(port));
+		inputs.add(name);
 	}
 
 	/**
