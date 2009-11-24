@@ -276,6 +276,15 @@ let rec mk_nodes graph node join =
 
 (** [mk_proc proc] returns a "procedure" element that defines the given [proc]. *)
 let mk_proc proc =
+	let nodes = mk_nodes proc.p_cfg proc.p_entry proc.p_exit in
+	let nodes =
+		if proc.p_return = TypeVoid then
+			 array
+				(Json_type.Browse.array nodes @ [array [string "return"; int 0; mk_loc dummy_loc; null] ])
+		else
+			nodes
+	in
+	
 	array
 		[ string proc.p_name;
 			bool proc.p_external;
@@ -283,7 +292,7 @@ let mk_proc proc =
 			mk_type proc.p_return;
 			mk_var_defs proc.p_params;
 			mk_var_defs proc.p_decls;
-			mk_nodes proc.p_cfg proc.p_entry proc.p_exit ]
+			nodes ]
 
 let mk_procs procs =
 	array (List.map (fun proc -> mk_proc proc) procs)
