@@ -583,7 +583,7 @@ public class IRParser {
 			} else if (name.equals(NAME_READ)) {
 				instr = parseReadNode(loc, array.getJSONArray(3));
 			} else if (name.equals(NAME_RETURN)) {
-				instr = parseReturnNode(loc, array.getJSONArray(3));
+				instr = parseReturnNode(loc, array.optJSONArray(3));
 			} else if (name.equals(NAME_STORE)) {
 				instr = parseStoreNode(loc, array.getJSONArray(3));
 			} else if (name.equals(NAME_WRITE)) {
@@ -729,7 +729,12 @@ public class IRParser {
 
 	private Return parseReturnNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		Expression expr = parseExpr(array);
+		Expression expr = null;
+		if (array == null) {
+			expr = null;
+		} else {
+			parseExpr(array);
+		}
 		return new Return(block, loc, expr);
 	}
 
