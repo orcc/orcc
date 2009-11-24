@@ -290,7 +290,10 @@ public class IRParser {
 			throws JSONException, OrccException {
 		Variable var = getVariable(array.getJSONArray(0));
 		Expression value = parseExpr(array.getJSONArray(1));
-		return new Assign(block, loc, (LocalVariable) var, value);
+		LocalVariable local = (LocalVariable) var;
+		Assign assign = new Assign(block, loc, local, value);
+		local.setInstruction(assign);
+		return assign;
 	}
 
 	private BinaryExpr parseBinaryExpr(Location location, JSONArray array)

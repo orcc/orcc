@@ -108,12 +108,25 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	}
 
 	/**
+	 * Appends the instructions of the specified block at the end of this block.
+	 * 
+	 * @param block
+	 *            a block
+	 */
+	public void add(BlockNode block) {
+		for (Instruction instruction : block) {
+			add(instruction);
+		}
+	}
+
+	/**
 	 * Appends the specified instruction to the end of this block.
 	 * 
 	 * @param instruction
 	 *            an instruction
 	 */
 	public void add(Instruction instruction) {
+		instruction.setBlock(this);
 		instructions.add(instruction);
 	}
 

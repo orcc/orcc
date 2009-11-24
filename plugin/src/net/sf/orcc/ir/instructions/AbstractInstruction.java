@@ -54,4 +54,9 @@ public abstract class AbstractInstruction extends AbstractLocalizable implements
 		return block;
 	}
 
+	@Override
+	public void setBlock(BlockNode block) {
+		this.block = block;
+	}
+
 }

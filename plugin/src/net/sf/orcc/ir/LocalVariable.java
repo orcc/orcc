@@ -59,7 +59,7 @@ public class LocalVariable extends Variable implements
 	/**
 	 * the node where the variable is assigned.
 	 */
-	private Instruction node;
+	private Instruction instruction;
 
 	/**
 	 * when local variables have the same name but different scopes.
@@ -67,11 +67,11 @@ public class LocalVariable extends Variable implements
 	private Integer suffix;
 
 	public LocalVariable(boolean assignable, int index, Location loc,
-			String name, Instruction node, Integer suffix, Type type) {
+			String name, Instruction instruction, Integer suffix, Type type) {
 		super(loc, type, name, false);
 		this.assignable = assignable;
 		this.index = index;
-		this.node = node;
+		this.instruction = instruction;
 		this.suffix = suffix;
 		this.constant = false;
 		constantExpr = null;
@@ -81,7 +81,7 @@ public class LocalVariable extends Variable implements
 		super(other);
 		assignable = other.assignable;
 		index = other.index;
-		node = null;
+		instruction = other.instruction;
 		suffix = other.suffix;
 		this.constant = false;
 		constantExpr = null;
@@ -136,8 +136,13 @@ public class LocalVariable extends Variable implements
 		return getBaseName() + (suffix == null ? "" : suffix) + indexStr;
 	}
 
-	public Instruction getNode() {
-		return node;
+	/**
+	 * Returns the instruction where this local variable is defined.
+	 * 
+	 * @return the instruction where this local variable is defined
+	 */
+	public Instruction getInstruction() {
+		return instruction;
 	}
 
 	/**
@@ -175,8 +180,14 @@ public class LocalVariable extends Variable implements
 		this.index = index;
 	}
 
-	public void setNode(Instruction node) {
-		this.node = node;
+	/**
+	 * Sets the instruction where this local variable is defined.
+	 * 
+	 * @param instruction
+	 *            the instruction where this local variable is defined
+	 */
+	public void setInstruction(Instruction instruction) {
+		this.instruction = instruction;
 	}
 
 	public void setSuffix(int suffix) {

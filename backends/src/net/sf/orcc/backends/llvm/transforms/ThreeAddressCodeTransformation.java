@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm.transforms;
 
+import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.Expression;
@@ -41,6 +42,7 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -50,6 +52,8 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * 
  */
 public class ThreeAddressCodeTransformation extends AbstractActorTransformation {
+	
+	private int tempVarCount;
 
 	private class ExpressionSplitter implements ExpressionInterpreter {
 
@@ -59,7 +63,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
-			// TODO Auto-generated method stub
+			tempVarCount++;
 			return null;
 		}
 
@@ -107,6 +111,18 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = assign.getValue();
 		assign.setValue((Expression) value.accept(new ExpressionSplitter(it)));
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Call call, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		List<Expression> parameters = call.getParameters();
+		ListIterator<Expression> pit = parameters.listIterator();
+		while (pit.hasNext()) {
+			Expression value = pit.next();
+			pit.set((Expression) value.accept(new ExpressionSplitter(it)));
+		}
 	}
 
 }

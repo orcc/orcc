@@ -102,8 +102,9 @@ indexes(indexes) ::= <<
 $indexes: { index | i32 $index$ }; separator=", "$
 >>
 
+// $assign.value$
 Assign(assign) ::= <<
-%$assign.target$ = $assign.value$
+%$assign.target$ = add i32 5, 5
 
 >>
 
@@ -143,8 +144,12 @@ call void @lff_peek(%struct.lff_t* %local_$peek.target$, i8* %$peek.target$_$pee
 
 >>
 
+phiPredecessors(vars) ::= <<
+$vars: { var |[ %$var.variable$, %b$var.variable.instruction.block.label$ ]}; separator=", "$
+>>
+
 PhiAssignment(phi) ::= <<
-$phi.target$ = phi $phi.target.type$ $phi.vars: {$it$}; separator=", "$
+%$phi.target$ = phi $phi.target.type$ $phiPredecessors(phi.vars)$
 
 >>
 
@@ -158,7 +163,7 @@ call void @lff_read(%struct.lff_t* %local_$read.target$, i8* %$read.target$_$rea
 // return node
 Return(return) ::= <<
 $if(return.value)$
-ret $return.value$
+ret i32 $return.value$
 
 $else$
 ret void
@@ -200,8 +205,8 @@ b$blockNode.label$:
 // if node
 IfNode(ifNode) ::= <<
 	br i1 $ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
-$nodes(ifNode.thenNodes)$	br %b$ifNode.joinNode.label$
-$nodes(ifNode.elseNodes)$	br %b$ifNode.joinNode.label$
+$nodes(ifNode.thenNodes)$	br label %b$ifNode.joinNode.label$
+$nodes(ifNode.elseNodes)$	br label %b$ifNode.joinNode.label$
 $BlockNode(ifNode.joinNode)$
 >>
 

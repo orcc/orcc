@@ -48,4 +48,12 @@ public interface Instruction extends User {
 	 */
 	public BlockNode getBlock();
 
+	/**
+	 * Sets the block that contains this instruction.
+	 * 
+	 * @param block
+	 *            the block that contains this instruction
+	 */
+	public void setBlock(BlockNode block);
+
 }
