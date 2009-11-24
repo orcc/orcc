@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 
 /**
@@ -40,8 +41,7 @@ import net.sf.orcc.ir.Expression;
 public class ExpressionEvaluator implements ExpressionInterpreter {
 
 	@Override
-	public Object interpret(BinaryExpr expr, Object... args)
-			throws OrccException {
+	public Object interpret(BinaryExpr expr, Object... args) {
 		Object val1 = expr.getE1().accept(this);
 		Object val2 = expr.getE2().accept(this);
 		switch (expr.getOp()) {
@@ -182,9 +182,11 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			break;
 		}
 
-		throw new OrccException("could not evaluate binary expression with OP="
-				+ expr.getOp().toString() + "(" + expr.getOp().getText()
-				+ ") and E1=" + val1 + "; E2=" + val2);
+		throw new OrccRuntimeException(
+				"could not evaluate binary expression with OP="
+						+ expr.getOp().toString() + "("
+						+ expr.getOp().getText() + ") and E1=" + val1 + "; E2="
+						+ val2);
 	}
 
 	@Override
@@ -198,8 +200,8 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(ListExpr expr, Object... args) throws OrccException {
-		throw new OrccException("can not evaluate List expression");
+	public Object interpret(ListExpr expr, Object... args) {
+		throw new OrccRuntimeException("can not evaluate List expression");
 	}
 
 	@Override
@@ -208,8 +210,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	}
 
 	@Override
-	public Object interpret(UnaryExpr expr, Object... args)
-			throws OrccException {
+	public Object interpret(UnaryExpr expr, Object... args) {
 		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
 		switch (expr.getOp()) {
 		case BITNOT:
@@ -234,8 +235,10 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			break;
 		}
 
-		throw new OrccException("could not evaluate unary expression with OP="
-				+ expr.getOp().toString() + "(" + expr.getOp().getText() + ")");
+		throw new OrccRuntimeException(
+				"could not evaluate unary expression with OP="
+						+ expr.getOp().toString() + "("
+						+ expr.getOp().getText() + ")");
 	}
 
 	@Override

@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -135,8 +136,7 @@ public class IRWriter {
 	private class ExpressionWriter implements ExpressionInterpreter {
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args)
-				throws OrccException {
+		public Object interpret(BinaryExpr expr, Object... args) {
 			JSONArray array = new JSONArray();
 			array.put(writeLocation(expr.getLocation()));
 			array.put(IRConstants.BINARY_EXPR);
@@ -164,9 +164,8 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(ListExpr expr, Object... args)
-				throws OrccException {
-			throw new OrccException("unsupported expression: List");
+		public Object interpret(ListExpr expr, Object... args) {
+			throw new OrccRuntimeException("unsupported expression: List");
 		}
 
 		@Override
@@ -178,8 +177,7 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(UnaryExpr expr, Object... args)
-				throws OrccException {
+		public Object interpret(UnaryExpr expr, Object... args) {
 			JSONArray array = new JSONArray();
 			array.put(writeLocation(expr.getLocation()));
 			array.put(IRConstants.UNARY_EXPR);
@@ -240,8 +238,7 @@ public class IRWriter {
 			case TIMES:
 				return IRConstants.BOP_TIMES;
 			default:
-				// never happens
-				throw new IllegalArgumentException();
+				throw new OrccRuntimeException("never happens");
 			}
 		}
 
@@ -256,8 +253,7 @@ public class IRWriter {
 			case NUM_ELTS:
 				return IRConstants.UOP_NUM_ELTS;
 			default:
-				// never happens
-				throw new IllegalArgumentException();
+				throw new OrccRuntimeException("never happens");
 			}
 		}
 

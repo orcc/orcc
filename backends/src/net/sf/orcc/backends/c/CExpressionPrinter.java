@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.c;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
@@ -41,14 +42,13 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 public class CExpressionPrinter extends DefaultExpressionPrinter {
 
 	@Override
-	public Object visit(BoolExpr expr, Object... args) {
+	public void visit(BoolExpr expr, Object... args) {
 		builder.append(expr.getValue() ? '1' : '0');
-		return null;
 	}
 
 	@Override
-	public Object visit(ListExpr expr, Object... args) {
-		throw new IllegalArgumentException("List expression not supported");
+	public void visit(ListExpr expr, Object... args) {
+		throw new OrccRuntimeException("List expression not supported");
 	}
 
 }

@@ -32,10 +32,10 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
-import net.sf.orcc.ir.transforms.CorrectBinaryExpressionType;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
@@ -76,13 +76,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = {
 				new AddInstantationProcedure(),
-				new CorrectBinaryExpressionType() };
-		/*
-		 * new AssignPeephole(), new ControlFlowTransformation(), new
-		 * JoinNodeTransformation(), // new CorrectLabelNameTransformation(),
-		 * new ThreeAddressCodeTransformation(), new AddInstantationProcedure(),
-		 * new ArrayListTransformation(), new TypeTransformation() };
-		 */
+				new ThreeAddressCodeTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

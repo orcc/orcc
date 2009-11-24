@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -109,44 +110,38 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 	}
 
 	@Override
-	public Object visit(BinaryExpr expr, Object... args) {
+	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
 
 		builder.append(toString(op) + " ");
 		expr.getE1().accept(this, expr.getUnderlyingType());
 		builder.append(", ");
 		expr.getE2().accept(this, false);
-
-		return null;
 	}
 
 	@Override
-	public Object visit(BoolExpr expr, Object... args) {
+	public void visit(BoolExpr expr, Object... args) {
 		builder.append(expr.getValue() ? '1' : '0');
-		return null;
 	}
 
 	@Override
-	public Object visit(IntExpr expr, Object... args) {
+	public void visit(IntExpr expr, Object... args) {
 		builder.append(expr.getValue());
-		return null;
 	}
 
 	@Override
-	public Object visit(ListExpr expr, Object... args) {
-		throw new IllegalArgumentException("List expression not supported");
+	public void visit(ListExpr expr, Object... args) {
+		throw new OrccRuntimeException("List expression not supported");
 	}
 
 	@Override
-	public Object visit(UnaryExpr expr, Object... args) {
+	public void visit(UnaryExpr expr, Object... args) {
 		expr.getExpr().accept(this, args);
-		return null;
 	}
 
 	@Override
-	public Object visit(VarExpr expr, Object... args) {
+	public void visit(VarExpr expr, Object... args) {
 		builder.append(expr.getVar().getVariable());
-		return null;
 	}
 
 }

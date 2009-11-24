@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.orcc.OrccRuntimeException;
+
 /**
  * 
  * @author vimartin
@@ -105,12 +107,10 @@ public class FileUtilities {
 				switch (format) {
 				case CAL_TO_CALML:
 					// Cal2CalML.parseSource(sourceFile, outputDirectory);
-					throw new UnsupportedOperationException(
-							"Cal2CalML.parseSource");
+					throw new OrccRuntimeException("Cal2CalML.parseSource");
 				case NL_TO_XNL:
 					// NL2XNL.parseSource(sourceFile, outputDirectory);
-					throw new UnsupportedOperationException(
-							"NL2XNL.parseSource");
+					throw new OrccRuntimeException("NL2XNL.parseSource");
 				case XDF_TO_XNL:
 					break;
 

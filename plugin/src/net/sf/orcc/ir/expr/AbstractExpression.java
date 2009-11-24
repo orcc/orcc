@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
@@ -57,8 +56,9 @@ public abstract class AbstractExpression extends AbstractLocalizable implements
 	public abstract void accept(ExpressionVisitor visitor, Object... args);
 
 	@Override
-	public abstract Object accept(ExpressionInterpreter interpreter, Object... args) throws OrccException;
-	
+	public abstract Object accept(ExpressionInterpreter interpreter,
+			Object... args);
+
 	@Override
 	public String toString() {
 		return Printer.getInstance().toString(this);

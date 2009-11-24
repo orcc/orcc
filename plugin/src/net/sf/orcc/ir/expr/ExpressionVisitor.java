@@ -36,18 +36,18 @@ package net.sf.orcc.ir.expr;
  */
 public interface ExpressionVisitor {
 
-	public Object visit(BinaryExpr expr, Object... args);
+	public void visit(BinaryExpr expr, Object... args);
 
-	public Object visit(BoolExpr expr, Object... args);
+	public void visit(BoolExpr expr, Object... args);
 
-	public Object visit(IntExpr expr, Object... args);
+	public void visit(IntExpr expr, Object... args);
 
-	public Object visit(ListExpr expr, Object... args);
+	public void visit(ListExpr expr, Object... args);
 
-	public Object visit(StringExpr expr, Object... args);
+	public void visit(StringExpr expr, Object... args);
 
-	public Object visit(UnaryExpr expr, Object... args);
+	public void visit(UnaryExpr expr, Object... args);
 
-	public Object visit(VarExpr expr, Object... args);
+	public void visit(VarExpr expr, Object... args);
 
 }

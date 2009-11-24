@@ -62,10 +62,9 @@ public class Use {
 		}
 
 		@Override
-		public Object visit(VarExpr expr, Object... args) {
+		public void visit(VarExpr expr, Object... args) {
 			Use use = expr.getVar();
 			use.setNode(node);
-			return null;
 		}
 
 	}
@@ -91,12 +90,11 @@ public class Use {
 		}
 
 		@Override
-		public Object visit(VarExpr expr, Object... args) {
+		public void visit(VarExpr expr, Object... args) {
 			Use use = expr.getVar();
 			if (use.getNode().equals(node)) {
 				use.remove();
 			}
-			return null;
 		}
 
 	}

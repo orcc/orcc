@@ -42,9 +42,8 @@ import net.sf.orcc.ir.expr.BoolExpr;
 public class CppExprPrinter extends CExpressionPrinter {
 
 	@Override
-	public Object visit(BoolExpr expr, Object... args) {
+	public void visit(BoolExpr expr, Object... args) {
 		builder.append(expr.getValue() ? "true" : "false");
-		return null;
 	}
 
 }

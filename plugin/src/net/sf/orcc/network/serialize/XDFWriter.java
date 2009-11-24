@@ -91,7 +91,7 @@ public class XDFWriter {
 	private class BinOpSeqWriter implements ExpressionVisitor {
 
 		@Override
-		public Object visit(BinaryExpr expr, Object... args) {
+		public void visit(BinaryExpr expr, Object... args) {
 			Element parent = ((Element) args[0]);
 
 			int parentPrec = (Integer) args[1];
@@ -112,55 +112,49 @@ public class XDFWriter {
 				writeOperator(expr.getOp(), parent);
 				expr.getE2().accept(this, parent, currentPrec);
 			}
-
-			return null;
 		}
 
 		@Override
-		public Object visit(BoolExpr expr, Object... args) {
+		public void visit(BoolExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			String value = Boolean.toString(expr.getValue());
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Boolean");
 			exprElt.setAttribute("value", value);
 			((Element) args[0]).appendChild(exprElt);
-			return null;
 		}
 
 		@Override
-		public Object visit(IntExpr expr, Object... args) {
+		public void visit(IntExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			String value = Integer.toString(expr.getValue());
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Integer");
 			exprElt.setAttribute("value", value);
 			((Element) args[0]).appendChild(exprElt);
-			return null;
 		}
 
 		@Override
-		public Object visit(ListExpr expr, Object... args) {
+		public void visit(ListExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "List");
 			for (Expression childExpr : expr.getValue()) {
 				childExpr.accept(this, args[0]);
 			}
-			return null;
 		}
 
 		@Override
-		public Object visit(StringExpr expr, Object... args) {
+		public void visit(StringExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			String value = expr.getValue();
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "String");
 			exprElt.setAttribute("value", value);
 			((Element) args[0]).appendChild(exprElt);
-			return null;
 		}
 
 		@Override
-		public Object visit(UnaryExpr expr, Object... args) {
+		public void visit(UnaryExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "UnaryOp");
 
@@ -172,17 +166,15 @@ public class XDFWriter {
 			expr.getExpr().accept(this, exprElt, Integer.MIN_VALUE);
 
 			((Element) args[0]).appendChild(exprElt);
-			return null;
 		}
 
 		@Override
-		public Object visit(VarExpr expr, Object... args) {
+		public void visit(VarExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
 			String value = expr.getVar().getVariable().getName();
 			exprElt.setAttribute("kind", "Var");
 			exprElt.setAttribute("name", value);
 			((Element) args[0]).appendChild(exprElt);
-			return null;
 		}
 
 		private void writeOperator(BinaryOp op, Element parent) {

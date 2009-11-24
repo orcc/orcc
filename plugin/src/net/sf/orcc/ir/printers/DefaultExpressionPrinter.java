@@ -66,7 +66,7 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 	}
 
 	@Override
-	public Object visit(BinaryExpr expr, Object... args) {
+	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
 		int currentPrec = op.getPrecedence();
 
@@ -94,24 +94,20 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 			builder.append(" ");
 			expr.getE2().accept(this, nextPrec, BinaryExpr.RIGHT);
 		}
-
-		return null;
 	}
 
 	@Override
-	public Object visit(BoolExpr expr, Object... args) {
+	public void visit(BoolExpr expr, Object... args) {
 		builder.append(expr.getValue());
-		return null;
 	}
 
 	@Override
-	public Object visit(IntExpr expr, Object... args) {
+	public void visit(IntExpr expr, Object... args) {
 		builder.append(expr.getValue());
-		return null;
 	}
 
 	@Override
-	public Object visit(ListExpr expr, Object... args) {
+	public void visit(ListExpr expr, Object... args) {
 		List<Expression> list = expr.getValue();
 		if (list.isEmpty()) {
 			builder.append("[]");
@@ -125,29 +121,25 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 			}
 			builder.append(']');
 		}
-		return null;
 	}
 
 	@Override
-	public Object visit(StringExpr expr, Object... args) {
+	public void visit(StringExpr expr, Object... args) {
 		builder.append('"');
 		builder.append(expr.getValue().replaceAll("\\\\", "\\\\\\\\"));
 		builder.append('"');
-		return null;
 	}
 
 	@Override
-	public Object visit(UnaryExpr expr, Object... args) {
+	public void visit(UnaryExpr expr, Object... args) {
 		builder.append(expr.getOp().getText());
 		expr.getExpr().accept(this, Integer.MIN_VALUE);
-		return null;
 	}
 
 	@Override
-	public Object visit(VarExpr expr, Object... args) {
+	public void visit(VarExpr expr, Object... args) {
 		Variable variable = expr.getVar().getVariable();
 		builder.append(variable.toString());
-		return null;
 	}
 
 }

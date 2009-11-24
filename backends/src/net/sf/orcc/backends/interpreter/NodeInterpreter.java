@@ -32,7 +32,6 @@ import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.ICommunicationFifo;
@@ -73,8 +72,8 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	// private String actorName;
 	private ListAllocator listAllocator;
 	private ExpressionEvaluator exprInterpreter;
-	private Object return_value;
-	private boolean block_return = false;
+	private Object returnValue;
+	private boolean blockReturn = false;
 
 	public NodeInterpreter(String id) {
 		// this.actorName = id;
@@ -85,8 +84,8 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	}
 
 	public Object getReturnValue() {
-		if (block_return) {
-			return return_value;
+		if (blockReturn) {
+			return returnValue;
 		} else {
 			return null;
 		}
@@ -99,47 +98,39 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@Override
 	public Object visit(IfNode node, Object... args) {
 		/* Interpret first expression ("if" condition) */
-		try {
-			Object condition = node.getValue().accept(exprInterpreter);
+		Object condition = node.getValue().accept(exprInterpreter);
 
-			/* if (condition is true) then */
-			if ((Boolean) condition) {
-				for (CFGNode subNode : node.getThenNodes()) {
+		/* if (condition is true) then */
+		if ((Boolean) condition) {
+			for (CFGNode subNode : node.getThenNodes()) {
+				subNode.accept(this, args);
+			}
+			/* else */
+		} else {
+			List<CFGNode> elseNodes = node.getElseNodes();
+			if (!elseNodes.isEmpty()) {
+				for (CFGNode subNode : elseNodes) {
 					subNode.accept(this, args);
 				}
-				/* else */
-			} else {
-				List<CFGNode> elseNodes = node.getElseNodes();
-				if (!elseNodes.isEmpty()) {
-					for (CFGNode subNode : elseNodes) {
-						subNode.accept(this, args);
-					}
-				}
 			}
-			node.getJoinNode().accept(this, args);
-		} catch (OrccException e) {
-			e.printStackTrace();
 		}
+		node.getJoinNode().accept(this, args);
 
 		return null;
 	}
 
 	@Override
 	public Object visit(WhileNode node, Object... args) {
-		/* Interpret first expression ("while" condition) */
-		try {
-			Object condition = node.getValue().accept(exprInterpreter);
-			/* while (condition is true) do */
-			while ((Boolean) condition) {
-				/* control flow sub-statements */
-				for (CFGNode subNode : node.getNodes()) {
-					subNode.accept(this, args);
-				}
-				/* Interpret next value of "while" condition */
-				condition = node.getValue().accept(exprInterpreter);
+		// Interpret first expression ("while" condition)
+		Object condition = node.getValue().accept(exprInterpreter);
+		// while (condition is true) do
+		while ((Boolean) condition) {
+			// control flow sub-statements
+			for (CFGNode subNode : node.getNodes()) {
+				subNode.accept(this, args);
 			}
-		} catch (OrccException e) {
-			e.printStackTrace();
+			// Interpret next value of "while" condition
+			condition = node.getValue().accept(exprInterpreter);
 		}
 		return null;
 	}
@@ -154,10 +145,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		}
 		return null;
 	}
-
-	/**
-	 * Instructions visitors
-	 */
 
 	@Override
 	public void visit(InitPort instr, Object... args) {
@@ -217,23 +204,15 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@Override
 	public void visit(Assign instr, Object... args) {
 		LocalVariable target = instr.getTarget();
-		try {
-			target.setValue(instr.getValue().accept(exprInterpreter));
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
+		target.setValue(instr.getValue().accept(exprInterpreter));
 	}
 
 	@Override
 	public void visit(PhiAssignment instr, Object... args) {
 		LocalVariable target = instr.getTarget();
-		try {
-			for (Use use : instr.getVars()) {
-				Variable var = use.getVariable();
-				target.setValue(var.getExpression().accept(exprInterpreter));
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
+		for (Use use : instr.getVars()) {
+			Variable var = use.getVariable();
+			target.setValue(var.getExpression().accept(exprInterpreter));
 		}
 	}
 
@@ -241,41 +220,33 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	public void visit(Load instr, Object... args) {
 		LocalVariable target = instr.getTarget();
 		Variable source = instr.getSource().getVariable();
-		try {
-			if (instr.getIndexes().isEmpty()) {
-				target.setValue(source.getValue());				
-			} else {
-				Object obj = source.getValue();
-				for (Expression index : instr.getIndexes()) {
-					obj = Array.get(obj, (Integer)index
-							.accept(exprInterpreter));
-				}
-				target.setValue(obj);		
+		if (instr.getIndexes().isEmpty()) {
+			target.setValue(source.getValue());
+		} else {
+			Object obj = source.getValue();
+			for (Expression index : instr.getIndexes()) {
+				obj = Array.get(obj, (Integer) index.accept(exprInterpreter));
 			}
-		} catch (OrccException e) {
-			e.printStackTrace();
+			target.setValue(obj);
 		}
 	}
 
 	@Override
 	public void visit(Store instr, Object... args) {
 		Variable variable = instr.getTarget().getVariable();
-		try {
-			if (instr.getIndexes().isEmpty()) {
-				variable.setValue(instr.getValue().accept(exprInterpreter));				
-			} else {
-				Object obj = variable.getValue();
-				Object objPrev=obj;
-				Integer lastIndex=0;
-				for (Expression index : instr.getIndexes()) {
-					objPrev = obj;
-					lastIndex = (Integer)index.accept(exprInterpreter);
-					obj = Array.get(objPrev, lastIndex);
-				}
-				Array.set(objPrev, lastIndex, instr.getValue().accept(exprInterpreter));
+		if (instr.getIndexes().isEmpty()) {
+			variable.setValue(instr.getValue().accept(exprInterpreter));
+		} else {
+			Object obj = variable.getValue();
+			Object objPrev = obj;
+			Integer lastIndex = 0;
+			for (Expression index : instr.getIndexes()) {
+				objPrev = obj;
+				lastIndex = (Integer) index.accept(exprInterpreter);
+				obj = Array.get(objPrev, lastIndex);
 			}
-		} catch (OrccException e) {
-			e.printStackTrace();
+			Array.set(objPrev, lastIndex, instr.getValue().accept(
+					exprInterpreter));
 		}
 	}
 
@@ -285,15 +256,11 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		Procedure proc = instr.getProcedure();
 
 		// Set the input parameters of the called procedure if any
-		try {
-			List<Expression> callParams = instr.getParameters();
-			List<Variable> procParams = proc.getParameters().getList();
-			for (int i = 0; i < callParams.size(); i++) {
-				Variable procVar = procParams.get(i);
-				procVar.setValue(callParams.get(i).accept(exprInterpreter));
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
+		List<Expression> callParams = instr.getParameters();
+		List<Variable> procParams = proc.getParameters().getList();
+		for (int i = 0; i < callParams.size(); i++) {
+			Variable procVar = procParams.get(i);
+			procVar.setValue(callParams.get(i).accept(exprInterpreter));
 		}
 
 		// Allocate procedure local List variables
@@ -311,18 +278,14 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 		// Get procedure result if any
 		if (instr.hasResult()) {
-			instr.getTarget().setValue(return_value);
+			instr.getTarget().setValue(returnValue);
 		}
 	}
 
 	@Override
 	public void visit(Return instr, Object... args) {
-		try {
-			this.return_value = instr.getValue().accept(exprInterpreter);
-			this.block_return = true;
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
+		this.returnValue = instr.getValue().accept(exprInterpreter);
+		this.blockReturn = true;
 	}
 
 	@Override

@@ -38,38 +38,31 @@ import net.sf.orcc.ir.Expression;
  */
 public abstract class AbstractExpressionVisitor implements ExpressionVisitor {
 
-	public Object visit(BinaryExpr expr, Object... args) {
+	public void visit(BinaryExpr expr, Object... args) {
 		expr.getE1().accept(this, args);
 		expr.getE2().accept(this, args);
-		return null;
 	}
 
-	public Object visit(BoolExpr expr, Object... args) {
-		return null;
+	public void visit(BoolExpr expr, Object... args) {
 	}
 
-	public Object visit(IntExpr expr, Object... args) {
-		return null;
+	public void visit(IntExpr expr, Object... args) {
 	}
 
-	public Object visit(ListExpr expr, Object... args) {
+	public void visit(ListExpr expr, Object... args) {
 		for (Expression subExpr : expr.getValue()) {
 			subExpr.accept(this, args);
 		}
-		return null;
 	}
 
-	public Object visit(StringExpr expr, Object... args) {
-		return null;
+	public void visit(StringExpr expr, Object... args) {
 	}
 
-	public Object visit(UnaryExpr expr, Object... args) {
+	public void visit(UnaryExpr expr, Object... args) {
 		expr.getExpr().accept(this, args);
-		return null;
 	}
 
-	public Object visit(VarExpr expr, Object... args) {
-		return null;
+	public void visit(VarExpr expr, Object... args) {
 	}
 
 }

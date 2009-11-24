@@ -127,7 +127,7 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(BinaryExpr expr, Object... args) {
+	public void visit(BinaryExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newDiffOperation(root, opString
 				.get(expr.getOp()));
 
@@ -143,7 +143,6 @@ public class XlimExprVisitor implements ExpressionVisitor {
 				.getUnderlyingType());
 
 		root.appendChild(operationE);
-		return null;
 	}
 
 	/**
@@ -154,12 +153,11 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(BoolExpr expr, Object... args) {
+	public void visit(BoolExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root,
 				"$literal_Integer", expr.getValue() ? "1" : "0");
 		XlimNodeTemplate
 				.newOutPort(operationE, names.putTempName(), "1", "int");
-		return null;
 	}
 
 	/**
@@ -170,14 +168,12 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(IntExpr expr, Object... args) {
+	public void visit(IntExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root,
 				"$literal_Integer", expr.toString());
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), "int",
 				expr.getValue());
 		// TODO Add size
-
-		return null;
 	}
 
 	/**
@@ -188,11 +184,9 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(ListExpr expr, Object... args) {
+	public void visit(ListExpr expr, Object... args) {
 		System.out.println("CHECK LIST EXPR");
 		// TODO Auto-generated method stub
-
-		return null;
 	}
 
 	/**
@@ -203,10 +197,9 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(StringExpr expr, Object... args) {
+	public void visit(StringExpr expr, Object... args) {
 		System.out.println("CHECK STRING EXPR");
 		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -217,7 +210,7 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(UnaryExpr expr, Object... args) {
+	public void visit(UnaryExpr expr, Object... args) {
 		System.out.println("CHECK UNARY EXPR");
 		// TODO Auto-generated method stub
 
@@ -230,8 +223,6 @@ public class XlimExprVisitor implements ExpressionVisitor {
 
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
 				.getUnderlyingType());
-
-		return null;
 	}
 
 	/**
@@ -242,15 +233,13 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(VarExpr expr, Object... args) {
+	public void visit(VarExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 
 		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar()));
 
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
 				.getVar().getVariable().getType());
-
-		return null;
 	}
 
 }

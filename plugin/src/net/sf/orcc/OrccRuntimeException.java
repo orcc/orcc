@@ -26,46 +26,53 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc;
 
-import java.util.List;
-
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 
 /**
- * This class defines a list expression. This kind of expression is only present
- * at the network level.
+ * This class defines a runtime exception that can be raised in Orcc.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class ListExpr extends AbstractExpression {
+public class OrccRuntimeException extends RuntimeException {
 
-	private List<Expression> value;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-	public ListExpr(Location location, List<Expression> value) {
-		super(location);
-		this.value = value;
+	/**
+	 * Creates a new exception with the given message.
+	 */
+	public OrccRuntimeException(String message) {
+		super(message);
 	}
 
-	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	/**
+	 * Creates a new exception with the given message, identified to have
+	 * occurred in the given file at the given location.
+	 */
+	public OrccRuntimeException(String fileName, Location location,
+			String message) {
+		this(fileName, location, message, null);
 	}
 
-	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
+	/**
+	 * Creates a new exception with the given message and cause, identified to
+	 * have occurred in the given file at the given location.
+	 */
+	public OrccRuntimeException(String fileName, Location location,
+			String message, Throwable cause) {
+		super("File \"" + fileName + "\", " + location + "\n" + message, cause);
 	}
 
-	@Override
-	public int getType() {
-		return LIST;
-	}
-
-	public List<Expression> getValue() {
-		return value;
+	/**
+	 * Creates a new exception with the given message and cause.
+	 */
+	public OrccRuntimeException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 }

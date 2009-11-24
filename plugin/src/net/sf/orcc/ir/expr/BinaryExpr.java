@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
@@ -74,8 +73,7 @@ public class BinaryExpr extends AbstractExpression {
 	}
 
 	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args)
-			throws OrccException {
+	public Object accept(ExpressionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);
 	}
 

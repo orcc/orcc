@@ -86,16 +86,5 @@ public class Port extends Variable implements Comparable<Port> {
 	public ICommunicationFifo fifo() {
 		return fifoBinding;
 	}
-	
-
-	//@Override
-	//public IExpr getValue() {
-	//	throw new UnsupportedOperationException("getValue");
-	//}
-
-	//@Override
-	//public void setValue(IExpr value) {
-	//	throw new UnsupportedOperationException("setValue");
-	//}
 
 }
