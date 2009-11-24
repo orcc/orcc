@@ -61,14 +61,12 @@ import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.consts.StringConst;
 import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
@@ -140,7 +138,7 @@ public class IRWriter {
 			JSONArray array = new JSONArray();
 			array.put(writeLocation(expr.getLocation()));
 			array.put(IRConstants.BINARY_EXPR);
-			array.put(writeBinaryOp(expr.getOp()));
+			array.put(expr.getOp().getText());
 			array.put(expr.getE1().accept(this));
 			array.put(expr.getE2().accept(this));
 			array.put(expr.getUnderlyingType().accept(new TypeWriter()));
@@ -181,7 +179,7 @@ public class IRWriter {
 			JSONArray array = new JSONArray();
 			array.put(writeLocation(expr.getLocation()));
 			array.put(IRConstants.UNARY_EXPR);
-			array.put(writeUnaryOp(expr.getOp()));
+			array.put(expr.getOp().getText());
 			array.put(expr.getExpr().accept(this));
 			array.put(expr.getUnderlyingType().accept(new TypeWriter()));
 			return array;
@@ -193,68 +191,6 @@ public class IRWriter {
 			array.put(writeLocation(expr.getLocation()));
 			array.put(writeVariable(expr.getVar().getVariable()));
 			return array;
-		}
-
-		private String writeBinaryOp(BinaryOp op) {
-			switch (op) {
-			case BITAND:
-				return IRConstants.BOP_BAND;
-			case BITOR:
-				return IRConstants.BOP_BOR;
-			case BITXOR:
-				return IRConstants.BOP_BXOR;
-			case DIV:
-				return IRConstants.BOP_DIV;
-			case DIV_INT:
-				return IRConstants.BOP_DIV_INT;
-			case EQ:
-				return IRConstants.BOP_EQ;
-			case EXP:
-				return IRConstants.BOP_EXP;
-			case GE:
-				return IRConstants.BOP_GE;
-			case GT:
-				return IRConstants.BOP_GT;
-			case LE:
-				return IRConstants.BOP_LE;
-			case LOGIC_AND:
-				return IRConstants.BOP_LAND;
-			case LOGIC_OR:
-				return IRConstants.BOP_LOR;
-			case LT:
-				return IRConstants.BOP_LT;
-			case MINUS:
-				return IRConstants.BOP_MINUS;
-			case MOD:
-				return IRConstants.BOP_MOD;
-			case NE:
-				return IRConstants.BOP_NE;
-			case PLUS:
-				return IRConstants.BOP_PLUS;
-			case SHIFT_LEFT:
-				return IRConstants.BOP_SHIFT_LEFT;
-			case SHIFT_RIGHT:
-				return IRConstants.BOP_SHIFT_RIGHT;
-			case TIMES:
-				return IRConstants.BOP_TIMES;
-			default:
-				throw new OrccRuntimeException("never happens");
-			}
-		}
-
-		private String writeUnaryOp(UnaryOp op) {
-			switch (op) {
-			case BITNOT:
-				return IRConstants.UOP_BNOT;
-			case LOGIC_NOT:
-				return IRConstants.UOP_LNOT;
-			case MINUS:
-				return IRConstants.UOP_MINUS;
-			case NUM_ELTS:
-				return IRConstants.UOP_NUM_ELTS;
-			default:
-				throw new OrccRuntimeException("never happens");
-			}
 		}
 
 	}

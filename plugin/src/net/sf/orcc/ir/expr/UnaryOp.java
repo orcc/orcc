@@ -42,22 +42,22 @@ import net.sf.orcc.OrccException;
 public enum UnaryOp {
 
 	/**
-	 * a binary not (~ in C)
+	 * a binary not <code>~</code>
 	 */
 	BITNOT("~"),
 
 	/**
-	 * a logical not (! in C)
+	 * a logical not <code>!</code>
 	 */
 	LOGIC_NOT("!"),
 
 	/**
-	 * unary minus
+	 * unary minus <code>-</code>
 	 */
 	MINUS("-"),
 
 	/**
-	 * number of elements (# in CAL)
+	 * number of elements <code>#</code>
 	 */
 	NUM_ELTS("#");
 
