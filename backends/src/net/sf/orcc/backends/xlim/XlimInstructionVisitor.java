@@ -207,8 +207,9 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	 */
 	public void visit(Load node, Object... args) {
 		Element operationE;
-		String name = null;
-		if (node.getSource().getVariable().getType().getType() == Type.LIST) {
+		String name = names.getVarName(node.getSource());
+		boolean inport = readMap.containsKey(name);
+		if (node.getSource().getVariable().getType().getType() == Type.LIST && !inport) {
 			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root));
 			operationE = XlimNodeTemplate.newNameOperation(root, "var_ref",
 					names.getVarName(node.getSource()));
@@ -225,7 +226,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local),
 				outtype);
 
-		if (name != null && readMap.containsKey(name)) {
+		if (inport) {
 			outtype.accept(new XlimTypeSizeVisitor(readMap.get(name)));
 		}
 	}
