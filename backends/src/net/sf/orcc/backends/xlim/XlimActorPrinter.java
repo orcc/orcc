@@ -34,7 +34,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -442,34 +441,17 @@ public class XlimActorPrinter {
 		for (Action action : actor.getInitializes()) {
 			phiRemoval.visitProcedure(action.getBody());
 		}
-		
+
 		// initializes the actor
-		InterpretedActor interpreted = new InterpretedActor("xxx", actor);
+		InterpretedActor interpreted = new InterpretedActor(actor.getName(),
+				actor);
 		try {
 			interpreted.initialize();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		for (Variable stateVar : actor.getStateVars()) {
-			if (stateVar.getType().getType() == Type.LIST) {
-				Object[] value = (Object[]) stateVar.getValue();
-				for (Object obj : value) {
-					System.out.print(obj + " ");
-				}
-				System.out.println();
-			}
-		}
 
-		// Executes initialize code execution to obtain missing init values
-		XlimNodeExecutor exec = new XlimNodeExecutor();
-		for (Action action : actor.getInitializes()) {
-			for (CFGNode node : action.getBody().getNodes()) {
-				node.accept(exec);
-			}
-		}
-		Map<String, List<Integer>> tables = exec.getTables();
-
+		// Prints all stateVars
 		for (Variable stateVar : actor.getStateVars()) {
 			if (stateVar.isUsed()) {
 
@@ -478,25 +460,34 @@ public class XlimActorPrinter {
 						.getVarName(stateVar), sourceName);
 
 				StateVariable state = (StateVariable) stateVar;
-				Element init = XlimNodeTemplate.newInitValue(newState, "Let");
+				/*
+				 * Element init = XlimNodeTemplate.newInitValue(newState,
+				 * "Let");
+				 * 
+				 * Element init2 = XlimNodeTemplate.newInitValue(init);
+				 */
+				Element init2 = XlimNodeTemplate.newInitValue(newState);
 
-				Element init2 = XlimNodeTemplate.newInitValue(init);
-
-				Constant value = state.getInit();
-				if (value != null) {
-					value.accept(new XlimValueVisitor(init2, state.getType()));
-				} else {
+				// For lists use result of initialize execution (initializes
+				// loops case)
+				if (stateVar.getType().getType() == Type.LIST) {
 					state.getType().accept(new XlimTypeSizeVisitor(init2));
-					if (tables.containsKey(state.getName())) {
-						for (Integer initvalue : tables.get(state.getName())) {
-							Element el = XlimNodeTemplate.newInitValue(init2,
-									"int");
-							el.setAttribute("value", initvalue.toString());
+
+					Object[] value = (Object[]) stateVar.getValue();
+					for (Object obj : value) {
+						if (obj != null) {
+							Element el = XlimNodeTemplate.newInitValue(init2);
+							el.setAttribute("value", obj.toString());
 							((ListType) state.getType()).getElementType()
 									.accept(new XlimTypeSizeVisitor(el));
 						}
-					} else {
-						System.out.println("STATE: " + state.getUses());
+					}
+				} else {
+					// For others just use the init value
+					Constant value = state.getInit();
+					if (value != null) {
+						value.accept(new XlimValueVisitor(init2, state
+								.getType()));
 					}
 				}
 			}
