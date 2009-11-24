@@ -44,13 +44,13 @@ ${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/actors/Actor_source.cpp
 )
 
 # projects in sub folders
-option(BUILD_AVC "whether AVC should be built" true)
-option(BUILD_MPEG2 "whether MPEG-2 should be built" true)
-option(BUILD_MPEG4 "whether MPEG-4 should be built" true)
-option(BUILD_MPEG4_SERIAL "whether MPEG-4 serial version should be built" true)
-option(BUILD_MPEG4_SERIAL_MOTION "whether MPEG-4 serial with new motion version should be built" true)
-option(BUILD_RVC_MPEG4 "whether RVC MPEG-4 should be built" true)
-option(BUILD_SEAM_CARVING "whether Seam carving should be built" true)
+option(BUILD_AVC "whether AVC should be built" false)
+option(BUILD_MPEG2 "whether MPEG-2 should be built" false)
+option(BUILD_MPEG4 "whether MPEG-4 should be built" false)
+option(BUILD_MPEG4_SERIAL "whether MPEG-4 serial version should be built" false)
+option(BUILD_MPEG4_SERIAL_MOTION "whether MPEG-4 serial with new motion version should be built" false)
+option(BUILD_RVC_MPEG4 "whether RVC MPEG-4 should be built" false)
+option(BUILD_SEAM_CARVING "whether Seam carving should be built" false)
 
 if(BUILD_AVC)
   add_subdirectory (AVC_CBP_Decoder)
