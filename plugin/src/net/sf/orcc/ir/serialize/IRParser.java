@@ -29,26 +29,6 @@
 package net.sf.orcc.ir.serialize;
 
 import static net.sf.orcc.ir.serialize.IRConstants.BINARY_EXPR;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_BAND;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_BOR;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_BXOR;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_DIV;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_DIV_INT;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_EQ;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_EXP;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_GE;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_GT;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_LAND;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_LE;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_LOR;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_LT;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_MINUS;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_MOD;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_NE;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_PLUS;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_SHIFT_LEFT;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_SHIFT_RIGHT;
-import static net.sf.orcc.ir.serialize.IRConstants.BOP_TIMES;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTIONS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
@@ -72,10 +52,6 @@ import static net.sf.orcc.ir.serialize.IRConstants.NAME_STORE;
 import static net.sf.orcc.ir.serialize.IRConstants.NAME_WHILE;
 import static net.sf.orcc.ir.serialize.IRConstants.NAME_WRITE;
 import static net.sf.orcc.ir.serialize.IRConstants.UNARY_EXPR;
-import static net.sf.orcc.ir.serialize.IRConstants.UOP_BNOT;
-import static net.sf.orcc.ir.serialize.IRConstants.UOP_LNOT;
-import static net.sf.orcc.ir.serialize.IRConstants.UOP_MINUS;
-import static net.sf.orcc.ir.serialize.IRConstants.UOP_NUM_ELTS;
 import static net.sf.orcc.ir.serialize.IRConstants.VAR_EXPR;
 
 import java.io.IOException;
@@ -323,52 +299,7 @@ public class IRParser {
 		Expression e1 = parseExpr(array.getJSONArray(1));
 		Expression e2 = parseExpr(array.getJSONArray(2));
 		Type type = parseType(array.get(3));
-		BinaryOp op = null;
-
-		if (name.equals(BOP_BAND)) {
-			op = BinaryOp.BITAND;
-		} else if (name.equals(BOP_BOR)) {
-			op = BinaryOp.BITOR;
-		} else if (name.equals(BOP_BXOR)) {
-			op = BinaryOp.BITXOR;
-		} else if (name.equals(BOP_DIV)) {
-			op = BinaryOp.DIV;
-		} else if (name.equals(BOP_DIV_INT)) {
-			op = BinaryOp.DIV_INT;
-		} else if (name.equals(BOP_EQ)) {
-			op = BinaryOp.EQ;
-		} else if (name.equals(BOP_EXP)) {
-			op = BinaryOp.EXP;
-		} else if (name.equals(BOP_GE)) {
-			op = BinaryOp.GE;
-		} else if (name.equals(BOP_GT)) {
-			op = BinaryOp.GT;
-		} else if (name.equals(BOP_LAND)) {
-			op = BinaryOp.LOGIC_AND;
-		} else if (name.equals(BOP_LE)) {
-			op = BinaryOp.LE;
-		} else if (name.equals(BOP_LOR)) {
-			op = BinaryOp.LOGIC_OR;
-		} else if (name.equals(BOP_LT)) {
-			op = BinaryOp.LT;
-		} else if (name.equals(BOP_MINUS)) {
-			op = BinaryOp.MINUS;
-		} else if (name.equals(BOP_MOD)) {
-			op = BinaryOp.MOD;
-		} else if (name.equals(BOP_NE)) {
-			op = BinaryOp.NE;
-		} else if (name.equals(BOP_PLUS)) {
-			op = BinaryOp.PLUS;
-		} else if (name.equals(BOP_SHIFT_LEFT)) {
-			op = BinaryOp.SHIFT_LEFT;
-		} else if (name.equals(BOP_SHIFT_RIGHT)) {
-			op = BinaryOp.SHIFT_RIGHT;
-		} else if (name.equals(BOP_TIMES)) {
-			op = BinaryOp.TIMES;
-		} else {
-			throw new OrccException("Invalid binary operator: " + name);
-		}
-
+		BinaryOp op = BinaryOp.getOperator(name);
 		return new BinaryExpr(location, e1, op, e2, type);
 	}
 
@@ -711,9 +642,9 @@ public class IRParser {
 		if (register) {
 			procs.add(file, location, name, proc);
 		}
-		
+
 		AbstractNode.resetLabelCount();
-		
+
 		return proc;
 	}
 
@@ -841,20 +772,7 @@ public class IRParser {
 		String name = array.getString(0);
 		Expression expr = parseExpr(array.getJSONArray(1));
 		Type type = parseType(array.get(2));
-		UnaryOp op = null;
-
-		if (name.equals(UOP_BNOT)) {
-			op = UnaryOp.BITNOT;
-		} else if (name.equals(UOP_LNOT)) {
-			op = UnaryOp.LOGIC_NOT;
-		} else if (name.equals(UOP_MINUS)) {
-			op = UnaryOp.MINUS;
-		} else if (name.equals(UOP_NUM_ELTS)) {
-			op = UnaryOp.NUM_ELTS;
-		} else {
-			throw new OrccException("Invalid unary operator: " + name);
-		}
-
+		UnaryOp op = UnaryOp.getOperator(name);
 		return new UnaryExpr(location, op, expr, type);
 	}
 

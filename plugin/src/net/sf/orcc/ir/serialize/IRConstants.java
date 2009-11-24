@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir.serialize;
 
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.UnaryOp;
 
 /**
  * Constants IR fields.
@@ -40,46 +38,6 @@ import net.sf.orcc.ir.expr.UnaryOp;
 public interface IRConstants {
 
 	public static final String BINARY_EXPR = "2 op";
-
-	public static final String BOP_BAND = BinaryOp.BITAND.getText();
-
-	public static final String BOP_BOR = BinaryOp.BITOR.getText();
-
-	public static final String BOP_BXOR = BinaryOp.BITXOR.getText();
-
-	public static final String BOP_DIV = BinaryOp.DIV.getText();
-
-	public static final String BOP_DIV_INT = BinaryOp.DIV_INT.getText();
-
-	public static final String BOP_EQ = BinaryOp.EQ.getText();
-
-	public static final String BOP_EXP = BinaryOp.EXP.getText();
-
-	public static final String BOP_GE = BinaryOp.GE.getText();
-
-	public static final String BOP_GT = BinaryOp.GT.getText();
-
-	public static final String BOP_LAND = BinaryOp.LOGIC_AND.getText();
-
-	public static final String BOP_LE = BinaryOp.LE.getText();
-
-	public static final String BOP_LOR = BinaryOp.LOGIC_OR.getText();
-
-	public static final String BOP_LT = BinaryOp.LT.getText();
-
-	public static final String BOP_MINUS = BinaryOp.MINUS.getText();
-
-	public static final String BOP_MOD = BinaryOp.MOD.getText();
-
-	public static final String BOP_NE = BinaryOp.NE.getText();
-
-	public static final String BOP_PLUS = BinaryOp.PLUS.getText();
-
-	public static final String BOP_SHIFT_LEFT = BinaryOp.SHIFT_LEFT.getText();
-
-	public static final String BOP_SHIFT_RIGHT = BinaryOp.SHIFT_RIGHT.getText();
-
-	public static final String BOP_TIMES = BinaryOp.TIMES.getText();
 
 	public static final String KEY_ACTION_SCHED = "action scheduler";
 
@@ -126,14 +84,6 @@ public interface IRConstants {
 	public static final String NAME_WRITE = "write";
 
 	public static final String UNARY_EXPR = "1 op";
-
-	public static final String UOP_BNOT = UnaryOp.BITNOT.getText();
-
-	public static final String UOP_LNOT = UnaryOp.LOGIC_NOT.getText();
-
-	public static final String UOP_MINUS = UnaryOp.MINUS.getText();
-
-	public static final String UOP_NUM_ELTS = UnaryOp.NUM_ELTS.getText();
 
 	public static final String VAR_EXPR = "var";
 
