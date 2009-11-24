@@ -44,38 +44,6 @@ $endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Nodes
-///////////////////////////////////////////////////////////////////////////////
-
-instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
->>
-
-nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}$
->>
-
-// if node
-BlockNode(blockNode) ::= <<
-$instructions(blockNode.instructions)$
->>
-
-// if node
-IfNode(ifNode) ::= <<
-if ($ifNode.value$) {
-	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$ else {
-	$nodes(ifNode.elseNodes)$}$endif$
-$BlockNode(ifNode.joinNode)$
->>
-
-// while node
-WhileNode(whileNode) ::= <<
-while ($whileNode.value$) {
-	$nodes(whileNode.nodes)$}
-$BlockNode(whileNode.joinNode)$
->>
-
-///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -150,6 +118,38 @@ $write.target$ = getWritePtr($actorName$_$write.port$, $write.numTokens$);
 WriteEnd(writeEnd) ::= <<
 setWriteEnd($actorName$_$writeEnd.port$);
 
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+instructions(instructions) ::= <<
+$instructions: {$(it.class.simpleName)(it)$}$
+>>
+
+nodes(nodes) ::= <<
+$nodes: {$(it.class.simpleName)(it)$}$
+>>
+
+// if node
+BlockNode(blockNode) ::= <<
+$instructions(blockNode.instructions)$
+>>
+
+// if node
+IfNode(ifNode) ::= <<
+if ($ifNode.value$) {
+	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$ else {
+	$nodes(ifNode.elseNodes)$}$endif$
+$BlockNode(ifNode.joinNode)$
+>>
+
+// while node
+WhileNode(whileNode) ::= <<
+while ($whileNode.value$) {
+	$nodes(whileNode.nodes)$}
+$BlockNode(whileNode.joinNode)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -329,10 +329,10 @@ actor(actorName, actor) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-$actor.inputs.list: fifo(port=it)$
+$actor.inputs.list: fifo(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-$actor.outputs.list: fifo(port=it)$
+$actor.outputs.list: fifo(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
 $actor.stateVars.list: stateVar(it)$
