@@ -98,8 +98,12 @@ initPortNode(fifoName, expr, index) ::= <<
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
+indexes(indexes) ::= <<
+$indexes: { index | i32 $index$ }; separator=", "$
+>>
+
 Assign(assign) ::= <<
-$assign.target$ = $assign.value$
+%$assign.target$ = $assign.value$
 
 >>
 
@@ -112,18 +116,26 @@ call $call.procedure.returnType$ @$call.procedure$($call.parameters; separator="
 >>
 
 HasTokens(hasTokens) ::= <<
-%$hasTokens.target$ = call i1 @lff_hasTokens(%struct.lff_t* %local_$actorName$_$hasTokens.port$, i32 $hasTokens.numTokens$)
+%$hasTokens.target$ = call i1 @lff_hasTokens(%struct.lff_t* %local_$hasTokens.port$, i32 $hasTokens.numTokens$)
 
 >>
 
 Load(load) ::= <<
-$load.target$ = load $load.source$
+$if(load.indexes.empty)$
+%$load.target$ = load $load.source.variable.type$* @$load.source$
 
+$else$
+%$load.target$_ptr = getelementptr $load.source.variable.type$* @$load.source$, $indexes(load.indexes)$
+%$load.target$ = load $load.source.variable.type$* %$load.target$_ptr
+
+$endif$
 >>
 
 Peek(peek) ::= <<
-call void @lff_peek(%struct.lff_t* %$actorName$_$peek.port$, $peek.target.type$ $peek.target$)
-	
+%$peek.target$_$peek.block.label$ = getelementptr $peek.target.type$* %$peek.target$
+%$peek.target$_$peek.block.label$_cast = bitcast $peek.target.type$* %$peek.target$_$peek.block.label$ to i8*
+call void @lff_peek(%struct.lff_t* %local_$peek.target$, i8* %$peek.target$_$peek.block.label$_cast)
+
 >>
 
 PhiAssignment(phi) ::= <<
@@ -142,10 +154,11 @@ call void @lff_read(%struct.lff_t* %local_$read.target$, i8* %$read.target$_$rea
 Return(return) ::= <<
 $if(return.value)$
 ret $return.value$
+
 $else$
 ret void
-$endif$
 
+$endif$
 >>
 
 Store(store) ::= <<
@@ -181,7 +194,7 @@ b$blockNode.label$:
 
 // if node
 IfNode(ifNode) ::= <<
-br i1 $ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
+	br i1 %$ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
 $nodes(ifNode.thenNodes)$	br %b$ifNode.joinNode.label$
 $nodes(ifNode.elseNodes)$	br %b$ifNode.joinNode.label$
 $BlockNode(ifNode.joinNode)$
