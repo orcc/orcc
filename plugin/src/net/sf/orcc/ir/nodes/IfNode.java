@@ -53,9 +53,9 @@ public class IfNode extends AbstractNode implements ValueContainer {
 
 	private Expression value;
 
-	public IfNode(int id, Location location, Expression condition,
+	public IfNode(Location location, Expression condition,
 			List<CFGNode> thenNodes, List<CFGNode> elseNodes, BlockNode joinNode) {
-		super(id, location);
+		super(location);
 		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
 		this.thenNodes = thenNodes;

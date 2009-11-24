@@ -31,6 +31,7 @@ package net.sf.orcc.ir.nodes;
 import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
 
 /**
  * This class defines an abstract node.
@@ -41,11 +42,23 @@ import net.sf.orcc.ir.Location;
 public abstract class AbstractNode extends AbstractLocalizable implements
 		CFGNode {
 
+	private static int labelCount;
+
+	/**
+	 * Resets the label count. The label count is used to assign labels to newly
+	 * created CFG nodes. Labels must be unique within a {@link Procedure},
+	 * which means this function can NOT be called in the middle of a procedure.
+	 */
+	public static synchronized void resetLabelCount() {
+		labelCount = 0;
+	}
+
 	private int label;
 
-	protected AbstractNode(int label, Location location) {
+	protected AbstractNode(Location location) {
 		super(location);
-		this.label = label;
+		labelCount++;
+		this.label = labelCount;
 	}
 
 	@Override

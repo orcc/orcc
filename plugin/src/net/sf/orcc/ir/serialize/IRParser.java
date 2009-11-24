@@ -128,6 +128,7 @@ import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
@@ -496,13 +497,13 @@ public class IRParser {
 		return new HasTokens(block, loc, port, numTokens, varDef);
 	}
 
-	private IfNode parseIfNode(int id, Location loc, JSONArray array)
+	private IfNode parseIfNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		Expression condition = parseExpr(array.getJSONArray(0));
 		List<CFGNode> thenNodes = parseNodes(array.getJSONArray(1));
 		List<CFGNode> elseNodes = parseNodes(array.getJSONArray(2));
 
-		return new IfNode(id, loc, condition, thenNodes, elseNodes, null);
+		return new IfNode(loc, condition, thenNodes, elseNodes, null);
 	}
 
 	private BlockNode parseJoinNode(Location loc, JSONArray array)
@@ -543,12 +544,12 @@ public class IRParser {
 	private CFGNode parseNode(JSONArray array) throws JSONException,
 			OrccException {
 		String name = array.getString(0);
-		int id = array.getInt(1);
+		// int id = array.getInt(1);
 		Location loc = parseLocation(array.getJSONArray(2));
 		CFGNode node = null;
 
 		if (name.equals(NAME_IF)) {
-			node = parseIfNode(id, loc, array.getJSONArray(3));
+			node = parseIfNode(loc, array.getJSONArray(3));
 		} else if (name.equals(NAME_JOIN)) {
 			node = parseJoinNode(loc, array.getJSONArray(3));
 
@@ -562,7 +563,7 @@ public class IRParser {
 				node = null;
 			}
 		} else if (name.equals(NAME_WHILE)) {
-			node = parseWhileNode(id, loc, array.getJSONArray(3));
+			node = parseWhileNode(loc, array.getJSONArray(3));
 		} else {
 			block = new BlockNode(loc);
 			Instruction instr = null;
@@ -710,6 +711,9 @@ public class IRParser {
 		if (register) {
 			procs.add(file, location, name, proc);
 		}
+		
+		AbstractNode.resetLabelCount();
+		
 		return proc;
 	}
 
@@ -892,12 +896,12 @@ public class IRParser {
 		return new Use(varDef);
 	}
 
-	private WhileNode parseWhileNode(int id, Location loc, JSONArray array)
+	private WhileNode parseWhileNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		Expression condition = parseExpr(array.getJSONArray(0));
 		List<CFGNode> nodes = parseNodes(array.getJSONArray(1));
 		BlockNode joinNode = (BlockNode) nodes.remove(0);
-		return new WhileNode(id, loc, condition, nodes, joinNode);
+		return new WhileNode(loc, condition, nodes, joinNode);
 	}
 
 	private Write parseWriteNode(Location loc, JSONArray array)

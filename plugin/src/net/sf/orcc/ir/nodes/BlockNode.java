@@ -46,8 +46,6 @@ import net.sf.orcc.ir.Location;
  */
 public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 
-	private static int globalLabel;
-
 	public static BlockNode first(List<CFGNode> nodes) {
 		BlockNode block;
 		if (nodes.isEmpty()) {
@@ -100,7 +98,7 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	 * Creates a new empty block node with the given location.
 	 */
 	public BlockNode(Location location) {
-		super(globalLabel++, location);
+		super(location);
 		instructions = new ArrayList<Instruction>();
 	}
 
