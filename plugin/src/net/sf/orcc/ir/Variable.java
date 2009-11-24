@@ -47,7 +47,7 @@ public abstract class Variable implements INameable {
 	/**
 	 * variable possible assign expression
 	 */
-	protected Expression expression;
+	private Expression expression;
 
 	/**
 	 * true if this variable is global
@@ -95,6 +95,8 @@ public abstract class Variable implements INameable {
 		this.location = location;
 		this.type = type;
 		this.name = name;
+		this.global = global;
+
 		this.uses = new ArrayList<Use>();
 	}
 
@@ -115,21 +117,25 @@ public abstract class Variable implements INameable {
 		this.location = location;
 		this.type = type;
 		this.name = name;
-		this.uses = new ArrayList<Use>();
+		this.global = global;
 		this.expression = expression;
+
+		this.uses = new ArrayList<Use>();
 	}
 
 	/**
 	 * Creates a new variable from the given variable.
 	 * 
-	 * @param var
+	 * @param variable
 	 *            a variable
 	 */
-	public Variable(Variable var) {
-		this.location = var.location;
-		this.type = var.type;
-		this.name = var.name;
-		this.uses = var.uses;
+	public Variable(Variable variable) {
+		this.location = variable.location;
+		this.type = variable.type;
+		this.name = variable.name;
+		this.global = variable.global;
+
+		this.uses = new ArrayList<Use>(variable.uses);
 	}
 
 	/**

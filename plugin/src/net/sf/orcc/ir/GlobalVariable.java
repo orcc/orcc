@@ -97,7 +97,7 @@ public class GlobalVariable extends Variable {
 	 *             if the value could not be evaluated to a constant
 	 */
 	public void evaluate() throws OrccException {
-		constantValue = AbstractConstant.evaluate(expression);
+		constantValue = AbstractConstant.evaluate(getExpression());
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class GlobalVariable extends Variable {
 	 * @return <code>true</code> if this global variable has a value
 	 */
 	public boolean hasExpression() {
-		return (expression != null);
+		return (getExpression() != null);
 	}
 
 }
