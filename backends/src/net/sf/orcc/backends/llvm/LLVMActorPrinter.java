@@ -37,6 +37,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Printer;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.INameable;
 
@@ -106,7 +107,11 @@ public final class LLVMActorPrinter extends Printer {
 
 	@Override
 	public String toString(INameable nameable) {
-		return nameable.getName();
+		if (nameable instanceof Procedure) {
+			return "@" + nameable.getName();
+		} else {
+			return nameable.getName();
+		}
 	}
 
 	@Override

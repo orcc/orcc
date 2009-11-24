@@ -141,6 +141,7 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 
 	@Override
 	public void visit(VarExpr expr, Object... args) {
+		builder.append('%');
 		builder.append(expr.getVar().getVariable());
 	}
 

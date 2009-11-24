@@ -125,7 +125,12 @@ $if(load.indexes.empty)$
 %$load.target$ = load $load.source.variable.type$* @$load.source$
 
 $else$
-%$load.target$_ptr = getelementptr $load.source.variable.type$* @$load.source$, $indexes(load.indexes)$
+%$load.target$_ptr = getelementptr $load.source.variable.type$* $if(load.source.variable.global)$
+@
+$else$
+%
+$endif$
+$load.source$, $indexes(load.indexes)$
 %$load.target$ = load $load.source.variable.type$* %$load.target$_ptr
 
 $endif$
@@ -194,7 +199,7 @@ b$blockNode.label$:
 
 // if node
 IfNode(ifNode) ::= <<
-	br i1 %$ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
+	br i1 $ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
 $nodes(ifNode.thenNodes)$	br %b$ifNode.joinNode.label$
 $nodes(ifNode.elseNodes)$	br %b$ifNode.joinNode.label$
 $BlockNode(ifNode.joinNode)$
@@ -225,7 +230,7 @@ $nodes$	ret void
 
 procedure(procedure) ::= <<
 
-define internal $procedure.returnType$ @$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
+define internal $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
 entry:
 $if(procedure.locals.list)$
 	$procedure.locals.list: variableDeclaration(it)$	br label %b$first(procedure.nodes).label$
