@@ -96,8 +96,10 @@ setReadEnd($actorName$_$readEnd.port$);
 >>
 
 Return(return) ::= <<
+$if(return.value)$
 return $return.value$;
 
+$endif$
 >>
 
 SelfAssignment(selfAssign) ::= <<

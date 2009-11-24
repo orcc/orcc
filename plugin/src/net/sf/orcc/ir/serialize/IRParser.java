@@ -664,7 +664,7 @@ public class IRParser {
 		if (array == null) {
 			expr = null;
 		} else {
-			parseExpr(array);
+			expr = parseExpr(array);
 		}
 		return new Return(block, loc, expr);
 	}
