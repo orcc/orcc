@@ -62,36 +62,20 @@ import org.jgrapht.DirectedGraph;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMNetworkPrinter {
+public final class LLVMNetworkPrinter {
 
 	private StringTemplateGroup group;
 
 	private StringTemplate template;
 
-	private TypeToString typeVisitor;
-
 	/**
-	 * Creates a new network printer with the template "C.st".
+	 * Creates a new network printer with the template "LLVM_network".
 	 * 
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
 	public LLVMNetworkPrinter() throws IOException {
-		this("LLVM_network", new TypeToString());
-	}
-
-	/**
-	 * Creates a new network printer using the given template file name.
-	 * 
-	 * @param name
-	 *            The template file name.
-	 * @throws IOException
-	 *             If the template file could not be read.
-	 */
-	protected LLVMNetworkPrinter(String name, TypeToString typeVisitor)
-			throws IOException {
-		group = new TemplateGroupLoader().loadGroup(name);
-		this.typeVisitor = typeVisitor;
+		group = new TemplateGroupLoader().loadGroup("LLVM_network");
 	}
 
 	/**
@@ -171,8 +155,7 @@ public class LLVMNetworkPrinter {
 				Broadcast bcast = (Broadcast) instance;
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("id", bcast.getId());
-				Type type = bcast.getType();
-				attrs.put("type", typeVisitor.toString(type));
+				attrs.put("type", bcast.getType());
 
 				List<Integer> num = new ArrayList<Integer>();
 				for (int i = 0; i < bcast.getNumOutput(); i++) {
@@ -231,7 +214,7 @@ public class LLVMNetworkPrinter {
 				attrs.put("count", fifoCount);
 				attrs.put("size", size);
 				attrs.put("elt_size", type.getType());
-				attrs.put("type", typeVisitor.toString(type));
+				attrs.put("type", type);
 				attrs.put("source", source.getId());
 				attrs.put("src_port", connection.getSource().getName());
 				attrs.put("target", target.getId());

@@ -32,23 +32,29 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import net.sf.orcc.backends.c.CBackendImpl;
+import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.quasistatic.core.org.efsmScheduler.main.Scheduler_Simulator;
 import net.sf.orcc.backends.c.quasistatic.core.org.efsmScheduler.output.ConfigFilesCreator;
 import net.sf.orcc.backends.c.quasistatic.core.org.efsmScheduler.utilities.FileUtilities;
 import net.sf.orcc.backends.c.quasistatic.parsers.CQuasiStaticActorParser;
 import net.sf.orcc.backends.c.quasistatic.parsers.CQuasiStaticNetworksParser;
 import net.sf.orcc.backends.c.quasistatic.utils.CQuasiStaticConstants;
+import net.sf.orcc.backends.c.transforms.IncrementPeephole;
+import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.transforms.DeadGlobalElimination;
+import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
-public class CQuasiStaticBackendImpl extends CBackendImpl {
+public class CQuasiStaticBackendImpl extends AbstractBackend {
 
 	private String actorsSourcePath;
 	private String networkFilePath;
 	private String outputDirectoryPath;
 	private String workingDirectoryPath;
+	private CQuasiStaticActorPrinter printer;
 
 	private void createConfigFiles() {
 		new File(workingDirectoryPath + CQuasiStaticConstants.CONFIG_PATH)
@@ -128,7 +134,17 @@ public class CQuasiStaticBackendImpl extends CBackendImpl {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		super.printActor(id, actor);
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new PhiRemoval(), new IncrementPeephole(),
+				new MoveReadsWritesTransformation() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+
+		String outputName = path + File.separator + id + ".c";
+		printer.printActor(outputName, id, actor);
+
 		parseActor(id, actor);
 	}
 
@@ -136,10 +152,10 @@ public class CQuasiStaticBackendImpl extends CBackendImpl {
 	protected void printNetwork(Network network) throws Exception {
 		CQuasiStaticNetworkPrinter networkPrinter = new CQuasiStaticNetworkPrinter();
 		String outputName = path + File.separator + network.getName() + ".c";
-		
+
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);
-		
+
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 		parseNetworkFiles();
 	}
@@ -157,8 +173,7 @@ public class CQuasiStaticBackendImpl extends CBackendImpl {
 	 * 
 	 */
 	private void removeOutputDirectories() {
-
 		FileUtilities.deleteFile(new File(workingDirectoryPath));
-
 	}
+
 }

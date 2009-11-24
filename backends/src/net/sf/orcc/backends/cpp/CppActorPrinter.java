@@ -44,13 +44,13 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
- * Actor printer.
+ * This class defines a C++ actor printer.
  * 
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
  * 
  */
-public class CppActorPrinter extends Printer {
+public final class CppActorPrinter extends Printer {
 
 	private StringTemplateGroup group;
 

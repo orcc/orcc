@@ -46,12 +46,12 @@ import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
- * Actor printer.
+ * This class defines a Java actor printer.
  * 
  * @author Mathieu Wipliez
  * 
  */
-public class JavaActorPrinter extends Printer {
+public final class JavaActorPrinter extends Printer {
 
 	private StringTemplateGroup group;
 

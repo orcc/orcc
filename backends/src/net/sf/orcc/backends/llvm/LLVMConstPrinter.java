@@ -31,13 +31,9 @@ package net.sf.orcc.backends.llvm;
 import java.util.List;
 
 import net.sf.orcc.ir.Constant;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstantVisitor;
-import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.ir.consts.StringConst;
-import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.printers.DefaultConstantPrinter;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -49,7 +45,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMConstPrinter implements ConstantVisitor {
+public class LLVMConstPrinter extends DefaultConstantPrinter {
 
 	/**
 	 * template group
@@ -57,84 +53,33 @@ public class LLVMConstPrinter implements ConstantVisitor {
 	private StringTemplateGroup group;
 
 	/**
-	 * current template
-	 */
-	private StringTemplate template;
-
-	private TypeToString typeVisitor;
-
-	/**
 	 * Creates a new const printer from the given template group.
 	 * 
 	 * @param group
 	 *            template group
 	 */
-	public LLVMConstPrinter(StringTemplateGroup group, TypeToString typeVisitor) {
+	public LLVMConstPrinter(StringTemplateGroup group) {
 		this.group = group;
-		this.typeVisitor = typeVisitor;
-	}
-
-	/**
-	 * Sets the top-level template.
-	 * 
-	 * @param template
-	 *            top-level template
-	 */
-	public void setTemplate(StringTemplate template) {
-		this.template = template;
 	}
 
 	@Override
 	public void visit(BoolConst constant, Object... args) {
-		if (args.length == 1) {
-			template.setAttribute("type", typeVisitor.toString((Type) args[0]));
-		}
-		template.setAttribute("value", constant.getValue() ? "1" : "0");
-	}
-
-	@Override
-	public void visit(IntConst constant, Object... args) {
-		if (args.length == 1) {
-			template.setAttribute("value", typeVisitor.toString((Type) args[0])
-					+ " " + constant.getValue());
-		} else {
-			template.setAttribute("value", constant.getValue());
-		}
-
+		builder.append(constant.getValue() ? '1' : '0');
 	}
 
 	@Override
 	public void visit(ListConst constant, Object... args) {
-		ListType listType = (ListType) args[0];
-		Type type = listType.getElementType();
-
-		// save current template
-		StringTemplate previousTempl = template;
-
 		// set instance of list template as current template
-		StringTemplate listTempl = group.getInstanceOf("listValue");
-		template = listTempl;
+		StringTemplate template = group.getInstanceOf("listValue");
 
 		List<Constant> list = constant.getValue();
 		for (Constant cst : list) {
-			cst.accept(this, type);
+			template.setAttribute("value", cst.toString());
 		}
 
 		// restore previous template as current template, and set attribute
 		// "value" to the instance of the list template
-		template = previousTempl;
-		template.setAttribute("value", listTempl);
-	}
-
-	@Override
-	public void visit(StringConst constant, Object... args) {
-		// escape backslashes
-		String val = constant.getValue();
-		String res = "\"" + val.replaceAll("\\\\", "\\\\") + "\"";
-		if (args.length == 1) {
-			template.setAttribute("type", typeVisitor.toString((Type) args[0]));
-		}
-		template.setAttribute("value", res);
+		builder.append(template.toString(80));
 	}
 
 }

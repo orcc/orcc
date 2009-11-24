@@ -34,6 +34,7 @@ import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.printers.DefaultTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -42,14 +43,13 @@ import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 
 /**
- * Type to string.
+ * This class defines a LLVM type printer.
  * 
  * @author Jérôme GORIN
  * 
  */
-public class TypeToString implements LLVMTypeVisitor {
-
-	private StringBuilder builder;
+public class LLVMTypePrinter extends DefaultTypePrinter implements
+		LLVMTypeVisitor {
 
 	private void printSize(Type type) {
 		int size = sizeOf(type);
@@ -89,19 +89,6 @@ public class TypeToString implements LLVMTypeVisitor {
 			e.printStackTrace();
 		}
 		return 0;
-	}
-
-	/**
-	 * Creates a string buffer and fills it with the text representation of the
-	 * given type. Returns the text representation.
-	 * 
-	 * @param type
-	 *            An {@link Type}.
-	 */
-	public String toString(Type type) {
-		builder = new StringBuilder();
-		type.accept(this);
-		return builder.toString();
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public class CNetworkPrinter {
 	protected StringTemplate template;
 
 	/**
-	 * Creates a new network printer with the template "C.st".
+	 * Creates a new network printer with the template "C_network".
 	 * 
 	 * @throws IOException
 	 *             If the template file could not be read.

@@ -28,26 +28,24 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 
 /**
+ * This class defines an LLVM expression printer.
  * 
  * @author Jérôme GORIN
  * 
  */
-public class LLVMExprPrinter implements ExpressionVisitor {
+public class LLVMExprPrinter extends DefaultExpressionPrinter {
+
 	public static String toString(BinaryOp op) {
 		switch (op) {
 		case BITAND:
@@ -96,7 +94,6 @@ public class LLVMExprPrinter implements ExpressionVisitor {
 	}
 
 	public static String toString(UnaryOp op, Object... args) {
-
 		switch (op) {
 		case BITNOT:
 			return "~";
@@ -109,24 +106,6 @@ public class LLVMExprPrinter implements ExpressionVisitor {
 		default:
 			throw new NullPointerException();
 		}
-	}
-
-	private StringBuilder builder;
-
-	private TypeToString typePrinter;
-
-	private LLVMVarDefPrinter varDefPrinter;
-
-	public LLVMExprPrinter(TypeToString typePrinter,
-			LLVMVarDefPrinter varDefPrinter) {
-		this.varDefPrinter = varDefPrinter;
-		this.typePrinter = typePrinter;
-	}
-
-	public String toString(Expression expr, Object... args) {
-		builder = new StringBuilder();
-		expr.accept(this, args);
-		return builder.toString();
 	}
 
 	@Override
@@ -143,23 +122,12 @@ public class LLVMExprPrinter implements ExpressionVisitor {
 
 	@Override
 	public Object visit(BoolExpr expr, Object... args) {
-		if (args[0] instanceof Type) {
-			Type type = (Type) args[0];
-			String typeStr = typePrinter.toString(type);
-			builder.append(typeStr + " ");
-		}
-
-		builder.append(expr.getValue() ? "1" : "0");
+		builder.append(expr.getValue() ? '1' : '0');
 		return null;
 	}
 
 	@Override
 	public Object visit(IntExpr expr, Object... args) {
-		if (args[0] instanceof Type) {
-			String type = typePrinter.toString((Type) args[0]);
-			builder.append(type + " ");
-		}
-
 		builder.append(expr.getValue());
 		return null;
 	}
@@ -170,14 +138,6 @@ public class LLVMExprPrinter implements ExpressionVisitor {
 	}
 
 	@Override
-	public Object visit(StringExpr expr, Object... args) {
-		builder.append('"');
-		builder.append(expr.getValue().replaceAll("\\\\", "\\\\"));
-		builder.append('"');
-		return null;
-	}
-
-	@Override
 	public Object visit(UnaryExpr expr, Object... args) {
 		expr.getExpr().accept(this, args);
 		return null;
@@ -185,8 +145,7 @@ public class LLVMExprPrinter implements ExpressionVisitor {
 
 	@Override
 	public Object visit(VarExpr expr, Object... args) {
-		Variable variable = expr.getVar().getVariable();
-		builder.append(varDefPrinter.getVarDefName(variable));
+		builder.append(expr.getVar().getVariable());
 		return null;
 	}
 

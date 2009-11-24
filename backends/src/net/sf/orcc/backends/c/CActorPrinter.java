@@ -51,14 +51,14 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Matthieu Wipliez
  * 
  */
-public class CActorPrinter extends Printer {
+public final class CActorPrinter extends Printer {
 
-	protected StringTemplateGroup group;
+	private StringTemplateGroup group;
 
 	private Map<String, String> transformations;
 
 	/**
-	 * Creates a new network printer with the template "C.st".
+	 * Creates a new network printer with the template "C_actor".
 	 * 
 	 * @throws IOException
 	 *             If the template file could not be read.

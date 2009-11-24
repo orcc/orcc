@@ -31,115 +31,39 @@ package net.sf.orcc.backends.llvm;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
-import net.sf.orcc.backends.llvm.util.NodeIndex;
-import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.INameable;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
- * Actor printer.
+ * This class defines a LLVM actor printer.
  * 
  * @author Jérôme GORIN
  * 
  */
-public class LLVMActorPrinter {
+public final class LLVMActorPrinter extends Printer {
 
-	protected LLVMConstPrinter constPrinter;
-
-	protected LLVMExprPrinter exprPrinter;
-
-	protected StringTemplateGroup group;
-
-	protected StringTemplate template;
-
-	protected TypeToString typePrinter;
-
-	protected LLVMVarDefPrinter varDefPrinter;
+	private StringTemplateGroup group;
 
 	/**
-	 * Creates a new network printer with the template "C.st".
+	 * Creates a new network printer with the template "LLVM_actor".
 	 * 
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
 	public LLVMActorPrinter() throws IOException {
-		this("LLVM_actor");
-		typePrinter = new TypeToString();
-		constPrinter = new LLVMConstPrinter(group, typePrinter);
-		varDefPrinter = new LLVMVarDefPrinter(typePrinter);
-		exprPrinter = new LLVMExprPrinter(typePrinter, varDefPrinter);
-	}
+		group = new TemplateGroupLoader().loadGroup("LLVM_actor");
 
-	/**
-	 * Creates a new network printer using the given template file name.
-	 * 
-	 * @param name
-	 *            The template file name.
-	 * @throws IOException
-	 *             If the template file could not be read.
-	 */
-	protected LLVMActorPrinter(String name) throws IOException {
-		group = new TemplateGroupLoader().loadGroup(name);
-	}
-
-	/**
-	 * Returns an instance of the "proc" template with attributes set using the
-	 * given Procedure proc.
-	 * 
-	 * @param proc
-	 *            a procedure
-	 * @return a string template
-	 */
-	private StringTemplate applyProc(String actorName, Procedure proc) {
-
-		StringTemplate procTmpl = group.getInstanceOf("proc");
-
-		// name
-		procTmpl.setAttribute("name", proc.getName());
-
-		// return type
-		Type type = proc.getReturnType();
-		procTmpl.setAttribute("type", typePrinter.toString(type));
-
-		// parameters
-		List<Object> parameters = new ArrayList<Object>();
-		for (Variable param : proc.getParameters()) {
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(param);
-			parameters.add(varDefMap);
-		}
-		procTmpl.setAttribute("parameters", parameters);
-
-		// locals
-		List<Object> varDefs = new ArrayList<Object>();
-		for (Variable local : proc.getLocals()) {
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(local);
-			varDefs.add(varDefMap);
-		}
-		procTmpl.setAttribute("locals", varDefs);
-
-		// body
-		LLVMNodePrinter printer = new LLVMNodePrinter(group, procTmpl,
-				actorName, proc, varDefPrinter, exprPrinter, typePrinter);
-		for (CFGNode node : proc.getNodes()) {
-			node.accept(printer);
-		}
-
-		return procTmpl;
+		// registers this printer as the default printer
+		Printer.register(this);
 	}
 
 	/**
@@ -155,9 +79,10 @@ public class LLVMActorPrinter {
 	 */
 	public void printActor(String fileName, String id, Actor actor)
 			throws IOException {
-		template = group.getInstanceOf("actor");
+		StringTemplate template = group.getInstanceOf("actor");
 
-		setAttributes(id, actor);
+		template.setAttribute("actorName", id);
+		template.setAttribute("actor", actor);
 
 		byte[] b = template.toString(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
@@ -165,101 +90,30 @@ public class LLVMActorPrinter {
 		os.close();
 	}
 
-	private void setActions(String tmplName, String actorName,
-			List<Action> actions) {
-		for (Action action : actions) {
-			StringTemplate procTmpl = applyProc(actorName, action.getBody());
-			template.setAttribute(tmplName, procTmpl);
-			Procedure proc = action.getScheduler();
-			proc.setName("isSchedulable_" + action);
-			procTmpl = applyProc(actorName, proc);
-			template.setAttribute(tmplName, procTmpl);
-		}
+	@Override
+	public String toString(Constant constant) {
+		LLVMConstPrinter printer = new LLVMConstPrinter(group);
+		constant.accept(printer);
+		return printer.toString();
 	}
 
-	/**
-	 * Sets attributes of the template from the given actor. Classes may extend,
-	 * but should call super.setAttributes(actor) first.
-	 * 
-	 * @param actor
-	 *            An actor
-	 */
-	private void setAttributes(String id, Actor actor) {
-		String actorName = actor.getName();
-		template.setAttribute("name", actorName);
-		setFifos("inputs", actor.getInputs());
-		setFifos("outputs", actor.getOutputs());
-		setStateVars(actor.getStateVars());
-		setInstantations(actorName, actor.getInstantations());
-		setProcedures(actorName, actor.getProcs());
-		setActions("actions", actorName, actor.getActions());
-		setActions("initializes", actorName, actor.getInitializes());
-		template.setAttribute("scheduler", actor.getActionScheduler());
-		template.setAttribute("iterator", new NodeIndex(0));
-		template.setAttribute("initialize", actor.getInitializes());
+	@Override
+	public String toString(Expression expression) {
+		LLVMExprPrinter printer = new LLVMExprPrinter();
+		expression.accept(printer, Integer.MAX_VALUE);
+		return printer.toString();
 	}
 
-	private void setFifos(String attribute, OrderedMap<Port> ports) {
-		int size = ports.size();
-		List<String> names = new ArrayList<String>(size);
-		for (Port port : ports) {
-			names.add(port.getName());
-		}
-
-		template.setAttribute(attribute, names);
+	@Override
+	public String toString(INameable nameable) {
+		return nameable.getName();
 	}
 
-	private void setInstantations(String actorName, List<Procedure> procs) {
-		for (Procedure proc : procs) {
-			int count = 0;
-
-			StringTemplate instTmpl = group.getInstanceOf("inst");
-			// name
-			instTmpl.setAttribute("name", proc.getName());
-
-			// body
-			LLVMNodePrinter printer = new LLVMNodePrinter(group, instTmpl,
-					actorName, proc, varDefPrinter, exprPrinter, typePrinter);
-
-			for (CFGNode node : proc.getNodes()) {
-				node.accept(printer, count);
-				count++;
-			}
-
-			template.setAttribute("insts", instTmpl);
-		}
-	}
-
-	private void setProcedures(String actorName, OrderedMap<Procedure> procs) {
-		for (Procedure proc : procs) {
-			if (!proc.isExternal()) {
-				template.setAttribute("procs", applyProc(actorName, proc));
-			}
-		}
-	}
-
-	private void setStateVars(OrderedMap<Variable> stateVars) {
-		for (Variable variable : stateVars) {
-			StateVariable stateVar = (StateVariable) variable;
-
-			StringTemplate stateTempl = group.getInstanceOf("stateVar");
-			template.setAttribute("stateVars", stateTempl);
-
-			Map<String, Object> varDefMap = varDefPrinter.applyVarDef(stateVar);
-			stateTempl.setAttribute("vardef", varDefMap);
-
-			// initial value of state var (if any)
-			if (stateVar.hasInit()) {
-				constPrinter.setTemplate(stateTempl);
-
-				if (stateVar.getInit() instanceof ListConst) {
-					// stateVar.getInit().accept(constPrinter,
-					// ((PointType) stateVar.getType()).getElementType());
-				} else {
-					stateVar.getInit().accept(constPrinter);
-				}
-			}
-		}
+	@Override
+	public String toString(Type type) {
+		LLVMTypePrinter printer = new LLVMTypePrinter();
+		type.accept(printer);
+		return printer.toString();
 	}
 
 }
