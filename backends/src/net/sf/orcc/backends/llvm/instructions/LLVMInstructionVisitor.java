@@ -38,18 +38,6 @@ public interface LLVMInstructionVisitor extends InstructionVisitor {
 
 	public void visit(BitcastNode node, Object... args);
 
-	public void visit(BrLabelNode node, Object... args);
-
-	public void visit(BrNode node, Object... args);
-
-	public void visit(GetElementPtrNode node, Object... args);
-
-	public void visit(LabelNode node, Object... args);
-
-	public void visit(LoadFifo node, Object... args);
-
-	public void visit(PhiNode node, Object... args);
-
 	public void visit(SelectNode node, Object... args);
 
 	public void visit(SextNode node, Object... args);
