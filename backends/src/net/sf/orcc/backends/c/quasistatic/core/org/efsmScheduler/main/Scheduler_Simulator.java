@@ -133,7 +133,7 @@ public class Scheduler_Simulator {
 
 	/**
 	 * 
-	 * @param XNLPathFile
+	 * @param networkFile
 	 *            set the top model file
 	 */
 	public void setTopModelFile(File networkFile) {
@@ -147,7 +147,7 @@ public class Scheduler_Simulator {
 
 	/**
 	 * 
-	 * @return
+	 * @return a string
 	 */
 	public String getKindOfTopModelFile() {
 		return kindOfTopModelFile;
@@ -164,7 +164,7 @@ public class Scheduler_Simulator {
 	/**
 	 * Sets the output directory path
 	 * 
-	 * @param OutputPathFile
+	 * @param outputFile
 	 */
 	public void setOutputDirectory(File outputFile) {
 		this.outputDirectory = outputFile;
@@ -263,8 +263,8 @@ public class Scheduler_Simulator {
 	/**
 	 * Starts the simulation in other thread.
 	 * 
-	 * @param simulationType
-	 *            : Type of simulation selected by user.
+	 * @param simulationMode
+	 *            Type of simulation selected by user.
 	 */
 	public HashMap<String, List<String>> start(final int simulationMode) {
 		System.out.println(toString());

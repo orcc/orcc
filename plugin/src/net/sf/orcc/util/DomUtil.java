@@ -98,14 +98,12 @@ public class DomUtil {
 	}
 
 	/**
-	 * Writes the given document to the given output stream.
+	 * Parses the given input stream as XML and returns the corresponding DOM
+	 * document.
 	 * 
-	 * @param os
-	 *            an output stream
-	 * @param document
-	 *            a DOM document created by
-	 *            {@link #writeDocument(OutputStream, Document)}
-	 * @throws OrccException
+	 * @param is
+	 *            an input stream
+	 * @return a DOM document
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
@@ -135,7 +133,6 @@ public class DomUtil {
 	 * @param document
 	 *            a DOM document created by
 	 *            {@link #writeDocument(OutputStream, Document)}
-	 * @throws OrccException
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */

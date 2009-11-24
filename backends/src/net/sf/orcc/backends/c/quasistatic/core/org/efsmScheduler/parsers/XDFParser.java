@@ -66,8 +66,8 @@ public class XDFParser {
     }
 
 	/**
-	 * @param xnlFileName
-	 *            name of the .xnl file to be parsed.
+	 * @param xdfFileName
+	 *            name of the .xdf file to be parsed.
 	 * @return the network described by xnlFileName
 	 */
 	public static Network parse(String networkName, String xdfFileName) throws XDFParsingException {

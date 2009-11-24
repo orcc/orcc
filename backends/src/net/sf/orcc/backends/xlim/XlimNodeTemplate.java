@@ -79,11 +79,11 @@ public class XlimNodeTemplate {
 	/**
 	 * Create the design
 	 * 
-	 * @param document
-	 *            Document where to add the design
+	 * @param design
+	 *            design element
 	 * @param name
 	 *            Name of the design
-	 * @return Created design
+	 * @return <code>design</code>
 	 */
 	public static Element newDesign(Element design, String name) {
 		design.setAttribute("name", name);

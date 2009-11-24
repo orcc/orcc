@@ -95,8 +95,6 @@ public class FileUtilities {
 	 * @param outputDirectory
 	 * @param inputFiles
 	 * @param format
-	 * @param listener
-	 *            null if it wouldn't exists
 	 */
 	public static void parseFiles(File outputDirectory, File[] inputFiles,
 			int format) {

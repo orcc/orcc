@@ -115,7 +115,7 @@ public class MathExtended {
 	 * Determines which is the average value
 	 * 
 	 * @param in
-	 * @return
+	 * @return a double
 	 */
 	public static double avg(ArrayList<Double> in) {
 		double sum = 0;

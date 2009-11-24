@@ -172,9 +172,10 @@ public abstract class Util {
 	 * file is null, it only acepts directories. If currentDirectoryPath is
 	 * null, it will use the default constructor of JFileChooser
 	 * 
-	 * @param extensionFile
+	 * @param filter
 	 * @param multipleSelectionEnabled
 	 * @param currentDirectoryPath
+	 * @param mode
 	 * @return the resulting file
 	 */
 	public static File[] getFile(FileFilter filter,

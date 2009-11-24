@@ -127,7 +127,7 @@ public class Constants {
 	 * 
 	 * @param lastLabel
 	 *            last shown label
-	 * @return
+	 * @return a string
 	 */
 	public static String getNextProgressBarLabel(String lastLabel) {
 		if (lastLabel.contains(STOPPED_LABEL))
@@ -148,7 +148,7 @@ public class Constants {
 	/**
 	 * 
 	 * @param label
-	 * @return
+	 * @return an integer
 	 */
 	public static int getProgressBarPercent(String label) {
 		if (label.contains(STOPPED_LABEL))
@@ -229,11 +229,6 @@ public class Constants {
 		return ND_ACTOR;
 	}
 
-	/**
-	 * 
-	 * @param BTYPE
-	 * @return
-	 */
 	public static int getIndexOfBTYPE(String BTYPE) {
 		if (BTYPE.equals(ZEROMV))
 			return 1;

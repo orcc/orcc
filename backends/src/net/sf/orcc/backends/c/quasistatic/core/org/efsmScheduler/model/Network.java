@@ -288,7 +288,7 @@ public class Network {
 	 * Selects subgraphs from actors depending on <code>btype</code> and
 	 * combines them into one system level graph.
 	 * 
-	 * @return system level graph obtained after combining subgraphs of actors.
+	 * // no return system level graph obtained after combining subgraphs of actors.
 	 */
 	public void updateSystemLevelGraph() {
 		Set<AbstractSubgraph> subgraphs;

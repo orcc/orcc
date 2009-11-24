@@ -112,7 +112,7 @@ public class SDFScheduler {
 
 	/**
      * Parse procMap to String
-     * @return
+     * @return a string
      */
     public static String procMapToString(){
         String str = "Processors Map: [Action name=Process] \n";

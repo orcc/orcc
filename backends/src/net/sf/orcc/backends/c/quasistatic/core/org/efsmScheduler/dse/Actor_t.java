@@ -75,10 +75,6 @@ public class Actor_t {
         this.actorName = actorName;
     }
 
-    /**
-     * 
-     * @return
-     */
     public String getActionName() {
         return actionName;
     }

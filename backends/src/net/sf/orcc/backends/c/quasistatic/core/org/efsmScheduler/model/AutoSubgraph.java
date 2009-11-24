@@ -82,9 +82,9 @@ public class AutoSubgraph extends AbstractSubgraph {
     /**
      * creates an SDF vertex and adds to the subgraph.
      * @param action the action which should be added to the graph.
-     * @param dontConnToPrev if this false, then the newly created SDF vertex is connected to the
-     * last vertex of the graph. Last vertex is the one added to the graph just before the new vertex.
-     * If the newly created vertex is the first one to be added to the graph, then dontConnToPrev is ignored.
+     * //@param dontConnToPrev if this false, then the newly created SDF vertex is connected to the
+     * //last vertex of the graph. Last vertex is the one added to the graph just before the new vertex.
+     * //If the newly created vertex is the first one to be added to the graph, then dontConnToPrev is ignored.
      */
     public void addAction(String actorName, String efsmName, Action action, int actorIndex) {
         if (action == null) {

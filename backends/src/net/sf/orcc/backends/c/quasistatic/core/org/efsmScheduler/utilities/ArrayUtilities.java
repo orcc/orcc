@@ -38,7 +38,7 @@ public class ArrayUtilities {
 	 * This method calls to "toString()" method of each contained object
 	 * 
 	 * @param array
-	 * @return
+	 * @return a string
 	 */
 	public static String toString(Object[] array) {
 		String str = new String();

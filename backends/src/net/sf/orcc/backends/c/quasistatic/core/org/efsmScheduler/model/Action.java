@@ -79,7 +79,7 @@ public class Action {
 	/**
 	 * Adds a guard to guards
 	 * @param expr guard
-	 * @return
+	 * @return a boolean
 	 */
 	public boolean addGuard(Expr expr){
 		if(expr != null){

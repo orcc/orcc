@@ -70,8 +70,8 @@ public class Port extends Variable implements Comparable<Port> {
 	/**
 	 * Bind the current port to a communication FIFO interface.
 	 * 
-	 * @param location
-	 *            the port location
+	 * @param fifo
+	 *            the communication FIFO
 	 */
 	public void bind(ICommunicationFifo fifo) {
 		this.fifoBinding = fifo;
