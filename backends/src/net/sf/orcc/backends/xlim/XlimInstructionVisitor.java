@@ -300,6 +300,9 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	 *            Arguments sent (not used)
 	 */
 	public void visit(Return node, Object... args) {
+		if(node.getValue() == null){
+			return;
+		}
 		node.getValue().accept(new XlimExprVisitor(names, root));
 
 		System.out.println("CHECK RETURN");

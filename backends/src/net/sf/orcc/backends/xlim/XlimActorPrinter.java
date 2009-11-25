@@ -160,7 +160,7 @@ public class XlimActorPrinter {
 					portname);
 
 			XlimNodeTemplate.newInPort(peekE, index);
-			XlimNodeTemplate.newOutPort(peekE, index, port.getType());
+			XlimNodeTemplate.newOutPort(peekE, names.getVarName(port), port.getType());
 
 			Element statusE = XlimNodeTemplate.newPortOperation(body,
 					"pinStatus", portname);
