@@ -77,12 +77,6 @@ SextNode(var, type, expr) ::= <<
 
 >>
 
-// getElementPtrNode node
-getElementPtrNode(target, source, indexes) ::= <<
-	$target$ = getelementptr $source$, i32 0, $indexes; separator=", "$
-
->>
-
 // initialization port node
 initPortNode(fifoName, expr, index) ::= <<
 	%$fifoName$_ptr = getelementptr %struct.lff_t** $expr$, i32 $index$
@@ -103,6 +97,10 @@ $indexes: { index | i32 $index$ }; separator=", "$
 
 loadLocalPort(instr) ::= <<
 %local_$instr.port$$instr.block.label$ = load %struct.lff_t** @$actorName$_$instr.port$
+>>
+
+loadTarget(instr) ::= <<
+%$instr.target$_$instr.block.label$_cast = bitcast $instr.target.type$* %$instr.target$ to i8*
 >>
 
 // $assign.value$
@@ -143,8 +141,7 @@ $endif$
 
 Peek(peek) ::= <<
 $loadLocalPort(peek)$
-%$peek.target$_$peek.block.label$ = getelementptr $peek.target.type$* %$peek.target$
-%$peek.target$_$peek.block.label$_cast = bitcast $peek.target.type$* %$peek.target$_$peek.block.label$ to i8*
+$loadTarget(peek)$
 call void @lff_peek(%struct.lff_t* %local_$peek.target$$peek.block.label$, i8* %$peek.target$_$peek.block.label$_cast)
 
 >>
@@ -160,8 +157,7 @@ PhiAssignment(phi) ::= <<
 
 Read(read) ::= <<
 $loadLocalPort(read)$
-%$read.target$_$read.block.label$ = getelementptr $read.target.type$* %$read.target$
-%$read.target$_$read.block.label$_cast = bitcast $read.target.type$* %$read.target$_$read.block.label$ to i8*
+$loadTarget(read)$
 call void @lff_read(%struct.lff_t* %local_$read.target$$read.block.label$, i8* %$read.target$_$read.block.label$_cast)
 
 >>
@@ -196,8 +192,7 @@ $endif$
 // write node
 Write(write) ::= <<
 $loadLocalPort(write)$
-%$write.target$_$write.block.label$ = getelementptr $write.target.type$* %$write.target$
-%$write.target$_$write.block.label$_cast = bitcast $write.target.type$* %$write.target$_$write.block.label$ to i8*
+$loadTarget(write)$
 call void @lff_write(%struct.lff_t* %local_$write.target$$write.block.label$, i8* %$write.target$_$write.block.label$_cast)
 
 >>
