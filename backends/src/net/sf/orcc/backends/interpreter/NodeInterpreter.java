@@ -69,11 +69,11 @@ import net.sf.orcc.ir.nodes.WhileNode;
  */
 public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
+	private boolean blockReturn = false;
+	private ExpressionEvaluator exprInterpreter;
 	// private String actorName;
 	private ListAllocator listAllocator;
-	private ExpressionEvaluator exprInterpreter;
 	private Object returnValue;
-	private boolean blockReturn = false;
 
 	public NodeInterpreter(String id) {
 		// this.actorName = id;
@@ -91,48 +91,10 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		}
 	}
 
-	/**
-	 * CFG nodes visitors
-	 */
-
 	@Override
-	public Object visit(IfNode node, Object... args) {
-		/* Interpret first expression ("if" condition) */
-		Object condition = node.getValue().accept(exprInterpreter);
-
-		/* if (condition is true) then */
-		if ((Boolean) condition) {
-			for (CFGNode subNode : node.getThenNodes()) {
-				subNode.accept(this, args);
-			}
-			/* else */
-		} else {
-			List<CFGNode> elseNodes = node.getElseNodes();
-			if (!elseNodes.isEmpty()) {
-				for (CFGNode subNode : elseNodes) {
-					subNode.accept(this, args);
-				}
-			}
-		}
-		node.getJoinNode().accept(this, args);
-
-		return null;
-	}
-
-	@Override
-	public Object visit(WhileNode node, Object... args) {
-		// Interpret first expression ("while" condition)
-		Object condition = node.getValue().accept(exprInterpreter);
-		// while (condition is true) do
-		while ((Boolean) condition) {
-			// control flow sub-statements
-			for (CFGNode subNode : node.getNodes()) {
-				subNode.accept(this, args);
-			}
-			// Interpret next value of "while" condition
-			condition = node.getValue().accept(exprInterpreter);
-		}
-		return null;
+	public void visit(Assign instr, Object... args) {
+		LocalVariable target = instr.getTarget();
+		target.setValue(instr.getValue().accept(exprInterpreter));
 	}
 
 	@Override
@@ -144,110 +106,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 			instr.accept(this, args);
 		}
 		return null;
-	}
-
-	@Override
-	public void visit(InitPort instr, Object... args) {
-		// Nothing TODO ?
-	}
-
-	@Override
-	public void visit(HasTokens instr, Object... args) {
-		ICommunicationFifo fifo = instr.getPort().fifo();
-		boolean hasTok = fifo.hasTokens(instr.getNumTokens());
-
-		instr.getTarget().setValue(hasTok);
-	}
-
-	// private int[] toIntArray(List<Integer> integerList) {
-	// int[] intArray = new int[integerList.size()];
-	// for (int i = 0; i < integerList.size(); i++) {
-	// intArray[i] = integerList.get(i);
-	// }
-	// return intArray;
-	// }
-
-	@Override
-	public void visit(Peek instr, Object... args) {
-		Object[] target = (Object[]) (instr.getTarget().getValue());
-
-		ICommunicationFifo fifo = instr.getPort().fifo();
-		fifo.peek(target);
-	}
-
-	@Override
-	public void visit(Read instr, Object... args) {
-		Object[] target = (Object[]) instr.getTarget().getValue();
-
-		ICommunicationFifo fifo = instr.getPort().fifo();
-		fifo.get(target);
-	}
-
-	@Override
-	public void visit(ReadEnd instr, Object... args) {
-		// Nothing to do
-	}
-
-	@Override
-	public void visit(Write instr, Object... args) {
-		Object[] target = (Object[]) instr.getTarget().getValue();
-
-		ICommunicationFifo fifo = instr.getPort().fifo();
-		fifo.put(target);
-	}
-
-	@Override
-	public void visit(WriteEnd instr, Object... args) {
-		// Nothing to do
-	}
-
-	@Override
-	public void visit(Assign instr, Object... args) {
-		LocalVariable target = instr.getTarget();
-		target.setValue(instr.getValue().accept(exprInterpreter));
-	}
-
-	@Override
-	public void visit(PhiAssignment instr, Object... args) {
-		LocalVariable target = instr.getTarget();
-		for (Use use : instr.getVars()) {
-			Variable var = use.getVariable();
-			target.setValue(var.getExpression().accept(exprInterpreter));
-		}
-	}
-
-	@Override
-	public void visit(Load instr, Object... args) {
-		LocalVariable target = instr.getTarget();
-		Variable source = instr.getSource().getVariable();
-		if (instr.getIndexes().isEmpty()) {
-			target.setValue(source.getValue());
-		} else {
-			Object obj = source.getValue();
-			for (Expression index : instr.getIndexes()) {
-				obj = Array.get(obj, (Integer) index.accept(exprInterpreter));
-			}
-			target.setValue(obj);
-		}
-	}
-
-	@Override
-	public void visit(Store instr, Object... args) {
-		Variable variable = instr.getTarget().getVariable();
-		if (instr.getIndexes().isEmpty()) {
-			variable.setValue(instr.getValue().accept(exprInterpreter));
-		} else {
-			Object obj = variable.getValue();
-			Object objPrev = obj;
-			Integer lastIndex = 0;
-			for (Expression index : instr.getIndexes()) {
-				objPrev = obj;
-				lastIndex = (Integer) index.accept(exprInterpreter);
-				obj = Array.get(objPrev, lastIndex);
-			}
-			Array.set(objPrev, lastIndex, instr.getValue().accept(
-					exprInterpreter));
-		}
 	}
 
 	@Override
@@ -283,13 +141,157 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	}
 
 	@Override
+	public void visit(HasTokens instr, Object... args) {
+		ICommunicationFifo fifo = instr.getPort().fifo();
+		boolean hasTok = fifo.hasTokens(instr.getNumTokens());
+
+		instr.getTarget().setValue(hasTok);
+	}
+
+	/**
+	 * CFG nodes visitors
+	 */
+
+	@Override
+	public Object visit(IfNode node, Object... args) {
+		/* Interpret first expression ("if" condition) */
+		Object condition = node.getValue().accept(exprInterpreter);
+
+		/* if (condition is true) then */
+		if ((Boolean) condition) {
+			for (CFGNode subNode : node.getThenNodes()) {
+				subNode.accept(this, args);
+			}
+			/* else */
+		} else {
+			List<CFGNode> elseNodes = node.getElseNodes();
+			if (!elseNodes.isEmpty()) {
+				for (CFGNode subNode : elseNodes) {
+					subNode.accept(this, args);
+				}
+			}
+		}
+		node.getJoinNode().accept(this, args);
+
+		return null;
+	}
+
+	// private int[] toIntArray(List<Integer> integerList) {
+	// int[] intArray = new int[integerList.size()];
+	// for (int i = 0; i < integerList.size(); i++) {
+	// intArray[i] = integerList.get(i);
+	// }
+	// return intArray;
+	// }
+
+	@Override
+	public void visit(InitPort instr, Object... args) {
+		// Nothing TODO ?
+	}
+
+	@Override
+	public void visit(Load instr, Object... args) {
+		LocalVariable target = instr.getTarget();
+		Variable source = instr.getSource().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			target.setValue(source.getValue());
+		} else {
+			Object obj = source.getValue();
+			for (Expression index : instr.getIndexes()) {
+				obj = Array.get(obj, (Integer) index.accept(exprInterpreter));
+			}
+			target.setValue(obj);
+		}
+	}
+
+	@Override
+	public void visit(Peek instr, Object... args) {
+		Object[] target = (Object[]) (instr.getTarget().getValue());
+
+		ICommunicationFifo fifo = instr.getPort().fifo();
+		fifo.peek(target);
+	}
+
+	@Override
+	public void visit(PhiAssignment instr, Object... args) {
+		LocalVariable target = instr.getTarget();
+		for (Use use : instr.getVars()) {
+			Variable var = use.getVariable();
+			target.setValue(var.getExpression().accept(exprInterpreter));
+		}
+	}
+
+	@Override
+	public void visit(Read instr, Object... args) {
+		Object[] target = (Object[]) instr.getTarget().getValue();
+
+		ICommunicationFifo fifo = instr.getPort().fifo();
+		fifo.get(target);
+	}
+
+	@Override
+	public void visit(ReadEnd instr, Object... args) {
+		// Nothing to do
+	}
+
+	@Override
 	public void visit(Return instr, Object... args) {
-		this.returnValue = instr.getValue().accept(exprInterpreter);
-		this.blockReturn = true;
+		if (instr.getValue() != null) {
+			this.returnValue = instr.getValue().accept(exprInterpreter);
+			this.blockReturn = true;
+		}
 	}
 
 	@Override
 	public void visit(SpecificInstruction instr, Object... args) {
+		// Nothing to do
+	}
+
+	@Override
+	public void visit(Store instr, Object... args) {
+		Variable variable = instr.getTarget().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			variable.setValue(instr.getValue().accept(exprInterpreter));
+		} else {
+			Object obj = variable.getValue();
+			Object objPrev = obj;
+			Integer lastIndex = 0;
+			for (Expression index : instr.getIndexes()) {
+				objPrev = obj;
+				lastIndex = (Integer) index.accept(exprInterpreter);
+				obj = Array.get(objPrev, lastIndex);
+			}
+			Array.set(objPrev, lastIndex, instr.getValue().accept(
+					exprInterpreter));
+		}
+	}
+
+	@Override
+	public Object visit(WhileNode node, Object... args) {
+		// Interpret first expression ("while" condition)
+		Object condition = node.getValue().accept(exprInterpreter);
+		// while (condition is true) do
+		while ((Boolean) condition) {
+			// control flow sub-statements
+			for (CFGNode subNode : node.getNodes()) {
+				subNode.accept(this, args);
+			}
+			// Interpret next value of "while" condition
+			condition = node.getValue().accept(exprInterpreter);
+		}
+		return null;
+	}
+
+	@Override
+	public void visit(Write instr, Object... args) {
+		Object[] target = (Object[]) instr.getTarget().getValue();
+
+		ICommunicationFifo fifo = instr.getPort().fifo();
+		fifo.put(target);
+	}
+
+	@Override
+	public void visit(WriteEnd instr, Object... args) {
 		// Nothing to do
 	}
 
