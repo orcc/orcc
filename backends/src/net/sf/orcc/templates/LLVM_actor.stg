@@ -26,7 +26,6 @@ phiPair(value, label) ::= <<
 variableDeclaration(variable) ::= <<
 $if(variable.port)$
 %$variable$ = alloca $variable.type$
-%local_$variable$ = load %struct.lff_t** @$actorName$_$variable$
 
 $endif$
 >>
@@ -102,6 +101,10 @@ indexes(indexes) ::= <<
 $indexes: { index | i32 $index$ }; separator=", "$
 >>
 
+loadLocalPort(instr) ::= <<
+%local_$instr.port$$instr.block.label$ = load %struct.lff_t** @$actorName$_$instr.port$
+>>
+
 // $assign.value$
 Assign(assign) ::= <<
 %$assign.target$ = add i32 5, 5
@@ -117,7 +120,8 @@ call $call.procedure.returnType$ @$call.procedure$($call.parameters; separator="
 >>
 
 HasTokens(hasTokens) ::= <<
-%$hasTokens.target$ = call i1 @lff_hasTokens(%struct.lff_t* %local_$hasTokens.port$, i32 $hasTokens.numTokens$)
+$loadLocalPort(hasTokens)$
+%$hasTokens.target$ = call i1 @lff_hasTokens(%struct.lff_t* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$)
 
 >>
 
@@ -131,16 +135,17 @@ $else$
 $else$
 %
 $endif$
-$load.source$, $indexes(load.indexes)$
-%$load.target$ = load $load.source.variable.type$* %$load.target$_ptr
+$load.source$, i32 0, $indexes(load.indexes)$
+%$load.target$ = load $load.target.type$* %$load.target$_ptr
 
 $endif$
 >>
 
 Peek(peek) ::= <<
+$loadLocalPort(peek)$
 %$peek.target$_$peek.block.label$ = getelementptr $peek.target.type$* %$peek.target$
 %$peek.target$_$peek.block.label$_cast = bitcast $peek.target.type$* %$peek.target$_$peek.block.label$ to i8*
-call void @lff_peek(%struct.lff_t* %local_$peek.target$, i8* %$peek.target$_$peek.block.label$_cast)
+call void @lff_peek(%struct.lff_t* %local_$peek.target$$peek.block.label$, i8* %$peek.target$_$peek.block.label$_cast)
 
 >>
 
@@ -154,9 +159,10 @@ PhiAssignment(phi) ::= <<
 >>
 
 Read(read) ::= <<
+$loadLocalPort(read)$
 %$read.target$_$read.block.label$ = getelementptr $read.target.type$* %$read.target$
 %$read.target$_$read.block.label$_cast = bitcast $read.target.type$* %$read.target$_$read.block.label$ to i8*
-call void @lff_read(%struct.lff_t* %local_$read.target$, i8* %$read.target$_$read.block.label$_cast)
+call void @lff_read(%struct.lff_t* %local_$read.target$$read.block.label$, i8* %$read.target$_$read.block.label$_cast)
 
 >>
 
@@ -172,13 +178,27 @@ $endif$
 >>
 
 Store(store) ::= <<
-store $store.value$, $store.target$
+$if(store.indexes.empty)$
+store i32 $store.value$, $store.target.variable.type$* @$store.target$
 
+$else$
+%$store.target$_ptr = getelementptr $store.target.variable.type$* $if(store.target.variable.global)$
+@
+$else$
+%
+$endif$
+$store.target$, i32 0, $indexes(store.indexes)$
+store i32 $store.value$, i32* %$store.target$_ptr
+
+$endif$
 >>
 
 // write node
 Write(write) ::= <<
-call void @lff_write(%struct.lff_t* %$actorName$_$write.port$, $write.target$)
+$loadLocalPort(write)$
+%$write.target$_$write.block.label$ = getelementptr $write.target.type$* %$write.target$
+%$write.target$_$write.block.label$_cast = bitcast $write.target.type$* %$write.target$_$write.block.label$ to i8*
+call void @lff_write(%struct.lff_t* %local_$write.target$$write.block.label$, i8* %$write.target$_$write.block.label$_cast)
 
 >>
 
@@ -198,15 +218,17 @@ $nodes: {$(it.class.simpleName)(it)$}$
 
 // if node
 BlockNode(blockNode) ::= <<
-b$blockNode.label$:
 	$instructions(blockNode.instructions)$
 >>
 
 // if node
 IfNode(ifNode) ::= <<
 	br i1 $ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
+$label(ifNode.thenNodes)$:
 $nodes(ifNode.thenNodes)$	br label %b$ifNode.joinNode.label$
+$label(ifNode.elseNodes)$:
 $nodes(ifNode.elseNodes)$	br label %b$ifNode.joinNode.label$
+b$ifNode.joinNode.label$:
 $BlockNode(ifNode.joinNode)$
 >>
 
@@ -238,8 +260,7 @@ procedure(procedure) ::= <<
 define internal $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
 entry:
 $if(procedure.locals.list)$
-	$procedure.locals.list: variableDeclaration(it)$	br label %b$first(procedure.nodes).label$
-
+	$procedure.locals.list: variableDeclaration(it)$
 $endif$
 $procedure.nodes: {$(it.class.simpleName)(it)$}$}
 
