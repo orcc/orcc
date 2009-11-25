@@ -31,7 +31,6 @@ package net.sf.orcc.ir.type;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
@@ -85,20 +84,10 @@ public class ListType extends AbstractType {
 
 	@Override
 	public List<Integer> getDimensions() {
-		ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator();
 		ArrayList<Integer> dimensions = new ArrayList<Integer>(1);
-		try {
-			Object size = getSize().accept(expressionEvaluator);
-			if (size instanceof Integer) {
-				dimensions.add((Integer) size);
-				dimensions.addAll(getElementType().getDimensions());
-			} else {
-				throw new OrccException("expected int");
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
-
+		int size = new ExpressionEvaluator().evaluateAsInteger(this.size);
+		dimensions.add(size);
+		dimensions.addAll(getElementType().getDimensions());
 		return dimensions;
 	}
 
@@ -106,6 +95,11 @@ public class ListType extends AbstractType {
 		return type;
 	}
 
+	/**
+	 * Returns the number of elements of this list type.
+	 * 
+	 * @return the number of elements of this list type
+	 */
 	public Expression getSize() {
 		return size;
 	}

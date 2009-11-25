@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
 import net.sf.orcc.backends.llvm.type.PointType;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.printers.DefaultTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
@@ -51,63 +48,24 @@ import net.sf.orcc.ir.type.VoidType;
 public class LLVMTypePrinter extends DefaultTypePrinter implements
 		LLVMTypeVisitor {
 
-	private void printSize(Type type) {
-		int size = sizeOf(type);
-		builder.append(Integer.toString(size));
-	}
-
-	/**
-	 * Creates a string buffer and fills it with the text representation of the
-	 * given type. Returns the text representation.
-	 * 
-	 * @param type
-	 *            An {@link Type}.
-	 */
-	public int sizeOf(Type type) {
-		try {
-			switch (type.getType()) {
-			case Type.BOOLEAN:
-				return 1;
-			case Type.INT: {
-				Expression exprSize = ((IntType) type).getSize();
-				return new ExpressionEvaluator().evaluateAsInteger(exprSize);
-			}
-			case Type.LIST: {
-				Expression exprSize = ((ListType) type).getSize();
-				return new ExpressionEvaluator().evaluateAsInteger(exprSize);
-			}
-			case Type.STRING:
-				return 8;
-			case Type.UINT: {
-				Expression exprSize = ((UintType) type).getSize();
-				return new ExpressionEvaluator().evaluateAsInteger(exprSize);
-			}
-			default:
-				throw new OrccException("Can't size type");
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
-		return 0;
-	}
-
 	@Override
 	public void visit(BoolType type) {
 		// boolean is a 1-bit integer.
-		builder.append("i");
-		printSize(type);
+		builder.append("i32");
 	}
 
 	@Override
 	public void visit(IntType type) {
-		builder.append('i');
-		printSize(type);
+		builder.append("i32");
 	}
 
 	@Override
 	public void visit(ListType type) {
 		builder.append("[ ");
-		printSize(type);
+
+		int size = new ExpressionEvaluator().evaluateAsInteger(type.getSize());
+		builder.append(size);
+
 		builder.append(" x ");
 		type.getElementType().accept(this);
 		builder.append(" ]");
@@ -121,15 +79,12 @@ public class LLVMTypePrinter extends DefaultTypePrinter implements
 
 	@Override
 	public void visit(StringType type) {
-		builder.append("i");
-		printSize(type);
-		builder.append(" *");
+		builder.append("i8 *");
 	}
 
 	@Override
 	public void visit(UintType type) {
-		builder.append('i');
-		printSize(type);
+		builder.append("i32");
 	}
 
 	@Override

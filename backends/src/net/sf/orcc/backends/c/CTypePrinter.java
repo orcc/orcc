@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.c;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.printers.DefaultTypePrinter;
@@ -48,20 +47,16 @@ import net.sf.orcc.ir.type.VoidType;
 public class CTypePrinter extends DefaultTypePrinter {
 
 	private void printInt(Expression expr) {
-		try {
-			int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
-			if (size <= 8) {
-				builder.append("char");
-			} else if (size <= 16) {
-				builder.append("short");
-			} else if (size <= 32) {
-				builder.append("int");
-			} else if (size <= 64) {
-				builder.append("long long");
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
+		if (size <= 8) {
+			builder.append("char");
+		} else if (size <= 16) {
+			builder.append("short");
+		} else if (size <= 32) {
+			builder.append("int");
+		} else if (size <= 64) {
+			builder.append("long long");
 		}
 	}
 

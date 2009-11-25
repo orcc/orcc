@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 
@@ -39,6 +38,25 @@ import net.sf.orcc.ir.Expression;
  * 
  */
 public class ExpressionEvaluator implements ExpressionInterpreter {
+
+	/**
+	 * Evaluates this expression and return its value as an integer.
+	 * 
+	 * @param expr
+	 *            an expression to evaluate
+	 * @return the expression evaluated as an integer
+	 * @throws OrccRuntimeException
+	 *             if the expression cannot be evaluated as an integer
+	 */
+	public int evaluateAsInteger(Expression expr) {
+		Object value = expr.accept(this, Integer.MIN_VALUE);
+		if (value instanceof Integer) {
+			return (Integer) value;
+		}
+
+		// evaluated ok, but not as an integer
+		throw new OrccRuntimeException("expected integer expression");
+	}
 
 	@Override
 	public Object interpret(BinaryExpr expr, Object... args) {
@@ -244,14 +262,5 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	@Override
 	public Object interpret(VarExpr expr, Object... args) {
 		return expr.getVar().getVariable().getValue();
-	}
-
-	public int evaluateAsInteger(Expression expr) throws OrccException {
-		Object value = expr.accept(this, Integer.MIN_VALUE);
-		if (value instanceof Integer) {
-			return (Integer) value;
-		}
-		// evaluated ok, but not as an integer
-		throw new OrccException("expected integer expression");
 	}
 }
