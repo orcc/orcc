@@ -482,6 +482,15 @@ actor(actorName, actor) ::= <<
 ; Generated from "$actor.name$"
 
 %struct.lff_t = type { i32, i8*, i32, i32, i32 }
+; %struct.fifo_s = type { i32, i32, i8*, i32, i32 }
+
+; define i8* @getPeekPtr(%struct.fifo_s* %fifo, i32 %n)
+; define i8* @getReadPtr(%struct.fifo_s* %fifo, i32 %n)
+; define i32 @hasRoom(%struct.fifo_s* %fifo, i32 %n)
+; define i32 @hasTokens(%struct.fifo_s* %fifo, i32 %n)
+; define i8* @getWritePtr(%struct.fifo_s* %fifo, i32 %n)
+; define void @setWriteEnd(%struct.fifo_s* %fifo)
+; define void @setReadEnd(%struct.fifo_s* %fifo)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; FIFO functions declarations
