@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.backends.llvm.type.LLVMTypeVisitor;
-import net.sf.orcc.backends.llvm.type.PointType;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.printers.DefaultTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
@@ -45,8 +43,7 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMTypePrinter extends DefaultTypePrinter implements
-		LLVMTypeVisitor {
+public class LLVMTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(BoolType type) {
@@ -69,12 +66,6 @@ public class LLVMTypePrinter extends DefaultTypePrinter implements
 		builder.append(" x ");
 		type.getElementType().accept(this);
 		builder.append(" ]");
-	}
-
-	@Override
-	public void visit(PointType type) {
-		type.getElementType().accept(this);
-		builder.append("*");
 	}
 
 	@Override
