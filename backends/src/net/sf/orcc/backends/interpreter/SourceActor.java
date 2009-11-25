@@ -37,14 +37,14 @@ import net.sf.orcc.ir.Actor;
 public class SourceActor extends AbstractInterpretedActor {
 
 	public String fileName;
-	
+
 	private IntFifo fifo_O;
 	private RandomAccessFile in;
 
 	public SourceActor(String id, Actor actor) {
 		super(id, actor);
 	}
-	
+
 	@Override
 	public void initialize() {
 		fileName = "D:/PL/rvc-cal/orcc/trunk/backends/src/net/sf/orcc/backends/interpreter/foreman_qcif_30.bit"; // CLIParameters.getInstance().getSourceFile();
@@ -59,8 +59,8 @@ public class SourceActor extends AbstractInterpretedActor {
 	}
 
 	@Override
-	public Integer schedule() throws Exception {
-		Object[] source = (Object[])new Integer[1];
+	public Integer schedule() {
+		Object[] source = (Object[]) new Integer[1];
 		int running = 0;
 
 		try {
@@ -68,7 +68,7 @@ public class SourceActor extends AbstractInterpretedActor {
 				int byteRead = in.read();
 				if (byteRead != -1) {
 					source[0] = byteRead;
-					//System.out.println("Next bitstream byte = "+source[0]);
+					// System.out.println("Next bitstream byte = "+source[0]);
 					fifo_O.put(source);
 					running = 1;
 				}

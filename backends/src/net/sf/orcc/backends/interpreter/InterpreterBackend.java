@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -167,9 +166,8 @@ public class InterpreterBackend implements IBackend {
 	/**
 	 * Initialize each network actor if initializing function exists
 	 * 
-	 * @throws OrccException
 	 */
-	private void initialize() throws Exception {
+	private void initialize() {
 		// init actors of the network
 		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.initialize();

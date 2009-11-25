@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.interpreter.FsmManager.TransitionManager;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -90,7 +89,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * Launch initializing actions for each network actor.
 	 * 
 	 */
-	public void initialize() throws Exception {
+	public void initialize() {
 		// Check for List state variables which need to be allocated or
 		// initialized
 		for (Variable stateVar : actor.getStateVars()) {
@@ -121,8 +120,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
 	 * 
 	 */
-	public Integer schedule() throws Exception {
-
+	public Integer schedule() {
 		if (sched.hasFsm()) {
 			if (name.equals("parseheaders")) {
 				System.out.println("Current FSM state is : " + fsmState);
@@ -171,7 +169,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		return 0;
 	}
 
-	private boolean isSchedulable(Action action) throws OrccException {
+	private boolean isSchedulable(Action action) {
 		Object isSchedulable = interpretProc(action.getScheduler());
 		if ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable)) {
 			if (checkOutputPattern(action.getOutputPattern())) {
@@ -207,7 +205,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * 
 	 * @return an object which contains procedure returned value
 	 */
-	private Object interpretProc(Procedure procedure) throws OrccException {
+	private Object interpretProc(Procedure procedure) {
 		// Don't mind about procedure parameters (already set)
 
 		// Allocate local List variables

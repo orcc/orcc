@@ -29,14 +29,10 @@
 package net.sf.orcc.backends.interpreter;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.type.AbstractTypeVisitor;
-import net.sf.orcc.ir.type.ListType;
 
 /**
  * Allocates a List of any dimension
@@ -46,16 +42,12 @@ import net.sf.orcc.ir.type.ListType;
  */
 public class ListAllocator extends AbstractTypeVisitor {
 
-	private ExpressionEvaluator expressionEvaluator;
-	private ArrayList<Integer> sizeList;
-
 	public ListAllocator() {
-		sizeList = new ArrayList<Integer>();
-		expressionEvaluator = new ExpressionEvaluator();
 	}
 
 	public Object allocate(Type type) {
 		type.accept(this);
+		List<Integer> sizeList = type.getDimensions();
 		int[] dimensions = new int[sizeList.size()];
 		for (int i = 0; i < sizeList.size(); i++) {
 			dimensions[i] = (Integer) sizeList.get(i);
@@ -65,24 +57,4 @@ public class ListAllocator extends AbstractTypeVisitor {
 		return Array.newInstance(Object.class, dimensions);
 	}
 
-	public List<Integer> getSize() {
-		List<Integer> list = new ArrayList<Integer>(sizeList);
-		sizeList.clear();
-		return list;
-	}
-
-	@Override
-	public void visit(ListType type) {
-		try {
-			Object size = type.getSize().accept(expressionEvaluator);
-			if (size instanceof Integer) {
-				sizeList.add((Integer) size);
-				type.getElementType().accept(this);
-			} else {
-				throw new OrccException("expected int");
-			}
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
-	}
 }
