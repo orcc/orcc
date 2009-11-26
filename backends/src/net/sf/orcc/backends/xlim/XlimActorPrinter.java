@@ -482,6 +482,12 @@ public class XlimActorPrinter {
 									.accept(new XlimTypeSizeVisitor(el));
 						}
 					}
+					if(value[0]==null){
+						Element el = XlimNodeTemplate.newInitValue(init2);
+						el.setAttribute("value", "0");
+						((ListType) state.getType()).getElementType()
+								.accept(new XlimTypeSizeVisitor(el));
+					}
 				} else {
 					// For others just use the init value
 					Constant value = state.getInit();
