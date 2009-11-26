@@ -32,13 +32,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.c.quasistatic.core.org.efsmScheduler.main.Scheduler_Simulator;
-import net.sf.orcc.backends.c.quasistatic.core.org.efsmScheduler.output.ConfigFilesCreator;
-import net.sf.orcc.backends.c.quasistatic.core.org.efsmScheduler.utilities.FileUtilities;
-import net.sf.orcc.backends.c.quasistatic.parsers.CQuasiStaticActorParser;
-import net.sf.orcc.backends.c.quasistatic.parsers.CQuasiStaticNetworksParser;
-import net.sf.orcc.backends.c.quasistatic.utils.CQuasiStaticConstants;
+import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
+import net.sf.orcc.backends.c.quasistatic.scheduler.main.Scheduler;
+import net.sf.orcc.backends.c.quasistatic.scheduler.util.FileUtilities;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
@@ -46,90 +44,35 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
 public class CQuasiStaticBackendImpl extends AbstractBackend {
 
-	private String actorsSourcePath;
-	private String networkFilePath;
-	private String outputDirectoryPath;
 	private String workingDirectoryPath;
 	private CQuasiStaticActorPrinter printer;
+	private HashMap<String, List<String>> scheduleMap;
 
-	private void createConfigFiles() {
-		new File(workingDirectoryPath + CQuasiStaticConstants.CONFIG_PATH)
-				.mkdirs();
-		ConfigFilesCreator.createPropertiesFiles(workingDirectoryPath
-				+ CQuasiStaticConstants.CONFIG_PATH);
-	}
-
-	private void createOutputDirectories() {
-
-		// Directories' creation
-		new File(workingDirectoryPath
-				+ CQuasiStaticConstants.SCHEDULE_FILES_PATH).mkdirs();
-		new File(workingDirectoryPath + CQuasiStaticConstants.XDF_FILE_PATH)
-				.mkdirs();
-		new File(workingDirectoryPath + CQuasiStaticConstants.CALML_FILE_PATH)
-				.mkdirs();
-		new File(workingDirectoryPath + CQuasiStaticConstants.DSE_INPUT_PATH)
-				.mkdirs();
-	}
-
-	public void generateCode(String fileName, int fifoSize) throws Exception {
+	/*public void generateCode(String fileName, int fifoSize) throws Exception {
+		// CQuasiStaticActorParser.initFSMs();
 		super.generateCode(fileName, 64);
-		networkFilePath = fileName;
+		// parses top network
+		Network network = new XDFParser(fileName).parseNetwork();
 		// print schedule
-		printSchedule();
-	}
+		printSchedule(network);
+	}*/
 
 	@Override
 	protected void init() throws IOException {
 		printer = new CQuasiStaticActorPrinter();
 
-		// Init scheduler's stuff
-		prepareScheduler();
+		// Inits scheduler's stuff
+		setDirectories();
 	}
 
-	/**
-	 * 
-	 * @param id
-	 * @param actor
-	 * @throws Exception
-	 */
-	protected void parseActor(String id, Actor actor) throws Exception {
-		File actorFile = new File(actor.getFile());
-
-		// Gets the parent path: working directory
-		if (actorsSourcePath.equals(CQuasiStaticConstants.PATH_NOT_ASSIGNED))
-			actorsSourcePath = actorFile.getParentFile().getAbsolutePath()
-					+ File.separator;
-
-		CQuasiStaticActorParser parser = new CQuasiStaticActorParser(actorFile
-				.getAbsolutePath(), workingDirectoryPath
-				+ CQuasiStaticConstants.CALML_FILE_PATH);
-		parser.parse();
-
-	}
-
-	protected void parseNetworkFiles() throws Exception {
-
-		CQuasiStaticNetworksParser parser = new CQuasiStaticNetworksParser(
-				actorsSourcePath, workingDirectoryPath
-						+ CQuasiStaticConstants.XDF_FILE_PATH);
-		parser.parse();
-
-	}
-
-	protected void prepareScheduler() {
-		actorsSourcePath = CQuasiStaticConstants.PATH_NOT_ASSIGNED;
+	protected void setDirectories() {
 		workingDirectoryPath = path + File.separator + "schedule"
 				+ File.separator;
-		outputDirectoryPath = workingDirectoryPath
-				+ CQuasiStaticConstants.SCHEDULE_FILES_PATH;
-
-		createOutputDirectories();
-		createConfigFiles();
 	}
 
 	@Override
@@ -144,8 +87,7 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 
 		String outputName = path + File.separator + id + ".c";
 		printer.printActor(outputName, id, actor);
-
-		parseActor(id, actor);
+		
 	}
 
 	@Override
@@ -155,16 +97,16 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);
-
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
-		parseNetworkFiles();
+		printSchedule(network);
 	}
 
-	protected void printSchedule() throws IOException {
+	protected void printSchedule(Network network) throws IOException,
+			OrccException, QuasiStaticSchedulerException {
+		scheduleMap = new Scheduler(workingDirectoryPath, network)
+				.performSchedule();
 		CQuasiStaticSchedulePrinter schedulePrinter = new CQuasiStaticSchedulePrinter();
 		String outputName = path + File.separator + "scheduling.c";
-		HashMap<String, List<String>> scheduleMap = Scheduler_Simulator.run(
-				workingDirectoryPath, networkFilePath, outputDirectoryPath);
 		removeOutputDirectories();
 		schedulePrinter.printSchedule(outputName, scheduleMap);
 	}
