@@ -26,3 +26,5 @@ Using ORCC on the command-line:
 backend separately.
 Please see the README files located in the "frontend" and "plugin" folders
 (in this order) to read more about how to run the different components.
+
+More information are available on : http://sourceforge.net/apps/trac/orcc/
