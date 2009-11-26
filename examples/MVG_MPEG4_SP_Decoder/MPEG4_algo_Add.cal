@@ -1,0 +1,105 @@
+// MPEG4_algo_Add.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+// Modified by: Christophe Lucarz (christophe.lucarz@epfl.ch)
+//
+// Copyright (c) 2004-2005 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+
+// Add motion and texture to produce pixels
+
+import all caltrop.lib.BitOps;
+
+actor MPEG4_algo_Add (
+    int PIX_SZ,
+    int MB_COORD_SZ,
+    int BTYPE_SZ,
+
+    // Command flags from parser
+    int NEWVOP,
+    int INTRA,
+    int ACCODED
+ )
+   int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==> int(size=PIX_SZ) VID :
+  //_CAL_tokenMonitor := true;
+  // Ignore new VOP command
+  cmd.newVop: action BTYPE:[ cmd ] ==>
+  guard
+    bitand( cmd, NEWVOP ) != 0
+  end
+
+  int(size=8) count := 0;
+
+  // Pure texture
+  cmd.textureOnly: action BTYPE:[ cmd ] ==>
+  guard
+    bitand( cmd, INTRA ) != 0
+  end
+
+  // Pure motion
+  cmd.motionOnly: action BTYPE:[ cmd ] ==>
+  guard
+    bitand( cmd, ACCODED ) = 0
+  end
+
+  // Mixed texture and motion
+  // (Also used to skip vop w,h)
+  cmd.other: action BTYPE:[ cmd ] ==>
+  end
+
+  done: action ==>
+  guard
+    count = 64
+  do
+    count := 0;
+  end
+
+  texture: action TEX:[ tex ] ==> VID:[ tex ]
+  do
+    count := count + 1;
+  end
+
+  motion: action MOT:[mot] ==> VID:[ mot ]
+  do
+    count := count + 1;
+  end
+
+  combine: action  MOT:[mot], TEX:[ tex ] ==> VID:[ if s < 0 then 0 else if s > 255 then 255 else s end end ]
+  var
+    int(size=PIX_SZ+1) s = tex + mot
+  do
+    count := count + 1;
+  end
+
+  schedule fsm cmd:
+    cmd          ( cmd.newVop        ) --> skipw;
+    cmd          ( cmd.textureOnly   ) --> texture;
+    cmd          ( cmd.motionOnly    ) --> motion;
+    cmd          ( cmd.other         ) --> combine;
+
+    texture      ( done              ) --> cmd;
+    texture      ( texture           ) --> texture;
+
+    motion       ( done              ) --> cmd;
+    motion       ( motion            ) --> motion;
+
+    combine      ( done              ) --> cmd;
+    combine      ( combine           ) --> combine;
+
+    skipw        ( cmd.other         ) --> skiph;
+    skiph        ( cmd.other         ) --> cmd;
+  end
+
+  priority
+    cmd.newVop > cmd.textureOnly > cmd.motionOnly > cmd.other;
+    done > combine;
+    done > texture;
+    done > motion;
+  end
+
+end

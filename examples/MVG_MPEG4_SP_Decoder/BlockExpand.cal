@@ -1,0 +1,85 @@
+// BlockExpand.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+// Copyright (c) 2004-2006 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+
+import all caltrop.lib.BitOps;
+
+// Insert zero coefficients into a sparsely encoded block
+
+actor BlockExpand (
+    int SAMPLE_COUNT_SZ,
+    int SAMPLE_SZ
+ ) int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE, bool LAST ==> int(size=SAMPLE_SZ) OUT :
+
+  int BLOCK_SIZE = 64;
+
+  int(size=SAMPLE_COUNT_SZ) count :=  0;  // Index of next sample to be transmitted
+  int(size=SAMPLE_COUNT_SZ) run := -1;    // Index offset of next sample decoded (-1 means no sample pending)
+  int(size=SAMPLE_SZ) next_value;         // Value of next non-zero to be transmitted
+  bool last := false;                     // Next sample is the last non-zero.
+
+  // End of block - reset counters
+  done: action ==>
+  guard
+    count = BLOCK_SIZE
+  do
+    count := 0;
+    run := -1;
+    last := false;
+  end
+
+  // When run count is zero, transmit the value
+  write.value: action ==> OUT:[ next_value ]
+  guard
+    run = 0
+  do
+    run := -1;
+    count := count + 1;
+  end
+
+  // Stuff zeros before the sample value, and after as well if it was the last
+  write.zero: action ==> OUT:[ 0 ]
+  guard
+    run > 0 or last
+  do
+    run := run - 1;
+    count := count + 1;
+  end
+
+  // Read actions are all lower priority than write actions
+
+  // Read and write the sample out immediately if RUN = 0
+  read.immediate: action RUN:[ r ], VALUE:[ v ], LAST:[ l ] ==> OUT:[ v ]
+  guard
+    r = 0
+  do
+    last := l;
+    count := count + 1;
+  end
+
+  // Write out a zero sample
+  read.save: action RUN:[ r ], VALUE:[ v ], LAST:[ l ] ==> OUT:[ 0 ]
+  do
+    run := r - 1;
+    next_value := v;
+    last := l;
+    count := count + 1;
+  end
+
+  priority
+    done > read;
+    done > write;
+    write > read;
+    read.immediate > read.save;
+    write.value > write.zero;
+  end
+
+end
