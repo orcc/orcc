@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.llvm.transforms.BitcastTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -76,7 +77,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = {
 				new AddInstantationProcedure(),
-				new ThreeAddressCodeTransformation() };
+				new ThreeAddressCodeTransformation(),
+				new BitcastTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

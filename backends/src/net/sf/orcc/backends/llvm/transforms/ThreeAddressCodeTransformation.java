@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.llvm.transforms;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -40,6 +42,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -58,12 +61,14 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 
 /**
  * Split expression and effective node.
  * 
  * @author Jérôme GORIN
+ * @author Matthieu Wipliez
  * 
  */
 public class ThreeAddressCodeTransformation extends AbstractActorTransformation {
@@ -73,6 +78,11 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		private ListIterator<Instruction> it;
 
 		/**
+		 * type of the target variable
+		 */
+		private Type type;
+
+		/**
 		 * Creates a new expression splitter with the given list iterator. The
 		 * iterator must be placed immediately before the expression to be
 		 * translated is used.
@@ -80,8 +90,9 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		 * @param it
 		 *            iterator on a list of instructions
 		 */
-		public ExpressionSplitter(ListIterator<Instruction> it) {
+		public ExpressionSplitter(ListIterator<Instruction> it, Type type) {
 			this.it = it;
+			this.type = type;
 		}
 
 		@Override
@@ -91,7 +102,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 			Location location = expr.getLocation();
 			BinaryOp op = expr.getOp();
-			Type type = expr.getUnderlyingType();
 
 			LocalVariable target = newVariable();
 			Assign assign = new Assign(block, location, target, new BinaryExpr(
@@ -202,22 +212,47 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void visit(Assign assign, Object... args) {
 		block = assign.getBlock();
-		assign.setValue(visitExpression(assign.getValue(), args[0]));
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		it.previous();
+		Expression oldExpr = assign.getValue();
+		Expression newExpr = visitExpression(oldExpr, it, assign.getTarget()
+				.getType());
+		assign.setValue(newExpr);
+
+		if (oldExpr == newExpr) {
+			it.next();
+		} else {
+			// sets the target of the new assign
+			Assign newAssign = (Assign) it.previous();
+			newAssign.setTarget(assign.getTarget());
+
+			// removes this assign
+			it.next();
+			it.next();
+			it.remove();
+		}
 	}
 
 	@Override
 	public void visit(Call call, Object... args) {
 		block = call.getBlock();
-		visitExpressions(call.getParameters(), args[0]);
+		List<Variable> params = call.getProcedure().getParameters().getList();
+		List<Type> types = new ArrayList<Type>(params.size());
+		for (Variable variable : params) {
+			types.add(variable.getType());
+		}
+		visitExpressions(call.getParameters(), args[0], types);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object visit(IfNode ifNode, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
-		ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it)));
+		ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it),
+				new BoolType()));
 
 		return super.visit(ifNode, args);
 	}
@@ -225,46 +260,65 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	@Override
 	public void visit(Load load, Object... args) {
 		block = load.getBlock();
-		visitExpressions(load.getIndexes(), args[0]);
+		List<Type> types = new ArrayList<Type>(load.getIndexes().size());
+		for (int i = 0; i < load.getIndexes().size(); i++) {
+			types.add(new IntType(new IntExpr(32)));
+		}
+		visitExpressions(load.getIndexes(), args[0], types);
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void visit(Return returnInstr, Object... args) {
 		block = returnInstr.getBlock();
 		if (returnInstr.getValue() != null) {
-			returnInstr.setValue(visitExpression(returnInstr.getValue(), args[0]));
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			it.previous();
+			returnInstr.setValue(visitExpression(returnInstr.getValue(), it,
+					procedure.getReturnType()));
+			it.next();
 		}
 	}
 
 	@Override
 	public void visit(Store store, Object... args) {
 		block = store.getBlock();
-		visitExpressions(store.getIndexes(), args[0]);
+		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
+		for (int i = 0; i < store.getIndexes().size(); i++) {
+			types.add(new IntType(new IntExpr(32)));
+		}
+		visitExpressions(store.getIndexes(), args[0], types);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object visit(WhileNode whileNode, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
-		whileNode.setValue(visitExpression(whileNode.getValue(), getItr(it)));
+		whileNode.setValue(visitExpression(whileNode.getValue(), getItr(it),
+				new BoolType()));
 
 		return super.visit(whileNode, args);
 	}
 
-	@SuppressWarnings("unchecked")
-	private Expression visitExpression(Expression value, Object arg) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) arg;
-		return (Expression) value.accept(new ExpressionSplitter(it));
+	private Expression visitExpression(Expression value,
+			ListIterator<Instruction> it, Type type) {
+		return (Expression) value.accept(new ExpressionSplitter(it, type));
 	}
 
 	@SuppressWarnings("unchecked")
-	private void visitExpressions(List<Expression> expressions, Object arg) {
+	private void visitExpressions(List<Expression> expressions, Object arg,
+			List<Type> types) {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) arg;
+		it.previous();
 		ListIterator<Expression> pit = expressions.listIterator();
+		Iterator<Type> itt = types.iterator();
 		while (pit.hasNext()) {
 			Expression value = pit.next();
-			pit.set((Expression) value.accept(new ExpressionSplitter(it)));
+			Expression expr = (Expression) value.accept(new ExpressionSplitter(
+					it, itt.next()));
+			pit.set(expr);
 		}
+		it.next();
 	}
 
 	@Override

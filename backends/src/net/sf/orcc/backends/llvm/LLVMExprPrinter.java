@@ -35,7 +35,6 @@ import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 
@@ -56,7 +55,7 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		case BITXOR:
 			return "xor";
 		case DIV:
-			return "/";
+			return "sdiv";
 		case DIV_INT:
 			return "sdiv";
 		case EQ:
@@ -94,29 +93,15 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		}
 	}
 
-	public static String toString(UnaryOp op, Object... args) {
-		switch (op) {
-		case BITNOT:
-			return "~";
-		case LOGIC_NOT:
-			return "!";
-		case MINUS:
-			return "-";
-		case NUM_ELTS:
-			return "sizeof";
-		default:
-			throw new NullPointerException();
-		}
-	}
-
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
 
-		builder.append(toString(op) + " ");
-		expr.getE1().accept(this, expr.getUnderlyingType());
+		builder.append(toString(op));
+		builder.append(" i32 ");
+		expr.getE1().accept(this);
 		builder.append(", ");
-		expr.getE2().accept(this, false);
+		expr.getE2().accept(this);
 	}
 
 	@Override
@@ -136,7 +121,8 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		expr.getExpr().accept(this, args);
+		System.err.println("oops: unary expr");
+		// throw new OrccRuntimeException("no unary expressions in LLVM");
 	}
 
 	@Override

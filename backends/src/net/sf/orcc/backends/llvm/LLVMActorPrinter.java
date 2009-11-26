@@ -101,7 +101,7 @@ public final class LLVMActorPrinter extends Printer {
 	@Override
 	public String toString(Expression expression) {
 		LLVMExprPrinter printer = new LLVMExprPrinter();
-		expression.accept(printer, Integer.MAX_VALUE);
+		expression.accept(printer);
 		return printer.toString();
 	}
 

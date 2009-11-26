@@ -124,12 +124,21 @@ $if(load.indexes.empty)$
 %$load.target$ = load $load.source.variable.type$* @$load.source$
 
 $else$
+$if(load.source.variable.port)$
+%$load.target$_cast = bitcast i8** %$load.source$ to $load.source.variable.type$*
+
+$endif$
 %$load.target$_ptr = getelementptr $load.source.variable.type$* $if(load.source.variable.global)$
 @
 $else$
 %
 $endif$
-$load.source$, i32 0, $indexes(load.indexes)$
+$if(load.source.variable.port)$
+$load.target$_cast
+$else$
+$load.source$
+$endif$
+, i32 0, $indexes(load.indexes)$
 %$load.target$ = load $load.target.type$* %$load.target$_ptr
 
 $endif$
@@ -174,12 +183,18 @@ $if(store.indexes.empty)$
 store i32 $store.value$, $store.target.variable.type$* @$store.target$
 
 $else$
+$if(store.target.variable.port)$
+$store.target$_cast = bitcast $store.target.variable.type$* %$store.target$
+$endif$
 %$store.target$_ptr = getelementptr $store.target.variable.type$* $if(store.target.variable.global)$
 @
 $else$
 %
 $endif$
-$store.target$, i32 0, $indexes(store.indexes)$
+$store.target$$if(store.target.variable.port)$
+_cast
+$endif$
+, i32 0, $indexes(store.indexes)$
 store i32 $store.value$, i32* %$store.target$_ptr
 
 $endif$
