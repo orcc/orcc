@@ -133,7 +133,8 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(node
-				.getTarget()));
+				.getTarget()), node.getTarget().getType());
+		
 	}
 
 	/**
