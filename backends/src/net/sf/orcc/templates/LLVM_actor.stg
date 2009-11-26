@@ -5,7 +5,7 @@ group LLVM_actor;
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(port) ::= <<
-@$actorName$_$port.name$ = common global %struct.lff_t* null
+@$actorName$_$port.name$ = common global %struct.fifo_s* null
 
 >>
 
@@ -25,7 +25,7 @@ phiPair(value, label) ::= <<
 
 variableDeclaration(variable) ::= <<
 $if(variable.port)$
-%$variable$ = alloca $variable.type$
+%$variable$ = alloca i8*
 
 $endif$
 >>
@@ -96,16 +96,12 @@ $indexes: { index | i32 $index$ }; separator=", "$
 >>
 
 loadLocalPort(instr) ::= <<
-%local_$instr.port$$instr.block.label$ = load %struct.lff_t** @$actorName$_$instr.port$
->>
-
-loadTarget(instr) ::= <<
-%$instr.target$_$instr.block.label$_cast = bitcast $instr.target.type$* %$instr.target$ to i8*
+%local_$instr.port$$instr.block.label$ = load %struct.fifo_s** @$actorName$_$instr.port$
 >>
 
 // $assign.value$
 Assign(assign) ::= <<
-%$assign.target$ = add i32 5, 5
+%$assign.target$ = $assign.value$
 
 >>
 
@@ -119,7 +115,7 @@ call $call.procedure.returnType$ @$call.procedure$($call.parameters; separator="
 
 HasTokens(hasTokens) ::= <<
 $loadLocalPort(hasTokens)$
-%$hasTokens.target$ = call i1 @lff_hasTokens(%struct.lff_t* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$)
+%$hasTokens.target$ = call i32 @hasTokens(%struct.fifo_s* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$)
 
 >>
 
@@ -141,8 +137,8 @@ $endif$
 
 Peek(peek) ::= <<
 $loadLocalPort(peek)$
-$loadTarget(peek)$
-call void @lff_peek(%struct.lff_t* %local_$peek.target$$peek.block.label$, i8* %$peek.target$_$peek.block.label$_cast)
+%$peek.target$_$peek.block.label$ = call i8* @getPeekPtr(%struct.fifo_s* %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$)
+store i8* %$peek.target$_$peek.block.label$, i8** %$peek.port$
 
 >>
 
@@ -157,8 +153,8 @@ PhiAssignment(phi) ::= <<
 
 Read(read) ::= <<
 $loadLocalPort(read)$
-$loadTarget(read)$
-call void @lff_read(%struct.lff_t* %local_$read.target$$read.block.label$, i8* %$read.target$_$read.block.label$_cast)
+%$read.target$_$read.block.label$ = call i8* @getReadPtr(%struct.fifo_s* %local_$read.target$$read.block.label$, i32 $read.numTokens$)
+store i8* %$read.target$_$read.block.label$, i8** %$read.port$
 
 >>
 
@@ -192,8 +188,8 @@ $endif$
 // write node
 Write(write) ::= <<
 $loadLocalPort(write)$
-$loadTarget(write)$
-call void @lff_write(%struct.lff_t* %local_$write.target$$write.block.label$, i8* %$write.target$_$write.block.label$_cast)
+%$write.target$_$write.block.label$ = call i8* @getWritePtr(%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$)
+store i8* %$write.target$_$write.block.label$, i8** %$write.port$
 
 >>
 
@@ -218,7 +214,8 @@ BlockNode(blockNode) ::= <<
 
 // if node
 IfNode(ifNode) ::= <<
-	br i1 $ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
+	%if_$ifNode.label$ = icmp ne i32 $ifNode.value$, 0
+	br i1 %if_$ifNode.label$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
 $label(ifNode.thenNodes)$:
 $nodes(ifNode.thenNodes)$	br label %b$ifNode.joinNode.label$
 $label(ifNode.elseNodes)$:
@@ -481,24 +478,20 @@ actor(actorName, actor) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Generated from "$actor.name$"
 
-%struct.lff_t = type { i32, i8*, i32, i32, i32 }
-; %struct.fifo_s = type { i32, i32, i8*, i32, i32 }
+%struct.fifo_s = type opaque
 
-; define i8* @getPeekPtr(%struct.fifo_s* %fifo, i32 %n)
-; define i8* @getReadPtr(%struct.fifo_s* %fifo, i32 %n)
-; define i32 @hasRoom(%struct.fifo_s* %fifo, i32 %n)
-; define i32 @hasTokens(%struct.fifo_s* %fifo, i32 %n)
-; define i8* @getWritePtr(%struct.fifo_s* %fifo, i32 %n)
-; define void @setWriteEnd(%struct.fifo_s* %fifo)
-; define void @setReadEnd(%struct.fifo_s* %fifo)
+; { i32, i32, i8*, i32, i32 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; FIFO functions declarations
-declare void @lff_read(%struct.lff_t* %lff, i8* %data)
-declare i1 @lff_hasTokens(%struct.lff_t* %lff, i32 %nbTokens)
-declare i1 @lff_hasRoom(%struct.lff_t* %lff, i32 %room)
-declare void @lff_peek(%struct.lff_t* %lff, i8* %data)
-declare void @lff_write(%struct.lff_t* %lff, i8* %data)
+
+declare i8* @getPeekPtr(%struct.fifo_s* %fifo, i32 %n)
+declare i8* @getReadPtr(%struct.fifo_s* %fifo, i32 %n)
+declare i8* @getWritePtr(%struct.fifo_s* %fifo, i32 %n)
+declare i32 @hasRoom(%struct.fifo_s* %fifo, i32 %n)
+declare i32 @hasTokens(%struct.fifo_s* %fifo, i32 %n)
+declare void @setReadEnd(%struct.fifo_s* %fifo)
+declare void @setWriteEnd(%struct.fifo_s* %fifo)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
