@@ -146,6 +146,17 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 
 	/**
 	 * Returns a list iterator over the elements in this list (in proper
+	 * sequence) that is positioned after the last instruction.
+	 * 
+	 * @return a list iterator over the elements in this list (in proper
+	 *         sequence)
+	 */
+	public ListIterator<Instruction> lastListIterator() {
+		return instructions.listIterator(instructions.size());
+	}
+
+	/**
+	 * Returns a list iterator over the elements in this list (in proper
 	 * sequence).
 	 * 
 	 * @return a list iterator over the elements in this list (in proper
