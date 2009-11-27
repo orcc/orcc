@@ -99,9 +99,9 @@ public class DSEInputFilesCreator {
 	
 	public void print() {
 		File actionFile = new File(DSEScheduler.INPUT_FOLDER + "actors_"
-				+ Switch.btype + ".txt");
+				+ Switch.getBTYPE() + ".txt");
 		File connectionsFile = new File(DSEScheduler.INPUT_FOLDER + "edges_"
-				+ Switch.btype + ".txt");
+				+ Switch.getBTYPE() + ".txt");
 		try {
 			actionFile.createNewFile();
 			connectionsFile.createNewFile();

@@ -24,10 +24,12 @@ public class RunTimeEvaluator {
 			}
 		}
 		
+		//If there is only one graph, returns it
 		if(elegibleGraphs.size() == 1){
 			return elegibleGraphs.get(0);
 		}
 		
+		//TODO: in other case, it should select one using priorities
 		return elegibleGraphs.get(0);
 	}
 	

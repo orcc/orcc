@@ -1,15 +1,11 @@
 package net.sf.orcc.backends.c.quasistatic.scheduler.model;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.ArtificialFSMCreator;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.Graph;
-import net.sf.orcc.backends.c.quasistatic.scheduler.parsers.PropertiesParser;
 import net.sf.orcc.backends.c.quasistatic.scheduler.unrollers.FSMUnroller;
-import net.sf.orcc.backends.c.quasistatic.scheduler.util.FileUtilities;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
@@ -20,11 +16,11 @@ public class ActorGraph {
 	private List<Graph> graphs;
 	private TokensPattern tokensPattern;
 	
+	
 	public ActorGraph(Actor actor) {
 		this.actor = actor;
-		this.tokensPattern = new TokensPattern(getMachineName());
 	}
-
+	
 	public Actor getActor() {
 		return actor;
 	}
@@ -47,7 +43,7 @@ public class ActorGraph {
 		if(fsm == null){
 			fsm = ArtificialFSMCreator.createArtificialFSM(actions);
 		}
-		System.out.println("********* Unrolling actor " + getMachineName() + " *********");
+		System.out.println("********* Unrolling actor " + getName() + " *********");
 		graphs = new FSMUnroller(fsm, tokensPattern).unroll();
 	}
 	
@@ -55,24 +51,8 @@ public class ActorGraph {
 		return RunTimeEvaluator.evaluateActorGraph(this,btype);
 	}
 	
-	public String getMachineName(){
-		return FileUtilities.getFileName(new File(actor.getFile()));
-	}
-	
-	public boolean isStaticActor(){
-		return PropertiesParser.existsMachineOnPropertiesFile(getMachineName());
-	}
-	
 	public String toString(){
-		return getMachineName() + ": " + (isStaticActor()? "Static":"Non-static");
-	}
-	
-	public void restoreTokenPattern(){
-		tokensPattern.restoreTokenPattern();
-	}
-	
-	public void firePort(String port){
-		tokensPattern.firePort(port);
+		return getName();
 	}
 	
 	public boolean equals(Object other){
@@ -97,6 +77,10 @@ public class ActorGraph {
 	
 	public boolean contains(Actor actor){
 		return this.actor.getName().equals(actor.getName());
+	}
+	
+	public void updateTokensPattern( TokensPattern tokensPattern){
+		this.tokensPattern = tokensPattern;
 	}
 	
 }

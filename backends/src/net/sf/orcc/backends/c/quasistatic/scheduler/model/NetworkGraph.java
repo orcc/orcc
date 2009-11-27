@@ -1,5 +1,6 @@
 package net.sf.orcc.backends.c.quasistatic.scheduler.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,10 +8,14 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
+import net.sf.orcc.backends.c.quasistatic.scheduler.main.Scheduler;
+import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.BtypeChangesListener;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.Graph;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.GraphEdge;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.GraphVertex;
 import net.sf.orcc.backends.c.quasistatic.scheduler.output.DSEInputFilesCreator;
+import net.sf.orcc.backends.c.quasistatic.scheduler.parsers.InputXDFParser;
+import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
@@ -19,52 +24,74 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.Connection;
 
-public class NetworkGraph {
+public class NetworkGraph implements BtypeChangesListener{
 	
 	private HashMap<String,Graph> graphsMap;
 	private Network network;
-	private List<ActorGraph> scheduledActors;
+	private List<ActorGraph> scheduledActorsList;
 	
 	public NetworkGraph(Network network){
 		this.network = network;
 	}
 	
-	public void reset() throws OrccException{
+	public void init() throws OrccException{
+		Switch.registerListener(this);
 		graphsMap = new HashMap<String,Graph>();
-		searchScheduledActors();
+		createScheduledActorsList();
 	}
 	
-	private void searchScheduledActors() throws OrccException{
+	private void createScheduledActorsList() throws OrccException{
 		
 		List<ActorGraph> actors = new ArrayList<ActorGraph>();
-		
+		InputXDFParser inputXDFParser = new InputXDFParser(Scheduler.workingDirectoryPath + File.separator + Constants.INPUT_FILE_NAME);
+		List<String> schedulableActorsNamesList = inputXDFParser.parseSchedulableActorsList();
 		for (Vertex vertex : network.getGraph().vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
 				if (instance.isActor()) {
 					Actor actor = instance.getActor();
 					ActorGraph actorGraph = new ActorGraph(actor);
-					if(actorGraph.isStaticActor()){
+					if(schedulableActorsNamesList.contains(actor.getName())){
 						actors.add(actorGraph);
 					}
 				}
 			}
 		}
 		
-		scheduledActors = actors;
+		scheduledActorsList = actors;
 	}
 	
 	public void unrollStaticActors() throws OrccException, QuasiStaticSchedulerException{
-		for(ActorGraph actor : scheduledActors){
+		for(ActorGraph actor : scheduledActorsList){
 			actor.unrollFSM();
 		}
 	}
 	
-	public List<ActorGraph> getScheduledActors() throws OrccException{
-		if(scheduledActors == null){ 
-			searchScheduledActors();
+	public void updateTokensPattern() throws OrccException {
+		InputXDFParser inputXDFParser = new InputXDFParser(
+				Scheduler.workingDirectoryPath + File.separator
+						+ Constants.INPUT_FILE_NAME);
+		String btype = Switch.getBTYPE();
+		HashMap<String, List<TokensPattern>> tokensPatternsMap = inputXDFParser
+				.parseTokensPattern();
+		List<TokensPattern> tokensPatternsList = tokensPatternsMap.get(btype);
+		loop: for (ActorGraph actor : scheduledActorsList) {
+			for (TokensPattern tokensPattern : tokensPatternsList) {
+				if (tokensPattern.getActorName().equals(actor.getName())) {
+					actor.updateTokensPattern(tokensPattern);
+					tokensPatternsList.remove(tokensPattern);
+					continue loop;
+				}
+			}
+
 		}
-		return scheduledActors;
+	}
+	
+	public List<ActorGraph> getScheduledActors() throws OrccException{
+		if(scheduledActorsList == null){ 
+			createScheduledActorsList();
+		}
+		return scheduledActorsList;
 	}
 	
 	/**
@@ -78,8 +105,8 @@ public class NetworkGraph {
 		DSEInputFilesCreator dseInputFilesCreator = new DSEInputFilesCreator();
 		
 		//Inserts the actions/connections of each actor
-		for(ActorGraph actor: scheduledActors){
-			Graph subgraph = actor.getGraph(Switch.btype);
+		for(ActorGraph actor: scheduledActorsList){
+			Graph subgraph = actor.getGraph(Switch.getBTYPE());
 			graph.addEdges(subgraph.getEdges());
 			graph.addVertices(subgraph.getVertices());
 			dseInputFilesCreator.addNodes(actor.getName(), subgraph.getVertices());
@@ -99,7 +126,7 @@ public class NetworkGraph {
 				if(srcInstance.isActor() && tgtInstance.isActor()){
 					ActorGraph srcActor = getActorGraph(srcInstance.getActor());
 					ActorGraph tgtActor = getActorGraph(tgtInstance.getActor());
-					if(srcActor != null && tgtActor != null && srcActor.isStaticActor() && tgtActor.isStaticActor()){
+					if(srcActor != null && tgtActor != null){
 						//Looks for the implicated actions
 						List<Action> srcActions = srcActor.getActionsWithPort(srcPort);
 						List<Action> tgtActions = tgtActor.getActionsWithPort(tgtPort);
@@ -136,7 +163,7 @@ public class NetworkGraph {
 		}
 		
 		//Registers the new graph
-		graphsMap.put(Switch.btype, graph);
+		graphsMap.put(Switch.getBTYPE(), graph);
 		//Prints DSE scheduler input files
 		dseInputFilesCreator.print();
 		
@@ -149,11 +176,16 @@ public class NetworkGraph {
 	}
 
 	public ActorGraph getActorGraph(Actor actor){
-		for(ActorGraph actorGraph: scheduledActors){
+		for(ActorGraph actorGraph: scheduledActorsList){
 			if(actorGraph.contains(actor)){
 				return actorGraph;
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void btypeHasChanged() throws OrccException {
+		updateTokensPattern();
 	}
 }

@@ -23,7 +23,6 @@ public class Scheduler {
 	
 	public Scheduler(String workingDirectoryPath, Network network, int noProcessors){
 		Scheduler.workingDirectoryPath = workingDirectoryPath;
-		SchedulePreparer.prepare();
 		this.noProcessors = noProcessors;
 		this.networkGraph = new NetworkGraph(network);
 	}
@@ -40,25 +39,22 @@ public class Scheduler {
 	 */
 	public HashMap<String, List<String>> performSchedule() throws OrccException, QuasiStaticSchedulerException{
 		HashMap<String, List<String>> scheduleMap;
+		SchedulePreparer.prepare();
 		//search for scheduled actors
-		networkGraph.reset();
-		
+		networkGraph.init();
 		for(String btype: Switch.getSwitchValues()){
 			System.out.println("BTYPE: " + btype);
-			Switch.btype = btype;
+			Switch.setBtype(btype);
 			//unrolls actors
-			unrollStaticActors();
+			networkGraph.unrollStaticActors();
 			//creates system level graphs
 			networkGraph.createSystemLevelGraph();
 		}
 		//performs DSE schedule
 		scheduleMap = performDSESchedule();
+		SchedulePreparer.removeInputData();
 		//returns schedule hashmap
 		return scheduleMap;
-	}
-	
-	private void unrollStaticActors() throws OrccException, QuasiStaticSchedulerException{
-		networkGraph.unrollStaticActors();
 	}
 	
 	private HashMap<String, List<String>> performDSESchedule() throws OrccException {

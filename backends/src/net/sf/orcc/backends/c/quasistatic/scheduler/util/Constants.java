@@ -29,7 +29,7 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.util;
 
 import java.io.File;
 
-import net.sf.orcc.backends.c.quasistatic.scheduler.parsers.PropertiesParser;
+
 
 /**
  * Global constants
@@ -37,11 +37,12 @@ import net.sf.orcc.backends.c.quasistatic.scheduler.parsers.PropertiesParser;
  * @author Victor Martin
  */
 public class Constants {
+	
 	/**
-	 * For variable token rate
+	 * For parse input XDF file
 	 */
-	private static int VARIABLE_TOKEN_RATE = Integer.MIN_VALUE;
-	private static int BLOCKSIZE = 8;
+	public static String INPUT_FILE_NAME = "QSB_input.xdf";
+	public static String TOKENS_PATTERN = "tokens_pattern";
 
 	/**
 	 * Kind of networks files
@@ -111,155 +112,8 @@ public class Constants {
 	public static final String CONFIG_PATH = "config";
 	public static final String DSE_INPUT_PATH = "DSE Input";
 	
-	/**
-	 * Return the next percent which the progress bar will show
-	 * 
-	 * @param lastPercent
-	 * @return next value which will be shown in the progress bar
-	 */
-	public static int getNextProgressBarPercent(int lastPercent) {
-		switch (lastPercent) {
-		case STOPPED_PERCENT:
-			return PARSING_XML_FILES;
-		case PARSING_XML_FILES:
-			return PARSING_CALML_FILES;
-		case PARSING_CALML_FILES:
-			return SEPARATING_ACTORS;
-		case SEPARATING_ACTORS:
-			return CREATING_SCHEDULE_FOR_BTYPE;
-		case CREATING_SCHEDULE_FOR_BTYPE:
-			return CREATING_DSE_SCHEDULING;
-		case CREATING_DSE_SCHEDULING:
-			return PROCESS_FINISHED;
-		case PROCESS_FINISHED:
-			return STOPPED_PERCENT;
-		default:
-			return STOPPED_PERCENT;
-		}
-	}
+	
 
-	/**
-	 * 
-	 * @param lastLabel
-	 *            last shown label
-	 * @return
-	 */
-	public static String getNextProgressBarLabel(String lastLabel) {
-		if (lastLabel.contains(STOPPED_LABEL))
-			return PARSING_XML_FILES_LABEL;
-		if (lastLabel.contains(PARSING_XML_FILES_LABEL))
-			return PARSING_CALML_FILES_LABEL;
-		if (lastLabel.contains(PARSING_CALML_FILES_LABEL))
-			return SEPARATING_ACTORS_LABEL;
-		if (lastLabel.contains(SEPARATING_ACTORS_LABEL))
-			return CREATING_SCHEDULE_FOR_BTYPE_LABEL;
-		if (lastLabel.contains(CREATING_SCHEDULE_FOR_BTYPE_LABEL))
-			return CREATING_DSE_SCHEDULING_LABEL;
-		if (lastLabel.contains(CREATING_DSE_SCHEDULING_LABEL))
-			return FINISHED_LABEL;
-		return STOPPED_LABEL;
-	}
-
-	/**
-	 * 
-	 * @param label
-	 * @return
-	 */
-	public static int getProgressBarPercent(String label) {
-		if (label.contains(STOPPED_LABEL))
-			return STOPPED_PERCENT;
-		if (label.contains(PARSING_XML_FILES_LABEL))
-			return PARSING_XML_FILES;
-		if (label.contains(PARSING_CALML_FILES_LABEL))
-			return PARSING_CALML_FILES;
-		if (label.contains(SEPARATING_ACTORS_LABEL))
-			return SEPARATING_ACTORS;
-		if (label.contains(CREATING_SCHEDULE_FOR_BTYPE_LABEL))
-			return CREATING_SCHEDULE_FOR_BTYPE;
-		if (label.contains(CREATING_DSE_SCHEDULING_LABEL))
-			return CREATING_DSE_SCHEDULING;
-		if (label.contains(FINISHED_LABEL))
-			return PROCESS_FINISHED;
-		return STOPPED_PERCENT;
-	}
-
-	/**
-	 * Return the next label which the user interface should shows
-	 * 
-	 * @param lastPercent
-	 *            value of progress var
-	 * @return the string which matches with the value of the progress bar
-	 */
-	public static String getProgressBarLabel(int lastPercent) {
-		switch (lastPercent) {
-		case STOPPED_PERCENT:
-			return STOPPED_LABEL;
-		case PARSING_XML_FILES:
-			return PARSING_XML_FILES_LABEL;
-		case PARSING_CALML_FILES:
-			return PARSING_CALML_FILES_LABEL;
-		case SEPARATING_ACTORS:
-			return SEPARATING_ACTORS_LABEL;
-		case CREATING_SCHEDULE_FOR_BTYPE:
-			return CREATING_SCHEDULE_FOR_BTYPE_LABEL;
-		case CREATING_DSE_SCHEDULING:
-			return CREATING_DSE_SCHEDULING_LABEL;
-		case PROCESS_FINISHED:
-			return FINISHED_LABEL;
-		default:
-			return STOPPED_LABEL;
-		}
-	}
-
-	/**
-	 * @return value of veriable token rate
-	 */
-	public static int getVariableTokenRate() {
-		return VARIABLE_TOKEN_RATE;
-	}
-
-	/**
-	 * @return block size
-	 */
-	public static int getBlocksize() {
-		return BLOCKSIZE;
-	}
-
-	/**
-	 * Determines what kind of actor is using the following rules: 1. Static
-	 * actor: static input and output. 2. Borderline Actor: Non-deterministic
-	 * input, static output 3. Non-deterministic Actors: ND input and output
-	 */
-	public static String getActorKind(boolean existsNDInput,
-			boolean existsNDOutput, String machineName) {
-
-		if (!PropertiesParser.existsMachineOnPropertiesFile(machineName))
-			return ND_ACTOR;
-
-		if (!existsNDInput && !existsNDOutput)
-			return STATIC_ACTOR;
-		if (existsNDInput && !existsNDOutput)
-			return BORDERLINE_ACTOR;
-
-		return ND_ACTOR;
-	}
-
-	/**
-	 * 
-	 * @param BTYPE
-	 * @return
-	 */
-	public static int getIndexOfBTYPE(String BTYPE) {
-		if (BTYPE.equals(ZEROMV))
-			return 1;
-		if (BTYPE.equals(INTER))
-			return 2;
-		if (BTYPE.equals(INTRA))
-			return 3;
-		if (BTYPE.equals(INTRA_AND_INTER))
-			return 4;
-		return 0;
-
-	}
+	
 
 }

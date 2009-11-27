@@ -22,12 +22,16 @@ public class FSMUnroller implements AbstractFSMUnroller {
 		this.tokensPattern = tokensPattern;
 	}
 	
-	@Override
+	/**
+	 * Unrolls the FSM, generating a set of SDF graphs
+	 * 
+	 * @return the list of SDF graphs
+	 */
 	public List<Graph> unroll() throws QuasiStaticSchedulerException {
-		//Graph vector: one graph per switch value
 		List<Graph> actorSubgraphs = new ArrayList<Graph>();
         List<NextStateInfo> nextStateInfos = getTransitionsFrom(fsm.getInitialState());
 		
+        //Generates a subgraph for each initial transition
 		for(NextStateInfo nextStateInfo: nextStateInfos ){
 			tokensPattern.restoreTokenPattern();
 			Graph actorSg = unrollSubgraph(nextStateInfo);
@@ -39,14 +43,14 @@ public class FSMUnroller implements AbstractFSMUnroller {
 	
 	private List<NextStateInfo> getTransitionsFrom(State state){
 		List<Transition> transitions = fsm.getTransitions();
-		List<NextStateInfo> initialTransitions = new ArrayList<NextStateInfo>();
+		List<NextStateInfo> transitionsFromState = new ArrayList<NextStateInfo>();
 		for(Transition transition: transitions){
 			if(transition.getSourceState().compareTo(state) == 0){
-				initialTransitions.addAll(transition.getNextStateInfo());
+				transitionsFromState.addAll(transition.getNextStateInfo());
 			}
 		}
 		
-		return initialTransitions;
+		return transitionsFromState;
 	}
 	
 	/**

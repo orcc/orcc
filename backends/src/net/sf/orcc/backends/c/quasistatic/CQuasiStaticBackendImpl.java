@@ -36,7 +36,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.main.Scheduler;
-import net.sf.orcc.backends.c.quasistatic.scheduler.util.FileUtilities;
+import net.sf.orcc.backends.c.quasistatic.scheduler.output.SchedulePreparer;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
@@ -44,35 +44,20 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
 public class CQuasiStaticBackendImpl extends AbstractBackend {
 
 	private String workingDirectoryPath;
+	
 	private CQuasiStaticActorPrinter printer;
 	private HashMap<String, List<String>> scheduleMap;
-
-	/*public void generateCode(String fileName, int fifoSize) throws Exception {
-		// CQuasiStaticActorParser.initFSMs();
-		super.generateCode(fileName, 64);
-		// parses top network
-		Network network = new XDFParser(fileName).parseNetwork();
-		// print schedule
-		printSchedule(network);
-	}*/
 
 	@Override
 	protected void init() throws IOException {
 		printer = new CQuasiStaticActorPrinter();
-
-		// Inits scheduler's stuff
-		setDirectories();
-	}
-
-	protected void setDirectories() {
 		workingDirectoryPath = path + File.separator + "schedule"
-				+ File.separator;
+							   + File.separator;
 	}
 
 	@Override
@@ -84,17 +69,18 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
-
+		if(SchedulePreparer.sourceFilesPath == null){
+			SchedulePreparer.sourceFilesPath = new File(actor.getFile()).getParent();
+		}
 		String outputName = path + File.separator + id + ".c";
 		printer.printActor(outputName, id, actor);
-		
 	}
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
 		CQuasiStaticNetworkPrinter networkPrinter = new CQuasiStaticNetworkPrinter();
 		String outputName = path + File.separator + network.getName() + ".c";
-
+		
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
@@ -107,15 +93,27 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 				.performSchedule();
 		CQuasiStaticSchedulePrinter schedulePrinter = new CQuasiStaticSchedulePrinter();
 		String outputName = path + File.separator + "scheduling.c";
-		removeOutputDirectories();
 		schedulePrinter.printSchedule(outputName, scheduleMap);
 	}
 
-	/**
-	 * 
-	 */
-	private void removeOutputDirectories() {
-		FileUtilities.deleteFile(new File(workingDirectoryPath));
-	}
+	/*protected void createInputData() throws QuasiStaticSchedulerException {
+		workingDirectoryPath = path + File.separator + "schedule"
+				+ File.separator;
+		FileUtilities.createDirectory(workingDirectoryPath);
+		
+		File srcFile = new File(sourceFilesPath + File.separator + Constants.INPUT_FILE_NAME);
+		if(!srcFile.exists()){
+			throw new QuasiStaticSchedulerException("The file "+ Constants.INPUT_FILE_NAME + " was not found at " + sourceFilesPath );
+		}
+		File dstFile = new File(workingDirectoryPath + File.separator + Constants.INPUT_FILE_NAME);
+		try {
+			dstFile.createNewFile();
+			FileUtilities.copyFile(srcFile, dstFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}*/
+	
+	
 
 }
