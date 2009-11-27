@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="quasistatic_input">
+	<!-- ************************************** -->
+    <!-- Tokens' pattern                        -->
+    <!-- ************************************** -->
+	<!-- NEWVOP         -->
+	<tokens_pattern>
+		<!-- NEWVOP         -->
+		<Btype name="NEWVOP"> 
+			<Actor name="address">
+				<Port name="BTYPE" reads= "3" consumption = "1"/>
+				<Port name="MV" reads= "0" consumption = "0"/>
+				<Port name="RA" reads= "0" consumption = "0"/>
+				<Port name="WA" reads= "0" consumption = "0"/>
+				<Port name="halfpel" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="buffer">
+				<Port name="RA" reads= "0" consumption = "0"/>
+				<Port name="WA" reads= "0" consumption = "0"/>
+				<Port name="RD" reads= "0" consumption = "0"/>
+				<Port name="WD" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="interpolation">
+				<Port name="halfpel" reads= "0" consumption = "0"/>
+				<Port name="RD" reads= "0" consumption = "0"/>
+				<Port name="MOT" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="add">
+				<Port name="BTYPE" reads= "3" consumption = "1"/>
+				<Port name="TEX" reads= "0" consumption = "0"/>
+				<Port name="MOT" reads= "0" consumption = "0"/>
+				<Port name="VID" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="broadcast_add_VID">
+				<Port name="VIDIN" reads= "0" consumption = "0"/>
+				<Port name="VIDOUT1" reads= "0" consumption = "0"/>
+				<Port name="VIDOUT2" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="transpose">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="retranspose">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="row">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="column">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IQ">
+				<Port name="QP" reads= "0" consumption = "0"/>
+				<Port name="AC" reads= "0" consumption = "0"/>
+				<Port name="DC" reads= "0" consumption = "0"/>
+				<Port name="OUT" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="clip">
+				<Port name="I" reads= "0" consumption = "0"/>
+				<Port name="SIGNED" reads= "0" consumption = "0"/>
+				<Port name="O" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IAP">
+				<Port name="PTR" reads= "0" consumption = "0"/>
+				<Port name="AC_PRED_DIR" reads= "0" consumption = "0"/>
+				<Port name="PQF_AC" reads= "0" consumption = "0"/>
+				<Port name="QF_AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IS">
+				<Port name="AC_PRED_DIR" reads= "0" consumption = "0"/>
+				<Port name="QFS_AC" reads= "0" consumption = "0"/>
+				<Port name="PQF_AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="addressing">
+				<Port name="BTYPE" reads= "0" consumption = "0"/>
+				<Port name="A" reads= "0" consumption = "0"/>
+				<Port name="B" reads= "0" consumption = "0"/>
+				<Port name="C" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="DCsplit">
+				<Port name="IN" reads= "0" consumption = "0"/>
+				<Port name="DC" reads= "0" consumption = "0"/>
+				<Port name="AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="invpred">
+				<Port name="BTYPE" reads= "3" consumption = "1"/>
+				<Port name="A" reads= "0" consumption = "0"/>
+				<Port name="B" reads= "0" consumption = "0"/>
+				<Port name="C" reads= "0" consumption = "0"/>
+				<Port name="QFS_DC" reads= "0" consumption = "0"/>
+				<Port name="QF_DC" reads= "0" consumption = "0"/>
+				<Port name="PTR" reads= "0" consumption = "0"/>
+				<Port name="AC_PRED_DIR" reads= "0" consumption = "0"/>
+				<Port name="SIGNED" reads= "0" consumption = "0"/>
+				<Port name="QUANT" reads= "0" consumption = "0"/>
+			</Actor>
+		</Btype>
+		<!-- ZEROMV         -->
+		<Btype name="ZEROMV"> 
+			<Actor name="address">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="MV" reads= "0" consumption = "0"/>
+				<Port name="RA" reads= "81" consumption = "1"/>
+				<Port name="WA" reads= "64" consumption = "1"/>
+				<Port name="halfpel" reads= "1" consumption = "1"/>
+			</Actor>
+			<Actor name="buffer">
+				<Port name="RA" reads= "81" consumption = "1"/>
+				<Port name="WA" reads= "64" consumption = "1"/>
+				<Port name="RD" reads= "81" consumption = "1"/>
+				<Port name="WD" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="interpolation">
+				<Port name="halfpel" reads= "1" consumption = "1"/>
+				<Port name="RD" reads= "81" consumption = "1"/>
+				<Port name="MOT" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="add">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="TEX" reads= "0" consumption = "0"/>
+				<Port name="MOT" reads= "64" consumption = "1"/>
+				<Port name="VID" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="broadcast_add_VID">
+				<Port name="VIDIN" reads= "64" consumption = "1"/>
+				<Port name="VIDOUT1" reads= "64" consumption = "1"/>
+				<Port name="VIDOUT2" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="transpose">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="retranspose">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="row">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="column">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IQ">
+				<Port name="QP" reads= "0" consumption = "0"/>
+				<Port name="AC" reads= "0" consumption = "0"/>
+				<Port name="DC" reads= "0" consumption = "0"/>
+				<Port name="OUT" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="clip">
+				<Port name="I" reads= "0" consumption = "0"/>
+				<Port name="SIGNED" reads= "0" consumption = "0"/>
+				<Port name="O" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IAP">
+				<Port name="PTR" reads= "0" consumption = "0"/>
+				<Port name="AC_PRED_DIR" reads= "1" consumption = "1"/>
+				<Port name="PQF_AC" reads= "0" consumption = "0"/>
+				<Port name="QF_AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IS">
+				<Port name="AC_PRED_DIR" reads= "0" consumption = "0"/>
+				<Port name="QFS_AC" reads= "0" consumption = "0"/>
+				<Port name="PQF_AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="addressing">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="A" reads= "0" consumption = "0"/>
+				<Port name="B" reads= "0" consumption = "0"/>
+				<Port name="C" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="DCsplit">
+				<Port name="IN" reads= "0" consumption = "0"/>
+				<Port name="DC" reads= "0" consumption = "0"/>
+				<Port name="AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="invpred">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="A" reads= "0" consumption = "0"/>
+				<Port name="B" reads= "0" consumption = "0"/>
+				<Port name="C" reads= "0" consumption = "0"/>
+				<Port name="QFS_DC" reads= "0" consumption = "0"/>
+				<Port name="QF_DC" reads= "0" consumption = "0"/>
+				<Port name="PTR" reads= "0" consumption = "0"/>
+				<Port name="AC_PRED_DIR" reads= "0" consumption = "0"/>
+				<Port name="SIGNED" reads= "0" consumption = "0"/>
+				<Port name="QUANT" reads= "0" consumption = "0"/>
+			</Actor>
+		</Btype>
+		<!-- INTER         -->
+		<Btype name="INTER"> 
+			<Actor name="address">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="MV" reads= "2" consumption = "1"/>
+				<Port name="RA" reads= "81" consumption = "1"/>
+				<Port name="WA" reads= "64" consumption = "1"/>
+				<Port name="halfpel" reads= "1" consumption = "1"/>
+			</Actor>
+			<Actor name="buffer">
+				<Port name="RA" reads= "81" consumption = "1"/>
+				<Port name="WA" reads= "64" consumption = "1"/>
+				<Port name="RD" reads= "81" consumption = "1"/>
+				<Port name="WD" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="interpolation">
+				<Port name="halfpel" reads= "1" consumption = "1"/>
+				<Port name="RD" reads= "81" consumption = "1"/>
+				<Port name="MOT" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="add">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="TEX" reads= "0" consumption = "0"/>
+				<Port name="MOT" reads= "64" consumption = "1"/>
+				<Port name="VID" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="broadcast_add_VID">
+				<Port name="VIDIN" reads= "64" consumption = "1"/>
+				<Port name="VIDOUT1" reads= "64" consumption = "1"/>
+				<Port name="VIDOUT2" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="transpose">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="retranspose">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="row">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="column">
+				<Port name="X" reads= "0" consumption = "0"/>
+				<Port name="Y" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IQ">
+				<Port name="QP" reads= "0" consumption = "0"/>
+				<Port name="AC" reads= "0" consumption = "0"/>
+				<Port name="DC" reads= "0" consumption = "0"/>
+				<Port name="OUT" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="clip">
+				<Port name="I" reads= "0" consumption = "0"/>
+				<Port name="SIGNED" reads= "0" consumption = "0"/>
+				<Port name="O" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IAP">
+				<Port name="PTR" reads= "0" consumption = "0"/>
+				<Port name="AC_PRED_DIR" reads= "1" consumption = "1"/>
+				<Port name="PQF_AC" reads= "0" consumption = "0"/>
+				<Port name="QF_AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="IS">
+				<Port name="AC_PRED_DIR" reads= "0" consumption = "0"/>
+				<Port name="QFS_AC" reads= "0" consumption = "0"/>
+				<Port name="PQF_AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="addressing">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="A" reads= "0" consumption = "0"/>
+				<Port name="B" reads= "0" consumption = "0"/>
+				<Port name="C" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="DCsplit">
+				<Port name="IN" reads= "0" consumption = "0"/>
+				<Port name="DC" reads= "0" consumption = "0"/>
+				<Port name="AC" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="invpred">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="A" reads= "0" consumption = "0"/>
+				<Port name="B" reads= "0" consumption = "0"/>
+				<Port name="C" reads= "0" consumption = "0"/>
+				<Port name="QFS_DC" reads= "0" consumption = "0"/>
+				<Port name="QF_DC" reads= "0" consumption = "0"/>
+				<Port name="PTR" reads= "0" consumption = "0"/>
+				<Port name="AC_PRED_DIR" reads= "0" consumption = "0"/>
+				<Port name="SIGNED" reads= "0" consumption = "0"/>
+				<Port name="QUANT" reads= "0" consumption = "0"/>
+			</Actor>
+		</Btype>
+		<!-- INTRA        -->
+		<Btype name="INTRA"> 
+			<Actor name="address">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="MV" reads= "0" consumption = "0"/>
+				<Port name="RA" reads= "0" consumption = "0"/>
+				<Port name="WA" reads= "64" consumption = "1"/>
+				<Port name="halfpel" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="buffer">
+				<Port name="RA" reads= "0" consumption = "0"/>
+				<Port name="WA" reads= "64" consumption = "1"/>
+				<Port name="RD" reads= "0" consumption = "0"/>
+				<Port name="WD" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="interpolation">
+				<Port name="halfpel" reads= "0" consumption = "0"/>
+				<Port name="RD" reads= "0" consumption = "0"/>
+				<Port name="MOT" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="add">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="TEX" reads= "64" consumption = "1"/>
+				<Port name="MOT" reads= "0" consumption = "0"/>
+				<Port name="VID" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="broadcast_add_VID">
+				<Port name="VIDIN" reads= "64" consumption = "1"/>
+				<Port name="VIDOUT1" reads= "64" consumption = "1"/>
+				<Port name="VIDOUT2" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="transpose">
+				<Port name="X" reads= "64" consumption = "1"/>
+				<Port name="Y" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="retranspose">
+				<Port name="X" reads= "64" consumption = "1"/>
+				<Port name="Y" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="row">
+				<Port name="X" reads= "8" consumption = "8"/>
+				<Port name="Y" reads= "8" consumption = "8"/>
+			</Actor>
+			<Actor name="column">
+				<Port name="X" reads= "8" consumption = "8"/>
+				<Port name="Y" reads= "8" consumption = "8"/>
+			</Actor>
+			<Actor name="IQ">
+				<Port name="QP" reads= "1" consumption = "1"/>
+				<Port name="AC" reads= "63" consumption = "1"/>
+				<Port name="DC" reads= "1" consumption = "1"/>
+				<Port name="OUT" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="clip">
+				<Port name="I" reads= "64" consumption = "1"/>
+				<Port name="SIGNED" reads= "1" consumption = "1"/>
+				<Port name="O" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="IAP">
+				<Port name="PTR" reads= "1" consumption = "1"/>
+				<Port name="AC_PRED_DIR" reads= "1" consumption = "1"/>
+				<Port name="PQF_AC" reads= "63" consumption = "1"/>
+				<Port name="QF_AC" reads= "63" consumption = "1"/>
+			</Actor>
+			<Actor name="IS">
+				<Port name="AC_PRED_DIR" reads= "1" consumption = "1"/>
+				<Port name="QFS_AC" reads= "63" consumption = "1"/>
+				<Port name="PQF_AC" reads= "63" consumption = "1"/>
+			</Actor>
+			<Actor name="addressing">
+				<Port name="BTYPE" reads= "5" consumption = "1"/>
+				<Port name="A" reads= "5" consumption = "1"/>
+				<Port name="B" reads= "5" consumption = "1"/>
+				<Port name="C" reads= "5" consumption = "1"/>
+			</Actor>
+			<Actor name="DCsplit">
+				<Port name="IN" reads= "64" consumption = "1"/>
+				<Port name="DC" reads= "1" consumption = "1"/>
+				<Port name="AC" reads= "63" consumption = "1"/>
+			</Actor>
+			<Actor name="invpred">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="A" reads= "1" consumption = "1"/>
+				<Port name="B" reads= "1" consumption = "1"/>
+				<Port name="C" reads= "1" consumption = "1"/>
+				<Port name="QFS_DC" reads= "1" consumption = "1"/>
+				<Port name="QF_DC" reads= "1" consumption = "1"/>
+				<Port name="PTR" reads= "1" consumption = "1"/>
+				<Port name="AC_PRED_DIR" reads= "1" consumption = "1"/>
+				<Port name="SIGNED" reads= "1" consumption = "1"/>
+				<Port name="QUANT" reads= "1" consumption = "1"/>
+			</Actor>
+		</Btype> 
+		<!-- COMBINED        -->
+		<Btype name="COMBINED"> 
+			<Actor name="address">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="MV" reads= "2" consumption = "1"/>
+				<Port name="RA" reads= "81" consumption = "1"/>
+				<Port name="WA" reads= "64" consumption = "1"/>
+				<Port name="halfpel" reads= "1" consumption = "1"/>
+			</Actor>
+			<Actor name="buffer">
+				<Port name="RA" reads= "81" consumption = "1"/>
+				<Port name="WA" reads= "64" consumption = "1"/>
+				<Port name="RD" reads= "81" consumption = "1"/>
+				<Port name="WD" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="interpolation">
+				<Port name="halfpel" reads= "1" consumption = "1"/>
+				<Port name="RD" reads= "1" consumption = "81"/>
+				<Port name="MOT" reads= "1" consumption = "64"/>
+			</Actor>
+			<Actor name="add">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="TEX" reads= "64" consumption = "1"/>
+				<Port name="MOT" reads= "64" consumption = "1"/>
+				<Port name="VID" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="broadcast_add_VID">
+				<Port name="VIDIN" reads= "64" consumption = "1"/>
+				<Port name="VIDOUT1" reads= "64" consumption = "1"/>
+				<Port name="VIDOUT2" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="transpose">
+				<Port name="X" reads= "64" consumption = "1"/>
+				<Port name="Y" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="retranspose">
+				<Port name="X" reads= "64" consumption = "1"/>
+				<Port name="Y" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="row">
+				<Port name="X" reads= "8" consumption = "8"/>
+				<Port name="Y" reads= "8" consumption = "8"/>
+			</Actor>
+			<Actor name="column">
+				<Port name="X" reads= "8" consumption = "8"/>
+				<Port name="Y" reads= "8" consumption = "8"/>
+			</Actor>
+			<Actor name="IQ">
+				<Port name="QP" reads= "1" consumption = "1"/>
+				<Port name="AC" reads= "63" consumption = "1"/>
+				<Port name="DC" reads= "1" consumption = "1"/>
+				<Port name="OUT" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="clip">
+				<Port name="I" reads= "64" consumption = "1"/>
+				<Port name="SIGNED" reads= "1" consumption = "1"/>
+				<Port name="O" reads= "64" consumption = "1"/>
+			</Actor>
+			<Actor name="IAP">
+				<Port name="PTR" reads= "1" consumption = "1"/>
+				<Port name="AC_PRED_DIR" reads= "1" consumption = "1"/>
+				<Port name="PQF_AC" reads= "63" consumption = "1"/>
+				<Port name="QF_AC" reads= "63" consumption = "1"/>
+			</Actor>
+			<Actor name="IS">
+				<Port name="AC_PRED_DIR" reads= "1" consumption = "1"/>
+				<Port name="QFS_AC" reads= "63" consumption = "1"/>
+				<Port name="PQF_AC" reads= "63" consumption = "1"/>
+			</Actor>
+			<Actor name="addressing">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="A" reads= "0" consumption = "0"/>
+				<Port name="B" reads= "0" consumption = "0"/>
+				<Port name="C" reads= "0" consumption = "0"/>
+			</Actor>
+			<Actor name="DCsplit">
+				<Port name="IN" reads= "64" consumption = "1"/>
+				<Port name="DC" reads= "1" consumption = "1"/>
+				<Port name="AC" reads= "63" consumption = "1"/>
+			</Actor>
+			<Actor name="invpred">
+				<Port name="BTYPE" reads= "1" consumption = "1"/>
+				<Port name="A" reads= "0" consumption = "0"/>
+				<Port name="B" reads= "0" consumption = "0"/>
+				<Port name="C" reads= "0" consumption = "0"/>
+				<Port name="QFS_DC" reads= "1" consumption = "1"/>
+				<Port name="QF_DC" reads= "1" consumption = "1"/>
+				<Port name="PTR" reads= "1" consumption = "1"/>
+				<Port name="AC_PRED_DIR" reads= "1" consumption = "1"/>
+				<Port name="SIGNED" reads= "1" consumption = "1"/>
+				<Port name="QUANT" reads= "1" consumption = "1"/>
+			</Actor>
+		</Btype> 
+	</tokens_pattern>
+</XDF>
