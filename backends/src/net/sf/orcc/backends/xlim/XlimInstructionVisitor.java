@@ -133,7 +133,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(node
-				.getTarget()), node.getTarget().getType());
+				.getTarget(), actionName), node.getTarget().getType());
 		
 	}
 
@@ -166,7 +166,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		if (target != null) {
 			Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
-			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target),
+			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target, actionName),
 					target.getType());
 		}
 	}
@@ -226,7 +226,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 
 		LocalVariable local = node.getTarget();
 		Type outtype = node.getTarget().getType();
-		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local),
+		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local, actionName),
 				outtype);
 	}
 
@@ -255,7 +255,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 				1)), "else");
 
 		Element portO = XlimNodeTemplate.newOutPort(phiE, names.getVarName(phi
-				.getTarget()), phi.getTarget().getType());
+				.getTarget(), actionName), phi.getTarget().getType());
 		phi.getTarget().getType().accept(new XlimTypeSizeVisitor(portO));
 	}
 
@@ -273,7 +273,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		operationE.setAttribute("removable", "no");
 		operationE.setAttribute("style", "simple");
 
-		String name = names.getVarName(node.getTarget());
+		String name = names.getVarName(node.getTarget(), actionName);
 		Element port = XlimNodeTemplate.newOutPort(operationE, name);
 		node.getPort().getType().accept(new XlimTypeSizeVisitor(port));
 		inputs.add(name);
@@ -365,7 +365,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		Element operationE = XlimNodeTemplate.newPortOperation(root,
 				"pinWrite", node.getPort().getName());
 		operationE.setAttribute("style", "simple");
-		String name = names.getVarName(node.getTarget());
+		String name = names.getVarName(node.getTarget(), actionName);
 		XlimNodeTemplate.newInPort(operationE, name);
 
 		node.getPort().getType().accept(

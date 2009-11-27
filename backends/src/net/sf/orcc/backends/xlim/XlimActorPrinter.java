@@ -74,6 +74,11 @@ public class XlimActorPrinter {
 	 * Outval count
 	 */
 	private static int ocount = 0;
+	
+	/**
+	 * Fire count
+	 */
+	private static int fcount = 0;
 
 	/**
 	 * XLIM naming
@@ -125,7 +130,10 @@ public class XlimActorPrinter {
 	 *            Actor where to take the action
 	 */
 	private void addActions(Actor actor) {
-		for (Action action : actor.getActions()) {
+		for (Action action : actor.getActions()){
+			for(Port oport : action.getOutputPattern().keySet()){
+				names.getVarName(oport, action.toString());
+			}
 			addAction(action);
 		}
 	}
@@ -160,7 +168,8 @@ public class XlimActorPrinter {
 					portname);
 
 			XlimNodeTemplate.newInPort(peekE, index);
-			XlimNodeTemplate.newOutPort(peekE, names.getVarName(port), port.getType());
+			XlimNodeTemplate.newOutPort(peekE, names.getVarName(port, action.toString()), port
+					.getType());
 
 			Element statusE = XlimNodeTemplate.newPortOperation(body,
 					"pinStatus", portname);
@@ -170,6 +179,13 @@ public class XlimActorPrinter {
 			XlimNodeTemplate.newOutPort(statusE, ready, "1", "bool");
 			XlimNodeTemplate.newInPort(guardE, ready);
 		}
+		
+		// Default true
+		Element operationE1 = XlimNodeTemplate.newValueOperation(body,
+				"$literal_Integer", "1");
+		XlimNodeTemplate.newOutPort(operationE1, names.putTempName(), "1", "bool");
+		
+		XlimNodeTemplate.newInPort(guardE, names.getTempName());
 
 		XlimNodeTemplate.newOutPort(guardE, "guard_" + name, "1", "bool");
 
@@ -194,6 +210,13 @@ public class XlimActorPrinter {
 			XlimNodeTemplate.newOutPort(statusE, status, "1", "bool");
 			XlimNodeTemplate.newInPort(fireE, status);
 		}
+		
+		// Default true
+		Element operationE2 = XlimNodeTemplate.newValueOperation(body,
+				"$literal_Integer", "1");
+		XlimNodeTemplate.newOutPort(operationE2, names.putTempName(), "1", "bool");
+		
+		XlimNodeTemplate.newInPort(fireE, names.getTempName());
 
 		XlimNodeTemplate.newOutPort(fireE, "fire_" + name, "1", "bool");
 
@@ -457,7 +480,7 @@ public class XlimActorPrinter {
 
 				String sourceName = stateVar.getName();
 				Element newState = XlimNodeTemplate.newStateVar(root, names
-						.getVarName(stateVar), sourceName);
+						.getVarName(stateVar, ""), sourceName);
 
 				StateVariable state = (StateVariable) stateVar;
 				/*
@@ -482,11 +505,11 @@ public class XlimActorPrinter {
 									.accept(new XlimTypeSizeVisitor(el));
 						}
 					}
-					if(value[0]==null){
+					if (value[0] == null) {
 						Element el = XlimNodeTemplate.newInitValue(init2);
 						el.setAttribute("value", "0");
-						((ListType) state.getType()).getElementType()
-								.accept(new XlimTypeSizeVisitor(el));
+						((ListType) state.getType()).getElementType().accept(
+								new XlimTypeSizeVisitor(el));
 					}
 				} else {
 					// For others just use the init value
@@ -517,7 +540,7 @@ public class XlimActorPrinter {
 		String initialname = "fsm" + transition.getSourceState();
 		String finalname = "fsm" + nextState.getTargetState();
 		String initialguard = initialname + "_guard_" + actionname;
-		String finalfire = finalname + "_fire_" + actionname;
+		String finalfire = finalname + "_fire_" + actionname + "_" + (fcount++) ;
 
 		String falseO = "outval" + (ocount++);
 		String trueO = "outval" + (ocount++);

@@ -31,7 +31,6 @@ package net.sf.orcc.backends.xlim;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 
@@ -58,10 +57,16 @@ public class XlimNames {
 	private Map<String, String> params;
 
 	/**
+	 * Ports map
+	 */
+	private Map<String, String> ports;
+
+	/**
 	 * XlimNames default constructor
 	 */
 	public XlimNames() {
 		params = new TreeMap<String, String>();
+		ports = new TreeMap<String, String>();
 	}
 
 	/**
@@ -79,27 +84,28 @@ public class XlimNames {
 	/**
 	 * Get the name of a port (port name + action name)
 	 * 
-	 * @param port
-	 *            Port to print
-	 * @param actionName
-	 *            Action containing the Port
-	 * @return Formatted name
-	 */
-	public String getPortName(Port port, String actionName) {
-		return "port_" + port.getName() + "_" + actionName;
-	}
-
-	/**
-	 * Get the name of a port (port name + action name)
-	 * 
 	 * @param use
 	 *            Use of Port to print
 	 * @param actionName
 	 *            Action containing the Port
 	 * @return Formatted name
 	 */
-	public String getPortName(Use use, String actionName) {
+	private String getPortName(Use use, String actionName) {
 		return "port_" + use.toString() + "_" + actionName;
+	}
+
+	/**
+	 * Get the name of a port (port name + action name)
+	 * 
+	 * @param port
+	 *            Port to print
+	 * @param actionName
+	 *            Action containing the Port
+	 * @return Formatted name
+	 */
+	private String getPortName(Variable port, String actionName) {
+		ports.put(port.getName(), actionName);
+		return "port_" + port.getName() + "_" + actionName;
 	}
 
 	/**
@@ -123,6 +129,9 @@ public class XlimNames {
 		if (params.containsKey(var)) {
 			return params.get(var);
 		}
+		if (use.getVariable().isPort()) {
+			return getPortName(use, ports.get(use.getVariable().getName()));
+		}
 		return getVarTemplate(use.getVariable());
 	}
 
@@ -131,9 +140,14 @@ public class XlimNames {
 	 * 
 	 * @param var
 	 *            Variable
+	 * @param actionName
+	 *            Action containing the Variable (used for ports)
 	 * @return Variable name
 	 */
-	public String getVarName(Variable var) {
+	public String getVarName(Variable var, String actionName) {
+		if (var.isPort()) {
+			return getPortName(var, actionName);
+		}
 		return getVarTemplate(var);
 	}
 
