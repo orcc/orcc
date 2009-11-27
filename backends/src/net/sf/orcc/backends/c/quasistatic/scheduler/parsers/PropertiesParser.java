@@ -57,8 +57,6 @@ public class PropertiesParser {
 
 	private static Properties systemProperties = null;
 
-	private static HashMap<String, String> actorsNamesMap;
-
 	/**
 	 * 
 	 * @return system properties
@@ -66,7 +64,7 @@ public class PropertiesParser {
 	public static Properties getSystemProperties() {
 		if (systemProperties == null) {
 			loadSystemPropertiesFile();
-			initActorsNamesMap();
+			//initActorsNamesMap();
 		}
 		return systemProperties;
 	}
@@ -100,15 +98,13 @@ public class PropertiesParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static HashMap<String, Integer> getPortsMap(String machineName) {
-		//System.out.println("Parsing ports of machine " + machineName);
+	public static HashMap<String, Integer> getNoReadsMap(String machineName) {
 		HashMap<String, Integer> patterns = new HashMap<String, Integer>();
 		Properties system_properties = getSystemProperties();
 		Enumeration propertiesNames = system_properties.propertyNames();
 		while (propertiesNames.hasMoreElements()) {
 			String key = (String) propertiesNames.nextElement();
-			// If property name starts with XNLFileName + "_" +efsm.getName() +
-			// "_PORT_"
+			
 			String portKey = Switch.btype + "_" + machineName + "_PORT_";
 			if (key.startsWith(portKey)) {
 				String value = system_properties.getProperty(key);
@@ -116,8 +112,7 @@ public class PropertiesParser {
 						.getVariableTokenRate()
 						: Integer.parseInt(value.split(" ")[1]);
 				key = key.split(portKey)[1];
-				//System.out.println("\t" + "Port: " + key + " --> Token value: "
-				//		+ Token_value);
+				
 				patterns.put(key, Token_value);
 			}
 		}
@@ -176,57 +171,6 @@ public class PropertiesParser {
 			e.printStackTrace();
 		}
 		return false;
-	}
-
-	/**
-	 * 
-	 * @param actorName
-	 * @return a short version name for that actor
-	 */
-	public static String getActorShortName(String actorName,
-			String actorLongName) {
-		return actorsNamesMap.containsKey(actorName) ? actorsNamesMap
-				.get(actorName)
-				: actorsNamesMap.containsKey(actorLongName) ? actorsNamesMap
-						.get(actorLongName) : actorName;
-	}
-
-	public static String getActorLongName(String shortName) {
-		for (String name : actorsNamesMap.keySet()) {
-			if (shortName.equals(actorsNamesMap.get(name)))
-				return name;
-		}
-		return shortName;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static void initActorsNamesMap() {
-		actorsNamesMap = new HashMap<String, String>();
-		Properties system_properties = getSystemProperties();
-		Enumeration propertiesNames = system_properties.propertyNames();
-		while (propertiesNames.hasMoreElements()) {
-			String key = (String) propertiesNames.nextElement();
-			if (key.startsWith(SHORT_NAME_PROPERTY_KEY)) {
-				String actorName = key.split(SHORT_NAME_PROPERTY_KEY)[1];
-				String shortName = system_properties.getProperty(key);
-				actorsNamesMap.put(actorName, shortName);
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param actorName
-	 * @param portRef
-	 * @return number of tokens in the port <code>portRef</code> which bellong
-	 *         to <code>actorName</code>actor
-	 */
-	public static int getTokensInPort(String actorName, String portRef) {
-		Properties system_properties = getSystemProperties();
-		String key = Switch.btype + "_" + actorName + "_PORT_" + portRef;
-		String tokens = system_properties.getProperty(key);
-		return !tokens.equals(Constants.VARIABLE_TOKEN) ? Integer
-				.parseInt(tokens) : Constants.getVariableTokenRate();
 	}
 
 }
