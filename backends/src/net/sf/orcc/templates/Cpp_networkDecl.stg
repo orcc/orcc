@@ -1,26 +1,18 @@
-group Java_network;
-
-setFifo(fifo) ::= <<
-actor_$fifo.source$.connect(ACTOR_PORT_OUT, $fifo.source$_$fifo.src_port$, fifo_$fifo.count$);
-actor_$fifo.target$.connect(ACTOR_PORT_IN, $fifo.target$_$fifo.tgt_port$, fifo_$fifo.count$);
-
->>
+group Cpp_network;
 
 network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
-/**
- * Generated from "$name$"
- */
+// Generated from "$name$"
  
 $instances: { inst |#include "Actor_$inst$.h"}; separator="\n"$
 #include "CalOrientedBoundedFifo.h"
 
-class Network_$name$ {
+class network_$name$ {
 
 public:
 	static const unsigned int SIZE = $size$;
 
-	Network_$name$();
-	~Network_$name$();
+	network_$name$();
+	~network_$name$();
 
 	void start(std::string &strErr);
 	void stop(std::string &strErr);
@@ -32,10 +24,7 @@ private:
 	$connections:{fifo|static FifoAPI * fifo_$fifo.count$;}; separator="\n"$
 
 	// Actors
-	$instances: {inst |Actor_$inst$ actor_$inst$;}; separator="\n"$
-
-	// Broadcasts
-	$broadcasts: { bcast | private Broadcast actor_$bcast.id$;}; separator="\n"$
+	$instances: {inst |actor_$inst$ $inst$;}; separator="\n"$
 
 };
 

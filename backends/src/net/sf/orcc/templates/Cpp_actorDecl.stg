@@ -1,59 +1,171 @@
-group Cpp_actor : C_actor;
+group C_actor;
 
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-fifo(portName) ::= <<
-$name$_$portName$,
-
+fifo(port) ::= <<
+$actorName$_$port.name$,
 >>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
-// the dimensions of a list: [][]...[]
+// the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
-// differs from inherited listSize because this one does not print any size
-// information.
-listDim(value) ::= <<
-$value : {[]} $
+listSize(value) ::= <<
+$value : {[$it$]} $
 >>
 
-// a variable definition
-// called by "function parameter", or "state variable with value"
-vardef(var) ::= <<
-$var.type$ $var.name$$if(var.size)$$listSize(var.size)$
-$endif$
+// the values of a list: {val1, val2, ..., valn}
+listValue(value) ::= <<
+{$value; wrap, separator=", "$}
 >>
 
-// a variable definition with initialization
-// called by "local variable", or "state variable with no value"
-vardefInit(var) ::= <<
-$if(var.isPort)$
-$var.type$ $var.name$$listSize(var.size)$
+variableDeclaration(variable) ::= <<
+$if(variable.port)$
+$variable.type$ *$variable$
 $else$
-$var.type$ $var.name$$if(var.size)$$listSize(var.size)$
+$variable.type$ $variable$$listSize(variable.type.dimensions)$
 $endif$
-$endif$>>
-
-// a state variable
-stateVar(vardef, value) ::= <<
-static $vardef(vardef)$;$\n\n$
 >>
 
-
+///////////////////////////////////////////////////////////////////////////////
+// State variables
+///////////////////////////////////////////////////////////////////////////////
+stateVar(variable) ::= <<
+static $variableDeclaration(variable)$;$\n$
+$endif$
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Procedure and actions
+// Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-proc(actorname, name, type, parameters, locals, nodes) ::= <<
+Assign(assign) ::= <<
+$assign.target$ = $assign.value$;
 
-$type$ $name$($parameters:vardef(); wrap, anchor, separator=", "$);
+>>
 
+Call(call) ::= <<
+$if(call.target)$
+$call.target$ = 
+$endif$
+$call.procedure$($call.parameters; separator=", "$);
+
+>>
+
+Decrement(decrement) ::= <<
+$decrement.target$--;
+
+>>
+
+HasTokens(hasTokens) ::= <<
+$hasTokens.target$ = hasTokens($actorName$_$hasTokens.port$, $hasTokens.numTokens$);
+
+>>
+
+Increment(increment) ::= <<
+$increment.target$++;
+
+>>
+
+Load(load) ::= <<
+$load.target$ = $load.source$$load.indexes : {[$it$]}$;
+
+>>
+
+Peek(peek) ::= <<
+$peek.target$ = getPeekPtr($actorName$_$peek.port$, $peek.numTokens$);
+
+>>
+
+Read(read) ::= <<
+$read.target$ = getReadPtr($actorName$_$read.port$, $read.numTokens$);
+
+>>
+
+ReadEnd(readEnd) ::= <<
+setReadEnd($actorName$_$readEnd.port$);
+
+>>
+
+Return(return) ::= <<
+$if(return.value)$
+return $return.value$;
+
+$endif$
+>>
+
+SelfAssignment(selfAssign) ::= <<
+$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
+
+>>
+
+Store(store) ::= <<
+$store.target$$store.indexes : {[$it$]}$ = $store.value$;
+
+>>
+
+Write(write) ::= <<
+$write.target$ = getWritePtr($actorName$_$write.port$, $write.numTokens$);
+
+>>
+
+WriteEnd(writeEnd) ::= <<
+setWriteEnd($actorName$_$writeEnd.port$);
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+instructions(instructions) ::= <<
+$instructions: {$(it.class.simpleName)(it)$}$
+>>
+
+nodes(nodes) ::= <<
+$nodes: {$(it.class.simpleName)(it)$}$
+>>
+
+// if node
+BlockNode(blockNode) ::= <<
+$instructions(blockNode.instructions)$
+>>
+
+// if node
+IfNode(ifNode) ::= <<
+if ($ifNode.value$) {
+	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$ else {
+	$nodes(ifNode.elseNodes)$}$endif$
+$BlockNode(ifNode.joinNode)$
+>>
+
+// while node
+WhileNode(whileNode) ::= <<
+while ($whileNode.value$) {
+	$nodes(whileNode.nodes)$}
+$BlockNode(whileNode.joinNode)$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Procedure
+///////////////////////////////////////////////////////////////////////////////
+
+procedure(procedure) ::= <<
+
+$procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$);
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+action(action) ::= <<
+$procedure(action.body)$$procedure(action.scheduler)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,100 +173,39 @@ $type$ $name$($parameters:vardef(); wrap, anchor, separator=", "$);
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|fifo_$port$.hasRoom($pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|hasRoom($actorName$_$port$, $pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
-actionCall(action) ::= <<
-$action$();
-res = true;
-i++;
->>
-
-actionTest(action) ::= <<
-if (isSchedulable_$action$()) {
-	$if(action.outputPattern)$
-	if ($outputPattern(action.outputPattern)$) {
-		$actionCall(action)$
-	}
-	$else$
-	$actionCall(action)$
-	$endif$
-}>>
-
-schedulingTest(actions) ::= <<
-$actions: actionTest(); separator=" else "$
->>
-
 scheduler(actions) ::= <<
-
-void process();
-
+void scheduler();
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
-
-actionCallState(nextState) ::= <<
-$nextState.action$();
-_FSM_state = States.s_$nextState.targetState$;
-res = true;
->>
-
-actionTestState(nextState) ::= <<
-if (isSchedulable_$nextState.action$()) {
-	$if(nextState.action.outputPattern)$
-	if ($outputPattern(nextState.action.outputPattern)$) {
-		$actionCallState(nextState)$
-	}
-	$else$
-	$actionCallState(nextState)$
-	$endif$
-}>>
-
-schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(); separator=" else "$
->>
 
 stateScheduler(transition) ::= <<
 bool $transition.sourceState$_state_scheduler();
 
 >>
 
-switch(transitions) ::= <<
-switch (_FSM_state) {
-$transitions: {case s_$it.sourceState$:
-	res = $it.sourceState$_state_scheduler();
-	if (res) {
-		i++;
-	}
-	break;
-}$
-default:
-	std::cout << "unknown state: %s\n" + _FSM_state << std::endl;
-	break;
-}
->>
-
 schedulerFSM(actions, fsm) ::= <<
-$if(actions)$
-bool outside_FSM_scheduler();
-
-$endif$
-$fsm.transitions: stateScheduler(); separator="\n"$
-public:
-	void process();
-
->>
-
-FSMdecl(actions, fsm) ::= <<
-enum States {
+enum states 
+{
 	$fsm.states : {s_$it$}; separator=",\n"$
 };
 
 int _FSM_state;
+
+
+$if(actions)$
+bool outside_FSM_scheduler();
+
+$endif$
+$fsm.transitions: stateScheduler(transition=it); separator="\n"$
+void scheduler();
 
 >>
 
@@ -162,58 +213,68 @@ int _FSM_state;
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(name, inputs, outputs, stateVars, procs,
-      actions, initializes, scheduler, initialize) ::= <<
-/**
- * Generated from "$name$"
- */
-#ifndef __ACTOR_$name$_H__
-#define __ACTOR_$name$_H__
+actor(actorName, actor) ::= <<
+// Generated from "$actor.name$"
+
+#ifndef __ACTOR_$actorName$_H__
+#define __ACTOR_$actorName$_H__
+
+#include <iostream>
 
 #include "actoraka.h"
 
-
-enum $name$_Iports{
-$inputs: fifo()$$name$_IPORT_SIZE
+////////////////////////////////////////////////////////////////////////////////
+// Input FIFOs
+enum
+{
+	$actor.inputs.list: fifo(it); separator="\n"$
+	$actorName$_IPORT_SIZE
+};
+////////////////////////////////////////////////////////////////////////////////
+// Output FIFOs
+enum
+{
+	$actor.outputs.list: fifo(it); separator="\n"$
+	$actorName$_OPORT_SIZE
 };
 
-enum $name$_Oports{
-$outputs: fifo()$$name$_OPORT_SIZE
-};
 
-class Actor_$name$ : public ActorGen 
+class actor_$actorName$ : public ActorGen 
 {
 
-	// State variables of the actor
-private:
-	$stateVars$
-	$if(scheduler.fsm)$	
-	$FSMdecl(actions=scheduler.actions, fsm=scheduler.fsm)$
-	$endif$
 public:
 	// Default constructor
-	Actor_$name$();
+	actor_$actorName$();
 	
 	void initializeActor();
 
+////////////////////////////////////////////////////////////////////////////////
+// State variables of the actor
+	$actor.stateVars.list: stateVar(it)$
 
 private:
-	// Functions/procedures
-	$procs$
-	// Actions
-	$actions$
-$if(initializes)$
-	// Initializes
-	$initializes$
-$endif$
+////////////////////////////////////////////////////////////////////////////////
+// Functions/procedures
+	$actor.procs.list: procedure(it)$
+////////////////////////////////////////////////////////////////////////////////
+// Actions
+	$actor.actions: action(it)$
+
 public:
+	$if(actor.initializes)$
+
+////////////////////////////////////////////////////////////////////////////////
+// Initializes
+	$actor.initializes: action(it)$
 	void initialize();
-	
-	// Action scheduler
-$if(scheduler.fsm)$
-	$schedulerFSM(actions=scheduler.actions, fsm=scheduler.fsm)$
+
+$endif$
+////////////////////////////////////////////////////////////////////////////////
+// Action scheduler
+$if(actor.actionScheduler.fsm)$
+	$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 $else$
-	$scheduler(scheduler.actions)$
+	$scheduler(actions=actor.actionScheduler.actions)$
 $endif$
 
 };
@@ -221,4 +282,3 @@ $endif$
 #endif
 
 >>
-

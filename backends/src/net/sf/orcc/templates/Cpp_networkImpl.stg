@@ -1,8 +1,8 @@
 group Cpp_networkImpl;
 
 setFifo(fifo) ::= <<
-actor_$fifo.source$.connect(ACTOR_PORT_OUT, $fifo.source$_$fifo.src_port$, fifo_$fifo.count$);
-actor_$fifo.target$.connect(ACTOR_PORT_IN, $fifo.target$_$fifo.tgt_port$, fifo_$fifo.count$);
+$fifo.source$.connect(ACTOR_PORT_OUT, $fifo.source$_$fifo.src_port$, fifo_$fifo.count$);
+$fifo.target$.connect(ACTOR_PORT_IN, $fifo.target$_$fifo.tgt_port$, fifo_$fifo.count$);
 
 >>
 
@@ -19,32 +19,32 @@ extern "C" {
 #include "orcc_util.h"
 }
 
-$connections:{ fifo | FifoAPI * Network_$name$::fifo_$fifo.count$ = (FifoAPI *)new CalOrientedBoundedFifo<$fifo.type$>($fifo.size$);}; separator="\n"$
+$connections:{ fifo | FifoAPI * network_$name$::fifo_$fifo.count$ = (FifoAPI *)new CalOrientedBoundedFifo<$fifo.type$>($fifo.size$);}; separator="\n"$
 
-Network_$name$::Network_$name$()
+network_$name$::network_$name$()
 {
 	$connections:setFifo()$
 }
 
-Network_$name$::~Network_$name$(){}
+network_$name$::~network_$name$(){}
 
-void Network_$name$::start(std::string &strErr)
+void network_$name$::start(std::string &strErr)
 {
-	$instances: {actor_$it$.initializeActor();}; separator="\n"$
+	$instances: {$it$.initializeActor();}; separator="\n"$
 	
-	$instances: {actor_$it$.startActorExecution();}; separator="\n"$
+	$instances: {$it$.startActorExecution();}; separator="\n"$
 }
 
-void Network_$name$::stop(std::string &strErr)
+void network_$name$::stop(std::string &strErr)
 {
-	$instances: {inst |actor_$inst$.stop();}; separator="\n"$
+	$instances: {inst |$inst$.stop();}; separator="\n"$
 }
 
-void Network_$name$::schedule() {
-	$initializes: { init | actor_$init$.initialize();}; separator="\n"$
+void network_$name$::schedule() {
+	$initializes: { init | $init$.initialize();}; separator="\n"$
 
 	while (1) {
-		$instances: { inst | actor_$inst$.process();$\n$}$
+		$instances: { inst | $inst$.scheduler();$\n$}$
 	}
 }
 
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
 	std::string strErr="";
 
-	Network_$name$ network;
+	network_$name$ network;
 	network.start(strErr);
 	network.schedule();
 	
