@@ -28,7 +28,11 @@
  */
 package net.sf.orcc.backends.interpreter;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
 import net.sf.orcc.ir.ICommunicationFifo;
+import net.sf.orcc.ir.Port;
 
 /**
  * A FIFO of integers.
@@ -45,16 +49,40 @@ public class IntFifo implements ICommunicationFifo {
 	private int size;
 
 	private int write;
+	
+	private Port srcPort;
+	private Port tgtPort;
+	
+	private OutputStreamWriter out;
 
-	public IntFifo(int size) {
+	public IntFifo(int size, OutputStreamWriter out) {
+		this.out = out;
 		this.size = size;
 		contents = new Object[size];
 	}
+	
+	public void setSource(Port srcPort) {
+		this.srcPort = srcPort;
+	}
+	public void setTarget(Port tgtPort) {
+		this.tgtPort = tgtPort;
+	}
 
 	public void get(Object[] target) {
-		System.out.println("Get from FIFO object : " + target);
 		peek(target);
 		read += target.length;
+		if (out != null) {
+			try {
+				out.write("Get from FIFO "+srcPort.getName()+"_"+tgtPort.getName()+" : \n");
+				for (int i = 0; i < target.length; i++) {
+					out.write(target[i] + " ");
+				}
+				out.write("\n");
+				out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public boolean hasRoom(int n) {
@@ -95,15 +123,25 @@ public class IntFifo implements ICommunicationFifo {
 
 	public void peek(Object[] target) {
 		int n = target.length;
-		System.out.println("Peek from FIFO object : " + target);
 		System.arraycopy(contents, read, target, 0, n);
 	}
 
 	public void put(Object[] source) {
 		int n = source.length;
-		System.out.println("Put in FIFO object : " + source);
 		System.arraycopy(source, 0, contents, write, n);
 		write += n;
+		if (out != null) {
+			try {
+				out.write("Put to FIFO "+srcPort.getName()+"_"+tgtPort.getName()+" : \n");
+				for (int i = 0; i < source.length; i++) {
+					out.write(source[i] + "");
+				}
+				out.write("\n");
+				out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public String toString() {

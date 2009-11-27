@@ -28,7 +28,12 @@
  */
 package net.sf.orcc.backends.interpreter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +52,7 @@ import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.network.transforms.BroadcastAdder;
 
 import org.jgrapht.DirectedGraph;
 
@@ -64,6 +70,9 @@ public class InterpreterBackend implements IBackend {
 
 	private List<AbstractInterpretedActor> actorQueue;
 
+	private FileOutputStream fos;
+	private OutputStreamWriter out;
+
 	@Override
 	public void generateCode(String fileName, int fifoSize) throws Exception {
 		// set FIFO size
@@ -71,15 +80,30 @@ public class InterpreterBackend implements IBackend {
 
 		System.out.println("Starting interpretation");
 
-		// parses top network
+		// Parses top network
 		Network network = new XDFParser(fileName).parseNetwork();
 
-		// instantiate the network
+		// Instantiate the network
 		network.instantiate();
+
+		// Add broadcasts before connecting actors
+		new BroadcastAdder().transform(network);
+		// Prepare an hash table for creating broadcast interpreted actors
+		HashMap<String, BroadcastActor> bcastMap = new HashMap<String, BroadcastActor>();
+		
+		// Create network communication tracing file
+		File file = new File(fileName).getParentFile();
+		try {
+			fos = new FileOutputStream(new File(file, "traces.txt"));
+			out = new OutputStreamWriter(fos, "UTF-8");
+		} catch (FileNotFoundException e) {
+			String msg = "file not found: \"" + fileName + "\"";
+			throw new RuntimeException(msg, e);
+		}
 
 		// get network graph
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
-
+		
 		// connect network actors to FIFOs thanks to their port names
 		Set<Connection> connections = graph.edgeSet();
 		for (Connection connection : connections) {
@@ -90,44 +114,66 @@ public class InterpreterBackend implements IBackend {
 			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
 				Instance srcInst = srcVertex.getInstance();
 				Instance tgtInst = tgtVertex.getInstance();
-
-				if (srcInst.isActor() && tgtInst.isActor()) {
-					Actor source = srcInst.getActor();
-					Actor target = tgtInst.getActor();
-
-					// get FIFO size (user-defined nor default)
-					Integer size;
-					IAttribute attr = connection
-							.getAttribute(Connection.BUFFER_SIZE);
-					if (attr != null && attr.getType() == IAttribute.VALUE) {
-						Expression expr = ((IValueAttribute) attr).getValue();
-						size = new ExpressionEvaluator()
-								.evaluateAsInteger(expr) + 1;
-					} else {
-						size = fifoSize;
-					}
-
-					// create the communication FIFO between source and target
-					// actors
-					IntFifo fifo = new IntFifo(size);
-					// connect source actor to the FIFO
-					Port srcPort = connection.getSource();
-					if (srcPort != null) {
-						srcPort.bind(fifo);
-					}
-					// connect target actor to the FIFO
-					Port tgtPort = connection.getTarget();
-					if (tgtPort != null) {
-						tgtPort.bind(fifo);
-					}
-					System.out.println("Connecting " + source.getName() + "."
-							+ srcPort.getName() + " to " + target.getName()
-							+ "." + tgtPort.getName());
+				
+				// get FIFO size (user-defined nor default)
+				Integer size;
+				IAttribute attr = connection
+						.getAttribute(Connection.BUFFER_SIZE);
+				if (attr != null && attr.getType() == IAttribute.VALUE) {
+					Expression expr = ((IValueAttribute) attr).getValue();
+					size = new ExpressionEvaluator().evaluateAsInteger(expr) + 1;
+				} else {
+					size = fifoSize;
 				}
+
+				// create the communication FIFO between source and target
+				// actors
+				IntFifo fifo;
+				if (srcInst.getId().equals("broadcast_parseheaders_BTYPE")) {
+					fifo = new IntFifo(size, out);
+				} else {
+					fifo = new IntFifo(size, null);
+				}
+				// connect source actor to the FIFO
+				Port srcPort = connection.getSource();
+				if (srcPort != null) {
+					srcPort.bind(fifo);
+					fifo.setSource(srcPort);
+					if (srcInst.isBroadcast()) {
+						// Broadcast actor to be explicitly connected to its port
+						BroadcastActor bcastActor = bcastMap.get(srcInst.getId());
+						if (bcastActor == null) {
+							bcastActor = new BroadcastActor(srcInst.getId(), null);
+							bcastMap.put(srcInst.getId(), bcastActor);
+							//bcastActor = bcastMap.get(srcInst.getId());
+						}
+						bcastActor.setOutport(srcPort);
+					}
+				}
+				// connect target actor to the FIFO
+				Port tgtPort = connection.getTarget();
+				if (tgtPort != null) {
+					tgtPort.bind(fifo);
+					fifo.setTarget(tgtPort);
+					if (tgtInst.isBroadcast()) {
+						// Broadcast actor to be explicitly connected to its ports
+						BroadcastActor bcastActor = bcastMap.get(tgtInst.getId());
+						if (bcastActor == null) {
+							bcastActor = new BroadcastActor(tgtInst.getId(), null);
+							bcastMap.put(tgtInst.getId(), bcastActor);
+							//bcastActor = bcastMap.get(tgtInst.getId());
+						}
+						bcastActor.setInport(tgtPort);
+					}
+				}
+
+				System.out.println("Connecting " + srcInst.getId() + "."
+						+ srcPort.getName() + " to " + tgtInst.getId() + "."
+						+ tgtPort.getName());
 			}
 		}
 
-		// build an actor queue with network graph vertexes
+		// Build an actor queue with network graph vertexes
 		actorQueue = new ArrayList<AbstractInterpretedActor>();
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
@@ -151,6 +197,8 @@ public class InterpreterBackend implements IBackend {
 						actorQueue.add(new InterpretedActor(instance.getId(),
 								actor));
 					}
+				} else if (instance.isBroadcast()) {
+					actorQueue.add(bcastMap.get(instance.getId()));
 				}
 			}
 		}
@@ -183,11 +231,16 @@ public class InterpreterBackend implements IBackend {
 	private void scheduler() throws Exception {
 
 		int running = 1;
+		int count=0;
 		// While at least one actor is running
 		while (running > 0) {
 			running = 0;
 			for (AbstractInterpretedActor actor : actorQueue) {
 				System.out.println("Schedule actor " + actor.getName());
+				if (actor.getName().equals("mvseq")) {
+					count += 1;
+					System.out.println("mvseq visited "+count+" times");
+				}
 				running += actor.schedule();
 			}
 			// Manage empty and full FIFOs

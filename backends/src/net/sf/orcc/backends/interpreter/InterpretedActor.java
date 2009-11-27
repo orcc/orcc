@@ -122,18 +122,13 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 */
 	public Integer schedule() {
 		if (sched.hasFsm()) {
-			if (name.equals("parseheaders")) {
-				System.out.println("Current FSM state is : " + fsmState);
-			}
+			System.out.println("Current FSM state is : " + fsmState);
 
 			// Check for untagged actions first
 			for (Action action : sched.getActions()) {
 				if (isSchedulable(action)) {
 					interpretProc(action.getBody());
-					if (name.equals("parseheaders")) {
-						System.out.println("Executing action : "
-								+ action.getBody().getName());
-					}
+					System.out.println("Executing action : "+ action.getBody().getName());
 				}
 			}
 			// Then check for next FSM transition
@@ -142,12 +137,10 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			while (it.hasNext()) {
 				TransitionManager transMgr = it.next();
 				Action action = transMgr.transitionAction;
+				System.out.println("Check schedulable : " + action.getBody().getName());
 				if (isSchedulable(action)) {
 					interpretProc(action.getBody());
-					if (name.equals("parseheaders")) {
-						System.out.println("Executing action : "
-								+ action.getBody().getName());
-					}
+					System.out.println("Executing action : "+ action.getBody().getName());
 					// Update FSM state
 					fsmState = transMgr.targetState;
 					// Execute 1 action only per actor scheduler cycle
@@ -156,11 +149,10 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			}
 		} else {
 			for (Action action : sched.getActions()) {
+				System.out.println("Checking schedulable action : "+ action.getBody().getName());
 				if (isSchedulable(action)) {
 					interpretProc(action.getBody());
-					if (name.equals("parseheaders")) {
-						System.out.println("WRONG !");
-					}
+					System.out.println("Executing action : "+ action.getBody().getName());
 					// Execute 1 action only per actor scheduler cycle
 					return 1;
 				}
