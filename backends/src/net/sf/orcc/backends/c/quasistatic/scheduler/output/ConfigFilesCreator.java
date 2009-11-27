@@ -580,82 +580,6 @@ public class ConfigFilesCreator {
 			+ "SHORT_NAME_GEN_algo_Clip = CLIP\n"
 			+ "SHORT_NAME_broadcast_add_VID = BCAST";
 
-	private static final String ACTORS_IDENTIFIER_PROPERTIES = "ADDR.cmd.noMotion = 1\n"
-			+ "ADDR.init = 2\n"
-			+ "ADDR.write_addr = 3\n"
-			+ "ADDR.done = 4\n"
-			+ "ADDR.cmd.motion = 5\n"
-			+ "ADDR.getmvx = 6\n"
-			+ "ADDR.getmvy = 7\n"
-			+ "ADDR.read_addr = 8\n"
-			+ "ADDR.cmd.neither = 9\n"
-			+ "ADDR.cmd.newVop = 10\n"
-			+ "ADDR.getw = 11\n"
-			+ "ADDR.geth = 12\n"
-			+ "FBUF.actRA = 13\n"
-			+ "FBUF.act0 = 13\n"
-			+ "FBUF.actWA = 14\n"
-			+ "FBUF.act1 = 14\n"
-			+ "INTER.row_col_0 = 15\n"
-			+ "INTER.other = 16\n"
-			+ "INTER.start = 17\n"
-			+ "INTER.done = 18\n"
-			+ "ADD.cmd.motionOnly = 19\n"
-			+ "ADD.motion = 20\n"
-			+ "ADD.cmd.textureOnly = 21\n"
-			+ "ADD.texture = 22\n"
-			+ "ADD.cmd.other = 23\n"
-			+ "ADD.combine = 24\n"
-			+ "ADD.cmd.newVop = 25\n"
-			+ "BCAST.tokens = 26\n"
-			+ "BCAST.act0 = 26\n"
-			+ "ADD.done = 27\n"
-			+ "IQ.ac = 28\n"
-			+ "IQ.get_qp = 29\n"
-			+ "IQ.done = 30\n"
-			+ "IDCT_ROW.row = 31\n"
-			+ "IDCT_ROW.act0 = 31\n"
-			+ "TRANS.actX = 32\n"
-			+ "TRANS.act0 = 32\n"
-			+ "IDCT_COLUMN.column = 33\n"
-			+ "IDCT_COLUMN.act0 = 33\n"
-			+ "RETRANS.actX = 34\n"
-			+ "RETRANS.act0 = 34\n"
-			+ "CLIP.read_signed = 35\n"
-			+ "CLIP.limit = 36\n"
-			+ "IAP.newvop = 37\n"
-			+ "IAP.skip = 38\n"
-			+ "IAP.start = 39\n"
-			+ "IAP.advance = 40\n"
-			+ "IAP.copy = 41\n"
-			+ "IS.skip = 42\n"
-			+ "IS.start = 43\n"
-			+ "IS.done = 44\n"
-			+ "IS.read_only = 45\n"
-			+ "IS.write_only = 46\n"
-			+ "SPLIT.dc = 47\n"
-			+ "SPLIT.ac = 48\n"
-			+ "DCRADDR.start = 49\n"
-			+ "DCRADDR.getw = 50\n"
-			+ "DCRADDR.geth = 51\n"
-			+ "DCRADDR.read.intra = 52\n"
-			+ "DCRADDR.read.other = 53\n"
-			+ "DCRADDR.advance = 54\n"
-			+ "DCRADDR.predict = 55\n"
-			+ "DCRADDR.predict.b0 = 55\n"
-			+ "DCRADDR.predict.b1 = 55\n"
-			+ "DCRADDR.predict.b2 = 55\n"
-			+ "DCRADDR.predict.b3 = 55\n"
-			+ "DCRADDR.predict.b45 = 55\n"
-			+ "DCRINV.start = 56\n"
-			+ "DCRINV.skip = 57\n"
-			+ "DCRINV.read.intra = 58\n"
-			+ "DCRINV.getdc.intra = 59\n"
-			+ "DCRINV.read.inter_ac = 60\n"
-			+ "DCRINV.getdc.inter = 61\n"
-			+ "DCRINV.read.other = 62\n"
-			+ "DCRINV.advance = 63\n" + "DCRINV.sat = 64";
-
 	private static void createProperties(String outputPath,
 			String propertiesName, String content) {
 		File file = new File(outputPath + File.separator + propertiesName
@@ -675,9 +599,7 @@ public class ConfigFilesCreator {
 	public static void createPropertiesFiles(String outputPath) {
 		
 		createProperties(outputPath, "system", SYSTEM_PROPERTIES);
-		createProperties(outputPath, "actionsIdentifiers",
-				ACTORS_IDENTIFIER_PROPERTIES);
-
+		
 		// sets config file
 		PropertiesParser.setConfigDirectoryPath(outputPath);
 	}
