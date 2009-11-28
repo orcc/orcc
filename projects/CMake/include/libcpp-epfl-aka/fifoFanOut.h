@@ -40,12 +40,12 @@ public:
 	FifoFanOut();
 	~FifoFanOut();
 
-	void put(void *pVal);
-	void put(void *pVal, unsigned uNbVal);
-	void get(void *pVal);
-	void get(void *pVal, unsigned uNbVal);
-	void peek(void *pVal);
-	void peek(void *pVal, unsigned uNbVal);
+	void put(void * const pVal);
+	void put(void * const pVal, const unsigned uNbVal);
+	void get(void * const pVal);
+	void get(void * const pVal, const unsigned uNbVal);
+	void peek(void * const pVal);
+	void peek(void * const pVal, const unsigned uNbVal);
 
 //	void cancel();
 
@@ -55,8 +55,8 @@ public:
 //	void getCountRoomAvailable(unsigned &pVal);
 
 
-	bool hasTokens(unsigned);
-	bool hasRooms(unsigned);
+	bool hasTokens(const unsigned);
+	bool hasRooms(const unsigned);
 
 private:
 	std::vector <FifoAPI *> m_oVectFifo;

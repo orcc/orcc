@@ -1,30 +1,45 @@
 #include "Actor_display.h"
 
-SDL_Surface * Actor_display::m_screen = NULL;
-SDL_Overlay *Actor_display::m_overlay = NULL;
-int Actor_display::m_x;
-int Actor_display::m_y;
-int Actor_display::m_width;
-int Actor_display::m_height;
-int Actor_display::init;
+SDL_Surface * actor_display::m_screen = NULL;
+SDL_Overlay *actor_display::m_overlay = NULL;
+int actor_display::m_x;
+int actor_display::m_y;
+int actor_display::m_width;
+int actor_display::m_height;
+int actor_display::init;
 
-Uint32 Actor_display::start_time;
-int Actor_display::num_images_start;
-int Actor_display::num_images_end;
+Uint32 actor_display::start_time;
+int actor_display::num_images_start;
+int actor_display::num_images_end;
 
-Actor_display::Actor_display():ActorGen(display_IPORT_SIZE, display_OPORT_SIZE)
+actor_display::actor_display():ActorGen(display_IPORT_SIZE, display_OPORT_SIZE)
 {
 }
 
+void actor_display::initializeActor()
+{
+#ifdef __TRACE_TOKENS__
+	std::string strTrace("");
+	strTrace = __FILE__;
+	unsigned uDesc = g_oTracer.createFileDescriptor(strTrace);
 
-void Actor_display::press_a_key(int code) {
+	for(unsigned uIdx = 0; uIdx < display_IPORT_SIZE; uIdx++)
+	{
+		strTrace = "m_poTabIn[" + toString(uIdx) + "] = " + toString((unsigned)m_poTabIn[uIdx]);
+		g_oTracer.addPort(uDesc, strTrace);
+	}
+#endif
+}
+
+
+void actor_display::press_a_key(int code) {
 	char buf[2];
 	printf("Press enter to continue\n");
 	fgets(buf, 2, stdin);
 	exit(code);
 }
 
-void Actor_display::print_fps_avg() {
+void actor_display::print_fps_avg() {
 	Uint32 t = SDL_GetTicks();
 
 	printf("%i images in %f seconds: %f FPS\n",
@@ -32,7 +47,7 @@ void Actor_display::print_fps_avg() {
 		1000.0f * (float)num_images_end / (float)t);
 }
 
-void Actor_display::display_show_image() {
+void actor_display::display_show_image() {
 	static Uint32 t;
 	SDL_Rect rect = { 0, 0, m_width, m_height };
 
@@ -70,6 +85,9 @@ void Actor_display::display_show_image() {
 			case SDL_QUIT:
 				exit(0);
 				break;
+			case SDL_KEYDOWN:
+				exit(0);
+				break;
 			default:
 				break;
 		}
@@ -77,7 +95,7 @@ void Actor_display::display_show_image() {
 }
 
 
-void Actor_display::display_write_mb(short tokens[384]) {
+void actor_display::display_write_mb(short tokens[384]) {
 	int i, j, x, y, cnt, base, idx;
 
 	cnt = 0;
@@ -149,22 +167,22 @@ void Actor_display::display_write_mb(short tokens[384]) {
 	}
 }
 
-void Actor_display::display_init() {
+void actor_display::display_init() {
 	// First, initialize SDL's video subsystem.
-    if (SDL_Init( SDL_INIT_VIDEO ) < 0) {
-        fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
+	if (SDL_Init( SDL_INIT_VIDEO ) < 0) {
+		fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
 		press_a_key(-1);
-    }
+	}
 
 	SDL_WM_SetCaption("display", NULL);
 
 	atexit(SDL_Quit);
-//	atexit(print_fps_avg());
+	//	atexit(print_fps_avg());
 
 	init = 1;
 }
 
-void Actor_display::display_set_video(int width, int height) {
+void actor_display::display_set_video(int width, int height) {
 	if (width == m_width && height == m_height) {
 		// video mode is already good
 		return;
@@ -195,16 +213,16 @@ void Actor_display::display_set_video(int width, int height) {
 
 
 
-void Actor_display::process() {
+void actor_display::scheduler() {
 	int res = 1;
 	short WIDTH[1], HEIGHT[1];
 	short B[384];
 	while (res) {
 		if (m_poTabIn[display_WIDTH]->hasTokens(1) && m_poTabIn[display_HEIGHT]->hasTokens(1)) {
 			short width, height;
-			m_poTabIn[display_WIDTH]->get(WIDTH, 1);
+			m_poTabIn[display_WIDTH]->get(WIDTH);
 			width = WIDTH[0] * 16;
-			m_poTabIn[display_HEIGHT]->get(HEIGHT, 1);
+			m_poTabIn[display_HEIGHT]->get(HEIGHT);
 			height = HEIGHT[0] * 16;
 
 			display_set_video(width, height);
@@ -220,6 +238,18 @@ void Actor_display::process() {
 			}
 			res = 1;
 		} else {
+#ifdef __TRACE_TOKENS__
+			SDL_Event event;
+			while (SDL_PollEvent(&event)) {
+				switch (event.type) {
+						case SDL_KEYDOWN:
+							exit(0);
+							break;
+						default:
+							break;
+				}
+			}
+#endif
 			res = 0;
 		}
 	}

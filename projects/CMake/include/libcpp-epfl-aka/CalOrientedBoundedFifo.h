@@ -39,23 +39,23 @@ public:
 	void release();
 
 
-	void put(void * pBuf);
-	void put(void * pBuf, unsigned uNbVal);
-	void get(void * pBuf);	
-	void get(void * pBuf, unsigned uNbVal);	
-	void peek(void * pVal);
-	void peek(void * pVal, unsigned uNbVal);
+	void put(void * const pBuf);
+	void put(void * const pBuf, const unsigned uNbVal);
+	void get(void * const pBuf);	
+	void get(void * const pBuf, const unsigned uNbVal);	
+	void peek(void * const pVal);
+	void peek(void * const pVal, const unsigned uNbVal);
 
-	bool hasTokens(unsigned uNbVal = 1);
-	bool hasRooms(unsigned uNbVal = 1);
+	bool hasTokens(const unsigned uNbVal = 1);
+	bool hasRooms(const unsigned uNbVal = 1);
 
 private:
 	bool m_bInitiliazed;
 
-	T *m_poFifo;
-	T* m_poFifoPut;
-	T* m_poFifoGet;
-	T* m_poFifoEnd;
+	T * m_poFifo;
+	T * m_poFifoPut;
+	T * m_poFifoGet;
+	T * m_poFifoEnd;
 	
 	unsigned m_uSize;
 	unsigned m_uCount;
@@ -127,7 +127,7 @@ void CalOrientedBoundedFifo<T>::release()
 }
 
 template <typename T>
-inline void CalOrientedBoundedFifo<T>::get(void * poVal)
+inline void CalOrientedBoundedFifo<T>::get(void * const poVal)
 {
 	T * pVal = (T *)poVal;
 
@@ -138,20 +138,19 @@ inline void CalOrientedBoundedFifo<T>::get(void * poVal)
 }
 #endif
 
-
-		*pVal = *m_poFifoGet;
-		m_poFifoGet ++;
-		if(m_poFifoGet >= m_poFifoEnd)
-		{
-			m_poFifoGet = m_poFifo;
-		}
-	m_uCount--;
+	*pVal = *m_poFifoGet;
+	++m_poFifoGet;
+	if(m_poFifoGet >= m_poFifoEnd)
+	{
+		m_poFifoGet = m_poFifo;
+	}
+	--m_uCount;
 
 }
 
 
 template <typename T>
-inline void CalOrientedBoundedFifo<T>::get(void * poVal, unsigned int uNbVal)
+inline void CalOrientedBoundedFifo<T>::get(void * const poVal, const unsigned uNbVal)
 {
 	T * pVal = (T *)poVal;
 
@@ -189,35 +188,24 @@ inline void CalOrientedBoundedFifo<T>::get(void * poVal, unsigned int uNbVal)
 }
 
 template <typename T> 
-inline void CalOrientedBoundedFifo<T>::put(void * poVal)
+inline void CalOrientedBoundedFifo<T>::put(void * const poVal)
 {
 	T * pVal = (T *)poVal;
 
-	if( hasRooms(1) == false)
-	{
-		// TODO: Error
-		return;
-	}
 	*m_poFifoPut = *pVal;
-	m_poFifoPut++;
+	++m_poFifoPut;
 	if(m_poFifoPut >= m_poFifoEnd)
 	{
 		m_poFifoPut = m_poFifo;
 	}
-	m_uCount++;
+	++m_uCount;
 }
 
 
 template <typename T> 
-inline void CalOrientedBoundedFifo<T>::put(void * poVal, unsigned uNbVal)
+inline void CalOrientedBoundedFifo<T>::put(void * const poVal, const unsigned uNbVal)
 {
 	T *pVal = (T*)poVal;
-
-/*	if( hasRooms(uNbVal) == false)
-	{
-		// TODO: Error
-		return;
-	}*/
 
 	// Two case:
 	// - There are too few space to store the Segment to add at the end of the circular buffer (the copy must be done in two packets)
@@ -243,28 +231,18 @@ inline void CalOrientedBoundedFifo<T>::put(void * poVal, unsigned uNbVal)
 
 
 template <typename T>
-inline void CalOrientedBoundedFifo<T>::peek(void * poVal)
+inline void CalOrientedBoundedFifo<T>::peek(void * const poVal)
 {
 	T * pVal = (T *)poVal;
 
-/*	if( hasTokens(1) == false)
-	{
-		// TODO: Error
-		return;
-	}*/
 	*pVal = *m_poFifoGet;
 }
 
 template <typename T>
-inline void CalOrientedBoundedFifo<T>::peek(void * poVal, unsigned int uNbVal )
+inline void CalOrientedBoundedFifo<T>::peek(void * const poVal, const unsigned uNbVal )
 {
 	T * pVal = (T *)poVal;
 
-	/*if( hasTokens(uNbVal) == false)
-	{
-		// TODO: Error
-		return;
-	}*/
 	// Two case:
 	// - There are too few data to get from the end of the circular buffer. The segment should be read in two packets.
 	if ( (m_poFifoGet + uNbVal) > m_poFifoEnd)
@@ -283,13 +261,13 @@ inline void CalOrientedBoundedFifo<T>::peek(void * poVal, unsigned int uNbVal )
 
 
 template <typename T>
-inline bool CalOrientedBoundedFifo<T>::hasRooms(unsigned uNbVal)
+inline bool CalOrientedBoundedFifo<T>::hasRooms(const unsigned uNbVal)
 {
 	return (m_uSize - m_uCount) >= uNbVal ? true : false;
 }
 
 template <typename T>
-inline bool CalOrientedBoundedFifo<T>::hasTokens(unsigned uNbVal)
+inline bool CalOrientedBoundedFifo<T>::hasTokens(const unsigned uNbVal)
 {
 	return m_uCount >= uNbVal ? true : false;
 }

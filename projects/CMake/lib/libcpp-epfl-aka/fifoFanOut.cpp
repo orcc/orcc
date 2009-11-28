@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fï¿½dï¿½rale de Lausanne / AKATECH SA
+ * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne / AKATECH SA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fï¿½dï¿½rale de Lausanne / AKATECH SA nor the names of its
+ *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne / AKATECH SA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -29,8 +29,6 @@
 
 #include "fifoFanOut.h"
 
-#include <assert.h>
-
 FifoFanOut::FifoFanOut()
 {
 }
@@ -41,7 +39,7 @@ FifoFanOut::~FifoFanOut()
 	m_oVectFifo.clear();
 }
 
-void FifoFanOut::put(void *pVal)
+void FifoFanOut::put(void * const pVal)
 {
 	std::vector <FifoAPI *>::iterator it = m_oVectFifo.begin();
 	while(it != m_oVectFifo.end())
@@ -52,40 +50,40 @@ void FifoFanOut::put(void *pVal)
 }
 
 
-void FifoFanOut::put(void *pVal, unsigned uNbVal)
+void FifoFanOut::put(void * const pVal, const unsigned uNbVal)
 {
 	std::vector <FifoAPI *>::iterator it = m_oVectFifo.begin();
 	while(it != m_oVectFifo.end())
 	{
 		(*it)->put(pVal, uNbVal);
-		it++;
+		++it;
 	}
 }
 
 
-void FifoFanOut::get(void *pVal)
+void FifoFanOut::get(void * const pVal)
 {
 	// Force an exception while this method should not be called
-	assert(false);
+	_ASSERT(0);
 }
 
-void FifoFanOut::get(void *pVal, unsigned uNbVal)
+void FifoFanOut::get(void * const pVal, const unsigned uNbVal)
 {
 	// Force an exception while this method should not be called
-	assert(false);
+	_ASSERT(0);
 }
 
 
-void FifoFanOut::peek(void *pVal)
+void FifoFanOut::peek(void * const pVal)
 {
 	// Force an exception while this method should not be called
-	assert(false);
+	_ASSERT(0);
 }
 
-void FifoFanOut::peek(void *pVal, unsigned uNbVal)
+void FifoFanOut::peek(void * const pVal, const unsigned uNbVal)
 {
 	// Force an exception while this method should not be called
-	assert(false);
+	_ASSERT(0);
 }
 
 
@@ -120,7 +118,7 @@ void FifoFanOut::addOut(FifoAPI *poFifo)
 }*/
 
 
-bool FifoFanOut::hasRooms(unsigned uNbVal)
+bool FifoFanOut::hasRooms(const unsigned uNbVal)
 {
  // Return false if one of the FIFOs has not rooms
 	bool bRet = true;
@@ -134,9 +132,9 @@ bool FifoFanOut::hasRooms(unsigned uNbVal)
 }
 
 
-bool FifoFanOut::hasTokens(unsigned pVal)
+bool FifoFanOut::hasTokens(const unsigned pVal)
 {
-	// Force an exception while this method should not be called
-	assert(false);
+		// Force an exception while this method should not be called
+	_ASSERT(0);
 	return false;
 }

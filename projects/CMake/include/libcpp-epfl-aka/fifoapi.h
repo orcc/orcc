@@ -34,20 +34,20 @@ class FifoAPI
 public:
 	virtual ~FifoAPI(){};
 
-	virtual void put(void *pVal) = 0;
-	virtual void put(void *pVal, unsigned uNbVal) = 0;
-	virtual void get(void *pVal) = 0;
-	virtual void get(void *pVal, unsigned uNbVal) = 0;
-	virtual void peek(void *pVal) = 0;
-	virtual void peek(void *pVal, unsigned uNbVal) = 0;
+	virtual void put(void * const pVal) = 0;
+	virtual void put(void * const pVal, const unsigned uNbVal) = 0;
+	virtual void get(void * const pVal) = 0;
+	virtual void get(void * const pVal, const unsigned uNbVal) = 0;
+	virtual void peek(void * const pVal) = 0;
+	virtual void peek(void * const pVal, const unsigned uNbVal) = 0;
 
 //	virtual void cancel() = 0;
 
 //	virtual void getCountDataAvailable(unsigned &pVal) = 0;
 //	virtual void getCountRoomAvailable(unsigned &pVal) = 0;
 
-	virtual bool hasTokens(unsigned) = 0;
-	virtual bool hasRooms(unsigned) = 0;
+	virtual bool hasTokens(const unsigned) = 0;
+	virtual bool hasRooms(const unsigned) = 0;
 
 
 private:

@@ -2,23 +2,35 @@
  * Generated from "source"
  */
 
-#define _CRT_SECURE_NO_WARNINGS
-
 #include "Actor_source.h"
 
 extern "C" {
 #include "orcc_util.h"
 };
 
-#include <stdlib.h>
 
-Actor_source::Actor_source():ActorGen(source_IPORT_SIZE, source_OPORT_SIZE)
+actor_source::actor_source():ActorGen(source_IPORT_SIZE, source_OPORT_SIZE)
 {
 	F = NULL;
 	cnt = 0;
 }
+
+void actor_source::initializeActor()
+{
+#ifdef __TRACE_TOKENS__
+	std::string strTrace("");
+	strTrace = __FILE__;
+	unsigned uDesc = g_oTracer.createFileDescriptor(strTrace);
+
+	for(unsigned uIdx = 0; uIdx < source_IPORT_SIZE; uIdx++)
+	{
+	  strTrace = "m_poTabIn[" + toString(uIdx) + "] = " + toString((unsigned)m_poTabIn[uIdx]);
+	  g_oTracer.addPort(uDesc, strTrace);
+	}
+#endif
+}
 		
-void Actor_source::initialize() {
+void actor_source::initialize() {
 	if (input_file == NULL) {
 		print_usage();
 		fprintf(stderr, "No input file given!\n");
@@ -29,7 +41,7 @@ void Actor_source::initialize() {
 	F = fopen(input_file, "rb");
 	if (F == NULL) {
 		if (input_file == NULL) {
-			input_file = (char *) "<null>";
+			input_file = "<null>";
 		}
 
 		fprintf(stderr, "could not open file \"%s\"\n", fname);
@@ -40,7 +52,7 @@ void Actor_source::initialize() {
 
 	// Action scheduler
 
-void Actor_source::process() {
+void actor_source::scheduler() {
 	char O[1];
 	int n;
 
@@ -59,3 +71,4 @@ void Actor_source::process() {
 		cnt++;
 	}
 }
+
