@@ -35,9 +35,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -105,25 +102,25 @@ public class ALAstParser {
 	 */
 	private class Block {
 
-		private CFGNode node;
+		private List<CFGNode> nodes;
 
 		private Scope<Variable> variables;
 
 		/**
-		 * Creates a new block with the given variables and node.
+		 * Creates a new block with the given variables and nodes.
 		 * 
 		 * @param variables
 		 *            a scope of variables
-		 * @param node
-		 *            a node
+		 * @param nodes
+		 *            a list of CFG nodes
 		 */
-		public Block(Scope<Variable> variables, CFGNode node) {
+		public Block(Scope<Variable> variables, List<CFGNode> nodes) {
 			this.variables = variables;
-			this.node = node;
+			this.nodes = nodes;
 		}
 
-		public CFGNode getNode() {
-			return node;
+		public List<CFGNode> getNodes() {
+			return nodes;
 		}
 
 		public Scope<Variable> getVariables() {
@@ -132,7 +129,7 @@ public class ALAstParser {
 
 		@Override
 		public String toString() {
-			return String.valueOf(getNode());
+			return nodes.toString();
 		}
 
 	}
@@ -284,10 +281,10 @@ public class ALAstParser {
 			parseLocalVariables(variables, tree.getChild(start));
 
 			// parse nodes
-			CFGNode node = null;
+			List<CFGNode> nodes = null;
 			currentScope = currentScope.getParent();
 
-			return new Block(variables, node);
+			return new Block(variables, nodes);
 		}
 
 		/**
@@ -450,6 +447,11 @@ public class ALAstParser {
 	}
 
 	/**
+	 * the action parser
+	 */
+	private ActionParser actionParser;
+
+	/**
 	 * list of actions
 	 */
 	private ActionList actions;
@@ -526,11 +528,6 @@ public class ALAstParser {
 	private final TypeParser typeParser;
 
 	/**
-	 * this integer is used to give a name to untagged actions.
-	 */
-	private int untaggedCounter;
-
-	/**
 	 * creates a new parser from the given file name.
 	 * 
 	 * @param fileName
@@ -540,6 +537,7 @@ public class ALAstParser {
 		try {
 			this.file = new File(fileName).getCanonicalPath();
 
+			actionParser = new ActionParser(this);
 			exprParser = new ExprParser();
 			stmtParser = new StatementParser();
 			typeParser = new TypeParser();
@@ -550,42 +548,31 @@ public class ALAstParser {
 	}
 
 	/**
-	 * Returns a name from the given tag. Location information is used only when
-	 * reporting an exception.
+	 * Adds the given action to the action list of this AST parser.
 	 * 
-	 * @param location
-	 *            location of the action
-	 * @param tag
-	 *            tag of the action, possibly empty
-	 * @return an action name
-	 * @throws OrccException
-	 *             if there are too many unnamed actions.
+	 * @param action
+	 *            an action
 	 */
-	private String getActionName(Location location, Tag tag)
-			throws OrccException {
-		StringBuilder builder = new StringBuilder();
-		if (tag.isEmpty()) {
-			builder.append("untagged");
+	public void add(Action action) {
+		actions.add(action);
+	}
 
-			untaggedCounter++;
-			if (untaggedCounter >= 100) {
-				final String message = "Whoa, this actor contains more than 100 anonymous actions. If you are "
-						+ "sure there is no other way for you to do what you want with less, "
-						+ "please contact us and we will see what we can do.";
-				throw new OrccException(file, location, message);
-			}
+	/**
+	 * Returns the file this AST parser is parsing.
+	 * 
+	 * @return the file this AST parser is parsing
+	 */
+	public String getFile() {
+		return file;
+	}
 
-			new Formatter(builder).format("%02d", untaggedCounter);
-		} else {
-			Iterator<String> it = tag.iterator();
-			builder.append(it.next());
-			while (it.hasNext()) {
-				builder.append('_');
-				builder.append(it.next());
-			}
-		}
-
-		return builder.toString();
+	/**
+	 * Returns the current scope of this AST parser.
+	 * 
+	 * @return the current scope of this AST parser
+	 */
+	public Scope<Variable> getScope() {
+		return currentScope;
 	}
 
 	/**
@@ -626,30 +613,6 @@ public class ALAstParser {
 		} catch (RecognitionException e) {
 			throw new OrccException("parse error", e);
 		}
-	}
-
-	private void parseAction(Tree tree) throws OrccException {
-		Tree tagTree = tree.getChild(0);
-		Location location = parseLocation(tree);
-		Tag tag = parseActionTag(tagTree);
-
-		Scope<Variable> tokens = new Scope<Variable>(currentScope, true);
-		currentScope = tokens;
-
-		stmtParser.parseBlock(tree, 4);
-		currentScope = currentScope.getParent();
-
-		String name = getActionName(location, tag);
-		Procedure scheduler = new Procedure("isSchedulable_" + name, false,
-				location, new BoolType(), tokens, new OrderedMap<Variable>(),
-				new ArrayList<CFGNode>());
-
-		Procedure body = new Procedure(name, false, location, new VoidType(),
-				tokens, new OrderedMap<Variable>(), new ArrayList<CFGNode>());
-
-		Action action = new Action(location, tag, new HashMap<Port, Integer>(),
-				new HashMap<Port, Integer>(), scheduler, body);
-		actions.add(action);
 	}
 
 	/**
@@ -715,7 +678,7 @@ public class ALAstParser {
 			Tree child = actorDecls.getChild(i);
 			switch (child.getType()) {
 			case RVCCalLexer.ACTION:
-				parseAction(child);
+				actionParser.parseAction(child);
 				break;
 			case RVCCalLexer.FUNCTION:
 				parseFunction(child);
@@ -835,7 +798,8 @@ public class ALAstParser {
 		currentScope = currentScope.getParent();
 
 		Procedure procedure = new Procedure(name, false, location,
-				new VoidType(), parameters, block.getVariables(), null);
+				new VoidType(), parameters, block.getVariables(), block
+						.getNodes());
 
 		procedures.add(file, location, name, procedure);
 	}

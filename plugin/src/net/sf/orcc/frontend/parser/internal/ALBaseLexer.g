@@ -33,9 +33,13 @@ lexer grammar ALBaseLexer;
 
 tokens {
   // common
+  INPUT;
   INPUTS;
+  OUTPUT;
   OUTPUTS;
+  PORT;
   PARAMETERS;
+  REPEAT;
   STATEMENTS;
   VARIABLE;
   VARIABLES;

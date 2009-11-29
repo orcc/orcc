@@ -52,13 +52,13 @@ actionGuards: GUARD expressions -> expressions;
 
 actionInput:
 	(ID ':')? '[' idents ']' actionRepeat?
-	{ };
+	-> ^(INPUT ^(PORT ID?) ^(INPUTS idents) ^(REPEAT actionRepeat?));
 
 actionInputs: actionInput (',' actionInput)* -> actionInput+;
 
 actionOutput:
 	(ID ':')? '[' expressions ']' actionRepeat?
-	{ };
+	-> ^(OUTPUT ^(PORT ID?) ^(OUTPUTS expressions) ^(REPEAT actionRepeat?));
 
 actionOutputs: actionOutput (',' actionOutput)* -> actionOutput+;
 
