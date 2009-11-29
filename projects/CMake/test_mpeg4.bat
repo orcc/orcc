@@ -1,9 +1,9 @@
-rem call build\RVC_MPEG4_SP_Decoder\Release\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\jvc013.m4v --o D:\sequences\MPEG4\SIMPLE\P-VOP\jvc013.yuv
+call build\RVC_MPEG4_SP_Decoder\Release\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\jvc013.m4v --o D:\sequences\MPEG4\SIMPLE\P-VOP\jvc013.yuv
 
-rem call build\RVC_MPEG4_SP_Decoder\Release\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\hit012.m4v --o D:\sequences\MPEG4\SIMPLE\P-VOP\hit012.yuv
-rem call build\RVC_MPEG4_SP_Decoder\Release\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san008.m4v --o D:\sequences\MPEG4\SIMPLE\P-VOP\san008.yuv
+call build\RVC_MPEG4_SP_Decoder\Release\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\hit012.m4v --o D:\sequences\MPEG4\SIMPLE\P-VOP\hit012.yuv
+call build\RVC_MPEG4_SP_Decoder\Release\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san008.m4v --o D:\sequences\MPEG4\SIMPLE\P-VOP\san008.yuv
 
-rem call build\RVC_MPEG4_SP_Decoder\Release\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san014.m4v --o D:\sequences\MPEG4\SIMPLE\P-VOP\san014.yuv
+call build\RVC_MPEG4_SP_Decoder\Release\RVC_MPEG4_SP_Decoder.exe -i D:\sequences\MPEG4\SIMPLE\P-VOP\san014.m4v --o D:\sequences\MPEG4\SIMPLE\P-VOP\san014.yuv
 
 
 rem intraQ

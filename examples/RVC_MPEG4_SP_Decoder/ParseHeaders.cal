@@ -521,8 +521,8 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   guard 
 	done_reading_bits()
   do
+	prev_quant:=vop_quant;
 	if (btype_is_Q) then
-		prev_quant:=vop_quant;
 		vop_quant:=vop_quant+dquant_table[read_result()];
         if ( vop_quant > 31 ) then 
             vop_quant := 31 ;
@@ -531,6 +531,7 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
             vop_quant := 1 ;
 		end
 	end
+	vop_quant:=vop_quant;
   end
   
   mb_dispatch_done: action ==>
