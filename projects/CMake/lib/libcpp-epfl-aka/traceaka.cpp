@@ -27,6 +27,8 @@
  * SUCH DAMAGE.
  */
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "traceaka.h"
 
 #include "stringaka.h"

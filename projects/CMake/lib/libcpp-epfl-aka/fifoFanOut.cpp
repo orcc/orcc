@@ -29,6 +29,8 @@
 
 #include "fifoFanOut.h"
 
+#include <assert.h>
+
 FifoFanOut::FifoFanOut()
 {
 }
@@ -64,26 +66,26 @@ void FifoFanOut::put(void * const pVal, const unsigned uNbVal)
 void FifoFanOut::get(void * const pVal)
 {
 	// Force an exception while this method should not be called
-	_ASSERT(0);
+	assert(false);
 }
 
 void FifoFanOut::get(void * const pVal, const unsigned uNbVal)
 {
 	// Force an exception while this method should not be called
-	_ASSERT(0);
+	assert(false);
 }
 
 
 void FifoFanOut::peek(void * const pVal)
 {
 	// Force an exception while this method should not be called
-	_ASSERT(0);
+	assert(false);
 }
 
 void FifoFanOut::peek(void * const pVal, const unsigned uNbVal)
 {
 	// Force an exception while this method should not be called
-	_ASSERT(0);
+	assert(false);
 }
 
 
@@ -134,7 +136,7 @@ bool FifoFanOut::hasRooms(const unsigned uNbVal)
 
 bool FifoFanOut::hasTokens(const unsigned pVal)
 {
-		// Force an exception while this method should not be called
-	_ASSERT(0);
+	// Force an exception while this method should not be called
+	assert(false);
 	return false;
 }
