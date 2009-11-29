@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.frontend.parser.internal.ALBaseLexer;
 import net.sf.orcc.frontend.parser.internal.C_ALLexer;
 import net.sf.orcc.frontend.parser.internal.C_ALParser;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
@@ -48,33 +47,18 @@ import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
-import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.ActionList;
-import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
@@ -95,318 +79,6 @@ import org.antlr.runtime.tree.Tree;
 public class ALAstParser {
 
 	/**
-	 * This class defines a parser that can parse AL expressions and translate
-	 * them to IR expressions.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class ExprParser {
-
-		/**
-		 * Returns the binary operator that match the type of the given tree.
-		 * 
-		 * @param op
-		 *            a Tree that represents an operator
-		 * @return a binary operator
-		 * @throws OrccException
-		 *             if the operator is not valid
-		 */
-		private BinaryOp parseBinaryOp(Tree op) throws OrccException {
-			switch (op.getType()) {
-			case ALBaseLexer.LOGIC_AND:
-				return BinaryOp.LOGIC_AND;
-			case ALBaseLexer.BITAND:
-				return BinaryOp.BITAND;
-			case ALBaseLexer.BITOR:
-				return BinaryOp.BITOR;
-			case ALBaseLexer.DIV:
-				return BinaryOp.DIV;
-			case ALBaseLexer.DIV_INT:
-				return BinaryOp.DIV_INT;
-			case ALBaseLexer.EQ:
-				return BinaryOp.EQ;
-			case ALBaseLexer.EXP:
-				return BinaryOp.EXP;
-			case ALBaseLexer.GE:
-				return BinaryOp.GE;
-			case ALBaseLexer.GT:
-				return BinaryOp.GT;
-			case ALBaseLexer.LE:
-				return BinaryOp.LE;
-			case ALBaseLexer.LT:
-				return BinaryOp.LT;
-			case ALBaseLexer.MINUS:
-				return BinaryOp.MINUS;
-			case ALBaseLexer.MOD:
-				return BinaryOp.MOD;
-			case ALBaseLexer.NE:
-				return BinaryOp.NE;
-			case ALBaseLexer.LOGIC_OR:
-				return BinaryOp.LOGIC_OR;
-			case ALBaseLexer.PLUS:
-				return BinaryOp.PLUS;
-			case ALBaseLexer.SHIFT_LEFT:
-				return BinaryOp.SHIFT_LEFT;
-			case ALBaseLexer.SHIFT_RIGHT:
-				return BinaryOp.SHIFT_RIGHT;
-			case ALBaseLexer.TIMES:
-				return BinaryOp.TIMES;
-			default:
-				throw new OrccException("Unknown operator: " + op.getText());
-			}
-		}
-
-		/**
-		 * Parses a sequence of binary operations represented by an ANTLR tree,
-		 * and transforms it to a binary expression tree using the operators'
-		 * precedences.
-		 * 
-		 * @param expr
-		 *            a tree that contains a binary operation sequence
-		 * @return an expression
-		 * @throws OrccException
-		 */
-		private Expression parseBinOpSeq(Tree expr) throws OrccException {
-			Tree treeExprs = expr.getChild(0);
-			int numExprs = treeExprs.getChildCount();
-			List<Expression> expressions = new ArrayList<Expression>(numExprs);
-			for (int i = 0; i < numExprs; i++) {
-				expressions.add(parseExpression(treeExprs.getChild(i)));
-			}
-
-			Tree treeOps = expr.getChild(1);
-			int numOps = treeOps.getChildCount();
-			List<BinaryOp> operators = new ArrayList<BinaryOp>(numOps);
-			for (int i = 0; i < numOps; i++) {
-				operators.add(parseBinaryOp(treeOps.getChild(i)));
-			}
-
-			return BinOpSeqParser.parse(expressions, operators);
-		}
-
-		/**
-		 * Parses the given tree as an expression. This method is package
-		 * because it should be called from {@link RVCCalASTParser} only.
-		 * 
-		 * @param expr
-		 *            a tree that contains an expression
-		 * @return an {@link Expression}.
-		 * @throws OrccException
-		 */
-		public Expression parseExpression(Tree expr) throws OrccException {
-			switch (expr.getType()) {
-			case ALBaseLexer.EXPR_BINARY:
-				return parseBinOpSeq(expr);
-			case ALBaseLexer.EXPR_BOOL: {
-				expr = expr.getChild(0);
-				boolean value = Boolean.parseBoolean(expr.getText());
-				return new BoolExpr(parseLocation(expr), value);
-			}
-			case ALBaseLexer.EXPR_FLOAT:
-				throw new OrccException("not yet implemented!");
-			case ALBaseLexer.EXPR_INT:
-				expr = expr.getChild(0);
-				int value = Integer.parseInt(expr.getText());
-				return new IntExpr(parseLocation(expr), value);
-			case ALBaseLexer.EXPR_STRING:
-				expr = expr.getChild(0);
-				return new StringExpr(parseLocation(expr), expr.getText());
-			case ALBaseLexer.EXPR_VAR:
-				return parseExprVar(expr.getChild(0));
-			default:
-				throw new OrccException("not yet implemented");
-			}
-		}
-
-		private Expression parseExprVar(Tree tree) throws OrccException {
-			Location location = parseLocation(tree);
-
-			Variable variable = currentScope.get(tree.getText());
-			if (variable == null) {
-				throw new OrccException(file, location, "unknown variable: "
-						+ variable);
-			}
-			Use localUse = new Use(variable);
-			return new VarExpr(location, localUse);
-		}
-
-	}
-
-	private class StatementParser {
-
-		private Block parseBlock(Tree tree, int start) throws OrccException {
-			Scope<Variable> variables = new Scope<Variable>(currentScope, false);
-			currentScope = variables;
-			parseLocalVariables(variables, tree.getChild(start));
-
-			// parse nodes
-			List<CFGNode> nodes = null;
-			currentScope = currentScope.getParent();
-
-			return new Block(variables, nodes);
-		}
-
-		/**
-		 * Parses the given tree as a local parameter/local variable.
-		 * 
-		 * @param tree
-		 *            a tree whose root is VARIABLE.
-		 * @return a local variable
-		 * @throws OrccException
-		 */
-		private LocalVariable parseLocalVariable(Tree tree)
-				throws OrccException {
-			Type type = typeParser.parseType(tree.getChild(0));
-			Tree nameTree = tree.getChild(1);
-			Location location = parseLocation(nameTree);
-			String name = nameTree.getText();
-			boolean assignable = (tree.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
-
-			if (tree.getChildCount() == 4) {
-				exprParser.parseExpression(tree.getChild(3));
-			}
-
-			Instruction instruction = null;
-			return new LocalVariable(assignable, 0, location, name,
-					instruction, null, type);
-		}
-
-		private void parseLocalVariables(Scope<Variable> variables, Tree tree)
-				throws OrccException {
-			int numChildren = tree.getChildCount();
-			for (int i = 0; i < numChildren; i++) {
-				LocalVariable variable = parseLocalVariable(tree.getChild(i));
-				variables.add(file, variable.getLocation(), variable.getName(),
-						variable);
-			}
-		}
-	}
-
-	/**
-	 * This class defines a parser that can parse AL types and translate them to
-	 * IR types;
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class TypeParser {
-
-		/**
-		 * Parses the given tree as an {@link Type}.
-		 * 
-		 * @param tree
-		 *            a tree whose root is TYPE or TYPE_LIST.
-		 * @return a type
-		 * @throws OrccException
-		 */
-		private Type parseType(Tree tree) throws OrccException {
-			if (tree.getType() == ALBaseLexer.TYPE) {
-				return parseTYPE(tree);
-			} else if (tree.getType() == ALBaseLexer.TYPE_LIST) {
-				return parseTypeList(tree);
-			} else {
-				throw new OrccException("unknown type node: " + tree.getType());
-			}
-		}
-
-		private Type parseTYPE(Tree tree) throws OrccException {
-			Tree typeTree = tree.getChild(0);
-			Location location = parseLocation(typeTree);
-			String typeName = typeTree.getText();
-
-			if (typeName.equals(BoolType.NAME)) {
-				return new BoolType();
-			} else if (typeName.equals(StringType.NAME)) {
-				return new StringType();
-			} else if (typeName.equals(VoidType.NAME)) {
-				return new VoidType();
-			} else if (typeName.equals(IntType.NAME)) {
-				Expression size = parseTypeAttributeSize(location, tree, 32);
-				return new IntType(size);
-			} else if (typeName.equals(UintType.NAME)) {
-				Expression size = parseTypeAttributeSize(location, tree, 32);
-				return new UintType(size);
-			} else if (typeName.equals(ListType.NAME)) {
-				Expression size = parseTypeAttributeSize(location, tree, null);
-				Type subType = parseTypeAttributeType(location, tree);
-				return new ListType(size, subType);
-			} else if (typeName.equals("float") || typeName.equals("unsigned")) {
-				System.out.println("TODO: " + typeName);
-				return new VoidType();
-			} else {
-				throw new OrccException(file, location, "Unknown type: "
-						+ typeName);
-			}
-		}
-
-		private Expression parseTypeAttributeSize(Location location, Tree type,
-				Integer defaultSize) throws OrccException {
-			int n = type.getChildCount();
-			for (int i = 1; i < n; i++) {
-				Tree attr = type.getChild(i);
-				if (attr.getType() == RVCCalLexer.EXPR) {
-					if (attr.getChildCount() > 1
-							&& !attr.getChild(1).getText().equals(AST.SIZE)) {
-						throw new OrccException(file, location, "unknown \""
-								+ attr.getChild(1).getText() + "\" attribute");
-					}
-
-					return exprParser.parseExpression(attr.getChild(0));
-				}
-			}
-
-			// if there is a default size, return it
-			if (defaultSize == null) {
-				// size attribute not found, and no default size given => error
-				throw new OrccException(file, location,
-						"missing \"size\" attribute");
-			} else {
-				return new IntExpr(location, defaultSize);
-			}
-		}
-
-		private Type parseTypeAttributeType(Location location, Tree typeAttrs)
-				throws OrccException {
-			int n = typeAttrs.getChildCount();
-			for (int i = 1; i < n; i++) {
-				Tree attr = typeAttrs.getChild(i);
-				if (attr.getType() == RVCCalLexer.TYPE) {
-					if (attr.getChildCount() > 1
-							&& !attr.getChild(1).getText().equals(AST.TYPE)) {
-						throw new OrccException(file, location, "unknown \""
-								+ attr.getChild(1).getText() + "\" attribute");
-					}
-
-					return parseType(attr.getChild(0));
-				}
-			}
-
-			// type attribute not found, and no default type given => error
-			throw new OrccException(file, location,
-					"missing \"type\" attribute");
-		}
-
-		/**
-		 * Parses a TYPE_LIST tree and return a {@link ListType}.
-		 * 
-		 * @param tree
-		 *            a tree whose root is TYPE_LIST
-		 * @return an {@link Type}
-		 * @throws OrccException
-		 */
-		private Type parseTypeList(Tree tree) throws OrccException {
-			Type type = parseType(tree.getChild(0));
-			for (int i = tree.getChildCount() - 1; i > 0; i--) {
-				Expression size = exprParser.parseExpression(tree.getChild(i));
-				type = new ListType(size, type);
-			}
-
-			return type;
-		}
-	}
-
-	/**
 	 * the action parser
 	 */
 	private ActionParser actionParser;
@@ -417,14 +89,9 @@ public class ALAstParser {
 	private ActionList actions;
 
 	/**
-	 * Contains the current scope of variables
-	 */
-	private Scope<Variable> currentScope;
-
-	/**
 	 * expression parser.
 	 */
-	private final ExprParser exprParser;
+	private final ExpressionParser exprParser;
 
 	/**
 	 * absolute name of input file
@@ -497,10 +164,10 @@ public class ALAstParser {
 		try {
 			this.file = new File(fileName).getCanonicalPath();
 
-			actionParser = new ActionParser(this);
-			exprParser = new ExprParser();
-			stmtParser = new StatementParser();
-			typeParser = new TypeParser();
+			actionParser = new ActionParser(file);
+			exprParser = new ExpressionParser(file);
+			typeParser = new TypeParser(file, exprParser);
+			stmtParser = new StatementParser(file, typeParser, exprParser);
 		} catch (IOException e) {
 			String msg = "could not solve the path \"" + fileName + "\"";
 			throw new OrccException(msg, e);
@@ -524,15 +191,6 @@ public class ALAstParser {
 	 */
 	public String getFile() {
 		return file;
-	}
-
-	/**
-	 * Returns the current scope of this AST parser.
-	 * 
-	 * @return the current scope of this AST parser
-	 */
-	public Scope<Variable> getScope() {
-		return currentScope;
 	}
 
 	/**
@@ -601,7 +259,7 @@ public class ALAstParser {
 
 		// parse parameters
 		parameters = new Scope<Variable>();
-		currentScope = parameters;
+		exprParser.setVariableScope(parameters);
 		parseActorParameters(tree.getChild(2));
 
 		// parse ports and return them as ordered maps
@@ -610,7 +268,8 @@ public class ALAstParser {
 
 		// parse actor declarations
 		stateVars = new Scope<Variable>(parameters, false);
-		currentScope = stateVars;
+		exprParser.setVariableScope(stateVars);
+		actionParser.setVariableScope(stateVars);
 		parseActorDeclarations(tree.getChild(5));
 
 		// sort actions by priority
@@ -638,7 +297,7 @@ public class ALAstParser {
 			Tree child = actorDecls.getChild(i);
 			switch (child.getType()) {
 			case RVCCalLexer.ACTION:
-				actionParser.parseAction(child);
+				actions.add(actionParser.parseAction(child));
 				break;
 			case RVCCalLexer.FUNCTION:
 				parseFunction(child);
@@ -746,16 +405,15 @@ public class ALAstParser {
 	}
 
 	private void parseProcedure(Tree tree) throws OrccException {
-		Scope<Variable> parameters = new Scope<Variable>(currentScope, true);
-		currentScope = parameters;
+		Scope<Variable> parameters = new Scope<Variable>(stateVars, true);
 		Tree nameTree = tree.getChild(0);
 		String name = nameTree.getText();
 		Location location = parseLocation(nameTree);
 
+		stmtParser.setVariableScope(parameters);
 		stmtParser.parseLocalVariables(parameters, tree.getChild(1));
 
 		Block block = stmtParser.parseBlock(tree, 2);
-		currentScope = currentScope.getParent();
 
 		Procedure procedure = new Procedure(name, false, location,
 				new VoidType(), parameters, block.getVariables(), block

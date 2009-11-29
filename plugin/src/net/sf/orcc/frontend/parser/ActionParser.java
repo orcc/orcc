@@ -59,6 +59,11 @@ import org.antlr.runtime.tree.Tree;
 public class ActionParser {
 
 	/**
+	 * the file being parsed
+	 */
+	private final String file;
+
+	/**
 	 * input pattern of the action being parsed
 	 */
 	private Map<Port, Integer> inputPattern;
@@ -73,10 +78,7 @@ public class ActionParser {
 	 */
 	private Map<Port, Integer> outputPattern;
 
-	/**
-	 * AST parser
-	 */
-	private ALAstParser parser;
+	private Scope<Variable> scope;
 
 	/**
 	 * this integer is used to give a name to untagged actions.
@@ -89,13 +91,14 @@ public class ActionParser {
 	private Scope<Variable> variables;
 
 	/**
-	 * Creates a new action parser from the given AST parser.
+	 * Creates a new action parser with the given file.
 	 * 
-	 * @param parser
-	 *            an AST parser
+	 * @param file
+	 *            the file being parsed
+	 * 
 	 */
-	public ActionParser(ALAstParser parser) {
-		this.parser = parser;
+	public ActionParser(String file) {
+		this.file = file;
 	}
 
 	private Procedure createSchedulingProcedure(Procedure body, Tree guards) {
@@ -137,7 +140,7 @@ public class ActionParser {
 				final String message = "Whoa, this actor contains more than 100 anonymous actions. If you are "
 						+ "sure there is no other way for you to do what you want with less, "
 						+ "please contact us and we will see what we can do.";
-				throw new OrccException(parser.getFile(), location, message);
+				throw new OrccException(file, location, message);
 			}
 
 			new Formatter(builder).format("%02d", untaggedCounter);
@@ -153,12 +156,12 @@ public class ActionParser {
 		return builder.toString();
 	}
 
-	public void parseAction(Tree tree) throws OrccException {
+	public Action parseAction(Tree tree) throws OrccException {
 		Tree tagTree = tree.getChild(0);
 		Location location = parseLocation(tree);
 		Tag tag = parseActionTag(tagTree);
 
-		variables = new Scope<Variable>(parser.getScope(), true);
+		variables = new Scope<Variable>(scope, true);
 		nodes = new ArrayList<CFGNode>();
 
 		parseInputPattern(tree.getChild(1));
@@ -173,7 +176,7 @@ public class ActionParser {
 
 		Action action = new Action(location, tag, inputPattern, outputPattern,
 				scheduler, body);
-		parser.add(action);
+		return action;
 	}
 
 	private void parseBody(Tree tree, int i, int j) {
@@ -186,6 +189,16 @@ public class ActionParser {
 
 	private void parseOutputPattern(Tree child) {
 		outputPattern = new HashMap<Port, Integer>();
+	}
+
+	/**
+	 * Sets the current scope of variable.
+	 * 
+	 * @param scope
+	 *            the current scope of variable
+	 */
+	public void setVariableScope(Scope<Variable> scope) {
+		this.scope = scope;
 	}
 
 }
