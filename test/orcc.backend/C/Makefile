@@ -1,6 +1,6 @@
 SOURCES = $(shell ls *.c)
 
-CFLAGS = -I ../../../runtime/liborcc/include
+CFLAGS = -I ../../../projects/CMake/include/liborcc
 
 executable: $(SOURCES:%.c=%.o)
 	$(CC) $(LDFLAGS) -o $@ $^ 
