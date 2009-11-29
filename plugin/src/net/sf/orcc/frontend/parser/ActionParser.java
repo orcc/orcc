@@ -33,6 +33,7 @@ import static net.sf.orcc.frontend.parser.Util.parseLocation;
 
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class ActionParser {
 		this.parser = parser;
 	}
 
-	private Procedure createSchedulingProcedure(Procedure body) {
+	private Procedure createSchedulingProcedure(Procedure body, Tree guards) {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		Location location = new Location();
@@ -161,22 +162,30 @@ public class ActionParser {
 		nodes = new ArrayList<CFGNode>();
 
 		parseInputPattern(tree.getChild(1));
-		
+		parseBody(tree, 4, 5);
+		parseOutputPattern(tree.getChild(2));
 
 		String name = getActionName(location, tag);
 		Procedure body = new Procedure(name, false, location, new VoidType(),
 				new OrderedMap<Variable>(), variables, nodes);
 
-		Procedure scheduler = createSchedulingProcedure(body);
+		Procedure scheduler = createSchedulingProcedure(body, tree.getChild(3));
 
 		Action action = new Action(location, tag, inputPattern, outputPattern,
 				scheduler, body);
 		parser.add(action);
 	}
 
-	private void parseInputPattern(Tree tree) {
+	private void parseBody(Tree tree, int i, int j) {
 		// TODO Auto-generated method stub
+	}
 
+	private void parseInputPattern(Tree tree) {
+		inputPattern = new HashMap<Port, Integer>();
+	}
+
+	private void parseOutputPattern(Tree child) {
+		outputPattern = new HashMap<Port, Integer>();
 	}
 
 }

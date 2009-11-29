@@ -95,46 +95,6 @@ import org.antlr.runtime.tree.Tree;
 public class ALAstParser {
 
 	/**
-	 * This class defines a block. A block contains variables and nodes.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class Block {
-
-		private List<CFGNode> nodes;
-
-		private Scope<Variable> variables;
-
-		/**
-		 * Creates a new block with the given variables and nodes.
-		 * 
-		 * @param variables
-		 *            a scope of variables
-		 * @param nodes
-		 *            a list of CFG nodes
-		 */
-		public Block(Scope<Variable> variables, List<CFGNode> nodes) {
-			this.variables = variables;
-			this.nodes = nodes;
-		}
-
-		public List<CFGNode> getNodes() {
-			return nodes;
-		}
-
-		public Scope<Variable> getVariables() {
-			return variables;
-		}
-
-		@Override
-		public String toString() {
-			return nodes.toString();
-		}
-
-	}
-
-	/**
 	 * This class defines a parser that can parse AL expressions and translate
 	 * them to IR expressions.
 	 * 
