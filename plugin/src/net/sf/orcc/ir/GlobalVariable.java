@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.consts.AbstractConstant;
 
 /**
@@ -93,11 +93,13 @@ public class GlobalVariable extends Variable {
 	/**
 	 * Evaluates this variable's value to a constant.
 	 * 
-	 * @throws OrccException
+	 * @throws OrccRuntimeException
 	 *             if the value could not be evaluated to a constant
 	 */
-	public void evaluate() throws OrccException {
-		constantValue = AbstractConstant.evaluate(getExpression());
+	public void evaluate() {
+		if (hasExpression()) {
+			constantValue = AbstractConstant.evaluate(getExpression());
+		}
 	}
 
 	/**
@@ -106,22 +108,15 @@ public class GlobalVariable extends Variable {
 	 * 
 	 * @return a constant, or <code>null</code> if this variable has no constant
 	 *         value.
+	 * @throws OrccRuntimeException
+	 *             if the value could not be evaluated to a constant
 	 */
-	public Constant getConstantValue() throws OrccException {
-		if (constantValue == null) {
+	public Constant getConstantValue() {
+		if (constantValue == null && hasExpression()) {
 			evaluate();
 		}
 
 		return constantValue;
-	}
-
-	/**
-	 * Returns <code>true</code> if this global variable has a value.
-	 * 
-	 * @return <code>true</code> if this global variable has a value
-	 */
-	public boolean hasExpression() {
-		return (getExpression() != null);
 	}
 
 }

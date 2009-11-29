@@ -513,7 +513,7 @@ public class XlimActorPrinter {
 					}
 				} else {
 					// For others just use the init value
-					Constant value = state.getInit();
+					Constant value = state.getConstantValue();
 					if (value != null) {
 						value.accept(new XlimValueVisitor(init2, state
 								.getType()));

@@ -52,7 +52,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
@@ -238,7 +237,7 @@ public class ALAstParser {
 		 * @return an {@link Expression}.
 		 * @throws OrccException
 		 */
-		Expression parseExpression(Tree expr) throws OrccException {
+		public Expression parseExpression(Tree expr) throws OrccException {
 			switch (expr.getType()) {
 			case ALBaseLexer.EXPR_BINARY:
 				return parseBinOpSeq(expr);
@@ -856,8 +855,9 @@ public class ALAstParser {
 		String name = nameTree.getText();
 		boolean assignable = (tree.getChild(2).getType() == RVCCalLexer.ASSIGNABLE);
 
-		Constant init = null;
+		Expression init = null;
 		if (tree.getChildCount() == 4) {
+			init = exprParser.parseExpression(tree.getChild(3));
 		}
 
 		StateVariable stateVariable = new StateVariable(location, type, name,

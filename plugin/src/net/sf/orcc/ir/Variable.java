@@ -166,8 +166,9 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
-	 * Gets the current valuing expression of this variable.
+	 * Returns the initial expression of this variable.
 	 * 
+	 * @return the initial expression of this variable
 	 */
 	public Expression getExpression() {
 		return expression;
@@ -216,6 +217,15 @@ public abstract class Variable implements INameable {
 	 */
 	public Object getValue() {
 		return value;
+	}
+
+	/**
+	 * Returns <code>true</code> if this variable has an initial expression.
+	 * 
+	 * @return <code>true</code> if this variable has an initial expression
+	 */
+	public boolean hasExpression() {
+		return (expression != null);
 	}
 
 	/**
@@ -285,10 +295,10 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
-	 * Sets the valuing expression of this variable.
+	 * Sets the initial expression of this variable.
 	 * 
 	 * @param expression
-	 *            the valuing expression of this variable
+	 *            the initial expression of this variable
 	 */
 	public void setExpression(Expression expression) {
 		this.expression = expression;

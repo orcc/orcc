@@ -574,10 +574,14 @@ public class IRWriter {
 		variableArray.put(writeLocation(variable.getLocation()));
 		variableArray.put(writeType(variable.getType()));
 
-		// value
-		JSONArray constantArray = (JSONArray) variable.getConstantValue()
-				.accept(new ConstantWriter());
-		array.put(constantArray);
+		Constant constant = variable.getConstantValue();
+		if (constant == null) {
+			array.put(JSONObject.NULL);
+		} else {
+			Object constantValue = variable.getConstantValue().accept(
+					new ConstantWriter());
+			array.put(constantValue);
+		}
 
 		return array;
 	}

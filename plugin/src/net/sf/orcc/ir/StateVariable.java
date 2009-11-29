@@ -62,12 +62,23 @@ public class StateVariable extends GlobalVariable {
 		this.constantValue = value;
 	}
 
-	public Constant getInit() {
-		return constantValue;
-	}
-
-	public boolean hasInit() {
-		return (constantValue != null);
+	/**
+	 * Creates a new state variable with the given location, type, name and
+	 * initial value expressed as an expression.
+	 * 
+	 * @param location
+	 *            the state variable location
+	 * @param type
+	 *            the state variable type
+	 * @param name
+	 *            the state variable name
+	 * @param value
+	 *            initial value
+	 */
+	public StateVariable(Location location, Type type, String name,
+			boolean assignable, Expression value) {
+		super(location, type, name, value);
+		this.assignable = assignable;
 	}
 
 	/**

@@ -36,8 +36,8 @@ $endif$
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-$if(variable.init)$
-static $variableDeclaration(variable)$ = $variable.init$;$\n$
+$if(variable.constantValue)$
+static $variableDeclaration(variable)$ = $variable.constantValue$;$\n$
 $else$
 static $variableDeclaration(variable)$;$\n$
 $endif$

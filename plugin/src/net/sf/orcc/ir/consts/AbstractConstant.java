@@ -31,7 +31,7 @@ package net.sf.orcc.ir.consts;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Printer;
@@ -54,10 +54,10 @@ public abstract class AbstractConstant implements Constant {
 	 * @param expr
 	 *            an expression
 	 * @return a constant
-	 * @throws OrccException
+	 * @throws OrccRuntimeException
 	 *             if the expression could not be evaluated to a constant
 	 */
-	public static Constant evaluate(Expression expr) throws OrccException {
+	public static Constant evaluate(Expression expr) {
 		if (expr.getType() == Expression.BOOLEAN) {
 			boolean value = ((BoolExpr) expr).getValue();
 			return new BoolConst(value);
@@ -76,7 +76,7 @@ public abstract class AbstractConstant implements Constant {
 			String value = ((StringExpr) expr).getValue();
 			return new StringConst(value);
 		} else {
-			throw new OrccException("this expression is not constant");
+			throw new OrccRuntimeException("this expression is not constant");
 		}
 	}
 

@@ -34,8 +34,8 @@ $endif$
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-$if(variable.init)$
-@$variable$ = internal global $variable.type$ $variable.init$
+$if(variable.constantValue)$
+@$variable$ = internal global $variable.type$ $variable.constantValue$
 
 $else$
 @$variable$ = internal global $variable.type$ zeroinitializer

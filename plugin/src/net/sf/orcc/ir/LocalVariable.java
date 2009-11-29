@@ -52,7 +52,7 @@ public class LocalVariable extends Variable implements
 	private Expression constantExpr;
 
 	/**
-	 * if the variable is local, index for SSA. Meaningless otherwise.
+	 * SSA index.
 	 */
 	private int index;
 

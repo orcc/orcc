@@ -36,8 +36,8 @@ $endif$
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-$if(variable.init)$
-$variable.type$ actor_$actorName$::$variable$$listSize(variable.type.dimensions)$ = $variable.init$;$\n$
+$if(variable.constantValue)$
+$variable.type$ actor_$actorName$::$variable$$listSize(variable.type.dimensions)$ = $variable.constantValue$;$\n$
 $else$
 $variable.type$ actor_$actorName$::$variable$$listSize(variable.type.dimensions)$;$\n$
 $endif$

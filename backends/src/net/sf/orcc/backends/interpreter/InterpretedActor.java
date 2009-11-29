@@ -95,8 +95,8 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		for (Variable stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
 			// Initialize variables with constant values
-			if (((StateVariable) stateVar).hasInit()) {
-				Constant initConst = ((StateVariable) stateVar).getInit();
+			if (stateVar.hasExpression()) {
+				Constant initConst = ((StateVariable) stateVar).getConstantValue();
 				Object initVal = initConst.accept(constEval);
 				stateVar.setValue(initVal);
 			} else if (type.getType() == Type.LIST) {
