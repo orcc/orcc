@@ -62,6 +62,42 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	public Object interpret(BinaryExpr expr, Object... args) {
 		Object val1 = expr.getE1().accept(this);
 		Object val2 = expr.getE2().accept(this);
+		return interpretBinaryExpr(expr, val1, val2);
+	}
+
+	@Override
+	public Object interpret(BoolExpr expr, Object... args) {
+		return expr.getValue();
+	}
+
+	@Override
+	public Object interpret(IntExpr expr, Object... args) {
+		return expr.getValue();
+	}
+
+	@Override
+	public Object interpret(ListExpr expr, Object... args) {
+		throw new OrccRuntimeException("can not evaluate List expression");
+	}
+
+	@Override
+	public Object interpret(StringExpr expr, Object... args) {
+		return expr.getValue();
+	}
+
+	@Override
+	public Object interpret(UnaryExpr expr, Object... args) {
+		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
+		return interpretUnaryExpr(expr, value);
+	}
+
+	@Override
+	public Object interpret(VarExpr expr, Object... args) {
+		return expr.getVar().getVariable().getValue();
+	}
+
+	protected Object interpretBinaryExpr(BinaryExpr expr, Object val1,
+			Object val2) {
 		switch (expr.getOp()) {
 		case BITAND:
 			if (val1 instanceof Integer && val2 instanceof Integer) {
@@ -207,29 +243,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 						+ val2);
 	}
 
-	@Override
-	public Object interpret(BoolExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object interpret(IntExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object interpret(ListExpr expr, Object... args) {
-		throw new OrccRuntimeException("can not evaluate List expression");
-	}
-
-	@Override
-	public Object interpret(StringExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object interpret(UnaryExpr expr, Object... args) {
-		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
+	protected Object interpretUnaryExpr(UnaryExpr expr, Object value) {
 		switch (expr.getOp()) {
 		case BITNOT:
 			if (value instanceof Integer) {
@@ -257,10 +271,5 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 				"could not evaluate unary expression with OP="
 						+ expr.getOp().toString() + "("
 						+ expr.getOp().getText() + ")");
-	}
-
-	@Override
-	public Object interpret(VarExpr expr, Object... args) {
-		return expr.getVar().getVariable().getValue();
 	}
 }
