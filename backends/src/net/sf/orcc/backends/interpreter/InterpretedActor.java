@@ -99,8 +99,19 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		}
 	}
 
-	public String getFsmState() {
-		return fsmState;
+	/**
+	 * Executes the given action once.
+	 * 
+	 * @param action
+	 *            an action
+	 * @return <code>1</code>
+	 */
+	private int execute(Action action) {
+		interpretProc(action.getBody());
+		System.out.println("Executing action : " + action.getBody().getName());
+
+		// Execute 1 action only per actor scheduler cycle
+		return 1;
 	}
 
 	/**
@@ -176,6 +187,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -190,9 +202,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			// Check for untagged actions first
 			for (Action action : sched.getActions()) {
 				if (isSchedulable(action)) {
-					interpretProc(action.getBody());
-					System.out.println("Executing action : "
-							+ action.getBody().getName());
+					return execute(action);
 				}
 			}
 
@@ -202,14 +212,10 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				String name = action.getBody().getName();
 				System.out.println("Check schedulable : " + name);
 				if (isSchedulable(action)) {
-					interpretProc(action.getBody());
-					System.out.println("Executing action : " + name);
-
 					// Update FSM state
 					fsmState = info.getTargetState().getName();
 
-					// Execute 1 action only per actor scheduler cycle
-					return 1;
+					return execute(action);
 				}
 			}
 		} else {
@@ -217,11 +223,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				String name = action.getBody().getName();
 				System.out.println("Checking schedulable action : " + name);
 				if (isSchedulable(action)) {
-					interpretProc(action.getBody());
-					System.out.println("Executing action : " + name);
-
-					// Execute 1 action only per actor scheduler cycle
-					return 1;
+					return execute(action);
 				}
 			}
 		}
