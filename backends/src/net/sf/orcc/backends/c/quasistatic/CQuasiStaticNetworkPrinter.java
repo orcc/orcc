@@ -24,7 +24,6 @@ import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 
 /*
  * Copyright(c)2009 Victor Martin, Jani Boutellier

@@ -31,7 +31,7 @@ package net.sf.orcc.ir;
 import java.util.List;
 
 /**
- * An action scheduler.
+ * This class defines an action scheduler.
  * 
  * @author Matthieu Wipliez
  * 
@@ -47,16 +47,44 @@ public class ActionScheduler {
 		this.fsm = fsm;
 	}
 
+	/**
+	 * Returns the actions that are outside of an FSM. If this action scheduler
+	 * has no FSM, all actions of the actor are returned. The actions are sorted
+	 * by decreasing priority.
+	 * 
+	 * @return a list of actions
+	 */
 	public List<Action> getActions() {
 		return actions;
 	}
 
+	/**
+	 * Returns the FSM of this action scheduler, or <code>null</code> if it does
+	 * not have one.
+	 * 
+	 * @return the FSM of this action scheduler
+	 */
 	public FSM getFsm() {
 		return fsm;
 	}
 
+	/**
+	 * Returns true if this action scheduler has an FSM.
+	 * 
+	 * @return true if this action scheduler has an FSM
+	 */
 	public boolean hasFsm() {
 		return (fsm != null);
+	}
+
+	/**
+	 * Sets the FSM of this action scheduler to the given FSM.
+	 * 
+	 * @param fsm
+	 *            an FSM
+	 */
+	public void setFsm(FSM fsm) {
+		this.fsm = fsm;
 	}
 
 }

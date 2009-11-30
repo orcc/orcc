@@ -32,6 +32,7 @@ import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.ICommunicationFifo;
@@ -63,24 +64,34 @@ import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
+ * This class defines a node interpreter.
  * 
  * @author Pierre-Laurent Lagalaye
  * 
  */
 public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
-	private boolean blockReturn = false;
-	private ExpressionEvaluator exprInterpreter;
-	// private String actorName;
-	private ListAllocator listAllocator;
+	private boolean blockReturn;
+
+	protected ExpressionEvaluator exprInterpreter;
+
+	protected ListAllocator listAllocator;
+
 	private Object returnValue;
 
 	public NodeInterpreter(String id) {
-		// this.actorName = id;
 		// Create the List allocator for called procedure local vars
 		listAllocator = new ListAllocator();
+
 		// Create the expression evaluator
 		this.exprInterpreter = new ExpressionEvaluator();
+	}
+
+	/**
+	 * Creates a new node interpreter without setting its list allocator nor its
+	 * expression interpreter.
+	 */
+	protected NodeInterpreter() {
 	}
 
 	public Object getReturnValue() {
@@ -244,7 +255,8 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(SpecificInstruction instr, Object... args) {
-		// Nothing to do
+		throw new OrccRuntimeException("does not know how to interpret a "
+				+ "specific instruction");
 	}
 
 	@Override

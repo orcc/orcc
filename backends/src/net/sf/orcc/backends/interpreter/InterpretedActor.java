@@ -45,7 +45,9 @@ import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.consts.ConstantEvaluator;
 
 /**
- * Interpreted actors made of an IR Actor, an FSM state and a scheduling state.
+ * This class defines an actor that can be interpreted by calling
+ * {@link #initialize()} and {@link #schedule()}. It consists in an action
+ * scheduler, an FSM state, and a node interpreter.
  * 
  * @author Pierre-Laurent Lagalaye
  * 
@@ -54,15 +56,13 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 	private ConstantEvaluator constEval;
 
-	private String fsmState;
+	protected String fsmState;
 
-	private NodeInterpreter interpret;
+	protected NodeInterpreter interpret;
 
 	private ListAllocator listAllocator;
 
-	private ActionScheduler sched;
-
-	// private List<Actor> schedPred;
+	protected ActionScheduler sched;
 
 	public InterpretedActor(String id, Actor actor) {
 		super(id, actor);
@@ -83,6 +83,8 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		// Creates an expression evaluator for state and local variables init
 		this.constEval = new ConstantEvaluator();
 	}
+
+	// private List<Actor> schedPred;
 
 	private boolean checkOutputPattern(Map<Port, Integer> outputPattern) {
 		if (outputPattern != null) {
@@ -106,7 +108,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 *            an action
 	 * @return <code>1</code>
 	 */
-	private int execute(Action action) {
+	protected int execute(Action action) {
 		interpretProc(action.getBody());
 		System.out.println("Executing action : " + action.getBody().getName());
 
@@ -115,8 +117,16 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	}
 
 	/**
-	 * Launch initializing actions for each network actor.
+	 * Returns the name of the current FSM state.
 	 * 
+	 * @return the name of the current FSM state
+	 */
+	public String getFsmState() {
+		return fsmState;
+	}
+
+	/**
+	 * Launch initializing actions of this actor.
 	 */
 	public void initialize() {
 		// Check for List state variables which need to be allocated or
@@ -124,16 +134,19 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		for (Variable stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
 			// Initialize variables with constant values
-			if (stateVar.hasExpression()) {
-				Constant initConst = ((StateVariable) stateVar)
-						.getConstantValue();
+			Constant initConst = ((StateVariable) stateVar).getConstantValue();
+			if (initConst == null) {
+				if (type.getType() == Type.LIST) {
+					// Allocate empty array variable
+					stateVar.setValue(listAllocator.allocate(type));
+				}
+			} else {
+				// initialize
 				Object initVal = initConst.accept(constEval);
 				stateVar.setValue(initVal);
-			} else if (type.getType() == Type.LIST) {
-				// Allocate empty array variable
-				stateVar.setValue(listAllocator.allocate(type));
 			}
 		}
+
 		// Get initializing procedure if any
 		for (Action action : actor.getInitializes()) {
 			System.out.println("Initialize actor " + name);
@@ -154,7 +167,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * 
 	 * @return an object which contains procedure returned value
 	 */
-	private Object interpretProc(Procedure procedure) {
+	protected Object interpretProc(Procedure procedure) {
 		// Don't mind about procedure parameters (already set)
 
 		// Allocate local List variables
@@ -180,7 +193,14 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		return result;
 	}
 
-	private boolean isSchedulable(Action action) {
+	/**
+	 * Returns true if the given action is schedulable.
+	 * 
+	 * @param action
+	 *            an action
+	 * @return true if the given action is schedulable
+	 */
+	protected boolean isSchedulable(Action action) {
 		Object isSchedulable = interpretProc(action.getScheduler());
 		if ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable)) {
 			if (checkOutputPattern(action.getOutputPattern())) {
@@ -194,6 +214,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	/**
 	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
 	 * 
+	 * @return the number of actions fired
 	 */
 	public Integer schedule() {
 		if (sched.hasFsm()) {
@@ -227,6 +248,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				}
 			}
 		}
+
 		return 0;
 	}
 
