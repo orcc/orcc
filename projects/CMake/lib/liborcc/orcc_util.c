@@ -103,9 +103,11 @@ void print_usage() {
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[], char *env[]) {
 	int c;
+	const char *ostr = "i:o:";
 
 	program = argv[0];
-	c = getopt(argc, argv, "i:y:");
+	
+	c = getopt(argc, argv, ostr);
 	while (c != -1) {
 		switch (c) {
 		case '?': // BADCH
@@ -125,6 +127,6 @@ void init_orcc(int argc, char *argv[], char *env[]) {
 			break;
 		}
 
-		c = getopt(argc, argv, argv[1]);
+		c = getopt(argc, argv, ostr);
 	}
 }
