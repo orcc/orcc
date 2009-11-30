@@ -49,12 +49,30 @@ import net.sf.orcc.network.transforms.BroadcastAdder;
 public class CQuasiStaticBackendImpl extends AbstractBackend {
 
 	private CQuasiStaticActorPrinter printer;
-	
+
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		if (args.length == 1) {
+			try {
+				new CQuasiStaticBackendImpl().generateCode(args[0], 10000);
+			} catch (Exception e) {
+				System.err.println("Could not print \"" + args[0] + "\"");
+				e.printStackTrace();
+			}
+		} else {
+			System.err
+					.println("Usage: CQuasiStaticBackendImpl <flattened XDF network>");
+		}
+	}
+
 	@Override
 	protected void init() throws IOException {
 		printer = new CQuasiStaticActorPrinter();
 		Scheduler.workingDirectoryPath = path + File.separator + "schedule"
-							   + File.separator;
+				+ File.separator;
 	}
 
 	@Override
@@ -66,8 +84,9 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
-		if(SchedulePreparer.sourceFilesPath == null){
-			SchedulePreparer.sourceFilesPath = new File(actor.getFile()).getParent();
+		if (SchedulePreparer.sourceFilesPath == null) {
+			SchedulePreparer.sourceFilesPath = new File(actor.getFile())
+					.getParent();
 			SchedulePreparer.prepare();
 		}
 		String outputName = path + File.separator + id + ".c";
@@ -78,7 +97,7 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 	protected void printNetwork(Network network) throws Exception {
 		CQuasiStaticNetworkPrinter networkPrinter = new CQuasiStaticNetworkPrinter();
 		String outputName = path + File.separator + network.getName() + ".c";
-		
+
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
