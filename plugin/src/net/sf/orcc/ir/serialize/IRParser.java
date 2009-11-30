@@ -465,9 +465,7 @@ public class IRParser {
 		if (array.length() == 4) {
 			int startLine = array.getInt(0);
 			int startCol = array.getInt(1);
-			// TODO to be removed when Java frontend done.
-			// int endLine = array.getInt(2);
-			int endCol = array.getInt(3);
+			int endCol = array.getInt(2);
 
 			return new Location(startLine, startCol, endCol);
 		} else {
@@ -478,14 +476,13 @@ public class IRParser {
 	private CFGNode parseNode(JSONArray array) throws JSONException,
 			OrccException {
 		String name = array.getString(0);
-		// int id = array.getInt(1);
-		Location loc = parseLocation(array.getJSONArray(2));
+		Location loc = parseLocation(array.getJSONArray(1));
 		CFGNode node = null;
 
 		if (name.equals(NAME_IF)) {
-			node = parseIfNode(loc, array.getJSONArray(3));
+			node = parseIfNode(loc, array.getJSONArray(2));
 		} else if (name.equals(NAME_JOIN)) {
-			node = parseJoinNode(loc, array.getJSONArray(3));
+			node = parseJoinNode(loc, array.getJSONArray(2));
 
 			// if the previous node is an If, then the join node we just parsed
 			// is the If's join node.
@@ -497,31 +494,31 @@ public class IRParser {
 				node = null;
 			}
 		} else if (name.equals(NAME_WHILE)) {
-			node = parseWhileNode(loc, array.getJSONArray(3));
+			node = parseWhileNode(loc, array.getJSONArray(2));
 		} else {
 			block = new BlockNode(loc);
 			Instruction instr = null;
 
 			if (name.equals(NAME_ASSIGN)) {
-				instr = parseAssignVarNode(loc, array.getJSONArray(3));
+				instr = parseAssignVarNode(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_CALL)) {
-				instr = parseCallNode(loc, array.getJSONArray(3));
+				instr = parseCallNode(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_EMPTY)) {
 				// nothing to do
 			} else if (name.equals(NAME_HAS_TOKENS)) {
-				instr = parseHasTokensNode(loc, array.getJSONArray(3));
+				instr = parseHasTokensNode(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_LOAD)) {
-				instr = parseLoadNode(loc, array.getJSONArray(3));
+				instr = parseLoadNode(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_PEEK)) {
-				instr = parsePeekNode(loc, array.getJSONArray(3));
+				instr = parsePeekNode(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_READ)) {
-				instr = parseReadNode(loc, array.getJSONArray(3));
+				instr = parseReadNode(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_RETURN)) {
-				instr = parseReturnNode(loc, array.optJSONArray(3));
+				instr = parseReturnNode(loc, array.optJSONArray(2));
 			} else if (name.equals(NAME_STORE)) {
-				instr = parseStoreNode(loc, array.getJSONArray(3));
+				instr = parseStoreNode(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_WRITE)) {
-				instr = parseWriteNode(loc, array.getJSONArray(3));
+				instr = parseWriteNode(loc, array.getJSONArray(2));
 			} else {
 				throw new OrccException("Invalid node definition: " + name);
 			}
@@ -794,8 +791,8 @@ public class IRParser {
 		JSONArray details = array.getJSONArray(0);
 		String name = details.getString(0);
 		boolean assignable = details.getBoolean(1);
-		Integer suffix = details.isNull(3) ? null : details.getInt(3);
-		int index = details.getInt(4);
+		Integer suffix = details.isNull(2) ? null : details.getInt(2);
+		int index = details.getInt(3);
 
 		Location loc = parseLocation(array.getJSONArray(1));
 		Type type = parseType(array.get(2));
@@ -818,7 +815,7 @@ public class IRParser {
 
 	private Use parseVarUse(JSONArray array) throws JSONException,
 			OrccException {
-		Variable varDef = getVariable(array.getJSONArray(0));
+		Variable varDef = getVariable(array);
 		return new Use(varDef);
 	}
 

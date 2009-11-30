@@ -440,7 +440,6 @@ public class IRWriter {
 		array.put(details);
 		details.put(variable.getBaseName());
 		details.put(variable.isAssignable());
-		details.put(42); // TODO remove when front-end done
 		Object suffix = variable.hasSuffix() ? variable.getSuffix()
 				: JSONObject.NULL;
 		details.put(suffix);
@@ -473,9 +472,6 @@ public class IRWriter {
 		JSONArray array = new JSONArray();
 		array.put(location.getStartLine());
 		array.put(location.getStartColumn());
-
-		// TODO remove when frontend done
-		array.put(42);
 		array.put(location.getEndColumn());
 
 		return array;
@@ -567,7 +563,6 @@ public class IRWriter {
 
 		details.put(variable.getName());
 		details.put(variable.isAssignable());
-		details.put(42); // TODO remove when front-end done
 		details.put(JSONObject.NULL);
 		details.put(0);
 

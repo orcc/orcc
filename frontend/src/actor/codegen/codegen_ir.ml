@@ -138,7 +138,6 @@ let mk_var_def var_def =
 	let var =
 		[string var_def.v_name;
 		bool var_def.v_assignable;
-		bool var_def.v_global;
 		mk_suffix var_def.v_suffix;
 		int var_def.v_index]
 	in
