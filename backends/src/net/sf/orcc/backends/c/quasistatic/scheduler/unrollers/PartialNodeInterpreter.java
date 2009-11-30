@@ -28,12 +28,16 @@
  */
 package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 
+import java.util.List;
+
 import net.sf.orcc.backends.interpreter.ListAllocator;
 import net.sf.orcc.backends.interpreter.NodeInterpreter;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.nodes.IfNode;
 
 /**
  * This class defines a partial node/instruction interpreter. It refines the
@@ -53,6 +57,28 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 	public void visit(HasTokens instr, Object... args) {
 		// we always have tokens :-)
 		instr.getTarget().setValue(true);
+	}
+
+	@Override
+	public Object visit(IfNode node, Object... args) {
+		// Interpret first expression ("if" condition)
+		Object condition = node.getValue().accept(exprInterpreter);
+
+		if (condition instanceof Boolean && (Boolean) condition) {
+			for (CFGNode subNode : node.getThenNodes()) {
+				subNode.accept(this, args);
+			}
+		} else {
+			List<CFGNode> elseNodes = node.getElseNodes();
+			if (!elseNodes.isEmpty()) {
+				for (CFGNode subNode : elseNodes) {
+					subNode.accept(this, args);
+				}
+			}
+		}
+		node.getJoinNode().accept(this, args);
+
+		return null;
 	}
 
 	@Override

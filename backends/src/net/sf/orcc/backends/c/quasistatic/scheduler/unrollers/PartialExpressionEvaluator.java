@@ -50,6 +50,11 @@ public class PartialExpressionEvaluator extends ExpressionEvaluator {
 	public Object interpret(BinaryExpr expr, Object... args) {
 		Object val1 = expr.getE1().accept(this);
 		Object val2 = expr.getE2().accept(this);
+
+		if (val1 == null || val2 == null) {
+			return null;
+		}
+
 		switch (expr.getOp()) {
 		case BITAND:
 			if (val1 instanceof Integer && val2 instanceof Integer) {

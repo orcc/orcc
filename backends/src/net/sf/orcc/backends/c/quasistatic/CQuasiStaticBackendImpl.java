@@ -37,7 +37,6 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.main.Scheduler;
 import net.sf.orcc.backends.c.quasistatic.scheduler.output.SchedulePreparer;
-import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -78,8 +77,7 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new PhiRemoval(), new IncrementPeephole(),
-				new MoveReadsWritesTransformation() };
+				new PhiRemoval(), new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
