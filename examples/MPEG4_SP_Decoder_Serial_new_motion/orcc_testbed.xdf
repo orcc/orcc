@@ -25,7 +25,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/orcc_fread"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/orcc_fread"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -37,7 +37,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/orcc_DispYUV"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/orcc_DispYUV"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

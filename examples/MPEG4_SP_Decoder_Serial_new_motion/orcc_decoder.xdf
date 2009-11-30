@@ -132,7 +132,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/byte2bit"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/byte2bit"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

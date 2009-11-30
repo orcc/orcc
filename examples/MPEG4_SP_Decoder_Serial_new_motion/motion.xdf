@@ -108,7 +108,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/MPEG4_mgnt_Address"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/MPEG4_mgnt_Address"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

@@ -108,7 +108,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/MPEG4_algo_DCRaddressing"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/MPEG4_algo_DCRaddressing"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -132,7 +132,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/MPEG4_algo_DCRinvpred"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/MPEG4_algo_DCRinvpred"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

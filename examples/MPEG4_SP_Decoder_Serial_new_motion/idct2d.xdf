@@ -53,7 +53,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/GEN_124_algo_Idct1d"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/GEN_124_algo_Idct1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -65,7 +65,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/GEN_algo_Transpose"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/GEN_algo_Transpose"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -74,7 +74,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/GEN_124_algo_Idct1d"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/GEN_124_algo_Idct1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -86,7 +86,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/GEN_algo_Transpose"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/GEN_algo_Transpose"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -95,7 +95,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../RVC_MPEG4_SP_Serial/GEN_algo_Clip"/>
+        <Class name="../MPEG4_SP_Decoder_Serial/GEN_algo_Clip"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
