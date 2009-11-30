@@ -48,34 +48,13 @@ import net.sf.orcc.network.transforms.BroadcastAdder;
 
 public class CQuasiStaticBackendImpl extends AbstractBackend {
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				new CQuasiStaticBackendImpl().generateCode(args[0], 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: CQuasiStaticBackendImpl <flattened XDF network>");
-		}
-	}
-
-	private String workingDirectoryPath;
-
 	private CQuasiStaticActorPrinter printer;
-	private HashMap<String, List<String>> scheduleMap;
-
+	
 	@Override
 	protected void init() throws IOException {
 		printer = new CQuasiStaticActorPrinter();
-		workingDirectoryPath = path + File.separator + "schedule"
-				+ File.separator;
+		Scheduler.workingDirectoryPath = path + File.separator + "schedule"
+							   + File.separator;
 	}
 
 	@Override
@@ -87,9 +66,9 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
-		if (SchedulePreparer.sourceFilesPath == null) {
-			SchedulePreparer.sourceFilesPath = new File(actor.getFile())
-					.getParent();
+		if(SchedulePreparer.sourceFilesPath == null){
+			SchedulePreparer.sourceFilesPath = new File(actor.getFile()).getParent();
+			SchedulePreparer.prepare();
 		}
 		String outputName = path + File.separator + id + ".c";
 		printer.printActor(outputName, id, actor);
@@ -99,7 +78,7 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 	protected void printNetwork(Network network) throws Exception {
 		CQuasiStaticNetworkPrinter networkPrinter = new CQuasiStaticNetworkPrinter();
 		String outputName = path + File.separator + network.getName() + ".c";
-
+		
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
@@ -108,25 +87,11 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 
 	protected void printSchedule(Network network) throws IOException,
 			OrccException, QuasiStaticSchedulerException {
-		scheduleMap = new Scheduler(workingDirectoryPath, network)
+		HashMap<String, List<String>> scheduleMap = new Scheduler(network)
 				.performSchedule();
 		CQuasiStaticSchedulePrinter schedulePrinter = new CQuasiStaticSchedulePrinter();
 		String outputName = path + File.separator + "scheduling.c";
 		schedulePrinter.printSchedule(outputName, scheduleMap);
 	}
-
-	/*
-	 * protected void createInputData() throws QuasiStaticSchedulerException {
-	 * workingDirectoryPath = path + File.separator + "schedule" +
-	 * File.separator; FileUtilities.createDirectory(workingDirectoryPath);
-	 * 
-	 * File srcFile = new File(sourceFilesPath + File.separator +
-	 * Constants.INPUT_FILE_NAME); if(!srcFile.exists()){ throw new
-	 * QuasiStaticSchedulerException("The file "+ Constants.INPUT_FILE_NAME +
-	 * " was not found at " + sourceFilesPath ); } File dstFile = new
-	 * File(workingDirectoryPath + File.separator + Constants.INPUT_FILE_NAME);
-	 * try { dstFile.createNewFile(); FileUtilities.copyFile(srcFile, dstFile);
-	 * } catch (IOException e) { e.printStackTrace(); } }
-	 */
 
 }
