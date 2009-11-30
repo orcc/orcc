@@ -38,9 +38,19 @@ import net.sf.orcc.ir.ICommunicationFifo;
  * 
  */
 public class Port extends Variable implements Comparable<Port> {
-	
+
 	private ICommunicationFifo fifoBinding;
-	
+
+	/**
+	 * the number of tokens consumed by this port.
+	 */
+	private int tokensConsumed;
+
+	/**
+	 * the number of tokens produced by this port.
+	 */
+	private int tokensProduced;
+
 	/**
 	 * Creates a new port with the given location, type, and name.
 	 * 
@@ -62,11 +72,6 @@ public class Port extends Variable implements Comparable<Port> {
 		super(port);
 	}
 
-	@Override
-	public int compareTo(Port port) {
-		return getName().compareTo(port.getName());
-	}
-
 	/**
 	 * Bind the current port to a communication FIFO interface.
 	 * 
@@ -77,14 +82,84 @@ public class Port extends Variable implements Comparable<Port> {
 		this.fifoBinding = fifo;
 	}
 
+	@Override
+	public int compareTo(Port port) {
+		return getName().compareTo(port.getName());
+	}
+
 	/**
 	 * Returns the communication FIFO interface corresponding to this Port.
 	 * 
-	 * @return fifo_binding
-	 *            the communication FIFO implemented interface
+	 * @return fifo_binding the communication FIFO implemented interface
 	 */
 	public ICommunicationFifo fifo() {
 		return fifoBinding;
+	}
+
+	/**
+	 * Returns the number of tokens consumed by this port.
+	 * 
+	 * @return the number of tokens consumed by this port
+	 */
+	public int getNumTokensConsumed() {
+		return tokensConsumed;
+	}
+
+	/**
+	 * Returns the number of tokens produced by this port.
+	 * 
+	 * @return the number of tokens produced by this port
+	 */
+	public int getNumTokensProduced() {
+		return tokensProduced;
+	}
+
+	/**
+	 * Increases the number of tokens consumed by this port by the given
+	 * integer.
+	 * 
+	 * @param n
+	 *            a number of tokens
+	 * @throws IllegalArgumentException
+	 *             if n is less or equal to zero
+	 */
+	public void increaseTokensConsumption(int n) {
+		if (n <= 0) {
+			throw new IllegalArgumentException();
+		}
+
+		tokensConsumed += n;
+	}
+
+	/**
+	 * Increases the number of tokens produced by this port by the given
+	 * integer.
+	 * 
+	 * @param n
+	 *            a number of tokens
+	 * @throws IllegalArgumentException
+	 *             if n is less or equal to zero
+	 */
+	public void increaseTokensProduction(int n) {
+		if (n <= 0) {
+			throw new IllegalArgumentException();
+		}
+
+		tokensProduced += n;
+	}
+
+	/**
+	 * Resets the number of tokens consumed by this port.
+	 */
+	public void resetTokensConsumption() {
+		tokensConsumed = 0;
+	}
+
+	/**
+	 * Resets the number of tokens produced by this port.
+	 */
+	public void resetTokensProduction() {
+		tokensProduced = 0;
 	}
 
 }
