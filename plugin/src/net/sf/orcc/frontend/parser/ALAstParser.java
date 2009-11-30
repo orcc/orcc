@@ -47,6 +47,7 @@ import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.GlobalVariable;
@@ -264,8 +265,9 @@ public class ALAstParser {
 		// parse ports and return them as ordered maps
 		inputs = parsePorts(tree.getChild(3));
 		outputs = parsePorts(tree.getChild(4));
-		
-		actionParser = new ActionParser(file, inputs, outputs);
+
+		actionParser = new ActionParser(file, inputs, outputs, exprParser,
+				stmtParser);
 
 		// parse actor declarations
 		stateVars = new Scope<Variable>(parameters, false);
@@ -405,20 +407,34 @@ public class ALAstParser {
 		}
 	}
 
+	/**
+	 * Parses the given tree as a procedure and adds it to the
+	 * {@link #procedures} ordered map.
+	 * 
+	 * @param tree
+	 *            a tree
+	 * @throws OrccException
+	 */
 	private void parseProcedure(Tree tree) throws OrccException {
 		Scope<Variable> parameters = new Scope<Variable>(stateVars, true);
+		List<CFGNode> nodes = new ArrayList<CFGNode>();
+
+		// parse parameters
+		stmtParser.setCFGNodeList(nodes);
+		stmtParser.setVariableScope(parameters);
+		stmtParser.parseLocalVariables(parameters, tree.getChild(1));
+
+		// parse block, and returns local variables
+		Scope<Variable> variables = stmtParser.parseBlock(tree, 2);
+
+		// get name and location
 		Tree nameTree = tree.getChild(0);
 		String name = nameTree.getText();
 		Location location = parseLocation(nameTree);
 
-		stmtParser.setVariableScope(parameters);
-		stmtParser.parseLocalVariables(parameters, tree.getChild(1));
-
-		Block block = stmtParser.parseBlock(tree, 2);
-
+		// creates the procedure
 		Procedure procedure = new Procedure(name, false, location,
-				new VoidType(), parameters, block.getVariables(), block
-						.getNodes());
+				new VoidType(), parameters, variables, nodes);
 
 		procedures.add(file, location, name, procedure);
 	}

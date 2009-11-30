@@ -41,12 +41,15 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.type.BoolType;
@@ -115,14 +118,14 @@ public class ActionParser {
 	private OrderedMap<Port> outputs;
 
 	/**
-	 * type of the current pattern
-	 */
-	private PatternType patternType;
-
-	/**
 	 * list of ports referenced by the current pattern
 	 */
 	private final List<Port> patternPorts;
+
+	/**
+	 * type of the current pattern
+	 */
+	private PatternType patternType;
 
 	/**
 	 * position of a port in an input pattern.
@@ -141,6 +144,10 @@ public class ActionParser {
 	 */
 	private Scope<Variable> variables;
 
+	private ExpressionParser exprParser;
+
+	private StatementParser stmtParser;
+
 	/**
 	 * Creates a new action parser with the given file.
 	 * 
@@ -151,10 +158,14 @@ public class ActionParser {
 	 * 
 	 */
 	public ActionParser(String file, OrderedMap<Port> inputs,
-			OrderedMap<Port> outputs) {
+			OrderedMap<Port> outputs, ExpressionParser exprParser,
+			StatementParser stmtParser) {
 		this.file = file;
 		this.inputs = inputs;
 		this.outputs = outputs;
+		this.exprParser = exprParser;
+		this.stmtParser = stmtParser;
+
 		patternPorts = new ArrayList<Port>();
 	}
 
@@ -286,9 +297,12 @@ public class ActionParser {
 
 		variables = new Scope<Variable>(scope, true);
 		nodes = new ArrayList<CFGNode>();
+		nodes.add(new BlockNode());
 
 		parseInputPattern(tree.getChild(1));
-		parseBody(tree, 4, 5);
+		stmtParser.setVariableScope(variables);
+		stmtParser.setCFGNodeList(nodes);
+		stmtParser.parseBlock(tree, 4);
 		parseOutputPattern(tree.getChild(2));
 
 		String name = getActionName(location, tag);
@@ -302,13 +316,31 @@ public class ActionParser {
 		return action;
 	}
 
-	private void parseBody(Tree tree, int i, int j) {
-		// TODO Auto-generated method stub
-	}
+	private void parseInput(Port port, Tree idents, Tree repeat)
+			throws OrccException {
+		BlockNode block = (BlockNode) nodes.get(nodes.size() - 1);
 
-	private void parseInput(Port port, Tree idents, Tree repeat) {
-		// TODO Auto-generated method stub
+		Expression numRepeats = null;
+		if (repeat.getChildCount() == 1) {
+			exprParser.setCFGNodeList(null);
+			exprParser.parseExpression(repeat.getChild(0));
+		}
 
+		int n = idents.getChildCount();
+		for (int i = 0; i < n; i++) {
+			Tree child = idents.getChild(i);
+			Location location = parseLocation(child);
+			String name = child.getText();
+
+			if (numRepeats == null) {
+				LocalVariable local = new LocalVariable(true, 0, location,
+						name, null, null, port.getType());
+				variables.add(file, location, name, local);
+				
+				Read read = new Read(block, location, port, 1, local);
+				block.add(read);
+			}
+		}
 	}
 
 	/**

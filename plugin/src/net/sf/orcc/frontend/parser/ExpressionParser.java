@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.internal.ALBaseLexer;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
@@ -34,6 +35,8 @@ public class ExpressionParser {
 	 * the file being parsed
 	 */
 	private final String file;
+
+	private List<CFGNode> nodes;
 
 	/**
 	 * the current scope of variable
@@ -176,6 +179,17 @@ public class ExpressionParser {
 		}
 		Use localUse = new Use(variable);
 		return new VarExpr(location, localUse);
+	}
+
+	/**
+	 * Sets the node list where nodes may be added when an expression is
+	 * translated as statements. Such expressions are calls, ifs, and lists.
+	 * 
+	 * @param nodes
+	 *            a list of CFG nodes
+	 */
+	public void setCFGNodeList(List<CFGNode> nodes) {
+		this.nodes = nodes;
 	}
 
 	/**

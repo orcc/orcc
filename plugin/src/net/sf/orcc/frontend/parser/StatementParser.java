@@ -5,8 +5,10 @@ import static net.sf.orcc.frontend.parser.Util.parseLocation;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.frontend.parser.internal.ALBaseLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -29,6 +31,8 @@ public class StatementParser {
 
 	private final TypeParser typeParser;
 
+	private List<CFGNode> nodes;
+
 	/**
 	 * Creates a new action parser with the given file
 	 * 
@@ -43,16 +47,47 @@ public class StatementParser {
 		this.exprParser = exprParser;
 	}
 
-	public Block parseBlock(Tree tree, int start) throws OrccException {
+	/**
+	 * Parses a block of statements. A block is a (possibly empty) list of local
+	 * variables and a (possibly empty) list of statements.
+	 * 
+	 * @param tree
+	 *            a tree whose child at index <code>start</code> is a VARIABLES
+	 *            tree, and whose child at index <code>start + 1</code> is a
+	 *            STATEMENTS tree
+	 * @param start
+	 *            index of the VARIABLES tree
+	 * @return a scope of local variables
+	 * @throws OrccException
+	 */
+	public Scope<Variable> parseBlock(Tree tree, int start)
+			throws OrccException {
 		Scope<Variable> variables = new Scope<Variable>(scope, false);
 		scope = variables;
 		parseLocalVariables(variables, tree.getChild(start));
 
 		// parse nodes
-		List<CFGNode> nodes = null;
-		scope = scope.getParent();
+		Tree statements = tree.getChild(start + 1);
+		int n = statements.getChildCount();
+		for (int i = 0; i < n; i++) {
+			parseStatement(statements.getChild(i));
+		}
 
-		return new Block(variables, nodes);
+		return variables;
+	}
+
+	private void parseStatement(Tree tree) throws OrccException {
+		if (tree.getType() == ALBaseLexer.ASSIGN) {
+			String targetName = tree.getChild(0).getText();
+			Tree indexes = tree.getChild(1);
+			Expression value = exprParser.parseExpression(tree.getChild(2));
+
+			Variable target = scope.get(targetName);
+			if (target == null) {
+				throw new OrccException("unknown variable: \"" + targetName
+						+ "\"");
+			}
+		}
 	}
 
 	/**
@@ -87,6 +122,16 @@ public class StatementParser {
 			variables.add(file, variable.getLocation(), variable.getName(),
 					variable);
 		}
+	}
+
+	/**
+	 * Sets the node list where nodes may be added when statements are parsed.
+	 * 
+	 * @param nodes
+	 *            a list of CFG nodes
+	 */
+	public void setCFGNodeList(List<CFGNode> nodes) {
+		this.nodes = nodes;
 	}
 
 	/**
