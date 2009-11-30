@@ -316,12 +316,12 @@
 				<Port name="VIDOUT2" reads= "64" consumption = "1"/>
 			</Actor>
 			<Actor name="transpose">
-				<Port name="X" reads= "64" consumption = "1"/>
-				<Port name="Y" reads= "64" consumption = "1"/>
+				<Port name="X" reads= "1" consumption = "64"/>
+				<Port name="Y" reads= "1" consumption = "64"/>
 			</Actor>
 			<Actor name="retranspose">
-				<Port name="X" reads= "64" consumption = "1"/>
-				<Port name="Y" reads= "64" consumption = "1"/>
+				<Port name="X" reads= "1" consumption = "64"/>
+				<Port name="Y" reads= "1" consumption = "64"/>
 			</Actor>
 			<Actor name="row">
 				<Port name="X" reads= "8" consumption = "8"/>
@@ -409,12 +409,12 @@
 				<Port name="VIDOUT2" reads= "64" consumption = "1"/>
 			</Actor>
 			<Actor name="transpose">
-				<Port name="X" reads= "64" consumption = "1"/>
-				<Port name="Y" reads= "64" consumption = "1"/>
+				<Port name="X" reads= "1" consumption = "64"/>
+				<Port name="Y" reads= "1" consumption = "64"/>
 			</Actor>
 			<Actor name="retranspose">
-				<Port name="X" reads= "64" consumption = "1"/>
-				<Port name="Y" reads= "64" consumption = "1"/>
+				<Port name="X" reads= "1" consumption = "64"/>
+				<Port name="Y" reads= "1" consumption = "64"/>
 			</Actor>
 			<Actor name="row">
 				<Port name="X" reads= "8" consumption = "8"/>
@@ -471,4 +471,18 @@
 			</Actor>
 		</Btype> 
 	</tokens_pattern>
+	<custom_buffers_sizes>
+		<Buffer actor= "IS" port = "PQF_AC" size = "63" />
+		<Buffer actor= "invpred" port = "DC" size = "1" />
+		<Buffer actor= "invpred" port = "QUANT" size = "1" />
+		<Buffer actor= "invpred" port = "SIGNED" size = "1" />
+		<Buffer actor= "IAP" port = "QF_AC" size = "63" />
+		<Buffer actor= "address" port = "RA" size = "81" />
+		<Buffer actor= "address" port = "WA" size = "SIZE" />
+		<Buffer actor= "DCsplit" port = "AC" size = "63" />
+		<Buffer actor= "mvrecon" port = "MV" size = "2" />
+		<Buffer actor= "parseheaders" port = "BTYPE" size =  "1" />
+		<Buffer actor= "add" port = "VID" size = "SIZE" />
+		<Buffer actor= "broadcast_add_VID" port = "output_0" size = "SIZE" />
+	</custom_buffers_sizes>
 </XDF>
