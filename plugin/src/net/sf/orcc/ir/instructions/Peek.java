@@ -39,7 +39,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Matthieu Wipliez
  * 
  */
-public class Peek extends AbstractFifo {
+public class Peek extends AbstractFifoInstruction {
 
 	public Peek(BlockNode block, Location location, Port port, int numTokens,
 			LocalVariable varDef) {

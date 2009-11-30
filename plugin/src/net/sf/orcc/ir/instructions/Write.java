@@ -39,7 +39,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Matthieu Wipliez
  * 
  */
-public class Write extends AbstractFifo {
+public class Write extends AbstractFifoInstruction {
 
 	public Write(BlockNode block, Location location, Port port, int numTokens,
 			LocalVariable varDef) {

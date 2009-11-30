@@ -39,7 +39,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Matthieu Wipliez
  * 
  */
-public class HasTokens extends AbstractFifo {
+public class HasTokens extends AbstractFifoInstruction {
 
 	public HasTokens(BlockNode block, Location location, Port port,
 			int numTokens, LocalVariable varDef) {

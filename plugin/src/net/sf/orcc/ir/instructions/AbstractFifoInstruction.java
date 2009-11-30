@@ -42,8 +42,8 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractFifo extends AbstractInstruction implements
-		TargetContainer {
+public abstract class AbstractFifoInstruction extends AbstractInstruction
+		implements TargetContainer {
 
 	private int numTokens;
 
@@ -51,18 +51,28 @@ public abstract class AbstractFifo extends AbstractInstruction implements
 
 	private LocalVariable target;
 
-	public AbstractFifo(BlockNode block, Location location, Port port,
-			int numTokens, LocalVariable target) {
+	public AbstractFifoInstruction(BlockNode block, Location location,
+			Port port, int numTokens, LocalVariable target) {
 		super(block, location);
 		this.numTokens = numTokens;
 		setPort(port);
 		setTarget(target);
 	}
 
+	/**
+	 * Returns the number of tokens used by this FIFO operation.
+	 * 
+	 * @return the number of tokens used by this FIFO operation
+	 */
 	public int getNumTokens() {
 		return numTokens;
 	}
 
+	/**
+	 * Returns the port used by this FIFO operation.
+	 * 
+	 * @return the port used by this FIFO operation
+	 */
 	public Port getPort() {
 		return port;
 	}
@@ -72,10 +82,32 @@ public abstract class AbstractFifo extends AbstractInstruction implements
 		return target;
 	}
 
+	/**
+	 * Returns true if this FIFO operation is a unit operation, which means it
+	 * uses exactly one token from its port.
+	 * 
+	 * @return true if this FIFO operation is a unit operation
+	 */
+	public boolean isUnit() {
+		return numTokens == 1;
+	}
+
+	/**
+	 * Sets the number of tokens used by this FIFO operation.
+	 * 
+	 * @param numTokens
+	 *            the number of tokens used by this FIFO operation
+	 */
 	public void setNumTokens(int numTokens) {
 		this.numTokens = numTokens;
 	}
 
+	/**
+	 * Sets the port used by this FIFO operation.
+	 * 
+	 * @param port
+	 *            the port used by this FIFO operation
+	 */
 	public void setPort(Port port) {
 		if (this.port != null) {
 			port.removeUse(this);
@@ -92,11 +124,6 @@ public abstract class AbstractFifo extends AbstractInstruction implements
 	@Override
 	public void setTargetSimple(LocalVariable target) {
 		this.target = target;
-	}
-
-	@Override
-	public String toString() {
-		return getTarget() + " = read(" + port + ", " + numTokens + ")";
 	}
 
 }

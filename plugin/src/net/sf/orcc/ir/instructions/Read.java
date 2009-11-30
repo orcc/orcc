@@ -39,7 +39,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
  * @author Matthieu Wipliez
  * 
  */
-public class Read extends AbstractFifo {
+public class Read extends AbstractFifoInstruction {
 
 	public Read(BlockNode block, Location location, Port port, int numTokens,
 			LocalVariable varDef) {
