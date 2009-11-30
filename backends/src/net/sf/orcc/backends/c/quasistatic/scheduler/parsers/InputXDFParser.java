@@ -58,59 +58,25 @@ public class InputXDFParser {
 		return true;
 	}
 	
-	private NodeList parseBtypeNodes(Element root) throws OrccException{
-		Node tokensPatternNode = null;
+	private NodeList parseGroupNodes(String groupName) throws OrccException{
+		Element root = document.getDocumentElement();
+		checkFile(root);
+		
+		Node node = null;
 		NodeList rootChilds = root.getChildNodes();
 		for(int i = 0 ; i < rootChilds.getLength() ; i++){
-			Node node = rootChilds.item(i);
-			if(node.getNodeName().equals(Constants.TOKENS_PATTERN)){
-				tokensPatternNode = node;
+			Node child = rootChilds.item(i);
+			if(child.getNodeName().equals(groupName)){
+				node = child;
 				break;
 			}
 		}
-		if(tokensPatternNode == null){
-			throw new OrccException("Expected a " + Constants.TOKENS_PATTERN + " element");
+		if(node == null){
+			throw new OrccException("Expected a " + groupName + " element");
 		}
 		
-		NodeList btypesNodes = tokensPatternNode.getChildNodes();
-		return btypesNodes;
-	}
-	
-	public List<String> parseSchedulableActorsList() throws OrccException{
-		Element root = document.getDocumentElement();
-		checkFile(root);
-		
-		NodeList btypesNodes = parseBtypeNodes(root);
-		List<String> actorsList = new ArrayList<String>();
-		for(int i = 0; i < btypesNodes.getLength() ; i++){
-			Node btypeNode = btypesNodes.item(i);
-			if(btypeNode.getNodeName().equals("Btype")){
-				actorsList = parseActorsNames(btypeNode);
-				break;
-			}
-		}
-		return actorsList;
-	}
-	
-	
-	public HashMap<String, List<TokensPattern>> parseTokensPattern() throws OrccException{
-		Element root = document.getDocumentElement();
-		checkFile(root);
-		
-		NodeList btypesNodes = parseBtypeNodes(root);
-		
-		HashMap<String, List<TokensPattern>> pattern = new HashMap<String, List<TokensPattern>>();
-		for(int i = 0; i < btypesNodes.getLength() ; i++){
-			Node btypeNode = btypesNodes.item(i);
-			if(btypeNode.getNodeName().equals("Btype")){
-				Element btypeElement = (Element)btypeNode;
-				String btypeName =  btypeElement.getAttribute("name");
-				List<TokensPattern> tokensPatterns = parseActorsPatterns(btypeNode);
-				pattern.put(btypeName, tokensPatterns);
-			}
-		}
-		
-		return pattern;
+		NodeList nodes = node.getChildNodes();
+		return nodes;
 	}
 	
 	private List<String> parseActorsNames(Node btypeNode){
@@ -132,14 +98,14 @@ public class InputXDFParser {
 		for(int i = 0; i < actorsNodes.getLength() ; i++){
 			Node actorNode = actorsNodes.item(i);
 			if(actorNode.getNodeName().equals("Actor")){
-				TokensPattern tokensPattern = getPortsPattern(actorNode);
+				TokensPattern tokensPattern = parsePortsPattern(actorNode);
 				tokensPatterns.add(tokensPattern);
 			}
 		}
 		return tokensPatterns;
 	}
 	
-	public TokensPattern getPortsPattern(Node actorNode){
+	private TokensPattern parsePortsPattern(Node actorNode){
 		String actorName = ((Element)actorNode).getAttribute("name");
 		NodeList portsNodes = actorNode.getChildNodes();
 		HashMap<String, Integer> remainingMap = new HashMap<String, Integer>();;
@@ -159,17 +125,54 @@ public class InputXDFParser {
 		return new TokensPattern(actorName, remainingMap, consumptionMap);
 	}
 	
-	public static void main(String[] args){
-		try {
-			new InputXDFParser("C:\\quasistatic_input.xdf").parseTokensPattern();
-		} catch (OrccException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public HashMap<String, String> parseCustomBuffersSizes() throws OrccException{
+		HashMap<String, String> customBuffersSize = new HashMap<String, String>();
+		
+		NodeList buffersNodes = parseGroupNodes(Constants.CUSTOM_BUFFERS_SIZES);
+		
+		for(int i = 0; i < buffersNodes.getLength() ; i++){
+			Node bufferNode = buffersNodes.item(i);
+			if(bufferNode.getNodeName().equals("Buffer")){
+				Element bufferElement = (Element) bufferNode;
+				String actorName = bufferElement.getAttribute("actor");
+				String portName = bufferElement.getAttribute("port");
+				String size = bufferElement.getAttribute("size");
+				customBuffersSize.put(actorName + "_" + portName, size);
+			}
 		}
+		return customBuffersSize;
+		
+	}
+	
+	public List<String> parseSchedulableActorsList() throws OrccException{
+		
+		NodeList btypesNodes = parseGroupNodes(Constants.TOKENS_PATTERN);
+		List<String> actorsList = new ArrayList<String>();
+		for(int i = 0; i < btypesNodes.getLength() ; i++){
+			Node btypeNode = btypesNodes.item(i);
+			if(btypeNode.getNodeName().equals("Btype")){
+				actorsList = parseActorsNames(btypeNode);
+				break;
+			}
+		}
+		return actorsList;
 	}
 	
 	
-	
-	
-	
+	public HashMap<String, List<TokensPattern>> parseTokensPattern() throws OrccException{
+		NodeList btypesNodes = parseGroupNodes(Constants.TOKENS_PATTERN);
+		
+		HashMap<String, List<TokensPattern>> pattern = new HashMap<String, List<TokensPattern>>();
+		for(int i = 0; i < btypesNodes.getLength() ; i++){
+			Node btypeNode = btypesNodes.item(i);
+			if(btypeNode.getNodeName().equals("Btype")){
+				Element btypeElement = (Element)btypeNode;
+				String btypeName =  btypeElement.getAttribute("name");
+				List<TokensPattern> tokensPatterns = parseActorsPatterns(btypeNode);
+				pattern.put(btypeName, tokensPatterns);
+			}
+		}
+		
+		return pattern;
+	}
 }
