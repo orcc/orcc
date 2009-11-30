@@ -31,6 +31,10 @@ public class Scheduler {
 		this(workingDirectoryPath, network, 1);
 	}
 	
+	public Scheduler(Network network){
+		this(Scheduler.workingDirectoryPath, network, 1);
+	}
+	
 	/**
 	 * 
 	 * @return
@@ -39,7 +43,9 @@ public class Scheduler {
 	 */
 	public HashMap<String, List<String>> performSchedule() throws OrccException, QuasiStaticSchedulerException{
 		HashMap<String, List<String>> scheduleMap;
-		SchedulePreparer.prepare();
+		if(SchedulePreparer.needsToPrepare()){
+			SchedulePreparer.prepare();
+		}
 		//search for scheduled actors
 		networkGraph.init();
 		for(String btype: Switch.getSwitchValues()){
