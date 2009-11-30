@@ -43,6 +43,7 @@ public class Constants {
 	 */
 	public static String INPUT_FILE_NAME = "QSB_input.xdf";
 	public static String TOKENS_PATTERN = "tokens_pattern";
+	public static String CUSTOM_BUFFERS_SIZES = "custom_buffers_sizes";
 
 	/**
 	 * Kind of networks files
