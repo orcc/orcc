@@ -21,6 +21,7 @@ ${Orcc_SOURCE_DIR}/lib/liborcc/actors/display.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/actors/img_display.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/actors/img_read.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/actors/source.c
+${Orcc_SOURCE_DIR}/lib/liborcc/actors/compareyuv.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/orcc_util.c
 ${Orcc_SOURCE_DIR}/lib/liborcc/getopt.c
 )
@@ -47,11 +48,13 @@ ${Orcc_SOURCE_DIR}/lib/libcpp-epfl-aka/actors/Actor_source.cpp
 
 # projects in sub folders
 option(BUILD_AVC "whether AVC should be built" false)
+option(BUILD_AVC_COMPARE "whether AVC with yuv comparison should be built" false)
 option(BUILD_MPEG2 "whether MPEG-2 should be built" false)
 option(BUILD_MPEG4 "whether MPEG-4 should be built" false)
 option(BUILD_MPEG4_SERIAL "whether MPEG-4 serial version should be built" false)
 option(BUILD_MPEG4_SERIAL_MOTION "whether MPEG-4 serial with new motion version should be built" false)
 option(BUILD_RVC_MPEG4 "whether RVC MPEG-4 should be built" false)
+option(BUILD_RVC_MPEG4_COMPARE "whether RVC MPEG-4 with yuv comparison should be built" false)
 option(BUILD_SEAM_CARVING "whether Seam carving should be built" false)
 option(BUILD_Cpp_MPEG4_SERIAL "whether C++ MPEG-4 serial should be built" false)
 
@@ -59,6 +62,10 @@ option(BUILD_Cpp_MPEG4_SERIAL "whether C++ MPEG-4 serial should be built" false)
 if(BUILD_AVC)
   add_subdirectory (AVC_CBP_Decoder)
 endif(BUILD_AVC)
+
+if(BUILD_AVC_COMPARE)
+  add_subdirectory (AVC_CBP_Decoder_Compare)
+endif(BUILD_AVC_COMPARE)
 
 if(BUILD_MPEG2)
   add_subdirectory (MPEG2)
@@ -79,6 +86,10 @@ endif(BUILD_MPEG4_SERIAL_MOTION)
 if(BUILD_RVC_MPEG4)
   add_subdirectory (RVC_MPEG4_SP_Decoder)
 endif(BUILD_RVC_MPEG4)
+
+if(BUILD_RVC_MPEG4_COMPARE)
+  add_subdirectory (RVC_MPEG4_SP_Decoder_Compare)
+endif(BUILD_RVC_MPEG4_COMPARE)
 
 if(BUILD_SEAM_CARVING)
   add_subdirectory (Seam_carving)
