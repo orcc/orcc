@@ -134,7 +134,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(node
 				.getTarget(), actionName), node.getTarget().getType());
-		
+
 	}
 
 	/**
@@ -166,8 +166,8 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		if (target != null) {
 			Element operationE = XlimNodeTemplate.newOperation(root, "noop");
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
-			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target, actionName),
-					target.getType());
+			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target,
+					actionName), target.getType());
 		}
 	}
 
@@ -226,8 +226,8 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 
 		LocalVariable local = node.getTarget();
 		Type outtype = node.getTarget().getType();
-		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local, actionName),
-				outtype);
+		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local,
+				actionName), outtype);
 	}
 
 	/**
@@ -301,7 +301,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	 *            Arguments sent (not used)
 	 */
 	public void visit(Return node, Object... args) {
-		if(node.getValue() == null){
+		if (node.getValue() == null) {
 			return;
 		}
 		node.getValue().accept(new XlimExprVisitor(names, root));

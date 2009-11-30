@@ -518,6 +518,11 @@ public class XlimActorPrinter {
 						value.accept(new XlimValueVisitor(init2, state
 								.getType()));
 					}
+					else{
+						Element el = XlimNodeTemplate.newInitValue(init2);
+						el.setAttribute("value", "0");
+						state.getType().accept(new XlimTypeSizeVisitor(el));
+					}
 				}
 			}
 		}
