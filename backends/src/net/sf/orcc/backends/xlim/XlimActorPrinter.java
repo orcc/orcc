@@ -39,6 +39,13 @@ import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.interpreter.InterpretedActor;
+import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimElementTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimModuleTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimOperationTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimValueTemplate;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -63,7 +70,9 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller
  */
-public class XlimActorPrinter {
+public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
+		XlimOperationTemplate, XlimAttributeTemplate, XlimValueTemplate,
+		XlimElementTemplate {
 
 	/**
 	 * Index count
@@ -74,7 +83,7 @@ public class XlimActorPrinter {
 	 * Outval count
 	 */
 	private static int ocount = 0;
-	
+
 	/**
 	 * Fire count
 	 */
@@ -111,7 +120,7 @@ public class XlimActorPrinter {
 	private void addAction(Action action) {
 		String actionName = action.toString();
 
-		Element actionE = XlimNodeTemplate.newModule(root, "action", "false",
+		Element actionE = XlimNodeTemplate.newModule(root, ACTION, FALSE,
 				actionName);
 
 		// action.getOutputPattern();
@@ -130,8 +139,8 @@ public class XlimActorPrinter {
 	 *            Actor where to take the action
 	 */
 	private void addActions(Actor actor) {
-		for (Action action : actor.getActions()){
-			for(Port oport : action.getOutputPattern().keySet()){
+		for (Action action : actor.getActions()) {
+			for (Port oport : action.getOutputPattern().keySet()) {
 				names.getVarName(oport, action.toString());
 			}
 			addAction(action);
@@ -150,50 +159,51 @@ public class XlimActorPrinter {
 
 		// Inputs
 
-		Element guardE = XlimNodeTemplate.newDiffOperation(body, "$and");
+		Element guardE = XlimNodeTemplate.newDiffOperation(body, AND);
 		String name = action.toString();
 
 		Map<Port, Integer> input = action.getInputPattern();
 		for (Entry<Port, Integer> entry : input.entrySet()) {
 			Element operationE = XlimNodeTemplate.newValueOperation(body,
-					"$literal_Integer", "0");
+					LITINT, "0");
 
 			String index = "index" + (icount++);
-			XlimNodeTemplate.newOutPort(operationE, index, "1", "int");
+			XlimNodeTemplate.newOutPort(operationE, index, "1", INT);
 
 			Port port = entry.getKey();
 			String portname = port.getName();
 
-			Element peekE = XlimNodeTemplate.newPortOperation(body, "pinPeek",
+			Element peekE = XlimNodeTemplate.newPortOperation(body, PINPEEK,
 					portname);
 
 			XlimNodeTemplate.newInPort(peekE, index);
-			XlimNodeTemplate.newOutPort(peekE, names.getVarName(port, action.toString()), port
-					.getType());
+			XlimNodeTemplate.newOutPort(peekE, names.getVarName(port, action
+					.toString()), port.getType());
 
 			Element statusE = XlimNodeTemplate.newPortOperation(body,
-					"pinStatus", portname);
+					PINSTATUS, portname);
 
 			String ready = "ready_" + index;
 
-			XlimNodeTemplate.newOutPort(statusE, ready, "1", "bool");
+			XlimNodeTemplate.newOutPort(statusE, ready, "1", BOOL);
 			XlimNodeTemplate.newInPort(guardE, ready);
 		}
-		
+
 		// Default true
-		Element operationE1 = XlimNodeTemplate.newValueOperation(body,
-				"$literal_Integer", "1");
-		XlimNodeTemplate.newOutPort(operationE1, names.putTempName(), "1", "bool");
-		
+		Element operationE1 = XlimNodeTemplate.newValueOperation(body, LITINT,
+				"1");
+		XlimNodeTemplate
+				.newOutPort(operationE1, names.putTempName(), "1", BOOL);
+
 		XlimNodeTemplate.newInPort(guardE, names.getTempName());
 
-		XlimNodeTemplate.newOutPort(guardE, "guard_" + name, "1", "bool");
+		XlimNodeTemplate.newOutPort(guardE, "guard_" + name, "1", BOOL);
 
 		body.appendChild(guardE);
 
 		// Outputs
 
-		Element fireE = XlimNodeTemplate.newDiffOperation(body, "$and");
+		Element fireE = XlimNodeTemplate.newDiffOperation(body, AND);
 
 		Map<Port, Integer> output = action.getOutputPattern();
 		for (Entry<Port, Integer> entry : output.entrySet()) {
@@ -203,22 +213,23 @@ public class XlimActorPrinter {
 			String portname = port.getName();
 
 			Element statusE = XlimNodeTemplate.newPortOperation(body,
-					"pinStatus", portname);
+					PINSTATUS, portname);
 
 			String status = "status_" + index;
 
-			XlimNodeTemplate.newOutPort(statusE, status, "1", "bool");
+			XlimNodeTemplate.newOutPort(statusE, status, "1", BOOL);
 			XlimNodeTemplate.newInPort(fireE, status);
 		}
-		
+
 		// Default true
-		Element operationE2 = XlimNodeTemplate.newValueOperation(body,
-				"$literal_Integer", "1");
-		XlimNodeTemplate.newOutPort(operationE2, names.putTempName(), "1", "bool");
-		
+		Element operationE2 = XlimNodeTemplate.newValueOperation(body, LITINT,
+				"1");
+		XlimNodeTemplate
+				.newOutPort(operationE2, names.putTempName(), "1", BOOL);
+
 		XlimNodeTemplate.newInPort(fireE, names.getTempName());
 
-		XlimNodeTemplate.newOutPort(fireE, "fire_" + name, "1", "bool");
+		XlimNodeTemplate.newOutPort(fireE, "fire_" + name, "1", BOOL);
 
 		body.appendChild(fireE);
 	}
@@ -237,7 +248,7 @@ public class XlimActorPrinter {
 	private Element addElseTransition(Transition transition,
 			NextStateInfo nextState, Element base) {
 		Element testE = addTransition(transition, nextState, base);
-		return XlimNodeTemplate.newModule(testE, "else");
+		return XlimNodeTemplate.newModule(testE, ELSE);
 	}
 
 	/**
@@ -249,8 +260,8 @@ public class XlimActorPrinter {
 	 *            Root where to add the transition
 	 */
 	private void addFSM(FSM fsm, Element root) {
-		Element mutexE = XlimNodeTemplate.newModule(root, "block");
-		mutexE.setAttribute("mutex", "true");
+		Element mutexE = XlimNodeTemplate.newModule(root, BLOCK);
+		mutexE.setAttribute(MUTEX, TRUE);
 
 		for (Transition transition : fsm.getTransitions()) {
 			Element checkstate = createCheckState(transition, mutexE);
@@ -282,10 +293,10 @@ public class XlimActorPrinter {
 
 		for (String state : fsm.getStates()) {
 			String fsmname = "fsm" + state;
-			Element operationE = XlimNodeTemplate.newOperation(root, "noop");
+			Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 			XlimNodeTemplate.newInPort(operationE, fsmname);
 			XlimNodeTemplate.newOutPort(operationE, fsmname + "_copy", "1",
-					"bool");
+					BOOL);
 		}
 	}
 
@@ -311,10 +322,10 @@ public class XlimActorPrinter {
 	 */
 	private void addPorts(Actor actor) {
 		for (Port input : actor.getInputs()) {
-			addPort(input, "in");
+			addPort(input, IN);
 		}
 		for (Port output : actor.getOutputs()) {
-			addPort(output, "out");
+			addPort(output, OUT);
 		}
 	}
 
@@ -339,31 +350,31 @@ public class XlimActorPrinter {
 
 		Element[] result = new Element[2];
 
-		Element if1E = XlimNodeTemplate.newModule(base, "if");
+		Element if1E = XlimNodeTemplate.newModule(base, IF);
 
 		Element dguardE = XlimNodeTemplate.newTestModule(if1E, initialguard);
 
-		Element oguardE = XlimNodeTemplate.newOperation(dguardE, "noop");
+		Element oguardE = XlimNodeTemplate.newOperation(dguardE, NOOP);
 
 		XlimNodeTemplate.newInPort(oguardE, guard);
 
-		XlimNodeTemplate.newOutPort(oguardE, initialguard, "1", "bool");
+		XlimNodeTemplate.newOutPort(oguardE, initialguard, "1", BOOL);
 
-		Element then1E = XlimNodeTemplate.newModule(if1E, "then");
+		Element then1E = XlimNodeTemplate.newModule(if1E, THEN);
 
-		Element if2E = XlimNodeTemplate.newModule(then1E, "if");
+		Element if2E = XlimNodeTemplate.newModule(then1E, IF);
 
 		Element dfireE = XlimNodeTemplate.newTestModule(if2E, finalfire);
 
-		Element ofireE = XlimNodeTemplate.newOperation(dfireE, "noop");
+		Element ofireE = XlimNodeTemplate.newOperation(dfireE, NOOP);
 
 		XlimNodeTemplate.newInPort(ofireE, fire);
 
-		XlimNodeTemplate.newOutPort(ofireE, finalfire, "1", "bool");
+		XlimNodeTemplate.newOutPort(ofireE, finalfire, "1", BOOL);
 
-		Element then2E = XlimNodeTemplate.newModule(if2E, "then");
+		Element then2E = XlimNodeTemplate.newModule(if2E, THEN);
 
-		XlimNodeTemplate.newTargetOperation(then2E, "taskCall", actionname);
+		XlimNodeTemplate.newTargetOperation(then2E, TASKCALL, actionname);
 
 		result[0] = if1E;
 		result[1] = then2E;
@@ -384,7 +395,7 @@ public class XlimActorPrinter {
 			Element[] sched = addScheduler(action, names.putDecision(), names
 					.putDecision(), root);
 			Element ifE = sched[0];
-			root = XlimNodeTemplate.newModule(ifE, "else");
+			root = XlimNodeTemplate.newModule(ifE, ELSE);
 		}
 		if (scheduler.hasFsm()) {
 			addFSM(scheduler.getFsm(), root);
@@ -409,27 +420,27 @@ public class XlimActorPrinter {
 
 				Element fsmState = XlimNodeTemplate.newStateVar(root, fsmname);
 
-				XlimNodeTemplate.newInitValue(fsmState, "1", "bool", start
+				XlimNodeTemplate.newInitValue(fsmState, "1", BOOL, start
 						.equals(state) ? "1" : "0");
 			}
 		}
 
 		Element schedE = XlimNodeTemplate.newModule(root, "action-scheduler",
-				"true", "action-scheduler", "action-scheduler");
+				TRUE, "action-scheduler", "action-scheduler");
 
-		Element operationE = XlimNodeTemplate.newValueOperation(schedE,
-				"$literal_Integer", "1");
-		XlimNodeTemplate.newOutPort(operationE, "var_sched", "1", "bool");
+		Element operationE = XlimNodeTemplate.newValueOperation(schedE, LITINT,
+				"1");
+		XlimNodeTemplate.newOutPort(operationE, "var_sched", "1", BOOL);
 
-		Element moduleE = XlimNodeTemplate.newModule(schedE, "loop");
+		Element moduleE = XlimNodeTemplate.newModule(schedE, LOOP);
 		Element moduledE = XlimNodeTemplate.newTestModule(moduleE, "var_loop");
 
-		Element operationdE = XlimNodeTemplate.newOperation(moduledE, "noop");
+		Element operationdE = XlimNodeTemplate.newOperation(moduledE, NOOP);
 
 		XlimNodeTemplate.newInPort(operationdE, "var_sched");
-		XlimNodeTemplate.newOutPort(operationdE, "var_loop", "1", "bool");
+		XlimNodeTemplate.newOutPort(operationdE, "var_loop", "1", BOOL);
 
-		Element modulebE = XlimNodeTemplate.newModule(moduleE, "body");
+		Element modulebE = XlimNodeTemplate.newModule(moduleE, BODY);
 
 		addScheduler(actor, modulebE);
 	}
@@ -500,14 +511,14 @@ public class XlimActorPrinter {
 					for (Object obj : value) {
 						if (obj != null) {
 							Element el = XlimNodeTemplate.newInitValue(init2);
-							el.setAttribute("value", obj.toString());
+							el.setAttribute(VALUE, obj.toString());
 							((ListType) state.getType()).getElementType()
 									.accept(new XlimTypeSizeVisitor(el));
 						}
 					}
 					if (value[0] == null) {
 						Element el = XlimNodeTemplate.newInitValue(init2);
-						el.setAttribute("value", "0");
+						el.setAttribute(VALUE, "0");
 						((ListType) state.getType()).getElementType().accept(
 								new XlimTypeSizeVisitor(el));
 					}
@@ -517,10 +528,9 @@ public class XlimActorPrinter {
 					if (value != null) {
 						value.accept(new XlimValueVisitor(init2, state
 								.getType()));
-					}
-					else{
+					} else {
 						Element el = XlimNodeTemplate.newInitValue(init2);
-						el.setAttribute("value", "0");
+						el.setAttribute(VALUE, "0");
 						state.getType().accept(new XlimTypeSizeVisitor(el));
 					}
 				}
@@ -545,7 +555,7 @@ public class XlimActorPrinter {
 		String initialname = "fsm" + transition.getSourceState();
 		String finalname = "fsm" + nextState.getTargetState();
 		String initialguard = initialname + "_guard_" + actionname;
-		String finalfire = finalname + "_fire_" + actionname + "_" + (fcount++) ;
+		String finalfire = finalname + "_fire_" + actionname + "_" + (fcount++);
 
 		String falseO = "outval" + (ocount++);
 		String trueO = "outval" + (ocount++);
@@ -557,23 +567,23 @@ public class XlimActorPrinter {
 		Element thenE = sched[1];
 
 		if (transition.getSourceState() != nextState.getTargetState()) {
-			Element ofalse = XlimNodeTemplate.newValueOperation(thenE,
-					"$literal_Integer", "0");
+			Element ofalse = XlimNodeTemplate.newValueOperation(thenE, LITINT,
+					"0");
 
-			XlimNodeTemplate.newOutPort(ofalse, falseO, "1", "bool");
+			XlimNodeTemplate.newOutPort(ofalse, falseO, "1", BOOL);
 
-			Element otrue = XlimNodeTemplate.newValueOperation(thenE,
-					"$literal_Integer", "1");
+			Element otrue = XlimNodeTemplate.newValueOperation(thenE, LITINT,
+					"1");
 
-			XlimNodeTemplate.newOutPort(otrue, trueO, "1", "bool");
+			XlimNodeTemplate.newOutPort(otrue, trueO, "1", BOOL);
 
-			Element afalse = XlimNodeTemplate.newTargetOperation(thenE,
-					"assign", initialname);
+			Element afalse = XlimNodeTemplate.newTargetOperation(thenE, ASSIGN,
+					initialname);
 
 			XlimNodeTemplate.newInPort(afalse, falseO);
 
-			Element atrue = XlimNodeTemplate.newTargetOperation(thenE,
-					"assign", finalname);
+			Element atrue = XlimNodeTemplate.newTargetOperation(thenE, ASSIGN,
+					finalname);
 
 			XlimNodeTemplate.newInPort(atrue, trueO);
 		}
@@ -590,7 +600,7 @@ public class XlimActorPrinter {
 	 * @return if node (to add else)
 	 */
 	private Element createCheckState(Transition transition, Element mutexE) {
-		Element ifE = XlimNodeTemplate.newModule(mutexE, "if");
+		Element ifE = XlimNodeTemplate.newModule(mutexE, IF);
 
 		String source = transition.getSourceState().getName();
 		String name = "fsm" + source;
@@ -598,13 +608,13 @@ public class XlimActorPrinter {
 
 		Element testE = XlimNodeTemplate.newTestModule(ifE, decision);
 
-		Element opE = XlimNodeTemplate.newOperation(testE, "noop");
+		Element opE = XlimNodeTemplate.newOperation(testE, NOOP);
 
 		XlimNodeTemplate.newInPort(opE, name + "_copy");
 
-		XlimNodeTemplate.newOutPort(opE, decision, "1", "bool");
+		XlimNodeTemplate.newOutPort(opE, decision, "1", BOOL);
 
-		Element thenE = XlimNodeTemplate.newModule(ifE, "then");
+		Element thenE = XlimNodeTemplate.newModule(ifE, THEN);
 
 		return thenE;
 	}
@@ -617,7 +627,7 @@ public class XlimActorPrinter {
 	 */
 	private void createXlimDocument(Actor actor) {
 		try {
-			xlim = DomUtil.createDocument("design");
+			xlim = DomUtil.createDocument(DESIGN);
 		} catch (OrccException e) {
 			e.printStackTrace();
 		}

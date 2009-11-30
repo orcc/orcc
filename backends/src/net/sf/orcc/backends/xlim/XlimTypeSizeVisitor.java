@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.xlim;
 
+import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -43,7 +45,8 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimTypeSizeVisitor implements TypeVisitor {
+public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
+		XlimAttributeTemplate {
 
 	/**
 	 * Element to modify
@@ -67,8 +70,8 @@ public class XlimTypeSizeVisitor implements TypeVisitor {
 	 *            Boolean type
 	 */
 	public void visit(BoolType type) {
-		element.setAttribute("size", "1");
-		element.setAttribute("typeName", "bool");
+		element.setAttribute(SIZE, "1");
+		element.setAttribute(TYPENAME, BOOL);
 	}
 
 	/**
@@ -84,8 +87,8 @@ public class XlimTypeSizeVisitor implements TypeVisitor {
 		} catch (Exception e) {
 			size = "";
 		}
-		element.setAttribute("size", size);
-		element.setAttribute("typeName", "int");
+		element.setAttribute(SIZE, size);
+		element.setAttribute(TYPENAME, INT);
 	}
 
 	/**
@@ -95,10 +98,10 @@ public class XlimTypeSizeVisitor implements TypeVisitor {
 	 *            List type
 	 */
 	public void visit(ListType type) {
-		element.setAttribute("typeName", "List");
+		element.setAttribute(TYPENAME, LIST);
 		/*
 		 * try {
-		 * element.setAttribute("size","SIZE"+Util.evaluateAsInteger(type.getSize
+		 * element.setAttribute(XlimNodeTemplate.SIZE,"SIZE"+Util.evaluateAsInteger(type.getSize
 		 * ())); } catch (OrccException e) { // TODO Auto-generated catch block
 		 * e.AddStackTrace(); }
 		 */
@@ -111,7 +114,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor {
 	 *            String type
 	 */
 	public void visit(StringType type) {
-		element.setAttribute("typeName", "String");
+		element.setAttribute(TYPENAME, STRING);
 		// TODO Auto-generated method stub
 
 	}
@@ -129,9 +132,8 @@ public class XlimTypeSizeVisitor implements TypeVisitor {
 		} catch (Exception e) {
 			size = "";
 		}
-		element.setAttribute("size", size);
-		// TODO Check the type name
-		element.setAttribute("typeName", "uint");
+		element.setAttribute(SIZE, size);
+		element.setAttribute(TYPENAME, UINT);
 	}
 
 	/**

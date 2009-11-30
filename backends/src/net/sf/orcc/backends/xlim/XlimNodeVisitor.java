@@ -32,6 +32,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import net.sf.orcc.backends.xlim.templates.XlimModuleTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimOperationTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -46,7 +50,7 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimNodeVisitor implements NodeVisitor {
+public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModuleTemplate, XlimOperationTemplate {
 
 	/**
 	 * Current action name
@@ -134,20 +138,20 @@ public class XlimNodeVisitor implements NodeVisitor {
 	 *            Arguments sent (not used)
 	 */
 	public Object visit(IfNode node, Object... args) {
-		Element moduleB = XlimNodeTemplate.newModule(root, "if");
+		Element moduleB = XlimNodeTemplate.newModule(root, IF);
 
 		String decision = names.putDecision();
 		Element moduleT = XlimNodeTemplate.newTestModule(moduleB, decision);
 
 		node.getValue().accept(new XlimExprVisitor(names, moduleT));
 
-		Element operationE = XlimNodeTemplate.newOperation(moduleT, "noop");
+		Element operationE = XlimNodeTemplate.newOperation(moduleT, NOOP);
 
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
-		XlimNodeTemplate.newOutPort(operationE, decision, "1", "bool");
+		XlimNodeTemplate.newOutPort(operationE, decision, "1", BOOL);
 
-		Element moduleY = XlimNodeTemplate.newModule(moduleB, "then");
+		Element moduleY = XlimNodeTemplate.newModule(moduleB, THEN);
 
 		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
 				actionName, inputs, writeMap);
@@ -155,7 +159,7 @@ public class XlimNodeVisitor implements NodeVisitor {
 			operations.accept(visitor);
 		}
 
-		Element moduleN = XlimNodeTemplate.newModule(moduleB, "else");
+		Element moduleN = XlimNodeTemplate.newModule(moduleB, ELSE);
 
 		for (CFGNode operations : node.getElseNodes()) {
 			operations.accept(new XlimNodeVisitor(names, moduleN, actionName,
@@ -180,19 +184,19 @@ public class XlimNodeVisitor implements NodeVisitor {
 		// TODO Wait for "while" example to check this
 		System.out.println("CHECK WHILE");
 
-		Element moduleB = XlimNodeTemplate.newModule(root, "loop");
+		Element moduleB = XlimNodeTemplate.newModule(root, LOOP);
 
 		String decision = names.putDecision();
 		Element moduleT = XlimNodeTemplate.newTestModule(moduleB, decision);
 		node.getValue().accept(new XlimExprVisitor(names, moduleT));
 
-		Element operationE = XlimNodeTemplate.newOperation(moduleT, "noop");
+		Element operationE = XlimNodeTemplate.newOperation(moduleT, NOOP);
 
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
-		XlimNodeTemplate.newOutPort(operationE, decision, "1", "bool");
+		XlimNodeTemplate.newOutPort(operationE, decision, "1", BOOL);
 
-		Element moduleY = XlimNodeTemplate.newModule(moduleB, "body");
+		Element moduleY = XlimNodeTemplate.newModule(moduleB, BODY);
 
 		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
 				actionName, inputs, writeMap);

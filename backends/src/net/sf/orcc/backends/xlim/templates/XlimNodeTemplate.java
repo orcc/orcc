@@ -27,8 +27,9 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.backends.xlim;
+package net.sf.orcc.backends.xlim.templates;
 
+import net.sf.orcc.backends.xlim.XlimTypeSizeVisitor;
 import net.sf.orcc.ir.Type;
 
 import org.w3c.dom.Element;
@@ -38,7 +39,8 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller
  */
-public class XlimNodeTemplate {
+public class XlimNodeTemplate implements XlimAttributeTemplate,
+		XlimElementTemplate, XlimModuleTemplate, XlimValueTemplate {
 
 	/**
 	 * Calculate value size
@@ -69,9 +71,9 @@ public class XlimNodeTemplate {
 	 * @return Created actor port
 	 */
 	public static Element newActorPort(Element root, String dir, String name) {
-		Element port = root.getOwnerDocument().createElement("actor-port");
-		port.setAttribute("dir", dir);
-		port.setAttribute("name", name);
+		Element port = root.getOwnerDocument().createElement(ACTORPORT);
+		port.setAttribute(DIR, dir);
+		port.setAttribute(NAME, name);
 		root.appendChild(port);
 		return port;
 	}
@@ -86,7 +88,7 @@ public class XlimNodeTemplate {
 	 * @return <code>design</code>
 	 */
 	public static Element newDesign(Element design, String name) {
-		design.setAttribute("name", name);
+		design.setAttribute(NAME, name);
 		return design;
 	}
 
@@ -99,8 +101,8 @@ public class XlimNodeTemplate {
 	 *            Kind of operation
 	 */
 	public static Element newDiffOperation(Element root, String kind) {
-		Element operation = root.getOwnerDocument().createElement("operation");
-		operation.setAttribute("kind", kind);
+		Element operation = root.getOwnerDocument().createElement(OPERATION);
+		operation.setAttribute(KIND, kind);
 		return operation;
 	}
 
@@ -112,7 +114,7 @@ public class XlimNodeTemplate {
 	 * @return New created Initial Value
 	 */
 	public static Element newInitValue(Element root) {
-		Element init = root.getOwnerDocument().createElement("initValue");
+		Element init = root.getOwnerDocument().createElement(INITVALUE);
 		root.appendChild(init);
 		return init;
 	}
@@ -128,7 +130,7 @@ public class XlimNodeTemplate {
 	 */
 	public static Element newInitValue(Element root, String typeName) {
 		Element init = newInitValue(root);
-		init.setAttribute("typeName", typeName);
+		init.setAttribute(TYPENAME, typeName);
 		return init;
 	}
 
@@ -148,8 +150,8 @@ public class XlimNodeTemplate {
 	public static Element newInitValue(Element root, String size,
 			String typeName, String value) {
 		Element init = newInitValue(root, typeName);
-		init.setAttribute("size", size);
-		init.setAttribute("value", value);
+		init.setAttribute(SIZE, size);
+		init.setAttribute(VALUE, value);
 		return init;
 	}
 
@@ -166,8 +168,8 @@ public class XlimNodeTemplate {
 	 */
 	public static Element newInPHIPort(Element root, String source,
 			String qualifier) {
-		Element result = newPort(root, "in", source);
-		result.setAttribute("qualifier", qualifier);
+		Element result = newPort(root, IN, source);
+		result.setAttribute(QUALIFIER, qualifier);
 		return result;
 	}
 
@@ -181,7 +183,7 @@ public class XlimNodeTemplate {
 	 * @return New In Port
 	 */
 	public static Element newInPort(Element root, String source) {
-		return newPort(root, "in", source);
+		return newPort(root, IN, source);
 	}
 
 	/**
@@ -194,8 +196,8 @@ public class XlimNodeTemplate {
 	 * @return New Module
 	 */
 	public static Element newModule(Element root, String kind) {
-		Element module = root.getOwnerDocument().createElement("module");
-		module.setAttribute("kind", kind);
+		Element module = root.getOwnerDocument().createElement(MODULE);
+		module.setAttribute(KIND, kind);
 		root.appendChild(module);
 		return (module);
 	}
@@ -217,8 +219,8 @@ public class XlimNodeTemplate {
 			String autostart, String name) {
 		Element module = newModule(root, kind);
 
-		module.setAttribute("autostart", autostart);
-		module.setAttribute("name", name);
+		module.setAttribute(AUTOSTART, autostart);
+		module.setAttribute(NAME, name);
 		return (module);
 	}
 
@@ -240,7 +242,7 @@ public class XlimNodeTemplate {
 	public static Element newModule(Element root, String kind,
 			String autostart, String name, String sourcename) {
 		Element module = newModule(root, kind, autostart, name);
-		module.setAttribute("sourcename", sourcename);
+		module.setAttribute(SOURCENAME_, sourcename);
 		return (module);
 	}
 
@@ -258,7 +260,7 @@ public class XlimNodeTemplate {
 	public static Element newNameOperation(Element root, String kind,
 			String name) {
 		Element operation = newOperation(root, kind);
-		operation.setAttribute("name", name);
+		operation.setAttribute(NAME, name);
 		return operation;
 	}
 
@@ -286,7 +288,7 @@ public class XlimNodeTemplate {
 	 * @return New Out Port
 	 */
 	public static Element newOutPort(Element root, String source) {
-		return newPort(root, "out", source);
+		return newPort(root, OUT, source);
 	}
 
 	/**
@@ -305,8 +307,8 @@ public class XlimNodeTemplate {
 	public static Element newOutPort(Element root, String source,
 			String typeName, int value) {
 		Element port = newOutPort(root, source);
-		port.setAttribute("typeName", typeName);
-		port.setAttribute("size", calcSize(value));
+		port.setAttribute(TYPENAME, typeName);
+		port.setAttribute(SIZE, calcSize(value));
 		return port;
 	}
 
@@ -326,8 +328,8 @@ public class XlimNodeTemplate {
 	public static Element newOutPort(Element root, String source, String size,
 			String typeName) {
 		Element port = newOutPort(root, source);
-		port.setAttribute("typeName", typeName);
-		port.setAttribute("size", size);
+		port.setAttribute(TYPENAME, typeName);
+		port.setAttribute(SIZE, size);
 		return port;
 	}
 
@@ -356,7 +358,7 @@ public class XlimNodeTemplate {
 	 * @return New created PHI
 	 */
 	public static Element newPHI(Element root) {
-		Element phi = root.getOwnerDocument().createElement("PHI");
+		Element phi = root.getOwnerDocument().createElement(PHI);
 		root.appendChild(phi);
 		return phi;
 	}
@@ -373,9 +375,9 @@ public class XlimNodeTemplate {
 	 * @return New Port
 	 */
 	private static Element newPort(Element root, String dir, String source) {
-		Element port = root.getOwnerDocument().createElement("port");
-		port.setAttribute("dir", dir);
-		port.setAttribute("source", source);
+		Element port = root.getOwnerDocument().createElement(PORT);
+		port.setAttribute(DIR, dir);
+		port.setAttribute(SOURCE, source);
 		root.appendChild(port);
 		return port;
 	}
@@ -394,7 +396,7 @@ public class XlimNodeTemplate {
 	public static Element newPortOperation(Element root, String kind,
 			String portName) {
 		Element operation = newOperation(root, kind);
-		operation.setAttribute("portName", portName);
+		operation.setAttribute(PORTNAME, portName);
 		return operation;
 	}
 
@@ -408,8 +410,8 @@ public class XlimNodeTemplate {
 	 * @return Created State variable
 	 */
 	public static Element newStateVar(Element root, String name) {
-		Element statevar = root.getOwnerDocument().createElement("stateVar");
-		statevar.setAttribute("name", name);
+		Element statevar = root.getOwnerDocument().createElement(STATEVAR);
+		statevar.setAttribute(NAME, name);
 		root.appendChild(statevar);
 		return statevar;
 	}
@@ -428,7 +430,7 @@ public class XlimNodeTemplate {
 	public static Element newStateVar(Element root, String name,
 			String sourceName) {
 		Element statevar = newStateVar(root, name);
-		statevar.setAttribute("sourceName", sourceName);
+		statevar.setAttribute(SOURCENAME, sourceName);
 		return statevar;
 	}
 
@@ -446,7 +448,7 @@ public class XlimNodeTemplate {
 	public static Element newTargetOperation(Element root, String kind,
 			String target) {
 		Element operation = newOperation(root, kind);
-		operation.setAttribute("target", target);
+		operation.setAttribute(TARGET, target);
 		return operation;
 	}
 
@@ -460,8 +462,8 @@ public class XlimNodeTemplate {
 	 * @return New Test Module
 	 */
 	public static Element newTestModule(Element root, String decision) {
-		Element module = newModule(root, "test");
-		module.setAttribute("decision", decision);
+		Element module = newModule(root, TEST);
+		module.setAttribute(DECISION, decision);
 		return module;
 	}
 
@@ -479,7 +481,7 @@ public class XlimNodeTemplate {
 	public static Element newValueOperation(Element root, String kind,
 			String value) {
 		Element operation = newOperation(root, kind);
-		operation.setAttribute("value", value);
+		operation.setAttribute(VALUE, value);
 		return operation;
 	}
 

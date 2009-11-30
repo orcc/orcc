@@ -34,6 +34,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimModuleTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimOperationTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimValueTemplate;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
@@ -63,7 +68,7 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimInstructionVisitor implements InstructionVisitor {
+public class XlimInstructionVisitor implements InstructionVisitor, XlimOperationTemplate, XlimAttributeTemplate, XlimModuleTemplate, XlimValueTemplate {
 
 	/**
 	 * Current action name
@@ -130,7 +135,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		 * XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		 */
 		node.getValue().accept(new XlimExprVisitor(names, root));
-		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
+		Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(node
 				.getTarget(), actionName), node.getTarget().getType());
@@ -164,7 +169,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 
 		Variable target = node.getTarget();
 		if (target != null) {
-			Element operationE = XlimNodeTemplate.newOperation(root, "noop");
+			Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
 			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target,
 					actionName), target.getType());
@@ -214,11 +219,11 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		if (node.getSource().getVariable().getType().getType() == Type.LIST
 				&& !inport) {
 			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root));
-			operationE = XlimNodeTemplate.newNameOperation(root, "var_ref",
+			operationE = XlimNodeTemplate.newNameOperation(root, VARREF,
 					names.getVarName(node.getSource()));
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		} else {
-			operationE = XlimNodeTemplate.newOperation(root, "noop");
+			operationE = XlimNodeTemplate.newOperation(root, NOOP);
 
 			name = names.getVarName(node.getSource());
 			XlimNodeTemplate.newInPort(operationE, name);
@@ -250,9 +255,9 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		System.out.println("CHECK PHIS");
 
 		XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars().get(
-				0)), "then");
+				0)), THEN);
 		XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars().get(
-				1)), "else");
+				1)), ELSE);
 
 		Element portO = XlimNodeTemplate.newOutPort(phiE, names.getVarName(phi
 				.getTarget(), actionName), phi.getTarget().getType());
@@ -268,10 +273,10 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	 *            Arguments sent (not used)
 	 */
 	public void visit(Read node, Object... args) {
-		Element operationE = XlimNodeTemplate.newPortOperation(root, "pinRead",
+		Element operationE = XlimNodeTemplate.newPortOperation(root, PINREAD,
 				node.getPort().getName());
-		operationE.setAttribute("removable", "no");
-		operationE.setAttribute("style", "simple");
+		operationE.setAttribute(REMOVABLE, NO);
+		operationE.setAttribute(STYLE, SIMPLE);
 
 		String name = names.getVarName(node.getTarget(), actionName);
 		Element port = XlimNodeTemplate.newOutPort(operationE, name);
@@ -330,8 +335,8 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 		Variable var = node.getTarget().getVariable();
 		if (var instanceof StateVariable) {
 			Element operationE = XlimNodeTemplate.newDiffOperation(root,
-					"assign");
-			operationE.setAttribute("target", names
+					ASSIGN);
+			operationE.setAttribute(TARGET, names
 					.getVarName(node.getTarget()));
 			String data = names.getTempName();
 
@@ -342,7 +347,7 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 			XlimNodeTemplate.newInPort(operationE, data);
 			root.appendChild(operationE);
 		} else {
-			Element operationE = XlimNodeTemplate.newOperation(root, "noop");
+			Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
@@ -363,8 +368,8 @@ public class XlimInstructionVisitor implements InstructionVisitor {
 	 */
 	public void visit(Write node, Object... args) {
 		Element operationE = XlimNodeTemplate.newPortOperation(root,
-				"pinWrite", node.getPort().getName());
-		operationE.setAttribute("style", "simple");
+				PINWRITE, node.getPort().getName());
+		operationE.setAttribute(STYLE, SIMPLE);
 		String name = names.getVarName(node.getTarget(), actionName);
 		XlimNodeTemplate.newInPort(operationE, name);
 

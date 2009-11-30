@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.xlim;
 
+import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.consts.BoolConst;
@@ -44,7 +46,7 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimValueVisitor implements ConstantVisitor {
+public class XlimValueVisitor implements ConstantVisitor, XlimAttributeTemplate {
 
 	/**
 	 * Element to modify
@@ -79,7 +81,7 @@ public class XlimValueVisitor implements ConstantVisitor {
 	 */
 	public void visit(BoolConst constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		element.setAttribute("value", constant.getValue() ? "1" : "0");
+		element.setAttribute(VALUE, constant.getValue() ? "1" : "0");
 	}
 
 	/**
@@ -92,7 +94,7 @@ public class XlimValueVisitor implements ConstantVisitor {
 	 */
 	public void visit(IntConst constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		element.setAttribute("value", constant.toString());
+		element.setAttribute(VALUE, constant.toString());
 	}
 
 	/**
@@ -122,7 +124,7 @@ public class XlimValueVisitor implements ConstantVisitor {
 	 */
 	public void visit(StringConst constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		element.setAttribute("value", constant.toString());
+		element.setAttribute(VALUE, constant.toString());
 	}
 
 }

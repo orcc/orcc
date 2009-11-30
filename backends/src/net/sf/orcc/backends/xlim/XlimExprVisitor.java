@@ -31,6 +31,9 @@ package net.sf.orcc.backends.xlim;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimOperationTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -49,7 +52,7 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller
  */
-public class XlimExprVisitor implements ExpressionVisitor {
+public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate, XlimOperationTemplate {
 
 	/**
 	 * Binary operators XLIM mapping
@@ -77,33 +80,33 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	{
 		// Binary operators
 		opString = new TreeMap<BinaryOp, String>();
-		opString.put(BinaryOp.BITAND, "bitand");
-		opString.put(BinaryOp.BITOR, "bitor");
-		opString.put(BinaryOp.BITXOR, "bitxor");
-		opString.put(BinaryOp.DIV, "$div");
-		opString.put(BinaryOp.DIV_INT, "$idiv");
-		opString.put(BinaryOp.EQ, "$eq");
-		opString.put(BinaryOp.EXP, "$exp");
-		opString.put(BinaryOp.GE, "$ge");
-		opString.put(BinaryOp.GT, "$gt");
-		opString.put(BinaryOp.LOGIC_AND, "$and");
-		opString.put(BinaryOp.LE, "$le");
-		opString.put(BinaryOp.LOGIC_OR, "$or");
-		opString.put(BinaryOp.LT, "$lt");
-		opString.put(BinaryOp.MINUS, "$sub");
-		opString.put(BinaryOp.MOD, "$mod");
-		opString.put(BinaryOp.NE, "$ne");
-		opString.put(BinaryOp.PLUS, "$add");
-		opString.put(BinaryOp.SHIFT_LEFT, "lshift");
-		opString.put(BinaryOp.SHIFT_RIGHT, "rshift");
-		opString.put(BinaryOp.TIMES, "$mul");
+		opString.put(BinaryOp.BITAND, BITAND);
+		opString.put(BinaryOp.BITOR, BITOR);
+		opString.put(BinaryOp.BITXOR, BITXOR);
+		opString.put(BinaryOp.DIV, DIV);
+		opString.put(BinaryOp.DIV_INT, IDIV);
+		opString.put(BinaryOp.EQ, EQ);
+		opString.put(BinaryOp.EXP, EXP);
+		opString.put(BinaryOp.GE, GE);
+		opString.put(BinaryOp.GT, GT);
+		opString.put(BinaryOp.LOGIC_AND, AND);
+		opString.put(BinaryOp.LE, LE);
+		opString.put(BinaryOp.LOGIC_OR, OR);
+		opString.put(BinaryOp.LT, LT);
+		opString.put(BinaryOp.MINUS, SUB);
+		opString.put(BinaryOp.MOD, MOD);
+		opString.put(BinaryOp.NE, NE);
+		opString.put(BinaryOp.PLUS, ADD);
+		opString.put(BinaryOp.SHIFT_LEFT, LSHIFT);
+		opString.put(BinaryOp.SHIFT_RIGHT, RSHIFT);
+		opString.put(BinaryOp.TIMES, MUL);
 
 		// Unary operators
 		uopString = new TreeMap<UnaryOp, String>();
-		uopString.put(UnaryOp.BITNOT, "bitnot");
-		uopString.put(UnaryOp.LOGIC_NOT, "$not");
-		uopString.put(UnaryOp.MINUS, "$negate");
-		uopString.put(UnaryOp.NUM_ELTS, "$elts");
+		uopString.put(UnaryOp.BITNOT, BITNOT);
+		uopString.put(UnaryOp.LOGIC_NOT, NOT);
+		uopString.put(UnaryOp.MINUS, NEG);
+		uopString.put(UnaryOp.NUM_ELTS, ELTS);
 	}
 
 	/**
@@ -155,9 +158,9 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 */
 	public void visit(BoolExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root,
-				"$literal_Integer", expr.getValue() ? "1" : "0");
+				LITINT, expr.getValue() ? "1" : "0");
 		XlimNodeTemplate
-				.newOutPort(operationE, names.putTempName(), "1", "int");
+				.newOutPort(operationE, names.putTempName(), "1", INT);
 	}
 
 	/**
@@ -170,8 +173,8 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 */
 	public void visit(IntExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root,
-				"$literal_Integer", expr.toString());
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), "int",
+				LITINT, expr.toString());
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), INT,
 				expr.getValue());
 		// TODO Add size
 	}
@@ -234,7 +237,7 @@ public class XlimExprVisitor implements ExpressionVisitor {
 	 *            Arguments sent (not used)
 	 */
 	public void visit(VarExpr expr, Object... args) {
-		Element operationE = XlimNodeTemplate.newOperation(root, "noop");
+		Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 
 		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar()));
 
