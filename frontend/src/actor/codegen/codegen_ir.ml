@@ -38,8 +38,7 @@ let mk_loc loc =
 			);
 			[int loc.Loc.start.Loc.line;
 			int (loc.Loc.start.Loc.off - loc.Loc.start.Loc.bol);
-			int loc.Loc.stop.Loc.line;
-			int (loc.Loc.stop.Loc.off - loc.Loc.start.Loc.bol)]
+			int (loc.Loc.stop.Loc.off - loc.Loc.stop.Loc.bol)]
 		)
 	in
 	array nodes
@@ -66,8 +65,7 @@ let mk_var_ref var_def =
 		int var_def.v_index]
 
 (** [mk_var_use var_use] calls [mk_var_ref] and adds a "node" attribute. *)
-let mk_var_use var_use =
-	array [mk_var_ref var_use.vu_def; int var_use.vu_node.n_id]
+let mk_var_use var_use = mk_var_ref var_use.vu_def
 
 (** [string_of_bop bop] returns an element name from a binary operator. *)
 let string_of_bop = function
@@ -135,12 +133,6 @@ and
 	| TypeUnknown -> failwith "unknown type"
 	| TypeVoid -> string "void"
 
-let mk_uses ref_list =
-	array
-		(List.map
-			(fun var_use -> int var_use.vu_node.n_id)
-			ref_list)
-
 (** [mk_var_def var_def] *)
 let mk_var_def var_def =
 	let var =
@@ -148,14 +140,12 @@ let mk_var_def var_def =
 		bool var_def.v_assignable;
 		bool var_def.v_global;
 		mk_suffix var_def.v_suffix;
-		int var_def.v_index;
-		int var_def.v_node.n_id]
+		int var_def.v_index]
 	in
 	array
 		[array var;
 		mk_loc var_def.v_loc;
-		mk_type var_def.v_type;
-		mk_uses var_def.v_refs]
+		mk_type var_def.v_type]
 
 let mk_ports ports =
 	array
@@ -200,7 +190,7 @@ let rec mk_nodes graph node join =
 				(fun node _join existing ->
 					(* yaml_node is a list because when node.n_kind is Empty, yaml_node *)
 					(* equals to an empty list. *)
-					let (node_name, yaml_node) =
+					let (node_name, json_node) =
 						match node.n_kind with
 							| HasTokens (ref, fifo, num_tokens) ->
 								("hasTokens",
@@ -266,8 +256,8 @@ let rec mk_nodes graph node join =
 					in
 					let node =
 						array
-							(string node_name :: int node.n_id :: mk_loc node.n_loc ::
-							yaml_node)
+							(string node_name :: mk_loc node.n_loc ::
+							json_node)
 					in
 					node :: existing)
 			graph node join []
@@ -280,7 +270,7 @@ let mk_proc proc =
 	let nodes =
 		if proc.p_return = TypeVoid then
 			 array
-				(Json_type.Browse.array nodes @ [array [string "return"; int 0; mk_loc dummy_loc; null] ])
+				(Json_type.Browse.array nodes @ [array [string "return"; mk_loc dummy_loc; null] ])
 		else
 			nodes
 	in
