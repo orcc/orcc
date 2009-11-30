@@ -24,7 +24,7 @@ display_OPORT_SIZE
 #define MAX_WIDTH 704
 #define MAX_HEIGHT 576
 
-class Actor_display : public ActorGen 
+class actor_display : public ActorGen 
 {
 
 	// State variables of the actor
@@ -49,7 +49,7 @@ private:
 
 public:
 	// Default constructor
-	Actor_display();
+	actor_display();
 	
 	
 private:
@@ -63,8 +63,9 @@ private:
 	void display_set_video(int width, int height);
 	
 public:
+		void initializeActor();
 	
-	void process();
+	void scheduler();
 
 };
 

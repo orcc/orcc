@@ -17,7 +17,7 @@ source_O,
 source_OPORT_SIZE
 };
 
-class Actor_source : public ActorGen 
+class actor_source : public ActorGen 
 {
 
 	// State variables of the actor
@@ -29,17 +29,17 @@ private:
 
 public:
 	// Default constructor
-	Actor_source();
+	actor_source();
 	
 private:
 	// Functions/procedures
 	// Actions
 public:
 	void initialize();
-	
+	void initializeActor();
 	// Action scheduler
 
-	void process();
+	void scheduler();
 
 };
 
