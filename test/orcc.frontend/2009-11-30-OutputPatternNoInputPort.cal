@@ -1,0 +1,8 @@
+// XFAIL: cannot write to an input port
+
+actor Actor () int Port1, int Port2 ==> int Port3, int Port4:
+
+  action ==> Port1:[0]
+  end
+
+end

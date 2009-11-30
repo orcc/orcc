@@ -56,7 +56,33 @@ import net.sf.orcc.util.Scope;
 
 import org.antlr.runtime.tree.Tree;
 
+/**
+ * This class defines an action parser.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public class ActionParser {
+
+	/**
+	 * This class defines a pattern type. Input patterns and outputs patterns
+	 * may either reference ports by position, or reference ports by name, but
+	 * not both.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private enum PatternType {
+		/**
+		 * the pattern references ports by name
+		 */
+		NAME,
+
+		/**
+		 * the pattern references ports by position
+		 */
+		POSITION;
+	};
 
 	/**
 	 * the file being parsed
@@ -69,6 +95,11 @@ public class ActionParser {
 	private Map<Port, Integer> inputPattern;
 
 	/**
+	 * ordered map of input ports
+	 */
+	private OrderedMap<Port> inputs;
+
+	/**
 	 * list of CFG nodes of the action being parsed
 	 */
 	private ArrayList<CFGNode> nodes;
@@ -77,6 +108,26 @@ public class ActionParser {
 	 * output pattern of the action being parsed
 	 */
 	private Map<Port, Integer> outputPattern;
+
+	/**
+	 * ordered map of output ports
+	 */
+	private OrderedMap<Port> outputs;
+
+	/**
+	 * type of the current pattern
+	 */
+	private PatternType patternType;
+
+	/**
+	 * list of ports referenced by the current pattern
+	 */
+	private final List<Port> patternPorts;
+
+	/**
+	 * position of a port in an input pattern.
+	 */
+	private int position;
 
 	private Scope<Variable> scope;
 
@@ -95,10 +146,16 @@ public class ActionParser {
 	 * 
 	 * @param file
 	 *            the file being parsed
+	 * @param outputs
+	 * @param inputs
 	 * 
 	 */
-	public ActionParser(String file) {
+	public ActionParser(String file, OrderedMap<Port> inputs,
+			OrderedMap<Port> outputs) {
 		this.file = file;
+		this.inputs = inputs;
+		this.outputs = outputs;
+		patternPorts = new ArrayList<Port>();
 	}
 
 	private Procedure createSchedulingProcedure(Procedure body, Tree guards) {
@@ -156,6 +213,72 @@ public class ActionParser {
 		return builder.toString();
 	}
 
+	/**
+	 * Returns a port from the ports ordered map. This method checks if the
+	 * given tree contains a port name, and if it does not, it uses the position
+	 * field.
+	 * 
+	 * @param ports
+	 *            ordered map of ports
+	 * @param tree
+	 *            a tree
+	 * @return a port
+	 * @throws OrccException
+	 */
+	private Port getPort(OrderedMap<Port> ports, Tree tree)
+			throws OrccException {
+		if (tree.getChildCount() == 0) {
+			if (patternType == null) {
+				// first reference sets the pattern
+				patternType = PatternType.POSITION;
+				position = 0;
+			} else if (PatternType.NAME.equals(patternType)) {
+				throw new OrccException(
+						"a pattern references ports by position and by name");
+			}
+
+			List<Port> list = ports.getList();
+			if (position >= list.size()) {
+				throw new OrccException(file, parseLocation(tree),
+						"pattern has too many ports");
+			}
+			return list.get(position++);
+		} else {
+			if (patternType == null) {
+				// first reference sets the pattern
+				patternType = PatternType.NAME;
+			} else if (PatternType.POSITION.equals(patternType)) {
+				throw new OrccException(
+						"a pattern references ports by position and by name");
+			}
+
+			String portName = tree.getChild(0).getText();
+			Port port = ports.get(portName);
+			if (port == null) {
+				throw new OrccException(file, parseLocation(tree),
+						"port cannot be found: \"" + portName + "\"");
+			}
+
+			// check that this port is only referenced once
+			if (patternPorts.contains(port)) {
+				throw new OrccException("port \"" + portName
+						+ "\" is referenced more than once");
+			} else {
+				patternPorts.add(port);
+			}
+
+			return port;
+		}
+	}
+
+	/**
+	 * Parses the given tree as an action.
+	 * 
+	 * @param tree
+	 *            a tree
+	 * @return an action
+	 * @throws OrccException
+	 */
 	public Action parseAction(Tree tree) throws OrccException {
 		Tree tagTree = tree.getChild(0);
 		Location location = parseLocation(tree);
@@ -183,12 +306,56 @@ public class ActionParser {
 		// TODO Auto-generated method stub
 	}
 
-	private void parseInputPattern(Tree tree) {
-		inputPattern = new HashMap<Port, Integer>();
+	private void parseInput(Port port, Tree idents, Tree repeat) {
+		// TODO Auto-generated method stub
+
 	}
 
-	private void parseOutputPattern(Tree child) {
+	/**
+	 * Parses the given tree as an input pattern, and adds Read calls as
+	 * appropriate.
+	 * 
+	 * @param tree
+	 *            a tree
+	 * @throws OrccException
+	 */
+	private void parseInputPattern(Tree tree) throws OrccException {
+		inputPattern = new HashMap<Port, Integer>();
+		patternType = null;
+		patternPorts.clear();
+
+		int n = tree.getChildCount();
+		for (int i = 0; i < n; i++) {
+			Tree input = tree.getChild(i);
+			Port port = getPort(inputs, input.getChild(0));
+			parseInput(port, input.getChild(1), input.getChild(2));
+		}
+	}
+
+	private void parseOutput(Port port, Tree expression, Tree repeat) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * Parses the given tree as an output pattern, and adds Write calls as
+	 * appropriate.
+	 * 
+	 * @param tree
+	 *            a tree
+	 * @throws OrccException
+	 */
+	private void parseOutputPattern(Tree tree) throws OrccException {
 		outputPattern = new HashMap<Port, Integer>();
+		patternType = null;
+		patternPorts.clear();
+
+		int n = tree.getChildCount();
+		for (int i = 0; i < n; i++) {
+			Tree output = tree.getChild(i);
+			Port port = getPort(outputs, output.getChild(0));
+			parseOutput(port, output.getChild(1), output.getChild(2));
+		}
 	}
 
 	/**

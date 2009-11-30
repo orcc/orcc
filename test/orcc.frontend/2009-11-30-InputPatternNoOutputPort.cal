@@ -1,0 +1,8 @@
+// XFAIL: cannot read from an output port
+
+actor Actor () int Port1, int Port2 ==> int Port3, int Port4:
+
+  action Port3:[x] ==>
+  end
+
+end

@@ -109,12 +109,12 @@ public class ALAstParser {
 	private ActionList initializes;
 
 	/**
-	 * scope of input ports
+	 * ordered map of input ports
 	 */
 	private OrderedMap<Port> inputs;
 
 	/**
-	 * scope of output ports
+	 * ordered map of output ports
 	 */
 	private OrderedMap<Port> outputs;
 
@@ -164,7 +164,6 @@ public class ALAstParser {
 		try {
 			this.file = new File(fileName).getCanonicalPath();
 
-			actionParser = new ActionParser(file);
 			exprParser = new ExpressionParser(file);
 			typeParser = new TypeParser(file, exprParser);
 			stmtParser = new StatementParser(file, typeParser, exprParser);
@@ -265,6 +264,8 @@ public class ALAstParser {
 		// parse ports and return them as ordered maps
 		inputs = parsePorts(tree.getChild(3));
 		outputs = parsePorts(tree.getChild(4));
+		
+		actionParser = new ActionParser(file, inputs, outputs);
 
 		// parse actor declarations
 		stateVars = new Scope<Variable>(parameters, false);

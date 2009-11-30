@@ -113,11 +113,11 @@ actorDeclaration:
   )
 
 // anonymous action
-| ACTION actionInputs? '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
+| ACTION inputs=actionInputs? '==>' outputs=actionOutputs? guards=actionGuards? ('var' varDecls)? actionStatements? 'end'
   -> ^(ACTION TAG ^(INPUTS $inputs?) ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARIABLES varDecls?) ^(STATEMENTS actionStatements?))
 
 // anonymous initialize
-| INITIALIZE '==>' actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
+| INITIALIZE '==>' outputs=actionOutputs? actionGuards? ('var' varDecls)? actionStatements? 'end'
   -> ^(INITIALIZE TAG INPUTS ^(OUTPUTS $outputs?) ^(GUARDS $guards?) ^(VARIABLES varDecls?) ^(STATEMENTS actionStatements?))
 
 | priorityOrder -> priorityOrder
