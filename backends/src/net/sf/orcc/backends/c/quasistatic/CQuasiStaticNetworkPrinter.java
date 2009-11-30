@@ -1,5 +1,6 @@
 package net.sf.orcc.backends.c.quasistatic;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,15 +10,20 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.c.CNetworkPrinter;
+import net.sf.orcc.backends.c.quasistatic.scheduler.main.Scheduler;
+import net.sf.orcc.backends.c.quasistatic.scheduler.parsers.InputXDFParser;
+import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DirectedMultigraph;
 
 /*
@@ -48,28 +54,11 @@ import org.jgrapht.graph.DirectedMultigraph;
  */
 public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 
-	private HashMap<String, String> customBuffersSize;
+	//private HashMap<String, String> customBuffersSize;
 
 	public CQuasiStaticNetworkPrinter() throws IOException {
 		super("C_quasistatic_network");
-		initBuffersMap();
-	}
-
-	private void initBuffersMap() {
-		customBuffersSize = new HashMap<String, String>();
-		customBuffersSize.put("IS_PQF_AC", "63");
-		customBuffersSize.put("invpred_QF_DC", "1");
-		customBuffersSize.put("invpred_QUANT", "1");
-		customBuffersSize.put("invpred_SIGNED", "1");
-		customBuffersSize.put("IAP_QF_AC", "63");
-		customBuffersSize.put("address_RA", "81");
-		customBuffersSize.put("address_WA", "SIZE");
-		customBuffersSize.put("DCsplit_AC", "63");
-		customBuffersSize.put("mvrecon_MV", "2");
-		customBuffersSize.put("parseheaders_BTYPE", "1");
-		customBuffersSize.put("add_VID", "SIZE");
-		customBuffersSize.put("broadcast_add_VID_output_0", "SIZE");
-		// customBuffersSize.put("broadcast_add_VID_output_1", "SIZE");
+		//initBuffersMap();
 	}
 
 	/**
@@ -99,9 +88,14 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 
 		template.setAttribute("broadcasts", broadcasts);
 	}
-
+	
 	/**
 	 * Sets the connections attribute.
+	 * 
+	 * setConnections is protected due to has been overwritten by
+	 * CQuasiStaticNetworkPrinter
+	 * 
+	 * Overwrite to include custom buffers sizes
 	 * 
 	 * @param graph
 	 *            The network's graph.
@@ -109,52 +103,61 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 	 *            The graph's connection.
 	 * @throws OrccException
 	 */
-	protected void setConnections(
-			DirectedMultigraph<Instance, Connection> graph,
+	protected void setConnections(DirectedGraph<Vertex, Connection> graph,
 			Set<Connection> connections) throws OrccException {
 		List<Map<String, Object>> conn = new ArrayList<Map<String, Object>>();
 		int fifoCount = 0;
 
 		for (Connection connection : connections) {
-			Instance source = graph.getEdgeSource(connection);
-			Instance target = graph.getEdgeTarget(connection);
+			Vertex srcVertex = graph.getEdgeSource(connection);
+			Vertex tgtVertex = graph.getEdgeTarget(connection);
 
-			Type type;
-			if (source.isBroadcast()) {
-				type = connection.getTarget().getType();
-			} else {
-				type = connection.getSource().getType();
+			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
+				Instance source = srcVertex.getInstance();
+				Instance target = tgtVertex.getInstance();
+
+				Type type;
+				if (source.isBroadcast()) {
+					type = connection.getTarget().getType();
+				} else {
+					type = connection.getSource().getType();
+				}
+
+				String size;
+				IAttribute attr = connection
+						.getAttribute(Connection.BUFFER_SIZE);
+				InputXDFParser inputXDFParser = new InputXDFParser(
+						Scheduler.workingDirectoryPath + File.separator
+								+ Constants.INPUT_FILE_NAME);
+				HashMap<String, String> customBuffersSize = inputXDFParser
+						.parseCustomBuffersSizes();
+				if (customBuffersSize.containsKey(source.getId() + "_"
+						+ connection.getSource().getName())){
+					size = customBuffersSize.get(source.getId() + "_"
+							+ connection.getSource().getName());
+				} else if (attr != null && attr.getType() == IAttribute.VALUE) {
+					Expression expr = ((IValueAttribute) attr).getValue();
+					size = Integer.toString(new ExpressionEvaluator()
+							.evaluateAsInteger(expr) + 1);
+				} else {
+					size = "SIZE";
+				}
+
+				Map<String, Object> attrs = new HashMap<String, Object>();
+				attrs.put("count", fifoCount);
+				attrs.put("size", size);
+				attrs.put("type", type.toString());
+				attrs.put("source", source.getId());
+				attrs.put("src_port", connection.getSource().getName());
+				attrs.put("target", target.getId());
+				attrs.put("tgt_port", connection.getTarget().getName());
+
+				conn.add(attrs);
+
+				fifoCount++;
 			}
-
-			String size;
-			IAttribute attr = connection.getAttribute(Connection.BUFFER_SIZE);
-			if (customBuffersSize.containsKey(source.getId() + "_"
-					+ connection.getSource().getName()))
-				size = customBuffersSize.get(source.getId() + "_"
-						+ connection.getSource().getName());
-			else if (attr != null && attr.getType() == IAttribute.VALUE) {
-				Expression expr = ((IValueAttribute) attr).getValue();
-				size = Integer.toString(new ExpressionEvaluator()
-						.evaluateAsInteger(expr) + 1);
-			} else {
-				size = "SIZE";
-			}
-
-			Map<String, Object> attrs = new HashMap<String, Object>();
-			attrs.put("count", fifoCount);
-			attrs.put("size", size);
-			attrs.put("type", type.toString());
-			attrs.put("source", source.getId());
-			attrs.put("src_port", connection.getSource().getName());
-			attrs.put("target", target.getId());
-			attrs.put("tgt_port", connection.getTarget().getName());
-
-			conn.add(attrs);
-
-			fifoCount++;
 		}
 
 		template.setAttribute("connections", conn);
 	}
-
 }
