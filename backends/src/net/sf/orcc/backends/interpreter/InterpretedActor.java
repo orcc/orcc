@@ -28,11 +28,9 @@
  */
 package net.sf.orcc.backends.interpreter;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.sf.orcc.backends.interpreter.FsmManager.TransitionManager;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -43,6 +41,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.consts.ConstantEvaluator;
 
 /**
@@ -53,11 +52,14 @@ import net.sf.orcc.ir.consts.ConstantEvaluator;
  */
 public class InterpretedActor extends AbstractInterpretedActor {
 
-	private String fsmState;
-	private FsmManager fsmMgr;
-	private ListAllocator listAllocator;
-	private NodeInterpreter interpret;
 	private ConstantEvaluator constEval;
+
+	private String fsmState;
+
+	private NodeInterpreter interpret;
+
+	private ListAllocator listAllocator;
+
 	private ActionScheduler sched;
 
 	// private List<Actor> schedPred;
@@ -67,7 +69,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
 			this.fsmState = sched.getFsm().getInitialState().getName();
-			fsmMgr = new FsmManager(sched.getFsm());
 		} else {
 			fsmState = "IDLE";
 		}
@@ -75,10 +76,27 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// Create the List allocator for state and procedure local vars
 		listAllocator = new ListAllocator();
+
 		// Build a node interpreter for visiting CFG and instructions
 		interpret = new NodeInterpreter(name);
+
 		// Creates an expression evaluator for state and local variables init
 		this.constEval = new ConstantEvaluator();
+	}
+
+	private boolean checkOutputPattern(Map<Port, Integer> outputPattern) {
+		if (outputPattern != null) {
+			boolean freeOutput = true;
+			for (Entry<Port, Integer> entry : outputPattern.entrySet()) {
+				Port outputPort = entry.getKey();
+				Integer nbOfTokens = entry.getValue();
+				freeOutput &= outputPort.fifo().hasRoom(nbOfTokens);
+			}
+
+			return freeOutput;
+		} else {
+			return true;
+		}
 	}
 
 	public String getFsmState() {
@@ -96,7 +114,8 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			Type type = stateVar.getType();
 			// Initialize variables with constant values
 			if (stateVar.hasExpression()) {
-				Constant initConst = ((StateVariable) stateVar).getConstantValue();
+				Constant initConst = ((StateVariable) stateVar)
+						.getConstantValue();
 				Object initVal = initConst.accept(constEval);
 				stateVar.setValue(initVal);
 			} else if (type.getType() == Type.LIST) {
@@ -113,79 +132,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 					interpretProc(action.getBody());
 				}
 			}
-		}
-	}
-
-	/**
-	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
-	 * 
-	 */
-	public Integer schedule() {
-		if (sched.hasFsm()) {
-			System.out.println("Current FSM state is : " + fsmState);
-
-			// Check for untagged actions first
-			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)) {
-					interpretProc(action.getBody());
-					System.out.println("Executing action : "+ action.getBody().getName());
-				}
-			}
-			// Then check for next FSM transition
-			Iterator<TransitionManager> it = fsmMgr.getIt(fsmState);
-
-			while (it.hasNext()) {
-				TransitionManager transMgr = it.next();
-				Action action = transMgr.transitionAction;
-				System.out.println("Check schedulable : " + action.getBody().getName());
-				if (isSchedulable(action)) {
-					interpretProc(action.getBody());
-					System.out.println("Executing action : "+ action.getBody().getName());
-					// Update FSM state
-					fsmState = transMgr.targetState;
-					// Execute 1 action only per actor scheduler cycle
-					return 1;
-				}
-			}
-		} else {
-			for (Action action : sched.getActions()) {
-				System.out.println("Checking schedulable action : "+ action.getBody().getName());
-				if (isSchedulable(action)) {
-					interpretProc(action.getBody());
-					System.out.println("Executing action : "+ action.getBody().getName());
-					// Execute 1 action only per actor scheduler cycle
-					return 1;
-				}
-			}
-		}
-		return 0;
-	}
-
-	private boolean isSchedulable(Action action) {
-		Object isSchedulable = interpretProc(action.getScheduler());
-		if ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable)) {
-			if (checkOutputPattern(action.getOutputPattern())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean checkOutputPattern(Map<Port, Integer> outputPattern) {
-		if (outputPattern != null) {
-			boolean freeOutput = true;
-			Iterator<Entry<Port, Integer>> it = outputPattern.entrySet()
-					.iterator();
-			while (it.hasNext()) {
-				Map.Entry<Port, Integer> pairs = (Map.Entry<Port, Integer>) it
-						.next();
-				Port outputPort = pairs.getKey();
-				Integer nbOfTokens = pairs.getValue();
-				freeOutput &= outputPort.fifo().hasRoom(nbOfTokens);
-			}
-			return freeOutput;
-		} else {
-			return true;
 		}
 	}
 
@@ -215,11 +161,71 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// Procedure return value
 		Object result = interpret.getReturnValue();
+
 		// TODO : check return type
 		// Type type = procedure.getReturnType();
 
 		// Return the result object
 		return result;
+	}
+
+	private boolean isSchedulable(Action action) {
+		Object isSchedulable = interpretProc(action.getScheduler());
+		if ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable)) {
+			if (checkOutputPattern(action.getOutputPattern())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
+	 * 
+	 */
+	public Integer schedule() {
+		if (sched.hasFsm()) {
+			System.out.println("Current FSM state is : " + fsmState);
+
+			// Check for untagged actions first
+			for (Action action : sched.getActions()) {
+				if (isSchedulable(action)) {
+					interpretProc(action.getBody());
+					System.out.println("Executing action : "
+							+ action.getBody().getName());
+				}
+			}
+
+			// Then check for next FSM transition
+			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
+				Action action = info.getAction();
+				String name = action.getBody().getName();
+				System.out.println("Check schedulable : " + name);
+				if (isSchedulable(action)) {
+					interpretProc(action.getBody());
+					System.out.println("Executing action : " + name);
+
+					// Update FSM state
+					fsmState = info.getTargetState().getName();
+
+					// Execute 1 action only per actor scheduler cycle
+					return 1;
+				}
+			}
+		} else {
+			for (Action action : sched.getActions()) {
+				String name = action.getBody().getName();
+				System.out.println("Checking schedulable action : " + name);
+				if (isSchedulable(action)) {
+					interpretProc(action.getBody());
+					System.out.println("Executing action : " + name);
+
+					// Execute 1 action only per actor scheduler cycle
+					return 1;
+				}
+			}
+		}
+		return 0;
 	}
 
 }

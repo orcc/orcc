@@ -35,6 +35,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -225,10 +226,9 @@ public class FSM {
 	private Map<String, State> states;
 
 	/**
-	 * list of transitions. This is specified as an array list because we
-	 * reference transitions by number.
+	 * a linked hash map of transitions.
 	 */
-	private ArrayList<Transition> transitions;
+	private LinkedHashMap<String, Transition> transitions;
 
 	/**
 	 * Creates an FSM with the given state as an initial state.
@@ -236,7 +236,7 @@ public class FSM {
 	 */
 	public FSM() {
 		states = new HashMap<String, State>();
-		transitions = new ArrayList<Transition>();
+		transitions = new LinkedHashMap<String, Transition>();
 	}
 
 	/**
@@ -252,7 +252,7 @@ public class FSM {
 		if (state == null) {
 			state = new State(name, index++);
 			states.put(name, state);
-			transitions.add(new Transition(state));
+			transitions.put(name, new Transition(state));
 		}
 
 		return state;
@@ -327,7 +327,18 @@ public class FSM {
 	 *         {@link Transition}
 	 */
 	public List<Transition> getTransitions() {
-		return transitions;
+		return new ArrayList<Transition>(transitions.values());
+	}
+
+	/**
+	 * Returns the transitions departing from the given state.
+	 * 
+	 * @param state
+	 *            a state name
+	 * @return a list of next state transitions
+	 */
+	public List<NextStateInfo> getTransitions(String state) {
+		return transitions.get(state).getNextStateInfo();
 	}
 
 	/**
@@ -366,6 +377,7 @@ public class FSM {
 		builder.append("schedule fsm ");
 		builder.append(initialState);
 		builder.append(" : \n");
+		List<Transition> transitions = getTransitions();
 		for (Transition transition : transitions) {
 			builder.append(transition.toString());
 			builder.append('\n');
