@@ -81,12 +81,20 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 >>
 
 Peek(peek) ::= <<
+$if(peek.unit)$
+m_poTabIn[$actorName$_$peek.port$]->peek($peek.target$);
+$else$
 m_poTabIn[$actorName$_$peek.port$]->peek($peek.target$, $peek.numTokens$);
+$endif$
 
 >>
 
 Read(read) ::= <<
+$if(read.unit)$
+m_poTabIn[$actorName$_$read.port$]->get($read.target$);
+$else$
 m_poTabIn[$actorName$_$read.port$]->get($read.target$, $read.numTokens$);
+$endif$
 
 >>
 
@@ -113,7 +121,11 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 >>
 
 Write(write) ::= <<
+$if(write.unit)$
+m_poTabOut[$actorName$_$write.port$]->put($write.target$);
+$else$
 m_poTabOut[$actorName$_$write.port$]->put($write.target$, $write.numTokens$);
+$endif$
 
 >>
 

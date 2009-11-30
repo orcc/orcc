@@ -66,23 +66,12 @@ public class CppBackendImpl extends AbstractBackend {
 
 	private CppActorPrinter impl_printer;
 
-	private String outputPath;
 	private CppActorPrinter printer;
 
 	@Override
 	protected void init() throws IOException {
 		printer = new CppActorPrinter("Cpp_actorDecl");
 		impl_printer = new CppActorPrinter("Cpp_actorImpl");
-
-		String sep = File.separator;
-
-		// create paths
-		outputPath = path + sep;
-		String[] segments = { "src", "cpp" };
-		for (String segment : segments) {
-			outputPath += segment + sep;
-			new File(outputPath).mkdir();
-		}
 	}
 
 	@Override
@@ -94,10 +83,10 @@ public class CppBackendImpl extends AbstractBackend {
 			transformation.transform(actor);
 		}
 
-		String outputName = outputPath + "Actor_" + id + ".h";
+		String outputName = path + File.separator + "Actor_" + id + ".h";
 		printer.printActor(outputName, id, actor);
 
-		outputName = outputPath + "Actor_" + id + ".cpp";
+		outputName = path + File.separator + "Actor_" + id + ".cpp";
 		impl_printer.printActor(outputName, id, actor);
 	}
 
@@ -109,9 +98,9 @@ public class CppBackendImpl extends AbstractBackend {
 				"Cpp_networkImpl");
 
 		String name = network.getName();
-		String outputName = outputPath + "Network_" + name + ".h";
+		String outputName = path + File.separator + "Network_" + name + ".h";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
-		outputName = outputPath + "Network_" + name + ".cpp";
+		outputName = path + File.separator + "Network_" + name + ".cpp";
 		networkImplPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 }
