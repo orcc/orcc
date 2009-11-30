@@ -269,11 +269,9 @@ public class FSM {
 	 *            an action
 	 */
 	public void addTransition(String source, String target, Action action) {
-		State srcState = states.get(source);
 		State tgtState = states.get(target);
 
-		int index = srcState.getIndex();
-		Transition transition = transitions.get(index);
+		Transition transition = transitions.get(source);
 		List<NextStateInfo> nextState = transition.getNextStateInfo();
 		nextState.add(new NextStateInfo(action, tgtState));
 	}
