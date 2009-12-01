@@ -37,6 +37,8 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.main.Scheduler;
 import net.sf.orcc.backends.c.quasistatic.scheduler.output.SchedulePreparer;
+import net.sf.orcc.backends.c.quasistatic.scheduler.parsers.InputXDFParser;
+import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -98,7 +100,15 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);
+		// Get the custom general buffer's size
+		InputXDFParser inputXDFParser = new InputXDFParser(
+				Scheduler.workingDirectoryPath + File.separator
+						+ Constants.INPUT_FILE_NAME);
+		Integer customSize = inputXDFParser.parseCustomGeneralBufferSize();
+		this.fifoSize = customSize == null? fifoSize:customSize;
+		// Print the network
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
+		// Finally,  prints the schedule
 		printSchedule(network);
 	}
 
