@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.nodes.BlockNode;
 
@@ -39,6 +40,25 @@ import net.sf.orcc.ir.nodes.BlockNode;
  */
 public interface Instruction extends User {
 
+	/**
+	 * Accepts the given instruction interpreter.
+	 * 
+	 * @param interpreter
+	 *            an interpreter
+	 * @param args
+	 *            arguments
+	 * @return an object
+	 */
+	public Object accept(InstructionInterpreter interpreter, Object... args);
+
+	/**
+	 * Accepts the given instruction visitor.
+	 * 
+	 * @param visitor
+	 *            a visitor
+	 * @param args
+	 *            arguments
+	 */
 	public void accept(InstructionVisitor visitor, Object... args);
 
 	/**

@@ -61,6 +61,11 @@ public class Store extends AbstractInstruction implements ValueContainer {
 	}
 
 	@Override
+	public Object accept(InstructionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+
+	@Override
 	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
