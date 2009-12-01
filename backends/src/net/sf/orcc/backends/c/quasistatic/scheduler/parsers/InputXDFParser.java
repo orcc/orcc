@@ -105,6 +105,16 @@ public class InputXDFParser {
 		return tokensPatterns;
 	}
 	
+	private String fixStatement(String stmt){
+		stmt = stmt.replace("BET", ">=");
+		stmt = stmt.replace("LET", "<=");
+		stmt = stmt.replace("BT", ">");
+		stmt = stmt.replace("LT", "<");
+		stmt = stmt.replace("AND", "&&");
+		
+		return stmt;
+	}
+	
 	private TokensPattern parsePortsPattern(Node actorNode){
 		String actorName = ((Element)actorNode).getAttribute("name");
 		NodeList portsNodes = actorNode.getChildNodes();
@@ -125,10 +135,10 @@ public class InputXDFParser {
 		return new TokensPattern(actorName, remainingMap, consumptionMap);
 	}
 	
-	public HashMap<String, String> parseCustomBuffersSizes() throws OrccException{
+	public HashMap<String, String> parseCustomIndividualBuffersSizes() throws OrccException{
 		HashMap<String, String> customBuffersSize = new HashMap<String, String>();
 		
-		NodeList buffersNodes = parseGroupNodes(Constants.CUSTOM_BUFFERS_SIZES);
+		NodeList buffersNodes = parseGroupNodes(Constants.CUSTOM_INDIVIDUAL_BUFFERS_SIZES);
 		
 		for(int i = 0; i < buffersNodes.getLength() ; i++){
 			Node bufferNode = buffersNodes.item(i);
@@ -141,6 +151,38 @@ public class InputXDFParser {
 			}
 		}
 		return customBuffersSize;
+		
+	}
+	
+	public Integer parseCustomGeneralBufferSize() throws OrccException{
+		
+		NodeList buffersNodes = parseGroupNodes(Constants.CUSTOM_GENERAL_BUFFER_SIZE);
+		
+		for(int i = 0; i < buffersNodes.getLength() ; i++){
+			Node bufferNode = buffersNodes.item(i);
+			if(bufferNode.getNodeName().equals("Size")){
+				Element bufferElement = (Element) bufferNode;
+				String size = bufferElement.getAttribute("value");
+				return Integer.parseInt(size);
+			}
+		}
+		return null;
+		
+	}
+	
+	public List<String> parseQSSchedulerStmts() throws OrccException{
+		List<String> stmts = new ArrayList<String>();
+		NodeList stmtsNodes = parseGroupNodes(Constants.QS_SCHEDULER);
+		
+		for(int i = 0; i < stmtsNodes.getLength() ; i++){
+			Node stmtNode = stmtsNodes.item(i);
+			if(stmtNode.getNodeName().equals("Statement")){
+				Element stmtElement = (Element) stmtNode;
+				String stmt = fixStatement(stmtElement.getAttribute("content"));
+				stmts.add(stmt);
+			}
+		}
+		return stmts;
 		
 	}
 	

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.c.CNetworkPrinter;
@@ -19,6 +20,7 @@ import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
@@ -89,6 +91,35 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 	}
 	
 	/**
+	 * Sets the qs_scheduler_stmts attribute.
+	 * @throws OrccException 
+	 */
+	private void setQSStmts() throws OrccException{
+		InputXDFParser inputXDFParser = new InputXDFParser(
+				Scheduler.workingDirectoryPath + File.separator
+						+ Constants.INPUT_FILE_NAME);
+		List<String> stmts = inputXDFParser.parseQSSchedulerStmts();
+		template.setAttribute("qs_scheduler_stmts", stmts);
+	}
+	
+	/**
+	 * Set the attributes to the template.
+	 * 
+	 * @param network
+	 *            The network to generate code for.
+	 * @param debugFifos
+	 *            Whether debug information should be printed about FIFOs.
+	 * @param fifoSize
+	 *            Default FIFO size.
+	 * @throws OrccException
+	 */
+	protected void setAttributes(Network network, boolean debugFifos, int fifoSize)
+			throws OrccException {
+		super.setAttributes(network, debugFifos, fifoSize);
+		setQSStmts();
+	}
+	
+	/**
 	 * Sets the connections attribute.
 	 * 
 	 * setConnections is protected due to has been overwritten by
@@ -129,7 +160,7 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 						Scheduler.workingDirectoryPath + File.separator
 								+ Constants.INPUT_FILE_NAME);
 				HashMap<String, String> customBuffersSize = inputXDFParser
-						.parseCustomBuffersSizes();
+						.parseCustomIndividualBuffersSizes();
 				if (customBuffersSize.containsKey(source.getId() + "_"
 						+ connection.getSource().getName())){
 					size = customBuffersSize.get(source.getId() + "_"

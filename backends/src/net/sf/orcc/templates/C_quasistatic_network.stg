@@ -81,91 +81,19 @@ void pause() {
 }
 >>
 
-qs_scheduler() ::= <<
+qs_scheduler(stmts) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Actor quasi-static scheduler
 static void qs_scheduler() {
-	int btype = 0;
-	int btype_phase = 0;
 
-  while (1) {
-	restart:
+$stmts: { stmt| 	$stmt$
+}$
 
-    // THE ACTORS BETWEEN THIS ...
-
-    source_scheduler();
-	display_scheduler();
-    serialize_scheduler();
-    parseheaders_scheduler();
-    mvrecon_scheduler();
-    mvseq_scheduler();
-    blkexp_scheduler();
-	if(btype < 500 || btype > 1100)
-		btype = broadcast_parseheaders_BTYPE_scheduler();
-
-	// ... AND THIS POINT ARE NOT SCHEDULED
-
-	if(btype == 0)
-		goto restart;
-
-	if(btype >= 1024 && btype <= 1027)
-	{
-		if(hasTokens(DCsplit_IN, 64) == 0)
-			goto restart;
-	}
-	
-	else if(btype == 522)
-	{
-		if(hasTokens(DCsplit_IN, 64) == 0)
-			goto restart;
-		if(hasTokens(address_MV, 2) == 0)
-			goto restart;
-	}
-	else if(btype == 520)
-	{
-		if(hasTokens(address_MV, 2) == 0)
-			goto restart;
-	}
-	else	// btype == 512
-	{
-		
-	}
-
-	if(btype >= 2048)						// newvop
-	{
-		btype_phase0_s();
-		btype_phase = 1;
-	}
-	else if(btype < 50)						
-	{
-		if(btype_phase == 2)				// screen size y
-		{
-			btype_phase2_s();
-			btype_phase = 0;
-		}
-		else if(btype_phase == 1)			// screen size x
-		{
-			btype_phase1_s();
-			btype_phase = 2;
-		}
-	}
-	else if(btype >= 1024 && btype <= 1027)	// intra
-		intra_s();
-	else if(btype == 522)					// intra and inter
-		combined_s();
-	else if(btype == 512)					// zeromv
-		zeromv_s();
-	else if(btype == 520)					// inter
-		inter_s();
-
-	btype = 0;
-  }
 }
-
 >>
 
-network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+network(debugFifos, name, size, broadcasts, initializes, instances, connections,qs_scheduler_stmts) ::= <<
 // Generated from "$name$"
 
 #include <locale.h>
@@ -212,7 +140,7 @@ static void scheduler() {
 }$	}
 }
 
-$qs_scheduler()$
+$qs_scheduler(stmts=qs_scheduler_stmts)$
 
 ////////////////////////////////////////////////////////////////////////////////
 
