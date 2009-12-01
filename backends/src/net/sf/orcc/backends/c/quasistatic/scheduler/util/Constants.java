@@ -43,7 +43,9 @@ public class Constants {
 	 */
 	public static String INPUT_FILE_NAME = "QSB_input.xdf";
 	public static String TOKENS_PATTERN = "tokens_pattern";
-	public static String CUSTOM_BUFFERS_SIZES = "custom_buffers_sizes";
+	public static String CUSTOM_INDIVIDUAL_BUFFERS_SIZES = "custom_individual_buffers_sizes";
+	public static String CUSTOM_GENERAL_BUFFER_SIZE = "custom_general_buffer_size";
+	public static String QS_SCHEDULER = "qs_scheduler";
 
 	/**
 	 * Kind of networks files
