@@ -129,6 +129,9 @@ public class CNetworkPrinter {
 	/**
 	 * Set the attributes to the template.
 	 * 
+	 * setAttributes is protected due to it has to be visible for
+	 * CQuasiStaticNetworkPrinter
+	 * 
 	 * @param network
 	 *            The network to generate code for.
 	 * @param debugFifos
@@ -137,7 +140,7 @@ public class CNetworkPrinter {
 	 *            Default FIFO size.
 	 * @throws OrccException
 	 */
-	private void setAttributes(Network network, boolean debugFifos, int fifoSize)
+	protected void setAttributes(Network network, boolean debugFifos, int fifoSize)
 			throws OrccException {
 		template.setAttribute("debugFifos", debugFifos);
 		template.setAttribute("name", network.getName());
