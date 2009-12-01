@@ -30,6 +30,15 @@ package net.sf.orcc.ir.serialize;
 
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NAME;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_SOURCE_FILE;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_ASSIGN;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_CALL;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_HAS_TOKENS;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_LOAD;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_PEEK;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_READ;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_RETURN;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_STORE;
+import static net.sf.orcc.ir.serialize.IRConstants.NAME_WRITE;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,9 +53,11 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
@@ -68,6 +79,26 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.InitPort;
+import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.ReadEnd;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.instructions.WriteEnd;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -141,7 +172,7 @@ public class IRWriter {
 			array.put(expr.getOp().getText());
 			array.put(expr.getE1().accept(this));
 			array.put(expr.getE2().accept(this));
-			array.put(expr.getUnderlyingType().accept(new TypeWriter()));
+			array.put(writeType(expr.getUnderlyingType()));
 			return array;
 		}
 
@@ -181,7 +212,7 @@ public class IRWriter {
 			array.put(IRConstants.UNARY_EXPR);
 			array.put(expr.getOp().getText());
 			array.put(expr.getExpr().accept(this));
-			array.put(expr.getUnderlyingType().accept(new TypeWriter()));
+			array.put(writeType(expr.getUnderlyingType()));
 			return array;
 		}
 
@@ -193,6 +224,242 @@ public class IRWriter {
 			return array;
 		}
 
+	}
+
+	/**
+	 * This class defines an instruction writer that serializes an instruction
+	 * to JSON.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class InstructionWriter implements InstructionVisitor {
+
+		@Override
+		public void visit(Assign assign, Object... args) {
+			JSONArray array = (JSONArray) args[0];
+			JSONArray instr = new JSONArray();
+			array.put(instr);
+
+			instr.put(NAME_ASSIGN);
+			instr.put(writeLocation(assign.getLocation()));
+
+			JSONArray body = new JSONArray();
+			instr.put(body);
+
+			body.put(writeVariable(assign.getTarget()));
+			body.put(writeExpression(assign.getValue()));
+		}
+
+		@Override
+		public void visit(Call call, Object... args) {
+			JSONArray array = (JSONArray) args[0];
+			JSONArray instr = new JSONArray();
+			array.put(instr);
+
+			instr.put(NAME_CALL);
+			instr.put(writeLocation(call.getLocation()));
+
+			JSONArray body = new JSONArray();
+			instr.put(body);
+
+			body.put(call.getProcedure().getName());
+			if (call.hasResult()) {
+				body.put(writeVariable(call.getTarget()));
+			} else {
+				body.put(JSONObject.NULL);
+			}
+
+			body.put(writeExpressions(call.getParameters()));
+		}
+
+		@Override
+		public void visit(HasTokens hasTokens, Object... args) {
+			visitFifoInstruction(NAME_HAS_TOKENS, hasTokens, args[0]);
+		}
+
+		@Override
+		public void visit(InitPort initPort, Object... args) {
+			// nothing to do
+		}
+
+		@Override
+		public void visit(Load load, Object... args) {
+			JSONArray array = (JSONArray) args[0];
+			JSONArray instr = new JSONArray();
+			array.put(instr);
+
+			instr.put(NAME_LOAD);
+			instr.put(writeLocation(load.getLocation()));
+
+			JSONArray body = new JSONArray();
+			instr.put(body);
+
+			body.put(writeVariable(load.getTarget()));
+			body.put(writeVariable(load.getSource().getVariable()));
+			body.put(writeExpressions(load.getIndexes()));
+		}
+
+		@Override
+		public void visit(Peek peek, Object... args) {
+			visitFifoInstruction(NAME_PEEK, peek, args[0]);
+		}
+
+		@Override
+		public void visit(PhiAssignment phi, Object... args) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void visit(Read read, Object... args) {
+			visitFifoInstruction(NAME_READ, read, args[0]);
+		}
+
+		@Override
+		public void visit(ReadEnd readEnd, Object... args) {
+			// nothing to do
+		}
+
+		@Override
+		public void visit(Return returnInst, Object... args) {
+			JSONArray array = (JSONArray) args[0];
+			JSONArray instr = new JSONArray();
+			array.put(instr);
+
+			instr.put(NAME_RETURN);
+			instr.put(writeLocation(returnInst.getLocation()));
+
+			Expression value = returnInst.getValue();
+			if (value == null) {
+				instr.put(JSONObject.NULL);
+			} else {
+				instr.put(writeExpression(value));
+			}
+		}
+
+		@Override
+		public void visit(SpecificInstruction specific, Object... args) {
+			throw new OrccRuntimeException(
+					"IR writer cannot write specific instructions");
+		}
+
+		@Override
+		public void visit(Store store, Object... args) {
+			JSONArray array = (JSONArray) args[0];
+			JSONArray instr = new JSONArray();
+			array.put(instr);
+
+			instr.put(NAME_STORE);
+			instr.put(writeLocation(store.getLocation()));
+
+			JSONArray body = new JSONArray();
+			instr.put(body);
+
+			body.put(writeVariable(store.getTarget().getVariable()));
+			body.put(writeExpressions(store.getIndexes()));
+			body.put(writeExpression(store.getValue()));
+		}
+
+		@Override
+		public void visit(Write write, Object... args) {
+			visitFifoInstruction(NAME_WRITE, write, args[0]);
+		}
+
+		@Override
+		public void visit(WriteEnd writeEnd, Object... args) {
+			// nothing to do
+		}
+
+		/**
+		 * Visits the given FIFO instruction.
+		 * 
+		 * @param name
+		 *            name of the instruction as indicated in
+		 *            {@link IRConstants}. Expected to be the name of a
+		 *            hasTokens, peek, read, write.
+		 * @param fifoInstr
+		 *            the {@link AbstractFifoInstruction} we want to visit
+		 * @param object
+		 *            the object passed in args[0], expected to be the target
+		 *            JSON array
+		 */
+		private void visitFifoInstruction(String name,
+				AbstractFifoInstruction fifoInstr, Object object) {
+			JSONArray array = (JSONArray) object;
+			JSONArray instr = new JSONArray();
+			array.put(instr);
+
+			instr.put(name);
+			instr.put(writeLocation(fifoInstr.getLocation()));
+
+			JSONArray body = new JSONArray();
+			instr.put(body);
+
+			body.put(writeVariable(fifoInstr.getTarget()));
+			body.put(fifoInstr.getPort().getName());
+			body.put(fifoInstr.getNumTokens());
+		}
+
+	}
+
+	/**
+	 * This class defines a node writer that serializes a CFG node to JSON.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class NodeWriter implements NodeVisitor {
+
+		@Override
+		public Object visit(BlockNode node, Object... args) {
+			JSONArray array = (JSONArray) args[0];
+			for (Instruction instruction : node) {
+				instruction.accept(instrWriter, array);
+			}
+
+			return null;
+		}
+
+		@Override
+		public Object visit(IfNode node, Object... args) {
+			JSONArray array = (JSONArray) args[0];
+
+			JSONArray ifArray = new JSONArray();
+			array.put(ifArray);
+
+			ifArray.put(IRConstants.NAME_IF);
+			ifArray.put(writeLocation(node.getLocation()));
+
+			JSONArray body = new JSONArray();
+			ifArray.put(body);
+
+			body.put(writeExpression(node.getValue()));
+			body.put(writeNodes(node.getThenNodes()));
+			body.put(writeNodes(node.getElseNodes()));
+
+			return null;
+		}
+
+		@Override
+		public Object visit(WhileNode node, Object... args) {
+			JSONArray array = (JSONArray) args[0];
+
+			// header
+			JSONArray whileArray = new JSONArray();
+			array.put(whileArray);
+
+			whileArray.put(IRConstants.NAME_WHILE);
+			whileArray.put(writeLocation(node.getLocation()));
+
+			JSONArray body = new JSONArray();
+			whileArray.put(body);
+
+			body.put(writeExpression(node.getValue()));
+			body.put(writeNodes(node.getNodes()));
+
+			return null;
+		}
 	}
 
 	/**
@@ -213,11 +480,7 @@ public class IRWriter {
 			JSONArray array = new JSONArray();
 			array.put(IntType.NAME);
 			Expression expr = type.getSize();
-			try {
-				array.put(writeExpression(expr));
-			} catch (OrccException e) {
-				e.printStackTrace();
-			}
+			array.put(writeExpression(expr));
 			return array;
 		}
 
@@ -226,12 +489,8 @@ public class IRWriter {
 			JSONArray array = new JSONArray();
 			array.put(ListType.NAME);
 			Expression expr = type.getSize();
-			try {
-				array.put(writeExpression(expr));
-				array.put(writeType(type.getElementType()));
-			} catch (OrccException e) {
-				e.printStackTrace();
-			}
+			array.put(writeExpression(expr));
+			array.put(writeType(type.getElementType()));
 			return array;
 		}
 
@@ -245,11 +504,7 @@ public class IRWriter {
 			JSONArray array = new JSONArray();
 			array.put(UintType.NAME);
 			Expression expr = type.getSize();
-			try {
-				array.put(writeExpression(expr));
-			} catch (OrccException e) {
-				e.printStackTrace();
-			}
+			array.put(writeExpression(expr));
 			return array;
 		}
 
@@ -262,6 +517,16 @@ public class IRWriter {
 
 	private Actor actor;
 
+	private final ConstantWriter constWriter;
+
+	private final ExpressionWriter exprWriter;
+
+	private final InstructionWriter instrWriter;
+
+	private final NodeWriter nodeWriter;
+
+	private final TypeWriter typeWriter;
+
 	/**
 	 * Creates an actor writer on the given actor.
 	 * 
@@ -270,6 +535,12 @@ public class IRWriter {
 	 */
 	public IRWriter(Actor actor) {
 		this.actor = actor;
+
+		constWriter = new ConstantWriter();
+		exprWriter = new ExpressionWriter();
+		instrWriter = new InstructionWriter();
+		nodeWriter = new NodeWriter();
+		typeWriter = new TypeWriter();
 	}
 
 	public void write(String outputDir) throws OrccException {
@@ -291,10 +562,8 @@ public class IRWriter {
 	 * @param action
 	 *            an action
 	 * @return a JSON array
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
-	private JSONArray writeAction(Action action) throws OrccException {
+	private JSONArray writeAction(Action action) {
 		JSONArray array = new JSONArray();
 		array.put(writeActionTag(action.getTag()));
 		array.put(writeActionPattern(action.getInputPattern()));
@@ -329,10 +598,8 @@ public class IRWriter {
 	 * @param actions
 	 *            a list of actions
 	 * @return the action list encoded in JSON
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
-	private JSONArray writeActions(List<Action> actions) throws OrccException {
+	private JSONArray writeActions(List<Action> actions) {
 		JSONArray array = new JSONArray();
 		for (Action action : actions) {
 			array.put(writeAction(action));
@@ -385,7 +652,7 @@ public class IRWriter {
 		return array;
 	}
 
-	private JSONObject writeActor() throws JSONException, OrccException {
+	private JSONObject writeActor() throws JSONException {
 		JSONObject obj = new JSONObject();
 		JSONArray array;
 
@@ -412,12 +679,26 @@ public class IRWriter {
 	 * @param expression
 	 *            an expression
 	 * @return a JSON array
-	 * @throws OrccException
 	 */
-	private JSONArray writeExpression(Expression expression)
-			throws OrccException {
-		ExpressionWriter writer = new ExpressionWriter();
-		return (JSONArray) expression.accept(writer);
+	private JSONArray writeExpression(Expression expression) {
+		return (JSONArray) expression.accept(exprWriter);
+	}
+
+	/**
+	 * Serializes the given list of expressions as JSON array whose each member
+	 * is set to the result of {@link #writeExpression(Expression)}.
+	 * 
+	 * @param expressions
+	 *            a list of expressions
+	 * @return a JSON array
+	 */
+	private JSONArray writeExpressions(List<Expression> expressions) {
+		JSONArray array = new JSONArray();
+		for (Expression expression : expressions) {
+			array.put(writeExpression(expression));
+		}
+
+		return array;
 	}
 
 	private JSONArray writeFSM(FSM fsm) {
@@ -430,10 +711,8 @@ public class IRWriter {
 	 * @param variable
 	 *            a variable
 	 * @return
-	 * @throws OrccException
 	 */
-	private JSONArray writeLocalVariable(LocalVariable variable)
-			throws OrccException {
+	private JSONArray writeLocalVariable(LocalVariable variable) {
 		JSONArray array = new JSONArray();
 
 		JSONArray details = new JSONArray();
@@ -457,10 +736,8 @@ public class IRWriter {
 	 * @param variables
 	 *            an ordered map of variables
 	 * @return a JSON array
-	 * @throws OrccException
 	 */
-	private JSONArray writeLocalVariables(OrderedMap<Variable> variables)
-			throws OrccException {
+	private JSONArray writeLocalVariables(OrderedMap<Variable> variables) {
 		JSONArray array = new JSONArray();
 		for (Variable variable : variables) {
 			array.put(writeLocalVariable((LocalVariable) variable));
@@ -478,14 +755,29 @@ public class IRWriter {
 	}
 
 	/**
+	 * Writes the given nodes.
+	 * 
+	 * @param nodes
+	 *            a list of nodes
+	 * @return a JSON array
+	 */
+	private JSONArray writeNodes(List<CFGNode> nodes) {
+		JSONArray array = new JSONArray();
+		for (CFGNode node : nodes) {
+			node.accept(nodeWriter, array);
+		}
+
+		return array;
+	}
+
+	/**
 	 * Writes the given port.
 	 * 
 	 * @param port
 	 *            a port
 	 * @return a JSON array
-	 * @throws OrccException
 	 */
-	private JSONArray writePort(Port port) throws OrccException {
+	private JSONArray writePort(Port port) {
 		JSONArray array = new JSONArray();
 		array.put(writeLocation(port.getLocation()));
 		array.put(writeType(port.getType()));
@@ -493,7 +785,7 @@ public class IRWriter {
 		return array;
 	}
 
-	private JSONArray writePorts(OrderedMap<Port> ports) throws OrccException {
+	private JSONArray writePorts(OrderedMap<Port> ports) {
 		JSONArray array = new JSONArray();
 		for (Port port : ports) {
 			array.put(writePort(port));
@@ -508,10 +800,8 @@ public class IRWriter {
 	 * @param procedure
 	 *            a procedure
 	 * @return a JSON array
-	 * @throws OrccException
-	 *             if something goes wrong
 	 */
-	private JSONArray writeProcedure(Procedure procedure) throws OrccException {
+	private JSONArray writeProcedure(Procedure procedure) {
 		JSONArray array = new JSONArray();
 		array.put(procedure.getName());
 		array.put(procedure.isExternal());
@@ -520,7 +810,7 @@ public class IRWriter {
 
 		array.put(writeLocalVariables(procedure.getParameters()));
 		array.put(writeLocalVariables(procedure.getLocals()));
-		array.put(new JSONArray()); // nodes
+		array.put(writeNodes(procedure.getNodes())); // nodes
 
 		return array;
 	}
@@ -531,10 +821,8 @@ public class IRWriter {
 	 * @param procedures
 	 *            an ordered map of procedures
 	 * @return a JSON array
-	 * @throws OrccException
 	 */
-	private JSONArray writeProcedures(OrderedMap<Procedure> procedures)
-			throws OrccException {
+	private JSONArray writeProcedures(OrderedMap<Procedure> procedures) {
 		JSONArray array = new JSONArray();
 		for (Procedure procedure : procedures) {
 			array.put(writeProcedure(procedure));
@@ -548,10 +836,8 @@ public class IRWriter {
 	 * @param variable
 	 *            a variable
 	 * @return
-	 * @throws OrccException
 	 */
-	private JSONArray writeStateVariable(StateVariable variable)
-			throws OrccException {
+	private JSONArray writeStateVariable(StateVariable variable) {
 		JSONArray array = new JSONArray();
 
 		// variable
@@ -574,7 +860,7 @@ public class IRWriter {
 			array.put(JSONObject.NULL);
 		} else {
 			Object constantValue = variable.getConstantValue().accept(
-					new ConstantWriter());
+					constWriter);
 			array.put(constantValue);
 		}
 
@@ -587,10 +873,8 @@ public class IRWriter {
 	 * @param variables
 	 *            an ordered map of variables
 	 * @return a JSON array
-	 * @throws OrccException
 	 */
-	private JSONArray writeStateVariables(OrderedMap<Variable> variables)
-			throws OrccException {
+	private JSONArray writeStateVariables(OrderedMap<Variable> variables) {
 		JSONArray array = new JSONArray();
 		for (Variable variable : variables) {
 			array.put(writeStateVariable((StateVariable) variable));
@@ -604,10 +888,9 @@ public class IRWriter {
 	 * @param type
 	 *            a type
 	 * @return JSON content, as a string or an array
-	 * @throws OrccException
 	 */
-	private Object writeType(Type type) throws OrccException {
-		return type.accept(new TypeWriter());
+	private Object writeType(Type type) {
+		return type.accept(typeWriter);
 	}
 
 	/**
