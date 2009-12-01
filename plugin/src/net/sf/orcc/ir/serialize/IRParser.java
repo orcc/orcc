@@ -286,7 +286,7 @@ public class IRParser {
 		}
 	}
 
-	private Assign parseAssignVarNode(Location loc, JSONArray array)
+	private Assign parseAssign(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		Variable var = getVariable(array.getJSONArray(0));
 		Expression value = parseExpr(array.getJSONArray(1));
@@ -306,8 +306,8 @@ public class IRParser {
 		return new BinaryExpr(location, e1, op, e2, type);
 	}
 
-	private Call parseCallNode(Location loc, JSONArray array)
-			throws JSONException, OrccException {
+	private Call parseCall(Location loc, JSONArray array) throws JSONException,
+			OrccException {
 		LocalVariable res = null;
 		String procName = array.getString(0);
 		if (!array.isNull(1)) {
@@ -421,7 +421,7 @@ public class IRParser {
 		return fsm;
 	}
 
-	private HasTokens parseHasTokensNode(Location loc, JSONArray array)
+	private HasTokens parseHasTokens(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		LocalVariable varDef = (LocalVariable) getVariable(array
 				.getJSONArray(0));
@@ -445,14 +445,14 @@ public class IRParser {
 		BlockNode join = new BlockNode(loc);
 		block = join;
 		for (int i = 0; i < array.length(); i++) {
-			join.add(parsePhiNode(loc, array.getJSONArray(i)));
+			join.add(parsePhi(loc, array.getJSONArray(i)));
 		}
 
 		return join;
 	}
 
-	private Load parseLoadNode(Location loc, JSONArray array)
-			throws JSONException, OrccException {
+	private Load parseLoad(Location loc, JSONArray array) throws JSONException,
+			OrccException {
 		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
 		Use source = parseVarUse(array.getJSONArray(1));
@@ -500,25 +500,25 @@ public class IRParser {
 			Instruction instr = null;
 
 			if (name.equals(NAME_ASSIGN)) {
-				instr = parseAssignVarNode(loc, array.getJSONArray(2));
+				instr = parseAssign(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_CALL)) {
-				instr = parseCallNode(loc, array.getJSONArray(2));
+				instr = parseCall(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_EMPTY)) {
 				// nothing to do
 			} else if (name.equals(NAME_HAS_TOKENS)) {
-				instr = parseHasTokensNode(loc, array.getJSONArray(2));
+				instr = parseHasTokens(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_LOAD)) {
-				instr = parseLoadNode(loc, array.getJSONArray(2));
+				instr = parseLoad(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_PEEK)) {
-				instr = parsePeekNode(loc, array.getJSONArray(2));
+				instr = parsePeek(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_READ)) {
-				instr = parseReadNode(loc, array.getJSONArray(2));
+				instr = parseRead(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_RETURN)) {
-				instr = parseReturnNode(loc, array.optJSONArray(2));
+				instr = parseReturn(loc, array.optJSONArray(2));
 			} else if (name.equals(NAME_STORE)) {
-				instr = parseStoreNode(loc, array.getJSONArray(2));
+				instr = parseStore(loc, array.getJSONArray(2));
 			} else if (name.equals(NAME_WRITE)) {
-				instr = parseWriteNode(loc, array.getJSONArray(2));
+				instr = parseWrite(loc, array.getJSONArray(2));
 			} else {
 				throw new OrccException("Invalid node definition: " + name);
 			}
@@ -559,17 +559,17 @@ public class IRParser {
 		return pattern;
 	}
 
-	private Peek parsePeekNode(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		String fifoName = array.getString(0);
-		Port port = inputs.get(fifoName);
-		int numTokens = array.getInt(1);
+	private Peek parsePeek(Location loc, JSONArray array) throws JSONException,
+			OrccException {
 		LocalVariable varDef = (LocalVariable) getVariable(array
-				.getJSONArray(2));
+				.getJSONArray(0));
+		String fifoName = array.getString(1);
+		Port port = inputs.get(fifoName);
+		int numTokens = array.getInt(2);
 		return new Peek(block, loc, port, numTokens, varDef);
 	}
 
-	private PhiAssignment parsePhiNode(Location loc, JSONArray array)
+	private PhiAssignment parsePhi(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		LocalVariable varDef = (LocalVariable) getVariable(array
 				.getJSONArray(0));
@@ -648,17 +648,17 @@ public class IRParser {
 		return proc;
 	}
 
-	private Read parseReadNode(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		String fifoName = array.getString(0);
-		Port port = inputs.get(fifoName);
-		int numTokens = array.getInt(1);
+	private Read parseRead(Location loc, JSONArray array) throws JSONException,
+			OrccException {
 		LocalVariable varDef = (LocalVariable) getVariable(array
-				.getJSONArray(2));
+				.getJSONArray(0));
+		String fifoName = array.getString(1);
+		Port port = inputs.get(fifoName);
+		int numTokens = array.getInt(2);
 		return new Read(block, loc, port, numTokens, varDef);
 	}
 
-	private Return parseReturnNode(Location loc, JSONArray array)
+	private Return parseReturn(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		Expression expr = null;
 		if (array == null) {
@@ -710,7 +710,7 @@ public class IRParser {
 		return stateVars;
 	}
 
-	private Store parseStoreNode(Location loc, JSONArray array)
+	private Store parseStore(Location loc, JSONArray array)
 			throws JSONException, OrccException {
 		Use target = parseVarUse(array.getJSONArray(0));
 		List<Expression> indexes = parseExprs(array.getJSONArray(1));
@@ -827,13 +827,13 @@ public class IRParser {
 		return new WhileNode(loc, condition, nodes, joinNode);
 	}
 
-	private Write parseWriteNode(Location loc, JSONArray array)
+	private Write parseWrite(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		String fifoName = array.getString(0);
-		Port port = outputs.get(fifoName);
-		int numTokens = array.getInt(1);
 		LocalVariable varDef = (LocalVariable) getVariable(array
-				.getJSONArray(2));
+				.getJSONArray(0));
+		String fifoName = array.getString(1);
+		Port port = outputs.get(fifoName);
+		int numTokens = array.getInt(2);
 		return new Write(block, loc, port, numTokens, varDef);
 	}
 

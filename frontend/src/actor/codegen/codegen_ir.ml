@@ -197,15 +197,15 @@ let rec mk_nodes graph node join =
 
 							| Peek (fifo, num_tokens, var) ->
 								("peek",
-								[array [string fifo; int num_tokens; mk_var_ref var]])
+								[array [mk_var_ref var; string fifo; int num_tokens]])
 
 							| Read (fifo, num_tokens, var) ->
 								("read",
-								[array [string fifo; int num_tokens; mk_var_ref var]])
+								[array [mk_var_ref var; string fifo; int num_tokens]])
 
 							| Write (fifo, num_tokens, var) ->
 								("write",
-								[array [string fifo; int num_tokens; mk_var_ref var]])
+								[array [mk_var_ref var; string fifo; int num_tokens]])
 
 							| AssignPhi _ -> failwith "mk_nodes: should never happen"
 		
