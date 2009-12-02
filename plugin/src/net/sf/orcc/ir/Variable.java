@@ -248,7 +248,8 @@ public abstract class Variable implements INameable {
 		boolean isPort = false;
 		for (Use use : getUses()) {
 			if (use.getNode() instanceof AbstractFifoInstruction) {
-				AbstractFifoInstruction fifoNode = (AbstractFifoInstruction) use.getNode();
+				AbstractFifoInstruction fifoNode = (AbstractFifoInstruction) use
+						.getNode();
 				if (getName().startsWith(fifoNode.getPort().getName())) {
 					isPort = true;
 					break;

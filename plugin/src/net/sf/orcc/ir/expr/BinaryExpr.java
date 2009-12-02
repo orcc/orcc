@@ -68,13 +68,13 @@ public class BinaryExpr extends AbstractExpression {
 	}
 
 	@Override
-	public void accept(ExpressionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public Object accept(ExpressionInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
 	}
 
 	@Override
-	public Object accept(ExpressionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
+	public void accept(ExpressionVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
 	/**

@@ -37,18 +37,15 @@ package net.sf.orcc.ir.nodes;
 public abstract class AbstractNodeVisitor implements NodeVisitor {
 
 	@Override
-	public Object visit(BlockNode node, Object... args) {
-		return null;
+	public void visit(BlockNode node, Object... args) {
 	}
 
 	@Override
-	public Object visit(IfNode node, Object... args) {
-		return null;
+	public void visit(IfNode node, Object... args) {
 	}
 
 	@Override
-	public Object visit(WhileNode node, Object... args) {
-		return null;
+	public void visit(WhileNode node, Object... args) {
 	}
 
 }

@@ -53,11 +53,11 @@ public abstract class AbstractExpression extends AbstractLocalizable implements
 	}
 
 	@Override
-	public abstract void accept(ExpressionVisitor visitor, Object... args);
-
-	@Override
 	public abstract Object accept(ExpressionInterpreter interpreter,
 			Object... args);
+
+	@Override
+	public abstract void accept(ExpressionVisitor visitor, Object... args);
 
 	@Override
 	public String toString() {

@@ -39,15 +39,15 @@ public class VoidType extends AbstractType {
 	public static final String NAME = "void";
 
 	@Override
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
+	}
+
+	@Override
 	public void accept(TypeVisitor visitor) {
 		visitor.visit(this);
 	}
 
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
-	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		return (obj instanceof VoidType);

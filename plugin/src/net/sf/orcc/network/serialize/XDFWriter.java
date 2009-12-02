@@ -65,8 +65,8 @@ import net.sf.orcc.network.attributes.IStringAttribute;
 import net.sf.orcc.network.attributes.ITypeAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.attributes.XmlElement;
-import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.DomUtil;
+import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
 import org.w3c.dom.Document;

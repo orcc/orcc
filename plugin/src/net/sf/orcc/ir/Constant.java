@@ -60,18 +60,19 @@ public interface Constant {
 	public static final int STRING = 4;
 
 	/**
+	 * Accepts an interpreter.
+	 * 
+	 * @param interpreter
+	 */
+	public abstract Object accept(ConstantInterpreter interpreter,
+			Object... args);
+
+	/**
 	 * Accepts a visitor.
 	 * 
 	 * @param visitor
 	 */
 	public abstract void accept(ConstantVisitor visitor, Object... args);
-
-	/**
-	 * Accepts an interpreter.
-	 * 
-	 * @param interpreter
-	 */
-	public abstract Object accept(ConstantInterpreter interpreter, Object... args);
 
 	/**
 	 * Returns the type of this constant.

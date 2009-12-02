@@ -249,12 +249,12 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object visit(IfNode ifNode, Object... args) {
+	public void visit(IfNode ifNode, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
 		ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it),
 				new BoolType()));
 
-		return super.visit(ifNode, args);
+		super.visit(ifNode, args);
 	}
 
 	@Override
@@ -292,12 +292,12 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object visit(WhileNode whileNode, Object... args) {
+	public void visit(WhileNode whileNode, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
 		whileNode.setValue(visitExpression(whileNode.getValue(), getItr(it),
 				new BoolType()));
 
-		return super.visit(whileNode, args);
+		super.visit(whileNode, args);
 	}
 
 	private Expression visitExpression(Expression value,

@@ -59,15 +59,15 @@ public class DefaultPrinter extends Printer {
 	}
 
 	@Override
+	public String toString(INameable nameable) {
+		return nameable.getName();
+	}
+
+	@Override
 	public String toString(Type type) {
 		DefaultTypePrinter printer = new DefaultTypePrinter();
 		type.accept(printer);
 		return printer.toString();
-	}
-
-	@Override
-	public String toString(INameable nameable) {
-		return nameable.getName();
 	}
 
 }

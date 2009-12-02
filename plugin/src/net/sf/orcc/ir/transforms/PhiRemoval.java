@@ -86,15 +86,14 @@ public class PhiRemoval extends AbstractActorTransformation {
 	}
 
 	@Override
-	public Object visit(BlockNode node, Object... args) {
+	public void visit(BlockNode node, Object... args) {
 		for (Instruction instruction : node) {
 			instruction.accept(this, args);
 		}
-		return null;
 	}
 
 	@Override
-	public Object visit(IfNode node, Object... args) {
+	public void visit(IfNode node, Object... args) {
 		BlockNode join = node.getJoinNode();
 		join.accept(this, BlockNode.last(node.getThenNodes()), 0);
 		join.accept(this, BlockNode.last(node.getElseNodes()), 1);
@@ -102,8 +101,6 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 		visit(node.getThenNodes());
 		visit(node.getElseNodes());
-
-		return null;
 	}
 
 	@Override
@@ -136,7 +133,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
 
 		// the node before the while.
@@ -165,8 +162,6 @@ public class PhiRemoval extends AbstractActorTransformation {
 		join.accept(this, block, 1);
 		removePhis(join);
 		visit(node.getNodes());
-
-		return null;
 	}
 
 }

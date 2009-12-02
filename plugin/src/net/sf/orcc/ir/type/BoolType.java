@@ -39,13 +39,13 @@ public class BoolType extends AbstractType {
 	public static final String NAME = "bool";
 
 	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
 	}
 
 	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
+	public void accept(TypeVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override

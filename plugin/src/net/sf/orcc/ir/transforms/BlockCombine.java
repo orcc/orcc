@@ -47,7 +47,7 @@ public class BlockCombine extends AbstractActorTransformation {
 	private BlockNode previous;
 
 	@Override
-	public Object visit(BlockNode node, Object... args) {
+	public void visit(BlockNode node, Object... args) {
 		if (previous == null) {
 			previous = node;
 		} else {
@@ -59,12 +59,10 @@ public class BlockCombine extends AbstractActorTransformation {
 			ListIterator<?> it = (ListIterator<?>) args[0];
 			it.remove();
 		}
-
-		return null;
 	}
 
 	@Override
-	public Object visit(IfNode node, Object... args) {
+	public void visit(IfNode node, Object... args) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
 		visit(node.getThenNodes());
@@ -80,20 +78,16 @@ public class BlockCombine extends AbstractActorTransformation {
 
 		// we do not set previous to null again, because join may be combined
 		// with next blocks (actually it needs to be).
-
-		return null;
 	}
 
 	@Override
-	public Object visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node, Object... args) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
 		visit(node.getNodes());
 
 		// no previous block to be linked to
 		previous = null;
-
-		return null;
 	}
 
 	@Override

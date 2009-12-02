@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.consts;
 
-
 /**
  * This class defines a string constant.
  * 
@@ -56,15 +55,15 @@ public class StringConst extends AbstractConstant {
 	}
 
 	@Override
+	public Object accept(ConstantInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+
+	@Override
 	public void accept(ConstantVisitor visitor, Object... args) {
 		visitor.visit(this, args);
 	}
 
-	@Override
-	public Object accept(ConstantInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-	
 	@Override
 	public int getType() {
 		return STRING;

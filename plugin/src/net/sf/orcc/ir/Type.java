@@ -72,14 +72,6 @@ public interface Type {
 	public static final int VOID = 6;
 
 	/**
-	 * Accepts a visitor.
-	 * 
-	 * @param visitor
-	 *            a visitor
-	 */
-	public void accept(TypeVisitor visitor);
-
-	/**
 	 * Accepts an interpreter.
 	 * 
 	 * @param interpreter
@@ -87,6 +79,14 @@ public interface Type {
 	 * @return an object
 	 */
 	public Object accept(TypeInterpreter interpreter);
+
+	/**
+	 * Accepts a visitor.
+	 * 
+	 * @param visitor
+	 *            a visitor
+	 */
+	public void accept(TypeVisitor visitor);
 
 	/**
 	 * Returns a list of dimensions of this type. Returns an empty list if the

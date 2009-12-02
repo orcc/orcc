@@ -412,17 +412,15 @@ public class IRWriter {
 	private class NodeWriter implements NodeVisitor {
 
 		@Override
-		public Object visit(BlockNode node, Object... args) {
+		public void visit(BlockNode node, Object... args) {
 			JSONArray array = (JSONArray) args[0];
 			for (Instruction instruction : node) {
 				instruction.accept(instrWriter, array);
 			}
-
-			return null;
 		}
 
 		@Override
-		public Object visit(IfNode node, Object... args) {
+		public void visit(IfNode node, Object... args) {
 			JSONArray array = (JSONArray) args[0];
 
 			JSONArray ifArray = new JSONArray();
@@ -437,12 +435,10 @@ public class IRWriter {
 			body.put(writeExpression(node.getValue()));
 			body.put(writeNodes(node.getThenNodes()));
 			body.put(writeNodes(node.getElseNodes()));
-
-			return null;
 		}
 
 		@Override
-		public Object visit(WhileNode node, Object... args) {
+		public void visit(WhileNode node, Object... args) {
 			JSONArray array = (JSONArray) args[0];
 
 			// header
@@ -457,8 +453,6 @@ public class IRWriter {
 
 			body.put(writeExpression(node.getValue()));
 			body.put(writeNodes(node.getNodes()));
-
-			return null;
 		}
 	}
 

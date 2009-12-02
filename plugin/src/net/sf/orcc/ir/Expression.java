@@ -75,16 +75,6 @@ public interface Expression extends Localizable {
 	public static final int VAR = 7;
 
 	/**
-	 * Accepts a visitor.
-	 * 
-	 * @param visitor
-	 *            an expression visitor
-	 * @param args
-	 *            arguments
-	 */
-	public void accept(ExpressionVisitor visitor, Object... args);
-
-	/**
 	 * Accepts an interpreter.
 	 * 
 	 * @param interpreter
@@ -94,6 +84,16 @@ public interface Expression extends Localizable {
 	 * @return an object
 	 */
 	public Object accept(ExpressionInterpreter interpreter, Object... args);
+
+	/**
+	 * Accepts a visitor.
+	 * 
+	 * @param visitor
+	 *            an expression visitor
+	 * @param args
+	 *            arguments
+	 */
+	public void accept(ExpressionVisitor visitor, Object... args);
 
 	/**
 	 * Returns the type of this expression.

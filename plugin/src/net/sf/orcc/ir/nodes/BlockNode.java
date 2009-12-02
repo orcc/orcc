@@ -103,8 +103,13 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	}
 
 	@Override
-	public Object accept(NodeVisitor visitor, Object... args) {
-		return visitor.visit(this, args);
+	public Object accept(NodeInterpreter interpreter, Object... args) {
+		return interpreter.interpret(this, args);
+	}
+
+	@Override
+	public void accept(NodeVisitor visitor, Object... args) {
+		visitor.visit(this, args);
 	}
 
 	/**

@@ -87,6 +87,8 @@ public class ActionParser {
 		POSITION;
 	};
 
+	private ExpressionParser exprParser;
+
 	/**
 	 * the file being parsed
 	 */
@@ -134,6 +136,8 @@ public class ActionParser {
 
 	private Scope<Variable> scope;
 
+	private StatementParser stmtParser;
+
 	/**
 	 * this integer is used to give a name to untagged actions.
 	 */
@@ -143,10 +147,6 @@ public class ActionParser {
 	 * the scope of variables of the action being parsed
 	 */
 	private Scope<Variable> variables;
-
-	private ExpressionParser exprParser;
-
-	private StatementParser stmtParser;
 
 	/**
 	 * Creates a new action parser with the given file.
@@ -336,7 +336,7 @@ public class ActionParser {
 				LocalVariable local = new LocalVariable(true, 0, location,
 						name, null, null, port.getType());
 				variables.add(file, location, name, local);
-				
+
 				Read read = new Read(block, location, port, 1, local);
 				block.add(read);
 			}

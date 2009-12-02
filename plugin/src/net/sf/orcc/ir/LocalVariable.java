@@ -130,12 +130,6 @@ public class LocalVariable extends Variable implements
 		return index;
 	}
 
-	@Override
-	public String getName() {
-		String indexStr = (index == 0) ? "" : "_" + index;
-		return getBaseName() + (suffix == null ? "" : suffix) + indexStr;
-	}
-
 	/**
 	 * Returns the instruction where this local variable is defined.
 	 * 
@@ -143,6 +137,12 @@ public class LocalVariable extends Variable implements
 	 */
 	public Instruction getInstruction() {
 		return instruction;
+	}
+
+	@Override
+	public String getName() {
+		String indexStr = (index == 0) ? "" : "_" + index;
+		return getBaseName() + (suffix == null ? "" : suffix) + indexStr;
 	}
 
 	/**

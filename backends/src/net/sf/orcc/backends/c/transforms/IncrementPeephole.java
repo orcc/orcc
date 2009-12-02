@@ -133,13 +133,12 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	}
 
 	@Override
-	public Object visit(BlockNode node, Object... args) {
+	public void visit(BlockNode node, Object... args) {
 		block = node;
 		ListIterator<Instruction> it = node.listIterator();
 		while (it.hasNext()) {
 			examine(it);
 		}
-		return null;
 	}
 
 }

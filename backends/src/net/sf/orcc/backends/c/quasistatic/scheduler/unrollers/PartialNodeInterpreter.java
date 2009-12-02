@@ -60,7 +60,7 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 	}
 
 	@Override
-	public Object visit(IfNode node, Object... args) {
+	public void visit(IfNode node, Object... args) {
 		// Interpret first expression ("if" condition)
 		Object condition = node.getValue().accept(exprInterpreter);
 
@@ -77,8 +77,6 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 			}
 		}
 		node.getJoinNode().accept(this, args);
-
-		return null;
 	}
 
 	@Override

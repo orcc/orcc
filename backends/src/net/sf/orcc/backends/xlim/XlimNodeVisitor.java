@@ -119,14 +119,12 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModul
 	}
 
 	@Override
-	public Object visit(BlockNode node, Object... args) {
+	public void visit(BlockNode node, Object... args) {
 		XlimInstructionVisitor iv = new XlimInstructionVisitor(names, root,
 				actionName, inputs, writeMap);
 		for (Instruction instruction : node) {
 			instruction.accept(iv, args);
 		}
-
-		return null;
 	}
 
 	/**
@@ -137,7 +135,7 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModul
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(IfNode node, Object... args) {
+	public void visit(IfNode node, Object... args) {
 		Element moduleB = XlimNodeTemplate.newModule(root, IF);
 
 		String decision = names.putDecision();
@@ -169,7 +167,6 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModul
 		node.getJoinNode().accept(
 				new XlimNodeVisitor(names, moduleB, actionName, inputs,
 						writeMap));
-		return null;
 	}
 
 	/**
@@ -180,7 +177,7 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModul
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public Object visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node, Object... args) {
 		// TODO Wait for "while" example to check this
 		System.out.println("CHECK WHILE");
 
@@ -207,7 +204,5 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModul
 		node.getJoinNode().accept(
 				new XlimNodeVisitor(names, moduleB, actionName, inputs,
 						writeMap));
-
-		return null;
 	}
 }

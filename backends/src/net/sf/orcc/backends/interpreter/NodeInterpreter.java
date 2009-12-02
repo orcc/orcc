@@ -109,14 +109,13 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	}
 
 	@Override
-	public Object visit(BlockNode node, Object... args) {
+	public void visit(BlockNode node, Object... args) {
 		Iterator<Instruction> it = node.iterator();
 
 		while (it.hasNext()) {
 			Instruction instr = it.next();
 			instr.accept(this, args);
 		}
-		return null;
 	}
 
 	@Override
@@ -164,7 +163,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	 */
 
 	@Override
-	public Object visit(IfNode node, Object... args) {
+	public void visit(IfNode node, Object... args) {
 		/* Interpret first expression ("if" condition) */
 		Object condition = node.getValue().accept(exprInterpreter);
 
@@ -183,8 +182,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 			}
 		}
 		node.getJoinNode().accept(this, args);
-
-		return null;
 	}
 
 	// private int[] toIntArray(List<Integer> integerList) {
@@ -279,7 +276,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	}
 
 	@Override
-	public Object visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node, Object... args) {
 		// Interpret first expression ("while" condition)
 		Object condition = node.getValue().accept(exprInterpreter);
 		// while (condition is true) do
@@ -291,7 +288,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 			// Interpret next value of "while" condition
 			condition = node.getValue().accept(exprInterpreter);
 		}
-		return null;
 	}
 
 	@Override

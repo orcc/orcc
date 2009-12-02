@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.orcc.ir.nodes.NodeInterpreter;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 
 /**
@@ -39,15 +40,25 @@ import net.sf.orcc.ir.nodes.NodeVisitor;
 public interface CFGNode extends User {
 
 	/**
+	 * Accepts the given node interpreter.
+	 * 
+	 * @param interpreter
+	 *            an interpreter
+	 * @param args
+	 *            arguments
+	 * @return an object
+	 */
+	public Object accept(NodeInterpreter interpreter, Object... args);
+
+	/**
 	 * Accepts the given node visitor.
 	 * 
 	 * @param visitor
 	 *            a visitor
 	 * @param args
 	 *            arguments
-	 * @return an object
 	 */
-	public Object accept(NodeVisitor visitor, Object... args);
+	public void accept(NodeVisitor visitor, Object... args);
 
 	/**
 	 * Returns the label of this node as an integer.

@@ -37,6 +37,15 @@ package net.sf.orcc.ir;
 public interface ICommunicationFifo {
 
 	/**
+	 * Feeds target array with next tokens as required by "hasTokens" without
+	 * and flush them.
+	 * 
+	 * @param target
+	 *            target array for receiving next FIFO tokens
+	 */
+	public void get(Object[] target);
+
+	/**
 	 * Returns true if FIFO free space can contain 'n' Tokens.
 	 * 
 	 * @param n
@@ -55,28 +64,19 @@ public interface ICommunicationFifo {
 	public boolean hasTokens(int n);
 
 	/**
+	 * Feeds target array with next tokens as required by "hasTokens" without
+	 * flushing them.
+	 * 
+	 * @param target
+	 *            target array for receiving next FIFO tokens
+	 */
+	public void peek(Object[] target);
+
+	/**
 	 * Copy source array to free rooms in FIFO as required by "hasRooms".
 	 * 
 	 * @param source
 	 *            source array to be copied to FIFO
 	 */
 	public void put(Object[] source);
-
-	/**
-	 * Feeds target array with next tokens as required by "hasTokens" 
-	 * without flushing them.
-	 * 
-	 * @param target
-	 *            target array for receiving next FIFO tokens
-	 */
-	public void peek(Object[] target);	
-	
-	/**
-	 * Feeds target array with next tokens as required by "hasTokens" 
-	 * without and flush them.
-	 * 
-	 * @param target
-	 *            target array for receiving next FIFO tokens
-	 */
-	public void get(Object[] target);
 }

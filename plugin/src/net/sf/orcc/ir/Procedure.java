@@ -32,7 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.nodes.NodeInterpreter;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.INameable;
 import net.sf.orcc.util.OrderedMap;
@@ -51,7 +51,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class CFGBuilder implements NodeVisitor {
+	private class CFGBuilder implements NodeInterpreter {
 
 		private CFG graph;
 
@@ -72,7 +72,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		}
 
 		@Override
-		public Object visit(BlockNode node, Object... args) {
+		public Object interpret(BlockNode node, Object... args) {
 			CFGNode previous = (CFGNode) args[0];
 			graph.addVertex(node);
 			if (previous != null) {
@@ -83,7 +83,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		}
 
 		@Override
-		public Object visit(IfNode node, Object... args) {
+		public Object interpret(IfNode node, Object... args) {
 			CFGNode previous = (CFGNode) args[0];
 			graph.addVertex(node);
 			if (previous != null) {
@@ -102,6 +102,24 @@ public class Procedure extends AbstractLocalizable implements INameable {
 			return join;
 		}
 
+		@Override
+		public Object interpret(WhileNode node, Object... args) {
+			CFGNode previous = (CFGNode) args[0];
+			graph.addVertex(node);
+			if (previous != null) {
+				graph.addEdge(previous, node);
+			}
+
+			CFGNode join = node.getJoinNode();
+			graph.addVertex(join);
+			graph.addEdge(node, join);
+
+			CFGNode last = (CFGNode) visit(node.getNodes(), join);
+			graph.addEdge(last, node);
+
+			return node;
+		}
+
 		/**
 		 * Visits the given node list.
 		 * 
@@ -116,25 +134,8 @@ public class Procedure extends AbstractLocalizable implements INameable {
 			for (CFGNode node : nodes) {
 				last = node.accept(this, last);
 			}
+
 			return last;
-		}
-
-		@Override
-		public Object visit(WhileNode node, Object... args) {
-			CFGNode previous = (CFGNode) args[0];
-			graph.addVertex(node);
-			if (previous != null) {
-				graph.addEdge(previous, node);
-			}
-
-			CFGNode join = node.getJoinNode();
-			graph.addVertex(join);
-			graph.addEdge(node, join);
-			
-			CFGNode last = (CFGNode) visit(node.getNodes(), join);
-			graph.addEdge(last, node);
-
-			return node;
 		}
 
 	}
@@ -164,21 +165,13 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 */
 	private OrderedMap<Variable> parameters;
 
+	private Expression result;
+
 	/**
 	 * the return type of this procedure
 	 */
 	private Type returnType;
 
-	
-	private Expression result;
-	public void setResult(Expression result) {
-		this.result = result;
-	}
-	
-	public Expression getResult() {
-		return result;
-	}
-	
 	/**
 	 * Construcs a new procedure.
 	 * 
@@ -255,6 +248,10 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		return parameters;
 	}
 
+	public Expression getResult() {
+		return result;
+	}
+
 	/**
 	 * Returns the return type of this procedure.
 	 * 
@@ -280,6 +277,10 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setResult(Expression result) {
+		this.result = result;
 	}
 
 	/**

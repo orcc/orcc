@@ -106,7 +106,6 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		}
 	}
 
-
 	private void createCmdLine(ILaunchConfiguration configuration,
 			List<String> cmdList) throws CoreException, IOException {
 		String exeName;

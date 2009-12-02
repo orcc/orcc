@@ -27,11 +27,11 @@ public class StatementParser {
 	 */
 	private final String file;
 
+	private List<CFGNode> nodes;
+
 	private Scope<Variable> scope;
 
 	private final TypeParser typeParser;
-
-	private List<CFGNode> nodes;
 
 	/**
 	 * Creates a new action parser with the given file
@@ -76,20 +76,6 @@ public class StatementParser {
 		return variables;
 	}
 
-	private void parseStatement(Tree tree) throws OrccException {
-		if (tree.getType() == ALBaseLexer.ASSIGN) {
-			String targetName = tree.getChild(0).getText();
-			Tree indexes = tree.getChild(1);
-			Expression value = exprParser.parseExpression(tree.getChild(2));
-
-			Variable target = scope.get(targetName);
-			if (target == null) {
-				throw new OrccException("unknown variable: \"" + targetName
-						+ "\"");
-			}
-		}
-	}
-
 	/**
 	 * Parses the given tree as a local parameter/local variable.
 	 * 
@@ -121,6 +107,20 @@ public class StatementParser {
 			LocalVariable variable = parseLocalVariable(tree.getChild(i));
 			variables.add(file, variable.getLocation(), variable.getName(),
 					variable);
+		}
+	}
+
+	private void parseStatement(Tree tree) throws OrccException {
+		if (tree.getType() == ALBaseLexer.ASSIGN) {
+			String targetName = tree.getChild(0).getText();
+			Tree indexes = tree.getChild(1);
+			Expression value = exprParser.parseExpression(tree.getChild(2));
+
+			Variable target = scope.get(targetName);
+			if (target == null) {
+				throw new OrccException("unknown variable: \"" + targetName
+						+ "\"");
+			}
 		}
 	}
 

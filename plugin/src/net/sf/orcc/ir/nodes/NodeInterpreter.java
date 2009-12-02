@@ -26,37 +26,47 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
-
-import java.util.Collections;
-import java.util.List;
-
-import net.sf.orcc.ir.Printer;
-import net.sf.orcc.ir.Type;
+package net.sf.orcc.ir.nodes;
 
 /**
- * This class is an abstract implementation of {@link Type}.
+ * This interface defines a node interpreter.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractType implements Type {
+public interface NodeInterpreter {
 
-	@Override
-	public abstract Object accept(TypeInterpreter interpreter);
+	/**
+	 * Interprets a block node.
+	 * 
+	 * @param node
+	 *            a block node
+	 * @param args
+	 *            arguments
+	 * @return an object
+	 */
+	public Object interpret(BlockNode node, Object... args);
 
-	@Override
-	public abstract void accept(TypeVisitor visitor);
+	/**
+	 * Interprets an if node.
+	 * 
+	 * @param node
+	 *            an if node
+	 * @param args
+	 *            arguments
+	 * @return an object
+	 */
+	public Object interpret(IfNode node, Object... args);
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<Integer> getDimensions() {
-		return Collections.EMPTY_LIST;
-	}
-
-	@Override
-	public String toString() {
-		return Printer.getInstance().toString(this);
-	}
+	/**
+	 * Interprets a while node.
+	 * 
+	 * @param node
+	 *            a while node
+	 * @param args
+	 *            arguments
+	 * @return an object
+	 */
+	public Object interpret(WhileNode node, Object... args);
 
 }

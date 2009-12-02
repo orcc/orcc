@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.serialize;
 
-
 /**
  * Constants IR fields.
  * 

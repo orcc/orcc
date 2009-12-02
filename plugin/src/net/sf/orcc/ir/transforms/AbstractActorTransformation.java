@@ -91,12 +91,11 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public Object visit(BlockNode node, Object... args) {
+	public void visit(BlockNode node, Object... args) {
 		ListIterator<Instruction> it = node.listIterator();
 		while (it.hasNext()) {
 			it.next().accept(this, it);
 		}
-		return null;
 	}
 
 	@Override
@@ -108,11 +107,10 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public Object visit(IfNode node, Object... args) {
+	public void visit(IfNode node, Object... args) {
 		visit(node.getThenNodes());
 		visit(node.getElseNodes());
 		visit(node.getJoinNode(), args);
-		return null;
 	}
 
 	@Override
@@ -169,10 +167,9 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public Object visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node, Object... args) {
 		visit(node.getNodes());
 		visit(node.getJoinNode(), args);
-		return null;
 	}
 
 	@Override

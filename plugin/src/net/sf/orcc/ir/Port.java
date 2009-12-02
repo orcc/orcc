@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.ICommunicationFifo;
 
 /**
  * This class defines a port. A port is just a variable, with a location, a

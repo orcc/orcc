@@ -262,8 +262,7 @@ public class XDFParser {
 			String kind = elt.getAttribute("literal-kind");
 			String value = elt.getAttribute("value");
 			if (kind.equals("Boolean")) {
-				return new BoolExpr(new Location(), Boolean
-						.parseBoolean(value));
+				return new BoolExpr(new Location(), Boolean.parseBoolean(value));
 			} else if (kind.equals("Character")) {
 				throw new OrccException("Characters not supported yet");
 			} else if (kind.equals("Integer")) {
