@@ -34,8 +34,11 @@ import java.util.List;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.Graph;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.FSM.NextStateInfo;
 
 /**
  * This class defines an FSM unroller that uses the partial interpreter.
@@ -47,8 +50,14 @@ public class FSMUnrollerMW implements AbstractFSMUnroller {
 
 	private Actor actor;
 
+	private ConfigurationAnalyzer analyzer;
+
 	public FSMUnrollerMW(Actor actor) {
 		this.actor = actor;
+
+		// analyze the configuration of this actor
+		analyzer = new ConfigurationAnalyzer(actor);
+		analyzer.analyze();
 	}
 
 	/**
@@ -57,30 +66,52 @@ public class FSMUnrollerMW implements AbstractFSMUnroller {
 	 * @return the list of SDF graphs
 	 */
 	public List<Graph> unroll() throws QuasiStaticSchedulerException {
-		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
-				actor.getName(), actor);
-		interpretedActor.initialize();
-
 		List<Graph> actorSubgraphs = new ArrayList<Graph>();
 
 		// Generates a subgraph for each initial transition
 		try {
 			ActionScheduler sched = actor.getActionScheduler();
-			if (!sched.hasFsm() && sched.getActions().size() == 1) {
-				interpretedActor.schedule();
+			if (sched.hasFsm()) {
+				// will unroll for each branch departing from the initial state
+				FSM fsm = sched.getFsm();
+				String initialState = fsm.getInitialState().getName();
+				for (NextStateInfo info : fsm.getTransitions(initialState)) {
+					actorSubgraphs.add(unroll(initialState, info.getAction()));
+				}
 			} else {
-				while (true) {
+				PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
+						actor.getName(), actor, analyzer);
+				interpretedActor.initialize();
+
+				if (sched.getActions().size() == 1) {
 					interpretedActor.schedule();
+				} else {
+					System.out.println("TODO NO FSM");
 				}
 			}
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();
 		}
 
-		Graph actorSg = new Graph();
-		actorSubgraphs.add(actorSg);
-
 		return actorSubgraphs;
+	}
+
+	private Graph unroll(String initialState, Action action) {
+		System.out.println();
+		System.out.println("unroll " + actor.getName() + " from "
+				+ initialState + ", configuration action " + action);
+		Graph actorSg = new Graph();
+
+		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
+				actor.getName(), actor, analyzer);
+		interpretedActor.initialize();
+		interpretedActor.setAction(action);
+
+		do {
+			interpretedActor.schedule();
+		} while (!interpretedActor.getFsmState().equals(initialState));
+
+		return actorSg;
 	}
 
 }

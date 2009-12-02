@@ -32,6 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.interpreter.ListAllocator;
 import net.sf.orcc.backends.interpreter.NodeInterpreter;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Peek;
@@ -48,9 +49,25 @@ import net.sf.orcc.ir.nodes.IfNode;
  */
 public class PartialNodeInterpreter extends NodeInterpreter {
 
-	public PartialNodeInterpreter(String id) {
+	private Action action;
+
+	private ConfigurationAnalyzer analyzer;
+
+	public PartialNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
+		this.analyzer = analyzer;
+
 		listAllocator = new ListAllocator();
 		exprInterpreter = new PartialExpressionEvaluator();
+	}
+
+	/**
+	 * Sets the configuration action that should be executed.
+	 * 
+	 * @param action
+	 *            an action
+	 */
+	public void setAction(Action action) {
+		this.action = action;
 	}
 
 	@Override
@@ -80,11 +97,22 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 	}
 
 	@Override
-	public void visit(Peek instr, Object... args) {
+	public void visit(Peek peek, Object... args) {
+		if (peek.getPort().equals(analyzer.getConfigurationPort())) {
+			int value = analyzer.getConfigurationValue(action);
+			Object[] target = (Object[]) peek.getTarget().getValue();
+			target[0] = value;
+		}
 	}
 
 	@Override
 	public void visit(Read read, Object... args) {
+		if (read.getPort().equals(analyzer.getConfigurationPort())) {
+			int value = analyzer.getConfigurationValue(action);
+			Object[] target = (Object[]) read.getTarget().getValue();
+			target[0] = value;
+		}
+
 		read.getPort().increaseTokensConsumption(read.getNumTokens());
 	}
 

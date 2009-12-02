@@ -51,11 +51,12 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 	 * @param actor
 	 *            an actor
 	 */
-	public PartiallyInterpretedActor(String id, Actor actor) {
+	public PartiallyInterpretedActor(String id, Actor actor,
+			ConfigurationAnalyzer analyzer) {
 		super(id, actor);
 
 		// Build a node interpreter for visiting CFG and instructions
-		interpret = new PartialNodeInterpreter(id);
+		interpret = new PartialNodeInterpreter(id, analyzer);
 	}
 
 	@Override
@@ -103,6 +104,16 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Sets the configuration action that should be executed.
+	 * 
+	 * @param action
+	 *            an action
+	 */
+	public void setAction(Action action) {
+		((PartialNodeInterpreter) interpret).setAction(action);
 	}
 
 }

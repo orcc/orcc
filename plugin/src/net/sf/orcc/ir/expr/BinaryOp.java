@@ -314,6 +314,27 @@ public enum BinaryOp {
 	}
 
 	/**
+	 * If this operator is an inequality operator, returns the matching operator
+	 * if we change the order of the comparison.
+	 * 
+	 * @return an operator
+	 */
+	public BinaryOp inequalityOpChangeOrder() {
+		switch (this) {
+		case GE:
+			return LE;
+		case GT:
+			return LT;
+		case LE:
+			return GE;
+		case LT:
+			return GT;
+		default:
+			return this;
+		}
+	}
+
+	/**
 	 * Returns true if this operator is right-to-left associative.
 	 * 
 	 * @return true if this operator is right-to-left associative
