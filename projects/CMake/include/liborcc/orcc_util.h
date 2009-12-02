@@ -39,8 +39,10 @@ extern char *yuv_file;
 // initialize APR and parse command-line options
 void init_orcc(int argc, char *argv[], char *env[]);
 
+#ifdef _WIN32 // Resolve linux compatibility issue 
 // pause function
 void pause();
+#endif
 
 // print usage
 void print_usage();
