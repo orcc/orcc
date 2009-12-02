@@ -47,7 +47,7 @@ public class SourceActor extends AbstractInterpretedActor {
 
 	@Override
 	public void initialize() {
-		fileName = "D:/PL/rvc-cal/orcc/trunk/backends/src/net/sf/orcc/backends/interpreter/foreman_qcif_30.bit"; // CLIParameters.getInstance().getSourceFile();
+		fileName = "D:/PL/rvc-cal/orcc/trunk/backends/src/net/sf/orcc/backends/interpreter/foreman_qcif_30.bit";
 		// Connect to FIFO
 		fifo_O = (IntFifo) actor.getOutput("O").fifo();
 		try {
@@ -68,7 +68,6 @@ public class SourceActor extends AbstractInterpretedActor {
 				int byteRead = in.read();
 				if (byteRead != -1) {
 					source[0] = byteRead;
-					// System.out.println("Next bitstream byte = "+source[0]);
 					fifo_O.put(source);
 					running = 1;
 				}

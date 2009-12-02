@@ -71,18 +71,18 @@ public class IntFifo implements ICommunicationFifo {
 	public void get(Object[] target) {
 		peek(target);
 		read += target.length;
-		if (out != null) {
-			try {
-				out.write("Get from FIFO "+srcPort.getName()+"_"+tgtPort.getName()+" : \n");
-				for (int i = 0; i < target.length; i++) {
-					out.write(target[i] + " ");
-				}
-				out.write("\n");
-				out.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+//		if (out != null) {
+//			try {
+//				out.write("Get from FIFO "+srcPort.getName()+"_"+tgtPort.getName()+" : \n");
+//				for (int i = 0; i < target.length; i++) {
+//					out.write(target[i] + " ");
+//				}
+//				out.write("\n");
+//				out.flush();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 	public boolean hasRoom(int n) {
@@ -130,18 +130,18 @@ public class IntFifo implements ICommunicationFifo {
 		int n = source.length;
 		System.arraycopy(source, 0, contents, write, n);
 		write += n;
-		if (out != null) {
-			try {
-				out.write("Put to FIFO "+srcPort.getName()+"_"+tgtPort.getName()+" : \n");
-				for (int i = 0; i < source.length; i++) {
-					out.write(source[i] + "");
-				}
-				out.write("\n");
-				out.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+//		if (out != null) {
+//			try {
+//				out.write("Put to FIFO "+srcPort.getName()+"_"+tgtPort.getName()+" : \n");
+//				for (int i = 0; i < source.length; i++) {
+//					out.write(source[i] + "");
+//				}
+//				out.write("\n");
+//				out.flush();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 	
 	public String toString() {

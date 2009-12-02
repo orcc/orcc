@@ -64,10 +64,10 @@ public class BroadcastActor extends AbstractInterpretedActor {
 		
 		while (inFifo.hasTokens(1)) {
 			running=1;
+			inFifo.get(inData);
 			for (Port out : outports) {
 				ICommunicationFifo outFifo = out.fifo();
 				if (outFifo.hasRoom(1)) {
-					inFifo.get(inData);
 					outFifo.put(inData);
 				}
 			}

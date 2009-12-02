@@ -110,8 +110,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 */
 	protected int execute(Action action) {
 		interpretProc(action.getBody());
-		System.out.println("Executing action : " + action.getBody().getName());
-
 		// Execute 1 action only per actor scheduler cycle
 		return 1;
 	}
@@ -149,7 +147,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// Get initializing procedure if any
 		for (Action action : actor.getInitializes()) {
-			System.out.println("Initialize actor " + name);
 			Object isSchedulable = interpretProc(action.getScheduler());
 			if (isSchedulable instanceof Boolean) {
 				if ((Boolean) isSchedulable) {
@@ -217,9 +214,39 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * @return the number of actions fired
 	 */
 	public Integer schedule() {
-		if (sched.hasFsm()) {
-			System.out.println("Current FSM state is : " + fsmState);
+//		int running=0;
+//		int schedulable=1;
+//		
+//		if (sched.hasFsm()) {
+//			while (schedulable>0) {
+//				// Check for untagged actions first
+//				for (Action action : sched.getActions()) {
+//					schedulable=0;
+//					if (isSchedulable(action)) {
+//						schedulable=execute(action);
+//						running=1;
+//						break;
+//					}
+//				}
+//
+//				// Then check for next FSM transition
+//				for (NextStateInfo info : sched.getFsm().getTransitions(
+//						fsmState)) {
+//					schedulable=0;
+//					Action action = info.getAction();
+//					if (isSchedulable(action)) {
+//						// Update FSM state
+//						fsmState = info.getTargetState().getName();
+//						schedulable=execute(action);
+//						running=1;
+//						break;
+//					}
+//				}
+//			}
+//
+//			return running;
 
+		if (sched.hasFsm()) {
 			// Check for untagged actions first
 			for (Action action : sched.getActions()) {
 				if (isSchedulable(action)) {
@@ -230,25 +257,19 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			// Then check for next FSM transition
 			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
 				Action action = info.getAction();
-				String name = action.getBody().getName();
-				System.out.println("Check schedulable : " + name);
 				if (isSchedulable(action)) {
 					// Update FSM state
 					fsmState = info.getTargetState().getName();
-
 					return execute(action);
 				}
 			}
 		} else {
 			for (Action action : sched.getActions()) {
-				String name = action.getBody().getName();
-				System.out.println("Checking schedulable action : " + name);
 				if (isSchedulable(action)) {
 					return execute(action);
 				}
 			}
 		}
-
 		return 0;
 	}
 

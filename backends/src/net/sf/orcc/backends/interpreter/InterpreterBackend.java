@@ -70,11 +70,12 @@ public class InterpreterBackend implements IBackend {
 
 	private List<AbstractInterpretedActor> actorQueue;
 
-	private FileOutputStream fos;
-	private OutputStreamWriter out;
+//	private FileOutputStream fos;
+//	private OutputStreamWriter out;
 
-	@Override
+	
 	public void generateCode(String fileName, int fifoSize) throws Exception {
+
 		// set FIFO size
 		this.fifoSize = fifoSize;
 
@@ -90,20 +91,20 @@ public class InterpreterBackend implements IBackend {
 		new BroadcastAdder().transform(network);
 		// Prepare an hash table for creating broadcast interpreted actors
 		HashMap<String, BroadcastActor> bcastMap = new HashMap<String, BroadcastActor>();
-		
+
 		// Create network communication tracing file
-		File file = new File(fileName).getParentFile();
-		try {
-			fos = new FileOutputStream(new File(file, "traces.txt"));
-			out = new OutputStreamWriter(fos, "UTF-8");
-		} catch (FileNotFoundException e) {
-			String msg = "file not found: \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
-		}
+//		File file = new File(fileName).getParentFile();
+//		try {
+//			fos = new FileOutputStream(new File(file, "traces.txt"));
+//			out = new OutputStreamWriter(fos, "UTF-8");
+//		} catch (FileNotFoundException e) {
+//			String msg = "file not found: \"" + fileName + "\"";
+//			throw new RuntimeException(msg, e);
+//		}
 
 		// get network graph
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
-		
+
 		// connect network actors to FIFOs thanks to their port names
 		Set<Connection> connections = graph.edgeSet();
 		for (Connection connection : connections) {
@@ -114,7 +115,7 @@ public class InterpreterBackend implements IBackend {
 			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
 				Instance srcInst = srcVertex.getInstance();
 				Instance tgtInst = tgtVertex.getInstance();
-				
+
 				// get FIFO size (user-defined nor default)
 				Integer size;
 				IAttribute attr = connection
@@ -130,7 +131,7 @@ public class InterpreterBackend implements IBackend {
 				// actors
 				IntFifo fifo;
 				if (srcInst.getId().equals("broadcast_parseheaders_BTYPE")) {
-					fifo = new IntFifo(size, out);
+					fifo = new IntFifo(size, null);
 				} else {
 					fifo = new IntFifo(size, null);
 				}
@@ -140,12 +141,15 @@ public class InterpreterBackend implements IBackend {
 					srcPort.bind(fifo);
 					fifo.setSource(srcPort);
 					if (srcInst.isBroadcast()) {
-						// Broadcast actor to be explicitly connected to its port
-						BroadcastActor bcastActor = bcastMap.get(srcInst.getId());
+						// Broadcast actor to be explicitly connected to its
+						// port
+						BroadcastActor bcastActor = bcastMap.get(srcInst
+								.getId());
 						if (bcastActor == null) {
-							bcastActor = new BroadcastActor(srcInst.getId(), null);
+							bcastActor = new BroadcastActor(srcInst.getId(),
+									null);
 							bcastMap.put(srcInst.getId(), bcastActor);
-							//bcastActor = bcastMap.get(srcInst.getId());
+							// bcastActor = bcastMap.get(srcInst.getId());
 						}
 						bcastActor.setOutport(srcPort);
 					}
@@ -156,20 +160,25 @@ public class InterpreterBackend implements IBackend {
 					tgtPort.bind(fifo);
 					fifo.setTarget(tgtPort);
 					if (tgtInst.isBroadcast()) {
-						// Broadcast actor to be explicitly connected to its ports
-						BroadcastActor bcastActor = bcastMap.get(tgtInst.getId());
+						// Broadcast actor to be explicitly connected to its
+						// ports
+						BroadcastActor bcastActor = bcastMap.get(tgtInst
+								.getId());
 						if (bcastActor == null) {
-							bcastActor = new BroadcastActor(tgtInst.getId(), null);
+							bcastActor = new BroadcastActor(tgtInst.getId(),
+									null);
 							bcastMap.put(tgtInst.getId(), bcastActor);
-							//bcastActor = bcastMap.get(tgtInst.getId());
+							// bcastActor = bcastMap.get(tgtInst.getId());
 						}
 						bcastActor.setInport(tgtPort);
 					}
 				}
 
-				System.out.println("Connecting " + srcInst.getId() + "."
-						+ srcPort.getName() + " to " + tgtInst.getId() + "."
-						+ tgtPort.getName());
+				/*
+				 * System.out.println("Connecting " + srcInst.getId() + "." +
+				 * srcPort.getName() + " to " + tgtInst.getId() + "." +
+				 * tgtPort.getName());
+				 */
 			}
 		}
 
@@ -231,16 +240,11 @@ public class InterpreterBackend implements IBackend {
 	private void scheduler() throws Exception {
 
 		int running = 1;
-		int count=0;
 		// While at least one actor is running
 		while (running > 0) {
 			running = 0;
 			for (AbstractInterpretedActor actor : actorQueue) {
-				System.out.println("Schedule actor " + actor.getName());
-				if (actor.getName().equals("mvseq")) {
-					count += 1;
-					System.out.println("mvseq visited "+count+" times");
-				}
+				// System.out.println("Schedule actor " + actor.getName());
 				running += actor.schedule();
 			}
 			// Manage empty and full FIFOs

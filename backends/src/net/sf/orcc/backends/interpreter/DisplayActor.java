@@ -114,8 +114,7 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				System.out.println(numImages + " in ");
-				System.exit(0);
+				System.out.println("Display closed after "+numImages+" images");
 			}
 
 		});
@@ -143,7 +142,7 @@ public class DisplayActor extends AbstractInterpretedActor {
 		if (fifo_B.hasTokens(384)) {
 			writeMB();
 			running = 1;
-			// TODO: print when frame is complete
+			// TODO: print when frame is complete => ?
 			if (buffer != null) {
 				Graphics graphics = buffer.getDrawGraphics();
 				graphics.drawImage(image, 0, 0, null);
