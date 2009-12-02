@@ -36,7 +36,6 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 #ifndef _CRT_SECURE_NO_DEPRECATE
@@ -72,6 +71,25 @@ static int  xsize_int ;
 static int  ysize_int ;
 static int  images = 0 ;
 
+
+
+int Filesize ( FILE *f )
+{
+   long  oldfp, fsize ;
+   
+   oldfp = ftell(f);
+   if ( oldfp < 0L ) 
+      return -1 ;
+   if ( 0 != fseek(f, 0, SEEK_END) ) 
+      return -1 ;
+   fsize = ftell(f);
+   if ( fsize < 0 ) 
+      return -1 ;
+   if ( 0 != fseek(f, oldfp, SEEK_SET) ) 
+      return -1 ;
+   return fsize ;
+}
+
 static void Read_YUV_init (int xsize, int ysize, char * filename )
 {
     if((ptfile = fopen(filename, "rb")) == NULL){
@@ -93,23 +111,6 @@ static void Read_YUV_init (int xsize, int ysize, char * filename )
    }
 
   NumberOfFrames = Filesize(ptfile) / (xsize * ysize + xsize * ysize / 2);
-}
-
-int Filesize ( FILE *f )
-{
-   long  oldfp, fsize ;
-   
-   oldfp = ftell(f);
-   if ( oldfp < 0L ) 
-      return -1 ;
-   if ( 0 != fseek(f, 0, SEEK_END) ) 
-      return -1 ;
-   fsize = ftell(f);
-   if ( fsize < 0 ) 
-      return -1 ;
-   if ( 0 != fseek(f, oldfp, SEEK_SET) ) 
-      return -1 ;
-   return fsize ;
 }
 
 void Read_YUV ( unsigned char *Y, unsigned char *U, unsigned char *V )

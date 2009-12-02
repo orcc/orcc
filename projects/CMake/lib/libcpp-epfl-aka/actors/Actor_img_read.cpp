@@ -5,7 +5,12 @@
 #include <iostream>
 #include "Actor_img_read.h"
 
-#include <windows.h>
+#ifdef _WIN32
+#include <Windows.h> 
+#else
+#include <sys/time.h> 
+typedef double LARGE_INTEGER;
+#endif
 
 extern "C" {
 #include "orcc_util.h"
