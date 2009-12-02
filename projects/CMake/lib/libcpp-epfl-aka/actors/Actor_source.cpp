@@ -4,6 +4,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "Actor_source.h"
+#include <stdlib.h>
 
 extern "C" {
 #include "orcc_util.h"
