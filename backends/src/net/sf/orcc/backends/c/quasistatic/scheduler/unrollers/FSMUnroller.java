@@ -30,26 +30,36 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.RunTimeEvaluator;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.TokensPattern;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.Graph;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
-import net.sf.orcc.ir.FSM.State;
-import net.sf.orcc.ir.FSM.Transition;
 
+/**
+ * This class defines an FSM unroller that uses the partial interpreter.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public class FSMUnroller implements AbstractFSMUnroller {
 
-	private FSM fsm;
-	private TokensPattern tokensPattern;
-	
-	public FSMUnroller(FSM fsm, TokensPattern tokensPattern){
-		this.fsm = fsm;
-		this.tokensPattern = tokensPattern;
+	private Actor actor;
+
+	private ConfigurationAnalyzer analyzer;
+
+	public FSMUnroller(Actor actor) {
+		this.actor = actor;
+
+		// analyze the configuration of this actor
+		analyzer = new ConfigurationAnalyzer(actor);
+		analyzer.analyze();
 	}
-	
+
 	/**
 	 * Unrolls the FSM, generating a set of SDF graphs
 	 * 
@@ -57,66 +67,66 @@ public class FSMUnroller implements AbstractFSMUnroller {
 	 */
 	public List<Graph> unroll() throws QuasiStaticSchedulerException {
 		List<Graph> actorSubgraphs = new ArrayList<Graph>();
-        List<NextStateInfo> nextStateInfos = getTransitionsFrom(fsm.getInitialState());
-		
-        //Generates a subgraph for each initial transition
-		for(NextStateInfo nextStateInfo: nextStateInfos ){
-			tokensPattern.restoreTokenPattern();
-			Graph actorSg = unrollSubgraph(nextStateInfo);
-            actorSubgraphs.add(actorSg);
+
+		// Generates a subgraph for each initial transition
+		try {
+			ActionScheduler sched = actor.getActionScheduler();
+			if (sched.hasFsm()) {
+				// will unroll for each branch departing from the initial state
+				FSM fsm = sched.getFsm();
+				String initialState = fsm.getInitialState().getName();
+				for (NextStateInfo info : fsm.getTransitions(initialState)) {
+					actorSubgraphs.add(unroll(initialState, info.getAction()));
+				}
+			} else {
+				actorSubgraphs.add(unroll(sched.getActions()));
+			}
+		} catch (OrccRuntimeException e) {
+			e.printStackTrace();
 		}
-		
+
 		return actorSubgraphs;
 	}
-	
-	private List<NextStateInfo> getTransitionsFrom(State state){
-		List<Transition> transitions = fsm.getTransitions();
-		List<NextStateInfo> transitionsFromState = new ArrayList<NextStateInfo>();
-		for(Transition transition: transitions){
-			if(transition.getSourceState().compareTo(state) == 0){
-				transitionsFromState.addAll(transition.getNextStateInfo());
-			}
+
+	private Graph unroll(List<Action> actions) {
+		Graph actorSg = new Graph();
+
+		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
+				actor.getName(), actor, analyzer);
+		interpretedActor.initialize();
+		if (actions.size() == 1) {
+			actorSg.addVertex(actions.get(0));
+			interpretedActor.schedule();
+		} else {
+			System.out.println("TODO NO FSM");
 		}
-		
-		return transitionsFromState;
+
+		return actorSg;
 	}
-	
-	/**
-     * unrolls the subgraph originating from initEdge
-     *
-     * @param initEdge
-     * @return the unrolled subgraph
-	 * @throws QuasiStaticSchedulerException 
-     */
-    private Graph unrollSubgraph(NextStateInfo nSInfo) throws QuasiStaticSchedulerException {
-    	
-    	int iterations = 0;
-    	Graph graph = new Graph();
-    	State nextState; 
-    	Action prevAct = null, actAct= null;
-    	String initAction = nSInfo.getAction().toString();
-    	System.out.println("Subgraph - init action: " + initAction);
-		do{
-			nextState = nSInfo.getTargetState();
-			actAct = nSInfo.getAction();
-			graph.addVertex(actAct);
-			if(prevAct != null){
-				graph.addEdge(prevAct, actAct);
+
+	private Graph unroll(String initialState, Action action)
+			throws QuasiStaticSchedulerException {
+		System.out.println();
+		System.out.println("unroll " + actor.getName() + " from "
+				+ initialState + ", configuration action " + action);
+		Graph actorSg = new Graph();
+
+		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
+				actor.getName(), actor, analyzer);
+		interpretedActor.initialize();
+		interpretedActor.setAction(action);
+
+		Action previous = null;
+		do {
+			interpretedActor.schedule();
+			Action latest = interpretedActor.getScheduledAction();
+			actorSg.addVertex(latest);
+			if (previous != null) {
+				actorSg.addEdge(latest, previous);
 			}
-			nSInfo = RunTimeEvaluator.nextTransition(getTransitionsFrom(nextState), tokensPattern);
-			if(nSInfo == null){
-				System.out.println("Invalid graph");
-				break;
-			}
-			prevAct = actAct;
-			iterations++;	
-		}while(!nextState.equals(fsm.getInitialState()) && iterations < 20);
-    	
-		System.out.println(graph.toString());
-		
-    	return graph;
-    	
-    }
-    
-    
+		} while (!interpretedActor.getFsmState().equals(initialState));
+
+		return actorSg;
+	}
+
 }

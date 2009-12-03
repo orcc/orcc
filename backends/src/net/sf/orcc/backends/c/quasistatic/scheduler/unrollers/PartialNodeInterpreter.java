@@ -36,8 +36,10 @@ import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
@@ -98,6 +100,26 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 			}
 		}
 		node.getJoinNode().accept(this, args);
+	}
+
+	@Override
+	public void visit(Load instr, Object... args) {
+		LocalVariable target = instr.getTarget();
+		Variable source = instr.getSource().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			target.setValue(source.getValue());
+		} else {
+			Object obj = source.getValue();
+			for (Expression index : instr.getIndexes()) {
+				Integer lastIndex = (Integer) index.accept(exprInterpreter);
+				if (obj != null && lastIndex != null) {
+					obj = Array.get(obj, lastIndex);
+				} else {
+					obj = null;
+				}
+			}
+			target.setValue(obj);
+		}
 	}
 
 	@Override

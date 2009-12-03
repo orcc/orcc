@@ -31,7 +31,6 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 import net.sf.orcc.interpreter.InterpretedActor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.FSM.NextStateInfo;
 
 /**
  * This class defines an actor that can be partially interpreted by calling
@@ -42,6 +41,8 @@ import net.sf.orcc.ir.FSM.NextStateInfo;
  * 
  */
 public class PartiallyInterpretedActor extends InterpretedActor {
+
+	private Action scheduledAction;
 
 	/**
 	 * Creates a new partially interpreted actor
@@ -60,50 +61,26 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 	}
 
 	@Override
+	protected int execute(Action action) {
+		scheduledAction = action;
+		return super.execute(action);
+	}
+
+	/**
+	 * Returns the latest action that was scheduled by the latest call to
+	 * {@link #schedule()}.
+	 * 
+	 * @return the latest scheduled action
+	 */
+	public Action getScheduledAction() {
+		return scheduledAction;
+	}
+
+	@Override
 	protected boolean isSchedulable(Action action) {
 		// no need to check output patterns because we do not have FIFOs
 		Object isSchedulable = interpretProc(action.getScheduler());
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
-	}
-
-	/**
-	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
-	 * 
-	 */
-	public Integer schedule() {
-		if (sched.hasFsm()) {
-			System.out.println("Current FSM state is : " + fsmState);
-
-			// Check for untagged actions first
-			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)) {
-					return execute(action);
-				}
-			}
-
-			// Then check for next FSM transition
-			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
-				Action action = info.getAction();
-				String name = action.getBody().getName();
-				System.out.println("Check schedulable : " + name);
-				if (isSchedulable(action)) {
-					// Update FSM state
-					fsmState = info.getTargetState().getName();
-
-					return execute(action);
-				}
-			}
-		} else {
-			for (Action action : sched.getActions()) {
-				String name = action.getBody().getName();
-				System.out.println("Checking schedulable action : " + name);
-				if (isSchedulable(action)) {
-					return execute(action);
-				}
-			}
-		}
-
-		return 0;
 	}
 
 	/**

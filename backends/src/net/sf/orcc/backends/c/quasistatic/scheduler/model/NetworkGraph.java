@@ -75,15 +75,14 @@ public class NetworkGraph implements BtypeChangesListener{
 		HashMap<String, List<TokensPattern>> tokensPatternsMap = inputXDFParser
 				.parseTokensPattern();
 		List<TokensPattern> tokensPatternsList = tokensPatternsMap.get(btype);
-		loop: for (ActorGraph actor : scheduledActorsList) {
+		for (ActorGraph actor : scheduledActorsList) {
 			for (TokensPattern tokensPattern : tokensPatternsList) {
 				if (tokensPattern.getActorName().equals(actor.getName())) {
-					actor.updateTokensPattern(tokensPattern);
+					//actor.updateTokensPattern(tokensPattern);
 					tokensPatternsList.remove(tokensPattern);
-					continue loop;
+					break;
 				}
 			}
-
 		}
 	}
 	
