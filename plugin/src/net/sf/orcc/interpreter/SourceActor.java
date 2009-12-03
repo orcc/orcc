@@ -38,18 +38,18 @@ public class SourceActor extends AbstractInterpretedActor {
 
 	public String fileName;
 
-	private IntFifo fifo_O;
+	private CommunicationFifo fifo_O;
 	private RandomAccessFile in;
 
-	public SourceActor(String id, Actor actor) {
+	public SourceActor(String id, Actor actor, String inputBitstream) {
 		super(id, actor);
+		fileName = inputBitstream;
 	}
 
 	@Override
 	public void initialize() {
-		fileName = "D:/PL/rvc-cal/orcc/trunk/backends/src/net/sf/orcc/backends/interpreter/foreman_qcif_30.bit";
 		// Connect to FIFO
-		fifo_O = (IntFifo) actor.getOutput("O").fifo();
+		fifo_O = (CommunicationFifo) actor.getOutput("O").fifo();
 		try {
 			in = new RandomAccessFile(fileName, "r");
 		} catch (FileNotFoundException e) {

@@ -81,11 +81,11 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 	private Canvas canvas;
 
-	private IntFifo fifo_B;
+	private CommunicationFifo fifo_B;
 
-	private IntFifo fifo_HEIGHT;
+	private CommunicationFifo fifo_HEIGHT;
 
-	private IntFifo fifo_WIDTH;
+	private CommunicationFifo fifo_WIDTH;
 
 	private JFrame frame;
 
@@ -125,9 +125,9 @@ public class DisplayActor extends AbstractInterpretedActor {
 	@Override
 	public void initialize() {
 		// Connect to FIFOs
-		fifo_WIDTH = (IntFifo) actor.getInput("WIDTH").fifo();
-		fifo_HEIGHT = (IntFifo) actor.getInput("HEIGHT").fifo();
-		fifo_B = (IntFifo) actor.getInput("B").fifo();
+		fifo_WIDTH = (CommunicationFifo) actor.getInput("WIDTH").fifo();
+		fifo_HEIGHT = (CommunicationFifo) actor.getInput("HEIGHT").fifo();
+		fifo_B = (CommunicationFifo) actor.getInput("B").fifo();
 	}
 
 	@Override

@@ -28,12 +28,15 @@
  */
 package net.sf.orcc.interpreter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.backends.IBackend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
@@ -58,19 +61,31 @@ import org.jgrapht.DirectedGraph;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class InterpreterBackend implements IBackend {
+public class InterpreterMain {
+
+	private static final InterpreterMain instance = new InterpreterMain();
+
+	/**
+	 * Returns the single instance of this interpreter
+	 * 
+	 * @return the single instance of this interperter
+	 */
+	public static InterpreterMain getInstance() {
+		return instance;
+	}
 
 	protected int fifoSize;
-
 	protected String path;
-
 	private List<AbstractInterpretedActor> actorQueue;
 
-//	private FileOutputStream fos;
-//	private OutputStreamWriter out;
+	private FileOutputStream fos;
+	private OutputStreamWriter out;
 
-	
-	public void generateCode(String fileName, int fifoSize) throws Exception {
+	private InterpreterMain() {
+	}
+
+	public void interpretNetwork(String fileName, String inputBitstream,
+			int fifoSize) throws Exception {
 
 		// set FIFO size
 		this.fifoSize = fifoSize;
@@ -89,14 +104,14 @@ public class InterpreterBackend implements IBackend {
 		HashMap<String, BroadcastActor> bcastMap = new HashMap<String, BroadcastActor>();
 
 		// Create network communication tracing file
-//		File file = new File(fileName).getParentFile();
-//		try {
-//			fos = new FileOutputStream(new File(file, "traces.txt"));
-//			out = new OutputStreamWriter(fos, "UTF-8");
-//		} catch (FileNotFoundException e) {
-//			String msg = "file not found: \"" + fileName + "\"";
-//			throw new RuntimeException(msg, e);
-//		}
+		File file = new File(fileName).getParentFile();
+		try {
+			fos = new FileOutputStream(new File(file, "traces.txt"));
+			out = new OutputStreamWriter(fos, "UTF-8");
+		} catch (FileNotFoundException e) {
+			String msg = "file not found: \"" + fileName + "\"";
+			throw new RuntimeException(msg, e);
+		}
 
 		// get network graph
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
@@ -125,11 +140,11 @@ public class InterpreterBackend implements IBackend {
 
 				// create the communication FIFO between source and target
 				// actors
-				IntFifo fifo;
-				if (srcInst.getId().equals("broadcast_parseheaders_BTYPE")) {
-					fifo = new IntFifo(size, null);
+				CommunicationFifo fifo;
+				if (tgtInst.getId().equals("display")) {
+					fifo = new CommunicationFifo(size, out);
 				} else {
-					fifo = new IntFifo(size, null);
+					fifo = new CommunicationFifo(size, null);
 				}
 				// connect source actor to the FIFO
 				Port srcPort = connection.getSource();
@@ -145,7 +160,6 @@ public class InterpreterBackend implements IBackend {
 							bcastActor = new BroadcastActor(srcInst.getId(),
 									null);
 							bcastMap.put(srcInst.getId(), bcastActor);
-							// bcastActor = bcastMap.get(srcInst.getId());
 						}
 						bcastActor.setOutport(srcPort);
 					}
@@ -164,7 +178,6 @@ public class InterpreterBackend implements IBackend {
 							bcastActor = new BroadcastActor(tgtInst.getId(),
 									null);
 							bcastMap.put(tgtInst.getId(), bcastActor);
-							// bcastActor = bcastMap.get(tgtInst.getId());
 						}
 						bcastActor.setInport(tgtPort);
 					}
@@ -186,8 +199,8 @@ public class InterpreterBackend implements IBackend {
 				if (instance.isActor()) {
 					Actor actor = instance.getActor();
 					if ("source".equals(actor.getName())) {
-						actorQueue
-								.add(new SourceActor(instance.getId(), actor));
+						actorQueue.add(new SourceActor(instance.getId(), actor,
+								inputBitstream));
 					} else if ("display".equals(actor.getName())) {
 						actorQueue
 								.add(new DisplayActor(instance.getId(), actor));
@@ -243,8 +256,6 @@ public class InterpreterBackend implements IBackend {
 				// System.out.println("Schedule actor " + actor.getName());
 				running += actor.schedule();
 			}
-			// Manage empty and full FIFOs
-			FifoManager.getInstance().emptyFifos();
 		}
 		System.out.println("Interpretation ended");
 	}
