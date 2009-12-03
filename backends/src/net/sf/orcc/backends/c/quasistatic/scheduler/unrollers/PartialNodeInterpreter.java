@@ -28,15 +28,19 @@
  */
 package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 import net.sf.orcc.backends.interpreter.ListAllocator;
 import net.sf.orcc.backends.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.IfNode;
 
@@ -114,6 +118,30 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 		}
 
 		read.getPort().increaseTokensConsumption(read.getNumTokens());
+	}
+
+	@Override
+	public void visit(Store instr, Object... args) {
+		Variable variable = instr.getTarget().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			variable.setValue(instr.getValue().accept(exprInterpreter));
+		} else {
+			Object obj = variable.getValue();
+			Object objPrev = obj;
+			Integer lastIndex = 0;
+			for (Expression index : instr.getIndexes()) {
+				objPrev = obj;
+				lastIndex = (Integer) index.accept(exprInterpreter);
+				if (objPrev != null && lastIndex != null) {
+					obj = Array.get(objPrev, lastIndex);
+				}
+			}
+
+			if (objPrev != null && lastIndex != null) {
+				Array.set(objPrev, lastIndex, instr.getValue().accept(
+						exprInterpreter));
+			}
+		}
 	}
 
 	@Override
