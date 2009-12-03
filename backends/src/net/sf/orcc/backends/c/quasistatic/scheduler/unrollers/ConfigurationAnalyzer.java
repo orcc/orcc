@@ -39,18 +39,22 @@ import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.IntVariable;
 import jp.ac.kobe_u.cs.cream.Network;
 import jp.ac.kobe_u.cs.cream.Solution;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -62,6 +66,8 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.UintType;
 
 /**
  * This class defines a configuration analyzer.
@@ -296,7 +302,29 @@ public class ConfigurationAnalyzer {
 		public void visit(Peek peek, Object... args) {
 			if (peek.getPort().equals(port)) {
 				tokens = peek.getTarget();
-				constraintVariable = new IntVariable(network, port.getName());
+
+				int lo;
+				int hi;
+				if (port.getType().getType() == Type.INT) {
+					IntType type = (IntType) port.getType();
+					Expression size = type.getSize();
+					ExpressionEvaluator evaluator = new ExpressionEvaluator();
+					int num = evaluator.evaluateAsInteger(size);
+					lo = -(1 << (num - 1));
+					hi = (1 << (num - 1)) - 1;
+				} else if (port.getType().getType() == Type.UINT) {
+					UintType type = (UintType) port.getType();
+					Expression size = type.getSize();
+					ExpressionEvaluator evaluator = new ExpressionEvaluator();
+					int num = evaluator.evaluateAsInteger(size);
+					lo = 0;
+					hi = 1 << num - 1;
+				} else {
+					throw new OrccRuntimeException("integer ports only");
+				}
+
+				constraintVariable = new IntVariable(network, lo, hi, port
+						.getName());
 			}
 		}
 
