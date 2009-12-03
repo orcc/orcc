@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.interpreter.InterpretedActor;
 import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimElementTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimModuleTemplate;
@@ -46,6 +45,7 @@ import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimOperationTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimValueTemplate;
+import net.sf.orcc.interpreter.InterpretedActor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;

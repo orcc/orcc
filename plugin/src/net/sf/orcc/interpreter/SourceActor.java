@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.interpreter;
+package net.sf.orcc.interpreter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

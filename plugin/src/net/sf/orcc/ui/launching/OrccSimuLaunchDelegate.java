@@ -41,6 +41,7 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_BITSTREAM;
 
 import java.io.File;
 import java.io.IOException;
@@ -229,6 +230,7 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		String backend = configuration.getAttribute(BACKEND, "");
 
 		String inputFile = configuration.getAttribute(INPUT_FILE, "");
+		String inputBitstream = configuration.getAttribute(INPUT_BITSTREAM, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
 		String file = new File(inputFile).getName();

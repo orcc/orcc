@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.interpreter;
+package net.sf.orcc.interpreter;
 
 import net.sf.orcc.ir.Actor;
 

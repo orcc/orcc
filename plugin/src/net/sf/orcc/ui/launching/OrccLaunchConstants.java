@@ -117,4 +117,9 @@ public interface OrccLaunchConstants {
 	 */
 	public static final String RUN_CONFIG_TYPE = "net.sf.orcc.runLaunchConfigurationType";
 
+	/**
+	 * Input bitstream file associated with an Orcc configuration.
+	 */
+	public static final String INPUT_BITSTREAM = "net.sf.orcc.inputBitstream";
+
 }

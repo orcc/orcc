@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 
-import net.sf.orcc.backends.interpreter.InterpretedActor;
+import net.sf.orcc.interpreter.InterpretedActor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM.NextStateInfo;

@@ -24,10 +24,6 @@
             class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
             name="C *quasi-static*">
       </backend>
-      <backend
-            class="net.sf.orcc.backends.interpreter.InterpreterBackend"
-            name="interpreter">
-      </backend>
    </extension>
 
 </plugin>

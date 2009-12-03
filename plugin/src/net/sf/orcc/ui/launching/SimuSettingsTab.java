@@ -30,6 +30,7 @@ package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_BITSTREAM;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
@@ -71,8 +72,9 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private Text textNetwork;
+	private Text textBitstream;
 
-	private void browseFiles(Shell shell) {
+	private void browseXdfFiles(Shell shell) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
 				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
 				new WorkbenchContentProvider());
@@ -117,6 +119,45 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			textNetwork.setText(file.getLocation().toOSString());
 		}
 	}
+	
+	private void browseBitFiles(Shell shell) {
+		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
+				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
+				new WorkbenchContentProvider());
+		tree.setAllowMultiple(false);
+		tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
+
+		IFile file = getFileFromText();
+		if (file != null) {
+			tree.setInitialSelection(file);
+		}
+
+		tree.setMessage("Please select an existing file:");
+		tree.setTitle("Choose an existing file");
+
+		tree.setValidator(new ISelectionStatusValidator() {
+
+			@Override
+			public IStatus validate(Object[] selection) {
+				if (selection.length == 1) {
+					if (selection[0] instanceof IFile) {
+						return new Status(Status.OK,
+								OrccActivator.PLUGIN_ID, "");
+					}
+				}
+
+				return new Status(Status.ERROR, OrccActivator.PLUGIN_ID,
+						"Only files can be selected, not folders nor projects");
+			}
+
+		});
+
+		// opens the dialog
+		if (tree.open() == Window.OK) {
+			file = (IFile) tree.getFirstResult();
+			textBitstream.setText(file.getLocation().toOSString());
+		}
+	}
 
 	@Override
 	public void createControl(Composite parent) {
@@ -132,12 +173,13 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		setControl(composite);
 
 		createControlNetwork(font, composite);
+		createControlBitstream(font, composite);
 	}
 
 	private void createControlNetwork(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
-		group.setText("&Input:");
+		group.setText("&Input network:");
 		group.setLayout(new GridLayout(2, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
@@ -163,11 +205,45 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		buttonBrowse.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				browseFiles(group.getShell());
+				browseXdfFiles(group.getShell());
 			}
 		});
 	}
 
+	private void createControlBitstream(Font font, Composite parent) {
+		final Group group = new Group(parent, SWT.NONE);
+		group.setFont(font);
+		group.setText("&Input bitstream:");
+		group.setLayout(new GridLayout(2, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		group.setLayoutData(data);
+
+		textBitstream = new Text(group, SWT.BORDER | SWT.SINGLE);
+		textBitstream.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		textBitstream.setLayoutData(data);
+		textBitstream.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateLaunchConfigurationDialog();
+			}
+
+		});
+
+		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseBitFiles(group.getShell());
+			}
+		});
+	}
+	
 	private IFile getFileFromText() {
 		String value = textNetwork.getText();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -192,6 +268,8 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		try {
 			String value = configuration.getAttribute(INPUT_FILE, "");
 			textNetwork.setText(value);
+			value = configuration.getAttribute(INPUT_BITSTREAM, "");
+			textBitstream.setText(value);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -219,12 +297,16 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		String value = textNetwork.getText();
 		configuration.setAttribute(INPUT_FILE, value);
+		value = textBitstream.getText();
+		configuration.setAttribute(INPUT_BITSTREAM, value);
 	}
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		// network model
 		configuration.setAttribute(INPUT_FILE, "");
-
+		// input bitstream
+		configuration.setAttribute(INPUT_BITSTREAM, "");
 		// backend
 		configuration.setAttribute(BACKEND, "interpreter");
 	}

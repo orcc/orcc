@@ -31,8 +31,8 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import net.sf.orcc.backends.interpreter.ListAllocator;
-import net.sf.orcc.backends.interpreter.NodeInterpreter;
+import net.sf.orcc.interpreter.ListAllocator;
+import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
