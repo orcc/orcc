@@ -36,11 +36,9 @@ import java.util.Map;
 import java.util.Set;
 
 import jp.ac.kobe_u.cs.cream.DefaultSolver;
-import jp.ac.kobe_u.cs.cream.IntDomain;
 import jp.ac.kobe_u.cs.cream.IntVariable;
 import jp.ac.kobe_u.cs.cream.Network;
 import jp.ac.kobe_u.cs.cream.Solution;
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -116,7 +114,13 @@ public class ConfigurationAnalyzer {
 		private Object addConstraint(IntVariable v1, BinaryOp op, Object o2) {
 			switch (op) {
 			case BITAND:
-				return addConstraintBitand(v1, o2);
+				if (o2 instanceof IntVariable) {
+					v1.bitand((IntVariable) o2);
+				} else if (o2 instanceof Integer) {
+					v1.bitand((Integer) o2);
+				} else {
+					break;
+				}
 			case EQ:
 				if (o2 instanceof IntVariable) {
 					v1.equals((IntVariable) o2);
@@ -174,44 +178,6 @@ public class ConfigurationAnalyzer {
 			}
 
 			return null;
-		}
-
-		private Object addConstraintBitand(IntVariable v1, Object o2) {
-			if (!(o2 instanceof Integer)) {
-				return null;
-			}
-
-			int mask = (Integer) o2;
-			double numBits = Math.log(mask) / Math.log(2);
-			if (numBits - Math.floor(numBits) > 0.0) {
-				throw new OrccRuntimeException(
-						"masks not a power of two not supported");
-			}
-
-			Network network = v1.getNetwork();
-
-			// step 1: let x = v1 divided by MASK
-			// x = v1 / MASK <=> v1 = x * MASK
-			IntVariable x = new IntVariable(network);
-			IntVariable xTimesMask = x.multiply(mask);
-			xTimesMask.equals(v1);
-
-			// step 2: let result is r = x modulo 2
-			// <=> x = 2 * q + r with q in 0..MAX, r in domain 0..1
-
-			IntVariable r = new IntVariable(network, 0, 1);
-
-			// x = y + r
-			IntVariable y = new IntVariable(network);
-			IntVariable sum = y.add(r);
-			sum.equals(x);
-
-			// y = 2 * q
-			IntVariable q = new IntVariable(network, 0, IntDomain.MAX_VALUE);
-			IntVariable twoTimesQ = q.multiply(2);
-			y.equals(twoTimesQ);
-
-			return r;
 		}
 
 		@Override

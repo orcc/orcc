@@ -42,6 +42,11 @@ public class IntArith extends Constraint {
 	 */
 	public static final int MIN = 7;
 
+	/**
+	 * bitand operation
+	 */
+	public static final int BITAND = 8;
+
 	private int operation;
 
 	private Variable[] v;
@@ -129,6 +134,57 @@ public class IntArith extends Constraint {
 		v1.updateDomain(d1, trail);
 		// v2 = v0 - v1
 		d2 = d2.capInterval(d0.min() - d1.max(), d0.max() - d1.min());
+		if (d2.isEmpty())
+			return false;
+		v2.updateDomain(d2, trail);
+
+		return true;
+	}
+
+	private boolean satisfyBITAND(Variable v0, Variable v1, Variable v2,
+			Trail trail) {
+		IntDomain d0 = (IntDomain) v0.getDomain();
+		IntDomain d1 = (IntDomain) v1.getDomain();
+		IntDomain d2 = (IntDomain) v2.getDomain();
+
+		if (d1.size() == 1 && d2.size() == 1) {
+			// v0 = v1 & v2
+			int value = d1.value() & d2.value();
+			if (!d0.contains(value))
+				return false;
+			if (d0.size() > 1)
+				v0.updateDomain(new IntDomain(value), trail);
+			return true;
+		} else if (d0.size() == 1 && d2.size() == 1) {
+			// v1 = v0 & v2
+			int value = d0.value() & d2.value();
+			if (!d1.contains(value))
+				return false;
+			if (d1.size() > 1)
+				v1.updateDomain(new IntDomain(value), trail);
+			return true;
+		} else if (d0.size() == 1 && d1.size() == 1) {
+			// v2 = v0 & v1
+			int value = d0.value() & d1.value();
+			if (!d2.contains(value))
+				return false;
+			if (d2.size() > 1)
+				v2.updateDomain(new IntDomain(value), trail);
+			return true;
+		}
+
+		// v0 = v1 & v2
+		d0 = d0.capInterval(d1.min() & d2.min(), d1.max() & d2.max());
+		if (d0.isEmpty())
+			return false;
+		v0.updateDomain(d0, trail);
+		// v1 = v0 & v2
+		d1 = d1.capInterval(d0.min() & d2.max(), d0.max() & d2.min());
+		if (d1.isEmpty())
+			return false;
+		v1.updateDomain(d1, trail);
+		// v2 = v0 & v1
+		d2 = d2.capInterval(d0.min() & d1.max(), d0.max() & d1.min());
 		if (d2.isEmpty())
 			return false;
 		v2.updateDomain(d2, trail);
@@ -403,6 +459,8 @@ public class IntArith extends Constraint {
 			return satisfyMAX(v[0], v[1], v[2], trail);
 		case MIN:
 			return satisfyMIN(v[0], v[1], v[2], trail);
+		case BITAND:
+			return satisfyBITAND(v[0], v[1], v[2], trail);
 		}
 		return false;
 	}
