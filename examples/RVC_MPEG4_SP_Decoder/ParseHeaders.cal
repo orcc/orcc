@@ -531,7 +531,6 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
             vop_quant := 1 ;
 		end
 	end
-	vop_quant:=vop_quant;
   end
   
   mb_dispatch_done: action ==>
