@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_CONFIG_TYPE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 
@@ -113,8 +112,8 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			// source file
 			wc.setAttribute(INPUT_FILE, file.getLocation().toOSString());
 
-			// backend
-			wc.setAttribute(BACKEND, "interpreter");
+//			// backend
+//			wc.setAttribute(BACKEND, "interpreter");
 
 			// other options need not be set.
 

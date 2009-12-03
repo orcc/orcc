@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
@@ -38,10 +37,10 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_KEEP;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DOT_CFG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_BITSTREAM;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_BITSTREAM;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +48,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.interpreter.InterpreterMain;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IProject;
@@ -227,8 +226,6 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 	 */
 	private void launchBackend(ILaunchConfiguration configuration)
 			throws CoreException {
-		String backend = configuration.getAttribute(BACKEND, "");
-
 		String inputFile = configuration.getAttribute(INPUT_FILE, "");
 		String inputBitstream = configuration.getAttribute(INPUT_BITSTREAM, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
@@ -237,11 +234,11 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		String name = outputFolder + File.separator + file;
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		try {
-			BackendFactory factory = BackendFactory.getInstance();
-			factory.runBackend(backend, name, fifoSize);
+			InterpreterMain interpreter = InterpreterMain.getInstance();
+			interpreter.interpretNetwork(name, inputBitstream, fifoSize);
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					backend + " error", e);
+					"interpreter error", e);
 			throw new CoreException(status);
 		}
 	}

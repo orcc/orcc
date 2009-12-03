@@ -29,8 +29,8 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_BITSTREAM;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
@@ -61,6 +61,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
+import org.eclipse.ui.dialogs.ResourceSelectionDialog;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
@@ -119,42 +120,52 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			textNetwork.setText(file.getLocation().toOSString());
 		}
 	}
-	
+
 	private void browseBitFiles(Shell shell) {
-		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
-				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
-				new WorkbenchContentProvider());
-		tree.setAllowMultiple(false);
-		tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
+		// ElementTreeSelectionDialog tree = new
+		// ElementTreeSelectionDialog(shell,
+		// WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
+		// new WorkbenchContentProvider());
+		//		
+		// tree.setAllowMultiple(false);
+		// tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
+		//
+		// IFile file = getFileFromText();
+		// if (file != null) {
+		// tree.setInitialSelection(file);
+		// }
+		//
+		// tree.setMessage("Please select an existing file:");
+		// tree.setTitle("Choose an existing file");
+		//
+		// tree.setValidator(new ISelectionStatusValidator() {
+		//
+		// @Override
+		// public IStatus validate(Object[] selection) {
+		// if (selection.length == 1) {
+		// if (selection[0] instanceof IFile) {
+		// return new Status(Status.OK,
+		// OrccActivator.PLUGIN_ID, "");
+		// }
+		// }
+		//
+		// return new Status(Status.ERROR, OrccActivator.PLUGIN_ID,
+		// "Only files can be selected, not folders nor projects");
+		// }
+		//
+		// });
 
-		IFile file = getFileFromText();
-		if (file != null) {
-			tree.setInitialSelection(file);
-		}
+		ResourceSelectionDialog dialog = new ResourceSelectionDialog(shell,
+				ResourcesPlugin.getWorkspace().getRoot(), "Select input data:");
 
-		tree.setMessage("Please select an existing file:");
-		tree.setTitle("Choose an existing file");
+		IFile file = getFileFromBitText();
 
-		tree.setValidator(new ISelectionStatusValidator() {
-
-			@Override
-			public IStatus validate(Object[] selection) {
-				if (selection.length == 1) {
-					if (selection[0] instanceof IFile) {
-						return new Status(Status.OK,
-								OrccActivator.PLUGIN_ID, "");
-					}
-				}
-
-				return new Status(Status.ERROR, OrccActivator.PLUGIN_ID,
-						"Only files can be selected, not folders nor projects");
-			}
-
-		});
+		dialog.setTitle("Choose an existing file");
 
 		// opens the dialog
-		if (tree.open() == Window.OK) {
-			file = (IFile) tree.getFirstResult();
+		if (dialog.open() == Window.OK) {
+			Object[] result = dialog.getResult();
+			file = (IFile) result[0];
 			textBitstream.setText(file.getLocation().toOSString());
 		}
 	}
@@ -213,7 +224,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	private void createControlBitstream(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
-		group.setText("&Input bitstream:");
+		group.setText("&Input stimulus:");
 		group.setLayout(new GridLayout(2, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
@@ -243,9 +254,18 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			}
 		});
 	}
-	
+
 	private IFile getFileFromText() {
 		String value = textNetwork.getText();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IFile file = root.getFileForLocation(new Path(value));
+
+		return file;
+	}
+
+	private IFile getFileFromBitText() {
+		String value = textBitstream.getText();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
 		IFile file = root.getFileForLocation(new Path(value));
