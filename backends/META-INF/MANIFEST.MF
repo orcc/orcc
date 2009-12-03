@@ -11,6 +11,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/antlr-2.7.7.jar,
- lib/cream106.jar,
  lib/stringtemplate.jar
 Bundle-Activator: net.sf.orcc.backends.Activator
