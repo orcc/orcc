@@ -297,7 +297,6 @@ public class ActionParser {
 
 		variables = new Scope<Variable>(scope, true);
 		nodes = new ArrayList<CFGNode>();
-		nodes.add(new BlockNode());
 
 		parseInputPattern(tree.getChild(1));
 		stmtParser.setVariableScope(variables);
@@ -318,7 +317,7 @@ public class ActionParser {
 
 	private void parseInput(Port port, Tree idents, Tree repeat)
 			throws OrccException {
-		BlockNode block = (BlockNode) nodes.get(nodes.size() - 1);
+		BlockNode block = BlockNode.last(nodes);
 
 		Expression numRepeats = null;
 		if (repeat.getChildCount() == 1) {

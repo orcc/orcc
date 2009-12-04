@@ -44,7 +44,6 @@ import net.sf.orcc.frontend.parser.internal.RVCCalLexer;
 import net.sf.orcc.frontend.parser.internal.RVCCalParser;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
-import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -172,16 +171,6 @@ public class ALAstParser {
 			String msg = "could not solve the path \"" + fileName + "\"";
 			throw new OrccException(msg, e);
 		}
-	}
-
-	/**
-	 * Adds the given action to the action list of this AST parser.
-	 * 
-	 * @param action
-	 *            an action
-	 */
-	public void add(Action action) {
-		actions.add(action);
 	}
 
 	/**
