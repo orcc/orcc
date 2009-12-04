@@ -53,7 +53,8 @@ public class Scheduler {
 		//creates system level graphs
 		networkGraph.createSystemLevelGraph();
 		//performs DSE schedule
-		scheduleMap = performDSESchedule();
+		//TODO: change DSE scheduler's API in order it uses the Orcc's API ( and not external input files)
+		scheduleMap = new HashMap();//performDSESchedule();
 		SchedulePreparer.removeInputData();
 		//returns schedule hashmap
 		return scheduleMap;
