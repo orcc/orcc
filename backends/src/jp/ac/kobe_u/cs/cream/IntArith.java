@@ -162,9 +162,28 @@ public class IntArith extends Constraint {
 		} else if (d0.size() == 1 && d1.size() == 1) {
 			return bitand(d0.value(), v2, d2, d1.value(), trail);
 		}
+		
+//		d0 = bitand(d0, d1, d2.value());
+//		if (d0.isEmpty()) {
+//			return false;
+//		}
+//		v0.updateDomain(d0, trail);
 
 		return true;
 	}
+
+//	private IntDomain bitand(IntDomain d0, IntDomain d1, int value) {
+//		int min = d1.min();
+//		int max = d1.max();
+//		
+//		for (int i = min; i <= max; i++) {
+//			if ((i & value) == 0) {
+//				d0 = d0.delete(i);
+//			}
+//		}
+//		
+//		return d0;
+//	}
 
 	private boolean bitand(int result, Variable var, IntDomain domVar,
 			int value, Trail trail) {
@@ -173,10 +192,11 @@ public class IntArith extends Constraint {
 			IntDomain domain = (IntDomain) it.next();
 			for (int i = domain.min(); i <= domain.max(); i++) {
 				if (result == (i & value)) {
-					if (domVar.size() > 1) {
-						var.updateDomain(new IntDomain(i), trail);
-					}
+					var.updateDomain(domVar, trail);
 					return true;
+				} else {
+					// i is not a good candidate
+					domVar = domVar.delete(i);
 				}
 			}
 		}
