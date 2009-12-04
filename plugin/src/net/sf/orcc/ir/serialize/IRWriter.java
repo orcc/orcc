@@ -168,11 +168,15 @@ public class IRWriter {
 		public Object interpret(BinaryExpr expr, Object... args) {
 			JSONArray array = new JSONArray();
 			array.put(writeLocation(expr.getLocation()));
-			array.put(IRConstants.BINARY_EXPR);
-			array.put(expr.getOp().getText());
-			array.put(expr.getE1().accept(this));
-			array.put(expr.getE2().accept(this));
-			array.put(writeType(expr.getUnderlyingType()));
+			JSONArray body = new JSONArray();
+			array.put(body);
+
+			body.put(IRConstants.BINARY_EXPR);
+			body.put(expr.getOp().getText());
+			body.put(expr.getE1().accept(this));
+			body.put(expr.getE2().accept(this));
+			body.put(writeType(expr.getUnderlyingType()));
+
 			return array;
 		}
 
@@ -209,10 +213,14 @@ public class IRWriter {
 		public Object interpret(UnaryExpr expr, Object... args) {
 			JSONArray array = new JSONArray();
 			array.put(writeLocation(expr.getLocation()));
-			array.put(IRConstants.UNARY_EXPR);
-			array.put(expr.getOp().getText());
-			array.put(expr.getExpr().accept(this));
-			array.put(writeType(expr.getUnderlyingType()));
+			JSONArray body = new JSONArray();
+			array.put(body);
+
+			body.put(IRConstants.UNARY_EXPR);
+			body.put(expr.getOp().getText());
+			body.put(expr.getExpr().accept(this));
+			body.put(writeType(expr.getUnderlyingType()));
+
 			return array;
 		}
 
@@ -220,7 +228,12 @@ public class IRWriter {
 		public Object interpret(VarExpr expr, Object... args) {
 			JSONArray array = new JSONArray();
 			array.put(writeLocation(expr.getLocation()));
-			array.put(writeVariable(expr.getVar().getVariable()));
+			JSONArray body = new JSONArray();
+			array.put(body);
+
+			body.put(IRConstants.VAR_EXPR);
+			body.put(writeVariable(expr.getVar().getVariable()));
+
 			return array;
 		}
 
