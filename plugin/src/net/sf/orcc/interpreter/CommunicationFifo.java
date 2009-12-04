@@ -30,9 +30,6 @@ package net.sf.orcc.interpreter;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 import net.sf.orcc.ir.ICommunicationFifo;
 import net.sf.orcc.ir.Port;
 
@@ -49,8 +46,6 @@ public class CommunicationFifo implements ICommunicationFifo {
 	private int size;
 	private int readPos;
 	private int writePos;
-	private boolean fifoEmpty;
-	
 	private Port srcPort;
 	private Port tgtPort;
 	private OutputStreamWriter out;
@@ -58,7 +53,6 @@ public class CommunicationFifo implements ICommunicationFifo {
 	public CommunicationFifo(int size, OutputStreamWriter out) {
 		this.out = out;
 		this.size = size;
-		this.fifoEmpty = true;
 		queue = new Object[size];
 	}
 	
@@ -70,43 +64,28 @@ public class CommunicationFifo implements ICommunicationFifo {
 	}
 
 	public boolean hasRoom(int n) {
-		if ((writePos > readPos) || ((writePos == readPos) && fifoEmpty )) {
-			if ((size - writePos + readPos) >= n) {
-				return true;
-			}
-		}else {
-			if ((readPos - writePos) >= n) {
-				return true;
-			}
+		if (readPos > writePos) {
+			return readPos - writePos > n;
 		}
-		return false;
+		return size - writePos + readPos > n;
 	}
 
 	public boolean hasTokens(int n) {
-		if (writePos == readPos) {
-			if (!fifoEmpty && (size >= n)) {
-				return true;
-			}
-		} else if (writePos > readPos) {
-			if ((writePos - readPos) >= n) {
-				return true;
-			}
-		}else {
-			if ((size - readPos + writePos) >= n) {
-				return true;
-			}
+		if (writePos >= readPos) {
+			return  writePos - readPos >= n;
+		} else {
+			return size - readPos + writePos >= n;
 		}
-		return false;
 	}
 	
 	public void get(Object[] target) {
-		if ((size - readPos) >= target.length) {
+		if (readPos + target.length <= size) {
 			System.arraycopy(queue, readPos, target, 0, target.length);
 			readPos += target.length; 
 		}else {
 			System.arraycopy(queue, readPos, target, 0, size - readPos);
-			System.arraycopy(queue, 0, target, size - readPos, target.length - size + readPos);
-			readPos=target.length - size + readPos;
+			System.arraycopy(queue, 0, target, size - readPos, target.length + readPos - size);
+			readPos=target.length + readPos - size ;
 		}
 		if (out != null) {
 			try {
@@ -123,22 +102,22 @@ public class CommunicationFifo implements ICommunicationFifo {
 	}
 
 	public void peek(Object[] target) {
-		if ((size - readPos) >= target.length) {
+		if (readPos + target.length <= size) {
 			System.arraycopy(queue, readPos, target, 0, target.length);
 		}else {
 			System.arraycopy(queue, readPos, target, 0, size - readPos);
-			System.arraycopy(queue, 0, target, size - readPos, target.length - size + readPos);
+			System.arraycopy(queue, 0, target, size - readPos, target.length + readPos - size);
 		}
 	}
 
 	public void put(Object[] source) {
-		if ((size - writePos) >= source.length) {
+		if (writePos + source.length <= size) {
 			System.arraycopy(source, 0, queue, writePos, source.length);
 			writePos += source.length;
 		}else {
 			System.arraycopy(source, 0, queue, writePos, size - writePos);
-			System.arraycopy(source, size - writePos, queue, 0, source.length - size + writePos);
-			writePos = source.length - size + writePos;
+			System.arraycopy(source, size - writePos, queue, 0, source.length + writePos - size);
+			writePos = source.length + writePos - size;
 		}
 		if (out != null) {
 			try {
