@@ -131,7 +131,7 @@ public class ConfigurationAnalyzer {
 				if (o2 instanceof IntVariable) {
 					v1.equals((IntVariable) o2);
 				} else if (o2 instanceof Integer) {
-					v1.equals((Integer) o2);
+					v1.equals(((Integer) o2).intValue());
 				} else {
 					break;
 				}
