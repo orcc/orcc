@@ -120,9 +120,7 @@ public class ConfigurationAnalyzer {
 		private Object addConstraint(IntVariable v1, BinaryOp op, Object o2) {
 			switch (op) {
 			case BITAND:
-				if (o2 instanceof IntVariable) {
-					v1.bitand((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
+				if (o2 instanceof Integer) {
 					v1.bitand((Integer) o2);
 				} else {
 					break;

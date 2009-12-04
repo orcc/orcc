@@ -3,6 +3,8 @@
  */
 package jp.ac.kobe_u.cs.cream;
 
+import java.util.Iterator;
+
 /**
  * IntArith constraint implements
  * arithmetic binary operations on integers.
@@ -148,48 +150,38 @@ public class IntArith extends Constraint {
 		IntDomain d2 = (IntDomain) v2.getDomain();
 
 		if (d1.size() == 1 && d2.size() == 1) {
-			// v0 = v1 & v2
 			int value = d1.value() & d2.value();
-			if (!d0.contains(value))
+			if (!d0.contains(value)) {
 				return false;
+			}
 			if (d0.size() > 1)
 				v0.updateDomain(new IntDomain(value), trail);
 			return true;
 		} else if (d0.size() == 1 && d2.size() == 1) {
-			// v1 = v0 & v2
-			int value = d0.value() & d2.value();
-			if (!d1.contains(value))
-				return false;
-			if (d1.size() > 1)
-				v1.updateDomain(new IntDomain(value), trail);
-			return true;
+			return bitand(d0.value(), v1, d1, d2.value(), trail);
 		} else if (d0.size() == 1 && d1.size() == 1) {
-			// v2 = v0 & v1
-			int value = d0.value() & d1.value();
-			if (!d2.contains(value))
-				return false;
-			if (d2.size() > 1)
-				v2.updateDomain(new IntDomain(value), trail);
-			return true;
+			return bitand(d0.value(), v2, d2, d1.value(), trail);
 		}
 
-		// v0 = v1 & v2
-		d0 = d0.capInterval(d1.max() & d2.max(), d1.max());
-		if (d0.isEmpty())
-			return false;
-		v0.updateDomain(d0, trail);
-		// v1 = v0 & v2
-		d1 = d1.capInterval(d0.min() & d2.max(), d0.max());
-		if (d1.isEmpty())
-			return false;
-		v1.updateDomain(d1, trail);
-		// v2 = v0 & v1
-		d2 = d2.capInterval(d0.min() & d1.max(), d0.max());
-		if (d2.isEmpty())
-			return false;
-		v2.updateDomain(d2, trail);
-
 		return true;
+	}
+
+	private boolean bitand(int result, Variable var, IntDomain domVar,
+			int value, Trail trail) {
+		Iterator<Domain> it = domVar.elements();
+		while (it.hasNext()) {
+			IntDomain domain = (IntDomain) it.next();
+			for (int i = domain.min(); i <= domain.max(); i++) {
+				if (result == (i & value)) {
+					if (domVar.size() > 1) {
+						var.updateDomain(new IntDomain(i), trail);
+					}
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private int toInt(long x) {

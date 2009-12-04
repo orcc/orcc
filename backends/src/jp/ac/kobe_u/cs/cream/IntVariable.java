@@ -137,20 +137,6 @@ public class IntVariable extends Variable {
 	}
 
 	/**
-	 * Returns a new integer variable which is equal to <tt>this & v</tt>.
-	 * @param v the variable to be bitand'ed
-	 * @return the new integer variable
-	 * @see IntArith
-	 */
-	public IntVariable bitand(IntVariable v) {
-		Network net = getNetwork();
-		IntVariable x = new IntVariable(net);
-		// x = this & v
-		new IntArith(net, IntArith.BITAND, x, this, v);
-		return x;
-	}
-
-	/**
 	 * Returns a new integer variable which is equal to <tt>this & value</tt>.
 	 * @param value the value to be bitand'ed
 	 * @return the new integer variable
