@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.BtypeChangesListener;
 import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
 
 /**
@@ -43,7 +42,6 @@ public class Switch {
 
 	
 	private static String btype;
-	private static List<BtypeChangesListener> listeners;
 	
 	public static int getSwitchValue(String newSwitch) {
 		int newValue = -1;
@@ -72,26 +70,11 @@ public class Switch {
 	
 	public static void setBtype(String btype)throws OrccException{
 		Switch.btype = btype;
-		btypeHasChanged();
-	}
-	
-	private static void btypeHasChanged()throws OrccException{
-		if(listeners == null){
-			return;
-		}
-		for(BtypeChangesListener listener: listeners){
-			listener.btypeHasChanged();
-		}
+		
 	}
 	
 	public static String getBTYPE(){
 		return Switch.btype;
 	}
 	
-	public static void registerListener(BtypeChangesListener listener){
-		if(listeners == null){
-			listeners = new ArrayList<BtypeChangesListener>();
-		}
-		listeners.add(listener);
-	}
 }

@@ -37,18 +37,22 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+
 
 import net.sf.orcc.backends.c.quasistatic.scheduler.dse.DSEScheduler;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.Switch;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.GraphEdge;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.GraphVertex;
+import net.sf.orcc.ir.Action;
 
 /**
  * 
  * @author Victor Martin
  */
 public class DSEInputFilesCreator {
-
+	
+	private Graph<Action, DefaultEdge> systemLevelGraph;
+	
 	private HashMap<String, Integer> actionsIndexes;
 	private ArrayList<String> actionsConnections;
 	private int lastActionIndex;
@@ -58,7 +62,7 @@ public class DSEInputFilesCreator {
 		actionsIndexes = new HashMap<String, Integer>();
 		lastActionIndex = 0;
 	}
-
+	
 	public void addNode(String actorId, String actionId) {
 		String key = actorId + " " + actionId;
 		if (actionsIndexes.containsKey(key))
@@ -67,11 +71,11 @@ public class DSEInputFilesCreator {
 		lastActionIndex++;
 	}
 
-	public void addNodes(String actorId, Collection<GraphVertex> vertices){
-		for(GraphVertex vertex: vertices){
+	public void addNodes(String actorId, Collection/*<GraphVertex>*/ vertices){
+		/*for(GraphVertex vertex: vertices){
 			String actionId = vertex.getVertexName();
 			addNode(actorId, actionId);
-		}
+		}*/
 	}
 	
 	public void addConnection(String fromActorId, String fromActionId, String toActorId, String toActionId) {
@@ -85,16 +89,16 @@ public class DSEInputFilesCreator {
 		actionsConnections.add(fromIndex + " " + toIndex);
 	}
 
-	public void addConnections(String actorId, Collection<GraphEdge> edges){
-		addConnections(actorId, actorId, edges);
+	public void addConnections(String actorId, Collection/*<GraphEdge>*/ edges){
+		//addConnections(actorId, actorId, edges);
 	}
 	
-	public void addConnections(String fromActorId, String toActorId, Collection<GraphEdge> edges){
-		for(GraphEdge edge: edges){
+	public void addConnections(String fromActorId, String toActorId, Collection/*<GraphEdge>*/ edges){
+		/*for(GraphEdge edge: edges){
 			String fromActionId = edge.getFromVertex().getVertexName();
 			String toActionId = edge.getToVertex().getVertexName();
 			addConnection(fromActorId, fromActionId, toActorId, toActionId);
-		}
+		}*/
 	}
 	
 	public void print() {

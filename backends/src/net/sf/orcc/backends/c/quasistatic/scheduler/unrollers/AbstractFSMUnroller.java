@@ -30,8 +30,11 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 
 import java.util.List;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.Graph;
+import net.sf.orcc.ir.Action;
 
 /**
  * This interfaces defines an FSM unroller.
@@ -47,6 +50,6 @@ public interface AbstractFSMUnroller {
 	 * @return a list of graphs
 	 * @throws QuasiStaticSchedulerException
 	 */
-	public List<Graph> unroll() throws QuasiStaticSchedulerException;
+	public List<Graph<Action, DefaultEdge>> unroll() throws QuasiStaticSchedulerException;
 
 }

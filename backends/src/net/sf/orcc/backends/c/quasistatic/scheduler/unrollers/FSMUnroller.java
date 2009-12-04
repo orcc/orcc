@@ -31,9 +31,12 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedMultigraph;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.Graph;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -65,8 +68,8 @@ public class FSMUnroller implements AbstractFSMUnroller {
 	 * 
 	 * @return the list of SDF graphs
 	 */
-	public List<Graph> unroll() throws QuasiStaticSchedulerException {
-		List<Graph> actorSubgraphs = new ArrayList<Graph>();
+	public List<Graph<Action, DefaultEdge>> unroll() throws QuasiStaticSchedulerException {
+		List<Graph<Action, DefaultEdge>> actorSubgraphs = new ArrayList<Graph<Action, DefaultEdge>>();
 
 		// Generates a subgraph for each initial transition
 		try {
@@ -88,8 +91,8 @@ public class FSMUnroller implements AbstractFSMUnroller {
 		return actorSubgraphs;
 	}
 
-	private Graph unroll(List<Action> actions) {
-		Graph actorSg = new Graph();
+	private Graph<Action, DefaultEdge> unroll(List<Action> actions) {
+		Graph<Action, DefaultEdge> actorSg = new DirectedMultigraph<Action, DefaultEdge>(DefaultEdge.class);
 
 		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
 				actor.getName(), actor, analyzer);
@@ -104,12 +107,12 @@ public class FSMUnroller implements AbstractFSMUnroller {
 		return actorSg;
 	}
 
-	private Graph unroll(String initialState, Action action)
+	private Graph<Action, DefaultEdge> unroll(String initialState, Action action)
 			throws QuasiStaticSchedulerException {
 		System.out.println();
 		System.out.println("unroll " + actor.getName() + " from "
 				+ initialState + ", configuration action " + action);
-		Graph actorSg = new Graph();
+		Graph<Action, DefaultEdge> actorSg = new DirectedMultigraph<Action, DefaultEdge>(DefaultEdge.class);
 
 		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
 				actor.getName(), actor, analyzer);

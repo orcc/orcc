@@ -48,14 +48,10 @@ public class Scheduler {
 		}
 		//search for scheduled actors
 		networkGraph.init();
-		for(String btype: Switch.getSwitchValues()){
-			System.out.println("BTYPE: " + btype);
-			Switch.setBtype(btype);
-			//unrolls actors
-			networkGraph.unrollStaticActors();
-			//creates system level graphs
-			networkGraph.createSystemLevelGraph();
-		}
+		//unrolls actors
+		networkGraph.unrollActors();
+		//creates system level graphs
+		networkGraph.createSystemLevelGraph();
 		//performs DSE schedule
 		scheduleMap = performDSESchedule();
 		SchedulePreparer.removeInputData();

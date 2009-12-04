@@ -32,17 +32,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.Graph;
 import net.sf.orcc.backends.c.quasistatic.scheduler.unrollers.FSMUnroller;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+
 public class ActorGraph {
 
 	private Actor actor;
 
-	private List<Graph> graphs;
+	private List<Graph<Action, DefaultEdge>> graphs;
+
 
 	public ActorGraph(Actor actor) {
 		this.actor = actor;
@@ -60,19 +63,15 @@ public class ActorGraph {
 		return actor.getName();
 	}
 
-	public List<Graph> getGraphs() {
+	public List<Graph<Action, DefaultEdge>> getGraphs() {
 		return graphs;
 	}
 
 	public void unrollFSM() throws QuasiStaticSchedulerException {
 		System.out.println("********* Unrolling actor " + getName()
-				+ " *********");
+							+ " *********");
 
 		graphs = new FSMUnroller(actor).unroll();
-	}
-
-	public Graph getGraph(String btype) {
-		return new Graph();
 	}
 
 	public String toString() {

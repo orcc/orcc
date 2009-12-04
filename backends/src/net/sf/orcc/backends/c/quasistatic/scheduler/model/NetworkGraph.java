@@ -6,27 +6,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedMultigraph;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.main.Scheduler;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.BtypeChangesListener;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.Graph;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.GraphEdge;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.util.GraphVertex;
-import net.sf.orcc.backends.c.quasistatic.scheduler.output.DSEInputFilesCreator;
 import net.sf.orcc.backends.c.quasistatic.scheduler.parsers.InputXDFParser;
 import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.Connection;
 
-public class NetworkGraph implements BtypeChangesListener{
+public class NetworkGraph{
 	
-	private HashMap<String,Graph> graphsMap;
+	private HashMap<String,Graph<Action, DefaultEdge>> graphsMap;
 	private Network network;
 	private List<ActorGraph> scheduledActorsList;
 	
@@ -35,8 +33,7 @@ public class NetworkGraph implements BtypeChangesListener{
 	}
 	
 	public void init() throws OrccException{
-		Switch.registerListener(this);
-		graphsMap = new HashMap<String,Graph>();
+		graphsMap = new HashMap<String,Graph<Action, DefaultEdge>>();
 		createScheduledActorsList();
 	}
 	
@@ -61,7 +58,7 @@ public class NetworkGraph implements BtypeChangesListener{
 		scheduledActorsList = actors;
 	}
 	
-	public void unrollStaticActors() throws OrccException, QuasiStaticSchedulerException{
+	public void unrollActors() throws OrccException, QuasiStaticSchedulerException{
 		for(ActorGraph actor : scheduledActorsList){
 			actor.unrollFSM();
 		}
@@ -99,17 +96,19 @@ public class NetworkGraph implements BtypeChangesListener{
 	 * @return this system level graph.
 	 * @throws OrccException
 	 */
-	public Graph createSystemLevelGraph() throws OrccException{
-		Graph graph = new Graph();
+	public Graph<Action, DefaultEdge> createSystemLevelGraph() throws OrccException{
+		//TODO: create a system-level graph once all the actors have been unrolled
+		return new DirectedMultigraph<Action, DefaultEdge>(DefaultEdge.class);
+		/*	Graph graph = new DirectedMultigraph<Action, DefaultEdge>(DefaultEdge.class);
 		DSEInputFilesCreator dseInputFilesCreator = new DSEInputFilesCreator();
 		
 		//Inserts the actions/connections of each actor
 		for(ActorGraph actor: scheduledActorsList){
-			Graph subgraph = actor.getGraph(Switch.getBTYPE());
-			graph.addEdges(subgraph.getEdges());
-			graph.addVertices(subgraph.getVertices());
-			dseInputFilesCreator.addNodes(actor.getName(), subgraph.getVertices());
-			dseInputFilesCreator.addConnections(actor.getName(), subgraph.getEdges());
+			//Take the actor subgraph
+			Graph<Action, DefaultEdge> subgraph = actor.getGraph(Switch.getBTYPE());
+			subgraph.
+			graph.addEdges(subgraph.edgeSet());
+			graph.addVertices(subgraph.vertexSet());
 		}
 		
 		//Inserts the connections between network's actors
@@ -166,7 +165,7 @@ public class NetworkGraph implements BtypeChangesListener{
 		//Prints DSE scheduler input files
 		dseInputFilesCreator.print();
 		
-		return graph;
+		return graph;*/
 	}
 	
 	
@@ -183,8 +182,4 @@ public class NetworkGraph implements BtypeChangesListener{
 		return null;
 	}
 
-	@Override
-	public void btypeHasChanged() throws OrccException {
-		updateTokensPattern();
-	}
 }
