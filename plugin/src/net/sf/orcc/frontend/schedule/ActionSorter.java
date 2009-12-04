@@ -104,6 +104,15 @@ public class ActionSorter {
 		}
 
 		ActionList actions = new ActionList();
+
+		// untagged actions first, by document order
+		for (Action action : actionList) {
+			if (action.getTag().isEmpty()) {
+				actions.add(action);
+			}
+		}
+
+		// tagged actions then, by priority order
 		TopologicalOrderIterator<Action, DefaultEdge> it = new TopologicalOrderIterator<Action, DefaultEdge>(
 				graph);
 		while (it.hasNext()) {
