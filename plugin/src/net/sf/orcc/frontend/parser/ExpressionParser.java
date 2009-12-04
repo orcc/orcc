@@ -3,12 +3,15 @@ package net.sf.orcc.frontend.parser;
 import static net.sf.orcc.frontend.parser.Util.parseLocation;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.internal.ALBaseLexer;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -17,6 +20,8 @@ import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.Scope;
 
@@ -36,6 +41,14 @@ public class ExpressionParser {
 	 */
 	private final String file;
 
+	/**
+	 * a map of global variables that were loaded
+	 */
+	private Map<Variable, LocalVariable> globalsLoaded;
+
+	/**
+	 * a list of nodes at the end of which this parser may add nodes
+	 */
 	private List<CFGNode> nodes;
 
 	/**
@@ -52,6 +65,49 @@ public class ExpressionParser {
 	 */
 	public ExpressionParser(String file) {
 		this.file = file;
+		globalsLoaded = new LinkedHashMap<Variable, LocalVariable>();
+	}
+
+	/**
+	 * Returns the variable whose name is given. If the variable is a global
+	 * returns the local variable where it is stored. If no local variable
+	 * matches, adds a Load instruction to nodes.
+	 * 
+	 * @param location
+	 *            a location
+	 * @param variableName
+	 *            variable name
+	 * @return a variable
+	 * @throws OrccException
+	 */
+	public Variable getVariable(Location location, String variableName)
+			throws OrccException {
+		Variable variable = scope.get(variableName);
+		if (variable == null) {
+			throw new OrccException(file, location, "unknown variable: \""
+					+ variableName + "\"");
+		}
+
+		if (variable.isGlobal()) {
+			LocalVariable local = globalsLoaded.get(variable);
+			if (local == null) {
+				local = new LocalVariable(true, 0, location, "_local_"
+						+ variableName, null, null, variable.getType());
+				scope.add(file, location, local.getBaseName(), local);
+				globalsLoaded.put(variable, local);
+
+				// add a Load
+				BlockNode block = BlockNode.last(nodes);
+				List<Expression> indexes = new ArrayList<Expression>(0);
+				Use use = new Use(variable, block);
+				Load load = new Load(block, location, local, use, indexes);
+				block.add(load);
+			}
+
+			variable = local;
+		}
+
+		return variable;
 	}
 
 	/**
@@ -139,44 +195,58 @@ public class ExpressionParser {
 	/**
 	 * Parses the given tree as an expression.
 	 * 
-	 * @param expr
+	 * @param tree
 	 *            a tree that contains an expression
 	 * @return an {@link Expression}.
 	 * @throws OrccException
 	 */
-	public Expression parseExpression(Tree expr) throws OrccException {
-		switch (expr.getType()) {
+	public Expression parseExpression(Tree tree) throws OrccException {
+		switch (tree.getType()) {
 		case ALBaseLexer.EXPR_BINARY:
-			return parseBinOpSeq(expr);
+			return parseBinOpSeq(tree);
 		case ALBaseLexer.EXPR_BOOL: {
-			expr = expr.getChild(0);
-			boolean value = Boolean.parseBoolean(expr.getText());
-			return new BoolExpr(parseLocation(expr), value);
+			tree = tree.getChild(0);
+			boolean value = Boolean.parseBoolean(tree.getText());
+			return new BoolExpr(parseLocation(tree), value);
 		}
 		case ALBaseLexer.EXPR_FLOAT:
 			throw new OrccException("not yet implemented!");
 		case ALBaseLexer.EXPR_INT:
-			expr = expr.getChild(0);
-			int value = Integer.parseInt(expr.getText());
-			return new IntExpr(parseLocation(expr), value);
+			tree = tree.getChild(0);
+			int value = Integer.parseInt(tree.getText());
+			return new IntExpr(parseLocation(tree), value);
 		case ALBaseLexer.EXPR_STRING:
-			expr = expr.getChild(0);
-			return new StringExpr(parseLocation(expr), expr.getText());
+			tree = tree.getChild(0);
+			return new StringExpr(parseLocation(tree), tree.getText());
 		case ALBaseLexer.EXPR_VAR:
-			return parseExprVar(expr.getChild(0));
+			return parseExprVar(tree.getChild(0));
 		default:
 			throw new OrccException("not yet implemented");
 		}
 	}
 
+	/**
+	 * Parses the children of the given tree as expressions.
+	 * 
+	 * @param tree
+	 *            a tree whose children are expressions
+	 * @return a list of {@link Expression}s
+	 * @throws OrccException
+	 */
+	public List<Expression> parseExpressions(Tree tree) throws OrccException {
+		int n = tree.getChildCount();
+		List<Expression> list = new ArrayList<Expression>(n);
+		for (int i = 0; i < n; i++) {
+			list.add(parseExpression(tree.getChild(i)));
+		}
+
+		return list;
+	}
+
 	private Expression parseExprVar(Tree tree) throws OrccException {
 		Location location = parseLocation(tree);
 
-		Variable variable = scope.get(tree.getText());
-		if (variable == null) {
-			throw new OrccException(file, location, "unknown variable: "
-					+ variable);
-		}
+		Variable variable = getVariable(location, tree.getText());
 		Use localUse = new Use(variable);
 		return new VarExpr(location, localUse);
 	}

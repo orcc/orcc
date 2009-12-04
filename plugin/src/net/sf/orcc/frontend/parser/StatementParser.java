@@ -2,7 +2,11 @@ package net.sf.orcc.frontend.parser;
 
 import static net.sf.orcc.frontend.parser.Util.parseLocation;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.parser.internal.ALBaseLexer;
@@ -13,7 +17,12 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.util.Scope;
 
 import org.antlr.runtime.tree.Tree;
@@ -26,6 +35,11 @@ public class StatementParser {
 	 * the file being parsed
 	 */
 	private final String file;
+
+	/**
+	 * a map of global variables that should be stored
+	 */
+	private Map<LocalVariable, Variable> globalsToStore;
 
 	private List<CFGNode> nodes;
 
@@ -45,6 +59,43 @@ public class StatementParser {
 		this.file = file;
 		this.typeParser = typeParser;
 		this.exprParser = exprParser;
+
+		globalsToStore = new LinkedHashMap<LocalVariable, Variable>();
+	}
+
+	/**
+	 * Returns the variable whose name is given. If the variable is a global
+	 * calls the {@link ExpressionParser#getVariable(Location, String)} method
+	 * to get the local variable where it is stored. The {@link #globalsToStore}
+	 * map is updated if no global is associated with the local variable.
+	 * 
+	 * @param location
+	 *            a location
+	 * @param variableName
+	 *            variable name
+	 * @return a variable
+	 * @throws OrccException
+	 */
+	private Variable getVariable(Location location, String variableName)
+			throws OrccException {
+		Variable variable = scope.get(variableName);
+		if (variable == null) {
+			throw new OrccException(file, location, "unknown variable: \""
+					+ variableName + "\"");
+		}
+
+		if (variable.isGlobal()) {
+			LocalVariable local = (LocalVariable) exprParser.getVariable(
+					location, variableName);
+			Variable global = globalsToStore.get(local);
+			if (global == null) {
+				globalsToStore.put(local, variable);
+			}
+
+			return local;
+		} else {
+			return variable;
+		}
 	}
 
 	/**
@@ -72,6 +123,9 @@ public class StatementParser {
 		for (int i = 0; i < n; i++) {
 			parseStatement(statements.getChild(i));
 		}
+
+		// adds global to store
+		storeGlobals();
 
 		return variables;
 	}
@@ -112,14 +166,21 @@ public class StatementParser {
 
 	private void parseStatement(Tree tree) throws OrccException {
 		if (tree.getType() == ALBaseLexer.ASSIGN) {
+			Location location = parseLocation(tree.getChild(0));
 			String targetName = tree.getChild(0).getText();
-			Tree indexes = tree.getChild(1);
+			List<Expression> indexes = exprParser.parseExpressions(tree
+					.getChild(1));
 			Expression value = exprParser.parseExpression(tree.getChild(2));
 
-			Variable target = scope.get(targetName);
-			if (target == null) {
-				throw new OrccException("unknown variable: \"" + targetName
-						+ "\"");
+			if (indexes.isEmpty()) {
+				Variable target = getVariable(location, targetName);
+				LocalVariable local = (LocalVariable) target;
+
+				BlockNode block = BlockNode.last(nodes);
+				Assign assign = new Assign(block, location, local, value);
+				block.add(assign);
+			} else {
+				// TODO: store
 			}
 		}
 	}
@@ -132,6 +193,7 @@ public class StatementParser {
 	 */
 	public void setCFGNodeList(List<CFGNode> nodes) {
 		this.nodes = nodes;
+		exprParser.setCFGNodeList(nodes);
 	}
 
 	/**
@@ -143,6 +205,26 @@ public class StatementParser {
 	public void setVariableScope(Scope<Variable> scope) {
 		this.scope = scope;
 		exprParser.setVariableScope(scope);
+	}
+
+	/**
+	 * Store back the globals that were modified. They are in the
+	 * {@link #globalsToStore} map.
+	 */
+	private void storeGlobals() {
+		for (Entry<LocalVariable, Variable> entry : globalsToStore.entrySet()) {
+			LocalVariable source = entry.getKey();
+			Variable target = entry.getValue();
+
+			BlockNode block = BlockNode.last(nodes);
+			Location location = block.getLocation();
+
+			Use use = new Use(target, block);
+			List<Expression> indexes = new ArrayList<Expression>(0);
+			Expression value = new VarExpr(location, new Use(source, block));
+			Store store = new Store(block, location, use, indexes, value);
+			block.add(store);
+		}
 	}
 
 }
