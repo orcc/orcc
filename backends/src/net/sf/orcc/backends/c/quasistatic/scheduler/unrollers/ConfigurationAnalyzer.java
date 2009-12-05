@@ -88,6 +88,11 @@ public class ConfigurationAnalyzer {
 
 		private IntVariable constraintVariable;
 
+		/**
+		 * whether constraints should be negated
+		 */
+		private boolean negateConstraints;
+
 		private Variable target;
 
 		/**
@@ -99,11 +104,15 @@ public class ConfigurationAnalyzer {
 		 *            target variable
 		 * @param constraintVariable
 		 *            constraint variable
+		 * @param negateConstraints
+		 *            if true, each constraint is created to satisfy the
+		 *            negation of the expression
 		 */
 		public ConstraintExpressionVisitor(Variable target,
-				IntVariable constraintVariable) {
+				IntVariable constraintVariable, boolean negateConstraints) {
 			this.target = target;
 			this.constraintVariable = constraintVariable;
+			this.negateConstraints = negateConstraints;
 		}
 
 		/**
@@ -189,14 +198,18 @@ public class ConfigurationAnalyzer {
 			Object o1 = expr.getE1().accept(this);
 			Object o2 = expr.getE2().accept(this);
 
+			BinaryOp op = expr.getOp();
+			if (negateConstraints && op.isComparison()) {
+				op = op.getInverse();
+			}
+
 			if (o1 instanceof IntVariable) {
 				IntVariable v1 = (IntVariable) o1;
-				return addConstraint(v1, expr.getOp(), o2);
+				return addConstraint(v1, op, o2);
 			} else {
 				if (o2 instanceof IntVariable) {
 					IntVariable v2 = (IntVariable) o2;
-					return addConstraint(v2, expr.getOp()
-							.inequalityOpChangeOrder(), o1);
+					return addConstraint(v2, op.getReversedInequality(), o1);
 				} else {
 					// no variable in binary expression
 					return null;
@@ -261,16 +274,47 @@ public class ConfigurationAnalyzer {
 	 */
 	private class GuardVisitor extends AbstractActorTransformation {
 
+		/**
+		 * the constraint variable created with the name and domain of the
+		 * configuration port
+		 */
 		private IntVariable constraintVariable;
 
+		/**
+		 * whether constraints added by the constraint expression visitor should
+		 * be negated
+		 */
+		private boolean negateConstraints;
+
+		/**
+		 * the constraint network
+		 */
 		private Network network;
 
+		/**
+		 * the variable loaded from the tokens array
+		 */
 		private Variable target;
 
+		/**
+		 * the variable that holds the tokens peeked on the configuration port
+		 */
 		private Variable tokens;
 
-		public GuardVisitor() {
+		/**
+		 * Creates a guard visitor. This visitor visits the previous actions,
+		 * and add negated constraints about the guards.
+		 * 
+		 * @param previous
+		 */
+		public GuardVisitor(List<Action> previous) {
 			network = new Network();
+			negateConstraints = true;
+			for (Action action : previous) {
+				visitAction(action, this);
+			}
+
+			negateConstraints = false;
 		}
 
 		/**
@@ -285,20 +329,20 @@ public class ConfigurationAnalyzer {
 		@Override
 		public void visit(Assign assign, Object... args) {
 			ConstraintExpressionVisitor visitor = new ConstraintExpressionVisitor(
-					target, constraintVariable);
+					target, constraintVariable, negateConstraints);
 			assign.getValue().accept(visitor);
 		}
 
 		@Override
 		public void visit(Load load, Object... args) {
-			if (load.getSource().getVariable().equals(tokens)) {
+			if (target == null && load.getSource().getVariable().equals(tokens)) {
 				target = load.getTarget();
 			}
 		}
 
 		@Override
 		public void visit(Peek peek, Object... args) {
-			if (peek.getPort().equals(port)) {
+			if (constraintVariable == null && peek.getPort().equals(port)) {
 				tokens = peek.getTarget();
 
 				int lo;
@@ -406,7 +450,7 @@ public class ConfigurationAnalyzer {
 		List<Set<Port>> ports = new ArrayList<Set<Port>>();
 		for (NextStateInfo info : fsm.getTransitions(initialState)) {
 			PeekVisitor visitor = new PeekVisitor();
-			visitAction(info, visitor);
+			visitAction(info.getAction(), visitor);
 			ports.add(visitor.getCandidates());
 		}
 
@@ -431,11 +475,19 @@ public class ConfigurationAnalyzer {
 		}
 	}
 
+	/**
+	 * For each action departing from the initial state, visits its guards and
+	 * stores a constrained variable that will contain the value to read from
+	 * the configuration port when solved.
+	 */
 	private void findConstraints() {
+		List<Action> previous = new ArrayList<Action>();
+
 		// visits the scheduler of each action departing from the initial state
 		for (NextStateInfo info : fsm.getTransitions(initialState)) {
-			GuardVisitor visitor = new GuardVisitor();
-			visitAction(info, visitor);
+			GuardVisitor visitor = new GuardVisitor(previous);
+			visitAction(info.getAction(), visitor);
+			previous.add(info.getAction());
 			if (visitor.getVariable() == null) {
 				System.out.println("no constraint on " + port);
 			} else {
@@ -480,16 +532,14 @@ public class ConfigurationAnalyzer {
 	}
 
 	/**
-	 * Visits the action stored in the given next state information with the
-	 * given visitor.
+	 * Visits the given action with the given visitor.
 	 * 
-	 * @param info
-	 *            information about the next state
+	 * @param action
+	 *            action associated with the next state
 	 * @param visitor
 	 *            a node visitor
 	 */
-	private void visitAction(NextStateInfo info, NodeVisitor visitor) {
-		Action action = info.getAction();
+	private void visitAction(Action action, NodeVisitor visitor) {
 		Procedure scheduler = action.getScheduler();
 		for (CFGNode node : scheduler.getNodes()) {
 			node.accept(visitor);

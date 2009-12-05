@@ -294,6 +294,45 @@ public enum BinaryOp {
 	}
 
 	/**
+	 * Returns the inverse operator, e.g. if this operator is {@link #GE},
+	 * returns {@link #LT}. If this operator has no inverse, returns itself.
+	 * 
+	 * @return the inverse operator
+	 */
+	public BinaryOp getInverse() {
+		switch (this) {
+		case DIV:
+			return TIMES;
+		case DIV_INT:
+			return TIMES;
+		case EQ:
+			return NE;
+		case GE:
+			return LT;
+		case GT:
+			return LE;
+		case LE:
+			return GT;
+		case LT:
+			return GE;
+		case MINUS:
+			return PLUS;
+		case NE:
+			return EQ;
+		case PLUS:
+			return MINUS;
+		case SHIFT_LEFT:
+			return SHIFT_RIGHT;
+		case SHIFT_RIGHT:
+			return SHIFT_LEFT;
+		case TIMES:
+			return DIV;
+		default:
+			return this;
+		}
+	}
+
+	/**
 	 * Returns this operator's precedence. An operator O1 that has a lower
 	 * precedence than another operator O2 means that the operation involving O1
 	 * is to be evaluated first.
@@ -302,6 +341,31 @@ public enum BinaryOp {
 	 */
 	public int getPrecedence() {
 		return precedence;
+	}
+
+	/**
+	 * If this operator is an inequality operator (greater/less than (or equal
+	 * to)), returns the reverse operator, e.g. if this operator is {@link #GE},
+	 * returns {@link #LE}; this is different from {@link #getInverse()}, which
+	 * would return {@link #LT} in this case. If this operator is not an
+	 * inequality operator, returns <code>this</code>.
+	 * 
+	 * @return if this operator is an inequality operator, returns the reverse
+	 *         operator; otherwise, returns <code>this</code>
+	 */
+	public BinaryOp getReversedInequality() {
+		switch (this) {
+		case GE:
+			return LE;
+		case GT:
+			return LT;
+		case LE:
+			return GE;
+		case LT:
+			return GT;
+		default:
+			return this;
+		}
 	}
 
 	/**
@@ -314,23 +378,23 @@ public enum BinaryOp {
 	}
 
 	/**
-	 * If this operator is an inequality operator, returns the matching operator
-	 * if we change the order of the comparison.
+	 * Returns a boolean indicating if this operator is a comparison operator
+	 * ((not) equal, greater/less than (or equal to)).
 	 * 
-	 * @return an operator
+	 * @return <code>true</code> if this operator is a comparison operator,
+	 *         <code>false</code> otherwise
 	 */
-	public BinaryOp inequalityOpChangeOrder() {
+	public boolean isComparison() {
 		switch (this) {
+		case EQ:
 		case GE:
-			return LE;
 		case GT:
-			return LT;
 		case LE:
-			return GE;
 		case LT:
-			return GT;
+		case NE:
+			return true;
 		default:
-			return this;
+			return false;
 		}
 	}
 
