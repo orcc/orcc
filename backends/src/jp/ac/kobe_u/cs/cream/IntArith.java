@@ -495,6 +495,9 @@ public class IntArith extends Constraint {
 		case MIN:
 			a.append("MIN");
 			break;
+		case BITAND:
+			a.append("BITAND");
+			break;
 		}
 		a.append(',').append(Constraint.toString(v)).append(')');
 		return a.toString();
