@@ -29,78 +29,45 @@
 package net.sf.orcc.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Location;
 
 /**
- * An ordered map maintains mapping of string to object as well as the order in
- * which those mappings were inserted.
+ * This class defines an ordered map of nameable objects. It is backed by a
+ * linked hash map, to which most of the calls are delegated to. The specific
+ * functionality of this map is that there is only one public method to add
+ * variables, and it checks for uniqueness or throw an exception.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class OrderedMap<T extends INameable> implements Iterable<T> {
 
-	private class Itr implements Iterator<T> {
+	/**
+	 * a cache for the getList method
+	 */
+	private List<T> list;
 
-		/**
-		 * Index of element to be returned by subsequent call to next.
-		 */
-		private int cursor = 0;
+	/**
+	 * a linked hash map which maintains the order in which objects are added
+	 */
+	private LinkedHashMap<String, T> map;
 
-		/**
-		 * Index of element returned by most recent call to next or previous.
-		 * Reset to -1 if this element is deleted by a call to remove.
-		 */
-		int lastRet = -1;
-
-		@Override
-		public boolean hasNext() {
-			return cursor != size();
-		}
-
-		@Override
-		public T next() {
-			T next = objects.get(cursor);
-			lastRet = cursor++;
-			return next;
-		}
-
-		@Override
-		public void remove() {
-			if (lastRet == -1) {
-				throw new IllegalStateException();
-			}
-
-			// remove the object at the given index
-			T next = objects.remove(lastRet);
-
-			// remove the object from the map
-			map.remove(next.getName());
-
-			if (lastRet < cursor) {
-				cursor--;
-			}
-			lastRet = -1;
-		}
-
-	}
-
-	private Map<String, T> map;
-
-	private List<T> objects;
+	/**
+	 * <code>true</code> if the map has been modified
+	 */
+	private boolean modified;
 
 	/**
 	 * Creates an empty ordered map.
 	 */
 	public OrderedMap() {
-		objects = new ArrayList<T>();
-		map = new HashMap<String, T>();
+		map = new LinkedHashMap<String, T>();
+		modified = true;
 	}
 
 	/**
@@ -126,8 +93,8 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 					+ "\" already defined in this scope");
 		}
 
-		objects.add(object);
 		map.put(name, object);
+		modified = true;
 	}
 
 	/**
@@ -140,8 +107,8 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 *            an object
 	 */
 	protected final void add(String name, T object) {
-		objects.add(object);
 		map.put(name, object);
+		modified = true;
 	}
 
 	/**
@@ -170,22 +137,26 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns the list of objects of this scope. Warning: DO NOT modify the
-	 * list returned! Indeed, the list is returned by reference for efficiency,
-	 * should you want to add objects to this ordered map, please do so using
-	 * {@link #add(String, Location, String, INameable)}; to remove objects, we
-	 * advise you to use an iterator wherever possible, and
-	 * {@link #remove(INameable)} elsewhere.
+	 * Returns the list of objects of this scope. The list returned is a copy.
+	 * Note that the list is cached for efficiency, so as long as no objects are
+	 * added or removed, calling this method will return a reference to the same
+	 * list.
 	 * 
 	 * @return the list of objects of this scope
 	 */
 	public List<T> getList() {
-		return objects;
+		if (modified) {
+			list = new ArrayList<T>(map.values());
+		}
+		return list;
 	}
 
 	@Override
 	public Iterator<T> iterator() {
-		return new Itr();
+		Iterator<T> it = map.values().iterator();
+		// because somebody may call "remove" on the iterator
+		modified = true;
+		return it;
 	}
 
 	/**
@@ -199,7 +170,7 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 */
 	public void remove(T object) {
 		map.remove(object.getName());
-		objects.remove(object);
+		modified = true;
 	}
 
 	/**
@@ -208,12 +179,12 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * @return the number of elements in this ordered map
 	 */
 	public int size() {
-		return objects.size();
+		return map.size();
 	}
 
 	@Override
 	public String toString() {
-		return objects.toString();
+		return map.toString();
 	}
 
 }
