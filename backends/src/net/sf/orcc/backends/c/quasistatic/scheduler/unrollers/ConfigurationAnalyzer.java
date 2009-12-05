@@ -121,7 +121,7 @@ public class ConfigurationAnalyzer {
 			switch (op) {
 			case BITAND:
 				if (o2 instanceof Integer) {
-					v1.bitand((Integer) o2);
+					return v1.bitand((Integer) o2);
 				} else {
 					break;
 				}
