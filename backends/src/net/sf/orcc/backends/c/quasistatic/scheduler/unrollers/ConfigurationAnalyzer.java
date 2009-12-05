@@ -131,63 +131,50 @@ public class ConfigurationAnalyzer {
 			case BITAND:
 				if (o2 instanceof Integer) {
 					return v1.bitand((Integer) o2);
-				} else {
-					break;
 				}
+				break;
 			case EQ:
 				if (o2 instanceof IntVariable) {
 					v1.equals((IntVariable) o2);
 				} else if (o2 instanceof Integer) {
 					v1.equals(((Integer) o2).intValue());
-				} else {
-					break;
 				}
-				return v1;
+				break;
 			case GE:
 				if (o2 instanceof IntVariable) {
 					v1.ge((IntVariable) o2);
 				} else if (o2 instanceof Integer) {
 					v1.ge((Integer) o2);
-				} else {
-					break;
 				}
-				return v1;
+				break;
 			case GT:
 				if (o2 instanceof IntVariable) {
 					v1.gt((IntVariable) o2);
 				} else if (o2 instanceof Integer) {
 					v1.gt((Integer) o2);
-				} else {
-					break;
 				}
-				return v1;
+				break;
 			case LE:
 				if (o2 instanceof IntVariable) {
 					v1.le((IntVariable) o2);
 				} else if (o2 instanceof Integer) {
 					v1.le((Integer) o2);
-				} else {
-					break;
 				}
-				return v1;
+				break;
 			case LT:
 				if (o2 instanceof IntVariable) {
 					v1.lt((IntVariable) o2);
 				} else if (o2 instanceof Integer) {
 					v1.lt((Integer) o2);
-				} else {
-					break;
 				}
-				return v1;
+				break;
 			case NE:
 				if (o2 instanceof IntVariable) {
 					v1.notEquals((IntVariable) o2);
 				} else if (o2 instanceof Integer) {
 					v1.notEquals((Integer) o2);
-				} else {
-					break;
 				}
-				return v1;
+				break;
 			}
 
 			return null;
@@ -335,38 +322,40 @@ public class ConfigurationAnalyzer {
 
 		@Override
 		public void visit(Load load, Object... args) {
-			if (target == null && load.getSource().getVariable().equals(tokens)) {
+			if (load.getSource().getVariable().equals(tokens)) {
 				target = load.getTarget();
 			}
 		}
 
 		@Override
 		public void visit(Peek peek, Object... args) {
-			if (constraintVariable == null && peek.getPort().equals(port)) {
+			if (peek.getPort().equals(port)) {
 				tokens = peek.getTarget();
 
-				int lo;
-				int hi;
-				if (port.getType().getType() == Type.INT) {
-					IntType type = (IntType) port.getType();
-					Expression size = type.getSize();
-					ExpressionEvaluator evaluator = new ExpressionEvaluator();
-					int num = evaluator.evaluateAsInteger(size);
-					lo = -(1 << (num - 1));
-					hi = (1 << (num - 1)) - 1;
-				} else if (port.getType().getType() == Type.UINT) {
-					UintType type = (UintType) port.getType();
-					Expression size = type.getSize();
-					ExpressionEvaluator evaluator = new ExpressionEvaluator();
-					int num = evaluator.evaluateAsInteger(size);
-					lo = 0;
-					hi = 1 << num - 1;
-				} else {
-					throw new OrccRuntimeException("integer ports only");
-				}
+				if (constraintVariable == null) {
+					int lo;
+					int hi;
+					if (port.getType().getType() == Type.INT) {
+						IntType type = (IntType) port.getType();
+						Expression size = type.getSize();
+						ExpressionEvaluator evaluator = new ExpressionEvaluator();
+						int num = evaluator.evaluateAsInteger(size);
+						lo = -(1 << (num - 1));
+						hi = (1 << (num - 1)) - 1;
+					} else if (port.getType().getType() == Type.UINT) {
+						UintType type = (UintType) port.getType();
+						Expression size = type.getSize();
+						ExpressionEvaluator evaluator = new ExpressionEvaluator();
+						int num = evaluator.evaluateAsInteger(size);
+						lo = 0;
+						hi = 1 << num - 1;
+					} else {
+						throw new OrccRuntimeException("integer ports only");
+					}
 
-				constraintVariable = new IntVariable(network, lo, hi, port
-						.getName());
+					constraintVariable = new IntVariable(network, lo, hi, port
+							.getName());
+				}
 			}
 		}
 
