@@ -509,15 +509,11 @@ public class ConfigurationAnalyzer {
 			DefaultSolver solver = new DefaultSolver(variable.getNetwork());
 			Solution solution = solver.findFirst();
 			if (solution != null) {
-				int value = solution.getIntValue(variable);
-				System.out.println("solution found for " + action
-						+ ", returning " + value);
-				return value;
+				return solution.getIntValue(variable);
 			}
 		}
 
-		System.out.println("returning 0 for " + action);
-		return 0;
+		throw new OrccRuntimeException("expected value for " + action);
 	}
 
 	/**

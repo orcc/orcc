@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.jgrapht.Graph;
@@ -41,7 +42,9 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines an FSM unroller that uses the partial interpreter.
@@ -55,6 +58,13 @@ public class FSMUnroller implements AbstractFSMUnroller {
 
 	private ConfigurationAnalyzer analyzer;
 
+	/**
+	 * Creates a new FSM unroller on the given actor. The unroller starts by
+	 * analyzing the actor's configuration if it has any.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
 	public FSMUnroller(Actor actor) {
 		this.actor = actor;
 
@@ -63,12 +73,45 @@ public class FSMUnroller implements AbstractFSMUnroller {
 		analyzer.analyze();
 	}
 
+	private void printInputs(OrderedMap<Port> inputs) {
+		System.out.print("input ports: [");
+		Iterator<Port> it = inputs.iterator();
+		if (it.hasNext()) {
+			Port port = it.next();
+			int tokens = port.getNumTokensConsumed();
+			System.out.print(port.getName() + ": " + tokens);
+			while (it.hasNext()) {
+				port = it.next();
+				tokens = port.getNumTokensConsumed();
+				System.out.print(", " + port.getName() + ": " + tokens);
+			}
+		}
+		System.out.println("]");
+	}
+
+	private void printOutputs(OrderedMap<Port> outputs) {
+		System.out.print("output ports: [");
+		Iterator<Port> it = outputs.iterator();
+		if (it.hasNext()) {
+			Port port = it.next();
+			int tokens = port.getNumTokensProduced();
+			System.out.print(port.getName() + ": " + tokens);
+			while (it.hasNext()) {
+				port = it.next();
+				tokens = port.getNumTokensProduced();
+				System.out.print(", " + port.getName() + ": " + tokens);
+			}
+		}
+		System.out.println("]");
+	}
+
 	/**
 	 * Unrolls the FSM, generating a set of SDF graphs
 	 * 
 	 * @return the list of SDF graphs
 	 */
-	public List<Graph<Action, DefaultEdge>> unroll() throws QuasiStaticSchedulerException {
+	public List<Graph<Action, DefaultEdge>> unroll()
+			throws QuasiStaticSchedulerException {
 		List<Graph<Action, DefaultEdge>> actorSubgraphs = new ArrayList<Graph<Action, DefaultEdge>>();
 
 		// Generates a subgraph for each initial transition
@@ -91,15 +134,29 @@ public class FSMUnroller implements AbstractFSMUnroller {
 		return actorSubgraphs;
 	}
 
+	/**
+	 * Unroll a list of actions. This method is only called for FSM-less actors.
+	 * 
+	 * @param actions
+	 *            a list of actions sorted by descending priority
+	 * @return a graph
+	 */
 	private Graph<Action, DefaultEdge> unroll(List<Action> actions) {
-		Graph<Action, DefaultEdge> actorSg = new DirectedMultigraph<Action, DefaultEdge>(DefaultEdge.class);
+		Graph<Action, DefaultEdge> actorSg = new DirectedMultigraph<Action, DefaultEdge>(
+				DefaultEdge.class);
 
 		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
 				actor.getName(), actor, analyzer);
 		interpretedActor.initialize();
 		if (actions.size() == 1) {
-			actorSg.addVertex(actions.get(0));
+			Action action = actions.get(0);
+			actorSg.addVertex(action);
 			interpretedActor.schedule();
+			
+			// print port token rates
+			System.out.println("only one action: " + action);
+			printInputs(actor.getInputs());
+			printOutputs(actor.getOutputs());
 		} else {
 			System.out.println("TODO NO FSM");
 		}
@@ -107,18 +164,39 @@ public class FSMUnroller implements AbstractFSMUnroller {
 		return actorSg;
 	}
 
+	/**
+	 * Unroll the FSM of the actor this unroller was created with, starting from
+	 * the given initial state, and using the given configuration action.
+	 * 
+	 * @param initialState
+	 *            the initial state of the FSM
+	 * @param action
+	 *            the action to use for configuring the FSM
+	 * @return a graph
+	 * @throws QuasiStaticSchedulerException
+	 */
 	private Graph<Action, DefaultEdge> unroll(String initialState, Action action)
 			throws QuasiStaticSchedulerException {
-		System.out.println();
-		System.out.println("unroll " + actor.getName() + " from "
-				+ initialState + ", configuration action " + action);
-		Graph<Action, DefaultEdge> actorSg = new DirectedMultigraph<Action, DefaultEdge>(DefaultEdge.class);
+		Graph<Action, DefaultEdge> actorSg = new DirectedMultigraph<Action, DefaultEdge>(
+				DefaultEdge.class);
 
+		// resets input consumption rates
+		for (Port port : actor.getInputs()) {
+			port.resetTokensConsumption();
+		}
+
+		// resets output production rates
+		for (Port port : actor.getOutputs()) {
+			port.resetTokensProduction();
+		}
+
+		// creates a partial interpreter
 		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
 				actor.getName(), actor, analyzer);
 		interpretedActor.initialize();
 		interpretedActor.setAction(action);
 
+		// schedule the actor
 		Action previous = null;
 		do {
 			interpretedActor.schedule();
@@ -128,6 +206,11 @@ public class FSMUnroller implements AbstractFSMUnroller {
 				actorSg.addEdge(latest, previous);
 			}
 		} while (!interpretedActor.getFsmState().equals(initialState));
+
+		// print port token rates
+		System.out.println("configuration " + action);
+		printInputs(actor.getInputs());
+		printOutputs(actor.getOutputs());
 
 		return actorSg;
 	}
