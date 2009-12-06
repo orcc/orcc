@@ -33,6 +33,11 @@ import java.util.List;
 import net.sf.orcc.util.OrderedMap;
 
 /**
+ * This class defines an actor. An actor has parameters, input and output ports,
+ * state variables, procedures, actions and an action scheduler. The action
+ * scheduler has information about the FSM if the actor has one, and the order
+ * in which actions should be scheduled.
+ * 
  * @author Matthieu Wipliez
  * 
  */
@@ -41,6 +46,11 @@ public class Actor {
 	private List<Action> actions;
 
 	private ActionScheduler actionScheduler;
+
+	/**
+	 * the class of this actor. Initialized to unknown.
+	 */
+	private ActorClass actorClass;
 
 	/**
 	 * The RVC-CAL file this actor was defined in.
@@ -63,6 +73,32 @@ public class Actor {
 
 	private OrderedMap<Variable> stateVars;
 
+	/**
+	 * Creates a new actor.
+	 * 
+	 * @param name
+	 *            actor name
+	 * @param file
+	 *            the RVC-CAL file this actor was defined in
+	 * @param parameters
+	 *            an ordered map of parameters
+	 * @param inputs
+	 *            an ordered map of input ports
+	 * @param outputs
+	 *            an ordered map of output ports
+	 * @param stateVars
+	 *            an ordered map of state variables
+	 * @param procs
+	 *            an ordered map of procedures
+	 * @param actions
+	 *            a list of actions
+	 * @param initializes
+	 *            a list of initialize actions
+	 * @param scheduler
+	 *            an action scheduler
+	 * @param instantations
+	 *            a list of instantiation procedures
+	 */
 	public Actor(String name, String file, OrderedMap<Variable> parameters,
 			OrderedMap<Port> inputs, OrderedMap<Port> outputs,
 			OrderedMap<Variable> stateVars, OrderedMap<Procedure> procs,
@@ -87,6 +123,15 @@ public class Actor {
 
 	public ActionScheduler getActionScheduler() {
 		return actionScheduler;
+	}
+
+	/**
+	 * Returns the class of this actor.
+	 * 
+	 * @return an actor class
+	 */
+	public ActorClass getActorClass() {
+		return actorClass;
 	}
 
 	/**
@@ -160,6 +205,16 @@ public class Actor {
 
 	public OrderedMap<Variable> getStateVars() {
 		return stateVars;
+	}
+
+	/**
+	 * Sets the class of this actor.
+	 * 
+	 * @param actorClass
+	 *            an actor class
+	 */
+	public void setActorClass(ActorClass actorClass) {
+		this.actorClass = actorClass;
 	}
 
 	public void setInstantations(List<Procedure> instantations) {

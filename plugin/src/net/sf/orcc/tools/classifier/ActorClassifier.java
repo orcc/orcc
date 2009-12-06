@@ -179,12 +179,12 @@ public class ActorClassifier {
 
 		// resets input consumption rates
 		for (Port port : actor.getInputs()) {
-			port.resetTokensConsumption();
+			port.resetTokenConsumption();
 		}
 
 		// resets output production rates
 		for (Port port : actor.getOutputs()) {
-			port.resetTokensProduction();
+			port.resetTokenProduction();
 		}
 
 		// creates a partial interpreter

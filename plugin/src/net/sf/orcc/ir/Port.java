@@ -122,7 +122,7 @@ public class Port extends Variable implements Comparable<Port> {
 	 * @throws IllegalArgumentException
 	 *             if n is less or equal to zero
 	 */
-	public void increaseTokensConsumption(int n) {
+	public void increaseTokenConsumption(int n) {
 		if (n <= 0) {
 			throw new IllegalArgumentException();
 		}
@@ -139,7 +139,7 @@ public class Port extends Variable implements Comparable<Port> {
 	 * @throws IllegalArgumentException
 	 *             if n is less or equal to zero
 	 */
-	public void increaseTokensProduction(int n) {
+	public void increaseTokenProduction(int n) {
 		if (n <= 0) {
 			throw new IllegalArgumentException();
 		}
@@ -150,14 +150,14 @@ public class Port extends Variable implements Comparable<Port> {
 	/**
 	 * Resets the number of tokens consumed by this port.
 	 */
-	public void resetTokensConsumption() {
+	public void resetTokenConsumption() {
 		tokensConsumed = 0;
 	}
 
 	/**
 	 * Resets the number of tokens produced by this port.
 	 */
-	public void resetTokensProduction() {
+	public void resetTokenProduction() {
 		tokensProduced = 0;
 	}
 

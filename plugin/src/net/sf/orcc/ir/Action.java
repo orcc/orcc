@@ -31,16 +31,19 @@ package net.sf.orcc.ir;
 import java.util.Map;
 
 /**
+ * This class defines an action. An action has a location, a tag, an input and
+ * an output pattern. Contrarily to the original CAL model, the scheduling
+ * information of an action is decoupled from its body. This is why an action
+ * has a "scheduler" and a body.
+ * 
  * @author Matthieu Wipliez
  * 
  */
-public class Action {
+public class Action extends AbstractLocalizable {
 
 	private Procedure body;
 
 	private Map<Port, Integer> inputPattern;
-
-	private Location location;
 
 	private Map<Port, Integer> outputPattern;
 
@@ -48,9 +51,26 @@ public class Action {
 
 	private Tag tag;
 
+	/**
+	 * Creates a new action.
+	 * 
+	 * @param location
+	 *            location of the action
+	 * @param tag
+	 *            action tag
+	 * @param inputPattern
+	 *            input pattern
+	 * @param outputPattern
+	 *            output pattern
+	 * @param scheduler
+	 *            procedure that computes scheduling information
+	 * @param body
+	 *            procedure that holds the body of the action
+	 */
 	public Action(Location location, Tag tag, Map<Port, Integer> inputPattern,
 			Map<Port, Integer> outputPattern, Procedure scheduler,
 			Procedure body) {
+		super(location);
 		this.body = body;
 		this.inputPattern = inputPattern;
 		this.outputPattern = outputPattern;
@@ -58,22 +78,40 @@ public class Action {
 		this.tag = tag;
 	}
 
+	/**
+	 * Returns the procedure that holds the body of this action.
+	 * 
+	 * @return the procedure that holds the body of this action
+	 */
 	public Procedure getBody() {
 		return body;
 	}
 
+	/**
+	 * Returns the input pattern of this action.
+	 * 
+	 * @return the input pattern of this action
+	 */
 	public Map<Port, Integer> getInputPattern() {
 		return inputPattern;
 	}
 
-	public Location getLocation() {
-		return location;
-	}
-
+	/**
+	 * Returns the output pattern of this action.
+	 * 
+	 * @return the output pattern of this action
+	 */
 	public Map<Port, Integer> getOutputPattern() {
 		return outputPattern;
 	}
 
+	/**
+	 * Returns the procedure that holds the scheduling information of this
+	 * action.
+	 * 
+	 * @return the procedure that holds the scheduling information of this
+	 *         action
+	 */
 	public Procedure getScheduler() {
 		return scheduler;
 	}

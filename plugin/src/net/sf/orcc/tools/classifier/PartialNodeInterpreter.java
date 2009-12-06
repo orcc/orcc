@@ -139,7 +139,7 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 			target[0] = value;
 		}
 
-		read.getPort().increaseTokensConsumption(read.getNumTokens());
+		read.getPort().increaseTokenConsumption(read.getNumTokens());
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 
 	@Override
 	public void visit(Write write, Object... args) {
-		write.getPort().increaseTokensProduction(write.getNumTokens());
+		write.getPort().increaseTokenProduction(write.getNumTokens());
 	}
 
 }
