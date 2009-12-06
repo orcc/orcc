@@ -195,16 +195,49 @@ public class Actor {
 		return outputs;
 	}
 
+	/**
+	 * Returns the ordered map of parameters.
+	 * 
+	 * @return the ordered map of parameters
+	 */
 	public OrderedMap<Variable> getParameters() {
 		return parameters;
 	}
 
+	/**
+	 * Returns the ordered map of procedures.
+	 * 
+	 * @return the ordered map of procedures
+	 */
 	public OrderedMap<Procedure> getProcs() {
 		return procs;
 	}
 
+	/**
+	 * Returns the ordered map of state variables.
+	 * 
+	 * @return the ordered map of state variables
+	 */
 	public OrderedMap<Variable> getStateVars() {
 		return stateVars;
+	}
+
+	/**
+	 * Resets input consumption rates.
+	 */
+	public void resetTokenConsumption() {
+		for (Port port : inputs) {
+			port.resetTokenConsumption();
+		}
+	}
+
+	/**
+	 * Resets output production rates.
+	 */
+	public void resetTokenProduction() {
+		for (Port port : outputs) {
+			port.resetTokenProduction();
+		}
 	}
 
 	/**

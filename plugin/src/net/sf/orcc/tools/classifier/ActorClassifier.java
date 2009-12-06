@@ -29,6 +29,7 @@
 package net.sf.orcc.tools.classifier;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
@@ -80,18 +81,7 @@ public class ActorClassifier {
 		try {
 			ActionScheduler sched = actor.getActionScheduler();
 			if (sched.hasFsm()) {
-				// will unroll for each branch departing from the initial state
-				QuasiStaticClass quasiStatic = new QuasiStaticClass();
-
-				FSM fsm = sched.getFsm();
-				String initialState = fsm.getInitialState().getName();
-				for (NextStateInfo info : fsm.getTransitions(initialState)) {
-					Action action = info.getAction();
-					StaticClass staticClass = classifyFSM(initialState, action);
-					quasiStatic.addConfiguration(action, staticClass);
-				}
-
-				return quasiStatic;
+				return classifyFsm();
 			} else {
 				return classifyActions(sched.getActions());
 			}
@@ -113,27 +103,90 @@ public class ActorClassifier {
 		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
 				actor.getName(), actor, analyzer);
 		interpretedActor.initialize();
-		if (actions.size() == 1) {
-			// an actor with a single action is static
-			interpretedActor.schedule();
 
-			StaticClass staticClass = new StaticClass();
-			staticClass.addAction(interpretedActor.getScheduledAction());
+		actor.resetTokenConsumption();
+		actor.resetTokenProduction();
 
-			// set token rates
-			staticClass.setTokenConsumptions(actor);
-			staticClass.setTokenProductions(actor);
-
-			// print port token rates
-			staticClass.printTokenConsumption();
-			staticClass.printTokenProduction();
-
-			return staticClass;
+		ActorState state = new ActorState(actor);
+		if (state.isEmpty()) {
+			// no state, let's check number of actions
+			if (actions.size() == 1) {
+				// an actor with a single action is static
+				return classifySingleAction(interpretedActor);
+			} else {
+				return classifyActionsNoState(interpretedActor, actions);
+			}
 		} else {
-			System.out.println("TODO NO FSM");
-
-			return new DynamicClass();
+			return classifyActionsWithState(interpretedActor, state, actions);
 		}
+	}
+
+	private ActorClass classifyActionsNoState(
+			PartiallyInterpretedActor interpretedActor, List<Action> actions) {
+		
+
+		return new DynamicClass();
+	}
+
+	/**
+	 * Classifies an actor that has no FSM, but a list of actions and a
+	 * non-empty state. This state consists in all scalar state variables that
+	 * have an initial value.
+	 * 
+	 * @param interpretedActor
+	 *            the partial interpreter
+	 * @param state
+	 *            the actor state
+	 * @param actions
+	 *            a list of actions
+	 * @return a static class
+	 */
+	private StaticClass classifyActionsWithState(
+			PartiallyInterpretedActor interpretedActor, ActorState state,
+			List<Action> actions) {
+		StaticClass staticClass = new StaticClass();
+
+		// schedule the actor
+		do {
+			interpretedActor.schedule();
+			Action latest = interpretedActor.getScheduledAction();
+			staticClass.addAction(latest);
+		} while (!state.isInitialState());
+
+		// set token rates
+		staticClass.setTokenConsumptions(actor);
+		staticClass.setTokenProductions(actor);
+
+		// print token rates
+		staticClass.printTokenConsumption();
+		staticClass.printTokenProduction();
+
+		return staticClass;
+	}
+
+	/**
+	 * Classifies this actor. This method is called when the actor this
+	 * classifier was built with has an FSM.
+	 * 
+	 * @return a quasi-static class if possible
+	 */
+	private QuasiStaticClass classifyFsm() {
+		// TODO: check FSM against the configuration/processing pattern
+		ActionScheduler sched = actor.getActionScheduler();
+
+		// will unroll for each branch departing from the initial state
+		QuasiStaticClass quasiStatic = new QuasiStaticClass();
+
+		FSM fsm = sched.getFsm();
+		String initialState = fsm.getInitialState().getName();
+		for (NextStateInfo info : fsm.getTransitions(initialState)) {
+			Action action = info.getAction();
+			StaticClass staticClass = classifyFsmConfiguration(initialState,
+					action);
+			quasiStatic.addConfiguration(action, staticClass);
+		}
+
+		return quasiStatic;
 	}
 
 	/**
@@ -146,18 +199,12 @@ public class ActorClassifier {
 	 *            the action to use for configuring the FSM
 	 * @return a static class
 	 */
-	private StaticClass classifyFSM(String initialState, Action action) {
+	private StaticClass classifyFsmConfiguration(String initialState,
+			Action action) {
 		StaticClass staticClass = new StaticClass();
 
-		// resets input consumption rates
-		for (Port port : actor.getInputs()) {
-			port.resetTokenConsumption();
-		}
-
-		// resets output production rates
-		for (Port port : actor.getOutputs()) {
-			port.resetTokenProduction();
-		}
+		actor.resetTokenConsumption();
+		actor.resetTokenProduction();
 
 		// creates a partial interpreter
 		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
@@ -178,6 +225,31 @@ public class ActorClassifier {
 
 		// print token rates
 		System.out.println("configuration " + action);
+		staticClass.printTokenConsumption();
+		staticClass.printTokenProduction();
+
+		return staticClass;
+	}
+
+	/**
+	 * Classify an actor with a single actor.
+	 * 
+	 * @param interpretedActor
+	 *            the partial interpreter
+	 * @return a static actor class
+	 */
+	private StaticClass classifySingleAction(
+			PartiallyInterpretedActor interpretedActor) {
+		interpretedActor.schedule();
+
+		StaticClass staticClass = new StaticClass();
+		staticClass.addAction(interpretedActor.getScheduledAction());
+
+		// set token rates
+		staticClass.setTokenConsumptions(actor);
+		staticClass.setTokenProductions(actor);
+
+		// print port token rates
 		staticClass.printTokenConsumption();
 		staticClass.printTokenProduction();
 
