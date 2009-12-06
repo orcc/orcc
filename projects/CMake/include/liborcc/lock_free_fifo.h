@@ -30,6 +30,7 @@
 #define FIFO_H
 
 #include <string.h>
+#include <stdlib.h>
 
 /** lock free fifo ring buffer structure */
 static struct fifo_s {
