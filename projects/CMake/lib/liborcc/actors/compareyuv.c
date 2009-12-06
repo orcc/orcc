@@ -272,11 +272,15 @@ int Compare_scheduler() {
 				Compare_init(width, height);
 				init=0;
 			}
+			setReadEnd(Compare_WIDTH);
+			setReadEnd(Compare_HEIGHT);
+
 		}
 
 		if (hasTokens(Compare_B, 384)) {
 			Compare_write_mb(getReadPtr(Compare_B, 384));
 			res = 1;
+			setReadEnd(Compare_B);
 		} else {
 			res = 0;
 		}

@@ -93,6 +93,7 @@ static void *getPeekPtr(struct fifo_s *fifo, int n) {
 		return fifo->malloc_ptrP;
 
 	} else {
+		fifo->malloc_ptrP=NULL;
 		return contents(fifo, fifo->read_ind);
 	}
 }
@@ -126,7 +127,7 @@ static void *getReadPtr(struct fifo_s *fifo, int n) {
 		return fifo->malloc_ptrR;
 
 	}else {
-		
+		fifo->malloc_ptrR=NULL;
 		//Return data
 		return contents(fifo, fifo->read_ind);
 	}
@@ -175,6 +176,7 @@ static void *getWritePtr(struct fifo_s *fifo, int n) {
 
 		return fifo->malloc_ptrW;
 	}else {
+		fifo->malloc_ptrW=NULL;
 		//Return fifo adress for data
 		return contents(fifo, fifo->write_ind);
 	}
