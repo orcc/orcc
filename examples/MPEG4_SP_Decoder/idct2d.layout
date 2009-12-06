@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="in" x="57" y="317"/>
-      <vertex id="signed" x="696" y="70"/>
-      <vertex id="out" x="932" y="138"/>
+      <vertex id="IN" x="57" y="317"/>
+      <vertex id="SIGNED" x="696" y="70"/>
+      <vertex id="OUT" x="932" y="138"/>
       <vertex id="rowsort" x="147" y="297"/>
       <vertex id="fairmerge" x="272" y="277"/>
       <vertex id="downsample" x="422" y="127"/>

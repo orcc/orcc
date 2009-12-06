@@ -355,7 +355,7 @@
     <Connection dst="motion" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
     <Connection dst="acdc" dst-port="data" src="parser" src-port="B"/>
     <Connection dst="motion" dst-port="MV" src="parser" src-port="MV"/>
-    <Connection dst="idct2d" dst-port="in" src="acdc" src-port="out">
+    <Connection dst="idct2d" dst-port="IN" src="acdc" src-port="out">
         <Attribute kind="Value" name="bufferSize">
             <Expr kind="BinOpSeq">
                 <Expr kind="Literal" literal-kind="Integer" value="6"/>
@@ -364,12 +364,12 @@
             </Expr>
         </Attribute>
     </Connection>
-    <Connection dst="idct2d" dst-port="signed" src="acdc" src-port="signed">
+    <Connection dst="idct2d" dst-port="SIGNED" src="acdc" src-port="signed">
         <Attribute kind="Value" name="bufferSize">
             <Expr kind="Literal" literal-kind="Integer" value="6"/>
         </Attribute>
     </Connection>
-    <Connection dst="motion" dst-port="TEX" src="idct2d" src-port="out"/>
+    <Connection dst="motion" dst-port="TEX" src="idct2d" src-port="OUT"/>
     <Connection dst="" dst-port="MBD" src="motion" src-port="MBD"/>
     <Connection dst="" dst-port="MBA" src="motion" src-port="MBA"/>
     <Connection dst="" dst-port="MCA" src="motion" src-port="MCA"/>
