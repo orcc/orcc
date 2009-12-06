@@ -26,71 +26,71 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
+package net.sf.orcc.tools.classifier;
 
-import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.interpreter.InterpretedActor;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 
 /**
- * This class defines a partial expression evaluator.
+ * This class defines an actor that can be partially interpreted by calling
+ * {@link #initialize()} and {@link #schedule()}. It refines the interpreted
+ * actor by not relying on anything that is data-dependent.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class PartialExpressionEvaluator extends ExpressionEvaluator {
+public class PartiallyInterpretedActor extends InterpretedActor {
 
-	@Override
-	public Object interpret(BinaryExpr expr, Object... args) {
-		Object val1 = expr.getE1().accept(this);
-		Object val2 = expr.getE2().accept(this);
+	private Action scheduledAction;
 
-		if (val1 == null || val2 == null) {
-			return null;
-		} else {
-			return super.interpretBinaryExpr(expr, val1, val2);
-		}
+	/**
+	 * Creates a new partially interpreted actor
+	 * 
+	 * @param id
+	 *            instance identifier
+	 * @param actor
+	 *            an actor
+	 */
+	public PartiallyInterpretedActor(String id, Actor actor,
+			ConfigurationAnalyzer analyzer) {
+		super(id, actor);
+
+		// Build a node interpreter for visiting CFG and instructions
+		interpret = new PartialNodeInterpreter(id, analyzer);
 	}
 
 	@Override
-	public Object interpret(BoolExpr expr, Object... args) {
-		return expr.getValue();
+	protected int execute(Action action) {
+		scheduledAction = action;
+		return super.execute(action);
+	}
+
+	/**
+	 * Returns the latest action that was scheduled by the latest call to
+	 * {@link #schedule()}.
+	 * 
+	 * @return the latest scheduled action
+	 */
+	public Action getScheduledAction() {
+		return scheduledAction;
 	}
 
 	@Override
-	public Object interpret(IntExpr expr, Object... args) {
-		return expr.getValue();
+	protected boolean isSchedulable(Action action) {
+		// no need to check output patterns because we do not have FIFOs
+		Object isSchedulable = interpretProc(action.getScheduler());
+		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
 
-	@Override
-	public Object interpret(ListExpr expr, Object... args) {
-		throw new OrccRuntimeException("can not evaluate List expression");
+	/**
+	 * Sets the configuration action that should be executed.
+	 * 
+	 * @param action
+	 *            an action
+	 */
+	public void setAction(Action action) {
+		((PartialNodeInterpreter) interpret).setAction(action);
 	}
 
-	@Override
-	public Object interpret(StringExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object interpret(UnaryExpr expr, Object... args) {
-		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
-		
-		if (value == null) {
-			return null;
-		} else {
-			return super.interpretUnaryExpr(expr, value);
-		}
-	}
-
-	@Override
-	public Object interpret(VarExpr expr, Object... args) {
-		return expr.getVar().getVariable().getValue();
-	}
 }

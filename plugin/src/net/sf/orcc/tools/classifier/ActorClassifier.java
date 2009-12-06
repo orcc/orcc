@@ -26,18 +26,13 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.quasistatic.scheduler.unrollers;
+package net.sf.orcc.tools.classifier;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DirectedMultigraph;
-
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -46,13 +41,18 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.util.OrderedMap;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DirectedMultigraph;
+
 /**
- * This class defines an FSM unroller that uses the partial interpreter.
+ * This class defines an actor classifier that uses the partial interpreter to
+ * determine if an actor is quasi-static or static.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class FSMUnroller implements AbstractFSMUnroller {
+public class ActorClassifier {
 
 	private Actor actor;
 
@@ -65,7 +65,7 @@ public class FSMUnroller implements AbstractFSMUnroller {
 	 * @param actor
 	 *            an actor
 	 */
-	public FSMUnroller(Actor actor) {
+	public ActorClassifier(Actor actor) {
 		this.actor = actor;
 
 		// analyze the configuration of this actor
@@ -110,8 +110,7 @@ public class FSMUnroller implements AbstractFSMUnroller {
 	 * 
 	 * @return the list of SDF graphs
 	 */
-	public List<Graph<Action, DefaultEdge>> unroll()
-			throws QuasiStaticSchedulerException {
+	public List<Graph<Action, DefaultEdge>> unroll() {
 		List<Graph<Action, DefaultEdge>> actorSubgraphs = new ArrayList<Graph<Action, DefaultEdge>>();
 
 		// Generates a subgraph for each initial transition
@@ -152,7 +151,7 @@ public class FSMUnroller implements AbstractFSMUnroller {
 			Action action = actions.get(0);
 			actorSg.addVertex(action);
 			interpretedActor.schedule();
-			
+
 			// print port token rates
 			System.out.println("only one action: " + action);
 			printInputs(actor.getInputs());
@@ -173,10 +172,8 @@ public class FSMUnroller implements AbstractFSMUnroller {
 	 * @param action
 	 *            the action to use for configuring the FSM
 	 * @return a graph
-	 * @throws QuasiStaticSchedulerException
 	 */
-	private Graph<Action, DefaultEdge> unroll(String initialState, Action action)
-			throws QuasiStaticSchedulerException {
+	private Graph<Action, DefaultEdge> unroll(String initialState, Action action) {
 		Graph<Action, DefaultEdge> actorSg = new DirectedMultigraph<Action, DefaultEdge>(
 				DefaultEdge.class);
 

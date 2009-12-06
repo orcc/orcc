@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.unrollers.FSMUnroller;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.tools.classifier.ActorClassifier;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -71,7 +71,7 @@ public class ActorGraph {
 		System.out.println("********* Unrolling actor " + getName()
 							+ " *********");
 
-		graphs = new FSMUnroller(actor).unroll();
+		graphs = new ActorClassifier(actor).unroll();
 	}
 
 	public String toString() {
