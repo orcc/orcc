@@ -29,11 +29,14 @@
 package net.sf.orcc.ir.classes;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
 
 /**
@@ -119,27 +122,67 @@ public class StaticClass extends AbstractActorClass {
 	}
 
 	/**
-	 * Sets the number of tokens consumed by the given port.
+	 * Prints the given port tokens map.
 	 * 
-	 * @param port
-	 *            an input port
-	 * @param numTokens
-	 *            a number of tokens
+	 * @param map
+	 *            a map from ports to number of tokens they produced/consumed
 	 */
-	public void setTokenConsumption(Port port, int numTokens) {
-		tokenConsumption.put(port, numTokens);
+	private void print(Map<Port, Integer> map) {
+		Iterator<Entry<Port, Integer>> it = map.entrySet().iterator();
+		if (it.hasNext()) {
+			Entry<Port, Integer> entry = it.next();
+			Port port = entry.getKey();
+			int tokens = entry.getValue();
+			System.out.print(port.getName() + ": " + tokens);
+			while (it.hasNext()) {
+				entry = it.next();
+				port = entry.getKey();
+				tokens = entry.getValue();
+				System.out.print(", " + port.getName() + ": " + tokens);
+			}
+		}
 	}
 
 	/**
-	 * Sets the number of tokens written to the given port.
-	 * 
-	 * @param port
-	 *            an output port
-	 * @param numTokens
-	 *            a number of tokens
+	 * Prints the token consumption of this static class.
 	 */
-	public void setTokenProduction(Port port, int numTokens) {
-		tokenProduction.put(port, numTokens);
+	public void printTokenConsumption() {
+		System.out.print("input ports: [");
+		print(tokenConsumption);
+		System.out.println("]");
+	}
+
+	/**
+	 * Prints the token production of this static class.
+	 */
+	public void printTokenProduction() {
+		System.out.print("output ports: [");
+		print(tokenProduction);
+		System.out.println("]");
+	}
+
+	/**
+	 * Saves the number of tokens consumed by input ports of the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public void setTokenConsumptions(Actor actor) {
+		for (Port port : actor.getInputs()) {
+			tokenConsumption.put(port, port.getNumTokensConsumed());
+		}
+	}
+
+	/**
+	 * Saves the number of tokens written to output ports of the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public void setTokenProductions(Actor actor) {
+		for (Port port : actor.getOutputs()) {
+			tokenProduction.put(port, port.getNumTokensProduced());
+		}
 	}
 
 }

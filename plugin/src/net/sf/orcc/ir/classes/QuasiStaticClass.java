@@ -30,6 +30,7 @@ package net.sf.orcc.ir.classes;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.ir.Action;
 
@@ -64,6 +65,15 @@ public class QuasiStaticClass extends AbstractActorClass {
 	 */
 	public void addConfiguration(Action action, StaticClass clasz) {
 		classes.put(action, clasz);
+	}
+
+	/**
+	 * Returns the set of configuration actions.
+	 * 
+	 * @return the set of configuration actions
+	 */
+	public Set<Action> getActions() {
+		return classes.keySet();
 	}
 
 	/**
