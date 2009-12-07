@@ -286,9 +286,7 @@ public class FSM {
 				UniqueEdge.class);
 		for (State source : states.values()) {
 			graph.addVertex(source);
-			int index = source.getIndex();
-			Transition transition = transitions.get(index);
-			List<NextStateInfo> nextState = transition.getNextStateInfo();
+			List<NextStateInfo> nextState = getTransitions(source.getName());
 			for (NextStateInfo info : nextState) {
 				State target = info.getTargetState();
 				graph.addVertex(target);

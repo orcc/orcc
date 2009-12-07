@@ -213,7 +213,7 @@ public class ExpressionParser {
 			throw new OrccException("not yet implemented!");
 		case ALBaseLexer.EXPR_INT:
 			tree = tree.getChild(0);
-			int value = Integer.parseInt(tree.getText());
+			int value = Integer.decode(tree.getText());
 			return new IntExpr(parseLocation(tree), value);
 		case ALBaseLexer.EXPR_STRING:
 			tree = tree.getChild(0);
@@ -221,7 +221,8 @@ public class ExpressionParser {
 		case ALBaseLexer.EXPR_VAR:
 			return parseExprVar(tree.getChild(0));
 		default:
-			throw new OrccException("not yet implemented");
+			System.out.println("TODO expression: " + tree.getText());
+			return new IntExpr(42);
 		}
 	}
 

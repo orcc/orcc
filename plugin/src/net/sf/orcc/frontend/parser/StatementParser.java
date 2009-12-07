@@ -115,6 +115,7 @@ public class StatementParser {
 			throws OrccException {
 		Scope<Variable> variables = new Scope<Variable>(scope, false);
 		scope = variables;
+		exprParser.setVariableScope(scope);
 		parseLocalVariables(variables, tree.getChild(start));
 
 		// parse nodes

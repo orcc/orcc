@@ -109,6 +109,11 @@ public class ALAstParser {
 	private ActionList initializes;
 
 	/**
+	 * initialization procedure
+	 */
+	private Procedure initialization;
+
+	/**
 	 * ordered map of input ports
 	 */
 	private OrderedMap<Port> inputs;
@@ -255,13 +260,19 @@ public class ALAstParser {
 		inputs = parsePorts(tree.getChild(3));
 		outputs = parsePorts(tree.getChild(4));
 
+		// creates state variables
+		stateVars = new Scope<Variable>(parameters, false);
+
+		// initialization procedure, set expr parser's nodes and scope
+		initialization = new Procedure("initialize", false, new Location(),
+				new VoidType(), new OrderedMap<Variable>(),
+				new OrderedMap<Variable>(), new ArrayList<CFGNode>(0));
+
+		// creates the action parser
 		actionParser = new ActionParser(file, inputs, outputs, exprParser,
 				stmtParser);
 
 		// parse actor declarations
-		stateVars = new Scope<Variable>(parameters, false);
-		exprParser.setVariableScope(stateVars);
-		actionParser.setVariableScope(stateVars);
 		parseActorDeclarations(tree.getChild(5));
 
 		// sort actions by priority
@@ -286,6 +297,10 @@ public class ALAstParser {
 	private void parseActorDeclarations(Tree actorDecls) throws OrccException {
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
+			actionParser.setVariableScope(stateVars);
+			exprParser.setCFGNodeList(initialization.getNodes());
+			exprParser.setVariableScope(stateVars);
+
 			Tree child = actorDecls.getChild(i);
 			switch (child.getType()) {
 			case RVCCalLexer.ACTION:
