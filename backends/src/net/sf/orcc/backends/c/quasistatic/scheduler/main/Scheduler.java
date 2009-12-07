@@ -3,16 +3,17 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.main;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.ActorGraph;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.NetworkGraph;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.Switch;
-import net.sf.orcc.backends.c.quasistatic.scheduler.output.DSEInputFilesCreator;
-import net.sf.orcc.backends.c.quasistatic.scheduler.output.SchedulePreparer;
 import net.sf.orcc.backends.c.quasistatic.scheduler.dse.DSEScheduler;
 import net.sf.orcc.backends.c.quasistatic.scheduler.dse.DSESchedulerUtils;
 import net.sf.orcc.backends.c.quasistatic.scheduler.exceptions.QuasiStaticSchedulerException;
+import net.sf.orcc.backends.c.quasistatic.scheduler.model.ActorGraph;
+import net.sf.orcc.backends.c.quasistatic.scheduler.model.NetworkGraph;
+import net.sf.orcc.backends.c.quasistatic.scheduler.output.DSEInputFilesCreator;
+import net.sf.orcc.backends.c.quasistatic.scheduler.output.SchedulePreparer;
+import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
 import net.sf.orcc.network.Network;
 
 public class Scheduler {
@@ -41,8 +42,8 @@ public class Scheduler {
 	 * @throws OrccException
 	 * @throws QuasiStaticSchedulerException 
 	 */
-	public HashMap<String, List<String>> performSchedule() throws OrccException, QuasiStaticSchedulerException{
-		HashMap<String, List<String>> scheduleMap;
+	public Map<String, List<String>> performSchedule() throws OrccException, QuasiStaticSchedulerException{
+		Map<String, List<String>> scheduleMap;
 		if(SchedulePreparer.needsToPrepare()){
 			SchedulePreparer.prepare();
 		}
@@ -54,7 +55,7 @@ public class Scheduler {
 		networkGraph.createSystemLevelGraph();
 		//performs DSE schedule
 		//TODO: change DSE scheduler's API in order it uses the Orcc's API ( and not external input files)
-		scheduleMap = new HashMap();//performDSESchedule();
+		scheduleMap = new HashMap<String, List<String>>();//performDSESchedule();
 		SchedulePreparer.removeInputData();
 		//returns schedule hashmap
 		return scheduleMap;

@@ -29,7 +29,6 @@
 package net.sf.orcc.tools.classifier;
 
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
@@ -37,7 +36,6 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorClass;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.classes.DynamicClass;
 import net.sf.orcc.ir.classes.QuasiStaticClass;

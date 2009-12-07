@@ -71,7 +71,7 @@ public class DSEInputFilesCreator {
 		lastActionIndex++;
 	}
 
-	public void addNodes(String actorId, Collection/*<GraphVertex>*/ vertices){
+	public void addNodes(String actorId, Collection<?>/*<GraphVertex>*/ vertices){
 		/*for(GraphVertex vertex: vertices){
 			String actionId = vertex.getVertexName();
 			addNode(actorId, actionId);
@@ -89,11 +89,11 @@ public class DSEInputFilesCreator {
 		actionsConnections.add(fromIndex + " " + toIndex);
 	}
 
-	public void addConnections(String actorId, Collection/*<GraphEdge>*/ edges){
+	public void addConnections(String actorId, Collection<?>/*<GraphEdge>*/ edges){
 		//addConnections(actorId, actorId, edges);
 	}
 	
-	public void addConnections(String fromActorId, String toActorId, Collection/*<GraphEdge>*/ edges){
+	public void addConnections(String fromActorId, String toActorId, Collection<?>/*<GraphEdge>*/ edges){
 		/*for(GraphEdge edge: edges){
 			String fromActionId = edge.getFromVertex().getVertexName();
 			String toActionId = edge.getToVertex().getVertexName();

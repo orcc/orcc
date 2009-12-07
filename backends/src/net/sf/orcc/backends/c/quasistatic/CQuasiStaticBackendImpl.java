@@ -29,8 +29,8 @@ package net.sf.orcc.backends.c.quasistatic;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -114,7 +114,7 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 
 	protected void printSchedule(Network network) throws IOException,
 			OrccException, QuasiStaticSchedulerException {
-		HashMap<String, List<String>> scheduleMap = new Scheduler(network)
+		Map<String, List<String>> scheduleMap = new Scheduler(network)
 				.performSchedule();
 		CQuasiStaticSchedulePrinter schedulePrinter = new CQuasiStaticSchedulePrinter();
 		String outputName = path + File.separator + "scheduling.c";

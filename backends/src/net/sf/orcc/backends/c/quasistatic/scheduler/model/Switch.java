@@ -28,7 +28,6 @@
 package net.sf.orcc.backends.c.quasistatic.scheduler.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;

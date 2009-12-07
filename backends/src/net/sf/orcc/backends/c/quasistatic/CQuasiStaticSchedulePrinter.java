@@ -4,8 +4,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
 
@@ -42,7 +42,7 @@ public class CQuasiStaticSchedulePrinter {
 
 	protected StringTemplateGroup group;
 
-	protected HashMap<String, List<String>> scheduleMap;
+	protected Map<String, List<String>> scheduleMap;
 
 	protected StringTemplate template;
 
@@ -82,7 +82,7 @@ public class CQuasiStaticSchedulePrinter {
 	}
 
 	public void printSchedule(String fileName,
-			HashMap<String, List<String>> scheduleMap) throws IOException {
+			Map<String, List<String>> scheduleMap) throws IOException {
 		this.scheduleMap = scheduleMap;
 		template = group.getInstanceOf("scheduling");
 		setDeclarations();
