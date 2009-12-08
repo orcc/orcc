@@ -35,10 +35,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Printer;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 
 /**
  * This class defines an abstract class that deals with constants.
@@ -58,23 +55,25 @@ public abstract class AbstractConstant implements Constant {
 	 *             if the expression could not be evaluated to a constant
 	 */
 	public static Constant evaluate(Expression expr) {
-		if (expr.getType() == Expression.BOOLEAN) {
-			boolean value = ((BoolExpr) expr).getValue();
-			return new BoolConst(value);
-		} else if (expr.getType() == Expression.INT) {
-			int value = ((IntExpr) expr).getValue();
-			return new IntConst(value);
-		} else if (expr.getType() == Expression.LIST) {
-			List<Expression> value = ((ListExpr) expr).getValue();
-			List<Constant> list = new ArrayList<Constant>(value.size());
-			for (Expression subExpr : value) {
-				list.add(evaluate(subExpr));
+		Object value = expr.accept(new ExpressionEvaluator());
+		return constant(value);
+	}
+
+	private static Constant constant(Object value) {
+		if (value instanceof Boolean) {
+			return new BoolConst((Boolean) value);
+		} else if (value instanceof Integer) {
+			return new IntConst((Integer) value);
+		} else if (value instanceof Object[]) {
+			Object[] values = (Object[]) value;
+			List<Constant> constants = new ArrayList<Constant>(values.length);
+			for (int i = 0; i < values.length; i++) {
+				constants.add(constant(values[i]));
 			}
 
-			return new ListConst(list);
-		} else if (expr.getType() == Expression.STRING) {
-			String value = ((StringExpr) expr).getValue();
-			return new StringConst(value);
+			return new ListConst(constants);
+		} else if (value instanceof String) {
+			return new StringConst((String) value);
 		} else {
 			throw new OrccRuntimeException("this expression is not constant");
 		}

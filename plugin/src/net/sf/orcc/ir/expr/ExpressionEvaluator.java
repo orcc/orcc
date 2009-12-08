@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir.expr;
 
+import java.util.List;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 
@@ -77,7 +79,15 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 
 	@Override
 	public Object interpret(ListExpr expr, Object... args) {
-		throw new OrccRuntimeException("can not evaluate List expression");
+		List<Expression> expressions = expr.getValue();
+		Object[] values = new Object[expressions.size()];
+		int i = 0;
+		for (Expression expression : expressions) {
+			values[i] = expression.accept(this);
+			i++;
+		}
+
+		return values;
 	}
 
 	@Override
@@ -272,4 +282,5 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 						+ expr.getOp().toString() + "("
 						+ expr.getOp().getText() + ")");
 	}
+
 }
