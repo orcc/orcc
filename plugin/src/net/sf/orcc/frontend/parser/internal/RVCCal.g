@@ -161,7 +161,7 @@ actorPortDecls: varDeclNoExpr (',' varDeclNoExpr)* -> varDeclNoExpr+;
 // we use an operator precedence parser in the Java code to correctly apply precedence
 
 expression: un_expr
-  ((bop un_expr)+ -> ^(EXPR_BINARY ^(EXPR un_expr+) ^(OP bop+))
+  ((bop un_expr)+ -> ^(EXPR_BINARY ^(EXPRESSION un_expr+) ^(OP bop+))
   | -> un_expr);
 
 bop: ('or' | '||') -> LOGIC_OR
@@ -181,7 +181,7 @@ un_expr: postfix_expression -> postfix_expression
 un_op: MINUS -> MINUS | 'not' -> LOGIC_NOT | '#' -> NUM_ELTS;
 
 postfix_expression:
-  '[' e=expressions (':' g=expressionGenerators)? ']' -> ^(EXPR_LIST $e $g?)
+  '[' e=expressions (':' g=expressionGenerators)? ']' -> ^(EXPR_LIST ^(EXPRESSIONS $e) ^(GENERATORS $g?))
 | 'if' e1=expression 'then' e2=expression 'else' e3=expression 'end' -> ^(EXPR_IF $e1 $e2 $e3)
 | constant -> constant
 | '(' expression ')' -> expression
@@ -251,7 +251,7 @@ statement:
 // thanks to the language designers, there is no specific name for type attributes.
 // even though only type and expr attributes are taken into account.
 
-typeAttr: ID (':' typeDef -> ^(TYPE typeDef ID) | '=' expression -> ^(EXPR expression ID)) ;
+typeAttr: ID (':' typeDef -> ^(TYPE typeDef ID) | '=' expression -> ^(EXPRESSION expression ID)) ;
 
 typeAttrs: typeAttr (',' typeAttr)* -> typeAttr+;
 

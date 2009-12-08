@@ -33,6 +33,8 @@ lexer grammar ALBaseLexer;
 
 tokens {
   // common
+  EXPRESSION;
+  EXPRESSIONS;
   INPUT;
   INPUTS;
   OUTPUT;
@@ -58,9 +60,14 @@ tokens {
   // action
   GUARDS;
   TAG;
+    
+  // statement
+  ASSIGN;
+  CALL;
 
-  // expressions  
-  EXPR;
+  // expressions
+  GENERATORS;
+
   EXPR_BINARY;
   EXPR_UNARY;
   OP;
@@ -99,11 +106,6 @@ tokens {
 
   // unary operators
   BITNOT; LOGIC_NOT; NUM_ELTS;
-  
-  // statement
-  ASSIGN;
-  CALL;
-  EXPRESSIONS;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

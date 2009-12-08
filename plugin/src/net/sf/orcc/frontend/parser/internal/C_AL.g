@@ -159,7 +159,7 @@ actorParameters: actorParameter (',' actorParameter)* -> actorParameter+;
 // we use an operator precedence parser in the Java code to correctly apply precedence
 
 expression: un_expr
-  ((bop un_expr)+ -> ^(EXPR_BINARY ^(EXPR un_expr+) ^(OP bop+))
+  ((bop un_expr)+ -> ^(EXPR_BINARY ^(EXPRESSION un_expr+) ^(OP bop+))
   | -> un_expr);
 
 bop: '||' -> LOGIC_OR
@@ -259,11 +259,11 @@ typeDef:
   'bool' -> ^(TYPE 'bool')
 | 'char' -> ^(TYPE 'char')
 | 'short' -> ^(TYPE 'short')
-| 'int' ('(' expression ')')? -> ^(TYPE 'int' ^(EXPR expression)?)
+| 'int' ('(' expression ')')? -> ^(TYPE 'int' ^(EXPRESSION expression)?)
 | 'unsigned'
   ('char' -> ^(TYPE 'unsigned' 'char')
   | 'short' -> ^(TYPE 'unsigned' 'short')
-  | 'int' ('(' expression ')')? -> ^(TYPE 'unsigned' 'int' ^(EXPR expression)?))
+  | 'int' ('(' expression ')')? -> ^(TYPE 'unsigned' 'int' ^(EXPRESSION expression)?))
 | 'float' -> ^(TYPE 'float');
 
 typeDefId:
