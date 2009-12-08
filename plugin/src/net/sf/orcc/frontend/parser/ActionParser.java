@@ -299,8 +299,7 @@ public class ActionParser {
 		nodes = new ArrayList<CFGNode>();
 
 		parseInputPattern(tree.getChild(1));
-		stmtParser.setVariableScope(variables);
-		stmtParser.setCFGNodeList(nodes);
+		stmtParser.init(variables, nodes);
 		stmtParser.parseLocalVariables(tree.getChild(4));
 		stmtParser.parseStatements(tree.getChild(5));
 		parseOutputPattern(tree.getChild(2));

@@ -123,6 +123,22 @@ public class ExpressionParser {
 	}
 
 	/**
+	 * Sets the current variable scope and node list where nodes may be added
+	 * when an expression is translated as statements. Such expressions are
+	 * calls, ifs, and lists.
+	 * 
+	 * @param scope
+	 *            the current scope of variable
+	 * @param nodes
+	 *            a list of CFG nodes
+	 */
+	public void init(Scope<Variable> scope, List<CFGNode> nodes) {
+		this.scope = scope;
+		this.nodes = nodes;
+		globalsLoaded.clear();
+	}
+
+	/**
 	 * Parses a sequence of binary operations represented by an ANTLR tree, and
 	 * transforms it to a binary expression tree using the operators'
 	 * precedences.
@@ -338,17 +354,6 @@ public class ExpressionParser {
 		default:
 			throw new OrccException("Unknown operator: " + op.getText());
 		}
-	}
-
-	/**
-	 * Sets the node list where nodes may be added when an expression is
-	 * translated as statements. Such expressions are calls, ifs, and lists.
-	 * 
-	 * @param nodes
-	 *            a list of CFG nodes
-	 */
-	public void setCFGNodeList(List<CFGNode> nodes) {
-		this.nodes = nodes;
 	}
 
 	/**

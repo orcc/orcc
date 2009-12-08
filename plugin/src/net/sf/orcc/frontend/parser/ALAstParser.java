@@ -89,11 +89,6 @@ public class ALAstParser {
 	private ActionList actions;
 
 	/**
-	 * expression parser.
-	 */
-	private final ExpressionParser exprParser;
-
-	/**
 	 * absolute name of input file
 	 */
 	private final String file;
@@ -173,8 +168,7 @@ public class ALAstParser {
 
 			globalExprParser = new GlobalExpressionParser(file);
 			typeParser = new TypeParser(file, globalExprParser);
-			exprParser = new ExpressionParser(file);
-			stmtParser = new StatementParser(file, typeParser, exprParser);
+			stmtParser = new StatementParser(file, typeParser);
 		} catch (IOException e) {
 			String msg = "could not solve the path \"" + fileName + "\"";
 			throw new OrccException(msg, e);
@@ -256,7 +250,7 @@ public class ALAstParser {
 
 		// parse parameters
 		parameters = new Scope<Variable>();
-		exprParser.setVariableScope(parameters);
+		globalExprParser.setVariableScope(parameters);
 		parseActorParameters(tree.getChild(2));
 
 		// parse ports and return them as ordered maps
@@ -271,8 +265,7 @@ public class ALAstParser {
 				new VoidType(), new OrderedMap<Variable>(),
 				new OrderedMap<Variable>(), new ArrayList<CFGNode>(0));
 
-		globalExprParser.setCFGNodeList(initialization.getNodes());
-		globalExprParser.setVariableScope(stateVars);
+		globalExprParser.init(stateVars, initialization.getNodes());
 
 		// creates the action parser
 		actionParser = new ActionParser(file, inputs, outputs,
@@ -355,7 +348,7 @@ public class ALAstParser {
 
 			Expression init = null;
 			if (child.getChildCount() == 3) {
-				init = exprParser.parseExpression(child.getChild(2));
+				init = globalExprParser.parseExpression(child.getChild(2));
 			}
 
 			GlobalVariable globalVariable = new GlobalVariable(location, type,
@@ -428,8 +421,7 @@ public class ALAstParser {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		// parse parameters
-		stmtParser.setCFGNodeList(nodes);
-		stmtParser.setVariableScope(parameters);
+		stmtParser.init(parameters, nodes);
 		stmtParser.parseLocalVariables(tree.getChild(1));
 
 		// parse block, and returns local variables
@@ -467,7 +459,7 @@ public class ALAstParser {
 
 		Expression init = null;
 		if (tree.getChildCount() == 4) {
-			init = exprParser.parseExpression(tree.getChild(3));
+			init = globalExprParser.parseExpression(tree.getChild(3));
 		}
 
 		StateVariable stateVariable = new StateVariable(location, type, name,

@@ -54,11 +54,10 @@ public class StatementParser {
 	 *            the file being parsed
 	 * 
 	 */
-	public StatementParser(String file, TypeParser typeParser,
-			ExpressionParser exprParser) {
+	public StatementParser(String file, TypeParser typeParser) {
 		this.file = file;
 		this.typeParser = typeParser;
-		this.exprParser = exprParser;
+		this.exprParser = new ExpressionParser(file);
 
 		globalsToStore = new LinkedHashMap<LocalVariable, Variable>();
 	}
@@ -96,6 +95,21 @@ public class StatementParser {
 		} else {
 			return variable;
 		}
+	}
+
+	/**
+	 * Sets the current scope and node list where nodes may be added when
+	 * statements are parsed.
+	 * 
+	 * @param scope
+	 *            the current scope of variable
+	 * @param nodes
+	 *            a list of CFG nodes
+	 */
+	public void init(Scope<Variable> scope, List<CFGNode> nodes) {
+		this.nodes = nodes;
+		this.scope = scope;
+		exprParser.init(scope, nodes);
 	}
 
 	/**
@@ -185,17 +199,6 @@ public class StatementParser {
 	}
 
 	/**
-	 * Sets the node list where nodes may be added when statements are parsed.
-	 * 
-	 * @param nodes
-	 *            a list of CFG nodes
-	 */
-	public void setCFGNodeList(List<CFGNode> nodes) {
-		this.nodes = nodes;
-		exprParser.setCFGNodeList(nodes);
-	}
-
-	/**
 	 * Sets the current scope of variable.
 	 * 
 	 * @param scope
@@ -224,6 +227,8 @@ public class StatementParser {
 			Store store = new Store(block, location, use, indexes, value);
 			block.add(store);
 		}
+
+		globalsToStore.clear();
 	}
 
 }

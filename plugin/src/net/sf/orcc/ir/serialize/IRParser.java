@@ -173,10 +173,10 @@ public class IRParser {
 		int index = array.getInt(2);
 
 		// retrieve the variable definition
-		Variable varDef = variables.get(stringOfVar(name, suffix, index));
+		String varName = stringOfVar(name, suffix, index);
+		Variable varDef = variables.get(varName);
 		if (varDef == null) {
-			throw new OrccException("unknown variable: " + name + suffix + "_"
-					+ index);
+			throw new OrccException("unknown variable: " + varName);
 		}
 		return varDef;
 	}
