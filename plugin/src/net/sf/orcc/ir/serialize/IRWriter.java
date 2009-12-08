@@ -172,10 +172,13 @@ public class IRWriter {
 			array.put(body);
 
 			body.put(IRConstants.BINARY_EXPR);
-			body.put(expr.getOp().getText());
-			body.put(expr.getE1().accept(this));
-			body.put(expr.getE2().accept(this));
-			body.put(writeType(expr.getUnderlyingType()));
+			JSONArray body2 = new JSONArray();
+			body.put(body2);
+
+			body2.put(expr.getOp().getText());
+			body2.put(expr.getE1().accept(this));
+			body2.put(expr.getE2().accept(this));
+			body2.put(writeType(expr.getUnderlyingType()));
 
 			return array;
 		}
@@ -217,9 +220,12 @@ public class IRWriter {
 			array.put(body);
 
 			body.put(IRConstants.UNARY_EXPR);
-			body.put(expr.getOp().getText());
-			body.put(expr.getExpr().accept(this));
-			body.put(writeType(expr.getUnderlyingType()));
+			JSONArray body2 = new JSONArray();
+			body.put(body2);
+
+			body2.put(expr.getOp().getText());
+			body2.put(expr.getExpr().accept(this));
+			body2.put(writeType(expr.getUnderlyingType()));
 
 			return array;
 		}

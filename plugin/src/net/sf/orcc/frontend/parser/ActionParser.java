@@ -295,13 +295,14 @@ public class ActionParser {
 		Location location = parseLocation(tree);
 		Tag tag = parseActionTag(tagTree);
 
-		variables = new Scope<Variable>(scope, true);
+		variables = new Scope<Variable>(scope, false);
 		nodes = new ArrayList<CFGNode>();
 
 		parseInputPattern(tree.getChild(1));
 		stmtParser.setVariableScope(variables);
 		stmtParser.setCFGNodeList(nodes);
-		stmtParser.parseBlock(tree, 4);
+		stmtParser.parseLocalVariables(tree.getChild(4));
+		stmtParser.parseStatements(tree.getChild(5));
 		parseOutputPattern(tree.getChild(2));
 
 		String name = getActionName(location, tag);
@@ -321,7 +322,6 @@ public class ActionParser {
 
 		Expression numRepeats = null;
 		if (repeat.getChildCount() == 1) {
-			exprParser.setCFGNodeList(null);
 			exprParser.parseExpression(repeat.getChild(0));
 		}
 

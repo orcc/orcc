@@ -103,15 +103,17 @@ public class ALAstParser {
 	 */
 	private FSMBuilder fsmBuilder;
 
-	/**
-	 * list of initialize actions
-	 */
-	private ActionList initializes;
+	private GlobalExpressionParser globalExprParser;
 
 	/**
 	 * initialization procedure
 	 */
 	private Procedure initialization;
+
+	/**
+	 * list of initialize actions
+	 */
+	private ActionList initializes;
 
 	/**
 	 * ordered map of input ports
@@ -169,8 +171,9 @@ public class ALAstParser {
 		try {
 			this.file = new File(fileName).getCanonicalPath();
 
+			globalExprParser = new GlobalExpressionParser(file);
+			typeParser = new TypeParser(file, globalExprParser);
 			exprParser = new ExpressionParser(file);
-			typeParser = new TypeParser(file, exprParser);
 			stmtParser = new StatementParser(file, typeParser, exprParser);
 		} catch (IOException e) {
 			String msg = "could not solve the path \"" + fileName + "\"";
@@ -268,9 +271,12 @@ public class ALAstParser {
 				new VoidType(), new OrderedMap<Variable>(),
 				new OrderedMap<Variable>(), new ArrayList<CFGNode>(0));
 
+		globalExprParser.setCFGNodeList(initialization.getNodes());
+		globalExprParser.setVariableScope(stateVars);
+
 		// creates the action parser
-		actionParser = new ActionParser(file, inputs, outputs, exprParser,
-				stmtParser);
+		actionParser = new ActionParser(file, inputs, outputs,
+				globalExprParser, stmtParser);
 
 		// parse actor declarations
 		parseActorDeclarations(tree.getChild(5));
@@ -298,8 +304,6 @@ public class ALAstParser {
 		int n = actorDecls.getChildCount();
 		for (int i = 0; i < n; i++) {
 			actionParser.setVariableScope(stateVars);
-			exprParser.setCFGNodeList(initialization.getNodes());
-			exprParser.setVariableScope(stateVars);
 
 			Tree child = actorDecls.getChild(i);
 			switch (child.getType()) {
@@ -426,10 +430,13 @@ public class ALAstParser {
 		// parse parameters
 		stmtParser.setCFGNodeList(nodes);
 		stmtParser.setVariableScope(parameters);
-		stmtParser.parseLocalVariables(parameters, tree.getChild(1));
+		stmtParser.parseLocalVariables(tree.getChild(1));
 
 		// parse block, and returns local variables
-		Scope<Variable> variables = stmtParser.parseBlock(tree, 2);
+		Scope<Variable> variables = new Scope<Variable>(parameters, false);
+		stmtParser.setVariableScope(variables);
+		stmtParser.parseLocalVariables(tree.getChild(2));
+		stmtParser.parseStatements(tree.getChild(3));
 
 		// get name and location
 		Tree nameTree = tree.getChild(0);

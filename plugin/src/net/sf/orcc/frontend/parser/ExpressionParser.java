@@ -19,9 +19,12 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.Scope;
 
@@ -39,7 +42,7 @@ public class ExpressionParser {
 	/**
 	 * the file being parsed
 	 */
-	private final String file;
+	protected final String file;
 
 	/**
 	 * a map of global variables that were loaded
@@ -111,6 +114,157 @@ public class ExpressionParser {
 	}
 
 	/**
+	 * Returns the current scope of variable.
+	 * 
+	 * @return the current scope of variable
+	 */
+	public Scope<Variable> getVariableScope() {
+		return scope;
+	}
+
+	/**
+	 * Parses a sequence of binary operations represented by an ANTLR tree, and
+	 * transforms it to a binary expression tree using the operators'
+	 * precedences.
+	 * 
+	 * @param expr
+	 *            a tree that contains a binary operation sequence
+	 * @return an expression
+	 * @throws OrccException
+	 */
+	private Expression parseBinOpSeq(Tree expr) throws OrccException {
+		Tree treeExprs = expr.getChild(0);
+		int numExprs = treeExprs.getChildCount();
+		List<Expression> expressions = new ArrayList<Expression>(numExprs);
+		for (int i = 0; i < numExprs; i++) {
+			expressions.add(parseExpression(treeExprs.getChild(i)));
+		}
+
+		Tree treeOps = expr.getChild(1);
+		int numOps = treeOps.getChildCount();
+		List<BinaryOp> operators = new ArrayList<BinaryOp>(numOps);
+		for (int i = 0; i < numOps; i++) {
+			operators.add(parseOpBinary(treeOps.getChild(i)));
+		}
+
+		return BinOpSeqParser.parse(expressions, operators);
+	}
+
+	private Expression parseExprBool(Tree tree) {
+		Tree child = tree.getChild(0);
+		boolean value = Boolean.parseBoolean(child.getText());
+		return new BoolExpr(parseLocation(child), value);
+	}
+
+	private Expression parseExprCall(Tree tree) {
+		System.out.println("EXPR_CAL not implemented");
+		return new IntExpr(42);
+	}
+
+	/**
+	 * Parses the given tree as an expression.
+	 * 
+	 * @param tree
+	 *            a tree that contains an expression
+	 * @return an {@link Expression}.
+	 * @throws OrccException
+	 */
+	public Expression parseExpression(Tree tree) throws OrccException {
+		switch (tree.getType()) {
+		case ALBaseLexer.EXPR_BINARY:
+			return parseBinOpSeq(tree);
+		case ALBaseLexer.EXPR_BOOL:
+			return parseExprBool(tree);
+		case ALBaseLexer.EXPR_CALL:
+			return parseExprCall(tree);
+		case ALBaseLexer.EXPR_FLOAT:
+			return parseExprFloat(tree);
+		case ALBaseLexer.EXPR_IDX:
+			return parseExprIndex(tree);
+		case ALBaseLexer.EXPR_IF:
+			return parseExprIf(tree);
+		case ALBaseLexer.EXPR_INT:
+			return parseExprInt(tree);
+		case ALBaseLexer.EXPR_LIST:
+			return parseExprList(tree);
+		case ALBaseLexer.EXPR_STRING:
+			return parseExprString(tree);
+		case ALBaseLexer.EXPR_UNARY:
+			return parseExprUnary(tree);
+		case ALBaseLexer.EXPR_VAR:
+			return parseExprVar(tree.getChild(0));
+		default:
+			throw new OrccException("unknown expression type: "
+					+ tree.getText());
+		}
+	}
+
+	/**
+	 * Parses the children of the given tree as expressions.
+	 * 
+	 * @param tree
+	 *            a tree whose children are expressions
+	 * @return a list of {@link Expression}s
+	 * @throws OrccException
+	 */
+	public List<Expression> parseExpressions(Tree tree) throws OrccException {
+		int n = tree.getChildCount();
+		List<Expression> list = new ArrayList<Expression>(n);
+		for (int i = 0; i < n; i++) {
+			list.add(parseExpression(tree.getChild(i)));
+		}
+
+		return list;
+	}
+
+	private Expression parseExprFloat(Tree tree) throws OrccException {
+		throw new OrccException("not yet implemented!");
+	}
+
+	private Expression parseExprIf(Tree tree) {
+		System.out.println("EXPR_IF not implemented");
+		return new IntExpr(42);
+	}
+
+	private Expression parseExprIndex(Tree tree) {
+		System.out.println("EXPR_IDX not implemented");
+		return new IntExpr(42);
+	}
+
+	private Expression parseExprInt(Tree tree) {
+		Tree child = tree.getChild(0);
+		int value = Integer.decode(child.getText());
+		return new IntExpr(parseLocation(child), value);
+	}
+
+	protected Expression parseExprList(Tree tree) throws OrccException {
+		System.out.println("EXPR_LIST not implemented");
+		return new IntExpr(42);
+	}
+
+	private Expression parseExprString(Tree tree) {
+		Tree child = tree.getChild(0);
+		return new StringExpr(parseLocation(child), child.getText());
+	}
+
+	private Expression parseExprUnary(Tree tree) throws OrccException {
+		Tree opTree = tree.getChild(0);
+		Location location = parseLocation(opTree);
+		UnaryOp op = parseOpUnary(opTree);
+
+		Expression expression = parseExpression(tree.getChild(1));
+		return new UnaryExpr(location, op, expression, new VoidType());
+	}
+
+	protected Expression parseExprVar(Tree tree) throws OrccException {
+		Location location = parseLocation(tree);
+
+		Variable variable = getVariable(location, tree.getText());
+		Use localUse = new Use(variable);
+		return new VarExpr(location, localUse);
+	}
+
+	/**
 	 * Returns the binary operator that match the type of the given tree.
 	 * 
 	 * @param op
@@ -119,7 +273,7 @@ public class ExpressionParser {
 	 * @throws OrccException
 	 *             if the operator is not valid
 	 */
-	private BinaryOp parseBinaryOp(Tree op) throws OrccException {
+	private BinaryOp parseOpBinary(Tree op) throws OrccException {
 		switch (op.getType()) {
 		case ALBaseLexer.LOGIC_AND:
 			return BinaryOp.LOGIC_AND;
@@ -165,91 +319,25 @@ public class ExpressionParser {
 	}
 
 	/**
-	 * Parses a sequence of binary operations represented by an ANTLR tree, and
-	 * transforms it to a binary expression tree using the operators'
-	 * precedences.
+	 * Returns the unary operator that match the type of the given tree.
 	 * 
-	 * @param expr
-	 *            a tree that contains a binary operation sequence
-	 * @return an expression
+	 * @param op
+	 *            a Tree that represents an operator
+	 * @return a unary operator
 	 * @throws OrccException
+	 *             if the operator is not valid
 	 */
-	private Expression parseBinOpSeq(Tree expr) throws OrccException {
-		Tree treeExprs = expr.getChild(0);
-		int numExprs = treeExprs.getChildCount();
-		List<Expression> expressions = new ArrayList<Expression>(numExprs);
-		for (int i = 0; i < numExprs; i++) {
-			expressions.add(parseExpression(treeExprs.getChild(i)));
-		}
-
-		Tree treeOps = expr.getChild(1);
-		int numOps = treeOps.getChildCount();
-		List<BinaryOp> operators = new ArrayList<BinaryOp>(numOps);
-		for (int i = 0; i < numOps; i++) {
-			operators.add(parseBinaryOp(treeOps.getChild(i)));
-		}
-
-		return BinOpSeqParser.parse(expressions, operators);
-	}
-
-	/**
-	 * Parses the given tree as an expression.
-	 * 
-	 * @param tree
-	 *            a tree that contains an expression
-	 * @return an {@link Expression}.
-	 * @throws OrccException
-	 */
-	public Expression parseExpression(Tree tree) throws OrccException {
-		switch (tree.getType()) {
-		case ALBaseLexer.EXPR_BINARY:
-			return parseBinOpSeq(tree);
-		case ALBaseLexer.EXPR_BOOL: {
-			tree = tree.getChild(0);
-			boolean value = Boolean.parseBoolean(tree.getText());
-			return new BoolExpr(parseLocation(tree), value);
-		}
-		case ALBaseLexer.EXPR_FLOAT:
-			throw new OrccException("not yet implemented!");
-		case ALBaseLexer.EXPR_INT:
-			tree = tree.getChild(0);
-			int value = Integer.decode(tree.getText());
-			return new IntExpr(parseLocation(tree), value);
-		case ALBaseLexer.EXPR_STRING:
-			tree = tree.getChild(0);
-			return new StringExpr(parseLocation(tree), tree.getText());
-		case ALBaseLexer.EXPR_VAR:
-			return parseExprVar(tree.getChild(0));
+	private UnaryOp parseOpUnary(Tree op) throws OrccException {
+		switch (op.getType()) {
+		case ALBaseLexer.LOGIC_NOT:
+			return UnaryOp.LOGIC_NOT;
+		case ALBaseLexer.MINUS:
+			return UnaryOp.MINUS;
+		case ALBaseLexer.NUM_ELTS:
+			return UnaryOp.NUM_ELTS;
 		default:
-			System.out.println("TODO expression: " + tree.getText());
-			return new IntExpr(42);
+			throw new OrccException("Unknown operator: " + op.getText());
 		}
-	}
-
-	/**
-	 * Parses the children of the given tree as expressions.
-	 * 
-	 * @param tree
-	 *            a tree whose children are expressions
-	 * @return a list of {@link Expression}s
-	 * @throws OrccException
-	 */
-	public List<Expression> parseExpressions(Tree tree) throws OrccException {
-		int n = tree.getChildCount();
-		List<Expression> list = new ArrayList<Expression>(n);
-		for (int i = 0; i < n; i++) {
-			list.add(parseExpression(tree.getChild(i)));
-		}
-
-		return list;
-	}
-
-	private Expression parseExprVar(Tree tree) throws OrccException {
-		Location location = parseLocation(tree);
-
-		Variable variable = getVariable(location, tree.getText());
-		Use localUse = new Use(variable);
-		return new VarExpr(location, localUse);
 	}
 
 	/**

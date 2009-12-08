@@ -94,7 +94,7 @@ public class TypeParser {
 		int n = type.getChildCount();
 		for (int i = 1; i < n; i++) {
 			Tree attr = type.getChild(i);
-			if (attr.getType() == RVCCalLexer.EXPR) {
+			if (attr.getType() == ALBaseLexer.EXPRESSION) {
 				if (attr.getChildCount() > 1
 						&& !attr.getChild(1).getText().equals(AST.SIZE)) {
 					throw new OrccException(file, location, "unknown \""

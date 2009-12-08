@@ -99,39 +99,6 @@ public class StatementParser {
 	}
 
 	/**
-	 * Parses a block of statements. A block is a (possibly empty) list of local
-	 * variables and a (possibly empty) list of statements.
-	 * 
-	 * @param tree
-	 *            a tree whose child at index <code>start</code> is a VARIABLES
-	 *            tree, and whose child at index <code>start + 1</code> is a
-	 *            STATEMENTS tree
-	 * @param start
-	 *            index of the VARIABLES tree
-	 * @return a scope of local variables
-	 * @throws OrccException
-	 */
-	public Scope<Variable> parseBlock(Tree tree, int start)
-			throws OrccException {
-		Scope<Variable> variables = new Scope<Variable>(scope, false);
-		scope = variables;
-		exprParser.setVariableScope(scope);
-		parseLocalVariables(variables, tree.getChild(start));
-
-		// parse nodes
-		Tree statements = tree.getChild(start + 1);
-		int n = statements.getChildCount();
-		for (int i = 0; i < n; i++) {
-			parseStatement(statements.getChild(i));
-		}
-
-		// adds global to store
-		storeGlobals();
-
-		return variables;
-	}
-
-	/**
 	 * Parses the given tree as a local parameter/local variable.
 	 * 
 	 * @param tree
@@ -155,16 +122,29 @@ public class StatementParser {
 				null, type);
 	}
 
-	public void parseLocalVariables(Scope<Variable> variables, Tree tree)
-			throws OrccException {
+	/**
+	 * Parses the given tree as a list of local variables, which are added to
+	 * the current scope.
+	 * 
+	 * @param tree
+	 *            a tree
+	 * @throws OrccException
+	 */
+	public void parseLocalVariables(Tree tree) throws OrccException {
 		int numChildren = tree.getChildCount();
 		for (int i = 0; i < numChildren; i++) {
 			LocalVariable variable = parseLocalVariable(tree.getChild(i));
-			variables.add(file, variable.getLocation(), variable.getName(),
+			scope.add(file, variable.getLocation(), variable.getName(),
 					variable);
 		}
 	}
 
+	/**
+	 * Parses one statement.
+	 * 
+	 * @param tree
+	 * @throws OrccException
+	 */
 	private void parseStatement(Tree tree) throws OrccException {
 		if (tree.getType() == ALBaseLexer.ASSIGN) {
 			Location location = parseLocation(tree.getChild(0));
@@ -184,6 +164,24 @@ public class StatementParser {
 				// TODO: store
 			}
 		}
+	}
+
+	/**
+	 * Parses statements.
+	 * 
+	 * @param tree
+	 *            a STATEMENTS tree
+	 * @throws OrccException
+	 */
+	public void parseStatements(Tree statements) throws OrccException {
+		// parse nodes
+		int n = statements.getChildCount();
+		for (int i = 0; i < n; i++) {
+			parseStatement(statements.getChild(i));
+		}
+
+		// adds global to store
+		storeGlobals();
 	}
 
 	/**
