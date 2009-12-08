@@ -35,7 +35,7 @@
   int MAX_CHUNK_SIZE = 64;
   
   // chunk
-  List(type:uint(size=8), size=MAX_CHUNK_SIZE) chunk := [0 : for int i in Integers(1, MAX_CHUNK_SIZE - 1) ];
+  List(type:uint(size=8), size=MAX_CHUNK_SIZE) chunk/* := [0 : for int i in Integers(1, MAX_CHUNK_SIZE - 1) ]*/;
   int byte_index; // index of the current byte in the chunk
   int byte_count; // number of bytes left in the current chunk
   int bits_count; // number of bits left in the current byte
