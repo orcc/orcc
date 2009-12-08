@@ -128,6 +128,7 @@
       <editor
             class="net.sf.orcc.ui.editors.CalEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="true"
             extensions="cal"
             icon="icons/orcc_run.gif"
             id="net.sf.orcc.ui.editors.RVCCalEditor"
