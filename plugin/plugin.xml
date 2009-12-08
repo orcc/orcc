@@ -123,5 +123,16 @@
             id="orcc plugin.simuLaunchConfigurationTypeImage">
       </launchConfigurationTypeImage>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="net.sf.orcc.ui.editors.CalEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            extensions="cal"
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.ui.editors.RVCCalEditor"
+            name="RVC-CAL editor">
+      </editor>
+   </extension>
 
 </plugin>
