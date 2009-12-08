@@ -1,47 +1,71 @@
+/*
+ * Copyright (c) 2009, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 package net.sf.orcc.ui.editors;
 
 import org.eclipse.swt.graphics.RGB;
 
+/**
+ * This class defines constants for the CAL editor.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public interface ICalColorConstants {
 
 	/**
-	 * 50% green
+	 * single-line and multi-line comment
 	 */
-	RGB COMMENT = new RGB(0x00, 0x80, 0x00);
+	RGB COMMENT = new RGB(63, 127, 95);
 
 	/**
-	 * 50% green
+	 * javadoc comment
 	 */
-	RGB COMMENT2 = new RGB(0x00, 0x80, 0x00);
+	RGB JAVADOC_COMMENT = new RGB(63, 95, 191);
 
 	/**
-	 * 70% red
+	 * constant
 	 */
-	RGB CONSTANT = new RGB(0xb4, 0x00, 0x00);
-
-	/**
-	 * black
-	 */
-	RGB DEFAULT = new RGB(0x00, 0x00, 0x00);
+	RGB CONSTANT = new RGB(42, 0, 255);
 
 	/**
 	 * black
 	 */
-	RGB IDENTIFIER = new RGB(0x00, 0x00, 0x00);
+	RGB DEFAULT = new RGB(0, 0, 0);
 
 	/**
-	 * 100% blue
+	 * identifier
 	 */
-	RGB KEYWORD = new RGB(0x00, 0x00, 0xff);
+	RGB IDENTIFIER = new RGB(0, 0, 0);
 
 	/**
-	 * Peru from http://www.htmlhelp.com/cgi-bin/color.cgi
+	 * keywork
 	 */
-	RGB OPERATOR = new RGB(0xcd, 0x85, 0x3f);
-
-	/**
-	 * Medium Orchid from http://www.htmlhelp.com/cgi-bin/color.cgi
-	 */
-	RGB SEPARATOR = new RGB(0xba, 0x55, 0xd3);
+	RGB KEYWORD = new RGB(127, 0, 85);
 
 }

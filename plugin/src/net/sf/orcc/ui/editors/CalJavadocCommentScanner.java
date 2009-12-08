@@ -31,60 +31,31 @@ package net.sf.orcc.ui.editors;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.rules.EndOfLineRule;
-import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 
 /**
- * This class defines a basic partition scanner for CAL content. It looks for
- * javadoc, multi-line and single-line comments using rules. Note that this
- * could probably done faster, the JDT has a FastPartitionScanner for instance.
- * But do we really care? :)
+ * This class defines a scanner called on contents that are inside javadoc
+ * comments. The scanner does nothing at the moment.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CalPartitionScanner extends RuleBasedPartitionScanner {
+public class CalJavadocCommentScanner extends RuleBasedScanner {
 
-	/**
-	 * The identifier of the single-line end comment partition content type.
-	 */
-	public static final String CAL_SINGLE_LINE_COMMENT = "__cal_singleline_comment"; //$NON-NLS-1$
-
-	/**
-	 * The identifier multi-line comment partition content type.
-	 */
-	public static final String CAL_MULTI_LINE_COMMENT = "__cal_multiline_comment"; //$NON-NLS-1$
-
-	/**
-	 * The identifier javadoc comment partition content type.
-	 */
-	public static final String CAL_JAVADOC_COMMENT = "__cal_javadoc_comment"; //$NON-NLS-1$
-
-	/**
-	 * Creates the partitioner and sets up the appropriate rules.
-	 */
-	public CalPartitionScanner() {
-		super();
-
-		IToken singleComment = new Token(CAL_SINGLE_LINE_COMMENT);
-		IToken multiComment = new Token(CAL_MULTI_LINE_COMMENT);
-		IToken javadocComment = new Token(CAL_JAVADOC_COMMENT);
+	public CalJavadocCommentScanner(ColorManager manager) {
+		IToken commentToken = new Token(new TextAttribute(manager
+				.getColor(ICalColorConstants.JAVADOC_COMMENT)));
+		setDefaultReturnToken(commentToken);
 
 		List<IRule> rules = new ArrayList<IRule>();
 
-		// Add rule for comments.
-		rules.add(new EndOfLineRule("//", singleComment)); //$NON-NLS-1$
-		rules.add(new MultiLineRule("/**", "*/", javadocComment)); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new MultiLineRule("/*", "*/", multiComment)); //$NON-NLS-1$ //$NON-NLS-2$
-
-		IPredicateRule[] result = new IPredicateRule[rules.size()];
+		IRule[] result = new IRule[rules.size()];
 		rules.toArray(result);
-		setPredicateRules(result);
+		setRules(result);
 	}
 
 }

@@ -1,3 +1,31 @@
+/*
+ * Copyright (c) 2009, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 package net.sf.orcc.ui.editors;
 
 import java.util.ArrayList;
@@ -6,23 +34,34 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.TextAttribute;
-import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.swt.SWT;
 
+/**
+ * This class defines a rule-based scanner for CAL. It uses rules to determine
+ * the different token types. The rules were copied from the OpenDF CAL editor
+ * classes.
+ * 
+ * <p>
+ * Note: This scanner is only used for the default content type, so it is never
+ * given single-line, multi-line, or javadoc-style comments.
+ * </p>
+ * 
+ * @author Matthieu Wipliez
+ */
 public class CalCodeScanner extends RuleBasedScanner {
 
-	private class OpendfNumberRule implements IRule {
+	private class CalNumberRule implements IRule {
 
 		IToken success;
 
-		public OpendfNumberRule(ColorManager colorManager) {
+		public CalNumberRule(ColorManager colorManager) {
 			success = new Token(new TextAttribute(colorManager
 					.getColor(ICalColorConstants.CONSTANT)));
 		}
@@ -167,17 +206,21 @@ public class CalCodeScanner extends RuleBasedScanner {
 
 	}
 
-	private class OpendfOperatorRule implements IRule {
+	private class CalOperatorRule implements IRule {
+
+		private static final String operators = "=+-*/<>!@$%^&#:?~|";
+
+		private static final String separators = ".[]{}(),;";
 
 		IToken operatorToken;
 
 		IToken separatorToken;
 
-		public OpendfOperatorRule(ColorManager manager) {
+		public CalOperatorRule(ColorManager manager) {
 			operatorToken = new Token(new TextAttribute(manager
-					.getColor(ICalColorConstants.OPERATOR)));
+					.getColor(ICalColorConstants.DEFAULT)));
 			separatorToken = new Token(new TextAttribute(manager
-					.getColor(ICalColorConstants.SEPARATOR)));
+					.getColor(ICalColorConstants.DEFAULT)));
 		}
 
 		public IToken evaluate(ICharacterScanner scanner) {
@@ -185,20 +228,14 @@ public class CalCodeScanner extends RuleBasedScanner {
 
 			int c = scanner.read();
 
-			switch (c) {
-			case '+':
-			case '-':
-			case '*':
-			case '/':
-			case '<':
-			case '>':
-				return operatorToken;
-
-			case '(':
-			case ')':
-			case '[':
-			case ']':
-				return separatorToken;
+			if (operators.indexOf(c) >= 0) {
+				token = operatorToken;
+				while (operators.indexOf(scanner.read()) >= 0) {
+				}
+			} else if (separators.indexOf(c) >= 0) {
+				token = separatorToken;
+				while (separators.indexOf(scanner.read()) >= 0) {
+				}
 			}
 
 			scanner.unread();
@@ -206,22 +243,17 @@ public class CalCodeScanner extends RuleBasedScanner {
 		}
 	}
 
-	private class OpendfWordRule implements IRule {
+	private class CalWordRule implements IRule {
 
-		private IToken constantToken;
 		private IToken identifierToken;
+
 		private IToken keywordToken;
+
 		private Map<String, IToken> map;
 
-		private IToken operatorToken;
-
-		public OpendfWordRule(ColorManager colorManager) {
+		public CalWordRule(ColorManager colorManager) {
 			keywordToken = new Token(new TextAttribute(colorManager
-					.getColor(ICalColorConstants.KEYWORD)));
-			constantToken = new Token(new TextAttribute(colorManager
-					.getColor(ICalColorConstants.CONSTANT)));
-			operatorToken = new Token(new TextAttribute(colorManager
-					.getColor(ICalColorConstants.OPERATOR)));
+					.getColor(ICalColorConstants.KEYWORD), null, SWT.BOLD));
 			identifierToken = new Token(new TextAttribute(colorManager
 					.getColor(ICalColorConstants.IDENTIFIER)));
 
@@ -231,14 +263,6 @@ public class CalCodeScanner extends RuleBasedScanner {
 
 			for (i = 0; i < keywords.length; i++) {
 				map.put(keywords[i], keywordToken);
-			}
-
-			for (i = 0; i < wordOperators.length; i++) {
-				map.put(wordOperators[i], operatorToken);
-			}
-
-			for (i = 0; i < wordConstants.length; i++) {
-				map.put(wordConstants[i], constantToken);
 			}
 		}
 
@@ -274,17 +298,16 @@ public class CalCodeScanner extends RuleBasedScanner {
 	private final static String[] keywords = {
 			// cal keywords
 			"action", "actor", "begin", "do", "else", "end", "foreach", "fsm",
-			"function", "guard", "if", "import", "initialize", "or",
-			"priority", "proc", "procedure", "repeat", "schedule", "then",
-			"var", "while" };
+			"function", "guard", "if", "import", "initialize", "priority",
+			"proc", "procedure", "repeat", "schedule", "then", "var", "while",
 
-	private final static String[] wordConstants = { "false", "true" };
+			// expressions
+			"and", "div", "false", "mod", "not", "or", "true",
 
-	private final static String[] wordOperators = { "and", "div", "mod", "not" };
+			// types
+			"bool", "float", "int", "List", "String", "uint", "void" };
 
 	public CalCodeScanner(ColorManager manager) {
-		IToken commentToken = new Token(new TextAttribute(manager
-				.getColor(ICalColorConstants.COMMENT)));
 		IToken constantToken = new Token(new TextAttribute(manager
 				.getColor(ICalColorConstants.CONSTANT)));
 
@@ -292,13 +315,11 @@ public class CalCodeScanner extends RuleBasedScanner {
 
 		rules.add(new WhitespaceRule(new CalWhitespaceDetector()));
 
-		rules.add(new MultiLineRule("/*", "*/", commentToken));
-		rules.add(new EndOfLineRule("//", commentToken));
-		rules.add(new SingleLineRule("\"", "\"", constantToken));
-		rules.add(new SingleLineRule("'", "'", constantToken));
-		rules.add(new OpendfNumberRule(manager));
-		rules.add(new OpendfWordRule(manager));
-		rules.add(new OpendfOperatorRule(manager));
+		rules.add(new SingleLineRule("\"", "\"", constantToken, '\\'));
+		rules.add(new SingleLineRule("'", "'", constantToken, '\\'));
+		rules.add(new CalNumberRule(manager));
+		rules.add(new CalWordRule(manager));
+		rules.add(new CalOperatorRule(manager));
 
 		IRule[] result = new IRule[rules.size()];
 		rules.toArray(result);
