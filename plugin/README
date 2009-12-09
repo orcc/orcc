@@ -1,6 +1,0 @@
-To run the backend, first import the project in Eclipse (using File > Imoprt)
-Then right-click, Run As > Java Application.
-The backends are listed as LanguageBackend: CBackend, LLVMBackend...
-
-The only argument to a backend is the absolute path of the flat XDF network
-produced by the frontend.
