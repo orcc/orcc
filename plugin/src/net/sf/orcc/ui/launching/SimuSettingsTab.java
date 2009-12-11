@@ -56,12 +56,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
-import org.eclipse.ui.dialogs.ResourceSelectionDialog;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
@@ -122,52 +122,15 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	}
 
 	private void browseBitFiles(Shell shell) {
-		// ElementTreeSelectionDialog tree = new
-		// ElementTreeSelectionDialog(shell,
-		// WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
-		// new WorkbenchContentProvider());
-		//		
-		// tree.setAllowMultiple(false);
-		// tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
-		//
-		// IFile file = getFileFromText();
-		// if (file != null) {
-		// tree.setInitialSelection(file);
-		// }
-		//
-		// tree.setMessage("Please select an existing file:");
-		// tree.setTitle("Choose an existing file");
-		//
-		// tree.setValidator(new ISelectionStatusValidator() {
-		//
-		// @Override
-		// public IStatus validate(Object[] selection) {
-		// if (selection.length == 1) {
-		// if (selection[0] instanceof IFile) {
-		// return new Status(Status.OK,
-		// OrccActivator.PLUGIN_ID, "");
-		// }
-		// }
-		//
-		// return new Status(Status.ERROR, OrccActivator.PLUGIN_ID,
-		// "Only files can be selected, not folders nor projects");
-		// }
-		//
-		// });
-
-		ResourceSelectionDialog dialog = new ResourceSelectionDialog(shell,
-				ResourcesPlugin.getWorkspace().getRoot(), "Select input data:");
-
-		IFile file = getFileFromBitText();
-
-		dialog.setTitle("Choose an existing file");
-
-		// opens the dialog
-		if (dialog.open() == Window.OK) {
-			Object[] result = dialog.getResult();
-			file = (IFile) result[0];
-			textBitstream.setText(file.getLocation().toOSString());
-		}
+        FileDialog fd = new FileDialog(shell, SWT.OPEN);
+        fd.setText("Select input data:");
+		fd.setFilterPath(textBitstream.getText());
+        String[] filterExt = { "*.*" };
+        fd.setFilterExtensions(filterExt);
+        String fileName = fd.open();
+        if (fileName != null) {
+        	textBitstream.setText(fileName);
+        }
 	}
 
 	@Override
@@ -257,15 +220,6 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private IFile getFileFromText() {
 		String value = textNetwork.getText();
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		IFile file = root.getFileForLocation(new Path(value));
-
-		return file;
-	}
-
-	private IFile getFileFromBitText() {
-		String value = textBitstream.getText();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
 		IFile file = root.getFileForLocation(new Path(value));

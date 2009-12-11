@@ -214,63 +214,78 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * @return the number of actions fired
 	 */
 	public Integer schedule() {
-//		int running=0;
-//		int schedulable=1;
-//		
-//		if (sched.hasFsm()) {
-//			while (schedulable>0) {
-//				// Check for untagged actions first
-//				for (Action action : sched.getActions()) {
-//					schedulable=0;
-//					if (isSchedulable(action)) {
-//						schedulable=execute(action);
-//						running=1;
-//						break;
-//					}
-//				}
-//
-//				// Then check for next FSM transition
-//				for (NextStateInfo info : sched.getFsm().getTransitions(
-//						fsmState)) {
-//					schedulable=0;
-//					Action action = info.getAction();
-//					if (isSchedulable(action)) {
-//						// Update FSM state
-//						fsmState = info.getTargetState().getName();
-//						schedulable=execute(action);
-//						running=1;
-//						break;
-//					}
-//				}
-//			}
-//
-//			return running;
-
+		int running=0;
+		boolean schedulable=true;
+		
+		// Schedule the actor as long as it can execute an action
 		if (sched.hasFsm()) {
-			// Check for untagged actions first
-			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)) {
-					return execute(action);
+			while (schedulable) {
+				schedulable=false;
+				// Check for untagged actions first
+				for (Action action : sched.getActions()) {
+					schedulable=isSchedulable(action);
+					if (schedulable) {
+						running=execute(action);
+						break;
+					}
 				}
-			}
-
-			// Then check for next FSM transition
-			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
-				Action action = info.getAction();
-				if (isSchedulable(action)) {
-					// Update FSM state
-					fsmState = info.getTargetState().getName();
-					return execute(action);
+				if (!schedulable) {
+					// If no untagged action has been executed,
+					// Then check for next FSM transition
+					for (NextStateInfo info : sched.getFsm().getTransitions(
+							fsmState)) {
+						Action action = info.getAction();
+						schedulable = isSchedulable(action);
+						if (schedulable) {
+							// Update FSM state
+							fsmState = info.getTargetState().getName();
+							running = execute(action);
+							break;
+						}
+					}
 				}
 			}
 		} else {
-			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)) {
-					return execute(action);
+			while (schedulable) {
+				schedulable=false;
+				for (Action action : sched.getActions()) {
+					schedulable = isSchedulable(action);
+					if (schedulable) {
+						running=execute(action);
+						break;
+					}
 				}
 			}
 		}
-		return 0;
+
+		return running;
+
+//      // Schedule only 1 action per actor
+//		if (sched.hasFsm()) {
+//			// Check for untagged actions first
+//			for (Action action : sched.getActions()) {
+//				if (isSchedulable(action)) {
+//					return execute(action);
+//				}
+//			}
+//
+//			// Then check for next FSM transition
+//			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
+//				Action action = info.getAction();
+//				if (isSchedulable(action)) {
+//					// Update FSM state
+//					fsmState = info.getTargetState().getName();
+//					return execute(action);
+//				}
+//			}
+//		} else {
+//			for (Action action : sched.getActions()) {
+//				if (isSchedulable(action)) {
+//					return execute(action);
+//				}
+//			}
+//		}
+//		return 0;
 	}
 
 }

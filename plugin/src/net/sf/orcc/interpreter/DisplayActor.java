@@ -37,6 +37,9 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+
 import net.sf.orcc.ir.Actor;
 
 public class DisplayActor extends AbstractInterpretedActor {
