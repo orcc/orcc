@@ -38,10 +38,12 @@ import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimModuleTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimOperationTemplate;
+import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimValueTemplate;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
@@ -68,7 +70,9 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimInstructionVisitor implements InstructionVisitor, XlimOperationTemplate, XlimAttributeTemplate, XlimModuleTemplate, XlimValueTemplate {
+public class XlimInstructionVisitor implements InstructionVisitor,
+		XlimOperationTemplate, XlimAttributeTemplate, XlimModuleTemplate,
+		XlimValueTemplate, XlimTypeTemplate {
 
 	/**
 	 * Current action name
@@ -219,8 +223,8 @@ public class XlimInstructionVisitor implements InstructionVisitor, XlimOperation
 		if (node.getSource().getVariable().getType().getType() == Type.LIST
 				&& !inport) {
 			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root));
-			operationE = XlimNodeTemplate.newNameOperation(root, VARREF,
-					names.getVarName(node.getSource()));
+			operationE = XlimNodeTemplate.newNameOperation(root, VARREF, names
+					.getVarName(node.getSource()));
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		} else {
 			operationE = XlimNodeTemplate.newOperation(root, NOOP);
@@ -245,8 +249,21 @@ public class XlimInstructionVisitor implements InstructionVisitor, XlimOperation
 	 */
 	public void visit(Peek node, Object... args) {
 		System.out.println("CHECK PEEK");
-		// TODO Auto-generated method stub
+		Element operationE = XlimNodeTemplate.newValueOperation(root, LITINT,
+				Integer.toString(node.getNumTokens()));
 
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), INT, node
+				.getNumTokens());
+
+		Port port = node.getPort();
+		String portname = port.getName();
+
+		Element peekE = XlimNodeTemplate.newPortOperation(root, PINPEEK,
+				portname);
+
+		XlimNodeTemplate.newInPort(peekE, names.getTempName());
+		XlimNodeTemplate.newOutPort(peekE, names.getVarName(node.getTarget(),
+				actionName), port.getType());
 	}
 
 	@Override
@@ -334,10 +351,9 @@ public class XlimInstructionVisitor implements InstructionVisitor, XlimOperation
 
 		Variable var = node.getTarget().getVariable();
 		if (var instanceof StateVariable) {
-			Element operationE = XlimNodeTemplate.newDiffOperation(root,
-					ASSIGN);
-			operationE.setAttribute(TARGET, names
-					.getVarName(node.getTarget()));
+			Element operationE = XlimNodeTemplate
+					.newDiffOperation(root, ASSIGN);
+			operationE.setAttribute(TARGET, names.getVarName(node.getTarget()));
 			String data = names.getTempName();
 
 			for (Expression expr : node.getIndexes()) {
@@ -367,8 +383,8 @@ public class XlimInstructionVisitor implements InstructionVisitor, XlimOperation
 	 *            Arguments sent (not used)
 	 */
 	public void visit(Write node, Object... args) {
-		Element operationE = XlimNodeTemplate.newPortOperation(root,
-				PINWRITE, node.getPort().getName());
+		Element operationE = XlimNodeTemplate.newPortOperation(root, PINWRITE,
+				node.getPort().getName());
 		operationE.setAttribute(STYLE, SIMPLE);
 		String name = names.getVarName(node.getTarget(), actionName);
 		XlimNodeTemplate.newInPort(operationE, name);

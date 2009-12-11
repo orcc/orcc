@@ -34,7 +34,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.Vector;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
@@ -52,12 +55,16 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.util.DomUtil;
@@ -164,21 +171,9 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 
 		Map<Port, Integer> input = action.getInputPattern();
 		for (Entry<Port, Integer> entry : input.entrySet()) {
-			Element operationE = XlimNodeTemplate.newValueOperation(body,
-					LITINT, "0");
-
 			String index = "index" + (icount++);
-			XlimNodeTemplate.newOutPort(operationE, index, "1", INT);
-
 			Port port = entry.getKey();
 			String portname = port.getName();
-
-			Element peekE = XlimNodeTemplate.newPortOperation(body, PINPEEK,
-					portname);
-
-			XlimNodeTemplate.newInPort(peekE, index);
-			XlimNodeTemplate.newOutPort(peekE, names.getVarName(port, action
-					.toString()), port.getType());
 
 			Element statusE = XlimNodeTemplate.newPortOperation(body,
 					PINSTATUS, portname);
@@ -187,6 +182,33 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 
 			XlimNodeTemplate.newOutPort(statusE, ready, "1", BOOL);
 			XlimNodeTemplate.newInPort(guardE, ready);
+		}
+
+		List<CFGNode> init = action.getScheduler().getNodes();
+		init = ((IfNode) init.get(init.size() - 1)).getThenNodes();
+
+		XlimInstructionVisitor iv = new XlimInstructionVisitor(names, body,
+				"_scheduler_", new Vector<String>(),
+				new TreeMap<String, Element>());
+		Iterator<Instruction> it = ((BlockNode) init.get(0)).getInstructions()
+				.iterator();
+
+		while (it.hasNext()) {
+			Instruction instruction = it.next();
+			if (it.hasNext()) {
+				instruction.accept(iv);
+			} else {
+				String index = "index" + (icount++);
+				String ready = "ready_" + index;
+				Assign assign = ((Assign) instruction);
+
+				assign.getValue().accept(new XlimExprVisitor(names, body));
+				Element operationE = XlimNodeTemplate.newOperation(body, NOOP);
+				XlimNodeTemplate.newInPort(operationE, names.getTempName());
+				XlimNodeTemplate.newOutPort(operationE, ready, assign
+						.getTarget().getType());
+				XlimNodeTemplate.newInPort(guardE, ready);
+			}
 		}
 
 		// Default true
