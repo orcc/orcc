@@ -532,17 +532,15 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 					Object[] value = (Object[]) stateVar.getValue();
 					for (Object obj : value) {
 						if (obj != null) {
-							Element el = XlimNodeTemplate.newInitValue(init2);
-							el.setAttribute(VALUE, obj.toString());
+							init2.setAttribute(VALUE, obj.toString());
 							((ListType) state.getType()).getElementType()
-									.accept(new XlimTypeSizeVisitor(el));
+									.accept(new XlimTypeSizeVisitor(init2));
 						}
 					}
 					if (value[0] == null) {
-						Element el = XlimNodeTemplate.newInitValue(init2);
-						el.setAttribute(VALUE, "0");
+						init2.setAttribute(VALUE, "0");
 						((ListType) state.getType()).getElementType().accept(
-								new XlimTypeSizeVisitor(el));
+								new XlimTypeSizeVisitor(init2));
 					}
 				} else {
 					// For others just use the init value
@@ -551,9 +549,8 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 						value.accept(new XlimValueVisitor(init2, state
 								.getType()));
 					} else {
-						Element el = XlimNodeTemplate.newInitValue(init2);
-						el.setAttribute(VALUE, "0");
-						state.getType().accept(new XlimTypeSizeVisitor(el));
+						init2.setAttribute(VALUE, "0");
+						state.getType().accept(new XlimTypeSizeVisitor(init2));
 					}
 				}
 			}
