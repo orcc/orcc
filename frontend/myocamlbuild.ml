@@ -20,7 +20,9 @@ let _ =
     (function
      | After_rules ->
          (* External libraries: graph. *)
-         ocaml_lib ~extern:true "graph";
+         ocaml_lib ~dir:"+ocamlgraph" ~extern:true "graph";
+		 
+		 Options.include_dirs := !Options.include_dirs @ ["+ocamlgraph"];
 
          Options.ocamlc := A "ocamlc.opt";
          Options.ocamldep := A "ocamldep.opt";

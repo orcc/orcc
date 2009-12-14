@@ -1,5 +1,6 @@
-This file describes how to use ORCC frontend.
-To compile ORCC frontend, please see the INSTALL file.
+This file describes how to use Orcc frontend.
+To compile the Orcc frontend, please go to the Wiki
+(see the top-level README file).
 
 Note: sample paths are defined as /path/to/something, if you're under Windows
 please read them as C:\path\to\something or D:\path\to\something or whatever
