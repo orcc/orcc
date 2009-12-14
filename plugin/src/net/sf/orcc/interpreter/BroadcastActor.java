@@ -40,6 +40,16 @@ public class BroadcastActor extends AbstractInterpretedActor {
 	private Port inport;
 	private List<Port> outports;
 	
+	private static boolean HasTokenOnOutputs(List<Port> outports) {
+		for (Port out : outports) {
+			ICommunicationFifo outFifo = out.fifo();
+			if (!outFifo.hasRoom(1)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public BroadcastActor(String id, Actor actor) {
 		super(id, actor);
 		outports = new ArrayList<Port>();
@@ -60,16 +70,13 @@ public class BroadcastActor extends AbstractInterpretedActor {
 	public Integer schedule() {
 		ICommunicationFifo inFifo = inport.fifo();
 		Object[] inData = new Object[1];
-		Integer running=0;		
-		
-		while (inFifo.hasTokens(1)) {
+		Integer running=0;
+		while (inFifo.hasTokens(1) && HasTokenOnOutputs(outports)) {
 			running=1;
 			inFifo.get(inData);
 			for (Port out : outports) {
 				ICommunicationFifo outFifo = out.fifo();
-				if (outFifo.hasRoom(1)) {
-					outFifo.put(inData);
-				}
+				outFifo.put(inData);
 			}
 		}
 
