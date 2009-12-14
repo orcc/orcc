@@ -36,7 +36,7 @@ import java.util.Map;
  * information of an action is decoupled from its body. This is why an action
  * has a "scheduler" and a body.
  * 
- * @author Matthieu Wipliez
+ * @author Matthieu Wipliez, Samuel Keller
  * 
  */
 public class Action extends AbstractLocalizable {
@@ -125,8 +125,11 @@ public class Action extends AbstractLocalizable {
 		return tag;
 	}
 
-	@Override
-	public String toString() {
+	/**
+	 * Returns action name (tag or body name)
+	 * @return action name
+	 */
+	public String getName() {
 		if (tag.isEmpty()) {
 			return body.getName();
 		} else {
@@ -138,6 +141,11 @@ public class Action extends AbstractLocalizable {
 			str += tag.get(tag.size() - 1);
 			return str;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 }

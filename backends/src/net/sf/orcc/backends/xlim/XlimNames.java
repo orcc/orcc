@@ -91,7 +91,7 @@ public class XlimNames {
 	 * @return Formatted name
 	 */
 	private String getPortName(Use use, String actionName) {
-		return "port_" + use.toString() + "_" + actionName;
+		return "port_" + use.getVariable().getName() + "_" + actionName;
 	}
 
 	/**

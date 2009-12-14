@@ -173,7 +173,7 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate, Xli
 	 */
 	public void visit(IntExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root,
-				LITINT, expr.toString());
+				LITINT, Integer.toString(expr.getValue()));
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), INT,
 				expr.getValue());
 		// TODO Add size

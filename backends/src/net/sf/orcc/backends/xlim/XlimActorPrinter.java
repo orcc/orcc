@@ -125,7 +125,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 *            Action to add
 	 */
 	private void addAction(Action action) {
-		String actionName = action.toString();
+		String actionName = action.getName();
 
 		Element actionE = XlimNodeTemplate.newModule(root, ACTION, FALSE,
 				actionName);
@@ -148,7 +148,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	private void addActions(Actor actor) {
 		for (Action action : actor.getActions()) {
 			for (Port oport : action.getOutputPattern().keySet()) {
-				names.getVarName(oport, action.toString());
+				names.getVarName(oport, action.getName());
 			}
 			addAction(action);
 		}
@@ -167,7 +167,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 		// Inputs
 
 		Element guardE = XlimNodeTemplate.newDiffOperation(body, AND);
-		String name = action.toString();
+		String name = action.getName();
 
 		Map<Port, Integer> input = action.getInputPattern();
 		for (Entry<Port, Integer> entry : input.entrySet()) {
@@ -366,7 +366,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 */
 	private Element[] addScheduler(Action action, String initialguard,
 			String finalfire, Element base) {
-		String actionname = action.toString();
+		String actionname = action.getName();
 		String guard = "guard_" + actionname;
 		String fire = "fire_" + actionname;
 
@@ -532,9 +532,10 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 					Object[] value = (Object[]) stateVar.getValue();
 					for (Object obj : value) {
 						if (obj != null) {
-							init2.setAttribute(VALUE, obj.toString());
+							Element el = XlimNodeTemplate.newInitValue(init2);
+							el.setAttribute(VALUE, obj.toString());
 							((ListType) state.getType()).getElementType()
-									.accept(new XlimTypeSizeVisitor(init2));
+									.accept(new XlimTypeSizeVisitor(el));
 						}
 					}
 					if (value[0] == null) {
@@ -570,7 +571,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 */
 	private Element addTransition(Transition transition,
 			NextStateInfo nextState, Element base) {
-		String actionname = nextState.getAction().toString();
+		String actionname = nextState.getAction().getName();
 		String initialname = "fsm" + transition.getSourceState();
 		String finalname = "fsm" + nextState.getTargetState();
 		String initialguard = initialname + "_guard_" + actionname;

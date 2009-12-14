@@ -94,7 +94,7 @@ public class XlimValueVisitor implements ConstantVisitor, XlimAttributeTemplate 
 	 */
 	public void visit(IntConst constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		element.setAttribute(VALUE, constant.toString());
+		element.setAttribute(VALUE, Integer.toString(constant.getValue()));
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class XlimValueVisitor implements ConstantVisitor, XlimAttributeTemplate 
 	 */
 	public void visit(StringConst constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		element.setAttribute(VALUE, constant.toString());
+		element.setAttribute(VALUE, constant.getValue());
 	}
 
 }
