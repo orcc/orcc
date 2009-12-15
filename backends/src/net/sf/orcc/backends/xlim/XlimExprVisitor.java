@@ -52,7 +52,8 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller
  */
-public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate, XlimOperationTemplate {
+public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
+		XlimOperationTemplate {
 
 	/**
 	 * Binary operators XLIM mapping
@@ -157,10 +158,9 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate, Xli
 	 *            Arguments sent (not used)
 	 */
 	public void visit(BoolExpr expr, Object... args) {
-		Element operationE = XlimNodeTemplate.newValueOperation(root,
-				LITINT, expr.getValue() ? "1" : "0");
-		XlimNodeTemplate
-				.newOutPort(operationE, names.putTempName(), "1", INT);
+		Element operationE = XlimNodeTemplate.newValueOperation(root, LITINT,
+				expr.getValue() ? "1" : "0");
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), "1", INT);
 	}
 
 	/**
@@ -172,11 +172,10 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate, Xli
 	 *            Arguments sent (not used)
 	 */
 	public void visit(IntExpr expr, Object... args) {
-		Element operationE = XlimNodeTemplate.newValueOperation(root,
-				LITINT,
+		Element operationE = XlimNodeTemplate.newValueOperation(root, LITINT,
 				Integer.toString(expr.getValue()));
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), INT,
-				expr.getValue());
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), INT, expr
+				.getValue());
 	}
 
 	/**
