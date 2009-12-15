@@ -38,9 +38,15 @@ import net.sf.orcc.ir.Port;
 public class BroadcastActor extends AbstractInterpretedActor {
 
 	private Port inport;
+
 	private List<Port> outports;
-	
-	private static boolean HasTokenOnOutputs(List<Port> outports) {
+
+	public BroadcastActor(String id, Actor actor) {
+		super(id, actor);
+		outports = new ArrayList<Port>();
+	}
+
+	private boolean hasRoom(List<Port> outports) {
 		for (Port out : outports) {
 			ICommunicationFifo outFifo = out.fifo();
 			if (!outFifo.hasRoom(1)) {
@@ -50,18 +56,6 @@ public class BroadcastActor extends AbstractInterpretedActor {
 		return true;
 	}
 
-	public BroadcastActor(String id, Actor actor) {
-		super(id, actor);
-		outports = new ArrayList<Port>();
-	}
-
-	public void setInport(Port inport) {
-		this.inport = inport;
-	}
-	public void setOutport(Port outport) {
-		this.outports.add(outport);
-	}
-	
 	@Override
 	public void initialize() {
 	}
@@ -70,9 +64,9 @@ public class BroadcastActor extends AbstractInterpretedActor {
 	public Integer schedule() {
 		ICommunicationFifo inFifo = inport.fifo();
 		Object[] inData = new Object[1];
-		Integer running=0;
-		while (inFifo.hasTokens(1) && HasTokenOnOutputs(outports)) {
-			running=1;
+		Integer running = 0;
+		while (inFifo.hasTokens(1) && hasRoom(outports)) {
+			running = 1;
 			inFifo.get(inData);
 			for (Port out : outports) {
 				ICommunicationFifo outFifo = out.fifo();
@@ -81,6 +75,14 @@ public class BroadcastActor extends AbstractInterpretedActor {
 		}
 
 		return running;
+	}
+
+	public void setInport(Port inport) {
+		this.inport = inport;
+	}
+
+	public void setOutport(Port outport) {
+		this.outports.add(outport);
 	}
 
 }
