@@ -40,7 +40,7 @@ public class SourceActor extends AbstractInterpretedActor {
 
 	private CommunicationFifo fifo_O;
 	private RandomAccessFile in;
-
+	
 	public SourceActor(String id, Actor actor, String inputBitstream) {
 		super(id, actor);
 		fileName = inputBitstream;
@@ -77,6 +77,18 @@ public class SourceActor extends AbstractInterpretedActor {
 			throw new RuntimeException(msg, e);
 		}
 		return running;
+	}
+	
+
+	@Override
+	public void close() {
+		try {
+			if (in != null) {
+				in.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

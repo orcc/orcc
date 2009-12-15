@@ -77,6 +77,10 @@ public class BroadcastActor extends AbstractInterpretedActor {
 		return running;
 	}
 
+	@Override
+	public void close() {
+	}
+	
 	public void setInport(Port inport) {
 		this.inport = inport;
 	}

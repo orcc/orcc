@@ -58,7 +58,8 @@ public class DisplayActor extends AbstractInterpretedActor {
 		}
 	}
 
-	public static void closeDisplay() {
+	@Override
+	public void close() {
 		if (instance != null) {
 			instance.frame.dispose();
 		}
@@ -76,6 +77,8 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 		return (r << 16) | (g << 8) | b;
 	}
+
+	private boolean userInterruption;
 
 	private BufferStrategy buffer;
 
@@ -114,12 +117,16 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				System.out.println("Display closed after "+numImages+" images");
+				System.out.println("Display closed after " + numImages
+						+ " images");
+				// Indicate the end of interpretation (will be returned to main
+				userInterruption = true;
 			}
 
 		});
 
 		instance = this;
+		userInterruption = false;
 	}
 
 	@Override
@@ -133,6 +140,10 @@ public class DisplayActor extends AbstractInterpretedActor {
 	@Override
 	public Integer schedule() {
 		int running = 0;
+
+		if (userInterruption) {
+			return -1;
+		}
 
 		if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
 			setVideoSize();

@@ -32,11 +32,10 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 
 /**
  * 
- * @author Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez / Pierre-Laurent Lagalaye
  * 
  */
 public class OrccSimuLaunchConfigurationTabGroup extends
@@ -46,7 +45,7 @@ public class OrccSimuLaunchConfigurationTabGroup extends
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
 				new SimuSettingsTab(), new ParametersTab(), new OptionsTab(),
-				new SourceLookupTab(), new CommonTab() };
+				new CommonTab() };
 		setTabs(tabs);
 	}
 

@@ -288,4 +288,8 @@ public class InterpretedActor extends AbstractInterpretedActor {
 //		return 0;
 	}
 
+	@Override
+	public void close() {
+		// Nothing to do when terminating interpretation
+	}
 }

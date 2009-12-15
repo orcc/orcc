@@ -23,4 +23,6 @@ public abstract class AbstractInterpretedActor {
 		return 0;
 	}
 
+	public void close() {
+	}
 }

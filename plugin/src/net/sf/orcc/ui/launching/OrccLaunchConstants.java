@@ -42,11 +42,6 @@ public interface OrccLaunchConstants {
 	public static final String BACKEND = "net.sf.orcc.backend";
 
 	/**
-	 * Orcc debug configuration type.
-	 */
-	public static final String DEBUG_CONFIG_TYPE = "net.sf.orcc.debugLaunchConfigurationType";
-
-	/**
 	 * When set, Orcc frontend will be launched in debug mode.
 	 */
 	public static final String DEBUG_MODE = "net.sf.orcc.debugMode";
@@ -116,10 +111,15 @@ public interface OrccLaunchConstants {
 	 * Orcc run configuration type.
 	 */
 	public static final String RUN_CONFIG_TYPE = "net.sf.orcc.runLaunchConfigurationType";
+	
+	/**
+	 * Orcc simulation configuration type.
+	 */
+	public static final String SIMULATION_CONFIG_TYPE = "net.sf.orcc.simuLaunchConfigurationType";
 
 	/**
-	 * Input bitstream file associated with an Orcc configuration.
+	 * Input stimulus file associated with an Orcc configuration.
 	 */
-	public static final String INPUT_BITSTREAM = "net.sf.orcc.inputBitstream";
+	public static final String INPUT_STIMULUS = "net.sf.orcc.inputStimulus";
 
 }

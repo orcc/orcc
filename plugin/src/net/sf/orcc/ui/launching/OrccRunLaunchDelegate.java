@@ -41,14 +41,12 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.ui.OrccActivator;
@@ -61,13 +59,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.ui.DebugUITools;
@@ -83,54 +77,6 @@ import org.osgi.framework.Bundle;
  * 
  */
 public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
-
-	private class DebugListener implements IDebugEventSetListener {
-
-		private Semaphore sem;
-
-		public DebugListener(Semaphore sem) {
-			this.sem = sem;
-		}
-
-		@Override
-		public void handleDebugEvents(DebugEvent[] events) {
-			for (DebugEvent event : events) {
-				Object source = event.getSource();
-				if (source instanceof IProcess) {
-					IProcess process = (IProcess) source;
-					handleProcessEvent(process, event.getKind());
-				}
-			}
-		}
-
-		private void handleProcessEvent(IProcess process, int kind) {
-			ILaunch launch = process.getLaunch();
-			ILaunchConfiguration configuration = launch
-					.getLaunchConfiguration();
-			try {
-				ILaunchConfigurationType type = configuration.getType();
-				String id = type.getIdentifier();
-				if (RUN_CONFIG_TYPE.equals(id)) {
-					// the process belongs to a launch created from an Orcc
-					// configuration
-					if (kind == DebugEvent.TERMINATE) {
-						if (process.isTerminated()) {
-							DebugPlugin.getDefault().removeDebugEventListener(
-									this);
-							sem.release();
-						}
-					}
-				}
-			} catch (CoreException e) {
-				// not much we can do about it :/
-				e.printStackTrace();
-
-				// assume the worst, will abort the launch
-				DebugPlugin.getDefault().removeDebugEventListener(this);
-				sem.release();
-			}
-		}
-	}
 
 	private IOConsole console;
 
@@ -293,10 +239,6 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 	 */
 	private int launchFrontend(String name, ILaunch launch,
 			IProgressMonitor monitor, String[] cmdLine) throws CoreException {
-		Semaphore sem = new Semaphore(0);
-		DebugListener listener = new DebugListener(sem);
-		DebugPlugin.getDefault().addDebugEventListener(listener);
-
 		monitor.beginTask("Compiling dataflow program", 2);
 		monitor.subTask("Launching frontend...");
 
@@ -305,23 +247,11 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 
 		createConsole(proc);
 
-		// wait for the launch to terminate.
 		try {
-			sem.acquire();
+			return process.waitFor();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			return -1;
 		}
-		monitor.worked(1);
-
-		if (proc.isTerminated()) {
-			try {
-				return proc.getExitValue();
-			} catch (DebugException e) {
-				// will not happen because the process is terminated
-			}
-		}
-
-		return -1;
 	}
 
 	/**

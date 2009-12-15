@@ -14,8 +14,9 @@
       <launchConfigurationType
             delegate="net.sf.orcc.ui.launching.OrccSimuLaunchDelegate"
             id="net.sf.orcc.simuLaunchConfigurationType"
-            modes="debug"
-            name="Orcc simulation">
+            modes="debug, run"
+            name="Orcc simulation"
+            public="true">
       </launchConfigurationType>
    </extension>
    <extension
@@ -54,13 +55,13 @@
             icon="icons/orcc_simu.gif"
             id="net.sf.orcc.simuLaunchShortcut"
             label="Orcc simulation"
-            modes="debug">
+            modes="run">
          <configurationType
                id="net.sf.orcc.simuLaunchConfigurationType">
          </configurationType>
          <description
                description="Simulates a dataflow program with Orcc"
-               mode="debug">
+               mode="debug, run">
          </description>
          <contextualLaunch>
             <enablement>
@@ -95,6 +96,9 @@
             description="Simulates a dataflow program with Orcc."
             id="net.sf.orcc.simuLaunchConfigurationTabGroup"
             type="net.sf.orcc.simuLaunchConfigurationType">
+         <launchMode
+               mode="run">
+         </launchMode>
          <launchMode
                mode="debug">
          </launchMode>

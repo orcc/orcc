@@ -28,10 +28,6 @@
  */
 package net.sf.orcc.interpreter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,8 +74,8 @@ public class InterpreterMain {
 	protected String path;
 	private List<AbstractInterpretedActor> actorQueue;
 
-	private FileOutputStream fos;
-	private OutputStreamWriter out;
+	// private FileOutputStream fos;
+	// private OutputStreamWriter out;
 
 	private InterpreterMain() {
 	}
@@ -104,14 +100,14 @@ public class InterpreterMain {
 		HashMap<String, BroadcastActor> bcastMap = new HashMap<String, BroadcastActor>();
 
 		// Create network communication tracing file
-		File file = new File(fileName).getParentFile();
-		try {
-			fos = new FileOutputStream(new File(file, "traces.txt"));
-			out = new OutputStreamWriter(fos, "UTF-8");
-		} catch (FileNotFoundException e) {
-			String msg = "file not found: \"" + fileName + "\"";
-			throw new RuntimeException(msg, e);
-		}
+		// File file = new File(fileName).getParentFile();
+		// try {
+		// fos = new FileOutputStream(new File(file, "traces.txt"));
+		// out = new OutputStreamWriter(fos, "UTF-8");
+		// } catch (FileNotFoundException e) {
+		// String msg = "file not found: \"" + fileName + "\"";
+		// throw new RuntimeException(msg, e);
+		// }
 
 		// get network graph
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
@@ -142,7 +138,7 @@ public class InterpreterMain {
 				// actors
 				CommunicationFifo fifo;
 				if (tgtInst.getId().equals("display")) {
-					fifo = new CommunicationFifo(size, out);
+					fifo = new CommunicationFifo(size, null);
 				} else {
 					fifo = new CommunicationFifo(size, null);
 				}
@@ -227,6 +223,20 @@ public class InterpreterMain {
 		// Call network scheduler main function
 		scheduler();
 
+		// Call network closing main function
+		close();
+
+		System.out.println("Interpretation ended");
+
+		// if (out!=null) {
+		// out.close();
+		// }
+		// if (out!=null) {
+		// fos.close();
+		// }
+		// if (out!=null) {
+		// file.delete();
+		// }
 	}
 
 	/**
@@ -254,10 +264,25 @@ public class InterpreterMain {
 			running = 0;
 			for (AbstractInterpretedActor actor : actorQueue) {
 				// System.out.println("Schedule actor " + actor.getName());
-				running += actor.schedule();
+				Integer actorStatus = actor.schedule();
+				if (actorStatus < 0) {
+					running = 0;
+					break;
+				} else {
+					running += actorStatus;
+				}
 			}
 		}
-		System.out.println("Interpretation ended");
 	}
 
+	/**
+	 * Ask each network actor for closing
+	 * 
+	 */
+	private void close() {
+		// close actors of the network
+		for (AbstractInterpretedActor actor : actorQueue) {
+			actor.close();
+		}
+	}
 }
