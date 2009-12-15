@@ -80,14 +80,14 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 	private String actionName;
 
 	/**
-	 * Names templates
-	 */
-	private XlimNames names;
-
-	/**
 	 * Vector of inputs names
 	 */
 	private Vector<String> inputs;
+
+	/**
+	 * Names templates
+	 */
+	private XlimNames names;
 
 	/**
 	 * Root element where to add everything

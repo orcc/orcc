@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.xlim;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -82,6 +81,11 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 		XlimElementTemplate {
 
 	/**
+	 * Fire count
+	 */
+	private static int fcount = 0;
+
+	/**
 	 * Index count
 	 */
 	private static int icount = 0;
@@ -90,11 +94,6 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 * Outval count
 	 */
 	private static int ocount = 0;
-
-	/**
-	 * Fire count
-	 */
-	private static int fcount = 0;
 
 	/**
 	 * XLIM naming
@@ -685,16 +684,8 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 			os = new FileOutputStream(file);
 			DomUtil.writeDocument(os, xlim);
 			os.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (OrccException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 }

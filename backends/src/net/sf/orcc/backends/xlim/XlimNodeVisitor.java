@@ -50,7 +50,8 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModuleTemplate, XlimOperationTemplate {
+public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
+		XlimModuleTemplate, XlimOperationTemplate {
 
 	/**
 	 * Current action name
@@ -58,14 +59,14 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModul
 	private String actionName;
 
 	/**
-	 * Names templates
-	 */
-	private XlimNames names;
-
-	/**
 	 * Vector of inputs names
 	 */
 	private Vector<String> inputs;
+
+	/**
+	 * Names templates
+	 */
+	private XlimNames names;
 
 	/**
 	 * Root element where to add everything
@@ -118,7 +119,14 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate, XlimModul
 		this.writeMap = writeMap;
 	}
 
-	@Override
+	/**
+	 * Add block node
+	 * 
+	 * @param node
+	 *            Block node to add
+	 * @param args
+	 *            Arguments sent (not used)
+	 */
 	public void visit(BlockNode node, Object... args) {
 		XlimInstructionVisitor iv = new XlimInstructionVisitor(names, root,
 				actionName, inputs, writeMap);

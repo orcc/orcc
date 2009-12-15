@@ -173,10 +173,10 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate, Xli
 	 */
 	public void visit(IntExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root,
-				LITINT, Integer.toString(expr.getValue()));
+				LITINT,
+				Integer.toString(expr.getValue()));
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), INT,
 				expr.getValue());
-		// TODO Add size
 	}
 
 	/**
@@ -214,9 +214,6 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate, Xli
 	 *            Arguments sent (not used)
 	 */
 	public void visit(UnaryExpr expr, Object... args) {
-		System.out.println("CHECK UNARY EXPR");
-		// TODO Auto-generated method stub
-
 		expr.getExpr().accept(this, root);
 
 		Element operationE = XlimNodeTemplate.newOperation(root, uopString

@@ -99,12 +99,6 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 */
 	public void visit(ListType type) {
 		element.setAttribute(TYPENAME, LIST);
-		/*
-		 * try {
-		 * element.setAttribute(XlimNodeTemplate.SIZE,"SIZE"+Util.evaluateAsInteger(type.getSize
-		 * ())); } catch (OrccException e) { // TODO Auto-generated catch block
-		 * e.AddStackTrace(); }
-		 */
 	}
 
 	/**
@@ -115,7 +109,6 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 */
 	public void visit(StringType type) {
 		element.setAttribute(TYPENAME, STRING);
-		// TODO Auto-generated method stub
 
 	}
 
