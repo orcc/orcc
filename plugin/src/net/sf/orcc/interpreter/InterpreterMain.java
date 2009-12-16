@@ -49,6 +49,7 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -73,20 +74,17 @@ public class InterpreterMain {
 	protected int fifoSize;
 	protected String path;
 	private List<AbstractInterpretedActor> actorQueue;
-
-	// private FileOutputStream fos;
-	// private OutputStreamWriter out;
+	private List<CommunicationFifo> fifoList;
 
 	private InterpreterMain() {
 	}
 
-	public void interpretNetwork(String fileName, String inputBitstream,
+	public void interpretNetwork(boolean enableTraces,
+			IProgressMonitor monitor, String fileName, String inputBitstream,
 			int fifoSize) throws Exception {
 
 		// set FIFO size
 		this.fifoSize = fifoSize;
-
-		System.out.println("Starting interpretation");
 
 		// Parses top network
 		Network network = new XDFParser(fileName).parseNetwork();
@@ -99,21 +97,12 @@ public class InterpreterMain {
 		// Prepare an hash table for creating broadcast interpreted actors
 		HashMap<String, BroadcastActor> bcastMap = new HashMap<String, BroadcastActor>();
 
-		// Create network communication tracing file
-		// File file = new File(fileName).getParentFile();
-		// try {
-		// fos = new FileOutputStream(new File(file, "traces.txt"));
-		// out = new OutputStreamWriter(fos, "UTF-8");
-		// } catch (FileNotFoundException e) {
-		// String msg = "file not found: \"" + fileName + "\"";
-		// throw new RuntimeException(msg, e);
-		// }
-
 		// get network graph
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
 
 		// connect network actors to FIFOs thanks to their port names
 		Set<Connection> connections = graph.edgeSet();
+		fifoList = new ArrayList<CommunicationFifo>();
 		for (Connection connection : connections) {
 			Vertex srcVertex = graph.getEdgeSource(connection);
 			Vertex tgtVertex = graph.getEdgeTarget(connection);
@@ -136,17 +125,15 @@ public class InterpreterMain {
 
 				// create the communication FIFO between source and target
 				// actors
-				CommunicationFifo fifo;
-				if (tgtInst.getId().equals("display")) {
-					fifo = new CommunicationFifo(size, null);
-				} else {
-					fifo = new CommunicationFifo(size, null);
-				}
-				// connect source actor to the FIFO
 				Port srcPort = connection.getSource();
+				Port tgtPort = connection.getTarget();
+				CommunicationFifo fifo = new CommunicationFifo(size,
+						enableTraces, fileName, tgtInst.getId() + "_"
+								+ tgtPort.getName());
+				fifoList.add(fifo);
+				// connect source actor to the FIFO
 				if (srcPort != null) {
 					srcPort.bind(fifo);
-					fifo.setSource(srcPort);
 					if (srcInst.isBroadcast()) {
 						// Broadcast actor to be explicitly connected to its
 						// port
@@ -161,10 +148,8 @@ public class InterpreterMain {
 					}
 				}
 				// connect target actor to the FIFO
-				Port tgtPort = connection.getTarget();
 				if (tgtPort != null) {
 					tgtPort.bind(fifo);
-					fifo.setTarget(tgtPort);
 					if (tgtInst.isBroadcast()) {
 						// Broadcast actor to be explicitly connected to its
 						// ports
@@ -221,22 +206,10 @@ public class InterpreterMain {
 		initialize();
 
 		// Call network scheduler main function
-		scheduler();
+		scheduler(monitor);
 
 		// Call network closing main function
 		close();
-
-		System.out.println("Interpretation ended");
-
-		// if (out!=null) {
-		// out.close();
-		// }
-		// if (out!=null) {
-		// fos.close();
-		// }
-		// if (out!=null) {
-		// file.delete();
-		// }
 	}
 
 	/**
@@ -256,7 +229,7 @@ public class InterpreterMain {
 	 * 
 	 * @throws Exception
 	 */
-	private void scheduler() throws Exception {
+	private void scheduler(IProgressMonitor monitor) throws Exception {
 
 		int running = 1;
 		// While at least one actor is running
@@ -265,9 +238,8 @@ public class InterpreterMain {
 			for (AbstractInterpretedActor actor : actorQueue) {
 				// System.out.println("Schedule actor " + actor.getName());
 				Integer actorStatus = actor.schedule();
-				if (actorStatus < 0) {
-					running = 0;
-					break;
+				if ((actorStatus < 0) || (monitor.isCanceled())) {
+					return;
 				} else {
 					running += actorStatus;
 				}
@@ -283,6 +255,10 @@ public class InterpreterMain {
 		// close actors of the network
 		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.close();
+		}
+		// Close network FIFOs
+		for (CommunicationFifo fifo : fifoList) {
+			fifo.close();
 		}
 	}
 }

@@ -28,10 +28,13 @@
  */
 package net.sf.orcc.interpreter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+
 import net.sf.orcc.ir.ICommunicationFifo;
-import net.sf.orcc.ir.Port;
 
 /**
  * A FIFO of object arrays for exchanging data between actors.
@@ -46,52 +49,87 @@ public class CommunicationFifo implements ICommunicationFifo {
 	private int size;
 	private int readPos;
 	private int writePos;
-	private Port srcPort;
-	private Port tgtPort;
+	private FileOutputStream fos;
 	private OutputStreamWriter out;
 
-	public CommunicationFifo(int size, OutputStreamWriter out) {
-		this.out = out;
+	public CommunicationFifo(int size, boolean enableTraces, String fileName,
+			String fifoName) throws Exception {
 		this.size = size;
 		queue = new Object[size];
-	}
-	
-	public void setSource(Port srcPort) {
-		this.srcPort = srcPort;
-	}
-	public void setTarget(Port tgtPort) {
-		this.tgtPort = tgtPort;
+		// Create network communication tracing file
+		if (enableTraces) {
+			File file = new File(fileName).getParentFile();
+			try {
+				fos = new FileOutputStream(new File(file, fifoName
+						+ "_traces.txt"));
+				this.out = new OutputStreamWriter(fos, "UTF-8");
+			} catch (FileNotFoundException e) {
+				String msg = "file not found: \"" + fileName + "\"";
+				throw new RuntimeException(msg, e);
+			}
+		} else {
+			fos = null;
+			out = null;
+		}
 	}
 
 	public boolean hasRoom(int n) {
 		if (readPos > writePos) {
-			return readPos - writePos > n;
+			return (readPos - writePos) > n;
 		}
-		return size - writePos + readPos > n;
+		return (size - writePos + readPos) > n;
 	}
 
 	public boolean hasTokens(int n) {
 		if (writePos >= readPos) {
-			return  writePos - readPos >= n;
+			return (writePos - readPos) >= n;
 		} else {
-			return size - readPos + writePos >= n;
+			return (size - readPos + writePos) >= n;
 		}
 	}
-	
+
 	public void get(Object[] target) {
 		if (readPos + target.length <= size) {
 			System.arraycopy(queue, readPos, target, 0, target.length);
-			readPos += target.length; 
-		}else {
+			readPos += target.length;
+			if (readPos == size) {
+				readPos=0;
+			}
+		} else {
 			System.arraycopy(queue, readPos, target, 0, size - readPos);
-			System.arraycopy(queue, 0, target, size - readPos, target.length + readPos - size);
-			readPos=target.length + readPos - size ;
+			System.arraycopy(queue, 0, target, size - readPos, target.length
+					+ readPos - size);
+			readPos = target.length + readPos - size;
+		}
+	}
+
+	public void peek(Object[] target) {
+		if (readPos + target.length <= size) {
+			System.arraycopy(queue, readPos, target, 0, target.length);
+		} else {
+			System.arraycopy(queue, readPos, target, 0, size - readPos);
+			System.arraycopy(queue, 0, target, size - readPos, target.length
+					+ readPos - size);
+		}
+	}
+
+	public void put(Object[] source) {
+		if (writePos + source.length <= size) {
+			System.arraycopy(source, 0, queue, writePos, source.length);
+			writePos += source.length;
+			if (writePos == size) {
+				writePos=0;
+			}
+		} else {
+			System.arraycopy(source, 0, queue, writePos, size - writePos);
+			System.arraycopy(source, size - writePos, queue, 0, source.length
+					+ writePos - size);
+			writePos = source.length + writePos - size;
 		}
 		if (out != null) {
 			try {
-				out.write("Get from FIFO "+srcPort.getName()+"_"+tgtPort.getName()+" : \n");
-				for (int i = 0; i < target.length; i++) {
-					out.write(target[i] + " ");
+				for (int i = 0; i < source.length; i++) {
+					out.write(source[i] + "");
 				}
 				out.write("\n");
 				out.flush();
@@ -101,32 +139,17 @@ public class CommunicationFifo implements ICommunicationFifo {
 		}
 	}
 
-	public void peek(Object[] target) {
-		if (readPos + target.length <= size) {
-			System.arraycopy(queue, readPos, target, 0, target.length);
-		}else {
-			System.arraycopy(queue, readPos, target, 0, size - readPos);
-			System.arraycopy(queue, 0, target, size - readPos, target.length + readPos - size);
-		}
-	}
-
-	public void put(Object[] source) {
-		if (writePos + source.length <= size) {
-			System.arraycopy(source, 0, queue, writePos, source.length);
-			writePos += source.length;
-		}else {
-			System.arraycopy(source, 0, queue, writePos, size - writePos);
-			System.arraycopy(source, size - writePos, queue, 0, source.length + writePos - size);
-			writePos = source.length + writePos - size;
-		}
+	public void close() {
 		if (out != null) {
 			try {
-				out.write("Put to FIFO "+srcPort.getName()+"_"+tgtPort.getName()+" : \n");
-				for (int i = 0; i < source.length; i++) {
-					out.write(source[i] + "");
-				}
-				out.write("\n");
-				out.flush();
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if (fos != null) {
+			try {
+				fos.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

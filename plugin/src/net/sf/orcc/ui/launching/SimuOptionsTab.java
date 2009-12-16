@@ -34,8 +34,10 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DOT_CFG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_KEEP;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_TRACES;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DOT_CFG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_CACHE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import net.sf.orcc.ui.OrccActivator;
@@ -43,12 +45,7 @@ import net.sf.orcc.ui.OrccActivator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -56,77 +53,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * 
- * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
-public class OptionsTab extends AbstractLaunchConfigurationTab {
+public class SimuOptionsTab extends OptionsTab {
 
-	protected Button debugMode;
-
-	protected Button dotCfg;
-
-	protected Button enableCache;
-
-	protected Text fifoSize;
-
-	protected Button keepIntermediate;
-
-	protected void createButton(Font font, Button button, String text,
-			String tooltip) {
-		button.setFont(font);
-		GridData data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		data.horizontalSpan = 2;
-		button.setLayoutData(data);
-		button.setText(text);
-		button.setToolTipText(tooltip);
-		button.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				updateLaunchConfigurationDialog();
-			}
-		});
-	}
+	private Button enableTraces;
 
 	@Override
-	public void createControl(Composite parent) {
-		Font font = parent.getFont();
-
-		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setFont(font);
-		GridLayout layout = new GridLayout();
-		layout.verticalSpacing = 0;
-		composite.setLayout(layout);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		composite.setLayoutData(data);
-		setControl(composite);
-
-		createGroup(font, composite);
-	}
-
-	protected void createFifoSize(Font font, Group group) {
-		Label label = new Label(group, SWT.NONE);
-		label.setFont(font);
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
-		label.setLayoutData(data);
-		label.setText("Default FIFO size: ");
-
-		fifoSize = new Text(group, SWT.BORDER | SWT.SINGLE);
-		fifoSize.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, true);
-		fifoSize.setLayoutData(data);
-		fifoSize.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				updateLaunchConfigurationDialog();
-			}
-		});
-	}
-
 	protected void createGroup(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
@@ -148,17 +85,20 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 		dotCfg = new Button(group, SWT.CHECK);
 		createButton(font, dotCfg, "Print CFG information",
 				"Prints DOT files showing CFG information.");
+		enableTraces = new Button(group, SWT.CHECK);
+		createButton(font, enableTraces, "Enable traces",
+				"Activates traces when simulating.");
 		createFifoSize(font, group);
 	}
 
 	@Override
 	public Image getImage() {
-		return OrccActivator.getImage("icons/orcc_run.gif");
+		return OrccActivator.getImage("icons/orcc_simu.gif");
 	}
 
 	@Override
 	public String getName() {
-		return "Compilation options";
+		return "Simulation options";
 	}
 
 	@Override
@@ -178,36 +118,15 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 			selected = configuration.getAttribute(DOT_CFG, DEFAULT_DOT_CFG);
 			dotCfg.setSelection(selected);
 
+			selected = configuration
+					.getAttribute(ENABLE_TRACES, DEFAULT_TRACES);
+			enableTraces.setSelection(selected);
+
 			int size = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			fifoSize.setText(Integer.toString(size));
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public boolean isValid(ILaunchConfiguration launchConfig) {
-		String value = fifoSize.getText();
-		if (value.isEmpty()) {
-			setErrorMessage("The default FIFO size field must have a value");
-			return false;
-		}
-
-		int size = 0;
-		try {
-			size = Integer.parseInt(value);
-		} catch (NumberFormatException e) {
-			setErrorMessage("The default FIFO size field must contain a valid integer");
-			return false;
-		}
-
-		if (size <= 0) {
-			setErrorMessage("The default FIFO size must be greater than 0");
-			return false;
-		}
-
-		setErrorMessage(null);
-		return true;
 	}
 
 	@Override
@@ -225,6 +144,9 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 			selected = dotCfg.getSelection();
 			configuration.setAttribute(DOT_CFG, selected);
 
+			selected = enableTraces.getSelection();
+			configuration.setAttribute(ENABLE_TRACES, selected);
+
 			String text = fifoSize.getText();
 			configuration.setAttribute(FIFO_SIZE, Integer.parseInt(text));
 		}
@@ -236,6 +158,7 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(ENABLE_CACHE, DEFAULT_CACHE);
 		configuration.setAttribute(KEEP_INTERMEDIATE, DEFAULT_KEEP);
 		configuration.setAttribute(DOT_CFG, DEFAULT_DOT_CFG);
+		configuration.setAttribute(ENABLE_TRACES, DEFAULT_TRACES);
 		configuration.setAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 	}
 

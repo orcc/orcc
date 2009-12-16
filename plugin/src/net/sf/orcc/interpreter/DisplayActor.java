@@ -117,8 +117,8 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				System.out.println("Display closed after " + numImages
-						+ " images");
+//				System.out.println("Display closed after " + numImages
+//						+ " images");
 				// Indicate the end of interpretation (will be returned to main
 				userInterruption = true;
 			}

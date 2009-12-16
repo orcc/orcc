@@ -60,6 +60,11 @@ public interface OrccLaunchConstants {
 	 * Default value for {@value #DOT_CFG}.
 	 */
 	public static final boolean DEFAULT_DOT_CFG = false;
+	
+	/**
+	 * Default value for {@value #ENABLE_TRACES}.
+	 */
+	public static final boolean DEFAULT_TRACES = false;
 
 	/**
 	 * Default value for {@value #FIFO_SIZE}.
@@ -81,6 +86,11 @@ public interface OrccLaunchConstants {
 	 * code was last generated.
 	 */
 	public static final String ENABLE_CACHE = "net.sf.orcc.enableCache";
+
+	/**
+	 * When enabled, interpreter traces each time data is written to (output)FIFO
+	 */
+	public static final String ENABLE_TRACES = "net.sf.orcc.enableTraces";
 
 	/**
 	 * Size of FIFO channels when not specified by the network.
