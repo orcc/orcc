@@ -184,29 +184,35 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 		}
 
 		List<CFGNode> init = action.getScheduler().getNodes();
-		init = ((IfNode) init.get(init.size() - 1)).getThenNodes();
-
-		XlimInstructionVisitor iv = new XlimInstructionVisitor(names, body,
-				"_scheduler_", new Vector<String>(),
-				new TreeMap<String, Element>());
-		Iterator<Instruction> it = ((BlockNode) init.get(0)).getInstructions()
-				.iterator();
-
-		while (it.hasNext()) {
-			Instruction instruction = it.next();
-			if (it.hasNext()) {
-				instruction.accept(iv);
-			} else {
-				String index = "index" + (icount++);
-				String ready = "ready_" + index;
-				Assign assign = ((Assign) instruction);
-
-				assign.getValue().accept(new XlimExprVisitor(names, body));
-				Element operationE = XlimNodeTemplate.newOperation(body, NOOP);
-				XlimNodeTemplate.newInPort(operationE, names.getTempName());
-				XlimNodeTemplate.newOutPort(operationE, ready, assign
-						.getTarget().getType());
-				XlimNodeTemplate.newInPort(guardE, ready);
+		
+		if((init != null)&&(init.get(init.size() - 1) instanceof IfNode)){
+			init = ((IfNode) init.get(init.size() - 1)).getThenNodes();
+			if((init != null)&&(init.size()>0)){
+				XlimInstructionVisitor iv = new XlimInstructionVisitor(names, body,
+						"_scheduler_", new Vector<String>(),
+						new TreeMap<String, Element>());
+				Iterator<Instruction> it = ((BlockNode) init.get(0)).getInstructions()
+						.iterator();
+		
+				while (it.hasNext()) {
+					Instruction instruction = it.next();
+					if (it.hasNext()) {
+						instruction.accept(iv);
+					} else {
+						if(instruction instanceof Assign){
+						String index = "index" + (icount++);
+						String ready = "ready_" + index;
+						Assign assign = ((Assign) instruction);
+		
+						assign.getValue().accept(new XlimExprVisitor(names, body));
+						Element operationE = XlimNodeTemplate.newOperation(body, NOOP);
+						XlimNodeTemplate.newInPort(operationE, names.getTempName());
+						XlimNodeTemplate.newOutPort(operationE, ready, assign
+								.getTarget().getType());
+						XlimNodeTemplate.newInPort(guardE, ready);
+						}
+					}
+				}
 			}
 		}
 

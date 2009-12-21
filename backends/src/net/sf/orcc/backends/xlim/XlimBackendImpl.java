@@ -86,6 +86,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	 *            Actor structure
 	 */
 	protected void printActor(String id, Actor actor) throws Exception {
+		System.out.println("FILE "+id);
 		String outputName = path + File.separator + id + ".xlim";
 		printer.printActor(outputName, actor);
 	}
