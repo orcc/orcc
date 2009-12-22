@@ -268,17 +268,20 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 
 	@Override
 	public void visit(PhiAssignment phi, Object... args) {
-		Element phiE = XlimNodeTemplate.newPHI(root);
-		System.out.println("CHECK PHIS");
-
-		XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars().get(
-				0)), THEN);
-		XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars().get(
-				1)), ELSE);
-
-		Element portO = XlimNodeTemplate.newOutPort(phiE, names.getVarName(phi
-				.getTarget(), actionName), phi.getTarget().getType());
-		phi.getTarget().getType().accept(new XlimTypeSizeVisitor(portO));
+		/*
+		 * Element phiE = XlimNodeTemplate.newPHI(root);
+		 * System.out.println("CHECK PHIS");
+		 * 
+		 * XlimNodeTemplate.newInPHIPort(phiE,
+		 * names.getVarName(phi.getVars().get( 0)), THEN);
+		 * XlimNodeTemplate.newInPHIPort(phiE,
+		 * names.getVarName(phi.getVars().get( 1)), ELSE);
+		 * 
+		 * Element portO = XlimNodeTemplate.newOutPort(phiE,
+		 * names.getVarName(phi .getTarget(), actionName),
+		 * phi.getTarget().getType()); phi.getTarget().getType().accept(new
+		 * XlimTypeSizeVisitor(portO));
+		 */
 	}
 
 	/**

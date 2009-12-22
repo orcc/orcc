@@ -28,15 +28,9 @@
  */
 package net.sf.orcc.backends.xlim;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import net.sf.orcc.backends.xlim.templates.XlimModuleTemplate;
-import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimOperationTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -46,22 +40,17 @@ import net.sf.orcc.ir.nodes.WhileNode;
 import org.w3c.dom.Element;
 
 /**
- * XlimNodeVisitor prints all procedures nodes in XLIM
+ * XlimPhiNodeVisitor prints PHI nodes in XLIM
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
+public class XlimPhiNodeVisitor implements NodeVisitor, XlimTypeTemplate,
 		XlimModuleTemplate, XlimOperationTemplate {
 
 	/**
 	 * Current action name
 	 */
 	private String actionName;
-
-	/**
-	 * Vector of inputs names
-	 */
-	private Vector<String> inputs;
 
 	/**
 	 * Names templates
@@ -72,29 +61,6 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
 	 * Root element where to add everything
 	 */
 	private Element root;
-
-	/**
-	 * Map for output type
-	 */
-	private Map<String, Element> writeMap;
-
-	/**
-	 * XlimNodeVisitor Constructor
-	 * 
-	 * @param names
-	 *            Names templates
-	 * @param root
-	 *            Root element where to add everything
-	 * @param actionName
-	 *            Current action name
-	 */
-	public XlimNodeVisitor(XlimNames names, Element root, String actionName) {
-		this.names = names;
-		this.root = root;
-		this.actionName = actionName;
-		this.inputs = new Vector<String>();
-		this.writeMap = new TreeMap<String, Element>();
-	}
 
 	/**
 	 * XlimNodeVisitor Constructor
@@ -110,13 +76,10 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
 	 * @param writeMap
 	 *            Temporary mapping for outputs
 	 */
-	public XlimNodeVisitor(XlimNames names, Element root, String actionName,
-			Vector<String> inputs, Map<String, Element> writeMap) {
+	public XlimPhiNodeVisitor(XlimNames names, Element root, String actionName) {
 		this.names = names;
 		this.root = root;
 		this.actionName = actionName;
-		this.inputs = inputs;
-		this.writeMap = writeMap;
 	}
 
 	/**
@@ -128,8 +91,8 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
 	 *            Arguments sent (not used)
 	 */
 	public void visit(BlockNode node, Object... args) {
-		XlimInstructionVisitor iv = new XlimInstructionVisitor(names, root,
-				actionName, inputs, writeMap);
+		XlimPhiInstructionVisitor iv = new XlimPhiInstructionVisitor(names,
+				root, actionName);
 		for (Instruction instruction : node) {
 			instruction.accept(iv, args);
 		}
@@ -144,38 +107,6 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
 	 *            Arguments sent (not used)
 	 */
 	public void visit(IfNode node, Object... args) {
-		Element moduleB = XlimNodeTemplate.newModule(root, IF);
-
-		String decision = names.putDecision();
-		Element moduleT = XlimNodeTemplate.newTestModule(moduleB, decision);
-
-		node.getValue().accept(new XlimExprVisitor(names, moduleT));
-
-		Element operationE = XlimNodeTemplate.newOperation(moduleT, NOOP);
-
-		XlimNodeTemplate.newInPort(operationE, names.getTempName());
-
-		XlimNodeTemplate.newOutPort(operationE, decision, "1", BOOL);
-
-		Element moduleY = XlimNodeTemplate.newModule(moduleB, THEN);
-
-		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
-				actionName, inputs, writeMap);
-		for (CFGNode operations : node.getThenNodes()) {
-			operations.accept(visitor);
-		}
-
-		Element moduleN = XlimNodeTemplate.newModule(moduleB, ELSE);
-
-		for (CFGNode operations : node.getElseNodes()) {
-			operations.accept(new XlimNodeVisitor(names, moduleN, actionName,
-					inputs, writeMap));
-		}
-
-		node.getJoinNode().accept(
-				new XlimPhiNodeVisitor(names, moduleB, actionName));
-		node.getJoinNode().accept(
-				new XlimNodeVisitor(names, root, actionName, inputs, writeMap));
 	}
 
 	/**
@@ -187,32 +118,5 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
 	 *            Arguments sent (not used)
 	 */
 	public void visit(WhileNode node, Object... args) {
-		// TODO Wait for "while" example to check this
-		System.out.println("CHECK WHILE");
-
-		Element moduleB = XlimNodeTemplate.newModule(root, LOOP);
-
-		String decision = names.putDecision();
-		Element moduleT = XlimNodeTemplate.newTestModule(moduleB, decision);
-		node.getValue().accept(new XlimExprVisitor(names, moduleT));
-
-		Element operationE = XlimNodeTemplate.newOperation(moduleT, NOOP);
-
-		XlimNodeTemplate.newInPort(operationE, names.getTempName());
-
-		XlimNodeTemplate.newOutPort(operationE, decision, "1", BOOL);
-
-		Element moduleY = XlimNodeTemplate.newModule(moduleB, BODY);
-
-		XlimNodeVisitor visitor = new XlimNodeVisitor(names, moduleY,
-				actionName, inputs, writeMap);
-		for (CFGNode operations : node.getNodes()) {
-			operations.accept(visitor);
-		}
-
-		node.getJoinNode().accept(
-				new XlimPhiNodeVisitor(names, moduleB, actionName));
-		node.getJoinNode().accept(
-				new XlimNodeVisitor(names, root, actionName, inputs, writeMap));
 	}
 }
