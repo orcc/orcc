@@ -181,7 +181,21 @@ let apply_priority_inside ht_actions ht_tags actions (init, transitions) =
 				let to_list =
 					List.sort
 						(fun (a1, _) (a2, _) ->
-							compare (TH.find ht_actions a1.a_tag) (TH.find ht_actions a2.a_tag))
+							let a1_rank =
+								try
+									TH.find ht_actions a1.a_tag
+								with Not_found ->
+									Asthelper.failwith a1.a_body.p_loc
+										("problem with priorities on tag: " ^ (name_of_tag a1.a_tag))
+							in
+							let a2_rank =
+								try
+									TH.find ht_actions a2.a_tag
+								with Not_found ->
+									Asthelper.failwith a2.a_body.p_loc
+										("problem with priorities on tag: " ^ (name_of_tag a2.a_tag))
+							in
+							compare a1_rank a2_rank)
 					to_list
 				in
 				(s_from, to_list) :: transitions)
