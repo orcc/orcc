@@ -155,6 +155,6 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 	end
 	
 	priority
-		ResetNone > Reset.AvailLeft > Reset.AvailTopLeft> Reset.AvailTopLeft;
+		ResetNone > Reset.AvailLeft > Reset.AvailTopLeft;
 	end
 end
