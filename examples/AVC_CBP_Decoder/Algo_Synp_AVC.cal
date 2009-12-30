@@ -537,29 +537,76 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	function done_reading_bits() --> bool : bits_to_read_count < 0 end
 	function read_result() --> int : read_result_in_progress end
 	function more_rbsp_data() --> uint(size=1) : 
-		if (bit_count + 8)/ 8  < val_nb_rbsp_bytes - 1 then 1 else 0 end 
-	end
+		if (bit_count + 8)/ 8  < val_nb_rbsp_bytes - 1 
+			then 1 
+			else 
+				if (8 - (bit_count mod 8) = 8) then
+					if ((bit_read[(bit_count) mod 8]=true) and (bit_read[(bit_count+1) mod 8]=false) and (bit_read[(bit_count+2) mod 8]=false) and (bit_read[(bit_count+3) mod 8]=false)
+						and (bit_read[(bit_count+4) mod 8]=false) and (bit_read[(bit_count+5) mod 8]=false) and (bit_read[(bit_count+6) mod 8]=false)
+						and (bit_read[(bit_count+7) mod 8]=false)) then 0 else 1 end
+				else
+				if (8 - (bit_count mod 8) = 7) then
+					if ((bit_read[(bit_count) mod 8]=true) and (bit_read[(bit_count+1) mod 8]=false) and (bit_read[(bit_count+2) mod 8]=false) and (bit_read[(bit_count+3) mod 8]=false)
+						and (bit_read[(bit_count+4) mod 8]=false) and (bit_read[(bit_count+5) mod 8]=false) and (bit_read[(bit_count+6) mod 8]=false)) 
+						then 0 else 1 end
+				else
+				if (8 - (bit_count mod 8) = 6) then
+					if ((bit_read[(bit_count) mod 8]=true) and (bit_read[(bit_count+1) mod 8]=false) and (bit_read[(bit_count+2) mod 8]=false) and (bit_read[(bit_count+3) mod 8]=false)
+						and (bit_read[(bit_count+4) mod 8]=false) and (bit_read[(bit_count+5) mod 8]=false)) then 0 else 1 end
+				else
+				if (8 - (bit_count mod 8) = 5) then
+					if ((bit_read[(bit_count) mod 8]=true) and (bit_read[(bit_count+1) mod 8]=false) and (bit_read[(bit_count+2) mod 8]=false) and (bit_read[(bit_count+3) mod 8]=false)
+						and (bit_read[(bit_count+4) mod 8]=false)) then 0 else 1 end
+				else
+				if (8 - (bit_count mod 8) = 4) then
+					if ((bit_read[(bit_count) mod 8]=true) and (bit_read[(bit_count+1) mod 8]=false) and (bit_read[(bit_count+2) mod 8]=false) and (bit_read[(bit_count+3) mod 8]=false))
+						then 0 else 1 end
+				else
+				if (8 - (bit_count mod 8) = 3) then
+					if ((bit_read[(bit_count) mod 8]=true) and (bit_read[(bit_count+1) mod 8]=false) and (bit_read[(bit_count+2) mod 8]=false))
+						then 0 else 1 end
+				else			
+				if (8 -(bit_count mod 8) = 2) then
+					if ((bit_read[(bit_count) mod 8]=true) and (bit_read[(bit_count+1) mod 8]=false))
+						then 0 else 1 end
+				else 0 end end end end end end
+				end
+			end
+		end
 	
   
 	function mask_bits( int(size=41)v, int(size=41)n ) --> int :
 		bitand( v, lshift(1,n)-1 )
 	end
-  
-	action bits:[ b ] ==>
+
+	List (type:bool, size=8 ) bit_read:=[0: for int i in Integers(0,7)];
+	int bit_read_cnt:=8;
+
+	action bits:[ b ] repeat 8==>
 	guard 
-		not done_reading_bits()
+		bit_read_cnt=8
 	do
-		read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b = 1 then 1 else 0 end );
+		bit_read_cnt:=0;
+		bit_read:=[(b[i]=1):for int i in Integers(0,7)];
+	end 
+  
+	action /*bits:[ b ]*/ ==>
+	guard 
+		not done_reading_bits(), bit_read_cnt!=8
+	do
+		read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if bit_read[bit_read_cnt] = true then 1 else 0 end );
 		bits_to_read_count := bits_to_read_count - 1;
 		bit_count := bit_count + 1;
+		bit_read_cnt := bit_read_cnt + 1;
 	end
 
-	action bits:[ b ] ==>
+	action /*bits:[ b ]*/ ==>
 	guard
 		NewVLD,
-		First_part
+		First_part,
+		bit_read_cnt!=8
 	do
-		if b = 1 then
+		if bit_read[bit_read_cnt] = true then
 			First_part := false;
 			CodeLen := VLD_Counter;
 			if CodeLen = 0 then NewVLD := false; end
@@ -567,17 +614,20 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			VLD_Counter := VLD_Counter + 1;
 		end
 		bit_count := bit_count + 1;
+		bit_read_cnt := bit_read_cnt + 1;
 	end
   
-	action bits:[ b ] ==>
+	action /*bits:[ b ]*/ ==>
 	guard
 		NewVLD,
-		not First_part
+		not First_part,
+		bit_read_cnt!=8
 	do
 		VLD_Counter := VLD_Counter - 1;
-		Codeword := bitor( lshift( Codeword, 1), if b = 1 then 1 else 0 end);
+		Codeword := bitor( lshift( Codeword, 1), if bit_read[bit_read_cnt] = true then 1 else 0 end);
 		bit_count := bit_count + 1;
 		if   VLD_Counter = 0 then NewVLD := false; end
+		bit_read_cnt := bit_read_cnt + 1;
 	end  
 
 	// ********** Read CAVLC ********** //
@@ -596,12 +646,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	function TrailingOnes() --> uint(size=2) : mask_bits(coeff_token,2) end
 	function Abs(int x) --> uint : if x >= 0 then x else -x end end
 
-	action bits:[ b ] ==>
+	action /*bits:[ b ]*/ ==>
 	guard
-	NewCoeff
+	NewCoeff,
+	bit_read_cnt!=8
 	do
 		VLD_Counter := VLD_Counter + 1;
-		Codeword := bitor( lshift( Codeword, 1), if b = 1 then 1 else 0 end);
+		Codeword := bitor( lshift( Codeword, 1), if bit_read[bit_read_cnt] = true then 1 else 0 end);
 		if CAVLC_type =0 then // coeff_token
 			foreach int i in Integers(0,61) do
 				if nc >=0 and nc < 2 then
@@ -660,6 +711,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 		end
 		bit_count := bit_count + 1;
+		bit_read_cnt:=bit_read_cnt + 1;
 	end
   
 
@@ -2173,25 +2225,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard moreDataFlag = 0
 	end
 
-	read_SliceD_mb_skip_run_done2_stop_crt_1: action bits:[crt_bit] ==>
-	guard
-		crt_bit=1
-	do
-		bit_count:=bit_count+1;
-		if (bit_count mod 8 = 0) then set_bits_to_read(0); else set_bits_to_read(8-bit_count mod 8); end
-	end
-	
-	read_SliceD_mb_skip_run_done2_stop_crt_0: action==>
-	do
-		moreDataFlag:=1;
-	end
-
-
-	read_SliceD_mb_skip_run_done2_stop_byte_align: action==> 
-	guard
-		done_reading_bits()
-	end
-
 	// else if(CABAC && (slice_type != I && slice_type != SI))
 	read_SliceD_mb_skip_flag: action ==>
 	guard
@@ -2285,24 +2318,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	SliceD_moredata_0: action ==>
 	guard moreDataFlag = 0
-	end
-
-	SliceD_stop_crt_1: action bits:[crt_bit]==>
-	guard
-		crt_bit=1
-	do
-		bit_count:=bit_count+1;
-		if (bit_count mod 8 = 0) then set_bits_to_read(0); else set_bits_to_read(8-bit_count mod 8); end
-	end
-	
-	SliceD_stop_crt_0: action ==>
-	do
-		moreDataFlag:=1;
-	end
-
-	SliceD_stop_byte_align: action==> 
-	guard
-		done_reading_bits()
 	end
 
 	//else (CABAC)
@@ -3899,16 +3914,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		read_SliceD_CABAC_alignement						( read_SliceD_CABAC_alignement						) --> read_SliceD_init;
 		read_SliceD_CABAC_alignement						( read_SliceD_skip_CABAC_alignement	                ) --> read_SliceD_init;
 		read_SliceD_init									( SliceD_init										) --> sync_do_mb_layer;
-		sync_do_mb_layer 									( sync_do_mb_layer										) --> read_SliceD_mb_skip;
+		sync_do_mb_layer 									( sync_do_mb_layer									) --> read_SliceD_mb_skip;
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_run							) --> read_SliceD_mb_skip_run_done0;
 		read_SliceD_mb_skip_run_done0						( read_SliceD_mb_skip_run_done0						) --> read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1						) --> read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done2						) --> read_SliceD_mb_skip_run_done2_moredata;
 		read_SliceD_mb_skip_run_done2_moredata              ( read_SliceD_mb_skip_run_done2_moredata_1          ) --> read_SliceD_mb_field_decoding_flag;
-		read_SliceD_mb_skip_run_done2_moredata 				( read_SliceD_mb_skip_run_done2_moredata_0			) --> read_SliceD_mb_skip_run_done2_moredata_0_done;
-		read_SliceD_mb_skip_run_done2_moredata_0_done 		( read_SliceD_mb_skip_run_done2_stop_crt_1			) --> read_SliceD_mb_skip_run_done2_stop_crt_1_done;
-		read_SliceD_mb_skip_run_done2_moredata_0_done 		( read_SliceD_mb_skip_run_done2_stop_crt_0			) --> read_SliceD_mb_field_decoding_flag;
-		read_SliceD_mb_skip_run_done2_stop_crt_1_done		( read_SliceD_mb_skip_run_done2_stop_byte_align     ) --> syncSliceD_endwhile;
+		read_SliceD_mb_skip_run_done2_moredata 				( read_SliceD_mb_skip_run_done2_moredata_0			) --> syncSliceD_endwhile;
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag 							) --> undefined; // CABAC : not yet implemented
 		read_SliceD_mb_skip									( read_SliceD_skip_mb_skip 							) --> read_SliceD_mb_field_decoding_flag;
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_mb_field_decoding_flag				) --> undefined; // interleaved not implemented
@@ -3918,10 +3930,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		SliceD_moredata                                     ( SliceD_moredata_1                                 ) --> SliceD_moredata_1_done;
 		SliceD_moredata_1_done								( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_moredata_1_done								( send_data_position_information	                ) --> syncSliceD_endwhile;
-		SliceD_moredata 									( SliceD_moredata_0									) --> SliceD_moredata_0_done;
-		SliceD_moredata_0_done 								( SliceD_stop_crt_1									) --> SliceD_stop_crt_1_done;
-		SliceD_moredata_0_done 								( SliceD_stop_crt_0									) --> SliceD_stop_byte_align_done;
-		SliceD_stop_crt_1_done								( SliceD_stop_byte_align 							) --> SliceD_stop_byte_align_done;
+		SliceD_moredata 									( SliceD_moredata_0									) --> SliceD_stop_byte_align_done;
 		SliceD_stop_byte_align_done							( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_stop_byte_align_done							( send_data_position_information	                ) --> syncSliceD_endwhile;
 		syncSliceD_endwhile									( syncSliceD_endwhile								) --> SliceD_while_moreDataFlag;
@@ -4083,8 +4092,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		MB_pred_done  > read_MB_pred_mvd_l1 > read_MB_pred_skip_mvd_l1;
 		test_zero_byte > generic_done;
 		test_one_byte  > generic_done;
-		read_SliceD_mb_skip_run_done2_stop_crt_1>read_SliceD_mb_skip_run_done2_stop_crt_0;
-		SliceD_stop_crt_1 > SliceD_stop_crt_0;
 		send_data_position_information_is_ipcm>send_data_position_information;
 	end
 
