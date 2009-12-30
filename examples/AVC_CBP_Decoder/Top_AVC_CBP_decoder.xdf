@@ -21,7 +21,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
         <Parameter name="fname">
-            <Expr kind="Literal" literal-kind="String" value="D:\sequences\AVC\CAVLC\general\AVCNL-3\NL2_Sony_H.jsv"/>
+            <Expr kind="Literal" literal-kind="String" value="D:\Sequences\ipcm.264"/>
         </Parameter>
     </Instance>
     <Instance id="AVCDecoder">
@@ -45,31 +45,13 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
         <Parameter name="height">
-            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+            <Expr kind="Literal" literal-kind="Integer" value="288"/>
         </Parameter>
         <Parameter name="title">
             <Expr kind="Literal" literal-kind="String" value="RVC Display Foreman QCIF"/>
         </Parameter>
         <Parameter name="width">
-            <Expr kind="Literal" literal-kind="Integer" value="176"/>
-        </Parameter>
-    </Instance>
-    <Instance id="Comp">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="CompAVC_To_File"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-        <Parameter name="file">
-            <Expr kind="Literal" literal-kind="String" value="D:\sequences\AVC\CAVLC\general\AVCNL-3\NL2_Sony_H.yuv"/>
-        </Parameter>
-        <Parameter name="height">
-            <Expr kind="Literal" literal-kind="Integer" value="144"/>
-        </Parameter>
-        <Parameter name="width">
-            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+            <Expr kind="Literal" literal-kind="Integer" value="352"/>
         </Parameter>
     </Instance>
     <!-- ************************************** -->
@@ -79,7 +61,4 @@
     <Connection dst="Display" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
     <Connection dst="Display" dst-port="U" src="AVCDecoder" src-port="Display_Cb"/>
     <Connection dst="Display" dst-port="V" src="AVCDecoder" src-port="Display_Cr"/>
-    <Connection dst="Comp" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
-    <Connection dst="Comp" dst-port="V" src="AVCDecoder" src-port="Display_Cr"/>
-    <Connection dst="Comp" dst-port="U" src="AVCDecoder" src-port="Display_Cb"/>
 </XDF>

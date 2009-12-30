@@ -51,8 +51,11 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
+//Modified by Endri Bezati IETR/INSA Rennes
+//Added FSM to the actor
+
 actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
-  uint(size=1) MbIntraFlag, 
+  uint(size=1) MbIntraFlag,
   uint(size=4) IntraPredMode, 
   uint(size=13) CurrMbAddr,
   uint(size=7) PicWidthInMb,
@@ -65,10 +68,11 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
       : 
  
 	//FIXME! number of MB per line of picture
-	int PICWIDTH=45; //number of MB per lines
+	int PICWIDTH=1280/16; //number of MB per lines
 
-  uint(size=2) intratype := 0; // Intra4x4 1, Intra8x8 2, Intra16x16 3
-  uint(size=5) count := 16;
+  uint( size = 2 ) intratype  := 0; // Intra4x4 1, Intra8x8 2, Intra16x16 3
+  uint( size = 3 ) MbTypeProc; 
+  uint(size=5) count := 0;
   uint mb_x:= 0;
   uint pic_w_in_mb;
   uint(size=13) curr_mb;
@@ -82,18 +86,23 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
   do
     intra4x4predmode := [[ 2 : for int j in Integers(0,15)]: for int i in Integers( 0, PICWIDTH - 1)];
   end
+  
+  Get_MbType: action MbIntraFlag : [ t_mb_intra_flag ] ==>
+  do
+  	MbTypeProc := t_mb_intra_flag;	
+  end
+  
     
-  get_intratype.inter: action 
+  get_inter: action 
   					CurrMbAddr: [t_curr_mb],
   					PicWidthInMb: [t_pic_w_in_mb],
-  					MbIntraFlag:[t_mb_intra_flag],
   					FirstMBInSlice:[t_first_mb_in_slice] 
   						==> 
   						Intra_DC_flag:[0],
   						Mb_Type:[2],
   						Mb_TypeC:[2]
   guard
-    t_mb_intra_flag=0 and count >= 16
+    MbTypeProc = 0
   do
     pic_w_in_mb := t_pic_w_in_mb; 
     curr_mb:=t_curr_mb;
@@ -102,30 +111,28 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
     intra4x4predmode[mb_x] := [ 2 : for int j in Integers(0,15)];
   end
     
-  get_intratype.intra: action 
+  get_intratype: action 
   					IntraPredMode:[t_mb_type], 
   					CurrMbAddr: [t_curr_mb],
   					PicWidthInMb: [t_pic_w_in_mb],
-  					MbIntraFlag:[t_mb_intra_flag],
   					FirstMBInSlice:[t_first_mb_in_slice] 
   					==> 
-  						Intra_DC_flag:[ if intratype = 3 then 1 else 0 end ],
-  						Mb_Type:[if intratype = 3 then 1 else 0 end],
-  						Mb_TypeC:[1]
   guard
-    t_mb_intra_flag=1 and count >= 16
+    MbTypeProc = 1 
   do
     intratype := t_mb_type;
     pic_w_in_mb := t_pic_w_in_mb; 
     first_mb_in_slice:=t_first_mb_in_slice;
     curr_mb:=t_curr_mb;
     mb_x := curr_mb mod pic_w_in_mb;
-    count := 0;
+    
   end
   
-  get_intra4x4: action IntraPredMode:[a] ==> PredMode:[val]
+  get_intra4x4: action IntraPredMode:[a] 
+  										==> 
+  											PredMode : [ val ]
   guard
-    intratype = 1 and count <16
+    intratype = 1 and count < 16
   var 
     int(size=5) top, 
 	int(size=5) left, 
@@ -155,7 +162,18 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
     if a < predicted then val := a; else val := a+1; end
     if a = 15 then val := predicted; end
     intra4x4predmode[mb_x, InverseScan4x4Tab[count]] := val;
-    count := count +1;
+    count := count + 1;
+  end
+  
+  get_intra4x4_done: action ==>
+  								Intra_DC_flag : [  0  ],
+  								Mb_Type       : [  0  ],
+  								Mb_TypeC      : [  1  ]
+  								
+  guard
+  	intratype = 1 and count = 16
+  do
+  	count := 0;
   end
   
 /*  get_intra8x8: action IntraPredMode:[a] ==> PredMode:[val] // Not yet tested
@@ -191,12 +209,45 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
     count := count +4;
   end */
   
-  get_intra16x16: action IntraPredMode:[a] ==> PredMode:[a]
+  get_intra16x16: action IntraPredMode : [ a ] 
+  										==> 
+  											Intra_DC_flag : [ 1 ],
+  											PredMode      : [ a ],
+  											Mb_Type       : [ 1 ],
+  										    Mb_TypeC      : [ 1 ] 
   guard
-    intratype = 3 and count <16    
+    intratype = 3 
   do
-    count := 16;
-    intra4x4predmode[mb_x] := [ 2 : for int j in Integers(0,15)];
+    intra4x4predmode[ mb_x ] := [ 2 : for int j in Integers(0,15) ];
+    //count := 16;
+  end
+  
+ 
+  
+  get_i_pcm: action
+					==>
+					Mb_Type       : [ 4 ],
+					Mb_TypeC      : [ 4 ]  										
+  guard
+  	intratype = 4
+  do
+    intra4x4predmode[ mb_x ] := [ 2 : for int j in Integers(0,15) ];
+  end 
+ 
+ schedule fsm GetType:
+  	GetType		  ( Get_MbType        )		--> MbType;
+  	//Decode Mb Inter
+  	MbType		  ( get_inter         )	    --> GetType;
+  	MbType		  ( get_intratype     )		--> IntraType;
+  	//Decode Mb Intra 4x4
+  	IntraType	  ( get_intra4x4      )		--> IntraType;
+  	IntraType     ( get_intra4x4_done )		--> GetType;
+  	//Decode Mb Intra 16x16
+  	IntraType	  ( get_intra16x16    )		--> GetType;
+   	
+  	//Decode Mb I PCM
+  	IntraType	  ( get_i_pcm         )		--> GetType;      
+  	
   end
   
 end

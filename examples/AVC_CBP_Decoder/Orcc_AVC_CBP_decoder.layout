@@ -3,7 +3,7 @@
    <vertices>
       <vertex id="source" x="57" y="172"/>
       <vertex id="AVCDecoder" x="169" y="136"/>
-      <vertex id="Merger" x="330" y="154"/>
-      <vertex id="display" x="444" y="70"/>
+      <vertex id="Merger" x="435" y="55"/>
+      <vertex id="display" x="667" y="176"/>
    </vertices>
 </layout>

@@ -19,12 +19,13 @@ actor Select ( int SAMPLE_SZ, int MB_WIDTH )
 	int(size=SAMPLE_SZ) X0,
 	int(size=9) X1 ,
 	int(size=9) X2,
+	int(size=9) X3,
 	uint(size=8) Mb_Type
 		==>
 		int(size=9) X
 		:
   
-	uint(size=2) sel;
+	uint(size=3) sel;
   
 	GetMbType:action Mb_Type:[a]==> 
 	do
@@ -46,10 +47,16 @@ actor Select ( int SAMPLE_SZ, int MB_WIDTH )
     	sel = 2
 	end
 	
+	GetPCM: action X3:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	guard
+    	sel = 4
+	end
+	
 	schedule fsm GetMbType:
 		GetMbType   (GetMbType)     --> Get;
 		Get   		(GetIntra4x4)	--> GetMbType;
 		Get   		(GetIntra16x16)	--> GetMbType;
+		Get			(GetPCM)		--> GetMbType;
 		Get   		(GetInter)    	--> GetMbType;
 	end 
 end

@@ -13,8 +13,6 @@
       <vertex id="MV" x="1113" y="415"/>
       <vertex id="LOCATION" x="735" y="472"/>
       <vertex id="PartSZ" x="674" y="494"/>
-      <vertex id="mv_out" x="649" y="543"/>
-      <vertex id="ref_idx" x="672" y="600"/>
       <vertex id="Mgnt_MVR" x="416" y="450"/>
       <vertex id="Algo_MVR_MultiFrameAdptive" x="642" y="337"/>
       <vertex id="Algo_Add" x="962" y="405"/>

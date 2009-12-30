@@ -125,13 +125,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="MbIntraFlag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="Mb_Type">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -293,7 +286,21 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="MB_intra_flag">
+    <Port kind="Output" name="I_PCM_Y">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="I_PCM_U">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="I_PCM_V">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -426,6 +433,15 @@
             <Expr kind="Var" name="DPBMAXSIZE"/>
         </Parameter>
     </Instance>
+    <Instance id="Algo_Parser_IPCM">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Algo_Parser_IPCM"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -444,7 +460,6 @@
     <Connection dst="" dst-port="MbPartWidth" src="Algo_Synp_AVC" src-port="MbPartWidth"/>
     <Connection dst="" dst-port="MbPartHeigth" src="Algo_Synp_AVC" src-port="MbPartHeigth"/>
     <Connection dst="" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
-    <Connection dst="" dst-port="MbIntraFlag" src="Algo_Synp_AVC" src-port="MbIntraFlag"/>
     <Connection dst="" dst-port="Intra_DC_flag"
         src="Algo_IntraPred_Split" src-port="Intra_DC_flag"/>
     <Connection dst="" dst-port="PredMode" src="Algo_IntraPred_Split" src-port="PredMode"/>
@@ -518,9 +533,13 @@
     <Connection dst="" dst-port="mv_out" src="MVReconstruct" src-port="mv_out"/>
     <Connection dst="" dst-port="ref_idx" src="MVReconstruct" src-port="ref_idx"/>
     <Connection dst="" dst-port="CodedBlockPattern" src="Algo_Synp_AVC" src-port="cbp_blk"/>
-    <Connection dst="" dst-port="MB_intra_flag" src="Algo_Synp_AVC" src-port="MbIntraFlag"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="FirstMBInSlice"
         src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
     <Connection dst="MVReconstruct" dst-port="FirstMbInSlice"
         src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
+    <Connection dst="Algo_Parser_IPCM" dst-port="I_PCM"
+        src="Algo_Synp_AVC" src-port="pix_I_PCM"/>
+    <Connection dst="" dst-port="I_PCM_Y" src="Algo_Parser_IPCM" src-port="I_PCM_Y"/>
+    <Connection dst="" dst-port="I_PCM_U" src="Algo_Parser_IPCM" src-port="I_PCM_U"/>
+    <Connection dst="" dst-port="I_PCM_V" src="Algo_Parser_IPCM" src-port="I_PCM_V"/>
 </XDF>

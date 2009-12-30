@@ -54,12 +54,12 @@ Copyright (c) ISO/IEC 2008.
 FU realizing Syntax Parsing for AVC
 *****************************************************************************/
 
-// This FU has been modified by Mickaël Raulet (INSA of Rennes) July 2009
+// This FU has been modified by Mickael Raulet (INSA of Rennes) July 2009
 
 actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		uint(size=1) bits, 
 		uint nb_rbsp_bytes 
-		==> /*uint(size=16) pix_I_PCM,*/ 
+		==> int(size=9) pix_I_PCM,
 			uint(size=4) IntraPredMode,
 			uint(size=4) IntraPredModeC, 
 			uint(size=4) RUN, 
@@ -90,8 +90,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			int(size=16) HEIGHT
 		:
   	// FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =45;
-	uint(size=7) PICHEIGHT=36;
+  	uint(size=7) PICWIDTH =1280/16;
+	uint(size=7) PICHEIGHT=720/16;
 	// ********** Read bits ********** //  
 	int(size=9) bits_to_read_count := -1;
 	int(size=41) read_result_in_progress; 
@@ -304,6 +304,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	uint(size=6) val_CodedBlockPatternLuma := 0;
 	uint(size=6) CodedBlockPatternChroma := 0;
 	int mb_qp_delta;
+	int ( size = 1 ) start_pcm_chroma := 0;
 	List ( type: List ( type: uint(size=4), size=3), size=25 ) Intra_16x16_tab = //[mb_type][Intra16x16PredMode / CBPChroma / CBPLuma]
 		[ 
 			[0,0,0], [0,0,0], [1,0,0], [2,0,0], [3,0,0], [0,1,0], [1,1,0], [2,1,0], 
@@ -2236,6 +2237,24 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		moreDataFlag := more_rbsp_data();
 	end
 
+	send_data_position_information_is_ipcm: action 
+		==> 
+			CurrMbAddr:[mb_addr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[first_mb_in_slice],
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
+			slice_beta_offset:[val_slice_beta_offset],
+			LFDisable:[disable_deblocking_filter_idc],
+			cbp_blk:[val_cbp_blk]
+	guard IS_I_PCM()
+	var 
+		int mb_addr
+	do
+		mb_addr:=val_CurrMbAddr;
+		NextMbAddress();
+	end
+
 	send_data_position_information: action 
 		==> 
 			CurrMbAddr:[mb_addr],
@@ -2361,7 +2380,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		start_vld();
 	end
 
-	read_MB_layer_mb_type_done: action ==> MbIntraFlag:[mb_intra_flag]//,MVskip:[0]
+	read_MB_layer_mb_type_done: action ==> MbIntraFlag:[mb_intra_flag] //,MVskip:[0]
 	guard
 		vld_end()
 	do
@@ -2373,7 +2392,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	//if( mb_type = = I_PCM )
 	// while( !byte_aligned( ) )
-	read_MB_layer_I_PCM_alignement: action ==>
+	read_MB_layer_I_PCM_alignement: action  ==>  IntraPredMode : [ 4 ]
 	guard
 		IS_I_PCM()
 	do
@@ -2392,7 +2411,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 	end
 
-	read_MB_layer_pcm_sample_luma1: action  ==> /*pix_I_PCM:[ v ]*/
+	read_MB_layer_pcm_sample_luma1: action  ==>  pix_I_PCM:[ v ]
 	guard
 		done_reading_bits(),
 		MB_inc < 256
@@ -2403,11 +2422,18 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		MB_inc := MB_inc + 1;
 		if MB_inc < 256 then set_bits_to_read(bit_depth_luma_minus8[sps_id]+8); end 
 	end
-
+	
+	read_MB_layer_pcm_sample_luma1_done: action ==>
+	guard
+		MB_inc = 256
+	do
+		start_pcm_chroma := 1;
+	end
+	
 	// for( i = 0; i < 2 * MbWidthC * MbHeightC; i++ )
 	read_MB_layer_pcm_sample_chroma0: action   ==> 
 	guard
-		MB_inc = 256
+		start_pcm_chroma
 	do
 		MB_inc := 0;
 		set_bits_to_read(bit_depth_chroma_minus8[sps_id]+8);
@@ -2415,9 +2441,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			NonZeroCountCb[val_CurrMbAddr,i] := 16;
 			NonZeroCountCr[val_CurrMbAddr,i] := 16;
 		end
+		start_pcm_chroma := 0;
+
 	end
 
-	read_MB_layer_pcm_sample_chroma1: action  ==> /*pix_I_PCM:[ v ]*/
+	read_MB_layer_pcm_sample_chroma1: action  ==> pix_I_PCM:[ v ]
 	guard
 	done_reading_bits(),
 		MB_inc < 2*64
@@ -2561,6 +2589,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//else
 	read_MB_layer_skip_mb_qp_delta: action 
 		==> 
+		
 			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
 	guard
 		val_CodedBlockPatternLuma = 0, CodedBlockPatternChroma = 0, not IS_Intra_16x16()
@@ -3887,11 +3916,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		// --> macrobloc_layer()
 		SliceD_update										( SliceD_update_CAVLC								) --> SliceD_moredata;
 		SliceD_moredata                                     ( SliceD_moredata_1                                 ) --> SliceD_moredata_1_done;
+		SliceD_moredata_1_done								( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_moredata_1_done								( send_data_position_information	                ) --> syncSliceD_endwhile;
 		SliceD_moredata 									( SliceD_moredata_0									) --> SliceD_moredata_0_done;
 		SliceD_moredata_0_done 								( SliceD_stop_crt_1									) --> SliceD_stop_crt_1_done;
 		SliceD_moredata_0_done 								( SliceD_stop_crt_0									) --> SliceD_stop_byte_align_done;
 		SliceD_stop_crt_1_done								( SliceD_stop_byte_align 							) --> SliceD_stop_byte_align_done;
+		SliceD_stop_byte_align_done							( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_stop_byte_align_done							( send_data_position_information	                ) --> syncSliceD_endwhile;
 		syncSliceD_endwhile									( syncSliceD_endwhile								) --> SliceD_while_moreDataFlag;
 		
@@ -3905,7 +3936,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		read_MB_layer_mb_type_done							( read_MB_layer_mb_type_done						) --> read_MB_layer_check_I_PCM;
 		read_MB_layer_check_I_PCM							( read_MB_layer_I_PCM_alignement					) --> read_MB_layer_pcm_sample_luma0;
 		read_MB_layer_pcm_sample_luma0					    ( read_MB_layer_pcm_sample_luma0	                ) --> read_MB_layer_pcm_sample_luma1;
-		read_MB_layer_pcm_sample_luma1						( read_MB_layer_pcm_sample_luma1	                ) --> read_MB_layer_pcm_sample_chroma0;	
+		read_MB_layer_pcm_sample_luma1						( read_MB_layer_pcm_sample_luma1	                ) --> read_MB_layer_pcm_sample_luma1;
+		read_MB_layer_pcm_sample_luma1						( read_MB_layer_pcm_sample_luma1_done		        ) --> read_MB_layer_pcm_sample_chroma0;	
 		read_MB_layer_pcm_sample_chroma0					( read_MB_layer_pcm_sample_chroma0					) --> read_MB_layer_pcm_sample_chroma1;	
 		read_MB_layer_pcm_sample_chroma1					( read_MB_layer_pcm_sample_chroma1					) --> read_MB_layer_pcm_sample_chroma1;
 		read_MB_layer_pcm_sample_chroma1					( read_MB_layer_pcm_sample_done						) --> SliceD_update;	
@@ -4053,6 +4085,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		test_one_byte  > generic_done;
 		read_SliceD_mb_skip_run_done2_stop_crt_1>read_SliceD_mb_skip_run_done2_stop_crt_0;
 		SliceD_stop_crt_1 > SliceD_stop_crt_0;
+		send_data_position_information_is_ipcm>send_data_position_information;
 	end
 
 end

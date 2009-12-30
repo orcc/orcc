@@ -89,7 +89,16 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	guard
 		a = 2
 	end
-  
+   
+    //Mb_Type_NOK : Consume the token from I_PCM  
+  	MbTypeI_PCM: action
+  		Mb_Type:[a], 
+		PicWidthInMb:[c], 
+		CurrMbAddr:[d], 
+		FirstMbInSlice:[f] ==>
+	guard
+		a = 4
+	end
   
 	//Mb_Type_OK : Enable the prediction 
 	MbTypeOK:action 
@@ -302,13 +311,14 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	schedule fsm Mb_Type:
 		Mb_Type     	(MbTypeIntra	)--> Mb_Type;
 		Mb_Type     	(MbTypeInter	)--> Mb_Type;
+		Mb_Type     	(MbTypeI_PCM	)--> Mb_Type;
 		Mb_Type     	(MbTypeOK		)--> EdgeNeighbour;
 		EdgeNeighbour	(EdgeNeighbour	)--> AvailEdge;
 		AvailEdge		(AvailEdge		)--> Process;
 		Process    		(SendEdge		)--> Process;
 		Process      	(StoreEdge		)--> AvailEdge;
 		
-		AvailEdge			(EndEdge		)--> Mb_Type;
+		AvailEdge		(EndEdge		)--> Mb_Type;
 	end
 	
 	priority

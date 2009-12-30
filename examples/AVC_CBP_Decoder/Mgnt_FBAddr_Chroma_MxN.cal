@@ -67,6 +67,21 @@ actor Mgnt_FBAddr_Chroma_MxN ( int ADDR_SZ,   int loca_SZ,   int MV_SZ,  int ref
   int pic_size := 0;
   
   
+  //Mb_Type_NOK_and_IPCM : Consume the token, nothing else to do 
+  Mb_Type_NOK_and_IPCM: action Mb_Type      :[a],
+  		              PicWidthInMb :[ b ], 
+  		              PicSizeInMb  :[ c ],
+  		              CurrMbAddr   :[ valCurrMbAddr ] ==> 
+  guard
+  	a = 4
+  do 
+    Picwidth_c  := lshift(b,3);
+    Picheight_c := lshift(c/b,3);
+    
+    currMB      := valCurrMbAddr;
+  	pic_size    := c;
+  end
+
   //Mb_Type_NOK : Consume the token, nothing else to do 
   Mb_Type_NOK: action Mb_Type      :[a],
   		              PicWidthInMb :[ b ], 
@@ -74,7 +89,7 @@ actor Mgnt_FBAddr_Chroma_MxN ( int ADDR_SZ,   int loca_SZ,   int MV_SZ,  int ref
   		              Coef_ACR     :[ d ] repeat MB_WIDTH*MB_WIDTH,
   		              CurrMbAddr   :[ valCurrMbAddr ] ==> 
   guard
-  	a != 2
+  	a = 0 or a = 1
   do 
     Picwidth_c  := lshift(b,3);
     Picheight_c := lshift(c/b,3);
@@ -216,6 +231,7 @@ actor Mgnt_FBAddr_Chroma_MxN ( int ADDR_SZ,   int loca_SZ,   int MV_SZ,  int ref
   end
  
   schedule fsm get_MB:
+    get_MB      		( Mb_Type_NOK_and_IPCM       ) 	--> get_pic_done;
     get_MB      		( Mb_Type_NOK       ) 	--> get_pic_done;
     get_pic_done   		( PIC_done       	) 	--> get_MB;
     get_pic_done   		( PIC_Ndone       	) 	--> get_MB;

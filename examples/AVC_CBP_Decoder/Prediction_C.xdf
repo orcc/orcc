@@ -164,7 +164,7 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="Mb_intra_flag">
+    <Port kind="Input" name="I_PCM_C">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -331,9 +331,10 @@
     <Connection dst="Deblocking Filter" dst-port="MV" src="" src-port="mv_in"/>
     <Connection dst="Deblocking Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Deblocking Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
-    <Connection dst="Deblocking Filter" dst-port="MbIntraFlag" src="" src-port="Mb_intra_flag"/>
-    <Connection dst="" dst-port="Display_C" src="Buffer_inter" src-port="Display"/>
     <Connection dst="Deblocking Filter" dst-port="Z" src="Select_chroma" src-port="X"/>
     <Connection dst="Deblocking Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
+    <Connection dst="" dst-port="Display_C" src="Buffer_inter" src-port="Display"/>
+    <Connection dst="Deblocking Filter" dst-port="MbIntraFlag" src="" src-port="Mb_TypeC"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking Filter" src-port="WD"/>
+    <Connection dst="Select_chroma" dst-port="X3" src="" src-port="I_PCM_C"/>
 </XDF>

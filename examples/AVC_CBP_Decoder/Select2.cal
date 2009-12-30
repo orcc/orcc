@@ -15,39 +15,42 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Select ( int SAMPLE_SZ, int MB_WIDTH )/* int(size=SAMPLE_SZ) X0,*/ int(size=9) X1 , int(size=9) X2, uint(size=8) Mb_Type  ==> int(size=9) X :
+actor Select ( int SAMPLE_SZ, int MB_WIDTH )/* int(size=SAMPLE_SZ) X0,*/ int(size=9) X1 , int(size=9) X2, int(size=9) X3, uint(size=8) Mb_Type  ==> int(size=9) X :
   uint(size=9) count := MB_WIDTH*MB_WIDTH;
-  uint(size=8) sel;
+  uint(size=3) sel;
   
-  GetFullMb:action Mb_Type:[a]==> 
-  guard
-    count = MB_WIDTH*MB_WIDTH
-  do
-    sel:= a;
-    count:=0;
-  end
- /* 
-  GetIntra4x4:action X0:[x] ==> X:[x]
-  guard
-    count < MB_WIDTH*MB_WIDTH,
-    sel = 0
-  do
-    count:= count +1;
-  end
+	GetMbType:action Mb_Type:[a]==> 
+	do
+		sel:= a;
+	end
+  /*
+	GetIntra4x4:action X0:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	guard
+    	sel = 0
+	end
   */
-  GetIntra16x16:action X1:[x] ==> X:[x]
-  guard
-    count < MB_WIDTH*MB_WIDTH,
-    sel = 1
-  do
-    count:= count +1;
-  end
+	GetIntra16x16:action X1:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH 
+	guard
+		sel = 1
+	end
   
-   GetInter:action X2:[x] ==> X:[x]
-  guard
-    count < MB_WIDTH*MB_WIDTH,
-    sel = 2
-  do
-    count:= count +1;
-  end
+	GetInter:action X2:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	guard
+    	sel = 2
+	end
+	
+	GetPCM: action X3:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	guard
+    	sel = 4
+	end
+	
+	schedule fsm GetMbType:
+		GetMbType   (GetMbType)     --> Get;
+		//Get   		(GetIntra4x4)	--> GetMbType;
+		Get   		(GetIntra16x16)	--> GetMbType;
+		Get			(GetPCM)		--> GetMbType;
+		Get   		(GetInter)    	--> GetMbType;
+	end 
+  
+  
 end

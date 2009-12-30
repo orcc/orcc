@@ -65,6 +65,12 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 	guard
 		a = 2
 	end
+	
+	//Mb_Type_NOK : Consume the token from inter prediction 
+	MbTypeNOK_I_PCM:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], CurrMbAddr:[d]==>
+	guard
+		a = 4
+	end
   
 	//Mb_Type_OK : Enable the prediction 
 	MbTypeOK:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH*MB_WIDTH ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH*MB_WIDTH
@@ -147,6 +153,7 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 	schedule fsm Mb_Type:
 		Mb_Type     (MbTypeNOK_inter	)--> Mb_Type;
 		Mb_Type     (MbTypeNOK_intra4x4	)--> Mb_Type;
+		Mb_Type     (MbTypeNOK_I_PCM	)--> Mb_Type;		
 		Mb_Type     (MbTypeOK			)--> InitEdge;
 		InitEdge    (InitEdge			)--> InitAvail;
 		InitAvail	(InitAvail			)--> Reset;

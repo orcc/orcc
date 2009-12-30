@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="Source" x="56" y="143"/>
-      <vertex id="AVCDecoder" x="162" y="147"/>
-      <vertex id="Display" x="323" y="72"/>
-      <vertex id="Comp" x="334" y="218"/>
+      <vertex id="Source" x="24" y="166"/>
+      <vertex id="AVCDecoder" x="236" y="166"/>
+      <vertex id="Display" x="540" y="166"/>
    </vertices>
 </layout>

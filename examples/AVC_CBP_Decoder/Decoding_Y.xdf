@@ -185,7 +185,7 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MB_intra_flag">
+    <Port kind="Input" name="I_PCM_Y">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -315,5 +315,5 @@
     <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_alpha_c0_offset"/>
     <Connection dst="TEX_L" dst-port="ref_idx_in" src="" src-port="ref_idx_in"/>
     <Connection dst="TEX_L" dst-port="mv_in" src="" src-port="mv_in"/>
-    <Connection dst="TEX_L" dst-port="MB_intra_flag" src="" src-port="MB_intra_flag"/>
+    <Connection dst="TEX_L" dst-port="I_PCM_Y" src="" src-port="I_PCM_Y"/>
 </XDF>
