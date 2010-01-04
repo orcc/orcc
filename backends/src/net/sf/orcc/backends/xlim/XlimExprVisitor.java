@@ -74,7 +74,12 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 	 * Root element where to add everything
 	 */
 	private Element root;
-
+	
+	/**
+	 * Action name
+	 */
+	private String actionName;
+	
 	/**
 	 * Initialization: filling of Unary and Binary Map
 	 */
@@ -117,10 +122,13 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 	 *            XLIM naming
 	 * @param root
 	 *            Root element where to add everything
+	 * @param actionName
+	 *            Current action name
 	 */
-	public XlimExprVisitor(XlimNames names, Element root) {
+	public XlimExprVisitor(XlimNames names, Element root, String actionName) {
 		this.names = names;
 		this.root = root;
+		this.actionName = actionName;
 	}
 
 	/**
@@ -160,7 +168,7 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 	public void visit(BoolExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newValueOperation(root, LITINT,
 				expr.getValue() ? "1" : "0");
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), "1", INT);
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), "1", BOOL);
 	}
 
 	/**
@@ -235,7 +243,7 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 	public void visit(VarExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 
-		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar()));
+		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar(), actionName));
 
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
 				.getVar().getVariable().getType());

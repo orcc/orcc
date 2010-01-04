@@ -189,7 +189,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 			init = ((IfNode) init.get(init.size() - 1)).getThenNodes();
 			if((init != null)&&(init.size()>0)){
 				XlimInstructionVisitor iv = new XlimInstructionVisitor(names, body,
-						"_scheduler_", new Vector<String>(),
+						"_scheduler_"+action.getName(), new Vector<String>(),
 						new TreeMap<String, Element>());
 				Iterator<Instruction> it = ((BlockNode) init.get(0)).getInstructions()
 						.iterator();
@@ -204,7 +204,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 						String ready = "ready_" + index;
 						Assign assign = ((Assign) instruction);
 		
-						assign.getValue().accept(new XlimExprVisitor(names, body));
+						assign.getValue().accept(new XlimExprVisitor(names, body, "_scheduler_"+action.getName()));
 						Element operationE = XlimNodeTemplate.newOperation(body, NOOP);
 						XlimNodeTemplate.newInPort(operationE, names.getTempName());
 						XlimNodeTemplate.newOutPort(operationE, ready, assign

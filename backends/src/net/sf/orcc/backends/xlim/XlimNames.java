@@ -57,16 +57,10 @@ public class XlimNames {
 	private Map<String, String> params;
 
 	/**
-	 * Ports map
-	 */
-	private Map<String, String> ports;
-
-	/**
 	 * XlimNames default constructor
 	 */
 	public XlimNames() {
 		params = new TreeMap<String, String>();
-		ports = new TreeMap<String, String>();
 	}
 
 	/**
@@ -104,7 +98,6 @@ public class XlimNames {
 	 * @return Formatted name
 	 */
 	private String getPortName(Variable port, String actionName) {
-		ports.put(port.getName(), actionName);
 		return "port_" + port.getName() + "_" + actionName;
 	}
 
@@ -122,17 +115,21 @@ public class XlimNames {
 	 * 
 	 * @param use
 	 *            Use of Variable
+	 * @param actionName
+	 *            Action containing the Variable
 	 * @return Variable name
 	 */
-	public String getVarName(Use use) {
-		String var = use.getVariable().getName();
-		if (params.containsKey(var)) {
-			return params.get(var);
+	public String getVarName(Use use, String actionName) {
+		Variable var = use.getVariable();
+		String varName = var.getName();
+		if (params.containsKey(varName)) {
+			return params.get(varName);
 		}
 		if (use.getVariable().isPort()) {
-			return getPortName(use, ports.get(use.getVariable().getName()));
+			return getPortName(use, actionName);
 		}
-		return getVarTemplate(use.getVariable());
+		
+		return getVarTemplate(var, actionName);
 	}
 
 	/**
@@ -141,14 +138,14 @@ public class XlimNames {
 	 * @param var
 	 *            Variable
 	 * @param actionName
-	 *            Action containing the Variable (used for ports)
+	 *            Action containing the Variable
 	 * @return Variable name
 	 */
 	public String getVarName(Variable var, String actionName) {
 		if (var.isPort()) {
 			return getPortName(var, actionName);
 		}
-		return getVarTemplate(var);
+		return getVarTemplate(var, actionName);
 	}
 
 	/**
@@ -156,10 +153,12 @@ public class XlimNames {
 	 * 
 	 * @param var
 	 *            Variable
+	 * @param actionName
+	 *            Action containing the Variable
 	 * @return Variable name
 	 */
-	private String getVarTemplate(Variable var) {
-		return "var_" + var.getName();
+	private String getVarTemplate(Variable var, String actionName) {
+		return "var_" + var.getName() + ((var.isGlobal()?"":"_" + actionName));
 	}
 
 	/**

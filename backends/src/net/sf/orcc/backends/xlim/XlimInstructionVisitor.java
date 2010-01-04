@@ -138,7 +138,7 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		 * names.getVarName(node.getTarget()));
 		 * XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		 */
-		node.getValue().accept(new XlimExprVisitor(names, root));
+		node.getValue().accept(new XlimExprVisitor(names, root, actionName));
 		Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		XlimNodeTemplate.newOutPort(operationE, names.getVarName(node
@@ -160,7 +160,7 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 				.iterator();
 
 		for (Expression param : node.getParameters()) {
-			param.accept(new XlimExprVisitor(names, root));
+			param.accept(new XlimExprVisitor(names, root, actionName));
 			params.put(it.next().getName(), names.getTempName());
 		}
 
@@ -218,18 +218,18 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 	 */
 	public void visit(Load node, Object... args) {
 		Element operationE;
-		String name = names.getVarName(node.getSource());
+		String name = names.getVarName(node.getSource(), actionName);
 		boolean inport = inputs.contains(name);
 		if (node.getSource().getVariable().getType().getType() == Type.LIST
 				&& !inport) {
-			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root));
+			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root, actionName));
 			operationE = XlimNodeTemplate.newNameOperation(root, VARREF, names
-					.getVarName(node.getSource()));
+					.getVarName(node.getSource(), actionName));
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		} else {
 			operationE = XlimNodeTemplate.newOperation(root, NOOP);
 
-			name = names.getVarName(node.getSource());
+			name = names.getVarName(node.getSource(), actionName);
 			XlimNodeTemplate.newInPort(operationE, name);
 		}
 
@@ -329,7 +329,7 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		if (node.getValue() == null) {
 			return;
 		}
-		node.getValue().accept(new XlimExprVisitor(names, root));
+		node.getValue().accept(new XlimExprVisitor(names, root, actionName));
 
 		System.out.println("CHECK RETURN");
 		// TODO Wait for "return" example
@@ -350,17 +350,17 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 	 *            Arguments sent (not used)
 	 */
 	public void visit(Store node, Object... args) {
-		node.getValue().accept(new XlimExprVisitor(names, root));
+		node.getValue().accept(new XlimExprVisitor(names, root, actionName));
 
 		Variable var = node.getTarget().getVariable();
 		if (var instanceof StateVariable) {
 			Element operationE = XlimNodeTemplate
 					.newDiffOperation(root, ASSIGN);
-			operationE.setAttribute(TARGET, names.getVarName(node.getTarget()));
+			operationE.setAttribute(TARGET, names.getVarName(node.getTarget(), actionName));
 			String data = names.getTempName();
 
 			for (Expression expr : node.getIndexes()) {
-				expr.accept(new XlimExprVisitor(names, root));
+				expr.accept(new XlimExprVisitor(names, root, actionName));
 				XlimNodeTemplate.newInPort(operationE, names.getTempName());
 			}
 			XlimNodeTemplate.newInPort(operationE, data);
@@ -370,7 +370,7 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
-			String name = names.getVarName(node.getTarget());
+			String name = names.getVarName(node.getTarget(), actionName);
 			Element port = XlimNodeTemplate.newOutPort(operationE, name);
 
 			writeMap.put(name, port);

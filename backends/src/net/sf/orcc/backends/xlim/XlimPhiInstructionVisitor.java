@@ -170,9 +170,9 @@ public class XlimPhiInstructionVisitor implements InstructionVisitor,
 		System.out.println("CHECK PHIS");
 
 		XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars().get(
-				0)), THEN);
+				0), actionName), THEN);
 		XlimNodeTemplate.newInPHIPort(phiE, names.getVarName(phi.getVars().get(
-				1)), ELSE);
+				1), actionName), ELSE);
 
 		Element portO = XlimNodeTemplate.newOutPort(phiE, names.getVarName(phi
 				.getTarget(), actionName), phi.getTarget().getType());

@@ -149,7 +149,7 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
 		String decision = names.putDecision();
 		Element moduleT = XlimNodeTemplate.newTestModule(moduleB, decision);
 
-		node.getValue().accept(new XlimExprVisitor(names, moduleT));
+		node.getValue().accept(new XlimExprVisitor(names, moduleT, actionName));
 
 		Element operationE = XlimNodeTemplate.newOperation(moduleT, NOOP);
 
@@ -194,7 +194,7 @@ public class XlimNodeVisitor implements NodeVisitor, XlimTypeTemplate,
 
 		String decision = names.putDecision();
 		Element moduleT = XlimNodeTemplate.newTestModule(moduleB, decision);
-		node.getValue().accept(new XlimExprVisitor(names, moduleT));
+		node.getValue().accept(new XlimExprVisitor(names, moduleT, actionName));
 
 		Element operationE = XlimNodeTemplate.newOperation(moduleT, NOOP);
 
