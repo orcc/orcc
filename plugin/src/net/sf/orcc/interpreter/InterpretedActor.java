@@ -200,9 +200,9 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	protected boolean isSchedulable(Action action) {
 		Object isSchedulable = interpretProc(action.getScheduler());
 		if ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable)) {
-			if (checkOutputPattern(action.getOutputPattern())) {
-				return true;
-			}
+			// if (checkOutputPattern(action.getOutputPattern())) {
+			return true;
+			// }
 		}
 
 		return false;
@@ -214,18 +214,22 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * @return the number of actions fired
 	 */
 	public Integer schedule() {
-		int running=0;
-		boolean schedulable=true;
-		
+		int running = 0;
+		boolean schedulable = true;
+
 		// Schedule the actor as long as it can execute an action
 		if (sched.hasFsm()) {
 			while (schedulable) {
-				schedulable=false;
+				schedulable = false;
 				// Check for untagged actions first
 				for (Action action : sched.getActions()) {
-					schedulable=isSchedulable(action);
+					schedulable = isSchedulable(action);
 					if (schedulable) {
-						running=execute(action);
+						if (checkOutputPattern(action.getOutputPattern())) {
+							running = execute(action);
+						} else {
+							schedulable = false;
+						}
 						break;
 					}
 				}
@@ -237,9 +241,13 @@ public class InterpretedActor extends AbstractInterpretedActor {
 						Action action = info.getAction();
 						schedulable = isSchedulable(action);
 						if (schedulable) {
-							// Update FSM state
-							fsmState = info.getTargetState().getName();
-							running = execute(action);
+							if (checkOutputPattern(action.getOutputPattern())) {
+								// Update FSM state
+								fsmState = info.getTargetState().getName();
+								running = execute(action);
+							} else {
+								schedulable = false;
+							}
 							break;
 						}
 					}
@@ -247,11 +255,15 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			}
 		} else {
 			while (schedulable) {
-				schedulable=false;
+				schedulable = false;
 				for (Action action : sched.getActions()) {
 					schedulable = isSchedulable(action);
 					if (schedulable) {
-						running=execute(action);
+						if (checkOutputPattern(action.getOutputPattern())) {
+							running = execute(action);
+						} else {
+							schedulable = false;
+						}
 						break;
 					}
 				}
@@ -260,32 +272,32 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		return running;
 
-//      // Schedule only 1 action per actor
-//		if (sched.hasFsm()) {
-//			// Check for untagged actions first
-//			for (Action action : sched.getActions()) {
-//				if (isSchedulable(action)) {
-//					return execute(action);
-//				}
-//			}
-//
-//			// Then check for next FSM transition
-//			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
-//				Action action = info.getAction();
-//				if (isSchedulable(action)) {
-//					// Update FSM state
-//					fsmState = info.getTargetState().getName();
-//					return execute(action);
-//				}
-//			}
-//		} else {
-//			for (Action action : sched.getActions()) {
-//				if (isSchedulable(action)) {
-//					return execute(action);
-//				}
-//			}
-//		}
-//		return 0;
+		// // Schedule only 1 action per actor
+		// if (sched.hasFsm()) {
+		// // Check for untagged actions first
+		// for (Action action : sched.getActions()) {
+		// if (isSchedulable(action)) {
+		// return execute(action);
+		// }
+		// }
+		//
+		// // Then check for next FSM transition
+		// for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
+		// Action action = info.getAction();
+		// if (isSchedulable(action)) {
+		// // Update FSM state
+		// fsmState = info.getTargetState().getName();
+		// return execute(action);
+		// }
+		// }
+		// } else {
+		// for (Action action : sched.getActions()) {
+		// if (isSchedulable(action)) {
+		// return execute(action);
+		// }
+		// }
+		// }
+		// return 0;
 	}
 
 	@Override

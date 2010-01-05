@@ -128,10 +128,19 @@ public class CommunicationFifo implements ICommunicationFifo {
 		}
 		if (out != null) {
 			try {
-				for (int i = 0; i < source.length; i++) {
-					out.write(source[i] + "");
+				if (source[0] instanceof Boolean) {
+					for (int i = 0; i < source.length; i++) {
+						if ((Boolean)source[i]) {
+							out.write("1\n");
+						}else {
+							out.write("0\n");							
+						}
+					}
+				} else {
+					for (int i = 0; i < source.length; i++) {
+						out.write(source[i] + "\n");
+					}
 				}
-				out.write("\n");
 				out.flush();
 			} catch (IOException e) {
 				e.printStackTrace();

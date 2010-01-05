@@ -128,8 +128,8 @@ public class InterpreterMain {
 				Port srcPort = connection.getSource();
 				Port tgtPort = connection.getTarget();
 				CommunicationFifo fifo = new CommunicationFifo(size,
-						enableTraces, fileName, tgtInst.getId() + "_"
-								+ tgtPort.getName());
+						enableTraces, fileName, srcInst.getId() + "_"
+								+ srcPort.getName());
 				fifoList.add(fifo);
 				// connect source actor to the FIFO
 				if (srcPort != null) {
