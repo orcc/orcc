@@ -83,8 +83,9 @@ public class Network {
 
 	/**
 	 * Flattens this network.
+	 * @throws OrccException 
 	 */
-	public void flatten() {
+	public void flatten() throws OrccException {
 		new NetworkFlattener().transform(this);
 	}
 
