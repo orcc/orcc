@@ -290,4 +290,10 @@
     <Connection dst="Decoding_Y" dst-port="I_PCM_Y" src="FUN_Parser" src-port="I_PCM_Y"/>
     <Connection dst="Decode_U" dst-port="I_PCM_C" src="FUN_Parser" src-port="I_PCM_U"/>
     <Connection dst="Decode_V" dst-port="I_PCM_C" src="FUN_Parser" src-port="I_PCM_V"/>
+    <Connection dst="Decoding_Y" dst-port="ConstrainedIFlag"
+        src="FUN_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="Decode_U" dst-port="ConstrainedIFlag"
+        src="FUN_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="Decode_V" dst-port="ConstrainedIFlag"
+        src="FUN_Parser" src-port="ConstrainedIFlag"/>
 </XDF>

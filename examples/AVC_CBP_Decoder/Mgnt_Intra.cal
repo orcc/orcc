@@ -26,14 +26,15 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 	uint(size=13) CurrMbAddr,
 	uint(size=4) PredMode,
 	uint(size=SAMPLE_SZ) EDGE, 
-	int(size=SAMPLE_SZ) Coef_ACR 
+	int(size=SAMPLE_SZ) Coef_ACR,
+	uint(size=1) ConstrainedIFlag 
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode_I,
 		int(size=SAMPLE_SZ) Coef_ACR_I,
 		int(size=SAMPLE_SZ) Y_Left,
 		int(size=SAMPLE_SZ) Y_Up,
-		int(size=SAMPLE_SZ) Y_UpLeft 
+		int(size=SAMPLE_SZ) Y_UpLeft
 		:  
 	
 	//List that contains the neighbouring pixel of the current 16x16 Mb, from bottom to top then left to right 
@@ -50,30 +51,47 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 	uint(size=1) topLeft_16x16_avail := 0;
 	uint(size=1) topRight_16x16_avail := 0;
 
+  	//FIXME! Maximum size of a line in macroclock
+  	uint(size=7) PICWIDTH =45;
+	List( type:uint(size=1), size=PICWIDTH) is_intra := [0 : for int i in Integers( 0, PICWIDTH-1)];
+	uint(size=13) curr_pos:=0;
+	uint(size=1) intra_top_left:=0;
 	
   //******************************* Enable or not Prediction management ********************************************
   
   
 	//Mb_Type_NOK : Consume the token from prediction 4x4 
-	MbTypeNOK_intra4x4:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH, PredMode:[f] repeat MB_WIDTH==>
+	MbTypeNOK_intra4x4:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH, PredMode:[f] repeat MB_WIDTH==>
 	guard
 		a = 0
+	do
+		curr_pos:=d mod c;
+		intra_top_left:=is_intra[curr_pos];
+		is_intra[curr_pos]:=1;
 	end
   
 	//Mb_Type_NOK : Consume the token from inter prediction 
-	MbTypeNOK_inter:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH ==>
+	MbTypeNOK_inter:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH ==>
 	guard
 		a = 2
+	do
+		curr_pos:=d mod c;
+		intra_top_left:=is_intra[curr_pos];
+		is_intra[curr_pos]:=0;
 	end
 	
 	//Mb_Type_NOK : Consume the token from inter prediction 
-	MbTypeNOK_I_PCM:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], CurrMbAddr:[d]==>
+	MbTypeNOK_I_PCM:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d]==>
 	guard
 		a = 4
+	do
+		curr_pos:=d mod c;
+		intra_top_left:=is_intra[curr_pos];
+		is_intra[curr_pos]:=1;
 	end
   
 	//Mb_Type_OK : Enable the prediction 
-	MbTypeOK:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH*MB_WIDTH ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH*MB_WIDTH
+	MbTypeOK:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH*MB_WIDTH ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH*MB_WIDTH
 	guard
 		a = 1
 	var
@@ -85,12 +103,24 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 		mbcurr := d;
 		first_mb_in_slice := b;
 		picwidth := c; 
+		curr_pos:=d mod c;
 				 
 		//Set 16x16 the available edge
-		left_16x16_avail := if (mbcurr = first_mb_in_slice) or ((mbcurr mod picwidth) = 0) then 0 else 1 end;
-		top_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth) then 0 else 1 end;
-		topRight_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth - 1)or (((mbcurr+1) mod picwidth) = 0) then 0 else 1 end;
-		topLeft_16x16_avail :=  if (mbcurr - first_mb_in_slice < picwidth +1) then 0 else 1 end;
+		left_16x16_avail := if (mbcurr = first_mb_in_slice) or ((mbcurr mod picwidth) = 0) then 0 else 
+								if (is_intra[curr_pos-1]=1 or c_intra_flag=0) then 1 else 0 end   
+							end;
+		top_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth) then 0 else 
+								if (is_intra[curr_pos]=1 or c_intra_flag=0) then 1 else 0 end   
+							end;
+		topRight_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth - 1)or (curr_pos+1=picwidth) then 0 else 
+									if (is_intra[curr_pos+1]=1 or c_intra_flag=0) then 1 else 0 end   
+								end;
+		topLeft_16x16_avail :=  if (mbcurr - first_mb_in_slice < picwidth +1) then 0 else 
+									if (intra_top_left=1 or c_intra_flag=0) then 1 else 0 end   
+								end;
+
+		intra_top_left:=is_intra[curr_pos];
+		is_intra[curr_pos]:=1;
 	end
 
 	//******************************* Receiving required token ********************************************

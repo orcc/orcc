@@ -52,6 +52,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="ConstrainedIFlag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -189,4 +196,5 @@
         src="" src-port="PicWidthInMb"/>
     <Connection dst="Buffer_Neighbour_4x4" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="MB_4X4" src="Algo_Add_4x4" src-port="Z"/>
+    <Connection dst="Mgnt_Intra4x4" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
 </XDF>

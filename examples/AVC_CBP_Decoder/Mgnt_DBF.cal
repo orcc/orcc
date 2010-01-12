@@ -83,7 +83,9 @@ List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_
 List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE)up_mb  :=[[0 :for int j in Integers(0, MB_BLOCK_SIZE-1)] : for int i in Integers(0, MB_BLOCK_SIZE-1)];
 //mrl upFifo;
 uint(size=4) left_mb_type; int left_cbp_blk; uint(size=QUANT_SZ) left_QP;
+uint(size=13) left_slice_nr:=0; 
 uint(size=4) up_mb_type; int up_cbp_blk; uint(size=QUANT_SZ) up_QP;
+uint(size=13) up_slice_nr:=0; 
 uint(size=5) blkP; uint(size=5) blkQ; 
 uint cnt:=0;      
 //
@@ -95,6 +97,8 @@ uint(size=2) chroma_format := 1;     // only 4:2:0 supported
 uint(size=3) bit_depth := 8;         // up to 8 supported
 uint(size=2) interlace := FRAME;     // frame or field
 uint(size=2) valLFDisable := 0;         // option to disable filtering for image or across slices
+uint(size=13) firstmbinslice:=0;
+uint(size=13) slice_nr:=0;
 // Macroblock parameters
 uint(size=QUANT_SZ) valQP := 0; // Quantization parameter: value between 0 and 51 inclusive
 int(size=6) alpha_offset := 0;      // Alpha QP offset. Between -12 and 12, equal to 2*slice_alpha_c0_offset_div2 from H.264 specification 
@@ -146,6 +150,8 @@ List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=PICWIDTH) upFifo_list0_
 
 List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=PICWIDTH) upFifo_list0_ref_pic_id :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, PICWIDTH-1)];
 List(type:List(type:int(size=SAMPLE_SZ), size=16 ), size=PICWIDTH) upFifo_list0_refPicIDX :=  [[0: for int l in Integers( 0, 16-1)]: for int i in Integers( 0, PICWIDTH-1)];
+
+List(type:uint(size=SAMPLE_SZ), size=PICWIDTH ) upFifo_slice_nr :=  [0: for int l in Integers( 0, PICWIDTH-1)];
 
 ////////////////
 // ROM Tables //
@@ -236,6 +242,8 @@ read_pic_parameters: action  ==>
   do           
     mb_x:=0;
     mb_y:=0;
+    slice_nr:=0;
+    firstmbinslice:=0;
   end
 
 ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g] repeat 32,LFDisable:[j]==> 
@@ -245,7 +253,7 @@ ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[hei
   	uint cbp2,
   	int mv1,
   	int mv2
-  do    
+  do      	
     MB_Width := width;          
     MB_Height:= height / width;
     mb_type:=a;
@@ -259,7 +267,12 @@ ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[hei
     	list0_MV0[i]:=g[i*2];
     	list0_MV1[i]:=g[i*2+1];
     end  
-    valLFDisable := j;        
+    valLFDisable := j;
+    
+    if(firstmbinslice!=mb0) then
+    	firstmbinslice:=mb0;    
+    	slice_nr:=slice_nr+1;
+    end    
   end
 
 ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
@@ -277,6 +290,11 @@ ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[he
     list0_MV0:=[ 0 : for int i in Integers(0, 16-1) ];
     list0_MV1:=[ 0 : for int i in Integers(0, 16-1) ];   
     valLFDisable := j;
+    
+    if(firstmbinslice!=mb0) then
+    	firstmbinslice:=mb0;    
+    	slice_nr:=slice_nr+1;
+    end    
   end 
 
 ReadMB.IPCM: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a], Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
@@ -314,6 +332,7 @@ StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>
       up_mb_type := upFifo_mb_type[mb_x];
       up_cbp_blk := upFifo_cbp_blk[mb_x];
       up_QP := upFifo_valQP[mb_x];
+      up_slice_nr:=upFifo_slice_nr[mb_x];      
       up_list0_MV1 := [ upFifo_list0_MV1[mb_x][i] : for int i in Integers(0, 16-1) ];
       up_list0_MV0 := [ upFifo_list0_MV0[mb_x][i] : for int i in Integers(0, 16-1) ];
       up_list0_ref_pic_id := [ upFifo_list0_ref_pic_id[mb_x][i] : for int i in Integers(0, 16-1) ];
@@ -322,6 +341,7 @@ StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>
       up_mb_type :=0;
       up_cbp_blk:=0;
       up_QP:=0;
+      up_slice_nr:=0;      
       up_list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
       up_list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
       up_list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
@@ -337,6 +357,7 @@ StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>
       left_mb_type := upFifo_mb_type[mb_x-1];
       left_cbp_blk := upFifo_cbp_blk[mb_x-1];
       left_QP := upFifo_valQP[mb_x-1];
+      left_slice_nr:=upFifo_slice_nr[mb_x-1];      
       left_list0_MV1 := [ upFifo_list0_MV1[mb_x-1][i] : for int i in Integers(0, 16-1) ];
       left_list0_MV0 := [ upFifo_list0_MV0[mb_x-1][i] : for int i in Integers(0, 16-1) ];
       left_list0_ref_pic_id := [ upFifo_list0_ref_pic_id[mb_x-1][i] : for int i in Integers(0, 16-1) ];
@@ -345,6 +366,7 @@ StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>
       left_mb_type :=0;
       left_cbp_blk:=0;
       left_QP:=0;
+      left_slice_nr:=0;
       left_list0_MV1 := [ 0 : for int i in Integers(0, 16-1) ];
       left_list0_MV0 := [ 0 : for int i in Integers(0, 16-1) ];
       left_list0_ref_pic_id := [ 0 : for int i in Integers(0, 16-1) ];
@@ -353,7 +375,7 @@ StartMB: action Z:[v] repeat MB_BLOCK_SIZE*MB_BLOCK_SIZE ==>
     end
   end    
 SkipMB: action ==> BS:[[0:for int i in Integers(0,37)]] repeat 38
-  guard (valLFDisable != 0) end  
+  guard (valLFDisable = 1) end  
 //
 // Get strengths for this MB (32 total values)
 //
@@ -368,7 +390,8 @@ GetStrengths: action ==> BS:[Strength] repeat 32
 	foreach int dir in Integers(0, 1) do // vertical edges, than horizontal edges
       foreach int b in Integers(0, 3) do
         edge_curr := b;
-        if ((b>0) or (dir=1 and mb_y!=0) or (dir=0 and mb_x!=0)) then
+        if ((b>0) or (dir=1 and mb_y!=0 and (valLFDisable=0 or slice_nr=up_slice_nr)) 
+        		  or (dir=0 and mb_x!=0 and (valLFDisable=0 or slice_nr=left_slice_nr))) then
           foreach int c in Integers(0, 3) do
             idx := lshift(dir,4) + lshift(c,2) + b;
 			xQ := getPixelPosX(lshift(c,2),dir);
@@ -417,7 +440,7 @@ GetStrengths: action ==> BS:[Strength] repeat 32
     	  end // while (j<4)
         end // if-then    		
       end // while (edge<4)    	
-    end // while (dir<2)
+    end // while (dir<2)    
   end // GetStrengths
 
 ZeroStrengths: action ==> BS:[[0:for int i in Integers(0,5)]] repeat 6
@@ -540,6 +563,7 @@ DoneMB: action ==>
     upFifo_valQP[mb_x]:=valQP;
     upFifo_mb_type[mb_x]:=mb_type;
     upFifo_cbp_blk[mb_x]:=cbp_blk;  
+    upFifo_slice_nr[mb_x]:=slice_nr;
     upFifo_list0_MV1[mb_x]:=[list0_MV1[i]:for int i in Integers(0, 16-1) ];
     upFifo_list0_MV0[mb_x]:=[list0_MV0[i]:for int i in Integers(0, 16-1) ];
     upFifo_list0_ref_pic_id[mb_x]:= [ list0_ref_pic_id[i] : for int i in Integers(0, 16-1) ];

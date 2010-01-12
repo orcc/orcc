@@ -192,6 +192,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="ConstrainedIFlag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -316,4 +323,5 @@
     <Connection dst="TEX_L" dst-port="ref_idx_in" src="" src-port="ref_idx_in"/>
     <Connection dst="TEX_L" dst-port="mv_in" src="" src-port="mv_in"/>
     <Connection dst="TEX_L" dst-port="I_PCM_Y" src="" src-port="I_PCM_Y"/>
+    <Connection dst="TEX_L" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
 </XDF>

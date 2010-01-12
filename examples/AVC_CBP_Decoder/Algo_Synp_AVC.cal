@@ -85,7 +85,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			uint(size=16) cbp_blk,
 			int(size=6) slice_alpha_c0_offset, 
 			int(size=6) slice_beta_offset,
-			uint(size=2) LFDisable, 
+			uint(size=2) LFDisable,
+			uint(size=1) ConstrainedIFlag,
 			int(size=16) WIDTH, 
 			int(size=16) HEIGHT
 		:
@@ -387,7 +388,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	uint(size=3) suffixLength;
 	uint(size=5) inc_nb_coeff;
 	uint level_prefix;
-	uint(size=16) val_cbp_blk;
+	uint(size=16) val_cbp_blk:=0;
 	uint levelCode;
 	uint level_suffix;
 	uint(size=4) zerosLeft;
@@ -1913,6 +1914,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		memory_management_control_operation = 5
 	do
 		start_vld();
+		prev_frame_num:=0;
 	end
 	// end if
 
@@ -2186,6 +2188,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
 			LFDisable:[disable_deblocking_filter_idc],
+			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
 			cbp_blk:[0],
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
@@ -2279,13 +2282,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
 			LFDisable:[disable_deblocking_filter_idc],
-			cbp_blk:[val_cbp_blk]
+			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
+			cbp_blk:[cbp_blk_tmp],
+			MbIntraFlag:[mb_intra_flag]
 	guard IS_I_PCM()
 	var 
-		int mb_addr
+		int mb_addr,
+		int cbp_blk_tmp=val_cbp_blk
 	do
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
+		val_cbp_blk:=0;
 	end
 
 	send_data_position_information: action 
@@ -2297,16 +2304,20 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
 			slice_beta_offset:[val_slice_beta_offset],
 			LFDisable:[disable_deblocking_filter_idc],
-			cbp_blk:[val_cbp_blk],
+			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
+			cbp_blk:[cbp_blk_tmp],
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16,
+			MbIntraFlag:[mb_intra_flag]
 	var 
-		int mb_addr
+		int mb_addr,
+		int cbp_blk_tmp=val_cbp_blk
 	do
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
+		val_cbp_blk:=0;
 	end
 	
 	syncSliceD_endwhile: action ==>
@@ -2395,7 +2406,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		start_vld();
 	end
 
-	read_MB_layer_mb_type_done: action ==> MbIntraFlag:[mb_intra_flag] //,MVskip:[0]
+	read_MB_layer_mb_type_done: action ==> 
 	guard
 		vld_end()
 	do
@@ -2551,7 +2562,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		coded_block_pattern := vld_me();
 		val_CodedBlockPatternLuma := coded_block_pattern mod 16;
 		CodedBlockPatternChroma := coded_block_pattern / 16;
-		val_cbp_blk:=0;
 		if( val_CodedBlockPatternLuma > 0 and 
 			transform_8x8_mode_flag[pps_id]=1 and 
 			slice_type != SLICE_TYPE_I and
@@ -3492,7 +3502,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		CAVLC_end(),
 		TotalCoeff() >0
 	do
-		if leveltype < 2 then //luma
+		if leveltype = 1 then //luma
     		val_cbp_blk:=(1<<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
 			NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]] := TotalCoeff();
 		else //chroma

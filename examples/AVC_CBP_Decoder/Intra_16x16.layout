@@ -13,5 +13,6 @@
       <vertex id="Algo_IntraPred_LUMA_16x16" x="614" y="264"/>
       <vertex id="Algo_Add_16x16" x="836" y="393"/>
       <vertex id="Buffer_Neighbour_FullMb" x="202" y="391"/>
+      <vertex id="ConstrainedIFlag" x="202" y="37"/>
    </vertices>
 </layout>

@@ -307,6 +307,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="ConstrainedIFlag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -542,4 +549,7 @@
     <Connection dst="" dst-port="I_PCM_Y" src="Algo_Parser_IPCM" src-port="I_PCM_Y"/>
     <Connection dst="" dst-port="I_PCM_U" src="Algo_Parser_IPCM" src-port="I_PCM_U"/>
     <Connection dst="" dst-port="I_PCM_V" src="Algo_Parser_IPCM" src-port="I_PCM_V"/>
+    <Connection dst="" dst-port="ConstrainedIFlag" src="Algo_Synp_AVC" src-port="ConstrainedIFlag"/>
+    <Connection dst="Algo_IntraPred_Split" dst-port="ConstrainedIFlag"
+        src="Algo_Synp_AVC" src-port="ConstrainedIFlag"/>
 </XDF>

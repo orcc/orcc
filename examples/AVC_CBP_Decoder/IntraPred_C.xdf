@@ -52,6 +52,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="ConstrainedIFlag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -161,4 +168,5 @@
     <Connection dst="Algo_Add" dst-port="X" src="Algo_IntraPred_CHROMA" src-port="MPR"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="Coef_ACR" src="" src-port="Coef_ACR"/>
     <Connection dst="Algo_Add" dst-port="Y" src="Mgnt_Intra_8x8" src-port="Coef_ACR_I"/>
+    <Connection dst="Mgnt_Intra_8x8" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
 </XDF>

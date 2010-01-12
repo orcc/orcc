@@ -15,5 +15,6 @@
       <vertex id="Algo_Merge_4x4_to_16x16_norasterscan" x="1111" y="445"/>
       <vertex id="Algo_Split_16x16_to_4x4_norasterscan" x="662" y="475"/>
       <vertex id="Buffer_Neighbour_4x4" x="202" y="397"/>
+      <vertex id="ConstrainedIFlag" x="258" y="60"/>
    </vertices>
 </layout>

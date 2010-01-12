@@ -171,6 +171,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="ConstrainedIFlag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -382,7 +389,9 @@
     <Connection dst="Deblocking Filter" dst-port="RefIdx" src="" src-port="ref_idx_in"/>
     <Connection dst="Deblocking Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Deblocking Filter" dst-port="MbIntraFlag" src="" src-port="Mb_Type"/>
-    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking Filter" src-port="WD"/>
     <Connection dst="Select" dst-port="X3" src="" src-port="I_PCM_Y"/>
     <Connection dst="" dst-port="Display_L" src="Buffer_inter" src-port="Display"/>
+    <Connection dst="Intra_16x16" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
+    <Connection dst="Intra_4x4" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
+    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking Filter" src-port="WD"/>
 </XDF>
