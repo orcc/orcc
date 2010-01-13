@@ -50,7 +50,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.debug.model.OrccDebugTarget;
 import net.sf.orcc.interpreter.InterpreterMain;
+import net.sf.orcc.interpreter.InterpreterProcess;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -64,6 +66,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.ui.DebugUITools;
@@ -184,7 +187,35 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 				out.write("*********************************************"
 						+ "**********************************\n");
 				out.write("Launching Orcc interpretation...\n");
-				launchInterpreter(monitor, configuration);
+				// int requestPort = -1;
+				// int eventPort = -1;
+				// if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				// // Get free port for debug sockets
+				// requestPort = findFreePort();
+				// eventPort = findFreePort();
+				// if (requestPort == -1 || eventPort == -1) {
+				// abort("Unable to find free port", null);
+				// monitor.worked(1);
+				// monitor.done();
+				// return;
+				// }
+				// }
+				// Launch interpreter
+				// IProcess process = new InterpreterProcess();
+				// launchInterpreter(monitor, configuration, requestPort,
+				// eventPort);
+				// if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+				// // Launch debugger
+				// IDebugTarget target = new OrccDebugTarget(launch, process,
+				// requestPort, eventPort);
+				// launch.addDebugTarget(target);
+				// }
+				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
+					launchDebugInterpreter(launch, monitor, configuration);
+				} else {
+					launchSimuInterpreter(monitor, configuration);
+
+				}
 				out.write("Orcc interpretation ended.");
 			}
 
@@ -197,13 +228,15 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 	}
 
 	/**
-	 * Calls the Orcc RVC-CAL interpreter.
+	 * Calls the Orcc RVC-CAL interpreter for simulation.
 	 * 
+	 * @param monitor
+	 *            The progress monitor.
 	 * @param configuration
 	 *            The configuration.
 	 * @throws CoreException
 	 */
-	private void launchInterpreter(IProgressMonitor monitor,
+	private void launchSimuInterpreter(IProgressMonitor monitor,
 			ILaunchConfiguration configuration) throws CoreException {
 		String inputFile = configuration.getAttribute(INPUT_FILE, "");
 		String inputStimulus = configuration.getAttribute(INPUT_STIMULUS, "");
@@ -212,13 +245,57 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		String file = new File(inputFile).getName();
 		String name = outputFolder + File.separator + file;
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+		boolean enableTraces = configuration.getAttribute(ENABLE_TRACES,
+				DEFAULT_TRACES);
 		try {
 			InterpreterMain interpreter = InterpreterMain.getInstance();
-			boolean enableTraces = configuration.getAttribute(ENABLE_TRACES,
-					DEFAULT_TRACES);
-			interpreter.interpretNetwork(enableTraces, monitor, name,
-					inputStimulus, fifoSize);
+			interpreter.interpretNetwork(enableTraces, name, inputStimulus,
+					fifoSize);
+			// Call network initializer main function
+			interpreter.initialize();
+			// Loop on network scheduler main function
+			while ((!monitor.isCanceled()) && (interpreter.scheduler() > 0))
+				;
+			// Call network closing main function
+			interpreter.close();
 		} catch (Exception e) {
+			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+					"interpreter error", e);
+			throw new CoreException(status);
+		}
+	}
+
+	/**
+	 * Calls the Orcc RVC-CAL interpreter for debugging.
+	 * 
+	 * @param launch
+	 *            The current launch context.
+	 * @param monitor
+	 *            The progress monitor.
+	 * @param configuration
+	 *            The configuration.
+	 * @throws CoreException
+	 */
+	private void launchDebugInterpreter(ILaunch launch,
+			IProgressMonitor monitor, ILaunchConfiguration configuration)
+			throws CoreException {
+
+		// Create Interpreter Process
+		InterpreterProcess process = new InterpreterProcess(monitor,
+				configuration);
+
+		// Create and launch DebugTarget
+		OrccDebugTarget target = new OrccDebugTarget(launch, process, -1, -1);
+		launch.addDebugTarget(target);
+
+		// Add the DebugTarget as a listener of interpreter
+		process.addPropertyChangeListener(target);
+
+		// Launch Interpreter Process
+		process.start();
+		try {
+			process.join();
+		} catch (InterruptedException e) {
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					"interpreter error", e);
 			throw new CoreException(status);

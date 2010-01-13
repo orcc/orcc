@@ -186,6 +186,10 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		// TODO : check return type
 		// Type type = procedure.getReturnType();
 
+		// Update last visited location value :
+		lastVisitedLocation = procedure.getLocation();
+		lastVisitedAction = procedure.getName();
+
 		// Return the result object
 		return result;
 	}

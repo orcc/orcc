@@ -16,7 +16,9 @@
             id="net.sf.orcc.simuLaunchConfigurationType"
             modes="debug, run"
             name="Orcc simulation"
-            public="true">
+            public="true"
+            sourceLocatorId="net.sf.orcc.debug.sourceLookupDirector.cal"
+            sourcePathComputerId="net.sf.orcc.debug.sourcePathComputer.cal">
       </launchConfigurationType>
    </extension>
    <extension
@@ -138,6 +140,28 @@
             id="net.sf.orcc.ui.editors.RVCCalEditor"
             name="RVC-CAL editor">
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="net.sf.orcc.debug.sourceLookup.OrccSourcePathComputerDelegate"
+            id="net.sf.orcc.debug.sourcePathComputer.cal">
+      </sourcePathComputer>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="net.sf.orcc.debug.sourceLookup.OrccSourceLookupDirector"
+            id="net.sf.orcc.debug.sourceLookupDirector.cal"
+            name="ORCC (RVC-CAL) Source Lookup Director">
+      </sourceLocator>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+            class="net.sf.orcc.debug.sourceLookup.OrccModelPresentation"
+            id="net.sf.orcc.debug.debugModelPresentation.cal">
+      </debugModelPresentation>
    </extension>
 
 </plugin>

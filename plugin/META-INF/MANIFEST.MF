@@ -41,3 +41,4 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.util,
  org.jgrapht,
  org.jgrapht.graph
+Import-Package: org.eclipse.jdt.launching

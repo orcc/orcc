@@ -49,11 +49,10 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.jgrapht.DirectedGraph;
 
 /**
- * Interpreter "back-end".
+ * RVC-CAL interpreter.
  * 
  * @author Pierre-Laurent Lagalaye
  * 
@@ -65,7 +64,7 @@ public class InterpreterMain {
 	/**
 	 * Returns the single instance of this interpreter
 	 * 
-	 * @return the single instance of this interperter
+	 * @return the single instance of this interpreter
 	 */
 	public static InterpreterMain getInstance() {
 		return instance;
@@ -79,8 +78,8 @@ public class InterpreterMain {
 	private InterpreterMain() {
 	}
 
-	public void interpretNetwork(boolean enableTraces,
-			IProgressMonitor monitor, String fileName, String inputBitstream,
+	public List<AbstractInterpretedActor> interpretNetwork(
+			boolean enableTraces, String fileName, String inputBitstream,
 			int fifoSize) throws Exception {
 
 		// set FIFO size
@@ -202,21 +201,14 @@ public class InterpreterMain {
 			}
 		}
 
-		// Call network initializer main function
-		initialize();
-
-		// Call network scheduler main function
-		scheduler(monitor);
-
-		// Call network closing main function
-		close();
+		return actorQueue;
 	}
 
 	/**
 	 * Initialize each network actor if initializing function exists
 	 * 
 	 */
-	private void initialize() {
+	public void initialize() {
 		// init actors of the network
 		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.initialize();
@@ -229,29 +221,26 @@ public class InterpreterMain {
 	 * 
 	 * @throws Exception
 	 */
-	private void scheduler(IProgressMonitor monitor) throws Exception {
+	public int scheduler() throws Exception {
 
-		int running = 1;
-		// While at least one actor is running
-		while (running > 0) {
-			running = 0;
-			for (AbstractInterpretedActor actor : actorQueue) {
-				// System.out.println("Schedule actor " + actor.getName());
-				Integer actorStatus = actor.schedule();
-				if ((actorStatus < 0) || (monitor.isCanceled())) {
-					return;
-				} else {
-					running += actorStatus;
-				}
+		int running = 0;
+		for (AbstractInterpretedActor actor : actorQueue) {
+			// System.out.println("Schedule actor " + actor.getName());
+			Integer actorStatus = actor.schedule();
+			if (actorStatus < 0) {
+				return -1;
+			} else {
+				running += actorStatus;
 			}
 		}
+		return running;
 	}
 
 	/**
 	 * Ask each network actor for closing
 	 * 
 	 */
-	private void close() {
+	public void close() {
 		// close actors of the network
 		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.close();
@@ -261,4 +250,5 @@ public class InterpreterMain {
 			fifo.close();
 		}
 	}
+
 }
