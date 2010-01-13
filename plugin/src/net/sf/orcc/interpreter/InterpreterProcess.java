@@ -411,6 +411,7 @@ public class InterpreterProcess extends Thread implements IProcess {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
 		// TODO Auto-generated method stub
 		return null;

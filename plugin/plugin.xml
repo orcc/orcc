@@ -159,8 +159,8 @@
    <extension
          point="org.eclipse.debug.ui.debugModelPresentations">
       <debugModelPresentation
-            class="net.sf.orcc.debug.sourceLookup.OrccModelPresentation"
-            id="net.sf.orcc.debug.debugModelPresentation.cal">
+            class="net.sf.orcc.debug.presentation.OrccModelPresentation"
+            id="net.sf.orcc.plugin.model">
       </debugModelPresentation>
    </extension>
 

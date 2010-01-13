@@ -37,6 +37,8 @@ import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
 /**
@@ -44,41 +46,8 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class OrccModelPresentation extends LabelProvider implements
 		IDebugModelPresentation {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.ui.IDebugModelPresentation#setAttribute(java.lang.String
-	 * , java.lang.Object)
-	 */
-	public void setAttribute(String attribute, Object value) {
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
-	public Image getImage(Object element) {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
-	public String getText(Object element) {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.ui.IDebugModelPresentation#computeDetail(org.eclipse
-	 * .debug.core.model.IValue, org.eclipse.debug.ui.IValueDetailListener)
-	 */
+	@Override
 	public void computeDetail(IValue value, IValueDetailListener listener) {
 		String detail = "";
 		try {
@@ -88,12 +57,20 @@ public class OrccModelPresentation extends LabelProvider implements
 		listener.detailComputed(value, detail);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.ui.ISourcePresentation#getEditorInput(java.lang.Object)
-	 */
+	@Override
+	public String getEditorId(IEditorInput input, Object element) {
+		if (element instanceof IFile || element instanceof ILineBreakpoint) {
+			try {
+				return IDE.getEditorDescriptor((IFile) element).getId();
+			} catch (PartInitException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public IEditorInput getEditorInput(Object element) {
 		if (element instanceof IFile) {
 			return new FileEditorInput((IFile) element);
@@ -105,17 +82,17 @@ public class OrccModelPresentation extends LabelProvider implements
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.debug.ui.ISourcePresentation#getEditorId(org.eclipse.ui.
-	 * IEditorInput, java.lang.Object)
-	 */
-	public String getEditorId(IEditorInput input, Object element) {
-		if (element instanceof IFile || element instanceof ILineBreakpoint) {
-		//	return "net.sf.orcc.ui.editors.CalEditor";
-			return "org.eclipse.ui.DefaultTextEditor";
-		}
+	@Override
+	public Image getImage(Object element) {
 		return null;
+	}
+
+	@Override
+	public String getText(Object element) {
+		return null;
+	}
+
+	@Override
+	public void setAttribute(String attribute, Object value) {
 	}
 }

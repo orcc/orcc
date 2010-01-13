@@ -30,14 +30,18 @@ package net.sf.orcc.debug.sourceLookup;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 
-import java.io.File;
-
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.ISourcePathComputerDelegate;
-import org.eclipse.debug.core.sourcelookup.containers.DirectorySourceContainer;
+import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 
 /**
  * Computes the default source lookup path for a ORCC launch configuration. The
@@ -47,42 +51,23 @@ import org.eclipse.debug.core.sourcelookup.containers.DirectorySourceContainer;
 public class OrccSourcePathComputerDelegate implements
 		ISourcePathComputerDelegate {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.internal.core.sourcelookup.ISourcePathComputerDelegate
-	 * #computeSourceContainers(org.eclipse.debug.core.ILaunchConfiguration,
-	 * org.eclipse.core.runtime.IProgressMonitor)
-	 */
+	@Override
 	public ISourceContainer[] computeSourceContainers(
 			ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
-		// Get source path
+		// get input file
 		String inputFile = configuration.getAttribute(INPUT_FILE, "");
-		File dir = new File(inputFile).getParentFile();
 
-		return new ISourceContainer[] { new DirectorySourceContainer(dir, true) };
+		// we know the file is in the workspace
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IFile file = root.getFileForLocation(new Path(inputFile));
 
-		// String path = "net.sf.orcc.examples";
-		// ISourceContainer sourceContainer = null;
-		// if (path != null) {
-		// IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-		// .findMember(new Path(path));
-		// if (resource != null) {
-		// IContainer container = resource.getParent();
-		// if (container.getType() == IResource.PROJECT) {
-		// sourceContainer = new ProjectSourceContainer(
-		// (IProject) container, false);
-		// } else if (container.getType() == IResource.FOLDER) {
-		// sourceContainer = new FolderSourceContainer(container,
-		// false);
-		// }
-		// }
-		// }
-		// if (sourceContainer == null) {
-		// sourceContainer = new WorkspaceSourceContainer();
-		// }
-		// return new ISourceContainer[] { sourceContainer };
+		// get the container of this file
+		IContainer container = file.getParent();
+
+		return new ISourceContainer[] { new FolderSourceContainer(container,
+				true) };
 	}
+
 }

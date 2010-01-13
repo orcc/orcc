@@ -37,13 +37,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * Creates a toggle breakpoint adapter
  */
 public class OrccBreakpointAdapterFactory implements IAdapterFactory {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
-	 * java.lang.Class)
-	 */
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof ITextEditor) {
 			ITextEditor editorPart = (ITextEditor) adaptableObject;
@@ -59,11 +55,8 @@ public class OrccBreakpointAdapterFactory implements IAdapterFactory {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
-	 */
+	@Override
+	@SuppressWarnings("unchecked")
 	public Class[] getAdapterList() {
 		return new Class[] { IToggleBreakpointsTarget.class };
 	}

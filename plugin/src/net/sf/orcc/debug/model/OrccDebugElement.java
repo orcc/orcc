@@ -31,6 +31,8 @@ public abstract class OrccDebugElement extends PlatformObject implements
 
 	// containing target
 	protected OrccDebugTarget fTarget;
+	
+	public static final String ID_ORCC_DEBUG_MODEL = OrccActivator.PLUGIN_ID + ".model";
 
 	/**
 	 * Constructs a new debug element contained in the given debug target.
@@ -48,7 +50,7 @@ public abstract class OrccDebugElement extends PlatformObject implements
 	 * @see org.eclipse.debug.core.model.IDebugElement#getModelIdentifier()
 	 */
 	public String getModelIdentifier() {
-		return OrccActivator.PLUGIN_ID;
+		return ID_ORCC_DEBUG_MODEL;
 	}
 
 	/*
@@ -69,11 +71,8 @@ public abstract class OrccDebugElement extends PlatformObject implements
 		return getDebugTarget().getLaunch();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-	 */
+	@Override
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
 		if (adapter == IDebugElement.class) {
 			return this;
