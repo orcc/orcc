@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.debug.breakpoints;
 
+import net.sf.orcc.debug.model.OrccDebugElement;
 import net.sf.orcc.debug.model.OrccLineBreakpoint;
-import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -63,7 +63,7 @@ public class OrccLineBreakpointAdapter implements IToggleBreakpointsTarget {
 			int lineNumber = textSelection.getStartLine();
 			IBreakpoint[] breakpoints = DebugPlugin.getDefault()
 					.getBreakpointManager().getBreakpoints(
-							OrccActivator.PLUGIN_ID);
+							OrccDebugElement.ID_ORCC_DEBUG_MODEL);
 			for (int i = 0; i < breakpoints.length; i++) {
 				IBreakpoint breakpoint = breakpoints[i];
 				if (resource.equals(breakpoint.getMarker().getResource())) {

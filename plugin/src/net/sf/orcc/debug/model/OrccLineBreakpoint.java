@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.debug.model;
 
-import net.sf.orcc.ui.OrccActivator;
-
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -88,6 +86,6 @@ public class OrccLineBreakpoint extends LineBreakpoint {
 	 * @see org.eclipse.debug.core.model.IBreakpoint#getModelIdentifier()
 	 */
 	public String getModelIdentifier() {
-		return OrccActivator.PLUGIN_ID;
+		return OrccDebugElement.ID_ORCC_DEBUG_MODEL;
 	}
 }

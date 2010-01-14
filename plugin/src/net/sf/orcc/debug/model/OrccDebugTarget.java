@@ -33,11 +33,11 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.interpreter.InterpreterProcess;
 import net.sf.orcc.interpreter.InterpreterProcess.InterpreterThread;
-import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -77,8 +77,8 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	private boolean fTerminated = false;
 
 	// threads
-	// private OrccThread fThread;
 	private IThread[] fThreads;
+	private Map<String, OrccThread> threadMap;
 
 	/**
 	 * Constructs a new debug target in the given launch for the associated Orcc
@@ -102,11 +102,13 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		fTarget = this;
 		fProcess = (InterpreterProcess) process;
 		fName = fProcess.getNetworkName();
+		threadMap = new HashMap<String, OrccThread>();
 		Map<String, InterpreterThread> threads = fProcess.getThreads();
 		fThreads = new IThread[threads.size()];
 		int idx = 0;
 		for (InterpreterThread thread : threads.values()) {
 			fThreads[idx] = new OrccThread(this, thread);
+			threadMap.put(thread.getName(), (OrccThread)fThreads[idx]);
 			idx++;
 		}
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(
@@ -160,7 +162,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * .debug.core.model.IBreakpoint)
 	 */
 	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
-		if (breakpoint.getModelIdentifier().equals(OrccActivator.PLUGIN_ID)) {
+		if (breakpoint.getModelIdentifier().equals(ID_ORCC_DEBUG_MODEL)) {
 			IMarker marker = breakpoint.getMarker();
 			if (marker != null) {
 				try {
@@ -208,7 +210,8 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
 	public boolean isTerminated() {
-		return getProcess().isTerminated();
+		fTerminated = getProcess().isTerminated();
+		return fTerminated;
 	}
 
 	/*
@@ -262,10 +265,15 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @param detail
 	 *            reason for the resume
 	 */
-	private void resumed(int detail) {
-		fSuspended = false;
-		for (IThread thread : fThreads) {
-			((OrccThread) thread).fireResumeEvent(detail);
+	private void resumed(int detail, OrccThread orccThread) {
+		if (orccThread != null) {
+			orccThread.resumed();
+			orccThread.fireResumeEvent(detail);
+		}else {
+			fSuspended = false;
+			for (IThread thread : fThreads) {
+				((OrccThread) thread).fireResumeEvent(detail);
+			}
 		}
 	}
 
@@ -275,10 +283,15 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @param detail
 	 *            reason for the suspend
 	 */
-	private void suspended(int detail) {
-		fSuspended = true;
-		for (IThread thread : fThreads) {
-			((OrccThread) thread).fireSuspendEvent(detail);
+	private void suspended(int detail, OrccThread orccThread) {
+		if (orccThread != null) {
+			orccThread.suspended();
+			orccThread.fireSuspendEvent(detail);
+		}else {
+			fSuspended = true;
+			for (IThread thread : fThreads) {
+				((OrccThread) thread).fireSuspendEvent(detail);
+			}
 		}
 	}
 
@@ -419,7 +432,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 */
 	private void installDeferredBreakpoints() {
 		IBreakpoint[] breakpoints = DebugPlugin.getDefault()
-				.getBreakpointManager().getBreakpoints(OrccActivator.PLUGIN_ID);
+				.getBreakpointManager().getBreakpoints(ID_ORCC_DEBUG_MODEL);
 		for (int i = 0; i < breakpoints.length; i++) {
 			breakpointAdded(breakpoints[i]);
 		}
@@ -484,8 +497,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			String line = event.substring(lastSpace + 1);
 			int lineNumber = Integer.parseInt(line);
 			IBreakpoint[] breakpoints = DebugPlugin.getDefault()
-					.getBreakpointManager().getBreakpoints(
-							OrccActivator.PLUGIN_ID);
+					.getBreakpointManager().getBreakpoints(ID_ORCC_DEBUG_MODEL);
 			for (int i = 0; i < breakpoints.length; i++) {
 				IBreakpoint breakpoint = breakpoints[i];
 				if (supportsBreakpoint(breakpoint)) {
@@ -503,11 +515,11 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 				}
 			}
 		}
-		suspended(DebugEvent.BREAKPOINT);
+		suspended(DebugEvent.BREAKPOINT, orccThread);
 	}
 
 	public void propertyChange(PropertyChangeEvent event) {
-		OrccThread orccThread = getOrccThreadFromName((String) event
+		OrccThread orccThread = threadMap.get((String) event
 				.getNewValue());
 		if (orccThread != null) {
 			orccThread.setBreakpoints(null);
@@ -523,33 +535,20 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 				if (orccThread != null) {
 					orccThread.setStepping(true);
 				}
-				resumed(DebugEvent.STEP_OVER);
+				resumed(DebugEvent.STEP_OVER, orccThread);
 			} else if (event.getPropertyName().endsWith("client")) {
-				resumed(DebugEvent.CLIENT_REQUEST);
+				resumed(DebugEvent.CLIENT_REQUEST, orccThread);
 			}
 		} else if (event.getPropertyName().startsWith("suspended")) {
 			if (event.getPropertyName().endsWith("client")) {
-				suspended(DebugEvent.CLIENT_REQUEST);
+				suspended(DebugEvent.CLIENT_REQUEST, orccThread);
 			} else if (event.getPropertyName().endsWith("step")) {
-				suspended(DebugEvent.STEP_END);
+				suspended(DebugEvent.STEP_END, orccThread);
 			} else if (event.getPropertyName().indexOf("breakpoint") >= 0) {
-				breakpointHit(event.getPropertyName(), orccThread);
-			}
-		}
-	}
-
-	private OrccThread getOrccThreadFromName(String name) {
-		if (name != null) {
-			for (IThread thread : fThreads) {
-				try {
-					if (thread.getName().equals(name)) {
-						return (OrccThread) thread;
-					}
-				} catch (DebugException e) {
-					e.printStackTrace();
+				if (orccThread != null) {
+					breakpointHit(event.getPropertyName(), orccThread);
 				}
 			}
 		}
-		return null;
 	}
 }

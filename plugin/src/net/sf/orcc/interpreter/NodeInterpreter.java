@@ -184,14 +184,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		node.getJoinNode().accept(this, args);
 	}
 
-	// private int[] toIntArray(List<Integer> integerList) {
-	// int[] intArray = new int[integerList.size()];
-	// for (int i = 0; i < integerList.size(); i++) {
-	// intArray[i] = integerList.get(i);
-	// }
-	// return intArray;
-	// }
-
 	@Override
 	public void visit(InitPort instr, Object... args) {
 		// Nothing TODO ?

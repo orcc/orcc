@@ -187,38 +187,14 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 				out.write("*********************************************"
 						+ "**********************************\n");
 				out.write("Launching Orcc interpretation...\n");
-				// int requestPort = -1;
-				// int eventPort = -1;
-				// if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				// // Get free port for debug sockets
-				// requestPort = findFreePort();
-				// eventPort = findFreePort();
-				// if (requestPort == -1 || eventPort == -1) {
-				// abort("Unable to find free port", null);
-				// monitor.worked(1);
-				// monitor.done();
-				// return;
-				// }
-				// }
-				// Launch interpreter
-				// IProcess process = new InterpreterProcess();
-				// launchInterpreter(monitor, configuration, requestPort,
-				// eventPort);
-				// if (mode.equals(ILaunchManager.DEBUG_MODE)) {
-				// // Launch debugger
-				// IDebugTarget target = new OrccDebugTarget(launch, process,
-				// requestPort, eventPort);
-				// launch.addDebugTarget(target);
-				// }
 				if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 					launchDebugInterpreter(launch, monitor, configuration);
 				} else {
-					launchSimuInterpreter(monitor, configuration);
+					launchSimuInterpreter(launch, monitor, configuration);
 
 				}
 				out.write("Orcc interpretation ended.");
 			}
-
 			monitor.worked(1);
 			monitor.done();
 		} catch (IOException e) {
@@ -236,8 +212,9 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 	 *            The configuration.
 	 * @throws CoreException
 	 */
-	private void launchSimuInterpreter(IProgressMonitor monitor,
-			ILaunchConfiguration configuration) throws CoreException {
+	private void launchSimuInterpreter(ILaunch launch,
+			IProgressMonitor monitor, ILaunchConfiguration configuration)
+			throws CoreException {
 		String inputFile = configuration.getAttribute(INPUT_FILE, "");
 		String inputStimulus = configuration.getAttribute(INPUT_STIMULUS, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
@@ -325,7 +302,6 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 
 		Process process = DebugPlugin.exec(cmdLine, null);
 		IProcess proc = DebugPlugin.newProcess(launch, process, name);
-
 		createConsole(proc);
 
 		try {

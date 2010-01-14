@@ -203,13 +203,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 */
 	protected boolean isSchedulable(Action action) {
 		Object isSchedulable = interpretProc(action.getScheduler());
-		if ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable)) {
-			// if (checkOutputPattern(action.getOutputPattern())) {
-			return true;
-			// }
-		}
-
-		return false;
+		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
 
 	/**
@@ -276,32 +270,38 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		return running;
 
-		// // Schedule only 1 action per actor
-		// if (sched.hasFsm()) {
-		// // Check for untagged actions first
-		// for (Action action : sched.getActions()) {
-		// if (isSchedulable(action)) {
-		// return execute(action);
-		// }
-		// }
-		//
-		// // Then check for next FSM transition
-		// for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
-		// Action action = info.getAction();
-		// if (isSchedulable(action)) {
-		// // Update FSM state
-		// fsmState = info.getTargetState().getName();
-		// return execute(action);
-		// }
-		// }
-		// } else {
-		// for (Action action : sched.getActions()) {
-		// if (isSchedulable(action)) {
-		// return execute(action);
-		// }
-		// }
-		// }
-		// return 0;
+//		// Schedule only 1 action per actor
+//		if (sched.hasFsm()) {
+//			// Check for untagged actions first
+//			for (Action action : sched.getActions()) {
+//				if (isSchedulable(action)) {
+//					if (checkOutputPattern(action.getOutputPattern())) {
+//						return execute(action);
+//					}
+//				}
+//			}
+//
+//			// Then check for next FSM transition
+//			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
+//				Action action = info.getAction();
+//				if (isSchedulable(action)) {
+//					// Update FSM state
+//					if (checkOutputPattern(action.getOutputPattern())) {
+//						fsmState = info.getTargetState().getName();
+//						return execute(action);
+//					}
+//				}
+//			}
+//		} else {
+//			for (Action action : sched.getActions()) {
+//				if (isSchedulable(action)) {
+//					if (checkOutputPattern(action.getOutputPattern())) {
+//						return execute(action);
+//					}
+//				}
+//			}
+//		}
+//		return 0;
 	}
 
 	@Override

@@ -50,7 +50,8 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 */
 	private boolean fStepping = false;
 
-	private boolean fSuspended = false;
+	private boolean fSuspended = true;
+	private boolean fTerminated = false;
 
 	private InterpreterThread fThread;
 
@@ -176,20 +177,26 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
-		fSuspended = false;
 		fThread.resume();
 	}
 
+	public void resumed() {
+		fSuspended = false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
-		fSuspended = true;
 		fThread.suspend();
 	}
 
+	public void suspended() {
+		fSuspended = true;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -257,7 +264,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
 	public boolean canTerminate() {
-		return !isTerminated();
+		return false;
 	}
 
 	/*
@@ -266,7 +273,8 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
 	public boolean isTerminated() {
-		return getDebugTarget().isTerminated();
+		fTerminated = fThread.isTerminated();
+		return fTerminated;
 	}
 
 	/*
@@ -275,7 +283,6 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
-		getDebugTarget().terminate();
 	}
 
 	/**

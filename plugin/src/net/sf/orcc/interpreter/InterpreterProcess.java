@@ -27,6 +27,8 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 public class InterpreterProcess extends Thread implements IProcess {
 
 	private String state;
+	private int nbOfSuspendedThreads = 0;
+	private boolean threadCommand = false;
 
 	/**
 	 * The hash map that stores property values.
@@ -39,11 +41,24 @@ public class InterpreterProcess extends Thread implements IProcess {
 	private PropertyChangeSupport propertyChange;
 
 	private IProgressMonitor monitor;
-	// private ILaunchConfiguration configuration;
 	private InterpreterMain interpreter;
 	private Map<String, InterpreterThread> threads;
 	private String networkName;
-	private String currentThread;
+
+	// private final Retransmitter outputMonitor;
+	// private final IStreamsProxy streamsProxy = new IStreamsProxy() {
+	// public IStreamMonitor getErrorStreamMonitor() {
+	// return NullStreamMonitor.INSTANCE;
+	// }
+	//
+	// public IStreamMonitor getOutputStreamMonitor() {
+	// return outputMonitor;
+	// }
+	//
+	// public void write(String input) {
+	// // ignore
+	// }
+	// };
 
 	public class InterpreterStackFrame {
 		public String actorFilename;
@@ -52,25 +67,13 @@ public class InterpreterProcess extends Thread implements IProcess {
 		public String fsmState;
 		public String currentAction;
 		public Boolean isSchedulable;
-
-		public InterpreterStackFrame() {
-		};
-
-		public InterpreterStackFrame(String actorFilename, Integer codeLine,
-				Map<String, Object> stateVars, String fsmState,
-				String currentAction, Boolean isSchedulable) {
-			this.actorFilename = actorFilename;
-			this.codeLine = codeLine;
-			this.stateVars = stateVars;
-			this.fsmState = fsmState;
-			this.currentAction = currentAction;
-			this.isSchedulable = isSchedulable;
-		}
 	}
 
 	public class InterpreterThread {
 		private AbstractInterpretedActor actor;
 		private InterpreterProcess process;
+		private boolean threadSuspended = true;
+		private boolean threadStepping = false;
 
 		public InterpreterThread(InterpreterProcess process,
 				AbstractInterpretedActor actor) {
@@ -86,19 +89,39 @@ public class InterpreterProcess extends Thread implements IProcess {
 			return actor;
 		}
 
+		public int run() {
+			Integer actorStatus = 0;
+			if ((!threadSuspended) || (threadStepping)) {
+				actorStatus = actor.schedule();
+				if (threadStepping) {
+					threadStepping = false;
+					firePropertyChange("suspended step", null, actor.name);
+				}
+			}
+			return actorStatus;
+		}
+
 		public void resume() {
-			currentThread = actor.name;
-			process.resumeInterpreter();
+			threadSuspended = false;
+			nbOfSuspendedThreads--;
+			threadCommand = true;
+			firePropertyChange("resumed client", null, actor.name);
 		}
 
 		public void suspend() {
-			currentThread = actor.name;
-			process.suspendInterpreter();
+			threadSuspended = true;
+			nbOfSuspendedThreads++;
+			firePropertyChange("suspended client", null, actor.name);
 		}
 
 		public void stepOver() {
-			currentThread = actor.name;
-			process.step();
+			threadStepping = true;
+			threadCommand = true;
+			firePropertyChange("resumed step", null, actor.name);
+		}
+
+		public boolean isTerminated() {
+			return process.isTerminated();
 		}
 
 		public void stepInto() {
@@ -115,8 +138,8 @@ public class InterpreterProcess extends Thread implements IProcess {
 			}
 			stackFrame.stateVars = stateVars;
 			stackFrame.currentAction = actor.getLastVisitedAction();
-			if ((actor.name.equalsIgnoreCase("source"))
-					&& (actor.name.equalsIgnoreCase("display"))) {
+			if ((!actor.name.equalsIgnoreCase("source"))
+					&& (!actor.name.equalsIgnoreCase("display"))) {
 				stackFrame.fsmState = ((InterpretedActor) actor).getFsmState();
 			} else {
 				stackFrame.fsmState = "idle";
@@ -130,20 +153,20 @@ public class InterpreterProcess extends Thread implements IProcess {
 	/**
 	 * Interpreter process constructor
 	 * 
-	 * @param enableTraces
 	 * @param monitor
-	 * @param fileName
-	 * @param inputBitstream
-	 * @param fifoSize
+	 * @param configuration
 	 */
+	// public InterpreterProcess(IProgressMonitor monitor,
+	// ILaunchConfiguration configuration, Retransmitter retransmitter) {
+	// this.outputMonitor = retransmitter;
 	public InterpreterProcess(IProgressMonitor monitor,
 			ILaunchConfiguration configuration) {
+
 		// Container for receiving interpreter events
 		propertyChange = new PropertyChangeSupport(this);
 		properties = new HashMap<String, Object>();
 		// Interpreter global state initialization
 		state = "IDLE";
-		currentThread = "";
 		// Get launch related objects
 		this.monitor = monitor;
 		// this.configuration = configuration;
@@ -170,6 +193,7 @@ public class InterpreterProcess extends Thread implements IProcess {
 				InterpreterThread thread = new InterpreterThread(this, actor);
 				threads.put(actor.name, thread);
 				threadIdx++;
+				nbOfSuspendedThreads++;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -272,38 +296,56 @@ public class InterpreterProcess extends Thread implements IProcess {
 					// Send the "started" event and wait for the resume/step
 					// command
 					state = "STARTED";
-					firePropertyChange("started", null, currentThread);
+					firePropertyChange("started", null, null);
 					// Nominal running
 				} else if (state.equals("RUNNING")) {
-					try {
-						if (interpreter.scheduler() <= 0) {
-							// Error found in the model interpretation
-							terminate();
+					if ((nbOfSuspendedThreads == 0) || (threadCommand)) {
+						threadCommand = false;
+						try {
+							if (runThreads() <= 0) {
+								terminate();
+							}
+						} catch (DebugException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					} catch (DebugException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 				} else if (state.equals("STEPPING")) {
-					try {
-						if (interpreter.scheduler() <= 0) {
-							// Error found in the model interpretation
-							terminate();
+					if ((nbOfSuspendedThreads == 0) || (threadCommand)) {
+						threadCommand = false;
+						try {
+							if (runThreads() <= 0) {
+								terminate();
+							}
+						} catch (DebugException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					} catch (DebugException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						state = "SUSPENDED";
+						firePropertyChange("suspended step", null, null);
 					}
-					firePropertyChange("suspend step", null, currentThread);
 				}
 			}
 		}
+	}
+
+	private int runThreads() {
+		int running = 0;
+		for (InterpreterThread thread : threads.values()) {
+			int threadStatus = thread.run();
+			if (threadStatus < 0) {
+				return -1;
+			} else {
+				running += threadStatus;
+			}
+		}
+		return running;
 	}
 
 	//
@@ -318,10 +360,16 @@ public class InterpreterProcess extends Thread implements IProcess {
 			// Call network initializer main function
 			interpreter.initialize();
 			state = "RUNNING";
-			firePropertyChange("resumed client", null, currentThread);
-		} else if ((state.equals("SUSPENDED")) || (state.equals("STEPPING"))) {
+			for (InterpreterThread thread : threads.values()) {
+				thread.resume();
+			}
+			firePropertyChange("resumed client", null, null);
+		} else if (state.equals("SUSPENDED")) {
 			state = "RUNNING";
-			firePropertyChange("resumed client", null, currentThread);
+			for (InterpreterThread thread : threads.values()) {
+				thread.resume();
+			}
+			firePropertyChange("resumed client", null, null);
 		}
 	}
 
@@ -330,6 +378,10 @@ public class InterpreterProcess extends Thread implements IProcess {
 	 */
 	public void suspendInterpreter() {
 		state = "SUSPENDED";
+		for (InterpreterThread thread : threads.values()) {
+			thread.suspend();
+		}
+		firePropertyChange("suspended client", null, null);
 	}
 
 	/**
@@ -340,12 +392,16 @@ public class InterpreterProcess extends Thread implements IProcess {
 			// Call network initializer main function
 			interpreter.initialize();
 			state = "STEPPING";
-			firePropertyChange("resumed step", null, currentThread);
-		} else if (state.equals("STEPPING")) {
-			firePropertyChange("resumed step", null, currentThread);
+			for (InterpreterThread thread : threads.values()) {
+				thread.stepOver();
+			}
+			firePropertyChange("resumed step", null, null);
 		} else if (state.equals("SUSPENDED")) {
 			state = "STEPPING";
-			firePropertyChange("resumed step", null, currentThread);
+			for (InterpreterThread thread : threads.values()) {
+				thread.stepOver();
+			}
+			firePropertyChange("resumed step", null, null);
 		}
 	}
 
@@ -364,14 +420,14 @@ public class InterpreterProcess extends Thread implements IProcess {
 	}
 
 	/**
-	 * "get stack" debugger command
+	 * "get thread stack" debugger command
 	 */
 	public InterpreterStackFrame getStackFrame(String threadId) {
 		return threads.get(threadId).getStackFrame();
 	}
 
 	//
-	// IProcess methods (unuseful ?)
+	// IProcess methods
 	//	
 
 	@Override
@@ -401,6 +457,7 @@ public class InterpreterProcess extends Thread implements IProcess {
 	@Override
 	public IStreamsProxy getStreamsProxy() {
 		// TODO Auto-generated method stub
+		// return streamsProxy;
 		return null;
 	}
 
@@ -432,5 +489,88 @@ public class InterpreterProcess extends Thread implements IProcess {
 		interpreter.close();
 		state = "TERMINATED";
 	}
+
+	// private static class NullStreamMonitor implements IStreamMonitor {
+	// public void addListener(IStreamListener listener) {
+	// }
+	//
+	// public String getContents() {
+	// return null;
+	// }
+	//
+	// public void removeListener(IStreamListener listener) {
+	// }
+	//
+	// static final NullStreamMonitor INSTANCE = new NullStreamMonitor();
+	// }
+	//
+	// /**
+	// * Responsible for getting text as {@link Writer} and retransmitting it as
+	// * {@link IStreamMonitor} to whoever is interested. However in its initial
+	// * state it only receives signal (the text) and saves it in a buffer. For
+	// * {@link Retransmitter} to start giving the signal away one should call
+	// * {@link #startFlushing} method.
+	// */
+	// public static class Retransmitter extends Writer implements
+	// IStreamMonitor {
+	// private StringWriter writer = new StringWriter();
+	// private boolean isFlushing = false;
+	// private final List<IStreamListener> listeners = new
+	// ArrayList<IStreamListener>(
+	// 2);
+	//
+	// public synchronized void addListener(IStreamListener listener) {
+	// listeners.add(listener);
+	// }
+	//
+	// public String getContents() {
+	// return null;
+	// }
+	//
+	// public synchronized void removeListener(IStreamListener listener) {
+	// listeners.remove(listener);
+	// }
+	//
+	// @Override
+	// public synchronized void flush() {
+	// if (!isFlushing) {
+	// return;
+	// }
+	// String text = writer.toString();
+	// int lastLinePos = text.lastIndexOf('\n');
+	// if (lastLinePos == -1) {
+	// // No full line in the buffer.
+	// return;
+	// }
+	// String readyText = text.substring(0, lastLinePos + 1);
+	// writer = new StringWriter();
+	// if (lastLinePos + 1 != text.length()) {
+	// String rest = text.substring(lastLinePos + 1);
+	// writer.append(rest);
+	// }
+	// for (IStreamListener listener : listeners) {
+	// listener.streamAppended(readyText, this);
+	// }
+	// }
+	//
+	// @Override
+	// public synchronized void close() {
+	// // do nothing
+	// }
+	//
+	// @Override
+	// public synchronized void write(char[] cbuf, int off, int len) {
+	// writer.write(cbuf, off, len);
+	// }
+	//
+	// public synchronized void startFlushing() {
+	// isFlushing = true;
+	// flush();
+	// }
+	//
+	// public void processClosed() {
+	//
+	// }
+	// }
 
 }
