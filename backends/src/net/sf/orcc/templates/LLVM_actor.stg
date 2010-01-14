@@ -231,18 +231,25 @@ BlockNode(blockNode) ::= <<
 IfNode(ifNode) ::= <<
 	%if_$ifNode.label$ = icmp ne i32 $ifNode.value$, 0
 	br i1 %if_$ifNode.label$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
+
 $label(ifNode.thenNodes)$:
 $nodes(ifNode.thenNodes)$	br label %b$ifNode.joinNode.label$
+
 $label(ifNode.elseNodes)$:
 $nodes(ifNode.elseNodes)$	br label %b$ifNode.joinNode.label$
+
 b$ifNode.joinNode.label$:
 $BlockNode(ifNode.joinNode)$
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
-while ($whileNode.value$) {
-	$nodes(whileNode.nodes)$}
+	br i1 $whileNode.value$, label %$label(whileNode.Nodes)$, label %$label(whileNode.joinNode)$
+
+$label(whileNode.Nodes)$:
+$nodes(whileNode.nodes)$	br i1 $whileNode.value$, label %$label(whileNode.Nodes)$, label %$label(whileNode.joinNode)$
+
+b$whileNode.joinNode.label$:
 $BlockNode(whileNode.joinNode)$
 >>
 
