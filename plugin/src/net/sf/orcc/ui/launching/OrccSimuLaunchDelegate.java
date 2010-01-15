@@ -227,7 +227,7 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 		try {
 			InterpreterMain interpreter = InterpreterMain.getInstance();
 			interpreter.interpretNetwork(enableTraces, name, inputStimulus,
-					fifoSize);
+					fifoSize, out);
 			// Call network initializer main function
 			interpreter.initialize();
 			// Loop on network scheduler main function
@@ -259,7 +259,7 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 
 		// Create Interpreter Process
 		InterpreterProcess process = new InterpreterProcess(monitor,
-				configuration);
+				configuration, out);
 
 		// Create and launch DebugTarget
 		OrccDebugTarget target = new OrccDebugTarget(launch, process, -1, -1);

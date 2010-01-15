@@ -23,6 +23,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamsProxy;
+import org.eclipse.ui.console.IOConsoleOutputStream;
 
 public class InterpreterProcess extends Thread implements IProcess {
 
@@ -93,6 +94,9 @@ public class InterpreterProcess extends Thread implements IProcess {
 			Integer actorStatus = 0;
 			if ((!threadSuspended) || (threadStepping)) {
 				actorStatus = actor.schedule();
+				
+				
+				
 				if (threadStepping) {
 					threadStepping = false;
 					firePropertyChange("suspended step", null, actor.name);
@@ -160,7 +164,7 @@ public class InterpreterProcess extends Thread implements IProcess {
 	// ILaunchConfiguration configuration, Retransmitter retransmitter) {
 	// this.outputMonitor = retransmitter;
 	public InterpreterProcess(IProgressMonitor monitor,
-			ILaunchConfiguration configuration) {
+			ILaunchConfiguration configuration, IOConsoleOutputStream out) {
 
 		// Container for receiving interpreter events
 		propertyChange = new PropertyChangeSupport(this);
@@ -186,7 +190,7 @@ public class InterpreterProcess extends Thread implements IProcess {
 					DEFAULT_TRACES);
 			List<AbstractInterpretedActor> actorQueue = interpreter
 					.interpretNetwork(enableTraces, fileName, inputStimulus,
-							fifoSize);
+							fifoSize, out);
 			threads = new HashMap<String, InterpreterThread>();
 			int threadIdx = 0;
 			for (AbstractInterpretedActor actor : actorQueue) {

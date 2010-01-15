@@ -49,6 +49,7 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
+import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -80,7 +81,7 @@ public class InterpreterMain {
 
 	public List<AbstractInterpretedActor> interpretNetwork(
 			boolean enableTraces, String fileName, String inputBitstream,
-			int fifoSize) throws Exception {
+			int fifoSize, IOConsoleOutputStream out) throws Exception {
 
 		// set FIFO size
 		this.fifoSize = fifoSize;
@@ -183,7 +184,7 @@ public class InterpreterMain {
 								inputBitstream));
 					} else if ("display".equals(actor.getName())) {
 						actorQueue
-								.add(new DisplayActor(instance.getId(), actor));
+								.add(new DisplayActor(instance.getId(), actor, out));
 					} else {
 						// Apply some simplification transformations
 						ActorTransformation[] transformations = {

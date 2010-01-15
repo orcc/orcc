@@ -67,17 +67,20 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		//fFileName = frame.actorFilename;
 		fLineNumber = frame.codeLine;
 		try {
-			fName = thread.getName() + "." + frame.currentAction + " at state " + frame.fsmState;
+			fName = thread.getName() + "." + frame.currentAction;
 		} catch (DebugException e) {
 			e.printStackTrace();
 		}
 		int numVars = frame.stateVars.size();
-		fVariables = new IVariable[numVars];
+		fVariables = new IVariable[numVars+1];
+		OrccValue value = new OrccValue((OrccDebugTarget) thread
+				.getDebugTarget(), frame.fsmState);
+		fVariables[0] = new OrccVariable(this, "FSM state", value);
 		String[] varNames = (String[]) frame.stateVars.keySet().toArray(new String[0]);
-		for (int i = 0; i < numVars; i++) {
-			OrccValue value = new OrccValue((OrccDebugTarget) thread
-					.getDebugTarget(), frame.stateVars.get(varNames[i]));
-			fVariables[i] = new OrccVariable(this, varNames[i], value);
+		for (int i = 1; i < numVars+1; i++) {
+			value = new OrccValue((OrccDebugTarget) thread
+					.getDebugTarget(), frame.stateVars.get(varNames[i-1]));
+			fVariables[i] = new OrccVariable(this, varNames[i-1], value);
 		}
 	}
 

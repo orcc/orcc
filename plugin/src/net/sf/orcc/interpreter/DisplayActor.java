@@ -34,8 +34,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 import javax.swing.JFrame;
+
+import org.eclipse.ui.console.IOConsoleOutputStream;
 
 import net.sf.orcc.ir.Actor;
 
@@ -79,6 +82,8 @@ public class DisplayActor extends AbstractInterpretedActor {
 	}
 
 	private boolean userInterruption;
+	
+	private IOConsoleOutputStream out;
 
 	private BufferStrategy buffer;
 
@@ -104,9 +109,10 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 	public int y;
 
-	public DisplayActor(String id, Actor actor) {
+	public DisplayActor(String id, Actor actor, IOConsoleOutputStream out) {
 		super(id, actor);
 
+		this.out = out;
 		frame = new JFrame("display");
 
 		canvas = new Canvas();
@@ -117,8 +123,8 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-//				System.out.println("Display closed after " + numImages
-//						+ " images");
+				// out.println("Display closed after " + numImages
+				// + " images");
 				// Indicate the end of interpretation (will be returned to main
 				userInterruption = true;
 			}
@@ -176,6 +182,15 @@ public class DisplayActor extends AbstractInterpretedActor {
 		int newHeight = (Integer) height[0] << 4;
 
 		if (newWidth != this.width || newHeight != this.height) {
+
+			try {
+				out.write("New video stream display size : " + newWidth
+						+ "x" + newHeight + "\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			this.width = newWidth;
 			this.height = newHeight;
 
@@ -220,6 +235,12 @@ public class DisplayActor extends AbstractInterpretedActor {
 		}
 
 		if (y == height) {
+			try {
+				out.write("Displaying picture " + numImages + " complete\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			x = 0;
 			y = 0;
 			numImages++;
