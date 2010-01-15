@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.printers.DefaultTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
@@ -45,6 +46,20 @@ import net.sf.orcc.ir.type.VoidType;
  */
 public class LLVMTypePrinter extends DefaultTypePrinter {
 
+	private void printInt(Expression expr) {
+		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+
+		if (size <= 8) {
+			builder.append("i8");
+		} else if (size <= 16) {
+			builder.append("i16");
+		} else if (size <= 32) {
+			builder.append("i32");
+		} else if (size <= 64) {
+			builder.append("i64");
+		}
+	}
+	
 	@Override
 	public void visit(BoolType type) {
 		// boolean is a 1-bit integer.
@@ -53,7 +68,7 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(IntType type) {
-		builder.append("i32");
+		printInt(type.getSize());
 	}
 
 	@Override

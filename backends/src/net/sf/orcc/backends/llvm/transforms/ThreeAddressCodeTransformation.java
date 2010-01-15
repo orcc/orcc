@@ -104,6 +104,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			BinaryOp op = expr.getOp();
 
 			LocalVariable target = newVariable();
+			target.setType(type);
 			Assign assign = new Assign(block, location, target, new BinaryExpr(
 					location, e1, op, e2, type));
 			it.add(assign);
@@ -166,11 +167,12 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			IntExpr intExpr = new IntExpr(location, 0);
 			
 			LocalVariable target = newVariable();
+			target.setType(type);
 			
 			Assign assign = new Assign(block, location, target, new BinaryExpr(
 					location, expr, op, intExpr, type));
 			it.add(assign);
-			
+
 			return new VarExpr(location, new Use(target));
 		}
 
