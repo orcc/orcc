@@ -29,6 +29,8 @@
 package net.sf.orcc.backends.llvm;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -96,9 +98,22 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
-
+		Expression e1 = expr.getE1();
+		
 		builder.append(toString(op));
-		builder.append(" i32 ");
+		
+		if (e1 instanceof VarExpr){
+			Use use = ((VarExpr) e1).getVar();
+			builder.append(" "+use.getVariable().getType().toString()+ " ");
+		}
+		else{
+			builder.append(" i32 ");
+			
+		}
+
+		
+
+		
 		expr.getE1().accept(this);
 		builder.append(", ");
 		expr.getE2().accept(this);

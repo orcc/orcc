@@ -30,6 +30,10 @@ $if(variable.port)$
 $endif$
 >>
 
+argumentDeclaration(variable) ::= <<
+$variable.type$ %$variable$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,7 +174,7 @@ store i8* %$read.target$_$read.block.label$, i8** %$read.port$
 // return node
 Return(return) ::= <<
 $if(return.value)$
-ret i32 $return.value$
+ret i1 $return.value$
 
 $else$
 ret void
@@ -229,8 +233,7 @@ BlockNode(blockNode) ::= <<
 
 // if node
 IfNode(ifNode) ::= <<
-	%if_$ifNode.label$ = icmp ne i32 $ifNode.value$, 0
-	br i1 %if_$ifNode.label$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
+	br i1 $ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
 
 $label(ifNode.thenNodes)$:
 $nodes(ifNode.thenNodes)$	br label %b$ifNode.joinNode.label$
@@ -271,7 +274,7 @@ $nodes$	ret void
 
 procedure(procedure) ::= <<
 
-define internal $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
+define internal $procedure.returnType$ $procedure$($procedure.parameters.list: {$argumentDeclaration(it)$}; wrap, anchor, separator=", "$) {
 entry:
 $if(procedure.locals.list)$
 	$procedure.locals.list: variableDeclaration(it)$

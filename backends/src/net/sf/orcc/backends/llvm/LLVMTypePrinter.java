@@ -48,7 +48,7 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 	@Override
 	public void visit(BoolType type) {
 		// boolean is a 1-bit integer.
-		builder.append("i32");
+		builder.append("i1");
 	}
 
 	@Override
