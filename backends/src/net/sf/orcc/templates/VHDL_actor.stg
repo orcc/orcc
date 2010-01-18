@@ -121,8 +121,7 @@ Peek(peek) ::= <<
 
 
 Read(read) ::= <<
--- $read.target$ = getReadPtr($actorName$_$read.port$, $read.numTokens$);
-$if(read.numTokens)$
+$if(read.unit)$
 $read.target$ := to_integer(unsigned($actorName$_$read.port$.data));
 $actorName$_$read.port$.read <= '1';
 $else$
@@ -132,10 +131,7 @@ $endif$
 
 >>
 
-ReadEnd(readEnd) ::= <<
--- setReadEnd($actorName$_$readEnd.port$);
-
->>
+ReadEnd(readEnd) ::= <<>>
 
 /**
  * calls are inlined, so the only returns still there are in the
@@ -154,16 +150,12 @@ $store.target$$store.indexes : {[$it$]}$ <= $store.value$;
 >>
 
 Write(write) ::= <<
--- $write.target$ = getWritePtr($actorName$_$write.port$, $write.numTokens$);
 $actorName$_$write.port$.data <= $write.target$;
+$actorName$_$write.port$.write <= '1';
 
 >>
 
-WriteEnd(writeEnd) ::= <<
--- setWriteEnd($actorName$_$writeEnd.port$);
-$actorName$_$writeEnd.port$.write <= '1';
-
->>
+WriteEnd(writeEnd) ::= <<>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
