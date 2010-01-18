@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.Actor;
@@ -53,6 +54,8 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * 
  */
 public final class VHDLActorPrinter extends Printer {
+
+	public static Pattern adjacent_ = Pattern.compile("_+");
 
 	private StringTemplateGroup group;
 
@@ -133,7 +136,8 @@ public final class VHDLActorPrinter extends Printer {
 		if (transformations.containsKey(name)) {
 			return transformations.get(name);
 		} else {
-			return name;
+			// replaces adjacent underscores by a single underscore
+			return adjacent_.matcher(name).replaceAll("_");
 		}
 	}
 

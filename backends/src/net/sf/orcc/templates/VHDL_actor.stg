@@ -238,9 +238,9 @@ $procedure(action.body)$
 actionTest(action) ::= <<
 (isSchedulable_$action$_done = '1' and isSchedulable_$action$_go = '1')
 	$if(action.outputPattern)$
-	if ($outputPattern(pattern=action.outputPattern)$) {
+	if ($outputPattern(pattern=action.outputPattern)$) then
 		$actionCall(action)$
-	}
+	end if;
 	$else$
 	$procedure(action.body)$
 	$endif$elsif (isSchedulable_$action$_done = '0')
