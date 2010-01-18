@@ -65,6 +65,7 @@ public class NetworkFlattener implements INetworkTransformation {
 
 			OrderedMap<GlobalVariable> parentVars = network.getVariables();
 			GlobalVariable newVar = new GlobalVariable(var);
+			newVar.setExpression(var.getExpression());
 			if (existingVars.contains(var)) {
 				newVar.setName(instance.getId() + "_" + newVar.getName());
 				for (Use use : var.getUses()) {
@@ -300,7 +301,7 @@ public class NetworkFlattener implements INetworkTransformation {
 		HashMap<String, Integer> alreadyExist = new HashMap<String, Integer>();
 
 		OrderedMap<GlobalVariable> ExistingVars = network.getVariables();
-
+		
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();

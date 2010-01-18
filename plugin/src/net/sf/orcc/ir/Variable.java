@@ -134,7 +134,6 @@ public abstract class Variable implements INameable {
 		this.type = variable.type;
 		this.name = variable.name;
 		this.global = variable.global;
-		this.expression = variable.expression;
 		
 		this.uses = new ArrayList<Use>(variable.uses);
 	}
