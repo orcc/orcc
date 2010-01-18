@@ -24,7 +24,7 @@ import net.sf.orcc.network.Connection;
 
 public class NetworkGraph{
 	
-	private HashMap<String,Graph<Action, DefaultEdge>> graphsMap;
+	// private HashMap<String,Graph<Action, DefaultEdge>> graphsMap;
 	private Network network;
 	private List<ActorGraph> scheduledActorsList;
 	
@@ -33,7 +33,7 @@ public class NetworkGraph{
 	}
 	
 	public void init() throws OrccException{
-		graphsMap = new HashMap<String,Graph<Action, DefaultEdge>>();
+		//graphsMap = new HashMap<String,Graph<Action, DefaultEdge>>();
 		createScheduledActorsList();
 	}
 	

@@ -37,13 +37,8 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
-
-
 import net.sf.orcc.backends.c.quasistatic.scheduler.dse.DSEScheduler;
 import net.sf.orcc.backends.c.quasistatic.scheduler.model.Switch;
-import net.sf.orcc.ir.Action;
 
 /**
  * 
@@ -51,7 +46,7 @@ import net.sf.orcc.ir.Action;
  */
 public class DSEInputFilesCreator {
 	
-	private Graph<Action, DefaultEdge> systemLevelGraph;
+	// private Graph<Action, DefaultEdge> systemLevelGraph;
 	
 	private HashMap<String, Integer> actionsIndexes;
 	private ArrayList<String> actionsConnections;
