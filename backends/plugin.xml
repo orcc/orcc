@@ -8,6 +8,10 @@
             name="C">
       </backend>
       <backend
+            class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
+            name="C *quasi-static*">
+      </backend>
+      <backend
                class="net.sf.orcc.backends.cpp.CppBackendImpl"
                name="C++">
       </backend>
@@ -17,12 +21,12 @@
   </backend>
 		<backend class="net.sf.orcc.backends.llvm.LLVMBackendImpl" name="LLVM"/>
       <backend
-            class="net.sf.orcc.backends.xlim.XlimBackendImpl"
-            name="XLIM (TODO)">
+            class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
+            name="VHDL">
       </backend>
       <backend
-            class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
-            name="C *quasi-static*">
+            class="net.sf.orcc.backends.xlim.XlimBackendImpl"
+            name="XLIM">
       </backend>
    </extension>
 

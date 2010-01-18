@@ -1,0 +1,77 @@
+group VHDL_network;
+
+ptr_fifo(fifo,instance) ::= <<
+$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
+$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
+
+>>
+//$if(instance==fifo.source)$
+
+network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+-------------------------------------------------------------------------------
+-- Title      : $name$_top
+-- Project    : $name$
+-------------------------------------------------------------------------------
+-- File       : $name$_top.vhd
+-- Author     : 
+-- Company    : 
+-- Created    : 
+-- Last update: 
+-- Platform   : All
+-- Standard   : VHDL'93/02
+-------------------------------------------------------------------------------
+-- Description: 
+-------------------------------------------------------------------------------
+-- Copyright (c) 20010 
+-------------------------------------------------------------------------------
+-- Revisions  :
+-- Date        Version    Author    Description
+--              1.0       CAL2HDL   Created
+-------------------------------------------------------------------------------
+
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+
+entity $name$_top is
+  port (
+  -- Inputs
+  clk     : in std_logic;
+  reset_n : in std_logic;
+  -- Outputs
+  );
+end $actor.name$;
+
+
+architecture rtl_$name$ of $name$_top is 
+
+  ---------------------------------------------------------------------------
+  -- Signal & constant declaration
+  ---------------------------------------------------------------------------
+
+begin
+  -----------------------------------------------------------------------------
+  --           Components instantiation                                      --
+  -----------------------------------------------------------------------------
+  $instances: { inst | $inst$_0 : entity work.$inst$;
+  port map(
+  $connections:ptr_fifo(fifo=it,instance=inst)$
+  );
+}$
+  
+  
+  FIFO_generate : for i in 0 to $fifo.count$ generate
+    FIFO_generic_i : entity work.FIFO_generic
+      generic map (
+      FIFO_DEPTH => FIFO_DEPTH(i),
+      DATA_SIZE  => DATA_SIZE(i))
+      port map (
+      data_in_bus  => data_in_bus_fifo(i),
+      data_out_bus => data_out_bus_fifo(i),
+      read_data    => read_data(i),
+      clk_out      => clk,
+      reset_n      => reset_n);
+  end generate RAM_generate;
+
+>>
