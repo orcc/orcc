@@ -137,9 +137,13 @@ ReadEnd(readEnd) ::= <<
 
 >>
 
+/**
+ * calls are inlined, so the only returns still there are in the
+ * isSchedulable procedures
+ */
 Return(return) ::= <<
 $if(return.value)$
--- return $return.value$;
+$procedure$_go := $return.value$;
 
 $endif$
 >>

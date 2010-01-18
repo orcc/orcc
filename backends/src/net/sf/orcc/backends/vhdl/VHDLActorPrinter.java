@@ -55,7 +55,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 public final class VHDLActorPrinter extends Printer {
 
 	private StringTemplateGroup group;
-	private int i = 0;
+
 	private Map<String, String> transformations;
 
 	/**
@@ -133,16 +133,7 @@ public final class VHDLActorPrinter extends Printer {
 		if (transformations.containsKey(name)) {
 			return transformations.get(name);
 		} else {
-			//System.out.println("rename: " +rename);
-			if (name.startsWith("_tmp")) {
-				//String rename = "var_"+i;
-				i++;
-				//return rename;
-				return name.substring(1);
-			} else {
-			  return name;
-			}			
-			
+			return name;
 		}
 	}
 

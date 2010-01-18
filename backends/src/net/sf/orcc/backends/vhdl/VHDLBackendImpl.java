@@ -33,9 +33,11 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.vhdl.transforms.VariableRenamer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
+import net.sf.orcc.ir.transforms.Inline;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
@@ -61,7 +63,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Usage: VHDLBackendImpl <flattened XDF network>");
+			System.err
+					.println("Usage: VHDLBackendImpl <flattened XDF network>");
 		}
 	}
 
@@ -78,7 +81,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new PhiRemoval() };
+				new Inline(), new PhiRemoval(), new VariableRenamer() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
