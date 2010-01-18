@@ -124,18 +124,7 @@ public final class VHDLActorPrinter extends Printer {
 	public String toString(Expression expression) {
 		VHDLExpressionPrinter printer = new VHDLExpressionPrinter();
 		expression.accept(printer, Integer.MAX_VALUE);
-		String corrector = printer.toString();
-		if (corrector.contains("||")) {
-			corrector = corrector.replace("||", "or");
-		}
-		if (corrector.contains("&&")) {
-			corrector = corrector.replace("&&", "and");
-		}
-		if (corrector.contains("!")) {
-			corrector = corrector.replace("!", "not");
-		}
-		//System.out.println("corrector : " + corrector);
-		return corrector;
+		return printer.toString();
 	}
 
 	@Override

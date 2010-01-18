@@ -41,6 +41,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 
 /**
@@ -65,6 +66,28 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 		return builder.toString();
 	}
 
+	/**
+	 * Returns the string representation of the given binary operator.
+	 * 
+	 * @param op
+	 *            a binary operator
+	 * @return the string representation of the given binary operator
+	 */
+	protected String toString(BinaryOp op) {
+		return op.getText();
+	}
+
+	/**
+	 * Returns the string representation of the given unary operator.
+	 * 
+	 * @param op
+	 *            a unary operator
+	 * @return the string representation of the given unary operator
+	 */
+	protected String toString(UnaryOp op) {
+		return op.getText();
+	}
+
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
@@ -83,14 +106,14 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 			builder.append("(");
 			expr.getE1().accept(this, nextPrec, BinaryExpr.LEFT);
 			builder.append(" ");
-			builder.append(op.getText());
+			builder.append(toString(op));
 			builder.append(" ");
 			expr.getE2().accept(this, nextPrec, BinaryExpr.RIGHT);
 			builder.append(")");
 		} else {
 			expr.getE1().accept(this, nextPrec, BinaryExpr.LEFT);
 			builder.append(" ");
-			builder.append(op.getText());
+			builder.append(toString(op));
 			builder.append(" ");
 			expr.getE2().accept(this, nextPrec, BinaryExpr.RIGHT);
 		}
@@ -132,7 +155,7 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(UnaryExpr expr, Object... args) {
-		builder.append(expr.getOp().getText());
+		builder.append(toString(expr.getOp()));
 		expr.getExpr().accept(this, Integer.MIN_VALUE);
 	}
 

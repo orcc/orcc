@@ -48,7 +48,8 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
  */
 public class LLVMExprPrinter extends DefaultExpressionPrinter {
 
-	public static String toString(BinaryOp op) {
+	@Override
+	protected String toString(BinaryOp op) {
 		switch (op) {
 		case BITAND:
 			return "and";
@@ -99,21 +100,16 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
 		Expression e1 = expr.getE1();
-		
+
 		builder.append(toString(op));
-		
-		if (e1 instanceof VarExpr){
+
+		if (e1 instanceof VarExpr) {
 			Use use = ((VarExpr) e1).getVar();
-			builder.append(" "+use.getVariable().getType().toString()+ " ");
-		}
-		else{
+			builder.append(" " + use.getVariable().getType().toString() + " ");
+		} else {
 			builder.append(" i32 ");
-			
 		}
 
-		
-
-		
 		expr.getE1().accept(this);
 		builder.append(", ");
 		expr.getE2().accept(this);

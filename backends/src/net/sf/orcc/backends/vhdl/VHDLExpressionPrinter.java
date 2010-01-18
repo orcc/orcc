@@ -30,8 +30,10 @@
 package net.sf.orcc.backends.vhdl;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 
 /**
@@ -41,6 +43,28 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
  * 
  */
 public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
+
+	@Override
+	protected String toString(BinaryOp op) {
+		switch (op) {
+		case LOGIC_AND:
+			return "and";
+		case LOGIC_OR:
+			return "or";
+		default:
+			return op.getText();
+		}
+	}
+
+	@Override
+	protected String toString(UnaryOp op) {
+		switch (op) {
+		case LOGIC_NOT:
+			return "not";
+		default:
+			return op.getText();
+		}
+	}
 
 	@Override
 	public void visit(BoolExpr expr, Object... args) {
