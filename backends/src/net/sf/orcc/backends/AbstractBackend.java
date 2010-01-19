@@ -94,6 +94,11 @@ public abstract class AbstractBackend implements IBackend {
 		// print network
 		printNetwork(network);
 	}
+	
+	@Override
+	public IOptions getOptionTab() throws Exception {
+		return optionTab;
+	}
 
 	/**
 	 * Prints the given actor with the given id.
