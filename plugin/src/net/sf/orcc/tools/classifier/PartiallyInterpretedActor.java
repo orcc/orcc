@@ -28,9 +28,12 @@
  */
 package net.sf.orcc.tools.classifier;
 
+import java.util.Map;
+
 import net.sf.orcc.interpreter.InterpretedActor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Port;
 
 /**
  * This class defines an actor that can be partially interpreted by calling
@@ -58,6 +61,11 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 
 		// Build a node interpreter for visiting CFG and instructions
 		interpret = new PartialNodeInterpreter(id, analyzer);
+	}
+
+	@Override
+	protected boolean checkOutputPattern(Map<Port, Integer> outputPattern) {
+		return true;
 	}
 
 	@Override
