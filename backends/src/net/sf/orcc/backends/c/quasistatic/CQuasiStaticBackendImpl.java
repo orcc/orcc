@@ -70,7 +70,7 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void init() throws IOException {
+	protected void beforeInstantiation(Network network) throws OrccException {
 		printer = new CQuasiStaticActorPrinter();
 		Scheduler.workingDirectoryPath = path + File.separator + "schedule"
 				+ File.separator;

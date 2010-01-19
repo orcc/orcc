@@ -30,8 +30,8 @@
 package net.sf.orcc.backends.vhdl;
 
 import java.io.File;
-import java.io.IOException;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.vhdl.transforms.VariableRenamer;
 import net.sf.orcc.ir.Actor;
@@ -74,7 +74,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	protected VHDLActorPrinter printer;
 
 	@Override
-	protected void init() throws IOException {
+	protected void beforeInstantiation(Network network) throws OrccException {
 		printer = new VHDLActorPrinter();
 	}
 

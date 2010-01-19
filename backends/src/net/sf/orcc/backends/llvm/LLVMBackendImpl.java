@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.llvm;
 
 import java.io.File;
-import java.io.IOException;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.llvm.transforms.BitcastTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
@@ -69,7 +69,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	private LLVMActorPrinter printer;
 
 	@Override
-	protected void init() throws IOException {
+	protected void beforeInstantiation(Network network) throws OrccException {
 		printer = new LLVMActorPrinter();
 	}
 

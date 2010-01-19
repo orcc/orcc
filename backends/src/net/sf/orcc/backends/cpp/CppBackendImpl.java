@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.cpp;
 
 import java.io.File;
-import java.io.IOException;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.Actor;
@@ -69,7 +69,7 @@ public class CppBackendImpl extends AbstractBackend {
 	private CppActorPrinter printer;
 
 	@Override
-	protected void init() throws IOException {
+	protected void beforeInstantiation(Network network) throws OrccException {
 		printer = new CppActorPrinter("Cpp_actorDecl");
 		impl_printer = new CppActorPrinter("Cpp_actorImpl");
 	}

@@ -63,7 +63,7 @@ public final class CActorPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public CActorPrinter() throws IOException {
+	public CActorPrinter() {
 		this("C_actor");
 
 		transformations = new HashMap<String, String>();
@@ -81,7 +81,7 @@ public final class CActorPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected CActorPrinter(String name) throws IOException {
+	protected CActorPrinter(String name) {
 		group = new TemplateGroupLoader().loadGroup(name);
 
 		// registers this printer as the default printer

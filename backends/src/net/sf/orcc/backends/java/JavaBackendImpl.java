@@ -29,8 +29,8 @@
 package net.sf.orcc.backends.java;
 
 import java.io.File;
-import java.io.IOException;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.Actor;
@@ -41,7 +41,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
 /**
- * C back-end.
+ * Java back-end.
  * 
  * @author Matthieu Wipliez
  * 
@@ -71,7 +71,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	private JavaActorPrinter printer;
 
 	@Override
-	protected void init() throws IOException {
+	protected void beforeInstantiation(Network network) throws OrccException {
 		printer = new JavaActorPrinter();
 
 		String sep = File.separator;

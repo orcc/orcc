@@ -31,15 +31,20 @@ package net.sf.orcc.backends.c;
 import java.io.File;
 import java.io.IOException;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorClass;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transforms.BroadcastAdder;
+import net.sf.orcc.tools.classifier.ActorClassifier;
 
 /**
  * C back-end.
@@ -48,6 +53,8 @@ import net.sf.orcc.network.transforms.BroadcastAdder;
  * 
  */
 public class CBackendImpl extends AbstractBackend {
+
+	public static final boolean merge = true;
 
 	/**
 	 * 
@@ -72,12 +79,56 @@ public class CBackendImpl extends AbstractBackend {
 	protected CActorPrinter printer;
 
 	@Override
-	protected void init() throws IOException {
-		printer = new CActorPrinter();
+	protected void afterInstantiation(Network network) throws OrccException {
+		if (merge) {
+			classifyActors(network);
+			mergeActors(network);
+		}
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws Exception {
+	protected void beforeInstantiation(Network network) throws OrccException {
+		printer = new CActorPrinter();
+	}
+
+	/**
+	 * Classifies actors of the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 */
+	private void classifyActors(Network network) throws OrccException {
+		ActorTransformation tr = new PhiRemoval();
+		for (Vertex vertex : network.getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isActor()) {
+					Actor actor = instance.getActor();
+
+					// removes phi so the actor can be interpreted
+					tr.transform(actor);
+
+					ActorClassifier classifier = new ActorClassifier(actor);
+					ActorClass clasz = classifier.classify();
+					actor.setActorClass(clasz);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Merges actors of the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 */
+	private void mergeActors(Network network) throws OrccException {
+	}
+
+	@Override
+	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new PhiRemoval(), new IncrementPeephole(),
 				new MoveReadsWritesTransformation() };
@@ -87,7 +138,11 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		String outputName = path + File.separator + id + ".c";
-		printer.printActor(outputName, id, actor);
+		try {
+			printer.printActor(outputName, id, actor);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	@Override
@@ -100,4 +155,5 @@ public class CBackendImpl extends AbstractBackend {
 		String outputName = path + File.separator + network.getName() + ".c";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
+
 }

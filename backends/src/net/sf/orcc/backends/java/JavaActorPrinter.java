@@ -61,7 +61,7 @@ public final class JavaActorPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public JavaActorPrinter() throws IOException {
+	public JavaActorPrinter() {
 		group = new TemplateGroupLoader().loadGroup("Java_actor");
 
 		// registers this printer as the default printer

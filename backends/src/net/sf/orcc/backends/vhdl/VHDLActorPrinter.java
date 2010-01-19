@@ -67,7 +67,7 @@ public final class VHDLActorPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public VHDLActorPrinter() throws IOException {
+	public VHDLActorPrinter() {
 		this("VHDL_actor");
 
 		transformations = new HashMap<String, String>();
@@ -85,7 +85,7 @@ public final class VHDLActorPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected VHDLActorPrinter(String name) throws IOException {
+	protected VHDLActorPrinter(String name) {
 		group = new TemplateGroupLoader().loadGroup(name);
 
 		// registers this printer as the default printer

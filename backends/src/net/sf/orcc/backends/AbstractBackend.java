@@ -29,8 +29,8 @@
 package net.sf.orcc.backends;
 
 import java.io.File;
-import java.io.IOException;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -49,6 +49,18 @@ public abstract class AbstractBackend implements IBackend {
 
 	protected String path;
 
+	/**
+	 * Here should go the things to do after the instantiation.
+	 */
+	protected void afterInstantiation(Network network) throws OrccException {
+	}
+
+	/**
+	 * Here should go the things to do before the instantiation.
+	 */
+	protected void beforeInstantiation(Network network) throws OrccException {
+	}
+
 	@Override
 	public void generateCode(String fileName, int fifoSize) throws Exception {
 		// set FIFO size
@@ -58,14 +70,15 @@ public abstract class AbstractBackend implements IBackend {
 		File file = new File(fileName);
 		path = file.getParent();
 
-		// initializes stuff
-		init();
-
 		// parses top network
 		Network network = new XDFParser(fileName).parseNetwork();
 
+		beforeInstantiation(network);
+
 		// instantiate the network
 		network.instantiate();
+
+		afterInstantiation(network);
 
 		// print actors of the network
 		for (Vertex vertex : network.getGraph().vertexSet()) {
@@ -83,21 +96,20 @@ public abstract class AbstractBackend implements IBackend {
 	}
 
 	/**
-	 * Perform any initialization necessary.
-	 */
-	abstract protected void init() throws IOException;
-
-	/**
 	 * Prints the given actor with the given id.
 	 * 
 	 * @param id
+	 *            instance identifier
 	 * @param actor
+	 *            the actor
 	 */
 	abstract protected void printActor(String id, Actor actor) throws Exception;
 
 	/**
+	 * Prints the given network.
 	 * 
 	 * @param network
+	 *            the network
 	 */
 	abstract protected void printNetwork(Network network) throws Exception;
 }

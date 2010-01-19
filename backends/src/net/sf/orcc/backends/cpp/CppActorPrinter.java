@@ -60,7 +60,7 @@ public final class CppActorPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public CppActorPrinter(String name) throws IOException {
+	public CppActorPrinter(String name) {
 		group = new TemplateGroupLoader().loadGroup(name);
 
 		// registers this printer as the default printer

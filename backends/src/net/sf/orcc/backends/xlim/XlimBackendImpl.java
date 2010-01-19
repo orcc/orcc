@@ -73,7 +73,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	/**
 	 * Create the printer
 	 */
-	protected void init() throws IOException {
+	protected void beforeXdfParsing() throws IOException {
 		printer = new XlimActorPrinter();
 	}
 

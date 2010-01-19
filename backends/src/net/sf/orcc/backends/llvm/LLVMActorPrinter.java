@@ -60,7 +60,7 @@ public final class LLVMActorPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public LLVMActorPrinter() throws IOException {
+	public LLVMActorPrinter() {
 		group = new TemplateGroupLoader().loadGroup("LLVM_actor");
 
 		// registers this printer as the default printer

@@ -64,7 +64,7 @@ public class CQuasiStaticActorPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public CQuasiStaticActorPrinter() throws IOException {
+	public CQuasiStaticActorPrinter() {
 		group = new TemplateGroupLoader().loadGroup("C_actor");
 		extensionGroup = new TemplateGroupLoader()
 				.loadGroup("C_quasistatic_actor");
