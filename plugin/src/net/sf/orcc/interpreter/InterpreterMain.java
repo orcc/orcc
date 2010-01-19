@@ -28,11 +28,15 @@
  */
 package net.sf.orcc.interpreter;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
@@ -49,7 +53,7 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
-import org.eclipse.ui.console.IOConsoleOutputStream;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -58,49 +62,173 @@ import org.jgrapht.DirectedGraph;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class InterpreterMain {
-
-	private static final InterpreterMain instance = new InterpreterMain();
+public class InterpreterMain extends Thread {
 
 	/**
-	 * Returns the single instance of this interpreter
-	 * 
-	 * @return the single instance of this interpreter
+	 * Interpreter automaton control
 	 */
-	public static InterpreterMain getInstance() {
-		return instance;
+	public enum InterpreterState {
+		IDLE, CONFIGURED, READY, RUNNING, STEPPING, SUSPENDED, TERMINATED
 	}
 
-	protected int fifoSize;
-	protected String path;
+	private InterpreterState state = InterpreterState.IDLE;
+
+	/**
+	 * Associated system objects
+	 */
+	private OrccProcess process;
+	private IProgressMonitor monitor;
+
+	/**
+	 * Options
+	 */
+	// private int fifoSize;
+	// private boolean enableTraces;
+	private String networkFilename;
+	private String stimulusFilename;
+
+	/**
+	 * Executable actor network
+	 */
+	private List<DebugThread> threadQueue;
 	private List<AbstractInterpretedActor> actorQueue;
 	private List<CommunicationFifo> fifoList;
 
-	private InterpreterMain() {
+	/**
+	 * The utility class that makes us able to support bound properties. This is
+	 * used for easy "debug events" exchange.
+	 */
+	private PropertyChangeSupport propertyChange;
+
+	/**
+	 * Add the listener <code>listener</code> to the registered listeners.
+	 * 
+	 * @param listener
+	 *            The PropertyChangeListener to add.
+	 */
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+		propertyChange.addPropertyChangeListener(listener);
 	}
 
-	public List<AbstractInterpretedActor> interpretNetwork(
-			boolean enableTraces, String fileName, String inputBitstream,
-			int fifoSize, IOConsoleOutputStream out) throws Exception {
+	/**
+	 * This methods calls
+	 * {@link PropertyChangeSupport#firePropertyChange(String, Object, Object)}
+	 * on the underlying {@link PropertyChangeSupport} without updating the
+	 * value of the property <code>propertyName</code>. This method is
+	 * particularly useful when a property should be fired regardless of the
+	 * previous value (in case of undo/redo for example, when a same object is
+	 * added, removed, and added again).
+	 * 
+	 * @param propertyName
+	 *            The name of the property concerned.
+	 * @param oldValue
+	 *            The old value of the property.
+	 * @param newValue
+	 *            The new value of the property.
+	 */
+	public void firePropertyChange(String propertyName, Object oldValue,
+			Object newValue) {
+		propertyChange.firePropertyChange(propertyName, oldValue, newValue);
+	}
 
-		// set FIFO size
-		this.fifoSize = fifoSize;
+	/**
+	 * Remove the listener listener from the registered listeners.
+	 * 
+	 * @param listener
+	 *            The listener to remove.
+	 */
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		propertyChange.removePropertyChangeListener(listener);
+	}
+
+	@Override
+	public void run() {
+		// Wait for the monitor to be set (for user cancel checking)
+		while (state != InterpreterState.CONFIGURED)
+			;
+		// Then wait for the end of the process
+		while (state != InterpreterState.TERMINATED) {
+			// Asynchronous user cancel
+			if (monitor.isCanceled()) {
+				terminate();
+			}
+			switch (state) {
+			case IDLE:
+				terminate();
+				break;
+			case CONFIGURED:
+				initialize();
+				state = InterpreterState.READY;
+				firePropertyChange("started", null, null);
+				break;
+			case READY:
+				break;
+			case RUNNING:
+				if (scheduleThreads() <= 0) {
+					terminate();
+				}
+				break;
+			case STEPPING:
+				if (scheduleThreads() <= 0) {
+					terminate();
+				}
+				break;
+			case SUSPENDED:
+				break;
+			case TERMINATED:
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Configure the interpreter with associated system/debug objects
+	 * 
+	 * @param process
+	 * @param monitor
+	 */
+	public void configSystem(OrccProcess process, IProgressMonitor monitor) {
+		// Orcc debug model "host" process
+		this.process = process;
+		// Progress monitor for user cancel
+		this.monitor = monitor;
+		// Property change support creation for sending interpreter events
+		propertyChange = new PropertyChangeSupport(this);
+		// Check interpreter completely configured
+		if (actorQueue != null) {
+			this.state = InterpreterState.CONFIGURED;
+		}
+	}
+
+	/**
+	 * Configure interpreter with parameters for a specific network simulation
+	 * 
+	 * @param inputNetwork
+	 * @param fifoSize
+	 * @param inputStimulus
+	 * @param enableTraces
+	 * @throws Exception
+	 */
+	public void configNetwork(String inputNetwork, int fifoSize,
+			String inputStimulus, boolean enableTraces) throws Exception {
+		// Store "input" configuration
+		// this.enableTraces = enableTraces;
+		this.networkFilename = inputNetwork;
+		this.stimulusFilename = inputStimulus;
+		// this.fifoSize = fifoSize;
 
 		// Parses top network
-		Network network = new XDFParser(fileName).parseNetwork();
-
+		Network network = new XDFParser(networkFilename).parseNetwork();
 		// Instantiate the network
 		network.instantiate();
-
 		// Add broadcasts before connecting actors
 		new BroadcastAdder().transform(network);
 		// Prepare an hash table for creating broadcast interpreted actors
 		HashMap<String, BroadcastActor> bcastMap = new HashMap<String, BroadcastActor>();
 
-		// get network graph
+		// Get network graph...
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
-
-		// connect network actors to FIFOs thanks to their port names
+		// ...and connect network actors to FIFOs thanks to their port names
 		Set<Connection> connections = graph.edgeSet();
 		fifoList = new ArrayList<CommunicationFifo>();
 		for (Connection connection : connections) {
@@ -128,7 +256,7 @@ public class InterpreterMain {
 				Port srcPort = connection.getSource();
 				Port tgtPort = connection.getTarget();
 				CommunicationFifo fifo = new CommunicationFifo(size,
-						enableTraces, fileName, srcInst.getId() + "_"
+						enableTraces, networkFilename, srcInst.getId() + "_"
 								+ srcPort.getName());
 				fifoList.add(fifo);
 				// connect source actor to the FIFO
@@ -141,7 +269,7 @@ public class InterpreterMain {
 								.getId());
 						if (bcastActor == null) {
 							bcastActor = new BroadcastActor(srcInst.getId(),
-									null);
+									srcInst.getActor());
 							bcastMap.put(srcInst.getId(), bcastActor);
 						}
 						bcastActor.setOutport(srcPort);
@@ -157,7 +285,7 @@ public class InterpreterMain {
 								.getId());
 						if (bcastActor == null) {
 							bcastActor = new BroadcastActor(tgtInst.getId(),
-									null);
+									srcInst.getActor());
 							bcastMap.put(tgtInst.getId(), bcastActor);
 						}
 						bcastActor.setInport(tgtPort);
@@ -165,9 +293,9 @@ public class InterpreterMain {
 				}
 
 				/*
-				 * System.out.println("Connecting " + srcInst.getId() + "." +
+				 * process.write("Connecting " + srcInst.getId() + "." +
 				 * srcPort.getName() + " to " + tgtInst.getId() + "." +
-				 * tgtPort.getName());
+				 * tgtPort.getName() + "\n");
 				 */
 			}
 		}
@@ -181,10 +309,10 @@ public class InterpreterMain {
 					Actor actor = instance.getActor();
 					if ("source".equals(actor.getName())) {
 						actorQueue.add(new SourceActor(instance.getId(), actor,
-								inputBitstream));
+								stimulusFilename));
 					} else if ("display".equals(actor.getName())) {
-						actorQueue
-								.add(new DisplayActor(instance.getId(), actor, out));
+						actorQueue.add(new DisplayActor(instance.getId(),
+								actor, process));
 					} else {
 						// Apply some simplification transformations
 						ActorTransformation[] transformations = {
@@ -202,14 +330,106 @@ public class InterpreterMain {
 			}
 		}
 
-		return actorQueue;
+		// Create interpreter debug threads from actor queue
+		threadQueue = new ArrayList<DebugThread>();
+		for (AbstractInterpretedActor actor : actorQueue) {
+			threadQueue.add(new DebugThread(this, actor));
+		}
+
+		// Check interpreter completely configured
+		if (monitor != null) {
+			this.state = InterpreterState.CONFIGURED;
+		}
+	}
+
+	/**
+	 * Start or restart all network actors
+	 */
+	public void resumeAll() {
+		if (state == InterpreterState.READY) {
+			state = InterpreterState.RUNNING;
+			for (DebugThread thread : threadQueue) {
+				thread.resume();
+			}
+			firePropertyChange("resumed client", null, null);
+		} else if (state == InterpreterState.SUSPENDED) {
+			state = InterpreterState.RUNNING;
+			for (DebugThread thread : threadQueue) {
+				thread.resume();
+			}
+			firePropertyChange("resumed client", null, null);
+		}
+	}
+
+	/**
+	 * Suspend all network actors
+	 */
+	public void suspendAll() {
+		if (state == InterpreterState.RUNNING) {
+			state = InterpreterState.SUSPENDED;
+			for (DebugThread thread : threadQueue) {
+				thread.suspend();
+			}
+			firePropertyChange("suspended client", null, null);
+		}
+	}
+
+	/**
+	 * Schedule next schedulable action for each actor of the network
+	 */
+	public void stepAll() {
+		if (state == InterpreterState.SUSPENDED) {
+			state = InterpreterState.STEPPING;
+			for (DebugThread thread : threadQueue) {
+				thread.stepOver();
+			}
+			firePropertyChange("resumed step", null, null);
+		}
+	}
+
+	/**
+	 * Terminate the interpretation of the current actors network
+	 */
+	public void terminate() {
+		close();
+		state = InterpreterState.TERMINATED;
+		firePropertyChange("terminated", null, null);
+	}
+
+	/**
+	 * Simulates the network until the end of application
+	 */
+	public void simulate() {
+		initialize();
+		while (!monitor.isCanceled() && (scheduleActors() > 0))
+			;
+		close();
+	}
+
+	/**
+	 * Provides the name of the currently configured XDF network
+	 * 
+	 * @return XDF network name
+	 */
+	public String getNetworkName() {
+		return new File(networkFilename).getName();
+	}
+
+	/**
+	 * Provides the interpreter threads corresponding to the RVC-CAL actors of
+	 * currently configured XDF network
+	 * 
+	 * @return A list of InterpreterThread debugging threads
+	 */
+	public List<DebugThread> getThreads() {
+		return threadQueue;
 	}
 
 	/**
 	 * Initialize each network actor if initializing function exists
 	 * 
 	 */
-	public void initialize() {
+	private void initialize() {
 		// init actors of the network
 		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.initialize();
@@ -217,31 +437,62 @@ public class InterpreterMain {
 	}
 
 	/**
-	 * Schedule each actor from the network while at least one actor still
-	 * active
+	 * Schedule each actor from the network and return the number of alive
+	 * actors
 	 * 
-	 * @throws Exception
 	 */
-	public int scheduler() throws Exception {
-
-		int running = 0;
+	private int scheduleActors() {
+		int nbRunningActors = 0;
 		for (AbstractInterpretedActor actor : actorQueue) {
-			// System.out.println("Schedule actor " + actor.getName());
+			// process.write("Schedule actor " + actor.getName() + "\n");
 			Integer actorStatus = actor.schedule();
 			if (actorStatus < 0) {
 				return -1;
 			} else {
-				running += actorStatus;
+				nbRunningActors += actorStatus;
 			}
 		}
-		return running;
+		return nbRunningActors;
+	}
+
+	/**
+	 * Schedule each debug thread (corresponding to network actors) if any event
+	 * is pending or no thread is suspended and return the number of active
+	 * threads
+	 * 
+	 */
+	private int scheduleThreads() {
+		int nbSuspendedThreads = 0;
+		int nbEventPending = 0;
+		int nbRunningActors = 0;
+		// Check threads schedulable
+		for (DebugThread thread : threadQueue) {
+			if (thread.isSuspended()) {
+				nbSuspendedThreads++;
+			}
+			if (thread.eventPending()) {
+				nbEventPending++;
+			}
+		}
+		// Execute "synchronous" cycle if threads are not suspended
+		if ((nbEventPending > 0) || (nbSuspendedThreads == 0)) {
+			for (DebugThread thread : threadQueue) {
+				Integer actorStatus = thread.run();
+				if (actorStatus < 0) {
+					return -1;
+				} else {
+					nbRunningActors += actorStatus;
+				}
+			}
+		}
+		return (nbRunningActors+nbSuspendedThreads);
 	}
 
 	/**
 	 * Ask each network actor for closing
 	 * 
 	 */
-	public void close() {
+	private void close() {
 		// close actors of the network
 		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.close();

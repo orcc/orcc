@@ -34,10 +34,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.interpreter.InterpreterProcess;
-import net.sf.orcc.interpreter.InterpreterProcess.InterpreterThread;
+import net.sf.orcc.interpreter.InterpreterMain;
+import net.sf.orcc.interpreter.DebugThread;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -61,8 +62,11 @@ import org.eclipse.debug.core.model.IThread;
 public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		PropertyChangeListener {
 
-	// associated system process (VM)
-	private InterpreterProcess fProcess;
+	// associated system process
+	private IProcess fProcess;
+	
+	// associated interpreter
+	private InterpreterMain fInterpreter;
 
 	// containing launch object
 	private ILaunch fLaunch;
@@ -95,20 +99,22 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @exception CoreException
 	 *                if unable to connect to host
 	 */
-	public OrccDebugTarget(ILaunch launch, IProcess process, int requestPort,
-			int eventPort) throws CoreException {
+	public OrccDebugTarget(ILaunch launch, IProcess process,
+			InterpreterMain interpreter)
+			throws CoreException {
 		super(null);
 		fLaunch = launch;
 		fTarget = this;
-		fProcess = (InterpreterProcess) process;
-		fName = fProcess.getNetworkName();
+		fProcess = process;
+		fInterpreter = interpreter;
+		fName = fInterpreter.getNetworkName();
 		threadMap = new HashMap<String, OrccThread>();
-		Map<String, InterpreterThread> threads = fProcess.getThreads();
+		List<DebugThread> threads = fInterpreter.getThreads();
 		fThreads = new IThread[threads.size()];
 		int idx = 0;
-		for (InterpreterThread thread : threads.values()) {
+		for (DebugThread thread : threads) {
 			fThreads[idx] = new OrccThread(this, thread);
-			threadMap.put(thread.getName(), (OrccThread)fThreads[idx]);
+			threadMap.put(thread.getName(), (OrccThread) fThreads[idx]);
 			idx++;
 		}
 		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(
@@ -269,7 +275,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		if (orccThread != null) {
 			orccThread.resumed();
 			orccThread.fireResumeEvent(detail);
-		}else {
+		} else {
 			fSuspended = false;
 			for (IThread thread : fThreads) {
 				((OrccThread) thread).fireResumeEvent(detail);
@@ -287,7 +293,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		if (orccThread != null) {
 			orccThread.suspended();
 			orccThread.fireSuspendEvent(detail);
-		}else {
+		} else {
 			fSuspended = true;
 			for (IThread thread : fThreads) {
 				((OrccThread) thread).fireSuspendEvent(detail);
@@ -469,17 +475,17 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 */
 	private void sendRequest(String request) throws DebugException {
 		if (request.equals("resume")) {
-			fProcess.resumeInterpreter();
+			fInterpreter.resumeAll();
 		} else if (request.equals("suspend")) {
-			fProcess.suspendInterpreter();
+			fInterpreter.suspendAll();
 		} else if (request.equals("step")) {
-			fProcess.step();
+			fInterpreter.stepAll();
 		} else if (request.startsWith("set")) {
-			fProcess.set_breakpoint(request.indexOf("set"));
+			// TODO : fInterpreter.set_breakpoint(request.indexOf("set"));
 		} else if (request.startsWith("clear")) {
-			fProcess.clear_breakpoint(request.indexOf("clear"));
+			// TODO : fInterpreter.clear_breakpoint(request.indexOf("clear"));
 		} else if (request.equals("terminate")) {
-			fProcess.terminate();
+			fInterpreter.terminate();
 		}
 	}
 
@@ -519,8 +525,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	}
 
 	public void propertyChange(PropertyChangeEvent event) {
-		OrccThread orccThread = threadMap.get((String) event
-				.getNewValue());
+		OrccThread orccThread = threadMap.get((String) event.getNewValue());
 		if (orccThread != null) {
 			orccThread.setBreakpoints(null);
 			orccThread.setStepping(false);

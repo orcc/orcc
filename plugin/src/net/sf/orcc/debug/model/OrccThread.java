@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.debug.model;
 
-import net.sf.orcc.interpreter.InterpreterProcess.InterpreterThread;
+import net.sf.orcc.interpreter.DebugThread;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -41,19 +41,23 @@ import org.eclipse.debug.core.model.IThread;
 public class OrccThread extends OrccDebugElement implements IThread {
 
 	/**
+	 * Debugging objects
+	 */
+	private OrccDebugTarget target;
+	private DebugThread fThread;
+	
+	/**
 	 * Breakpoints this thread is suspended at or <code>null</code> if none.
 	 */
 	private IBreakpoint[] fBreakpoints;
 
 	/**
-	 * Whether this thread is stepping
+	 * Whether this thread is stepping or suspended
 	 */
 	private boolean fStepping = false;
-
 	private boolean fSuspended = true;
-	private boolean fTerminated = false;
 
-	private InterpreterThread fThread;
+	
 
 	/**
 	 * Constructs a new thread for the given target
@@ -61,8 +65,9 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @param target
 	 *            VM
 	 */
-	public OrccThread(OrccDebugTarget target, InterpreterThread thread) {
+	public OrccThread(OrccDebugTarget target, DebugThread thread) {
 		super(target);
+		this.target = target;
 		this.fThread = thread;
 	}
 
@@ -203,7 +208,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
 	 */
 	public boolean canStepInto() {
-		return false;
+		return isSuspended();
 	}
 
 	/*
@@ -239,6 +244,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#stepInto()
 	 */
 	public void stepInto() throws DebugException {
+		fThread.stepInto();
 	}
 
 	/*
@@ -264,7 +270,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
 	public boolean canTerminate() {
-		return false;
+		return !target.isTerminated();
 	}
 
 	/*
@@ -273,8 +279,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
 	public boolean isTerminated() {
-		fTerminated = fThread.isTerminated();
-		return fTerminated;
+		return target.isTerminated();
 	}
 
 	/*

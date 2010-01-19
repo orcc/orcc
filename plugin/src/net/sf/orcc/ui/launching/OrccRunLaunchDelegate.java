@@ -48,7 +48,7 @@ public class OrccRunLaunchDelegate implements ILaunchConfigurationDelegate {
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
 		launch.addProcess(process);
-		process.start();
+		process.start("backend");
 	}
 
 }

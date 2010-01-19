@@ -78,6 +78,12 @@ public class BroadcastActor extends AbstractInterpretedActor {
 	}
 
 	@Override
+	public boolean step() {
+		schedule();
+		return true;
+	}
+	
+	@Override
 	public void close() {
 	}
 	

@@ -30,7 +30,7 @@ package net.sf.orcc.debug.model;
 
 import java.io.File;
 
-import net.sf.orcc.interpreter.InterpreterProcess.InterpreterStackFrame;
+import net.sf.orcc.interpreter.DebugThread.InterpreterStackFrame;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;

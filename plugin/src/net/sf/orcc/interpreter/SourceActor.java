@@ -78,7 +78,12 @@ public class SourceActor extends AbstractInterpretedActor {
 		}
 		return running;
 	}
-	
+
+	@Override
+	public boolean step() {
+		schedule();
+		return true;
+	}
 
 	@Override
 	public void close() {

@@ -63,6 +63,13 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	private ListAllocator listAllocator;
 
 	protected ActionScheduler sched;
+	private boolean isSynchronousScheduler = false;
+	
+	/**
+	 * Step into utils
+	 */
+	private Action currentAction = null;
+	private int currentNode = 0;
 
 	// private List<Actor> schedPred;
 
@@ -90,7 +97,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// Build a node interpreter for visiting CFG and instructions
 		interpret = new NodeInterpreter(name);
-
+		
 		// Creates an expression evaluator for state and local variables init
 		this.constEval = new ConstantEvaluator();
 	}
@@ -119,15 +126,16 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	}
 
 	/**
-	 * Executes the given action once.
-	 * 
+	 * Require the execution (interpretation) of the given actor's action
 	 * @param action
-	 *            an action
 	 * @return <code>1</code>
 	 */
 	protected int execute(Action action) {
+		// Update last visited location value :
+		lastVisitedLocation = action.getBody().getLocation();
+		lastVisitedAction = action.getName();
+		// Interpret the whole action
 		interpretProc(action.getBody());
-		// Execute 1 action only per actor scheduler cycle
 		return 1;
 	}
 
@@ -195,7 +203,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		// Interpret procedure body
 		for (CFGNode node : procedure.getNodes()) {
 			node.accept(interpret);
-			lastVisitedLocation = node.getLocation();
 		}
 
 		// Procedure return value
@@ -203,9 +210,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// TODO : check return type
 		// Type type = procedure.getReturnType();
-
-		// Update last visited location value :
-		lastVisitedAction = procedure.getName();
 
 		// Return the result object
 		return result;
@@ -223,77 +227,90 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
 
-	/**
-	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
-	 * 
-	 * @return the number of actions fired
-	 */
+	@Override
 	public Integer schedule() {
-		// int running = 0;
-		// boolean schedulable = true;
-		//
-		// // Schedule the actor as long as it can execute an action
-		// if (sched.hasFsm()) {
-		// while (schedulable) {
-		// schedulable = false;
-		// // Check for untagged actions first
-		// for (Action action : sched.getActions()) {
-		// schedulable = isSchedulable(action);
-		// if (schedulable) {
-		// if (checkOutputPattern(action.getOutputPattern())) {
-		// running = execute(action);
-		// } else {
-		// schedulable = false;
-		// }
-		// break;
-		// }
-		// }
-		// if (!schedulable) {
-		// // If no untagged action has been executed,
-		// // Then check for next FSM transition
-		// for (NextStateInfo info : sched.getFsm().getTransitions(
-		// fsmState)) {
-		// Action action = info.getAction();
-		// schedulable = isSchedulable(action);
-		// if (schedulable) {
-		// if (checkOutputPattern(action.getOutputPattern())) {
-		// // Update FSM state
-		// fsmState = info.getTargetState().getName();
-		// running = execute(action);
-		// } else {
-		// schedulable = false;
-		// }
-		// break;
-		// }
-		// }
-		// }
-		// }
-		// } else {
-		// while (schedulable) {
-		// schedulable = false;
-		// for (Action action : sched.getActions()) {
-		// schedulable = isSchedulable(action);
-		// if (schedulable) {
-		// if (checkOutputPattern(action.getOutputPattern())) {
-		// running = execute(action);
-		// } else {
-		// schedulable = false;
-		// }
-		// break;
-		// }
-		// }
-		// }
-		// }
-		//
-		// return running;
+		if (isSynchronousScheduler) {
+			// "Synchronous-like" scheduling policy : schedule only 1 action per
+			// actor at each "schedule" (network logical cycle) call
+			Action action = getNextAction();
+			if (action != null) {
+				return execute(action);
+			} else {
+				return 0;
+			}
 
-		// Schedule only 1 action per actor
+		} else {
+			// Other scheduling policy : schedule the actor as long as it can
+			// execute an action
+			int running = 0;
+			boolean schedulable = true;
+			if (sched.hasFsm()) {
+				while (schedulable) {
+					schedulable = false;
+					// Check for untagged actions first
+					for (Action action : sched.getActions()) {
+						schedulable = isSchedulable(action);
+						if (schedulable) {
+							if (checkOutputPattern(action.getOutputPattern())) {
+								running = execute(action);
+							} else {
+								schedulable = false;
+							}
+							break;
+						}
+					}
+					if (!schedulable) {
+						// If no untagged action has been executed,
+						// Then check for next FSM transition
+						for (NextStateInfo info : sched.getFsm()
+								.getTransitions(fsmState)) {
+							Action action = info.getAction();
+							schedulable = isSchedulable(action);
+							if (schedulable) {
+								if (checkOutputPattern(action
+										.getOutputPattern())) {
+									// Update FSM state
+									fsmState = info.getTargetState().getName();
+									running = execute(action);
+								} else {
+									schedulable = false;
+								}
+								break;
+							}
+						}
+					}
+				}
+			} else {
+				while (schedulable) {
+					schedulable = false;
+					for (Action action : sched.getActions()) {
+						schedulable = isSchedulable(action);
+						if (schedulable) {
+							if (checkOutputPattern(action.getOutputPattern())) {
+								running = execute(action);
+							} else {
+								schedulable = false;
+							}
+							break;
+						}
+					}
+				}
+			}
+			return running;
+		}
+	}
+
+	/**
+	 * Get the next schedulable action to be executed for this actor
+	 * @return the schedulable action or null
+	 */
+	private Action getNextAction() {
 		if (sched.hasFsm()) {
 			// Check for untagged actions first
 			for (Action action : sched.getActions()) {
 				if (isSchedulable(action)) {
 					if (checkOutputPattern(action.getOutputPattern())) {
-						return execute(action);
+						return action;
 					}
 					break;
 				}
@@ -306,7 +323,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 					// Update FSM state
 					if (checkOutputPattern(action.getOutputPattern())) {
 						fsmState = info.getTargetState().getName();
-						return execute(action);
+						return action;
 					}
 					break;
 				}
@@ -315,13 +332,43 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			for (Action action : sched.getActions()) {
 				if (isSchedulable(action)) {
 					if (checkOutputPattern(action.getOutputPattern())) {
-						return execute(action);
+						return action;
 					}
 					break;
 				}
 			}
 		}
-		return 0;
+		return null;
+	}
+	
+	@Override
+	public boolean step() {
+		if (currentAction != null) {
+			if (currentNode == currentAction.getBody().getNodes().size()) {
+				currentAction = null;
+				return true;
+			}else {
+				CFGNode node = currentAction.getBody().getNodes().get(currentNode++);
+				node.accept(interpret);
+				lastVisitedLocation = node.getLocation();
+				lastVisitedAction = currentAction.getName();
+				return false;
+			}
+		}else {
+			currentAction = getNextAction();
+			if (currentAction != null) {
+				// Allocate local List variables
+				for (Variable local : currentAction.getBody().getLocals()) {
+					Type type = local.getType();
+					if (type.getType() == Type.LIST) {
+						local.setValue(listAllocator.allocate(type));
+					}
+				}
+				// Control nodes index
+				currentNode = 0;
+			}
+		}
+		return true;
 	}
 
 	@Override

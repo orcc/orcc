@@ -7,10 +7,13 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DOT_CFG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_KEEP;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_TRACES;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DOT_CFG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_CACHE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.interpreter.InterpreterMain;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -76,7 +80,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	}
 
 	private class OrccProxy implements IStreamsProxy {
-		
+
 		private IStreamMonitor outputMonitor;
 
 		public OrccProxy() {
@@ -162,6 +166,56 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	@Override
 	public boolean canTerminate() {
 		return !terminated;
+	}
+
+	/**
+	 * Calls the Orcc RVC-CAL interpreter for simulation.
+	 * 
+	 * @param option
+	 *            Selects debugger or simulator.
+	 * @param launch
+	 *            The current launch context.
+	 * @param monitor
+	 *            The progress monitor.
+	 * @param configuration
+	 *            The configuration.
+	 * @throws CoreException
+	 */
+	private void launchInterpreter(String option)
+			throws CoreException {
+		// Get configuration options
+		String inputFile = configuration.getAttribute(INPUT_FILE, "");
+		String inputStimulus = configuration.getAttribute(INPUT_STIMULUS, "");
+		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
+		String file = new File(inputFile).getName();
+		String filename = outputFolder + File.separator + file;
+		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+		boolean enableTraces = configuration.getAttribute(ENABLE_TRACES,
+				DEFAULT_TRACES);
+		try {
+			// Get interpreter instance and configure it
+			InterpreterMain interpreter = new InterpreterMain();
+			interpreter.configSystem(this, monitor);
+			interpreter.configNetwork(filename, fifoSize, inputStimulus,
+					enableTraces);
+			if (option.equals("debugger")) {
+				// Add the DebugTarget as a listener of interpreter
+				OrccDebugTarget target = new OrccDebugTarget(launch, this, interpreter);
+				launch.addDebugTarget(target);
+				interpreter.addPropertyChangeListener(target);
+				// Start interpreter thread...
+				interpreter.start();
+				// ...wait for the end of inputStimulus consumption
+				interpreter.join();
+			}else {
+				// No debug thread to be used : call directly the simulator
+				interpreter.simulate();
+			}
+		} catch (Exception e) {
+			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+					"simulator error", e);
+			throw new CoreException(status);
+		}
 	}
 
 	/**
@@ -293,7 +347,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 	}
 
-	public void start() throws CoreException {
+	public void start(String option) throws CoreException {
 		monitor.beginTask("Compiling dataflow program", 2);
 		monitor.subTask("Launching frontend...");
 		process = DebugPlugin.exec(cmdLine, null);
@@ -305,13 +359,23 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		write("Orcc frontend exit code: " + value + "\n");
 		if (value == 0) {
-			monitor.subTask("Launching backend...");
-			write("\n");
-			write("*********************************************"
-					+ "**********************************\n");
-			write("Launching Orcc backend...\n");
-			launchBackend(configuration);
-			write("Orcc backend done.");
+			if (option.equals("backend")) {
+				monitor.subTask("Launching backend...");
+				write("\n");
+				write("*********************************************"
+						+ "**********************************\n");
+				write("Launching Orcc backend...\n");
+				launchBackend(configuration);
+				write("Orcc backend done.");
+			} else {
+				monitor.subTask("Launching simulator...");
+				write("\n");
+				write("*********************************************"
+						+ "**********************************\n");
+				write("Launching Orcc simulator...\n");
+				launchInterpreter(option);
+				write("Orcc simulation done.");
+			}
 		}
 
 		terminated = true;
@@ -321,13 +385,14 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		DebugPlugin.getDefault().fireDebugEventSet(events);
 	}
 
-	private void write(String msg) {
+	public void write(String msg) {
 		synchronized (contents) {
 			contents += msg;
 		}
-		
+
 		for (Object listener : list.getListeners()) {
-			((IStreamListener) listener).streamAppended(msg, proxy.getOutputStreamMonitor());
+			((IStreamListener) listener).streamAppended(msg, proxy
+					.getOutputStreamMonitor());
 		}
 	}
 
