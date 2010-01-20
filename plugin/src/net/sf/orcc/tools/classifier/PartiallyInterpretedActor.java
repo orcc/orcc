@@ -88,8 +88,14 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 	@Override
 	protected boolean isSchedulable(Action action) {
 		// no need to check output patterns because we do not have FIFOs
-		Object isSchedulable = interpretProc(action.getScheduler());
-		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
+		((PartialNodeInterpreter) interpret).setSchedulableMode(true);
+		try {
+			Object isSchedulable = interpretProc(action.getScheduler());
+			return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
+		} finally {
+			// always resets schedulable mode to false
+			((PartialNodeInterpreter) interpret).setSchedulableMode(false);
+		}
 	}
 
 	/**

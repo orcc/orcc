@@ -29,8 +29,9 @@
 package net.sf.orcc.tools.classifier;
 
 import java.lang.reflect.Array;
-import java.util.List;
+import java.util.Random;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
@@ -38,6 +39,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -59,8 +61,11 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 
 	private ConfigurationAnalyzer analyzer;
 
+	private Random random;
+
 	public PartialNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
 		this.analyzer = analyzer;
+		random = new Random();
 
 		listAllocator = new ListAllocator();
 		exprInterpreter = new PartialExpressionEvaluator();
@@ -76,10 +81,18 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 		this.action = action;
 	}
 
+	public void setSchedulableMode(boolean schedulableMode) {
+		if (schedulableMode) {
+			exprInterpreter = new ExpressionEvaluator();
+		} else {
+			exprInterpreter = new PartialExpressionEvaluator();
+		}
+	}
+
 	@Override
 	public void visit(HasTokens instr, Object... args) {
-		// we always have tokens :-)
-		instr.getTarget().setValue(true);
+		// this allows actions with empty input patterns to run, too!
+		instr.getTarget().setValue(random.nextBoolean());
 	}
 
 	@Override
@@ -87,18 +100,20 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 		// Interpret first expression ("if" condition)
 		Object condition = node.getValue().accept(exprInterpreter);
 
-		if (condition instanceof Boolean && (Boolean) condition) {
-			for (CFGNode subNode : node.getThenNodes()) {
-				subNode.accept(this, args);
-			}
-		} else {
-			List<CFGNode> elseNodes = node.getElseNodes();
-			if (!elseNodes.isEmpty()) {
-				for (CFGNode subNode : elseNodes) {
+		if (condition instanceof Boolean) {
+			if ((Boolean) condition) {
+				for (CFGNode subNode : node.getThenNodes()) {
+					subNode.accept(this, args);
+				}
+			} else {
+				for (CFGNode subNode : node.getElseNodes()) {
 					subNode.accept(this, args);
 				}
 			}
+		} else {
+			throw new OrccRuntimeException("null condition");
 		}
+
 		node.getJoinNode().accept(this, args);
 	}
 
