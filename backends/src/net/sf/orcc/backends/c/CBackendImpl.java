@@ -91,10 +91,8 @@ public class CBackendImpl extends AbstractBackend {
 			classifyActors(network);
 			mergeActors(network);
 		}
-	}
-
-	@Override
-	protected void beforeInstantiation(Network network) throws OrccException {
+		
+		// until now, printer is default printer 
 		printer = new CActorPrinter();
 	}
 
