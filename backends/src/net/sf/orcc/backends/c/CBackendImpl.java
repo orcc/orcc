@@ -54,7 +54,7 @@ import net.sf.orcc.tools.classifier.ActorClassifier;
  */
 public class CBackendImpl extends AbstractBackend {
 
-	public static final boolean merge = true;
+	public static final boolean merge = false;
 
 	/**
 	 * 
