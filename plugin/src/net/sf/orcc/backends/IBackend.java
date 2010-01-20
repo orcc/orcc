@@ -32,17 +32,8 @@ package net.sf.orcc.backends;
  * @author Matthieu Wipliez
  * 
  */
-public interface IBackend{
-	
-	IOptions optionTab = null;
-	
-	/**
-	 * Return backend option tab in configuration plugin.
-	 * 
-	 * @throws Exception
-	 */
-	public IOptions getOptionTab() throws Exception;
-	
+public interface IBackend {
+
 	/**
 	 * Generates code from a flat XDF network and IR files.
 	 * 
@@ -53,6 +44,5 @@ public interface IBackend{
 	 * @throws Exception
 	 */
 	public void generateCode(String fileName, int fifoSize) throws Exception;
-	
 
 }

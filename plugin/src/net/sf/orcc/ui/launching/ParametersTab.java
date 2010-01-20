@@ -69,7 +69,6 @@ import org.eclipse.swt.widgets.TableItem;
 /**
  * 
  * @author Matthieu Wipliez
- * "Parameters" description of configuration's tab
  * 
  */
 public class ParametersTab extends AbstractLaunchConfigurationTab {

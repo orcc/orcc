@@ -74,7 +74,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 /**
  * 
  * @author Matthieu Wipliez
- * "Compilation settings" description of configuration's tabs
+ * 
  */
 public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
@@ -211,11 +211,6 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		createControlOutputBackend(font, group);
 	}
 
-	private void updateBackendOptions(){
-		
-		
-	}
-	
 	private void createControlOutputBackend(Font font, Group group) {
 		Label lbl = new Label(group, SWT.NONE);
 		lbl.setFont(font);
@@ -235,12 +230,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 
 		comboBackend.addSelectionListener(new SelectionAdapter() {
-
-			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateLaunchConfigurationDialog();
-				updateBackendOptions();
 			}
 		});
 	}

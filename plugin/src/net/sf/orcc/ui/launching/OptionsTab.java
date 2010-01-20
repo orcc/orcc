@@ -62,7 +62,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * 
  * @author Matthieu Wipliez
- * "Compilation options" description of configuration's tab
+ * 
  */
 public class OptionsTab extends AbstractLaunchConfigurationTab {
 
