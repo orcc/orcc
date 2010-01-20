@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.tools.classifier;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -36,6 +37,7 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorClass;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.classes.DynamicClass;
 import net.sf.orcc.ir.classes.QuasiStaticClass;
@@ -55,33 +57,29 @@ public class ActorClassifier {
 	private ConfigurationAnalyzer analyzer;
 
 	/**
-	 * Creates a new FSM unroller on the given actor. The unroller starts by
-	 * analyzing the actor's configuration if it has any.
-	 * 
-	 * @param actor
-	 *            an actor
+	 * Creates a new classifier
 	 */
-	public ActorClassifier(Actor actor) {
-		this.actor = actor;
-
-		// analyze the configuration of this actor
-		analyzer = new ConfigurationAnalyzer(actor);
-		analyzer.analyze();
+	public ActorClassifier() {
 	}
 
 	/**
 	 * Classifies the actor as dynamic, quasi-static, or static.
 	 * 
+	 * @param actor
+	 *            an actor
 	 * @return the class of the actor
 	 */
-	public ActorClass classify() {
+	public ActorClass classify(Actor actor) {
+		this.actor = actor;
+		analyzer = new ConfigurationAnalyzer(actor);
+
 		// Generates a subgraph for each initial transition
 		try {
 			ActionScheduler sched = actor.getActionScheduler();
 			if (sched.hasFsm()) {
-				return classifyFsm();
+				return new DynamicClass();
 			} else {
-				return classifyActions(sched.getActions());
+				return classifyNoFsm(sched.getActions());
 			}
 		} catch (OrccRuntimeException e) {
 			e.printStackTrace();
@@ -89,39 +87,8 @@ public class ActorClassifier {
 		}
 	}
 
-	/**
-	 * Classify the given list of actions. This method is only called for
-	 * FSM-less actors.
-	 * 
-	 * @param actions
-	 *            a list of actions sorted by descending priority
-	 * @return an actor class
-	 */
-	private ActorClass classifyActions(List<Action> actions) {
-		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
-				actor.getName(), actor, analyzer);
-		interpretedActor.initialize();
-
-		actor.resetTokenConsumption();
-		actor.resetTokenProduction();
-
-		ActorState state = new ActorState(actor);
-		if (state.isEmpty()) {
-			// no state, let's check number of actions
-			if (actions.size() == 1) {
-				// an actor with a single action is static
-				return classifySingleAction(interpretedActor);
-			} else {
-				return classifyActionsNoState(interpretedActor, actions);
-			}
-		} else {
-			return classifyActionsWithState(interpretedActor, state, actions);
-		}
-	}
-
 	private ActorClass classifyActionsNoState(
 			PartiallyInterpretedActor interpretedActor, List<Action> actions) {
-		
 
 		return new DynamicClass();
 	}
@@ -169,6 +136,9 @@ public class ActorClassifier {
 	 * @return a quasi-static class if possible
 	 */
 	private QuasiStaticClass classifyFsm() {
+		// analyze the configuration of this actor
+		analyzer.analyze();
+
 		// TODO: check FSM against the configuration/processing pattern
 		ActionScheduler sched = actor.getActionScheduler();
 
@@ -230,26 +200,83 @@ public class ActorClassifier {
 	}
 
 	/**
-	 * Classify an actor with a single actor.
+	 * Classify an actor without FSM.
 	 * 
-	 * @param interpretedActor
-	 *            the partial interpreter
-	 * @return a static actor class
+	 * @param actions
+	 *            a list of actions sorted by descending priority
+	 * @return an actor class
 	 */
-	private StaticClass classifySingleAction(
-			PartiallyInterpretedActor interpretedActor) {
-		interpretedActor.schedule();
+	private ActorClass classifyNoFsm(List<Action> actions) {
+		ActorClass clasz = classifyNoFsmSDF(actions);
+		if (clasz.isDynamic()) {
+			// actor cannot be considered SDF
+
+			/*
+			 * PartiallyInterpretedActor interpretedActor = new
+			 * PartiallyInterpretedActor( actor.getName(), actor, analyzer);
+			 * interpretedActor.initialize();
+			 * 
+			 * actor.resetTokenConsumption(); actor.resetTokenProduction();
+			 * 
+			 * ActorState state = new ActorState(actor); if (state.isEmpty()) {
+			 * return classifyActionsNoState(interpretedActor, actions); } else
+			 * { return classifyActionsWithState(interpretedActor, state,
+			 * actions); }
+			 */
+			return clasz;
+		} else {
+			return clasz;
+		}
+	}
+
+	/**
+	 * Tries to classify an actor with several actions and no FSM as SDF.
+	 * 
+	 * @param actions
+	 *            a list of actions sorted by descending priority
+	 * @return an actor class
+	 */
+	private ActorClass classifyNoFsmSDF(List<Action> actions) {
+		Iterator<Action> it = actions.iterator();
+		if (it.hasNext()) {
+			Action action = it.next();
+			Pattern input = action.getInputPattern();
+			Pattern output = action.getOutputPattern();
+			while (it.hasNext()) {
+				action = it.next();
+				if ((input.equals(action.getInputPattern()) && output
+						.equals(action.getOutputPattern())) == false) {
+					// one pattern is not equal to another
+					return new DynamicClass();
+				}
+			}
+		} else {
+			// an empty actor is considered dynamic
+			// because the only actors with no actions are system actors
+			// such as source and display
+			return new DynamicClass();
+		}
 
 		StaticClass staticClass = new StaticClass();
-		staticClass.addAction(interpretedActor.getScheduledAction());
+
+		actor.resetTokenConsumption();
+		actor.resetTokenProduction();
+
+		// schedule
+		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
+				actor.getName(), actor, analyzer);
+		interpretedActor.initialize();
+		interpretedActor.schedule();
 
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
 		staticClass.setTokenProductions(actor);
 
 		// print port token rates
+		System.out.println("actor " + actor + " is SDF");
 		staticClass.printTokenConsumption();
 		staticClass.printTokenProduction();
+		System.out.println();
 
 		return staticClass;
 	}

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.interpreter;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
@@ -36,6 +35,7 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
@@ -63,7 +63,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	private ListAllocator listAllocator;
 
 	protected ActionScheduler sched;
-	private boolean isSynchronousScheduler = false;
+	protected boolean isSynchronousScheduler = false;
 	
 	/**
 	 * Step into utils
@@ -110,7 +110,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 *            output pattern of an action
 	 * @return true if the pattern is empty or satisfiable
 	 */
-	protected boolean checkOutputPattern(Map<Port, Integer> outputPattern) {
+	protected boolean checkOutputPattern(Pattern outputPattern) {
 		if (outputPattern != null) {
 			boolean freeOutput = true;
 			for (Entry<Port, Integer> entry : outputPattern.entrySet()) {

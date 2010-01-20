@@ -54,22 +54,29 @@ import net.sf.orcc.tools.classifier.ActorClassifier;
  */
 public class CBackendImpl extends AbstractBackend {
 
-	public static final boolean merge = false;
+	public static boolean merge = false;
 
 	/**
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 1) {
+		String file;
+		if (args.length > 0) {
+			file = args[0];
+			if (args.length > 1) {
+				merge = Boolean.parseBoolean(args[1]);
+			}
+
 			try {
-				new CBackendImpl().generateCode(args[0], 10000);
+				new CBackendImpl().generateCode(file, 10000);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Usage: CBackendImpl <flattened XDF network>");
+			System.err.println("Usage: CBackendImpl "
+					+ "<flattened XDF network> [<merge>]");
 		}
 	}
 
@@ -109,14 +116,14 @@ public class CBackendImpl extends AbstractBackend {
 					// removes phi so the actor can be interpreted
 					tr.transform(actor);
 
-					ActorClassifier classifier = new ActorClassifier(actor);
-					ActorClass clasz = classifier.classify();
+					ActorClassifier classifier = new ActorClassifier();
+					ActorClass clasz = classifier.classify(actor);
 					actor.setActorClass(clasz);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Merges actors of the given network.
 	 * 

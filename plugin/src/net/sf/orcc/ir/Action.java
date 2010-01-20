@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.Map;
 
 /**
  * This class defines an action. An action has a location, a tag, an input and
@@ -43,9 +42,9 @@ public class Action extends AbstractLocalizable {
 
 	private Procedure body;
 
-	private Map<Port, Integer> inputPattern;
+	private Pattern inputPattern;
 
-	private Map<Port, Integer> outputPattern;
+	private Pattern outputPattern;
 
 	private Procedure scheduler;
 
@@ -67,9 +66,8 @@ public class Action extends AbstractLocalizable {
 	 * @param body
 	 *            procedure that holds the body of the action
 	 */
-	public Action(Location location, Tag tag, Map<Port, Integer> inputPattern,
-			Map<Port, Integer> outputPattern, Procedure scheduler,
-			Procedure body) {
+	public Action(Location location, Tag tag, Pattern inputPattern,
+			Pattern outputPattern, Procedure scheduler, Procedure body) {
 		super(location);
 		this.body = body;
 		this.inputPattern = inputPattern;
@@ -92,7 +90,7 @@ public class Action extends AbstractLocalizable {
 	 * 
 	 * @return the input pattern of this action
 	 */
-	public Map<Port, Integer> getInputPattern() {
+	public Pattern getInputPattern() {
 		return inputPattern;
 	}
 
@@ -101,7 +99,7 @@ public class Action extends AbstractLocalizable {
 	 * 
 	 * @return the output pattern of this action
 	 */
-	public Map<Port, Integer> getOutputPattern() {
+	public Pattern getOutputPattern() {
 		return outputPattern;
 	}
 
@@ -127,6 +125,7 @@ public class Action extends AbstractLocalizable {
 
 	/**
 	 * Returns action name (tag or body name)
+	 * 
 	 * @return action name
 	 */
 	public String getName() {
@@ -142,7 +141,7 @@ public class Action extends AbstractLocalizable {
 			return str;
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return getName();

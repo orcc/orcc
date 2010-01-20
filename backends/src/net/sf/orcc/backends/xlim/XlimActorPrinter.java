@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.Map.Entry;
@@ -55,6 +54,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
@@ -168,7 +168,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 		Element guardE = XlimNodeTemplate.newDiffOperation(body, AND);
 		String name = action.getName();
 
-		Map<Port, Integer> input = action.getInputPattern();
+		Pattern input = action.getInputPattern();
 		for (Entry<Port, Integer> entry : input.entrySet()) {
 			String index = "index" + (icount++);
 			Port port = entry.getKey();
@@ -232,7 +232,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 
 		Element fireE = XlimNodeTemplate.newDiffOperation(body, AND);
 
-		Map<Port, Integer> output = action.getOutputPattern();
+		Pattern output = action.getOutputPattern();
 		for (Entry<Port, Integer> entry : output.entrySet()) {
 			String index = "index" + (icount++);
 

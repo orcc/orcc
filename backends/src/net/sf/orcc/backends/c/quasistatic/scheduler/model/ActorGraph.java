@@ -129,7 +129,7 @@ public class ActorGraph {
 		System.out.println("********* Unrolling actor " + getName()
 				+ " *********");
 
-		ActorClass actorClass = new ActorClassifier(actor).classify();
+		ActorClass actorClass = new ActorClassifier().classify(actor);
 
 		if (actorClass.isDynamic()) {
 			// nothing to do...

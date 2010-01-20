@@ -29,14 +29,11 @@
 package net.sf.orcc.ir.classes;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 
 /**
@@ -53,17 +50,17 @@ public class StaticClass extends AbstractActorClass {
 	 */
 	private List<Action> actions;
 
-	private Map<Port, Integer> tokenConsumption;
+	private Pattern tokenConsumption;
 
-	private Map<Port, Integer> tokenProduction;
+	private Pattern tokenProduction;
 
 	/**
 	 * Creates a new static class.
 	 */
 	public StaticClass() {
 		actions = new ArrayList<Action>();
-		tokenConsumption = new LinkedHashMap<Port, Integer>();
-		tokenProduction = new LinkedHashMap<Port, Integer>();
+		tokenConsumption = new Pattern();
+		tokenProduction = new Pattern();
 	}
 
 	/**
@@ -122,43 +119,17 @@ public class StaticClass extends AbstractActorClass {
 	}
 
 	/**
-	 * Prints the given port tokens map.
-	 * 
-	 * @param map
-	 *            a map from ports to number of tokens they produced/consumed
-	 */
-	private void print(Map<Port, Integer> map) {
-		Iterator<Entry<Port, Integer>> it = map.entrySet().iterator();
-		if (it.hasNext()) {
-			Entry<Port, Integer> entry = it.next();
-			Port port = entry.getKey();
-			int tokens = entry.getValue();
-			System.out.print(port.getName() + ": " + tokens);
-			while (it.hasNext()) {
-				entry = it.next();
-				port = entry.getKey();
-				tokens = entry.getValue();
-				System.out.print(", " + port.getName() + ": " + tokens);
-			}
-		}
-	}
-
-	/**
 	 * Prints the token consumption of this static class.
 	 */
 	public void printTokenConsumption() {
-		System.out.print("input ports: [");
-		print(tokenConsumption);
-		System.out.println("]");
+		System.out.println("input ports: " + tokenConsumption);
 	}
 
 	/**
 	 * Prints the token production of this static class.
 	 */
 	public void printTokenProduction() {
-		System.out.print("output ports: [");
-		print(tokenProduction);
-		System.out.println("]");
+		System.out.println("output ports: " + tokenProduction);
 	}
 
 	/**

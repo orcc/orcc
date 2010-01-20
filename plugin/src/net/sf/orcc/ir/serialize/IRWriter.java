@@ -45,7 +45,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
@@ -60,6 +59,7 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
@@ -595,7 +595,7 @@ public class IRWriter {
 	 *            integer&gt;
 	 * @return a JSON array
 	 */
-	private JSONArray writeActionPattern(Map<Port, Integer> pattern) {
+	private JSONArray writeActionPattern(Pattern pattern) {
 		JSONArray array = new JSONArray();
 		for (Entry<Port, Integer> entry : pattern.entrySet()) {
 			array.put(entry.getKey().getName());

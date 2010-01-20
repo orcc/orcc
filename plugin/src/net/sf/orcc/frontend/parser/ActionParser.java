@@ -33,10 +33,8 @@ import static net.sf.orcc.frontend.parser.Util.parseLocation;
 
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
@@ -44,6 +42,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
@@ -97,7 +96,7 @@ public class ActionParser {
 	/**
 	 * input pattern of the action being parsed
 	 */
-	private Map<Port, Integer> inputPattern;
+	private Pattern inputPattern;
 
 	/**
 	 * ordered map of input ports
@@ -112,7 +111,7 @@ public class ActionParser {
 	/**
 	 * output pattern of the action being parsed
 	 */
-	private Map<Port, Integer> outputPattern;
+	private Pattern outputPattern;
 
 	/**
 	 * ordered map of output ports
@@ -350,7 +349,7 @@ public class ActionParser {
 	 * @throws OrccException
 	 */
 	private void parseInputPattern(Tree tree) throws OrccException {
-		inputPattern = new HashMap<Port, Integer>();
+		inputPattern = new Pattern();
 		patternType = null;
 		patternPorts.clear();
 
@@ -376,7 +375,7 @@ public class ActionParser {
 	 * @throws OrccException
 	 */
 	private void parseOutputPattern(Tree tree) throws OrccException {
-		outputPattern = new HashMap<Port, Integer>();
+		outputPattern = new Pattern();
 		patternType = null;
 		patternPorts.clear();
 

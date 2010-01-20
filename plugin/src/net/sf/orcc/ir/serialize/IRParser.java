@@ -61,7 +61,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
@@ -74,6 +73,7 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
@@ -189,8 +189,8 @@ public class IRParser {
 			tag.add(tagArray.getString(i));
 		}
 
-		Map<Port, Integer> ip = parsePattern(inputs, array.getJSONArray(1));
-		Map<Port, Integer> op = parsePattern(outputs, array.getJSONArray(2));
+		Pattern ip = parsePattern(inputs, array.getJSONArray(1));
+		Pattern op = parsePattern(outputs, array.getJSONArray(2));
 
 		Procedure scheduler = parseProc(array.getJSONArray(3), false);
 		Procedure body = parseProc(array.getJSONArray(4), false);
@@ -546,9 +546,9 @@ public class IRParser {
 		return nodes;
 	}
 
-	private Map<Port, Integer> parsePattern(OrderedMap<Port> ports,
+	private Pattern parsePattern(OrderedMap<Port> ports,
 			JSONArray array) throws JSONException, OrccException {
-		Map<Port, Integer> pattern = new TreeMap<Port, Integer>();
+		Pattern pattern = new Pattern();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray patternArray = array.getJSONArray(i);
 			Port port = ports.get(patternArray.getString(0));
