@@ -74,8 +74,8 @@ actor RowSort ( int sz ) int(size=sz) ROW ==> int(size=sz) Y0, int(size=sz) Y1 :
   a7: action ROW:[a] ==> Y0:[x1], Y1:[a]
   end
  
-//  a8: action ROW:[a] ==> Y0:[x5], Y1:[x3]
-//  do x0 := a; end
+  a8: action ROW:[a] ==> Y0:[x5], Y1:[x3]
+  do x0 := a; end
 
   a9: action ==> Y0:[x5], Y1:[x3]
   end
@@ -89,12 +89,12 @@ actor RowSort ( int sz ) int(size=sz) ROW ==> int(size=sz) Y0, int(size=sz) Y1 :
     s5( a5 ) --> s6;
     s6( a6 ) --> s7;
     s7( a7 ) --> s8;
-//    s8( a8 ) --> s1;
+    s8( a8 ) --> s1;
     s8( a9 ) --> s0;
   end
 
-  /*priority
+  priority
     a8 > a9;
-  end*/
+  end
   
 end
