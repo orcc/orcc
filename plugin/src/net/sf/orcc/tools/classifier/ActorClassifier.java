@@ -31,6 +31,9 @@ package net.sf.orcc.tools.classifier;
 import java.util.Iterator;
 import java.util.List;
 
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.ConnectivityInspector;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -39,9 +42,11 @@ import net.sf.orcc.ir.ActorClass;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.classes.DynamicClass;
 import net.sf.orcc.ir.classes.QuasiStaticClass;
 import net.sf.orcc.ir.classes.StaticClass;
+import net.sf.orcc.util.UniqueEdge;
 
 /**
  * This class defines an actor classifier that uses the partial interpreter to
@@ -86,13 +91,14 @@ public class ActorClassifier {
 		ActorClass clasz = classifySDF(actions);
 		if (!clasz.isStatic()) {
 			try {
+				// not SDF, tries CSDF
 				ActionScheduler sched = actor.getActionScheduler();
-				if (sched.hasFsm()) {
-					// FSM: may be CSDF or QSDF
-					clasz = classifyFsm();
-				} else {
-					// no FSM: may be CSDF
-					clasz = classifyNoFsmCSDF(sched.getActions());
+				clasz = classifyCSDF(sched);
+				if (!clasz.isStatic()) {
+					// not CSDF, tries QSDF
+					if (sched.hasFsm()) {
+						clasz = classifyQSDF();
+					}
 				}
 			} catch (OrccRuntimeException e) {
 				System.out.println("actor " + actor
@@ -113,22 +119,80 @@ public class ActorClassifier {
 	}
 
 	/**
-	 * Tries to classify this actor with an FSM as CSDF or QSDF.
+	 * Tries to classify an actor as CSDF. Classification works only on actor
+	 * with a non-empty state. Such a state consists in all scalar state
+	 * variables that have an initial value.
+	 * 
+	 * @param actions
+	 *            a list of actions
+	 * @return an actor class
+	 */
+	private ActorClass classifyCSDF(ActionScheduler sched) {
+		// new interpreter must be called before creation of ActorState
+		PartiallyInterpretedActor interpretedActor = newInterpreter();
+
+		ActorState state = new ActorState(actor);
+		if (state.isEmpty()) {
+			if (sched.hasFsm()) {
+				FSM fsm = sched.getFsm();
+				if (isCycloStaticFsm(fsm)) {
+					return classifyCSDFStateless(sched.getFsm(),
+							interpretedActor);
+				}
+			}
+
+			// no state, no cyclo-static FSM => dynamic
+			return new DynamicClass();
+		}
+
+		// schedule the actor
+		StaticClass staticClass = new StaticClass();
+		int scheduled;
+		do {
+			scheduled = interpretedActor.schedule();
+			if (scheduled != 0) {
+				Action latest = interpretedActor.getScheduledAction();
+				staticClass.addAction(latest);
+			}
+		} while (!state.isInitialState() || scheduled == 0);
+
+		// set token rates
+		staticClass.setTokenConsumptions(actor);
+		staticClass.setTokenProductions(actor);
+
+		System.out.println("actor " + actor + " is CSDF");
+
+		return staticClass;
+	}
+
+	/**
+	 * Tries to classify this actor with no state as CSDF.
 	 * 
 	 * @return an actor class
 	 */
-	private ActorClass classifyFsm() {
-		ActionScheduler sched = actor.getActionScheduler();
-		FSM fsm = sched.getFsm();
-		if (isQuasiStaticFsm(fsm)) {
-			return classifyFsmQuasiStatic(fsm);
-		} else if (isCycloStaticFsm(fsm)) {
-			return classifyFsmCycloStatic(fsm);
-		} else {
-			System.out.println("actor " + actor
-					+ ": unsupported FSM, classified dynamic");
-			return new DynamicClass();
-		}
+	private ActorClass classifyCSDFStateless(FSM fsm,
+			PartiallyInterpretedActor interpretedActor) {
+		// schedule the actor
+		StaticClass staticClass = new StaticClass();
+		String initialState = fsm.getInitialState().getName();
+		String state = null;
+		int scheduled;
+		do {
+			scheduled = interpretedActor.schedule();
+			if (scheduled != 0) {
+				Action latest = interpretedActor.getScheduledAction();
+				staticClass.addAction(latest);
+				state = interpretedActor.getFsmState();
+			}
+		} while (!initialState.equals(state) || scheduled == 0);
+
+		// set token rates
+		staticClass.setTokenConsumptions(actor);
+		staticClass.setTokenProductions(actor);
+
+		System.out.println("actor " + actor + " is CSDF");
+
+		return staticClass;
 	}
 
 	/**
@@ -174,70 +238,35 @@ public class ActorClassifier {
 	}
 
 	/**
-	 * Tries to classify this actor with an FSM as CSDF.
+	 * Tries to classify this actor with an FSM as CSDF or QSDF.
 	 * 
 	 * @return an actor class
 	 */
-	private ActorClass classifyFsmCycloStatic(FSM fsm) {
-		return new DynamicClass();
-	}
+	private ActorClass classifyQSDF() {
+		ActionScheduler sched = actor.getActionScheduler();
+		FSM fsm = sched.getFsm();
+		if (isQuasiStaticFsm(fsm)) {
+			String initialState = fsm.getInitialState().getName();
 
-	private QuasiStaticClass classifyFsmQuasiStatic(FSM fsm) {
-		String initialState = fsm.getInitialState().getName();
+			// analyze the configuration of this actor
+			analyzer.analyze();
 
-		// analyze the configuration of this actor
-		analyzer.analyze();
+			// will unroll for each branch departing from the initial state
+			QuasiStaticClass quasiStatic = new QuasiStaticClass();
 
-		// will unroll for each branch departing from the initial state
-		QuasiStaticClass quasiStatic = new QuasiStaticClass();
+			for (NextStateInfo info : fsm.getTransitions(initialState)) {
+				Action action = info.getAction();
+				StaticClass staticClass = classifyFsmConfiguration(
+						initialState, action);
+				quasiStatic.addConfiguration(action, staticClass);
+			}
 
-		for (NextStateInfo info : fsm.getTransitions(initialState)) {
-			Action action = info.getAction();
-			StaticClass staticClass = classifyFsmConfiguration(initialState,
-					action);
-			quasiStatic.addConfiguration(action, staticClass);
-		}
-
-		return quasiStatic;
-	}
-
-	/**
-	 * Tries to classify an actor with several actions and no FSM as CSDF.
-	 * Classification works only on actor with a non-empty state. Such a state
-	 * consists in all scalar state variables that have an initial value.
-	 * 
-	 * @param actions
-	 *            a list of actions
-	 * @return an actor class
-	 */
-	private ActorClass classifyNoFsmCSDF(List<Action> actions) {
-		PartiallyInterpretedActor interpretedActor = newInterpreter();
-
-		ActorState state = new ActorState(actor);
-		if (state.isEmpty()) {
+			return quasiStatic;
+		} else {
 			System.out.println("actor " + actor
-					+ " has no state, considered dynamic");
+					+ ": unsupported FSM, classified dynamic");
 			return new DynamicClass();
 		}
-
-		// schedule the actor
-		StaticClass staticClass = new StaticClass();
-		int scheduled;
-		do {
-			scheduled = interpretedActor.schedule();
-			if (scheduled != 0) {
-				Action latest = interpretedActor.getScheduledAction();
-				staticClass.addAction(latest);
-			}
-		} while (!state.isInitialState() || scheduled == 0);
-
-		// set token rates
-		staticClass.setTokenConsumptions(actor);
-		staticClass.setTokenProductions(actor);
-
-		System.out.println("actor " + actor + " is CSDF");
-
-		return staticClass;
 	}
 
 	/**
@@ -288,14 +317,20 @@ public class ActorClassifier {
 
 	/**
 	 * Returns <code>true</code> if the given FSM looks like the FSM of a
-	 * cyclo-static actor, <code>false</code> otherwise.
+	 * cyclo-static actor, <code>false</code> otherwise. A potentially
+	 * cyclo-static actor is an actor with an FSM that cycles back to its
+	 * initial state.
 	 * 
 	 * @param fsm
 	 *            a Finite State Machine
 	 * @return <code>true</code> if the given FSM has cyclo-static form
 	 */
 	private boolean isCycloStaticFsm(FSM fsm) {
-		return false;
+		DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
+		ConnectivityInspector<State, UniqueEdge> inspector;
+		inspector = new ConnectivityInspector<State, UniqueEdge>(graph);
+		State initial = fsm.getInitialState();
+		return inspector.pathExists(initial, initial);
 	}
 
 	/**

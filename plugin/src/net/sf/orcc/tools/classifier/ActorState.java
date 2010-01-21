@@ -37,11 +37,12 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 
 /**
- * This class defines the state of an actor as a set of state variables with
- * initial values. Only scalar values are considered.
+ * This class defines the state of an actor as a set of scalar state variables
+ * with initial values that are used by guards, in isSchedulable procedures.
  * 
  * @author Matthieu Wipliez
  * 
@@ -64,7 +65,9 @@ public class ActorState {
 			StateVariable stateVariable = (StateVariable) variable;
 			Constant constant = stateVariable.getConstantValue();
 			if (constant != null && type.getType() != Type.LIST) {
-				// add constant to what we consider state
+				// we might consider this constant if it is used by guards
+				for (Use use : stateVariable.getUses()) {
+				}
 				state.put(stateVariable, stateVariable.getValue());
 			}
 		}
