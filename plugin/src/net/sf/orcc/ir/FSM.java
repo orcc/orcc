@@ -277,11 +277,12 @@ public class FSM {
 	}
 
 	/**
-	 * Returns a graph representation of this FSM.
+	 * Creates and returns a graph representation of this FSM. Note that the
+	 * graph is built each time this method is called.
 	 * 
 	 * @return a graph representation of this FSM
 	 */
-	private DirectedGraph<State, UniqueEdge> getGraph() {
+	public DirectedGraph<State, UniqueEdge> getGraph() {
 		DirectedGraph<State, UniqueEdge> graph = new DirectedMultigraph<State, UniqueEdge>(
 				UniqueEdge.class);
 		for (State source : states.values()) {
@@ -376,7 +377,6 @@ public class FSM {
 		List<Transition> transitions = getTransitions();
 		for (Transition transition : transitions) {
 			builder.append(transition.toString());
-			builder.append('\n');
 		}
 		builder.append("end");
 		return builder.toString();
