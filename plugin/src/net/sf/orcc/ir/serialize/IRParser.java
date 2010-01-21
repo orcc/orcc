@@ -464,7 +464,7 @@ public class IRParser {
 	}
 
 	private Location parseLocation(JSONArray array) throws JSONException {
-		if (array.length() == 4) {
+		if (array.length() == 3) {
 			int startLine = array.getInt(0);
 			int startCol = array.getInt(1);
 			int endCol = array.getInt(2);
