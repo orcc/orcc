@@ -297,15 +297,15 @@ public class ActionParser {
 		variables = new Scope<Variable>(scope, false);
 		nodes = new ArrayList<CFGNode>();
 
-		parseInputPattern(tree.getChild(1));
+		String name = getActionName(location, tag);
+		Procedure body = new Procedure(name, false, location, new VoidType(),
+				new OrderedMap<Variable>(), variables, nodes);
+
+		parseInputPattern(body, tree.getChild(1));
 		stmtParser.init(variables, nodes);
 		stmtParser.parseLocalVariables(tree.getChild(4));
 		stmtParser.parseStatements(tree.getChild(5));
 		parseOutputPattern(tree.getChild(2));
-
-		String name = getActionName(location, tag);
-		Procedure body = new Procedure(name, false, location, new VoidType(),
-				new OrderedMap<Variable>(), variables, nodes);
 
 		Procedure scheduler = createSchedulingProcedure(body, tree.getChild(3));
 
@@ -314,9 +314,9 @@ public class ActionParser {
 		return action;
 	}
 
-	private void parseInput(Port port, Tree idents, Tree repeat)
-			throws OrccException {
-		BlockNode block = BlockNode.last(nodes);
+	private void parseInput(Procedure procedure, Port port, Tree idents,
+			Tree repeat) throws OrccException {
+		BlockNode block = BlockNode.last(procedure, nodes);
 
 		Expression numRepeats = null;
 		if (repeat.getChildCount() == 1) {
@@ -348,7 +348,8 @@ public class ActionParser {
 	 *            a tree
 	 * @throws OrccException
 	 */
-	private void parseInputPattern(Tree tree) throws OrccException {
+	private void parseInputPattern(Procedure procedure, Tree tree)
+			throws OrccException {
 		inputPattern = new Pattern();
 		patternType = null;
 		patternPorts.clear();
@@ -357,7 +358,7 @@ public class ActionParser {
 		for (int i = 0; i < n; i++) {
 			Tree input = tree.getChild(i);
 			Port port = getPort(inputs, input.getChild(0));
-			parseInput(port, input.getChild(1), input.getChild(2));
+			parseInput(procedure, port, input.getChild(1), input.getChild(2));
 		}
 	}
 

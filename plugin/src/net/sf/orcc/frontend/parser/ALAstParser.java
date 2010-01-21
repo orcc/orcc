@@ -250,7 +250,8 @@ public class ALAstParser {
 
 		// parse parameters
 		parameters = new Scope<Variable>();
-		globalExprParser.setVariableScope(parameters);
+		// this parser will never need the procedure
+		globalExprParser.setVariableScope(null, parameters);
 		parseActorParameters(tree.getChild(2));
 
 		// parse ports and return them as ordered maps
@@ -424,20 +425,20 @@ public class ALAstParser {
 		stmtParser.init(parameters, nodes);
 		stmtParser.parseLocalVariables(tree.getChild(1));
 
-		// parse block, and returns local variables
-		Scope<Variable> variables = new Scope<Variable>(parameters, false);
-		stmtParser.setVariableScope(variables);
-		stmtParser.parseLocalVariables(tree.getChild(2));
-		stmtParser.parseStatements(tree.getChild(3));
-
 		// get name and location
 		Tree nameTree = tree.getChild(0);
 		String name = nameTree.getText();
 		Location location = parseLocation(nameTree);
 
 		// creates the procedure
+		Scope<Variable> variables = new Scope<Variable>(parameters, false);
 		Procedure procedure = new Procedure(name, false, location,
 				new VoidType(), parameters, variables, nodes);
+
+		// parse block, and returns local variables
+		stmtParser.setVariableScope(procedure, variables);
+		stmtParser.parseLocalVariables(tree.getChild(2));
+		stmtParser.parseStatements(tree.getChild(3));
 
 		procedures.add(file, location, name, procedure);
 	}

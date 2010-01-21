@@ -13,6 +13,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -53,6 +54,8 @@ public class ExpressionParser {
 	 * a list of nodes at the end of which this parser may add nodes
 	 */
 	private List<CFGNode> nodes;
+
+	private Procedure procedure;
 
 	/**
 	 * the current scope of variable
@@ -100,7 +103,7 @@ public class ExpressionParser {
 				globalsLoaded.put(variable, local);
 
 				// add a Load
-				BlockNode block = BlockNode.last(nodes);
+				BlockNode block = BlockNode.last(procedure, nodes);
 				List<Expression> indexes = new ArrayList<Expression>(0);
 				Use use = new Use(variable, block);
 				Load load = new Load(block, location, local, use, indexes);
@@ -362,7 +365,8 @@ public class ExpressionParser {
 	 * @param scope
 	 *            the current scope of variable
 	 */
-	public void setVariableScope(Scope<Variable> scope) {
+	public void setVariableScope(Procedure procedure, Scope<Variable> scope) {
+		this.procedure = procedure;
 		this.scope = scope;
 	}
 

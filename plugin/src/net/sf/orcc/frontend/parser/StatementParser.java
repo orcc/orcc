@@ -16,6 +16,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -42,6 +43,8 @@ public class StatementParser {
 	private Map<LocalVariable, Variable> globalsToStore;
 
 	private List<CFGNode> nodes;
+
+	private Procedure procedure;
 
 	private Scope<Variable> scope;
 
@@ -171,7 +174,7 @@ public class StatementParser {
 				Variable target = getVariable(location, targetName);
 				LocalVariable local = (LocalVariable) target;
 
-				BlockNode block = BlockNode.last(nodes);
+				BlockNode block = BlockNode.last(procedure, nodes);
 				Assign assign = new Assign(block, location, local, value);
 				block.add(assign);
 			} else {
@@ -204,9 +207,10 @@ public class StatementParser {
 	 * @param scope
 	 *            the current scope of variable
 	 */
-	public void setVariableScope(Scope<Variable> scope) {
+	public void setVariableScope(Procedure procedure, Scope<Variable> scope) {
 		this.scope = scope;
-		exprParser.setVariableScope(scope);
+		this.procedure = procedure;
+		exprParser.setVariableScope(procedure, scope);
 	}
 
 	/**
@@ -218,7 +222,7 @@ public class StatementParser {
 			LocalVariable source = entry.getKey();
 			Variable target = entry.getValue();
 
-			BlockNode block = BlockNode.last(nodes);
+			BlockNode block = BlockNode.last(procedure, nodes);
 			Location location = block.getLocation();
 
 			Use use = new Use(target, block);

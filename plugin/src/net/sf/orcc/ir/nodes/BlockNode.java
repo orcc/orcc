@@ -47,17 +47,17 @@ import net.sf.orcc.ir.Procedure;
  */
 public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 
-	public static BlockNode first(List<CFGNode> nodes) {
+	public static BlockNode first(Procedure procedure, List<CFGNode> nodes) {
 		BlockNode block;
 		if (nodes.isEmpty()) {
-			block = new BlockNode(null);
+			block = new BlockNode(procedure);
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(0);
 			if (node instanceof BlockNode) {
 				block = (BlockNode) node;
 			} else {
-				block = new BlockNode(null);
+				block = new BlockNode(procedure);
 				nodes.add(0, block);
 			}
 		}
@@ -65,17 +65,17 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 		return block;
 	}
 
-	public static BlockNode last(List<CFGNode> nodes) {
+	public static BlockNode last(Procedure procedure, List<CFGNode> nodes) {
 		BlockNode block;
 		if (nodes.isEmpty()) {
-			block = new BlockNode(null);
+			block = new BlockNode(procedure);
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(nodes.size() - 1);
 			if (node instanceof BlockNode) {
 				block = (BlockNode) node;
 			} else {
-				block = new BlockNode(null);
+				block = new BlockNode(procedure);
 				nodes.add(block);
 			}
 		}
