@@ -29,15 +29,19 @@
 package net.sf.orcc.tools.classifier;
 
 import java.lang.reflect.Array;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.instructions.HasTokens;
@@ -61,6 +65,8 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 
 	private ConfigurationAnalyzer analyzer;
 
+	private Map<Port, Boolean> hasTokens;
+
 	private Random random;
 
 	public PartialNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
@@ -69,6 +75,7 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 
 		listAllocator = new ListAllocator();
 		exprInterpreter = new PartialExpressionEvaluator();
+		hasTokens = new HashMap<Port, Boolean>();
 	}
 
 	/**
@@ -92,7 +99,7 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 	@Override
 	public void visit(HasTokens instr, Object... args) {
 		// this allows actions with empty input patterns to run, too!
-		instr.getTarget().setValue(random.nextBoolean());
+		instr.getTarget().setValue(hasTokens.get(instr.getPort()));
 	}
 
 	@Override
@@ -184,6 +191,18 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 	@Override
 	public void visit(Write write, Object... args) {
 		write.getPort().increaseTokenProduction(write.getNumTokens());
+	}
+
+	/**
+	 * Configure this node interpreter so that the next calls to hasTokens will
+	 * return a randomly-generated boolean
+	 * 
+	 * @param actor
+	 */
+	public void randomizeHasTokens(Actor actor) {
+		for (Port port : actor.getInputs()) {
+			hasTokens.put(port, random.nextBoolean());
+		}
 	}
 
 }

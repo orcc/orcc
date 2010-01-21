@@ -35,10 +35,14 @@ import java.util.Map.Entry;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class defines the state of an actor as a set of scalar state variables
@@ -66,9 +70,25 @@ public class ActorState {
 			Constant constant = stateVariable.getConstantValue();
 			if (constant != null && type.getType() != Type.LIST) {
 				// we might consider this constant if it is used by guards
+				boolean usedByGuard = false;
 				for (Use use : stateVariable.getUses()) {
+					User user = use.getNode();
+					Procedure proc;
+					if (user instanceof Instruction) {
+						proc = ((Instruction) user).getBlock().getProcedure();
+					} else {
+						proc = ((BlockNode) user).getProcedure();
+					}
+
+					if (proc.getName().startsWith("isSchedulable_")) {
+						usedByGuard = true;
+						break;
+					}
 				}
-				state.put(stateVariable, stateVariable.getValue());
+
+				if (usedByGuard) {
+					state.put(stateVariable, stateVariable.getValue());
+				}
 			}
 		}
 	}
