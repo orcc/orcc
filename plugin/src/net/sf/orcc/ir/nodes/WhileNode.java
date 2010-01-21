@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -51,9 +52,9 @@ public class WhileNode extends AbstractNode implements ValueContainer {
 
 	private Expression value;
 
-	public WhileNode(Location location, Expression condition,
-			List<CFGNode> nodes, BlockNode joinNode) {
-		super(location);
+	public WhileNode(Location location, Procedure procedure,
+			Expression condition, List<CFGNode> nodes, BlockNode joinNode) {
+		super(location, procedure);
 		this.joinNode = joinNode;
 		this.nodes = nodes;
 		setValue(condition);

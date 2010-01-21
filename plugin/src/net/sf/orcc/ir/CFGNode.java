@@ -67,4 +67,11 @@ public interface CFGNode extends User {
 	 */
 	public int getLabel();
 
+	/**
+	 * Returns the procedure this node belongs to.
+	 * 
+	 * @return the procedure this node belongs to
+	 */
+	public Procedure getProcedure();
+
 }

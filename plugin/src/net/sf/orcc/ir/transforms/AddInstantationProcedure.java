@@ -65,8 +65,12 @@ public class AddInstantationProcedure implements ActorTransformation {
 		OrderedMap<Variable> locals = new OrderedMap<Variable>();
 		Location location = new Location();
 
-		BlockNode block = new BlockNode(location);
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
+
+		Procedure proc = new Procedure(actorName + "_init" + Attributs, false,
+				new Location(), new VoidType(), parameters, locals, nodes);
+
+		BlockNode block = new BlockNode(location, proc);
 		nodes.add(block);
 
 		LocalVariable parameter = new LocalVariable(false, 0, location, "fifo",
@@ -83,8 +87,7 @@ public class AddInstantationProcedure implements ActorTransformation {
 			block.add(node);
 		}
 
-		return new Procedure(actorName + "_init" + Attributs, false,
-				new Location(), new VoidType(), parameters, locals, nodes);
+		return proc;
 	}
 
 	@Override

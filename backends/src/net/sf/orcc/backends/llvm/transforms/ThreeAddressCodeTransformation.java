@@ -215,7 +215,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			}
 		} else {
 			// no previous block, create and add a new one
-			block = new BlockNode();
+			block = new BlockNode(procedure);
 			it.add(block);
 		}
 		it.next();

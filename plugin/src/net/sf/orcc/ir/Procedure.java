@@ -279,6 +279,16 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		this.name = name;
 	}
 
+	/**
+	 * Sets the node list of this procedure.
+	 * 
+	 * @param nodes
+	 *            a list of CFG nodes
+	 */
+	public void setNodes(List<CFGNode> nodes) {
+		this.nodes = nodes;
+	}
+
 	public void setResult(Expression result) {
 		this.result = result;
 	}

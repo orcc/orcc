@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -53,9 +54,9 @@ public class IfNode extends AbstractNode implements ValueContainer {
 
 	private Expression value;
 
-	public IfNode(Location location, Expression condition,
+	public IfNode(Location location, Procedure procedure, Expression condition,
 			List<CFGNode> thenNodes, List<CFGNode> elseNodes, BlockNode joinNode) {
-		super(location);
+		super(location, procedure);
 		this.elseNodes = elseNodes;
 		this.joinNode = joinNode;
 		this.thenNodes = thenNodes;

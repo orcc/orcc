@@ -36,6 +36,7 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
 
 /**
  * This class defines a Block node. A block node is a node that contains
@@ -49,14 +50,14 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	public static BlockNode first(List<CFGNode> nodes) {
 		BlockNode block;
 		if (nodes.isEmpty()) {
-			block = new BlockNode();
+			block = new BlockNode(null);
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(0);
 			if (node instanceof BlockNode) {
 				block = (BlockNode) node;
 			} else {
-				block = new BlockNode();
+				block = new BlockNode(null);
 				nodes.add(0, block);
 			}
 		}
@@ -67,14 +68,14 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	public static BlockNode last(List<CFGNode> nodes) {
 		BlockNode block;
 		if (nodes.isEmpty()) {
-			block = new BlockNode();
+			block = new BlockNode(null);
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(nodes.size() - 1);
 			if (node instanceof BlockNode) {
 				block = (BlockNode) node;
 			} else {
-				block = new BlockNode();
+				block = new BlockNode(null);
 				nodes.add(block);
 			}
 		}
@@ -90,15 +91,15 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	/**
 	 * Creates a new empty block node.
 	 */
-	public BlockNode() {
-		this(new Location());
+	public BlockNode(Procedure procedure) {
+		this(new Location(), procedure);
 	}
 
 	/**
 	 * Creates a new empty block node with the given location.
 	 */
-	public BlockNode(Location location) {
-		super(location);
+	public BlockNode(Location location, Procedure procedure) {
+		super(location, procedure);
 		instructions = new ArrayList<Instruction>();
 	}
 

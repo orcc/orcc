@@ -143,11 +143,11 @@ public class PhiRemoval extends AbstractActorTransformation {
 			if (previousNode instanceof BlockNode) {
 				block = (BlockNode) previousNode;
 			} else {
-				block = new BlockNode();
+				block = new BlockNode(procedure);
 				it.add(block);
 			}
 		} else {
-			block = new BlockNode();
+			block = new BlockNode(procedure);
 			it.add(block);
 		}
 

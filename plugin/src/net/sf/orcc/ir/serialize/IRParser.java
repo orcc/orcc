@@ -152,6 +152,8 @@ public class IRParser {
 
 	private Scope<Variable> variables;
 
+	private Procedure procedure;
+
 	private Action getAction(JSONArray array) throws JSONException {
 		if (array.length() == 0) {
 			// removes the first untagged action found
@@ -437,12 +439,12 @@ public class IRParser {
 		List<CFGNode> thenNodes = parseNodes(array.getJSONArray(1));
 		List<CFGNode> elseNodes = parseNodes(array.getJSONArray(2));
 
-		return new IfNode(loc, condition, thenNodes, elseNodes, null);
+		return new IfNode(loc, procedure, condition, thenNodes, elseNodes, null);
 	}
 
 	private BlockNode parseJoinNode(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		BlockNode join = new BlockNode(loc);
+		BlockNode join = new BlockNode(loc, procedure);
 		block = join;
 		for (int i = 0; i < array.length(); i++) {
 			join.add(parsePhi(loc, array.getJSONArray(i)));
@@ -496,7 +498,7 @@ public class IRParser {
 		} else if (name.equals(NAME_WHILE)) {
 			node = parseWhileNode(loc, array.getJSONArray(2));
 		} else {
-			block = new BlockNode(loc);
+			block = new BlockNode(loc, procedure);
 			Instruction instr = null;
 
 			if (name.equals(NAME_ASSIGN)) {
@@ -546,8 +548,8 @@ public class IRParser {
 		return nodes;
 	}
 
-	private Pattern parsePattern(OrderedMap<Port> ports,
-			JSONArray array) throws JSONException, OrccException {
+	private Pattern parsePattern(OrderedMap<Port> ports, JSONArray array)
+			throws JSONException, OrccException {
 		Pattern pattern = new Pattern();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray patternArray = array.getJSONArray(i);
@@ -632,20 +634,22 @@ public class IRParser {
 		OrderedMap<Variable> locals = variables;
 		parseVarDefs(array.getJSONArray(5));
 
+		procedure = new Procedure(name, external, location, returnType,
+				parameters, locals, null);
+
 		List<CFGNode> nodes = parseNodes(array.getJSONArray(6));
+		procedure.setNodes(nodes);
 
 		// go back to previous scope
 		variables = variables.getParent().getParent();
 
-		Procedure proc = new Procedure(name, external, location, returnType,
-				parameters, locals, nodes);
 		if (register) {
-			procs.add(file, location, name, proc);
+			procs.add(file, location, name, procedure);
 		}
 
 		AbstractNode.resetLabelCount();
 
-		return proc;
+		return procedure;
 	}
 
 	private Read parseRead(Location loc, JSONArray array) throws JSONException,
@@ -824,7 +828,7 @@ public class IRParser {
 		Expression condition = parseExpr(array.getJSONArray(0));
 		List<CFGNode> nodes = parseNodes(array.getJSONArray(1));
 		BlockNode joinNode = (BlockNode) nodes.remove(0);
-		return new WhileNode(loc, condition, nodes, joinNode);
+		return new WhileNode(loc, procedure, condition, nodes, joinNode);
 	}
 
 	private Write parseWrite(Location loc, JSONArray array)

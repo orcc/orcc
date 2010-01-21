@@ -54,9 +54,12 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 	}
 
 	private int label;
+	
+	private Procedure procedure;
 
-	protected AbstractNode(Location location) {
+	protected AbstractNode(Location location, Procedure procedure) {
 		super(location);
+		this.procedure = procedure;
 		labelCount++;
 		this.label = labelCount;
 	}
@@ -64,6 +67,11 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 	@Override
 	public int getLabel() {
 		return label;
+	}
+
+	@Override
+	public Procedure getProcedure() {
+		return procedure;
 	}
 
 }
