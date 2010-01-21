@@ -58,11 +58,16 @@ public class BackendFactory {
 	public static BackendFactory getInstance() {
 		return instance;
 	}
-
+	
 	/**
 	 * list of back-ends.
 	 */
 	private final Map<String, IBackend> backends;
+	
+	/**
+	 * list of back-ends.
+	 */
+	private static Map<String, IConfigurationElement[]> options;
 
 	/**
 	 * private constructor called when this class is loaded and instance is
@@ -70,12 +75,19 @@ public class BackendFactory {
 	 */
 	private BackendFactory() {
 		backends = new TreeMap<String, IBackend>();
-
+		options = new TreeMap<String, IConfigurationElement[]>();
+		
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] elements = registry
 				.getConfigurationElementsFor("net.sf.orcc.plugin.backend");
 		for (IConfigurationElement element : elements) {
 			String name = element.getAttribute("name");
+			IConfigurationElement[] optionLists = element.getChildren();
+			for (IConfigurationElement optionList : optionLists) {
+				IConfigurationElement[] optionElements = optionList.getChildren();
+				options.put(name, optionElements);
+			}
+			
 			try {
 				Object obj = element.createExecutableExtension("class");
 				backends.put(name, (IBackend) obj);
@@ -85,6 +97,15 @@ public class BackendFactory {
 		}
 	}
 
+	/**
+	 * Returns options of for a selected backend
+	 * 
+	 * @return IConfigurationElement[] associated to the backend
+	 */
+	public static IConfigurationElement[] getOptions(String name) {
+		return options.get(name);
+	}
+	
 	/**
 	 * Returns the list of the names of registered back-ends
 	 * 

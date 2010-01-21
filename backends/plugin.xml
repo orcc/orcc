@@ -1,33 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension
-         point="net.sf.orcc.plugin.backend">
-      <backend
-            class="net.sf.orcc.backends.c.CBackendImpl"
-            name="C">
-      </backend>
-      <backend
-            class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
-            name="C *quasi-static*">
-      </backend>
-      <backend
-               class="net.sf.orcc.backends.cpp.CppBackendImpl"
-               name="C++">
-      </backend>
-   <backend
-        class="net.sf.orcc.backends.java.JavaBackendImpl"
-        name="Java">
-  </backend>
-		<backend class="net.sf.orcc.backends.llvm.LLVMBackendImpl" name="LLVM"/>
-      <backend
-            class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
-            name="VHDL">
-      </backend>
-      <backend
-            class="net.sf.orcc.backends.xlim.XlimBackendImpl"
-            name="XLIM">
-      </backend>
-   </extension>
-
+ <extension
+       point="net.sf.orcc.plugin.backend">
+    <backend
+          class="net.sf.orcc.backends.c.CBackendImpl"
+          name="C">
+       <option>
+          <BrowseFile
+                caption="Input file:"
+                extension="xdf"
+                name="INPUT_FILE"
+                requiered="true">
+          </BrowseFile>
+       </option>
+    </backend>
+    <backend
+          class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
+          name="C *quasi-static*">
+       <option>
+          <BrowseFile
+                caption="Input file:"
+                extension="xdf"
+                name="INPUT_FILE"
+                requiered="true">
+          </BrowseFile>
+       </option>
+    </backend>
+    <backend
+          class="net.sf.orcc.backends.java.JavaBackendImpl"
+          name="Java">
+       <option>
+          <BrowseFile
+                caption="Input file:"
+                extension="xdf"
+                name="INPUT_FILE"
+                requiered="true">
+          </BrowseFile>
+       </option>
+    </backend>
+    <backend
+          class="net.sf.orcc.backends.cpp.CppBackendImpl"
+          name="C++">
+       <option>
+          <BrowseFile
+                caption="Input file:"
+                extension="xdf"
+                name="INPUT_FILE"
+                requiered="true">
+          </BrowseFile>
+       </option>
+    </backend>
+    <backend
+          class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
+          name="LLVM">
+       <option>
+          <BrowseFile
+                caption="Input file:"
+                extension="xdf"
+                name="INPUT_FILE"
+                requiered="true">
+          </BrowseFile>
+       </option>
+    </backend>
+    <backend
+          class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
+          name="VHDL">
+       <option>
+          <BrowseFile
+                caption="Input file:"
+                extension="xdf"
+                name="INPUT_FILE"
+                requiered="true">
+          </BrowseFile>
+       </option>
+    </backend>
+    <backend
+          class="net.sf.orcc.backends.xlim.XlimBackendImpl"
+          name="XLIM">
+       <option>
+          <BrowseFile
+                caption="Input file:"
+                extension="xdf"
+                name="INPUT_FILE"
+                requiered="true">
+          </BrowseFile>
+       </option>
+    </backend>
+ </extension>
 </plugin>

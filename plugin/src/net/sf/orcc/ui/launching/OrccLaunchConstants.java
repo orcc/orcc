@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.ui.launching;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Constants associated with an Orcc launch configuration.
  * 
@@ -101,6 +104,11 @@ public interface OrccLaunchConstants {
 	 * Input file associated with an Orcc configuration.
 	 */
 	public static final String INPUT_FILE = "net.sf.orcc.fileName";
+	
+	/**
+	 * Options associated to the backend.
+	 */
+	public static final Map<String, String> OPTIONS = new HashMap<String, String>();
 
 	/**
 	 * Whether intermediate files should be kept.

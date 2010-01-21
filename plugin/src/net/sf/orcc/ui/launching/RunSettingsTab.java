@@ -33,22 +33,17 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.ui.OrccActivator;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -66,10 +61,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
-import org.eclipse.ui.dialogs.ISelectionStatusValidator;
-import org.eclipse.ui.model.WorkbenchContentProvider;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
+import net.sf.orcc.backends.options.BackendSetting;
 
 /**
  * 
@@ -80,56 +72,12 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private Combo comboBackend;
 
-	private Text textNetwork;
+	private Group groupOption;
 
 	private Text textOutput;
-
-	private void browseFiles(Shell shell) {
-		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
-				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
-				new WorkbenchContentProvider());
-		tree.setAllowMultiple(false);
-		tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
-
-		IFile file = getFileFromText();
-		if (file != null) {
-			tree.setInitialSelection(file);
-		}
-
-		tree.setMessage("Please select an existing file:");
-		tree.setTitle("Choose an existing file");
-
-		tree.setValidator(new ISelectionStatusValidator() {
-
-			@Override
-			public IStatus validate(Object[] selection) {
-				if (selection.length == 1) {
-					if (selection[0] instanceof IFile) {
-						IFile file = (IFile) selection[0];
-						if (file.getFileExtension().equals("xdf")) {
-							return new Status(Status.OK,
-									OrccActivator.PLUGIN_ID, "");
-						} else {
-							return new Status(Status.ERROR,
-									OrccActivator.PLUGIN_ID,
-									"Selected file must be an XDF file.");
-						}
-					}
-				}
-
-				return new Status(Status.ERROR, OrccActivator.PLUGIN_ID,
-						"Only files can be selected, not folders nor projects");
-			}
-
-		});
-
-		// opens the dialog
-		if (tree.open() == Window.OK) {
-			file = (IFile) tree.getFirstResult();
-			textNetwork.setText(file.getLocation().toOSString());
-		}
-	}
-
+	
+	List<BackendSetting> backendSettings = new ArrayList<BackendSetting>();
+		
 	private void browseOutputFolder(Shell shell) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
 		dialog.setMessage("Select output folder:");
@@ -157,64 +105,71 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		composite.setLayoutData(data);
 		setControl(composite);
 
-		createControlNetwork(font, composite);
-		Label lbl = new Label(composite, SWT.NONE);
-		data = new GridData(GridData.FILL_HORIZONTAL);
-		data.heightHint = 1;
-		lbl.setLayoutData(data);
-		createControlOutput(font, composite);
+		createControlBackend(font, composite);
+		createControlOption(font, composite);
 	}
 
-	private void createControlNetwork(Font font, Composite parent) {
+	private void createControlBackend(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
-		group.setText("&Input:");
-		group.setLayout(new GridLayout(2, false));
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		group.setLayoutData(data);
-
-		textNetwork = new Text(group, SWT.BORDER | SWT.SINGLE);
-		textNetwork.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		textNetwork.setLayoutData(data);
-		textNetwork.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				updateLaunchConfigurationDialog();
-			}
-
-		});
-
-		Button buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				browseFiles(group.getShell());
-			}
-		});
-	}
-
-	private void createControlOutput(Font font, Composite parent) {
-		final Group group = new Group(parent, SWT.NONE);
-		group.setFont(font);
-		group.setText("&Output:");
+		group.setText("&Backend:");
 		group.setLayout(new GridLayout(3, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
 
-		createControlOutputFolder(font, group);
 		createControlOutputBackend(font, group);
+		createControlOutputFolder(font, group);
+	}
+	
+
+	
+	private void createControlOption(Font font, Composite parent) {
+		groupOption = new Group(parent, SWT.NONE);
+		groupOption.setFont(font);
+		groupOption.setText("&Option:");
+		groupOption.setLayout(new GridLayout(3, false));
+		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		groupOption.setLayoutData(data);
+		groupOption.setVisible(false);
+
+		updateOptionSelection();
+
+	}
+	
+	private void updateOptionSelection(){
+
+		int index = comboBackend.getSelectionIndex();
+	
+		if (index != -1) {
+				
+			String value = comboBackend.getItem(index);
+			Composite parent = groupOption.getParent();
+			Font font = groupOption.getFont();
+			groupOption.dispose();
+			groupOption = new Group(parent, SWT.NONE);
+			groupOption.setFont(font);
+			groupOption.setText("&Option:");
+			groupOption.setLayout(new GridLayout(3, false));
+			GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+			groupOption.setLayoutData(data);
+			groupOption.setVisible(true);
+			
+			backendSettings.clear();
+			IConfigurationElement[] configurationElements = BackendFactory.getOptions(value);
+			for (IConfigurationElement configurationElement : configurationElements) {
+				BackendSetting backendSetting = new BackendSetting(configurationElement, font, data, groupOption);
+				backendSettings.add(backendSetting);
+			}
+		}else{
+			groupOption.setVisible(false);
+		}
+		
 	}
 
-	private void createControlOutputBackend(Font font, Group group) {
+	private void createControlOutputBackend(final Font font, final Group group) {
 		Label lbl = new Label(group, SWT.NONE);
 		lbl.setFont(font);
-		lbl.setText("Backend:");
+		lbl.setText("Select a backend:");
 		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
 		lbl.setLayoutData(data);
 
@@ -232,6 +187,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		comboBackend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				updateOptionSelection();
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -268,14 +224,6 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		});
 	}
 
-	private IFile getFileFromText() {
-		String value = textNetwork.getText();
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		IFile file = root.getFileForLocation(new Path(value));
-
-		return file;
-	}
 
 	private boolean getFolderFromText() {
 		String value = textOutput.getText();
@@ -300,15 +248,18 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			String value = configuration.getAttribute(INPUT_FILE, "");
-			textNetwork.setText(value);
+			/*String value = configuration.getAttribute(INPUT_FILE, "");
+			textNetwork.setText(value);*/
 
-			value = configuration.getAttribute(OUTPUT_FOLDER, "");
+			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
 			textOutput.setText(value);
 
 			value = configuration.getAttribute(BACKEND, "");
 			int index = comboBackend.indexOf(value);
 			comboBackend.select(index);
+			
+			updateOptionSelection();
+			
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -316,19 +267,15 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		String value = textNetwork.getText();
-		if (value.isEmpty()) {
-			setErrorMessage("Network path not specified");
-			return false;
+		for (BackendSetting backendSetting : backendSettings) {
+			if (!backendSetting.isValid()) {
+				setErrorMessage("Requiered backend options are not specified");
+				return false;
+			}
 		}
 
-		IFile file = getFileFromText();
-		if (file == null || !file.exists()) {
-			setErrorMessage("Given network path does not specify an existing file");
-			return false;
-		}
 
-		value = textOutput.getText();
+		String value = textOutput.getText();
 		if (value.isEmpty()) {
 			setErrorMessage("Output path not specified");
 			return false;
@@ -351,10 +298,17 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		String value = textNetwork.getText();
-		configuration.setAttribute(INPUT_FILE, value);
+		for (BackendSetting backendSetting : backendSettings){
+			String option = backendSetting.getOption();
+			if (option.equals("INPUT_FILE")){
+				configuration.setAttribute(INPUT_FILE, backendSetting.getValue());
+			}
+		}
+		
+		/*String value = textNetwork.getText();
+		configuration.setAttribute(INPUT_FILE, value);*/
 
-		value = textOutput.getText();
+		String value = textOutput.getText();
 		configuration.setAttribute(OUTPUT_FOLDER, value);
 
 		int index = comboBackend.getSelectionIndex();
