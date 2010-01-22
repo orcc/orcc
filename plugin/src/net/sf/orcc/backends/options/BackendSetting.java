@@ -29,17 +29,9 @@
 package net.sf.orcc.backends.options;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
-import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.ui.OrccActivator;
-
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
@@ -66,7 +58,6 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.core.resources.ResourcesPlugin;
 
 
 /**
@@ -101,12 +92,14 @@ public class BackendSetting implements ModifyListener{
 	
 		this.font = font;
 		this.data = data;
+		String.valueOf(this.data);
 		this.group = group;
 		
 		String elementName = configurationElement.getName();
 			
 		if (elementName.equals("BrowseFile")){
 			optionType = BackendOptionConstants.BROWSEFILE;
+			optionType.toString();
 			option = configurationElement.getAttribute("name");
 			
 			String stringRequiered = configurationElement.getAttribute("requiered");
