@@ -46,16 +46,18 @@ import net.sf.orcc.ir.expr.VarExpr;
  */
 public class PartialExpressionEvaluator extends ExpressionEvaluator {
 
+	private boolean schedulableMode;
+
 	@Override
 	public Object interpret(BinaryExpr expr, Object... args) {
 		Object val1 = expr.getE1().accept(this);
 		Object val2 = expr.getE2().accept(this);
 
-		if (val1 == null || val2 == null) {
+		if (!schedulableMode && (val1 == null || val2 == null)) {
 			return null;
-		} else {
-			return super.interpretBinaryExpr(expr, val1, val2);
 		}
+
+		return super.interpretBinaryExpr(expr, val1, val2);
 	}
 
 	@Override
@@ -81,8 +83,8 @@ public class PartialExpressionEvaluator extends ExpressionEvaluator {
 	@Override
 	public Object interpret(UnaryExpr expr, Object... args) {
 		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
-		
-		if (value == null) {
+
+		if (!schedulableMode && value == null) {
 			return null;
 		} else {
 			return super.interpretUnaryExpr(expr, value);
@@ -92,5 +94,15 @@ public class PartialExpressionEvaluator extends ExpressionEvaluator {
 	@Override
 	public Object interpret(VarExpr expr, Object... args) {
 		return expr.getVar().getVariable().getValue();
+	}
+
+	/**
+	 * Sets schedulable mode. When in schedulable mode, evaluations of null
+	 * expressions is forbidden. Otherwise it is allowed.
+	 * 
+	 * @param schedulableMode
+	 */
+	public void setSchedulableMode(boolean schedulableMode) {
+		this.schedulableMode = schedulableMode;
 	}
 }

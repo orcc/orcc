@@ -43,7 +43,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -69,6 +68,8 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 
 	private Random random;
 
+	private boolean schedulableMode;
+
 	public PartialNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
 		this.analyzer = analyzer;
 		random = new Random();
@@ -76,6 +77,18 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 		listAllocator = new ListAllocator();
 		exprInterpreter = new PartialExpressionEvaluator();
 		hasTokens = new HashMap<Port, Boolean>();
+	}
+
+	/**
+	 * Configure this node interpreter so that the next calls to hasTokens will
+	 * return a randomly-generated boolean
+	 * 
+	 * @param actor
+	 */
+	public void randomizeHasTokens(Actor actor) {
+		for (Port port : actor.getInputs()) {
+			hasTokens.put(port, random.nextBoolean());
+		}
 	}
 
 	/**
@@ -88,12 +101,16 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 		this.action = action;
 	}
 
+	/**
+	 * Sets schedulable mode. When in schedulable mode, evaluations of null
+	 * expressions is forbidden.
+	 * 
+	 * @param schedulableMode
+	 */
 	public void setSchedulableMode(boolean schedulableMode) {
-		if (schedulableMode) {
-			exprInterpreter = new ExpressionEvaluator();
-		} else {
-			exprInterpreter = new PartialExpressionEvaluator();
-		}
+		this.schedulableMode = schedulableMode;
+		((PartialExpressionEvaluator) exprInterpreter)
+				.setSchedulableMode(schedulableMode);
 	}
 
 	@Override
@@ -117,7 +134,8 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 					subNode.accept(this, args);
 				}
 			}
-		} else {
+		} else if (schedulableMode) {
+			// only throw exception in schedulable mode
 			throw new OrccRuntimeException("null condition");
 		}
 
@@ -191,18 +209,6 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 	@Override
 	public void visit(Write write, Object... args) {
 		write.getPort().increaseTokenProduction(write.getNumTokens());
-	}
-
-	/**
-	 * Configure this node interpreter so that the next calls to hasTokens will
-	 * return a randomly-generated boolean
-	 * 
-	 * @param actor
-	 */
-	public void randomizeHasTokens(Actor actor) {
-		for (Port port : actor.getInputs()) {
-			hasTokens.put(port, random.nextBoolean());
-		}
 	}
 
 }
