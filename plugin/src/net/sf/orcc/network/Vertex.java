@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.network;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Port;
 
 /**
@@ -101,15 +101,12 @@ public class Vertex {
 	 * Returns the instance contained in this vertex.
 	 * 
 	 * @return the instance contained in this vertex.
-	 * @throws OrccException
-	 *             if {@link #isInstance()} returns <code>false</code> and this
-	 *             method is called.
 	 */
-	public Instance getInstance() throws OrccException {
+	public Instance getInstance() {
 		if (isInstance()) {
 			return (Instance) contents;
 		} else {
-			throw new OrccException("expected an Instance");
+			throw new OrccRuntimeException("expected an Instance");
 		}
 	}
 
@@ -117,15 +114,12 @@ public class Vertex {
 	 * Returns the port contained in this vertex.
 	 * 
 	 * @return the port contained in this vertex.
-	 * @throws OrccException
-	 *             if {@link #isPort()} returns <code>false</code> and this
-	 *             method is called.
 	 */
-	public Port getPort() throws OrccException {
+	public Port getPort() {
 		if (isPort()) {
 			return (Port) contents;
 		} else {
-			throw new OrccException("expected a Port");
+			throw new OrccRuntimeException("expected a Port");
 		}
 	}
 

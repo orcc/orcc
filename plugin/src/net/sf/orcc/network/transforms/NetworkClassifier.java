@@ -26,86 +26,48 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends;
-
-import java.io.File;
+package net.sf.orcc.network.transforms;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.network.Instance;
+import net.sf.orcc.ir.ActorClass;
+import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.transforms.DeadGlobalElimination;
+import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
 
 /**
- * Abstract implementation of {@link IBackend}.
+ * This class defines a network transformation that classifies all actors using
+ * the {@link ActorClassifierIndependent} class.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractBackend implements IBackend {
-
-	protected int fifoSize;
-
-	protected String path;
+public class NetworkClassifier implements INetworkTransformation {
 
 	/**
-	 * Here should go the things to do after the instantiation.
+	 * Creates a new classifier
 	 */
-	protected void afterInstantiation(Network network) throws OrccException {
-	}
-
-	/**
-	 * Here should go the things to do before the instantiation.
-	 */
-	protected void beforeInstantiation(Network network) throws OrccException {
+	public NetworkClassifier() {
 	}
 
 	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
-		// set FIFO size
-		this.fifoSize = fifoSize;
+	public void transform(Network network) throws OrccException {
+		// will remove phi so the actor can be interpreted
+		ActorTransformation phi = new PhiRemoval();
 
-		// set output path
-		File file = new File(fileName);
-		path = file.getParent();
+		// will remove dead globals (they are useless anyway)
+		ActorTransformation dge = new DeadGlobalElimination();
 
-		// parses top network
-		Network network = new XDFParser(fileName).parseNetwork();
+		for (Actor actor : network.getActors()) {
+			dge.transform(actor);
+			phi.transform(actor);
 
-		beforeInstantiation(network);
-
-		// instantiate the network
-		network.instantiate();
-
-		afterInstantiation(network);
-
-		// print actors of the network
-		for (Instance instance : network.getInstances()) {
-			if (instance.isActor()) {
-				Actor actor = instance.getActor();
-				printActor(instance.getId(), actor);
-			}
+			ActorClassifierIndependent classifier = new ActorClassifierIndependent();
+			ActorClass clasz = classifier.classify(actor);
+			actor.setActorClass(clasz);
 		}
-
-		// print network
-		printNetwork(network);
 	}
 
-	/**
-	 * Prints the given actor with the given id.
-	 * 
-	 * @param id
-	 *            instance identifier
-	 * @param actor
-	 *            the actor
-	 */
-	abstract protected void printActor(String id, Actor actor) throws Exception;
-
-	/**
-	 * Prints the given network.
-	 * 
-	 * @param network
-	 *            the network
-	 */
-	abstract protected void printNetwork(Network network) throws Exception;
 }

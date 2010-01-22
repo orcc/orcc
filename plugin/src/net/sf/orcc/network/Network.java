@@ -28,11 +28,17 @@
  */
 package net.sf.orcc.network;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.transforms.Instantiator;
+import net.sf.orcc.network.transforms.NetworkClassifier;
 import net.sf.orcc.network.transforms.NetworkFlattener;
+import net.sf.orcc.tools.merger.ActorMerger;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -82,11 +88,42 @@ public class Network {
 	}
 
 	/**
+	 * Classifies all actors of this network.
+	 * 
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	public void classifyActors() throws OrccException {
+		new NetworkClassifier().transform(this);
+	}
+
+	/**
 	 * Flattens this network.
-	 * @throws OrccException 
+	 * 
+	 * @throws OrccException
 	 */
 	public void flatten() throws OrccException {
 		new NetworkFlattener().transform(this);
+	}
+
+	/**
+	 * Returns the list of actors referenced by the graph of this network.
+	 * 
+	 * @return a list of actors
+	 */
+	public List<Actor> getActors() {
+		List<Actor> actors = new ArrayList<Actor>();
+		for (Vertex vertex : getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isActor()) {
+					Actor actor = instance.getActor();
+					actors.add(actor);
+				}
+			}
+		}
+
+		return actors;
 	}
 
 	/**
@@ -105,6 +142,23 @@ public class Network {
 	 */
 	public OrderedMap<Port> getInputs() {
 		return inputs;
+	}
+
+	/**
+	 * Returns the list of instances referenced by the graph of this network.
+	 * 
+	 * @return a list of instances
+	 */
+	public List<Instance> getInstances() {
+		List<Instance> instances = new ArrayList<Instance>();
+		for (Vertex vertex : getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				instances.add(instance);
+			}
+		}
+
+		return instances;
 	}
 
 	/**
@@ -154,6 +208,16 @@ public class Network {
 	 */
 	public void instantiate() throws OrccException {
 		new Instantiator().transform(this);
+	}
+
+	/**
+	 * Merges actors of this network
+	 * 
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	public void mergeActors() throws OrccException {
+		new ActorMerger().transform(this);
 	}
 
 	@Override

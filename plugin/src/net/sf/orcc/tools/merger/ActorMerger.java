@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,86 +26,43 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends;
-
-import java.io.File;
+package net.sf.orcc.tools.merger;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.network.transforms.INetworkTransformation;
 
 /**
- * Abstract implementation of {@link IBackend}.
+ * This class defines a network transformation that merges actors until a
+ * fixpoint is found.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractBackend implements IBackend {
-
-	protected int fifoSize;
-
-	protected String path;
+public class ActorMerger implements INetworkTransformation {
 
 	/**
-	 * Here should go the things to do after the instantiation.
+	 * Creates a new classifier
 	 */
-	protected void afterInstantiation(Network network) throws OrccException {
-	}
-
-	/**
-	 * Here should go the things to do before the instantiation.
-	 */
-	protected void beforeInstantiation(Network network) throws OrccException {
+	public ActorMerger() {
 	}
 
 	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
-		// set FIFO size
-		this.fifoSize = fifoSize;
-
-		// set output path
-		File file = new File(fileName);
-		path = file.getParent();
-
-		// parses top network
-		Network network = new XDFParser(fileName).parseNetwork();
-
-		beforeInstantiation(network);
-
-		// instantiate the network
-		network.instantiate();
-
-		afterInstantiation(network);
-
-		// print actors of the network
-		for (Instance instance : network.getInstances()) {
-			if (instance.isActor()) {
-				Actor actor = instance.getActor();
-				printActor(instance.getId(), actor);
-			}
-		}
-
-		// print network
-		printNetwork(network);
+	public void transform(Network network) throws OrccException {
+		boolean changed;
+		do {
+			changed = mergeActors();
+		} while (changed);
 	}
 
 	/**
-	 * Prints the given actor with the given id.
+	 * Tries to merge actors.
 	 * 
-	 * @param id
-	 *            instance identifier
-	 * @param actor
-	 *            the actor
+	 * @return <code>true</code> if actors were merged, <code>false</code>
+	 *         otherwise
 	 */
-	abstract protected void printActor(String id, Actor actor) throws Exception;
+	private boolean mergeActors() {
+		return false;
+	}
 
-	/**
-	 * Prints the given network.
-	 * 
-	 * @param network
-	 *            the network
-	 */
-	abstract protected void printNetwork(Network network) throws Exception;
 }

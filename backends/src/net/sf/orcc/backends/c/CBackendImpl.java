@@ -36,15 +36,11 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorClass;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
-import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transforms.BroadcastAdder;
-import net.sf.orcc.tools.classifier.ActorClassifier;
 
 /**
  * C back-end.
@@ -88,48 +84,12 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void afterInstantiation(Network network) throws OrccException {
 		if (merge) {
-			classifyActors(network);
-			mergeActors(network);
+			network.classifyActors();
+			network.mergeActors();
 		}
-		
-		// until now, printer is default printer 
+
+		// until now, printer is default printer
 		printer = new CActorPrinter();
-	}
-
-	/**
-	 * Classifies actors of the given network.
-	 * 
-	 * @param network
-	 *            a network
-	 * @throws OrccException
-	 */
-	private void classifyActors(Network network) throws OrccException {
-		ActorTransformation tr = new PhiRemoval();
-		for (Vertex vertex : network.getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isActor()) {
-					Actor actor = instance.getActor();
-
-					// removes phi so the actor can be interpreted
-					tr.transform(actor);
-
-					ActorClassifier classifier = new ActorClassifier();
-					ActorClass clasz = classifier.classify(actor);
-					actor.setActorClass(clasz);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Merges actors of the given network.
-	 * 
-	 * @param network
-	 *            a network
-	 * @throws OrccException
-	 */
-	private void mergeActors(Network network) throws OrccException {
 	}
 
 	@Override

@@ -38,7 +38,6 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.serialize.XDFWriter;
@@ -162,23 +161,20 @@ public class Frontend {
 	 * @throws OrccException
 	 */
 	private void getActors(Network network) throws OrccException {
-		for (Vertex vertex : network.getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isNetwork()) {
-					getActors(instance.getNetwork());
-				} else {
-					IAttribute attr = instance.getAttribute("skip");
-					if (attr == null || attr.getType() != IAttribute.FLAG) {
-						// generate code if the "skip" attribute is not present
-						// or is not a flag
-						String parent = instance.getFile().getParent();
-						String clasz = instance.getClasz();
+		for (Instance instance : network.getInstances()) {
+			if (instance.isNetwork()) {
+				getActors(instance.getNetwork());
+			} else {
+				IAttribute attr = instance.getAttribute("skip");
+				if (attr == null || attr.getType() != IAttribute.FLAG) {
+					// generate code if the "skip" attribute is not present
+					// or is not a flag
+					String parent = instance.getFile().getParent();
+					String clasz = instance.getClasz();
 
-						String actorPath = parent + File.separator + clasz;
-						Actor actor = processActor(actorPath);
-						instance.setClasz(actor.getName());
-					}
+					String actorPath = parent + File.separator + clasz;
+					Actor actor = processActor(actorPath);
+					instance.setClasz(actor.getName());
 				}
 			}
 		}

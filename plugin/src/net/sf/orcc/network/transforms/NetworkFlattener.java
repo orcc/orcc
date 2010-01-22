@@ -104,13 +104,10 @@ public class NetworkFlattener implements INetworkTransformation {
 
 		HashMap<String, Expression> parentParams = new HashMap<String, Expression>();
 
-		for (Vertex vertex : network.getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance parentInstance = vertex.getInstance();
-				if (parentInstance.equals(instance)) {
-					parentParams = new HashMap<String, Expression>(
-							parentInstance.getParameters());
-				}
+		for (Instance parentInstance : network.getInstances()) {
+			if (parentInstance.equals(instance)) {
+				parentParams = new HashMap<String, Expression>(parentInstance
+						.getParameters());
 			}
 		}
 
@@ -301,7 +298,7 @@ public class NetworkFlattener implements INetworkTransformation {
 		HashMap<String, Integer> alreadyExist = new HashMap<String, Integer>();
 
 		OrderedMap<GlobalVariable> ExistingVars = network.getVariables();
-		
+
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();

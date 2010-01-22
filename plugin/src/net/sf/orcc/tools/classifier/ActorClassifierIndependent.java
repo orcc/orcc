@@ -31,9 +31,6 @@ package net.sf.orcc.tools.classifier;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.ConnectivityInspector;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -48,14 +45,17 @@ import net.sf.orcc.ir.classes.QuasiStaticClass;
 import net.sf.orcc.ir.classes.StaticClass;
 import net.sf.orcc.util.UniqueEdge;
 
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.ConnectivityInspector;
+
 /**
- * This class defines an actor classifier that uses the partial interpreter to
- * determine if an actor is quasi-static or static.
+ * This class defines an actor classifier that uses symbolic execution to
+ * classify an actor as static, cyclo-static, quasi-static, or dynamic.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class ActorClassifier {
+public class ActorClassifierIndependent {
 
 	private Actor actor;
 
@@ -64,7 +64,7 @@ public class ActorClassifier {
 	/**
 	 * Creates a new classifier
 	 */
-	public ActorClassifier() {
+	public ActorClassifierIndependent() {
 	}
 
 	/**

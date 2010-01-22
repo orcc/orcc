@@ -39,7 +39,7 @@ import net.sf.orcc.ir.ActorClass;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.classes.QuasiStaticClass;
 import net.sf.orcc.ir.classes.StaticClass;
-import net.sf.orcc.tools.classifier.ActorClassifier;
+import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -129,7 +129,7 @@ public class ActorGraph {
 		System.out.println("********* Unrolling actor " + getName()
 				+ " *********");
 
-		ActorClass actorClass = new ActorClassifier().classify(actor);
+		ActorClass actorClass = new ActorClassifierIndependent().classify(actor);
 
 		if (actorClass.isDynamic()) {
 			// nothing to do...
