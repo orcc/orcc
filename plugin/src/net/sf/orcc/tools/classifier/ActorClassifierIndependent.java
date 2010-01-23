@@ -88,23 +88,35 @@ public class ActorClassifierIndependent {
 			return new DynamicClass();
 		}
 
+		// checks for FSMs with time-dependent behavior
+		ActionScheduler sched = actor.getActionScheduler();
+		if (sched.hasFsm() && isTimeDependent(sched.getFsm())) {
+			// don't know about time-dependent FSMs
+			System.out.println("actor " + actor
+					+ " has an FSM with time-dependent behavior,"
+					+ " defaults to dynamic");
+			return new DynamicClass();
+		}
+
 		// first tries SDF with *all* the actions of the actor
 		ActorClass clasz = classifySDF(actions);
 		if (!clasz.isStatic()) {
 			try {
 				// not SDF, tries CSDF
-				ActionScheduler sched = actor.getActionScheduler();
 				clasz = classifyCSDF(sched);
-				if (!clasz.isStatic()) {
-					// not CSDF, tries QSDF
-					if (sched.hasFsm()) {
+			} catch (OrccRuntimeException e) {
+				// data-dependent behavior
+			}
+
+			if (!clasz.isStatic()) {
+				// not CSDF, tries QSDF
+				if (sched.hasFsm()) {
+					try {
 						clasz = classifyQSDF();
+					} catch (OrccRuntimeException e) {
+						// data-dependent behavior
 					}
 				}
-			} catch (OrccRuntimeException e) {
-				System.out.println("actor " + actor
-						+ " could not be classified, defaults to dynamic");
-				clasz = new DynamicClass();
 			}
 		}
 
@@ -114,6 +126,8 @@ public class ActorClassifierIndependent {
 			staticClass.printTokenConsumption();
 			staticClass.printTokenProduction();
 			System.out.println();
+		} else if (clasz.isDynamic()) {
+			System.out.println("actor " + actor + " classified dynamic");
 		}
 
 		return clasz;
@@ -136,16 +150,13 @@ public class ActorClassifierIndependent {
 		if (state.isEmpty()) {
 			if (sched.hasFsm()) {
 				FSM fsm = sched.getFsm();
-				if (isCycloStaticFsm(fsm) && !isTimeDependent(fsm)) {
+				if (isCycloStaticFsm(fsm)) {
 					return classifyCSDFStateless(sched.getFsm(),
 							interpretedActor);
 				}
 			}
 
 			// no state, no cyclo-static FSM => dynamic
-			return new DynamicClass();
-		} else if (sched.hasFsm() && isTimeDependent(sched.getFsm())) {
-			// state, but a time-dependent FSM
 			return new DynamicClass();
 		}
 
@@ -267,8 +278,6 @@ public class ActorClassifierIndependent {
 
 			return quasiStatic;
 		} else {
-			System.out.println("actor " + actor
-					+ ": unsupported FSM, classified dynamic");
 			return new DynamicClass();
 		}
 	}
@@ -373,8 +382,6 @@ public class ActorClassifierIndependent {
 					} else {
 						// the new pattern is not a superset of (or equal to)
 						// this one, this means time-dependent behavior
-						System.out.println("*** " + actor
-								+ " is time-dependent");
 						return true;
 					}
 				}
