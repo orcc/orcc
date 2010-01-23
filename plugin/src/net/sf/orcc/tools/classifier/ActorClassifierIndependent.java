@@ -40,6 +40,7 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.classes.DynamicClass;
 import net.sf.orcc.ir.classes.QuasiStaticClass;
 import net.sf.orcc.ir.classes.StaticClass;
@@ -135,13 +136,16 @@ public class ActorClassifierIndependent {
 		if (state.isEmpty()) {
 			if (sched.hasFsm()) {
 				FSM fsm = sched.getFsm();
-				if (isCycloStaticFsm(fsm)) {
+				if (isCycloStaticFsm(fsm) && !isTimeDependent(fsm)) {
 					return classifyCSDFStateless(sched.getFsm(),
 							interpretedActor);
 				}
 			}
 
 			// no state, no cyclo-static FSM => dynamic
+			return new DynamicClass();
+		} else if (sched.hasFsm() && isTimeDependent(sched.getFsm())) {
+			// state, but a time-dependent FSM
 			return new DynamicClass();
 		}
 
@@ -342,6 +346,41 @@ public class ActorClassifierIndependent {
 	 * @return <code>true</code> if the given FSM has quasi-static form
 	 */
 	private boolean isQuasiStaticFsm(FSM fsm) {
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the FSM has actions with time-dependent
+	 * behavior.
+	 * 
+	 * @param fsm
+	 *            a Finite State Machine
+	 * @return <code>true</code> if the FSM has actions with time-dependent
+	 *         behavior
+	 */
+	private boolean isTimeDependent(FSM fsm) {
+		for (Transition transition : fsm.getTransitions()) {
+			List<NextStateInfo> stateInfo = transition.getNextStateInfo();
+			Iterator<NextStateInfo> it = stateInfo.iterator();
+			if (it.hasNext()) {
+				Pattern input = it.next().getAction().getInputPattern();
+				while (it.hasNext()) {
+					Pattern newInput = it.next().getAction().getInputPattern();
+					if (input.isSubsetOf(newInput)) {
+						// because the next action must have a pattern which is
+						// a superset of (or equal to) this one
+						input = newInput;
+					} else {
+						// the new pattern is not a superset of (or equal to)
+						// this one, this means time-dependent behavior
+						System.out.println("*** " + actor
+								+ " is time-dependent");
+						return true;
+					}
+				}
+			}
+		}
+
 		return false;
 	}
 

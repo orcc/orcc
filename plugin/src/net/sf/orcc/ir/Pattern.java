@@ -47,4 +47,18 @@ public class Pattern extends LinkedHashMap<Port, Integer> {
 	public Pattern() {
 	}
 
+	/**
+	 * Returns <code>true</code> if this pattern is a subset of the given
+	 * pattern. This can be used to determine time-dependent behavior, which
+	 * occurs when an action reads inputs not read by a higher-priority action.
+	 * 
+	 * @param pattern
+	 *            a pattern
+	 * @return <code>true</code> if this pattern is a subset of the given
+	 *         pattern
+	 */
+	public boolean isSubsetOf(Pattern pattern) {
+		return pattern.keySet().containsAll(keySet());
+	}
+
 }
