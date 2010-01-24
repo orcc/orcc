@@ -29,9 +29,13 @@
 package net.sf.orcc.backends;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import net.sf.orcc.backends.options.AbtractBackendOption;
+import net.sf.orcc.backends.options.BrowseFileOption;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -48,8 +52,13 @@ import org.eclipse.core.runtime.Platform;
  */
 public class BackendFactory {
 
-	private static final BackendFactory instance = new BackendFactory();
+	/**
+	 * list of options of a back-end.
+	 */
+	private static Map<String, AbtractBackendOption[]> AbtractBackendOptions;
 
+	private static final BackendFactory instance = new BackendFactory();
+	
 	/**
 	 * Returns the single instance of this factory
 	 * 
@@ -60,22 +69,56 @@ public class BackendFactory {
 	}
 	
 	/**
+	 * Returns options of for a selected backend
+	 * 
+	 * @return IConfigurationElement[] associated to the backend
+	 */
+	public static AbtractBackendOption[] getOptions(String name) {
+		return AbtractBackendOptions.get(name);
+	}
+
+	private static AbtractBackendOption[] parseConfigurationElement(IConfigurationElement[] configurationElements){
+		int count = 0;
+		int size = configurationElements.length;
+		AbtractBackendOption backendOptions[] = new AbtractBackendOption[size]; 
+		
+	
+		for (IConfigurationElement configurationElement :configurationElements){
+			String elementName = configurationElement.getName();
+			
+			if (elementName.equals("browseFile")){
+				String stringRequired = configurationElement.getAttribute("required");
+				boolean required = Boolean.getBoolean(stringRequired);
+				String option = configurationElement.getAttribute("name");
+				String caption = configurationElement.getAttribute("caption");
+				String defaultVal = configurationElement.getAttribute("default");
+				if (defaultVal == null){
+					defaultVal = new String("");				
+				}
+				String extension = configurationElement.getAttribute("extension");
+							
+				backendOptions[count] = new BrowseFileOption(option, caption, required, defaultVal, extension);
+				count ++;
+			}
+		}
+		
+		return backendOptions;
+		
+		
+	}
+
+	/**
 	 * list of back-ends.
 	 */
 	private final Map<String, IBackend> backends;
 	
-	/**
-	 * list of back-ends.
-	 */
-	private static Map<String, IConfigurationElement[]> options;
-
 	/**
 	 * private constructor called when this class is loaded and instance is
 	 * initialized
 	 */
 	private BackendFactory() {
 		backends = new TreeMap<String, IBackend>();
-		options = new TreeMap<String, IConfigurationElement[]>();
+		AbtractBackendOptions = new HashMap<String, AbtractBackendOption[]>();
 		
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] elements = registry
@@ -85,7 +128,9 @@ public class BackendFactory {
 			IConfigurationElement[] optionLists = element.getChildren();
 			for (IConfigurationElement optionList : optionLists) {
 				IConfigurationElement[] optionElements = optionList.getChildren();
-				options.put(name, optionElements);
+				AbtractBackendOption[] backendOptions = parseConfigurationElement(optionElements);
+				
+				AbtractBackendOptions.put(name, backendOptions);
 			}
 			
 			try {
@@ -95,15 +140,6 @@ public class BackendFactory {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Returns options of for a selected backend
-	 * 
-	 * @return IConfigurationElement[] associated to the backend
-	 */
-	public static IConfigurationElement[] getOptions(String name) {
-		return options.get(name);
 	}
 	
 	/**

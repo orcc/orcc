@@ -28,19 +28,23 @@
  */
 package net.sf.orcc.backends.options;
 
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Group;
+
 /**
- * Constants associated with backend options.
- * 
- * @author Jérôme GORIN
+ * @author Jérôme Gorin
  * 
  */
+public interface AbtractBackendOption extends  ModifyListener {
 
-public enum 	BackendOptionConstants{
- 
-	/*
-	 * Browse file option constant
-	 */
-	BROWSEFILE
+	
+	public String getOption();
+	
+	public String getValue();
+	
+	public boolean isValid();
+	
+	public void show(Font font, Group group);
 
-};
-
+}

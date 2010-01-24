@@ -75,16 +75,13 @@
    <element name="option">
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
-            <element ref="BrowseFile"/>
+            <element ref="browseFile"/>
          </choice>
       </complexType>
    </element>
 
-   <element name="BrowseFile">
+   <element name="browseFile">
       <complexType>
-         <sequence>
-            <element ref="option" minOccurs="0" maxOccurs="unbounded"/>
-         </sequence>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
@@ -99,21 +96,21 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="requiered" type="boolean" use="required">
+         <attribute name="required" type="boolean" use="default" value="False">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="Default" type="string">
+         <attribute name="defaultValue" type="string" use="default" value="">
             <annotation>
                <documentation>
                   
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="extension" type="string">
+         <attribute name="extension" type="string" use="default" value="">
             <annotation>
                <documentation>
                   

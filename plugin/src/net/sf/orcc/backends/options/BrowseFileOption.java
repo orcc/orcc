@@ -28,23 +28,18 @@
  */
 package net.sf.orcc.backends.options;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -62,109 +57,27 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * 
- * @author Jérôme GORIN
+ * @author Jérôme Gorin
  * 
  */
-public class BackendSetting implements ModifyListener{
+public class BrowseFileOption implements AbtractBackendOption {
 	
 	
-	private Font font;
-	private Group group;
-	private Boolean requiered;
-	private BackendOptionConstants optionType;
-	private String option;
-	private String value;
+	private String caption;
 	private String extension;
-	private Object element;
-	private List<BackendSetting> backendSettings;
-	private GridData data;
+	private String option;
+	private boolean required;
+	private Text text;
+	private String value;
 
-	public String getOption() {
-		return option;
+	public BrowseFileOption(String option, String caption, boolean required, String defaultVal, String extension){
+		this.option = option;
+		this.caption = caption;
+		this.required = required;
+		this.value = defaultVal;
+		this.extension = extension;
 	}
 
-
-	public String getValue() {
-		return value;
-	}
-
-	public BackendSetting(IConfigurationElement configurationElement, Font font, GridData data, Group group){
-	
-		this.font = font;
-		this.data = data;
-		String.valueOf(this.data);
-		this.group = group;
-		
-		String elementName = configurationElement.getName();
-			
-		if (elementName.equals("BrowseFile")){
-			optionType = BackendOptionConstants.BROWSEFILE;
-			optionType.toString();
-			option = configurationElement.getAttribute("name");
-			
-			String stringRequiered = configurationElement.getAttribute("requiered");
-			requiered = Boolean.getBoolean(stringRequiered);	
-			
-			String caption = configurationElement.getAttribute("caption");
-			String defaultVal = configurationElement.getAttribute("default");
-			extension = configurationElement.getAttribute("extension");
-						
-			createBrowseFile(caption, defaultVal);
-					
-		}
-		
-		backendSettings = new ArrayList<BackendSetting>();
-		
-		IConfigurationElement[] optionLists = configurationElement.getChildren();
-		for (IConfigurationElement optionList : optionLists) {
-			BackendSetting backendSetting = new BackendSetting(optionList, font, data, group);
-			backendSettings.add(backendSetting);
-		}
-	}
-	
-	public Boolean isValid(){
-		if (requiered){
-			return !value.equals("");
-		}
-		
-		 return true;
-	}
-	
-	
-	public Boolean getOptions(){
-			
-		 return true;
-	}
-	
-	private void createBrowseFile(String Label, String defaultVal){
-
-		Label lbl = new Label(group, SWT.NONE);
-		lbl.setFont(font);
-		lbl.setText(Label);
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		lbl.setLayoutData(data);
-	
-		Text text = new Text(group, SWT.BORDER | SWT.SINGLE);
-		text.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		text.setLayoutData(data);
-		element = text;
-		
-		text.addModifyListener(this);
-	
-		Button buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				browseFiles(group.getShell(), (Text)element);
-			}
-		});
-
-	}
 
 	private void browseFiles(Shell shell, Text text) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
@@ -190,21 +103,21 @@ public class BackendSetting implements ModifyListener{
 						IFile file = (IFile) selection[0];
 						if (extension!= null){
 							if (file.getFileExtension().equals(extension)) {
-								return new Status(Status.OK,
+								return new Status(IStatus.OK,
 										OrccActivator.PLUGIN_ID, "");
 							} else {
-								return new Status(Status.ERROR,
+								return new Status(IStatus.ERROR,
 										OrccActivator.PLUGIN_ID,
 										"Selected file must be an "+extension+" file.");
 							}
 						} else {
-							return new Status(Status.OK,
+							return new Status(IStatus.OK,
 									OrccActivator.PLUGIN_ID, "");
 						}
 					}
 				}
 
-				return new Status(Status.ERROR, OrccActivator.PLUGIN_ID,
+				return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 						"Only files can be selected, not folders nor projects");
 			}
 
@@ -216,6 +129,35 @@ public class BackendSetting implements ModifyListener{
 			text.setText(file.getLocation().toOSString());
 		}
 	}
+
+	private void createBrowseFile(Font font, final Group group){
+
+		Label lbl = new Label(group, SWT.NONE);
+		lbl.setFont(font);
+		lbl.setText(caption);
+		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+	
+		text = new Text(group, SWT.BORDER | SWT.SINGLE);
+		text.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		text.setLayoutData(data);
+		text.setText(value);
+		text.addModifyListener(this);
+	
+		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseFiles(group.getShell(), text);
+			}
+		});
+
+	}
 	
 	private IFile getFileFromText(Text text) {
 		String value = text.getText();
@@ -226,13 +168,41 @@ public class BackendSetting implements ModifyListener{
 		return file;
 	}
 	
+	
+	public String getOption() {
+		return option;
+	}
+	
+	public Boolean getOptions(){
+			
+		 return true;
+	}
+
+	public String getValue() {
+		return value;
+	}
+	
+	public boolean isValid(){
+		if (required){
+			return !value.equals("");
+		}
+		
+		 return true;
+	}
+	
 
 	@Override
 	public void modifyText(ModifyEvent e) {
-		IFile file = getFileFromText((Text)element);
+		IFile file = getFileFromText(text);
 		if (!file.toString().equals("")){
-			value = ((Text)element).getText();
+			value = text.getText();
 		}
+	}
+
+
+	@Override
+	public void show(Font font, Group group) {
+		createBrowseFile(font, group);
 	}
 
 }
