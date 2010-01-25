@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,6 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
-import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.classes.DynamicClass;
 import net.sf.orcc.ir.classes.QuasiStaticClass;
 import net.sf.orcc.ir.classes.StaticClass;
@@ -88,19 +87,19 @@ public class ActorClassifierIndependent {
 			return new DynamicClass();
 		}
 
-		// checks for FSMs with time-dependent behavior
-		ActionScheduler sched = actor.getActionScheduler();
-		if (sched.hasFsm() && isTimeDependent(sched.getFsm())) {
-			// don't know about time-dependent FSMs
+		// checks for actors with time-dependent behavior
+		boolean td = new TimeDependencyAnalyzer(actor).isTimeDependent();
+		actor.setTimeDependent(td);
+		if (actor.isTimeDependent()) {
 			System.out.println("actor " + actor
-					+ " has an FSM with time-dependent behavior,"
-					+ " defaults to dynamic");
+					+ " is time-dependent, defaults to dynamic");
 			return new DynamicClass();
 		}
 
 		// first tries SDF with *all* the actions of the actor
 		ActorClass clasz = classifySDF(actions);
 		if (!clasz.isStatic()) {
+			ActionScheduler sched = actor.getActionScheduler();
 			try {
 				// not SDF, tries CSDF
 				clasz = classifyCSDF(sched);
@@ -355,39 +354,6 @@ public class ActorClassifierIndependent {
 	 * @return <code>true</code> if the given FSM has quasi-static form
 	 */
 	private boolean isQuasiStaticFsm(FSM fsm) {
-		return false;
-	}
-
-	/**
-	 * Returns <code>true</code> if the FSM has actions with time-dependent
-	 * behavior.
-	 * 
-	 * @param fsm
-	 *            a Finite State Machine
-	 * @return <code>true</code> if the FSM has actions with time-dependent
-	 *         behavior
-	 */
-	private boolean isTimeDependent(FSM fsm) {
-		for (Transition transition : fsm.getTransitions()) {
-			List<NextStateInfo> stateInfo = transition.getNextStateInfo();
-			Iterator<NextStateInfo> it = stateInfo.iterator();
-			if (it.hasNext()) {
-				Pattern input = it.next().getAction().getInputPattern();
-				while (it.hasNext()) {
-					Pattern newInput = it.next().getAction().getInputPattern();
-					if (input.isSubsetOf(newInput)) {
-						// because the next action must have a pattern which is
-						// a superset of (or equal to) this one
-						input = newInput;
-					} else {
-						// the new pattern is not a superset of (or equal to)
-						// this one, this means time-dependent behavior
-						return true;
-					}
-				}
-			}
-		}
-
 		return false;
 	}
 

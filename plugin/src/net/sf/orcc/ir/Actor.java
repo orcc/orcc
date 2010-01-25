@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -72,6 +72,8 @@ public class Actor {
 	private OrderedMap<Procedure> procs;
 
 	private OrderedMap<Variable> stateVars;
+
+	private boolean timeDependent;
 
 	/**
 	 * Creates a new actor.
@@ -223,6 +225,17 @@ public class Actor {
 	}
 
 	/**
+	 * Returns <code>true</code> if this actor is time-dependent,
+	 * <code>false</code> otherwise.
+	 * 
+	 * @return <code>true</code> if this actor is time-dependent,
+	 *         <code>false</code> otherwise
+	 */
+	public boolean isTimeDependent() {
+		return timeDependent;
+	}
+
+	/**
 	 * Resets input consumption rates.
 	 */
 	public void resetTokenConsumption() {
@@ -256,6 +269,16 @@ public class Actor {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Sets this actor to be time-dependent or not.
+	 * 
+	 * @param timeDependent
+	 *            a boolean indicating if this actor is time-dependent or not
+	 */
+	public void setTimeDependent(boolean timeDependent) {
+		this.timeDependent = timeDependent;
 	}
 
 	@Override

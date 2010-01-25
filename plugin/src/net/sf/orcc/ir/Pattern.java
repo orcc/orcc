@@ -29,6 +29,7 @@
 package net.sf.orcc.ir;
 
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 /**
  * This class defines a pattern. A pattern is a map between ports and the number
@@ -58,7 +59,18 @@ public class Pattern extends LinkedHashMap<Port, Integer> {
 	 *         pattern
 	 */
 	public boolean isSubsetOf(Pattern pattern) {
-		return pattern.keySet().containsAll(keySet());
+		if (pattern.keySet().containsAll(keySet())) {
+			for (Entry<Port, Integer> entry : entrySet()) {
+				// consumption must be >=
+				if (pattern.get(entry.getKey()) < entry.getValue()) {
+					return false;
+				}
+			}
+
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }
