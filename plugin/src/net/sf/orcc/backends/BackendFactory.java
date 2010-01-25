@@ -193,7 +193,15 @@ public class BackendFactory {
 	 */
 	public void runBackend(String name, String fileName, int fifoSize)
 			throws Exception {
-		IBackend backend = backends.get(name);
+		IBackend backend = backends.get(name);	
+		AbstractOption[] options = AbtractBackendOptions.get(name);
+		Map<String, String> optionMap = new HashMap<String, String>();
+		
+		for (AbstractOption option : options){
+			optionMap.put(option.getOption(), option.getValue());
+		}
+		
+		backend.setOptions(optionMap);
 		backend.generateCode(fileName, fifoSize);
 	}
 }

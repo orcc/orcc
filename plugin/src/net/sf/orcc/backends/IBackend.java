@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends;
 
+import java.util.Map;
+
 /**
  * @author Matthieu Wipliez
  * 
@@ -44,5 +46,13 @@ public interface IBackend {
 	 * @throws Exception
 	 */
 	public void generateCode(String fileName, int fifoSize) throws Exception;
+	
+	/**
+	 * Set options for a backend.
+	 * 
+	 * @param options
+	 *            Map containing options and their values.
+	 */
+	public void setOptions(Map<String, String> options);
 
 }

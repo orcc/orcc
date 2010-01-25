@@ -29,6 +29,7 @@
 package net.sf.orcc.backends;
 
 import java.io.File;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
@@ -44,16 +45,27 @@ import net.sf.orcc.network.serialize.XDFParser;
  */
 public abstract class AbstractBackend implements IBackend {
 
+	/**
+	 * Fifo size used in backend.
+	 */
 	protected int fifoSize;
 
-	protected String path;
+	/**
+	 * Map containing a list of options.
+	 */
+	protected Map<String, String> options;
 
+	/**
+	 * Path of the network.
+	 */
+	protected String path;
+	
 	/**
 	 * Here should go the things to do after the instantiation.
 	 */
 	protected void afterInstantiation(Network network) throws OrccException {
 	}
-
+	
 	/**
 	 * Here should go the things to do before the instantiation.
 	 */
@@ -108,4 +120,14 @@ public abstract class AbstractBackend implements IBackend {
 	 *            the network
 	 */
 	abstract protected void printNetwork(Network network) throws Exception;
+
+	/**
+	 * Set options for a backend.
+	 * 
+	 * @param options
+	 *            Map containing options and their values.
+	 */
+	public void setOptions(Map<String, String> options){
+		this.options = options;
+	}
 }

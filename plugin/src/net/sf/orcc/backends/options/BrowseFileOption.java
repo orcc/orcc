@@ -108,6 +108,16 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	private String value;
 	
 	/**
+	 * Font connected with the option
+	 */
+	private Font font;
+	
+	/**
+	 * group connected with the option
+	 */
+	private Group group;
+	
+	/**
 	 * BrowseFileOption constructor 
 	 * 
 	 * @param option
@@ -197,7 +207,7 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	 * @param group
 	 *       Group to add the input file interface
 	 */
-	private void createBrowseFile(Font font, final Group group){			
+	private void createBrowseFile(){			
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		data.horizontalSpan = 3;
 		group.setLayoutData(data);
@@ -305,6 +315,8 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 		if (!file.toString().equals("")){
 			value = text.getText();
 		}
+		
+		group.redraw();
 	}
 
 
@@ -329,6 +341,9 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	 */
 	@Override
 	public void show(Font font, Group group) {
-		createBrowseFile(font, group);
+		this.font = font;
+		this.group = group;
+		
+		createBrowseFile();
 	}
 }

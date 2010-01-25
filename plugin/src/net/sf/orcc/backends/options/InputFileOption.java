@@ -108,6 +108,15 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 	 */
 	private String value;
 	
+	/**
+	 * Font connected with the option
+	 */
+	private Font font;
+	
+	/**
+	 * group connected with the option
+	 */
+	private Group group;
 
 	/**
 	 * BrowseFileOption constructor 
@@ -140,7 +149,7 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 	 * @param group
 	 *       Group to add the input file interface
 	 */
-	private void createInputFile(Font font, final Group group){
+	private void createInputFile(){
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		data.horizontalSpan = 3;
 		group.setLayoutData(data);
@@ -308,6 +317,8 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 		if (!file.toString().equals("")){
 			value = text.getText();
 		}
+		
+		group.redraw();
 	}
 
 
@@ -332,7 +343,10 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 	 */
 	@Override
 	public void show(Font font, Group group) {
-		createInputFile(font, group);
+		this.font = font;
+		this.group = group;
+		
+		createInputFile();
 	}
 
 }
