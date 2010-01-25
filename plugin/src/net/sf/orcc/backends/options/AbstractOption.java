@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.options;
 
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Group;
 
@@ -39,16 +38,49 @@ import org.eclipse.swt.widgets.Group;
  * @author Jérôme Gorin
  * 
  */
-public interface AbtractOption extends  ModifyListener {
+public interface AbstractOption {
 	
+	/**
+	 * Dispose option elements
+	 */
+	public void dispose();
+	
+	/**
+	 * Returns the option name
+	 *
+	 * @return a String containing the option name
+	 */
 	public String getOption();
 	
+	/**
+	 * Returns the value of the option
+	 *
+	 * @return a String containing the value
+	 */
 	public String getValue();
 	
+	/**
+	 * Tests if the option is valid
+	 *
+	 * @return a boolean representing the validation of the option
+	 */
 	public boolean isValid();
 	
-	public void show(Font font, Group group);
-	
+	/**
+	 * Apply option to the specificied ILaunchConfigurationWorkingCopy
+	 * 	 * @param configuration
+	 *            ILaunchConfigurationWorkingCopy of configuration tab
+	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration);
+	
+	/**
+	 * Show interfaces on the selected group
+	 * 
+	 * @param font
+	 *       Font used in the interface
+	 * @param group
+	 *       Group to add the input file interface
+	 */
+	public void show(Font font, Group group);
 
 }

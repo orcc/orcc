@@ -51,6 +51,18 @@
                 caption="Input file:"
                 extension="xdf">
           </inputFile>
+          <checkBox
+                caption="Generate bitcode:"
+                defaultValue="false"
+                name="bitcode">
+             <option>
+                <browseFile
+                      caption="Location of llvm-as:"
+                      name="llvm-as"
+                      required="true">
+                </browseFile>
+             </option>
+          </checkBox>
        </option>
     </backend>
     <backend

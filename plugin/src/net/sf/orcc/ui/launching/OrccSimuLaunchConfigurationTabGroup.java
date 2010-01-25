@@ -35,7 +35,8 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 
 /**
  * 
- * @author Matthieu Wipliez / Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
 public class OrccSimuLaunchConfigurationTabGroup extends

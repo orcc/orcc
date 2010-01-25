@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009/2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.backends.options.AbtractOption;
+import net.sf.orcc.backends.options.AbstractOption;
 import net.sf.orcc.backends.options.BrowseFileOption;
+import net.sf.orcc.backends.options.CheckBoxOption;
 import net.sf.orcc.backends.options.InputFileOption;
 
 import org.eclipse.core.runtime.CoreException;
@@ -48,7 +49,8 @@ import org.eclipse.core.runtime.Platform;
  * are classes that implement the {@link IBackend} interface and are declared in the
  * <code>net.sf.orcc.plugin.backend</code> extension point.
  * 
- * @author Matthieu Wipliez / Jérôme Gorin
+ * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class BackendFactory {
@@ -56,7 +58,7 @@ public class BackendFactory {
 	/**
 	 * list of options of a back-end.
 	 */
-	private static Map<String, AbtractOption[]> AbtractBackendOptions;
+	private static Map<String, AbstractOption[]> AbtractBackendOptions;
 
 	private static final BackendFactory instance = new BackendFactory();
 	
@@ -74,7 +76,7 @@ public class BackendFactory {
 	 * 
 	 * @return AbtractOption[] associated to the backend
 	 */
-	public static AbtractOption[] getOptions(String name) {
+	public static AbstractOption[] getOptions(String name) {
 		return AbtractBackendOptions.get(name);
 	}
 
@@ -83,10 +85,10 @@ public class BackendFactory {
 	 * 
 	 * @return AbtractOption[] corresponding to the IConfigurationElement[]
 	 */
-	private static AbtractOption[] parseConfigurationElement(IConfigurationElement[] configurationElements){
+	public static AbstractOption[] parseConfigurationElement(IConfigurationElement[] configurationElements){
 		int count = 0;
 		int size = configurationElements.length;
-		AbtractOption backendOptions[] = new AbtractOption[size]; 
+		AbstractOption backendOptions[] = new AbstractOption[size]; 
 		
 	
 		for (IConfigurationElement configurationElement :configurationElements){
@@ -114,6 +116,15 @@ public class BackendFactory {
 				String extension = configurationElement.getAttribute("extension");
 							
 				backendOptions[count] = new InputFileOption(caption, defaultVal, extension);
+			}else if (elementName.equals("checkBox")){
+				String caption = configurationElement.getAttribute("caption");
+				String option = configurationElement.getAttribute("name");
+				String defaultVal = configurationElement.getAttribute("defaultValue");
+				if (defaultVal == null){
+					defaultVal = new String("");				
+				}
+							
+				backendOptions[count] = new CheckBoxOption(option, caption, defaultVal, configurationElement.getChildren());
 			}
 			count ++;
 			
@@ -135,7 +146,7 @@ public class BackendFactory {
 	 */
 	private BackendFactory() {
 		backends = new TreeMap<String, IBackend>();
-		AbtractBackendOptions = new HashMap<String, AbtractOption[]>();
+		AbtractBackendOptions = new HashMap<String, AbstractOption[]>();
 		
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] elements = registry
@@ -145,7 +156,7 @@ public class BackendFactory {
 			IConfigurationElement[] optionLists = element.getChildren();
 			for (IConfigurationElement optionList : optionLists) {
 				IConfigurationElement[] optionElements = optionList.getChildren();
-				AbtractOption[] backendOptions = parseConfigurationElement(optionElements);
+				AbstractOption[] backendOptions = parseConfigurationElement(optionElements);
 				
 				AbtractBackendOptions.put(name, backendOptions);
 			}

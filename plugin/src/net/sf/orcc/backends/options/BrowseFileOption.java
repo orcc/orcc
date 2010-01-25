@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -63,18 +64,49 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * @author Jérôme Gorin
  * 
  */
-public class BrowseFileOption implements AbtractOption {
+public class BrowseFileOption implements ModifyListener, AbstractOption {
+	
 	
 	/**
-	 * list of required attributes
+	 * Button browse connected with the option
+	 */
+	private Button buttonBrowse;
+	
+	/**
+	 * Text connected with the interface
 	 */
 	private String caption;
+	
+	/**
+	 * Extension of files selectable
+	 */
 	private String extension;
+	
+	/**
+	 * Label connected with the option
+	 */
+	private Label lbl;
+	
+	/**
+	 * Name of the option
+	 */
 	private String option;
+	
+	/**
+	 * indicate if this option is mandatory
+	 */
 	private boolean required;
+	
+	/**
+	 * Text connected with the option
+	 */
 	private Text text;
+	
+	/**
+	 * Value of the option
+	 */
 	private String value;
-
+	
 	/**
 	 * BrowseFileOption constructor 
 	 * 
@@ -165,12 +197,16 @@ public class BrowseFileOption implements AbtractOption {
 	 * @param group
 	 *       Group to add the input file interface
 	 */
-	private void createBrowseFile(Font font, final Group group){
-
-		Label lbl = new Label(group, SWT.NONE);
+	private void createBrowseFile(Font font, final Group group){			
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		data.horizontalSpan = 3;
+		group.setLayoutData(data);
+		
+		lbl = new Label(group, SWT.LEFT);
 		lbl.setFont(font);
 		lbl.setText(caption);
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		
+		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		lbl.setLayoutData(data);
 	
 		text = new Text(group, SWT.BORDER | SWT.SINGLE);
@@ -180,7 +216,7 @@ public class BrowseFileOption implements AbtractOption {
 		text.setText(value);
 		text.addModifyListener(this);
 	
-		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse = new Button(group, SWT.PUSH);
 		buttonBrowse.setFont(font);
 		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		buttonBrowse.setLayoutData(data);
@@ -192,6 +228,18 @@ public class BrowseFileOption implements AbtractOption {
 			}
 		});
 
+	}
+	
+	/**
+	 * Dispose option elements
+	 */
+	@Override
+	public void dispose() {
+		if (text != null){
+			text.dispose();
+			buttonBrowse.dispose();
+			lbl.dispose();
+		}
 	}
 	
 	/**
@@ -229,12 +277,11 @@ public class BrowseFileOption implements AbtractOption {
 		return value;
 	}
 	
+
 	/**
-	 * Modify listener on events of text
+	 * Tests if the option is valid
 	 *
-	 * @param e
-	 *       a ModifyEvent containing event from the text
-	 *
+	 * @return a boolean representing the validation of the option
 	 */
 	public boolean isValid(){
 		if (required){
@@ -243,10 +290,13 @@ public class BrowseFileOption implements AbtractOption {
 		
 		 return true;
 	}
-	
+
 
 	/**
 	 * Modify listener on events of text
+	 *
+	 * @param e
+	 *       a ModifyEvent containing event from the text
 	 *
 	 */
 	@Override
@@ -255,6 +305,17 @@ public class BrowseFileOption implements AbtractOption {
 		if (!file.toString().equals("")){
 			value = text.getText();
 		}
+	}
+
+
+	/**
+	 * Apply option to the specificied ILaunchConfigurationWorkingCopy
+	 * 	 * @param configuration
+	 *            ILaunchConfigurationWorkingCopy of configuration tab
+	 */
+	@Override
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		
 	}
 
 
@@ -270,16 +331,4 @@ public class BrowseFileOption implements AbtractOption {
 	public void show(Font font, Group group) {
 		createBrowseFile(font, group);
 	}
-
-
-	/**
-	 * Apply option to the specificied ILaunchConfigurationWorkingCopy
-	 * 	 * @param configuration
-	 *            ILaunchConfigurationWorkingCopy of configuration tab
-	 */
-	@Override
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		
-	}
-
 }

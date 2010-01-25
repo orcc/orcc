@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009/, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,8 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * 
- * @author Matthieu Wipliez / Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
 public class SimuSettingsTab extends AbstractLaunchConfigurationTab {

@@ -39,7 +39,8 @@ import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 
 /**
  * 
- * @author Matthieu Wipliez / Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
 public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {

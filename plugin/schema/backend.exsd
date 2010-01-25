@@ -47,6 +47,35 @@
       </complexType>
    </element>
 
+   <element name="checkBox">
+      <complexType>
+         <sequence>
+            <element ref="option" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="defaultValue" type="boolean">
+            <annotation>
+               <documentation>
+                  Default value of the interface
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="caption" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Caption associated to the interface
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Name of the option
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <element name="backend">
       <complexType>
          <sequence>
@@ -77,6 +106,7 @@
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="browseFile"/>
             <element ref="inputFile"/>
+            <element ref="checkBox"/>
          </choice>
       </complexType>
    </element>
@@ -104,14 +134,14 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="defaultValue" type="string" use="">
+         <attribute name="defaultValue" type="string">
             <annotation>
                <documentation>
                   Default value of the interface
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="extension" type="string" use="xdf">
+         <attribute name="extension" type="string">
             <annotation>
                <documentation>
                   Restrict extension possiblity
@@ -135,14 +165,14 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="defaultValue" type="string" use="">
+         <attribute name="defaultValue" type="string">
             <annotation>
                <documentation>
                   Default value of the interface
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="extension" type="string" use="xdf">
+         <attribute name="extension" type="string">
             <annotation>
                <documentation>
                   Restrict extension possiblity

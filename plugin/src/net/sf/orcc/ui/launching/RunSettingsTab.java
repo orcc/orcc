@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009/2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import java.io.File;
 
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.backends.options.AbtractOption;
+import net.sf.orcc.backends.options.AbstractOption;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -45,6 +45,8 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -62,12 +64,13 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * 
- * @author Matthieu Wipliez/Jérôme Gorin
+ * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
-	AbtractOption[] backendSettings;
+	AbstractOption[] backendSettings;
 
 	private Combo comboBackend;
 
@@ -127,8 +130,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		groupOption.setLayout(new GridLayout(3, false));
 		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		groupOption.setLayoutData(data);
+		groupOption.setLayout(new GridLayout(3, false));
 		groupOption.setVisible(false);
-
+		
 		updateOptionSelection();
 
 	}
@@ -234,7 +238,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		for (AbtractOption backendSetting : backendSettings){
+		for (AbstractOption backendSetting : backendSettings){
 			if (!backendSetting.isValid()) {
 				setErrorMessage("Required backend options are not specified");
 				return false;
@@ -265,7 +269,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		for (AbtractOption backendSetting : backendSettings){
+		for (AbstractOption backendSetting : backendSettings){
 			backendSetting.performApply(configuration);
 		}
 
@@ -304,8 +308,16 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			groupOption.setLayoutData(data);
 			groupOption.setVisible(true);
 			
+			groupOption.addPaintListener(new PaintListener() {
+				@Override
+				public void paintControl(PaintEvent e) {
+					updateLaunchConfigurationDialog();
+					
+				}
+			});
+			
 			backendSettings = BackendFactory.getOptions(value);
-			for (AbtractOption backendSetting : backendSettings){
+			for (AbstractOption backendSetting : backendSettings){
 				backendSetting.show(font, groupOption);
 			}
 		}else{

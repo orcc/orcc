@@ -64,7 +64,8 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 /**
  * 
- * @author Matthieu Wipliez / Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
+ * @author Pierre-Laurent Lagalaye
  * 
  */
 public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {

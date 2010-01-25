@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -64,17 +65,49 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * @author Jérôme Gorin
  * 
  */
-public class InputFileOption implements AbtractOption {
+public class InputFileOption implements ModifyListener, AbstractOption  {
+	
 	
 	/**
-	 * list of required attributes
+	 * Button browse connected with the option
+	 */
+	private Button buttonBrowse;
+	
+	/**
+	 * Text connected with the interface
 	 */
 	private String caption;
+	
+	/**
+	 * Extension of files selectable
+	 */
 	private String extension;
+	
+	/**
+	 * Label connected with the option
+	 */
+	private Label lbl;
+	
+	/**
+	 * Name of the option
+	 */
 	private String option;
+	
+	/**
+	 * indicate if this option is mandatory
+	 */
 	private boolean required;
+
+	/**
+	 * Text connected with the option
+	 */
 	private Text text;
+	
+	/**
+	 * Value of the option
+	 */
 	private String value;
+	
 
 	/**
 	 * BrowseFileOption constructor 
@@ -108,11 +141,15 @@ public class InputFileOption implements AbtractOption {
 	 *       Group to add the input file interface
 	 */
 	private void createInputFile(Font font, final Group group){
-
-		Label lbl = new Label(group, SWT.NONE);
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		data.horizontalSpan = 3;
+		group.setLayoutData(data);
+		
+		lbl = new Label(group, SWT.NONE);
 		lbl.setFont(font);
 		lbl.setText(caption);
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		
+		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		lbl.setLayoutData(data);
 	
 		text = new Text(group, SWT.BORDER | SWT.SINGLE);
@@ -136,6 +173,19 @@ public class InputFileOption implements AbtractOption {
 
 	}
 
+	/**
+	 * Dispose option elements
+	 *
+	 */
+	@Override
+	public void dispose() {
+		if (text != null){
+			text.dispose();
+			buttonBrowse.dispose();
+			lbl.dispose();
+		}
+	}
+	
 	/**
 	 * Returns an IFile instance of the focused file in text
 	 *
@@ -230,6 +280,7 @@ public class InputFileOption implements AbtractOption {
 		}
 	}
 	
+
 	/**
 	 * Tests if the option is valid
 	 *
@@ -242,7 +293,7 @@ public class InputFileOption implements AbtractOption {
 		
 		 return true;
 	}
-	
+
 
 	/**
 	 * Modify listener on events of text
