@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -91,12 +91,6 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 		((PartialNodeInterpreter) interpret).setSchedulableMode(true);
 		Object isSchedulable = interpretProc(action.getScheduler());
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
-	}
-
-	@Override
-	public Integer schedule() {
-		((PartialNodeInterpreter) interpret).randomizeHasTokens(actor);
-		return super.schedule();
 	}
 
 	/**

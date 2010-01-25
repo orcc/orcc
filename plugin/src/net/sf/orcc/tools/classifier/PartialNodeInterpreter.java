@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,19 +29,14 @@
 package net.sf.orcc.tools.classifier;
 
 import java.lang.reflect.Array;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
@@ -64,31 +59,13 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 
 	private ConfigurationAnalyzer analyzer;
 
-	private Map<Port, Boolean> hasTokens;
-
-	private Random random;
-
 	private boolean schedulableMode;
 
 	public PartialNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
 		this.analyzer = analyzer;
-		random = new Random();
 
 		listAllocator = new ListAllocator();
 		exprInterpreter = new PartialExpressionEvaluator();
-		hasTokens = new HashMap<Port, Boolean>();
-	}
-
-	/**
-	 * Configure this node interpreter so that the next calls to hasTokens will
-	 * return a randomly-generated boolean
-	 * 
-	 * @param actor
-	 */
-	public void randomizeHasTokens(Actor actor) {
-		for (Port port : actor.getInputs()) {
-			hasTokens.put(port, random.nextBoolean());
-		}
 	}
 
 	/**
@@ -115,8 +92,7 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 
 	@Override
 	public void visit(HasTokens instr, Object... args) {
-		// this allows actions with empty input patterns to run, too!
-		instr.getTarget().setValue(hasTokens.get(instr.getPort()));
+		instr.getTarget().setValue(true);
 	}
 
 	@Override
