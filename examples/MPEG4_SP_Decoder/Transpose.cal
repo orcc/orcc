@@ -53,28 +53,6 @@ actor Transpose ( int sz )
   int ccount := 0;
   int select := 0;
 
-  action X0:[a], X1:[b], X2:[c], X3:[d] ==>
-  guard rcount < 64
-  var
-    int row = rshift( rcount, 3 ),
-    int quad = bitand( rshift( rcount, 2), 1)
-  do
-    // { 0, 7, 3, 4 }
-    // { 1, 6, 2, 5 }
-    if  quad = 0 then
-      mem[select,row,0] := a;
-      mem[select,row,7] := b;
-      mem[select,row,3] := c;
-      mem[select,row,4] := d;
-    else
-      mem[select,row,1] := a;
-      mem[select,row,6] := b;
-      mem[select,row,2] := c;
-      mem[select,row,5] := d;
-    end
-    rcount := rcount + 4;
-  end
-
   action ==> Y0:[ mem[i][a][col] ], Y1:[ mem[i][b][col] ]
   guard ccount > 0
   var
@@ -101,6 +79,28 @@ actor Transpose ( int sz )
            end
          end;
     ccount := ccount - 2;
+  end
+
+  action X0:[a], X1:[b], X2:[c], X3:[d] ==>
+  guard rcount < 64
+  var
+    int row = rshift( rcount, 3 ),
+    int quad = bitand( rshift( rcount, 2), 1)
+  do
+    // { 0, 7, 3, 4 }
+    // { 1, 6, 2, 5 }
+    if  quad = 0 then
+      mem[select,row,0] := a;
+      mem[select,row,7] := b;
+      mem[select,row,3] := c;
+      mem[select,row,4] := d;
+    else
+      mem[select,row,1] := a;
+      mem[select,row,6] := b;
+      mem[select,row,2] := c;
+      mem[select,row,5] := d;
+    end
+    rcount := rcount + 4;
   end
 
   action ==>
