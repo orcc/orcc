@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.options;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
@@ -58,12 +59,12 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  *
- *  Class that add a Browse file input into backend options.
+ *  Class that create input file interface into backend options.
  *   
  * @author Jérôme Gorin
  * 
  */
-public class BrowseFileOption implements AbtractOption {
+public class InputFileOption implements AbtractOption {
 	
 	/**
 	 * list of required attributes
@@ -89,24 +90,96 @@ public class BrowseFileOption implements AbtractOption {
 	 * @param extension
 	 *       File extension for restricting selection
 	 */
-	public BrowseFileOption(String option, String caption, boolean required, String defaultVal, String extension){
-		this.option = option;
+	public InputFileOption(String caption, String defaultVal, String extension){
+		this.option = new String ("INPUT_FILE");
 		this.caption = caption;
-		this.required = required;
+		this.required = true;
 		this.value = defaultVal;
 		this.extension = extension;
 	}
 
 
 	/**
-	 * Creates the interface of the browseFiles button
+	 * Creates the interface of the BrowseFile text into the given group
+	 * 
+	 * @param font
+	 *       Font used in the interface
+	 * @param group
+	 *       Group to add the input file interface
+	 */
+	private void createInputFile(Font font, final Group group){
+
+		Label lbl = new Label(group, SWT.NONE);
+		lbl.setFont(font);
+		lbl.setText(caption);
+		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+	
+		text = new Text(group, SWT.BORDER | SWT.SINGLE);
+		text.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		text.setLayoutData(data);
+		text.setText(value);
+		text.addModifyListener(this);
+	
+		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				inputFile(group.getShell(), text);
+			}
+		});
+
+	}
+
+	/**
+	 * Returns an IFile instance of the focused file in text
+	 *
+	 * @param text
+	 * 		Text containing the file 
+	 * 
+	 * @return an IFile instance of focused file 
+	 */
+	private IFile getFileFromText(Text text) {
+		String value = text.getText();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IFile file = root.getFileForLocation(new Path(value));
+
+		return file;
+	}
+	
+	/**
+	 * Returns the option name
+	 *
+	 * @return a String containing the option name
+	 */
+	public String getOption() {
+		return option;
+	}
+	
+	/**
+	 * Returns the value of the option
+	 *
+	 * @return a String containing the value
+	 */
+	public String getValue() {
+		return value;
+	}
+	
+	/**
+	 * Creates the interface of the Input File button
 	 * 
 	 * @param shell
 	 *       Instance of the windows manager
 	 * @param text
 	 *       Text of input file interface
 	 */
-	private void browseFiles(Shell shell, Text text) {
+	private void inputFile(Shell shell, Text text) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
 				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
 				new WorkbenchContentProvider());
@@ -156,85 +229,11 @@ public class BrowseFileOption implements AbtractOption {
 			text.setText(file.getLocation().toOSString());
 		}
 	}
-
-	/**
-	 * Creates the interface of the BrowseFile text into the given group
-	 * 
-	 * @param font
-	 *       Font used in the interface
-	 * @param group
-	 *       Group to add the input file interface
-	 */
-	private void createBrowseFile(Font font, final Group group){
-
-		Label lbl = new Label(group, SWT.NONE);
-		lbl.setFont(font);
-		lbl.setText(caption);
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		lbl.setLayoutData(data);
-	
-		text = new Text(group, SWT.BORDER | SWT.SINGLE);
-		text.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		text.setLayoutData(data);
-		text.setText(value);
-		text.addModifyListener(this);
-	
-		Button buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				browseFiles(group.getShell(), text);
-			}
-		});
-
-	}
 	
 	/**
-	 * Returns an IFile instance of the focused file in text
+	 * Tests if the option is valid
 	 *
-	 * @param text
-	 * 		Text containing the file 
-	 * 
-	 * @return an IFile instance of focused file 
-	 */
-	private IFile getFileFromText(Text text) {
-		String value = text.getText();
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		IFile file = root.getFileForLocation(new Path(value));
-
-		return file;
-	}
-	
-	/**
-	 * Returns the option name
-	 *
-	 * @return a String containing the option name
-	 */
-	public String getOption() {
-		return option;
-	}
-	
-	/**
-	 * Returns the value of the option
-	 *
-	 * @return a String containing the value
-	 */
-	public String getValue() {
-		return value;
-	}
-	
-	/**
-	 * Modify listener on events of text
-	 *
-	 * @param e
-	 *       a ModifyEvent containing event from the text
-	 *
+	 * @return a boolean representing the validation of the option
 	 */
 	public boolean isValid(){
 		if (required){
@@ -248,6 +247,9 @@ public class BrowseFileOption implements AbtractOption {
 	/**
 	 * Modify listener on events of text
 	 *
+	 * @param e
+	 *       a ModifyEvent containing event from the text
+	 *
 	 */
 	@Override
 	public void modifyText(ModifyEvent e) {
@@ -255,6 +257,17 @@ public class BrowseFileOption implements AbtractOption {
 		if (!file.toString().equals("")){
 			value = text.getText();
 		}
+	}
+
+
+	/**
+	 * Apply option to the specificied ILaunchConfigurationWorkingCopy
+	 * 	 * @param configuration
+	 *            ILaunchConfigurationWorkingCopy of configuration tab
+	 */
+	@Override
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		configuration.setAttribute(INPUT_FILE, value);
 	}
 
 
@@ -268,18 +281,7 @@ public class BrowseFileOption implements AbtractOption {
 	 */
 	@Override
 	public void show(Font font, Group group) {
-		createBrowseFile(font, group);
-	}
-
-
-	/**
-	 * Apply option to the specificied ILaunchConfigurationWorkingCopy
-	 * 	 * @param configuration
-	 *            ILaunchConfigurationWorkingCopy of configuration tab
-	 */
-	@Override
-	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		
+		createInputFile(font, group);
 	}
 
 }

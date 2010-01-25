@@ -76,6 +76,7 @@
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="browseFile"/>
+            <element ref="inputFile"/>
          </choice>
       </complexType>
    </element>
@@ -85,35 +86,66 @@
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Name of the option
                </documentation>
             </annotation>
          </attribute>
          <attribute name="caption" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  Caption associated to the interface
                </documentation>
             </annotation>
          </attribute>
          <attribute name="required" type="boolean" use="default" value="False">
             <annotation>
                <documentation>
-                  
+                  Specify if this option is mandatory
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="defaultValue" type="string" use="default" value="">
+         <attribute name="defaultValue" type="string" use="">
             <annotation>
                <documentation>
-                  
+                  Default value of the interface
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="extension" type="string" use="default" value="">
+         <attribute name="extension" type="string" use="xdf">
             <annotation>
                <documentation>
-                  
+                  Restrict extension possiblity
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="inputFile">
+      <annotation>
+         <documentation>
+            Specify the frontend input file
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="caption" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Caption associated to the interface
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="defaultValue" type="string" use="">
+            <annotation>
+               <documentation>
+                  Default value of the interface
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="extension" type="string" use="xdf">
+            <annotation>
+               <documentation>
+                  Restrict extension possiblity
                </documentation>
             </annotation>
          </attribute>

@@ -34,8 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.backends.options.AbtractBackendOption;
+import net.sf.orcc.backends.options.AbtractOption;
 import net.sf.orcc.backends.options.BrowseFileOption;
+import net.sf.orcc.backends.options.InputFileOption;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -43,11 +44,11 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
 /**
- * A factory class that contains a list of back-ends. The back-ends are classes
- * that implement the {@link IBackend} interface and are declared in the
+ * A factory class that contains a list of back-ends and their options. The back-ends 
+ * are classes that implement the {@link IBackend} interface and are declared in the
  * <code>net.sf.orcc.plugin.backend</code> extension point.
  * 
- * @author Matthieu Wipliez
+ * @author Matthieu Wipliez / Jérôme Gorin
  * 
  */
 public class BackendFactory {
@@ -55,7 +56,7 @@ public class BackendFactory {
 	/**
 	 * list of options of a back-end.
 	 */
-	private static Map<String, AbtractBackendOption[]> AbtractBackendOptions;
+	private static Map<String, AbtractOption[]> AbtractBackendOptions;
 
 	private static final BackendFactory instance = new BackendFactory();
 	
@@ -69,18 +70,23 @@ public class BackendFactory {
 	}
 	
 	/**
-	 * Returns options of for a selected backend
+	 * Returns options of of the selected backend
 	 * 
-	 * @return IConfigurationElement[] associated to the backend
+	 * @return AbtractOption[] associated to the backend
 	 */
-	public static AbtractBackendOption[] getOptions(String name) {
+	public static AbtractOption[] getOptions(String name) {
 		return AbtractBackendOptions.get(name);
 	}
 
-	private static AbtractBackendOption[] parseConfigurationElement(IConfigurationElement[] configurationElements){
+	/**
+	 * Parse a list of IConfigurationElement
+	 * 
+	 * @return AbtractOption[] corresponding to the IConfigurationElement[]
+	 */
+	private static AbtractOption[] parseConfigurationElement(IConfigurationElement[] configurationElements){
 		int count = 0;
 		int size = configurationElements.length;
-		AbtractBackendOption backendOptions[] = new AbtractBackendOption[size]; 
+		AbtractOption backendOptions[] = new AbtractOption[size]; 
 		
 	
 		for (IConfigurationElement configurationElement :configurationElements){
@@ -98,8 +104,19 @@ public class BackendFactory {
 				String extension = configurationElement.getAttribute("extension");
 							
 				backendOptions[count] = new BrowseFileOption(option, caption, required, defaultVal, extension);
-				count ++;
+
+			}else if (elementName.equals("inputFile")){
+				String caption = configurationElement.getAttribute("caption");
+				String defaultVal = configurationElement.getAttribute("default");
+				if (defaultVal == null){
+					defaultVal = new String("");				
+				}
+				String extension = configurationElement.getAttribute("extension");
+							
+				backendOptions[count] = new InputFileOption(caption, defaultVal, extension);
 			}
+			count ++;
+			
 		}
 		
 		return backendOptions;
@@ -118,7 +135,7 @@ public class BackendFactory {
 	 */
 	private BackendFactory() {
 		backends = new TreeMap<String, IBackend>();
-		AbtractBackendOptions = new HashMap<String, AbtractBackendOption[]>();
+		AbtractBackendOptions = new HashMap<String, AbtractOption[]>();
 		
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] elements = registry
@@ -128,7 +145,7 @@ public class BackendFactory {
 			IConfigurationElement[] optionLists = element.getChildren();
 			for (IConfigurationElement optionList : optionLists) {
 				IConfigurationElement[] optionElements = optionList.getChildren();
-				AbtractBackendOption[] backendOptions = parseConfigurationElement(optionElements);
+				AbtractOption[] backendOptions = parseConfigurationElement(optionElements);
 				
 				AbtractBackendOptions.put(name, backendOptions);
 			}

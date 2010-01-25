@@ -35,7 +35,7 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import java.io.File;
 
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.backends.options.AbtractBackendOption;
+import net.sf.orcc.backends.options.AbtractOption;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -67,7 +67,7 @@ import org.eclipse.swt.widgets.Text;
  */
 public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
-	AbtractBackendOption[] backendSettings;
+	AbtractOption[] backendSettings;
 
 	private Combo comboBackend;
 
@@ -234,9 +234,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		for (AbtractBackendOption backendSetting : backendSettings){
+		for (AbtractOption backendSetting : backendSettings){
 			if (!backendSetting.isValid()) {
-				setErrorMessage("Requiered backend options are not specified");
+				setErrorMessage("Required backend options are not specified");
 				return false;
 			}
 		}
@@ -265,15 +265,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		for (AbtractBackendOption backendSetting : backendSettings){
-			String option = backendSetting.getOption();
-			if (option.equals("INPUT_FILE")){
-				configuration.setAttribute(INPUT_FILE, backendSetting.getValue());
-			}
+		for (AbtractOption backendSetting : backendSettings){
+			backendSetting.performApply(configuration);
 		}
-			
-		/*String value = textNetwork.getText();
-		configuration.setAttribute(INPUT_FILE, value);*/
 
 		String value = textOutput.getText();
 		configuration.setAttribute(OUTPUT_FOLDER, value);
@@ -311,7 +305,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			groupOption.setVisible(true);
 			
 			backendSettings = BackendFactory.getOptions(value);
-			for (AbtractBackendOption backendSetting : backendSettings){
+			for (AbtractOption backendSetting : backendSettings){
 				backendSetting.show(font, groupOption);
 			}
 		}else{

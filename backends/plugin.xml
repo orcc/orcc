@@ -7,91 +7,66 @@
           class="net.sf.orcc.backends.c.CBackendImpl"
           name="C">
        <option>
-          <browseFile
+          <inputFile
                 caption="Input file:"
-                defaultValue=""
-                extension="xdf"
-                name="INPUT_FILE"
-                required="true">
-          </browseFile>
+                extension="xdf">
+          </inputFile>
        </option>
     </backend>
     <backend
           class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
           name="C *quasi-static*">
        <option>
-          <browseFile
+          <inputFile
                 caption="Input file:"
-                defaultValue=""
-                extension="xdf"
-                name="INPUT_FILE"
-                required="true">
-          </browseFile>
+                extension="xdf">
+          </inputFile>
        </option>
     </backend>
     <backend
           class="net.sf.orcc.backends.java.JavaBackendImpl"
           name="Java">
        <option>
-          <browseFile
+          <inputFile
                 caption="Input file:"
-                defaultValue=""
-                extension="xdf"
-                name="INPUT_FILE"
-                required="true">
-          </browseFile>
+                extension="xdf">
+          </inputFile>
        </option>
     </backend>
     <backend
           class="net.sf.orcc.backends.cpp.CppBackendImpl"
           name="C++">
        <option>
-          <browseFile
+          <inputFile
                 caption="Input file:"
-                defaultValue=""
-                extension="xdf"
-                name="INPUT_FILE"
-                required="true">
-          </browseFile>
+                extension="xdf">
+          </inputFile>
        </option>
     </backend>
     <backend
           class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
           name="LLVM">
        <option>
-          <browseFile
+          <inputFile
                 caption="Input file:"
-                defaultValue=""
-                extension="xdf"
-                name="INPUT_FILE"
-                required="true">
-          </browseFile>
+                extension="xdf">
+          </inputFile>
        </option>
     </backend>
     <backend
           class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
           name="VHDL">
        <option>
-          <browseFile
-                caption="Input file:"
-                defaultValue=""
-                extension="xdf"
-                name="INPUT_FILE"
-                required="true">
-          </browseFile>
        </option>
     </backend>
     <backend
           class="net.sf.orcc.backends.xlim.XlimBackendImpl"
           name="XLIM">
        <option>
-          <browseFile
+          <inputFile
                 caption="Input file:"
-                defaultValue=""
-                extension="xdf"
-                name="INPUT_FILE"
-                required="true">
-          </browseFile>
+                extension="xdf">
+          </inputFile>
        </option>
     </backend>
  </extension>

@@ -28,16 +28,18 @@
  */
 package net.sf.orcc.backends.options;
 
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Group;
 
 /**
+ *  Abstract implementation of backend's option.
+ *
  * @author Jérôme Gorin
  * 
  */
-public interface AbtractBackendOption extends  ModifyListener {
-
+public interface AbtractOption extends  ModifyListener {
 	
 	public String getOption();
 	
@@ -46,5 +48,7 @@ public interface AbtractBackendOption extends  ModifyListener {
 	public boolean isValid();
 	
 	public void show(Font font, Group group);
+	
+	public void performApply(ILaunchConfigurationWorkingCopy configuration);
 
 }
