@@ -50,17 +50,17 @@ public class StaticClass extends AbstractActorClass {
 	 */
 	private List<Action> actions;
 
-	private Pattern tokenConsumption;
+	private Pattern inputPattern;
 
-	private Pattern tokenProduction;
+	private Pattern outputPattern;
 
 	/**
 	 * Creates a new static class.
 	 */
 	public StaticClass() {
 		actions = new ArrayList<Action>();
-		tokenConsumption = new Pattern();
-		tokenProduction = new Pattern();
+		inputPattern = new Pattern();
+		outputPattern = new Pattern();
 	}
 
 	/**
@@ -84,6 +84,15 @@ public class StaticClass extends AbstractActorClass {
 	}
 
 	/**
+	 * Returns the input pattern of this static class.
+	 * 
+	 * @return the input pattern of this static class
+	 */
+	public Pattern getInputPattern() {
+		return inputPattern;
+	}
+
+	/**
 	 * Returns the number of tokens consumed by this port.
 	 * 
 	 * @param port
@@ -91,7 +100,7 @@ public class StaticClass extends AbstractActorClass {
 	 * @return the number of tokens consumed by this port.
 	 */
 	public int getNumTokensConsumed(Port port) {
-		Integer numTokens = tokenConsumption.get(port);
+		Integer numTokens = inputPattern.get(port);
 		if (numTokens == null) {
 			return 0;
 		}
@@ -106,11 +115,20 @@ public class StaticClass extends AbstractActorClass {
 	 * @return the number of tokens written to this port.
 	 */
 	public int getNumTokensProduced(Port port) {
-		Integer numTokens = tokenConsumption.get(port);
+		Integer numTokens = inputPattern.get(port);
 		if (numTokens == null) {
 			return 0;
 		}
 		return numTokens;
+	}
+
+	/**
+	 * Returns the output pattern of this static class.
+	 * 
+	 * @return the output pattern of this static class
+	 */
+	public Pattern getOutputPattern() {
+		return outputPattern;
 	}
 
 	@Override
@@ -122,14 +140,14 @@ public class StaticClass extends AbstractActorClass {
 	 * Prints the token consumption of this static class.
 	 */
 	public void printTokenConsumption() {
-		System.out.println("input ports: " + tokenConsumption);
+		System.out.println("input ports: " + inputPattern);
 	}
 
 	/**
 	 * Prints the token production of this static class.
 	 */
 	public void printTokenProduction() {
-		System.out.println("output ports: " + tokenProduction);
+		System.out.println("output ports: " + outputPattern);
 	}
 
 	/**
@@ -140,7 +158,7 @@ public class StaticClass extends AbstractActorClass {
 	 */
 	public void setTokenConsumptions(Actor actor) {
 		for (Port port : actor.getInputs()) {
-			tokenConsumption.put(port, port.getNumTokensConsumed());
+			inputPattern.put(port, port.getNumTokensConsumed());
 		}
 	}
 
@@ -152,7 +170,7 @@ public class StaticClass extends AbstractActorClass {
 	 */
 	public void setTokenProductions(Actor actor) {
 		for (Port port : actor.getOutputs()) {
-			tokenProduction.put(port, port.getNumTokensProduced());
+			outputPattern.put(port, port.getNumTokensProduced());
 		}
 	}
 

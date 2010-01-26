@@ -39,6 +39,7 @@ import net.sf.orcc.network.transforms.Instantiator;
 import net.sf.orcc.network.transforms.NetworkClassifier;
 import net.sf.orcc.network.transforms.NetworkFlattener;
 import net.sf.orcc.tools.merger.ActorMerger;
+import net.sf.orcc.tools.merger.ActorNormalizer;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -211,13 +212,26 @@ public class Network {
 	}
 
 	/**
-	 * Merges actors of this network
+	 * Merges actors of this network. Note that for this transformation to work
+	 * properly, actors must have been classified and normalized first.
 	 * 
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
 	public void mergeActors() throws OrccException {
 		new ActorMerger().transform(this);
+	}
+
+	/**
+	 * Normalizes actors of this network so they can later be merged. Note that
+	 * for this transformation to work properly, actors must have been
+	 * classified first.
+	 * 
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	public void normalizeActors() throws OrccException {
+		new ActorNormalizer().transform(this);
 	}
 
 	@Override
