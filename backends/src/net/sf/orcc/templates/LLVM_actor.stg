@@ -92,7 +92,55 @@ initPortNode(fifoName, expr, index) ::= <<
 >> */
 
 ///////////////////////////////////////////////////////////////////////////////
-// Instructions
+// Variables
+///////////////////////////////////////////////////////////////////////////////
+
+
+Var(variable) ::= <<
+$if(variable.global)$
+@$variable$
+$else$
+%$variable$
+$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// LLVM Operations
+///////////////////////////////////////////////////////////////////////////////
+StoreOp(ty, value, pty, pointer) ::= <<
+store $ty$ $value$, $pty$* $pointer$
+>>
+
+GetElementPtrOp(result, pty, ptrval, idx) ::= <<
+$result$ = getelementptr $pty$* $ptrval$, i32 0 $if(idx)$
+, $indexes(idx)$
+$endif$
+>>
+
+BitcastOp(result, ty, value, ty2) ::= <<
+$result$ = bitcast $ty$ $value$ to $ty2$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Conversion instructions
+///////////////////////////////////////////////////////////////////////////////
+StoreWithIndex(value, target, indexes) ::= <<
+$if(target.variable.port)$
+$BitcastOp(result = "%"+target+"_cast", ty = "i8**", value = "%"+target, ty2 = target.variable.type+"*")$
+$endif$
+
+$GetElementPtrOp(result="%"+target+"_ptr", pty=target.variable.type, ptrval="%"+target+"_cast", idx = indexes)$
+$StoreOp(ty="i32", value=value, pty="i32", pointer="%"+target+"_ptr")$
+
+>>
+
+StoreWithoutIndex(value, target) ::= <<
+$StoreOp(ty="i32", value=value, pty="i32*", pointer=target)$
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// ORCC Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
 indexes(indexes) ::= <<
@@ -187,13 +235,15 @@ ret void
 $endif$
 >>
 
+
+/*
 Store(store) ::= <<
 $if(store.indexes.empty)$
 store i32 $store.value$, i32* @$store.target$
 
 $else$
 $if(store.target.variable.port)$
-%$store.target$_cast = bitcast $store.target.variable.type$* %$store.target$
+%$store.target$_cast = bitcast  i8** %$store.target$ to $store.target.variable.type$* 
 
 $endif$
 %$store.target$_ptr = getelementptr $store.target.variable.type$* $if(store.target.variable.global)$
@@ -207,6 +257,16 @@ $endif$
 , i32 0, $indexes(store.indexes)$
 store i32 $store.value$, i32* %$store.target$_ptr
 
+$endif$
+>>
+*/
+
+
+Store(store) ::= <<
+$if(store.indexes.empty)$
+$StoreWithoutIndex(value=store.value, target=store.target)$
+$else$
+$StoreWithIndex(value=store.value, target=store.target, indexes = store.indexes)$
 $endif$
 >>
 
