@@ -1,3 +1,31 @@
+/*
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 package net.sf.orcc.debug.model;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
@@ -19,6 +47,7 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +77,28 @@ import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.osgi.framework.Bundle;
 
+/**
+ * This class defines an implementation of {@link IProcess} to launch the
+ * front-end and back-end of Orcc.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public class OrccProcess extends PlatformObject implements IProcess {
 
-	private String contents;
-
-	private ListenerList list;
-
+	/**
+	 * This class defines an implementation of stream monitor.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
 	private class OrccMonitor implements IStreamMonitor {
 
+		private ListenerList list;
+
+		/**
+		 * Creates a new monitor.
+		 */
 		public OrccMonitor() {
 			list = new ListenerList();
 		}
@@ -77,19 +120,38 @@ public class OrccProcess extends PlatformObject implements IProcess {
 			list.remove(listener);
 		}
 
+		/**
+		 * Writes the given message to the contents watched by this monitor.
+		 * 
+		 * @param msg
+		 *            a message
+		 */
+		private void write(String msg) {
+			synchronized (contents) {
+				contents += msg;
+			}
+
+			for (Object listener : list.getListeners()) {
+				((IStreamListener) listener).streamAppended(msg, this);
+			}
+		}
+
 	}
 
 	private class OrccProxy implements IStreamsProxy {
 
+		private IStreamMonitor errorMonitor;
+
 		private IStreamMonitor outputMonitor;
 
 		public OrccProxy() {
+			errorMonitor = new OrccMonitor();
 			outputMonitor = new OrccMonitor();
 		}
 
 		@Override
 		public IStreamMonitor getErrorStreamMonitor() {
-			return null;
+			return errorMonitor;
 		}
 
 		@Override
@@ -99,25 +161,74 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		@Override
 		public void write(String input) throws IOException {
+			// nothing to do
 		}
 
 	}
 
-	private ILaunch launch;
+	/**
+	 * This class defines a thread that reads from an input stream.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ReadingThread extends Thread {
+
+		private InputStream in;
+
+		private OrccMonitor monitor;
+
+		/**
+		 * Creates a reading thread on the given input stream, and with the
+		 * given monitor to write to.
+		 * 
+		 * @param in
+		 *            an input stream
+		 * @param monitor
+		 *            a monitor to write to
+		 */
+		public ReadingThread(InputStream in, OrccMonitor monitor) {
+			this.in = in;
+			this.monitor = monitor;
+		}
+
+		@Override
+		public void run() {
+			while (true) {
+				try {
+					process.exitValue();
+					return;
+				} catch (IllegalThreadStateException e) {
+					try {
+						int n = in.available();
+						byte[] bytes = new byte[n];
+						in.read(bytes);
+						monitor.write(new String(bytes));
+					} catch (IOException e1) {
+					}
+				}
+			}
+		}
+
+	}
+
+	private String[] cmdLine;
 
 	private ILaunchConfiguration configuration;
 
-	private boolean terminated;
+	private String contents;
+
+	private ILaunch launch;
 
 	private IProgressMonitor monitor;
-
-	private int value;
-
-	private String[] cmdLine;
 
 	private Process process;
 
 	private IStreamsProxy proxy;
+
+	private boolean terminated;
+
+	private int value;
 
 	public OrccProcess(ILaunch launch, ILaunchConfiguration configuration,
 			IProgressMonitor monitor) throws CoreException {
@@ -136,86 +247,9 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		}
 	}
 
-	/**
-	 * Calls one of the backends.
-	 * 
-	 * @param configuration
-	 *            The configuration.
-	 * @throws CoreException
-	 */
-	private void launchBackend(ILaunchConfiguration configuration)
-			throws CoreException {
-		String backend = configuration.getAttribute(BACKEND, "");
-
-		String inputFile = configuration.getAttribute(INPUT_FILE, "");
-		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
-
-		String file = new File(inputFile).getName();
-		String name = outputFolder + File.separator + file;
-		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-		try {
-			BackendFactory factory = BackendFactory.getInstance();
-			factory.runBackend(backend, name, fifoSize);
-		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					backend + " backend could not generate code", e);
-			throw new CoreException(status);
-		}
-	}
-
 	@Override
 	public boolean canTerminate() {
 		return !terminated;
-	}
-
-	/**
-	 * Calls the Orcc RVC-CAL interpreter for simulation.
-	 * 
-	 * @param option
-	 *            Selects debugger or simulator.
-	 * @param launch
-	 *            The current launch context.
-	 * @param monitor
-	 *            The progress monitor.
-	 * @param configuration
-	 *            The configuration.
-	 * @throws CoreException
-	 */
-	private void launchInterpreter(String option)
-			throws CoreException {
-		// Get configuration options
-		String inputFile = configuration.getAttribute(INPUT_FILE, "");
-		String inputStimulus = configuration.getAttribute(INPUT_STIMULUS, "");
-		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
-		String file = new File(inputFile).getName();
-		String filename = outputFolder + File.separator + file;
-		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-		boolean enableTraces = configuration.getAttribute(ENABLE_TRACES,
-				DEFAULT_TRACES);
-		try {
-			// Get interpreter instance and configure it
-			InterpreterMain interpreter = new InterpreterMain();
-			interpreter.configSystem(this, monitor);
-			interpreter.configNetwork(filename, fifoSize, inputStimulus,
-					enableTraces);
-			if (option.equals("debugger")) {
-				// Add the DebugTarget as a listener of interpreter
-				OrccDebugTarget target = new OrccDebugTarget(launch, this, interpreter);
-				launch.addDebugTarget(target);
-				interpreter.addPropertyChangeListener(target);
-				// Start interpreter thread...
-				interpreter.start();
-				// ...wait for the end of inputStimulus consumption
-				interpreter.join();
-			}else {
-				// No debug thread to be used : call directly the simulator
-				interpreter.simulate();
-			}
-		} catch (Exception e) {
-			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					"simulator error", e);
-			throw new CoreException(status);
-		}
 	}
 
 	/**
@@ -324,6 +358,83 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	}
 
 	/**
+	 * Calls one of the backends.
+	 * 
+	 * @param configuration
+	 *            The configuration.
+	 * @throws CoreException
+	 */
+	private void launchBackend(ILaunchConfiguration configuration)
+			throws CoreException {
+		String backend = configuration.getAttribute(BACKEND, "");
+
+		String inputFile = configuration.getAttribute(INPUT_FILE, "");
+		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
+
+		String file = new File(inputFile).getName();
+		String name = outputFolder + File.separator + file;
+		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+		try {
+			BackendFactory factory = BackendFactory.getInstance();
+			factory.runBackend(backend, name, fifoSize);
+		} catch (Exception e) {
+			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+					backend + " backend could not generate code", e);
+			throw new CoreException(status);
+		}
+	}
+
+	/**
+	 * Calls the Orcc RVC-CAL interpreter for simulation.
+	 * 
+	 * @param option
+	 *            Selects debugger or simulator.
+	 * @param launch
+	 *            The current launch context.
+	 * @param monitor
+	 *            The progress monitor.
+	 * @param configuration
+	 *            The configuration.
+	 * @throws CoreException
+	 */
+	private void launchInterpreter(String option) throws CoreException {
+		// Get configuration options
+		String inputFile = configuration.getAttribute(INPUT_FILE, "");
+		String inputStimulus = configuration.getAttribute(INPUT_STIMULUS, "");
+		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
+		String file = new File(inputFile).getName();
+		String filename = outputFolder + File.separator + file;
+		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+		boolean enableTraces = configuration.getAttribute(ENABLE_TRACES,
+				DEFAULT_TRACES);
+		try {
+			// Get interpreter instance and configure it
+			InterpreterMain interpreter = new InterpreterMain();
+			interpreter.configSystem(this, monitor);
+			interpreter.configNetwork(filename, fifoSize, inputStimulus,
+					enableTraces);
+			if (option.equals("debugger")) {
+				// Add the DebugTarget as a listener of interpreter
+				OrccDebugTarget target = new OrccDebugTarget(launch, this,
+						interpreter);
+				launch.addDebugTarget(target);
+				interpreter.addPropertyChangeListener(target);
+				// Start interpreter thread...
+				interpreter.start();
+				// ...wait for the end of inputStimulus consumption
+				interpreter.join();
+			} else {
+				// No debug thread to be used : call directly the simulator
+				interpreter.simulate();
+			}
+		} catch (Exception e) {
+			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+					"simulator error", e);
+			throw new CoreException(status);
+		}
+	}
+
+	/**
 	 * Quote file if file contains spaces.
 	 * 
 	 * @param file
@@ -342,17 +453,33 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	public void setAttribute(String key, String value) {
 	}
 
-	@Override
-	public void terminate() throws DebugException {
-
-	}
-
+	/**
+	 * Starts this process with the given option
+	 * 
+	 * @param option
+	 *            "backend" or "interpreter"
+	 * @throws CoreException
+	 */
 	public void start(String option) throws CoreException {
 		monitor.beginTask("Compiling dataflow program", 2);
 		monitor.subTask("Launching frontend...");
 		process = DebugPlugin.exec(cmdLine, null);
+
+		// read from process
+		ReadingThread t1 = new ReadingThread(process.getErrorStream(),
+				(OrccMonitor) proxy.getErrorStreamMonitor());
+		ReadingThread t2 = new ReadingThread(process.getInputStream(),
+				(OrccMonitor) proxy.getOutputStreamMonitor());
+		t1.start();
+		t2.start();
+
+		// wait for it to finish
 		try {
 			value = process.waitFor();
+
+			// wait for reading threads to finish
+			t1.join();
+			t2.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -385,15 +512,19 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		DebugPlugin.getDefault().fireDebugEventSet(events);
 	}
 
-	public void write(String msg) {
-		synchronized (contents) {
-			contents += msg;
-		}
+	@Override
+	public void terminate() throws DebugException {
 
-		for (Object listener : list.getListeners()) {
-			((IStreamListener) listener).streamAppended(msg, proxy
-					.getOutputStreamMonitor());
-		}
+	}
+
+	/**
+	 * Writes the given message to the normal output of this process.
+	 * 
+	 * @param msg
+	 *            a message
+	 */
+	public void write(String msg) {
+		((OrccMonitor) proxy.getOutputStreamMonitor()).write(msg);
 	}
 
 }
