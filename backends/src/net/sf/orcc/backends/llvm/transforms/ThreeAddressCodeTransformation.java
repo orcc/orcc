@@ -162,7 +162,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-			Location location = expr.getLocation();
+		/*	Location location = expr.getLocation();
 			BinaryOp op = BinaryOp.EQ;
 			IntExpr intExpr = new IntExpr(location, 0);
 			
@@ -173,7 +173,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 					location, expr, op, intExpr, type));
 			it.add(assign);
 
-			return new VarExpr(location, new Use(target));
+			return new VarExpr(location, new Use(target));*/
+			return expr;
 		}
 
 		/**

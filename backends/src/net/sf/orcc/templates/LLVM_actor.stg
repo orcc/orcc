@@ -138,9 +138,9 @@ $else$
 %
 $endif$
 $if(load.source.variable.port)$
-$load.target$_cast
+$load.target$_cast 
 $else$
-$load.source$
+$load.source$ 
 $endif$
 , i32 0, $indexes(load.indexes)$
 %$load.target$ = load $load.target.type$* %$load.target$_ptr
@@ -171,6 +171,11 @@ store i8* %$read.target$_$read.block.label$, i8** %$read.port$
 
 >>
 
+ReadEnd(readEnd) ::= <<
+setReadEnd(%struct.fifo_s* @$actorName$_$readEnd.port$);
+
+>>
+
 // return node
 Return(return) ::= <<
 $if(return.value)$
@@ -184,11 +189,12 @@ $endif$
 
 Store(store) ::= <<
 $if(store.indexes.empty)$
-store i32 $store.value$, $store.target.variable.type$* @$store.target$
+store i32 $store.value$, i32* @$store.target$
 
 $else$
 $if(store.target.variable.port)$
-$store.target$_cast = bitcast $store.target.variable.type$* %$store.target$
+%$store.target$_cast = bitcast $store.target.variable.type$* %$store.target$
+
 $endif$
 %$store.target$_ptr = getelementptr $store.target.variable.type$* $if(store.target.variable.global)$
 @
@@ -209,6 +215,11 @@ Write(write) ::= <<
 $loadLocalPort(write)$
 %$write.target$_$write.block.label$ = call i8* @getWritePtr(%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$)
 store i8* %$write.target$_$write.block.label$, i8** %$write.port$
+
+>>
+
+WriteEnd(writeEnd) ::= <<
+call void @setWriteEnd(%struct.fifo_s* @$actorName$_$writeEnd.port$)
 
 >>
 
