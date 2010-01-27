@@ -104,9 +104,25 @@ public class StaticActorNormalizer {
 		ActionScheduler sched = actor.getActionScheduler();
 		sched.setFsm(null);
 
-		// removes all actions
+		// removes all actions from action scheduler
 		sched.getActions().clear();
-		// actor.getActions().clear();
+
+		// all action scheduler now just return true
+		for (Action action : actor.getActions()) {
+			Procedure scheduler = action.getScheduler();
+			Iterator<Variable> it = scheduler.getLocals().iterator();
+			while (it.hasNext()) {
+				it.next();
+				it.remove();
+			}
+
+			List<CFGNode> nodes = scheduler.getNodes();
+			nodes.clear();
+			BlockNode block = new BlockNode(scheduler);
+			nodes.add(block);
+			block.add(new Return(block, new Location(), new BoolExpr(
+					new Location(), true)));
+		}
 	}
 
 	private Procedure createBody() {
