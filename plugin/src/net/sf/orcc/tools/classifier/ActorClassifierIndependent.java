@@ -189,16 +189,10 @@ public class ActorClassifierIndependent {
 		// schedule the actor
 		StaticClass staticClass = new StaticClass();
 		String initialState = fsm.getInitialState().getName();
-		String state = null;
-		int scheduled;
 		do {
-			scheduled = interpretedActor.schedule();
-			if (scheduled != 0) {
-				Action latest = interpretedActor.getScheduledAction();
-				staticClass.addAction(latest);
-				state = interpretedActor.getFsmState();
-			}
-		} while (!initialState.equals(state) || scheduled == 0);
+			interpretedActor.schedule();
+			staticClass.addAction(interpretedActor.getScheduledAction());
+		} while (!initialState.equals(interpretedActor.getFsmState()));
 
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
@@ -311,14 +305,12 @@ public class ActorClassifierIndependent {
 		}
 
 		// schedule
+		StaticClass staticClass = new StaticClass();
 		PartiallyInterpretedActor interpretedActor = newInterpreter();
-		int scheduled;
-		do {
-			scheduled = interpretedActor.schedule();
-		} while (scheduled == 0);
+		interpretedActor.schedule();
+		staticClass.addAction(interpretedActor.getScheduledAction());
 
 		// set token rates
-		StaticClass staticClass = new StaticClass();
 		staticClass.setTokenConsumptions(actor);
 		staticClass.setTokenProductions(actor);
 
