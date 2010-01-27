@@ -28,17 +28,9 @@
  */
 package net.sf.orcc.tools.merger;
 
-import java.util.List;
-
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorClass;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.classes.StaticClass;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.INetworkTransformation;
 
@@ -57,31 +49,12 @@ public class ActorNormalizer implements INetworkTransformation {
 	public ActorNormalizer() {
 	}
 
-	private void normalize(Actor actor, StaticClass staticCls) {
-		Pattern input = staticCls.getInputPattern();
-		Pattern output = staticCls.getOutputPattern();
-		Tag tag = new Tag();
-		tag.add("x");
-		Action staticAction = new Action(new Location(), tag, input,
-				output, null, null);
-		staticCls.getActions();
-
-		// remove FSM
-		ActionScheduler sched = actor.getActionScheduler();
-		sched.setFsm(null);
-
-		// schedule the given action
-		List<Action> actions = sched.getActions();
-		actions.clear();
-		actions.add(staticAction);
-	}
-
 	@Override
 	public void transform(Network network) throws OrccException {
 		for (Actor actor : network.getActors()) {
 			ActorClass clasz = actor.getActorClass();
 			if (clasz.isStatic()) {
-				normalize(actor, (StaticClass) clasz);
+				new StaticActorNormalizer(actor).normalize();
 			}
 		}
 	}

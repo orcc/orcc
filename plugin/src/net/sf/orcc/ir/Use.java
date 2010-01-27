@@ -185,17 +185,17 @@ public class Use {
 	 * 
 	 * @param variable
 	 *            a variable
-	 * @param node
+	 * @param user
 	 *            a node
 	 * @throws NullPointerException
 	 *             if node is null.
 	 */
-	public Use(Variable variable, User node) {
-		if (node == null) {
+	public Use(Variable variable, User user) {
+		if (user == null) {
 			throw new NullPointerException();
 		}
 		setVariable(variable);
-		this.node = node;
+		this.node = user;
 	}
 
 	/**
