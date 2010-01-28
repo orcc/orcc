@@ -199,7 +199,7 @@
             <Expr kind="Var" name="MODE_SZ"/>
         </Parameter>
         <Parameter name="frac_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
         </Parameter>
     </Instance>
     <Instance id="Algo_Interp_split_MB">

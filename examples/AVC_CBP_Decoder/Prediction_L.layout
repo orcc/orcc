@@ -28,7 +28,7 @@
       <vertex id="ConstrainedIFlag" x="74" y="522"/>
       <vertex id="Display_L" x="980" y="1258"/>
       <vertex id="Inter" x="203" y="1195"/>
-      <vertex id="Buffer_inter" x="780" y="1168"/>
+      <vertex id="Buffer_inter" x="785" y="1133"/>
       <vertex id="Select" x="432" y="970"/>
       <vertex id="Intra_16x16" x="203" y="565"/>
       <vertex id="Intra_4x4" x="203" y="784"/>

@@ -28,9 +28,9 @@
       <vertex id="ref_idx_in" x="205" y="2039"/>
       <vertex id="mv_in" x="205" y="2132"/>
       <vertex id="I_PCM_Y" x="205" y="2318"/>
+      <vertex id="ConstrainedIFlag" x="55" y="1090"/>
       <vertex id="Display_L" x="614" y="1284"/>
       <vertex id="TEX_L" x="393" y="1059"/>
       <vertex id="RES_L" x="205" y="1391"/>
-      <vertex id="ConstrainedIFlag" x="55" y="1090"/>
    </vertices>
 </layout>

@@ -317,11 +317,11 @@
     <Connection dst="TEX_L" dst-port="RefList" src="" src-port="RefList"/>
     <Connection dst="TEX_L" dst-port="QP" src="" src-port="QP"/>
     <Connection dst="TEX_L" dst-port="CodedBlockPattern" src="" src-port="CodedBlockPattern"/>
-    <Connection dst="TEX_L" dst-port="slice_alpha_c0_offset" src="" src-port="slice_beta_offset"/>
     <Connection dst="TEX_L" dst-port="LFDisable" src="" src-port="LFDisable"/>
-    <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_alpha_c0_offset"/>
     <Connection dst="TEX_L" dst-port="ref_idx_in" src="" src-port="ref_idx_in"/>
     <Connection dst="TEX_L" dst-port="mv_in" src="" src-port="mv_in"/>
     <Connection dst="TEX_L" dst-port="I_PCM_Y" src="" src-port="I_PCM_Y"/>
     <Connection dst="TEX_L" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
+    <Connection dst="TEX_L" dst-port="slice_alpha_c0_offset" src="" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_beta_offset"/>
 </XDF>

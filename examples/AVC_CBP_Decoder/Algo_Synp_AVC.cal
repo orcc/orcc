@@ -1307,7 +1307,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_SliceH_check_separate_colour_plane_flag: action ==> MMCO:[num_ref_frames[sps_id]]
 	guard
-		vld_end()
+		vld_end(), first_mb_in_slice = 0
+	do
+		pps_id := vld_ue();
+		sps_id := sequence_parameter_set_id[pps_id];
+	end
+
+	skip_read_SliceH_check_separate_colour_plane_flag: action ==> 
+	guard
+		vld_end(), first_mb_in_slice != 0
 	do
 		pps_id := vld_ue();
 		sps_id := sequence_parameter_set_id[pps_id];
@@ -1497,8 +1505,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		pic_order_present_flag[pps_id] != 1 or field_pic_flag != 0
 	end
 	//end if
+	
+	skipPOC: action ==> 
+	guard first_mb_in_slice!=0
+	end
 
 	CalcPOC: action ==> POC:[POC_val]
+	guard first_mb_in_slice=0
 	var 
 		int PicOrderCntMsb,
 		int TopFieldOrderCnt,
@@ -1823,7 +1836,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	// if (IdrPicFlag)
 	read_SliceH_no_output_of_prior_pics_flag_done: action ==> MMCO:[0, long_term_reference_flag]
 	guard
-		nal_unit_type = 5,
+		nal_unit_type = 5, first_mb_in_slice=0,
+		done_reading_bits()
+	do
+		no_output_of_prior_pics_flag := rshift(read_result(),1);
+		long_term_reference_flag := mask_bits(read_result(),1);
+	end
+
+	skip_read_SliceH_no_output_of_prior_pics_flag_done: action ==> 
+	guard
+		nal_unit_type = 5, first_mb_in_slice!=0,
 		done_reading_bits()
 	do
 		no_output_of_prior_pics_flag := rshift(read_result(),1);
@@ -1833,7 +1855,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	// else (!IdrPicFlag)
 	read_SliceH_adaptative_ref_pic_marking_mode_flag_done: action ==> MMCO:[1,adaptative_ref_pic_marking_mode_flag]
 	guard
-		nal_unit_type != 5,
+		nal_unit_type != 5, first_mb_in_slice = 0,
+		done_reading_bits()
+	do
+		adaptative_ref_pic_marking_mode_flag := read_result();
+		if adaptative_ref_pic_marking_mode_flag = 1 then start_vld(); end
+	end
+	
+	skip_read_SliceH_adaptative_ref_pic_marking_mode_flag_done: action ==> 
+	guard
+		nal_unit_type != 5, first_mb_in_slice != 0,
 		done_reading_bits()
 	do
 		adaptative_ref_pic_marking_mode_flag := read_result();
@@ -3819,6 +3850,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		read_SliceH_slice_type								( read_SliceH_slice_type  	                        ) --> read_SliceH_pps_id;
 		read_SliceH_pps_id									( read_SliceH_pps_id						  		) --> read_SliceH_check_separate_colour_plane_flag;
 		read_SliceH_check_separate_colour_plane_flag		( read_SliceH_check_separate_colour_plane_flag	 	) --> read_SliceH_check_separate_colour_plane_flag_done; 
+		read_SliceH_check_separate_colour_plane_flag		( skip_read_SliceH_check_separate_colour_plane_flag	 	) --> read_SliceH_check_separate_colour_plane_flag_done; 
 		read_SliceH_check_separate_colour_plane_flag_done	( read_SliceH_separate_colour_plane_flag_done		) --> read_SliceH_read_colour_plane_id;
 		read_SliceH_check_separate_colour_plane_flag_done	( read_SliceH_skip_separate_colour_plane_flag	  	) --> read_SliceH_frame_num;	
 		read_SliceH_read_colour_plane_id					( read_SliceH_read_colour_plane_id				  	) --> read_SliceH_frame_num;
@@ -3850,6 +3882,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		read_SliceH_delta_pic_order_cnt0_done				( read_SliceH_skip_delta_pic_order_cnt1				) --> CalcPOC;
 
 		CalcPOC												( CalcPOC	                                        ) --> read_SliceH_redundant_pic_cnt;
+		CalcPOC												( skipPOC	                                        ) --> read_SliceH_redundant_pic_cnt;
 		read_SliceH_redundant_pic_cnt						( read_SliceH_redundant_pic_cnt                     ) --> read_SliceH_redundant_pic_cnt_done;
 		read_SliceH_redundant_pic_cnt_done					( read_SliceH_redundant_pic_cnt_done  				) --> read_SliceH_direct_spatial_mv_pred_flag;
 		read_SliceH_redundant_pic_cnt						( read_SliceH_skip_redundant_pic_cnt                ) --> read_SliceH_direct_spatial_mv_pred_flag;
@@ -3885,7 +3918,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		//dec_ref_pic_marking
 		read_SliceH_dec_ref_pic_marking						( read_SliceH_dec_ref_pic_marking	                ) --> read_SliceH_check_IdrPicFlag;
 		read_SliceH_check_IdrPicFlag						( read_SliceH_no_output_of_prior_pics_flag_done		) --> read_SliceH_cabac_init_idc;
+		read_SliceH_check_IdrPicFlag						( skip_read_SliceH_no_output_of_prior_pics_flag_done		) --> read_SliceH_cabac_init_idc;
 		read_SliceH_check_IdrPicFlag						( read_SliceH_adaptative_ref_pic_marking_mode_flag_done) --> read_SliceH_check_mmco;
+		read_SliceH_check_IdrPicFlag						( skip_read_SliceH_adaptative_ref_pic_marking_mode_flag_done) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco								( read_SliceH_skip_memory_management_control_operation_done ) --> read_SliceH_cabac_init_idc;
 		read_SliceH_check_mmco								( read_SliceH_memory_management_control_operation_done) --> read_SliceH_check_mmco_done;
 		read_SliceH_check_mmco_done							( read_SliceH_mmco_0								) --> read_SliceH_cabac_init_idc;
