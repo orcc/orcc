@@ -51,12 +51,16 @@ import net.sf.orcc.ir.classes.StaticClass;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
 
@@ -67,6 +71,97 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class StaticActorNormalizer {
+
+	/**
+	 * This class contains code to transform a pattern to IR code (not entirely
+	 * valid because not in SSA form at this point).
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class MyPatternVisitor implements PatternVisitor {
+
+		private int depth;
+
+		private List<LocalVariable> indexes;
+
+		private Procedure procedure;
+
+		private List<CFGNode> nodes;
+
+		private Location location;
+
+		public MyPatternVisitor(Procedure procedure) {
+			this.procedure = procedure;
+			nodes = procedure.getNodes();
+			indexes = new ArrayList<LocalVariable>();
+			location = new Location();
+		}
+
+		@Override
+		public void visit(LoopPattern pattern) {
+			depth++;
+			if (indexes.size() < depth) {
+				LocalVariable varDef = new LocalVariable(true, depth - 1,
+						new Location(), "loop", null, null, new BoolType());
+				variables.add(actor.getFile(), location, varDef.getName(),
+						varDef);
+				indexes.add(varDef);
+			}
+
+			LocalVariable loopVar = indexes.get(depth - 1);
+
+			// init var
+			BlockNode block = BlockNode.last(procedure, nodes);
+			Assign assign = new Assign(block, location, loopVar, new IntExpr(0));
+			block.add(assign);
+
+			// create while
+			List<CFGNode> oldNodes = nodes;
+			nodes = new ArrayList<CFGNode>();
+
+			WhileNode whileNode = new WhileNode(location, procedure, null,
+					nodes, new BlockNode(procedure));
+			oldNodes.add(whileNode);
+
+			// assign condition
+			Expression condition = new BinaryExpr(location, new VarExpr(
+					location, new Use(loopVar, whileNode)), BinaryOp.LT,
+					new IntExpr(pattern.getNumIterations()), new BoolType());
+			whileNode.setValue(condition);
+
+			// accept sub pattern
+			pattern.getPattern().accept(this);
+
+			// add assign
+			block = BlockNode.last(procedure, nodes);
+			assign = new Assign(block, location, loopVar, null);
+			assign.setValue(new BinaryExpr(location, new VarExpr(location,
+					new Use(loopVar, assign)), BinaryOp.PLUS, new IntExpr(1),
+					new IntType(new IntExpr(32))));
+			block.add(assign);
+
+			// restore stuff
+			this.nodes = oldNodes;
+			depth--;
+		}
+
+		@Override
+		public void visit(SequentialPattern pattern) {
+			for (ExecutionPattern subPattern : pattern) {
+				subPattern.accept(this);
+			}
+		}
+
+		@Override
+		public void visit(SimplePattern pattern) {
+			BlockNode block = BlockNode.last(procedure, nodes);
+			Call call = new Call(block, new Location(), null, pattern
+					.getAction().getBody(), new ArrayList<Expression>());
+			block.add(call);
+		}
+
+	}
 
 	private static final String ACTION_NAME = "xxx";
 
@@ -133,20 +228,13 @@ public class StaticActorNormalizer {
 		Procedure procedure = new Procedure(ACTION_NAME, false, location,
 				new VoidType(), new OrderedMap<Variable>(), variables, nodes);
 
-		BlockNode block = new BlockNode(procedure);
-		nodes.add(block);
-
-		for (Action action : staticCls.getActions()) {
-			createBodyAction(block, action);
-		}
+		// finds a pattern in the actions
+		LoopPatternRecognizer r = new LoopPatternRecognizer();
+		ExecutionPattern pattern = r.getPattern(staticCls.getActions());
+		System.out.println(pattern);
+		pattern.accept(new MyPatternVisitor(procedure));
 
 		return procedure;
-	}
-
-	private void createBodyAction(BlockNode block, Action action) {
-		Call call = new Call(block, new Location(), null, action.getBody(),
-				new ArrayList<Expression>());
-		block.add(call);
 	}
 
 	/**
