@@ -33,7 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -83,13 +83,13 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 *            the name of an object
 	 * @param object
 	 *            an object
-	 * @throws OrccException
+	 * @throws OrccRuntimeException
 	 *             if the object is already defined
 	 */
 	public void add(String file, Location location, String name, T object)
-			throws OrccException {
+			throws OrccRuntimeException {
 		if (map.containsKey(name)) {
-			throw new OrccException(file, location, "\"" + name
+			throw new OrccRuntimeException(file, location, "\"" + name
 					+ "\" already defined in this scope");
 		}
 

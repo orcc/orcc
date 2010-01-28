@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.util;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Location;
 
 /**
@@ -86,12 +86,12 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 *            the name of an object
 	 * @param object
 	 *            an object
-	 * @throws OrccException
+	 * @throws OrccRuntimeException
 	 *             if the object is already defined
 	 */
 	@Override
 	public void add(String file, Location location, String name, T object)
-			throws OrccException {
+			throws OrccRuntimeException {
 		if (allowOverride) {
 			// a variable is allowed to override a variable defined in a
 			// different scope
@@ -105,12 +105,12 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 				if (parent != null) {
 					existingObject = parent.get(name, false);
 					if (existingObject != null) {
-						throw new OrccException(file, location, "\"" + name
-								+ "\" already defined in parent scope");
+						throw new OrccRuntimeException(file, location, "\""
+								+ name + "\" already defined in parent scope");
 					}
 				}
 			} else {
-				throw new OrccException(file, location, "\"" + name
+				throw new OrccRuntimeException(file, location, "\"" + name
 						+ "\" already defined in this scope");
 			}
 
