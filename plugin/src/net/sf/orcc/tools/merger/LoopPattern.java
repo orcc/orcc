@@ -56,6 +56,11 @@ public class LoopPattern extends ExecutionPattern {
 	}
 
 	@Override
+	public int cost() {
+		return pattern.cost();
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof LoopPattern) {
 			LoopPattern other = (LoopPattern) obj;

@@ -85,11 +85,11 @@ public class StaticActorNormalizer {
 
 		private List<LocalVariable> indexes;
 
-		private Procedure procedure;
+		private Location location;
 
 		private List<CFGNode> nodes;
 
-		private Location location;
+		private Procedure procedure;
 
 		public MyPatternVisitor(Procedure procedure) {
 			this.procedure = procedure;

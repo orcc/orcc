@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.tools.merger;
 
-
 /**
  * This class defines a pattern. A pattern is the invocation of one or more
  * patterns. A pattern can invoke one action (simple pattern), a series of other
@@ -49,6 +48,15 @@ public abstract class ExecutionPattern {
 	 *            a visitor
 	 */
 	public abstract void accept(PatternVisitor visitor);
+
+	/**
+	 * Returns the cost of this pattern. The cost is determined from the number
+	 * of sequential patterns, for instance [a, b, a, b] is more expensive than
+	 * [2 x [a, b]].
+	 * 
+	 * @return the cost of this pattern
+	 */
+	public abstract int cost();
 
 	/**
 	 * Returns <code>true</code> if this pattern is a loop pattern.

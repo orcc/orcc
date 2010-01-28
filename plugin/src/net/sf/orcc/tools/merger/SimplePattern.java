@@ -44,10 +44,15 @@ public class SimplePattern extends ExecutionPattern {
 	public SimplePattern(Action action) {
 		this.action = action;
 	}
-	
+
 	@Override
 	public void accept(PatternVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public int cost() {
+		return 1;
 	}
 
 	public boolean equals(Object obj) {

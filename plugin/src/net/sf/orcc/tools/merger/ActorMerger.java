@@ -47,14 +47,6 @@ public class ActorMerger implements INetworkTransformation {
 	public ActorMerger() {
 	}
 
-	@Override
-	public void transform(Network network) throws OrccException {
-		boolean changed;
-		do {
-			changed = mergeActors();
-		} while (changed);
-	}
-
 	/**
 	 * Tries to merge actors.
 	 * 
@@ -63,6 +55,14 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private boolean mergeActors() {
 		return false;
+	}
+
+	@Override
+	public void transform(Network network) throws OrccException {
+		boolean changed;
+		do {
+			changed = mergeActors();
+		} while (changed);
 	}
 
 }

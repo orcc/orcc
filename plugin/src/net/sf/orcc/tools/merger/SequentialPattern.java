@@ -62,12 +62,34 @@ public class SequentialPattern extends ExecutionPattern implements
 	}
 
 	@Override
+	public int cost() {
+		int cost = 0;
+		for (ExecutionPattern pattern : patterns) {
+			cost += pattern.cost();
+		}
+		return cost;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof SequentialPattern) {
 			SequentialPattern other = (SequentialPattern) obj;
 			return patterns.equals(other.patterns);
 		}
 		return false;
+	}
+
+	public ExecutionPattern get(int index) {
+		return patterns.get(index);
+	}
+
+	public SequentialPattern getSubPattern(int beginIndex, int length) {
+		SequentialPattern pattern = new SequentialPattern();
+		for (int i = beginIndex; i < beginIndex + length; i++) {
+			pattern.add(patterns.get(i));
+		}
+
+		return pattern;
 	}
 
 	@Override
@@ -88,6 +110,15 @@ public class SequentialPattern extends ExecutionPattern implements
 	@Override
 	public Iterator<ExecutionPattern> iterator() {
 		return patterns.iterator();
+	}
+
+	/**
+	 * Returns the size of this pattern.
+	 * 
+	 * @return the size of this pattern
+	 */
+	public int size() {
+		return patterns.size();
 	}
 
 	@Override

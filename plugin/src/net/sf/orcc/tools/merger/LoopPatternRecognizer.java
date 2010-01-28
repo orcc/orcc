@@ -67,7 +67,7 @@ public class LoopPatternRecognizer {
 		}
 	}
 
-	private ExecutionPattern createSequential(List<Action> actions) {
+	private SequentialPattern createSequential(List<Action> actions) {
 		SequentialPattern pattern = new SequentialPattern();
 		for (Action action : actions) {
 			SimplePattern simple = new SimplePattern(action);
@@ -78,28 +78,104 @@ public class LoopPatternRecognizer {
 	}
 
 	/**
-	 * Finds a pattern in the given pattern.
+	 * Finds a loop pattern in the given sequential pattern.
 	 * 
 	 * @param pattern
-	 *            a pattern
-	 * @return a pattern (possibly the same)
+	 *            a sequential pattern
+	 * @return a sequential pattern (possibly the same)
 	 */
-	private ExecutionPattern findPattern(ExecutionPattern pattern) {
-		if (pattern.isSequential()) {
-			return findPatternSequential((SequentialPattern) pattern);
-		} else {
-			return pattern;
+	private SequentialPattern findHigherOrderLoopPattern(
+			SequentialPattern pattern, int length, SequentialPattern look) {
+		SequentialPattern newPattern = new SequentialPattern();
+		SequentialPattern sub = null;
+
+		int iterations = 0;
+		int maxIndex = pattern.size() - length - 1;
+		int i = 0;
+		while (i < maxIndex) {
+			sub = pattern.getSubPattern(i, length);
+			if (sub.equals(look)) {
+				iterations++;
+				i += length;
+			} else {
+				// add iterations of sub-pattern accumulated so far
+				if (iterations > 0) {
+					addPattern(newPattern, iterations, sub);
+				}
+
+				// add current element
+				newPattern.add(pattern.get(i));
+				iterations = 0;
+				i++;
+			}
 		}
+
+		// adds remaining iterations of sub-pattern
+		if (iterations > 0) {
+			addPattern(newPattern, iterations, sub);
+		}
+
+		// adds remaining non-recognized patterns
+		while (i < pattern.size()) {
+			newPattern.add(pattern.get(i));
+			i++;
+		}
+
+		return newPattern;
 	}
 
 	/**
-	 * Finds a pattern in the given sequential pattern.
+	 * Finds a higher-order pattern in the given sequential pattern.
+	 * 
+	 * @param pattern
+	 *            a sequential pattern
+	 * @return a sequential pattern (possibly the same)
+	 */
+	private SequentialPattern findHigherOrderPattern(SequentialPattern pattern) {
+		SequentialPattern best = pattern;
+		int maxPatternSize = pattern.size() / 2;
+		for (int i = 2; i < maxPatternSize; i++) {
+			SequentialPattern newPattern = findHigherOrderPattern(pattern, i);
+			if (newPattern.cost() < best.cost()) {
+				best = newPattern;
+			}
+		}
+
+		return best;
+	}
+
+	/**
+	 * Finds a higher-order pattern in the given sequential pattern, whose
+	 * length is given.
+	 * 
+	 * @param pattern
+	 *            a sequential pattern
+	 * @return a sequential pattern (possibly the same)
+	 */
+	private SequentialPattern findHigherOrderPattern(SequentialPattern pattern,
+			int length) {
+		SequentialPattern best = pattern;
+		int maxIndex = pattern.size() - length - 1;
+		for (int i = 0; i < maxIndex; i++) {
+			SequentialPattern look = pattern.getSubPattern(i, length);
+			SequentialPattern newPattern = findHigherOrderLoopPattern(pattern,
+					length, look);
+			if (newPattern.cost() < best.cost()) {
+				best = newPattern;
+			}
+		}
+
+		return best;
+	}
+
+	/**
+	 * Finds a loop pattern in the given sequential pattern.
 	 * 
 	 * @param oldPattern
 	 *            a sequential pattern
 	 * @return a sequential pattern (possibly the same)
 	 */
-	private ExecutionPattern findPatternSequential(SequentialPattern oldPattern) {
+	private SequentialPattern findLoopPattern(SequentialPattern oldPattern) {
 		Iterator<ExecutionPattern> it = oldPattern.iterator();
 		if (it.hasNext()) {
 			SequentialPattern newPattern = new SequentialPattern();
@@ -128,6 +204,28 @@ public class LoopPatternRecognizer {
 	}
 
 	/**
+	 * Finds a pattern in the given sequential pattern.
+	 * 
+	 * @param pattern
+	 *            a sequential pattern
+	 * @return a sequential pattern (possibly the same)
+	 */
+	private SequentialPattern findPattern(SequentialPattern pattern) {
+		SequentialPattern oldPattern;
+		do {
+			oldPattern = pattern;
+			pattern = findLoopPattern(oldPattern);
+		} while (!pattern.equals(oldPattern));
+
+		do {
+			oldPattern = pattern;
+			pattern = findHigherOrderPattern(oldPattern);
+		} while (!pattern.equals(oldPattern));
+
+		return pattern;
+	}
+
+	/**
 	 * Returns an execution pattern that matches the given list of actions.
 	 * 
 	 * @param actions
@@ -135,8 +233,8 @@ public class LoopPatternRecognizer {
 	 * @return an execution pattern that matches the given list of actions
 	 */
 	public ExecutionPattern getPattern(List<Action> actions) {
-		ExecutionPattern oldPattern;
-		ExecutionPattern newPattern = createSequential(actions);
+		SequentialPattern oldPattern;
+		SequentialPattern newPattern = createSequential(actions);
 		do {
 			oldPattern = newPattern;
 			newPattern = findPattern(oldPattern);
