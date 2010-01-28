@@ -37,9 +37,9 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
 $if(variable.constantValue)$
-$variable.type$ actor_$actorName$::$variable$$listSize(variable.type.dimensions)$ = $variable.constantValue$;$\n$
+$variableDeclaration(variable)$ = $variable.constantValue$;$\n$
 $else$
-$variable.type$ actor_$actorName$::$variable$$listSize(variable.type.dimensions)$;$\n$
+$variableDeclaration(variable)$;$\n$
 $endif$
 >>
 
@@ -82,18 +82,18 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 
 Peek(peek) ::= <<
 $if(peek.unit)$
-m_poTabIn[$actorName$_$peek.port$]->peek($peek.target$);
+m_poTabIn[$actorName$_$peek.port$]->peek($peek.target$);$\n$
 $else$
-m_poTabIn[$actorName$_$peek.port$]->peek($peek.target$, $peek.numTokens$);
+m_poTabIn[$actorName$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
 $endif$
 
 >>
 
 Read(read) ::= <<
 $if(read.unit)$
-m_poTabIn[$actorName$_$read.port$]->get($read.target$);
+m_poTabIn[$actorName$_$read.port$]->get($read.target$);$\n$
 $else$
-m_poTabIn[$actorName$_$read.port$]->get($read.target$, $read.numTokens$);
+m_poTabIn[$actorName$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
 $endif$
 
 >>
@@ -122,9 +122,9 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 
 Write(write) ::= <<
 $if(write.unit)$
-m_poTabOut[$actorName$_$write.port$]->put($write.target$);
+m_poTabOut[$actorName$_$write.port$]->put($write.target$);$\n$
 $else$
-m_poTabOut[$actorName$_$write.port$]->put($write.target$, $write.numTokens$);
+m_poTabOut[$actorName$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
 $endif$
 
 >>
@@ -331,7 +331,9 @@ actor(actorName, actor) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
-$actor.stateVars.list: stateVar(it)$
+namespace
+{
+	$actor.stateVars.list: stateVar(it)$}
 
 actor_$actorName$::actor_$actorName$():ActorGen($actorName$_IPORT_SIZE, $actorName$_OPORT_SIZE)
 {
