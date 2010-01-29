@@ -28,31 +28,34 @@
  */
 package net.sf.orcc.backends.vhdl.transforms;
 
+import java.util.List;
+
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.type.ListType;
 
 /**
- * This class defines an actor transformation that renames all variables inside
- * a procedure by prefixing them with the name of the procedure. New variables
- * must not be added to any procedure after this pass, for they won't be
- * renamed.
+ * This class defines an actor transformation that modify the dimension of size
+ * = 1 variables. It avert the tables of size 1 (0 downto 0) in VHDL.
  * 
- * @author Matthieu Wipliez
+ * @author Nicolas Siret
  * 
  */
-public class VariableRenamer extends AbstractActorTransformation {
+public class VariableRedimension extends AbstractActorTransformation {
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
-		String procName = procedure.getName();	
 		for (Variable variable : procedure.getLocals()) {
 			LocalVariable local = (LocalVariable) variable;
-			if (local.getBaseName().contains("tmp"))
-				variable.setName(procName);
-			else
-				variable.setName(procName + "_" + local.getBaseName());
+			//System.out.println("local : " + local.getType().getDimensions());
+			List<Integer> dimensions = local.getType().getDimensions();
+			if (!dimensions.isEmpty() && dimensions.get(0).equals(1)) {
+				Type type = ((ListType) local.getType()).getElementType();
+				local.setType(type);
+			}
 		}
 	}
 

@@ -34,6 +34,7 @@ import java.io.File;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.vhdl.transforms.VariableRenamer;
+import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
@@ -81,7 +82,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new Inline(), new PhiRemoval(), new VariableRenamer() };
+				new Inline(), new PhiRemoval(), new VariableRenamer(), new VariableRedimension() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

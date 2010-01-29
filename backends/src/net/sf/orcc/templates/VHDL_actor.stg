@@ -1,19 +1,28 @@
 group VHDL_actor;
 
 fifo_in(port) ::= <<
-$actorName$_$port.name$ : in fifo_bus_in;$"\n"$
+$actorName$_$port.name$_data  : in $port.type$;
+$actorName$_$port.name$_empty : in std_logic;
+$actorName$_$port.name$_read  : out std_logic;
+
 >>
+
 fifo_out(port) ::= <<
-$actorName$_$port.name$_read : out std_logic;
+$actorName$_$port.name$_full  : in std_logic;
 $if(last(port.name))$
-$actorName$_$port.name$ : out fifo_bus_out
+$actorName$_$port.name$_data  : out $port.type$;
+$actorName$_$port.name$_write : out std_logic
 $else$
-$actorName$_$port.name$ : out fifo_bus_out;
+$actorName$_$port.name$_data  : out $port.type$;
+$actorName$_$port.name$_write : out std_logic;
 $endif$
 >>
 
 fifo_in_init(port) ::=<<
-read_FIFO_$actorName$_$port.name$ <= '0';$"\n"$
+$actorName$_$port.name$_read <= '0';$"\n"$
+>>
+fifo_out_init(port) ::=<<
+$actorName$_$port.name$_write <= '0';$"\n"$
 >>
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
@@ -44,6 +53,7 @@ $endif$
 >>
 
 variableDeclaration(variable) ::= <<
+$variable.type.dimensions$
 $if(variable.port)$
 variable $variable$ : $variable.type$
 $else$
@@ -94,16 +104,17 @@ $call.procedure$($call.parameters; separator=", "$);
 
 //$hasTokens.target$ = hasTokens($actorName$_$hasTokens.port$, $hasTokens.numTokens$);
 HasTokens(hasTokens) ::= <<
-$hasTokens.target$ := not $actorName$_$hasTokens.port$.empty;
+$hasTokens.target$ := not $actorName$_$hasTokens.port$_empty;
 
 >>
 
 Load(load) ::= <<
 $if(!(load.indexes : {$it$}))$
-$load.target$ := $load.source$;
+$load.target$ := $load.source$; 
 
 $else$
-$load.target$ := $load.source$;
+-- tab not implemented yet
+$load.target$ := $load.source$;   --$load.indexes : {$it$}$
 
 $endif$
 >>
@@ -113,7 +124,7 @@ Peek(peek) ::= <<
 
 >>
 // $if(peek.numTokens)$
-// $peek.target$ := $actorName$_$peek.port$.data;
+// $peek.target$ := $actorName$_$peek.port$_data;
 // read_FIFO_$actorName$_$peek.port$ <= '1';
 // $else$
 // -- ERROR multiple token : $peek.numTokens$ 
@@ -122,8 +133,8 @@ Peek(peek) ::= <<
 
 Read(read) ::= <<
 $if(read.unit)$
-$read.target$ := to_integer(unsigned($actorName$_$read.port$.data));
-$actorName$_$read.port$.read <= '1';
+$read.target$ := $actorName$_$read.port$_data;
+$actorName$_$read.port$_read <= '1';
 $else$
 -- read multiple token not coded yet
 $endif$
@@ -145,13 +156,20 @@ $endif$
 >>
 
 Store(store) ::= <<
-$store.target$$store.indexes : {[$it$]}$ <= $store.value$;
+$if(!(store.indexes : {$it$}))$
+$store.target$ <= $store.value$;
+
+$else$
+-- tab not implemented yet
+$store.target$ <= $store.value$; -- [$store.indexes : {$it$}$]
+
+$endif$
 
 >>
 
 Write(write) ::= <<
-$actorName$_$write.port$.data <= $write.target$;
-$actorName$_$write.port$.write <= '1';
+$actorName$_$write.port$_data <= $write.target$;
+$actorName$_$write.port$_write <= '1';
 
 >>
 
@@ -176,7 +194,7 @@ $instructions(blockNode.instructions)$
 
 // if node
 IfNode(ifNode) ::= <<
-if ($ifNode.value$ = '1') then
+if ($ifNode.value$) then
 	$nodes(ifNode.thenNodes)$$if(ifNode.elseNodes)$else
 	$nodes(ifNode.elseNodes)$end if;	
 	$endif$
@@ -203,21 +221,22 @@ procedure_init(procedure) ::= <<
 $if(procedure.locals.list)$
 $procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
 $endif$
+
 >>
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 action(action) ::= <<
 when isSchedulable_$action$ =>
-  $procedure(action.scheduler)$$action.scheduler$_done := '1'
-
+  $procedure(action.scheduler)$$action.scheduler$_done := '1';
 
 >>
-//$procedure(action.body)$$procedure(action.scheduler)$
 
 
 action_init(action) ::= <<
-$procedure_init(action.body)$$procedure_init(action.scheduler)$
+$procedure_init(action.body)$$procedure_init(action.scheduler)$variable $action.scheduler$_done : std_logic;
+variable $action.scheduler$_go : std_logic;
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -225,7 +244,7 @@ $procedure_init(action.body)$$procedure_init(action.scheduler)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|$actorName$_$port$.full = '0'}; separator=" and "$
+$pattern.keys:{port|$actorName$_$port$_full = '0'}; separator=" and "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -236,19 +255,20 @@ $procedure(action.body)$
 >>
 
 actionTest(action) ::= <<
-(isSchedulable_$action$_done = '1' and isSchedulable_$action$_go = '1')
+(isSchedulable_$action$_done = '1' and isSchedulable_$action$_go = '1') then
 	$if(action.outputPattern)$
 	if ($outputPattern(pattern=action.outputPattern)$) then
 		$actionCall(action)$
 	end if;
 	$else$
 	$procedure(action.body)$
-	$endif$elsif (isSchedulable_$action$_done = '0')
+	$endif$elsif (isSchedulable_$action$_done = '0') then
   FSM <= isSchedulable_$action$;
 >>
 
 schedulingTest(actions) ::= <<
 if $actions: actionTest(action=it); separator="\n--\nelsif"$
+end if;
 >>
 
 scheduler(actions) ::= <<
@@ -359,7 +379,7 @@ actor(actorName, actor) ::= <<
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 
 library work;
 use work.type_package.all;
@@ -367,9 +387,9 @@ use work.type_package.all;
 entity $actor.name$ is
   port (
   -- Inputs
-  $actor.inputs.list: fifo_in(it)$  clock   : in std_logic;
+  clock   : in std_logic;
   reset_n : in std_logic;
-  -- Outputs
+  $actor.inputs.list: fifo_in(it)$-- Outputs
   $actor.outputs.list: fifo_out(it)$);
 end $actor.name$;
 
@@ -388,12 +408,12 @@ begin
   $actor.name$_Proc : process (reset_n, clock) is
     $actor.actions: action_init(it)$  --
   begin
-    if reset_n = 0 then 
+    if reset_n = '0' then 
       $InitFSM(fsm=actor.actionScheduler.fsm)$
-      $actor.inputs.list: fifo_in_init(it)$      --
-      $actor.stateVars.list: InitConst(it); separator=""$    --
-    elsif rising_edge(clock)
-      $actor.inputs.list: fifo_in_init(it)$
+      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
+    elsif rising_edge(clock) then
+      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
+      case FSM is
       $if(actor.actionScheduler.fsm)$
       $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
       $actor.actions: action(it)$
@@ -410,7 +430,9 @@ begin
 	    FSM <= compute;
       $endif$
       $endif$
-      
+      end case;
+    end if;      
+  end process $actor.name$_Proc;
       
 end architecture rtl_$actor.name$;
 >>
