@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.ir.instructions;
 
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TargetContainer;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -48,10 +48,10 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 
 	private Port port;
 
-	private LocalVariable target;
+	private Variable target;
 
 	public AbstractFifoInstruction(Location location, Port port, int numTokens,
-			LocalVariable target) {
+			Variable target) {
 		super(location);
 		this.numTokens = numTokens;
 		setPort(port);
@@ -77,7 +77,7 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 	}
 
 	@Override
-	public LocalVariable getTarget() {
+	public Variable getTarget() {
 		return target;
 	}
 
@@ -116,12 +116,12 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void setTarget(Variable target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 
 	@Override
-	public void setTargetSimple(LocalVariable target) {
+	public void setTargetSimple(Variable target) {
 		this.target = target;
 	}
 

@@ -46,7 +46,6 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -259,7 +258,7 @@ public class TimeDependencyAnalyzer {
 		 * @param variable
 		 *            a state variable or a port
 		 */
-		private void associateVariable(LocalVariable target, Variable variable) {
+		private void associateVariable(Variable target, Variable variable) {
 			IntVariable intVar = variables.get(variable);
 			if (intVar == null) {
 				// create int variable associated with given variable

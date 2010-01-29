@@ -33,7 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.TargetContainer;
+import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -44,7 +44,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Load extends AbstractInstruction implements TargetContainer {
+public class Load extends AbstractInstruction implements LocalTargetContainer {
 
 	private List<Expression> indexes;
 

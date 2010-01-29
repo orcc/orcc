@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir.instructions;
 
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Variable;
 
 /**
  * This class defines a Read instruction.
@@ -40,9 +40,12 @@ import net.sf.orcc.ir.Port;
  */
 public class Read extends AbstractFifoInstruction {
 
-	public Read(Location location, Port port, int numTokens,
-			LocalVariable varDef) {
+	public Read(Location location, Port port, int numTokens, Variable varDef) {
 		super(location, port, numTokens, varDef);
+	}
+
+	public Read(Port port, int numTokens, Variable varDef) {
+		this(new Location(), port, numTokens, varDef);
 	}
 
 	@Override

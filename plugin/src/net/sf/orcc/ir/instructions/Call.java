@@ -34,7 +34,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.TargetContainer;
+import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -45,7 +45,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Call extends AbstractInstruction implements TargetContainer {
+public class Call extends AbstractInstruction implements LocalTargetContainer {
 
 	private List<Expression> parameters;
 

@@ -59,6 +59,10 @@ public class Store extends AbstractInstruction implements ValueContainer {
 		setValue(value);
 	}
 
+	public Store(Use target, List<Expression> indexes, Expression value) {
+		this(new Location(), target, indexes, value);
+	}
+
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);

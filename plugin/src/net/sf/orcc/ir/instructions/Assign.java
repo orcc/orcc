@@ -31,7 +31,7 @@ package net.sf.orcc.ir.instructions;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.TargetContainer;
+import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -42,7 +42,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Assign extends AbstractInstruction implements TargetContainer,
+public class Assign extends AbstractInstruction implements LocalTargetContainer,
 		ValueContainer {
 
 	private LocalVariable target;

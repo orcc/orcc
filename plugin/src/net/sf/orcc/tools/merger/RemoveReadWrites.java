@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,37 +26,57 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir;
+package net.sf.orcc.tools.merger;
+
+import java.util.Iterator;
+import java.util.ListIterator;
+
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.util.OrderedMap;
 
 /**
- * This interface defines a node that has a target local variable.
+ * This class defines a transform that removes reads and writes.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface TargetContainer {
+public class RemoveReadWrites extends AbstractActorTransformation {
 
-	/**
-	 * Returns the target of this node.
-	 * 
-	 * @return the target of this node
-	 */
-	public Variable getTarget();
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Read read, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		read.getTarget().removeUse(read);
+		read.getPort().removeUse(read);
+		it.remove();
+	}
 
-	/**
-	 * Sets the target of this node. Uses are updated to point to this node.
-	 * 
-	 * @param target
-	 *            a variable
-	 */
-	public void setTarget(Variable target);
-
-	/**
-	 * Sets the target of this node without updating the use list.
-	 * 
-	 * @param target
-	 *            a variable
-	 */
-	public void setTargetSimple(Variable target);
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Write write, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		write.getTarget().removeUse(write);
+		write.getPort().removeUse(write);
+		it.remove();
+	}
+	
+	public void visitProcedure(Procedure procedure) {
+		OrderedMap<Variable> locals = procedure.getLocals();
+		Iterator<Variable> it = locals.iterator();
+		while (it.hasNext()) {
+			LocalVariable local = (LocalVariable) it.next();
+			if (local.isPort()) {
+				it.remove();
+			}
+		}
+		
+		super.visitProcedure(procedure);
+	}
 
 }

@@ -33,21 +33,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.classes.StaticClass;
+import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -56,11 +59,15 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
 
@@ -166,6 +173,8 @@ public class StaticActorNormalizer {
 
 	private Actor actor;
 
+	private OrderedMap<Variable> stateVars;
+
 	private StaticClass staticCls;
 
 	private OrderedMap<Variable> variables;
@@ -175,6 +184,44 @@ public class StaticActorNormalizer {
 	 */
 	public StaticActorNormalizer(Actor actor) {
 		this.actor = actor;
+		staticCls = (StaticClass) actor.getActorClass();
+		stateVars = actor.getStateVars();
+	}
+
+	/**
+	 * Adds state variables to hold the values of data read/stored in the given
+	 * pattern. Initializes count to 0.
+	 * 
+	 * @param procedure
+	 *            body of the target action
+	 * @param pattern
+	 *            input or output pattern
+	 */
+	private void addStateVariables(Procedure procedure, Pattern pattern) {
+		BlockNode block = BlockNode.last(procedure, procedure.getNodes());
+		for (Entry<Port, Integer> entry : pattern.entrySet()) {
+			Port port = entry.getKey();
+			int numTokens = entry.getValue();
+
+			Expression size = new IntExpr(numTokens);
+			Type type = new ListType(size, port.getType());
+			StateVariable var = new StateVariable(new Location(), type, port
+					.getName(), false, (Constant) null);
+			stateVars.add(actor.getFile(), var.getLocation(), var.getName(),
+					var);
+
+			StateVariable varCount = new StateVariable(new Location(),
+					new IntType(new IntExpr(32)), port.getName() + "_count",
+					true, new IntConst(0));
+			stateVars.add(actor.getFile(), varCount.getLocation(), varCount
+					.getName(), varCount);
+
+			Use use = new Use(varCount);
+			Store store = new Store(use, new ArrayList<Expression>(),
+					new IntExpr(0));
+			use.setNode(store);
+			block.add(store);
+		}
 	}
 
 	/**
@@ -216,6 +263,28 @@ public class StaticActorNormalizer {
 		}
 	}
 
+	/**
+	 * Creates the static action for this actor.
+	 * 
+	 * @return a static action
+	 */
+	private Action createAction() {
+		Procedure scheduler = createScheduler();
+		Procedure body = createBody();
+
+		Pattern input = staticCls.getInputPattern();
+		Pattern output = staticCls.getOutputPattern();
+		Tag tag = new Tag();
+		tag.add(ACTION_NAME);
+
+		return new Action(new Location(), tag, input, output, scheduler, body);
+	}
+
+	/**
+	 * Creates the body of the static action.
+	 * 
+	 * @return the body of the static action
+	 */
 	private Procedure createBody() {
 		Location location = new Location();
 		variables = new OrderedMap<Variable>();
@@ -224,11 +293,27 @@ public class StaticActorNormalizer {
 		Procedure procedure = new Procedure(ACTION_NAME, false, location,
 				new VoidType(), new OrderedMap<Variable>(), variables, nodes);
 
-		// finds a pattern in the actions
+		// add state variables
+		addStateVariables(procedure, staticCls.getInputPattern());
+		addStateVariables(procedure, staticCls.getOutputPattern());
+		
+		// change accesses to FIFO
+		new ChangeFifoArrayAccess().transform(actor);
+		
+		// removes read/writes
+		new RemoveReadWrites().transform(actor);
+
+		// add read instructions for input pattern
+		createReads(procedure);
+
+		// finds a pattern in the actions and visit it
 		LoopPatternRecognizer r = new LoopPatternRecognizer();
 		ExecutionPattern pattern = r.getPattern(staticCls.getActions());
 		System.out.println(pattern);
 		pattern.accept(new MyPatternVisitor(procedure));
+
+		// add write instructions for output pattern
+		createWrites(procedure);
 
 		return procedure;
 	}
@@ -266,9 +351,8 @@ public class StaticActorNormalizer {
 	 * 
 	 * @param block
 	 *            the block to which hasTokens instructions are added
-	 * @throws OrccException
 	 */
-	private void createInputTests(BlockNode block) throws OrccException {
+	private void createInputTests(BlockNode block) {
 		Pattern inputPattern = staticCls.getInputPattern();
 		int i = 0;
 		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
@@ -289,12 +373,30 @@ public class StaticActorNormalizer {
 	}
 
 	/**
+	 * Creates calls to Read instructions.
+	 * 
+	 * @param procedure
+	 *            the body of the static action being created
+	 */
+	private void createReads(Procedure procedure) {
+		Pattern inputPattern = staticCls.getInputPattern();
+		BlockNode block = BlockNode.last(procedure, procedure.getNodes());
+		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
+			Port port = entry.getKey();
+			int numTokens = entry.getValue();
+			Variable var = stateVars.get(port.getName());
+
+			Read read = new Read(port, numTokens, var);
+			block.add(read);
+		}
+	}
+
+	/**
 	 * Creates an "isSchedulable" procedure for the static action of this actor.
 	 * 
 	 * @return an "isSchedulable" procedure
-	 * @throws OrccException
 	 */
-	private Procedure createScheduler() throws OrccException {
+	private Procedure createScheduler() {
 		Location location = new Location();
 		variables = new OrderedMap<Variable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
@@ -312,26 +414,32 @@ public class StaticActorNormalizer {
 	}
 
 	/**
+	 * Creates calls to Write instructions.
+	 * 
+	 * @param procedure
+	 *            the body of the static action being created
+	 */
+	private void createWrites(Procedure procedure) {
+		Pattern inputPattern = staticCls.getOutputPattern();
+		BlockNode block = BlockNode.last(procedure, procedure.getNodes());
+		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
+			Port port = entry.getKey();
+			int numTokens = entry.getValue();
+			Variable var = stateVars.get(port.getName());
+
+			Write write = new Write(port, numTokens, var);
+			block.add(write);
+		}
+	}
+
+	/**
 	 * Normalizes this actor so it fits the given static class.
 	 * 
 	 * @param staticCls
 	 *            a static class
-	 * @throws OrccException
 	 */
-	public void normalize() throws OrccException {
-		staticCls = (StaticClass) actor.getActorClass();
-		Procedure scheduler = createScheduler();
-		Procedure body = createBody();
-
-		Pattern input = staticCls.getInputPattern();
-		Pattern output = staticCls.getOutputPattern();
-		Tag tag = new Tag();
-		tag.add(ACTION_NAME);
-
-		Action staticAction = new Action(new Location(), tag, input, output,
-				scheduler, body);
-
-		// removes useless stuff, add the static action
+	public void normalize() {
+		Action staticAction = createAction();
 		cleanupActor();
 		addStaticAction(staticAction);
 	}

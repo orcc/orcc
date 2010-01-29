@@ -34,29 +34,29 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public interface TargetContainer {
+public interface LocalTargetContainer {
 
 	/**
 	 * Returns the target of this node.
 	 * 
 	 * @return the target of this node
 	 */
-	public Variable getTarget();
+	public LocalVariable getTarget();
 
 	/**
 	 * Sets the target of this node. Uses are updated to point to this node.
 	 * 
 	 * @param target
-	 *            a variable
+	 *            a local variable
 	 */
-	public void setTarget(Variable target);
+	public void setTarget(LocalVariable target);
 
 	/**
 	 * Sets the target of this node without updating the use list.
 	 * 
 	 * @param target
-	 *            a variable
+	 *            a local variable
 	 */
-	public void setTargetSimple(Variable target);
+	public void setTargetSimple(LocalVariable target);
 
 }
