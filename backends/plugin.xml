@@ -69,6 +69,10 @@
           class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
           name="VHDL">
        <option>
+          <inputFile
+                caption="Input file:"
+                extension="xdf">
+          </inputFile>
        </option>
     </backend>
     <backend

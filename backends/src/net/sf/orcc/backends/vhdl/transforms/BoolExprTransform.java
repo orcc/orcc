@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,57 +26,18 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl;
+package net.sf.orcc.backends.vhdl.transforms;
 
-import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
+import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
- * This class defines a VHDL expression printer.
+ * This class defines an actor transformation that transforms assignments whose
+ * right hand side is a boolean expression to if nodes.
  * 
+ * @author Matthieu Wipliez
  * @author Nicolas Siret
  * 
  */
-public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
-
-	@Override
-	protected String toString(BinaryOp op) {
-		switch (op) {
-		case EQ:
-			return "=";
-		case LOGIC_AND:
-			return "and";
-		case LOGIC_OR:
-			return "or";
-		case NE:
-			return "/=";
-		default:
-			return op.getText();
-		}
-	}
-
-	@Override
-	protected String toString(UnaryOp op) {
-		switch (op) {
-		case LOGIC_NOT:
-			return "not";
-		default:
-			return op.getText();
-		}
-	}
-
-	@Override
-	public void visit(BoolExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "'1'" : "'0'");
-	}
-
-	@Override
-	public void visit(ListExpr expr, Object... args) {
-		throw new OrccRuntimeException("List expression not supported");
-	}
+public class BoolExprTransform extends AbstractActorTransformation {
 
 }

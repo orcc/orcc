@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,57 +26,59 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl;
+package net.sf.orcc.backends.vhdl.transforms;
 
-import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
+import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.type.BoolType;
 
 /**
- * This class defines a VHDL expression printer.
+ * This class defines an actor transformation that transform the simple
+ * condition tests <code>var</code> and <code>not var</code> to
+ * <code>var = true</code> and to <code>var = false</code> respectively.
  * 
+ * @author Matthieu Wipliez
  * @author Nicolas Siret
  * 
  */
-public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
+public class TransformConditionals extends AbstractActorTransformation {
 
-	@Override
-	protected String toString(BinaryOp op) {
-		switch (op) {
-		case EQ:
-			return "=";
-		case LOGIC_AND:
-			return "and";
-		case LOGIC_OR:
-			return "or";
-		case NE:
-			return "/=";
-		default:
-			return op.getText();
+	private Expression changeConditional(Expression expr) {
+		if (expr.getType() == Expression.VAR) {
+			VarExpr varExpr = (VarExpr) expr;
+			return new BinaryExpr(new Location(), varExpr, BinaryOp.EQ,
+					new BoolExpr(new Location(), true), new BoolType());
+		} else if (expr.getType() == Expression.UNARY) {
+			UnaryExpr unaryExpr = (UnaryExpr) expr;
+			if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT) {
+				return new BinaryExpr(new Location(), unaryExpr.getExpr(),
+						BinaryOp.EQ, new BoolExpr(new Location(), false),
+						new BoolType());
+			}
 		}
+
+		return expr;
 	}
 
 	@Override
-	protected String toString(UnaryOp op) {
-		switch (op) {
-		case LOGIC_NOT:
-			return "not";
-		default:
-			return op.getText();
-		}
+	public void visit(IfNode node, Object... args) {
+		node.setValue(changeConditional(node.getValue()));
+		super.visit(node, args);
 	}
 
 	@Override
-	public void visit(BoolExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "'1'" : "'0'");
-	}
-
-	@Override
-	public void visit(ListExpr expr, Object... args) {
-		throw new OrccRuntimeException("List expression not supported");
+	public void visit(WhileNode node, Object... args) {
+		node.setValue(changeConditional(node.getValue()));
+		super.visit(node, args);
 	}
 
 }

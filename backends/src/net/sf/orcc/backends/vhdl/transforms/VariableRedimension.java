@@ -39,7 +39,7 @@ import net.sf.orcc.ir.type.ListType;
 
 /**
  * This class defines an actor transformation that modify the dimension of size
- * = 1 variables. It avert the tables of size 1 (0 downto 0) in VHDL.
+ * = 1 variables to avoid generating tables of size 1 (0 downto 0) in VHDL.
  * 
  * @author Nicolas Siret
  * 
@@ -50,7 +50,7 @@ public class VariableRedimension extends AbstractActorTransformation {
 	public void visitProcedure(Procedure procedure) {
 		for (Variable variable : procedure.getLocals()) {
 			LocalVariable local = (LocalVariable) variable;
-			//System.out.println("local : " + local.getType().getDimensions());
+			// System.out.println("local : " + local.getType().getDimensions());
 			List<Integer> dimensions = local.getType().getDimensions();
 			if (!dimensions.isEmpty() && dimensions.get(0).equals(1)) {
 				Type type = ((ListType) local.getType()).getElementType();
