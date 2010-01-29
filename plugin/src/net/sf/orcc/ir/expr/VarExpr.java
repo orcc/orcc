@@ -47,6 +47,10 @@ public class VarExpr extends AbstractExpression {
 		this.use = use;
 	}
 
+	public VarExpr(Use use) {
+		this(new Location(), use);
+	}
+
 	@Override
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);

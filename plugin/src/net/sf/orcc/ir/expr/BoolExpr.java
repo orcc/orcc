@@ -40,6 +40,10 @@ public class BoolExpr extends AbstractExpression {
 
 	private boolean value;
 
+	public BoolExpr(boolean value) {
+		this(new Location(), value);
+	}
+
 	public BoolExpr(Location location, boolean value) {
 		super(location);
 		this.value = value;

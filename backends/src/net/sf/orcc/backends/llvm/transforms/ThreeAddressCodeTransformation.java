@@ -143,7 +143,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 			switch (expr.getOp()) {
 			case MINUS:
-				constExpr = new IntExpr(new Location(), 0);
+				constExpr = new IntExpr(0);
 				binary = new BinaryExpr(loc, constExpr, BinaryOp.MINUS, exprE1,
 						type);
 				return binary.accept(this, args);

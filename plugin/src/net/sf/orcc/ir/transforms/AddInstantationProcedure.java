@@ -79,10 +79,9 @@ public class AddInstantationProcedure implements ActorTransformation {
 		parameters.add(file, location, "fifo", parameter);
 		for (Port port : ports) {
 			Use varUse = new Use(parameter);
-			VarExpr expr = new VarExpr(new Location(), varUse);
+			VarExpr expr = new VarExpr(varUse);
 
-			InitPort node = new InitPort(new Location(), port.getName(), 0,
-					expr);
+			InitPort node = new InitPort(port.getName(), 0, expr);
 			block.add(node);
 		}
 

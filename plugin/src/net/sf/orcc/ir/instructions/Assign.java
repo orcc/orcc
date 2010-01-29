@@ -49,6 +49,10 @@ public class Assign extends AbstractInstruction implements TargetContainer,
 
 	private Expression value;
 
+	public Assign(LocalVariable target, Expression value) {
+		this(new Location(), target, value);
+	}
+
 	public Assign(Location location, LocalVariable target, Expression value) {
 		super(location);
 		setTarget(target);

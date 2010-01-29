@@ -171,14 +171,12 @@ public class ActionParser {
 	private Procedure createSchedulingProcedure(Procedure body, Tree guards) {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
-		Location location = new Location();
-
 		Procedure scheduler = new Procedure("isSchedulable_" + body.getName(),
-				false, location, new BoolType(), new OrderedMap<Variable>(),
-				new OrderedMap<Variable>(), nodes);
+				false, new Location(), new BoolType(),
+				new OrderedMap<Variable>(), new OrderedMap<Variable>(), nodes);
 
 		BlockNode block = new BlockNode(scheduler);
-		block.add(new Return(location, new BoolExpr(location, true)));
+		block.add(new Return(new BoolExpr(true)));
 		nodes.add(block);
 
 		return scheduler;

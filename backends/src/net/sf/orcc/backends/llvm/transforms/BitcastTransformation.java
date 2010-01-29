@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.llvm.transforms;
 
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -55,8 +54,8 @@ public class BitcastTransformation extends AbstractActorTransformation {
 			Expression e1 = new IntExpr(0);
 			BinaryOp op = BinaryOp.PLUS;
 
-			Expression newExpr = new BinaryExpr(new Location(), e1, op, expr,
-					new IntType(new IntExpr(32)));
+			Expression newExpr = new BinaryExpr(e1, op, expr, new IntType(
+					new IntExpr(32)));
 			assign.setValue(newExpr);
 		}
 	}

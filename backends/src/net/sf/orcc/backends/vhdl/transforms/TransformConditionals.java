@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.vhdl.transforms;
 
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -55,14 +54,13 @@ public class TransformConditionals extends AbstractActorTransformation {
 	private Expression changeConditional(Expression expr) {
 		if (expr.getType() == Expression.VAR) {
 			VarExpr varExpr = (VarExpr) expr;
-			return new BinaryExpr(new Location(), varExpr, BinaryOp.EQ,
-					new BoolExpr(new Location(), true), new BoolType());
+			return new BinaryExpr(varExpr, BinaryOp.EQ, new BoolExpr(true),
+					new BoolType());
 		} else if (expr.getType() == Expression.UNARY) {
 			UnaryExpr unaryExpr = (UnaryExpr) expr;
 			if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT) {
-				return new BinaryExpr(new Location(), unaryExpr.getExpr(),
-						BinaryOp.EQ, new BoolExpr(new Location(), false),
-						new BoolType());
+				return new BinaryExpr(unaryExpr.getExpr(), BinaryOp.EQ,
+						new BoolExpr(false), new BoolType());
 			}
 		}
 

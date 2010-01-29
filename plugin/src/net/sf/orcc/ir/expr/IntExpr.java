@@ -47,8 +47,7 @@ public class IntExpr extends AbstractExpression {
 	 *            an integer value.
 	 */
 	public IntExpr(int value) {
-		super(new Location());
-		this.value = value;
+		this(new Location(), value);
 	}
 
 	/**

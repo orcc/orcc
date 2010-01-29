@@ -52,6 +52,11 @@ public class WhileNode extends AbstractNode implements ValueContainer {
 
 	private Expression value;
 
+	public WhileNode(Procedure procedure, Expression condition,
+			List<CFGNode> nodes, BlockNode joinNode) {
+		this(new Location(), procedure, condition, nodes, joinNode);
+	}
+
 	public WhileNode(Location location, Procedure procedure,
 			Expression condition, List<CFGNode> nodes, BlockNode joinNode) {
 		super(location, procedure);

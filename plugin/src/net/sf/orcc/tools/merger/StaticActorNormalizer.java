@@ -85,8 +85,6 @@ public class StaticActorNormalizer {
 
 		private List<LocalVariable> indexes;
 
-		private Location location;
-
 		private List<CFGNode> nodes;
 
 		private Procedure procedure;
@@ -95,7 +93,6 @@ public class StaticActorNormalizer {
 			this.procedure = procedure;
 			nodes = procedure.getNodes();
 			indexes = new ArrayList<LocalVariable>();
-			location = new Location();
 		}
 
 		@Override
@@ -104,8 +101,8 @@ public class StaticActorNormalizer {
 			if (indexes.size() < depth) {
 				LocalVariable varDef = new LocalVariable(true, depth - 1,
 						new Location(), "loop", null, null, new BoolType());
-				variables.add(actor.getFile(), location, varDef.getName(),
-						varDef);
+				variables.add(actor.getFile(), varDef.getLocation(), varDef
+						.getName(), varDef);
 				indexes.add(varDef);
 			}
 
@@ -113,21 +110,21 @@ public class StaticActorNormalizer {
 
 			// init var
 			BlockNode block = BlockNode.last(procedure, nodes);
-			Assign assign = new Assign(location, loopVar, new IntExpr(0));
+			Assign assign = new Assign(loopVar, new IntExpr(0));
 			block.add(assign);
 
 			// create while
 			List<CFGNode> oldNodes = nodes;
 			nodes = new ArrayList<CFGNode>();
 
-			WhileNode whileNode = new WhileNode(location, procedure, null,
-					nodes, new BlockNode(procedure));
+			WhileNode whileNode = new WhileNode(procedure, null, nodes,
+					new BlockNode(procedure));
 			oldNodes.add(whileNode);
 
 			// assign condition
-			Expression condition = new BinaryExpr(location, new VarExpr(
-					location, new Use(loopVar, whileNode)), BinaryOp.LT,
-					new IntExpr(pattern.getNumIterations()), new BoolType());
+			Expression condition = new BinaryExpr(new VarExpr(new Use(loopVar,
+					whileNode)), BinaryOp.LT, new IntExpr(pattern
+					.getNumIterations()), new BoolType());
 			whileNode.setValue(condition);
 
 			// accept sub pattern
@@ -135,10 +132,10 @@ public class StaticActorNormalizer {
 
 			// add assign
 			block = BlockNode.last(procedure, nodes);
-			assign = new Assign(location, loopVar, null);
-			assign.setValue(new BinaryExpr(location, new VarExpr(location,
-					new Use(loopVar, assign)), BinaryOp.PLUS, new IntExpr(1),
-					new IntType(new IntExpr(32))));
+			assign = new Assign(loopVar, null);
+			assign.setValue(new BinaryExpr(
+					new VarExpr(new Use(loopVar, assign)), BinaryOp.PLUS,
+					new IntExpr(1), new IntType(new IntExpr(32))));
 			block.add(assign);
 
 			// restore stuff
@@ -215,8 +212,7 @@ public class StaticActorNormalizer {
 			nodes.clear();
 			BlockNode block = new BlockNode(scheduler);
 			nodes.add(block);
-			block.add(new Return(new Location(), new BoolExpr(new Location(),
-					true)));
+			block.add(new Return(new Location(), new BoolExpr(true)));
 		}
 	}
 
@@ -245,25 +241,23 @@ public class StaticActorNormalizer {
 	 *            block to which return is to be added
 	 */
 	private void createInputCondition(BlockNode block) {
-		Location location = new Location();
 		Expression value;
 		Iterator<Variable> it = variables.iterator();
 		if (it.hasNext()) {
 			LocalVariable previous = (LocalVariable) it.next();
-			value = new VarExpr(location, new Use(previous, block));
+			value = new VarExpr(new Use(previous, block));
 
 			while (it.hasNext()) {
 				LocalVariable thisOne = (LocalVariable) it.next();
-				value = new BinaryExpr(location, value, BinaryOp.LOGIC_AND,
-						new VarExpr(location, new Use(thisOne, block)),
-						new BoolType());
+				value = new BinaryExpr(value, BinaryOp.LOGIC_AND, new VarExpr(
+						new Use(thisOne, block)), new BoolType());
 				previous = thisOne;
 			}
 		} else {
-			value = new BoolExpr(location, true);
+			value = new BoolExpr(true);
 		}
 
-		Return returnInstr = new Return(location, value);
+		Return returnInstr = new Return(value);
 		block.add(returnInstr);
 	}
 

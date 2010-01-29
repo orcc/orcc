@@ -43,6 +43,10 @@ public class Return extends AbstractInstruction implements ValueContainer {
 
 	private Expression value;
 
+	public Return(Expression value) {
+		this(new Location(), value);
+	}
+
 	public Return(Location location, Expression value) {
 		super(location);
 		setValue(value);
