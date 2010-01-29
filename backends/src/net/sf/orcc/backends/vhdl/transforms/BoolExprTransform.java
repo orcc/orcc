@@ -28,6 +28,19 @@
  */
 package net.sf.orcc.backends.vhdl.transforms;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -39,5 +52,81 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * 
  */
 public class BoolExprTransform extends AbstractActorTransformation {
+
+	private ListIterator<CFGNode> nodeIt;
+
+	/**
+	 * Creates an "if" node that assign <code>true</code> or <code>false</code>
+	 * to <code>target</code> if the given expression is <code>true</code>,
+	 * respectively <code>false</code>/
+	 * 
+	 * @param target
+	 *            target local variable
+	 * @param expr
+	 *            an expression
+	 */
+	private void createIfNode(LocalVariable target, Expression expr) {
+		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
+		List<CFGNode> elseNodes = new ArrayList<CFGNode>();
+		IfNode node = new IfNode(procedure, expr, thenNodes, elseNodes,
+				new BlockNode(procedure));
+
+		// add "then" nodes
+		BlockNode block = new BlockNode(procedure);
+		thenNodes.add(block);
+		Assign assign = new Assign(target, new BoolExpr(true));
+		block.add(assign);
+
+		// add "else" nodes
+		block = new BlockNode(procedure);
+		elseNodes.add(block);
+		assign = new Assign(target, new BoolExpr(false));
+		block.add(assign);
+
+		nodeIt.add(node);
+	}
+
+	/**
+	 * Creates a new block node that contains the instructions after the assign.
+	 * 
+	 * @param iit
+	 *            list iterator
+	 */
+	private void createNewBlock(ListIterator<Instruction> iit) {
+		BlockNode block = new BlockNode(procedure);
+		iit.previous();
+		iit.remove();
+		while (iit.hasNext()) {
+			Instruction instruction = iit.next();
+			iit.remove();
+			block.add(instruction);
+		}
+
+		nodeIt.add(block);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Assign node, Object... args) {
+		if (node.getTarget().getType().getType() == Type.BOOLEAN) {
+			Expression expr = node.getValue();
+			if (expr.getType() == Expression.BINARY
+					|| expr.getType() == Expression.UNARY) {
+				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
+				createIfNode(node.getTarget(), expr);
+				createNewBlock(iit);
+			}
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(BlockNode node, Object... args) {
+		nodeIt = (ListIterator<CFGNode>) args[0];
+		ListIterator<Instruction> it = node.listIterator();
+		while (it.hasNext()) {
+			it.next().accept(this, it);
+		}
+	}
 
 }
