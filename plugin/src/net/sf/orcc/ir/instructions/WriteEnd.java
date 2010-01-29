@@ -30,7 +30,6 @@ package net.sf.orcc.ir.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class defines a WriteEnd instruction. This node is used in code
@@ -43,13 +42,13 @@ public class WriteEnd extends AbstractInstruction {
 
 	private Port port;
 
-	public WriteEnd(BlockNode block, Location location, Port port) {
-		super(block, location);
+	public WriteEnd(Location location, Port port) {
+		super(location);
 		setPort(port);
 	}
 
 	public WriteEnd(Write node) {
-		super(node.getBlock(), node.getLocation());
+		super(node.getLocation());
 		setPort(node.getPort());
 	}
 

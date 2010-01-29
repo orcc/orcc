@@ -30,7 +30,6 @@ package net.sf.orcc.ir.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class does something, but only Jérôme knows what it is :D
@@ -44,9 +43,8 @@ public class InitPort extends AbstractInstruction {
 
 	private VarExpr value;
 
-	public InitPort(BlockNode block, Location location, String fifoName,
-			int index, VarExpr value) {
-		super(block, location);
+	public InitPort(Location location, String fifoName, int index, VarExpr value) {
+		super(location);
 		this.fifoName = fifoName;
 		this.value = value;
 	}

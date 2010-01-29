@@ -293,7 +293,7 @@ public class IRParser {
 		Variable var = getVariable(array.getJSONArray(0));
 		Expression value = parseExpr(array.getJSONArray(1));
 		LocalVariable local = (LocalVariable) var;
-		Assign assign = new Assign(block, loc, local, value);
+		Assign assign = new Assign(loc, local, value);
 		local.setInstruction(assign);
 		return assign;
 	}
@@ -317,7 +317,7 @@ public class IRParser {
 		}
 
 		List<Expression> parameters = parseExprs(array.getJSONArray(2));
-		return new Call(block, loc, res, procs.get(procName), parameters);
+		return new Call(loc, res, procs.get(procName), parameters);
 	}
 
 	/**
@@ -430,7 +430,7 @@ public class IRParser {
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new HasTokens(block, loc, port, numTokens, varDef);
+		return new HasTokens(loc, port, numTokens, varDef);
 	}
 
 	private IfNode parseIfNode(Location loc, JSONArray array)
@@ -460,7 +460,7 @@ public class IRParser {
 		Use source = parseVarUse(array.getJSONArray(1));
 		List<Expression> indexes = parseExprs(array.getJSONArray(2));
 
-		return new Load(block, loc, target, source, indexes);
+		return new Load(loc, target, source, indexes);
 	}
 
 	private Location parseLocation(JSONArray array) throws JSONException {
@@ -568,7 +568,7 @@ public class IRParser {
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new Peek(block, loc, port, numTokens, varDef);
+		return new Peek(loc, port, numTokens, varDef);
 	}
 
 	private PhiAssignment parsePhi(Location loc, JSONArray array)
@@ -581,7 +581,7 @@ public class IRParser {
 			vars.add(parseVarUse(array.getJSONArray(i)));
 		}
 
-		return new PhiAssignment(block, loc, varDef, vars);
+		return new PhiAssignment(loc, varDef, vars);
 	}
 
 	/**
@@ -659,7 +659,7 @@ public class IRParser {
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new Read(block, loc, port, numTokens, varDef);
+		return new Read(loc, port, numTokens, varDef);
 	}
 
 	private Return parseReturn(Location loc, JSONArray array)
@@ -670,7 +670,7 @@ public class IRParser {
 		} else {
 			expr = parseExpr(array);
 		}
-		return new Return(block, loc, expr);
+		return new Return(loc, expr);
 	}
 
 	/**
@@ -720,7 +720,7 @@ public class IRParser {
 		List<Expression> indexes = parseExprs(array.getJSONArray(1));
 		Expression value = parseExpr(array.getJSONArray(2));
 
-		return new Store(block, loc, target, indexes, value);
+		return new Store(loc, target, indexes, value);
 	}
 
 	/**
@@ -838,7 +838,7 @@ public class IRParser {
 		String fifoName = array.getString(1);
 		Port port = outputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new Write(block, loc, port, numTokens, varDef);
+		return new Write(loc, port, numTokens, varDef);
 	}
 
 	private void putAction(Tag tag, Action action) {

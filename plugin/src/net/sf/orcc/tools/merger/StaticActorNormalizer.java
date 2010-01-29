@@ -113,7 +113,7 @@ public class StaticActorNormalizer {
 
 			// init var
 			BlockNode block = BlockNode.last(procedure, nodes);
-			Assign assign = new Assign(block, location, loopVar, new IntExpr(0));
+			Assign assign = new Assign(location, loopVar, new IntExpr(0));
 			block.add(assign);
 
 			// create while
@@ -135,7 +135,7 @@ public class StaticActorNormalizer {
 
 			// add assign
 			block = BlockNode.last(procedure, nodes);
-			assign = new Assign(block, location, loopVar, null);
+			assign = new Assign(location, loopVar, null);
 			assign.setValue(new BinaryExpr(location, new VarExpr(location,
 					new Use(loopVar, assign)), BinaryOp.PLUS, new IntExpr(1),
 					new IntType(new IntExpr(32))));
@@ -156,8 +156,8 @@ public class StaticActorNormalizer {
 		@Override
 		public void visit(SimplePattern pattern) {
 			BlockNode block = BlockNode.last(procedure, nodes);
-			Call call = new Call(block, new Location(), null, pattern
-					.getAction().getBody(), new ArrayList<Expression>());
+			Call call = new Call(new Location(), null, pattern.getAction()
+					.getBody(), new ArrayList<Expression>());
 			block.add(call);
 		}
 
@@ -215,8 +215,8 @@ public class StaticActorNormalizer {
 			nodes.clear();
 			BlockNode block = new BlockNode(scheduler);
 			nodes.add(block);
-			block.add(new Return(block, new Location(), new BoolExpr(
-					new Location(), true)));
+			block.add(new Return(new Location(), new BoolExpr(new Location(),
+					true)));
 		}
 	}
 
@@ -263,7 +263,7 @@ public class StaticActorNormalizer {
 			value = new BoolExpr(location, true);
 		}
 
-		Return returnInstr = new Return(block, location, value);
+		Return returnInstr = new Return(location, value);
 		block.add(returnInstr);
 	}
 
@@ -287,8 +287,8 @@ public class StaticActorNormalizer {
 			i++;
 			variables.add(actor.getFile(), location, varDef.getName(), varDef);
 
-			HasTokens hasTokens = new HasTokens(block, location, port,
-					numTokens, varDef);
+			HasTokens hasTokens = new HasTokens(location, port, numTokens,
+					varDef);
 			varDef.setInstruction(hasTokens);
 			block.add(hasTokens);
 		}

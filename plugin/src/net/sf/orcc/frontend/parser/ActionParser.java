@@ -178,7 +178,7 @@ public class ActionParser {
 				new OrderedMap<Variable>(), nodes);
 
 		BlockNode block = new BlockNode(scheduler);
-		block.add(new Return(block, location, new BoolExpr(location, true)));
+		block.add(new Return(location, new BoolExpr(location, true)));
 		nodes.add(block);
 
 		return scheduler;
@@ -334,7 +334,7 @@ public class ActionParser {
 						name, null, null, port.getType());
 				variables.add(file, location, name, local);
 
-				Read read = new Read(block, location, port, 1, local);
+				Read read = new Read(location, port, 1, local);
 				block.add(read);
 			}
 		}

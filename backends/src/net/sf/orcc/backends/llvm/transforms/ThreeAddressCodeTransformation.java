@@ -105,8 +105,9 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 			LocalVariable target = newVariable();
 			target.setType(type);
-			Assign assign = new Assign(block, location, target, new BinaryExpr(
+			Assign assign = new Assign(location, target, new BinaryExpr(
 					location, e1, op, e2, type));
+			assign.setBlock(block);
 			it.add(assign);
 
 			return new VarExpr(location, new Use(target));
@@ -162,18 +163,17 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-		/*	Location location = expr.getLocation();
-			BinaryOp op = BinaryOp.EQ;
-			IntExpr intExpr = new IntExpr(location, 0);
-			
-			LocalVariable target = newVariable();
-			target.setType(type);
-			
-			Assign assign = new Assign(block, location, target, new BinaryExpr(
-					location, expr, op, intExpr, type));
-			it.add(assign);
-
-			return new VarExpr(location, new Use(target));*/
+			/*
+			 * Location location = expr.getLocation(); BinaryOp op =
+			 * BinaryOp.EQ; IntExpr intExpr = new IntExpr(location, 0);
+			 * 
+			 * LocalVariable target = newVariable(); target.setType(type);
+			 * 
+			 * Assign assign = new Assign(block, location, target, new
+			 * BinaryExpr( location, expr, op, intExpr, type)); it.add(assign);
+			 * 
+			 * return new VarExpr(location, new Use(target));
+			 */
 			return expr;
 		}
 
@@ -264,7 +264,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	@SuppressWarnings("unchecked")
 	public void visit(IfNode ifNode, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
-		ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it), new BoolType()));
+		ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it),
+				new BoolType()));
 		super.visit(ifNode, args);
 	}
 

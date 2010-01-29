@@ -174,8 +174,8 @@ public class StatementParser {
 				Variable target = getVariable(location, targetName);
 				LocalVariable local = (LocalVariable) target;
 
+				Assign assign = new Assign(location, local, value);
 				BlockNode block = BlockNode.last(procedure, nodes);
-				Assign assign = new Assign(block, location, local, value);
 				block.add(assign);
 			} else {
 				// TODO: store
@@ -228,7 +228,7 @@ public class StatementParser {
 			Use use = new Use(target, block);
 			List<Expression> indexes = new ArrayList<Expression>(0);
 			Expression value = new VarExpr(location, new Use(source, block));
-			Store store = new Store(block, location, use, indexes, value);
+			Store store = new Store(location, use, indexes, value);
 			block.add(store);
 		}
 

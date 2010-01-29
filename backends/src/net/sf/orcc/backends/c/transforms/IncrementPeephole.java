@@ -102,19 +102,19 @@ public class IncrementPeephole extends AbstractActorTransformation {
 	private boolean replaceSelfAssignment(OrderedMap<Variable> locals,
 			ListIterator<Instruction> it, LocalVariable varDefTmp,
 			Variable varDef, VarExpr v1, BinaryOp op, Expression e2) {
-		AbstractCInstruction node;
+		AbstractCInstruction instruction;
 		if (op == BinaryOp.PLUS && e2.getType() == Expression.INT
 				&& ((IntExpr) e2).getValue() == 1) {
-			node = new Increment(block, new Location(), varDef);
+			instruction = new Increment(new Location(), varDef);
 		} else if (op == BinaryOp.MINUS && e2.getType() == Expression.INT
 				&& ((IntExpr) e2).getValue() == 1) {
-			node = new Decrement(block, new Location(), varDef);
+			instruction = new Decrement(new Location(), varDef);
 		} else if (op == BinaryOp.BITAND || op == BinaryOp.BITOR
 				|| op == BinaryOp.BITXOR || op == BinaryOp.DIV
 				|| op == BinaryOp.MINUS || op == BinaryOp.MOD
 				|| op == BinaryOp.PLUS || op == BinaryOp.SHIFT_LEFT
 				|| op == BinaryOp.SHIFT_RIGHT || op == BinaryOp.TIMES) {
-			node = new SelfAssignment(block, new Location(), varDef, op, e2);
+			instruction = new SelfAssignment(new Location(), varDef, op, e2);
 		} else {
 			// nothing for us, just return
 			return false;
@@ -124,7 +124,8 @@ public class IncrementPeephole extends AbstractActorTransformation {
 		it.remove();
 		it.previous();
 		it.remove();
-		it.add(node);
+		instruction.setBlock(block);
+		it.add(instruction);
 
 		// if we recognized something we could change, remove the temp var
 		locals.remove(varDefTmp);

@@ -34,7 +34,6 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -60,9 +59,8 @@ public class PhiAssignment extends AbstractInstruction implements
 	 * @param vars
 	 *            a list of uses
 	 */
-	public PhiAssignment(BlockNode block, Location location,
-			LocalVariable target, List<Use> vars) {
-		super(block, location);
+	public PhiAssignment(Location location, LocalVariable target, List<Use> vars) {
+		super(location);
 		setTarget(target);
 		this.localUses = vars;
 	}

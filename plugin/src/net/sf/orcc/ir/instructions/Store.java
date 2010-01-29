@@ -34,7 +34,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -52,9 +51,9 @@ public class Store extends AbstractInstruction implements ValueContainer {
 
 	private Expression value;
 
-	public Store(BlockNode block, Location location, Use target,
-			List<Expression> indexes, Expression value) {
-		super(block, location);
+	public Store(Location location, Use target, List<Expression> indexes,
+			Expression value) {
+		super(location);
 		setIndexes(indexes);
 		setTarget(target);
 		setValue(value);

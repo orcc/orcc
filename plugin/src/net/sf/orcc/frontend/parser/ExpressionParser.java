@@ -103,10 +103,11 @@ public class ExpressionParser {
 				globalsLoaded.put(variable, local);
 
 				// add a Load
-				BlockNode block = BlockNode.last(procedure, nodes);
 				List<Expression> indexes = new ArrayList<Expression>(0);
-				Use use = new Use(variable, block);
-				Load load = new Load(block, location, local, use, indexes);
+				Use use = new Use(variable);
+				Load load = new Load(location, local, use, indexes);
+				use.setNode(load);
+				BlockNode block = BlockNode.last(procedure, nodes);
 				block.add(load);
 			}
 

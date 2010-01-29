@@ -30,7 +30,6 @@ package net.sf.orcc.backends.llvm.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class defines an LLVM instruction. An LLVM instruction is a
@@ -43,8 +42,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
  */
 public abstract class AbstractLLVMInstruction extends SpecificInstruction {
 
-	protected AbstractLLVMInstruction(BlockNode block, Location location) {
-		super(block, location);
+	protected AbstractLLVMInstruction(Location location) {
+		super(location);
 	}
 
 	/**

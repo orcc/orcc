@@ -31,7 +31,6 @@ package net.sf.orcc.backends.llvm.instructions;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
@@ -43,9 +42,8 @@ public class TruncNode extends AbstractLLVMInstruction {
 
 	private LocalVariable var;
 
-	public TruncNode(BlockNode block, Location location, LocalVariable var,
-			Expression value) {
-		super(block, location);
+	public TruncNode(Location location, LocalVariable var, Expression value) {
+		super(location);
 		this.var = var;
 		this.value = value;
 	}

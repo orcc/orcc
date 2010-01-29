@@ -30,7 +30,6 @@ package net.sf.orcc.backends.c.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class defines a C instruction. A C instruction is a
@@ -42,8 +41,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
  */
 public abstract class AbstractCInstruction extends SpecificInstruction {
 
-	protected AbstractCInstruction(BlockNode block, Location location) {
-		super(block, location);
+	protected AbstractCInstruction(Location location) {
+		super(location);
 	}
 
 	/**

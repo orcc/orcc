@@ -81,9 +81,8 @@ public class AddInstantationProcedure implements ActorTransformation {
 			Use varUse = new Use(parameter);
 			VarExpr expr = new VarExpr(new Location(), varUse);
 
-			InitPort node = new InitPort(null, new Location(), port.getName(),
-					0, expr);
-
+			InitPort node = new InitPort(new Location(), port.getName(), 0,
+					expr);
 			block.add(node);
 		}
 

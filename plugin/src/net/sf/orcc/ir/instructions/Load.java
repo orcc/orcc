@@ -35,7 +35,6 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -53,9 +52,9 @@ public class Load extends AbstractInstruction implements TargetContainer {
 
 	private LocalVariable target;
 
-	public Load(BlockNode block, Location location, LocalVariable target,
-			Use source, List<Expression> indexes) {
-		super(block, location);
+	public Load(Location location, LocalVariable target, Use source,
+			List<Expression> indexes) {
+		super(location);
 		setIndexes(indexes);
 		setSource(source);
 		setTarget(target);

@@ -33,7 +33,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -55,9 +54,9 @@ public class SelfAssignment extends AbstractCInstruction implements
 
 	private Variable target;
 
-	public SelfAssignment(BlockNode block, Location location, Variable target,
-			BinaryOp op, Expression value) {
-		super(block, location);
+	public SelfAssignment(Location location, Variable target, BinaryOp op,
+			Expression value) {
+		super(location);
 		this.op = op;
 		this.value = value;
 		this.target = target;

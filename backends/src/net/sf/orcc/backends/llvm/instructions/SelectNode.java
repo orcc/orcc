@@ -33,7 +33,6 @@ import java.util.List;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * @author Jérôme GORIN
@@ -45,9 +44,9 @@ public class SelectNode extends AbstractLLVMInstruction {
 
 	private List<PhiAssignment> phis;
 
-	public SelectNode(BlockNode block, Location location, Expression condition,
+	public SelectNode(Location location, Expression condition,
 			List<PhiAssignment> phis) {
-		super(block, location);
+		super(location);
 		this.condition = condition;
 		this.phis = phis;
 	}

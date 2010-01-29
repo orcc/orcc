@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.instructions;
 
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class defines a back-end specific instruction.
@@ -39,8 +38,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
  */
 public class SpecificInstruction extends AbstractInstruction {
 
-	protected SpecificInstruction(BlockNode block, Location location) {
-		super(block, location);
+	protected SpecificInstruction(Location location) {
+		super(location);
 	}
 
 	@Override

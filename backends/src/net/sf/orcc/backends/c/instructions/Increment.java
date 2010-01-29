@@ -30,7 +30,6 @@ package net.sf.orcc.backends.c.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class defines an Increment instruction that increments a Variable,
@@ -43,8 +42,8 @@ public class Increment extends AbstractCInstruction {
 
 	private Variable target;
 
-	public Increment(BlockNode block, Location location, Variable target) {
-		super(block, location);
+	public Increment(Location location, Variable target) {
+		super(location);
 		this.target = target;
 	}
 

@@ -32,7 +32,6 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TargetContainer;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -51,9 +50,9 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 
 	private LocalVariable target;
 
-	public AbstractFifoInstruction(BlockNode block, Location location,
-			Port port, int numTokens, LocalVariable target) {
-		super(block, location);
+	public AbstractFifoInstruction(Location location, Port port, int numTokens,
+			LocalVariable target) {
+		super(location);
 		this.numTokens = numTokens;
 		setPort(port);
 		setTarget(target);

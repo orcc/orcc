@@ -31,7 +31,6 @@ package net.sf.orcc.ir.instructions;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -44,8 +43,8 @@ public class Return extends AbstractInstruction implements ValueContainer {
 
 	private Expression value;
 
-	public Return(BlockNode block, Location location, Expression value) {
-		super(block, location);
+	public Return(Location location, Expression value) {
+		super(location);
 		setValue(value);
 	}
 

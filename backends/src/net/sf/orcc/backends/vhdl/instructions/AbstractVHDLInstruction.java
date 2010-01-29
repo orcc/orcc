@@ -31,7 +31,6 @@ package net.sf.orcc.backends.vhdl.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class defines a VHDL instruction. A VHDL instruction is a
@@ -43,8 +42,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
  */
 public abstract class AbstractVHDLInstruction extends SpecificInstruction {
 
-	protected AbstractVHDLInstruction(BlockNode block, Location location) {
-		super(block, location);
+	protected AbstractVHDLInstruction(Location location) {
+		super(location);
 	}
 
 	/**

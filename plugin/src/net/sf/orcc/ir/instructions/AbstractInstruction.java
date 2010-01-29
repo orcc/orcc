@@ -44,9 +44,8 @@ public abstract class AbstractInstruction extends AbstractLocalizable implements
 
 	private BlockNode block;
 
-	protected AbstractInstruction(BlockNode block, Location location) {
+	protected AbstractInstruction(Location location) {
 		super(location);
-		this.block = block;
 	}
 
 	@Override

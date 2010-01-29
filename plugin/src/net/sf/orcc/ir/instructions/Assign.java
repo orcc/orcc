@@ -33,7 +33,6 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -50,9 +49,8 @@ public class Assign extends AbstractInstruction implements TargetContainer,
 
 	private Expression value;
 
-	public Assign(BlockNode block, Location location, LocalVariable target,
-			Expression value) {
-		super(block, location);
+	public Assign(Location location, LocalVariable target, Expression value) {
+		super(location);
 		setTarget(target);
 		setValue(value);
 	}

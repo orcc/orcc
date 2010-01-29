@@ -121,11 +121,11 @@ public class PhiRemoval extends AbstractActorTransformation {
 		if (source.getIndex() == 0 && !parameters.contains(source)) {
 			procedure.getLocals().remove(source);
 			IntExpr expr = new IntExpr(new Location(), 0);
-			assign = new Assign(targetBlock, new Location(), target, expr);
+			assign = new Assign(new Location(), target, expr);
 		} else {
 			Use localUse = new Use(source);
 			VarExpr expr = new VarExpr(new Location(), localUse);
-			assign = new Assign(targetBlock, new Location(), target, expr);
+			assign = new Assign(new Location(), target, expr);
 		}
 
 		targetBlock.add(assign);

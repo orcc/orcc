@@ -36,7 +36,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -54,9 +53,9 @@ public class Call extends AbstractInstruction implements TargetContainer {
 
 	private LocalVariable target;
 
-	public Call(BlockNode block, Location location, LocalVariable target,
-			Procedure procedure, List<Expression> parameters) {
-		super(block, location);
+	public Call(Location location, LocalVariable target, Procedure procedure,
+			List<Expression> parameters) {
+		super(location);
 		setParameters(parameters);
 		setTarget(target);
 		this.procedure = procedure;

@@ -30,7 +30,6 @@ package net.sf.orcc.backends.c.instructions;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
  * This class defines a Decrement instruction that increments a Variable, global
@@ -43,8 +42,8 @@ public class Decrement extends AbstractCInstruction {
 
 	private Variable target;
 
-	public Decrement(BlockNode block, Location location, Variable target) {
-		super(block, location);
+	public Decrement(Location location, Variable target) {
+		super(location);
 		this.target = target;
 	}
 
