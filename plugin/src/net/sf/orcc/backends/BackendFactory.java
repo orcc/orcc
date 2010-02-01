@@ -30,6 +30,7 @@ package net.sf.orcc.backends;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -78,6 +79,34 @@ public class BackendFactory {
 	 */
 	public static AbstractOption[] getOptions(String name) {
 		return AbtractBackendOptions.get(name);
+	}
+	
+	/**
+	 * Returns the given option from a all backends
+	 * 
+	 * @param optionName
+	 * 		String containing the name of the option looking for
+	 *
+	 * @return AbtractOption[] associated to the option
+	 */
+	public static AbstractOption[] getOption(String optionName) {
+		int ind = 0;
+		AbstractOption[] options = new AbstractOption[AbtractBackendOptions.size()]; 
+		Iterator<String> it = AbtractBackendOptions.keySet().iterator();
+		while(it.hasNext()) {
+			String key = it.next();
+			AbstractOption[] abstractOptions = AbtractBackendOptions.get(key);
+			
+			for (AbstractOption abstractOption : abstractOptions){
+				String option = abstractOption.getOption();
+				if (option.equals(optionName)){
+					options[ind++]= abstractOption;
+				}
+			}
+			
+		}
+		
+		return options;
 	}
 
 	/**

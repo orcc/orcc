@@ -80,7 +80,11 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 
 		// add writes at the beginning of the node list, and read at the ends
 		BlockNode.first(procedure, nodes).getInstructions().addAll(0, writes);
-		BlockNode.last(procedure, nodes).getInstructions().addAll(readEnds);
+		List<Instruction> instructions = BlockNode.last(procedure, nodes).getInstructions();
+		if (instructions.size()> 0){
+			//Put readend nodes before return instruction 
+			instructions.addAll(instructions.size()-1,readEnds);
+		}
 
 		// clears the lists
 		writes.clear();

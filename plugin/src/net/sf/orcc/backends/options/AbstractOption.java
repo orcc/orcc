@@ -74,6 +74,22 @@ public interface AbstractOption {
 	public void performApply(ILaunchConfigurationWorkingCopy configuration);
 	
 	/**
+	 * Set the option name
+	 *
+	 * @param option
+	 *		String containing the option name
+	 */
+	public void setOption(String option);
+	
+	/**
+	 * Set the value of the option
+	 *
+	 * @param value
+	 *		String containing the value
+	 */
+	public void setValue(String value);
+	
+	/**
 	 * Show interfaces on the selected group
 	 * 
 	 * @param font

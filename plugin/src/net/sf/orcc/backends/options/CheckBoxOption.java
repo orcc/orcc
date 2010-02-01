@@ -201,6 +201,18 @@ public class CheckBoxOption implements AbstractOption, SelectionListener  {
 		
 	}
 	
+	@Override
+	public void setOption(String option) {
+		this.option = option;
+	}
+
+
+	@Override
+	public void setValue(String value) {
+		this.value = Boolean.getBoolean(value);
+	}
+
+
 	/**
 	 * Show the interface on the selected group
 	 * 
@@ -237,8 +249,7 @@ public class CheckBoxOption implements AbstractOption, SelectionListener  {
 			group.redraw();
 		}
 	}
-
-
+	
 	@Override
 	public void widgetDefaultSelected(SelectionEvent arg0) {
 		checkBox.setSelection(value);

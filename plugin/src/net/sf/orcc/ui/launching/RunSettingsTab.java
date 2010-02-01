@@ -219,8 +219,12 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			/*String value = configuration.getAttribute(INPUT_FILE, "");
-			textNetwork.setText(value);*/
+			AbstractOption[] options = BackendFactory.getOption("INPUT_FILE");
+			
+			for (AbstractOption option : options){
+				String value = configuration.getAttribute(INPUT_FILE, "");
+				option.setValue(value);
+			}
 
 			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
 			textOutput.setText(value);

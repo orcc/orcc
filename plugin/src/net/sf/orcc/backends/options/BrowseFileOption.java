@@ -83,6 +83,16 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	private String extension;
 	
 	/**
+	 * Font connected with the option
+	 */
+	private Font font;
+	
+	/**
+	 * group connected with the option
+	 */
+	private Group group;
+	
+	/**
 	 * Label connected with the option
 	 */
 	private Label lbl;
@@ -106,16 +116,6 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	 * Value of the option
 	 */
 	private String value;
-	
-	/**
-	 * Font connected with the option
-	 */
-	private Font font;
-	
-	/**
-	 * group connected with the option
-	 */
-	private Group group;
 	
 	/**
 	 * BrowseFileOption constructor 
@@ -328,6 +328,17 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		
+	}
+
+
+	@Override
+	public void setOption(String option) {
+		this.option = option;
+	}
+	
+	@Override
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 

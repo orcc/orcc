@@ -111,6 +111,16 @@ StoreOp(ty, value, pty, pointer) ::= <<
 store $ty$ $value$, $pty$* $pointer$
 >>
 
+LoadOp(result, ty, pointer,alignment) ::= <<
+$result$ = load $ty$* $pointer$ $if(alignment)$
+[, align <alignment>]
+$endif$
+>>  
+
+AddOp(result, ty, op1, op2) ::= <<
+$result$ = add $ty$ $op1$, $op2$
+>>  
+
 GetElementPtrOp(result, pty, ptrval, idx) ::= <<
 $result$ = getelementptr $pty$* $ptrval$, i32 0 $if(idx)$
 , $indexes(idx)$
@@ -121,6 +131,34 @@ BitcastOp(result, ty, value, ty2) ::= <<
 $result$ = bitcast $ty$ $value$ to $ty2$
 >>
 
+AllocaOp(result, type, NumElements, alignment) ::= <<
+$result$ = alloca $type$ $if(NumElements)$
+[, i32 <NumElements>]
+$endif$
+$if(alignment)$
+[, align <alignment>]
+$endif$
+>>
+
+BrOp(cond, iftrue, iffalse, dest) ::= <<
+$if(cond)$br i1 $cond$, label $iftrue$, label $iffalse$
+$else$
+br label $dest$
+$endif$
+>>
+
+RetOp(type, value) ::= <<
+$if(value)$
+ret $type$ $value$
+$else$
+ret void
+$endif$
+>>  
+
+CallOp(result, tail, cconv, ret_attrs, ty, fnty, fnptrval, function_args, fn_attrs) ::= <<
+$if(result)$$result$ = $endif$$if(tail)$ [tail] $endif$call$if(cconv)$ [cconv] $endif$$if(ret_attrs)$ [ret_attrs] $endif$ $ty$$if(fnty)$ [<fnty>*] $endif$ $fnptrval$ ($if(function_args)$$function_args$$endif$) $if(fn_attrs)$ [fn_attrs] $endif$
+>>
+ 
 ///////////////////////////////////////////////////////////////////////////////
 // Conversion instructions
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,16 +177,16 @@ $StoreOp(ty="i32", value=value, pty="i32*", pointer=target)$
 
 >>
 
+LoadLocalPort(instr) ::= <<
+$LoadOp(result="%local_"+instr.port+instr.block.label, ty="%struct.fifo_s*", pointer="@"+actorName+"_"+instr.port)$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // ORCC Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
 indexes(indexes) ::= <<
 $indexes: { index | i32 $index$ }; separator=", "$
->>
-
-loadLocalPort(instr) ::= <<
-%local_$instr.port$$instr.block.label$ = load %struct.fifo_s** @$actorName$_$instr.port$
 >>
 
 // $assign.value$
@@ -166,7 +204,7 @@ call $call.procedure.returnType$ @$call.procedure$($call.parameters; separator="
 >>
 
 HasTokens(hasTokens) ::= <<
-$loadLocalPort(hasTokens)$
+$LoadLocalPort(hasTokens)$
 %$hasTokens.target$ = call i32 @hasTokens(%struct.fifo_s* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$)
 
 >>
@@ -197,7 +235,7 @@ $endif$
 >>
 
 Peek(peek) ::= <<
-$loadLocalPort(peek)$
+$LoadLocalPort(peek)$
 %$peek.target$_$peek.block.label$ = call i8* @getPeekPtr(%struct.fifo_s* %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$)
 store i8* %$peek.target$_$peek.block.label$, i8** %$peek.port$
 
@@ -213,26 +251,27 @@ PhiAssignment(phi) ::= <<
 >>
 
 Read(read) ::= <<
-$loadLocalPort(read)$
-%$read.target$_$read.block.label$ = call i8* @getReadPtr(%struct.fifo_s* %local_$read.target$$read.block.label$, i32 $read.numTokens$)
-store i8* %$read.target$_$read.block.label$, i8** %$read.port$
+$LoadLocalPort(read)$
+$CallOp(result="%"+read.target+"_"+read.block.label, ty ="i8*", fnptrval="@getReadPtr", function_args="%struct.fifo_s* %local_"+read.target+read.block.label+", i32 "+read.numTokens)$
+$StoreOp(ty="i8*", value="%"+read.target+"_"+read.block.label, pty="i8*", pointer="%"+read.port)$
 
 >>
 
 ReadEnd(readEnd) ::= <<
-setReadEnd(%struct.fifo_s* @$actorName$_$readEnd.port$);
+$LoadOp(result="%end_"+readEnd.port, ty="%struct.fifo_s*", pointer="@"+actorName+"_"+readEnd.port)$
+$CallOp(ty ="void", fnptrval="@setReadEnd", function_args="%struct.fifo_s* %end_"+readEnd.port)$
 
 >>
 
 // return node
 Return(return) ::= <<
 $if(return.value)$
-ret i1 $return.value$
-
+$RetOp(type="i1", value=return.value)$
 $else$
-ret void
+$RetOp()$
 
 $endif$
+
 >>
 
 
@@ -272,7 +311,7 @@ $endif$
 
 // write node
 Write(write) ::= <<
-$loadLocalPort(write)$
+$LoadLocalPort(write)$
 %$write.target$_$write.block.label$ = call i8* @getWritePtr(%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$)
 store i8* %$write.target$_$write.block.label$, i8** %$write.port$
 
@@ -304,15 +343,17 @@ BlockNode(blockNode) ::= <<
 
 // if node
 IfNode(ifNode) ::= <<
-	br i1 $ifNode.value$, label %$label(ifNode.thenNodes)$, label %$label(ifNode.elseNodes)$
-
-$label(ifNode.thenNodes)$:
-$nodes(ifNode.thenNodes)$	br label %b$ifNode.joinNode.label$
-
-$label(ifNode.elseNodes)$:
-$nodes(ifNode.elseNodes)$	br label %b$ifNode.joinNode.label$
-
-b$ifNode.joinNode.label$:
+$if(ifNode.thenNodes)$
+	$if(ifNode.elseNodes)$
+1
+	$else$
+2	
+	$endif$
+$else$
+	$if(ifNode.elseNodes)$
+3
+$endif$
+$endif$
 $BlockNode(ifNode.joinNode)$
 >>
 
@@ -366,18 +407,26 @@ $procedure(action.body)$$procedure(action.scheduler)$
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-outputPattern(pattern, token, iterator) ::= <<
-$loadFifoTmp(var=iterator.index, fifoName=pattern)$ $hasRoomNode(var=iterator.nextNodeIndex.index, expr="%"+iterator.lastIndex, token=token)$
+outputPattern(pattern) ::= <<
+$pattern.keys:{port|hasRoom($actorName$_$port$, $pattern.(port)$)}; separator=" && "$
 >>
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
+
+actionCall(action) ::= <<
+$CallOp(ty="void", fnptrval=action.body)$
+$BrOp(dest="%inc_i")$
+>>
+/*
 actionCall(action) ::= <<
 	call void @$action$()
 >>
+*/
 
+/*
 actionTest(action, iterator) ::= <<
 	%$action$ = call i1 @isSchedulable_$action$()
 	br i1 %$action$, label %fire_$action$, label %skip_$action$
@@ -392,18 +441,36 @@ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+i
 
 hasRoom_$action$:
 $actionCall(action)$
-	br label %bb
+	br label %bb 
 hasNoRoom_$action$:
 	br label %return
 
 $else$
 $actionCall(action)$
-	br label %return
+	br label %bb
+	
 $endif$
 
 skip_$action$:
 
 >>
+*/
+
+actionTest(action) ::= <<
+	$CallOp(result="%"+action, ty="i1", fnptrval="@isSchedulable_"+action)$
+	$BrOp(cond="%"+action, iftrue="%fire_"+action, iffalse="%skip_"+action)$
+
+fire_$action$:
+	$actionCall(action)$
+	
+skip_$action$:
+	$if(action.outputPattern)$
+	if ($outputPattern(pattern=action.outputPattern)$) {
+		$actionCall(action)$
+	}
+	$endif$
+>>
+
 
 outside_FSM_actionTest(action, iterator) ::= <<
 	%$action$ = call i1 @isSchedulable_$action$()
@@ -433,7 +500,7 @@ skip_$action$:
 >>
 
 schedulingTest(actions, iterator) ::= <<
-$actions: actionTest(action=it, iterator = iterator)$
+$actions: actionTest(action=it); separator=" else "$
 >>
 
 outside_FSM_schedulingTest(actions, iterator) ::= <<
@@ -443,19 +510,25 @@ $actions: outside_FSM_actionTest(action=it, iterator = iterator)$
 scheduler(actions, iterator) ::= <<
 define i32 @$actorName$_scheduler() {
 entry:
-	%i = alloca i32
-	store i32 0, i32* %i
-	br label %bb
+	$AllocaOp(result="%i", type="i32")$ 
+	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	$BrOp(dest="%bb")$
 	
 bb:  
 $if(actions)$
 $schedulingTest(actions=actions, iterator = iterator)$
 $endif$
-	br label %return
+	$BrOp(dest="%return")$
+
+inc_i:
+  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
+  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  $BrOp(dest="%bb")$
 
 return:
-	%i_ret = load i32* %i
-	ret i32 %i_ret
+	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	$RetOp(type="i32", value="%i_ret")$
 }
 
 >>
@@ -632,12 +705,12 @@ return:
 }
 
 $endif$
-
+!$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Action scheduler
-$if(scheduler.fsm)$
-$schedulerFSM(actions=scheduler.actions, fsm=scheduler.fsm, iterator = iterator)$
+$if(actor.actionScheduler.fsm)$
+$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 $else$
-$scheduler(actions=scheduler.actions, iterator= iterator)$
-$endif$ !$
+$scheduler(actions=actor.actionScheduler.actions)$
+$endif$ 
 >>
