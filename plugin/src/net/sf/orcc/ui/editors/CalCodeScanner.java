@@ -297,9 +297,10 @@ public class CalCodeScanner extends RuleBasedScanner {
 
 	private final static String[] keywords = {
 			// cal keywords
-			"action", "actor", "begin", "do", "else", "end", "foreach", "fsm",
-			"function", "guard", "if", "import", "initialize", "priority",
-			"proc", "procedure", "repeat", "schedule", "then", "var", "while",
+			"action", "actor", "begin", "do", "else", "end", "for", "foreach",
+			"fsm", "function", "guard", "if", "import", "in", "initialize",
+			"priority", "proc", "procedure", "repeat", "schedule", "then",
+			"var", "while",
 
 			// expressions
 			"and", "div", "false", "mod", "not", "or", "true",
