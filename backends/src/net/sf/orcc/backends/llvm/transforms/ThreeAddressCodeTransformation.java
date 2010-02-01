@@ -214,9 +214,12 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void visit(Assign assign, Object... args) {
 		block = assign.getBlock();
-		assign.setValue(visitExpression(assign.getValue());
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		Type type = assign.getTarget().getType();
+		assign.setValue(visitExpression(assign.getValue(), it, type));
 	}
 
 	@Override
