@@ -48,7 +48,7 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 
 	private void printInt(Expression expr) {
 		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-
+/*
 		if (size <= 8) {
 			builder.append("i8");
 		} else if (size <= 16) {
@@ -58,8 +58,8 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 		} else if (size <= 64) {
 			builder.append("i64");
 		}
-		
-		//builder.append("i32");
+		*/
+		builder.append("i32");
 	}
 	
 	@Override

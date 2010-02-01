@@ -107,7 +107,7 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 			Use use = ((VarExpr) e1).getVar();
 			builder.append(" " + use.getVariable().getType().toString() + " ");
 		} else {
-			builder.append(" i32 ");
+			builder.append(" i32");
 		}
 
 		expr.getE1().accept(this);

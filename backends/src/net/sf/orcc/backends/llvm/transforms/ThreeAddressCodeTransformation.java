@@ -163,17 +163,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-			/*
-			 * Location location = expr.getLocation(); BinaryOp op =
-			 * BinaryOp.EQ; IntExpr intExpr = new IntExpr(location, 0);
-			 * 
-			 * LocalVariable target = newVariable(); target.setType(type);
-			 * 
-			 * Assign assign = new Assign(block, location, target, new
-			 * BinaryExpr( location, expr, op, intExpr, type)); it.add(assign);
-			 * 
-			 * return new VarExpr(location, new Use(target));
-			 */
 			return expr;
 		}
 
@@ -225,28 +214,9 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void visit(Assign assign, Object... args) {
 		block = assign.getBlock();
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		it.previous();
-		Expression oldExpr = assign.getValue();
-		Expression newExpr = visitExpression(oldExpr, it, assign.getTarget()
-				.getType());
-		assign.setValue(newExpr);
-
-		if (oldExpr == newExpr) {
-			it.next();
-		} else {
-			// sets the target of the new assign
-			Assign newAssign = (Assign) it.previous();
-			newAssign.setTarget(assign.getTarget());
-
-			// removes this assign
-			it.next();
-			it.next();
-			it.remove();
-		}
+		assign.setValue(visitExpression(assign.getValue());
 	}
 
 	@Override
