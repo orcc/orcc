@@ -35,16 +35,27 @@ package net.sf.orcc.tools.merger.sequitur;
  * 
  */
 public abstract class Symbol {
-	
+
 	private Symbol next;
-	
+
 	private Symbol previous;
 
+	/**
+	 * Appends the given symbol to this symbol.
+	 * 
+	 * @param symbol
+	 *            a symbol
+	 */
 	public void append(Symbol symbol) {
 		next = symbol;
 		symbol.previous = this;
 	}
 
+	/**
+	 * Returns a copy of this symbol without any links to other symbols.
+	 * 
+	 * @return a copy of this symbol without any links to other symbols
+	 */
 	public abstract Symbol copy();
 
 	public Symbol getNext() {
@@ -55,12 +66,27 @@ public abstract class Symbol {
 		return previous;
 	}
 
-	public void setNext(Symbol next) {
-		this.next = next;
+	/**
+	 * Inserts this symbol between <code>predecessor</code> and
+	 * <code>successor</code> symbols.
+	 * 
+	 * @param predecessor
+	 *            symbol that will be the predecessor of this symbol
+	 * @param successor
+	 *            symbol that will be the successor of this symbol
+	 */
+	public void insertBetween(Symbol predecessor, Symbol successor) {
+		predecessor.append(this);
+		append(successor);
 	}
 
-	public void setPrevious(Symbol previous) {
-		this.previous = previous;
+	/**
+	 * Returns <code>true</code> if this symbol is non-terminal.
+	 * 
+	 * @return <code>true</code> if this symbol is non-terminal
+	 */
+	public boolean isNonTerminal() {
+		return false;
 	}
 
 }

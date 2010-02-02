@@ -37,7 +37,7 @@ package net.sf.orcc.tools.merger.sequitur;
 public class GuardSymbol extends Symbol {
 
 	private Rule rule;
-	
+
 	public GuardSymbol(Rule rule) {
 		this.rule = rule;
 		append(this);
@@ -47,17 +47,17 @@ public class GuardSymbol extends Symbol {
 	public Symbol copy() {
 		return new GuardSymbol(rule);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof GuardSymbol) {
 			GuardSymbol symbol = (GuardSymbol) obj;
 			return rule.equals(symbol.rule);
 		}
-		
+
 		return false;
 	}
-	
+
 	public Rule getRule() {
 		return rule;
 	}
@@ -66,7 +66,7 @@ public class GuardSymbol extends Symbol {
 	public int hashCode() {
 		return rule.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "guard of rule " + rule.getName();

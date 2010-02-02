@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.tools.merger.sequitur;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * This class defines a rule.
  * 
@@ -36,7 +39,9 @@ package net.sf.orcc.tools.merger.sequitur;
  */
 public class Rule {
 
-	private GuardSymbol first;
+	public static final Map<String, Rule> rules = new LinkedHashMap<String, Rule>();
+
+	private GuardSymbol guard;
 
 	private String name;
 
@@ -44,22 +49,35 @@ public class Rule {
 
 	public Rule(String name) {
 		this.name = name;
+		rules.put(name, this);
 
-		first = new GuardSymbol(this);
-		first.append(first);
+		guard = new GuardSymbol(this);
+		guard.append(guard);
 	}
 
+	/**
+	 * Creates a new rule with the given name, and copies the two symbols
+	 * present in the digram.
+	 * 
+	 * @param name
+	 *            rule name
+	 * @param digram
+	 *            a digram
+	 */
 	public Rule(String name, Digram digram) {
 		this(name);
-		appendSymbol(digram.getS1().copy());
-		appendSymbol(digram.getS2().copy());
+		append(digram.getS1().copy());
+		append(digram.getS2().copy());
 	}
 
-	public void appendSymbol(Symbol symbol) {
-		first.getPrevious().append(symbol);
-		symbol.append(first);
+	public void append(Symbol symbol) {
+		getLast().append(symbol);
+		symbol.append(guard);
 	}
 
+	/**
+	 * Decrements the reference count of this rule.
+	 */
 	public void decrementReferenceCount() {
 		this.referenceCount--;
 	}
@@ -74,6 +92,33 @@ public class Rule {
 		return false;
 	}
 
+	/**
+	 * Returns the first symbol of this rule, or the guard if there are no
+	 * symbols in this rule.
+	 * 
+	 * @return the first symbol of this rule, or the guard if there are no
+	 *         symbols in this rule
+	 */
+	public Symbol getFirst() {
+		return guard.getNext();
+	}
+
+	/**
+	 * Returns the last symbol of this rule, or the guard if there are no
+	 * symbols in this rule.
+	 * 
+	 * @return the last symbol of this rule, or the guard if there are no
+	 *         symbols in this rule
+	 */
+	public Symbol getLast() {
+		return guard.getPrevious();
+	}
+
+	/**
+	 * Returns this rule's name.
+	 * 
+	 * @return this rule's name
+	 */
 	public String getName() {
 		return name;
 	}
@@ -83,33 +128,32 @@ public class Rule {
 		return name.hashCode();
 	}
 
+	/**
+	 * Increments the reference count of this rule.
+	 */
 	public void incrementReferenceCount() {
 		this.referenceCount++;
 	}
 
 	/**
-	 * Removes last symbol.
+	 * Returns <code>true</code> if this rule is only referenced once.
+	 * 
+	 * @return <code>true</code> if this rule is only referenced once
 	 */
-	public void pop() {
-		Symbol last = first.getPrevious();
-		Symbol penultimate = last.getPrevious();
-		penultimate.append(first);
+	public boolean isReferencedOnce() {
+		return (referenceCount == 1);
 	}
 
 	@Override
 	public String toString() {
 		String res = name + ": ";
-		Symbol symbol = first.getNext();
-		while (symbol != first) {
+		Symbol symbol = guard.getNext();
+		while (symbol != guard) {
 			res += symbol.toString();
 			symbol = symbol.getNext();
 		}
 
 		return res;
-	}
-
-	public GuardSymbol getGuard() {
-		return first;
 	}
 
 }

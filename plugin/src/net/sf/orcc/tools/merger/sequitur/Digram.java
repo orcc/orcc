@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.tools.merger.sequitur;
 
-
 /**
  * This class defines a digram.
  * 

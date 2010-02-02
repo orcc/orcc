@@ -37,7 +37,14 @@ package net.sf.orcc.tools.merger.sequitur;
 public class NonTerminalSymbol extends Symbol {
 
 	private Rule rule;
-	
+
+	/**
+	 * Creates a new non-terminal symbol that references the given rule, and
+	 * increments the rule's reference count.
+	 * 
+	 * @param rule
+	 *            rule referenced
+	 */
 	public NonTerminalSymbol(Rule rule) {
 		this.rule = rule;
 		rule.incrementReferenceCount();
@@ -47,17 +54,22 @@ public class NonTerminalSymbol extends Symbol {
 	public Symbol copy() {
 		return new NonTerminalSymbol(rule);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof NonTerminalSymbol) {
 			NonTerminalSymbol symbol = (NonTerminalSymbol) obj;
 			return rule.equals(symbol.rule);
 		}
-		
+
 		return false;
 	}
-	
+
+	/**
+	 * Returns the rule referenced by this non-terminal symbol.
+	 * 
+	 * @return the rule referenced by this non-terminal symbol
+	 */
 	public Rule getRule() {
 		return rule;
 	}
@@ -66,7 +78,12 @@ public class NonTerminalSymbol extends Symbol {
 	public int hashCode() {
 		return rule.hashCode();
 	}
-	
+
+	@Override
+	public boolean isNonTerminal() {
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return rule.getName();

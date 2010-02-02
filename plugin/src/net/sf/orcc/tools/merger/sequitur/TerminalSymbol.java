@@ -56,7 +56,7 @@ public class TerminalSymbol extends Symbol {
 
 		return false;
 	}
-	
+
 	public Object getContents() {
 		return contents;
 	}
@@ -65,7 +65,7 @@ public class TerminalSymbol extends Symbol {
 	public int hashCode() {
 		return contents.hashCode();
 	}
-	
+
 	@Override
 	public String toString() {
 		return contents.toString();

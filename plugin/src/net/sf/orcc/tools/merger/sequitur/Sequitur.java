@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * This class defines the Sequitur algorithm.
@@ -55,71 +56,86 @@ public class Sequitur {
 
 	private Symbol last;
 
-	private char lastName;
-
 	private Symbol penultimate;
+
+	private int ruleIndex;
 
 	private Rule s;
 
+	/**
+	 * Creates a new Sequitur algorithm.
+	 */
 	public Sequitur() {
 		digrams = new HashMap<Digram, Symbol>();
-		lastName = 'A';
+		ruleIndex = 1;
 	}
 
+	/**
+	 * Creates a new rule to represent the given digram. The given symbol and
+	 * its successor are replaced by a reference to the newly-created rule. The
+	 * penultimate and last symbols are also replaced by a reference to the
+	 * newly-created rule.
+	 * 
+	 * @param symbol
+	 *            symbol where the digram occurs
+	 * @param digram
+	 *            a digram
+	 */
 	private void createNewRule(Symbol symbol, Digram digram) {
-		Rule newRule = new Rule(String.valueOf(lastName), digram);
-		lastName++;
+		Rule newRule = new Rule(String.valueOf(ruleIndex), digram);
+		ruleIndex++;
 
 		// removes digram located at symbol, and references rule
 		NonTerminalSymbol s1 = new NonTerminalSymbol(newRule);
-		Symbol before = symbol.getPrevious();
-		Symbol after = symbol.getNext().getNext();
-		before.append(s1);
-		s1.append(after);
-
-		// remove obsolete digrams
-		removeDigram(before, symbol);
-		removeDigram(after.getPrevious(), after);
+		replaceDigram(symbol, s1);
 
 		// append reference to rule
 		NonTerminalSymbol s2 = new NonTerminalSymbol(newRule);
-		s.appendSymbol(s2);
+		replaceDigram(digram.getS1(), s2);
 
-		// update digrams
-		digrams.put(digram, newRule.getGuard().getNext());
 		last = s2;
 	}
 
-	private void removeDigram(Symbol s1, Symbol s2) {
-		Digram digram = new Digram(s1, s2);
-		digrams.remove(digram);
-	}
-
-	private void enforeDigramConstraint() {
-		Digram digram = new Digram(penultimate, last);
+	/**
+	 * Enforces the digram utility constraint.
+	 * 
+	 * @param digram
+	 *            a digram whose symbols are newly-linked
+	 * @param s1
+	 *            first symbol that references the digram
+	 */
+	private void enforceDigramUtility(Digram digram, Symbol s1) {
 		Symbol symbol = digrams.get(digram);
 		if (symbol == null) {
-			digrams.put(digram, penultimate);
+			digrams.put(digram, s1);
 		} else {
 			Symbol g1 = symbol.getPrevious();
 			Symbol g2 = symbol.getNext().getNext();
 
-			// removes last two digrams
-			removeDigram(penultimate.getPrevious(), penultimate);
-			removeDigram(penultimate, last);
-			
-			// removes last two symbols
-			s.pop();
-			s.pop();
-
-			if (g1.equals(g2)) {
+			if (g1 == g2) {
 				// there is a rule that contains only this digram
 				Rule rule = ((GuardSymbol) g1).getRule();
-				s.appendSymbol(new NonTerminalSymbol(rule));
+				replaceDigram(penultimate, new NonTerminalSymbol(rule));
 			} else {
 				// create a new rule
 				createNewRule(symbol, digram);
 			}
+		}
+	}
+
+	/**
+	 * Enforces the rule utility constraint when the digram located at the given
+	 * symbol <code>s1</code> is replaced by the given non-terminal symbol.
+	 * 
+	 * @param s1
+	 *            first symbol of the digram replaced
+	 * @param ntSymbol
+	 *            a non-terminal symbol
+	 */
+	private void enforceRuleUtility(Symbol s1, NonTerminalSymbol ntSymbol) {
+		if (s1.isNonTerminal()
+				&& ((NonTerminalSymbol) s1).getRule().isReferencedOnce()) {
+
 		}
 	}
 
@@ -128,16 +144,54 @@ public class Sequitur {
 		Iterator<?> it = terminals.iterator();
 		if (it.hasNext()) {
 			penultimate = new TerminalSymbol(it.next());
-			s.appendSymbol(penultimate);
+			s.append(penultimate);
 			while (it.hasNext()) {
 				last = new TerminalSymbol(it.next());
-				s.appendSymbol(last);
-				enforeDigramConstraint();
+				s.append(last);
+
+				// a link is made between penultimate and last
+				enforceDigramUtility(new Digram(penultimate, last), penultimate);
 				penultimate = last;
 			}
 		}
 
+		for (Entry<String, Rule> entry : Rule.rules.entrySet()) {
+			System.out.println(entry.getValue());
+		}
+
 		return s;
+	}
+
+	/**
+	 * Replaces the digram located at the given symbol <code>s1</code> by the
+	 * given new symbol.
+	 * 
+	 * @param s1
+	 *            first symbol of the digram to replace
+	 * @param ntSymbol
+	 *            a non-terminal symbol
+	 */
+	private void replaceDigram(Symbol s1, NonTerminalSymbol ntSymbol) {
+		Symbol before = s1.getPrevious();
+		Symbol s2 = s1.getNext();
+		Symbol after = s2.getNext();
+		ntSymbol.insertBetween(before, after);
+
+		// removes old digrams
+		digrams.remove(new Digram(before, s1));
+		digrams.remove(new Digram(s2, after));
+
+		// adds new digrams around the new symbol
+		enforceDigramUtility(new Digram(before, ntSymbol), before);
+		enforceDigramUtility(new Digram(ntSymbol, after), ntSymbol);
+
+		// replaces the digram by a reference to the new symbol
+		// does not enforce digram utility, because we just did that
+		Symbol reference = ntSymbol.getRule().getFirst();
+		digrams.put(new Digram(s1, s2), reference);
+
+		// because a digram is replaced by a non-terminal symbol
+		enforceRuleUtility(s1, ntSymbol);
 	}
 
 }
