@@ -99,7 +99,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		public Object interpret(BinaryExpr expr, Object... args) {
 			Expression e1 = (Expression) expr.getE1().accept(this, args);
 			Expression e2 = (Expression) expr.getE2().accept(this, args);
-
+									
 			Location location = expr.getLocation();
 			BinaryOp op = expr.getOp();
 
@@ -219,7 +219,18 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		block = assign.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Type type = assign.getTarget().getType();
+		it.previous();
 		assign.setValue(visitExpression(assign.getValue(), it, type));
+		it.next();
+		
+		//3AC does not support direct assignement
+		if (!(assign.getValue() instanceof BinaryExpr)){
+			Expression expr = assign.getValue();
+			Location location = expr.getLocation();
+			BinaryOp op = BinaryOp.PLUS;
+		
+			assign.setValue(new BinaryExpr(location, new IntExpr(0),op, expr, type));
+		}
 	}
 
 	@Override

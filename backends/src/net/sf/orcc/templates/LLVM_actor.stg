@@ -123,12 +123,13 @@ $LoadOp(result="%"+port+"_"+action, ty="%struct.fifo_s*", pointer="@"+actor+"_"+
 $CallOp(result="%"+result, ty="i1", fnptrval="@hasRoom", function_args="%struct.fifo_s* %"+port+"_"+action+", i32 "+numToken)$
 
 >>
+
 ///////////////////////////////////////////////////////////////////////////////
 // ORCC IR Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
 Assign(assign) ::= <<
-$AddOp(result="%"+assign.target, ty="i1", op1="0", op2=assign.value)$
+%$assign.target$ = $assign.value$
 
 >>
 
@@ -567,7 +568,7 @@ skip_$action$:
 >>
 
 schedulingTest(actions, iterator) ::= <<
-$actions: actionTest(action=it); separator=" else "$
+$actions: actionTest(action=it)$
 >>
 
 outside_FSM_schedulingTest(actions, iterator) ::= <<

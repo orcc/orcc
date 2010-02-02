@@ -47,8 +47,8 @@ import net.sf.orcc.ir.type.VoidType;
 public class LLVMTypePrinter extends DefaultTypePrinter {
 
 	private void printInt(Expression expr) {
-		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-/*
+/*		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+
 		if (size <= 8) {
 			builder.append("i8");
 		} else if (size <= 16) {
