@@ -127,7 +127,7 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="required" type="boolean" use="default" value="False">
+         <attribute name="required" type="boolean" use="default" value="false">
             <annotation>
                <documentation>
                   Specify if this option is mandatory
@@ -145,6 +145,13 @@
             <annotation>
                <documentation>
                   Restrict extension possiblity
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="workspace" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  Files can only be selected into the current workspace
                </documentation>
             </annotation>
          </attribute>

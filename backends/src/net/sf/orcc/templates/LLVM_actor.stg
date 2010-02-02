@@ -121,7 +121,6 @@ $vars: { var |[ %$var.variable$, %bb$var.variable.instruction.block.label$ ]}; s
 HasRoom(result, action, actor, port, numToken) ::= <<
 $LoadOp(result="%"+port+"_"+action, ty="%struct.fifo_s*", pointer="@"+actor+"_"+port)$
 $CallOp(result="%"+result, ty="i1", fnptrval="@hasRoom", function_args="%struct.fifo_s* %"+port+"_"+action+", i32 "+numToken)$
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

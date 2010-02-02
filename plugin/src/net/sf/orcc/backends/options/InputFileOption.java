@@ -29,6 +29,10 @@
 package net.sf.orcc.backends.options;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
@@ -217,8 +221,10 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 	 *
 	 * @return a String containing the option name
 	 */
-	public String getOption() {
-		return option;
+	public String[] getOption() {
+		List<String> options = new ArrayList<String>();
+		options.add(option);
+		return (String[]) options.toArray(new String[] {});
 	}
 	
 	/**
@@ -226,8 +232,10 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 	 *
 	 * @return a String containing the value
 	 */
-	public String getValue() {
-		return value;
+	public String[] getValue() {
+		List<String> values = new ArrayList<String>();
+		values.add(value);
+		return (String[]) values.toArray(new String[] {});
 	}
 	
 	/**

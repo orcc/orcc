@@ -59,7 +59,8 @@
                 <browseFile
                       caption="Location of llvm-as:"
                       name="llvm-as"
-                      required="true">
+                      required="true"
+                      workspace="false">
                 </browseFile>
              </option>
           </checkBox>

@@ -29,6 +29,9 @@
 package net.sf.orcc.backends.llvm;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -86,6 +89,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		String outputName = path + File.separator + id + ".s";
 		printer.printActor(outputName, id, actor);
+		
+		if (options.containsKey("llvm-as")){
+			printBitcode(options.get("llvm-as"), outputName, id);
+		}
 	}
 
 	@Override
@@ -97,5 +104,26 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		String outputName = path + File.separator + network.getName() + ".s";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
+	}
+	
+	protected void printBitcode(String cmd, String inputName, String actor) {
+		List<String> cmdList = new ArrayList<String>();
+		String outputName = path + File.separator + actor + ".bc";
+		
+		Runtime run = Runtime.getRuntime();
+		cmdList.add(cmd);
+		cmdList.add(inputName);
+		cmdList.add("-f");
+		cmdList.add("-o");
+		cmdList.add(outputName);
+		String[] test = cmdList.toArray(new String[]{});
+		
+		
+		try {
+			run.exec(test);
+		} catch (IOException e) {
+			System.err.println("Could not print bitcode : ");
+			e.printStackTrace();
+		}
 	}
 }

@@ -91,22 +91,24 @@ public class BackendFactory {
 	 */
 	public static AbstractOption[] getOption(String optionName) {
 		int ind = 0;
-		AbstractOption[] options = new AbstractOption[AbtractBackendOptions.size()]; 
+		AbstractOption[] res = new AbstractOption[AbtractBackendOptions.size()]; 
 		Iterator<String> it = AbtractBackendOptions.keySet().iterator();
 		while(it.hasNext()) {
 			String key = it.next();
 			AbstractOption[] abstractOptions = AbtractBackendOptions.get(key);
 			
 			for (AbstractOption abstractOption : abstractOptions){
-				String option = abstractOption.getOption();
-				if (option.equals(optionName)){
-					options[ind++]= abstractOption;
+				String[] options = abstractOption.getOption();
+				for (String option : options){
+					if (option.equals(optionName)){
+						res[ind++]= abstractOption;
+					}
 				}
 			}
 			
 		}
 		
-		return options;
+		return res;
 	}
 
 	/**
@@ -125,7 +127,7 @@ public class BackendFactory {
 			
 			if (elementName.equals("browseFile")){
 				String stringRequired = configurationElement.getAttribute("required");
-				boolean required = Boolean.getBoolean(stringRequired);
+				boolean required = Boolean.valueOf(stringRequired.toLowerCase());
 				String option = configurationElement.getAttribute("name");
 				String caption = configurationElement.getAttribute("caption");
 				String defaultVal = configurationElement.getAttribute("default");
@@ -133,8 +135,9 @@ public class BackendFactory {
 					defaultVal = new String("");				
 				}
 				String extension = configurationElement.getAttribute("extension");
-							
-				backendOptions[count] = new BrowseFileOption(option, caption, required, defaultVal, extension);
+				String stringWorkspace = configurationElement.getAttribute("workspace");
+				boolean workspace = Boolean.valueOf(stringWorkspace.toLowerCase());
+				backendOptions[count] = new BrowseFileOption(option, caption, required, workspace, defaultVal, extension);
 
 			}else if (elementName.equals("inputFile")){
 				String caption = configurationElement.getAttribute("caption");
@@ -223,11 +226,17 @@ public class BackendFactory {
 	public void runBackend(String name, String fileName, int fifoSize)
 			throws Exception {
 		IBackend backend = backends.get(name);	
-		AbstractOption[] options = AbtractBackendOptions.get(name);
+		AbstractOption[] abstractOptions = AbtractBackendOptions.get(name);
 		Map<String, String> optionMap = new HashMap<String, String>();
 		
-		for (AbstractOption option : options){
-			optionMap.put(option.getOption(), option.getValue());
+		for (AbstractOption abstractOption : abstractOptions){
+			String[] options = abstractOption.getOption();
+			String[] values = abstractOption.getValue();
+			int i = 0;
+			
+			for(String option : options){
+				optionMap.put(option, values[i++]);
+			}
 		}
 		
 		backend.setOptions(optionMap);

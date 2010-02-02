@@ -50,14 +50,14 @@ public interface AbstractOption {
 	 *
 	 * @return a String containing the option name
 	 */
-	public String getOption();
+	public String[] getOption();
 	
 	/**
 	 * Returns the value of the option
 	 *
 	 * @return a String containing the value
 	 */
-	public String getValue();
+	public String[] getValue();
 	
 	/**
 	 * Tests if the option is valid

@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends.options;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.backends.BackendFactory;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -144,6 +147,7 @@ public class CheckBoxOption implements AbstractOption, SelectionListener  {
 	
 		checkBox = new Button(group, SWT.CHECK);
 		checkBox.setFont(font);
+		checkBox.setSelection(value);
 		checkBox.addSelectionListener(this);
 		
 		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
@@ -167,8 +171,21 @@ public class CheckBoxOption implements AbstractOption, SelectionListener  {
 	 *
 	 * @return a String containing the option name
 	 */
-	public String getOption() {
-		return option;
+	public String[] getOption() {
+		List<String> options = new ArrayList<String>();
+		options.add(option);
+		
+		if (value){			
+			//Add suboptions to the option list
+			for (AbstractOption abstractOption : abstractOptions){
+				String[] subOptions = abstractOption.getOption();
+				for (String subOption : subOptions){
+					options.add(subOption);
+				}
+			}
+		}
+		
+		return (String[]) options.toArray(new String[] {});
 	}
 	
 	/**
@@ -176,8 +193,20 @@ public class CheckBoxOption implements AbstractOption, SelectionListener  {
 	 *
 	 * @return a String containing the value
 	 */
-	public String getValue() {
-		return Boolean.toString(value);
+	public String[] getValue() {
+		List<String> values = new ArrayList<String>();
+		values.add(Boolean.toString(value));
+		if (value){		
+			//Add suboptions value to the value list
+			for (AbstractOption abstractOption : abstractOptions){
+				String[] subOptions = abstractOption.getValue();
+				for (String subOption : subOptions){
+					values.add(subOption);
+				}
+			}
+		}
+		
+		return (String[]) values.toArray(new String[] {});
 	}
 	
 
@@ -225,7 +254,7 @@ public class CheckBoxOption implements AbstractOption, SelectionListener  {
 	public void show(Font font, Group group) {
 		this.font = font;
 		this.group = group;
-		
+
 		createCheckBox();
 		updateChildrens();
 	}

@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends.options;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
@@ -47,6 +50,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -118,6 +122,11 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	private String value;
 	
 	/**
+	 * indicate if the demanded file is located in the workspace
+	 */
+	private boolean workspace;
+	
+	/**
 	 * BrowseFileOption constructor 
 	 * 
 	 * @param option
@@ -131,24 +140,99 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	 * @param extension
 	 *       File extension for restricting selection
 	 */
-	public BrowseFileOption(String option, String caption, boolean required, String defaultVal, String extension){
+	public BrowseFileOption(String option, String caption, boolean required, boolean workspace, String defaultVal, String extension){
 		this.option = option;
 		this.caption = caption;
 		this.required = required;
 		this.value = defaultVal;
 		this.extension = extension;
+		this.workspace = workspace;
 	}
 
+	/**
+	 * Creates the interface of the BrowseFile text into the given group
+	 * 
+	 * @param font
+	 *       Font used in the interface
+	 * @param group
+	 *       Group to add the input file interface
+	 */
+	private void createBrowseFile(){			
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		data.horizontalSpan = 3;
+		group.setLayoutData(data);
+		
+		lbl = new Label(group, SWT.LEFT);
+		lbl.setFont(font);
+		lbl.setText(caption);
+		
+		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+	
+		text = new Text(group, SWT.BORDER | SWT.SINGLE);
+		text.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		text.setLayoutData(data);
+		text.setText(value);
+		text.addModifyListener(this);
+	
+		buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (workspace){
+					editWorkspace(group.getShell(), text);
+				}else{
+					editExternalPath(group.getShell(), text);
+				}
+			}
+		});
+
+	}
+	
 
 	/**
-	 * Creates the interface of the browseFiles button
+	 * Dispose option elements
+	 */
+	@Override
+	public void dispose() {
+		if (text != null){
+			text.dispose();
+			buttonBrowse.dispose();
+			lbl.dispose();
+		}
+	}
+
+	/**
+	 * Creates the FileDialog of the browseFiles button
 	 * 
 	 * @param shell
 	 *       Instance of the windows manager
 	 * @param text
 	 *       Text of input file interface
 	 */
-	private void browseFiles(Shell shell, Text text) {
+	private void editExternalPath(Shell shell, Text text) {
+		FileDialog fileDialog = new FileDialog(shell,  SWT.OPEN);
+
+		if (extension!= null){
+			fileDialog.setFilterExtensions(new String[]{extension});
+		}
+		text.setText(fileDialog.open());
+	}
+	
+	/**
+	 * Creates the ElementTreeSelectionDialog of the browseFiles button
+	 * 
+	 * @param shell
+	 *       Instance of the windows manager
+	 * @param text
+	 *       Text of input file interface
+	 */
+	private void editWorkspace(Shell shell, Text text) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
 				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
 				new WorkbenchContentProvider());
@@ -198,59 +282,6 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 			text.setText(file.getLocation().toOSString());
 		}
 	}
-
-	/**
-	 * Creates the interface of the BrowseFile text into the given group
-	 * 
-	 * @param font
-	 *       Font used in the interface
-	 * @param group
-	 *       Group to add the input file interface
-	 */
-	private void createBrowseFile(){			
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		data.horizontalSpan = 3;
-		group.setLayoutData(data);
-		
-		lbl = new Label(group, SWT.LEFT);
-		lbl.setFont(font);
-		lbl.setText(caption);
-		
-		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		lbl.setLayoutData(data);
-	
-		text = new Text(group, SWT.BORDER | SWT.SINGLE);
-		text.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		text.setLayoutData(data);
-		text.setText(value);
-		text.addModifyListener(this);
-	
-		buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				browseFiles(group.getShell(), text);
-			}
-		});
-
-	}
-	
-	/**
-	 * Dispose option elements
-	 */
-	@Override
-	public void dispose() {
-		if (text != null){
-			text.dispose();
-			buttonBrowse.dispose();
-			lbl.dispose();
-		}
-	}
 	
 	/**
 	 * Returns an IFile instance of the focused file in text
@@ -274,8 +305,10 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	 *
 	 * @return a String containing the option name
 	 */
-	public String getOption() {
-		return option;
+	public String[] getOption() {
+		List<String> options = new ArrayList<String>();
+		options.add(option);
+		return (String[]) options.toArray(new String[] {});
 	}
 	
 	/**
@@ -283,8 +316,10 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	 *
 	 * @return a String containing the value
 	 */
-	public String getValue() {
-		return value;
+	public String[] getValue() {
+		List<String> values = new ArrayList<String>();
+		values.add(value);
+		return (String[]) values.toArray(new String[] {});
 	}
 	
 
@@ -311,8 +346,12 @@ public class BrowseFileOption implements ModifyListener, AbstractOption {
 	 */
 	@Override
 	public void modifyText(ModifyEvent e) {
-		IFile file = getFileFromText(text);
-		if (!file.toString().equals("")){
+		if (workspace){
+			IFile file = getFileFromText(text);
+			if (!file.toString().equals("")){
+				value = text.getText();
+			}
+		}else{
 			value = text.getText();
 		}
 		
