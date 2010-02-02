@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,18 +28,33 @@
  */
 package net.sf.orcc.ui.editors;
 
-import org.eclipse.jface.text.rules.IWhitespaceDetector;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.ui.editors.text.FileDocumentProvider;
 
 /**
- * This class defines a simple whitespace detector.
+ * This class defines a CAL document provider. It extends the file document
+ * provider with the createDocument method that returns the partition scanner
+ * for CAL documents.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CalWhitespaceDetector implements IWhitespaceDetector {
+public class StgDocumentProvider extends FileDocumentProvider {
 
-	public boolean isWhitespace(char c) {
-		return Character.isWhitespace(c);
+	protected IDocument createDocument(Object element) throws CoreException {
+		IDocument document = super.createDocument(element);
+		if (document != null) {
+			IDocumentPartitioner partitioner = new FastPartitioner(
+					new StgPartitionScanner(), new String[] {
+							StgPartitionScanner.STG_COMMENT,
+							StgPartitionScanner.STG_TEMPLATE });
+			partitioner.connect(document);
+			document.setDocumentPartitioner(partitioner);
+		}
+		return document;
 	}
 
 }

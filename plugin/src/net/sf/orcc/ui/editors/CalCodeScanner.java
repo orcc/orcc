@@ -314,7 +314,7 @@ public class CalCodeScanner extends RuleBasedScanner {
 
 		List<IRule> rules = new ArrayList<IRule>();
 
-		rules.add(new WhitespaceRule(new CalWhitespaceDetector()));
+		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		rules.add(new SingleLineRule("\"", "\"", constantToken, '\\'));
 		rules.add(new SingleLineRule("'", "'", constantToken, '\\'));

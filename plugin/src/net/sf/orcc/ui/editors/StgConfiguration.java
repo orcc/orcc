@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -38,8 +38,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 /**
- * This class defines the configuration of a CAL editor. The configuration
- * consists in (1) the content types allowed in a CAL document, which are
+ * This class defines the configuration of a STG editor. The configuration
+ * consists in (1) the content types allowed in a STG document, which are
  * default, and single-line, multi-line, javadoc comments (2) the presentation
  * reconcilier configured for these content types.
  * 
@@ -52,17 +52,15 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
  * @author Matthieu Wipliez
  * 
  */
-public class CalConfiguration extends SourceViewerConfiguration {
+public class StgConfiguration extends SourceViewerConfiguration {
 
 	private ColorManager manager;
 
-	private CalCodeScanner scanner;
+	private StgScanner scanner;
 
-	private EmptyScanner multiLineCommentScanner;
+	private StgTemplateScanner templateScanner;
 
-	private EmptyScanner singleLineCommentScanner;
-
-	private EmptyScanner javadocCommentScanner;
+	private EmptyScanner commentScanner;
 
 	/**
 	 * Creates a new configuration based on the given color manager.
@@ -70,26 +68,21 @@ public class CalConfiguration extends SourceViewerConfiguration {
 	 * @param colorManager
 	 *            a color manager
 	 */
-	public CalConfiguration(ColorManager colorManager) {
+	public StgConfiguration(ColorManager colorManager) {
 		this.manager = colorManager;
 
-		scanner = new CalCodeScanner(manager);
+		scanner = new StgScanner(manager);
 		scanner.setDefaultReturnToken(new Token(new TextAttribute(manager
-				.getColor(ICalColorConstants.DEFAULT))));
+				.getColor(IStgColorConstants.DEFAULT))));
 
-		javadocCommentScanner = new EmptyScanner(manager,
-				ICalColorConstants.JAVADOC_COMMENT);
-		multiLineCommentScanner = new EmptyScanner(manager,
-				ICalColorConstants.COMMENT);
-		singleLineCommentScanner = new EmptyScanner(manager,
-				ICalColorConstants.COMMENT);
+		commentScanner = new EmptyScanner(manager, IStgColorConstants.COMMENT);
+		templateScanner = new StgTemplateScanner(manager);
 	}
 
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 		return new String[] { IDocument.DEFAULT_CONTENT_TYPE,
-				CalPartitionScanner.CAL_JAVADOC_COMMENT,
-				CalPartitionScanner.CAL_MULTI_LINE_COMMENT,
-				CalPartitionScanner.CAL_SINGLE_LINE_COMMENT };
+				StgPartitionScanner.STG_COMMENT,
+				StgPartitionScanner.STG_TEMPLATE };
 	}
 
 	public IPresentationReconciler getPresentationReconciler(
@@ -102,17 +95,13 @@ public class CalConfiguration extends SourceViewerConfiguration {
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
-		dr = new DefaultDamagerRepairer(javadocCommentScanner);
-		reconciler.setDamager(dr, CalPartitionScanner.CAL_JAVADOC_COMMENT);
-		reconciler.setRepairer(dr, CalPartitionScanner.CAL_JAVADOC_COMMENT);
+		dr = new DefaultDamagerRepairer(commentScanner);
+		reconciler.setDamager(dr, StgPartitionScanner.STG_COMMENT);
+		reconciler.setRepairer(dr, StgPartitionScanner.STG_COMMENT);
 
-		dr = new DefaultDamagerRepairer(multiLineCommentScanner);
-		reconciler.setDamager(dr, CalPartitionScanner.CAL_MULTI_LINE_COMMENT);
-		reconciler.setRepairer(dr, CalPartitionScanner.CAL_MULTI_LINE_COMMENT);
-
-		dr = new DefaultDamagerRepairer(singleLineCommentScanner);
-		reconciler.setDamager(dr, CalPartitionScanner.CAL_SINGLE_LINE_COMMENT);
-		reconciler.setRepairer(dr, CalPartitionScanner.CAL_SINGLE_LINE_COMMENT);
+		dr = new DefaultDamagerRepairer(templateScanner);
+		reconciler.setDamager(dr, StgPartitionScanner.STG_TEMPLATE);
+		reconciler.setRepairer(dr, StgPartitionScanner.STG_TEMPLATE);
 
 		return reconciler;
 	}

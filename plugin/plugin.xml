@@ -140,6 +140,15 @@
             id="net.sf.orcc.ui.editors.RVCCalEditor"
             name="RVC-CAL editor">
       </editor>
+      <editor
+            class="net.sf.orcc.ui.editors.StgEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="false"
+            extensions="stg"
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.ui.editors.StgEditor"
+            name="StringTemplateGroup editor">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.debug.core.sourcePathComputers">

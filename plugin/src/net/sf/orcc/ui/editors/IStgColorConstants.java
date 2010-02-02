@@ -28,34 +28,36 @@
  */
 package net.sf.orcc.ui.editors;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.jface.text.TextAttribute;
-import org.eclipse.jface.text.rules.IRule;
-import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.Token;
+import org.eclipse.swt.graphics.RGB;
 
 /**
- * This class defines a scanner called on contents that are inside javadoc
- * comments. The scanner does nothing at the moment.
+ * This class defines constants for the STG editor.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CalJavadocCommentScanner extends RuleBasedScanner {
+public interface IStgColorConstants {
 
-	public CalJavadocCommentScanner(ColorManager manager) {
-		IToken commentToken = new Token(new TextAttribute(manager
-				.getColor(ICalColorConstants.JAVADOC_COMMENT)));
-		setDefaultReturnToken(commentToken);
+	/**
+	 * single-line and multi-line comment
+	 */
+	RGB COMMENT = new RGB(63, 127, 95);
 
-		List<IRule> rules = new ArrayList<IRule>();
+	/**
+	 * javadoc comment
+	 */
+	RGB JAVADOC_COMMENT = new RGB(63, 95, 191);
 
-		IRule[] result = new IRule[rules.size()];
-		rules.toArray(result);
-		setRules(result);
-	}
+	/**
+	 * black
+	 */
+	RGB DEFAULT = new RGB(0, 0, 0);
+
+	/**
+	 * keywork
+	 */
+	RGB KEYWORD = new RGB(127, 0, 85);
+
+	RGB SEPARATOR = new RGB(63, 95, 191);
 
 }

@@ -36,19 +36,20 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.swt.graphics.RGB;
 
 /**
- * This class defines a scanner called on contents that are inside single-line
- * comments. The scanner does nothing at the moment.
+ * This class defines an empty scanner. Useful when there is nothing specific we
+ * want to scan.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CalSingleLineCommentScanner extends RuleBasedScanner {
+public class EmptyScanner extends RuleBasedScanner {
 
-	public CalSingleLineCommentScanner(ColorManager manager) {
+	public EmptyScanner(ColorManager manager, RGB color) {
 		IToken commentToken = new Token(new TextAttribute(manager
-				.getColor(ICalColorConstants.COMMENT)));
+				.getColor(color)));
 		setDefaultReturnToken(commentToken);
 
 		List<IRule> rules = new ArrayList<IRule>();
