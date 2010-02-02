@@ -42,19 +42,85 @@ import java.util.Map;
  */
 public class Sequitur {
 
-	private Map<Digram, Symbol> digrams;
+	public static void main(String[] args) {
+		Sequitur seq = new Sequitur();
+		List<Character> terminals = new ArrayList<Character>();
+		for (char c : "abcdbcabcd".toCharArray()) {
+			terminals.add(c);
+		}
+		seq.getSRule(terminals);
+	}
 
-	private Symbol penultimate;
+	private Map<Digram, Symbol> digrams;
 
 	private Symbol last;
 
-	private Rule s;
-
 	private char lastName;
+
+	private Symbol penultimate;
+
+	private Rule s;
 
 	public Sequitur() {
 		digrams = new HashMap<Digram, Symbol>();
 		lastName = 'A';
+	}
+
+	private void createNewRule(Symbol symbol, Digram digram) {
+		Rule newRule = new Rule(String.valueOf(lastName), digram);
+		lastName++;
+
+		// removes digram located at symbol, and references rule
+		NonTerminalSymbol s1 = new NonTerminalSymbol(newRule);
+		Symbol before = symbol.getPrevious();
+		Symbol after = symbol.getNext().getNext();
+		before.append(s1);
+		s1.append(after);
+
+		// remove obsolete digrams
+		removeDigram(before, symbol);
+		removeDigram(after.getPrevious(), after);
+
+		// append reference to rule
+		NonTerminalSymbol s2 = new NonTerminalSymbol(newRule);
+		s.appendSymbol(s2);
+
+		// update digrams
+		digrams.put(digram, newRule.getGuard().getNext());
+		last = s2;
+	}
+
+	private void removeDigram(Symbol s1, Symbol s2) {
+		Digram digram = new Digram(s1, s2);
+		digrams.remove(digram);
+	}
+
+	private void enforeDigramConstraint() {
+		Digram digram = new Digram(penultimate, last);
+		Symbol symbol = digrams.get(digram);
+		if (symbol == null) {
+			digrams.put(digram, penultimate);
+		} else {
+			Symbol g1 = symbol.getPrevious();
+			Symbol g2 = symbol.getNext().getNext();
+
+			// removes last two digrams
+			removeDigram(penultimate.getPrevious(), penultimate);
+			removeDigram(penultimate, last);
+			
+			// removes last two symbols
+			s.pop();
+			s.pop();
+
+			if (g1.equals(g2)) {
+				// there is a rule that contains only this digram
+				Rule rule = ((GuardSymbol) g1).getRule();
+				s.appendSymbol(new NonTerminalSymbol(rule));
+			} else {
+				// create a new rule
+				createNewRule(symbol, digram);
+			}
+		}
 	}
 
 	public Rule getSRule(List<?> terminals) {
@@ -72,59 +138,6 @@ public class Sequitur {
 		}
 
 		return s;
-	}
-
-	private void enforeDigramConstraint() {
-		Digram digram = new Digram(penultimate, last);
-		Symbol symbol = digrams.get(digram);
-		if (symbol == null) {
-			digrams.put(digram, penultimate);
-		} else {
-			Symbol g1 = symbol.getPrevious();
-			Symbol g2 = symbol.getNext().getNext();
-
-			// removes last two symbols
-			s.pop();
-			s.pop();
-
-			if (g1.equals(g2)) {
-				// there is a rule that contains only this digram
-				Rule rule = ((NonTerminalSymbol) g1).getRule();
-				s.appendSymbol(new NonTerminalSymbol(rule));
-			} else {
-				// create a new rule
-				createNewRule(symbol, digram);
-			}
-		}
-	}
-
-	private void createNewRule(Symbol symbol, Digram digram) {
-		Rule newRule = new Rule(String.valueOf(lastName), digram);
-		lastName++;
-
-		// removes digram located at symbol, and references rule
-		NonTerminalSymbol s1 = new NonTerminalSymbol(newRule);
-		Symbol before = symbol.getPrevious();
-		Symbol after = symbol.getNext().getNext();
-		before.append(s1);
-		s1.append(after);
-
-		// append reference to rule
-		NonTerminalSymbol s2 = new NonTerminalSymbol(newRule);
-		s.appendSymbol(s2);
-		
-		// update digrams
-		digrams.put(digram, digram.getS1());
-		last = s2;
-	}
-
-	public static void main(String[] args) {
-		Sequitur seq = new Sequitur();
-		List<Character> terminals = new ArrayList<Character>();
-		for (char c : "abcdbcabcd".toCharArray()) {
-			terminals.add(c);
-		}
-		seq.getSRule(terminals);
 	}
 
 }

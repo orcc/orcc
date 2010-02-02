@@ -56,17 +56,17 @@ public class Digram {
 		return false;
 	}
 
-	@Override
-	public int hashCode() {
-		return s1.hashCode() ^ s2.hashCode();
-	}
-
 	public Symbol getS1() {
 		return s1;
 	}
 
 	public Symbol getS2() {
 		return s2;
+	}
+
+	@Override
+	public int hashCode() {
+		return s1.hashCode() ^ s2.hashCode();
 	}
 
 	@Override

@@ -36,7 +36,7 @@ package net.sf.orcc.tools.merger.sequitur;
  */
 public class Rule {
 
-	private Symbol first;
+	private GuardSymbol first;
 
 	private String name;
 
@@ -45,14 +45,14 @@ public class Rule {
 	public Rule(String name) {
 		this.name = name;
 
-		first = new NonTerminalSymbol(this);
+		first = new GuardSymbol(this);
 		first.append(first);
 	}
-	
+
 	public Rule(String name, Digram digram) {
 		this(name);
-		appendSymbol(digram.getS1());
-		appendSymbol(digram.getS2());
+		appendSymbol(digram.getS1().copy());
+		appendSymbol(digram.getS2().copy());
 	}
 
 	public void appendSymbol(Symbol symbol) {
@@ -72,6 +72,10 @@ public class Rule {
 		}
 
 		return false;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -94,15 +98,18 @@ public class Rule {
 
 	@Override
 	public String toString() {
-		String res = "[" + name + ": ";
+		String res = name + ": ";
 		Symbol symbol = first.getNext();
 		while (symbol != first) {
 			res += symbol.toString();
 			symbol = symbol.getNext();
 		}
-		
-		res += "]";
+
 		return res;
+	}
+
+	public GuardSymbol getGuard() {
+		return first;
 	}
 
 }

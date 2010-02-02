@@ -29,38 +29,47 @@
 package net.sf.orcc.tools.merger.sequitur;
 
 /**
- * This class defines a symbol.
+ * This class defines a guard symbol.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class Symbol {
+public class GuardSymbol extends Symbol {
+
+	private Rule rule;
 	
-	private Symbol next;
+	public GuardSymbol(Rule rule) {
+		this.rule = rule;
+		append(this);
+	}
+
+	@Override
+	public Symbol copy() {
+		return new GuardSymbol(rule);
+	}
 	
-	private Symbol previous;
-
-	public void append(Symbol symbol) {
-		next = symbol;
-		symbol.previous = this;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof GuardSymbol) {
+			GuardSymbol symbol = (GuardSymbol) obj;
+			return rule.equals(symbol.rule);
+		}
+		
+		return false;
+	}
+	
+	public Rule getRule() {
+		return rule;
 	}
 
-	public abstract Symbol copy();
-
-	public Symbol getNext() {
-		return next;
+	@Override
+	public int hashCode() {
+		return rule.hashCode();
 	}
-
-	public Symbol getPrevious() {
-		return previous;
-	}
-
-	public void setNext(Symbol next) {
-		this.next = next;
-	}
-
-	public void setPrevious(Symbol previous) {
-		this.previous = previous;
+	
+	@Override
+	public String toString() {
+		return "guard of rule " + rule.getName();
 	}
 
 }

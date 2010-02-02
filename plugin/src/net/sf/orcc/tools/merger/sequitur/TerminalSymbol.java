@@ -43,6 +43,11 @@ public class TerminalSymbol extends Symbol {
 	}
 
 	@Override
+	public Symbol copy() {
+		return new TerminalSymbol(contents);
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof TerminalSymbol) {
 			TerminalSymbol symbol = (TerminalSymbol) obj;
@@ -52,13 +57,13 @@ public class TerminalSymbol extends Symbol {
 		return false;
 	}
 	
+	public Object getContents() {
+		return contents;
+	}
+
 	@Override
 	public int hashCode() {
 		return contents.hashCode();
-	}
-
-	public Object getContents() {
-		return contents;
 	}
 	
 	@Override

@@ -40,6 +40,12 @@ public class NonTerminalSymbol extends Symbol {
 	
 	public NonTerminalSymbol(Rule rule) {
 		this.rule = rule;
+		rule.incrementReferenceCount();
+	}
+
+	@Override
+	public Symbol copy() {
+		return new NonTerminalSymbol(rule);
 	}
 	
 	@Override
@@ -52,18 +58,18 @@ public class NonTerminalSymbol extends Symbol {
 		return false;
 	}
 	
+	public Rule getRule() {
+		return rule;
+	}
+
 	@Override
 	public int hashCode() {
 		return rule.hashCode();
 	}
-
-	public Rule getRule() {
-		return rule;
-	}
 	
 	@Override
 	public String toString() {
-		return rule.toString();
+		return rule.getName();
 	}
 
 }
