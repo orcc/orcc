@@ -54,6 +54,7 @@ Algo_Merge_4x4_to_8x8_01.c
 Algo_MMCO.c
 Algo_MVR_MultiFrameAdptive.c
 Algo_NALU.c
+Algo_Parser_IPCM.c
 Algo_Split_16x16_to_4x4_norasterscan.c
 Algo_Synp_AVC.c
 Algo_Transpose4x4_0.c

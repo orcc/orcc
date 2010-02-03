@@ -104,6 +104,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(data);
 		setControl(composite);
+		
+		//Initialize backendSettings
+		backendSettings = new AbstractOption[]{};
 
 		createControlBackend(font, composite);
 		createControlOption(font, composite);
@@ -154,7 +157,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		for (String backend : factory.listBackends()) {
 			comboBackend.add(backend);
 		}
-
+		
 		comboBackend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {

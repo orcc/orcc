@@ -90,8 +90,7 @@ public class BackendFactory {
 	 * @return AbtractOption[] associated to the option
 	 */
 	public static AbstractOption[] getOption(String optionName) {
-		int ind = 0;
-		AbstractOption[] res = new AbstractOption[AbtractBackendOptions.size()]; 
+		List<AbstractOption> optionsList = new ArrayList<AbstractOption>(); 
 		Iterator<String> it = AbtractBackendOptions.keySet().iterator();
 		while(it.hasNext()) {
 			String key = it.next();
@@ -101,14 +100,14 @@ public class BackendFactory {
 				String[] options = abstractOption.getOption();
 				for (String option : options){
 					if (option.equals(optionName)){
-						res[ind++]= abstractOption;
+						optionsList.add(abstractOption);
 					}
 				}
 			}
 			
 		}
 		
-		return res;
+		return optionsList.toArray(new AbstractOption[]{});
 	}
 
 	/**
@@ -117,10 +116,7 @@ public class BackendFactory {
 	 * @return AbtractOption[] corresponding to the IConfigurationElement[]
 	 */
 	public static AbstractOption[] parseConfigurationElement(IConfigurationElement[] configurationElements){
-		int count = 0;
-		int size = configurationElements.length;
-		AbstractOption backendOptions[] = new AbstractOption[size]; 
-		
+		List<AbstractOption> backendOptions = new ArrayList<AbstractOption>();
 	
 		for (IConfigurationElement configurationElement :configurationElements){
 			String elementName = configurationElement.getName();
@@ -137,7 +133,7 @@ public class BackendFactory {
 				String extension = configurationElement.getAttribute("extension");
 				String stringWorkspace = configurationElement.getAttribute("workspace");
 				boolean workspace = Boolean.valueOf(stringWorkspace.toLowerCase());
-				backendOptions[count] = new BrowseFileOption(option, caption, required, workspace, defaultVal, extension);
+				backendOptions.add(new BrowseFileOption(option, caption, required, workspace, defaultVal, extension));
 
 			}else if (elementName.equals("inputFile")){
 				String caption = configurationElement.getAttribute("caption");
@@ -147,7 +143,7 @@ public class BackendFactory {
 				}
 				String extension = configurationElement.getAttribute("extension");
 							
-				backendOptions[count] = new InputFileOption(caption, defaultVal, extension);
+				backendOptions.add(new InputFileOption(caption, defaultVal, extension));
 			}else if (elementName.equals("checkBox")){
 				String caption = configurationElement.getAttribute("caption");
 				String option = configurationElement.getAttribute("name");
@@ -156,13 +152,11 @@ public class BackendFactory {
 					defaultVal = new String("");				
 				}
 							
-				backendOptions[count] = new CheckBoxOption(option, caption, defaultVal, configurationElement.getChildren());
-			}
-			count ++;
-			
+				backendOptions.add(new CheckBoxOption(option, caption, defaultVal, configurationElement.getChildren()));
+			}			
 		}
 		
-		return backendOptions;
+		return (AbstractOption[])backendOptions.toArray(new AbstractOption[]{});
 		
 		
 	}

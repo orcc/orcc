@@ -29,7 +29,6 @@
 package net.sf.orcc.backends;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
@@ -54,7 +53,7 @@ public abstract class AbstractBackend implements IBackend {
 	/**
 	 * Map containing a list of options.
 	 */
-	protected static Map<String, String> options = new HashMap<String, String>();
+	protected static Map<String, String> options;
 
 	/**
 	 * Path of the network.

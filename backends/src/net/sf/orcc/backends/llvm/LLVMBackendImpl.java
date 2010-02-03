@@ -106,21 +106,21 @@ public class LLVMBackendImpl extends AbstractBackend {
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 	
-	protected void printBitcode(String cmd, String inputName, String actor) {
+	protected void printBitcode(String execPath, String inputName, String actor) {
 		List<String> cmdList = new ArrayList<String>();
 		String outputName = path + File.separator + actor + ".bc";
 		
 		Runtime run = Runtime.getRuntime();
-		cmdList.add(cmd);
+		cmdList.add(execPath);
 		cmdList.add(inputName);
 		cmdList.add("-f");
 		cmdList.add("-o");
 		cmdList.add(outputName);
-		String[] test = cmdList.toArray(new String[]{});
+		String[] cmd = cmdList.toArray(new String[]{});
 		
 		
 		try {
-			run.exec(test);
+			run.exec(cmd);
 		} catch (IOException e) {
 			System.err.println("Could not print bitcode : ");
 			e.printStackTrace();
