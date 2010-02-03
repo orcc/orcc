@@ -46,8 +46,10 @@ public class Sequitur {
 	public static void main(String[] args) {
 		Sequitur seq = new Sequitur();
 		List<Character> terminals = new ArrayList<Character>();
-		final String pattern = "aaab";
-		for (int i = 0; i < 4; i++) {
+		//final String pattern = "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc";
+		final String pattern = "abbbbbbbbbbccccccccbccccccccbccccccccbccccccccbccccccccbccccccccbccccccccbd";
+		//final String pattern = "aaaaaaaaaaaaaaaabcccccccccccccccccccccccccccccccc";
+		for (int i = 0; i < 1; i++) {
 			for (char c : pattern.toCharArray()) {
 				terminals.add(c);
 			}
@@ -57,10 +59,6 @@ public class Sequitur {
 	}
 
 	private Map<Digram, Symbol> digrams;
-
-	private Symbol last;
-
-	private Symbol penultimate;
 
 	private int ruleIndex;
 
@@ -124,7 +122,7 @@ public class Sequitur {
 			if (g1 == g2) {
 				// there is a rule that contains only this digram
 				Rule rule = ((GuardSymbol) g1).getRule();
-				replaceDigram(penultimate, new NonTerminalSymbol(rule));
+				replaceDigram(s1, new NonTerminalSymbol(rule));
 			} else {
 				// create a new rule
 				createNewRule(symbol, digram);
@@ -150,32 +148,28 @@ public class Sequitur {
 		}
 	}
 
-	private void trySubstitute(NonTerminalSymbol ntSymbol, NonTerminalSymbol other) {
+	private void trySubstitute(NonTerminalSymbol ntSymbol,
+			NonTerminalSymbol other) {
 		Rule rule = ntSymbol.getRule();
 		if (rule.isReferencedOnce()) {
 			Symbol symbol = other.getRule().getFirst();
 			while (!symbol.equals(ntSymbol)) {
 				symbol = symbol.getNext();
 			}
-			
+
 			Symbol before = symbol.getPrevious();
 			Symbol after = symbol.getNext();
 			Symbol ruleStart = rule.getFirst();
 			Symbol ruleEnd = rule.getLast().getNext();
 			symbol = ruleStart;
-			
+
 			while (symbol != ruleEnd) {
 				Symbol next = symbol.getNext();
 				symbol.insertBetween(before, after);
-
-				if (!before.isGuard() && !symbol.isGuard()) {
-					digrams.put(new Digram(before, symbol), before);
-				}
-
 				before = symbol;
 				symbol = next;
 			}
-			
+
 			rule.delete();
 			toString();
 		}
@@ -185,10 +179,10 @@ public class Sequitur {
 		s = new Rule("s");
 		Iterator<?> it = terminals.iterator();
 		if (it.hasNext()) {
-			penultimate = new TerminalSymbol(it.next());
+			Symbol penultimate = new TerminalSymbol(it.next());
 			s.append(penultimate);
 			while (it.hasNext()) {
-				last = new TerminalSymbol(it.next());
+				Symbol last = new TerminalSymbol(it.next());
 				s.append(last);
 
 				// a link is made between penultimate and last
