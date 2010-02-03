@@ -86,7 +86,7 @@ public class NonTerminalSymbol extends Symbol {
 
 	@Override
 	public String toString() {
-		return rule.getName();
+		return "{" + rule.getName() + "}";
 	}
 
 }

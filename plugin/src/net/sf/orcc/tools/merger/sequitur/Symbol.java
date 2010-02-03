@@ -46,7 +46,7 @@ public abstract class Symbol {
 	 * @param symbol
 	 *            a symbol
 	 */
-	public void append(Symbol symbol) {
+	protected void append(Symbol symbol) {
 		next = symbol;
 		symbol.previous = this;
 	}
@@ -78,6 +78,15 @@ public abstract class Symbol {
 	public void insertBetween(Symbol predecessor, Symbol successor) {
 		predecessor.append(this);
 		append(successor);
+	}
+
+	/**
+	 * Returns <code>true</code> if this symbol is a guard.
+	 * 
+	 * @return <code>true</code> if this symbol is a guard
+	 */
+	public boolean isGuard() {
+		return false;
 	}
 
 	/**

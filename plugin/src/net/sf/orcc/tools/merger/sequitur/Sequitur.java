@@ -46,9 +46,13 @@ public class Sequitur {
 	public static void main(String[] args) {
 		Sequitur seq = new Sequitur();
 		List<Character> terminals = new ArrayList<Character>();
-		for (char c : "abcdbcabcd".toCharArray()) {
-			terminals.add(c);
+		final String pattern = "aaab";
+		for (int i = 0; i < 4; i++) {
+			for (char c : pattern.toCharArray()) {
+				terminals.add(c);
+			}
 		}
+
 		seq.getSRule(terminals);
 	}
 
@@ -92,8 +96,6 @@ public class Sequitur {
 		// append reference to rule
 		NonTerminalSymbol s2 = new NonTerminalSymbol(newRule);
 		replaceDigram(digram.getS1(), s2);
-
-		last = s2;
 	}
 
 	/**
@@ -105,10 +107,17 @@ public class Sequitur {
 	 *            first symbol that references the digram
 	 */
 	private void enforceDigramUtility(Digram digram, Symbol s1) {
+		if (digram.getS1().isGuard() || digram.getS2().isGuard()) {
+			return;
+		}
+
 		Symbol symbol = digrams.get(digram);
 		if (symbol == null) {
+			// digram is not repeated elsewhere
 			digrams.put(digram, s1);
-		} else {
+		} else if (symbol.getNext() != digram.getS1()) {
+			// the new digram is repeated elsewhere and the repetitions do not
+			// overlap
 			Symbol g1 = symbol.getPrevious();
 			Symbol g2 = symbol.getNext().getNext();
 
@@ -133,9 +142,42 @@ public class Sequitur {
 	 *            a non-terminal symbol
 	 */
 	private void enforceRuleUtility(Symbol s1, NonTerminalSymbol ntSymbol) {
-		if (s1.isNonTerminal()
-				&& ((NonTerminalSymbol) s1).getRule().isReferencedOnce()) {
+		Symbol s2 = s1.getNext();
+		if (s1.isNonTerminal()) {
+			trySubstitute((NonTerminalSymbol) s1, ntSymbol);
+		} else if (s2.isNonTerminal()) {
+			trySubstitute((NonTerminalSymbol) s2, ntSymbol);
+		}
+	}
 
+	private void trySubstitute(NonTerminalSymbol ntSymbol, NonTerminalSymbol other) {
+		Rule rule = ntSymbol.getRule();
+		if (rule.isReferencedOnce()) {
+			Symbol symbol = other.getRule().getFirst();
+			while (!symbol.equals(ntSymbol)) {
+				symbol = symbol.getNext();
+			}
+			
+			Symbol before = symbol.getPrevious();
+			Symbol after = symbol.getNext();
+			Symbol ruleStart = rule.getFirst();
+			Symbol ruleEnd = rule.getLast().getNext();
+			symbol = ruleStart;
+			
+			while (symbol != ruleEnd) {
+				Symbol next = symbol.getNext();
+				symbol.insertBetween(before, after);
+
+				if (!before.isGuard() && !symbol.isGuard()) {
+					digrams.put(new Digram(before, symbol), before);
+				}
+
+				before = symbol;
+				symbol = next;
+			}
+			
+			rule.delete();
+			toString();
 		}
 	}
 
@@ -151,13 +193,11 @@ public class Sequitur {
 
 				// a link is made between penultimate and last
 				enforceDigramUtility(new Digram(penultimate, last), penultimate);
-				penultimate = last;
+				penultimate = s.getLast();
 			}
 		}
 
-		for (Entry<String, Rule> entry : Rule.rules.entrySet()) {
-			System.out.println(entry.getValue());
-		}
+		System.out.println(this);
 
 		return s;
 	}
@@ -177,6 +217,15 @@ public class Sequitur {
 		Symbol after = s2.getNext();
 		ntSymbol.insertBetween(before, after);
 
+		// if either symbol is a non-terminal, decrements the reference count of
+		// the rule it references
+		if (s1.isNonTerminal()) {
+			((NonTerminalSymbol) s1).getRule().decrementReferenceCount();
+		}
+		if (s2.isNonTerminal()) {
+			((NonTerminalSymbol) s2).getRule().decrementReferenceCount();
+		}
+
 		// removes old digrams
 		digrams.remove(new Digram(before, s1));
 		digrams.remove(new Digram(s2, after));
@@ -192,6 +241,16 @@ public class Sequitur {
 
 		// because a digram is replaced by a non-terminal symbol
 		enforceRuleUtility(s1, ntSymbol);
+	}
+
+	@Override
+	public String toString() {
+		String res = "";
+		for (Entry<String, Rule> entry : Rule.rules.entrySet()) {
+			res += entry.getValue() + "\n";
+		}
+
+		return res;
 	}
 
 }

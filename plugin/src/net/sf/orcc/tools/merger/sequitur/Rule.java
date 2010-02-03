@@ -52,7 +52,6 @@ public class Rule {
 		rules.put(name, this);
 
 		guard = new GuardSymbol(this);
-		guard.append(guard);
 	}
 
 	/**
@@ -71,8 +70,7 @@ public class Rule {
 	}
 
 	public void append(Symbol symbol) {
-		getLast().append(symbol);
-		symbol.append(guard);
+		symbol.insertBetween(getLast(), guard);
 	}
 
 	/**
@@ -154,6 +152,10 @@ public class Rule {
 		}
 
 		return res;
+	}
+
+	public void delete() {
+		rules.remove(name);
 	}
 
 }

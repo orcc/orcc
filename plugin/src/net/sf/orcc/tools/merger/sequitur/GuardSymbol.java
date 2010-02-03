@@ -38,6 +38,12 @@ public class GuardSymbol extends Symbol {
 
 	private Rule rule;
 
+	/**
+	 * Creates a new guard symbol associated with the given rule.
+	 * 
+	 * @param rule
+	 *            the rule that references this guard
+	 */
 	public GuardSymbol(Rule rule) {
 		this.rule = rule;
 		append(this);
@@ -58,6 +64,11 @@ public class GuardSymbol extends Symbol {
 		return false;
 	}
 
+	/**
+	 * Returns the rule that references this guard.
+	 * 
+	 * @return the rule that references this guard
+	 */
 	public Rule getRule() {
 		return rule;
 	}
@@ -65,6 +76,11 @@ public class GuardSymbol extends Symbol {
 	@Override
 	public int hashCode() {
 		return rule.hashCode();
+	}
+
+	@Override
+	public boolean isGuard() {
+		return true;
 	}
 
 	@Override
