@@ -486,30 +486,32 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		write("Orcc frontend exit code: " + value + "\n");
 		if (value == 0) {
-			if (option.equals("backend")) {
-				monitor.subTask("Launching backend...");
-				write("\n");
-				write("*********************************************"
-						+ "**********************************\n");
-				write("Launching Orcc backend...\n");
-				launchBackend(configuration);
-				write("Orcc backend done.");
-			} else {
-				monitor.subTask("Launching simulator...");
-				write("\n");
-				write("*********************************************"
-						+ "**********************************\n");
-				write("Launching Orcc simulator...\n");
-				launchInterpreter(option);
-				write("Orcc simulation done.");
+			try {
+				if (option.equals("backend")) {
+					monitor.subTask("Launching backend...");
+					write("\n");
+					write("*********************************************"
+							+ "**********************************\n");
+					write("Launching Orcc backend...\n");
+					launchBackend(configuration);
+					write("Orcc backend done.");
+				} else {
+					monitor.subTask("Launching simulator...");
+					write("\n");
+					write("*********************************************"
+							+ "**********************************\n");
+					write("Launching Orcc simulator...\n");
+					launchInterpreter(option);
+					write("Orcc simulation done.");
+				}
+			} finally {
+				terminated = true;
+
+				DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
+				DebugEvent[] events = { event };
+				DebugPlugin.getDefault().fireDebugEventSet(events);
 			}
 		}
-
-		terminated = true;
-
-		DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
-		DebugEvent[] events = { event };
-		DebugPlugin.getDefault().fireDebugEventSet(events);
 	}
 
 	@Override
