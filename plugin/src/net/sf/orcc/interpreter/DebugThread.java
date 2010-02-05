@@ -10,9 +10,9 @@ public class DebugThread {
 	public class InterpreterStackFrame {
 		public String actorFilename;
 		public Integer codeLine;
-		public Map<String, Object> stateVars;
-		public String fsmState;
 		public String currentAction;
+		public String fsmState;
+		public Map<String, Object> stateVars;
 
 		public InterpreterStackFrame() {
 			actorFilename = "";
@@ -23,11 +23,11 @@ public class DebugThread {
 	}
 
 	private AbstractInterpretedActor actor;
-	private InterpreterMain interpreter;
-	private boolean threadSuspended = true;
-	private boolean threadStepping = false;
-	private boolean threadStepInto = false;
 	private boolean eventPending = false;
+	private InterpreterMain interpreter;
+	private boolean threadStepInto = false;
+	private boolean threadStepping = false;
+	private boolean threadSuspended = true;
 
 	public DebugThread(InterpreterMain interpreter,
 			AbstractInterpretedActor actor) {
@@ -35,12 +35,51 @@ public class DebugThread {
 		this.interpreter = interpreter;
 	}
 
-	public String getName() {
-		return actor.name;
+	public boolean eventPending() {
+		return eventPending;
 	}
 
 	public AbstractInterpretedActor getActor() {
 		return actor;
+	}
+
+	public String getName() {
+		return actor.name;
+	}
+
+	public InterpreterStackFrame getStackFrame() {
+		InterpreterStackFrame stackFrame = new InterpreterStackFrame();
+		if (actor.actor != null) {
+			stackFrame.actorFilename = actor.actor.getFile();
+			stackFrame.codeLine = actor.getLastVisitedLocation().getStartLine();
+			if (stackFrame.codeLine != 0) {
+				System.out.println("Location not null !");
+			}
+			stackFrame.stateVars.clear();
+			for (Variable stateVar : actor.actor.getStateVars()) {
+				stackFrame.stateVars.put(stateVar.getName(), stateVar
+						.getValue());
+			}
+			stackFrame.currentAction = actor.getLastVisitedAction();
+			if ((actor instanceof SourceActor)
+					|| (actor instanceof DisplayActor)
+					|| (actor instanceof BroadcastActor)) {
+				stackFrame.fsmState = "idle";
+			} else {
+				stackFrame.fsmState = ((InterpretedActor) actor).getFsmState();
+			}
+		}
+		return stackFrame;
+	}
+
+	public boolean isSuspended() {
+		return threadSuspended;
+	}
+
+	public void resume() {
+		threadSuspended = false;
+		eventPending = true;
+		interpreter.firePropertyChange("resumed client", null, actor.name);
 	}
 
 	public int run() {
@@ -72,23 +111,11 @@ public class DebugThread {
 		return actorStatus;
 	}
 
-	public void resume() {
-		threadSuspended = false;
+	public void stepInto() {
+		threadStepping = true;
+		threadStepInto = true;
 		eventPending = true;
-		interpreter.firePropertyChange("resumed client", null, actor.name);
-	}
-
-	public void suspend() {
-		threadSuspended = true;
-		interpreter.firePropertyChange("suspended client", null, actor.name);
-	}
-
-	public boolean isSuspended() {
-		return threadSuspended;
-	}
-
-	public boolean eventPending() {
-		return eventPending;
+		interpreter.firePropertyChange("resumed step", null, actor.name);
 	}
 
 	public void stepOver() {
@@ -97,35 +124,8 @@ public class DebugThread {
 		interpreter.firePropertyChange("resumed step", null, actor.name);
 	}
 
-	public void stepInto() {
-		threadStepping = true;
-		threadStepInto = true;
-		eventPending = true;
-		interpreter.firePropertyChange("resumed step", null, actor.name);
-	}
-
-	public InterpreterStackFrame getStackFrame() {
-		InterpreterStackFrame stackFrame = new InterpreterStackFrame();
-		if (actor.actor != null) {
-			stackFrame.actorFilename = actor.actor.getFile();
-			stackFrame.codeLine = actor.getLastVisitedLocation().getStartLine();
-			if (stackFrame.codeLine != 0) {
-				System.out.println("Location not null !");
-			}
-			stackFrame.stateVars.clear();
-			for (Variable stateVar : actor.actor.getStateVars()) {
-				stackFrame.stateVars.put(stateVar.getName(), stateVar
-						.getValue());
-			}
-			stackFrame.currentAction = actor.getLastVisitedAction();
-			if ((actor instanceof SourceActor)
-					|| (actor instanceof DisplayActor)
-					|| (actor instanceof BroadcastActor)) {
-				stackFrame.fsmState = "idle";
-			} else {
-				stackFrame.fsmState = ((InterpretedActor) actor).getFsmState();
-			}
-		}
-		return stackFrame;
+	public void suspend() {
+		threadSuspended = true;
+		interpreter.firePropertyChange("suspended client", null, actor.name);
 	}
 }

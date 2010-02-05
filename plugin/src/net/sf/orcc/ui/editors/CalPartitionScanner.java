@@ -51,9 +51,9 @@ import org.eclipse.jface.text.rules.Token;
 public class CalPartitionScanner extends RuleBasedPartitionScanner {
 
 	/**
-	 * The identifier of the single-line end comment partition content type.
+	 * The identifier javadoc comment partition content type.
 	 */
-	public static final String CAL_SINGLE_LINE_COMMENT = "__cal_singleline_comment"; //$NON-NLS-1$
+	public static final String CAL_JAVADOC_COMMENT = "__cal_javadoc_comment"; //$NON-NLS-1$
 
 	/**
 	 * The identifier multi-line comment partition content type.
@@ -61,9 +61,9 @@ public class CalPartitionScanner extends RuleBasedPartitionScanner {
 	public static final String CAL_MULTI_LINE_COMMENT = "__cal_multiline_comment"; //$NON-NLS-1$
 
 	/**
-	 * The identifier javadoc comment partition content type.
+	 * The identifier of the single-line end comment partition content type.
 	 */
-	public static final String CAL_JAVADOC_COMMENT = "__cal_javadoc_comment"; //$NON-NLS-1$
+	public static final String CAL_SINGLE_LINE_COMMENT = "__cal_singleline_comment"; //$NON-NLS-1$
 
 	/**
 	 * Creates the partitioner and sets up the appropriate rules.

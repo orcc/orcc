@@ -36,6 +36,22 @@ import java.util.ArrayList;
  */
 public class MathExtended {
 
+	/**
+	 * Determines which is the average value
+	 * 
+	 * @param in
+	 * @return
+	 */
+	public static double avg(ArrayList<Double> in) {
+		double sum = 0;
+
+		for (int i = 0; i < in.size(); i++) {
+			sum += in.get(i);
+		}
+
+		return (in.size() > 0) ? sum / in.size() : 0;
+	}
+
 	public static boolean bitAndNotEqualsZero(int a, int b) {
 
 		String binA = Integer.toBinaryString(a);
@@ -109,22 +125,6 @@ public class MathExtended {
 		}
 
 		return min;
-	}
-
-	/**
-	 * Determines which is the average value
-	 * 
-	 * @param in
-	 * @return
-	 */
-	public static double avg(ArrayList<Double> in) {
-		double sum = 0;
-
-		for (int i = 0; i < in.size(); i++) {
-			sum += in.get(i);
-		}
-
-		return (in.size() > 0) ? sum / in.size() : 0;
 	}
 
 }

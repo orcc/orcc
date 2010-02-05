@@ -45,20 +45,6 @@ import net.sf.orcc.ir.expr.ExpressionEvaluator;
  */
 public abstract class AbstractConstant implements Constant {
 
-	/**
-	 * Returns a constant created by evaluating the given expression.
-	 * 
-	 * @param expr
-	 *            an expression
-	 * @return a constant
-	 * @throws OrccRuntimeException
-	 *             if the expression could not be evaluated to a constant
-	 */
-	public static Constant evaluate(Expression expr) {
-		Object value = expr.accept(new ExpressionEvaluator());
-		return constant(value);
-	}
-
 	private static Constant constant(Object value) {
 		if (value instanceof Boolean) {
 			return new BoolConst((Boolean) value);
@@ -77,6 +63,20 @@ public abstract class AbstractConstant implements Constant {
 		} else {
 			throw new OrccRuntimeException("this expression is not constant");
 		}
+	}
+
+	/**
+	 * Returns a constant created by evaluating the given expression.
+	 * 
+	 * @param expr
+	 *            an expression
+	 * @return a constant
+	 * @throws OrccRuntimeException
+	 *             if the expression could not be evaluated to a constant
+	 */
+	public static Constant evaluate(Expression expr) {
+		Object value = expr.accept(new ExpressionEvaluator());
+		return constant(value);
 	}
 
 	@Override

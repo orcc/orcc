@@ -50,9 +50,9 @@ public class SelfAssignment extends AbstractCInstruction implements
 
 	private BinaryOp op;
 
-	private Expression value;
-
 	private Variable target;
+
+	private Expression value;
 
 	public SelfAssignment(Location location, Variable target, BinaryOp op,
 			Expression value) {
@@ -71,17 +71,21 @@ public class SelfAssignment extends AbstractCInstruction implements
 		return op;
 	}
 
+	public Variable getTarget() {
+		return target;
+	}
+
 	@Override
 	public Expression getValue() {
 		return value;
 	}
 
-	public Variable getTarget() {
-		return target;
-	}
-
 	public void setOp(BinaryOp op) {
 		this.op = op;
+	}
+
+	public void setTarget(Variable target) {
+		this.target = target;
 	}
 
 	@Override
@@ -92,10 +96,6 @@ public class SelfAssignment extends AbstractCInstruction implements
 	@Override
 	public void setValueSimple(Expression value) {
 		this.value = value;
-	}
-
-	public void setTarget(Variable target) {
-		this.target = target;
 	}
 
 }

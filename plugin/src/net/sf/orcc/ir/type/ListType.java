@@ -39,6 +39,7 @@ import net.sf.orcc.ir.expr.ExpressionEvaluator;
  * This class defines a List type.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class ListType extends AbstractType {
@@ -105,7 +106,7 @@ public class ListType extends AbstractType {
 	}
 
 	@Override
-	public int getType() {
+	public int getTypeOf() {
 		return LIST;
 	}
 

@@ -59,13 +59,6 @@ public class DisplayActor extends AbstractInterpretedActor {
 		}
 	}
 
-	@Override
-	public void close() {
-		if (instance != null) {
-			instance.frame.dispose();
-		}
-	}
-
 	private static int convertYCbCrtoRGB(int y, int cb, int cr) {
 		y = (76306 * (y - 16)) + 32768;
 		int r = (y + (104597 * (cr - 128))) >> 16;
@@ -78,10 +71,6 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 		return (r << 16) | (g << 8) | b;
 	}
-
-	private OrccProcess process;
-
-	private boolean userInterruption;
 
 	private BufferStrategy buffer;
 
@@ -100,6 +89,10 @@ public class DisplayActor extends AbstractInterpretedActor {
 	private BufferedImage image;
 
 	private int numImages;
+
+	private OrccProcess process;
+
+	private boolean userInterruption;
 
 	public int width;
 
@@ -131,6 +124,13 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 		instance = this;
 		userInterruption = false;
+	}
+
+	@Override
+	public void close() {
+		if (instance != null) {
+			instance.frame.dispose();
+		}
 	}
 
 	@Override
@@ -169,15 +169,9 @@ public class DisplayActor extends AbstractInterpretedActor {
 		return running;
 	}
 
-	@Override
-	public boolean step() {
-		schedule();
-		return true;
-	}
-
 	private void setVideoSize() {
-		Object[] width = (Object[]) new Integer[1];
-		Object[] height = (Object[]) new Integer[1];
+		Object[] width = new Integer[1];
+		Object[] height = new Integer[1];
 
 		fifo_WIDTH.get(width);
 		fifo_HEIGHT.get(height);
@@ -203,8 +197,14 @@ public class DisplayActor extends AbstractInterpretedActor {
 		}
 	}
 
+	@Override
+	public boolean step() {
+		schedule();
+		return true;
+	}
+
 	private void writeMB() {
-		Object[] mb = (Object[]) new Integer[384];
+		Object[] mb = new Integer[384];
 		fifo_B.get(mb);
 
 		for (int i = 0; i < 8; i++) {

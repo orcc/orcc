@@ -12,22 +12,22 @@ import net.sf.orcc.network.Network;
 
 public class Scheduler {
 
-	private int noProcessors;
-	private NetworkGraph networkGraph;
 	public static String workingDirectoryPath;
+	private NetworkGraph networkGraph;
+	private int noProcessors;
 	
-	public Scheduler(String workingDirectoryPath, Network network, int noProcessors){
-		Scheduler.workingDirectoryPath = workingDirectoryPath;
-		this.noProcessors = noProcessors;
-		this.networkGraph = new NetworkGraph(network);
+	public Scheduler(Network network){
+		this(Scheduler.workingDirectoryPath, network, 1);
 	}
 	
 	public Scheduler(String workingDirectoryPath, Network network){
 		this(workingDirectoryPath, network, 1);
 	}
 	
-	public Scheduler(Network network){
-		this(Scheduler.workingDirectoryPath, network, 1);
+	public Scheduler(String workingDirectoryPath, Network network, int noProcessors){
+		Scheduler.workingDirectoryPath = workingDirectoryPath;
+		this.noProcessors = noProcessors;
+		this.networkGraph = new NetworkGraph(network);
 	}
 	
 	/**

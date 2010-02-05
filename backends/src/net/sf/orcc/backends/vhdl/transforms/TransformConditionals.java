@@ -52,11 +52,11 @@ import net.sf.orcc.ir.type.BoolType;
 public class TransformConditionals extends AbstractActorTransformation {
 
 	private Expression changeConditional(Expression expr) {
-		if (expr.getType() == Expression.VAR) {
+		if (expr.getTypeOf() == Expression.VAR) {
 			VarExpr varExpr = (VarExpr) expr;
 			return new BinaryExpr(varExpr, BinaryOp.EQ, new BoolExpr(true),
 					new BoolType());
-		} else if (expr.getType() == Expression.UNARY) {
+		} else if (expr.getTypeOf() == Expression.UNARY) {
 			UnaryExpr unaryExpr = (UnaryExpr) expr;
 			if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT) {
 				return new BinaryExpr(unaryExpr.getExpr(), BinaryOp.EQ,

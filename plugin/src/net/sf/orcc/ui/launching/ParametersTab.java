@@ -122,7 +122,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 				String[] varNames = new String[m.size()];
 				m.keySet().toArray(varNames);
 				for (int i = 0; i < m.size(); i++) {
-					elements[i] = new Variable(varNames[i], (String) m
+					elements[i] = new Variable(varNames[i], m
 							.get(varNames[i]));
 				}
 			}
@@ -139,6 +139,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 					return;
 				}
 				tableViewer.setComparator(new ViewerComparator() {
+					@Override
 					public int compare(Viewer iviewer, Object e1, Object e2) {
 						if (e1 == null) {
 							return -1;
@@ -286,6 +287,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 		final Table tref = table;
 		final Composite comp = tableComposite;
 		tableComposite.addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(ControlEvent e) {
 				Rectangle area = comp.getClientArea();
 				Point size = tref.computeSize(SWT.DEFAULT, SWT.DEFAULT);

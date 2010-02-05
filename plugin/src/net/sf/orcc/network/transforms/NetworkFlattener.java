@@ -58,6 +58,45 @@ import org.jgrapht.DirectedGraph;
  */
 public class NetworkFlattener implements INetworkTransformation {
 
+	/**
+	 * Copy all instances and edges between them of subGraph in graph
+	 * 
+	 * @throws OrccException
+	 */
+	private void copySubGraph(HashMap<String, Integer> existingInsts,
+			Map<String, IAttribute> attrs, Network network, Network subNetwork)
+			throws OrccException {
+		DirectedGraph<Vertex, Connection> graph = network.getGraph();
+		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
+
+		Set<Vertex> vertexSet = new HashSet<Vertex>(subGraph.vertexSet());
+		Set<Connection> edgeSet = new HashSet<Connection>(subGraph.edgeSet());
+
+		for (Vertex vertex : vertexSet) {
+			if (vertex.isInstance()) {
+				Map<String, IAttribute> vertexAttrs = vertex.getInstance()
+						.getAttributes();
+				for (Entry<String, IAttribute> attr : attrs.entrySet()) {
+					if (!vertexAttrs.containsKey(attr.getKey())) {
+						vertexAttrs.put(attr.getKey(), attr.getValue());
+					}
+				}
+
+				graph.addVertex(renameInstance(existingInsts, vertex, graph,
+						subGraph));
+			}
+		}
+
+		for (Connection edge : edgeSet) {
+			Vertex srcVertex = subGraph.getEdgeSource(edge);
+			Vertex tgtVertex = subGraph.getEdgeTarget(edge);
+
+			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
+				graph.addEdge(srcVertex, tgtVertex, edge);
+			}
+		}
+	}
+
 	private void copyVariables(OrderedMap<GlobalVariable> existingVars,
 			Network network, Instance instance) throws OrccException {
 
@@ -80,23 +119,84 @@ public class NetworkFlattener implements INetworkTransformation {
 		}
 	}
 
-	private Expression resolveExpr(Expression expr,
-			HashMap<String, Expression> parentParams) {
-		if (expr.getType() == Expression.BINARY) {
-			BinaryExpr bopExpr = (BinaryExpr) expr;
-			bopExpr.setE1(resolveExpr(bopExpr.getE1(), parentParams));
-			bopExpr.setE2(resolveExpr(bopExpr.getE2(), parentParams));
+	/**
+	 * Links each predecessor of vertex to the successors of the input port in
+	 * subGraph
+	 * 
+	 * @param vertex
+	 *            the parent graph
+	 * @param graph
+	 *            the parent graph
+	 * @param subGraph
+	 *            the child graph
+	 * @throws OrccException
+	 */
+	private void linkIncomingConnections(Vertex vertex,
+			DirectedGraph<Vertex, Connection> graph,
+			DirectedGraph<Vertex, Connection> subGraph) throws OrccException {
+		Set<Connection> incomingEdgeSet = new HashSet<Connection>(graph
+				.incomingEdgesOf(vertex));
 
-		} else if (expr.getType() == Expression.UNARY) {
-			UnaryExpr uopExpr = (UnaryExpr) expr;
-			uopExpr.setExpr(resolveExpr(uopExpr.getExpr(), parentParams));
+		for (Connection edge : incomingEdgeSet) {
 
-		} else {
-			if (parentParams.containsKey(expr.toString())) {
-				expr = parentParams.get(expr.toString());
+			Set<Connection> outgoingEdgeSet = new HashSet<Connection>();
+
+			for (Vertex v : subGraph.vertexSet()) {
+				if (v.isPort()) {
+					if (edge.getTarget().getName()
+							.equals(v.getPort().getName())) {
+						outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
+					}
+				}
+			}
+
+			for (Connection newEdge : outgoingEdgeSet) {
+				Connection incoming = new Connection(edge.getSource(), newEdge
+						.getTarget(), edge.getAttributes());
+				graph.addEdge(graph.getEdgeSource(edge), subGraph
+						.getEdgeTarget(newEdge), incoming);
 			}
 		}
-		return expr;
+	}
+
+	/**
+	 * Links each successor of vertex to the predecessors of the output port in
+	 * subGraph
+	 * 
+	 * @param vertex
+	 *            the current vertex
+	 * @param graph
+	 *            the parent graph
+	 * @param subGraph
+	 *            the child graph
+	 * @throws OrccException
+	 */
+	private void linkOutgoingConnections(Vertex vertex,
+			DirectedGraph<Vertex, Connection> graph,
+			DirectedGraph<Vertex, Connection> subGraph) throws OrccException {
+		Set<Connection> outgoingEdgeSet = new HashSet<Connection>(graph
+				.outgoingEdgesOf(vertex));
+
+		for (Connection edge : outgoingEdgeSet) {
+
+			Set<Connection> incomingEdgeSet = new HashSet<Connection>();
+
+			for (Vertex v : subGraph.vertexSet()) {
+				if (v.isPort()) {
+					if (edge.getSource().getName()
+							.equals(v.getPort().getName())) {
+						incomingEdgeSet = subGraph.incomingEdgesOf(v);
+					}
+				}
+			}
+
+			for (Connection newEdge : incomingEdgeSet) {
+				Connection incoming = new Connection(newEdge.getSource(), edge
+						.getTarget(), edge.getAttributes());
+				graph.addEdge(subGraph.getEdgeSource(newEdge), graph
+						.getEdgeTarget(edge), incoming);
+			}
+		}
 	}
 
 	/**
@@ -158,123 +258,23 @@ public class NetworkFlattener implements INetworkTransformation {
 		return vertex;
 	}
 
-	/**
-	 * Copy all instances and edges between them of subGraph in graph
-	 * 
-	 * @throws OrccException
-	 */
-	private void copySubGraph(HashMap<String, Integer> existingInsts,
-			Map<String, IAttribute> attrs, Network network, Network subNetwork)
-			throws OrccException {
-		DirectedGraph<Vertex, Connection> graph = network.getGraph();
-		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
+	private Expression resolveExpr(Expression expr,
+			HashMap<String, Expression> parentParams) {
+		if (expr.getTypeOf() == Expression.BINARY) {
+			BinaryExpr bopExpr = (BinaryExpr) expr;
+			bopExpr.setE1(resolveExpr(bopExpr.getE1(), parentParams));
+			bopExpr.setE2(resolveExpr(bopExpr.getE2(), parentParams));
 
-		Set<Vertex> vertexSet = new HashSet<Vertex>(subGraph.vertexSet());
-		Set<Connection> edgeSet = new HashSet<Connection>(subGraph.edgeSet());
+		} else if (expr.getTypeOf() == Expression.UNARY) {
+			UnaryExpr uopExpr = (UnaryExpr) expr;
+			uopExpr.setExpr(resolveExpr(uopExpr.getExpr(), parentParams));
 
-		for (Vertex vertex : vertexSet) {
-			if (vertex.isInstance()) {
-				Map<String, IAttribute> vertexAttrs = vertex.getInstance()
-						.getAttributes();
-				for (Entry<String, IAttribute> attr : attrs.entrySet()) {
-					if (!vertexAttrs.containsKey(attr.getKey())) {
-						vertexAttrs.put(attr.getKey(), attr.getValue());
-					}
-				}
-
-				graph.addVertex(renameInstance(existingInsts, vertex, graph,
-						subGraph));
+		} else {
+			if (parentParams.containsKey(expr.toString())) {
+				expr = parentParams.get(expr.toString());
 			}
 		}
-
-		for (Connection edge : edgeSet) {
-			Vertex srcVertex = subGraph.getEdgeSource(edge);
-			Vertex tgtVertex = subGraph.getEdgeTarget(edge);
-
-			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
-				graph.addEdge(srcVertex, tgtVertex, edge);
-			}
-		}
-	}
-
-	/**
-	 * Links each successor of vertex to the predecessors of the output port in
-	 * subGraph
-	 * 
-	 * @param vertex
-	 *            the current vertex
-	 * @param graph
-	 *            the parent graph
-	 * @param subGraph
-	 *            the child graph
-	 * @throws OrccException
-	 */
-	private void linkOutgoingConnections(Vertex vertex,
-			DirectedGraph<Vertex, Connection> graph,
-			DirectedGraph<Vertex, Connection> subGraph) throws OrccException {
-		Set<Connection> outgoingEdgeSet = new HashSet<Connection>(graph
-				.outgoingEdgesOf(vertex));
-
-		for (Connection edge : outgoingEdgeSet) {
-
-			Set<Connection> incomingEdgeSet = new HashSet<Connection>();
-
-			for (Vertex v : subGraph.vertexSet()) {
-				if (v.isPort()) {
-					if (edge.getSource().getName()
-							.equals(v.getPort().getName())) {
-						incomingEdgeSet = subGraph.incomingEdgesOf(v);
-					}
-				}
-			}
-
-			for (Connection newEdge : incomingEdgeSet) {
-				Connection incoming = new Connection(newEdge.getSource(), edge
-						.getTarget(), edge.getAttributes());
-				graph.addEdge(subGraph.getEdgeSource(newEdge), graph
-						.getEdgeTarget(edge), incoming);
-			}
-		}
-	}
-
-	/**
-	 * Links each predecessor of vertex to the successors of the input port in
-	 * subGraph
-	 * 
-	 * @param vertex
-	 *            the parent graph
-	 * @param graph
-	 *            the parent graph
-	 * @param subGraph
-	 *            the child graph
-	 * @throws OrccException
-	 */
-	private void linkIncomingConnections(Vertex vertex,
-			DirectedGraph<Vertex, Connection> graph,
-			DirectedGraph<Vertex, Connection> subGraph) throws OrccException {
-		Set<Connection> incomingEdgeSet = new HashSet<Connection>(graph
-				.incomingEdgesOf(vertex));
-
-		for (Connection edge : incomingEdgeSet) {
-
-			Set<Connection> outgoingEdgeSet = new HashSet<Connection>();
-
-			for (Vertex v : subGraph.vertexSet()) {
-				if (v.isPort()) {
-					if (edge.getTarget().getName()
-							.equals(v.getPort().getName())) {
-						outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
-					}
-				}
-			}
-
-			for (Connection newEdge : outgoingEdgeSet) {
-				Connection incoming = new Connection(edge.getSource(), newEdge
-						.getTarget(), edge.getAttributes());
-				graph.addEdge(graph.getEdgeSource(edge), subGraph
-						.getEdgeTarget(newEdge), incoming);
-			}
-		}
+		return expr;
 	}
 
 	@Override

@@ -35,11 +35,11 @@ import java.util.ArrayList;
  * @author vimartin
  */
 public class Actor_t {
-    private Integer cluster;
-	private Integer owner, delay, data;			// owner: the index of the processor that executes this actor
-	private ArrayList<Integer> output, input;
     private String actionName;
-    private String actorName;
+	private String actorName;
+	private Integer cluster;
+    private ArrayList<Integer> output, input;
+    private Integer owner, delay, data;			// owner: the index of the processor that executes this actor
     private String shortActorName;
     
     /**
@@ -75,6 +75,14 @@ public class Actor_t {
         this.actorName = actorName;
     }
 
+    public boolean addInput(int in){
+        return input.add(in);
+    }
+
+    public boolean addOutput(int out){
+        return output.add(out);
+    }
+
     /**
      * 
      * @return
@@ -83,40 +91,28 @@ public class Actor_t {
         return actionName;
     }
 
-    public void setActionName(String actionName) {
-        this.actionName = actionName;
-    }
-
     public String getActorName() {
         return actorName;
-    }
-
-    public void setActorName(String actorName) {
-        this.actorName = actorName;
     }
 
     public Integer getCluster() {
         return cluster;
     }
 
-    public void setCluster(int cluster) {
-        this.cluster = cluster;
-    }
-
     public Integer getData() {
         return data;
-    }
-
-    public void setData(int data) {
-        this.data = data;
     }
 
     public Integer getDelay() {
         return delay;
     }
 
-    public void setDelay(int delay) {
-        this.delay = delay;
+    public ArrayList<Integer> getInput() {
+        return input;
+    }
+
+    public Integer getInputAt(int index){
+        return input.get(index);
     }
 
     public Integer getNum_inputs() {
@@ -127,56 +123,60 @@ public class Actor_t {
         return output.size();
     }
 
-    public Integer getOwner() {
-        return owner;
-    }
-
-    public void setOwner(int owner) {
-        this.owner = owner;
-    }
-
-    public ArrayList<Integer> getInput() {
-        return input;
-    }
-
-    public void setInput(ArrayList<Integer> input) {
-        this.input = input;
-    }
-
     public ArrayList<Integer> getOutput() {
         return output;
-    }
-
-    public void setOutput(ArrayList<Integer> output) {
-        this.output = output;
-    }
-
-    public boolean addOutput(int out){
-        return output.add(out);
-    }
-
-    public boolean addInput(int in){
-        return input.add(in);
-    }
-
-    public Integer getInputAt(int index){
-        return input.get(index);
     }
 
     public Integer getOutputAt(int index){
         return output.get(index);
     }
 
-    public String getShortActorName() {
-        return shortActorName;
+    public Integer getOwner() {
+        return owner;
     }
 
-    public void setShortActorName(String shortActorName) {
-        this.shortActorName = shortActorName;
+    public String getShortActorName() {
+        return shortActorName;
     }
 
     public void resetInputAndOutput(){
         this.output = new ArrayList<Integer>();
         this.input = new ArrayList<Integer>();
+    }
+
+    public void setActionName(String actionName) {
+        this.actionName = actionName;
+    }
+
+    public void setActorName(String actorName) {
+        this.actorName = actorName;
+    }
+
+    public void setCluster(int cluster) {
+        this.cluster = cluster;
+    }
+
+    public void setData(int data) {
+        this.data = data;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
+
+    public void setInput(ArrayList<Integer> input) {
+        this.input = input;
+    }
+
+    public void setOutput(ArrayList<Integer> output) {
+        this.output = output;
+    }
+
+    public void setOwner(int owner) {
+        this.owner = owner;
+    }
+
+    public void setShortActorName(String shortActorName) {
+        this.shortActorName = shortActorName;
     }
 }

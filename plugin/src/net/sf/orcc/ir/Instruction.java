@@ -69,6 +69,13 @@ public interface Instruction extends User {
 	public BlockNode getBlock();
 
 	/**
+	 * Returns instruction casting type if needed.
+	 * 
+	 * @return Type of cast made by this instruction
+	 */
+	public Type getCast();
+	
+	/**
 	 * Sets the block that contains this instruction.
 	 * 
 	 * @param block

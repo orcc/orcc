@@ -220,7 +220,7 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		Element operationE;
 		String name = names.getVarName(node.getSource(), actionName);
 		boolean inport = inputs.contains(name);
-		if (node.getSource().getVariable().getType().getType() == Type.LIST
+		if (node.getSource().getVariable().getType().getTypeOf() == Type.LIST
 				&& !inport) {
 			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root, actionName));
 			operationE = XlimNodeTemplate.newNameOperation(root, VARREF, names

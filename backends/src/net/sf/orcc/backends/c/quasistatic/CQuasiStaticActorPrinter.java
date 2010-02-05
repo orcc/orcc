@@ -52,11 +52,11 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class CQuasiStaticActorPrinter extends Printer {
 
-	private StringTemplateGroup group;
-
 	private StringTemplateGroup extensionGroup;
 
 	private StringTemplate extensionTemplate;
+
+	private StringTemplateGroup group;
 
 	/**
 	 * Creates a new network printer with the template "C.st".
@@ -68,36 +68,6 @@ public class CQuasiStaticActorPrinter extends Printer {
 		group = new TemplateGroupLoader().loadGroup("C_actor");
 		extensionGroup = new TemplateGroupLoader()
 				.loadGroup("C_quasistatic_actor");
-	}
-
-	/**
-	 * Fills the "sche_proc" template
-	 * 
-	 * @param tmplName
-	 * @param actorName
-	 * @param actions
-	 */
-	protected void setScheduleActions(String tmplName, String actorName,
-			List<Action> actions) {
-		for (Action action : actions) {
-			StringTemplate tmpl = extensionGroup.getInstanceOf("sche_proc");
-			// sets actor name and action
-			tmpl.setAttribute("actorName", actorName);
-			tmpl.setAttribute("action", action);
-			extensionTemplate.setAttribute(tmplName, tmpl);
-		}
-	}
-
-	/**
-	 * Sets attributes of the template from the given actor. Classes may extend,
-	 * but should call super.setAttributes(actor) first.
-	 * 
-	 * @param actor
-	 *            An actor
-	 */
-	protected void setAttributes(String id, Actor actor) {
-		// TODO: super.setAttributes(id,actor);
-		setScheduleActions("scheduleActions", id, actor.getActions());
 	}
 
 	/**
@@ -131,6 +101,36 @@ public class CQuasiStaticActorPrinter extends Printer {
 			os.write(b1);
 		}
 		os.close();
+	}
+
+	/**
+	 * Sets attributes of the template from the given actor. Classes may extend,
+	 * but should call super.setAttributes(actor) first.
+	 * 
+	 * @param actor
+	 *            An actor
+	 */
+	protected void setAttributes(String id, Actor actor) {
+		// TODO: super.setAttributes(id,actor);
+		setScheduleActions("scheduleActions", id, actor.getActions());
+	}
+
+	/**
+	 * Fills the "sche_proc" template
+	 * 
+	 * @param tmplName
+	 * @param actorName
+	 * @param actions
+	 */
+	protected void setScheduleActions(String tmplName, String actorName,
+			List<Action> actions) {
+		for (Action action : actions) {
+			StringTemplate tmpl = extensionGroup.getInstanceOf("sche_proc");
+			// sets actor name and action
+			tmpl.setAttribute("actorName", actorName);
+			tmpl.setAttribute("action", action);
+			extensionTemplate.setAttribute(tmplName, tmpl);
+		}
 	}
 
 	@Override

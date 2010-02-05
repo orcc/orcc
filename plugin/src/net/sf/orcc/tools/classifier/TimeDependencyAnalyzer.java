@@ -283,21 +283,21 @@ public class TimeDependencyAnalyzer {
 			int lo;
 			int hi;
 
-			if (variable.getType().getType() == Type.INT) {
+			if (variable.getType().getTypeOf() == Type.INT) {
 				IntType type = (IntType) variable.getType();
 				Expression size = type.getSize();
 				ExpressionEvaluator evaluator = new ExpressionEvaluator();
 				int num = evaluator.evaluateAsInteger(size);
 				lo = -(1 << (num - 1));
 				hi = (1 << (num - 1)) - 1;
-			} else if (variable.getType().getType() == Type.UINT) {
+			} else if (variable.getType().getTypeOf() == Type.UINT) {
 				UintType type = (UintType) variable.getType();
 				Expression size = type.getSize();
 				ExpressionEvaluator evaluator = new ExpressionEvaluator();
 				int num = evaluator.evaluateAsInteger(size);
 				lo = 0;
 				hi = 1 << num - 1;
-			} else if (variable.getType().getType() == Type.BOOLEAN) {
+			} else if (variable.getType().getTypeOf() == Type.BOOLEAN) {
 				lo = 0;
 				hi = 1;
 			} else {

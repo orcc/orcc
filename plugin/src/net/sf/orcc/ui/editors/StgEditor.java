@@ -48,6 +48,7 @@ public class StgEditor extends TextEditor {
 		setDocumentProvider(new StgDocumentProvider());
 	}
 
+	@Override
 	public void dispose() {
 		colorManager.dispose();
 		super.dispose();

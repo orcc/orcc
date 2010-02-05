@@ -54,15 +54,15 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
  */
 public class CalConfiguration extends SourceViewerConfiguration {
 
-	private ColorManager manager;
+	private EmptyScanner javadocCommentScanner;
 
-	private CalCodeScanner scanner;
+	private ColorManager manager;
 
 	private EmptyScanner multiLineCommentScanner;
 
-	private EmptyScanner singleLineCommentScanner;
+	private CalCodeScanner scanner;
 
-	private EmptyScanner javadocCommentScanner;
+	private EmptyScanner singleLineCommentScanner;
 
 	/**
 	 * Creates a new configuration based on the given color manager.
@@ -85,6 +85,7 @@ public class CalConfiguration extends SourceViewerConfiguration {
 				ICalColorConstants.COMMENT);
 	}
 
+	@Override
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 		return new String[] { IDocument.DEFAULT_CONTENT_TYPE,
 				CalPartitionScanner.CAL_JAVADOC_COMMENT,
@@ -92,6 +93,7 @@ public class CalConfiguration extends SourceViewerConfiguration {
 				CalPartitionScanner.CAL_SINGLE_LINE_COMMENT };
 	}
 
+	@Override
 	public IPresentationReconciler getPresentationReconciler(
 			ISourceViewer sourceViewer) {
 		PresentationReconciler reconciler = new PresentationReconciler();

@@ -47,7 +47,7 @@ import net.sf.orcc.ir.type.VoidType;
 public class LLVMTypePrinter extends DefaultTypePrinter {
 
 	private void printInt(Expression expr) {
-/*		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
 		if (size <= 8) {
 			builder.append("i8");
@@ -58,8 +58,6 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 		} else if (size <= 64) {
 			builder.append("i64");
 		}
-		*/
-		builder.append("i32");
 	}
 	
 	@Override
@@ -75,9 +73,9 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(ListType type) {
-		builder.append("[ ");
+		int size = new ExpressionEvaluator().evaluateAsInteger(type.getSize());	
 
-		int size = new ExpressionEvaluator().evaluateAsInteger(type.getSize());
+		builder.append("[ ");
 		builder.append(size);
 
 		builder.append(" x ");
@@ -92,7 +90,8 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(UintType type) {
-		builder.append("i32");
+		printInt(type.getSize());
+		//builder.append("i32");
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class ActorState {
 			Type type = variable.getType();
 			StateVariable stateVariable = (StateVariable) variable;
 			Constant constant = stateVariable.getConstantValue();
-			if (constant != null && type.getType() != Type.LIST) {
+			if (constant != null && type.getTypeOf() != Type.LIST) {
 				// we might consider this constant if it is used by guards
 				boolean usedByGuard = false;
 				for (Use use : stateVariable.getUses()) {

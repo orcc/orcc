@@ -30,11 +30,6 @@ public class NetworkGraph {
 		this.network = network;
 	}
 
-	public void init() throws OrccException {
-		// graphsMap = new HashMap<String,Graph<Action, DefaultEdge>>();
-		createScheduledActorsList();
-	}
-
 	private void createScheduledActorsList() throws OrccException {
 
 		List<ActorGraph> actors = new ArrayList<ActorGraph>();
@@ -51,39 +46,6 @@ public class NetworkGraph {
 		}
 
 		scheduledActorsList = actors;
-	}
-
-	public void unrollActors() throws OrccException,
-			QuasiStaticSchedulerException {
-		for (ActorGraph actor : scheduledActorsList) {
-			actor.unrollFSM();
-		}
-	}
-
-	public void updateTokensPattern() throws OrccException {
-		InputXDFParser inputXDFParser = new InputXDFParser(
-				Scheduler.workingDirectoryPath + File.separator
-						+ Constants.INPUT_FILE_NAME);
-		String btype = Switch.getBTYPE();
-		HashMap<String, List<TokensPattern>> tokensPatternsMap = inputXDFParser
-				.parseTokensPattern();
-		List<TokensPattern> tokensPatternsList = tokensPatternsMap.get(btype);
-		for (ActorGraph actor : scheduledActorsList) {
-			for (TokensPattern tokensPattern : tokensPatternsList) {
-				if (tokensPattern.getActorName().equals(actor.getName())) {
-					// actor.updateTokensPattern(tokensPattern);
-					tokensPatternsList.remove(tokensPattern);
-					break;
-				}
-			}
-		}
-	}
-
-	public List<ActorGraph> getScheduledActors() throws OrccException {
-		if (scheduledActorsList == null) {
-			createScheduledActorsList();
-		}
-		return scheduledActorsList;
 	}
 
 	/**
@@ -147,10 +109,6 @@ public class NetworkGraph {
 		 */
 	}
 
-	public Set<Connection> getNetworkConnections() {
-		return network.getGraph().edgeSet();
-	}
-
 	public ActorGraph getActorGraph(Actor actor) {
 		for (ActorGraph actorGraph : scheduledActorsList) {
 			if (actorGraph.contains(actor)) {
@@ -158,6 +116,48 @@ public class NetworkGraph {
 			}
 		}
 		return null;
+	}
+
+	public Set<Connection> getNetworkConnections() {
+		return network.getGraph().edgeSet();
+	}
+
+	public List<ActorGraph> getScheduledActors() throws OrccException {
+		if (scheduledActorsList == null) {
+			createScheduledActorsList();
+		}
+		return scheduledActorsList;
+	}
+
+	public void init() throws OrccException {
+		// graphsMap = new HashMap<String,Graph<Action, DefaultEdge>>();
+		createScheduledActorsList();
+	}
+
+	public void unrollActors() throws OrccException,
+			QuasiStaticSchedulerException {
+		for (ActorGraph actor : scheduledActorsList) {
+			actor.unrollFSM();
+		}
+	}
+
+	public void updateTokensPattern() throws OrccException {
+		InputXDFParser inputXDFParser = new InputXDFParser(
+				Scheduler.workingDirectoryPath + File.separator
+						+ Constants.INPUT_FILE_NAME);
+		String btype = Switch.getBTYPE();
+		HashMap<String, List<TokensPattern>> tokensPatternsMap = inputXDFParser
+				.parseTokensPattern();
+		List<TokensPattern> tokensPatternsList = tokensPatternsMap.get(btype);
+		for (ActorGraph actor : scheduledActorsList) {
+			for (TokensPattern tokensPattern : tokensPatternsList) {
+				if (tokensPattern.getActorName().equals(actor.getName())) {
+					// actor.updateTokensPattern(tokensPattern);
+					tokensPatternsList.remove(tokensPattern);
+					break;
+				}
+			}
+		}
 	}
 
 }

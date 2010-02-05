@@ -51,112 +51,45 @@ import net.sf.orcc.backends.c.quasistatic.scheduler.util.FileUtilities;
  */
 public class DSEScheduler {
 
-	private HashMap<String, List<String>> scheduleMap;
+	public final static int ERROR = -1;
 	
+    public static String INPUT_FOLDER;
+    private final static int IPC_COST = 1;
     //CONSTANTS
     public final static int NORMAL = 1;
-    public final static int ERROR = -1;
+    public static String OUTPUT_FOLDER;
     private final static int STEP1 = 2;
     private final static int STEP2 = 1;
+    
     private final static int STEP3 = 0;
-    private final static int IPC_COST = 1;
+    public static void main(String[] args) {
+        //new DSEScheduler().schedule();
+    	System.out.println("act1".matches("act[0-9]"));
+    }
     
-    public static String INPUT_FOLDER;
-    public static String OUTPUT_FOLDER;
-    
+    private int[] exec_time, exec_order;
+    private SchedulingGraph graph;
+    private int[] initial_token_edge;
     //------------
     private int initial_token_edge_count;
-    private int[] initial_token_edge;
-    private BufferedWriter[] log;
-    private BufferedWriter permutationWriter, mapWriter;
-    private BufferedReader permutationReader, mapReader;
+    private int level = -1;
 
-    private int permutation_size;
-    private SchedulingGraph graph;
+    private BufferedWriter[] log;
     private int operationMode;
-    private int[] exec_time, exec_order;
-    private int[] temp;
+    private int permutation_size;
+    private BufferedReader permutationReader, mapReader;
+    private BufferedWriter permutationWriter, mapWriter;
+    private HashMap<String, List<String>> scheduleMap;
     private String switchName;
+
+    private int[] temp;
+
+
     /**
      * Default constructor
      */
     public DSEScheduler() {
     	initScheduleMap();
-    }
-
-    /**
-     * Init method
-     */
-    private void init() {
-        operationMode = STEP1;
-        graph = new SchedulingGraph();
-    }
-
-
-    private void initLogs(){
-
-        log = new BufferedWriter[graph.getNum_processors()];
-        for (int j = 0; j < graph.getNum_processors(); j++) {
-            try {
-                File logFile = new File(OUTPUT_FOLDER + File.separator+ "DSE_Schedude "+ j +" - "+ switchName + ".xml");
-                int switchValue = Switch.getSwitchValue(switchName);
-                logFile.createNewFile();
-                log[j] = new BufferedWriter(new FileWriter(logFile));
-                log[j].write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-                log[j].write("<Schedule processor = \""+ j +"\">\n");
-                log[j].write("<switch><name>BTYPE</name><type>"+ switchName + "</type><value>"+switchValue + "</value></switch>\n");
-                log[j].write("<Operation_Mode>"+ operationMode +"</Operation_Mode>\n");
-            } catch (IOException ex) {
-                Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-    }
-
-    private void closeLogs(){
-        for (int j = 0; j < graph.getNum_processors(); j++) {
-            try {
-                log[j].write("</Schedule>\n");
-                log[j].close();
-            } catch (IOException ex) {
-                Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-    /**
-     * Updates operationMode
-     * @return process is ended
-     */
-    private int nextStep() {
-        return --operationMode;
-    }
-
-    private boolean hasNext() {
-        return operationMode >= 0;
-    }
-
-    /**
-     * Initializes all the instances
-     *
-     * @param graph
-     * @param v_inputs
-     * @param v_outputs
-     */
-    private void scheduler_allocmem() {
-        graph.setProcessor_time(new int[graph.getNum_processors()]);
-        graph.setActors_for_pe(new int[graph.getNum_processors()]);
-        graph.setActors(new Actor_t[graph.getActor_count()]);
-
-        for (int i = 0; i < graph.getActor_count(); i++) {
-            graph.setActorAt(i, new Actor_t());
-        }
-
-        graph.setEdges(new Edge_t[graph.getEdge_count()]);
-        initial_token_edge = new int[graph.getEdge_count()];
-
-        for (int i = 0; i < graph.getEdge_count(); i++) {
-            graph.setEdgeAt(i, new Edge_t());
-        }
     }
 
     /**
@@ -174,7 +107,6 @@ public class DSEScheduler {
         int newValue = graph.getActors_for_pe_At(processor) + 1;
         graph.setActors_for_pe_At(processor, newValue);
      }
-
     /**
      * Adds an edge into the schedule
      * @param s
@@ -407,261 +339,26 @@ public class DSEScheduler {
         }
     }
 
-// 
-    /**
-     * FIRE_ACTOR: executed when an actor has a token in all inputs
-     * parameters: s - the graph structure, i - the index of the vertex that fires,
-     * firing_time - when the firing happens, is_sink - 1: vertex is sink, 0: is not
-     * @param s
-     * @param i
-     * @param firing_time
-     * @param is_sink
-     * @return
-     */
-    private int fire_actor(int i, int firing_time, int is_sink) {
-        int proc;		// a variable that contains the processor index on which this actor executes
-        int execution_time;	// the delay of this actor (see header file)
-        int en;			// edge number variable
-
-        Actor_t actor = graph.getActorAt(i);
-
-        proc = actor.getOwner();	// fetch processor number
-
-        if (graph.getProcessor_time_At(proc) > firing_time) // get the actual firing time for this actor
-        {
-            firing_time = graph.getProcessor_time_At(proc);
-        }
-
-        execution_time = actor.getDelay();		// fetch actor delay
-
-        int newProcessorTime = firing_time + execution_time;
-        graph.setProcessor_time_At(proc, newProcessorTime);		// update processor time for this processor
-        //String keyName = actor.getActorName()+": "+actor.getActionName().split("#")[0];
-        try {
-
-            // update processor time for this processor
-            BufferedWriter out = log[proc];
-            out.write("<Action><name>"+actor.getActionName()+"</name>" +
-                      "<short_actor_name>"+actor.getShortActorName()+ "</short_actor_name>" +
-                      "<actor_name>"+actor.getActorName()+ "</actor_name>" +
-                      "<start>"+firing_time+ "</start>" +
-                      "<end>"+ newProcessorTime + "</end>" +
-                      "</Action>\n");
-
-            //Adds action into the map
-            if(operationMode == STEP3){
-            	String actionName = actor.getActionName();
-            	String actorName = actor.getActorName();
-	            List<String> array = scheduleMap.get(switchName.toLowerCase());
-	            array.add(actorName + "_" + actionName);
-	        }
-            
-        } catch (IOException ex) {
-            Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (is_sink == 0) // do for all non-sink actors
-        {
-            for (int j = 0; j < graph.getActorAt(i).getNum_outputs(); j++) // produce a token to each output
-            {
-                en = graph.getActorAt(i).getOutputAt(j);	// get output edge index
-                graph.getEdgeAt(en).setToken(graph.getProcessor_time_At(proc));	// create token by witing the present time to the field
-            }
-        }
-
-        for (int j = 0; j < graph.getActorAt(i).getNum_inputs(); j++) // consume tokens from inputs
-        {
-            en = graph.getActorAt(i).getInputAt(j);
-            graph.getEdgeAt(en).setToken(-1);			// delete token by witing -1 to the time
-        }
-        
-        return firing_time;
-    }
-
-    
-
-    /**
-     * MAKE_SCHEDULE: this is how the schedule is made
-     * parameters: smem - the graph structure, exec_order_actor -- can be ignored, exec_order_time -- can be ignored
-     * num_processors - number of processors in system, sink_vertices - an array containing sink vertex indexes
-     * sink_count - number of sink vertexes
-     * @param graph
-     * @param exec_order_actor
-     * @param exec_order_time
-     * @param num_processors
-     * @param permutation
-     * @return
-     */
-    private int make_schedule(int[] permutation) {
-        int tokensum;									// a variable for counting tokens on input edges
-        int sinks_fired;								// a variable to count the sink actors that have been fired
-        //int proc;										// a variable to store the index of the processor of the current vertex
-        int en;											// to store and edge index
-        int ft;											// to store a token time
-        int ft_max;										// to store the largest token time of all input edges
-        int out_index;									// (remove this variable)
-        int[] enabled;
-
-        for (int j = 0; j < graph.getEdge_count(); j++) {
-            graph.getEdgeAt(j).setToken(-1);
-        }
-        for (int j = 0; j < initial_token_edge_count; j++) {
-            graph.getEdgeAt(initial_token_edge[j]).setToken(0);
-        }
-
-        initLogs();
-
-        enabled = new int[graph.getActor_count()];
-
-        out_index = 0;		// remove
-
-        sinks_fired = 0;
-
-        for(int i = 0; i < graph.getNum_processors(); i++)		// initialize the clock of each processor to zero
-            graph.setProcessor_time_At(i, 0);
-        for(int i = 0; i < graph.getActor_count(); i++)
-            enabled[i] = 0 ;
-
-        while (sinks_fired < graph.getSink_count()) // loop until all sinks have fired
-        {
-            for (int i = 0; i < graph.getActor_count(); i++) // loop through all vertexes
-            {
-                if (enabled[i] == 0) {
-                    //proc = graph.getActorAt(i).getOwner();
-
-                    tokensum = 0;
-                    ft_max = 0;
-
-                    // count tokens and notice the one that has the greatest time
-                    for (int j = 0; j < graph.getActorAt(i).getNum_inputs(); j++) {
-                        en = graph.getActorAt(i).getInputAt(j);
-
-                        if (graph.getEdgeAt(en).getToken() >= 0) // if the token field has value >= 0, there is a token. -1 is for no token
-                        {
-                            tokensum++;
-
-                            ft = graph.getEdgeAt(en).getToken();
-
-                            if (ft_max < ft) {
-                                ft_max = ft;
-                            }
-                        }
-                    }
-
-                    if (tokensum == graph.getActorAt(i).getNum_inputs()) // if there is a token for each input edge -> fire actor
-                    {
-                        enabled[i] = ft_max + 1;
-                    }
-                }	// for i
-            }
-            for (int k = 0; k < graph.getCluster_count(); k++) {
-                int p = permutation[k];
-
-                for (int i = 0; i < graph.getActor_count(); i++) {
-                    if (enabled[i] > 0 && graph.getActorAt(i).getCluster() == p) {
-                        int is_sink = 0;		// temporary variable to store information if this vertex is a sink or not
-
-                        for (int j = 0; j < graph.getSink_count(); j++) {
-                            if (i == graph.getSink_actor_At(j)) {
-                                is_sink = 1;
-                                sinks_fired++;
-                            }
-                        }
-
-                        exec_time[out_index] = fire_actor(i, enabled[i] - 1, is_sink);	// exec_order_time and
-                        exec_order[out_index++] = i;											// exec_order_actor can be removed
-                        
-                        enabled[i] = -1;
-                    }
-                }
-            }
-        }
-        closeLogs();
-        return exec_time[out_index - 1] + graph.getActorAt(exec_order[out_index - 1]).getDelay();
-    }
-
-    private void print(int[] v, int size) {
-        if (v != null) {
+    private void closeLogs(){
+        for (int j = 0; j < graph.getNum_processors(); j++) {
             try {
-                for (int i = 0; i < size; i++) {
-                    permutationWriter.write((v[i] - 1) + "\t");
-                }
-                permutationWriter.write("\n");
-                permutation_size++;
-            } catch (IOException ex) {
-                Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
-            } 
-        }
-    }
-
-    private int level = -1;
-    /**
-     * Alexander Bogomolyn's unordered permutation algorithm 
-     * @param temp
-     * @param N
-     * @param k
-     */
-    private void visit(int N, int k) {
-        level = level + 1;
-        temp[k] = level;
-
-        if (level == N) {
-            print(temp, N);
-        } else {
-            for (int i = 0; i < N; i++) {
-                if (temp[i] == 0) {
-                    visit(N, i);
-                }
-            }
-        }
-
-        level = level - 1;
-        temp[k] = 0;
-    }
-
-    /**
-     * Creates permutations
-     * @param cluster_count
-     */
-    void create_permutations(int cluster_count) {
-        temp = new int[cluster_count];
-
-        File permu = new File("permutations.txt");
-        try {
-            permu.createNewFile();
-            permutationWriter = new BufferedWriter(new FileWriter(permu));
-            visit(cluster_count, 0);
-        } catch (IOException ex) {
-            Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally{
-            try {
-                permutationWriter.close();
+                log[j].write("</Schedule>\n");
+                log[j].close();
             } catch (IOException ex) {
                 Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
     }
 
-    private int[] to_base_n(int val, int n, int len) {
-        int i;
-        int[] coeffs;
-        int[] result = new int[len];
-        coeffs = new int[len + 1];
+    private int count_ipc_edges() {
+        int count = 0;
 
-        coeffs[0] = 1;
-        for (i = 1; i < len + 1; i++) {
-            coeffs[i] = coeffs[i - 1] * n;
-        }
-
-        for (i = len; i >= 0; i--) {
-            if (val / coeffs[i] > 0) {
-                result[i] = val / coeffs[i];
-                val -= (val / coeffs[i]) * coeffs[i];
+        for (int i = 0; i < graph.getEdge_count(); i++) {
+            if (graph.getActorAt(graph.getEdgeAt(i).getInput()).getOwner() != graph.getActorAt(graph.getEdgeAt(i).getOutput()).getOwner()) {
+                count++;
             }
         }
-
-        return result;
+        return count;
     }
 
     /**
@@ -703,33 +400,39 @@ public class DSEScheduler {
         }
     }
 
-    private int count_ipc_edges() {
-        int count = 0;
+    /**
+     * Creates permutations
+     * @param cluster_count
+     */
+    void create_permutations(int cluster_count) {
+        temp = new int[cluster_count];
 
-        for (int i = 0; i < graph.getEdge_count(); i++) {
-            if (graph.getActorAt(graph.getEdgeAt(i).getInput()).getOwner() != graph.getActorAt(graph.getEdgeAt(i).getOutput()).getOwner()) {
-                count++;
+        File permu = new File("permutations.txt");
+        try {
+            permu.createNewFile();
+            permutationWriter = new BufferedWriter(new FileWriter(permu));
+            visit(cluster_count, 0);
+        } catch (IOException ex) {
+            Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally{
+            try {
+                permutationWriter.close();
+            } catch (IOException ex) {
+                Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return count;
+        
     }
 
-    @Override
-    public String toString(){
-        String str = "*********************\n" +
-                     "* Operation Mode: "+operationMode + " *\n" +
-                     "*********************\n";
-        return str;
+public void createInputFiles(){
+    	FileUtilities.createFile(DSEScheduler.INPUT_FOLDER, "delays.txt", "0\n");
+    	FileUtilities.createFile(DSEScheduler.INPUT_FOLDER, "manual_mapping.txt", "0 0 0 0 0 0 \n");
+    	FileUtilities.createFile(DSEScheduler.INPUT_FOLDER, "manual_clustering.txt", "0 1 2 3 4 5 \n");
     }
 
-    private void initScheduleMap(){
-    	ArrayList<String> switchValues = Switch.getSwitchValues();
-    	scheduleMap = new HashMap<String, List<String>>();
-    	for(String btypeValue : switchValues){
-    		scheduleMap.put(btypeValue.toLowerCase(), new ArrayList<String>());
-    	}
-    }
     
+
     /**
      * Performs the scheduler's simulation
      * @return
@@ -913,6 +616,237 @@ public class DSEScheduler {
         }
     }
 
+    // 
+    /**
+     * FIRE_ACTOR: executed when an actor has a token in all inputs
+     * parameters: s - the graph structure, i - the index of the vertex that fires,
+     * firing_time - when the firing happens, is_sink - 1: vertex is sink, 0: is not
+     * @param s
+     * @param i
+     * @param firing_time
+     * @param is_sink
+     * @return
+     */
+    private int fire_actor(int i, int firing_time, int is_sink) {
+        int proc;		// a variable that contains the processor index on which this actor executes
+        int execution_time;	// the delay of this actor (see header file)
+        int en;			// edge number variable
+
+        Actor_t actor = graph.getActorAt(i);
+
+        proc = actor.getOwner();	// fetch processor number
+
+        if (graph.getProcessor_time_At(proc) > firing_time) // get the actual firing time for this actor
+        {
+            firing_time = graph.getProcessor_time_At(proc);
+        }
+
+        execution_time = actor.getDelay();		// fetch actor delay
+
+        int newProcessorTime = firing_time + execution_time;
+        graph.setProcessor_time_At(proc, newProcessorTime);		// update processor time for this processor
+        //String keyName = actor.getActorName()+": "+actor.getActionName().split("#")[0];
+        try {
+
+            // update processor time for this processor
+            BufferedWriter out = log[proc];
+            out.write("<Action><name>"+actor.getActionName()+"</name>" +
+                      "<short_actor_name>"+actor.getShortActorName()+ "</short_actor_name>" +
+                      "<actor_name>"+actor.getActorName()+ "</actor_name>" +
+                      "<start>"+firing_time+ "</start>" +
+                      "<end>"+ newProcessorTime + "</end>" +
+                      "</Action>\n");
+
+            //Adds action into the map
+            if(operationMode == STEP3){
+            	String actionName = actor.getActionName();
+            	String actorName = actor.getActorName();
+	            List<String> array = scheduleMap.get(switchName.toLowerCase());
+	            array.add(actorName + "_" + actionName);
+	        }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (is_sink == 0) // do for all non-sink actors
+        {
+            for (int j = 0; j < graph.getActorAt(i).getNum_outputs(); j++) // produce a token to each output
+            {
+                en = graph.getActorAt(i).getOutputAt(j);	// get output edge index
+                graph.getEdgeAt(en).setToken(graph.getProcessor_time_At(proc));	// create token by witing the present time to the field
+            }
+        }
+
+        for (int j = 0; j < graph.getActorAt(i).getNum_inputs(); j++) // consume tokens from inputs
+        {
+            en = graph.getActorAt(i).getInputAt(j);
+            graph.getEdgeAt(en).setToken(-1);			// delete token by witing -1 to the time
+        }
+        
+        return firing_time;
+    }
+
+    private boolean hasNext() {
+        return operationMode >= 0;
+    }
+    /**
+     * Init method
+     */
+    private void init() {
+        operationMode = STEP1;
+        graph = new SchedulingGraph();
+    }
+
+    private void initLogs(){
+
+        log = new BufferedWriter[graph.getNum_processors()];
+        for (int j = 0; j < graph.getNum_processors(); j++) {
+            try {
+                File logFile = new File(OUTPUT_FOLDER + File.separator+ "DSE_Schedude "+ j +" - "+ switchName + ".xml");
+                int switchValue = Switch.getSwitchValue(switchName);
+                logFile.createNewFile();
+                log[j] = new BufferedWriter(new FileWriter(logFile));
+                log[j].write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+                log[j].write("<Schedule processor = \""+ j +"\">\n");
+                log[j].write("<switch><name>BTYPE</name><type>"+ switchName + "</type><value>"+switchValue + "</value></switch>\n");
+                log[j].write("<Operation_Mode>"+ operationMode +"</Operation_Mode>\n");
+            } catch (IOException ex) {
+                Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }
+
+    private void initScheduleMap(){
+    	ArrayList<String> switchValues = Switch.getSwitchValues();
+    	scheduleMap = new HashMap<String, List<String>>();
+    	for(String btypeValue : switchValues){
+    		scheduleMap.put(btypeValue.toLowerCase(), new ArrayList<String>());
+    	}
+    }
+
+    /**
+     * MAKE_SCHEDULE: this is how the schedule is made
+     * parameters: smem - the graph structure, exec_order_actor -- can be ignored, exec_order_time -- can be ignored
+     * num_processors - number of processors in system, sink_vertices - an array containing sink vertex indexes
+     * sink_count - number of sink vertexes
+     * @param graph
+     * @param exec_order_actor
+     * @param exec_order_time
+     * @param num_processors
+     * @param permutation
+     * @return
+     */
+    private int make_schedule(int[] permutation) {
+        int tokensum;									// a variable for counting tokens on input edges
+        int sinks_fired;								// a variable to count the sink actors that have been fired
+        //int proc;										// a variable to store the index of the processor of the current vertex
+        int en;											// to store and edge index
+        int ft;											// to store a token time
+        int ft_max;										// to store the largest token time of all input edges
+        int out_index;									// (remove this variable)
+        int[] enabled;
+
+        for (int j = 0; j < graph.getEdge_count(); j++) {
+            graph.getEdgeAt(j).setToken(-1);
+        }
+        for (int j = 0; j < initial_token_edge_count; j++) {
+            graph.getEdgeAt(initial_token_edge[j]).setToken(0);
+        }
+
+        initLogs();
+
+        enabled = new int[graph.getActor_count()];
+
+        out_index = 0;		// remove
+
+        sinks_fired = 0;
+
+        for(int i = 0; i < graph.getNum_processors(); i++)		// initialize the clock of each processor to zero
+            graph.setProcessor_time_At(i, 0);
+        for(int i = 0; i < graph.getActor_count(); i++)
+            enabled[i] = 0 ;
+
+        while (sinks_fired < graph.getSink_count()) // loop until all sinks have fired
+        {
+            for (int i = 0; i < graph.getActor_count(); i++) // loop through all vertexes
+            {
+                if (enabled[i] == 0) {
+                    //proc = graph.getActorAt(i).getOwner();
+
+                    tokensum = 0;
+                    ft_max = 0;
+
+                    // count tokens and notice the one that has the greatest time
+                    for (int j = 0; j < graph.getActorAt(i).getNum_inputs(); j++) {
+                        en = graph.getActorAt(i).getInputAt(j);
+
+                        if (graph.getEdgeAt(en).getToken() >= 0) // if the token field has value >= 0, there is a token. -1 is for no token
+                        {
+                            tokensum++;
+
+                            ft = graph.getEdgeAt(en).getToken();
+
+                            if (ft_max < ft) {
+                                ft_max = ft;
+                            }
+                        }
+                    }
+
+                    if (tokensum == graph.getActorAt(i).getNum_inputs()) // if there is a token for each input edge -> fire actor
+                    {
+                        enabled[i] = ft_max + 1;
+                    }
+                }	// for i
+            }
+            for (int k = 0; k < graph.getCluster_count(); k++) {
+                int p = permutation[k];
+
+                for (int i = 0; i < graph.getActor_count(); i++) {
+                    if (enabled[i] > 0 && graph.getActorAt(i).getCluster() == p) {
+                        int is_sink = 0;		// temporary variable to store information if this vertex is a sink or not
+
+                        for (int j = 0; j < graph.getSink_count(); j++) {
+                            if (i == graph.getSink_actor_At(j)) {
+                                is_sink = 1;
+                                sinks_fired++;
+                            }
+                        }
+
+                        exec_time[out_index] = fire_actor(i, enabled[i] - 1, is_sink);	// exec_order_time and
+                        exec_order[out_index++] = i;											// exec_order_actor can be removed
+                        
+                        enabled[i] = -1;
+                    }
+                }
+            }
+        }
+        closeLogs();
+        return exec_time[out_index - 1] + graph.getActorAt(exec_order[out_index - 1]).getDelay();
+    }
+
+    /**
+     * Updates operationMode
+     * @return process is ended
+     */
+    private int nextStep() {
+        return --operationMode;
+    }
+
+    private void print(int[] v, int size) {
+        if (v != null) {
+            try {
+                for (int i = 0; i < size; i++) {
+                    permutationWriter.write((v[i] - 1) + "\t");
+                }
+                permutationWriter.write("\n");
+                permutation_size++;
+            } catch (IOException ex) {
+                Logger.getLogger(DSEScheduler.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+        }
+    }
+
     /**
      *
      */
@@ -924,16 +858,82 @@ public class DSEScheduler {
         }
         return scheduleMap;
     }
+    
+    /**
+     * Initializes all the instances
+     *
+     * @param graph
+     * @param v_inputs
+     * @param v_outputs
+     */
+    private void scheduler_allocmem() {
+        graph.setProcessor_time(new int[graph.getNum_processors()]);
+        graph.setActors_for_pe(new int[graph.getNum_processors()]);
+        graph.setActors(new Actor_t[graph.getActor_count()]);
 
-    public void createInputFiles(){
-    	FileUtilities.createFile(DSEScheduler.INPUT_FOLDER, "delays.txt", "0\n");
-    	FileUtilities.createFile(DSEScheduler.INPUT_FOLDER, "manual_mapping.txt", "0 0 0 0 0 0 \n");
-    	FileUtilities.createFile(DSEScheduler.INPUT_FOLDER, "manual_clustering.txt", "0 1 2 3 4 5 \n");
+        for (int i = 0; i < graph.getActor_count(); i++) {
+            graph.setActorAt(i, new Actor_t());
+        }
+
+        graph.setEdges(new Edge_t[graph.getEdge_count()]);
+        initial_token_edge = new int[graph.getEdge_count()];
+
+        for (int i = 0; i < graph.getEdge_count(); i++) {
+            graph.setEdgeAt(i, new Edge_t());
+        }
+    }
+
+    private int[] to_base_n(int val, int n, int len) {
+        int i;
+        int[] coeffs;
+        int[] result = new int[len];
+        coeffs = new int[len + 1];
+
+        coeffs[0] = 1;
+        for (i = 1; i < len + 1; i++) {
+            coeffs[i] = coeffs[i - 1] * n;
+        }
+
+        for (i = len; i >= 0; i--) {
+            if (val / coeffs[i] > 0) {
+                result[i] = val / coeffs[i];
+                val -= (val / coeffs[i]) * coeffs[i];
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public String toString(){
+        String str = "*********************\n" +
+                     "* Operation Mode: "+operationMode + " *\n" +
+                     "*********************\n";
+        return str;
     }
     
-    public static void main(String[] args) {
-        //new DSEScheduler().schedule();
-    	System.out.println("act1".matches("act[0-9]"));
+    /**
+     * Alexander Bogomolyn's unordered permutation algorithm 
+     * @param temp
+     * @param N
+     * @param k
+     */
+    private void visit(int N, int k) {
+        level = level + 1;
+        temp[k] = level;
+
+        if (level == N) {
+            print(temp, N);
+        } else {
+            for (int i = 0; i < N; i++) {
+                if (temp[i] == 0) {
+                    visit(N, i);
+                }
+            }
+        }
+
+        level = level - 1;
+        temp[k] = 0;
     }
 
 }

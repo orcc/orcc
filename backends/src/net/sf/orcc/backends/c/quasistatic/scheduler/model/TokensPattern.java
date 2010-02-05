@@ -5,20 +5,20 @@ import java.util.HashMap;
 public class TokensPattern {
 	
 	
-	/**
-	 * remaingMap: <Port_Name>, <Remaining_Tokens>
-	 */
-	private HashMap<String, Integer> initialMap;
-	/**
-	 * remaingMap: <Port_Name>, <Remaining_Tokens>
-	 */
-	private HashMap<String, Integer> remainingMap;
+	private String actorName;
 	/**
 	 * remaingMap: <Port_Name>, <No tokens consumed when is fired>
 	 */
 	private HashMap<String, Integer> consumptionMap;
+	/**
+	 * remaingMap: <Port_Name>, <Remaining_Tokens>
+	 */
+	private HashMap<String, Integer> initialMap;
 	
-	private String actorName;
+	/**
+	 * remaingMap: <Port_Name>, <Remaining_Tokens>
+	 */
+	private HashMap<String, Integer> remainingMap;
 	
 	public TokensPattern(String actorName){
 		this(actorName, null, null);
@@ -29,10 +29,6 @@ public class TokensPattern {
 		this.remainingMap = remainingMap;
 		this.initialMap = new HashMap<String, Integer>(remainingMap);
 		this.consumptionMap = consumptionMap;
-	}
-	
-	public void restoreTokenPattern(){
-		remainingMap =  new HashMap<String, Integer>(initialMap);
 	}
 	
 	/**
@@ -55,5 +51,9 @@ public class TokensPattern {
 	
 	public String getActorName(){
 		return actorName;
+	}
+	
+	public void restoreTokenPattern(){
+		remainingMap =  new HashMap<String, Integer>(initialMap);
 	}
 }

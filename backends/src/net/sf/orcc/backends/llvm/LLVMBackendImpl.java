@@ -89,23 +89,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		String outputName = path + File.separator + id + ".s";
 		printer.printActor(outputName, id, actor);
-		
-		if (options.containsKey("llvm-as")){
-			printBitcode(options.get("llvm-as"), outputName, id);
+		if (options != null){
+			if (options.containsKey("llvm-as")){
+				printBitcode(options.get("llvm-as"), outputName, id);
+			}
 		}
 	}
 
-	@Override
-	protected void printNetwork(Network network) throws Exception {
-		LLVMNetworkPrinter networkPrinter = new LLVMNetworkPrinter();
-
-		// Add broadcasts before printing
-		new BroadcastAdder().transform(network);
-
-		String outputName = path + File.separator + network.getName() + ".s";
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
-	}
-	
 	protected void printBitcode(String execPath, String inputName, String actor) {
 		List<String> cmdList = new ArrayList<String>();
 		String outputName = path + File.separator + actor + ".bc";
@@ -125,5 +115,16 @@ public class LLVMBackendImpl extends AbstractBackend {
 			System.err.println("Could not print bitcode : ");
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	protected void printNetwork(Network network) throws Exception {
+		LLVMNetworkPrinter networkPrinter = new LLVMNetworkPrinter();
+
+		// Add broadcasts before printing
+		new BroadcastAdder().transform(network);
+
+		String outputName = path + File.separator + network.getName() + ".s";
+		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 }

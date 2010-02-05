@@ -29,10 +29,10 @@ import org.eclipse.debug.core.model.IDebugTarget;
 public abstract class OrccDebugElement extends PlatformObject implements
 		IDebugElement {
 
+	public static final String ID_ORCC_DEBUG_MODEL = OrccActivator.PLUGIN_ID + ".model";
+	
 	// containing target
 	protected OrccDebugTarget fTarget;
-	
-	public static final String ID_ORCC_DEBUG_MODEL = OrccActivator.PLUGIN_ID + ".model";
 
 	/**
 	 * Constructs a new debug element contained in the given debug target.
@@ -44,46 +44,17 @@ public abstract class OrccDebugElement extends PlatformObject implements
 		fTarget = target;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugElement#getModelIdentifier()
-	 */
-	public String getModelIdentifier() {
-		return ID_ORCC_DEBUG_MODEL;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
-	 */
-	public IDebugTarget getDebugTarget() {
-		return fTarget;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
-	 */
-	public ILaunch getLaunch() {
-		return getDebugTarget().getLaunch();
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Object getAdapter(Class adapter) {
-		if (adapter == IDebugElement.class) {
-			return this;
-		}
-		return super.getAdapter(adapter);
-	}
-
 	protected void abort(String message, Throwable e) throws DebugException {
 		throw new DebugException(
 				new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 						DebugPlugin.INTERNAL_ERROR, message, e));
+	}
+
+	/**
+	 * Fires a <code>CREATE</code> event for this element.
+	 */
+	protected void fireCreationEvent() {
+		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
 	}
 
 	/**
@@ -94,13 +65,6 @@ public abstract class OrccDebugElement extends PlatformObject implements
 	 */
 	protected void fireEvent(DebugEvent event) {
 		DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
-	}
-
-	/**
-	 * Fires a <code>CREATE</code> event for this element.
-	 */
-	protected void fireCreationEvent() {
-		fireEvent(new DebugEvent(this, DebugEvent.CREATE));
 	}
 
 	/**
@@ -129,5 +93,41 @@ public abstract class OrccDebugElement extends PlatformObject implements
 	 */
 	protected void fireTerminateEvent() {
 		fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Object getAdapter(Class adapter) {
+		if (adapter == IDebugElement.class) {
+			return this;
+		}
+		return super.getAdapter(adapter);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
+	 */
+	public IDebugTarget getDebugTarget() {
+		return fTarget;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
+	 */
+	public ILaunch getLaunch() {
+		return getDebugTarget().getLaunch();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugElement#getModelIdentifier()
+	 */
+	public String getModelIdentifier() {
+		return ID_ORCC_DEBUG_MODEL;
 	}
 }

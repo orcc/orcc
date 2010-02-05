@@ -74,15 +74,6 @@ public class OrccValue extends OrccDebugElement implements IValue {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.model.IValue#isAllocated()
-	 */
-	public boolean isAllocated() throws DebugException {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.debug.core.model.IValue#getVariables()
 	 */
 	public IVariable[] getVariables() throws DebugException {
@@ -96,5 +87,14 @@ public class OrccValue extends OrccDebugElement implements IValue {
 	 */
 	public boolean hasVariables() throws DebugException {
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IValue#isAllocated()
+	 */
+	public boolean isAllocated() throws DebugException {
+		return true;
 	}
 }

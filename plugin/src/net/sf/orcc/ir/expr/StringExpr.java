@@ -29,11 +29,14 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.type.StringType;
 
 /**
  * This class defines a String expression.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class StringExpr extends AbstractExpression {
@@ -56,7 +59,12 @@ public class StringExpr extends AbstractExpression {
 	}
 
 	@Override
-	public int getType() {
+	public Type getType() {
+		return new StringType();
+	}
+
+	@Override
+	public int getTypeOf() {
 		return STRING;
 	}
 

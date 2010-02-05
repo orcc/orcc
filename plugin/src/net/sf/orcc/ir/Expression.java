@@ -35,6 +35,7 @@ import net.sf.orcc.ir.expr.ExpressionVisitor;
  * This interface defines an expression.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public interface Expression extends Localizable {
@@ -96,10 +97,17 @@ public interface Expression extends Localizable {
 	public void accept(ExpressionVisitor visitor, Object... args);
 
 	/**
-	 * Returns the type of this expression.
+	 * Returns Type corresponding to the type of this expression.
 	 * 
-	 * @return the type of this expression
+	 * @return Type of this expression
 	 */
-	public int getType();
+	public Type getType();
+	
+	/**
+	 * Returns an integer corresponding to the type of this expression.
+	 * 
+	 * @return Integer representing type of this expression
+	 */
+	public int getTypeOf();
 
 }

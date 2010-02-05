@@ -37,9 +37,9 @@ import org.eclipse.debug.core.model.IVariable;
  */
 public class OrccVariable extends OrccDebugElement implements IVariable {
 
+	private OrccStackFrame fFrame;
 	// name & stack frmae
 	private String fName;
-	private OrccStackFrame fFrame;
 	private OrccValue fValue;
 
 	/**
@@ -61,15 +61,6 @@ public class OrccVariable extends OrccDebugElement implements IVariable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.model.IVariable#getValue()
-	 */
-	public IValue getValue() throws DebugException {
-		return fValue;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.debug.core.model.IVariable#getName()
 	 */
 	public String getName() throws DebugException {
@@ -86,6 +77,24 @@ public class OrccVariable extends OrccDebugElement implements IVariable {
 		return "Thing";
 	}
 
+	/**
+	 * Returns the stack frame owning this variable.
+	 * 
+	 * @return the stack frame owning this variable
+	 */
+	protected OrccStackFrame getStackFrame() {
+		return fFrame;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IVariable#getValue()
+	 */
+	public IValue getValue() throws DebugException {
+		return fValue;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -100,20 +109,20 @@ public class OrccVariable extends OrccDebugElement implements IVariable {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.debug.core.model.IValueModification#setValue(java.lang.String
-	 * )
+	 * org.eclipse.debug.core.model.IValueModification#setValue(org.eclipse.
+	 * debug.core.model.IValue)
 	 */
-	public void setValue(String expression) throws DebugException {
+	public void setValue(IValue value) throws DebugException {
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.debug.core.model.IValueModification#setValue(org.eclipse.
-	 * debug.core.model.IValue)
+	 * org.eclipse.debug.core.model.IValueModification#setValue(java.lang.String
+	 * )
 	 */
-	public void setValue(IValue value) throws DebugException {
+	public void setValue(String expression) throws DebugException {
 	}
 
 	/*
@@ -131,17 +140,6 @@ public class OrccVariable extends OrccDebugElement implements IVariable {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.debug.core.model.IValueModification#verifyValue(java.lang
-	 * .String)
-	 */
-	public boolean verifyValue(String expression) throws DebugException {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * org.eclipse.debug.core.model.IValueModification#verifyValue(org.eclipse
 	 * .debug.core.model.IValue)
 	 */
@@ -149,13 +147,15 @@ public class OrccVariable extends OrccDebugElement implements IVariable {
 		return false;
 	}
 
-	/**
-	 * Returns the stack frame owning this variable.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return the stack frame owning this variable
+	 * @see
+	 * org.eclipse.debug.core.model.IValueModification#verifyValue(java.lang
+	 * .String)
 	 */
-	protected OrccStackFrame getStackFrame() {
-		return fFrame;
+	public boolean verifyValue(String expression) throws DebugException {
+		return false;
 	}
 
 }

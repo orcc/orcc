@@ -224,7 +224,7 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 	public String[] getOption() {
 		List<String> options = new ArrayList<String>();
 		options.add(option);
-		return (String[]) options.toArray(new String[] {});
+		return options.toArray(new String[] {});
 	}
 	
 	/**
@@ -235,7 +235,7 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 	public String[] getValue() {
 		List<String> values = new ArrayList<String>();
 		values.add(value);
-		return (String[]) values.toArray(new String[] {});
+		return values.toArray(new String[] {});
 	}
 	
 	/**

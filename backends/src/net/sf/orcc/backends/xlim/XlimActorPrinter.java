@@ -531,7 +531,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 
 				// For lists use result of initialize execution (initializes
 				// loops case)
-				if (stateVar.getType().getType() == Type.LIST) {
+				if (stateVar.getType().getTypeOf() == Type.LIST) {
 					state.getType().accept(new XlimTypeSizeVisitor(init2));
 
 					Object[] value = (Object[]) stateVar.getValue();

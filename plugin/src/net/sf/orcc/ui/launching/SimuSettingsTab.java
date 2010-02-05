@@ -80,9 +80,9 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private Text textNetwork;
 
-	private Text textStimulus;
-
 	private Text textOutput;
+
+	private Text textStimulus;
 
 	private void browseFiles(Shell shell) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
@@ -107,17 +107,17 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 					if (selection[0] instanceof IFile) {
 						IFile file = (IFile) selection[0];
 						if (file.getFileExtension().equals("xdf")) {
-							return new Status(Status.OK,
+							return new Status(IStatus.OK,
 									OrccActivator.PLUGIN_ID, "");
 						} else {
-							return new Status(Status.ERROR,
+							return new Status(IStatus.ERROR,
 									OrccActivator.PLUGIN_ID,
 									"Selected file must be an XDF file.");
 						}
 					}
 				}
 
-				return new Status(Status.ERROR, OrccActivator.PLUGIN_ID,
+				return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 						"Only files can be selected, not folders nor projects");
 			}
 
@@ -179,40 +179,6 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		createControlOutput(font, composite);
 	}
 
-	private void createControlNetwork(Font font, Composite parent) {
-		final Group group = new Group(parent, SWT.NONE);
-		group.setFont(font);
-		group.setText("&Input:");
-		group.setLayout(new GridLayout(2, false));
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		group.setLayoutData(data);
-
-		textNetwork = new Text(group, SWT.BORDER | SWT.SINGLE);
-		textNetwork.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		textNetwork.setLayoutData(data);
-		textNetwork.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				updateLaunchConfigurationDialog();
-			}
-
-		});
-
-		Button buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				browseFiles(group.getShell());
-			}
-		});
-	}
-
 	private void createControlBitstream(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
@@ -243,6 +209,40 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				browseStimulusFiles(group.getShell());
+			}
+		});
+	}
+
+	private void createControlNetwork(Font font, Composite parent) {
+		final Group group = new Group(parent, SWT.NONE);
+		group.setFont(font);
+		group.setText("&Input:");
+		group.setLayout(new GridLayout(2, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		group.setLayoutData(data);
+
+		textNetwork = new Text(group, SWT.BORDER | SWT.SINGLE);
+		textNetwork.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		textNetwork.setLayoutData(data);
+		textNetwork.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateLaunchConfigurationDialog();
+			}
+
+		});
+
+		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseFiles(group.getShell());
 			}
 		});
 	}
@@ -298,17 +298,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		return file;
 	}
 
-	 private boolean getStimulusFromText() {
-		String value = textStimulus.getText();
-		File file = new File(value);
-		if (file.isFile()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private boolean getFolderFromText() {
+	 private boolean getFolderFromText() {
 		String value = textOutput.getText();
 		File file = new File(value);
 		if (file.isDirectory()) {
@@ -326,6 +316,16 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public String getName() {
 		return "Interpretation settings";
+	}
+
+	private boolean getStimulusFromText() {
+		String value = textStimulus.getText();
+		File file = new File(value);
+		if (file.isFile()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override

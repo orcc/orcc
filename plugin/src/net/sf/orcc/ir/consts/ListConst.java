@@ -36,6 +36,7 @@ import net.sf.orcc.ir.Constant;
  * This class defines a list constant.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class ListConst extends AbstractConstant {
@@ -69,7 +70,7 @@ public class ListConst extends AbstractConstant {
 	}
 
 	@Override
-	public int getType() {
+	public int getTypeOf() {
 		return LIST;
 	}
 

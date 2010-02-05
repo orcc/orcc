@@ -85,6 +85,7 @@ public class ActorGraph {
 		return this.actor.getName().equals(actor.getName());
 	}
 
+	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof ActorGraph)) {
 			return false;
@@ -121,6 +122,7 @@ public class ActorGraph {
 		this.actor = actor;
 	}
 
+	@Override
 	public String toString() {
 		return getName();
 	}

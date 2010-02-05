@@ -8,16 +8,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.backends.c.quasistatic.scheduler.model.TokensPattern;
+import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
+import net.sf.orcc.util.DomUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.c.quasistatic.scheduler.model.TokensPattern;
-import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
-import net.sf.orcc.util.DomUtil;
 
 public class InputXDFParser {
 	
@@ -35,17 +34,6 @@ public class InputXDFParser {
 		parseInput(new File(fileName));
 	}
 	
-	private void parseInput(File file) throws OrccException{
-		// input
-		InputStream is;
-		try {
-			is = new FileInputStream(file);
-			document = DomUtil.parseDocument(is);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	private boolean checkFile(Element root) throws OrccException{
 		if (!root.getNodeName().equals("XDF")) {
 			throw new OrccException("Expected \"XDF\" start element");
@@ -58,25 +46,14 @@ public class InputXDFParser {
 		return true;
 	}
 	
-	private NodeList parseGroupNodes(String groupName) throws OrccException{
-		Element root = document.getDocumentElement();
-		checkFile(root);
+	private String fixStatement(String stmt){
+		stmt = stmt.replace("BET", ">=");
+		stmt = stmt.replace("LET", "<=");
+		stmt = stmt.replace("BT", ">");
+		stmt = stmt.replace("LT", "<");
+		stmt = stmt.replace("AND", "&&");
 		
-		Node node = null;
-		NodeList rootChilds = root.getChildNodes();
-		for(int i = 0 ; i < rootChilds.getLength() ; i++){
-			Node child = rootChilds.item(i);
-			if(child.getNodeName().equals(groupName)){
-				node = child;
-				break;
-			}
-		}
-		if(node == null){
-			throw new OrccException("Expected a " + groupName + " element");
-		}
-		
-		NodeList nodes = node.getChildNodes();
-		return nodes;
+		return stmt;
 	}
 	
 	private List<String> parseActorsNames(Node btypeNode){
@@ -105,34 +82,20 @@ public class InputXDFParser {
 		return tokensPatterns;
 	}
 	
-	private String fixStatement(String stmt){
-		stmt = stmt.replace("BET", ">=");
-		stmt = stmt.replace("LET", "<=");
-		stmt = stmt.replace("BT", ">");
-		stmt = stmt.replace("LT", "<");
-		stmt = stmt.replace("AND", "&&");
+	public Integer parseCustomGeneralBufferSize() throws OrccException{
 		
-		return stmt;
-	}
-	
-	private TokensPattern parsePortsPattern(Node actorNode){
-		String actorName = ((Element)actorNode).getAttribute("name");
-		NodeList portsNodes = actorNode.getChildNodes();
-		HashMap<String, Integer> remainingMap = new HashMap<String, Integer>();;
-		HashMap<String, Integer> consumptionMap = new HashMap<String, Integer>();
-		for(int i = 0 ; i < portsNodes.getLength() ; i++){
-			Node portNode = portsNodes.item(i);
-			if(portNode.getNodeName().equals("Port")){
-				Element portElement = (Element) portNode;
-				String portName = portElement.getAttribute("name");
-				int noReads = Integer.parseInt(portElement.getAttribute("reads"));
-				int consumptionTokens = Integer.parseInt(portElement.getAttribute("consumption"));
-				remainingMap.put(portName, noReads * consumptionTokens);
-				consumptionMap.put(portName, consumptionTokens);
+		NodeList buffersNodes = parseGroupNodes(Constants.CUSTOM_GENERAL_BUFFER_SIZE);
+		
+		for(int i = 0; i < buffersNodes.getLength() ; i++){
+			Node bufferNode = buffersNodes.item(i);
+			if(bufferNode.getNodeName().equals("Size")){
+				Element bufferElement = (Element) bufferNode;
+				String size = bufferElement.getAttribute("value");
+				return Integer.parseInt(size);
 			}
 		}
+		return null;
 		
-		return new TokensPattern(actorName, remainingMap, consumptionMap);
 	}
 	
 	public HashMap<String, String> parseCustomIndividualBuffersSizes() throws OrccException{
@@ -154,20 +117,56 @@ public class InputXDFParser {
 		
 	}
 	
-	public Integer parseCustomGeneralBufferSize() throws OrccException{
+	private NodeList parseGroupNodes(String groupName) throws OrccException{
+		Element root = document.getDocumentElement();
+		checkFile(root);
 		
-		NodeList buffersNodes = parseGroupNodes(Constants.CUSTOM_GENERAL_BUFFER_SIZE);
-		
-		for(int i = 0; i < buffersNodes.getLength() ; i++){
-			Node bufferNode = buffersNodes.item(i);
-			if(bufferNode.getNodeName().equals("Size")){
-				Element bufferElement = (Element) bufferNode;
-				String size = bufferElement.getAttribute("value");
-				return Integer.parseInt(size);
+		Node node = null;
+		NodeList rootChilds = root.getChildNodes();
+		for(int i = 0 ; i < rootChilds.getLength() ; i++){
+			Node child = rootChilds.item(i);
+			if(child.getNodeName().equals(groupName)){
+				node = child;
+				break;
 			}
 		}
-		return null;
+		if(node == null){
+			throw new OrccException("Expected a " + groupName + " element");
+		}
 		
+		NodeList nodes = node.getChildNodes();
+		return nodes;
+	}
+	
+	private void parseInput(File file) throws OrccException{
+		// input
+		InputStream is;
+		try {
+			is = new FileInputStream(file);
+			document = DomUtil.parseDocument(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private TokensPattern parsePortsPattern(Node actorNode){
+		String actorName = ((Element)actorNode).getAttribute("name");
+		NodeList portsNodes = actorNode.getChildNodes();
+		HashMap<String, Integer> remainingMap = new HashMap<String, Integer>();;
+		HashMap<String, Integer> consumptionMap = new HashMap<String, Integer>();
+		for(int i = 0 ; i < portsNodes.getLength() ; i++){
+			Node portNode = portsNodes.item(i);
+			if(portNode.getNodeName().equals("Port")){
+				Element portElement = (Element) portNode;
+				String portName = portElement.getAttribute("name");
+				int noReads = Integer.parseInt(portElement.getAttribute("reads"));
+				int consumptionTokens = Integer.parseInt(portElement.getAttribute("consumption"));
+				remainingMap.put(portName, noReads * consumptionTokens);
+				consumptionMap.put(portName, consumptionTokens);
+			}
+		}
+		
+		return new TokensPattern(actorName, remainingMap, consumptionMap);
 	}
 	
 	public List<String> parseQSSchedulerStmts() throws OrccException{

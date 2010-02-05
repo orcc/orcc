@@ -41,21 +41,21 @@ import org.eclipse.debug.core.model.IThread;
 public class OrccThread extends OrccDebugElement implements IThread {
 
 	/**
-	 * Debugging objects
-	 */
-	private OrccDebugTarget target;
-	private DebugThread fThread;
-	
-	/**
 	 * Breakpoints this thread is suspended at or <code>null</code> if none.
 	 */
 	private IBreakpoint[] fBreakpoints;
-
 	/**
 	 * Whether this thread is stepping or suspended
 	 */
 	private boolean fStepping = false;
+	
 	private boolean fSuspended = true;
+
+	private DebugThread fThread;
+	/**
+	 * Debugging objects
+	 */
+	private OrccDebugTarget target;
 
 	
 
@@ -74,134 +74,12 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getStackFrames()
-	 */
-	public IStackFrame[] getStackFrames() throws DebugException {
-		if (isSuspended()) {
-			return new IStackFrame[] { new OrccStackFrame(this, fThread
-					.getStackFrame(), 0) };
-		} else {
-			return new IStackFrame[0];
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#hasStackFrames()
-	 */
-	public boolean hasStackFrames() throws DebugException {
-		return isSuspended();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getPriority()
-	 */
-	public int getPriority() throws DebugException {
-		return 0;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getTopStackFrame()
-	 */
-	public IStackFrame getTopStackFrame() throws DebugException {
-		IStackFrame[] frames = getStackFrames();
-		if (frames.length > 0) {
-			return frames[0];
-		}
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getName()
-	 */
-	public String getName() throws DebugException {
-		return fThread.getName();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IThread#getBreakpoints()
-	 */
-	public IBreakpoint[] getBreakpoints() {
-		if (fBreakpoints == null) {
-			return new IBreakpoint[0];
-		}
-		return fBreakpoints;
-	}
-
-	/**
-	 * Sets the breakpoints this thread is suspended at, or <code>null</code> if
-	 * none.
-	 * 
-	 * @param breakpoints
-	 *            the breakpoints this thread is suspended at, or
-	 *            <code>null</code> if none
-	 */
-	protected void setBreakpoints(IBreakpoint[] breakpoints) {
-		fBreakpoints = breakpoints;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
 	public boolean canResume() {
 		return isSuspended();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
-	 */
-	public boolean canSuspend() {
-		return !isSuspended();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
-	 */
-	public boolean isSuspended() {
-		return fSuspended;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
-	 */
-	public void resume() throws DebugException {
-		fThread.resume();
-	}
-
-	public void resumed() {
-		fSuspended = false;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
-	 */
-	public void suspend() throws DebugException {
-		fThread.suspend();
-	}
-
-	public void suspended() {
-		fSuspended = true;
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -232,10 +110,147 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
+	 */
+	public boolean canSuspend() {
+		return !isSuspended();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
+	 */
+	public boolean canTerminate() {
+		return !target.isTerminated();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IThread#getBreakpoints()
+	 */
+	public IBreakpoint[] getBreakpoints() {
+		if (fBreakpoints == null) {
+			return new IBreakpoint[0];
+		}
+		return fBreakpoints;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IThread#getName()
+	 */
+	public String getName() throws DebugException {
+		return fThread.getName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IThread#getPriority()
+	 */
+	public int getPriority() throws DebugException {
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IThread#getStackFrames()
+	 */
+	public IStackFrame[] getStackFrames() throws DebugException {
+		if (isSuspended()) {
+			return new IStackFrame[] { new OrccStackFrame(this, fThread
+					.getStackFrame(), 0) };
+		} else {
+			return new IStackFrame[0];
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IThread#getTopStackFrame()
+	 */
+	public IStackFrame getTopStackFrame() throws DebugException {
+		IStackFrame[] frames = getStackFrames();
+		if (frames.length > 0) {
+			return frames[0];
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IThread#hasStackFrames()
+	 */
+	public boolean hasStackFrames() throws DebugException {
+		return isSuspended();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
 	public boolean isStepping() {
 		return fStepping;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
+	 */
+	public boolean isSuspended() {
+		return fSuspended;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
+	 */
+	public boolean isTerminated() {
+		return target.isTerminated();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
+	 */
+	public void resume() throws DebugException {
+		fThread.resume();
+	}
+
+	public void resumed() {
+		fSuspended = false;
+	}
+
+	/**
+	 * Sets the breakpoints this thread is suspended at, or <code>null</code> if
+	 * none.
+	 * 
+	 * @param breakpoints
+	 *            the breakpoints this thread is suspended at, or
+	 *            <code>null</code> if none
+	 */
+	protected void setBreakpoints(IBreakpoint[] breakpoints) {
+		fBreakpoints = breakpoints;
+	}
+
+	/**
+	 * Sets whether this thread is stepping
+	 * 
+	 * @param stepping
+	 *            whether stepping
+	 */
+	protected void setStepping(boolean stepping) {
+		fStepping = stepping;
 	}
 
 	/*
@@ -267,19 +282,14 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
+	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
-	public boolean canTerminate() {
-		return !target.isTerminated();
+	public void suspend() throws DebugException {
+		fThread.suspend();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
-	 */
-	public boolean isTerminated() {
-		return target.isTerminated();
+	public void suspended() {
+		fSuspended = true;
 	}
 
 	/*
@@ -288,15 +298,5 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
-	}
-
-	/**
-	 * Sets whether this thread is stepping
-	 * 
-	 * @param stepping
-	 *            whether stepping
-	 */
-	protected void setStepping(boolean stepping) {
-		fStepping = stepping;
 	}
 }

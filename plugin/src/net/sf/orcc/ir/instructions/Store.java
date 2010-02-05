@@ -32,6 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.util.CommonNodeOperations;
@@ -71,6 +72,19 @@ public class Store extends AbstractInstruction implements ValueContainer {
 	@Override
 	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
+	}
+
+	@Override
+	public Type getCast(){
+		Type expr = value.getType();
+		Type val = target.getVariable().getType();
+		if(expr != null){
+			if (!expr.equals(val)){
+				return val;
+			}
+		}
+		
+		return null;
 	}
 
 	public List<Expression> getIndexes() {
@@ -123,7 +137,7 @@ public class Store extends AbstractInstruction implements ValueContainer {
 	public void setValueSimple(Expression value) {
 		this.value = value;
 	}
-
+	
 	@Override
 	public String toString() {
 		return target.toString() + indexes + " = " + getValue();

@@ -79,19 +79,19 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	private Object returnValue;
 
+	/**
+	 * Creates a new node interpreter without setting its list allocator nor its
+	 * expression interpreter.
+	 */
+	protected NodeInterpreter() {
+	}
+
 	public NodeInterpreter(String id) {
 		// Create the List allocator for called procedure local vars
 		listAllocator = new ListAllocator();
 
 		// Create the expression evaluator
 		this.exprInterpreter = new ExpressionEvaluator();
-	}
-
-	/**
-	 * Creates a new node interpreter without setting its list allocator nor its
-	 * expression interpreter.
-	 */
-	protected NodeInterpreter() {
 	}
 
 	public Object getReturnValue() {
@@ -134,7 +134,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		// Allocate procedure local List variables
 		for (Variable local : proc.getLocals()) {
 			Type type = local.getType();
-			if (type.getType() == Type.LIST) {
+			if (type.getTypeOf() == Type.LIST) {
 				local.setValue(listAllocator.allocate(type));
 			}
 		}

@@ -37,6 +37,7 @@ import net.sf.orcc.ir.type.TypeVisitor;
  * This interface defines a type.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public interface Type {
@@ -101,6 +102,6 @@ public interface Type {
 	 * 
 	 * @return the type of this type
 	 */
-	public int getType();
+	public int getTypeOf();
 
 }

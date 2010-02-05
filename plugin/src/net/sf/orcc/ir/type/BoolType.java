@@ -32,6 +32,7 @@ package net.sf.orcc.ir.type;
  * This class defines a boolean type.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class BoolType extends AbstractType {
@@ -54,7 +55,7 @@ public class BoolType extends AbstractType {
 	}
 
 	@Override
-	public int getType() {
+	public int getTypeOf() {
 		return BOOLEAN;
 	}
 

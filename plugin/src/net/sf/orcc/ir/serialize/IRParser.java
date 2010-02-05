@@ -146,13 +146,13 @@ public class IRParser {
 
 	private CFGNode previousNode;
 
+	private Procedure procedure;
+
 	private OrderedMap<Procedure> procs;
 
 	private List<Action> untaggedActions;
 
 	private Scope<Variable> variables;
-
-	private Procedure procedure;
 
 	private Action getAction(JSONArray array) throws JSONException {
 		if (array.length() == 0) {

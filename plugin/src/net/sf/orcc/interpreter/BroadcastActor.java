@@ -46,6 +46,10 @@ public class BroadcastActor extends AbstractInterpretedActor {
 		outports = new ArrayList<Port>();
 	}
 
+	@Override
+	public void close() {
+	}
+
 	private boolean hasRoom(List<Port> outports) {
 		for (Port out : outports) {
 			ICommunicationFifo outFifo = out.fifo();
@@ -76,23 +80,19 @@ public class BroadcastActor extends AbstractInterpretedActor {
 
 		return running;
 	}
+	
+	public void setInport(Port inport) {
+		this.inport = inport;
+	}
+	
+	public void setOutport(Port outport) {
+		this.outports.add(outport);
+	}
 
 	@Override
 	public boolean step() {
 		schedule();
 		return true;
-	}
-	
-	@Override
-	public void close() {
-	}
-	
-	public void setInport(Port inport) {
-		this.inport = inport;
-	}
-
-	public void setOutport(Port outport) {
-		this.outports.add(outport);
 	}
 
 }

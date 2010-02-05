@@ -32,6 +32,7 @@ package net.sf.orcc.ir.type;
  * This class defines a void type.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class VoidType extends AbstractType {
@@ -54,7 +55,7 @@ public class VoidType extends AbstractType {
 	}
 
 	@Override
-	public int getType() {
+	public int getTypeOf() {
 		return VOID;
 	}
 

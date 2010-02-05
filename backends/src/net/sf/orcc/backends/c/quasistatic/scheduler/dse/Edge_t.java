@@ -47,20 +47,20 @@ public class Edge_t {
         return input;
     }
 
-    public void setInput(int input) {
-        this.input = input;
-    }
-
     public int getOutput() {
         return output;
     }
 
-    public void setOutput(int output) {
-        this.output = output;
-    }
-
     public int getToken() {
         return token;
+    }
+
+    public void setInput(int input) {
+        this.input = input;
+    }
+
+    public void setOutput(int output) {
+        this.output = output;
     }
 
     public void setToken(int token) {

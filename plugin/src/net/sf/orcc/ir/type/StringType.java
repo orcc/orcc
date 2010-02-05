@@ -32,6 +32,7 @@ package net.sf.orcc.ir.type;
  * This class defines a String type.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class StringType extends AbstractType {
@@ -54,7 +55,7 @@ public class StringType extends AbstractType {
 	}
 
 	@Override
-	public int getType() {
+	public int getTypeOf() {
 		return STRING;
 	}
 

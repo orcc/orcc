@@ -68,15 +68,12 @@ public class InterpreterMain extends Thread {
 	 * Interpreter automaton control
 	 */
 	public enum InterpreterState {
-		IDLE, CONFIGURED, READY, RUNNING, STEPPING, SUSPENDED, TERMINATED
+		CONFIGURED, IDLE, READY, RUNNING, STEPPING, SUSPENDED, TERMINATED
 	}
 
-	private InterpreterState state = InterpreterState.IDLE;
+	private List<AbstractInterpretedActor> actorQueue;
 
-	/**
-	 * Associated system objects
-	 */
-	private OrccProcess process;
+	private List<CommunicationFifo> fifoList;
 	private IProgressMonitor monitor;
 
 	/**
@@ -85,20 +82,23 @@ public class InterpreterMain extends Thread {
 	// private int fifoSize;
 	// private boolean enableTraces;
 	private String networkFilename;
-	private String stimulusFilename;
-
 	/**
-	 * Executable actor network
+	 * Associated system objects
 	 */
-	private List<DebugThread> threadQueue;
-	private List<AbstractInterpretedActor> actorQueue;
-	private List<CommunicationFifo> fifoList;
+	private OrccProcess process;
 
 	/**
 	 * The utility class that makes us able to support bound properties. This is
 	 * used for easy "debug events" exchange.
 	 */
 	private PropertyChangeSupport propertyChange;
+	private InterpreterState state = InterpreterState.IDLE;
+	private String stimulusFilename;
+
+	/**
+	 * Executable actor network
+	 */
+	private List<DebugThread> threadQueue;
 
 	/**
 	 * Add the listener <code>listener</code> to the registered listeners.
@@ -111,92 +111,17 @@ public class InterpreterMain extends Thread {
 	}
 
 	/**
-	 * This methods calls
-	 * {@link PropertyChangeSupport#firePropertyChange(String, Object, Object)}
-	 * on the underlying {@link PropertyChangeSupport} without updating the
-	 * value of the property <code>propertyName</code>. This method is
-	 * particularly useful when a property should be fired regardless of the
-	 * previous value (in case of undo/redo for example, when a same object is
-	 * added, removed, and added again).
+	 * Ask each network actor for closing
 	 * 
-	 * @param propertyName
-	 *            The name of the property concerned.
-	 * @param oldValue
-	 *            The old value of the property.
-	 * @param newValue
-	 *            The new value of the property.
 	 */
-	public void firePropertyChange(String propertyName, Object oldValue,
-			Object newValue) {
-		propertyChange.firePropertyChange(propertyName, oldValue, newValue);
-	}
-
-	/**
-	 * Remove the listener listener from the registered listeners.
-	 * 
-	 * @param listener
-	 *            The listener to remove.
-	 */
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		propertyChange.removePropertyChangeListener(listener);
-	}
-
-	@Override
-	public void run() {
-		// Wait for the monitor to be set (for user cancel checking)
-		while (state != InterpreterState.CONFIGURED)
-			;
-		// Then wait for the end of the process
-		while (state != InterpreterState.TERMINATED) {
-			// Asynchronous user cancel
-			if (monitor.isCanceled()) {
-				terminate();
-			}
-			switch (state) {
-			case IDLE:
-				terminate();
-				break;
-			case CONFIGURED:
-				initialize();
-				state = InterpreterState.READY;
-				firePropertyChange("started", null, null);
-				break;
-			case READY:
-				break;
-			case RUNNING:
-				if (scheduleThreads() <= 0) {
-					terminate();
-				}
-				break;
-			case STEPPING:
-				if (scheduleThreads() <= 0) {
-					terminate();
-				}
-				break;
-			case SUSPENDED:
-				break;
-			case TERMINATED:
-				break;
-			}
+	private void close() {
+		// close actors of the network
+		for (AbstractInterpretedActor actor : actorQueue) {
+			actor.close();
 		}
-	}
-
-	/**
-	 * Configure the interpreter with associated system/debug objects
-	 * 
-	 * @param process
-	 * @param monitor
-	 */
-	public void configSystem(OrccProcess process, IProgressMonitor monitor) {
-		// Orcc debug model "host" process
-		this.process = process;
-		// Progress monitor for user cancel
-		this.monitor = monitor;
-		// Property change support creation for sending interpreter events
-		propertyChange = new PropertyChangeSupport(this);
-		// Check interpreter completely configured
-		if (actorQueue != null) {
-			this.state = InterpreterState.CONFIGURED;
+		// Close network FIFOs
+		for (CommunicationFifo fifo : fifoList) {
+			fifo.close();
 		}
 	}
 
@@ -343,67 +268,43 @@ public class InterpreterMain extends Thread {
 	}
 
 	/**
-	 * Start or restart all network actors
+	 * Configure the interpreter with associated system/debug objects
+	 * 
+	 * @param process
+	 * @param monitor
 	 */
-	public void resumeAll() {
-		if (state == InterpreterState.READY) {
-			state = InterpreterState.RUNNING;
-			for (DebugThread thread : threadQueue) {
-				thread.resume();
-			}
-			firePropertyChange("resumed client", null, null);
-		} else if (state == InterpreterState.SUSPENDED) {
-			state = InterpreterState.RUNNING;
-			for (DebugThread thread : threadQueue) {
-				thread.resume();
-			}
-			firePropertyChange("resumed client", null, null);
+	public void configSystem(OrccProcess process, IProgressMonitor monitor) {
+		// Orcc debug model "host" process
+		this.process = process;
+		// Progress monitor for user cancel
+		this.monitor = monitor;
+		// Property change support creation for sending interpreter events
+		propertyChange = new PropertyChangeSupport(this);
+		// Check interpreter completely configured
+		if (actorQueue != null) {
+			this.state = InterpreterState.CONFIGURED;
 		}
 	}
 
 	/**
-	 * Suspend all network actors
+	 * This methods calls
+	 * {@link PropertyChangeSupport#firePropertyChange(String, Object, Object)}
+	 * on the underlying {@link PropertyChangeSupport} without updating the
+	 * value of the property <code>propertyName</code>. This method is
+	 * particularly useful when a property should be fired regardless of the
+	 * previous value (in case of undo/redo for example, when a same object is
+	 * added, removed, and added again).
+	 * 
+	 * @param propertyName
+	 *            The name of the property concerned.
+	 * @param oldValue
+	 *            The old value of the property.
+	 * @param newValue
+	 *            The new value of the property.
 	 */
-	public void suspendAll() {
-		if (state == InterpreterState.RUNNING) {
-			state = InterpreterState.SUSPENDED;
-			for (DebugThread thread : threadQueue) {
-				thread.suspend();
-			}
-			firePropertyChange("suspended client", null, null);
-		}
-	}
-
-	/**
-	 * Schedule next schedulable action for each actor of the network
-	 */
-	public void stepAll() {
-		if (state == InterpreterState.SUSPENDED) {
-			state = InterpreterState.STEPPING;
-			for (DebugThread thread : threadQueue) {
-				thread.stepOver();
-			}
-			firePropertyChange("resumed step", null, null);
-		}
-	}
-
-	/**
-	 * Terminate the interpretation of the current actors network
-	 */
-	public void terminate() {
-		close();
-		state = InterpreterState.TERMINATED;
-		firePropertyChange("terminated", null, null);
-	}
-
-	/**
-	 * Simulates the network until the end of application
-	 */
-	public void simulate() {
-		initialize();
-		while (!monitor.isCanceled() && (scheduleActors() > 0))
-			;
-		close();
+	public void firePropertyChange(String propertyName, Object oldValue,
+			Object newValue) {
+		propertyChange.firePropertyChange(propertyName, oldValue, newValue);
 	}
 
 	/**
@@ -433,6 +334,75 @@ public class InterpreterMain extends Thread {
 		// init actors of the network
 		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.initialize();
+		}
+	}
+
+	/**
+	 * Remove the listener listener from the registered listeners.
+	 * 
+	 * @param listener
+	 *            The listener to remove.
+	 */
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+		propertyChange.removePropertyChangeListener(listener);
+	}
+
+	/**
+	 * Start or restart all network actors
+	 */
+	public void resumeAll() {
+		if (state == InterpreterState.READY) {
+			state = InterpreterState.RUNNING;
+			for (DebugThread thread : threadQueue) {
+				thread.resume();
+			}
+			firePropertyChange("resumed client", null, null);
+		} else if (state == InterpreterState.SUSPENDED) {
+			state = InterpreterState.RUNNING;
+			for (DebugThread thread : threadQueue) {
+				thread.resume();
+			}
+			firePropertyChange("resumed client", null, null);
+		}
+	}
+
+	@Override
+	public void run() {
+		// Wait for the monitor to be set (for user cancel checking)
+		while (state != InterpreterState.CONFIGURED)
+			;
+		// Then wait for the end of the process
+		while (state != InterpreterState.TERMINATED) {
+			// Asynchronous user cancel
+			if (monitor.isCanceled()) {
+				terminate();
+			}
+			switch (state) {
+			case IDLE:
+				terminate();
+				break;
+			case CONFIGURED:
+				initialize();
+				state = InterpreterState.READY;
+				firePropertyChange("started", null, null);
+				break;
+			case READY:
+				break;
+			case RUNNING:
+				if (scheduleThreads() <= 0) {
+					terminate();
+				}
+				break;
+			case STEPPING:
+				if (scheduleThreads() <= 0) {
+					terminate();
+				}
+				break;
+			case SUSPENDED:
+				break;
+			case TERMINATED:
+				break;
+			}
 		}
 	}
 
@@ -489,18 +459,48 @@ public class InterpreterMain extends Thread {
 	}
 
 	/**
-	 * Ask each network actor for closing
-	 * 
+	 * Simulates the network until the end of application
 	 */
-	private void close() {
-		// close actors of the network
-		for (AbstractInterpretedActor actor : actorQueue) {
-			actor.close();
+	public void simulate() {
+		initialize();
+		while (!monitor.isCanceled() && (scheduleActors() > 0))
+			;
+		close();
+	}
+
+	/**
+	 * Schedule next schedulable action for each actor of the network
+	 */
+	public void stepAll() {
+		if (state == InterpreterState.SUSPENDED) {
+			state = InterpreterState.STEPPING;
+			for (DebugThread thread : threadQueue) {
+				thread.stepOver();
+			}
+			firePropertyChange("resumed step", null, null);
 		}
-		// Close network FIFOs
-		for (CommunicationFifo fifo : fifoList) {
-			fifo.close();
+	}
+
+	/**
+	 * Suspend all network actors
+	 */
+	public void suspendAll() {
+		if (state == InterpreterState.RUNNING) {
+			state = InterpreterState.SUSPENDED;
+			for (DebugThread thread : threadQueue) {
+				thread.suspend();
+			}
+			firePropertyChange("suspended client", null, null);
 		}
+	}
+
+	/**
+	 * Terminate the interpretation of the current actors network
+	 */
+	public void terminate() {
+		close();
+		state = InterpreterState.TERMINATED;
+		firePropertyChange("terminated", null, null);
 	}
 
 }

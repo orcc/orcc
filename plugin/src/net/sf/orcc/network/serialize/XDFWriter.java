@@ -512,7 +512,7 @@ public class XDFWriter {
 		String name;
 		Expression size;
 
-		switch (type.getType()) {
+		switch (type.getTypeOf()) {
 		case Type.BOOLEAN:
 			name = "bool";
 			break;

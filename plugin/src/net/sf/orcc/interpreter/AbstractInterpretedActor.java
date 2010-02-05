@@ -6,9 +6,9 @@ import net.sf.orcc.ir.Location;
 public abstract class AbstractInterpretedActor {
 
 	protected Actor actor;
-	protected String name;
-	protected Location lastVisitedLocation;
 	protected String lastVisitedAction;
+	protected Location lastVisitedLocation;
+	protected String name;
 
 	protected AbstractInterpretedActor(String id, Actor actor) {
 		this.name = id;
@@ -18,21 +18,9 @@ public abstract class AbstractInterpretedActor {
 	}
 
 	/**
-	 * Get instance actor's name
-	 * 
-	 * @return name
+	 * Close any additional resources (IO, file...)
 	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Get line number of the last code that has been interpreted
-	 * 
-	 * @return code line number
-	 */
-	public Location getLastVisitedLocation() {
-		return lastVisitedLocation;
+	public void close() {
 	}
 
 	/**
@@ -45,10 +33,29 @@ public abstract class AbstractInterpretedActor {
 	}
 
 	/**
+	 * Get line number of the last code that has been interpreted
+	 * 
+	 * @return code line number
+	 */
+	public Location getLastVisitedLocation() {
+		return lastVisitedLocation;
+	}
+
+	/**
+	 * Get instance actor's name
+	 * 
+	 * @return name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
 	 * Initialize the actor state variables
 	 */
 	public void initialize() {
 	}
+	
 
 	/**
 	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
@@ -58,7 +65,6 @@ public abstract class AbstractInterpretedActor {
 	public Integer schedule() {
 		return 0;
 	}
-	
 
 	/**
 	 * Check next instruction of the current schedulable action to be interpreted and interpret it.
@@ -67,11 +73,5 @@ public abstract class AbstractInterpretedActor {
 	 */
 	public boolean step() {
 		return true;
-	}
-
-	/**
-	 * Close any additional resources (IO, file...)
-	 */
-	public void close() {
 	}
 }

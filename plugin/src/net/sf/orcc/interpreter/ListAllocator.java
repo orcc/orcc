@@ -50,7 +50,7 @@ public class ListAllocator extends AbstractTypeVisitor {
 		List<Integer> sizeList = type.getDimensions();
 		int[] dimensions = new int[sizeList.size()];
 		for (int i = 0; i < sizeList.size(); i++) {
-			dimensions[i] = (Integer) sizeList.get(i);
+			dimensions[i] = sizeList.get(i);
 		}
 		sizeList.clear();
 

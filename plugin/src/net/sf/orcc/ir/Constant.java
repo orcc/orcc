@@ -35,6 +35,7 @@ import net.sf.orcc.ir.consts.ConstantVisitor;
  * This interface defines a constant.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public interface Constant {
@@ -79,6 +80,6 @@ public interface Constant {
 	 * 
 	 * @return the type of this constant
 	 */
-	public int getType();
+	public int getTypeOf();
 
 }

@@ -89,18 +89,18 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	private List<Instruction> instructions;
 
 	/**
-	 * Creates a new empty block node.
-	 */
-	public BlockNode(Procedure procedure) {
-		this(new Location(), procedure);
-	}
-
-	/**
 	 * Creates a new empty block node with the given location.
 	 */
 	public BlockNode(Location location, Procedure procedure) {
 		super(location, procedure);
 		instructions = new ArrayList<Instruction>();
+	}
+
+	/**
+	 * Creates a new empty block node.
+	 */
+	public BlockNode(Procedure procedure) {
+		this(new Location(), procedure);
 	}
 
 	@Override

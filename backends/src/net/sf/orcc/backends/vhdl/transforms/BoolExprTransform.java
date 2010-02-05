@@ -108,10 +108,10 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(Assign node, Object... args) {
-		if (node.getTarget().getType().getType() == Type.BOOLEAN) {
+		if (node.getTarget().getType().getTypeOf() == Type.BOOLEAN) {
 			Expression expr = node.getValue();
-			if (expr.getType() == Expression.BINARY
-					|| expr.getType() == Expression.UNARY) {
+			if (expr.getTypeOf() == Expression.BINARY
+					|| expr.getTypeOf() == Expression.UNARY) {
 				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
 				createIfNode(node.getTarget(), expr);
 				createNewBlock(iit);

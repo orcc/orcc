@@ -32,6 +32,7 @@ package net.sf.orcc.ir.consts;
  * This class defines a boolean constant.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class BoolConst extends AbstractConstant {
@@ -59,7 +60,7 @@ public class BoolConst extends AbstractConstant {
 	}
 
 	@Override
-	public int getType() {
+	public int getTypeOf() {
 		return BOOLEAN;
 	}
 

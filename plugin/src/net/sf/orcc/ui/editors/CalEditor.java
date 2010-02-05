@@ -48,6 +48,7 @@ public class CalEditor extends TextEditor {
 		setDocumentProvider(new CalDocumentProvider());
 	}
 
+	@Override
 	public void dispose() {
 		colorManager.dispose();
 		super.dispose();

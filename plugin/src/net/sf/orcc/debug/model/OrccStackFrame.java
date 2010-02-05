@@ -43,11 +43,11 @@ import org.eclipse.debug.core.model.IVariable;
  */
 public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 
-	private OrccThread fThread;
-	private String fName;
 	private String fFileName;
-	private int fLineNumber;
 	private int fId;
+	private int fLineNumber;
+	private String fName;
+	private OrccThread fThread;
 	private IVariable[] fVariables;
 
 	/**
@@ -76,7 +76,7 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		OrccValue value = new OrccValue((OrccDebugTarget) thread
 				.getDebugTarget(), frame.fsmState);
 		fVariables[0] = new OrccVariable(this, "FSM state", value);
-		String[] varNames = (String[]) frame.stateVars.keySet().toArray(new String[0]);
+		String[] varNames = frame.stateVars.keySet().toArray(new String[0]);
 		for (int i = 1; i < numVars+1; i++) {
 			value = new OrccValue((OrccDebugTarget) thread
 					.getDebugTarget(), frame.stateVars.get(varNames[i-1]));
@@ -87,82 +87,10 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getThread()
+	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
-	public IThread getThread() {
-		return fThread;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getVariables()
-	 */
-	public IVariable[] getVariables() throws DebugException {
-		return fVariables;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#hasVariables()
-	 */
-	public boolean hasVariables() throws DebugException {
-		return fVariables.length > 0;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getLineNumber()
-	 */
-	public int getLineNumber() throws DebugException {
-		return fLineNumber;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getCharStart()
-	 */
-	public int getCharStart() throws DebugException {
-		return -1;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getCharEnd()
-	 */
-	public int getCharEnd() throws DebugException {
-		return -1;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getName()
-	 */
-	public String getName() throws DebugException {
-		return fName;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#getRegisterGroups()
-	 */
-	public IRegisterGroup[] getRegisterGroups() throws DebugException {
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IStackFrame#hasRegisterGroups()
-	 */
-	public boolean hasRegisterGroups() throws DebugException {
-		return false;
+	public boolean canResume() {
+		return getThread().canResume();
 	}
 
 	/*
@@ -195,10 +123,183 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
+	 */
+	public boolean canSuspend() {
+		return getThread().canSuspend();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
+	 */
+	public boolean canTerminate() {
+		return getThread().canTerminate();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof OrccStackFrame) {
+			OrccStackFrame sf = (OrccStackFrame) obj;
+			try {
+				return sf.getSourceName().equals(getSourceName())
+						&& sf.getLineNumber() == getLineNumber()
+						&& sf.fId == fId;
+			} catch (DebugException e) {
+			}
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#getCharEnd()
+	 */
+	public int getCharEnd() throws DebugException {
+		return -1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#getCharStart()
+	 */
+	public int getCharStart() throws DebugException {
+		return -1;
+	}
+
+	/**
+	 * Returns this stack frame's unique identifier within its thread
+	 * 
+	 * @return this stack frame's unique identifier within its thread
+	 */
+	protected int getIdentifier() {
+		return fId;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#getLineNumber()
+	 */
+	public int getLineNumber() throws DebugException {
+		return fLineNumber;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#getName()
+	 */
+	public String getName() throws DebugException {
+		return fName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#getRegisterGroups()
+	 */
+	public IRegisterGroup[] getRegisterGroups() throws DebugException {
+		return null;
+	}
+
+	/**
+	 * Returns the name of the source file this stack frame is associated with.
+	 * 
+	 * @return the name of the source file this stack frame is associated with
+	 */
+	public String getSourceName() {
+		return fFileName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#getThread()
+	 */
+	public IThread getThread() {
+		return fThread;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#getVariables()
+	 */
+	public IVariable[] getVariables() throws DebugException {
+		return fVariables;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return getSourceName().hashCode() + fId;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#hasRegisterGroups()
+	 */
+	public boolean hasRegisterGroups() throws DebugException {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IStackFrame#hasVariables()
+	 */
+	public boolean hasVariables() throws DebugException {
+		return fVariables.length > 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
 	public boolean isStepping() {
 		return getThread().isStepping();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
+	 */
+	public boolean isSuspended() {
+		return getThread().isSuspended();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
+	 */
+	public boolean isTerminated() {
+		return getThread().isTerminated();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
+	 */
+	public void resume() throws DebugException {
+		getThread().resume();
 	}
 
 	/*
@@ -231,42 +332,6 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
-	 */
-	public boolean canResume() {
-		return getThread().canResume();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
-	 */
-	public boolean canSuspend() {
-		return getThread().canSuspend();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
-	 */
-	public boolean isSuspended() {
-		return getThread().isSuspended();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
-	 */
-	public void resume() throws DebugException {
-		getThread().resume();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
@@ -276,72 +341,9 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
-	 */
-	public boolean canTerminate() {
-		return getThread().canTerminate();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
-	 */
-	public boolean isTerminated() {
-		return getThread().isTerminated();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
 		getThread().terminate();
-	}
-
-	/**
-	 * Returns the name of the source file this stack frame is associated with.
-	 * 
-	 * @return the name of the source file this stack frame is associated with
-	 */
-	public String getSourceName() {
-		return fFileName;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object obj) {
-		if (obj instanceof OrccStackFrame) {
-			OrccStackFrame sf = (OrccStackFrame) obj;
-			try {
-				return sf.getSourceName().equals(getSourceName())
-						&& sf.getLineNumber() == getLineNumber()
-						&& sf.fId == fId;
-			} catch (DebugException e) {
-			}
-		}
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode() {
-		return getSourceName().hashCode() + fId;
-	}
-
-	/**
-	 * Returns this stack frame's unique identifier within its thread
-	 * 
-	 * @return this stack frame's unique identifier within its thread
-	 */
-	protected int getIdentifier() {
-		return fId;
 	}
 }

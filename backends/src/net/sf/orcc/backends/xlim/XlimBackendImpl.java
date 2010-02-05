@@ -85,6 +85,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	 * @param actor
 	 *            Actor structure
 	 */
+	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		System.out.println("FILE "+id);
 		String outputName = path + File.separator + id + ".xlim";
@@ -97,6 +98,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	 * @param network
 	 *            Network structure
 	 */
+	@Override
 	protected void printNetwork(Network network) throws Exception {
 	}
 

@@ -335,14 +335,14 @@ public class ConfigurationAnalyzer {
 				if (constraintVariable == null) {
 					int lo;
 					int hi;
-					if (port.getType().getType() == Type.INT) {
+					if (port.getType().getTypeOf() == Type.INT) {
 						IntType type = (IntType) port.getType();
 						Expression size = type.getSize();
 						ExpressionEvaluator evaluator = new ExpressionEvaluator();
 						int num = evaluator.evaluateAsInteger(size);
 						lo = -(1 << (num - 1));
 						hi = (1 << (num - 1)) - 1;
-					} else if (port.getType().getType() == Type.UINT) {
+					} else if (port.getType().getTypeOf() == Type.UINT) {
 						UintType type = (UintType) port.getType();
 						Expression size = type.getSize();
 						ExpressionEvaluator evaluator = new ExpressionEvaluator();

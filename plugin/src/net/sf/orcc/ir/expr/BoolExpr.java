@@ -29,11 +29,14 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.type.BoolType;
 
 /**
  * This class defines a boolean expression.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class BoolExpr extends AbstractExpression {
@@ -60,7 +63,12 @@ public class BoolExpr extends AbstractExpression {
 	}
 
 	@Override
-	public int getType() {
+	public Type getType() {
+		return new BoolType();
+	}
+
+	@Override
+	public int getTypeOf() {
 		return BOOLEAN;
 	}
 

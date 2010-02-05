@@ -49,6 +49,66 @@ public class OrccLineBreakpointAdapter implements IToggleBreakpointsTarget {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @seeorg.eclipse.debug.ui.actions.IToggleBreakpointsTarget#
+	 * canToggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart,
+	 * org.eclipse.jface.viewers.ISelection)
+	 */
+	public boolean canToggleLineBreakpoints(IWorkbenchPart part,
+			ISelection selection) {
+		return getEditor(part) != null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.debug.ui.actions.IToggleBreakpointsTarget#
+	 * canToggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart,
+	 * org.eclipse.jface.viewers.ISelection)
+	 */
+	public boolean canToggleMethodBreakpoints(IWorkbenchPart part,
+			ISelection selection) {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleWatchpoints
+	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
+	public boolean canToggleWatchpoints(IWorkbenchPart part,
+			ISelection selection) {
+		return false;
+	}
+
+	/**
+	 * Returns the editor being used to edit a CAL file, associated with the
+	 * given part, or <code>null</code> if none.
+	 * 
+	 * @param part
+	 *            workbench part
+	 * @return the editor being used to edit a ORCC file, associated with the
+	 *         given part, or <code>null</code> if none
+	 */
+	private ITextEditor getEditor(IWorkbenchPart part) {
+		if (part instanceof ITextEditor) {
+			ITextEditor editorPart = (ITextEditor) part;
+			IResource resource = (IResource) editorPart.getEditorInput()
+					.getAdapter(IResource.class);
+			if (resource != null) {
+				String extension = resource.getFileExtension();
+				if (extension != null && extension.equals("cal")) {
+					return editorPart;
+				}
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleLineBreakpoints
 	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
@@ -85,42 +145,6 @@ public class OrccLineBreakpointAdapter implements IToggleBreakpointsTarget {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.eclipse.debug.ui.actions.IToggleBreakpointsTarget#
-	 * canToggleLineBreakpoints(org.eclipse.ui.IWorkbenchPart,
-	 * org.eclipse.jface.viewers.ISelection)
-	 */
-	public boolean canToggleLineBreakpoints(IWorkbenchPart part,
-			ISelection selection) {
-		return getEditor(part) != null;
-	}
-
-	/**
-	 * Returns the editor being used to edit a CAL file, associated with the
-	 * given part, or <code>null</code> if none.
-	 * 
-	 * @param part
-	 *            workbench part
-	 * @return the editor being used to edit a ORCC file, associated with the
-	 *         given part, or <code>null</code> if none
-	 */
-	private ITextEditor getEditor(IWorkbenchPart part) {
-		if (part instanceof ITextEditor) {
-			ITextEditor editorPart = (ITextEditor) part;
-			IResource resource = (IResource) editorPart.getEditorInput()
-					.getAdapter(IResource.class);
-			if (resource != null) {
-				String extension = resource.getFileExtension();
-				if (extension != null && extension.equals("cal")) {
-					return editorPart;
-				}
-			}
-		}
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleMethodBreakpoints
 	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
@@ -132,35 +156,11 @@ public class OrccLineBreakpointAdapter implements IToggleBreakpointsTarget {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.eclipse.debug.ui.actions.IToggleBreakpointsTarget#
-	 * canToggleMethodBreakpoints(org.eclipse.ui.IWorkbenchPart,
-	 * org.eclipse.jface.viewers.ISelection)
-	 */
-	public boolean canToggleMethodBreakpoints(IWorkbenchPart part,
-			ISelection selection) {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#toggleWatchpoints
 	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	public void toggleWatchpoints(IWorkbenchPart part, ISelection selection)
 			throws CoreException {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.ui.actions.IToggleBreakpointsTarget#canToggleWatchpoints
-	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
-	 */
-	public boolean canToggleWatchpoints(IWorkbenchPart part,
-			ISelection selection) {
-		return false;
 	}
 }

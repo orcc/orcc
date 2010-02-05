@@ -37,8 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.interpreter.InterpreterMain;
 import net.sf.orcc.interpreter.DebugThread;
+import net.sf.orcc.interpreter.InterpreterMain;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -62,17 +62,17 @@ import org.eclipse.debug.core.model.IThread;
 public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		PropertyChangeListener {
 
-	// associated system process
-	private IProcess fProcess;
-	
 	// associated interpreter
 	private InterpreterMain fInterpreter;
-
+	
 	// containing launch object
 	private ILaunch fLaunch;
 
 	// name of the model to be debugged
 	private String fName;
+
+	// associated system process
+	private IProcess fProcess;
 
 	// suspend state
 	private boolean fSuspended = true;
@@ -124,195 +124,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
-	 */
-	public IProcess getProcess() {
-		return fProcess;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugTarget#getThreads()
-	 */
-	public IThread[] getThreads() throws DebugException {
-		return fThreads;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
-	 */
-	public boolean hasThreads() throws DebugException {
-		return true; // WTB Changed per bug #138600
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugTarget#getName()
-	 */
-	public String getName() throws DebugException {
-		if (fName == null) {
-			fName = "RVC-CAL model";
-		}
-		return fName;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.IDebugTarget#supportsBreakpoint(org.eclipse
-	 * .debug.core.model.IBreakpoint)
-	 */
-	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
-		if (breakpoint.getModelIdentifier().equals(ID_ORCC_DEBUG_MODEL)) {
-			IMarker marker = breakpoint.getMarker();
-			if (marker != null) {
-				try {
-					String inputFile = getLaunch().getLaunchConfiguration()
-							.getAttribute(INPUT_FILE, "");
-					IPath p = new Path(new File(inputFile).getPath());
-					return marker.getResource().getFullPath().equals(p);
-				} catch (CoreException e) {
-				}
-			}
-		}
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
-	 */
-	public IDebugTarget getDebugTarget() {
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
-	 */
-	public ILaunch getLaunch() {
-		return fLaunch;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
-	 */
-	public boolean canTerminate() {
-		return getProcess().canTerminate();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
-	 */
-	public boolean isTerminated() {
-		fTerminated = getProcess().isTerminated();
-		return fTerminated;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
-	 */
-	public void terminate() throws DebugException {
-		sendRequest("terminate");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
-	 */
-	public boolean canResume() {
-		return !isTerminated() && isSuspended();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
-	 */
-	public boolean canSuspend() {
-		return !isTerminated() && !isSuspended();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
-	 */
-	public boolean isSuspended() {
-		return fSuspended;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
-	 */
-	public void resume() throws DebugException {
-		sendRequest("resume");
-	}
-
-	/**
-	 * Notification the target has resumed for the given reason
-	 * 
-	 * @param detail
-	 *            reason for the resume
-	 */
-	private void resumed(int detail, OrccThread orccThread) {
-		if (orccThread != null) {
-			orccThread.resumed();
-			orccThread.fireResumeEvent(detail);
-		} else {
-			fSuspended = false;
-			for (IThread thread : fThreads) {
-				((OrccThread) thread).fireResumeEvent(detail);
-			}
-		}
-	}
-
-	/**
-	 * Notification the target has suspended for the given reason
-	 * 
-	 * @param detail
-	 *            reason for the suspend
-	 */
-	private void suspended(int detail, OrccThread orccThread) {
-		if (orccThread != null) {
-			orccThread.suspended();
-			orccThread.fireSuspendEvent(detail);
-		} else {
-			fSuspended = true;
-			for (IThread thread : fThreads) {
-				((OrccThread) thread).fireSuspendEvent(detail);
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
-	 */
-	public void suspend() throws DebugException {
-		sendRequest("suspend");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see
 	 * org.eclipse.debug.core.IBreakpointListener#breakpointAdded(org.eclipse
 	 * .debug.core.model.IBreakpoint)
@@ -337,23 +148,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse
-	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
-	 */
-	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
-		if (supportsBreakpoint(breakpoint)) {
-			try {
-				sendRequest("clear "
-						+ ((ILineBreakpoint) breakpoint).getLineNumber());
-			} catch (CoreException e) {
-			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
 	 * org.eclipse.debug.core.IBreakpointListener#breakpointChanged(org.eclipse
 	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
 	 */
@@ -367,125 +161,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 				}
 			} catch (CoreException e) {
 			}
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDisconnect#canDisconnect()
-	 */
-	public boolean canDisconnect() {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDisconnect#disconnect()
-	 */
-	public void disconnect() throws DebugException {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.debug.core.model.IDisconnect#isDisconnected()
-	 */
-	public boolean isDisconnected() {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.IMemoryBlockRetrieval#supportsStorageRetrieval
-	 * ()
-	 */
-	public boolean supportsStorageRetrieval() {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.debug.core.model.IMemoryBlockRetrieval#getMemoryBlock(long,
-	 * long)
-	 */
-	public IMemoryBlock getMemoryBlock(long startAddress, long length)
-			throws DebugException {
-		return null;
-	}
-
-	/**
-	 * Notification we have connected to the VM and it has started. Resume the
-	 * VM.
-	 */
-	private void started() {
-		fireCreationEvent();
-		installDeferredBreakpoints();
-		try {
-			resume();
-		} catch (DebugException e) {
-		}
-	}
-
-	/**
-	 * Install breakpoints that are already registered with the breakpoint
-	 * manager.
-	 */
-	private void installDeferredBreakpoints() {
-		IBreakpoint[] breakpoints = DebugPlugin.getDefault()
-				.getBreakpointManager().getBreakpoints(ID_ORCC_DEBUG_MODEL);
-		for (int i = 0; i < breakpoints.length; i++) {
-			breakpointAdded(breakpoints[i]);
-		}
-	}
-
-	/**
-	 * Called when this debug target terminates.
-	 */
-	private void terminated() {
-		fTerminated = true;
-		fSuspended = false;
-		DebugPlugin.getDefault().getBreakpointManager()
-				.removeBreakpointListener(this);
-		fireTerminateEvent();
-	}
-
-	/**
-	 * Single step the interpreter.
-	 * 
-	 * @throws DebugException
-	 *             if the request fails
-	 */
-	protected void step() throws DebugException {
-		sendRequest("step");
-	}
-
-	/**
-	 * Sends a request to the Orcc VM and waits for an OK.
-	 * 
-	 * @param request
-	 *            debug command
-	 * @throws DebugException
-	 *             if the request fails
-	 */
-	private void sendRequest(String request) throws DebugException {
-		if (request.equals("resume")) {
-			fInterpreter.resumeAll();
-		} else if (request.equals("suspend")) {
-			fInterpreter.suspendAll();
-		} else if (request.equals("step")) {
-			fInterpreter.stepAll();
-		} else if (request.startsWith("set")) {
-			// TODO : fInterpreter.set_breakpoint(request.indexOf("set"));
-		} else if (request.startsWith("clear")) {
-			// TODO : fInterpreter.clear_breakpoint(request.indexOf("clear"));
-		} else if (request.equals("terminate")) {
-			fInterpreter.terminate();
 		}
 	}
 
@@ -524,8 +199,180 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		suspended(DebugEvent.BREAKPOINT, orccThread);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.IBreakpointListener#breakpointRemoved(org.eclipse
+	 * .debug.core.model.IBreakpoint, org.eclipse.core.resources.IMarkerDelta)
+	 */
+	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
+		if (supportsBreakpoint(breakpoint)) {
+			try {
+				sendRequest("clear "
+						+ ((ILineBreakpoint) breakpoint).getLineNumber());
+			} catch (CoreException e) {
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDisconnect#canDisconnect()
+	 */
+	public boolean canDisconnect() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
+	 */
+	public boolean canResume() {
+		return !isTerminated() && isSuspended();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
+	 */
+	public boolean canSuspend() {
+		return !isTerminated() && !isSuspended();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
+	 */
+	public boolean canTerminate() {
+		return getProcess().canTerminate();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDisconnect#disconnect()
+	 */
+	public void disconnect() throws DebugException {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugElement#getDebugTarget()
+	 */
+	@Override
+	public IDebugTarget getDebugTarget() {
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
+	 */
+	@Override
+	public ILaunch getLaunch() {
+		return fLaunch;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IMemoryBlockRetrieval#getMemoryBlock(long,
+	 * long)
+	 */
+	public IMemoryBlock getMemoryBlock(long startAddress, long length)
+			throws DebugException {
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugTarget#getName()
+	 */
+	public String getName() throws DebugException {
+		if (fName == null) {
+			fName = "RVC-CAL model";
+		}
+		return fName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugTarget#getProcess()
+	 */
+	public IProcess getProcess() {
+		return fProcess;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugTarget#getThreads()
+	 */
+	public IThread[] getThreads() throws DebugException {
+		return fThreads;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
+	 */
+	public boolean hasThreads() throws DebugException {
+		return true; // WTB Changed per bug #138600
+	}
+
+	/**
+	 * Install breakpoints that are already registered with the breakpoint
+	 * manager.
+	 */
+	private void installDeferredBreakpoints() {
+		IBreakpoint[] breakpoints = DebugPlugin.getDefault()
+				.getBreakpointManager().getBreakpoints(ID_ORCC_DEBUG_MODEL);
+		for (int i = 0; i < breakpoints.length; i++) {
+			breakpointAdded(breakpoints[i]);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.IDisconnect#isDisconnected()
+	 */
+	public boolean isDisconnected() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
+	 */
+	public boolean isSuspended() {
+		return fSuspended;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
+	 */
+	public boolean isTerminated() {
+		fTerminated = getProcess().isTerminated();
+		return fTerminated;
+	}
+
 	public void propertyChange(PropertyChangeEvent event) {
-		OrccThread orccThread = threadMap.get((String) event.getNewValue());
+		OrccThread orccThread = threadMap.get(event.getNewValue());
 		if (orccThread != null) {
 			orccThread.setBreakpoints(null);
 			orccThread.setStepping(false);
@@ -555,5 +402,160 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 				}
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
+	 */
+	public void resume() throws DebugException {
+		sendRequest("resume");
+	}
+
+	/**
+	 * Notification the target has resumed for the given reason
+	 * 
+	 * @param detail
+	 *            reason for the resume
+	 */
+	private void resumed(int detail, OrccThread orccThread) {
+		if (orccThread != null) {
+			orccThread.resumed();
+			orccThread.fireResumeEvent(detail);
+		} else {
+			fSuspended = false;
+			for (IThread thread : fThreads) {
+				((OrccThread) thread).fireResumeEvent(detail);
+			}
+		}
+	}
+
+	/**
+	 * Sends a request to the Orcc VM and waits for an OK.
+	 * 
+	 * @param request
+	 *            debug command
+	 * @throws DebugException
+	 *             if the request fails
+	 */
+	private void sendRequest(String request) throws DebugException {
+		if (request.equals("resume")) {
+			fInterpreter.resumeAll();
+		} else if (request.equals("suspend")) {
+			fInterpreter.suspendAll();
+		} else if (request.equals("step")) {
+			fInterpreter.stepAll();
+		} else if (request.startsWith("set")) {
+			// TODO : fInterpreter.set_breakpoint(request.indexOf("set"));
+		} else if (request.startsWith("clear")) {
+			// TODO : fInterpreter.clear_breakpoint(request.indexOf("clear"));
+		} else if (request.equals("terminate")) {
+			fInterpreter.terminate();
+		}
+	}
+
+	/**
+	 * Notification we have connected to the VM and it has started. Resume the
+	 * VM.
+	 */
+	private void started() {
+		fireCreationEvent();
+		installDeferredBreakpoints();
+		try {
+			resume();
+		} catch (DebugException e) {
+		}
+	}
+
+	/**
+	 * Single step the interpreter.
+	 * 
+	 * @throws DebugException
+	 *             if the request fails
+	 */
+	protected void step() throws DebugException {
+		sendRequest("step");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IDebugTarget#supportsBreakpoint(org.eclipse
+	 * .debug.core.model.IBreakpoint)
+	 */
+	public boolean supportsBreakpoint(IBreakpoint breakpoint) {
+		if (breakpoint.getModelIdentifier().equals(ID_ORCC_DEBUG_MODEL)) {
+			IMarker marker = breakpoint.getMarker();
+			if (marker != null) {
+				try {
+					String inputFile = getLaunch().getLaunchConfiguration()
+							.getAttribute(INPUT_FILE, "");
+					IPath p = new Path(new File(inputFile).getPath());
+					return marker.getResource().getFullPath().equals(p);
+				} catch (CoreException e) {
+				}
+			}
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.core.model.IMemoryBlockRetrieval#supportsStorageRetrieval
+	 * ()
+	 */
+	public boolean supportsStorageRetrieval() {
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
+	 */
+	public void suspend() throws DebugException {
+		sendRequest("suspend");
+	}
+
+	/**
+	 * Notification the target has suspended for the given reason
+	 * 
+	 * @param detail
+	 *            reason for the suspend
+	 */
+	private void suspended(int detail, OrccThread orccThread) {
+		if (orccThread != null) {
+			orccThread.suspended();
+			orccThread.fireSuspendEvent(detail);
+		} else {
+			fSuspended = true;
+			for (IThread thread : fThreads) {
+				((OrccThread) thread).fireSuspendEvent(detail);
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
+	 */
+	public void terminate() throws DebugException {
+		sendRequest("terminate");
+	}
+
+	/**
+	 * Called when this debug target terminates.
+	 */
+	private void terminated() {
+		fTerminated = true;
+		fSuspended = false;
+		DebugPlugin.getDefault().getBreakpointManager()
+				.removeBreakpointListener(this);
+		fireTerminateEvent();
 	}
 }

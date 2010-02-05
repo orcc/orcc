@@ -148,33 +148,6 @@ public class Sequitur {
 		}
 	}
 
-	private void trySubstitute(NonTerminalSymbol ntSymbol,
-			NonTerminalSymbol other) {
-		Rule rule = ntSymbol.getRule();
-		if (rule.isReferencedOnce()) {
-			Symbol symbol = other.getRule().getFirst();
-			while (!symbol.equals(ntSymbol)) {
-				symbol = symbol.getNext();
-			}
-
-			Symbol before = symbol.getPrevious();
-			Symbol after = symbol.getNext();
-			Symbol ruleStart = rule.getFirst();
-			Symbol ruleEnd = rule.getLast().getNext();
-			symbol = ruleStart;
-
-			while (symbol != ruleEnd) {
-				Symbol next = symbol.getNext();
-				symbol.insertBetween(before, after);
-				before = symbol;
-				symbol = next;
-			}
-
-			rule.delete();
-			toString();
-		}
-	}
-
 	public Rule getSRule(List<?> terminals) {
 		s = new Rule("s");
 		Iterator<?> it = terminals.iterator();
@@ -245,6 +218,33 @@ public class Sequitur {
 		}
 
 		return res;
+	}
+
+	private void trySubstitute(NonTerminalSymbol ntSymbol,
+			NonTerminalSymbol other) {
+		Rule rule = ntSymbol.getRule();
+		if (rule.isReferencedOnce()) {
+			Symbol symbol = other.getRule().getFirst();
+			while (!symbol.equals(ntSymbol)) {
+				symbol = symbol.getNext();
+			}
+
+			Symbol before = symbol.getPrevious();
+			Symbol after = symbol.getNext();
+			Symbol ruleStart = rule.getFirst();
+			Symbol ruleEnd = rule.getLast().getNext();
+			symbol = ruleStart;
+
+			while (symbol != ruleEnd) {
+				Symbol next = symbol.getNext();
+				symbol.insertBetween(before, after);
+				before = symbol;
+				symbol = next;
+			}
+
+			rule.delete();
+			toString();
+		}
 	}
 
 }

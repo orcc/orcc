@@ -36,6 +36,7 @@ import net.sf.orcc.ir.Type;
  * This class defines a binary expression.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class BinaryExpr extends AbstractExpression {
@@ -110,12 +111,13 @@ public class BinaryExpr extends AbstractExpression {
 	}
 
 	@Override
-	public int getType() {
-		return BINARY;
+	public Type getType() {
+		return type;
 	}
 
-	public Type getUnderlyingType() {
-		return type;
+	@Override
+	public int getTypeOf() {
+		return BINARY;
 	}
 
 	public void setE1(Expression e1) {

@@ -36,6 +36,7 @@ import net.sf.orcc.ir.Type;
  * This class defines a unary expression.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class UnaryExpr extends AbstractExpression {
@@ -46,15 +47,15 @@ public class UnaryExpr extends AbstractExpression {
 
 	private Type type;
 
-	public UnaryExpr(UnaryOp op, Expression expr, Type type) {
-		this(new Location(), op, expr, type);
-	}
-
 	public UnaryExpr(Location location, UnaryOp op, Expression expr, Type type) {
 		super(location);
 		this.expr = expr;
 		this.op = op;
 		this.type = type;
+	}
+
+	public UnaryExpr(UnaryOp op, Expression expr, Type type) {
+		this(new Location(), op, expr, type);
 	}
 
 	@Override
@@ -76,17 +77,13 @@ public class UnaryExpr extends AbstractExpression {
 	}
 
 	@Override
-	public int getType() {
-		return UNARY;
+	public Type getType() {
+		return type;
 	}
 
-	/**
-	 * Returns the type of this expression as a {@link Type}.
-	 * 
-	 * @return the type of this expression as a {@link Type}
-	 */
-	public Type getUnderlyingType() {
-		return type;
+	@Override
+	public int getTypeOf() {
+		return UNARY;
 	}
 
 	public void setExpr(Expression expr) {

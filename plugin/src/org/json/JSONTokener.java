@@ -38,9 +38,29 @@ SOFTWARE.
  */
 public class JSONTokener {
 
+    /**
+     * Get the hex value of a character (base16).
+     * @param c A character between '0' and '9' or between 'A' and 'F' or
+     * between 'a' and 'f'.
+     * @return  An int between 0 and 15, or -1 if c was not a hex digit.
+     */
+    public static int dehexchar(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c >= 'A' && c <= 'F') {
+            return c - ('A' - 10);
+        }
+        if (c >= 'a' && c <= 'f') {
+            return c - ('a' - 10);
+        }
+        return -1;
+    }
     private int index;
-    private Reader reader;
     private char lastChar;
+    private Reader reader;
+
+
     private boolean useLastChar;
 
 
@@ -67,6 +87,7 @@ public class JSONTokener {
     }
 
 
+
     /**
      * Back up one character. This provides a sort of lookahead capability,
      * so that you can test for a digit or letter before attempting to parse
@@ -78,27 +99,6 @@ public class JSONTokener {
         }
         index -= 1;
         useLastChar = true;
-    }
-
-
-
-    /**
-     * Get the hex value of a character (base16).
-     * @param c A character between '0' and '9' or between 'A' and 'F' or
-     * between 'a' and 'f'.
-     * @return  An int between 0 and 15, or -1 if c was not a hex digit.
-     */
-    public static int dehexchar(char c) {
-        if (c >= '0' && c <= '9') {
-            return c - '0';
-        }
-        if (c >= 'A' && c <= 'F') {
-            return c - ('A' - 10);
-        }
-        if (c >= 'a' && c <= 'f') {
-            return c - ('a' - 10);
-        }
-        return -1;
     }
 
 
@@ -416,7 +416,8 @@ public class JSONTokener {
      *
      * @return " at character [this.index]"
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return " at character " + index;
     }
 }

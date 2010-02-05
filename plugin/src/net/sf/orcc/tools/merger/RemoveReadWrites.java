@@ -66,6 +66,7 @@ public class RemoveReadWrites extends AbstractActorTransformation {
 		it.remove();
 	}
 	
+	@Override
 	public void visitProcedure(Procedure procedure) {
 		OrderedMap<Variable> locals = procedure.getLocals();
 		Iterator<Variable> it = locals.iterator();

@@ -44,13 +44,13 @@ import net.sf.orcc.ir.ICommunicationFifo;
  */
 public class CommunicationFifo implements ICommunicationFifo {
 
-	private Object[] queue;
-
-	private int size;
-	private int readPos;
-	private int writePos;
 	private FileOutputStream fos;
+
 	private OutputStreamWriter out;
+	private Object[] queue;
+	private int readPos;
+	private int size;
+	private int writePos;
 
 	public CommunicationFifo(int size, boolean enableTraces, String fileName,
 			String fifoName) throws Exception {
@@ -73,18 +73,20 @@ public class CommunicationFifo implements ICommunicationFifo {
 		}
 	}
 
-	public boolean hasRoom(int n) {
-		if (readPos > writePos) {
-			return (readPos - writePos) > n;
+	public void close() {
+		if (out != null) {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		return (size - writePos + readPos) > n;
-	}
-
-	public boolean hasTokens(int n) {
-		if (writePos >= readPos) {
-			return (writePos - readPos) >= n;
-		} else {
-			return (size - readPos + writePos) >= n;
+		if (fos != null) {
+			try {
+				fos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -100,6 +102,21 @@ public class CommunicationFifo implements ICommunicationFifo {
 			System.arraycopy(queue, 0, target, size - readPos, target.length
 					+ readPos - size);
 			readPos = target.length + readPos - size;
+		}
+	}
+
+	public boolean hasRoom(int n) {
+		if (readPos > writePos) {
+			return (readPos - writePos) > n;
+		}
+		return (size - writePos + readPos) > n;
+	}
+
+	public boolean hasTokens(int n) {
+		if (writePos >= readPos) {
+			return (writePos - readPos) >= n;
+		} else {
+			return (size - readPos + writePos) >= n;
 		}
 	}
 
@@ -142,23 +159,6 @@ public class CommunicationFifo implements ICommunicationFifo {
 					}
 				}
 				out.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void close() {
-		if (out != null) {
-			try {
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		if (fos != null) {
-			try {
-				fos.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

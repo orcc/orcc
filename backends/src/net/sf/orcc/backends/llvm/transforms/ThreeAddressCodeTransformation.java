@@ -139,7 +139,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			Expression binary;
 			Expression exprE1 = expr.getExpr();
 			Location loc = expr.getLocation();
-			Type type = expr.getUnderlyingType();
+			Type type = expr.getType();
 
 			switch (expr.getOp()) {
 			case MINUS:

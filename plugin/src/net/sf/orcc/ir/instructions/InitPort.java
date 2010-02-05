@@ -43,14 +43,14 @@ public class InitPort extends AbstractInstruction {
 
 	private VarExpr value;
 
-	public InitPort(String fifoName, int index, VarExpr value) {
-		this(new Location(), fifoName, index, value);
-	}
-
 	public InitPort(Location location, String fifoName, int index, VarExpr value) {
 		super(location);
 		this.fifoName = fifoName;
 		this.value = value;
+	}
+
+	public InitPort(String fifoName, int index, VarExpr value) {
+		this(new Location(), fifoName, index, value);
 	}
 
 	@Override

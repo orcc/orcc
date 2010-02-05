@@ -58,6 +58,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 
 	private OrderedMap<Variable> stateVars;
 
+	@Override
 	public void transform(Actor actor) {
 		stateVars = actor.getStateVars();
 		super.transform(actor);

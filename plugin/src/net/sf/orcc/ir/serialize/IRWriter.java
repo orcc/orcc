@@ -178,7 +178,7 @@ public class IRWriter {
 			body2.put(expr.getOp().getText());
 			body2.put(expr.getE1().accept(this));
 			body2.put(expr.getE2().accept(this));
-			body2.put(writeType(expr.getUnderlyingType()));
+			body2.put(writeType(expr.getType()));
 
 			return array;
 		}
@@ -225,7 +225,7 @@ public class IRWriter {
 
 			body2.put(expr.getOp().getText());
 			body2.put(expr.getExpr().accept(this));
-			body2.put(writeType(expr.getUnderlyingType()));
+			body2.put(writeType(expr.getType()));
 
 			return array;
 		}

@@ -34,6 +34,7 @@ import net.sf.orcc.ir.Expression;
  * This class defines an integer type.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class IntType extends AbstractType {
@@ -76,7 +77,7 @@ public class IntType extends AbstractType {
 	}
 
 	@Override
-	public int getType() {
+	public int getTypeOf() {
 		return INT;
 	}
 

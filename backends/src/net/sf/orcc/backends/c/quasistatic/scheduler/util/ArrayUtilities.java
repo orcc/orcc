@@ -34,6 +34,13 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.util;
  */
 public class ArrayUtilities {
 
+	public static String toString(char[] array) {
+		String str = new String();
+		for (int i = 0; i < array.length; i++)
+			str += array[i] + " ";
+		return str;
+	}
+
 	/**
 	 * This method calls to "toString()" method of each contained object
 	 * 
@@ -44,13 +51,6 @@ public class ArrayUtilities {
 		String str = new String();
 		for (int i = 0; i < array.length; i++)
 			str += array[i].toString() + " ";
-		return str;
-	}
-
-	public static String toString(char[] array) {
-		String str = new String();
-		for (int i = 0; i < array.length; i++)
-			str += array[i] + " ";
 		return str;
 	}
 

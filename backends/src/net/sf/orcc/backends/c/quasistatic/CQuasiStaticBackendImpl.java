@@ -49,8 +49,6 @@ import net.sf.orcc.network.transforms.BroadcastAdder;
 
 public class CQuasiStaticBackendImpl extends AbstractBackend {
 
-	private CQuasiStaticActorPrinter printer;
-
 	/**
 	 * 
 	 * @param args
@@ -68,6 +66,8 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 					.println("Usage: CQuasiStaticBackendImpl <flattened XDF network>");
 		}
 	}
+
+	private CQuasiStaticActorPrinter printer;
 
 	@Override
 	protected void beforeInstantiation(Network network) throws OrccException {

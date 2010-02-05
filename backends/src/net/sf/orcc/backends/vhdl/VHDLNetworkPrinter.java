@@ -123,6 +123,11 @@ public class VHDLNetworkPrinter {
 		}
 	}
 
+	public int rsyze(Expression expr) {
+		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+		return size;
+		}
+
 	/**
 	 * Set the attributes to the template.
 	 * 
@@ -189,6 +194,8 @@ public class VHDLNetworkPrinter {
 		template.setAttribute("broadcasts", broadcasts);
 	}
 
+	
+	
 	/**
 	 * Sets the connections attribute.
 	 * 
@@ -248,13 +255,6 @@ public class VHDLNetworkPrinter {
 
 		template.setAttribute("connections", conn);
 	}
-
-	
-	
-	public int rsyze(Expression expr) {
-		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-		return size;
-		}
 	
 	/**
 	 * Sets the instances and initializes attributes.

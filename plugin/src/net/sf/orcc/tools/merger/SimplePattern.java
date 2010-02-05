@@ -55,6 +55,7 @@ public class SimplePattern extends ExecutionPattern {
 		return 1;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof SimplePattern) {
 			return action.equals(((SimplePattern) obj).action);

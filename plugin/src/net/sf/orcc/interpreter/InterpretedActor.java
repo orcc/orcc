@@ -56,20 +56,20 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 	private ConstantEvaluator constEval;
 
-	protected String fsmState;
-
-	protected NodeInterpreter interpret;
-
-	private ListAllocator listAllocator;
-
-	protected ActionScheduler sched;
-	protected boolean isSynchronousScheduler = false;
-	
 	/**
 	 * Step into utils
 	 */
 	private Action currentAction = null;
+
 	private int currentNode = 0;
+
+	protected String fsmState;
+
+	protected NodeInterpreter interpret;
+	protected boolean isSynchronousScheduler = false;
+	
+	private ListAllocator listAllocator;
+	protected ActionScheduler sched;
 
 	// private List<Actor> schedPred;
 
@@ -125,6 +125,11 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		}
 	}
 
+	@Override
+	public void close() {
+		// Nothing to do when terminating interpretation
+	}
+
 	/**
 	 * Require the execution (interpretation) of the given actor's action
 	 * @param action
@@ -149,8 +154,50 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	}
 
 	/**
+	 * Get the next schedulable action to be executed for this actor
+	 * @return the schedulable action or null
+	 */
+	private Action getNextAction() {
+		if (sched.hasFsm()) {
+			// Check for untagged actions first
+			for (Action action : sched.getActions()) {
+				if (isSchedulable(action)) {
+					if (checkOutputPattern(action.getOutputPattern())) {
+						return action;
+					}
+					break;
+				}
+			}
+
+			// Then check for next FSM transition
+			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
+				Action action = info.getAction();
+				if (isSchedulable(action)) {
+					// Update FSM state
+					if (checkOutputPattern(action.getOutputPattern())) {
+						fsmState = info.getTargetState().getName();
+						return action;
+					}
+					break;
+				}
+			}
+		} else {
+			for (Action action : sched.getActions()) {
+				if (isSchedulable(action)) {
+					if (checkOutputPattern(action.getOutputPattern())) {
+						return action;
+					}
+					break;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Launch initializing actions of this actor.
 	 */
+	@Override
 	public void initialize() {
 		// Check for List state variables which need to be allocated or
 		// initialized
@@ -159,7 +206,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			// Initialize variables with constant values
 			Constant initConst = ((StateVariable) stateVar).getConstantValue();
 			if (initConst == null) {
-				if (type.getType() == Type.LIST) {
+				if (type.getTypeOf() == Type.LIST) {
 					// Allocate empty array variable
 					stateVar.setValue(listAllocator.allocate(type));
 				}
@@ -195,7 +242,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		// Allocate local List variables
 		for (Variable local : procedure.getLocals()) {
 			Type type = local.getType();
-			if (type.getType() == Type.LIST) {
+			if (type.getTypeOf() == Type.LIST) {
 				local.setValue(listAllocator.allocate(type));
 			}
 		}
@@ -226,7 +273,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		Object isSchedulable = interpretProc(action.getScheduler());
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
-
+	
 	@Override
 	public Integer schedule() {
 		if (isSynchronousScheduler) {
@@ -300,47 +347,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		}
 	}
 
-	/**
-	 * Get the next schedulable action to be executed for this actor
-	 * @return the schedulable action or null
-	 */
-	private Action getNextAction() {
-		if (sched.hasFsm()) {
-			// Check for untagged actions first
-			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)) {
-					if (checkOutputPattern(action.getOutputPattern())) {
-						return action;
-					}
-					break;
-				}
-			}
-
-			// Then check for next FSM transition
-			for (NextStateInfo info : sched.getFsm().getTransitions(fsmState)) {
-				Action action = info.getAction();
-				if (isSchedulable(action)) {
-					// Update FSM state
-					if (checkOutputPattern(action.getOutputPattern())) {
-						fsmState = info.getTargetState().getName();
-						return action;
-					}
-					break;
-				}
-			}
-		} else {
-			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)) {
-					if (checkOutputPattern(action.getOutputPattern())) {
-						return action;
-					}
-					break;
-				}
-			}
-		}
-		return null;
-	}
-	
 	@Override
 	public boolean step() {
 		if (currentAction != null) {
@@ -360,7 +366,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				// Allocate local List variables
 				for (Variable local : currentAction.getBody().getLocals()) {
 					Type type = local.getType();
-					if (type.getType() == Type.LIST) {
+					if (type.getTypeOf() == Type.LIST) {
 						local.setValue(listAllocator.allocate(type));
 					}
 				}
@@ -369,10 +375,5 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public void close() {
-		// Nothing to do when terminating interpretation
 	}
 }

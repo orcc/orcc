@@ -73,15 +73,6 @@ public class BackendFactory {
 	}
 	
 	/**
-	 * Returns options of of the selected backend
-	 * 
-	 * @return AbtractOption[] associated to the backend
-	 */
-	public static AbstractOption[] getOptions(String name) {
-		return AbtractBackendOptions.get(name);
-	}
-	
-	/**
 	 * Returns the given option from a all backends
 	 * 
 	 * @param optionName
@@ -108,6 +99,15 @@ public class BackendFactory {
 		}
 		
 		return optionsList.toArray(new AbstractOption[]{});
+	}
+	
+	/**
+	 * Returns options of of the selected backend
+	 * 
+	 * @return AbtractOption[] associated to the backend
+	 */
+	public static AbstractOption[] getOptions(String name) {
+		return AbtractBackendOptions.get(name);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class BackendFactory {
 			}			
 		}
 		
-		return (AbstractOption[])backendOptions.toArray(new AbstractOption[]{});
+		return backendOptions.toArray(new AbstractOption[]{});
 		
 		
 	}

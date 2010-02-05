@@ -29,9 +29,9 @@
 package net.sf.orcc.ir.instructions;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 

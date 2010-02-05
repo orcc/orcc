@@ -32,6 +32,7 @@ package net.sf.orcc.ir.consts;
  * This class defines a string constant.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class StringConst extends AbstractConstant {
@@ -65,7 +66,7 @@ public class StringConst extends AbstractConstant {
 	}
 
 	@Override
-	public int getType() {
+	public int getTypeOf() {
 		return STRING;
 	}
 

@@ -29,11 +29,13 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
 
 /**
  * This class defines an integer expression.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class IntExpr extends AbstractExpression {
@@ -83,7 +85,12 @@ public class IntExpr extends AbstractExpression {
 	}
 
 	@Override
-	public int getType() {
+	public Type getType() {
+		return null;
+	}
+
+	@Override
+	public int getTypeOf() {
 		return INT;
 	}
 

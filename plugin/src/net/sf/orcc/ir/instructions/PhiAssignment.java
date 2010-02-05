@@ -30,9 +30,9 @@ package net.sf.orcc.ir.instructions;
 
 import java.util.List;
 
+import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 

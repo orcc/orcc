@@ -66,19 +66,19 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 	private static Map<UnaryOp, String> uopString;
 
 	/**
+	 * Action name
+	 */
+	private String actionName;
+
+	/**
 	 * XLIM naming
 	 */
 	private XlimNames names;
-
+	
 	/**
 	 * Root element where to add everything
 	 */
 	private Element root;
-	
-	/**
-	 * Action name
-	 */
-	private String actionName;
 	
 	/**
 	 * Initialization: filling of Unary and Binary Map
@@ -152,7 +152,7 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
-				.getUnderlyingType());
+				.getType());
 
 		root.appendChild(operationE);
 	}
@@ -229,7 +229,7 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
 
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
-				.getUnderlyingType());
+				.getType());
 	}
 
 	/**

@@ -55,33 +55,6 @@ import org.eclipse.swt.SWT;
  */
 public class StgScanner extends RuleBasedScanner {
 
-	private class SeparatorsRule implements IRule {
-
-		private static final String separators = "():=";
-
-		IToken separatorToken;
-
-		public SeparatorsRule(ColorManager manager) {
-			separatorToken = new Token(new TextAttribute(manager
-					.getColor(IStgColorConstants.SEPARATOR)));
-		}
-
-		public IToken evaluate(ICharacterScanner scanner) {
-			IToken token = Token.UNDEFINED;
-
-			int c = scanner.read();
-
-			if (separators.indexOf(c) >= 0) {
-				token = separatorToken;
-				while (separators.indexOf(scanner.read()) >= 0) {
-				}
-			}
-
-			scanner.unread();
-			return token;
-		}
-	}
-
 	private class KeywordRule implements IRule {
 
 		private IToken identifierToken;
@@ -131,6 +104,33 @@ public class StgScanner extends RuleBasedScanner {
 			}
 
 			return returnToken;
+		}
+	}
+
+	private class SeparatorsRule implements IRule {
+
+		private static final String separators = "():=";
+
+		IToken separatorToken;
+
+		public SeparatorsRule(ColorManager manager) {
+			separatorToken = new Token(new TextAttribute(manager
+					.getColor(IStgColorConstants.SEPARATOR)));
+		}
+
+		public IToken evaluate(ICharacterScanner scanner) {
+			IToken token = Token.UNDEFINED;
+
+			int c = scanner.read();
+
+			if (separators.indexOf(c) >= 0) {
+				token = separatorToken;
+				while (separators.indexOf(scanner.read()) >= 0) {
+				}
+			}
+
+			scanner.unread();
+			return token;
 		}
 	}
 

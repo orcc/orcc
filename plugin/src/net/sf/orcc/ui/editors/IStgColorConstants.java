@@ -44,14 +44,14 @@ public interface IStgColorConstants {
 	RGB COMMENT = new RGB(63, 127, 95);
 
 	/**
-	 * javadoc comment
-	 */
-	RGB JAVADOC_COMMENT = new RGB(63, 95, 191);
-
-	/**
 	 * black
 	 */
 	RGB DEFAULT = new RGB(0, 0, 0);
+
+	/**
+	 * javadoc comment
+	 */
+	RGB JAVADOC_COMMENT = new RGB(63, 95, 191);
 
 	/**
 	 * keywork

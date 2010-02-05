@@ -46,50 +46,6 @@ public class FileUtilities {
 	public static final int NL_TO_XNL = 2;
 	public static final int XDF_TO_XNL = 3;
 
-	public static String[] fscanf(BufferedReader reader, String separator,
-			int numArgs) {
-		String[] result = new String[numArgs];
-		int row = 0;
-		try {
-			String line = reader.readLine();
-			if (line == null)
-				return result;
-			String[] components = line.split(separator);
-			for (int i = 0; row < numArgs && i < components.length; i++)
-				if (!components[i].equals("")) {
-					result[row] = components[i];
-					row++;
-				}
-		} catch (IOException ex) {
-			Logger.getLogger(FileUtilities.class.getName()).log(Level.SEVERE,
-					null, ex);
-		}
-
-		return result;
-
-	}
-
-	public static void fprintf(File file, String content) {
-		try {
-			boolean created = file.createNewFile();
-			if (created)
-				System.out.println("File created: " + file.getAbsolutePath());
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			writer.write(content);
-			writer.close();
-		} catch (IOException ex) {
-			Logger.getLogger(FileUtilities.class.getName()).log(Level.SEVERE,
-					null, ex);
-		}
-	}
-
-	public static boolean createDirectory(String path) {
-		File directory = new File(path + File.separator);
-
-		return directory.mkdirs();
-
-	}
-
 	/**
 	 * 
 	 * @param sourceFile
@@ -114,6 +70,31 @@ public class FileUtilities {
 
 	}
 
+	public static boolean createDirectory(String path) {
+		File directory = new File(path + File.separator);
+
+		return directory.mkdirs();
+
+	}
+
+	/**
+	 * Creates a file called <code>fileName</code> in the selected output
+	 * directory, adding the content to that file.
+	 */
+	public static void createFile(String outputDirectory, String fileName,
+			String content) {
+		try {
+			File file = new File(outputDirectory + fileName);
+			file.createNewFile();
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			writer.write(content);
+			writer.close();
+		} catch (IOException ex) {
+			Logger.getLogger(FileUtilities.class.getName()).log(
+					Level.SEVERE, null, ex);
+		}
+	}
+
 	/**
 	 * Removes a file
 	 * 
@@ -133,29 +114,48 @@ public class FileUtilities {
 		return file.delete();
 
 	}
+
+	public static void fprintf(File file, String content) {
+		try {
+			boolean created = file.createNewFile();
+			if (created)
+				System.out.println("File created: " + file.getAbsolutePath());
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			writer.write(content);
+			writer.close();
+		} catch (IOException ex) {
+			Logger.getLogger(FileUtilities.class.getName()).log(Level.SEVERE,
+					null, ex);
+		}
+	}
+	
+	public static String[] fscanf(BufferedReader reader, String separator,
+			int numArgs) {
+		String[] result = new String[numArgs];
+		int row = 0;
+		try {
+			String line = reader.readLine();
+			if (line == null)
+				return result;
+			String[] components = line.split(separator);
+			for (int i = 0; row < numArgs && i < components.length; i++)
+				if (!components[i].equals("")) {
+					result[row] = components[i];
+					row++;
+				}
+		} catch (IOException ex) {
+			Logger.getLogger(FileUtilities.class.getName()).log(Level.SEVERE,
+					null, ex);
+		}
+
+		return result;
+
+	}
 	
 	public static String getFileName(File file){
 		String name = file.getName();
 		int endIndex = name.contains(".")? name.indexOf("."):name.length();
 		return name.substring(0, endIndex);
-	}
-	
-	/**
-	 * Creates a file called <code>fileName</code> in the selected output
-	 * directory, adding the content to that file.
-	 */
-	public static void createFile(String outputDirectory, String fileName,
-			String content) {
-		try {
-			File file = new File(outputDirectory + fileName);
-			file.createNewFile();
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			writer.write(content);
-			writer.close();
-		} catch (IOException ex) {
-			Logger.getLogger(FileUtilities.class.getName()).log(
-					Level.SEVERE, null, ex);
-		}
 	}
 	
 }

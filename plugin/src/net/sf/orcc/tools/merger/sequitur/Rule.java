@@ -80,6 +80,10 @@ public class Rule {
 		this.referenceCount--;
 	}
 
+	public void delete() {
+		rules.remove(name);
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Rule) {
@@ -152,10 +156,6 @@ public class Rule {
 		}
 
 		return res;
-	}
-
-	public void delete() {
-		rules.remove(name);
 	}
 
 }

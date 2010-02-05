@@ -46,14 +46,14 @@ import net.sf.orcc.network.serialize.XDFParser;
 public abstract class AbstractBackend implements IBackend {
 
 	/**
-	 * Fifo size used in backend.
-	 */
-	protected int fifoSize;
-
-	/**
 	 * Map containing a list of options.
 	 */
 	protected static Map<String, String> options;
+
+	/**
+	 * Fifo size used in backend.
+	 */
+	protected int fifoSize;
 
 	/**
 	 * Path of the network.

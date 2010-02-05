@@ -44,11 +44,6 @@ public interface ICalColorConstants {
 	RGB COMMENT = new RGB(63, 127, 95);
 
 	/**
-	 * javadoc comment
-	 */
-	RGB JAVADOC_COMMENT = new RGB(63, 95, 191);
-
-	/**
 	 * constant
 	 */
 	RGB CONSTANT = new RGB(42, 0, 255);
@@ -62,6 +57,11 @@ public interface ICalColorConstants {
 	 * identifier
 	 */
 	RGB IDENTIFIER = new RGB(0, 0, 0);
+
+	/**
+	 * javadoc comment
+	 */
+	RGB JAVADOC_COMMENT = new RGB(63, 95, 191);
 
 	/**
 	 * keywork

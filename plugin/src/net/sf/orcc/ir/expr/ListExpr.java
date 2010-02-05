@@ -32,12 +32,15 @@ import java.util.List;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.type.ListType;
 
 /**
  * This class defines a list expression. This kind of expression is only present
  * at the network level.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class ListExpr extends AbstractExpression {
@@ -60,7 +63,26 @@ public class ListExpr extends AbstractExpression {
 	}
 
 	@Override
-	public int getType() {
+	public Type getType() {
+		if (value.size()==0){
+			return null;
+		}
+		
+		//Verify if every expressions on the list are getting the same type
+		Expression firstExpr = value.get(0);
+		Type refType = firstExpr.getType();
+		for (Expression expr : value){
+			Type type = expr.getType();
+			if(!refType.equals(type)){
+				return null;
+			}
+		}
+		
+		return new ListType(new IntExpr(value.size()), refType);
+	}
+
+	@Override
+	public int getTypeOf() {
 		return LIST;
 	}
 

@@ -48,29 +48,62 @@ public class DSEInputFilesCreator {
 	
 	// private Graph<Action, DefaultEdge> systemLevelGraph;
 	
-	private HashMap<String, Integer> actionsIndexes;
+	/**
+	 * Creates the delays.txt file which is an input of DSE Scheduler
+	 */
+	public static void createDelaysFile() {
+		try {
+			File delaysFile = new File(DSEScheduler.INPUT_FOLDER + "delays.txt");
+			delaysFile.createNewFile();
+			BufferedWriter delaysWriter = new BufferedWriter(new FileWriter(
+					delaysFile));
+			delaysWriter.write(0 + "\n");
+			delaysWriter.close();
+		} catch (IOException ex) {
+			Logger.getLogger(DSEInputFilesCreator.class.getName()).log(
+					Level.SEVERE, null, ex);
+		}
+	}
+	/**
+	 * Creates mapping file
+	 */
+	public static void createMappingFile(int noProcessors, int noClusters,
+			HashMap<String, Integer> clusterMap) {
+		BufferedWriter mappingWriter = null;
+		try {
+			File mappingFile = new File(DSEScheduler.INPUT_FOLDER
+					+ "mapping.txt");
+			mappingFile.createNewFile();
+			mappingWriter = new BufferedWriter(new FileWriter(mappingFile));
+			mappingWriter.write(clusterMap.size() + " " + noClusters + " "
+					+ noProcessors + "\n");
+			for (String actorName : clusterMap.keySet()) {
+				int cluster = clusterMap.get(actorName);
+				mappingWriter.write(actorName + " " + cluster + "\n");
+			}
+			mappingWriter.close();
+		} catch (IOException ex) {
+			Logger.getLogger(DSEInputFilesCreator.class.getName()).log(
+					Level.SEVERE, null, ex);
+		} finally {
+			try {
+				mappingWriter.close();
+			} catch (IOException ex) {
+				Logger.getLogger(DSEInputFilesCreator.class.getName()).log(
+						Level.SEVERE, null, ex);
+			}
+		}
+	}
 	private ArrayList<String> actionsConnections;
+
+	private HashMap<String, Integer> actionsIndexes;
+	
 	private int lastActionIndex;
 
 	public DSEInputFilesCreator() {
 		actionsConnections = new ArrayList<String>();
 		actionsIndexes = new HashMap<String, Integer>();
 		lastActionIndex = 0;
-	}
-	
-	public void addNode(String actorId, String actionId) {
-		String key = actorId + " " + actionId;
-		if (actionsIndexes.containsKey(key))
-			return;
-		actionsIndexes.put(key, lastActionIndex);
-		lastActionIndex++;
-	}
-
-	public void addNodes(String actorId, Collection<?>/*<GraphVertex>*/ vertices){
-		/*for(GraphVertex vertex: vertices){
-			String actionId = vertex.getVertexName();
-			addNode(actorId, actionId);
-		}*/
 	}
 	
 	public void addConnection(String fromActorId, String fromActionId, String toActorId, String toActionId) {
@@ -93,6 +126,21 @@ public class DSEInputFilesCreator {
 			String fromActionId = edge.getFromVertex().getVertexName();
 			String toActionId = edge.getToVertex().getVertexName();
 			addConnection(fromActorId, fromActionId, toActorId, toActionId);
+		}*/
+	}
+	
+	public void addNode(String actorId, String actionId) {
+		String key = actorId + " " + actionId;
+		if (actionsIndexes.containsKey(key))
+			return;
+		actionsIndexes.put(key, lastActionIndex);
+		lastActionIndex++;
+	}
+	
+	public void addNodes(String actorId, Collection<?>/*<GraphVertex>*/ vertices){
+		/*for(GraphVertex vertex: vertices){
+			String actionId = vertex.getVertexName();
+			addNode(actorId, actionId);
 		}*/
 	}
 	
@@ -126,54 +174,6 @@ public class DSEInputFilesCreator {
 			connectionsBW.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Creates the delays.txt file which is an input of DSE Scheduler
-	 */
-	public static void createDelaysFile() {
-		try {
-			File delaysFile = new File(DSEScheduler.INPUT_FOLDER + "delays.txt");
-			delaysFile.createNewFile();
-			BufferedWriter delaysWriter = new BufferedWriter(new FileWriter(
-					delaysFile));
-			delaysWriter.write(0 + "\n");
-			delaysWriter.close();
-		} catch (IOException ex) {
-			Logger.getLogger(DSEInputFilesCreator.class.getName()).log(
-					Level.SEVERE, null, ex);
-		}
-	}
-	
-	/**
-	 * Creates mapping file
-	 */
-	public static void createMappingFile(int noProcessors, int noClusters,
-			HashMap<String, Integer> clusterMap) {
-		BufferedWriter mappingWriter = null;
-		try {
-			File mappingFile = new File(DSEScheduler.INPUT_FOLDER
-					+ "mapping.txt");
-			mappingFile.createNewFile();
-			mappingWriter = new BufferedWriter(new FileWriter(mappingFile));
-			mappingWriter.write(clusterMap.size() + " " + noClusters + " "
-					+ noProcessors + "\n");
-			for (String actorName : clusterMap.keySet()) {
-				int cluster = clusterMap.get(actorName);
-				mappingWriter.write(actorName + " " + cluster + "\n");
-			}
-			mappingWriter.close();
-		} catch (IOException ex) {
-			Logger.getLogger(DSEInputFilesCreator.class.getName()).log(
-					Level.SEVERE, null, ex);
-		} finally {
-			try {
-				mappingWriter.close();
-			} catch (IOException ex) {
-				Logger.getLogger(DSEInputFilesCreator.class.getName()).log(
-						Level.SEVERE, null, ex);
-			}
 		}
 	}
 }

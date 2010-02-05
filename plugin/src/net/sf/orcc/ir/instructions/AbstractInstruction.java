@@ -31,6 +31,7 @@ package net.sf.orcc.ir.instructions;
 import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
@@ -53,6 +54,11 @@ public abstract class AbstractInstruction extends AbstractLocalizable implements
 		return block;
 	}
 
+	@Override
+	public Type getCast(){
+		return null;
+	}
+	
 	@Override
 	public void setBlock(BlockNode block) {
 		this.block = block;

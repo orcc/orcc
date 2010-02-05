@@ -65,11 +65,6 @@ public interface OrccLaunchConstants {
 	public static final boolean DEFAULT_DOT_CFG = false;
 	
 	/**
-	 * Default value for {@value #ENABLE_TRACES}.
-	 */
-	public static final boolean DEFAULT_TRACES = false;
-
-	/**
 	 * Default value for {@value #FIFO_SIZE}.
 	 */
 	public static final int DEFAULT_FIFO_SIZE = 10000;
@@ -78,6 +73,11 @@ public interface OrccLaunchConstants {
 	 * Default value for {@value #KEEP_INTERMEDIATE}.
 	 */
 	public static final boolean DEFAULT_KEEP = false;
+
+	/**
+	 * Default value for {@value #ENABLE_TRACES}.
+	 */
+	public static final boolean DEFAULT_TRACES = false;
 
 	/**
 	 * When enabled, frontend prints DOT files showing CFG information.
@@ -106,14 +106,19 @@ public interface OrccLaunchConstants {
 	public static final String INPUT_FILE = "net.sf.orcc.fileName";
 	
 	/**
-	 * Options associated to the backend.
+	 * Input stimulus file associated with an Orcc configuration.
 	 */
-	public static final Map<String, String> OPTIONS = new HashMap<String, String>();
+	public static final String INPUT_STIMULUS = "net.sf.orcc.inputStimulus";
 
 	/**
 	 * Whether intermediate files should be kept.
 	 */
 	public static final String KEEP_INTERMEDIATE = "net.sf.orcc.keepIntermediate";
+
+	/**
+	 * Options associated to the backend.
+	 */
+	public static final Map<String, String> OPTIONS = new HashMap<String, String>();
 
 	/**
 	 * Output folder associated with an Orcc configuration.
@@ -124,20 +129,15 @@ public interface OrccLaunchConstants {
 	 * Parameters associated with an Orcc configuration.
 	 */
 	public static final String PARAMETERS = "net.sf.orcc.parameters";
-
+	
 	/**
 	 * Orcc run configuration type.
 	 */
 	public static final String RUN_CONFIG_TYPE = "net.sf.orcc.runLaunchConfigurationType";
-	
+
 	/**
 	 * Orcc simulation configuration type.
 	 */
 	public static final String SIMULATION_CONFIG_TYPE = "net.sf.orcc.simuLaunchConfigurationType";
-
-	/**
-	 * Input stimulus file associated with an Orcc configuration.
-	 */
-	public static final String INPUT_STIMULUS = "net.sf.orcc.inputStimulus";
 
 }

@@ -42,6 +42,10 @@ public class Switch {
 	
 	private static String btype;
 	
+	public static String getBTYPE(){
+		return Switch.btype;
+	}
+
 	public static int getSwitchValue(String newSwitch) {
 		int newValue = -1;
 		if (newSwitch.equals(Constants.NEWVOP))
@@ -56,7 +60,7 @@ public class Switch {
 			newValue = Integer.parseInt("000000001010", 2);
 		return newValue;
 	}
-
+	
 	public static ArrayList<String> getSwitchValues() {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add(Constants.INTER);
@@ -70,10 +74,6 @@ public class Switch {
 	public static void setBtype(String btype)throws OrccException{
 		Switch.btype = btype;
 		
-	}
-	
-	public static String getBTYPE(){
-		return Switch.btype;
 	}
 	
 }

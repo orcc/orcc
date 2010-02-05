@@ -185,7 +185,7 @@ public class CheckBoxOption implements AbstractOption, SelectionListener  {
 			}
 		}
 		
-		return (String[]) options.toArray(new String[] {});
+		return options.toArray(new String[] {});
 	}
 	
 	/**
@@ -206,7 +206,7 @@ public class CheckBoxOption implements AbstractOption, SelectionListener  {
 			}
 		}
 		
-		return (String[]) values.toArray(new String[] {});
+		return values.toArray(new String[] {});
 	}
 	
 

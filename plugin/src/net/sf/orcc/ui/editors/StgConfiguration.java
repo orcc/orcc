@@ -54,13 +54,13 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
  */
 public class StgConfiguration extends SourceViewerConfiguration {
 
+	private EmptyScanner commentScanner;
+
 	private ColorManager manager;
 
 	private StgScanner scanner;
 
 	private StgTemplateScanner templateScanner;
-
-	private EmptyScanner commentScanner;
 
 	/**
 	 * Creates a new configuration based on the given color manager.
@@ -79,12 +79,14 @@ public class StgConfiguration extends SourceViewerConfiguration {
 		templateScanner = new StgTemplateScanner(manager);
 	}
 
+	@Override
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 		return new String[] { IDocument.DEFAULT_CONTENT_TYPE,
 				StgPartitionScanner.STG_COMMENT,
 				StgPartitionScanner.STG_TEMPLATE };
 	}
 
+	@Override
 	public IPresentationReconciler getPresentationReconciler(
 			ISourceViewer sourceViewer) {
 		PresentationReconciler reconciler = new PresentationReconciler();

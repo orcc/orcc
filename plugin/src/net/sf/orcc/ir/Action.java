@@ -95,6 +95,25 @@ public class Action extends AbstractLocalizable {
 	}
 
 	/**
+	 * Returns action name (tag or body name)
+	 * 
+	 * @return action name
+	 */
+	public String getName() {
+		if (tag.isEmpty()) {
+			return body.getName();
+		} else {
+			String str = "";
+			for (int i = 0; i < tag.size() - 1; i++) {
+				str += tag.get(i) + "_";
+			}
+
+			str += tag.get(tag.size() - 1);
+			return str;
+		}
+	}
+
+	/**
 	 * Returns the output pattern of this action.
 	 * 
 	 * @return the output pattern of this action
@@ -121,25 +140,6 @@ public class Action extends AbstractLocalizable {
 	 */
 	public Tag getTag() {
 		return tag;
-	}
-
-	/**
-	 * Returns action name (tag or body name)
-	 * 
-	 * @return action name
-	 */
-	public String getName() {
-		if (tag.isEmpty()) {
-			return body.getName();
-		} else {
-			String str = "";
-			for (int i = 0; i < tag.size() - 1; i++) {
-				str += tag.get(i) + "_";
-			}
-
-			str += tag.get(tag.size() - 1);
-			return str;
-		}
 	}
 
 	@Override

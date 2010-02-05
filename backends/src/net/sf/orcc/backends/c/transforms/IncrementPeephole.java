@@ -73,13 +73,13 @@ public class IncrementPeephole extends AbstractActorTransformation {
 				if (varDef == store.getTarget().getVariable()
 						&& load.getIndexes().isEmpty()) {
 					Expression expr = store.getValue();
-					if (expr.getType() == Expression.BINARY) {
+					if (expr.getTypeOf() == Expression.BINARY) {
 						BinaryExpr binExpr = (BinaryExpr) expr;
 						BinaryOp op = binExpr.getOp();
 						Expression e1 = binExpr.getE1();
 						Expression e2 = binExpr.getE2();
 
-						if (e1.getType() == Expression.VAR) {
+						if (e1.getTypeOf() == Expression.VAR) {
 							VarExpr v1 = (VarExpr) e1;
 							if (v1.getVar().getVariable() == varDefTmp) {
 								res = replaceSelfAssignment(procedure
@@ -103,10 +103,10 @@ public class IncrementPeephole extends AbstractActorTransformation {
 			ListIterator<Instruction> it, LocalVariable varDefTmp,
 			Variable varDef, VarExpr v1, BinaryOp op, Expression e2) {
 		AbstractCInstruction instruction;
-		if (op == BinaryOp.PLUS && e2.getType() == Expression.INT
+		if (op == BinaryOp.PLUS && e2.getTypeOf() == Expression.INT
 				&& ((IntExpr) e2).getValue() == 1) {
 			instruction = new Increment(new Location(), varDef);
-		} else if (op == BinaryOp.MINUS && e2.getType() == Expression.INT
+		} else if (op == BinaryOp.MINUS && e2.getTypeOf() == Expression.INT
 				&& ((IntExpr) e2).getValue() == 1) {
 			instruction = new Decrement(new Location(), varDef);
 		} else if (op == BinaryOp.BITAND || op == BinaryOp.BITOR

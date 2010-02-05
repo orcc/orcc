@@ -62,11 +62,30 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 	}
 
 	/**
+	 * Set the attributes to the template.
+	 * 
+	 * @param network
+	 *            The network to generate code for.
+	 * @param debugFifos
+	 *            Whether debug information should be printed about FIFOs.
+	 * @param fifoSize
+	 *            Default FIFO size.
+	 * @throws OrccException
+	 */
+	@Override
+	protected void setAttributes(Network network, boolean debugFifos, int fifoSize)
+			throws OrccException {
+		super.setAttributes(network, debugFifos, fifoSize);
+		setQSStmts();
+	}
+	
+	/**
 	 * Sets the broadcasts attribute.
 	 * 
 	 * @param instances
 	 *            The list of instances.
 	 */
+	@Override
 	protected void setBroadcasts(Set<Instance> instances) {
 		List<Map<String, Object>> broadcasts = new ArrayList<Map<String, Object>>();
 		for (Instance instance : instances) {
@@ -90,35 +109,6 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 	}
 	
 	/**
-	 * Sets the qs_scheduler_stmts attribute.
-	 * @throws OrccException 
-	 */
-	private void setQSStmts() throws OrccException{
-		InputXDFParser inputXDFParser = new InputXDFParser(
-				Scheduler.workingDirectoryPath + File.separator
-						+ Constants.INPUT_FILE_NAME);
-		List<String> stmts = inputXDFParser.parseQSSchedulerStmts();
-		template.setAttribute("qs_scheduler_stmts", stmts);
-	}
-	
-	/**
-	 * Set the attributes to the template.
-	 * 
-	 * @param network
-	 *            The network to generate code for.
-	 * @param debugFifos
-	 *            Whether debug information should be printed about FIFOs.
-	 * @param fifoSize
-	 *            Default FIFO size.
-	 * @throws OrccException
-	 */
-	protected void setAttributes(Network network, boolean debugFifos, int fifoSize)
-			throws OrccException {
-		super.setAttributes(network, debugFifos, fifoSize);
-		setQSStmts();
-	}
-	
-	/**
 	 * Sets the connections attribute.
 	 * 
 	 * setConnections is protected due to has been overwritten by
@@ -132,6 +122,7 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 	 *            The graph's connection.
 	 * @throws OrccException
 	 */
+	@Override
 	protected void setConnections(DirectedGraph<Vertex, Connection> graph,
 			Set<Connection> connections) throws OrccException {
 		List<Map<String, Object>> conn = new ArrayList<Map<String, Object>>();
@@ -188,5 +179,17 @@ public class CQuasiStaticNetworkPrinter extends CNetworkPrinter {
 		}
 
 		template.setAttribute("connections", conn);
+	}
+	
+	/**
+	 * Sets the qs_scheduler_stmts attribute.
+	 * @throws OrccException 
+	 */
+	private void setQSStmts() throws OrccException{
+		InputXDFParser inputXDFParser = new InputXDFParser(
+				Scheduler.workingDirectoryPath + File.separator
+						+ Constants.INPUT_FILE_NAME);
+		List<String> stmts = inputXDFParser.parseQSSchedulerStmts();
+		template.setAttribute("qs_scheduler_stmts", stmts);
 	}
 }
