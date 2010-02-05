@@ -95,8 +95,23 @@ $result$ = trunc $ty$ $value$ to $ty2$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Instructions
+///////////////////////////////////////////////////////////////////////////////
+
+StoreInstr(ty, value, pty, pointer, cast) ::= <<
+$if(ty)$
+$StoreOp(ty=ty, value=value, pty=pty, pointer=pointer)$
+$else$
+$StoreOp(ty=pty, value=value, pty=pty, pointer=pointer)$
+$endif$
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Conversion instructions
 ///////////////////////////////////////////////////////////////////////////////
+
 
 StoreWithIndex(value, target, cast, indexes) ::= <<
 $if(target.variable.port)$
@@ -105,27 +120,22 @@ $endif$
 
 $GetElementPtrOp(result="%"+target+"_ptr", pty=target.variable.type, ptrval="%"+target+"_cast", idx = indexes)$
 $if(cast)$
-$BitcastOp(result=value+"_cast", ty=ExprType(value), value=value, ty2=cast)$
-
+$ZextOp(result=value+"_"+target, ty=ExprType(value), value=value, ty2=cast.elementType)$
+$StoreInstr(ty=cast.elementType, value=value+"_"+target, pty=ListType(target), pointer="%"+target+"_ptr")$
+$else$ 
+$StoreInstr(ty=value.type, value=value, pty=ListType(target), pointer="%"+target+"_ptr")$
 $endif$
 
-$if(value.type)$
-$StoreOp(ty=ExprType(value), value=value, pty=ListType(target), pointer="%"+target+"_ptr")$
-
-$else$
-$StoreOp(ty=ListType(target), value=value, pty=ListType(target), pointer="%"+target+"_ptr")$
-
-$endif$
 
 >>
 
 
 StoreWithoutIndex(value, target, cast) ::= <<
 $if(cast)$
-$BitcastOp(result=value+"_cast", ty=ExprType(value), value=value, ty2=cast)$
-$StoreOp(ty="i32", value=value+"_cast", pty=VarType(target), pointer=Var(target))$
+$ZextOp(result=value+"_cast", ty=ExprType(value), value=value, ty2=cast)$
+$StoreInstr(ty=value.type, value=value+"_cast", pty=VarType(target), pointer=Var(target))$
 $else$ 
-$StoreOp(ty="i32", value=value, pty=VarType(target), pointer=Var(target))$
+$StoreInstr(ty=value.type, value=value, pty=VarType(target), pointer=Var(target))$
 $endif$
 
 
