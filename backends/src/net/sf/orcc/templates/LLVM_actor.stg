@@ -8,11 +8,15 @@ $if(var.variable.global)$@$else$%$endif$$var$
 >>
 
 ExprType(expr) ::= <<
-$expr.underlyingType$
+$expr.type$
 >>
 
 VarType(var) ::= <<
 $var.variable.type$$if(var.variable.global)$*$endif$
+>>
+
+ListType(list) ::= <<
+$list.variable.type.elementType$$if(list.variable.global)$*$endif$
 >>
 
 variableDeclaration(variable) ::= <<
@@ -104,7 +108,14 @@ $if(cast)$
 $BitcastOp(result=value+"_cast", ty=ExprType(value), value=value, ty2=cast)$
 
 $endif$
-$StoreOp(ty=ExprType(value), value=value, pty=VarType(target), pointer="%"+target+"_ptr")$
+
+$if(value.type)$
+$StoreOp(ty=ExprType(value), value=value, pty=ListType(target), pointer="%"+target+"_ptr")$
+
+$else$
+$StoreOp(ty=ListType(target), value=value, pty=ListType(target), pointer="%"+target+"_ptr")$
+
+$endif$
 
 >>
 
@@ -180,8 +191,8 @@ $CallOp(ty ="void", fnptrval="@setReadEnd", function_args="%struct.fifo_s* %end_
 
 Write(write) ::= <<
 $LoadLocalPort(write)$
-%$write.target$_$write.block.label$ = call i8* @getWritePtr(%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$)
-$StoreOp(ty="i8*", value="%"+write.target+"_"+write.block.label, pty="i8*", pointer="%"+write.port+"_"+write.numTokens)$
+$CallOp(result="%"+write.target+"_"+write.block.label, ty ="i8*", fnptrval="@getWritePtr", function_args="%struct.fifo_s* %local_"+write.target+write.block.label+", i32 "+write.numTokens)$
+$StoreOp(ty="i8*", value="%"+write.target+"_"+write.block.label, pty="i8*", pointer="%"+write.port)$
 
 >>
 
