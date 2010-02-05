@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="bits" x="18" y="271"/>
+      <vertex id="VID" x="832" y="271"/>
+      <vertex id="WIDTH" x="743" y="459"/>
+      <vertex id="HEIGHT" x="754" y="340"/>
+      <vertex id="serialize" x="115" y="262"/>
+      <vertex id="parser" x="233" y="190"/>
+      <vertex id="texture_Y" x="383" y="7"/>
+      <vertex id="texture_U" x="383" y="178"/>
+      <vertex id="texture_V" x="383" y="349"/>
+      <vertex id="motion_Y" x="512" y="94"/>
+      <vertex id="motion_U" x="512" y="244"/>
+      <vertex id="motion_V" x="512" y="391"/>
+      <vertex id="GEN_mgnt_Merger420" x="644" y="244"/>
+   </vertices>
+</layout>
