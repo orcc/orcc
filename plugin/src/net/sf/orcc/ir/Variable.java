@@ -236,6 +236,15 @@ public abstract class Variable implements INameable {
 	public boolean isGlobal() {
 		return global;
 	}
+	
+	/**
+	 * Returns <code>true</code> if this variable is a list of value.
+	 * 
+	 * @return <code>true</code> if this variable is a list of value.
+	 */
+	public boolean isList() {
+		return (type.getTypeOf()== Type.LIST);
+	}
 
 	/**
 	 * Returns true if this variable is used by at least one instruction that

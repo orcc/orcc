@@ -80,7 +80,9 @@ public class Store extends AbstractInstruction implements ValueContainer {
 		Type val = target.getVariable().getType();
 		if(expr != null){
 			if (!expr.equals(val)){
-				return val;
+				if (!expr.toString().equals(val.toString())){
+					return val;
+				}
 			}
 		}
 		

@@ -22,8 +22,13 @@ $list.variable.type.elementType$
 variableDeclaration(variable) ::= <<
 $if(variable.port)$
 $AllocaOp(result="%"+variable, type=variable.type.elementType+"*")$
-
+$else$
+$if(variable.list)$
+$AllocaOp(result="%"+variable, type=variable.type)$ 
 $endif$
+$endif$
+
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,9 +39,7 @@ store $ty$ $value$, $pty$* $pointer$
 >>
 
 LoadOp(result, ty, pointer,alignment) ::= <<
-$result$ = load $ty$* $pointer$ $if(alignment)$
-[, align <alignment>]
-$endif$
+$result$ = load $ty$* $pointer$ $if(alignment)$ [, align <alignment>] $endif$
 >>  
 
 AddOp(result, ty, op1, op2) ::= <<
@@ -107,8 +110,6 @@ $StoreOp(ty=ty, value=value, pty=pty, pointer=pointer)$
 $else$
 $StoreOp(ty=pty, value=value, pty=pty, pointer=pointer)$
 $endif$
-
-
 >>
 
 
@@ -118,15 +119,10 @@ $endif$
 CastStore(ty, value, pty, pointer, cast)::= <<
 $SextOp(result=value+"_ext", ty=ty, value=value, ty2=cast.elementType)$
 $StoreInstr(ty=cast.elementType, value=value+"_ext", pty=pty, pointer=pointer)$
-	
 >>
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
-$if(cast)$
-$CastStore(ty=ty, value=value, pty=pty, pointer=pointer, cast=cast)$
-$else$
-$StoreInstr(ty=ty, value=value, pty=pty, pointer=pointer)$
-$endif$
+StoreWithIndex
 
 >>
 
@@ -136,6 +132,23 @@ $CastStore(ty=ty, value=value, pty=pty, pointer=pointer, cast=cast)$
 $else$
 $StoreInstr(ty=ty, value=value, pty=pty, pointer=pointer)$
 $endif$
+
+
+>>
+
+StorePortWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
+$LoadOp(result=pointer+"_L", ty=pty+"*", pointer=pointer)$
+$if(cast)$
+$CastStore(ty=ty, value=value, pty=pty, pointer=pointer+"_L", cast=cast)$
+$else$
+$StoreInstr(ty=ty, value=value, pty=pty, pointer=pointer+"_L")$
+$endif$
+
+
+>>
+
+StorePortWithoutIndex(ty, value, pty, pointer, cast) ::= <<
+StorePortWithoutIndex
 
 >>
 
@@ -153,10 +166,10 @@ IfWithThenElseNodes(ifNode) ::= <<
 	$BrOp(cond=ifNode.value, iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.elseNodes))$
 
 b$label(ifNode.thenNodes)$: 
-$nodes(ifNode.thenNodes)$	$BrOp(dest ="%b"+ifNode.joinNode.label)$
+$ConditionalBlockNode(ifNode.thenNodes)$	$BrOp(dest ="%b"+ifNode.joinNode.label)$
 
 b$label(ifNode.elseNodes)$:
-$nodes(ifNode.elseNodes)$	$BrOp(dest ="%b"+ifNode.joinNode.label)$
+$ConditionalBlockNode(ifNode.elseNodes)$	$BrOp(dest ="%b"+ifNode.joinNode.label)$
 
 b$ifNode.joinNode.label$:
 >>
@@ -190,7 +203,6 @@ Assign(assign) ::= <<
 
 PhiAssignment(phi) ::= <<
 $PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiPredecessors(phi.vars))$
-
 >>
 
 Read(read) ::= <<
@@ -239,17 +251,16 @@ $TruncOp(result="%"+hasTokens.target, ty="i32", value="%"+hasTokens.target+"32",
 
 Store(store) ::= <<
 $if(store.target.variable.port)$
-$LoadOp(result=Var(store.target)+"_L", ty=store.target.variable.type.elementType+"*", pointer=Var(store.target))$
 $if(store.indexes.empty)$
-$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=Var(store.target)+"_L", cast=store.cast, indexes=store.indexes)$
+$StorePortWithoutIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=Var(store.target), cast=store.cast)$
 $else$
-$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=Var(store.target)+"_L", cast=store.cast)$
+$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=Var(store.target), cast=store.cast, indexes=store.indexes)$
 $endif$
 $else$
 $if(store.indexes.empty)$
-$StoreWithIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=Var(store.target), cast=store.cast, indexes=store.indexes)$
-$else$
 $StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=Var(store.target), cast=store.cast)$
+$else$
+$StoreWithIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=Var(store.target), cast=store.cast, indexes=store.indexes)$
 $endif$
 $endif$
 
@@ -289,8 +300,44 @@ $else$
 3
 $endif$
 $endif$
-$BlockNode(ifNode.joinNode)$
+$ConditionalBlockNode(ifNode.joinNode)$
 
+>>
+
+// while node
+WhileNode(whileNode) ::= <<
+$BlockNode(whileNode.joinNode)$
+	$BrOp(cond=whileNode.value, iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+label(whileNode.joinNode)+"_next")$
+
+b$label(whileNode.nodes)$:
+$ConditionalBlockNode(whileNode.nodes)$
+	$BrOp(dest="%b"+label(whileNode.joinNode))$
+
+$label(whileNode.joinNode)$_next:
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+BlockNode(blockNode) ::= <<
+	$BrOp(dest="%b"+label(blockNode))$
+
+b$label(blockNode)$:
+	$instructions(blockNode.instructions)$
+>>
+
+ConditionalBlockNode(blockNode) ::= <<
+	$blockNode: {$instructions(it.instructions)$}$
+>>
+
+instructions(instructions) ::= <<
+$instructions: {$(it.class.simpleName)(it)$}$
+>>
+
+nodes(nodes) ::= <<
+$nodes: {$(it.class.simpleName)(it)$}$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -490,31 +537,6 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 
-instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
->>
-
-nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}$
->>
-
-// if node
-BlockNode(blockNode) ::= <<
-	$instructions(blockNode.instructions)$
->>
-
-
-// while node
-WhileNode(whileNode) ::= <<
-	br i1 $whileNode.value$, label %$label(whileNode.Nodes)$, label %$label(whileNode.joinNode)$
-
-$label(whileNode.Nodes)$:
-$nodes(whileNode.nodes)$	br i1 $whileNode.value$, label %$label(whileNode.Nodes)$, label %$label(whileNode.joinNode)$
-
-b$whileNode.joinNode.label$:
-$BlockNode(whileNode.joinNode)$
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Instantiation
 ///////////////////////////////////////////////////////////////////////////////
@@ -537,8 +559,10 @@ define internal $procedure.returnType$ $procedure$($procedure.parameters.list: {
 entry:
 $if(procedure.locals.list)$
 	$procedure.locals.list: variableDeclaration(it)$
+	
 $endif$
-$procedure.nodes: {$(it.class.simpleName)(it)$}$}
+$trunc(procedure.nodes): {$(it.class.simpleName)(it)$}$
+	$last(procedure.nodes): {$instructions(it.instructions)$}$}
 
 >>
 

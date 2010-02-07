@@ -287,10 +287,9 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void visit(WhileNode whileNode, Object... args) {
-		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
-		whileNode.setValue(visitExpression(whileNode.getValue(), getItr(it),
+		ListIterator<Instruction> it = whileNode.getJoinNode().listIterator();
+		whileNode.setValue(visitExpression(whileNode.getValue(), it,
 				new BoolType()));
 
 		super.visit(whileNode, args);
