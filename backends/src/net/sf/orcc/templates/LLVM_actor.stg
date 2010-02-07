@@ -31,6 +31,10 @@ $endif$
 
 >>
 
+indexes(indexes) ::= <<
+$indexes: { index | i32 $index$ }; separator=", "$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // LLVM Operations
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,7 +126,9 @@ $StoreInstr(ty=cast.elementType, value=value+"_ext", pty=pty, pointer=pointer)$
 >>
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
-StoreWithIndex
+$GetElementPtrOp(result=pointer+"_ptr", pty=pty, ptrval=pointer, idx=indexes) $
+$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer=pointer+"_ptr")$
+
 
 >>
 
@@ -153,7 +159,7 @@ StorePortWithoutIndex
 >>
 
 LoadWithIndex(result, ty, pointer, indexes) ::= <<
-$LoadOp(result=result, ty=ty, pointer=pointer)$
+LoadWithIndex
 
 >>
 
@@ -260,7 +266,7 @@ $else$
 $if(store.indexes.empty)$
 $StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=Var(store.target), cast=store.cast)$
 $else$
-$StoreWithIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=Var(store.target), cast=store.cast, indexes=store.indexes)$
+$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=Var(store.target), cast=store.cast, indexes=store.indexes)$
 $endif$
 $endif$
 
@@ -276,9 +282,9 @@ $LoadWithoutIndex(result="%"+load.target, ty=load.source.variable.type.elementTy
 $endif$
 $else$
 $if(load.indexes.empty)$
-$LoadWithIndex(result="%"+load.target, ty=VarType(load.source), pointer=Var(load.source))$
+$LoadWithoutIndex(result="%"+load.target, ty=VarType(load.source), pointer=Var(load.source))$ 
 $else$
-$LoadWithoutIndex(result="%"+load.target, ty=VarType(load.source), pointer=Var(load.source))$
+$LoadWithIndex(result="%"+load.target, ty=VarType(load.source), pointer=Var(load.source))$
 $endif$
 $endif$
 
@@ -484,11 +490,6 @@ initPortNode(fifoName, expr, index) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // ORCC Nodes
 ///////////////////////////////////////////////////////////////////////////////
-
-indexes(indexes) ::= <<
-$indexes: { index | i32 $index$ }; separator=", "$
->>
-
 
 Call(call) ::= <<
 $if(call.target)$
