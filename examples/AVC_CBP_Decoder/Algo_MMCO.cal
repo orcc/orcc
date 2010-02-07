@@ -68,8 +68,8 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
   
   uint(size=3) mmco_opcode;
   
-  uint(size=4) pic_curr_idx      := 0;
-  uint frame_num                 := 0;
+  uint(size=4) pic_curr_idx;
+  uint frame_num;
   uint pred                      := 0;
   uint(size=4) index             := 0;
   uint(size=4) num_ref_frames    := 0;
@@ -131,14 +131,14 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
       end
     end
     pic_curr_idx := idx;
-    frame_num := frame_num +1 ;
   end
   
 
-  read_num_ref_frames: action MMCO:[a]==> RefList:[pic_curr_idx]
+  read_num_ref_frames: action MMCO:[a, b]==> RefList:[pic_curr_idx]
   do
     num_ref_frames := a;
     flag_long_term := 0;
+    frame_num:= b;
   end
  
   
@@ -519,6 +519,8 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
   guard 
     a = 5
   do
+    frame_num:=0;
+    pic_curr_idx:=0;
     short_term_count := 0;
     short_term_list := [-1 :for int s in Integers(0,NB_PIC-1)];
     pic_idx_list := [-1 :for int s in Integers(0,NB_PIC-1)];

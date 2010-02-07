@@ -1,4 +1,5 @@
 add_executable (AVC_CBP_Decoder_Compare
+Algo_Parser_IPCM.c
 Algo_Add.c
 Algo_Add_01.c
 Algo_Add_01_01.c

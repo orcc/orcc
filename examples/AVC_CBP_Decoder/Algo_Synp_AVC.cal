@@ -1305,17 +1305,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		start_vld();
 	end
 
-	read_SliceH_check_separate_colour_plane_flag: action ==> MMCO:[num_ref_frames[sps_id]]
+	read_SliceH_check_separate_colour_plane_flag: action ==> 
 	guard
-		vld_end(), first_mb_in_slice = 0
-	do
-		pps_id := vld_ue();
-		sps_id := sequence_parameter_set_id[pps_id];
-	end
-
-	skip_read_SliceH_check_separate_colour_plane_flag: action ==> 
-	guard
-		vld_end(), first_mb_in_slice != 0
+		vld_end()
 	do
 		pps_id := vld_ue();
 		sps_id := sequence_parameter_set_id[pps_id];
@@ -1346,9 +1338,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 
 
-	read_SliceH_frame_num: action ==>
+	read_SliceH_frame_num: action ==> MMCO:[num_ref_frames[sps_id], frame_num]
 	guard
-		done_reading_bits()
+		done_reading_bits(),first_mb_in_slice=0
+	do
+		frame_num := read_result();
+	end
+
+	skip_read_SliceH_frame_num: action ==> 
+	guard
+		done_reading_bits(),first_mb_in_slice!=0
 	do
 		frame_num := read_result();
 	end
@@ -1875,7 +1874,22 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//do
 	read_SliceH_memory_management_control_operation_done: action ==> MMCO:[memory_management_control_operation]
 	guard
-		adaptative_ref_pic_marking_mode_flag = 1,
+		adaptative_ref_pic_marking_mode_flag = 1, first_mb_in_slice=0,
+		vld_end()
+	do
+		memory_management_control_operation := vld_ue();
+		if 	memory_management_control_operation = 1 or 
+			memory_management_control_operation = 2 or 
+			memory_management_control_operation = 3 or 
+			memory_management_control_operation = 4 or 
+			memory_management_control_operation = 6 then 
+				start_vld(); 
+		end
+	end
+
+	skip_read_SliceH_memory_management_control_operation_done: action ==> 
+	guard
+		adaptative_ref_pic_marking_mode_flag = 1, first_mb_in_slice!=0,
 		vld_end()
 	do
 		memory_management_control_operation := vld_ue();
@@ -1892,7 +1906,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	read_SliceH_difference_of_pic_nums_minus1_done: action ==> MMCO:[difference_of_pic_nums_minus1]
 	guard
 		memory_management_control_operation = 1 or memory_management_control_operation = 3,
-		vld_end()
+		vld_end(), first_mb_in_slice=0
+	do
+		difference_of_pic_nums_minus1 := vld_ue();
+		start_vld();
+	end
+
+	skip_read_SliceH_difference_of_pic_nums_minus1_done: action ==> 
+	guard
+		memory_management_control_operation = 1 or memory_management_control_operation = 3,
+		vld_end(), first_mb_in_slice!=0
 	do
 		difference_of_pic_nums_minus1 := vld_ue();
 		start_vld();
@@ -1903,18 +1926,39 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	read_SliceH_long_term_pic_num_done: action ==> MMCO:[long_term_pic_num]
 	guard
 		memory_management_control_operation = 2,
-		vld_end()
+		vld_end(), first_mb_in_slice=0
+	do
+		long_term_pic_num := vld_ue();
+		start_vld();
+	end
+
+	skip_read_SliceH_long_term_pic_num_done: action ==>
+	guard
+		memory_management_control_operation = 2,
+		vld_end(), first_mb_in_slice!=0
 	do
 		long_term_pic_num := vld_ue();
 		start_vld();
 	end
 	// end if
 
+	// end if
+
 	// if (mmco == 3 || mmco == 6)
 	read_SliceH_long_term_frame_idx_done: action ==> MMCO:[long_term_frame_idx]
 	guard
 		memory_management_control_operation = 3 or memory_management_control_operation = 6,
-		vld_end()
+		vld_end(), first_mb_in_slice=0
+	do
+		long_term_frame_idx := vld_ue();
+		start_vld();
+	end
+
+	// if (mmco == 3 || mmco == 6)
+	skip_read_SliceH_long_term_frame_idx_done: action ==>
+	guard
+		memory_management_control_operation = 3 or memory_management_control_operation = 6,
+		vld_end(), first_mb_in_slice!=0
 	do
 		long_term_frame_idx := vld_ue();
 		start_vld();
@@ -1932,7 +1976,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	read_SliceH_max_long_term_frame_idx_plus1_done: action ==> MMCO:[max_long_term_frame_idx_plus1]
 	guard
 		memory_management_control_operation = 4,
-		vld_end()
+		vld_end(), first_mb_in_slice=0
+	do
+		max_long_term_frame_idx_plus1 := vld_ue();
+		start_vld();
+	end
+
+	skip_read_SliceH_max_long_term_frame_idx_plus1_done: action ==> 
+	guard
+		memory_management_control_operation = 4,
+		vld_end(), first_mb_in_slice!=0
 	do
 		max_long_term_frame_idx_plus1 := vld_ue();
 		start_vld();
@@ -3850,11 +3903,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		read_SliceH_slice_type								( read_SliceH_slice_type  	                        ) --> read_SliceH_pps_id;
 		read_SliceH_pps_id									( read_SliceH_pps_id						  		) --> read_SliceH_check_separate_colour_plane_flag;
 		read_SliceH_check_separate_colour_plane_flag		( read_SliceH_check_separate_colour_plane_flag	 	) --> read_SliceH_check_separate_colour_plane_flag_done; 
-		read_SliceH_check_separate_colour_plane_flag		( skip_read_SliceH_check_separate_colour_plane_flag	 	) --> read_SliceH_check_separate_colour_plane_flag_done; 
 		read_SliceH_check_separate_colour_plane_flag_done	( read_SliceH_separate_colour_plane_flag_done		) --> read_SliceH_read_colour_plane_id;
 		read_SliceH_check_separate_colour_plane_flag_done	( read_SliceH_skip_separate_colour_plane_flag	  	) --> read_SliceH_frame_num;	
 		read_SliceH_read_colour_plane_id					( read_SliceH_read_colour_plane_id				  	) --> read_SliceH_frame_num;
 		read_SliceH_frame_num								( read_SliceH_frame_num	  	                        ) --> read_SliceH_field_pic_flag;
+		read_SliceH_frame_num								( skip_read_SliceH_frame_num	  	                        ) --> read_SliceH_field_pic_flag;
 		read_SliceH_field_pic_flag							( read_SliceH_field_pic_flag						) --> read_SliceH_bottom_field_flag;
 		read_SliceH_field_pic_flag							( read_SliceH_skip_field_pic_flag					) --> read_SliceH_idr_pic_id;
 		read_SliceH_bottom_field_flag						( read_SliceH_bottom_field_flag						) --> read_SliceH_bottom_field_flag_done;
@@ -3923,13 +3976,19 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		read_SliceH_check_IdrPicFlag						( skip_read_SliceH_adaptative_ref_pic_marking_mode_flag_done) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco								( read_SliceH_skip_memory_management_control_operation_done ) --> read_SliceH_cabac_init_idc;
 		read_SliceH_check_mmco								( read_SliceH_memory_management_control_operation_done) --> read_SliceH_check_mmco_done;
+		read_SliceH_check_mmco								( skip_read_SliceH_memory_management_control_operation_done) --> read_SliceH_check_mmco_done;
 		read_SliceH_check_mmco_done							( read_SliceH_mmco_0								) --> read_SliceH_cabac_init_idc;
 		read_SliceH_check_mmco_done							( read_SliceH_difference_of_pic_nums_minus1_done	) --> read_SliceH_check_mmco_36;
+		read_SliceH_check_mmco_done							( skip_read_SliceH_difference_of_pic_nums_minus1_done	) --> read_SliceH_check_mmco_36;
 		read_SliceH_check_mmco_done							( read_SliceH_long_term_pic_num_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_done							( skip_read_SliceH_long_term_pic_num_done				) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_done							( skip_read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_36							( read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_36							( skip_read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_36							( read_SliceH_long_not_term_frame_idx_done				) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( read_SliceH_max_long_term_frame_idx_plus1_done	) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_done							( skip_read_SliceH_max_long_term_frame_idx_plus1_done	) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( read_SliceH_mmco_5								) --> read_SliceH_check_mmco;
 		read_SliceH_dec_ref_pic_marking						( read_SliceH_skip_dec_ref_pic_marking				) --> read_SliceH_cabac_init_idc;
 
