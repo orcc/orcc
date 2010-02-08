@@ -97,8 +97,12 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
+			Type binaryType = type;
+			type = expr.getE1().getType();
 			Expression e1 = (Expression) expr.getE1().accept(this, args);
+			type = expr.getE2().getType();
 			Expression e2 = (Expression) expr.getE2().accept(this, args);
+			type = binaryType;
 									
 			Location location = expr.getLocation();
 			BinaryOp op = expr.getOp();
@@ -276,14 +280,26 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Store store, Object... args) {
 		block = store.getBlock();
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		Expression value = store.getValue();
+		Variable target = store.getTarget().getVariable();
+		Type type = target.getType();
+		
+		//Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
 		for (int i = 0; i < store.getIndexes().size(); i++) {
 			types.add(new IntType(new IntExpr(32)));
 		}
-		visitExpressions(store.getIndexes(), args[0], types);
+		visitExpressions(store.getIndexes(), it, types);
+		it.previous();
+		
+		//Check store value
+		store.setValue(visitExpression(value, it,type));
+		it.next();
 	}
 
 	@Override
