@@ -1707,7 +1707,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_SliceH_ref_pic_list_reordering_flag_l0_done: action ==> RefReordering:[ref_pic_list_reordering_flag_l0]
 	guard
-		done_reading_bits()
+		done_reading_bits(), first_mb_in_slice=0
+	do
+		ref_pic_list_reordering_flag_l0 := read_result();
+		reordering_of_pic_nums_idc :=0;
+	end
+
+	skip_read_SliceH_ref_pic_list_reordering_flag_l0_done: action ==>
+	guard
+		done_reading_bits(), first_mb_in_slice!=0
 	do
 		ref_pic_list_reordering_flag_l0 := read_result();
 		reordering_of_pic_nums_idc :=0;
@@ -1724,7 +1732,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_SliceH_reordering_of_pic_nums_idc_done: action ==> RefReordering:[reordering_of_pic_nums_idc]
 	guard
-		vld_end()
+		vld_end(), first_mb_in_slice=0
+	do
+		reordering_of_pic_nums_idc := vld_ue();
+		if reordering_of_pic_nums_idc != 3 then start_vld(); end
+	end
+
+	skip_read_SliceH_reordering_of_pic_nums_idc_done: action ==>
+	guard
+		vld_end(), first_mb_in_slice!=0
 	do
 		reordering_of_pic_nums_idc := vld_ue();
 		if reordering_of_pic_nums_idc != 3 then start_vld(); end
@@ -1733,7 +1749,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
 	read_SliceH_abs_diff_pic_num_minus1_done: action ==> RefReordering:[vld_ue()]
 	guard
-		vld_end(),
+		vld_end(), first_mb_in_slice=0,
 		reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
 	do
 		if flag_list_l1 = 0 then
@@ -1743,10 +1759,22 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 	end
 
+	//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
+	skip_read_SliceH_abs_diff_pic_num_minus1_done: action ==> 
+	guard
+		vld_end(), first_mb_in_slice!=0,
+		reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
+	do
+		if flag_list_l1 = 0 then
+			abs_diff_pic_num_minus1_l0[ref_pic_idx] := vld_ue();
+		else
+			abs_diff_pic_num_minus1_l1[ref_pic_idx] := vld_ue();
+		end
+	end
 	// else if (reordering_of_pic_nums_idc == 2)
 	read_SliceH_long_term_pic_num_done_idc2: action ==> RefReordering:[vld_ue()]
 	guard
-		vld_end(),
+		vld_end(), first_mb_in_slice=0,
 		reordering_of_pic_nums_idc =2
 	do
 		if flag_list_l1 = 0 then
@@ -1756,6 +1784,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 	end
 
+	skip_read_SliceH_long_term_pic_num_done_idc2: action ==>
+	guard
+		vld_end(), first_mb_in_slice!=0,
+		reordering_of_pic_nums_idc =2
+	do
+		if flag_list_l1 = 0 then
+			long_term_pic_num_l0[ref_pic_idx] := vld_ue();
+		else
+			long_term_pic_num_l1[ref_pic_idx] := vld_ue();
+		end
+	end
 	//else (reordering_of_pic_nums_idc == 3)
 	read_SliceH_skip_reordering_of_pic_nums_idc3: action ==>
 	guard
@@ -1799,7 +1838,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//else (slice_type % 5 == 2 || slice_type % 5 == 4)
 	read_SliceH_skip_ref_pic_list_reordering: action ==> RefReordering:[0]
 	guard
-		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
+		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI, first_mb_in_slice=0
+	end
+
+	skip_read_SliceH_skip_ref_pic_list_reordering: action ==>
+	guard
+		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI, first_mb_in_slice!=0
 	end
 	//end if
 	//******* End of ref_pic_list_reordering  ********/
@@ -3953,12 +3997,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		//ref_pic_list_reordering
 		read_SliceH_ref_pic_list_reordering					( read_SliceH_ref_pic_list_reordering_flag_l0		) --> read_SliceH_ref_pic_list_reordering_flag_l0_done;
 		read_SliceH_ref_pic_list_reordering					( read_SliceH_skip_ref_pic_list_reordering			) --> read_SliceH_pred_weight_table;
+		read_SliceH_ref_pic_list_reordering					( skip_read_SliceH_skip_ref_pic_list_reordering			) --> read_SliceH_pred_weight_table;
 		read_SliceH_ref_pic_list_reordering_flag_l0_done	( read_SliceH_ref_pic_list_reordering_flag_l0_done	) --> read_SliceH_reordering_of_pic_nums_idc;
+		read_SliceH_ref_pic_list_reordering_flag_l0_done	( skip_read_SliceH_ref_pic_list_reordering_flag_l0_done	) --> read_SliceH_reordering_of_pic_nums_idc;
 		read_SliceH_reordering_of_pic_nums_idc 				( read_SliceH_reordering_of_pic_nums_idc	        ) --> read_SliceH_reordering_of_pic_nums_idc_done;
 		read_SliceH_reordering_of_pic_nums_idc				( read_SliceH_skip_reordering_of_pic_nums_idc		) --> read_SliceH_ref_pic_list_reordering_flag_l1;	
 		read_SliceH_reordering_of_pic_nums_idc_done			( read_SliceH_reordering_of_pic_nums_idc_done		) --> look_SliceH_reordering_of_pic_nums_idc;	
+		read_SliceH_reordering_of_pic_nums_idc_done			( skip_read_SliceH_reordering_of_pic_nums_idc_done		) --> look_SliceH_reordering_of_pic_nums_idc;	
 		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_abs_diff_pic_num_minus1_done	        ) --> read_SliceH_reordering_of_pic_nums_idc;	
+		look_SliceH_reordering_of_pic_nums_idc				( skip_read_SliceH_abs_diff_pic_num_minus1_done	        ) --> read_SliceH_reordering_of_pic_nums_idc;	
 		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_long_term_pic_num_done_idc2				) --> read_SliceH_reordering_of_pic_nums_idc;
+		look_SliceH_reordering_of_pic_nums_idc				( skip_read_SliceH_long_term_pic_num_done_idc2				) --> read_SliceH_reordering_of_pic_nums_idc;
 		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_skip_reordering_of_pic_nums_idc3		) --> read_SliceH_ref_pic_list_reordering_flag_l1;
 		read_SliceH_ref_pic_list_reordering_flag_l1			( read_SliceH_ref_pic_list_reordering_flag_l1		) --> read_SliceH_ref_pic_list_reordering_flag_l1_done;
 		read_SliceH_ref_pic_list_reordering_flag_l1_done	( read_SliceH_ref_pic_list_reordering_flag_l1_done	) --> read_SliceH_reordering_of_pic_nums_idc;
