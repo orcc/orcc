@@ -150,7 +150,7 @@ ReadEnd(readEnd) ::= <<>>
  */
 Return(return) ::= <<
 $if(return.value)$
-$procedure$_go := $return.value$;
+$procedure$_go <= $return.value$;
 
 $endif$
 >>
@@ -161,7 +161,7 @@ $store.target$ <= $store.value$;
 
 $else$
 -- tab not implemented yet
-$store.target$ <= $store.value$; -- [$store.indexes : {$it$}$]
+$store.target$ := $store.value$; -- [$store.indexes : {$it$}$]
 
 $endif$
 
@@ -217,7 +217,7 @@ procedure(procedure) ::= <<
 $procedure.nodes: {$(it.class.simpleName)(it)$}$
 >>
 
-procedure_init(procedure) ::= <<
+PrintLocals(procedure) ::= <<
 $if(procedure.locals.list)$
 $procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
 $endif$
@@ -227,15 +227,21 @@ $endif$
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 action(action) ::= <<
-when isSchedulable_$action$ =>
-  $procedure(action.scheduler)$$action.scheduler$_done := '1';
+$action$_proc : process (reset_n, clock) is
+$PrintLocals(action.scheduler)$
+begin
+  if reset_n = '0' then 
+    -- Todo
+  elsif rising_edge(clock) then
+    $procedure(action.scheduler)$
+  end if;
+end process $action$_proc;
 
 >>
 
 
-action_init(action) ::= <<
-$procedure_init(action.body)$$procedure_init(action.scheduler)$variable $action.scheduler$_done : std_logic;
-variable $action.scheduler$_go : std_logic;
+PrintActionLocals(action) ::= <<
+$PrintLocals(action.body)$
 
 >>
 
@@ -255,20 +261,22 @@ $procedure(action.body)$
 >>
 
 actionTest(action) ::= <<
-(isSchedulable_$action$_done = '1' and isSchedulable_$action$_go = '1') then
-	$if(action.outputPattern)$
-	if ($outputPattern(pattern=action.outputPattern)$) then
-		$actionCall(action)$
-	end if;
-	$else$
-	$procedure(action.body)$
-	$endif$elsif (isSchedulable_$action$_done = '0') then
-  FSM <= isSchedulable_$action$;
+if (isSchedulable_$action$_go = '1') then
+$if(action.outputPattern)$
+if ($outputPattern(pattern=action.outputPattern)$) then
+  $actionCall(action)$
+end if;
+$else$
+$procedure(action.body)$
+$endif$
+
+end if;
+
 >>
 
 schedulingTest(actions) ::= <<
-if $actions: actionTest(action=it); separator="\n--\nelsif"$
-end if;
+$actions: actionTest(action=it); separator="\n--\n"$
+
 >>
 
 scheduler(actions) ::= <<
@@ -317,7 +325,7 @@ $procedure(nextState.action.body)$FSM = s_$nextState.targetState$;
 >>
 
 actionTestState(nextState) ::= <<
-(isSchedulable_$nextState.action$_done = '1' and isSchedulable_$nextState.action$_go = '1')
+(isSchedulable_$nextState.action$_go = '1')
   $if(nextState.action.outputPattern)$
   if ($outputPattern(nextState.action.outputPattern)$) {
     $actionCallState(nextState)$
@@ -325,8 +333,7 @@ actionTestState(nextState) ::= <<
   $else$
   $actionCallState(nextState)$
   $endif$
-elsif (isSchedulable_$nextState.action$_done = '0')
-  FSM <= isSchedulable_$nextState.action$;
+
 >>
 
 schedulingTestState(nextStates) ::= <<
@@ -349,12 +356,10 @@ $transitions: {when s_$it.sourceState$ =>
 
 DefineFSM(actions, fsm) ::= <<
 $if(fsm)$
-type FSM_type is ($first(fsm.states)$, $rest(fsm.states) : {$it$}; separator=","$, $actor.actions: action_FSM(it); separator=", "$);
-$else$
-type FSM_type is (compute, $actor.actions: action_FSM(it); separator=", "$);
+type FSM_type is ($first(fsm.states)$, $rest(fsm.states) : {$it$}; separator=","$);
+signal FSM : FSM_type;
 $endif$
 
-signal FSM : FSM_type;
 >>
 
 action_FSM(action) ::= <<
@@ -381,9 +386,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.type_package.all;
-
 entity $actor.name$ is
   port (
   -- Inputs
@@ -399,40 +401,34 @@ architecture rtl_$actor.name$ of $actor.name$ is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   $actor.stateVars.list: stateConst(it)$
+  $actor.actions: {action|signal $action.scheduler$_go : std_logic;}; separator="\n"$
+  
   -- FSM
   $DefineFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
   ---------------------------------------------------------------------------
 
 begin
 
-  $actor.name$_Proc : process (reset_n, clock) is
-    $actor.actions: action_init(it)$  --
+$if(actor.actionScheduler.actions)$
+  $actor.name$_proc : process (reset_n, clock) is
+    $actor.actions: PrintActionLocals(it)$  --
   begin
     if reset_n = '0' then 
-      $InitFSM(fsm=actor.actionScheduler.fsm)$
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
     elsif rising_edge(clock) then
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-      case FSM is
-      $if(actor.actionScheduler.fsm)$
-      $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
-      $actor.actions: action(it)$
-      when others => 
-	    FSM <= $actor.actionScheduler.fsm.initialState$;
-      $else$
-      $if(actor.actionScheduler.actions)$
-      when compute => 
-        $schedulingTest(actor.actionScheduler.actions)$
-      --
-      $actor.actions: action(it); separator="  FSM <= compute;\n--\n"$        FSM <= compute;
-      --
-      when others => 
-	    FSM <= compute;
-      $endif$
-      $endif$
-      end case;
-    end if;      
-  end process $actor.name$_Proc;
-      
+      $schedulingTest(actor.actionScheduler.actions)$
+    end if;
+  end process $actor.name$_proc;
+
+
+  $actor.actions: action(it); separator="\n\n"$
+$else$
+  $if(actor.actionScheduler.fsm)$
+  $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
+  $actor.actions: action(it)$
+  $endif$
+$endif$
+
 end architecture rtl_$actor.name$;
 >>
