@@ -78,6 +78,29 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 	}
 
 	/**
+	 * Returns the string representation of the binary expression whose
+	 * precedence level is given.
+	 * 
+	 * @param nextPrec
+	 *            precedence level to be used when printing e1 and e2
+	 * @param e1
+	 *            left expression
+	 * @param op
+	 *            binary operator
+	 * @param e2
+	 *            right expression
+	 * @return the string representation of the binary expression
+	 */
+	protected void toString(int nextPrec, Expression e1, BinaryOp op,
+			Expression e2) {
+		e1.accept(this, nextPrec, BinaryExpr.LEFT);
+		builder.append(" ");
+		builder.append(toString(op));
+		builder.append(" ");
+		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
+	}
+
+	/**
 	 * Returns the string representation of the given unary operator.
 	 * 
 	 * @param op
@@ -91,31 +114,13 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {
 		BinaryOp op = expr.getOp();
-		int currentPrec = op.getPrecedence();
-
-		int nextPrec;
-		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
-			// special case, for shifts always put parentheses because compilers
-			// often issue warnings
-			nextPrec = Integer.MIN_VALUE;
-		} else {
-			nextPrec = currentPrec;
-		}
 
 		if (op.needsParentheses(args)) {
 			builder.append("(");
-			expr.getE1().accept(this, nextPrec, BinaryExpr.LEFT);
-			builder.append(" ");
-			builder.append(toString(op));
-			builder.append(" ");
-			expr.getE2().accept(this, nextPrec, BinaryExpr.RIGHT);
+			toString(op.getPrecedence(), expr.getE1(), op, expr.getE2());
 			builder.append(")");
 		} else {
-			expr.getE1().accept(this, nextPrec, BinaryExpr.LEFT);
-			builder.append(" ");
-			builder.append(toString(op));
-			builder.append(" ");
-			expr.getE2().accept(this, nextPrec, BinaryExpr.RIGHT);
+			toString(op.getPrecedence(), expr.getE1(), op, expr.getE2());
 		}
 	}
 

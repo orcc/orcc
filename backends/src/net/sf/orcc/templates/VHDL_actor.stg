@@ -221,14 +221,14 @@ PrintLocals(procedure) ::= <<
 $if(procedure.locals.list)$
 $procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
 $endif$
-
 >>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 action(action) ::= <<
 $action$_proc : process (reset_n, clock) is
-$PrintLocals(action.scheduler)$
+  $PrintLocals(action.scheduler)$
 begin
   if reset_n = '0' then 
     -- Todo

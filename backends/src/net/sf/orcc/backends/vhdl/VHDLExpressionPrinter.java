@@ -30,6 +30,8 @@
 package net.sf.orcc.backends.vhdl;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -43,6 +45,30 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
  * 
  */
 public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
+
+	/**
+	 * Prints a function call to the function with the given name, whose
+	 * arguments are the expressions e1 and e2.
+	 * 
+	 * @param function
+	 *            a function name
+	 * @param e1
+	 *            first expression
+	 * @param e2
+	 *            second expression
+	 */
+	private void printCall(String function, Expression e1, Expression e2) {
+		// parent precedence is the highest possible to prevent top-level binary
+		// expression from being parenthesized
+		int nextPrec = Integer.MAX_VALUE;
+
+		builder.append(function);
+		builder.append("(");
+		e1.accept(this, nextPrec, BinaryExpr.LEFT);
+		builder.append(", ");
+		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
+		builder.append(")");
+	}
 
 	@Override
 	protected String toString(BinaryOp op) {
@@ -67,6 +93,46 @@ public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 			return "not";
 		default:
 			return op.getText();
+		}
+	}
+
+	@Override
+	public void visit(BinaryExpr expr, Object... args) {
+		BinaryOp op = expr.getOp();
+		Expression e1 = expr.getE1();
+		Expression e2 = expr.getE2();
+
+		switch (op) {
+		case BITAND:
+			printCall("bitand", e1, e2);
+			break;
+		case BITOR:
+			printCall("bitor", e1, e2);
+			break;
+		case BITXOR:
+			printCall("bitxor", e1, e2);
+			break;
+		case DIV:
+		case DIV_INT:
+			printCall("div", e1, e2);
+			break;
+		case MOD:
+			printCall("get_mod", e1, e2);
+			break;
+		case SHIFT_LEFT:
+			printCall("shift_left", e1, e2);
+			break;
+		case SHIFT_RIGHT:
+			printCall("shift_right", e1, e2);
+			break;
+		default:
+			if (op.needsParentheses(args)) {
+				builder.append("(");
+				toString(op.getPrecedence(), expr.getE1(), op, expr.getE2());
+				builder.append(")");
+			} else {
+				toString(op.getPrecedence(), expr.getE1(), op, expr.getE2());
+			}
 		}
 	}
 

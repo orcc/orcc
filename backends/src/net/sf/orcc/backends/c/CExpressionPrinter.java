@@ -29,6 +29,8 @@
 package net.sf.orcc.backends.c;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
@@ -40,6 +42,29 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
  * 
  */
 public class CExpressionPrinter extends DefaultExpressionPrinter {
+
+	@Override
+	public void visit(BinaryExpr expr, Object... args) {
+		BinaryOp op = expr.getOp();
+		int currentPrec = op.getPrecedence();
+
+		int nextPrec;
+		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
+			// special case, for shifts always put parentheses because compilers
+			// often issue warnings
+			nextPrec = Integer.MIN_VALUE;
+		} else {
+			nextPrec = currentPrec;
+		}
+
+		if (op.needsParentheses(args)) {
+			builder.append("(");
+			toString(nextPrec, expr.getE1(), op, expr.getE2());
+			builder.append(")");
+		} else {
+			toString(nextPrec, expr.getE1(), op, expr.getE2());
+		}
+	}
 
 	@Override
 	public void visit(BoolExpr expr, Object... args) {
