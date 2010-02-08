@@ -1942,8 +1942,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	// end if
 
-	// end if
-
 	// if (mmco == 3 || mmco == 6)
 	read_SliceH_long_term_frame_idx_done: action ==> MMCO:[long_term_frame_idx]
 	guard
@@ -4183,7 +4181,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		read_Sps_chroma_format_idc > read_Sps_log2_max_frame_num_minus4 ;
 		read_SliceH_read_colour_plane_id > read_SliceH_frame_num ;
 		read_SliceH_pred_weight_table > read_SliceH_skip_pred_weight_table;
-		read_SliceH_difference_of_pic_nums_minus1_done > read_SliceH_long_term_frame_idx_done > read_SliceH_memory_management_control_operation_done;
+		read_SliceH_difference_of_pic_nums_minus1_done > read_SliceH_long_term_frame_idx_done > skip_read_SliceH_long_term_frame_idx_done > read_SliceH_memory_management_control_operation_done;
 		read_SliceH_sp_for_switch_flag_done > read_SliceH_slice_qs_delta_done ;
 		read_SliceH_slice_group_change_cycle > read_SliceH_skip_slice_group_change_cycle;
 		read_SliceD_mb_field_decoding_flag > read_SliceD_skip_mb_field_decoding_flag;
