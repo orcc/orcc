@@ -54,14 +54,18 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 	}
 
 	/**
-	 * Set the last label value used by the AbstractNode constructor
+	 * Set the label count to the given value. This function should be called
+	 * before visiting a procedure to ensure newly-created nodes do not have the
+	 * same labels as existing nodes.
+	 * 
 	 * @param labelCount
-	 *            Value of last label used
+	 *            new value of labelCount
+	 * @see #resetLabelCount()
 	 */
 	public static void setLabelCount(int labelCount) {
 		AbstractNode.labelCount = labelCount;
 	}
-	
+
 	private int label;
 
 	private Procedure procedure;

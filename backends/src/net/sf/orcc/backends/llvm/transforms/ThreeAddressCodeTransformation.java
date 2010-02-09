@@ -104,7 +104,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			type = expr.getE2().getType();
 			Expression e2 = (Expression) expr.getE2().accept(this, args);
 			type = binaryType;
-									
+
 			Location location = expr.getLocation();
 			BinaryOp op = expr.getOp();
 
@@ -209,10 +209,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				block = ((WhileNode) previous).getJoinNode();
 			}
 		} else {
-			// no previous block, create and add a new one with a new label
-			List<CFGNode> nodes = procedure.getNodes();
-			CFGNode lastNode = nodes.get(nodes.size() - 1);
-			AbstractNode.setLabelCount(lastNode.getLabel() + 1);
+			// no previous block, create and add a new one
 			block = new BlockNode(procedure);
 			it.add(block);
 		}
@@ -230,14 +227,15 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		it.previous();
 		assign.setValue(visitExpression(assign.getValue(), it, type));
 		it.next();
-		
-		//3AC does not support direct assignement
-		if (!(assign.getValue() instanceof BinaryExpr)){
+
+		// 3AC does not support direct assignement
+		if (!(assign.getValue() instanceof BinaryExpr)) {
 			Expression expr = assign.getValue();
 			Location location = expr.getLocation();
 			BinaryOp op = BinaryOp.PLUS;
-		
-			assign.setValue(new BinaryExpr(location, new IntExpr(0),op, expr, type));
+
+			assign.setValue(new BinaryExpr(location, new IntExpr(0), op, expr,
+					type));
 		}
 	}
 
@@ -292,17 +290,17 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		Expression value = store.getValue();
 		Variable target = store.getTarget().getVariable();
 		Type type = target.getType();
-		
-		//Check indexes
+
+		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
 		for (int i = 0; i < store.getIndexes().size(); i++) {
 			types.add(new IntType(new IntExpr(32)));
 		}
 		visitExpressions(store.getIndexes(), it, types);
 		it.previous();
-		
-		//Check store value
-		store.setValue(visitExpression(value, it,type));
+
+		// Check store value
+		store.setValue(visitExpression(value, it, type));
 		it.next();
 	}
 
@@ -340,6 +338,13 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	@Override
 	public void visitProcedure(Procedure procedure) {
 		tempVarCount = 1;
+
+		// set the label counter to prevent new nodes from having the same label
+		// as existing nodes
+		List<CFGNode> nodes = procedure.getNodes();
+		CFGNode lastNode = nodes.get(nodes.size() - 1);
+		AbstractNode.setLabelCount(lastNode.getLabel() + 1);
+
 		super.visitProcedure(procedure);
 	}
 
