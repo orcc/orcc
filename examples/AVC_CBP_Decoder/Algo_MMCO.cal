@@ -53,15 +53,13 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
 //Modified by Mederic Blestel and Endri Bezati IETR/INSA of Rennes
-//To work with ORCC 
+//Modified by Mickael Raulet IETR/INSA of Rennes
 
 
 actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> uint(size=5) RefList :  
   List(type:uint(size=4),size=NB_PIC) reordering_ref_list := [0 :for int s in Integers(0,NB_PIC-1)];
-  List(type:int,size=NB_PIC) short_term_list:= [0 :for int s in Integers(0,NB_PIC-1)];//frame_num  | pic_idx
-  List(type:int,size=NB_PIC) short_term:= [0 :for int s in Integers(0,NB_PIC-1)];//frame_num  | pic_idx
-  List(type:int,size=NB_PIC) pic_idx_list:= [0 :for int s in Integers(0,NB_PIC-1)];//frame_num  | pic_idx
-  List(type:int,size=NB_PIC) pic_idx:= [0 :for int s in Integers(0,NB_PIC-1)];//frame_num  | pic_idx
+  List(type:int,size=NB_PIC) short_term_list:= [0 :for int s in Integers(0,NB_PIC-1)];
+  List(type:int,size=NB_PIC) pic_idx_list:= [0 :for int s in Integers(0,NB_PIC-1)];
   List(type:int(size=5),size=NB_PIC) long_term_list := [-1 :for int s in Integers(0,NB_PIC-1)];
   List(type:uint(size = 5), size = 2*NB_PIC) RefListTab := [-1 :for int s in Integers(0,2*NB_PIC-1)];
   List(type:uint(size=4),size= 2*NB_PIC) RefListSent := [0: for int s in Integers(0, 2*NB_PIC-1)];
@@ -87,7 +85,9 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
   update_idx: action ==>
   var
     int(size=5) idx := -1, 
-    bool flag := false
+    bool flag := false,
+    List(type:int,size=NB_PIC) short_term,
+    List(type:int,size=NB_PIC) pic_idx
   do
     if long_term_count + short_term_count = num_ref_frames then
       //remove short
@@ -158,12 +158,12 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     pred := frame_num;
     index:= 0;
     if short_term_count != 0 then 
-    	 foreach int i in Integers (0, short_term_count - 1) do
-    	    reordering_ref_list[i] := pic_idx_list[i];
-    	 end
-    	 ListIndex :=  short_term_count;
+      foreach int i in Integers (0, short_term_count - 1) do
+        reordering_ref_list[i] := pic_idx_list[i];
+      end
+      ListIndex :=  short_term_count;
     else 
-    	reordering_ref_list := [0 :for int s in Integers(0,NB_PIC-1)];
+      reordering_ref_list := [0 :for int s in Integers(0,NB_PIC-1)];
     end 
     
     if long_term_count != 0 then 
@@ -335,58 +335,51 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
   guard
   	EndInitSentRefList = false and ( short_term_count + long_term_count != 0 )
   var 
-  	List(type:uint(size=4),size=2*NB_PIC) reflist:= [0: for int k in Integers(0,2*NB_PIC-1)],
-  	int ListIndex := 0
+    List(type:uint(size=4),size=2*NB_PIC) reflist:= [0: for int k in Integers(0,2*NB_PIC-1)],
+    int ListIndex := 0
   do
- 
     if short_term_count != 0 then 
-    	foreach int l in Integers( 0, short_term_count - 1 ) do
-    		reflist[l] := pic_idx_list[l];
-    	end
-    	ListIndex := short_term_count; 
+      foreach int l in Integers( 0, short_term_count - 1 ) do
+        reflist[l] := pic_idx_list[l];
+      end
+      ListIndex := short_term_count; 
     else 
-    	foreach int s in Integers( 0, short_term_count + long_term_count - 1 ) do
-    		reflist[s] := 0;
-    	end
-    	ListIndex := short_term_count + long_term_count;
+      foreach int s in Integers( 0, short_term_count + long_term_count - 1 ) do
+        reflist[s] := 0;
+      end
+      ListIndex := short_term_count + long_term_count;
     end
    
     if long_term_count != 0 then
-     
       foreach int i in Integers(0, long_term_max_idx) do
         if long_term_list[i] != -1 then 
-        	reflist[ListIndex + i] := long_term_list[i]; 
+          reflist[ListIndex + i] := long_term_list[i]; 
         end
       end
     end
-    
-    
     RefListSent[0] := short_term_count + long_term_count;
   	foreach int s in Integers(0, short_term_count + long_term_count - 1) do
-  		RefListSent[s + 1] := reflist[s];	
+  	  RefListSent[s + 1] := reflist[s];	
   	end
-  	
-  	
    	EndInitSentRefList := true;	
-   end
+  end
  
-   SendRefList: action ==> RefList:[ref]
-   guard
- 		EndInitSentRefList 
-   var
- 		uint(size = 5) ref
-   do
- 		ref := RefListSent[CounterRefListTab];
-		CounterRefListTab := CounterRefListTab + 1;
-   end		
-
+  SendRefList: action ==> RefList:[ref]
+  guard
+       EndInitSentRefList 
+  var
+    uint(size = 5) ref
+  do
+    ref := RefListSent[CounterRefListTab];
+	CounterRefListTab := CounterRefListTab + 1;
+  end		
 	 
   SendRefListDone: action ==>
   guard
 		( CounterRefListTab = short_term_count + long_term_count + 1 ) 
   do
-		CounterRefListTab := 0;
-		EndInitSentRefList := false;
+	CounterRefListTab := 0;
+	EndInitSentRefList := false;
   end	
   
   
@@ -402,26 +395,20 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     long_term_list   := [-1 :for int s in Integers(0,NB_PIC-1)];
   end
   
-  
   read_not_IDR_not_MMCO: action MMCO:[a , b]==>
   guard 
     a = 1 and b = 0
   end
   
-
   read_not_IDR_MMCO: action MMCO:[a , b]==>
   guard 
     a = 1 and b = 1
   end
   
-   
- 
   MMCO_opcode0: action MMCO:[ a ]==>
   guard 
     a = 0
   end
-  
-  
   
   // Mark a short term reference picture as "unused for reference "
   MMCO_opcode.v1: action MMCO:[ a, b ]==>
@@ -433,30 +420,28 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     pred := frame_num - b-1; 
     foreach int i in Integers( 0, short_term_count - 1 ) do
       if short_term_list[i] = pred then 
-      	idx := i;
+        idx := i;
       end
     end
 
     if ( idx = 0 ) then
-    	foreach int s in Integers( 0, short_term_count - 2 ) do
-    		short_term_list[s] := short_term_list[s + 1];
-    		pic_idx_list[s] := pic_idx_list[s + 1];
-    	end
+      foreach int s in Integers( 0, short_term_count - 2 ) do
+        short_term_list[s] := short_term_list[s + 1];
+    	pic_idx_list[s] := pic_idx_list[s + 1];
+      end
     else
-    	foreach int i in Integers(0, idx - 1) do
-    	 	short_term_list[i] := short_term_list[i];
-    	 	pic_idx_list[i] := pic_idx_list[i];
-    	end
-    	foreach int i in Integers(idx, short_term_count+long_term_count - 2) do
-    	    short_term_list[i] := short_term_list[i + 1];
-    	    pic_idx_list[i] := pic_idx_list[i + 1];
-    	end 
+      foreach int i in Integers(0, idx - 1) do
+        short_term_list[i] := short_term_list[i];
+        pic_idx_list[i] := pic_idx_list[i];
+      end
+      foreach int i in Integers(idx, short_term_count+long_term_count - 2) do
+        short_term_list[i] := short_term_list[i + 1];
+    	pic_idx_list[i] := pic_idx_list[i + 1];
+      end 
     end
     
     short_term_count := short_term_count-1;
   end
-  
-  
   
   // Mark a long term reference picture as "unused for reference "
   MMCO_opcode.v2: action MMCO:[ a, b ]==>
@@ -466,8 +451,6 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     long_term_list[b] := -1;
     long_term_count := long_term_count-1;
   end
-  
-  
   
   // Mark a short term reference picture as long term
   MMCO_opcode.v3: action MMCO:[a, b, c ]==>
@@ -482,24 +465,22 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     if long_term_list[c] = -1 then long_term_count := long_term_count+1; end
 	long_term_list[c] := pic_idx_list[idx];
     if ( idx = 0 ) then
-    	foreach int s in Integers( 0, short_term_count - 2 ) do
-    		short_term_list[s] := short_term_list[s + 1];
-    		pic_idx_list[s] := pic_idx_list[s + 1];
-    	end
+      foreach int s in Integers( 0, short_term_count - 2 ) do
+        short_term_list[s] := short_term_list[s + 1];
+    	pic_idx_list[s] := pic_idx_list[s + 1];
+      end
     else
-    	foreach int i in Integers(0, idx - 1) do
-    	 	short_term_list[i] := short_term_list[i];
-    	 	pic_idx_list[i] := pic_idx_list[i];
-    	end
-    	foreach int i in Integers(idx, short_term_count+long_term_count - 2) do
-    	    short_term_list[i] := short_term_list[i + 1];
-    	    pic_idx_list[i] := pic_idx_list[i + 1];
-    	end 
+      foreach int i in Integers(0, idx - 1) do
+        short_term_list[i] := short_term_list[i];
+        pic_idx_list[i] := pic_idx_list[i];
+      end
+      foreach int i in Integers(idx, short_term_count+long_term_count - 2) do
+        short_term_list[i] := short_term_list[i + 1];
+        pic_idx_list[i] := pic_idx_list[i + 1];
+      end 
     end
     short_term_count := short_term_count-1;
   end
-  
-  
   
   // Specify the maximum long term frame index
   MMCO_opcode.v4: action MMCO:[a, b ]==>
@@ -511,8 +492,6 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
       if long_term_list[i] != -1 then long_term_count := long_term_count-1; long_term_list[i] := -1; end
     end
   end
- 
- 
  
   // Mark all reference picture as "unused for reference "
   MMCO_opcode.v5: action MMCO:[a]==>
@@ -528,8 +507,6 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     long_term_max_idx := 0;
     long_term_list := [-1 :for int s in Integers(0,NB_PIC-1)];
   end
-  
-  
   
   // Mark the current picture as long term reference picture
   MMCO_opcode.v6: action MMCO:[a, b ]==>
@@ -558,8 +535,6 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     IDC3SendRefList	 							(IDC3SendRefList)				  		--> IDC3SendRefList;
     IDC3SendRefList	 							(IDC3SendRefListDone)				    --> check_IDR;
   
-  
-    
     check_IDR									(read_IDR)								--> update_idx;
     check_IDR									(read_not_IDR_not_MMCO)					--> update_idx;
     check_IDR									(read_not_IDR_MMCO)						--> MMCO_opcode;
@@ -572,6 +547,5 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
   	SendRefListDone     > SendRefList;
   	IDC3SendRefListDone > IDC3SendRefList;
   end
-  
 
 end
