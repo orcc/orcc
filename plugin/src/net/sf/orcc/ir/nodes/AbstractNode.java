@@ -53,8 +53,17 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 		labelCount = 0;
 	}
 
-	private int label;
+	/**
+	 * Set the last label value used by the AbstractNode constructor
+	 * @param labelCount
+	 *            Value of last label used
+	 */
+	public static void setLabelCount(int labelCount) {
+		AbstractNode.labelCount = labelCount;
+	}
 	
+	private int label;
+
 	private Procedure procedure;
 
 	protected AbstractNode(Location location, Procedure procedure) {

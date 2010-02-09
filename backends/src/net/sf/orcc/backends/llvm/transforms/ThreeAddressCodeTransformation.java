@@ -57,6 +57,7 @@ import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
@@ -208,7 +209,10 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				block = ((WhileNode) previous).getJoinNode();
 			}
 		} else {
-			// no previous block, create and add a new one
+			// no previous block, create and add a new one with a new label
+			List<CFGNode> nodes = procedure.getNodes();
+			CFGNode lastNode = nodes.get(nodes.size() - 1);
+			AbstractNode.setLabelCount(lastNode.getLabel() + 1);
 			block = new BlockNode(procedure);
 			it.add(block);
 		}
