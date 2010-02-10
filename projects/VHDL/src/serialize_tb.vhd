@@ -21,6 +21,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 -------------------------------------------------------------------------------
 
@@ -68,7 +69,7 @@ begin  -- architecture rtl
     serialize_in8_empty <= '1';
     wait for 100 ns;
     reset_n <= '1';
-    serialize_in8_data <= 10;
+    serialize_in8_data <= to_integer(to_signed(165, 8));
     wait for 100 ns;
     serialize_in8_empty <= '0';
     wait for 500 ns;
