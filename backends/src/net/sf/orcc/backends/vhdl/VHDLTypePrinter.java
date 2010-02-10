@@ -29,6 +29,7 @@
  */
 package net.sf.orcc.backends.vhdl;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.printers.DefaultTypePrinter;
@@ -47,19 +48,47 @@ import net.sf.orcc.ir.type.VoidType;
  */
 public class VHDLTypePrinter extends DefaultTypePrinter {
 
+	/**
+	 * Prints an integer with the given number of bits.
+	 * 
+	 * @param expr
+	 *            an expression that gives the number of bits
+	 */
 	private void printInt(Expression expr) {
 		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-		if (size<16)
-		  builder.append("integer range " + (int) (Math.pow(2,(size-1)) -1) + (" downto ") + (int) (-Math.pow(2,(size-1))+1));
-		else
-		  builder.append("integer range " + (int) (Math.pow(2,15)-1) + (" downto ") + (int) (-(Math.pow(2,15)-1)));
+		printInt(size);
 	}
-	
+
+	/**
+	 * Prints an integer with the given number of bits.
+	 * 
+	 * @param size
+	 *            an integer that gives the number of bits
+	 */
+	private void printInt(int size) {
+		// limits size to 16 bits
+		if (size >= 16) {
+			size = 16;
+		}
+
+		int bound = 1 << (size - 1);
+		builder.append("integer range ");
+		builder.append(bound - 1);
+		builder.append(" downto -");
+		builder.append(bound);
+	}
+
+	/**
+	 * Prints an unsigned integer with the given number of bits as an integer
+	 * with the given number of bits + 1.
+	 * 
+	 * @param expr
+	 *            an expression that gives the number of bits
+	 */
 	private void printUInt(Expression expr) {
 		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-		builder.append("integer range " + ((2^size-1)-1) + (" downto ") + ((- 2^size-1)+1));
-			}
-	
+		printInt(size + 1);
+	}
 
 	@Override
 	public void visit(BoolType type) {
@@ -79,7 +108,7 @@ public class VHDLTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(StringType type) {
-		builder.append("error char type");
+		throw new OrccRuntimeException("unsupported String type");
 	}
 
 	@Override
