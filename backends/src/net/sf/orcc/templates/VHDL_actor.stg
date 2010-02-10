@@ -211,7 +211,7 @@ $BlockNode(whileNode.joinNode)$
 
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure
-/////////////////////////////////////1/////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
 $procedure.nodes: {$(it.class.simpleName)(it)$}$
@@ -279,22 +279,6 @@ $actions: actionTest(action=it); separator="\n--\n"$
 
 >>
 
-scheduler(actions) ::= <<
-int $actorName$_scheduler() {
-	int res = 1;
-	int i = 0;
-  
-	while (res) {
-		res = 0;
-		$if(actions)$
-		$schedulingTest(actions)$
-		$endif$
-	}
-
-	return i;
-}
-
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
@@ -362,10 +346,6 @@ $endif$
 
 >>
 
-action_FSM(action) ::= <<
-isSchedulable_$action$
->>
-
 InitFSM(fsm) ::= <<
 $if(fsm)$
 FSM <= $fsm.initialState$;
@@ -385,6 +365,9 @@ actor(actorName, actor) ::= <<
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
+library work;
+use work.orcc_package.all;
 
 entity $actor.name$ is
   port (
