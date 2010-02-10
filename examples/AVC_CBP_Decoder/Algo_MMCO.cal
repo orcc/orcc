@@ -86,8 +86,7 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
   var
     int(size=5) idx := -1, 
     bool flag := false,
-    List(type:int,size=NB_PIC) short_term,
-    List(type:int,size=NB_PIC) pic_idx
+    int j
   do
     if long_term_count + short_term_count = num_ref_frames then
       //remove short
@@ -99,16 +98,14 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     end
     // add current picture
     if flag_long_term = 0 then
-	   foreach int i in Integers (0, short_term_count - 1) do
-       	short_term[i] := short_term_list[i];
-       	pic_idx[i] := pic_idx_list[i];
+	   j:=short_term_count - 1;
+       foreach int i in Integers (0, short_term_count - 1) do
+       	 short_term_list[j + 1] := short_term_list[j];
+       	 pic_idx_list[j + 1] := pic_idx_list[j];
+       	 j:= j - 1;
        end
        short_term_list[0] := frame_num;
 	   pic_idx_list[0]:= pic_curr_idx;
-       foreach int i in Integers (0, short_term_count - 1) do
-       	 short_term_list[i + 1] := short_term[i];
-       	 pic_idx_list[i + 1] := pic_idx[i];
-       end
        short_term_count := short_term_count +1;
     else
       if long_term_list[long_term_idx] = -1 then long_term_count := long_term_count +1; end
