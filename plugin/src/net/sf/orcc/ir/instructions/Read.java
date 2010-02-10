@@ -63,5 +63,4 @@ public class Read extends AbstractFifoInstruction {
 		return getTarget() + " = read(" + getPort() + ", " + getNumTokens()
 				+ ")";
 	}
-
 }

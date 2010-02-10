@@ -41,7 +41,7 @@ import net.sf.orcc.ir.type.TypeVisitor;
  * 
  */
 public interface Type {
-
+	
 	/**
 	 * boolean type
 	 */
@@ -96,7 +96,7 @@ public interface Type {
 	 * @return the list of dimensions of this type if it is a list
 	 */
 	public List<Integer> getDimensions();
-
+	
 	/**
 	 * Returns the type of this type.
 	 * 

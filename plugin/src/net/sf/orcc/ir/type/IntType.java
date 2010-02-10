@@ -80,7 +80,7 @@ public class IntType extends AbstractType {
 	public int getTypeOf() {
 		return INT;
 	}
-
+	
 	public void setSize(Expression size) {
 		this.size = size;
 	}

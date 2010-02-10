@@ -49,7 +49,7 @@ public interface Expression extends Localizable {
 	 * boolean expression
 	 */
 	public static final int BOOLEAN = 2;
-
+	
 	/**
 	 * integer expression
 	 */

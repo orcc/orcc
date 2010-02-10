@@ -121,9 +121,15 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 // Conversion instructions
 ///////////////////////////////////////////////////////////////////////////////
+
 CastStore(ty, value, pty, pointer, cast)::= <<
-$SextOp(result=value+"_ext", ty=ty, value=value, ty2=cast.elementType)$
-$StoreInstr(ty=cast.elementType, value=value+"_ext", pty=pty, pointer=pointer)$
+$if(cast.extended)$
+$SextOp(result=value+"_ext", ty=ty, value=value, ty2=pty)$
+$StoreInstr(ty=pty, value=value+"_ext", pty=pty, pointer=pointer)$
+$else$
+$TruncOp(result=value+"_trunc", ty=ty, value=value, ty2=pty)$
+$StoreInstr(ty=pty, value=value+"_trunc", pty=pty, pointer=pointer)$
+$endif$
 >>
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
@@ -217,7 +223,8 @@ $PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiPredecessors(phi.vars
 Read(read) ::= <<
 $LoadLocalPort(read)$
 $CallOp(result="%"+read.target+"_"+read.block.label, ty ="i8*", fnptrval="@getReadPtr", function_args="%struct.fifo_s* %local_"+read.target+read.block.label+", i32 "+read.numTokens)$
-$StoreOp(ty="i8*", value="%"+read.target+"_"+read.block.label, pty="i8*", pointer="%"+read.port)$
+$BitcastOp(result="%"+read.target+"_"+read.block.label+"_cast", ty="i8*", value="%"+read.target+"_"+read.block.label, ty2=ExprType(read.port)+"*")$
+$StoreOp(ty=ExprType(read.port)+"*", value="%"+read.target+"_"+read.block.label+"_cast", pty=ExprType(read.port)+"*", pointer="%"+read.port)$
 
 >>
 

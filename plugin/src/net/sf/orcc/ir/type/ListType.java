@@ -75,7 +75,7 @@ public class ListType extends AbstractType {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof UintType) {
+		if (obj instanceof ListType) {
 			ListType list = (ListType) obj;
 			return (size.equals(list.size) && type.equals(list.type));
 		} else {
@@ -121,5 +121,4 @@ public class ListType extends AbstractType {
 
 		this.type = type;
 	}
-
 }

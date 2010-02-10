@@ -119,10 +119,11 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 	public void setTarget(Variable target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
-
+	
 	@Override
 	public void setTargetSimple(Variable target) {
 		this.target = target;
 	}
+
 
 }

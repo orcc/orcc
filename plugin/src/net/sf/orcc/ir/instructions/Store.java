@@ -30,6 +30,7 @@ package net.sf.orcc.ir.instructions;
 
 import java.util.List;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
@@ -75,15 +76,18 @@ public class Store extends AbstractInstruction implements ValueContainer {
 	}
 
 	@Override
-	public Type getCast(){
+	public Cast getCast(){
 		Type expr = value.getType();
 		Type val = target.getVariable().getType();
-		if(expr != null){
-			if (!expr.equals(val)){
-				if (!expr.toString().equals(val.toString())){
-					return val;
-				}
-			}
+		
+		if (expr == null){
+			return null;	
+		}
+		
+		Cast cast = new Cast(expr, val);
+
+		if (cast.isExtended()||cast.isTrunced()){
+			return cast;
 		}
 		
 		return null;
