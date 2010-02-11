@@ -35,7 +35,7 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import java.io.File;
 
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.backends.options.AbstractOption;
+import net.sf.orcc.backends.options.BackendOption;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -63,6 +63,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
+ * This class defines the settings tab for a "run" configuration of
+ * "Orcc compilation".
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
@@ -70,14 +72,14 @@ import org.eclipse.swt.widgets.Text;
  */
 public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
-	AbstractOption[] backendSettings;
+	private BackendOption[] backendSettings;
 
 	private Combo comboBackend;
 
 	private Group groupOption;
-	
+
 	private Text textOutput;
-		
+
 	private void browseOutputFolder(Shell shell) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
 		dialog.setMessage("Select output folder:");
@@ -104,9 +106,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(data);
 		setControl(composite);
-		
-		//Initialize backendSettings
-		backendSettings = new AbstractOption[]{};
+
+		// Initialize backendSettings
+		backendSettings = new BackendOption[] {};
 
 		createControlBackend(font, composite);
 		createControlOption(font, composite);
@@ -123,9 +125,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		createControlOutputBackend(font, group);
 		createControlOutputFolder(font, group);
 	}
-	
 
-	
 	private void createControlOption(Font font, Composite parent) {
 		groupOption = new Group(parent, SWT.NONE);
 		groupOption.setFont(font);
@@ -135,11 +135,10 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		groupOption.setLayoutData(data);
 		groupOption.setLayout(new GridLayout(3, false));
 		groupOption.setVisible(false);
-		
-		updateOptionSelection();
 
+		updateOptionSelection();
 	}
-	
+
 	private void createControlOutputBackend(final Font font, final Group group) {
 		Label lbl = new Label(group, SWT.NONE);
 		lbl.setFont(font);
@@ -157,7 +156,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		for (String backend : factory.listBackends()) {
 			comboBackend.add(backend);
 		}
-		
+
 		comboBackend.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -208,7 +207,6 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 	}
 
-
 	@Override
 	public Image getImage() {
 		return OrccActivator.getImage("icons/orcc_run.gif");
@@ -222,9 +220,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			AbstractOption[] options = BackendFactory.getOption("INPUT_FILE");
-			
-			for (AbstractOption option : options){
+			BackendOption[] options = BackendFactory.getOption("INPUT_FILE");
+
+			for (BackendOption option : options) {
 				String value = configuration.getAttribute(INPUT_FILE, "");
 				option.setValue(value);
 			}
@@ -235,9 +233,8 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			value = configuration.getAttribute(BACKEND, "");
 			int index = comboBackend.indexOf(value);
 			comboBackend.select(index);
-			
+
 			updateOptionSelection();
-			
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -245,13 +242,12 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		for (AbstractOption backendSetting : backendSettings){
+		for (BackendOption backendSetting : backendSettings) {
 			if (!backendSetting.isValid()) {
 				setErrorMessage("Required backend options are not specified");
 				return false;
 			}
 		}
-
 
 		String value = textOutput.getText();
 		if (value.isEmpty()) {
@@ -276,7 +272,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		for (AbstractOption backendSetting : backendSettings){
+		for (BackendOption backendSetting : backendSettings) {
 			backendSetting.performApply(configuration);
 		}
 
@@ -297,12 +293,10 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(BACKEND, "");
 	}
 
-	private void updateOptionSelection(){
-
+	private void updateOptionSelection() {
 		int index = comboBackend.getSelectionIndex();
-	
+
 		if (index != -1) {
-				
 			String value = comboBackend.getItem(index);
 			Composite parent = groupOption.getParent();
 			Font font = groupOption.getFont();
@@ -314,23 +308,22 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 			groupOption.setLayoutData(data);
 			groupOption.setVisible(true);
-			
+
 			groupOption.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent e) {
 					updateLaunchConfigurationDialog();
-					
+
 				}
 			});
-			
+
 			backendSettings = BackendFactory.getOptions(value);
-			for (AbstractOption backendSetting : backendSettings){
+			for (BackendOption backendSetting : backendSettings) {
 				backendSetting.show(font, groupOption);
 			}
-		}else{
+		} else {
 			groupOption.setVisible(false);
 		}
-		
 	}
 
 }

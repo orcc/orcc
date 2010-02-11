@@ -48,7 +48,7 @@ public abstract class AbstractBackend implements IBackend {
 	/**
 	 * Map containing a list of options.
 	 */
-	protected static Map<String, String> options;
+	protected Map<String, String> options;
 
 	/**
 	 * Fifo size used in backend.
@@ -59,13 +59,13 @@ public abstract class AbstractBackend implements IBackend {
 	 * Path of the network.
 	 */
 	protected String path;
-	
+
 	/**
 	 * Here should go the things to do after the instantiation.
 	 */
 	protected void afterInstantiation(Network network) throws OrccException {
 	}
-	
+
 	/**
 	 * Here should go the things to do before the instantiation.
 	 */
@@ -127,7 +127,8 @@ public abstract class AbstractBackend implements IBackend {
 	 * @param options
 	 *            Map containing options and their values.
 	 */
-	public void setOptions(Map<String, String> options){
-		AbstractBackend.options = options;
+	public void setOptions(Map<String, String> options) {
+		this.options = options;
 	}
+
 }

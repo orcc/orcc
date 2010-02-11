@@ -61,42 +61,40 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-
 /**
- *
- *  Class that create input file interface into backend options.
- *   
+ * 
+ * Class that create input file interface into backend options.
+ * 
  * @author Jérôme Gorin
  * 
  */
-public class InputFileOption implements ModifyListener, AbstractOption  {
-	
-	
+public class InputFileOption implements ModifyListener, BackendOption {
+
 	/**
 	 * Button browse connected with the option
 	 */
 	private Button buttonBrowse;
-	
+
 	/**
 	 * Text connected with the interface
 	 */
 	private String caption;
-	
+
 	/**
 	 * Extension of files selectable
 	 */
 	private String extension;
-	
+
 	/**
 	 * Font connected with the option
 	 */
 	private Font font;
-	
+
 	/**
 	 * group connected with the option
 	 */
 	private Group group;
-	
+
 	/**
 	 * Label connected with the option
 	 */
@@ -106,72 +104,71 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 	 * Name of the option
 	 */
 	private String option;
-	
+
 	/**
 	 * indicate if this option is mandatory
 	 */
 	private boolean required;
-	
+
 	/**
 	 * Text connected with the option
 	 */
 	private Text text;
-	
+
 	/**
 	 * Value of the option
 	 */
 	private String value;
 
 	/**
-	 * BrowseFileOption constructor 
+	 * BrowseFileOption constructor
 	 * 
 	 * @param option
-	 *       Name of the option
+	 *            Name of the option
 	 * @param caption
-	 *       Caption associated to input file interface
+	 *            Caption associated to input file interface
 	 * @param required
-	 *       Indicate if this information is mandatory 
+	 *            Indicate if this information is mandatory
 	 * @param defaultVal
-	 *       Default value text of the Text
+	 *            Default value text of the Text
 	 * @param extension
-	 *       File extension for restricting selection
+	 *            File extension for restricting selection
 	 */
-	public InputFileOption(String caption, String defaultVal, String extension){
-		this.option = new String ("INPUT_FILE");
+	public InputFileOption(String caption, String defaultVal, String extension) {
+		this.option = new String("INPUT_FILE");
 		this.caption = caption;
 		this.required = true;
 		this.value = defaultVal;
 		this.extension = extension;
 	}
 
-
 	/**
 	 * Creates the interface of the BrowseFile text into the given group
 	 * 
 	 * @param font
-	 *       Font used in the interface
+	 *            Font used in the interface
 	 * @param group
-	 *       Group to add the input file interface
+	 *            Group to add the input file interface
 	 */
-	private void createInputFile(){
+	private void createInputFile() {
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		data.horizontalSpan = 3;
 		group.setLayoutData(data);
-		
+
 		lbl = new Label(group, SWT.NONE);
 		lbl.setFont(font);
 		lbl.setText(caption);
-		
+
 		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		lbl.setLayoutData(data);
-	
+
 		text = new Text(group, SWT.BORDER | SWT.SINGLE);
 		text.setFont(font);
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		text.setLayoutData(data);
 		text.setText(value);
 		text.addModifyListener(this);
-	
+
 		Button buttonBrowse = new Button(group, SWT.PUSH);
 		buttonBrowse.setFont(font);
 		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
@@ -188,24 +185,24 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 
 	/**
 	 * Dispose option elements
-	 *
+	 * 
 	 */
 	@Override
 	public void dispose() {
-		if (text != null){
+		if (text != null) {
 			text.dispose();
 			buttonBrowse.dispose();
 			lbl.dispose();
 		}
 	}
-	
+
 	/**
 	 * Returns an IFile instance of the focused file in text
-	 *
-	 * @param text
-	 * 		Text containing the file 
 	 * 
-	 * @return an IFile instance of focused file 
+	 * @param text
+	 *            Text containing the file
+	 * 
+	 * @return an IFile instance of focused file
 	 */
 	private IFile getFileFromText(Text text) {
 		String value = text.getText();
@@ -215,10 +212,10 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 
 		return file;
 	}
-	
+
 	/**
 	 * Returns the option name
-	 *
+	 * 
 	 * @return a String containing the option name
 	 */
 	public String[] getOption() {
@@ -226,10 +223,10 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 		options.add(option);
 		return options.toArray(new String[] {});
 	}
-	
+
 	/**
 	 * Returns the value of the option
-	 *
+	 * 
 	 * @return a String containing the value
 	 */
 	public String[] getValue() {
@@ -237,14 +234,14 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 		values.add(value);
 		return values.toArray(new String[] {});
 	}
-	
+
 	/**
 	 * Creates the interface of the Input File button
 	 * 
 	 * @param shell
-	 *       Instance of the windows manager
+	 *            Instance of the windows manager
 	 * @param text
-	 *       Text of input file interface
+	 *            Text of input file interface
 	 */
 	private void inputFile(Shell shell, Text text) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
@@ -268,14 +265,15 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 				if (selection.length == 1) {
 					if (selection[0] instanceof IFile) {
 						IFile file = (IFile) selection[0];
-						if (extension!= null){
+						if (extension != null) {
 							if (file.getFileExtension().equals(extension)) {
 								return new Status(IStatus.OK,
 										OrccActivator.PLUGIN_ID, "");
 							} else {
 								return new Status(IStatus.ERROR,
 										OrccActivator.PLUGIN_ID,
-										"Selected file must be an "+extension+" file.");
+										"Selected file must be an " + extension
+												+ " file.");
 							}
 						} else {
 							return new Status(IStatus.OK,
@@ -296,76 +294,69 @@ public class InputFileOption implements ModifyListener, AbstractOption  {
 			text.setText(file.getLocation().toOSString());
 		}
 	}
-	
 
 	/**
 	 * Tests if the option is valid
-	 *
+	 * 
 	 * @return a boolean representing the validation of the option
 	 */
-	public boolean isValid(){
-		if (required){
+	public boolean isValid() {
+		if (required) {
 			return !value.equals("");
 		}
-		
-		 return true;
-	}
 
+		return true;
+	}
 
 	/**
 	 * Modify listener on events of text
-	 *
+	 * 
 	 * @param e
-	 *       a ModifyEvent containing event from the text
-	 *
+	 *            a ModifyEvent containing event from the text
+	 * 
 	 */
 	@Override
 	public void modifyText(ModifyEvent e) {
 		IFile file = getFileFromText(text);
-		if (!file.toString().equals("")){
+		if (!file.toString().equals("")) {
 			value = text.getText();
 		}
-		
+
 		group.redraw();
 	}
 
-
 	/**
-	 * Apply option to the specificied ILaunchConfigurationWorkingCopy
-	 * 	 * @param configuration
-	 *            ILaunchConfigurationWorkingCopy of configuration tab
+	 * Apply option to the specificied ILaunchConfigurationWorkingCopy * @param
+	 * configuration ILaunchConfigurationWorkingCopy of configuration tab
 	 */
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(INPUT_FILE, value);
 	}
 
-
 	@Override
 	public void setOption(String option) {
 		this.option = option;
 	}
-
 
 	@Override
 	public void setValue(String value) {
 		this.value = value;
 	}
 
-
 	/**
 	 * Show the interface on the selected group
 	 * 
 	 * @param font
-	 *       Font used in the interface
+	 *            Font used in the interface
 	 * @param group
-	 *       Group to add the input file interface
+	 *            Group to add the input file interface
 	 */
 	@Override
 	public void show(Font font, Group group) {
 		this.font = font;
 		this.group = group;
-		
+
 		createInputFile();
 	}
 

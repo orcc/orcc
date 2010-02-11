@@ -33,69 +33,68 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Group;
 
 /**
- *  Abstract implementation of backend's option.
- *
+ * This interface defines an option of a back-end.
+ * 
  * @author Jérôme Gorin
  * 
  */
-public interface AbstractOption {
-	
+public interface BackendOption {
+
 	/**
 	 * Dispose option elements
 	 */
 	public void dispose();
-	
+
 	/**
 	 * Returns the option name
-	 *
+	 * 
 	 * @return a String containing the option name
 	 */
 	public String[] getOption();
-	
+
 	/**
 	 * Returns the value of the option
-	 *
+	 * 
 	 * @return a String containing the value
 	 */
 	public String[] getValue();
-	
+
 	/**
 	 * Tests if the option is valid
-	 *
+	 * 
 	 * @return a boolean representing the validation of the option
 	 */
 	public boolean isValid();
-	
+
 	/**
-	 * Apply option to the specificied ILaunchConfigurationWorkingCopy
-	 * 	 * @param configuration
-	 *            ILaunchConfigurationWorkingCopy of configuration tab
+	 * Apply option to the specificied ILaunchConfigurationWorkingCopy * @param
+	 * configuration ILaunchConfigurationWorkingCopy of configuration tab
 	 */
 	public void performApply(ILaunchConfigurationWorkingCopy configuration);
-	
+
 	/**
 	 * Set the option name
-	 *
+	 * 
 	 * @param option
-	 *		String containing the option name
+	 *            String containing the option name
 	 */
 	public void setOption(String option);
-	
+
 	/**
 	 * Set the value of the option
-	 *
+	 * 
 	 * @param value
-	 *		String containing the value
+	 *            String containing the value
 	 */
 	public void setValue(String value);
-	
+
 	/**
 	 * Show interfaces on the selected group
 	 * 
 	 * @param font
-	 *       Font used in the interface
+	 *            Font used in the interface
 	 * @param group
-	 *       Group to add the input file interface
+	 *            Group to add the input file interface
 	 */
 	public void show(Font font, Group group);
 

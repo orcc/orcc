@@ -109,4 +109,5 @@ public class JavaBackendImpl extends AbstractBackend {
 		String outputName = outputPath + "Network_" + name + ".java";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
+
 }

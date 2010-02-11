@@ -46,7 +46,7 @@ public interface IBackend {
 	 * @throws Exception
 	 */
 	public void generateCode(String fileName, int fifoSize) throws Exception;
-	
+
 	/**
 	 * Set options for a backend.
 	 * 
