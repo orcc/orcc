@@ -50,6 +50,14 @@ AddOp(result, ty, op1, op2) ::= <<
 $result$ = add $ty$ $op1$, $op2$
 >>  
 
+AndOp(result, ty, op1, op2) ::= <<
+$result$ = and $ty$ $op1$, $op2$
+>>
+
+IcmpOp(result, cond, ty, op1, op2) ::= <<
+$result$ = icmp $cond$ $ty$ $op1$, $op2$
+>>
+ 
 GetElementPtrOp(result, pty, ptrval, idx) ::= <<
 $result$ = getelementptr $pty$* $ptrval$, i32 0 $if(idx)$
 , $indexes(idx)$
@@ -83,6 +91,10 @@ $else$
 ret void
 $endif$
 >>  
+
+SwitchOp(intty, value, defaultdest, labelpairs) ::= <<
+switch $intty$ $value$, label $defaultdest$ [ $labelpairs$ ]
+>>
 
 CallOp(result, tail, cconv, ret_attrs, ty, fnty, fnptrval, function_args, fn_attrs) ::= <<
 $if(result)$$result$ = $endif$$if(tail)$ [tail] $endif$call$if(cconv)$ [cconv] $endif$$if(ret_attrs)$ [ret_attrs] $endif$ $ty$$if(fnty)$ [<fnty>*] $endif$ $fnptrval$ ($if(function_args)$$function_args$$endif$) $if(fn_attrs)$ [fn_attrs] $endif$
@@ -121,6 +133,24 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 // Conversion instructions
 ///////////////////////////////////////////////////////////////////////////////
+
+states(transitions) ::= <<
+
+$transitions:{$\t$i32 $it.sourceState.index$, label %s_$it.sourceState$$\n$}$
+>>
+
+switch(fsm, transitions) ::= <<
+	$LoadOp(result="%"+fsm, ty="i32", pointer="@"+fsm)$
+	$SwitchOp(intty="i32", value="%"+fsm, defaultdest="%default", labelpairs=states(transitions))$
+$transitions: {
+s_$it.sourceState$:
+	$CallOp(result="%"+it.sourceState+"_res", ty="i1", fnptrval="@"+it.sourceState+"_state_scheduler")$
+	$BrOp(cond="%"+it.sourceState+"_res", iftrue="%inc_i", iffalse="%return")$
+}$
+default:
+	$BrOp(dest="%return")$
+
+>>
 
 CastStore(ty, value, pty, pointer, cast)::= <<
 $if(cast.extended)$
@@ -362,25 +392,168 @@ $nodes: {$(it.class.simpleName)(it)$}$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern, action) ::= <<
+$if(rest(pattern.keys))$
+$AddOp(result="%"+action+"_roomTest", ty="i1", op1="0", op2="0")$
+$trunc(pattern.keys):{port|
+	$HasRoom(result=action+i+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$
+	$AndOp(result="%"+action+i, ty="i1", op1=action+i+"_room", op2="%"+action+"_roomTest")$
+}$
+$last(pattern.keys):{port|
+	$HasRoom(result=action+i+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$
+	$AndOp(result="%"+action+"_room", ty="i1", op1=action+i+"_room", op2="%"+action+"_roomTest")$
+}$
+
+$else$
 $pattern.keys:{port|
-	$HasRoom(result=it+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$}; separator=" && "$ >>
+	$HasRoom(result=action+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$}$
+$endif$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler with FSM
+///////////////////////////////////////////////////////////////////////////////
+schedulerFSM(actions, fsm) ::= <<
+@_FSM_state = internal global i32 $fsm.initialState.index$
+
+$fsm.transitions: stateScheduler(transition=it); separator="\n"$
+
+$if(actions)$
+define i32 @outside_FSM_scheduler() {
+entry:
+	$AllocaOp(result="%i", type="i32")$ 
+	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	$BrOp(dest="%bb")$
+	
+bb:  
+$schedulingTest(actions)$
+	$BrOp(dest="%return")$
+
+inc_i:
+  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
+  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  $BrOp(dest="%bb")$
+
+return:
+	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	$RetOp(type="i32", value="%i_ret")$
+}
+$endif$
+
+define i32 @$actorName$_scheduler() {
+entry:
+	$AllocaOp(result="%i", type="i32")$ 
+	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	$BrOp(dest="%bb")$
+
+bb:
+$if(actions)$
+	$CallOp(result="%outside_FSM_res", ty="i32", fnptrval="@outside_FSM_scheduler")$
+	$IcmpOp(result="%outside_FSM", cond="sgt", ty="i32", op1="%outside_FSM_res", op2="0")$
+	$BrOp(cond="%outside_FSM", iftrue="%inc_i", iffalse="%fsm_state")$
+
+fsm_state:
+
+$endif$
+$switch(fsm="_FSM_state", transitions=fsm.transitions)$
+
+
+inc_i:
+  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
+  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  $BrOp(dest="%bb")$
+
+return:
+	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	$RetOp(type="i32", value="%i_ret")$
+}
+
+>>
+
+stateScheduler(transition) ::= <<
+define internal i1 @$transition.sourceState$_state_scheduler() {
+entry:
+$schedulingTestState(nextStates=transition.nextStateInfo)$	$BrOp(dest="%sched_nok")$
+
+sched_ok:
+	$RetOp(type="i1", value="1")$
+
+sched_nok:	
+	$RetOp(type="i1", value="0")$
+}
+
+>>
+
+schedulingTestState(nextStates) ::= <<
+$nextStates: actionTestState(nextState=it)$
+>>
+
+actionTestState(nextState) ::= <<
+	$CallOp(result="%"+nextState.action, ty="i1", fnptrval="@isSchedulable_"+nextState.action)$
+	$BrOp(cond="%"+nextState.action, iftrue="%fire_"+nextState.action, iffalse="%skip_"+nextState.action)$
+
+fire_$nextState.action$:
+$if(nextState.action.outputPattern)$
+$actionTestStateOutputs(nextState)$
+$else$
+$actionCallState(nextState)$
+
+	
+$endif$
+
+skip_$nextState.action$:
+
+>>
+
+actionTestStateOutputs(nextState) ::= <<
+$outputPattern(pattern=nextState.action.outputPattern, action=nextState.action)$
+	$BrOp(cond="%"+nextState.action+"_room", iftrue="%hasroom_"+nextState.action, iffalse="%skip_"+nextState.action)$
+
+hasroom_$nextState.action$:
+$actionCallState(nextState)$
+	
+>>
+
+actionCallState(nextState) ::= <<
+	$CallOp(ty="void", fnptrval=nextState.action.body)$
+	$StoreOp(ty="i32", value=nextState.targetState.index, pty="i32", pointer="@_FSM_state")$
+	$BrOp(dest="%sched_ok")$
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 ///////////////////////////////////////////////////////////////////////////////
 
-actionCall(action) ::= <<
-	$CallOp(ty="void", fnptrval=action.body)$
+scheduler(actions, iterator) ::= <<
+define i32 @$actorName$_scheduler() {
+entry:
+	$AllocaOp(result="%i", type="i32")$ 
+	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	$BrOp(dest="%bb")$
+	
+bb:  
+$if(actions)$
+$schedulingTest(actions=actions)$
+$endif$
+	$BrOp(dest="%return")$
+
+inc_i:
+  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
+  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  $BrOp(dest="%bb")$
+
+return:
+	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	$RetOp(type="i32", value="%i_ret")$
+}
+
 >>
 
-actionTestOutputs(action) ::= <<
-$outputPattern(pattern=action.outputPattern, action=action)$
-	$BrOp(cond="%"+action+"_room", iftrue="%hasroom_"+action, iffalse="%skip_"+action)$
-
-hasroom_$action$:
-$actionCall(action)$
-	$BrOp(dest="%inc_i")$
-	
+schedulingTest(actions) ::= <<
+$actions: actionTest(action=it)$
 >>
 
 actionTest(action) ::= <<
@@ -397,6 +570,20 @@ $endif$
 	
 skip_$action$:
 
+>>
+
+actionCall(action) ::= <<
+	$CallOp(ty="void", fnptrval=action.body)$
+>>
+
+actionTestOutputs(action) ::= <<
+$outputPattern(pattern=action.outputPattern, action=action)$
+	$BrOp(cond="%"+action+"_room", iftrue="%hasroom_"+action, iffalse="%skip_"+action)$
+
+hasroom_$action$:
+$actionCall(action)$
+	$BrOp(dest="%inc_i")$
+	
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -655,145 +842,13 @@ skip_$action$:
 
 >>
 
-schedulingTest(actions, iterator) ::= <<
-$actions: actionTest(action=it)$
->>
-
 outside_FSM_schedulingTest(actions, iterator) ::= <<
 $actions: outside_FSM_actionTest(action=it, iterator = iterator)$
 >>
 
-scheduler(actions, iterator) ::= <<
-define i32 @$actorName$_scheduler() {
-entry:
-	$AllocaOp(result="%i", type="i32")$ 
-	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
-	$BrOp(dest="%bb")$
-	
-bb:  
-$if(actions)$
-$schedulingTest(actions=actions, iterator = iterator)$
-$endif$
-	$BrOp(dest="%return")$
-
-inc_i:
-  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
-  $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
-  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
-  $BrOp(dest="%bb")$
-
-return:
-	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
-	$RetOp(type="i32", value="%i_ret")$
-}
-
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
-
-actionCallState(nextState) ::= <<
-	call void @$nextState.action$()
-	store i32 $nextState.targetState.index$, i32* @_FSM_state
-	ret i1 1
-
->>
-
-actionTestState(nextState, br, iterator) ::= <<
-
-$if(nextState.action.outputPattern)$
-	%sched_$nextState.action$ = call i1 @isSchedulable_$nextState.action$()
-	br i1 %sched_$nextState.action$, label %$nextState.action$, label %$br$
-
-$nextState.action$:
-$first(nextState.action.outputPattern.keys):{port|$outputPattern(pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator)$}$ $rest(nextState.action.outputPattern.keys):{port|$outputPattern(pattern=port, token = nextState.action.outputPattern.(port), iterator = iterator.nextNodeIndex)$}$
-	br i1 %$iterator.nextNodeIndex.lastIndex$, label %n_$nextState.action$, label %$br$
-
-n_$nextState.action$:
-$actionCallState(nextState)$
-$br$:
-$else$
-	%sched_$nextState.action$ = call i1 @isSchedulable_$nextState.action$()
-	br i1 %sched_$nextState.action$, label %$nextState.action$, label %$br$
-
-$nextState.action$:
-$actionCallState(nextState)$
-
-$br$:
-$endif$
-
->>
-
-schedulingTestState(nextStates, iterator) ::= <<
-$trunc(nextStates): actionTestState(nextState=it, br = "bb"+i0, iterator = iterator)$
-$last(nextStates): actionTestState(nextState=it, br = "return", iterator = iterator)$
->>
-
-stateScheduler(transition, iterator) ::= <<
-define internal i1 @$transition.sourceState$_state_scheduler() {
-entry:
-$schedulingTestState(nextStates=transition.nextStateInfo, iterator = iterator.init)$
-	ret i1 0
-}
-
->>
-
-switch(transitions) ::= <<
-	%_FSM_state = load i32* @_FSM_state
-	switch i32 %_FSM_state, label %default [
-$transitions:{$\t\t$i32 $it.sourceState.index$, label %s_$it.sourceState$$\n$}$$\t$]
-$transitions: {
-s_$it.sourceState$:
-	%$it.sourceState$_res = call i1 @$it.sourceState$_state_scheduler();
-	br i1 %$it.sourceState$_res, label %bb, label %return
-}$
-default:
-	br label %return
-
->>
-
-schedulerFSM(actions, fsm, iterator) ::= <<
-
-@_FSM_state = internal global i32 $fsm.initialState.index$
-
-$if(actions)$
-define i1 @outside_FSM_scheduler() {
-entry:
-	$outside_FSM_schedulingTest(actions=actions, iterator = iterator)$
-	ret i1 0
-}
-
-
-$endif$
-$fsm.transitions: stateScheduler(transition=it, iterator = iterator); separator="\n"$
-define i32 @$actorName$_scheduler() {
-entry:
-	%i = alloca i32
-	store i32 0, i32* %i
-	br label %bb
-	
-bb:  
-$if(actions)$
-	%out = call i1 @outside_FSM_scheduler()
-	br i1 %out, label %bb1, label %bb2
-
-bb1:
-	%0 = load i32* %i
-	%1 = add i32 %0, 1
-	store i32 %1, i32* %i
-	br label %bb
-	
-bb2:
-$switch(fsm.transitions)$
-$else$ $switch(fsm.transitions)$
-$endif$
-
-return:
-	%i_ret = load i32* %i
-	ret i32 %i_ret
-}
-
->>
+///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
