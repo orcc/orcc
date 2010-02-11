@@ -29,27 +29,27 @@ $value : {[]} $
 
 // a variable definition
 // called by "function parameter", or "state variable with value"
-vardef(var) ::= <<
-$var.type$$listDim(var.size)$ $var.name$
+variableDeclaration(variable) ::= <<
+$variable.type$$listDim(variable.type.dimensions)$ $variable.name$
 >>
 
 // a variable definition with initialization
 // called by "local variable", or "state variable with no value"
-vardefInit(var) ::= <<
-$if(var.isPort)$
-$var.type$[] $var.name$ = new $var.type$$listSize(var.size)$
+variableDeclarationInit(variable) ::= <<
+$if(variable.port)$
+$variable.type$[] $variable$ = new $variable.type$$listSize(variable.type.dimensions)$
 $else$
-$var.type$$listDim(var.size)$ $var.name$$if(var.size)$
- = new $var.type$$listSize(var.size)$
+$variable.type$$listDim(variable.type.dimensions)$ $variable$$if(variable.type.dimensions)$
+ = new $variable.type$$listSize(variable.type.dimensions)$
 $endif$
 $endif$>>
 
 // a state variable
-stateVar(vardef, value) ::= <<
-$if(value)$
-private $vardef(vardef)$ = $value$;$\n\n$
+stateVar(variable) ::= <<
+$if(variable.constantValue)$
+private $variableDeclaration(variable)$ = $variable.constantValue$;$\n\n$
 $else$
-private $vardefInit(vardef)$;$\n\n$
+private $variableDeclarationInit(variable)$;$\n\n$
 $endif$
 >>
 
@@ -58,26 +58,26 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 // hasTokens node
-hasTokensNode(var, actorName, fifoName, numTokens) ::= <<
-$var$ = fifo_$fifoName$.hasTokens($numTokens$);
+HasTokens(hasTokens) ::= <<
+$hasTokens.target$ = fifo_$hasTokens.port$.hasTokens($hasTokens.numTokens$);
 
 >>
 
 // peek node
-peekNode(var, actorName, fifoName, numTokens) ::= <<
-fifo_$fifoName$.peek($var$);
+Peek(peek) ::= <<
+fifo_$peek.port$.peek($peek.target$);
 
 >>
 
 // read node
-readNode(var, actorName, fifoName, numTokens) ::= <<
-fifo_$fifoName$.get($var$);
+Read(read) ::= <<
+fifo_$read.port$.get($read.target$);
 
 >>
 
 // write node
-writeNode(var, actorName, fifoName, numTokens) ::= <<
-fifo_$fifoName$.put($var$);
+Write(write) ::= <<
+fifo_$write.port$.put($write.target$);
 
 >>
 
@@ -85,14 +85,14 @@ fifo_$fifoName$.put($var$);
 // Procedure and actions
 ///////////////////////////////////////////////////////////////////////////////
 
-proc(name, type, parameters, locals, nodes) ::= <<
+procedure(procedure) ::= <<
 
-private $type$ $name$($parameters:vardef(); wrap, anchor, separator=", "$) {
-$if(locals)$
-	$locals: {$vardefInit(it)$;$\n$}$
+private $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
+$if(procedure.locals.list)$
+	$procedure.locals.list: {$variableDeclarationInit(it)$;$\n$}$
 
 $endif$
-	$nodes$}
+	$procedure.nodes: {$(it.class.simpleName)(it)$}$}
 
 >>
 
@@ -240,10 +240,9 @@ public int schedule() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(name, inputs, outputs, stateVars, procs,
-      actions, initializes, scheduler, initialize) ::= <<
+actor(actorName, actor) ::= <<
 /**
- * Generated from "$name$"
+ * Generated from "$actorName$"
  */
 package net.sf.orcc.generated;
 
@@ -253,52 +252,52 @@ import java.util.Map;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.actors.IActor;
 
-public class Actor_$name$ implements IActor {
+public class Actor_$actorName$ implements IActor {
 
 	private Map<String, IntFifo> fifos;
 
 	// Input FIFOs
-	$inputs: fifo()$
+	$actor.inputs.list: fifo(it)$
 	// Output FIFOs
-	$outputs: fifo()$
+	$actor.outputs.list: fifo(it)$
 	// State variables of the actor
-	$stateVars$
+	$actor.stateVars.list: stateVar(it)$
 	
-	public Actor_$name$() {
+	public Actor_$actorName$() {
 		fifos = new HashMap<String, IntFifo>();
 	}
 	
 	// Functions/procedures
-	$procs$
+	$actor.procs.list: procedure(it)$
 	// Actions
-	$actions$
-$if(initializes)$
+	$actor.actions: action(it)$
+$if(actor.initializes)$
 	// Initializes
-	$initializes$
+	$actor.initializes: action(it)$
 $endif$
 	@Override
 	public void initialize() {
-$if(initialize)$
+$if(actor.initializes)$
 		boolean res = true;
 		int i = 0;
 
-		$schedulingTest(initialize)$
+		$schedulingTest(actor.initializes)$
 $endif$
 	}
 
 	@Override
 	public void setFifo(String portName, IntFifo fifo) {
-		$inputs : setFifo()$$outputs : setFifo()${
+		$actor.inputs.list: setFifo()$$actor.outputs.list: setFifo()${
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
 	}
 
 	// Action scheduler
-$if(scheduler.fsm)$
-	$schedulerFSM(actions=scheduler.actions, fsm=scheduler.fsm)$
+$if(actor.actionScheduler.fsm)$
+	$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 $else$
-	$scheduler(scheduler.actions)$
+	$scheduler(actor.actionScheduler.actions)$
 $endif$
 
 }
