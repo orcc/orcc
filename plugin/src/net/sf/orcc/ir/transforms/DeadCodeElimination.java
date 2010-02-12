@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -36,25 +35,60 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 
 /**
- * This class defines a very simple Dead Global Elimination.
+ * This class defines a very simple Dead Code Elimination.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class DeadCodeElimination extends AbstractActorTransformation {
 
-	private void addNodes(ListIterator<CFGNode> it, List<CFGNode> nodes) {
+	private void addNodes(ListIterator<CFGNode> it, List<CFGNode> nodes,
+			BlockNode join, int index) {
 		it.previous();
 		it.remove();
 
 		for (CFGNode node : nodes) {
 			it.add(node);
+		}
+
+		it.add(join);
+		replacePhis(join, index);
+	}
+
+	private void replacePhis(BlockNode joinNode, int index) {
+		ListIterator<Instruction> it = joinNode.listIterator();
+		while (it.hasNext()) {
+			Instruction instruction = it.next();
+			if (instruction instanceof PhiAssignment) {
+				PhiAssignment phi = (PhiAssignment) instruction;
+
+				LocalVariable target = phi.getTarget();
+				LocalVariable source = (LocalVariable) phi.getVars().get(index)
+						.getVariable();
+
+				// translate the phi to an assign
+				Use localUse = new Use(source);
+				VarExpr expr = new VarExpr(localUse);
+				Assign assign = new Assign(new Location(), target, expr);
+
+				it.set(assign);
+
+				// remove the other variable
+				LocalVariable local = (LocalVariable) phi.getVars().get(
+						1 - index).getVariable();
+				procedure.getLocals().remove(local);
+			}
 		}
 	}
 
@@ -74,22 +108,9 @@ public class DeadCodeElimination extends AbstractActorTransformation {
 		Expression condition = node.getValue();
 		if (condition.getTypeOf() == Expression.BOOLEAN) {
 			if (((BoolExpr) condition).getValue()) {
-				addNodes(it, node.getThenNodes());
+				addNodes(it, node.getThenNodes(), node.getJoinNode(), 0);
 			} else {
-				addNodes(it, node.getElseNodes());
-			}
-
-			it.add(node.getJoinNode());
-			removePhis(node.getJoinNode());
-		}
-	}
-
-	private void removePhis(BlockNode joinNode) {
-		Iterator<Instruction> it = joinNode.iterator();
-		while (it.hasNext()) {
-			Instruction instruction = it.next();
-			if (instruction instanceof PhiAssignment) {
-				it.remove();
+				addNodes(it, node.getElseNodes(), node.getJoinNode(), 1);
 			}
 		}
 	}
