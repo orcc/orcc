@@ -31,12 +31,16 @@ package net.sf.orcc.backends.vhdl;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.UintType;
 
 /**
  * This class defines a VHDL expression printer.
@@ -65,9 +69,40 @@ public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 		builder.append(function);
 		builder.append("(");
 		e1.accept(this, nextPrec, BinaryExpr.LEFT);
+		printType(e1);
 		builder.append(", ");
 		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
+		printType(e2);
 		builder.append(")");
+	}
+
+	private void printType(Expression expr) {
+		builder.append(", ");
+		Type type = expr.getType();
+		if (type == null) {
+			builder.append(32);
+		} else {
+			switch (type.getTypeOf()) {
+			case Type.BOOLEAN:
+				builder.append(1);
+				break;
+			case Type.INT: {
+				expr = ((IntType) type).getSize();
+				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+				builder.append(size);
+				break;
+			}
+			case Type.UINT: {
+				expr = ((UintType) type).getSize();
+				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+				builder.append(size + 1);
+				break;
+			}
+			default:
+				throw new OrccRuntimeException("cannot get size of type: "
+						+ type);
+			}
+		}
 	}
 
 	@Override

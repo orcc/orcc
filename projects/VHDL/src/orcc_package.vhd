@@ -50,36 +50,36 @@ use IEEE.numeric_std.all;
 
 package orcc_package is
 
-  function bitand (ARG0      : integer; ARG1 : integer) return integer;
-  function bitor (ARG0       : integer; ARG1 : integer) return integer;
-  function bitxor (ARG0      : integer; ARG1 : integer) return integer;
+  function bitand(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
+  function bitor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
+  function bitxor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
   function div (ARG0         : integer; ARG1 : integer) return integer;
   function get_mod (ARG0     : integer; ARG1 : integer) return integer;
-  function shift_left (ARG0  : integer; ARG1 : integer) return integer;
-  function shift_right (ARG0 : integer; ARG1 : integer) return integer;
+  function shift_left(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
+  function shift_right(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
 
 end;
 
 package body orcc_package is
 
-  function bitand (ARG0 : integer; ARG1 : integer) return integer is
-    variable result : std_logic_vector(31 downto 0);
+  function bitand(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
+    variable result : std_logic_vector(l1 downto 0);
   begin
-    result := std_logic_vector(to_signed(ARG0, 32)) and std_logic_vector(to_signed(ARG1, 32));
+    result := std_logic_vector(to_signed(op1, l1)) and std_logic_vector(to_signed(op2, l2));
     return to_integer(signed(result));
   end function;
 
-  function bitor (ARG0 : integer; ARG1 : integer) return integer is
-    variable result : std_logic_vector(31 downto 0);
+  function bitor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
+    variable result : std_logic_vector(l1 downto 0);
   begin
-    result := std_logic_vector(to_signed(ARG0, 32)) or std_logic_vector(to_signed(ARG1, 32));
+    result := std_logic_vector(to_signed(op1, l1)) or std_logic_vector(to_signed(op2, l2));
     return to_integer(signed(result));
   end function;
 
-  function bitxor (ARG0 : integer; ARG1 : integer) return integer is
-    variable result : std_logic_vector(31 downto 0);
+  function bitxor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
+    variable result : std_logic_vector(l1 downto 0);
   begin
-    result := std_logic_vector(to_signed(ARG0, 32)) xor std_logic_vector(to_signed(ARG1, 32));
+    result := std_logic_vector(to_signed(op1, l1)) xor std_logic_vector(to_signed(op2, l2));
     return to_integer(signed(result));
   end function;
 
@@ -97,17 +97,18 @@ package body orcc_package is
     return result;
   end function;
 
-  function shift_left (ARG0 : integer; ARG1 : integer) return integer is
+  -- logical left shift
+  -- result type is the same as the type of the first operand
+  function shift_left(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
   begin
-    return to_integer(to_signed(ARG0, 32) sll ARG1);
+    return to_integer(to_signed(op1, l1) sll op2);
   end function;
 
-  function shift_right (ARG0 : integer; ARG1 : integer) return integer is
+  -- logical right shift
+  -- result type is the same as the type of the first operand
+  function shift_right(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
   begin
-    return to_integer(to_signed(ARG0, 32) srl ARG1);
+    return to_integer(to_signed(op1, l1) srl op2);
   end function;
   
 end package body orcc_package;
-
-
-
