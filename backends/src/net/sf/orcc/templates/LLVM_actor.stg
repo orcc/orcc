@@ -32,7 +32,7 @@ $endif$
 >>
 
 indexes(indexes) ::= <<
-$indexes: { index | i32 $index$ }; separator=", "$
+$indexes: { index | $if(index.type)$$index.type$$else$i32$endif$ $index$ }; separator=", "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
