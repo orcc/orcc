@@ -63,21 +63,21 @@ end;
 package body orcc_package is
 
   function bitand(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
-    variable result : std_logic_vector(l1 downto 0);
+    variable result : std_logic_vector(l1 downto 1);
   begin
     result := std_logic_vector(to_signed(op1, l1)) and std_logic_vector(to_signed(op2, l2));
     return to_integer(signed(result));
   end function;
 
   function bitor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
-    variable result : std_logic_vector(l1 downto 0);
+    variable result : std_logic_vector(l1 downto 1);
   begin
     result := std_logic_vector(to_signed(op1, l1)) or std_logic_vector(to_signed(op2, l2));
     return to_integer(signed(result));
   end function;
 
   function bitxor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
-    variable result : std_logic_vector(l1 downto 0);
+    variable result : std_logic_vector(l1 downto 1);
   begin
     result := std_logic_vector(to_signed(op1, l1)) xor std_logic_vector(to_signed(op2, l2));
     return to_integer(signed(result));

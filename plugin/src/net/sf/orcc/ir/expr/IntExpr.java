@@ -30,6 +30,7 @@ package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.type.IntType;
 
 /**
  * This class defines an integer expression.
@@ -86,7 +87,18 @@ public class IntExpr extends AbstractExpression {
 
 	@Override
 	public Type getType() {
-		return null;
+		// we return a signed type
+
+		int size;
+		if (value == 0) {
+			size = 1;
+		} else if (value > 0) {
+			size = (int) (Math.log(value) / Math.log(2.0)) + 2;
+		} else {
+			size = (int) Math.ceil(Math.log(-value) / Math.log(2.0)) + 1;
+		}
+
+		return new IntType(new IntExpr(size));
 	}
 
 	@Override
