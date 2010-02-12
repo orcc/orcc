@@ -195,26 +195,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	 * @return
 	 */
 	private ListIterator<Instruction> getItr(ListIterator<CFGNode> it) {
-		it.previous();
-		if (it.hasPrevious()) {
-			// get previous and restore iterator's position
-			CFGNode previous = it.previous();
-			it.next();
-
-			if (previous instanceof BlockNode) {
-				block = ((BlockNode) previous);
-			} else if (previous instanceof IfNode) {
-				block = ((IfNode) previous).getJoinNode();
-			} else {
-				block = ((WhileNode) previous).getJoinNode();
-			}
-		} else {
-			// no previous block, create and add a new one
-			block = new BlockNode(procedure);
-			it.add(block);
-		}
-		it.next();
-
+		block = BlockNode.getPrevious(procedure, it);
 		return block.lastListIterator();
 	}
 

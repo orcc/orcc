@@ -107,7 +107,7 @@ public class ExpressionParser {
 				Use use = new Use(variable);
 				Load load = new Load(location, local, use, indexes);
 				use.setNode(load);
-				BlockNode block = BlockNode.last(procedure, nodes);
+				BlockNode block = BlockNode.getLast(procedure, nodes);
 				block.add(load);
 			}
 

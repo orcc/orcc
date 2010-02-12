@@ -116,7 +116,7 @@ public class StaticActorNormalizer {
 			LocalVariable loopVar = indexes.get(depth - 1);
 
 			// init var
-			BlockNode block = BlockNode.last(procedure, nodes);
+			BlockNode block = BlockNode.getLast(procedure, nodes);
 			Assign assign = new Assign(loopVar, new IntExpr(0));
 			block.add(assign);
 
@@ -138,7 +138,7 @@ public class StaticActorNormalizer {
 			pattern.getPattern().accept(this);
 
 			// add assign
-			block = BlockNode.last(procedure, nodes);
+			block = BlockNode.getLast(procedure, nodes);
 			assign = new Assign(loopVar, null);
 			assign.setValue(new BinaryExpr(
 					new VarExpr(new Use(loopVar, assign)), BinaryOp.PLUS,
@@ -159,7 +159,7 @@ public class StaticActorNormalizer {
 
 		@Override
 		public void visit(SimplePattern pattern) {
-			BlockNode block = BlockNode.last(procedure, nodes);
+			BlockNode block = BlockNode.getLast(procedure, nodes);
 			Call call = new Call(new Location(), null, pattern.getAction()
 					.getBody(), new ArrayList<Expression>());
 			block.add(call);
@@ -198,7 +198,7 @@ public class StaticActorNormalizer {
 	 *            input or output pattern
 	 */
 	private void addStateVariables(Procedure procedure, Pattern pattern) {
-		BlockNode block = BlockNode.last(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
 		for (Entry<Port, Integer> entry : pattern.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
@@ -380,7 +380,7 @@ public class StaticActorNormalizer {
 	 */
 	private void createReads(Procedure procedure) {
 		Pattern inputPattern = staticCls.getInputPattern();
-		BlockNode block = BlockNode.last(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
 		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
@@ -421,7 +421,7 @@ public class StaticActorNormalizer {
 	 */
 	private void createWrites(Procedure procedure) {
 		Pattern inputPattern = staticCls.getOutputPattern();
-		BlockNode block = BlockNode.last(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
 		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();

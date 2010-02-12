@@ -175,7 +175,7 @@ public class StatementParser {
 				LocalVariable local = (LocalVariable) target;
 
 				Assign assign = new Assign(location, local, value);
-				BlockNode block = BlockNode.last(procedure, nodes);
+				BlockNode block = BlockNode.getLast(procedure, nodes);
 				block.add(assign);
 			} else {
 				// TODO: store
@@ -222,7 +222,7 @@ public class StatementParser {
 			LocalVariable source = entry.getKey();
 			Variable target = entry.getValue();
 
-			BlockNode block = BlockNode.last(procedure, nodes);
+			BlockNode block = BlockNode.getLast(procedure, nodes);
 			Location location = block.getLocation();
 
 			Use use = new Use(target, block);

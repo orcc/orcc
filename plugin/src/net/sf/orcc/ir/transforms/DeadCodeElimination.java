@@ -26,69 +26,72 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.transforms;
+package net.sf.orcc.ir.transforms;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.ReadEnd;
-import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.instructions.WriteEnd;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.nodes.IfNode;
 
 /**
- * Move writes to the beginning of an action (because we use pointers).
+ * This class defines a very simple Dead Global Elimination.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class MoveReadsWritesTransformation extends AbstractActorTransformation {
+public class DeadCodeElimination extends AbstractActorTransformation {
 
-	private List<Instruction> readEnds;
+	private void addNodes(ListIterator<CFGNode> it, List<CFGNode> nodes) {
+		it.previous();
+		it.remove();
 
-	private List<Instruction> writes;
-
-	public MoveReadsWritesTransformation() {
-		writes = new ArrayList<Instruction>();
-		readEnds = new ArrayList<Instruction>();
+		for (CFGNode node : nodes) {
+			it.add(node);
+		}
 	}
 
 	@Override
-	public void visit(Read node, Object... args) {
-		readEnds.add(new ReadEnd(node));
+	public void transform(Actor actor) {
+		// remove dead ifs and whiles
+		super.transform(actor);
+
+		// combines adjacent blocks that may have been created
+		new BlockCombine().transform(actor);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void visit(Write node, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		writes.add(node);
-		it.set(new WriteEnd(node));
+	public void visit(IfNode node, Object... args) {
+		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
+		Expression condition = node.getValue();
+		if (condition.getTypeOf() == Expression.BOOLEAN) {
+			if (((BoolExpr) condition).getValue()) {
+				addNodes(it, node.getThenNodes());
+			} else {
+				addNodes(it, node.getElseNodes());
+			}
+
+			it.add(node.getJoinNode());
+			removePhis(node.getJoinNode());
+		}
 	}
 
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		super.visitProcedure(procedure);
-
-		List<CFGNode> nodes = procedure.getNodes();
-
-		// add writes at the beginning of the node list, and read at the ends
-		BlockNode.getFirst(procedure, nodes).getInstructions().addAll(0, writes);
-		List<Instruction> instructions = BlockNode.getLast(procedure, nodes).getInstructions();
-		if (instructions.size()> 0){
-			//Put readend nodes before return instruction 
-			instructions.addAll(instructions.size()-1,readEnds);
+	private void removePhis(BlockNode joinNode) {
+		Iterator<Instruction> it = joinNode.iterator();
+		while (it.hasNext()) {
+			Instruction instruction = it.next();
+			if (instruction instanceof PhiAssignment) {
+				it.remove();
+			}
 		}
-
-		// clears the lists
-		writes.clear();
-		readEnds.clear();
 	}
 
 }

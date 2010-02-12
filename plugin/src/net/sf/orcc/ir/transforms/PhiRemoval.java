@@ -95,8 +95,8 @@ public class PhiRemoval extends AbstractActorTransformation {
 	@Override
 	public void visit(IfNode node, Object... args) {
 		BlockNode join = node.getJoinNode();
-		join.accept(this, BlockNode.last(procedure, node.getThenNodes()), 0);
-		join.accept(this, BlockNode.last(procedure, node.getElseNodes()), 1);
+		join.accept(this, BlockNode.getLast(procedure, node.getThenNodes()), 0);
+		join.accept(this, BlockNode.getLast(procedure, node.getElseNodes()), 1);
 		removePhis(join);
 
 		visit(node.getThenNodes());
@@ -158,7 +158,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 		it.next();
 
 		// last node of the while
-		block = BlockNode.last(procedure, node.getNodes());
+		block = BlockNode.getLast(procedure, node.getNodes());
 		join.accept(this, block, 1);
 		removePhis(join);
 		visit(node.getNodes());

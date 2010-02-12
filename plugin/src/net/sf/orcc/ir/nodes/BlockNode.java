@@ -47,7 +47,17 @@ import net.sf.orcc.ir.Procedure;
  */
 public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 
-	public static BlockNode first(Procedure procedure, List<CFGNode> nodes) {
+	/**
+	 * Returns the first block in the given list of nodes. A new block is
+	 * created if there is no block in the given node list.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @param nodes
+	 *            a list of nodes of the given procedure
+	 * @return a block
+	 */
+	public static BlockNode getFirst(Procedure procedure, List<CFGNode> nodes) {
 		BlockNode block;
 		if (nodes.isEmpty()) {
 			block = new BlockNode(procedure);
@@ -65,7 +75,17 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 		return block;
 	}
 
-	public static BlockNode last(Procedure procedure, List<CFGNode> nodes) {
+	/**
+	 * Returns the last block in the given list of nodes. A new block is created
+	 * if there is no block in the given node list.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @param nodes
+	 *            a list of nodes of the given procedure
+	 * @return a block
+	 */
+	public static BlockNode getLast(Procedure procedure, List<CFGNode> nodes) {
 		BlockNode block;
 		if (nodes.isEmpty()) {
 			block = new BlockNode(procedure);
@@ -79,6 +99,43 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 				nodes.add(block);
 			}
 		}
+
+		return block;
+	}
+
+	/**
+	 * Returns the previous block. A new block is created if there is no
+	 * previous one.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @param it
+	 *            an iterator over nodes of the given procedure
+	 * @return a block
+	 */
+	public static BlockNode getPrevious(Procedure procedure,
+			ListIterator<CFGNode> it) {
+		BlockNode block;
+
+		it.previous();
+		if (it.hasPrevious()) {
+			// get previous and restore iterator's position
+			CFGNode previous = it.previous();
+			it.next();
+
+			if (previous instanceof BlockNode) {
+				block = ((BlockNode) previous);
+			} else if (previous instanceof IfNode) {
+				block = ((IfNode) previous).getJoinNode();
+			} else {
+				block = ((WhileNode) previous).getJoinNode();
+			}
+		} else {
+			// no previous block, create and add a new one
+			block = new BlockNode(procedure);
+			it.add(block);
+		}
+		it.next();
 
 		return block;
 	}

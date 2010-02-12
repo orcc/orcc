@@ -314,7 +314,7 @@ public class ActionParser {
 
 	private void parseInput(Procedure procedure, Port port, Tree idents,
 			Tree repeat) throws OrccException {
-		BlockNode block = BlockNode.last(procedure, nodes);
+		BlockNode block = BlockNode.getLast(procedure, nodes);
 
 		Expression numRepeats = null;
 		if (repeat.getChildCount() == 1) {
