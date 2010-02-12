@@ -288,8 +288,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		block = store.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = store.getValue();
-		Variable target = store.getTarget().getVariable();
-		Type type = target.getType();
 
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
@@ -300,7 +298,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		it.previous();
 
 		// Check store value
-		store.setValue(visitExpression(value, it, type));
+		store.setValue(visitExpression(value, it, value.getType()));
 		it.next();
 	}
 

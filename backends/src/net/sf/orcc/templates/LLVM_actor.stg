@@ -402,7 +402,7 @@ $last(pattern.keys):{port|
 	$HasRoom(result=action+i+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$
 	$AndOp(result="%"+action+"_room", ty="i1", op1=action+i+"_room", op2="%"+action+"_roomTest")$
 }$
-
+multioutputtest
 $else$
 $pattern.keys:{port|
 	$HasRoom(result=action+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$}$
