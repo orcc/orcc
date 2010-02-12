@@ -163,17 +163,17 @@ $endif$
 >>
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
-$GetElementPtrOp(result=pointer+"S_ptr", pty=pty, ptrval=pointer, idx=indexes)$
-$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer=pointer+"S_ptr")$
+$GetElementPtrOp(result="%"+pointer+"S_ptr", pty=pty, ptrval=Var(pointer), idx=indexes)$
+$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S_ptr")$
 
 
 >>
 
 StoreWithoutIndex(ty, value, pty, pointer, cast) ::= <<
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty, pointer=pointer, cast=cast)$
+$CastStore(ty=ty, value=value, pty=pty, pointer=Var(pointer), cast=cast)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty, pointer=pointer)$
+$StoreInstr(ty=ty, value=value, pty=pty, pointer=Var(pointer))$
 $endif$
 
 
@@ -218,6 +218,17 @@ $ConditionalBlockNode(ifNode.elseNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode)
 b$label(ifNode.joinNode)$:
 
 >>
+
+IfWithThenNode(ifNode) ::= <<
+	$BrOp(cond=ifNode.value, iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.joinNode))$
+
+b$label(ifNode.thenNodes)$: 
+$ConditionalBlockNode(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
+
+b$label(ifNode.joinNode)$:
+
+>>
+
 
 
 LoadLocalPort(instr) ::= <<
@@ -304,9 +315,9 @@ $StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.var
 $endif$
 $else$
 $if(store.indexes.empty)$
-$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=Var(store.target), cast=store.cast)$
+$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast)$
 $else$
-$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=Var(store.target), cast=store.cast, indexes=store.indexes)$
+$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes)$
 $endif$
 $endif$
 
@@ -339,7 +350,7 @@ $if(ifNode.thenNodes)$
 $if(ifNode.elseNodes)$
 $IfWithThenElseNodes(ifNode)$
 $else$
-2	
+$IfWithThenNode(ifNode)$	
 	$endif$
 $else$
 	$if(ifNode.elseNodes)$
