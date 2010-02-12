@@ -152,6 +152,18 @@ default:
 
 >>
 
+CastAssign(target, value, cast)::= <<
+$if(cast.extended)$
+%$target$_ext = $value$
+$SextOp(result="%"+target, ty=value.type, value="%"+target+"_ext", ty2=target.type)$
+$else$
+%$target$_trunc = $value$
+$TruncOp(result="%"+target, ty=value.type, value="%"+target+"_trunc", ty2=target.type)$
+$endif$
+
+>>
+
+
 CastStore(ty, value, pty, pointer, cast)::= <<
 $if(cast.extended)$
 $SextOp(result=value+"_ext", ty=ty, value=value, ty2=pty)$
@@ -257,7 +269,12 @@ $vars: { var |[ %$var.variable$, %bb$var.variable.instruction.block.label$ ]}; s
 ///////////////////////////////////////////////////////////////////////////////
 
 Assign(assign) ::= <<
+$if(assign.cast)$
+$CastAssign(target = assign.target, value = assign.value, cast = assign.cast)$
+$else$
 %$assign.target$ = $assign.value$
+$endif$
+
 
 >>
 

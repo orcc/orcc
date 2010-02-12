@@ -59,8 +59,7 @@ public class BinaryExpr extends AbstractExpression {
 
 	private Type type;
 
-	public BinaryExpr(Expression e1, BinaryOp op,
-			Expression e2, Type type) {
+	public BinaryExpr(Expression e1, BinaryOp op, Expression e2, Type type) {
 		this(new Location(), e1, op, e2, type);
 	}
 

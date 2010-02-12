@@ -98,20 +98,19 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
-			Type binaryType = type;
-			type = expr.getE1().getType();
-			Expression e1 = (Expression) expr.getE1().accept(this, args);
-			type = expr.getE2().getType();
-			Expression e2 = (Expression) expr.getE2().accept(this, args);
-			type = binaryType;
-
-			Location location = expr.getLocation();
+			Type previousType = type;
 			BinaryOp op = expr.getOp();
+			Type BinaryType = expr.getType();
+			Location location = expr.getLocation();
+	
+			type = expr.getE1().getType();		
+			Expression e1 = (Expression) expr.getE1().accept(this, args);
+			Expression e2 = (Expression) expr.getE2().accept(this, args);
 
 			LocalVariable target = newVariable();
-			target.setType(type);
+			target.setType(previousType);
 			Assign assign = new Assign(location, target, new BinaryExpr(
-					location, e1, op, e2, type));
+					location, e1, op, e2, BinaryType));
 			assign.setBlock(block);
 			it.add(assign);
 

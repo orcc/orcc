@@ -28,10 +28,12 @@
  */
 package net.sf.orcc.ir.instructions;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.ValueContainer;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -70,6 +72,24 @@ public class Assign extends AbstractInstruction implements LocalTargetContainer,
 	}
 
 	@Override
+	public Cast getCast(){
+		Type expr = value.getType();
+		Type val = target.getType();
+		
+		if (expr == null){
+			return null;	
+		}
+		
+		Cast cast = new Cast(expr, val);
+
+		if (cast.isExtended()||cast.isTrunced()){
+			return cast;
+		}
+		
+		return null;
+	}
+
+	@Override
 	public LocalVariable getTarget() {
 		return target;
 	}
@@ -98,7 +118,7 @@ public class Assign extends AbstractInstruction implements LocalTargetContainer,
 	public void setValueSimple(Expression value) {
 		this.value = value;
 	}
-
+	
 	@Override
 	public String toString() {
 		return target + " = " + getValue();
