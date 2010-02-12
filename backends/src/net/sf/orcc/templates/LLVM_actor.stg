@@ -164,7 +164,11 @@ $endif$
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
 $GetElementPtrOp(result="%"+pointer+"S_ptr", pty=pty, ptrval=Var(pointer), idx=indexes)$
+$if(cast)$
+$CastStore(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S_ptr", cast=cast)$
+$else$
 $StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S_ptr")$
+$endif$
 
 
 >>
