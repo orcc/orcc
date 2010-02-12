@@ -35,6 +35,7 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -77,6 +78,10 @@ public class Assign extends AbstractInstruction implements LocalTargetContainer,
 		Type val = target.getType();
 		
 		if (expr == null){
+			return null;	
+		}
+		
+		if (value instanceof IntExpr){
 			return null;	
 		}
 		

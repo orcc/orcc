@@ -65,12 +65,12 @@ public class IntExpr extends AbstractExpression {
 		super(location);
 		this.value = value;
 	}
-
+	
 	@Override
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);
 	}
-
+	
 	@Override
 	public void accept(ExpressionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
@@ -108,6 +108,11 @@ public class IntExpr extends AbstractExpression {
 
 	public int getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isIntExpr() {
+		return true;
 	}
 
 	public void setValue(int value) {

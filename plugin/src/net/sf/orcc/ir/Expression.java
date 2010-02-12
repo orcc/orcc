@@ -49,7 +49,7 @@ public interface Expression extends Localizable {
 	 * boolean expression
 	 */
 	public static final int BOOLEAN = 2;
-	
+
 	/**
 	 * integer expression
 	 */
@@ -102,7 +102,7 @@ public interface Expression extends Localizable {
 	 * @return Type of this expression
 	 */
 	public Type getType();
-	
+
 	/**
 	 * Returns an integer corresponding to the type of this expression.
 	 * 
@@ -110,4 +110,52 @@ public interface Expression extends Localizable {
 	 */
 	public int getTypeOf();
 
+	/**
+	 * Returns true if the expression is an instance of BinaryExpr
+	 * 
+	 * @return True if the expression is an instance of BinaryExpr
+	 */
+	public boolean isBinaryExpr();
+
+	/**
+	 * Returns true if the expression is an instance of BooleanExpr
+	 * 
+	 * @return True if the expression is an instance of BooleanExpr
+	 */
+	public boolean isBooleanExpr();
+
+	/**
+	 * Returns true if the expression is an instance of IntExpr
+	 * 
+	 * @return True if the expression is an instance of IntExpr
+	 */
+	public boolean isIntExpr();
+
+	/**
+	 * Returns true if the expression is an instance of ListExpr
+	 * 
+	 * @return True if the expression is an instance of ListExpr
+	 */
+	public boolean isListExpr();
+
+	/**
+	 * Returns true if the expression is an instance of StringExpr
+	 * 
+	 * @return True if the expression is an instance of StringExpr
+	 */
+	public boolean isStringExpr();
+
+	/**
+	 * Returns true if the expression is an instance of UnaryExpr
+	 * 
+	 * @return True if the expression is an instance of UnaryExpr
+	 */
+	public boolean isUnaryExpr();
+
+	/**
+	 * Returns true if the expression is an instance of VarExpr
+	 * 
+	 * @return True if the expression is an instance of VarExpr
+	 */
+	public boolean isVarExpr();
 }

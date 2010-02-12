@@ -47,7 +47,7 @@ public class StringExpr extends AbstractExpression {
 		super(location);
 		this.value = value;
 	}
-
+	
 	@Override
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);
@@ -70,6 +70,11 @@ public class StringExpr extends AbstractExpression {
 
 	public String getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isStringExpr() {
+		return true;
 	}
 
 	public void setValue(String value) {

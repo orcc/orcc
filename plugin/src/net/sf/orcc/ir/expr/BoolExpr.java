@@ -71,9 +71,14 @@ public class BoolExpr extends AbstractExpression {
 	public int getTypeOf() {
 		return BOOLEAN;
 	}
-
+	
 	public boolean getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isBooleanExpr() {
+		return true;
 	}
 
 	public void setValue(boolean value) {

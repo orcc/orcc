@@ -121,11 +121,11 @@ $result$ = trunc $ty$ $value$ to $ty2$
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-StoreInstr(ty, value, pty, pointer) ::= <<
-$if(ty)$
-$StoreOp(ty=ty, value=value, pty=pty, pointer=pointer)$
+StoreInstr(ty, value, pty, pointer, cast) ::= <<
+$if(value.intExpr)$
+$StoreOp(ty=pty, value=value+cast, pty=pty, pointer=pointer)$
 $else$
-$StoreOp(ty=pty, value=value, pty=pty, pointer=pointer)$
+$StoreOp(ty=ty, value=value+cast, pty=pty, pointer=pointer)$
 $endif$
 >>
 
@@ -167,10 +167,10 @@ $endif$
 CastStore(ty, value, pty, pointer, cast)::= <<
 $if(cast.extended)$
 $SextOp(result=value+"_ext", ty=ty, value=value, ty2=pty)$
-$StoreInstr(ty=pty, value=value+"_ext", pty=pty, pointer=pointer)$
+$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_ext")$
 $else$
 $TruncOp(result=value+"_trunc", ty=ty, value=value, ty2=pty)$
-$StoreInstr(ty=pty, value=value+"_trunc", pty=pty, pointer=pointer)$
+$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_trunc")$
 $endif$
 >>
 
@@ -354,7 +354,7 @@ $LoadWithoutIndex(result="%"+load.target, ty=load.source.variable.type.elementTy
 $endif$
 $else$
 $if(load.indexes.empty)$
-$LoadWithoutIndex(result="%"+load.target, ty=VarType(load.source), pointer=Var(load.source))$ 
+$LoadWithoutIndex(result="%"+load.target, ty=VarType(load.source), pointer=Var(load.source))$
 $else$
 $LoadWithIndex(result="%"+load.target, ty=load.source.variable.type, pointer=Var(load.source), indexes=load.indexes)$
 $endif$

@@ -77,6 +77,11 @@ public class VarExpr extends AbstractExpression {
 		return use;
 	}
 
+	@Override
+	public boolean isVarExpr() {
+		return true;
+	}
+
 	public void setVar(Use use) {
 		this.use = use;
 	}

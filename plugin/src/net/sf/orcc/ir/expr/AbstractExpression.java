@@ -60,6 +60,41 @@ public abstract class AbstractExpression extends AbstractLocalizable implements
 	public abstract void accept(ExpressionVisitor visitor, Object... args);
 
 	@Override
+	public boolean isBinaryExpr() {
+		return false;
+	}
+
+	@Override
+	public boolean isBooleanExpr() {
+		return false;
+	}
+
+	@Override
+	public boolean isIntExpr() {
+		return false;
+	}
+
+	@Override
+	public boolean isListExpr() {
+		return false;
+	}
+
+	@Override
+	public boolean isStringExpr() {
+		return false;
+	}
+
+	@Override
+	public boolean isUnaryExpr() {
+		return false;
+	}
+
+	@Override
+	public boolean isVarExpr() {
+		return false;
+	}
+
+	@Override
 	public String toString() {
 		return Printer.getInstance().toString(this);
 	}

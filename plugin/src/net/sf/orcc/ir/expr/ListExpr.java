@@ -56,7 +56,7 @@ public class ListExpr extends AbstractExpression {
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);
 	}
-
+	
 	@Override
 	public void accept(ExpressionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
@@ -88,6 +88,11 @@ public class ListExpr extends AbstractExpression {
 
 	public List<Expression> getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isListExpr() {
+		return true;
 	}
 
 }

@@ -119,6 +119,11 @@ public class BinaryExpr extends AbstractExpression {
 		return BINARY;
 	}
 
+	@Override
+	public boolean isBinaryExpr() {
+		return true;
+	}
+
 	public void setE1(Expression e1) {
 		this.e1 = e1;
 	}
@@ -130,7 +135,7 @@ public class BinaryExpr extends AbstractExpression {
 	public void setOp(BinaryOp op) {
 		this.op = op;
 	}
-
+	
 	public void setType(Type type) {
 		this.type = type;
 	}
