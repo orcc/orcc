@@ -211,14 +211,26 @@ StorePortWithoutIndex
 
 >>
 
+LoadPortWithIndex(result, ty, pointer, indexes) ::= <<
+$GetElementPtrOp(result="%"+pointer+"L_ptr", pty=ty, ptrval=pointer, idx=indexes)$
+$LoadOp(result=result, ty=ty.elementType, pointer="%"+pointer+"L_ptr")$
+
+>>
+
+LoadPortWithoutIndex(result, ty, pointer) ::= <<
+$LoadOp(result=result, ty=ty, pointer=pointer)$
+
+>>
+
+
 LoadWithIndex(result, ty, pointer, indexes) ::= <<
-$GetElementPtrOp(result=pointer+"L_ptr", pty=ty, ptrval=pointer, idx=indexes)$
-$LoadOp(result=result, ty=ty.elementType, pointer=pointer+"L_ptr")$
+$GetElementPtrOp(result="%"+pointer+"L_ptr", pty=ty, ptrval=Var(pointer), idx=indexes)$
+$LoadOp(result=result, ty=ty.elementType, pointer="%"+pointer+"L_ptr")$
 
 >>
 
 LoadWithoutIndex(result, ty, pointer) ::= <<
-$LoadOp(result=result, ty=ty, pointer=pointer)$
+$LoadOp(result=result, ty=ty, pointer=Var(pointer))$
 
 >>
 
@@ -348,15 +360,15 @@ Load(load) ::= <<
 $if(load.source.variable.port)$
 $LoadOp(result="%"+load.target+"_L", ty=load.source.variable.type.elementType+"*", pointer=Var(load.source))$
 $if(load.indexes.empty)$
-$LoadWithIndex(result="%"+load.target, ty=load.source.variable.type.elementType, pointer="%"+load.target+"_L")$
+$LoadPortWithIndex(result="%"+load.target, ty=load.source.variable.type.elementType, pointer="%"+load.target+"_L")$
 $else$
-$LoadWithoutIndex(result="%"+load.target, ty=load.source.variable.type.elementType, pointer="%"+load.target+"_L")$
+$LoadPortWithoutIndex(result="%"+load.target, ty=load.source.variable.type.elementType, pointer="%"+load.target+"_L")$
 $endif$
 $else$
 $if(load.indexes.empty)$
-$LoadWithoutIndex(result="%"+load.target, ty=VarType(load.source), pointer=Var(load.source))$
+$LoadWithoutIndex(result="%"+load.target, ty=VarType(load.source), pointer=load.source)$
 $else$
-$LoadWithIndex(result="%"+load.target, ty=load.source.variable.type, pointer=Var(load.source), indexes=load.indexes)$
+$LoadWithIndex(result="%"+load.target, ty=load.source.variable.type, pointer=load.source, indexes=load.indexes)$
 $endif$
 $endif$
 
