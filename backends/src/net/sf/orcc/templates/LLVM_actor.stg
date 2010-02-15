@@ -7,6 +7,10 @@ Var(var) ::= <<
 $if(var.variable.global)$@$else$%$endif$$var$
 >>
 
+Expr(expr) ::= <<
+$if(expr.varExpr)$%$endif$$expr$
+>>
+
 ExprType(expr) ::= <<
 $expr.type$
 >>
@@ -32,7 +36,11 @@ $endif$
 >>
 
 indexes(indexes) ::= <<
-$indexes: { index | $if(index.type)$$index.type$$else$i32$endif$ $index$ }; separator=", "$
+$indexes: { index | $if(index.type)$$index.type$$else$i32$endif$ $Expr(index)$ }; separator=", "$
+>>
+
+indexesName(indexes) ::= <<
+$indexes: {index |$index$}; separator="_"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,8 +66,10 @@ IcmpOp(result, cond, ty, op1, op2) ::= <<
 $result$ = icmp $cond$ $ty$ $op1$, $op2$
 >>
  
-GetElementPtrOp(result, pty, ptrval, idx) ::= <<
-$result$ = getelementptr $pty$* $ptrval$, i32 0 $if(idx)$
+GetElementPtrOp(result, pty, ptrval, idx0, idx) ::= <<
+$result$ = getelementptr $pty$* $ptrval$$if(idx0)$
+, i32 $idx0$
+$endif$ $if(idx)$
 , $indexes(idx)$
 $endif$
 >>
@@ -123,9 +133,9 @@ $result$ = trunc $ty$ $value$ to $ty2$
 
 StoreInstr(ty, value, pty, pointer, cast) ::= <<
 $if(value.intExpr)$
-$StoreOp(ty=pty, value=value+cast, pty=pty, pointer=pointer)$
+$StoreOp(ty=pty, value=Expr(value)+cast, pty=pty, pointer=pointer)$
 $else$
-$StoreOp(ty=ty, value=value+cast, pty=pty, pointer=pointer)$
+$StoreOp(ty=ty, value=Expr(value)+cast, pty=pty, pointer=pointer)$
 $endif$
 >>
 
@@ -166,20 +176,20 @@ $endif$
 
 CastStore(ty, value, pty, pointer, cast)::= <<
 $if(cast.extended)$
-$SextOp(result=value+"_ext", ty=ty, value=value, ty2=pty)$
+$SextOp(result="%"+value+"_ext", ty=ty, value=Expr(value), ty2=pty)$
 $StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_ext")$
 $else$
-$TruncOp(result=value+"_trunc", ty=ty, value=value, ty2=pty)$
+$TruncOp(result="%"+value+"_trunc", ty=ty, value=Expr(value), ty2=pty)$
 $StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_trunc")$
 $endif$
 >>
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
-$GetElementPtrOp(result="%"+pointer+"S_ptr", pty=pty, ptrval=Var(pointer), idx=indexes)$
+$GetElementPtrOp(result="%"+pointer+"S"+indexesName(indexes)+"_ptr", idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S_ptr", cast=cast)$
+$CastStore(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S"+indexesName(indexes)+"_ptr", cast=cast)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S_ptr")$
+$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S"+indexesName(indexes)+"_ptr")$
 $endif$
 
 
@@ -197,10 +207,11 @@ $endif$
 
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
 $LoadOp(result=pointer+"_L", ty=pty+"*", pointer=pointer)$
+$GetElementPtrOp(result=pointer+"_L"+indexesName(indexes)+"_ptr", pty=pty, ptrval=pointer+"_L", idx=indexes)$
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty, pointer=pointer+"_L", cast=cast)$
+$CastStore(ty=ty, value=value, pty=pty, pointer=pointer+"_L"+indexesName(indexes)+"_ptr", cast=cast)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty, pointer=pointer+"_L")$
+$StoreInstr(ty=ty, value=value, pty=pty, pointer=pointer+"_L"+indexesName(indexes)+"_ptr")$
 $endif$
 
 
@@ -212,8 +223,8 @@ StorePortWithoutIndex
 >>
 
 LoadPortWithIndex(result, ty, pointer, indexes) ::= <<
-$GetElementPtrOp(result="%"+pointer+"L_ptr", pty=ty, ptrval=pointer, idx=indexes)$
-$LoadOp(result=result, ty=ty.elementType, pointer="%"+pointer+"L_ptr")$
+$GetElementPtrOp(result=pointer+indexesName(indexes)+"_ptr", pty=ty, ptrval=pointer, idx=indexes)$
+$LoadOp(result=result, ty=ty, pointer=pointer+indexesName(indexes)+"_ptr")$
 
 >>
 
@@ -224,8 +235,8 @@ $LoadOp(result=result, ty=ty, pointer=pointer)$
 
 
 LoadWithIndex(result, ty, pointer, indexes) ::= <<
-$GetElementPtrOp(result="%"+pointer+"L_ptr", pty=ty, ptrval=Var(pointer), idx=indexes)$
-$LoadOp(result=result, ty=ty.elementType, pointer="%"+pointer+"L_ptr")$
+$GetElementPtrOp(result="%"+pointer+"L"+indexesName(indexes)+"_ptr", idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
+$LoadOp(result=result, ty=ty.elementType, pointer="%"+pointer+"L"+indexesName(indexes)+"_ptr")$
 
 >>
 
@@ -235,7 +246,7 @@ $LoadOp(result=result, ty=ty, pointer=Var(pointer))$
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
-	$BrOp(cond=ifNode.value, iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.elseNodes))$
+	$BrOp(cond=Expr(ifNode.value), iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.elseNodes))$
 
 b$label(ifNode.thenNodes)$: 
 $ConditionalBlockNode(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
@@ -248,7 +259,7 @@ b$label(ifNode.joinNode)$:
 >>
 
 IfWithThenNode(ifNode) ::= <<
-	$BrOp(cond=ifNode.value, iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.joinNode))$
+	$BrOp(cond=Expr(ifNode.value), iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.thenNodes)$: 
 $ConditionalBlockNode(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
@@ -324,7 +335,7 @@ $CallOp(ty ="void", fnptrval="@setWriteEnd", function_args="%struct.fifo_s* %end
 
 Return(return) ::= <<
 $if(return.value)$
-$RetOp(type="i1", value=return.value)$
+$RetOp(type="i1", value=Expr(return.value))$
 $else$
 $RetOp()$
 
@@ -360,9 +371,9 @@ Load(load) ::= <<
 $if(load.source.variable.port)$
 $LoadOp(result="%"+load.target+"_L", ty=load.source.variable.type.elementType+"*", pointer=Var(load.source))$
 $if(load.indexes.empty)$
-$LoadPortWithIndex(result="%"+load.target, ty=load.source.variable.type.elementType, pointer="%"+load.target+"_L")$
-$else$
 $LoadPortWithoutIndex(result="%"+load.target, ty=load.source.variable.type.elementType, pointer="%"+load.target+"_L")$
+$else$
+$LoadPortWithIndex(result="%"+load.target, ty=load.source.variable.type.elementType, pointer="%"+load.target+"_L", indexes=load.indexes)$
 $endif$
 $else$
 $if(load.indexes.empty)$
@@ -397,7 +408,7 @@ $ConditionalBlockNode(ifNode.joinNode)$
 // while node
 WhileNode(whileNode) ::= <<
 $BlockNode(whileNode.joinNode)$
-	$BrOp(cond=whileNode.value, iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+label(whileNode.joinNode)+"_next")$
+	$BrOp(cond=Expr(whileNode.value), iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+label(whileNode.joinNode)+"_next")$
 
 b$label(whileNode.nodes)$:
 $ConditionalBlockNode(whileNode.nodes)$

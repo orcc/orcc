@@ -107,6 +107,13 @@ public class Cast {
 		if (source.toString().equals(target.toString())) {
 			return false;
 		}
+		
+		if (target.getTypeOf() == Type.LIST){
+			ListType list = (ListType)target;
+			if (source.toString().equals(list.getElementType().toString())){
+				return false;
+			}
+		}
 
 		return getSizeOf(source) < getSizeOf(target);
 
@@ -127,6 +134,13 @@ public class Cast {
 			return false;
 		}
 
+		if (target.getTypeOf() == Type.LIST){
+			ListType list = (ListType)target;
+			if (source.toString().equals(list.getElementType().toString())){
+				return false;
+			}
+		}
+		
 		return getSizeOf(source) > getSizeOf(target);
 	}
 }

@@ -109,7 +109,7 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		if (e1 instanceof VarExpr) {
 			Use use = ((VarExpr) e1).getVar();
 			type = use.getVariable().getType();
-		} else if (e1 instanceof VarExpr) {
+		} else if (e2 instanceof VarExpr) {
 			Use use = ((VarExpr) e2).getVar();
 			type = use.getVariable().getType();
 		} else {
@@ -117,9 +117,15 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		}
 		
 		builder.append(" " + type.toString() + " ");
-
+		
+		if (e1 instanceof VarExpr){
+			builder.append("%");
+		}
 		expr.getE1().accept(this);
 		builder.append(", ");
+		if (e2 instanceof VarExpr){
+			builder.append("%");
+		}
 		expr.getE2().accept(this);
 	}
 
@@ -146,7 +152,6 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 
 	@Override
 	public void visit(VarExpr expr, Object... args) {
-		builder.append('%');
 		builder.append(expr.getVar().getVariable());
 	}
 
