@@ -57,31 +57,15 @@ import net.sf.orcc.ir.type.BoolType;
 public class TransformConditionals extends AbstractActorTransformation
 		implements ExpressionInterpreter {
 
-	private Expression changeConditional(Expression expr) {
-		if (expr.isVarExpr()) {
-			VarExpr varExpr = (VarExpr) expr;
-			return new BinaryExpr(varExpr, BinaryOp.EQ, new BoolExpr(true),
-					new BoolType());
-		} else if (expr.isUnaryExpr()) {
-			UnaryExpr unaryExpr = (UnaryExpr) expr;
-			if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT) {
-				return new BinaryExpr(unaryExpr.getExpr(), BinaryOp.EQ,
-						new BoolExpr(false), new BoolType());
-			}
-		}
-
-		return expr;
-	}
-
 	@Override
 	public void visit(IfNode node, Object... args) {
-		node.setValue(changeConditional(node.getValue()));
+		node.setValue((Expression) node.getValue().accept(this));
 		super.visit(node, args);
 	}
 
 	@Override
 	public void visit(WhileNode node, Object... args) {
-		node.setValue(changeConditional(node.getValue()));
+		node.setValue((Expression) node.getValue().accept(this));
 		super.visit(node, args);
 	}
 
