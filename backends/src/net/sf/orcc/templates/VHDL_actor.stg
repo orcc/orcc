@@ -70,6 +70,14 @@ variable $variable$ : $variable.type$ $listSize(variable.type.dimensions)$
 $endif$
 >>
 
+functionDeclaration(variable) ::= <<
+$variable.type.dimensions$
+$if(!(listSize(variable.type.dimensions)))$
+$variable$ : $variable.type$ $listSize(variable.type.dimensions)$
+$else$
+-- error !!!!! type memory type
+$endif$
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constant Signal
@@ -91,7 +99,7 @@ $assign.target$ := $assign.value$;
 
 Call(call) ::= <<
 $if(call.target)$
-$call.target$ = 
+$call.target$ := 
 $endif$
 $call.procedure$($call.parameters; separator=", "$);
 
@@ -209,11 +217,21 @@ $BlockNode(whileNode.joinNode)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Procedure
+// Procedure and function
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
 $procedure.nodes: {$(it.class.simpleName)(it)$}$
+>>
+
+function(procedure) ::= <<
+function $procedure$($procedure.parameters.list: { $functionDeclaration(it)$}; wrap, anchor, separator=", "$) return $procedure.returnType$ is 
+begin
+  $if(procedure.locals.list)$
+  $procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
+  $endif$
+  $procedure.nodes: {$(it.class.simpleName)(it)$}$end $procedure$;
+
 >>
 
 PrintLocals(procedure) ::= <<
@@ -366,6 +384,9 @@ entity $actor.name$ is
   $actor.inputs.list: fifo_in(it)$  -- Outputs
   $actor.outputs.list: {$fifo_out(it)$}; separator=";\n"$);  
 end $actor.name$;
+
+
+$actor.procs.list: function(it); separator="\n"$
 
 
 architecture rtl_$actor.name$ of $actor.name$ is 
