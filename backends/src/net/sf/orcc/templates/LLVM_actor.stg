@@ -249,10 +249,10 @@ IfWithThenElseNodes(ifNode) ::= <<
 	$BrOp(cond=Expr(ifNode.value), iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.elseNodes))$
 
 b$label(ifNode.thenNodes)$: 
-$ConditionalBlockNode(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.elseNodes)$:
-$ConditionalBlockNode(ifNode.elseNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(ifNode.elseNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.joinNode)$:
 
@@ -262,7 +262,7 @@ IfWithThenNode(ifNode) ::= <<
 	$BrOp(cond=Expr(ifNode.value), iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.thenNodes)$: 
-$ConditionalBlockNode(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.joinNode)$:
 
@@ -401,7 +401,7 @@ $else$
 3
 $endif$
 $endif$
-$ConditionalBlockNode(ifNode.joinNode)$
+$nodes_cond(ifNode.joinNode)$
 
 >>
 
@@ -411,7 +411,7 @@ $BlockNode(whileNode.joinNode)$
 	$BrOp(cond=Expr(whileNode.value), iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+label(whileNode.joinNode)+"_next")$
 
 b$label(whileNode.nodes)$:
-$ConditionalBlockNode(whileNode.nodes)$
+$nodes_cond(whileNode.nodes)$
 	$BrOp(dest="%b"+label(whileNode.joinNode))$
 
 b$label(whileNode.joinNode)$_next:
@@ -422,18 +422,6 @@ b$label(whileNode.joinNode)$_next:
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-BlockNode(blockNode) ::= <<
-	$BrOp(dest="%b"+label(blockNode))$
-
-b$label(blockNode)$:
-	$instructions(blockNode.instructions)$
-
->>
-
-ConditionalBlockNode(blockNode) ::= <<
-	$blockNode: {$instructions(it.instructions)$}$
->>
-
 instructions(instructions) ::= <<
 $instructions: {$(it.class.simpleName)(it)$}$
 >>
@@ -441,6 +429,29 @@ $instructions: {$(it.class.simpleName)(it)$}$
 nodes(nodes) ::= <<
 $nodes: {$(it.class.simpleName)(it)$}$
 >>
+
+nodes_cond(nodes) ::= <<
+$nodes: {$(it.class.simpleName+"_cond")(it)$}$
+>>
+
+WhileNode_cond(nodes) ::= <<
+$WhileNode(nodes)$
+>>
+
+
+BlockNode_cond(blockNode) ::= <<
+$instructions(blockNode.instructions)$
+>>
+
+// if node
+BlockNode(blockNode) ::= <<
+	$BrOp(dest="%b"+label(blockNode))$
+
+b$label(blockNode)$:
+$instructions(blockNode.instructions)$
+>>
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action scheduler

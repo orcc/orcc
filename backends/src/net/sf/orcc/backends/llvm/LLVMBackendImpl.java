@@ -83,16 +83,23 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new ThreeAddressCodeTransformation(),
 				new MoveReadsWritesTransformation()};
 
-		for (ActorTransformation transformation : transformations) {
+//		if(actor.getName().equals("Algo_h4x4_inv")){
+		
+			for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
 
 		String outputName = path + File.separator + id + ".s";
+		
+
 		printer.printActor(outputName, id, actor);
+		
 		if (options != null){
 			if (options.containsKey("llvm-as")){
 				printBitcode(options.get("llvm-as"), outputName, id);
 			}
+	//	}
+
 		}
 	}
 
