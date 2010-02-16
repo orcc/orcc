@@ -58,11 +58,11 @@ public class TransformConditionals extends AbstractActorTransformation
 		implements ExpressionInterpreter {
 
 	private Expression changeConditional(Expression expr) {
-		if (expr.getTypeOf() == Expression.VAR) {
+		if (expr.isVarExpr()) {
 			VarExpr varExpr = (VarExpr) expr;
 			return new BinaryExpr(varExpr, BinaryOp.EQ, new BoolExpr(true),
 					new BoolType());
-		} else if (expr.getTypeOf() == Expression.UNARY) {
+		} else if (expr.isUnaryExpr()) {
 			UnaryExpr unaryExpr = (UnaryExpr) expr;
 			if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT) {
 				return new BinaryExpr(unaryExpr.getExpr(), BinaryOp.EQ,
@@ -117,8 +117,7 @@ public class TransformConditionals extends AbstractActorTransformation
 	@Override
 	public Object interpret(UnaryExpr unaryExpr, Object... args) {
 		Expression subExpr = unaryExpr.getExpr();
-		if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT
-				&& subExpr.getTypeOf() == Expression.VAR) {
+		if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT && subExpr.isVarExpr()) {
 			return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(false),
 					new BoolType());
 		} else {

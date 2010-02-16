@@ -82,11 +82,6 @@ public class UnaryExpr extends AbstractExpression {
 	}
 
 	@Override
-	public int getTypeOf() {
-		return UNARY;
-	}
-
-	@Override
 	public boolean isUnaryExpr() {
 		return true;
 	}

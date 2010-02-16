@@ -115,11 +115,6 @@ public class BinaryExpr extends AbstractExpression {
 	}
 
 	@Override
-	public int getTypeOf() {
-		return BINARY;
-	}
-
-	@Override
 	public boolean isBinaryExpr() {
 		return true;
 	}

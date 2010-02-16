@@ -106,7 +106,7 @@ public class DeadCodeElimination extends AbstractActorTransformation {
 	public void visit(IfNode node, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
 		Expression condition = node.getValue();
-		if (condition.getTypeOf() == Expression.BOOLEAN) {
+		if (condition.isBooleanExpr()) {
 			if (((BoolExpr) condition).getValue()) {
 				addNodes(it, node.getThenNodes(), node.getJoinNode(), 0);
 			} else {

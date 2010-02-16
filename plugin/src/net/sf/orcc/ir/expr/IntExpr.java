@@ -101,11 +101,6 @@ public class IntExpr extends AbstractExpression {
 		return new IntType(new IntExpr(size));
 	}
 
-	@Override
-	public int getTypeOf() {
-		return INT;
-	}
-
 	public int getValue() {
 		return value;
 	}

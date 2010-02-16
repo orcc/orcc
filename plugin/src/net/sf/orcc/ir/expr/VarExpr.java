@@ -68,11 +68,6 @@ public class VarExpr extends AbstractExpression {
 		return use.getVariable().getType();
 	}
 
-	@Override
-	public int getTypeOf() {
-		return VAR;
-	}
-
 	public Use getVar() {
 		return use;
 	}

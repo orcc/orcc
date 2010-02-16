@@ -260,15 +260,13 @@ public class NetworkFlattener implements INetworkTransformation {
 
 	private Expression resolveExpr(Expression expr,
 			HashMap<String, Expression> parentParams) {
-		if (expr.getTypeOf() == Expression.BINARY) {
+		if (expr.isBinaryExpr()) {
 			BinaryExpr bopExpr = (BinaryExpr) expr;
 			bopExpr.setE1(resolveExpr(bopExpr.getE1(), parentParams));
 			bopExpr.setE2(resolveExpr(bopExpr.getE2(), parentParams));
-
-		} else if (expr.getTypeOf() == Expression.UNARY) {
+		} else if (expr.isUnaryExpr()) {
 			UnaryExpr uopExpr = (UnaryExpr) expr;
 			uopExpr.setExpr(resolveExpr(uopExpr.getExpr(), parentParams));
-
 		} else {
 			if (parentParams.containsKey(expr.toString())) {
 				expr = parentParams.get(expr.toString());
@@ -279,7 +277,6 @@ public class NetworkFlattener implements INetworkTransformation {
 
 	@Override
 	public void transform(Network network) throws OrccException {
-
 		Set<Vertex> vertexSet = new HashSet<Vertex>(network.getGraph()
 				.vertexSet());
 
@@ -316,4 +313,5 @@ public class NetworkFlattener implements INetworkTransformation {
 			}
 		}
 	}
+
 }

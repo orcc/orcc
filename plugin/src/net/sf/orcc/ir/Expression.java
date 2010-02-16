@@ -104,13 +104,6 @@ public interface Expression extends Localizable {
 	public Type getType();
 
 	/**
-	 * Returns an integer corresponding to the type of this expression.
-	 * 
-	 * @return Integer representing type of this expression
-	 */
-	public int getTypeOf();
-
-	/**
 	 * Returns true if the expression is an instance of BinaryExpr
 	 * 
 	 * @return True if the expression is an instance of BinaryExpr

@@ -109,8 +109,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	public void visit(Assign node, Object... args) {
 		if (node.getTarget().getType().isBool()) {
 			Expression expr = node.getValue();
-			if (expr.getTypeOf() == Expression.BINARY
-					|| expr.getTypeOf() == Expression.UNARY) {
+			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
 				createIfNode(node.getTarget(), expr);
 				createNewBlock(iit);

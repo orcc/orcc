@@ -63,11 +63,6 @@ public class StringExpr extends AbstractExpression {
 		return new StringType();
 	}
 
-	@Override
-	public int getTypeOf() {
-		return STRING;
-	}
-
 	public String getValue() {
 		return value;
 	}
