@@ -29,6 +29,8 @@
  */
 package net.sf.orcc.backends.vhdl;
 
+import java.math.BigInteger;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
@@ -66,14 +68,14 @@ public class VHDLTypePrinter extends DefaultTypePrinter {
 	 *            an integer that gives the number of bits
 	 */
 	private void printInt(int size) {
-		// limits size to 16 bits
-		if (size >= 16) {
-			size = 16;
+		// limits size to 32 bits
+		if (size >= 32) {
+			size = 32;
 		}
 
-		int bound = 1 << (size - 1);
+		BigInteger bound = new BigInteger("1").shiftLeft(size - 1);
 		builder.append("integer range ");
-		builder.append(bound - 1);
+		builder.append(bound.subtract(BigInteger.ONE));
 		builder.append(" downto -");
 		builder.append(bound);
 	}
