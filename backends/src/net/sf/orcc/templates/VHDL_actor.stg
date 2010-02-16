@@ -147,14 +147,18 @@ $endif$
 
 ReadEnd(readEnd) ::= <<>>
 
-/**
- * calls are inlined, so the only returns still there are in the
- * isSchedulable procedures
- */
+// a "return" must be transformed when the attribute "transformReturn"
+// is present, which normally only occurs when printActionSchedulerInline
+// is called
 Return(return) ::= <<
 $if(return.value)$
+$if(transformReturn)$
 $procedure$_go := $return.value$;
 
+$else$
+return $return.value$;
+
+$endif$
 $endif$
 >>
 
@@ -217,14 +221,10 @@ $BlockNode(whileNode.joinNode)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Procedure and function
+// Prints functions
 ///////////////////////////////////////////////////////////////////////////////
 
-procedure(procedure) ::= <<
-$procedure.nodes: {$(it.class.simpleName)(it)$}$
->>
-
-function(procedure) ::= <<
+function(procedure, transformReturn) ::= <<
 function $procedure$($procedure.parameters.list: { $functionDeclaration(it)$}; wrap, anchor, separator=", "$) return $procedure.returnType$ is 
 begin
   $if(procedure.locals.list)$
@@ -234,23 +234,36 @@ begin
 
 >>
 
-PrintLocals(procedure) ::= <<
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+procedure(procedure, transformReturn) ::= <<
+$procedure.nodes: {$(it.class.simpleName)(it)$}$
+>>
+
+// prints the scheduler of the given action "inline" (ie not within a function)
+printActionSchedulerInline(action) ::= <<
+-- tests if "$action$" action is schedulable
+$procedure(procedure=action.scheduler, transformReturn="true")$
+>>
+
+printLocals(procedure) ::= <<
 $if(procedure.locals.list)$
 $procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
 $endif$
 >>
 
-///////////////////////////////////////////////////////////////////////////////
-// Action
-///////////////////////////////////////////////////////////////////////////////
-action(action) ::= <<
--- $action$ Scheduler 
-$procedure(action.scheduler)$
+// this template prints the locals of the body and the scheduler function
+// of the given action
+printActionLocals(action) ::= <<
+$printLocals(action.body)$$printLocals(action.scheduler)$
 >>
 
-
-PrintActionLocals(action) ::= <<
-$PrintLocals(action.body)$$PrintLocals(action.scheduler)$
+// prints the body of the given action "inline" (ie not within a function)
+printActionBodyInline(action) ::= <<
+-- body of "$action$" action
+$procedure(procedure=action.body)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -264,18 +277,14 @@ $pattern.keys:{port|$actorName$_$port$_full = '0'}; separator=" and "$
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
-actionCall(action) ::= <<
-$procedure(action.body)$
->>
-
 actionTest(action) ::= <<
 (isSchedulable_$action$_go = '1') then 
 $if(action.outputPattern)$
 if ($outputPattern(pattern=action.outputPattern)$) then
-  $actionCall(action)$
+  $printActionBodyInline(action)$
 end if;
 $else$
-$procedure(action.body)$
+$printActionBodyInline(action)$
 $endif$
 
 >>
@@ -344,6 +353,12 @@ if $nextStates: actionTestState(nextState=it); separator="elsif"$end if;
 
 >>
 
+// prints the action referenced by the "nextState" parameter
+// and updates the FSM state
+actionCallState(nextState) ::= <<
+$printActionBodyInline(nextState.action)$FSM <= $nextState.targetState$;
+>>
+
 actionTestState(nextState) ::= <<
 (isSchedulable_$nextState.action$_go = '1') then
   $if(nextState.action.outputPattern)$
@@ -355,11 +370,6 @@ actionTestState(nextState) ::= <<
   $endif$
 
 >>
-
-actionCallState(nextState) ::= <<
-$procedure(nextState.action.body)$FSM <= $nextState.targetState$;
->>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
@@ -386,7 +396,7 @@ entity $actor.name$ is
 end $actor.name$;
 
 
-$actor.procs.list: function(it); separator="\n"$
+$actor.procs.list: function(procedure=it); separator="\n"$
 
 
 architecture rtl_$actor.name$ of $actor.name$ is 
@@ -404,14 +414,14 @@ $if(actor.actionScheduler.actions)$
   $actor.name$_proc : process (reset_n, clock) is
     $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
     --
-    $actor.actions: PrintActionLocals(it)$  --
+    $actor.actions: printActionLocals(it)$  --
   begin
     if reset_n = '0' then 
   	  $actor.stateVars.list: stateConst(it); separator="\n"$
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
     elsif rising_edge(clock) then
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-      $actor.actions: action(it); separator="\n"$
+      $actor.actions: printActionSchedulerInline(it); separator="\n"$
       $schedulingTest(actor.actionScheduler.actions)$
     end if;
   end process $actor.name$_proc;
@@ -421,7 +431,7 @@ $else$
   $actor.name$_proc : process (reset_n, clock) is
     $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
     --
-    $actor.actions: PrintActionLocals(it)$  --
+    $actor.actions: printActionLocals(it)$  --
   begin
     if reset_n = '0' then 
   	  $actor.stateVars.list: stateConst(it); separator="\n"$
@@ -429,7 +439,7 @@ $else$
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
     elsif rising_edge(clock) then
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-      $actor.actions: action(it); separator="\n"$
+      $actor.actions: printActionSchedulerInline(it); separator="\n"$
       $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
     end if;
   end process $actor.name$_proc;
