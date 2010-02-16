@@ -48,7 +48,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -335,14 +334,14 @@ public class ConfigurationAnalyzer {
 				if (constraintVariable == null) {
 					int lo;
 					int hi;
-					if (port.getType().getTypeOf() == Type.INT) {
+					if (port.getType().isInt()) {
 						IntType type = (IntType) port.getType();
 						Expression size = type.getSize();
 						ExpressionEvaluator evaluator = new ExpressionEvaluator();
 						int num = evaluator.evaluateAsInteger(size);
 						lo = -(1 << (num - 1));
 						hi = (1 << (num - 1)) - 1;
-					} else if (port.getType().getTypeOf() == Type.UINT) {
+					} else if (port.getType().isUint()) {
 						UintType type = (UintType) port.getType();
 						Expression size = type.getSize();
 						ExpressionEvaluator evaluator = new ExpressionEvaluator();

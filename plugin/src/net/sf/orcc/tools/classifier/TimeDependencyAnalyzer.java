@@ -48,7 +48,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
@@ -283,21 +282,21 @@ public class TimeDependencyAnalyzer {
 			int lo;
 			int hi;
 
-			if (variable.getType().getTypeOf() == Type.INT) {
+			if (variable.getType().isInt()) {
 				IntType type = (IntType) variable.getType();
 				Expression size = type.getSize();
 				ExpressionEvaluator evaluator = new ExpressionEvaluator();
 				int num = evaluator.evaluateAsInteger(size);
 				lo = -(1 << (num - 1));
 				hi = (1 << (num - 1)) - 1;
-			} else if (variable.getType().getTypeOf() == Type.UINT) {
+			} else if (variable.getType().isUint()) {
 				UintType type = (UintType) variable.getType();
 				Expression size = type.getSize();
 				ExpressionEvaluator evaluator = new ExpressionEvaluator();
 				int num = evaluator.evaluateAsInteger(size);
 				lo = 0;
 				hi = 1 << num - 1;
-			} else if (variable.getType().getTypeOf() == Type.BOOLEAN) {
+			} else if (variable.getType().isBool()) {
 				lo = 0;
 				hi = 1;
 			} else {

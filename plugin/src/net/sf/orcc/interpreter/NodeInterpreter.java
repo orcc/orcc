@@ -134,7 +134,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		// Allocate procedure local List variables
 		for (Variable local : proc.getLocals()) {
 			Type type = local.getType();
-			if (type.getTypeOf() == Type.LIST) {
+			if (type.isList()) {
 				local.setValue(listAllocator.allocate(type));
 			}
 		}

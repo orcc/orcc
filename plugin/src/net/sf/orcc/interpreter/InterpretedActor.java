@@ -206,7 +206,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			// Initialize variables with constant values
 			Constant initConst = ((StateVariable) stateVar).getConstantValue();
 			if (initConst == null) {
-				if (type.getTypeOf() == Type.LIST) {
+				if (type.isList()) {
 					// Allocate empty array variable
 					stateVar.setValue(listAllocator.allocate(type));
 				}
@@ -242,7 +242,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		// Allocate local List variables
 		for (Variable local : procedure.getLocals()) {
 			Type type = local.getType();
-			if (type.getTypeOf() == Type.LIST) {
+			if (type.isList()) {
 				local.setValue(listAllocator.allocate(type));
 			}
 		}
@@ -366,7 +366,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				// Allocate local List variables
 				for (Variable local : currentAction.getBody().getLocals()) {
 					Type type = local.getType();
-					if (type.getTypeOf() == Type.LIST) {
+					if (type.isList()) {
 						local.setValue(listAllocator.allocate(type));
 					}
 				}

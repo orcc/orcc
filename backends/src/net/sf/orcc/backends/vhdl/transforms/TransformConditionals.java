@@ -29,9 +29,14 @@
 package net.sf.orcc.backends.vhdl.transforms;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionInterpreter;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -49,7 +54,8 @@ import net.sf.orcc.ir.type.BoolType;
  * @author Nicolas Siret
  * 
  */
-public class TransformConditionals extends AbstractActorTransformation {
+public class TransformConditionals extends AbstractActorTransformation
+		implements ExpressionInterpreter {
 
 	private Expression changeConditional(Expression expr) {
 		if (expr.getTypeOf() == Expression.VAR) {
@@ -77,6 +83,59 @@ public class TransformConditionals extends AbstractActorTransformation {
 	public void visit(WhileNode node, Object... args) {
 		node.setValue(changeConditional(node.getValue()));
 		super.visit(node, args);
+	}
+
+	@Override
+	public Object interpret(BinaryExpr expr, Object... args) {
+		Expression e1 = (Expression) expr.getE1().accept(this);
+		Expression e2 = (Expression) expr.getE2().accept(this);
+		BinaryOp op = expr.getOp();
+		Type type = expr.getType();
+		return new BinaryExpr(e1, op, e2, type);
+	}
+
+	@Override
+	public Object interpret(BoolExpr expr, Object... args) {
+		return expr;
+	}
+
+	@Override
+	public Object interpret(IntExpr expr, Object... args) {
+		return expr;
+	}
+
+	@Override
+	public Object interpret(ListExpr expr, Object... args) {
+		return expr;
+	}
+
+	@Override
+	public Object interpret(StringExpr expr, Object... args) {
+		return expr;
+	}
+
+	@Override
+	public Object interpret(UnaryExpr unaryExpr, Object... args) {
+		Expression subExpr = unaryExpr.getExpr();
+		if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT
+				&& subExpr.getTypeOf() == Expression.VAR) {
+			return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(false),
+					new BoolType());
+		} else {
+			subExpr = (Expression) subExpr.accept(this);
+			return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(false),
+					new BoolType());
+		}
+	}
+
+	@Override
+	public Object interpret(VarExpr expr, Object... args) {
+		if (expr.getType().isBool()) {
+			return new BinaryExpr(expr, BinaryOp.EQ, new BoolExpr(true),
+					new BoolType());
+		} else {
+			return expr;
+		}
 	}
 
 }

@@ -106,8 +106,8 @@ public class ListType extends AbstractType {
 	}
 
 	@Override
-	public int getTypeOf() {
-		return LIST;
+	public boolean isList() {
+		return true;
 	}
 
 	public void setSize(Expression size) {
@@ -121,4 +121,5 @@ public class ListType extends AbstractType {
 
 		this.type = type;
 	}
+
 }

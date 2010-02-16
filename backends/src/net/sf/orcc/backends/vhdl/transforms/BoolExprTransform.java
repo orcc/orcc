@@ -36,7 +36,6 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -108,7 +107,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(Assign node, Object... args) {
-		if (node.getTarget().getType().getTypeOf() == Type.BOOLEAN) {
+		if (node.getTarget().getType().isBool()) {
 			Expression expr = node.getValue();
 			if (expr.getTypeOf() == Expression.BINARY
 					|| expr.getTypeOf() == Expression.UNARY) {

@@ -41,36 +41,6 @@ import net.sf.orcc.ir.type.TypeVisitor;
  * 
  */
 public interface Type {
-	
-	/**
-	 * boolean type
-	 */
-	public static final int BOOLEAN = 1;
-
-	/**
-	 * integer type
-	 */
-	public static final int INT = 2;
-
-	/**
-	 * list type
-	 */
-	public static final int LIST = 3;
-
-	/**
-	 * string type
-	 */
-	public static final int STRING = 4;
-
-	/**
-	 * unsigned integer type
-	 */
-	public static final int UINT = 5;
-
-	/**
-	 * void type
-	 */
-	public static final int VOID = 6;
 
 	/**
 	 * Accepts an interpreter.
@@ -96,12 +66,47 @@ public interface Type {
 	 * @return the list of dimensions of this type if it is a list
 	 */
 	public List<Integer> getDimensions();
-	
+
 	/**
-	 * Returns the type of this type.
+	 * Returns true if this type is <tt>bool</tt>.
 	 * 
-	 * @return the type of this type
+	 * @return true if this type is <tt>bool</tt>
 	 */
-	public int getTypeOf();
+	public boolean isBool();
+
+	/**
+	 * Returns true if this type is <tt>int</tt>.
+	 * 
+	 * @return true if this type is <tt>int</tt>
+	 */
+	public boolean isInt();
+
+	/**
+	 * Returns true if this type is <tt>List</tt>.
+	 * 
+	 * @return true if this type is <tt>List</tt>
+	 */
+	public boolean isList();
+
+	/**
+	 * Returns true if this type is <tt>String</tt>.
+	 * 
+	 * @return true if this type is <tt>String</tt>
+	 */
+	public boolean isString();
+
+	/**
+	 * Returns true if this type is <tt>uint</tt>.
+	 * 
+	 * @return true if this type is <tt>uint</tt>
+	 */
+	public boolean isUint();
+
+	/**
+	 * Returns true if this type is <tt>void</tt>.
+	 * 
+	 * @return true if this type is <tt>void</tt>
+	 */
+	public boolean isVoid();
 
 }

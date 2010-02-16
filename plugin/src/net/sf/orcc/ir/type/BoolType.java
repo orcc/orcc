@@ -55,8 +55,8 @@ public class BoolType extends AbstractType {
 	}
 
 	@Override
-	public int getTypeOf() {
-		return BOOLEAN;
+	public boolean isBool() {
+		return true;
 	}
 
 }

@@ -77,10 +77,10 @@ public class IntType extends AbstractType {
 	}
 
 	@Override
-	public int getTypeOf() {
-		return INT;
+	public boolean isInt() {
+		return true;
 	}
-	
+
 	public void setSize(Expression size) {
 		this.size = size;
 	}

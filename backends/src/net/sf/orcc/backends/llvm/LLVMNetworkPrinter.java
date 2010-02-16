@@ -213,7 +213,7 @@ public final class LLVMNetworkPrinter {
 				Map<String, Object> attrs = new HashMap<String, Object>();
 				attrs.put("count", fifoCount);
 				attrs.put("size", size);
-				attrs.put("elt_size", type.getTypeOf());
+				attrs.put("elt_size", 0);
 				attrs.put("type", type);
 				attrs.put("source", source.getId());
 				attrs.put("src_port", connection.getSource().getName());

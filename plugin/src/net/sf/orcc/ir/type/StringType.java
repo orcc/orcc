@@ -55,8 +55,8 @@ public class StringType extends AbstractType {
 	}
 
 	@Override
-	public int getTypeOf() {
-		return STRING;
+	public boolean isString() {
+		return true;
 	}
 
 }

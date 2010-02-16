@@ -82,23 +82,17 @@ public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 		if (type == null) {
 			builder.append(32);
 		} else {
-			switch (type.getTypeOf()) {
-			case Type.BOOLEAN:
+			if (type.isBool()) {
 				builder.append(1);
-				break;
-			case Type.INT: {
+			} else if (type.isInt()) {
 				expr = ((IntType) type).getSize();
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 				builder.append(size);
-				break;
-			}
-			case Type.UINT: {
+			} else if (type.isUint()) {
 				expr = ((UintType) type).getSize();
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 				builder.append(size + 1);
-				break;
-			}
-			default:
+			} else {
 				throw new OrccRuntimeException("cannot get size of type: "
 						+ type);
 			}

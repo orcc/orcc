@@ -243,7 +243,7 @@ public abstract class Variable implements INameable {
 	 * @return <code>true</code> if this variable is a list of value.
 	 */
 	public boolean isList() {
-		return (type.getTypeOf()== Type.LIST);
+		return type.isList();
 	}
 
 	/**

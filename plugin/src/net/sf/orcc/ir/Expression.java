@@ -158,4 +158,5 @@ public interface Expression extends Localizable {
 	 * @return True if the expression is an instance of VarExpr
 	 */
 	public boolean isVarExpr();
+
 }

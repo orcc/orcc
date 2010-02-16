@@ -512,33 +512,27 @@ public class XDFWriter {
 		String name;
 		Expression size;
 
-		switch (type.getTypeOf()) {
-		case Type.BOOLEAN:
+		if (type.isBool()) {
 			name = "bool";
-			break;
-		case Type.INT:
+		} else if (type.isInt()) {
 			name = "int";
 			size = ((IntType) type).getSize();
 			typeElt.appendChild(writeEntry("size", size));
-			break;
-		case Type.LIST:
+		} else if (type.isList()) {
 			name = "List";
 			size = ((ListType) type).getSize();
 			type = ((ListType) type).getElementType();
 			typeElt.appendChild(writeEntry("type", type));
 			typeElt.appendChild(writeEntry("size", size));
-			break;
-		case Type.STRING:
+		} else if (type.isString()) {
 			name = "String";
-			break;
-		case Type.UINT:
+		} else if (type.isUint()) {
 			name = "uint";
 			size = ((UintType) type).getSize();
 			typeElt.appendChild(writeEntry("size", size));
-			break;
-		case Type.VOID:
+		} else if (type.isVoid()) {
 			throw new OrccException("void type is invalid in XDF");
-		default:
+		} else {
 			throw new OrccException("unknown type");
 		}
 

@@ -220,9 +220,9 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		Element operationE;
 		String name = names.getVarName(node.getSource(), actionName);
 		boolean inport = inputs.contains(name);
-		if (node.getSource().getVariable().getType().getTypeOf() == Type.LIST
-				&& !inport) {
-			node.getIndexes().get(0).accept(new XlimExprVisitor(names, root, actionName));
+		if (node.getSource().getVariable().getType().isList() && !inport) {
+			node.getIndexes().get(0).accept(
+					new XlimExprVisitor(names, root, actionName));
 			operationE = XlimNodeTemplate.newNameOperation(root, VARREF, names
 					.getVarName(node.getSource(), actionName));
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
@@ -356,7 +356,8 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		if (var instanceof StateVariable) {
 			Element operationE = XlimNodeTemplate
 					.newDiffOperation(root, ASSIGN);
-			operationE.setAttribute(TARGET, names.getVarName(node.getTarget(), actionName));
+			operationE.setAttribute(TARGET, names.getVarName(node.getTarget(),
+					actionName));
 			String data = names.getTempName();
 
 			for (Expression expr : node.getIndexes()) {

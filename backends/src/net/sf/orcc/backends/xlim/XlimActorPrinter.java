@@ -57,7 +57,6 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.StateVariable;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
@@ -531,7 +530,7 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 
 				// For lists use result of initialize execution (initializes
 				// loops case)
-				if (stateVar.getType().getTypeOf() == Type.LIST) {
+				if (stateVar.getType().isList()) {
 					state.getType().accept(new XlimTypeSizeVisitor(init2));
 
 					Object[] value = (Object[]) stateVar.getValue();

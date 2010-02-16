@@ -56,18 +56,17 @@ public class Cast {
 	 * @return integer corresponding to the size of the selected type
 	 */
 	private int getSizeOf(Type type) {
-		int typeOf = type.getTypeOf();
-		if (typeOf == Type.BOOLEAN) {
+		if (type.isBool()) {
 			return 1;
-		} else if (typeOf == Type.INT) {
+		} else if (type.isInt()) {
 			IntType intType = (IntType) type;
 			return new ExpressionEvaluator().evaluateAsInteger(intType
 					.getSize());
-		} else if (typeOf == Type.UINT) {
+		} else if (type.isUint()) {
 			UintType uintType = (UintType) type;
 			return new ExpressionEvaluator().evaluateAsInteger(uintType
 					.getSize());
-		} else if (typeOf == Type.LIST) {
+		} else if (type.isList()) {
 			ListType listType = (ListType) type;
 			return getSizeOf(listType.getElementType());
 		}
@@ -108,7 +107,7 @@ public class Cast {
 			return false;
 		}
 		
-		if (target.getTypeOf() == Type.LIST){
+		if (target.isList()){
 			ListType list = (ListType)target;
 			if (source.toString().equals(list.getElementType().toString())){
 				return false;
@@ -134,7 +133,7 @@ public class Cast {
 			return false;
 		}
 
-		if (target.getTypeOf() == Type.LIST){
+		if (target.isList()) {
 			ListType list = (ListType)target;
 			if (source.toString().equals(list.getElementType().toString())){
 				return false;

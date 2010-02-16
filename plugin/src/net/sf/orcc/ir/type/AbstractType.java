@@ -41,6 +41,7 @@ import net.sf.orcc.ir.Type;
  * 
  */
 public abstract class AbstractType implements Type {
+
 	@Override
 	public abstract Object accept(TypeInterpreter interpreter);
 
@@ -52,7 +53,37 @@ public abstract class AbstractType implements Type {
 	public List<Integer> getDimensions() {
 		return Collections.EMPTY_LIST;
 	}
-	
+
+	@Override
+	public boolean isBool() {
+		return false;
+	}
+
+	@Override
+	public boolean isInt() {
+		return false;
+	}
+
+	@Override
+	public boolean isList() {
+		return false;
+	}
+
+	@Override
+	public boolean isString() {
+		return false;
+	}
+
+	@Override
+	public boolean isUint() {
+		return false;
+	}
+
+	@Override
+	public boolean isVoid() {
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return Printer.getInstance().toString(this);
