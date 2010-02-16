@@ -134,7 +134,7 @@ public abstract class Variable implements INameable {
 		this.type = variable.type;
 		this.name = variable.name;
 		this.global = variable.global;
-		
+
 		this.uses = new ArrayList<Use>(variable.uses);
 	}
 
@@ -236,7 +236,7 @@ public abstract class Variable implements INameable {
 	public boolean isGlobal() {
 		return global;
 	}
-	
+
 	/**
 	 * Returns <code>true</code> if this variable is a list of value.
 	 * 
@@ -259,7 +259,8 @@ public abstract class Variable implements INameable {
 			if (use.getNode() instanceof AbstractFifoInstruction) {
 				AbstractFifoInstruction fifoNode = (AbstractFifoInstruction) use
 						.getNode();
-				if (getName().startsWith(fifoNode.getPort().getName())) {
+				if (getName().startsWith(fifoNode.getPort().getName())
+						|| getName().endsWith(fifoNode.getPort().getName())) {
 					isPort = true;
 					break;
 				}

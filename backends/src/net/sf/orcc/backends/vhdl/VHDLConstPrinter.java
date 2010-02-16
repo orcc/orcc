@@ -64,7 +64,7 @@ public class VHDLConstPrinter extends DefaultConstantPrinter {
 
 	@Override
 	public void visit(BoolConst constant, Object... args) {
-		builder.append(constant.getValue() ? '1' : '0');
+		builder.append(constant.getValue() ? "'1'" : "'0'");
 	}
 
 	@Override

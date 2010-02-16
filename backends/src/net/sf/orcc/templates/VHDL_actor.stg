@@ -32,7 +32,7 @@ $actorName$_$port.name$_write <= '0';$"\n"$
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
 listSize(value) ::= <<
-$value : {[$it$]} $
+$value : {$it $} $
 >>
 
 // the values of a list: {val1, val2, ..., valn}
@@ -103,12 +103,16 @@ $hasTokens.target$ := not $actorName$_$hasTokens.port$_empty;
 >>
 
 Load(load) ::= <<
-$if(!(load.indexes : {$it$}))$
-$load.target$ := $load.source$; 
+$if(load.indexes)$
+$if(load.source.variable.port)$
+$load.target$ := $load.source$;
 
 $else$
--- tab not implemented yet
-$load.target$ := $load.source$;   --$load.indexes : {$it$}$
+$load.target$ := $load.source$($load.indexes : {$it$}$);
+
+$endif$
+$else$
+$load.target$ := $load.source$; 
 
 $endif$
 >>
@@ -147,12 +151,16 @@ $endif$
 >>
 
 Store(store) ::= <<
-$if(!(store.indexes : {$it$}))$
-$store.target$ <= $store.value$;
+$if(store.indexes)$
+$if(store.target.variable.port)$
+$store.target$ := $store.value$;
 
 $else$
--- tab not implemented yet
-$store.target$ := $store.value$; -- [$store.indexes : {$it$}$]
+$store.target$($store.indexes : {$it$}$) <= $store.value$;
+
+$endif$
+$else$
+$store.target$ <= $store.value$;
 
 $endif$
 
