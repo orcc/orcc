@@ -1,0 +1,229 @@
+group VHDL_testbench;
+
+fifo_in(port) ::= <<
+signal $actorName$_$port.name$_data  : $port.type$;
+signal $actorName$_$port.name$_empty : std_logic;
+signal $actorName$_$port.name$_read  : std_logic;
+
+>>
+
+fifo_out(port) ::= <<
+signal $actorName$_$port.name$_full  : std_logic;
+$if(last(port.name))$
+signal $actorName$_$port.name$_data  : $port.type$;
+signal $actorName$_$port.name$_write : std_logic;
+$else$
+signal $actorName$_$port.name$_data  : $port.type$;
+signal $actorName$_$port.name$_write : std_logic;
+$endif$
+
+>>
+
+fifo_in_init(port) ::=<<
+$actorName$_$port.name$_empty <= '1';$"\n"$
+>>
+fifo_out_init(port) ::=<<
+$actorName$_$port.name$_full <= '0';$"\n"$
+>>
+
+fifo_map_in(port) ::= <<
+$actorName$_$port.name$_data  => $actorName$_$port.name$_data,
+$actorName$_$port.name$_empty => $actorName$_$port.name$_empty,
+$actorName$_$port.name$_read  => $actorName$_$port.name$_read
+>>
+
+fifo_map_out(port) ::= <<
+$actorName$_$port.name$_data  => $actorName$_$port.name$_data,
+$actorName$_$port.name$_full  => $actorName$_$port.name$_full,
+$actorName$_$port.name$_write => $actorName$_$port.name$_write
+>>
+///////////////////////////////////////////////////////////////////////////////
+// Types and variables
+///////////////////////////////////////////////////////////////////////////////
+
+// the dimensions of a list: [dim1][dim2]...[dimn]
+// does not output anything if $value$ is empty
+listSize(value) ::= <<
+$value : {[$it$]} $
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+listValue(value) ::= <<
+{$value; wrap, separator=", "$}
+>>
+
+signalDeclaration(variable) ::= <<
+$if(variable.port)$
+signal $variable$ : $variable.type$;
+
+$else$
+  $if(!(listSize(variable.type.dimensions)))$
+signal $variable$ : $variable.type$;
+
+  $else$
+type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$ -1 downto 0) of $variable.type$;
+signal $variable$ : memory_type_$variable$;
+
+  $endif$
+$endif$
+>>
+
+variableDeclaration(variable) ::= <<
+$variable.type.dimensions$
+$if(variable.port)$
+variable $variable$ : $variable.type$
+$else$
+  $if(!(listSize(variable.type.dimensions)))$
+variable $variable$ : $variable.type$ $listSize(variable.type.dimensions)$
+  $else$
+-- error !!!!! type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$ -1 downto 0) of $variable.type$;
+-- error !!!!! variable $variable$ : memory_type_$variable$
+  $endif$
+$endif$
+>>
+
+
+sig_const() ::= <<
+constant clk_period      : time := 10 ns;
+type tb_type is (after_reset, read_file, CheckRead);
+$actor.inputs.list: signal_in(it)$--
+$actor.inputs.list: fifo_in(it)$--
+$actor.outputs.list: fifo_out(it)$
+signal count             : integer range 255 downto 0;
+signal clock             : std_logic := '0';
+signal reset_n           : std_logic;
+
+>>
+
+signal_in(port) ::= <<
+--
+signal tb_FSM_$actorName$_$port.name$  : tb_type;
+file sim_file_$actorName$_$port.name$  : text is "$actorName$_$port.name$_sim.txt";
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Process
+///////////////////////////////////////////////////////////////////////////////
+init_process() ::= <<
+  -- clock generation
+  clock <= not clock after clk_period/2;
+
+  -- reset generation
+  process
+  begin
+    reset_n <= '0';
+    wait for 10*clk_period;
+    reset_n <= '1';
+    wait;
+  end process;
+
+>>
+
+tb_FSM_init(port) ::= <<
+  tb_FSM_$actorName$_$port.name$ <= after_reset;
+
+>>
+    
+
+
+waveform_process() ::= <<
+WaveGen_Proc : process (reset_n, clock)
+    variable Input_bit   : integer range 2147483647 downto - 2147483648;
+  variable line_number : line;
+begin
+  if reset_n = '0' then
+    $actor.inputs.list: fifo_in_init(it)$    --
+    $actor.outputs.list: fifo_out_init(it)$    --
+    $actor.inputs.list: tb_FSM_init(it)$
+    count <= 0;
+    
+  elsif rising_edge(clock) then
+    --
+    $actor.inputs.list:  {$case_define(it)$}; separator="\n"$
+  end if;
+end process WaveGen_Proc;
+
+>>
+
+
+case_define(port) ::= <<
+case tb_FSM_$actorName$_$port.name$ is
+  when after_reset =>
+    count <= count + 1;
+    if count = 15 then
+      tb_FSM_$actorName$_$port.name$ <= read_file;
+      count           <= 0;
+    end if;
+
+  when read_file =>
+    if (not endfile (sim_file_$actorName$_$port.name$)) then
+      readline(sim_file_$actorName$_$port.name$, line_number);
+      --
+      if line_number'length > 0 and line_number(1) /= '-' then
+        read(line_number, input_bit);
+        $actorName$_$port.name$_data  <= input_bit;
+        $actorName$_$port.name$_empty <= '0';    
+        tb_FSM_$actorName$_$port.name$ <= CheckRead;
+      end if;
+    end if;
+
+  when CheckRead =>
+    if (not endfile (sim_file_$actorName$_$port.name$)) and $actorName$_$port.name$_read = '1' then
+      readline(sim_file_$actorName$_$port.name$, line_number);
+      --
+      if line_number'length > 0 and line_number(1) /= '-' then
+        read(line_number, input_bit);
+        $actorName$_$port.name$_data  <= input_bit;
+        $actorName$_$port.name$_empty <= '0';     
+      end if;
+    end if;
+
+  when others => null;
+end case;
+
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// testbench
+///////////////////////////////////////////////////////////////////////////////
+testbench(actorName, actor) ::= <<
+------------------------------------------------------------------------------
+-- Generated from $actor.name$ actor
+------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use std.textio.all;
+use ieee.numeric_std.all;
+
+
+entity $actor.name$_testbench is
+
+end $actor.name$_testbench;
+
+
+architecture rtl of $actor.name$_testbench is 
+
+  ---------------------------------------------------------------------------
+  -- Signal & constant declaration
+  $sig_const()$
+  ---------------------------------------------------------------------------
+
+begin
+
+  $actor.name$_orcc : entity work.$actor.name$
+    port map (
+      clock      => clock,
+      reset_n    => reset_n,
+      $actor.inputs.list: {$fifo_map_in(it)$}; separator=",\n"$,
+      $actor.outputs.list: {$fifo_map_out(it)$}; separator=",\n"$);
+      
+  $init_process()$
+  $waveform_process()$
+
+end architecture rtl;
+>>

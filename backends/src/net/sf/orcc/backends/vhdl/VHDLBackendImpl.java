@@ -43,6 +43,7 @@ import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.Inline;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
@@ -75,7 +76,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	/**
 	 * printer is protected
 	 */
-	protected VHDLActorPrinter printer;
+	private VHDLActorPrinter printer;
 
 	@Override
 	protected void beforeInstantiation(Network network) throws OrccException {
@@ -99,6 +100,16 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
+		VHDLTestbenchPrinter tbPrinter = new VHDLTestbenchPrinter();
+		for (Instance instance : network.getInstances()) {
+			if (instance.isActor()) {
+				Actor actor = instance.getActor();
+				String id = instance.getId();
+				String outputName = path + File.separator + id + "_tb.vhd";
+				tbPrinter.printTestbench(outputName, id, actor);
+			}
+		}
+
 		VHDLNetworkPrinter networkPrinter = new VHDLNetworkPrinter();
 
 		// Add broadcasts before printing
@@ -107,4 +118,5 @@ public class VHDLBackendImpl extends AbstractBackend {
 		String outputName = path + File.separator + network.getName() + ".vhd";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
+
 }
