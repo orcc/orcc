@@ -36,4 +36,4 @@ ${orcc_SOURCE_DIR}/src/traceaka.cpp
 )
 
 install (TARGETS orcc DESTINATION lib)
-install (FILES include/fifo.h DESTINATION include)
+install(DIRECTORY include/ DESTINATION include/orcc PATTERN ".svn" EXCLUDE)
