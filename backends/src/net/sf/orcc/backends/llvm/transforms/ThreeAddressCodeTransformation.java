@@ -215,7 +215,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			BinaryOp op = BinaryOp.PLUS;
 
 			assign.setValue(new BinaryExpr(location, new IntExpr(0), op, expr,
-					type));
+					expr.getType()));
 		}
 	}
 
