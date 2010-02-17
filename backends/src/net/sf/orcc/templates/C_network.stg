@@ -43,8 +43,8 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "orcc/fifo.h"
-#include "orcc/orcc_util.h"
+#include "fifo.h"
+#include "orcc_util.h"
 
 #define SIZE $size$
 

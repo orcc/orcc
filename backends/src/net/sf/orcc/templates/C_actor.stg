@@ -327,7 +327,7 @@ actor(actorName, actor) ::= <<
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "orcc/fifo.h"
+#include "fifo.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs

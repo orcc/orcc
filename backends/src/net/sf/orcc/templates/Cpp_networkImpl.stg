@@ -16,7 +16,7 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
 #include <iostream>
 
 extern "C" {
-#include "orcc/orcc_util.h"
+#include "orcc_util.h"
 }
 
 $connections:{ fifo | FifoAPI * network_$name$::fifo_$fifo.count$ = (FifoAPI *)new CalOrientedBoundedFifo<$fifo.type$>($fifo.size$);}; separator="\n"$

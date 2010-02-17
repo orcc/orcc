@@ -27,6 +27,6 @@ add_executable ($network.name$
 $network.name$.c
 $network.instances: printInstance(it)$)
 
-target_link_libraries(MPEG4_SP_Decoder \${orcc_LIBRARY} \${SDL_LIBRARY})
+target_link_libraries($network.name$ \${orcc_LIBRARY} \${SDL_LIBRARY})
 
 >>
