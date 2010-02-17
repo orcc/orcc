@@ -165,7 +165,13 @@ default:
 CastAssign(target, value, cast)::= <<
 $if(cast.extended)$
 %$target$_ext = $value$
+$if(cast.signed)$
 $SextOp(result="%"+target, ty=value.type, value="%"+target+"_ext", ty2=target.type)$
+
+$else$
+$ZextOp(result="%"+target, ty=value.type, value="%"+target+"_ext", ty2=target.type)$
+
+$endif$
 $else$
 %$target$_trunc = $value$
 $TruncOp(result="%"+target, ty=value.type, value="%"+target+"_trunc", ty2=target.type)$
@@ -176,7 +182,13 @@ $endif$
 
 CastStore(ty, value, pty, pointer, cast)::= <<
 $if(cast.extended)$
+$if(cast.signed)$
 $SextOp(result="%"+value+"_ext", ty=ty, value=Expr(value), ty2=pty)$
+
+$else$
+$ZextOp(result="%"+value+"_ext", ty=ty, value=Expr(value), ty2=pty)$
+
+$endif$
 $StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_ext")$
 $else$
 $TruncOp(result="%"+value+"_trunc", ty=ty, value=Expr(value), ty2=pty)$
@@ -423,7 +435,7 @@ b$label(whileNode.joinNode)$_next:
 ///////////////////////////////////////////////////////////////////////////////
 
 instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
+	$instructions: {$(it.class.simpleName)(it)$}$
 >>
 
 nodes(nodes) ::= <<
@@ -436,6 +448,10 @@ $nodes: {$(it.class.simpleName+"_cond")(it)$}$
 
 WhileNode_cond(nodes) ::= <<
 $WhileNode(nodes)$
+>>
+
+IfNode_cond(nodes) ::= <<
+$IfNode(nodes)$
 >>
 
 

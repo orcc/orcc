@@ -117,6 +117,27 @@ public class Cast {
 		return getSizeOf(source) < getSizeOf(target);
 
 	}
+	
+	/**
+	 * Return true if the source type is signed
+	 * 
+	 * @return a boolean indicating if source is signed
+	 *         type
+	 */
+	public boolean isSigned() {
+		if (source.isUint()) {
+			return false;
+		}
+
+		if (source.isList()) {
+			ListType type = (ListType)source;
+			if(type.getElementType().isUint()){
+				return false;
+			}
+		}
+		
+		return true;
+	}
 
 	/**
 	 * Return true if the target type is trunced from the source type.
