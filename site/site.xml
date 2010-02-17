@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/net.sf.orcc_0.5.0.jar" id="net.sf.orcc" version="0.5.0">
+   <feature url="features/net.sf.orcc_0.7.0.beta1.jar" id="net.sf.orcc" version="0.7.0.beta1">
       <category name="Open RVC-CAL Compiler"/>
    </feature>
    <category-def name="Open RVC-CAL Compiler" label="Open RVC-CAL Compiler">
       <description>
-         The Orc Compiler is a compiler for the RVC-CAL language.
+         The Open RVC-CAL Compiler (Orcc) is a collection of support tools under BSD license created by IETR/INSA Rennes for the RVC-CAL dataflow programming language. Its primary purpose is to provide developers with a compiler infrastructure to allow several languages and combination of languages (in the case of co-design) to be generated from RVC-CAL actors and XDF networks.
       </description>
    </category-def>
 </site>

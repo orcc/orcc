@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Orc front-end win32 x86
+Bundle-Name: Orcc front-end win32 x86
 Bundle-SymbolicName: net.sf.orcc.frontend.win32.x86;singleton:=true
-Bundle-Version: 0.5.0
+Bundle-Version: 0.7.0.beta1
 Fragment-Host: net.sf.orcc.plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-PlatformFilter: (& (osgi.os=win32) (osgi.arch=x86))
-Bundle-Vendor: IETR/INSA of Rennes
+Bundle-Vendor: IETR/INSA Rennes
