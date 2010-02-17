@@ -347,7 +347,7 @@ $CallOp(ty ="void", fnptrval="@setWriteEnd", function_args="%struct.fifo_s* %end
 
 Return(return) ::= <<
 $if(return.value)$
-$RetOp(type="i1", value=Expr(return.value))$
+$RetOp(type=return.value.type, value=Expr(return.value))$
 $else$
 $RetOp()$
 
@@ -961,7 +961,7 @@ $actor.procs.list: procedure(it)$
 ; Actions
 $actor.actions: action(it)$
 
-$!
+
 $if(initializes)$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Initializes
@@ -983,7 +983,7 @@ return:
 }
 
 $endif$
-!$
+
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Action scheduler
 $if(actor.actionScheduler.fsm)$
