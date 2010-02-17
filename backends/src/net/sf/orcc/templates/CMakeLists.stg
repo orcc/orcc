@@ -1,9 +1,15 @@
 group CMakeLists;
 
+printActor(id, actor) ::= <<
+$if (!actor.actions.empty)$
+$id$.c
+
+$endif$
+>>
+
 printInstance(instance) ::= <<
 $if (instance.actor)$
-$instance.id$.c
-
+$printActor(id=instance.id, actor=instance.actor)$
 $endif$
 >>
 
