@@ -247,8 +247,8 @@ $LoadOp(result=result, ty=ty, pointer=pointer)$
 
 
 LoadWithIndex(result, ty, pointer, indexes) ::= <<
-$GetElementPtrOp(result="%"+pointer+"L"+indexesName(indexes)+"_ptr", idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
-$LoadOp(result=result, ty=ty.elementType, pointer="%"+pointer+"L"+indexesName(indexes)+"_ptr")$
+$GetElementPtrOp(result=result+"_"+pointer+"L"+indexesName(indexes)+"_ptr", idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
+$LoadOp(result=result, ty=ty.elementType, pointer=result+"_"+pointer+"L"+indexesName(indexes)+"_ptr")$
 
 >>
 
