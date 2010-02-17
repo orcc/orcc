@@ -221,7 +221,7 @@ actor(actorName, actor) ::= <<
 
 #include <iostream>
 
-#include "actoraka.h"
+#include "orcc/actoraka.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs

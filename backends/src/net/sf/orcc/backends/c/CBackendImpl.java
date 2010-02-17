@@ -121,6 +121,8 @@ public class CBackendImpl extends AbstractBackend {
 
 		String outputName = path + File.separator + network.getName() + ".c";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
+		
+		new CMakePrinter().printCMake(path, network);
 	}
 
 }

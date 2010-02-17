@@ -4,7 +4,7 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
 // Generated from "$name$"
  
 $instances: { inst |#include "Actor_$inst$.h"}; separator="\n"$
-#include "CalOrientedBoundedFifo.h"
+#include "orcc/CalOrientedBoundedFifo.h"
 
 class network_$name$ {
 
