@@ -977,25 +977,31 @@ $actor.procs.list: procedure(it)$
 ; Actions
 $actor.actions: action(it)$
 
-
-$if(initializes)$
+$if(actor.initializes)$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Initializes
-$initializes$
-define internal void @$name$_initialize() {
+$actor.initializes: action(it)$
+define i32 @$actorName$_initialize() {
 entry:
-	%i = alloca i32
-	store i32 0, i32* %i
-	br label %bb
+	$AllocaOp(result="%i", type="i32")$ 
+	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	$BrOp(dest="%bb")$
 	
-bb:  
-$if(initialize)$
-$schedulingTest(initialize)$
+bb:
+$if(actor.initializes)$
+$schedulingTest(actor.initializes)$
 $endif$
-	br label %return
-	
+	$BrOp(dest="%return")$
+
+inc_i:
+  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
+  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  $BrOp(dest="%bb")$
+
 return:
-	ret void
+	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	$RetOp(type="i32", value="%i_ret")$
 }
 
 $endif$

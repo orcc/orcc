@@ -64,6 +64,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
 
 /**
  * Split expression and effective node.
@@ -101,17 +102,13 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			//Get expr information
 			Type previousType = type;
 			BinaryOp op = expr.getOp();
-			Type BinaryType = expr.getType();
+			//Type BinaryType = expr.getType();
 			
 			Location location = expr.getLocation();
-	
-			//Transform e1 and e2
-			type = expr.getE1().getType();		
-			Expression e1 = (Expression) expr.getE1().accept(this, args);
-			Expression e2 = (Expression) expr.getE2().accept(this, args);
+			Expression e1 = expr.getE1();
+			Expression e2 = expr.getE2();
 			
-			//Check binary expression correctness
-			
+			//Check binary expression correctness	
 			if (!e1.isVarExpr()&& e2.isVarExpr()){
 				Expression tmpE1 = e1;
 				e1 = e2;
@@ -119,29 +116,19 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			}
 			
 			//Correct binaryExpr type
-			if (!op.isComparison()){
-				BinaryType = e1.getType();
+			if (op.isComparison()){
+				type = e1.getType();
 			}
 			
-			Type e1Type = e1.getType();
-			Type e2Type = e2.getType();
-			
-			//Check the coherence of e1 and e2
-			if (e2.isVarExpr() & !e1Type.equals(e2Type)){
-				LocalVariable target = newVariable();
-				target.setType(e1Type);
-				Assign assign = new Assign(location, target, new BinaryExpr(
-						location, e2, BinaryOp.PLUS , new IntExpr(0), e2Type));
-				assign.setBlock(block);
-				e2 = new VarExpr(new Use(target));
-				it.add(assign);
-			}
+			//Transform e1 and e2
+			e1 = (Expression) e1.accept(this, args);
+			e2 = (Expression) e2.accept(this, args);
 
 			//Make the final asssignment
 			LocalVariable target = newVariable();
 			target.setType(previousType);
 			Assign assign = new Assign(location, target, new BinaryExpr(
-					location, e1, op, e2, BinaryType));
+					location, e1, op, e2, previousType));
 			assign.setBlock(block);
 			it.add(assign);
 
@@ -198,6 +185,18 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
+			if (!expr.getType().equals(type)){
+				//Make the final asssignment
+				LocalVariable target = newVariable();
+				Use use = new Use(target);
+				Location location = expr.getLocation();
+				target.setType(type);
+				Assign assign = new Assign(location, target, new BinaryExpr(
+						location, expr, BinaryOp.PLUS, new IntExpr(0), expr.getType()));
+				assign.setBlock(block);
+				it.add(assign);
+				return new VarExpr(use);
+			}
 			return expr;
 		}
 
@@ -300,7 +299,13 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		block = store.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = store.getValue();
-
+		Variable target = store.getTarget().getVariable();
+		Type targetType = target.getType();
+		
+		if (targetType.isList()){
+			targetType = ((ListType)targetType).getElementType();
+		}
+		
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
 		for (int i = 0; i < store.getIndexes().size(); i++) {
@@ -310,7 +315,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		it.previous();
 
 		// Check store value
-		store.setValue(visitExpression(value, it, value.getType()));
+		store.setValue(visitExpression(value, it, targetType));
 		it.next();
 	}
 
