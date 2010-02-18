@@ -28,11 +28,20 @@
  */
 package net.sf.orcc.ir;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
+import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeInterpreter;
+import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.INameable;
 import net.sf.orcc.util.OrderedMap;
@@ -136,6 +145,84 @@ public class Procedure extends AbstractLocalizable implements INameable {
 			}
 
 			return last;
+		}
+
+	}
+
+	/**
+	 * This class visits the procedure to find the state variables used.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class ProcVisitor extends AbstractInstructionVisitor implements
+			NodeVisitor {
+
+		private Set<StateVariable> vars;
+
+		public ProcVisitor() {
+			vars = new HashSet<StateVariable>();
+		}
+
+		public List<StateVariable> getStateVarsUsed() {
+			return Arrays.asList(vars.toArray(new StateVariable[0]));
+		}
+
+		@Override
+		public void visit(BlockNode node, Object... args) {
+			ListIterator<Instruction> it = node.listIterator();
+			while (it.hasNext()) {
+				it.next().accept(this, it);
+			}
+		}
+
+		@Override
+		public void visit(IfNode node, Object... args) {
+			visit(node.getThenNodes());
+			visit(node.getElseNodes());
+			visit(node.getJoinNode(), args);
+		}
+
+		/**
+		 * Visits the nodes of the given node list.
+		 * 
+		 * @param nodes
+		 *            a list of nodes that belong to a procedure
+		 * @param args
+		 *            arguments
+		 */
+		public void visit(List<CFGNode> nodes, Object... args) {
+			ListIterator<CFGNode> it = nodes.listIterator();
+			while (it.hasNext()) {
+				CFGNode node = it.next();
+				node.accept(this, it);
+			}
+		}
+
+		@Override
+		public void visit(Load node, Object... args) {
+			Variable var = node.getSource().getVariable();
+			if (!var.getType().isList()) {
+				vars.add((StateVariable) var);
+			}
+		}
+
+		@Override
+		public void visit(SpecificInstruction specific, Object... args) {
+		}
+
+		@Override
+		public void visit(Store node, Object... args) {
+			Variable var = node.getTarget().getVariable();
+			if (!var.getType().isList()) {
+				vars.add((StateVariable) var);
+			}
+		}
+
+		@Override
+		public void visit(WhileNode node, Object... args) {
+			visit(node.getNodes());
+			visit(node.getJoinNode(), args);
 		}
 
 	}
@@ -259,6 +346,19 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 */
 	public Type getReturnType() {
 		return returnType;
+	}
+
+	/**
+	 * Computes and returns the list of state variables used (loaded or stored)
+	 * by this procedure.
+	 * 
+	 * @return the list of state variables used (loaded or stored) by this
+	 *         procedure
+	 */
+	public List<StateVariable> getStateVarsUsed() {
+		ProcVisitor visitor = new ProcVisitor();
+		visitor.visit(nodes);
+		return visitor.getStateVarsUsed();
 	}
 
 	public boolean isExternal() {

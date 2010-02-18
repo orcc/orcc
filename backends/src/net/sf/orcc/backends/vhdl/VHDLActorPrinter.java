@@ -71,10 +71,7 @@ public final class VHDLActorPrinter extends Printer {
 		this("VHDL_actor");
 
 		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_");
-		transformations.put("index", "index_");
-		transformations.put("getw", "getw_");
-		transformations.put("select", "select_");
+		transformations.put("abs", "abs_1");
 	}
 
 	/**
