@@ -163,7 +163,16 @@ case tb_FSM_$actorName$_$port.name$ is
       --
       if line_number'length > 0 and line_number(1) /= '-' then
         read(line_number, input_bit);
+$if(port.type.bool)$
+        if (input_bit = 1) then
+          $actorName$_$port.name$_data  <= '1';
+        else
+          $actorName$_$port.name$_data  <= '0';
+        end if;
+$else$
         $actorName$_$port.name$_data  <= input_bit;
+$endif$
+
         $actorName$_$port.name$_empty <= '0';    
         tb_FSM_$actorName$_$port.name$ <= CheckRead;
       end if;
@@ -175,7 +184,16 @@ case tb_FSM_$actorName$_$port.name$ is
       --
       if line_number'length > 0 and line_number(1) /= '-' then
         read(line_number, input_bit);
+$if(port.type.bool)$
+        if (input_bit = 1) then
+          $actorName$_$port.name$_data  <= '1';
+        else
+          $actorName$_$port.name$_data  <= '0';
+        end if;
+$else$
         $actorName$_$port.name$_data  <= input_bit;
+$endif$
+
         $actorName$_$port.name$_empty <= '0';     
       end if;
     end if;

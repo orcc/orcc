@@ -64,18 +64,29 @@ $else$
   $if(!(listSize(variable.type.dimensions)))$
 variable $variable$ : $variable.type$ $listSize(variable.type.dimensions)$
   $else$
--- error !!!!! type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$ -1 downto 0) of $variable.type$;
--- error !!!!! variable $variable$ : memory_type_$variable$
+-- error !!!!! type memory_type
   $endif$
 $endif$
 >>
 
 functionDeclaration(variable) ::= <<
-$variable.type.dimensions$
 $if(!(listSize(variable.type.dimensions)))$
-$variable$ : $variable.type$ $listSize(variable.type.dimensions)$
+$variable$ : $if(procedure.returnType.bool)$std_logic$else$$if(procedure.returnType.int)$integer$endif$$endif$
 $else$
 -- error !!!!! type memory type
+$endif$
+>>
+
+VarInFctDeclaration(variable) ::= <<
+$variable.type.dimensions$
+$if(variable.port)$
+variable $variable$ : $if(procedure.returnType.bool)$std_logic$else$$if(procedure.returnType.int)$integer$endif$$endif$
+$else$
+  $if(!(listSize(variable.type.dimensions)))$
+variable $variable$ : $if(procedure.returnType.bool)$std_logic$else$$if(procedure.returnType.int)$integer$endif$$endif$
+  $else$
+-- error !!!!! type memory_type
+  $endif$
 $endif$
 >>
 
@@ -84,9 +95,17 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 stateConst(variable) ::= <<
 $if(variable.constantValue)$
-$variable$ <= $variable.constantValue$;
+$declareConst(variable=variable)$
 $endif$
 >>
+
+
+declareConst(variable) ::= <<
+$variable$ <= $variable.constantValue$;
+
+>>
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
@@ -225,11 +244,10 @@ $BlockNode(whileNode.joinNode)$
 ///////////////////////////////////////////////////////////////////////////////
 
 function(procedure, transformReturn) ::= <<
-function $procedure$($procedure.parameters.list: { $functionDeclaration(it)$}; wrap, anchor, separator=", "$) return $procedure.returnType$ is 
-begin
+function $procedure$($procedure.parameters.list: { $functionDeclaration(it)$}; wrap, anchor, separator="; "$) return $if(procedure.returnType.bool)$std_logic$else$$if(procedure.returnType.int)$integer$endif$$endif$ is 
   $if(procedure.locals.list)$
-  $procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
-  $endif$
+  $procedure.locals.list: {$VarInFctDeclaration(it)$;$\n$}$
+  $endif$begin
   $procedure.nodes: {$(it.class.simpleName)(it)$}$end $procedure$;
 
 >>
@@ -396,14 +414,17 @@ entity $actor.name$ is
 end $actor.name$;
 
 
-$actor.procs.list: function(procedure=it); separator="\n"$
-
-
 architecture rtl_$actor.name$ of $actor.name$ is 
+
+  ---------------------------------------------------------------------------
+  -- Functions
+  $actor.procs.list: function(procedure=it); separator="\n"$
 
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   $actor.stateVars.list: signalDeclaration(it)$
+  
+  ---------------------------------------------------------------------------
   -- FSM
   $DefineFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
   ---------------------------------------------------------------------------
@@ -417,7 +438,7 @@ $if(actor.actionScheduler.actions)$
     $actor.actions: printActionLocals(it)$  --
   begin
     if reset_n = '0' then 
-  	  $actor.stateVars.list: stateConst(it); separator="\n"$
+      $actor.stateVars.list: stateConst(it)$      --
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
     elsif rising_edge(clock) then
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
@@ -434,8 +455,7 @@ $else$
     $actor.actions: printActionLocals(it)$  --
   begin
     if reset_n = '0' then 
-  	  $actor.stateVars.list: stateConst(it); separator="\n"$
-  	  $InitFSM(actor.actionScheduler.fsm)$
+      $actor.stateVars.list: stateConst(it)$$InitFSM(actor.actionScheduler.fsm)$      --
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
     elsif rising_edge(clock) then
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
