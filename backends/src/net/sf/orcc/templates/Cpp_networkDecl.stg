@@ -1,10 +1,10 @@
 group Cpp_network;
 
-network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+network(debugFifos, name, size, broadcasts, initializes, instances, connections, wrapper) ::= <<
 // Generated from "$name$"
  
 $instances: { inst |#include "Actor_$inst$.h"}; separator="\n"$
-#include "CalOrientedBoundedFifo.h"
+#include "FifoFactory.h"
 
 class network_$name$ {
 
@@ -25,6 +25,8 @@ private:
 
 	// Actors
 	$instances: {inst |actor_$inst$ $inst$;}; separator="\n"$
+
+	$wrapper.type$ $wrapper.id$;
 
 };
 

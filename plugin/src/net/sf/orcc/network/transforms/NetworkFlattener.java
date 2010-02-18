@@ -59,7 +59,7 @@ import org.jgrapht.DirectedGraph;
 public class NetworkFlattener implements INetworkTransformation {
 
 	/**
-	 * Copy all instances and edges between them of subGraph in graph
+	 * Copies all instances and edges between them of subGraph in graph
 	 * 
 	 * @throws OrccException
 	 */
@@ -82,8 +82,7 @@ public class NetworkFlattener implements INetworkTransformation {
 					}
 				}
 
-				graph.addVertex(renameInstance(existingInsts, vertex, graph,
-						subGraph));
+				graph.addVertex(renameInstance(existingInsts, vertex, network));
 			}
 		}
 
@@ -200,7 +199,7 @@ public class NetworkFlattener implements INetworkTransformation {
 	}
 
 	/**
-	 * Propagate parameters of instance to the different sub-instances contain
+	 * Propagates parameters of instance to the different sub-instances contain
 	 * in the attached network of instance
 	 * 
 	 * @throws OrccException
@@ -229,30 +228,27 @@ public class NetworkFlattener implements INetworkTransformation {
 	}
 
 	/**
-	 * Rename instance if an instance with the same name already exists
+	 * Renames instance if an instance with the same name already exists
 	 * 
 	 * @throws OrccException
 	 */
 	private Vertex renameInstance(HashMap<String, Integer> existingInsts,
-			Vertex vertex, DirectedGraph<Vertex, Connection> graph,
-			DirectedGraph<Vertex, Connection> subGraph) throws OrccException {
+			Vertex vertex, Network network) throws OrccException {
 
 		Instance instance = vertex.getInstance();
 		String str = instance.getId();
 		Integer value = new Integer(0);
-
+		
 		if (existingInsts.containsKey(str)) {
 			value = existingInsts.get(str);
 			instance.setId(String.format(str + "_%03d", ++value));
-
-			for (Vertex v : graph.vertexSet()) {
-				if (v.isInstance()) {
-					if (v.getInstance().getId().equals(instance.getId())) {
-						instance.setId(String.format(str + "_%03d", ++value));
-					}
+			for (Instance inst : network.getInstances()) {
+				if (inst.getId().equals(instance.getId())) {
+					instance.setId(String.format(str + "_%03d", ++value));
 				}
 			}
 		}
+		
 		existingInsts.put(instance.getId(), value);
 
 		return vertex;
@@ -284,12 +280,9 @@ public class NetworkFlattener implements INetworkTransformation {
 
 		OrderedMap<GlobalVariable> ExistingVars = network.getVariables();
 
-		for (Vertex vertex : vertexSet) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (!instance.isNetwork()) {
-					existingInsts.put(instance.getId(), new Integer(0));
-				}
+		for (Instance instance : network.getInstances()) {
+			if (!instance.isNetwork()) {
+				existingInsts.put(instance.getId(), new Integer(0));
 			}
 		}
 

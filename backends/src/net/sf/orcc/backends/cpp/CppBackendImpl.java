@@ -33,6 +33,7 @@ import java.io.File;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
+import net.sf.orcc.backends.cpp.codesign.WrapperAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.PhiRemoval;
@@ -51,16 +52,25 @@ public class CppBackendImpl extends AbstractBackend {
 	 * 
 	 * @param args
 	 */
+
+	public static Boolean partitioning = false;
+
 	public static void main(String[] args) {
-		if (args.length == 1) {
+		String file;
+		if (args.length > 0) {
+			file = args[0];
+			if (args.length > 1) {
+				partitioning = Boolean.parseBoolean(args[1]);
+			}
 			try {
-				new CppBackendImpl().generateCode(args[0], 10000);
+				new CppBackendImpl().generateCode(file, 10000);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Usage: CppBackendImpl <flattened XDF network>");
+			System.err
+					.println("Usage: CppBackendImpl <flattened XDF network> [<partition>]");
 		}
 	}
 
@@ -92,15 +102,22 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
+
 		CppNetworkPrinter networkPrinter = new CppNetworkPrinter(
 				"Cpp_networkDecl");
 		CppNetworkPrinter networkImplPrinter = new CppNetworkPrinter(
 				"Cpp_networkImpl");
 
+		if (partitioning) {
+			new WrapperAdder().transform(network);
+		}
+
 		String name = network.getName();
+		
 		String outputName = path + File.separator + "Network_" + name + ".h";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 		outputName = path + File.separator + "Network_" + name + ".cpp";
 		networkImplPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
+
 }

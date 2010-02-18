@@ -6,7 +6,7 @@ $fifo.target$.connect(ACTOR_PORT_IN, $fifo.target$_$fifo.tgt_port$, fifo_$fifo.c
 
 >>
 
-network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+network(debugFifos, name, size, broadcasts, initializes, instances, connections, wrapper) ::= <<
 /**
  * Generated from "$name$"
  */
@@ -19,7 +19,7 @@ extern "C" {
 #include "orcc_util.h"
 }
 
-$connections:{ fifo | FifoAPI * network_$name$::fifo_$fifo.count$ = (FifoAPI *)new CalOrientedBoundedFifo<$fifo.type$>($fifo.size$);}; separator="\n"$
+$connections:{ fifo | FifoAPI * network_$name$::fifo_$fifo.count$ = FifoFactory<$fifo.type$>::allocateFifo($fifo.size$, $fifo.lock$);}; separator="\n"$
 
 network_$name$::network_$name$()
 {
@@ -40,7 +40,8 @@ void network_$name$::stop(std::string &strErr)
 	$instances: {inst |$inst$.stop();}; separator="\n"$
 }
 
-void network_$name$::schedule() {
+void network_$name$::schedule() 
+{
 	$initializes: { init | $init$.initialize();}; separator="\n"$
 
 	while (1) {

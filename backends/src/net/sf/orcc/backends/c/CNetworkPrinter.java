@@ -264,7 +264,7 @@ public class CNetworkPrinter {
 		List<String> inst = new ArrayList<String>();
 
 		for (Instance instance : instances) {
-			if (!instance.isBroadcast()) {
+			if (!instance.isBroadcast() && !instance.isWrapper()) {
 				List<Action> initializes = instance.getActor().getInitializes();
 				if (!initializes.isEmpty()) {
 					init.add(instance.getId());

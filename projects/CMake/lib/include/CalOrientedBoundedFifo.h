@@ -27,6 +27,9 @@
  * SUCH DAMAGE.
  */
 
+#ifndef __CAL_ORIENTED_BOUNDED_FIFO__
+#define __CAL_ORIENTED_BOUNDED_FIFO__
+
 template <typename T>
 class CalOrientedBoundedFifo: public FifoAPI
 {
@@ -271,3 +274,5 @@ inline bool CalOrientedBoundedFifo<T>::hasTokens(const unsigned uNbVal)
 {
 	return m_uCount >= uNbVal ? true : false;
 }
+
+#endif
