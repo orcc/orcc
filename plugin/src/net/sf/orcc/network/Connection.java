@@ -144,13 +144,13 @@ public class Connection implements IAttributeContainer {
 	 * @return the size of this connection
 	 * @throws OrccException
 	 */
-	public int getSize() throws OrccException {
+	public Object getSize() throws OrccException {
 		IAttribute attr = getAttribute(Connection.BUFFER_SIZE);
 		if (attr != null && attr.getType() == IAttribute.VALUE) {
 			Expression expr = ((IValueAttribute) attr).getValue();
-			return new ExpressionEvaluator().evaluateAsInteger(expr);
+			return new ExpressionEvaluator().evaluateAsInteger(expr) + 1;
 		} else {
-			throw new OrccException("could not get the size of this connection");
+			return "SIZE";
 		}
 	}
 

@@ -33,6 +33,7 @@ import java.io.IOException;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
@@ -114,7 +115,7 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
-		CNetworkPrinter networkPrinter = new CNetworkPrinter();
+		NetworkPrinter networkPrinter = new NetworkPrinter("C_network");
 
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);

@@ -33,6 +33,7 @@ import java.io.File;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
@@ -110,7 +111,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 			}
 		}
 
-		VHDLNetworkPrinter networkPrinter = new VHDLNetworkPrinter();
+		NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
 
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);

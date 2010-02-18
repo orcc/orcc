@@ -28,7 +28,9 @@
  */
 package net.sf.orcc.network;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
@@ -44,6 +46,8 @@ public class Broadcast extends Instance {
 	public static final String CLASS = "";
 
 	private int numOutput;
+
+	private List<Integer> outputList;
 
 	private Type type;
 
@@ -68,8 +72,15 @@ public class Broadcast extends Instance {
 		this.type = type;
 	}
 
-	public int getNumOutput() {
-		return numOutput;
+	public List<Integer> getOutputList() {
+		if (outputList == null) {
+			outputList = new ArrayList<Integer>();
+			for (int i = 0; i < numOutput; i++) {
+				outputList.add(i);
+			}
+		}
+
+		return outputList;
 	}
 
 	public Type getType() {

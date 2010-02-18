@@ -35,6 +35,7 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
@@ -81,41 +82,39 @@ public class LLVMBackendImpl extends AbstractBackend {
 		ActorTransformation[] transformations = {
 				new AddInstantationProcedure(),
 				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation()};
+				new MoveReadsWritesTransformation() };
 
-		//if(actor.getName().equals("Algo_h2x2")){
-		
-			for (ActorTransformation transformation : transformations) {
+		// if(actor.getName().equals("Algo_h2x2")){
+
+		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
 
 		String outputName = path + File.separator + id + ".s";
-		
 
 		printer.printActor(outputName, id, actor);
-		
-		if (options != null){
-			if (options.containsKey("llvm-as")){
+
+		if (options != null) {
+			if (options.containsKey("llvm-as")) {
 				printBitcode(options.get("llvm-as"), outputName, id);
 			}
 		}
 
-		//}
+		// }
 	}
 
 	protected void printBitcode(String execPath, String inputName, String actor) {
 		List<String> cmdList = new ArrayList<String>();
 		String outputName = path + File.separator + actor + ".bc";
-		
+
 		Runtime run = Runtime.getRuntime();
 		cmdList.add(execPath);
 		cmdList.add(inputName);
 		cmdList.add("-f");
 		cmdList.add("-o");
 		cmdList.add(outputName);
-		String[] cmd = cmdList.toArray(new String[]{});
-		
-		
+		String[] cmd = cmdList.toArray(new String[] {});
+
 		try {
 			run.exec(cmd);
 		} catch (IOException e) {
@@ -123,10 +122,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	protected void printNetwork(Network network) throws Exception {
-		LLVMNetworkPrinter networkPrinter = new LLVMNetworkPrinter();
+		NetworkPrinter networkPrinter = new NetworkPrinter("LLVM_network");
 
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);

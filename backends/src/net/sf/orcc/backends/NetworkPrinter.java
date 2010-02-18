@@ -26,28 +26,69 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.java;
+package net.sf.orcc.backends;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import net.sf.orcc.backends.c.CNetworkPrinter;
+import net.sf.orcc.network.Network;
+
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
- * Network printer.
+ * This class defines a C network printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class JavaNetworkPrinter extends CNetworkPrinter {
+public class NetworkPrinter {
+
+	private StringTemplateGroup group;
 
 	/**
-	 * Creates a new network printer with the template "Java_network.stg".
+	 * Creates a new network printer using the given template file name.
 	 * 
+	 * @param name
+	 *            The template file name.
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public JavaNetworkPrinter() throws IOException {
-		super("Java_network");
+	public NetworkPrinter(String name) throws IOException {
+		group = new TemplateGroupLoader().loadGroup(name);
+	}
+
+	/**
+	 * Prints the given network to a file whose name is given. debugFifos
+	 * specifies whether debug information should be printed about FIFOs, and
+	 * fifoSize is the default FIFO size.
+	 * 
+	 * @param fileName
+	 *            The output file name.
+	 * @param network
+	 *            The network to generate code for.
+	 * @param debugFifos
+	 *            Whether debug information should be printed about FIFOs.
+	 * @param fifoSize
+	 *            Default FIFO size.
+	 * @throws IOException
+	 *             if there is an I/O error
+	 */
+	public void printNetwork(String fileName, Network network,
+			boolean debugFifos, int fifoSize) throws IOException {
+		StringTemplate template = group.getInstanceOf("network");
+
+		network.computeGraphMaps();
+
+		template.setAttribute("debugFifos", debugFifos);
+		template.setAttribute("network", network);
+		template.setAttribute("fifoSize", fifoSize);
+
+		byte[] b = template.toString(80).getBytes();
+		OutputStream os = new FileOutputStream(fileName);
+		os.write(b);
+		os.close();
 	}
 
 }

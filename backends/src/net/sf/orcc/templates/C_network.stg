@@ -1,43 +1,134 @@
 group C_network;
 
-broadcast(bcast) ::= <<
+declareBroadcast(bcast) ::= <<
 int $bcast.id$_scheduler() {
 	$bcast.type$ *tok_input;
-	$bcast.num: { n | $bcast.type$ *tok_output_$n$;
+	$bcast.outputList: { n | $bcast.type$ *tok_output_$n$;
 }$
 	while (hasTokens($bcast.id$_input, 1)
-		$bcast.num:{ && hasRoom($bcast.id$_output_$i0$, 1)}$) {
+		$bcast.outputList:{ && hasRoom($bcast.id$_output_$i0$, 1)}$) {
 		tok_input = getReadPtr($bcast.id$_input, 1);
-		$bcast.num: { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
-}$
-		$bcast.num: { n | *tok_output_$n$ = *tok_input;
+		$bcast.outputList:
+		  { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
+*tok_output_$n$ = *tok_input;
 }$	
 		setReadEnd($bcast.id$_input);
-		$bcast.num: { n | setWriteEnd($bcast.id$_output_$n$);
+		$bcast.outputList: { n | setWriteEnd($bcast.id$_output_$n$);
 }$	}
-	
-	
 
 	return 0;
 }
 
+>>
+
+declareBroadcasts(broadcasts) ::= <<
+$broadcasts: declareBroadcast(it)$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// allocates FIFOs
+
+allocateFifoType(type, size, count) ::= <<
+static $type$ array_$count$[$size$ * sizeof($type$)];
+static struct fifo_s fifo_$count$ = { sizeof($type$), $size$, (char *)array_$count$, 0, 0 };
 
 >>
 
-struct_fifo(fifo) ::= <<
-static $fifo.type$ array_$fifo.count$[$fifo.size$ * sizeof($fifo.type$)];
-static struct fifo_s fifo_$fifo.count$ = { sizeof($fifo.type$), $fifo.size$, (char *)array_$fifo.count$, 0, 0 };
+allocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
+$if (source.broadcast)$
+$allocateFifoType(
+  type=targetPort.type, size=edge.size, count=network.connectionMap.(edge))$
+$else$
+$allocateFifoType(
+  type=sourcePort.type, size=edge.size, count=network.connectionMap.(edge))$
+$endif$
+>>
+
+tryAllocateFifo(edge, src, tgt) ::= <<
+$if (src.instance)$
+$if (tgt.instance)$
+$allocateFifo(
+  edge=edge,
+  source=src.instance, sourcePort=edge.source,
+  target=tgt.instance, targetPort=edge.target)$
+$endif$
+$endif$
+>>
+
+allocateFifos(edges) ::= <<
+$edges: tryAllocateFifo(
+  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it))$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// assigns FIFOs
+
+assignFifo(source, sourcePort, target, targetPort, count) ::= <<
+struct fifo_s *$source.id$_$sourcePort.name$ = &fifo_$count$;
+struct fifo_s *$target.id$_$targetPort.name$ = &fifo_$count$;
 
 >>
 
-ptr_fifo(fifo) ::= <<
-struct fifo_s *$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
-struct fifo_s *$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
-
+tryAssignFifo(edge, src, tgt) ::= <<
+$if (src.instance)$
+$if (tgt.instance)$
+$assignFifo(
+  source=src.instance, sourcePort=edge.source,
+  target=tgt.instance, targetPort=edge.target,
+  count=network.connectionMap.(edge))$
+$endif$
+$endif$
 >>
 
-network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
-// Generated from "$name$"
+assignFifos(edges) ::= <<
+$edges: tryAssignFifo(
+  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it)) $
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// declares initialize and scheduler functions
+
+initialize(instance) ::= <<
+$if (instance.actor)$
+$if (!instance.actor.initializes.empty)$
+extern void $instance.id$_initialize();
+
+$endif$
+$endif$
+>>
+
+declareInitializes(instances) ::= <<
+$instances: initialize()$
+>>
+
+declareSchedulers(instances) ::= <<
+$instances: {extern int $it.id$_scheduler();}; separator="\n"$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print calls to initialize() and scheduler()
+
+printInitialize(instance) ::= <<
+$if (instance.actor)$
+$if (!instance.actor.initializes.empty)$
+$instance.id$_initialize();
+
+$endif$
+$endif$
+>>
+
+printInitializes(instances) ::= <<
+$instances: printInitialize()$
+>>
+
+printSchedulers(instances) ::= <<
+$instances: {$it.id$_scheduler();}; separator="\n"$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print network
+network(debugFifos, fifoSize, network) ::= <<
+// Generated from "$network.name$"
 
 #include <locale.h>
 #include <stdio.h>
@@ -46,32 +137,31 @@ network(debugFifos, name, size, broadcasts, initializes, instances, connections)
 #include "fifo.h"
 #include "orcc_util.h"
 
-#define SIZE $size$
+#define SIZE $fifoSize$
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
-$connections:struct_fifo()$
+$allocateFifos(network.connections)$
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO pointer assignments
-$connections:ptr_fifo()$
+$assignFifos(network.connections)$
 
 ////////////////////////////////////////////////////////////////////////////////
-$broadcasts:broadcast()$////////////////////////////////////////////////////////////////////////////////
+$declareBroadcasts(network.broadcasts)$
+
+////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
-$initializes: { init | extern void $init$_initialize(); 
-}$
-$instances: { inst | extern int $inst$_scheduler();
-}$
+$declareInitializes(network.instances)$
+$declareSchedulers(network.instances)$
+
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
 static void scheduler() {
-	$initializes: { init | $init$_initialize();
-}$	while (1) {
-		$instances: { inst | $inst$_scheduler();
-}$
-		$broadcasts: { bcast | $bcast.id$_scheduler();
-}$	}
+	$printInitializes(network.instances)$
+	while (1) {
+		$printSchedulers(network.instances)$
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

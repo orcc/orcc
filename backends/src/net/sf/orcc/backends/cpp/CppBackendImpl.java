@@ -32,6 +32,7 @@ import java.io.File;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.cpp.codesign.WrapperAdder;
 import net.sf.orcc.ir.Actor;
@@ -102,10 +103,8 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
-
-		CppNetworkPrinter networkPrinter = new CppNetworkPrinter(
-				"Cpp_networkDecl");
-		CppNetworkPrinter networkImplPrinter = new CppNetworkPrinter(
+		NetworkPrinter networkPrinter = new NetworkPrinter("Cpp_networkDecl");
+		NetworkPrinter networkImplPrinter = new NetworkPrinter(
 				"Cpp_networkImpl");
 
 		if (partitioning) {
@@ -113,7 +112,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		String name = network.getName();
-		
+
 		String outputName = path + File.separator + "Network_" + name + ".h";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 		outputName = path + File.separator + "Network_" + name + ".cpp";

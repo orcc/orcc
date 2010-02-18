@@ -29,7 +29,10 @@
 package net.sf.orcc.network;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
@@ -52,6 +55,8 @@ import org.jgrapht.DirectedGraph;
  */
 public class Network {
 
+	private Map<Connection, Integer> connectionMap;
+
 	private DirectedGraph<Vertex, Connection> graph;
 
 	private OrderedMap<Port> inputs;
@@ -61,6 +66,10 @@ public class Network {
 	private OrderedMap<Port> outputs;
 
 	private OrderedMap<GlobalVariable> parameters;
+
+	private Map<Connection, Vertex> sourceMap;
+
+	private Map<Connection, Vertex> targetMap;
 
 	private OrderedMap<GlobalVariable> variables;
 
@@ -99,6 +108,28 @@ public class Network {
 	}
 
 	/**
+	 * Computes the source map and target maps that associate each connection to
+	 * its source vertex (respectively target vertex).
+	 */
+	public void computeGraphMaps() {
+		sourceMap = new HashMap<Connection, Vertex>();
+		for (Connection connection : graph.edgeSet()) {
+			sourceMap.put(connection, graph.getEdgeSource(connection));
+		}
+
+		targetMap = new HashMap<Connection, Vertex>();
+		for (Connection connection : graph.edgeSet()) {
+			targetMap.put(connection, graph.getEdgeTarget(connection));
+		}
+
+		connectionMap = new HashMap<Connection, Integer>();
+		int i = 0;
+		for (Connection connection : graph.edgeSet()) {
+			connectionMap.put(connection, i++);
+		}
+	}
+
+	/**
 	 * Flattens this network.
 	 * 
 	 * @throws OrccException
@@ -125,6 +156,44 @@ public class Network {
 		}
 
 		return actors;
+	}
+
+	/**
+	 * Returns the list of broadcasts referenced by the graph of this network.
+	 * 
+	 * @return a list of actors
+	 */
+	public List<Broadcast> getBroadcasts() {
+		List<Broadcast> broadcasts = new ArrayList<Broadcast>();
+		for (Vertex vertex : getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isBroadcast()) {
+					Broadcast bcast = (Broadcast) instance;
+					broadcasts.add(bcast);
+				}
+			}
+		}
+
+		return broadcasts;
+	}
+
+	/**
+	 * Returns a map that associates each connection to a unique integer.
+	 * 
+	 * @return a map that associates each connection to a unique integer
+	 */
+	public Map<Connection, Integer> getConnectionMap() {
+		return connectionMap;
+	}
+
+	/**
+	 * Returns the list of this graph's connections.
+	 * 
+	 * @return the list of this graph's connections
+	 */
+	public List<Connection> getConnections() {
+		return Arrays.asList(graph.edgeSet().toArray(new Connection[0]));
 	}
 
 	/**
@@ -187,6 +256,24 @@ public class Network {
 	 */
 	public OrderedMap<GlobalVariable> getParameters() {
 		return parameters;
+	}
+
+	/**
+	 * Returns a map that associates each connection to its source vertex.
+	 * 
+	 * @return a map that associates each connection to its source vertex
+	 */
+	public Map<Connection, Vertex> getSourceMap() {
+		return sourceMap;
+	}
+
+	/**
+	 * Returns a map that associates each connection to its target vertex.
+	 * 
+	 * @return a map that associates each connection to its target vertex
+	 */
+	public Map<Connection, Vertex> getTargetMap() {
+		return targetMap;
 	}
 
 	/**
