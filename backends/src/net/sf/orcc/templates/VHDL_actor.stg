@@ -97,10 +97,12 @@ $assign.target$ := $assign.value$;
 
 Call(call) ::= <<
 $if(call.target)$
-$call.target$ := 
-$endif$
-$call.procedure$($call.parameters; separator=", "$);
+$call.target$ := $call.procedure$($call.procedure.stateVarsUsed: {$it$, }$$call.parameters: {$it$, }$'1');
 
+$else$
+$call.procedure$($call.parameters; separator=", "$, '1');
+
+$endif$
 >>
 
 HasTokens(hasTokens) ::= <<
