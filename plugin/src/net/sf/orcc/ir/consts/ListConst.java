@@ -69,11 +69,6 @@ public class ListConst extends AbstractConstant {
 		visitor.visit(this, args);
 	}
 
-	@Override
-	public int getTypeOf() {
-		return LIST;
-	}
-
 	/**
 	 * Returns the value of this constant. The list returned is a reference.
 	 * 
@@ -81,6 +76,11 @@ public class ListConst extends AbstractConstant {
 	 */
 	public List<Constant> getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isListConst() {
+		return true;
 	}
 
 }

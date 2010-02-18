@@ -59,11 +59,6 @@ public class BoolConst extends AbstractConstant {
 		visitor.visit(this, args);
 	}
 
-	@Override
-	public int getTypeOf() {
-		return BOOLEAN;
-	}
-
 	/**
 	 * Returns the value of this constant.
 	 * 
@@ -71,5 +66,10 @@ public class BoolConst extends AbstractConstant {
 	 */
 	public boolean getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isBoolConst() {
+		return true;
 	}
 }

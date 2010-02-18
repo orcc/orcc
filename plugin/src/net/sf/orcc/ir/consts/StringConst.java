@@ -65,11 +65,6 @@ public class StringConst extends AbstractConstant {
 		visitor.visit(this, args);
 	}
 
-	@Override
-	public int getTypeOf() {
-		return STRING;
-	}
-
 	/**
 	 * Returns the value of this constant.
 	 * 
@@ -77,6 +72,11 @@ public class StringConst extends AbstractConstant {
 	 */
 	public String getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isStringConst() {
+		return true;
 	}
 
 }

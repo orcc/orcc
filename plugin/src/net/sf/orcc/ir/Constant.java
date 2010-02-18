@@ -76,10 +76,31 @@ public interface Constant {
 	public abstract void accept(ConstantVisitor visitor, Object... args);
 
 	/**
-	 * Returns the type of this constant.
+	 * Returns true if the constant is an instance of BoolConst
 	 * 
-	 * @return the type of this constant
+	 * @return True if the constant is an instance of BoolConst
 	 */
-	public int getTypeOf();
+	public boolean isBoolConst();
+
+	/**
+	 * Returns true if the constant is an instance of IntConst
+	 * 
+	 * @return True if the constant is an instance of IntConst
+	 */
+	public boolean isIntConst();
+
+	/**
+	 * Returns true if the constant is an instance of ListConst
+	 * 
+	 * @return True if the constant is an instance of ListConst
+	 */
+	public boolean isListConst();
+
+	/**
+	 * Returns true if the constant is an instance of StringConst
+	 * 
+	 * @return True if the constant is an instance of StringConst
+	 */
+	public boolean isStringConst();
 
 }

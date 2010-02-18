@@ -59,11 +59,6 @@ public class IntConst extends AbstractConstant {
 		visitor.visit(this, args);
 	}
 
-	@Override
-	public int getTypeOf() {
-		return INT;
-	}
-
 	/**
 	 * Returns the value of this constant.
 	 * 
@@ -71,6 +66,11 @@ public class IntConst extends AbstractConstant {
 	 */
 	public int getValue() {
 		return value;
+	}
+
+	@Override
+	public boolean isIntConst() {
+		return true;
 	}
 
 }

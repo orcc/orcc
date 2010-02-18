@@ -84,4 +84,24 @@ public abstract class AbstractConstant implements Constant {
 		return Printer.getInstance().toString(this);
 	}
 
+
+	@Override
+	public boolean isBoolConst() {
+		return false;
+	}
+
+	@Override
+	public boolean isIntConst() {
+		return false;
+	}
+
+	@Override
+	public boolean isListConst() {
+		return false;
+	}
+
+	@Override
+	public boolean isStringConst() {
+		return false;
+	}
 }

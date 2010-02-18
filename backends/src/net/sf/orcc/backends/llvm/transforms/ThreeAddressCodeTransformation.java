@@ -203,7 +203,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	public void visit(Assign assign, Object... args) {
 		block = assign.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		Type type = assign.getTarget().getType();
+		//Type type = assign.getTarget().getType();
+		Type type = assign.getValue().getType();
 		it.previous();
 		assign.setValue(visitExpression(assign.getValue(), it, type));
 		it.next();
@@ -215,7 +216,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			BinaryOp op = BinaryOp.PLUS;
 
 			assign.setValue(new BinaryExpr(location, new IntExpr(0), op, expr,
-					expr.getType()));
+					type));
 		}
 	}
 

@@ -692,7 +692,7 @@ fifo(port) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 // the values of a list: {val1, val2, ..., valn}
-listValue(value) ::= <<
+listValue(type, value) ::= <<
 [$value; wrap, separator=", "$]
 >>
 
