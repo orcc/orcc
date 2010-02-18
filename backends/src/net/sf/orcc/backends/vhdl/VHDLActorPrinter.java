@@ -72,6 +72,9 @@ public final class VHDLActorPrinter extends Printer {
 
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_1");
+		transformations.put("access", "access_1");
+		transformations.put("component", "component_1");
+		transformations.put("select", "select_1");
 	}
 
 	/**

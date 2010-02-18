@@ -341,14 +341,14 @@ end if;
 
 DefineFSM(actions, fsm) ::= <<
 $if(fsm)$
-type FSM_type is ($first(fsm.states)$, $rest(fsm.states) : {$it$}; separator=", "$);
+type FSM_type is ($fsm.states: {s_$it$}; separator=", "$);
 signal FSM : FSM_type;
 $endif$
 
 >>
 
 InitFSM(fsm) ::= <<
-FSM <= $fsm.initialState$;
+FSM <= s_$fsm.initialState$;
 
 >>
 
@@ -377,7 +377,7 @@ end case;
 
 
 switch(transitions) ::= <<
-$transitions: {when $it.sourceState$ =>
+$transitions: {when s_$it.sourceState$ =>
 $stateScheduler(transition=it)$}$
 >>
 
@@ -395,7 +395,7 @@ if $nextStates: actionTestState(nextState=it); separator="elsif"$end if;
 // prints the action referenced by the "nextState" parameter
 // and updates the FSM state
 actionCallState(nextState) ::= <<
-$printActionBodyInline(nextState.action)$FSM <= $nextState.targetState$;
+$printActionBodyInline(nextState.action)$FSM <= s_$nextState.targetState$;
 >>
 
 actionTestState(nextState) ::= <<

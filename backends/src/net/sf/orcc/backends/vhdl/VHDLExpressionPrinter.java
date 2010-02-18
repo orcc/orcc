@@ -119,7 +119,7 @@ public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 	protected String toString(UnaryOp op) {
 		switch (op) {
 		case LOGIC_NOT:
-			return "not";
+			return "not ";
 		default:
 			return op.getText();
 		}
@@ -154,14 +154,25 @@ public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 		case SHIFT_RIGHT:
 			printCall("shift_right", e1, e2);
 			break;
-		default:
+		default: {
+			int currentPrec = op.getPrecedence();
+			int nextPrec;
+			if (op == BinaryOp.LOGIC_OR) {
+				// special case, for "or" always put parentheses because
+				// VHDL does not get it if we don't
+				nextPrec = Integer.MIN_VALUE;
+			} else {
+				nextPrec = currentPrec;
+			}
+
 			if (op.needsParentheses(args)) {
 				builder.append("(");
-				toString(op.getPrecedence(), expr.getE1(), op, expr.getE2());
+				toString(nextPrec, expr.getE1(), op, expr.getE2());
 				builder.append(")");
 			} else {
-				toString(op.getPrecedence(), expr.getE1(), op, expr.getE2());
+				toString(nextPrec, expr.getE1(), op, expr.getE2());
 			}
+		}
 		}
 	}
 
