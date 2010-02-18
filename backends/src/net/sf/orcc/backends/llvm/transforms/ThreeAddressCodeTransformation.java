@@ -98,15 +98,46 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
+			//Get expr information
 			Type previousType = type;
 			BinaryOp op = expr.getOp();
 			Type BinaryType = expr.getType();
+			
 			Location location = expr.getLocation();
 	
+			//Transform e1 and e2
 			type = expr.getE1().getType();		
 			Expression e1 = (Expression) expr.getE1().accept(this, args);
 			Expression e2 = (Expression) expr.getE2().accept(this, args);
+			
+			//Check binary expression correctness
+			
+			if (!e1.isVarExpr()&& e2.isVarExpr()){
+				Expression tmpE1 = e1;
+				e1 = e2;
+				e2 = tmpE1;
+			}
+			
+			//Correct binaryExpr type
+			if (!op.isComparison()){
+				BinaryType = e1.getType();
+			}
+			
+			Type e1Type = e1.getType();
+			Type e2Type = e2.getType();
+			
+			//Check the coherence of e1 and e2
+			if (e2.isVarExpr() & !e1Type.equals(e2Type)){
+				LocalVariable target = newVariable();
+				target.setType(e1Type);
+				Assign assign = new Assign(location, target, new BinaryExpr(
+						location, e2, BinaryOp.PLUS , new IntExpr(0), e2Type));
+				assign.setBlock(block);
+				e2 = new VarExpr(new Use(target));
+				it.add(assign);
+			}
 
+			//Make the final asssignment
 			LocalVariable target = newVariable();
 			target.setType(previousType);
 			Assign assign = new Assign(location, target, new BinaryExpr(
@@ -215,8 +246,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			Location location = expr.getLocation();
 			BinaryOp op = BinaryOp.PLUS;
 
-			assign.setValue(new BinaryExpr(location, new IntExpr(0), op, expr,
-					type));
+			assign.setValue(new BinaryExpr(location, expr, op, new IntExpr(0),
+					expr.getType()));
 		}
 	}
 
