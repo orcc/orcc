@@ -43,6 +43,47 @@ indexesName(indexes) ::= <<
 $indexes: {index |$index$}; separator="_"$
 >>
 
+argumentDeclaration(variable) ::= <<
+$variable.type$ %$variable$
+>>
+
+ConstantValue(type, const) ::= <<
+$if(const.listConst)$
+$listValue(type=type.elementType, values=const.value)$
+$else$
+$const$
+$endif$
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// List
+///////////////////////////////////////////////////////////////////////////////
+
+// the values of a list: {val1, val2, ..., valn}
+listValue(type, values) ::= <<
+[$values: {$type$ $it$}; separator=", "$]
+>>
+
+// phi definition
+phiPair(value, label) ::= <<
+[$value$, %$label$]
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// State variables
+///////////////////////////////////////////////////////////////////////////////
+stateVar(variable) ::= <<
+$if(variable.constantValue)$
+@$variable$ = internal global $variable.type$ $ConstantValue(type=variable.type, const=variable.constantValue)$
+
+$else$
+@$variable$ = internal global $variable.type$ zeroinitializer
+
+$endif$
+>>
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // LLVM Operations
 ///////////////////////////////////////////////////////////////////////////////
@@ -691,32 +732,6 @@ fifo(port) ::= <<
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
-// the values of a list: {val1, val2, ..., valn}
-listValue(type, value) ::= <<
-[$value; wrap, separator=", "$]
->>
-
-// phi definition
-phiPair(value, label) ::= <<
-[$value$, %$label$]
->>
-
-argumentDeclaration(variable) ::= <<
-$variable.type$ %$variable$
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// State variables
-///////////////////////////////////////////////////////////////////////////////
-stateVar(variable) ::= <<
-$if(variable.constantValue)$
-@$variable$ = internal global $variable.type$ $variable.constantValue$
-
-$else$
-@$variable$ = internal global $variable.type$ zeroinitializer
-
-$endif$
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions

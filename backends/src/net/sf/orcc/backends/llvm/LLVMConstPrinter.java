@@ -28,15 +28,9 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import java.util.List;
-
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.printers.DefaultConstantPrinter;
-
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * Sets the "value" attribute of the given top-level template to the value of
@@ -47,19 +41,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class LLVMConstPrinter extends DefaultConstantPrinter {
 
-	/**
-	 * template group
-	 */
-	private StringTemplateGroup group;
-
-	/**
-	 * Creates a new const printer from the given template group.
-	 * 
-	 * @param group
-	 *            template group
-	 */
-	public LLVMConstPrinter(StringTemplateGroup group) {
-		this.group = group;
+	public LLVMConstPrinter() {
 	}
 
 	@Override
@@ -69,17 +51,8 @@ public class LLVMConstPrinter extends DefaultConstantPrinter {
 
 	@Override
 	public void visit(ListConst constant, Object... args) {
-		// set instance of list template as current template
-		StringTemplate template = group.getInstanceOf("listValue");
+		builder.append(constant.getValue());
 
-		List<Constant> list = constant.getValue();
-		for (Constant cst : list) {
-			template.setAttribute("value", cst.toString());
-		}
-
-		// restore previous template as current template, and set attribute
-		// "value" to the instance of the list template
-		builder.append(template.toString(80));
 	}
 
 }

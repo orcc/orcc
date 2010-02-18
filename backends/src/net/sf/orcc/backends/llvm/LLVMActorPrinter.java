@@ -93,7 +93,7 @@ public final class LLVMActorPrinter extends Printer {
 
 	@Override
 	public String toString(Constant constant) {
-		LLVMConstPrinter printer = new LLVMConstPrinter(group);
+		LLVMConstPrinter printer = new LLVMConstPrinter();
 		constant.accept(printer);
 		return printer.toString();
 	}
