@@ -317,7 +317,11 @@ public class IRParser {
 		}
 
 		List<Expression> parameters = parseExprs(array.getJSONArray(2));
-		return new Call(loc, res, procs.get(procName), parameters);
+		Call call = new Call(loc, res, procs.get(procName), parameters);
+		if (res != null) {
+			res.setInstruction(call);
+		}
+		return call;
 	}
 
 	/**
@@ -425,12 +429,14 @@ public class IRParser {
 
 	private HasTokens parseHasTokens(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		LocalVariable varDef = (LocalVariable) getVariable(array
+		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new HasTokens(loc, port, numTokens, varDef);
+		HasTokens hasTokens = new HasTokens(loc, port, numTokens, target);
+		target.setInstruction(hasTokens);
+		return hasTokens;
 	}
 
 	private IfNode parseIfNode(Location loc, JSONArray array)
@@ -565,12 +571,14 @@ public class IRParser {
 
 	private Peek parsePeek(Location loc, JSONArray array) throws JSONException,
 			OrccException {
-		LocalVariable varDef = (LocalVariable) getVariable(array
+		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new Peek(loc, port, numTokens, varDef);
+		Peek peek = new Peek(loc, port, numTokens, target);
+		target.setInstruction(peek);
+		return peek;
 	}
 
 	private PhiAssignment parsePhi(Location loc, JSONArray array)
@@ -658,12 +666,14 @@ public class IRParser {
 
 	private Read parseRead(Location loc, JSONArray array) throws JSONException,
 			OrccException {
-		LocalVariable varDef = (LocalVariable) getVariable(array
+		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new Read(loc, port, numTokens, varDef);
+		Read read = new Read(loc, port, numTokens, target);
+		target.setInstruction(read);
+		return read;
 	}
 
 	private Return parseReturn(Location loc, JSONArray array)
