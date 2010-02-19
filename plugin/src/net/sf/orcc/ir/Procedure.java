@@ -62,22 +62,11 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 */
 	private class CFGBuilder implements NodeInterpreter {
 
-		private CFG graph;
-
 		/**
 		 * Creates a new CFG builder.
 		 */
 		public CFGBuilder() {
 			graph = new CFG();
-		}
-
-		/**
-		 * Returns the CFG built.
-		 * 
-		 * @return the CFG built
-		 */
-		public CFG getCFG() {
-			return graph;
 		}
 
 		@Override
@@ -232,6 +221,8 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 */
 	private boolean external;
 
+	private CFG graph;
+
 	/**
 	 * ordered map of local variables
 	 */
@@ -288,14 +279,21 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	}
 
 	/**
-	 * Builds and returns the CFG of this procedure.
-	 * 
-	 * @return the CFG built
+	 * Builds the CFG of this procedure.
 	 */
-	public CFG buildCFG() {
+	public void buildCFG() {
 		CFGBuilder builder = new CFGBuilder();
 		builder.visit(nodes, null);
-		return builder.getCFG();
+	}
+
+	/**
+	 * Returns the CFG of this procedure. The CFG must be built by calling
+	 * {@link #buildCFG()} before.
+	 * 
+	 * @return the CFG of this procedure
+	 */
+	public CFG getCFG() {
+		return graph;
 	}
 
 	/**

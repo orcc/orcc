@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import java.util.List;
+
 import net.sf.orcc.ir.nodes.NodeInterpreter;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 
@@ -68,10 +70,24 @@ public interface CFGNode extends User {
 	public int getLabel();
 
 	/**
+	 * Returns the predecessors of this node in the CFG.
+	 * 
+	 * @return the predecessors of this node in the CFG
+	 */
+	public List<CFGNode> getPredecessors();
+
+	/**
 	 * Returns the procedure this node belongs to.
 	 * 
 	 * @return the procedure this node belongs to
 	 */
 	public Procedure getProcedure();
+
+	/**
+	 * Returns the successors of this node in the CFG.
+	 * 
+	 * @return the successors of this node in the CFG
+	 */
+	public List<CFGNode> getSuccessors();
 
 }

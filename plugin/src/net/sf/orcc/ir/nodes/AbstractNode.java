@@ -28,7 +28,13 @@
  */
 package net.sf.orcc.ir.nodes;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import net.sf.orcc.ir.AbstractLocalizable;
+import net.sf.orcc.ir.CFG;
+import net.sf.orcc.ir.CFGEdge;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -83,8 +89,46 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 	}
 
 	@Override
+	public List<CFGNode> getPredecessors() {
+		if (procedure == null) {
+			return null;
+		}
+
+		CFG cfg = procedure.getCFG();
+		if (cfg == null) {
+			return null;
+		}
+
+		Set<CFGEdge> edges = cfg.incomingEdgesOf(this);
+		List<CFGNode> predecessors = new ArrayList<CFGNode>(edges.size());
+		for (CFGEdge edge : edges) {
+			predecessors.add(cfg.getEdgeSource(edge));
+		}
+		return predecessors;
+	}
+
+	@Override
 	public Procedure getProcedure() {
 		return procedure;
+	}
+
+	@Override
+	public List<CFGNode> getSuccessors() {
+		if (procedure == null) {
+			return null;
+		}
+
+		CFG cfg = procedure.getCFG();
+		if (cfg == null) {
+			return null;
+		}
+
+		Set<CFGEdge> edges = cfg.outgoingEdgesOf(this);
+		List<CFGNode> successors = new ArrayList<CFGNode>(edges.size());
+		for (CFGEdge edge : edges) {
+			successors.add(cfg.getEdgeTarget(edge));
+		}
+		return successors;
 	}
 
 }
