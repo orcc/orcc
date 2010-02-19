@@ -460,7 +460,9 @@ public class IRParser {
 		Use source = parseVarUse(array.getJSONArray(1));
 		List<Expression> indexes = parseExprs(array.getJSONArray(2));
 
-		return new Load(loc, target, source, indexes);
+		Load load = new Load(loc, target, source, indexes);
+		target.setInstruction(load);
+		return load;
 	}
 
 	private Location parseLocation(JSONArray array) throws JSONException {
@@ -573,7 +575,7 @@ public class IRParser {
 
 	private PhiAssignment parsePhi(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		LocalVariable varDef = (LocalVariable) getVariable(array
+		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
 		List<Use> vars = new ArrayList<Use>();
 		array = array.getJSONArray(1);
@@ -581,7 +583,9 @@ public class IRParser {
 			vars.add(parseVarUse(array.getJSONArray(i)));
 		}
 
-		return new PhiAssignment(loc, varDef, vars);
+		PhiAssignment phi = new PhiAssignment(loc, target, vars);
+		target.setInstruction(phi);
+		return phi;
 	}
 
 	/**
