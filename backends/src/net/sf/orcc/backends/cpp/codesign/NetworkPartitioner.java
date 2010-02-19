@@ -140,11 +140,12 @@ public class NetworkPartitioner {
 		Port srcPort = connection.getSource();
 		
 		Instance tgtInstance = tgt.getInstance();
+		String partName = getPartNameOf(tgtInstance);
 
 		Vertex vertex = null;
 		if (!incomingFanout.containsKey(srcPort)) {
 			Port port = new Port(srcPort);
-			port.setName("input_" + nbInput);
+			port.setName(partName+"_input_" + nbInput);
 
 			vertex = new Vertex("Input", port);
 			network.getGraph().addVertex(vertex);
@@ -179,13 +180,14 @@ public class NetworkPartitioner {
 			Connection connection, Network network) throws OrccException {
 
 		Instance inst = tgt.getInstance();
-
 		Port srcPort = connection.getSource();
 		Port tgtPort = connection.getTarget();
-
+		
+		String partName = getPartNameOf(src.getInstance());
+		
 		
 		Port port = new Port(tgtPort);
-		port.setName("output_" + nbOutput);
+		port.setName(partName+"_output_" + nbOutput);
 		Vertex vertex = new Vertex("Output", port);
 		network.getGraph().addVertex(vertex);
 		network.getOutputs().add(file.getAbsolutePath(), port.getLocation(),

@@ -1,18 +1,59 @@
 group Cpp_network;
 
-network(debugFifos, name, size, broadcasts, initializes, instances, connections, wrapper) ::= <<
-// Generated from "$name$"
- 
-$instances: { inst |#include "Actor_$inst$.h"}; separator="\n"$
+includeInstance(instance) ::= <<
+$if(instance.wrapper)$
+#include "wrapper.h"
+$else$
+#include "Actor_$instance.id$.h"
+$endif$
+>>
+
+includeInstances(instances) ::= <<
+$instances: includeInstance(it); separator="\n"$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// declare FIFOs
+
+declareFifo(count) ::= <<
+static FifoAPI * fifo_$count$;
+
+>>
+
+declareFifos(edges) ::= <<
+$edges: declareFifo(network.connectionMap.(it))$
+>>
+
+declareInstance(instance) ::= <<
+$if(instance.wrapper)$
+Wrapper $instance.id$;
+$else$
+actor_$instance.id$ $instance.id$;
+$endif$
+>>
+
+declareInstances(instances) ::= <<
+$instances: declareInstance(it); separator="\n"$
+>>
+
+
+
+
+network(debugFifos, fifoSize, network) ::= <<
+// Generated from "$network.name$"
+
+$includeInstances(network.instances)$
+
 #include "FifoFactory.h"
 
-class network_$name$ {
+class network_$network.name$ {
 
 public:
-	static const unsigned int SIZE = $size$;
+	static const unsigned int SIZE = $fifoSize$;
 
-	network_$name$();
-	~network_$name$();
+	network_$network.name$();
+	~network_$network.name$();
 
 	void start(std::string &strErr);
 	void stop(std::string &strErr);
@@ -21,13 +62,8 @@ public:
 	
 	// FIFO declarations
 private:
-	$connections:{fifo|static FifoAPI * fifo_$fifo.count$;}; separator="\n"$
-
-	// Actors
-	$instances: {inst |actor_$inst$ $inst$;}; separator="\n"$
-
-	$wrapper.type$ $wrapper.id$;
-
+	
+	$declareInstances(network.instances)$
 };
 
 >>
