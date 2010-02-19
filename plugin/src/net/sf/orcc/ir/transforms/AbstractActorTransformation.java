@@ -190,6 +190,7 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 		this.procedure = procedure;
 		List<CFGNode> nodes = procedure.getNodes();
 		visit(nodes);
+		procedure.buildCFG();
 	}
 
 }
