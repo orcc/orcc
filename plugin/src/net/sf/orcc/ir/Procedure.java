@@ -103,19 +103,21 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		@Override
 		public Object interpret(WhileNode node, Object... args) {
 			CFGNode previous = (CFGNode) args[0];
-			graph.addVertex(node);
-			if (previous != null) {
-				graph.addEdge(previous, node);
-			}
-
+			
 			CFGNode join = node.getJoinNode();
 			graph.addVertex(join);
-			graph.addEdge(node, join);
+			
+			if (previous != null) {
+				graph.addEdge(previous, join);
+			}
+			
+			graph.addVertex(node);
+			graph.addEdge(join, node);
 
 			CFGNode last = (CFGNode) visit(node.getNodes(), join);
-			graph.addEdge(last, node);
+			graph.addEdge(last, join);
 
-			return node;
+			return join;
 		}
 
 		/**

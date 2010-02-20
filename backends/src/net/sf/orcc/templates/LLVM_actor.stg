@@ -347,10 +347,14 @@ phiSuccessors(phi) ::= <<
 [ %$first(rest(phi.vars))$, %b$nextLabel(phi.block.successors)$ ]
 >>
 
-
-phiVars(vars) ::= <<
-$vars: { var |[ %$var.variable$, %bb$var.variable.instruction.block.label$ ]}; separator=", "$
+phiPairs(phi) ::= <<
+$phiVars(vars=first(phi.vars), node = first(phi.block.predecessors))$, $phiVars(vars=rest(phi.vars), node = rest(phi.block.predecessors))$
 >>
+
+phiVars(vars, node) ::= <<
+[ %$first(vars)$, %b$label(node)$ ]
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // ORCC IR Instructions
@@ -367,11 +371,13 @@ $endif$
 >>
 
 PhiAssignment(phi) ::= <<
-$if(phi.block.successors)$
-$PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiPredecessors(phi)+","+phiSuccessors(phi))$
-$else$
+$!$if(phi.block.successors)$!$
+$PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiPairs(phi))$
+$!$else$
+$label(phi.block.predecessors)$
+$label(rest(phi.block.predecessors))$
 $PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiVars(phi.vars))$
-$endif$
+$endif$!$
 >>
 
 Read(read) ::= <<
@@ -485,13 +491,13 @@ $nodes_cond(ifNode.joinNode)$
 // while node
 WhileNode(whileNode) ::= <<
 $BlockNode(whileNode.joinNode)$
-	$BrOp(cond=Expr(whileNode.value), iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+nextLabel(whileNode.Nodes))$
+	$BrOp(cond=Expr(whileNode.value), iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+label(whileNode.joinNode.successors))$
 
 b$label(whileNode.nodes)$:
 $nodes_cond(whileNode.nodes)$
 	$BrOp(dest="%b"+label(whileNode.joinNode))$
 
-b$nextLabel(whileNode.Nodes)$:
+b$label(whileNode.joinNode.successors)$:
 
 >>
 
