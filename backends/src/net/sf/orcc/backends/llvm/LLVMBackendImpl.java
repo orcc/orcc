@@ -35,14 +35,13 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
+import net.sf.orcc.ir.transforms.RebuildCFG;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.transforms.BroadcastAdder;
 
 /**
  * LLVM back-end.
@@ -82,7 +81,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 		ActorTransformation[] transformations = {
 				new AddInstantationProcedure(),
 				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation() };
+				new MoveReadsWritesTransformation(),
+				new RebuildCFG()};
 
 		// if(actor.getName().equals("Algo_h2x2")){
 
@@ -125,12 +125,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
-		NetworkPrinter networkPrinter = new NetworkPrinter("LLVM_network");
+		//NetworkPrinter networkPrinter = new NetworkPrinter("LLVM_network");
 
 		// Add broadcasts before printing
-		new BroadcastAdder().transform(network);
+		//new BroadcastAdder().transform(network);
 
-		String outputName = path + File.separator + network.getName() + ".s";
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
+		//String outputName = path + File.separator + network.getName() + ".s";
+		//networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 }

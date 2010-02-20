@@ -335,8 +335,20 @@ $TruncOp(result="%"+result, ty="i32", value="%"+result+"32", ty2="i1")$
 
 label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
 
+nextLabel(nodes) ::= "$first(nodes):{ x | $label(x.successors)$}$"
 
-phiPredecessors(vars) ::= <<
+previousLabel(nodes) ::= "$first(nodes):{ x | $label(x.predecessors)$}$"
+
+phiPredecessors(phi) ::= <<
+[ %$first(phi.vars)$, %b$previousLabel(phi.block.predecessors)$ ]
+>>
+
+phiSuccessors(phi) ::= <<
+[ %$first(rest(phi.vars))$, %b$nextLabel(phi.block.successors)$ ]
+>>
+
+
+phiVars(vars) ::= <<
 $vars: { var |[ %$var.variable$, %bb$var.variable.instruction.block.label$ ]}; separator=", "$
 >>
 
@@ -355,7 +367,11 @@ $endif$
 >>
 
 PhiAssignment(phi) ::= <<
-$PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiPredecessors(phi.vars))$
+$if(phi.block.successors)$
+$PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiPredecessors(phi)+","+phiSuccessors(phi))$
+$else$
+$PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiVars(phi.vars))$
+$endif$
 >>
 
 Read(read) ::= <<
@@ -469,13 +485,13 @@ $nodes_cond(ifNode.joinNode)$
 // while node
 WhileNode(whileNode) ::= <<
 $BlockNode(whileNode.joinNode)$
-	$BrOp(cond=Expr(whileNode.value), iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+label(whileNode.joinNode)+"_next")$
+	$BrOp(cond=Expr(whileNode.value), iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+nextLabel(whileNode.Nodes))$
 
 b$label(whileNode.nodes)$:
 $nodes_cond(whileNode.nodes)$
 	$BrOp(dest="%b"+label(whileNode.joinNode))$
 
-b$label(whileNode.joinNode)$_next:
+b$nextLabel(whileNode.Nodes)$:
 
 >>
 
