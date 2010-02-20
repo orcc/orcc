@@ -77,24 +77,24 @@ public class Store extends AbstractInstruction implements ValueContainer {
 	}
 
 	@Override
-	public Cast getCast(){
+	public Cast getCast() {
 		Type expr = value.getType();
 		Type val = target.getVariable().getType();
-		
-		if (expr == null){
-			return null;	
+
+		if (expr == null) {
+			return null;
 		}
-		
-		if (value instanceof IntExpr){
-			return null;	
+
+		if (value instanceof IntExpr) {
+			return null;
 		}
-		
+
 		Cast cast = new Cast(expr, val);
 
-		if (cast.isExtended()||cast.isTrunced()){
+		if (cast.isExtended() || cast.isTrunced()) {
 			return cast;
 		}
-		
+
 		return null;
 	}
 
@@ -148,7 +148,7 @@ public class Store extends AbstractInstruction implements ValueContainer {
 	public void setValueSimple(Expression value) {
 		this.value = value;
 	}
-	
+
 	@Override
 	public String toString() {
 		return target.toString() + indexes + " = " + getValue();

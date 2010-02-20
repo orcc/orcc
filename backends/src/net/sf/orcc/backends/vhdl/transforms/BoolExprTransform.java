@@ -36,15 +36,40 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.type.BoolType;
 
 /**
  * This class defines an actor transformation that transforms assignments whose
- * right hand side is a boolean expression to if nodes.
+ * right hand side is a boolean expression to if nodes. Note: this
+ * transformation must be called after PhiRemoval because it generates non-SSA
+ * code.
+ * 
+ * <p>
+ * The algorithm works as follows: Considering a block with instructions [i1,
+ * i2, ..., ii, ..., in] where the instruction <code>ii</code> is an assign or a
+ * store whose value is a boolean binary/unary expression, then create an IfNode
+ * after the current block that assigns <code>true</code> to the target if
+ * <code>true</code>, and assigns <code>false</code> otherwise.
+ * </p>
+ * 
+ * <p>
+ * The remaining instructions <code>i(i+1)</code> to <code>in</code> are moved
+ * to a new block created after the newly-created IfNode. The
+ * <code>previous</code> method is called on the node iterator so that the new
+ * block is to be visited next.
+ * </p>
  * 
  * @author Matthieu Wipliez
  * @author Nicolas Siret
@@ -52,7 +77,13 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class BoolExprTransform extends AbstractActorTransformation {
 
+	/**
+	 * an iterator on the current node. Initiated by
+	 * {@link #visit(BlockNode, Object...)}.
+	 */
 	private ListIterator<CFGNode> nodeIt;
+
+	private int tempVarCount;
 
 	/**
 	 * Creates an "if" node that assign <code>true</code> or <code>false</code>
@@ -86,32 +117,51 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	}
 
 	/**
-	 * Creates a new block node that contains the instructions after the assign.
+	 * Creates a new block node that will contain the remaining instructions of
+	 * the block that is being visited. The new block is added after the IfNode.
 	 * 
 	 * @param iit
 	 *            list iterator
 	 */
 	private void createNewBlock(ListIterator<Instruction> iit) {
 		BlockNode block = new BlockNode(procedure);
-		iit.previous();
-		iit.remove();
 		while (iit.hasNext()) {
 			Instruction instruction = iit.next();
 			iit.remove();
 			block.add(instruction);
 		}
 
+		// adds this block after the IfNode
 		nodeIt.add(block);
+
+		// moves the iterator back so the new block will be visited next
+		nodeIt.previous();
+	}
+
+	/**
+	 * Returns a new boolean local variable.
+	 * 
+	 * @return a new boolean local variable
+	 */
+	private LocalVariable newVariable() {
+		return new LocalVariable(true, tempVarCount++, new Location(),
+				"bool_expr", null, null, new BoolType());
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void visit(Assign node, Object... args) {
-		if (node.getTarget().getType().isBool()) {
-			Expression expr = node.getValue();
+	public void visit(Assign assign, Object... args) {
+		LocalVariable target = assign.getTarget();
+		if (target.getType().isBool()) {
+			Expression expr = assign.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
+				createIfNode(target, expr);
+
+				// removes this assign and moves remaining instructions to a new
+				// block
 				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
-				createIfNode(node.getTarget(), expr);
+				iit.previous();
+				iit.remove();
 				createNewBlock(iit);
 			}
 		}
@@ -125,6 +175,54 @@ public class BoolExprTransform extends AbstractActorTransformation {
 		while (it.hasNext()) {
 			it.next().accept(this, it);
 		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Return returnInstr, Object... args) {
+		if (procedure.getReturnType().isBool()) {
+			Expression expr = returnInstr.getValue();
+			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
+				LocalVariable local = newVariable();
+				procedure.getLocals().add("", local.getLocation(),
+						local.getName(), local);
+				returnInstr.setValue(new VarExpr(new Use(local)));
+				createIfNode(local, expr);
+
+				// moves this return and remaining instructions to a new block
+				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
+				iit.previous();
+				createNewBlock(iit);
+			}
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Store store, Object... args) {
+		Use use = store.getTarget();
+		Variable target = use.getVariable();
+		if (target.getType().isBool()) {
+			Expression expr = store.getValue();
+			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
+				LocalVariable local = newVariable();
+				procedure.getLocals().add("", local.getLocation(),
+						local.getName(), local);
+				store.setValue(new VarExpr(new Use(local)));
+				createIfNode(local, expr);
+
+				// moves this store and remaining instructions to a new block
+				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
+				iit.previous();
+				createNewBlock(iit);
+			}
+		}
+	}
+
+	@Override
+	public void visitProcedure(Procedure procedure) {
+		tempVarCount = 1;
+		super.visitProcedure(procedure);
 	}
 
 }

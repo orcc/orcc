@@ -88,8 +88,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new Inline(), new PhiRemoval(),
-				new VariableRenamer(), new VariableRedimension(),
-				new BoolExprTransform(), new TransformConditionals() };
+				new VariableRedimension(), new BoolExprTransform(),
+				new VariableRenamer(), new TransformConditionals() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
