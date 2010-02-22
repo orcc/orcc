@@ -40,7 +40,7 @@ import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
-import net.sf.orcc.ir.transforms.RebuildCFG;
+import net.sf.orcc.ir.transforms.BuildCFG;
 import net.sf.orcc.network.Network;
 
 /**
@@ -82,7 +82,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 				new AddInstantationProcedure(),
 				new ThreeAddressCodeTransformation(),
 				new MoveReadsWritesTransformation(),
-				new RebuildCFG()};
+				new BuildCFG()};
 
 		// if(actor.getName().equals("Algo_h2x2")){
 

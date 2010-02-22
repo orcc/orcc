@@ -40,7 +40,6 @@ import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.NodeInterpreter;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.INameable;
@@ -53,92 +52,6 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class Procedure extends AbstractLocalizable implements INameable {
-
-	/**
-	 * This class defines a CFG builder.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class CFGBuilder implements NodeInterpreter {
-
-		/**
-		 * Creates a new CFG builder.
-		 */
-		public CFGBuilder() {
-			graph = new CFG();
-		}
-
-		@Override
-		public Object interpret(BlockNode node, Object... args) {
-			CFGNode previous = (CFGNode) args[0];
-			graph.addVertex(node);
-			if (previous != null) {
-				graph.addEdge(previous, node);
-			}
-
-			return node;
-		}
-
-		@Override
-		public Object interpret(IfNode node, Object... args) {
-			CFGNode previous = (CFGNode) args[0];
-			graph.addVertex(node);
-			if (previous != null) {
-				graph.addEdge(previous, node);
-			}
-
-			CFGNode join = node.getJoinNode();
-			graph.addVertex(join);
-
-			CFGNode last = (CFGNode) visit(node.getThenNodes(), node);
-			graph.addEdge(last, join);
-
-			last = (CFGNode) visit(node.getElseNodes(), node);
-			graph.addEdge(last, join);
-
-			return join;
-		}
-
-		@Override
-		public Object interpret(WhileNode node, Object... args) {
-			CFGNode previous = (CFGNode) args[0];
-			
-			CFGNode join = node.getJoinNode();
-			graph.addVertex(join);
-			
-			if (previous != null) {
-				graph.addEdge(previous, join);
-			}
-			
-			graph.addVertex(node);
-			graph.addEdge(join, node);
-
-			CFGNode last = (CFGNode) visit(node.getNodes(), join);
-			graph.addEdge(last, join);
-
-			return join;
-		}
-
-		/**
-		 * Visits the given node list.
-		 * 
-		 * @param nodes
-		 *            a list of nodes
-		 * @param previous
-		 *            the previous node, or <code>null</code> if there is none
-		 * @return the last node of the node list
-		 */
-		public Object visit(List<CFGNode> nodes, CFGNode previous) {
-			Object last = previous;
-			for (CFGNode node : nodes) {
-				last = node.accept(this, last);
-			}
-
-			return last;
-		}
-
-	}
 
 	/**
 	 * This class visits the procedure to find the state variables used.
@@ -281,16 +194,8 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	}
 
 	/**
-	 * Builds the CFG of this procedure.
-	 */
-	public void buildCFG() {
-		CFGBuilder builder = new CFGBuilder();
-		builder.visit(nodes, null);
-	}
-
-	/**
-	 * Returns the CFG of this procedure. The CFG must be built by calling
-	 * {@link #buildCFG()} before.
+	 * Returns the CFG of this procedure. The CFG must be set by calling
+	 * {@link #buildCFG()} transformation.
 	 * 
 	 * @return the CFG of this procedure
 	 */
@@ -367,6 +272,15 @@ public class Procedure extends AbstractLocalizable implements INameable {
 
 	public void setExternal(boolean external) {
 		this.external = external;
+	}
+
+	/**
+	 * Set the CFG of this procedure. 
+	 * 
+	 * @param the CFG of this procedure
+	 */
+	public void setGraph(CFG graph) {
+		this.graph = graph;
 	}
 
 	/**
