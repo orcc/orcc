@@ -322,7 +322,11 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	@Override
 	public void visit(WhileNode whileNode, Object... args) {
 		ListIterator<Instruction> it = whileNode.getJoinNode().listIterator();
-		it.next();
+
+		//Go to the end of joinNode
+		while (it.hasNext()){
+			it.next();
+		}
 		whileNode.setValue(visitExpression(whileNode.getValue(), it,
 				new BoolType()));
 
