@@ -682,7 +682,7 @@ skip_$nextState.action$:
 
 actionTestStateOutputs(nextState) ::= <<
 $outputPattern(pattern=nextState.action.outputPattern, action=nextState.action)$
-	$BrOp(cond="%"+nextState.action+"_room", iftrue="%hasroom_"+nextState.action, iffalse="%skip_"+nextState.action)$
+	$BrOp(cond="%"+nextState.action+"_room", iftrue="%hasroom_"+nextState.action, iffalse="%sched_nok")$
 
 hasroom_$nextState.action$:
 $actionCallState(nextState)$
