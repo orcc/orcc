@@ -302,10 +302,10 @@ IfWithThenElseNodes(ifNode) ::= <<
 	$BrOp(cond=Expr(ifNode.value), iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.elseNodes))$
 
 b$label(ifNode.thenNodes)$: 
-$nodes_cond(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(first(ifNode.thenNodes))$ $nodes(rest(ifNode.thenNodes))$ $BrOp(dest ="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.elseNodes)$:
-$nodes_cond(ifNode.elseNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(first(ifNode.elseNodes))$ $nodes(rest(ifNode.elseNodes))$ $BrOp(dest ="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.joinNode)$:
 
@@ -315,7 +315,7 @@ IfWithThenNode(ifNode) ::= <<
 	$BrOp(cond=Expr(ifNode.value), iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.thenNodes)$: 
-$nodes_cond(ifNode.thenNodes)$	$BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(first(ifNode.thenNodes))$ $nodes(rest(ifNode.thenNodes))$ $BrOp(dest ="%b"+label(ifNode.joinNode))$
 
 b$label(ifNode.joinNode)$:
 
@@ -335,24 +335,12 @@ $TruncOp(result="%"+result, ty="i32", value="%"+result+"32", ty2="i1")$
 
 label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
 
-nextLabel(nodes) ::= "$first(nodes):{ x | $label(x.successors)$}$"
-
-previousLabel(nodes) ::= "$first(nodes):{ x | $label(x.predecessors)$}$"
-
-phiPredecessors(phi) ::= <<
-[ %$first(phi.vars)$, %b$previousLabel(phi.block.predecessors)$ ]
->>
-
-phiSuccessors(phi) ::= <<
-[ %$first(rest(phi.vars))$, %b$nextLabel(phi.block.successors)$ ]
->>
-
 phiPairs(phi) ::= <<
-$phiVars(vars=first(phi.vars), node = first(phi.block.predecessors))$, $phiVars(vars=rest(phi.vars), node = rest(phi.block.predecessors))$
+$phiVars(vars=first(phi.vars), node = first(phi.block.predecessors))$, $phiVars(vars=first(rest(phi.vars)), node = rest(phi.block.predecessors))$
 >>
 
 phiVars(vars, node) ::= <<
-[ %$first(vars)$, %b$label(node)$ ]
+[$if(vars.variable.affected)$ %$vars$ $else$ 0 $endif$, %b$label(node)$ ]
 >>
 
 
@@ -371,13 +359,8 @@ $endif$
 >>
 
 PhiAssignment(phi) ::= <<
-$!$if(phi.block.successors)$!$
 $PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiPairs(phi))$
-$!$else$
-$label(phi.block.predecessors)$
-$label(rest(phi.block.predecessors))$
-$PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiVars(phi.vars))$
-$endif$!$
+
 >>
 
 Read(read) ::= <<
@@ -484,7 +467,8 @@ $else$
 3
 $endif$
 $endif$
-$nodes_cond(ifNode.joinNode)$
+$nodes_cond(first(ifNode.joinNode))$
+$nodes(rest(ifNode.joinNode))$
 
 >>
 
@@ -494,7 +478,8 @@ $BlockNode(whileNode.joinNode)$
 	$BrOp(cond=Expr(whileNode.value), iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+label(whileNode.joinNode.successors))$
 
 b$label(whileNode.nodes)$:
-$nodes_cond(whileNode.nodes)$
+$nodes_cond(first(whileNode.nodes))$
+$nodes(rest(whileNode.nodes))$
 	$BrOp(dest="%b"+label(whileNode.joinNode))$
 
 b$label(whileNode.joinNode.successors)$:

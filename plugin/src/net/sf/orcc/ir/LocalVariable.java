@@ -159,6 +159,15 @@ public class LocalVariable extends Variable implements
 		return (suffix != null);
 	}
 
+	/**
+	 * Indicates if this local variable has already been affected to a value
+	 * 
+	 * @return true if the variable has been affected
+	 */
+	public boolean isAffected() {
+		return index != 0;
+	}
+
 	public boolean isAssignable() {
 		return assignable;
 	}
