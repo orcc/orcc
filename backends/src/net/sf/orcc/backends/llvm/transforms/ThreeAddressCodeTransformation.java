@@ -107,14 +107,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			Location location = expr.getLocation();
 			Expression e1 = expr.getE1();
 			Expression e2 = expr.getE2();
-			
-			//Check binary expression correctness	
-			if (!e1.isVarExpr()&& e2.isVarExpr()){
-				Expression tmpE1 = e1;
-				e1 = e2;
-				e2 = tmpE1;
-			}
-			
+
 			//Correct binaryExpr type
 			if (op.isComparison()){
 				type = e1.getType();
