@@ -308,7 +308,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		it.previous();
 
 		// Check store value
-		store.setValue(visitExpression(value, it, targetType));
+		store.setValue(visitExpression(value, it, new IntType(new IntExpr(32))));
 		it.next();
 	}
 
