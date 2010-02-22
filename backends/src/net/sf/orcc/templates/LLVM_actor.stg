@@ -43,6 +43,10 @@ indexesName(indexes) ::= <<
 $indexes: {index |$index$}; separator="_"$
 >>
 
+parametersDeclaration(parameters) ::= <<
+$parameters: {$argumentDeclaration(it)$}; separator=", "$
+>>
+
 argumentDeclaration(variable) ::= <<
 $variable.type$ %$variable$
 >>
@@ -220,6 +224,23 @@ $endif$
 
 >>
 
+CastCall(result, ty, fnptrval, function_args, cast)::= <<
+$if(cast.extended)$
+$CallOp(result="%"+result+"_ext", ty=ty, fnptrval=fnptrval, function_args=function_args)$
+$if(cast.signed)$
+$SextOp(result="%"+result, ty=ty, value="%"+result+"_ext", ty2=result.type)$
+
+$else$
+$ZextOp(result="%"+result, ty=ty, value="%"+result+"_ext", ty2=result.type)$
+
+$endif$
+$else$
+$CallOp(result="%"+result+"_trunc", ty=ty, fnptrval=fnptrval, function_args=function_args)$
+$TruncOp(result="%"+result, ty=ty, value="%"+result+"_trunc", ty2=result.type)$
+$endif$
+
+>>
+
 
 CastStore(ty, value, pty, pointer, cast)::= <<
 $if(cast.extended)$
@@ -347,6 +368,21 @@ phiVars(vars, node) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // ORCC IR Instructions
 ///////////////////////////////////////////////////////////////////////////////
+
+
+Call(call) ::= <<
+$if(call.target)$
+$if(call.cast)$
+$CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(call.parameters), cast=call.cast)$
+$else$
+$CallOp(result="%"+call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(call.parameters))$
+$endif$
+$else$
+$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(call.parameters))$
+$endif$
+
+
+>>
 
 Assign(assign) ::= <<
 $if(assign.cast)$
@@ -799,14 +835,6 @@ initPortNode(fifoName, expr, index) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // ORCC Nodes
 ///////////////////////////////////////////////////////////////////////////////
-
-Call(call) ::= <<
-$if(call.target)$
-$call.target$ = 
-$endif$
-call $call.procedure.returnType$ @$call.procedure$($call.parameters; separator=", "$)
-
->>
 
 
 /*

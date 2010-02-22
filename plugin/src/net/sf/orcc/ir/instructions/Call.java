@@ -30,11 +30,13 @@ package net.sf.orcc.ir.instructions;
 
 import java.util.List;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -69,6 +71,20 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 	@Override
 	public void accept(InstructionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
+	}
+
+	@Override
+	public Cast getCast() {
+		Type var = target.getType();
+		Type retProc = procedure.getReturnType();
+
+		Cast cast = new Cast(retProc, var);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
 	}
 
 	public List<Expression> getParameters() {
@@ -128,5 +144,4 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 		String str = hasResult() ? getTarget() + " = " : "";
 		return str + procedure + "(" + parameters + ")";
 	}
-
 }
