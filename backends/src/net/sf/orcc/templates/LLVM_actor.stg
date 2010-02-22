@@ -1031,7 +1031,7 @@ inc_i:
   $LoadOp(result="%i_load", ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
   $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
-  $BrOp(dest="%bb")$
+  $BrOp(dest="%return")$
 
 return:
 	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
