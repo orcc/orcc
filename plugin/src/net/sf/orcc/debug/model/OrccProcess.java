@@ -219,7 +219,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 				DebugPlugin.log(e);
 			}
 		}
-
 	}
 
 	private String[] cmdLine;
@@ -495,8 +494,8 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		}
 
 		write("Orcc frontend exit code: " + value + "\n");
-		if (value == 0) {
-			try {
+		try {
+			if (value == 0) {
 				if (option.equals("backend")) {
 					monitor.subTask("Launching backend...");
 					write("\n");
@@ -514,19 +513,18 @@ public class OrccProcess extends PlatformObject implements IProcess {
 					launchInterpreter(option);
 					write("Orcc simulation done.");
 				}
-			} finally {
-				terminated = true;
-
-				DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
-				DebugEvent[] events = { event };
-				DebugPlugin.getDefault().fireDebugEventSet(events);
 			}
+		} finally {
+			terminated = true;
+
+			DebugEvent event = new DebugEvent(this, DebugEvent.TERMINATE);
+			DebugEvent[] events = { event };
+			DebugPlugin.getDefault().fireDebugEventSet(events);
 		}
 	}
 
 	@Override
 	public void terminate() throws DebugException {
-
 	}
 
 	/**
