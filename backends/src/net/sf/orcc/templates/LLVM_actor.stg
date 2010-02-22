@@ -531,16 +531,15 @@ $instructions(blockNode.instructions)$
 
 outputPattern(pattern, action) ::= <<
 $if(rest(pattern.keys))$
-$AddOp(result="%"+action+"_roomTest", ty="i1", op1="0", op2="0")$
-$trunc(pattern.keys):{port|
+	$AllocaOp(result="%p"+action+"_roomTest", type="i1")$
+	$StoreOp(ty="i1", value="1", pty="i1", pointer="%p"+action+"_roomTest")$
+$pattern.keys:{port|
 	$HasRoom(result=action+i+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$
-	$AndOp(result="%"+action+i, ty="i1", op1=action+i+"_room", op2="%"+action+"_roomTest")$
+	$LoadOp(result="%"+action+i+"_roomTest", ty="i1", pointer="%p"+action+"_roomTest")$
+	$AndOp(result="%"+action+i, ty="i1", op1="%"+action+i+"_room", op2="%"+action+i+"_roomTest")$
+	$StoreOp(ty="i1", value="%"+action+i, pty="i1", pointer="%p"+action+"_roomTest")$
 }$
-$last(pattern.keys):{port|
-	$HasRoom(result=action+i+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$
-	$AndOp(result="%"+action+"_room", ty="i1", op1=action+i+"_room", op2="%"+action+"_roomTest")$
-}$
-multioutputtest
+	$LoadOp(result="%"+action+"_room", ty="i1", pointer="%p"+action+"_roomTest")$
 $else$
 $pattern.keys:{port|
 	$HasRoom(result=action+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$}$
