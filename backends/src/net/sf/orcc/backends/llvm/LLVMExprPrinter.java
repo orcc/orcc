@@ -49,6 +49,8 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
  */
 public class LLVMExprPrinter extends DefaultExpressionPrinter {
 
+	private boolean signed;
+	
 	@Override
 	protected String toString(BinaryOp op) {
 		switch (op) {
@@ -59,25 +61,44 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		case BITXOR:
 			return "xor";
 		case DIV:
-			return "sdiv";
+			if (signed){
+				return "sdiv";
+			}
+			return "udiv";
 		case DIV_INT:
-			return "sdiv";
+			if (signed){
+				return "sdiv";
+			}
+			return "udiv";
 		case EQ:
 			return "icmp eq";
 		case EXP:
 			return "pow";
 		case GE:
-			return "icmp sge";
+			if (signed){
+				return "icmp sge";
+			}
+			return "icmp uge";
+
 		case GT:
-			return "icmp sgt";
+			if (signed){
+				return "icmp sgt";
+			}
+			return "icmp ugt";
 		case LOGIC_AND:
 			return "and";
 		case LE:
-			return "icmp sle";
+			if (signed){
+				return "icmp sle";
+			}
+			return "icmp ule";
 		case LOGIC_OR:
 			return "or";
 		case LT:
-			return "icmp slt";
+			if (signed){
+				return "icmp slt";
+			}
+			return "icmp ult";
 		case MINUS:
 			return "sub";
 		case MOD:
@@ -114,6 +135,12 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 			type = use.getVariable().getType();
 		} else {
 			type = expr.getType();
+		}
+		
+		if (type.isUint()){
+			signed = false;
+		}else{
+			signed = true;
 		}
 		
 		builder.append(" " + type.toString() + " ");
