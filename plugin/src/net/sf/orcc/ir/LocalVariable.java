@@ -160,11 +160,11 @@ public class LocalVariable extends Variable implements
 	}
 
 	/**
-	 * Indicates if this local variable has already been affected to a value
+	 * Indicates wether or not this local variable is assigned
 	 * 
-	 * @return true if the variable has been affected
+	 * @return true if the variable is assigned
 	 */
-	public boolean isAffected() {
+	public boolean isAssigned() {
 		return index != 0;
 	}
 

@@ -361,7 +361,7 @@ $phiVars(vars=first(phi.vars), node = first(phi.block.predecessors))$, $phiVars(
 >>
 
 phiVars(vars, node) ::= <<
-[$if(vars.variable.affected)$ %$vars$ $else$ 0 $endif$, %b$label(node)$ ]
+[$if(vars.variable.assigned)$ %$vars$ $else$ 0 $endif$, %b$label(node)$ ]
 >>
 
 
