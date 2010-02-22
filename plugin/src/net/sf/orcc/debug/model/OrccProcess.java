@@ -194,19 +194,29 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		@Override
 		public void run() {
-			while (true) {
+			byte[] bytes = new byte[8192];
+			int numRead = 0;
+			while (numRead >= 0) {
 				try {
-					process.exitValue();
-					return;
-				} catch (IllegalThreadStateException e) {
-					try {
-						int n = in.available();
-						byte[] bytes = new byte[n];
-						in.read(bytes);
-						monitor.write(new String(bytes));
-					} catch (IOException e1) {
+					numRead = in.read(bytes);
+					if (numRead > 0) {
+						monitor.write(new String(bytes, 0, numRead));
 					}
+				} catch (IOException e) {
+					DebugPlugin.log(e);
 				}
+
+				try {
+					// just give up CPU to maintain UI responsiveness.
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+				}
+			}
+
+			try {
+				in.close();
+			} catch (IOException e) {
+				DebugPlugin.log(e);
 			}
 		}
 
