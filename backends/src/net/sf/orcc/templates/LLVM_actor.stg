@@ -415,7 +415,7 @@ $CallOp(ty ="void", fnptrval="@setReadEnd", function_args="%struct.fifo_s* %end_
 
 Peek(peek) ::= <<
 $LoadLocalPort(peek)$
-$CallOp(result="%"+peek.target+"_"+peek.block.label, ty ="i8*", fnptrval="@getReadPtr", function_args="%struct.fifo_s* %local_"+peek.target+peek.block.label+", i32 "+peek.numTokens)$
+$CallOp(result="%"+peek.target+"_"+peek.block.label, ty ="i8*", fnptrval="@getPeekPtr", function_args="%struct.fifo_s* %local_"+peek.target+peek.block.label+", i32 "+peek.numTokens)$
 $BitcastOp(result="%"+peek.target+"_"+peek.block.label+"_cast", ty="i8*", value="%"+peek.target+"_"+peek.block.label, ty2=ExprType(peek.port)+"*")$
 $StoreOp(ty=ExprType(peek.port)+"*", value="%"+peek.target+"_"+peek.block.label+"_cast", pty=ExprType(peek.port)+"*", pointer="%"+peek.port)$
 
