@@ -44,7 +44,11 @@ $indexes: {index |$index$}; separator="_"$
 >>
 
 parametersDeclaration(parameters) ::= <<
-$parameters: {$argumentDeclaration(it)$}; separator=", "$
+$parameters: {$parameters(it)$}; separator=", "$
+>>
+
+parameters(variable) ::= <<
+$if(variable.intExpr)$i32 $variable$$elseif(variable.booleanExpr)$i1 $variable$$else$$variable.type$ %$variable$$endif$ 
 >>
 
 argumentDeclaration(variable) ::= <<
@@ -145,6 +149,8 @@ ret $type$ $value$
 $else$
 ret void
 $endif$
+
+
 >>  
 
 SwitchOp(intty, value, defaultdest, labelpairs) ::= <<
