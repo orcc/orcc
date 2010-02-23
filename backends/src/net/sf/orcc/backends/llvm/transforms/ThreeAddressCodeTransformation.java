@@ -173,7 +173,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				return binary.accept(this, args);
 			case LOGIC_NOT:
 				constExpr = new IntExpr(new Location(), 0);
-				binary = new BinaryExpr(loc, exprE1, BinaryOp.NE, constExpr,
+				binary = new BinaryExpr(loc, exprE1, BinaryOp.EQ, constExpr,
 						type);
 				return binary.accept(this, args);
 			case BITNOT:
