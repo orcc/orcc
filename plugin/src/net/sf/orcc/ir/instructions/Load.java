@@ -30,11 +30,14 @@ package net.sf.orcc.ir.instructions;
 
 import java.util.List;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -105,6 +108,28 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 		source.setNode(this);
 	}
 
+	@Override
+	public Cast getCast() {
+		Type tgt = target.getType();
+		Type src = source.getVariable().getType();
+
+		if (src == null) {
+			return null;
+		}
+
+		if (src instanceof IntExpr) {
+			return null;
+		}
+
+		Cast cast = new Cast(src, tgt);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
+	}
+	
 	@Override
 	public void setTarget(LocalVariable target) {
 		CommonNodeOperations.setTarget(this, target);
