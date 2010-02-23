@@ -127,7 +127,9 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 					location, e1, op, e2, previousType));
 			assign.setBlock(block);
 			it.add(assign);
-
+			
+			type = previousType;
+			
 			return new VarExpr(location, new Use(target));
 		}
 

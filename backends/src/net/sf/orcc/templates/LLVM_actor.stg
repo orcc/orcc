@@ -267,8 +267,6 @@ $CastStore(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S"+inde
 $else$
 $StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"S"+indexesName(indexes)+"_ptr")$
 $endif$
-
-
 >>
 
 StoreWithoutIndex(ty, value, pty, pointer, cast) ::= <<
@@ -277,8 +275,6 @@ $CastStore(ty=ty, value=value, pty=pty, pointer=Var(pointer), cast=cast)$
 $else$
 $StoreInstr(ty=ty, value=value, pty=pty, pointer=Var(pointer))$
 $endif$
-
-
 >>
 
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
@@ -289,8 +285,6 @@ $CastStore(ty=ty, value=value, pty=pty, pointer=pointer+"_L"+indexesName(indexes
 $else$
 $StoreInstr(ty=ty, value=value, pty=pty, pointer=pointer+"_L"+indexesName(indexes)+"_ptr")$
 $endif$
-
-
 >>
 
 StorePortWithoutIndex(ty, value, pty, pointer, cast) ::= <<
@@ -502,6 +496,7 @@ $else$
 $StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes)$
 $endif$
 $endif$
+
 
 
 >>
