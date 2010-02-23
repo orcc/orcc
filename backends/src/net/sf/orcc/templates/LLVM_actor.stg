@@ -43,12 +43,12 @@ indexesName(indexes) ::= <<
 $indexes: {index |$index$}; separator="_"$
 >>
 
-parametersDeclaration(parameters) ::= <<
-$parameters: {$parameters(it)$}; separator=", "$
+parametersDeclaration(arguments, parameters) ::= <<
+$arguments, parameters: { arg, param | $parameters(type = arg.type, variable= param)$}; separator=", "$
 >>
 
-parameters(variable) ::= <<
-$if(variable.intExpr)$i32 $variable$$elseif(variable.booleanExpr)$i1 $variable$$else$$variable.type$ %$variable$$endif$ 
+parameters(type, variable) ::= <<
+$if(variable.intExpr)$$type$ $variable$$elseif(variable.booleanExpr)$i1 $variable$$else$$variable.type$ %$variable$$endif$ 
 >>
 
 argumentDeclaration(variable) ::= <<
@@ -409,12 +409,12 @@ phiVars(vars, node) ::= <<
 Call(call) ::= <<
 $if(call.target)$
 $if(call.cast)$
-$CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(call.parameters), cast=call.cast)$
+$CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters), cast=call.cast)$
 $else$
-$CallOp(result="%"+call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(call.parameters))$
+$CallOp(result="%"+call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters))$
 $endif$
 $else$
-$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(call.parameters))$
+$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters))$
 $endif$
 
 
