@@ -125,8 +125,6 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
 		
-		builder.append(toString(op));
-
 		if (e1 instanceof VarExpr) {
 			Use use = ((VarExpr) e1).getVar();
 			type = use.getVariable().getType();
@@ -142,6 +140,8 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		}else{
 			signed = true;
 		}
+		
+		builder.append(toString(op));
 		
 		builder.append(" " + type.toString() + " ");
 		
