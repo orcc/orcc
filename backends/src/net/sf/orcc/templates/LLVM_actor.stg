@@ -28,7 +28,7 @@ $if(variable.port)$
 $AllocaOp(result="%"+variable, type=variable.type.elementType+"*")$
 $else$
 $if(variable.list)$
-$AllocaOp(result="%"+variable, type=variable.type)$ 
+$AllocaOp(result="%"+variable, type=variable.type)$
 $endif$
 $endif$
 

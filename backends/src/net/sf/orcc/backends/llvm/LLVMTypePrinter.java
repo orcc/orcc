@@ -79,7 +79,7 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 		builder.append(size);
 
 		builder.append(" x ");
-		type.getElementType().accept(this);
+		type.getType().accept(this);
 		builder.append(" ]");
 	}
 

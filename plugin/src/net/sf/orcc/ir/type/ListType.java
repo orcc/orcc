@@ -98,6 +98,18 @@ public class ListType extends AbstractType {
 	 * @return the number of elements of this list
 	 */
 	public Type getElementType() {
+		if (type.isList()){
+			return ((ListType)type).getElementType();
+		}
+		return type;
+	}
+	
+	/**
+	 * Returns the type of the list
+	 * 
+	 * @return the type of the list
+	 */
+	public Type getType() {
 		return type;
 	}
 
