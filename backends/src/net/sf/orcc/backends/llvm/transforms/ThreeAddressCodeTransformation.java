@@ -34,11 +34,14 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -349,6 +352,18 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
+		//Transform Local boolean Variable into int Variable (to be remove later)
+		for (Variable var : procedure.getLocals()){
+			if (var.isPort()){
+				ListType listType = (ListType)var.getType();
+				if (listType.getElementType().isBool()){
+					listType.setElementType(new IntType(new IntExpr(32)));
+				}
+			}
+		}
+		
+		
+		
 		tempVarCount = 1;
 
 		// set the label counter to prevent new nodes from having the same label
@@ -358,6 +373,38 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		AbstractNode.setLabelCount(lastNode.getLabel() + 1);
 
 		super.visitProcedure(procedure);
+	}
+	
+	@Override
+	public void transform(Actor actor) {
+		//Transform boolean Port into int port (to be remove later)
+		for (Port port : actor.getInputs()){
+			if (port.getType().isBool()){
+				port.setType(new IntType(new IntExpr(32)));
+			}
+		}
+		
+		for (Port port : actor.getOutputs()){
+			if (port.getType().isBool()){
+				port.setType(new IntType(new IntExpr(32)));
+			}
+		}
+		
+		
+		//Visit procedure
+		for (Procedure proc : actor.getProcs()) {
+			visitProcedure(proc);
+		}
+
+		for (Action action : actor.getActions()) {
+			visitProcedure(action.getBody());
+			visitProcedure(action.getScheduler());
+		}
+
+		for (Action action : actor.getInitializes()) {
+			visitProcedure(action.getBody());
+			visitProcedure(action.getScheduler());
+		}
 	}
 
 }

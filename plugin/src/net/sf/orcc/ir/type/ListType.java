@@ -92,6 +92,11 @@ public class ListType extends AbstractType {
 		return dimensions;
 	}
 
+	/**
+	 * Returns the type of the elements of this list
+	 * 
+	 * @return the number of elements of this list
+	 */
 	public Type getElementType() {
 		return type;
 	}
@@ -108,6 +113,16 @@ public class ListType extends AbstractType {
 	@Override
 	public boolean isList() {
 		return true;
+	}
+
+	/**
+	 * Set the type of the elements of this list
+	 * 
+	 * @param the
+	 *            type of the elements of this list
+	 */
+	public void setElementType(Type elementType) {
+		this.type = elementType;
 	}
 
 	public void setSize(Expression size) {
