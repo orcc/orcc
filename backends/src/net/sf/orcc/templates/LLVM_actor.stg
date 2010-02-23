@@ -179,6 +179,8 @@ $result$ = trunc $ty$ $value$ to $ty2$
 StoreInstr(ty, value, pty, pointer, cast) ::= <<
 $if(value.intExpr)$
 $StoreOp(ty=pty, value=Expr(value)+cast, pty=pty, pointer=pointer)$
+$elseif(value.booleanExpr)$
+$StoreOp(ty=pty, value=Expr(value)+cast, pty=pty, pointer=pointer)$
 $else$
 $StoreOp(ty=ty, value=Expr(value)+cast, pty=pty, pointer=pointer)$
 $endif$
@@ -500,6 +502,7 @@ $else$
 $StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes)$
 $endif$
 $endif$
+
 
 >>
 
