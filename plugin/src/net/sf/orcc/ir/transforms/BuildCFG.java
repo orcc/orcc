@@ -76,6 +76,7 @@ public class BuildCFG extends AbstractActorTransformation {
 		@Override
 		public Object interpret(IfNode node, Object... args) {
 			CFGNode previous = (CFGNode) args[0];
+			CFGNode last;
 			graph.addVertex(node);
 			if (previous != null) {
 				graph.addEdge(previous, node);
@@ -83,12 +84,20 @@ public class BuildCFG extends AbstractActorTransformation {
 
 			CFGNode join = node.getJoinNode();
 			graph.addVertex(join);
-
-			CFGNode last = (CFGNode) visit(node.getThenNodes(), node);
-			graph.addEdge(last, join);
-
-			last = (CFGNode) visit(node.getElseNodes(), node);
-			graph.addEdge(last, join);
+			
+			if (node.getThenNodes().isEmpty()){
+				graph.addEdge(previous, join);
+			}else{
+				last = (CFGNode) visit(node.getThenNodes(), node);
+				graph.addEdge(last, join);
+			}
+			
+			if (node.getElseNodes().isEmpty()){
+				graph.addEdge(previous, join);
+			}else{
+				last = (CFGNode) visit(node.getElseNodes(), node);
+				graph.addEdge(last, join);
+			}
 
 			return join;
 		}
