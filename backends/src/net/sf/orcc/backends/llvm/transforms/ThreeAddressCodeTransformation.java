@@ -105,13 +105,12 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			//Get expr information
 			Type previousType = type;
 			BinaryOp op = expr.getOp();
-			//Type BinaryType = expr.getType();
 			
 			Location location = expr.getLocation();
 			Expression e1 = expr.getE1();
 			Expression e2 = expr.getE2();
 
-			//Correct binaryExpr type
+			//Correct binaryExpr type if expr is a comparison
 			if (op.isComparison()){
 				type = e1.getType();
 			}
@@ -120,6 +119,13 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			e1 = (Expression) e1.accept(this, args);
 			e2 = (Expression) e2.accept(this, args);
 
+			type = previousType;
+			
+			//Assign the correct type to the current expression
+			if (op.isComparison()){
+				previousType = new BoolType();
+			}
+			
 			//Make the final asssignment
 			LocalVariable target = newVariable();
 			target.setType(previousType);
@@ -127,8 +133,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 					location, e1, op, e2, previousType));
 			assign.setBlock(block);
 			it.add(assign);
-			
-			type = previousType;
 			
 			return new VarExpr(location, new Use(target));
 		}
