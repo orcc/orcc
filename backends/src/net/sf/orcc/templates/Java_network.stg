@@ -1,14 +1,51 @@
-group Java_network;
+group Java_network : C_network;
 
-setFifo(fifo) ::= <<
-actor_$fifo.source$.setFifo("$fifo.src_port$", fifo_$fifo.count$);
-actor_$fifo.target$.setFifo("$fifo.tgt_port$", fifo_$fifo.count$);
+assignFifo(source, sourcePort, target, targetPort, count) ::= <<
+actor_$source.id$.setFifo("$sourcePort.name$", fifo_$count$);
+actor_$target.id$.setFifo("$targetPort.name$", fifo_$count$);
 
 >>
 
-network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
+allocateFifoType(type, size, count) ::= <<
+private IntFifo fifo_$count$ = new IntFifo($size$);
+
+>>
+
+printInitialize(instance) ::= <<
+$if (instance.actor)$
+$if (!instance.actor.initializes.empty)$
+actor_$instance.id$.initialize();
+
+$endif$
+$endif$
+>>
+
+declareActor(instance) ::= <<
+$if (instance.actor)$
+private IActor actor_$instance.id$;
+
+$endif$
+>>
+
+constructActor(instance) ::= <<
+$if (instance.actor)$
+actor_$instance.id$ = new Actor_$instance.id$();
+
+$endif$
+>>
+
+scheduleActor(instance) ::= <<
+$if (instance.actor)$
+i += actor_$instance.id$.schedule();
+
+$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print network
+network(debugFifos, fifoSize, network) ::= <<
 /**
- * Generated from "$name$"
+ * Generated from "$network.name$"
  */
 package net.sf.orcc.generated;
 
@@ -21,39 +58,33 @@ import net.sf.orcc.oj.actors.Broadcast;
 import net.sf.orcc.oj.actors.IActor;
 import net.sf.orcc.oj.actors.IScheduler;
 
-public class Network_$name$ implements IScheduler {
+public class Network_$network.name$ implements IScheduler {
 
-	public static final int SIZE = $size$;
+	public static final int SIZE = $fifoSize$;
 
 	// FIFO declarations
-	$connections:{fifo|private IntFifo fifo_$fifo.count$;}; separator="\n"$
-
+	$allocateFifos(network.connections)$
 	// Actors
-	$instances: { inst | private IActor actor_$inst$;}; separator="\n"$
-
+	$network.instances: declareActor()$
 	// Broadcasts
-	$broadcasts: { bcast | private Broadcast actor_$bcast.id$;}; separator="\n"$
+	$network.broadcasts: { bcast | private Broadcast actor_$bcast.id$;}; separator="\n"$
 
 	@Override
 	public void initialize() {
-		$instances: { inst | actor_$inst$ = new Actor_$inst$();}; separator="\n"$
+		$network.instances: constructActor()$
+		$network.broadcasts: { bcast | actor_$bcast.id$ = new Broadcast($length(bcast.outputList)$);}; separator="\n"$
 
-		$broadcasts: { bcast | actor_$bcast.id$ = new Broadcast($length(bcast.num)$);}; separator="\n"$
-
-		$connections:{ fifo | fifo_$fifo.count$ = new IntFifo($fifo.size$);}; separator="\n"$
-
-		$connections:setFifo()$
+		$assignFifos(network.connections)$
 	}
 
 	@Override
 	public void schedule() {
-		$initializes: { init | actor_$init$.initialize();}; separator="\n"$
-
+		$printInitializes(network.instances)$
 		int i = 1;
 		while (i > 0) {
 			i = 0;
-			$instances: { inst | i += actor_$inst$.schedule();$\n$}$
-			$broadcasts: { bcast | i += actor_$bcast.id$.schedule();}; separator="\n"$
+			$network.instances: scheduleActor()$
+			$network.broadcasts: { bcast | i += actor_$bcast.id$.schedule();}; separator="\n"$
 
 			FifoManager.getInstance().emptyFifos();
 		}
@@ -65,7 +96,7 @@ public class Network_$name$ implements IScheduler {
 	 */
 	public static void main(String[] args) {
 		CLIParameters.getInstance().setArguments(args);
-		IScheduler scheduler = new Network_$name$();
+		IScheduler scheduler = new Network_$network.name$();
 		scheduler.initialize();
 		scheduler.schedule();
 		Actor_display.closeDisplay();

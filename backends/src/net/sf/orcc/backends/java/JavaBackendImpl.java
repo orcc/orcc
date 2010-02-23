@@ -36,6 +36,7 @@ import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
@@ -67,35 +68,24 @@ public class JavaBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private String outputPath;
-
 	private JavaActorPrinter printer;
 
 	@Override
 	protected void beforeInstantiation(Network network) throws OrccException {
 		printer = new JavaActorPrinter();
-
-		String sep = File.separator;
-
-		// create paths
-		outputPath = path + sep;
-		String[] segments = { "src", "net", "sf", "orcc", "generated" };
-		for (String segment : segments) {
-			outputPath += segment + sep;
-			new File(outputPath).mkdir();
-		}
 	}
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new PhiRemoval(), new IncrementPeephole() };
+				new DeadCodeElimination(), new PhiRemoval(),
+				new IncrementPeephole() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
 
-		String outputName = outputPath + "Actor_" + id + ".java";
+		String outputName = path + File.separator + "Actor_" + id + ".java";
 		printer.printActor(outputName, id, actor);
 	}
 
@@ -107,7 +97,7 @@ public class JavaBackendImpl extends AbstractBackend {
 		new BroadcastAdder().transform(network);
 
 		String name = network.getName();
-		String outputName = outputPath + "Network_" + name + ".java";
+		String outputName = path + File.separator + "Network_" + name + ".java";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 
