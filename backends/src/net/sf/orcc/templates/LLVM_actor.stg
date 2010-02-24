@@ -288,8 +288,8 @@ $endif$
 >>
 
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
-$LoadOp(result=pointer+"_L"+value+"_S", ty=pty+"*", pointer=pointer)$
-$GetElementPtrOp(result=pointer+"_L"+value+"_S"+indexesName(indexes)+"_ptr", pty=pty, ptrval=pointer+"_L"+value+"_S", idx=indexes)$
+$LoadOp(result=pointer+"_L"+value+"_S"+indexesName(indexes), ty=pty+"*", pointer=pointer)$
+$GetElementPtrOp(result=pointer+"_L"+value+"_S"+indexesName(indexes)+"_ptr", pty=pty, ptrval=pointer+"_L"+value+"_S"+indexesName(indexes), idx=indexes)$
 $if(cast)$
 $CastStore(ty=ty, value=value, pty=pty, pointer=pointer+"_L"+value+"_S"+indexesName(indexes)+"_ptr", cast=cast)$
 $else$
