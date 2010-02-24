@@ -102,7 +102,10 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		case MINUS:
 			return "sub";
 		case MOD:
-			return "%";
+			if (signed){
+				return "srem";
+			}
+			return "urem";
 		case NE:
 			return "icmp ne";
 		case PLUS:
