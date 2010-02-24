@@ -34,7 +34,6 @@ import java.io.IOException;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -99,7 +98,7 @@ public class CBackendImpl extends AbstractBackend {
 	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new PhiRemoval(),
-				/*new IncrementPeephole(),*/ new MoveReadsWritesTransformation() };
+				new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -122,7 +121,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		String outputName = path + File.separator + network.getName() + ".c";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
-		
+
 		new CMakePrinter().printCMake(path, network);
 	}
 

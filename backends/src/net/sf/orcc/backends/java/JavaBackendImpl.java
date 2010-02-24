@@ -33,7 +33,6 @@ import java.io.File;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
@@ -78,8 +77,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new PhiRemoval(),
-				new IncrementPeephole() };
+				new DeadCodeElimination(), new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

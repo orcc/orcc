@@ -33,7 +33,6 @@ import java.io.File;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
-import net.sf.orcc.backends.c.transforms.IncrementPeephole;
 import net.sf.orcc.backends.cpp.codesign.WrapperAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -87,8 +86,7 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printActor(String id, Actor actor) throws Exception {
-		ActorTransformation[] transformations = { new PhiRemoval(),
-				new IncrementPeephole() };
+		ActorTransformation[] transformations = { new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
