@@ -88,7 +88,7 @@ public class ListType extends AbstractType {
 		ArrayList<Integer> dimensions = new ArrayList<Integer>(1);
 		int size = new ExpressionEvaluator().evaluateAsInteger(this.size);
 		dimensions.add(size);
-		dimensions.addAll(getElementType().getDimensions());
+		dimensions.addAll(getType().getDimensions());
 		return dimensions;
 	}
 

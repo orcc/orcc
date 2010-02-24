@@ -99,7 +99,7 @@ public class CBackendImpl extends AbstractBackend {
 	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new PhiRemoval(),
-				new IncrementPeephole(), new MoveReadsWritesTransformation() };
+				/*new IncrementPeephole(),*/ new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
