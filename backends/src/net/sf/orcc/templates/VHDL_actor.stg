@@ -215,9 +215,10 @@ $endif$
 
 // while node
 WhileNode(whileNode) ::= <<
-while ($whileNode.value$) {
-  $nodes(whileNode.nodes)$}
+while ($whileNode.value$) loop
+  $nodes(whileNode.nodes)$
 $BlockNode(whileNode.joinNode)$
+end loop;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -226,7 +227,7 @@ $BlockNode(whileNode.joinNode)$
 
 functionParameter(variable) ::= <<
 $if(!(listSize(variable.type.dimensions)))$
-$variable$ : $variable.type$
+$variable$ : $typeFunction(variable.type)$
 $else$
 -- error !!!!! type memory type
 $endif$
@@ -235,10 +236,10 @@ $endif$
 VarInFctDeclaration(variable) ::= <<
 $variable.type.dimensions$
 $if(variable.port)$
-variable $variable$ : $variable.type$
+variable $variable$ : $typeFunction(variable.type)$
 $else$
   $if(!(listSize(variable.type.dimensions)))$
-variable $variable$ : $variable.type$
+variable $variable$ : $typeFunction(variable.type)$
   $else$
 -- error !!!!! type memory_type
   $endif$
@@ -251,6 +252,18 @@ return std_logic
 $else$
 $if(type.int)$
 return integer 
+$endif$
+$endif$
+>>
+
+typeFunction(type) ::= <<
+$if(type.bool)$
+std_logic 
+$else$
+$if(type.int)$
+integer
+$else$
+integer 
 $endif$
 $endif$
 >>
@@ -451,25 +464,7 @@ architecture rtl_$actor.name$ of $actor.name$ is
   ---------------------------------------------------------------------------
 
 begin
-
-$if(actor.actionScheduler.actions)$
-  $actor.name$_proc : process (reset_n, clock) is
-    $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
-    --
-    $actor.actions: printActionLocals(it)$  --
-  begin
-    if reset_n = '0' then 
-      $actor.stateVars.list: stateConst(it)$      --
-      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-    elsif rising_edge(clock) then
-      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-      $actor.actions: printActionSchedulerInline(it); separator="\n"$
-      $schedulingTest(actor.actionScheduler.actions)$
-    end if;
-  end process $actor.name$_proc;
-
-$else$
-  $if(actor.actionScheduler.fsm)$
+$if(actor.actionScheduler.fsm)$
   $actor.name$_proc : process (reset_n, clock) is
     $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
     --
@@ -484,7 +479,21 @@ $else$
       $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
     end if;
   end process $actor.name$_proc;
-  $endif$
+$else$
+  $actor.name$_proc : process (reset_n, clock) is
+    $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
+    --
+    $actor.actions: printActionLocals(it)$  --
+  begin
+    if reset_n = '0' then 
+      $actor.stateVars.list: stateConst(it)$      --
+      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
+    elsif rising_edge(clock) then
+      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
+      $actor.actions: printActionSchedulerInline(it); separator="\n"$
+      $schedulingTest(actor.actionScheduler.actions)$
+    end if;
+  end process $actor.name$_proc;
 $endif$
 
 end architecture rtl_$actor.name$;

@@ -1,77 +1,88 @@
 group VHDL_network;
 
-ptr_fifo(fifo,instance) ::= <<
-$fifo.source$_$fifo.src_port$ = &fifo_$fifo.count$;
-$fifo.target$_$fifo.tgt_port$ = &fifo_$fifo.count$;
+///////////////////////////////////////////////////////////////////////////////
+// assigns FIFOs
+
+assignFifo(source, sourcePort, target, targetPort, count) ::= <<
+entity work.fifo_$count$ is 
+generic map (
+depth => $edge.size$,
+width => $targetPort.type$ );
+port map (
+  fifo_$count$_write    => $source.id$_$sourcePort.name$_write, 
+  fifo_$count$_data_in  => $source.id$_$sourcePort.name$_data_in, 
+  fifo_$count$_full     => $source.id$_$sourcePort.name$_full, 
+  fifo_$count$_read     => $target.id$_$targetPort.name$_read, 
+  fifo_$count$_data_out => $target.id$_$targetPort.name$_data_out, 
+  fifo_$count$_empty    => $target.id$_$targetPort.name$_empty, 
+  clock            => clock, 
+  reset_n          => reset_n); 
+
 
 >>
-//$if(instance==fifo.source)$
 
-network(debugFifos, name, size, broadcasts, initializes, instances, connections) ::= <<
--------------------------------------------------------------------------------
--- Title      : $name$_top
--- Project    : $name$
--------------------------------------------------------------------------------
--- File       : $name$_top.vhd
--- Author     : 
--- Company    : 
--- Created    : 
--- Last update: 
--- Platform   : All
--- Standard   : VHDL'93/02
--------------------------------------------------------------------------------
--- Description: 
--------------------------------------------------------------------------------
--- Copyright (c) 20010 
--------------------------------------------------------------------------------
--- Revisions  :
--- Date        Version    Author    Description
---              1.0       CAL2HDL   Created
--------------------------------------------------------------------------------
+tryAssignFifo(edge, src, tgt) ::= <<
+$if (src.instance)$
+$if (tgt.instance)$
+$assignFifo(
+  source=src.instance, sourcePort=edge.source,
+  target=tgt.instance, targetPort=edge.target,
+  count=network.connectionMap.(edge))$
+$endif$
+$endif$
+>>
 
+assignFifos(edges) ::= <<
+$edges: tryAssignFifo(
+  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it)) $
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print calls to scheduler()
+
+printSchedulers(instances) ::= <<
+$instances: { entity work.$it.id$ is 
+port map (
+  $it.id$_write    => $it.id$_$it.network$_write, 
+  clock            => clock, 
+  reset_n          => reset_n); 
+}; separator="\n"$
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print network
+network(debugFifos, fifoSize, network) ::= <<
+------------------------------------------------------------------------------
+-- Generated from $network.name$ actor
+------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 
-entity $name$_top is
+entity $network.name$ is
   port (
   -- Inputs
-  clk     : in std_logic;
-  reset_n : in std_logic;
-  -- Outputs
-  );
-end $actor.name$;
+  clock   : in std_logic;
+  reset_n : in std_logic);  
+end $network.name$;
 
 
-architecture rtl_$name$ of $name$_top is 
+architecture rtl_$network.name$ of $network.name$ is
 
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
 
-begin
-  -----------------------------------------------------------------------------
-  --           Components instantiation                                      --
-  -----------------------------------------------------------------------------
-  $instances: { inst | $inst$_0 : entity work.$inst$;
-  port map(
-  $connections:ptr_fifo(fifo=it,instance=inst)$
-  );
-}$
-  
-  
-  FIFO_generate : for i in 0 to $fifo.count$ generate
-    FIFO_generic_i : entity work.FIFO_generic
-      generic map (
-      FIFO_DEPTH => FIFO_DEPTH(i),
-      DATA_SIZE  => DATA_SIZE(i))
-      port map (
-      data_in_bus  => data_in_bus_fifo(i),
-      data_out_bus => data_out_bus_fifo(i),
-      read_data    => read_data(i),
-      clk_out      => clk,
-      reset_n      => reset_n);
-  end generate RAM_generate;
+  ---------------------------------------------------------------------------
+  -- Actors instantiation 
+  $printSchedulers(network.instances)$
+
+  ---------------------------------------------------------------------------
+  -- FIFOs instantiation 
+  $assignFifos(network.connections)$ 
+  ---------------------------------------------------------------------------
 
 >>
+
