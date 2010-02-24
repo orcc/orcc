@@ -128,7 +128,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			
 			//Make the final asssignment
 			LocalVariable target = newVariable();
-			target.setType(previousType);
+			target.setType(type);
 			Assign assign = new Assign(location, target, new BinaryExpr(
 					location, e1, op, e2, previousType));
 			assign.setBlock(block);
