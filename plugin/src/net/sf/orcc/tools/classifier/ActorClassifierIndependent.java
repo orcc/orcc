@@ -143,12 +143,12 @@ public class ActorClassifierIndependent {
 	 */
 	private ActorClass classifyCSDF(ActionScheduler sched) {
 		// new interpreter must be called before creation of ActorState
-		PartiallyInterpretedActor interpretedActor = newInterpreter();
+		AbstractInterpretedActor interpretedActor = newInterpreter();
 
 		ActorState state = new ActorState(actor);
+		FSM fsm = sched.getFsm();
 		if (state.isEmpty()) {
 			if (sched.hasFsm()) {
-				FSM fsm = sched.getFsm();
 				if (isCycloStaticFsm(fsm)) {
 					return classifyCSDFStateless(sched.getFsm(),
 							interpretedActor);
@@ -162,13 +162,26 @@ public class ActorClassifierIndependent {
 		// schedule the actor
 		StaticClass staticClass = new StaticClass();
 		int scheduled;
-		do {
-			scheduled = interpretedActor.schedule();
-			if (scheduled != 0) {
-				Action latest = interpretedActor.getScheduledAction();
-				staticClass.addAction(latest);
-			}
-		} while (!state.isInitialState() || scheduled == 0);
+		if (fsm == null) {
+			do {
+				scheduled = interpretedActor.schedule();
+				if (scheduled != 0) {
+					Action latest = interpretedActor.getScheduledAction();
+					staticClass.addAction(latest);
+				}
+			} while (!state.isInitialState() || scheduled == 0);
+		} else {
+			String initialState = fsm.getInitialState().getName();
+			do {
+				scheduled = interpretedActor.schedule();
+				if (scheduled != 0) {
+					Action latest = interpretedActor.getScheduledAction();
+					staticClass.addAction(latest);
+				}
+			} while (!state.isInitialState()
+					|| !initialState.equals(interpretedActor.getFsmState())
+					|| scheduled == 0);
+		}
 
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
@@ -185,7 +198,7 @@ public class ActorClassifierIndependent {
 	 * @return an actor class
 	 */
 	private ActorClass classifyCSDFStateless(FSM fsm,
-			PartiallyInterpretedActor interpretedActor) {
+			AbstractInterpretedActor interpretedActor) {
 		// schedule the actor
 		StaticClass staticClass = new StaticClass();
 		String initialState = fsm.getInitialState().getName();
@@ -221,7 +234,7 @@ public class ActorClassifierIndependent {
 		actor.resetTokenProduction();
 
 		// creates a partial interpreter
-		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
+		AbstractInterpretedActor interpretedActor = new AbstractInterpretedActor(
 				actor.getName(), actor, analyzer);
 		interpretedActor.initialize();
 		interpretedActor.setAction(action);
@@ -306,7 +319,7 @@ public class ActorClassifierIndependent {
 
 		// schedule
 		StaticClass staticClass = new StaticClass();
-		PartiallyInterpretedActor interpretedActor = newInterpreter();
+		AbstractInterpretedActor interpretedActor = newInterpreter();
 		interpretedActor.schedule();
 		staticClass.addAction(interpretedActor.getScheduledAction());
 
@@ -355,8 +368,8 @@ public class ActorClassifierIndependent {
 	 * 
 	 * @return the interpreter created
 	 */
-	private PartiallyInterpretedActor newInterpreter() {
-		PartiallyInterpretedActor interpretedActor = new PartiallyInterpretedActor(
+	private AbstractInterpretedActor newInterpreter() {
+		AbstractInterpretedActor interpretedActor = new AbstractInterpretedActor(
 				actor.getName(), actor, analyzer);
 		interpretedActor.initialize();
 

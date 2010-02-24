@@ -44,7 +44,7 @@ import net.sf.orcc.ir.expr.VarExpr;
  * @author Matthieu Wipliez
  * 
  */
-public class PartialExpressionEvaluator extends ExpressionEvaluator {
+public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 
 	private boolean schedulableMode;
 

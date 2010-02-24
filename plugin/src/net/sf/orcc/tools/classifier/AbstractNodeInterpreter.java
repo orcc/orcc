@@ -47,13 +47,13 @@ import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.IfNode;
 
 /**
- * This class defines a partial node/instruction interpreter. It refines the
+ * This class defines an abstract node/instruction interpreter. It refines the
  * existing interpreter by not relying on anything that is data-dependent.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class PartialNodeInterpreter extends NodeInterpreter {
+public class AbstractNodeInterpreter extends NodeInterpreter {
 
 	private Action action;
 
@@ -61,11 +61,11 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 
 	private boolean schedulableMode;
 
-	public PartialNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
+	public AbstractNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
 		this.analyzer = analyzer;
 
 		listAllocator = new ListAllocator();
-		exprInterpreter = new PartialExpressionEvaluator();
+		exprInterpreter = new AbstractExpressionEvaluator();
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class PartialNodeInterpreter extends NodeInterpreter {
 	 */
 	public void setSchedulableMode(boolean schedulableMode) {
 		this.schedulableMode = schedulableMode;
-		((PartialExpressionEvaluator) exprInterpreter)
+		((AbstractExpressionEvaluator) exprInterpreter)
 				.setSchedulableMode(schedulableMode);
 	}
 

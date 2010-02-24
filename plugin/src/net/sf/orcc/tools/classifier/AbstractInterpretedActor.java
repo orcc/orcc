@@ -34,14 +34,14 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Pattern;
 
 /**
- * This class defines an actor that can be partially interpreted by calling
- * {@link #initialize()} and {@link #schedule()}. It refines the interpreted
- * actor by not relying on anything that is data-dependent.
+ * This class defines an actor on which we can do abstract interpretation by
+ * calling {@link #initialize()} and {@link #schedule()}. It refines the
+ * interpreted actor by not relying on anything that is data-dependent.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class PartiallyInterpretedActor extends InterpretedActor {
+public class AbstractInterpretedActor extends InterpretedActor {
 
 	private Action scheduledAction;
 
@@ -53,7 +53,7 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 	 * @param actor
 	 *            an actor
 	 */
-	public PartiallyInterpretedActor(String id, Actor actor,
+	public AbstractInterpretedActor(String id, Actor actor,
 			ConfigurationAnalyzer analyzer) {
 		super(id, actor);
 
@@ -61,7 +61,7 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 		isSynchronousScheduler = true;
 
 		// Build a node interpreter for visiting CFG and instructions
-		interpret = new PartialNodeInterpreter(id, analyzer);
+		interpret = new AbstractNodeInterpreter(id, analyzer);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 	@Override
 	protected int execute(Action action) {
 		scheduledAction = action;
-		((PartialNodeInterpreter) interpret).setSchedulableMode(false);
+		((AbstractNodeInterpreter) interpret).setSchedulableMode(false);
 		return super.execute(action);
 	}
 
@@ -88,7 +88,7 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 
 	@Override
 	protected boolean isSchedulable(Action action) {
-		((PartialNodeInterpreter) interpret).setSchedulableMode(true);
+		((AbstractNodeInterpreter) interpret).setSchedulableMode(true);
 		Object isSchedulable = interpretProc(action.getScheduler());
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
@@ -100,7 +100,7 @@ public class PartiallyInterpretedActor extends InterpretedActor {
 	 *            an action
 	 */
 	public void setAction(Action action) {
-		((PartialNodeInterpreter) interpret).setAction(action);
+		((AbstractNodeInterpreter) interpret).setAction(action);
 	}
 
 }
