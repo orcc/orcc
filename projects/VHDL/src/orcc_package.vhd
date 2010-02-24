@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-02-09
+-- Last update: 2010-02-23
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -53,7 +53,8 @@ package orcc_package is
   function bitand(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
   function bitor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
   function bitxor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
-  function div (ARG0         : integer; ARG1 : integer) return integer;
+  function bitnot(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
+  function div (op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
   function get_mod (ARG0     : integer; ARG1 : integer) return integer;
   function shift_left(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
   function shift_right(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
@@ -83,10 +84,17 @@ package body orcc_package is
     return to_integer(signed(result));
   end function;
 
-  function div (ARG0 : integer; ARG1 : integer) return integer is
+  function bitnot(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
+    variable result : std_logic_vector(l1 - 1 downto 0);
+  begin
+    result := not std_logic_vector(to_signed(op1, l1));
+    return to_integer(signed(result));
+  end function;
+  
+  function div (op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
     variable result : integer;
   begin
-    result := ARG0/ARG1;
+    result := op1/op2;
     return result;
   end function;
 
