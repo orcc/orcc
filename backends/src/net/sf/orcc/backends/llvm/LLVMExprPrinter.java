@@ -110,6 +110,9 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		case SHIFT_LEFT:
 			return "shl";
 		case SHIFT_RIGHT:
+			if (signed){
+				return "ashr";
+			}
 			return "lshr";
 		case TIMES:
 			return "mul";

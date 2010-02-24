@@ -42,7 +42,7 @@ action IN:[ x ] repeat 64, SIGNED:[ s ] ==> OUT:[ block1 ] repeat 64
  	block1 := [rshift( block1[n], 13 ) : for int n in Integers( 0,63 )];
  	
  	/* clipping */
- 	block1 := clip( block1, if s then -255 else 0 end );
+ 	block1 := [clip( block1[n], if s then -255 else 0 end ): for int n in Integers( 0,63 )];
  end
 
 
@@ -139,18 +139,16 @@ procedure idct1d( List(type:int, size = 64) X, List(type:int, size = 64) Y )
     Temp1 - Temp2
  end
   
- function clip( List(type:int, size = 64) x, int lim ) --> int : 
- [
-   if ( x[ n ] < lim ) then 
+ function clip( int x, int lim ) --> int : 
+   if ( x < lim ) then 
      lim
    else
-     if ( x[ n ] > 255 ) then 
+     if ( x > 255 ) then 
        255 
  	 else 
- 	   x[ n ] 
+ 	   x 
      end
-   end : for int n in Integers(0, 63) 
- ]
+   end 
  end
 
 end

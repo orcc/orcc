@@ -48,11 +48,15 @@ $arguments, parameters: { arg, param | $parameters(type = arg.type, variable= pa
 >>
 
 parameters(type, variable) ::= <<
-$if(variable.intExpr)$$type$ $variable$$elseif(variable.booleanExpr)$i1 $variable$$else$$variable.type$ %$variable$$endif$ 
+$if(variable.intExpr)$$type$ $variable$$elseif(type.list)$$variable.type$* %$variable$$elseif(variable.booleanExpr)$i1 $variable$$else$$variable.type$ %$variable$$endif$ 
 >>
 
 argumentDeclaration(variable) ::= <<
+$if(variable.type.list)$
+$variable.type$* %$variable$
+$else$
 $variable.type$ %$variable$
+$endif$
 >>
 
 ConstantValue(type, const) ::= <<
