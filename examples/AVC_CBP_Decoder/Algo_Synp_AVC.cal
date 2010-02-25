@@ -305,7 +305,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	uint(size=6) val_CodedBlockPatternLuma := 0;
 	uint(size=6) CodedBlockPatternChroma := 0;
 	int mb_qp_delta;
-	int ( size = 1 ) start_pcm_chroma := 0;
+	bool start_pcm_chroma := false;
 	List ( type: List ( type: uint(size=4), size=3), size=25 ) Intra_16x16_tab = //[mb_type][Intra16x16PredMode / CBPChroma / CBPLuma]
 		[ 
 			[0,0,0], [0,0,0], [1,0,0], [2,0,0], [3,0,0], [0,1,0], [1,1,0], [2,1,0], 
@@ -2579,7 +2579,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		MB_inc = 256
 	do
-		start_pcm_chroma := 1;
+		start_pcm_chroma := true;
 	end
 	
 	// for( i = 0; i < 2 * MbWidthC * MbHeightC; i++ )
@@ -2593,7 +2593,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			NonZeroCountCb[val_CurrMbAddr,i] := 16;
 			NonZeroCountCr[val_CurrMbAddr,i] := 16;
 		end
-		start_pcm_chroma := 0;
+		start_pcm_chroma := false;
 
 	end
 
