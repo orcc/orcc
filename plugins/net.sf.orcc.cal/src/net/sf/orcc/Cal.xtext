@@ -3,11 +3,13 @@ grammar net.sf.orcc.Cal with org.eclipse.xtext.common.Terminals
 generate cal "http://www.sf.net/orcc/Cal"
 
 Actor:
-	'actor' name=ID '(' ')' (inputs += Port (',' inputs += Port)*)? '==>'
-	(outputs += Port (',' outputs += Port)*)? ':'
+	imports=Import*
+	'actor' name=ID ('[' ']')?
+		'(' (parameters += Parameter (',' parameters += Parameter)*)? ')'
+		(inputs += Port (',' inputs += Port)*)? '==>'
+		(outputs += Port (',' outputs += Port)*)? ':'
 	
-	(actions+=Action
-	|stateVariables+=StateVariable)*
+	(actions+=Action | stateVariables+=StateVariable)*
 	
 	'end';
 	
@@ -15,21 +17,91 @@ Action:
 	(tag=Tag ':')? 'action' '==>' ':'
 	('do' (statements+=Statement)*)?
 	'end';
-	
-Tag: (identifiers += ID) ('.' identifiers += ID)*;
 
-Port: type=Type name=ID;
+Assign: target=[Variable|ID] ':=' value=Expression ';';
 
-Type: 'int' | 'bool';
+/*Expression: operands += And_expr (('or' | '||') operands += And_expr)+;
 
-StateVariable: type=Type name=ID ';';
+And_expr returns Expression: operands += Bitor_expr (('and' | '&&') operands += Bitor_expr)+;
 
-Statement: Assign | If;
+Bitor_expr returns Expression: operands += Bitand_expr (('|' operands += Bitand_expr)+);
 
-Variable: StateVariable;
+Bitand_expr returns Expression: operands += Eq_expr (('&' operands += Eq_expr)+);
 
-Assign: target=[Variable|ID] ':=' Expression ';';
+Eq_expr returns Expression: '14';*/
+
+Expression:
+	AtomicExpression
+		({ChainExpression.left=current} '+' right=Expression)?;
+     
+AtomicExpression returns Expression:
+     LiteralExpression | VariableReference | '(' Expression ')';
+
+LiteralExpression:
+	BooleanExpression | IntegerExpression | StringExpression;
+
+BooleanExpression: 'true' | 'false';
+
+IntegerExpression: value=INT;
+
+StringExpression: value=STRING;
+
+VariableReference: value=[Variable];
+
+/*
+
+eq_expr: e1=rel_expr (((op=EQ | op=NE) e2=rel_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
+
+rel_expr: e1=shift_expr (((op=LT | op=GT | op=LE | op=GE) e2=shift_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1);
+
+shift_expr: e1=add_expr (((op=SHIFT_LEFT | op=SHIFT_RIGHT) e2=add_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
+
+add_expr: e1=mul_expr (((op=PLUS | op=MINUS) e2=mul_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
+
+mul_expr: e1=exp_expr (((op=DIV | op=DIV_INT | op=MOD | op=TIMES) e2=exp_expr)+ -> ^(EXPR_BINARY $e1 ($op $e2)+) | -> $e1 );
+
+exp_expr: e1=un_expr ((EXP e2=un_expr)+ -> ^(EXPR_BINARY $e1 (EXP $e2)+) | -> $e1 );
+
+un_expr: postfix_expression -> postfix_expression
+	| (op=MINUS | op=NOT | op=NUM_ELTS) un_expr -> ^(EXPR_UNARY $op un_expr);
+
+postfix_expression:
+  '[' e=expressions (':' g=expressionGenerators)? ']' -> ^(EXPR_LIST $e $g?)
+| 'if' e1=expression 'then' e2=expression 'else' e3=expression 'end' -> ^(EXPR_IF $e1 $e2 $e3)
+| constant -> constant
+| '(' expression ')' -> expression
+| var=ID (
+    '(' expressions? ')' -> ^(EXPR_CALL $var expressions?)
+  |  ('[' expressions ']')+ -> ^(EXPR_IDX $var expressions+)
+  | -> ^(EXPR_VAR $var));
+
+constant:
+  'true' -> ^(EXPR_BOOL 'true')
+| 'false' -> ^(EXPR_BOOL 'false')
+| FLOAT -> ^(EXPR_FLOAT FLOAT)
+| INTEGER -> ^(EXPR_INT INTEGER)
+| STRING -> ^(EXPR_STRING STRING);*/
 
 If: 'if' condition=Expression 'then' statements+=Statement 'end';
 
-Expression: INT | 'true' | 'false';
+Port: type=Type name=ID;
+
+Import:
+	'import' ('all' Tag ';' | Tag ';');
+
+Parameter returns Variable: VariableDeclaration ('=' value=Expression)?;
+
+Statement: Assign | If;
+
+StateVariable returns Variable: ValuedVariableDeclaration ';';
+
+Tag: (identifiers += ID) ('.' identifiers += ID)*;
+
+Type: name=ID ('(' attributes += TypeAttribute (',' attributes += TypeAttribute)* ')')?;
+
+TypeAttribute: name=ID (':' type=Type | '=' value=Expression);
+
+VariableDeclaration returns Variable: type=Type name=ID;
+
+ValuedVariableDeclaration returns Variable:
+  VariableDeclaration (('=' | ':=') value=Expression)?;

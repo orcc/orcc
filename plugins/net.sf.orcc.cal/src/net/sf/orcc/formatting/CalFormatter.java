@@ -10,16 +10,17 @@ import org.eclipse.xtext.formatting.impl.FormattingConfig;
  * This class contains custom formatting description.
  * 
  * see : http://www.eclipse.org/Xtext/documentation/latest/xtext.html#formatting
- * on how and when to use it 
+ * on how and when to use it
  * 
- * Also see {@link org.eclipse.xtext.xtext.XtextFormattingTokenSerializer} as an example
+ * Also see {@link org.eclipse.xtext.xtext.XtextFormattingTokenSerializer} as an
+ * example
  */
 public class CalFormatter extends AbstractDeclarativeFormatter {
-	
+
 	@Override
 	protected void configureFormatting(FormattingConfig c) {
 		net.sf.orcc.services.CalGrammarAccess f = (net.sf.orcc.services.CalGrammarAccess) getGrammarAccess();
 
-		//...
+		// ...
 	}
 }
