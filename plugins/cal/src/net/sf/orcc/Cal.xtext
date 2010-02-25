@@ -1,0 +1,35 @@
+grammar net.sf.orcc.Cal with org.eclipse.xtext.common.Terminals
+
+generate cal "http://www.sf.net/orcc/Cal"
+
+Actor:
+	'actor' name=ID '(' ')' (inputs += Port (',' inputs += Port)*)? '==>'
+	(outputs += Port (',' outputs += Port)*)? ':'
+	
+	(actions+=Action
+	|stateVariables+=StateVariable)*
+	
+	'end';
+	
+Action:
+	(tag=Tag ':')? 'action' '==>' ':'
+	('do' (statements+=Statement)*)?
+	'end';
+	
+Tag: (identifiers += ID) ('.' identifiers += ID)*;
+
+Port: type=Type name=ID;
+
+Type: 'int' | 'bool';
+
+StateVariable: type=Type name=ID ';';
+
+Statement: Assign | If;
+
+Variable: StateVariable;
+
+Assign: target=[Variable|ID] ':=' Expression ';';
+
+If: 'if' condition=Expression 'then' statements+=Statement 'end';
+
+Expression: INT | 'true' | 'false';
