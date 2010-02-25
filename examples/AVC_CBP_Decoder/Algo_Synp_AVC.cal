@@ -580,7 +580,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		bitand( v, lshift(1,n)-1 )
 	end
 
-	List (type:bool, size=8 ) bit_read:=[0: for int i in Integers(0,7)];
+	List (type:bool, size=8 ) bit_read:=[false: for int i in Integers(0,7)];
 	int bit_read_cnt:=8;
 
 	action bits:[ b ] repeat 8==>
