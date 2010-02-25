@@ -132,15 +132,6 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="net.sf.orcc.ui.editors.CalEditor"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            default="true"
-            extensions="cal"
-            icon="icons/orcc_run.gif"
-            id="net.sf.orcc.ui.editors.RVCCalEditor"
-            name="RVC-CAL editor">
-      </editor>
-      <editor
             class="net.sf.orcc.ui.editors.StgEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="false"
@@ -162,7 +153,7 @@
       <sourceLocator
             class="net.sf.orcc.debug.sourceLookup.OrccSourceLookupDirector"
             id="net.sf.orcc.debug.sourceLookupDirector.cal"
-            name="ORCC (RVC-CAL) Source Lookup Director">
+            name="Orcc (RVC-CAL) Source Lookup Director">
       </sourceLocator>
    </extension>
    <extension
