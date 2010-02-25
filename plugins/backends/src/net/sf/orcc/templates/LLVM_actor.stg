@@ -260,54 +260,48 @@ $endif$
 >>
 
 
-CastStore(ty, value, pty, pointer, pointerExt, cast)::= <<
+CastStore(ty, value, pty, pointer, cast, location)::= <<
 $if(cast.extended)$
 $if(cast.signed)$
-$SextOp(result="%"+value+"_"+pointer+pointerExt+"_ext", ty=ty, value=Expr(value), ty2=pty)$
+$SextOp(result="%"+value+"_l"+location+"_ext", ty=ty, value=Expr(value), ty2=pty)$
 
 $else$
-$ZextOp(result="%"+value+"_"+pointer+pointerExt+"_ext", ty=ty, value=Expr(value), ty2=pty)$
+$ZextOp(result="%"+value+"_l"+location+"_ext", ty=ty, value=Expr(value), ty2=pty)$
 
 $endif$
-$if(pointerExt)$
-$StoreInstr(ty=pty, value=value, pty=pty, pointer="%"+pointer+pointerExt, cast="_"+pointer+"_ext")$
+$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_l"+location+"_ext")$
 $else$
-$StoreInstr(ty=pty, value=value, pty=pty, pointer=Var(pointer), cast="_"+pointer+"_ext")$
-$endif$
-$else$
-$TruncOp(result="%"+value+"_"+pointer+"_trunc", ty=ty, value=Expr(value), ty2=pty)$
-$if(pointerExt)$
-$StoreInstr(ty=pty, value=value, pty=pty, pointer="%"+pointer+pointerExt, cast="_"+pointer+"_trunc")$
-$else$
-$StoreInstr(ty=pty, value=value, pty=pty, pointer=Var(pointer), cast="_"+pointer+"_trunc")$
+$TruncOp(result="%"+value+"_l"+location+"_trunc", ty=ty, value=Expr(value), ty2=pty)$
+
+$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_l"+location+"_trunc")$
 $endif$
 $endif$
 >>
 
-StoreWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
-$GetElementPtrOp(result="%"+pointer+"_L"+value+"_S_"+indexesName(indexes)+"_ptr", idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
+StoreWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
+$GetElementPtrOp(result="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr", idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty.elementType, pointer=pointer, pointerExt="_L"+value+"_S_"+indexesName(indexes)+"_ptr", cast=cast)$
+$CastStore(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr", cast=cast, location=location)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_L"+value+"_S_"+indexesName(indexes)+"_ptr")$
+$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr")$
 $endif$
 >>
 
-StoreWithoutIndex(ty, value, pty, pointer, cast) ::= <<
+StoreWithoutIndex(ty, value, pty, pointer, cast, location) ::= <<
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty, pointer=pointer, cast=cast)$
+$CastStore(ty=ty, value=value, pty=pty, pointer=Var(pointer), cast=cast, location=location)$
 $else$
 $StoreInstr(ty=ty, value=value, pty=pty, pointer=Var(pointer))$
 $endif$
 >>
 
-StorePortWithIndex(ty, value, pty, pointer, cast, indexes) ::= <<
-$LoadOp(result=Var(pointer)+"_L"+value+"_S"+indexesName(indexes), ty=pty+"*", pointer=Var(pointer))$
-$GetElementPtrOp(result=Var(pointer)+"_L"+value+"_S"+indexesName(indexes)+"_ptr", pty=pty, ptrval=Var(pointer)+"_L"+value+"_S"+indexesName(indexes), idx=indexes)$
+StorePortWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
+$LoadOp(result="%"+pointer+"_l"+location+"_Loadport"+indexesName(indexes), ty=pty+"*", pointer=Var(pointer))$
+$GetElementPtrOp(result="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr", pty=pty, ptrval="%"+pointer+"_l"+location+"_Loadport"+indexesName(indexes), idx=indexes)$
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty, pointer=pointer, pointerExt="_L"+value+"_S"+indexesName(indexes)+"_ptr", cast=cast)$
+$CastStore(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr", cast=cast, location=location)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_L"+value+"_S"+indexesName(indexes)+"_ptr")$
+$StoreInstr(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr")$
 $endif$
 >>
 
@@ -512,13 +506,13 @@ $if(store.target.variable.port)$
 $if(store.indexes.empty)$
 $StorePortWithoutIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=Var(store.target), cast=store.cast)$
 $else$
-$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes)$
+$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=store.location.startLine)$
 $endif$
 $else$
 $if(store.indexes.empty)$
-$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast)$
+$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast, location=store.location.startLine)$
 $else$
-$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes)$
+$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=store.location.startLine)$
 $endif$
 $endif$
 
