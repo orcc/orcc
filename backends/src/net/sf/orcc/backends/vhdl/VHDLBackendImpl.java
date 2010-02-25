@@ -82,6 +82,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void beforeInstantiation(Network network) throws OrccException {
 		printer = new VHDLActorPrinter();
+		VHDLTypePrinter.isInNetwork = false;
 	}
 
 	@Override
@@ -94,11 +95,14 @@ public class VHDLBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
-		File repertory = new File (path + "/Design");
-		if (!repertory.exists()){
-		     repertory.mkdir();
+
+		File folder = new File(path + File.separator + "Design");
+		if (!folder.exists()) {
+			folder.mkdir();
 		}
-		String outputName = path + File.separator + "Design" + File.separator + id + ".vhd";
+
+		String outputName = path + File.separator + "Design" + File.separator
+				+ id + ".vhd";
 		printer.printActor(outputName, id, actor);
 	}
 
@@ -109,21 +113,25 @@ public class VHDLBackendImpl extends AbstractBackend {
 			if (instance.isActor()) {
 				Actor actor = instance.getActor();
 				String id = instance.getId();
-				File repertory = new File (path + "/Testbench");
-				if (!repertory.exists()){
-				     repertory.mkdir();
+				File folder = new File(path + File.separator + "Testbench");
+				if (!folder.exists()) {
+					folder.mkdir();
 				}
-				String outputName = path + File.separator + "Testbench" + File.separator + id + "_tb.vhd";
+
+				String outputName = path + File.separator + "Testbench"
+						+ File.separator + id + "_tb.vhd";
 				tbPrinter.printTestbench(outputName, id, actor);
 			}
 		}
 
+		VHDLTypePrinter.isInNetwork = true;
 		NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
 
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);
 
-		String outputName = path + File.separator + network.getName() + "_TOP.vhd";
+		String outputName = path + File.separator + network.getName()
+				+ "_TOP.vhd";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 

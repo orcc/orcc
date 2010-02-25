@@ -40,14 +40,24 @@ $edges: tryAssignFifo(
 ///////////////////////////////////////////////////////////////////////////////
 // print calls to scheduler()
 
-printSchedulers(instances) ::= <<
-$instances: { entity work.$it.id$ is 
+printActorPorts(instance) ::= <<
+$if (instance.actor)$
+$instance.actor.inputs.list: {$it$ => $it$}; separator=", "$
+$endif$
+>>
+
+printScheduler(instance) ::= <<
+entity work.$it.id$ is
 port map (
   $it.id$_write    => $it.id$_$it.network$_write, 
   clock            => clock, 
-  reset_n          => reset_n); 
-}; separator="\n"$
+  reset_n          => reset_n
+  $printActorPorts(instance)$);
 
+>>
+
+printSchedulers(instances) ::= <<
+$instances: printScheduler()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

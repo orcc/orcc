@@ -64,28 +64,16 @@ public final class CActorPrinter extends Printer {
 	 *             If the template file could not be read.
 	 */
 	public CActorPrinter() {
-		this("C_actor");
+		group = new TemplateGroupLoader().loadGroup("C_actor");
+		
+		// registers this printer as the default printer
+		Printer.register(this);
 
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_");
 		transformations.put("index", "index_");
 		transformations.put("getw", "getw_");
 		transformations.put("select", "select_");
-	}
-
-	/**
-	 * Creates a new network printer using the given template file name.
-	 * 
-	 * @param name
-	 *            The template file name.
-	 * @throws IOException
-	 *             If the template file could not be read.
-	 */
-	protected CActorPrinter(String name) {
-		group = new TemplateGroupLoader().loadGroup(name);
-
-		// registers this printer as the default printer
-		Printer.register(this);
 	}
 
 	/**

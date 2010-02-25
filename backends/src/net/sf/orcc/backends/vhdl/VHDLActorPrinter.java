@@ -68,28 +68,16 @@ public final class VHDLActorPrinter extends Printer {
 	 *             If the template file could not be read.
 	 */
 	public VHDLActorPrinter() {
-		this("VHDL_actor");
+		group = new TemplateGroupLoader().loadGroup("VHDL_actor");
+
+		// registers this printer as the default printer
+		Printer.register(this);
 
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_1");
 		transformations.put("access", "access_1");
 		transformations.put("component", "component_1");
 		transformations.put("select", "select_1");
-	}
-
-	/**
-	 * Creates a new network printer using the given template file name.
-	 * 
-	 * @param name
-	 *            The template file name.
-	 * @throws IOException
-	 *             If the template file could not be read.
-	 */
-	protected VHDLActorPrinter(String name) {
-		group = new TemplateGroupLoader().loadGroup(name);
-
-		// registers this printer as the default printer
-		Printer.register(this);
 	}
 
 	/**
