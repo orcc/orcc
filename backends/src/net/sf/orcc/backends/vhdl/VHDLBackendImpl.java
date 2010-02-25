@@ -94,8 +94,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
-
-		String outputName = path + File.separator + id + ".vhd";
+		File repertory = new File (path + "/Design");
+		if (!repertory.exists()){
+		     repertory.mkdir();
+		}
+		String outputName = path + File.separator + "Design" + File.separator + id + ".vhd";
 		printer.printActor(outputName, id, actor);
 	}
 
@@ -106,7 +109,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 			if (instance.isActor()) {
 				Actor actor = instance.getActor();
 				String id = instance.getId();
-				String outputName = path + File.separator + id + "_tb.vhd";
+				File repertory = new File (path + "/Testbench");
+				if (!repertory.exists()){
+				     repertory.mkdir();
+				}
+				String outputName = path + File.separator + "Testbench" + File.separator + id + "_tb.vhd";
 				tbPrinter.printTestbench(outputName, id, actor);
 			}
 		}
@@ -116,7 +123,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// Add broadcasts before printing
 		new BroadcastAdder().transform(network);
 
-		String outputName = path + File.separator + network.getName() + ".vhd";
+		String outputName = path + File.separator + network.getName() + "_TOP.vhd";
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 

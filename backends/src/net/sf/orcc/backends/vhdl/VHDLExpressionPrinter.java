@@ -37,6 +37,7 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 import net.sf.orcc.ir.type.IntType;
@@ -184,6 +185,22 @@ public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 	@Override
 	public void visit(ListExpr expr, Object... args) {
 		throw new OrccRuntimeException("List expression not supported");
+	}
+
+	@Override
+	public void visit(UnaryExpr expr, Object... args) {
+		UnaryOp op = expr.getOp();
+		switch (op) {
+		case BITNOT:
+			builder.append("bitnot");
+			builder.append("(");
+			expr.getExpr().accept(this, Integer.MIN_VALUE);
+			printType(expr.getExpr());
+			builder.append(")");
+			break;
+		default:
+			super.visit(expr, args);
+		}
 	}
 
 }
