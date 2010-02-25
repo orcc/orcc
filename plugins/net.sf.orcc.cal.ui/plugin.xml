@@ -6,12 +6,13 @@
     <extension
             point="org.eclipse.ui.editors">
         <editor
-            class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.core.editor.XtextEditor"
-            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
-            default="true"
-            extensions="cal"
-            id="net.sf.orcc.Cal"
-            name="Cal Editor">
+              class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.core.editor.XtextEditor"
+              contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
+              default="true"
+              extensions="cal"
+              icon="icons/orcc_run.gif"
+              id="net.sf.orcc.Cal"
+              name="Cal Editor">
         </editor>
     </extension>
     <extension
