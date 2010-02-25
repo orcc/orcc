@@ -43,7 +43,7 @@ public class OrccActivator extends AbstractUIPlugin {
 	private static OrccActivator plugin;
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "net.sf.orcc.plugin";
+	public static final String PLUGIN_ID = "net.sf.orcc.core";
 
 	/**
 	 * Returns the shared instance

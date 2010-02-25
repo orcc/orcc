@@ -5,8 +5,8 @@ Bundle-SymbolicName: net.sf.orcc.backends;singleton:=true
 Bundle-Version: 0.7.0.beta2
 Bundle-Vendor: IETR/INSA Rennes
 Require-Bundle: org.eclipse.core.runtime,
- net.sf.orcc.plugin,
- org.eclipse.ui
+ org.eclipse.ui,
+ net.sf.orcc.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,

@@ -169,7 +169,7 @@
          point="org.eclipse.debug.ui.debugModelPresentations">
       <debugModelPresentation
             class="net.sf.orcc.debug.presentation.OrccModelPresentation"
-            id="net.sf.orcc.plugin.model">
+            id="net.sf.orcc.core.model">
       </debugModelPresentation>
    </extension>
 

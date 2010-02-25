@@ -93,7 +93,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
          unpack="false"/>
 
    <plugin
-         id="net.sf.orcc.plugin"
+         id="net.sf.orcc.core"
          download-size="0"
          install-size="0"
          version="0.0.0"

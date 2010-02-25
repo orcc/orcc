@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Orcc main plug-in
-Bundle-SymbolicName: net.sf.orcc.plugin;singleton:=true
+Bundle-Name: Orcc core plug-in
+Bundle-SymbolicName: net.sf.orcc.core;singleton:=true
 Bundle-Version: 0.7.0.beta3
 Bundle-Activator: net.sf.orcc.ui.OrccActivator
 Require-Bundle: org.eclipse.core.expressions,
