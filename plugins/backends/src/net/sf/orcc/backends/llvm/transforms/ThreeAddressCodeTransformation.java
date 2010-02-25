@@ -188,6 +188,15 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
 			if (!expr.getType().equals(type)){
+				if(expr.getType().isList()&&type.isList()){
+					//compare type of two arrays
+					ListType exprtype = (ListType)expr.getType();
+					ListType refType = (ListType)type;
+					if(exprtype.getElementType().equals(refType.getElementType())){
+						return expr;
+					}
+				}
+				
 				//Make the final asssignment
 				LocalVariable target = newVariable();
 				Use use = new Use(target);

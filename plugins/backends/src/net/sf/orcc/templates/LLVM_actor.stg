@@ -43,12 +43,12 @@ indexesName(indexes) ::= <<
 $indexes: {index |$index$}; separator="_"$
 >>
 
-parametersDeclaration(arguments, parameters) ::= <<
-$arguments, parameters: { arg, param | $parameters(type = arg.type, variable= param)$}; separator=", "$
+parametersDeclaration(arguments, parameters, casts, location) ::= <<
+$arguments, parameters, casts: { arg, param, cast | $parameters(type = arg.type, variable= param, cast =cast, location=location)$}; separator=", "$
 >>
 
-parameters(type, variable) ::= <<
-$if(variable.intExpr)$$type$ $variable$$elseif(type.list)$$variable.type$* %$variable$$elseif(variable.booleanExpr)$i1 $variable$$else$$variable.type$ %$variable$$endif$ 
+parameters(type, variable, cast, location) ::= <<
+$if(variable.intExpr)$$type$ $elseif(type.list)$$type$* %$elseif(variable.booleanExpr)$i1 $else$$variable.type$ %$endif$$variable$$if(cast)$$location$_cast$endif$
 >>
 
 argumentDeclaration(variable) ::= <<
@@ -236,6 +236,12 @@ $endif$
 
 >>
 
+CastParameter(casts, args, params, location )::= <<
+$casts, args, params: { cast, arg, param | $if(cast)$ 
+$BitcastOp(result="%"+param+location+"_cast", ty=param.type+"*", value=Expr(param), ty2=arg.type+"*")$
+$endif$}$
+>>
+
 CastCall(result, ty, fnptrval, function_args, cast)::= <<
 $if(cast.extended)$
 $CallOp(result="%"+result+"_ext", ty=ty, fnptrval=fnptrval, function_args=function_args)$
@@ -419,14 +425,15 @@ phiVars(vars, node) ::= <<
 
 
 Call(call) ::= <<
+$CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=call.location.startLine)$
 $if(call.target)$
 $if(call.cast)$
-$CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters), cast=call.cast)$
+$CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=call.location.startLine), cast=call.cast)$
 $else$
-$CallOp(result="%"+call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters))$
+$CallOp(result="%"+call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=call.location.startLine))$
 $endif$
 $else$
-$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters))$
+$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=call.location.startLine))$
 $endif$
 
 

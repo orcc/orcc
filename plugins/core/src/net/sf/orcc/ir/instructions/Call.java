@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.instructions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Cast;
@@ -38,6 +39,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -85,6 +87,43 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Returns a list of parameter cast when needed.
+	 * 
+	 * @return List of cast for each parameter
+	 */
+	public List<Cast> getParamCast() {
+		List<Cast> casts = new ArrayList<Cast>();
+		List<Variable> varParams = this.getProcedure().getParameters().getList();
+
+		for (int i=0; i<parameters.size(); i++){
+			Expression parameter = parameters.get(i);
+			
+			if(!parameter.isBooleanExpr()&& !parameter.isIntExpr()){
+				Type var = varParams.get(i).getType();
+				Type expr = parameter.getType();
+			
+				Cast cast = new Cast(expr, var);
+
+				if (cast.isExtended() || cast.isTrunced() ) {
+					casts.add(cast);
+				}else if (var.isList()){
+					// Test size of the two list
+					if (!var.equals(expr)){
+						casts.add(cast);
+					}else{
+						casts.add(null);
+					}
+				}else{
+					casts.add(null);
+				}
+			}
+			
+		}
+		
+		return casts;
 	}
 
 	public List<Expression> getParameters() {
