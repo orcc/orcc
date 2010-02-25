@@ -8,7 +8,7 @@ $if(var.variable.global)$@$else$%$endif$$var$
 >>
 
 Expr(expr) ::= <<
-$if(expr.varExpr)$%$endif$$expr$
+$if(expr.varExpr)$$Var(expr.var)$$else$$expr$$endif$
 >>
 
 ExprType(expr) ::= <<
@@ -48,7 +48,7 @@ $arguments, parameters, casts: { arg, param, cast | $parameters(type = arg.type,
 >>
 
 parameters(type, variable, cast, location) ::= <<
-$if(variable.intExpr)$$type$ $elseif(type.list)$$type$* %$elseif(variable.booleanExpr)$i1 $else$$variable.type$ %$endif$$variable$$if(cast)$$location$_cast$endif$
+$if(variable.intExpr)$$type$ $elseif(type.list)$$type$* $elseif(variable.booleanExpr)$i1 $else$$variable.type$ $endif$$if(cast)$%$variable$$location$_cast$else$$Expr(variable)$$endif$
 >>
 
 argumentDeclaration(variable) ::= <<
