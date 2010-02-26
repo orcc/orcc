@@ -130,11 +130,6 @@ actor Sobel(uint(size=16) MAXW)
     end
   end
 
-  // priority statement
-  priority
-    one_line_done > read_pixel;
-    done > compute_sobel;
-  end
 
   // FSM schedule
   schedule fsm get_dim:
@@ -155,6 +150,12 @@ actor Sobel(uint(size=16) MAXW)
     // fill one line, and go to compute sobel
     get_line (read_pixel) --> get_line;
     get_line (one_line_done) --> compute_sobel;
+  end
+
+  // priority statement
+  priority
+    one_line_done > read_pixel;
+    done > compute_sobel;
   end
 
 end
