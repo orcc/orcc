@@ -247,14 +247,12 @@ actor(actorName, actor) ::= <<
 package net.sf.orcc.generated;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.actors.IActor;
 
 public class Actor_$actorName$ implements IActor {
 
-	private Map<String, IntFifo> fifos;
 
 	// Input FIFOs
 	$actor.inputs.list: fifo(it)$
@@ -264,7 +262,7 @@ public class Actor_$actorName$ implements IActor {
 	$actor.stateVars.list: stateVar(it)$
 	
 	public Actor_$actorName$() {
-		fifos = new HashMap<String, IntFifo>();
+		new HashMap<String, IntFifo>();
 	}
 	
 	// Functions/procedures
@@ -278,7 +276,7 @@ $endif$
 	@Override
 	public void initialize() {
 $if(actor.initializes)$
-		boolean res = true;
+		boolean res = false;
 		int i = 0;
 
 		$schedulingTest(actor.initializes)$
