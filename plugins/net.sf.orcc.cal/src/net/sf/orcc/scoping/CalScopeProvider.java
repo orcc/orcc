@@ -105,7 +105,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            unknown!
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_value(Action action, EReference ref) {
+	public IScope scope_VariableReference_variable(Action action, EReference ref) {
 		return getScope(action, ref);
 	}
 
@@ -118,7 +118,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            unknown!
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_value(Actor actor, EReference ref) {
+	public IScope scope_VariableReference_variable(Actor actor, EReference ref) {
 		List<IScopedElement> elements = new ArrayList<IScopedElement>();
 		for (Variable parameter : actor.getParameters()) {
 			IScopedElement element = ScopedElement.create(parameter.getName(),
@@ -145,7 +145,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            unknown!
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_value(Function func, EReference ref) {
+	public IScope scope_VariableReference_variable(Function func, EReference ref) {
 		return getScope(func.getParameters(), func.getVariables(), func, ref);
 	}
 
@@ -159,7 +159,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 * @return a scope
 	 */
 	@SuppressWarnings("unchecked")
-	public IScope scope_VariableReference_value(ListExpression list,
+	public IScope scope_VariableReference_variable(ListExpression list,
 			EReference ref) {
 		List<Variable> variables = new ArrayList<Variable>();
 		for (Generator generator : list.getGenerators()) {
@@ -177,7 +177,8 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            unknown!
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_value(Procedure proc, EReference ref) {
+	public IScope scope_VariableReference_variable(Procedure proc,
+			EReference ref) {
 		return getScope(proc.getParameters(), proc.getVariables(), proc, ref);
 	}
 

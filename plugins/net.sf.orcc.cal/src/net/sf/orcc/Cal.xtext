@@ -113,7 +113,21 @@ OutputPattern: (port=[Port] ':')? '[' values+=Expression (',' values+=Expression
 // statements
 ///////////////////////////////////////////////////////////////////////////////
 
-Assign: target=[Variable] ':=' value=Expression ';';
+Assign:
+	target=VariableReference
+	('[' (indexes += Expression (',' indexes += Expression)*)? ']')*
+	':=' value=Expression ';';
+
+CallStatement:
+	procedure=ID
+	'(' (parameters += Expression (',' parameters += Expression)*)? ')' ';';
+
+ForeachStatement:
+	'foreach' variable=VariableDeclaration 'in'
+		'Integers' '(' lower=Expression ',' higher=Expression ')'
+	 'do'
+		(statements += Statement)*
+	'end';
 
 IfStatement:
 	'if' condition=Expression 'then'
@@ -122,7 +136,12 @@ IfStatement:
 		(else += Statement)*)?
 	'end';
 
-Statement: Assign | IfStatement;
+WhileStatement:
+	'while' condition=Expression 'do'
+		(statements += Statement)*
+	'end';
+
+Statement: Assign | CallStatement | ForeachStatement | IfStatement | WhileStatement;
 
 ///////////////////////////////////////////////////////////////////////////////
 // expressions
@@ -159,14 +178,15 @@ PostfixExpression returns Expression:
 	| IndexExpression
 	| IfExpression
     | LiteralExpression
-    | VariableReference
+    | VariableExpression
     | '(' Expression ')';
 
 CallExpression:
 	procedure=ID '(' (parameters += Expression (',' parameters += Expression)*)? ')';
 
 IndexExpression:
-	source=[Variable] '[' (indexes += Expression (',' indexes += Expression)*)? ']';
+	source=VariableReference
+	('[' (indexes += Expression (',' indexes += Expression)*)? ']')+;
 
 IfExpression:
 	'if' condition=Expression
@@ -182,7 +202,7 @@ Generator:
 	'for' variable=VariableDeclaration 'in'
 	'Integers' '(' lower=Expression ',' higher=Expression ')';
 
-VariableReference: value=[Variable];
+VariableExpression: value=VariableReference;
 
 ///////////////////////////////////////////////////////////////////////////////
 // literal expressions
@@ -215,3 +235,5 @@ VariableDeclaration returns Variable: type=Type name=ID;
 
 ValuedVariableDeclaration returns Variable:
 	VariableDeclaration (('=' | ':=') value=Expression)?;
+
+VariableReference: variable=[Variable];
