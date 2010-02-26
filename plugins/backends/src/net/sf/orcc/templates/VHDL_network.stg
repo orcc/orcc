@@ -1,6 +1,36 @@
 group VHDL_network;
 
 ///////////////////////////////////////////////////////////////////////////////
+// print signals()
+
+printSig(instance) ::= <<
+$if (instance.actor)$
+$instance.actor.inputs.list: printSigInput(it)$
+$instance.actor.outputs.list: printSigOutput(it)$
+$endif$
+>>
+
+printSigInput(it) ::= <<
+signal $instance.actor$_$it$_data_in   : std_logic_vector($it.type$ -1 downto 0);
+signal $instance.actor$_$it$_read      : std_logic;
+signal $instance.actor$_$it$_empty     : std_logic;
+
+>>
+
+printSigOutput(it) ::= <<
+signal $instance.actor$_$it$_data_out   : std_logic_vector($it.type$ -1 downto 0);
+signal $instance.actor$_$it$_full       : std_logic;
+signal $instance.actor$_$it$_write      : std_logic;
+
+>> 
+
+printSignals(instances) ::= <<
+$instances: printSig()$
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
 assignFifo(source, sourcePort, target, targetPort, count) ::= <<
@@ -10,10 +40,10 @@ depth => $edge.size$,
 width => $targetPort.type$ );
 port map (
   fifo_$count$_write    => $source.id$_$sourcePort.name$_write, 
-  fifo_$count$_data_in  => $source.id$_$sourcePort.name$_data_in, 
+  fifo_$count$_data_in  => $source.id$_$sourcePort.name$_data_out, 
   fifo_$count$_full     => $source.id$_$sourcePort.name$_full, 
   fifo_$count$_read     => $target.id$_$targetPort.name$_read, 
-  fifo_$count$_data_out => $target.id$_$targetPort.name$_data_out, 
+  fifo_$count$_data_out => $target.id$_$targetPort.name$_data_in, 
   fifo_$count$_empty    => $target.id$_$targetPort.name$_empty, 
   clock            => clock, 
   reset_n          => reset_n); 
@@ -42,22 +72,36 @@ $edges: tryAssignFifo(
 
 printActorPorts(instance) ::= <<
 $if (instance.actor)$
-$instance.actor.inputs.list: {$it$ => $it$}; separator=", "$
+$instance.actor.inputs.list: printPortsInput(it); separator="\n"$
+$instance.actor.outputs.list: printPortsOutput(it); separator="\n"$
 $endif$
 >>
 
-printScheduler(instance) ::= <<
-entity work.$it.id$ is
-port map (
-  $it.id$_write    => $it.id$_$it.network$_write, 
-  clock            => clock, 
-  reset_n          => reset_n
-  $printActorPorts(instance)$);
+printPortsInput(it) ::= <<
+$instance.actor$_$it$_data   => $instance.actor$_$it$_data_in,
+$instance.actor$_$it$_read   => $instance.actor$_$it$_read,
+$instance.actor$_$it$_empty  => $instance.actor$_$it$_empty,
+>>
 
+printPortsOutput(it) ::= <<
+$instance.actor$_$it$_data   => $instance.actor$_$it$_data_out,
+$instance.actor$_$it$_full   => $instance.actor$_$it$_full,
+$instance.actor$_$it$_write  => $instance.actor$_$it$_write,
+>> 
+
+printScheduler(instance) ::= <<
+
+entity work.$it.id$ is
+  port map (
+    $printActorPorts(instance)$,
+    clock            => clock, 
+    reset_n          => reset_n);
+  
 >>
 
 printSchedulers(instances) ::= <<
 $instances: printScheduler()$
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,15 +128,17 @@ architecture rtl_$network.name$ of $network.name$ is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
+  $printSignals(network.instances); separator="\n"$
 
   ---------------------------------------------------------------------------
   -- Actors instantiation 
-  $printSchedulers(network.instances)$
+  $printSchedulers(network.instances); separator="\n"$
 
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
   $assignFifos(network.connections)$ 
   ---------------------------------------------------------------------------
 
+end architecture rtl_$network.name$;
 >>
 
