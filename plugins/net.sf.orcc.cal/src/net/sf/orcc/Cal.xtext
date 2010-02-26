@@ -2,16 +2,57 @@ grammar net.sf.orcc.Cal with org.eclipse.xtext.common.Terminals
 
 generate cal "http://www.sf.net/orcc/Cal"
 
+///////////////////////////////////////////////////////////////////////////////
+// actor
+///////////////////////////////////////////////////////////////////////////////
+
 Actor:
 	imports=Import*
 	'actor' name=ID ('[' ']')?
 		'(' (parameters += Parameter (',' parameters += Parameter)*)? ')'
 		(inputs += Port (',' inputs += Port)*)? '==>'
 		(outputs += Port (',' outputs += Port)*)? ':'
-	
-	(actions+=Action | stateVariables+=StateVariable)*
-	
+
+	(actions += Action | stateVariables += StateVariable)*
+	(schedule = Schedule)?
+	(priorities += Priority)*
+
 	'end';
+
+Port: type=Type name=ID;
+
+Import:
+	'import' ('all' Tag ';' | Tag ';');
+
+Parameter returns Variable: VariableDeclaration ('=' value=Expression)?;
+
+StateVariable returns Variable: ValuedVariableDeclaration ';';
+
+Tag: (identifiers += ID) ('.' identifiers += ID)*;
+
+///////////////////////////////////////////////////////////////////////////////
+// priorities
+///////////////////////////////////////////////////////////////////////////////
+
+Inequality:
+	tags += Tag ('>' tags += Tag)+ ';';
+	
+Priority:
+	'priority'
+		(inequalities += Inequality)*
+	'end';
+
+///////////////////////////////////////////////////////////////////////////////
+// schedule
+///////////////////////////////////////////////////////////////////////////////
+
+Schedule:
+	'schedule' 'fsm' initialState=ID ':'
+		(transitions += Transition)*
+	'end';
+
+Transition:
+	source=ID '(' tag=Tag ')' '-->' target=ID ';';
 
 ///////////////////////////////////////////////////////////////////////////////
 // actions
@@ -37,6 +78,16 @@ Token returns Variable: name=ID;
 
 OutputPattern: (port=[Port] ':')? '[' values+=Expression (',' values+=Expression)* ']'
 	('repeat' repeat=Expression)?;
+
+///////////////////////////////////////////////////////////////////////////////
+// statements
+///////////////////////////////////////////////////////////////////////////////
+
+Assign: target=[Variable] ':=' value=Expression ';';
+
+If: 'if' condition=Expression 'then' statements+=Statement 'end';
+
+Statement: Assign | If;
 
 ///////////////////////////////////////////////////////////////////////////////
 // expressions
@@ -97,25 +148,8 @@ IntegerExpression: value=INT;
 StringExpression: value=STRING;
 
 ///////////////////////////////////////////////////////////////////////////////
-// statements
+// common stuff
 ///////////////////////////////////////////////////////////////////////////////
-
-Assign: target=[Variable] ':=' value=Expression ';';
-
-If: 'if' condition=Expression 'then' statements+=Statement 'end';
-
-Port: type=Type name=ID;
-
-Import:
-	'import' ('all' Tag ';' | Tag ';');
-
-Parameter returns Variable: VariableDeclaration ('=' value=Expression)?;
-
-Statement: Assign | If;
-
-StateVariable returns Variable: ValuedVariableDeclaration ';';
-
-Tag: (identifiers += ID) ('.' identifiers += ID)*;
 
 Type: name=ID ('(' attributes += TypeAttribute (',' attributes += TypeAttribute)* ')')?;
 
@@ -124,4 +158,4 @@ TypeAttribute: name=ID (':' type=Type | '=' value=Expression);
 VariableDeclaration returns Variable: type=Type name=ID;
 
 ValuedVariableDeclaration returns Variable:
-  VariableDeclaration (('=' | ':=') value=Expression)?;
+	VariableDeclaration (('=' | ':=') value=Expression)?;
