@@ -1,5 +1,7 @@
 grammar net.sf.orcc.Cal with org.eclipse.xtext.common.Terminals
 
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
 generate cal "http://www.sf.net/orcc/Cal"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,9 +115,14 @@ OutputPattern: (port=[Port] ':')? '[' values+=Expression (',' values+=Expression
 
 Assign: target=[Variable] ':=' value=Expression ';';
 
-If: 'if' condition=Expression 'then' statements+=Statement 'end';
+IfStatement:
+	'if' condition=Expression 'then'
+		(then += Statement)*
+	('else'
+		(else += Statement)*)?
+	'end';
 
-Statement: Assign | If;
+Statement: Assign | IfStatement;
 
 ///////////////////////////////////////////////////////////////////////////////
 // expressions
@@ -188,7 +195,9 @@ LiteralExpression:
 
 BooleanExpression: value=('true' | 'false');
 
-IntegerExpression: value=INT;
+IntegerExpression: value=(INT | HEX);
+
+terminal HEX returns ecore::EInt: '0' ('x'|'X') ('0'..'9'|'a'..'f'|'A'..'F')+ ;
 
 StringExpression: value=STRING;
 
@@ -196,7 +205,9 @@ StringExpression: value=STRING;
 // common stuff
 ///////////////////////////////////////////////////////////////////////////////
 
-Type: name=ID ('(' attributes += TypeAttribute (',' attributes += TypeAttribute)* ')')?;
+Type:
+	name=('bool' | 'float' | 'int' | 'List' | 'String' | 'uint')
+	('(' attributes += TypeAttribute (',' attributes += TypeAttribute)* ')')?;
 
 TypeAttribute: name=ID (':' type=Type | '=' value=Expression);
 
