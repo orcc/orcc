@@ -49,7 +49,6 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 	uint(size=1) left_16x16_avail := 0;
 	uint(size=1) top_16x16_avail := 0;
 	uint(size=1) topLeft_16x16_avail := 0;
-	uint(size=1) topRight_16x16_avail := 0;
 
   	//FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =45;
@@ -112,9 +111,6 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 		top_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth) then 0 else 
 								if (is_intra[curr_pos]=1 or c_intra_flag=0) then 1 else 0 end   
 							end;
-		topRight_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth - 1)or (curr_pos+1=picwidth) then 0 else 
-									if (is_intra[curr_pos+1]=1 or c_intra_flag=0) then 1 else 0 end   
-								end;
 		topLeft_16x16_avail :=  if (mbcurr - first_mb_in_slice < picwidth +1) then 0 else 
 									if (intra_top_left=1 or c_intra_flag=0) then 1 else 0 end   
 								end;

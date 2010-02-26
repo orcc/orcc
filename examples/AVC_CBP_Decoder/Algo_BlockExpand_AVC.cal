@@ -54,17 +54,17 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
 actor Algo_BlockExpand_AVC (int SAMPLE_SZ) 
-  uint(size=4) RUN, 
-  int(size=12) VALUE,
-  bool LAST 
-  ==> 
-  int(size=SAMPLE_SZ) Block :
+		uint(size=4) RUN, 
+		int(size=12) VALUE, 
+		bool LAST 
+  			==> 
+  			int(size=SAMPLE_SZ) Block :
 
   
-  List( type:int(size=SAMPLE_SZ), size=16 ) value_buf := [ 0 : for int i in Integers(0,15) ];  
+  List(type:int(size=SAMPLE_SZ), size=16) value_buf := [ 0 : for int i in Integers(0,15) ];  
   uint(size=5) stuff_count := 0;
   
-  uint(size=5) count := 0;   // Index of next sample to be transmitted
+  uint(size=5) count := 0;  // Index of next sample to be transmitted
   int(size=5) run := -1;    // Index offset of next sample decoded (-1 means no sample pending)
   bool last := false;       // the end of block.
   
@@ -167,4 +167,5 @@ actor Algo_BlockExpand_AVC (int SAMPLE_SZ)
 	out_zero 		( out_zero 			) --> out_zero;
 	out_zero 		( out_finish		) --> check_last;  
   end
+  
 end

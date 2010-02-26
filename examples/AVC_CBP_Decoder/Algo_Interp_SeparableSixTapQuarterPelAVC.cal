@@ -8,8 +8,8 @@ import all caltrop.lib.BitOps;
 actor Algo_Interp_SeparableSixTapQuarterPelAVC ( int frac_SZ, int PIX_SZ, int PartSZ_SZ ) 
 		uint(size=frac_SZ) Frac, int(size=PIX_SZ) RD,
 		uint(size=PartSZ_SZ) PartSZ
-		==>
-		int(size=PIX_SZ) INTERP:
+				==>
+				int(size=PIX_SZ) INTERP:
 
   int(size=32) x ;
   int(size=32) y ;

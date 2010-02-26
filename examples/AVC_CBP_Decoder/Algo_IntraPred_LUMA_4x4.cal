@@ -87,11 +87,6 @@ actor Algo_IntraPred_LUMA_4x4 ( int PIX_SZ )
     end
   end
 
-  function clip(int x)--> int:
-    if x > 255 then 255 else if x < 0 then 0 else x end end
-  end
-
-
   read.avail: action AVAIL:[avail] repeat 3 ==>
   do
     left_avail    := avail[0];

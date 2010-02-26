@@ -22,9 +22,8 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
 		uint(size=5) MbPartWidth,
 		uint(size=5) MbPartHeigth,
 		int(size=SAMPLE_SZ) INTERP 
-		==> 
-		int(size=SAMPLE_SZ) MBPred
-		:
+				==> 
+				int(size=SAMPLE_SZ) MBPred:
  
   uint(size=5) count := 0;
   uint(size=5) mbpart_idx;

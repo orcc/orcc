@@ -71,15 +71,13 @@ This copyright notice must be included in all copies or derivative works. Copyri
 import all caltrop.lib.BitOps;
 
 actor Algo_IntraPred_CHROMA ( int PIX_SZ )
-  int(size=PIX_SZ) C_LEFT,     // List
-  int(size=PIX_SZ) C_UP,       // List
-  int(size=PIX_SZ) C_UP_LEFT,  // point
-
-  uint(size=1) AVAIL,              // up, left, up_left availability List
-
-  uint(size=4) PredMode
-
-  ==> int(size=PIX_SZ) MPR:
+		int(size=PIX_SZ) C_LEFT,     // List
+		int(size=PIX_SZ) C_UP,       // List
+		int(size=PIX_SZ) C_UP_LEFT,  // point
+		uint(size=1) AVAIL,              // up, left, up_left availability List
+		uint(size=4) PredMode
+				==> 
+				int(size=PIX_SZ) MPR:
 
   int res;
   int sum_temp;
@@ -145,11 +143,11 @@ actor Algo_IntraPred_CHROMA ( int PIX_SZ )
   guard up_left_avail = 0
   end
 
-write.mode0: action PredMode:[mode] ==>
+  write.mode0: action PredMode:[mode] ==>
     MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
- guard
+  guard
  	mode = 0
- var
+  var
     // mode 0 variables
     //   +-s0-+-s1-+
     //  s2 m0 | m1 |
@@ -216,29 +214,29 @@ write.mode0: action PredMode:[mode] ==>
               else
                 if i<4 then m2 else m3 end
               end: for int i in  Integers(0,7), for int j in Integers(0,7)];
-end
+  end
 
-write.mode1: action PredMode:[mode] ==>
+  write.mode1: action PredMode:[mode] ==>
     MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
- guard
+  guard
  	mode = 1
  	
  	do
  		mpr := [c_left[j]: for int i in  Integers(0,7), for int j in Integers(0,7)];
- end
+  end
  
- write.mode2: action PredMode:[mode] ==>
+  write.mode2: action PredMode:[mode] ==>
     MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
- guard
+  guard
  	mode = 2
  	
  	do
  		mpr := [c_up[i]  : for int i in  Integers(0,7), for int j in Integers(0,7)];
- end
+  end
 
-write.mode3: action PredMode:[mode] ==>
+  write.mode3: action PredMode:[mode] ==>
     MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
-guard
+  guard
 	mode = 3
   var
     int H, int V, int a, int b, int c,
@@ -264,7 +262,7 @@ guard
       c:= rshift( 34*V + 32, 6);
 
       mpr := [clip( rshift(a + b*(i-3) + c*(j-3) + 16, 5) ): for int i in  Integers(0,7), for int j in Integers(0,7)];
-end
+  end
 
 
   schedule fsm start:
@@ -273,8 +271,7 @@ end
     readpix0 (readpix.l)    --> readpix1;
     readpix1 (readpix.u)    --> readpix2;
     readpix2 (readpix.ul)   --> pixdone;
-
     pixdone (write)  --> start;
-
   end
+
 end

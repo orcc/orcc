@@ -57,9 +57,9 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ( int QUANT_SZ, int SAMPLE_SZ )
 		int(size=SAMPLE_SZ) I, 
 		int(size=QUANT_SZ) QP,
 		int(size=QUANT_SZ) ScalingList
-		==>
-		int(size=SAMPLE_SZ) O
-		:
+				==>
+				int(size=SAMPLE_SZ) O:
+
   List( type:uint(size=5), size=6*16 ) t_normAdjust4x4  = [// same as a AVC_IQ4x4's t_normAdjust4x4. used only 16*n-th(n=0..5) elements in this FU. 
     // qp_rem = 0
     10, 13, 10, 13, 13, 16, 13, 16, 10, 13, 10, 13, 13, 16, 13, 16,

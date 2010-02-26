@@ -6,10 +6,13 @@
 
 import all caltrop.lib.BitOps;
 
-actor Algo_Interp_EighthPelBilinear( int frac_SZ, int PIX_SZ, int PartSZ_SZ ) int(size=frac_SZ) Frac, int(size=PIX_SZ) RD, uint(size=PartSZ_SZ) PartSZ ==> int(size=PIX_SZ) INTERP:
+actor Algo_Interp_EighthPelBilinear( int frac_SZ, int PIX_SZ, int PartSZ_SZ ) 
+		int(size=frac_SZ) Frac, 
+		int(size=PIX_SZ) RD, 
+		uint(size=PartSZ_SZ) PartSZ 
+				==> 
+				int(size=PIX_SZ) INTERP:
 
-
-  //_CAL_tokenMonitor := true;
   int(size=32) x ;
   int(size=32) y ;
   int(size=32) o_x ;
@@ -98,7 +101,6 @@ actor Algo_Interp_EighthPelBilinear( int frac_SZ, int PIX_SZ, int PartSZ_SZ ) in
     interpolate  ( fetch       ) --> interpolate;
     interpolate  ( done        ) --> get_fract_x;
     interpolate  ( process     ) --> interpolate;
-
   end
 
   priority

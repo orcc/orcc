@@ -57,8 +57,7 @@ int MAXVAL_CHROMA = 255;
 List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE) curr_mb:= [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1) ];
 List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE) up_mb  := [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1) ];
 List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE) left_mb:= [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1) ];
-uint(size=5) blkP; 
-uint(size=5) blkQ;      
+
 //
 // Image parameters
 //
@@ -193,8 +192,6 @@ begin
       yP := yN;
     end
   end
-  blkQ := lshift(rshift(yQ, 2), 2) + rshift(xQ, 2);
-  blkP := lshift(rshift(yP, 2), 2) + rshift(xP, 2);
 end
 
 /*************************************************************

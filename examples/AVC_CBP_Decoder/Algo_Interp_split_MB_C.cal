@@ -58,8 +58,11 @@ Copyright (c) ISO/IEC 2008.
 
 
 actor Algo_Interp_split_MB_C (int SAMPLE_SZ) 
-  uint(size=3) MbPartIdx, uint(size=5) MbPartWidth, uint(size=5) MbPartHeigth, int(size=SAMPLE_SZ) INTERP ==> int(size=SAMPLE_SZ) MBPred
-  :
+		uint(size=3) MbPartIdx, 
+		uint(size=5) MbPartWidth, 
+		uint(size=5) MbPartHeigth, 
+		int(size=SAMPLE_SZ) INTERP 
+				==> int(size=SAMPLE_SZ) MBPred :
  
   uint(size=5) count := 0;
   uint(size=5) mbpart_idx;
@@ -215,5 +218,4 @@ actor Algo_Interp_split_MB_C (int SAMPLE_SZ)
     get_send_part	( send_data	) --> get_send_part;
   end
 
-    
 end

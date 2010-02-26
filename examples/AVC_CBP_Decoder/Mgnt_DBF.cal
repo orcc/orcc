@@ -175,7 +175,6 @@ List( type:int( size=4 ), size=32 ) CHROMA_EDGE_ROM = [
 //
 function abs( int val ) --> int  :  if (val < 0) then -val else val end end
 function mask_one_bit( int v, int n ) --> int :  rshift( bitand( v, lshift(1,n) ), n ) end
-function mask_bits( int v, int n ) --> int :  bitand( v, lshift(1,n)-1 ) end
 function Clip( int Min, int Max, int Val  )--> int :  if (Val < Min) then Min else if (Val > Max) then Max else Val end end end
 function ClipPicId( int Check, int Val ) --> int  :  if (Check < 0) then INT64_MIN else Val end end
 //

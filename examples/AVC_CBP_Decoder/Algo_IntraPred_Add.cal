@@ -18,7 +18,11 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Algo_Add ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) X, int(size=SAMPLE_SZ) Y ==> int(size=9) Z :
+actor Algo_Add ( int SAMPLE_SZ ) 
+		int(size=SAMPLE_SZ) X, 
+		int(size=SAMPLE_SZ) Y 
+				==> 
+				int(size=9) Z :
   
   // Clip the value higher than 255 and lower to 0
   function clip(int x)-->int :
