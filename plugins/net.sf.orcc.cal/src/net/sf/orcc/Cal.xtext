@@ -12,11 +12,31 @@ Actor:
 	(actions+=Action | stateVariables+=StateVariable)*
 	
 	'end';
-	
+
+///////////////////////////////////////////////////////////////////////////////
+// actions
+///////////////////////////////////////////////////////////////////////////////
+
 Action:
-	(tag=Tag ':')? 'action' '==>' ':'
+	(tag=Tag ':')?
+	'action'
+	(inputs += InputPattern (',' inputs += InputPattern)*)?
+	'==>'
+	(outputs += OutputPattern (',' outputs += OutputPattern)*)?
+	('guard' guards += Expression (',' guards += Expression)*)?
+	('var'
+		variables += ValuedVariableDeclaration
+		(',' variables += ValuedVariableDeclaration)*)?
 	('do' (statements+=Statement)*)?
 	'end';
+
+InputPattern: (port=[Port] ':')? '[' tokens+=Token (',' tokens+=Token)* ']'
+	('repeat' repeat=Expression)?;
+
+Token returns Variable: name=ID;
+
+OutputPattern: (port=[Port] ':')? '[' values+=Expression (',' values+=Expression)* ']'
+	('repeat' repeat=Expression)?;
 
 ///////////////////////////////////////////////////////////////////////////////
 // expressions
@@ -80,7 +100,7 @@ StringExpression: value=STRING;
 // statements
 ///////////////////////////////////////////////////////////////////////////////
 
-Assign: target=[Variable|ID] ':=' value=Expression ';';
+Assign: target=[Variable] ':=' value=Expression ';';
 
 If: 'if' condition=Expression 'then' statements+=Statement 'end';
 

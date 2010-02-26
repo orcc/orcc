@@ -18,6 +18,7 @@ import org.eclipse.xtext.formatting.impl.FormattingConfig;
 public class CalFormatter extends AbstractDeclarativeFormatter {
 
 	@Override
+	@SuppressWarnings("unused")
 	protected void configureFormatting(FormattingConfig c) {
 		net.sf.orcc.services.CalGrammarAccess f = (net.sf.orcc.services.CalGrammarAccess) getGrammarAccess();
 

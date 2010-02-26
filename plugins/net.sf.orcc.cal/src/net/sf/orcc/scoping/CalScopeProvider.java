@@ -3,15 +3,67 @@
  */
 package net.sf.orcc.scoping;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.orcc.cal.Action;
+import net.sf.orcc.cal.Actor;
+import net.sf.orcc.cal.InputPattern;
+import net.sf.orcc.cal.Variable;
+
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.xtext.scoping.IScope;
+import org.eclipse.xtext.scoping.IScopedElement;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
+import org.eclipse.xtext.scoping.impl.ScopedElement;
+import org.eclipse.xtext.scoping.impl.SimpleScope;
 
 /**
  * This class contains custom scoping description.
  * 
- * see : http://www.eclipse.org/Xtext/documentation/latest/xtext.html#scoping
- * on how and when to use it 
- *
+ * see : http://www.eclipse.org/Xtext/documentation/latest/xtext.html#scoping on
+ * how and when to use it
+ * 
  */
 public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
+
+	public IScope scope_VariableReference_value(Action action, EReference ref) {
+		List<IScopedElement> elements = new ArrayList<IScopedElement>();
+		for (InputPattern pattern : action.getInputs()) {
+			for (Variable token : pattern.getTokens()) {
+				IScopedElement element = ScopedElement.create(token.getName(),
+						token);
+				elements.add(element);
+			}
+		}
+
+		for (Variable variable : action.getVariables()) {
+			IScopedElement element = ScopedElement.create(variable.getName(),
+					variable);
+			elements.add(element);
+		}
+
+		IScope outer = getScope(action.eContainer(), ref);
+		IScope scope = new SimpleScope(outer, elements);
+		return scope;
+	}
+
+	public IScope scope_VariableReference_value(Actor actor, EReference ref) {
+		List<IScopedElement> elements = new ArrayList<IScopedElement>();
+		for (Variable parameter : actor.getParameters()) {
+			IScopedElement element = ScopedElement.create(parameter.getName(),
+					parameter);
+			elements.add(element);
+		}
+
+		for (Variable stateVariable : actor.getStateVariables()) {
+			IScopedElement element = ScopedElement.create(stateVariable
+					.getName(), stateVariable);
+			elements.add(element);
+		}
+
+		IScope scope = new SimpleScope(elements);
+		return scope;
+	}
 
 }
