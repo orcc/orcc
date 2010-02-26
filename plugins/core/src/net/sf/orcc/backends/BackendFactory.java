@@ -39,6 +39,7 @@ import net.sf.orcc.backends.options.BackendOption;
 import net.sf.orcc.backends.options.BrowseFileOption;
 import net.sf.orcc.backends.options.CheckBoxOption;
 import net.sf.orcc.backends.options.InputFileOption;
+import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -187,7 +188,8 @@ public class BackendFactory {
 
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] elements = registry
-				.getConfigurationElementsFor("net.sf.orcc.plugin.backend");
+				.getConfigurationElementsFor(OrccActivator.PLUGIN_ID
+						+ ".backend");
 		for (IConfigurationElement element : elements) {
 			String name = element.getAttribute("name");
 			IConfigurationElement[] optionLists = element.getChildren();
