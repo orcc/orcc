@@ -8,4 +8,8 @@ package net.sf.orcc;
  */
 public class CalRuntimeModule extends net.sf.orcc.AbstractCalRuntimeModule {
 
+	public Class<? extends org.eclipse.xtext.conversion.IValueConverterService> bindIValueConverterService() {
+		return CalValueConverter.class;
+	}
+
 }

@@ -46,7 +46,7 @@ Procedure:
 	'procedure' name=ID
 	'('
 		(parameters += VariableDeclaration (',' parameters += VariableDeclaration)*)?
-	')' '-->' type=Type
+	')'
 	('var'
 		variables += ValuedVariableDeclaration
 		(',' variables += ValuedVariableDeclaration)*)?
