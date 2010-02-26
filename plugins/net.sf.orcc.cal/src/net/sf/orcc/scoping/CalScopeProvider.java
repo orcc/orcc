@@ -27,7 +27,7 @@ import org.eclipse.xtext.scoping.impl.SimpleScope;
  */
 public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 
-	public IScope scope_VariableReference_value(Action action, EReference ref) {
+	private IScope getScope(Action action, EReference ref) {
 		List<IScopedElement> elements = new ArrayList<IScopedElement>();
 		for (InputPattern pattern : action.getInputs()) {
 			for (Variable token : pattern.getTokens()) {
@@ -46,6 +46,14 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 		IScope outer = getScope(action.eContainer(), ref);
 		IScope scope = new SimpleScope(outer, elements);
 		return scope;
+	}
+
+	public IScope scope_IndexExpression_source(Action action, EReference ref) {
+		return getScope(action, ref);
+	}
+
+	public IScope scope_VariableReference_value(Action action, EReference ref) {
+		return getScope(action, ref);
 	}
 
 	public IScope scope_VariableReference_value(Actor actor, EReference ref) {

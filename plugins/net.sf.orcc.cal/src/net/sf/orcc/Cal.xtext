@@ -113,14 +113,31 @@ MultiplicativeExpression returns Expression:
 	ExpExpression ({BinOpSeq.left=current} operator=('*' | '/' | 'div' | 'mod') right=ExpExpression)*;
 ExpExpression returns Expression:
 	UnaryExpression ({BinOpSeq.left=current} operator='^' right=UnaryExpression)*;
-/*UnaryExpression returns Expression:
-	operator=('-' | 'not' | '#') right=PostfixExpression;*/
 
 UnaryExpression returns Expression:
+	{UnaryExpression} unaryOperator=('-' | 'not' | '#') expression=PostfixExpression
+	| PostfixExpression;
+
+PostfixExpression returns Expression:
 	ListExpression
+	| CallExpression
+	| IndexExpression
+	| IfExpression
     | LiteralExpression
     | VariableReference
     | '(' Expression ')';
+
+CallExpression:
+	procedure=ID '(' (parameters += Expression (',' parameters += Expression)*)? ')';
+
+IndexExpression:
+	source=[Variable] '[' (indexes += Expression (',' indexes += Expression)*)? ']';
+
+IfExpression:
+	'if' condition=Expression
+	'then' then=Expression
+	'else' else=Expression
+	'end';
 
 ListExpression:
 	'[' expressions+=Expression (',' expressions+=Expression)*
