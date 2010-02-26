@@ -1,7 +1,11 @@
 group VHDL_actor;
 
 fifo_in(port) ::= <<
-$actorName$_$port.name$_data  : in $port.type$;
+$if(port.type.bool)$
+$actorName$_$port.name$_data  : in std_logic;$\n$
+$else$
+$actorName$_$port.name$_data  : in std_logic_vector($port.type.size$ -1 downto 0);$\n$
+$endif$
 $actorName$_$port.name$_empty : in std_logic;
 $actorName$_$port.name$_read  : out std_logic;
 
@@ -10,7 +14,11 @@ $actorName$_$port.name$_read  : out std_logic;
 fifo_out(port) ::= <<
 $actorName$_$port.name$_full  : in std_logic;
 $if(last(port.name))$
-$actorName$_$port.name$_data  : out $port.type$;
+$if(port.type.bool)$
+$actorName$_$port.name$_data  : std_logic;$\n$
+$else$
+$actorName$_$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$\n$
+$endif$
 $actorName$_$port.name$_write : out std_logic
 $else$
 $actorName$_$port.name$_data  : out $port.type$;
@@ -184,7 +192,11 @@ $endif$
 >>
 
 Write(write) ::= <<
-$actorName$_$write.port$_data <= $write.target$;
+$if(write.port.type.bool)$
+$actorName$_$write.port$_data <= $write.target$;$\n$
+$else$
+$actorName$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$\n$
+$endif$
 $actorName$_$write.port$_write <= '1';
 
 >>

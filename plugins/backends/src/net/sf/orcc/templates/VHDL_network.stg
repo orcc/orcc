@@ -11,14 +11,22 @@ $endif$
 >>
 
 printSigInput(it) ::= <<
-signal $instance.actor$_$it$_data_in   : std_logic_vector($it.type$ -1 downto 0);
+$if(it.type.bool)$
+signal $instance.actor$_$it$_data_in   : std_logic;$\n$
+$else$
+signal $instance.actor$_$it$_data_in   : std_logic_vector($it.type$ -1 downto 0);$\n$
+$endif$
 signal $instance.actor$_$it$_read      : std_logic;
 signal $instance.actor$_$it$_empty     : std_logic;
 
 >>
 
 printSigOutput(it) ::= <<
-signal $instance.actor$_$it$_data_out   : std_logic_vector($it.type$ -1 downto 0);
+$if(it.type.bool)$
+signal $instance.actor$_$it$_data_out   : std_logic;$\n$
+$else$
+signal $instance.actor$_$it$_data_out   : std_logic_vector($it.type$ -1 downto 0);$\n$
+$endif$
 signal $instance.actor$_$it$_full       : std_logic;
 signal $instance.actor$_$it$_write      : std_logic;
 
@@ -34,19 +42,20 @@ $instances: printSig()$
 // assigns FIFOs
 
 assignFifo(source, sourcePort, target, targetPort, count) ::= <<
-entity work.fifo_$count$ is 
+fifo_$count$ : entity work.fifo_generic 
 generic map (
 depth => $edge.size$,
 width => $targetPort.type$ );
 port map (
-  fifo_$count$_write    => $source.id$_$sourcePort.name$_write, 
-  fifo_$count$_data_in  => $source.id$_$sourcePort.name$_data_out, 
-  fifo_$count$_full     => $source.id$_$sourcePort.name$_full, 
-  fifo_$count$_read     => $target.id$_$targetPort.name$_read, 
-  fifo_$count$_data_out => $target.id$_$targetPort.name$_data_in, 
-  fifo_$count$_empty    => $target.id$_$targetPort.name$_empty, 
-  clock            => clock, 
-  reset_n          => reset_n); 
+  write_data => $source.id$_$sourcePort.name$_write, 
+  data_in    => $source.id$_$sourcePort.name$_data_out, 
+  full       => $source.id$_$sourcePort.name$_full, 
+  read_data  => $target.id$_$targetPort.name$_read, 
+  data_out   => $target.id$_$targetPort.name$_data_in, 
+  empty      => $target.id$_$targetPort.name$_empty, 
+  clock_in   => clock, 
+  clock_out  => clock, 
+  reset_n    => reset_n); 
 
 
 >>
@@ -90,12 +99,15 @@ $instance.actor$_$it$_write  => $instance.actor$_$it$_write,
 >> 
 
 printScheduler(instance) ::= <<
+$if (instance.actor)$
 
-entity work.$it.id$ is
+
+$it.id$ : entity work.$it.id$
   port map (
-    $printActorPorts(instance)$,
+    $printActorPorts(instance)$
     clock            => clock, 
     reset_n          => reset_n);
+$endif$
   
 >>
 
@@ -127,8 +139,10 @@ architecture rtl_$network.name$ of $network.name$ is
 
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
-  ---------------------------------------------------------------------------
   $printSignals(network.instances); separator="\n"$
+  ---------------------------------------------------------------------------
+
+begin
 
   ---------------------------------------------------------------------------
   -- Actors instantiation 
