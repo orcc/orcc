@@ -9,6 +9,7 @@ import java.util.List;
 
 import net.sf.orcc.cal.Action;
 import net.sf.orcc.cal.Actor;
+import net.sf.orcc.cal.ForeachStatement;
 import net.sf.orcc.cal.Function;
 import net.sf.orcc.cal.Generator;
 import net.sf.orcc.cal.InputPattern;
@@ -134,6 +135,23 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 
 		IScope scope = new SimpleScope(elements);
 		return scope;
+	}
+
+	/**
+	 * Returns the scope for a variable referenced inside a foreach statement.
+	 * 
+	 * @param foreach
+	 *            a foreach statement
+	 * @param ref
+	 *            unknown!
+	 * @return a scope
+	 */
+	@SuppressWarnings("unchecked")
+	public IScope scope_VariableReference_variable(ForeachStatement foreach,
+			EReference ref) {
+		List<Variable> variables = new ArrayList<Variable>();
+		variables.add(foreach.getVariable());
+		return getScope(variables, Collections.EMPTY_LIST, foreach, ref);
 	}
 
 	/**

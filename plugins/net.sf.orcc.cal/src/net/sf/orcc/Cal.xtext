@@ -18,6 +18,7 @@ Actor:
 	(functions += Function
 	| procedures += Procedure
 	| actions += Action
+	| initializes += Initialize
 	| stateVariables += StateVariable)*
 
 	(schedule = Schedule)?
@@ -92,6 +93,18 @@ Action:
 	(tag=Tag ':')?
 	'action'
 	(inputs += InputPattern (',' inputs += InputPattern)*)?
+	'==>'
+	(outputs += OutputPattern (',' outputs += OutputPattern)*)?
+	('guard' guards += Expression (',' guards += Expression)*)?
+	('var'
+		variables += ValuedVariableDeclaration
+		(',' variables += ValuedVariableDeclaration)*)?
+	('do' (statements+=Statement)*)?
+	'end';
+
+Initialize returns Action:
+	(tag=Tag ':')?
+	'initialize'
 	'==>'
 	(outputs += OutputPattern (',' outputs += OutputPattern)*)?
 	('guard' guards += Expression (',' guards += Expression)*)?
