@@ -1,23 +1,32 @@
 group VHDL_testbench;
 
 fifo_in(port) ::= <<
-signal $actorName$_$port.name$_data  : $port.type$;
+$if(port.type.bool)$
+signal $actorName$_$port.name$_data  : std_logic;$\n$
+$else$
+signal $actorName$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$
+$endif$
 signal $actorName$_$port.name$_empty : std_logic;
 signal $actorName$_$port.name$_read  : std_logic;
 
 >>
 
+
 fifo_out(port) ::= <<
 signal $actorName$_$port.name$_full  : std_logic;
 $if(last(port.name))$
-signal $actorName$_$port.name$_data  : $port.type$;
-signal $actorName$_$port.name$_write : std_logic;
+$if(port.type.bool)$
+signal $actorName$_$port.name$_data  : std_logic;$\n$
+$else$
+signal $actorName$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$
+$endif$signal $actorName$_$port.name$_write : std_logic;
 $else$
 signal $actorName$_$port.name$_data  : $port.type$;
 signal $actorName$_$port.name$_write : std_logic;
 $endif$
 
 >>
+
 
 fifo_in_init(port) ::=<<
 $actorName$_$port.name$_empty <= '1';$"\n"$
@@ -161,7 +170,7 @@ case tb_FSM_$actorName$_$port.name$ is
     if (not endfile (sim_file_$actorName$_$port.name$)) then
       readline(sim_file_$actorName$_$port.name$, line_number);
       --
-      if line_number'length > 0 and line_number(1) /= '-' then
+      if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
 $if(port.type.bool)$
         if (input_bit = 1) then
@@ -170,9 +179,12 @@ $if(port.type.bool)$
           $actorName$_$port.name$_data  <= '0';
         end if;
 $else$
-        $actorName$_$port.name$_data  <= input_bit;
+$if(port.type.int)$
+        $actorName$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$
+$else$
+        $actorName$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$
 $endif$
-
+$endif$
         $actorName$_$port.name$_empty <= '0';    
         tb_FSM_$actorName$_$port.name$ <= CheckRead;
       end if;
@@ -182,7 +194,7 @@ $endif$
     if (not endfile (sim_file_$actorName$_$port.name$)) and $actorName$_$port.name$_read = '1' then
       readline(sim_file_$actorName$_$port.name$, line_number);
       --
-      if line_number'length > 0 and line_number(1) /= '-' then
+      if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
 $if(port.type.bool)$
         if (input_bit = 1) then
@@ -191,9 +203,12 @@ $if(port.type.bool)$
           $actorName$_$port.name$_data  <= '0';
         end if;
 $else$
-        $actorName$_$port.name$_data  <= input_bit;
+$if(port.type.int)$
+        $actorName$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$
+$else$
+        $actorName$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$
 $endif$
-
+$endif$
         $actorName$_$port.name$_empty <= '0';     
       end if;
     end if;

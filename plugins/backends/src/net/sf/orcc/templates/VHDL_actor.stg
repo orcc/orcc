@@ -15,7 +15,7 @@ fifo_out(port) ::= <<
 $actorName$_$port.name$_full  : in std_logic;
 $if(last(port.name))$
 $if(port.type.bool)$
-$actorName$_$port.name$_data  : std_logic;$\n$
+$actorName$_$port.name$_data  : out std_logic;$\n$
 $else$
 $actorName$_$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$\n$
 $endif$
@@ -149,7 +149,15 @@ Peek(peek) ::= <<>>
 
 Read(read) ::= <<
 $if(read.unit)$
-$read.target$ := $actorName$_$read.port$_data;
+$if(read.target.type.bool)$
+$read.target$ := $actorName$_$read.port$_data;$\n$
+$else$
+$if(read.target.type.int)$
+$read.target$ := to_integer(signed($actorName$_$read.port$_data));$\n$
+$else$
+$read.target$ := to_integer(unsigned($actorName$_$read.port$_data));$\n$
+$endif$
+$endif$
 $actorName$_$read.port$_read <= '1';
 $else$
 -- read multiple token not coded yet
@@ -192,10 +200,14 @@ $endif$
 >>
 
 Write(write) ::= <<
-$if(write.port.type.bool)$
+$if(write.target.type.bool)$
 $actorName$_$write.port$_data <= $write.target$;$\n$
 $else$
+$if(write.target.type.int)$
+$actorName$_$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$\n$
+$else$
 $actorName$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$\n$
+$endif$
 $endif$
 $actorName$_$write.port$_write <= '1';
 

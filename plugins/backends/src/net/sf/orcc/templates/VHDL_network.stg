@@ -45,13 +45,25 @@ assignFifo(source, sourcePort, target, targetPort, count) ::= <<
 fifo_$count$ : entity work.fifo_generic 
 generic map (
 depth => $edge.size$,
-width => $targetPort.type$ );
+$if(targetPort.type.bool)$
+width => 0)$\n$
+$else$
+width => $targetPort.type$)$\n$
+$endif$
 port map (
   write_data => $source.id$_$sourcePort.name$_write, 
-  data_in    => $source.id$_$sourcePort.name$_data_out, 
+$if(targetPort.type.bool)$ 
+  data_in(0) => $source.id$_$sourcePort.name$_data_out,$\n$
+$else$
+  data_in    => $source.id$_$sourcePort.name$_data_out,$\n$
+$endif$
   full       => $source.id$_$sourcePort.name$_full, 
   read_data  => $target.id$_$targetPort.name$_read, 
-  data_out   => $target.id$_$targetPort.name$_data_in, 
+$if(targetPort.type.bool)$ 
+  data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$
+$else$
+  data_out   => $target.id$_$targetPort.name$_data_in,$\n$
+$endif$
   empty      => $target.id$_$targetPort.name$_empty, 
   clock_in   => clock, 
   clock_out  => clock, 
@@ -139,6 +151,7 @@ architecture rtl_$network.name$ of $network.name$ is
 
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
+  constant SIZE : integer := $fifoSize$;
   $printSignals(network.instances); separator="\n"$
   ---------------------------------------------------------------------------
 
