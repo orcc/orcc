@@ -59,9 +59,13 @@ $variable.type$ %$variable$
 $endif$
 >>
 
+Location(location) ::= <<
+l$location.startLine$c$location.startColumn$
+>>
+
 ConstantValue(type, const) ::= <<
 $if(const.listConst)$
-$listValue(type=type.elementType, values=const.value)$
+$listValue(type=type.type, values=const.value)$
 $else$
 $const$
 $endif$
@@ -74,8 +78,14 @@ $endif$
 
 // the values of a list: {val1, val2, ..., valn}
 listValue(type, values) ::= <<
-[$values: {$type$ $it$}; separator=", "$]
+$if(first(values).listConst)$
+[$type.sizeIterator, values :{ iterator, value | $type$ $if(value)$ $value$ $else$ zeroinitializer $endif$}; separator=", "$]
+$else$
+[$values:{$type$ $it$}; separator=", "$]
+$endif$
+
 >>
+
 
 // phi definition
 phiPair(value, label) ::= <<
@@ -263,27 +273,27 @@ $endif$
 CastStore(ty, value, pty, pointer, cast, location)::= <<
 $if(cast.extended)$
 $if(cast.signed)$
-$SextOp(result="%"+value+"_l"+location+"_ext", ty=ty, value=Expr(value), ty2=pty)$
+$SextOp(result="%"+value+"_"+location+"_ext", ty=ty, value=Expr(value), ty2=pty)$
 
 $else$
-$ZextOp(result="%"+value+"_l"+location+"_ext", ty=ty, value=Expr(value), ty2=pty)$
+$ZextOp(result="%"+value+"_"+location+"_ext", ty=ty, value=Expr(value), ty2=pty)$
 
 $endif$
-$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_l"+location+"_ext")$
+$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_"+location+"_ext")$
 $else$
-$TruncOp(result="%"+value+"_l"+location+"_trunc", ty=ty, value=Expr(value), ty2=pty)$
+$TruncOp(result="%"+value+"_"+location+"_trunc", ty=ty, value=Expr(value), ty2=pty)$
 
-$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_l"+location+"_trunc")$
+$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_"+location+"_trunc")$
 $endif$
 $endif$
 >>
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-$GetElementPtrOp(result="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr", idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
+$GetElementPtrOp(result="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr", idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr", cast=cast, location=location)$
+$CastStore(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr", cast=cast, location=location)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr")$
+$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr")$
 $endif$
 >>
 
@@ -296,12 +306,12 @@ $endif$
 >>
 
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-$LoadOp(result="%"+pointer+"_l"+location+"_Loadport"+indexesName(indexes), ty=pty+"*", pointer=Var(pointer))$
-$GetElementPtrOp(result="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr", pty=pty, ptrval="%"+pointer+"_l"+location+"_Loadport"+indexesName(indexes), idx=indexes)$
+$LoadOp(result="%"+pointer+"_"+location+"_Loadport"+indexesName(indexes), ty=pty+"*", pointer=Var(pointer))$
+$GetElementPtrOp(result="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr", pty=pty, ptrval="%"+pointer+"_"+location+"_Loadport"+indexesName(indexes), idx=indexes)$
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr", cast=cast, location=location)$
+$CastStore(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr", cast=cast, location=location)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_l"+location+"_L"+indexesName(indexes)+"ptr")$
+$StoreInstr(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr")$
 $endif$
 >>
 
@@ -419,15 +429,15 @@ phiVars(vars, node) ::= <<
 
 
 Call(call) ::= <<
-$CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=call.location.startLine)$
+$CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=Location(call.location))$
 $if(call.target)$
 $if(call.cast)$
-$CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=call.location.startLine), cast=call.cast)$
+$CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)), cast=call.cast)$
 $else$
-$CallOp(result="%"+call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=call.location.startLine))$
+$CallOp(result="%"+call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
 $endif$
 $else$
-$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=call.location.startLine))$
+$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
 $endif$
 
 
@@ -506,13 +516,13 @@ $if(store.target.variable.port)$
 $if(store.indexes.empty)$
 $StorePortWithoutIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=Var(store.target), cast=store.cast)$
 $else$
-$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=store.location.startLine)$
+$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$
 $endif$
 $else$
 $if(store.indexes.empty)$
-$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast, location=store.location.startLine)$
+$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast, location=Location(store.location))$
 $else$
-$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=store.location.startLine)$
+$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$
 $endif$
 $endif$
 
@@ -642,7 +652,7 @@ schedulerFSM(actions, fsm) ::= <<
 $fsm.transitions: stateScheduler(transition=it); separator="\n"$
 
 $if(actions)$
-define i32 @outside_FSM_scheduler() {
+define internal i32 @outside_FSM_scheduler() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
 	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$

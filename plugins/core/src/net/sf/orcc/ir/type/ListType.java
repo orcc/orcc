@@ -34,6 +34,7 @@ import java.util.List;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.expr.IntExpr;
 
 /**
  * This class defines a List type.
@@ -105,21 +106,36 @@ public class ListType extends AbstractType {
 	}
 	
 	/**
-	 * Returns the type of the list
-	 * 
-	 * @return the type of the list
-	 */
-	public Type getType() {
-		return type;
-	}
-
-	/**
 	 * Returns the number of elements of this list type.
 	 * 
 	 * @return the number of elements of this list type
 	 */
 	public Expression getSize() {
 		return size;
+	}
+
+	/**
+	 * Returns an iterator on a list that can be used inside a template.
+	 * 
+	 * @return the iterator that contains indice for this array
+	 */
+	public List<Expression> getSizeIterator() {
+		List <Expression> it = new ArrayList<Expression>();
+		
+		for (int i = 0; i < ((IntExpr)size).getValue(); i++){
+			it.add(new IntExpr(i));
+		}
+		
+		return it;
+	}
+	
+	/**
+	 * Returns the type of the list
+	 * 
+	 * @return the type of the list
+	 */
+	public Type getType() {
+		return type;
 	}
 
 	@Override

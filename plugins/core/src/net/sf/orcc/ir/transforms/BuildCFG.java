@@ -118,8 +118,9 @@ public class BuildCFG extends AbstractActorTransformation {
 
 			CFGNode last = (CFGNode) visit(node.getNodes(), join);
 			graph.addEdge(last, join);
+			
 
-			return join;
+			return node;
 		}
 
 		/**

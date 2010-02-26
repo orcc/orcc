@@ -75,12 +75,12 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 	public void visit(ListType type) {
 		int size = new ExpressionEvaluator().evaluateAsInteger(type.getSize());	
 
-		builder.append("[ ");
+		builder.append("[");
 		builder.append(size);
 
 		builder.append(" x ");
 		type.getType().accept(this);
-		builder.append(" ]");
+		builder.append("]");
 	}
 
 	@Override
