@@ -115,7 +115,7 @@ public class StaticClass extends AbstractActorClass {
 	 * @return the number of tokens written to this port.
 	 */
 	public int getNumTokensProduced(Port port) {
-		Integer numTokens = inputPattern.get(port);
+		Integer numTokens = outputPattern.get(port);
 		if (numTokens == null) {
 			return 0;
 		}
