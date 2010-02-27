@@ -86,7 +86,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			int(size=6) slice_alpha_c0_offset, 
 			int(size=6) slice_beta_offset,
 			uint(size=2) LFDisable,
-			uint(size=1) ConstrainedIFlag,
+			bool ConstrainedIFlag,
 			int(size=16) WIDTH, 
 			int(size=16) HEIGHT
 		:
@@ -197,7 +197,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	List (type:int(size=6),size=255) pic_init_qs_minus26 := [ 0 : for int i in Integers( 0, 254)];
 	List (type:int(size=5),size=255) chroma_qp_index_offset := [ 0 : for int i in Integers( 0, 254)];
 	List (type:uint(size=1),size=255) deblocking_filter_control_present_flag := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=1),size=255) constrained_intra_pred_flag := [ 0 : for int i in Integers( 0, 254)];
+	List (type:bool,size=255) constrained_intra_pred_flag := [ false : for int i in Integers( 0, 254)];
 	List (type:uint(size=1),size=255) redundant_pic_cnt_present_flag := [ 0 : for int i in Integers( 0, 254)];
 
 	//High profile 
@@ -510,7 +510,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Codeword := 0;
 		CodeLen := 0;
 	end
-
+ 
 	function IS_Intra_4x4() --> bool : mb_intra_flag = 1 and mb_type = 0 and transform_size_8x8_flag = 0 end
 	function IS_Intra_8x8() --> bool : mb_intra_flag = 1 and mb_type = 0 and transform_size_8x8_flag = 1 end
 	function IS_Intra_16x16() --> bool : mb_intra_flag = 1 and mb_type > 0 and mb_type <25 end
@@ -1254,7 +1254,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		done_reading_bits()
 	do
 		deblocking_filter_control_present_flag[pps_id] := mask_bits(rshift(read_result(),2), 1);
-		constrained_intra_pred_flag[pps_id] := mask_bits(rshift(read_result(),1), 1);
+		constrained_intra_pred_flag[pps_id] := (mask_bits(rshift(read_result(),1), 1) = 1);
 		redundant_pic_cnt_present_flag[pps_id] := mask_bits(read_result(), 1);
 		set_bits_to_read(8 -  bit_count mod 8); //byte_alignment
 	end 

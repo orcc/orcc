@@ -21,11 +21,11 @@ This FU puts together 4*4 macroblock send in raster scan order to generate a 16x
 actor Algo_Merge_4x4_to_8x8 ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) X ==> int(size=SAMPLE_SZ) Y :
 
   //Tab containing the 8x8 macroblock
-  List( type:int(size=SAMPLE_SZ), size=8*8 ) buff := [ 0 : for int i in Integers( 0, 8*8 - 1) ];
+  List( type:int(size=SAMPLE_SZ), size=64 ) buff := [ 0 : for int i in Integers(0, 63) ];
   
   action X:[ x ] repeat 4*8 ==> Y:[ buff ] repeat 4*8
   var
-    int addr_Mbx, int num_4x4, int addr_Mb4x4
+    int addr_Mbx
   do  
     // For each 4x4 macroblock
     foreach int n in Integers(0,1) do
@@ -39,4 +39,5 @@ actor Algo_Merge_4x4_to_8x8 ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) X ==> int(size
       end
     end
   end
+  
 end

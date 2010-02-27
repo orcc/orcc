@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="57" y="1853"/>
+      <vertex id="bits8" x="22" y="1778"/>
       <vertex id="CoefDC_L" x="1056" y="1940"/>
       <vertex id="CoefAC_L" x="1056" y="2033"/>
       <vertex id="Intra_DC_flag" x="1139" y="1459"/>
@@ -44,13 +44,13 @@
       <vertex id="I_PCM_Y" x="889" y="3226"/>
       <vertex id="I_PCM_U" x="888" y="3106"/>
       <vertex id="I_PCM_V" x="888" y="3177"/>
-      <vertex id="ConstrainedIFlag" x="891" y="1463"/>
-      <vertex id="byte2bit" x="318" y="1778"/>
-      <vertex id="Algo_NALU" x="160" y="1835"/>
-      <vertex id="Algo_Synp_AVC" x="438" y="1592"/>
+      <vertex id="ConstrainedIFlag" x="931" y="1461"/>
+      <vertex id="byte2bit" x="257" y="1590"/>
+      <vertex id="Algo_NALU" x="129" y="1753"/>
+      <vertex id="Algo_Synp_AVC" x="404" y="1591"/>
       <vertex id="Algo_BlockExpand_AVC" x="730" y="1969"/>
       <vertex id="Algo_BlockSplit_AVC" x="895" y="1949"/>
-      <vertex id="Algo_IntraPred_Split" x="914" y="1553"/>
+      <vertex id="Algo_IntraPred_Split" x="879" y="1618"/>
       <vertex id="MVReconstruct" x="661" y="2744"/>
       <vertex id="Algo_MMCO" x="813" y="2997"/>
       <vertex id="Algo_Parser_IPCM" x="661" y="3128"/>

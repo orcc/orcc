@@ -53,11 +53,11 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
 actor Algo_Parser_IPCM ( ) 
-	int ( size = 9 ) I_PCM
-								 ==>
-								 	 int ( size = 9 ) I_PCM_Y,
-								 	 int ( size = 9 ) I_PCM_U,
-								 	 int ( size = 9 ) I_PCM_V :
+		int ( size = 9 ) I_PCM
+				==>
+				int ( size = 9 ) I_PCM_Y,
+				int ( size = 9 ) I_PCM_U,
+				int ( size = 9 ) I_PCM_V :
 								 	 
  split_Y: action I_PCM : [ x ] repeat 256 ==> I_PCM_Y : [ x ] repeat 256
 		  end							 	 

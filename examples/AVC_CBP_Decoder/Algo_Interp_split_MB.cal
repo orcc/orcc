@@ -70,9 +70,7 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
-    
      count := if mbpart_idx = 0 then 4 else 16 end;
-    
   end
   
   get_data.mode_8x16: action INTERP:[v] repeat 8*16 ==>
@@ -86,9 +84,7 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
-    
     count := count+rshift(mbpart_w,2)*rshift(mbpart_h,2);
-    
   end
   
   get_data.mode_8x8: action INTERP:[v] repeat 8*8 ==>
@@ -102,9 +98,7 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
-    
     count := count+rshift(mbpart_w,2)*rshift(mbpart_h,2);
-    
   end
   
   get_data.mode_8x4: action INTERP:[v] repeat 8*4 ==>
@@ -118,9 +112,7 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
-    
     count := count+1+lshift(mbpart_idx,1);
-    
   end
   
   get_data.mode_4x8: action INTERP:[v] repeat 4*8 ==>
@@ -134,9 +126,7 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
-    
     count := count+rshift(mbpart_w,2)*rshift(mbpart_h,2);
-    
   end
   
   get_data.mode_4x4: action INTERP:[v] repeat 4*4 ==>
@@ -150,9 +140,7 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
-    
     count := count+rshift(mbpart_w,2)*rshift(mbpart_h,2);
-    
   end
   
   send_data: action ==> MBPred:[ [MB[s]: for int s in Integers(0,255)] ] repeat 16*16
@@ -168,5 +156,4 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
     get_send_part	( send_data	) --> get_send_part;
   end
 
-    
 end

@@ -51,13 +51,13 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-import all caltrop.lib.BitOps;
-
 actor Algo_IT4x4_Addshift ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) X ==> int(size=SAMPLE_SZ) Y :
+
   action X:[x] ==> Y:[y]
   var 
     int(size=SAMPLE_SZ) y
   do
     y := rshift(x + 32, 6);
   end
+
 end

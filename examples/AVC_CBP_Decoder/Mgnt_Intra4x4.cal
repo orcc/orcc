@@ -28,7 +28,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	uint(size=SAMPLE_SZ) EDGE,
 	int(size=9) MB_4X4,
 	int(size=SAMPLE_SZ) Coef_ACR,
-	uint(size=1) ConstrainedIFlag 
+	bool ConstrainedIFlag 
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode4x4,
@@ -68,9 +68,9 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 
   	//FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =45;
-	List( type:uint(size=1), size=PICWIDTH) is_intra := [0 : for int i in Integers( 0, PICWIDTH-1)];
+	List( type:bool, size=PICWIDTH) is_intra := [false : for int i in Integers( 0, PICWIDTH-1)];
 	uint(size=13) curr_pos:=0;
-	uint(size=1) intra_top_left:=0;
+	bool intra_top_left:=false;
 	
   //******************************* Enable or not Prediction management ********************************************
   
@@ -88,7 +88,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	do
 		curr_pos:=d mod c;
 		intra_top_left:=is_intra[curr_pos];
-		is_intra[curr_pos]:=1;
+		is_intra[curr_pos]:=true;
 	end
   
 	//Mb_Type_NOK : Consume the token from inter prediction 
@@ -104,7 +104,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	do
 		curr_pos:=d mod c;
 		intra_top_left:=is_intra[curr_pos];
-		is_intra[curr_pos]:=0;
+		is_intra[curr_pos]:=false;
 	end
    
     //Mb_Type_NOK : Consume the token from I_PCM  
@@ -119,7 +119,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	do
 		curr_pos:=d mod c;
 		intra_top_left:=is_intra[curr_pos];
-		is_intra[curr_pos]:=1;
+		is_intra[curr_pos]:=true;
 	end
   
 	//Mb_Type_OK : Enable the prediction 
@@ -153,16 +153,16 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 		 		 
 		//Set 16x16 the available edge
 		left_16x16_avail := if (mbcurr = first_mb_in_slice) or ((mbcurr mod picwidth) = 0) then 0 else 
-								if (is_intra[curr_pos-1]=1 or c_intra_flag=0) then 1 else 0 end   
+								if (is_intra[curr_pos-1] or not(c_intra_flag)) then 1 else 0 end   
 							end;
 		top_16x16_avail := if (mbcurr < picwidth + first_mb_in_slice) then 0 else  
-								if (is_intra[curr_pos]=1 or c_intra_flag=0) then 1 else 0 end   
+								if (is_intra[curr_pos] or not(c_intra_flag)) then 1 else 0 end   
 							end;
 		topRight_16x16_avail := if (mbcurr < picwidth + first_mb_in_slice) or (curr_pos+1=picwidth)  then 0 else   
-									if (is_intra[curr_pos+1]=1 or c_intra_flag=0) then 1 else 0 end   
+									if (is_intra[curr_pos+1] or not(c_intra_flag)) then 1 else 0 end   
 								end;
 		topLeft_16x16_avail :=  if top_16x16_avail=0 and top_16x16_avail=0 then 0 else    
-									if (intra_top_left=1 or c_intra_flag=0) then 1 else 0 end   
+									if (intra_top_left or not(c_intra_flag)) then 1 else 0 end   
 								end;
 		 
 		 
@@ -177,7 +177,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	     						 1				   , 1              , 1				 , 0              ,
 	     						 1	               , 0	            , 1              , 0			  ];
 		intra_top_left:=is_intra[curr_pos];
-		is_intra[curr_pos]:=1;
+		is_intra[curr_pos]:=true;
 	end
 
 	//******************************* Receiving required token ********************************************

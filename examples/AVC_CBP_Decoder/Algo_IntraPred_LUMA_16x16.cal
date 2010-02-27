@@ -219,13 +219,13 @@ actor Algo_IntraPred_LUMA_16x16 ( int PIX_SZ )
  end
  		
   schedule fsm start:
-    start   (read.avail)   --> readpix0;
+    start    ( read.avail ) --> readpix0;
 
-    readpix0 (readpix.l)    --> readpix1;
-    readpix1 (readpix.u)    --> readpix2;
-    readpix2 (readpix.ul)   --> pixdone;
+    readpix0 ( readpix.l  ) --> readpix1;
+    readpix1 ( readpix.u  ) --> readpix2;
+    readpix2 ( readpix.ul ) --> pixdone;
 
-    pixdone (write)  --> start;
+    pixdone  ( write      ) --> start;
 
   end
 end

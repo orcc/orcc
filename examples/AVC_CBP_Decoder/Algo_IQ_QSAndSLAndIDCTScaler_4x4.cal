@@ -54,30 +54,21 @@ Copyright (c) ISO/IEC 2007.
   and a parameter NB4x4 which is set to 16 for luma or 4 for chroma
 *************************************************************************/
 
-import all caltrop.lib.BitOps;
-
 actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 ( int QUANT_SZ, int SAMPLE_SZ, int PREDTYPE_SZ, int NB4x4 )
-  int(size=SAMPLE_SZ) Lev2d, int(size=QUANT_SZ) QP, int(size=PREDTYPE_SZ) intra_DC_flag,
-  int(size=QUANT_SZ) ScalingList
-  ==> int(size=SAMPLE_SZ) Cof:
+		int(size=SAMPLE_SZ) Lev2d, 
+		int(size=QUANT_SZ) QP, 
+		int(size=PREDTYPE_SZ) intra_DC_flag, 
+		int(size=QUANT_SZ) ScalingList
+				==> 
+				int(size=SAMPLE_SZ) Cof:
+				
   List( type:uint(size=5), size=6*16 ) t_normAdjust4x4  = [
-    // qp_rem = 0
-    10, 13, 10, 13, 13, 16, 13, 16, 10, 13, 10, 13, 13, 16, 13, 16,
-
-    // qp_rem = 1
-    11, 14, 11, 14, 14, 18, 14, 18, 11, 14, 11, 14, 14, 18, 14, 18,
-
-    // qp_rem = 2
-    13, 16, 13, 16, 16, 20, 16, 20, 13, 16, 13, 16, 16, 20, 16, 20,
-
-    // qp_rem = 3
-    14, 18, 14, 18, 18, 23, 18, 23, 14, 18, 14, 18, 18, 23, 18, 23,
-
-    // qp_rem = 4
-    16, 20, 16, 20, 20, 25, 20, 25, 16, 20, 16, 20, 20, 25, 20, 25,
-
-    // qp_rem = 5
-    18, 23, 18, 23, 23, 29, 23, 29, 18, 23, 18, 23, 23, 29, 23, 29
+    10, 13, 10, 13, 13, 16, 13, 16, 10, 13, 10, 13, 13, 16, 13, 16, // qp_rem = 0
+    11, 14, 11, 14, 14, 18, 14, 18, 11, 14, 11, 14, 14, 18, 14, 18, // qp_rem = 1
+    13, 16, 13, 16, 16, 20, 16, 20, 13, 16, 13, 16, 16, 20, 16, 20, // qp_rem = 2
+    14, 18, 14, 18, 18, 23, 18, 23, 14, 18, 14, 18, 18, 23, 18, 23, // qp_rem = 3
+    16, 20, 16, 20, 20, 25, 20, 25, 16, 20, 16, 20, 20, 25, 20, 25, // qp_rem = 4
+    18, 23, 18, 23, 23, 29, 23, 29, 18, 23, 18, 23, 23, 29, 23, 29 // qp_rem = 5
   ];
   List( type:uint(size=4), size=16 )  t_Index = [
     0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
@@ -93,8 +84,8 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 ( int QUANT_SZ, int SAMPLE_SZ, int PREDTY
   
   int nb_4x4:=0;
   
- read_qp: action QP:[x] ==>
- do
+  read_qp: action QP:[x] ==>
+  do
     qp := x;
     qp_per := qp / 6;
     qp_rem := qp mod 6;
@@ -112,19 +103,19 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 ( int QUANT_SZ, int SAMPLE_SZ, int PREDTY
   end
   
   
-  read_coeff:
-  action Lev2d:[ x ] repeat 16 ==> Cof:[buff] repeat 16
+  read_coeff: action Lev2d:[ x ] repeat 16 ==> Cof:[buff] repeat 16
   var
     List (type: int(size=SAMPLE_SZ), size=16) buff := [ 0 : for int s in Integers( 0, 15) ]
   do
     nb_4x4:= nb_4x4 + 1;
-    buff [0] := if intradcflag = 1 then x[0] else         // DC coefficient
-       if qp >= 24 then
-         lshift(x[0]*t_LevelScale[qp_rem*16], qp_per-4)
-       else
-         rshift(x[0]*t_LevelScale[qp_rem*16]+qp_sft, 4-qp_per)
-       end end;
-       
+    buff [0] := if intradcflag = 1 then x[0] 
+                else         // DC coefficient
+                  if qp >= 24 then
+                    lshift(x[0]*t_LevelScale[qp_rem*16], qp_per-4)
+                  else
+                    rshift(x[0]*t_LevelScale[qp_rem*16]+qp_sft, 4-qp_per)
+                  end 
+                end;
 	foreach int i in Integers(1,15) do
         buff[i] := 
         	if qp >= 24 then         // AC coefficient
@@ -149,6 +140,7 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 ( int QUANT_SZ, int SAMPLE_SZ, int PREDTY
     read_coeff   ( read_coeff 		) --> read_coeff;
     read_coeff   ( read_coeff_done  ) --> read_qp;
   end
+  
   priority
     read_coeff_done > read_coeff;
   end

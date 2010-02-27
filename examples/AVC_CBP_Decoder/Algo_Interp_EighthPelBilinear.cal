@@ -59,7 +59,6 @@ actor Algo_Interp_EighthPelBilinear( int frac_SZ, int PIX_SZ, int PartSZ_SZ )
   end
 
   // fetch (width+1)x(height+1) pixels
-
   fetch: action RD:[d] ==>
   guard 
    x < (width+1) and y < (height+1)
@@ -69,7 +68,7 @@ actor Algo_Interp_EighthPelBilinear( int frac_SZ, int PIX_SZ, int PartSZ_SZ )
    if x >= (width+1) then
       x := 0;
       y := y + 1;
-    end
+   end
   end
 
   done: action ==>
@@ -80,7 +79,7 @@ actor Algo_Interp_EighthPelBilinear( int frac_SZ, int PIX_SZ, int PartSZ_SZ )
   // interpolation according to MODE
   process: action ==> INTERP:[ p ]
   guard
-   x = 0 and y = (height+1)
+    x = 0 and y = (height+1)
   var 
 	int p
   do

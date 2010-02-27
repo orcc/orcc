@@ -23,11 +23,11 @@ actor Algo_Merge_4x4_to_16x16 ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) X ==> int(si
   List( type:int(size=7), size=16 )  t_scan2_Index = [ 0, 1, 16, 17, 2, 3, 18, 19, 32, 33, 48, 49, 34, 35, 50, 51];
   //Tab containing the 16x16 macroblock
 
+  List (type: int(size=SAMPLE_SZ), size=256) buff := [ 0 : for int s in Integers(0, 255) ];
   
   action X:[ x ] repeat 16*16 ==> Y:[ buff] repeat 16*16
   var
-    List (type: int(size=SAMPLE_SZ), size=256) buff := [ 0 : for int s in Integers( 0, 255) ],
-    int(size=16) addr_Mbx, int(size=16) num_4x4, int(size=16) addr_Mb4x4
+    int(size=16) addr_Mbx, int(size=16) num_4x4
     
   do  
     // For each 4x4 macroblock

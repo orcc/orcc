@@ -82,15 +82,15 @@ actor Algo_IntraPred_CHROMA ( int PIX_SZ )
   int res;
   int sum_temp;
 
- procedure Sum(List(type:int ( size = PIX_SZ ), size = 16) list, int n)
- begin
+  procedure Sum(List(type:int ( size = PIX_SZ ), size = 16) list, int n)
+  begin
  	res := 0;
  	if n > 0 then   	
  	   	foreach int i in Integers(0, n-1) do
       		res := res + list[i]; 
      	end
     end
- end
+  end
  
  
   function clip(int x)-->int :
@@ -134,13 +134,16 @@ actor Algo_IntraPred_CHROMA ( int PIX_SZ )
   end
 
   readpix.l.no: action ==>
-  guard left_avail = 0
+  guard 
+    left_avail = 0
   end
   readpix.u.no: action ==>
-  guard up_avail = 0
+  guard 
+    up_avail = 0
   end
   readpix.ul.no: action ==>
-  guard up_left_avail = 0
+  guard 
+    up_left_avail = 0
   end
 
   write.mode0: action PredMode:[mode] ==>
@@ -220,18 +223,16 @@ actor Algo_IntraPred_CHROMA ( int PIX_SZ )
     MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
   guard
  	mode = 1
- 	
- 	do
- 		mpr := [c_left[j]: for int i in  Integers(0,7), for int j in Integers(0,7)];
+  do
+    mpr := [c_left[j]: for int i in  Integers(0,7), for int j in Integers(0,7)];
   end
  
   write.mode2: action PredMode:[mode] ==>
     MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
   guard
  	mode = 2
- 	
- 	do
- 		mpr := [c_up[i]  : for int i in  Integers(0,7), for int j in Integers(0,7)];
+  do
+    mpr := [c_up[i]  : for int i in  Integers(0,7), for int j in Integers(0,7)];
   end
 
   write.mode3: action PredMode:[mode] ==>
@@ -242,36 +243,28 @@ actor Algo_IntraPred_CHROMA ( int PIX_SZ )
     int H, int V, int a, int b, int c,
     List(type: int(size = PIX_SZ), size = 3) sum_list
   do
-  	// If we expressed c_up[-1] = c_left[-1] = c_up_left in CAL,
-      //   H:= sum([(i+1)*(c_up[4+i]  -c_up[2-i]  ):for int i in Integers(0,3)]);
-      //   V:= sum([(j+1)*(c_left[4+j]-c_left[2-j]):for int j in Integers(0,3)]);
+    sum_list := [(i+1)*(c_up[4+i]  - c_up[2-i]  ):for int i in Integers(0,2)];
+    Sum(sum_list,3);
+    H := res + (3+1)*(c_up[4+3]  - c_up_left);
       
-      //H:= sum([(i+1)*(c_up[4+i]  -c_up[2-i]  ):for int i in Integers(0,2)],3) + (3+1)*(c_up[4+3]  -c_up_left);
-      //V:= sum([(j+1)*(c_left[4+j]-c_left[2-j]):for int j in Integers(0,2)],3) + (3+1)*(c_left[4+3]-c_up_left);
+    sum_list := [(j+1)*(c_left[4+j] - c_left[2-j]):for int j in Integers(0,2)];
+    Sum(sum_list,3);
+    V := res + (3+1)*(c_left[4+3] - c_up_left);
       
-      sum_list := [(i+1)*(c_up[4+i]  - c_up[2-i]  ):for int i in Integers(0,2)];
-      Sum(sum_list,3);
-      H := res + (3+1)*(c_up[4+3]  - c_up_left);
-      
-      sum_list := [(j+1)*(c_left[4+j] - c_left[2-j]):for int j in Integers(0,2)];
-      Sum(sum_list,3);
-      V := res + (3+1)*(c_left[4+3] - c_up_left);
-      
-      a:= 16*(c_left[7] + c_up[7]);
-      b:= rshift( 34*H + 32, 6);
-      c:= rshift( 34*V + 32, 6);
+    a:= 16*(c_left[7] + c_up[7]);
+    b:= rshift( 34*H + 32, 6);
+    c:= rshift( 34*V + 32, 6);
 
-      mpr := [clip( rshift(a + b*(i-3) + c*(j-3) + 16, 5) ): for int i in  Integers(0,7), for int j in Integers(0,7)];
+    mpr := [clip( rshift(a + b*(i-3) + c*(j-3) + 16, 5) ): for int i in  Integers(0,7), for int j in Integers(0,7)];
   end
 
 
   schedule fsm start:
-    start   (read.avail)   --> readpix0;
-
-    readpix0 (readpix.l)    --> readpix1;
-    readpix1 (readpix.u)    --> readpix2;
-    readpix2 (readpix.ul)   --> pixdone;
-    pixdone (write)  --> start;
+    start    ( read.avail ) --> readpix0;
+    readpix0 ( readpix.l  ) --> readpix1;
+    readpix1 ( readpix.u  ) --> readpix2;
+    readpix2 ( readpix.ul ) --> pixdone;
+    pixdone  ( write      ) --> start;
   end
 
 end

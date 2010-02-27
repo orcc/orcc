@@ -467,8 +467,6 @@
     <Connection dst="" dst-port="MbPartWidth" src="Algo_Synp_AVC" src-port="MbPartWidth"/>
     <Connection dst="" dst-port="MbPartHeigth" src="Algo_Synp_AVC" src-port="MbPartHeigth"/>
     <Connection dst="" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
-    <Connection dst="" dst-port="Intra_DC_flag"
-        src="Algo_IntraPred_Split" src-port="Intra_DC_flag"/>
     <Connection dst="" dst-port="PredMode" src="Algo_IntraPred_Split" src-port="PredMode"/>
     <Connection dst="byte2bit" dst-port="in8" src="Algo_NALU" src-port="bits_rbsp8">
         <Attribute kind="Value" name="bufferSize">
@@ -498,7 +496,6 @@
         src="Algo_Synp_AVC" src-port="PicWidthInMb"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="IntraPredMode"
         src="Algo_Synp_AVC" src-port="IntraPredMode"/>
-    <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="Mb_Type"/>
     <Connection dst="" dst-port="RefReordering" src="Algo_Synp_AVC" src-port="RefReordering"/>
     <Connection dst="" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
     <Connection dst="" dst-port="Width" src="Algo_Synp_AVC" src-port="WIDTH"/>
@@ -525,7 +522,6 @@
     <Connection dst="Algo_MMCO" dst-port="RefReordering"
         src="Algo_Synp_AVC" src-port="RefReordering"/>
     <Connection dst="" dst-port="RefList" src="Algo_MMCO" src-port="RefList"/>
-    <Connection dst="" dst-port="Mb_TypeC" src="Algo_IntraPred_Split" src-port="Mb_TypeC"/>
     <Connection dst="" dst-port="CoefDC_Cr" src="Algo_BlockSplit_AVC" src-port="Block_V_DC"/>
     <Connection dst="" dst-port="CoefDC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_DC"/>
     <Connection dst="" dst-port="CoefAC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_AC"/>
@@ -552,4 +548,8 @@
     <Connection dst="" dst-port="ConstrainedIFlag" src="Algo_Synp_AVC" src-port="ConstrainedIFlag"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="ConstrainedIFlag"
         src="Algo_Synp_AVC" src-port="ConstrainedIFlag"/>
+    <Connection dst="" dst-port="Mb_TypeC" src="Algo_IntraPred_Split" src-port="MbTypeC"/>
+    <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="MbType"/>
+    <Connection dst="" dst-port="Intra_DC_flag"
+        src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
 </XDF>

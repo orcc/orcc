@@ -21,7 +21,7 @@ This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
 actor Algo_Merge_4x4_to_16x16_norasterscan ( int SAMPLE_SZ ) int(size=9) X ==> int(size=SAMPLE_SZ) Y :
 
   //Tab containing the 16x16 macroblock
-  List( type:int(size=SAMPLE_SZ), size=64 ) buff := [ 0 : for int i in Integers( 0, 63) ];
+  List( type:int(size=SAMPLE_SZ), size=64 ) buff := [ 0 : for int i in Integers(0, 63) ];
   
   Reorder:action X:[ x ] repeat 64 ==> Y:[ buff] repeat 64
   do    
@@ -33,4 +33,5 @@ actor Algo_Merge_4x4_to_16x16_norasterscan ( int SAMPLE_SZ ) int(size=9) X ==> i
       end
     end
   end
+
 end
