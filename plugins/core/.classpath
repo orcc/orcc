@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/antlr-runtime-3.1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgrapht-jdk1.6.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://www.jgrapht.org/javadoc/"/>

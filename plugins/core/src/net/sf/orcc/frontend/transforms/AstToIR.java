@@ -99,7 +99,9 @@ public class AstToIR {
 		if (expr instanceof LiteralExpression) {
 			return transformExprLiteral((LiteralExpression) expr);
 		}
-		return null;
+
+		Location location = new Location();
+		return new IntExpr(location, 42);
 	}
 
 	private Expression transformExprLiteral(LiteralExpression expr) {

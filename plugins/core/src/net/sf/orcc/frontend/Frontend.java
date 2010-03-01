@@ -30,10 +30,11 @@ package net.sf.orcc.frontend;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.sf.orcc.CalRuntimeModule;
+import net.sf.orcc.CalStandaloneSetup;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.transforms.AstToIR;
 import net.sf.orcc.ir.ActionScheduler;
@@ -44,10 +45,13 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.serialize.XDFWriter;
-import net.sf.orcc.parser.antlr.CalParser;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.parser.IParseResult;
+import org.eclipse.xtext.parser.IParser;
+import org.eclipse.xtext.parser.antlr.IAntlrParser;
+
+import com.google.inject.Injector;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -79,6 +83,8 @@ public class Frontend {
 	 * output folder
 	 */
 	private File outputFolder;
+
+	private IParser parser;
 
 	/**
 	 * print FSM flag
@@ -152,6 +158,11 @@ public class Frontend {
 			throw new OrccException("I/O error", e);
 		}
 
+		// guice stuff
+		Injector guiceInjector = new CalStandaloneSetup()
+				.createInjectorAndDoEMFRegistration();
+		parser = guiceInjector.getInstance(IAntlrParser.class);
+
 		XDFParser parser = new XDFParser(fileName);
 		Network network = parser.parseNetwork();
 		getActors(network);
@@ -188,15 +199,15 @@ public class Frontend {
 	}
 
 	private Actor processActor(String actorPath) throws OrccException {
-		CalParser parser = new CalParser();
 		net.sf.orcc.cal.Actor aActor = null;
 
 		try {
+			actorPath = new File(actorPath + ".cal").getCanonicalPath();
 			InputStream in = new FileInputStream(actorPath);
-			IParseResult result = parser.doParse(in);
+			IParseResult result = parser.parse(in);
 			EObject root = result.getRootASTElement();
 			aActor = (net.sf.orcc.cal.Actor) root;
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
 
@@ -206,6 +217,7 @@ public class Frontend {
 			// prints priority graph
 			String fileName = "priority_" + actor.getName() + ".dot";
 			File file = new File(outputFolder, fileName);
+			file.toString();
 		}
 
 		if (printFSM) {
