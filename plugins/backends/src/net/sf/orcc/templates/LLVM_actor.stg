@@ -720,12 +720,12 @@ sched_nok:
 >>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(nextState=it)$
+$nextStates: actionTestState(it)$
 >>
 
 actionTestState(nextState) ::= <<
-	$CallOp(result="%"+nextState.action, ty="i1", fnptrval="@isSchedulable_"+nextState.action)$
-	$BrOp(cond="%"+nextState.action, iftrue="%fire_"+nextState.action, iffalse="%skip_"+nextState.action)$
+	$CallOp(result="%isSchedulable_"+nextState.action, ty="i1", fnptrval="@isSchedulable_"+nextState.action)$
+	$BrOp(cond="%isSchedulable_"+nextState.action, iftrue="%fire_"+nextState.action, iffalse="%skip_"+nextState.action)$
 
 fire_$nextState.action$:
 $if(nextState.action.outputPattern)$
@@ -790,8 +790,8 @@ $actions: actionTest(action=it)$
 >>
 
 actionTest(action) ::= <<
-	$CallOp(result="%"+action, ty="i1", fnptrval="@isSchedulable_"+action)$
-	$BrOp(cond="%"+action, iftrue="%fire_"+action, iffalse="%skip_"+action)$
+	$CallOp(result="%isSchedulable_"+action, ty="i1", fnptrval="@isSchedulable_"+action)$
+	$BrOp(cond="%isSchedulable_"+action, iftrue="%fire_"+action, iffalse="%skip_"+action)$
 
 fire_$action$:
 $if(action.outputPattern)$
@@ -978,8 +978,8 @@ actionCall(action) ::= <<
 
 /*
 actionTest(action, iterator) ::= <<
-	%$action$ = call i1 @isSchedulable_$action$()
-	br i1 %$action$, label %fire_$action$, label %skip_$action$
+	%isSchedulable_$action$ = call i1 @isSchedulable_$action$()
+	br i1 %isSchedulable_$action$, label %fire_$action$, label %skip_$action$
 
 fire_$action$:
 $if(action.outputPattern)$
@@ -1008,8 +1008,8 @@ skip_$action$:
 */
 
 outside_FSM_actionTest(action, iterator) ::= <<
-	%$action$ = call i1 @isSchedulable_$action$()
-	br i1 %$action$, label %fire_$action$, label %skip_$action$
+	%isSchedulable_$action$ = call i1 @isSchedulable_$action$()
+	br i1 %isSchedulable_$action$, label %fire_$action$, label %skip_$action$
 
 fire_$action$:
 $if(action.outputPattern)$
