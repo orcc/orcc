@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.merger.sequitur;
+package net.sf.orcc.tools.normalizer.sequitur;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

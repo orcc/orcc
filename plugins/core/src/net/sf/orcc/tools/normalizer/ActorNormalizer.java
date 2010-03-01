@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.merger;
+package net.sf.orcc.tools.normalizer;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;

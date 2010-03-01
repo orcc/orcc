@@ -41,8 +41,8 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.transforms.Instantiator;
 import net.sf.orcc.network.transforms.NetworkClassifier;
 import net.sf.orcc.network.transforms.NetworkFlattener;
-import net.sf.orcc.tools.merger.ActorMerger;
-import net.sf.orcc.tools.merger.ActorNormalizer;
+import net.sf.orcc.tools.normalizer.ActorMerger;
+import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
