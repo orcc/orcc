@@ -1,5 +1,15 @@
 group LLVM_actor;
 
+
+///////////////////////////////////////////////////////////////////////////////
+// FIFO declaration
+///////////////////////////////////////////////////////////////////////////////
+
+fifo(port) ::= <<
+@$actorName$_$port.name$ = common global %struct.fifo_s* null
+
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,6 +81,7 @@ $const$
 $endif$
 
 >>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // List
@@ -819,126 +830,6 @@ $actionCall(action)$
 	
 >>
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// Not structured
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-// FIFO declaration
-///////////////////////////////////////////////////////////////////////////////
-
-fifo(port) ::= <<
-@$actorName$_$port.name$ = common global %struct.fifo_s* null
-
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Types and variables
-///////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Instructions
-///////////////////////////////////////////////////////////////////////////////
-
-/* // selectnode
-selectNode(var, type, expr, trueVar, falseVar) ::= <<
-	$var$ = select $expr$, $trueVar$, $falseVar$
-
->>
-
-// bitcastnode
-BitcastNode(var, type, expr) ::= <<
-	$var$ = bitcast $expr$ to $type$
-
->>
-
-// truncnode
-TruncNode(var, type, expr) ::= <<
-	$var$ = trunc $expr$ to $type$
-
->>
-
-// zextnode
-ZextNode(var, type, expr) ::= <<
-	$var$ = zext $expr$ to $type$
-
->>
-
-// sextnode
-SextNode(var, type, expr) ::= <<
-	$var$ = sext $expr$ to $type$
-
->>
-
-// initialization port node
-initPortNode(fifoName, expr, index) ::= <<
-	%$fifoName$_ptr = getelementptr %struct.lff_t** $expr$, i32 $index$
-	%$fifoName$_val = load %struct.lff_t** %$fifoName$_ptr
-	store %struct.lff_t* %$fifoName$_val, %struct.lff_t** @$actorName$_$fifoName$
-
->>
-
->> */
-
-///////////////////////////////////////////////////////////////////////////////
-// Variables
-///////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////
-// ORCC Nodes
-///////////////////////////////////////////////////////////////////////////////
-
-
-/*
-Store(store) ::= <<
-$if(store.indexes.empty)$
-store i32 $store.value$, i32* @$store.target$
-
-$else$
-$if(store.target.variable.port)$
-%$store.target$_cast = bitcast  i8** %$store.target$ to $store.target.variable.type$* 
-
-$endif$
-%$store.target$_ptr = getelementptr $store.target.variable.type$* $if(store.target.variable.global)$
-@
-$else$
-%
-$endif$
-$store.target$$if(store.target.variable.port)$
-_cast
-$endif$
-, i32 0, $indexes(store.indexes)$
-store i32 $store.value$, i32* %$store.target$_ptr
-
-$endif$
->>
-*/
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Nodes
-///////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Instantiation
-///////////////////////////////////////////////////////////////////////////////
-
-inst(name, nodes) ::= <<
-
-define internal void @$name$(%struct.lff_t** %fifo) {
-entry:
-$nodes$	ret void
-}
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure
@@ -957,6 +848,7 @@ $trunc(procedure.nodes): {$(it.class.simpleName)(it)$}$
 
 >>
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
@@ -964,83 +856,6 @@ $trunc(procedure.nodes): {$(it.class.simpleName)(it)$}$
 action(action) ::= <<
 $procedure(action.body)$$procedure(action.scheduler)$
 >>
-
-///////////////////////////////////////////////////////////////////////////////
-// Scheduler without FSM
-///////////////////////////////////////////////////////////////////////////////
-
-
-/*
-actionCall(action) ::= <<
-	call void @$action$()
->>
-*/
-
-/*
-actionTest(action, iterator) ::= <<
-	%isSchedulable_$action$ = call i1 @isSchedulable_$action$()
-	br i1 %isSchedulable_$action$, label %fire_$action$, label %skip_$action$
-
-fire_$action$:
-$if(action.outputPattern)$
-
-$first(action.outputPattern.keys):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
-$first(rest(action.outputPattern.keys)):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
-$rest(rest(action.outputPattern.keys)):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
-$andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$$\n$}$
-	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action$, label %hasNoRoom_$action$
-
-hasRoom_$action$:
-$actionCall(action)$
-	br label %bb 
-hasNoRoom_$action$:
-	br label %return
-
-$else$
-$actionCall(action)$
-	br label %bb
-	
-$endif$
-
-skip_$action$:
-
->>
-*/
-
-outside_FSM_actionTest(action, iterator) ::= <<
-	%isSchedulable_$action$ = call i1 @isSchedulable_$action$()
-	br i1 %isSchedulable_$action$, label %fire_$action$, label %skip_$action$
-
-fire_$action$:
-$if(action.outputPattern)$
-$first(action.outputPattern.keys):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator)$}$
-$first(rest(action.outputPattern.keys)):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$ $andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$}$
-$rest(rest(action.outputPattern.keys)):{port|$outputPattern(pattern=port, token = action.outputPattern.(port), iterator=iterator.nextNodeIndex)$
-$andNode(var= iterator.nextNodeIndex.index, e1="%"+iterator.firstIndex, e2="%"+iterator.secondIndex)$$\n$}$
-	br i1 %$iterator.nextNodeIndex.lastIndex$, label %hasRoom_$action$, label %hasNoRoom_$action$
-
-hasRoom_$action$:
-$actionCall(action)$
-	br label %bb
-hasNoRoom_$action$:
-	br label %return
-
-$else$
-$actionCall(action)$
-ret i1 1
-$endif$
-
-skip_$action$:
-
->>
-
-outside_FSM_schedulingTest(actions, iterator) ::= <<
-$actions: outside_FSM_actionTest(action=it, iterator = iterator)$
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Scheduler with FSM
-///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
@@ -1059,10 +874,6 @@ $actor.outputs.list: fifo(it)$
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
 $actor.stateVars.list: stateVar(it)$
-
-$! TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO !$
-$! $insts$ !$
-$! TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO !$
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
