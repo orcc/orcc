@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.frontend.parser.ALAstParser;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
@@ -181,21 +180,19 @@ public class Frontend {
 	}
 
 	private Actor processActor(String actorPath) throws OrccException {
-		ALAstParser parser = new ALAstParser(actorPath);
-		Actor actor = parser.parse();
+		net.sf.orcc.cal.Actor astActor;
+		Actor actor = null;
 
 		if (printPriorities) {
 			// prints priority graph
 			String fileName = "priority_" + actor.getName() + ".dot";
 			File file = new File(outputFolder, fileName);
-			parser.printPriorityGraph(file);
 		}
 
 		if (printFSM) {
 			// prints FSM
 			String fileName = "fsm_" + actor.getName() + ".dot";
 			File file = new File(outputFolder, fileName);
-			parser.printFSMGraph(file);
 
 			// prints FSM after priorities have been applied
 			ActionScheduler scheduler = actor.getActionScheduler();

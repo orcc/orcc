@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.frontend.schedule;
 
-import static net.sf.orcc.frontend.parser.Util.parseActionTag;
-
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -41,13 +39,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.orcc.cal.Schedule;
+import net.sf.orcc.cal.Transition;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.UniqueEdge;
 
-import org.antlr.runtime.tree.Tree;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.StringEdgeNameProvider;
@@ -74,10 +73,10 @@ public class FSMBuilder {
 	 * @param tree
 	 *            an ANTLR tree that represents the AST of an FSM.
 	 */
-	public FSMBuilder(Tree tree) {
+	public FSMBuilder(Schedule schedule) {
 		graph = new DirectedMultigraph<String, UniqueEdge>(UniqueEdge.class);
-		initialState = tree.getChild(0).getText();
-		parseTransitions(tree.getChild(1));
+		initialState = schedule.getInitialState();
+		parseTransitions(schedule.getTransitions());
 	}
 
 	/**
@@ -194,13 +193,11 @@ public class FSMBuilder {
 	 * @param tree
 	 *            an ANTLR tree whose root is TRANSITIONS
 	 */
-	private void parseTransitions(Tree tree) {
-		int n = tree.getChildCount();
-		for (int i = 0; i < n; i++) {
-			Tree transition = tree.getChild(i);
-			String source = transition.getChild(0).getText();
-			Tag tag = parseActionTag(transition.getChild(1));
-			String target = transition.getChild(2).getText();
+	private void parseTransitions(List<Transition> transitions) {
+		for (Transition transition : transitions) {
+			String source = transition.getSource();
+			Tag tag = new Tag(transition.getTag());
+			String target = transition.getTarget();
 			graph.addVertex(source);
 			graph.addVertex(target);
 			graph.addEdge(source, target, new UniqueEdge(tag));

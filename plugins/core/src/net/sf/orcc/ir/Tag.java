@@ -50,6 +50,14 @@ public class Tag implements Comparable<Tag>, Iterable<String> {
 	}
 
 	/**
+	 * Creates a tag from an AST tag object.
+	 */
+	public Tag(net.sf.orcc.cal.Tag tag) {
+		List<String> identifiers = tag.getIdentifiers();
+		this.identifiers = new ArrayList<String>(identifiers);
+	}
+
+	/**
 	 * Creates an empty tag with a given initial size.
 	 * 
 	 * @param size
