@@ -29,9 +29,13 @@
 package net.sf.orcc.frontend;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.frontend.transforms.AstToIR;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
@@ -40,6 +44,10 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.serialize.XDFWriter;
+import net.sf.orcc.parser.antlr.CalParser;
+
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.parser.IParseResult;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -180,8 +188,19 @@ public class Frontend {
 	}
 
 	private Actor processActor(String actorPath) throws OrccException {
-		net.sf.orcc.cal.Actor astActor;
-		Actor actor = null;
+		CalParser parser = new CalParser();
+		net.sf.orcc.cal.Actor aActor = null;
+
+		try {
+			InputStream in = new FileInputStream(actorPath);
+			IParseResult result = parser.doParse(in);
+			EObject root = result.getRootASTElement();
+			aActor = (net.sf.orcc.cal.Actor) root;
+		} catch (FileNotFoundException e) {
+			throw new OrccException("I/O error", e);
+		}
+
+		Actor actor = new AstToIR().transform(actorPath, aActor);
 
 		if (printPriorities) {
 			// prints priority graph

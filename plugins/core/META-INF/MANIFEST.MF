@@ -4,17 +4,18 @@ Bundle-Name: Orcc core plug-in
 Bundle-SymbolicName: net.sf.orcc.core;singleton:=true
 Bundle-Version: 0.7.0.beta3
 Bundle-Activator: net.sf.orcc.ui.OrccActivator
-Require-Bundle: org.eclipse.core.expressions,
+Require-Bundle: net.sf.orcc.cal,
+ org.eclipse.core.expressions,
  org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
+ org.eclipse.emf.common,
+ org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.console,
- org.eclipse.ui.ide,
- org.eclipse.jface.text,
  org.eclipse.ui.editors,
- net.sf.orcc.cal,
- org.eclipse.emf.common
+ org.eclipse.ui.ide,
+ org.eclipse.xtext
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
