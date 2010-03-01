@@ -115,16 +115,16 @@ public class ListType extends AbstractType {
 	}
 
 	/**
-	 * Returns an iterator on a list that can be used inside a template.
+	 * Returns a list of indice that can be used inside a template.
 	 * 
-	 * @return the iterator that contains indice for this array
+	 * @return a list of indice corresponding to the list size
 	 */
 	public List<Expression> getSizeIterator() {
 		List <Expression> it = new ArrayList<Expression>();
 		
 		for (int i = 0; i < ((IntExpr)size).getValue(); i++){
 			it.add(new IntExpr(i));
-		}
+		} 
 		
 		return it;
 	}

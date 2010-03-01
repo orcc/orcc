@@ -65,7 +65,7 @@ l$location.startLine$c$location.startColumn$
 
 ConstantValue(type, const) ::= <<
 $if(const.listConst)$
-$listValue(type=type.type, values=const.value)$
+$listValue(type=type.type, values=const.value, iterator = type.sizeIterator)$
 $else$
 $const$
 $endif$
@@ -77,9 +77,9 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 // the values of a list: {val1, val2, ..., valn}
-listValue(type, values) ::= <<
+listValue(type, values, iterator) ::= <<
 $if(first(values).listConst)$
-[$type.sizeIterator, values :{ iterator, value | $type$ $if(value)$ $value$ $else$ zeroinitializer $endif$}; separator=", "$]
+[$iterator, values :{ iterator, value | $type$ $if(value)$ $listValue(type=type.type, values=value.value, iterator= type.sizeIterator)$ $else$ zeroinitializer $endif$}; separator=", "$]
 $else$
 [$values:{$type$ $it$}; separator=", "$]
 $endif$
