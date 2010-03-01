@@ -56,46 +56,12 @@ listSize(value) ::= <<
 $value : {[$it$]} $
 >>
 
-// the values of a list: {val1, val2, ..., valn}
-listValue(value) ::= <<
-{$value; wrap, separator=", "$}
->>
-
-signalDeclaration(variable) ::= <<
-$if(variable.port)$
-signal $variable$ : $variable.type$;
-
-$else$
-  $if(!(listSize(variable.type.dimensions)))$
-signal $variable$ : $variable.type$;
-
-  $else$
-type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$ -1 downto 0) of $variable.type$;
-signal $variable$ : memory_type_$variable$;
-
-  $endif$
-$endif$
->>
-
-variableDeclaration(variable) ::= <<
-$variable.type.dimensions$
-$if(variable.port)$
-variable $variable$ : $variable.type$
-$else$
-  $if(!(listSize(variable.type.dimensions)))$
-variable $variable$ : $variable.type$ $listSize(variable.type.dimensions)$
-  $else$
--- error !!!!! type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$ -1 downto 0) of $variable.type$;
--- error !!!!! variable $variable$ : memory_type_$variable$
-  $endif$
-$endif$
->>
-
-
 sig_const() ::= <<
 constant clk_period      : time := 10 ns;
+type severity_level is (note, warning, error, failure);
 type tb_type is (after_reset, read_file, CheckRead);
 $actor.inputs.list: signal_in(it)$--
+$actor.outputs.list: signal_out(it)$--
 $actor.inputs.list: fifo_in(it)$--
 $actor.outputs.list: fifo_out(it)$
 signal count             : integer range 255 downto 0;
@@ -111,6 +77,11 @@ file sim_file_$actorName$_$port.name$  : text is "$actorName$_$port.name$_sim.tx
 
 >>
 
+signal_out(port) ::= <<
+--
+file sim_file_$actorName$_$port.name$  : text is "$actorName$_$port.name$_sim.txt";
+
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Process
@@ -137,27 +108,27 @@ tb_FSM_init(port) ::= <<
     
 
 
-waveform_process() ::= <<
-WaveGen_Proc : process (reset_n, clock)
-    variable Input_bit   : integer range 2147483647 downto - 2147483648;
+waveform_process_in() ::= <<
+-- Input(s) waveform Generation
+WaveGen_Proc_In : process (reset_n, clock)
+  variable Input_bit   : integer range 2147483647 downto - 2147483648;
   variable line_number : line;
 begin
   if reset_n = '0' then
     $actor.inputs.list: fifo_in_init(it)$    --
-    $actor.outputs.list: fifo_out_init(it)$    --
     $actor.inputs.list: tb_FSM_init(it)$
     count <= 0;
     
   elsif rising_edge(clock) then
     --
-    $actor.inputs.list:  {$case_define(it)$}; separator="\n"$
+    $actor.inputs.list:  {$case_define_in(it)$}; separator="\n"$$\n$
   end if;
-end process WaveGen_Proc;
+end process WaveGen_Proc_In;
 
 >>
 
 
-case_define(port) ::= <<
+case_define_in(port) ::= <<
 case tb_FSM_$actorName$_$port.name$ is
   when after_reset =>
     count <= count + 1;
@@ -219,6 +190,56 @@ end case;
 
 >>
 
+waveform_process_out() ::= <<
+-- Output(s) waveform Generation
+WaveGen_Proc_Out : process (reset_n, clock)
+  variable Input_bit   : integer range 2147483647 downto - 2147483648;
+  variable line_number : line;
+begin
+  if reset_n = '0' then
+    $actor.outputs.list: fifo_out_init(it)$    --
+  elsif rising_edge(clock) then
+    --
+    $actor.outputs.list:  {$case_define_out(it)$}; separator="\n"$
+  end if;
+end process WaveGen_Proc_Out;
+
+>>
+
+
+case_define_out(port) ::= <<
+    if (not endfile (sim_file_$actorName$_$port.name$) and $actorName$_$port.name$_write = '1') then
+      readline(sim_file_$actorName$_$port.name$, line_number);
+      --
+      if line_number'length > 0 and line_number(1) /= '/' then
+        read(line_number, input_bit);
+$if(port.type.bool)$
+        assert (input_bit = 1 and $actorName$_$port.name$_data = '0')
+          report "incorrectly value computed : 0 instead of : 1"
+          severity error;
+        assert (input_bit = 0 and $actorName$_$port.name$_data = '1')
+          report "incorrectly value computed : 1 instead of : 0"
+          severity error;
+        end if;
+$else$
+$if(port.type.int)$
+        assert ($actorName$_$port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
+          -- report "incorrectly value computed : " & to_string(to_integer(to_signed($actorName$_$port.name$_data))) & " instead of :" & to_string(input_bit)
+          report "incorrectly value computed : " & str(to_integer(signed($actorName$_$port.name$_data))) & " instead of :" & str(input_bit)
+          severity error;$\n$
+$else$
+        assert ($actorName$_$port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
+          report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($actorName$_$port.name$_data))) & " instead of :" & to_string(input_bit)
+          --report "Incorrectly value computed : " & str(to_integer(unsigned($actorName$_$port.name$_data))) & " instead of :" & str(input_bit)
+          severity error;$\n$
+$endif$
+$endif$
+        --
+        $actorName$_$port.name$_full <= '0';    
+      end if;
+    end if;
+
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // testbench
@@ -233,6 +254,8 @@ use ieee.std_logic_1164.all;
 use std.textio.all;
 use ieee.numeric_std.all;
 
+library work;
+use work.sim_package.all;
 
 entity $actor.name$_testbench is
 
@@ -256,7 +279,8 @@ begin
       $actor.outputs.list: {$fifo_map_out(it)$}; separator=",\n"$);
       
   $init_process()$
-  $waveform_process()$
+  $waveform_process_in()$
+  $waveform_process_out()$
 
 end architecture rtl;
 >>
