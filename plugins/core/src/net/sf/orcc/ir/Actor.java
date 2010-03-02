@@ -225,6 +225,19 @@ public class Actor {
 	}
 
 	/**
+	 * Returns <code>true</code> if this actor is a <code>system</code> actor,
+	 * which means that it is supposed to be replaced by a hand-written
+	 * implementation. An actor is identified as "system" if it does not contain
+	 * any actions.
+	 * 
+	 * @return <code>true</code> if this actor is a <code>system</code> actor,
+	 *         <code>false</code> otherwise
+	 */
+	public boolean isSystem() {
+		return actions.isEmpty();
+	}
+
+	/**
 	 * Returns <code>true</code> if this actor is time-dependent,
 	 * <code>false</code> otherwise.
 	 * 

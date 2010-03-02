@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.network;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Port;
 
 /**
@@ -106,7 +105,7 @@ public class Vertex {
 		if (isInstance()) {
 			return (Instance) contents;
 		} else {
-			throw new OrccRuntimeException("expected an Instance");
+			return null;
 		}
 	}
 
@@ -119,7 +118,7 @@ public class Vertex {
 		if (isPort()) {
 			return (Port) contents;
 		} else {
-			throw new OrccRuntimeException("expected a Port");
+			return null;
 		}
 	}
 
