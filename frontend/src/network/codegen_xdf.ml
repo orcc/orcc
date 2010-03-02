@@ -198,19 +198,6 @@ let mk_attribute a_name a_value = (("", a_name), a_value)
 
 let mk_elt name attributes children = E ((("", name), attributes), children)
 
-let mk_ports kind graph existing =
-	G.fold_vertex
-		(fun vertex ports ->
-			match vertex with
-				| Input port
-				| Output port ->
-					let attributes =
-						[mk_attribute "kind" kind; mk_attribute "name" port.po_name]
-					in
-					mk_elt "Port" attributes [] :: ports
-				| Instance _ -> ports)
-	graph existing
-
 let mk_literal kind lit_value =
 	let attributes =
 		[mk_attribute "kind" "Literal"; mk_attribute "literal-kind" kind;
@@ -253,6 +240,19 @@ let rec mk_type = function
 and mk_entry_type typ =
 	mk_elt "Entry" [mk_attribute "kind" "Type"; mk_attribute "name" "type"]
 		[mk_type typ]
+
+let mk_ports kind graph existing =
+	G.fold_vertex
+		(fun vertex ports ->
+			match vertex with
+				| Input port
+				| Output port ->
+					let attributes =
+						[mk_attribute "kind" kind; mk_attribute "name" port.po_name]
+					in
+					mk_elt "Port" attributes [mk_type port.po_type] :: ports
+				| Instance _ -> ports)
+	graph existing
 
 let mk_parameters parameters existing =
 	List.fold_left
@@ -363,7 +363,9 @@ let generate_actors options network =
 								model_has_errors := true)
 
 						| Ast.Network _ -> failwith "Never happens after flattening")
-				| _ -> failwith "A top-level flattened network must not contain ports")
+
+				(* do nothing with ports *)
+				| _ -> ())
 	network.Ast.n_graph
 
 (** [start options] parses the XDF file in options.o_file, flattens the network,
