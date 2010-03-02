@@ -33,7 +33,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.sf.orcc.CalRuntimeModule;
 import net.sf.orcc.CalStandaloneSetup;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.frontend.transforms.AstToIR;

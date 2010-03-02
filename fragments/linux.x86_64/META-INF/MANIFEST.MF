@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Orcc front-end linux x86_64
 Bundle-SymbolicName: net.sf.orcc.frontend.linux.x86_64;singleton:=true
-Bundle-Version: 0.7.0.beta1
+Bundle-Version: 0.7.0
 Fragment-Host: net.sf.orcc.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-PlatformFilter: (& (osgi.os=linux) (osgi.arch=x86_64))

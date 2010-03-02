@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: net.sf.orcc.cal.ui
-Bundle-Vendor: My Company
-Bundle-Version: 1.0.0
+Bundle-Name: RVC-CAL Xtext editor plug-in
+Bundle-Vendor: IETR/INSA Rennes
+Bundle-Version: 0.7.0
 Bundle-SymbolicName: net.sf.orcc.cal.ui; singleton:=true
 Eclipse-RegisterBuddy: org.eclipse.xtext.log4j
 Bundle-ActivationPolicy: lazy
