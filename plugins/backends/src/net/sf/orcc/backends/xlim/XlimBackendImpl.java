@@ -53,7 +53,9 @@ public class XlimBackendImpl extends AbstractBackend {
 		if (args.length == 1) {
 			try {
 				System.out.println("START");
-				new XlimBackendImpl().generateCode(args[0], 10000);
+				XlimBackendImpl impl = new XlimBackendImpl();
+				impl.beforeXdfParsing();
+				impl.generateCode(args[0], 10000);
 				System.out.println("DONE");
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
