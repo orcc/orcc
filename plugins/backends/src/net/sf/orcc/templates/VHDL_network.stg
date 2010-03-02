@@ -112,15 +112,16 @@ $instance.actor$_$it$_write  => $instance.actor$_$it$_write,
 
 printScheduler(instance) ::= <<
 $if (instance.actor)$
-
+$if (!instance.actor.system)$
 
 $it.id$ : entity work.$it.id$
   port map (
     $printActorPorts(instance)$
     clock            => clock, 
     reset_n          => reset_n);
+
 $endif$
-  
+$endif$
 >>
 
 printSchedulers(instances) ::= <<
