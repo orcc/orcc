@@ -40,8 +40,9 @@ $actorName$_$port.name$_write <= '0';$"\n"$
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
 listSize(value) ::= <<
-$value : {$it $} $
+$value : {$it$ -1 downto 0}; separator=", "$
 >>
+
 
 // the values of a list: {val1, val2, ..., valn}
 listValue(value) ::= <<
@@ -57,7 +58,7 @@ $else$
 signal $variable$ : $variable.type$;
 
   $else$
-type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$ -1 downto 0) of $variable.type$;
+type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
 signal $variable$ : memory_type_$variable$;
 
   $endif$
@@ -129,7 +130,7 @@ $if(load.source.variable.port)$
 $load.target$ := $load.source$;
 
 $else$
-$load.target$ := $load.source$($load.indexes : {$it$}$);
+$load.target$ := $load.source$($load.indexes : {$it$}; separator=", "$);
 
 $endif$
 $else$
@@ -189,7 +190,7 @@ $if(store.target.variable.port)$
 $store.target$ := $store.value$;
 
 $else$
-$store.target$($store.indexes : {$it$}$) <= $store.value$;
+$store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;
 
 $endif$
 $else$
