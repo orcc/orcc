@@ -3,7 +3,6 @@
  */
 package net.sf.orcc.outline;
 
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.cal.Action;
@@ -14,15 +13,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.text.Region;
 import org.eclipse.xtext.ui.common.editor.outline.ContentOutlineNode;
 import org.eclipse.xtext.ui.common.editor.outline.transformer.AbstractDeclarativeSemanticModelTransformer;
-import org.eclipse.xtext.ui.core.ILocationInFileProvider;
 
 /**
  * customization of the default outline structure
  * 
  */
 public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer {
-
-	private ILocationInFileProvider locationProvider;
 
 	public ContentOutlineNode createNode(Actor actor,
 			ContentOutlineNode parentNode) {
@@ -53,11 +49,6 @@ public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer 
 
 	public List<EObject> getChildren(Actor actor) {
 		return NO_CHILDREN;
-	}
-
-	public void setLocationProvider(ILocationInFileProvider locationProvider) {
-		super.setLocationProvider(locationProvider);
-		this.locationProvider = locationProvider;
 	}
 
 }
