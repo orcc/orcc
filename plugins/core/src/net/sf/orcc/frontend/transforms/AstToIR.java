@@ -37,7 +37,6 @@ import net.sf.orcc.cal.BooleanExpression;
 import net.sf.orcc.cal.IntegerExpression;
 import net.sf.orcc.cal.LiteralExpression;
 import net.sf.orcc.cal.StringExpression;
-import net.sf.orcc.cal.TypeAttribute;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -144,16 +143,20 @@ public class AstToIR {
 		if (typeName.equals("bool")) {
 			return new BoolType();
 		} else if (typeName.equals("int")) {
-			Expression size = transformTypeAttrSize(aType.getAttributes());
+			Expression size = transformExpression(((net.sf.orcc.cal.IntType) aType)
+					.getSize());
 			return new IntType(size);
 		} else if (typeName.equals("List")) {
-			Type type = transformTypeAttrType(aType.getAttributes());
-			Expression size = transformTypeAttrSize(aType.getAttributes());
+			Type type = transformType(((net.sf.orcc.cal.ListType) aType)
+					.getType());
+			Expression size = transformExpression(((net.sf.orcc.cal.ListType) aType)
+					.getSize());
 			return new ListType(size, type);
 		} else if (typeName.equals("String")) {
 			return new StringType();
 		} else if (typeName.equals("uint")) {
-			Expression size = transformTypeAttrSize(aType.getAttributes());
+			Expression size = transformExpression(((net.sf.orcc.cal.UintType) aType)
+					.getSize());
 			return new UintType(size);
 		} else if (typeName.equals("void")) {
 			return new VoidType();
@@ -161,28 +164,6 @@ public class AstToIR {
 
 		// never happens
 		throw new OrccRuntimeException("unknown type \"" + typeName + "\"");
-	}
-
-	private Expression transformTypeAttrSize(List<TypeAttribute> attributes) {
-		for (TypeAttribute aTypeAttr : attributes) {
-			net.sf.orcc.cal.Expression size = aTypeAttr.getValue();
-			if (aTypeAttr.getName().equals("size") && size != null) {
-				return transformExpression(size);
-			}
-		}
-
-		throw new OrccRuntimeException("no suitable \"size\" attribute found");
-	}
-
-	private Type transformTypeAttrType(List<TypeAttribute> attributes) {
-		for (TypeAttribute aTypeAttr : attributes) {
-			net.sf.orcc.cal.Type aType = aTypeAttr.getType();
-			if (aTypeAttr.getName().equals("type") && aType != null) {
-				return transformType(aType);
-			}
-		}
-
-		throw new OrccRuntimeException("no suitable \"type\" attribute found");
 	}
 
 }

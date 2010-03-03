@@ -30,7 +30,7 @@ Actor:
 Port: type=Type name=ID;
 
 Import:
-	'import' ('all' Tag ';' | Tag ';');
+	'import' ('all' Tag | Tag) ';';
 
 Function:
 	'function' name=ID
@@ -238,11 +238,19 @@ StringExpression: value=STRING;
 // common stuff
 ///////////////////////////////////////////////////////////////////////////////
 
-Type:
-	name=('bool' | 'float' | 'int' | 'List' | 'String' | 'uint')
-	('(' attributes += TypeAttribute (',' attributes += TypeAttribute)* ')')?;
+Type: BoolType | FloatType | IntType | ListType | StringType | UintType;
 
-TypeAttribute: name=ID (':' type=Type | '=' value=Expression);
+BoolType: name='bool';
+
+FloatType: name='float';
+
+IntType: name='int' ('(' 'size' '=' size = Expression ')')?;
+
+ListType: name='List' '(' 'type' ':' type = Type ',' 'size' '=' size = Expression ')';
+
+StringType: name='String';
+
+UintType: name='uint' ('(' 'size' '=' size = Expression ')')?;
 
 VariableDeclaration returns Variable: type=Type name=ID;
 

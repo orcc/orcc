@@ -3,6 +3,14 @@
  */
 package net.sf.orcc.formatting;
 
+import net.sf.orcc.services.CalGrammarAccess;
+import net.sf.orcc.services.CalGrammarAccess.ActionElements;
+import net.sf.orcc.services.CalGrammarAccess.ActorElements;
+import net.sf.orcc.services.CalGrammarAccess.IntTypeElements;
+import net.sf.orcc.services.CalGrammarAccess.PriorityElements;
+import net.sf.orcc.services.CalGrammarAccess.ScheduleElements;
+import net.sf.orcc.services.CalGrammarAccess.UintTypeElements;
+
 import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter;
 import org.eclipse.xtext.formatting.impl.FormattingConfig;
 
@@ -17,11 +25,161 @@ import org.eclipse.xtext.formatting.impl.FormattingConfig;
  */
 public class CalFormatter extends AbstractDeclarativeFormatter {
 
-	@Override
-	@SuppressWarnings("unused")
-	protected void configureFormatting(FormattingConfig c) {
-		net.sf.orcc.services.CalGrammarAccess f = (net.sf.orcc.services.CalGrammarAccess) getGrammarAccess();
+	private CalGrammarAccess f;
 
-		// ...
+	private void configureActorBody(FormattingConfig c) {
+		c.setLinewrap(2).after(f.getActorAccess().getColonKeyword_10());
+		c.setIndentation(f.getActorAccess().getColonKeyword_10(), f
+				.getActorAccess().getEndKeyword_14());
+
+		c.setLinewrap(2).before(f.getActorAccess().getEndKeyword_14());
+		c.setLinewrap(2).after(f.getActorAccess().getEndKeyword_14());
+	}
+
+	@Override
+	protected void configureFormatting(FormattingConfig c) {
+		f = (CalGrammarAccess) getGrammarAccess();
+
+		c.setIndentationSpace("\t");
+
+		// Tags
+		c.setNoSpace().around(f.getTagAccess().getFullStopKeyword_1_0());
+
+		// Imports
+		c.setNoSpace().before(f.getImportAccess().getSemicolonKeyword_2());
+		c.setLinewrap().after(f.getImportAccess().getSemicolonKeyword_2());
+		c.setLinewrap(2).after(f.getActorAccess().getImportsAssignment_0());
+
+		configureParameters(c);
+		configurePorts(c);
+		configureActorBody(c);
+
+		configureAction(c);
+
+		configureStatements(c);
+
+		configureSchedule(c);
+
+		configurePriorities(c);
+
+		// Types
+		configureIntType(c);
+		configureUintType(c);
+	}
+
+	private void configurePriorities(FormattingConfig c) {
+		PriorityElements access = f.getPriorityAccess();
+
+		c.setIndentation(access.getPriorityKeyword_0(), access
+				.getEndKeyword_2());
+		c.setLinewrap().after(access.getPriorityKeyword_0());
+		c.setLinewrap(2).after(access.getEndKeyword_2());
+
+		c.setNoSpace().before(f.getInequalityAccess().getSemicolonKeyword_2());
+		c.setLinewrap().after(f.getInequalityAccess().getSemicolonKeyword_2());
+	}
+
+	private void configureSchedule(FormattingConfig c) {
+		ScheduleElements access = f.getScheduleAccess();
+
+		c.setIndentation(access.getScheduleKeyword_0(), access
+				.getEndKeyword_5());
+		c.setLinewrap().after(access.getColonKeyword_3());
+		c.setLinewrap(2).after(access.getEndKeyword_5());
+
+		c.setNoSpace().before(f.getTransitionAccess().getSemicolonKeyword_6());
+		c.setLinewrap().after(f.getTransitionAccess().getSemicolonKeyword_6());
+	}
+
+	private void configureStatements(FormattingConfig c) {
+		c.setLinewrap().after(f.getAssignAccess().getSemicolonKeyword_4());
+		c.setNoSpace().before(f.getAssignAccess().getSemicolonKeyword_4());
+	}
+
+	private void configureAction(FormattingConfig c) {
+		ActionElements access = f.getActionAccess();
+
+		c.setLinewrap().before(access.getTagAssignment_0_0());
+		c.setLinewrap(2).after(access.getEndKeyword_8());
+		c.setNoSpace().before(access.getColonKeyword_0_1());
+
+		c.setIndentation(access.getActionKeyword_1(), access.getEndKeyword_8());
+
+		// input pattern
+		c.setNoSpace().before(access.getCommaKeyword_2_1_0());
+		c.setNoSpace().before(f.getInputPatternAccess().getColonKeyword_0_1());
+		c.setNoSpace().before(f.getInputPatternAccess().getCommaKeyword_3_0());
+		c.setNoSpace().before(
+				f.getInputPatternAccess().getLeftSquareBracketKeyword_1());
+
+		// output pattern
+		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
+		c.setNoSpace().before(f.getOutputPatternAccess().getColonKeyword_0_1());
+		c.setNoSpace().before(f.getOutputPatternAccess().getCommaKeyword_3_0());
+		c.setNoSpace().before(
+				f.getOutputPatternAccess().getLeftSquareBracketKeyword_1());
+
+		// guards
+		c.setLinewrap().before(access.getGuardKeyword_5_0());
+		c.setLinewrap().before(access.getGuardsAssignment_5_1());
+		c.setLinewrap().before(access.getGuardsAssignment_5_2_1());
+
+		// body
+		c.setLinewrap().before(access.getDoKeyword_7_0());
+		c.setLinewrap().after(access.getDoKeyword_7_0());
+
+		// variables
+		c.setLinewrap().before(access.getVarKeyword_6_0());
+		c.setLinewrap().after(access.getVarKeyword_6_0());
+	}
+
+	private void configureIntType(FormattingConfig c) {
+		IntTypeElements access = f.getIntTypeAccess();
+
+		c.setNoSpace().before(access.getLeftParenthesisKeyword_1_0());
+		c.setNoSpace().after(access.getLeftParenthesisKeyword_1_0());
+		c.setNoSpace().after(access.getSizeKeyword_1_1());
+		c.setNoSpace().after(access.getEqualsSignKeyword_1_2());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_1_4());
+
+		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1_0());
+		c.setNoLinewrap().around(access.getEqualsSignKeyword_1_2());
+		c.setNoLinewrap().around(access.getRightParenthesisKeyword_1_4());
+	}
+
+	private void configureParameters(FormattingConfig c) {
+		ActorElements access = f.getActorAccess();
+
+		c.setIndentation(access.getLeftParenthesisKeyword_4(), access
+				.getRightParenthesisKeyword_6());
+		c.setNoSpace().after(access.getLeftParenthesisKeyword_4());
+		c.setLinewrap().before(access.getParametersAssignment_5_0());
+		c.setNoSpace().before(access.getCommaKeyword_5_1_0());
+		c.setLinewrap().after(access.getCommaKeyword_5_1_0());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_6());
+	}
+
+	private void configurePorts(FormattingConfig c) {
+		ActorElements access = f.getActorAccess();
+
+		c.setNoLinewrap().around(access.getInputsAssignment_7_0());
+		c.setNoLinewrap().around(access.getInputsAssignment_7_1_1());
+		c.setNoLinewrap().around(access.getOutputsAssignment_9_0());
+		c.setNoLinewrap().around(access.getOutputsAssignment_9_1_1());
+		c.setNoSpace().before(access.getCommaKeyword_7_1_0());
+	}
+
+	private void configureUintType(FormattingConfig c) {
+		UintTypeElements access = f.getUintTypeAccess();
+
+		c.setNoSpace().before(access.getLeftParenthesisKeyword_1_0());
+		c.setNoSpace().after(access.getLeftParenthesisKeyword_1_0());
+		c.setNoSpace().after(access.getSizeKeyword_1_1());
+		c.setNoSpace().after(access.getEqualsSignKeyword_1_2());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_1_4());
+
+		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1_0());
+		c.setNoLinewrap().around(access.getEqualsSignKeyword_1_2());
+		c.setNoLinewrap().around(access.getRightParenthesisKeyword_1_4());
 	}
 }
