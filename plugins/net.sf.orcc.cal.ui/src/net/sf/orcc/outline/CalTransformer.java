@@ -24,8 +24,10 @@ public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer 
 			ContentOutlineNode parentNode) {
 		ContentOutlineNode node = super.newOutlineNode(actor, parentNode);
 
-		createNode(node, "Inputs", actor.getInputs());
-		createNode(node, "Outputs", actor.getOutputs());
+		createNode(node, "Parameters", actor.getParameters());
+		createNode(node, "Input ports", actor.getInputs());
+		createNode(node, "Output ports", actor.getOutputs());
+		createNode(node, "State variables", actor.getStateVariables());
 		createNode(node, "Actions", actor.getActions());
 
 		return node;

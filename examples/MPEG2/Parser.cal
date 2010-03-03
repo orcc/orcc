@@ -425,25 +425,6 @@
   /** macroblock */
   mb: action I:[ byte ] ==>
   end
-
-  ///////////////////////////////////////////////////////////////////////////
-  // priorities
-  priority
-    next_start_code > byte_stuffing.zero > byte_stuffing.whatever;
-    
-    sequence_header > other_start_code;
-    load_intra_quantiser_matrix.no > load_intra_quantiser_matrix.yes;
-    load_non_intra_quantiser_matrix.no > load_non_intra_quantiser_matrix.yes;
-
-    sequence_extension > other_start_code;
-    user_data > other_start_code;
-    gop_header > other_start_code;
-    picture_header > other_start_code;
-    slice > other_start_code;
-    
-    composite_flag.no > composite_flag.yes;
-    slice_intra_flag.no > slice_intra_flag.yes;
-  end
   
   ///////////////////////////////////////////////////////////////////////////
   // FSM
@@ -551,6 +532,25 @@
 
     // just so we do not have warnings
     oops (oops) --> oops;
+  end
+
+  ///////////////////////////////////////////////////////////////////////////
+  // priorities
+  priority
+    next_start_code > byte_stuffing.zero > byte_stuffing.whatever;
+    
+    sequence_header > other_start_code;
+    load_intra_quantiser_matrix.no > load_intra_quantiser_matrix.yes;
+    load_non_intra_quantiser_matrix.no > load_non_intra_quantiser_matrix.yes;
+
+    sequence_extension > other_start_code;
+    user_data > other_start_code;
+    gop_header > other_start_code;
+    picture_header > other_start_code;
+    slice > other_start_code;
+    
+    composite_flag.no > composite_flag.yes;
+    slice_intra_flag.no > slice_intra_flag.yes;
   end
 
 end
