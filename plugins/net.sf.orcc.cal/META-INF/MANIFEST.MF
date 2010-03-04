@@ -11,7 +11,6 @@ Require-Bundle: org.eclipse.xtext,
  de.itemis.xtext.antlr;resolution:=optional,
  org.apache.commons.logging;resolution:=optional,
  org.eclipse.emf.codegen.ecore;resolution:=optional,
- org.eclipse.xtext.log4j;resolution:=optional,
  org.eclipse.emf.mwe.utils;resolution:=optional,
  org.eclipse.emf.mwe.core;resolution:=optional,
  com.ibm.icu;resolution:=optional,
@@ -28,4 +27,6 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.cal.util,
  net.sf.orcc.parseTreeConstruction,
  net.sf.orcc.parser.antlr,
- net.sf.orcc.validation
+ net.sf.orcc.validation,
+ net.sf.orcc.parser.antlr.internal
+Import-Package: org.apache.log4j

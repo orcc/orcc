@@ -44,10 +44,10 @@ import net.sf.orcc.cal.Variable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.xtext.resource.EObjectDescription;
+import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.scoping.IScope;
-import org.eclipse.xtext.scoping.IScopedElement;
 import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
-import org.eclipse.xtext.scoping.impl.ScopedElement;
 import org.eclipse.xtext.scoping.impl.SimpleScope;
 
 /**
@@ -71,17 +71,17 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 * @return a scope
 	 */
 	private IScope getScope(Action action, EReference ref) {
-		List<IScopedElement> elements = new ArrayList<IScopedElement>();
+		List<IEObjectDescription> elements = new ArrayList<IEObjectDescription>();
 		for (InputPattern pattern : action.getInputs()) {
 			for (Variable token : pattern.getTokens()) {
-				IScopedElement element = ScopedElement.create(token.getName(),
+				IEObjectDescription element = EObjectDescription.create(token.getName(),
 						token);
 				elements.add(element);
 			}
 		}
 
 		for (Variable variable : action.getVariables()) {
-			IScopedElement element = ScopedElement.create(variable.getName(),
+			IEObjectDescription element = EObjectDescription.create(variable.getName(),
 					variable);
 			elements.add(element);
 		}
@@ -104,15 +104,15 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 */
 	private IScope getScope(List<Variable> parameters,
 			List<Variable> variables, EObject obj, EReference ref) {
-		List<IScopedElement> elements = new ArrayList<IScopedElement>();
+		List<IEObjectDescription> elements = new ArrayList<IEObjectDescription>();
 		for (Variable variable : parameters) {
-			IScopedElement element = ScopedElement.create(variable.getName(),
+			IEObjectDescription element = EObjectDescription.create(variable.getName(),
 					variable);
 			elements.add(element);
 		}
 
 		for (Variable variable : variables) {
-			IScopedElement element = ScopedElement.create(variable.getName(),
+			IEObjectDescription element = EObjectDescription.create(variable.getName(),
 					variable);
 			elements.add(element);
 		}
@@ -145,15 +145,15 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 * @return a scope
 	 */
 	public IScope scope_VariableReference_variable(Actor actor, EReference ref) {
-		List<IScopedElement> elements = new ArrayList<IScopedElement>();
+		List<IEObjectDescription> elements = new ArrayList<IEObjectDescription>();
 		for (Variable parameter : actor.getParameters()) {
-			IScopedElement element = ScopedElement.create(parameter.getName(),
+			IEObjectDescription element = EObjectDescription.create(parameter.getName(),
 					parameter);
 			elements.add(element);
 		}
 
 		for (Variable stateVariable : actor.getStateVariables()) {
-			IScopedElement element = ScopedElement.create(stateVariable
+			IEObjectDescription element = EObjectDescription.create(stateVariable
 					.getName(), stateVariable);
 			elements.add(element);
 		}

@@ -11,10 +11,10 @@ Require-Bundle: net.sf.orcc.cal;visibility:=reexport,
  org.eclipse.ui,
  org.eclipse.ui.editors;bundle-version="3.5.0",
  org.eclipse.ui.ide;bundle-version="3.5.0",
- org.eclipse.xtext.log4j;bundle-version="1.2.15",
  org.eclipse.xtext.ui.common,
  org.eclipse.xtext.ui.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sf.orcc.contentassist,
  net.sf.orcc.contentassist.antlr
 Bundle-Activator: net.sf.orcc.internal.CalActivator
+Import-Package: org.apache.log4j
