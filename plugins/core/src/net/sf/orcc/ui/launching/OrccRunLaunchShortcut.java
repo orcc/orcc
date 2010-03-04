@@ -142,7 +142,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		ILaunchConfiguration config = null;
 		try {
 			String name = file.getName();
-			name = manager.generateUniqueLaunchConfigurationNameFrom(name);
+			name = manager.generateLaunchConfigurationName(name);
 			wc = type.newInstance(null, name);
 
 			// source file

@@ -57,7 +57,7 @@ public class TemplateGroupLoader implements StringTemplateGroupLoader {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public StringTemplateGroup loadGroup(String groupName, Class templateLexer,
 			StringTemplateGroup superGroup) {
 		StringTemplateGroup group = null;

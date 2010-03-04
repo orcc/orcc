@@ -39,7 +39,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class OrccBreakpointAdapterFactory implements IAdapterFactory {
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof ITextEditor) {
 			ITextEditor editorPart = (ITextEditor) adaptableObject;
@@ -56,7 +56,7 @@ public class OrccBreakpointAdapterFactory implements IAdapterFactory {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
 		return new Class[] { IToggleBreakpointsTarget.class };
 	}
