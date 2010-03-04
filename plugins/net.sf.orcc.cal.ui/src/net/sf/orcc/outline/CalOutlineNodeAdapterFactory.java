@@ -8,7 +8,7 @@ import org.eclipse.xtext.ui.common.editor.outline.actions.DefaultContentOutlineN
 public class CalOutlineNodeAdapterFactory extends
 		DefaultContentOutlineNodeAdapterFactory {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private static final Class[] types = {
 	// provide list of classes to adapt to, e.g.:
 	// Entity.class
@@ -16,7 +16,7 @@ public class CalOutlineNodeAdapterFactory extends
 	};
 
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Class[] getAdapterList() {
 		return types;
 	}
