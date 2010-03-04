@@ -9,7 +9,7 @@ generate cal "http://www.sf.net/orcc/Cal"
 ///////////////////////////////////////////////////////////////////////////////
 
 Actor:
-	imports=Import*
+	(imports+=Import)*
 	'actor' name=ID ('[' ']')?
 		'(' (parameters += Parameter (',' parameters += Parameter)*)? ')'
 		(inputs += Port (',' inputs += Port)*)? '==>'
@@ -69,6 +69,7 @@ Inequality:
 	tags += Tag ('>' tags += Tag)+ ';';
 	
 Priority:
+	{Priority}
 	'priority'
 		(inequalities += Inequality)*
 	'end';
@@ -90,19 +91,30 @@ Transition:
 ///////////////////////////////////////////////////////////////////////////////
 
 Action:
+	{Action}
 	(tag=Tag ':')?
 	'action'
 	(inputs += InputPattern (',' inputs += InputPattern)*)?
 	'==>'
 	(outputs += OutputPattern (',' outputs += OutputPattern)*)?
-	('guard' guards += Expression (',' guards += Expression)*)?
-	('var'
-		variables += ValuedVariableDeclaration
-		(',' variables += ValuedVariableDeclaration)*)?
-	('do' (statements+=Statement)*)?
-	'end';
+
+	(
+		'end'
+	|	'guard' guards += Expression (',' guards += Expression)*
+		(	('var'
+				variables += ValuedVariableDeclaration
+				(',' variables += ValuedVariableDeclaration)*
+			('end' | 'do' (statements+=Statement)* 'end'))
+		|	('end' | 'do' (statements+=Statement)* 'end'))
+	|	'var'
+			variables += ValuedVariableDeclaration
+			(',' variables += ValuedVariableDeclaration)*
+		('end' | 'do' (statements+=Statement)* 'end')
+	|	'do' (statements+=Statement)* 'end'
+	);
 
 Initialize returns Action:
+	{Action}
 	(tag=Tag ':')?
 	'initialize'
 	'==>'
