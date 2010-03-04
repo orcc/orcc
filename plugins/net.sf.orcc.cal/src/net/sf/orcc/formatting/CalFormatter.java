@@ -6,6 +6,8 @@ package net.sf.orcc.formatting;
 import net.sf.orcc.services.CalGrammarAccess;
 import net.sf.orcc.services.CalGrammarAccess.ActionElements;
 import net.sf.orcc.services.CalGrammarAccess.ActorElements;
+import net.sf.orcc.services.CalGrammarAccess.FunctionElements;
+import net.sf.orcc.services.CalGrammarAccess.IfExpressionElements;
 import net.sf.orcc.services.CalGrammarAccess.IntTypeElements;
 import net.sf.orcc.services.CalGrammarAccess.PriorityElements;
 import net.sf.orcc.services.CalGrammarAccess.ScheduleElements;
@@ -215,6 +217,8 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		configureStateVariable(c);
 
+		configureFunction(c);
+
 		configureAction(c);
 
 		configureStatements(c);
@@ -226,13 +230,24 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		// Types
 		configureIntType(c);
 		configureUintType(c);
+
+		configureIfExpression(c);
 	}
 
-	private void configureStateVariable(FormattingConfig c) {
-		StateVariableElements access = f.getStateVariableAccess();
+	private void configureFunction(FormattingConfig c) {
+		FunctionElements access = f.getFunctionAccess();
 
-		c.setNoSpace().before(access.getSemicolonKeyword_1());
-		c.setLinewrap(2).after(access.getSemicolonKeyword_1());
+		c.setLinewrap(2).after(access.getEndKeyword_10());
+	}
+
+	private void configureIfExpression(FormattingConfig c) {
+		IfExpressionElements access = f.getIfExpressionAccess();
+		c.setIndentation(access.getThenKeyword_2(), access.getElseKeyword_4());
+		c.setLinewrap().after(access.getThenKeyword_2());
+		c.setIndentation(access.getElseKeyword_4(), access.getEndKeyword_6());
+		c.setLinewrap().before(access.getElseKeyword_4());
+		c.setLinewrap().after(access.getElseKeyword_4());
+		c.setLinewrap().before(access.getEndKeyword_6());
 	}
 
 	private void configureIntType(FormattingConfig c) {
@@ -298,6 +313,13 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureStatements(FormattingConfig c) {
 		c.setLinewrap().after(f.getAssignAccess().getSemicolonKeyword_4());
 		c.setNoSpace().before(f.getAssignAccess().getSemicolonKeyword_4());
+	}
+
+	private void configureStateVariable(FormattingConfig c) {
+		StateVariableElements access = f.getStateVariableAccess();
+
+		c.setNoSpace().before(access.getSemicolonKeyword_1());
+		c.setLinewrap(2).after(access.getSemicolonKeyword_1());
 	}
 
 	private void configureUintType(FormattingConfig c) {
