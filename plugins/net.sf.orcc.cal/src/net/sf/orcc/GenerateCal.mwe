@@ -43,7 +43,8 @@
 			
             
 			<!-- scoping API -->
-			<fragment class="org.eclipse.xtext.generator.scoping.JavaScopingFragment"/>
+			<fragment class="org.eclipse.xtext.generator.scoping.ImportNamespacesScopingFragment"/>
+			<fragment class="org.eclipse.xtext.generator.exporting.QualifiedNamesFragment"/>
 			
 			<!-- formatter API -->
 			<fragment class="org.eclipse.xtext.generator.formatting.FormatterFragment"/>

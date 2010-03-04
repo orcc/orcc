@@ -10,7 +10,6 @@ import net.sf.orcc.cal.Actor;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.text.Region;
 import org.eclipse.xtext.ui.common.editor.outline.ContentOutlineNode;
 import org.eclipse.xtext.ui.common.editor.outline.transformer.AbstractDeclarativeSemanticModelTransformer;
 
@@ -35,14 +34,14 @@ public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer 
 
 	private void createNode(ContentOutlineNode parent, String name,
 			EList<?> objects) {
-		ContentOutlineNode node = super.newOutlineNode(parent, name, null,
-				new Region(0, 0));
-		for (Object obj : objects) {
-			createNode((EObject) obj, node);
-		}
-		
-		node.setSelectionOffset(parent.getSelectionOffset());
-		node.setSelectionLength(parent.getSelectionLength());
+//		ContentOutlineNode node = super.newOutlineNode(parent, name, null,
+//				new Region(0, 0));
+//		for (Object obj : objects) {
+//			createNode((EObject) obj, node);
+//		}
+//		
+//		node.setSelectionOffset(parent.getSelectionOffset());
+//		node.setSelectionLength(parent.getSelectionLength());
 	}
 
 	public List<EObject> getChildren(Action action) {
