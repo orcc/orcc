@@ -68,7 +68,7 @@ actor Algo_IntraPred_Split (int PREDTYPE_SIZE)
 				uint (size=8) MbTypeC : 
  
   //FIXME! number of MB per line of picture
-  int PICWIDTH=1280/16; //number of MB per lines
+  int PICWIDTH=720/16; //number of MB per lines
 
   uint( size=2 ) mb_intra_type  := 0; // Intra4x4 1, Intra8x8 2, Intra16x16 3
   uint( size=3 ) mb_intra_flag; 

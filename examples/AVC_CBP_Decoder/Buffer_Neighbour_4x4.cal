@@ -26,7 +26,7 @@ uint(size=SAMPLE_SZ) EDGE
 :
 
   	//FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =45;
+  	uint(size=7) PICWIDTH =720/16;
 
   	//Flag	
   	uint (size = 1) ReadFlag := 0;

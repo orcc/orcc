@@ -278,6 +278,8 @@ $endif$
 $if(actor.initializes)$
 		boolean res = false;
 		int i = 0;
+		if (res){
+		}
 
 		$schedulingTest(actor.initializes)$
 $endif$

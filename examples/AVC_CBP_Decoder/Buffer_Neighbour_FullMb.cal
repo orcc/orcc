@@ -28,7 +28,7 @@ actor Buffer_Neighbour_FullMB ( int SAMPLE_SZ, int MB_WIDTH )
 		uint(size=SAMPLE_SZ) EDGE 
 		:
   	//FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =45;
+  	uint(size=7) PICWIDTH =720/16;
   	
   	// Index of the macroblock in the current line
   	uint(size=13) mb_Index := 0;
