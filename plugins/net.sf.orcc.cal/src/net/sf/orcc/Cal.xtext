@@ -69,7 +69,6 @@ Inequality:
 	tags += Tag ('>' tags += Tag)+ ';';
 	
 Priority:
-	{Priority}
 	'priority'
 		(inequalities += Inequality)*
 	'end';
@@ -91,7 +90,6 @@ Transition:
 ///////////////////////////////////////////////////////////////////////////////
 
 Action:
-	{Action}
 	(tag=Tag ':')?
 	'action'
 	(inputs += InputPattern (',' inputs += InputPattern)*)?
@@ -106,7 +104,6 @@ Action:
 	'end';
 
 Initialize returns Action:
-	{Action}
 	(tag=Tag ':')?
 	'initialize'
 	'==>'

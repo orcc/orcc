@@ -34,46 +34,46 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureAction(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
-		c.setLinewrap().before(access.getTagAssignment_1_0());
-		c.setNoSpace().before(access.getColonKeyword_1_1());
+		c.setLinewrap().before(access.getTagAssignment_0_0());
+		c.setNoSpace().before(access.getColonKeyword_0_1());
 
 		configureActionInputs(c);
 		configureActionOutputs(c);
 
 		// action indents
-		c.setIndentation(access.getActionKeyword_2(), null);
+		c.setIndentation(access.getActionKeyword_1(), null);
 
 		// "guard" unindents
-		c.setIndentation(null, access.getGuardKeyword_6_0());
+		c.setIndentation(null, access.getGuardKeyword_5_0());
 
 		// "guard" indents, configure comma rules
-		keywordAndCommas(c, access.getGuardKeyword_6_0(), access
-				.getCommaKeyword_6_2_0());
+		keywordAndCommas(c, access.getGuardKeyword_5_0(), access
+				.getCommaKeyword_5_2_0());
 
 		// "var" unindents
-		c.setIndentation(null, access.getVarKeyword_7_0());
+		c.setIndentation(null, access.getVarKeyword_6_0());
 
 		// "var" indents, configure comma rules
-		keywordAndCommas(c, access.getVarKeyword_7_0(), access
-				.getCommaKeyword_7_2_0());
+		keywordAndCommas(c, access.getVarKeyword_6_0(), access
+				.getCommaKeyword_6_2_0());
 
 		// "do" unindents and indents
-		c.setIndentation(access.getDoKeyword_8_0(), access.getDoKeyword_8_0());
-		
+		c.setIndentation(access.getDoKeyword_7_0(), access.getDoKeyword_7_0());
+
 		// "end" unindents
-		c.setIndentation(null, access.getEndKeyword_9());
+		c.setIndentation(null, access.getEndKeyword_8());
 
-		c.setLinewrap().before(access.getDoKeyword_8_0());
-		c.setLinewrap().after(access.getDoKeyword_8_0());
+		c.setLinewrap().before(access.getDoKeyword_7_0());
+		c.setLinewrap().after(access.getDoKeyword_7_0());
 
-		c.setLinewrap().before(access.getEndKeyword_9());
-		c.setLinewrap(2).after(access.getEndKeyword_9());
+		c.setLinewrap().before(access.getEndKeyword_8());
+		c.setLinewrap(2).after(access.getEndKeyword_8());
 	}
 
 	private void configureActionInputs(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
-		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
+		c.setNoSpace().before(access.getCommaKeyword_2_1_0());
 		c.setNoSpace().before(f.getInputPatternAccess().getColonKeyword_0_1());
 		c.setNoSpace().before(f.getInputPatternAccess().getCommaKeyword_3_0());
 		c.setNoSpace().before(
@@ -83,7 +83,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureActionOutputs(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
-		c.setNoSpace().before(access.getCommaKeyword_5_1_0());
+		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
 		c.setNoSpace().before(f.getOutputPatternAccess().getColonKeyword_0_1());
 		c.setNoSpace().before(f.getOutputPatternAccess().getCommaKeyword_3_0());
 		c.setNoSpace().before(
@@ -192,10 +192,10 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configurePriorities(FormattingConfig c) {
 		PriorityElements access = f.getPriorityAccess();
 
-		c.setIndentation(access.getPriorityKeyword_1(), access
-				.getEndKeyword_3());
-		c.setLinewrap().after(access.getPriorityKeyword_1());
-		c.setLinewrap(2).after(access.getEndKeyword_3());
+		c.setIndentation(access.getPriorityKeyword_0(), access
+				.getEndKeyword_2());
+		c.setLinewrap().after(access.getPriorityKeyword_0());
+		c.setLinewrap(2).after(access.getEndKeyword_2());
 
 		c.setNoSpace().before(f.getInequalityAccess().getSemicolonKeyword_2());
 		c.setLinewrap().after(f.getInequalityAccess().getSemicolonKeyword_2());
