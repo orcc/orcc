@@ -21,6 +21,7 @@ import net.sf.orcc.services.CalGrammarAccess.ListExpressionElements;
 import net.sf.orcc.services.CalGrammarAccess.ListTypeElements;
 import net.sf.orcc.services.CalGrammarAccess.PostfixExpressionElements;
 import net.sf.orcc.services.CalGrammarAccess.PriorityElements;
+import net.sf.orcc.services.CalGrammarAccess.ProcedureElements;
 import net.sf.orcc.services.CalGrammarAccess.ScheduleElements;
 import net.sf.orcc.services.CalGrammarAccess.StateVariableElements;
 import net.sf.orcc.services.CalGrammarAccess.UintTypeElements;
@@ -43,6 +44,21 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 	private CalGrammarAccess f;
 
+	private void body(FormattingConfig c, Keyword kwdDo, Keyword kwdEnd) {
+		// "do" unindents and indents
+		c.setIndentation(kwdDo, kwdDo);
+
+		// "end" unindents
+		c.setIndentation(null, kwdEnd);
+
+		// add some spaces around do and end
+		c.setLinewrap().before(kwdDo);
+		c.setLinewrap().after(kwdDo);
+
+		c.setLinewrap().before(kwdEnd);
+		c.setLinewrap(2).after(kwdEnd);
+	}
+
 	/**
 	 * Configure action.
 	 * 
@@ -61,34 +77,17 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		// "action" indents
 		c.setIndentation(access.getActionKeyword_1(), null);
 
-		// "guard" unindents
-		c.setIndentation(null, access.getGuardKeyword_5_0());
-
-		// "guard" indents, configure comma rules
+		// "guard" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getGuardKeyword_5_0(), access
 				.getCommaKeyword_5_2_0());
 
-		// "var" unindents
-		c.setIndentation(null, access.getVarKeyword_6_0());
-
-		// "var" indents, configure comma rules
+		// "var" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getVarKeyword_6_0(), access
 				.getCommaKeyword_6_2_0());
 
-		// "do" unindents and indents
-		c.setIndentation(access.getDoKeyword_7_0(), access.getDoKeyword_7_0());
-
-		// "end" unindents
-		c.setIndentation(null, access.getEndKeyword_8());
-
-		// add some spaces around do and end
-		c.setLinewrap().before(access.getDoKeyword_7_0());
-		c.setLinewrap().after(access.getDoKeyword_7_0());
-
-		c.setLinewrap().before(access.getEndKeyword_8());
-		c.setLinewrap(2).after(access.getEndKeyword_8());
+		body(c, access.getDoKeyword_7_0(), access.getEndKeyword_8());
 	}
-	
+
 	/**
 	 * Configure action input pattern.
 	 * 
@@ -148,7 +147,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		c.setNoSpace().around(access.getLeftParenthesisKeyword_1());
 		c.setNoSpace().before(access.getCommaKeyword_2_1_0());
-		c.setNoSpace().around(access.getRightParenthesisKeyword_3());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_3());
 	}
 
 	/**
@@ -274,6 +273,23 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureFunction(FormattingConfig c) {
 		FunctionElements access = f.getFunctionAccess();
 
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_2());
+		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_4());
+
+		// "procedure" indents
+		c.setIndentation(access.getFunctionKeyword_0(), null);
+
+		// "var" unindents and indents, configure comma rules
+		keywordAndCommas(c, access.getVarKeyword_7_0(), access
+				.getCommaKeyword_7_2_0());
+
+		c.setLinewrap().after(access.getColonKeyword_8());
+
+		// "end" unindents
+		c.setIndentation(null, access.getEndKeyword_10());
+
+		c.setLinewrap().before(access.getEndKeyword_10());
 		c.setLinewrap(2).after(access.getEndKeyword_10());
 	}
 
@@ -295,32 +311,15 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		// "initialize" indents
 		c.setIndentation(access.getInitializeKeyword_1(), null);
 
-		// "guard" unindents
-		c.setIndentation(null, access.getGuardKeyword_4_0());
-
-		// "guard" indents, configure comma rules
+		// "guard" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getGuardKeyword_4_0(), access
 				.getCommaKeyword_4_2_0());
 
-		// "var" unindents
-		c.setIndentation(null, access.getVarKeyword_5_0());
-
-		// "var" indents, configure comma rules
+		// "var" unindents and indents, configure comma rules
 		keywordAndCommas(c, access.getVarKeyword_5_0(), access
 				.getCommaKeyword_5_2_0());
 
-		// "do" unindents and indents
-		c.setIndentation(access.getDoKeyword_6_0(), access.getDoKeyword_6_0());
-
-		// "end" unindents
-		c.setIndentation(null, access.getEndKeyword_7());
-
-		// add some spaces around do and end
-		c.setLinewrap().before(access.getDoKeyword_6_0());
-		c.setLinewrap().after(access.getDoKeyword_6_0());
-
-		c.setLinewrap().before(access.getEndKeyword_7());
-		c.setLinewrap(2).after(access.getEndKeyword_7());
+		body(c, access.getDoKeyword_6_0(), access.getEndKeyword_7());
 	}
 
 	private void configureParameters(FormattingConfig c) {
@@ -364,9 +363,21 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	 *            formatting config
 	 */
 	private void configureProcedure(FormattingConfig c) {
-		FunctionElements access = f.getFunctionAccess();
+		ProcedureElements access = f.getProcedureAccess();
 
-		c.setLinewrap(2).after(access.getEndKeyword_10());
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_2());
+		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_4());
+		c.setLinewrap().after(access.getRightParenthesisKeyword_4());
+
+		// "procedure" indents
+		c.setIndentation(access.getProcedureKeyword_0(), null);
+
+		// "var" unindents and indents, configure comma rules
+		keywordAndCommas(c, access.getVarKeyword_5_0(), access
+				.getCommaKeyword_5_2_0());
+
+		body(c, access.getBeginKeyword_6(), access.getEndKeyword_8());
 	}
 
 	private void configureSchedule(FormattingConfig c) {
@@ -542,7 +553,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void keywordAndCommas(FormattingConfig c, Keyword keyword,
 			Keyword comma) {
 		// keyword indents
-		c.setIndentation(keyword, null);
+		c.setIndentation(keyword, keyword);
 
 		// newline before and after keyword
 		c.setLinewrap().before(keyword);
