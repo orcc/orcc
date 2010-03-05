@@ -1,5 +1,5 @@
 <workflow>
-	<property file="net/sf/orcc/GenerateCal.properties"/>
+	<property file="net/sf/orcc/Cal.properties"/>
 	
 	<property name="runtimeProject" value="../${projectName}"/>
 	

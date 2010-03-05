@@ -6,13 +6,25 @@ package net.sf.orcc.formatting;
 import net.sf.orcc.services.CalGrammarAccess;
 import net.sf.orcc.services.CalGrammarAccess.ActionElements;
 import net.sf.orcc.services.CalGrammarAccess.ActorElements;
+import net.sf.orcc.services.CalGrammarAccess.AssignElements;
+import net.sf.orcc.services.CalGrammarAccess.CallExpressionElements;
+import net.sf.orcc.services.CalGrammarAccess.CallStatementElements;
+import net.sf.orcc.services.CalGrammarAccess.ForeachStatementElements;
 import net.sf.orcc.services.CalGrammarAccess.FunctionElements;
+import net.sf.orcc.services.CalGrammarAccess.GeneratorElements;
 import net.sf.orcc.services.CalGrammarAccess.IfExpressionElements;
+import net.sf.orcc.services.CalGrammarAccess.IfStatementElements;
+import net.sf.orcc.services.CalGrammarAccess.IndexExpressionElements;
+import net.sf.orcc.services.CalGrammarAccess.InitializeElements;
 import net.sf.orcc.services.CalGrammarAccess.IntTypeElements;
+import net.sf.orcc.services.CalGrammarAccess.ListExpressionElements;
+import net.sf.orcc.services.CalGrammarAccess.ListTypeElements;
+import net.sf.orcc.services.CalGrammarAccess.PostfixExpressionElements;
 import net.sf.orcc.services.CalGrammarAccess.PriorityElements;
 import net.sf.orcc.services.CalGrammarAccess.ScheduleElements;
 import net.sf.orcc.services.CalGrammarAccess.StateVariableElements;
 import net.sf.orcc.services.CalGrammarAccess.UintTypeElements;
+import net.sf.orcc.services.CalGrammarAccess.WhileStatementElements;
 
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter;
@@ -31,6 +43,12 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 	private CalGrammarAccess f;
 
+	/**
+	 * Configure action.
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
 	private void configureAction(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
@@ -40,7 +58,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		configureActionInputs(c);
 		configureActionOutputs(c);
 
-		// action indents
+		// "action" indents
 		c.setIndentation(access.getActionKeyword_1(), null);
 
 		// "guard" unindents
@@ -63,13 +81,20 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		// "end" unindents
 		c.setIndentation(null, access.getEndKeyword_8());
 
+		// add some spaces around do and end
 		c.setLinewrap().before(access.getDoKeyword_7_0());
 		c.setLinewrap().after(access.getDoKeyword_7_0());
 
 		c.setLinewrap().before(access.getEndKeyword_8());
 		c.setLinewrap(2).after(access.getEndKeyword_8());
 	}
-
+	
+	/**
+	 * Configure action input pattern.
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
 	private void configureActionInputs(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
@@ -80,6 +105,12 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 				f.getInputPatternAccess().getLeftSquareBracketKeyword_1());
 	}
 
+	/**
+	 * Configure action output pattern.
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
 	private void configureActionOutputs(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
@@ -90,6 +121,12 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 				f.getOutputPatternAccess().getLeftSquareBracketKeyword_1());
 	}
 
+	/**
+	 * Configure actor body
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
 	private void configureActorBody(FormattingConfig c) {
 		ActorElements access = f.getActorAccess();
 
@@ -98,6 +135,101 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		c.setLinewrap(2).before(access.getEndKeyword_14());
 		c.setLinewrap(2).after(access.getEndKeyword_14());
+	}
+
+	/**
+	 * Configure call expression
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureExpressionCall(FormattingConfig c) {
+		CallExpressionElements access = f.getCallExpressionAccess();
+
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_1());
+		c.setNoSpace().before(access.getCommaKeyword_2_1_0());
+		c.setNoSpace().around(access.getRightParenthesisKeyword_3());
+	}
+
+	/**
+	 * Configure if expression
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureExpressionIf(FormattingConfig c) {
+		IfExpressionElements access = f.getIfExpressionAccess();
+		c.setIndentation(access.getThenKeyword_2(), access.getElseKeyword_4());
+		c.setLinewrap().after(access.getThenKeyword_2());
+		c.setIndentation(access.getElseKeyword_4(), access.getEndKeyword_6());
+		c.setLinewrap().before(access.getElseKeyword_4());
+		c.setLinewrap().after(access.getElseKeyword_4());
+		c.setLinewrap().before(access.getEndKeyword_6());
+	}
+
+	/**
+	 * Configure index expression
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureExpressionIndex(FormattingConfig c) {
+		IndexExpressionElements access = f.getIndexExpressionAccess();
+
+		c.setNoSpace().around(access.getLeftSquareBracketKeyword_1_0());
+		c.setNoSpace().before(access.getRightSquareBracketKeyword_1_2());
+
+		c.setNoSpace().before(access.getCommaKeyword_1_1_1_0());
+	}
+
+	/**
+	 * Configure list expression
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureExpressionList(FormattingConfig c) {
+		GeneratorElements gaccess = f.getGeneratorAccess();
+
+		c.setNoSpace().around(gaccess.getLeftParenthesisKeyword_4());
+		c.setNoSpace().before(gaccess.getRightParenthesisKeyword_8());
+		c.setNoSpace().before(gaccess.getCommaKeyword_6());
+
+		ListExpressionElements eaccess = f.getListExpressionAccess();
+
+		c.setNoSpace().before(eaccess.getCommaKeyword_2_0());
+		c.setNoSpace().before(eaccess.getCommaKeyword_3_2_0());
+	}
+
+	/**
+	 * Configure postfix expression
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureExpressionPostfix(FormattingConfig c) {
+		PostfixExpressionElements access = f.getPostfixExpressionAccess();
+
+		c.setNoSpace().after(access.getLeftParenthesisKeyword_6_0());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_6_2());
+	}
+
+	/**
+	 * Configure expressions
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureExpressions(FormattingConfig c) {
+		configureExpressionCall(c);
+		configureExpressionList(c);
+		configureExpressionIf(c);
+		configureExpressionIndex(c);
+		configureExpressionPostfix(c);
+
+		c.setNoSpace().after(
+				f.getUnaryExpressionAccess()
+						.getUnaryOperatorHyphenMinusKeyword_0_1_0_0());
 	}
 
 	@Override
@@ -114,57 +246,81 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap().after(f.getImportAccess().getSemicolonKeyword_2());
 		c.setLinewrap(2).after(f.getActorAccess().getImportsAssignment_0());
 
+		configureAction(c);
+		configureActorBody(c);
+		configureFunction(c);
+		configureExpressions(c);
+		configureInitialize(c);
 		configureParameters(c);
 		configurePorts(c);
-		configureActorBody(c);
-
-		configureStateVariable(c);
-
-		configureFunction(c);
-
-		configureAction(c);
-
-		configureStatements(c);
-
-		configureSchedule(c);
-
 		configurePriorities(c);
+		configureProcedure(c);
+		configureSchedule(c);
+		configureStatements(c);
+		configureStateVariable(c);
+		configureTypeInt(c);
+		configureTypeList(c);
+		configureTypeUint(c);
 
-		// Types
-		configureIntType(c);
-		configureUintType(c);
-
-		configureIfExpression(c);
+		f = null;
 	}
 
+	/**
+	 * Configure function
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
 	private void configureFunction(FormattingConfig c) {
 		FunctionElements access = f.getFunctionAccess();
 
 		c.setLinewrap(2).after(access.getEndKeyword_10());
 	}
 
-	private void configureIfExpression(FormattingConfig c) {
-		IfExpressionElements access = f.getIfExpressionAccess();
-		c.setIndentation(access.getThenKeyword_2(), access.getElseKeyword_4());
-		c.setLinewrap().after(access.getThenKeyword_2());
-		c.setIndentation(access.getElseKeyword_4(), access.getEndKeyword_6());
-		c.setLinewrap().before(access.getElseKeyword_4());
-		c.setLinewrap().after(access.getElseKeyword_4());
-		c.setLinewrap().before(access.getEndKeyword_6());
-	}
+	/**
+	 * Configure initialize.
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureInitialize(FormattingConfig c) {
+		InitializeElements access = f.getInitializeAccess();
 
-	private void configureIntType(FormattingConfig c) {
-		IntTypeElements access = f.getIntTypeAccess();
+		c.setLinewrap().before(access.getTagAssignment_0_0());
+		c.setNoSpace().before(access.getColonKeyword_0_1());
 
-		c.setNoSpace().before(access.getLeftParenthesisKeyword_1_0());
-		c.setNoSpace().after(access.getLeftParenthesisKeyword_1_0());
-		c.setNoSpace().after(access.getSizeKeyword_1_1());
-		c.setNoSpace().after(access.getEqualsSignKeyword_1_2());
-		c.setNoSpace().before(access.getRightParenthesisKeyword_1_4());
+		// output pattern
+		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
 
-		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1_0());
-		c.setNoLinewrap().around(access.getEqualsSignKeyword_1_2());
-		c.setNoLinewrap().around(access.getRightParenthesisKeyword_1_4());
+		// "initialize" indents
+		c.setIndentation(access.getInitializeKeyword_1(), null);
+
+		// "guard" unindents
+		c.setIndentation(null, access.getGuardKeyword_4_0());
+
+		// "guard" indents, configure comma rules
+		keywordAndCommas(c, access.getGuardKeyword_4_0(), access
+				.getCommaKeyword_4_2_0());
+
+		// "var" unindents
+		c.setIndentation(null, access.getVarKeyword_5_0());
+
+		// "var" indents, configure comma rules
+		keywordAndCommas(c, access.getVarKeyword_5_0(), access
+				.getCommaKeyword_5_2_0());
+
+		// "do" unindents and indents
+		c.setIndentation(access.getDoKeyword_6_0(), access.getDoKeyword_6_0());
+
+		// "end" unindents
+		c.setIndentation(null, access.getEndKeyword_7());
+
+		// add some spaces around do and end
+		c.setLinewrap().before(access.getDoKeyword_6_0());
+		c.setLinewrap().after(access.getDoKeyword_6_0());
+
+		c.setLinewrap().before(access.getEndKeyword_7());
+		c.setLinewrap(2).after(access.getEndKeyword_7());
 	}
 
 	private void configureParameters(FormattingConfig c) {
@@ -201,6 +357,18 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap().after(f.getInequalityAccess().getSemicolonKeyword_2());
 	}
 
+	/**
+	 * Configure procedure
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureProcedure(FormattingConfig c) {
+		FunctionElements access = f.getFunctionAccess();
+
+		c.setLinewrap(2).after(access.getEndKeyword_10());
+	}
+
 	private void configureSchedule(FormattingConfig c) {
 		ScheduleElements access = f.getScheduleAccess();
 
@@ -213,9 +381,100 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap().after(f.getTransitionAccess().getSemicolonKeyword_6());
 	}
 
+	/**
+	 * Configure assign statement
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureStatementAssign(FormattingConfig c) {
+		AssignElements access = f.getAssignAccess();
+
+		c.setNoSpace().around(access.getLeftSquareBracketKeyword_1_0());
+		c.setNoSpace().before(access.getRightSquareBracketKeyword_1_2());
+
+		c.setNoSpace().before(access.getCommaKeyword_1_1_1_0());
+
+		c.setLinewrap().after(access.getSemicolonKeyword_4());
+		c.setNoSpace().before(access.getSemicolonKeyword_4());
+	}
+
+	/**
+	 * Configure call statement
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureStatementCall(FormattingConfig c) {
+		CallStatementElements access = f.getCallStatementAccess();
+
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_1());
+		c.setNoSpace().around(access.getRightParenthesisKeyword_3());
+
+		c.setNoSpace().before(access.getCommaKeyword_2_1_0());
+
+		c.setLinewrap().after(access.getSemicolonKeyword_4());
+	}
+
+	/**
+	 * Configure foreach statement
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureStatementForeach(FormattingConfig c) {
+		ForeachStatementElements access = f.getForeachStatementAccess();
+
+		c.setIndentation(access.getDoKeyword_9(), access.getEndKeyword_11());
+
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_4());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_8());
+		c.setNoSpace().before(access.getCommaKeyword_6());
+
+		c.setLinewrap().after(access.getDoKeyword_9());
+		c.setLinewrap().after(access.getEndKeyword_11());
+	}
+
+	/**
+	 * Configure if statement
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureStatementIf(FormattingConfig c) {
+		IfStatementElements access = f.getIfStatementAccess();
+
+		c.setIndentation(access.getThenKeyword_2(), null);
+		c.setIndentation(access.getElseKeyword_4_0(), access
+				.getElseKeyword_4_0());
+		c.setIndentation(null, access.getEndKeyword_5());
+
+		c.setLinewrap().after(access.getThenKeyword_2());
+		c.setLinewrap().after(access.getElseKeyword_4_0());
+		c.setLinewrap().after(access.getEndKeyword_5());
+	}
+
 	private void configureStatements(FormattingConfig c) {
-		c.setLinewrap().after(f.getAssignAccess().getSemicolonKeyword_4());
-		c.setNoSpace().before(f.getAssignAccess().getSemicolonKeyword_4());
+		configureStatementAssign(c);
+		configureStatementCall(c);
+		configureStatementForeach(c);
+		configureStatementIf(c);
+		configureStatementWhile(c);
+	}
+
+	/**
+	 * Configure while statement
+	 * 
+	 * @param c
+	 *            formatting config
+	 */
+	private void configureStatementWhile(FormattingConfig c) {
+		WhileStatementElements access = f.getWhileStatementAccess();
+
+		c.setIndentation(access.getDoKeyword_2(), access.getEndKeyword_4());
+
+		c.setLinewrap().after(access.getDoKeyword_2());
+		c.setLinewrap().after(access.getEndKeyword_4());
 	}
 
 	private void configureStateVariable(FormattingConfig c) {
@@ -225,7 +484,37 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setLinewrap(2).after(access.getSemicolonKeyword_1());
 	}
 
-	private void configureUintType(FormattingConfig c) {
+	private void configureTypeInt(FormattingConfig c) {
+		IntTypeElements access = f.getIntTypeAccess();
+
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_1_0());
+		c.setNoSpace().after(access.getSizeKeyword_1_1());
+		c.setNoSpace().after(access.getEqualsSignKeyword_1_2());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_1_4());
+
+		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1_0());
+		c.setNoLinewrap().around(access.getEqualsSignKeyword_1_2());
+		c.setNoLinewrap().around(access.getRightParenthesisKeyword_1_4());
+	}
+
+	private void configureTypeList(FormattingConfig c) {
+		ListTypeElements access = f.getListTypeAccess();
+
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_1());
+		c.setNoSpace().after(access.getTypeKeyword_2());
+		c.setNoSpace().before(access.getCommaKeyword_5());
+		c.setNoSpace().after(access.getSizeKeyword_6());
+		c.setNoSpace().after(access.getEqualsSignKeyword_7());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_9());
+
+		c.setNoLinewrap().around(access.getLeftParenthesisKeyword_1());
+		c.setNoLinewrap().around(access.getColonKeyword_3());
+		c.setNoLinewrap().around(access.getCommaKeyword_5());
+		c.setNoLinewrap().around(access.getEqualsSignKeyword_7());
+		c.setNoLinewrap().around(access.getRightParenthesisKeyword_9());
+	}
+
+	private void configureTypeUint(FormattingConfig c) {
 		UintTypeElements access = f.getUintTypeAccess();
 
 		c.setNoSpace().before(access.getLeftParenthesisKeyword_1_0());

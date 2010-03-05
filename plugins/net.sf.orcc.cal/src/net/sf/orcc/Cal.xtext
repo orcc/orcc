@@ -133,7 +133,7 @@ Assign:
 	':=' value=Expression ';';
 
 CallStatement:
-	procedure=ID
+	procedure=[Procedure]
 	'(' (parameters += Expression (',' parameters += Expression)*)? ')' ';';
 
 ForeachStatement:
@@ -196,7 +196,7 @@ PostfixExpression returns Expression:
     | '(' Expression ')';
 
 CallExpression:
-	procedure=ID '(' (parameters += Expression (',' parameters += Expression)*)? ')';
+	function=[Function] '(' (parameters += Expression (',' parameters += Expression)*)? ')';
 
 IndexExpression:
 	source=VariableReference
