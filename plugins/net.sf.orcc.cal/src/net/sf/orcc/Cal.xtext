@@ -98,20 +98,12 @@ Action:
 	'==>'
 	(outputs += OutputPattern (',' outputs += OutputPattern)*)?
 
-	(
-		'end'
-	|	'guard' guards += Expression (',' guards += Expression)*
-		(	('var'
-				variables += ValuedVariableDeclaration
-				(',' variables += ValuedVariableDeclaration)*
-			('end' | 'do' (statements+=Statement)* 'end'))
-		|	('end' | 'do' (statements+=Statement)* 'end'))
-	|	'var'
-			variables += ValuedVariableDeclaration
-			(',' variables += ValuedVariableDeclaration)*
-		('end' | 'do' (statements+=Statement)* 'end')
-	|	'do' (statements+=Statement)* 'end'
-	);
+	('guard' guards += Expression (',' guards += Expression)*)?
+	('var'
+		variables += ValuedVariableDeclaration
+		(',' variables += ValuedVariableDeclaration)*)?
+	('do' (statements+=Statement)*)?
+	'end';
 
 Initialize returns Action:
 	{Action}

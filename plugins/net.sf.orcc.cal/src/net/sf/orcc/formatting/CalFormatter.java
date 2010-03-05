@@ -31,47 +31,6 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 	private CalGrammarAccess f;
 
-	/**
-	 * <pre>
-	 * do
-	 *   xxx
-	 * end
-	 * 
-	 * </pre>
-	 * 
-	 * @param c
-	 * @param kwdDo
-	 * @param end
-	 */
-	private void body(FormattingConfig c, Keyword kwdDo, Keyword end) {
-		// "do" indents until "end"
-		c.setIndentation(kwdDo, end);
-
-		// new line before and after "do"
-		c.setLinewrap().before(kwdDo);
-		c.setLinewrap().after(kwdDo);
-
-		// 2 new lines after "end"
-		c.setLinewrap(2).after(end);
-	}
-
-	/**
-	 * <pre>
-	 * end
-	 * </pre>
-	 * 
-	 * @param c
-	 * @param end
-	 */
-	private void bodyEmpty(FormattingConfig c, Keyword end) {
-		// "end" unindents
-		c.setIndentation(null, end);
-
-		// new line before and 2 new lines after "end"
-		c.setLinewrap().before(end);
-		c.setLinewrap(2).after(end);
-	}
-
 	private void configureAction(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
@@ -81,69 +40,34 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		configureActionInputs(c);
 		configureActionOutputs(c);
 
-		// empty action (no guards, no vars, no body)
-		c.setLinewrap().before(access.getEndKeyword_6_0());
-		c.setLinewrap(2).after(access.getEndKeyword_6_0());
+		// action indents
+		c.setIndentation(access.getActionKeyword_2(), null);
 
-		// action with guards (and possibly vars and body)
-		configureActionGuards(c);
+		// "guard" unindents
+		c.setIndentation(null, access.getGuardKeyword_6_0());
 
-		// action with vars (and possibly a body)
-		configureActionVars(c);
-
-		// action with only a body
-		body(c, access.getDoKeyword_6_3_0(), access.getEndKeyword_6_3_2());
-	}
-
-	/**
-	 * <pre>
-	 * guards
-	 *   xxx
-	 * ...
-	 * </pre>
-	 * 
-	 * @param c
-	 */
-	private void configureActionGuards(FormattingConfig c) {
-		ActionElements access = f.getActionAccess();
-
-		keywordAndCommas(c, access.getGuardKeyword_6_1_0(), access
-				.getCommaKeyword_6_1_2_0());
-
-		configureActionGuardsVars(c);
-
-		bodyEmpty(c, access.getEndKeyword_6_1_3_1_0());
-
-		c.setIndentation(null, access.getDoKeyword_6_1_3_1_1_0());
-		body(c, access.getDoKeyword_6_1_3_1_1_0(), access
-				.getEndKeyword_6_1_3_1_1_2());
-	}
-
-	/**
-	 * <pre>
-	 * guards
-	 *   xxx
-	 * var
-	 *   yyy
-	 * ...
-	 * </pre>
-	 * 
-	 * @param c
-	 */
-	private void configureActionGuardsVars(FormattingConfig c) {
-		ActionElements access = f.getActionAccess();
+		// "guard" indents, configure comma rules
+		keywordAndCommas(c, access.getGuardKeyword_6_0(), access
+				.getCommaKeyword_6_2_0());
 
 		// "var" unindents
-		c.setIndentation(null, access.getVarKeyword_6_1_3_0_0());
+		c.setIndentation(null, access.getVarKeyword_7_0());
 
-		keywordAndCommas(c, access.getVarKeyword_6_1_3_0_0(), access
-				.getCommaKeyword_6_1_3_0_2_0());
+		// "var" indents, configure comma rules
+		keywordAndCommas(c, access.getVarKeyword_7_0(), access
+				.getCommaKeyword_7_2_0());
 
-		bodyEmpty(c, access.getEndKeyword_6_1_3_0_3_0());
+		// "do" unindents and indents
+		c.setIndentation(access.getDoKeyword_8_0(), access.getDoKeyword_8_0());
+		
+		// "end" unindents
+		c.setIndentation(null, access.getEndKeyword_9());
 
-		c.setIndentation(null, access.getDoKeyword_6_1_3_0_3_1_0());
-		body(c, access.getDoKeyword_6_1_3_0_3_1_0(), access
-				.getEndKeyword_6_1_3_0_3_1_2());
+		c.setLinewrap().before(access.getDoKeyword_8_0());
+		c.setLinewrap().after(access.getDoKeyword_8_0());
+
+		c.setLinewrap().before(access.getEndKeyword_9());
+		c.setLinewrap(2).after(access.getEndKeyword_9());
 	}
 
 	private void configureActionInputs(FormattingConfig c) {
@@ -164,27 +88,6 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		c.setNoSpace().before(f.getOutputPatternAccess().getCommaKeyword_3_0());
 		c.setNoSpace().before(
 				f.getOutputPatternAccess().getLeftSquareBracketKeyword_1());
-	}
-
-	/**
-	 * <pre>
-	 * var
-	 *   xxx
-	 * ...
-	 * </pre>
-	 * 
-	 * @param c
-	 */
-	private void configureActionVars(FormattingConfig c) {
-		ActionElements access = f.getActionAccess();
-
-		keywordAndCommas(c, access.getVarKeyword_6_2_0(), access
-				.getCommaKeyword_6_2_2_0());
-		bodyEmpty(c, access.getEndKeyword_6_2_3_0());
-
-		c.setIndentation(null, access.getDoKeyword_6_2_3_1_0());
-		body(c, access.getDoKeyword_6_2_3_1_0(), access
-				.getEndKeyword_6_2_3_1_2());
 	}
 
 	private void configureActorBody(FormattingConfig c) {
