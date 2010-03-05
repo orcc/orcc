@@ -67,7 +67,7 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 	List( type:uint(size=1), size=MB_WIDTH) topRight_4x4_avail := [0 : for int i in Integers( 0, MB_WIDTH-1)];
 
   	//FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =45;
+  	uint(size=7) PICWIDTH =720/16;
 	List( type:bool, size=PICWIDTH) is_intra := [false : for int i in Integers( 0, PICWIDTH-1)];
 	uint(size=13) curr_pos:=0;
 	bool intra_top_left:=false;

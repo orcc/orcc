@@ -51,7 +51,7 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 	uint(size=1) topLeft_16x16_avail := 0;
 
   	//FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =45;
+  	uint(size=7) PICWIDTH =720/16;
 	List( type:bool, size=PICWIDTH) is_intra := [false : for int i in Integers( 0, PICWIDTH-1)];
 	uint(size=13) curr_pos:=0;
 	bool intra_top_left:=false;
