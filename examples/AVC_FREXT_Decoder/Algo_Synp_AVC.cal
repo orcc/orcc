@@ -112,7 +112,23 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	uint(size=7) coeff_token;
 	uint(size=4) total_zeros;
 	uint(size=4) run_before :=0;
-
+	
+	// ********** read CABAC ********* //
+	
+	//Cabac initialisation
+	bool Cabac_Start_Initialisation := false;
+	
+	//Cabac State variables
+	int preCtxState;
+	List ( type : int (size = 6), size = 640) pStateIdx;
+	List ( type : int (size = 1), size = 640) valMPS;
+	int ctxIdxInc := 0;
+	
+	//mb_skip_flag 
+	int ( size = 1 ) CondTermFlagA;
+	int ( size = 1 ) CondTermFlagB;
+	
+	// ******** End of CABAC variables declaration ******
 	/*************************************************************
 	*************************************************************
 	********              NAL Unit HEADER                ********
@@ -485,7 +501,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	********       		Context Index Lists - CABAC   	 *********
 	*************************************************************
 	*************************************************************/
-	List ( type: List (type: uint(size=2), size = 2) , size = 467 ) Cabac_Context_Init_I = 
+	List ( type: List (type: int(size=2), size = 2) , size = 467 ) Cabac_Context_Init_I = 
 	[
 		/* 0 - 10 */
 		[ 20, -15 ], [  2, 54 ],  [  3,  74 ], [ 20, -15 ],
@@ -661,7 +677,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[  -6,  67 ], [  -6,  67 ], [ -23, 104 ], [ -35, 106]
 	];	
 	
-	List ( type: List ( type: List (type: uint(size=2), size = 2) , size = 467), size = 3 ) Cabac_Context_Init_PB = 
+	List ( type: List ( type: List (type: int(size=2), size = 2) , size = 467), size = 3 ) Cabac_Context_Init_PB = 
 	
 	[
 		/* i_cabac_init_idc == 0 */
@@ -1147,7 +1163,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			//Be carefull, should be a ctxIdx == 1024 to 1029
 			/* 460 -> 466 */
 			[  0,   75 ], [   2,  65 ], [   2,  59],
-			[  -6,  67 ], [  -6,  67 ], [ -23, 104 ], [ -35, 106]
+			[  -6,  67 ], [  -6,  67 ], [ -23, 104 ], [ -35, 106 ]
 		]
 	];
 	
@@ -1391,7 +1407,49 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		bit_read_cnt:=bit_read_cnt + 1;
 	end
   
-
+	// ********** Read CABAC ********** //
+	
+	function Clip3( int Min, int Max, int Val  ) --> int :  if (Val < Min) then Min else if (Val > Max) then Max else Val end end end
+	
+	procedure preCtxState_pro(int QPy, int m, int n)
+	begin
+		preCtxState := Clip3( 1, 126, ( ( m * Clip3( 0, 51, QPy ) ) >> 4 ) + n );
+	end
+	//Cabac intialisation
+	
+	action ==>
+	guard
+		(Cabac_Start_Initialisation = true) and ( entropy_coding_mode_flag[pps_id] = 1 )  
+	do
+		//look for preCtxState value
+		
+		//FIXME (value of m and n)
+		foreach int i in Integers(0, 459) do
+		
+			if (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI )then
+						preCtxState_pro(val_QP, Cabac_Context_Init_I[i][0], Cabac_Context_Init_I[i][1]);
+			else
+						preCtxState_pro(val_QP, Cabac_Context_Init_PB[cabac_init_idc][i][0], Cabac_Context_Init_PB[cabac_init_idc][i][1]);
+			end
+			
+			
+				
+			if ( preCtxState  <=  63 )  then
+				//FIX ME: (( 63 - pre ) << 1) + 0;
+				pStateIdx[i] := 63 - preCtxState;
+				valMPS[i] := 0 ;
+			else 
+				//FIX ME: (( pre - 64 ) << 1) + 1;
+				pStateIdx[i] := preCtxState - 64;
+				valMPS[i] := 1;
+			end
+		end
+		
+		//Wait For another Slice before CABAC initialisation
+		Cabac_Start_Initialisation := false;
+		
+	end
+	
 	/*************************************************************
 	*************************************************************
 	********              NAL Unit HEADER                ********
@@ -2927,6 +2985,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		entropy_coding_mode_flag[pps_id] = 1
 	do
 		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
+		Cabac_Start_Initialisation := true;
 	end
 
 	read_SliceD_skip_CABAC_alignement: action ==>
@@ -2979,7 +3038,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			prevMbSkipped := 0; 
 		end
-		end
+	end
 
 	read_SliceD_mb_skip_run_done1: action 
 		==> 
@@ -3040,7 +3099,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		// mb_skip_flag   ae(v)
 		// moreDataFlag = !mb_skip_flag
 	end
-
+	
+	//TODO for cabac
+	/*
+	read_SliceD_mb_skip_flag_done: action ==>
+	guard
+		MbaffFrameFlag = 1
+	end
+	*/
 	//else (slice_type = I || slice_type = SI)
 	read_SliceD_skip_mb_skip: action ==>
 	guard
