@@ -124,6 +124,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	List ( type : int (size = 1), size = 640) valMPS;
 	int ctxIdxInc := 0;
 	
+	//Cabac intialisation process for the arithmetic decoding engine
+	bool Cabac_Arithmetic_Decoding_Engine_Start := false;
+	
+	int ( size = 16 ) codIRange;
+	int ( size = 16 ) codIOffset;
+
+	
 	//mb_skip_flag 
 	int ( size = 1 ) CondTermFlagA;
 	int ( size = 1 ) CondTermFlagB;
@@ -1449,7 +1456,31 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Cabac_Start_Initialisation := false;
 		
 	end
+	//FIXME : set Cabac_Arithmetic_Decoding_Engine_Start := true before reading a slice
+	//CABAC : Intialisation process for the arithmetic decoding engine
+	action ==>
+	guard
+		 entropy_coding_mode_flag[pps_id] = 1 and 
+		 Cabac_Arithmetic_Decoding_Engine_Start  
+	do
+		codIRange  := 0x01FE;
+		set_bits_to_read(9);
+		
+		
+		//Stop Initialisation process for the arithmetic decoding engine
+		Cabac_Arithmetic_Decoding_Engine_Start := false;
+	end
 	
+	//Read result for codIOffset
+	
+	action ==>
+	guard 
+		 entropy_coding_mode_flag[pps_id] = 1   and 
+		 Cabac_Arithmetic_Decoding_Engine_Start and
+		 done_reading_bits()
+	do
+		codIOffset := read_result();	
+	end
 	/*************************************************************
 	*************************************************************
 	********              NAL Unit HEADER                ********
@@ -1507,6 +1538,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		nal_unit_type = 5 or nal_unit_type = 1
 	do
 		start_vld();
+		//Initialisation process for the arithmetic decoding engine
+		Cabac_Arithmetic_Decoding_Engine_Start := true; 
 	end
 
 	/*************************************************************
@@ -3291,6 +3324,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		IS_I_PCM()
 	do
 		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
+		//Initialisation process for the arithmetic decoding engine
+		Cabac_Arithmetic_Decoding_Engine_Start := true; 
 	end
 
 	//for( i = 0; i < 256; i++ )
@@ -3322,6 +3357,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		MB_inc = 256
 	do
 		start_pcm_chroma := true;
+		//Initialisation process for the arithmetic decoding engine
+		Cabac_Arithmetic_Decoding_Engine_Start := true;
 	end
 	
 	// for( i = 0; i < 2 * MbWidthC * MbHeightC; i++ )
@@ -3354,6 +3391,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	read_MB_layer_pcm_sample_done: action  ==> 
 	guard
 		MB_inc = 2*64
+	do
+		//Initialisation process for the arithmetic decoding engine
+		Cabac_Arithmetic_Decoding_Engine_Start := true;
 	end
 
 	//} else {
