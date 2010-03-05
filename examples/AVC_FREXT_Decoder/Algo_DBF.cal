@@ -1,0 +1,365 @@
+// AVC_algo_loopFilter_noMBAFF.cal
+//
+// Author: Paul Schumacher, Xilinx Research Labs 
+//         (Email: paul.schumacher@xilinx.com)
+//
+// Copyright (c) 2006-2007 Xilinx Inc.
+// All Rights Reserved
+//
+// Description:
+//   This design performs the in-loop deblocking filter for an AVC video 
+//   coder.  Tokens on the inputs and outputs of this block contain maps 
+//   (similar to structures) for easier interfacing.  One token on 'mbIn' is 
+//   assumed to contain the contents of a single macroblock (MB) including the 
+//   input YUV values as well as the MB parameters.  This design assumes raster 
+//   order of MBs (see below).  One token on 'imgParams' contains a map of 
+//   parameters for one frame or field.
+//
+//   The 'mbDataOut' and 'StrengthOut' outputs each produce one token per MB.
+//   One token on 'mbDataOut' is a map containing the (x,y) position (in MB
+//   coordinates) as well as arrays of YUV 4:2:0 output data.  'StrengthOut'
+//   should be used for debug only and produces a map of strength values and
+//   important parameters for debug purposes.
+//
+//   Note that the following modes are not supported by this revision of the 
+//   design:
+//     * MBAFF (Macroblock Adaptive Field/Frame mode)
+//     * only 4:2:0 format is supported
+//     * > 8-bit video
+
+// Revised:
+//  Author: Jia-Wei Liang, MSOC Lab, NCKU
+//  (E-mail: n2697181@mail.ncku.edu.tw)
+//  This loop filter has a bug and is fixed.
+//  The bug is that the loop filter does not perform deblocking on the right and
+//  bottom boundaries of a macroblock before outputting it out.
+//  The codes have been modified to output macroblocks at correct time.
+
+//  Algo_DBF.cal
+//  Description: The algorithm part of deblocking filter without mbaff
+
+
+actor Algo_DBF (int LUMA_CHROMA) uint(size=8)DB_I,uint(size=6)BS ==> uint(size=8)DB_O : //LUMA_CHROMA luma:=0, chroma:=1
+      
+///////////////
+// Constants //
+///////////////
+int SAMPLE_SZ = 8; 
+int MB_BLOCK_SIZE= LUMA_CHROMA;
+int FRAME        = 0;   // image structures
+int TOP_FIELD    = 1;
+int BOTTOM_FIELD = 2;
+int MAXVAL_LUMA  = 255;
+int MAXVAL_CHROMA = 255;  
+/////////////////////
+// State Variables //
+/////////////////////
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE) curr_mb:= [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1) ];
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE) up_mb  := [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1) ];
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE ), size=MB_BLOCK_SIZE) left_mb:= [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE-1)]: for int j in Integers( 0, MB_BLOCK_SIZE-1) ];
+
+//
+// Image parameters
+//
+uint(size=2) interlace := FRAME;     // frame or field
+uint(size=2) LFDisable := 0;         // option to disable filtering for image or across slices
+// Macroblock parameters
+List(type:uint(size=6), size=3) Alist := [ 0 : for int i in Integers(0, 3 - 1) ]; //curr,left,up
+List(type:uint(size=6), size=3) Blist := [ 0 : for int i in Integers(0, 3 - 1) ]; //curr,left,up 
+uint(size=1) StrengthNotZero := 0;
+uint(size=1) useLeft := 0;
+uint(size=1) useUp := 0;
+
+uint(size=3) mvlimit := 4;//frame
+uint(size=3) edge_curr := 0;
+int xQ := 0; 
+int yQ := 0;
+int xP := 0; 
+int yP := 0;
+List( type:uint(size=3), size=32 ) Strength := [ 0 : for int i in Integers(0, 32 - 1) ];
+int count:=0;
+////////////////
+// ROM Tables //
+////////////////
+// NOTE: In principle, the alpha and beta tables are calculated with the formulas below
+//       Alpha( qp ) := 0.8 * (2^(qp/6)  -  1)
+//       Beta ( qp ) := 0.5 * qp  -  7
+// The tables actually used have been "hand optimized" though (by Anthony Joch). So, the
+// table values might be a little different to formula-generated values. Also, the first
+// few values of both tables is set to zero to force the filter off at low QPs
+
+// ALPHA table (52 x 8-bit ROM)
+List( type:uint( size=9 ), size=52 ) ALPHA_TABLE = [
+  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  
+  0,  0,  0,  0,  0,  0,  4,  4,  5,  6,  
+  7,  8,  9, 10, 12, 13, 15, 17, 20, 22,
+ 25, 28, 32, 36, 40, 45, 50, 56, 63, 71,
+ 80, 90,101,113,127,144,162,182,203,226,
+255,255  ];
+
+List( type:uint( size=9 ), size=52 ) ALPHA_TABLE_DIV4_PLUS2 = [
+  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  
+  0,  0,  0,  0,  0,  0,  3,  3,  3,  3,  
+  3,  4,  4, 4, 5, 5, 5, 6, 7, 7,
+ 8, 9, 10, 11, 12, 13, 14, 16, 17, 19,
+ 22, 24,27,30,33,38,42,47,52,58,
+65,65  ];
+
+// BETA table (52 x 5-bit ROM)
+List( type:uint( size=6 ), size=52 ) BETA_TABLE = [
+  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+  0,  0,  0,  0,  0,  0,  2,  2,  2,  3,  
+  3,  3,  3,  4,  4,  4,  6,  6,  7,  7, 
+  8,  8,  9,  9, 10, 10, 11, 11, 12, 12,
+ 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 
+ 18, 18  ];
+// CLIP table (260 x 5-bit ROM)
+List( type:uint( size=6 ), size=52*5 ) CLIP_TABLE = [
+    0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  
+    0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,
+    0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  
+    0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,  0, 0, 0, 0, 0 ,
+    0, 0, 0, 0, 0 ,  0, 0, 0, 1, 1 ,  0, 0, 0, 1, 1 ,  0, 0, 0, 1, 1 ,  
+    0, 0, 0, 1, 1 ,  0, 0, 1, 1, 1 ,  0, 0, 1, 1, 1 ,  0, 1, 1, 1, 1 ,
+    0, 1, 1, 1, 1 ,  0, 1, 1, 1, 1 ,  0, 1, 1, 1, 1 ,  0, 1, 1, 2, 2 ,  
+    0, 1, 1, 2, 2 ,  0, 1, 1, 2, 2 ,  0, 1, 1, 2, 2 ,  0, 1, 2, 3, 3 ,
+    0, 1, 2, 3, 3 ,  0, 2, 2, 3, 3 ,  0, 2, 2, 4, 4 ,  0, 2, 3, 4, 4 ,  
+    0, 2, 3, 4, 4 ,  0, 3, 3, 5, 5 ,  0, 3, 4, 6, 6 ,  0, 3, 4, 6, 6 ,
+    0, 4, 5, 7, 7 ,  0, 4, 5, 8, 8 ,  0, 4, 6, 9, 9 ,  0, 5, 7,10,10 ,  
+    0, 6, 8,11,11 ,  0, 6, 8,13,13 ,  0, 7,10,14,14 ,  0, 8,11,16,16 ,
+    0, 9,12,18,18 ,  0,10,13,20,20 ,  0,11,15,23,23 ,  0,13,17,25,25   ];
+// chroma edge table (32 x 3-bit ROM)
+List( type:int( size=4 ), size=32 ) CHROMA_EDGE_ROM = [  
+   -1, 0, 0, 0,  -1,-1,-1, 1,  -1, 1, 1, 2,  -1,-1,-1, 3,
+   -1, 0, 0, 0,  -1,-1, 1, 1,  -1, 1, 2, 2,  -1,-1, 3, 3  ];
+///////////////
+// Functions //
+///////////////
+//
+// Arithmetic functions
+//
+function abs( int val ) --> int :  if (val < 0) then -val else val end end
+function Clip( int Min, int Max, int Val  ) --> int :  if (Val < Min) then Min else if (Val > Max) then Max else Val end end end
+//
+// Memory interface functions
+//
+function ClipTab( int index, int strength ) --> int :  CLIP_TABLE[index*5 + strength] end  
+function chroma_edge( int d, int e, int f ) --> int :  CHROMA_EDGE_ROM[d*16 + e*4 + f] end
+// Get the X position in the current MB (0 to 15)
+function getPixelPosX( int pel, int dir ) --> int : if (dir=1) then pel else 4*edge_curr end end
+// Get the Y position in the current MB (0 to 15)
+function getPixelPosY( int pel, int dir) --> int : if (dir=1) then if (edge_curr < 4) then 4*edge_curr else 1 end else pel end end
+function getLeftPixel( int i, int dir ) --> int : if useLeft=1 then left_mb[yP - i*dir, xP - i*(1-dir)]
+      else if useUp=1 then up_mb[yP - i*dir, xP - i*(1-dir)] else curr_mb[yP - i*dir, xP - i*(1-dir)] end end end
+function getRightPixel( int i, int dir ) --> int : curr_mb[yQ + i*dir, xQ + i*(1-dir)] end
+procedure setLeftPixel( int i, int val, int dir )
+	var  
+		int xmod = xP - i*(1-dir),
+		int ymod = yP - i*dir
+    begin  
+    	if useLeft=1 then left_mb[ymod, xmod] := val; 
+    	else 
+    		if useUp=1 then up_mb[ymod, xmod] := val; 
+           	else  curr_mb[ymod, xmod] := val; 
+          	end 
+   	 	end
+end
+procedure setRightPixel( int i, int val, int dir ) 
+	var  
+		int xmod = xQ + i*(1-dir),
+		int ymod = yQ + i*dir 
+	begin 
+		curr_mb[ymod, xmod] := val; 
+end
+// Set the neighbour (used in GetStrengths)
+//
+// NOTE: only options are: within current MB, use left MB,
+// or use up/top MB 
+procedure setNeighbour( int xN, int yN )
+begin
+  useLeft := 0;
+  useUp := 0;
+  if (xN < 0) then       // only used when dir=0 & edge=0
+    xP := MB_BLOCK_SIZE + xN; // -1 becomes 15, -2 becomes 14, etc.
+    yP := yN;
+    useLeft := 1;
+  else if (yN < 0) then  // only used when dir=1 & edge=0
+      xP := xN;
+      yP := MB_BLOCK_SIZE + yN;
+      useUp := 1;
+    else
+      xP := xN;
+      yP := yN;
+    end
+  end
+end
+
+/*************************************************************
+ *************************************************************
+ ********        Deblocking Filter: Actions           ********
+ *************************************************************
+ *************************************************************/
+// Read Macroblock data
+StartMB: action DB_I:[v] repeat (MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4), BS:[u] repeat 38==>
+var
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE) upbuf := [0 : for int k in Integers(0, 4*MB_BLOCK_SIZE-1) ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE-1) ],
+    List(type:int(size=SAMPLE_SZ),size =MB_BLOCK_SIZE*MB_BLOCK_SIZE) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ],
+	int uc:=0,
+	int lc:=0,
+	int cc:=0     
+do  
+    foreach int i in Integers(0, (MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4)-1) do
+      if (i<4*(MB_BLOCK_SIZE+4)) then  if((i mod (MB_BLOCK_SIZE+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
+      else  if((i mod (MB_BLOCK_SIZE+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
+    end        
+    foreach int y in Integers(0, MB_BLOCK_SIZE-1) do
+        foreach int x in Integers(0, MB_BLOCK_SIZE-1) do  
+        	curr_mb[y,x]:= currbuf[x + y * MB_BLOCK_SIZE]; 
+        end
+    end			   
+    foreach int y in Integers(0, MB_BLOCK_SIZE-1) do
+        foreach int x in Integers(MB_BLOCK_SIZE-4, MB_BLOCK_SIZE-1) do  
+        	left_mb[y,x]:= leftbuf[(x mod 4)+y*4]; 
+    	end
+    end			   
+    foreach int y in Integers(MB_BLOCK_SIZE-4, MB_BLOCK_SIZE-1) do
+        foreach int x in Integers(0, MB_BLOCK_SIZE-1) do  
+        	up_mb[y,x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE)]; 
+    	end
+    end         
+    StrengthNotZero :=0;    
+    foreach int i in Integers(0, 31) do 
+    	Strength[i] := u[i]; if (Strength[i] != 0) then StrengthNotZero := 1; end 
+	end
+    Alist :=[u[i] :for int i in Integers(32, 34) ];
+    Blist :=[u[i] :for int i in Integers(35, 37) ];    
+end 
+
+ZeroStrengths: action ==>
+  guard (StrengthNotZero=0)  end  
+
+EdgeLoops: action ==>
+  var
+    int indexA,int indexB,int StrengthIdx,
+    int pel,int PelNum := MB_BLOCK_SIZE,
+    int ap := 0,int aq := 0,int small_gap := 0,
+    int L3, int L2, int L1, int L0, int R3, int R2, int R1, int R0, int RL0, int C0,
+    int dif,int Delta,int AbsDelta,
+    int Alpha := 0, int Beta := 0
+  do       
+    foreach int dir in Integers(0,1) do
+      foreach int edge in Integers(0,3) do
+        if (LUMA_CHROMA = 8) then edge_curr := chroma_edge(dir, edge, 1); else edge_curr := edge;  end
+        		if (edge_curr<4 and edge_curr>=0) then           
+			    pel := 0;
+			    while (pel < PelNum) do
+			      xQ := getPixelPosX(pel,dir);
+			      yQ := getPixelPosY(pel,dir);                    
+			      setNeighbour(xQ - 1 + dir, yQ - dir);			      
+			      if (LUMA_CHROMA=8) then  StrengthIdx := bitand(lshift(rshift(pel, 1), 2) + bitand(pel, 1), 12);
+			      else   StrengthIdx := bitand(pel, 12);  end
+				  StrengthIdx := StrengthIdx + lshift(dir,4) + edge;				  
+				  if useLeft=1 then indexA:=Alist[1]; indexB:=Blist[1]; 
+				  else if useUp=1 then indexA:=Alist[2]; indexB:=Blist[2]; 
+				       else indexA:=Alist[0]; indexB:=Blist[0]; end end
+				  Alpha := ALPHA_TABLE[indexA];
+			      Beta := BETA_TABLE[indexB];
+			      if (Strength[StrengthIdx] > 0) then
+			        L3 := getLeftPixel(3,dir);
+			        L2 := getLeftPixel(2,dir);
+			        L1 := getLeftPixel(1,dir);
+			        L0 := getLeftPixel(0,dir);
+			        R0 := getRightPixel(0,dir);
+			        R1 := getRightPixel(1,dir);
+			        R2 := getRightPixel(2,dir);
+			        R3 := getRightPixel(3,dir);
+			        RL0 := L0 + R0;
+			        Delta := R0 - L0;
+			        AbsDelta := abs(Delta);
+			        if ( AbsDelta < Alpha ) then			          
+			          C0  := ClipTab(indexA, Strength[StrengthIdx]);
+			          if ( bitand((abs(R0 - R1) - Beta), (abs(L0 - L1) - Beta)) < 0 ) then 
+			            if (LUMA_CHROMA = 16) then //Luma
+			              if ((abs(R0 - R2) - Beta) < 0) then aq := 1; else aq := 0; end
+			              if ((abs(L0 - L2) - Beta) < 0) then ap := 1; else ap := 0; end
+			            end       
+			            if (Strength[StrengthIdx] = 4) then 	// INTRA strong filtering
+			              if (LUMA_CHROMA=8) then  // Chroma
+			                setLeftPixel(0, rshift(lshift(L1, 1) + L0 + R1 + 2, 2),dir); 
+			                setRightPixel(0, rshift(lshift(R1, 1) + R0 + L1 + 2, 2),dir);                                           
+			              else  // Luma
+			                if (AbsDelta < ALPHA_TABLE_DIV4_PLUS2[indexA]) then small_gap := 1; else small_gap := 0;  end
+			                ap := bitand(ap, small_gap);
+			                aq := bitand(aq, small_gap);			
+			                if (aq=1) then
+			                  setRightPixel(0, rshift(L1 + lshift(R1 + RL0, 1) +  R2 + 4, 3),dir);
+			                  setRightPixel(1, rshift(R2 + R0 + R1 + L0 + 2, 2),dir);
+			                  setRightPixel(2, rshift(lshift(R3 + R2, 1) + R2 + R1 + RL0 + 4, 3),dir);
+			                else
+			                  setRightPixel(0, rshift(lshift(R1, 1) + R0 + L1 + 2, 2),dir);
+			                  setRightPixel(1, R1,dir);
+			                  setRightPixel(2, R2,dir);
+			                end
+			                if (ap=1) then
+			                  setLeftPixel(0, rshift(R1 + lshift((L1 + RL0), 1) +  L2 + 4, 3),dir);
+			                  setLeftPixel(1, rshift(L2 + L1 + L0 + R0 + 2, 2),dir);
+			                  setLeftPixel(2, rshift(lshift(L3 + L2, 1) + L2 + L1 + RL0 + 4, 3),dir);
+			                else
+			                  setLeftPixel(0, rshift(lshift(L1, 1) + L0 + R1 + 2, 2),dir);
+			                  setLeftPixel(1, L1,dir);
+			                  setLeftPixel(2, L2,dir);
+			                end
+			              end
+			            else // normal filtering
+			              if (LUMA_CHROMA = 16) then dif := Clip( -C0 - ap - aq, (C0 + ap + aq), rshift(lshift(Delta, 2) + (L1 - R1) + 4, 3));
+			              else dif := Clip( -C0-1, C0+1, rshift(lshift(Delta, 2) + (L1 - R1) + 4, 3));
+			              end        			
+			              if (LUMA_CHROMA = 16) then  
+			                setLeftPixel(0, Clip(0, MAXVAL_LUMA, L0 + dif),dir);
+			                setRightPixel(0, Clip(0, MAXVAL_LUMA, R0 - dif),dir);			                
+			                if (ap=1) then setLeftPixel(1, L1 + Clip(-C0, C0, rshift(L2 + rshift(RL0 + 1, 1) - lshift(L1, 1), 1)),dir);  end
+			                if (aq=1) then setRightPixel(1, R1 + Clip(-C0, C0, rshift(R2 + rshift(RL0 + 1, 1) - lshift(R1, 1), 1)),dir); end
+			              else 
+			                setLeftPixel(0, Clip(0, MAXVAL_CHROMA, L0 + dif),dir);
+			                setRightPixel(0, Clip(0, MAXVAL_CHROMA, R0 - dif),dir);
+			              end
+			            end //if (Strength[StrengthIdx] = 4)
+			          end //if ( bitand((abs(R0 - R1) - Beta), (abs(L0 - L1) - Beta)) < 0 ) then 
+			        end //if ( AbsDelta < Alpha ) then
+		          end  //if ( AbsDelta < Alpha )		          
+		          pel := pel + 1;
+			    end // while (pel<PelNum)
+			  end // if-then
+			end // while (edge<4)
+	  end // while (dir<2)
+  end // EdgeLoops
+ 
+ OutMB: action ==> DB_O:[buff] repeat (MB_BLOCK_SIZE+4) * (MB_BLOCK_SIZE+4)
+  var 
+  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4)) buff=[0:for int s in Integers(0,(MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4)-1)],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE) upbuf := [0 : for int j in Integers(0, 4*MB_BLOCK_SIZE-1) ],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE) leftbuf := [0 : for int k in Integers(0, 4*MB_BLOCK_SIZE-1) ],
+    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE*MB_BLOCK_SIZE) currbuf := [0 : for int l in Integers(0, MB_BLOCK_SIZE*MB_BLOCK_SIZE-1) ],
+    int uc:=0,int lc:=0,int cc:=0     
+  do
+    upbuf   := [up_mb[ MB_BLOCK_SIZE - 4 + i / MB_BLOCK_SIZE ][i mod MB_BLOCK_SIZE] : for int i in Integers(0, 4*MB_BLOCK_SIZE-1) ];
+    leftbuf := [left_mb[i / 4 ][MB_BLOCK_SIZE - 4 + (i mod 4)] : for int i in Integers(0, 4*MB_BLOCK_SIZE-1) ];
+    currbuf := [curr_mb[i / MB_BLOCK_SIZE][i mod MB_BLOCK_SIZE] : for int i in Integers(0, MB_BLOCK_SIZE*MB_BLOCK_SIZE-1)];
+    foreach int i in Integers(0, (MB_BLOCK_SIZE+4)*(MB_BLOCK_SIZE+4)-1) do
+        if (i<4*(MB_BLOCK_SIZE+4)) then  if((i mod (MB_BLOCK_SIZE+4))>3) then buff[i]:=upbuf[uc]; uc:=uc+1; end
+        else  if((i mod (MB_BLOCK_SIZE+4))>3) then buff[i]:=currbuf[cc]; cc:=cc+1; else buff[i]:=leftbuf[lc]; lc:=lc+1; end  end
+    end      
+    count:=count+1;
+ end
+///////////////////////
+// Schedule/Priority //
+///////////////////////
+schedule fsm S0 :
+  S0 						(StartMB) 					--> S1;  
+  S1						(ZeroStrengths)				--> S2;
+  S1					    (EdgeLoops)					--> S2;  
+  S2  						(OutMB) 					--> S0;  
+end
+priority  ZeroStrengths > EdgeLoops;  end
+end

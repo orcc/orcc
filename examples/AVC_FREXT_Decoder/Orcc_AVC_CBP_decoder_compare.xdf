@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Orcc_AVC_CBP_decoder_compare">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="orcc_fread"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="fname">
+            <Expr kind="Literal" literal-kind="String" value=""/>
+        </Parameter>
+    </Instance>
+    <Instance id="AVCDecoder">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="AVC_CBP_decoder"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Merger">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Mgnt_Merger420"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="orcc_DispYUV"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Compare">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="orcc_CompYUV"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="file">
+            <Expr kind="Literal" literal-kind="String" value="D:\sequences\AVC\CAVLC\general\AVCNL-3\NL2_Sony_H.yuv"/>
+        </Parameter>
+        <Parameter name="height">
+            <Expr kind="Literal" literal-kind="Integer" value="144"/>
+        </Parameter>
+        <Parameter name="width">
+            <Expr kind="Literal" literal-kind="Integer" value="176"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="AVCDecoder" dst-port="bits8" src="source" src-port="O"/>
+    <Connection dst="Merger" dst-port="U" src="AVCDecoder" src-port="Display_Cb"/>
+    <Connection dst="Merger" dst-port="V" src="AVCDecoder" src-port="Display_Cr"/>
+    <Connection dst="display" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="display" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
+    <Connection dst="display" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
+    <Connection dst="Merger" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
+    <Connection dst="Compare" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="Compare" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
+    <Connection dst="Compare" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
+</XDF>

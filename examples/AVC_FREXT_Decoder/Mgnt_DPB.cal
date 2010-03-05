@@ -1,0 +1,229 @@
+/********************************************************************************
+
+This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+
+*****************************************************************************/
+//Modified by Endri Bezati <endri.bezati@insa-renens.fr>
+//To work with Orcc
+actor Mgnt_DPB ( int SAMPLE_SZ, int MB_WIDTH, int NB_PIC ) 
+		uint(size=7) PicWidthInMb, 
+		uint(size=13) CurrMbAddr, 
+		uint(size=13) PicSizeInMb, 
+		uint POC, 
+		uint(size=5) RefList, 
+		int(size=9) WD, 
+		uint(size=21) RA, 
+		uint(size=11) RA_Width, 
+		uint(size=11) RA_Height,  
+		uint(size=3) RefIdx 
+		==> 
+		int(size=SAMPLE_SZ) RD, 
+		int(size=9) Display,
+		bool Write_Done
+:  
+//FIXME! number of MB per line of picture
+int PICWIDTH=1280/16; //number of MB per lines
+int PICHEIGHT=720/16; //number of MB per columns
+  uint(size=7) picwidth :=0;
+  uint(size=13) picsize := 0;
+  List(type:uint,size=NB_PIC) poc := [0 :for int s in Integers(0,NB_PIC-1)];
+  uint(size=21) wa := 0;
+  uint(size=11) wa_W;
+  uint(size=11) wa_H;
+  uint(size=11) wa_x := 0;
+  uint(size=11) wa_y := 0;
+  List(type :List( type:int(size=SAMPLE_SZ), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
+  uint(size=4) pic_curr_idx := 0;
+  List(type:uint(size=4),size=NB_PIC) pic_ref_idx := [0 :for int s in Integers(0,NB_PIC-1)];
+  List(type:uint(size=1),size=NB_PIC) flag_picture_end := [1 : for int s in Integers(0,NB_PIC-1)];
+  List(type:uint(size=1),size=NB_PIC) flag_display := [1 : for int s in Integers(0,NB_PIC-1)];
+  int(size=14) nbMBdisplay := 0;
+  uint(size=4) pic_display_idx := 0;
+  uint(size=21) ra := 0;
+  uint(size=11) ra_W;
+  uint(size=11) ra_H;
+  uint(size=11) ra_x := 0;
+  uint(size=11) ra_y := 0;
+  uint(size=4) nb_ref := 0;
+  uint(size=4) ref_idx := 0;
+  uint(size=1) read_done := 1;
+  uint(size=1) write_done := 1;
+  uint(size=16) currmbaddr := 0;
+  int countRead := 0;
+  
+  initialize ==>
+  do
+    pic := [ [-1 : for int i in Integers( 0, PICWIDTH*PICHEIGHT*256-1)]: for int j in Integers( 0, NB_PIC-1) ];
+  end
+
+    
+  read_ref_parameters: action RefList:[a, b] ==>
+  do
+    pic_curr_idx := a;
+    nb_ref := b;
+  end
+  
+  read_pic_parameters: action  POC:[c] ==>
+  guard
+    flag_picture_end[pic_curr_idx] = 1, flag_display[pic_curr_idx] = 1 //flag_display pour ne pas virer l image avant de l'avoir affichée
+  do
+		    
+    poc[pic_curr_idx] := c;
+    flag_picture_end[pic_curr_idx] := 0;
+    flag_display[pic_curr_idx] := 0;
+    //println("read_pic_parameters: pic_curr_idx "+pic_curr_idx+" poc "+poc+" pic_ref_idx "+pic_ref_idx+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display+" pic_display_idx "+pic_display_idx);
+  end
+
+  read_refList: action RefList:[v] ==>  
+  do
+    pic_ref_idx[countRead] := v;
+    countRead := countRead +1;
+  end
+  
+  refList_done: action ==> 
+  guard
+  	countRead  =  nb_ref
+  do
+    if nb_ref = 0 then
+      pic_ref_idx[0] := 0;
+    end
+  	countRead := 0;
+  end
+  
+  get_writeAddr: action PicWidthInMb:[a], PicSizeInMb:[b], CurrMbAddr:[v] ==>
+  guard
+    write_done = 1
+  var
+  	uint(size=16) x,
+  	uint(size=16) y
+  do
+    picwidth := a;
+    picsize := b;
+    currmbaddr := v;
+    x := v mod picwidth;
+    y := v / picwidth;
+    wa := y *MB_WIDTH* MB_WIDTH*picwidth + x*MB_WIDTH;
+    wa_W := MB_WIDTH;
+    wa_H := MB_WIDTH;
+    wa_x := 0;
+    wa_y := 0;
+    write_done := 0;
+  end
+  
+  //Write_data: 
+  write_data : action WD:[v] ==>
+  guard 
+  	write_done = 0
+  do
+    pic[pic_curr_idx,wa + wa_x + wa_y * picwidth * MB_WIDTH] := v;
+    wa_x := wa_x +1;
+    if wa_x = wa_W then
+      wa_y := wa_y +1;
+      if wa_y != wa_H then wa_x := 0; else write_done :=1; end
+    end
+  end
+        
+  write_picture_done: action ==> Write_Done:[true]
+  guard 
+      write_done = 1, currmbaddr = picsize - 1
+  do
+    println("write_picture_done");
+    flag_picture_end[pic_curr_idx] := 1;
+    wa_x := 0;
+    wa_y := 0;
+    currmbaddr:=0;
+  end 
+  
+  get_readAddr: action RA:[a], RA_Width:[b], RA_Height:[c], RefIdx:[e] ==>
+  guard
+    read_done = 1
+  do
+    ra := a;
+    ra_W := b;
+    ra_H := c;
+    ref_idx := e;
+    ra_x := 0;
+    ra_y := 0;
+    read_done := 0;
+  end
+  
+  // Read data
+  read_data: action  ==> RD:[v]
+  guard 
+    read_done = 0
+  var 
+    uint(size=SAMPLE_SZ) v
+  do
+    v := pic[ pic_ref_idx[ref_idx] ][ra + ra_x + ra_y * picwidth * MB_WIDTH];
+    ra_x := ra_x +1;
+    if ra_x = ra_W then
+      ra_y := ra_y +1;
+      if ra_y != ra_H then
+        ra_x := 0; 
+      else 
+        ra_x := 0;
+        ra_y := 0; 
+        read_done := 1;
+      end
+    end
+  end
+ 
+  //write MB on the output display
+  action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH * MB_WIDTH-1)] ] repeat MB_WIDTH * MB_WIDTH
+  guard
+    flag_display[pic_display_idx] = 0 and flag_picture_end[pic_display_idx] = 1
+  var
+    uint CurrAddrInPix, uint(size=5) last_idx,
+    uint(size=2) flag_poc := 0,
+    uint(size=5) idx,
+    
+    List(type:int(size=SAMPLE_SZ),size = MB_WIDTH * MB_WIDTH + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH*MB_WIDTH) ] 
+  do
+    CurrAddrInPix := (nbMBdisplay mod picwidth)*MB_WIDTH + (nbMBdisplay / picwidth)*MB_WIDTH*MB_WIDTH*picwidth ;
+    foreach int y in Integers(0, (MB_WIDTH-1)) do
+      foreach int x in Integers(0, (MB_WIDTH-1)) do
+        buff[x + y * MB_WIDTH] := pic[pic_display_idx][CurrAddrInPix + x + y * MB_WIDTH * picwidth];
+      end
+    end
+    nbMBdisplay := nbMBdisplay +1;
+    if nbMBdisplay = picsize then 
+      flag_display[pic_display_idx] := 1;
+      nbMBdisplay := 0;
+      if (pic_display_idx<NB_PIC - 1) then
+      	pic_display_idx := pic_display_idx + 1;
+      else
+      	pic_display_idx := 0;
+      end
+      println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
+    end
+  end
+
+  
+  schedule fsm  read_ref_parameters:
+    read_ref_parameters   	(read_ref_parameters)		--> read_pic_parameters;
+    read_pic_parameters   	(read_pic_parameters)		--> read_ref_list;
+    read_ref_list			(refList_done)				--> read_write;
+    read_ref_list			(read_refList)				--> read_ref_list;
+    read_write				(write_data	) 		  	--> read_write;
+    read_write				(read_data	) 		  	--> read_write;
+    read_write				(get_writeAddr) 		  	--> read_write;
+    read_write				(get_readAddr) 		  		--> read_write;
+    read_write			  	(write_picture_done) 		--> read_ref_parameters;
+  end
+
+  priority
+    write_data > read_data > write_picture_done  > get_writeAddr > get_readAddr ;
+  	refList_done >	read_refList;
+  end
+end

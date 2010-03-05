@@ -1,0 +1,316 @@
+/*************************************************************************
+This software module was originally developed by 
+Kenji Otoi, Yoshihisa Yamada and Kohtaro Asai (Mitsubishi Electric Corporation), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+Mitsubishi Electric Corporation grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that Mitsubishi Electric 
+Corporation owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, Mitsubishi 
+Electric Corporation will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+Mitsubishi Electric Corporation retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2007.
+*************************************************************************/
+
+import all caltrop.lib.BitOps;
+
+actor Algo_IntraPred_LUMA_4x4 ( int PIX_SZ )
+  int(size=PIX_SZ) Y_LEFT,     // List
+  int(size=PIX_SZ) Y_UP,       // List
+  int(size=PIX_SZ) Y_UP_LEFT,  // point
+  uint(size=1) AVAIL,              // up, left, up_left, up_right availability List
+  uint(size=4) PredMode
+
+  ==> int(size=PIX_SZ) MPR:
+
+  /* res variable used by procedure sum */
+  int res;
+  /*sum_temp variable used for summing different sum procedures */
+  int sum_temp;
+  
+  int(size=2) left_avail;
+  int(size=2) up_avail;
+  int(size=2) up_left_avail;
+  int(size=PIX_SZ)       y_up_left;
+
+  List(type:int(size=PIX_SZ), size=4) y_left := [ 0 : for int i in Integers( 0, 3) ];
+  List(type:int(size=PIX_SZ), size=8) y_up := [ 0 : for int i in Integers( 0, 7) ];
+  List(type:int(size=PIX_SZ), size=4*4 ) mpr := [ 0 : for int i in Integers( 0, 15) ];
+  
+  
+  procedure Summ(List(type:int(size=PIX_SZ), size=16) list, int n)
+  begin
+    res := 0;
+    if n > 0 then
+    	foreach int i in Integers(0, n - 1) do
+      		res := res + list[i]; 
+     	end
+    end
+  end
+
+  read.avail: action AVAIL:[avail] repeat 3 ==>
+  do
+    left_avail    := avail[0];
+    up_avail      := avail[1];
+    up_left_avail := avail[2];
+  end
+
+  readpix.l.av: action Y_LEFT:[x] repeat 4 ==>
+  guard left_avail = 1
+  do
+    y_left := [ x[i] :  for int i in Integers(0,3) ];
+  end
+  
+  
+  // Supposing y_up[4..7] equal to y_up[3] when these are not available.
+  readpix.u.av: action Y_UP:[x] repeat 8 ==>
+  guard up_avail = 1
+  do
+    y_up := [ x[i] :  for int i in Integers(0, 7) ];
+  end
+  
+  
+  readpix.ul.av: action Y_UP_LEFT:[x] ==>
+  guard up_left_avail = 1
+  do
+    y_up_left:=x;
+  end
+
+  readpix.l.no: action ==>
+  guard left_avail = 0
+  end
+
+  readpix.u.no: action ==>
+  guard up_avail = 0
+  end
+
+  readpix.ul.no: action ==>
+  guard up_left_avail = 0
+  end
+
+  write.mode0: action PredMode:[mode] ==>
+    MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+  guard 
+  	mode = 0 
+  do
+    mpr := [y_up[i]  : for int i in  Integers(0,3), for int j in Integers(0,3)];
+  end
+  
+  
+  
+  write.mode1: action PredMode:[mode] ==>
+    MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+  guard 
+  	mode = 1 
+   do
+    mpr := [y_left[j]: for int i in  Integers(0,3), for int j in Integers(0,3)];
+  end
+  
+  write.mode2: action PredMode:[mode] ==>
+   	 MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+   guard 
+  		mode = 2 
+   var
+    	int mean
+   do
+     if left_avail = 1 and up_avail = 1 then 
+  			Summ(y_left, 4);
+  			sum_temp := res;
+  			Summ(y_up, 4);
+  			sum_temp := res + sum_temp + 4;
+  			mean := rshift(sum_temp, 3);
+      else if left_avail = 1   then 
+      		Summ(y_left,4);
+  			sum_temp := res + 2;
+      		mean := rshift(sum_temp, 2);
+      else if up_avail   = 1             then 
+  			Summ(y_up, 4);
+  			sum_temp := res + 2;
+      		mean := rshift(sum_temp, 2);
+      else mean := 128;
+      end end end
+      
+      mpr := [mean     : for int i in  Integers(0,3), for int j in Integers(0,3)];
+   end
+	
+   write.mode3: action PredMode:[mode] ==>
+    MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+  guard 
+  	mode = 3 
+   do
+     // y_uur is a List that is like
+     // abcd efgh h, when the part efgh exists
+	 foreach int i in Integers(0,3) do
+	  	foreach int j in Integers(0,3) do
+	  		mpr [4 * i + j] := 
+	  			if i = 3 and j = 3 then
+	      			 rshift( y_up[i+j+1 -1] + 2*y_up[i+j+1 ] + y_up[7] + 2, 2) 
+	      		else
+	      			 rshift( y_up[i+j+1 -1] + 2*y_up[i+j+1 ] + y_up[i+j+1 +1] + 2, 2)
+	      		end;
+	  	 end
+	  end
+	end
+	
+   write.mode4: action PredMode:[mode] ==>
+    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+   guard 
+  		mode = 4 
+   do
+      // i - j  = n lines
+     mpr := [
+        if      i - j = 0  then rshift( y_left[0]   + 2*y_up_left   + y_up  [0] +2, 2)
+
+        else if i - j = 1  then rshift( y_up_left   + 2*y_up  [0]   + y_up  [1] +2, 2)
+        else if i - j = 2  then rshift( y_up  [0]   + 2*y_up  [1]   + y_up  [2] +2, 2)
+        else if i - j = 3  then rshift( y_up  [1]   + 2*y_up  [2]   + y_up  [3] +2, 2)
+
+        else if i - j = -1 then rshift( y_up_left   + 2*y_left[0]   + y_left[1] +2, 2)
+        else if i - j = -2 then rshift( y_left[0]   + 2*y_left[1]   + y_left[2] +2, 2)
+        else /* i - j = -3 */   rshift( y_left[1]   + 2*y_left[2]   + y_left[3] +2, 2)
+        end end end end end end : for int i in  Integers(0,3), for int j in Integers(0,3)
+      ];
+   end
+	
+   write.mode5: action PredMode:[mode] ==>
+    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+   guard 
+  		mode = 5 
+   do
+      // 2*i - j = n lines
+      mpr := [
+        if      2*i - j= 0  then rshift( y_up_left + y_up[0]   +1, 1)
+        else if 2*i - j= 2  then rshift( y_up[0]   + y_up[1]   +1, 1)
+        else if 2*i - j= 4  then rshift( y_up[1]   + y_up[2]   +1, 1)
+        else if 2*i - j= 6  then rshift( y_up[2]   + y_up[3]   +1, 1)
+
+        else if 2*i - j= -3   then rshift( y_left[2] + 2*y_left[1] + y_left[0] +2, 2)
+        else if 2*i - j= -2   then rshift( y_left[1] + 2*y_left[0] + y_up_left +2, 2)
+        else if 2*i - j= -1   then rshift( y_left[0] + 2*y_up_left + y_up[0]   +2, 2)
+
+        else if 2*i - j= 1  then rshift( y_up_left + 2*y_up[0] + y_up[1] +2, 2)
+        else if 2*i - j= 3  then rshift( y_up[0]   + 2*y_up[1] + y_up[2] +2, 2)
+        else /* 2*i - j= 5  */   rshift( y_up[1]    + 2*y_up[2] + y_up[3] +2, 2)
+        end end end end end end end end end :
+        for int i in  Integers(0,3), for int j in Integers(0,3)
+      ];
+
+   end
+	
+   write.mode6: action PredMode:[mode] ==>
+    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+   guard 
+  		mode = 6 
+   do
+      // i - 2*j = n lines
+      mpr := [
+        if      i - 2*j= 0   then rshift( y_up_left   + y_left[0]      +1, 1)
+        else if i - 2*j= -2  then rshift( y_left[0]   + y_left[1]      +1, 1)
+        else if i - 2*j= -4  then rshift( y_left[1]   + y_left[2]      +1, 1)
+        else if i - 2*j= -6  then rshift( y_left[2]   + y_left[3]      +1, 1)
+
+        else if i - 2*j= 3   then rshift( y_up[2] + 2*y_up[1]   + y_up[0]    +2, 2)
+        else if i - 2*j= 2   then rshift( y_up[1] + 2*y_up[0]   + y_up_left  +2, 2)
+        else if i - 2*j= 1   then rshift( y_up[0] + 2*y_up_left + y_left[0]  +2, 2)
+
+        else if i - 2*j= -1  then rshift( y_up_left   + 2*y_left[0] + y_left[1] +2, 2)
+        else if i - 2*j= -3  then rshift( y_left[0]   + 2*y_left[1] + y_left[2] +2, 2)
+        else /* i - 2*j= -5  */  rshift( y_left[1]   + 2*y_left[2] + y_left[3] +2, 2)
+        end end end end end end end end end :
+        for int i in  Integers(0,3), for int j in Integers(0,3)
+      ];
+
+    end
+	
+   write.mode7: action PredMode:[mode] ==>
+    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+   guard 
+  		mode = 7 
+   do
+      // 2*i + j = n lines
+      mpr := [
+        if      2*i + j= 0  then rshift( y_up[0]   + y_up[1]      +1, 1)
+        else if 2*i + j= 2  then rshift( y_up[1]   + y_up[2]      +1, 1)
+        else if 2*i + j= 4  then rshift( y_up[2]   + y_up[3]      +1, 1)
+        else if 2*i + j= 6  then rshift( y_up[3]   + y_up[4]      +1, 1)
+        else if 2*i + j= 8  then rshift( y_up[4]   + y_up[5]      +1, 1)
+        
+        else if 2*i + j= 1  then rshift( y_up[0] + 2*y_up[1] + y_up[2] +2, 2)
+        else if 2*i + j= 3  then rshift( y_up[1] + 2*y_up[2] + y_up[3] +2, 2)
+        else if 2*i + j= 5  then rshift( y_up[2] + 2*y_up[3] + y_up[4] +2, 2)
+        else if 2*i + j= 7  then rshift( y_up[3] + 2*y_up[4] + y_up[5] +2, 2)
+        else /* 2*i + j= 9 */   rshift( y_up[4] + 2*y_up[5] + y_up[6] +2, 2)
+        end end end end end end end end end:
+        for int i in  Integers(0,3), for int j in Integers(0,3)
+      ];
+    end
+	
+   write.mode8: action PredMode:[mode] ==>
+    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+   guard 
+  		mode = 8 
+   do
+      // i + 2*j = n lines
+      mpr := [
+        if      i + 2*j= 0  then rshift( y_left[0]   + y_left[1]      +1, 1)
+        else if i + 2*j= 2  then rshift( y_left[1]   + y_left[2]      +1, 1)
+        else if i + 2*j= 4  then rshift( y_left[2]   + y_left[3]      +1, 1)
+
+        else if i + 2*j= 1  then rshift( y_left[0] + 2*y_left[1] + y_left[2] +2, 2)
+        else if i + 2*j= 3  then rshift( y_left[1] + 2*y_left[2] + y_left[3] +2, 2)
+        else if i + 2*j= 5  then rshift( y_left[2] + 3*y_left[3]             +2, 2)
+        else /* otherwise */     y_left[3]
+        end end end end end end: for int i in  Integers(0,3), for int j in Integers(0,3)
+      ];
+   end
+
+  schedule fsm start:
+    start   (read.avail)   --> readpix0;
+
+    readpix0 (readpix.l)    --> readpix1;
+    readpix1 (readpix.u)    --> readpix2;
+    readpix2 (readpix.ul)   --> pixdone;
+
+    pixdone (write)  --> start;
+
+  end
+end

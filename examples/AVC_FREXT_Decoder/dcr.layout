@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CoefDC_L" x="57" y="172"/>
+      <vertex id="QP" x="853" y="70"/>
+      <vertex id="ScalingList" x="853" y="274"/>
+      <vertex id="CoefDCR_L" x="1853" y="172"/>
+      <vertex id="Algo_IS_Zigzag_4x4_DC" x="191" y="158"/>
+      <vertex id="Algo_DCR_Hadamard_LUMA_IHT1d_0" x="383" y="163"/>
+      <vertex id="Algo_DC_Transpose4x4_0" x="646" y="163"/>
+      <vertex id="Algo_DCR_Hadamard_LUMA_IHT1d_1" x="853" y="163"/>
+      <vertex id="Algo_DCR_Hadamard_LUMA_Scaling" x="1116" y="145"/>
+      <vertex id="Algo_DC_Transpose4x4_1" x="1371" y="163"/>
+      <vertex id="Algo_DCR_Hadamard_LUMA_Reordering" x="1578" y="163"/>
+   </vertices>
+</layout>

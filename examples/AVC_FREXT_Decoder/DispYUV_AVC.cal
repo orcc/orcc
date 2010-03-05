@@ -1,0 +1,131 @@
+/* 
+BEGINCOPYRIGHT X
+	
+	Copyright (c) 2007, Xilinx Inc.
+	All rights reserved.
+	
+	Redistribution and use in source and binary forms, 
+	with or without modification, are permitted provided 
+	that the following conditions are met:
+	- Redistributions of source code must retain the above 
+	  copyright notice, this List of conditions and the 
+	  following disclaimer.
+	- Redistributions in binary form must reproduce the 
+	  above copyright notice, this List of conditions and 
+	  the following disclaimer in the documentation and/or 
+	  other materials provided with the distribution.
+	- Neither the name of the copyright holder nor the names 
+	  of its contributors may be used to endorse or promote 
+	  products derived from this software without specific 
+	  prior written permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	
+ENDCOPYRIGHT
+*/
+
+import ptolemy.media.Picture;
+import javax.swing.JFrame;
+import java.lang.System;
+
+actor DispYUV_AVC (String title, int width, int height ) int Y, int U, int V ==>  : 
+
+  int pos_x := 0;
+  int pos_y := 0;
+
+  int lastTime := 0;
+  int thisTime:=0;
+  int fcount:=0;
+
+//mrl  int
+  picture = Picture( width, height);
+//mrl  int
+  frame = JFrame( title );
+  
+  initialize ==>
+  do
+    frame.getContentPane().add(picture);
+    frame.pack();
+    frame.setVisible(true);    
+  end
+
+  action Y:[ MB_Y ] repeat 16 * 16 , U:[ MB_U ] repeat 8 * 8, V:[ MB_V ] repeat 8 * 8 ==>
+  var
+    int n = 0,
+    int xx,
+    int yy,
+    int py,
+    int pu,
+    int pv,
+    
+    int uvx,
+    int uvy,
+    int r,
+    int g,
+    int b,
+    int t,
+    int tu,
+    int tv,
+    int nuv
+  do
+    // Display macro block
+    while n < 16*16 do
+      xx := pos_x + n mod 16; // -> xx = pos_x + n % 16
+      yy := pos_y + n / 16;   // -> yy = pos_y + n / 16
+      uvx := rshift(pos_x,1) + n mod 16; // uvx = pos_x / 2 + n % 16
+      uvy := rshift(pos_y,1) + n / 16;   // uvy = pos_y / 2 + n / 16
+
+      /*
+      t := (76306 * ( MB_Y [n] - 16) ) + 32768;
+      nuv := (8 * rshift( n, 5 )) + (rshift( n, 1) mod 8); // nuv = 8 * (n / 32) + (n / 2) % 8
+      tu := MB_U [ nuv ];
+      tv := MB_V [ nuv ];
+      r := rshift( t + ( 104597 * ( tv - 128 ) ), 16);
+      g := rshift( t - ( ( 25675 * ( tu - 128) ) + ( 53279 * ( tv - 128 ) ) ), 16);
+      b := rshift( t + ( 132201 * ( tu - 128 ) ), 16);
+      picture.setPixel( yy, xx, r, g, b );
+      */
+      
+      nuv := (8 * rshift( n, 5 )) + (rshift( n, 1) mod 8); // nuv = 8 * (n / 32) + (n / 2) % 8
+      tu := MB_U [ nuv ];
+      tv := MB_V [ nuv ];
+      r := rshift( 76306 * MB_Y [n] + 104597 * tv - 14576544, 16);
+      g := rshift( 76306 * MB_Y [n] - 25675 * tu - 53279 * tv + 8917984, 16);
+      b := rshift( 76306 * MB_Y [n] + 132201 * tu - 18109856, 16);
+      picture.setPixel( yy, xx, r, g, b );
+      
+
+      n := n + 1;
+    end
+    picture.displayImage();
+
+    // Advance to next MB position
+    pos_x := pos_x + 16;
+    if pos_x >= width then
+      pos_x := 0;
+      pos_y := pos_y + 16;
+
+      if pos_y >= height then
+        pos_y := 0;
+        thisTime := currentSystemTime();
+        println("Frame "+fcount+ " time: " + (thisTime - lastTime) + "ms");
+        fcount:=fcount+1;
+        lastTime := thisTime;
+        //picture.displayImage();
+      end
+    end
+  end
+
+end
