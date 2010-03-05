@@ -11,6 +11,7 @@ import net.sf.orcc.cal.Actor;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.ui.common.editor.outline.ContentOutlineNode;
+import org.eclipse.xtext.ui.common.editor.outline.CreateNode;
 import org.eclipse.xtext.ui.common.editor.outline.transformer.AbstractDeclarativeSemanticModelTransformer;
 
 /**
@@ -19,29 +20,27 @@ import org.eclipse.xtext.ui.common.editor.outline.transformer.AbstractDeclarativ
  */
 public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer {
 
+	@CreateNode
 	public ContentOutlineNode createNode(Actor actor,
 			ContentOutlineNode parentNode) {
 		ContentOutlineNode node = super.newOutlineNode(actor, parentNode);
 
-		createNode(node, "Parameters", actor.getParameters());
-		createNode(node, "Input ports", actor.getInputs());
-		createNode(node, "Output ports", actor.getOutputs());
-		createNode(node, "State variables", actor.getStateVariables());
-		createNode(node, "Actions", actor.getActions());
+		createNodes(node, "Parameters", actor.getParameters());
+		createNodes(node, "Input ports", actor.getInputs());
+		createNodes(node, "Output ports", actor.getOutputs());
+		createNodes(node, "State variables", actor.getStateVariables());
+		createNodes(node, "Actions", actor.getActions());
 
 		return node;
 	}
 
-	private void createNode(ContentOutlineNode parent, String name,
+	private void createNodes(ContentOutlineNode parent, String name,
 			EList<?> objects) {
-//		ContentOutlineNode node = super.newOutlineNode(parent, name, null,
-//				new Region(0, 0));
-//		for (Object obj : objects) {
-//			createNode((EObject) obj, node);
-//		}
-//		
-//		node.setSelectionOffset(parent.getSelectionOffset());
-//		node.setSelectionLength(parent.getSelectionLength());
+		ContentOutlineNode node = new ContentOutlineNode(name);
+		parent.addChildren(node);
+		for (Object obj : objects) {
+			createNode((EObject) obj, node);
+		}
 	}
 
 	public List<EObject> getChildren(Action action) {
