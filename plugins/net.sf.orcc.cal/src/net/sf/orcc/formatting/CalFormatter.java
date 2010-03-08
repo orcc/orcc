@@ -236,6 +236,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		f = (CalGrammarAccess) getGrammarAccess();
 
 		c.setIndentationSpace("\t");
+		c.setLinewrap().after(f.getML_COMMENTRule());
 
 		// Tags
 		c.setNoSpace().around(f.getTagAccess().getFullStopKeyword_1_0());
