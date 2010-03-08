@@ -1,0 +1,34 @@
+//import org::eclipse::emf::ecore;
+//import org::eclipse::xtext;
+
+import xtext;
+import ecore;
+
+process(GeneratedMetamodel this) :
+    ePackage.process()
+;
+
+process(EPackage this) :
+    eClassifiers.process()
+;
+
+process(EClassifier this) :
+    null
+;
+
+process(EClass this) :
+    if name == 'VariableReference' then
+    	((EReference) getEStructuralFeature('variable')).defineEOpposite('references')
+    else if name == 'CallExpression' then
+    	((EReference) getEStructuralFeature('function')).defineEOpposite('calls')
+    else if name == 'CallStatement' then
+    	((EReference) getEStructuralFeature('procedure')).defineEOpposite('calls')
+;
+
+defineEOpposite(EReference this, String name) :
+    let opp = new EReference :
+        opp.setName(name) -> opp.setEType(eContainingClass) ->
+        setEOpposite(opp) -> opp.setEOpposite(this) ->
+        opp.setUpperBound(-1) ->
+        eReferenceType.eStructuralFeatures.add(opp)
+;
