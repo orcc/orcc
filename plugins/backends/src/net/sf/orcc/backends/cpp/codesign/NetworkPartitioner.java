@@ -94,10 +94,11 @@ public class NetworkPartitioner {
 	/**
 	 * 
 	 * Returns the partName of the given instance.
+	 * 
 	 * @param instance
 	 * 
 	 * @throws OrccException
-	 * 				If the instance does not contain a partName attribute.
+	 *             If the instance does not contain a partName attribute.
 	 */
 	private String getPartNameOf(Instance instance) throws OrccException {
 		String partName = null;
@@ -117,7 +118,7 @@ public class NetworkPartitioner {
 
 	/**
 	 * Copies connections between instances on the same partition.
-	 *
+	 * 
 	 */
 
 	private void addInternalConnection(Vertex src, Vertex tgt,
@@ -129,8 +130,8 @@ public class NetworkPartitioner {
 	}
 
 	/**
-	 * Creates an input port's vertex and a connection if the source 
-	 * of the connection is on a different partition.
+	 * Creates an input port's vertex and a connection if the source of the
+	 * connection is on a different partition.
 	 * 
 	 */
 
@@ -138,14 +139,13 @@ public class NetworkPartitioner {
 			Connection connection, Network network) throws OrccException {
 
 		Port srcPort = connection.getSource();
-		
+
 		Instance tgtInstance = tgt.getInstance();
-		String partName = getPartNameOf(tgtInstance);
 
 		Vertex vertex = null;
 		if (!incomingFanout.containsKey(srcPort)) {
 			Port port = new Port(srcPort);
-			port.setName(partName+"_input_" + nbInput);
+			port.setName("input_" + nbInput);
 
 			vertex = new Vertex("Input", port);
 			network.getGraph().addVertex(vertex);
@@ -171,8 +171,8 @@ public class NetworkPartitioner {
 	}
 
 	/**
-	 * Creates an output port's vertex and a connection if the source 
-	 * of the connection is on a different partition
+	 * Creates an output port's vertex and a connection if the source of the
+	 * connection is on a different partition
 	 * 
 	 */
 
@@ -182,12 +182,9 @@ public class NetworkPartitioner {
 		Instance inst = tgt.getInstance();
 		Port srcPort = connection.getSource();
 		Port tgtPort = connection.getTarget();
-		
-		String partName = getPartNameOf(src.getInstance());
-		
-		
+
 		Port port = new Port(tgtPort);
-		port.setName(partName+"_output_" + nbOutput);
+		port.setName("output_" + nbOutput);
 		Vertex vertex = new Vertex("Output", port);
 		network.getGraph().addVertex(vertex);
 		network.getOutputs().add(file.getAbsolutePath(), port.getLocation(),
@@ -273,7 +270,7 @@ public class NetworkPartitioner {
 	private Network createPartition(Map.Entry<String, Set<Vertex>> entry,
 			Network network) throws OrccException {
 
-		String name = network.getName() + "_" + entry.getKey();
+		String name = entry.getKey();
 		file = new File(folder.getAbsolutePath() + File.separator + name
 				+ ".xdf");
 
@@ -296,7 +293,7 @@ public class NetworkPartitioner {
 			graph.addVertex(new Vertex(instance));
 
 		}
-		
+
 		// adds variables of the previous flatten network to the sub-network
 		for (GlobalVariable var : network.getVariables()) {
 			GlobalVariable newVar = new GlobalVariable(var.getLocation(), var

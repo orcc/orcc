@@ -2,7 +2,7 @@ group Cpp_network;
 
 includeInstance(instance) ::= <<
 $if(instance.wrapper)$
-#include "wrapper.h"
+#include "wrapperaka.h"
 $else$
 #include "Actor_$instance.id$.h"
 $endif$
@@ -27,7 +27,7 @@ $edges: declareFifo(network.connectionMap.(it))$
 
 declareInstance(instance) ::= <<
 $if(instance.wrapper)$
-Wrapper $instance.id$;
+WrapperAka $instance.id$;
 $else$
 actor_$instance.id$ $instance.id$;
 $endif$

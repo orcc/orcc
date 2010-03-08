@@ -80,15 +80,17 @@ public final class CppActorPrinter extends Printer {
 	 */
 	public void printActor(String fileName, String id, Actor actor)
 			throws IOException {
-		StringTemplate template = group.getInstanceOf("actor");
+		if (!actor.isSystem()) {
+			StringTemplate template = group.getInstanceOf("actor");
 
-		template.setAttribute("actorName", id);
-		template.setAttribute("actor", actor);
+			template.setAttribute("actorName", id);
+			template.setAttribute("actor", actor);
 
-		byte[] b = template.toString(80).getBytes();
-		OutputStream os = new FileOutputStream(fileName);
-		os.write(b);
-		os.close();
+			byte[] b = template.toString(80).getBytes();
+			OutputStream os = new FileOutputStream(fileName);
+			os.write(b);
+			os.close();
+		}
 	}
 
 	@Override

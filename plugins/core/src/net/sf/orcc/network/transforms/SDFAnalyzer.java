@@ -52,7 +52,7 @@ import org.jgrapht.DirectedGraph;
  * 
  */
 
-public class NetworkSdfAnalyzer {
+public class SDFAnalyzer {
 
 	private Map<Vertex, Integer> repetitionVector = new HashMap<Vertex, Integer>();
 	private Map<Vertex, net.sf.orcc.util.Rational> rationalRepetitionVector = new HashMap<Vertex, Rational>();
@@ -61,18 +61,16 @@ public class NetworkSdfAnalyzer {
 
 	int lcm = 0;
 
-	public void transform(Network network) throws OrccException {
-
+	public SDFAnalyzer(Network network) {		
 		graph = network.getGraph();
-		computeRepetitionVector();
-
 	}
-
+	
+	
 	/**
 	 * Computes the repetition vector
 	 * 
 	 */
-	public void computeRepetitionVector() throws OrccException {
+	public Map<Vertex, Integer> computeRepetitionVector() throws OrccException {
 
 		Vertex vertex = (Vertex) graph.vertexSet().toArray()[0];
 
@@ -92,7 +90,7 @@ public class NetworkSdfAnalyzer {
 		}
 
 		checkConsistency();
-
+		return repetitionVector;
 	}
 
 	/**

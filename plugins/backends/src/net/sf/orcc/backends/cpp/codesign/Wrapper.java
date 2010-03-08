@@ -35,8 +35,8 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.attributes.IAttribute;
 
 /**
- * This class defines a wrapper as a particular instance.
- * This class is only used in the context of the codesign.
+ * This class defines a wrapper as a particular instance. This class is only
+ * used in the context of the codesign.
  * 
  * @author Matthieu Wipliez
  * @author Ghislain Roquier
@@ -52,9 +52,8 @@ public class Wrapper extends Instance {
 
 	/**
 	 * Creates a new wrapper whose name is composed from the given actor name
-	 * and port name. 
-	 * The wrapper will have the number of inputs and outputs given and
-	 * the given type.
+	 * and port name. The wrapper will have the number of inputs and outputs
+	 * given and the given type.
 	 * 
 	 * @param actorName
 	 *            name of the source actor

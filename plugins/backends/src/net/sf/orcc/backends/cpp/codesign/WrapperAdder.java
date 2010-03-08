@@ -42,8 +42,8 @@ import net.sf.orcc.util.OrderedMap;
 import org.jgrapht.DirectedGraph;
 
 /**
- * This class defines a transformation that replace input and output ports of the network
- * with a (unique) wrapper instance and appropriate connections.
+ * This class defines a transformation that replace input and output ports of
+ * the network with a (unique) wrapper instance and appropriate connections.
  * This transformation is only used in the context of the codesign.
  * 
  * @author Ghislain Roquier
@@ -53,7 +53,7 @@ import org.jgrapht.DirectedGraph;
 public class WrapperAdder {
 
 	private DirectedGraph<Vertex, Connection> graph;
-	
+
 	/**
 	 * 
 	 */
@@ -61,13 +61,14 @@ public class WrapperAdder {
 	public void transform(Network network) throws OrccException {
 
 		graph = network.getGraph();
-		
+
 		OrderedMap<Port> inputs = network.getInputs();
 		OrderedMap<Port> outputs = network.getOutputs();
 
 		if (inputs.size() > 0 || outputs.size() > 0) {
 
-			Wrapper wrapper = new Wrapper(network.getName(), inputs.size(), outputs.size());
+			Wrapper wrapper = new Wrapper(network.getName(), inputs.size(),
+					outputs.size());
 			Vertex vWrap = new Vertex(wrapper);
 
 			graph.addVertex(vWrap);

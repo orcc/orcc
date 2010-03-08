@@ -80,6 +80,10 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void beforeInstantiation(Network network) throws OrccException {
+		if (partitioning) {
+			path += File.separator + network.getName();
+			new File(path).mkdir();
+		}
 		printer = new CppActorPrinter("Cpp_actorDecl");
 		impl_printer = new CppActorPrinter("Cpp_actorImpl");
 	}
@@ -115,6 +119,10 @@ public class CppBackendImpl extends AbstractBackend {
 		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 		outputName = path + File.separator + "Network_" + name + ".cpp";
 		networkImplPrinter.printNetwork(outputName, network, false, fifoSize);
+		networkImplPrinter.printNetwork(outputName, network, false, fifoSize);
+
+		new CppCMakePrinter().printCMake(path, network, partitioning);
+
 	}
 
 }
