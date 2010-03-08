@@ -30,8 +30,8 @@
 package net.sf.orcc.backends.xlim;
 
 import java.io.File;
-import java.io.IOException;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Network;
@@ -54,7 +54,6 @@ public class XlimBackendImpl extends AbstractBackend {
 			try {
 				System.out.println("START");
 				XlimBackendImpl impl = new XlimBackendImpl();
-				impl.beforeXdfParsing();
 				impl.generateCode(args[0], 10000);
 				System.out.println("DONE");
 			} catch (Exception e) {
@@ -75,7 +74,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	/**
 	 * Create the printer
 	 */
-	protected void beforeXdfParsing() throws IOException {
+	protected void beforeInstantiation(Network network) throws OrccException {
 		printer = new XlimActorPrinter();
 	}
 
