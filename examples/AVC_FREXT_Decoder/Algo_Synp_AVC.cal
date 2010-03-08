@@ -126,6 +126,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	//Cabac intialisation process for the arithmetic decoding engine
 	bool Cabac_Arithmetic_Decoding_Engine_Start := false;
+	bool Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := false;
 	
 	int ( size = 16 ) codIRange;
 	int ( size = 16 ) codIOffset;
@@ -134,6 +135,55 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//mb_skip_flag 
 	int ( size = 1 ) CondTermFlagA;
 	int ( size = 1 ) CondTermFlagB;
+	
+	//CABAC Binarisation
+	
+	int maxBinIdxCtx;
+	int ctxIdxOffset;
+	bool bypassFlag := false;
+	
+	
+	
+	/* List Used as a result for Unary Binarization */
+	List (type: uint(size=2), size=128) synElVal;
+	
+	/* Binary Index */
+	int BinIdx;
+	
+	/* Syntax Element Enumeration */
+	
+	int synElValTest := 1;
+	int CabacSyntaxElementType;
+	
+	int CABAC_MB_TYPE_SI    	 := 0;
+	int CABAC_MB_TYPE_I     	 := 1;
+	int CABAC_MB_TYPE_P_SP  	 := 2;
+	int CABAC_MB_TYPE_B      	 := 3;
+	int CABAC_MB_SKIP_FLAG_P_SP  := 4; 
+	int CABAC_MB_SKIP_FLAG_B     := 5;
+	int CABAC_SUB_MB_TYPE_P_SP   := 6;
+	int CABAC_SUB_MB_TYPE_B	     := 7; 
+	int CABAC_MVD_L0_0_0	     := 8;
+	int CABAC_MVD_L0_1_1	     := 9;
+	int CABAC_REF_IDX_L0_L1      := 10;
+	int CABAC_MB_QP_DELTA        := 11;
+	int CABAC_INTRA_CHROMA_PRED_MODE := 12;
+	int CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG := 13;
+	int CABAC_REM_INTRA4x4_8x8_PRED_MODE := 14;
+	int CABAC_MB_FIELD_DECODING_FLAG := 15;
+	int CABAC_CODED_BLOCK_PATERN := 16;	
+	int CABAC_CODED_BLOCK_FLAG := 17;
+	int CABAC_SIGNIFICANT_COEFF_FLAG := 18;
+	int CABAC_LAST_SIGNIFICANT_COEFF_FLAG := 19;
+	int CABAC_COEFF_ABS_LEVEL_MINUS1 := 20;
+	int CABAC_COEFF_SIGN_FLAG := 21;
+	int CABAC_END_OF_SLICE_FLAG := 22;
+	int CABAC_TRANSFORM_SIZE_8x8_FLAG := 23;
+	
+	
+	
+	
+	
 	
 	// ******** End of CABAC variables declaration ******
 	/*************************************************************
@@ -1416,6 +1466,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
   
 	// ********** Read CABAC ********** //
 	
+	
+	
 	function Clip3( int Min, int Max, int Val  ) --> int :  if (Val < Min) then Min else if (Val > Max) then Max else Val end end end
 	
 	procedure preCtxState_pro(int QPy, int m, int n)
@@ -1456,7 +1508,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Cabac_Start_Initialisation := false;
 		
 	end
-	//FIXME : set Cabac_Arithmetic_Decoding_Engine_Start := true before reading a slice
+	//FIX ME: Maybe put in an an FSM
 	//CABAC : Intialisation process for the arithmetic decoding engine
 	action ==>
 	guard
@@ -1469,6 +1521,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		//Stop Initialisation process for the arithmetic decoding engine
 		Cabac_Arithmetic_Decoding_Engine_Start := false;
+		
+		Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := true;
 	end
 	
 	//Read result for codIOffset
@@ -1476,11 +1530,90 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	action ==>
 	guard 
 		 entropy_coding_mode_flag[pps_id] = 1   and 
-		 Cabac_Arithmetic_Decoding_Engine_Start and
+		 Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start and
 		 done_reading_bits()
 	do
-		codIOffset := read_result();	
+		codIOffset := read_result();
+		Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := false;
 	end
+	
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********       		CABAC Binarization		    	    *********
+	*************************************************************
+	*************************************************************/
+	
+	procedure Ubinarization(int SyntaxElement)
+	begin
+		if ( SyntaxElement  = 0 ) then
+			
+			synElVal[0] := 0;
+			BinIdx := 0;
+		
+		else
+			
+			foreach int s in Integers(0, SyntaxElement - 1) do
+				synElVal[s] := 1;
+			end
+			
+			synElVal[SyntaxElement] := 1; 
+			BinIdx := SyntaxElement;
+		end 
+	end
+	
+	procedure TUbinarization(int SyntaxElement,int cMax)
+	begin
+		if ( SyntaxElement < cMax )then
+				Ubinarization(SyntaxElement);
+		else
+			foreach int s in Integers(0, cMax - 1) do
+				synElVal[s] := 1;
+			end
+		end
+	end
+	
+	function Min(int a, int b) --> int :
+		if ( a < b ) then
+			a
+		else
+			b
+		end
+	end
+	
+	procedure synElValTestValue(int Value, int BinIndx)
+	begin
+		foreach int s in Integers(0, BinIdx - 1) do
+			synElValTest := synElValTest * synElVal[s]; 
+		end
+	end
+	
+	procedure UEGkbinarization(int SyntaxElement, bool signedValFlag, int uCoff, int k)
+	var
+		bool test,
+		int sufS,
+		int stopLoop,
+		int i
+	begin
+		
+		TUbinarization( SyntaxElement, uCoff);
+		synElValTestValue( 1, uCoff);
+		test := ( not signedValFlag and synElValTest = 1 ) or ( signedValFlag and synElVal[0] = 0 and BinIdx = 0 ) ;
+		
+		if ( not test ) then
+			if ( Abs( SyntaxElement ) >= uCoff ) then
+				sufS := Abs( SyntaxElement ) - uCoff;
+				stopLoop := 0;
+				i := 0;
+				while( stopLoop != 0 ) do
+					if( sufS >= ( 1 << k )) then
+						synElVal[i] := 1;
+						sufS := sufS - ( 1 << k );
+						
+			end
+		end
+	end
+	
 	/*************************************************************
 	*************************************************************
 	********              NAL Unit HEADER                ********
