@@ -161,10 +161,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//CABAC Binarisation
 	
 	int maxBinIdxCtx;
-	int ctxIdxOffset;
+	
 	bool bypassFlag := false;
 	
-	
+	//CABAC Decoding Process
+	int ctxIdxOffset;
 	
 	/* List Used as a result for Binarization */
 	List (type: uint(size=2), size=128) synElVal;
@@ -1710,7 +1711,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		codIOffset := read_result();
 		Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := false;
-		FLbinarization(54,8);
 	end
 	
 	//*************************************************************/
@@ -1743,7 +1743,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	procedure TUbinarization(int SyntaxElement, int cMax, int binIdx)
 	begin
 		if ( SyntaxElement < cMax ) then
-			Ubinarization(SyntaxElement);
+			Ubinarization(SyntaxElement, binIdx);
 		else
 			BinIdx := 0;
 			foreach int s in Integers(binIdx, cMax - 1) do
@@ -1895,12 +1895,68 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
-	********       		CABAC Decoding Process    	    *********
+	********      CABAC Decoding Process Flow       	*********
 	*************************************************************
 	*************************************************************/
 	
+	//Derivation process of ctxIdxInc for the syntax element mb_type
+	/*
+	procedure ctxIdxincMbType() 
+		var
+		int condTermFlagA,
+		int condTermFlagB
+	begin
+		
+	end
+	*/
 	
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********      MB Neighbouring                    	*********
+	*************************************************************
+	*************************************************************/
 	
+	// FIXME : Add the possibility to return false when the mbAddr belongs to another slice
+	function mbAddrAvailable( int mbAddrN ) --> bool : 
+		if ( ( mbAddrN < 0 ) or ( mbAddrN > val_CurrMbAddr ) )then 
+			false  //return 
+		else 
+			true  //return
+		end 
+	end
+	
+	function GiveMbAddrA( ) --> int :
+		val_CurrMbAddr - 1
+	end
+	
+	function mbAddrA_Avail() --> bool :
+		( val_CurrMbAddr mod PicWidthInMbs )= 0
+	end
+	
+	function GiveMbAddrB( ) --> int :
+		val_CurrMbAddr - PicWidthInMbs
+	end
+	
+	function mbAddrB_Avail() --> bool :
+		mbAddrAvailable( GiveMbAddrB() )
+	end
+	
+	function GivembAddrC( ) --> int :
+		val_CurrMbAddr - PicWidthInMbs + 1
+	end
+	
+	function mbAddrC_Avail() --> bool :
+		( ( val_CurrMbAddr + 1 ) mod PicWidthInMbs  ) = 0
+	end
+	
+	function GivembAddrD( ) --> int :
+		val_CurrMbAddr - PicWidthInMbs - 1
+	end
+	
+	function mbAddrD_Avail() --> bool :
+		( val_CurrMbAddr mod PicWidthInMbs )= 0
+	end
 	/*************************************************************
 	*************************************************************
 	********              NAL Unit HEADER                ********
