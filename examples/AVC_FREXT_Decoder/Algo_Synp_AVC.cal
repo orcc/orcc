@@ -115,6 +115,28 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	// ********** read CABAC ********* //
 	
+	//log2 tab
+    List(type: int(size=4), size=256) ceil_log2_tab = 
+		[ 
+			0, 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 
+			5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 
+			6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 
+			6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 
+			7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+			7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+			7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+			7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8,
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
+			8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8  
+		];
+
+
+	
 	//Cabac initialisation
 	bool Cabac_Start_Initialisation := false;
 	
@@ -144,9 +166,161 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	
 	
-	/* List Used as a result for Unary Binarization */
+	/* List Used as a result for Binarization */
 	List (type: uint(size=2), size=128) synElVal;
+	List ( type: List ( type: int(size = 8), size = 8) , size = 26 ) synEval_MB_I = 
+	[
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		[5, 1, 0, 0, 0, 0, 0, 0],
+		[5, 1, 0, 0, 0, 0, 1, 0],
+		[5, 1, 0, 0, 0, 1, 0, 0],
+		[5, 1, 0, 0, 0, 1, 1, 0],
+		[6, 1, 0, 0, 1, 0, 0, 0],
+		[6, 1, 0, 0, 1, 0, 0, 1],
+		[6, 1, 0, 0, 1, 0, 1, 0],
+		[6, 1, 0, 0, 1, 0, 1, 1],
+		[6, 1, 0, 0, 1, 1, 0, 0],
+		[6, 1, 0, 0, 1, 1, 0, 1],
+		[6, 1, 0, 0, 1, 1, 1, 0],
+		[6, 1, 0, 0, 1, 1, 1, 1],
+		[5, 1, 0, 1, 0, 0, 0, 0],
+		[5, 1, 0, 1, 0, 0, 1, 0],
+		[5, 1, 0, 1, 0, 1, 0, 0],
+		[5, 1, 0, 1, 0, 1, 1, 0],
+		[6, 1, 0, 1, 1, 0, 0, 0],
+		[6, 1, 0, 1, 1, 0, 0, 1],
+		[6, 1, 0, 1, 1, 0, 1, 0],
+		[6, 1, 0, 1, 1, 0, 1, 1],
+		[6, 1, 0, 1, 1, 1, 0, 0],
+		[6, 1, 0, 1, 1, 1, 0, 1],
+		[6, 1, 0, 1, 1, 1, 1, 0],
+		[6, 1, 0, 1, 1, 1, 1, 1],
+		[1, 1, 1, 0, 0, 0, 0, 0]
+	];
+	List ( type: List ( type: int(size = 8), size = 4) , size = 31 ) synEval_MB_P_SP = 
+	[
+		[2, 0, 0, 0],
+		[2, 0, 1, 1],
+		[2, 0, 1, 0],
+		[2, 0, 0, 1],
+		[0, 0, 0, 0],
+	    [0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 1, 0, 0]
+	];
 	
+	List ( type: List ( type: int(size = 8), size = 8) , size = 49 ) synEval_MB_B = 
+	[
+		[0, 0, 0, 0, 0, 0, 0, 0],
+		
+		[2, 1, 0, 0, 0, 0, 0, 0],
+		[2, 1, 0, 1, 0, 0, 0, 0],
+		
+		[6, 1, 1, 0, 0, 0, 0, 0],
+		[6, 1, 1, 0, 0, 0, 1, 0],
+		[6, 1, 1, 0, 0, 1, 0, 0],
+		[6, 1, 1, 0, 0, 1, 1, 0],
+		[6, 1, 1, 0, 1, 0, 0, 0],
+		[6, 1, 1, 0, 1, 0, 1, 0],
+		[6, 1, 1, 0, 1, 1, 0, 0],
+		[6, 1, 1, 0, 1, 1, 1, 0],
+		[6, 1, 1, 1, 1, 1, 0, 0],
+		[6, 1, 1, 1, 0, 0, 0, 0],
+		[6, 1, 1, 1, 0, 0, 0, 1],
+		[6, 1, 1, 1, 0, 0, 1, 0],
+		[6, 1, 1, 1, 0, 0, 1, 1],
+		[6, 1, 1, 1, 0, 1, 0, 0],
+		[6, 1, 1, 1, 0, 1, 0, 1],
+		[6, 1, 1, 1, 0, 1, 1, 0],
+		[6, 1, 1, 1, 0, 1, 1, 1],
+		[6, 1, 1, 1, 1, 0, 0, 0],
+		[6, 1, 1, 1, 1, 0, 0, 1],
+		
+		[5, 1, 1, 1, 1, 1, 1, 0],
+		
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 1, 0, 1, 0]
+	];
+	
+	
+	List ( type: List ( type: int(size = 8), size = 7) , size = 4 ) synEval_SUB_MB_P_SP = 
+	[
+		[0, 1, 0, 0, 0, 0, 0],
+		
+		[1, 0, 0, 0, 0, 0, 0],
+		
+		[2, 0, 1, 1, 0, 0, 0],
+		[2, 0, 1, 0, 0, 0, 0]
+		
+	];
+	
+	List ( type: List ( type: int(size = 8), size = 7) , size = 13 ) synEval_SUB_MB_B = 
+	[
+		[0, 0, 0, 0, 0, 0, 0],
+		
+		[2, 1, 0, 0, 0, 0, 0],
+		[2, 1, 0, 1, 0, 0, 0],
+		
+		[4, 1, 1, 0, 0, 0, 0],
+		[4, 1, 1, 0, 0, 1, 0],
+		[4, 1, 1, 0, 1, 0, 0],
+		[4, 1, 1, 0, 1, 1, 0],
+		
+		[5, 1, 1, 1, 0, 0, 0],
+		[5, 1, 1, 1, 0, 0, 1],
+		[5, 1, 1, 1, 0, 1, 0],
+		[5, 1, 1, 1, 0, 1, 1],
+		
+		[4, 1, 1, 1, 1, 0, 0],
+		[4, 1, 1, 1, 1, 1, 0]
+	];
 	/* Binary Index */
 	int BinIdx;
 	
@@ -558,7 +732,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	********       		Context Index Lists - CABAC   	 *********
 	*************************************************************
 	*************************************************************/
-	List ( type: List (type: int(size=2), size = 2) , size = 467 ) Cabac_Context_Init_I = 
+	
+	List ( type: List ( type: int(size = 9), size = 2) , size = 467 ) Cabac_Context_Init_I = 
 	[
 		/* 0 - 10 */
 		[ 20, -15 ], [  2, 54 ],  [  3,  74 ], [ 20, -15 ],
@@ -1535,25 +1710,27 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		codIOffset := read_result();
 		Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := false;
+		FLbinarization(54,8);
 	end
 	
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
-	********       		CABAC Binarization		    	    *********
+	********       		CABAC Binarization		    	*********
 	*************************************************************
 	*************************************************************/
 	
-	procedure Ubinarization(int SyntaxElement)
+	// Unary binarisation process
+	procedure Ubinarization(int SyntaxElement,int binIdx)
 	begin
 		if ( SyntaxElement  = 0 ) then
 			
-			synElVal[0] := 0;
+			synElVal[binIdx] := 0;
 			BinIdx := 0;
 		
 		else
 			
-			foreach int s in Integers(0, SyntaxElement - 1) do
+			foreach int s in Integers(binIdx, SyntaxElement - 1) do
 				synElVal[s] := 1;
 			end
 			
@@ -1562,14 +1739,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end 
 	end
 	
-	procedure TUbinarization(int SyntaxElement,int cMax)
+	// Truncated unary binarisation process
+	procedure TUbinarization(int SyntaxElement, int cMax, int binIdx)
 	begin
-		if ( SyntaxElement < cMax )then
-				Ubinarization(SyntaxElement);
+		if ( SyntaxElement < cMax ) then
+			Ubinarization(SyntaxElement);
 		else
-			foreach int s in Integers(0, cMax - 1) do
+			BinIdx := 0;
+			foreach int s in Integers(binIdx, cMax - 1) do
 				synElVal[s] := 1;
-			end
+				BinIdx := BinIdx + 1;
+			end	
 		end
 	end
 	
@@ -1588,6 +1768,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 	end
 	
+	//Concatenated unary/k-th order Exp-Golomb (UEGk) binarization process
+	
+	//FIXME 
+	/*
 	procedure UEGkbinarization(int SyntaxElement, bool signedValFlag, int uCoff, int k)
 	var
 		bool test,
@@ -1606,13 +1790,116 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				stopLoop := 0;
 				i := 0;
 				while( stopLoop != 0 ) do
-					if( sufS >= ( 1 << k )) then
+					if( sufS >= ( 1 << k ) ) then
 						synElVal[i] := 1;
 						sufS := sufS - ( 1 << k );
-						
+						k := k + 1;
+					else
+						synElVal[i] := 0;
+						while( k > 0 ) do
+							synElVal[i] := ( sufS >> k ) & 0x01;
+							k := k - 1;
+						end
+						stopLoop := 1;
+					end
+				end
+			end 
+			if( signedValFlag and synElVal != 0 ) then
+     				if( synElVal > 0 ) then
+          				synElVal[ i + 1 ] := 0;
+     				else
+          				synElVal[ i + 1 ] := 1;
+				end
 			end
 		end
 	end
+	*/
+	
+	function ceil_log2(int idx) --> int :
+	  ceil_log2_tab[idx]
+	end
+	
+	procedure FLbinarization(int SyntaxElement,int cMax,int binIdx)
+	var
+		int fixedLength,
+		int se
+	begin
+		fixedLength := ceil_log2(cMax + 1);
+		se :=  SyntaxElement;
+		foreach int s in Integers(binIdx, fixedLength - 1) do
+			synElVal[s] := ( se >> s ) & 0x1;
+		end
+		BinIdx := fixedLength;
+	end
+	
+	/* Specific Syntax Element Binarization */
+	
+	// Mb Type and Sub Mb Type Binarization
+
+	procedure MbTypeBinarizationSliceI(int MbType)
+	begin
+		BinIdx := synEval_MB_I[MbType][0];
+		foreach int s in Integers(1, BinIdx + 1) do
+			synElVal[s - 1] := synEval_MB_I[MbType][s];
+		end
+	end
+	
+	procedure MbTypeBinarizationSliceP_SP(int MbType)
+	begin
+		BinIdx := synEval_MB_P_SP[MbType][0];
+		foreach int s in Integers(1, BinIdx + 1) do
+			synElVal[s - 1] := synEval_MB_P_SP[MbType][s];
+		end
+	end
+	
+	procedure MbTypeBinarizationSliceB(int MbType)
+	begin
+		BinIdx := synEval_MB_B[MbType][0];
+		foreach int s in Integers(1, BinIdx + 1) do
+			synElVal[s - 1] := synEval_MB_B[MbType][s];
+		end
+	end
+	
+	procedure SubMbTypeBinarizationSliceP_SP(int MbType)
+	begin
+		BinIdx := synEval_SUB_MB_P_SP[MbType][0];
+		foreach int s in Integers(1, BinIdx + 1) do
+			synElVal[s - 1] := synEval_SUB_MB_P_SP[MbType][s];
+		end
+	end
+	
+	procedure SubMbTypeBinarizationSliceB(int MbType)
+	begin
+		BinIdx := synEval_SUB_MB_B[MbType][0];
+		foreach int s in Integers(1, BinIdx + 1) do
+			synElVal[s - 1] := synEval_SUB_MB_B[MbType][s];
+		end
+	end
+	
+	//Binarization pocess for coded block pattern
+	procedure CodedBlockPaternBinarization( )
+	begin
+		FLbinarization(val_CodedBlockPatternLuma, 15, 0);
+		if ( ( chroma_format_idc[sps_id] = 0 ) or ( chroma_format_idc[sps_id] = 3 ) ) then
+			TUbinarization(CodedBlockPatternChroma, 2, BinIdx );
+		end	
+	end
+	
+	//Binarization pocess for mb_qp_delta
+	procedure MbQpDeltaBinarization(int MbQpDelta_se )
+	begin
+		Ubinarization( MbQpDelta_se, 0);
+	end
+	
+	
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********       		CABAC Decoding Process    	    *********
+	*************************************************************
+	*************************************************************/
+	
+	
 	
 	/*************************************************************
 	*************************************************************
@@ -1671,7 +1958,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		nal_unit_type = 5 or nal_unit_type = 1
 	do
 		start_vld();
-		//Initialisation process for the arithmetic decoding engine
+		//Initialisation process for the arithmetic decoding engine //FIXME
 		Cabac_Arithmetic_Decoding_Engine_Start := true; 
 	end
 
