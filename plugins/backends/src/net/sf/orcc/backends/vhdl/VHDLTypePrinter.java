@@ -75,8 +75,8 @@ public class VHDLTypePrinter extends DefaultTypePrinter {
 	 */
 	private void printInt(int size) {
 		// limits size to 32 bits
-		if (size >= 32) {
-			size = 32;
+		if (size >= 31) {
+			size = 31;
 		}
 
 		BigInteger bound = new BigInteger("1").shiftLeft(size - 1);

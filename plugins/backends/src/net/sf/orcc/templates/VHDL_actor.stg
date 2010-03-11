@@ -40,7 +40,7 @@ $actorName$_$port.name$_write <= '0';$"\n"$
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
 listSize(value) ::= <<
-$value : {$it$ -1 downto 0}; separator=", "$
+$value : {0 to $it$ -1}; separator=", "$
 >>
 
 
@@ -94,7 +94,6 @@ $variable$ <= $variable.constantValue$;
 >>
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,35 +138,42 @@ $load.target$ := $load.source$;
 $endif$
 >>
 
-Peek(peek) ::= <<>>
-// $if(peek.numTokens)$
-// $peek.target$ := $actorName$_$peek.port$_data;
-// read_FIFO_$actorName$_$peek.port$ <= '1';
-// $else$
-// -- ERROR multiple token : $peek.numTokens$ 
-// $endif$
+Peek(peek) ::= <<
+$if(peek.unit)$
+  $if(peek.target.type.bool)$
+$peek.target$ := $actorName$_$peek.port$_data;$\n$
+  $else$
+    $if(peek.target.type.int)$
+$peek.target$ := to_integer(signed($actorName$_$peek.port$_data));$\n$
+    $else$
+$peek.target$ := to_integer(unsigned($actorName$_$peek.port$_data));$\n$
+    $endif$
+  $endif$
+$else$
+-- peek multiple token not coded yet
+$endif$
+>>
+
 
 
 Read(read) ::= <<
 $if(read.unit)$
-$if(read.target.type.bool)$
+  $if(read.target.type.bool)$
 $read.target$ := $actorName$_$read.port$_data;$\n$
-$else$
-$if(read.target.type.int)$
+  $else$
+    $if(read.target.type.int)$
 $read.target$ := to_integer(signed($actorName$_$read.port$_data));$\n$
-$else$
+    $else$
 $read.target$ := to_integer(unsigned($actorName$_$read.port$_data));$\n$
-$endif$
-$endif$
-$actorName$_$read.port$_read <= '1';
+    $endif$
+  $endif$
+  $actorName$_$read.port$_read <= '1';
 $else$
 -- read multiple token not coded yet
 $endif$
 
 
 >>
-
-ReadEnd(readEnd) ::= <<>>
 
 // a "return" must be transformed when the attribute "transformReturn"
 // is present, which normally only occurs when printActionSchedulerInline
@@ -214,7 +220,6 @@ $actorName$_$write.port$_write <= '1';
 
 >>
 
-WriteEnd(writeEnd) ::= <<>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
