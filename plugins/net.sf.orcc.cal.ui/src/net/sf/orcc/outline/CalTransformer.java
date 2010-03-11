@@ -32,6 +32,8 @@ import java.util.List;
 
 import net.sf.orcc.cal.Action;
 import net.sf.orcc.cal.Actor;
+import net.sf.orcc.cal.Priority;
+import net.sf.orcc.cal.Schedule;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -54,17 +56,31 @@ public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer 
 		createNodes(node, "Input ports", actor.getInputs());
 		createNodes(node, "Output ports", actor.getOutputs());
 		createNodes(node, "State variables", actor.getStateVariables());
+		createNodes(node, "Functions", actor.getFunctions());
+		createNodes(node, "Procedures", actor.getProcedures());
 		createNodes(node, "Actions", actor.getActions());
+		
+		Schedule schedule = actor.getSchedule();
+		if (schedule != null) {
+			createNodes(node, "FSM", schedule.getTransitions());
+		}
+
+		List<Priority> priorities = actor.getPriorities();
+		if (!priorities.isEmpty()) {
+			createNodes(node, "Priorities", priorities.get(0).getInequalities());
+		}
 
 		return node;
 	}
 
 	private void createNodes(ContentOutlineNode parent, String name,
 			EList<?> objects) {
-		ContentOutlineNode node = new ContentOutlineNode(name);
-		parent.addChildren(node);
-		for (Object obj : objects) {
-			createNode((EObject) obj, node);
+		if (!objects.isEmpty()) {
+			ContentOutlineNode node = new ContentOutlineNode(name);
+			parent.addChildren(node);
+			for (Object obj : objects) {
+				createNode((EObject) obj, node);
+			}
 		}
 	}
 

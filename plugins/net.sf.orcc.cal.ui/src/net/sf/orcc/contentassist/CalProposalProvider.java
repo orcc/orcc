@@ -33,10 +33,13 @@ import net.sf.orcc.cal.Port;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.xtext.Assignment;
+import org.eclipse.xtext.CrossReference;
+import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.ui.core.editor.contentassist.ContentAssistContext;
 import org.eclipse.xtext.ui.core.editor.contentassist.ICompletionProposalAcceptor;
+
+import com.google.common.base.Predicate;
 
 /**
  * see
@@ -48,29 +51,26 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 	public void completeInputPattern_Port(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		Actor actor = (Actor) model.eContainer();
-		createProposals(actor.getInputs(), context, acceptor);
+		proposePorts(actor.getInputs(), assignment, context, acceptor);
 	}
 
 	public void completeOutputPattern_Port(EObject model,
 			Assignment assignment, ContentAssistContext context,
 			ICompletionProposalAcceptor acceptor) {
 		Actor actor = (Actor) model.eContainer();
-		createProposals(actor.getOutputs(), context, acceptor);
+		proposePorts(actor.getOutputs(), assignment, context, acceptor);
 	}
 
-	private void createProposals(EList<Port> ports,
+	private void proposePorts(final EList<Port> ports, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		for (Port port : ports) {
-			String proposal = port.getName();
+		lookupCrossReference(((CrossReference) assignment.getTerminal()),
+				context, acceptor, new Predicate<IEObjectDescription>() {
 
-			// create the completion proposal
-			ICompletionProposal completionProposal = createCompletionProposal(
-					proposal, context);
-
-			// register the proposal, the acceptor handles null-values
-			// gracefully
-			acceptor.accept(completionProposal);
-		}
+					@Override
+					public boolean apply(IEObjectDescription objDesc) {
+						return ports.contains(objDesc.getEObjectOrProxy());
+					}
+				});
 	}
 
 }

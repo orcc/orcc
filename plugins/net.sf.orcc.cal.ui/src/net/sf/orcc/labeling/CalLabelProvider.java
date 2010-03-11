@@ -29,10 +29,11 @@
 package net.sf.orcc.labeling;
 
 import java.util.Iterator;
-import java.util.List;
 
 import net.sf.orcc.cal.Action;
+import net.sf.orcc.cal.Inequality;
 import net.sf.orcc.cal.Tag;
+import net.sf.orcc.cal.Transition;
 
 import org.eclipse.xtext.ui.core.DefaultLabelProvider;
 
@@ -47,18 +48,42 @@ public class CalLabelProvider extends DefaultLabelProvider {
 		if (tag == null) {
 			return "(untagged)";
 		} else {
-			StringBuilder builder = new StringBuilder();
-			List<String> identifiers = action.getTag().getIdentifiers();
-			Iterator<String> it = identifiers.iterator();
-			builder.append(it.next());
+			return getText(tag);
+		}
+	}
 
+	public String text(Inequality inequality) {
+		Iterator<Tag> it = inequality.getTags().iterator();
+		StringBuilder builder = new StringBuilder();
+		if (it.hasNext()) {
+			builder.append(text(it.next()));
+			while (it.hasNext()) {
+				builder.append(" > ");
+				builder.append(getText(it.next()));
+			}
+			builder.append(';');
+		}
+
+		return builder.toString();
+	}
+
+	public String text(Tag tag) {
+		Iterator<String> it = tag.getIdentifiers().iterator();
+		StringBuilder builder = new StringBuilder();
+		if (it.hasNext()) {
+			builder.append(it.next());
 			while (it.hasNext()) {
 				builder.append('.');
 				builder.append(it.next());
 			}
-
-			return builder.toString();
 		}
+
+		return builder.toString();
+	}
+
+	public String text(Transition transition) {
+		return transition.getSource() + " (" + getText(transition.getTag())
+				+ ") --> " + transition.getTarget();
 	}
 
 }
