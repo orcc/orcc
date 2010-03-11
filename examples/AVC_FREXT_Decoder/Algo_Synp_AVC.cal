@@ -136,6 +136,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		];
 
 
+	//Skip Flags
+	
+	bool P_Skip_Flag := false;
+	bool B_Skip_Flag := false;
+	
+	// SLICE TYPES
+	
+	function IS_INxN(int Mbtype) --> bool : Mbtype > 0 and Mbtype < 25 end
+	function IS_I4x4(int Mbtype) --> bool : Mbtype = 0 end
+	function IS_SI() --> bool : slice_type = SLICE_TYPE_SI end
 	
 	//Cabac initialisation
 	bool Cabac_Start_Initialisation := false;
@@ -145,7 +155,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	List ( type : int (size = 6), size = 640) pStateIdx;
 	List ( type : int (size = 1), size = 640) valMPS;
 	int ctxIdxInc := 0;
-	
+	int ctxIdx;
+	int binIdx;
 	//Cabac intialisation process for the arithmetic decoding engine
 	bool Cabac_Arithmetic_Decoding_Engine_Start := false;
 	bool Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := false;
@@ -167,8 +178,18 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//CABAC Decoding Process
 	int ctxIdxOffset;
 	
+	//CABAC Neighbouring*
+	/*
+		mbTab := [ Address ][ Availability, mb_type ]
+	*/
+    int mbTabAvail  := 0;
+	int mbTabMbtype := 1;
+	
+	List ( type: List ( type: int, size = 2) , size = PICHEIGHT ) mbTab;
+	 
+	
 	/* List Used as a result for Binarization */
-	List (type: uint(size=2), size=128) synElVal;
+	List ( type: uint(size=2), size=128 ) synElVal;
 	List ( type: List ( type: int(size = 8), size = 8) , size = 26 ) synEval_MB_I = 
 	[
 		[0, 0, 0, 0, 0, 0, 0, 0],
@@ -330,29 +351,29 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	int synElValTest := 1;
 	int CabacSyntaxElementType;
 	
-	int CABAC_MB_TYPE_SI    	 := 0;
-	int CABAC_MB_TYPE_I     	 := 1;
-	int CABAC_MB_TYPE_P_SP  	 := 2;
-	int CABAC_MB_TYPE_B      	 := 3;
-	int CABAC_MB_SKIP_FLAG_P_SP  := 4; 
-	int CABAC_MB_SKIP_FLAG_B     := 5;
-	int CABAC_SUB_MB_TYPE_P_SP   := 6;
-	int CABAC_SUB_MB_TYPE_B	     := 7; 
-	int CABAC_MVD_L0_0_0	     := 8;
-	int CABAC_MVD_L0_1_1	     := 9;
-	int CABAC_REF_IDX_L0_L1      := 10;
-	int CABAC_MB_QP_DELTA        := 11;
-	int CABAC_INTRA_CHROMA_PRED_MODE := 12;
-	int CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG := 13;
-	int CABAC_REM_INTRA4x4_8x8_PRED_MODE := 14;
-	int CABAC_MB_FIELD_DECODING_FLAG := 15;
-	int CABAC_CODED_BLOCK_PATERN := 16;	
-	int CABAC_CODED_BLOCK_FLAG := 17;
-	int CABAC_SIGNIFICANT_COEFF_FLAG := 18;
-	int CABAC_LAST_SIGNIFICANT_COEFF_FLAG := 19;
-	int CABAC_COEFF_ABS_LEVEL_MINUS1 := 20;
-	int CABAC_COEFF_SIGN_FLAG := 21;
-	int CABAC_END_OF_SLICE_FLAG := 22;
+	int CABAC_MB_TYPE_SI    	 				:= 0;
+	int CABAC_MB_TYPE_I     	 				:= 1;
+	int CABAC_MB_TYPE_P_SP  	 				:= 2;
+	int CABAC_MB_TYPE_B      	 				:= 3;
+	int CABAC_MB_SKIP_FLAG_P_SP  				:= 4; 
+	int CABAC_MB_SKIP_FLAG_B     				:= 5;
+	int CABAC_SUB_MB_TYPE_P_SP   				:= 6;
+	int CABAC_SUB_MB_TYPE_B	     				:= 7; 
+	int CABAC_MVD_L0_0_0	     				:= 8;
+	int CABAC_MVD_L0_1_1	     				:= 9;
+	int CABAC_REF_IDX_L0_L1						:= 10;
+	int CABAC_MB_QP_DELTA						:= 11;
+	int CABAC_INTRA_CHROMA_PRED_MODE			:= 12;
+	int CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG	:= 13;
+	int CABAC_REM_INTRA4x4_8x8_PRED_MODE 		:= 14;
+	int CABAC_MB_FIELD_DECODING_FLAG 			:= 15;
+	int CABAC_CODED_BLOCK_PATERN 				:= 16;	
+	int CABAC_CODED_BLOCK_FLAG 					:= 17;
+	int CABAC_SIGNIFICANT_COEFF_FLAG 			:= 18;
+	int CABAC_LAST_SIGNIFICANT_COEFF_FLAG 		:= 19;
+	int CABAC_COEFF_ABS_LEVEL_MINUS1 			:= 20;
+	int CABAC_COEFF_SIGN_FLAG 					:= 21;
+	int CABAC_END_OF_SLICE_FLAG 				:= 22;
 	int CABAC_TRANSFORM_SIZE_8x8_FLAG := 23;
 	
 	
@@ -1442,6 +1463,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	function IS_I_PCM() --> bool : mb_intra_flag = 1 and mb_type = 25 end
 	function IS_P_8x8ref0() --> bool : slice_type = SLICE_TYPE_P and mb_type = 4 end
 	function IS_B_Direct_8x8() --> bool : slice_type = SLICE_TYPE_B and sub_mb_type[ mbPartIdx ] = 0 end
+	
 
 	function vld_end() --> bool : not NewVLD end
 	function vld_ue() --> int : lshift(1, CodeLen)+Codeword-1 end
@@ -1891,6 +1913,43 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Ubinarization( MbQpDelta_se, 0);
 	end
 	
+	procedure Getbinarization(int SyntaxElement, int ctxBlockCat)
+	begin
+		if ( SyntaxElement = CABAC_MB_TYPE_SI ) then
+			maxBinIdxCtx := 6;
+			ctxIdxOffset := 3;
+			bypassFlag := false;
+		else if ( SyntaxElement = CABAC_MB_TYPE_I ) then
+			maxBinIdxCtx := 6;
+			ctxIdxOffset := 3;
+			bypassFlag := false;
+		else if ( SyntaxElement = CABAC_MB_TYPE_P_SP ) then
+			maxBinIdxCtx := 2 + 5;
+			ctxIdxOffset := 14 + 17;
+			bypassFlag := false;
+		else if ( SyntaxElement = CABAC_MB_TYPE_B ) then
+			maxBinIdxCtx := 3 + 5;
+			ctxIdxOffset := 27 + 32;
+			bypassFlag := false;
+		else if ( SyntaxElement = CABAC_MB_SKIP_FLAG_P_SP ) then
+			maxBinIdxCtx := 2;
+			ctxIdxOffset := 21;
+			bypassFlag := false;
+		else if ( SyntaxElement = CABAC_MB_SKIP_FLAG_B ) then
+			maxBinIdxCtx := 0;
+			ctxIdxOffset := 24;
+			bypassFlag := false;
+		else if ( SyntaxElement = CABAC_SUB_MB_TYPE_P_SP ) then
+			maxBinIdxCtx := 2;
+			ctxIdxOffset := 21;
+			bypassFlag := false;
+		else if ( SyntaxElement = CABAC_SUB_MB_TYPE_B ) then
+			maxBinIdxCtx := 3;
+			ctxIdxOffset := 36;
+			bypassFlag := false;
+		end end end end end end end end
+	end
+	
 	
 	//*************************************************************/
 	/*************************************************************
@@ -1899,16 +1958,70 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	*************************************************************
 	*************************************************************/
 	
+	//Derivation process for ctxIdx
+	procedure GetCtxIdx()
+	begin
+		if ( ctxIdxOffset = 0 ) then
+			ctxIdxincMbType();
+			ctxIdx := ctxIdxInc;
+		else if (  ctxIdxOffset = 3 ) then
+			if (binIdx = 0) then
+				ctxIdxincMbType();
+				ctxIdx := 3 + ctxIdxInc;
+			else if ( binIdx = 1 ) then
+				ctxIdx := 276;
+			else if ( binIdx = 2 ) then
+				ctxIdx := 6;
+			else if ( binIdx = 3 ) then
+				ctxIdx := 7;
+			else if ( binIdx = 4 ) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := 3 + ctxIdxInc;
+			else if ( binIdx = 5 ) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := 3 + ctxIdxInc;
+			else
+				ctxIdx := 3 + 7;
+			end end end end end end
+		end end
+			
+	end
+	
+	
+	
+	
 	//Derivation process of ctxIdxInc for the syntax element mb_type
-	/*
+	
+	//FIXME : Maybe add B_Direct_16x16 in the ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+	
 	procedure ctxIdxincMbType() 
-		var
+	var
 		int condTermFlagA,
 		int condTermFlagB
 	begin
+		if ( mbAddrA_Avail() or
+		     ctxIdxOffset = 0  and ( IS_SI() and ( IS_I4x4( GiveMbTypeAddrA() ) and IS_INxN( GiveMbTypeAddrA() ) ) ) or
+			 ctxIdxOffset = 3  and IS_INxN( GiveMbTypeAddrA() ) or
+			 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+			 
+			 condTermFlagA := 0;
+		else
+			 condTermFlagA := 1;
+		end
 		
+		if ( mbAddrB_Avail() or
+		     ctxIdxOffset = 0  and ( IS_SI() and ( IS_I4x4( GiveMbTypeAddrB() ) and IS_INxN( GiveMbTypeAddrB() ) ) ) or
+			 ctxIdxOffset = 3  and IS_INxN( GiveMbTypeAddrB() ) or
+			 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+	
+			 condTermFlagB := 0;
+		else
+			 condTermFlagB := 1;
+		end
+		
+		ctxIdxInc := condTermFlagA + condTermFlagB;
 	end
-	*/
+	
 	
 	//*************************************************************/
 	/*************************************************************
@@ -1941,7 +2054,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	function mbAddrB_Avail() --> bool :
 		mbAddrAvailable( GiveMbAddrB() )
 	end
-	
+	/*
 	function GivembAddrC( ) --> int :
 		val_CurrMbAddr - PicWidthInMbs + 1
 	end
@@ -1955,8 +2068,26 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	function mbAddrD_Avail() --> bool :
-		( val_CurrMbAddr mod PicWidthInMbs )= 0
+		( val_CurrMbAddr mod PicWidthInMbs ) = 0
 	end
+	*/
+	function GiveMbTypeAddrA( ) --> int :
+		if (mbAddrA_Avail() ) then
+			mbTab[ val_CurrMbAddr - GiveMbAddrA() ][ mbTabAvail ]
+		else
+			-1
+		end		
+	end
+	
+	function GiveMbTypeAddrB( ) --> int :
+		if (mbAddrB_Avail() ) then
+			mbTab[ val_CurrMbAddr - GiveMbAddrB() ][ mbTabAvail ]
+		else
+			-1
+		end		
+	end
+	
+	
 	/*************************************************************
 	*************************************************************
 	********              NAL Unit HEADER                ********
