@@ -28,7 +28,15 @@
  */
 package net.sf.orcc.contentassist;
 
-import net.sf.orcc.contentassist.AbstractCalProposalProvider;
+import net.sf.orcc.cal.Actor;
+import net.sf.orcc.cal.Port;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.xtext.Assignment;
+import org.eclipse.xtext.ui.core.editor.contentassist.ContentAssistContext;
+import org.eclipse.xtext.ui.core.editor.contentassist.ICompletionProposalAcceptor;
 
 /**
  * see
@@ -36,5 +44,33 @@ import net.sf.orcc.contentassist.AbstractCalProposalProvider;
  * how to customize content assistant
  */
 public class CalProposalProvider extends AbstractCalProposalProvider {
+
+	public void completeInputPattern_Port(EObject model, Assignment assignment,
+			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		Actor actor = (Actor) model.eContainer();
+		createProposals(actor.getInputs(), context, acceptor);
+	}
+
+	public void completeOutputPattern_Port(EObject model,
+			Assignment assignment, ContentAssistContext context,
+			ICompletionProposalAcceptor acceptor) {
+		Actor actor = (Actor) model.eContainer();
+		createProposals(actor.getOutputs(), context, acceptor);
+	}
+
+	private void createProposals(EList<Port> ports,
+			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		for (Port port : ports) {
+			String proposal = port.getName();
+
+			// create the completion proposal
+			ICompletionProposal completionProposal = createCompletionProposal(
+					proposal, context);
+
+			// register the proposal, the acceptor handles null-values
+			// gracefully
+			acceptor.accept(completionProposal);
+		}
+	}
 
 }
