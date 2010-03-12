@@ -177,6 +177,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	//CABAC Decoding Process
 	int ctxIdxOffset;
+	int ctxBlockCat;
 	
 	//CABAC Neighbouring*
 	/*
@@ -350,6 +351,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	int synElValTest := 1;
 	int CabacSyntaxElementType;
+	int CABAC_SEARCH_SYNTAX_ELEMENT				:= -1;
 	
 	int CABAC_MB_TYPE_SI    	 				:= 0;
 	int CABAC_MB_TYPE_I     	 				:= 1;
@@ -1422,8 +1424,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	];
 	
 	
+	List ( type: List ( type: int , size = 14), size = 3 ) ctxIdxBlockCatOffset_tab = 
 	
-	
+	[
+		[ 0,  4,  8, 12, 16, 0, 0,  4,  8, 4, 0,  4,  8, 8 ],
+		[ 0, 15, 29, 44, 47, 0, 0, 15, 29, 0, 0, 15, 29, 0 ], //significant_coeff_flag values equal to last_significant_coeff_flag values
+		[ 0, 10, 20, 30, 39, 0, 0, 10, 20, 0, 0, 10, 20, 0 ]
+	];
 	
 	//*************************************************************/
 	/*************************************************************
@@ -1743,16 +1750,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	*************************************************************/
 	
 	// Unary binarisation process
-	procedure Ubinarization(int SyntaxElement,int binIdx)
+	procedure Ubinarization(int SyntaxElement,int binIdxOffset)
 	begin
 		if ( SyntaxElement  = 0 ) then
 			
-			synElVal[binIdx] := 0;
+			synElVal[binIdxOffset] := 0;
 			BinIdx := 0;
 		
 		else
 			
-			foreach int s in Integers(binIdx, SyntaxElement - 1) do
+			foreach int s in Integers(binIdxOffset, SyntaxElement - 1) do
 				synElVal[s] := 1;
 			end
 			
@@ -1762,13 +1769,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	// Truncated unary binarisation process
-	procedure TUbinarization(int SyntaxElement, int cMax, int binIdx)
+	procedure TUbinarization(int SyntaxElement, int cMax, int binIdxOffset)
 	begin
 		if ( SyntaxElement < cMax ) then
-			Ubinarization(SyntaxElement, binIdx);
+			Ubinarization(SyntaxElement, binIdxOffset);
 		else
 			BinIdx := 0;
-			foreach int s in Integers(binIdx, cMax - 1) do
+			foreach int s in Integers(binIdxOffset, cMax - 1) do
 				synElVal[s] := 1;
 				BinIdx := BinIdx + 1;
 			end	
@@ -1841,14 +1848,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	  ceil_log2_tab[idx]
 	end
 	
-	procedure FLbinarization(int SyntaxElement,int cMax,int binIdx)
+	procedure FLbinarization(int SyntaxElement,int cMax,int binIdxOffset)
 	var
 		int fixedLength,
 		int se
 	begin
 		fixedLength := ceil_log2(cMax + 1);
 		se :=  SyntaxElement;
-		foreach int s in Integers(binIdx, fixedLength - 1) do
+		foreach int s in Integers(binIdxOffset, fixedLength - 1) do
 			synElVal[s] := ( se >> s ) & 0x1;
 		end
 		BinIdx := fixedLength;
@@ -1913,7 +1920,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Ubinarization( MbQpDelta_se, 0);
 	end
 	
-	procedure Getbinarization(int SyntaxElement, int ctxBlockCat)
+	procedure Getbinarization(int SyntaxElement)
 	begin
 		if ( SyntaxElement = CABAC_MB_TYPE_SI ) then
 			maxBinIdxCtx := 6;
@@ -1949,79 +1956,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			bypassFlag := false;
 		end end end end end end end end
 	end
-	
-	
-	//*************************************************************/
-	/*************************************************************
-	*************************************************************
-	********      CABAC Decoding Process Flow       	*********
-	*************************************************************
-	*************************************************************/
-	
-	//Derivation process for ctxIdx
-	procedure GetCtxIdx()
-	begin
-		if ( ctxIdxOffset = 0 ) then
-			ctxIdxincMbType();
-			ctxIdx := ctxIdxInc;
-		else if (  ctxIdxOffset = 3 ) then
-			if (binIdx = 0) then
-				ctxIdxincMbType();
-				ctxIdx := 3 + ctxIdxInc;
-			else if ( binIdx = 1 ) then
-				ctxIdx := 276;
-			else if ( binIdx = 2 ) then
-				ctxIdx := 6;
-			else if ( binIdx = 3 ) then
-				ctxIdx := 7;
-			else if ( binIdx = 4 ) then
-				//To be done (subclause 9.3.3.1.2)
-				ctxIdx := 3 + ctxIdxInc;
-			else if ( binIdx = 5 ) then
-				//To be done (subclause 9.3.3.1.2)
-				ctxIdx := 3 + ctxIdxInc;
-			else
-				ctxIdx := 3 + 7;
-			end end end end end end
-		end end
-			
-	end
-	
-	
-	
-	
-	//Derivation process of ctxIdxInc for the syntax element mb_type
-	
-	//FIXME : Maybe add B_Direct_16x16 in the ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
-	
-	procedure ctxIdxincMbType() 
-	var
-		int condTermFlagA,
-		int condTermFlagB
-	begin
-		if ( mbAddrA_Avail() or
-		     ctxIdxOffset = 0  and ( IS_SI() and ( IS_I4x4( GiveMbTypeAddrA() ) and IS_INxN( GiveMbTypeAddrA() ) ) ) or
-			 ctxIdxOffset = 3  and IS_INxN( GiveMbTypeAddrA() ) or
-			 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
-			 
-			 condTermFlagA := 0;
-		else
-			 condTermFlagA := 1;
-		end
-		
-		if ( mbAddrB_Avail() or
-		     ctxIdxOffset = 0  and ( IS_SI() and ( IS_I4x4( GiveMbTypeAddrB() ) and IS_INxN( GiveMbTypeAddrB() ) ) ) or
-			 ctxIdxOffset = 3  and IS_INxN( GiveMbTypeAddrB() ) or
-			 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
-	
-			 condTermFlagB := 0;
-		else
-			 condTermFlagB := 1;
-		end
-		
-		ctxIdxInc := condTermFlagA + condTermFlagB;
-	end
-	
 	
 	//*************************************************************/
 	/*************************************************************
@@ -2086,7 +2020,262 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			-1
 		end		
 	end
+		
 	
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********      CABAC Decoding Process Flow       	*********
+	*************************************************************
+	*************************************************************/
+		//Derivation process of ctxIdxInc for the syntax element mb_type
+	
+	//FIXME : Maybe add B_Direct_16x16 in the ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+	
+	procedure ctxIdxincMbType() 
+	var
+		int condTermFlagA,
+		int condTermFlagB
+	begin
+		if ( mbAddrA_Avail() or
+		     ctxIdxOffset = 0  and ( IS_SI() and ( IS_I4x4( GiveMbTypeAddrA() ) and IS_INxN( GiveMbTypeAddrA() ) ) ) or
+			 ctxIdxOffset = 3  and IS_INxN( GiveMbTypeAddrA() ) or
+			 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+			 
+			 condTermFlagA := 0;
+		else
+			 condTermFlagA := 1;
+		end
+		
+		if ( mbAddrB_Avail() or
+		     ctxIdxOffset = 0  and ( IS_SI() and ( IS_I4x4( GiveMbTypeAddrB() ) and IS_INxN( GiveMbTypeAddrB() ) ) ) or
+			 ctxIdxOffset = 3  and IS_INxN( GiveMbTypeAddrB() ) or
+			 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+	
+			 condTermFlagB := 0;
+		else
+			 condTermFlagB := 1;
+		end
+		
+		ctxIdxInc := condTermFlagA + condTermFlagB;
+	end
+	
+	//Derivation process for ctxIdx
+	procedure GetCtxIdx()
+	begin
+		if ( ctxIdxOffset = 0 ) then
+			ctxIdxincMbType();
+			ctxIdx := ctxIdxInc;
+		end
+		
+		if (  ctxIdxOffset = 3 ) then
+			if (binIdx = 0) then
+				ctxIdxincMbType();
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else if ( binIdx = 1 ) then
+				ctxIdx := 276;
+			else if ( binIdx = 2 ) then
+				ctxIdx := ctxIdxOffset + 3;
+			else if ( binIdx = 3 ) then
+				ctxIdx := ctxIdxOffset + 4;
+			else if ( binIdx = 4 ) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else if ( binIdx = 5 ) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else
+				ctxIdx := ctxIdxOffset + 7;
+			end end end end end end
+		end
+		
+		if ( ctxIdxOffset = 11 ) then
+			if (binIdx = 0) then
+				//To be done (subclause 9.3.3.1.1)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			end
+		end
+		
+		if ( ctxIdxOffset = 14 ) then
+			if (binIdx = 0) then
+				ctxIdx := ctxIdxOffset;
+			else if ( binIdx = 1 ) then
+				ctxIdx := ctxIdxOffset + 1;
+			else if ( binIdx = 2 ) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			end end end
+		end
+		
+		if ( ctxIdxOffset = 17 or ctxIdxOffset = 32 ) then
+			if (binIdx = 0) then
+				ctxIdx := ctxIdxOffset;
+			else if ( binIdx = 1 ) then
+				ctxIdx := 276;
+			else if ( binIdx = 2 ) then
+				ctxIdx := ctxIdxOffset + 1;
+			else if ( binIdx = 3 ) then
+				ctxIdx := ctxIdxOffset + 2;
+			else if ( binIdx = 4 ) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else
+				ctxIdx := ctxIdxOffset + 3;
+			end end end end end 
+		end
+		
+		if ( ctxIdxOffset = 21 ) then
+			if (binIdx = 0) then
+				ctxIdx := ctxIdxOffset;
+			else if ( binIdx = 1 ) then
+				ctxIdx := ctxIdxOffset + 1;
+			else if ( binIdx = 2 ) then
+				ctxIdx := ctxIdxOffset + 2;
+			end end end
+		end
+		
+		if ( ctxIdxOffset = 27 ) then
+			if (binIdx = 0) then
+				ctxIdxincMbType();
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else if ( binIdx = 1 ) then
+				ctxIdx := ctxIdxOffset + 3;
+			else if ( binIdx = 2 ) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else
+				ctxIdx := ctxIdxOffset + 5;
+			end end end
+		end
+		
+		if ( ctxIdxOffset = 36 ) then
+			if (binIdx = 0) then
+				ctxIdx := ctxIdxOffset;
+			else if ( binIdx = 1 ) then
+				ctxIdx := ctxIdxOffset + 1;
+			else if ( binIdx = 2 ) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else if ( binIdx = 3 or binIdx = 4 or binIdx = 5) then
+				ctxIdx := ctxIdxOffset + 3;
+			end end end end 
+		end
+		
+		if ( ctxIdxOffset = 40 or ctxIdxOffset = 47 ) then
+			if (binIdx = 0) then
+				//To be done (subclause 9.3.3.1.7)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else if ( binIdx = 1 ) then
+				ctxIdx := ctxIdxOffset + 3;
+			else if ( binIdx = 2 ) then
+				ctxIdx := ctxIdxOffset + 4;
+			else if ( binIdx = 3 ) then
+				ctxIdx := ctxIdxOffset + 5;
+			else
+				ctxIdx := ctxIdxOffset + 6;
+			end end end end 
+		end
+		
+		if ( ctxIdxOffset = 54 ) then
+			if (binIdx = 0) then
+				//To be done (subclause 9.3.3.1.6)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else if ( binIdx = 1 ) then
+				ctxIdx := ctxIdxOffset + 4;
+			else
+				ctxIdx := ctxIdxOffset + 5;
+			end end
+		end
+		
+		if ( ctxIdxOffset = 60 ) then
+			if (binIdx = 0) then
+				//To be done (subclause 9.3.3.1.5)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else if ( binIdx = 1 ) then
+				ctxIdx := ctxIdxOffset + 2;
+			else
+				ctxIdx := ctxIdxOffset + 3;
+			end end	
+		end
+		
+		if ( ctxIdxOffset = 64 ) then
+			if (binIdx = 0) then
+				//To be done (subclause 9.3.3.1.8)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			else if ( binIdx = 1 or binIdx = 2 ) then
+				ctxIdx := ctxIdxOffset + 3;
+			end end 
+		end
+		
+		if ( ctxIdxOffset = 68 ) then
+			if (binIdx = 0) then
+				ctxIdx := ctxIdxOffset;
+			end 
+		end
+		
+		if ( ctxIdxOffset = 69 ) then
+			if (binIdx = 0 or binIdx = 1 or binIdx = 2) then
+				ctxIdx := ctxIdxOffset;
+			end 
+		end
+		
+		if ( ctxIdxOffset = 70 ) then
+			if (binIdx = 0) then
+				//To be done (subclause 9.3.3.1.2)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			end 
+		end
+		
+		if ( ctxIdxOffset = 73 ) then
+			if (binIdx = 0 or binIdx = 1 or binIdx = 2 or binIdx = 3) then
+				//To be done (subclause 9.3.3.1.4)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			end 
+		end
+		
+		if ( ctxIdxOffset = 77 ) then
+			if (binIdx = 0 or binIdx = 1 ) then
+				//To be done (subclause 9.3.3.1.4)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			end 
+		end
+		
+		if ( ctxIdxOffset = 276 ) then
+			if (binIdx = 0 ) then
+				ctxIdx := ctxIdxOffset;
+			end 
+		end
+		
+		if ( ctxIdxOffset = 399 ) then
+			if (binIdx = 0 ) then
+				//To be done (subclause 9.3.3.1.10)
+				ctxIdx := ctxIdxOffset + ctxIdxInc;
+			end 
+		end
+		
+		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG ) then
+				ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[0][ctxBlockCat];
+		end	
+	    
+		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG ) then
+				ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
+		end	
+		
+		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG ) then
+				ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
+		end	
+		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 ) then
+				ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[2][ctxBlockCat];
+		end
+		
+	end
+	
+	
+
+	
+
+	
+
 	
 	/*************************************************************
 	*************************************************************
