@@ -51,6 +51,26 @@ import net.sf.orcc.ir.type.UintType;
  */
 public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 
+	private int getSizeOfType(Expression expr) {
+		Type type = expr.getType();
+		if (type == null) {
+			return 32;
+		} else {
+			if (type.isBool()) {
+				return 1;
+			} else if (type.isInt()) {
+				expr = ((IntType) type).getSize();
+				return new ExpressionEvaluator().evaluateAsInteger(expr);
+			} else if (type.isUint()) {
+				expr = ((UintType) type).getSize();
+				return new ExpressionEvaluator().evaluateAsInteger(expr);
+			} else {
+				throw new OrccRuntimeException("cannot get size of type: "
+						+ type);
+			}
+		}
+	}
+
 	/**
 	 * Prints a function call to the function with the given name, whose
 	 * arguments are the expressions e1 and e2.
@@ -70,34 +90,27 @@ public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 		builder.append(function);
 		builder.append("(");
 		e1.accept(this, nextPrec, BinaryExpr.LEFT);
-		printType(e1);
 		builder.append(", ");
 		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
-		printType(e2);
-		builder.append(")");
-	}
-
-	private void printType(Expression expr) {
 		builder.append(", ");
-		Type type = expr.getType();
-		if (type == null) {
-			builder.append(32);
-		} else {
-			if (type.isBool()) {
-				builder.append(1);
-			} else if (type.isInt()) {
-				expr = ((IntType) type).getSize();
-				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-				builder.append(size);
-			} else if (type.isUint()) {
-				expr = ((UintType) type).getSize();
-				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-				builder.append(size + 1);
+
+		int s1 = getSizeOfType(e1);
+		int s2 = getSizeOfType(e2);
+		if (s1 == 32) {
+			if (s2 == 32) {
+				builder.append(32);
 			} else {
-				throw new OrccRuntimeException("cannot get size of type: "
-						+ type);
+				builder.append(s2);
+			}
+		} else {
+			if (s2 == 32) {
+				builder.append(s1);
+			} else {
+				builder.append(Math.max(s1, s2));
 			}
 		}
+
+		builder.append(")");
 	}
 
 	@Override
@@ -195,7 +208,7 @@ public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
 			builder.append("bitnot");
 			builder.append("(");
 			expr.getExpr().accept(this, Integer.MIN_VALUE);
-			printType(expr.getExpr());
+			builder.append(getSizeOfType(expr.getExpr()));
 			builder.append(")");
 			break;
 		default:

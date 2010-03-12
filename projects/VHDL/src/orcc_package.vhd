@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-02-25
+-- Last update: 2010-03-12
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -50,48 +50,54 @@ use IEEE.numeric_std.all;
 
 package orcc_package is
 
-  function bitand(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
-  function bitor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
-  function bitxor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
-  function bitnot(op1 : integer; l1 : integer) return integer;
-  function div (op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
-  function get_mod (ARG0     : integer; ARG1 : integer) return integer;
-  function shift_left(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
-  function shift_right(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer;
+  function bitand(op1      : integer; op2 : integer; size : integer) return integer;
+  function bitor(op1       : integer; op2 : integer; size : integer) return integer;
+  function bitxor(op1      : integer; op2 : integer; size : integer) return integer;
+  function bitnot(op1      : integer; size : integer) return integer;
+  function div (op1        : integer; op2 : integer; size : integer) return integer;
+  function get_mod (ARG0   : integer; ARG1 : integer) return integer;
+  function shift_left(op1  : integer; op2 : integer; size : integer) return integer;
+  function shift_right(op1 : integer; op2 : integer; size : integer) return integer;
 
 end;
 
 package body orcc_package is
 
-  function bitand(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
-    variable result : std_logic_vector(l1 - 1 downto 0);
+  function bitand(op1 : integer; op2 : integer; size : integer) return integer is
+    variable arg1   : std_logic_vector(size - 1 downto 0);
+    variable arg2   : std_logic_vector(size - 1 downto 0);
   begin
-    result := std_logic_vector(to_signed(op1, l1)) and std_logic_vector(to_signed(op2, l2));
+      arg1   := std_logic_vector(to_signed(op1, size));
+      arg2   := std_logic_vector(to_signed(op2, size));
+    return to_integer(signed(arg1 and arg2));
+  end function;
+
+  function bitor(op1 : integer; op2 : integer; size : integer) return integer is
+    variable arg1   : std_logic_vector(size - 1 downto 0);
+    variable arg2   : std_logic_vector(size - 1 downto 0);
+  begin
+      arg1   := std_logic_vector(to_signed(op1, size));
+      arg2   := std_logic_vector(to_signed(op2, size));
+    return to_integer(signed(arg1 or arg2));
+  end function;
+
+  function bitxor(op1 : integer; op2 : integer; size : integer) return integer is
+    variable arg1   : std_logic_vector(size - 1 downto 0);
+    variable arg2   : std_logic_vector(size - 1 downto 0);
+  begin
+      arg1   := std_logic_vector(to_signed(op1, size));
+      arg2   := std_logic_vector(to_signed(op2, size));
+    return to_integer(signed(arg1 xor arg2));
+  end function;
+
+  function bitnot(op1 : integer; size : integer) return integer is
+    variable result : std_logic_vector(size - 1 downto 0);
+  begin
+    result := not std_logic_vector(to_signed(op1, size));
     return to_integer(signed(result));
   end function;
 
-  function bitor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
-    variable result : std_logic_vector(l1 - 1 downto 0);
-  begin
-    result := std_logic_vector(to_signed(op1, l1)) or std_logic_vector(to_signed(op2, l2));
-    return to_integer(signed(result));
-  end function;
-
-  function bitxor(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
-    variable result : std_logic_vector(l1 - 1 downto 0);
-  begin
-    result := std_logic_vector(to_signed(op1, l1)) xor std_logic_vector(to_signed(op2, l2));
-    return to_integer(signed(result));
-  end function;
-
-  function bitnot(op1 : integer; l1 : integer) return integer is
-    variable result : std_logic_vector(l1 - 1 downto 0);
-  begin
-    result := not std_logic_vector(to_signed(op1, l1));
-    return to_integer(signed(result));
-  end function;
-  
-  function div (op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
+  function div (op1 : integer; op2 : integer; size : integer) return integer is
     variable result : integer;
   begin
     result := op1/op2;
@@ -107,16 +113,16 @@ package body orcc_package is
 
   -- logical left shift
   -- result type is the same as the type of the first operand
-  function shift_left(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
+  function shift_left(op1 : integer; op2 : integer; size : integer) return integer is
   begin
-    return to_integer(to_signed(op1, l1) sll op2);
+    return to_integer(to_signed(op1, size) sll op2);
   end function;
 
   -- logical right shift
   -- result type is the same as the type of the first operand
-  function shift_right(op1 : integer; l1 : integer; op2 : integer; l2 : integer) return integer is
+  function shift_right(op1 : integer; op2 : integer; size : integer) return integer is
   begin
-    return to_integer(to_signed(op1, l1) srl op2);
+    return to_integer(to_signed(op1, size) srl op2);
   end function;
   
 end package body orcc_package;
