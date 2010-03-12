@@ -119,7 +119,7 @@ begin
     $actor.inputs.list: tb_FSM_init(it)$
     count <= 0;
     
-  elsif rising_edge(clock) then
+  elsif falling_edge(clock) then
     --
     $actor.inputs.list:  {$case_define_in(it)$}; separator="\n"$$\n$
   end if;
