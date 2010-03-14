@@ -13,7 +13,7 @@ if defined VS100COMNTOOLS (
   echo Visual Studio not found.
 )
 
-set CMAKE_PREFIX_PATH=%CD%\SDL-1.2.13;%CD%\SDL_image-1.2.7;%CD%\orcc
+set CMAKE_PREFIX_PATH=%CD%\SDL-1.2.14;%CD%\SDL_image-1.2.10;%CD%\orcc
 set CMAKE_INSTALL_PREFIX=%CD%\orcc
 
 echo Launching "cmake-gui"
