@@ -83,7 +83,6 @@ int FOURMV
   int(size=MB_COORD_SZ) ptr_left;
   int(size=MB_COORD_SZ) ptr_above;
   int(size=MB_COORD_SZ) ptr_above_right;
-  int old_a;
 
   // buffer pointer wrap, skipping over address 0
   function decrement( int(size=MB_COORD_SZ) p ) --> int(size=MB_COORD_SZ) :
@@ -203,8 +202,9 @@ int FOURMV
   end
 
   write: action ==> A:[ old_a ]
+  var
+    int(size=MB_COORD_SZ+3) old_a = a
   do
-    old_a:=a;
     a := b;
     b := c;
   end
