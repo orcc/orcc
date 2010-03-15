@@ -122,7 +122,10 @@ $instances: printInitialize()$
 >>
 
 printSchedulers(instances) ::= <<
-$instances: {$it.id$_scheduler();}; separator="\n"$
+$instances: {i = $it.id$_scheduler();
+#ifdef PRINT_FIRINGS
+printf("$it.id$_scheduler: %i\n", i);
+#endif}; separator="\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -138,6 +141,7 @@ network(debugFifos, fifoSize, network) ::= <<
 #include "orcc_util.h"
 
 #define SIZE $fifoSize$
+// #define PRINT_FIRINGS
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
@@ -158,6 +162,8 @@ $declareSchedulers(network.instances)$
 // Actor scheduler
 
 static void scheduler() {
+	int i;
+
 	$printInitializes(network.instances)$
 	while (1) {
 		$printSchedulers(network.instances)$

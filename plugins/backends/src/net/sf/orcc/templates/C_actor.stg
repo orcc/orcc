@@ -233,6 +233,7 @@ actionCallState(nextState) ::= <<
 $nextState.action.body$();
 _FSM_state = s_$nextState.targetState$;
 res = 1;
+(*pi)++;
 >>
 
 actionTestState(nextState) ::= <<
@@ -251,7 +252,7 @@ $nextStates: actionTestState(nextState=it); separator=" else "$
 >>
 
 stateScheduler(transition) ::= <<
-static int $transition.sourceState$_state_scheduler() {
+static int $transition.sourceState$_state_scheduler(int *pi) {
 	int res = 0;
 	$schedulingTestState(nextStates=transition.nextStateInfo)$
 	return res;
@@ -262,7 +263,7 @@ static int $transition.sourceState$_state_scheduler() {
 switch(transitions) ::= <<
 switch (_FSM_state) {
 $transitions: {case s_$it.sourceState$:
-	res = $it.sourceState$_state_scheduler();
+	res = $it.sourceState$_state_scheduler(&i);
 	break;
 }$
 default:
