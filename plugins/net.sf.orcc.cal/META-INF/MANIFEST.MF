@@ -21,12 +21,13 @@ Require-Bundle: org.eclipse.xtext,
  org.antlr.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sf.orcc,
- net.sf.orcc.services,
  net.sf.orcc.cal,
  net.sf.orcc.cal.impl,
  net.sf.orcc.cal.util,
  net.sf.orcc.parseTreeConstruction,
  net.sf.orcc.parser.antlr,
- net.sf.orcc.validation,
- net.sf.orcc.parser.antlr.internal
+ net.sf.orcc.parser.antlr.internal,
+ net.sf.orcc.services,
+ net.sf.orcc.util,
+ net.sf.orcc.validation
 Import-Package: org.apache.log4j
