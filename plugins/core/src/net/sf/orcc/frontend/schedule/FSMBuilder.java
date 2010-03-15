@@ -75,7 +75,7 @@ public class FSMBuilder {
 	 */
 	public FSMBuilder(Schedule schedule) {
 		graph = new DirectedMultigraph<String, UniqueEdge>(UniqueEdge.class);
-		initialState = schedule.getInitialState();
+		initialState = schedule.getInitialState().getName();
 		parseTransitions(schedule.getTransitions());
 	}
 
@@ -195,9 +195,9 @@ public class FSMBuilder {
 	 */
 	private void parseTransitions(List<Transition> transitions) {
 		for (Transition transition : transitions) {
-			String source = transition.getSource();
+			String source = transition.getSource().getName();
 			Tag tag = new Tag(transition.getTag());
-			String target = transition.getTarget();
+			String target = transition.getTarget().getName();
 			graph.addVertex(source);
 			graph.addVertex(target);
 			graph.addEdge(source, target, new UniqueEdge(tag));

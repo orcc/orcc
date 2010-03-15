@@ -38,7 +38,7 @@ import net.sf.orcc.cal.Port;
 import net.sf.orcc.cal.Priority;
 import net.sf.orcc.cal.Tag;
 import net.sf.orcc.cal.Transition;
-import net.sf.orcc.util.ActionList;
+import net.sf.orcc.util.CalActionList;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -102,7 +102,7 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 			ICompletionProposalAcceptor acceptor) {
 		Actor actor = (Actor) model.eContainer();
 		List<Action> actions = actor.getActions();
-		List<Tag> tags = new ActionList(actions).getTags(1);
+		List<Tag> tags = new CalActionList(actions).getTags(1);
 		for (Tag tag : tags) {
 			String tagName = getLabelProvider().getText(tag);
 			ICompletionProposal proposal = createCompletionProposal(tagName,
@@ -150,7 +150,7 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 		int n = tag.getIdentifiers().size() - 1;
 		List<String> identifiers = tag.getIdentifiers().subList(0, n);
 
-		actions = new ActionList(actions).getActions(identifiers);
+		actions = new CalActionList(actions).getActions(identifiers);
 		for (Action action : actions) {
 			identifiers = action.getTag().getIdentifiers();
 			if (n < identifiers.size()) {

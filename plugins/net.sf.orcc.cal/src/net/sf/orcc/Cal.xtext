@@ -78,12 +78,14 @@ Priority:
 ///////////////////////////////////////////////////////////////////////////////
 
 Schedule:
-	'schedule' 'fsm' initialState=ID ':'
+	'schedule' 'fsm' initialState=[State] ':'
 		(transitions += Transition)*
 	'end';
 
 Transition:
-	source=ID '(' tag=Tag ')' '-->' target=ID ';';
+	source=State '(' tag=Tag ')' '-->' target=[State] ';';
+
+State: name=ID;
 
 ///////////////////////////////////////////////////////////////////////////////
 // actions

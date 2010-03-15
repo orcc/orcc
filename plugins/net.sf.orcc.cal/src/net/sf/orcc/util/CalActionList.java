@@ -45,7 +45,7 @@ import net.sf.orcc.cal.Tag;
  * @author Matthieu Wipliez
  * 
  */
-public class ActionList implements Iterable<Action> {
+public class CalActionList implements Iterable<Action> {
 
 	private List<Action> actionList;
 
@@ -54,7 +54,7 @@ public class ActionList implements Iterable<Action> {
 	/**
 	 * Creates an empty action list.
 	 */
-	public ActionList() {
+	public CalActionList() {
 		actionList = new ArrayList<Action>();
 		tagMap = new HashMap<List<String>, List<Action>>();
 	}
@@ -62,7 +62,7 @@ public class ActionList implements Iterable<Action> {
 	/**
 	 * Creates an action list.
 	 */
-	public ActionList(List<Action> actions) {
+	public CalActionList(List<Action> actions) {
 		this();
 
 		for (Action action : actions) {
