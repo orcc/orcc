@@ -18,6 +18,8 @@ This FU remove emulation_prevention_three_byte, send the RBSP bytes and the numb
 
 *****************************************************************************/
 
+
+
 actor Algo_NALU() 
 	int(size=8) bits8 
 	==> 
@@ -27,8 +29,10 @@ actor Algo_NALU()
  
   uint(size=8) byte0;
   uint(size=8) byte1; 
+  uint(size=8) byte_moins1;
   uint(size=2) byte_count := 0;
   uint(size=2) start_code := 0;
+  uint(size=2) start_code_trunk_3 := 0;
   uint num_bytes_in_RBSP:=0;
     
   get_byte: action bits8:[ b ] ==>
@@ -61,13 +65,23 @@ actor Algo_NALU()
     if start_code = 1 then
       num_bytes_in_RBSP := num_bytes_in_RBSP+1;
     end
+
     if byte0 = 0 and byte1 = 0 and b = 1 then 
       start_code := start_code+1;
+      if byte_moins1 != 0 then // case video bitstreams where start code do not start with 00 00 00 01 but by 00 00 01 see file in AVCBS-5 folder
+      	start_code_trunk_3 := 1;
+      end
+      	
     end
+    byte_moins1 := byte0;
     v := byte0;
     byte0 := byte1; 
     byte1 := b;
+    
   end
+  
+// Modifications done by J DELORME the 12.03.10 for management of start code in video bitstreams which do not start with 4 bytes but 3 bytes 
+// usually it is 00 00 00 01 then data and in certain cases (video in AVCBS-5 folder) start code begin as 00 00 01
   
   send_nb_rbsp_bytes: action  ==> nb_rbsp_bytes:[ v ]
   guard 
@@ -75,7 +89,12 @@ actor Algo_NALU()
   var 
     uint v
   do
-    v := num_bytes_in_RBSP - 4; // 3 for start_code + 1 for NAL Unit header
+    if start_code_trunk_3 = 0 then 	// start codes are 00 00 01
+		v := num_bytes_in_RBSP - 4; // 3 for start_code + 1 for NAL Unit header
+	else							// start codes are 00 00 00 01
+		v := num_bytes_in_RBSP - 3; // 2 for start_code + 1 for NAL Unit header
+		start_code_trunk_3 := 0;
+	end	  	
     num_bytes_in_RBSP :=0;
     start_code := 1;
   end

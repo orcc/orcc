@@ -3619,14 +3619,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	//   for( subMbPartIdx = 0; subMbPartIdx < NumSubMbPart( sub_mb_type[ mbPartIdx ] ); subMbPartIdx++)
 	//     for( compIdx = 0; compIdx < 2; compIdx++ )
-	read_sub_MB_pred_mvd_l1_done0: action ==> 
+	read_sub_MB_pred_mvd_l1_done0: action ==> MbPartIdx:[subMbPartIdx], RefIdx:[ref_idx_l1[mbPartIdx]], MbPartWidth:[SubMbPartWidthHeigth(0)], MbPartHeigth:[SubMbPartWidthHeigth(1)] 
 	guard
 		subMbPartIdx < NumSubMbPart()
 	do
 		start_vld();
 	end
-
-	read_sub_MB_pred_mvd_l1_done1: action ==> 
+// modification ajout sortie par J Delorme le 09.03.10
+	read_sub_MB_pred_mvd_l1_done1: action ==> MvRes:[mvd_l1]
 	guard
 		vld_end()
 	do
@@ -3634,7 +3634,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		start_vld();
 	end
 
-	read_sub_MB_pred_mvd_l1_done2: action ==> 
+	read_sub_MB_pred_mvd_l1_done2: action ==> MvRes:[mvd_l1]
 	guard
 		vld_end()
 	do
@@ -3855,7 +3855,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
 	end
 
-	read_MB_pred_ref_idx_l1_done: action ==> 
+	read_MB_pred_ref_idx_l1_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l1[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
 	guard
 		(slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())
 	do
@@ -3934,7 +3934,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		start_vld();
 	end
 
-	read_MB_pred_mvd_l1_done0: action ==> 
+	read_MB_pred_mvd_l1_done0: action ==> MvRes:[mvd_l1]
 	guard
 		vld_end()
 	do
@@ -3942,7 +3942,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		start_vld();
 	end
 
-	read_MB_pred_mvd_l1_done1: action ==> 
+	read_MB_pred_mvd_l1_done1: action ==> MvRes:[mvd_l1]
 	guard
 		vld_end()
 	do
@@ -4510,7 +4510,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	byte_align: action ==>
 	do
-		set_bits_to_read( 8 - bitand( bit_count, 7 ) );
+		if bit_count mod 8 = 0 then set_bits_to_read( 0); else set_bits_to_read( 8 - bitand( bit_count, 7 ) );end
 	end
 	
 	
