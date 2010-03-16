@@ -75,10 +75,10 @@ static struct lock_free_fifo fifo_0 = { SIZE, (char *)array_0, sizeof(int), 0, 0
 static void* array_1[SIZE * sizeof(int)];
 static struct lock_free_fifo fifo_1 = { SIZE, (char *)array_1, sizeof(int), 0, 0 };
 
-static struct lff_t *source_O = &fifo_0;
-static struct lff_t *compute_I = &fifo_0;
-static struct lff_t *compute_O = &fifo_1;
-static struct lff_t *sink_I = &fifo_1;
+static struct lock_free_fifo *source_O = &fifo_0;
+static struct lock_free_fifo *compute_I = &fifo_0;
+static struct lock_free_fifo *compute_O = &fifo_1;
+static struct lock_free_fifo *sink_I = &fifo_1;
 
 static struct lff_t *full_fifos[2];
 static int last_idx = 0;
