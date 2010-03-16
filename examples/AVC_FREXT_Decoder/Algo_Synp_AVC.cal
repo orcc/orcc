@@ -152,8 +152,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	//Cabac State variables
 	int preCtxState;
-	List ( type : int (size = 6), size = 640) pStateIdx;
-	List ( type : int (size = 1), size = 640) valMPS;
+	List ( type : int (size = 6), size = 640 ) pStateIdx;
+	List ( type : int (size = 1), size = 640 ) valMPS;
 	int ctxIdxInc := 0;
 	int ctxIdx := 0;
 	int binIdx := -1;
@@ -170,7 +170,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	bool Cabac_Arithmetic_Decoding_Engine_Start := false;
 	bool Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := false;
 	
-	
+	bool PcmAlignementZeroBitDone := false;
+	bool PcmSampleLumaDone := false;
+	bool PcmSampleChromaDone := false;
 
 	
 	//mb_skip_flag 
@@ -202,8 +204,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
     int mbTabAvail  := 0;
 	int mbTabMbtype := 1;
 	
-	//CABAC Start 
-	bool CabacStartProcess := false;
+	//CABAC Process Conditions 
+	bool FirstSEinSlice		   := true;
+	bool CabacStartProcess	   := false;
+	bool ReadBitsBeforeInit    := true;
+	bool CabacFirstBitToDecode := true;
+	bool FoundSE		       := false;
+	bool CabacInitializationFinished := false;
+	
+	int getBitStreamValue;
 	
 	//CABAC Decode Variables
 	/* Defines the Final Value of the Cabac Decoding Process and the Index of the Cabac Compare Tbale SynElVal */
@@ -369,8 +378,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[4, 1, 1, 1, 1, 0, 0],
 		[4, 1, 1, 1, 1, 1, 0]
 	];
-	/* Binary Index */
-	//int BinIdx;
+	/* Max Binary Index */
+	int MaxBinIdx;
 	
 	/* Syntax Element Enumeration */
 	
@@ -1741,9 +1750,18 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		bit_read_cnt:=bit_read_cnt + 1;
 	end
   
-	// ********** Read CABAC ********** //
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********       		Read CABAC      		    	*********
+	*************************************************************
+	*************************************************************/
 	
-	
+	procedure get_cabac()
+	begin
+		getBitStreamValue := bit_read[ bit_read_cnt ];
+		bit_read_cnt := bit_read_cnt + 1;
+	end
 	
 	function Clip3( int Min, int Max, int Val  ) --> int :  if (Val < Min) then Min else if (Val > Max) then Max else Val end end end
 	
@@ -1751,69 +1769,261 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	begin
 		preCtxState := Clip3( 1, 126, ( ( m * Clip3( 0, 51, QPy ) ) >> 4 ) + n );
 	end
-	//Cabac intialisation
 	
-	action ==>
-	guard
-		(Cabac_Start_Initialisation = true) and ( entropy_coding_mode_flag[pps_id] = 1 )  
-	do
-		//look for preCtxState value
+	procedure DecodeDecision()
+	begin
+		qCodIRangeIdx := ( codIRange >> 6 ) & 3;
+		codIRangeLPS := rangeTabLPS[pStateIdx[ctxIdx]][qCodIRangeIdx];
+		codIRange := codIRange - codIRangeLPS;
 		
-		//FIXME (value of m and n)
-		foreach int i in Integers(0, 459) do
-		
-			if (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI )then
-						preCtxState_pro(val_QP, Cabac_Context_Init_I[i][0], Cabac_Context_Init_I[i][1]);
-			else
-						preCtxState_pro(val_QP, Cabac_Context_Init_PB[cabac_init_idc][i][0], Cabac_Context_Init_PB[cabac_init_idc][i][1]);
+		if codIOffset >= codIRange then
+			binVal     := intXOR(valMPS);
+			codIOffset := codIOffset - codIRange;
+			codIRange  := codIRangeLPS;
+			
+			if pStateIdx[ctxIdx] = 0 then
+				valMPS[ctxIdx] := 1 - valMPS[ctxIdx];
 			end
-			
-			
-				
-			if ( preCtxState  <=  63 )  then
-				//FIX ME: (( 63 - pre ) << 1) + 0;
-				pStateIdx[i] := 63 - preCtxState;
-				valMPS[i] := 0 ;
-			else 
-				//FIX ME: (( pre - 64 ) << 1) + 1;
-				pStateIdx[i] := preCtxState - 64;
-				valMPS[i] := 1;
+			pStateIdx[ctxIdx] := transIdxLPS[pStateIdx[ctxIdx]];
+		else
+			binVal := valMPS;
+			pStateIdx[ctxIdx] := transIdxMPS[ pStateIdx[ctxIdx] ];
+		end
+	end
+	
+	procedure updateSynElVal()
+	begin
+		ValueIndex := ValueIndex + 1;
+		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I then
+			MaxBinIdx	:= synEval_MB_I[ValueIndex][0];
+			synElVal[0]	:= MaxBinIdx;
+			foreach int s in Integers(1,MaxBinIdx + 1) do
+				synElVal[s] := synEval_MB_I[ValueIndex][s];
 			end
 		end
 		
-		//Wait For another Slice before CABAC initialisation
-		Cabac_Start_Initialisation := false;
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP then
+			MaxBinIdx	:= synEval_MB_P_SP[ValueIndex][0];
+			synElVal[0]	:= MaxBinIdx;
+			foreach int s in Integers(1,MaxBinIdx + 1) do
+				synElVal[s] := synEval_MB_P_SP[ValueIndex][s];
+			end
+		end
+		
+		//TODO other Syntax Element
+	end
+	
+	procedure GetCabacMbTypeSyntaxElement()
+	begin
+		
+		if slice_type = SLICE_TYPE_I then
+			CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_I;
+		else if  slice_type = SLICE_TYPE_SI then
+				CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_SI;
+		else if  slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then
+			CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_P_SP;
+		else if  slice_type = SLICE_TYPE_B then
+				CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_B;
+		end end end end	
 		
 	end
-	//FIX ME: Maybe put in an an FSM
-	//CABAC : Intialisation process for the arithmetic decoding engine
+	
+	/* For each CABAC Syntax Element*/
 	action ==>
 	guard
-		 entropy_coding_mode_flag[pps_id] = 1 and 
-		 Cabac_Arithmetic_Decoding_Engine_Start  
+		CabacStartProcess
 	do
-		codIRange  := 0x01FE;
-		set_bits_to_read(9);
+		if CabacFirstBitToDecode then	
+			/* Initialize binIdx to -1, indicates the number of bits we have already read */
+			binIdx := -1;
+			CabacFirstBitToDecode := false;
+		end
 		
 		
-		//Stop Initialisation process for the arithmetic decoding engine
-		Cabac_Arithmetic_Decoding_Engine_Start := false;
+		if ReadBitsBeforeInit then
+			set_bits_to_read(9);
+			/* Stop Reading 9 bits for the initialization process */
+			ReadBitsBeforeInit := false;
+		else	
+			if FirstSEinSlice and done_reading_bits() then
+				/* Initialisation of context variables */
+
+				foreach int i in Integers(0, 459) do
+					if (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI )then
+						preCtxState_pro(val_QP, Cabac_Context_Init_I[i][0], Cabac_Context_Init_I[i][1]);
+					else
+						preCtxState_pro(val_QP, Cabac_Context_Init_PB[cabac_init_idc][i][0], Cabac_Context_Init_PB[cabac_init_idc][i][1]);
+					end
+									
+					if ( preCtxState  <=  63 )  then
+						//FIX ME: (( 63 - pre ) << 1) + 0;
+						pStateIdx[i]	:= 63 - preCtxState;
+						valMPS[i]		:= 0 ;
+					else 
+						//FIX ME: (( pre - 64 ) << 1) + 1;
+						pStateIdx[i]	:= preCtxState - 64;
+						valMPS[i]		:= 1;
+					end
+				end
+				
+				/* End of initialisation of context variables */
+				
+				/* Initialisation of decoding engine */
+				
+				codIRange	:= 0x01FE;
+				codIOffset	:= read_result();
+				
+				/* End of decoding engine initialisation*/
+				
+				/* Stop Initialisation if we found the first SE In Slce */
+				FirstSEinSlice := false;
+				CabacInitializationFinished := true;
+			end
+			
+			/* 
+			   Generates each bit and compare it with binarization, 
+			   though the binarization process is called every 
+			   time the parser demands an Syntax Element.
+			*/
+			if CabacInitializationFinished then
+				/* Initialize ValueIndex */
+					ValueIndex := -1;
+				
+				/* Initialise SynElVal Tab*/
+				updateSynElVal();
+				while( not FoundSE ) do
+					
+					/* Suppose that we have found the correct binValue */
+					FoundSE := true;
+					
+					
+					
+					foreach int i in Integers(0, MaxBinIdx) do
+						/* Update binIdx */
+						binIdx := i;
+						
+						/* Recovers maxBinIdxCtx and ctxIdxOffset */
+						Getbinarization(CABAC_SEARCH_SYNTAX_ELEMENT);
+						/* Calculates ctxIdx */
+						GetCtxIdx();
+									
+						/* Decode Bin value Process */
+						
+						if bypassFlag then
+							/* Start Decode Bypass Process */ 
+							
+							codIOffset := codIOffset << 1;
+							/* Read one bit */
+							get_cabac();
+							codIOffset := codIOffset | getBitStreamValue;
+							
+							if codIOffset >= codIRange then
+								binVal := 1;
+								codIOffset := codIOffset - codIRange;
+							else
+								binVal := 0;
+							end
+							
+							/* End of Decode Bypass Process */ 
+						else if ctxIdx = 276 then
+							/* Start Decode Terminate Process */
+							
+							codIRange := codIRange - 2;
+				
+							if codIOffset >= codIRange then
+								binVal := 1;
+							else
+								binVal := 0;
+								
+								/* Start RenormD Process */
+								while ( codIRange < 0x0100 ) do
+									codIRange  := codIRange  << 1;
+									codIOffset := codIOffset << 1;
+									get_cabac();
+									codIOffset := codIOffset | getBitStreamValue;
+								end
+								/* End of RenormD Process */
+								
+							end
+							
+							/* End of Decode Terminate Process */
+						else
+							DecodeDecision();
+							/* Start RenormD Process */
+							while ( codIRange < 0x0100 ) do
+								codIRange  := codIRange  << 1;
+								codIOffset := codIOffset << 1;
+								get_cabac();
+								codIOffset := codIOffset | getBitStreamValue;
+							end
+							/* End of RenormD Process */
+							
+						end end
+						/* End of decode Bin value Process */
+						
+						/* Store Decoded bin */
+						
+						ReadBinString[binIdx + 1] := binVal;
+					end
+					
+					ReadBinString[0] := binIdx;
+					/* Start to Compare */
+					
+					if synElVal[0] != MaxBinIdx then
+						updateSynElVal();
+					else
+						foreach int s in Integers(1, MaxBinIdx + 1) do
+							FoundSE := FoundSE and ReadBinString[s] = synElVal[s];
+						end
+						
+						if FoundSE != true then
+							updateSynElVal();
+						end
+					end
+					
+					
+				end
+			
+				if (CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I) and
+					ValueIndex = 25 then
+					
+					Cabac_Arithmetic_Decoding_Engine_Start := true;
+					set_bits_to_read(9);
+					
+				end
 		
-		Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := true;
+			
+				if  ReadBitsBeforeInit = false then
+					CabacStartProcess := false;
+				end
+			end
+		end
 	end
-	
-	//Read result for codIOffset
 	
 	action ==>
-	guard 
-		 entropy_coding_mode_flag[pps_id] = 1   and 
-		 Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start and
-		 done_reading_bits()
+	guard
+		Cabac_Arithmetic_Decoding_Engine_Start and
+		PcmAlignementZeroBitDone and
+		PcmSampleLumaDone and
+		PcmSampleChromaDone and
+		done_reading_bits()
 	do
-		codIOffset := read_result();
-		Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := false;
+		/* Initialisation of decoding engine */
+				
+				codIRange	:= 0x01FE;
+				codIOffset	:= read_result();
+				
+		/* End of decoding engine initialisation*/
+		
+		Cabac_Arithmetic_Decoding_Engine_Start	:= false;
+		PcmAlignementZeroBitDone 				:= false;
+		PcmSampleLumaDone						:= false;
+		PcmSampleChromaDone						:= false;
+		
 	end
 	
+
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -4310,6 +4520,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		else 
 			if entropy_coding_mode_flag[pps_id] = 1 then
+				GetCabacMbTypeSyntaxElement();
 				start_cabac();
 			end 
 		end
@@ -4342,7 +4553,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
 		//Initialisation process for the arithmetic decoding engine
-		Cabac_Arithmetic_Decoding_Engine_Start := true; 
+		PcmAlignementZeroBitDone := true; 
 	end
 
 	//for( i = 0; i < 256; i++ )
@@ -4375,7 +4586,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		start_pcm_chroma := true;
 		//Initialisation process for the arithmetic decoding engine
-		Cabac_Arithmetic_Decoding_Engine_Start := true;
+		PcmSampleLumaDone := true;
 	end
 	
 	// for( i = 0; i < 2 * MbWidthC * MbHeightC; i++ )
@@ -4410,7 +4621,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		MB_inc = 2*64
 	do
 		//Initialisation process for the arithmetic decoding engine
-		Cabac_Arithmetic_Decoding_Engine_Start := true;
+		PcmSampleChromaDone := true;
 	end
 
 	//} else {
