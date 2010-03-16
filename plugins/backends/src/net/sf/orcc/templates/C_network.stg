@@ -2,6 +2,7 @@ group C_network;
 
 declareBroadcast(bcast) ::= <<
 int $bcast.id$_scheduler() {
+	int i = 0;
 	$bcast.type$ *tok_input;
 	$bcast.outputList: { n | $bcast.type$ *tok_output_$n$;
 }$
@@ -13,10 +14,11 @@ int $bcast.id$_scheduler() {
 *tok_output_$n$ = *tok_input;
 }$	
 		setReadEnd($bcast.id$_input);
-		$bcast.outputList: { n | setWriteEnd($bcast.id$_output_$n$);
-}$	}
+		$bcast.outputList: { n | setWriteEnd($bcast.id$_output_$n$);}; separator="\n"$
+		i++;
+	}
 
-	return 0;
+	return i;
 }
 
 >>
@@ -126,6 +128,10 @@ $instances: {i = $it.id$_scheduler();
 #ifdef PRINT_FIRINGS
 printf("$it.id$_scheduler: %i\n", i);
 #endif}; separator="\n"$
+
+#ifdef PRINT_FIRINGS
+printf("\n");
+#endif
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -277,6 +277,7 @@ static void display_set_video(int width, int height) {
 }
 
 int display_scheduler() {
+	int i = 0;
 	int res = 1;
 	while (res) {
 		if (hasTokens(display_WIDTH, 1) && hasTokens(display_HEIGHT, 1)) {
@@ -289,6 +290,7 @@ int display_scheduler() {
 			display_set_video(width, height);
 			setReadEnd(display_WIDTH);
 			setReadEnd(display_HEIGHT);
+			i++;
 		}
 
 		if (hasTokens(display_B, 384)) {
@@ -297,11 +299,12 @@ int display_scheduler() {
 			}
 			display_write_mb(getReadPtr(display_B, 384));
 			setReadEnd(display_B);
+			i++;
 			res = 1;
 		} else {
 			res = 0;
 		}
 	}
 
-	return 0;
+	return i;
 }

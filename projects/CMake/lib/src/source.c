@@ -72,6 +72,7 @@ extern struct fifo_s *source_O;
 
 int source_scheduler() {
 	unsigned char *ptr;
+	int i = 0;
 	int n;
 
 	if (feof(F)) {
@@ -86,9 +87,10 @@ int source_scheduler() {
 			cnt = 0;
 			n = fread(ptr, 1, 1, F);
 		}
+		i++;
 		cnt++;
 		setWriteEnd(source_O);
 	}
 
-	return 0;
+	return i;
 }
