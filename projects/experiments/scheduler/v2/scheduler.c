@@ -14,6 +14,9 @@ extern void scheduler_v5();
 extern void scheduler_v6();
 extern void scheduler_vSDF();
 
+extern void initialize2_v1();
+extern void scheduler2_v1();
+
 LARGE_INTEGER freq;
 
 typedef void (*func_t)();
@@ -45,6 +48,12 @@ int main(int argc, char *argv[]) {
 	float elapsedTime;
 
 	QueryPerformanceFrequency(&freq);
+
+	// initialize structure of scheduler
+	initialize2_v1();
+
+	elapsedTime = measure_time(scheduler2_v1);
+	printf("elapsed time scheduler2: %f ms\n", elapsedTime);
 	
 	elapsedTime = measure_time(scheduler_v0);
 	printf("elapsed time initial: %f ms\n", elapsedTime);

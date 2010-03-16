@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\scheduler2_v1.c"
+				>
+			</File>
+			<File
 				RelativePath=".\scheduler_v0.c"
 				>
 			</File>
