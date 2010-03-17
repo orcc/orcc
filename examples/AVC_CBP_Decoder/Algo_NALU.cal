@@ -20,7 +20,7 @@ This FU remove emulation_prevention_three_byte, send the RBSP bytes and the numb
 
 
 
-actor Algo_NALU() 
+actor Algo_NALU (int Buffer_Size) 
 	int(size=8) bits8 
 	==> 
 	int(size=8) bits_rbsp8, 
@@ -32,9 +32,14 @@ actor Algo_NALU()
   uint(size=8) byte_moins1;
   uint(size=2) byte_count := 0;
   uint(size=2) start_code := 0;
+  uint(size=2) start_code_found := 0;
   uint(size=2) start_code_trunk_3 := 0;
   uint num_bytes_in_RBSP:=0;
-    
+  List (type : int , size = Buffer_Size ) Input_Bitstream := [ 0 : for int l in Integers ( 0 , Buffer_Size-1)];
+  int i:=0;
+  int a :=0;
+
+  
   get_byte: action bits8:[ b ] ==>
   guard 
     byte_count < 2
@@ -42,16 +47,54 @@ actor Algo_NALU()
     if byte_count = 1 then
       byte0 := byte1;
     end 
-    
     byte1:=b;
     byte_count := byte_count+1;
   end
   
+/*  read : action bits8:[current_byte]==>
+  guard
+  	i < Buffer_Size,
+  	start_code_found < 2
+  do
+  	if i <3 then
+  		Input_Bitstream[i] := current_byte;
+  	else
+  		Input_Bitstream[i] := current_byte;
+  		if Input_Bitstream[i-2] = 0 and Input_Bitstream[i-1] = 0 and Input_Bitstream[i] = 1 then
+  			start_code_found := start_code_found + 1;
+  		end 
+  		if Input_Bitstream[i-2] = 0 and Input_Bitstream[i-1] = 0 and Input_Bitstream[i] = 3 then
+  			num_bytes_in_RBSP := num_bytes_in_RBSP-2;
+  			i := i-2;
+  		end
+  		num_bytes_in_RBSP := num_bytes_in_RBSP+1;
+  	end
+  	i := i+1;
+  end
+  
+  send_stream : action ==>  bits_rbsp8:[Input_Bitstream] repeat Buffer_Size, nb_rbsp_bytes:[b]
+  guard
+  	i < Buffer_Size,
+  	start_code_found = 2
+  do
+  		i := i -1;
+		// case where SC is of 3 bytes instead of 4
+  		if Input_Bitstream[i-3] != 0 and Input_Bitstream[i-2] = 0 and Input_Bitstream[i-1] = 0 and Input_Bitstream[i] = 1 then
+  			num_bytes_in_RBSP := num_bytes_in_RBSP-1;
+  		end 
+		b := num_bytes_in_RBSP;
+		start_code_found := 1;
+		num_bytes_in_RBSP := 0;
+		i := 0;
+		
+  end
+ */
+ 
   emul: action bits8:[ b ] ==> bits_rbsp8:[ 0 , 0 ]
   guard 
     byte_count = 2,
     byte0 = 0 and byte1 = 0 and b = 3
-  do
+   do
     byte_count := 0;
     num_bytes_in_RBSP := num_bytes_in_RBSP+2;
   end
@@ -71,13 +114,13 @@ actor Algo_NALU()
       if byte_moins1 != 0 then // case video bitstreams where start code do not start with 00 00 00 01 but by 00 00 01 see file in AVCBS-5 folder
       	start_code_trunk_3 := 1;
       end
-      	
-    end
+	end
+
     byte_moins1 := byte0;
     v := byte0;
     byte0 := byte1; 
     byte1 := b;
-    
+  
   end
   
 // Modifications done by J DELORME the 12.03.10 for management of start code in video bitstreams which do not start with 4 bytes but 3 bytes 
@@ -101,6 +144,7 @@ actor Algo_NALU()
 
   priority
     send_nb_rbsp_bytes > emul > send;
+//    read> send_stream;
   end
 end
 
