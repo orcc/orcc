@@ -3818,7 +3818,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
 	end
 
-	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	read_MB_pred_ref_idx_l0_done: action ==> 
 	guard
 		(slice_num_ref_idx_l0_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l0_active_minus1 > 1 and vld_end())
 	do
@@ -3827,7 +3827,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 
 	//else
-	read_MB_pred_skip_ref_idx_l0: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	read_MB_pred_skip_ref_idx_l0: action ==> 
 	guard
 		mbPartIdx < NumMbPart()
 	do
@@ -3855,7 +3855,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
 	end
 
-	read_MB_pred_ref_idx_l1_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l1[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	read_MB_pred_ref_idx_l1_done: action ==> 
 	guard
 		(slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())
 	do
@@ -3883,7 +3883,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	//  for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
 	//    if( MbPartPredMode ( mb_type, mbPartIdx ) != Pred_L1 )
-	read_MB_pred_mvd_l0: action ==> 
+	read_MB_pred_mvd_l0: action ==> MbPartIdx:[mbPartIdx], RefIdx:[ref_idx_l0[mbPartIdx]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
 	guard
 		mbPartIdx < NumMbPart(),
 		not IS_MBPred_L1(mbPartIdx), not IS_MBNA(mbPartIdx)
@@ -3926,7 +3926,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	// for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
 	//   if( MbPartPredMode( mb_type, mbPartIdx ) != Pred_L0 )
-	read_MB_pred_mvd_l1: action ==> 
+	read_MB_pred_mvd_l1: action ==> MbPartIdx:[mbPartIdx], RefIdx:[ref_idx_l1[mbPartIdx]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
 	guard
 		mbPartIdx < NumMbPart(),
 		not IS_MBPred_L0(mbPartIdx), not IS_MBNA(mbPartIdx)
