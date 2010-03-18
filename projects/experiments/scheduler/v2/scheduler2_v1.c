@@ -169,20 +169,15 @@ struct actor {
 };
 
 struct scheduler {
-	int sched_idx;
-	int num_schedulables;
+	int next_schedulable_idx;
+	int next_free_idx;
+	int num_actors;
 	struct actor **actors;
 };
 
 struct actor source = {source_scheduler};
 struct actor compute = {compute_scheduler};
 struct actor sink = {sink_scheduler};
-
-struct actor *actors[] = {
-	&source,
-	&compute,
-	&sink
-};
 
 struct conn_s conn_0 = {&fifo_0, &source, &compute};
 struct conn_s conn_1 = {&fifo_1, &compute, &sink};
@@ -224,28 +219,58 @@ int is_schedulable(struct actor *actor) {
 	return 1;
 }
 
+struct actor *actors[3];
+
+struct actor *get_next_schedulable_actor(struct scheduler *my_scheduler) {
+	int i = 0;
+	struct actor *actor = my_scheduler->actors[my_scheduler->next_schedulable_idx];
+	while (actor == NULL && i < my_scheduler->num_actors) {
+		my_scheduler->next_schedulable_idx = (my_scheduler->next_schedulable_idx + 1) % my_scheduler->num_actors;
+		actor = my_scheduler->actors[my_scheduler->next_schedulable_idx];
+		i++;
+	}
+
+	my_scheduler->actors[my_scheduler->next_schedulable_idx] = NULL;
+	my_scheduler->next_schedulable_idx = (my_scheduler->next_schedulable_idx + 1) % my_scheduler->num_actors;
+
+	return actor;
+}
+
+void add_schedulable_actor(struct scheduler *my_scheduler, struct actor *actor) {
+	struct actor *p_actor = my_scheduler->actors[my_scheduler->next_free_idx];
+	while (p_actor != NULL) {
+		my_scheduler->next_free_idx = (my_scheduler->next_free_idx + 1) % my_scheduler->num_actors;
+		p_actor = my_scheduler->actors[my_scheduler->next_free_idx];
+	}
+
+	my_scheduler->actors[my_scheduler->next_free_idx] = actor;
+	my_scheduler->next_free_idx = (my_scheduler->next_free_idx + 1) % my_scheduler->num_actors;
+}
+
 void scheduler2_v1() {
 	int i;
-
+	struct actor *my_actor;
 	struct scheduler my_scheduler = {
 		0,
 		0,
+		sizeof(actors) / sizeof(actors[0]),
 		actors
 	};
 
-	my_scheduler.sched_idx = 0;
-	my_scheduler.num_schedulables = 1;
+	my_scheduler.next_schedulable_idx = 0;
+	my_scheduler.actors[0] = &source;
 
-	while (my_scheduler.num_schedulables > 0) {
-		struct actor *my_actor = my_scheduler.actors[my_scheduler.sched_idx];
+	my_actor = get_next_schedulable_actor(&my_scheduler);
+	while (my_actor != NULL) {
 		my_actor->sched_func();
 
 		for (i = 0; i < my_actor->num_outputs; i++) {
 			struct conn_s *connection = my_actor->outputs[i];
 			if (is_schedulable(connection->target)) {
-				my_scheduler.num_schedulables = 1;
-				my_scheduler.actors[my_scheduler.sched_idx] = connection->target;
+				add_schedulable_actor(&my_scheduler, connection->target);
 			}
 		}
+
+		my_actor = get_next_schedulable_actor(&my_scheduler);
 	}
 }
