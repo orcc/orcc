@@ -219,6 +219,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	bool StartDecodeTerminate := false;
 	bool StartDecodeDecision := false;
 	bool StartDecodeBypass := false;
+	bool NextBitToDeocde	:= true;
+	bool StartRenormDRead := false;
 	int getBitStreamValue;
 	
 	//CABAC Decode Variables
@@ -2560,7 +2562,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 			
 			
-			if FoundSE = false and StartDecodeBypass = false and StartDecodeTerminate = false and StartDecodeDecision = false then
+			if FoundSE = false and NextBitToDeocde then
 				// Update the Bin string that we are going to compare with
 				updateSynElVal();
 				// Update the binIdx
@@ -2576,8 +2578,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				else
 					StartDecodeDecision := true;
 				end end
-				
-				
+				//Read Next Bit when we have compared it first
+				NextBitToDeocde := false;
 				// Do not give the hand to Cabac Parsing Process if the initialization has not finished
 				CabacStartProcess := false;
 			end
@@ -2590,11 +2592,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 					if synElVal[0] != MaxBinIdx then
 							updateSynElVal();
 					else
+						FoundSE := true;
 						foreach int s in Integers(1, MaxBinIdx + 1) do
 							FoundSE := FoundSE and ReadBinString[s] = synElVal[s];
 						end
 					end
-				
+				//You can decode the next bit
+				NextBitToDeocde := true;
 				binValDecoded := false;
 			end
 			
@@ -2617,15 +2621,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	/********************** RenormD actions **********************/
 	
-	Start_RenormD: action ==>
+	RenormD_Read: action ==>
 	guard
-		StartRenormD and
+		StartRenormDRead and
 		codIRange < 0x0100
 	do
 		set_bits_to_read(1);
+		StartRenormD := true;
+		StartRenormDRead := false;
 	end
 	
-	RenormD: action ==>
+	RenormD_Start: action ==>
 	guard
 		StartRenormD and
 		codIRange < 0x0100 and
@@ -2637,14 +2643,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	end
 	
-	RenormD_done: action ==>
+	RenormD_Done: action ==>
 	guard
 		StartRenormD and
 		codIRange >= 0x0100
 	do
 		StartRenormD := false;
-		if StartDecodeDecision then
-			StartDecodeDecision := false;
+		if StartDecodeDecision = false then
 			// Give the hand to CabacParsing
 			CabacStartProcess := true;
 		end
@@ -2681,7 +2686,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 		// Give the right write a bit into ReadBinString[]
 		binValDecoded := true;
-		StartRenormD := true;
+		StartRenormDRead := true;
+		// Do not call again DecodeDecision
+		StartDecodeDecision := false;
 		// Do not give the hand to CabacParsing
 		CabacStartProcess := false;
 	end
@@ -2754,9 +2761,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		StartDecodeTerminate and
 		ctxIdx = 276 and binVal = 0 and
-		StartRenormD = false
+		StartRenormDRead = false
 	do
-		StartRenormD := true;
+		StartRenormDRead := true;
 	end
 	
 	/********************** Cabac Initialization **********************/
