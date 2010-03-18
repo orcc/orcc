@@ -214,12 +214,14 @@ case_define_out(port) ::= <<
       if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
 $if(port.type.bool)$
-        assert (input_bit = 1 and $actorName$_$port.name$_data = '0')
-          report "incorrectly value computed : 0 instead of : 1"
-          severity error;
-        assert (input_bit = 0 and $actorName$_$port.name$_data = '1')
-          report "incorrectly value computed : 1 instead of : 0"
-          severity error;
+        if Input_bit = 1 then
+          assert ($actorName$_$port.name$_data = '1')
+            report "incorrectly value computed : 0 instead of : 1"
+            severity error;
+        else
+          assert ($actorName$_$port.name$_data = '0')
+            report "incorrectly value computed : 1 instead of : 0"
+            severity error;                
         end if;
 $else$
 $if(port.type.int)$
