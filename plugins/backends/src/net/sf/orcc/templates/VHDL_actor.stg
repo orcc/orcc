@@ -251,9 +251,7 @@ $endif$
 // while node
 WhileNode(whileNode) ::= <<
 while ($whileNode.value$) loop
-  $nodes(whileNode.nodes)$
-$BlockNode(whileNode.joinNode)$
-end loop;
+  $nodes(whileNode.nodes)$$BlockNode(whileNode.joinNode)$end loop;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -453,6 +451,7 @@ actionTestState(nextState) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
+
 actor(actorName, actor) ::= <<
 ------------------------------------------------------------------------------
 -- Generated from $actor.name$ actor
@@ -465,6 +464,8 @@ use ieee.numeric_std.all;
 library work;
 use work.orcc_package.all;
 
+------------------------------------------------------------------------------
+
 entity $actor.name$ is
   port (
   -- Inputs
@@ -474,6 +475,7 @@ entity $actor.name$ is
   $actor.outputs.list: {$fifo_out(it)$}; separator=";\n"$);  
 end $actor.name$;
 
+------------------------------------------------------------------------------
 
 architecture rtl_$actor.name$ of $actor.name$ is
 
@@ -501,6 +503,9 @@ $if(actor.actionScheduler.fsm)$
       $actor.stateVars.list: stateConst(it)$$InitFSM(actor.actionScheduler.fsm)$      --
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
     elsif rising_edge(clock) then
+      $if(actor.initializes)$
+      -- $actor.initializes: action(it)$
+      $endif$
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
       $actor.actions: printActionSchedulerInline(it); separator="\n"$
       $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
@@ -516,6 +521,9 @@ $else$
       $actor.stateVars.list: stateConst(it)$      --
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
     elsif rising_edge(clock) then
+      $if(actor.initializes)$
+      $actor.initializes: action(it)$
+      $endif$    
       $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
       $actor.actions: printActionSchedulerInline(it); separator="\n"$
       $schedulingTest(actor.actionScheduler.actions)$
@@ -525,4 +533,13 @@ $else$
 $endif$
 
 end architecture rtl_$actor.name$;
+
+>>
+
+
+action(action) ::= <<
+
+-- TODO
+$procedure(procedure=action.body)$
+
 >>
