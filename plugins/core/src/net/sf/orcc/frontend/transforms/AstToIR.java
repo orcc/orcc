@@ -33,10 +33,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.cal.BooleanExpression;
-import net.sf.orcc.cal.IntegerExpression;
-import net.sf.orcc.cal.LiteralExpression;
-import net.sf.orcc.cal.StringExpression;
+import net.sf.orcc.cal.cal.BooleanExpression;
+import net.sf.orcc.cal.cal.IntegerExpression;
+import net.sf.orcc.cal.cal.LiteralExpression;
+import net.sf.orcc.cal.cal.StringExpression;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -66,17 +66,17 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class AstToIR {
 
-	private Map<net.sf.orcc.cal.Port, Port> portMap;
+	private Map<net.sf.orcc.cal.cal.Port, Port> portMap;
 
-	private Map<net.sf.orcc.cal.Variable, Variable> variableMap;
+	private Map<net.sf.orcc.cal.cal.Variable, Variable> variableMap;
 
 	public AstToIR() {
-		portMap = new HashMap<net.sf.orcc.cal.Port, Port>();
-		variableMap = new HashMap<net.sf.orcc.cal.Variable, Variable>();
+		portMap = new HashMap<net.sf.orcc.cal.cal.Port, Port>();
+		variableMap = new HashMap<net.sf.orcc.cal.cal.Variable, Variable>();
 		variableMap.toString();
 	}
 
-	public Actor transform(String file, net.sf.orcc.cal.Actor astActor) {
+	public Actor transform(String file, net.sf.orcc.cal.cal.Actor astActor) {
 		String name = astActor.getName();
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 		OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
@@ -94,7 +94,7 @@ public class AstToIR {
 				scheduler, null);
 	}
 
-	private Expression transformExpression(net.sf.orcc.cal.Expression expr) {
+	private Expression transformExpression(net.sf.orcc.cal.cal.Expression expr) {
 		if (expr instanceof LiteralExpression) {
 			return transformExprLiteral((LiteralExpression) expr);
 		}
@@ -125,9 +125,10 @@ public class AstToIR {
 		throw new OrccRuntimeException("unknown literal expression type");
 	}
 
-	private OrderedMap<Port> transformPorts(List<net.sf.orcc.cal.Port> portList) {
+	private OrderedMap<Port> transformPorts(
+			List<net.sf.orcc.cal.cal.Port> portList) {
 		OrderedMap<Port> ports = new OrderedMap<Port>();
-		for (net.sf.orcc.cal.Port aPort : portList) {
+		for (net.sf.orcc.cal.cal.Port aPort : portList) {
 			Location location = new Location();
 			Type type = transformType(aPort.getType());
 			Port port = new Port(location, type, aPort.getName());
@@ -138,24 +139,24 @@ public class AstToIR {
 		return ports;
 	}
 
-	private Type transformType(net.sf.orcc.cal.Type aType) {
+	private Type transformType(net.sf.orcc.cal.cal.Type aType) {
 		String typeName = aType.getName();
 		if (typeName.equals("bool")) {
 			return new BoolType();
 		} else if (typeName.equals("int")) {
-			Expression size = transformExpression(((net.sf.orcc.cal.IntType) aType)
+			Expression size = transformExpression(((net.sf.orcc.cal.cal.IntType) aType)
 					.getSize());
 			return new IntType(size);
 		} else if (typeName.equals("List")) {
-			Type type = transformType(((net.sf.orcc.cal.ListType) aType)
+			Type type = transformType(((net.sf.orcc.cal.cal.ListType) aType)
 					.getType());
-			Expression size = transformExpression(((net.sf.orcc.cal.ListType) aType)
+			Expression size = transformExpression(((net.sf.orcc.cal.cal.ListType) aType)
 					.getSize());
 			return new ListType(size, type);
 		} else if (typeName.equals("String")) {
 			return new StringType();
 		} else if (typeName.equals("uint")) {
-			Expression size = transformExpression(((net.sf.orcc.cal.UintType) aType)
+			Expression size = transformExpression(((net.sf.orcc.cal.cal.UintType) aType)
 					.getSize());
 			return new UintType(size);
 		} else if (typeName.equals("void")) {

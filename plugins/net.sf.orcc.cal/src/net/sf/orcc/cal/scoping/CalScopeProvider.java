@@ -26,21 +26,21 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.scoping;
+package net.sf.orcc.cal.scoping;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.orcc.cal.Action;
-import net.sf.orcc.cal.Actor;
-import net.sf.orcc.cal.ForeachStatement;
-import net.sf.orcc.cal.Function;
-import net.sf.orcc.cal.Generator;
-import net.sf.orcc.cal.InputPattern;
-import net.sf.orcc.cal.ListExpression;
-import net.sf.orcc.cal.Procedure;
-import net.sf.orcc.cal.Variable;
+import net.sf.orcc.cal.cal.Action;
+import net.sf.orcc.cal.cal.Actor;
+import net.sf.orcc.cal.cal.ForeachStatement;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.InputPattern;
+import net.sf.orcc.cal.cal.ListExpression;
+import net.sf.orcc.cal.cal.Procedure;
+import net.sf.orcc.cal.cal.Variable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;

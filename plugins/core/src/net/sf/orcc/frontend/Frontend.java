@@ -33,8 +33,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import net.sf.orcc.CalStandaloneSetup;
 import net.sf.orcc.OrccException;
+import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.frontend.transforms.AstToIR;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -198,14 +198,14 @@ public class Frontend {
 	}
 
 	private Actor processActor(String actorPath) throws OrccException {
-		net.sf.orcc.cal.Actor aActor = null;
+		net.sf.orcc.cal.cal.Actor aActor = null;
 
 		try {
 			actorPath = new File(actorPath + ".cal").getCanonicalPath();
 			InputStream in = new FileInputStream(actorPath);
 			IParseResult result = parser.parse(in);
 			EObject root = result.getRootASTElement();
-			aActor = (net.sf.orcc.cal.Actor) root;
+			aActor = (net.sf.orcc.cal.cal.Actor) root;
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

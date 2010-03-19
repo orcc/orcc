@@ -39,8 +39,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.orcc.cal.Schedule;
-import net.sf.orcc.cal.Transition;
+import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.Transition;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Tag;

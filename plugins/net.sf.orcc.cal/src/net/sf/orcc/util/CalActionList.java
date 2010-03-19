@@ -34,9 +34,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.cal.Action;
-import net.sf.orcc.cal.CalFactory;
-import net.sf.orcc.cal.Tag;
+import net.sf.orcc.cal.cal.Action;
+import net.sf.orcc.cal.cal.CalFactory;
+import net.sf.orcc.cal.cal.Tag;
 
 /**
  * A list of action is like an ordered map, except keys are tags (list of

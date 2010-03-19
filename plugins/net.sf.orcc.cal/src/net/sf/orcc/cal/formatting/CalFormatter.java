@@ -26,31 +26,31 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.formatting;
+package net.sf.orcc.cal.formatting;
 
-import net.sf.orcc.services.CalGrammarAccess;
-import net.sf.orcc.services.CalGrammarAccess.ActionElements;
-import net.sf.orcc.services.CalGrammarAccess.ActorElements;
-import net.sf.orcc.services.CalGrammarAccess.AssignElements;
-import net.sf.orcc.services.CalGrammarAccess.CallExpressionElements;
-import net.sf.orcc.services.CalGrammarAccess.CallStatementElements;
-import net.sf.orcc.services.CalGrammarAccess.ForeachStatementElements;
-import net.sf.orcc.services.CalGrammarAccess.FunctionElements;
-import net.sf.orcc.services.CalGrammarAccess.GeneratorElements;
-import net.sf.orcc.services.CalGrammarAccess.IfExpressionElements;
-import net.sf.orcc.services.CalGrammarAccess.IfStatementElements;
-import net.sf.orcc.services.CalGrammarAccess.IndexExpressionElements;
-import net.sf.orcc.services.CalGrammarAccess.InitializeElements;
-import net.sf.orcc.services.CalGrammarAccess.IntTypeElements;
-import net.sf.orcc.services.CalGrammarAccess.ListExpressionElements;
-import net.sf.orcc.services.CalGrammarAccess.ListTypeElements;
-import net.sf.orcc.services.CalGrammarAccess.PostfixExpressionElements;
-import net.sf.orcc.services.CalGrammarAccess.PriorityElements;
-import net.sf.orcc.services.CalGrammarAccess.ProcedureElements;
-import net.sf.orcc.services.CalGrammarAccess.ScheduleElements;
-import net.sf.orcc.services.CalGrammarAccess.StateVariableElements;
-import net.sf.orcc.services.CalGrammarAccess.UintTypeElements;
-import net.sf.orcc.services.CalGrammarAccess.WhileStatementElements;
+import net.sf.orcc.cal.services.CalGrammarAccess;
+import net.sf.orcc.cal.services.CalGrammarAccess.ActionElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.ActorElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.AssignElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.CallExpressionElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.CallStatementElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.ForeachStatementElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.FunctionElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.GeneratorElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.IfExpressionElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.IfStatementElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.IndexExpressionElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.InitializeElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.IntTypeElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.ListExpressionElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.ListTypeElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.PostfixExpressionElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.PriorityElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.ProcedureElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.ScheduleElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.StateVariableElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.UintTypeElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.WhileStatementElements;
 
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.formatting.impl.AbstractDeclarativeFormatter;

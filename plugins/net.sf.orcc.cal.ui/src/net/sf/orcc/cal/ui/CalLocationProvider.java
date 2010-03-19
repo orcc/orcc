@@ -26,14 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc;
+package net.sf.orcc.cal.ui;
 
-import net.sf.orcc.cal.Action;
+import net.sf.orcc.cal.cal.Action;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.xtext.ui.core.DefaultLocationInFileProvider;
+import org.eclipse.xtext.ui.DefaultLocationInFileProvider;
 
 /**
  * This class provides location for the objects of the AST.

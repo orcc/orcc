@@ -26,64 +26,56 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.labeling;
+package net.sf.orcc.cal.validation;
 
-import java.util.Iterator;
+import java.util.List;
 
-import net.sf.orcc.cal.Action;
-import net.sf.orcc.cal.Inequality;
-import net.sf.orcc.cal.Tag;
-import net.sf.orcc.cal.Transition;
+import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.CallExpression;
+import net.sf.orcc.cal.cal.CallStatement;
+import net.sf.orcc.cal.cal.ForeachStatement;
+import net.sf.orcc.cal.cal.Function;
+import net.sf.orcc.cal.cal.Generator;
+import net.sf.orcc.cal.cal.Procedure;
+import net.sf.orcc.cal.cal.Variable;
+import net.sf.orcc.cal.cal.VariableReference;
 
-import org.eclipse.xtext.ui.core.DefaultLabelProvider;
+import org.eclipse.xtext.validation.Check;
 
 /**
- * see
- * http://www.eclipse.org/Xtext/documentation/latest/xtext.html#labelProvider
+ * This class describes the validation of an RVC-CAL actor.
+ * 
+ * @author Matthieu Wipliez
+ * 
  */
-public class CalLabelProvider extends DefaultLabelProvider {
+public class CalJavaValidator extends AbstractCalJavaValidator {
 
-	public String text(Action action) {
-		Tag tag = action.getTag();
-		if (tag == null) {
-			return "(untagged)";
-		} else {
-			return getText(tag);
+	@Check
+	public void checkIsFunctionUsed(Function function) {
+		List<CallExpression> refs = function.getCalls();
+		if (refs.isEmpty()) {
+			warning("Unused function", CalPackage.FUNCTION__NAME);
 		}
 	}
 
-	public String text(Inequality inequality) {
-		Iterator<Tag> it = inequality.getTags().iterator();
-		StringBuilder builder = new StringBuilder();
-		if (it.hasNext()) {
-			builder.append(text(it.next()));
-			while (it.hasNext()) {
-				builder.append(" > ");
-				builder.append(getText(it.next()));
-			}
-			builder.append(';');
+	@Check
+	public void checkIsFunctionUsed(Procedure procedure) {
+		List<CallStatement> refs = procedure.getCalls();
+		if (refs.isEmpty()) {
+			warning("Unused procedure", CalPackage.PROCEDURE__NAME);
 		}
-
-		return builder.toString();
 	}
 
-	public String text(Tag tag) {
-		Iterator<String> it = tag.getIdentifiers().iterator();
-		StringBuilder builder = new StringBuilder();
-		if (it.hasNext()) {
-			builder.append(it.next());
-			while (it.hasNext()) {
-				builder.append('.');
-				builder.append(it.next());
+	@Check
+	public void checkIsVariabledUsed(Variable variable) {
+		// loop variables do not have to be used
+		if (!(variable.eContainer() instanceof Generator || variable
+				.eContainer() instanceof ForeachStatement)) {
+			List<VariableReference> refs = variable.getReferences();
+			if (refs.isEmpty()) {
+				warning("Unused variable", CalPackage.VARIABLE__NAME);
 			}
 		}
-
-		return builder.toString();
-	}
-
-	public String text(Transition transition) {
-		return transition.getSource() + " (" + getText(transition.getTag())
-				+ ") --> " + transition.getTarget();
 	}
 
 }

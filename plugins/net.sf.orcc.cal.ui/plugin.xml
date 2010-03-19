@@ -6,7 +6,7 @@
     <extension
             point="org.eclipse.ui.editors">
         <editor
-              class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.core.editor.XtextEditor"
+              class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.editor.XtextEditor"
               contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
               default="true"
               extensions="cal"
@@ -18,8 +18,8 @@
     <extension
         point="org.eclipse.ui.handlers">
         <handler
-            class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.common.editor.hyperlinking.OpenDeclarationHandler"
-            commandId="org.eclipse.xtext.ui.common.editor.hyperlinking.OpenDeclaration">
+            class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.editor.hyperlinking.OpenDeclarationHandler"
+            commandId="org.eclipse.xtext.ui.editor.hyperlinking.OpenDeclaration">
             <activeWhen>
                 <reference
                     definitionId="net.sf.orcc.Cal.Editor.opened">
@@ -27,7 +27,7 @@
             </activeWhen>
         </handler>
         <handler
-            class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.core.editor.handler.ValidateActionHandler"
+            class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.editor.handler.ValidateActionHandler"
             commandId="net.sf.orcc.Cal.validate">
          <activeWhen>
             <reference
@@ -41,7 +41,7 @@
             <and>
                 <reference definitionId="isActiveEditorAnInstanceOfXtextEditor"/>
                 <with variable="activeEditor">
-                    <test property="org.eclipse.xtext.ui.core.editor.XtextEditor.languageName" 
+                    <test property="org.eclipse.xtext.ui.editor.XtextEditor.languageName" 
                         value="net.sf.orcc.Cal" 
                         forcePluginActivation="true"/>
                 </with>        
@@ -51,21 +51,21 @@
     <extension
             point="org.eclipse.ui.preferencePages">
         <page
-            class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.core.editor.preferences.LanguageRootPreferencePage"
+            class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.editor.preferences.LanguageRootPreferencePage"
             id="net.sf.orcc.Cal"
             name="Cal">
             <keywordReference id="net.sf.orcc.ui.keyword_Cal"/>
         </page>
         <page
             category="net.sf.orcc.Cal"
-            class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.common.editor.syntaxcoloring.SyntaxColoringPreferencePage"
+            class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.editor.syntaxcoloring.SyntaxColoringPreferencePage"
             id="net.sf.orcc.Cal.coloring"
             name="Syntax Coloring">
             <keywordReference id="net.sf.orcc.ui.keyword_Cal"/>
         </page>
         <page
             category="net.sf.orcc.Cal"
-            class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.common.editor.templates.XtextTemplatePreferencePage"
+            class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.editor.templates.XtextTemplatePreferencePage"
             id="net.sf.orcc.Cal.templates"
             name="Templates">
             <keywordReference id="net.sf.orcc.ui.keyword_Cal"/>
@@ -102,7 +102,7 @@
     </extension>
     <extension point="org.eclipse.ui.menus">
 		<menuContribution locationURI="popup:#TextEditorContext?endof=group.find">
-			<command commandId="org.eclipse.xtext.ui.core.editor.FindReferences">
+			<command commandId="org.eclipse.xtext.ui.editor.FindReferences">
 				<visibleWhen checkEnabled="false">
                 	<reference definitionId="net.sf.orcc.Cal.Editor.opened">
                 	</reference>
@@ -112,8 +112,8 @@
 	</extension>
 	<extension point="org.eclipse.ui.handlers">
 	    <handler
-            class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.core.editor.findrefs.FindReferencesHandler"
-            commandId="org.eclipse.xtext.ui.core.editor.FindReferences">
+            class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.editor.findrefs.FindReferencesHandler"
+            commandId="org.eclipse.xtext.ui.editor.FindReferences">
             <activeWhen>
                 <reference
                     definitionId="net.sf.orcc.Cal.Editor.opened">
@@ -127,13 +127,13 @@
 	<extension
 		point="org.eclipse.emf.ecore.extension_parser">
 		<parser
-			class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.resource.IResourceFactory"
+			class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.resource.IResourceFactory"
 			type="cal">
 		</parser>
 	</extension>
 	<extension point="org.eclipse.xtext.extension_resourceServiceProvider">
         <resourceServiceProvider
-            class="net.sf.orcc.CalExecutableExtensionFactory:org.eclipse.xtext.ui.core.resource.IResourceUIServiceProvider"
+            class="net.sf.orcc.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.resource.IResourceUIServiceProvider"
             uriExtension="cal">
         </resourceServiceProvider>
     </extension>

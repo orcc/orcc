@@ -26,18 +26,18 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.contentassist;
+package net.sf.orcc.cal.ui.contentassist;
 
 import java.util.List;
 
-import net.sf.orcc.cal.Action;
-import net.sf.orcc.cal.Actor;
-import net.sf.orcc.cal.CalFactory;
-import net.sf.orcc.cal.Inequality;
-import net.sf.orcc.cal.Port;
-import net.sf.orcc.cal.Priority;
-import net.sf.orcc.cal.Tag;
-import net.sf.orcc.cal.Transition;
+import net.sf.orcc.cal.cal.Action;
+import net.sf.orcc.cal.cal.Actor;
+import net.sf.orcc.cal.cal.CalFactory;
+import net.sf.orcc.cal.cal.Inequality;
+import net.sf.orcc.cal.cal.Port;
+import net.sf.orcc.cal.cal.Priority;
+import net.sf.orcc.cal.cal.Tag;
+import net.sf.orcc.cal.cal.Transition;
 import net.sf.orcc.util.CalActionList;
 
 import org.eclipse.emf.common.util.EList;
@@ -46,8 +46,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CrossReference;
 import org.eclipse.xtext.resource.IEObjectDescription;
-import org.eclipse.xtext.ui.core.editor.contentassist.ContentAssistContext;
-import org.eclipse.xtext.ui.core.editor.contentassist.ICompletionProposalAcceptor;
+import org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext;
+import org.eclipse.xtext.ui.editor.contentassist.ICompletionProposalAcceptor;
 
 import com.google.common.base.Predicate;
 

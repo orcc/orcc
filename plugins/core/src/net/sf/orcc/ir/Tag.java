@@ -52,7 +52,7 @@ public class Tag implements Comparable<Tag>, Iterable<String> {
 	/**
 	 * Creates a tag from an AST tag object.
 	 */
-	public Tag(net.sf.orcc.cal.Tag tag) {
+	public Tag(net.sf.orcc.cal.cal.Tag tag) {
 		List<String> identifiers = tag.getIdentifiers();
 		this.identifiers = new ArrayList<String>(identifiers);
 	}
