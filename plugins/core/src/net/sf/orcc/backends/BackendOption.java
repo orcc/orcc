@@ -37,16 +37,23 @@ package net.sf.orcc.backends;
 public interface BackendOption {
 
 	/**
-	 * Returns the option name.
+	 * Returns the option's default value.
 	 * 
-	 * @return a String containing the option name
+	 * @return the option's default value
 	 */
 	String getDefaultValue();
 
 	/**
-	 * Returns the option name.
+	 * Returns the option's identifier.
 	 * 
-	 * @return a String containing the option name
+	 * @return the option's identifier
+	 */
+	String getIdentifier();
+
+	/**
+	 * Returns the option's name.
+	 * 
+	 * @return the option's name
 	 */
 	String getName();
 
@@ -54,15 +61,23 @@ public interface BackendOption {
 	 * Sets the default value of this option.
 	 * 
 	 * @param defaultValue
-	 *            a string that contains the default value of this option
+	 *            the default value of this option
 	 */
 	void setDefaultValue(String defaultValue);
+
+	/**
+	 * Sets the option's identifier.
+	 * 
+	 * @param identifier
+	 *            the option's identifier
+	 */
+	void setIdentifier(String identifier);
 
 	/**
 	 * Sets the option name.
 	 * 
 	 * @param name
-	 *            a String containing the option name
+	 *            the option name
 	 */
 	void setName(String name);
 

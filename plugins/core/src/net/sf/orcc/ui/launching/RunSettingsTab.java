@@ -33,10 +33,16 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.backends.BackendOption;
+import net.sf.orcc.backends.BrowseFileOption;
+import net.sf.orcc.backends.CheckboxOption;
+import net.sf.orcc.backends.InputFileOption;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -46,8 +52,6 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -73,13 +77,26 @@ import org.eclipse.swt.widgets.Text;
  */
 public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
-	private BackendOption[] backendSettings;
+	private Map<BackendOption, OptionWidget> backendOptions;
 
 	private Combo comboBackend;
 
 	private Group groupOption;
 
 	private Text textOutput;
+
+	/**
+	 * Copies values from this tab into the given launch configuration.
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 */
+	private void applyOptions(ILaunchConfigurationWorkingCopy configuration) {
+		for (Entry<BackendOption, OptionWidget> entry : backendOptions
+				.entrySet()) {
+			entry.getValue().performApply(configuration);
+		}
+	}
 
 	private void browseOutputFolder(Shell shell) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
@@ -97,6 +114,8 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void createControl(Composite parent) {
+		backendOptions = new HashMap<BackendOption, OptionWidget>();
+
 		Font font = parent.getFont();
 
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -107,9 +126,6 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(data);
 		setControl(composite);
-
-		// Initialize backendSettings
-		backendSettings = new BackendOption[] {};
 
 		createControlBackend(font, composite);
 		createControlOption(font, composite);
@@ -130,14 +146,10 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	private void createControlOption(Font font, Composite parent) {
 		groupOption = new Group(parent, SWT.NONE);
 		groupOption.setFont(font);
-		groupOption.setText("&Option:");
-		groupOption.setLayout(new GridLayout(3, false));
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		groupOption.setText("&Options:");
+		groupOption.setLayout(new GridLayout(1, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		groupOption.setLayoutData(data);
-		groupOption.setLayout(new GridLayout(3, false));
-		groupOption.setVisible(false);
-
-		updateOptionSelection();
 	}
 
 	private void createControlOutputBackend(final Font font, final Group group) {
@@ -198,6 +210,40 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		});
 	}
 
+	private OptionWidget createOption(BackendOption option) {
+		if (option instanceof BrowseFileOption) {
+			return null;
+		} else if (option instanceof CheckboxOption) {
+			return null;
+		} else if (option instanceof InputFileOption) {
+			return new InputFileOptionWidget(this, (InputFileOption) option,
+					groupOption);
+		} else {
+			return null;
+		}
+	}
+
+	private void createOptions(List<BackendOption> options) {
+		for (BackendOption option : options) {
+			OptionWidget control = createOption(option);
+			backendOptions.put(option, control);
+		}
+	}
+
+	@Override
+	public void dispose() {
+		disposeOptions();
+	}
+
+	private void disposeOptions() {
+		for (Entry<BackendOption, OptionWidget> entry : backendOptions
+				.entrySet()) {
+			entry.getValue().dispose();
+		}
+
+		backendOptions.clear();
+	}
+
 	private boolean getFolderFromText() {
 		String value = textOutput.getText();
 		File file = new File(value);
@@ -221,13 +267,10 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			BackendFactory factory = BackendFactory.getInstance();
 			String backend = configuration.getAttribute(BACKEND, "");
 
 			int index = comboBackend.indexOf(backend);
 			comboBackend.select(index);
-
-			List<BackendOption> options = factory.getOptions(backend);
 
 			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
 			textOutput.setText(value);
@@ -271,10 +314,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		// TODO
-		// for (BackendOption backendSetting : backendSettings) {
-		// backendSetting.performApply(configuration);
-		// }
+		applyOptions(configuration);
 
 		String value = textOutput.getText();
 		configuration.setAttribute(OUTPUT_FOLDER, value);
@@ -288,43 +328,22 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(INPUT_FILE, "");
 		configuration.setAttribute(OUTPUT_FOLDER, "");
 		configuration.setAttribute(BACKEND, "");
 	}
 
+	@Override
+	public void updateLaunchConfigurationDialog() {
+		super.updateLaunchConfigurationDialog();
+	}
+
 	private void updateOptionSelection() {
+		disposeOptions();
+
 		int index = comboBackend.getSelectionIndex();
-
-		if (index != -1) {
-			String value = comboBackend.getItem(index);
-			Composite parent = groupOption.getParent();
-			Font font = groupOption.getFont();
-			groupOption.dispose();
-			groupOption = new Group(parent, SWT.NONE);
-			groupOption.setFont(font);
-			groupOption.setText("&Option:");
-			groupOption.setLayout(new GridLayout(3, false));
-			GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-			groupOption.setLayoutData(data);
-			groupOption.setVisible(true);
-
-			groupOption.addPaintListener(new PaintListener() {
-				@Override
-				public void paintControl(PaintEvent e) {
-					updateLaunchConfigurationDialog();
-
-				}
-			});
-
-			// TODO
-			// backendSettings = BackendFactory.getOptions(value);
-			// for (BackendOption backendSetting : backendSettings) {
-			// backendSetting.show(font, groupOption);
-			// }
-		} else {
-			groupOption.setVisible(false);
-		}
+		String backend = comboBackend.getItem(index);
+		BackendFactory factory = BackendFactory.getInstance();
+		createOptions(factory.getOptions(backend));
 	}
 
 }

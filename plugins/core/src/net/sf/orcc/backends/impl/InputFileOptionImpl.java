@@ -39,16 +39,21 @@ import net.sf.orcc.backends.InputFileOption;
 public class InputFileOptionImpl extends BackendOptionImpl implements
 		InputFileOption {
 
+	private String extension;
+
 	@Override
 	public String getExtension() {
-		// TODO Auto-generated method stub
-		return null;
+		return extension;
 	}
 
 	@Override
 	public void setExtension(String extension) {
-		// TODO Auto-generated method stub
-		
+		this.extension = extension;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", extension: " + getExtension();
 	}
 
 }

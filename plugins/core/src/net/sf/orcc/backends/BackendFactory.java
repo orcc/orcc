@@ -151,13 +151,8 @@ public class BackendFactory {
 		for (IConfigurationElement element : elements) {
 			String name = element.getAttribute("name");
 			IConfigurationElement[] optionLists = element.getChildren();
-			for (IConfigurationElement optionList : optionLists) {
-				IConfigurationElement[] optionElements = optionList
-						.getChildren();
-				List<BackendOption> options = parseBackendOptions(optionElements);
-
-				this.backendOptions.put(name, options);
-			}
+			List<BackendOption> options = parseBackendOptions(optionLists);
+			this.backendOptions.put(name, options);
 
 			try {
 				Object obj = element.createExecutableExtension("class");
@@ -223,25 +218,31 @@ public class BackendFactory {
 	private List<BackendOption> parseOptions(IConfigurationElement[] elements) {
 		List<BackendOption> options = new ArrayList<BackendOption>();
 		for (IConfigurationElement element : elements) {
-			BackendOption option;
-			String type = element.getName();
-			if (type.equals("browseFile")) {
-				option = parseBrowseFile(element);
-			} else if (type.equals("checkBox")) {
-				option = parseCheckbox(element);
-			} else if (type.equals("inputFile")) {
-				option = parseInputFile(element);
-			} else {
-				continue;
+			IConfigurationElement[] children = element.getChildren();
+			if (children.length > 0) {
+				BackendOption option;
+
+				IConfigurationElement child = children[0];
+				String type = child.getName();
+				if (type.equals("browseFile")) {
+					option = parseBrowseFile(child);
+				} else if (type.equals("checkBox")) {
+					option = parseCheckbox(child);
+				} else if (type.equals("inputFile")) {
+					option = parseInputFile(child);
+				} else {
+					continue;
+				}
+
+				String id = element.getAttribute("id");
+				option.setIdentifier(id);
+				String name = element.getAttribute("name");
+				option.setName(name);
+				String defaultValue = element.getAttribute("defaultValue");
+				option.setDefaultValue(defaultValue);
+
+				this.options.put(id, option);
 			}
-
-			String name = element.getAttribute("name");
-			option.setName(name);
-			String defaultValue = element.getAttribute("defaultValue");
-			option.setDefaultValue(defaultValue);
-
-			String id = element.getAttribute("id");
-			this.options.put(id, option);
 		}
 
 		return options;

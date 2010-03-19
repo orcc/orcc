@@ -38,28 +38,46 @@ import net.sf.orcc.backends.BackendOption;
  */
 public class BackendOptionImpl implements BackendOption {
 
+	private String defaultValue;
+
+	private String identifier;
+
+	private String name;
+
 	@Override
 	public String getDefaultValue() {
-		// TODO Auto-generated method stub
-		return null;
+		return defaultValue;
+	}
+
+	@Override
+	public String getIdentifier() {
+		return identifier;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
 	public void setDefaultValue(String defaultValue) {
-		// TODO Auto-generated method stub
-		
+		this.defaultValue = defaultValue;
+	}
+
+	@Override
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
 
 	@Override
 	public void setName(String name) {
-		// TODO Auto-generated method stub
-		
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "identifier: " + getIdentifier() + ", name: " + getName()
+				+ ", default: " + getDefaultValue();
 	}
 
 }

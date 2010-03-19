@@ -26,37 +26,20 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.impl;
+package net.sf.orcc.ui.launching;
 
-import java.util.List;
-
-import net.sf.orcc.backends.BackendOption;
-import net.sf.orcc.backends.CheckboxOption;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 
 /**
- * This class defines the implementation of a back-end option.
+ * This interface defines a widget that shows an option.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class CheckboxOptionImpl extends BackendOptionImpl implements
-		CheckboxOption {
+public interface OptionWidget {
 	
-	private List<BackendOption> options;
+	void dispose();
 
-	@Override
-	public List<BackendOption> getOptions() {
-		return options;
-	}
-
-	@Override
-	public void setOptions(List<BackendOption> options) {
-		this.options = options;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + ", options: " + getOptions();
-	}
+	void performApply(ILaunchConfigurationWorkingCopy configuration);
 
 }

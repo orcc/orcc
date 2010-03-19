@@ -39,16 +39,21 @@ import net.sf.orcc.backends.BrowseFileOption;
 public class BrowseFileOptionImpl extends BackendOptionImpl implements
 		BrowseFileOption {
 
+	private boolean workspace;
+
 	@Override
 	public boolean isWorkspace() {
-		// TODO Auto-generated method stub
-		return false;
+		return workspace;
 	}
 
 	@Override
 	public void setWorkspace(boolean workspace) {
-		// TODO Auto-generated method stub
-		
+		this.workspace = workspace;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", isWorkspace: " + isWorkspace();
 	}
 
 }
