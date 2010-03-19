@@ -93,24 +93,24 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureAction(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
-		c.setLinewrap().before(access.getTagAssignment_0_0());
-		c.setNoSpace().before(access.getColonKeyword_0_1());
+		c.setLinewrap().before(access.getTagAssignment_1_0());
+		c.setNoSpace().before(access.getColonKeyword_1_1());
 
 		configureActionInputs(c);
 		configureActionOutputs(c);
 
 		// "action" indents
-		c.setIndentation(access.getActionKeyword_1(), null);
+		c.setIndentation(access.getActionKeyword_2(), null);
 
 		// "guard" unindents and indents, configure comma rules
-		keywordAndCommas(c, access.getGuardKeyword_5_0(), access
-				.getCommaKeyword_5_2_0());
-
-		// "var" unindents and indents, configure comma rules
-		keywordAndCommas(c, access.getVarKeyword_6_0(), access
+		keywordAndCommas(c, access.getGuardKeyword_6_0(), access
 				.getCommaKeyword_6_2_0());
 
-		body(c, access.getDoKeyword_7_0(), access.getEndKeyword_8());
+		// "var" unindents and indents, configure comma rules
+		keywordAndCommas(c, access.getVarKeyword_7_0(), access
+				.getCommaKeyword_6_2_0());
+
+		body(c, access.getDoKeyword_8_0(), access.getEndKeyword_9());
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureActionInputs(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
-		c.setNoSpace().before(access.getCommaKeyword_2_1_0());
+		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
 		c.setNoSpace().before(f.getInputPatternAccess().getColonKeyword_0_1());
 		c.setNoSpace().before(f.getInputPatternAccess().getCommaKeyword_3_0());
 		c.setNoSpace().before(
@@ -138,7 +138,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureActionOutputs(FormattingConfig c) {
 		ActionElements access = f.getActionAccess();
 
-		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
+		c.setNoSpace().before(access.getCommaKeyword_5_1_0());
 		c.setNoSpace().before(f.getOutputPatternAccess().getColonKeyword_0_1());
 		c.setNoSpace().before(f.getOutputPatternAccess().getCommaKeyword_3_0());
 		c.setNoSpace().before(
@@ -328,24 +328,24 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureInitialize(FormattingConfig c) {
 		InitializeElements access = f.getInitializeAccess();
 
-		c.setLinewrap().before(access.getTagAssignment_0_0());
-		c.setNoSpace().before(access.getColonKeyword_0_1());
+		c.setLinewrap().before(access.getTagAssignment_1_0());
+		c.setNoSpace().before(access.getColonKeyword_1_1());
 
 		// output pattern
-		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
+		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
 
 		// "initialize" indents
-		c.setIndentation(access.getInitializeKeyword_1(), null);
+		c.setIndentation(access.getInitializeKeyword_2(), null);
 
 		// "guard" unindents and indents, configure comma rules
-		keywordAndCommas(c, access.getGuardKeyword_4_0(), access
-				.getCommaKeyword_4_2_0());
-
-		// "var" unindents and indents, configure comma rules
-		keywordAndCommas(c, access.getVarKeyword_5_0(), access
+		keywordAndCommas(c, access.getGuardKeyword_5_0(), access
 				.getCommaKeyword_5_2_0());
 
-		body(c, access.getDoKeyword_6_0(), access.getEndKeyword_7());
+		// "var" unindents and indents, configure comma rules
+		keywordAndCommas(c, access.getVarKeyword_6_0(), access
+				.getCommaKeyword_5_2_0());
+
+		body(c, access.getDoKeyword_7_0(), access.getEndKeyword_8());
 	}
 
 	private void configureParameters(FormattingConfig c) {
@@ -373,10 +373,10 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configurePriorities(FormattingConfig c) {
 		PriorityElements access = f.getPriorityAccess();
 
-		c.setIndentation(access.getPriorityKeyword_0(), access
-				.getEndKeyword_2());
-		c.setLinewrap().after(access.getPriorityKeyword_0());
-		c.setLinewrap(2).after(access.getEndKeyword_2());
+		c.setIndentation(access.getPriorityKeyword_1(), access
+				.getEndKeyword_3());
+		c.setLinewrap().after(access.getPriorityKeyword_1());
+		c.setLinewrap(2).after(access.getEndKeyword_3());
 
 		c.setNoSpace().before(f.getInequalityAccess().getSemicolonKeyword_2());
 		c.setLinewrap().after(f.getInequalityAccess().getSemicolonKeyword_2());
