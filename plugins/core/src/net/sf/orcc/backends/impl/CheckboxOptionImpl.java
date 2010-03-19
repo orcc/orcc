@@ -26,76 +26,32 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.options;
+package net.sf.orcc.backends.impl;
 
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Group;
+import java.util.List;
+
+import net.sf.orcc.backends.BackendOption;
+import net.sf.orcc.backends.CheckboxOption;
 
 /**
- * This interface defines an option of a back-end.
+ * This class defines the implementation of a back-end option.
  * 
- * @author Jérôme Gorin
+ * @author Matthieu Wipliez
  * 
  */
-public interface BackendOption {
+public class CheckboxOptionImpl extends BackendOptionImpl implements
+		CheckboxOption {
 
-	/**
-	 * Dispose option elements
-	 */
-	public void dispose();
+	@Override
+	public List<BackendOption> getOptions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-	/**
-	 * Returns the option name
-	 * 
-	 * @return a String containing the option name
-	 */
-	public String[] getOption();
+	@Override
+	public void setOptions(List<BackendOption> options) {
+		// TODO Auto-generated method stub
 
-	/**
-	 * Returns the value of the option
-	 * 
-	 * @return a String containing the value
-	 */
-	public String[] getValue();
-
-	/**
-	 * Tests if the option is valid
-	 * 
-	 * @return a boolean representing the validation of the option
-	 */
-	public boolean isValid();
-
-	/**
-	 * Apply option to the specificied ILaunchConfigurationWorkingCopy * @param
-	 * configuration ILaunchConfigurationWorkingCopy of configuration tab
-	 */
-	public void performApply(ILaunchConfigurationWorkingCopy configuration);
-
-	/**
-	 * Set the option name
-	 * 
-	 * @param option
-	 *            String containing the option name
-	 */
-	public void setOption(String option);
-
-	/**
-	 * Set the value of the option
-	 * 
-	 * @param value
-	 *            String containing the value
-	 */
-	public void setValue(String value);
-
-	/**
-	 * Show interfaces on the selected group
-	 * 
-	 * @param font
-	 *            Font used in the interface
-	 * @param group
-	 *            Group to add the input file interface
-	 */
-	public void show(Font font, Group group);
+	}
 
 }

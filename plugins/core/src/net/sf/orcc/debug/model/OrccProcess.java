@@ -385,7 +385,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		try {
 			BackendFactory factory = BackendFactory.getInstance();
-			factory.runBackend(backend, name, fifoSize);
+			factory.runBackend(backend, name, fifoSize, configuration);
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					backend + " backend could not generate code", e);

@@ -6,7 +6,8 @@ Bundle-Version: 0.7.0
 Bundle-Vendor: IETR/INSA Rennes
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- net.sf.orcc.core
+ net.sf.orcc.core,
+ org.eclipse.debug.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,

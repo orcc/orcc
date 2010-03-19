@@ -30,21 +30,20 @@ package net.sf.orcc.backends;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.backends.options.BackendOption;
-import net.sf.orcc.backends.options.BrowseFileOption;
-import net.sf.orcc.backends.options.CheckBoxOption;
-import net.sf.orcc.backends.options.InputFileOption;
+import net.sf.orcc.backends.impl.BrowseFileOptionImpl;
+import net.sf.orcc.backends.impl.CheckboxOptionImpl;
+import net.sf.orcc.backends.impl.InputFileOptionImpl;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * A factory class that contains a list of back-ends and their options. The
@@ -56,11 +55,6 @@ import org.eclipse.core.runtime.Platform;
  * 
  */
 public class BackendFactory {
-
-	/**
-	 * list of options of a back-end.
-	 */
-	private static Map<String, BackendOption[]> AbtractBackendOptions;
 
 	private static final BackendFactory instance = new BackendFactory();
 
@@ -74,104 +68,9 @@ public class BackendFactory {
 	}
 
 	/**
-	 * Returns the given option from a all backends
-	 * 
-	 * @param optionName
-	 *            String containing the name of the option looking for
-	 * 
-	 * @return AbtractOption[] associated to the option
+	 * list of options of a back-end.
 	 */
-	public static BackendOption[] getOption(String optionName) {
-		List<BackendOption> optionsList = new ArrayList<BackendOption>();
-		Iterator<String> it = AbtractBackendOptions.keySet().iterator();
-		while (it.hasNext()) {
-			String key = it.next();
-			BackendOption[] abstractOptions = AbtractBackendOptions.get(key);
-
-			for (BackendOption abstractOption : abstractOptions) {
-				String[] options = abstractOption.getOption();
-				for (String option : options) {
-					if (option.equals(optionName)) {
-						optionsList.add(abstractOption);
-					}
-				}
-			}
-
-		}
-
-		return optionsList.toArray(new BackendOption[] {});
-	}
-
-	/**
-	 * Returns options of of the selected backend
-	 * 
-	 * @return AbtractOption[] associated to the backend
-	 */
-	public static BackendOption[] getOptions(String name) {
-		return AbtractBackendOptions.get(name);
-	}
-
-	/**
-	 * Parse a list of IConfigurationElement
-	 * 
-	 * @return AbtractOption[] corresponding to the IConfigurationElement[]
-	 */
-	public static BackendOption[] parseConfigurationElement(
-			IConfigurationElement[] configurationElements) {
-		List<BackendOption> backendOptions = new ArrayList<BackendOption>();
-
-		for (IConfigurationElement configurationElement : configurationElements) {
-			String elementName = configurationElement.getName();
-
-			if (elementName.equals("browseFile")) {
-				String stringRequired = configurationElement
-						.getAttribute("required");
-				boolean required = Boolean
-						.valueOf(stringRequired.toLowerCase());
-				String option = configurationElement.getAttribute("name");
-				String caption = configurationElement.getAttribute("caption");
-				String defaultVal = configurationElement
-						.getAttribute("default");
-				if (defaultVal == null) {
-					defaultVal = new String("");
-				}
-				String extension = configurationElement
-						.getAttribute("extension");
-				String stringWorkspace = configurationElement
-						.getAttribute("workspace");
-				boolean workspace = Boolean.valueOf(stringWorkspace
-						.toLowerCase());
-				backendOptions.add(new BrowseFileOption(option, caption,
-						required, workspace, defaultVal, extension));
-
-			} else if (elementName.equals("inputFile")) {
-				String caption = configurationElement.getAttribute("caption");
-				String defaultVal = configurationElement
-						.getAttribute("default");
-				if (defaultVal == null) {
-					defaultVal = new String("");
-				}
-				String extension = configurationElement
-						.getAttribute("extension");
-
-				backendOptions.add(new InputFileOption(caption, defaultVal,
-						extension));
-			} else if (elementName.equals("checkBox")) {
-				String caption = configurationElement.getAttribute("caption");
-				String option = configurationElement.getAttribute("name");
-				String defaultVal = configurationElement
-						.getAttribute("defaultValue");
-				if (defaultVal == null) {
-					defaultVal = new String("");
-				}
-
-				backendOptions.add(new CheckBoxOption(option, caption,
-						defaultVal, configurationElement.getChildren()));
-			}
-		}
-
-		return backendOptions.toArray(new BackendOption[] {});
-	}
+	private Map<String, List<BackendOption>> backendOptions;
 
 	/**
 	 * list of back-ends.
@@ -179,35 +78,39 @@ public class BackendFactory {
 	private final Map<String, IBackend> backends;
 
 	/**
+	 * list of options.
+	 */
+	private Map<String, BackendOption> options;
+
+	/**
 	 * private constructor called when this class is loaded and instance is
 	 * initialized
 	 */
 	private BackendFactory() {
 		backends = new TreeMap<String, IBackend>();
-		AbtractBackendOptions = new HashMap<String, BackendOption[]>();
+		backendOptions = new HashMap<String, List<BackendOption>>();
+		options = new HashMap<String, BackendOption>();
 
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IConfigurationElement[] elements = registry
 				.getConfigurationElementsFor(OrccActivator.PLUGIN_ID
-						+ ".backend");
-		for (IConfigurationElement element : elements) {
-			String name = element.getAttribute("name");
-			IConfigurationElement[] optionLists = element.getChildren();
-			for (IConfigurationElement optionList : optionLists) {
-				IConfigurationElement[] optionElements = optionList
-						.getChildren();
-				BackendOption[] backendOptions = parseConfigurationElement(optionElements);
+						+ ".options");
 
-				AbtractBackendOptions.put(name, backendOptions);
-			}
+		parseOptions(elements);
+		elements = registry.getConfigurationElementsFor(OrccActivator.PLUGIN_ID
+				+ ".backends");
 
-			try {
-				Object obj = element.createExecutableExtension("class");
-				backends.put(name, (IBackend) obj);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
+		parseBackends(elements);
+	}
+
+	/**
+	 * Returns the list of options associated to the back-end with the given
+	 * name.
+	 * 
+	 * @return associated to the backend
+	 */
+	public List<BackendOption> getOptions(String name) {
+		return backendOptions.get(name);
 	}
 
 	/**
@@ -220,6 +123,131 @@ public class BackendFactory {
 	}
 
 	/**
+	 * Returns the list of options referenced by the list of "option" elements.
+	 * 
+	 * @param elements
+	 *            a list of "option" elements
+	 * @return a list of options
+	 */
+	private List<BackendOption> parseBackendOptions(
+			IConfigurationElement[] elements) {
+		List<BackendOption> backendOptions = new ArrayList<BackendOption>();
+		for (IConfigurationElement element : elements) {
+			String id = element.getAttribute("id");
+			BackendOption option = options.get(id);
+			backendOptions.add(option);
+		}
+
+		return backendOptions;
+	}
+
+	/**
+	 * Parses the "backend" elements as back-ends.
+	 * 
+	 * @param elements
+	 *            a list of "backend" elements
+	 */
+	private void parseBackends(IConfigurationElement[] elements) {
+		for (IConfigurationElement element : elements) {
+			String name = element.getAttribute("name");
+			IConfigurationElement[] optionLists = element.getChildren();
+			for (IConfigurationElement optionList : optionLists) {
+				IConfigurationElement[] optionElements = optionList
+						.getChildren();
+				List<BackendOption> options = parseBackendOptions(optionElements);
+
+				this.backendOptions.put(name, options);
+			}
+
+			try {
+				Object obj = element.createExecutableExtension("class");
+				backends.put(name, (IBackend) obj);
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Parses the given configuration element as a "browse file" option.
+	 * 
+	 * @param element
+	 *            a configuration element
+	 * @return a "browse file" option
+	 */
+	private BrowseFileOption parseBrowseFile(IConfigurationElement element) {
+		boolean workspace = Boolean.parseBoolean(element
+				.getAttribute("workspace"));
+		BrowseFileOption option = new BrowseFileOptionImpl();
+		option.setWorkspace(workspace);
+		return option;
+	}
+
+	/**
+	 * Parses the given configuration element as a "checkbox" option.
+	 * 
+	 * @param element
+	 *            a configuration element
+	 * @return a "checkbox" option
+	 */
+	private CheckboxOption parseCheckbox(IConfigurationElement element) {
+		CheckboxOption option = new CheckboxOptionImpl();
+		List<BackendOption> options = parseOptions(element.getChildren());
+		option.setOptions(options);
+		return option;
+	}
+
+	/**
+	 * Parses the given configuration element as an "input file" option.
+	 * 
+	 * @param element
+	 *            a configuration element
+	 * @return an "input file" option
+	 */
+	private InputFileOption parseInputFile(IConfigurationElement element) {
+		String extension = element.getAttribute("extension");
+		InputFileOption option = new InputFileOptionImpl();
+		option.setExtension(extension);
+		return option;
+	}
+
+	/**
+	 * Parses the given configuration elements as a list of options. The options
+	 * are added to the option map of this factory, and also returned as a list.
+	 * This allows checkbox options to have sub-options.
+	 * 
+	 * @param elements
+	 *            a list of configuration elements
+	 * @return a list of options
+	 */
+	private List<BackendOption> parseOptions(IConfigurationElement[] elements) {
+		List<BackendOption> options = new ArrayList<BackendOption>();
+		for (IConfigurationElement element : elements) {
+			BackendOption option;
+			String type = element.getName();
+			if (type.equals("browseFile")) {
+				option = parseBrowseFile(element);
+			} else if (type.equals("checkBox")) {
+				option = parseCheckbox(element);
+			} else if (type.equals("inputFile")) {
+				option = parseInputFile(element);
+			} else {
+				continue;
+			}
+
+			String name = element.getAttribute("name");
+			option.setName(name);
+			String defaultValue = element.getAttribute("defaultValue");
+			option.setDefaultValue(defaultValue);
+
+			String id = element.getAttribute("id");
+			this.options.put(id, option);
+		}
+
+		return options;
+	}
+
+	/**
 	 * Runs the given back-end on the given input file with the given FIFO size.
 	 * 
 	 * @param name
@@ -229,25 +257,15 @@ public class BackendFactory {
 	 *            name of top-level input network
 	 * @param fifoSize
 	 *            default size of FIFOs
+	 * @param configuration
+	 *            launch configuration
 	 * @throws Exception
 	 */
-	public void runBackend(String name, String fileName, int fifoSize)
-			throws Exception {
+	public void runBackend(String name, String fileName, int fifoSize,
+			ILaunchConfiguration configuration) throws Exception {
 		IBackend backend = backends.get(name);
-		BackendOption[] abstractOptions = AbtractBackendOptions.get(name);
-		Map<String, String> optionMap = new HashMap<String, String>();
-
-		for (BackendOption abstractOption : abstractOptions) {
-			String[] options = abstractOption.getOption();
-			String[] values = abstractOption.getValue();
-			int i = 0;
-
-			for (String option : options) {
-				optionMap.put(option, values[i++]);
-			}
-		}
-
-		backend.setOptions(optionMap);
+		backend.setLaunchConfiguration(configuration);
 		backend.generateCode(fileName, fifoSize);
 	}
+
 }

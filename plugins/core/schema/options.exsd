@@ -1,24 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="net.sf.orcc.plugin.backend" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="net.sf.orcc.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appinfo>
-         <meta.schema plugin="net.sf.orcc.plugin.backend" id="backend" name="backend"/>
-      </appinfo>
+      <appInfo>
+         <meta.schema plugin="net.sf.orcc.core" id="options" name="options"/>
+      </appInfo>
       <documentation>
-         Allows a plugin to declare backends.
+         [Enter description of this extension point.]
       </documentation>
    </annotation>
 
    <element name="extension">
       <annotation>
-         <appinfo>
+         <appInfo>
             <meta.element />
-         </appinfo>
+         </appInfo>
       </annotation>
       <complexType>
          <sequence>
-            <element ref="backend" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="option" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -39,63 +39,9 @@
                <documentation>
                   
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute translatable="true"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="checkBox">
-      <complexType>
-         <sequence>
-            <element ref="option" minOccurs="0" maxOccurs="1"/>
-         </sequence>
-         <attribute name="defaultValue" type="boolean">
-            <annotation>
-               <documentation>
-                  Default value of the interface
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="caption" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Caption associated to the interface
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="name" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Name of the option
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="backend">
-      <complexType>
-         <sequence>
-            <element ref="option" minOccurs="0" maxOccurs="1"/>
-         </sequence>
-         <attribute name="name" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="class" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn=":net.sf.orcc.backends.IBackend"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
@@ -103,30 +49,37 @@
 
    <element name="option">
       <complexType>
-         <choice minOccurs="0" maxOccurs="unbounded">
+         <choice>
             <element ref="browseFile"/>
-            <element ref="inputFile"/>
             <element ref="checkBox"/>
+            <element ref="inputFile"/>
          </choice>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Unique identifier of the &quot;input file&quot; field. This allows back-ends to reference this option.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Name of the &quot;input file&quot; field.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="defaultValue" type="string">
+            <annotation>
+               <documentation>
+                  Default value of the &quot;input file&quot; field.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
    <element name="browseFile">
       <complexType>
-         <attribute name="name" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Name of the option
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="caption" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Caption associated to the interface
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="required" type="boolean" use="default" value="false">
             <annotation>
                <documentation>
@@ -134,17 +87,10 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="defaultValue" type="string">
-            <annotation>
-               <documentation>
-                  Default value of the interface
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="extension" type="string">
             <annotation>
                <documentation>
-                  Restrict extension possiblity
+                  Restrict file choice to files that have the given extension (optional).
                </documentation>
             </annotation>
          </attribute>
@@ -158,6 +104,14 @@
       </complexType>
    </element>
 
+   <element name="checkBox">
+      <complexType>
+         <sequence>
+            <element ref="option" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+      </complexType>
+   </element>
+
    <element name="inputFile">
       <annotation>
          <documentation>
@@ -165,24 +119,10 @@
          </documentation>
       </annotation>
       <complexType>
-         <attribute name="caption" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Caption associated to the interface
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="defaultValue" type="string">
-            <annotation>
-               <documentation>
-                  Default value of the interface
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="extension" type="string">
             <annotation>
                <documentation>
-                  Restrict extension possiblity
+                  Restrict file choice to files that have the given extension (optional).
                </documentation>
             </annotation>
          </attribute>
@@ -190,36 +130,36 @@
    </element>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="since"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          [Enter the first release in which this extension point appears.]
       </documentation>
    </annotation>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="examples"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          [Enter extension point usage example here.]
       </documentation>
    </annotation>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="apiinfo"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          [Enter API information here.]
       </documentation>
    </annotation>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="implementation"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          [Enter information about supplied implementation of this extension point.]
       </documentation>

@@ -33,9 +33,10 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
+import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.backends.options.BackendOption;
+import net.sf.orcc.backends.BackendOption;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -220,19 +221,16 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			BackendOption[] options = BackendFactory.getOption("INPUT_FILE");
+			BackendFactory factory = BackendFactory.getInstance();
+			String backend = configuration.getAttribute(BACKEND, "");
 
-			for (BackendOption option : options) {
-				String value = configuration.getAttribute(INPUT_FILE, "");
-				option.setValue(value);
-			}
+			int index = comboBackend.indexOf(backend);
+			comboBackend.select(index);
+
+			List<BackendOption> options = factory.getOptions(backend);
 
 			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
 			textOutput.setText(value);
-
-			value = configuration.getAttribute(BACKEND, "");
-			int index = comboBackend.indexOf(value);
-			comboBackend.select(index);
 
 			updateOptionSelection();
 		} catch (CoreException e) {
@@ -242,12 +240,13 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		for (BackendOption backendSetting : backendSettings) {
-			if (!backendSetting.isValid()) {
-				setErrorMessage("Required backend options are not specified");
-				return false;
-			}
-		}
+		// TODO
+		// for (BackendOption backendSetting : backendSettings) {
+		// if (!backendSetting.isValid()) {
+		// setErrorMessage("Required backend options are not specified");
+		// return false;
+		// }
+		// }
 
 		String value = textOutput.getText();
 		if (value.isEmpty()) {
@@ -272,9 +271,10 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		for (BackendOption backendSetting : backendSettings) {
-			backendSetting.performApply(configuration);
-		}
+		// TODO
+		// for (BackendOption backendSetting : backendSettings) {
+		// backendSetting.performApply(configuration);
+		// }
 
 		String value = textOutput.getText();
 		configuration.setAttribute(OUTPUT_FOLDER, value);
@@ -317,10 +317,11 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 				}
 			});
 
-			backendSettings = BackendFactory.getOptions(value);
-			for (BackendOption backendSetting : backendSettings) {
-				backendSetting.show(font, groupOption);
-			}
+			// TODO
+			// backendSettings = BackendFactory.getOptions(value);
+			// for (BackendOption backendSetting : backendSettings) {
+			// backendSetting.show(font, groupOption);
+			// }
 		} else {
 			groupOption.setVisible(false);
 		}

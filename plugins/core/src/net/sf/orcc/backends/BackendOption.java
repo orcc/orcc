@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,33 +28,42 @@
  */
 package net.sf.orcc.backends;
 
-import org.eclipse.debug.core.ILaunchConfiguration;
-
 /**
- * This interface defines a back-end.
+ * This interface defines an option of a back-end.
  * 
- * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
-public interface IBackend {
+public interface BackendOption {
 
 	/**
-	 * Generates code from a flat XDF network and IR files.
+	 * Returns the option name.
 	 * 
-	 * @param fileName
-	 *            The file name of the top XDF network.
-	 * @param fifoSize
-	 *            The default FIFO size.
-	 * @throws Exception
+	 * @return a String containing the option name
 	 */
-	public void generateCode(String fileName, int fifoSize) throws Exception;
+	String getDefaultValue();
 
 	/**
-	 * Set the launch configuration of this back-end.
+	 * Returns the option name.
 	 * 
-	 * @param configuration
-	 *            the launch configuration of this back-end
+	 * @return a String containing the option name
 	 */
-	public void setLaunchConfiguration(ILaunchConfiguration configuration);
+	String getName();
+
+	/**
+	 * Sets the default value of this option.
+	 * 
+	 * @param defaultValue
+	 *            a string that contains the default value of this option
+	 */
+	void setDefaultValue(String defaultValue);
+
+	/**
+	 * Sets the option name.
+	 * 
+	 * @param name
+	 *            a String containing the option name
+	 */
+	void setName(String name);
 
 }

@@ -63,7 +63,7 @@ public interface OrccLaunchConstants {
 	 * Default value for {@value #DOT_CFG}.
 	 */
 	public static final boolean DEFAULT_DOT_CFG = false;
-	
+
 	/**
 	 * Default value for {@value #FIFO_SIZE}.
 	 */
@@ -91,7 +91,8 @@ public interface OrccLaunchConstants {
 	public static final String ENABLE_CACHE = "net.sf.orcc.enableCache";
 
 	/**
-	 * When enabled, interpreter traces each time data is written to (output)FIFO
+	 * When enabled, interpreter traces each time data is written to
+	 * (output)FIFO
 	 */
 	public static final String ENABLE_TRACES = "net.sf.orcc.enableTraces";
 
@@ -101,10 +102,11 @@ public interface OrccLaunchConstants {
 	public static final String FIFO_SIZE = "net.sf.orcc.fifoSize";
 
 	/**
-	 * Input file associated with an Orcc configuration.
+	 * Input file associated with an Orcc configuration. Must be kept in sync
+	 * with options in the back-ends plug-in.
 	 */
-	public static final String INPUT_FILE = "net.sf.orcc.fileName";
-	
+	public static final String INPUT_FILE = "net.sf.orcc.backends.xdfInputFile";
+
 	/**
 	 * Input stimulus file associated with an Orcc configuration.
 	 */
@@ -129,7 +131,7 @@ public interface OrccLaunchConstants {
 	 * Parameters associated with an Orcc configuration.
 	 */
 	public static final String PARAMETERS = "net.sf.orcc.parameters";
-	
+
 	/**
 	 * Orcc run configuration type.
 	 */

@@ -81,10 +81,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		ActorTransformation[] transformations = {
 				new AddInstantationProcedure(),
 				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation(),
-				new BuildCFG()};
-
-		// if(actor.getName().equals("Algo_h2x2")){
+				new MoveReadsWritesTransformation(), new BuildCFG() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -94,13 +91,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		printer.printActor(outputName, id, actor);
 
-		if (options != null) {
-			if (options.containsKey("llvm-as")) {
-				printBitcode(options.get("llvm-as"), outputName, id);
+		if (configuration != null) {
+			String llvmAs = configuration.getAttribute("llvm-as", "");
+			if (!llvmAs.isEmpty()) {
+				printBitcode(llvmAs, outputName, id);
 			}
 		}
-
-		// }
 	}
 
 	protected void printBitcode(String execPath, String inputName, String actor) {
@@ -125,12 +121,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws Exception {
-		//NetworkPrinter networkPrinter = new NetworkPrinter("LLVM_network");
+		// NetworkPrinter networkPrinter = new NetworkPrinter("LLVM_network");
 
 		// Add broadcasts before printing
-		//new BroadcastAdder().transform(network);
+		// new BroadcastAdder().transform(network);
 
-		//String outputName = path + File.separator + network.getName() + ".s";
-		//networkPrinter.printNetwork(outputName, network, false, fifoSize);
+		// String outputName = path + File.separator + network.getName() + ".s";
+		// networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 }

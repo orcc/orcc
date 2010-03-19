@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,33 +28,27 @@
  */
 package net.sf.orcc.backends;
 
-import org.eclipse.debug.core.ILaunchConfiguration;
-
 /**
- * This interface defines a back-end.
+ * This interface defines an option of a back-end.
  * 
- * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
-public interface IBackend {
+public interface InputFileOption extends BackendOption {
 
 	/**
-	 * Generates code from a flat XDF network and IR files.
+	 * Returns the extension that this "input file" should have.
 	 * 
-	 * @param fileName
-	 *            The file name of the top XDF network.
-	 * @param fifoSize
-	 *            The default FIFO size.
-	 * @throws Exception
+	 * @return the extension that this "input file" should have
 	 */
-	public void generateCode(String fileName, int fifoSize) throws Exception;
+	String getExtension();
 
 	/**
-	 * Set the launch configuration of this back-end.
+	 * Sets the extension that this "input file" should have.
 	 * 
-	 * @param configuration
-	 *            the launch configuration of this back-end
+	 * @param extension
+	 *            the extension that this "input file" should have
 	 */
-	public void setLaunchConfiguration(ILaunchConfiguration configuration);
+	void setExtension(String extension);
 
 }

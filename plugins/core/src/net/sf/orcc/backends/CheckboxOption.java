@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,33 +28,29 @@
  */
 package net.sf.orcc.backends;
 
-import org.eclipse.debug.core.ILaunchConfiguration;
+import java.util.List;
 
 /**
- * This interface defines a back-end.
+ * This interface defines an option of a back-end.
  * 
- * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
-public interface IBackend {
+public interface CheckboxOption extends BackendOption {
 
 	/**
-	 * Generates code from a flat XDF network and IR files.
+	 * Returns the options that are enabled when this checkbox is.
 	 * 
-	 * @param fileName
-	 *            The file name of the top XDF network.
-	 * @param fifoSize
-	 *            The default FIFO size.
-	 * @throws Exception
+	 * @return the options that are enabled when this checkbox is
 	 */
-	public void generateCode(String fileName, int fifoSize) throws Exception;
+	List<BackendOption> getOptions();
 
 	/**
-	 * Set the launch configuration of this back-end.
+	 * Sets the options that are enabled when this checkbox is.
 	 * 
-	 * @param configuration
-	 *            the launch configuration of this back-end
+	 * @param options
+	 *            the options that are enabled when this checkbox is
 	 */
-	public void setLaunchConfiguration(ILaunchConfiguration configuration);
+	void setOptions(List<BackendOption> options);
 
 }

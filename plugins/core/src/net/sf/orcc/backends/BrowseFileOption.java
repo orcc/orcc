@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,33 +28,27 @@
  */
 package net.sf.orcc.backends;
 
-import org.eclipse.debug.core.ILaunchConfiguration;
-
 /**
- * This interface defines a back-end.
+ * This interface defines an option of a back-end.
  * 
- * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
-public interface IBackend {
+public interface BrowseFileOption extends BackendOption {
 
 	/**
-	 * Generates code from a flat XDF network and IR files.
+	 * Returns whether this "browse file" should be opened in the workspace.
 	 * 
-	 * @param fileName
-	 *            The file name of the top XDF network.
-	 * @param fifoSize
-	 *            The default FIFO size.
-	 * @throws Exception
+	 * @return whether this "browse file" should be opened in the workspace
 	 */
-	public void generateCode(String fileName, int fifoSize) throws Exception;
+	boolean isWorkspace();
 
 	/**
-	 * Set the launch configuration of this back-end.
+	 * Sets whether this "browse file" should be opened in the workspace.
 	 * 
-	 * @param configuration
-	 *            the launch configuration of this back-end
+	 * @param workspace
+	 *            whether this "browse file" should be opened in the workspace
 	 */
-	public void setLaunchConfiguration(ILaunchConfiguration configuration);
+	void setWorkspace(boolean workspace);
 
 }

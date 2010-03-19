@@ -1,90 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
- <extension
-       point="net.sf.orcc.core.backend">
-    <backend
-          class="net.sf.orcc.backends.c.CBackendImpl"
-          name="C">
-       <option>
-          <inputFile
-                caption="Input file:"
-                extension="xdf">
-          </inputFile>
-       </option>
-    </backend>
-    <backend
-          class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
-          name="C *quasi-static*">
-       <option>
-          <inputFile
-                caption="Input file:"
-                extension="xdf">
-          </inputFile>
-       </option>
-    </backend>
-    <backend
-          class="net.sf.orcc.backends.java.JavaBackendImpl"
-          name="Java">
-       <option>
-          <inputFile
-                caption="Input file:"
-                extension="xdf">
-          </inputFile>
-       </option>
-    </backend>
-    <backend
-          class="net.sf.orcc.backends.cpp.CppBackendImpl"
-          name="C++">
-       <option>
-          <inputFile
-                caption="Input file:"
-                extension="xdf">
-          </inputFile>
-       </option>
-    </backend>
-    <backend
-          class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
-          name="LLVM">
-       <option>
-          <inputFile
-                caption="Input file:"
-                extension="xdf">
-          </inputFile>
-          <checkBox
-                caption="Generate bitcode:"
-                defaultValue="false"
-                name="bitcode">
-             <option>
-                <browseFile
-                      caption="Location of llvm-as:"
-                      name="llvm-as"
-                      required="true"
-                      workspace="false">
-                </browseFile>
-             </option>
-          </checkBox>
-       </option>
-    </backend>
-    <backend
-          class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
-          name="VHDL">
-       <option>
-          <inputFile
-                caption="Input file:"
-                extension="xdf">
-          </inputFile>
-       </option>
-    </backend>
-    <backend
-          class="net.sf.orcc.backends.xlim.XlimBackendImpl"
-          name="XLIM">
-       <option>
-          <inputFile
-                caption="Input file:"
-                extension="xdf">
-          </inputFile>
-       </option>
-    </backend>
- </extension>
+   <extension
+         point="net.sf.orcc.core.backends">
+      <backend
+            class="net.sf.orcc.backends.c.CBackendImpl"
+            name="C">
+         <option
+               id="net.sf.orcc.backends.xdfInputFile">
+         </option>
+      </backend>
+      <backend
+            class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
+            name="C *quasi-static*">
+         <option
+               id="net.sf.orcc.backends.xdfInputFile">
+         </option>
+      </backend>
+      <backend
+            class="net.sf.orcc.backends.java.JavaBackendImpl"
+            name="Java">
+         <option
+               id="net.sf.orcc.backends.xdfInputFile">
+         </option>
+      </backend>
+      <backend
+            class="net.sf.orcc.backends.cpp.CppBackendImpl"
+            name="C++">
+         <option
+               id="net.sf.orcc.backends.xdfInputFile">
+         </option>
+      </backend>
+      <backend
+            class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
+            name="LLVM">
+         <option
+               id="net.sf.orcc.backends.xdfInputFile">
+         </option>
+         <option
+               id="net.sf.orcc.backends.llvmBitcode">
+         </option>
+      </backend>
+      <backend
+            class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
+            name="VHDL">
+         <option
+               id="net.sf.orcc.backends.xdfInputFile">
+         </option>
+      </backend>
+      <backend
+            class="net.sf.orcc.backends.xlim.XlimBackendImpl"
+            name="XLIM">
+         <option
+               id="net.sf.orcc.backends.xdfInputFile">
+         </option>
+      </backend>
+   </extension>
+   <extension
+         point="net.sf.orcc.core.options">
+      <option
+            id="net.sf.orcc.backends.xdfInputFile"
+            name="Input file">
+         <inputFile
+               extension="xdf">
+         </inputFile>
+      </option>
+      
+         <option
+               defaultValue="false"
+               id="net.sf.orcc.backends.llvmBitcode"
+               name="Generate bitcode">
+            <checkBox>
+               <option
+                     id="net.sf.orcc.backends.llvm-as"
+                     name="Location of llvm-as">
+                  <browseFile
+                        required="true"
+                        workspace="false">
+                  </browseFile>
+               </option>
+            </checkBox>
+         </option>
+   </extension>
+
 </plugin>

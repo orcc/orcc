@@ -29,13 +29,14 @@
 package net.sf.orcc.backends;
 
 import java.io.File;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
+
+import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
  * Abstract implementation of {@link IBackend}.
@@ -46,9 +47,9 @@ import net.sf.orcc.network.serialize.XDFParser;
 public abstract class AbstractBackend implements IBackend {
 
 	/**
-	 * Map containing a list of options.
+	 * the configuration used to launch this back-end.
 	 */
-	protected Map<String, String> options;
+	protected ILaunchConfiguration configuration;
 
 	/**
 	 * Fifo size used in backend.
@@ -121,14 +122,9 @@ public abstract class AbstractBackend implements IBackend {
 	 */
 	abstract protected void printNetwork(Network network) throws Exception;
 
-	/**
-	 * Set options for a backend.
-	 * 
-	 * @param options
-	 *            Map containing options and their values.
-	 */
-	public void setOptions(Map<String, String> options) {
-		this.options = options;
+	@Override
+	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		this.configuration = configuration;
 	}
 
 }
