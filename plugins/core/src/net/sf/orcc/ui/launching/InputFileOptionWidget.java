@@ -35,9 +35,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -232,7 +234,7 @@ public class InputFileOptionWidget implements ModifyListener, OptionWidget {
 	 * 
 	 * @return a boolean representing the validation of the option
 	 */
-	public boolean isValid() {
+	public boolean isValid(ILaunchConfiguration launchConfig) {
 		IFile file = getFileFromText();
 		return (file != null);
 	}
@@ -250,6 +252,13 @@ public class InputFileOptionWidget implements ModifyListener, OptionWidget {
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(option.getIdentifier(), value);
+	}
+
+	@Override
+	public void initializeFrom(ILaunchConfiguration configuration)
+			throws CoreException {
+		text.setText(configuration.getAttribute(option.getIdentifier(), option
+				.getDefaultValue()));
 	}
 
 }

@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.launching;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 
 /**
@@ -37,8 +39,13 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
  * 
  */
 public interface OptionWidget {
-	
+
 	void dispose();
+
+	void initializeFrom(ILaunchConfiguration configuration)
+			throws CoreException;
+
+	boolean isValid(ILaunchConfiguration launchConfig);
 
 	void performApply(ILaunchConfigurationWorkingCopy configuration);
 

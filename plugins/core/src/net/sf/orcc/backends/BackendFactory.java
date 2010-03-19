@@ -239,6 +239,9 @@ public class BackendFactory {
 				String name = element.getAttribute("name");
 				option.setName(name);
 				String defaultValue = element.getAttribute("defaultValue");
+				if (defaultValue == null) {
+					defaultValue = "";
+				}
 				option.setDefaultValue(defaultValue);
 
 				this.options.put(id, option);

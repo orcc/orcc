@@ -29,14 +29,11 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.backends.BackendOption;
@@ -77,25 +74,18 @@ import org.eclipse.swt.widgets.Text;
  */
 public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
-	private Map<BackendOption, OptionWidget> backendOptions;
+	private List<OptionWidget> backendOptions;
 
 	private Combo comboBackend;
+
+	private ILaunchConfiguration configuration;
 
 	private Group groupOption;
 
 	private Text textOutput;
-
-	/**
-	 * Copies values from this tab into the given launch configuration.
-	 * 
-	 * @param configuration
-	 *            launch configuration
-	 */
-	private void applyOptions(ILaunchConfigurationWorkingCopy configuration) {
-		for (Entry<BackendOption, OptionWidget> entry : backendOptions
-				.entrySet()) {
-			entry.getValue().performApply(configuration);
-		}
+	
+	public RunSettingsTab() {
+		backendOptions = new ArrayList<OptionWidget>();
 	}
 
 	private void browseOutputFolder(Shell shell) {
@@ -114,8 +104,6 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void createControl(Composite parent) {
-		backendOptions = new HashMap<BackendOption, OptionWidget>();
-
 		Font font = parent.getFont();
 
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -174,6 +162,10 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateOptionSelection();
+				try {
+					initializeFromOptions(configuration);
+				} catch (CoreException e1) {
+				}
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -226,7 +218,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	private void createOptions(List<BackendOption> options) {
 		for (BackendOption option : options) {
 			OptionWidget control = createOption(option);
-			backendOptions.put(option, control);
+			backendOptions.add(control);
 		}
 	}
 
@@ -236,9 +228,8 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	}
 
 	private void disposeOptions() {
-		for (Entry<BackendOption, OptionWidget> entry : backendOptions
-				.entrySet()) {
-			entry.getValue().dispose();
+		for (OptionWidget optionWidget : backendOptions) {
+			optionWidget.dispose();
 		}
 
 		backendOptions.clear();
@@ -266,6 +257,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
+		this.configuration = configuration;
 		try {
 			String backend = configuration.getAttribute(BACKEND, "");
 
@@ -276,21 +268,28 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			textOutput.setText(value);
 
 			updateOptionSelection();
+			initializeFromOptions(configuration);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Initializes this tab's controls with values from the given launch
+	 * configuration.
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 */
+	private void initializeFromOptions(ILaunchConfiguration configuration)
+			throws CoreException {
+		for (OptionWidget optionWidget : backendOptions) {
+			optionWidget.initializeFrom(configuration);
+		}
+	}
+
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		// TODO
-		// for (BackendOption backendSetting : backendSettings) {
-		// if (!backendSetting.isValid()) {
-		// setErrorMessage("Required backend options are not specified");
-		// return false;
-		// }
-		// }
-
 		String value = textOutput.getText();
 		if (value.isEmpty()) {
 			setErrorMessage("Output path not specified");
@@ -309,12 +308,30 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 
 		setErrorMessage(null);
+		return isValidOptions(launchConfig);
+	}
+
+	/**
+	 * Returns <code>true</code> if the given launch configuration is valid,
+	 * <code>false</code> otherwise.
+	 * 
+	 * @param launchConfig
+	 *            a launch configuration
+	 * @return <code>true</code> if the given launch configuration is valid
+	 */
+	private boolean isValidOptions(ILaunchConfiguration launchConfig) {
+		for (OptionWidget optionWidget : backendOptions) {
+			if (!optionWidget.isValid(launchConfig)) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		applyOptions(configuration);
+		performApplyOptions(configuration);
 
 		String value = textOutput.getText();
 		configuration.setAttribute(OUTPUT_FOLDER, value);
@@ -323,6 +340,19 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		if (index != -1) {
 			value = comboBackend.getItem(index);
 			configuration.setAttribute(BACKEND, value);
+		}
+	}
+
+	/**
+	 * Copies values from this tab into the given launch configuration.
+	 * 
+	 * @param configuration
+	 *            launch configuration
+	 */
+	private void performApplyOptions(
+			ILaunchConfigurationWorkingCopy configuration) {
+		for (OptionWidget optionWidget : backendOptions) {
+			optionWidget.performApply(configuration);
 		}
 	}
 
@@ -341,9 +371,11 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		disposeOptions();
 
 		int index = comboBackend.getSelectionIndex();
-		String backend = comboBackend.getItem(index);
-		BackendFactory factory = BackendFactory.getInstance();
-		createOptions(factory.getOptions(backend));
+		if (index != -1) {
+			String backend = comboBackend.getItem(index);
+			BackendFactory factory = BackendFactory.getInstance();
+			createOptions(factory.getOptions(backend));
+		}
 	}
 
 }
