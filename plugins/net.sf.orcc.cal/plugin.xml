@@ -5,11 +5,12 @@
 
   <extension point="org.eclipse.emf.ecore.generated_package">
     <package 
-       uri = "http://www.sf.net/orcc/Cal" 
+       uri = "http://orcc.sf.net/cal/Cal" 
        class = "net.sf.orcc.cal.cal.CalPackage"
-       genModel = "net/sf/orcc/Cal.genmodel" /> 
+       genModel = "net/sf/orcc/cal/Cal.genmodel" /> 
 	
   </extension>
+
 
 
 

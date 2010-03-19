@@ -2,11 +2,12 @@
 package net.sf.orcc.cal.ui.quickfix;
 
 import org.eclipse.xtext.ui.editor.quickfix.DefaultQuickfixProvider;
-import org.eclipse.xtext.ui.editor.quickfix.Fix;
-import org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor;
-import org.eclipse.xtext.validation.Issue;
 
 public class CalQuickfixProvider extends DefaultQuickfixProvider {
+	
+	// org.eclipse.xtext.ui.editor.quickfix.Fix
+	// org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor
+	// org.eclipse.xtext.validation.Issue
 
 //	@Fix(MyJavaValidator.INVALID_TYPE_NAME)
 //	public void capitalizeName(final Issue issue, IssueResolutionAcceptor acceptor) {

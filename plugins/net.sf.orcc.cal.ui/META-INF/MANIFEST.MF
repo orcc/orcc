@@ -15,6 +15,6 @@ Require-Bundle: net.sf.orcc.cal;visibility:=reexport,
  org.antlr.runtime,
  org.eclipse.xtext.builder
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-Activator: net.sf.orcc.internal.CalActivator
+Bundle-Activator: net.sf.orcc.cal.ui.internal.CalActivator
 Import-Package: org.apache.log4j
 Export-Package: net.sf.orcc.cal.ui.contentassist.antlr
