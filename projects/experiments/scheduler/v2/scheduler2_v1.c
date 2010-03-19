@@ -162,10 +162,12 @@ struct conn_s {
 
 struct actor {
 	int (*sched_func)();
+	int num_successors;
 	int num_inputs;
-	struct conn_s **inputs;
 	int num_outputs;
+	struct conn_s **inputs;
 	struct conn_s **outputs;
+	struct actor **successors;
 };
 
 struct scheduler {
@@ -182,30 +184,33 @@ struct actor sink = {sink_scheduler};
 struct conn_s conn_0 = {&fifo_0, &source, &compute};
 struct conn_s conn_1 = {&fifo_1, &compute, &sink};
 
-struct conn_s **source_inputs = NULL;
 struct conn_s *source_outputs[] = {&conn_0};
+struct actor *source_successors[] = {&compute};
 
 struct conn_s *compute_inputs[] = {&conn_0};
 struct conn_s *compute_outputs[] = {&conn_1};
+struct actor *compute_successors[] = {&sink};
 
 struct conn_s *sink_inputs[] = {&conn_1};
-struct conn_s **sink_outputs = NULL;
 
 void initialize2_v1() {
 	source.num_inputs = 0;
-	source.inputs = source_inputs;
 	source.num_outputs = 1;
 	source.outputs = source_outputs;
+	source.num_successors = 1;
+	source.successors = source_successors;
 
 	compute.num_inputs = 1;
 	compute.inputs = compute_inputs;
 	compute.num_outputs = 1;
 	compute.outputs = compute_outputs;
+	compute.num_successors = 1;
+	compute.successors = compute_successors;
 
 	sink.num_inputs = 1;
 	sink.inputs = sink_inputs;
 	sink.num_outputs = 0;
-	sink.outputs = sink_outputs;
+	sink.num_successors = 0;
 }
 
 int is_schedulable(struct actor *actor) {
@@ -262,12 +267,12 @@ void scheduler2_v1() {
 
 	my_actor = get_next_schedulable_actor(&my_scheduler);
 	while (my_actor != NULL) {
-		my_actor->sched_func();
+		int num_firings = my_actor->sched_func();
 
-		for (i = 0; i < my_actor->num_outputs; i++) {
-			struct conn_s *connection = my_actor->outputs[i];
-			if (is_schedulable(connection->target)) {
-				add_schedulable_actor(&my_scheduler, connection->target);
+		for (i = 0; i < my_actor->num_successors; i++) {
+			struct actor *succ = my_actor->successors[i];
+			if (is_schedulable(succ)) {
+				add_schedulable_actor(&my_scheduler, succ);
 			}
 		}
 
