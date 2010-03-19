@@ -143,9 +143,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	// SLICE TYPES
 	
-	function IS_INxN(int Mbtype) --> bool : Mbtype > 0 and Mbtype < 25 end
-	function IS_I4x4(int Mbtype) --> bool : Mbtype = 0 end
-	function IS_SI() --> bool : slice_type = SLICE_TYPE_SI end
+	function IS_INxN(int SliceType, int Mbtype) --> bool : (Mbtype > 0 and Mbtype < 25) and (SliceType = SLICE_TYPE_I) end
+	function IS_I4x4(int SliceType, int Mbtype) --> bool : (Mbtype = 0 ) and (SliceType = SLICE_TYPE_I) end
+	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
+	function IS_P(int SliceType) --> bool : SliceType = SLICE_TYPE_P end
 	
 	//Cabac initialisation
 	bool Cabac_Start_Initialisation := false;
@@ -176,9 +177,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	
 	//mb_skip_flag 
+	/*
 	int ( size = 1 ) CondTermFlagA;
 	int ( size = 1 ) CondTermFlagB;
-	
+	*/
 	//CABAC Binarisation
 	
 	int maxBinIdxCtx;
@@ -198,11 +200,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	//CABAC Neighbouring
 	/*
-		mbTab := [ Address ][ Availability, mb_type ]
+		mbTab := [ Address ][ Availability, mbSliceType, mb_type, IntraChromaPredMode, mbQpDelta, mbCBPLuma, mbCBPChroma ]
 	*/
+	List ( type: List ( type: int, size = 7) , size = PICHEIGHT ) mbTab;
 	
     int mbTabAvail  := 0;
-	int mbTabMbtype := 1;
+	int mbSliceType := 1;
+	int mbTabMbtype := 2;
+	int mbIntraChromaPredMode := 3;
+	int mbQpDelta := 4;
+	int mbCBPLuma := 5;
+	int mbCBPChroma := 6;
 	
 	//CABAC Process Conditions 
 	bool FirstSEinSlice		   := true;
@@ -229,7 +237,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	/* Defines the number of bins to Read, used as BinsToRead: = synElVal[ValueIndex][0] */
 	int BinsToRead;
 	
-	List ( type: List ( type: int, size = 2) , size = PICHEIGHT ) mbTab;
+	
 	 
 	
 
@@ -387,6 +395,33 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[4, 1, 1, 1, 1, 0, 0],
 		[4, 1, 1, 1, 1, 1, 0]
 	];
+	
+	List ( type: List ( type: int(size = 8), size = 2) , size = 2 ) synEval_Coded_Bloc_Flag = 
+	[
+		[0, 0],
+		[0, 1]
+	];
+	List ( type: List ( type: int(size = 8), size = 4) , size = 8 ) synEval_Rem_Intra_4x4_8x8_Pred_Mode = 
+	[
+		[ 2, 0, 0, 0 ],
+		[ 2, 1, 0, 0 ],
+		[ 2, 0, 1, 0 ],
+		[ 2, 1, 1, 0 ],
+		[ 2, 0, 0, 1 ],
+		[ 2, 1, 0, 1 ],
+		[ 2, 0, 1, 1 ],
+		[ 2, 1, 1, 1 ]
+	];
+	
+	List ( type: List ( type: int(size = 8), size = 4) , size = 8 ) synEval_Intra_Chroma_Pred_Mode = 
+	[
+		[ 0, 0, 0, 0 ],
+		[ 1, 1, 0, 0 ],
+		[ 2, 1, 1, 0 ],
+		[ 2, 1, 1, 1 ]
+	];
+
+	
 	/* Max Binary Index */
 	int MaxBinIdx;
 	
@@ -1775,6 +1810,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		ValueIndex
 	end	
 	
+	function cabac_end() --> bool:
+		FoundSE
+	end
+	
 	procedure get_cabac()
 	begin
 		getBitStreamValue := bit_read[ bit_read_cnt ];
@@ -1826,6 +1865,30 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 	end
 	
+	procedure GetCabacCodedBlockPatternSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_CODED_BLOCK_PATERN;
+	end
+	
+	procedure GetCabacMbQpDeltaSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_QP_DELTA;
+	end
+	
+	procedure GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG;
+	end
+	
+	procedure GetCabacRemIntra4x4_8x8PredModeSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_REM_INTRA4x4_8x8_PRED_MODE;
+	end
+	
+	procedure GetCabacRemIntraChromaPredModeSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_INTRA_CHROMA_PRED_MODE;
+	end
 	/* For each CABAC Syntax Element*/
 	/*
 	action ==>
@@ -2009,7 +2072,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				synElVal[s] := 1;
 			end
 			synElVal[0] := SyntaxElement;
-			synElVal[SyntaxElement] := 1; 
+			synElVal[SyntaxElement] := 0; 
 		end 
 	end
 	
@@ -2090,22 +2153,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	*/
 	
-	function ceil_log2(int idx) --> int :
-	  ceil_log2_tab[idx]
-	end
 	
-	procedure FLbinarization(int SyntaxElement,int cMax,int binIdxOffset)
-	var
-		int fixedLength,
-		int se
-	begin
-		fixedLength := ceil_log2(cMax + 1);
-		se :=  SyntaxElement;
-		foreach int s in Integers(binIdxOffset, fixedLength - 1) do
-			synElVal[s] := ( se >> s ) & 0x1;
-		end
-		synElVal[0] := fixedLength;
-	end
 	
 	/* Specific Syntax Element Binarization */
 	
@@ -2150,7 +2198,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			synElVal[s - 1] := synEval_SUB_MB_B[MbType][s];
 		end
 	end
-	
+/*	
 	//Binarization pocess for coded block pattern
 	procedure CodedBlockPaternBinarization( )
 	begin
@@ -2165,42 +2213,215 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	begin
 		Ubinarization( MbQpDelta_se, 0);
 	end
-	
+*/	
 	procedure Getbinarization(int SyntaxElement)
 	begin
 		if ( SyntaxElement = CABAC_MB_TYPE_SI ) then
 			maxBinIdxCtx := 6;
 			ctxIdxOffset := 3;
 			bypassFlag := false;
-		else if ( SyntaxElement = CABAC_MB_TYPE_I ) then
+		end
+		if ( SyntaxElement = CABAC_MB_TYPE_I ) then
 			maxBinIdxCtx := 6;
 			ctxIdxOffset := 3;
 			bypassFlag := false;
-		else if ( SyntaxElement = CABAC_MB_TYPE_P_SP ) then
+		end
+		if ( SyntaxElement = CABAC_MB_TYPE_P_SP ) then
 			maxBinIdxCtx := 2 + 5;
 			ctxIdxOffset := 14 + 17;
 			bypassFlag := false;
-		else if ( SyntaxElement = CABAC_MB_TYPE_B ) then
+		end
+		if ( SyntaxElement = CABAC_MB_TYPE_B ) then
 			maxBinIdxCtx := 3 + 5;
 			ctxIdxOffset := 27 + 32;
 			bypassFlag := false;
-		else if ( SyntaxElement = CABAC_MB_SKIP_FLAG_P_SP ) then
+		end
+		if ( SyntaxElement = CABAC_MB_SKIP_FLAG_P_SP ) then
 			maxBinIdxCtx := 2;
 			ctxIdxOffset := 21;
 			bypassFlag := false;
-		else if ( SyntaxElement = CABAC_MB_SKIP_FLAG_B ) then
+		end
+		if ( SyntaxElement = CABAC_MB_SKIP_FLAG_B ) then
 			maxBinIdxCtx := 0;
 			ctxIdxOffset := 24;
 			bypassFlag := false;
-		else if ( SyntaxElement = CABAC_SUB_MB_TYPE_P_SP ) then
+		end
+		if ( SyntaxElement = CABAC_SUB_MB_TYPE_P_SP ) then
 			maxBinIdxCtx := 2;
 			ctxIdxOffset := 21;
 			bypassFlag := false;
-		else if ( SyntaxElement = CABAC_SUB_MB_TYPE_B ) then
+		end
+		if ( SyntaxElement = CABAC_SUB_MB_TYPE_B ) then
 			maxBinIdxCtx := 3;
 			ctxIdxOffset := 36;
 			bypassFlag := false;
-		end end end end end end end end
+		end
+		if ( SyntaxElement = CABAC_MVD_L0_0_0 ) then
+			maxBinIdxCtx := 4; //prefix
+			ctxIdxOffset := 40;
+			bypassFlag := true;
+		end
+		if ( SyntaxElement = CABAC_MVD_L0_1_1 ) then
+			maxBinIdxCtx := 4; //prefix
+			ctxIdxOffset := 47;
+			bypassFlag := true;
+		end
+		if ( SyntaxElement = CABAC_REF_IDX_L0_L1 ) then
+			maxBinIdxCtx := 2; //prefix
+			ctxIdxOffset := 54;
+			bypassFlag := false;
+		end
+		if ( SyntaxElement = CABAC_MB_QP_DELTA ) then
+			maxBinIdxCtx := 2; //prefix
+			ctxIdxOffset := 60;
+			bypassFlag := false;
+		end
+		if ( SyntaxElement = CABAC_INTRA_CHROMA_PRED_MODE ) then
+			maxBinIdxCtx := 1; //prefix
+			ctxIdxOffset := 64;
+			bypassFlag := false;
+		end
+		if ( SyntaxElement = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG ) then
+			maxBinIdxCtx := 0; //prefix
+			ctxIdxOffset := 68;
+			bypassFlag := false;
+		end
+		if ( SyntaxElement = CABAC_REM_INTRA4x4_8x8_PRED_MODE ) then
+			maxBinIdxCtx := 0; //prefix
+			ctxIdxOffset := 69;
+			bypassFlag := false;
+		end
+		if ( SyntaxElement = CABAC_MB_FIELD_DECODING_FLAG ) then
+			maxBinIdxCtx := 0; //prefix
+			ctxIdxOffset := 70;
+			bypassFlag := false;
+		end
+		if ( SyntaxElement = CABAC_CODED_BLOCK_PATERN ) then
+			maxBinIdxCtx := 3+1; //FIXME prefix
+			ctxIdxOffset := 73+77;
+			bypassFlag := false;
+		end
+		if ( SyntaxElement = CABAC_CODED_BLOCK_FLAG ) then
+			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
+				maxBinIdxCtx := 0; //FIXME prefix
+				ctxIdxOffset := 460;
+				bypassFlag := false;
+			else if ( ctxBlockCat > 9 and ctxBlockCat < 13 ) then
+				maxBinIdxCtx := 0; //FIXME prefix
+				ctxIdxOffset := 472;
+				bypassFlag := false;
+			else if ( ctxBlockCat = 5 and ctxBlockCat = 9 and ctxBlockCat = 13 ) then
+				maxBinIdxCtx := 0; //FIXME prefix
+				ctxIdxOffset := 1012;
+				bypassFlag := false;	
+			else
+				maxBinIdxCtx := 0; //FIXME prefix
+				ctxIdxOffset := 85;
+				bypassFlag := false;
+			end end end
+		end
+		
+		if ( SyntaxElement = CABAC_SIGNIFICANT_COEFF_FLAG ) then
+			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
+				maxBinIdxCtx := 0; //FIXME prefix
+				ctxIdxOffset := 484;
+				bypassFlag := false;
+			else if ( ctxBlockCat > 9 and ctxBlockCat < 13 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 528;
+					bypassFlag := false;
+			else if ( ctxBlockCat = 5 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 402;
+					bypassFlag := false;
+			else if ( ctxBlockCat = 9 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 660;
+					bypassFlag := false;
+			else if ( ctxBlockCat = 13 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 718;
+					bypassFlag := false;		
+			else if ( ctxBlockCat < 5 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 105;
+					bypassFlag := false;		
+			end end end end end end
+		end
+		
+		if ( SyntaxElement = CABAC_LAST_SIGNIFICANT_COEFF_FLAG ) then
+			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
+				maxBinIdxCtx := 0; //FIXME prefix
+				ctxIdxOffset := 572;
+				bypassFlag := false;
+			else if ( ctxBlockCat > 9 and ctxBlockCat < 13 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 616;
+					bypassFlag := false;
+			else if ( ctxBlockCat = 5 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 417;
+					bypassFlag := false;
+			else if ( ctxBlockCat = 9 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 690;
+					bypassFlag := false;
+			else if ( ctxBlockCat = 13 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 748;
+					bypassFlag := false;		
+			else if ( ctxBlockCat < 5 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 166;
+					bypassFlag := false;		
+			end end end end end end
+		end
+		
+		if ( SyntaxElement = CABAC_COEFF_ABS_LEVEL_MINUS1 ) then
+			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
+				maxBinIdxCtx := 1; //FIXME prefix
+				ctxIdxOffset := 952;
+				bypassFlag := true;
+			else if ( ctxBlockCat > 9 and ctxBlockCat < 13 ) then
+					maxBinIdxCtx := 1; //FIXME prefix
+					ctxIdxOffset := 982;
+					bypassFlag := true;
+			else if ( ctxBlockCat = 5 ) then
+					maxBinIdxCtx := 0; //FIXME prefix
+					ctxIdxOffset := 417;
+					bypassFlag := true;
+			else if ( ctxBlockCat = 9 ) then
+					maxBinIdxCtx := 1; //FIXME prefix
+					ctxIdxOffset := 708;
+					bypassFlag := true;
+			else if ( ctxBlockCat = 13 ) then
+					maxBinIdxCtx := 1; //FIXME prefix
+					ctxIdxOffset := 766;
+					bypassFlag := true;		
+			else if ( ctxBlockCat < 5 ) then
+					maxBinIdxCtx := 1; //FIXME prefix
+					ctxIdxOffset := 227;
+					bypassFlag := true;		
+			end end end end end end
+		end
+		
+		if ( SyntaxElement = CABAC_COEFF_SIGN_FLAG ) then
+			maxBinIdxCtx := 0; //FIXME prefix
+			bypassFlag := true;		
+		end
+		
+		if ( SyntaxElement = CABAC_END_OF_SLICE_FLAG ) then
+			maxBinIdxCtx := 0; //FIXME prefix
+			ctxIdxOffset := 276;
+			bypassFlag := false;		
+		end
+		
+		if ( SyntaxElement = CABAC_TRANSFORM_SIZE_8x8_FLAG ) then
+			maxBinIdxCtx := 0; //FIXME prefix
+			ctxIdxOffset := 399;
+			bypassFlag := false;		
+		end
+		
 	end
 	
 	//*************************************************************/
@@ -2224,16 +2445,30 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	function mbAddrA_Avail() --> bool :
-		( val_CurrMbAddr mod PicWidthInMbs )= 0
+		if val_CurrMbAddr then
+			false
+		else 
+			( val_CurrMbAddr mod PicWidthInMbs ) = 0
+		end
 	end
 	
 	function GiveMbAddrB( ) --> int :
 		val_CurrMbAddr - PicWidthInMbs
 	end
 	
+	
 	function mbAddrB_Avail() --> bool :
 		mbAddrAvailable( GiveMbAddrB() )
 	end
+	
+	function GivePrevMbAdd( ) --> int :
+		val_CurrMbAddr - 1
+	end
+	
+	function prevMbAddr_Avail() --> bool:
+		val_CurrMbAddr != 0
+	end
+	
 	/*
 	function GivembAddrC( ) --> int :
 		val_CurrMbAddr - PicWidthInMbs + 1
@@ -2251,9 +2486,33 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		( val_CurrMbAddr mod PicWidthInMbs ) = 0
 	end
 	*/
+	function GiveMbSliceTypeAddrA( ) --> int :
+		if (mbAddrA_Avail() ) then
+			mbTab[ GiveMbAddrA() ][ mbSliceType ]
+		else
+			-1
+		end		
+	end
+	
+	function GiveMbSliceTypeAddrB( ) --> int :
+		if (mbAddrB_Avail() ) then
+			mbTab[ GiveMbAddrB() ][ mbSliceType ]
+		else
+			-1
+		end		
+	end
+	
+	function GiveMbSliceTypePrevMbAddr( ) --> int :
+		if (prevMbAddr_Avail() ) then
+			mbTab[ GivePrevMbAdd() ][ mbSliceType ]
+		else
+			-1
+		end		
+	end
+	
 	function GiveMbTypeAddrA( ) --> int :
 		if (mbAddrA_Avail() ) then
-			mbTab[ val_CurrMbAddr - GiveMbAddrA() ][ mbTabAvail ]
+			mbTab[ GiveMbAddrA() ][ mbTabAvail ]
 		else
 			-1
 		end		
@@ -2261,13 +2520,60 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	function GiveMbTypeAddrB( ) --> int :
 		if (mbAddrB_Avail() ) then
-			mbTab[ val_CurrMbAddr - GiveMbAddrB() ][ mbTabAvail ]
+			mbTab[ GiveMbAddrB() ][ mbTabAvail ]
 		else
 			-1
 		end		
 	end
 		
+	function GiveMbTypePrevMbAddr( ) --> int:
+		if (prevMbAddr_Avail() ) then
+			mbTab[ GivePrevMbAdd() ][ mbTabAvail ]
+		else
+			-1
+		end		
+	end
 	
+	
+	function GiveIntraChromaPredModeAddrA( ) --> int :
+		if (mbAddrA_Avail() ) then
+			mbTab[ GiveMbAddrA() ][ mbIntraChromaPredMode ]
+		else
+			-1
+		end		
+	end
+	
+	function GiveIntraChromaPredModeAddrB( ) --> int :
+		if (mbAddrB_Avail() ) then
+			mbTab[ GiveMbAddrB() ][ mbIntraChromaPredMode ]
+		else
+			-1
+		end		
+	end
+	
+	function GiveCBPLumaPrevMbAddr() --> int :
+		if( prevMbAddr_Avail() ) then
+			mbTab[ GivePrevMbAdd() ][ mbCBPLuma ]
+		else
+			-1
+		end
+	end
+	
+	function GiveCBPChromaPrevMbAddr() --> int :
+		if( prevMbAddr_Avail() ) then
+			mbTab[ GivePrevMbAdd() ][ mbCBPChroma ]
+		else
+			-1
+		end
+	end
+	
+	function GiveMbQpDelta() -->  int:
+	if( prevMbAddr_Avail() ) then
+			mbTab[ GivePrevMbAdd() ][ mbQpDelta ]
+		else
+			-1
+		end
+	end
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -2283,29 +2589,92 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		int condTermFlagA,
 		int condTermFlagB
 	begin
-		if ( mbAddrA_Avail() or
-		     ctxIdxOffset = 0  and ( IS_SI() and ( IS_I4x4( GiveMbTypeAddrA() ) and IS_INxN( GiveMbTypeAddrA() ) ) ) or
-			 ctxIdxOffset = 3  and IS_INxN( GiveMbTypeAddrA() ) or
-			 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
-			 
-			 condTermFlagA := 0;
+		if ( not mbAddrA_Avail() ) then
+			condTermFlagA := 1;
 		else
-			 condTermFlagA := 1;
+		    if ( ctxIdxOffset = 0  and ( IS_SI(GiveMbSliceTypeAddrA() ) and ( IS_I4x4(GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) and IS_INxN( GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) ) ) or
+				 ctxIdxOffset = 3  and IS_INxN( GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) or
+				 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+					
+				 condTermFlagA := 0;
+			else
+				 condTermFlagA := 1;
+			end	
+			
+		
 		end
 		
-		if ( mbAddrB_Avail() or
-		     ctxIdxOffset = 0  and ( IS_SI() and ( IS_I4x4( GiveMbTypeAddrB() ) and IS_INxN( GiveMbTypeAddrB() ) ) ) or
-			 ctxIdxOffset = 3  and IS_INxN( GiveMbTypeAddrB() ) or
-			 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
-	
-			 condTermFlagB := 0;
-		else
+		if ( not mbAddrB_Avail() ) then
 			 condTermFlagB := 1;
+		else
+		    if( ctxIdxOffset = 0  and ( IS_SI( GiveMbSliceTypeAddrB() ) and ( IS_I4x4( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) and IS_INxN( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) ) ) or
+			    ctxIdxOffset = 3  and IS_INxN( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) or
+			    ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+	
+			    condTermFlagB := 0;
+			else
+				 condTermFlagB := 1;
+			end
 		end
 		
 		ctxIdxInc := condTermFlagA + condTermFlagB;
 	end
 	
+	procedure ctxIdxincIntraChromaPredmode()
+	var
+		int condTermFlagA,
+		int condTermFlagB
+	begin
+		if not mbAddrA_Avail() then
+			condTermFlagA := 1;
+		else	
+			if ( IS_P( GiveMbSliceTypeAddrA() ) or
+			     GiveMbSliceTypeAddrA() = SLICE_TYPE_I and GiveMbTypeAddrA() = 25 or
+			     GiveIntraChromaPredModeAddrA() = 0 ) then
+			 
+				 condTermFlagA := 0;
+			else
+				 condTermFlagA := 1;
+			end
+		end
+		
+		if  not mbAddrB_Avail() then
+			condTermFlagA := 1;
+		else
+			if ( IS_P( GiveMbSliceTypeAddrB() ) or
+			     GiveMbSliceTypeAddrB() = SLICE_TYPE_I and GiveMbTypeAddrB() = 25 or
+			     GiveIntraChromaPredModeAddrB() = 0 ) then
+			 
+				 condTermFlagB := 0;
+			else
+				 condTermFlagB := 1;
+			end
+		
+		end
+			
+		ctxIdxInc := condTermFlagA + condTermFlagB;
+	end
+	
+	procedure ctxIdxincMbQpDelta()
+	var
+		int condTermFlagA,
+		int condTermFlagB
+	begin
+		//FIXME add P_Skip and B_Skip
+		if not prevMbAddr_Avail() then
+			ctxIdxInc := 1;
+		else
+			if ( GiveMbSliceTypePrevMbAddr() = SLICE_TYPE_I and GiveMbTypePrevMbAddr() = 25 or
+		          not IS_INxN( GiveMbSliceTypePrevMbAddr(), GiveMbTypePrevMbAddr() ) and GiveCBPLumaPrevMbAddr() = 0 and GiveCBPChromaPrevMbAddr() = 0 or
+				  GiveMbQpDelta() = 0 ) then
+				 
+				 ctxIdxInc := 0;
+			else
+				ctxIdxInc := 1;
+			end
+		end
+			 
+	end
 	//Derivation process for ctxIdx
 	procedure GetCtxIdx()
 	begin
@@ -2446,7 +2815,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		if ( ctxIdxOffset = 64 ) then
 			if (binIdx = 0) then
-				//To be done (subclause 9.3.3.1.8)
+				ctxIdxincIntraChromaPredmode();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			else if ( binIdx = 1 or binIdx = 2 ) then
 				ctxIdx := ctxIdxOffset + 3;
@@ -4380,7 +4749,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		entropy_coding_mode_flag[pps_id] = 1
 	do
 		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
-		Cabac_Start_Initialisation := true;
 	end
 
 	read_SliceD_skip_CABAC_alignement: action ==>
@@ -4681,7 +5049,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_MB_layer_mb_type_done: action ==> 
 	guard
-		vld_end()
+		vld_end() or cabac_end()
 	do
 		if entropy_coding_mode_flag[pps_id] = 0 then
 			mb_type := vld_ue();
@@ -4837,16 +5205,32 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 	not IS_Intra_16x16()
 	do
-	start_vld();
+		if  entropy_coding_mode_flag[pps_id] = 0 then
+			start_vld();
+		
+		else 
+			if entropy_coding_mode_flag[pps_id] = 1 then
+				GetCabacCodedBlockPatternSyntaxElement();
+				start_cabac();
+			end 
+		end
 	end
 
 	read_MB_layer_coded_block_pattern_done: action ==> 
 	guard
-		vld_end()
+		vld_end() or cabac_end()
 	var 
 		uint(size=6) coded_block_pattern
 	do
-		coded_block_pattern := vld_me();
+		
+		if entropy_coding_mode_flag[pps_id] = 0 then
+			coded_block_pattern := vld_me();
+		else 
+			if entropy_coding_mode_flag[pps_id] = 1 then
+				coded_block_pattern := cabac_value();
+			end
+		end
+		
 		val_CodedBlockPatternLuma := coded_block_pattern mod 16;
 		CodedBlockPatternChroma := coded_block_pattern / 16;
 		if( val_CodedBlockPatternLuma > 0 and 
@@ -4883,15 +5267,29 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		val_CodedBlockPatternLuma > 0 or CodedBlockPatternChroma > 0 or IS_Intra_16x16()
 	do
-		start_vld();
+		if  entropy_coding_mode_flag[pps_id] = 0 then
+			start_vld();
+		
+		else 
+			if entropy_coding_mode_flag[pps_id] = 1 then
+				GetCabacMbQpDeltaSyntaxElement();
+				start_cabac();
+			end 
+		end
 	end
 
-	read_MB_layer_mb_qp_delta_done: action 
-		==> 
+	read_MB_layer_mb_qp_delta_done: action ==> 
 	guard
-		vld_end()
+		vld_end() or cabac_end()
 	do
-		mb_qp_delta := vld_se();
+		if entropy_coding_mode_flag[pps_id] = 0 then
+			mb_qp_delta := vld_se();
+		else 
+			if entropy_coding_mode_flag[pps_id] = 1 then
+				mb_qp_delta := cabac_value();
+			end
+		end
+		
 		val_QP := (val_QP + mb_qp_delta + 52) mod 52;
 		val_QP_Cb := qP_tab[val_QP + chroma_qp_index_offset[pps_id]];
 		val_QP_Cr := qP_tab[val_QP + second_chroma_qp_index_offset[pps_id]];
@@ -5163,29 +5561,60 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		IS_Intra_4x4()
 	do
-		luma4x4BlkIdx := 0;
-		set_bits_to_read(1);
+		
+		
+		if  entropy_coding_mode_flag[pps_id] = 0 then
+			luma4x4BlkIdx := 0;
+			set_bits_to_read(1);
+		
+		else 
+			if entropy_coding_mode_flag[pps_id] = 1 then
+				GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+				start_cabac();
+			end 
+		end
+		
 	end
 
 	//for( luma4x4BlkIdx=0; luma4x4BlkIdx<16; luma4x4BlkIdx++ )
 	read_MB_pred_rem_intra4x4_pred_mode: action ==>
 	guard
-		done_reading_bits(),
-		luma4x4BlkIdx < 16
+		( done_reading_bits() and luma4x4BlkIdx < 16 ) or ( cabac_end() and luma4x4BlkIdx < 16 )
 	do
-		prev_intra4x4_pred_mode_flag := read_result();
-		if prev_intra4x4_pred_mode_flag = 0 then set_bits_to_read(3); end
+		if entropy_coding_mode_flag[pps_id] = 0 then
+			prev_intra4x4_pred_mode_flag := read_result();
+			
+			if prev_intra4x4_pred_mode_flag = 0 then 
+				set_bits_to_read(3); 
+			end
+		else 
+			if entropy_coding_mode_flag[pps_id] = 1 then
+				prev_intra4x4_pred_mode_flag := cabac_value();
+				
+				if prev_intra4x4_pred_mode_flag = 0 then 
+					GetCabacRemIntra4x4_8x8PredModeSyntaxElement();
+					start_cabac();
+				end
+			end
+		end
 	end
 
 	//if( !prev_intra4x4_pred_mode_flag[ luma4x4BlkIdx ] )
 	read_MB_pred_rem_intra4x4_pred_mode_done: action ==>
 	guard
-		done_reading_bits(),
-		prev_intra4x4_pred_mode_flag = 0
+		( done_reading_bits() and prev_intra4x4_pred_mode_flag = 0 ) or ( cabac_end() and prev_intra4x4_pred_mode_flag = 0 ) 
 	do
-		rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
-		luma4x4BlkIdx := luma4x4BlkIdx +1;
-		if luma4x4BlkIdx < 16 then set_bits_to_read(1); end
+		if entropy_coding_mode_flag[pps_id] = 0 then
+			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
+			luma4x4BlkIdx := luma4x4BlkIdx +1;
+			if luma4x4BlkIdx < 16 then set_bits_to_read(1); end
+		else 
+			if entropy_coding_mode_flag[pps_id] = 1 then
+				rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := cabac_value();
+				luma4x4BlkIdx := luma4x4BlkIdx +1;
+				//FIXME maybe create a state variable to loop until luma4x4BlkIdx = 16
+			end
+		end
 	end
 
 	//else
@@ -5193,9 +5622,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		prev_intra4x4_pred_mode_flag = 1
 	do
-		rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
-		luma4x4BlkIdx := luma4x4BlkIdx +1;
-		if luma4x4BlkIdx < 16 then set_bits_to_read(1); end
+		if entropy_coding_mode_flag[pps_id] = 0 then
+			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
+			luma4x4BlkIdx := luma4x4BlkIdx +1;
+			if luma4x4BlkIdx < 16 then set_bits_to_read(1); end
+		else
+			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
+			luma4x4BlkIdx := luma4x4BlkIdx +1;
+		end
+		
 	end
 	//end if
 
@@ -5265,14 +5700,28 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		IS_Intra_4x4() or IS_Intra_8x8() or IS_Intra_16x16(),
 		chroma_format_idc[sps_id] = 1 or chroma_format_idc[sps_id] = 2
 	do
-		start_vld();
+		if entropy_coding_mode_flag[pps_id] = 0 then
+			start_vld();
+		else
+			if entropy_coding_mode_flag[pps_id] = 1 then
+			GetCabacRemIntraChromaPredModeSyntaxElement();
+			start_cabac();
+			end
+		end
 	end
 
 	read_MB_pred_intra_chroma_pred_mode_done: action ==> IntraPredModeC: [intra_chroma_pred_mode]
 	guard
-		vld_end()
+		vld_end() or cabac_end()
 	do
-		intra_chroma_pred_mode := vld_ue();
+		if entropy_coding_mode_flag[pps_id] = 0 then
+			intra_chroma_pred_mode := vld_ue();
+		else
+			if entropy_coding_mode_flag[pps_id] = 1 then
+			intra_chroma_pred_mode := cabac_value();
+			end
+		end
+			
 	end
 
 	//else
