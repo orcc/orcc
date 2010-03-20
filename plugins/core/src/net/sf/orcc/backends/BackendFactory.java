@@ -163,6 +163,23 @@ public class BackendFactory {
 	}
 
 	/**
+	 * Parses the given configuration element as an "input file" option.
+	 * 
+	 * @param element
+	 *            a configuration element
+	 * @return an "input file" option
+	 */
+	private BrowseFileOption parseBrowseFile(IConfigurationElement element) {
+		String extension = element.getAttribute("extension");
+		BrowseFileOption option = new BrowseFileOptionImpl();
+		option.setExtension(extension);
+
+		String workspace = element.getAttribute("workspace");
+		option.setWorkspace(Boolean.parseBoolean(workspace));
+		return option;
+	}
+
+	/**
 	 * Parses the given configuration element as a "checkbox" option.
 	 * 
 	 * @param element
@@ -173,23 +190,6 @@ public class BackendFactory {
 		CheckboxOption option = new CheckboxOptionImpl();
 		List<BackendOption> options = parseOptions(element.getChildren());
 		option.setOptions(options);
-		return option;
-	}
-
-	/**
-	 * Parses the given configuration element as an "input file" option.
-	 * 
-	 * @param element
-	 *            a configuration element
-	 * @return an "input file" option
-	 */
-	private BrowseFileOption parseInputFile(IConfigurationElement element) {
-		String extension = element.getAttribute("extension");
-		BrowseFileOption option = new BrowseFileOptionImpl();
-		option.setExtension(extension);
-		
-		String workspace = element.getAttribute("workspace");
-		option.setWorkspace(Boolean.parseBoolean(workspace));
 		return option;
 	}
 
@@ -211,10 +211,10 @@ public class BackendFactory {
 
 				IConfigurationElement child = children[0];
 				String type = child.getName();
-				if (type.equals("checkBox")) {
+				if (type.equals("browseFile")) {
+					option = parseBrowseFile(child);
+				} else if (type.equals("checkBox")) {
 					option = parseCheckbox(child);
-				} else if (type.equals("inputFile")) {
-					option = parseInputFile(child);
 				} else {
 					continue;
 				}
