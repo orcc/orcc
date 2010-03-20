@@ -209,6 +209,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 		Label lbl = new Label(composite, SWT.NONE);
 		lbl.setFont(font);
 		lbl.setText(option.getName() + ":");
+		lbl.setToolTipText(option.getDescription());
 
 		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		lbl.setLayoutData(data);

@@ -45,6 +45,13 @@ public interface BackendOption {
 	String getDefaultValue();
 
 	/**
+	 * Returns the description of the option.
+	 * 
+	 * @return the description of the option
+	 */
+	String getDescription();
+
+	/**
 	 * Returns the option's identifier.
 	 * 
 	 * @return the option's identifier
@@ -65,6 +72,14 @@ public interface BackendOption {
 	 *            the default value of this option
 	 */
 	void setDefaultValue(String defaultValue);
+
+	/**
+	 * Sets the description of the option.
+	 * 
+	 * @param description
+	 *            the description of the option
+	 */
+	void setDescription(String description);
 
 	/**
 	 * Sets the option's identifier.

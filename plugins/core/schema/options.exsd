@@ -74,6 +74,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -99,7 +106,7 @@
    <element name="checkBox">
       <complexType>
          <sequence>
-            <element ref="option" minOccurs="0" maxOccurs="1"/>
+            <element ref="option" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
       </complexType>
    </element>

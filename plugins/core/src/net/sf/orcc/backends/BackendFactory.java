@@ -223,11 +223,18 @@ public class BackendFactory {
 				option.setIdentifier(id);
 				String name = element.getAttribute("name");
 				option.setName(name);
+
 				String defaultValue = element.getAttribute("defaultValue");
 				if (defaultValue == null) {
 					defaultValue = "";
 				}
 				option.setDefaultValue(defaultValue);
+
+				String description = element.getAttribute("description");
+				if (description == null) {
+					description = "";
+				}
+				option.setDescription(description);
 
 				this.options.put(id, option);
 				options.add(option);

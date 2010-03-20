@@ -40,6 +40,8 @@ public class BackendOptionImpl implements BackendOption {
 
 	private String defaultValue;
 
+	private String description;
+
 	private String identifier;
 
 	private String name;
@@ -47,6 +49,11 @@ public class BackendOptionImpl implements BackendOption {
 	@Override
 	public String getDefaultValue() {
 		return defaultValue;
+	}
+
+	@Override
+	public String getDescription() {
+		return description;
 	}
 
 	@Override
@@ -62,6 +69,11 @@ public class BackendOptionImpl implements BackendOption {
 	@Override
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
+	}
+
+	@Override
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override

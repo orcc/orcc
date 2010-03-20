@@ -9,6 +9,9 @@
          <option
                id="net.sf.orcc.backends.xdfInputFile">
          </option>
+         <option
+               id="net.sf.orcc.backends.classify">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
@@ -59,6 +62,7 @@
    <extension
          point="net.sf.orcc.core.options">
       <option
+            description="Specify the top-level file to compile"
             id="net.sf.orcc.backends.xdfInputFile"
             name="Input file">
          <browseFile
@@ -69,15 +73,39 @@
       
          <option
                defaultValue="false"
+               description="Whether we should generate .ll or .bc files"
                id="net.sf.orcc.backends.llvmBitcode"
                name="Generate bitcode">
             <checkBox>
                <option
+                     description="Location of llvm-as"
                      id="net.sf.orcc.backends.llvm-as"
                      name="Location of llvm-as">
                   <browseFile
                         workspace="false">
                   </browseFile>
+               </option>
+            </checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               id="net.sf.orcc.backends.classify"
+               description="Whether actors should be classified"
+               name="Classify actors">
+            <checkBox>
+               <option
+                     defaultValue="true"
+                     description="Classify actors independently of their neighbours"
+                     id="net.sf.orcc.backends.classifyIntra"
+                     name="intra">
+                  <checkBox></checkBox>
+               </option>
+               <option
+                     defaultValue="false"
+                     description="&lt;Description of groquier&apos;s classification method&gt;"
+                     id="net.sf.orcc.backends.classifyGroquier"
+                     name="groquier">
+                  <checkBox></checkBox>
                </option>
             </checkBox>
          </option>

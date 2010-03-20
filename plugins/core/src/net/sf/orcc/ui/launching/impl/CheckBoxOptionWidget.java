@@ -114,6 +114,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 		checkBox.addSelectionListener(this);
 		checkBox.setText(option.getName());
 		checkBox.setLayoutData(data);
+		checkBox.setToolTipText(option.getDescription());
 	}
 
 	private void disableOptions() {
