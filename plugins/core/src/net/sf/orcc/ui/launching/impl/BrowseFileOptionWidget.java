@@ -80,6 +80,8 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 */
 	private Composite composite;
 
+	private boolean initialized;
+
 	private RunSettingsTab launchConfigurationTab;
 
 	private BrowseFileOption option;
@@ -119,7 +121,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 		if (extension != null) {
 			fileDialog.setFilterExtensions(new String[] { extension });
 		}
-		
+
 		String file = fileDialog.open();
 		if (file != null) {
 			text.setText(file);
@@ -259,6 +261,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 			throws CoreException {
 		text.setText(configuration.getAttribute(option.getIdentifier(), option
 				.getDefaultValue()));
+		initialized = true;
 	}
 
 	/**
@@ -306,7 +309,9 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 */
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(option.getIdentifier(), value);
+		if (initialized) {
+			configuration.setAttribute(option.getIdentifier(), value);
+		}
 	}
 
 }

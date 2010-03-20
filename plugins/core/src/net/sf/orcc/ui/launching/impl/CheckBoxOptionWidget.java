@@ -60,6 +60,8 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	 * composite that contains the components of this option
 	 */
 	private Composite composite;
+	
+	private boolean initialized;
 
 	private RunSettingsTab launchConfigurationTab;
 
@@ -140,6 +142,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 		}
 
 		manager.initializeFromOptions(configuration);
+		initialized = true;
 	}
 
 	@Override
@@ -153,9 +156,11 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(option.getIdentifier(), value);
-		if (value) {
-			manager.performApplyOptions(configuration);
+		if (initialized) {
+			configuration.setAttribute(option.getIdentifier(), value);
+			if (value) {
+				manager.performApplyOptions(configuration);
+			}
 		}
 	}
 
