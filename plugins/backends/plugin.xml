@@ -61,9 +61,10 @@
       <option
             id="net.sf.orcc.backends.xdfInputFile"
             name="Input file">
-         <inputFile
-               extension="xdf">
-         </inputFile>
+         <browseFile
+               extension="xdf"
+               workspace="true">
+         </browseFile>
       </option>
       
          <option
@@ -75,7 +76,6 @@
                      id="net.sf.orcc.backends.llvm-as"
                      name="Location of llvm-as">
                   <browseFile
-                        required="true"
                         workspace="false">
                   </browseFile>
                </option>

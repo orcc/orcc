@@ -32,22 +32,38 @@ package net.sf.orcc.backends;
  * This interface defines an option of a back-end.
  * 
  * @author Jérôme Gorin
+ * @author Matthieu Wipliez
  * 
  */
 public interface BrowseFileOption extends BackendOption {
 
 	/**
-	 * Returns whether this "browse file" should be opened in the workspace.
+	 * Returns the extension that this "input file" should have.
 	 * 
-	 * @return whether this "browse file" should be opened in the workspace
+	 * @return the extension that this "input file" should have
+	 */
+	String getExtension();
+
+	/**
+	 * Returns whether we should browse the workspace or the file system.
+	 * 
+	 * @return whether we should browse the workspace or the file system
 	 */
 	boolean isWorkspace();
 
 	/**
-	 * Sets whether this "browse file" should be opened in the workspace.
+	 * Sets the extension that this "input file" should have.
+	 * 
+	 * @param extension
+	 *            the extension that this "input file" should have
+	 */
+	void setExtension(String extension);
+
+	/**
+	 * Sets whether we should browse the workspace or the file system.
 	 * 
 	 * @param workspace
-	 *            whether this "browse file" should be opened in the workspace
+	 *            whether we should browse the workspace or the file system
 	 */
 	void setWorkspace(boolean workspace);
 

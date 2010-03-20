@@ -52,7 +52,6 @@
          <choice>
             <element ref="browseFile"/>
             <element ref="checkBox"/>
-            <element ref="inputFile"/>
          </choice>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -80,13 +79,6 @@
 
    <element name="browseFile">
       <complexType>
-         <attribute name="required" type="boolean" use="default" value="false">
-            <annotation>
-               <documentation>
-                  Specify if this option is mandatory
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="extension" type="string">
             <annotation>
                <documentation>
@@ -97,7 +89,7 @@
          <attribute name="workspace" type="boolean" use="default" value="true">
             <annotation>
                <documentation>
-                  Files can only be selected into the current workspace
+                  Whether files are selected inside the workspace or outside the workspace
                </documentation>
             </annotation>
          </attribute>
@@ -109,23 +101,6 @@
          <sequence>
             <element ref="option" minOccurs="0" maxOccurs="1"/>
          </sequence>
-      </complexType>
-   </element>
-
-   <element name="inputFile">
-      <annotation>
-         <documentation>
-            Specify the frontend input file
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="extension" type="string">
-            <annotation>
-               <documentation>
-                  Restrict file choice to files that have the given extension (optional).
-               </documentation>
-            </annotation>
-         </attribute>
       </complexType>
    </element>
 

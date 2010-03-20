@@ -32,15 +32,10 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.backends.BackendOption;
-import net.sf.orcc.backends.BrowseFileOption;
-import net.sf.orcc.backends.CheckboxOption;
-import net.sf.orcc.backends.InputFileOption;
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -74,18 +69,18 @@ import org.eclipse.swt.widgets.Text;
  */
 public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
-	private List<OptionWidget> backendOptions;
-
 	private Combo comboBackend;
 
 	private ILaunchConfiguration configuration;
 
 	private Group groupOption;
 
+	private OptionWidgetManager manager;
+
 	private Text textOutput;
-	
+
 	public RunSettingsTab() {
-		backendOptions = new ArrayList<OptionWidget>();
+		manager = new OptionWidgetManager(this);
 	}
 
 	private void browseOutputFolder(Shell shell) {
@@ -163,7 +158,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			public void widgetSelected(SelectionEvent e) {
 				updateOptionSelection();
 				try {
-					initializeFromOptions(configuration);
+					manager.initializeFromOptions(configuration);
 				} catch (CoreException e1) {
 				}
 				updateLaunchConfigurationDialog();
@@ -202,37 +197,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		});
 	}
 
-	private OptionWidget createOption(BackendOption option) {
-		if (option instanceof BrowseFileOption) {
-			return null;
-		} else if (option instanceof CheckboxOption) {
-			return null;
-		} else if (option instanceof InputFileOption) {
-			return new InputFileOptionWidget(this, (InputFileOption) option,
-					groupOption);
-		} else {
-			return null;
-		}
-	}
-
-	private void createOptions(List<BackendOption> options) {
-		for (BackendOption option : options) {
-			OptionWidget control = createOption(option);
-			backendOptions.add(control);
-		}
-	}
-
 	@Override
 	public void dispose() {
-		disposeOptions();
-	}
-
-	private void disposeOptions() {
-		for (OptionWidget optionWidget : backendOptions) {
-			optionWidget.dispose();
-		}
-
-		backendOptions.clear();
+		manager.disposeOptions();
 	}
 
 	private boolean getFolderFromText() {
@@ -268,23 +235,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			textOutput.setText(value);
 
 			updateOptionSelection();
-			initializeFromOptions(configuration);
+			manager.initializeFromOptions(configuration);
 		} catch (CoreException e) {
 			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Initializes this tab's controls with values from the given launch
-	 * configuration.
-	 * 
-	 * @param configuration
-	 *            launch configuration
-	 */
-	private void initializeFromOptions(ILaunchConfiguration configuration)
-			throws CoreException {
-		for (OptionWidget optionWidget : backendOptions) {
-			optionWidget.initializeFrom(configuration);
 		}
 	}
 
@@ -308,31 +261,11 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 
 		setErrorMessage(null);
-		return isValidOptions(launchConfig);
-	}
-
-	/**
-	 * Returns <code>true</code> if the given launch configuration is valid,
-	 * <code>false</code> otherwise.
-	 * 
-	 * @param launchConfig
-	 *            a launch configuration
-	 * @return <code>true</code> if the given launch configuration is valid
-	 */
-	private boolean isValidOptions(ILaunchConfiguration launchConfig) {
-		for (OptionWidget optionWidget : backendOptions) {
-			if (!optionWidget.isValid(launchConfig)) {
-				return false;
-			}
-		}
-
-		return true;
+		return manager.isValidOptions(launchConfig);
 	}
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		performApplyOptions(configuration);
-
 		String value = textOutput.getText();
 		configuration.setAttribute(OUTPUT_FOLDER, value);
 
@@ -341,19 +274,8 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			value = comboBackend.getItem(index);
 			configuration.setAttribute(BACKEND, value);
 		}
-	}
-
-	/**
-	 * Copies values from this tab into the given launch configuration.
-	 * 
-	 * @param configuration
-	 *            launch configuration
-	 */
-	private void performApplyOptions(
-			ILaunchConfigurationWorkingCopy configuration) {
-		for (OptionWidget optionWidget : backendOptions) {
-			optionWidget.performApply(configuration);
-		}
+		
+		manager.performApplyOptions(configuration);
 	}
 
 	@Override
@@ -368,13 +290,13 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	}
 
 	private void updateOptionSelection() {
-		disposeOptions();
+		manager.disposeOptions();
 
 		int index = comboBackend.getSelectionIndex();
 		if (index != -1) {
 			String backend = comboBackend.getItem(index);
 			BackendFactory factory = BackendFactory.getInstance();
-			createOptions(factory.getOptions(backend));
+			manager.createOptions(factory.getOptions(backend), groupOption);
 		}
 	}
 

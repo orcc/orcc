@@ -32,6 +32,7 @@ package net.sf.orcc.backends;
  * This interface defines an option of a back-end.
  * 
  * @author Jérôme Gorin
+ * @author Matthieu Wipliez
  * 
  */
 public interface BackendOption {

@@ -39,11 +39,23 @@ import net.sf.orcc.backends.BrowseFileOption;
 public class BrowseFileOptionImpl extends BackendOptionImpl implements
 		BrowseFileOption {
 
+	private String extension;
+
 	private boolean workspace;
+
+	@Override
+	public String getExtension() {
+		return extension;
+	}
 
 	@Override
 	public boolean isWorkspace() {
 		return workspace;
+	}
+
+	@Override
+	public void setExtension(String extension) {
+		this.extension = extension;
 	}
 
 	@Override
@@ -53,7 +65,8 @@ public class BrowseFileOptionImpl extends BackendOptionImpl implements
 
 	@Override
 	public String toString() {
-		return super.toString() + ", isWorkspace: " + isWorkspace();
+		return super.toString() + ", extension: " + getExtension()
+				+ ", isWorkspace: " + isWorkspace();
 	}
 
 }

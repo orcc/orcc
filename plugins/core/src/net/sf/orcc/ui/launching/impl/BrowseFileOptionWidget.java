@@ -26,10 +26,12 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui.launching;
+package net.sf.orcc.ui.launching.impl;
 
-import net.sf.orcc.backends.InputFileOption;
+import net.sf.orcc.backends.BrowseFileOption;
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.launching.OptionWidget;
+import net.sf.orcc.ui.launching.RunSettingsTab;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
@@ -52,6 +54,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -65,9 +68,10 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * Class that create input file interface into backend options.
  * 
  * @author Jérôme Gorin
+ * @author Matthieu Wipliez
  * 
  */
-public class InputFileOptionWidget implements ModifyListener, OptionWidget {
+public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 
 	/**
 	 * composite that contains the components of this option
@@ -76,7 +80,7 @@ public class InputFileOptionWidget implements ModifyListener, OptionWidget {
 
 	private RunSettingsTab launchConfigurationTab;
 
-	private InputFileOption option;
+	private BrowseFileOption option;
 
 	/**
 	 * Text connected with the option
@@ -91,7 +95,7 @@ public class InputFileOptionWidget implements ModifyListener, OptionWidget {
 	/**
 	 * Creates a new input file option.
 	 */
-	public InputFileOptionWidget(RunSettingsTab tab, InputFileOption option,
+	public BrowseFileOptionWidget(RunSettingsTab tab, BrowseFileOption option,
 			Composite parent) {
 		this.launchConfigurationTab = tab;
 		this.option = option;
@@ -101,82 +105,29 @@ public class InputFileOptionWidget implements ModifyListener, OptionWidget {
 	}
 
 	/**
-	 * Creates the interface of the BrowseFile text into the given group
-	 * 
-	 * @param font
-	 *            Font used in the interface
-	 * @param composite
-	 *            Group to add the input file interface
-	 */
-	private void createInputFile(Composite parent) {
-		composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(3, false));
-
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		data.horizontalSpan = 3;
-		composite.setLayoutData(data);
-
-		Font font = parent.getFont();
-
-		Label lbl = new Label(composite, SWT.NONE);
-		lbl.setFont(font);
-		lbl.setText(option.getName() + ":");
-
-		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		lbl.setLayoutData(data);
-
-		text = new Text(composite, SWT.BORDER | SWT.SINGLE);
-		text.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		text.setLayoutData(data);
-		text.setText(value);
-		text.addModifyListener(this);
-
-		Button buttonBrowse = new Button(composite, SWT.PUSH);
-		buttonBrowse.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				inputFile(composite.getShell(), text);
-			}
-		});
-
-	}
-
-	/**
-	 * Dispose option elements
-	 * 
-	 */
-	@Override
-	public void dispose() {
-		composite.dispose();
-	}
-
-	/**
-	 * Returns an IFile instance of the focused file in text
-	 * 
-	 * @return an IFile instance of focused file
-	 */
-	private IFile getFileFromText() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		IFile file = root.getFileForLocation(new Path(value));
-
-		return file;
-	}
-
-	/**
-	 * Creates the interface of the Input File button
+	 * Browses the file system.
 	 * 
 	 * @param shell
-	 *            Instance of the windows manager
-	 * @param text
-	 *            Text of input file interface
+	 *            a shell
 	 */
-	private void inputFile(Shell shell, Text text) {
+	private void browseFileSystem(Shell shell) {
+		FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
+
+		String extension = option.getExtension();
+		if (extension != null) {
+			fileDialog.setFilterExtensions(new String[] { extension });
+		}
+		text.setText(fileDialog.open());
+	}
+
+	/**
+	 * Browses the workspace.
+	 * 
+	 * @param shell
+	 *            a shell
+	 * 
+	 */
+	private void browseWorkspace(Shell shell) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
 				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
 				new WorkbenchContentProvider());
@@ -230,6 +181,81 @@ public class InputFileOptionWidget implements ModifyListener, OptionWidget {
 	}
 
 	/**
+	 * Creates the interface of the BrowseFile text into the given group
+	 * 
+	 * @param font
+	 *            Font used in the interface
+	 * @param composite
+	 *            Group to add the input file interface
+	 */
+	private void createInputFile(Composite parent) {
+		composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new GridLayout(3, false));
+
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		data.horizontalSpan = 3;
+		composite.setLayoutData(data);
+
+		Font font = parent.getFont();
+
+		Label lbl = new Label(composite, SWT.NONE);
+		lbl.setFont(font);
+		lbl.setText(option.getName() + ":");
+
+		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+
+		text = new Text(composite, SWT.BORDER | SWT.SINGLE);
+		text.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		text.setLayoutData(data);
+		text.setText(value);
+		text.addModifyListener(this);
+
+		Button buttonBrowse = new Button(composite, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (option.isWorkspace()) {
+					browseWorkspace(composite.getShell());
+				} else {
+					browseFileSystem(composite.getShell());
+				}
+			}
+		});
+
+	}
+
+	@Override
+	public void dispose() {
+		composite.dispose();
+	}
+
+	/**
+	 * Returns an IFile instance of the focused file in text
+	 * 
+	 * @return an IFile instance of focused file
+	 */
+	private IFile getFileFromText() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IFile file = root.getFileForLocation(new Path(value));
+
+		return file;
+	}
+
+	@Override
+	public void initializeFrom(ILaunchConfiguration configuration)
+			throws CoreException {
+		text.setText(configuration.getAttribute(option.getIdentifier(), option
+				.getDefaultValue()));
+	}
+
+	/**
 	 * Tests if the option is valid
 	 * 
 	 * @return a boolean representing the validation of the option
@@ -252,13 +278,6 @@ public class InputFileOptionWidget implements ModifyListener, OptionWidget {
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(option.getIdentifier(), value);
-	}
-
-	@Override
-	public void initializeFrom(ILaunchConfiguration configuration)
-			throws CoreException {
-		text.setText(configuration.getAttribute(option.getIdentifier(), option
-				.getDefaultValue()));
 	}
 
 }

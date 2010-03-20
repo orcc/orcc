@@ -34,9 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.backends.impl.BrowseFileOptionImpl;
 import net.sf.orcc.backends.impl.CheckboxOptionImpl;
-import net.sf.orcc.backends.impl.InputFileOptionImpl;
+import net.sf.orcc.backends.impl.BrowseFileOptionImpl;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -164,21 +163,6 @@ public class BackendFactory {
 	}
 
 	/**
-	 * Parses the given configuration element as a "browse file" option.
-	 * 
-	 * @param element
-	 *            a configuration element
-	 * @return a "browse file" option
-	 */
-	private BrowseFileOption parseBrowseFile(IConfigurationElement element) {
-		boolean workspace = Boolean.parseBoolean(element
-				.getAttribute("workspace"));
-		BrowseFileOption option = new BrowseFileOptionImpl();
-		option.setWorkspace(workspace);
-		return option;
-	}
-
-	/**
 	 * Parses the given configuration element as a "checkbox" option.
 	 * 
 	 * @param element
@@ -199,10 +183,13 @@ public class BackendFactory {
 	 *            a configuration element
 	 * @return an "input file" option
 	 */
-	private InputFileOption parseInputFile(IConfigurationElement element) {
+	private BrowseFileOption parseInputFile(IConfigurationElement element) {
 		String extension = element.getAttribute("extension");
-		InputFileOption option = new InputFileOptionImpl();
+		BrowseFileOption option = new BrowseFileOptionImpl();
 		option.setExtension(extension);
+		
+		String workspace = element.getAttribute("workspace");
+		option.setWorkspace(Boolean.parseBoolean(workspace));
 		return option;
 	}
 
@@ -224,9 +211,7 @@ public class BackendFactory {
 
 				IConfigurationElement child = children[0];
 				String type = child.getName();
-				if (type.equals("browseFile")) {
-					option = parseBrowseFile(child);
-				} else if (type.equals("checkBox")) {
+				if (type.equals("checkBox")) {
 					option = parseCheckbox(child);
 				} else if (type.equals("inputFile")) {
 					option = parseInputFile(child);
@@ -245,6 +230,7 @@ public class BackendFactory {
 				option.setDefaultValue(defaultValue);
 
 				this.options.put(id, option);
+				options.add(option);
 			}
 		}
 
