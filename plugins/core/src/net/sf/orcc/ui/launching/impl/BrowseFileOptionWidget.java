@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.launching.impl;
 
+import java.io.File;
+
 import net.sf.orcc.backends.BrowseFileOption;
 import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
@@ -117,7 +119,11 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 		if (extension != null) {
 			fileDialog.setFilterExtensions(new String[] { extension });
 		}
-		text.setText(fileDialog.open());
+		
+		String file = fileDialog.open();
+		if (file != null) {
+			text.setText(file);
+		}
 	}
 
 	/**
@@ -261,8 +267,31 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 * @return a boolean representing the validation of the option
 	 */
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		IFile file = getFileFromText();
-		return (file != null);
+		if (value.isEmpty()) {
+			launchConfigurationTab.setErrorMessage("The \"" + option.getName()
+					+ "\" field is empty");
+			return false;
+		}
+
+		if (option.isWorkspace()) {
+			IFile file = getFileFromText();
+			if (file == null) {
+				launchConfigurationTab.setErrorMessage(option.getName()
+						+ " refers to a non-existent file.");
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			File file = new File(value);
+			if (file.exists()) {
+				return true;
+			} else {
+				launchConfigurationTab.setErrorMessage(option.getName()
+						+ " refers to a non-existent file.");
+				return false;
+			}
+		}
 	}
 
 	@Override

@@ -133,6 +133,15 @@ public class OptionWidgetManager {
 			optionWidget.performApply(configuration);
 		}
 	}
+	
+	/**
+	 * Sets this page's error message, possibly <code>null</code>.
+	 * 
+	 * @param errorMessage the error message or <code>null</code>
+	 */
+	public void setErrorMessage(String errorMessage) {
+		launchConfigurationTab.setErrorMessage(errorMessage);
+	}
 
 	public void updateLaunchConfigurationDialog() {
 		launchConfigurationTab.updateLaunchConfigurationDialog();

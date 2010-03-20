@@ -160,6 +160,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 				try {
 					manager.initializeFromOptions(configuration);
 				} catch (CoreException e1) {
+					e1.printStackTrace();
 				}
 				updateLaunchConfigurationDialog();
 			}
@@ -260,8 +261,12 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			return false;
 		}
 
-		setErrorMessage(null);
-		return manager.isValidOptions(launchConfig);
+		if (manager.isValidOptions(launchConfig)) {
+			setErrorMessage(null);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -282,6 +287,11 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(OUTPUT_FOLDER, "");
 		configuration.setAttribute(BACKEND, "");
+	}
+	
+	@Override
+	public void setErrorMessage(String errorMessage) {
+		super.setErrorMessage(errorMessage);
 	}
 
 	@Override
