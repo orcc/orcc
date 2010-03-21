@@ -31,8 +31,10 @@ package net.sf.orcc.network;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
@@ -63,11 +65,15 @@ public class Network {
 
 	private String name;
 
+	private Map<Instance, List<Connection>> outgoingMap;
+
 	private OrderedMap<Port> outputs;
 
 	private OrderedMap<GlobalVariable> parameters;
 
 	private Map<Connection, Vertex> sourceMap;
+
+	private Map<Instance, List<Instance>> successorsMap;
 
 	private Map<Connection, Vertex> targetMap;
 
@@ -126,6 +132,28 @@ public class Network {
 		int i = 0;
 		for (Connection connection : graph.edgeSet()) {
 			connectionMap.put(connection, i++);
+		}
+
+		successorsMap = new HashMap<Instance, List<Instance>>();
+		outgoingMap = new HashMap<Instance, List<Connection>>();
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				Set<Connection> connections = graph.outgoingEdgesOf(vertex);
+				Set<Instance> successors = new HashSet<Instance>();
+				List<Connection> outgoing = new ArrayList<Connection>();
+				for (Connection connection : connections) {
+					outgoing.add(connection);
+					Vertex target = graph.getEdgeTarget(connection);
+					if (target.isInstance()) {
+						successors.add(target.getInstance());
+					}
+				}
+
+				outgoingMap.put(vertex.getInstance(), outgoing);
+				List<Instance> successorsList = Arrays.asList(successors
+						.toArray(new Instance[0]));
+				successorsMap.put(vertex.getInstance(), successorsList);
+			}
 		}
 	}
 
@@ -240,6 +268,10 @@ public class Network {
 		return name;
 	}
 
+	public Map<Instance, List<Connection>> getOutgoingMap() {
+		return outgoingMap;
+	}
+
 	/**
 	 * Returns the list of this network's output ports
 	 * 
@@ -265,6 +297,10 @@ public class Network {
 	 */
 	public Map<Connection, Vertex> getSourceMap() {
 		return sourceMap;
+	}
+
+	public Map<Instance, List<Instance>> getSuccessorsMap() {
+		return successorsMap;
 	}
 
 	/**
