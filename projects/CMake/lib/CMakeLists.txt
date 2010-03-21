@@ -21,6 +21,7 @@ ${orcc_SOURCE_DIR}/src/display.c
 ${orcc_SOURCE_DIR}/src/getopt.c
 ${orcc_SOURCE_DIR}/src/img_display.c
 ${orcc_SOURCE_DIR}/src/img_read.c
+${orcc_SOURCE_DIR}/src/scheduler.c
 ${orcc_SOURCE_DIR}/src/sink.c
 ${orcc_SOURCE_DIR}/src/source.c
 ${orcc_SOURCE_DIR}/src/orcc_util.c
