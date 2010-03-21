@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "defs.h"
+#define BRAINDEAD_FIFO 1
 #include "fifo.h"
 #include "scheduler.h"
 
