@@ -41,6 +41,9 @@
                id="net.sf.orcc.backends.xdfInputFile">
          </option>
          <option
+               id="net.sf.orcc.backends.classify">
+         </option>
+         <option
                id="net.sf.orcc.backends.llvmBitcode">
          </option>
       </backend>

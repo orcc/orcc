@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends;
 
+import net.sf.orcc.OrccException;
+
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
@@ -47,7 +49,8 @@ public interface IBackend {
 	 *            The default FIFO size.
 	 * @throws Exception
 	 */
-	public void generateCode(String fileName, int fifoSize) throws Exception;
+	public void generateCode(String fileName, int fifoSize)
+			throws OrccException;
 
 	/**
 	 * Set the launch configuration of this back-end.

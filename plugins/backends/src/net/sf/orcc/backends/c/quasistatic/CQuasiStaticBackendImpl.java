@@ -77,7 +77,7 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws Exception {
+	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new PhiRemoval(), new MoveReadsWritesTransformation() };
 
@@ -87,33 +87,46 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 		if (SchedulePreparer.sourceFilesPath == null) {
 			SchedulePreparer.sourceFilesPath = new File(actor.getFile())
 					.getParent();
-			SchedulePreparer.prepare();
+			try {
+				SchedulePreparer.prepare();
+			} catch (QuasiStaticSchedulerException e) {
+				throw new OrccException("exception in quasi-static back-end", e);
+			}
 		}
 		String outputName = path + File.separator + id + ".c";
-		printer.printActor(outputName, id, actor);
+		try {
+			printer.printActor(outputName, id, actor);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	@Override
-	protected void printNetwork(Network network) throws Exception {
-		CQuasiStaticNetworkPrinter networkPrinter = new CQuasiStaticNetworkPrinter();
-		String outputName = path + File.separator + network.getName() + ".c";
+	protected void printNetwork(Network network) throws OrccException {
+		try {
+			CQuasiStaticNetworkPrinter networkPrinter = new CQuasiStaticNetworkPrinter();
+			String outputName = path + File.separator + network.getName()
+					+ ".c";
 
-		// Add broadcasts before printing
-		new BroadcastAdder().transform(network);
-		// Get the custom general buffer's size
-		InputXDFParser inputXDFParser = new InputXDFParser(
-				Scheduler.workingDirectoryPath + File.separator
-						+ Constants.INPUT_FILE_NAME);
-		Integer customSize = inputXDFParser.parseCustomGeneralBufferSize();
-		this.fifoSize = customSize == null? fifoSize:customSize;
-		// Print the network
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
-		// Finally,  prints the schedule
-		printSchedule(network);
+			// Add broadcasts before printing
+			new BroadcastAdder().transform(network);
+			// Get the custom general buffer's size
+			InputXDFParser inputXDFParser = new InputXDFParser(
+					Scheduler.workingDirectoryPath + File.separator
+							+ Constants.INPUT_FILE_NAME);
+			Integer customSize = inputXDFParser.parseCustomGeneralBufferSize();
+			this.fifoSize = customSize == null ? fifoSize : customSize;
+			// Print the network
+			networkPrinter.printNetwork(outputName, network, false, fifoSize);
+			// Finally, prints the schedule
+			printSchedule(network);
+		} catch (IOException e) {
+
+		}
 	}
 
 	protected void printSchedule(Network network) throws IOException,
-			OrccException, QuasiStaticSchedulerException {
+			OrccException {
 		Map<String, List<String>> scheduleMap = new Scheduler(network)
 				.performSchedule();
 		CQuasiStaticSchedulePrinter schedulePrinter = new CQuasiStaticSchedulePrinter();

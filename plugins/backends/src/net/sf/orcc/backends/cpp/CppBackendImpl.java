@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.cpp;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -89,40 +90,51 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws Exception {
+	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
 
-		String outputName = path + File.separator + "Actor_" + id + ".h";
-		printer.printActor(outputName, id, actor);
+		try {
+			String outputName = path + File.separator + "Actor_" + id + ".h";
+			printer.printActor(outputName, id, actor);
 
-		outputName = path + File.separator + "Actor_" + id + ".cpp";
-		impl_printer.printActor(outputName, id, actor);
+			outputName = path + File.separator + "Actor_" + id + ".cpp";
+			impl_printer.printActor(outputName, id, actor);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	@Override
-	protected void printNetwork(Network network) throws Exception {
-		NetworkPrinter networkPrinter = new NetworkPrinter("Cpp_networkDecl");
-		NetworkPrinter networkImplPrinter = new NetworkPrinter(
-				"Cpp_networkImpl");
+	protected void printNetwork(Network network) throws OrccException {
+		try {
+			NetworkPrinter networkPrinter = new NetworkPrinter(
+					"Cpp_networkDecl");
+			NetworkPrinter networkImplPrinter = new NetworkPrinter(
+					"Cpp_networkImpl");
 
-		if (partitioning) {
-			new WrapperAdder().transform(network);
+			if (partitioning) {
+				new WrapperAdder().transform(network);
+			}
+
+			String name = network.getName();
+
+			String outputName = path + File.separator + "Network_" + name
+					+ ".h";
+			networkPrinter.printNetwork(outputName, network, false, fifoSize);
+			outputName = path + File.separator + "Network_" + name + ".cpp";
+			networkImplPrinter.printNetwork(outputName, network, false,
+					fifoSize);
+			networkImplPrinter.printNetwork(outputName, network, false,
+					fifoSize);
+
+			new CppCMakePrinter().printCMake(path, network, partitioning);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
 		}
-
-		String name = network.getName();
-
-		String outputName = path + File.separator + "Network_" + name + ".h";
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
-		outputName = path + File.separator + "Network_" + name + ".cpp";
-		networkImplPrinter.printNetwork(outputName, network, false, fifoSize);
-		networkImplPrinter.printNetwork(outputName, network, false, fifoSize);
-
-		new CppCMakePrinter().printCMake(path, network, partitioning);
-
 	}
 
 }

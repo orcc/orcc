@@ -31,6 +31,8 @@ package net.sf.orcc.backends.c;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.runtime.CoreException;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
@@ -88,6 +90,18 @@ public class CBackendImpl extends AbstractBackend {
 			network.classifyActors();
 			network.normalizeActors();
 			network.mergeActors();
+		} else {
+			if (configuration != null) {
+				try {
+					boolean classify = configuration.getAttribute(
+							"net.sf.orcc.backends.classify", false);
+					if (classify) {
+						network.classifyActors();
+					}
+				} catch (CoreException e) {
+					throw new OrccException("could not read configuration", e);
+				}
+			}
 		}
 
 		// until now, printer is default printer
@@ -113,16 +127,21 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printNetwork(Network network) throws Exception {
-		NetworkPrinter networkPrinter = new NetworkPrinter("C_network");
+	protected void printNetwork(Network network) throws OrccException {
+		try {
+			NetworkPrinter networkPrinter = new NetworkPrinter("C_network");
 
-		// Add broadcasts before printing
-		new BroadcastAdder().transform(network);
+			// Add broadcasts before printing
+			new BroadcastAdder().transform(network);
 
-		String outputName = path + File.separator + network.getName() + ".c";
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
+			String outputName = path + File.separator + network.getName()
+					+ ".c";
+			networkPrinter.printNetwork(outputName, network, false, fifoSize);
 
-		new CMakePrinter().printCMake(path, network);
+			new CMakePrinter().printCMake(path, network);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 }

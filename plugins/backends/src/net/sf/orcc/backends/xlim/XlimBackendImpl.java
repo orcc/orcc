@@ -30,6 +30,7 @@
 package net.sf.orcc.backends.xlim;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -87,10 +88,14 @@ public class XlimBackendImpl extends AbstractBackend {
 	 *            Actor structure
 	 */
 	@Override
-	protected void printActor(String id, Actor actor) throws Exception {
-		System.out.println("FILE "+id);
+	protected void printActor(String id, Actor actor) throws OrccException {
+		System.out.println("FILE " + id);
 		String outputName = path + File.separator + id + ".xlim";
-		printer.printActor(outputName, actor);
+		try {
+			printer.printActor(outputName, actor);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	/**
@@ -100,7 +105,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	 *            Network structure
 	 */
 	@Override
-	protected void printNetwork(Network network) throws Exception {
+	protected void printNetwork(Network network) throws OrccException {
 	}
 
 }

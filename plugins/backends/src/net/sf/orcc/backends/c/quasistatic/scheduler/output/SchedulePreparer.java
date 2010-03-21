@@ -27,7 +27,7 @@ public class SchedulePreparer {
 		}
 	}
 
-	private static void createOutputDirectories() throws QuasiStaticSchedulerException {
+	private static void createOutputDirectories() {
 		DSEScheduler.INPUT_FOLDER = Scheduler.workingDirectoryPath + File.separator + Constants.DSE_INPUT_PATH + File.separator;
 		DSEScheduler.OUTPUT_FOLDER = Scheduler.workingDirectoryPath + File.separator + Constants.SCHEDULE_FILES_PATH + File.separator;
 		new File(DSEScheduler.INPUT_FOLDER).mkdirs();

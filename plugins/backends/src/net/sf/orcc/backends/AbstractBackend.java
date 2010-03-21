@@ -74,7 +74,8 @@ public abstract class AbstractBackend implements IBackend {
 	}
 
 	@Override
-	public void generateCode(String fileName, int fifoSize) throws Exception {
+	public void generateCode(String fileName, int fifoSize)
+			throws OrccException {
 		// set FIFO size
 		this.fifoSize = fifoSize;
 
@@ -112,7 +113,8 @@ public abstract class AbstractBackend implements IBackend {
 	 * @param actor
 	 *            the actor
 	 */
-	abstract protected void printActor(String id, Actor actor) throws Exception;
+	abstract protected void printActor(String id, Actor actor)
+			throws OrccException;
 
 	/**
 	 * Prints the given network.
@@ -120,7 +122,7 @@ public abstract class AbstractBackend implements IBackend {
 	 * @param network
 	 *            the network
 	 */
-	abstract protected void printNetwork(Network network) throws Exception;
+	abstract protected void printNetwork(Network network) throws OrccException;
 
 	@Override
 	public void setLaunchConfiguration(ILaunchConfiguration configuration) {

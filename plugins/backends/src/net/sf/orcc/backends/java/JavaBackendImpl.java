@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.java;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -75,7 +76,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws Exception {
+	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new PhiRemoval() };
 
@@ -84,19 +85,28 @@ public class JavaBackendImpl extends AbstractBackend {
 		}
 
 		String outputName = path + File.separator + "Actor_" + id + ".java";
-		printer.printActor(outputName, id, actor);
+		try {
+			printer.printActor(outputName, id, actor);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	@Override
-	protected void printNetwork(Network network) throws Exception {
-		NetworkPrinter networkPrinter = new NetworkPrinter("Java_network");
+	protected void printNetwork(Network network) throws OrccException {
+		try {
+			NetworkPrinter networkPrinter = new NetworkPrinter("Java_network");
 
-		// Add broadcasts before printing
-		new BroadcastAdder().transform(network);
+			// Add broadcasts before printing
+			new BroadcastAdder().transform(network);
 
-		String name = network.getName();
-		String outputName = path + File.separator + "Network_" + name + ".java";
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
+			String name = network.getName();
+			String outputName = path + File.separator + "Network_" + name
+					+ ".java";
+			networkPrinter.printNetwork(outputName, network, false, fifoSize);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 }

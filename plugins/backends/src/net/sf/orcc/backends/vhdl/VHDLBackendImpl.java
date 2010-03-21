@@ -30,6 +30,7 @@
 package net.sf.orcc.backends.vhdl;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -85,7 +86,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws Exception {
+	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new Inline(), new PhiRemoval(),
 				new VariableRedimension(), new BoolExprTransform(),
@@ -102,33 +103,41 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		String outputName = path + File.separator + "Design" + File.separator
 				+ id + ".vhd";
-		printer.printActor(outputName, id, actor);
+		try {
+			printer.printActor(outputName, id, actor);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 
 	@Override
-	protected void printNetwork(Network network) throws Exception {
-		VHDLTestbenchPrinter tbPrinter = new VHDLTestbenchPrinter();
-		for (Instance instance : network.getInstances()) {
-			if (instance.isActor()) {
-				Actor actor = instance.getActor();
-				String id = instance.getId();
-				File folder = new File(path + File.separator + "Testbench");
-				if (!folder.exists()) {
-					folder.mkdir();
+	protected void printNetwork(Network network) throws OrccException {
+		try {
+			VHDLTestbenchPrinter tbPrinter = new VHDLTestbenchPrinter();
+			for (Instance instance : network.getInstances()) {
+				if (instance.isActor()) {
+					Actor actor = instance.getActor();
+					String id = instance.getId();
+					File folder = new File(path + File.separator + "Testbench");
+					if (!folder.exists()) {
+						folder.mkdir();
+					}
+
+					String outputName = path + File.separator + "Testbench"
+							+ File.separator + id + "_tb.vhd";
+					tbPrinter.printTestbench(outputName, id, actor);
 				}
-
-				String outputName = path + File.separator + "Testbench"
-						+ File.separator + id + "_tb.vhd";
-				tbPrinter.printTestbench(outputName, id, actor);
 			}
+
+			VHDLTypePrinter.isInNetwork = true;
+			NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
+
+			String outputName = path + File.separator + network.getName()
+					+ "_TOP.vhd";
+			networkPrinter.printNetwork(outputName, network, false, fifoSize);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
 		}
-
-		VHDLTypePrinter.isInNetwork = true;
-		NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
-
-		String outputName = path + File.separator + network.getName()
-				+ "_TOP.vhd";
-		networkPrinter.printNetwork(outputName, network, false, fifoSize);
 	}
 
 }

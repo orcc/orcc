@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
@@ -72,12 +74,28 @@ public class LLVMBackendImpl extends AbstractBackend {
 	private LLVMActorPrinter printer;
 
 	@Override
-	protected void beforeInstantiation(Network network) throws OrccException {
+	protected void afterInstantiation(Network network) throws OrccException {
+		if (configuration != null) {
+			try {
+				boolean classify = configuration.getAttribute(
+						"net.sf.orcc.backends.classify", false);
+				if (classify) {
+					network.classifyActors();
+				}
+			} catch (CoreException e) {
+				throw new OrccException("could not read configuration", e);
+			}
+		}
+
 		printer = new LLVMActorPrinter();
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws Exception {
+	protected void beforeInstantiation(Network network) throws OrccException {
+	}
+
+	@Override
+	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = {
 				new AddInstantationProcedure(),
 				new ThreeAddressCodeTransformation(),
@@ -89,13 +107,26 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		String outputName = path + File.separator + id + ".s";
 
-		printer.printActor(outputName, id, actor);
+		try {
+			printer.printActor(outputName, id, actor);
 
-		if (configuration != null) {
-			String llvmAs = configuration.getAttribute("llvm-as", "");
-			if (!llvmAs.isEmpty()) {
-				printBitcode(llvmAs, outputName, id);
+			try {
+				if (configuration != null) {
+					boolean llvmBitcode = configuration.getAttribute(
+							"net.sf.orcc.backends.llvmBitcode", false);
+					if (llvmBitcode) {
+						String llvmAs = configuration.getAttribute(
+								"net.sf.orcc.backends.llvm-as", "");
+						if (!llvmAs.isEmpty()) {
+							printBitcode(llvmAs, outputName, id);
+						}
+					}
+				}
+			} catch (CoreException e) {
+				throw new OrccException("could not read configuration", e);
 			}
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
 		}
 	}
 
@@ -120,7 +151,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printNetwork(Network network) throws Exception {
+	protected void printNetwork(Network network) throws OrccException {
 		// NetworkPrinter networkPrinter = new NetworkPrinter("LLVM_network");
 
 		// Add broadcasts before printing
