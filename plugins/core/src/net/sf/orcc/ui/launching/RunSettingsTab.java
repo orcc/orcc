@@ -32,8 +32,13 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.backends.BackendOption;
 import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
@@ -69,18 +74,18 @@ import org.eclipse.swt.widgets.Text;
  */
 public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
+	private String backend;
+
 	private Combo comboBackend;
 
-	private ILaunchConfiguration configuration;
+	private Group groupOptions;
 
-	private Group groupOption;
-
-	private OptionWidgetManager manager;
+	private Map<String, List<OptionWidget>> optionWidgets;
 
 	private Text textOutput;
 
 	public RunSettingsTab() {
-		manager = new OptionWidgetManager(this);
+		optionWidgets = new HashMap<String, List<OptionWidget>>();
 	}
 
 	private void browseOutputFolder(Shell shell) {
@@ -112,6 +117,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 		createControlBackend(font, composite);
 		createControlOption(font, composite);
+		createOptions();
 	}
 
 	private void createControlBackend(Font font, Composite parent) {
@@ -127,12 +133,12 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	}
 
 	private void createControlOption(Font font, Composite parent) {
-		groupOption = new Group(parent, SWT.NONE);
-		groupOption.setFont(font);
-		groupOption.setText("&Options:");
-		groupOption.setLayout(new GridLayout(1, false));
+		groupOptions = new Group(parent, SWT.NONE);
+		groupOptions.setFont(font);
+		groupOptions.setText("&Options:");
+		groupOptions.setLayout(new GridLayout(1, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		groupOption.setLayoutData(data);
+		groupOptions.setLayoutData(data);
 	}
 
 	private void createControlOutputBackend(final Font font, final Group group) {
@@ -157,11 +163,6 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateOptionSelection();
-				try {
-					manager.initializeFromOptions(configuration);
-				} catch (CoreException e1) {
-					e1.printStackTrace();
-				}
 				updateLaunchConfigurationDialog();
 			}
 		});
@@ -198,9 +199,23 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		});
 	}
 
+	/**
+	 * Creates the controls for all options, but do not show them yet.
+	 */
+	private void createOptions() {
+		BackendFactory factory = BackendFactory.getInstance();
+		for (String backend : factory.listBackends()) {
+			List<BackendOption> options = factory.getOptions(backend);
+			List<OptionWidget> widgets = OptionWidgetManager.createOptions(
+					this, options, groupOptions);
+			optionWidgets.put(backend, widgets);
+		}
+	}
+
 	@Override
 	public void dispose() {
-		manager.disposeOptions();
+		optionWidgets.clear();
+		groupOptions.dispose();
 	}
 
 	private boolean getFolderFromText() {
@@ -225,9 +240,8 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
-		this.configuration = configuration;
 		try {
-			String backend = configuration.getAttribute(BACKEND, "");
+			backend = configuration.getAttribute(BACKEND, "");
 
 			int index = comboBackend.indexOf(backend);
 			comboBackend.select(index);
@@ -235,8 +249,15 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
 			textOutput.setText(value);
 
+			// initialize from all options
+			for (Entry<String, List<OptionWidget>> entry : optionWidgets
+					.entrySet()) {
+				List<OptionWidget> widgets = entry.getValue();
+				OptionWidgetManager.initializeFromOptions(widgets,
+						configuration);
+			}
+
 			updateOptionSelection();
-			manager.initializeFromOptions(configuration);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
@@ -261,7 +282,8 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			return false;
 		}
 
-		if (manager.isValidOptions(launchConfig)) {
+		List<OptionWidget> widgets = optionWidgets.get(backend);
+		if (OptionWidgetManager.isValidOptions(widgets, launchConfig)) {
 			setErrorMessage(null);
 			return true;
 		} else {
@@ -279,8 +301,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			value = comboBackend.getItem(index);
 			configuration.setAttribute(BACKEND, value);
 		}
-		
-		manager.performApplyOptions(configuration);
+
+		List<OptionWidget> widgets = optionWidgets.get(backend);
+		OptionWidgetManager.performApplyOptions(widgets, configuration);
 	}
 
 	@Override
@@ -288,7 +311,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		configuration.setAttribute(OUTPUT_FOLDER, "");
 		configuration.setAttribute(BACKEND, "");
 	}
-	
+
 	@Override
 	public void setErrorMessage(String errorMessage) {
 		super.setErrorMessage(errorMessage);
@@ -300,13 +323,16 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	}
 
 	private void updateOptionSelection() {
-		manager.disposeOptions();
+		if (!backend.isEmpty()) {
+			List<OptionWidget> widgets = optionWidgets.get(backend);
+			OptionWidgetManager.hideOptions(widgets);
+		}
 
 		int index = comboBackend.getSelectionIndex();
 		if (index != -1) {
-			String backend = comboBackend.getItem(index);
-			BackendFactory factory = BackendFactory.getInstance();
-			manager.createOptions(factory.getOptions(backend), groupOption);
+			backend = comboBackend.getItem(index);
+			List<OptionWidget> widgets = optionWidgets.get(backend);
+			OptionWidgetManager.showOptions(widgets);
 		}
 	}
 

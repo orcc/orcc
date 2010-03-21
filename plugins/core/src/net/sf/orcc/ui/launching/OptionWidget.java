@@ -40,13 +40,42 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
  */
 public interface OptionWidget {
 
-	void dispose();
+	/**
+	 * Hides this option widget (and this children, if any).
+	 */
+	void hide();
 
+	/**
+	 * Initializes this option widget from the given configuration.
+	 * 
+	 * @param configuration
+	 *            a launch configuration
+	 * @throws CoreException
+	 */
 	void initializeFrom(ILaunchConfiguration configuration)
 			throws CoreException;
 
+	/**
+	 * Returns true if this option widget is valid in the context of the given
+	 * configuration.
+	 * 
+	 * @param launchConfig
+	 *            a launch configuration
+	 */
 	boolean isValid(ILaunchConfiguration launchConfig);
 
+	/**
+	 * Copies values from this option widget into the given working copy of a
+	 * launch configuration.
+	 * 
+	 * @param configuration
+	 *            a working copy of a launch configuration
+	 */
 	void performApply(ILaunchConfigurationWorkingCopy configuration);
+
+	/**
+	 * Shows this option widget (and this children, if any).
+	 */
+	void show();
 
 }

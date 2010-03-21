@@ -80,8 +80,6 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 */
 	private Composite composite;
 
-	private boolean initialized;
-
 	private RunSettingsTab launchConfigurationTab;
 
 	private BrowseFileOption option;
@@ -203,6 +201,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		data.horizontalSpan = 3;
 		composite.setLayoutData(data);
+		hide();
 
 		Font font = parent.getFont();
 
@@ -239,11 +238,6 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 
 	}
 
-	@Override
-	public void dispose() {
-		composite.dispose();
-	}
-
 	/**
 	 * Returns an IFile instance of the focused file in text
 	 * 
@@ -258,11 +252,16 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	}
 
 	@Override
+	public void hide() {
+		composite.setVisible(false);
+		((GridData) composite.getLayoutData()).exclude = true;
+	}
+
+	@Override
 	public void initializeFrom(ILaunchConfiguration configuration)
 			throws CoreException {
 		text.setText(configuration.getAttribute(option.getIdentifier(), option
 				.getDefaultValue()));
-		initialized = true;
 	}
 
 	/**
@@ -310,9 +309,13 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 */
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		if (initialized) {
-			configuration.setAttribute(option.getIdentifier(), value);
-		}
+		configuration.setAttribute(option.getIdentifier(), value);
+	}
+
+	@Override
+	public void show() {
+		composite.setVisible(true);
+		((GridData) composite.getLayoutData()).exclude = false;
 	}
 
 }

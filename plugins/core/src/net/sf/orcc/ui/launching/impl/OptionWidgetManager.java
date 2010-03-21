@@ -50,43 +50,33 @@ import net.sf.orcc.ui.launching.RunSettingsTab;
  */
 public class OptionWidgetManager {
 
-	private List<OptionWidget> backendOptions;
-
-	private Composite parent;
-
-	private RunSettingsTab launchConfigurationTab;
-
-	public OptionWidgetManager(RunSettingsTab tab) {
-		backendOptions = new ArrayList<OptionWidget>();
-		launchConfigurationTab = tab;
-	}
-
-	public void createOptions(List<BackendOption> options, Composite parent) {
-		this.parent = parent;
-		for (BackendOption option : options) {
-			OptionWidget control = createOption(option);
-			backendOptions.add(control);
-		}
-	}
-
-	private OptionWidget createOption(BackendOption option) {
+	private static OptionWidget createOption(RunSettingsTab tab,
+			BackendOption option, Composite parent) {
 		if (option instanceof CheckboxOption) {
-			return new CheckBoxOptionWidget(launchConfigurationTab,
-					(CheckboxOption) option, parent);
+			return new CheckBoxOptionWidget(tab, (CheckboxOption) option,
+					parent);
 		} else if (option instanceof BrowseFileOption) {
-			return new BrowseFileOptionWidget(launchConfigurationTab,
-					(BrowseFileOption) option, parent);
+			return new BrowseFileOptionWidget(tab, (BrowseFileOption) option,
+					parent);
 		} else {
 			return null;
 		}
 	}
 
-	public void disposeOptions() {
-		for (OptionWidget optionWidget : backendOptions) {
-			optionWidget.dispose();
+	public static List<OptionWidget> createOptions(RunSettingsTab tab,
+			List<BackendOption> options, Composite parent) {
+		List<OptionWidget> widgets = new ArrayList<OptionWidget>();
+		for (BackendOption option : options) {
+			OptionWidget widget = createOption(tab, option, parent);
+			widgets.add(widget);
 		}
+		return widgets;
+	}
 
-		backendOptions.clear();
+	public static void hideOptions(List<OptionWidget> widgets) {
+		for (OptionWidget widget : widgets) {
+			widget.hide();
+		}
 	}
 
 	/**
@@ -96,10 +86,10 @@ public class OptionWidgetManager {
 	 * @param configuration
 	 *            launch configuration
 	 */
-	public void initializeFromOptions(ILaunchConfiguration configuration)
-			throws CoreException {
-		for (OptionWidget optionWidget : backendOptions) {
-			optionWidget.initializeFrom(configuration);
+	public static void initializeFromOptions(List<OptionWidget> widgets,
+			ILaunchConfiguration configuration) throws CoreException {
+		for (OptionWidget widget : widgets) {
+			widget.initializeFrom(configuration);
 		}
 	}
 
@@ -111,9 +101,10 @@ public class OptionWidgetManager {
 	 *            a launch configuration
 	 * @return <code>true</code> if the given launch configuration is valid
 	 */
-	public boolean isValidOptions(ILaunchConfiguration launchConfig) {
-		for (OptionWidget optionWidget : backendOptions) {
-			if (!optionWidget.isValid(launchConfig)) {
+	public static boolean isValidOptions(List<OptionWidget> widgets,
+			ILaunchConfiguration launchConfig) {
+		for (OptionWidget widget : widgets) {
+			if (!widget.isValid(launchConfig)) {
 				return false;
 			}
 		}
@@ -127,24 +118,17 @@ public class OptionWidgetManager {
 	 * @param configuration
 	 *            launch configuration
 	 */
-	public void performApplyOptions(
+	public static void performApplyOptions(List<OptionWidget> widgets,
 			ILaunchConfigurationWorkingCopy configuration) {
-		for (OptionWidget optionWidget : backendOptions) {
-			optionWidget.performApply(configuration);
+		for (OptionWidget widget : widgets) {
+			widget.performApply(configuration);
 		}
 	}
-	
-	/**
-	 * Sets this page's error message, possibly <code>null</code>.
-	 * 
-	 * @param errorMessage the error message or <code>null</code>
-	 */
-	public void setErrorMessage(String errorMessage) {
-		launchConfigurationTab.setErrorMessage(errorMessage);
-	}
 
-	public void updateLaunchConfigurationDialog() {
-		launchConfigurationTab.updateLaunchConfigurationDialog();
+	public static void showOptions(List<OptionWidget> widgets) {
+		for (OptionWidget widget : widgets) {
+			widget.show();
+		}
 	}
 
 }

@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.launching.impl;
 
+import java.util.List;
+
 import net.sf.orcc.backends.CheckboxOption;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.RunSettingsTab;
@@ -60,12 +62,8 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	 * composite that contains the components of this option
 	 */
 	private Composite composite;
-	
-	private boolean initialized;
 
 	private RunSettingsTab launchConfigurationTab;
-
-	private OptionWidgetManager manager;
 
 	private CheckboxOption option;
 
@@ -74,13 +72,13 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	 */
 	private boolean value;
 
+	private List<OptionWidget> widgets;
+
 	/**
 	 * Creates a new input file option.
 	 */
 	public CheckBoxOptionWidget(RunSettingsTab tab, CheckboxOption option,
 			Composite parent) {
-		manager = new OptionWidgetManager(tab);
-
 		this.launchConfigurationTab = tab;
 		this.option = option;
 		this.value = false;
@@ -103,6 +101,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		data.horizontalSpan = 1;
 		composite.setLayoutData(data);
+		hide();
 
 		Font font = parent.getFont();
 
@@ -115,19 +114,15 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 		checkBox.setText(option.getName());
 		checkBox.setLayoutData(data);
 		checkBox.setToolTipText(option.getDescription());
-	}
 
-	private void disableOptions() {
-		manager.disposeOptions();
+		widgets = OptionWidgetManager.createOptions(launchConfigurationTab,
+				option.getOptions(), composite);
 	}
 
 	@Override
-	public void dispose() {
-		composite.dispose();
-	}
-
-	private void enableOptions() {
-		manager.createOptions(option.getOptions(), composite);
+	public void hide() {
+		composite.setVisible(false);
+		((GridData) composite.getLayoutData()).exclude = true;
 	}
 
 	@Override
@@ -139,17 +134,16 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 
 		checkBox.setSelection(value);
 		if (value) {
-			enableOptions();
+			OptionWidgetManager.showOptions(widgets);
 		}
 
-		manager.initializeFromOptions(configuration);
-		initialized = true;
+		OptionWidgetManager.initializeFromOptions(widgets, configuration);
 	}
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
 		if (value) {
-			return manager.isValidOptions(launchConfig);
+			return OptionWidgetManager.isValidOptions(widgets, launchConfig);
 		} else {
 			return true;
 		}
@@ -157,12 +151,16 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		if (initialized) {
-			configuration.setAttribute(option.getIdentifier(), value);
-			if (value) {
-				manager.performApplyOptions(configuration);
-			}
+		configuration.setAttribute(option.getIdentifier(), value);
+		if (value) {
+			OptionWidgetManager.performApplyOptions(widgets, configuration);
 		}
+	}
+
+	@Override
+	public void show() {
+		composite.setVisible(true);
+		((GridData) composite.getLayoutData()).exclude = false;
 	}
 
 	@Override
@@ -173,9 +171,9 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	public void widgetSelected(SelectionEvent e) {
 		value = checkBox.getSelection();
 		if (value) {
-			enableOptions();
+			OptionWidgetManager.showOptions(widgets);
 		} else {
-			disableOptions();
+			OptionWidgetManager.hideOptions(widgets);
 		}
 		launchConfigurationTab.updateLaunchConfigurationDialog();
 	}
