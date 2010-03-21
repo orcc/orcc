@@ -96,7 +96,9 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	 */
 	private void createCheckBox(Composite parent) {
 		composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(1, false));
+		GridLayout layout = new GridLayout(1, false);
+		composite.setLayout(layout);
+		layout.marginHeight = 0;
 
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		data.horizontalSpan = 1;

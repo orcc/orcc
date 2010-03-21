@@ -215,7 +215,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void dispose() {
 		optionWidgets.clear();
-		groupOptions.dispose();
+		if (groupOptions != null) {
+			groupOptions.dispose();
+		}
 	}
 
 	private boolean getFolderFromText() {
@@ -265,6 +267,12 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
+		int index = comboBackend.getSelectionIndex();
+		if (index == -1) {
+			setErrorMessage("No backend selected.");
+			return false;
+		}
+
 		String value = textOutput.getText();
 		if (value.isEmpty()) {
 			setErrorMessage("Output path not specified");
@@ -273,12 +281,6 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 
 		if (!getFolderFromText()) {
 			setErrorMessage("Given output path does not specify an existing folder");
-			return false;
-		}
-
-		int index = comboBackend.getSelectionIndex();
-		if (index == -1) {
-			setErrorMessage("No backend selected.");
 			return false;
 		}
 
@@ -303,7 +305,9 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 
 		List<OptionWidget> widgets = optionWidgets.get(backend);
-		OptionWidgetManager.performApplyOptions(widgets, configuration);
+		if (widgets != null) {
+			OptionWidgetManager.performApplyOptions(widgets, configuration);
+		}
 	}
 
 	@Override
