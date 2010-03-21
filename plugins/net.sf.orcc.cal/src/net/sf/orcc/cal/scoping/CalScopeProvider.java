@@ -74,15 +74,15 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 		List<IEObjectDescription> elements = new ArrayList<IEObjectDescription>();
 		for (InputPattern pattern : action.getInputs()) {
 			for (Variable token : pattern.getTokens()) {
-				IEObjectDescription element = EObjectDescription.create(token.getName(),
-						token);
+				IEObjectDescription element = EObjectDescription.create(token
+						.getName(), token);
 				elements.add(element);
 			}
 		}
 
 		for (Variable variable : action.getVariables()) {
-			IEObjectDescription element = EObjectDescription.create(variable.getName(),
-					variable);
+			IEObjectDescription element = EObjectDescription.create(variable
+					.getName(), variable);
 			elements.add(element);
 		}
 
@@ -106,14 +106,14 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 			List<Variable> variables, EObject obj, EReference ref) {
 		List<IEObjectDescription> elements = new ArrayList<IEObjectDescription>();
 		for (Variable variable : parameters) {
-			IEObjectDescription element = EObjectDescription.create(variable.getName(),
-					variable);
+			IEObjectDescription element = EObjectDescription.create(variable
+					.getName(), variable);
 			elements.add(element);
 		}
 
 		for (Variable variable : variables) {
-			IEObjectDescription element = EObjectDescription.create(variable.getName(),
-					variable);
+			IEObjectDescription element = EObjectDescription.create(variable
+					.getName(), variable);
 			elements.add(element);
 		}
 
@@ -147,14 +147,14 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	public IScope scope_VariableReference_variable(Actor actor, EReference ref) {
 		List<IEObjectDescription> elements = new ArrayList<IEObjectDescription>();
 		for (Variable parameter : actor.getParameters()) {
-			IEObjectDescription element = EObjectDescription.create(parameter.getName(),
-					parameter);
+			IEObjectDescription element = EObjectDescription.create(parameter
+					.getName(), parameter);
 			elements.add(element);
 		}
 
 		for (Variable stateVariable : actor.getStateVariables()) {
-			IEObjectDescription element = EObjectDescription.create(stateVariable
-					.getName(), stateVariable);
+			IEObjectDescription element = EObjectDescription.create(
+					stateVariable.getName(), stateVariable);
 			elements.add(element);
 		}
 

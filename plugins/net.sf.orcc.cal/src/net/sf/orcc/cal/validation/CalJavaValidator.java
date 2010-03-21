@@ -28,14 +28,7 @@
  */
 package net.sf.orcc.cal.validation;
 
-import java.util.List;
-
-import net.sf.orcc.cal.cal.CalPackage;
-import net.sf.orcc.cal.cal.CallExpression;
-import net.sf.orcc.cal.cal.CallStatement;
-import net.sf.orcc.cal.cal.ForeachStatement;
 import net.sf.orcc.cal.cal.Function;
-import net.sf.orcc.cal.cal.Generator;
 import net.sf.orcc.cal.cal.Procedure;
 import net.sf.orcc.cal.cal.Variable;
 import net.sf.orcc.cal.cal.VariableReference;
@@ -52,30 +45,30 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
 	public void checkIsFunctionUsed(Function function) {
-		List<CallExpression> refs = function.getCalls();
-		if (refs.isEmpty()) {
-			warning("Unused function", CalPackage.FUNCTION__NAME);
-		}
+		// List<CallExpression> refs = function.getCalls();
+		// if (refs.isEmpty()) {
+		// warning("Unused function", CalPackage.FUNCTION__NAME);
+		// }
 	}
 
 	@Check
 	public void checkIsFunctionUsed(Procedure procedure) {
-		List<CallStatement> refs = procedure.getCalls();
-		if (refs.isEmpty()) {
-			warning("Unused procedure", CalPackage.PROCEDURE__NAME);
-		}
+		// List<CallStatement> refs = procedure.getCalls();
+		// if (refs.isEmpty()) {
+		// warning("Unused procedure", CalPackage.PROCEDURE__NAME);
+		// }
 	}
 
 	@Check
 	public void checkIsVariabledUsed(Variable variable) {
 		// loop variables do not have to be used
-		if (!(variable.eContainer() instanceof Generator || variable
-				.eContainer() instanceof ForeachStatement)) {
-			List<VariableReference> refs = variable.getReferences();
-			if (refs.isEmpty()) {
-				warning("Unused variable", CalPackage.VARIABLE__NAME);
-			}
-		}
+		// if (!(variable.eContainer() instanceof Generator || variable
+		// .eContainer() instanceof ForeachStatement)) {
+		// List<VariableReference> refs = variable.getReferences();
+		// if (refs.isEmpty()) {
+		// warning("Unused variable", CalPackage.VARIABLE__NAME);
+		// }
+		// }
 	}
 
 }

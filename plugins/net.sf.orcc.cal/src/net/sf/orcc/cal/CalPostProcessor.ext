@@ -17,18 +17,46 @@ process(EClassifier this) :
 ;
 
 process(EClass this) :
-    if name == 'VariableReference' then
-    	((EReference) getEStructuralFeature('variable')).defineEOpposite('references')
-    else if name == 'CallExpression' then
-    	((EReference) getEStructuralFeature('function')).defineEOpposite('calls')
-    else if name == 'CallStatement' then
-    	((EReference) getEStructuralFeature('procedure')).defineEOpposite('calls')
+	switch (this.name) {
+		case "VariableReference": (
+			//((EReference) getEStructuralFeature('variable')).defineEOpposite('references')
+			null
+        )
+        
+        case "CallExpression": (
+    		//((EReference) getEStructuralFeature('function')).defineEOpposite('calls')
+    		null
+    	)
+    	
+    	case "CallStatement": (
+    		//((EReference) getEStructuralFeature('procedure')).defineEOpposite('calls')
+    		null
+    	)
+    	
+    	default:
+    		null
+    }
 ;
 
-defineEOpposite(EReference this, String name) :
+/*defineEOpposite(EReference this, String name) :
     let opp = new EReference :
-        opp.setName(name) -> opp.setEType(eContainingClass) ->
-        setEOpposite(opp) -> opp.setEOpposite(this) ->
+        opp.setName(name) ->
+        opp.setEType(eContainingClass) ->
+        setEOpposite(opp) ->
+        opp.setEOpposite(this) ->
         opp.setUpperBound(-1) ->
         eReferenceType.eStructuralFeatures.add(opp)
+;*/
+
+/*create EReference this createBackReference(String name, EClass etype, String refName) :
+	this.setName(name) ->
+	this.setEType(etype) ->
+	this.setLowerBound(0) ->
+	this.setUpperBound(-1) ->
+	this.setEOpposite(etype.findEReference(refName))
 ;
+
+EReference findEReference(EClass this, String refName):
+	this.eStructuralFeatures.typeSelect(EReference).selectFirst(e|e.name == refName)
+;*/
+
