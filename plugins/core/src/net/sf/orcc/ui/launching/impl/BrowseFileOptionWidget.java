@@ -94,6 +94,8 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 */
 	private String value;
 
+	private boolean updateLaunchConfiguration;
+
 	/**
 	 * Creates a new input file option.
 	 */
@@ -260,8 +262,10 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration)
 			throws CoreException {
+		updateLaunchConfiguration = false;
 		text.setText(configuration.getAttribute(option.getIdentifier(), option
 				.getDefaultValue()));
+		updateLaunchConfiguration = true;
 	}
 
 	/**
@@ -300,7 +304,9 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	@Override
 	public void modifyText(ModifyEvent e) {
 		value = text.getText();
-		launchConfigurationTab.updateLaunchConfigurationDialog();
+		if (updateLaunchConfiguration) {
+			launchConfigurationTab.updateLaunchConfigurationDialog();
+		}
 	}
 
 	/**

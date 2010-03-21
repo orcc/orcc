@@ -72,7 +72,8 @@ import org.eclipse.swt.widgets.Text;
  * @author Jérôme Gorin
  * 
  */
-public class RunSettingsTab extends AbstractLaunchConfigurationTab {
+public class RunSettingsTab extends AbstractLaunchConfigurationTab implements
+		ModifyListener {
 
 	private String backend;
 
@@ -83,6 +84,8 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 	private Map<String, List<OptionWidget>> optionWidgets;
 
 	private Text textOutput;
+
+	private boolean updateLaunchConfiguration;
 
 	public RunSettingsTab() {
 		optionWidgets = new HashMap<String, List<OptionWidget>>();
@@ -136,7 +139,12 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		groupOptions = new Group(parent, SWT.NONE);
 		groupOptions.setFont(font);
 		groupOptions.setText("&Options:");
-		groupOptions.setLayout(new GridLayout(1, false));
+
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginWidth = 0;
+		layout.horizontalSpacing = 0;
+		groupOptions.setLayout(layout);
+
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		groupOptions.setLayoutData(data);
 	}
@@ -179,12 +187,7 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 		textOutput.setFont(font);
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		textOutput.setLayoutData(data);
-		textOutput.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				updateLaunchConfigurationDialog();
-			}
-		});
+		textOutput.addModifyListener(this);
 
 		Button buttonBrowse = new Button(group, SWT.PUSH);
 		buttonBrowse.setFont(font);
@@ -248,8 +251,10 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			int index = comboBackend.indexOf(backend);
 			comboBackend.select(index);
 
+			updateLaunchConfiguration = false;
 			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
 			textOutput.setText(value);
+			updateLaunchConfiguration = true;
 
 			// initialize from all options
 			for (Entry<String, List<OptionWidget>> entry : optionWidgets
@@ -290,6 +295,13 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	@Override
+	public void modifyText(ModifyEvent e) {
+		if (updateLaunchConfiguration) {
+			updateLaunchConfigurationDialog();
 		}
 	}
 

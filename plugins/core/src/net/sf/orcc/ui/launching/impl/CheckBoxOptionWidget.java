@@ -95,21 +95,12 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	 *            Group to add the input file interface
 	 */
 	private void createCheckBox(Composite parent) {
-		composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(1, false);
-		composite.setLayout(layout);
-		layout.marginHeight = 0;
-
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		data.horizontalSpan = 1;
-		composite.setLayoutData(data);
-		hide();
-
 		Font font = parent.getFont();
 
-		data = new GridData(SWT.LEFT, SWT.TOP, false, false);
+		GridData data = new GridData(SWT.LEFT, SWT.TOP, false, false);
+		data.horizontalIndent = 5;
 
-		checkBox = new Button(composite, SWT.CHECK);
+		checkBox = new Button(parent, SWT.CHECK);
 		checkBox.setFont(font);
 		checkBox.setSelection(value);
 		checkBox.addSelectionListener(this);
@@ -117,14 +108,29 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 		checkBox.setLayoutData(data);
 		checkBox.setToolTipText(option.getDescription());
 
+		composite = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginHeight = 0;
+		composite.setLayout(layout);
+
+		data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		data.horizontalSpan = 1;
+		data.horizontalIndent = 10;
+		composite.setLayoutData(data);
+
 		widgets = OptionWidgetManager.createOptions(launchConfigurationTab,
 				option.getOptions(), composite);
+		OptionWidgetManager.hideOptions(widgets);
+
+		hide();
 	}
 
 	@Override
 	public void hide() {
-		composite.setVisible(false);
-		((GridData) composite.getLayoutData()).exclude = true;
+		checkBox.setVisible(false);
+		((GridData) checkBox.getLayoutData()).exclude = true;
+
+		showComposite(false);
 	}
 
 	@Override
@@ -161,8 +167,19 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 
 	@Override
 	public void show() {
-		composite.setVisible(true);
-		((GridData) composite.getLayoutData()).exclude = false;
+		checkBox.setVisible(true);
+		((GridData) checkBox.getLayoutData()).exclude = false;
+
+		showComposite(true);
+	}
+
+	private void showComposite(boolean show) {
+		if (widgets.isEmpty()) {
+			show = false;
+		}
+
+		composite.setVisible(show);
+		((GridData) composite.getLayoutData()).exclude = !show;
 	}
 
 	@Override
@@ -173,8 +190,10 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	public void widgetSelected(SelectionEvent e) {
 		value = checkBox.getSelection();
 		if (value) {
+			showComposite(true);
 			OptionWidgetManager.showOptions(widgets);
 		} else {
+			showComposite(false);
 			OptionWidgetManager.hideOptions(widgets);
 		}
 		launchConfigurationTab.updateLaunchConfigurationDialog();
