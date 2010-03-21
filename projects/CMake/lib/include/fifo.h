@@ -54,6 +54,7 @@ static void *getReadPtr(struct fifo_s *fifo, int n) {
 static int hasRoom(struct fifo_s *fifo, int n) {
 	int num_free = fifo->size - fifo->write_ptr;
 	int res = (num_free >= n);
+#ifndef BRAINDEAD_FIFO
 	if (!res) {
 		// the FIFO is full, check if it is artificial
 		int num_tokens = fifo->write_ptr - fifo->read_ptr;
@@ -69,12 +70,14 @@ static int hasRoom(struct fifo_s *fifo, int n) {
 			res = ((fifo->size - num_tokens) >= n);
 		}
 	}
+#endif
 	return res;
 }
 
 static int hasTokens(struct fifo_s *fifo, int n) {
 	int num_tokens = fifo->write_ptr - fifo->read_ptr;
 	int res = (num_tokens >= n);
+#ifndef BRAINDEAD_FIFO
 	if (!res) {
 		if (num_tokens == 0) {
 			// there are no tokens in the FIFO, just resets the read/write pointers
@@ -83,6 +86,7 @@ static int hasTokens(struct fifo_s *fifo, int n) {
 			fifo->write_ptr = 0;
 		}
 	}
+#endif
 
 	return res;
 }

@@ -128,33 +128,41 @@ void initialize2_v1() {
 	sink.num_successors = 0;
 }
 
-struct actor *actors[6];
+struct actor *actors[] = {&source, &compute, &sink};
 
 void scheduler2_v1() {
 	int i;
 	struct actor *my_actor;
-	struct scheduler my_scheduler = {
-		0,
-		0,
-		3, // number of actors
-		
-	};
+	struct scheduler my_scheduler;
 
-	my_scheduler.next_schedulable_idx = 0;
+	// initialize scheduler
+	scheduler_init(&my_scheduler, sizeof(actors) / sizeof(actors[0]), actors);
+
 	add_schedulable(&my_scheduler, &source);
-
 	my_actor = get_next_schedulable(&my_scheduler);
 	while (my_actor != NULL) {
-		int num_firings = my_actor->sched_func();
+		while (my_actor != NULL) {
+			int num_firings = my_actor->sched_func();
+			if (num_firings > 0) {
+				// the actor has fired, so it is likely it has produced data
+				// we consider its successors as schedulable
 
-		for (i = 0; i < my_actor->num_successors; i++) {
-			struct actor *succ = my_actor->successors[i];
-			if (is_schedulable(succ)) {
-				add_schedulable(&my_scheduler, succ);
+				for (i = 0; i < my_actor->num_successors; i++) {
+					struct actor *succ = my_actor->successors[i];
+					if (is_schedulable(succ)) {
+						add_schedulable(&my_scheduler, succ);
+					}
+				}
 			}
+
+			my_actor = get_next_schedulable(&my_scheduler);
 		}
 
-		add_schedulable_last(&my_scheduler, my_actor);
+		update_fifos(&my_scheduler);
+		if (source_X == N) {
+			return;
+		}
+		add_schedulable(&my_scheduler, &source);
 		my_actor = get_next_schedulable(&my_scheduler);
 	}
 }

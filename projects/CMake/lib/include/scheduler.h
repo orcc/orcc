@@ -47,24 +47,20 @@ struct actor {
 
 struct list_head {
 	struct list_head *prev, *next;
+	void *payload;
 };
 
 struct scheduler {
-	int next_schedulable_idx;
-	int next_free_idx;
 	int num_actors;
-	struct list_head actors;
+	struct actor **actors;
+	struct list_head sched1;
+	struct list_head sched2;
 };
 
 /**
- * returns true if this actor is schedulable
+ * Initializes the given scheduler.
  */
-int is_schedulable(struct actor *actor);
-
-/**
- * returns the next schedulable actor
- */
-struct actor *get_next_schedulable(struct scheduler *sched);
+void scheduler_init(struct scheduler *sched, int num_actors, struct actor **actors);
 
 /**
  * add the actor to the schedulable list
@@ -72,8 +68,18 @@ struct actor *get_next_schedulable(struct scheduler *sched);
 void add_schedulable(struct scheduler *sched, struct actor *actor);
 
 /**
- * add the actor at the end of the schedulable list
+ * returns the next schedulable actor
  */
-void add_schedulable_last(struct scheduler *sched, struct actor *actor);
+struct actor *get_next_schedulable(struct scheduler *sched);
+
+/**
+ * returns true if this actor is schedulable
+ */
+int is_schedulable(struct actor *actor);
+
+/**
+ * updates FIFOs: move read/write pointers.
+ */
+void update_fifos(struct scheduler *sched);
 
 #endif
