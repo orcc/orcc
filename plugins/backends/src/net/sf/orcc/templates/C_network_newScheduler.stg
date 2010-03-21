@@ -1,0 +1,211 @@
+group C_network_newScheduler : C_network;
+
+///////////////////////////////////////////////////////////////////////////////
+// Declare actors
+
+declareActor(instance) ::= <<
+struct actor $instance.id$ = {$instance.id$_scheduler};
+
+>>
+
+declareActors(instances) ::= <<
+$instances: declareActor()$
+>>
+
+declareActorsArray(instances) ::= <<
+struct actor *actors[] = {$instances: {&$it.id$}; wrap, separator=", "$};
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Declare successors
+
+goDeclareSuccessors(instance, successors) ::= <<
+$if(!successors.empty)$
+struct actor *$instance.id$_successors[] = {$successors: {&$it.id$}; wrap, separator=", "$};
+
+$endif$
+>>
+
+declareSuccessors(instances) ::= <<
+$instances: goDeclareSuccessors(instance=it, successors=network.successorsMap.(it))$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Declare connections
+
+declareConnection(source, sourcePort, target, targetPort, count) ::= <<
+struct conn_s conn_$count$ = {&fifo_$count$, &$source.id$, &$target.id$};
+
+>>
+
+tryDeclareConnection(edge, src, tgt) ::= <<
+$if (src.instance)$
+$if (tgt.instance)$
+$declareConnection(
+  source=src.instance, sourcePort=edge.source,
+  target=tgt.instance, targetPort=edge.target,
+  count=network.connectionMap.(edge))$
+$endif$
+$endif$
+>>
+
+declareConnections(edges) ::= <<
+$edges: tryDeclareConnection(
+  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it)) $
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Declare outputs
+
+goDeclareOutputs(instance, outgoing) ::= <<
+$if(!outgoing.empty)$
+struct conn_s *$instance.id$_outputs[] = {$outgoing: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
+
+$endif$
+>>
+
+declareOutputs(instances) ::= <<
+$instances: goDeclareOutputs(instance=it, outgoing=network.outgoingMap.(it))$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Fill actors structures
+
+fillActorStruct(instance) ::= <<
+$instance.id$.num_inputs = 0;
+$instance.id$.inputs = NULL;
+$if(network.outgoingMap.(instance).empty)$
+$instance.id$.num_outputs = 0;
+$instance.id$.outputs = NULL;
+
+$else$
+$instance.id$.num_outputs = $length(network.outgoingMap.(instance))$;
+$instance.id$.outputs = $instance.id$_outputs;
+
+$endif$
+$if(network.successorsMap.(instance).empty)$
+$instance.id$.num_successors = 0;
+$instance.id$.successors = NULL;
+
+
+$else$
+$instance.id$.num_successors = $length(network.successorsMap.(instance))$;
+$instance.id$.successors = $instance.id$_successors;
+
+
+$endif$
+
+>>
+
+fillActorsStructs(instances) ::= <<
+$instances: fillActorStruct()$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print network
+network(debugFifos, fifoSize, network) ::= <<
+// Generated from "$network.name$"
+
+#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define BRAINDEAD_FIFO 1
+#include "fifo.h"
+#include "scheduler.h"
+#include "orcc_util.h"
+
+#define SIZE $fifoSize$
+// #define PRINT_FIRINGS
+
+////////////////////////////////////////////////////////////////////////////////
+// FIFO allocation
+$allocateFifos(network.connections)$
+////////////////////////////////////////////////////////////////////////////////
+// FIFO pointer assignments
+$assignFifos(network.connections)$
+////////////////////////////////////////////////////////////////////////////////
+$declareBroadcasts(network.broadcasts)$
+////////////////////////////////////////////////////////////////////////////////
+// Action schedulers
+$declareInitializes(network.instances)$
+$declareSchedulers(network.instances)$
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of a struct actor for each actor
+$declareActors(network.instances)$
+
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of the successors of each actor
+
+$declareSuccessors(network.instances)$
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of conn_s structures
+
+$declareConnections(network.connections)$
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of the outputs of each actor
+
+$declareOutputs(network.instances)$
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of the actors array
+
+$declareActorsArray(network.instances)$
+////////////////////////////////////////////////////////////////////////////////
+// Actor scheduler
+
+static void fill_actors_structs() {
+	$fillActorsStructs(network.instances)$
+}
+
+static void scheduler() {
+	int i;
+	struct actor *my_actor;
+	struct scheduler my_scheduler;
+	
+	fill_actors_structs();
+
+	// initializes the actors that need it
+	$printInitializes(network.instances)$
+	// initialize scheduler
+	scheduler_init(&my_scheduler, sizeof(actors) / sizeof(actors[0]), actors);
+
+	add_schedulable(&my_scheduler, &source);
+	my_actor = get_next_schedulable(&my_scheduler);
+	while (my_actor != NULL) {
+		while (my_actor != NULL) {
+			int num_firings = my_actor->sched_func();
+			if (num_firings > 0) {
+				// the actor has fired, so it is likely it has produced data
+				// we consider its successors as schedulable
+
+				for (i = 0; i < my_actor->num_successors; i++) {
+					struct actor *succ = my_actor->successors[i];
+					if (is_schedulable(succ)) {
+						add_schedulable(&my_scheduler, succ);
+					}
+				}
+			}
+
+			my_actor = get_next_schedulable(&my_scheduler);
+		}
+
+		update_fifos(&my_scheduler);
+		add_schedulable(&my_scheduler, &source);
+		my_actor = get_next_schedulable(&my_scheduler);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int main(int argc, char *argv[], char *env[]) {
+	init_orcc(argc, argv, env);
+
+	scheduler();
+
+	printf("End of simulation! Press a key to continue\n");
+	pause();
+
+	return 0;
+}
+
+>>
+

@@ -12,6 +12,9 @@
          <option
                id="net.sf.orcc.backends.classify">
          </option>
+         <option
+               id="net.sf.orcc.backends.newScheduler">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
@@ -111,6 +114,13 @@
                   <checkBox></checkBox>
                </option>
             </checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Uses an experimental scheduler instead of using the default round-robin scheduler"
+               id="net.sf.orcc.backends.newScheduler"
+               name="Use the experimental scheduler">
+            <checkBox></checkBox>
          </option>
    </extension>
 

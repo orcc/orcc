@@ -129,7 +129,22 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
 		try {
-			NetworkPrinter networkPrinter = new NetworkPrinter("C_network");
+			String networkTemplate = "C_network";
+			if (configuration != null) {
+				boolean useNewScheduler;
+				try {
+					useNewScheduler = configuration.getAttribute(
+							"net.sf.orcc.backends.newScheduler", false);
+				} catch (CoreException e) {
+					throw new OrccException("could not read configuration", e);
+				}
+
+				if (useNewScheduler) {
+					networkTemplate = "C_network_newScheduler";
+				}
+			}
+			
+			NetworkPrinter networkPrinter = new NetworkPrinter(networkTemplate);
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);
