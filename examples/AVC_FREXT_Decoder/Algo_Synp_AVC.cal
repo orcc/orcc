@@ -3050,16 +3050,20 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 			pStateIdx[ctxIdx] := transIdxLPS[pStateIdx[ctxIdx]];
 		else
-			binVal := valMPS;
+			binVal := valMPS[ctxIdx]; 
 			pStateIdx[ctxIdx] := transIdxMPS[ pStateIdx[ctxIdx] ];
 		end
 		// Give the right write a bit into ReadBinString[]
 		binValDecoded := true;
-		StartRenormDRead := true;
+		if codIRange < 0x0100 then
+			StartRenormDRead := true;
+		else
+			CabacStartProcess := true;
+		end			
 		// Do not call again DecodeDecision
 		StartDecodeDecision := false;
 		// Do not give the hand to CabacParsing
-		CabacStartProcess := false;
+		
 	end
 	/********************** DecodeBypass actions **********************/
 	
@@ -3071,11 +3075,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		set_bits_to_read(1);
 		// Do not give the hand to CabacParsing
 		CabacStartProcess := false;
+		StartDecodeBypass := false;
 	end
 	
 	DecodeBypass: action ==>
 	guard
-		StartDecodeBypass and
 		bypassFlag and done_reading_bits()
 	do
 		codIOffset := codIOffset << 1;
@@ -3115,20 +3119,19 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		binValDecoded := true;
 		// Do not give the hand to CabacParsing
 		CabacStartProcess := false;
+		StartDecodeTerminate := false;
 	end
 	
 	DecodeTerminate_donne: action ==>
 	guard
-		StartDecodeTerminate and ctxIdx = 276 and binVal = 1
+		ctxIdx = 276 and binVal = 1
 	do
-		StartDecodeTerminate := false;
 		// Give the hand to CabacParsing
 		CabacStartProcess := true;
 	end
 	
 	DecodeTerminate_not_donne: action ==>
 	guard
-		StartDecodeTerminate and
 		ctxIdx = 276 and binVal = 0 and
 		StartRenormDRead = false
 	do
@@ -5049,7 +5052,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_MB_layer_mb_type_done: action ==> 
 	guard
-		vld_end() or cabac_end()
+		(entropy_coding_mode_flag[pps_id] = 0 and vld_end()) or (entropy_coding_mode_flag[pps_id] = 1 and cabac_end() )
 	do
 		if entropy_coding_mode_flag[pps_id] = 0 then
 			mb_type := vld_ue();
@@ -5063,7 +5066,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then if mb_type < 5 then mb_intra_flag := 0; else mb_type:= mb_type - 5; mb_intra_flag := 1; end end
 		if slice_type = SLICE_TYPE_B then if mb_type < 23 then mb_intra_flag := 0; else mb_type:= mb_type -23; mb_intra_flag := 1; end end
 	end
-
+/*
+	read_MB_layer_mb_type_not_done: action ==> 
+	guard
+		(entropy_coding_mode_flag[pps_id] = 0 and not vld_end()) or (entropy_coding_mode_flag[pps_id] = 1 and not cabac_end() )
+	end
+	*/
 	//if( mb_type = = I_PCM )
 	// while( !byte_aligned( ) )
 	read_MB_layer_I_PCM_alignement: action  ==>  IntraPredMode : [ 4 ]
@@ -6703,6 +6711,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		// macrobloc_layer
 		read_MB_layer_mb_type								( read_MB_layer_mb_type								) --> read_MB_layer_mb_type_done;
+		//read_MB_layer_mb_type_done							( read_MB_layer_mb_type_not_done					) --> read_MB_layer_mb_type_done;
 		read_MB_layer_mb_type_done							( read_MB_layer_mb_type_done						) --> read_MB_layer_check_I_PCM;
 		read_MB_layer_check_I_PCM							( read_MB_layer_I_PCM_alignement					) --> read_MB_layer_pcm_sample_luma0;
 		read_MB_layer_pcm_sample_luma0					    ( read_MB_layer_pcm_sample_luma0	                ) --> read_MB_layer_pcm_sample_luma1;
