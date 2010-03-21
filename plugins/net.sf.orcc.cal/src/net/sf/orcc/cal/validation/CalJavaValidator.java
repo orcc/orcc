@@ -31,7 +31,6 @@ package net.sf.orcc.cal.validation;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Procedure;
 import net.sf.orcc.cal.cal.Variable;
-import net.sf.orcc.cal.cal.VariableReference;
 
 import org.eclipse.xtext.validation.Check;
 
