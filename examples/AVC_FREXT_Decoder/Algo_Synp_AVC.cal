@@ -2445,7 +2445,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	function mbAddrA_Avail() --> bool :
-		if val_CurrMbAddr then
+		if val_CurrMbAddr = 0 then
 			false
 		else 
 			( val_CurrMbAddr mod PicWidthInMbs ) = 0
@@ -2590,7 +2590,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		int condTermFlagB
 	begin
 		if ( not mbAddrA_Avail() ) then
-			condTermFlagA := 1;
+			condTermFlagA := 0;
 		else
 		    if ( ctxIdxOffset = 0  and ( IS_SI(GiveMbSliceTypeAddrA() ) and ( IS_I4x4(GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) and IS_INxN( GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) ) ) or
 				 ctxIdxOffset = 3  and IS_INxN( GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) or
@@ -2605,7 +2605,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 		
 		if ( not mbAddrB_Avail() ) then
-			 condTermFlagB := 1;
+			 condTermFlagB := 0;
 		else
 		    if( ctxIdxOffset = 0  and ( IS_SI( GiveMbSliceTypeAddrB() ) and ( IS_I4x4( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) and IS_INxN( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) ) ) or
 			    ctxIdxOffset = 3  and IS_INxN( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) or
@@ -2626,7 +2626,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		int condTermFlagB
 	begin
 		if not mbAddrA_Avail() then
-			condTermFlagA := 1;
+			condTermFlagA := 0;
 		else	
 			if ( IS_P( GiveMbSliceTypeAddrA() ) or
 			     GiveMbSliceTypeAddrA() = SLICE_TYPE_I and GiveMbTypeAddrA() = 25 or
@@ -2639,7 +2639,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 		
 		if  not mbAddrB_Avail() then
-			condTermFlagA := 1;
+			condTermFlagA := 0;
 		else
 			if ( IS_P( GiveMbSliceTypeAddrB() ) or
 			     GiveMbSliceTypeAddrB() = SLICE_TYPE_I and GiveMbTypeAddrB() = 25 or
@@ -2662,7 +2662,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	begin
 		//FIXME add P_Skip and B_Skip
 		if not prevMbAddr_Avail() then
-			ctxIdxInc := 1;
+			ctxIdxInc := 0;
 		else
 			if ( GiveMbSliceTypePrevMbAddr() = SLICE_TYPE_I and GiveMbTypePrevMbAddr() = 25 or
 		          not IS_INxN( GiveMbSliceTypePrevMbAddr(), GiveMbTypePrevMbAddr() ) and GiveCBPLumaPrevMbAddr() = 0 and GiveCBPChromaPrevMbAddr() = 0 or
@@ -5062,16 +5062,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				mb_type := cabac_value();
 			end
 		end
+		
 		if slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI then mb_intra_flag := 1; end
 		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then if mb_type < 5 then mb_intra_flag := 0; else mb_type:= mb_type - 5; mb_intra_flag := 1; end end
 		if slice_type = SLICE_TYPE_B then if mb_type < 23 then mb_intra_flag := 0; else mb_type:= mb_type -23; mb_intra_flag := 1; end end
+		
+		//Update mbTab with the current type of mb and slice_type
+		mbTab[val_CurrMbAddr][mbSliceType] := slice_type;
+		mbTab[val_CurrMbAddr][mbTabMbtype] := mb_type;
+		
 	end
-/*
-	read_MB_layer_mb_type_not_done: action ==> 
-	guard
-		(entropy_coding_mode_flag[pps_id] = 0 and not vld_end()) or (entropy_coding_mode_flag[pps_id] = 1 and not cabac_end() )
-	end
-	*/
+
 	//if( mb_type = = I_PCM )
 	// while( !byte_aligned( ) )
 	read_MB_layer_I_PCM_alignement: action  ==>  IntraPredMode : [ 4 ]
