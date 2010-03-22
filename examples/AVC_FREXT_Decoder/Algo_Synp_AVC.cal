@@ -148,6 +148,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
 	function IS_P(int SliceType) --> bool : SliceType = SLICE_TYPE_P end
 	
+	
+	//Entropie decoding
+	function IS_CAVLC() --> bool: entropy_coding_mode_flag[pps_id] = 0 end
+	function IS_CABAC() --> bool: entropy_coding_mode_flag[pps_id] = 1 end
+	
 	//Cabac initialisation
 	bool Cabac_Start_Initialisation := false;
 	
@@ -196,6 +201,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	int ( size = 16 ) codIOffset;
 	
 	
+	//CBP
+	uint(size=6) coded_block_pattern;
+	
 	int qCodIRangeIdx;
 	
 	//CABAC Neighbouring
@@ -230,7 +238,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	bool NextBitToDeocde	:= true;
 	bool StartRenormDRead := false;
 	int getBitStreamValue;
-	
+	bool cbp_done := false;
 	//CABAC Decode Variables
 	/* Defines the Final Value of the Cabac Decoding Process and the Index of the Cabac Compare Tbale SynElVal */
 	int ValueIndex;
@@ -421,6 +429,31 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[ 2, 1, 1, 1 ]
 	];
 
+	List ( type: List ( type: int(size = 8), size = 5) , size = 16 ) synEval_CBP_Luma = 
+	[
+		[ 3, 0, 0, 0, 0 ],
+		[ 3, 1, 0, 0, 0 ],
+		[ 3, 0, 1, 0, 0 ],
+		[ 3, 1, 1, 0, 0 ],
+		[ 3, 0, 0, 1, 0 ],
+		[ 3, 1, 0, 1, 0 ],
+		[ 3, 0, 1, 1, 0 ],
+		[ 3, 1, 1, 1, 0 ],
+		[ 3, 0, 0, 0, 1 ],
+		[ 3, 1, 0, 0, 1 ],
+		[ 3, 0, 1, 0, 1 ],
+		[ 3, 1, 1, 0, 1 ],
+		[ 3, 0, 0, 1, 1 ],
+		[ 3, 1, 0, 1, 1 ],
+		[ 3, 0, 1, 1, 1 ],
+		[ 3, 1, 1, 1, 1 ]
+	];
+	List ( type: List ( type: int(size = 8), size = 3) , size = 3 ) synEval_CBP_Chroma = 
+	[
+		[ 0, 0, 0 ],
+		[ 1, 1, 0 ],
+		[ 1, 1, 1 ]	
+	];
 	
 	/* Max Binary Index */
 	int MaxBinIdx;
@@ -447,14 +480,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	int CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG	:= 13;
 	int CABAC_REM_INTRA4x4_8x8_PRED_MODE 		:= 14;
 	int CABAC_MB_FIELD_DECODING_FLAG 			:= 15;
-	int CABAC_CODED_BLOCK_PATERN 				:= 16;	
-	int CABAC_CODED_BLOCK_FLAG 					:= 17;
-	int CABAC_SIGNIFICANT_COEFF_FLAG 			:= 18;
-	int CABAC_LAST_SIGNIFICANT_COEFF_FLAG 		:= 19;
-	int CABAC_COEFF_ABS_LEVEL_MINUS1 			:= 20;
-	int CABAC_COEFF_SIGN_FLAG 					:= 21;
-	int CABAC_END_OF_SLICE_FLAG 				:= 22;
-	int CABAC_TRANSFORM_SIZE_8x8_FLAG 			:= 23;
+	int CABAC_CODED_BLOCK_PATERN_LUMA 			:= 16;
+	int CABAC_CODED_BLOCK_PATERN_CHROMA			:= 17;		
+	int CABAC_CODED_BLOCK_FLAG 					:= 18;
+	int CABAC_SIGNIFICANT_COEFF_FLAG 			:= 19;
+	int CABAC_LAST_SIGNIFICANT_COEFF_FLAG 		:= 20;
+	int CABAC_COEFF_ABS_LEVEL_MINUS1 			:= 21;
+	int CABAC_COEFF_SIGN_FLAG 					:= 22;
+	int CABAC_END_OF_SLICE_FLAG 				:= 23;
+	int CABAC_TRANSFORM_SIZE_8x8_FLAG 			:= 24;
 	
 	
 	
@@ -1805,6 +1839,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	begin
 		CabacStartProcess := true;
 	end 
+	procedure cabav_reinit()
+	begin
+		FoundSE := 0;
+	end
 	
 	function cabac_value() --> int:
 		ValueIndex
@@ -1847,6 +1885,23 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 		end
 		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA then
+			MaxBinIdx	:= synEval_CBP_Luma[ValueIndex][0];
+			synElVal[0]	:= MaxBinIdx;
+			foreach int s in Integers(1,MaxBinIdx + 1) do
+				synElVal[s] := synEval_CBP_Luma[ValueIndex][s];
+			end
+		end
+		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_CHROMA then
+			MaxBinIdx	:= synEval_CBP_Chroma[ValueIndex][0];
+			synElVal[0]	:= MaxBinIdx;
+			foreach int s in Integers(1,MaxBinIdx + 1) do
+				synElVal[s] := synEval_CBP_Chroma[ValueIndex][s];
+			end
+		end
+		
+		
 		//TODO other Syntax Element
 	end
 	
@@ -1865,9 +1920,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 	end
 	
-	procedure GetCabacCodedBlockPatternSyntaxElement()
+	procedure GetCabacCodedBlockPatternLumaSyntaxElement()
 	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_CODED_BLOCK_PATERN;
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_CODED_BLOCK_PATERN_LUMA;
+	end
+	
+	procedure GetCabacCodedBlockPatternChromaSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_CODED_BLOCK_PATERN_CHROMA;
 	end
 	
 	procedure GetCabacMbQpDeltaSyntaxElement()
@@ -2227,7 +2287,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			bypassFlag := false;
 		end
 		if ( SyntaxElement = CABAC_MB_TYPE_P_SP ) then
-			maxBinIdxCtx := 2 + 5;
+			maxBinIdxCtx := 2 + 5; //FIXME to change it throught the cabacparsing when binVal 1 --> put the correct ctxIdxOffset
 			ctxIdxOffset := 14 + 17;
 			bypassFlag := false;
 		end
@@ -2296,11 +2356,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			ctxIdxOffset := 70;
 			bypassFlag := false;
 		end
-		if ( SyntaxElement = CABAC_CODED_BLOCK_PATERN ) then
-			maxBinIdxCtx := 3+1; //FIXME prefix
-			ctxIdxOffset := 73+77;
+		if ( SyntaxElement = CABAC_CODED_BLOCK_PATERN_LUMA ) then
+			maxBinIdxCtx := 3; //FIXME prefix
+			ctxIdxOffset := 73;
 			bypassFlag := false;
 		end
+		if ( SyntaxElement = CABAC_CODED_BLOCK_PATERN_CHROMA ) then
+			maxBinIdxCtx := 1; //FIXME prefix
+			ctxIdxOffset := 77;
+			bypassFlag := false;
+		end
+		
 		if ( SyntaxElement = CABAC_CODED_BLOCK_FLAG ) then
 			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
 				maxBinIdxCtx := 0; //FIXME prefix
@@ -2433,7 +2499,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	// FIXME : Add the possibility to return false when the mbAddr belongs to another slice
 	function mbAddrAvailable( int mbAddrN ) --> bool : 
-		if ( ( mbAddrN < 0 ) or ( mbAddrN > val_CurrMbAddr ) )then 
+		if ( ( mbAddrN < 0 ) or ( mbAddrN > PicSizeInMbs ) )then 
 			false  //return 
 		else 
 			true  //return
@@ -2656,9 +2722,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	procedure ctxIdxincMbQpDelta()
-	var
-		int condTermFlagA,
-		int condTermFlagB
 	begin
 		//FIXME add P_Skip and B_Skip
 		if not prevMbAddr_Avail() then
@@ -2675,6 +2738,62 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 			 
 	end
+	
+	procedure ctxIdxCodedBlockPattern()
+	var
+		int condTermFlagA,
+		int condTermFlagB,
+		int temp
+	begin
+		if ctxIdxOffset = 73 then
+			// Not yet impemented for 8x8 luma blocks
+			if  not mbAddrA_Avail() then
+				condTermFlagA := 0;
+			end
+				
+		else
+			//if ctxIdxOffset = 77
+			if  not mbAddrA_Avail() then
+				condTermFlagA := 0;
+			else
+				if ( mbTab[GiveMbAddrA()][mbTabMbtype] = 25 and mbTab[GiveMbAddrA()][mbSliceType] = SLICE_TYPE_I ) then
+					condTermFlagA := 1;
+				end
+				
+				if ( binIdx = 0 and mbTab[GiveMbAddrA()][mbCBPChroma] = 0) or
+				   ( binIdx = 1 and mbTab[GiveMbAddrA()][mbCBPChroma] = 2) then
+					condTermFlagA := 0;
+				else
+					condTermFlagA := 1;
+				end
+			end
+			
+			if  not mbAddrB_Avail() then
+				condTermFlagB := 0;
+			else
+				if ( mbTab[GiveMbAddrB()][mbTabMbtype] = 25 and mbTab[GiveMbAddrB()][mbSliceType] = SLICE_TYPE_I ) then
+					condTermFlagB := 1;
+				end
+				
+				if ( binIdx = 0 and mbTab[GiveMbAddrB()][mbCBPChroma] = 0) or
+				   ( binIdx = 1 and mbTab[GiveMbAddrB()][mbCBPChroma] = 2) then
+					condTermFlagB := 0;
+				else
+					condTermFlagB := 1;
+				end
+			end
+		end
+		
+		if binIdx = 0 then
+			temp := 4;
+		else
+			temp := 0;
+		end
+		
+		ctxIdxInc := condTermFlagA + 2*condTermFlagB + temp;
+		
+	end
+	
 	//Derivation process for ctxIdx
 	procedure GetCtxIdx()
 	begin
@@ -2975,6 +3094,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				binIdx := -1;
 				ValueIndex := -1;
 				CabacStartProcess := false;
+				GetBinarizationFlag := false; 
+				NextBitToDeocde := true;
 			end
 			
 			if (CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I) and ValueIndex = 25 and FoundSE then
@@ -5060,6 +5181,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if entropy_coding_mode_flag[pps_id] = 1 then
 				mb_type := cabac_value();
+				//Reinitialize Cabac Process for the next call
+				cabav_reinit();
 			end
 		end
 		
@@ -5212,36 +5335,60 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	// if( MbPartPredMode( mb_type, 0 ) != Intra_16x16 )
 	read_MB_layer_coded_block_pattern: action ==>
 	guard
-	not IS_Intra_16x16()
+		not IS_Intra_16x16()
 	do
-		if  entropy_coding_mode_flag[pps_id] = 0 then
+		if  IS_CAVLC() then
 			start_vld();
 		
 		else 
-			if entropy_coding_mode_flag[pps_id] = 1 then
-				GetCabacCodedBlockPatternSyntaxElement();
+			if IS_CABAC() then
+				//Get CBP Luma
+				GetCabacCodedBlockPatternLumaSyntaxElement();
 				start_cabac();
 			end 
 		end
 	end
 
+	read_MB_layer_coded_block_pattern_done_cabac_luma: action ==>
+	guard
+		IS_CABAC() and cabac_end() and ( not cbp_done ) 
+	do
+		coded_block_pattern := cabac_value();
+		//get CBP Chroma
+		GetCabacCodedBlockPatternChromaSyntaxElement();
+		start_cabac();
+		cbp_done := true;
+	end
+	
 	read_MB_layer_coded_block_pattern_done: action ==> 
 	guard
-		vld_end() or cabac_end()
-	var 
-		uint(size=6) coded_block_pattern
+		( IS_CAVLC() and vld_end() ) or ( IS_CABAC() and cabac_end() and cbp_done )
+	var
+		int cbp_temp
 	do
 		
-		if entropy_coding_mode_flag[pps_id] = 0 then
+		if IS_CAVLC() then
 			coded_block_pattern := vld_me();
 		else 
-			if entropy_coding_mode_flag[pps_id] = 1 then
-				coded_block_pattern := cabac_value();
+			if IS_CABAC() then
+				
+				cbp_temp := cabac_value();
+				cbp_done := false;
+				if cbp_temp = 1 then
+					coded_block_pattern := coded_block_pattern + 16;
+				else
+					if cbp_temp = 2 then
+						coded_block_pattern := coded_block_pattern + 32;
+					end
+				end
 			end
 		end
 		
 		val_CodedBlockPatternLuma := coded_block_pattern mod 16;
 		CodedBlockPatternChroma := coded_block_pattern / 16;
+		
+		mbTab[val_CurrMbAddr][mbCBPLuma]	:= val_CodedBlockPatternLuma;
+		mbTab[val_CurrMbAddr][mbCBPChroma]	:= CodedBlockPatternChroma;
 		if( val_CodedBlockPatternLuma > 0 and 
 			transform_8x8_mode_flag[pps_id]=1 and 
 			slice_type != SLICE_TYPE_I and
@@ -6730,6 +6877,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		// --> mb_pred()	
 
 		read_MB_layer_coded_block_pattern					( read_MB_layer_coded_block_pattern					) --> read_MB_layer_coded_block_pattern_done;
+		read_MB_layer_coded_block_pattern_done				( read_MB_layer_coded_block_pattern_done_cabac_luma ) --> read_MB_layer_coded_block_pattern_done;
 		read_MB_layer_coded_block_pattern_done			    ( read_MB_layer_coded_block_pattern_done	        ) --> read_MB_layer_cbp_transform_size_8x8_flag_done;
 		read_MB_layer_cbp_transform_size_8x8_flag_done		( read_MB_layer_cbp_transform_size_8x8_flag_done	) --> read_MB_layer_mb_qp_delta;
 		read_MB_layer_coded_block_pattern					( read_MB_layer_skip_coded_block_pattern			) --> read_MB_layer_mb_qp_delta;
