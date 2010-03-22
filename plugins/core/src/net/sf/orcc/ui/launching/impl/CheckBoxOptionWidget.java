@@ -120,7 +120,6 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 
 		widgets = OptionWidgetManager.createOptions(launchConfigurationTab,
 				option.getOptions(), composite);
-		OptionWidgetManager.hideOptions(widgets);
 
 		hide();
 	}
@@ -170,7 +169,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 		checkBox.setVisible(true);
 		((GridData) checkBox.getLayoutData()).exclude = false;
 
-		showComposite(true);
+		showComposite(value);
 	}
 
 	private void showComposite(boolean show) {
@@ -194,7 +193,6 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 			OptionWidgetManager.showOptions(widgets);
 		} else {
 			showComposite(false);
-			OptionWidgetManager.hideOptions(widgets);
 		}
 		launchConfigurationTab.updateLaunchConfigurationDialog();
 	}
