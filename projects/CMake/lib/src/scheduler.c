@@ -3,6 +3,8 @@
 #include "fifo.h"
 #include "scheduler.h"
 
+#include <stdio.h>
+
 ///////////////////////////////////////////////////////////////////////////////
 // List allocation
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,6 +36,7 @@ static struct list_head* new_list() {
 		if (next_free == pool_size) {
 			next_free = 0;
 		}
+		some_list_head = &list_pool[next_free];
 	}
 
 	return new_list_head;
@@ -73,52 +76,42 @@ static __inline void list_internal_remove(struct list_head *prev, struct list_he
 
 static __inline void list_remove(struct list_head *entry) {
 	list_internal_remove(entry->prev, entry->next);
+	delete_list(entry);
 }
 
 static __inline int list_is_empty(struct list_head *list) {
 	return list == list->next;
 }
 
+static __inline void list_init(struct list_head *list) {
+	list->prev = list;
+	list->next = list;
+	list->payload = NULL;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduling functions
 ///////////////////////////////////////////////////////////////////////////////
 
-/**
- * Initializes the given scheduler.
- */
-void scheduler_init(struct scheduler *sched, int num_actors, struct actor **actors) {
-	struct list_head *list = &(sched->sched1);
-	sched->actors = actors;
-	sched->num_actors = num_actors;
-
-	list->next = list;
-	list->prev = list;
-	list->payload = NULL;
-}
-
-void add_schedulable(struct scheduler *sched, struct actor *actor) {
+void sched_add_schedulable(struct scheduler *sched, struct actor *actor) {
 	struct list_head *list = new_list();
 	list->payload = actor;
-	list_add_tail(&(sched->sched1), list);
+	list_add_tail(&(sched->schedulable), list);
 }
 
-int is_schedulable(struct actor *actor) {
-	int i;
-	for (i = 0; i < actor->num_inputs; i++) {
-		if (!hasTokens(actor->inputs[i]->fifo, 1)) {
-			return 0;
-		}
-	}
-
-	return 1;
+void sched_add_scheduled(struct scheduler *sched, struct actor *actor) {
+	struct list_head *list = new_list();
+	list->payload = actor;
+	list_add_tail(&(sched->scheduled), list);
+	printf("scheduled actor: %s\n", actor->name);
 }
 
 /**
  * Returns the next schedulable actor, or NULL if no actor is schedulable.
  * The actor is removed from the schedulable list.
  */
-struct actor *get_next_schedulable(struct scheduler *sched) {
-	struct list_head *list = &(sched->sched1);
+struct actor *sched_get_next_schedulable(struct scheduler *sched) {
+	struct list_head *list = &(sched->schedulable);
 	struct list_head *first;
 	struct actor *actor;
 
@@ -129,9 +122,52 @@ struct actor *get_next_schedulable(struct scheduler *sched) {
 	first = list->next;
 	actor = (struct actor *)first->payload;
 	list_remove(first);
-	delete_list(first);
 
 	return actor;
+}
+
+/**
+ * Initializes the given scheduler.
+ */
+void sched_init(struct scheduler *sched, int num_actors, struct actor **actors) {
+	struct list_head *list = &(sched->schedulable);
+	sched->actors = actors;
+	sched->num_actors = num_actors;
+
+	list_init(&(sched->schedulable));
+	list_init(&(sched->scheduled));
+}
+
+/**
+ * returns true if this actor is schedulable
+ */
+int sched_is_schedulable(struct actor *actor) {
+	int i;
+	for (i = 0; i < actor->num_inputs; i++) {
+		if (!hasTokens(actor->inputs[i]->fifo, 1)) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+void sched_promote(struct scheduler *sched) {
+	struct list_head *from = &(sched->scheduled);
+	struct list_head *to = &(sched->schedulable);
+	struct list_head *elt;
+
+	elt = from->next;
+	while (elt != from) {
+		struct list_head *new_elt = new_list();
+		struct list_head *next = elt->next;
+
+		new_elt->payload = elt->payload;
+		list_add_tail(to, new_elt);
+		list_remove(elt);
+
+		elt = next;
+	}
 }
 
 /**
@@ -140,15 +176,19 @@ struct actor *get_next_schedulable(struct scheduler *sched) {
 static void update_fifo(struct fifo_s *fifo) {
 	int num_tokens = fifo->write_ptr - fifo->read_ptr;
 	if (num_tokens == 0) {
+		// go back to the beginning
 		fifo->read_ptr = 0;
 		fifo->write_ptr = 0;
 	} else {
-		if (fifo->read_ptr >= num_tokens) {
-			// there is room to copy the not-read-yet tokens at the beginning of the FIFO
-			memcpy(fifo->contents, contents(fifo, fifo->read_ptr), num_tokens * fifo->elt_size);
-			fifo->read_ptr = 0;
-			fifo->write_ptr = num_tokens;
-		}
+		//if (num_tokens >= fifo->size / 2) {
+			// FIFO more than half-full, let us move these tokens back
+			if (fifo->read_ptr >= num_tokens) {
+				// there is room to copy the not-read-yet tokens at the beginning of the FIFO
+				memcpy(fifo->contents, contents(fifo, fifo->read_ptr), num_tokens * fifo->elt_size);
+				fifo->read_ptr = 0;
+				fifo->write_ptr = num_tokens;
+			}
+		//}
 	}
 }
 
@@ -169,4 +209,6 @@ void update_fifos(struct scheduler *sched) {
 			update_fifo(conn->fifo);
 		}
 	}
+
+	printf("\n");
 }

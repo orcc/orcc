@@ -36,6 +36,7 @@ struct conn_s {
 };
 
 struct actor {
+	char *name;
 	int (*sched_func)();
 	int num_inputs;
 	int num_outputs;
@@ -53,29 +54,36 @@ struct list_head {
 struct scheduler {
 	int num_actors;
 	struct actor **actors;
-	struct list_head sched1;
-	struct list_head sched2;
+	struct list_head schedulable;
+	struct list_head scheduled;
 };
 
 /**
  * Initializes the given scheduler.
  */
-void scheduler_init(struct scheduler *sched, int num_actors, struct actor **actors);
+void sched_init(struct scheduler *sched, int num_actors, struct actor **actors);
 
 /**
  * add the actor to the schedulable list
  */
-void add_schedulable(struct scheduler *sched, struct actor *actor);
+void sched_add_schedulable(struct scheduler *sched, struct actor *actor);
+
+/**
+ * add the actor to the scheduled list
+ */
+void sched_add_scheduled(struct scheduler *sched, struct actor *actor);
 
 /**
  * returns the next schedulable actor
  */
-struct actor *get_next_schedulable(struct scheduler *sched);
+struct actor *sched_get_next_schedulable(struct scheduler *sched);
+
+void sched_promote(struct scheduler *sched);
 
 /**
  * returns true if this actor is schedulable
  */
-int is_schedulable(struct actor *actor);
+int sched_is_schedulable(struct actor *actor);
 
 /**
  * updates FIFOs: move read/write pointers.

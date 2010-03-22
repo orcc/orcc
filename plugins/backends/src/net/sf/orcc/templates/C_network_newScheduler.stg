@@ -4,7 +4,7 @@ group C_network_newScheduler : C_network;
 // Declare actors
 
 declareActor(instance) ::= <<
-struct actor $instance.id$ = {$instance.id$_scheduler};
+struct actor $instance.id$ = {"$instance.id$", $instance.id$_scheduler};
 
 >>
 
@@ -130,10 +130,11 @@ $declareBroadcasts(network.broadcasts)$
 // Action schedulers
 $declareInitializes(network.instances)$
 $declareSchedulers(network.instances)$
+
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of a struct actor for each actor
-$declareActors(network.instances)$
 
+$declareActors(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the successors of each actor
 
@@ -167,10 +168,10 @@ static void scheduler() {
 	// initializes the actors that need it
 	$printInitializes(network.instances)$
 	// initialize scheduler
-	scheduler_init(&my_scheduler, sizeof(actors) / sizeof(actors[0]), actors);
+	sched_init(&my_scheduler, sizeof(actors) / sizeof(actors[0]), actors);
 
-	add_schedulable(&my_scheduler, &source);
-	my_actor = get_next_schedulable(&my_scheduler);
+	sched_add_schedulable(&my_scheduler, &source);
+	my_actor = sched_get_next_schedulable(&my_scheduler);
 	while (my_actor != NULL) {
 		while (my_actor != NULL) {
 			int num_firings = my_actor->sched_func();
@@ -180,18 +181,20 @@ static void scheduler() {
 
 				for (i = 0; i < my_actor->num_successors; i++) {
 					struct actor *succ = my_actor->successors[i];
-					if (is_schedulable(succ)) {
-						add_schedulable(&my_scheduler, succ);
+					if (sched_is_schedulable(succ)) {
+						sched_add_schedulable(&my_scheduler, succ);
 					}
 				}
+				
+				sched_add_scheduled(&my_scheduler, my_actor);
 			}
 
-			my_actor = get_next_schedulable(&my_scheduler);
+			my_actor = sched_get_next_schedulable(&my_scheduler);
 		}
 
 		update_fifos(&my_scheduler);
-		add_schedulable(&my_scheduler, &source);
-		my_actor = get_next_schedulable(&my_scheduler);
+		sched_promote(&my_scheduler);
+		my_actor = sched_get_next_schedulable(&my_scheduler);
 	}
 }
 
