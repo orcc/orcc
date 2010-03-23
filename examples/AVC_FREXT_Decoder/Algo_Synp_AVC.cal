@@ -244,6 +244,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//CABAC Decode Variables
 	/* Defines the Final Value of the Cabac Decoding Process and the Index of the Cabac Compare Tbale SynElVal */
 	int ValueIndex;
+	uint CabacValue;
 	/* Defines the number of bins to Read, used as BinsToRead: = synElVal[ValueIndex][0] */
 	int BinsToRead;
 	
@@ -1841,13 +1842,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	begin
 		CabacStartProcess := true;
 	end 
-	procedure cabav_reinit()
+	
+	//TODO to merge with start_cabac()
+	procedure cabac_reinit()
 	begin
 		FoundSE := 0;
 	end
 	
-	function cabac_value() --> int:
-		ValueIndex
+	function cabac_value() --> uint:
+		CabacValue
 	end	
 	
 	function cabac_end() --> bool:
@@ -3220,6 +3223,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			
 			if FoundSE then
 				binIdx := -1;
+				//Save cabac value
+				CabacValue := ValueIndex;
 				ValueIndex := -1;
 				CabacStartProcess := false;
 				GetBinarizationFlag := false; 
@@ -3290,7 +3295,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		codIRange := codIRange - codIRangeLPS;
 		
 		if codIOffset >= codIRange then
-			binVal     := intXOR(valMPS);
+			binVal     := intXOR(valMPS[ctxIdx]);
 			codIOffset := codIOffset - codIRange;
 			codIRange  := codIRangeLPS;
 			
@@ -5310,7 +5315,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			if entropy_coding_mode_flag[pps_id] = 1 then
 				mb_type := cabac_value();
 				//Reinitialize Cabac Process for the next call
-				cabav_reinit();
+				cabac_reinit();
 			end
 		end
 		
@@ -5460,6 +5465,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else
 			if IS_CABAC() then
 				transform_size_8x8_flag := cabac_value();
+				//Reinitialize Cabac Process for the next call
+				cabac_reinit();
 			end
 		end
 	end
@@ -5494,6 +5501,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		IS_CABAC() and cabac_end() and ( not cbp_done ) 
 	do
 		cbp_cabac := cabac_value();
+		//Reinitialize Cabac Process for the next call
+		cabac_reinit();
 		//get CBP Chroma
 		//Start cabac for CBP chroma Syntax element
 		GetCabacCodedBlockPatternChromaSyntaxElement();
@@ -5515,6 +5524,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			if IS_CABAC() then
 				
 				cbp_temp := cabac_value();
+				//Reinitialize Cabac Process for the next call
+				cabac_reinit();
 				cbp_done := false;
 				if cbp_temp = 1 then
 					coded_block_pattern := cbp_cabac + 16;
@@ -5560,6 +5571,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			else
 				if IS_CABAC() then
 					transform_size_8x8_flag := cabac_value();
+					//Reinitialize Cabac Process for the next call
+					cabac_reinit();
 				end
 			end
 		end 
@@ -5601,6 +5614,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if entropy_coding_mode_flag[pps_id] = 1 then
 				mb_qp_delta := cabac_value();
+				//Reinitialize Cabac Process for the next call
+				cabac_reinit();
 			end
 		end
 		
@@ -5877,7 +5892,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		
 		
-		if  entropy_coding_mode_flag[pps_id] = 0 then
+		if  IS_CAVLC() then
 			luma4x4BlkIdx := 0;
 			set_bits_to_read(1);
 		
@@ -5904,6 +5919,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if entropy_coding_mode_flag[pps_id] = 1 then
 				prev_intra4x4_pred_mode_flag := cabac_value();
+				//Reinitialize Cabac Process for the next call
+				cabac_reinit();
 				
 				if prev_intra4x4_pred_mode_flag = 0 then 
 					GetCabacRemIntra4x4_8x8PredModeSyntaxElement();
@@ -5925,6 +5942,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if entropy_coding_mode_flag[pps_id] = 1 then
 				rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := cabac_value();
+				//Reinitialize Cabac Process for the next call
+				cabac_reinit();
 				luma4x4BlkIdx := luma4x4BlkIdx +1;
 				//FIXME maybe create a state variable to loop until luma4x4BlkIdx = 16
 			end
@@ -6033,6 +6052,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else
 			if entropy_coding_mode_flag[pps_id] = 1 then
 			intra_chroma_pred_mode := cabac_value();
+			//Reinitialize Cabac Process for the next call
+			cabac_reinit();
 			end
 		end
 			
