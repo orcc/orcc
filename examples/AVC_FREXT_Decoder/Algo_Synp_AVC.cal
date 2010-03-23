@@ -168,8 +168,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	uint binVal;
 	
 		/* List Used as a result for Binarization */
-	List ( type: uint(size=2), size=128 ) synElVal;
-	List ( type: uint(size=2), size=128 ) ReadBinString;
+	List ( type: uint(size=2), size=128 ) synElVal := [ 0 : for int i in Integers( 0, 127)];
+	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 127)];
 	
 	
 	//Cabac intialisation process for the arithmetic decoding engine
@@ -210,33 +210,35 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	/*
 		mbTab := [ Address ][ Availability, mbSliceType, mb_type, IntraChromaPredMode, mbQpDelta, mbCBPLuma, mbCBPChroma ]
 	*/
-	List ( type: List ( type: int, size = 7) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 6)] : for int j in Integers( 0, 254)];
+	List ( type: List ( type: int, size = 8) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 6)] : for int j in Integers( 0, 254)];
 	
-    int mbTabAvail  := 0;
-	int mbSliceType := 1;
-	int mbTabMbtype := 2;
-	int mbIntraChromaPredMode := 3;
-	int mbQpDelta := 4;
-	int mbCBPLuma := 5;
-	int mbCBPChroma := 6;
+    int mbTabAvail				:= 0;
+	int mbSliceType				:= 1;
+	int mbTabMbtype				:= 2;
+	int mbIntraChromaPredMode	:= 3;
+	int mbQpDelta				:= 4;
+	int mbCBPLuma				:= 5;
+	int mbCBPChroma				:= 6;
+	int mbTransSize8x8Flag		:= 7;
 	
 	//CABAC Process Conditions 
-	bool FirstSEinSlice		   := true;
-	bool CabacStartProcess	   := false;
-	bool ReadBitsBeforeInit    := true;
-	bool CabacFirstBitToDecode := true;
-	bool FoundSE		       := false;
-	bool CabacInitializationFinished := false;
-	bool StartRenormD		   := false;
-	bool StartInitializationDecoding := false;
-	bool StartCabacInit := false;
-	bool GetBinarizationFlag := false;
-	bool binValDecoded := false;
-	bool StartDecodeTerminate := false;
-	bool StartDecodeDecision := false;
-	bool StartDecodeBypass := false;
-	bool NextBitToDeocde	:= true;
-	bool StartRenormDRead := false;
+	bool FirstSEinSlice					:= true;
+	bool CabacStartProcess				:= false;
+	bool ReadBitsBeforeInit				:= true;
+	bool CabacFirstBitToDecode			:= true;
+	bool FoundSE		       			:= false;
+	bool CabacInitializationFinished	:= false;
+	bool StartRenormD					:= false;
+	bool StartInitializationDecoding	:= false;
+	bool StartCabacInit					:= false;
+	bool GetBinarizationFlag			:= false;
+	bool binValDecoded					:= false;
+	bool StartDecodeTerminate			:= false;
+	bool StartDecodeDecision			:= false;
+	bool StartDecodeBypass				:= false;
+	bool NextBitToDeocde				:= true;
+	bool StartRenormDRead				:= false;
+	
 	int getBitStreamValue;
 	bool cbp_done := false;
 	//CABAC Decode Variables
@@ -1901,6 +1903,30 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 		end
 		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG then
+			MaxBinIdx	:= synEval_Coded_Bloc_Flag[ValueIndex][0];
+			synElVal[0]	:= MaxBinIdx;
+			foreach int s in Integers(1,MaxBinIdx + 1) do
+				synElVal[s] := synEval_Coded_Bloc_Flag[ValueIndex][s];
+			end
+		end
+		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE then
+			MaxBinIdx	:= synEval_Rem_Intra_4x4_8x8_Pred_Mode[ValueIndex][0];
+			synElVal[0]	:= MaxBinIdx;
+			foreach int s in Integers(1,MaxBinIdx + 1) do
+				synElVal[s] := synEval_Rem_Intra_4x4_8x8_Pred_Mode[ValueIndex][s];
+			end
+		end
+				
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_TRANSFORM_SIZE_8x8_FLAG then
+			MaxBinIdx	:= synEval_Coded_Bloc_Flag[ValueIndex][0];
+			synElVal[0]	:= MaxBinIdx;
+			foreach int s in Integers(1,MaxBinIdx + 1) do
+				synElVal[s] := synEval_Coded_Bloc_Flag[ValueIndex][s];
+			end
+		end
+		
 		
 		//TODO other Syntax Element
 	end
@@ -1949,6 +1975,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	begin
 		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_INTRA_CHROMA_PRED_MODE;
 	end
+	
+	procedure GetCabacTransSize8x8FlagSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_TRANSFORM_SIZE_8x8_FLAG;
+	end
+	
 	/* For each CABAC Syntax Element*/
 	/*
 	action ==>
@@ -2753,7 +2785,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				
 		else
 			//if ctxIdxOffset = 77
-			if  not mbAddrA_Avail() then
+			if not mbAddrA_Avail() then
 				condTermFlagA := 0;
 			else
 				if ( mbTab[GiveMbAddrA()][mbTabMbtype] = 25 and mbTab[GiveMbAddrA()][mbSliceType] = SLICE_TYPE_I ) then
@@ -2768,7 +2800,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				end
 			end
 			
-			if  not mbAddrB_Avail() then
+			if not mbAddrB_Avail() then
 				condTermFlagB := 0;
 			else
 				if ( mbTab[GiveMbAddrB()][mbTabMbtype] = 25 and mbTab[GiveMbAddrB()][mbSliceType] = SLICE_TYPE_I ) then
@@ -2793,6 +2825,29 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		ctxIdxInc := condTermFlagA + 2*condTermFlagB + temp;
 		
 	end
+	
+	procedure ctxIdxTransSize8x8Flag()
+	var
+		int condTermFlagA,
+		int condTermFlagB
+	begin
+		if not mbAddrA_Avail() then
+				condTermFlagA := 0;
+		else
+			if mbTab[GiveMbAddrA()][mbTransSize8x8Flag] = 0 then
+				condTermFlagA := 1;
+			end
+		end
+		if not mbAddrB_Avail() then
+				condTermFlagB := 0;
+		else
+			if mbTab[GiveMbAddrB()][mbTransSize8x8Flag] = 0 then
+				condTermFlagB := 1;
+			end
+		end
+		ctxIdxInc := condTermFlagA + 2*condTermFlagB;
+	end
+	
 	
 	//Derivation process for ctxIdx
 	procedure GetCtxIdx()
@@ -2982,7 +3037,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		if ( ctxIdxOffset = 399 ) then
 			if (binIdx = 0 ) then
-				//To be done (subclause 9.3.3.1.10)
+				ctxIdxTransSize8x8Flag();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			end 
 		end
@@ -5312,15 +5367,28 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		NumMbPart() != 4, // NumMbPart() tests the slice_type and return 0 if slice_type is I or SI
 		transform_8x8_mode_flag[pps_id] = 1 and IS_Intra_4x4()
 	do
-		set_bits_to_read(1);
+		if IS_CAVLC() then
+			set_bits_to_read(1);
+		else
+			if IS_CABAC() then
+				GetCabacTransSize8x8FlagSyntaxElement();
+				start_cabac();
+			end
+		end
 	end
 
 	read_MB_layer_transform_size_8x8_flag_done: action ==>
 	guard
 		NumMbPart() != 4,
-		done_reading_bits()
+		(IS_CAVLC() and done_reading_bits() ) or ( IS_CABAC() and cabac_end() )
 	do
-		transform_size_8x8_flag := read_result();
+		if IS_CAVLC() then
+			transform_size_8x8_flag := read_result();
+		else
+			if IS_CABAC() then
+				transform_size_8x8_flag := cabac_value();
+			end
+		end
 	end
 
 	// else
@@ -5397,17 +5465,31 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			slice_type != SLICE_TYPE_I and
 			noSubMbPartSizeLessThan8x8Flag =1 and
 			(( slice_type = SLICE_TYPE_B and mb_type = 0) or direct_8x8_interference_flag[sps_id]=1 ) )then 
-				set_bits_to_read(1); 
+				if IS_CAVLC() then
+					set_bits_to_read(1); 
+				else
+					if IS_CABAC() then
+						GetCabacTransSize8x8FlagSyntaxElement();
+						start_cabac();
+					end
+				end
 		end
 	end
 
 	//if( val_CodedBlockPatternLuma > 0 && transform_8x8_mode_flag && mb_type != I_NxN && noSubMbPartSizeLessThan8x8Flag && ( mb_type != B_Direct_16x16 | | direct_8x8_inference_flag ) ) 
 	read_MB_layer_cbp_transform_size_8x8_flag_done: action ==>
 	guard
-		done_reading_bits()
+		(IS_CAVLC() and done_reading_bits() ) or ( IS_CABAC() and cabac_end() )
 	do
 		if( val_CodedBlockPatternLuma > 0 and transform_8x8_mode_flag[pps_id]=1 and not IS_Intra_4x4()and not IS_Intra_8x8() and noSubMbPartSizeLessThan8x8Flag =1 and (( slice_type = SLICE_TYPE_B and mb_type = 0) or direct_8x8_interference_flag[sps_id]=1 ) )then
-		transform_size_8x8_flag := read_result(); end 
+			if IS_CAVLC() then
+				transform_size_8x8_flag := read_result();
+			else
+				if IS_CABAC() then
+					transform_size_8x8_flag := cabac_value();
+				end
+			end
+		end 
 	end
 	//end if
 
