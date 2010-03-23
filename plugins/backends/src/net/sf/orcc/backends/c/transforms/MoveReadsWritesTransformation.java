@@ -79,16 +79,16 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 		List<CFGNode> nodes = procedure.getNodes();
 
 		// add writes at the beginning of the node list, and read at the ends
-		BlockNode.getFirst(procedure, nodes).getInstructions().addAll(0, writes);
-		List<Instruction> instructions = BlockNode.getLast(procedure, nodes).getInstructions();
-		if (instructions.size()> 0){
-			//Put readend nodes before return instruction 
-			instructions.addAll(instructions.size()-1,readEnds);
-		}
+		BlockNode.getFirst(procedure, nodes).getInstructions()
+				.addAll(0, writes);
+
+		// Put readend nodes before return instruction
+		List<Instruction> instructions = BlockNode.getLast(procedure, nodes)
+				.getInstructions();
+		instructions.addAll(instructions.size(), readEnds);
 
 		// clears the lists
 		writes.clear();
 		readEnds.clear();
 	}
-
 }
