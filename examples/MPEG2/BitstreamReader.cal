@@ -45,7 +45,7 @@ uint(size=32) DataOut :
 	uint(size=8) CTRL_NB_BITS = 0x3F;
 	
 	// Position of barrel shifter
-	uint(size=5) bit_pos := 0;
+	int(size=7) bit_pos := 0;
 
 	// Currently bitwise word to be read from input bitstream
 	uint(size=32) curr_32;
@@ -72,28 +72,30 @@ uint(size=32) DataOut :
 	
 	procedure show_bits(uint(size=6) nb_bits)
 	var
-		uint(size=33) temp_33
+		uint(size=32) temp_32
 	begin
 		if ((32 - bit_pos) >= nb_bits) then
-			temp_33 := curr_32 >> ((32 - bit_pos) - nb_bits);
-			temp_33 := temp_33 & ((1 << nb_bits) - 1);
+			next_bits := curr_32 >> ((32 - bit_pos) - nb_bits);
+			if nb_bits != 32 then
+				next_bits := next_bits & ((1 << nb_bits) - 1);
+			end
 		else
-			temp_33 := curr_32;
-			temp_33 := temp_33 & ((1 << (32 - bit_pos)) - 1);
-			next_bits := temp_33 << (nb_bits - (32 - bit_pos));
-			temp_33 := next_32 >> (32 - (nb_bits - (32 - bit_pos)));
-			temp_33 := temp_33 & ((1 << (nb_bits - (32 - bit_pos))) - 1);
-			temp_33 := next_bits | temp_33;
-			temp_33 := temp_33 & ((1 << nb_bits) - 1);
+			next_bits := curr_32;
+			next_bits := next_bits & ((1 << (32 - bit_pos)) - 1);
+			next_bits := next_bits << (nb_bits - (32 - bit_pos));
+			temp_32 := next_32 >> (32 - (nb_bits - (32 - bit_pos)));
+			temp_32 := temp_32 & ((1 << (nb_bits - (32 - bit_pos))) - 1);
+			next_bits := next_bits | temp_32;
+			if nb_bits != 32 then
+				next_bits := next_bits & ((1 << nb_bits) - 1);
+			end
 		end
-		next_bits := temp_33;
 	end
 
 	procedure flush_bits(uint(size=6) nb_bits)
 	begin
 		if (((32 - bit_pos) - nb_bits) > 0) then
 			bit_pos := bit_pos + nb_bits;
-			bit_pos := bit_pos & 0x1F;
 			need_data := false;
 		else
 		// End of current word, get next 32 bits
@@ -101,6 +103,7 @@ uint(size=32) DataOut :
 			bit_pos := nb_bits - (32 - bit_pos);
 			need_data := true;
 		end
+		bit_pos := bit_pos & 0x1F;
 	end
 
 	///////////////////////////////////////////////////////////////////////////
