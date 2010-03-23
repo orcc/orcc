@@ -148,7 +148,7 @@ public class Connection implements IAttributeContainer {
 		IAttribute attr = getAttribute(Connection.BUFFER_SIZE);
 		if (attr != null && attr.getType() == IAttribute.VALUE) {
 			Expression expr = ((IValueAttribute) attr).getValue();
-			return new ExpressionEvaluator().evaluateAsInteger(expr) + 1;
+			return new ExpressionEvaluator().evaluateAsInteger(expr);
 		} else {
 			return "SIZE";
 		}
