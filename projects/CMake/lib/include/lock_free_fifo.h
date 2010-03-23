@@ -26,8 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef FIFO_H
-#define FIFO_H
+#ifndef LOCK_FREE_FIFO_H
+#define LOCK_FREE_FIFO_H
 
 #include <string.h>
 #include <stdlib.h>
@@ -56,7 +56,9 @@ static struct fifo_s {
 	char* malloc_ptrP;
 };
 
-
+// declare FIFO with a size equal to ((size) + 1)
+#define DECLARE_FIFO(type, size, count) static char array_##count[((size) + 1) * sizeof(type)]; \
+static struct fifo_s fifo_##count = { sizeof(type), ((size) + 1), array_##count, 0, 0 };
 
 #define contents(fifo, ptr) (& (fifo)->contents[(ptr) * (fifo)->elt_size])
 

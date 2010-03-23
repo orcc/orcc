@@ -39,6 +39,9 @@ struct fifo_s {
 	int write_ptr;
 };
 
+#define DECLARE_FIFO(type, size, count) static char array_##count[(size) * sizeof(type)]; \
+static struct fifo_s fifo_##count = { sizeof(type), size, array_##count, 0, 0 };
+
 #define contents(fifo, ptr) (& (fifo)->contents[(ptr) * (fifo)->elt_size])
 
 static void *getPeekPtr(struct fifo_s *fifo, int n) {
