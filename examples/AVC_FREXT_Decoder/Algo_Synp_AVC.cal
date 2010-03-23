@@ -202,7 +202,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	
 	//CBP
-	uint(size=6) coded_block_pattern;
+	uint (size=6) cbp_cabac;
 	
 	int qCodIRangeIdx;
 	
@@ -210,7 +210,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	/*
 		mbTab := [ Address ][ Availability, mbSliceType, mb_type, IntraChromaPredMode, mbQpDelta, mbCBPLuma, mbCBPChroma ]
 	*/
-	List ( type: List ( type: int, size = 7) , size = PICHEIGHT ) mbTab;
+	List ( type: List ( type: int, size = 7) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 6)] : for int j in Integers( 0, 254)];
 	
     int mbTabAvail  := 0;
 	int mbSliceType := 1;
@@ -5335,26 +5335,26 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	// if( MbPartPredMode( mb_type, 0 ) != Intra_16x16 )
 	read_MB_layer_coded_block_pattern: action ==>
 	guard
-		not IS_Intra_16x16()
+	not IS_Intra_16x16()
 	do
 		if  IS_CAVLC() then
 			start_vld();
 		
 		else 
 			if IS_CABAC() then
-				//Get CBP Luma
 				GetCabacCodedBlockPatternLumaSyntaxElement();
 				start_cabac();
 			end 
 		end
 	end
 	
-	read_MB_layer_coded_block_pattern_done_cabac_luma: action ==>
+	read_MB_layer_coded_block_pattern_start_cabac_chroma: action ==>
 	guard
 		IS_CABAC() and cabac_end() and ( not cbp_done ) 
 	do
-		coded_block_pattern := cabac_value();
+		cbp_cabac := cabac_value();
 		//get CBP Chroma
+		//Start cabac for CBP chroma Syntax element
 		GetCabacCodedBlockPatternChromaSyntaxElement();
 		start_cabac();
 		cbp_done := true;
@@ -5362,12 +5362,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	read_MB_layer_coded_block_pattern_done: action ==> 
 	guard
-		( IS_CAVLC() and vld_end() ) or ( IS_CABAC() and cabac_end() and cbp_done )
-	var
-		int cbp_temp
+		( IS_CAVLC() and vld_end() ) or ( IS_CABAC() and cabac_end() )
+	var 
+		uint(size=6) coded_block_pattern,
+		uint(size=6) cbp_temp
 	do
 		
-		if IS_CAVLC() then
+		if  IS_CAVLC() then
 			coded_block_pattern := vld_me();
 		else 
 			if IS_CABAC() then
@@ -5375,12 +5376,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				cbp_temp := cabac_value();
 				cbp_done := false;
 				if cbp_temp = 1 then
-					coded_block_pattern := coded_block_pattern + 16;
+					coded_block_pattern := cbp_cabac + 16;
 				else
 					if cbp_temp = 2 then
-						coded_block_pattern := coded_block_pattern + 32;
+						coded_block_pattern := cbp_cabac + 32;
 					end
 				end
+				cbp_done := false;
 			end
 		end
 		
@@ -5389,6 +5391,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		mbTab[val_CurrMbAddr][mbCBPLuma]	:= val_CodedBlockPatternLuma;
 		mbTab[val_CurrMbAddr][mbCBPChroma]	:= CodedBlockPatternChroma;
+		
 		if( val_CodedBlockPatternLuma > 0 and 
 			transform_8x8_mode_flag[pps_id]=1 and 
 			slice_type != SLICE_TYPE_I and
@@ -6877,7 +6880,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		// --> mb_pred()	
 
 		read_MB_layer_coded_block_pattern					( read_MB_layer_coded_block_pattern					) --> read_MB_layer_coded_block_pattern_done;
-		read_MB_layer_coded_block_pattern_done				( read_MB_layer_coded_block_pattern_done_cabac_luma ) --> read_MB_layer_coded_block_pattern_done;
+		read_MB_layer_coded_block_pattern_done				( read_MB_layer_coded_block_pattern_start_cabac_chroma ) --> read_MB_layer_coded_block_pattern_done;
 		read_MB_layer_coded_block_pattern_done			    ( read_MB_layer_coded_block_pattern_done	        ) --> read_MB_layer_cbp_transform_size_8x8_flag_done;
 		read_MB_layer_cbp_transform_size_8x8_flag_done		( read_MB_layer_cbp_transform_size_8x8_flag_done	) --> read_MB_layer_mb_qp_delta;
 		read_MB_layer_coded_block_pattern					( read_MB_layer_skip_coded_block_pattern			) --> read_MB_layer_mb_qp_delta;
