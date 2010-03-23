@@ -61,6 +61,8 @@ public class Network {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
+	private Map<Instance, List<Connection>> incomingMap;
+
 	private OrderedMap<Port> inputs;
 
 	private String name;
@@ -135,21 +137,31 @@ public class Network {
 		}
 
 		successorsMap = new HashMap<Instance, List<Instance>>();
+		incomingMap = new HashMap<Instance, List<Connection>>();
 		outgoingMap = new HashMap<Instance, List<Connection>>();
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
-				Set<Connection> connections = graph.outgoingEdgesOf(vertex);
+				// incoming edges
+				Set<Connection> connections = graph.incomingEdgesOf(vertex);
+				List<Connection> incoming = Arrays.asList(connections
+						.toArray(new Connection[0]));
+				incomingMap.put(vertex.getInstance(), incoming);
+
+				// outgoing edges
+				connections = graph.outgoingEdgesOf(vertex);
+				List<Connection> outgoing = Arrays.asList(connections
+						.toArray(new Connection[0]));
+				outgoingMap.put(vertex.getInstance(), outgoing);
+
+				// compute successors
 				Set<Instance> successors = new HashSet<Instance>();
-				List<Connection> outgoing = new ArrayList<Connection>();
 				for (Connection connection : connections) {
-					outgoing.add(connection);
 					Vertex target = graph.getEdgeTarget(connection);
 					if (target.isInstance()) {
 						successors.add(target.getInstance());
 					}
 				}
 
-				outgoingMap.put(vertex.getInstance(), outgoing);
 				List<Instance> successorsList = Arrays.asList(successors
 						.toArray(new Instance[0]));
 				successorsMap.put(vertex.getInstance(), successorsList);
@@ -234,6 +246,17 @@ public class Network {
 	}
 
 	/**
+	 * Returns a map that associates each instance to the list of its incoming
+	 * edges.
+	 * 
+	 * @return a map that associates each instance to the list of its incoming
+	 *         edges
+	 */
+	public Map<Instance, List<Connection>> getIncomingMap() {
+		return incomingMap;
+	}
+
+	/**
 	 * Returns the list of this network's input ports
 	 * 
 	 * @return the list of this network's input ports
@@ -268,6 +291,13 @@ public class Network {
 		return name;
 	}
 
+	/**
+	 * Returns a map that associates each instance to the list of its outgoing
+	 * edges.
+	 * 
+	 * @return a map that associates each instance to the list of its outgoing
+	 *         edges
+	 */
 	public Map<Instance, List<Connection>> getOutgoingMap() {
 		return outgoingMap;
 	}
@@ -299,6 +329,12 @@ public class Network {
 		return sourceMap;
 	}
 
+	/**
+	 * Returns a map that associates each instance to the list of its
+	 * successors.
+	 * 
+	 * @return a map that associates each instance to the list of its successors
+	 */
 	public Map<Instance, List<Instance>> getSuccessorsMap() {
 		return successorsMap;
 	}

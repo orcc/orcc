@@ -116,10 +116,10 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		this.isBroadcast = true;
 		this.parameters = parameters;
 	}
-	
-	
+
 	/**
-	 * Creates a new virtual instance. Only used by subclass Wrapper in the C++ backend.
+	 * Creates a new virtual instance. Only used by subclass Wrapper in the C++
+	 * backend.
 	 * 
 	 * @param id
 	 *            the instance id
@@ -129,7 +129,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 *            parameters of this instance
 	 */
 	protected Instance(String id, String clasz,
-			Map<String, Expression> parameters, HashMap<String, IAttribute> attributes) {
+			Map<String, Expression> parameters,
+			HashMap<String, IAttribute> attributes) {
 		this.clasz = clasz;
 		this.id = id;
 		this.isWrapper = true;
@@ -247,6 +248,12 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		return parameters;
 	}
 
+	@Override
+	public int hashCode() {
+		// the hash code of an instance is the hash code of its identifier
+		return id.hashCode();
+	}
+
 	/**
 	 * Tries to load this instance as an actor.
 	 * 
@@ -290,16 +297,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	public boolean isBroadcast() {
 		return isBroadcast;
 	}
-	
-	/**
-	 * Returns true if this instance is a wrapper.
-	 * 
-	 * @return true if this instance is a wrapper
-	 */
-	public boolean isWrapper() {
-		return isWrapper;
-	}
-
 
 	/**
 	 * Returns true if this instance references a network.
@@ -308,6 +305,15 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	public boolean isNetwork() {
 		return (network != null);
+	}
+
+	/**
+	 * Returns true if this instance is a wrapper.
+	 * 
+	 * @return true if this instance is a wrapper
+	 */
+	public boolean isWrapper() {
+		return isWrapper;
 	}
 
 	public void setClasz(String clasz) {

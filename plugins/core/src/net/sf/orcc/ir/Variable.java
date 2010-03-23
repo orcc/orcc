@@ -219,6 +219,12 @@ public abstract class Variable implements INameable {
 		return value;
 	}
 
+	@Override
+	public int hashCode() {
+		// the hash code of a variable is the hash code of its name
+		return getName().hashCode();
+	}
+
 	/**
 	 * Returns <code>true</code> if this variable has an initial expression.
 	 * 

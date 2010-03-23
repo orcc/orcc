@@ -3,13 +3,9 @@ group C_network_newScheduler : C_network;
 ///////////////////////////////////////////////////////////////////////////////
 // Declare actors
 
-declareActor(instance) ::= <<
-struct actor $instance.id$ = {"$instance.id$", $instance.id$_scheduler};
-
->>
-
 declareActors(instances) ::= <<
-$instances: declareActor()$
+struct actor $instances: {$it.id$}; wrap, separator=", "$;
+
 >>
 
 declareActorsArray(instances) ::= <<
@@ -55,45 +51,43 @@ $edges: tryDeclareConnection(
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Declare outputs
+// Declare inputs and outputs
 
-goDeclareOutputs(instance, outgoing) ::= <<
+goDeclareInputsOutputs(instance, incoming, outgoing) ::= <<
+$if(!incoming.empty)$
+struct conn_s *$instance.id$_inputs[] = {$incoming: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
+
+$endif$
 $if(!outgoing.empty)$
 struct conn_s *$instance.id$_outputs[] = {$outgoing: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
 
 $endif$
 >>
 
-declareOutputs(instances) ::= <<
-$instances: goDeclareOutputs(instance=it, outgoing=network.outgoingMap.(it))$
+declareInputsOutputs(instances) ::= <<
+$instances:
+  goDeclareInputsOutputs(instance=it,
+    incoming=network.incomingMap.(it),
+    outgoing=network.outgoingMap.(it))$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fill actors structures
+// Define actors
 
 fillActorStruct(instance) ::= <<
-$instance.id$.num_inputs = 0;
-$instance.id$.inputs = NULL;
-$if(network.outgoingMap.(instance).empty)$
-$instance.id$.num_outputs = 0;
-$instance.id$.outputs = NULL;
-
+struct actor $instance.id$ = {"$instance.id$", $instance.id$_scheduler, $length(network.incomingMap.(instance))$, $length(network.outgoingMap.(instance))$, $length(network.successorsMap.(instance))$, $if(network.incomingMap.(instance).empty)$
+NULL
 $else$
-$instance.id$.num_outputs = $length(network.outgoingMap.(instance))$;
-$instance.id$.outputs = $instance.id$_outputs;
-
-$endif$
-$if(network.successorsMap.(instance).empty)$
-$instance.id$.num_successors = 0;
-$instance.id$.successors = NULL;
-
-
+$instance.id$_inputs
+$endif$, $if(network.outgoingMap.(instance).empty)$
+NULL
 $else$
-$instance.id$.num_successors = $length(network.successorsMap.(instance))$;
-$instance.id$.successors = $instance.id$_successors;
-
-
-$endif$
+$instance.id$_outputs
+$endif$, $if(network.successorsMap.(instance).empty)$
+NULL
+$else$
+$instance.id$_successors
+$endif$};
 
 >>
 
@@ -144,26 +138,21 @@ $declareSuccessors(network.instances)$
 
 $declareConnections(network.connections)$
 ////////////////////////////////////////////////////////////////////////////////
-// Declaration of the outputs of each actor
+// Declaration of the inputs and outputs of each actor
 
-$declareOutputs(network.instances)$
+$declareInputsOutputs(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the actors array
 
+$fillActorsStructs(network.instances)$
 $declareActorsArray(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
-
-static void fill_actors_structs() {
-	$fillActorsStructs(network.instances)$
-}
 
 static void scheduler() {
 	int i;
 	struct actor *my_actor;
 	struct scheduler my_scheduler;
-	
-	fill_actors_structs();
 
 	// initializes the actors that need it
 	$printInitializes(network.instances)$
@@ -175,6 +164,9 @@ static void scheduler() {
 	while (my_actor != NULL) {
 		while (my_actor != NULL) {
 			int num_firings = my_actor->sched_func();
+#ifdef PRINT_FIRINGS
+			printf("%5i\t%s\n", num_firings, my_actor->name);
+#endif
 			if (num_firings > 0) {
 				// the actor has fired, so it is likely it has produced data
 				// we consider its successors as schedulable
@@ -192,6 +184,9 @@ static void scheduler() {
 			my_actor = sched_get_next_schedulable(&my_scheduler);
 		}
 
+#ifdef PRINT_FIRINGS
+		printf("\n");
+#endif
 		update_fifos(&my_scheduler);
 		sched_promote(&my_scheduler);
 		my_actor = sched_get_next_schedulable(&my_scheduler);
