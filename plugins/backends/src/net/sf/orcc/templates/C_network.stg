@@ -31,8 +31,7 @@ $broadcasts: declareBroadcast(it)$
 // allocates FIFOs
 
 allocateFifoType(type, size, count) ::= <<
-static $type$ array_$count$[$size$ * sizeof($type$)];
-static struct fifo_s fifo_$count$ = { sizeof($type$), $size$, (char *)array_$count$, 0, 0 };
+DECLARE_FIFO($type$, $size$, $count$)
 
 >>
 

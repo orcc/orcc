@@ -110,7 +110,6 @@ network(debugFifos, fifoSize, network) ::= <<
 #include "orcc_util.h"
 
 #define SIZE $fifoSize$
-// #define PRINT_FIRINGS
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
@@ -148,6 +147,9 @@ $fillActorsStructs(network.instances)$
 $declareActorsArray(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
+
+// Uncomment to print firings
+// #define PRINT_FIRINGS
 
 static void scheduler() {
 	int i;
