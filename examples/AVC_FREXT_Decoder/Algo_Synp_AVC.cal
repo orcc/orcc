@@ -2962,14 +2962,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		if ( ctxIdxOffset = 73 ) then
 			if (binIdx = 0 or binIdx = 1 or binIdx = 2 or binIdx = 3) then
-				//To be done (subclause 9.3.3.1.4)
+				ctxIdxCodedBlockPattern();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			end 
 		end
 		
 		if ( ctxIdxOffset = 77 ) then
 			if (binIdx = 0 or binIdx = 1 ) then
-				//To be done (subclause 9.3.3.1.4)
+				ctxIdxCodedBlockPattern();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			end 
 		end
@@ -5348,7 +5348,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end 
 		end
 	end
-
+	
 	read_MB_layer_coded_block_pattern_done_cabac_luma: action ==>
 	guard
 		IS_CABAC() and cabac_end() and ( not cbp_done ) 
