@@ -2849,6 +2849,79 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	
+	procedure ctxIdxPriorDecodeBinValues()
+	begin
+	
+		if ctxIdxOffset = 3 then
+			if binIdx = 4 then
+				if ReadBinString[3 + 1] != 0 then
+					ctxIdxInc := 5;
+				else
+					ctxIdxInc := 6;
+				end
+			else
+				if binIdx = 5 then
+					if ReadBinString[3 + 1] != 0 then
+						ctxIdxInc := 6;
+					else
+						ctxIdxInc := 7;
+					end
+				end
+			end
+		end
+		
+		if ctxIdxOffset = 14 then
+			if binIdx = 2 then
+				if ReadBinString[1 + 1] != 1 then
+					ctxIdxInc := 2;
+				else
+					ctxIdxInc := 3;
+				end
+			end
+		end
+		
+		if ctxIdxOffset = 17 then
+			if binIdx = 4 then
+				if ReadBinString[3 + 1] != 0 then
+					ctxIdxInc := 2;
+				else
+					ctxIdxInc := 3;
+				end
+			end
+		end
+		
+		if ctxIdxOffset = 27 then
+			if binIdx = 2 then
+				if ReadBinString[1 + 1] != 0 then
+					ctxIdxInc := 4;
+				else
+					ctxIdxInc := 5;
+				end
+			end
+		end
+		
+		if ctxIdxOffset = 32 then
+			if binIdx = 4 then
+				if ReadBinString[3 + 1] != 0 then
+					ctxIdxInc := 2;
+				else
+					ctxIdxInc := 3;
+				end
+			end
+		end
+		
+		if ctxIdxOffset = 36 then
+			if binIdx = 2 then
+				if ReadBinString[1 + 1] != 0 then
+					ctxIdxInc := 2;
+				else
+					ctxIdxInc := 3;
+				end
+			end
+		end
+		
+	end
+	
 	//Derivation process for ctxIdx
 	procedure GetCtxIdx()
 	begin
@@ -2868,10 +2941,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			else if ( binIdx = 3 ) then
 				ctxIdx := ctxIdxOffset + 4;
 			else if ( binIdx = 4 ) then
-				//To be done (subclause 9.3.3.1.2)
+				ctxIdxPriorDecodeBinValues();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			else if ( binIdx = 5 ) then
-				//To be done (subclause 9.3.3.1.2)
+				ctxIdxPriorDecodeBinValues();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			else
 				ctxIdx := ctxIdxOffset + 7;
@@ -2891,7 +2964,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			else if ( binIdx = 1 ) then
 				ctxIdx := ctxIdxOffset + 1;
 			else if ( binIdx = 2 ) then
-				//To be done (subclause 9.3.3.1.2)
+				ctxIdxPriorDecodeBinValues();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			end end end
 		end
@@ -2906,7 +2979,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			else if ( binIdx = 3 ) then
 				ctxIdx := ctxIdxOffset + 2;
 			else if ( binIdx = 4 ) then
-				//To be done (subclause 9.3.3.1.2)
+				ctxIdxPriorDecodeBinValues();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			else
 				ctxIdx := ctxIdxOffset + 3;
@@ -2930,7 +3003,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			else if ( binIdx = 1 ) then
 				ctxIdx := ctxIdxOffset + 3;
 			else if ( binIdx = 2 ) then
-				//To be done (subclause 9.3.3.1.2)
+				ctxIdxPriorDecodeBinValues();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			else
 				ctxIdx := ctxIdxOffset + 5;
@@ -2943,7 +3016,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			else if ( binIdx = 1 ) then
 				ctxIdx := ctxIdxOffset + 1;
 			else if ( binIdx = 2 ) then
-				//To be done (subclause 9.3.3.1.2)
+				ctxIdxPriorDecodeBinValues();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			else if ( binIdx = 3 or binIdx = 4 or binIdx = 5) then
 				ctxIdx := ctxIdxOffset + 3;
@@ -3010,7 +3083,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		if ( ctxIdxOffset = 70 ) then
 			if (binIdx = 0) then
-				//To be done (subclause 9.3.3.1.2)
+				ctxIdxPriorDecodeBinValues();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			end 
 		end
