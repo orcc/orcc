@@ -108,26 +108,12 @@ let mk_var_def env globals initializes var_info value =
 
 (** [mk_globals env parameters values globals] adds global variable declarations for
 [parameters] (and their associated [values]) and the global variables [globals]. *)
-let mk_globals env parameters values globals initializes =
-	let (env, vars, initializes) =
-		List.fold_left
-			(fun (env, vars, initializes) var_info ->
-				let value =
-					try
-						Some (List.assoc var_info.Calast.v_name values)
-					with Not_found ->
-						Asthelper.failwith var_info.Calast.v_loc
-							(sprintf "no value supplied for parameter \"%s\"!" var_info.Calast.v_name)
-				in
-				mk_var_def env vars initializes var_info value)
-		(env, [], initializes) parameters
-	in
-	
+let mk_globals env globals initializes =
 	let (env, globals, initializes) =
 		List.fold_left
 			(fun (env, vars, initializes) var_info ->
 				mk_var_def env vars initializes var_info var_info.Calast.v_value)
-		(env, vars, initializes) globals
+		(env, [], initializes) globals
 	in
 
 	reset_suffix env;
@@ -278,10 +264,12 @@ let ir_of_ast options out_base actor =
 	(* first map parameters and globals because types of ports may depend on them. *)
 	(* Lists initializations are done at the beginning of initialize actions. *)
 	let env = mk_env () in
+	let (env, parameters) =
+		map_params env actor.Calast.ac_parameters
+	in
+	
 	let (env, vars, initializes) =
-		mk_globals
-			env actor.Calast.ac_parameters options.o_values actor.Calast.ac_vars
-			actor.Calast.ac_initializes
+		mk_globals env actor.Calast.ac_vars actor.Calast.ac_initializes
 	in
 
 	(* set all globals that are assignable to LattTop so that their values will not be *)
@@ -328,7 +316,7 @@ let ir_of_ast options out_base actor =
 		ac_inputs = inputs;
 		ac_name = actor.Calast.ac_name;
 		ac_outputs = outputs;
-		ac_parameters = [];
+		ac_parameters = parameters;
 		ac_sched = sched;
 		ac_procs = List.rev procs;
 		ac_vars = vars}
