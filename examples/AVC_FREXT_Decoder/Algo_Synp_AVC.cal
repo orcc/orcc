@@ -282,7 +282,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[6, 1, 0, 1, 1, 1, 1, 1],
 		[1, 1, 1, 0, 0, 0, 0, 0]
 	];
-	synEval_MB_P_SP_Ele = 31;
+	int synEval_MB_P_SP_Ele = 31;
 	List ( type: List ( type: int(size = 8), size = 4) , size = 31 ) synEval_MB_P_SP = 
 	[
 		[2, 0, 0, 0],
@@ -318,7 +318,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[0, 1, 0, 0]
 	];
 	
-	synEval_MB_B_Ele = 49;
+	int synEval_MB_B_Ele = 49;
 	List ( type: List ( type: int(size = 8), size = 8) , size = 49 ) synEval_MB_B = 
 	[
 		[0, 0, 0, 0, 0, 0, 0, 0],
@@ -376,7 +376,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[5, 1, 1, 1, 1, 0, 1, 0]
 	];
 	
-	synEval_SUB_MB_P_SP_Ele = 4;
+	int synEval_SUB_MB_P_SP_Ele = 4;
 	List ( type: List ( type: int(size = 8), size = 7) , size = 4 ) synEval_SUB_MB_P_SP = 
 	[
 		[0, 1, 0, 0, 0, 0, 0],
@@ -388,7 +388,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 	];
 	
-	synEval_SUB_MB_B = 13;
+	int synEval_SUB_MB_B_Ele = 13;
 	List ( type: List ( type: int(size = 8), size = 7) , size = 13 ) synEval_SUB_MB_B = 
 	[
 		[0, 0, 0, 0, 0, 0, 0],
@@ -410,13 +410,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[4, 1, 1, 1, 1, 1, 0]
 	];
 	
-	synEval_Coded_Bloc_Flag_Ele = 2;
+	int synEval_Coded_Bloc_Flag_Ele = 2;
 	List ( type: List ( type: int(size = 8), size = 2) , size = 2 ) synEval_Coded_Bloc_Flag = 
 	[
 		[0, 0],
 		[0, 1]
 	];
-	synEval_Rem_Intra_4x4_8x8_Pred_Mode_Ele = 8;
+	int synEval_Rem_Intra_4x4_8x8_Pred_Mode_Ele = 8;
 	List ( type: List ( type: int(size = 8), size = 4) , size = 8 ) synEval_Rem_Intra_4x4_8x8_Pred_Mode = 
 	[
 		[ 2, 0, 0, 0 ],
@@ -429,7 +429,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[ 2, 1, 1, 1 ]
 	];
 	
-	synEval_Intra_Chroma_Pred_Mode_Ele = 8;
+	int synEval_Intra_Chroma_Pred_Mode_Ele = 8;
 	List ( type: List ( type: int(size = 8), size = 4) , size = 8 ) synEval_Intra_Chroma_Pred_Mode = 
 	[
 		[ 0, 0, 0, 0 ],
@@ -437,7 +437,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[ 2, 1, 1, 0 ],
 		[ 2, 1, 1, 1 ]
 	];
-	synEval_CBP_Luma_Ele = 16;
+	int synEval_CBP_Luma_Ele = 16;
 	List ( type: List ( type: int(size = 8), size = 5) , size = 16 ) synEval_CBP_Luma = 
 	[
 		[ 3, 0, 0, 0, 0 ],
@@ -457,7 +457,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[ 3, 0, 1, 1, 1 ],
 		[ 3, 1, 1, 1, 1 ]
 	];
-	synEval_CBP_Chroma_Ele = 3;
+	int synEval_CBP_Chroma_Ele = 3;
 	List ( type: List ( type: int(size = 8), size = 3) , size = 3 ) synEval_CBP_Chroma = 
 	[
 		[ 0, 0, 0 ],
