@@ -264,6 +264,7 @@ type actor = {
 	mutable ac_inputs : var_def list;
 	mutable ac_name : string;
 	mutable ac_outputs : var_def list;
+	mutable ac_parameters : var_def list;
 	mutable ac_procs : proc list;
 	mutable ac_sched : schedinfo;
 	mutable ac_vars : globvar_def list

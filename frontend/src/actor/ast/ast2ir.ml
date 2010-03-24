@@ -328,6 +328,7 @@ let ir_of_ast options out_base actor =
 		ac_inputs = inputs;
 		ac_name = actor.Calast.ac_name;
 		ac_outputs = outputs;
+		ac_parameters = [];
 		ac_sched = sched;
 		ac_procs = List.rev procs;
 		ac_vars = vars}

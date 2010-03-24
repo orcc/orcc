@@ -32,16 +32,10 @@ let _ =
 		printf "parsing CAL = %f
 converting = %f
 transforming to SSA = %f
-constant propagation, phase 1 = %f
-constant propagation, phase 2 = %f
-optimizations = %f
 generating code = %f\n"
 			!Cal_parser_wrapper.time
 			!Ast2ir.time
 			!Cal_ssa.time
-			!Constprop.time_1
-			!Constprop.time_2
-			!Optims.time
 			!Codegen_ir.time
 	);
 	

@@ -215,6 +215,7 @@ type actor = {
 	mutable ac_inputs : IR.var_def list; (** actor input ports declarations. *)
 	mutable ac_name : string; (** actor name. *)
 	mutable ac_outputs : IR.var_def list; (** actor output ports declarations. *)
+	mutable ac_parameters : IR.var_def list;
 	mutable ac_procs : IR.proc list; (** procedures. *)
 	mutable ac_sched : schedinfo; (** schedule information *)
 	mutable ac_vars : globvar_def list; (** actor variable declarations. *)

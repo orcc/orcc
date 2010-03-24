@@ -367,14 +367,6 @@ let transform_actor options out_base actor =
 	Cal_ssa.compute_ssa actor;
 	if options.o_keep then print out_base actor 2;
 	if options.o_dot_cfg then Asthelper.print_cfg (out_base ^ "_a") actor;
-	
-	Constprop.const_prop actor;
-	if options.o_keep then print out_base actor 3;
-	if options.o_dot_cfg then Asthelper.print_cfg (out_base ^ "_b") actor;
-	
-	Optims.remove_dead_stores actor;
-	if options.o_keep then print out_base actor 4;
-	if options.o_dot_cfg then Asthelper.print_cfg (out_base ^ "_c") actor;
 
 	(* resets the node ID counter so IR nodes don't end up with huge IDs *)
 	(* no IR nodes should be created in *this* actor's graph after that. *)
