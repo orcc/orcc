@@ -35,6 +35,7 @@ import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_INPUTS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NAME;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_OUTPUTS;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_PARAMETERS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_PROCEDURES;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_SOURCE_FILE;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_STATE_VARS;
@@ -247,6 +248,11 @@ public class IRParser {
 
 			file = obj.getString(KEY_SOURCE_FILE);
 			String name = obj.getString(KEY_NAME);
+
+			OrderedMap<Variable> parameters = variables;
+			parseVarDefs(obj.getJSONArray(KEY_PARAMETERS));
+			variables = new Scope<Variable>(variables, true);
+
 			inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
 			outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
 
@@ -269,9 +275,6 @@ public class IRParser {
 
 			array = obj.getJSONArray(KEY_ACTION_SCHED);
 			ActionScheduler sched = parseActionScheduler(array);
-
-			// no parameters at this point.
-			OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 
 			Actor actor = new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procs, actions, initializes, sched, null);

@@ -50,6 +50,8 @@ public interface IRConstants {
 
 	public final static String KEY_OUTPUTS = "outputs";
 
+	public final static String KEY_PARAMETERS = "parameters";
+
 	public final static String KEY_PROCEDURES = "procedures";
 
 	public static final String KEY_SOURCE_FILE = "source file";
