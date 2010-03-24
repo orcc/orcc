@@ -41,6 +41,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
+import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
@@ -111,8 +112,8 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void printActor(String id, Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new PhiRemoval(),
-				new MoveReadsWritesTransformation() };
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new PhiRemoval(), new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -143,7 +144,7 @@ public class CBackendImpl extends AbstractBackend {
 					networkTemplate = "C_network_newScheduler";
 				}
 			}
-			
+
 			NetworkPrinter networkPrinter = new NetworkPrinter(networkTemplate);
 
 			// Add broadcasts before printing
