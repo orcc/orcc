@@ -168,8 +168,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	uint binVal;
 	
 		/* List Used as a result for Binarization */
-	List ( type: uint(size=2), size=128 ) synElVal := [ 0 : for int i in Integers( 0, 127)];
-	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 127)];
+	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 25)] : for int j in Integers( 0, 100)];
+	//List ( type: uint(size=2), size=128 ) synElVal := [ 0 : for int i in Integers( 0, 127)];
+	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 100)];
 	
 	
 	//Cabac intialisation process for the arithmetic decoding engine
@@ -210,7 +211,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	/*
 		mbTab := [ Address ][ Availability, mbSliceType, mb_type, IntraChromaPredMode, mbQpDelta, mbCBPLuma, mbCBPChroma ]
 	*/
-	List ( type: List ( type: int, size = 8) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 6)] : for int j in Integers( 0, 254)];
+	List ( type: List ( type: int, size = 8) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 7)] : for int j in Integers( 0, 254)];
 	
     int mbTabAvail				:= 0;
 	int mbSliceType				:= 1;
@@ -1880,64 +1881,84 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	procedure updateSynElVal()
+	var
+		uint BinIdxSize
+		
 	begin
-		ValueIndex := ValueIndex + 1;
+		//ValueIndex := ValueIndex + 1;
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I then
-			MaxBinIdx	:= synEval_MB_I[ValueIndex][0];
-			synElVal[0]	:= MaxBinIdx;
-			foreach int s in Integers(1,MaxBinIdx + 1) do
-				synElVal[s] := synEval_MB_I[ValueIndex][s];
+			MaxEleCompTab := synEval_MB_I_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_MB_I[e][0];
+				foreach int s in Integers(0, 7) do
+					synElVal[e][s] := synEval_MB_I[e][s];
+				end
 			end
 		end
 		
+		
+		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP then
-			MaxBinIdx	:= synEval_MB_P_SP[ValueIndex][0];
-			synElVal[0]	:= MaxBinIdx;
-			foreach int s in Integers(1,MaxBinIdx + 1) do
-				synElVal[s] := synEval_MB_P_SP[ValueIndex][s];
+			MaxEleCompTab := synEval_MB_P_SP_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_MB_P_SP[l][0];
+				foreach int s in Integers(0, 3) do
+					synElVal[e][s] := synEval_MB_P_SP[e][s];
+				end
 			end
 		end
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA then
-			MaxBinIdx	:= synEval_CBP_Luma[ValueIndex][0];
-			synElVal[0]	:= MaxBinIdx;
-			foreach int s in Integers(1,MaxBinIdx + 1) do
-				synElVal[s] := synEval_CBP_Luma[ValueIndex][s];
+			MaxEleCompTab := synEval_CBP_Luma_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_CBP_Luma[e][0];
+				foreach int s in Integers(0, 4) do
+					synElVal[e][s] := synEval_CBP_Luma[e][s];
+				end
 			end
 		end
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_CHROMA then
-			MaxBinIdx	:= synEval_CBP_Chroma[ValueIndex][0];
-			synElVal[0]	:= MaxBinIdx;
-			foreach int s in Integers(1,MaxBinIdx + 1) do
-				synElVal[s] := synEval_CBP_Chroma[ValueIndex][s];
+			MaxEleCompTab := synEval_CBP_Chroma_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_CBP_Chroma[e][0];
+				foreach int s in Integers(0, 2) do
+					synElVal[e][s] := synEval_CBP_Chroma[e][s];
+				end
 			end
 		end
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG then
-			MaxBinIdx	:= synEval_Coded_Bloc_Flag[ValueIndex][0];
-			synElVal[0]	:= MaxBinIdx;
-			foreach int s in Integers(1,MaxBinIdx + 1) do
-				synElVal[s] := synEval_Coded_Bloc_Flag[ValueIndex][s];
+			MaxEleCompTab := synEval_Coded_Bloc_Flag_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_Coded_Bloc_Flag[e][0];
+				foreach int s in Integers(0, 1) do
+					synElVal[e][s] := synEval_Coded_Bloc_Flag[e][s];
+				end
 			end
 		end
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE then
-			MaxBinIdx	:= synEval_Rem_Intra_4x4_8x8_Pred_Mode[ValueIndex][0];
-			synElVal[0]	:= MaxBinIdx;
-			foreach int s in Integers(1,MaxBinIdx + 1) do
-				synElVal[s] := synEval_Rem_Intra_4x4_8x8_Pred_Mode[ValueIndex][s];
+			MaxEleCompTab := synEval_Rem_Intra_4x4_8x8_Pred_Mode_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_Rem_Intra_4x4_8x8_Pred_Mode[e][0];
+				foreach int s in Integers(0, 3) do
+					synElVal[e][s] := synEval_Rem_Intra_4x4_8x8_Pred_Mode[e][s];
+				end
 			end
 		end
 				
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_TRANSFORM_SIZE_8x8_FLAG then
-			MaxBinIdx	:= synEval_Coded_Bloc_Flag[ValueIndex][0];
-			synElVal[0]	:= MaxBinIdx;
-			foreach int s in Integers(1,MaxBinIdx + 1) do
-				synElVal[s] := synEval_Coded_Bloc_Flag[ValueIndex][s];
+			MaxEleCompTab := synEval_Coded_Bloc_Flag_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_Coded_Bloc_Flag[e][0];
+				foreach int s in Integers(0, 1) do
+					synElVal[e][s] := synEval_Coded_Bloc_Flag[e][s];
+				end
 			end
 		end
+		
 		
 		
 		//TODO other Syntax Element
@@ -1993,183 +2014,20 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_TRANSFORM_SIZE_8x8_FLAG;
 	end
 	
-	/* For each CABAC Syntax Element*/
-	/*
-	action ==>
-	guard
-		CabacStartProcess
-	do
-		if CabacFirstBitToDecode then	
-			// Initialize binIdx to -1, indicates the number of bits we have already read 
-			binIdx := -1;
-			CabacFirstBitToDecode := false;
-		end
-		
-		
-		if ReadBitsBeforeInit then
-			set_bits_to_read(9);
-			// Stop Reading 9 bits for the initialization process 
-			ReadBitsBeforeInit := false;
-		else	
-			if FirstSEinSlice and done_reading_bits() then
-				// Initialisation of context variables 
-
-				foreach int i in Integers(0, 459) do
-					if (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI )then
-						preCtxState_pro(val_QP, Cabac_Context_Init_I[i][0], Cabac_Context_Init_I[i][1]);
-					else
-						preCtxState_pro(val_QP, Cabac_Context_Init_PB[cabac_init_idc][i][0], Cabac_Context_Init_PB[cabac_init_idc][i][1]);
-					end
-									
-					if ( preCtxState  <=  63 )  then
-						//FIX ME: (( 63 - pre ) << 1) + 0;
-						pStateIdx[i]	:= 63 - preCtxState;
-						valMPS[i]		:= 0 ;
-					else 
-						//FIX ME: (( pre - 64 ) << 1) + 1;
-						pStateIdx[i]	:= preCtxState - 64;
-						valMPS[i]		:= 1;
-					end
-				end
-				
-				// End of initialisation of context variables 
-				
-				// Initialisation of decoding engine 
-				
-				codIRange	:= 0x01FE;
-				codIOffset	:= read_result();
-				
-				// End of decoding engine initialisation
-				
-				// Stop Initialisation if we found the first SE In Slce 
-				FirstSEinSlice := false;
-				CabacInitializationFinished := true;
-			end
-			
-			 
-			//   Generates each bit and compare it with binarization, 
-			//   though the binarization process is called every 
-			//   time the parser demands an Syntax Element.
-			
-			if CabacInitializationFinished then
-				// Initialize ValueIndex 
-					ValueIndex := -1;
-				
-				// Initialise SynElVal Tab
-				updateSynElVal();
-				while( not FoundSE ) do
-					
-					// Suppose that we have found the correct binValue 
-					FoundSE := true;
-					
-					
-					
-					foreach int i in Integers(0, MaxBinIdx) do
-						// Update binIdx 
-						binIdx := i;
-						
-						// Recovers maxBinIdxCtx and ctxIdxOffset 
-						Getbinarization(CABAC_SEARCH_SYNTAX_ELEMENT);
-						// Calculates ctxIdx
-						GetCtxIdx();
-									
-						// Decode Bin value Process
-						
-						if bypassFlag then
-							// Start Decode Bypass Process
-							
-							codIOffset := codIOffset << 1;
-							// Read one bit
-							get_cabac();
-							codIOffset := codIOffset | getBitStreamValue;
-							
-							if codIOffset >= codIRange then
-								binVal := 1;
-								codIOffset := codIOffset - codIRange;
-							else
-								binVal := 0;
-							end
-							
-							// End of Decode Bypass Process 
-						else if ctxIdx = 276 then
-							// Start Decode Terminate Process 
-							
-							codIRange := codIRange - 2;
-				
-							if codIOffset >= codIRange then
-								binVal := 1;
-							else
-								binVal := 0;
-								
-								// Start RenormD Process 
-								StartRenormD := true;
-								// End of RenormD Process 
-								
-							end
-							
-							// End of Decode Terminate Process 
-						else
-							DecodeDecision();
-							// Start RenormD Process 
-							StartRenormD := true;
-							// End of RenormD Process 
-							
-						end end
-						// End of decode Bin value Process 
-						
-						// Store Decoded bin 
-						
-						ReadBinString[binIdx + 1] := binVal;
-					end
-					
-					ReadBinString[0] := binIdx;
-					// Start to Compare
-					
-					if synElVal[0] != MaxBinIdx then
-						updateSynElVal();
-					else
-						foreach int s in Integers(1, MaxBinIdx + 1) do
-							FoundSE := FoundSE and ReadBinString[s] = synElVal[s];
-						end
-						
-						if FoundSE != true then
-							updateSynElVal();
-						end
-					end
-					
-					
-				end
-			
-				if (CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I) and
-					ValueIndex = 25 then
-					
-					Cabac_Arithmetic_Decoding_Engine_Start := true;
-					set_bits_to_read(9);
-					
-				end
-		
-			
-				if  ReadBitsBeforeInit = false then
-					CabacStartProcess := false;
-				end
-			end
-		end
-	end
-	*/
+	
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
 	********       		CABAC Binarization		    	*********
 	*************************************************************
 	*************************************************************/
-	
+	/*
 	// Unary binarisation process
 	procedure Ubinarization(int SyntaxElement,int binIdxOffset)
 	begin
-		if ( SyntaxElement  = 0 ) then
+		if SyntaxElement = 0  then
 			synElVal[0] := 0;
 			synElVal[binIdxOffset + 1] := 0;
-		
 		else
 			
 			foreach int s in Integers(binIdxOffset, SyntaxElement - 1) do
@@ -2213,7 +2071,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//Concatenated unary/k-th order Exp-Golomb (UEGk) binarization process
 	
 	//FIXME 
-	/*
+	
 	procedure UEGkbinarization(int SyntaxElement, bool signedValFlag, int uCoff, int k)
 	var
 		bool test,
@@ -2260,7 +2118,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	
 	/* Specific Syntax Element Binarization */
-	
+/*	
 	// Mb Type and Sub Mb Type Binarization
 
 	procedure MbTypeBinarizationSliceI(int MbType)
@@ -2302,7 +2160,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			synElVal[s - 1] := synEval_SUB_MB_B[MbType][s];
 		end
 	end
-/*	
+	
 	//Binarization pocess for coded block pattern
 	procedure CodedBlockPaternBinarization( )
 	begin
@@ -3171,6 +3029,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	CabacParsing: action ==>
 	guard
 		CabacStartProcess
+	var
+		int loop
 	do
 		
 		// Start Initialization Process
@@ -3185,14 +3045,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			if GetBinarizationFlag = false then
 				// Recovers maxBinIdxCtx and ctxIdxOffset 
 				Getbinarization(CABAC_SEARCH_SYNTAX_ELEMENT);
-				ValueIndex := -1; 
+				// Update the Bin string that we are going to compare with
+				updateSynElVal();
+				ValueIndex := 0; 
 				GetBinarizationFlag := true;
 			end
 			
 			
 			if FoundSE = false and NextBitToDecode then
-				// Update the Bin string that we are going to compare with
-				updateSynElVal();
+				
 				// Update the binIdx
 				binIdx := binIdx + 1;
 				
@@ -3212,6 +3073,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				CabacStartProcess := false;
 			end
 			
+			/*
 			if binValDecoded then
 				if binIdx != MaxBinIdx then
 					if ReadBinString[binIdx + 1] = synElVal[binIdx + 1] then
@@ -3232,6 +3094,36 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 							//binValDecoded := false;
 					end
 				end
+			end
+			*/
+			
+			if binValDecoded then
+				loop := 0;
+				while loop < MaxEleCompTab  do
+					
+					MaxBinIdx := synElVal[loop][0];
+					if binIdx = MaxBinIdx then
+						FoundSE := true;
+						foreach int s in Integers(1, MaxBinIdx + 1) do
+							FoundSE := FoundSE and ReadBinString[s] = synElVal[loop][s];
+						end
+						
+						if FoundSE then
+							//Attribute the valueIndex
+							ValueIndex := loop;
+							//If you found the Bin String Stop the Loop
+							loop := MaxEleCompTab;
+						end
+					else
+							NextBitToDecode := true;
+							//If MaxBinIdx := synElVal[e][0] then quit the loop
+							loop := MaxEleCompTab;
+					end
+					
+					binValDecoded := false;
+					loop := loop + 1;
+				end
+				
 			end
 			
 			
