@@ -43,9 +43,12 @@ ENDCOPYRIGHT
 import all caltrop.lib.BitOps;
 import java.lang.Math;
 
-actor DDRModel(int MAXW_IN_MB, int MAXH_IN_MB)
+actor DDRModel()
   int(size=32) RA, int(size=32) WA, int(size=32) WD ==>
   int(size=32) RD :
+  
+  int MAXW_IN_MB = 121;
+  int MAXH_IN_MB = 69;
 
   //bool _CAL_tokenMonitor := true;
   

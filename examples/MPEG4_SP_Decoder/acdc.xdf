@@ -37,51 +37,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="MAXW_IN_MB">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MB_COORD_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="BTYPE_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="SAMPLE_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="NEWVOP">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="INTRA">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="INTER">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="QUANT_MASK">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="ROUND_TYPE">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="FCODE_MASK">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="FCODE_SHIFT">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MOTION">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="ACCODED">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="ACPRED">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="QUANT_SZ">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -93,36 +48,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
-        <Parameter name="FCODE_MASK">
-            <Expr kind="Var" name="FCODE_MASK"/>
-        </Parameter>
-        <Parameter name="FCODE_SHIFT">
-            <Expr kind="Var" name="FCODE_SHIFT"/>
-        </Parameter>
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Var" name="MAXW_IN_MB"/>
-        </Parameter>
-        <Parameter name="MB_COORD_SZ">
-            <Expr kind="Var" name="MB_COORD_SZ"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
-        <Parameter name="QUANT_MASK">
-            <Expr kind="Var" name="QUANT_MASK"/>
-        </Parameter>
-        <Parameter name="ROUND_TYPE">
-            <Expr kind="Var" name="ROUND_TYPE"/>
-        </Parameter>
     </Instance>
     <Instance id="dcsplit">
         <!-- ************************* -->
@@ -132,9 +57,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="dcpred">
         <!-- ************************* -->
@@ -144,46 +66,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ACCODED">
-            <Expr kind="Var" name="ACCODED"/>
-        </Parameter>
-        <Parameter name="ACPRED">
-            <Expr kind="Var" name="ACPRED"/>
-        </Parameter>
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
-        <Parameter name="DCVAL">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="128"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Expr>
-        </Parameter>
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Var" name="MAXW_IN_MB"/>
-        </Parameter>
-        <Parameter name="MB_COORD_SZ">
-            <Expr kind="Var" name="MB_COORD_SZ"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
-        <Parameter name="QUANT_MASK">
-            <Expr kind="Var" name="QUANT_MASK"/>
-        </Parameter>
-        <Parameter name="QUANT_SZ">
-            <Expr kind="Var" name="QUANT_SZ"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="zzaddr">
         <!-- ************************* -->
@@ -202,9 +84,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="acpred">
         <!-- ************************* -->
@@ -214,15 +93,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Var" name="MAXW_IN_MB"/>
-        </Parameter>
-        <Parameter name="MB_COORD_SZ">
-            <Expr kind="Var" name="MB_COORD_SZ"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="dequant">
         <!-- ************************* -->
@@ -232,12 +102,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="QUANT_SZ">
-            <Expr kind="Var" name="QUANT_SZ"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

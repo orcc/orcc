@@ -45,23 +45,19 @@ ENDCOPYRIGHT
 import all caltrop.lib.BitOps;
 import java.lang.Math;
 
-actor MemoryManager (
-    int SEARCHWIN_IN_MB,      // search window size (in macroblocks)
-    int MAXW_IN_MB,           // maximum image width (in macroblocks)
-    int MAXH_IN_MB,           // maximum image height (in macroblocks)
-    int ADDR_SZ,
-    int FLAG_SZ,
-    int MV_SZ,
-    int MB_COORD_SZ,
-    int BTYPE_SZ,
-    int PIX_SZ,
-    int INTRA,
-    int INTER,
-    int NEWVOP,
-    int MOTION,
-  int ROUND_TYPE
- )
+actor MemoryManager ()
    int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA, int(size=32) WA :
+
+  int MAXW_IN_MB = 121;           // maximum image width (in macroblocks)
+  int MAXH_IN_MB = 69;           // maximum image height (in macroblocks)
+  int SEARCHWIN_IN_MB = 3;      // search window size (in macroblocks)
+  
+  int BTYPE_SZ = 12;
+  int PIX_SZ = 9;
+  
+  
+  int NEWVOP = 2048;
+  int INTRA = 1024;
 
    // find the number of bits needed to represent some positive integer
 /*   function log2_ceil( n ) :

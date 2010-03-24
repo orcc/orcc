@@ -45,17 +45,20 @@ import all caltrop.lib.BitOps;
 actor MVReconstruct (
   // Maximum image width (in units of macroblocks) that the decoder can handle.
   // It is used to allocate line buffer space at compile time.
-  int MAXW_IN_MB,
-  int MB_COORD_SZ,
-  int BTYPE_SZ,
-  int MV_SZ,
-  int NEWVOP,
-  int INTER,
-  int FCODE_MASK,
-  int FCODE_SHIFT,
-  int FOURMV,
-  int MOTION
  ) int(size=BTYPE_SZ) BTYPE, int(size=MV_SZ) MVIN, int(size=MB_COORD_SZ+3) A ==> int(size=MV_SZ) MV :
+
+  int MAXW_IN_MB = 121;
+  int MB_COORD_SZ = 8;
+  int BTYPE_SZ = 12; 
+  int NEWVOP = 2048;
+  int INTER = 512;
+  int MOTION = 8;
+  int FOURMV = 4;
+  
+  int MV_SZ = 9;
+  
+  int FCODE_MASK = 448;
+  int FCODE_SHIFT = 6;
 
   // Motion vector line buffers - pointer behavior must be implemented exactly as in MVSequence.cal
   int(size=MB_COORD_SZ) mbx := 0;           // Current macroblock x position

@@ -29,9 +29,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="fname">
-            <Expr kind="Literal" literal-kind="String" value="D:/Projects/RVC/OpenDF/models/MPEG4_SP_Decoder/data/foreman_qcif_30.bit"/>
-        </Parameter>
     </Instance>
     <Instance id="display">
         <!-- ************************* -->
@@ -41,12 +38,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MAX_HEIGHT">
-            <Expr kind="Literal" literal-kind="Integer" value="576"/>
-        </Parameter>
-        <Parameter name="MAX_WIDTH">
-            <Expr kind="Literal" literal-kind="Integer" value="704"/>
-        </Parameter>
     </Instance>
     <Instance id="ddr">
         <!-- ************************* -->
@@ -56,12 +47,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MAXH_IN_MB">
-            <Expr kind="Literal" literal-kind="Integer" value="69"/>
-        </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Literal" literal-kind="Integer" value="121"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

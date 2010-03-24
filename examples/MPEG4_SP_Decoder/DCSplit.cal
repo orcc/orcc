@@ -42,7 +42,9 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor DCSplit ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
+actor DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
+
+  int SAMPLE_SZ = 13;
 
   int(size=8) count := 0;
 

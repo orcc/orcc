@@ -46,20 +46,18 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Unpack (
-    int SEARCHWIN_IN_MB,      // search window size (in macroblocks)
-    int FLAG_SZ,
-    int MV_SZ,
-    int MB_COORD_SZ,
-    int BTYPE_SZ,
-    int PIX_SZ,
-    int INTRA,
-    int INTER,
-    int NEWVOP,
-    int MOTION,
-    int ROUND_TYPE
- )
+actor Unpack ()
    int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI  ==> int(size=PIX_SZ) DO :
+   
+  int BTYPE_SZ = 12;
+  int PIX_SZ = 9;
+  int MV_SZ = 9;
+  int MB_COORD_SZ = 8;
+  
+  int MOTION = 8;
+  int NEWVOP = 2048;
+  int INTRA = 1024;
+  int INTER = 512;
 
   function maskBits( int v, int n ) --> int :
     bitand( v, lshift(1,n)-1 )

@@ -45,9 +45,10 @@ import all caltrop.lib.BitOps;
 // Insert zero coefficients into a sparsely encoded block
 
 actor BlockExpand (
-    int SAMPLE_COUNT_SZ,
-    int SAMPLE_SZ
  ) int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE, bool LAST ==> int(size=SAMPLE_SZ) OUT :
+
+  int SAMPLE_COUNT_SZ = 8;
+  int SAMPLE_SZ = 13;
 
   int BLOCK_SIZE = 64;
 

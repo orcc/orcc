@@ -44,21 +44,24 @@ ENDCOPYRIGHT
 import all caltrop.lib.BitOps;
 
 actor DCPred (
- int DCVAL,
- int MAXW_IN_MB,
- int MB_COORD_SZ,
- int BTYPE_SZ,
- int SAMPLE_SZ,
- int NEWVOP,
- int INTRA,
- int INTER,
- int QUANT_MASK,
- int ACCODED,
- int ACPRED,
- int QUANT_SZ
 )
  int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ+3) A, int(size=MB_COORD_SZ+3) B, int(size=MB_COORD_SZ+3) C, int(size=SAMPLE_SZ) IN ==>
    int(size=SAMPLE_SZ) OUT, int(size=MB_COORD_SZ+3) PTR, int(size=3) START, bool SIGNED, int(size=QUANT_SZ) QUANT :
+
+  int ACPRED = 1;
+  int ACCODED = 2;
+  int QUANT_SZ = 6;
+  int MAXW_IN_MB = 121;
+  int SAMPLE_SZ = 13;
+  int BTYPE_SZ = 12;
+  int MB_COORD_SZ = 8;
+  int QUANT_MASK = 31;
+  
+  int NEWVOP = 2048;
+  int INTRA = 1024;
+  int INTER = 512;
+  
+  int DCVAL = 128*8;
 
   int SCALER_SZ = 7;
 

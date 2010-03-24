@@ -45,9 +45,12 @@ ENDCOPYRIGHT
 // or wind-down of a burst of video it will break the pattern
 // as needed.
 
-actor FairMerge ( int rsz, int csz )
+actor FairMerge ()
     int(size=rsz) R0, int(size=rsz) R1, int(size=csz) C0, int(size=csz) C1 ==>
     int(size=csz) Y0, int(size=csz) Y1, bool ROWOUT :
+    
+    int rsz = 13;
+    int csz = 16; 
 
       row: action R0:[a], R1:[b] ==> Y0:[a], Y1:[b], ROWOUT:[true] end
       col: action C0:[a], C1:[b] ==> Y0:[a], Y1:[b], ROWOUT:[false] end

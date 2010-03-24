@@ -30,20 +30,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="INP_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="PIX_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Variable" name="MEM_SZ">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="16"/>
-    </Decl>
-    <Decl kind="Variable" name="OUT_SZ">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="10"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -55,9 +41,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="sz">
-            <Expr kind="Var" name="INP_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="fairmerge">
         <!-- ************************* -->
@@ -67,12 +50,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="csz">
-            <Expr kind="Var" name="MEM_SZ"/>
-        </Parameter>
-        <Parameter name="rsz">
-            <Expr kind="Var" name="INP_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="downsample">
         <!-- ************************* -->
@@ -91,9 +68,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MEM_SZ">
-            <Expr kind="Var" name="MEM_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="sep">
         <!-- ************************* -->
@@ -103,15 +77,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="csz">
-            <Expr kind="Var" name="OUT_SZ"/>
-        </Parameter>
-        <Parameter name="isz">
-            <Expr kind="Var" name="MEM_SZ"/>
-        </Parameter>
-        <Parameter name="rsz">
-            <Expr kind="Var" name="MEM_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="trans">
         <!-- ************************* -->
@@ -121,9 +86,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="sz">
-            <Expr kind="Var" name="MEM_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="retrans">
         <!-- ************************* -->
@@ -133,12 +95,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="isz">
-            <Expr kind="Var" name="OUT_SZ"/>
-        </Parameter>
-        <Parameter name="osz">
-            <Expr kind="Var" name="OUT_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="clip">
         <!-- ************************* -->
@@ -148,12 +104,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="isz">
-            <Expr kind="Var" name="OUT_SZ"/>
-        </Parameter>
-        <Parameter name="osz">
-            <Expr kind="Var" name="PIX_SZ"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

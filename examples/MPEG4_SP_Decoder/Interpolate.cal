@@ -45,7 +45,10 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Interpolate ( int PIX_SZ, int FLAG_SZ ) int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
+actor Interpolate () int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
+
+  int PIX_SZ = 9;
+  int FLAG_SZ = 4; 
 
   bool _CAL_tokenMonitor := true;
 

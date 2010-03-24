@@ -29,7 +29,7 @@
  
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 
-actor fread( String fname ) ==> int(size=8) O :
+actor fread() ==> int(size=8) O :
 
   // so the actor scheduler will call an initialize function
   initialize ==>

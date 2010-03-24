@@ -42,7 +42,10 @@ ENDCOPYRIGHT
 
 // Limit pixel value to either [0,255] or [-255,255]
 
-actor Clip ( int isz, int osz ) int(size=isz) I, bool SIGNED ==> int(size=osz) O :
+actor Clip () int(size=isz) I, bool SIGNED ==> int(size=osz) O :
+
+  int isz = 10;
+  int osz = 9;
 
   int(size=7) count := -1;
   bool sflag;

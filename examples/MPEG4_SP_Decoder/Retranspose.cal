@@ -44,8 +44,11 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Retranspose ( int isz, int osz )
+actor Retranspose ()
    int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3 ==> int(size=osz) Y :
+   
+  int isz = 10;
+  int osz = 10; 
 
   //List[ List[ List[ int(size=osz) ] ] ] mem :=
   List ( type:int(size=osz), size=128) mem := 

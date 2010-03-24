@@ -45,17 +45,14 @@ ENDCOPYRIGHT
 import all caltrop.lib.BitOps;
 
 actor Sequence (
-int MAXW_IN_MB,
-int MB_COORD_SZ,
-int BTYPE_SZ,
-int NEWVOP,
-int INTRA,
-int INTER,
-int QUANT_MASK,
-int ROUND_TYPE,
-int FCODE_MASK,
-int FCODE_SHIFT
  ) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ+3) A, int (size=MB_COORD_SZ+3) B, int(size=MB_COORD_SZ+3) C :
+
+  int MB_COORD_SZ = 8;
+  int MAXW_IN_MB = 121;
+  int BTYPE_SZ = 12;
+  int NEWVOP = 2048;
+  int INTRA = 1024;
+  int SAMPLE_SZ = 13;
 
   // Generate indices into the stream history to locate
   //   A  neighbor to the left

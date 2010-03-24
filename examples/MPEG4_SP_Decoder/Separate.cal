@@ -44,11 +44,15 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Separate ( int isz, int rsz, int csz )
+actor Separate ()
    int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3,
    bool ROW ==>
    int(size=rsz) R0, int(size=rsz) R1, int(size=rsz) R2, int(size=rsz) R3,
    int(size=csz) C0, int(size=csz) C1, int(size=csz) C2, int(size=csz) C3 :
+   
+   int isz = 16;
+   int rsz = 16;
+   int csz = 10; 
 
    action X0:[a], X1:[b], X2:[c], X3:[d], ROW:[r] ==> R0:[a], R1:[b], R2:[c], R3:[d]
    guard r end

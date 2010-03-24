@@ -44,9 +44,11 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Shuffle( int sz )
+actor Shuffle()
     int(size=sz) X0, int(size=sz) X1, int(size=sz) X2, int(size=sz) X3 ==>
     int(size=sz) Y0, int(size=sz) Y1, int(size=sz) Y2, int(size=sz) Y3 :
+    
+  int sz = 24;
 
   int(size=sz) x4;
   int(size=sz) x5;

@@ -42,7 +42,9 @@ ENDCOPYRIGHT
 
 // Read row queue and write pairs of data to IDCT FairMerge
 
-actor RowSort ( int sz ) int(size=sz) ROW ==> int(size=sz) Y0, int(size=sz) Y1 :
+actor RowSort () int(size=sz) ROW ==> int(size=sz) Y0, int(size=sz) Y1 :
+
+  int sz = 13;
 
   int(size=sz) x0;
   int(size=sz) x1;

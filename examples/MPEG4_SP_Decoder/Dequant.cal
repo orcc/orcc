@@ -44,7 +44,10 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Dequant ( int QUANT_SZ, int SAMPLE_SZ ) int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
+actor Dequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
+
+  int QUANT_SZ = 6;
+  int SAMPLE_SZ = 13;
 
   function saturate( int x ) --> int
     var

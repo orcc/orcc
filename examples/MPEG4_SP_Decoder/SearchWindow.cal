@@ -43,20 +43,20 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor SearchWindow (
-    int SEARCHWIN_IN_MB,      // search window size (in macroblocks)
-    int FLAG_SZ,
-    int MV_SZ,
-    int MB_COORD_SZ,
-    int BTYPE_SZ,
-    int PIX_SZ,
-    int INTRA,
-    int INTER,
-    int NEWVOP,
-    int MOTION,
-    int ROUND_TYPE
- )
+actor SearchWindow ()
    int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI  ==> int(size=32) DO, int(size=FLAG_SZ) FLAGS :
+
+  int BTYPE_SZ = 12;
+  int FLAG_SZ = 4;
+  int MB_COORD_SZ = 8;
+  int MV_SZ = 9;
+  int ROUND_TYPE = 32;
+  int SEARCHWIN_IN_MB = 3;
+
+  int MOTION = 8;
+  int NEWVOP = 2048;
+  int INTRA = 1024;
+  int INTER = 512;
 
   // Search window organization - separate LUMA, CHROMA buffers
   //   LUMA     <-- Y (6 bits) --><-- X (4 bits) -->

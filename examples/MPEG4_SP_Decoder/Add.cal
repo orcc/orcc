@@ -44,17 +44,16 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Add (
-    int PIX_SZ,
-    int MB_COORD_SZ,
-    int BTYPE_SZ,
-
-    // Command flags from parser
-    int NEWVOP,
-    int INTRA,
-    int ACCODED
- )
+actor Add ()
    int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==> int(size=PIX_SZ) VID :
+
+  int PIX_SZ = 9;
+  int MB_COORD_SZ = 8;
+  int BTYPE_SZ = 12;
+
+  int NEWVOP = 2048;
+  int INTRA = 1024;
+  int ACCODED = 2;
 
   bool _CAL_tokenMonitor := true;
   

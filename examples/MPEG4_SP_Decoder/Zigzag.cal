@@ -43,7 +43,9 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Zigzag ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) AC, int(size=3) START, int(size=7) ADDR ==> int(size=SAMPLE_SZ) OUT :
+actor Zigzag ( ) int(size=SAMPLE_SZ) AC, int(size=3) START, int(size=7) ADDR ==> int(size=SAMPLE_SZ) OUT :
+
+  int SAMPLE_SZ = 13;
 
   int BUF_SIZE = 128;
   int(size=8) count := 1;

@@ -43,8 +43,10 @@ ENDCOPYRIGHT
 
 import all caltrop.lib.BitOps;
 
-actor Transpose ( int sz )
+actor Transpose ()
    int(size=sz) X0, int(size=sz) X1, int(size=sz) X2, int(size=sz) X3 ==> int(size=sz) Y0, int(size=sz) Y1 :
+
+  int sz = 16;
 
   List ( type:List( type:List( type:int(size=sz), size=8), size=8), size=2) mem := 
      [  [  [0 : for int k in Integers(1, 8)]  : for int j in Integers(1, 8)]   : for int i in Integers(1, 2) ];
