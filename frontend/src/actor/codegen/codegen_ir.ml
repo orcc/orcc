@@ -343,6 +343,7 @@ let mk_node actor =
 	objekt
 		[ ("source file", string !file_name);
 			("name", string actor.ac_name);
+			("parameters", mk_var_defs actor.ac_parameters);
 			("inputs", inputs);
 			("outputs", outputs);
 			("state variables", mk_state_vars actor.ac_vars);
