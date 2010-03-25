@@ -12,21 +12,21 @@
     <Port kind="Output" name="BTYPE">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MV">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="B">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>

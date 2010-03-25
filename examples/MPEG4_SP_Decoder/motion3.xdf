@@ -6,21 +6,21 @@
     <Port kind="Input" name="MV">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Input" name="BTYPE">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Input" name="TEX">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
@@ -58,7 +58,7 @@
     <Port kind="Output" name="VID">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
