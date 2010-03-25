@@ -100,12 +100,11 @@ public class Instantiator implements INetworkTransformation {
 		Vertex srcVertex = graph.getEdgeSource(connection);
 		Vertex tgtVertex = graph.getEdgeTarget(connection);
 
-		if (srcVertex.isInstance() && tgtVertex.isInstance()) {
+		Type srcPortType;
+		String sourceString;
+		if (srcVertex.isInstance()) {
 			Instance source = srcVertex.getInstance();
-			Instance target = tgtVertex.getInstance();
-
 			String srcPortName = connection.getSource().getName();
-			String dstPortName = connection.getTarget().getName();
 
 			Port srcPort;
 			if (source.isActor()) {
@@ -113,6 +112,26 @@ public class Instantiator implements INetworkTransformation {
 			} else {
 				srcPort = source.getNetwork().getOutput(srcPortName);
 			}
+
+			if (srcPort == null) {
+				throw new OrccException("A Connection refers to "
+						+ "a non-existent source port: \"" + srcPortName + "\"");
+			}
+
+			connection.setSource(srcPort);
+
+			srcPortType = srcPort.getType();
+			sourceString = srcPort + " of " + source;
+		} else {
+			srcPortType = srcVertex.getPort().getType();
+			sourceString = srcVertex.getPort().toString();
+		}
+
+		Type dstPortType;
+		String targetString;
+		if (tgtVertex.isInstance()) {
+			Instance target = tgtVertex.getInstance();
+			String dstPortName = connection.getTarget().getName();
 
 			Port dstPort;
 			if (target.isActor()) {
@@ -122,26 +141,26 @@ public class Instantiator implements INetworkTransformation {
 			}
 
 			// check ports exist
-			if (srcPort == null) {
-				throw new OrccException("A Connection refers to "
-						+ "a non-existent source port: \"" + srcPortName + "\"");
-			} else if (dstPort == null) {
+			if (dstPort == null) {
 				throw new OrccException("A Connection refers to "
 						+ "a non-existent target port: \"" + dstPortName + "\"");
 			}
 
-			// check port types match
-			Type srcType = srcPort.getType();
-			Type dstType = dstPort.getType();
-			if (!srcType.equals(dstType)) {
-				throw new OrccException("Type error: port " + srcPort + " of "
-						+ source + " is " + srcType + ", port " + dstPort
-						+ " of " + target + " is " + dstType);
-			}
-
-			// update connection
-			connection.setSource(srcPort);
 			connection.setTarget(dstPort);
+
+			dstPortType = dstPort.getType();
+			targetString = dstPort + " of " + target;
+		} else {
+			dstPortType = tgtVertex.getPort().getType();
+			targetString = tgtVertex.getPort().toString();
+		}
+
+		// check port types match
+		Type srcType = srcPortType;
+		Type dstType = dstPortType;
+		if (!srcType.equals(dstType)) {
+			throw new OrccException("Type error: port " + sourceString + " is "
+					+ srcType + ", port " + targetString + " is " + dstType);
 		}
 	}
 
