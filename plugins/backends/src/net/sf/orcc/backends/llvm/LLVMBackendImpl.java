@@ -33,8 +33,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
@@ -44,6 +42,8 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.BuildCFG;
 import net.sf.orcc.network.Network;
+
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * LLVM back-end.
@@ -58,17 +58,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				new LLVMBackendImpl().generateCode(args[0], 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: LLVMBackendImpl <flattened XDF network>");
-		}
+		main(LLVMBackendImpl.class, args);
 	}
 
 	private LLVMActorPrinter printer;

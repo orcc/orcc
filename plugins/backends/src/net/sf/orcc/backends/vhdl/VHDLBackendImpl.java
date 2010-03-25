@@ -61,17 +61,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				new VHDLBackendImpl().generateCode(args[0], 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: VHDLBackendImpl <flattened XDF network>");
-		}
+		main(VHDLBackendImpl.class, args);
 	}
 
 	/**

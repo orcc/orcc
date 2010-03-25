@@ -250,19 +250,21 @@ public class BackendFactory {
 	 * @param name
 	 *            back-end name. Must belong to the list returned by
 	 *            {@link #listBackends()}
-	 * @param fileName
-	 *            name of top-level input network
+	 * @param inputFile
+	 *            absolute path of top-level input network
+	 * @param outputFolder
+	 *            folder absolute path of output folder
 	 * @param fifoSize
 	 *            default size of FIFOs
 	 * @param configuration
 	 *            launch configuration
 	 * @throws Exception
 	 */
-	public void runBackend(String name, String fileName, int fifoSize,
-			ILaunchConfiguration configuration) throws Exception {
+	public void runBackend(String name, String inputFile, String outputFolder,
+			int fifoSize, ILaunchConfiguration configuration) throws Exception {
 		IBackend backend = backends.get(name);
 		backend.setLaunchConfiguration(configuration);
-		backend.generateCode(fileName, fifoSize);
+		backend.generateCode(inputFile, outputFolder, fifoSize);
 	}
 
 }

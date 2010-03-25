@@ -45,26 +45,11 @@ import net.sf.orcc.network.Network;
 public class XlimBackendImpl extends AbstractBackend {
 
 	/**
-	 * Command line to generate XLIM
 	 * 
 	 * @param args
-	 *            First argument used only: XDF location
 	 */
 	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				System.out.println("START");
-				XlimBackendImpl impl = new XlimBackendImpl();
-				impl.generateCode(args[0], 10000);
-				System.out.println("DONE");
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: XlimBackendImpl <flattened XDF network>");
-		}
+		main(XlimBackendImpl.class, args);
 	}
 
 	/**

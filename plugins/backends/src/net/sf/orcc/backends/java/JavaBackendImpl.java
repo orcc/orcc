@@ -55,17 +55,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				new JavaBackendImpl().generateCode(args[0], 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: JavaBackendImpl <flattened XDF network>");
-		}
+		main(JavaBackendImpl.class, args);
 	}
 
 	private JavaActorPrinter printer;

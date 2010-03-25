@@ -43,13 +43,15 @@ public interface IBackend {
 	/**
 	 * Generates code from a flat XDF network and IR files.
 	 * 
-	 * @param fileName
-	 *            The file name of the top XDF network.
+	 * @param inputFile
+	 *            absolute path of top-level input network
+	 * @param outputFolder
+	 *            folder absolute path of output folder
 	 * @param fifoSize
 	 *            The default FIFO size.
 	 * @throws Exception
 	 */
-	public void generateCode(String fileName, int fifoSize)
+	void generateCode(String inputFile, String outputFolder, int fifoSize)
 			throws OrccException;
 
 	/**
@@ -58,6 +60,6 @@ public interface IBackend {
 	 * @param configuration
 	 *            the launch configuration of this back-end
 	 */
-	public void setLaunchConfiguration(ILaunchConfiguration configuration);
+	void setLaunchConfiguration(ILaunchConfiguration configuration);
 
 }

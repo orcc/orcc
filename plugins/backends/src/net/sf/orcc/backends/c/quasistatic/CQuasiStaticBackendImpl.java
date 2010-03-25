@@ -54,17 +54,7 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 1) {
-			try {
-				new CQuasiStaticBackendImpl().generateCode(args[0], 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: CQuasiStaticBackendImpl <flattened XDF network>");
-		}
+		main(CQuasiStaticBackendImpl.class, args);
 	}
 
 	private CQuasiStaticActorPrinter printer;

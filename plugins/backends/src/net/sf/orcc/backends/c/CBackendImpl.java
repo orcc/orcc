@@ -31,8 +31,6 @@ package net.sf.orcc.backends.c;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.core.runtime.CoreException;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
@@ -46,6 +44,8 @@ import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
+import org.eclipse.core.runtime.CoreException;
+
 /**
  * C back-end.
  * 
@@ -55,30 +55,6 @@ import net.sf.orcc.network.transforms.BroadcastAdder;
 public class CBackendImpl extends AbstractBackend {
 
 	public static boolean merge = false;
-
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String file;
-		if (args.length > 0) {
-			file = args[0];
-			if (args.length > 1) {
-				merge = Boolean.parseBoolean(args[1]);
-			}
-
-			try {
-				new CBackendImpl().generateCode(file, 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err.println("Usage: CBackendImpl "
-					+ "<flattened XDF network> [<merge>]");
-		}
-	}
 
 	/**
 	 * printer is protected in order to be visible to CQuasiBackendImpl

@@ -380,12 +380,11 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		String inputFile = configuration.getAttribute(INPUT_FILE, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
-		String file = new File(inputFile).getName();
-		String name = outputFolder + File.separator + file;
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		try {
 			BackendFactory factory = BackendFactory.getInstance();
-			factory.runBackend(backend, name, fifoSize, configuration);
+			factory.runBackend(backend, inputFile, outputFolder, fifoSize,
+					configuration);
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					backend + " backend could not generate code", e);

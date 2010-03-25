@@ -49,30 +49,14 @@ import net.sf.orcc.network.Network;
  */
 public class CppBackendImpl extends AbstractBackend {
 
+	public static Boolean partitioning = false;
+
 	/**
 	 * 
 	 * @param args
 	 */
-
-	public static Boolean partitioning = false;
-
 	public static void main(String[] args) {
-		String file;
-		if (args.length > 0) {
-			file = args[0];
-			if (args.length > 1) {
-				partitioning = Boolean.parseBoolean(args[1]);
-			}
-			try {
-				new CppBackendImpl().generateCode(file, 10000);
-			} catch (Exception e) {
-				System.err.println("Could not print \"" + args[0] + "\"");
-				e.printStackTrace();
-			}
-		} else {
-			System.err
-					.println("Usage: CppBackendImpl <flattened XDF network> [<partition>]");
-		}
+		main(CppBackendImpl.class, args);
 	}
 
 	private CppActorPrinter impl_printer;

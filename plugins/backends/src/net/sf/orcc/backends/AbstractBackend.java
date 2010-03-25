@@ -47,6 +47,29 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 public abstract class AbstractBackend implements IBackend {
 
 	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(Class<? extends AbstractBackend> clasz,
+			String[] args) {
+		if (args.length == 2) {
+			String inputFile = args[0];
+			String outputFolder = args[1];
+
+			try {
+				AbstractBackend backend = clasz.newInstance();
+				backend.generateCode(inputFile, outputFolder, 10000);
+			} catch (Exception e) {
+				System.err.println("Could not print \"" + args[0] + "\"");
+				e.printStackTrace();
+			}
+		} else {
+			System.err.println("Usage: " + clasz.getSimpleName()
+					+ "<input XDF network> <output folder>");
+		}
+	}
+
+	/**
 	 * the configuration used to launch this back-end.
 	 */
 	protected ILaunchConfiguration configuration;
@@ -74,17 +97,16 @@ public abstract class AbstractBackend implements IBackend {
 	}
 
 	@Override
-	public void generateCode(String fileName, int fifoSize)
+	public void generateCode(String inputFile, String outputFolder, int fifoSize)
 			throws OrccException {
 		// set FIFO size
 		this.fifoSize = fifoSize;
 
 		// set output path
-		File file = new File(fileName);
-		path = file.getParent();
+		path = new File(outputFolder).getAbsolutePath();
 
 		// parses top network
-		Network network = new XDFParser(fileName).parseNetwork();
+		Network network = new XDFParser(inputFile).parseNetwork();
 
 		beforeInstantiation(network);
 
