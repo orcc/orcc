@@ -144,8 +144,10 @@ public class InterpreterMain extends Thread {
 
 		// Parses top network
 		Network network = new XDFParser(networkFilename).parseNetwork();
+
 		// Instantiate the network
-		network.instantiate();
+		network.instantiate(null);
+
 		// Add broadcasts before connecting actors
 		new BroadcastAdder().transform(network);
 		// Prepare an hash table for creating broadcast interpreted actors
@@ -455,7 +457,7 @@ public class InterpreterMain extends Thread {
 				}
 			}
 		}
-		return (nbRunningActors+nbSuspendedThreads);
+		return (nbRunningActors + nbSuspendedThreads);
 	}
 
 	/**

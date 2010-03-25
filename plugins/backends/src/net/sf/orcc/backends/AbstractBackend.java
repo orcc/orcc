@@ -111,7 +111,7 @@ public abstract class AbstractBackend implements IBackend {
 		beforeInstantiation(network);
 
 		// instantiate the network
-		network.instantiate();
+		network.instantiate(outputFolder);
 
 		afterInstantiation(network);
 

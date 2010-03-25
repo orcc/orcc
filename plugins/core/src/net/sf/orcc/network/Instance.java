@@ -94,11 +94,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	private Map<String, Expression> parameters;
 
 	/**
-	 * the absolute path of the parent of the file this instance is defined in
-	 */
-	private File path;
-
-	/**
 	 * Creates a new virtual instance. Only used by subclass Broadcast.
 	 * 
 	 * @param id
@@ -130,7 +125,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	protected Instance(String id, String clasz,
 			Map<String, Expression> parameters,
-			HashMap<String, IAttribute> attributes) {
+			Map<String, IAttribute> attributes) {
 		this.clasz = clasz;
 		this.id = id;
 		this.isWrapper = true;
@@ -160,7 +155,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		this.attributes = attributes;
 		this.id = id;
 		this.parameters = parameters;
-		this.path = new File(path);
 
 		file = new File(path, clasz + ".xdf");
 		if (file.exists()) {
@@ -257,21 +251,16 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	/**
 	 * Tries to load this instance as an actor.
 	 * 
+	 * @param path
+	 *            the path where actors should be looked up
+	 * 
 	 * @throws OrccException
 	 */
-	public void instantiate() throws OrccException {
-		file = new File(path, id + ".json");
+	public void instantiate(String path) throws OrccException {
+		file = new File(path, clasz + ".json");
 		try {
-			if (file.exists()) {
-				InputStream in = new FileInputStream(file);
-				actor = new IRParser().parseActor(in);
-			} else {
-				// TODO when new front end is ready, add instantiation here
-				file = new File(path, clasz + "_2.json");
-				// this may cause a FileNotFoundException
-				InputStream in = new FileInputStream(file);
-				actor = new IRParser().parseActor(in);
-			}
+			InputStream in = new FileInputStream(file);
+			actor = new IRParser().parseActor(in);
 		} catch (OrccException e) {
 			throw new OrccException("Could not parse instance \"" + id
 					+ "\" because: " + e.getLocalizedMessage(), e);

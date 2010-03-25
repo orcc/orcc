@@ -48,6 +48,18 @@ public class Instantiator implements INetworkTransformation {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
+	private String path;
+
+	/**
+	 * Creates a new instantiator that will look up actors in the given path.
+	 * 
+	 * @param path
+	 *            the path where actors should be looked up
+	 */
+	public Instantiator(String path) {
+		this.path = path;
+	}
+
 	/**
 	 * Walks through the hierarchy, instantiate actors, and checks that
 	 * connections actually point to ports defined in actors. Instantiating an
@@ -64,10 +76,10 @@ public class Instantiator implements INetworkTransformation {
 				Instance instance = vertex.getInstance();
 				if (instance.isNetwork()) {
 					// instantiate the child network
-					instance.getNetwork().instantiate();
+					instance.getNetwork().instantiate(path);
 				} else if (!instance.isBroadcast()) {
 					// instantiate the child actor
-					instance.instantiate();
+					instance.instantiate(path);
 				}
 			}
 		}

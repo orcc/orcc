@@ -366,8 +366,8 @@ public class Network {
 	 *             if an actor could not be instantiated, or a connection is
 	 *             wrong
 	 */
-	public void instantiate() throws OrccException {
-		new Instantiator().transform(this);
+	public void instantiate(String path) throws OrccException {
+		new Instantiator(path).transform(this);
 	}
 
 	/**
