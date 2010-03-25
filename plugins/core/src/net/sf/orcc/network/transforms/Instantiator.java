@@ -105,10 +105,21 @@ public class Instantiator implements INetworkTransformation {
 			Instance target = tgtVertex.getInstance();
 
 			String srcPortName = connection.getSource().getName();
-			Port srcPort = source.getActor().getOutput(srcPortName);
-
 			String dstPortName = connection.getTarget().getName();
-			Port dstPort = target.getActor().getInput(dstPortName);
+
+			Port srcPort;
+			if (source.isActor()) {
+				srcPort = source.getActor().getOutput(srcPortName);
+			} else {
+				srcPort = source.getNetwork().getOutput(srcPortName);
+			}
+
+			Port dstPort;
+			if (target.isActor()) {
+				dstPort = target.getActor().getInput(dstPortName);
+			} else {
+				dstPort = target.getNetwork().getInput(dstPortName);
+			}
 
 			// check ports exist
 			if (srcPort == null) {
@@ -123,9 +134,9 @@ public class Instantiator implements INetworkTransformation {
 			Type srcType = srcPort.getType();
 			Type dstType = dstPort.getType();
 			if (!srcType.equals(dstType)) {
-				throw new OrccException("Type error: " + source.getActor()
-						+ "." + srcPort + " is " + srcType + ", "
-						+ target.getActor() + "." + dstPort + " is " + dstType);
+				throw new OrccException("Type error: port " + srcPort + " of "
+						+ source + " is " + srcType + ", port " + dstPort
+						+ " of " + target + " is " + dstType);
 			}
 
 			// update connection

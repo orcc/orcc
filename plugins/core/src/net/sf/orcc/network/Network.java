@@ -292,6 +292,17 @@ public class Network {
 	}
 
 	/**
+	 * Returns the input port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an input port whose name matches the given name
+	 */
+	public Port getInput(String name) {
+		return inputs.get(name);
+	}
+
+	/**
 	 * Returns a map that associates each instance to the list of its outgoing
 	 * edges.
 	 * 
@@ -300,6 +311,17 @@ public class Network {
 	 */
 	public Map<Instance, List<Connection>> getOutgoingMap() {
 		return outgoingMap;
+	}
+
+	/**
+	 * Returns the output port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an output port whose name matches the given name
+	 */
+	public Port getOutput(String name) {
+		return outputs.get(name);
 	}
 
 	/**
