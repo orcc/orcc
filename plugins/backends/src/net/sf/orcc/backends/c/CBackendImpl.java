@@ -63,6 +63,8 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void afterInstantiation(Network network) throws OrccException {
+		network.flatten();
+		
 		if (merge) {
 			network.classifyActors();
 			network.normalizeActors();
