@@ -40,6 +40,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.network.transforms.CloseActorsTransform;
 import net.sf.orcc.network.transforms.Instantiator;
 import net.sf.orcc.network.transforms.NetworkClassifier;
 import net.sf.orcc.network.transforms.NetworkFlattener;
@@ -50,7 +51,8 @@ import net.sf.orcc.util.OrderedMap;
 import org.jgrapht.DirectedGraph;
 
 /**
- * An XDF network.
+ * This class defines a hierarchical XDF network. It contains several maps so
+ * templates can walk through the graph of the network.
  * 
  * @author Matthieu Wipliez
  * 
@@ -113,6 +115,18 @@ public class Network {
 	 */
 	public void classifyActors() throws OrccException {
 		new NetworkClassifier().transform(this);
+	}
+
+	/**
+	 * Closes the actors of this network. This means that the parameters of each
+	 * actor become constant state variables whose value is the value given by
+	 * the network.
+	 * 
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	public void closeActors() throws OrccException {
+		new CloseActorsTransform().transform(this);
 	}
 
 	/**

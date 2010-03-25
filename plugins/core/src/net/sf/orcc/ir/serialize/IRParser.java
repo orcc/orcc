@@ -250,7 +250,7 @@ public class IRParser {
 			String name = obj.getString(KEY_NAME);
 
 			OrderedMap<Variable> parameters = variables;
-			parseVarDefs(obj.getJSONArray(KEY_PARAMETERS));
+			parseParameters(obj.getJSONArray(KEY_PARAMETERS));
 			variables = new Scope<Variable>(variables, true);
 
 			inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
@@ -557,6 +557,25 @@ public class IRParser {
 		}
 
 		return nodes;
+	}
+
+	private void parseParameters(JSONArray array) throws JSONException,
+			OrccException {
+		for (int i = 0; i < array.length(); i++) {
+			JSONArray varDefArray = array.getJSONArray(i);
+
+			JSONArray details = varDefArray.getJSONArray(0);
+			String name = details.getString(0);
+
+			Location location = parseLocation(varDefArray.getJSONArray(1));
+			Type type = parseType(varDefArray.get(2));
+
+			StateVariable parameter = new StateVariable(location, type, name,
+					false, (Expression) null);
+
+			// register the state variable
+			variables.add(file, location, name, parameter);
+		}
 	}
 
 	private Pattern parsePattern(OrderedMap<Port> ports, JSONArray array)
