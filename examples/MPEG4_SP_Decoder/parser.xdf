@@ -4,11 +4,7 @@
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
     <Port kind="Input" name="BITS">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->

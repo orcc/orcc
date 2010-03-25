@@ -6,7 +6,7 @@
     <Port kind="Input" name="bits">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
@@ -23,7 +23,7 @@
     <Port kind="Output" name="VIDEO">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
