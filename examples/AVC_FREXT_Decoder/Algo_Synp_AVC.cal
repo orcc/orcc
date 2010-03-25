@@ -1959,7 +1959,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 		end
 		
-		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE then
+			MaxEleCompTab := synEval_Intra_Chroma_Pred_Mode_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_Coded_Bloc_Flag[e][0];
+				foreach int s in Integers(0, 3) do
+					synElVal[e][s] := synEval_Intra_Chroma_Pred_Mode[e][s];
+				end
+			end
+		end
 		
 		//TODO other Syntax Element
 	end
@@ -2022,56 +2030,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	*************************************************************
 	*************************************************************/
 	/*
-	// Unary binarisation process
-	procedure Ubinarization(int SyntaxElement,int binIdxOffset)
-	begin
-		if SyntaxElement = 0  then
-			synElVal[0] := 0;
-			synElVal[binIdxOffset + 1] := 0;
-		else
-			
-			foreach int s in Integers(binIdxOffset, SyntaxElement - 1) do
-				synElVal[s] := 1;
-			end
-			synElVal[0] := SyntaxElement;
-			synElVal[SyntaxElement] := 0; 
-		end 
-	end
-	
-	// Truncated unary binarisation process
-	procedure TUbinarization(int SyntaxElement, int cMax, int binIdxOffset)
-	begin
-		if ( SyntaxElement < cMax ) then
-			Ubinarization(SyntaxElement, binIdxOffset);
-		else
-			binIdx := 0;
-			foreach int s in Integers(binIdxOffset + 1, cMax - 1) do
-				synElVal[s] := 1;
-				binIdx := binIdx + 1;
-			end	
-			synElVal[cMax + 1] := SyntaxElement;
-		end
-	end
-	
-	function Min(int a, int b) --> int :
-		if ( a < b ) then
-			a
-		else
-			b
-		end
-	end
-	
-	procedure synElValTestValue(int Value, int BinIdx)
-	begin
-		foreach int s in Integers(0, BinIdx - 1) do
-			synElValTest := synElValTest * synElVal[s]; 
-		end
-	end
-	
-	//Concatenated unary/k-th order Exp-Golomb (UEGk) binarization process
-	
-	//FIXME 
-	
+		
 	procedure UEGkbinarization(int SyntaxElement, bool signedValFlag, int uCoff, int k)
 	var
 		bool test,
@@ -2115,67 +2074,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	*/
 	
-	
-	
-	/* Specific Syntax Element Binarization */
-/*	
-	// Mb Type and Sub Mb Type Binarization
-
-	procedure MbTypeBinarizationSliceI(int MbType)
-	begin
-		synElVal[0] := synEval_MB_I[MbType][0];
-		foreach int s in Integers(1, binIdx + 1) do
-			synElVal[s - 1] := synEval_MB_I[MbType][s];
-		end
-	end
-	
-	procedure MbTypeBinarizationSliceP_SP(int MbType)
-	begin
-		synElVal[0] := synEval_MB_P_SP[MbType][0];
-		foreach int s in Integers(1, binIdx + 1) do
-			synElVal[s - 1] := synEval_MB_P_SP[MbType][s];
-		end
-	end
-	
-	procedure MbTypeBinarizationSliceB(int MbType)
-	begin
-		synElVal[0] := synEval_MB_B[MbType][0];
-		foreach int s in Integers(1, binIdx + 1) do
-			synElVal[s - 1] := synEval_MB_B[MbType][s];
-		end
-	end
-	
-	procedure SubMbTypeBinarizationSliceP_SP(int MbType)
-	begin
-		synElVal[0] := synEval_SUB_MB_P_SP[MbType][0];
-		foreach int s in Integers(1, binIdx + 1) do
-			synElVal[s - 1] := synEval_SUB_MB_P_SP[MbType][s];
-		end
-	end
-	
-	procedure SubMbTypeBinarizationSliceB(int MbType)
-	begin
-		synElVal[0] := synEval_SUB_MB_B[MbType][0];
-		foreach int s in Integers(1, binIdx + 1) do
-			synElVal[s - 1] := synEval_SUB_MB_B[MbType][s];
-		end
-	end
-	
-	//Binarization pocess for coded block pattern
-	procedure CodedBlockPaternBinarization( )
-	begin
-		FLbinarization(val_CodedBlockPatternLuma, 15, 0);
-		if ( ( chroma_format_idc[sps_id] = 0 ) or ( chroma_format_idc[sps_id] = 3 ) ) then
-			TUbinarization(CodedBlockPatternChroma, 2, binIdx );
-		end	
-	end
-	
-	//Binarization pocess for mb_qp_delta
-	procedure MbQpDeltaBinarization(int MbQpDelta_se )
-	begin
-		Ubinarization( MbQpDelta_se, 0);
-	end
-*/	
 	procedure Getbinarization(int SyntaxElement)
 	begin
 		if ( SyntaxElement = CABAC_MB_TYPE_SI ) then
@@ -2607,7 +2505,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 		
 		if  not mbAddrB_Avail() then
-			condTermFlagA := 0;
+			condTermFlagB := 0;
 		else
 			if ( IS_P( GiveMbSliceTypeAddrB() ) or
 			     GiveMbSliceTypeAddrB() = SLICE_TYPE_I and GiveMbTypeAddrB() = 25 or
@@ -5959,10 +5857,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		IS_Intra_4x4() or IS_Intra_8x8() or IS_Intra_16x16(),
 		chroma_format_idc[sps_id] = 1 or chroma_format_idc[sps_id] = 2
 	do
-		if entropy_coding_mode_flag[pps_id] = 0 then
+		if IS_CAVLC() then
 			start_vld();
 		else
-			if entropy_coding_mode_flag[pps_id] = 1 then
+			if IS_CABAC() then
 			GetCabacRemIntraChromaPredModeSyntaxElement();
 			start_cabac();
 			end
@@ -5971,12 +5869,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_MB_pred_intra_chroma_pred_mode_done: action ==> IntraPredModeC: [intra_chroma_pred_mode]
 	guard
-		vld_end() or cabac_end()
+		( IS_CAVLC() and vld_end() ) or ( IS_CABAC() and cabac_end() )
 	do
-		if entropy_coding_mode_flag[pps_id] = 0 then
+		if IS_CAVLC() then
 			intra_chroma_pred_mode := vld_ue();
 		else
-			if entropy_coding_mode_flag[pps_id] = 1 then
+			if IS_CABAC() then
 			intra_chroma_pred_mode := cabac_value();
 			//Reinitialize Cabac Process for the next call
 			cabac_reinit();
