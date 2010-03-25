@@ -249,9 +249,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	/* Defines the number of bins to Read, used as BinsToRead: = synElVal[ValueIndex][0] */
 	int BinsToRead;
 	
+	/* CABAC Neighbouring */
+	 uint luma8x8BlkIdx;
+	 uint luma8x8BlkIdxA;
+	 uint luma8x8BlkIdxB;
 	
-	 
-	
+	int P_Skip = 254;
+	int B_Skip = 255;
 
 	int synEval_MB_I_Ele = 26;
 	List ( type: List ( type: int(size = 8), size = 8) , size = 26 ) synEval_MB_I = 
@@ -2543,14 +2547,81 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	var
 		int condTermFlagA,
 		int condTermFlagB,
-		int temp
+		int temp,
+		int xN,
+		int yN,
+		int mbAddrA,
+		int mbAddrB,
+		bool AvailMbA,
+		bool AvailMbB
+		
 	begin
 		if ctxIdxOffset = 73 then
-			// Not yet impemented for 8x8 luma blocks
-			if  not mbAddrA_Avail() then
-				condTermFlagA := 0;
+			AvailMbA := false;
+		/*
+			//Neighbouring for A
+			xN := ( luma8x8BlkIdx mod 2 ) * 8 - 1;
+			yN := ( luma8x8BlkIdx  /  2 ) * 8; 
+			
+			if xN < 0 and yN > 0 and yN < 15 then
+				mbAddrA := GiveMbAddrA();
+				AvailMbA := true;
+			else
+				if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
+					mbAddrA := val_CurrMbAddr;
+					AvailMbA := true;
+				else
+					if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
+						AvailMbA := false;
+					end
+				end
 			end
-				
+			
+			//Neighbouring for B
+			xN := ( luma8x8BlkIdx mod 2 ) * 8;
+			yN := ( luma8x8BlkIdx  /  2 ) * 8 - 1; 
+			if yN < 0 and xN > 0 and xN < 15 then
+				mbAddrB := GiveMbAddrB();
+				AvailMbB := true;
+			else
+				if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
+					mbAddrB := val_CurrMbAddr;
+					AvailMbB := true;
+				else
+					if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
+						AvailMbB := false;
+					end
+				end
+			end
+			
+			if  not AvailMbA then
+				condTermFlagA := 0;
+			else
+				if ( ( mbTab[mbAddrA][mbTabMbtype] = 25 and  mbTab[mbAddrA][mbSliceType] = 2 ) or
+					 ( ( mbAddrA != val_CurrMbAddr and ( mbTab[mbAddrA] != P_Skip or mbTab[mbAddrA] != B_Skip ) and 
+				       ( mbTab[mbAddrA][mbCBPLuma] >> luma8x8BlkIdxA ) & 0x01 ) != 0 ) ) then
+					
+					condTermFlagA := 0;
+				else
+					condTermFlagA := 1;
+				end
+			end
+			
+			if  not AvailMbB then
+				condTermFlagB := 0;
+			else
+				if ( ( mbTab[mbAddrB][mbTabMbtype] = 25 and  mbTab[mbAddrB][mbSliceType] = 2 ) or
+					 ( ( mbAddrB != val_CurrMbAddr and ( mbTab[mbAddrB] != P_Skip or mbTab[mbAddrB] != B_Skip ) and 
+				       ( mbTab[mbAddrB][mbCBPLuma] >> luma8x8BlkIdxB ) & 0x01 ) != 0 ) ) then
+					
+					condTermFlagB := 0;
+				else
+					condTermFlagB := 1;
+				end
+			end
+			
+			ctxIdxInc := condTermFlagA + 2*condTermFlagB;
+		*/
 		else
 			//if ctxIdxOffset = 77
 			if not mbAddrA_Avail() then
@@ -2582,15 +2653,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 					condTermFlagB := 1;
 				end
 			end
+			if binIdx = 0 then
+				temp := 4;
+			else
+				temp := 0;
+			end
+		
+			ctxIdxInc := condTermFlagA + 2*condTermFlagB + temp;
 		end
 		
-		if binIdx = 0 then
-			temp := 4;
-		else
-			temp := 0;
-		end
 		
-		ctxIdxInc := condTermFlagA + 2*condTermFlagB + temp;
 		
 	end
 	
@@ -2899,22 +2971,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 		
 	end
-	
-	//*************************************************************/
-	/*************************************************************
-	*************************************************************
-	********      CABAC Arithmetic Decoding           	*********
-	*************************************************************
-	*************************************************************/
-	
-	function intXOR(int value) --> int:
-		if value = 0 then
-			1
-		else
-			0
-		end
-	end
-	
+		
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -2971,30 +3028,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				CabacStartProcess := false;
 			end
 			
-			/*
-			if binValDecoded then
-				if binIdx != MaxBinIdx then
-					if ReadBinString[binIdx + 1] = synElVal[binIdx + 1] then
-						NextBitToDecode := true;
-						binValDecoded := false;
-					else
-						updateSynElVal();
-					end
-				else
-					FoundSE := true;
-					foreach int s in Integers(1, MaxBinIdx + 1) do
-						FoundSE := FoundSE and ReadBinString[s] = synElVal[s];
-					end
-					//If the bin string is not equal to the bin with MaxbinIdx then updtaeSynEval (binIdx++)
-					if not FoundSE then
-							updateSynElVal();
-							//NextBitToDecode := true;
-							//binValDecoded := false;
-					end
-				end
-			end
-			*/
-			
 			if binValDecoded then
 				loop := 0;
 				while loop < MaxEleCompTab  do
@@ -3023,8 +3056,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				end
 				
 			end
-			
-			
+					
 			if FoundSE then
 				binIdx := -1;
 				//Save cabac value
@@ -3045,7 +3077,20 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	
-	/********************** Decodebin actions **********************/
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********      CABAC Arithmetic Decoding           	*********
+	*************************************************************
+	*************************************************************/
+	
+	function intXOR(int value) --> int:
+		if value = 0 then
+			1
+		else
+			0
+		end
+	end
 	
 	
 	/********************** RenormD actions **********************/
@@ -3264,23 +3309,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		CabacStartProcess := true;
 	end
 	
-	
-	
-	
-	//*************************************************************/
-	/*************************************************************
-	*************************************************************
-	********       		CABAC Start Decode		    	*********
-	*************************************************************
-	*************************************************************/
-	
-	procedure set_synax_element_type(int Syntax_Element)
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := Syntax_Element;
-	end
-	
-	
-		
 	/*************************************************************
 	*************************************************************
 	********              NAL Unit HEADER                ********
@@ -5316,7 +5344,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		//Reinitialize Cabac Process for the next call
 		cabac_reinit();
 		//get CBP Chroma
-		//Start cabac for CBP chroma Syntax element
 		GetCabacCodedBlockPatternChromaSyntaxElement();
 		start_cabac();
 		cbp_done := true;
@@ -5324,7 +5351,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	read_MB_layer_coded_block_pattern_done: action ==> 
 	guard
-		( IS_CAVLC() and vld_end() ) or ( IS_CABAC() and cabac_end() )
+		( IS_CAVLC() and vld_end() ) or ( IS_CABAC() and cabac_end() and cbp_done)
 	var 
 		uint(size=6) coded_block_pattern,
 		uint(size=6) cbp_temp
@@ -5334,16 +5361,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			coded_block_pattern := vld_me();
 		else 
 			if IS_CABAC() then
-				
+				coded_block_pattern := cbp_cabac;
 				cbp_temp := cabac_value();
 				//Reinitialize Cabac Process for the next call
 				cabac_reinit();
 				cbp_done := false;
 				if cbp_temp = 1 then
-					coded_block_pattern := cbp_cabac + 16;
+					coded_block_pattern := coded_block_pattern + 16;
 				else
 					if cbp_temp = 2 then
-						coded_block_pattern := cbp_cabac + 32;
+						coded_block_pattern := coded_block_pattern + 32;
 					end
 				end
 				cbp_done := false;
