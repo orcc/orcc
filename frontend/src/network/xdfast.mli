@@ -28,7 +28,7 @@ module rec Ast :
 
 		(** XDF instance *)
 		type contents =
-			| Actor of Calir.actor
+			| Actor
 			| Network of network
 			
 		and instance = {

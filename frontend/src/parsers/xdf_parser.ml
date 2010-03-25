@@ -185,24 +185,6 @@ let find_port_actor port ports =
 	{ po_name = port.v_name; po_type = port.v_type }
 
 let find_port_network ports port = SH.find ports port
-	
-let find_port_in loc instance port =
-	try
-		match instance.Ast.i_contents with
-			| Ast.Actor actor -> find_port_actor port actor.ac_inputs
-			| Ast.Network network -> find_port_network network.Ast.n_inputs port
-	with Not_found ->
-		Asthelper.failwith loc
-			(sprintf "could not find an input port named \"%s\"" port)
-
-let find_port_out loc instance port =
-	try
-		match instance.Ast.i_contents with
-			| Ast.Actor actor -> find_port_actor port actor.ac_outputs
-			| Ast.Network network -> find_port_network network.Ast.n_outputs port
-	with Not_found ->
-		Asthelper.failwith loc
-			(sprintf "could not find an output port named \"%s\"" port)
 
 let rec parse_size env = function
 	| [] -> None
@@ -219,48 +201,6 @@ let rec parse_size env = function
 				Asthelper.failwith l
 					("a FIFO size could not be statically evaluated because: " ^ msg))
 	| _ :: rest -> parse_size env rest
-
-let parse_structure graph env ht_inputs ht_outputs ht_instances children =
-	iter_all "Connection"
-		(fun loc e a c ->
-			let src = get_attribute loc e a "src" in
-			let src_port = get_attribute loc e a "src-port" in
-			let dst = get_attribute loc e a "dst" in
-			let dst_port = get_attribute loc e a "dst-port" in
-
-			let (v_from, p_from) =
-				if src = "" then
-					try
-						(Ast.Input (SH.find ht_inputs src_port), None)
-					with Not_found ->
-						Asthelper.failwith loc (sprintf "\"%s\" is not an input port" src_port)
-				else
-					try
-						let instance = SH.find ht_instances src in
-						(Ast.Instance instance, Some (find_port_out loc instance src_port))
-					with Not_found ->
-						Asthelper.failwith loc (sprintf "\"%s\" is not an instance name" src)
-			in
-
-			let (v_to, p_to) =
-				if dst = "" then
-					try
-						(Ast.Output (SH.find ht_outputs dst_port), None)
-					with Not_found ->
-						Asthelper.failwith loc (sprintf "\"%s\" is not an output port" dst_port)
-				else
-					try
-						let instance = SH.find ht_instances dst in
-						(Ast.Instance instance, Some (find_port_in loc instance dst_port))
-					with Not_found ->
-						Asthelper.failwith loc (sprintf "\"%s\" is not an instance name" dst)
-			in
-			
-			let size = parse_size env c in
-
-			G.add_edge_e graph (v_from, (p_from, p_to, size), v_to))
-	children;
-	graph
 
 let rec expr_of_constant loc = function
 	| CBool bool -> Calast.ExprBool (loc, bool)
@@ -318,17 +258,11 @@ let rec parse_instances graph ht_instances options env children =
 	(children, List.rev instances)
 
 and load_instance options loc cls_name parameters =
-	let out_base = Filename.concat options.o_outdir cls_name in
 	let abs_file = Filename.concat options.o_mp cls_name in
 
 	let cal_file = abs_file ^ ".cal" in
 	if Sys.file_exists cal_file then
-		(* parse actor and convert it to IR. *)
-		let ast_actor = Cal_parser_wrapper.parse_actor cal_file in
-		let actor =
-			Ast2ir.ir_of_ast {options with o_values = parameters} out_base ast_actor
-		in
-		Ast.Actor actor
+		Ast.Actor
 	else
 		let xdf_file = abs_file ^ ".xdf" in
 		if Sys.file_exists xdf_file then
@@ -360,10 +294,9 @@ and ast_of_tree options root =
 				let (children, _) = parse_ports graph ht_inputs ht_outputs children in
 				let (children, (parameters, vars)) = parse_decls children in
 				let env = evaluate_vars parameters options.o_values vars in
-				let (children, _) =
+				let _ =
 					parse_instances graph ht_instances options env children
 				in
-				let graph = parse_structure graph env ht_inputs ht_outputs ht_instances children in
 
 				{ Ast.n_graph = graph;
 					Ast.n_inputs = ht_inputs;

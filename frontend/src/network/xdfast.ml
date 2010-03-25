@@ -24,7 +24,7 @@ type label = port option * port option * int option
 module rec Ast :
 	sig
 		type contents =
-			| Actor of Calir.actor
+			| Actor
 			| Network of network
 
 		and instance = {
@@ -49,7 +49,7 @@ module rec Ast :
 			| Output of port
 	end = struct
 		type contents =
-			| Actor of Calir.actor
+			| Actor
 			| Network of network
 
 		and instance = {
