@@ -355,6 +355,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="Buffer_Size">
+            <Expr kind="Literal" literal-kind="Integer" value="10000"/>
+        </Parameter>
     </Instance>
     <Instance id="Algo_Synp_AVC">
         <!-- ************************* -->

@@ -3171,6 +3171,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		codIRange  := codIRange  << 1;
 		codIOffset := codIOffset << 1;
 		codIOffset := codIOffset | read_result();
+		if ( codIRange < 0x0100 ) then
+			set_bits_to_read(1);
+		end
 
 	end
 	
@@ -5202,11 +5205,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_MB_layer_mb_type: action ==>
 	do
-		if  entropy_coding_mode_flag[pps_id] = 0 then
+		if  IS_CAVLC() then
 			start_vld();
 		
 		else 
-			if entropy_coding_mode_flag[pps_id] = 1 then
+			if IS_CABAC() then
 				GetCabacMbTypeSyntaxElement();
 				start_cabac();
 			end 
@@ -5217,13 +5220,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_MB_layer_mb_type_done: action ==> 
 	guard
-		(entropy_coding_mode_flag[pps_id] = 0 and vld_end()) or (entropy_coding_mode_flag[pps_id] = 1 and cabac_end() )
+		( IS_CAVLC() and vld_end()) or (IS_CABAC() and cabac_end() )
 	do
-		if entropy_coding_mode_flag[pps_id] = 0 then
+		if IS_CAVLC() then
 			mb_type := vld_ue();
 		
 		else 
-			if entropy_coding_mode_flag[pps_id] = 1 then
+			if IS_CABAC() then
 				mb_type := cabac_value();
 				//Reinitialize Cabac Process for the next call
 				cabac_reinit();
@@ -5505,11 +5508,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		val_CodedBlockPatternLuma > 0 or CodedBlockPatternChroma > 0 or IS_Intra_16x16()
 	do
-		if  entropy_coding_mode_flag[pps_id] = 0 then
+		if IS_CAVLC() then
 			start_vld();
 		
 		else 
-			if entropy_coding_mode_flag[pps_id] = 1 then
+			if IS_CABAC() then
 				GetCabacMbQpDeltaSyntaxElement();
 				start_cabac();
 			end 
@@ -5518,12 +5521,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	read_MB_layer_mb_qp_delta_done: action ==> 
 	guard
-		vld_end() or cabac_end()
+		( IS_CAVLC() and vld_end() ) or ( cabac_end() and IS_CABAC() )
 	do
-		if entropy_coding_mode_flag[pps_id] = 0 then
+		if IS_CAVLC() then
 			mb_qp_delta := vld_se();
 		else 
-			if entropy_coding_mode_flag[pps_id] = 1 then
+			if IS_CABAC() then
 				mb_qp_delta := cabac_value();
 				//Reinitialize Cabac Process for the next call
 				cabac_reinit();
@@ -5857,8 +5860,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				cabac_reinit();
 				luma4x4BlkIdx := luma4x4BlkIdx +1;
 				//Read until luma4x4BlkIdx = 16
-				GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
-				start_cabac();
+				if luma4x4BlkIdx < 16 then
+					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+					start_cabac();
+				end
 			end
 		end
 	end
@@ -5868,16 +5873,21 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		prev_intra4x4_pred_mode_flag = 1
 	do
-		if entropy_coding_mode_flag[pps_id] = 0 then
+		if IS_CAVLC() then
 			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
 			luma4x4BlkIdx := luma4x4BlkIdx +1;
 			if luma4x4BlkIdx < 16 then set_bits_to_read(1); end
 		else
-			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
-			luma4x4BlkIdx := luma4x4BlkIdx +1;
-			//Read until luma4x4BlkIdx = 16
-			GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
-			start_cabac();
+			if IS_CABAC() then
+				rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
+				luma4x4BlkIdx := luma4x4BlkIdx +1;
+				//Read until luma4x4BlkIdx = 16
+				if luma4x4BlkIdx < 16 then
+					cabac_reinit();
+					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+					start_cabac();
+				end
+			end
 		end
 		
 	end
