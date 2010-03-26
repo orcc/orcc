@@ -218,9 +218,6 @@
     <Decl kind="Param" name="PREDTYPE_SIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="MV_SZ">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="Idx_SZ">
         <Type name="int"/>
     </Decl>
@@ -261,9 +258,6 @@
         </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
-        </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>

@@ -52,8 +52,12 @@
  * Copyright (c) ISO/IEC 2008-2010.
  */
 
-actor Algo_Add (int MV_SZ) int(size=MV_SZ) X, int(size=MV_SZ) Y	==> int(size=MV_SZ) Z:
+actor Algo_Add () int(size=MV_SZ) X, int(size=MV_SZ) Y	==> int(size=MV_SZ) Z:
 
+  // Port size declaration
+  int MV_SZ = 16;
+  
+  
   action X:[x], Y:[y] ==> Z:[ x+ y]
   end
 

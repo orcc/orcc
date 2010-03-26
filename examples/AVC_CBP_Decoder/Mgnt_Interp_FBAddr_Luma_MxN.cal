@@ -10,7 +10,7 @@
 //Modified by Endri Bezati <endri.bezati@insa-rennes.fr>
 //Modified the "size" correctly to work with orcc
 
-actor Mgnt_Interp_FBAddr_Luma_MxN (int SAMPLE_SZ, int MB_WIDTH, int MV_SZ, int Idx_SZ, int MODE_SZ)
+actor Mgnt_Interp_FBAddr_Luma_MxN (int MB_WIDTH, int Idx_SZ, int MODE_SZ)
 		uint(size=13) CurrMbAddr,
 		uint(size=3) MbPartIdx,
 		uint (size=8) Mb_Type,
@@ -30,6 +30,11 @@ actor Mgnt_Interp_FBAddr_Luma_MxN (int SAMPLE_SZ, int MB_WIDTH, int MV_SZ, int I
 		uint(size=Idx_SZ) refIdx,
 		int(size=SAMPLE_SZ) Coef_ACR_P
 	:
+	
+	  // Port size declaration
+  int MV_SZ = 16;
+  int SAMPLE_SZ = 16;
+  
   int(size=32) x_index ;
   int(size=32) y_index ;
   uint(size=11) Picheight_l := 1;

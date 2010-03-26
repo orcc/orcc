@@ -53,13 +53,15 @@ Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
 
-actor Algo_BlockExpand_AVC (int SAMPLE_SZ) 
+actor Algo_BlockExpand_AVC () 
 		uint(size=4) RUN, 
 		int(size=12) VALUE, 
 		bool LAST 
   			==> 
   			int(size=SAMPLE_SZ) Block :
 
+  // Port size declaration
+  int SAMPLE_SZ = 16;
   
   List(type:int(size=SAMPLE_SZ), size=16) value_buf := [ 0 : for int i in Integers(0,15) ];  
   uint(size=5) stuff_count := 0;

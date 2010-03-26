@@ -54,9 +54,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_DCR_Hadamard_LUMA_IHT1d_0">
         <!-- ************************* -->
@@ -66,9 +63,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_DC_Transpose4x4_0">
         <!-- ************************* -->
@@ -78,9 +72,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_DCR_Hadamard_LUMA_IHT1d_1">
         <!-- ************************* -->
@@ -90,9 +81,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_DCR_Hadamard_LUMA_Scaling">
         <!-- ************************* -->
@@ -105,9 +93,6 @@
         <Parameter name="QUANT_SZ">
             <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_DC_Transpose4x4_1">
         <!-- ************************* -->
@@ -117,9 +102,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_DCR_Hadamard_LUMA_Reordering">
         <!-- ************************* -->
@@ -129,9 +111,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

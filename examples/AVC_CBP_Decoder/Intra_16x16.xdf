@@ -95,9 +95,6 @@
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_IntraPred_LUMA_16x16">
         <!-- ************************* -->
@@ -119,9 +116,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Buffer_Neighbour_FullMb">
         <!-- ************************* -->
@@ -133,9 +127,6 @@
         <!-- ************************* -->
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
     <!-- ************************************** -->

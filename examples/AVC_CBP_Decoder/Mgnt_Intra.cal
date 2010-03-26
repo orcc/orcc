@@ -19,7 +19,7 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
+actor Mgnt_Intra ( int MB_WIDTH, int ID )
 	uint(size=13) FirstMbInSlice,
 	uint (size=8) Mb_Type,
 	uint(size=7) PicWidthInMb,
@@ -36,6 +36,10 @@ actor Mgnt_Intra ( int SAMPLE_SZ, int MB_WIDTH, int ID )
 		int(size=SAMPLE_SZ) Y_Up,
 		int(size=SAMPLE_SZ) Y_UpLeft
 		:  
+	
+	// Port size declaration
+	int SAMPLE_SZ = 16;
+	
 	
 	//List that contains the neighbouring pixel of the current 16x16 Mb, from bottom to top then left to right 
 	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) left_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH-1)];

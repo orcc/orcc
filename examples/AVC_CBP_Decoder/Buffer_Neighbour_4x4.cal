@@ -19,12 +19,17 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Buffer_Neighbour_4x4 ( int SAMPLE_SZ, int MB_WIDTH ) 
+actor Buffer_Neighbour_4x4 ( int MB_WIDTH ) 
 uint (size=8) Mb_Type, uint(size=13) CurrMbAddr, int(size=9) MB_IN, uint(size=7) PicWidthInMb 
 ==> 
 uint(size=SAMPLE_SZ) EDGE 
 :
 
+
+// Port size declaration
+  int SAMPLE_SZ = 16;
+  
+  
   	//FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =720/16;
 

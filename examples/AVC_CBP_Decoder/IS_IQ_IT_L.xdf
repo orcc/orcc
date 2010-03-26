@@ -71,9 +71,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Mgnt_IQ_INTRA16x16">
         <!-- ************************* -->
@@ -85,9 +82,6 @@
         <!-- ************************* -->
         <Parameter name="PREDTYPE_SZ">
             <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
     <Instance id="Algo_IQ_QSAndSLAndIDCTScaler_4x4">
@@ -106,9 +100,6 @@
         </Parameter>
         <Parameter name="QUANT_SZ">
             <Expr kind="Var" name="QUANT_SIZE"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
     <Instance id="IT4x4">

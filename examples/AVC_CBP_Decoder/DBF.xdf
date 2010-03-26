@@ -100,9 +100,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="MV_SZ">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="Idx_SZ">
         <Type name="int"/>
     </Decl>
@@ -140,9 +137,6 @@
         </Parameter>
         <Parameter name="LUMA_CHROMA">
             <Expr kind="Var" name="LUMA_CHROMA"/>
-        </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
         </Parameter>
         <Parameter name="QUANT_SZ">
             <Expr kind="Var" name="QUANT_SIZE"/>

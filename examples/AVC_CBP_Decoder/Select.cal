@@ -15,7 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Select ( int SAMPLE_SZ, int MB_WIDTH ) 
+actor Select (int MB_WIDTH ) 
 	int(size=SAMPLE_SZ) X0,
 	int(size=9) X1 ,
 	int(size=9) X2,
@@ -24,6 +24,10 @@ actor Select ( int SAMPLE_SZ, int MB_WIDTH )
 		==>
 		int(size=9) X
 		:
+  
+  // Port size declaration
+  int SAMPLE_SZ = 16;
+  
   
 	uint(size=3) sel;
   

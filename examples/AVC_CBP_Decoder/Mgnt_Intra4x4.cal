@@ -19,7 +19,7 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
+actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	uint (size=8) Mb_Type,
 	uint(size=13) FirstMbInSlice,
 	uint(size=7) PicWidthInMb,
@@ -38,6 +38,11 @@ actor Mgnt_Intra_4x4 ( int SAMPLE_SZ, int MB_WIDTH )
 		int(size=SAMPLE_SZ) Y_UpLeft4
 		:  
   	
+  	
+  	// Port size declaration
+	int SAMPLE_SZ = 16;
+	
+	
 	//Token counter
 	int (size = 6) mb_counter := 0;
 	

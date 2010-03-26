@@ -68,9 +68,6 @@
         <Parameter name="QUANT_SZ">
             <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="IS_IQ_IT_C">
         <!-- ************************* -->
@@ -98,9 +95,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

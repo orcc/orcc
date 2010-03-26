@@ -107,9 +107,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="MV_SZ">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="Idx_SZ">
         <Type name="int"/>
     </Decl>
@@ -133,9 +130,6 @@
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
         </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_MVR_MultiFrameAdptive">
         <!-- ************************* -->
@@ -151,9 +145,6 @@
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
         </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Add">
         <!-- ************************* -->
@@ -163,9 +154,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

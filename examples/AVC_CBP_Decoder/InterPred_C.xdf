@@ -171,9 +171,6 @@
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="16"/>
-        </Parameter>
         <Parameter name="PartSZ_SZ">
             <Expr kind="Literal" literal-kind="Integer" value="6"/>
         </Parameter>
@@ -182,9 +179,6 @@
         </Parameter>
         <Parameter name="PicW_SZ">
             <Expr kind="Literal" literal-kind="Integer" value="7"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
         <Parameter name="frac_SZ">
             <Expr kind="Literal" literal-kind="Integer" value="4"/>
@@ -222,9 +216,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Add">
         <!-- ************************* -->
@@ -234,9 +225,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

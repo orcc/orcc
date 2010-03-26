@@ -15,9 +15,13 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Mgnt_IQ_INTRA16x16 ( int SAMPLE_SZ, int PREDTYPE_SZ ) int(size=SAMPLE_SZ) CoefDCR_L, int(size=PREDTYPE_SZ) Intra_DC_flag, int(size=SAMPLE_SZ) CoefAC_L ==> int(size=SAMPLE_SZ) Lev2d
+actor Mgnt_IQ_INTRA16x16 ( int PREDTYPE_SZ ) int(size=SAMPLE_SZ) CoefDCR_L, int(size=PREDTYPE_SZ) Intra_DC_flag, int(size=SAMPLE_SZ) CoefAC_L ==> int(size=SAMPLE_SZ) Lev2d
 :  
 
+  // Port size declaration
+  int SAMPLE_SZ = 16;
+	
+	
   int(size=PREDTYPE_SZ) intra_dc_flag :=0;
   int(size=SAMPLE_SZ) coef_dc:=0;
   int nb_4x4:=0;

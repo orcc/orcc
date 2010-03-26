@@ -253,9 +253,6 @@
         <Parameter name="NB_PIC">
             <Expr kind="Var" name="DPBMAXSIZE"/>
         </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Select_chroma">
         <!-- ************************* -->
@@ -267,9 +264,6 @@
         <!-- ************************* -->
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
     <Instance id="Deblocking Filter">
@@ -285,9 +279,6 @@
         </Parameter>
         <Parameter name="LUMA_CHROMA">
             <Expr kind="Literal" literal-kind="Integer" value="8"/>
-        </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="16"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Literal" literal-kind="Integer" value="8"/>

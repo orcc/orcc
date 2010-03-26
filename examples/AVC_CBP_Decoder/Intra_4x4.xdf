@@ -92,9 +92,6 @@
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_IntraPred_LUMA_4x4">
         <!-- ************************* -->
@@ -116,9 +113,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Merge_4x4_to_16x16_norasterscan">
         <!-- ************************* -->
@@ -128,9 +122,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Split_16x16_to_4x4_norasterscan">
         <!-- ************************* -->
@@ -140,9 +131,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Buffer_Neighbour_4x4">
         <!-- ************************* -->
@@ -154,9 +142,6 @@
         <!-- ************************* -->
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
     <!-- ************************************** -->

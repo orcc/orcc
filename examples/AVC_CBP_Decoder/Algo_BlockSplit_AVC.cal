@@ -52,7 +52,7 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
-actor Algo_BlockSplit_AVC (int SAMPLE_SZ) 
+actor Algo_BlockSplit_AVC () 
 		int(size=SAMPLE_SZ) Block 
 		==>  
 			int(size=SAMPLE_SZ) Block_Y_DC, 
@@ -61,7 +61,12 @@ actor Algo_BlockSplit_AVC (int SAMPLE_SZ)
 			int(size=SAMPLE_SZ) Block_U_AC,
 			int(size=SAMPLE_SZ) Block_V_DC,
 			int(size=SAMPLE_SZ) Block_V_AC:
-
+  
+  
+  // Port size declaration
+  int SAMPLE_SZ = 16;
+  
+  
   splitY_DC: action Block:[ x ] repeat 16 ==> Block_Y_DC:[ x ] repeat 16 
   end
   

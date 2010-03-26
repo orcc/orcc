@@ -51,8 +51,11 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-actor Algo_IT4x4_1d ( int SAMPLE_SZ ) int(size=SAMPLE_SZ) X ==> int(size=SAMPLE_SZ) Y :
+actor Algo_IT4x4_1d ( ) int(size=SAMPLE_SZ) X ==> int(size=SAMPLE_SZ) Y :
 
+// Port size declaration
+  int SAMPLE_SZ = 16;
+  
   action X:[x] repeat 4 ==> Y:[ y[0], y[1], y[2], y[3]]
   var
    List(type:int(size=SAMPLE_SZ), size=4 ) buf,

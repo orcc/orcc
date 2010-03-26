@@ -16,7 +16,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 //Modified by Endri Bezati <endri.bezati@insa-renens.fr>
 //To work with Orcc
-actor Mgnt_DPB ( int SAMPLE_SZ, int MB_WIDTH, int NB_PIC ) 
+actor Mgnt_DPB ( int MB_WIDTH, int NB_PIC ) 
 		uint(size=7) PicWidthInMb, 
 		uint(size=13) CurrMbAddr, 
 		uint(size=13) PicSizeInMb, 
@@ -32,6 +32,11 @@ actor Mgnt_DPB ( int SAMPLE_SZ, int MB_WIDTH, int NB_PIC )
 		int(size=9) Display,
 		bool Write_Done
 :  
+
+  // Port size declaration
+  int SAMPLE_SZ = 16;
+  
+  
 //FIXME! number of MB per line of picture
 int PICWIDTH=720/16; //number of MB per lines
 int PICHEIGHT=576/16; //number of MB per columns

@@ -54,14 +54,19 @@ Copyright (c) ISO/IEC 2007.
   and a parameter NB4x4 which is set to 16 for luma or 4 for chroma
 *************************************************************************/
 
-actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 ( int QUANT_SZ, int SAMPLE_SZ, int PREDTYPE_SZ, int NB4x4 )
+actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 ( int QUANT_SZ, int PREDTYPE_SZ, int NB4x4 )
 		int(size=SAMPLE_SZ) Lev2d, 
 		int(size=QUANT_SZ) QP, 
 		int(size=PREDTYPE_SZ) intra_DC_flag, 
 		int(size=QUANT_SZ) ScalingList
 				==> 
 				int(size=SAMPLE_SZ) Cof:
-				
+
+
+// Port size declaration
+  int SAMPLE_SZ = 16;
+  
+  				
   List( type:uint(size=5), size=6*16 ) t_normAdjust4x4  = [
     10, 13, 10, 13, 13, 16, 13, 16, 10, 13, 10, 13, 13, 16, 13, 16, // qp_rem = 0
     11, 14, 11, 14, 14, 18, 14, 18, 11, 14, 11, 14, 14, 18, 14, 18, // qp_rem = 1

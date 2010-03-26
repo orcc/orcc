@@ -51,7 +51,11 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-actor Algo_IS_Zigzag_4x4 ( int SAMPLE_SZ  ) int(size=SAMPLE_SZ) levarr ==> int(size=SAMPLE_SZ) Lev2d :
+actor Algo_IS_Zigzag_4x4 ( ) int(size=SAMPLE_SZ) levarr ==> int(size=SAMPLE_SZ) Lev2d :
+  
+  // Port size declaration
+  int SAMPLE_SZ = 16;
+  
   List( type:uint(size=4), size=16 )  t_Index = [
     0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
   ];

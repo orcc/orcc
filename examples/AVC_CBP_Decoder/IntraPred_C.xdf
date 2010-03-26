@@ -101,9 +101,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Buffer_Neighbour_FullMb">
         <!-- ************************* -->
@@ -115,9 +112,6 @@
         <!-- ************************* -->
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
     <Instance id="Mgnt_Intra_8x8">
@@ -133,9 +127,6 @@
         </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
     <!-- ************************************** -->

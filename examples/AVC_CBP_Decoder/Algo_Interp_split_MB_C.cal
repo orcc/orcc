@@ -57,13 +57,17 @@ Copyright (c) ISO/IEC 2008.
 //Chnage
 
 
-actor Algo_Interp_split_MB_C (int SAMPLE_SZ) 
+actor Algo_Interp_split_MB_C () 
 		uint(size=3) MbPartIdx, 
 		uint(size=5) MbPartWidth, 
 		uint(size=5) MbPartHeigth, 
 		int(size=SAMPLE_SZ) INTERP 
 				==> int(size=SAMPLE_SZ) MBPred :
  
+ // Port size declaration
+  int SAMPLE_SZ = 16;
+  
+  
   uint(size=5) count := 0;
   uint(size=5) mbpart_idx;
   uint(size=5) mbpart_w;

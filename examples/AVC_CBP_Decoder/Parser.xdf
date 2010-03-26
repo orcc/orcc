@@ -326,9 +326,6 @@
     <Decl kind="Param" name="PREDTYPE_SIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="MV_SZ">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="Idx_SZ">
         <Type name="int"/>
     </Decl>
@@ -370,12 +367,6 @@
         <Parameter name="Idx_SZ">
             <Expr kind="Var" name="Idx_SZ"/>
         </Parameter>
-        <Parameter name="MVSZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_BlockExpand_AVC">
         <!-- ************************* -->
@@ -385,9 +376,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_BlockSplit_AVC">
         <!-- ************************* -->
@@ -397,9 +385,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_IntraPred_Split">
         <!-- ************************* -->
@@ -427,10 +412,7 @@
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
         </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
-    </Instance>
+     </Instance>
     <Instance id="Algo_MMCO">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->

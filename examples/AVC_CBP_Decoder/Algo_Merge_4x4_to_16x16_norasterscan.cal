@@ -18,8 +18,12 @@ This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
  
 *****************************************************************************/
 
-actor Algo_Merge_4x4_to_16x16_norasterscan ( int SAMPLE_SZ ) int(size=9) X ==> int(size=SAMPLE_SZ) Y :
+actor Algo_Merge_4x4_to_16x16_norasterscan () int(size=9) X ==> int(size=SAMPLE_SZ) Y :
 
+// Port size declaration
+  int SAMPLE_SZ = 16;
+  
+  
   //Tab containing the 16x16 macroblock
   List( type:int(size=SAMPLE_SZ), size=64 ) buff := [ 0 : for int i in Integers(0, 63) ];
   

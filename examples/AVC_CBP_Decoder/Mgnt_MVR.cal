@@ -51,7 +51,7 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-actor Mgnt_MVR ( int MV_SZ, int Idx_SZ, int MODE_SZ) 
+actor Mgnt_MVR ( int Idx_SZ, int MODE_SZ) 
 	uint(size=3) MbPartIdx,
 	uint(size=Idx_SZ) RefIdx,
 	uint(size=5) MbPartWidth,
@@ -70,6 +70,9 @@ actor Mgnt_MVR ( int MV_SZ, int Idx_SZ, int MODE_SZ)
 		uint(size=Idx_SZ) refidx_out
 		:
 
+  // Port size declaration
+  int MV_SZ = 16;
+  
 	//FIXME! number of MB per line of picture
 	int PICWIDTH=720/16; //number of MB per lines
 	int PICHEIGHT=576/16; //number of MB per columns

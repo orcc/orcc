@@ -17,7 +17,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 //Modified to work with ORCC
 //By Endri Bezati <endri.bezati@insa-rennes.fr>
 
-actor Algo_Interp_split_MB (int SAMPLE_SZ) 
+actor Algo_Interp_split_MB () 
 		uint(size=3) MbPartIdx,
 		uint(size=5) MbPartWidth,
 		uint(size=5) MbPartHeigth,
@@ -25,6 +25,10 @@ actor Algo_Interp_split_MB (int SAMPLE_SZ)
 				==> 
 				int(size=SAMPLE_SZ) MBPred:
  
+ 
+ // Port size declaration
+  int SAMPLE_SZ = 16;
+  
   uint(size=5) count := 0;
   uint(size=5) mbpart_idx;
   uint(size=5) mbpart_w;
