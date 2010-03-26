@@ -6368,6 +6368,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	function InverseScan4x4(uint(size=4) index, uint stride) --> uint : (InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4) end
 
 	Residual_block_init_coeff_token: action ==>
+	guard
+		IS_CAVLC()
 	var 
 		uint(size=1) top, uint(size=1) left,//= 1 if MB not available
 		uint(size=5) nA, 
@@ -6630,28 +6632,29 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	********       Residual Block CABAC			   	    *********
 	*************************************************************
 	*************************************************************/
-	/*
-	Residual_Cabac_coded_block_start: action ==>
+
+	
+	Residual_Cabac_coded_block_flag_start: action ==>
 	guard
-		maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2
+		maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 and IS_CABAC()
 	do
 		//Start 
 		GetCabacCodedBlockFlagyntaxElement();
 		start_cabac();
 	end
 	
-	Residual_Cabac_coded_block_start_done: action ==>
+	Residual_Cabac_coded_block_flag_done: action ==>
 	guard
-		maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 and  cabac_end()
+		maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 and cabac_end()
 	do
 		coded_block_flag := cabac_value();
 	end
 	
-	Residual_Cabac_skip_coded_block_start: action ==>
+	Residual_Cabac_skip_coded_block_flag: action ==>
 	guard
-		maxNumCoeff != 64 or chroma_format_idc[sps_id] != 2
+		maxNumCoeff != 64 or chroma_format_idc[sps_id] != 2 and IS_CABAC()
 	end
-	*/
+	
 	//******* End of Residual Block CABAC ********  
 	
 	test_one_byte: action ==>
@@ -7053,7 +7056,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_chroma_AC_CodedBlock4x4					( Residual_skip_chroma_AC							) --> SliceD_update; 
 		// --> macrobloc_layer / --> Slice_data
 
-		// residual_block
+		// residual_block CAVLC
 		Residual_block										( Residual_block_init_coeff_token					) --> Residual_block_read_suffixLength;
 		Residual_block_read_suffixLength					( Residual_block_read_suffixLength					) --> Residual_block_read_non_zero_coeff;
 		Residual_block_read_non_zero_coeff					( Residual_block_read_trailing_ones_sign_flag		) --> Residual_block_read_trailing_ones_sign_flag_done;
@@ -7072,6 +7075,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_block_send_run								( Residual_block_send_done							) --> Residual_return;
 		Residual_block_read_suffixLength					( Residual_block_skip_read_suffixLength				) --> Residual_return;
 
+		// residual_block CABAC
+		Residual_block										( Residual_Cabac_coded_block_flag_start				) --> Residual_Cabac_coded_block_flag_done;
+		Residual_block										( Residual_Cabac_skip_coded_block_flag				) --> Residual_return; //FIXME
+		Residual_Cabac_coded_block_flag_done				( Residual_Cabac_coded_block_flag_done				) --> Residual_return; //FIXME
+		
 	end
 
 	priority
