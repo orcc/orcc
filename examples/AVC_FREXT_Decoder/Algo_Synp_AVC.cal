@@ -2543,11 +2543,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			 
 	end
 	
-	procedure ctxIdxCodedBlockPattern()
+	procedure ctxIdxCodedBlockPatternLuma()
 	var
 		int condTermFlagA,
 		int condTermFlagB,
-		int temp,
 		int xN,
 		int yN,
 		int mbAddrA,
@@ -2556,116 +2555,117 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		bool AvailMbB
 		
 	begin
-		if ctxIdxOffset = 73 then
-			AvailMbA := false;
-		/*
-			//Neighbouring for A
-			xN := ( luma8x8BlkIdx mod 2 ) * 8 - 1;
-			yN := ( luma8x8BlkIdx  /  2 ) * 8; 
-			
-			if xN < 0 and yN > 0 and yN < 15 then
-				mbAddrA := GiveMbAddrA();
+		//if ctxIdxOffset = 73 then
+		AvailMbA := false;
+		//Neighbouring for A
+		xN := ( luma8x8BlkIdx mod 2 ) * 8 - 1;
+		yN := ( luma8x8BlkIdx  /  2 ) * 8; 
+		
+		if xN < 0 and yN > 0 and yN < 15 then
+			mbAddrA := GiveMbAddrA();
+			AvailMbA := true;
+		else
+			if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
+				mbAddrA := val_CurrMbAddr;
 				AvailMbA := true;
 			else
-				if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
-					mbAddrA := val_CurrMbAddr;
-					AvailMbA := true;
-				else
-					if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
-						AvailMbA := false;
-					end
+				if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
+					AvailMbA := false;
 				end
 			end
-			
-			//Neighbouring for B
-			xN := ( luma8x8BlkIdx mod 2 ) * 8;
-			yN := ( luma8x8BlkIdx  /  2 ) * 8 - 1; 
-			if yN < 0 and xN > 0 and xN < 15 then
-				mbAddrB := GiveMbAddrB();
-				AvailMbB := true;
-			else
-				if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
-					mbAddrB := val_CurrMbAddr;
-					AvailMbB := true;
-				else
-					if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
-						AvailMbB := false;
-					end
-				end
-			end
-			
-			if  not AvailMbA then
-				condTermFlagA := 0;
-			else
-				if ( ( mbTab[mbAddrA][mbTabMbtype] = 25 and  mbTab[mbAddrA][mbSliceType] = 2 ) or
-					 ( ( mbAddrA != val_CurrMbAddr and ( mbTab[mbAddrA] != P_Skip or mbTab[mbAddrA] != B_Skip ) and 
-				       ( mbTab[mbAddrA][mbCBPLuma] >> luma8x8BlkIdxA ) & 0x01 ) != 0 ) ) then
-					
-					condTermFlagA := 0;
-				else
-					condTermFlagA := 1;
-				end
-			end
-			
-			if  not AvailMbB then
-				condTermFlagB := 0;
-			else
-				if ( ( mbTab[mbAddrB][mbTabMbtype] = 25 and  mbTab[mbAddrB][mbSliceType] = 2 ) or
-					 ( ( mbAddrB != val_CurrMbAddr and ( mbTab[mbAddrB] != P_Skip or mbTab[mbAddrB] != B_Skip ) and 
-				       ( mbTab[mbAddrB][mbCBPLuma] >> luma8x8BlkIdxB ) & 0x01 ) != 0 ) ) then
-					
-					condTermFlagB := 0;
-				else
-					condTermFlagB := 1;
-				end
-			end
-			
-			ctxIdxInc := condTermFlagA + 2*condTermFlagB;
-		*/
-		else
-			//if ctxIdxOffset = 77
-			if not mbAddrA_Avail() then
-				condTermFlagA := 0;
-			else
-				if ( mbTab[GiveMbAddrA()][mbTabMbtype] = 25 and mbTab[GiveMbAddrA()][mbSliceType] = SLICE_TYPE_I ) then
-					condTermFlagA := 1;
-				end
-				
-				if ( binIdx = 0 and mbTab[GiveMbAddrA()][mbCBPChroma] = 0) or
-				   ( binIdx = 1 and mbTab[GiveMbAddrA()][mbCBPChroma] = 2) then
-					condTermFlagA := 0;
-				else
-					condTermFlagA := 1;
-				end
-			end
-			
-			if not mbAddrB_Avail() then
-				condTermFlagB := 0;
-			else
-				if ( mbTab[GiveMbAddrB()][mbTabMbtype] = 25 and mbTab[GiveMbAddrB()][mbSliceType] = SLICE_TYPE_I ) then
-					condTermFlagB := 1;
-				end
-				
-				if ( binIdx = 0 and mbTab[GiveMbAddrB()][mbCBPChroma] = 0) or
-				   ( binIdx = 1 and mbTab[GiveMbAddrB()][mbCBPChroma] = 2) then
-					condTermFlagB := 0;
-				else
-					condTermFlagB := 1;
-				end
-			end
-			if binIdx = 0 then
-				temp := 4;
-			else
-				temp := 0;
-			end
-		
-			ctxIdxInc := condTermFlagA + 2*condTermFlagB + temp;
 		end
 		
+		//Neighbouring for B
+		xN := ( luma8x8BlkIdx mod 2 ) * 8;
+		yN := ( luma8x8BlkIdx  /  2 ) * 8 - 1; 
+		if yN < 0 and xN > 0 and xN < 15 then
+			mbAddrB := GiveMbAddrB();
+			AvailMbB := true;
+		else
+			if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
+				mbAddrB := val_CurrMbAddr;
+				AvailMbB := true;
+			else
+				if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
+					AvailMbB := false;
+				end
+			end
+		end
 		
+		if  not AvailMbA then
+			condTermFlagA := 0;
+		else
+			if  ( mbTab[mbAddrA][mbTabMbtype] = 25 and  mbTab[mbAddrA][mbSliceType] = 2 ) or
+				  ( mbAddrA != val_CurrMbAddr and ( mbTab[mbAddrA][mbTabMbtype] != P_Skip or mbTab[mbAddrA][mbTabMbtype] != B_Skip ) ) then
+				
+				condTermFlagA := 0;
+			else
+				condTermFlagA := 1;
+			end
+		end
 		
+		if  not AvailMbB then
+			condTermFlagB := 0;
+		else
+			if  ( mbTab[mbAddrB][mbTabMbtype] = 25 and  mbTab[mbAddrB][mbSliceType] = 2 ) or
+			    ( mbAddrB != val_CurrMbAddr and ( mbTab[mbAddrB][mbTabMbtype] != P_Skip or mbTab[mbAddrB][mbTabMbtype] != B_Skip ) ) then
+				
+				condTermFlagB := 0;
+			else
+				condTermFlagB := 1;
+			end
+		end
+		
+		ctxIdxInc := condTermFlagA + 2*condTermFlagB;
 	end
 	
+	procedure ctxIdxCodedBlockPatternChroma()
+	var
+		int condTermFlagA,
+		int condTermFlagB,
+		int temp
+	begin
+		//if ctxIdxOffset = 77
+		if not mbAddrA_Avail() then
+			condTermFlagA := 0;
+		else
+			if ( mbTab[GiveMbAddrA()][mbTabMbtype] = 25 and mbTab[GiveMbAddrA()][mbSliceType] = SLICE_TYPE_I ) then
+				condTermFlagA := 1;
+			end
+			
+			if ( binIdx = 0 and mbTab[GiveMbAddrA()][mbCBPChroma] = 0) or
+			   ( binIdx = 1 and mbTab[GiveMbAddrA()][mbCBPChroma] = 2) then
+				condTermFlagA := 0;
+			else
+				condTermFlagA := 1;
+			end
+		end
+		
+		if not mbAddrB_Avail() then
+			condTermFlagB := 0;
+		else
+			if ( mbTab[GiveMbAddrB()][mbTabMbtype] = 25 and mbTab[GiveMbAddrB()][mbSliceType] = SLICE_TYPE_I ) then
+				condTermFlagB := 1;
+			end
+			
+			if ( binIdx = 0 and mbTab[GiveMbAddrB()][mbCBPChroma] = 0) or
+			   ( binIdx = 1 and mbTab[GiveMbAddrB()][mbCBPChroma] = 2) then
+				condTermFlagB := 0;
+			else
+				condTermFlagB := 1;
+			end
+		end
+		if binIdx = 1 then
+			temp := 4;
+		else
+			temp := 0;
+		end
+	
+		ctxIdxInc := condTermFlagA + 2*condTermFlagB + temp;
+	end
+		
+		
+			
 	procedure ctxIdxTransSize8x8Flag()
 	var
 		int condTermFlagA,
@@ -2930,14 +2930,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		if ( ctxIdxOffset = 73 ) then
 			if (binIdx = 0 or binIdx = 1 or binIdx = 2 or binIdx = 3) then
-				ctxIdxCodedBlockPattern();
+				ctxIdxCodedBlockPatternLuma();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			end 
 		end
 		
 		if ( ctxIdxOffset = 77 ) then
 			if (binIdx = 0 or binIdx = 1 ) then
-				ctxIdxCodedBlockPattern();
+				ctxIdxCodedBlockPatternChroma();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			end 
 		end
@@ -3046,9 +3046,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 							loop := MaxEleCompTab;
 						end
 					else
+						if loop = MaxEleCompTab -1 then
 							NextBitToDecode := true;
 							//If MaxBinIdx := synElVal[e][0] then quit the loop
 							loop := MaxEleCompTab;
+						end
 					end
 					
 					binValDecoded := false;
