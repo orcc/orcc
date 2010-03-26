@@ -1854,15 +1854,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	procedure start_cabac() 
 	begin
+		FoundSE := false;
 		CabacStartProcess := true;
 	end 
 	
 	//TODO to merge with start_cabac()
+	/*
 	procedure cabac_reinit()
 	begin
 		FoundSE := false;
 	end
-	
+	*/
 	function cabac_value() --> uint:
 		CabacValue
 	end	
@@ -5156,8 +5158,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if IS_CABAC() then
 				mb_type := cabac_value();
-				//Reinitialize Cabac Process for the next call
-				cabac_reinit();
 			end
 		end
 		
@@ -5307,8 +5307,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else
 			if IS_CABAC() then
 				transform_size_8x8_flag := cabac_value();
-				//Reinitialize Cabac Process for the next call
-				cabac_reinit();
 			end
 		end
 	end
@@ -5343,8 +5341,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		IS_CABAC() and cabac_end() and ( not cbp_done ) 
 	do
 		cbp_cabac := cabac_value();
-		//Reinitialize Cabac Process for the next call
-		cabac_reinit();
 		//get CBP Chroma
 		GetCabacCodedBlockPatternChromaSyntaxElement();
 		start_cabac();
@@ -5365,8 +5361,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			if IS_CABAC() then
 				coded_block_pattern := cbp_cabac;
 				cbp_temp := cabac_value();
-				//Reinitialize Cabac Process for the next call
-				cabac_reinit();
+				
 				cbp_done := false;
 				if cbp_temp = 1 then
 					coded_block_pattern := coded_block_pattern + 16;
@@ -5412,8 +5407,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			else
 				if IS_CABAC() then
 					transform_size_8x8_flag := cabac_value();
-					//Reinitialize Cabac Process for the next call
-					cabac_reinit();
 				end
 			end
 		end 
@@ -5455,8 +5448,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if IS_CABAC() then
 				mb_qp_delta := cabac_value();
-				//Reinitialize Cabac Process for the next call
-				cabac_reinit();
 			end
 		end
 		
@@ -5760,8 +5751,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if IS_CABAC() then
 				prev_intra4x4_pred_mode_flag := cabac_value();
-				//Reinitialize Cabac Process for the next call
-				cabac_reinit();
 				
 				if prev_intra4x4_pred_mode_flag = 0 then 
 					GetCabacRemIntra4x4_8x8PredModeSyntaxElement();
@@ -5783,8 +5772,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if IS_CABAC() then
 				rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := cabac_value();
-				//Reinitialize Cabac Process for the next call
-				cabac_reinit();
 				luma4x4BlkIdx := luma4x4BlkIdx +1;
 				//Read until luma4x4BlkIdx = 16
 				if luma4x4BlkIdx < 16 then
@@ -5810,7 +5797,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				luma4x4BlkIdx := luma4x4BlkIdx +1;
 				//Read until luma4x4BlkIdx = 16
 				if luma4x4BlkIdx < 16 then
-					cabac_reinit();
 					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
 					start_cabac();
 				end
@@ -5905,8 +5891,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else
 			if IS_CABAC() then
 			intra_chroma_pred_mode := cabac_value();
-			//Reinitialize Cabac Process for the next call
-			cabac_reinit();
 			end
 		end
 			
