@@ -469,6 +469,20 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		[ 1, 1, 0 ],
 		[ 1, 1, 1 ]	
 	];
+	int synEval_Mb_Qp_Delta_Ele = 10;
+	List ( type: List ( type: int(size = 8), size = 11) , size = 10 ) synEval_Mb_Qp_Delta = 
+	[ 
+		[ 0, 0 ,0, 0, 0, 0, 0, 0, 0, 0, 0  ],
+		[ 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0  ],
+		[ 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0  ],
+		[ 3, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0  ],
+		[ 4, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0  ],
+		[ 5, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0  ],
+		[ 6, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0  ],
+		[ 7, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0  ],
+		[ 8, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0  ],
+		[ 9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0  ]
+	];
 	
 	/* Max Binary Index */
 	int MaxBinIdx;
@@ -1975,6 +1989,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 		end
 		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_QP_DELTA then
+			MaxEleCompTab := synEval_Mb_Qp_Delta_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_Coded_Bloc_Flag[e][0];
+				foreach int s in Integers(0, 3) do
+					synElVal[e][s] := synEval_Mb_Qp_Delta[e][s];
+				end
+			end
+		end
+		
+		
 		//TODO other Syntax Element
 	end
 	
@@ -2893,7 +2918,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		if ( ctxIdxOffset = 60 ) then
 			if (binIdx = 0) then
-				//To be done (subclause 9.3.3.1.5)
+				ctxIdxincMbQpDelta();
 				ctxIdx := ctxIdxOffset + ctxIdxInc;
 			else if ( binIdx = 1 ) then
 				ctxIdx := ctxIdxOffset + 2;
@@ -5448,6 +5473,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		else 
 			if IS_CABAC() then
 				mb_qp_delta := cabac_value();
+				
+				if ( mb_qp_delta & 0x01 ) then
+					mb_qp_delta := ( mb_qp_delta + 1 ) >> 1;
+				else
+					mb_qp_delta :=  -( ( mb_qp_delta + 1 ) >> 1);
+				end
 			end
 		end
 		
