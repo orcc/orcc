@@ -182,11 +182,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	bool PcmSampleChromaDone := false;
 
 	
-	//mb_skip_flag 
-	/*
-	int ( size = 1 ) CondTermFlagA;
-	int ( size = 1 ) CondTermFlagB;
-	*/
+	//CABAC SE
+	uint (size = 1) coded_block_flag;
+	
+	
+	
 	//CABAC Binarisation
 	
 	int maxBinIdxCtx;
@@ -2053,6 +2053,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_TRANSFORM_SIZE_8x8_FLAG;
 	end
 	
+	procedure GetCabacCodedBlockFlagyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_CODED_BLOCK_FLAG;
+	end
 	
 	//*************************************************************/
 	/*************************************************************
@@ -6621,6 +6625,35 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	//******* End of Residual Block CAVLC ********  
 
+	/*************************************************************
+	*************************************************************
+	********       Residual Block CABAC			   	    *********
+	*************************************************************
+	*************************************************************/
+	/*
+	Residual_Cabac_coded_block_start: action ==>
+	guard
+		maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2
+	do
+		//Start 
+		GetCabacCodedBlockFlagyntaxElement();
+		start_cabac();
+	end
+	
+	Residual_Cabac_coded_block_start_done: action ==>
+	guard
+		maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 and  cabac_end()
+	do
+		coded_block_flag := cabac_value();
+	end
+	
+	Residual_Cabac_skip_coded_block_start: action ==>
+	guard
+		maxNumCoeff != 64 or chroma_format_idc[sps_id] != 2
+	end
+	*/
+	//******* End of Residual Block CABAC ********  
+	
 	test_one_byte: action ==>
 	guard
 		done_reading_bits(),
