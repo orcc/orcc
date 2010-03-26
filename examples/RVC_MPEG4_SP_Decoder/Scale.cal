@@ -1,7 +1,11 @@
 import all caltrop.lib.BitOps;
 
-actor Scale (int SIN_SZ, int SOUT_SZ) int (size=SIN_SZ) SIn ==> int (size=SOUT_SZ) SOut :
+actor Scale () int (size=SIN_SZ) SIn ==> int (size=SOUT_SZ) SOut :
 
+  // Port size declaration
+  int SIN_SZ 	= 13;
+  int SOUT_SZ 	= 32;
+  
 int A = 1024;
 int B = 1138;
 int C = 1730;

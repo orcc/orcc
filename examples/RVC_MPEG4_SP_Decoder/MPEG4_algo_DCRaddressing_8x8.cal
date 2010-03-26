@@ -51,13 +51,15 @@
 import all caltrop.lib.BitOps;
 
 actor MPEG4_algo_DCRaddressing_8x8 (
-int MAXW_IN_MB,
-int MB_COORD_SZ,
-int BTYPE_SZ,
 int NEWVOP,
 int INTRA
- ) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ) A, int (size=MB_COORD_SZ) B, int(size=MB_COORD_SZ) C :
+) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ) A, int (size=MB_COORD_SZ) B, int(size=MB_COORD_SZ) C :
 
+  // Port size declaration
+  int BTYPE_SZ		= 12;
+  int MB_COORD_SZ 	= 8;
+  int MAXW_IN_MB	= 121;
+  
   // Generate indices into the stream history to locate
   //   A  neighbor to the left
   //   B  neighbor above left

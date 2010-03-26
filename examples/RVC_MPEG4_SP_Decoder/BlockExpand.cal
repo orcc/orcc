@@ -14,11 +14,13 @@ import all caltrop.lib.BitOps;
 
 // Insert zero coefficients into a sparsely encoded block
 
-actor BlockExpand (
-    int SAMPLE_COUNT_SZ,
-    int SAMPLE_SZ
- ) int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE, bool LAST ==> int(size=SAMPLE_SZ) OUT :
+actor BlockExpand () int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE, bool LAST ==> int(size=SAMPLE_SZ) OUT :
 
+  // Port size declaration
+  int SAMPLE_SZ 	= 13;  
+  int SAMPLE_COUNT_SZ 	= 8;
+    
+      
   int BLOCK_SIZE = 64;
 
   int(size=SAMPLE_COUNT_SZ) count :=  0;  // Index of next sample to be transmitted

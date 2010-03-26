@@ -15,8 +15,14 @@
 
 // Limit pixel value to either [0,255] or [-255,255]
 
-actor GEN_algo_Clip ( int SAMPLE_SZ, int osz ) int(size=SAMPLE_SZ) I, bool SIGNED ==> int(size=osz) O :
+actor GEN_algo_Clip () int(size=SAMPLE_SZ) I, bool SIGNED ==> int(size=osz) O :
 
+  // Port size declaration
+  int osz 	= 13;
+  
+  // Port size declaration
+  int SAMPLE_SZ 	= 13;  
+  
   bool sflag;
 
   read_signed: action SIGNED:[s] ==>

@@ -45,13 +45,14 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_IAP_16x16 (
- int MAXW_IN_MB,
- int MB_COORD_SZ,
- int SAMPLE_SZ
-)
+actor MPEG4_algo_IAP_16x16 ()
   int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ+2) PTR, int(size=3) AC_PRED_DIR, int(size=6) QP, int(size=6) PREV_QP ==> int(size=SAMPLE_SZ) QF_AC :
-
+  
+  // Port size declaration
+  int MB_COORD_SZ 	= 8;
+  int SAMPLE_SZ 	= 13;
+  int MAXW_IN_MB	= 121;
+  
   // Use 3 address lines for component index to save address calculation effort
   // Also, location 0 is reserved for all uncoded blocks. This protocol must
   // be identical to the buffer addressing in DCR_addressing_16x16.cal and DCR_invpred_16x16_L.cal, since

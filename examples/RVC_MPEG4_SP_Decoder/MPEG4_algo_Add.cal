@@ -15,17 +15,17 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_Add (
-    int PIX_SZ,
-    int MB_COORD_SZ,
-    int BTYPE_SZ,
-
-    // Command flags from parser
-    int NEWVOP,
-    int INTRA,
-    int ACCODED
- )
-   int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==> int(size=PIX_SZ) VID :
+actor MPEG4_algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==> int(size=PIX_SZ) VID :
+  
+  
+  // Port size declaration
+  int BTYPE_SZ		= 12;
+  int MB_COORD_SZ 	= 8;
+  int PIX_SZ 		= 9;
+  int NEWVOP 		= 2048;
+  int INTRA			= 1024;
+  int ACCODED		= 2;
+  
   //_CAL_tokenMonitor := true;
   // Ignore new VOP command
   cmd.newVop: action BTYPE:[ cmd ] ==>

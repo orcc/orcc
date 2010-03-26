@@ -15,8 +15,13 @@
 
 import all caltrop.lib.BitOps;
 
-actor GEN_124_algo_Idct1d ( bool ROW, int isz, int osz ) int(size=isz) X ==> int(size=osz) Y :
+actor GEN_124_algo_Idct1d ( bool ROW) int(size=isz) X ==> int(size=osz) Y :
 
+  // Port size declaration
+  int osz 	= 13;
+  int isz 	= 13;
+  
+  
   List(type: int, size=4) W0 = [ 2048, 2676, 2841, 1609 ];
   List(type: int, size=4) W1 = [ 2048, 1108,  565, 2408 ];
 

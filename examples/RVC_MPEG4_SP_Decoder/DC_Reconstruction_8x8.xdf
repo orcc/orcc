@@ -6,21 +6,21 @@
     <Port kind="Input" name="BTYPE">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Input" name="QFS_DC">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Input" name="QP">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
@@ -30,61 +30,45 @@
     <Port kind="Output" name="PTR">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="AC_PRED_DIR">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="SIGNED">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <Port kind="Output" name="QF_DC">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="QUANT">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="PREV_QUANT">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="DCVAL">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MAXW_IN_MB">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MB_COORD_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="BTYPE_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="SAMPLE_SZ">
+   <Decl kind="Param" name="DCVAL">
         <Type name="int"/>
     </Decl>
     <Decl kind="Param" name="NEWVOP">
@@ -105,9 +89,6 @@
     <Decl kind="Param" name="ACPRED">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="QUANT_SZ">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -119,17 +100,8 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
         <Parameter name="INTRA">
             <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Var" name="MAXW_IN_MB"/>
-        </Parameter>
-        <Parameter name="MB_COORD_SZ">
-            <Expr kind="Var" name="MB_COORD_SZ"/>
         </Parameter>
         <Parameter name="NEWVOP">
             <Expr kind="Var" name="NEWVOP"/>
@@ -149,9 +121,6 @@
         <Parameter name="ACPRED">
             <Expr kind="Var" name="ACPRED"/>
         </Parameter>
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
         <Parameter name="DCVAL">
             <Expr kind="BinOpSeq">
                 <Expr kind="Literal" literal-kind="Integer" value="128"/>
@@ -165,23 +134,11 @@
         <Parameter name="INTRA">
             <Expr kind="Var" name="INTRA"/>
         </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Var" name="MAXW_IN_MB"/>
-        </Parameter>
-        <Parameter name="MB_COORD_SZ">
-            <Expr kind="Var" name="MB_COORD_SZ"/>
-        </Parameter>
         <Parameter name="NEWVOP">
             <Expr kind="Var" name="NEWVOP"/>
         </Parameter>
         <Parameter name="QUANT_MASK">
             <Expr kind="Var" name="QUANT_MASK"/>
-        </Parameter>
-        <Parameter name="QUANT_SZ">
-            <Expr kind="Var" name="QUANT_SZ"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
         </Parameter>
     </Instance>
     <!-- ************************************** -->

@@ -9,16 +9,19 @@
 import all caltrop.lib.BitOps;
 
 actor splitter_420_B (
-  int BLOCK_SZ,
-  int SAMPLE_SZ,
-  int BTYPE_SZ,
   int NEWVOP,
   int INTRA,
   int INTER,
   int ACCODED
-) 
+  ) 
 int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BTYPE ==> int(size=SAMPLE_SZ) Y , int(size=SAMPLE_SZ) U, int(size=SAMPLE_SZ) V :
 
+  // Port size declaration
+  int BTYPE_SZ		= 12;
+  int SAMPLE_SZ 	= 13;
+  int BLOCK_SZ 		= 64;
+
+  
   int(size=4) comp := 0;
   //         comp layout
   //      Y         U       V

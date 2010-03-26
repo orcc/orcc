@@ -11,6 +11,8 @@
       <vertex id="B_Y" x="603" y="238"/>
       <vertex id="B_U" x="603" y="331"/>
       <vertex id="B_V" x="603" y="424"/>
+      <vertex id="WIDTH" x="382" y="587"/>
+      <vertex id="HEIGHT" x="392" y="642"/>
       <vertex id="parseheaders" x="159" y="412"/>
       <vertex id="mvseq" x="305" y="448"/>
       <vertex id="blkexp" x="305" y="280"/>
@@ -18,7 +20,5 @@
       <vertex id="splitter_BTYPE" x="305" y="133"/>
       <vertex id="splitter_MV" x="603" y="517"/>
       <vertex id="splitter_420_B" x="454" y="349"/>
-      <vertex id="WIDTH" x="382" y="587"/>
-      <vertex id="HEIGHT" x="392" y="642"/>
    </vertices>
 </layout>

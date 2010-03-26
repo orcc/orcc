@@ -6,16 +6,12 @@
     <Port kind="Input" name="IN">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Input" name="SIGNED">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
@@ -23,25 +19,13 @@
     <Port kind="Output" name="OUT">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Variable" name="OUT_SZ">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="32"/>
-    </Decl>
-    <Decl kind="Variable" name="PIX_SZ">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="9"/>
-    </Decl>
-    <Decl kind="Variable" name="SIN_SZ">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="13"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -53,12 +37,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SIN_SZ">
-            <Expr kind="Var" name="SIN_SZ"/>
-        </Parameter>
-        <Parameter name="SOUT_SZ">
-            <Expr kind="Var" name="OUT_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="row">
         <!-- ************************* -->
@@ -68,12 +46,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="IN_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="32"/>
-        </Parameter>
-        <Parameter name="OUT_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="32"/>
-        </Parameter>
     </Instance>
     <Instance id="column">
         <!-- ************************* -->
@@ -83,12 +55,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="IN_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="32"/>
-        </Parameter>
-        <Parameter name="OUT_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="32"/>
-        </Parameter>
     </Instance>
     <Instance id="transpose">
         <!-- ************************* -->
@@ -125,12 +91,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="isz">
-            <Expr kind="Var" name="OUT_SZ"/>
-        </Parameter>
-        <Parameter name="osz">
-            <Expr kind="Var" name="PIX_SZ"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

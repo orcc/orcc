@@ -17,23 +17,26 @@
 import all caltrop.lib.BitOps;
 
 actor MPEG4_mgnt_Address (
-    int SEARCHWIN_IN_MB,      // search window size (in macroblocks)
-    int MAXW_IN_MB,           // maximum image width (in macroblocks)
-    int MAXH_IN_MB,           // maximum image height (in macroblocks)
-    int ADDR_SZ,
-    int FLAG_SZ,
-    int MV_SZ,
-    int MB_COORD_SZ,
-    int BTYPE_SZ,
     int INTRA,
     int NEWVOP,
     int MOTION,
-    int ROUND_TYPE
-,
+    int ROUND_TYPE,
     int LAYOUT 
  )
    int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE ==> int(size=ADDR_SZ) RA, int(size=ADDR_SZ) WA, int(size=FLAG_SZ) halfpel :
 
+
+  // Port size declaration
+  int BTYPE_SZ			= 12;
+  int MB_COORD_SZ 		= 8;  
+  int MV_SZ				= 9;
+  int MAXW_IN_MB		= 121; // maximum image width (in macroblocks)
+  int MAXH_IN_MB		= 69;  // maximum image height (in macroblocks)
+  int SEARCHWIN_IN_MB	= 3;   // search window size (in macroblocks)  
+  int ADDR_SZ 			= 24;
+  int FLAG_SZ 			= 4;
+
+  
   // Frame buffer
   //  * sized for max width, max height + half the search window.
   //  * pixels are written/read ring-buffer fashion

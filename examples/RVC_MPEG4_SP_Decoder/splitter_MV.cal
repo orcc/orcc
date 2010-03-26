@@ -6,9 +6,14 @@
 
 import all caltrop.lib.BitOps;
 
-actor splitter_MV(int MV_SZ, int BTYPE_SZ, int MOTION, int NEWVOP)
+actor splitter_MV(int MOTION, int NEWVOP)
   int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE ==> int(size=MV_SZ) Y, int(size=MV_SZ) U, int(size=MV_SZ) V:
 
+  // Port size declaration
+  int BTYPE_SZ		= 12;
+  int MV_SZ			= 9;
+  
+  
 // Ignore new VOP command
 newvop: action BTYPE:[ cmd ] ==>
 guard

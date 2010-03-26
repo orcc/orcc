@@ -1,4 +1,10 @@
-actor scaled_1d_idct (int IN_SZ, int OUT_SZ) int (size=IN_SZ) In ==> int (size=OUT_SZ) Out : 
+actor scaled_1d_idct () int (size=IN_SZ) In ==> int (size=OUT_SZ) Out : 
+ 
+  // Port size declaration
+  int IN_SZ 	= 32;
+  int OUT_SZ 	= 32;
+  
+  
   function pmul_1_0 (int X) --> int
     var int (size=32) Temp1 = rshift(X, 3) - rshift(X, 7):
         X - Temp1

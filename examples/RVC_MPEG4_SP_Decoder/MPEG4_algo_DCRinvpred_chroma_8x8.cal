@@ -75,21 +75,24 @@ import all caltrop.lib.BitOps;
 
 actor MPEG4_algo_DCRinvpred_chroma_8x8 (
  int DCVAL,
- int MAXW_IN_MB,
- int MB_COORD_SZ,
- int BTYPE_SZ,
- int SAMPLE_SZ,
  int NEWVOP,
  int INTRA,
  int INTER,
  int QUANT_MASK,
  int ACCODED,
- int ACPRED,
- int QUANT_SZ
+ int ACPRED
 )
  int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B, int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
    int(size=SAMPLE_SZ) QF_DC, int(size=MB_COORD_SZ) PTR, int(size=3) AC_PRED_DIR, bool SIGNED, int(size=QUANT_SZ) QUANT, int(size=QUANT_SZ) PREV_QUANT  :
 
+  // Port size declaration
+  int BTYPE_SZ		= 12;
+  int MB_COORD_SZ 	= 8;
+  int SAMPLE_SZ 	= 13;
+  int MAXW_IN_MB	= 121;
+  int QUANT_SZ 		= 6;
+
+  
   // Use 3 address lines for component index to save address calculation effort
   // Also, location 0 is reserved for all uncoded blocks. This protocol must
   // be identical to the buffer addressing in Reconstruct.cal, since pointer

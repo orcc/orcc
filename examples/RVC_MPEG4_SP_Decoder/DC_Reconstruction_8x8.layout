@@ -9,8 +9,8 @@
       <vertex id="SIGNED" x="494" y="256"/>
       <vertex id="QF_DC" x="494" y="349"/>
       <vertex id="QUANT" x="494" y="442"/>
+      <vertex id="PREV_QUANT" x="486" y="502"/>
       <vertex id="addressing" x="167" y="229"/>
       <vertex id="invpred" x="299" y="211"/>
-      <vertex id="PREV_QUANT" x="486" y="502"/>
    </vertices>
 </layout>

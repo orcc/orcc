@@ -14,8 +14,12 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_Inversequant ( int QUANT_SZ, int SAMPLE_SZ ) int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
+actor MPEG4_algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 
+  // Port size declaration
+  int SAMPLE_SZ 	= 13;
+  int QUANT_SZ = 6;
+  
   function saturate( int x ) --> int
     var
       bool minus = x < -2048,

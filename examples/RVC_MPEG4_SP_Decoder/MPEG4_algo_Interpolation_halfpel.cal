@@ -14,8 +14,12 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_Interpolation_halfpel ( int PIX_SZ, int FLAG_SZ ) int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
+actor MPEG4_algo_Interpolation_halfpel () int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
 
+  // Port size declaration
+  int FLAG_SZ = 4;
+  int PIX_SZ = 9;
+  
   bool _CAL_tokenMonitor := true;
 
   // Compensation function

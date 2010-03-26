@@ -93,30 +93,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="SAMPLE_COUNT_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="SAMPLE_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MAXW_IN_MB">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MB_COORD_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="BTYPE_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="NEWVOP">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="INTRA">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="INTER">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="QUANT_MASK">
         <Type name="int"/>
     </Decl>
@@ -129,19 +105,10 @@
     <Decl kind="Param" name="FCODE_SHIFT">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="MOTION">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="FOURMV">
         <Type name="int"/>
     </Decl>
     <Decl kind="Param" name="ACPRED">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="ACCODED">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MV_SZ">
         <Type name="int"/>
     </Decl>
     <!-- ************************************** -->
@@ -155,14 +122,8 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ACCODED">
-            <Expr kind="Var" name="ACCODED"/>
-        </Parameter>
         <Parameter name="ACPRED">
             <Expr kind="Var" name="ACPRED"/>
-        </Parameter>
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
         </Parameter>
         <Parameter name="FCODE_MASK">
             <Expr kind="Var" name="FCODE_MASK"/>
@@ -173,38 +134,11 @@
         <Parameter name="FOURMV">
             <Expr kind="Var" name="FOURMV"/>
         </Parameter>
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Var" name="MAXW_IN_MB"/>
-        </Parameter>
-        <Parameter name="MB_COORD_SZ">
-            <Expr kind="Var" name="MB_COORD_SZ"/>
-        </Parameter>
-        <Parameter name="MOTION">
-            <Expr kind="Var" name="MOTION"/>
-        </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
         <Parameter name="QUANT_MASK">
             <Expr kind="Var" name="QUANT_MASK"/>
         </Parameter>
         <Parameter name="ROUND_TYPE">
             <Expr kind="Var" name="ROUND_TYPE"/>
-        </Parameter>
-        <Parameter name="SAMPLE_COUNT_SZ">
-            <Expr kind="Var" name="SAMPLE_COUNT_SZ"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
         </Parameter>
     </Instance>
     <Instance id="mvseq">
@@ -215,26 +149,8 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
         <Parameter name="FOURMV">
             <Expr kind="Var" name="FOURMV"/>
-        </Parameter>
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Var" name="MAXW_IN_MB"/>
-        </Parameter>
-        <Parameter name="MB_COORD_SZ">
-            <Expr kind="Var" name="MB_COORD_SZ"/>
-        </Parameter>
-        <Parameter name="MOTION">
-            <Expr kind="Var" name="MOTION"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
         </Parameter>
     </Instance>
     <Instance id="blkexp">
@@ -245,12 +161,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_COUNT_SZ">
-            <Expr kind="Var" name="SAMPLE_COUNT_SZ"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="mvrecon">
         <!-- ************************* -->
@@ -260,9 +170,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
         <Parameter name="FCODE_MASK">
             <Expr kind="Var" name="FCODE_MASK"/>
         </Parameter>
@@ -271,24 +178,6 @@
         </Parameter>
         <Parameter name="FOURMV">
             <Expr kind="Var" name="FOURMV"/>
-        </Parameter>
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Var" name="MAXW_IN_MB"/>
-        </Parameter>
-        <Parameter name="MB_COORD_SZ">
-            <Expr kind="Var" name="MB_COORD_SZ"/>
-        </Parameter>
-        <Parameter name="MOTION">
-            <Expr kind="Var" name="MOTION"/>
-        </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
         </Parameter>
     </Instance>
     <Instance id="splitter_BTYPE">
@@ -299,12 +188,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
     </Instance>
     <Instance id="splitter_MV">
         <!-- ************************* -->
@@ -314,18 +197,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
-        <Parameter name="MOTION">
-            <Expr kind="Var" name="MOTION"/>
-        </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
     </Instance>
     <Instance id="splitter_420_B">
         <!-- ************************* -->
@@ -335,27 +206,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ACCODED">
-            <Expr kind="Var" name="ACCODED"/>
-        </Parameter>
-        <Parameter name="BLOCK_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="64"/>
-        </Parameter>
-        <Parameter name="BTYPE_SZ">
-            <Expr kind="Var" name="BTYPE_SZ"/>
-        </Parameter>
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SZ"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

@@ -26,8 +26,11 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_IS (int SAMPLE_SZ ) int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS_AC ==> int(size=SAMPLE_SZ) PQF_AC :
+actor MPEG4_algo_IS () int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS_AC ==> int(size=SAMPLE_SZ) PQF_AC :
 
+  // Port size declaration
+  int SAMPLE_SZ 	= 13;  
+  
   List( type:int(size=7), size=192 ) Scanmode = 
   [    0,  1,  5,  6, 14, 15, 27, 28,  2,  4,  7, 13, 16, 26, 29, 42,	//0:63 zigzag
        3,  8, 12, 17, 25, 30, 41, 43,  9, 11, 18, 24, 31, 40, 44, 53,

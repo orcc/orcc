@@ -10,8 +10,13 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
-actor GEN_algo_Transpose ( int isz, int osz ) int(size=isz) X ==> int(size=osz) Y :
+actor GEN_algo_Transpose () int(size=isz) X ==> int(size=osz) Y :
 
+  // Port size declaration
+  int osz 	= 13;
+  int isz 	= 13;
+  
+  
   action X:[ x ] repeat 64 ==> Y: [ [ x[ 8 * c + r ] : for int r in Integers(0,7), for int c in Integers(0,7) ] ] repeat 64
   end
 

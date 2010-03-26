@@ -14,8 +14,13 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_mgnt_Framebuf ( int BUF_SZ, int ADDR_SZ, int PIX_SZ )
+actor MPEG4_mgnt_Framebuf ()
    int(size=ADDR_SZ) RA, int(size=ADDR_SZ) WA, int(size=PIX_SZ) WD ==> int(size=PIX_SZ) RD :
+
+  // Port size declaration
+  int ADDR_SZ = 24;
+  int BUF_SZ = 121*(384*69+3*192+384);
+  int PIX_SZ = 9;
 
   List( type:int(size=PIX_SZ), size=BUF_SZ ) buf := [ 0 : for int i in Integers(1,BUF_SZ) ];
 
