@@ -256,11 +256,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	int P_Skip = 254;
 	int B_Skip = 255;
-
+	int tempCoeff;
 	/* reidual block Cabac */
 	
 	int blCabacIdx := 0;
-	int numCoeff := 0;
+	uint(size=5) numCoeff := 0;
 	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 254)] ;
 	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 254)] ;
 	List (type: int(size = 8), size = 256) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 254)] ;
@@ -6760,12 +6760,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		GetCabacCoeffAbsLevelMinus1SyntaxElement();
 		start_cabac();
 	end
-	/*
+	
 	Residual_block_read_coeff_abs_level_minus1_done: action ==>
 	guard
 		cabac_end()
+	
 	do
-		coeff_abs_level_minus1[ numCoeff – 1 ] := cabac_value();
+		tempCoeff := numCoeff - 1;
+		coeff_abs_level_minus1[ tempCoeff ] := cabac_value();
 		
 		//Read coeff_sign_flag[ numCoeff – 1 ]
 		GetCabacCoeffSignFlagSyntaxElement();
@@ -6776,13 +6778,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		cabac_end()
 	do
-		coeff_sign_flag[ numCoeff – 1 ] := cabac_value();
+		tempCoeff := numCoeff - 1;
+		coeff_sign_flag[ tempCoeff ] := cabac_value();
 		 
-		coeffLevel[ numCoeff – 1 ] := ( coeff_abs_level_minus1[ numCoeff – 1 ] + 1 ) * ( 1 – 2 * coeff_sign_flag[ numCoeff – 1 ] );
+		coeffLevel[ temp ] := ( coeff_abs_level_minus1[ temp ] + 1 ) * ( 1 – 2 * coeff_sign_flag[ temp ] );
 		
 		blCabacIdx := numCoeff – 2;
 	end
-	*/
+	
 	//for( i = numCoeff – 2; i >= 0; i-- )
 	Residual_block_update_coeffLevel_start: action ==>
 	guard
@@ -7254,7 +7257,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_block_send_run								( Residual_block_send_run							) --> Residual_block_send_run;
 		Residual_block_send_run								( Residual_block_send_done							) --> Residual_return;
 		Residual_block_read_suffixLength					( Residual_block_skip_read_suffixLength				) --> Residual_return;
-/*
+
 		// residual_block CABAC
 		Residual_block										( Residual_Cabac_coded_block_flag_start				) --> Residual_Cabac_coded_block_flag_done;
 		Residual_block										( Residual_Cabac_skip_coded_block_flag				) --> Residual_Cabac_Coeff_Level_Init;
@@ -7273,7 +7276,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_start_not_read	) --> Residual_block_update_coeffLevel;
 		Residual_block_update_coeffLevel_start_read_Coeff_Abs_done	( Residual_block_update_coeffLevel_start_read_Coeff_Abs_done ) --> Residual_block_update_coeffLevel_start_read_Coeff_sign_done;
 		Residual_block_update_coeffLevel_start_read_Coeff_sign_done	( Residual_block_update_coeffLevel_start_read_Coeff_sign_done ) --> Residual_block_update_coeffLevel;
-	*/
+	
 	end
 	
 	priority
