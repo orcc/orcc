@@ -59,10 +59,6 @@
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="6"/>
     </Decl>
-    <Decl kind="Variable" name="PREDTYPE_SIZE">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="2"/>
-    </Decl>
     <Decl kind="Variable" name="QUANT_SIZE">
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="8"/>
@@ -88,9 +84,6 @@
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SIZE"/>
         </Parameter>
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
         <Parameter name="SAMPLE_SIZE">
             <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
@@ -108,9 +101,6 @@
         </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SIZE"/>
-        </Parameter>
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>
@@ -130,9 +120,6 @@
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
         </Parameter>
-       <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>
@@ -150,9 +137,6 @@
         <!-- ************************* -->
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>

@@ -77,9 +77,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Literal" literal-kind="Integer" value="2"/>
-        </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>

@@ -57,9 +57,6 @@
     <Decl kind="Param" name="QUANT_SIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="PREDTYPE_SIZE">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -80,9 +77,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PREDTYPE_SZ">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_IQ_QSAndSLAndIDCTScaler_4x4">
         <!-- ************************* -->
@@ -94,9 +88,6 @@
         <!-- ************************* -->
         <Parameter name="NB4x4">
             <Expr kind="Literal" literal-kind="Integer" value="16"/>
-        </Parameter>
-        <Parameter name="PREDTYPE_SZ">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
         </Parameter>
         <Parameter name="QUANT_SZ">
             <Expr kind="Var" name="QUANT_SIZE"/>

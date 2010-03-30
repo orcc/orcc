@@ -54,9 +54,6 @@
     <Decl kind="Param" name="SAMPLE_SIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="PREDTYPE_SIZE">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Variable" name="DPBMAXSIZE">
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="16"/>
@@ -105,9 +102,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>

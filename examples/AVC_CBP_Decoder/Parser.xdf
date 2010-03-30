@@ -323,9 +323,6 @@
     <Decl kind="Param" name="DPBMAXSIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="PREDTYPE_SIZE">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="MODE_SZ">
         <Type name="int"/>
     </Decl>
@@ -388,9 +385,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="MVReconstruct">
         <!-- ************************* -->

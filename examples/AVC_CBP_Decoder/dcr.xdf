@@ -40,6 +40,9 @@
     <Decl kind="Param" name="SAMPLE_SIZE">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="QUANT_SIZE">
+        <Type name="int"/>
+    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
