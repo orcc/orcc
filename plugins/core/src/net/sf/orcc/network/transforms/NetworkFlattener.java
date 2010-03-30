@@ -59,8 +59,10 @@ public class NetworkFlattener implements INetworkTransformation {
 	 * @throws OrccException
 	 */
 	private void copySubGraph(Map<String, IAttribute> attrs, Network network,
-			Network subNetwork) {
+			Instance instance) {
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
+
+		Network subNetwork = instance.getNetwork();
 		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
 
 		List<Vertex> vertexSet = new ArrayList<Vertex>(subGraph.vertexSet());
@@ -68,8 +70,8 @@ public class NetworkFlattener implements INetworkTransformation {
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				instance.setId(subNetwork.getName() + "_" + instance.getId());
+				Instance subInstance = vertex.getInstance();
+				subInstance.setId(instance.getId() + "_" + subInstance.getId());
 
 				Map<String, IAttribute> vertexAttrs = vertex.getInstance()
 						.getAttributes();
@@ -182,7 +184,7 @@ public class NetworkFlattener implements INetworkTransformation {
 					subNetwork.flatten();
 
 					// copy vertices and edges
-					copySubGraph(instance.getAttributes(), network, subNetwork);
+					copySubGraph(instance.getAttributes(), network, instance);
 					linkOutgoingConnections(vertex, network.getGraph(),
 							subNetwork.getGraph());
 					linkIncomingConnections(vertex, network.getGraph(),
