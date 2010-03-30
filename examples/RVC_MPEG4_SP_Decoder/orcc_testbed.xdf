@@ -29,9 +29,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="fname">
-            <Expr kind="Literal" literal-kind="String" value="D:/Projects/RVC/Cal2C_delivery/data/foreman_qcif_30.bit"/>
-        </Parameter>
     </Instance>
     <Instance id="display">
         <!-- ************************* -->
@@ -41,21 +38,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="doCompare">
-            <Expr kind="Literal" literal-kind="Integer" value="1"/>
-        </Parameter>
-        <Parameter name="file">
-            <Expr kind="Literal" literal-kind="String" value="D:/Projects/RVC/Cal2C_delivery/data/foreman_qcif_30.yuv"/>
-        </Parameter>
-        <Parameter name="height">
-            <Expr kind="Literal" literal-kind="Integer" value="144"/>
-        </Parameter>
-        <Parameter name="title">
-            <Expr kind="Literal" literal-kind="String" value="Foreman QCIF"/>
-        </Parameter>
-        <Parameter name="width">
-            <Expr kind="Literal" literal-kind="Integer" value="176"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
