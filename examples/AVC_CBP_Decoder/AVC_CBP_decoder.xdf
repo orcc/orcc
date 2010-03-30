@@ -55,17 +55,9 @@
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="16"/>
     </Decl>
-    <Decl kind="Variable" name="Idx_SZ">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="3"/>
-    </Decl>
     <Decl kind="Variable" name="MODE_SIZE">
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="6"/>
-    </Decl>
-    <Decl kind="Variable" name="MV_SIZE">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="16"/>
     </Decl>
     <Decl kind="Variable" name="PREDTYPE_SIZE">
         <Type name="int"/>
@@ -93,9 +85,6 @@
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
         </Parameter>
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SIZE"/>
         </Parameter>
@@ -116,9 +105,6 @@
         <!-- ************************* -->
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
         </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SIZE"/>
@@ -144,10 +130,7 @@
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
         </Parameter>
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
-        <Parameter name="PREDTYPE_SIZE">
+       <Parameter name="PREDTYPE_SIZE">
             <Expr kind="Var" name="PREDTYPE_SIZE"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
@@ -167,9 +150,6 @@
         <!-- ************************* -->
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
         </Parameter>
         <Parameter name="PREDTYPE_SIZE">
             <Expr kind="Var" name="PREDTYPE_SIZE"/>

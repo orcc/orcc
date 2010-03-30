@@ -1,4 +1,4 @@
-actor orcc_parseheader(int Idx_SZ) 
+actor orcc_parseheader() 
 int(size=SAMPLE_SZ) Coef_U_DC, int(size=SAMPLE_SZ) coef_U_AC, int(size=SAMPLE_SZ) Coef_V_DC, int(size=SAMPLE_SZ) Coef_V_AC, 
 uint POC, uint(size=5) RefReordering, uint(size=5) MMCO , uint(size=6) CodedBlockPatternLuma, 
 int(size=8) QP_Cb, int(size=8) QP_Cr,
@@ -10,5 +10,6 @@ uint(size=11)Location , int(size=MV_SZ) mv_out ,uint(size=5) refidx_out
   // Port size declaration
   int MV_SZ = 16;
   int SAMPLE_SZ = 16;
+  int Idx_SZ = 3;
   
 end

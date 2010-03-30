@@ -12,7 +12,7 @@ import all caltrop.lib.BitOps;
 // refID  MB position (x,y)
 actor Mgnt_FBAddr_Chroma_MxN ( int ADDR_SZ,   int loca_SZ,    int ref_SZ,
     						   int frac_SZ,   int PartSZ_SZ, int PicS_SZ,int PicW_SZ,
-    						   int MB_WIDTH,  int Idx_SZ ) 
+    						   int MB_WIDTH ) 
    							
    							 int (size=SAMPLE_SZ) Coef_ACR, 
    							 uint(size=8)         Mb_Type, 
@@ -37,6 +37,8 @@ actor Mgnt_FBAddr_Chroma_MxN ( int ADDR_SZ,   int loca_SZ,    int ref_SZ,
    // Port size declaration
   int MV_SZ = 16;
   int SAMPLE_SZ = 16;
+  int Idx_SZ = 3;
+  
 	/* ***
 		Global Variables
 							*** */

@@ -39,7 +39,7 @@
 // Description: The management part of deblocking filter without mbaff
 
   
-actor Mgnt_DBF (int LUMA_CHROMA, int QUANT_SZ, int Idx_SZ) 
+actor Mgnt_DBF (int LUMA_CHROMA, int QUANT_SZ) 
 	int(size=9) Z,
 	uint(size=7) PicWidthInMb,
 	uint(size=13) PicSizeInMb,
@@ -60,6 +60,7 @@ actor Mgnt_DBF (int LUMA_CHROMA, int QUANT_SZ, int Idx_SZ)
 
   // Port size declaration
   int MV_SZ = 16;
+  int Idx_SZ = 3;
   
 ///////////////
 // Constants //

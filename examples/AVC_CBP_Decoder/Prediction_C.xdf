@@ -200,9 +200,6 @@
     <Decl kind="Param" name="SAMPLE_SIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="Idx_SZ">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -229,9 +226,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
@@ -274,9 +268,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
         <Parameter name="LUMA_CHROMA">
             <Expr kind="Literal" literal-kind="Integer" value="8"/>
         </Parameter>

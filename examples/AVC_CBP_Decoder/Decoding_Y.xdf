@@ -218,9 +218,6 @@
     <Decl kind="Param" name="PREDTYPE_SIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="Idx_SZ">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="MODE_SZ">
         <Type name="int"/>
     </Decl>
@@ -249,9 +246,6 @@
         <!-- ************************* -->
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
         </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>

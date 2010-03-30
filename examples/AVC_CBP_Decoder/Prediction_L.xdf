@@ -200,9 +200,6 @@
     <Decl kind="Param" name="DPBMAXSIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="Idx_SZ">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="MODE_SZ">
         <Type name="int"/>
     </Decl>
@@ -230,9 +227,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
@@ -308,9 +302,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
         <Parameter name="LUMA_CHROMA">
             <Expr kind="Literal" literal-kind="Integer" value="16"/>
         </Parameter>

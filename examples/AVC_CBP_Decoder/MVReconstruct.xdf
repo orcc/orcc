@@ -107,9 +107,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="Idx_SZ">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="MODE_SZ">
         <Type name="int"/>
     </Decl>
@@ -124,9 +121,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
         </Parameter>
@@ -139,9 +133,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
         </Parameter>

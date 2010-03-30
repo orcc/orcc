@@ -100,9 +100,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="Idx_SZ">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="QUANT_SIZE">
         <Type name="int"/>
     </Decl>
@@ -132,9 +129,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
         <Parameter name="LUMA_CHROMA">
             <Expr kind="Var" name="LUMA_CHROMA"/>
         </Parameter>

@@ -54,7 +54,7 @@ Copyright (c) ISO/IEC 2008.
 
 
 
-actor Algo_MVR_MultiFrameAdptive (int MODE_SZ, int Idx_SZ) 
+actor Algo_MVR_MultiFrameAdptive (int MODE_SZ) 
 		uint(size=Idx_SZ) mbPartIdx,
 		uint(size=MODE_SZ) PartSZ,
 		uint(size=Idx_SZ) refIdxLX,
@@ -66,6 +66,8 @@ actor Algo_MVR_MultiFrameAdptive (int MODE_SZ, int Idx_SZ)
 
   // Port size declaration
   int MV_SZ = 16;
+  int Idx_SZ = 3;
+  
   
   int(size=Idx_SZ) mbPartIdxt;
   int(size=MODE_SZ) MbPartWidth;

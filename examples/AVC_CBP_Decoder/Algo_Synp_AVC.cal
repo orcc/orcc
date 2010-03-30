@@ -56,7 +56,7 @@ FU realizing Syntax Parsing for AVC
 
 // This FU has been modified by Mickael Raulet (INSA of Rennes) July 2009
 
-actor Algo_Synp_AVC( int MVSZ, int Idx_SZ)
+actor Algo_Synp_AVC( int MVSZ)
 		uint(size=1) bits, 
 		uint nb_rbsp_bytes 
 		==> int(size=9) pix_I_PCM,
@@ -93,6 +93,7 @@ actor Algo_Synp_AVC( int MVSZ, int Idx_SZ)
 		
 	// Port size declaration
     int SAMPLE_SZ = 16;
+    int Idx_SZ = 3;
   
   	// FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =1280/16;
