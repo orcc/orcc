@@ -41,6 +41,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.transforms.CloseActorsTransform;
+import net.sf.orcc.network.transforms.SolveParametersTransform;
 import net.sf.orcc.network.transforms.Instantiator;
 import net.sf.orcc.network.transforms.NetworkClassifier;
 import net.sf.orcc.network.transforms.NetworkFlattener;
@@ -185,10 +186,9 @@ public class Network {
 
 	/**
 	 * Flattens this network.
-	 * 
-	 * @throws OrccException
 	 */
-	public void flatten() throws OrccException {
+	public void flatten() {
+		new SolveParametersTransform().transform(this);
 		new NetworkFlattener().transform(this);
 	}
 
@@ -271,6 +271,17 @@ public class Network {
 	}
 
 	/**
+	 * Returns the input port whose name matches the given name.
+	 * 
+	 * @param name
+	 *            the port name
+	 * @return an input port whose name matches the given name
+	 */
+	public Port getInput(String name) {
+		return inputs.get(name);
+	}
+
+	/**
 	 * Returns the list of this network's input ports
 	 * 
 	 * @return the list of this network's input ports
@@ -303,17 +314,6 @@ public class Network {
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * Returns the input port whose name matches the given name.
-	 * 
-	 * @param name
-	 *            the port name
-	 * @return an input port whose name matches the given name
-	 */
-	public Port getInput(String name) {
-		return inputs.get(name);
 	}
 
 	/**
