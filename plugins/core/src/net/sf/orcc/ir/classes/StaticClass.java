@@ -54,6 +54,8 @@ public class StaticClass extends AbstractActorClass {
 
 	private Pattern outputPattern;
 
+	private int numberOfPhases;
+
 	/**
 	 * Creates a new static class.
 	 */
@@ -172,6 +174,14 @@ public class StaticClass extends AbstractActorClass {
 		for (Port port : actor.getOutputs()) {
 			outputPattern.put(port, port.getNumTokensProduced());
 		}
+	}
+
+	public void setNumberOfPhases(int numberOfPhases) {
+		this.numberOfPhases = numberOfPhases;
+	}
+
+	public int getNumberOfPhases() {
+		return numberOfPhases;
 	}
 
 }

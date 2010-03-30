@@ -162,6 +162,7 @@ public class ActorClassifierIndependent {
 		// schedule the actor
 		StaticClass staticClass = new StaticClass();
 		int scheduled;
+		int nbPhases = 0;
 		if (fsm == null) {
 			do {
 				scheduled = interpretedActor.schedule();
@@ -169,6 +170,7 @@ public class ActorClassifierIndependent {
 					Action latest = interpretedActor.getScheduledAction();
 					staticClass.addAction(latest);
 				}
+				nbPhases++;
 			} while (!state.isInitialState() || scheduled == 0);
 		} else {
 			String initialState = fsm.getInitialState().getName();
@@ -178,6 +180,7 @@ public class ActorClassifierIndependent {
 					Action latest = interpretedActor.getScheduledAction();
 					staticClass.addAction(latest);
 				}
+				nbPhases++;
 			} while (!state.isInitialState()
 					|| !initialState.equals(interpretedActor.getFsmState())
 					|| scheduled == 0);
@@ -186,6 +189,7 @@ public class ActorClassifierIndependent {
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
 		staticClass.setTokenProductions(actor);
+		staticClass.setNumberOfPhases(nbPhases);
 
 		System.out.println("actor " + actor + " is CSDF");
 
@@ -202,14 +206,19 @@ public class ActorClassifierIndependent {
 		// schedule the actor
 		StaticClass staticClass = new StaticClass();
 		String initialState = fsm.getInitialState().getName();
+
+		int nbPhases = 0;
+
 		do {
 			interpretedActor.schedule();
 			staticClass.addAction(interpretedActor.getScheduledAction());
+			nbPhases++;
 		} while (!initialState.equals(interpretedActor.getFsmState()));
 
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
 		staticClass.setTokenProductions(actor);
+		staticClass.setNumberOfPhases(nbPhases);
 
 		System.out.println("actor " + actor + " is CSDF");
 
@@ -326,6 +335,9 @@ public class ActorClassifierIndependent {
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
 		staticClass.setTokenProductions(actor);
+
+		// an SDF actor is a specific CSDF with 1 phase
+		staticClass.setNumberOfPhases(1);
 
 		System.out.println("actor " + actor + " is SDF");
 

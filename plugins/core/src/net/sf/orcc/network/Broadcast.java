@@ -83,6 +83,10 @@ public class Broadcast extends Instance {
 		return outputList;
 	}
 
+	public int getNumOutput() {
+		return numOutput;
+	}
+
 	public Type getType() {
 		return type;
 	}
