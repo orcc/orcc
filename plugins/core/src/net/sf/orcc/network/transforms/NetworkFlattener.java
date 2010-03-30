@@ -28,8 +28,10 @@
  */
 package net.sf.orcc.network.transforms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -63,17 +65,19 @@ public class NetworkFlattener implements INetworkTransformation {
 	 * 
 	 * @throws OrccException
 	 */
-	private void copySubGraph(HashMap<String, Integer> existingInsts,
-			Map<String, IAttribute> attrs, Network network, Network subNetwork)
-			throws OrccException {
+	private void copySubGraph(Map<String, IAttribute> attrs, Network network,
+			Network subNetwork) throws OrccException {
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
 		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
 
-		Set<Vertex> vertexSet = new HashSet<Vertex>(subGraph.vertexSet());
-		Set<Connection> edgeSet = new HashSet<Connection>(subGraph.edgeSet());
+		List<Vertex> vertexSet = new ArrayList<Vertex>(subGraph.vertexSet());
+		List<Connection> edgeSet = new ArrayList<Connection>(subGraph.edgeSet());
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				instance.setId(subNetwork.getName() + "_" + instance.getId());
+
 				Map<String, IAttribute> vertexAttrs = vertex.getInstance()
 						.getAttributes();
 				for (Entry<String, IAttribute> attr : attrs.entrySet()) {
@@ -82,7 +86,7 @@ public class NetworkFlattener implements INetworkTransformation {
 					}
 				}
 
-				graph.addVertex(renameInstance(existingInsts, vertex, network));
+				graph.addVertex(vertex);
 			}
 		}
 
@@ -98,9 +102,7 @@ public class NetworkFlattener implements INetworkTransformation {
 
 	private void copyVariables(OrderedMap<GlobalVariable> existingVars,
 			Network network, Instance instance) throws OrccException {
-
 		for (GlobalVariable var : instance.getNetwork().getVariables()) {
-
 			OrderedMap<GlobalVariable> parentVars = network.getVariables();
 			GlobalVariable newVar = new GlobalVariable(var);
 			newVar.setExpression(var.getExpression());
@@ -133,13 +135,10 @@ public class NetworkFlattener implements INetworkTransformation {
 	private void linkIncomingConnections(Vertex vertex,
 			DirectedGraph<Vertex, Connection> graph,
 			DirectedGraph<Vertex, Connection> subGraph) throws OrccException {
-		Set<Connection> incomingEdgeSet = new HashSet<Connection>(graph
+		List<Connection> incomingEdgeSet = new ArrayList<Connection>(graph
 				.incomingEdgesOf(vertex));
-
 		for (Connection edge : incomingEdgeSet) {
-
 			Set<Connection> outgoingEdgeSet = new HashSet<Connection>();
-
 			for (Vertex v : subGraph.vertexSet()) {
 				if (v.isPort()) {
 					if (edge.getTarget().getName()
@@ -173,13 +172,10 @@ public class NetworkFlattener implements INetworkTransformation {
 	private void linkOutgoingConnections(Vertex vertex,
 			DirectedGraph<Vertex, Connection> graph,
 			DirectedGraph<Vertex, Connection> subGraph) throws OrccException {
-		Set<Connection> outgoingEdgeSet = new HashSet<Connection>(graph
+		List<Connection> outgoingEdgeSet = new ArrayList<Connection>(graph
 				.outgoingEdgesOf(vertex));
-
 		for (Connection edge : outgoingEdgeSet) {
-
 			Set<Connection> incomingEdgeSet = new HashSet<Connection>();
-
 			for (Vertex v : subGraph.vertexSet()) {
 				if (v.isPort()) {
 					if (edge.getSource().getName()
@@ -205,7 +201,6 @@ public class NetworkFlattener implements INetworkTransformation {
 	 * @throws OrccException
 	 */
 	private void propagateParams(Instance instance) throws OrccException {
-
 		HashMap<String, Expression> parentParams = new HashMap<String, Expression>(
 				instance.getParameters());
 
@@ -224,34 +219,6 @@ public class NetworkFlattener implements INetworkTransformation {
 				entry.setValue(expr);
 			}
 		}
-
-	}
-
-	/**
-	 * Renames instance if an instance with the same name already exists
-	 * 
-	 * @throws OrccException
-	 */
-	private Vertex renameInstance(HashMap<String, Integer> existingInsts,
-			Vertex vertex, Network network) throws OrccException {
-
-		Instance instance = vertex.getInstance();
-		String str = instance.getId();
-		Integer value = new Integer(0);
-		
-		if (existingInsts.containsKey(str)) {
-			value = existingInsts.get(str);
-			instance.setId(String.format(str + "_%03d", ++value));
-			for (Instance inst : network.getInstances()) {
-				if (inst.getId().equals(instance.getId())) {
-					instance.setId(String.format(str + "_%03d", ++value));
-				}
-			}
-		}
-		
-		existingInsts.put(instance.getId(), value);
-
-		return vertex;
 	}
 
 	private Expression resolveExpr(Expression expr,
@@ -273,34 +240,29 @@ public class NetworkFlattener implements INetworkTransformation {
 
 	@Override
 	public void transform(Network network) throws OrccException {
-		Set<Vertex> vertexSet = new HashSet<Vertex>(network.getGraph()
+		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getGraph()
 				.vertexSet());
 
-		HashMap<String, Integer> existingInsts = new HashMap<String, Integer>();
-
 		OrderedMap<GlobalVariable> ExistingVars = network.getVariables();
-
-		for (Instance instance : network.getInstances()) {
-			if (!instance.isNetwork()) {
-				existingInsts.put(instance.getId(), new Integer(0));
-			}
-		}
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
 				if (instance.isNetwork()) {
 					Network subNetwork = instance.getNetwork();
+					subNetwork.flatten();
 
-					transform(subNetwork);
 					propagateParams(instance);
 					copyVariables(ExistingVars, network, instance);
-					copySubGraph(existingInsts, instance.getAttributes(),
-							network, subNetwork);
+
+					// copy vertices and edges
+					copySubGraph(instance.getAttributes(), network, subNetwork);
 					linkOutgoingConnections(vertex, network.getGraph(),
 							subNetwork.getGraph());
 					linkIncomingConnections(vertex, network.getGraph(),
 							subNetwork.getGraph());
+
+					// remove vertex from this graph
 					network.getGraph().removeVertex(vertex);
 				}
 			}
