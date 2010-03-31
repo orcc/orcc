@@ -459,11 +459,11 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     bitand( vld_result(), 7 ) != 4
   var
     int mcbpc = vld_result(),
-    int type = bitand( mcbpc, 7 )
+    int mcbpc_type = bitand( mcbpc, 7 )
   do
-    btype_is_INTRA := type >= 3;
-	btype_is_Q:= (type = 4) or (type = 1);
-    fourmvflag := (type = 2);
+    btype_is_INTRA := mcbpc_type >= 3;
+	btype_is_Q:= (mcbpc_type = 4) or (mcbpc_type = 1);
+    fourmvflag := (mcbpc_type = 2);
     cbpc := bitand( rshift( mcbpc, 4 ), 3 );
     acpredflag := false;
     start_vld_engine( CBPY_START_INDEX );
@@ -474,10 +474,10 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
     vld_success()
   var
     int mcbpc = vld_result(),
-    int type = bitand( mcbpc, 7 )
+    int mcbpc_type = bitand( mcbpc, 7 )
   do
     btype_is_INTRA := true;
-	btype_is_Q:= (type = 4) or (type = 1);
+	btype_is_Q:= (mcbpc_type = 4) or (mcbpc_type = 1);
     cbpc := bitand( rshift( mcbpc, 4 ), 3 );
     acpredflag := b;
     bit_count := bit_count + 1;

@@ -123,17 +123,17 @@ int INTRA
   end
 
   // Is this an INTRA 8x8 block?
-  read.intra: action BTYPE:[ type ] ==>
+  read.intra: action BTYPE:[ btype ] ==>
   guard
-    bitand( type, INTRA ) != 0, bitand( type, NEWVOP ) = 0
+    bitand( btype, INTRA ) != 0, bitand( btype, NEWVOP ) = 0
   do
     coded[ access(ptr,comp) ] := true;
   end
 
   // Is this not an INTRA 8x8 block?
-  read.other: action BTYPE:[ type ] ==>
+  read.other: action BTYPE:[ btype ] ==>
   guard
-    bitand( type, INTRA ) = 0, bitand( type, NEWVOP ) = 0
+    bitand( btype, INTRA ) = 0, bitand( btype, NEWVOP ) = 0
   do
     coded[ access(ptr,comp) ] := false;
   end
