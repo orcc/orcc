@@ -31,7 +31,9 @@ package net.sf.orcc.cal;
 import net.sf.orcc.cal.linking.CalLinkingService;
 import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 
+import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingService;
+import org.eclipse.xtext.naming.IQualifiedNameProvider;
 
 /**
  * Use this class to register components to be used within the IDE.
@@ -39,8 +41,13 @@ import org.eclipse.xtext.linking.ILinkingService;
 public class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
 
 	@Override
-	public Class<? extends org.eclipse.xtext.naming.IQualifiedNameProvider> bindIQualifiedNameProvider() {
+	public Class<? extends IQualifiedNameProvider> bindIQualifiedNameProvider() {
 		return CalQualifiedNameProvider.class;
+	}
+
+	@Override
+	public Class<? extends IValueConverterService> bindIValueConverterService() {
+		return CalValueConverter.class;
 	}
 
 	@Override

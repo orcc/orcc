@@ -18,21 +18,33 @@ process(EClassifier this) :
 
 process(EClass this) :
 	switch (this.name) {
+		case "Schedule": (
+			// make schedule contain the list of states referenced by transitions 
+			let etype = (EClass) ePackage.eContents.selectFirst(e|((EClass) e).name == "State") :
+			let states = new EReference :
+			states.setContainment(true) ->
+			states.setEType(etype) ->
+			states.setName("states") ->
+			states.setLowerBound(0) ->
+			states.setUpperBound(-1) ->
+			this.eStructuralFeatures.add(states)
+        )
+        
 		case "VariableReference": (
 			//((EReference) getEStructuralFeature('variable')).defineEOpposite('references')
 			null
         )
-        
+
         case "CallExpression": (
     		//((EReference) getEStructuralFeature('function')).defineEOpposite('calls')
     		null
     	)
-    	
+
     	case "CallStatement": (
     		//((EReference) getEStructuralFeature('procedure')).defineEOpposite('calls')
     		null
     	)
-    	
+
     	default:
     		null
     }

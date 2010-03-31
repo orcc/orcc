@@ -35,16 +35,18 @@ import java.util.Map;
 
 import net.sf.orcc.cal.cal.Actor;
 import net.sf.orcc.cal.cal.CalFactory;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.Function;
 import net.sf.orcc.cal.cal.Procedure;
+import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.State;
+import net.sf.orcc.cal.cal.Transition;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.xtext.linking.impl.DefaultLinkingService;
 import org.eclipse.xtext.parsetree.AbstractNode;
-import org.eclipse.xtext.resource.IEObjectDescription;
-import org.eclipse.xtext.scoping.IScope;
 
 public class CalLinkingService extends DefaultLinkingService {
 
@@ -155,24 +157,21 @@ public class CalLinkingService extends DefaultLinkingService {
 
 	public List<EObject> getLinkedObjects(EObject context, EReference ref,
 			AbstractNode node) {
-		final EClass requiredType = ref.getEReferenceType();
-		if (requiredType == null) {
-			return Collections.<EObject> emptyList();
+		List<EObject> result = super.getLinkedObjects(context, ref, node);
+		if (result != null && !result.isEmpty()) {
+			return result;
 		}
 
-		final IScope scope = getScope(context, ref);
+		final EClass requiredType = ref.getEReferenceType();
 		final String s = getCrossRefNodeAsString(node);
-		if (s != null) {
-			IEObjectDescription eObjectDescription = scope.getContentByName(s);
-			if (eObjectDescription == null) {
-				if (requiredType.getName().equals("Function")) {
-					return builtinFunction(context, s);
-				} else if (requiredType.getName().equals("Procedure")) {
-					return builtinProcedure(context, s);
-				}
-			} else {
-				return Collections.singletonList(eObjectDescription
-						.getEObjectOrProxy());
+		if (requiredType != null && s != null) {
+			if (CalPackage.Literals.FUNCTION.isSuperTypeOf(requiredType)) {
+				return builtinFunction(context, s);
+			} else if (CalPackage.Literals.PROCEDURE
+					.isSuperTypeOf(requiredType)) {
+				return builtinProcedure(context, s);
+			} else if (CalPackage.Literals.STATE.isSuperTypeOf(requiredType)) {
+				return getState(context, ref, s);
 			}
 		}
 
@@ -181,6 +180,38 @@ public class CalLinkingService extends DefaultLinkingService {
 
 	private Procedure getProcedure(String name) {
 		return procedures.get(name);
+	}
+
+	private List<EObject> getState(EObject context, EReference reference,
+			String name) {
+		if (reference.getName().equals("initialState")) {
+			Schedule schedule = (Schedule) context;
+			State state = getState(schedule, name);
+			// schedule.setInitialState(state);
+
+			return Collections.singletonList((EObject) state);
+		} else if (reference.getName().equals("source")) {
+			Transition transition = (Transition) context;
+			Schedule schedule = (Schedule) transition.eContainer();
+			State state = getState(schedule, name);
+
+			return Collections.singletonList((EObject) state);
+		} else if (reference.getName().equals("target")) {
+			Transition transition = (Transition) context;
+			Schedule schedule = (Schedule) transition.eContainer();
+			State state = getState(schedule, name);
+
+			return Collections.singletonList((EObject) state);
+		}
+
+		return Collections.emptyList();
+	}
+
+	public State getState(Schedule schedule, String name) {
+		State state = CalFactory.eINSTANCE.createState();
+		state.setName(name);
+		schedule.getStates().add(state);
+		return state;
 	}
 
 }
