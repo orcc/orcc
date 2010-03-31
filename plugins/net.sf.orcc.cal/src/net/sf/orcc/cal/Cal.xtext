@@ -85,7 +85,7 @@ Schedule:
 	'end';
 
 Transition:
-	source=State '(' tag=Tag ')' '-->' target=[State] ';';
+	source=[State] '(' tag=Tag ')' '-->' target=[State] ';';
 
 State: name=ID;
 
