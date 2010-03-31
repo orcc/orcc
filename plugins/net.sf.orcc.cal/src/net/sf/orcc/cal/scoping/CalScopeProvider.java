@@ -89,6 +89,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	public IScope scope_VariableReference_variable(Actor actor,
 			EReference reference) {
 		List<Variable> elements = new ArrayList<Variable>();
+		elements.addAll(actor.getParameters());
 		elements.addAll(actor.getStateVariables());
 		return Scopes.scopeFor(elements);
 	}

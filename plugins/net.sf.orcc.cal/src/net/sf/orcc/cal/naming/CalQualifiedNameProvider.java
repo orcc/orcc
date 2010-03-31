@@ -25,7 +25,7 @@ public class CalQualifiedNameProvider extends
 		if (it.hasNext()) {
 			builder.append(it.next());
 			while (it.hasNext()) {
-				// builder.append('.');
+				builder.append('.');
 				builder.append(it.next());
 			}
 		}
