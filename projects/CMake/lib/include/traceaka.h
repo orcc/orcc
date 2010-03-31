@@ -35,6 +35,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include <cstdio>
 
 #define TRACE_CACHE_THRESHOLD 1000
 #define TRACE_FIFO_SIZE (TRACE_CACHE_THRESHOLD<<2)
