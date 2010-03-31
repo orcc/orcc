@@ -116,14 +116,14 @@ actor Sequence (
   geth: action BTYPE:[h] ==>
   end
 
-  read.intra: action BTYPE:[ type ] ==>
+  read.intra: action BTYPE:[ btype ] ==>
   guard
-    bitand( type, INTRA ) != 0
+    bitand( btype, INTRA ) != 0
   do
     coded[ access(ptr,comp) ] := true;
   end
 
-  read.other: action BTYPE:[ type ] ==>
+  read.other: action BTYPE:[ btype ] ==>
   do
     coded[ access(ptr,comp) ] := false;
   end
