@@ -6756,7 +6756,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		blCabacIdx > numCoeff - 1
 	do
-		//Read coeff_abs_level_minus1[ numCoeff – 1 ]
+		//Read coeff_abs_level_minus1[ numCoeff - 1 ]
 		GetCabacCoeffAbsLevelMinus1SyntaxElement();
 		start_cabac();
 	end
@@ -6769,7 +6769,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		tempCoeff := numCoeff - 1;
 		coeff_abs_level_minus1[ tempCoeff ] := cabac_value();
 		
-		//Read coeff_sign_flag[ numCoeff – 1 ]
+		//Read coeff_sign_flag[ numCoeff - 1 ]
 		GetCabacCoeffSignFlagSyntaxElement();
 		start_cabac();
 	end
@@ -6778,20 +6778,19 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		cabac_end()
 	do
-		tempCoeff := numCoeff - 1;
-		coeff_sign_flag[ tempCoeff ] := cabac_value();
+		coeff_sign_flag[ numCoeff - 1 ] := cabac_value();
 		 
-		coeffLevel[ temp ] := ( coeff_abs_level_minus1[ temp ] + 1 ) * ( 1 – 2 * coeff_sign_flag[ temp ] );
+		coeffLevel[ numCoeff - 1 ] := ( coeff_abs_level_minus1[ numCoeff - 1 ] + 1 ) * ( 1 - 2 * coeff_sign_flag[ numCoeff - 1 ] );
 		
-		blCabacIdx := numCoeff – 2;
+		blCabacIdx := numCoeff - 2;
 	end
 	
-	//for( i = numCoeff – 2; i >= 0; i-- )
+	//for( i = numCoeff - 2; i >= 0; i-- )
 	Residual_block_update_coeffLevel_start: action ==>
 	guard
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1
 	do
-		//Read coeff_abs_level_minus1[ numCoeff – 1 ]
+		//Read coeff_abs_level_minus1[ numCoeff - 1 ]
 		GetCabacCoeffAbsLevelMinus1SyntaxElement();
 		start_cabac();
 	end
@@ -6802,22 +6801,22 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		coeff_abs_level_minus1[ blCabacIdx ] := cabac_value();	
 		
-		//Read coeff_sign_flag[ numCoeff – 1 ]
+		//Read coeff_sign_flag[ numCoeff - 1 ]
 		GetCabacCoeffSignFlagSyntaxElement();
 		start_cabac();
 	end
-	/*
+	
 	Residual_block_update_coeffLevel_start_read_Coeff_sign_done: action ==>
 	guard
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1 and cabac_end()
 	do
 		
 		coeff_sign_flag[ numCoeff - 1 ] := cabac_value();
-		coeffLevel[ blCabacIdx ] := ( coeff_abs_level_minus1[ blCabacIdx ] + 1 )*( 1 – 2 * coeff_sign_flag[ blCabacIdx ] );
+		coeffLevel[ blCabacIdx ] := ( coeff_abs_level_minus1[ blCabacIdx ] + 1 )*( 1 - 2 * coeff_sign_flag[ blCabacIdx ] );
 	
 		blCabacIdx := blCabacIdx - 1;
 	end
-	*/
+	
 	Residual_block_update_coeffLevel_start_not_read: action ==>
 	guard
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 0
