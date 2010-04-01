@@ -81,42 +81,42 @@ let init_options () =
 	(* checks *)
 	if !input_file = "" then (
 			Arg.usage speclist usage;
-			prerr_endline "ORCC frontend: no input file given!";
+			prerr_endline "Orcc frontend: no input file given!";
 			exit 1
 	);
 	
 	if !output_folder = "" then (
 			Arg.usage speclist usage;
-			prerr_endline "ORCC frontend: no output folder given!";
+			prerr_endline "Orcc frontend: no output folder given!";
 			exit 1
 	);
 	
 	if Sys.file_exists !input_file then (
 		if Sys.is_directory !input_file then (
-			prerr_endline "ORCC frontend: the given input path is not a file.";
+			prerr_endline "Orcc frontend: the given input path is not a file.";
 			prerr_endline !input_file;
 			exit 1
 		)
 	) else (
-		prerr_endline "ORCC frontend: the given input file does not exist.";
+		prerr_endline "Orcc frontend: the given input file does not exist.";
 		prerr_endline !input_file;
 		exit 1
 	);
 
 	if Sys.file_exists !output_folder then (
 		if not (Sys.is_directory !output_folder) then (
-			prerr_endline "ORCC frontend: the given output path is not a directory.";
+			prerr_endline "Orcc frontend: the given output path is not a directory.";
 			prerr_endline !output_folder;
 			exit 1
 		)
 	) else (
-		prerr_endline "ORCC frontend: the given output path does not exist.";
+		prerr_endline "Orcc frontend: the given output path does not exist.";
 		prerr_endline !output_folder;
 		exit 1
 	);
 	
 	if not (Filename.check_suffix !input_file ".xdf") then (
-			prerr_endline "ORCC frontend: the given input file must be a .xdf file.";
+			prerr_endline "Orcc frontend: the given input file must be a .xdf file.";
 			prerr_endline !output_folder;
 			exit 1
 	);
@@ -136,7 +136,7 @@ let init_options () =
 		}
 	in
 
-	print_endline "Starting ORCC frontend...";
+	print_endline "Starting Orcc frontend...";
 	printf "model path: %s\n" options.o_mp;
 	printf "top network: %s\n" options.o_file;
 	printf "output folder: %s\n" options.o_outdir;

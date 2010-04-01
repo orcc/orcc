@@ -44,4 +44,4 @@ generating code = %f\n"
 		exit 1
 	);
 
-	print_endline "ORCC frontend done.\n"
+	print_endline "Orcc frontend done.\n"
