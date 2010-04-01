@@ -378,7 +378,7 @@ let cached = ref false
 (** [codegen options actor] apply transformations to an actor in IR form,
 and prints it in JSON. *)
 let codegen options actor =
-	let file_base = Filename.chop_suffix options.o_file ".cal" in
+	let file_base = Filename.chop_suffix (Filename.basename options.o_file) ".cal" in
 	let out_base = Filename.concat options.o_outdir file_base in
 	let out_name = out_base ^ ".json" in
 	
