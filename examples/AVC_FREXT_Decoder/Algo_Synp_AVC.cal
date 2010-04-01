@@ -1,7 +1,8 @@
 /********************************************************************************
 
 This software module was originally developed by 
-Florian Decologne (IETR/INSA of Rennes), 
+Florian Decologne (IETR/INSA of Rennes) for CAVLC and 
+Endri Bezati (IETR/INSA of Rennes and EPFL) for CABAC entropy coding, 
 in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
 for reference purposes and its performance may not have been optimized. 
 This software module is an implementation of one or more tools as 
@@ -7258,10 +7259,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_block_read_suffixLength					( Residual_block_skip_read_suffixLength				) --> Residual_return;
 
 		// residual_block CABAC
-		Residual_block										( Residual_Cabac_coded_block_flag_start				) --> Residual_Cabac_coded_block_flag_done;
-		Residual_block										( Residual_Cabac_skip_coded_block_flag				) --> Residual_Cabac_Coeff_Level_Init;
-		Residual_Cabac_coded_block_flag_done				( Residual_Cabac_coded_block_flag_done				) --> Residual_Cabac_Coeff_Level_Init;
-		Residual_Cabac_Coeff_Level_Init						( Residual_Cabac_Coeff_Level_Init					) --> Residual_block_Cabac_coded_block_flag_condition;
+		Residual_block										( Residual_block_Cabac_coded_block_flag_start		) --> Residual_Cabac_coded_block_flag_done;
+		Residual_block										( Residual_block_Cabac_skip_coded_block_flag		) --> Residual_Cabac_Coeff_Level_Init;
+		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_Cabac_Coeff_Level_Init;
+		Residual_Cabac_Coeff_Level_Init						( Residual_block_Cabac_Coeff_Level_Init				) --> Residual_block_Cabac_coded_block_flag_condition;
 		Residual_block_Cabac_coded_block_flag_condition		( Residual_block_Cabac_coded_block_flag_false		) -->Residual_return;
 		Residual_block_Cabac_coded_block_flag_condition		( Residual_block_Cabac_coded_block_flag_true		) -->Residual_block_read_significant_coeff_flag_done;
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_read_significant_coeff_flag_done	) --> Residual_block_read_last_significant_coeff_flag;
