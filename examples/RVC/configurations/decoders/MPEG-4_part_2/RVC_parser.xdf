@@ -4,11 +4,7 @@
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
     <Port kind="Input" name="BITS">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
@@ -16,83 +12,113 @@
     <Port kind="Output" name="BTYPE_Y">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="BTYPE_U">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="BTYPE_V">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MV_Y">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MV_U">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MV_V">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="B_Y">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="B_U">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="B_V">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="WIDTH">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="HEIGHT">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QUANT_Y">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QUANT_U">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QUANT_V">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
+    <Decl kind="Param" name="NEWVOP">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="INTRA">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="INTER">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Param" name="QUANT_MASK">
         <Type name="int"/>
     </Decl>
@@ -105,10 +131,16 @@
     <Decl kind="Param" name="FCODE_SHIFT">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="MOTION">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Param" name="FOURMV">
         <Type name="int"/>
     </Decl>
     <Decl kind="Param" name="ACPRED">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="ACCODED">
         <Type name="int"/>
     </Decl>
     <!-- ************************************** -->
@@ -122,6 +154,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="ACCODED">
+            <Expr kind="Var" name="ACCODED"/>
+        </Parameter>
         <Parameter name="ACPRED">
             <Expr kind="Var" name="ACPRED"/>
         </Parameter>
@@ -133,6 +168,18 @@
         </Parameter>
         <Parameter name="FOURMV">
             <Expr kind="Var" name="FOURMV"/>
+        </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA"/>
+        </Parameter>
+        <Parameter name="MOTION">
+            <Expr kind="Var" name="MOTION"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
         </Parameter>
         <Parameter name="QUANT_MASK">
             <Expr kind="Var" name="QUANT_MASK"/>
@@ -151,6 +198,15 @@
         <!-- ************************* -->
         <Parameter name="FOURMV">
             <Expr kind="Var" name="FOURMV"/>
+        </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="MOTION">
+            <Expr kind="Var" name="MOTION"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
         </Parameter>
     </Instance>
     <Instance id="blkexp">
@@ -179,6 +235,15 @@
         <Parameter name="FOURMV">
             <Expr kind="Var" name="FOURMV"/>
         </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="MOTION">
+            <Expr kind="Var" name="MOTION"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
     </Instance>
     <Instance id="splitter_BTYPE">
         <!-- ************************* -->
@@ -188,6 +253,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
     </Instance>
     <Instance id="splitter_MV">
         <!-- ************************* -->
@@ -197,12 +265,39 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="MOTION">
+            <Expr kind="Var" name="MOTION"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
     </Instance>
     <Instance id="splitter_420_B">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
         <Class name="../../../VTL/MPEG/MPEG-4_part_2/splitter_420_B"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="ACCODED">
+            <Expr kind="Var" name="ACCODED"/>
+        </Parameter>
+        <Parameter name="INTER">
+            <Expr kind="Var" name="INTER"/>
+        </Parameter>
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA"/>
+        </Parameter>
+        <Parameter name="NEWVOP">
+            <Expr kind="Var" name="NEWVOP"/>
+        </Parameter>
+    </Instance>
+    <Instance id="splitter_Qp">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/MPEG-4_part_2/splitter_Qp"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -234,4 +329,8 @@
     <Connection dst="" dst-port="B_V" src="splitter_420_B" src-port="V"/>
     <Connection dst="" dst-port="WIDTH" src="parseheaders" src-port="WIDTH"/>
     <Connection dst="" dst-port="HEIGHT" src="parseheaders" src-port="HEIGHT"/>
+    <Connection dst="splitter_Qp" dst-port="QP" src="parseheaders" src-port="QP"/>
+    <Connection dst="" dst-port="QUANT_Y" src="splitter_Qp" src-port="QUANT_Y"/>
+    <Connection dst="" dst-port="QUANT_U" src="splitter_Qp" src-port="QUANT_U"/>
+    <Connection dst="" dst-port="QUANT_V" src="splitter_Qp" src-port="QUANT_V"/>
 </XDF>

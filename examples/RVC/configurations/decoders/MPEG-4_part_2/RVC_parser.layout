@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="BITS" x="57" y="514"/>
-      <vertex id="BTYPE_Y" x="454" y="190"/>
-      <vertex id="BTYPE_U" x="454" y="283"/>
-      <vertex id="BTYPE_V" x="454" y="376"/>
-      <vertex id="MV_Y" x="736" y="505"/>
-      <vertex id="MV_U" x="736" y="598"/>
-      <vertex id="MV_V" x="736" y="691"/>
-      <vertex id="B_Y" x="603" y="358"/>
-      <vertex id="B_U" x="603" y="451"/>
-      <vertex id="B_V" x="603" y="544"/>
+      <vertex id="BITS" x="57" y="542"/>
+      <vertex id="BTYPE_Y" x="454" y="127"/>
+      <vertex id="BTYPE_U" x="454" y="220"/>
+      <vertex id="BTYPE_V" x="454" y="313"/>
+      <vertex id="MV_Y" x="736" y="721"/>
+      <vertex id="MV_U" x="736" y="814"/>
+      <vertex id="MV_V" x="736" y="907"/>
+      <vertex id="B_Y" x="603" y="340"/>
+      <vertex id="B_U" x="603" y="433"/>
+      <vertex id="B_V" x="603" y="526"/>
       <vertex id="WIDTH" x="305" y="70"/>
       <vertex id="HEIGHT" x="305" y="163"/>
-      <vertex id="parseheaders" x="159" y="451"/>
+      <vertex id="QUANT_Y" x="454" y="700"/>
+      <vertex id="QUANT_U" x="454" y="793"/>
+      <vertex id="QUANT_V" x="454" y="886"/>
+      <vertex id="parseheaders" x="159" y="470"/>
       <vertex id="mvseq" x="305" y="571"/>
       <vertex id="blkexp" x="305" y="403"/>
-      <vertex id="mvrecon" x="454" y="616"/>
+      <vertex id="mvrecon" x="454" y="553"/>
       <vertex id="splitter_BTYPE" x="305" y="256"/>
-      <vertex id="splitter_MV" x="603" y="637"/>
-      <vertex id="splitter_420_B" x="454" y="469"/>
+      <vertex id="splitter_MV" x="603" y="791"/>
+      <vertex id="splitter_420_B" x="454" y="406"/>
+      <vertex id="splitter_Qp" x="305" y="724"/>
    </vertices>
 </layout>

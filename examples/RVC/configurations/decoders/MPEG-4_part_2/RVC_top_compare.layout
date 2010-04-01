@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="decoder" x="169" y="144"/>
+      <vertex id="source" x="57" y="162"/>
+      <vertex id="display" x="308" y="70"/>
+      <vertex id="Compare" x="308" y="217"/>
+   </vertices>
+</layout>
