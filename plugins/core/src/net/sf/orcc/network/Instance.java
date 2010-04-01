@@ -257,7 +257,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @throws OrccException
 	 */
 	public void instantiate(String path) throws OrccException {
-		file = new File(path, clasz + ".json");
+		File last = new File(clasz);
+		file = new File(path, last.getName() + ".json");
 		try {
 			InputStream in = new FileInputStream(file);
 			actor = new IRParser().parseActor(in);
