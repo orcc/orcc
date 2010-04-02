@@ -87,9 +87,6 @@
         <Parameter name="ROUND_TYPE">
             <Expr kind="Var" name="ROUND_TYPE"/>
         </Parameter>
-        <Parameter name="SEARCHWIN_IN_MB">
-            <Expr kind="Var" name="SEARCHWIN_IN_MB"/>
-        </Parameter>
     </Instance>
     <Instance id="buffer">
         <!-- ************************* -->
@@ -117,15 +114,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ACCODED">
-            <Expr kind="Var" name="ACCODED"/>
-        </Parameter>
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
