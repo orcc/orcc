@@ -5,7 +5,7 @@ group C_actor;
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(port) ::= <<
-extern struct fifo_s *$actorName$_$port.name$;
+extern struct fifo_s *$instance.id$_$port.name$;
 
 >>
 
@@ -76,7 +76,7 @@ $decrement.target$--;
 >>
 
 HasTokens(hasTokens) ::= <<
-$hasTokens.target$ = hasTokens($actorName$_$hasTokens.port$, $hasTokens.numTokens$);
+$hasTokens.target$ = hasTokens($instance.id$_$hasTokens.port$, $hasTokens.numTokens$);
 
 >>
 
@@ -91,17 +91,17 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 >>
 
 Peek(peek) ::= <<
-$peek.target$ = getPeekPtr($actorName$_$peek.port$, $peek.numTokens$);
+$peek.target$ = getPeekPtr($instance.id$_$peek.port$, $peek.numTokens$);
 
 >>
 
 Read(read) ::= <<
-$read.target$ = getReadPtr($actorName$_$read.port$, $read.numTokens$);
+$read.target$ = getReadPtr($instance.id$_$read.port$, $read.numTokens$);
 
 >>
 
 ReadEnd(readEnd) ::= <<
-setReadEnd($actorName$_$readEnd.port$);
+setReadEnd($instance.id$_$readEnd.port$);
 
 >>
 
@@ -123,12 +123,12 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 >>
 
 Write(write) ::= <<
-$write.target$ = getWritePtr($actorName$_$write.port$, $write.numTokens$);
+$write.target$ = getWritePtr($instance.id$_$write.port$, $write.numTokens$);
 
 >>
 
 WriteEnd(writeEnd) ::= <<
-setWriteEnd($actorName$_$writeEnd.port$);
+setWriteEnd($instance.id$_$writeEnd.port$);
 
 >>
 
@@ -192,7 +192,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|hasRoom($actorName$_$port$, $pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|hasRoom($instance.id$_$port$, $pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -220,7 +220,7 @@ $actions: actionTest(action=it); separator=" else "$
 >>
 
 scheduler(actions) ::= <<
-int $actorName$_scheduler() {
+int $instance.id$_scheduler() {
 	int res = 1;
 	int i = 0;
   
@@ -305,7 +305,7 @@ static int outside_FSM_scheduler() {
 
 $endif$
 $fsm.transitions: stateScheduler(transition=it); separator="\n"$
-int $actorName$_scheduler() {
+int $instance.id$_scheduler() {
 	int res = 1;
 	int i = 0;
 	
@@ -332,8 +332,8 @@ int $actorName$_scheduler() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actorName, actor) ::= <<
-// Generated from "$actor.name$"
+instance(instance) ::= <<
+// $instance.id$ generated from "$instance.actor.name$"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -342,39 +342,42 @@ actor(actorName, actor) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-$actor.inputs.list: fifo(it)$
+$instance.actor.inputs.list: fifo(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-$actor.outputs.list: fifo(it)$
+$instance.actor.outputs.list: fifo(it)$
+////////////////////////////////////////////////////////////////////////////////
+// Parameter values of the instance
+$instance.parameters$
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
-$actor.stateVars.list: stateVar(it)$
+$instance.actor.stateVars.list: stateVar(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-$actor.procs.list: procedure(it)$
+$instance.actor.procs.list: procedure(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-$actor.actions: action(it)$
-$if(actor.initializes)$
+$instance.actor.actions: action(it)$
+$if(instance.actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-$actor.initializes: action(it)$
-void $actorName$_initialize() {
+$instance.actor.initializes: action(it)$
+void $instance.id$_initialize() {
 	int res = 1;
 	int i = 0;
 
-	$if(actor.initializes)$
-	$schedulingTest(actor.initializes)$
+	$if(instance.actor.initializes)$
+	$schedulingTest(instance.actor.initializes)$
 	$endif$
 }
 
 $endif$
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
-$if(actor.actionScheduler.fsm)$
-$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
+$if(instance.actor.actionScheduler.fsm)$
+$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
 $else$
-$scheduler(actions=actor.actionScheduler.actions)$
+$scheduler(actions=instance.actor.actionScheduler.actions)$
 $endif$
 
 >>

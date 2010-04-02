@@ -35,6 +35,7 @@ import java.io.IOException;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 /**
@@ -64,6 +65,11 @@ public class XlimBackendImpl extends AbstractBackend {
 		printer = new XlimActorPrinter();
 	}
 
+	@Override
+	protected void doActorCodeGeneration(Network network) throws OrccException {
+		printInstances(network);
+	}
+
 	/**
 	 * Print one actor
 	 * 
@@ -73,7 +79,10 @@ public class XlimBackendImpl extends AbstractBackend {
 	 *            Actor structure
 	 */
 	@Override
-	protected void printActor(String id, Actor actor) throws OrccException {
+	protected void printInstance(Instance instance) throws OrccException {
+		String id = instance.getId();
+		Actor actor = instance.getActor();
+
 		System.out.println("FILE " + id);
 		String outputName = path + File.separator + id + ".xlim";
 		try {

@@ -44,6 +44,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
@@ -60,14 +61,22 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 	private CQuasiStaticActorPrinter printer;
 
 	@Override
-	protected void beforeInstantiation(Network network) throws OrccException {
+	protected void afterInstantiation(Network network) throws OrccException {
 		printer = new CQuasiStaticActorPrinter();
 		Scheduler.workingDirectoryPath = path + File.separator + "schedule"
 				+ File.separator;
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws OrccException {
+	protected void doActorCodeGeneration(Network network) throws OrccException {
+		printInstances(network);
+	}
+
+	@Override
+	protected void printInstance(Instance instance) throws OrccException {
+		String id = instance.getId();
+		Actor actor = instance.getActor();
+
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new PhiRemoval(), new MoveReadsWritesTransformation() };
 

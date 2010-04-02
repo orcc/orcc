@@ -257,16 +257,21 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @throws OrccException
 	 */
 	public void instantiate(String path) throws OrccException {
-		File last = new File(clasz);
-		file = new File(path, last.getName() + ".json");
-		try {
-			InputStream in = new FileInputStream(file);
-			actor = new IRParser().parseActor(in);
-		} catch (OrccException e) {
-			throw new OrccException("Could not parse instance \"" + id
-					+ "\" because: " + e.getLocalizedMessage(), e);
-		} catch (FileNotFoundException e) {
-			throw new OrccException("I/O error when parsing \"" + id + "\"", e);
+		String className = new File(clasz).getName();
+		actor = Network.getActorFromPool(className);
+		if (actor == null) {
+			// try and load the actor
+			file = new File(path, className + ".json");
+			try {
+				InputStream in = new FileInputStream(file);
+				actor = new IRParser().parseActor(in);
+				Network.putActorInPool(className, actor);
+			} catch (OrccException e) {
+				throw new OrccException("Could not parse instance \"" + id
+						+ "\" because: " + e.getLocalizedMessage(), e);
+			} catch (FileNotFoundException e) {
+				throw new OrccException("I/O error when parsing \"" + id + "\"", e);
+			}
 		}
 	}
 

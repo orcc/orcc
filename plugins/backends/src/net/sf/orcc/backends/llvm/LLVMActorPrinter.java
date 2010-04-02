@@ -72,17 +72,14 @@ public final class LLVMActorPrinter extends Printer {
 	 * 
 	 * @param fileName
 	 *            output file name
-	 * @param id
-	 *            the instance id
 	 * @param actor
 	 *            actor to print
 	 * @throws IOException
 	 */
-	public void printActor(String fileName, String id, Actor actor)
-			throws IOException {
+	public void printActor(String fileName, Actor actor) throws IOException {
 		StringTemplate template = group.getInstanceOf("actor");
 
-		template.setAttribute("actorName", id);
+		template.setAttribute("actorName", actor.getName());
 		template.setAttribute("actor", actor);
 
 		byte[] b = template.toString(80).getBytes();

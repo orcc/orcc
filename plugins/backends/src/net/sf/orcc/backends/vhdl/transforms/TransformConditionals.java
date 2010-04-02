@@ -58,18 +58,6 @@ public class TransformConditionals extends AbstractActorTransformation
 		implements ExpressionInterpreter {
 
 	@Override
-	public void visit(IfNode node, Object... args) {
-		node.setValue((Expression) node.getValue().accept(this));
-		super.visit(node, args);
-	}
-
-	@Override
-	public void visit(WhileNode node, Object... args) {
-		node.setValue((Expression) node.getValue().accept(this));
-		super.visit(node, args);
-	}
-
-	@Override
 	public Object interpret(BinaryExpr expr, Object... args) {
 		Expression e1 = (Expression) expr.getE1().accept(this);
 		Expression e2 = (Expression) expr.getE2().accept(this);
@@ -119,6 +107,18 @@ public class TransformConditionals extends AbstractActorTransformation
 		} else {
 			return expr;
 		}
+	}
+
+	@Override
+	public void visit(IfNode node, Object... args) {
+		node.setValue((Expression) node.getValue().accept(this));
+		super.visit(node, args);
+	}
+
+	@Override
+	public void visit(WhileNode node, Object... args) {
+		node.setValue((Expression) node.getValue().accept(this));
+		super.visit(node, args);
 	}
 
 }

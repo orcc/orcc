@@ -91,10 +91,15 @@ public abstract class AbstractBackend implements IBackend {
 	}
 
 	/**
-	 * Here should go the things to do before the instantiation.
+	 * This method must be implemented by subclasses to do the actual code
+	 * generation for actors or instances.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
 	 */
-	protected void beforeInstantiation(Network network) throws OrccException {
-	}
+	abstract protected void doActorCodeGeneration(Network network)
+			throws OrccException;
 
 	@Override
 	public void generateCode(String inputFile, String outputFolder, int fifoSize)
@@ -108,35 +113,63 @@ public abstract class AbstractBackend implements IBackend {
 		// parses top network
 		Network network = new XDFParser(inputFile).parseNetwork();
 
-		beforeInstantiation(network);
-
 		// instantiate the network
 		network.instantiate(outputFolder);
+		Network.clearActorPool();
 
 		afterInstantiation(network);
 
-		// print actors of the network
-		for (Instance instance : network.getInstances()) {
-			if (instance.isActor()) {
-				Actor actor = instance.getActor();
-				printActor(instance.getId(), actor);
-			}
-		}
+		doActorCodeGeneration(network);
 
 		// print network
 		printNetwork(network);
 	}
 
 	/**
-	 * Prints the given actor with the given id.
+	 * Prints the given actor.
 	 * 
-	 * @param id
-	 *            instance identifier
 	 * @param actor
 	 *            the actor
 	 */
-	abstract protected void printActor(String id, Actor actor)
-			throws OrccException;
+	protected void printActor(Actor actor) throws OrccException {
+	}
+
+	/**
+	 * Print instances of the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 */
+	protected void printActors(Network network) throws OrccException {
+		for (Actor actor : network.getActors()) {
+			printActor(actor);
+		}
+	}
+
+	/**
+	 * Prints the given instance.
+	 * 
+	 * @param instance
+	 *            the instance
+	 */
+	protected void printInstance(Instance instance) throws OrccException {
+	}
+
+	/**
+	 * Print instances of the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 */
+	protected void printInstances(Network network) throws OrccException {
+		for (Instance instance : network.getInstances()) {
+			if (instance.isActor()) {
+				printInstance(instance);
+			}
+		}
+	}
 
 	/**
 	 * Prints the given network.
@@ -149,6 +182,28 @@ public abstract class AbstractBackend implements IBackend {
 	@Override
 	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
+	}
+
+	/**
+	 * Transforms the given actor.
+	 * 
+	 * @param actor
+	 *            the actor
+	 */
+	protected void transformActor(Actor actor) throws OrccException {
+	}
+
+	/**
+	 * Transforms instances of the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 */
+	protected void transformActors(Network network) throws OrccException {
+		for (Actor actor : network.getActors()) {
+			transformActor(actor);
+		}
 	}
 
 }

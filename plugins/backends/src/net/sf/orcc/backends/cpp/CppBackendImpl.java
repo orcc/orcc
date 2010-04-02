@@ -38,6 +38,7 @@ import net.sf.orcc.backends.cpp.codesign.WrapperAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 /**
@@ -64,7 +65,7 @@ public class CppBackendImpl extends AbstractBackend {
 	private CppActorPrinter printer;
 
 	@Override
-	protected void beforeInstantiation(Network network) throws OrccException {
+	protected void afterInstantiation(Network network) throws OrccException {
 		if (partitioning) {
 			path += File.separator + network.getName();
 			new File(path).mkdir();
@@ -74,7 +75,15 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws OrccException {
+	protected void doActorCodeGeneration(Network network) throws OrccException {
+		printInstances(network);
+	}
+
+	@Override
+	protected void printInstance(Instance instance) throws OrccException {
+		String id = instance.getId();
+		Actor actor = instance.getActor();
+
 		ActorTransformation[] transformations = { new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {

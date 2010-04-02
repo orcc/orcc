@@ -35,11 +35,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.util.INameable;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -77,22 +77,19 @@ public final class CActorPrinter extends Printer {
 	}
 
 	/**
-	 * Prints the given actor to a file whose name is given.
+	 * Prints the given instance to a file whose name is given.
 	 * 
 	 * @param fileName
 	 *            output file name
-	 * @param id
-	 *            the instance id
-	 * @param actor
-	 *            actor to print
+	 * @param instance
+	 *            the instance
 	 * @throws IOException
 	 */
-	public void printActor(String fileName, String id, Actor actor)
+	public void printInstance(String fileName, Instance instance)
 			throws IOException {
-		StringTemplate template = group.getInstanceOf("actor");
+		StringTemplate template = group.getInstanceOf("instance");
 
-		template.setAttribute("actorName", id);
-		template.setAttribute("actor", actor);
+		template.setAttribute("instance", instance);
 
 		byte[] b = template.toString(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);

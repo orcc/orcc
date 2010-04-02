@@ -240,6 +240,38 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	}
 
 	@Override
+	public void transform(Actor actor) {
+		//Transform boolean Port into int port (to be remove later)
+		for (Port port : actor.getInputs()){
+			if (port.getType().isBool()){
+				port.setType(new IntType(new IntExpr(32)));
+			}
+		}
+		
+		for (Port port : actor.getOutputs()){
+			if (port.getType().isBool()){
+				port.setType(new IntType(new IntExpr(32)));
+			}
+		}
+		
+		
+		//Visit procedure
+		for (Procedure proc : actor.getProcs()) {
+			visitProcedure(proc);
+		}
+
+		for (Action action : actor.getActions()) {
+			visitProcedure(action.getBody());
+			visitProcedure(action.getScheduler());
+		}
+
+		for (Action action : actor.getInitializes()) {
+			visitProcedure(action.getBody());
+			visitProcedure(action.getScheduler());
+		}
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(Assign assign, Object... args) {
 		block = assign.getBlock();
@@ -364,7 +396,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		}
 		it.next();
 	}
-
+	
 	@Override
 	public void visitProcedure(Procedure procedure) {
 		//Transform Local boolean Variable into int Variable (to be remove later)
@@ -388,38 +420,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		AbstractNode.setLabelCount(lastNode.getLabel() + 1);
 
 		super.visitProcedure(procedure);
-	}
-	
-	@Override
-	public void transform(Actor actor) {
-		//Transform boolean Port into int port (to be remove later)
-		for (Port port : actor.getInputs()){
-			if (port.getType().isBool()){
-				port.setType(new IntType(new IntExpr(32)));
-			}
-		}
-		
-		for (Port port : actor.getOutputs()){
-			if (port.getType().isBool()){
-				port.setType(new IntType(new IntExpr(32)));
-			}
-		}
-		
-		
-		//Visit procedure
-		for (Procedure proc : actor.getProcs()) {
-			visitProcedure(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
-		}
 	}
 
 }

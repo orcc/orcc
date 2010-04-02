@@ -70,13 +70,21 @@ public class VHDLBackendImpl extends AbstractBackend {
 	private VHDLActorPrinter printer;
 
 	@Override
-	protected void beforeInstantiation(Network network) throws OrccException {
+	protected void afterInstantiation(Network network) throws OrccException {
 		printer = new VHDLActorPrinter();
 		VHDLTypePrinter.isInNetwork = false;
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws OrccException {
+	protected void doActorCodeGeneration(Network network) throws OrccException {
+		printActors(network);
+	}
+
+	@Override
+	protected void printInstance(Instance instance) throws OrccException {
+		String id = instance.getId();
+		Actor actor = instance.getActor();
+
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new Inline(), new PhiRemoval(),
 				new VariableRedimension(), new BoolExprTransform(),

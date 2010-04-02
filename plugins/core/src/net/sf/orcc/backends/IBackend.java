@@ -41,15 +41,17 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 public interface IBackend {
 
 	/**
-	 * Generates code from a flat XDF network and IR files.
+	 * Loads a hierarchical XDF network and IR files, and generates code. Some
+	 * back-ends may flatten the network and close actors.
 	 * 
 	 * @param inputFile
 	 *            absolute path of top-level input network
 	 * @param outputFolder
 	 *            folder absolute path of output folder
 	 * @param fifoSize
-	 *            The default FIFO size.
-	 * @throws Exception
+	 *            default FIFO size
+	 * @throws OrccException
+	 *             if something goes wrong
 	 */
 	void generateCode(String inputFile, String outputFolder, int fifoSize)
 			throws OrccException;

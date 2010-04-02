@@ -14,6 +14,7 @@ import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 import org.jgrapht.Graph;
@@ -38,10 +39,13 @@ public class NetworkGraph {
 						+ Constants.INPUT_FILE_NAME);
 		List<String> schedulableActorsNamesList = inputXDFParser
 				.parseSchedulableActorsList();
-		for (Actor actor : network.getActors()) {
-			ActorGraph actorGraph = new ActorGraph(actor);
-			if (schedulableActorsNamesList.contains(actor.getName())) {
-				actors.add(actorGraph);
+		for (Instance instance : network.getInstances()) {
+			if (instance.isActor()) {
+				Actor actor = instance.getActor();
+				ActorGraph actorGraph = new ActorGraph(actor);
+				if (schedulableActorsNamesList.contains(actor.getName())) {
+					actors.add(actorGraph);
+				}
 			}
 		}
 

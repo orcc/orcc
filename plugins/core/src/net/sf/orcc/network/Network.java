@@ -40,11 +40,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.network.transforms.CloseActorsTransform;
-import net.sf.orcc.network.transforms.SolveParametersTransform;
 import net.sf.orcc.network.transforms.Instantiator;
 import net.sf.orcc.network.transforms.NetworkClassifier;
 import net.sf.orcc.network.transforms.NetworkFlattener;
+import net.sf.orcc.network.transforms.SolveParametersTransform;
 import net.sf.orcc.tools.normalizer.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrderedMap;
@@ -59,6 +58,41 @@ import org.jgrapht.DirectedGraph;
  * 
  */
 public class Network {
+
+	private static Map<String, Actor> actorPool = new HashMap<String, Actor>();
+
+	/**
+	 * Clears the actor pool. Should be called after a network has been
+	 * instantiated.
+	 */
+	public static void clearActorPool() {
+		actorPool.clear();
+	}
+
+	/**
+	 * Returns the actor from the pool that has the given class, or
+	 * <code>null</code> if there is not.
+	 * 
+	 * @param actorClass
+	 *            the actor class name
+	 * @return the actor from the pool that has the given class, or
+	 *         <code>null</code> if there is not
+	 */
+	public static Actor getActorFromPool(String actorClass) {
+		return actorPool.get(actorClass);
+	}
+
+	/**
+	 * Puts the given actor in the pool that has the given class.
+	 * 
+	 * @param actorClass
+	 *            the actor class name
+	 * @param actor
+	 *            the actor
+	 */
+	public static void putActorInPool(String actorClass, Actor actor) {
+		actorPool.put(actorClass, actor);
+	}
 
 	private Map<Connection, Integer> connectionMap;
 
@@ -116,18 +150,6 @@ public class Network {
 	 */
 	public void classifyActors() throws OrccException {
 		new NetworkClassifier().transform(this);
-	}
-
-	/**
-	 * Closes the actors of this network. This means that the parameters of each
-	 * actor become constant state variables whose value is the value given by
-	 * the network.
-	 * 
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	public void closeActors() throws OrccException {
-		new CloseActorsTransform().transform(this);
 	}
 
 	/**
@@ -193,23 +215,34 @@ public class Network {
 	}
 
 	/**
-	 * Returns the list of actors referenced by the graph of this network.
+	 * Returns the list of actors referenced by the graph of this network. This
+	 * is different from the list of instances of this network: There are
+	 * typically more instances than there are actors, because an actor may be
+	 * instantiated several times.
+	 * 
+	 * <p>
+	 * The list is computed on the fly by adding all the actors referenced in a
+	 * set.
+	 * </p>
 	 * 
 	 * @return a list of actors
 	 */
 	public List<Actor> getActors() {
-		List<Actor> actors = new ArrayList<Actor>();
+		Set<Actor> actors = new HashSet<Actor>();
 		for (Vertex vertex : getGraph().vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
 				if (instance.isActor()) {
 					Actor actor = instance.getActor();
 					actors.add(actor);
+				} else if (instance.isNetwork()) {
+					Network network = instance.getNetwork();
+					actors.addAll(network.getActors());
 				}
 			}
 		}
 
-		return actors;
+		return Arrays.asList(actors.toArray(new Actor[0]));
 	}
 
 	/**

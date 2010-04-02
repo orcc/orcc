@@ -62,58 +62,33 @@ import org.jgrapht.graph.DirectedMultigraph;
 
 public class NetworkPartitioner {
 
+	private File file;
+
 	/**
 	 * 
 	 */
 	private File folder;
 
-	private File file;
-
 	private DirectedGraph<Vertex, Connection> graph;
-
-	private Map<String, Set<Vertex>> partitions = new HashMap<String, Set<Vertex>>();
-
-	private Map<Port, Map<String, Vertex>> outgoingFanout;
 
 	private Map<Port, Vertex> incomingFanout;
 
 	private Map<Port, Port> incomingPort = new HashMap<Port, Port>();
 
-	private Map<Port, Port> outgoingPort = new HashMap<Port, Port>();
-
-	private Map<Port, String> toPartition = new HashMap<Port, String>();
-
 	private int nbInput;
 
 	private int nbOutput;
 
+	private Map<Port, Map<String, Vertex>> outgoingFanout;
+
+	private Map<Port, Port> outgoingPort = new HashMap<Port, Port>();
+
+	private Map<String, Set<Vertex>> partitions = new HashMap<String, Set<Vertex>>();
+
+	private Map<Port, String> toPartition = new HashMap<Port, String>();
+
 	public NetworkPartitioner(File folder) {
 		this.folder = folder;
-	}
-
-	/**
-	 * 
-	 * Returns the partName of the given instance.
-	 * 
-	 * @param instance
-	 * 
-	 * @throws OrccException
-	 *             If the instance does not contain a partName attribute.
-	 */
-	private String getPartNameOf(Instance instance) throws OrccException {
-		String partName = null;
-
-		IAttribute attr = instance.getAttribute("partName");
-		if (attr != null && attr.getType() == IAttribute.VALUE) {
-			Expression expr = ((IValueAttribute) attr).getValue();
-			if (expr.isStringExpr()) {
-				partName = ((StringExpr) expr).getValue();
-			} else {
-				throw new OrccException(
-						"partName attribute must be a String expression");
-			}
-		}
-		return partName;
 	}
 
 	/**
@@ -127,6 +102,44 @@ public class NetworkPartitioner {
 				connection.getTarget(), connection.getAttributes());
 		network.getGraph().addEdge(src, tgt, newConnection);
 
+	}
+
+	/**
+	 *
+	 */
+
+	private void createConnections(Set<Vertex> vertices, Network network)
+			throws OrccException {
+
+		outgoingFanout = new HashMap<Port, Map<String, Vertex>>();
+		incomingFanout = new HashMap<Port, Vertex>();
+
+		nbInput = nbOutput = 0;
+
+		for (Vertex vertex : vertices) {
+			for (Connection connection : graph.incomingEdgesOf(vertex)) {
+				Vertex src = graph.getEdgeSource(connection);
+				Vertex tgt = graph.getEdgeTarget(connection);
+
+				if (vertices.contains(src)) {
+					addInternalConnection(src, tgt, connection, network);
+
+				} else {
+					createIncomingConnection(src, tgt, connection, network);
+				}
+			}
+
+			for (Connection connection : graph.outgoingEdgesOf(vertex)) {
+
+				Vertex src = graph.getEdgeSource(connection);
+				Vertex tgt = graph.getEdgeTarget(connection);
+
+				if (!vertices.contains(tgt)) {
+					createOutgoingConnection(src, tgt, connection, network);
+
+				}
+			}
+		}
 	}
 
 	/**
@@ -229,44 +242,6 @@ public class NetworkPartitioner {
 	 *
 	 */
 
-	private void createConnections(Set<Vertex> vertices, Network network)
-			throws OrccException {
-
-		outgoingFanout = new HashMap<Port, Map<String, Vertex>>();
-		incomingFanout = new HashMap<Port, Vertex>();
-
-		nbInput = nbOutput = 0;
-
-		for (Vertex vertex : vertices) {
-			for (Connection connection : graph.incomingEdgesOf(vertex)) {
-				Vertex src = graph.getEdgeSource(connection);
-				Vertex tgt = graph.getEdgeTarget(connection);
-
-				if (vertices.contains(src)) {
-					addInternalConnection(src, tgt, connection, network);
-
-				} else {
-					createIncomingConnection(src, tgt, connection, network);
-				}
-			}
-
-			for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-
-				Vertex src = graph.getEdgeSource(connection);
-				Vertex tgt = graph.getEdgeTarget(connection);
-
-				if (!vertices.contains(tgt)) {
-					createOutgoingConnection(src, tgt, connection, network);
-
-				}
-			}
-		}
-	}
-
-	/**
-	 *
-	 */
-
 	private Network createPartition(Map.Entry<String, Set<Vertex>> entry,
 			Network network) throws OrccException {
 
@@ -307,6 +282,31 @@ public class NetworkPartitioner {
 
 		new XDFWriter(folder, subNetwork);
 		return subNetwork;
+	}
+
+	/**
+	 * 
+	 * Returns the partName of the given instance.
+	 * 
+	 * @param instance
+	 * 
+	 * @throws OrccException
+	 *             If the instance does not contain a partName attribute.
+	 */
+	private String getPartNameOf(Instance instance) throws OrccException {
+		String partName = null;
+
+		IAttribute attr = instance.getAttribute("partName");
+		if (attr != null && attr.getType() == IAttribute.VALUE) {
+			Expression expr = ((IValueAttribute) attr).getValue();
+			if (expr.isStringExpr()) {
+				partName = ((StringExpr) expr).getValue();
+			} else {
+				throw new OrccException(
+						"partName attribute must be a String expression");
+			}
+		}
+		return partName;
 	}
 
 	/**

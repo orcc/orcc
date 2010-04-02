@@ -41,6 +41,7 @@ import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
@@ -64,7 +65,6 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void afterInstantiation(Network network) throws OrccException {
 		network.flatten();
-		network.closeActors();
 		
 		if (merge) {
 			network.classifyActors();
@@ -89,18 +89,17 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(String id, Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new PhiRemoval(), new MoveReadsWritesTransformation() };
+	protected void doActorCodeGeneration(Network network) throws OrccException {
+		transformActors(network);
+		printInstances(network);
+	}
 
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
-
+	@Override
+	protected void printInstance(Instance instance) throws OrccException {
+		String id = instance.getId();
 		String outputName = path + File.separator + id + ".c";
 		try {
-			printer.printActor(outputName, id, actor);
+			printer.printInstance(outputName, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
@@ -136,6 +135,17 @@ public class CBackendImpl extends AbstractBackend {
 			new CMakePrinter().printCMake(path, network);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
+		}
+	}
+
+	@Override
+	protected void transformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new PhiRemoval(), new MoveReadsWritesTransformation() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
 		}
 	}
 

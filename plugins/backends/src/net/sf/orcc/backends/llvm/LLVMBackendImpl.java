@@ -81,43 +81,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void beforeInstantiation(Network network) throws OrccException {
-	}
-
-	@Override
-	protected void printActor(String id, Actor actor) throws OrccException {
-		ActorTransformation[] transformations = {
-				new AddInstantationProcedure(),
-				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation(), new BuildCFG() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
-
-		String outputName = path + File.separator + id + ".s";
-
-		try {
-			printer.printActor(outputName, id, actor);
-
-			try {
-				if (configuration != null) {
-					boolean llvmBitcode = configuration.getAttribute(
-							"net.sf.orcc.backends.llvmBitcode", false);
-					if (llvmBitcode) {
-						String llvmAs = configuration.getAttribute(
-								"net.sf.orcc.backends.llvm-as", "");
-						if (!llvmAs.isEmpty()) {
-							printBitcode(llvmAs, outputName, id);
-						}
-					}
-				}
-			} catch (CoreException e) {
-				throw new OrccException("could not read configuration", e);
-			}
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+	protected void doActorCodeGeneration(Network network) throws OrccException {
+		printActors(network);
 	}
 
 	protected void printBitcode(String execPath, String inputName, String actor) {
@@ -137,6 +102,42 @@ public class LLVMBackendImpl extends AbstractBackend {
 		} catch (IOException e) {
 			System.err.println("Could not print bitcode : ");
 			e.printStackTrace();
+		}
+	}
+
+	@Override
+	protected void printActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = {
+				new AddInstantationProcedure(),
+				new ThreeAddressCodeTransformation(),
+				new MoveReadsWritesTransformation(), new BuildCFG() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+
+		String outputName = path + File.separator + actor.getName() + ".s";
+
+		try {
+			printer.printActor(outputName, actor);
+
+			try {
+				if (configuration != null) {
+					boolean llvmBitcode = configuration.getAttribute(
+							"net.sf.orcc.backends.llvmBitcode", false);
+					if (llvmBitcode) {
+						String llvmAs = configuration.getAttribute(
+								"net.sf.orcc.backends.llvm-as", "");
+						if (!llvmAs.isEmpty()) {
+							printBitcode(llvmAs, outputName, actor.getName());
+						}
+					}
+				}
+			} catch (CoreException e) {
+				throw new OrccException("could not read configuration", e);
+			}
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
 		}
 	}
 
