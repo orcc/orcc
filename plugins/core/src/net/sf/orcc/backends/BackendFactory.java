@@ -36,6 +36,7 @@ import java.util.TreeMap;
 
 import net.sf.orcc.backends.impl.CheckboxOptionImpl;
 import net.sf.orcc.backends.impl.BrowseFileOptionImpl;
+import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -247,6 +248,8 @@ public class BackendFactory {
 	/**
 	 * Runs the given back-end on the given input file with the given FIFO size.
 	 * 
+	 * @param process
+	 *            the process that launched the back-end
 	 * @param name
 	 *            back-end name. Must belong to the list returned by
 	 *            {@link #listBackends()}
@@ -260,11 +263,12 @@ public class BackendFactory {
 	 *            launch configuration
 	 * @throws Exception
 	 */
-	public void runBackend(String name, String inputFile, String outputFolder,
-			int fifoSize, ILaunchConfiguration configuration) throws Exception {
+	public void runBackend(OrccProcess process, String name, String inputFile,
+			String outputFolder, int fifoSize,
+			ILaunchConfiguration configuration) throws Exception {
 		IBackend backend = backends.get(name);
 		backend.setLaunchConfiguration(configuration);
-		backend.generateCode(inputFile, outputFolder, fifoSize);
+		backend.generateCode(process, inputFile, outputFolder, fifoSize);
 	}
 
 }

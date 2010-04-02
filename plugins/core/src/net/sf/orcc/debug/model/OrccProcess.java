@@ -121,18 +121,18 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		}
 
 		/**
-		 * Writes the given message to the contents watched by this monitor.
+		 * Writes the given text to the contents watched by this monitor.
 		 * 
-		 * @param msg
-		 *            a message
+		 * @param text
+		 *            a string
 		 */
-		private void write(String msg) {
+		private void write(String text) {
 			synchronized (contents) {
-				contents += msg;
+				contents += text;
 			}
 
 			for (Object listener : list.getListeners()) {
-				((IStreamListener) listener).streamAppended(msg, this);
+				((IStreamListener) listener).streamAppended(text, this);
 			}
 		}
 
@@ -383,8 +383,8 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		try {
 			BackendFactory factory = BackendFactory.getInstance();
-			factory.runBackend(backend, inputFile, outputFolder, fifoSize,
-					configuration);
+			factory.runBackend(this, backend, inputFile, outputFolder,
+					fifoSize, configuration);
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					backend + " backend could not generate code", e);
@@ -527,13 +527,13 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	}
 
 	/**
-	 * Writes the given message to the normal output of this process.
+	 * Writes the given text to the normal output of this process.
 	 * 
-	 * @param msg
-	 *            a message
+	 * @param text
+	 *            a string
 	 */
-	public void write(String msg) {
-		((OrccMonitor) proxy.getOutputStreamMonitor()).write(msg);
+	public void write(String text) {
+		((OrccMonitor) proxy.getOutputStreamMonitor()).write(text);
 	}
 
 }

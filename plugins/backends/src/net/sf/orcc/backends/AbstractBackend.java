@@ -31,6 +31,7 @@ package net.sf.orcc.backends;
 import java.io.File;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -58,7 +59,7 @@ public abstract class AbstractBackend implements IBackend {
 
 			try {
 				AbstractBackend backend = clasz.newInstance();
-				backend.generateCode(inputFile, outputFolder, 10000);
+				backend.generateCode(null, inputFile, outputFolder, 10000);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
@@ -84,6 +85,8 @@ public abstract class AbstractBackend implements IBackend {
 	 */
 	protected String path;
 
+	private OrccProcess process;
+
 	/**
 	 * Here should go the things to do after the instantiation.
 	 */
@@ -102,8 +105,10 @@ public abstract class AbstractBackend implements IBackend {
 			throws OrccException;
 
 	@Override
-	public void generateCode(String inputFile, String outputFolder, int fifoSize)
-			throws OrccException {
+	public void generateCode(OrccProcess process, String inputFile,
+			String outputFolder, int fifoSize) throws OrccException {
+		this.process = process;
+
 		// set FIFO size
 		this.fifoSize = fifoSize;
 
@@ -111,18 +116,24 @@ public abstract class AbstractBackend implements IBackend {
 		path = new File(outputFolder).getAbsolutePath();
 
 		// parses top network
+		write("Parsing XDF network...\n");
 		Network network = new XDFParser(inputFile).parseNetwork();
 
 		// instantiate the network
+		write("Instantiating actors...\n");
 		network.instantiate(outputFolder);
 		Network.clearActorPool();
 
 		afterInstantiation(network);
+		write("Instantiation done\n");
 
 		doActorCodeGeneration(network);
 
 		// print network
+		write("Printing network...\n");
 		printNetwork(network);
+
+		write("That's all folks!\n");
 	}
 
 	/**
@@ -142,6 +153,7 @@ public abstract class AbstractBackend implements IBackend {
 	 * @throws OrccException
 	 */
 	protected void printActors(Network network) throws OrccException {
+		write("Printing actors...\n");
 		for (Actor actor : network.getActors()) {
 			printActor(actor);
 		}
@@ -164,6 +176,7 @@ public abstract class AbstractBackend implements IBackend {
 	 * @throws OrccException
 	 */
 	protected void printInstances(Network network) throws OrccException {
+		write("Printing instances...\n");
 		for (Instance instance : network.getInstances()) {
 			if (instance.isActor()) {
 				printInstance(instance);
@@ -201,8 +214,21 @@ public abstract class AbstractBackend implements IBackend {
 	 * @throws OrccException
 	 */
 	protected void transformActors(Network network) throws OrccException {
+		write("Transforming actors...\n");
 		for (Actor actor : network.getActors()) {
 			transformActor(actor);
+		}
+	}
+
+	/**
+	 * Writes the given text to the process's normal output.
+	 * 
+	 * @param text
+	 *            a string
+	 */
+	protected void write(String text) {
+		if (process != null) {
+			process.write(text);
 		}
 	}
 

@@ -23,6 +23,7 @@ Bundle-ClassPath: .,
 Bundle-Vendor: IETR/INSA Rennes
 Export-Package: net.sf.orcc,
  net.sf.orcc.backends,
+ net.sf.orcc.debug.model,
  net.sf.orcc.interpreter,
  net.sf.orcc.ir,
  net.sf.orcc.ir.classes,

@@ -29,6 +29,7 @@
 package net.sf.orcc.backends;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.debug.model.OrccProcess;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 
@@ -44,6 +45,9 @@ public interface IBackend {
 	 * Loads a hierarchical XDF network and IR files, and generates code. Some
 	 * back-ends may flatten the network and close actors.
 	 * 
+	 * @param process
+	 *            the process that launched the back-end, so we can report
+	 *            messages to it
 	 * @param inputFile
 	 *            absolute path of top-level input network
 	 * @param outputFolder
@@ -53,8 +57,8 @@ public interface IBackend {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void generateCode(String inputFile, String outputFolder, int fifoSize)
-			throws OrccException;
+	void generateCode(OrccProcess process, String inputFile,
+			String outputFolder, int fifoSize) throws OrccException;
 
 	/**
 	 * Set the launch configuration of this back-end.
