@@ -28,13 +28,19 @@
  */
 package net.sf.orcc.network.transforms;
 
+import java.util.Map;
+
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
 
@@ -61,6 +67,47 @@ public class Instantiator implements INetworkTransformation {
 	}
 
 	/**
+	 * Checks that the parameters passed to instances match the parameters
+	 * declared by their refinment (network or actor).
+	 * 
+	 * @param network
+	 *            the network
+	 */
+	private void checkParameters(Network network) {
+		for (Instance instance : network.getInstances()) {
+			OrderedMap<? extends Variable> parameters;
+			if (instance.isActor()) {
+				parameters = instance.getActor().getParameters();
+			} else {
+				parameters = instance.getNetwork().getParameters();
+			}
+
+			// check all parameters declared have a value
+			Map<String, Expression> values = instance.getParameters();
+			for (Variable parameter : parameters) {
+				String name = parameter.getName();
+				Expression value = values.get(name);
+				if (value == null) {
+					throw new OrccRuntimeException("Instance "
+							+ instance.getId() + " has no value for parameter "
+							+ name);
+				}
+			}
+
+			// check that the values all reference a parameter
+			for (String name : values.keySet()) {
+				Variable parameter = parameters.get(name);
+				if (parameter == null) {
+					throw new OrccRuntimeException("Instance "
+							+ instance.getId()
+							+ " is given a value for a parameter " + name
+							+ " that is not declared.");
+				}
+			}
+		}
+	}
+
+	/**
 	 * Walks through the hierarchy, instantiate actors, and checks that
 	 * connections actually point to ports defined in actors. Instantiating an
 	 * actor implies first loading it and then giving it the right parameters.
@@ -84,6 +131,7 @@ public class Instantiator implements INetworkTransformation {
 			}
 		}
 
+		checkParameters(network);
 		updateConnections();
 	}
 
