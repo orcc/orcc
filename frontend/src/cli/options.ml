@@ -55,7 +55,8 @@ let init_options () =
   let speclist =
     [
 			("-i", Arg.Set_string input_file,
-			"<file> Specifies the absolute path of the input XDF network.");
+			"<file> If the argument is a file, specifies the absolute path of the input XDF network.\ 
+			Otherwise specifies the absolute path of the VTL folder.");
 
 			("-o", Arg.Set_string output_folder,
 			"<dir> Specifies the absolute path of the output folder where generated files will be put.");
@@ -92,9 +93,9 @@ let init_options () =
 	);
 	
 	if Sys.file_exists !input_file then (
-		if Sys.is_directory !input_file then (
-			prerr_endline "Orcc frontend: the given input path is not a file.";
-			prerr_endline !input_file;
+		if not (Sys.is_directory !input_file) && not (Filename.check_suffix !input_file ".xdf") then (
+			prerr_endline "Orcc frontend: the given input file must be a .xdf file.";
+			prerr_endline !output_folder;
 			exit 1
 		)
 	) else (
@@ -115,21 +116,23 @@ let init_options () =
 		exit 1
 	);
 	
-	if not (Filename.check_suffix !input_file ".xdf") then (
-			prerr_endline "Orcc frontend: the given input file must be a .xdf file.";
-			prerr_endline !output_folder;
-			exit 1
-	);
-	
 	let options =
 		{
 			o_cache = !cache;
 			o_debug = !debug;
 			o_dot_cfg = !dot_cfg;
 			o_dot_prio = [];
-			o_file = Filename.basename !input_file;
+			o_file =
+				if Sys.is_directory !input_file then
+					""
+				else
+					Filename.basename !input_file;
 			o_keep = !keep;
-			o_mp = Filename.dirname !input_file;
+			o_mp =
+				if Sys.is_directory !input_file then
+					!input_file
+				else
+					Filename.dirname !input_file;
 			o_outdir = !output_folder;
 			o_profiling = !profiling;
 			o_values = [];

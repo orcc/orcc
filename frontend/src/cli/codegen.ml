@@ -20,10 +20,10 @@ open Options
 
 module SS = Asthelper.SS
 
-(** [get_actors network] returns the actors instantiated by the network.
+(** [get_actors_network network] returns the set of actors instantiated by the network.
 For instance for two instances "a1" and "a2" that instantiate the same actor "a", this
 function returns "a". *)
-let get_actors network =
+let get_actors_network network =
 	let rec aux instances network =
 		let graph = network.Ast.n_graph in
 		G.fold_vertex
@@ -39,9 +39,36 @@ let get_actors network =
 	
 	aux SS.empty network
 
+(** [get_actors_vtl folder] returns the list of filenames of RVC-CAL actors defined
+in the given VTL folder. *)
+let get_actors_vtl folder =
+	let rec aux instances path =
+		let root = Filename.concat folder path in
+		let dirs = Sys.readdir root in
+		Array.fold_left
+			(fun instances dir ->
+				if String.length dir > 0 && dir.[0] = '.' then
+					(* hidden folder, do not read *)
+					instances
+				else
+					let file = Filename.concat root dir in
+					if Sys.is_directory file then
+						aux instances (Filename.concat path dir)
+					else
+						if Filename.check_suffix file ".cal" then
+							SS.add (Filename.chop_suffix (Filename.concat path dir) ".cal") instances
+						else
+							instances)
+			instances dirs
+	in
+	
+	aux SS.empty ""
+
 (** whether at least an actor has errors. *)
 let model_has_errors = ref false
 
+(** [load_instance options cls_name] loads the actor that has the given class name,
+and generates its IR in the output folder given by [options.o_outdir]. *)
 let load_instance options cls_name =
 	let out_base = Filename.concat options.o_outdir cls_name in
 	let abs_file = Filename.concat options.o_mp cls_name in
@@ -59,14 +86,20 @@ let load_instance options cls_name =
 			Printexc.print_backtrace stdout;
 		model_has_errors := true)
 
-(** [start options] parses the XDF file in options.o_file, flattens the network,
-and generates a single file. *)
+(** [start options] generates the IR of each actor in a network whose top is given by
+the options.o_file field, or else of each actor in the folder given by options.o_mp. *)
 let start options =
-	printf "Parsing actors and networks...\n%!";
-	let xdf_file = Filename.concat options.o_mp options.o_file in
-	let network = Xdf_parser.parse_network options xdf_file in
-	
-	let actors = get_actors network in
+	let actors =
+		if options.o_file = "" then (
+			printf "Finding actors in the VTL...\n%!";
+			get_actors_vtl options.o_mp
+		) else (
+			printf "Parsing networks...\n%!";
+			let xdf_file = Filename.concat options.o_mp options.o_file in
+			let network = Xdf_parser.parse_network options xdf_file in
+			get_actors_network network
+		)
+	in
 
-	printf "Generating actors...\n%!";
+	printf "Generating %i actors...\n%!" (SS.cardinal actors);
 	SS.iter (load_instance options) actors

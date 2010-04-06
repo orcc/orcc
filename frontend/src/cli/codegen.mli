@@ -12,10 +12,10 @@
 (* Matthieu WIPLIEZ <Matthieu.Wipliez@insa-rennes.fr                         *)
 (*****************************************************************************)
 
-(** Code generation for networks. *)
+(** Code generation. *)
 
 val model_has_errors : bool ref
 (** set to true if at least one actor could not be compiled. *)
 
-(** [start options] generates code for the given network. *)
+(** [start options] generates code for the given network or VTL. *)
 val start : Options.t -> unit

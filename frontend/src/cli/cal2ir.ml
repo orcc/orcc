@@ -27,7 +27,8 @@ let _ =
 	(* if debug enabled, records backtraces *)
 	Printexc.record_backtrace options.o_debug;
 
-	Codegen_xdf.start options;
+	(* start code generation *)
+	Codegen.start options;
 	if options.o_profiling then (
 		printf "parsing CAL = %f
 converting = %f
@@ -39,7 +40,7 @@ generating code = %f\n"
 			!Codegen_ir.time
 	);
 	
-	if !Codegen_xdf.model_has_errors then (
+	if !Codegen.model_has_errors then (
 		prerr_endline "Errors detected, compilation aborted.";
 		exit 1
 	);
