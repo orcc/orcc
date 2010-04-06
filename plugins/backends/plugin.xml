@@ -41,7 +41,7 @@
             class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
             name="LLVM">
          <option
-               id="net.sf.orcc.backends.xdfInputFile">
+               id="net.sf.orcc.backends.vtlFolder">
          </option>
          <option
                id="net.sf.orcc.backends.classify">
@@ -73,6 +73,7 @@
             name="Input file">
          <browseFile
                extension="xdf"
+               folder="false"
                workspace="true">
          </browseFile>
       </option>
@@ -121,6 +122,15 @@
                id="net.sf.orcc.backends.newScheduler"
                name="Use the experimental scheduler">
             <checkBox></checkBox>
+         </option>
+         <option
+               description="The folder that contains the Video Tool Library (VTL)"
+               id="net.sf.orcc.backends.vtlFolder"
+               name="VTL folder">
+            <browseFile
+                  folder="true"
+                  workspace="true">
+            </browseFile>
          </option>
    </extension>
 
