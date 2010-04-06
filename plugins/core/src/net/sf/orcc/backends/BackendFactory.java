@@ -175,6 +175,9 @@ public class BackendFactory {
 		BrowseFileOption option = new BrowseFileOptionImpl();
 		option.setExtension(extension);
 
+		String folder = element.getAttribute("folder");
+		option.setFolder(Boolean.parseBoolean(folder));
+
 		String workspace = element.getAttribute("workspace");
 		option.setWorkspace(Boolean.parseBoolean(workspace));
 		return option;

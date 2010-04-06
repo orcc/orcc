@@ -45,6 +45,13 @@ public interface BrowseFileOption extends BackendOption {
 	String getExtension();
 
 	/**
+	 * Returns whether we should select a folder or a regular file.
+	 * 
+	 * @return whether we should select a folder or a regular file
+	 */
+	boolean isFolder();
+
+	/**
 	 * Returns whether we should browse the workspace or the file system.
 	 * 
 	 * @return whether we should browse the workspace or the file system
@@ -58,6 +65,14 @@ public interface BrowseFileOption extends BackendOption {
 	 *            the extension that this "input file" should have
 	 */
 	void setExtension(String extension);
+
+	/**
+	 * Sets whether we should select a folder or a regular file.
+	 * 
+	 * @param folder
+	 *            whether we should select a folder or a regular file
+	 */
+	void setFolder(boolean folder);
 
 	/**
 	 * Sets whether we should browse the workspace or the file system.

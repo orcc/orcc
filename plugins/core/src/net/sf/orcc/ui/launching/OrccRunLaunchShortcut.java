@@ -66,6 +66,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 /**
+ * This class defines the launch shortcut to launch an Orcc compilation.
  * 
  * @author Matthieu Wipliez
  * 
@@ -74,7 +75,8 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 
 	private String browseOutputFolder(Shell shell, IFile file) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select output folder:");
+		dialog.setMessage("Please select an output folder:");
+		dialog.setText("Choose output folder");
 		// set initial directory
 		String location = file.getParent().getLocation().toOSString();
 		dialog.setFilterPath(location);

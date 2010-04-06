@@ -89,7 +89,7 @@
          <attribute name="extension" type="string">
             <annotation>
                <documentation>
-                  Restrict file choice to files that have the given extension (optional).
+                  Restrict file choice to files that have the given extension.
                </documentation>
             </annotation>
          </attribute>
@@ -97,6 +97,13 @@
             <annotation>
                <documentation>
                   Whether files are selected inside the workspace or outside the workspace
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="folder" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  Whether the file that should be selected is a folder or a file
                </documentation>
             </annotation>
          </attribute>

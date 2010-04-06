@@ -38,14 +38,21 @@ import net.sf.orcc.backends.BrowseFileOption;
  */
 public class BrowseFileOptionImpl extends BackendOptionImpl implements
 		BrowseFileOption {
-
+	
 	private String extension;
+
+	private boolean folder;
 
 	private boolean workspace;
 
 	@Override
 	public String getExtension() {
 		return extension;
+	}
+
+	@Override
+	public boolean isFolder() {
+		return folder;
 	}
 
 	@Override
@@ -56,6 +63,11 @@ public class BrowseFileOptionImpl extends BackendOptionImpl implements
 	@Override
 	public void setExtension(String extension) {
 		this.extension = extension;
+	}
+
+	@Override
+	public void setFolder(boolean folder) {
+		this.folder = folder;
 	}
 
 	@Override

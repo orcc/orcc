@@ -40,7 +40,6 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.DOT_CFG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
@@ -53,8 +52,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.backends.BackendOption;
+import net.sf.orcc.backends.BrowseFileOption;
 import net.sf.orcc.interpreter.InterpreterMain;
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.launching.OrccLaunchConstants;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -221,11 +223,11 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		}
 	}
 
-	private String[] cmdLine;
-
 	private ILaunchConfiguration configuration;
 
 	private String contents;
+
+	private String inputFile;
 
 	private ILaunch launch;
 
@@ -247,13 +249,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		contents = "";
 		proxy = new OrccProxy();
 
-		try {
-			cmdLine = createCmdLine();
-		} catch (IOException e) {
-			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					"I/O error", e);
-			throw new CoreException(status);
-		}
+		inputFile = configuration.getAttribute(getInputFile(), "");
 	}
 
 	@Override
@@ -311,12 +307,11 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		File file = new File(exe);
 		file.setExecutable(true);
 
-		String networkName = configuration.getAttribute(INPUT_FILE, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
 		cmdList.add(quoteFile(exe));
 		cmdList.add("-i");
-		cmdList.add(quoteFile(networkName));
+		cmdList.add(quoteFile(inputFile));
 		cmdList.add("-o");
 		cmdList.add(quoteFile(outputFolder));
 
@@ -344,6 +339,31 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	@Override
 	public int getExitValue() throws DebugException {
 		return value;
+	}
+
+	/**
+	 * Returns the identifier of the option that contains the input file that
+	 * should be given to the front-end and back-end/interpreter/debugger.
+	 * 
+	 * @return the identifier of the option that contains an input file
+	 * @throws CoreException
+	 *             if something goes wrong
+	 */
+	private String getInputFile() throws CoreException {
+		String backend = configuration.getAttribute(BACKEND, "");
+		BackendFactory factory = BackendFactory.getInstance();
+		List<BackendOption> options = factory.getOptions(backend);
+		if (options != null) {
+			// return the identifier of the first "browseFile" option
+			for (BackendOption option : options) {
+				if (option instanceof BrowseFileOption) {
+					return option.getIdentifier();
+				}
+			}
+		}
+
+		// by default, return the identifier of the "input file" option
+		return OrccLaunchConstants.INPUT_FILE;
 	}
 
 	@Override
@@ -376,8 +396,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	private void launchBackend(ILaunchConfiguration configuration)
 			throws CoreException {
 		String backend = configuration.getAttribute(BACKEND, "");
-
-		String inputFile = configuration.getAttribute(INPUT_FILE, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
@@ -407,7 +425,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 */
 	private void launchInterpreter(String option) throws CoreException {
 		// Get configuration options
-		String inputFile = configuration.getAttribute(INPUT_FILE, "");
 		String inputStimulus = configuration.getAttribute(INPUT_STIMULUS, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 		String file = new File(inputFile).getName();
@@ -471,7 +488,15 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	public void start(String option) throws CoreException {
 		monitor.beginTask("Compiling dataflow program", 2);
 		monitor.subTask("Launching frontend...");
-		process = DebugPlugin.exec(cmdLine, null);
+
+		try {
+			String[] cmdLine = createCmdLine();
+			process = DebugPlugin.exec(cmdLine, null);
+		} catch (IOException e) {
+			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+					"I/O error", e);
+			throw new CoreException(status);
+		}
 
 		// read from process
 		ReadingThread t1 = new ReadingThread(process.getErrorStream(),

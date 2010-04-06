@@ -36,6 +36,8 @@ import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.RunSettingsTab;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -56,6 +58,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -115,14 +118,33 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 *            a shell
 	 */
 	private void browseFileSystem(Shell shell) {
-		FileDialog fileDialog = new FileDialog(shell, SWT.OPEN);
+		IResource resource = getResourceFromText();
+		String file;
+		if (option.isFolder()) {
+			DirectoryDialog dialog = new DirectoryDialog(shell, SWT.OPEN);
+			dialog.setMessage("Please select an output folder:");
+			dialog.setText("Choose output folder");
 
-		String extension = option.getExtension();
-		if (extension != null) {
-			fileDialog.setFilterExtensions(new String[] { extension });
+			// set initial directory
+			String location = resource.getParent().getLocation().toOSString();
+			dialog.setFilterPath(location);
+
+			file = dialog.open();
+		} else {
+			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+
+			String extension = option.getExtension();
+			if (extension != null) {
+				dialog.setFilterExtensions(new String[] { extension });
+			}
+			
+			// set initial directory
+			String location = resource.getParent().getLocation().toOSString();
+			dialog.setFilterPath(location);
+
+			file = dialog.open();
 		}
 
-		String file = fileDialog.open();
 		if (file != null) {
 			text.setText(file);
 		}
@@ -142,13 +164,14 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 		tree.setAllowMultiple(false);
 		tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
 
-		IFile file = getFileFromText();
-		if (file != null) {
-			tree.setInitialSelection(file);
+		IResource resource = getResourceFromText();
+		if (resource != null) {
+			tree.setInitialSelection(resource);
 		}
 
-		tree.setMessage("Please select an existing file:");
-		tree.setTitle("Choose an existing file");
+		String name = option.isFolder() ? "folder" : "file";
+		tree.setMessage("Please select an existing" + name + ":");
+		tree.setTitle("Choose an existing " + name);
 
 		tree.setValidator(new ISelectionStatusValidator() {
 
@@ -156,7 +179,16 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 			public IStatus validate(Object[] selection) {
 				String extension = option.getExtension();
 				if (selection.length == 1) {
-					if (selection[0] instanceof IFile) {
+					if (option.isFolder()) {
+						if (selection[0] instanceof IFolder) {
+							return new Status(IStatus.OK,
+									OrccActivator.PLUGIN_ID, "");
+						} else {
+							return new Status(IStatus.ERROR,
+									OrccActivator.PLUGIN_ID,
+									"Only folders can be selected, not files nor projects");
+						}
+					} else if (selection[0] instanceof IFile) {
 						IFile file = (IFile) selection[0];
 						if (extension != null) {
 							if (file.getFileExtension().equals(extension)) {
@@ -172,19 +204,23 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 							return new Status(IStatus.OK,
 									OrccActivator.PLUGIN_ID, "");
 						}
+					} else {
+						return new Status(IStatus.ERROR,
+								OrccActivator.PLUGIN_ID,
+								"Only files can be selected, not folders nor projects");
 					}
 				}
 
 				return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-						"Only files can be selected, not folders nor projects");
+						"No file or folder selected.");
 			}
 
 		});
 
 		// opens the dialog
 		if (tree.open() == Window.OK) {
-			file = (IFile) tree.getFirstResult();
-			text.setText(file.getLocation().toOSString());
+			resource = (IResource) tree.getFirstResult();
+			text.setText(resource.getLocation().toOSString());
 		}
 	}
 
@@ -241,16 +277,18 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	}
 
 	/**
-	 * Returns an IFile instance of the focused file in text
+	 * Returns an {@link IResource} instance of the focused file/folder in text
 	 * 
-	 * @return an IFile instance of focused file
+	 * @return an {@link IResource} instance of the focused file/folder in text
 	 */
-	private IFile getFileFromText() {
+	private IResource getResourceFromText() {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
-		IFile file = root.getFileForLocation(new Path(value));
-
-		return file;
+		if (option.isFolder()) {
+			return root.getContainerForLocation(new Path(value));
+		} else {
+			return root.getFileForLocation(new Path(value));
+		}
 	}
 
 	@Override
@@ -281,10 +319,11 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 		}
 
 		if (option.isWorkspace()) {
-			IFile file = getFileFromText();
-			if (file == null) {
+			IResource file = getResourceFromText();
+			if (file == null || !file.exists()) {
 				launchConfigurationTab.setErrorMessage(option.getName()
-						+ " refers to a non-existent file.");
+						+ " refers to a non-existent "
+						+ (option.isFolder() ? "folder" : "file") + ".");
 				return false;
 			} else {
 				return true;
@@ -295,7 +334,8 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 				return true;
 			} else {
 				launchConfigurationTab.setErrorMessage(option.getName()
-						+ " refers to a non-existent file.");
+						+ " refers to a non-existent "
+						+ (option.isFolder() ? "folder" : "file") + ".");
 				return false;
 			}
 		}
