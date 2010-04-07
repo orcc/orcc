@@ -44,7 +44,7 @@ $instances: printSig()$
 assignFifo(source, sourcePort, target, targetPort, count) ::= <<
 fifo_$count$ : entity work.fifo_generic 
 generic map (
-depth => $edge.size$,
+depth => FIFO_DEPTH,
 $if(targetPort.type.bool)$
 width => 0)$\n$
 $else$
@@ -72,14 +72,35 @@ $endif$
 
 >>
 
+assignIn(source, sourcePort) ::= <<
+$network$_$tgt.port$_data   <= $source.id$_$sourcePort.name$_data_out;
+$network$_$tgt.port$_write   <= $source.id$_$sourcePort.name$_write;
+$source.id$_$sourcePort.name$_full   <= $network$_$tgt.port$_full;
+
+>>
+
+assignOut(target, targetPort) ::= <<
+$target.id$_$targetPort.name$_data_in <= $network$_$src.port$_data;
+$target.id$_$targetPort.name$_empty <= $network$_$src.port$_empty;
+$network$_$src.port$_read <= $target.id$_$targetPort.name$_read;
+
+
+>>
+
 tryAssignFifo(edge, src, tgt) ::= <<
 $if (src.instance)$
-$if (tgt.instance)$
+  $if (tgt.instance)$
 $assignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
   count=network.connectionMap.(edge))$
-$endif$
+  $else$ 
+$assignIn(source=src.instance, sourcePort=edge.source)$
+  $endif$
+$else$
+  $if (tgt.instance)$
+$assignOut(target=tgt.instance, targetPort=edge.target)$
+  $endif$
 $endif$
 >>
 
@@ -140,10 +161,8 @@ $network$_$it$_write  => $network$_$it$_write,
 // print IOs of the actors
 
 printActorPorts(instance) ::= <<
-$if (instance.actor)$
 $instance.actor.inputs.list: printPortsInput(it); separator="\n"$
 $instance.actor.outputs.list: printPortsOutput(it); separator="\n"$
-$endif$
 >>
 
 printPortsInput(it) ::= <<
@@ -177,7 +196,10 @@ $endif$
 
 printNetwork(instance) ::= <<
 $if (!instance.actor)$
+
 $it.id$ : entity work.$it.network$
+  generic map (
+    FIFO_DEPTH       => FIFO_DEPTH) 
   port map (
     $printNetworksPorts(it.network)$
     clock            => clock, 
@@ -204,6 +226,9 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity $network.name$ is
+  generic (
+  FIFO_DEPTH : integer := $fifoSize$;
+  );
   port (
     $printNetworkPorts(network)$
     clock   : in std_logic;
@@ -214,8 +239,8 @@ end $network.name$;
 architecture rtl_$network.name$ of $network.name$ is
 
   ---------------------------------------------------------------------------
-  -- Signal & constant declaration
-  constant SIZE : integer := $fifoSize$;
+  -- Signals declaration
+  ---------------------------------------------------------------------------
   $printSignals(network.instances); separator="\n"$
   ---------------------------------------------------------------------------
 
@@ -223,10 +248,12 @@ begin
 
   ---------------------------------------------------------------------------
   -- Actors and Networks instantiation 
+  ---------------------------------------------------------------------------
   $printNetAct(network.instances); separator="\n"$
 
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
+  ---------------------------------------------------------------------------  
   $assignFifos(network.connections)$ 
   ---------------------------------------------------------------------------
 
