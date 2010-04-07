@@ -1882,13 +1882,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		CabacStartProcess := true;
 	end 
 	
-	//TODO to merge with start_cabac()
-	/*
-	procedure cabac_reinit()
-	begin
-		FoundSE := false;
-	end
-	*/
 	function cabac_value() --> uint:
 		CabacValue
 	end	
@@ -2009,6 +2002,16 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 		end
 		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG then
+			MaxEleCompTab := synEval_Coded_Bloc_Flag_Ele;
+			foreach int e in Integers(0, MaxEleCompTab - 1) do
+				//BinIdxSize	:= synEval_Coded_Bloc_Flag[e][0];
+				foreach int s in Integers(0, 3) do
+					synElVal[e][s] := synEval_Coded_Bloc_Flag[e][s];
+				end
+			end
+		end
+
 		
 		//TODO other Syntax Element
 	end
@@ -2235,6 +2238,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 		
 		if ( SyntaxElement = CABAC_CODED_BLOCK_FLAG ) then
+			//Generated ctxBlockCat the			
 			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
 				maxBinIdxCtx := 0; //FIXME prefix
 				ctxIdxOffset := 460;
@@ -6670,7 +6674,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//if( maxNumCoeff = = 64 | | ( ChromaArrayType = = 3 ) ) )
 	Residual_block_Cabac_coded_block_flag_start: action ==>
 	guard
-		maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 and IS_CABAC()
+		( maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 ) and IS_CABAC()
 	do
 		//Read coded_block_flag Syntax Element
 		GetCabacCodedBlockFlagSyntaxElement();
@@ -6680,7 +6684,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//coded_block_flag
 	Residual_block_Cabac_coded_block_flag_done: action ==>
 	guard
-		maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 and cabac_end()
+		( maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 ) and cabac_end()
 	do
 		coded_block_flag := cabac_value();
 	end
@@ -6688,12 +6692,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//else
 	Residual_block_Cabac_skip_coded_block_flag: action ==>
 	guard
-		maxNumCoeff != 64 or chroma_format_idc[sps_id] != 2 and IS_CABAC()
+		( maxNumCoeff != 64 or chroma_format_idc[sps_id] != 2 ) and IS_CABAC()
 	end
 	
 	//for( i = 0; i < maxNumCoeff; i++ )
 	//	coeffLevel[ i ] = 0
 	Residual_block_Cabac_Coeff_Level_Init: action ==>
+	guard
+		IS_CABAC()	
 	do
 		foreach int i in Integers(0, maxNumCoeff - 1) do
 			coeffLevel[i] := 0;
