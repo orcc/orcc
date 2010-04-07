@@ -2,35 +2,35 @@ group VHDL_actor;
 
 fifo_in(port) ::= <<
 $if(port.type.bool)$
-$actorName$_$port.name$_data  : in std_logic;$\n$
+$actor.name$_$port.name$_data  : in std_logic;$\n$
 $else$
-$actorName$_$port.name$_data  : in std_logic_vector($port.type.size$ -1 downto 0);$\n$
+$actor.name$_$port.name$_data  : in std_logic_vector($port.type.size$ -1 downto 0);$\n$
 $endif$
-$actorName$_$port.name$_empty : in std_logic;
-$actorName$_$port.name$_read  : out std_logic;
+$actor.name$_$port.name$_empty : in std_logic;
+$actor.name$_$port.name$_read  : out std_logic;
 
 >>
 
 fifo_out(port) ::= <<
-$actorName$_$port.name$_full  : in std_logic;
+$actor.name$_$port.name$_full  : in std_logic;
 $if(last(port.name))$
 $if(port.type.bool)$
-$actorName$_$port.name$_data  : out std_logic;$\n$
+$actor.name$_$port.name$_data  : out std_logic;$\n$
 $else$
-$actorName$_$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$\n$
+$actor.name$_$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$\n$
 $endif$
-$actorName$_$port.name$_write : out std_logic
+$actor.name$_$port.name$_write : out std_logic
 $else$
-$actorName$_$port.name$_data  : out $port.type$;
-$actorName$_$port.name$_write : out std_logic;
+$actor.name$_$port.name$_data  : out $port.type$;
+$actor.name$_$port.name$_write : out std_logic;
 $endif$
 >>
 
 fifo_in_init(port) ::=<<
-$actorName$_$port.name$_read <= '0';$"\n"$
+$actor.name$_$port.name$_read <= '0';$"\n"$
 >>
 fifo_out_init(port) ::=<<
-$actorName$_$port.name$_write <= '0';$"\n"$
+$actor.name$_$port.name$_write <= '0';$"\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ $endif$
 >>
 
 HasTokens(hasTokens) ::= <<
-$hasTokens.target$ := not $actorName$_$hasTokens.port$_empty;
+$hasTokens.target$ := not $actor.name$_$hasTokens.port$_empty;
 
 >>
 
@@ -141,12 +141,12 @@ $endif$
 Peek(peek) ::= <<
 $if(peek.unit)$
   $if(peek.target.type.bool)$
-$peek.target$ := $actorName$_$peek.port$_data;$\n$
+$peek.target$ := $actor.name$_$peek.port$_data;$\n$
   $else$
     $if(peek.target.type.int)$
-$peek.target$ := to_integer(signed($actorName$_$peek.port$_data));$\n$
+$peek.target$ := to_integer(signed($actor.name$_$peek.port$_data));$\n$
     $else$
-$peek.target$ := to_integer(unsigned($actorName$_$peek.port$_data));$\n$
+$peek.target$ := to_integer(unsigned($actor.name$_$peek.port$_data));$\n$
     $endif$
   $endif$
 $else$
@@ -159,15 +159,15 @@ $endif$
 Read(read) ::= <<
 $if(read.unit)$
   $if(read.target.type.bool)$
-$read.target$ := $actorName$_$read.port$_data;$\n$
+$read.target$ := $actor.name$_$read.port$_data;$\n$
   $else$
     $if(read.target.type.int)$
-$read.target$ := to_integer(signed($actorName$_$read.port$_data));$\n$
+$read.target$ := to_integer(signed($actor.name$_$read.port$_data));$\n$
     $else$
-$read.target$ := to_integer(unsigned($actorName$_$read.port$_data));$\n$
+$read.target$ := to_integer(unsigned($actor.name$_$read.port$_data));$\n$
     $endif$
   $endif$
-  $actorName$_$read.port$_read <= '1';
+  $actor.name$_$read.port$_read <= '1';
 $else$
 -- read multiple token not coded yet
 $endif$
@@ -208,15 +208,15 @@ $endif$
 
 Write(write) ::= <<
 $if(write.target.type.bool)$
-$actorName$_$write.port$_data <= $write.target$;$\n$
+$actor.name$_$write.port$_data <= $write.target$;$\n$
 $else$
 $if(write.target.type.int)$
-$actorName$_$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$\n$
+$actor.name$_$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$\n$
 $else$
-$actorName$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$\n$
+$actor.name$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$\n$
 $endif$
 $endif$
-$actorName$_$write.port$_write <= '1';
+$actor.name$_$write.port$_write <= '1';
 
 >>
 
@@ -356,7 +356,7 @@ $procedure(procedure=action.body)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|$actorName$_$port$_full = '0'}; separator=" and "$
+$pattern.keys:{port|$actor.name$_$port$_full = '0'}; separator=" and "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -452,7 +452,7 @@ actionTestState(nextState) ::= <<
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actorName, actor) ::= <<
+actor(actor) ::= <<
 ------------------------------------------------------------------------------
 -- Generated from $actor.name$ actor
 ------------------------------------------------------------------------------

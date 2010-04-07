@@ -36,8 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Printer;
@@ -95,15 +95,14 @@ public final class VHDLActorPrinter extends Printer {
 			throws IOException {
 		StringTemplate template = group.getInstanceOf("actor");
 
-		template.setAttribute("actorName", id);
 		template.setAttribute("actor", actor);
 
 		byte[] b = template.toString(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();
-	}
-
+	}	
+	
 	@Override
 	public String toString(Constant constant) {
 		VHDLConstPrinter printer = new VHDLConstPrinter(group);

@@ -48,6 +48,7 @@ import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
+
 /**
  * VHDL back-end.
  * 
@@ -78,35 +79,28 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void doActorCodeGeneration(Network network) throws OrccException {
 		printActors(network);
+		printInstances(network);
 	}
 
 	@Override
-	protected void printInstance(Instance instance) throws OrccException {
-		String id = instance.getId();
-		Actor actor = instance.getActor();
+	protected void printActor(Actor actor) throws OrccException {
+		transformActor(actor);
 
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new Inline(), new PhiRemoval(),
-				new VariableRedimension(), new BoolExprTransform(),
-				new VariableRenamer(), new TransformConditionals() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
-
+		String id = actor.getName();
 		File folder = new File(path + File.separator + "Design");
 		if (!folder.exists()) {
 			folder.mkdir();
 		}
-
+		
 		String outputName = path + File.separator + "Design" + File.separator
-				+ id + ".vhd";
+		+ id + ".vhd";
 		try {
 			printer.printActor(outputName, id, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
 	}
+	
 
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
@@ -124,7 +118,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 					String outputName = path + File.separator + "Testbench"
 							+ File.separator + id + "_tb.vhd";
 					tbPrinter.printTestbench(outputName, id, actor);
-				}
+				} 
 			}
 
 			VHDLTypePrinter.isInNetwork = true;
@@ -135,6 +129,19 @@ public class VHDLBackendImpl extends AbstractBackend {
 			networkPrinter.printNetwork(outputName, network, false, fifoSize);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
+		}
+	}
+
+	
+	@Override
+	protected void transformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadCodeElimination(), new Inline(), new PhiRemoval(),
+				new VariableRedimension(), new BoolExprTransform(),
+				new VariableRenamer(), new TransformConditionals() };
+		
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
 		}
 	}
 
