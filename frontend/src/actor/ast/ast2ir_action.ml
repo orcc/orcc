@@ -331,10 +331,22 @@ let mk_sched_test loc name env ip inputs guards =
 				let (env, vars, var_def) = mk_tmp env vars TypeBool in
 				let call = mk_node (HasTokens (ref var_def, port.v_name, size)) in
 				CFG.add_edge graph node call;
-				(env, vars, call,
-					ExprBOp(dummy_loc, expr, BOpLAnd,
-						ExprVar (dummy_loc, mk_var_use var_def), TypeBool)))
-		(env, vars, entry, ExprBool (dummy_loc, true)) ip
+				
+				let expr =
+					match expr with
+						| None -> ExprVar (dummy_loc, mk_var_use var_def)
+						| Some expr ->
+							ExprBOp(dummy_loc, expr, BOpLAnd,
+								ExprVar (dummy_loc, mk_var_use var_def), TypeBool)
+				in
+				(env, vars, call, Some expr))
+		(env, vars, entry, None) ip
+	in
+	
+	let expr =
+		match expr with
+			| None -> ExprBool (dummy_loc, true)
+			| Some expr -> expr
 	in
 	
 	(* creates the schedulability test *)
