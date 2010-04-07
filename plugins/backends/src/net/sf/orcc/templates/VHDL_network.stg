@@ -89,7 +89,55 @@ $edges: tryAssignFifo(
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// print calls to scheduler()
+// print IOs of the TOP Network
+
+printNetworkPorts(network) ::= <<
+$network.inputs.list: printNetPortsInput(it); separator="\n"$
+$network.outputs.list: printNetPortsOutput(it); separator="\n"$
+>>
+
+printNetPortsInput(it) ::= <<
+$if(it.type.bool)$
+$network$_$it$_data    : in  std_logic;$\n$
+$else$
+$network$_$it$_data    : in  std_logic_vector($it.type.size$ - 1 downto 0);$\n$
+$endif$
+$network$_$it$_empty   : in  std_logic;
+$network$_$it$_read    : out std_logic;
+>>
+
+printNetPortsOutput(it) ::= <<
+$if(it.type.bool)$
+$network$_$it$_data   : out std_logic;$\n$
+$else$
+$network$_$it$_data   : out std_logic_vector($it.type.size$ - 1 downto 0);$\n$
+$endif$
+$network$_$it$_write      : out std_logic;
+$network$_$it$_full       : in  std_logic;
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print IOs of the Networks
+
+printNetworksPorts(network) ::= <<
+$network.inputs.list: printNetsInput(it); separator="\n"$
+$network.outputs.list: printNetsOutput(it); separator="\n"$
+>>
+
+printNetsInput(it) ::= <<
+$network$_$it$_data   => $network$_$it$_data_in,
+$network$_$it$_read   => $network$_$it$_read,
+$network$_$it$_empty  => $network$_$it$_empty,
+>>
+
+printNetsOutput(it) ::= <<
+$network$_$it$_data   => $network$_$it$_data_out,
+$network$_$it$_full   => $network$_$it$_full,
+$network$_$it$_write  => $network$_$it$_write,
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print IOs of the actors
 
 printActorPorts(instance) ::= <<
 $if (instance.actor)$
@@ -110,7 +158,10 @@ $instance.actor$_$it$_full   => $instance.actor$_$it$_full,
 $instance.actor$_$it$_write  => $instance.actor$_$it$_write,
 >> 
 
-printScheduler(instance) ::= <<
+///////////////////////////////////////////////////////////////////////////////
+// print actors and networks
+
+printActor(instance) ::= <<
 $if (instance.actor)$
 $if (!instance.actor.system)$
 
@@ -121,19 +172,23 @@ $it.id$ : entity work.$it.actor$
     reset_n          => reset_n);
 
 $endif$
-$else$
+$endif$
+>>
 
+printNetwork(instance) ::= <<
+$if (!instance.actor)$
 $it.id$ : entity work.$it.network$
   port map (
-    $printActorPorts(instance)$
+    $printNetworksPorts(it.network)$
     clock            => clock, 
     reset_n          => reset_n);
 
 $endif$
 >>
 
-printSchedulers(instances) ::= <<
-$instances: printScheduler()$
+printNetAct(instances) ::= <<
+$instances: printActor()$
+$instances: printNetwork()$
 
 >>
 
@@ -150,9 +205,9 @@ use ieee.numeric_std.all;
 
 entity $network.name$ is
   port (
-  -- Inputs
-  clock   : in std_logic;
-  reset_n : in std_logic);  
+    $printNetworkPorts(network)$
+    clock   : in std_logic;
+    reset_n : in std_logic);  
 end $network.name$;
 
 
@@ -167,8 +222,8 @@ architecture rtl_$network.name$ of $network.name$ is
 begin
 
   ---------------------------------------------------------------------------
-  -- Actors instantiation 
-  $printSchedulers(network.instances); separator="\n"$
+  -- Actors and Networks instantiation 
+  $printNetAct(network.instances); separator="\n"$
 
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
