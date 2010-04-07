@@ -1,41 +1,25 @@
 group Cpp_actorDecl;
 
 ///////////////////////////////////////////////////////////////////////////////
-// FIFO declaration
-///////////////////////////////////////////////////////////////////////////////
-
-fifo(port) ::= <<
-$instance.actor.name$_$port.name$,
->>
-
-///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
-listSize(value) ::= <<
-$value : {[$it$]} $
->>
-
-// the values of a list: {val1, val2, ..., valn}
-listValue(value) ::= <<
-{$value; wrap, separator=", "$}
+declarePointer(value) ::= <<
+$value : {*} $
 >>
 
 variableDeclaration(variable) ::= <<
-$if(variable.port)$
-$variable.type$ *$variable$
-$else$
-$variable.type$ $variable$$listSize(variable.type.dimensions)$
-$endif$
+$variable.type$$declarePointer(variable.type.dimensions)$ $variable$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// State variables
+// Non-const state variables
 ///////////////////////////////////////////////////////////////////////////////
-stateVar(variable) ::= <<
-static $variableDeclaration(variable)$;$\n$
+nonConstStateVar(variable) ::= <<
+$if(!variable.constantValue)$
+$variableDeclaration(variable)$;$\n$
 $endif$
 >>
 
@@ -237,15 +221,13 @@ instance(instance) ::= <<
 // Input FIFOs
 enum
 {
-	$instance.actor.inputs.list: fifo(it); separator="\n"$
-	$instance.actor.name$_IPORT_SIZE
+	$instance.actor.inputs.list: {$instance.actor.name$_$it.name$}; separator=",\n"$
 };
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
 enum
 {
-	$instance.actor.outputs.list: fifo(it); separator="\n"$
-	$instance.actor.name$_OPORT_SIZE
+	$instance.actor.outputs.list: {$instance.actor.name$_$it.name$}; separator=",\n"$
 };
 
 
@@ -259,13 +241,15 @@ $constructor(instance.parameters)$
 
 $! ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
-	$instance.actor.stateVars.list: stateVar(it)$ !$
+	$instance.actor.stateVars.list: nonConstStateVar(it)$ !$
 
 private:
 ////////////////////////////////////////////////////////////////////////////////
 // Parameters
 $parameters(instance.parameters)$
-
+////////////////////////////////////////////////////////////////////////////////
+// Non-const state variables of the actor
+$instance.actor.stateVars.list: nonConstStateVar(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
 	$instance.actor.procs.list: procedure(it)$
@@ -275,7 +259,6 @@ $parameters(instance.parameters)$
 
 public:
 	$if(instance.actor.initializes)$
-
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
 	$instance.actor.initializes: action(it)$

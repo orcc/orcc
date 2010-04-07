@@ -16,21 +16,26 @@ listValue(value) ::= <<
 >>
 
 variableDeclaration(variable) ::= <<
-$if(variable.port)$
 $variable.type$ $variable$$listSize(variable.type.dimensions)$
-$else$
-$variable.type$ $variable$$listSize(variable.type.dimensions)$
-$endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// State variables
+// Const state variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
 $if(variable.constantValue)$
 $variableDeclaration(variable)$ = $variable.constantValue$;$\n$
-$else$
-$variableDeclaration(variable)$;$\n$
+$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Non-const State variables
+///////////////////////////////////////////////////////////////////////////////
+nonConstStateVar(variable) ::= <<
+$if(!variable.constantValue)$
+$if(variable.type.dimensions)$
+$variable$ = new $variable.type$$listSize(variable.type.dimensions)$;
+$endif$
 $endif$
 >>
 
@@ -327,7 +332,7 @@ int actor_$instance.actor.name$::scheduler()
 
 >>
 
-constructor(parameters) ::= <<
+constructor(parameters, stateVars) ::= <<
 actor_$instance.actor.name$::actor_$instance.actor.name$($parameters.keys: {int $it$}; separator=", "$)
 :
 $parameters.keys: {$it$($it$),}; separator="\n"$
@@ -335,8 +340,9 @@ $if(instance.actor.actionScheduler.fsm)$
 _FSM_state(state_$instance.actor.actionScheduler.fsm.initialState$),
 
 $endif$
-ActorGen($instance.actor.name$_IPORT_SIZE, $instance.actor.name$_OPORT_SIZE)
+ActorGen($length(instance.actor.inputs.list)$, $length(instance.actor.outputs.list)$)
 {
+	$stateVars : nonConstStateVar(it)$
 }
 
 
@@ -357,7 +363,8 @@ namespace
 	$instance.actor.stateVars.list: stateVar(it)$}
 
 
-$constructor(instance.parameters)$
+
+$constructor(parameters=instance.parameters, stateVars=instance.actor.stateVars.list)$
 
 
 void actor_$instance.actor.name$::initializeActor()
@@ -366,8 +373,7 @@ void actor_$instance.actor.name$::initializeActor()
 	std::string strTrace("");
 	strTrace = __FILE__;
 	unsigned uDesc = g_oTracer.createFileDescriptor(strTrace);
-
-	for(unsigned uIdx = 0; uIdx < $instance.actor.name$_IPORT_SIZE; uIdx++)
+	for(unsigned uIdx = 0; uIdx < $length(instance.actor.inputs.list)$; uIdx++)
 	{
 	  strTrace = "m_poTabIn[" + toString(uIdx) + "] = " + toString((unsigned)m_poTabIn[uIdx]);
 	  g_oTracer.addPort(uDesc, strTrace);

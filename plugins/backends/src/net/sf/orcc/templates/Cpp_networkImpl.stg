@@ -39,7 +39,7 @@ $edges: tryAllocateFifo(
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 assignLockedFifo(target, targetPort, count, dir) ::= <<
-$target.id$.connect($dir$, $target.id$_$targetPort.name$, lockedFifo_$count$);
+$target.id$.connect($dir$, $target.actor.name$_$targetPort.name$, lockedFifo_$count$);
 
 >>
 
