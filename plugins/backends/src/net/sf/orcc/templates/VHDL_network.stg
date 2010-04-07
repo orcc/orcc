@@ -14,7 +14,7 @@ printSigInput(it) ::= <<
 $if(it.type.bool)$
 signal $instance.actor$_$it$_data_in   : std_logic;$\n$
 $else$
-signal $instance.actor$_$it$_data_in   : std_logic_vector($it.type$ -1 downto 0);$\n$
+signal $instance.actor$_$it$_data_in   : std_logic_vector($it.type.size$ - 1 downto 0);$\n$
 $endif$
 signal $instance.actor$_$it$_read      : std_logic;
 signal $instance.actor$_$it$_empty     : std_logic;
@@ -25,7 +25,7 @@ printSigOutput(it) ::= <<
 $if(it.type.bool)$
 signal $instance.actor$_$it$_data_out   : std_logic;$\n$
 $else$
-signal $instance.actor$_$it$_data_out   : std_logic_vector($it.type$ -1 downto 0);$\n$
+signal $instance.actor$_$it$_data_out   : std_logic_vector($it.type.size$ - 1 downto 0);$\n$
 $endif$
 signal $instance.actor$_$it$_full       : std_logic;
 signal $instance.actor$_$it$_write      : std_logic;
@@ -48,7 +48,7 @@ depth => $edge.size$,
 $if(targetPort.type.bool)$
 width => 0)$\n$
 $else$
-width => $targetPort.type$)$\n$
+width => $targetPort.type.size$)$\n$
 $endif$
 port map (
   write_data => $source.id$_$sourcePort.name$_write, 
@@ -114,13 +114,21 @@ printScheduler(instance) ::= <<
 $if (instance.actor)$
 $if (!instance.actor.system)$
 
-$it.id$ : entity work.$it.id$
+$it.id$ : entity work.$it.actor$
   port map (
     $printActorPorts(instance)$
     clock            => clock, 
     reset_n          => reset_n);
 
 $endif$
+$else$
+
+$it.id$ : entity work.$it.network$
+  port map (
+    $printActorPorts(instance)$
+    clock            => clock, 
+    reset_n          => reset_n);
+
 $endif$
 >>
 

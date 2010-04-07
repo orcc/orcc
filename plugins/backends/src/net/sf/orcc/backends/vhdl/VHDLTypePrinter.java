@@ -51,12 +51,6 @@ import net.sf.orcc.ir.type.VoidType;
 public class VHDLTypePrinter extends DefaultTypePrinter {
 
 	/**
-	 * When set to <code>true</code>, this printer will print type for use in
-	 * the network.
-	 */
-	public static boolean isInNetwork = false;
-
-	/**
 	 * Prints an integer with the given number of bits.
 	 * 
 	 * @param expr
@@ -105,13 +99,7 @@ public class VHDLTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(IntType type) {
-		if (isInNetwork) {
-			int size = new ExpressionEvaluator().evaluateAsInteger(type
-					.getSize());
-			builder.append(size);
-		} else {
-			printInt(type.getSize());
-		}
+		printInt(type.getSize());
 	}
 
 	@Override

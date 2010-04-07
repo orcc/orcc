@@ -48,7 +48,6 @@ import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
-
 /**
  * VHDL back-end.
  * 
@@ -69,43 +68,61 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 * printer is protected
 	 */
 	private VHDLActorPrinter printer;
+	private NetworkPrinter networkPrinter;
 
 	@Override
 	protected void afterInstantiation(Network network) throws OrccException {
 		printer = new VHDLActorPrinter();
-		VHDLTypePrinter.isInNetwork = false;
 	}
 
 	@Override
 	protected void doActorCodeGeneration(Network network) throws OrccException {
+		transformActors(network);
 		printActors(network);
-		printInstances(network);
 	}
 
 	@Override
 	protected void printActor(Actor actor) throws OrccException {
-		transformActor(actor);
-
 		String id = actor.getName();
 		File folder = new File(path + File.separator + "Design");
 		if (!folder.exists()) {
 			folder.mkdir();
 		}
-		
+
 		String outputName = path + File.separator + "Design" + File.separator
-		+ id + ".vhd";
+				+ id + ".vhd";
 		try {
 			printer.printActor(outputName, id, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
 	}
-	
 
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
+		printTestbench(network);
+
 		try {
-			VHDLTestbenchPrinter tbPrinter = new VHDLTestbenchPrinter();
+			networkPrinter = new NetworkPrinter("VHDL_network");
+
+			String outputName = path + File.separator + network.getName()
+					+ "_TOP.vhd";
+			networkPrinter.printNetwork(outputName, network, false, fifoSize);
+
+			for (Network subNetwork : network.getNetworks()) {
+				outputName = path + File.separator + subNetwork.getName()
+						+ ".vhd";
+				networkPrinter.printNetwork(outputName, subNetwork, false,
+						fifoSize);
+			}
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
+	}
+
+	private void printTestbench(Network network) throws OrccException {
+		VHDLTestbenchPrinter tbPrinter = new VHDLTestbenchPrinter();
+		try {
 			for (Instance instance : network.getInstances()) {
 				if (instance.isActor()) {
 					Actor actor = instance.getActor();
@@ -118,28 +135,20 @@ public class VHDLBackendImpl extends AbstractBackend {
 					String outputName = path + File.separator + "Testbench"
 							+ File.separator + id + "_tb.vhd";
 					tbPrinter.printTestbench(outputName, id, actor);
-				} 
+				}
 			}
-
-			VHDLTypePrinter.isInNetwork = true;
-			NetworkPrinter networkPrinter = new NetworkPrinter("VHDL_network");
-
-			String outputName = path + File.separator + network.getName()
-					+ "_TOP.vhd";
-			networkPrinter.printNetwork(outputName, network, false, fifoSize);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
 	}
 
-	
 	@Override
 	protected void transformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new Inline(), new PhiRemoval(),
 				new VariableRedimension(), new BoolExprTransform(),
 				new VariableRenamer(), new TransformConditionals() };
-		
+
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}

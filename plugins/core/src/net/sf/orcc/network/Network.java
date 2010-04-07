@@ -350,6 +350,35 @@ public class Network {
 	}
 
 	/**
+	 * Returns the list of networks referenced by the graph of this network.
+	 * This is different from the list of instances of this network: There are
+	 * typically more instances than there are networks, because a network may
+	 * be instantiated several times.
+	 * 
+	 * <p>
+	 * The list is computed on the fly by adding all the networks referenced in
+	 * a set.
+	 * </p>
+	 * 
+	 * @return a list of networks
+	 */
+	public List<Network> getNetworks() {
+		Set<Network> networks = new HashSet<Network>();
+		for (Vertex vertex : getGraph().vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isNetwork()) {
+					Network network = instance.getNetwork();
+					networks.add(network);
+					networks.addAll(network.getNetworks());
+				}
+			}
+		}
+
+		return Arrays.asList(networks.toArray(new Network[0]));
+	}
+
+	/**
 	 * Returns a map that associates each instance to the list of its outgoing
 	 * edges.
 	 * 
