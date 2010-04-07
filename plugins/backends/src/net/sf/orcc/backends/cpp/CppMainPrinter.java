@@ -33,8 +33,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Network;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -47,18 +49,18 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Ghislain Roquier
  * 
  */
-public class CppCMakePrinter {
+public class CppMainPrinter {
 
 	private StringTemplateGroup group;
 
 	/**
-	 * Creates a new CMake printer with the template "Cpp_CMakeLists".
+	 * Creates a new CMake printer with the template "Cpp_main".
 	 * 
 	 * @throws IOException
 	 *             if the template file could not be read
 	 */
-	public CppCMakePrinter() throws IOException {
-		group = new TemplateGroupLoader().loadGroup("Cpp_CMakeLists");
+	public CppMainPrinter() throws IOException {
+		group = new TemplateGroupLoader().loadGroup("Cpp_main");
 	}
 
 	/**
@@ -73,12 +75,13 @@ public class CppCMakePrinter {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public void printCMake(String path, List<Network> network)
-			throws IOException {
-		StringTemplate template = group.getInstanceOf("Cpp_CMakeLists");
-		template.setAttribute("networkList", network);
+	public void printMain(String path, List<Network> networks,
+			Map<Connection, Integer> globalFifoMap) throws IOException {
+		StringTemplate template = group.getInstanceOf("Cpp_main");
+		template.setAttribute("networks", networks);
+		template.setAttribute("globalFifoMap", globalFifoMap);
 
-		String fileName = path + File.separator + "CMakeLists.txt";
+		String fileName = path + File.separator + "main.cpp";
 
 		byte[] b = template.toString(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);

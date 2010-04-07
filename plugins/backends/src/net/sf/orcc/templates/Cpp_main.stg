@@ -1,0 +1,56 @@
+group Cpp_main;
+
+includeNetwork(net) ::= <<
+#include "Network_$net.name$.h"
+>>
+
+declareGlobalFifos(globalFifoMap) ::= <<
+$globalFifoMap.keys : 
+{FifoAPI * lockedFifo_$globalFifoMap.(it)$ = FifoFactory<$it.source.type$>::allocateFifo($it.size$, 2);}; separator="\n"$
+>>
+
+
+declareNetwork(net) ::= <<
+	network_$net.name$ $net.name$;
+>>
+
+startNetwork(net) ::= <<
+	$net.name$.start();
+>>
+
+stopNetwork(net) ::= <<
+	$net.name$.stop();
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print network
+Cpp_main(networks, globalFifoMap) ::= <<
+
+$networks : includeNetwork(it); separator="\n"$
+
+#include "FifoFactory.h"
+
+#define SIZE 10000
+
+extern "C" {
+#include "orcc_util.h"
+}
+
+$declareGlobalFifos(globalFifoMap); separator="\n"$
+
+#ifdef __TRACE_TOKENS__
+TraceAka g_oTracer;
+#endif
+
+int main(int argc, char *argv[]) {
+
+	init_orcc(argc, argv, NULL);
+
+$networks : declareNetwork(it); separator="\n"$
+$networks : startNetwork(it); separator="\n"$
+$networks : stopNetwork(it); separator="\n"$
+	return 0;
+}
+
+>>
+

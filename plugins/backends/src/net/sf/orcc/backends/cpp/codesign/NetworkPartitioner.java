@@ -29,8 +29,10 @@
 package net.sf.orcc.backends.cpp.codesign;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,11 +71,15 @@ public class NetworkPartitioner {
 	 */
 	private File folder;
 
+	private Boolean manageFanout;
+
 	private DirectedGraph<Vertex, Connection> graph;
+
+	private Network network;
 
 	private Map<Port, Vertex> incomingFanout;
 
-	private Map<Port, Port> incomingPort = new HashMap<Port, Port>();
+	private Map<Connection, Port> incomingPort = new HashMap<Connection, Port>();
 
 	private int nbInput;
 
@@ -81,14 +87,40 @@ public class NetworkPartitioner {
 
 	private Map<Port, Map<String, Vertex>> outgoingFanout;
 
-	private Map<Port, Port> outgoingPort = new HashMap<Port, Port>();
+	private Map<Connection, Port> outgoingPort = new HashMap<Connection, Port>();
 
-	private Map<String, Set<Vertex>> partitions = new HashMap<String, Set<Vertex>>();
+	private Map<Port, String> partitionMap = new HashMap<Port, String>();
 
-	private Map<Port, String> toPartition = new HashMap<Port, String>();
-
-	public NetworkPartitioner(File folder) {
+	public NetworkPartitioner(File folder, Network network, Boolean manageFanout) {
 		this.folder = folder;
+		this.network = network;
+		graph = network.getGraph();
+		this.manageFanout = manageFanout;
+	}
+
+	/**
+	 * 
+	 * Returns the partName of the given instance.
+	 * 
+	 * @param instance
+	 * 
+	 * @throws OrccException
+	 *             If the instance does not contain a partName attribute.
+	 */
+	private String getPartNameOf(Instance instance) throws OrccException {
+		String partName = null;
+
+		IAttribute attr = instance.getAttribute("partName");
+		if (attr != null && attr.getType() == IAttribute.VALUE) {
+			Expression expr = ((IValueAttribute) attr).getValue();
+			if (expr.isStringExpr()) {
+				partName = ((StringExpr) expr).getValue();
+			} else {
+				throw new OrccException(
+						"partName attribute must be a String expression");
+			}
+		}
+		return partName;
 	}
 
 	/**
@@ -156,7 +188,7 @@ public class NetworkPartitioner {
 		Instance tgtInstance = tgt.getInstance();
 
 		Vertex vertex = null;
-		if (!incomingFanout.containsKey(srcPort)) {
+		if (!incomingFanout.containsKey(srcPort) || !manageFanout) {
 			Port port = new Port(srcPort);
 			port.setName("input_" + nbInput);
 
@@ -167,8 +199,8 @@ public class NetworkPartitioner {
 					port.getName(), port);
 
 			incomingFanout.put(srcPort, vertex);
-			incomingPort.put(port, srcPort);
-			toPartition.put(port, getPartNameOf(tgtInstance));
+			incomingPort.put(connection, port);
+			partitionMap.put(port, getPartNameOf(tgtInstance));
 
 			nbInput++;
 
@@ -205,12 +237,12 @@ public class NetworkPartitioner {
 
 		nbOutput++;
 
-		if (!outgoingFanout.containsKey(srcPort)) {
+		if (!outgoingFanout.containsKey(srcPort) || !manageFanout) {
 
 			Map<String, Vertex> map = new HashMap<String, Vertex>();
 			map.put(getPartNameOf(inst), vertex);
 			outgoingFanout.put(srcPort, map);
-			outgoingPort.put(tgtPort, port);
+			outgoingPort.put(connection, port);
 
 			Connection outgoing = new Connection(connection.getSource(), null,
 					connection.getAttributes());
@@ -221,7 +253,7 @@ public class NetworkPartitioner {
 			if (!outgoingFanout.get(srcPort).containsKey(getPartNameOf(inst))) {
 
 				outgoingFanout.get(srcPort).put(getPartNameOf(inst), vertex);
-				outgoingPort.put(tgtPort, port);
+				outgoingPort.put(connection, port);
 
 				Connection outgoing = new Connection(connection.getSource(),
 						null, connection.getAttributes());
@@ -284,37 +316,8 @@ public class NetworkPartitioner {
 		return subNetwork;
 	}
 
-	/**
-	 * 
-	 * Returns the partName of the given instance.
-	 * 
-	 * @param instance
-	 * 
-	 * @throws OrccException
-	 *             If the instance does not contain a partName attribute.
-	 */
-	private String getPartNameOf(Instance instance) throws OrccException {
-		String partName = null;
-
-		IAttribute attr = instance.getAttribute("partName");
-		if (attr != null && attr.getType() == IAttribute.VALUE) {
-			Expression expr = ((IValueAttribute) attr).getValue();
-			if (expr.isStringExpr()) {
-				partName = ((StringExpr) expr).getValue();
-			} else {
-				throw new OrccException(
-						"partName attribute must be a String expression");
-			}
-		}
-		return partName;
-	}
-
-	/**
-	 *
-	 */
-
-	public void transform(Network network) throws OrccException {
-		graph = network.getGraph();
+	public Map<String, Set<Vertex>> getPartitionSets() throws OrccException {
+		Map<String, Set<Vertex>> partitionSets = new HashMap<String, Set<Vertex>>();
 
 		for (Vertex vertex : graph.vertexSet()) {
 			String partName = getPartNameOf(vertex.getInstance());
@@ -324,14 +327,39 @@ public class NetworkPartitioner {
 						+ vertex.getInstance().getId() + " is missing");
 			}
 
-			if (!partitions.containsKey(partName)) {
+			if (!partitionSets.containsKey(partName)) {
 				Set<Vertex> vertices = new HashSet<Vertex>();
 				vertices.add(vertex);
-				partitions.put(partName, vertices);
+				partitionSets.put(partName, vertices);
 			} else {
-				partitions.get(partName).add(vertex);
+				partitionSets.get(partName).add(vertex);
 			}
 		}
+
+		return partitionSets;
+	}
+
+	public List<Network> getSubnetworks() throws OrccException {
+		List<Network> subNetworks = new ArrayList<Network>();
+
+		for (Map.Entry<String, Set<Vertex>> entry : getPartitionSets()
+				.entrySet()) {
+			Network subNetwork = createPartition(entry, network);
+			subNetworks.add(subNetwork);
+		}
+		return subNetworks;
+	}
+
+	/**
+	 *
+	 */
+
+	public void transform() throws OrccException {
+		graph = network.getGraph();
+
+		Map<String, Set<Vertex>> partitions = new HashMap<String, Set<Vertex>>();
+
+		partitions = getPartitionSets();
 
 		// Creates a copy of vertices of graph
 		Set<Vertex> vertices = new HashSet<Vertex>(graph.vertexSet());
@@ -360,27 +388,13 @@ public class NetworkPartitioner {
 			Vertex src = graph.getEdgeSource(connection);
 			Vertex tgt = graph.getEdgeTarget(connection);
 
-			Port srcPort = connection.getSource();
-			Port tgtPort = connection.getTarget();
+			if (incomingPort.containsKey(connection)) {
 
-			if (incomingPort.containsValue(srcPort)
-					&& outgoingPort.containsKey(tgtPort)) {
+				Port srcPort = outgoingPort.get(connection);
+				Port tgtPort = incomingPort.get(connection);
 
-				Port newSrcPort = outgoingPort.get(tgtPort);
-
-				Port newTgtPort = null;
-				for (Map.Entry<Port, Port> entry : incomingPort.entrySet()) {
-					Port port = entry.getValue();
-					if (port.equals(srcPort)) {
-						if (toPartition.get(entry.getKey()).equals(
-								getPartNameOf(tgt.getInstance()))) {
-							newTgtPort = entry.getKey();
-						}
-					}
-				}
-
-				Connection conn = new Connection(newSrcPort, newTgtPort,
-						connection.getAttributes());
+				Connection conn = new Connection(srcPort, tgtPort, connection
+						.getAttributes());
 
 				Vertex srcVertex = topHierNetworkVertices.get(getPartNameOf(src
 						.getInstance()));

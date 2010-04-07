@@ -31,6 +31,8 @@ package net.sf.orcc.backends.cpp;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.Actor;
@@ -38,6 +40,7 @@ import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.util.INameable;
 
 import org.antlr.stringtemplate.StringTemplate;
@@ -53,6 +56,8 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 public final class CppActorPrinter extends Printer {
 
 	private StringTemplateGroup group;
+
+	private Set<Actor> alreadyExists = new HashSet<Actor>();
 
 	/**
 	 * Creates a new actor printer with the given template.
@@ -78,18 +83,33 @@ public final class CppActorPrinter extends Printer {
 	 *            actor to print
 	 * @throws IOException
 	 */
-	public void printActor(String fileName, String id, Actor actor)
+	public void printInstance(String fileName, Instance instance)
 			throws IOException {
-		if (!actor.isSystem()) {
-			StringTemplate template = group.getInstanceOf("actor");
+		if (!instance.getActor().isSystem()) {
+			StringTemplate template = group.getInstanceOf("instance");
 
-			template.setAttribute("actorName", id);
-			template.setAttribute("actor", actor);
+			template.setAttribute("instance", instance);
 
 			byte[] b = template.toString(80).getBytes();
 			OutputStream os = new FileOutputStream(fileName);
 			os.write(b);
 			os.close();
+		}
+	}
+
+	public void printActor(String fileName, Instance instance) throws IOException {
+		Actor actor = instance.getActor();
+		if (!alreadyExists.contains(actor) && !actor.isSystem()) {
+			StringTemplate template = group.getInstanceOf("instance");
+
+			template.setAttribute("instance", instance);
+
+			byte[] b = template.toString(80).getBytes();
+			OutputStream os = new FileOutputStream(fileName);
+			os.write(b);
+			os.close();
+			
+			alreadyExists.add(actor);
 		}
 	}
 

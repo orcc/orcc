@@ -1,68 +1,89 @@
 group Cpp_CMakeLists;
 
-
-printIncludeDirForWrapper(instance) ::= <<
-$if (instance.wrapper)$
-# Wrapper-dedicated include directories
-include_directories(\${LIBPATH}/LibWrapper/include)
-include_directories(\${LIBPATH}/LibThread/include)
-include_directories(\${LIBPATH}/LibAdaptor/include)
-
-link_directories(\${LIBPATH}/LibWrapper/lib)
-link_directories(\${LIBPATH}/LibThread/lib)
-link_directories(\${LIBPATH}/LibAdaptor/lib)
-$endif$
->>
-
-printLibForWrapper(instance) ::= <<
-$if (instance.wrapper)$
-LibWrapper
-LibThread
-LibAdaptor
-$endif$
->>
-
 printActor(id, actor) ::= <<
 $if (!actor.system)$
-Actor_$id$.cpp
-
+Actor_$actor.name$.cpp
 $endif$
+
 >>
 
 printInstance(instance) ::= <<
 $if (instance.actor)$
 $printActor(id=instance.id, actor=instance.actor)$
 $endif$
+
 >>
 
-Cpp_CMakeLists(network) ::= <<
+printSubnetwork(net) ::= <<
+Network_$net.name$.cpp
+$net.instances: printInstance(it);separator="\n"$
+
+>>
+
+addLibraries(net) ::= <<
+$net.instances:
+{$if(it.wrapper)$
+add_library(LibAdaptorConfig STATIC \${LIBCAL2CPP_ROOT_PATH}/src/LibAdaptorConfig.cpp)
+add_library(LibWrapper STATIC \${LIBCAL2CPP_ROOT_PATH}/src/wrapperaka.cpp)
+$endif$}
+$
+>>
+
+addDependencies(net) ::= <<
+$net.instances:
+{$if(it.wrapper)$
+add_dependencies(top LibWrapper LibAdaptorConfig)
+$endif$}
+$
+>>
+targetLinkWrapper(net) ::= <<
+$net.instances :
+{$if(it.wrapper)$
+LibAdaptorFactory
+LibWrapper
+LibAdaptorConfig
+$endif$}
+$
+>>
+
+Cpp_CMakeLists(networkList) ::= <<
 # Generated from $network.name$
 
 cmake_minimum_required (VERSION 2.8)
-project ($network.name$)
+project (top)
 
-IF(NOT EXISTS "@LIBPATH@")
-MESSAGE(FATAL_ERROR "The path to the library is does not exist!")
-ENDIF(NOT EXISTS "@LIBPATH@")
+if(MSVC)
+set(CMAKE_CXX_FLAGS_DEBUG /MTd)
+set(CMAKE_CXX_FLAGS_RELEASE /MT)
+endif(MSVC)
 
 
 # Common include directories
-include_directories(\${LIBPATH}/LibOrcc/include)
-include_directories(\${LIBPATH}/LibCALaka/include)
+find_path(LIBCAL2CPP_ROOT_PATH include/actoraka.h)
 
-link_directories(\${LIBPATH}/LibOrcc/lib)
-link_directories(\${LIBPATH}/LibCALaka/lib)
+include_directories(\${CMAKE_SOURCE_DIR} \${LIBCAL2CPP_ROOT_PATH}/include)
 
-$network.instances: printIncludeDirForWrapper(it)$
+# Common link directories
+link_directories(
+\${LIBCAL2CPP_ROOT_PATH}/lib
+)
 
-add_executable ($network.name$
-Network_$network.name$.cpp
-$network.instances: printInstance(it)$)
+$networkList : addLibraries(it)$
 
-target_link_libraries($network.name$ 
-LibOrcc 
+
+add_executable (top
+main.cpp
+$networkList : printSubnetwork(it)$
+)
+
+$networkList : addDependencies(it)$
+
+
+target_link_libraries(top
+LibOrcc
 LibCALaka
-$network.instances: printLibForWrapper(it)$
+LibThread
+$networkList : targetLinkWrapper(it)$
 )
 
 >>

@@ -1,13 +1,4 @@
-group C_actor;
-
-///////////////////////////////////////////////////////////////////////////////
-// FIFO declaration
-///////////////////////////////////////////////////////////////////////////////
-
-fifo(port) ::= <<
-extern struct fifo_s *$actorName$_$port.name$;
-
->>
+group Cpp_actorImpl;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
@@ -66,7 +57,7 @@ $decrement.target$--;
 >>
 
 HasTokens(hasTokens) ::= <<
-$hasTokens.target$ = m_poTabIn[$actorName$_$hasTokens.port$]->hasTokens($hasTokens.numTokens$);
+$hasTokens.target$ = m_poTabIn[$instance.actor.name$_$hasTokens.port$]->hasTokens($hasTokens.numTokens$);
 
 >>
 
@@ -82,24 +73,24 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 
 Peek(peek) ::= <<
 $if(peek.unit)$
-m_poTabIn[$actorName$_$peek.port$]->peek($peek.target$);$\n$
+m_poTabIn[$instance.actor.name$_$peek.port$]->peek($peek.target$);$\n$
 $else$
-m_poTabIn[$actorName$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
+m_poTabIn[$instance.actor.name$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
 $endif$
 
 >>
 
 Read(read) ::= <<
 $if(read.unit)$
-m_poTabIn[$actorName$_$read.port$]->get($read.target$);$\n$
+m_poTabIn[$instance.actor.name$_$read.port$]->get($read.target$);$\n$
 $else$
-m_poTabIn[$actorName$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
+m_poTabIn[$instance.actor.name$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
 $endif$
 
 >>
 
 ReadEnd(readEnd) ::= <<
-setReadEnd($actorName$_$readEnd.port$);
+setReadEnd($instance.actor.name$_$readEnd.port$);
 
 >>
 
@@ -122,15 +113,15 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 
 Write(write) ::= <<
 $if(write.unit)$
-m_poTabOut[$actorName$_$write.port$]->put($write.target$);$\n$
+m_poTabOut[$instance.actor.name$_$write.port$]->put($write.target$);$\n$
 $else$
-m_poTabOut[$actorName$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
+m_poTabOut[$instance.actor.name$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
 $endif$
 
 >>
 
 WriteEnd(writeEnd) ::= <<
-setWriteEnd($actorName$_$writeEnd.port$);
+setWriteEnd($instance.actor.name$_$writeEnd.port$);
 
 >>
 
@@ -153,15 +144,20 @@ $instructions(blockNode.instructions)$
 
 // if node
 IfNode(ifNode) ::= <<
-if ($ifNode.value$) {
-	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$ else {
+if($ifNode.value$)
+{
+	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$
+
+else
+{
 	$nodes(ifNode.elseNodes)$}$endif$
 $BlockNode(ifNode.joinNode)$
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
-while ($whileNode.value$) {
+while ($whileNode.value$)
+{
 	$nodes(whileNode.nodes)$}
 $BlockNode(whileNode.joinNode)$
 >>
@@ -172,7 +168,8 @@ $BlockNode(whileNode.joinNode)$
 
 procedure(procedure) ::= <<
 
-$procedure.returnType$ actor_$actorName$::$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
+$procedure.returnType$ actor_$instance.actor.name$::$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$)
+{
 $if(procedure.locals.list)$
 	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
 
@@ -194,7 +191,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|m_poTabOut[$actorName$_$port$]->hasRooms($pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|m_poTabOut[$instance.actor.name$_$port$]->hasRooms($pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -207,9 +204,11 @@ i++;
 >>
 
 actionTest(action) ::= <<
-if (isSchedulable_$action$()) {
+if(isSchedulable_$action$())
+{
 	$if(action.outputPattern)$
-	if ($outputPattern(pattern=action.outputPattern)$) {
+	if($outputPattern(pattern=action.outputPattern)$)
+	{
 		$actionCall(action)$
 	}
 	$else$
@@ -218,20 +217,23 @@ if (isSchedulable_$action$()) {
 }>>
 
 schedulingTest(actions) ::= <<
-$actions: actionTest(action=it); separator=" else "$
+$actions: actionTest(action=it); separator="\nelse "$
 >>
 
 scheduler(actions) ::= <<
-void actor_$actorName$::scheduler() {
+int actor_$instance.actor.name$::scheduler()
+{
 	bool res = true;
 	int i = 0;
   
-	while (res) {
+	while (res) 
+	{
 		res = false;
 		$if(actions)$
 		$schedulingTest(actions)$
 		$endif$
 	}
+	return i;
 }
 
 >>
@@ -241,14 +243,16 @@ void actor_$actorName$::scheduler() {
 
 actionCallState(nextState) ::= <<
 $nextState.action.body$();
-_FSM_state = s_$nextState.targetState$;
+_FSM_state = state_$nextState.targetState$;
 res = true;
 >>
 
 actionTestState(nextState) ::= <<
-if (isSchedulable_$nextState.action$()) {
+if(isSchedulable_$nextState.action$())
+{
 	$if(nextState.action.outputPattern)$
-	if ($outputPattern(nextState.action.outputPattern)$) {
+	if($outputPattern(nextState.action.outputPattern)$)
+	{
 		$actionCallState(nextState)$
 	}
 	$else$
@@ -261,7 +265,8 @@ $nextStates: actionTestState(nextState=it); separator=" else "$
 >>
 
 stateScheduler(transition) ::= <<
-bool actor_$actorName$::$transition.sourceState$_state_scheduler() {
+bool actor_$instance.actor.name$::$transition.sourceState$_state_scheduler()
+{
 	bool res = false;
 	$schedulingTestState(nextStates=transition.nextStateInfo)$
 	return res;
@@ -270,8 +275,9 @@ bool actor_$actorName$::$transition.sourceState$_state_scheduler() {
 >>
 
 switch(transitions) ::= <<
-switch (_FSM_state) {
-$transitions: {case s_$it.sourceState$:
+switch (_FSM_state)
+{
+$transitions: {case state_$it.sourceState$:
 	res = $it.sourceState$_state_scheduler();
 	break;
 }$
@@ -282,14 +288,9 @@ default:
 >>
 
 schedulerFSM(actions, fsm) ::= <<
-enum states {
-	s_$first(fsm.states)$ = 0,
-	$rest(fsm.states) : {s_$it$}; separator=",\n"$
-};
-
-
 $if(actions)$
-bool actor_$actorName$::outside_FSM_scheduler() {
+bool actor_$instance.actor.name$::outside_FSM_scheduler()
+{
 	bool res = false;
 	int i = 0;
 	$schedulingTest(actions)$
@@ -299,24 +300,45 @@ bool actor_$actorName$::outside_FSM_scheduler() {
 
 $endif$
 $fsm.transitions: stateScheduler(transition=it); separator="\n"$
-void actor_$actorName$::scheduler() {
+int actor_$instance.actor.name$::scheduler()
+{
 	bool res = true;
 	int i = 0;
 	
-	while (res) {
+	while (res)
+	{
 		res = false;
 		$if(actions)$
-		if (outside_FSM_scheduler()) {
+		if(outside_FSM_scheduler())
+		{
 			res = true;
 			i++;
-		} else {
+		}
+		else
+		{
 			$switch(fsm.transitions)$
 		}
 		$else$
 		$switch(fsm.transitions)$
 		$endif$
 	}
+	return i;
 }
+
+>>
+
+constructor(parameters) ::= <<
+actor_$instance.actor.name$::actor_$instance.actor.name$($parameters.keys: {int $it$}; separator=", "$)
+:
+$parameters.keys: {$it$($it$),}; separator="\n"$
+$if(instance.actor.actionScheduler.fsm)$
+_FSM_state(state_$instance.actor.actionScheduler.fsm.initialState$),
+
+$endif$
+ActorGen($instance.actor.name$_IPORT_SIZE, $instance.actor.name$_OPORT_SIZE)
+{
+}
+
 
 >>
 
@@ -324,33 +346,28 @@ void actor_$actorName$::scheduler() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actorName, actor) ::= <<
-// Generated from "$actor.name$"
+instance(instance) ::= <<
 
-#include "Actor_$actorName$.h"
+#include "Actor_$instance.actor.name$.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
 namespace
 {
-	$actor.stateVars.list: stateVar(it)$}
+	$instance.actor.stateVars.list: stateVar(it)$}
 
-actor_$actorName$::actor_$actorName$():ActorGen($actorName$_IPORT_SIZE, $actorName$_OPORT_SIZE)
-{
-$if(actor.actionScheduler.fsm)$
-	_FSM_state = s_$actor.actionScheduler.fsm.initialState$;
 
-$endif$
-}
+$constructor(instance.parameters)$
 
-void actor_$actorName$::initializeActor()
+
+void actor_$instance.actor.name$::initializeActor()
 {
 #ifdef __TRACE_TOKENS__
 	std::string strTrace("");
 	strTrace = __FILE__;
 	unsigned uDesc = g_oTracer.createFileDescriptor(strTrace);
 
-	for(unsigned uIdx = 0; uIdx < $actorName$_IPORT_SIZE; uIdx++)
+	for(unsigned uIdx = 0; uIdx < $instance.actor.name$_IPORT_SIZE; uIdx++)
 	{
 	  strTrace = "m_poTabIn[" + toString(uIdx) + "] = " + toString((unsigned)m_poTabIn[uIdx]);
 	  g_oTracer.addPort(uDesc, strTrace);
@@ -361,30 +378,31 @@ void actor_$actorName$::initializeActor()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-$actor.procs.list: procedure(it)$
+$instance.actor.procs.list: procedure(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-$actor.actions: action(it)$
-$if(actor.initializes)$
+$instance.actor.actions: action(it)$
+$if(instance.actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-$actor.initializes: action(it)$
-void actor_$actorName$::initialize() {
+$instance.actor.initializes: action(it)$
+void actor_$instance.actor.name$::initialize()
+{
 	bool res = true;
 	int i = 0;
 
-	$if(actor.initializes)$
-	$schedulingTest(actor.initializes)$
+	$if(instance.actor.initializes)$
+	$schedulingTest(instance.actor.initializes)$
 	$endif$
 }
 
 $endif$
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
-$if(actor.actionScheduler.fsm)$
-$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
+$if(instance.actor.actionScheduler.fsm)$
+$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
 $else$
-$scheduler(actions=actor.actionScheduler.actions)$
+$scheduler(actions=instance.actor.actionScheduler.actions)$
 $endif$
 
 >>
