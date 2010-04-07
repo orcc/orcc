@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.network.transforms;
+package net.sf.orcc.tools.staticanalyzer;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,12 +46,13 @@ import org.jgrapht.DirectedGraph;
 
 /**
  * This class computes the repetition vector of the graph. All instances of the
- * network are assumed to be SDF. The network classifier is assumed to be
- * computed first.
+ * network are assumed to be static (SDF/CSDF). The network classifier is
+ * assumed to be computed first.
  * 
  * @author Ghislain Roquier
  * 
  */
+
 
 public class RepetitionVectorAnalyzer {
 
