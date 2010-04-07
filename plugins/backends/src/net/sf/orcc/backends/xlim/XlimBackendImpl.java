@@ -58,15 +58,9 @@ public class XlimBackendImpl extends AbstractBackend {
 	 */
 	private XlimActorPrinter printer;
 
-	/**
-	 * Create the printer
-	 */
-	protected void beforeInstantiation(Network network) throws OrccException {
-		printer = new XlimActorPrinter();
-	}
-
 	@Override
 	protected void doActorCodeGeneration(Network network) throws OrccException {
+		printer = new XlimActorPrinter();
 		printInstances(network);
 	}
 
@@ -100,6 +94,11 @@ public class XlimBackendImpl extends AbstractBackend {
 	 */
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
+	}
+
+	@Override
+	protected void transformActor(Actor actor) throws OrccException {
+		// no transformation
 	}
 
 }

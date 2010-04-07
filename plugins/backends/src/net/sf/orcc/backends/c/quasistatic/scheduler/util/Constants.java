@@ -29,15 +29,13 @@ package net.sf.orcc.backends.c.quasistatic.scheduler.util;
 
 import java.io.File;
 
-
-
 /**
  * Global constants
  * 
  * @author Victor Martin
  */
 public class Constants {
-	
+
 	public static final String ACCODED = "ACCODED";
 	public static final String BORDERLINE_ACTOR = "Borderline Actor";
 	public static final String CALML_FILE_PATH = "CALML files" + File.separator;
@@ -114,9 +112,5 @@ public class Constants {
 	public static final String XDF_FILE = "xdf";
 	public static final String XDF_FILE_PATH = "XDF files" + File.separator;
 	public static final String ZEROMV = "ZEROMV";
-	
-	
-
-	
 
 }

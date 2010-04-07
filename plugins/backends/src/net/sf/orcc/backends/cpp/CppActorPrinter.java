@@ -55,9 +55,9 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public final class CppActorPrinter extends Printer {
 
-	private StringTemplateGroup group;
-
 	private Set<Actor> alreadyExists = new HashSet<Actor>();
+
+	private StringTemplateGroup group;
 
 	/**
 	 * Creates a new actor printer with the given template.
@@ -70,6 +70,23 @@ public final class CppActorPrinter extends Printer {
 
 		// registers this printer as the default printer
 		Printer.register(this);
+	}
+
+	public void printActor(String fileName, Instance instance)
+			throws IOException {
+		Actor actor = instance.getActor();
+		if (!alreadyExists.contains(actor) && !actor.isSystem()) {
+			StringTemplate template = group.getInstanceOf("instance");
+
+			template.setAttribute("instance", instance);
+
+			byte[] b = template.toString(80).getBytes();
+			OutputStream os = new FileOutputStream(fileName);
+			os.write(b);
+			os.close();
+
+			alreadyExists.add(actor);
+		}
 	}
 
 	/**
@@ -94,22 +111,6 @@ public final class CppActorPrinter extends Printer {
 			OutputStream os = new FileOutputStream(fileName);
 			os.write(b);
 			os.close();
-		}
-	}
-
-	public void printActor(String fileName, Instance instance) throws IOException {
-		Actor actor = instance.getActor();
-		if (!alreadyExists.contains(actor) && !actor.isSystem()) {
-			StringTemplate template = group.getInstanceOf("instance");
-
-			template.setAttribute("instance", instance);
-
-			byte[] b = template.toString(80).getBytes();
-			OutputStream os = new FileOutputStream(fileName);
-			os.write(b);
-			os.close();
-			
-			alreadyExists.add(actor);
 		}
 	}
 

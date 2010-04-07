@@ -39,11 +39,11 @@ import org.eclipse.debug.core.ILaunchConfiguration;
  * @author Matthieu Wipliez
  * 
  */
-public interface IBackend {
+public interface Backend {
 
 	/**
 	 * Loads a hierarchical XDF network and IR files, and generates code. Some
-	 * back-ends may flatten the network and close actors.
+	 * back-ends may flatten the network.
 	 * 
 	 * @param process
 	 *            the process that launched the back-end, so we can report
@@ -51,7 +51,7 @@ public interface IBackend {
 	 * @param inputFile
 	 *            absolute path of top-level input network
 	 * @param outputFolder
-	 *            folder absolute path of output folder
+	 *            absolute path of output folder
 	 * @param fifoSize
 	 *            default FIFO size
 	 * @throws OrccException
@@ -59,6 +59,20 @@ public interface IBackend {
 	 */
 	void generateCode(OrccProcess process, String inputFile,
 			String outputFolder, int fifoSize) throws OrccException;
+
+	/**
+	 * Loads IR files, transforms actors and prints them.
+	 * 
+	 * @param process
+	 *            the process that launched the back-end, so we can report
+	 *            messages to it
+	 * @param outputFolder
+	 *            absolute path of folder that contains IR files
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	void generateVtl(OrccProcess process, String outputFolder)
+			throws OrccException;
 
 	/**
 	 * Set the launch configuration of this back-end.

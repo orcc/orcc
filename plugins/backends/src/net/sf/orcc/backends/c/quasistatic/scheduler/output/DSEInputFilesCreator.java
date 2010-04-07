@@ -45,9 +45,9 @@ import net.sf.orcc.backends.c.quasistatic.scheduler.model.Switch;
  * @author Victor Martin
  */
 public class DSEInputFilesCreator {
-	
+
 	// private Graph<Action, DefaultEdge> systemLevelGraph;
-	
+
 	/**
 	 * Creates the delays.txt file which is an input of DSE Scheduler
 	 */
@@ -64,6 +64,7 @@ public class DSEInputFilesCreator {
 					Level.SEVERE, null, ex);
 		}
 	}
+
 	/**
 	 * Creates mapping file
 	 */
@@ -94,10 +95,11 @@ public class DSEInputFilesCreator {
 			}
 		}
 	}
+
 	private ArrayList<String> actionsConnections;
 
 	private HashMap<String, Integer> actionsIndexes;
-	
+
 	private int lastActionIndex;
 
 	public DSEInputFilesCreator() {
@@ -105,30 +107,35 @@ public class DSEInputFilesCreator {
 		actionsIndexes = new HashMap<String, Integer>();
 		lastActionIndex = 0;
 	}
-	
-	public void addConnection(String fromActorId, String fromActionId, String toActorId, String toActionId) {
-		Integer fromIndex = actionsIndexes.get(fromActorId + " " + fromActionId);
+
+	public void addConnection(String fromActorId, String fromActionId,
+			String toActorId, String toActionId) {
+		Integer fromIndex = actionsIndexes
+				.get(fromActorId + " " + fromActionId);
 		Integer toIndex = actionsIndexes.get(fromActorId + " " + fromActionId);
-		
-		if(fromIndex == null || toIndex == null) {
+
+		if (fromIndex == null || toIndex == null) {
 			return;
 		}
-		
+
 		actionsConnections.add(fromIndex + " " + toIndex);
 	}
 
-	public void addConnections(String actorId, Collection<?>/*<GraphEdge>*/ edges){
-		//addConnections(actorId, actorId, edges);
+	public void addConnections(String actorId,
+			Collection<?>/* <GraphEdge> */edges) {
+		// addConnections(actorId, actorId, edges);
 	}
-	
-	public void addConnections(String fromActorId, String toActorId, Collection<?>/*<GraphEdge>*/ edges){
-		/*for(GraphEdge edge: edges){
-			String fromActionId = edge.getFromVertex().getVertexName();
-			String toActionId = edge.getToVertex().getVertexName();
-			addConnection(fromActorId, fromActionId, toActorId, toActionId);
-		}*/
+
+	public void addConnections(String fromActorId, String toActorId,
+			Collection<?>/* <GraphEdge> */edges) {
+		/*
+		 * for(GraphEdge edge: edges){ String fromActionId =
+		 * edge.getFromVertex().getVertexName(); String toActionId =
+		 * edge.getToVertex().getVertexName(); addConnection(fromActorId,
+		 * fromActionId, toActorId, toActionId); }
+		 */
 	}
-	
+
 	public void addNode(String actorId, String actionId) {
 		String key = actorId + " " + actionId;
 		if (actionsIndexes.containsKey(key))
@@ -136,14 +143,14 @@ public class DSEInputFilesCreator {
 		actionsIndexes.put(key, lastActionIndex);
 		lastActionIndex++;
 	}
-	
-	public void addNodes(String actorId, Collection<?>/*<GraphVertex>*/ vertices){
-		/*for(GraphVertex vertex: vertices){
-			String actionId = vertex.getVertexName();
-			addNode(actorId, actionId);
-		}*/
+
+	public void addNodes(String actorId, Collection<?>/* <GraphVertex> */vertices) {
+		/*
+		 * for(GraphVertex vertex: vertices){ String actionId =
+		 * vertex.getVertexName(); addNode(actorId, actionId); }
+		 */
 	}
-	
+
 	public void print() {
 		File actionFile = new File(DSEScheduler.INPUT_FOLDER + "actors_"
 				+ Switch.getBTYPE() + ".txt");
@@ -156,17 +163,18 @@ public class DSEInputFilesCreator {
 					actionFile.getAbsolutePath()));
 			BufferedWriter connectionsBW = new BufferedWriter(new FileWriter(
 					connectionsFile.getAbsolutePath()));
-			
+
 			// prints indexes of each action
 			for (String actionId : actionsIndexes.keySet()) {
-				actionsBW.write(actionsIndexes.get(actionId) + " " + actionId + "\n");
+				actionsBW.write(actionsIndexes.get(actionId) + " " + actionId
+						+ "\n");
 			}
 			actionsBW.close();
 
 			int actorsCount = lastActionIndex;
 			int edgesCount = actionsConnections.size();
 			connectionsBW.write(actorsCount + " " + edgesCount + "\n");
-			
+
 			// prints connections
 			for (int i = 0; i < edgesCount; i++) {
 				connectionsBW.write(actionsConnections.get(i) + "\n");

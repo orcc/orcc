@@ -101,8 +101,8 @@ public final class VHDLActorPrinter extends Printer {
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();
-	}	
-	
+	}
+
 	@Override
 	public String toString(Constant constant) {
 		VHDLConstPrinter printer = new VHDLConstPrinter(group);

@@ -30,6 +30,7 @@ package net.sf.orcc.backends.c;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -63,9 +64,9 @@ public class CBackendImpl extends AbstractBackend {
 	protected CActorPrinter printer;
 
 	@Override
-	protected void afterInstantiation(Network network) throws OrccException {
+	protected void doActorCodeGeneration(Network network) throws OrccException {
 		network.flatten();
-		
+
 		if (merge) {
 			network.classifyActors();
 			network.normalizeActors();
@@ -86,11 +87,9 @@ public class CBackendImpl extends AbstractBackend {
 
 		// until now, printer is default printer
 		printer = new CActorPrinter();
-	}
 
-	@Override
-	protected void doActorCodeGeneration(Network network) throws OrccException {
-		transformActors(network);
+		List<Actor> actors = network.getActors();
+		transformActors(actors);
 		printInstances(network);
 	}
 

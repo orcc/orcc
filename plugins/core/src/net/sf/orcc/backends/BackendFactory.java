@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +76,7 @@ public class BackendFactory {
 	/**
 	 * list of back-ends.
 	 */
-	private final Map<String, IBackend> backends;
+	private final Map<String, Backend> backends;
 
 	/**
 	 * list of options.
@@ -87,7 +88,7 @@ public class BackendFactory {
 	 * initialized
 	 */
 	private BackendFactory() {
-		backends = new TreeMap<String, IBackend>();
+		backends = new TreeMap<String, Backend>();
 		backendOptions = new HashMap<String, List<BackendOption>>();
 		options = new HashMap<String, BackendOption>();
 
@@ -156,7 +157,7 @@ public class BackendFactory {
 
 			try {
 				Object obj = element.createExecutableExtension("class");
-				backends.put(name, (IBackend) obj);
+				backends.put(name, (Backend) obj);
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
@@ -269,9 +270,13 @@ public class BackendFactory {
 	public void runBackend(OrccProcess process, String name, String inputFile,
 			String outputFolder, int fifoSize,
 			ILaunchConfiguration configuration) throws Exception {
-		IBackend backend = backends.get(name);
+		Backend backend = backends.get(name);
 		backend.setLaunchConfiguration(configuration);
-		backend.generateCode(process, inputFile, outputFolder, fifoSize);
+		if (new File(inputFile).isDirectory()) {
+			backend.generateVtl(process, outputFolder);
+		} else {
+			backend.generateCode(process, inputFile, outputFolder, fifoSize);
+		}
 	}
 
 }

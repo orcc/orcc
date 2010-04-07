@@ -71,19 +71,19 @@ public class NetworkPartitioner {
 	 */
 	private File folder;
 
-	private Boolean manageFanout;
-
 	private DirectedGraph<Vertex, Connection> graph;
-
-	private Network network;
 
 	private Map<Port, Vertex> incomingFanout;
 
 	private Map<Connection, Port> incomingPort = new HashMap<Connection, Port>();
 
+	private Boolean manageFanout;
+
 	private int nbInput;
 
 	private int nbOutput;
+
+	private Network network;
 
 	private Map<Port, Map<String, Vertex>> outgoingFanout;
 
@@ -96,31 +96,6 @@ public class NetworkPartitioner {
 		this.network = network;
 		graph = network.getGraph();
 		this.manageFanout = manageFanout;
-	}
-
-	/**
-	 * 
-	 * Returns the partName of the given instance.
-	 * 
-	 * @param instance
-	 * 
-	 * @throws OrccException
-	 *             If the instance does not contain a partName attribute.
-	 */
-	private String getPartNameOf(Instance instance) throws OrccException {
-		String partName = null;
-
-		IAttribute attr = instance.getAttribute("partName");
-		if (attr != null && attr.getType() == IAttribute.VALUE) {
-			Expression expr = ((IValueAttribute) attr).getValue();
-			if (expr.isStringExpr()) {
-				partName = ((StringExpr) expr).getValue();
-			} else {
-				throw new OrccException(
-						"partName attribute must be a String expression");
-			}
-		}
-		return partName;
 	}
 
 	/**
@@ -337,6 +312,31 @@ public class NetworkPartitioner {
 		}
 
 		return partitionSets;
+	}
+
+	/**
+	 * 
+	 * Returns the partName of the given instance.
+	 * 
+	 * @param instance
+	 * 
+	 * @throws OrccException
+	 *             If the instance does not contain a partName attribute.
+	 */
+	private String getPartNameOf(Instance instance) throws OrccException {
+		String partName = null;
+
+		IAttribute attr = instance.getAttribute("partName");
+		if (attr != null && attr.getType() == IAttribute.VALUE) {
+			Expression expr = ((IValueAttribute) attr).getValue();
+			if (expr.isStringExpr()) {
+				partName = ((StringExpr) expr).getValue();
+			} else {
+				throw new OrccException(
+						"partName attribute must be a String expression");
+			}
+		}
+		return partName;
 	}
 
 	public List<Network> getSubnetworks() throws OrccException {

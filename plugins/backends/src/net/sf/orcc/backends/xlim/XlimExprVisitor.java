@@ -74,12 +74,12 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 	 * XLIM naming
 	 */
 	private XlimNames names;
-	
+
 	/**
 	 * Root element where to add everything
 	 */
 	private Element root;
-	
+
 	/**
 	 * Initialization: filling of Unary and Binary Map
 	 */
@@ -243,7 +243,8 @@ public class XlimExprVisitor implements ExpressionVisitor, XlimTypeTemplate,
 	public void visit(VarExpr expr, Object... args) {
 		Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 
-		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar(), actionName));
+		XlimNodeTemplate.newInPort(operationE, names.getVarName(expr.getVar(),
+				actionName));
 
 		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), expr
 				.getVar().getVariable().getType());

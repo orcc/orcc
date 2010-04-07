@@ -39,10 +39,9 @@ import net.sf.orcc.backends.c.quasistatic.scheduler.util.Constants;
  */
 public class Switch {
 
-	
 	private static String btype;
-	
-	public static String getBTYPE(){
+
+	public static String getBTYPE() {
 		return Switch.btype;
 	}
 
@@ -60,7 +59,7 @@ public class Switch {
 			newValue = Integer.parseInt("000000001010", 2);
 		return newValue;
 	}
-	
+
 	public static ArrayList<String> getSwitchValues() {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add(Constants.INTER);
@@ -70,10 +69,10 @@ public class Switch {
 		list.add(Constants.NEWVOP);
 		return list;
 	}
-	
-	public static void setBtype(String btype)throws OrccException{
+
+	public static void setBtype(String btype) throws OrccException {
 		Switch.btype = btype;
-		
+
 	}
-	
+
 }

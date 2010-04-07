@@ -41,7 +41,6 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.BuildCFG;
-import net.sf.orcc.network.Network;
 
 import org.eclipse.core.runtime.CoreException;
 
@@ -64,13 +63,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 	private LLVMActorPrinter printer;
 
 	@Override
-	protected void afterInstantiation(Network network) throws OrccException {
+	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
 		if (configuration != null) {
 			try {
 				boolean classify = configuration.getAttribute(
 						"net.sf.orcc.backends.classify", false);
 				if (classify) {
-					network.classifyActors();
+					// TODO classify actors
 				}
 			} catch (CoreException e) {
 				throw new OrccException("could not read configuration", e);
@@ -78,44 +77,14 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 
 		printer = new LLVMActorPrinter();
-	}
 
-	@Override
-	protected void doActorCodeGeneration(Network network) throws OrccException {
-		printActors(network);
-	}
-
-	protected void printBitcode(String execPath, String inputName, String actor) {
-		List<String> cmdList = new ArrayList<String>();
-		String outputName = path + File.separator + actor + ".bc";
-
-		Runtime run = Runtime.getRuntime();
-		cmdList.add(execPath);
-		cmdList.add(inputName);
-		cmdList.add("-f");
-		cmdList.add("-o");
-		cmdList.add(outputName);
-		String[] cmd = cmdList.toArray(new String[] {});
-
-		try {
-			run.exec(cmd);
-		} catch (IOException e) {
-			System.err.println("Could not print bitcode : ");
-			e.printStackTrace();
-		}
+		// transforms and prints actors
+		transformActors(actors);
+		printActors(actors);
 	}
 
 	@Override
 	protected void printActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = {
-				new AddInstantationProcedure(),
-				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation(), new BuildCFG() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
-
 		String outputName = path + File.separator + actor.getName() + ".s";
 
 		try {
@@ -141,14 +110,36 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 	}
 
-	@Override
-	protected void printNetwork(Network network) throws OrccException {
-		// NetworkPrinter networkPrinter = new NetworkPrinter("LLVM_network");
+	protected void printBitcode(String execPath, String inputName, String actor) {
+		List<String> cmdList = new ArrayList<String>();
+		String outputName = path + File.separator + actor + ".bc";
 
-		// Add broadcasts before printing
-		// new BroadcastAdder().transform(network);
+		Runtime run = Runtime.getRuntime();
+		cmdList.add(execPath);
+		cmdList.add(inputName);
+		cmdList.add("-f");
+		cmdList.add("-o");
+		cmdList.add(outputName);
+		String[] cmd = cmdList.toArray(new String[] {});
 
-		// String outputName = path + File.separator + network.getName() + ".s";
-		// networkPrinter.printNetwork(outputName, network, false, fifoSize);
+		try {
+			run.exec(cmd);
+		} catch (IOException e) {
+			System.err.println("Could not print bitcode : ");
+			e.printStackTrace();
+		}
 	}
+
+	@Override
+	protected void transformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = {
+				new AddInstantationProcedure(),
+				new ThreeAddressCodeTransformation(),
+				new MoveReadsWritesTransformation(), new BuildCFG() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+	}
+
 }

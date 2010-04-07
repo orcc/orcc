@@ -31,6 +31,7 @@ package net.sf.orcc.backends.vhdl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -64,21 +65,18 @@ public class VHDLBackendImpl extends AbstractBackend {
 		main(VHDLBackendImpl.class, args);
 	}
 
+	private NetworkPrinter networkPrinter;
 	/**
 	 * printer is protected
 	 */
 	private VHDLActorPrinter printer;
-	private NetworkPrinter networkPrinter;
-
-	@Override
-	protected void afterInstantiation(Network network) throws OrccException {
-		printer = new VHDLActorPrinter();
-	}
 
 	@Override
 	protected void doActorCodeGeneration(Network network) throws OrccException {
-		transformActors(network);
-		printActors(network);
+		printer = new VHDLActorPrinter();
+		List<Actor> actors = network.getActors();
+		transformActors(actors);
+		printActors(actors);
 	}
 
 	@Override
@@ -105,13 +103,13 @@ public class VHDLBackendImpl extends AbstractBackend {
 		try {
 			networkPrinter = new NetworkPrinter("VHDL_network");
 
-			String outputName = path + File.separator + "Design" + File.separator + network.getName()
-					+ "_TOP.vhd";
+			String outputName = path + File.separator + "Design"
+					+ File.separator + network.getName() + "_TOP.vhd";
 			networkPrinter.printNetwork(outputName, network, false, fifoSize);
 
 			for (Network subNetwork : network.getNetworks()) {
-				outputName = path + File.separator + "Design"+ File.separator + subNetwork.getName()
-						+ ".vhd";
+				outputName = path + File.separator + "Design" + File.separator
+						+ subNetwork.getName() + ".vhd";
 				networkPrinter.printNetwork(outputName, subNetwork, false,
 						fifoSize);
 			}

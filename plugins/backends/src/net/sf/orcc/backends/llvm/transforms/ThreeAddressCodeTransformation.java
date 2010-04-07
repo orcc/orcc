@@ -102,38 +102,38 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
-			//Get expr information
+			// Get expr information
 			Type previousType = type;
 			BinaryOp op = expr.getOp();
-			
+
 			Location location = expr.getLocation();
 			Expression e1 = expr.getE1();
 			Expression e2 = expr.getE2();
 
-			//Correct binaryExpr type if expr is a comparison
-			if (op.isComparison()){
+			// Correct binaryExpr type if expr is a comparison
+			if (op.isComparison()) {
 				type = e1.getType();
 			}
-			
-			//Transform e1 and e2
+
+			// Transform e1 and e2
 			e1 = (Expression) e1.accept(this, args);
 			e2 = (Expression) e2.accept(this, args);
 
 			type = previousType;
-			
-			//Assign the correct type to the current expression
-			if (op.isComparison()){
+
+			// Assign the correct type to the current expression
+			if (op.isComparison()) {
 				previousType = new BoolType();
 			}
-			
-			//Make the final asssignment
+
+			// Make the final asssignment
 			LocalVariable target = newVariable();
 			target.setType(type);
 			Assign assign = new Assign(location, target, new BinaryExpr(
 					location, e1, op, e2, previousType));
 			assign.setBlock(block);
 			it.add(assign);
-			
+
 			return new VarExpr(location, new Use(target));
 		}
 
@@ -187,23 +187,25 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-			if (!expr.getType().equals(type)){
-				if(expr.getType().isList()&&type.isList()){
-					//compare type of two arrays
-					ListType exprtype = (ListType)expr.getType();
-					ListType refType = (ListType)type;
-					if(exprtype.getElementType().equals(refType.getElementType())){
+			if (!expr.getType().equals(type)) {
+				if (expr.getType().isList() && type.isList()) {
+					// compare type of two arrays
+					ListType exprtype = (ListType) expr.getType();
+					ListType refType = (ListType) type;
+					if (exprtype.getElementType().equals(
+							refType.getElementType())) {
 						return expr;
 					}
 				}
-				
-				//Make the final asssignment
+
+				// Make the final asssignment
 				LocalVariable target = newVariable();
 				Use use = new Use(target);
 				Location location = expr.getLocation();
 				target.setType(type);
 				Assign assign = new Assign(location, target, new BinaryExpr(
-						location, expr, BinaryOp.PLUS, new IntExpr(0), expr.getType()));
+						location, expr, BinaryOp.PLUS, new IntExpr(0), expr
+								.getType()));
 				assign.setBlock(block);
 				it.add(assign);
 				return new VarExpr(use);
@@ -241,21 +243,20 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	public void transform(Actor actor) {
-		//Transform boolean Port into int port (to be remove later)
-		for (Port port : actor.getInputs()){
-			if (port.getType().isBool()){
+		// Transform boolean Port into int port (to be remove later)
+		for (Port port : actor.getInputs()) {
+			if (port.getType().isBool()) {
 				port.setType(new IntType(new IntExpr(32)));
 			}
 		}
-		
-		for (Port port : actor.getOutputs()){
-			if (port.getType().isBool()){
+
+		for (Port port : actor.getOutputs()) {
+			if (port.getType().isBool()) {
 				port.setType(new IntType(new IntExpr(32)));
 			}
 		}
-		
-		
-		//Visit procedure
+
+		// Visit procedure
 		for (Procedure proc : actor.getProcs()) {
 			visitProcedure(proc);
 		}
@@ -276,7 +277,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	public void visit(Assign assign, Object... args) {
 		block = assign.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		//Type type = assign.getTarget().getType();
+		// Type type = assign.getTarget().getType();
 		Type type = assign.getValue().getType();
 		it.previous();
 		assign.setValue(visitExpression(assign.getValue(), it, type));
@@ -344,11 +345,11 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		Expression value = store.getValue();
 		Variable target = store.getTarget().getVariable();
 		Type targetType = target.getType();
-		
-		if (targetType.isList()){
-			targetType = ((ListType)targetType).getElementType();
+
+		if (targetType.isList()) {
+			targetType = ((ListType) targetType).getElementType();
 		}
-		
+
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
 		for (int i = 0; i < store.getIndexes().size(); i++) {
@@ -366,8 +367,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	public void visit(WhileNode whileNode, Object... args) {
 		ListIterator<Instruction> it = whileNode.getJoinNode().listIterator();
 
-		//Go to the end of joinNode
-		while (it.hasNext()){
+		// Go to the end of joinNode
+		while (it.hasNext()) {
 			it.next();
 		}
 		whileNode.setValue(visitExpression(whileNode.getValue(), it,
@@ -396,21 +397,20 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		}
 		it.next();
 	}
-	
+
 	@Override
 	public void visitProcedure(Procedure procedure) {
-		//Transform Local boolean Variable into int Variable (to be remove later)
-		for (Variable var : procedure.getLocals()){
-			if (var.isPort()){
-				ListType listType = (ListType)var.getType();
-				if (listType.getElementType().isBool()){
+		// Transform Local boolean Variable into int Variable (to be remove
+		// later)
+		for (Variable var : procedure.getLocals()) {
+			if (var.isPort()) {
+				ListType listType = (ListType) var.getType();
+				if (listType.getElementType().isBool()) {
 					listType.setElementType(new IntType(new IntExpr(32)));
 				}
 			}
 		}
-		
-		
-		
+
 		tempVarCount = 1;
 
 		// set the label counter to prevent new nodes from having the same label

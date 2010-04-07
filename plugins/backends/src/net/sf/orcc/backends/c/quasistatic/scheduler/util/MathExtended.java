@@ -57,12 +57,11 @@ public class MathExtended {
 		String binA = Integer.toBinaryString(a);
 		String binB = Integer.toBinaryString(b);
 		int n = Math.abs(binA.length() - binB.length());
-		if (binA.length() < binB.length()){
+		if (binA.length() < binB.length()) {
 			binA = increaseLenght(binA, n);
-		}
-		else if (binB.length() < binA.length()){
+		} else if (binB.length() < binA.length()) {
 			binB = increaseLenght(binB, n);
-		}	
+		}
 		char[] binAArray = binA.toCharArray();
 		char[] binBArray = binB.toCharArray();
 		for (int i = 0; i < binAArray.length; i++) {

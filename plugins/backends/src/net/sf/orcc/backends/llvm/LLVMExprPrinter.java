@@ -50,7 +50,7 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 public class LLVMExprPrinter extends DefaultExpressionPrinter {
 
 	private boolean signed;
-	
+
 	@Override
 	protected String toString(BinaryOp op) {
 		switch (op) {
@@ -61,12 +61,12 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		case BITXOR:
 			return "xor";
 		case DIV:
-			if (signed){
+			if (signed) {
 				return "sdiv";
 			}
 			return "udiv";
 		case DIV_INT:
-			if (signed){
+			if (signed) {
 				return "sdiv";
 			}
 			return "udiv";
@@ -75,34 +75,34 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		case EXP:
 			return "pow";
 		case GE:
-			if (signed){
+			if (signed) {
 				return "icmp sge";
 			}
 			return "icmp uge";
 
 		case GT:
-			if (signed){
+			if (signed) {
 				return "icmp sgt";
 			}
 			return "icmp ugt";
 		case LOGIC_AND:
 			return "and";
 		case LE:
-			if (signed){
+			if (signed) {
 				return "icmp sle";
 			}
 			return "icmp ule";
 		case LOGIC_OR:
 			return "or";
 		case LT:
-			if (signed){
+			if (signed) {
 				return "icmp slt";
 			}
 			return "icmp ult";
 		case MINUS:
 			return "sub";
 		case MOD:
-			if (signed){
+			if (signed) {
 				return "srem";
 			}
 			return "urem";
@@ -113,7 +113,7 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		case SHIFT_LEFT:
 			return "shl";
 		case SHIFT_RIGHT:
-			if (signed){
+			if (signed) {
 				return "ashr";
 			}
 			return "lshr";
@@ -130,7 +130,7 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		Type type;
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
-		
+
 		if (e1 instanceof VarExpr) {
 			Use use = ((VarExpr) e1).getVar();
 			type = use.getVariable().getType();
@@ -140,23 +140,23 @@ public class LLVMExprPrinter extends DefaultExpressionPrinter {
 		} else {
 			type = expr.getType();
 		}
-		
-		if (type.isUint()){
+
+		if (type.isUint()) {
 			signed = false;
-		}else{
+		} else {
 			signed = true;
 		}
-		
+
 		builder.append(toString(op));
-		
+
 		builder.append(" " + type.toString() + " ");
-		
-		if (e1 instanceof VarExpr){
+
+		if (e1 instanceof VarExpr) {
 			builder.append("%");
 		}
 		expr.getE1().accept(this);
 		builder.append(", ");
-		if (e2 instanceof VarExpr){
+		if (e2 instanceof VarExpr) {
 			builder.append("%");
 		}
 		expr.getE2().accept(this);

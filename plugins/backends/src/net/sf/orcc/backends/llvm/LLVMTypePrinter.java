@@ -59,7 +59,7 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 			builder.append("i64");
 		}
 	}
-	
+
 	@Override
 	public void visit(BoolType type) {
 		// boolean is a 1-bit integer.
@@ -73,7 +73,7 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(ListType type) {
-		int size = new ExpressionEvaluator().evaluateAsInteger(type.getSize());	
+		int size = new ExpressionEvaluator().evaluateAsInteger(type.getSize());
 
 		builder.append("[");
 		builder.append(size);
@@ -91,7 +91,7 @@ public class LLVMTypePrinter extends DefaultTypePrinter {
 	@Override
 	public void visit(UintType type) {
 		printInt(type.getSize());
-		//builder.append("i32");
+		// builder.append("i32");
 	}
 
 	@Override

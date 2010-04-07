@@ -65,7 +65,7 @@ public final class CActorPrinter extends Printer {
 	 */
 	public CActorPrinter() {
 		group = new TemplateGroupLoader().loadGroup("C_actor");
-		
+
 		// registers this printer as the default printer
 		Printer.register(this);
 

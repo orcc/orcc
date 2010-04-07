@@ -74,7 +74,7 @@ public class CppBackendImpl extends AbstractBackend {
 	private CppActorPrinter printer;
 
 	@Override
-	protected void afterInstantiation(Network network) throws OrccException {
+	protected void doActorCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
 		if (partitioning) {
@@ -83,11 +83,9 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 		printer = new CppActorPrinter("Cpp_actorDecl");
 		impl_printer = new CppActorPrinter("Cpp_actorImpl");
-	}
 
-	@Override
-	protected void doActorCodeGeneration(Network network) throws OrccException {
-		transformActors(network);
+		List<Actor> actors = network.getActors();
+		transformActors(actors);
 		printInstances(network);
 	}
 
@@ -96,11 +94,13 @@ public class CppBackendImpl extends AbstractBackend {
 		Actor actor = instance.getActor();
 
 		try {
-			String outputName = path + File.separator + "Actor_" + actor.getName() + ".h";
+			String outputName = path + File.separator + "Actor_"
+					+ actor.getName() + ".h";
 			printer.printActor(outputName, instance);
 
-			 outputName = path + File.separator + "Actor_" + actor.getName() + ".cpp";
-			 impl_printer.printActor(outputName, instance);
+			outputName = path + File.separator + "Actor_" + actor.getName()
+					+ ".cpp";
+			impl_printer.printActor(outputName, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

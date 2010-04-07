@@ -61,14 +61,11 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 	private CQuasiStaticActorPrinter printer;
 
 	@Override
-	protected void afterInstantiation(Network network) throws OrccException {
+	protected void doActorCodeGeneration(Network network) throws OrccException {
 		printer = new CQuasiStaticActorPrinter();
 		Scheduler.workingDirectoryPath = path + File.separator + "schedule"
 				+ File.separator;
-	}
 
-	@Override
-	protected void doActorCodeGeneration(Network network) throws OrccException {
 		printInstances(network);
 	}
 
@@ -77,12 +74,6 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 		String id = instance.getId();
 		Actor actor = instance.getActor();
 
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new PhiRemoval(), new MoveReadsWritesTransformation() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
 		if (SchedulePreparer.sourceFilesPath == null) {
 			SchedulePreparer.sourceFilesPath = new File(actor.getFile())
 					.getParent();
@@ -131,6 +122,16 @@ public class CQuasiStaticBackendImpl extends AbstractBackend {
 		CQuasiStaticSchedulePrinter schedulePrinter = new CQuasiStaticSchedulePrinter();
 		String outputName = path + File.separator + "scheduling.c";
 		schedulePrinter.printSchedule(outputName, scheduleMap);
+	}
+
+	@Override
+	protected void transformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new PhiRemoval(), new MoveReadsWritesTransformation() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
 	}
 
 }

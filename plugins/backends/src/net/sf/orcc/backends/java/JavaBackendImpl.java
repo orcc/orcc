@@ -62,12 +62,8 @@ public class JavaBackendImpl extends AbstractBackend {
 	private JavaActorPrinter printer;
 
 	@Override
-	protected void afterInstantiation(Network network) throws OrccException {
-		printer = new JavaActorPrinter();
-	}
-
-	@Override
 	protected void doActorCodeGeneration(Network network) throws OrccException {
+		printer = new JavaActorPrinter();
 		printInstances(network);
 	}
 
@@ -75,13 +71,6 @@ public class JavaBackendImpl extends AbstractBackend {
 	protected void printInstance(Instance instance) throws OrccException {
 		String id = instance.getId();
 		Actor actor = instance.getActor();
-
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new PhiRemoval() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
 
 		String outputName = path + File.separator + "Actor_" + id + ".java";
 		try {
@@ -105,6 +94,16 @@ public class JavaBackendImpl extends AbstractBackend {
 			networkPrinter.printNetwork(outputName, network, false, fifoSize);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
+		}
+	}
+
+	@Override
+	protected void transformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadCodeElimination(), new PhiRemoval() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
 		}
 	}
 

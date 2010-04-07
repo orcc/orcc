@@ -128,7 +128,7 @@ public class XlimNames {
 		if (use.getVariable().isPort()) {
 			return getPortName(use, actionName);
 		}
-		
+
 		return getVarTemplate(var, actionName);
 	}
 
@@ -158,7 +158,8 @@ public class XlimNames {
 	 * @return Variable name
 	 */
 	private String getVarTemplate(Variable var, String actionName) {
-		return "var_" + var.getName() + ((var.isGlobal()?"":"_" + actionName));
+		return "var_" + var.getName()
+				+ ((var.isGlobal() ? "" : "_" + actionName));
 	}
 
 	/**

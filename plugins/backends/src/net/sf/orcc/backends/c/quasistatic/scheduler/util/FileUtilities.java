@@ -90,8 +90,8 @@ public class FileUtilities {
 			writer.write(content);
 			writer.close();
 		} catch (IOException ex) {
-			Logger.getLogger(FileUtilities.class.getName()).log(
-					Level.SEVERE, null, ex);
+			Logger.getLogger(FileUtilities.class.getName()).log(Level.SEVERE,
+					null, ex);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class FileUtilities {
 					null, ex);
 		}
 	}
-	
+
 	public static String[] fscanf(BufferedReader reader, String separator,
 			int numArgs) {
 		String[] result = new String[numArgs];
@@ -151,11 +151,11 @@ public class FileUtilities {
 		return result;
 
 	}
-	
-	public static String getFileName(File file){
+
+	public static String getFileName(File file) {
 		String name = file.getName();
-		int endIndex = name.contains(".")? name.indexOf("."):name.length();
+		int endIndex = name.contains(".") ? name.indexOf(".") : name.length();
 		return name.substring(0, endIndex);
 	}
-	
+
 }

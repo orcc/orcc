@@ -7,8 +7,8 @@ public class QuasiStaticSchedulerException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public QuasiStaticSchedulerException(String message){
+	public QuasiStaticSchedulerException(String message) {
 		super(message);
 	}
-	
+
 }
