@@ -150,7 +150,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_Synp_MPEG-4"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_Synp_MPEG_4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

@@ -1,8 +1,8 @@
-// GEN_mgnt_Merger420.cal
+// Mgnt_Merger420
 //
 // Author: Christophe Lucarz (christophe.lucarz@epfl.ch)
 
-actor GEN_mgnt_Merger420 () int(size=9) Y, int(size=9) U, int(size=9) V ==> int(size=9) YUV :
+actor Mgnt_Merger420 () int(size=9) Y, int(size=9) U, int(size=9) V ==> int(size=9) YUV :
 
   // Port size declaration
   int PIX_SZ = 9;

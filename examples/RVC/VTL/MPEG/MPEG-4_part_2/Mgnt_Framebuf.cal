@@ -1,4 +1,4 @@
-// MPEG4_mgnt_Framebuf.cal
+// Mgnt_Framebuf
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -14,7 +14,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_mgnt_Framebuf ()
+actor Mgnt_Framebuf ()
    int(size=ADDR_SZ) RA, int(size=ADDR_SZ) WA, int(size=PIX_SZ) WD ==> int(size=PIX_SZ) RD :
 
   // Port size declaration

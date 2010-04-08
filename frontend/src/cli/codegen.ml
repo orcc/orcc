@@ -76,6 +76,12 @@ let load_instance options cls_name =
 	let cal_file = abs_file ^ ".cal" in
 	(* parse actor and convert it to IR. *)
 	let ast_actor = Cal_parser_wrapper.parse_actor cal_file in
+	let basename = Filename.basename abs_file in
+	if ast_actor.Calast.ac_name <> basename then
+		Asthelper.failwith {dummy_loc with Loc.file_name = cal_file}
+			("The actor name is \"" ^ ast_actor.Calast.ac_name ^ "\", but it MUST be \
+			the same as the file name, i.e. \"" ^ basename ^ "\"!");
+	
 	let actor =
 		Ast2ir.ir_of_ast options out_base ast_actor
 	in

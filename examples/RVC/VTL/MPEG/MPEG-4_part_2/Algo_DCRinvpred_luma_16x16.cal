@@ -1,4 +1,4 @@
-// MPEG4_algo_DCRinvpred_luma_16x16.cal
+// Algo_DCRinvpred_luma_16x16
 //
 // Created By:  David B. Parlour (dave.parlour@xilinx.com)
 // Modified By: Andrew Kinane (kinanea@eeng.dcu.ie)
@@ -73,7 +73,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_DCRinvpred_luma_16x16 (
+actor Algo_DCRinvpred_luma_16x16 (
  int DCVAL,
  int NEWVOP,
  int INTRA,

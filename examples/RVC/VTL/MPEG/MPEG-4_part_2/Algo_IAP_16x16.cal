@@ -1,4 +1,4 @@
-// MPEG4_algo_IAP_16x16.cal
+// Algo_IAP_16x16
 //
 // Created By:  David B. Parlour (dave.parlour@xilinx.com)
 // Modified By: Andrew Kinane (kinanea@eeng.dcu.ie)
@@ -45,7 +45,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_IAP_16x16 ()
+actor Algo_IAP_16x16 ()
   int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ+2) PTR, int(size=3) AC_PRED_DIR, int(size=6) QP, int(size=6) PREV_QP ==> int(size=SAMPLE_SZ) QF_AC :
   
   // Port size declaration

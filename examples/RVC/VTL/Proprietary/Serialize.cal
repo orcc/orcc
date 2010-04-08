@@ -1,4 +1,4 @@
-// byte2bit.cal
+// Serialize
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -14,7 +14,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor byte2bit () int(size=8) in8 ==> bool out :
+actor Serialize () int(size=8) in8 ==> bool out :
 
   int(size=4) count := 0;
   int(size=9) buf;

@@ -1,4 +1,4 @@
-// MPEG4_algo_Inversequant.cal
+// Algo_Inversequant
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -14,7 +14,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
+actor Algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 
   // Port size declaration
   int SAMPLE_SZ 	= 13;

@@ -1,4 +1,4 @@
-// MPEG4_algo_IS.cal
+// Algo_IS
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -26,7 +26,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_IS () int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS_AC ==> int(size=SAMPLE_SZ) PQF_AC :
+actor Algo_IS () int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS_AC ==> int(size=SAMPLE_SZ) PQF_AC :
 
   // Port size declaration
   int SAMPLE_SZ 	= 13;  

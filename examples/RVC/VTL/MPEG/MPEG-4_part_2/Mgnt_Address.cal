@@ -1,4 +1,4 @@
-// MPEG4_mgnt_Address.cal
+// Mgnt_Address
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -16,7 +16,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_mgnt_Address (
+actor Mgnt_Address (
     int INTRA,
     int NEWVOP,
     int MOTION,

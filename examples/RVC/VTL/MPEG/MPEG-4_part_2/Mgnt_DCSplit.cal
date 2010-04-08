@@ -1,4 +1,4 @@
-// GEN_mgnt_DCSplit.cal
+// Mgnt_DCSplit
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -15,7 +15,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor GEN_mgnt_DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
+actor Mgnt_DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
   
   // Port size declaration
   int SAMPLE_SZ 	= 13;

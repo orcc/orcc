@@ -15,7 +15,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==> int(size=PIX_SZ) VID :
+actor Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==> int(size=PIX_SZ) VID :
   
   
   // Port size declaration

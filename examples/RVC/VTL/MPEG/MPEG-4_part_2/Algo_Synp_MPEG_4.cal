@@ -1,4 +1,4 @@
-// ParseHeaders.cal
+// Algo_Synp_MPEG-4
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -41,7 +41,7 @@ import all caltrop.lib.BitOps;
 
 //  The INTRA type also has ACPRED
 
-actor ParseHeaders (
+actor Algo_Synp_MPEG_4 (
     // Maximum image width (in units of macroblocks) that the decoder can handle.
     // It is used to allocate line buffer space at compile time.
   int QUANT_MASK,

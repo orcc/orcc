@@ -1,4 +1,4 @@
-// MPEG4_algo_DCRaddressing_16x16.cal
+// Algo_DCRaddressing_16x16
 //
 // Created By:  David B. Parlour (dave.parlour@xilinx.com)
 // Modified By: Andrew Kinane (kinanea@eeng.dcu.ie)
@@ -49,7 +49,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MPEG4_algo_DCRaddressing_16x16 (
+actor Algo_DCRaddressing_16x16 (
 int NEWVOP,
 int INTRA
 ) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ+2) A, int (size=MB_COORD_SZ+2) B, int(size=MB_COORD_SZ+2) C : 

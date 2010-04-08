@@ -1,4 +1,4 @@
-// BlockExpand.cal
+// Mgnt_BlockExpand
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -14,7 +14,7 @@ import all caltrop.lib.BitOps;
 
 // Insert zero coefficients into a sparsely encoded block
 
-actor BlockExpand () int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE, bool LAST ==> int(size=SAMPLE_SZ) OUT :
+actor Mgnt_BlockExpand () int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE, bool LAST ==> int(size=SAMPLE_SZ) OUT :
 
   // Port size declaration
   int SAMPLE_SZ 	= 13;  

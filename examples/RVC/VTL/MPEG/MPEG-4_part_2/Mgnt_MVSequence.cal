@@ -1,4 +1,4 @@
-// MVSequence.cal
+// Mgnt_MVSequence
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
@@ -13,7 +13,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor MVSequence (
+actor Mgnt_MVSequence (
 int FOURMV,
 int NEWVOP,
 int INTER,
