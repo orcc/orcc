@@ -91,7 +91,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		String outputName = path + File.separator + "Design" + File.separator
 				+ id + ".vhd";
 		try {
-			printer.printActor(outputName, id, actor);
+			printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

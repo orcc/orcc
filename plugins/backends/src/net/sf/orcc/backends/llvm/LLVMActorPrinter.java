@@ -28,21 +28,14 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.INameable;
-
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * This class defines a LLVM actor printer.
@@ -50,9 +43,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Jérôme GORIN
  * 
  */
-public final class LLVMActorPrinter extends Printer {
-
-	private StringTemplateGroup group;
+public final class LLVMActorPrinter extends STPrinter {
 
 	/**
 	 * Creates a new network printer with the template "LLVM_actor".
@@ -61,31 +52,7 @@ public final class LLVMActorPrinter extends Printer {
 	 *             If the template file could not be read.
 	 */
 	public LLVMActorPrinter() {
-		group = new TemplateGroupLoader().loadGroup("LLVM_actor");
-
-		// registers this printer as the default printer
-		Printer.register(this);
-	}
-
-	/**
-	 * Prints the given actor to a file whose name is given.
-	 * 
-	 * @param fileName
-	 *            output file name
-	 * @param actor
-	 *            actor to print
-	 * @throws IOException
-	 */
-	public void printActor(String fileName, Actor actor) throws IOException {
-		StringTemplate template = group.getInstanceOf("actor");
-
-		template.setAttribute("actorName", actor.getName());
-		template.setAttribute("actor", actor);
-
-		byte[] b = template.toString(80).getBytes();
-		OutputStream os = new FileOutputStream(fileName);
-		os.write(b);
-		os.close();
+		super("LLVM_actor");
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,63 +32,79 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import net.sf.orcc.network.Network;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Printer;
+import net.sf.orcc.network.Instance;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
- * This class defines a C network printer.
+ * This class defines a printer that uses StringTemplate.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class NetworkPrinter {
+public abstract class STPrinter extends Printer {
 
-	private StringTemplateGroup group;
+	final protected StringTemplateGroup group;
 
 	/**
-	 * Creates a new network printer using the given template file name.
+	 * Creates a new StringTemplate printer with the given template group name.
 	 * 
-	 * @param name
-	 *            The template file name.
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public NetworkPrinter(String name) throws IOException {
-		group = new TemplateGroupLoader().loadGroup(name);
+	protected STPrinter(String groupName) {
+		group = new TemplateGroupLoader().loadGroup(groupName);
+
+		// registers this printer as the default printer
+		Printer.register(this);
 	}
 
 	/**
-	 * Prints the given network to a file whose name is given. debugFifos
-	 * specifies whether debug information should be printed about FIFOs, and
-	 * fifoSize is the default FIFO size.
+	 * Prints the given actor to a file whose name is given.
 	 * 
 	 * @param fileName
-	 *            The output file name.
-	 * @param network
-	 *            The network to generate code for.
-	 * @param debugFifos
-	 *            Whether debug information should be printed about FIFOs.
-	 * @param fifoSize
-	 *            Default FIFO size.
+	 *            output file name
+	 * @param actor
+	 *            the actor
 	 * @throws IOException
-	 *             if there is an I/O error
 	 */
-	public void printNetwork(String fileName, Network network,
-			boolean debugFifos, int fifoSize) throws IOException {
-		StringTemplate template = group.getInstanceOf("network");
+	public void printActor(String fileName, Actor actor) throws IOException {
+		if (!actor.isSystem()) {
+			StringTemplate template = group.getInstanceOf("actor");
 
-		network.computeGraphMaps();
+			template.setAttribute("actor", actor);
 
-		template.setAttribute("debugFifos", debugFifos);
-		template.setAttribute("network", network);
-		template.setAttribute("fifoSize", fifoSize);
+			byte[] b = template.toString(80).getBytes();
+			OutputStream os = new FileOutputStream(fileName);
+			os.write(b);
+			os.close();
+		}
+	}
 
-		byte[] b = template.toString(80).getBytes();
-		OutputStream os = new FileOutputStream(fileName);
-		os.write(b);
-		os.close();
+	/**
+	 * Prints the given instance to a file whose name is given.
+	 * 
+	 * @param fileName
+	 *            output file name
+	 * @param instance
+	 *            the instance
+	 * @throws IOException
+	 */
+	public void printInstance(String fileName, Instance instance)
+			throws IOException {
+		if (!instance.getActor().isSystem()) {
+			StringTemplate template = group.getInstanceOf("instance");
+
+			template.setAttribute("instance", instance);
+
+			byte[] b = template.toString(80).getBytes();
+			OutputStream os = new FileOutputStream(fileName);
+			os.write(b);
+			os.close();
+		}
 	}
 
 }

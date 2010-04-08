@@ -28,22 +28,15 @@
  */
 package net.sf.orcc.backends.c;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.network.Instance;
 import net.sf.orcc.util.INameable;
-
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * This class defines a C actor printer.
@@ -51,9 +44,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Matthieu Wipliez
  * 
  */
-public final class CActorPrinter extends Printer {
-
-	private StringTemplateGroup group;
+public final class CActorPrinter extends STPrinter {
 
 	private Map<String, String> transformations;
 
@@ -64,37 +55,13 @@ public final class CActorPrinter extends Printer {
 	 *             If the template file could not be read.
 	 */
 	public CActorPrinter() {
-		group = new TemplateGroupLoader().loadGroup("C_actor");
-
-		// registers this printer as the default printer
-		Printer.register(this);
+		super("C_actor");
 
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_");
 		transformations.put("index", "index_");
 		transformations.put("getw", "getw_");
 		transformations.put("select", "select_");
-	}
-
-	/**
-	 * Prints the given instance to a file whose name is given.
-	 * 
-	 * @param fileName
-	 *            output file name
-	 * @param instance
-	 *            the instance
-	 * @throws IOException
-	 */
-	public void printInstance(String fileName, Instance instance)
-			throws IOException {
-		StringTemplate template = group.getInstanceOf("instance");
-
-		template.setAttribute("instance", instance);
-
-		byte[] b = template.toString(80).getBytes();
-		OutputStream os = new FileOutputStream(fileName);
-		os.write(b);
-		os.close();
 	}
 
 	@Override

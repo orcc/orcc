@@ -70,11 +70,10 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	protected void printInstance(Instance instance) throws OrccException {
 		String id = instance.getId();
-		Actor actor = instance.getActor();
 
 		String outputName = path + File.separator + "Actor_" + id + ".java";
 		try {
-			printer.printActor(outputName, id, actor);
+			printer.printInstance(outputName, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

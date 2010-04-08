@@ -29,23 +29,16 @@
  */
 package net.sf.orcc.backends.vhdl;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.INameable;
-
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * This class defines a VHDL actor printer.
@@ -53,11 +46,9 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Nicolas Siret
  * 
  */
-public final class VHDLActorPrinter extends Printer {
+public final class VHDLActorPrinter extends STPrinter {
 
 	public static Pattern adjacent_ = Pattern.compile("_+");
-
-	private StringTemplateGroup group;
 
 	private Map<String, String> transformations;
 
@@ -68,39 +59,13 @@ public final class VHDLActorPrinter extends Printer {
 	 *             If the template file could not be read.
 	 */
 	public VHDLActorPrinter() {
-		group = new TemplateGroupLoader().loadGroup("VHDL_actor");
-
-		// registers this printer as the default printer
-		Printer.register(this);
+		super("VHDL_actor");
 
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_1");
 		transformations.put("access", "access_1");
 		transformations.put("component", "component_1");
 		transformations.put("select", "select_1");
-	}
-
-	/**
-	 * Prints the given actor to a file whose name is given.
-	 * 
-	 * @param fileName
-	 *            output file name
-	 * @param id
-	 *            the instance id
-	 * @param actor
-	 *            actor to print
-	 * @throws IOException
-	 */
-	public void printActor(String fileName, String id, Actor actor)
-			throws IOException {
-		StringTemplate template = group.getInstanceOf("actor");
-
-		template.setAttribute("actor", actor);
-
-		byte[] b = template.toString(80).getBytes();
-		OutputStream os = new FileOutputStream(fileName);
-		os.write(b);
-		os.close();
 	}
 
 	@Override
