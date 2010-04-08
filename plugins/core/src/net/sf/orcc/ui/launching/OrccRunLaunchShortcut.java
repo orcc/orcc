@@ -37,7 +37,6 @@ import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -48,7 +47,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.debug.ui.ILaunchShortcut2;
+import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -72,24 +71,24 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
  * @author Matthieu Wipliez
  * 
  */
-public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
+public class OrccRunLaunchShortcut implements ILaunchShortcut {
 
 	/**
 	 * Opens a directory dialog to select the output folder.
 	 * 
 	 * @param shell
 	 *            the shell
-	 * @param file
+	 * @param resource
 	 *            input file
 	 * @return output folder
 	 */
-	private String browseOutputFolder(Shell shell, IFile file) {
+	private String browseOutputFolder(Shell shell, IResource resource) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
 		dialog.setMessage("Please select an output folder:");
 		dialog.setText("Choose output folder");
 
 		// set initial directory
-		String location = file.getParent().getLocation().toOSString();
+		String location = resource.getParent().getLocation().toOSString();
 		dialog.setFilterPath(location);
 
 		return dialog.open();
@@ -99,17 +98,18 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 	 * Chooses a configuration and launch it. If no configuration exists, create
 	 * one.
 	 * 
-	 * @param file
+	 * @param resource
 	 *            input file
 	 * @param configs
 	 *            a possibly empty array of configurations
 	 */
-	private void chooseAndLaunch(IFile file, ILaunchConfiguration[] configs) {
+	private void chooseAndLaunch(IResource resource,
+			ILaunchConfiguration[] configs) {
 		if (configs.length == 0) {
 			Shell shell = getShell();
 
 			// no configuration: Create one
-			ILaunchConfiguration config = createConfiguration(file);
+			ILaunchConfiguration config = createConfiguration(resource);
 			if (config != null) {
 				// open launch dialog so the user can tune the settings
 				DebugUITools.openLaunchConfigurationDialogOnGroup(shell,
@@ -191,15 +191,15 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 	 *            the input file
 	 * @return the launch configuration created, or <code>null</code>
 	 */
-	private ILaunchConfiguration createConfiguration(IFile file) {
+	private ILaunchConfiguration createConfiguration(IResource resource) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		String id = RUN_CONFIG_TYPE;
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(id);
 
 		ILaunchConfiguration config = null;
 		try {
-			String inputFile = file.getLocation().toOSString();
-			String folder = browseOutputFolder(getShell(), file);
+			String inputFile = resource.getLocation().toOSString();
+			String folder = browseOutputFolder(getShell(), resource);
 			if (folder == null) {
 				return null;
 			}
@@ -210,7 +210,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 			}
 
 			// generate configuration name
-			String name = file.getName() + " - " + backend;
+			String name = resource.getName() + " - " + backend;
 			name = manager.generateLaunchConfigurationName(name);
 
 			// create configuration
@@ -235,7 +235,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 	 * @return a possibly empty, possibly <code>null</code> array of
 	 *         configurations
 	 */
-	private ILaunchConfiguration[] getConfigurations(IFile file) {
+	private ILaunchConfiguration[] getConfigurations(IResource file) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		String id = RUN_CONFIG_TYPE;
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(id);
@@ -277,7 +277,6 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		return factory.getInputId(backend);
 	}
 
-	@Override
 	public IResource getLaunchableResource(IEditorPart editorpart) {
 		IEditorInput input = editorpart.getEditorInput();
 		if (input instanceof IFileEditorInput) {
@@ -287,37 +286,16 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		return null;
 	}
 
-	@Override
 	public IResource getLaunchableResource(ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection ssel = (IStructuredSelection) selection;
 			Object obj = ssel.getFirstElement();
-			if (obj instanceof IFile) {
-				return (IFile) obj;
+			if (obj instanceof IResource) {
+				return (IResource) obj;
 			}
 		}
 
 		return null;
-	}
-
-	@Override
-	public ILaunchConfiguration[] getLaunchConfigurations(IEditorPart editorpart) {
-		IResource resource = getLaunchableResource(editorpart);
-		if (resource instanceof IFile) {
-			return getConfigurations((IFile) resource);
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public ILaunchConfiguration[] getLaunchConfigurations(ISelection selection) {
-		IResource resource = getLaunchableResource(selection);
-		if (resource instanceof IFile) {
-			return getConfigurations((IFile) resource);
-		} else {
-			return null;
-		}
 	}
 
 	private Shell getShell() {
@@ -329,18 +307,16 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 	@Override
 	public void launch(IEditorPart editor, String mode) {
 		IResource resource = getLaunchableResource(editor);
-		if (resource instanceof IFile) {
-			IFile file = (IFile) resource;
-			chooseAndLaunch(file, getConfigurations(file));
+		if (resource != null) {
+			chooseAndLaunch(resource, getConfigurations(resource));
 		}
 	}
 
 	@Override
 	public void launch(ISelection selection, String mode) {
 		IResource resource = getLaunchableResource(selection);
-		if (resource instanceof IFile) {
-			IFile file = (IFile) resource;
-			chooseAndLaunch(file, getConfigurations(file));
+		if (resource != null) {
+			chooseAndLaunch(resource, getConfigurations(resource));
 		}
 	}
 

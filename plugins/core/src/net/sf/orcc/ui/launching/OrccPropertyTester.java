@@ -30,8 +30,10 @@ package net.sf.orcc.ui.launching;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 
 /**
+ * This class defines a property tester for the "isVTL" and "isXDF" properties.
  * 
  * @author Matthieu Wipliez
  * 
@@ -41,9 +43,15 @@ public class OrccPropertyTester extends PropertyTester {
 	@Override
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
-		if (receiver instanceof IFile) {
-			IFile file = (IFile) receiver;
-			return ("xdf".equals(file.getFileExtension()));
+		if ("isVTL".equals(property)) {
+			if (receiver instanceof IFolder) {
+				return true;
+			}
+		} else if ("isXDF".equals(property)) {
+			if (receiver instanceof IFile) {
+				IFile file = (IFile) receiver;
+				return ("xdf".equals(file.getFileExtension()));
+			}
 		}
 
 		return false;

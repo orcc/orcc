@@ -45,9 +45,16 @@
                         value="1">
                   </count>
                   <iterate>
-                     <test
-                           property="net.sf.orcc.isXDF">
-                     </test>
+                     <or>
+                        <test
+                              forcePluginActivation="true"
+                              property="net.sf.orcc.isVTL">
+                        </test>
+                        <test
+                              forcePluginActivation="true"
+                              property="net.sf.orcc.isXDF">
+                        </test>
+                     </or>
                   </iterate>
                </with>
             </enablement>
@@ -113,7 +120,7 @@
             class="net.sf.orcc.ui.launching.OrccPropertyTester"
             id="net.sf.orcc.propertyTester"
             namespace="net.sf.orcc"
-            properties="isXDF"
+            properties="isVTL,isXDF"
             type="org.eclipse.core.runtime.IAdaptable">
       </propertyTester>
    </extension>
