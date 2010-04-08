@@ -37,8 +37,8 @@ import java.util.List;
 import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.network.Network;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 /**
  * This class defines a C++ CMake printer.
@@ -49,7 +49,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class CppCMakePrinter {
 
-	private StringTemplateGroup group;
+	private STGroup group;
 
 	/**
 	 * Creates a new CMake printer with the template "Cpp_CMakeLists".
@@ -58,7 +58,7 @@ public class CppCMakePrinter {
 	 *             if the template file could not be read
 	 */
 	public CppCMakePrinter() throws IOException {
-		group = new TemplateGroupLoader().loadGroup("Cpp_CMakeLists");
+		group = TemplateGroupLoader.loadGroup("Cpp_CMakeLists");
 	}
 
 	/**
@@ -75,12 +75,12 @@ public class CppCMakePrinter {
 	 */
 	public void printCMake(String path, List<Network> network)
 			throws IOException {
-		StringTemplate template = group.getInstanceOf("Cpp_CMakeLists");
-		template.setAttribute("networkList", network);
+		ST template = group.getInstanceOf("Cpp_CMakeLists");
+		template.add("networkList", network);
 
 		String fileName = path + File.separator + "CMakeLists.txt";
 
-		byte[] b = template.toString(80).getBytes();
+		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();

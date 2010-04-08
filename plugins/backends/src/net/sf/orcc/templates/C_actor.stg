@@ -1,5 +1,3 @@
-group C_actor;
-
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,7 +214,7 @@ if (isSchedulable_$action$()) {
 }>>
 
 schedulingTest(actions) ::= <<
-$actions: actionTest(action=it); separator=" else "$
+$actions: actionTest(); separator=" else "$
 >>
 
 scheduler(actions) ::= <<
@@ -258,7 +256,7 @@ if (isSchedulable_$nextState.action$()) {
 }>>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(nextState=it); separator=" else "$
+$nextStates: actionTestState(); separator=" else "$
 >>
 
 stateScheduler(transition) ::= <<
@@ -304,7 +302,7 @@ static int outside_FSM_scheduler() {
 
 
 $endif$
-$fsm.transitions: stateScheduler(transition=it); separator="\n"$
+$fsm.transitions: stateScheduler(); separator="\n"$
 int $instance.id$_scheduler() {
 	int res = 1;
 	int i = 0;
@@ -347,26 +345,26 @@ instance(instance) ::= <<
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-$instance.actor.inputs.list: fifo(it)$
+$instance.actor.inputs.list: fifo()$
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-$instance.actor.outputs.list: fifo(it)$
+$instance.actor.outputs.list: fifo()$
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance
 $parameters(instance.parameters)$
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
-$instance.actor.stateVars.list: stateVar(it)$
+$instance.actor.stateVars.list: stateVar()$
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-$instance.actor.procs.list: procedure(it)$
+$instance.actor.procs.list: procedure()$
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-$instance.actor.actions: action(it)$
+$instance.actor.actions: action()$
 $if(instance.actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-$instance.actor.initializes: action(it)$
+$instance.actor.initializes: action()$
 void $instance.id$_initialize() {
 	int res = 1;
 	int i = 0;

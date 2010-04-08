@@ -227,11 +227,15 @@ public abstract class AbstractBackend implements Backend {
 	 */
 	final protected void printInstances(Network network) throws OrccException {
 		write("Printing instances...\n");
+		long t0 = System.currentTimeMillis();
 		for (Instance instance : network.getInstances()) {
 			if (instance.isActor()) {
 				printInstance(instance);
 			}
 		}
+
+		long t1 = System.currentTimeMillis();
+		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
 	}
 
 	/**

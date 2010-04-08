@@ -44,8 +44,8 @@ import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.INameable;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 /**
  * This class defines a VHDL actor printer.
@@ -57,7 +57,7 @@ public final class VHDLTestbenchPrinter extends Printer {
 
 	public static Pattern adjacent_ = Pattern.compile("_+");
 
-	private StringTemplateGroup group;
+	private STGroup group;
 
 	private Map<String, String> transformations;
 
@@ -86,7 +86,7 @@ public final class VHDLTestbenchPrinter extends Printer {
 	 *             If the template file could not be read.
 	 */
 	protected VHDLTestbenchPrinter(String name) {
-		group = new TemplateGroupLoader().loadGroup(name);
+		group = TemplateGroupLoader.loadGroup(name);
 
 		// registers this printer as the default printer
 		Printer.register(this);
@@ -105,12 +105,12 @@ public final class VHDLTestbenchPrinter extends Printer {
 	 */
 	public void printTestbench(String fileName, String id, Actor actor)
 			throws IOException {
-		StringTemplate template = group.getInstanceOf("testbench");
+		ST template = group.getInstanceOf("testbench");
 
-		template.setAttribute("actorName", id);
-		template.setAttribute("actor", actor);
+		template.add("actorName", id);
+		template.add("actor", actor);
 
-		byte[] b = template.toString(80).getBytes();
+		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();

@@ -39,8 +39,8 @@ import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Network;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 /**
  * This class defines a C++ CMake printer.
@@ -51,7 +51,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class CppMainPrinter {
 
-	private StringTemplateGroup group;
+	private STGroup group;
 
 	/**
 	 * Creates a new CMake printer with the template "Cpp_main".
@@ -60,7 +60,7 @@ public class CppMainPrinter {
 	 *             if the template file could not be read
 	 */
 	public CppMainPrinter() throws IOException {
-		group = new TemplateGroupLoader().loadGroup("Cpp_main");
+		group = TemplateGroupLoader.loadGroup("Cpp_main");
 	}
 
 	/**
@@ -77,13 +77,13 @@ public class CppMainPrinter {
 	 */
 	public void printMain(String path, List<Network> networks,
 			Map<Connection, Integer> globalFifoMap) throws IOException {
-		StringTemplate template = group.getInstanceOf("Cpp_main");
-		template.setAttribute("networks", networks);
-		template.setAttribute("globalFifoMap", globalFifoMap);
+		ST template = group.getInstanceOf("Cpp_main");
+		template.add("networks", networks);
+		template.add("globalFifoMap", globalFifoMap);
 
 		String fileName = path + File.separator + "main.cpp";
 
-		byte[] b = template.toString(80).getBytes();
+		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();

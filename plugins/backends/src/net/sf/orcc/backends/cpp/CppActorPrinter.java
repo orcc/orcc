@@ -28,21 +28,13 @@
  */
 package net.sf.orcc.backends.cpp;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import net.sf.orcc.backends.TemplateGroupLoader;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.network.Instance;
 import net.sf.orcc.util.INameable;
-
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
 
 /**
  * This class defines a C++ actor printer.
@@ -51,9 +43,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  * @author Ghislain Roquier
  * 
  */
-public final class CppActorPrinter extends Printer {
-
-	private StringTemplateGroup group;
+public final class CppActorPrinter extends STPrinter {
 
 	/**
 	 * Creates a new actor printer with the given template.
@@ -62,48 +52,7 @@ public final class CppActorPrinter extends Printer {
 	 *             If the template file could not be read.
 	 */
 	public CppActorPrinter(String name) {
-		group = new TemplateGroupLoader().loadGroup(name);
-
-		// registers this printer as the default printer
-		Printer.register(this);
-	}
-
-	public void printActor(String fileName, Actor actor) throws IOException {
-		if (!actor.isSystem()) {
-			StringTemplate template = group.getInstanceOf("actor");
-
-			template.setAttribute("actor", actor);
-
-			byte[] b = template.toString(80).getBytes();
-			OutputStream os = new FileOutputStream(fileName);
-			os.write(b);
-			os.close();
-		}
-	}
-
-	/**
-	 * Prints the given actor to a file whose name is given.
-	 * 
-	 * @param fileName
-	 *            output file name
-	 * @param id
-	 *            the instance id
-	 * @param actor
-	 *            actor to print
-	 * @throws IOException
-	 */
-	public void printInstance(String fileName, Instance instance)
-			throws IOException {
-		if (!instance.getActor().isSystem()) {
-			StringTemplate template = group.getInstanceOf("instance");
-
-			template.setAttribute("instance", instance);
-
-			byte[] b = template.toString(80).getBytes();
-			OutputStream os = new FileOutputStream(fileName);
-			os.write(b);
-			os.close();
-		}
+		super("C_actor", name);
 	}
 
 	@Override

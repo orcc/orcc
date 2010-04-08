@@ -35,8 +35,8 @@ import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.ListConst;
 import net.sf.orcc.ir.printers.DefaultConstantPrinter;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 /**
  * This class defines a C constant printer.
@@ -49,7 +49,7 @@ public class CConstPrinter extends DefaultConstantPrinter {
 	/**
 	 * template group
 	 */
-	private StringTemplateGroup group;
+	private STGroup group;
 
 	/**
 	 * Creates a new const printer from the given template group.
@@ -57,7 +57,7 @@ public class CConstPrinter extends DefaultConstantPrinter {
 	 * @param group
 	 *            template group
 	 */
-	public CConstPrinter(StringTemplateGroup group) {
+	public CConstPrinter(STGroup group) {
 		this.group = group;
 	}
 
@@ -69,16 +69,16 @@ public class CConstPrinter extends DefaultConstantPrinter {
 	@Override
 	public void visit(ListConst constant, Object... args) {
 		// set instance of list template as current template
-		StringTemplate template = group.getInstanceOf("listValue");
+		ST template = group.getInstanceOf("listValue");
 
 		List<Constant> list = constant.getValue();
 		for (Constant cst : list) {
-			template.setAttribute("value", cst.toString());
+			template.add("value", cst.toString());
 		}
 
 		// restore previous template as current template, and set attribute
 		// "value" to the instance of the list template
-		builder.append(template.toString(80));
+		builder.append(template.render(80));
 	}
 
 }

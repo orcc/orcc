@@ -1,5 +1,3 @@
-group C_network;
-
 declareBroadcast(bcast) ::= <<
 int $bcast.id$_scheduler() {
 	int i = 0;
@@ -24,7 +22,7 @@ int $bcast.id$_scheduler() {
 >>
 
 declareBroadcasts(broadcasts) ::= <<
-$broadcasts: declareBroadcast(it)$
+$broadcasts: declareBroadcast()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,7 +33,7 @@ DECLARE_FIFO($type$, $size$, $count$)
 
 >>
 
-allocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
+doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
 $if (source.broadcast)$
 $allocateFifoType(
   type=targetPort.type, size=edge.size, count=network.connectionMap.(edge))$
@@ -48,7 +46,7 @@ $endif$
 tryAllocateFifo(edge, src, tgt) ::= <<
 $if (src.instance)$
 $if (tgt.instance)$
-$allocateFifo(
+$doAllocateFifo(
   edge=edge,
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target)$
@@ -56,15 +54,18 @@ $endif$
 $endif$
 >>
 
+allocateFifo(edge) ::= <<
+$tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+>>
+
 allocateFifos(edges) ::= <<
-$edges: tryAllocateFifo(
-  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it))$
+$edges: allocateFifo()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
-assignFifo(source, sourcePort, target, targetPort, count) ::= <<
+doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 struct fifo_s *$source.id$_$sourcePort.name$ = &fifo_$count$;
 struct fifo_s *$target.id$_$targetPort.name$ = &fifo_$count$;
 
@@ -73,7 +74,7 @@ struct fifo_s *$target.id$_$targetPort.name$ = &fifo_$count$;
 tryAssignFifo(edge, src, tgt) ::= <<
 $if (src.instance)$
 $if (tgt.instance)$
-$assignFifo(
+$doAssignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
   count=network.connectionMap.(edge))$
@@ -81,9 +82,12 @@ $endif$
 $endif$
 >>
 
+assignFifo(edge) ::= <<
+$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+>>
+
 assignFifos(edges) ::= <<
-$edges: tryAssignFifo(
-  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it)) $
+$edges: assignFifo()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

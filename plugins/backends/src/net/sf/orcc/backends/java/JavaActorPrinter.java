@@ -53,7 +53,7 @@ public final class JavaActorPrinter extends STPrinter {
 	 *             If the template file could not be read.
 	 */
 	public JavaActorPrinter() {
-		super("Java_actor");
+		super("C_actor", "Java_actor");
 	}
 
 	@Override

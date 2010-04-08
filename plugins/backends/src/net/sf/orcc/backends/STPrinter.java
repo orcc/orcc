@@ -36,8 +36,8 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Printer;
 import net.sf.orcc.network.Instance;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 /**
  * This class defines a printer that uses StringTemplate.
@@ -47,7 +47,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public abstract class STPrinter extends Printer {
 
-	final protected StringTemplateGroup group;
+	final protected STGroup group;
 
 	/**
 	 * Creates a new StringTemplate printer with the given template group name.
@@ -55,8 +55,8 @@ public abstract class STPrinter extends Printer {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected STPrinter(String groupName) {
-		group = new TemplateGroupLoader().loadGroup(groupName);
+	protected STPrinter(String root, String... groupNames) {
+		group = TemplateGroupLoader.loadGroup(root, groupNames);
 
 		// registers this printer as the default printer
 		Printer.register(this);
@@ -73,11 +73,11 @@ public abstract class STPrinter extends Printer {
 	 */
 	public void printActor(String fileName, Actor actor) throws IOException {
 		if (!actor.isSystem()) {
-			StringTemplate template = group.getInstanceOf("actor");
+			ST template = group.getInstanceOf("actor");
 
-			template.setAttribute("actor", actor);
+			template.add("actor", actor);
 
-			byte[] b = template.toString(80).getBytes();
+			byte[] b = template.render(80).getBytes();
 			OutputStream os = new FileOutputStream(fileName);
 			os.write(b);
 			os.close();
@@ -96,11 +96,11 @@ public abstract class STPrinter extends Printer {
 	public void printInstance(String fileName, Instance instance)
 			throws IOException {
 		if (!instance.getActor().isSystem()) {
-			StringTemplate template = group.getInstanceOf("instance");
+			ST template = group.getInstanceOf("instance");
 
-			template.setAttribute("instance", instance);
+			template.add("instance", instance);
 
-			byte[] b = template.toString(80).getBytes();
+			byte[] b = template.render(80).getBytes();
 			OutputStream os = new FileOutputStream(fileName);
 			os.write(b);
 			os.close();

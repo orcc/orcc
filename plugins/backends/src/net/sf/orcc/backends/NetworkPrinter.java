@@ -34,8 +34,8 @@ import java.io.OutputStream;
 
 import net.sf.orcc.network.Network;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 /**
  * This class defines a C network printer.
@@ -45,7 +45,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class NetworkPrinter {
 
-	private StringTemplateGroup group;
+	private STGroup group;
 
 	/**
 	 * Creates a new network printer using the given template file name.
@@ -56,7 +56,7 @@ public class NetworkPrinter {
 	 *             If the template file could not be read.
 	 */
 	public NetworkPrinter(String name) throws IOException {
-		group = new TemplateGroupLoader().loadGroup(name);
+		group = TemplateGroupLoader.loadGroup(name);
 	}
 
 	/**
@@ -77,15 +77,15 @@ public class NetworkPrinter {
 	 */
 	public void printNetwork(String fileName, Network network,
 			boolean debugFifos, int fifoSize) throws IOException {
-		StringTemplate template = group.getInstanceOf("network");
+		ST template = group.getInstanceOf("network");
 
 		network.computeGraphMaps();
 
-		template.setAttribute("debugFifos", debugFifos);
-		template.setAttribute("network", network);
-		template.setAttribute("fifoSize", fifoSize);
+		template.add("debugFifos", debugFifos);
+		template.add("network", network);
+		template.add("fifoSize", fifoSize);
 
-		byte[] b = template.toString(80).getBytes();
+		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();

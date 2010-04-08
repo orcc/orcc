@@ -28,15 +28,8 @@
  */
 package net.sf.orcc.backends;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import org.antlr.stringtemplate.StringTemplateGroup;
-import org.antlr.stringtemplate.StringTemplateGroupInterface;
-import org.antlr.stringtemplate.StringTemplateGroupLoader;
-import org.antlr.stringtemplate.language.DefaultTemplateLexer;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 
 /**
  * An implementation of {@link StringTemplateGroupLoader} that loads a template
@@ -45,48 +38,21 @@ import org.antlr.stringtemplate.language.DefaultTemplateLexer;
  * @author Matthieu Wipliez
  * 
  */
-public class TemplateGroupLoader implements StringTemplateGroupLoader {
+public class TemplateGroupLoader {
 
-	public TemplateGroupLoader() {
-		StringTemplateGroup.registerGroupLoader(this);
-	}
-
-	@Override
-	public StringTemplateGroup loadGroup(String groupName) {
-		return loadGroup(groupName, null);
-	}
-
-	@Override
-	@SuppressWarnings("rawtypes")
-	public StringTemplateGroup loadGroup(String groupName, Class templateLexer,
-			StringTemplateGroup superGroup) {
-		StringTemplateGroup group = null;
-
-		try {
-			String groupPath = "/net/sf/orcc/templates/" + groupName + ".stg";
-			Class<?> clasz = this.getClass();
-			InputStream is = clasz.getResourceAsStream(groupPath);
-
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			group = new StringTemplateGroup(br, templateLexer, null, superGroup);
-			br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+	public static STGroup loadGroup(String root, String... groupNames) {
+		STGroup group = null;
+		
+		String groupPath = "/net/sf/orcc/templates/" + root + ".stg";
+		group = new STGroupFile(groupPath, '$', '$');
+		for (String groupName : groupNames) {
+			STGroup previous = group;
+			groupPath = "/net/sf/orcc/templates/" + groupName + ".stg";
+			group = new STGroupFile(groupPath, '$', '$');
+			group.importTemplates(previous);
 		}
 
 		return group;
-	}
-
-	@Override
-	public StringTemplateGroup loadGroup(String groupName,
-			StringTemplateGroup superGroup) {
-		return loadGroup(groupName, DefaultTemplateLexer.class, superGroup);
-	}
-
-	@Override
-	public StringTemplateGroupInterface loadInterface(String interfaceName) {
-		throw new UnsupportedOperationException("loadInterface");
 	}
 
 }

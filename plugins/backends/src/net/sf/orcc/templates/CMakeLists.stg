@@ -1,5 +1,3 @@
-group CMakeLists;
-
 printActor(id, actor) ::= <<
 $if (!actor.system)$
 $id$.c
@@ -31,7 +29,7 @@ include_directories(\${orcc_INCLUDE_DIR} \${SDL_INCLUDE_DIR} \${SDLIMAGE_INCLUDE
 
 add_executable ($network.name$
 $network.name$.c
-$network.instances: printInstance(it)$)
+$network.instances: printInstance()$)
 
 target_link_libraries($network.name$ \${orcc_LIBRARY} \${SDL_LIBRARY})
 

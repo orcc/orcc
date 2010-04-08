@@ -36,8 +36,8 @@ import java.io.OutputStream;
 import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.network.Network;
 
-import org.antlr.stringtemplate.StringTemplate;
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
 
 /**
  * This class defines a C network printer.
@@ -47,7 +47,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public class CMakePrinter {
 
-	private StringTemplateGroup group;
+	private STGroup group;
 
 	/**
 	 * Creates a new CMake printer with the template "CMakeLists".
@@ -56,7 +56,7 @@ public class CMakePrinter {
 	 *             if the template file could not be read
 	 */
 	public CMakePrinter() throws IOException {
-		group = new TemplateGroupLoader().loadGroup("CMakeLists");
+		group = TemplateGroupLoader.loadGroup("CMakeLists");
 	}
 
 	/**
@@ -72,12 +72,12 @@ public class CMakePrinter {
 	 *             if there is an I/O error
 	 */
 	public void printCMake(String path, Network network) throws IOException {
-		StringTemplate template = group.getInstanceOf("CMakeLists");
-		template.setAttribute("network", network);
+		ST template = group.getInstanceOf("CMakeLists");
+		template.add("network", network);
 
 		String fileName = path + File.separator + "CMakeLists.txt";
 
-		byte[] b = template.toString(80).getBytes();
+		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();

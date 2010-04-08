@@ -31,7 +31,7 @@ package net.sf.orcc.backends.cpp;
 import net.sf.orcc.backends.c.CConstPrinter;
 import net.sf.orcc.ir.consts.BoolConst;
 
-import org.antlr.stringtemplate.StringTemplateGroup;
+import org.stringtemplate.v4.STGroup;
 
 /**
  * This class defines a C++ constant printer.
@@ -47,7 +47,7 @@ public class CppConstPrinter extends CConstPrinter {
 	 * @param group
 	 *            template group
 	 */
-	public CppConstPrinter(StringTemplateGroup group) {
+	public CppConstPrinter(STGroup group) {
 		super(group);
 	}
 
