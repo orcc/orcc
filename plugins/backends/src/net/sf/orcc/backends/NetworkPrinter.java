@@ -50,13 +50,13 @@ public class NetworkPrinter {
 	/**
 	 * Creates a new network printer using the given template file name.
 	 * 
-	 * @param name
-	 *            The template file name.
+	 * @param groupNames
+	 *            names of the template groups
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public NetworkPrinter(String name) throws IOException {
-		group = TemplateGroupLoader.loadGroup(name);
+	public NetworkPrinter(String... groupNames) throws IOException {
+		group = TemplateGroupLoader.loadGroup(groupNames);
 	}
 
 	/**

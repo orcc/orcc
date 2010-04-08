@@ -1,5 +1,3 @@
-group Java_network : C_network;
-
 assignFifo(source, sourcePort, target, targetPort, count) ::= <<
 actor_$source.id$.setFifo("$sourcePort.name$", fifo_$count$);
 actor_$target.id$.setFifo("$targetPort.name$", fifo_$count$);

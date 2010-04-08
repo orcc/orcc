@@ -46,9 +46,9 @@ $endif$>>
 // a state variable
 stateVar(variable) ::= <<
 $if(variable.constantValue)$
-private $variableDeclaration(variable)$ = $variable.constantValue$;$\n\n$
+private $variableDeclaration(variable)$ = $variable.constantValue$;$\n$$\n$
 $else$
-private $variableDeclarationInit(variable)$;$\n\n$
+private $variableDeclarationInit(variable)$;$\n$$\n$
 $endif$
 >>
 

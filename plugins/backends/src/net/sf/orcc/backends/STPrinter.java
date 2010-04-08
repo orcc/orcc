@@ -52,11 +52,13 @@ public abstract class STPrinter extends Printer {
 	/**
 	 * Creates a new StringTemplate printer with the given template group name.
 	 * 
+	 * @param groupNames
+	 *            names of the template groups
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected STPrinter(String root, String... groupNames) {
-		group = TemplateGroupLoader.loadGroup(root, groupNames);
+	protected STPrinter(String... groupNames) {
+		group = TemplateGroupLoader.loadGroup(groupNames);
 
 		// registers this printer as the default printer
 		Printer.register(this);

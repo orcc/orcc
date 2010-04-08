@@ -40,12 +40,28 @@ import org.stringtemplate.v4.STGroupFile;
  */
 public class TemplateGroupLoader {
 
-	public static STGroup loadGroup(String root, String... groupNames) {
+	/**
+	 * Loads a group. Hierarchy must be specified:
+	 * <p>
+	 * For a group G2 that extends a group G1 that extends a group G0, this
+	 * method should be called as: loadGroup(G0, G1, G2) to properly load and
+	 * return G2.
+	 * </p>
+	 * 
+	 * @param groupNames
+	 *            the names of the groups to load, starting from the root of the
+	 *            hierarchy (if any)
+	 * @return
+	 */
+	public static STGroup loadGroup(String... groupNames) {
 		STGroup group = null;
-		
+
+		String root = groupNames[0];
 		String groupPath = "/net/sf/orcc/templates/" + root + ".stg";
 		group = new STGroupFile(groupPath, '$', '$');
-		for (String groupName : groupNames) {
+
+		for (int i = 1; i < groupNames.length; i++) {
+			String groupName = groupNames[i];
 			STGroup previous = group;
 			groupPath = "/net/sf/orcc/templates/" + groupName + ".stg";
 			group = new STGroupFile(groupPath, '$', '$');

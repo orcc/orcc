@@ -82,7 +82,8 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
 		try {
-			NetworkPrinter networkPrinter = new NetworkPrinter("Java_network");
+			NetworkPrinter networkPrinter = new NetworkPrinter("C_network",
+					"Java_network");
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);
