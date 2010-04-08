@@ -555,4 +555,6 @@
     <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="MbType"/>
     <Connection dst="" dst-port="Intra_DC_flag"
         src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="ENTROPY_TYPE"
+        src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
 </XDF>

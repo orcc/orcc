@@ -52,11 +52,13 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+//Modified by Endri Bezati (EPFL - IETR/INSA of Rennes) to accept CABAC VALUE input
 
 actor Algo_BlockExpand_AVC (int SAMPLE_SZ) 
 		uint(size=4) RUN, 
 		int(size=12) VALUE, 
-		bool LAST 
+		bool LAST,
+		bool ENTROPY_TYPE 
   			==> 
   			int(size=SAMPLE_SZ) Block :
 
@@ -70,6 +72,16 @@ actor Algo_BlockExpand_AVC (int SAMPLE_SZ)
   
   uint(size=2) leveltype := 0; // Intra16x16DCLevel 0, Intra16x16ACLevel / LumaLevel 1, ChromaDCLevel 2, ChromaACLevel 3
   uint(size=5) nb4x4 :=0;
+  
+  BlockExpand: action ENTROPY_TYPE:[cavlc] ==>
+  guard
+  	cavlc = true
+  end
+  
+  SkipBlockExpand: action ENTROPY_TYPE:[not_cavlc], VALUE:[v] ==> Block:[v]
+  guard
+  	not_cavlc = false
+  end
   
   //if it is the end of a block, begin to stuff 0.
   //if it is not the end, begin to read data to buffer.
@@ -153,7 +165,10 @@ actor Algo_BlockExpand_AVC (int SAMPLE_SZ)
     run = 0
   end
 
-  schedule fsm check_last:
+  schedule fsm entropie_type:
+    entropie_type	( SkipBlockExpand	) --> entropie_type;
+   
+    entropie_type	( BlockExpand		) --> check_last;
 	check_last 		( check_last 		) --> check_last_done;
 	check_last_done ( read_immediate 	) --> check_last;
 	check_last_done ( read_save 		) --> write_zero;
@@ -165,7 +180,7 @@ actor Algo_BlockExpand_AVC (int SAMPLE_SZ)
 	out_buffer 		( out_finish 		) --> check_last;
 	check_last_done	( out_zero			) --> out_zero;
 	out_zero 		( out_zero 			) --> out_zero;
-	out_zero 		( out_finish		) --> check_last;  
+	out_zero 		( out_finish		) --> entropie_type;  
   end
   
 end

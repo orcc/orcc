@@ -65,7 +65,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			uint(size=4) IntraPredModeC, 
 			uint(size=4) RUN, 
 			int(size=12) VALUE, 
-			bool LAST, 
+			bool LAST,
+			bool ENTROPY_TYPE, 
 			int(size=8) ScalingList, 
 			int(size=8) QP,
 			int(size=8) QP_Cb, 
@@ -5050,7 +5051,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0], 
-			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+			LAST:[[true: for int t in Integers(0,26) ]] repeat 27, ENTROPY_TYPE:[[IS_CAVLC(): for int j in Integers(0,26) ]] repeat 27
 	guard
 		prevMbSkipped = 1
 	var 
@@ -5592,7 +5593,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	read_MB_layer_skip_mb_qp_delta: action 
 		==> 
 		
-			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+			LAST:[[true: for int t in Integers(0,26) ]] repeat 27, ENTROPY_TYPE:[[IS_CAVLC(): for int j in Integers(0,26) ]] repeat 27
 	guard
 		val_CodedBlockPatternLuma = 0, CodedBlockPatternChroma = 0, not IS_Intra_16x16()
 	end
@@ -6241,13 +6242,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	// --> residual_block( i16x16DClevel, 0, 15, 16 )
 
-	Residual_return_luma_DC: action ==> LAST:[true]
+	Residual_return_luma_DC: action ==> LAST:[true], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		leveltype=0
 	end
 
 	//else
-	Residual_luma_skip_DC_init: action ==> LAST:[true]
+	Residual_luma_skip_DC_init: action ==> LAST:[true], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16()
 	end
@@ -6292,13 +6293,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		//end if
 	end
 
-	Residual_return_luma_AC: action ==> LAST: [true]
+	Residual_return_luma_AC: action ==> LAST: [true], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		leveltype = 1
 	end
 
 	// else 
-	Residual_luma_skip_AC_CodedBlock8x8: action ==>  LAST: [true]
+	Residual_luma_skip_AC_CodedBlock8x8: action ==>  LAST: [true], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		i4x4 < 4,
 		rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 // MB sub part 8x8 == 0
@@ -6372,7 +6373,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end 
 	//--> residual_block( ChromaDCLevel[ iCbCr ], 0, 4 * NumC8x8 - 1, 4 * NumC8x8 )
 
-	Residual_return_chroma_DC: action ==> LAST: [true]
+	Residual_return_chroma_DC: action ==> LAST: [true], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		leveltype = 2
 	do
@@ -6380,7 +6381,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 
 	// else
-	Residual_skip_chroma_DC_init: action ==> LAST: [true]
+	Residual_skip_chroma_DC_init: action ==> LAST: [true], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		iCbCr < 2,
 		bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0
@@ -6423,7 +6424,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	// --> residual_block( ChromaACLevel[ iCbCr ][ i8x8*4+i4x4 ], max( 0, startIdx1 ), endIdx1, 15)
 
-	Residual_return_chroma_AC: action ==> LAST:[true]
+	Residual_return_chroma_AC: action ==> LAST:[true], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		leveltype = 3
 	do
@@ -6433,7 +6434,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 
 	// else
-	Residual_chroma_AC_skip_CodedBlock4x4: action ==> LAST: [true]
+	Residual_chroma_AC_skip_CodedBlock4x4: action ==> LAST: [true], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		iCbCr < 2,
 		bitand(CodedBlockPatternChroma, 2) != 2 or endIdx <= 0
@@ -6698,7 +6699,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	// --> residual_return
 
 	//end for
-	Residual_block_send_run: action ==> LAST:[false], RUN:[run[coeff_sent]], VALUE:[level[coeff_sent]]
+	Residual_block_send_run: action ==> LAST:[false], RUN:[run[coeff_sent]], VALUE:[level[coeff_sent]], ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		coeff_sent < TotalCoeff()-1
 	do
@@ -6762,12 +6763,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	//for( i = 0; i < maxNumCoeff; i++ )
 	//	coeffLevel[ i ] = 0
-	Residual_block_Cabac_Coeff_Level_Init: action ==>
+	Residual_block_Cabac_Coeff_Level_Init: action ==> VALUE:[[0: for int i in Integers(0, 64 - 1)]],
+													  ENTROPY_TYPE:[[IS_CAVLC() : for int j in Integers(0, 64 - 1)] ]
 	guard
 		IS_CABAC()	
 	do
 		foreach int i in Integers(0, maxNumCoeff - 1) do
-			coeffLevel[i] := 0;
+			level[i] := 0;
 		end
 	
 		numCoeff := endIdx + 1;
@@ -6852,7 +6854,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		coeff_sign_flag[ numCoeff - 1 ] := cabac_value();
 		 
-		coeffLevel[ numCoeff - 1 ] := ( coeff_abs_level_minus1[ numCoeff - 1 ] + 1 ) * ( 1 - 2 * coeff_sign_flag[ numCoeff - 1 ] );
+		level[ numCoeff - 1 ] := ( coeff_abs_level_minus1[ numCoeff - 1 ] + 1 ) * ( 1 - 2 * coeff_sign_flag[ numCoeff - 1 ] );
 		
 		blCabacIdx := numCoeff - 2;
 	end
@@ -6884,7 +6886,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		
 		coeff_sign_flag[ numCoeff - 1 ] := cabac_value();
-		coeffLevel[ blCabacIdx ] := ( coeff_abs_level_minus1[ blCabacIdx ] + 1 )*( 1 - 2 * coeff_sign_flag[ blCabacIdx ] );
+		level[ blCabacIdx ] := ( coeff_abs_level_minus1[ blCabacIdx ] + 1 )*( 1 - 2 * coeff_sign_flag[ blCabacIdx ] );
 	
 		blCabacIdx := blCabacIdx - 1;
 	end
