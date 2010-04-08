@@ -34,6 +34,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 
 /**
+ * This class defines the configuration tab group for compilation.
  * 
  * @author Matthieu Wipliez
  * 

@@ -34,6 +34,7 @@ import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 
 /**
+ * This class defines the configuration tab group for simulation.
  * 
  * @author Matthieu Wipliez
  * @author Pierre-Laurent Lagalaye
@@ -45,8 +46,8 @@ public class OrccSimuLaunchConfigurationTabGroup extends
 	@Override
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
-				new SimuSettingsTab(), new ParametersTab(), new SimuOptionsTab(),
-				new CommonTab() };
+				new SimuSettingsTab(), new ParametersTab(),
+				new SimuOptionsTab(), new CommonTab() };
 		setTabs(tabs);
 	}
 

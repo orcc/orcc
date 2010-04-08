@@ -36,7 +36,7 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * This class defines a very simple Dead Code Elimination.
+ * This class defines a very simple Dead Variable Elimination.
  * 
  * @author Matthieu Wipliez
  * 

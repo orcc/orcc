@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,10 +38,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.orcc.backends.impl.CheckboxOptionImpl;
 import net.sf.orcc.backends.impl.BrowseFileOptionImpl;
+import net.sf.orcc.backends.impl.CheckboxOptionImpl;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.launching.OrccLaunchConstants;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -102,6 +106,29 @@ public class BackendFactory {
 				+ ".backends");
 
 		parseBackends(elements);
+	}
+
+	/**
+	 * Returns the identifier of the option that contains the input file that
+	 * should be given to the front-end and back-end/interpreter/debugger.
+	 * 
+	 * @return the identifier of the option that contains an input file
+	 * @throws CoreException
+	 *             if something goes wrong
+	 */
+	public String getInputId(String backend) throws CoreException {
+		List<BackendOption> options = getOptions(backend);
+		if (options != null) {
+			// return the identifier of the first "browseFile" option
+			for (BackendOption option : options) {
+				if (option instanceof BrowseFileOption) {
+					return option.getIdentifier();
+				}
+			}
+		}
+
+		// by default, return the identifier of the "input file" option
+		return OrccLaunchConstants.INPUT_FILE;
 	}
 
 	/**
@@ -250,7 +277,7 @@ public class BackendFactory {
 	}
 
 	/**
-	 * Runs the given back-end on the given input file with the given FIFO size.
+	 * Runs the given back-end on the given input file.
 	 * 
 	 * @param process
 	 *            the process that launched the back-end
@@ -261,15 +288,15 @@ public class BackendFactory {
 	 *            absolute path of top-level input network
 	 * @param outputFolder
 	 *            folder absolute path of output folder
-	 * @param fifoSize
-	 *            default size of FIFOs
 	 * @param configuration
 	 *            launch configuration
 	 * @throws Exception
 	 */
 	public void runBackend(OrccProcess process, String name, String inputFile,
-			String outputFolder, int fifoSize,
-			ILaunchConfiguration configuration) throws Exception {
+			String outputFolder, ILaunchConfiguration configuration)
+			throws Exception {
+		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+
 		Backend backend = backends.get(name);
 		backend.setLaunchConfiguration(configuration);
 		if (new File(inputFile).isDirectory()) {

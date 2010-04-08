@@ -52,11 +52,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.backends.BackendOption;
-import net.sf.orcc.backends.BrowseFileOption;
 import net.sf.orcc.interpreter.InterpreterMain;
 import net.sf.orcc.ui.OrccActivator;
-import net.sf.orcc.ui.launching.OrccLaunchConstants;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -249,7 +246,9 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		contents = "";
 		proxy = new OrccProxy();
 
-		inputFile = configuration.getAttribute(getInputFile(), "");
+		String backend = configuration.getAttribute(BACKEND, "");
+		String optionId = BackendFactory.getInstance().getInputId(backend);
+		inputFile = configuration.getAttribute(optionId, "");
 	}
 
 	@Override
@@ -341,31 +340,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		return value;
 	}
 
-	/**
-	 * Returns the identifier of the option that contains the input file that
-	 * should be given to the front-end and back-end/interpreter/debugger.
-	 * 
-	 * @return the identifier of the option that contains an input file
-	 * @throws CoreException
-	 *             if something goes wrong
-	 */
-	private String getInputFile() throws CoreException {
-		String backend = configuration.getAttribute(BACKEND, "");
-		BackendFactory factory = BackendFactory.getInstance();
-		List<BackendOption> options = factory.getOptions(backend);
-		if (options != null) {
-			// return the identifier of the first "browseFile" option
-			for (BackendOption option : options) {
-				if (option instanceof BrowseFileOption) {
-					return option.getIdentifier();
-				}
-			}
-		}
-
-		// by default, return the identifier of the "input file" option
-		return OrccLaunchConstants.INPUT_FILE;
-	}
-
 	@Override
 	public String getLabel() {
 		return configuration.getName();
@@ -398,11 +372,10 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		String backend = configuration.getAttribute(BACKEND, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
-		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		try {
 			BackendFactory factory = BackendFactory.getInstance();
 			factory.runBackend(this, backend, inputFile, outputFolder,
-					fifoSize, configuration);
+					configuration);
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					backend + " backend could not generate code", e);

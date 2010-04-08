@@ -29,7 +29,6 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
 
@@ -48,11 +47,13 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ILaunchShortcut2;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -85,12 +86,27 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 	}
 
 	private void chooseAndLaunch(IFile file, ILaunchConfiguration[] configs) {
-		ILaunchConfiguration config = null;
 		if (configs.length == 0) {
-			config = createConfiguration(file);
-		} else if (configs.length == 1) {
+			Shell shell = getShell();
+
+			// no configuration: Create one
+			ILaunchConfiguration config = createConfiguration(file);
+			if (config != null) {
+				// open launch dialog so the user can tune the settings
+				DebugUITools.openLaunchConfigurationDialogOnGroup(shell,
+						new StructuredSelection(config),
+						IDebugUIConstants.ID_RUN_LAUNCH_GROUP);
+			}
+
+			return;
+		}
+
+		ILaunchConfiguration config = null;
+		if (configs.length == 1) {
+			// one existing configuration
 			config = configs[0];
 		} else {
+			// several existing configurations, prompt the user
 			config = chooseConfiguration(configs);
 		}
 
@@ -140,31 +156,28 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		String id = RUN_CONFIG_TYPE;
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(id);
 
-		ILaunchConfigurationWorkingCopy wc;
 		ILaunchConfiguration config = null;
 		try {
-			String name = file.getName();
-			name = manager.generateLaunchConfigurationName(name);
-			wc = type.newInstance(null, name);
-
-			// source file
-			wc.setAttribute(INPUT_FILE, file.getLocation().toOSString());
-
-			// output folder
+			String inputFile = file.getLocation().toOSString();
 			String folder = browseOutputFolder(getShell(), file);
 			if (folder == null) {
 				return null;
 			}
-			wc.setAttribute(OUTPUT_FOLDER, folder);
 
-			// backend
 			String backend = chooseBackend();
 			if (backend == null) {
 				return null;
 			}
-			wc.setAttribute(BACKEND, backend);
 
-			// other options need not be set.
+			// generate configuration name
+			String name = file.getName() + " - " + backend;
+			name = manager.generateLaunchConfigurationName(name);
+
+			// create configuration
+			ILaunchConfigurationWorkingCopy wc = type.newInstance(null, name);
+			wc.setAttribute(BACKEND, backend);
+			wc.setAttribute(getInputId(wc), inputFile);
+			wc.setAttribute(OUTPUT_FOLDER, folder);
 
 			config = wc.doSave();
 		} catch (CoreException e) {
@@ -186,7 +199,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 			ILaunchConfiguration[] candidates = manager
 					.getLaunchConfigurations(type);
 			for (ILaunchConfiguration config : candidates) {
-				String fileName = config.getAttribute(INPUT_FILE, "");
+				String fileName = config.getAttribute(getInputId(config), "");
 				if (fileName.equals(file.getLocation().toOSString())) {
 					configs.add(config);
 				}
@@ -197,6 +210,23 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	/**
+	 * Returns the identifier of the input field of the back-end set in the
+	 * given configuration.
+	 * 
+	 * @param configuration
+	 *            a launch configuration (or a copy of)
+	 * @return the identifier of the input field
+	 * @throws CoreException
+	 *             if something goes wrong with the configuration
+	 */
+	private String getInputId(ILaunchConfiguration configuration)
+			throws CoreException {
+		BackendFactory factory = BackendFactory.getInstance();
+		String backend = configuration.getAttribute(BACKEND, "");
+		return factory.getInputId(backend);
 	}
 
 	@Override
