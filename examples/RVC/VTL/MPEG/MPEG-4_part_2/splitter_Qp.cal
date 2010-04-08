@@ -1,4 +1,4 @@
-actor splitter_BTYPE() int(size=QUANT_SZ) QP ==> int(size=QUANT_SZ) QUANT_Y , int(size=QUANT_SZ) QUANT_U, int(size=QUANT_SZ) QUANT_V :
+actor splitter_Qp() int(size=QUANT_SZ) QP ==> int(size=QUANT_SZ) QUANT_Y , int(size=QUANT_SZ) QUANT_U, int(size=QUANT_SZ) QUANT_V :
 
 // Port size declaration
 int QUANT_SZ = 6;

@@ -36,8 +36,7 @@ $variable.type$$listDim(variable.type.dimensions)$ $variable.name$
 // called by "local variable", or "state variable with no value"
 variableDeclarationInit(variable) ::= <<
 $if(variable.port)$
-$variable.type$[] $variable$ = new $variable.type$$listSize(variable.type.dimensions)$$else$$variable.type$$listDim(variable.type.dimensions)$ $variable$$if(variable.type.dimensions)$
- = new $variable.type$$listSize(variable.type.dimensions)$$endif$$endif$>>
+$variable.type$[] $variable$ = new $variable.type$$listSize(variable.type.dimensions)$$else$$variable.type$$listDim(variable.type.dimensions)$ $variable$$if(variable.type.dimensions)$ = new $variable.type$$listSize(variable.type.dimensions)$$endif$$endif$>>
 
 parameter(parameter) ::= <<
 private $variableDeclarationInit(parameter)$;
@@ -264,8 +263,6 @@ actor(actor) ::= <<
  * Generated from "$actor.name$"
  */
 package net.sf.orcc.generated;
-
-import java.util.HashMap;
 
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.actors.IActor;
