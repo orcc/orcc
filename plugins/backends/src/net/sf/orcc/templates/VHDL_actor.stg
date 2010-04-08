@@ -1,5 +1,8 @@
 group VHDL_actor;
 
+///////////////////////////////////////////////////////////////////////////////
+// FIFOs
+///////////////////////////////////////////////////////////////////////////////
 fifo_in(port) ::= <<
 $if(port.type.bool)$
 $actor.name$_$port.name$_data  : in std_logic;$\n$
@@ -27,10 +30,77 @@ $endif$
 >>
 
 fifo_in_init(port) ::=<<
-$actor.name$_$port.name$_read <= '0';$"\n"$
+$actor.name$_$port.name$_read <= '0';
 >>
 fifo_out_init(port) ::=<<
-$actor.name$_$port.name$_write <= '0';$"\n"$
+$actor.name$_$port.name$_write <= '0';
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor VHDL Architecture
+///////////////////////////////////////////////////////////////////////////////
+
+Actor_out(port) ::= <<
+$if(port.type.bool)$
+$actor.name$_$port.name$_data  <= '0';$\n$
+$else$
+$actor.name$_$port.name$_data  <= (others => '0');$\n$
+$endif$
+
+>>
+
+
+Actor_Schedul(actor) ::= <<
+$actor.name$_proc : process (reset_n, clock) is
+  $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
+  --
+  $actor.actions: printActionLocals(it)$  --
+begin
+  if reset_n = '0' then 
+    $actor.stateVars.list: stateConst(it)$$InitFSM(actor.actionScheduler.fsm)$    --
+    $actor.inputs.list: fifo_in_init(it); separator="\n"$
+    $actor.outputs.list: fifo_out_init(it); separator="\n"$
+    $actor.outputs.list: Actor_out(it)$    --
+  elsif rising_edge(clock) then
+    $if(actor.initializes)$
+    -- $actor.initializes: action(it)$
+    $endif$
+    $actor.inputs.list: fifo_in_init(it); separator="\n"$
+    $actor.outputs.list: fifo_out_init(it); separator="\n"$
+    --
+    $actor.actions: printActionSchedulerInline(it); separator="\n"$
+    $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
+  end if;
+end process $actor.name$_proc;
+
+>>
+
+
+Actor_No_Schedul(actor) ::= <<
+$actor.name$_proc : process (reset_n, clock) is
+  $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
+  --
+  $actor.actions: printActionLocals(it)$  --
+begin
+  if reset_n = '0' then 
+    $actor.stateVars.list: stateConst(it)$    --
+    $actor.inputs.list: fifo_in_init(it); separator="\n"$
+    $actor.outputs.list: fifo_out_init(it); separator="\n"$
+    $actor.outputs.list: Actor_out(it)$    --
+  elsif rising_edge(clock) then
+    $if(actor.initializes)$
+    $actor.initializes: action(it)$
+    $endif$    
+    $actor.inputs.list: fifo_in_init(it); separator="\n"$
+    $actor.outputs.list: fifo_out_init(it); separator="\n"$
+    --
+    $actor.actions: printActionSchedulerInline(it); separator="\n"$
+    $schedulingTest(actor.actionScheduler.actions)$
+    end if;
+  end if;
+end process $actor.name$_proc;
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -496,42 +566,9 @@ architecture rtl_$actor.name$ of $actor.name$ is
 
 begin
 $if(actor.actionScheduler.fsm)$
-  $actor.name$_proc : process (reset_n, clock) is
-    $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
-    --
-    $actor.actions: printActionLocals(it)$  --
-  begin
-    if reset_n = '0' then 
-      $actor.stateVars.list: stateConst(it)$$InitFSM(actor.actionScheduler.fsm)$      --
-      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-    elsif rising_edge(clock) then
-      $if(actor.initializes)$
-      -- $actor.initializes: action(it)$
-      $endif$
-      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-      $actor.actions: printActionSchedulerInline(it); separator="\n"$
-      $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
-    end if;
-  end process $actor.name$_proc;
+  $Actor_Schedul(actor)$
 $else$
-  $actor.name$_proc : process (reset_n, clock) is
-    $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
-    --
-    $actor.actions: printActionLocals(it)$  --
-  begin
-    if reset_n = '0' then 
-      $actor.stateVars.list: stateConst(it)$      --
-      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-    elsif rising_edge(clock) then
-      $if(actor.initializes)$
-      $actor.initializes: action(it)$
-      $endif$    
-      $actor.inputs.list: fifo_in_init(it)$$actor.outputs.list: fifo_out_init(it)$      --
-      $actor.actions: printActionSchedulerInline(it); separator="\n"$
-      $schedulingTest(actor.actionScheduler.actions)$
-      end if;
-    end if;
-  end process $actor.name$_proc;
+  $Actor_No_Schedul(actor)$
 $endif$
 
 end architecture rtl_$actor.name$;
