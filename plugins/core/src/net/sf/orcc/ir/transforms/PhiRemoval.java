@@ -31,11 +31,13 @@ package net.sf.orcc.ir.transforms;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
@@ -120,7 +122,12 @@ public class PhiRemoval extends AbstractActorTransformation {
 		Assign assign;
 		if (source.getIndex() == 0 && !parameters.contains(source)) {
 			procedure.getLocals().remove(source);
-			IntExpr expr = new IntExpr(0);
+			Expression expr;
+			if (target.getType().isBool()) {
+				expr = new BoolExpr(false);
+			} else {
+				expr = new IntExpr(0);
+			}
 			assign = new Assign(new Location(), target, expr);
 		} else {
 			Use localUse = new Use(source);
