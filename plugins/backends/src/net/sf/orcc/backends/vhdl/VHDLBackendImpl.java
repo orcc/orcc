@@ -44,6 +44,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
+import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.Inline;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
@@ -121,18 +122,21 @@ public class VHDLBackendImpl extends AbstractBackend {
 	private void printTestbench(Network network) throws OrccException {
 		VHDLTestbenchPrinter tbPrinter = new VHDLTestbenchPrinter();
 		try {
-			for (Instance instance : network.getInstances()) {
-				if (instance.isActor()) {
-					Actor actor = instance.getActor();
-					String id = instance.getId();
-					File folder = new File(path + File.separator + "Testbench");
-					if (!folder.exists()) {
-						folder.mkdir();
-					}
+			for (Network subNetwork : network.getNetworks()) {
+				for (Instance instance : subNetwork.getInstances()) {
+					if (instance.isActor()) {
+						Actor actor = instance.getActor();
+						String id = instance.getId();
+						File folder = new File(path + File.separator
+								+ "Testbench");
+						if (!folder.exists()) {
+							folder.mkdir();
+						}
 
-					String outputName = path + File.separator + "Testbench"
-							+ File.separator + id + "_tb.vhd";
-					tbPrinter.printTestbench(outputName, id, actor);
+						String outputName = path + File.separator + "Testbench"
+								+ File.separator + id + "_tb.vhd";
+						tbPrinter.printTestbench(outputName, id, actor);
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -143,9 +147,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void transformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new Inline(), new PhiRemoval(),
-				new VariableRedimension(), new BoolExprTransform(),
-				new VariableRenamer(), new TransformConditionals() };
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new Inline(), new PhiRemoval(), new VariableRedimension(),
+				new BoolExprTransform(), new VariableRenamer(),
+				new TransformConditionals() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

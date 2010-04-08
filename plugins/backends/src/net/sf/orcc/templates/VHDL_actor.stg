@@ -140,15 +140,15 @@ $endif$
 
 Peek(peek) ::= <<
 $if(peek.unit)$
-  $if(peek.target.type.bool)$
+$if(peek.target.type.bool)$
 $peek.target$ := $actor.name$_$peek.port$_data;$\n$
-  $else$
-    $if(peek.target.type.int)$
-$peek.target$ := to_integer(signed($actor.name$_$peek.port$_data));$\n$
-    $else$
-$peek.target$ := to_integer(unsigned($actor.name$_$peek.port$_data));$\n$
-    $endif$
-  $endif$
+$else$
+$if(peek.target.type.int)$
+$peek.target$ := to_integer(signed($actor.name$_$peek.port$_data));
+$else$
+$peek.target$ := to_integer(unsigned($actor.name$_$peek.port$_data));
+$endif$
+$endif$
 $else$
 -- peek multiple token not coded yet
 $endif$
@@ -158,16 +158,16 @@ $endif$
 
 Read(read) ::= <<
 $if(read.unit)$
-  $if(read.target.type.bool)$
+$if(read.target.type.bool)$
 $read.target$ := $actor.name$_$read.port$_data;$\n$
-  $else$
-    $if(read.target.type.int)$
-$read.target$ := to_integer(signed($actor.name$_$read.port$_data));$\n$
-    $else$
-$read.target$ := to_integer(unsigned($actor.name$_$read.port$_data));$\n$
-    $endif$
-  $endif$
-  $actor.name$_$read.port$_read <= '1';
+$else$
+$if(read.target.type.int)$
+$read.target$ := to_integer(signed($actor.name$_$read.port$_data));
+$else$
+$read.target$ := to_integer(unsigned($actor.name$_$read.port$_data));
+$endif$
+$endif$
+$actor.name$_$read.port$_read <= '1';
 $else$
 -- read multiple token not coded yet
 $endif$
@@ -481,16 +481,18 @@ architecture rtl_$actor.name$ of $actor.name$ is
 
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
+  ---------------------------------------------------------------------------
   $actor.stateVars.list: signalDeclaration(it)$
 
   ---------------------------------------------------------------------------
   -- Functions and procedures
+  ---------------------------------------------------------------------------
   $actor.procs.list: function(procedure=it); separator="\n"$
 
   ---------------------------------------------------------------------------
   -- FSM
-  $DefineFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
   ---------------------------------------------------------------------------
+  $DefineFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 
 begin
 $if(actor.actionScheduler.fsm)$

@@ -44,7 +44,7 @@ $instances: printSig()$
 assignFifo(source, sourcePort, target, targetPort, count) ::= <<
 fifo_$count$ : entity work.fifo_generic 
 generic map (
-depth => FIFO_DEPTH,
+depth => $edge.size$,
 $if(targetPort.type.bool)$
 width => 0)$\n$
 $else$
@@ -199,7 +199,7 @@ $if (!instance.actor)$
 
 $it.id$ : entity work.$it.network$
   generic map (
-    FIFO_DEPTH       => FIFO_DEPTH) 
+    SIZE             => SIZE) 
   port map (
     $printNetworksPorts(it.network)$
     clock            => clock, 
@@ -227,7 +227,7 @@ use ieee.numeric_std.all;
 
 entity $network.name$ is
   generic (
-  FIFO_DEPTH : integer := $fifoSize$;
+  SIZE : integer := $fifoSize$
   );
   port (
     $printNetworkPorts(network)$
