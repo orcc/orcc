@@ -74,10 +74,20 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
  */
 public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 
+	/**
+	 * Opens a directory dialog to select the output folder.
+	 * 
+	 * @param shell
+	 *            the shell
+	 * @param file
+	 *            input file
+	 * @return output folder
+	 */
 	private String browseOutputFolder(Shell shell, IFile file) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
 		dialog.setMessage("Please select an output folder:");
 		dialog.setText("Choose output folder");
+
 		// set initial directory
 		String location = file.getParent().getLocation().toOSString();
 		dialog.setFilterPath(location);
@@ -85,6 +95,15 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		return dialog.open();
 	}
 
+	/**
+	 * Chooses a configuration and launch it. If no configuration exists, create
+	 * one.
+	 * 
+	 * @param file
+	 *            input file
+	 * @param configs
+	 *            a possibly empty array of configurations
+	 */
 	private void chooseAndLaunch(IFile file, ILaunchConfiguration[] configs) {
 		if (configs.length == 0) {
 			Shell shell = getShell();
@@ -115,6 +134,11 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		}
 	}
 
+	/**
+	 * Prompts the user to choose a back-end.
+	 * 
+	 * @return the back-end chosen, or <code>null</code>
+	 */
 	private String chooseBackend() {
 		ILabelProvider labelProvider = new LabelProvider();
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
@@ -133,6 +157,13 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		return null;
 	}
 
+	/**
+	 * Prompts the user a launch configuration if there are several of them.
+	 * 
+	 * @param configs
+	 *            a non-empty array of configurations
+	 * @return the launch configuration chosen, or <code>null</code>
+	 */
 	private ILaunchConfiguration chooseConfiguration(
 			ILaunchConfiguration[] configs) {
 		IDebugModelPresentation labelProvider = DebugUITools
@@ -148,9 +179,18 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		if (result == Window.OK) {
 			return (ILaunchConfiguration) dialog.getFirstResult();
 		}
+
 		return null;
 	}
 
+	/**
+	 * Creates a configuration based on the input file. Prompts the user to pick
+	 * an output folder and a back-end.
+	 * 
+	 * @param file
+	 *            the input file
+	 * @return the launch configuration created, or <code>null</code>
+	 */
 	private ILaunchConfiguration createConfiguration(IFile file) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		String id = RUN_CONFIG_TYPE;
@@ -187,6 +227,14 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut2 {
 		return config;
 	}
 
+	/**
+	 * Returns the configurations associated with the given input file.
+	 * 
+	 * @param file
+	 *            an input file
+	 * @return a possibly empty, possibly <code>null</code> array of
+	 *         configurations
+	 */
 	private ILaunchConfiguration[] getConfigurations(IFile file) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		String id = RUN_CONFIG_TYPE;

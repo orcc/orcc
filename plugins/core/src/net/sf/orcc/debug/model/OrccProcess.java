@@ -370,12 +370,10 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	private void launchBackend(ILaunchConfiguration configuration)
 			throws CoreException {
 		String backend = configuration.getAttribute(BACKEND, "");
-		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
 		try {
 			BackendFactory factory = BackendFactory.getInstance();
-			factory.runBackend(this, backend, inputFile, outputFolder,
-					configuration);
+			factory.runBackend(this, configuration);
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					backend + " backend could not generate code", e);

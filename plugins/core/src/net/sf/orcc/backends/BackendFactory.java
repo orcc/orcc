@@ -28,8 +28,10 @@
  */
 package net.sf.orcc.backends;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -277,32 +279,29 @@ public class BackendFactory {
 	}
 
 	/**
-	 * Runs the given back-end on the given input file.
+	 * Runs the back-end specified by the configuration.
 	 * 
 	 * @param process
 	 *            the process that launched the back-end
-	 * @param name
-	 *            back-end name. Must belong to the list returned by
-	 *            {@link #listBackends()}
-	 * @param inputFile
-	 *            absolute path of top-level input network
-	 * @param outputFolder
-	 *            folder absolute path of output folder
 	 * @param configuration
 	 *            launch configuration
 	 * @throws Exception
 	 */
-	public void runBackend(OrccProcess process, String name, String inputFile,
-			String outputFolder, ILaunchConfiguration configuration)
-			throws Exception {
-		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+	public void runBackend(OrccProcess process,
+			ILaunchConfiguration configuration) throws Exception {
+		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
+		String backend = configuration.getAttribute(BACKEND, "");
+		String inputId = getInputId(backend);
+		String inputFile = configuration.getAttribute(inputId, "");
 
-		Backend backend = backends.get(name);
-		backend.setLaunchConfiguration(configuration);
+		Backend backendObj = backends.get(backend);
+		backendObj.setLaunchConfiguration(configuration);
 		if (new File(inputFile).isDirectory()) {
-			backend.generateVtl(process, outputFolder);
+			backendObj.generateVtl(process, outputFolder);
 		} else {
-			backend.generateCode(process, inputFile, outputFolder, fifoSize);
+			int fifoSize = configuration.getAttribute(FIFO_SIZE,
+					DEFAULT_FIFO_SIZE);
+			backendObj.generateCode(process, inputFile, outputFolder, fifoSize);
 		}
 	}
 
