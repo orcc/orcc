@@ -62,8 +62,7 @@ $assign.target$ = $assign.value$;
 
 Call(call) ::= <<
 $if(call.target)$
-$call.target$ = 
-$endif$
+$call.target$ = $endif$
 $call.procedure$($call.parameters; separator=", "$);
 
 >>
@@ -106,7 +105,6 @@ setReadEnd($instance.id$_$readEnd.port$);
 Return(return) ::= <<
 $if(return.value)$
 return $return.value$;
-
 $endif$
 >>
 
@@ -151,7 +149,8 @@ $instructions(blockNode.instructions)$
 IfNode(ifNode) ::= <<
 if ($ifNode.value$) {
 	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$ else {
-	$nodes(ifNode.elseNodes)$}$endif$
+	$nodes(ifNode.elseNodes)$}
+$endif$
 $BlockNode(ifNode.joinNode)$
 >>
 
@@ -171,7 +170,6 @@ procedure(procedure) ::= <<
 static $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
 $if(procedure.locals.list)$
 	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
-
 $endif$
 	$procedure.nodes: {$(it.class.simpleName)(it)$}$}
 

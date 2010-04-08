@@ -41,7 +41,6 @@ import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
-import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
@@ -71,16 +70,15 @@ public class JavaBackendImpl extends AbstractBackend {
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
-		printInstances(network);
+		printActors(actors);
 	}
 
 	@Override
-	protected void printInstance(Instance instance) throws OrccException {
-		String id = instance.getId();
-
-		String outputName = path + File.separator + "Actor_" + id + ".java";
+	protected void printActor(Actor actor) throws OrccException {
+		String name = actor.getName();
+		String outputName = path + File.separator + "Actor_" + name + ".java";
 		try {
-			printer.printInstance(outputName, instance);
+			printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

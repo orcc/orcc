@@ -36,22 +36,17 @@ DECLARE_FIFO($type$, $size$, $count$)
 doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
 $if (source.broadcast)$
 $allocateFifoType(
-  type=targetPort.type, size=edge.size, count=network.connectionMap.(edge))$
-$else$
+  type=targetPort.type, size=edge.size, count=network.connectionMap.(edge))$$else$
 $allocateFifoType(
-  type=sourcePort.type, size=edge.size, count=network.connectionMap.(edge))$
-$endif$
+  type=sourcePort.type, size=edge.size, count=network.connectionMap.(edge))$$endif$
 >>
 
 tryAllocateFifo(edge, src, tgt) ::= <<
-$if (src.instance)$
-$if (tgt.instance)$
+$if (src.instance && tgt.instance)$
 $doAllocateFifo(
   edge=edge,
   source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target)$
-$endif$
-$endif$
+  target=tgt.instance, targetPort=edge.target)$$endif$
 >>
 
 allocateFifo(edge) ::= <<
@@ -68,18 +63,14 @@ $edges: allocateFifo()$
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 struct fifo_s *$source.id$_$sourcePort.name$ = &fifo_$count$;
 struct fifo_s *$target.id$_$targetPort.name$ = &fifo_$count$;
-
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$if (src.instance)$
-$if (tgt.instance)$
+$if (src.instance && tgt.instance)$
 $doAssignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
-  count=network.connectionMap.(edge))$
-$endif$
-$endif$
+  count=network.connectionMap.(edge))$$endif$
 >>
 
 assignFifo(edge) ::= <<
@@ -94,11 +85,8 @@ $edges: assignFifo()$
 // declares initialize and scheduler functions
 
 initialize(instance) ::= <<
-$if (instance.actor)$
-$if (!instance.actor.initializes.empty)$
+$if (instance.actor && !instance.actor.initializes.empty)$
 extern void $instance.id$_initialize();
-
-$endif$
 $endif$
 >>
 
@@ -114,11 +102,8 @@ $instances: {extern int $it.id$_scheduler();}; separator="\n"$
 // print calls to initialize() and scheduler()
 
 printInitialize(instance) ::= <<
-$if (instance.actor)$
-$if (!instance.actor.initializes.empty)$
+$if (instance.actor && !instance.actor.initializes.empty)$
 $instance.id$_initialize();
-
-$endif$
 $endif$
 >>
 

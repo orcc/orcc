@@ -36,19 +36,37 @@ $variable.type$$listDim(variable.type.dimensions)$ $variable.name$
 // called by "local variable", or "state variable with no value"
 variableDeclarationInit(variable) ::= <<
 $if(variable.port)$
-$variable.type$[] $variable$ = new $variable.type$$listSize(variable.type.dimensions)$
-$else$
-$variable.type$$listDim(variable.type.dimensions)$ $variable$$if(variable.type.dimensions)$
- = new $variable.type$$listSize(variable.type.dimensions)$
-$endif$
-$endif$>>
+$variable.type$[] $variable$ = new $variable.type$$listSize(variable.type.dimensions)$$else$$variable.type$$listDim(variable.type.dimensions)$ $variable$$if(variable.type.dimensions)$
+ = new $variable.type$$listSize(variable.type.dimensions)$$endif$$endif$>>
+
+parameter(parameter) ::= <<
+private $variableDeclarationInit(parameter)$;
+
+>>
+
+parameters(parameters) ::= <<
+$parameters: parameter()$
+>>
+
+declareParameters(parameters) ::= <<
+$parameters: variableDeclaration(); wrap, separator=", "$
+>>
+
+setParameter(parameter) ::= <<
+this.$parameter$ = $parameter$;
+
+>>
+
+setParameters(parameters) ::= <<
+$parameters: setParameter()$
+>>
 
 // a state variable
 stateVar(variable) ::= <<
 $if(variable.constantValue)$
-private $variableDeclaration(variable)$ = $variable.constantValue$;$\n$$\n$
+private $variableDeclaration(variable)$ = $variable.constantValue$;
 $else$
-private $variableDeclarationInit(variable)$;$\n$$\n$
+private $variableDeclarationInit(variable)$;
 $endif$
 >>
 
@@ -89,7 +107,6 @@ procedure(procedure) ::= <<
 private $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
 $if(procedure.locals.list)$
 	$procedure.locals.list: {$variableDeclarationInit(it)$;$\n$}$
-
 $endif$
 	$procedure.nodes: {$(it.class.simpleName)(it)$}$}
 
@@ -242,9 +259,9 @@ public int schedule() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-instance(instance) ::= <<
+actor(actor) ::= <<
 /**
- * Generated from "$instance.id$"
+ * Generated from "$actor.name$"
  */
 package net.sf.orcc.generated;
 
@@ -253,53 +270,55 @@ import java.util.HashMap;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.actors.IActor;
 
-public class Actor_$instance.id$ implements IActor {
+public class Actor_$actor.name$ implements IActor {
 
 
 	// Input FIFOs
-	$instance.actor.inputs.list: fifo()$
+	$actor.inputs.list: fifo()$
 	// Output FIFOs
-	$instance.actor.outputs.list: fifo()$
+	$actor.outputs.list: fifo()$
+	// Parameters of the actor
+	$parameters(actor.parameters.list)$
 	// State variables of the actor
-	$instance.actor.stateVars.list: stateVar()$
+	$actor.stateVars.list: stateVar()$
 	
-	public Actor_$instance.id$() {
-		new HashMap<String, IntFifo>();
+	public Actor_$actor.name$($declareParameters(actor.parameters.list)$) {
+		$setParameters(actor.parameters.list)$
 	}
 	
 	// Functions/procedures
-	$instance.actor.procs.list: procedure()$
+	$actor.procs.list: procedure()$
 	// Actions
-	$instance.actor.actions: action()$
-$if(instance.actor.initializes)$
+	$actor.actions: action()$
+$if(actor.initializes)$
 	// Initializes
-	$instance.actor.initializes: action()$
+	$actor.initializes: action()$
 $endif$
 	@Override
 	public void initialize() {
-$if(instance.actor.initializes)$
+$if(actor.initializes)$
 		boolean res = false;
 		int i = 0;
 		if (res){
 		}
 
-		$schedulingTest(instance.actor.initializes)$
+		$schedulingTest(actor.initializes)$
 $endif$
 	}
 
 	@Override
 	public void setFifo(String portName, IntFifo fifo) {
-		$instance.actor.inputs.list: setFifo()$$instance.actor.outputs.list: setFifo()${
+		$actor.inputs.list: setFifo()$$actor.outputs.list: setFifo()${
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
 	}
 
 	// Action scheduler
-$if(instance.actor.actionScheduler.fsm)$
-	$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
+$if(actor.actionScheduler.fsm)$
+	$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 $else$
-	$scheduler(instance.actor.actionScheduler.actions)$
+	$scheduler(actor.actionScheduler.actions)$
 $endif$
 
 }

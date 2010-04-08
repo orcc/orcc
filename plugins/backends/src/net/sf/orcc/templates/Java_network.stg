@@ -1,41 +1,41 @@
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 actor_$source.id$.setFifo("$sourcePort.name$", fifo_$count$);
 actor_$target.id$.setFifo("$targetPort.name$", fifo_$count$);
-
 >>
 
 allocateFifoType(type, size, count) ::= <<
 private IntFifo fifo_$count$ = new IntFifo($size$);
-
 >>
 
 printInitialize(instance) ::= <<
-$if (instance.actor)$
-$if (!instance.actor.initializes.empty)$
+$if (instance.actor && !instance.actor.initializes.empty)$
 actor_$instance.id$.initialize();
-
-$endif$
 $endif$
 >>
 
 declareActor(instance) ::= <<
 $if (instance.actor)$
 private IActor actor_$instance.id$;
-
 $endif$
+>>
+
+parameter(param) ::= <<
+/* $param$ */ $instance.parameters.(param)$
+>>
+
+parameters(parameters) ::= <<
+$parameters: parameter(); wrap, separator=", "$
 >>
 
 constructActor(instance) ::= <<
 $if (instance.actor)$
-actor_$instance.id$ = new Actor_$instance.id$();
-
+actor_$instance.id$ = new Actor_$instance.actor.name$($parameters(instance.actor.parameters.list)$);
 $endif$
 >>
 
 scheduleActor(instance) ::= <<
 $if (instance.actor)$
 i += actor_$instance.id$.schedule();
-
 $endif$
 >>
 
@@ -50,8 +50,8 @@ package net.sf.orcc.generated;
 import net.sf.orcc.oj.CLIParameters;
 import net.sf.orcc.oj.FifoManager;
 import net.sf.orcc.oj.IntFifo;
-import net.sf.orcc.oj.actors.Actor_display;
-import net.sf.orcc.oj.actors.Actor_source;
+import net.sf.orcc.oj.actors.Actor_Display;
+import net.sf.orcc.oj.actors.Actor_Source;
 import net.sf.orcc.oj.actors.Broadcast;
 import net.sf.orcc.oj.actors.IActor;
 import net.sf.orcc.oj.actors.IScheduler;
@@ -97,8 +97,9 @@ public class Network_$network.name$ implements IScheduler {
 		IScheduler scheduler = new Network_$network.name$();
 		scheduler.initialize();
 		scheduler.schedule();
-		Actor_display.closeDisplay();
+		Actor_Display.closeDisplay();
 	}
+
 }
 
 >>
