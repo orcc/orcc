@@ -17,13 +17,6 @@
          </option>
       </backend>
       <backend
-            class="net.sf.orcc.backends.c.quasistatic.CQuasiStaticBackendImpl"
-            name="C *quasi-static*">
-         <option
-               id="net.sf.orcc.backends.xdfInputFile">
-         </option>
-      </backend>
-      <backend
             class="net.sf.orcc.backends.java.JavaBackendImpl"
             name="Java">
          <option
