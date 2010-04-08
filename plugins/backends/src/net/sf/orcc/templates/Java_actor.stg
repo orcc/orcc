@@ -242,9 +242,9 @@ public int schedule() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actorName, actor) ::= <<
+instance(instance) ::= <<
 /**
- * Generated from "$actorName$"
+ * Generated from "$instance.id$"
  */
 package net.sf.orcc.generated;
 
@@ -253,53 +253,53 @@ import java.util.HashMap;
 import net.sf.orcc.oj.IntFifo;
 import net.sf.orcc.oj.actors.IActor;
 
-public class Actor_$actorName$ implements IActor {
+public class Actor_$instance.id$ implements IActor {
 
 
 	// Input FIFOs
-	$actor.inputs.list: fifo()$
+	$instance.actor.inputs.list: fifo()$
 	// Output FIFOs
-	$actor.outputs.list: fifo()$
+	$instance.actor.outputs.list: fifo()$
 	// State variables of the actor
-	$actor.stateVars.list: stateVar()$
+	$instance.actor.stateVars.list: stateVar()$
 	
-	public Actor_$actorName$() {
+	public Actor_$instance.id$() {
 		new HashMap<String, IntFifo>();
 	}
 	
 	// Functions/procedures
-	$actor.procs.list: procedure()$
+	$instance.actor.procs.list: procedure()$
 	// Actions
-	$actor.actions: action()$
-$if(actor.initializes)$
+	$instance.actor.actions: action()$
+$if(instance.actor.initializes)$
 	// Initializes
-	$actor.initializes: action()$
+	$instance.actor.initializes: action()$
 $endif$
 	@Override
 	public void initialize() {
-$if(actor.initializes)$
+$if(instance.actor.initializes)$
 		boolean res = false;
 		int i = 0;
 		if (res){
 		}
 
-		$schedulingTest(actor.initializes)$
+		$schedulingTest(instance.actor.initializes)$
 $endif$
 	}
 
 	@Override
 	public void setFifo(String portName, IntFifo fifo) {
-		$actor.inputs.list: setFifo()$$actor.outputs.list: setFifo()${
+		$instance.actor.inputs.list: setFifo()$$instance.actor.outputs.list: setFifo()${
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
 	}
 
 	// Action scheduler
-$if(actor.actionScheduler.fsm)$
-	$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
+$if(instance.actor.actionScheduler.fsm)$
+	$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
 $else$
-	$scheduler(actor.actionScheduler.actions)$
+	$scheduler(instance.actor.actionScheduler.actions)$
 $endif$
 
 }

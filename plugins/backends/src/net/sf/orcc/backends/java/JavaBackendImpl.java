@@ -30,6 +30,7 @@ package net.sf.orcc.backends.java;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -38,6 +39,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
+import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -63,7 +65,12 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doActorCodeGeneration(Network network) throws OrccException {
+		network.flatten();
+		
 		printer = new JavaActorPrinter();
+
+		List<Actor> actors = network.getActors();
+		transformActors(actors);
 		printInstances(network);
 	}
 
@@ -100,7 +107,8 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	protected void transformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new PhiRemoval() };
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
