@@ -67,7 +67,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			int(size=12) VALUE, 
 			bool LAST, 
 			int(size=8) ScalingList, 
-			int(size=8) QP, 
+			int(size=8) QP,
 			int(size=8) QP_Cb, 
 			int(size=8) QP_Cr, 
 			uint(size=13) CurrMbAddr, 
@@ -1632,6 +1632,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	];
 	//
 	
+	List ( type: uint, size = 24 ) zigzag_scan =
+	[
+		  4 + 1 * 8, 5 + 1 * 8, 4 + 2 * 8, 5 + 2 * 8, 6 + 1 * 8, 7 + 1 * 8,  6 + 2 * 8, 7 + 2 * 8
+		, 4 + 3 * 8, 5 + 3 * 8, 4 + 4 * 8, 5 + 4 * 8, 6 + 3 * 8, 7 + 3 * 8,  6 + 4 * 8, 7 + 4 * 8
+		, 1 + 1 * 8, 2 + 1 * 8, 1 + 2 * 8, 2 + 2 * 8, 1 + 4 * 8, 2 + 4 * 8,  1 + 5 * 8, 2 + 5 * 8
+	];
+	
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -2829,6 +2836,53 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 	end
 	
+	function SCAN8(int x) --> int:
+		zigzag_scan[x]
+	end
+	
+	procedure ctxIdxCodedBlockFlag()
+	var
+		int nza,
+		int nzb,
+		int left_cbp,
+		int top_cbp
+	begin
+		ctxIdxInc := 0;
+		
+		if ctxBlockCat = 0 then
+			left_cbp := mbTab[GiveMbAddrA()][mbCBPLuma];
+			top_cbp  := mbTab[GiveMbAddrB()][mbCBPLuma];
+			nza := left_cbp & 0x100;
+			nzb := top_cbp &  0x100;
+		end
+		
+		if ctxBlockCat = 1 or ctxBlockCat = 2 then
+			nza := NonZeroCount[val_CurrMbAddr,SCAN8(luma4x4BlkIdx) - 1];
+			nzb := NonZeroCount[val_CurrMbAddr,SCAN8(luma4x4BlkIdx) - 8];
+		end
+		
+		if ctxBlockCat = 3 then
+			left_cbp := mbTab[GiveMbAddrA()][mbCBPChroma];
+			top_cbp  := mbTab[GiveMbAddrB()][mbCBPChroma];
+			nza := ( left_cbp >> ( 6 + iCbCr ) ) & 0x01;
+			nzb := ( top_cbp  >> ( 6 + iCbCr ) ) & 0x01;
+		end
+		/*
+		if ctxBlockCat != 0 or ctxBlockCat != 1 ctxBlockCat != 2 ctxBlockCat != 3 then
+			nza := NonZeroCount[SCAN8( (4 * luma8x8BlkIdx+16) + 16) - 1];
+			nzb := NonZeroCount[SCAN8( (4 * luma8x8BlkIdx+16) + 16) - 8];
+		end
+		*/
+		if  nza > 0 then
+			ctxIdxInc := ctxIdxInc + 1;
+		end	
+		if  nzb > 0 then
+			ctxIdxInc := ctxIdxInc + 2;
+		end
+
+		ctxIdxInc := ctxIdxInc + (ctxBlockCat << 2);
+	end
+
 	//Derivation process for ctxIdx
 	procedure GetCtxIdx()
 	begin
@@ -3009,6 +3063,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end 
 		end
 		
+		if ( ctxIdxOffset = 85 ) then
+			ctxIdxCodedBlockFlag();
+			ctxIdx := ctxIdxOffset + ctxIdxInc;
+		end
+		
 		if ( ctxIdxOffset = 276 ) then
 			if (binIdx = 0 ) then
 				ctxIdx := ctxIdxOffset;
@@ -3022,10 +3081,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end 
 		end
 		
+		/*
 		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG ) then
 			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[0][ctxBlockCat];
 		end	
-	    
+		*/
 		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG ) then
 			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
 		end	
@@ -6679,7 +6739,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//if( maxNumCoeff = = 64 | | ( ChromaArrayType = = 3 ) ) )
 	Residual_block_Cabac_coded_block_flag_start: action ==>
 	guard
-		( maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 ) and IS_CABAC()
+		( maxNumCoeff = 64 or chroma_format_idc[sps_id] = 3 ) and IS_CABAC()
 	do
 		//Read coded_block_flag Syntax Element
 		GetCabacCodedBlockFlagSyntaxElement();
@@ -6689,7 +6749,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//coded_block_flag
 	Residual_block_Cabac_coded_block_flag_done: action ==>
 	guard
-		( maxNumCoeff = 64 or chroma_format_idc[sps_id] = 2 ) and cabac_end()
+		( maxNumCoeff = 64 or chroma_format_idc[sps_id] = 3 ) and cabac_end()
 	do
 		coded_block_flag := cabac_value();
 	end
@@ -6697,7 +6757,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//else
 	Residual_block_Cabac_skip_coded_block_flag: action ==>
 	guard
-		( maxNumCoeff != 64 or chroma_format_idc[sps_id] != 2 ) and IS_CABAC()
+		( maxNumCoeff != 64 or chroma_format_idc[sps_id] != 3 ) and IS_CABAC()
 	end
 	
 	//for( i = 0; i < maxNumCoeff; i++ )
