@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="test_HeadersParser">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/System/Source"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="fname">
+            <Expr kind="Literal" literal-kind="String" value="whatever"/>
+        </Parameter>
+    </Instance>
+    <Instance id="BitstreamReader">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/IETR/MPEG-2/Algo_Generic_Bitstream_Reader"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Synp">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/IETR/MPEG-2/Algo_Synp_MPEG-2"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="ResultPrinter">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/System/ResultPrinter"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="HeadersParser_UT">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/IETR/MPEG-2/HeadersParser_UT"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="BitstreamReader" dst-port="DataIn" src="source" src-port="O"/>
+    <Connection dst="BitstreamReader" dst-port="Control" src="Synp" src-port="CtrlBitstreamReader"/>
+    <Connection dst="Synp" dst-port="Symbol" src="BitstreamReader" src-port="DataOut"/>
+    <Connection dst="HeadersParser_UT" dst-port="Width" src="Synp" src-port="Width"/>
+    <Connection dst="HeadersParser_UT" dst-port="Height" src="Synp" src-port="Height"/>
+    <Connection dst="HeadersParser_UT" dst-port="HasIntraQuant"
+        src="Synp" src-port="HasIntraQuant"/>
+    <Connection dst="HeadersParser_UT" dst-port="HasNonIntraQuant"
+        src="Synp" src-port="HasNonIntraQuant"/>
+    <Connection dst="ResultPrinter" dst-port="Check"
+        src="HeadersParser_UT" src-port="Check"/>
+    <Connection dst="HeadersParser_UT" dst-port="NonIntraQuantCoeff"
+        src="Synp" src-port="NonIntraQuantCoeff"/>
+</XDF>

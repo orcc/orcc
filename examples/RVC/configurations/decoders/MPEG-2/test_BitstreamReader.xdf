@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="test_BitstreamReader">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="BitstreamReader_UT">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/IETR/MPEG-2/BitstreamReader_UT"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="BitstreamReader">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/IETR/MPEG-2/Algo_Generic_Bitstream_Reader"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="ResultPrinter">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/System/ResultPrinter"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="BitstreamReader" dst-port="DataIn"
+        src="BitstreamReader_UT" src-port="Data"/>
+    <Connection dst="BitstreamReader_UT" dst-port="Result"
+        src="BitstreamReader" src-port="DataOut"/>
+    <Connection dst="ResultPrinter" dst-port="Check"
+        src="BitstreamReader_UT" src-port="Check"/>
+    <Connection dst="BitstreamReader" dst-port="Control"
+        src="BitstreamReader_UT" src-port="CtrlBitstreamReader"/>
+</XDF>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="source" x="25" y="35"/>
+      <vertex id="BitstreamReader" x="131" y="16"/>
+      <vertex id="Synp" x="113" y="123"/>
+      <vertex id="ResultPrinter" x="490" y="142"/>
+      <vertex id="HeadersParser_UT" x="330" y="138"/>
+   </vertices>
+</layout>
