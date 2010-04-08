@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="idct2d">
+<XDF name="Xilinx_idct2d">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -33,7 +33,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="RowSort"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/RowSort"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -42,7 +42,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="FairMerge"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/FairMerge"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -51,7 +51,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Downsample"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Downsample"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -60,7 +60,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="idct1d"/>
+        <Class name="Xilinx_idct1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -69,7 +69,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Separate"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Separate"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -78,7 +78,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Transpose"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Transpose"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -87,7 +87,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Retranspose"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Retranspose"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -96,7 +96,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Clip"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Clip"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

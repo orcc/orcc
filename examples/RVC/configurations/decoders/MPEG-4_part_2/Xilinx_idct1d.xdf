@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="idct1d">
+<XDF name="Xilinx_idct1d">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -61,7 +61,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Scale"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Scale"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -70,7 +70,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Combine"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Combine"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -79,7 +79,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="ShuffleFly"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/ShuffleFly"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -88,7 +88,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Shuffle"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Shuffle"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -97,7 +97,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Final"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Final"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="BITS" x="16" y="67"/>
+      <vertex id="BTYPE" x="285" y="6"/>
+      <vertex id="MV" x="549" y="82"/>
+      <vertex id="B" x="418" y="157"/>
+      <vertex id="WIDTH" x="228" y="212"/>
+      <vertex id="HEIGHT" x="238" y="121"/>
+      <vertex id="parseheaders" x="106" y="76"/>
+      <vertex id="mvseq" x="312" y="47"/>
+      <vertex id="blkexp" x="303" y="153"/>
+      <vertex id="mvrecon" x="446" y="47"/>
+   </vertices>
+</layout>

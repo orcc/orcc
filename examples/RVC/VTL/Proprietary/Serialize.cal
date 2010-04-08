@@ -41,4 +41,5 @@ actor byte2bit () int(size=8) in8 ==> bool out :
   priority
     reload > shift;
   end
+
 end

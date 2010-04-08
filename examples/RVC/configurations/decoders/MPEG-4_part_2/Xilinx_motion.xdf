@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="acdc">
+<XDF name="Xilinx_motion">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
+    <Port kind="Input" name="MV">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
     <Port kind="Input" name="BTYPE">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -10,23 +17,48 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="data">
+    <Port kind="Input" name="TEX">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MCD">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
         </Type>
     </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
-    <Port kind="Output" name="signed">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Output" name="out">
+    <Port kind="Output" name="MBD">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MBA">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MCA">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="VID">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
@@ -36,65 +68,56 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="seq">
+    <Instance id="memorymanager">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Sequence"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/MemoryManager"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="dcsplit">
+    <Instance id="mbpack">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="DCSplit"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/MBPacker"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="dcpred">
+    <Instance id="searchwin">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="DCPred"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/SearchWindow"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="zzaddr">
+    <Instance id="unpack">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="ZigzagAddr"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Unpack"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="zigzag">
+    <Instance id="interpolate">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Zigzag"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Interpolate"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="acpred">
+    <Instance id="add">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="ACPred"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="dequant">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Dequant"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Add"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -102,14 +125,34 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="seq" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="dcpred" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="dcsplit" dst-port="IN" src="" src-port="data"/>
-    <Connection dst="dcpred" dst-port="A" src="seq" src-port="A"/>
-    <Connection dst="dcpred" dst-port="B" src="seq" src-port="B"/>
-    <Connection dst="dcpred" dst-port="C" src="seq" src-port="C"/>
-    <Connection dst="dcpred" dst-port="IN" src="dcsplit" src-port="DC"/>
-    <Connection dst="zigzag" dst-port="AC" src="dcsplit" src-port="AC">
+    <Connection dst="searchwin" dst-port="MV" src="" src-port="MV"/>
+    <Connection dst="unpack" dst-port="MV" src="" src-port="MV"/>
+    <Connection dst="memorymanager" dst-port="BTYPE" src="" src-port="BTYPE"/>
+    <Connection dst="searchwin" dst-port="BTYPE" src="" src-port="BTYPE"/>
+    <Connection dst="unpack" dst-port="BTYPE" src="" src-port="BTYPE"/>
+    <Connection dst="add" dst-port="BTYPE" src="" src-port="BTYPE"/>
+    <Connection dst="add" dst-port="TEX" src="" src-port="TEX"/>
+    <Connection dst="mbpack" dst-port="AI" src="memorymanager" src-port="WA">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="3"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="" dst-port="MCA" src="memorymanager" src-port="RA"/>
+    <Connection dst="" dst-port="MBD" src="mbpack" src-port="DO"/>
+    <Connection dst="" dst-port="MBA" src="mbpack" src-port="AO"/>
+    <Connection dst="searchwin" dst-port="DI" src="" src-port="MCD"/>
+    <Connection dst="unpack" dst-port="DI" src="searchwin" src-port="DO"/>
+    <Connection dst="interpolate" dst-port="halfpel" src="searchwin" src-port="FLAGS"/>
+    <Connection dst="interpolate" dst-port="RD" src="unpack" src-port="DO">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="BinOpSeq">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                <Op name="*"/>
+                <Expr kind="Literal" literal-kind="Integer" value="81"/>
+            </Expr>
+        </Attribute>
+    </Connection>
+    <Connection dst="add" dst-port="MOT" src="interpolate" src-port="MOT">
         <Attribute kind="Value" name="bufferSize">
             <Expr kind="BinOpSeq">
                 <Expr kind="Literal" literal-kind="Integer" value="6"/>
@@ -118,23 +161,7 @@
             </Expr>
         </Attribute>
     </Connection>
-    <Connection dst="" dst-port="signed" src="dcpred" src-port="SIGNED"/>
-    <Connection dst="dequant" dst-port="QP" src="dcpred" src-port="QUANT">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="6"/>
-        </Attribute>
-    </Connection>
-    <Connection dst="dequant" dst-port="DC" src="dcpred" src-port="OUT">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="6"/>
-        </Attribute>
-    </Connection>
-    <Connection dst="acpred" dst-port="PTR" src="dcpred" src-port="PTR"/>
-    <Connection dst="zzaddr" dst-port="START" src="dcpred" src-port="START"/>
-    <Connection dst="zigzag" dst-port="START" src="dcpred" src-port="START"/>
-    <Connection dst="acpred" dst-port="START" src="dcpred" src-port="START"/>
-    <Connection dst="zigzag" dst-port="ADDR" src="zzaddr" src-port="ADDR"/>
-    <Connection dst="acpred" dst-port="AC" src="zigzag" src-port="OUT">
+    <Connection dst="mbpack" dst-port="DI" src="add" src-port="VID">
         <Attribute kind="Value" name="bufferSize">
             <Expr kind="BinOpSeq">
                 <Expr kind="Literal" literal-kind="Integer" value="6"/>
@@ -143,14 +170,13 @@
             </Expr>
         </Attribute>
     </Connection>
-    <Connection dst="dequant" dst-port="AC" src="acpred" src-port="OUT">
+    <Connection dst="" dst-port="VID" src="add" src-port="VID">
         <Attribute kind="Value" name="bufferSize">
             <Expr kind="BinOpSeq">
                 <Expr kind="Literal" literal-kind="Integer" value="6"/>
                 <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="63"/>
+                <Expr kind="Literal" literal-kind="Integer" value="64"/>
             </Expr>
         </Attribute>
     </Connection>
-    <Connection dst="" dst-port="out" src="dequant" src-port="OUT"/>
 </XDF>

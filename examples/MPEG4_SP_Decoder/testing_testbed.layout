@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="decoder" x="382" y="206"/>
-      <vertex id="source" x="270" y="233"/>
-      <vertex id="display" x="536" y="299"/>
-      <vertex id="ddr" x="510" y="215"/>
-   </vertices>
-</layout>

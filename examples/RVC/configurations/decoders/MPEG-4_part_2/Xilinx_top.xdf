@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="simulation_testbed">
+<XDF name="Xilinx_top">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -16,7 +16,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="decoder"/>
+        <Class name="Xilinx_decoder"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -25,60 +25,58 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="fread"/>
+        <Class name="../../../VTL/System/Source"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="fname">
-            <Expr kind="Literal" literal-kind="String" value="D:\Projects\RVC\OpenDF\models\MPEG4_SP_Decoder\data\foreman_qcif_30.bit"/>
-        </Parameter>
     </Instance>
     <Instance id="display">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="DispYUV"/>
+        <Class name="../../../VTL/System/Display"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="doCompare">
-            <Expr kind="Literal" literal-kind="Integer" value="0"/>
-        </Parameter>
-        <Parameter name="file">
-            <Expr kind="Literal" literal-kind="String" value="D:\Projects\RVC\OpenDF\models\MPEG4_SP_Decoder\data\foreman_qcif_30.yuv"/>
-        </Parameter>
-        <Parameter name="height">
-            <Expr kind="Literal" literal-kind="Integer" value="144"/>
-        </Parameter>
-        <Parameter name="title">
-            <Expr kind="Literal" literal-kind="String" value="Foreman QCIF"/>
-        </Parameter>
-        <Parameter name="width">
-            <Expr kind="Literal" literal-kind="Integer" value="176"/>
-        </Parameter>
     </Instance>
     <Instance id="ddr">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="DDRModel"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/DDRModel"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MAXH_IN_MB">
-            <Expr kind="Literal" literal-kind="Integer" value="69"/>
-        </Parameter>
-        <Parameter name="MAXW_IN_MB">
-            <Expr kind="Literal" literal-kind="Integer" value="121"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="decoder" dst-port="bits" src="source" src-port="O"/>
-    <Connection dst="display" dst-port="B" src="decoder" src-port="VIDEO"/>
+    <Connection dst="display" dst-port="B" src="decoder" src-port="VIDEO">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="BinOpSeq">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                <Op name="*"/>
+                <Expr kind="Literal" literal-kind="Integer" value="64"/>
+            </Expr>
+        </Attribute>
+    </Connection>
     <Connection dst="decoder" dst-port="MCD" src="ddr" src-port="RD"/>
     <Connection dst="ddr" dst-port="WD" src="decoder" src-port="MBD"/>
     <Connection dst="ddr" dst-port="WA" src="decoder" src-port="MBA"/>
-    <Connection dst="ddr" dst-port="RA" src="decoder" src-port="MCA"/>
+    <Connection dst="ddr" dst-port="RA" src="decoder" src-port="MCA">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="9"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="display" dst-port="WIDTH" src="decoder" src-port="WIDTH">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Attribute>
+    </Connection>
+    <Connection dst="display" dst-port="HEIGHT" src="decoder" src-port="HEIGHT">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Attribute>
+    </Connection>
 </XDF>

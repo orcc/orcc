@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="token_producer" x="66" y="97"/>
-      <vertex id="serialize" x="227" y="97"/>
-      <vertex id="token_checker" x="379" y="106"/>
-   </vertices>
-</layout>
