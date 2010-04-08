@@ -178,15 +178,18 @@ private boolean stateScheduler_$transition.sourceState$() {
 
 >>
 
-switch(transitions) ::= <<
-switch (_FSM_state) {
-$transitions: {case s_$it.sourceState$:
-	res = stateScheduler_$it.sourceState$();
+transition(transition) ::= <<
+case s_$transition.sourceState$:
+	res = stateScheduler_$transition.sourceState$();
 	if (res) {
 		i++;
 	}
 	break;
-}$
+>>
+
+switch(transitions) ::= <<
+switch (_FSM_state) {
+$transitions: transition()$
 default:
 	System.out.println("unknown state: %s\n" + _FSM_state);
 	break;
@@ -254,23 +257,23 @@ public class Actor_$actorName$ implements IActor {
 
 
 	// Input FIFOs
-	$actor.inputs.list: fifo(it)$
+	$actor.inputs.list: fifo()$
 	// Output FIFOs
-	$actor.outputs.list: fifo(it)$
+	$actor.outputs.list: fifo()$
 	// State variables of the actor
-	$actor.stateVars.list: stateVar(it)$
+	$actor.stateVars.list: stateVar()$
 	
 	public Actor_$actorName$() {
 		new HashMap<String, IntFifo>();
 	}
 	
 	// Functions/procedures
-	$actor.procs.list: procedure(it)$
+	$actor.procs.list: procedure()$
 	// Actions
-	$actor.actions: action(it)$
+	$actor.actions: action()$
 $if(actor.initializes)$
 	// Initializes
-	$actor.initializes: action(it)$
+	$actor.initializes: action()$
 $endif$
 	@Override
 	public void initialize() {
