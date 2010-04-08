@@ -43,7 +43,6 @@ import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
-import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 /**
@@ -86,21 +85,19 @@ public class CppBackendImpl extends AbstractBackend {
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
-		printInstances(network);
+		printActors(network.getActors());
 	}
 
 	@Override
-	protected void printInstance(Instance instance) throws OrccException {
-		Actor actor = instance.getActor();
-
+	protected void printActor(Actor actor) throws OrccException {
 		try {
 			String outputName = path + File.separator + "Actor_"
 					+ actor.getName() + ".h";
-			printer.printActor(outputName, instance);
+			printer.printActor(outputName, actor);
 
 			outputName = path + File.separator + "Actor_" + actor.getName()
 					+ ".cpp";
-			impl_printer.printActor(outputName, instance);
+			impl_printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

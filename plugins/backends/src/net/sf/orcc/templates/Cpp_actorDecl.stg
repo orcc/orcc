@@ -46,7 +46,7 @@ $decrement.target$--;
 >>
 
 HasTokens(hasTokens) ::= <<
-$hasTokens.target$ = hasTokens($instance.actor.name$_$hasTokens.port$, $hasTokens.numTokens$);
+$hasTokens.target$ = hasTokens($actor.name$_$hasTokens.port$, $hasTokens.numTokens$);
 
 >>
 
@@ -61,17 +61,17 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 >>
 
 Peek(peek) ::= <<
-$peek.target$ = getPeekPtr($instance.actor.name$_$peek.port$, $peek.numTokens$);
+$peek.target$ = getPeekPtr($actor.name$_$peek.port$, $peek.numTokens$);
 
 >>
 
 Read(read) ::= <<
-$read.target$ = getReadPtr($instance.actor.name$_$read.port$, $read.numTokens$);
+$read.target$ = getReadPtr($actor.name$_$read.port$, $read.numTokens$);
 
 >>
 
 ReadEnd(readEnd) ::= <<
-setReadEnd($instance.actor.name$_$readEnd.port$);
+setReadEnd($actor.name$_$readEnd.port$);
 
 >>
 
@@ -93,12 +93,12 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 >>
 
 Write(write) ::= <<
-$write.target$ = getWritePtr($instance.actor.name$_$write.port$, $write.numTokens$);
+$write.target$ = getWritePtr($actor.name$_$write.port$, $write.numTokens$);
 
 >>
 
 WriteEnd(writeEnd) ::= <<
-setWriteEnd($instance.actor.name$_$writeEnd.port$);
+setWriteEnd($actor.name$_$writeEnd.port$);
 
 >>
 
@@ -157,7 +157,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|hasRoom($instance.actor.name$_$port$, $pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|hasRoom($actor.name$_$port$, $pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,11 +196,11 @@ int scheduler();
 
 
 constructor(parameters) ::= <<
-	actor_$instance.actor.name$($parameters: {int}; separator=", "$);
+	actor_$actor.name$($parameters: {int}; separator=", "$);
 >>
 
 parameters(parameters) ::= <<
-$parameters.keys: { k | int $k$;}; separator="\n"$
+$parameters: { k | int $k$;}; separator="\n"$
 
 >>
 
@@ -208,10 +208,10 @@ $parameters.keys: { k | int $k$;}; separator="\n"$
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-instance(instance) ::= <<
+actor(actor) ::= <<
 
-#ifndef __ACTOR_$instance.actor.name$_H__
-#define __ACTOR_$instance.actor.name$_H__
+#ifndef __ACTOR_$actor.name$_H__
+#define __ACTOR_$actor.name$_H__
 
 #include <iostream>
 
@@ -221,56 +221,56 @@ instance(instance) ::= <<
 // Input FIFOs
 enum
 {
-	$instance.actor.inputs.list: {$instance.actor.name$_$it.name$}; separator=",\n"$
+	$actor.inputs.list: {$actor.name$_$it.name$}; separator=",\n"$
 };
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
 enum
 {
-	$instance.actor.outputs.list: {$instance.actor.name$_$it.name$}; separator=",\n"$
+	$actor.outputs.list: {$actor.name$_$it.name$}; separator=",\n"$
 };
 
 
-class actor_$instance.actor.name$ : public ActorGen 
+class actor_$actor.name$ : public ActorGen 
 {
 
 public:
-$constructor(instance.parameters)$
+$constructor(actor.parameters.list)$
 	
 	void initializeActor();
 
 $! ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
-	$instance.actor.stateVars.list: nonConstStateVar(it)$ !$
+	$actor.stateVars.list: nonConstStateVar(it)$ !$
 
 private:
 ////////////////////////////////////////////////////////////////////////////////
 // Parameters
-$parameters(instance.parameters)$
+$parameters(actor.parameters.list)$
 ////////////////////////////////////////////////////////////////////////////////
 // Non-const state variables of the actor
-$instance.actor.stateVars.list: nonConstStateVar(it)$
+$actor.stateVars.list: nonConstStateVar(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-	$instance.actor.procs.list: procedure(it)$
+	$actor.procs.list: procedure(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-	$instance.actor.actions: action(it)$
+	$actor.actions: action(it)$
 
 public:
-	$if(instance.actor.initializes)$
+	$if(actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-	$instance.actor.initializes: action(it)$
+	$actor.initializes: action(it)$
 	void initialize();
 
 $endif$
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
-$if(instance.actor.actionScheduler.fsm)$
-$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
+$if(actor.actionScheduler.fsm)$
+$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 $else$
-$scheduler(actions=instance.actor.actionScheduler.actions)$
+$scheduler(actions=actor.actionScheduler.actions)$
 $endif$
 
 };

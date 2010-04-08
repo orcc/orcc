@@ -62,7 +62,7 @@ $decrement.target$--;
 >>
 
 HasTokens(hasTokens) ::= <<
-$hasTokens.target$ = m_poTabIn[$instance.actor.name$_$hasTokens.port$]->hasTokens($hasTokens.numTokens$);
+$hasTokens.target$ = m_poTabIn[$actor.name$_$hasTokens.port$]->hasTokens($hasTokens.numTokens$);
 
 >>
 
@@ -78,24 +78,24 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 
 Peek(peek) ::= <<
 $if(peek.unit)$
-m_poTabIn[$instance.actor.name$_$peek.port$]->peek($peek.target$);$\n$
+m_poTabIn[$actor.name$_$peek.port$]->peek($peek.target$);$\n$
 $else$
-m_poTabIn[$instance.actor.name$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
+m_poTabIn[$actor.name$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
 $endif$
 
 >>
 
 Read(read) ::= <<
 $if(read.unit)$
-m_poTabIn[$instance.actor.name$_$read.port$]->get($read.target$);$\n$
+m_poTabIn[$actor.name$_$read.port$]->get($read.target$);$\n$
 $else$
-m_poTabIn[$instance.actor.name$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
+m_poTabIn[$actor.name$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
 $endif$
 
 >>
 
 ReadEnd(readEnd) ::= <<
-setReadEnd($instance.actor.name$_$readEnd.port$);
+setReadEnd($actor.name$_$readEnd.port$);
 
 >>
 
@@ -118,15 +118,15 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 
 Write(write) ::= <<
 $if(write.unit)$
-m_poTabOut[$instance.actor.name$_$write.port$]->put($write.target$);$\n$
+m_poTabOut[$actor.name$_$write.port$]->put($write.target$);$\n$
 $else$
-m_poTabOut[$instance.actor.name$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
+m_poTabOut[$actor.name$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
 $endif$
 
 >>
 
 WriteEnd(writeEnd) ::= <<
-setWriteEnd($instance.actor.name$_$writeEnd.port$);
+setWriteEnd($actor.name$_$writeEnd.port$);
 
 >>
 
@@ -173,7 +173,7 @@ $BlockNode(whileNode.joinNode)$
 
 procedure(procedure) ::= <<
 
-$procedure.returnType$ actor_$instance.actor.name$::$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$)
+$procedure.returnType$ actor_$actor.name$::$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$)
 {
 $if(procedure.locals.list)$
 	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
@@ -196,7 +196,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|m_poTabOut[$instance.actor.name$_$port$]->hasRooms($pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|m_poTabOut[$actor.name$_$port$]->hasRooms($pattern.(port)$)}; separator=" && "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -226,7 +226,7 @@ $actions: actionTest(action=it); separator="\nelse "$
 >>
 
 scheduler(actions) ::= <<
-int actor_$instance.actor.name$::scheduler()
+int actor_$actor.name$::scheduler()
 {
 	bool res = true;
 	int i = 0;
@@ -270,7 +270,7 @@ $nextStates: actionTestState(nextState=it); separator=" else "$
 >>
 
 stateScheduler(transition) ::= <<
-bool actor_$instance.actor.name$::$transition.sourceState$_state_scheduler()
+bool actor_$actor.name$::$transition.sourceState$_state_scheduler()
 {
 	bool res = false;
 	$schedulingTestState(nextStates=transition.nextStateInfo)$
@@ -294,7 +294,7 @@ default:
 
 schedulerFSM(actions, fsm) ::= <<
 $if(actions)$
-bool actor_$instance.actor.name$::outside_FSM_scheduler()
+bool actor_$actor.name$::outside_FSM_scheduler()
 {
 	bool res = false;
 	int i = 0;
@@ -305,7 +305,7 @@ bool actor_$instance.actor.name$::outside_FSM_scheduler()
 
 $endif$
 $fsm.transitions: stateScheduler(transition=it); separator="\n"$
-int actor_$instance.actor.name$::scheduler()
+int actor_$actor.name$::scheduler()
 {
 	bool res = true;
 	int i = 0;
@@ -333,14 +333,14 @@ int actor_$instance.actor.name$::scheduler()
 >>
 
 constructor(parameters, stateVars) ::= <<
-actor_$instance.actor.name$::actor_$instance.actor.name$($parameters.keys: {int $it$}; separator=", "$)
+actor_$actor.name$::actor_$actor.name$($parameters: {int $it$}; separator=", "$)
 :
-$parameters.keys: {$it$($it$),}; separator="\n"$
-$if(instance.actor.actionScheduler.fsm)$
-_FSM_state(state_$instance.actor.actionScheduler.fsm.initialState$),
+$parameters: {$it$($it$),}; separator="\n"$
+$if(actor.actionScheduler.fsm)$
+_FSM_state(state_$actor.actionScheduler.fsm.initialState$),
 
 $endif$
-ActorGen($length(instance.actor.inputs.list)$, $length(instance.actor.outputs.list)$)
+ActorGen($length(actor.inputs.list)$, $length(actor.outputs.list)$)
 {
 	$stateVars : nonConstStateVar(it)$
 }
@@ -352,28 +352,28 @@ ActorGen($length(instance.actor.inputs.list)$, $length(instance.actor.outputs.li
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-instance(instance) ::= <<
+actor(actor) ::= <<
 
-#include "Actor_$instance.actor.name$.h"
+#include "Actor_$actor.name$.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
 namespace
 {
-	$instance.actor.stateVars.list: stateVar(it)$}
+	$actor.stateVars.list: stateVar(it)$}
 
 
 
-$constructor(parameters=instance.parameters, stateVars=instance.actor.stateVars.list)$
+$constructor(parameters=actor.parameters.list, stateVars=actor.stateVars.list)$
 
 
-void actor_$instance.actor.name$::initializeActor()
+void actor_$actor.name$::initializeActor()
 {
 #ifdef __TRACE_TOKENS__
 	std::string strTrace("");
 	strTrace = __FILE__;
 	unsigned uDesc = g_oTracer.createFileDescriptor(strTrace);
-	for(unsigned uIdx = 0; uIdx < $length(instance.actor.inputs.list)$; uIdx++)
+	for(unsigned uIdx = 0; uIdx < $length(actor.inputs.list)$; uIdx++)
 	{
 	  strTrace = "m_poTabIn[" + toString(uIdx) + "] = " + toString((unsigned)m_poTabIn[uIdx]);
 	  g_oTracer.addPort(uDesc, strTrace);
@@ -384,31 +384,31 @@ void actor_$instance.actor.name$::initializeActor()
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-$instance.actor.procs.list: procedure(it)$
+$actor.procs.list: procedure(it)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-$instance.actor.actions: action(it)$
-$if(instance.actor.initializes)$
+$actor.actions: action(it)$
+$if(actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-$instance.actor.initializes: action(it)$
-void actor_$instance.actor.name$::initialize()
+$actor.initializes: action(it)$
+void actor_$actor.name$::initialize()
 {
 	bool res = true;
 	int i = 0;
 
-	$if(instance.actor.initializes)$
-	$schedulingTest(instance.actor.initializes)$
+	$if(actor.initializes)$
+	$schedulingTest(actor.initializes)$
 	$endif$
 }
 
 $endif$
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
-$if(instance.actor.actionScheduler.fsm)$
-$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
+$if(actor.actionScheduler.fsm)$
+$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 $else$
-$scheduler(actions=instance.actor.actionScheduler.actions)$
+$scheduler(actions=actor.actionScheduler.actions)$
 $endif$
 
 >>

@@ -31,8 +31,6 @@ package net.sf.orcc.backends.cpp;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashSet;
-import java.util.Set;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.ir.Actor;
@@ -55,8 +53,6 @@ import org.antlr.stringtemplate.StringTemplateGroup;
  */
 public final class CppActorPrinter extends Printer {
 
-	private Set<Actor> alreadyExists = new HashSet<Actor>();
-
 	private StringTemplateGroup group;
 
 	/**
@@ -72,20 +68,16 @@ public final class CppActorPrinter extends Printer {
 		Printer.register(this);
 	}
 
-	public void printActor(String fileName, Instance instance)
-			throws IOException {
-		Actor actor = instance.getActor();
-		if (!alreadyExists.contains(actor) && !actor.isSystem()) {
-			StringTemplate template = group.getInstanceOf("instance");
+	public void printActor(String fileName, Actor actor) throws IOException {
+		if (!actor.isSystem()) {
+			StringTemplate template = group.getInstanceOf("actor");
 
-			template.setAttribute("instance", instance);
+			template.setAttribute("actor", actor);
 
 			byte[] b = template.toString(80).getBytes();
 			OutputStream os = new FileOutputStream(fileName);
 			os.write(b);
 			os.close();
-
-			alreadyExists.add(actor);
 		}
 	}
 

@@ -105,13 +105,13 @@ $connectionMap: {extern FifoAPI * lockedFifo_$it$;}; separator="\n"$
 
 >>
 
-initializerList(id, parameters) ::= <<
-$id$($parameters:{$it$}; separator=", "$)
+initializerList(id, instance) ::= <<
+$id$($instance.actor.parameters.list:{$instance.parameters.(it)$}; separator=", "$)
 >>
 
 
 initializerLists(instances) ::= <<
-$instances: initializerList(id=it.id, parameters=it.parameters); separator=",\n"$
+$instances: initializerList(id=it.id, instance=it); separator=",\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
