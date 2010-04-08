@@ -32,9 +32,14 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorClass;
 import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.classes.StaticClass;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.NetworkClass;
+import net.sf.orcc.network.classes.CSDFNetworkClass;
+import net.sf.orcc.network.classes.DynamicNetworkClass;
+import net.sf.orcc.network.classes.SDFNetworkClass;
 import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
 
 /**
@@ -46,9 +51,14 @@ import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
  */
 public class NetworkClassifier implements INetworkTransformation {
 
+	private static int SDF = 0;
+	private static int CSDF = 1;
+	private static int DYNAMIC = 2;
+
 	/**
 	 * Creates a new classifier
 	 */
+
 	public NetworkClassifier() {
 	}
 
@@ -68,6 +78,34 @@ public class NetworkClassifier implements INetworkTransformation {
 			ActorClass clasz = classifier.classify(actor);
 			actor.setActorClass(clasz);
 		}
+
+		network.setNetworkClass(getNetworkClass(network));
 	}
 
+	private NetworkClass getNetworkClass(Network network) {
+		NetworkClass networkClass = new SDFNetworkClass();
+
+		int status = SDF;
+
+		for (Actor actor : network.getActors()) {
+			ActorClass clasz = actor.getActorClass();
+
+			if (clasz.isDynamic()) {
+				if (status < DYNAMIC) {
+					networkClass = new DynamicNetworkClass();
+					status = DYNAMIC;
+				}
+			} else if (clasz.isStatic()) {
+				if (status < CSDF) {
+					StaticClass staticClass = (StaticClass) clasz;
+					if (staticClass.getNumberOfPhases() > 1) {
+						networkClass = new CSDFNetworkClass();
+						status = CSDF;
+					}
+				}
+			}
+		}
+		return networkClass;
+
+	}
 }

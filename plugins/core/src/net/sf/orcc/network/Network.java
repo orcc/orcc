@@ -62,6 +62,11 @@ public class Network {
 	private static Map<String, Actor> actorPool = new HashMap<String, Actor>();
 
 	/**
+	 * the class of this network. Initialized to unknown.
+	 */
+	private NetworkClass networkClass;
+
+	/**
 	 * Clears the actor pool. Should be called after a network has been
 	 * instantiated.
 	 */
@@ -494,6 +499,14 @@ public class Network {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	public void setNetworkClass(NetworkClass networkClass) {
+		this.networkClass = networkClass;
+	}
+
+	public NetworkClass getNetworkClass() {
+		return networkClass;
 	}
 
 }
