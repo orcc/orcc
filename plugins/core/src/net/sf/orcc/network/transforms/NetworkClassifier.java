@@ -85,22 +85,22 @@ public class NetworkClassifier implements INetworkTransformation {
 	private NetworkClass getNetworkClass(Network network) {
 		NetworkClass networkClass = new SDFNetworkClass();
 
-		int status = SDF;
+		int currentClass = SDF;
 
 		for (Actor actor : network.getActors()) {
 			ActorClass clasz = actor.getActorClass();
 
-			if (clasz.isDynamic()) {
-				if (status < DYNAMIC) {
+			if (clasz.isDynamic() || clasz.isQuasiStatic()) {
+				if (currentClass < DYNAMIC) {
 					networkClass = new DynamicNetworkClass();
-					status = DYNAMIC;
+					currentClass = DYNAMIC;
 				}
 			} else if (clasz.isStatic()) {
-				if (status < CSDF) {
+				if (currentClass < CSDF) {
 					StaticClass staticClass = (StaticClass) clasz;
 					if (staticClass.getNumberOfPhases() > 1) {
 						networkClass = new CSDFNetworkClass();
-						status = CSDF;
+						currentClass = CSDF;
 					}
 				}
 			}
