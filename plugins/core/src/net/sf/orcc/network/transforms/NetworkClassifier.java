@@ -29,17 +29,15 @@
 package net.sf.orcc.network.transforms;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.classes.CSDFNetworkClass;
+import net.sf.orcc.classes.DynamicNetworkClass;
+import net.sf.orcc.classes.IClass;
+import net.sf.orcc.classes.SDFNetworkClass;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorClass;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.classes.StaticClass;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.NetworkClass;
-import net.sf.orcc.network.classes.CSDFNetworkClass;
-import net.sf.orcc.network.classes.DynamicNetworkClass;
-import net.sf.orcc.network.classes.SDFNetworkClass;
 import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
 
 /**
@@ -75,34 +73,31 @@ public class NetworkClassifier implements INetworkTransformation {
 			phi.transform(actor);
 
 			ActorClassifierIndependent classifier = new ActorClassifierIndependent();
-			ActorClass clasz = classifier.classify(actor);
+			IClass clasz = classifier.classify(actor);
 			actor.setActorClass(clasz);
 		}
 
 		network.setNetworkClass(getNetworkClass(network));
 	}
 
-	private NetworkClass getNetworkClass(Network network) {
-		NetworkClass networkClass = new SDFNetworkClass();
+	private IClass getNetworkClass(Network network) {
+		IClass networkClass = new SDFNetworkClass();
 
 		int currentClass = SDF;
 
 		for (Actor actor : network.getActors()) {
-			ActorClass clasz = actor.getActorClass();
+			IClass clasz = actor.getActorClass();
 
 			if (clasz.isDynamic() || clasz.isQuasiStatic()) {
 				if (currentClass < DYNAMIC) {
 					networkClass = new DynamicNetworkClass();
 					currentClass = DYNAMIC;
 				}
-			} else if (clasz.isStatic()) {
+			} else if (clasz.isCSDF()) {
 				if (currentClass < CSDF) {
-					StaticClass staticClass = (StaticClass) clasz;
-					if (staticClass.getNumberOfPhases() > 1) {
-						networkClass = new CSDFNetworkClass();
-						currentClass = CSDF;
+					networkClass = new CSDFNetworkClass();
+					currentClass = CSDF;
 					}
-				}
 			}
 		}
 		return networkClass;

@@ -48,6 +48,8 @@ import net.sf.orcc.tools.normalizer.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrderedMap;
 
+import net.sf.orcc.classes.IClass;
+
 import org.jgrapht.DirectedGraph;
 
 /**
@@ -64,7 +66,7 @@ public class Network {
 	/**
 	 * the class of this network. Initialized to unknown.
 	 */
-	private NetworkClass networkClass;
+	private IClass networkClass;
 
 	/**
 	 * Clears the actor pool. Should be called after a network has been
@@ -501,11 +503,11 @@ public class Network {
 		return name;
 	}
 
-	public void setNetworkClass(NetworkClass networkClass) {
+	public void setNetworkClass(IClass networkClass) {
 		this.networkClass = networkClass;
 	}
 
-	public NetworkClass getNetworkClass() {
+	public IClass getNetworkClass() {
 		return networkClass;
 	}
 
