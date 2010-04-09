@@ -133,9 +133,13 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			try {
 				if (breakpoint.isEnabled()) {
 					try {
-						sendRequest("set "
-								+ (((ILineBreakpoint) breakpoint)
-										.getLineNumber() - 1));
+						// sendRequest("set "
+						// + (((ILineBreakpoint) breakpoint)
+						// .getLineNumber() - 1));
+						sendRequest(
+								"set",
+								breakpoint.getMarker().getResource().getName(),
+								(((ILineBreakpoint) breakpoint).getLineNumber()));
 					} catch (CoreException e) {
 					}
 				}
@@ -209,8 +213,11 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
 		if (supportsBreakpoint(breakpoint)) {
 			try {
-				sendRequest("clear "
-						+ ((ILineBreakpoint) breakpoint).getLineNumber());
+				// sendRequest("clear "
+				// + ((ILineBreakpoint) breakpoint).getLineNumber());
+				sendRequest("clear",
+						breakpoint.getMarker().getResource().getName(),
+						(((ILineBreakpoint) breakpoint).getLineNumber()));
 			} catch (CoreException e) {
 			}
 		}
@@ -373,10 +380,10 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 
 	public void propertyChange(PropertyChangeEvent event) {
 		OrccThread orccThread = threadMap.get(event.getNewValue());
-		if (orccThread != null) {
-			orccThread.setBreakpoints(null);
-			orccThread.setStepping(false);
-		}
+//		if (orccThread != null) {
+//			orccThread.setBreakpoints(null);
+//			orccThread.setStepping(false);
+//		}
 
 		if (event.getPropertyName().equals("started")) {
 			started();
@@ -446,12 +453,17 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			fInterpreter.suspendAll();
 		} else if (request.equals("step")) {
 			fInterpreter.stepAll();
-		} else if (request.startsWith("set")) {
-			// TODO : fInterpreter.set_breakpoint(request.indexOf("set"));
-		} else if (request.startsWith("clear")) {
-			// TODO : fInterpreter.clear_breakpoint(request.indexOf("clear"));
 		} else if (request.equals("terminate")) {
 			fInterpreter.terminate();
+		}
+	}
+
+	private void sendRequest(String request, String id, int lineNumber)
+			throws DebugException {
+		if (request.equals("set")) {
+			fInterpreter.set_breakpoint(id, lineNumber);
+		} else if (request.equals("clear")) {
+			fInterpreter.clear_breakpoint(id, lineNumber);
 		}
 	}
 
@@ -489,13 +501,15 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		if (breakpoint.getModelIdentifier().equals(ID_ORCC_DEBUG_MODEL)) {
 			IMarker marker = breakpoint.getMarker();
 			if (marker != null) {
-				try {
-					String inputFile = getLaunch().getLaunchConfiguration()
-							.getAttribute(INPUT_FILE, "");
-					IPath p = new Path(new File(inputFile).getPath());
-					return marker.getResource().getFullPath().equals(p);
-				} catch (CoreException e) {
-				}
+				// try {
+				// String inputFile = getLaunch(). getLaunchConfiguration()
+				// .getAttribute(INPUT_FILE, "");
+				// IPath p = new Path(new File(inputFile).getParent());
+				// return marker.getResource().getFullPath().equals(p);
+				// } catch (CoreException e) {
+				// }
+				// TODO : check we are running project containing this resource
+				return true;
 			}
 		}
 		return false;

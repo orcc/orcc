@@ -250,11 +250,11 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			break;
 		}
 
-		throw new OrccRuntimeException(
-				"could not evaluate binary expression with OP="
-						+ expr.getOp().toString() + "("
-						+ expr.getOp().getText() + ") and E1=" + val1 + "; E2="
-						+ val2);
+		throw new OrccRuntimeException("Error at location : "
+				+ expr.getLocation().getStartLine()
+				+ "\nCould not evaluate binary expression with OP="
+				+ expr.getOp().toString() + "(" + expr.getOp().getText()
+				+ ") and E1=" + val1 + "; E2=" + val2);
 	}
 
 	protected Object interpretUnaryExpr(UnaryExpr expr, Object value) {
@@ -281,10 +281,10 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			break;
 		}
 
-		throw new OrccRuntimeException(
-				"could not evaluate unary expression with OP="
-						+ expr.getOp().toString() + "("
-						+ expr.getOp().getText() + ")");
+		throw new OrccRuntimeException("Error at location : "
+				+ expr.getLocation().getStartLine()
+				+ "\nCould not evaluate unary expression with OP="
+				+ expr.getOp().toString() + "(" + expr.getOp().getText() + ")");
 	}
 
 }

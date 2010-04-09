@@ -198,9 +198,8 @@ public class DisplayActor extends AbstractInterpretedActor {
 	}
 
 	@Override
-	public boolean step() {
-		schedule();
-		return true;
+	public int step(boolean doStepInto) {
+		return schedule();
 	}
 
 	private void writeMB() {

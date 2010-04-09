@@ -68,7 +68,7 @@ public class OrccLineBreakpoint extends LineBreakpoint {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IMarker marker = resource
-						.createMarker("example.debug.core.Orcc.markerType.lineBreakpoint");
+						.createMarker("net.sf.orcc.debug.lineBreakpoint.marker");
 				setMarker(marker);
 				marker.setAttribute(IBreakpoint.ENABLED, Boolean.TRUE);
 				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);

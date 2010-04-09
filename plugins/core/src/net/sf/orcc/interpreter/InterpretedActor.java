@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.interpreter;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
@@ -35,14 +38,20 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Constant;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.consts.ConstantEvaluator;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
  * This class defines an actor that can be interpreted by calling
@@ -57,21 +66,41 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	private ConstantEvaluator constEval;
 
 	/**
-	 * Step into utils
+	 * Debugger utils
 	 */
+	public class NodeInfo {
+		public int subNodeIdx;
+		public int nbSubNodes;
+		public List<CFGNode> subNodes;
+		public BlockNode joinNode;
+		public Expression condition;
+
+		public NodeInfo(int subNodeIdx, int nbSubNodes, List<CFGNode> subNodes,
+				BlockNode joinNode, Expression condition) {
+			this.subNodeIdx = subNodeIdx;
+			this.nbSubNodes = nbSubNodes;
+			this.subNodes = subNodes;
+			this.joinNode = joinNode;
+			this.condition = condition;
+		}
+	}
+
 	private Action currentAction = null;
+	private List<NodeInfo> nodeStack;
+	private int nodeStackLevel;
+	private List<Instruction> instrStack;
 
-	private int currentNode = 0;
-
+	/**
+	 * Simulator properties
+	 */
 	protected String fsmState;
 
 	protected NodeInterpreter interpret;
 	protected boolean isSynchronousScheduler = false;
-	
+
+	protected ExpressionEvaluator exprInterpreter;
 	private ListAllocator listAllocator;
 	protected ActionScheduler sched;
-
-	// private List<Actor> schedPred;
 
 	/**
 	 * Creates a new interpreted actor with the given instance id and the given
@@ -90,14 +119,18 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		} else {
 			fsmState = "IDLE";
 		}
-		// TODO : get scheduling predecessors
 
 		// Create the List allocator for state and procedure local vars
 		listAllocator = new ListAllocator();
+		// Create the expression evaluator
+		exprInterpreter = new ExpressionEvaluator();
+		// Create lists for nodes and instructions in case of debug mode
+		nodeStack = new ArrayList<NodeInfo>();
+		instrStack = new ArrayList<Instruction>();
 
 		// Build a node interpreter for visiting CFG and instructions
 		interpret = new NodeInterpreter(name);
-		
+
 		// Creates an expression evaluator for state and local variables init
 		this.constEval = new ConstantEvaluator();
 	}
@@ -132,6 +165,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 	/**
 	 * Require the execution (interpretation) of the given actor's action
+	 * 
 	 * @param action
 	 * @return <code>1</code>
 	 */
@@ -155,6 +189,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 	/**
 	 * Get the next schedulable action to be executed for this actor
+	 * 
 	 * @return the schedulable action or null
 	 */
 	private Action getNextAction() {
@@ -255,9 +290,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		// Procedure return value
 		Object result = interpret.getReturnValue();
 
-		// TODO : check return type
-		// Type type = procedure.getReturnType();
-
 		// Return the result object
 		return result;
 	}
@@ -273,7 +305,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		Object isSchedulable = interpretProc(action.getScheduler());
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
-	
+
 	@Override
 	public Integer schedule() {
 		if (isSynchronousScheduler) {
@@ -347,22 +379,80 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		}
 	}
 
-	@Override
-	public boolean step() {
-		if (currentAction != null) {
-			if (currentNode == currentAction.getBody().getNodes().size()) {
-				currentAction = null;
-				return true;
-			}else {
-				CFGNode node = currentAction.getBody().getNodes().get(currentNode++);
-				node.accept(interpret);
-				lastVisitedLocation = node.getLocation();
-				lastVisitedAction = currentAction.getName();
-				return false;
+	private void popNodeStack() {
+		NodeInfo node = nodeStack.get(nodeStackLevel - 1);
+		if (node.nbSubNodes > 0) {
+			if (node.subNodeIdx == node.nbSubNodes) {
+				if ((node.condition != null)
+						&& ((Boolean) node.condition.accept(exprInterpreter))) {
+					node.subNodeIdx = 0;
+				} else {
+					nodeStack.remove(nodeStackLevel - 1);
+					nodeStackLevel--;
+					if (node.joinNode != null) {
+						Iterator<Instruction> it = node.joinNode.iterator();
+						while (it.hasNext()) {
+							instrStack.add(it.next());
+						}
+						nodeStack.add(new NodeInfo(0, 0, null, null, null));
+						nodeStackLevel++;
+					}
+				}
+			} else {
+				CFGNode subNode = node.subNodes.get(node.subNodeIdx++);
+				lastVisitedLocation = subNode.getLocation();
+				if (subNode instanceof IfNode) {
+					Object condition = ((IfNode) subNode).getValue().accept(
+							exprInterpreter);
+					if ((Boolean) condition) {
+						nodeStack.add(new NodeInfo(0, ((IfNode) subNode)
+								.getThenNodes().size(), ((IfNode) subNode)
+								.getThenNodes(), ((IfNode) subNode)
+								.getJoinNode(), null));
+					} else {
+						nodeStack.add(new NodeInfo(0, ((IfNode) subNode)
+								.getElseNodes().size(), ((IfNode) subNode)
+								.getElseNodes(), ((IfNode) subNode)
+								.getJoinNode(), null));
+					}
+					nodeStackLevel++;
+				} else if (subNode instanceof WhileNode) {
+					Expression condition = ((WhileNode) subNode).getValue();
+					if ((Boolean) condition.accept(exprInterpreter)) {
+						nodeStack.add(new NodeInfo(0, ((WhileNode) subNode)
+								.getNodes().size(), ((WhileNode) subNode)
+								.getNodes(), null, condition));
+						nodeStackLevel++;
+					}
+				} else /* BlockNode => add instructions to stack */{
+					Iterator<Instruction> it = ((BlockNode) subNode).iterator();
+					while (it.hasNext()) {
+						instrStack.add(it.next());
+					}
+					nodeStack.add(new NodeInfo(0, 0, null, null, null));
+					nodeStackLevel++;
+				}
 			}
-		}else {
+		} else {
+			// Instructions
+			if (instrStack.size() > 0) {
+				Instruction instr = instrStack.remove(0);
+				instr.accept(interpret);
+				lastVisitedLocation = instr.getLocation();
+			}
+			if (instrStack.size() == 0) {
+				nodeStack.remove(nodeStackLevel - 1);
+				nodeStackLevel--;
+			}
+		}
+	}
+
+	@Override
+	public int step(boolean doStepInto) {
+		if (currentAction == null) {
 			currentAction = getNextAction();
 			if (currentAction != null) {
+				lastVisitedAction = currentAction.getName();
 				// Allocate local List variables
 				for (Variable local : currentAction.getBody().getLocals()) {
 					Type type = local.getType();
@@ -370,10 +460,23 @@ public class InterpretedActor extends AbstractInterpretedActor {
 						local.setValue(listAllocator.allocate(type));
 					}
 				}
-				// Control nodes index
-				currentNode = 0;
+				// Initialize stack frame
+				nodeStack.add(new NodeInfo(0, currentAction.getBody()
+						.getNodes().size(), currentAction.getBody().getNodes(),
+						null, null));
+				nodeStackLevel = 1;
 			}
 		}
-		return true;
+		if (currentAction != null) {
+			if (nodeStackLevel > 0) {
+				popNodeStack();
+				return 0;
+			} else {
+				currentAction = null;
+				return 1;
+			}
+		} else {
+			return -1;
+		}
 	}
 }

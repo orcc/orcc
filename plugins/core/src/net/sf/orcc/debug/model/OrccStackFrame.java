@@ -28,10 +28,13 @@
  */
 package net.sf.orcc.debug.model;
 
-import java.io.File;
-
 import net.sf.orcc.interpreter.DebugThread.InterpreterStackFrame;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -63,8 +66,12 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		super((OrccDebugTarget) thread.getDebugTarget());
 		fId = id;
 		fThread = thread;
-		fFileName = new File(frame.actorFilename).getName();
-		//fFileName = frame.actorFilename;
+		// fFileName = new File(frame.actorFilename).getName();
+		// Get relative path in the workspace :
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IFile file = root.getFileForLocation(new Path(frame.actorFilename));
+		fFileName = file.getProjectRelativePath().toString();
 		fLineNumber = frame.codeLine;
 		try {
 			fName = thread.getName() + "." + frame.currentAction;
@@ -72,15 +79,15 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 			e.printStackTrace();
 		}
 		int numVars = frame.stateVars.size();
-		fVariables = new IVariable[numVars+1];
+		fVariables = new IVariable[numVars + 1];
 		OrccValue value = new OrccValue((OrccDebugTarget) thread
 				.getDebugTarget(), frame.fsmState);
 		fVariables[0] = new OrccVariable(this, "FSM state", value);
 		String[] varNames = frame.stateVars.keySet().toArray(new String[0]);
-		for (int i = 1; i < numVars+1; i++) {
-			value = new OrccValue((OrccDebugTarget) thread
-					.getDebugTarget(), frame.stateVars.get(varNames[i-1]));
-			fVariables[i] = new OrccVariable(this, varNames[i-1], value);
+		for (int i = 1; i < numVars + 1; i++) {
+			value = new OrccValue((OrccDebugTarget) thread.getDebugTarget(),
+					frame.stateVars.get(varNames[i - 1]));
+			fVariables[i] = new OrccVariable(this, varNames[i - 1], value);
 		}
 	}
 

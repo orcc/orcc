@@ -1,7 +1,11 @@
 package net.sf.orcc.interpreter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import net.sf.orcc.ir.Variable;
 
@@ -22,21 +26,22 @@ public class DebugThread {
 		}
 	}
 
+	private IProgressMonitor monitor;
 	private AbstractInterpretedActor actor;
 	private boolean eventPending = false;
 	private InterpreterMain interpreter;
+	private boolean threadTerminated = false;
 	private boolean threadStepInto = false;
 	private boolean threadStepping = false;
 	private boolean threadSuspended = true;
+	private List<Integer> breakpoints;
 
 	public DebugThread(InterpreterMain interpreter,
-			AbstractInterpretedActor actor) {
+			AbstractInterpretedActor actor, IProgressMonitor monitor) {
+		this.monitor = monitor;
 		this.actor = actor;
 		this.interpreter = interpreter;
-	}
-
-	public boolean eventPending() {
-		return eventPending;
+		this.breakpoints = new ArrayList<Integer>();
 	}
 
 	public AbstractInterpretedActor getActor() {
@@ -52,9 +57,6 @@ public class DebugThread {
 		if (actor.actor != null) {
 			stackFrame.actorFilename = actor.actor.getFile();
 			stackFrame.codeLine = actor.getLastVisitedLocation().getStartLine();
-			if (stackFrame.codeLine != 0) {
-				System.out.println("Location not null !");
-			}
 			stackFrame.stateVars.clear();
 			for (Variable stateVar : actor.actor.getStateVars()) {
 				stackFrame.stateVars.put(stateVar.getName(), stateVar
@@ -72,60 +74,113 @@ public class DebugThread {
 		return stackFrame;
 	}
 
+	public boolean isStepping() {
+		return threadStepping;
+	}
+
 	public boolean isSuspended() {
 		return threadSuspended;
 	}
 
 	public void resume() {
-		threadSuspended = false;
-		eventPending = true;
-		interpreter.firePropertyChange("resumed client", null, actor.name);
+		if (threadSuspended) {
+			threadSuspended = false;
+			threadStepping = false;
+			eventPending = false;
+			interpreter.firePropertyChange("resumed client", null, actor.name);
+		}
 	}
 
 	public int run() {
 		Integer actorStatus = 0;
 		if ((!threadSuspended) || (threadStepping)) {
-			if (threadStepInto) {
-				while (threadStepInto) {
-					while (!eventPending)
-						;
-					if (actor.step()) {
-						threadStepInto = false;
-						threadStepping = false;
-						actorStatus = 1;
+			if (threadStepping) {
+//				do {
+//					while (!(eventPending)) {
+//						if ((monitor.isCanceled()) || 
+//								(!threadSuspended) ||
+//								(threadTerminated)) {
+//							return 0;
+//						}
+//					}
+					actorStatus = actor.step(threadStepInto);
+					if (actorStatus > -1) {
+						eventPending = false;
+						interpreter.firePropertyChange("suspended step", null,
+								actor.name);
 					}
-					eventPending = false;
-					interpreter.firePropertyChange("suspended step", null,
-							actor.name);
-				}
+//				} while (actorStatus == 0);
+//				if (actorStatus == 1) {
+//					threadStepping = false;
+//				} else {
+//					actorStatus = 0;
+//				}
 			} else {
-				actorStatus = actor.schedule();
-				eventPending = false;
-				if (threadStepping) {
-					threadStepping = false;
-					interpreter.firePropertyChange("suspended step", null,
-							actor.name);
+				// actorStatus = actor.schedule();
+				do {
+					actorStatus = actor.step(false);
+					for (Integer breakpoint : breakpoints) {
+						if ((breakpoint == actor.lastVisitedLocation
+								.getStartLine())) {
+							threadSuspended = true;
+							threadStepping = true;
+							interpreter.firePropertyChange(
+									"suspended breakpoint " + breakpoint, null, actor.name);
+							actorStatus = 1;
+							break;
+						}
+					}
+				} while (actorStatus == 0);
+				if (actorStatus < 0) {
+					actorStatus = 0;
 				}
 			}
 		}
 		return actorStatus;
 	}
 
-	public void stepInto() {
-		threadStepping = true;
-		threadStepInto = true;
-		eventPending = true;
-		interpreter.firePropertyChange("resumed step", null, actor.name);
+	public synchronized void stepInto() {
+		if (!eventPending) {
+			threadStepping = true;
+			threadStepInto = true;
+			eventPending = true;
+			interpreter.firePropertyChange("resumed step", null, actor.name);
+			interpreter.stepAll();
+		}
 	}
 
-	public void stepOver() {
-		threadStepping = true;
-		eventPending = true;
-		interpreter.firePropertyChange("resumed step", null, actor.name);
+	public synchronized void stepOver() {
+		if (!eventPending) {
+			threadStepping = true;
+			eventPending = true;
+			interpreter.firePropertyChange("resumed step", null, actor.name);
+			interpreter.stepAll();
+		}
 	}
 
-	public void suspend() {
-		threadSuspended = true;
-		interpreter.firePropertyChange("suspended client", null, actor.name);
+	public synchronized void suspend() {
+		if (!threadSuspended) {
+			threadSuspended = true;
+			interpreter
+					.firePropertyChange("suspended client", null, actor.name);
+		}
+	}
+
+	public void suspendFromInterpreter() {
+		if (!threadSuspended) {
+			threadSuspended = true;
+		}
+	}
+
+	public void set_breakpoint(int bkpt) {
+		breakpoints.add(bkpt);
+	}
+
+	public void clear_breakpoint(int bkpt) {
+		breakpoints.remove(bkpt);
+	}
+	
+	public synchronized void terminate() {
+		threadTerminated = true;
 	}
 }

@@ -91,9 +91,8 @@ public class SourceActor extends AbstractInterpretedActor {
 	}
 
 	@Override
-	public boolean step() {
-		schedule();
-		return true;
+	public int step(boolean doStepInto) {
+		return schedule();
 	}
 
 }

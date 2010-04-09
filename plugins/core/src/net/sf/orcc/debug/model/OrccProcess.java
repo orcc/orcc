@@ -398,8 +398,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		// Get configuration options
 		String inputStimulus = configuration.getAttribute(INPUT_STIMULUS, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
-		String file = new File(inputFile).getName();
-		String filename = outputFolder + File.separator + file;
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		boolean enableTraces = configuration.getAttribute(ENABLE_TRACES,
 				DEFAULT_TRACES);
@@ -407,8 +405,8 @@ public class OrccProcess extends PlatformObject implements IProcess {
 			// Get interpreter instance and configure it
 			InterpreterMain interpreter = new InterpreterMain();
 			interpreter.configSystem(this, monitor);
-			interpreter.configNetwork(filename, fifoSize, inputStimulus,
-					enableTraces);
+			interpreter.configNetwork(inputFile, fifoSize, inputStimulus,
+					enableTraces, outputFolder);
 			if (option.equals("debugger")) {
 				// Add the DebugTarget as a listener of interpreter
 				OrccDebugTarget target = new OrccDebugTarget(launch, this,

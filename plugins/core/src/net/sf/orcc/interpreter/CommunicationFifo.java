@@ -52,19 +52,19 @@ public class CommunicationFifo implements ICommunicationFifo {
 	private int size;
 	private int writePos;
 
-	public CommunicationFifo(int size, boolean enableTraces, String fileName,
+	public CommunicationFifo(int size, boolean enableTraces, String folderName,
 			String fifoName) throws Exception {
 		this.size = size;
 		queue = new Object[size];
 		// Create network communication tracing file
 		if (enableTraces) {
-			File file = new File(fileName).getParentFile();
+			File file = new File(folderName);
 			try {
 				fos = new FileOutputStream(new File(file, fifoName
 						+ "_traces.txt"));
 				this.out = new OutputStreamWriter(fos, "UTF-8");
 			} catch (FileNotFoundException e) {
-				String msg = "file not found: \"" + fileName + "\"";
+				String msg = "folder not found: \"" + folderName + "\"";
 				throw new RuntimeException(msg, e);
 			}
 		} else {

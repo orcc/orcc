@@ -158,10 +158,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		instr.getTarget().setValue(hasTok);
 	}
 
-	/**
-	 * CFG nodes visitors
-	 */
-
 	@Override
 	public void visit(IfNode node, Object... args) {
 		/* Interpret first expression ("if" condition) */

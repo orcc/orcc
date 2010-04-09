@@ -64,7 +64,10 @@ public class OrccSourcePathComputerDelegate implements
 		IFile file = root.getFileForLocation(new Path(inputFile));
 
 		// get the container of this file
-		IContainer container = file.getParent();
+		IContainer container = file.getProject(); //getParent();
+//		while (container.getParent() != null) {
+//			container = container.getParent();
+//		}
 
 		return new ISourceContainer[] { new FolderSourceContainer(container,
 				true) };

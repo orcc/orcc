@@ -69,9 +69,9 @@ public abstract class AbstractInterpretedActor {
 	/**
 	 * Check next instruction of the current schedulable action to be interpreted and interpret it.
 	 * 
-	 * @return if current schedulable action has been completed
+	 * @return 1 if running
 	 */
-	public boolean step() {
-		return true;
+	public int step(boolean doStepInto) {
+		return 0;
 	}
 }
