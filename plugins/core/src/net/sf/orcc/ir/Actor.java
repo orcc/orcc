@@ -30,6 +30,7 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
+import net.sf.orcc.classes.IClass;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -50,7 +51,7 @@ public class Actor {
 	/**
 	 * the class of this actor. Initialized to unknown.
 	 */
-	private ActorClass actorClass;
+	private IClass actorClass;
 
 	/**
 	 * The RVC-CAL file this actor was defined in.
@@ -132,7 +133,7 @@ public class Actor {
 	 * 
 	 * @return an actor class
 	 */
-	public ActorClass getActorClass() {
+	public IClass getActorClass() {
 		return actorClass;
 	}
 
@@ -272,7 +273,7 @@ public class Actor {
 	 * @param actorClass
 	 *            an actor class
 	 */
-	public void setActorClass(ActorClass actorClass) {
+	public void setActorClass(IClass actorClass) {
 		this.actorClass = actorClass;
 	}
 
