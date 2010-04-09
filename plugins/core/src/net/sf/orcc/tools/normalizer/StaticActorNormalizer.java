@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import net.sf.orcc.classes.CSDFActorClass;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -49,7 +50,6 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.classes.StaticClass;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -175,7 +175,7 @@ public class StaticActorNormalizer {
 
 	private OrderedMap<Variable> stateVars;
 
-	private StaticClass staticCls;
+	private CSDFActorClass staticCls;
 
 	private OrderedMap<Variable> variables;
 
@@ -184,7 +184,7 @@ public class StaticActorNormalizer {
 	 */
 	public StaticActorNormalizer(Actor actor) {
 		this.actor = actor;
-		staticCls = (StaticClass) actor.getActorClass();
+		staticCls = (CSDFActorClass) actor.getActorClass();
 		stateVars = actor.getStateVars();
 	}
 

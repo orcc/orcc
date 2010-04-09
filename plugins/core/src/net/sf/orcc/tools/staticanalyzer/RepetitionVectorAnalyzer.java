@@ -36,7 +36,7 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.classes.StaticClass;
+import net.sf.orcc.classes.SDFActorClass;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
@@ -96,7 +96,7 @@ public class RepetitionVectorAnalyzer {
 		// multiply the actor repetition count with its number of phases
 		for (Map.Entry<Vertex, Integer> entry : repetitionVector.entrySet()) {
 			Integer val = entry.getValue();
-			int nbPhases = getStaticClass(entry.getKey()).getNumberOfPhases();
+			int nbPhases = getActorStaticClass(entry.getKey()).getNumberOfPhases();
 			entry.setValue(val * nbPhases);
 		}
 
@@ -112,11 +112,11 @@ public class RepetitionVectorAnalyzer {
 	private void calculateRate(Vertex vertex, Rational rate)
 			throws OrccException {
 		Actor actor = vertex.getInstance().getActor();
-		if (!actor.getActorClass().isStatic()) {
+		if (!actor.getActorClass().isSDF()) {
 			throw new OrccException("actor" + actor.getName()
 					+ "is not static!");
 		}
-		StaticClass SdfActor = (StaticClass) actor.getActorClass();
+		SDFActorClass SdfActor = (SDFActorClass) actor.getActorClass();
 
 		rationals.put(vertex, rate);
 
@@ -127,8 +127,7 @@ public class RepetitionVectorAnalyzer {
 
 					Port srcPort = connection.getSource();
 					Port tgtPort = connection.getTarget();
-					StaticClass tgtSdfActor = (StaticClass) tgt.getInstance()
-							.getActor().getActorClass();
+					SDFActorClass tgtSdfActor = getActorStaticClass(tgt);
 
 					int produced = SdfActor.getNumTokensProduced(srcPort);
 					int consumed = tgtSdfActor.getNumTokensConsumed(tgtPort);
@@ -146,8 +145,7 @@ public class RepetitionVectorAnalyzer {
 
 					Port srcPort = connection.getSource();
 					Port tgtPort = connection.getTarget();
-					StaticClass srcSdfActor = (StaticClass) src.getInstance()
-							.getActor().getActorClass();
+					SDFActorClass srcSdfActor = getActorStaticClass(src);
 
 					int produced = srcSdfActor.getNumTokensProduced(srcPort);
 					int consumed = SdfActor.getNumTokensConsumed(tgtPort);
@@ -177,8 +175,8 @@ public class RepetitionVectorAnalyzer {
 				Port srcPort = connection.getSource();
 				Port tgtPort = connection.getTarget();
 
-				StaticClass srcStaticActor = getStaticClass(src);
-				StaticClass tgtStaticActor = getStaticClass(tgt);
+				SDFActorClass srcStaticActor = getActorStaticClass(src);
+				SDFActorClass tgtStaticActor = getActorStaticClass(tgt);
 
 				int produced = srcStaticActor.getNumTokensProduced(srcPort);
 				int consumed = tgtStaticActor.getNumTokensConsumed(tgtPort);
@@ -194,8 +192,8 @@ public class RepetitionVectorAnalyzer {
 		}
 	}
 
-	private StaticClass getStaticClass(Vertex vertex) {
-		StaticClass staticClass = (StaticClass) vertex.getInstance().getActor()
+	private SDFActorClass getActorStaticClass(Vertex vertex) {
+		SDFActorClass staticClass = (SDFActorClass) vertex.getInstance().getActor()
 				.getActorClass();
 		return staticClass;
 	}
