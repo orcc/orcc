@@ -2884,6 +2884,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 		ctxIdxInc := ctxIdxInc + (ctxBlockCat << 2);
 	end
+	
+	procedure ctxIdxSignificantCoeffFlag()
+	begin
+		if ctxBlockCat != 3 or ctxBlockCat != 5 then
+			ctxIdxInc := blCabacIdx;
+		end
+		
+		if ctxBlockCat = 3 then
+			ctxIdxInc := if ( ( blCabacIdx / NumC8x8 ) < 2 ) then blCabacIdx / NumC8x8 else 2 end;
+		end
+	end
 
 	//Derivation process for ctxIdx
 	procedure GetCtxIdx()
@@ -3070,6 +3081,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			ctxIdx := ctxIdxOffset + ctxIdxInc;
 		end
 		
+		if ( ctxIdxOffset = 105 ) then
+			ctxIdxSignificantCoeffFlag();
+			ctxIdx := ctxIdxOffset + ctxIdxInc;
+		end	
 		if ( ctxIdxOffset = 276 ) then
 			if (binIdx = 0 ) then
 				ctxIdx := ctxIdxOffset;
