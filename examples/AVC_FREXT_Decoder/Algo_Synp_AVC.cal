@@ -263,6 +263,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	int blCabacIdx := 0;
 	uint(size=5) numCoeff := 0;
+	int maxNumIdx := 0;
 	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 254)] ;
 	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 254)] ;
 	List (type: int(size = 8), size = 256) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 254)] ;
@@ -6343,7 +6344,24 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		i8x8 = 4
 	end
 	//end for
-
+	
+	Residual_luma_AC_CABAC: action ==>
+	guard
+		val_CodedBlockPatternLuma &  ( 1 << i8x8 )
+	do
+		block_startIdx := 4 * block_startIdx ;
+		block_endIdx := 4 * block_endIdx + 3;
+		maxNumCoeff := 64;
+		ctxBlockCat := 2;
+	end
+	//if not CABAC
+	Residual_luma_skip_AC_CABAC: action ==>
+	guard
+		( val_CodedBlockPatternLuma &  ( 1 << i8x8 ) ) != 0
+	end
+	
+	//--> residual_block( level8x8[ i8x8 ], 4 * startIdx, 4 * endIdx + 3, 64 )
+	
 	//if( ChromaArrayType = = 1 | | ChromaArrayType = = 2 )
 	Residual_ChromaArrayType_1_2_init: action ==>
 	guard
@@ -6759,28 +6777,41 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	Residual_block_Cabac_skip_coded_block_flag: action ==>
 	guard
 		( maxNumCoeff != 64 or chroma_format_idc[sps_id] != 3 ) and IS_CABAC()
+	do
+		coded_block_flag := 1; //When coded_block_flag is not present, it is infered to be equal to 1
 	end
-	
+	/*
 	//for( i = 0; i < maxNumCoeff; i++ )
 	//	coeffLevel[ i ] = 0
-	Residual_block_Cabac_Coeff_Level_Init: action ==> VALUE:[[0: for int i in Integers(0, 64 - 1)]],
-													  ENTROPY_TYPE:[[IS_CAVLC() : for int j in Integers(0, 64 - 1)] ]
+	Residual_block_Cabac_Coeff_Level_Init: action ==>
 	guard
-		IS_CABAC()	
+		IS_CABAC()
 	do
-		foreach int i in Integers(0, maxNumCoeff - 1) do
-			level[i] := 0;
-		end
-	
-		numCoeff := endIdx + 1;
-		blCabacIdx := startIdx;
+		maxNumIdx := 0;
 	end
 	
+	Residual_block_Cabac_Coeff_Level_Send: action ==> VALUE:[0]
+	guard
+		maxNumIdx < maxNumCoeff - 1
+	do	
+		level[maxNumIdx] := 0;
+		maxNumIdx := maxNumIdx + 1;
+	end
+	
+	Residual_block_Cabac_Coeff_Level_done: action ==>
+	guard	
+		maxNumIdx = maxNumCoeff - 1
+	do
+		
+	end
+	*/
 	//if( coded_block_flag ) {
 	Residual_block_Cabac_coded_block_flag_true: action ==>
 	guard
 		coded_block_flag = 1 and blCabacIdx < numCoeff - 1
 	do	
+		numCoeff := block_endIdx + 1;
+		blCabacIdx := block_startIdx;
 		//read significant_coeff_flag Syntax Element
 		GetCabacSignificantCoeffFlagSyntaxElement();
 		start_cabac();
@@ -7299,7 +7330,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_return										( Residual_return_luma_AC							) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8				) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
-		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma; 
+		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_luma_AC_CABAC;
+		Residual_luma_AC_CABAC								( Residual_luma_AC_CABAC 							) --> Residual_block;
+		Residual_luma_AC_CABAC								( Residual_luma_skip_AC_CABAC						) --> Residual_chroma; 
 		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_chroma_DC_init							) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_chroma_DC							) --> Residual_chroma_DC_init;
@@ -7333,11 +7366,17 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 		// residual_block CABAC
 		Residual_block										( Residual_block_Cabac_coded_block_flag_start		) --> Residual_Cabac_coded_block_flag_done;
-		Residual_block										( Residual_block_Cabac_skip_coded_block_flag		) --> Residual_Cabac_Coeff_Level_Init;
-		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_Cabac_Coeff_Level_Init;
-		Residual_Cabac_Coeff_Level_Init						( Residual_block_Cabac_Coeff_Level_Init				) --> Residual_block_Cabac_coded_block_flag_condition;
-		Residual_block_Cabac_coded_block_flag_condition		( Residual_block_Cabac_coded_block_flag_false		) -->Residual_return;
-		Residual_block_Cabac_coded_block_flag_condition		( Residual_block_Cabac_coded_block_flag_true		) -->Residual_block_read_significant_coeff_flag_done;
+		Residual_block										( Residual_block_Cabac_skip_coded_block_flag		) --> Residual_return;
+		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_block_Cabac_coded_block_flag_condition;
+		
+		/*
+		Residual_Cabac_Coeff_Level_Init						( Residual_block_Cabac_Coeff_Level_Init				) --> Residual_block_Cabac_Coeff_Level_Send;
+		Residual_block_Cabac_Coeff_Level_Send				( Residual_block_Cabac_Coeff_Level_Send				) --> Residual_block_Cabac_Coeff_Level_Send;
+		Residual_block_Cabac_Coeff_Level_Send				( Residual_block_Cabac_Coeff_Level_done				) --> Residual_block_Cabac_coded_block_flag_condition;		
+		*/
+		
+		Residual_block_Cabac_coded_block_flag_condition		( Residual_block_Cabac_coded_block_flag_false		) --> Residual_return;
+		Residual_block_Cabac_coded_block_flag_condition		( Residual_block_Cabac_coded_block_flag_true		) --> Residual_block_read_significant_coeff_flag_done;
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_read_significant_coeff_flag_done	) --> Residual_block_read_last_significant_coeff_flag;
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_skip_significant_coeff_flag_while	) --> Residual_block_read_coeff_abs_level_minus1_done;
 		Residual_block_read_last_significant_coeff_flag		( Residual_block_read_last_significant_coeff_flag_done ) --> Residual_block_read_significant_coeff_flag_done;

@@ -78,9 +78,12 @@ actor Algo_BlockExpand_AVC (int SAMPLE_SZ)
   	cavlc = true
   end
   
-  SkipBlockExpand: action ENTROPY_TYPE:[not_cavlc], VALUE:[v] ==> Block:[v]
+  SkipBlockExpand: action ENTROPY_TYPE:[not_cavlc] ==>
   guard
   	not_cavlc = false
+  end
+  
+  SendCabacResValue: action VALUE:[v] ==> Block:[v]
   end
   
   //if it is the end of a block, begin to stuff 0.
@@ -167,7 +170,7 @@ actor Algo_BlockExpand_AVC (int SAMPLE_SZ)
 
   schedule fsm entropie_type:
     entropie_type	( SkipBlockExpand	) --> entropie_type;
-   
+   	SendCabacValue 	( SendCabacResValue	) --> SendCabacValue;
     entropie_type	( BlockExpand		) --> check_last;
 	check_last 		( check_last 		) --> check_last_done;
 	check_last_done ( read_immediate 	) --> check_last;
