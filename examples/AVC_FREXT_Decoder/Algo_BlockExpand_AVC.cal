@@ -180,7 +180,7 @@ actor Algo_BlockExpand_AVC (int SAMPLE_SZ)
 	out_buffer 		( out_finish 		) --> check_last;
 	check_last_done	( out_zero			) --> out_zero;
 	out_zero 		( out_zero 			) --> out_zero;
-	out_zero 		( out_finish		) --> entropie_type;  
+	out_zero 		( out_finish		) --> check_last;  
   end
   
 end
