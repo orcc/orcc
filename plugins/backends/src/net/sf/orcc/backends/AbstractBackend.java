@@ -204,9 +204,13 @@ public abstract class AbstractBackend implements Backend {
 	 */
 	final protected void printActors(List<Actor> actors) throws OrccException {
 		write("Printing actors...\n");
+		long t0 = System.currentTimeMillis();
 		for (Actor actor : actors) {
 			printActor(actor);
 		}
+
+		long t1 = System.currentTimeMillis();
+		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
 	}
 
 	/**

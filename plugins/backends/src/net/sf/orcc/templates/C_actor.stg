@@ -57,49 +57,40 @@ $endif$
 
 Assign(assign) ::= <<
 $assign.target$ = $assign.value$;
-
 >>
 
 Call(call) ::= <<
 $if(call.target)$
 $call.target$ = $endif$
 $call.procedure$($call.parameters; separator=", "$);
-
 >>
 
 Decrement(decrement) ::= <<
 $decrement.target$--;
-
 >>
 
 HasTokens(hasTokens) ::= <<
 $hasTokens.target$ = hasTokens($instance.id$_$hasTokens.port$, $hasTokens.numTokens$);
-
 >>
 
 Increment(increment) ::= <<
 $increment.target$++;
-
 >>
 
 Load(load) ::= <<
 $load.target$ = $load.source$$load.indexes : {[$it$]}$;
-
 >>
 
 Peek(peek) ::= <<
 $peek.target$ = getPeekPtr($instance.id$_$peek.port$, $peek.numTokens$);
-
 >>
 
 Read(read) ::= <<
 $read.target$ = getReadPtr($instance.id$_$read.port$, $read.numTokens$);
-
 >>
 
 ReadEnd(readEnd) ::= <<
 setReadEnd($instance.id$_$readEnd.port$);
-
 >>
 
 Return(return) ::= <<
@@ -110,22 +101,18 @@ $endif$
 
 SelfAssignment(selfAssign) ::= <<
 $selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
-
 >>
 
 Store(store) ::= <<
 $store.target$$store.indexes : {[$it$]}$ = $store.value$;
-
 >>
 
 Write(write) ::= <<
 $write.target$ = getWritePtr($instance.id$_$write.port$, $write.numTokens$);
-
 >>
 
 WriteEnd(writeEnd) ::= <<
 setWriteEnd($instance.id$_$writeEnd.port$);
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -133,11 +120,11 @@ setWriteEnd($instance.id$_$writeEnd.port$);
 ///////////////////////////////////////////////////////////////////////////////
 
 instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
+$instructions: {$(it.class.simpleName)(it)$}; separator="\n"$
 >>
 
 nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}$
+$nodes: {$(it.class.simpleName)(it)$}; separator="\n"$
 >>
 
 // if node
@@ -147,17 +134,20 @@ $instructions(blockNode.instructions)$
 
 // if node
 IfNode(ifNode) ::= <<
+
 if ($ifNode.value$) {
-	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$ else {
-	$nodes(ifNode.elseNodes)$}
-$endif$
-$BlockNode(ifNode.joinNode)$
+	$nodes(ifNode.thenNodes)$
+}$if(ifNode.elseNodes)$ else {
+	$nodes(ifNode.elseNodes)$
+}$endif$$BlockNode(ifNode.joinNode)$
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
+
 while ($whileNode.value$) {
-	$nodes(whileNode.nodes)$}
+	$nodes(whileNode.nodes)$
+}
 $BlockNode(whileNode.joinNode)$
 >>
 

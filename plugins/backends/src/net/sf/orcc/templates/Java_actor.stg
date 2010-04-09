@@ -76,25 +76,21 @@ $endif$
 // hasTokens node
 HasTokens(hasTokens) ::= <<
 $hasTokens.target$ = fifo_$hasTokens.port$.hasTokens($hasTokens.numTokens$);
-
 >>
 
 // peek node
 Peek(peek) ::= <<
 fifo_$peek.port$.peek($peek.target$);
-
 >>
 
 // read node
 Read(read) ::= <<
 fifo_$read.port$.get($read.target$);
-
 >>
 
 // write node
 Write(write) ::= <<
 fifo_$write.port$.put($write.target$);
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
