@@ -9,34 +9,34 @@
 //              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
-
 // Frame buffer
-
 import all caltrop.lib.BitOps;
+actor Mgnt_Framebuf () int(size=ADDR_SZ) RA, int(size=ADDR_SZ) WA, int(size=PIX_SZ) WD
+==> int(size=PIX_SZ) RD :
 
-actor Mgnt_Framebuf ()
-   int(size=ADDR_SZ) RA, int(size=ADDR_SZ) WA, int(size=PIX_SZ) WD ==> int(size=PIX_SZ) RD :
+// Port size declaration
+	int ADDR_SZ = 24;
 
-  // Port size declaration
-  int ADDR_SZ = 24;
-  int BUF_SZ = 121*(384*69+3*192+384);
-  int PIX_SZ = 9;
+	int BUF_SZ = 121 * (384 * 69 + 3 * 192 + 384);
 
-  List( type:int(size=PIX_SZ), size=BUF_SZ ) buf := [ 0 : for int i in Integers(1,BUF_SZ) ];
+	int PIX_SZ = 9;
 
-  action RA:[a] ==> RD:[ buf[a] ]
-//do
-//if a = 25344 + 115456 + 24 then
-//  println("buf["+a+"] contains "+buf[a]);
-//end
- end
+	List(type: int(size=PIX_SZ), size=BUF_SZ) buf := [ 0 : for int i in Integers(1, BUF_SZ) ];
 
-  action WA:[a], WD:[ d ] ==>
-  do
-    buf[a] := d;
-//if a = 25344 + 115456 + 24 then
-//  println("setting buf["+a+"] to "+d);
-//end
-  end
+	action RA:[ a ] ==> RD:[ buf[a] ] //do
+		//if a = 25344 + 115456 + 24 then
+		//  println("buf["+a+"] contains "+buf[a]);
+		//end
+
+	end
+
+	action WA:[ a ], WD:[ d ] ==>
+	do
+		buf[a] := d;
+		//if a = 25344 + 115456 + 24 then
+		//  println("setting buf["+a+"] to "+d);
+		//end
+
+	end
 
 end

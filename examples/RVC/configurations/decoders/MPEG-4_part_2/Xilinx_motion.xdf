@@ -108,7 +108,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Interpolate"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_Interpolation_halfpel"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

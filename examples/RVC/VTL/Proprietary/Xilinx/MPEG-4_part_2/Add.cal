@@ -35,101 +35,105 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-
 // Add.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
-
 // Add motion and texture to produce pixels
-
 import all caltrop.lib.BitOps;
+actor Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==>
+int(size=PIX_SZ) VID :
 
-actor Add ()
-   int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==> int(size=PIX_SZ) VID :
+	int PIX_SZ = 9;
 
-  int PIX_SZ = 9;
-  int MB_COORD_SZ = 8;
-  int BTYPE_SZ = 12;
+	int MB_COORD_SZ = 8;
 
-  int NEWVOP = 2048;
-  int INTRA = 1024;
-  int ACCODED = 2;
+	int BTYPE_SZ = 12;
 
-  bool _CAL_tokenMonitor := true;
-  
-  // Ignore new VOP command
-  cmd.newVop: action BTYPE:[ cmd ] ==>
-  guard
-    bitand( cmd, NEWVOP ) != 0
-  end
+	int NEWVOP = 2048;
 
-  int(size=8) count := 0;
+	int INTRA = 1024;
 
-  // Pure texture
-  cmd.textureOnly: action BTYPE:[ cmd ] ==>
-  guard
-    bitand( cmd, INTRA ) != 0
-  end
+	int ACCODED = 2;
 
-  // Pure motion
-  cmd.motionOnly: action BTYPE:[ cmd ] ==>
-  guard
-    bitand( cmd, ACCODED ) = 0
-  end
+	bool _CAL_tokenMonitor := true;
 
-  // Mixed texture and motion
-  // (Also used to skip vop w,h)
-  cmd.other: action BTYPE:[ cmd ] ==>
-  end
+	// Ignore new VOP command
+	cmd.newVop: action BTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, NEWVOP) != 0
+	end
 
-  done: action ==>
-  guard
-    count = 64
-  do
-    count := 0;
-  end
+	int(size=8) count := 0;
 
-  texture: action TEX:[ tex ] ==> VID:[ tex ]
-  do
-    count := count + 1;
-  end
+	// Pure texture
+	cmd.textureOnly: action BTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, INTRA) != 0
+	end
 
-  motion: action MOT:[mot] ==> VID:[ mot ]
-  do
-    count := count + 1;
-  end
+	// Pure motion
+	cmd.motionOnly: action BTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, ACCODED) = 0
+	end
 
-  combine: action  MOT:[mot], TEX:[ tex ] ==> VID:[ if s < 0 then 0 else if s > 255 then 255 else s end end ]
-  var
-    int(size=PIX_SZ+1) s = tex + mot
-  do
-    count := count + 1;
-  end
+	// Mixed texture and motion
+	// (Also used to skip vop w,h)
+	cmd.other: action BTYPE:[ cmd ] ==>
+	end
 
-  schedule fsm cmd:
-    cmd          ( cmd.newVop        ) --> skipw;
-    cmd          ( cmd.textureOnly   ) --> texture;
-    cmd          ( cmd.motionOnly    ) --> motion;
-    cmd          ( cmd.other         ) --> combine;
+	done: action ==>
+	guard
+		count = 64
+	do
+		count := 0;
+	end
 
-    texture      ( done              ) --> cmd;
-    texture      ( texture           ) --> texture;
+	texture: action TEX:[ tex ] ==> VID:[ tex ]
+	do
+		count := count + 1;
+	end
 
-    motion       ( done              ) --> cmd;
-    motion       ( motion            ) --> motion;
+	motion: action MOT:[ mot ] ==> VID:[ mot ]
+	do
+		count := count + 1;
+	end
 
-    combine      ( done              ) --> cmd;
-    combine      ( combine           ) --> combine;
+	combine: action MOT:[ mot ], TEX:[ tex ] ==> VID:[ if s < 0 then
+			0
+		else
+			if s > 255 then
+				255
+			else
+				s
+			end
+		end ]
+	var
+		int(size=PIX_SZ + 1) s = tex + mot
+	do
+		count := count + 1;
+	end
 
-    skipw        ( cmd.other         ) --> skiph;
-    skiph        ( cmd.other         ) --> cmd;
-  end
+	schedule fsm cmd :
+		cmd ( cmd.newVop ) --> skipw;
+		cmd ( cmd.textureOnly ) --> texture;
+		cmd ( cmd.motionOnly ) --> motion;
+		cmd ( cmd.other ) --> combine;
+		texture ( done ) --> cmd;
+		texture ( texture ) --> texture;
+		motion ( done ) --> cmd;
+		motion ( motion ) --> motion;
+		combine ( done ) --> cmd;
+		combine ( combine ) --> combine;
+		skipw ( cmd.other ) --> skiph;
+		skiph ( cmd.other ) --> cmd;
+	end
 
-  priority
-    cmd.newVop > cmd.textureOnly > cmd.motionOnly > cmd.other;
-    done > combine;
-    done > texture;
-    done > motion;
-  end
+	priority
+		cmd.newVop > cmd.textureOnly > cmd.motionOnly > cmd.other;
+		done > combine;
+		done > texture;
+		done > motion;
+	end
 
 end

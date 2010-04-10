@@ -37,107 +37,123 @@
 // Modifications:
 // * In advance action, indices adjust after every component instead of 6 since now
 //   dealing with a single 8x8 block rather than 6 8x8 blocks.
-
 import all caltrop.lib.BitOps;
+actor Algo_IAP_8x8 () int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ) PTR,
+int(size=3) AC_PRED_DIR, int(size=6) QP, int(size=6) PREV_QP ==>
+int(size=SAMPLE_SZ) QF_AC :
 
-actor Algo_IAP_8x8 ()
-  int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ) PTR, int(size=3) AC_PRED_DIR, int(size=6) QP, int(size=6) PREV_QP ==> int(size=SAMPLE_SZ) QF_AC :
+// Port size declaration
+	int MB_COORD_SZ = 8;
 
-  // Port size declaration
-  int MB_COORD_SZ 	= 8;
-  int SAMPLE_SZ 	= 13;
-  int MAXW_IN_MB	= 121;
-    
-  // Use 3 address lines for component index to save address calculation effort
-  // Also, location 0 is reserved for all uncoded blocks. This protocol must
-  // be identical to the buffer addressing in Predict.cal and Sequence.cal, since
-  // pointer values are generated there.
+	int SAMPLE_SZ = 13;
 
-  int(size=8) count;
-  int BUF_SIZE = (MAXW_IN_MB + 2);
-  int(size=MB_COORD_SZ) ptr;
-  int(size=MB_COORD_SZ) pred_ptr;
+	int MAXW_IN_MB = 121;
 
-  // Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
-  // Add 4 address lines  so that we can store the left edge and top edge AC values (14 in all).
-  List( type:int(size=SAMPLE_SZ), size=BUF_SIZE*16 ) buf := [ 0 : for int k in Integers(1, BUF_SIZE*16)  ];
+	// Use 3 address lines for component index to save address calculation effort
+	// Also, location 0 is reserved for all uncoded blocks. This protocol must
+	// be identical to the buffer addressing in Predict.cal and Sequence.cal, since
+	// pointer values are generated there.
+	int(size=8) count;
 
-  bool top;
-  bool acpred_flag;  
-  int(size=6) s_quant;
-  int(size=6) s_prev_quant;
-  
+	int BUF_SIZE = (MAXW_IN_MB + 2);
 
-  function divroundnearest( int i, int iDenom ) --> int:
-	if(i>=0) then
-		(i+(iDenom>>1))/iDenom
-	else
-		(i-(iDenom>>1))/iDenom
+	int(size=MB_COORD_SZ) ptr;
+
+	int(size=MB_COORD_SZ) pred_ptr;
+
+	// Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
+	// Add 4 address lines  so that we can store the left edge and top edge AC values (14 in all).
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE * 16) buf := [ 0 : for int k in Integers(1,
+	BUF_SIZE * 16) ];
+
+	bool top;
+
+	bool acpred_flag;
+
+	int(size=6) s_quant;
+
+	int(size=6) s_prev_quant;
+
+	function divroundnearest(int i, int iDenom) --> int :
+		if (i >= 0) then
+			(i + (iDenom >> 1)) / iDenom
+		else
+			(i - (iDenom >> 1)) / iDenom
+		end
 	end
-  end
 
-  newvop: action AC_PRED_DIR:[ s ] ==>
-  guard s = -2
-  do
-    ptr := 1;      // Start at 1, since 0 is reserved
-  end
+	newvop: action AC_PRED_DIR:[ s ] ==>
+	guard
+		s = -2
+	do
+		ptr := 1;
+		// Start at 1, since 0 is reserved
 
-  skip: action AC_PRED_DIR:[ s ] ==>
-  guard s < 0
-  do
-    count := 64;
-  end
+	end
 
-  start: action AC_PRED_DIR:[ s ], PTR:[ p ], QP:[qp], PREV_QP:[prev_qp] ==>
-  do
-    s_quant		:= qp;
-    s_prev_quant:= prev_qp;
-    count := 1;
-    pred_ptr := p;
-    top := s = 2;
-    acpred_flag := s != 0;
-  end
+	skip: action AC_PRED_DIR:[ s ] ==>
+	guard
+		s < 0
+	do
+		count := 64;
+	end
 
-  advance: action ==>
-  guard
-    count = 64
-  do
-    ptr := if ptr = 1 then BUF_SIZE-1 else ptr-1 end ;    
-  end
+	start: action AC_PRED_DIR:[ s ], PTR:[ p ], QP:[ qp ], PREV_QP:[ prev_qp ] ==>
+	do
+		s_quant := qp;
+		s_prev_quant := prev_qp;
+		count := 1;
+		pred_ptr := p;
+		top := s = 2;
+		acpred_flag := s != 0;
+	end
 
-  copy: action PQF_AC:[ ac ] ==> QF_AC:[ pred ]
-  var
-    int(size=SAMPLE_SZ) pred := ac,
-    int(size=4) v = bitand( count, 7 ),
-    int(size=4) h = bitand( rshift( count, 3), 7 ),
-    bool top_edge = (h = 0),
-    bool left_edge = (v = 0),
-    int(size=5) index = if top_edge then v else bitor( h, 8 ) end
-  do
-    if acpred_flag and ( (top and top_edge) or ((not top) and left_edge) ) then
-      if(s_prev_quant=s_quant) then
-        pred := pred + buf[ bitor( lshift( pred_ptr, 4 ), index ) ];
-      else
-      	pred := pred + divroundnearest(buf[ bitor( lshift( pred_ptr, 4 ), index )] * s_prev_quant, s_quant);
-      end
-    end
-    if left_edge or top_edge then
-      buf[ bitor( lshift( ptr, 4 ), index ) ] := pred;
-    end
-    count := count + 1;
-  end
+	advance: action ==>
+	guard
+		count = 64
+	do
+		ptr := if ptr = 1 then
+			BUF_SIZE - 1
+		else
+			ptr - 1
+		end;
+	end
 
-  schedule fsm start :
-    start   ( newvop  ) --> start;
-    start   ( skip    ) --> pred;
-    start   ( start   ) --> pred;
+	copy: action PQF_AC:[ ac ] ==> QF_AC:[ pred ]
+	var
+		int(size=SAMPLE_SZ) pred := ac , int(size=4) v = bitand(count, 7) , int(size=4) h = bitand(
+		rshift(count, 3), 7) , bool top_edge = (h = 0) , bool left_edge = (v = 0) , int(size=5) index = if
+		top_edge then
+			v
+		else
+			bitor(h, 8)
+		end
+	do
+		if acpred_flag and ((top and top_edge) or ((not top) and left_edge)) then
+			if (s_prev_quant = s_quant) then
+				pred := pred + buf[bitor(lshift(pred_ptr, 4), index)];
+			else
+				pred := pred + divroundnearest(buf[bitor(lshift(pred_ptr, 4), index)] * s_prev_quant,
+				s_quant);
+			end
+		end
+		if left_edge or top_edge then
+			buf[bitor(lshift(ptr, 4), index)] := pred;
+		end
+		count := count + 1;
+	end
 
-    pred    ( copy    ) --> pred;
-    pred    ( advance ) --> start;
-  end
+	schedule fsm start :
+		start ( newvop ) --> start;
+		start ( skip ) --> pred;
+		start ( start ) --> pred;
+		pred ( copy ) --> pred;
+		pred ( advance ) --> start;
+	end
 
-  priority
-    newvop > skip > start;
-    advance > copy;
-  end
+	priority
+		newvop > skip > start;
+		advance > copy;
+	end
+
 end

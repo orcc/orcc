@@ -35,85 +35,94 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-
 // Zigzag.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 import all caltrop.lib.BitOps;
+actor Zigzag () int(size=SAMPLE_SZ) AC, int(size=3) START, int(size=7) ADDR ==>
+int(size=SAMPLE_SZ) OUT :
 
-actor Zigzag ( ) int(size=SAMPLE_SZ) AC, int(size=3) START, int(size=7) ADDR ==> int(size=SAMPLE_SZ) OUT :
+	int SAMPLE_SZ = 13;
 
-  int SAMPLE_SZ = 13;
+	int BUF_SIZE = 128;
 
-  int BUF_SIZE = 128;
-  int(size=8) count := 1;
-  bool half := false;
-  List( type:int(size=SAMPLE_SZ), size=BUF_SIZE ) buf := [ 0 : for int k in Integers(1,BUF_SIZE) ];
+	int(size=8) count := 1;
 
-  skip: action START:[ s ] ==>
-  guard s < 0
-  end
+	bool half := false;
 
-  start: action START:[ s ] ==>
-  end
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) buf := [ 0 : for int k in Integers(1, BUF_SIZE
+	) ];
 
-  done: action ==>
-  guard count = 64
-  do
-    count := 1;
-    half := not half;
-  end
+	skip: action START:[ s ] ==>
+	guard
+		s < 0
+	end
 
-  function wa() --> int :
-    bitor( bitand(count,63), if half then 64 else 0 end )
-  end
+	start: action START:[ s ] ==>
+	end
 
-  function ra( int addr ) --> int :
-    bitor( bitand(addr,63), if half then 0 else 64 end )
-  end
+	done: action ==>
+	guard
+		count = 64
+	do
+		count := 1;
+		half := not half;
+	end
 
-  // If there is not a block in the buffer already, just read in the block
-  read_only: action AC:[ ac ] ==>
-  do
-    buf[ wa() ] := ac;
-    count := count + 1;
-  end
+	function wa() --> int :
+		bitor(bitand(count, 63), if half then
+			64
+		else
+			0
+		end)
+	end
 
-  // If there is a block in the buffer already but no new arrival, just write it out
-  write_only: action ADDR:[ addr ] ==> OUT:[ buf[ ra( addr ) ] ]
-  do
-    count := count + 1;
-  end
+	function ra(int addr) --> int :
+		bitor(bitand(addr, 63), if half then
+			0
+		else
+			64
+		end)
+	end
 
-  read_write: action ADDR:[ addr ], AC:[ ac ] ==> OUT:[ buf[ ra( addr ) ] ]
-  do
-    buf[wa() ] := ac;
-    count := count + 1;
-  end
+	// If there is not a block in the buffer already, just read in the block
+	read_only: action AC:[ ac ] ==>
+	do
+		buf[wa()] := ac;
+		count := count + 1;
+	end
 
-  schedule fsm empty :
-    empty ( skip         ) --> empty;
-    empty ( start        ) --> read;
+	// If there is a block in the buffer already but no new arrival, just write it out
+	write_only: action ADDR:[ addr ] ==> OUT:[ buf[ra(addr)] ]
+	do
+		count := count + 1;
+	end
 
-    full  ( skip         ) --> drain;
-    full  ( start        ) --> both;
+	read_write: action ADDR:[ addr ], AC:[ ac ] ==> OUT:[ buf[ra(addr)] ]
+	do
+		buf[wa()] := ac;
+		count := count + 1;
+	end
 
-    read  ( read_only    ) --> read;
-    read  ( done         ) --> full;
+	schedule fsm empty :
+		empty ( skip ) --> empty;
+		empty ( start ) --> read;
+		full ( skip ) --> drain;
+		full ( start ) --> both;
+		read ( read_only ) --> read;
+		read ( done ) --> full;
+		drain ( write_only ) --> drain;
+		drain ( done ) --> empty;
+		both ( read_write ) --> both;
+		both ( done ) --> full;
+	end
 
-    drain ( write_only   ) --> drain;
-    drain ( done         ) --> empty;
- 
-    both  ( read_write   ) --> both;
-    both  ( done         ) --> full;
-  end
+	priority
+		skip > start;
+		done > read_only;
+		done > write_only;
+		done > read_write;
+	end
 
-  priority
-    skip > start;
-    done > read_only;
-    done > write_only;
-    done > read_write;
-  end
 end

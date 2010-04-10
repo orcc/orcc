@@ -39,55 +39,56 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 // Pack pixels into 32-bit words, pass an address once per macroblock so that the
 // burst write into the DRAM will not be starved for data
-
 import all caltrop.lib.BitOps;
+actor MBPacker () int(size=PIX_SZ) DI, int(size=32) AI ==> int(size=32) DO , int(size=32) AO
+:
 
-actor MBPacker () int(size=PIX_SZ) DI, int(size=32) AI ==> int(size=32) DO, int(size=32) AO :
+	int PIX_SZ = 9;
 
-  int PIX_SZ = 9;
+	int TC = 6 * 64;
 
-  int TC = 6 * 64;
+	int(size=10) pix_count := 0;
 
-  int(size=10) pix_count := 0;
-  int(size=24) buf       := 0;
+	int(size=24) buf := 0;
 
-  // Just passed an entire macroblock
-  tc: action ==>
-  guard pix_count = TC
-  end
+	// Just passed an entire macroblock
+	tc: action ==>
+	guard
+		pix_count = TC
+	end
 
-  // Every fourth pixel, emit a 32 bit word
-  data.out: action DI:[d] ==> DO:[ bitor( lshift( buf, 8 ), d ) ]
-  guard bitand( pix_count, 3) = 3
-  do
-    pix_count := pix_count + 1;
-  end
+	// Every fourth pixel, emit a 32 bit word
+	data.out: action DI:[ d ] ==> DO:[ bitor(lshift(buf, 8), d) ]
+	guard
+		bitand(pix_count, 3) = 3
+	do
+		pix_count := pix_count + 1;
+	end
 
-  // Just accumulate pixels
-  data.inp: action DI:[d] ==> 
-  do
-    buf := bitor( lshift( buf, 8 ), d );
-    pix_count := pix_count + 1;
-  end
+	// Just accumulate pixels
+	data.inp: action DI:[ d ] ==>
+	do
+		buf := bitor(lshift(buf, 8), d);
+		pix_count := pix_count + 1;
+	end
 
-  // Pass the address to the memory controller now
-  addr: action AI:[a] ==> AO:[a]
-  do
-    pix_count := 0;
-  end
+	// Pass the address to the memory controller now
+	addr: action AI:[ a ] ==> AO:[ a ]
+	do
+		pix_count := 0;
+	end
 
-  schedule fsm rw:
-    rw    ( tc   ) --> addr;
-    rw    ( data ) --> rw;
-    addr  ( addr ) --> rw;
-  end
+	schedule fsm rw :
+		rw ( tc ) --> addr;
+		rw ( data ) --> rw;
+		addr ( addr ) --> rw;
+	end
 
-  priority
-    tc > data;
-    data.out > data.inp;
-  end
+	priority
+		tc > data;
+		data.out > data.inp;
+	end
 
 end

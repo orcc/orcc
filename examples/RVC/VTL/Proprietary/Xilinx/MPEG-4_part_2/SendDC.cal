@@ -35,37 +35,44 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-
 // SendDC.cal
 //
 // Author: Jörn W. Janneck (jorn.janneck@xilinx.com)
 //
-
-
 actor SendDC () int TYPE, int IN ==> int DC :
 
-  int INTER = 1;
-  int INTRA = 0;
+	int INTER = 1;
 
-  int count := 0;
+	int INTRA = 0;
 
-  action TYPE: [t], IN: [v] ==> DC: [v]
-  guard count = 0, t = INTRA
-  do
-    count := count + 1;
-  end
+	int count := 0;
 
-  action TYPE: [t], IN: [v] ==>
-  guard count = 0, t = INTER
-  do
-    count := count + 1;
-  end
+	action TYPE:[ t ], IN:[ v ] ==> DC:[ v ]
+	guard
+		count = 0,
+		t = INTRA
+	do
+		count := count + 1;
+	end
 
-  action IN: [v] ==>
-  guard count > 0
-  do
-    count := if count < 63 then count + 1 else 0 end;
-  end
+	action TYPE:[ t ], IN:[ v ] ==>
+	guard
+		count = 0,
+		t = INTER
+	do
+		count := count + 1;
+	end
+
+	action IN:[ v ] ==>
+	guard
+		count > 0
+	do
+		count := if count < 63 then
+			count + 1
+		else
+			0
+		end;
+	end
 
 end
 

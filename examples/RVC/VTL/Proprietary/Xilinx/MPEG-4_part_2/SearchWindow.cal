@@ -35,322 +35,403 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-
 // SearchWindow.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 import all caltrop.lib.BitOps;
+actor SearchWindow () int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI ==>
+int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
-actor SearchWindow ()
-   int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI  ==> int(size=32) DO, int(size=FLAG_SZ) FLAGS :
+	int BTYPE_SZ = 12;
 
-  int BTYPE_SZ = 12;
-  int FLAG_SZ = 4;
-  int MB_COORD_SZ = 8;
-  int MV_SZ = 9;
-  int ROUND_TYPE = 32;
-  int SEARCHWIN_IN_MB = 3;
+	int FLAG_SZ = 4;
 
-  int MOTION = 8;
-  int NEWVOP = 2048;
-  int INTRA = 1024;
-  int INTER = 512;
+	int MB_COORD_SZ = 8;
 
-  // Search window organization - separate LUMA, CHROMA buffers
-  //   LUMA     <-- Y (6 bits) --><-- X (4 bits) -->
-  //   CHROMA   <-- COMP (1 bit) --><-- Y (5 bits) --><-- X (3 bits) -->
+	int MV_SZ = 9;
 
-  // The 4 luma blocks are stored pixel-wise in one buffer, the U and V components are stored in a second
-  // buffer with each plane individually addressable. Since the data are stored in 32-bit words, the X
-  // address is the pixel-X divided by 4. The upper byte is the left-most pixel in this word. The X 
-  // macroblock address is computed by adding a pointer offset which is incremented once per macroblock
-  // to implement a ring-buffer.
+	int ROUND_TYPE = 32;
 
-  // Retreival is always 3 words (12 pixels) which bracket the actual 9 values needed. A down-stream actor
-  // will sort out the actual pixels required. This is necessary to maintain HD throughput.
-  // Filling search window = 3 x 6 x 64 / 4   ->  288 clocks per macroblock
-  // Reading compensation  = 6 x 3 x 9        ->  162 clocks per macroblock
-  // Required rate is 6 * 64 * 120MHz/93.3MHz -> max. 493 clocks per macroblock
+	int SEARCHWIN_IN_MB = 3;
 
-  function maskBits( int v, int n ) --> int :
-    bitand( v, lshift(1,n)-1 )
-  end
+	int MOTION = 8;
 
-  int LUMA_X_BITS = 4;
-  int LUMA_Y_BITS = 6;
-  int LUMA_X_SIZE = lshift(1,LUMA_X_BITS);
-  int LUMA_Y_SIZE = lshift(1,LUMA_Y_BITS);
-  int CHROMA_X_BITS = 3;
-  int CHROMA_Y_BITS = 5;
-  int CHROMA_X_SIZE = lshift(1,CHROMA_X_BITS);
-  int CHROMA_Y_SIZE = lshift(1,CHROMA_Y_BITS);
+	int NEWVOP = 2048;
 
-//  list( type:list(type:int(size=32), size=LUMA_X_SIZE), size=LUMA_Y_SIZE )
-//           luma := initList( initList(0,LUMA_X_SIZE), LUMA_Y_SIZE );   // 2 BRAMs
-  List( type:int(size=32), size=16*64 ) luma := [ 0 : for int i in Integers(1,16*64 ) ];   // 2 BRAMs
+	int INTRA = 1024;
 
-//  list( type:list( type:list(type:int(size=32), size=CHROMA_X_SIZE), size=CHROMA_Y_SIZE ), size=2 )
-//           chroma := initList( initList( initList(0,CHROMA_X_SIZE), CHROMA_Y_SIZE), 2);    // 1 BRAM
-  List( type:int(size=32), size=8*32*2 ) chroma := [ 0 : for int i in Integers(1,8*32*2 ) ];    // 1 BRAM
+	int INTER = 512;
 
-  bool prediction_is_INTRA;
-  bool is_motion;
-  bool round;
-  int(size=8) count;
-  int(size=4) comp;
+	// Search window organization - separate LUMA, CHROMA buffers
+	//   LUMA     <-- Y (6 bits) --><-- X (4 bits) -->
+	//   CHROMA   <-- COMP (1 bit) --><-- Y (5 bits) --><-- X (3 bits) -->
+	// The 4 luma blocks are stored pixel-wise in one buffer, the U and V components are stored in a second
+	// buffer with each plane individually addressable. Since the data are stored in 32-bit words, the X
+	// address is the pixel-X divided by 4. The upper byte is the left-most pixel in this word. The X 
+	// macroblock address is computed by adding a pointer offset which is incremented once per macroblock
+	// to implement a ring-buffer.
+	// Retreival is always 3 words (12 pixels) which bracket the actual 9 values needed. A down-stream actor
+	// will sort out the actual pixels required. This is necessary to maintain HD throughput.
+	// Filling search window = 3 x 6 x 64 / 4   ->  288 clocks per macroblock
+	// Reading compensation  = 6 x 3 x 9        ->  162 clocks per macroblock
+	// Required rate is 6 * 64 * 120MHz/93.3MHz -> max. 493 clocks per macroblock
+	function maskBits(int v, int n) --> int :
+		bitand(v, lshift(1, n) - 1)
+	end
 
-  cmd.newVop: action BTYPE:[ cmd ] ==>
-  guard
-    bitand( cmd, NEWVOP ) != 0
-  do
-    round := bitand( cmd, ROUND_TYPE ) != 0;
-    prediction_is_INTRA := bitand( cmd, INTRA ) != 0;
-    comp := 0;
-    is_motion := false; // ensure that we do not attempt to read MVs when filling 1st search stripe
-    mbx := -1;       // prefill one macroblock
-    mby := 0;
-    y_offset := -1;
-    count := 0;
-  end
+	int LUMA_X_BITS = 4;
 
-  int(size=MB_COORD_SZ) mbw_max;
-  int(size=MB_COORD_SZ) mbh_max;
-  int(size=MB_COORD_SZ) mbx;
-  int(size=MB_COORD_SZ) mby;
-  int(size=LUMA_X_BITS) mbx_ptr := 0;
+	int LUMA_Y_BITS = 6;
 
-  int(size=3) y_offset;
+	int LUMA_X_SIZE = lshift(1, LUMA_X_BITS);
 
-  getw: action BTYPE:[w] ==>
-  do
-    mbw_max := w - 1;
-  end
+	int LUMA_Y_SIZE = lshift(1, LUMA_Y_BITS);
 
-  geth: action BTYPE:[h] ==>
-  do
-    mbh_max := h - 1;
-  end
+	int CHROMA_X_BITS = 3;
 
-  cmd.motion: action BTYPE:[cmd] ==>
-  guard bitand( cmd, bitor( INTER, MOTION ) ) = bitor( INTER, MOTION )
- // var int mask = bitor( INTER, MOTION )
-  do
-    is_motion := true;
-  end
+	int CHROMA_Y_BITS = 5;
 
-  cmd.noMotion: action BTYPE:[cmd] ==> FLAGS:[ 0 ]
-  guard bitand( cmd, INTER ) = INTER
-  do 
-    mvx := 0;
-    mvy := 0;
-    is_motion := true;
-  end
+	int CHROMA_X_SIZE = lshift(1, CHROMA_X_BITS);
 
-  cmd.other: action BTYPE:[cmd] ==>
-  do
-    is_motion := false;
-  end
+	int CHROMA_Y_SIZE = lshift(1, CHROMA_Y_BITS);
 
-  bypass: action ==>
-  guard  prediction_is_INTRA or comp != 0 or (mbx = mbw_max and mby = mbh_max)
-  do
-    if comp = 0 then
-      // When bypassing the last MB in frame, increment so that offset calculations are correct
-      mbx_ptr := mbx_ptr + 1;
-    end
-  end
+	//  list( type:list(type:int(size=32), size=LUMA_X_SIZE), size=LUMA_Y_SIZE )
+	//           luma := initList( initList(0,LUMA_X_SIZE), LUMA_Y_SIZE );   // 2 BRAMs
+	List(type: int(size=32), size=16 * 64) luma := [ 0 : for int i in Integers(1, 16 * 64) ];
 
-  next: action ==>
-  do
-    if mbx < 0 then
-      mbx := 0;
-    else
-      if comp = 5 then
-        comp := 0;
-        if mbx = mbw_max then
-          mbx := 0;
-          mby := mby + 1;
-        else
-          mbx := mbx + 1;
-        end
-      else
-        comp := comp + 1;
-      end
-    end
-  end
+	// 2 BRAMs
+	//  list( type:list( type:list(type:int(size=32), size=CHROMA_X_SIZE), size=CHROMA_Y_SIZE ), size=2 )
+	//           chroma := initList( initList( initList(0,CHROMA_X_SIZE), CHROMA_Y_SIZE), 2);    // 1 BRAM
+	List(type: int(size=32), size=8 * 32 * 2) chroma := [ 0 : for int i in Integers(1, 8 * 32 * 2) ];
 
-  done: action ==>
-  guard y_offset = 2
-  do
-    mbx_ptr := mbx_ptr + 1;
-    y_offset := -1;
-    count := 0;
-  end
+	// 1 BRAM
+	bool prediction_is_INTRA;
 
-  // Note: a stripe of 3 MBs is prefetched into the search window, so
-  // the current position in the prev image is always at delta mbx = -1
+	bool is_motion;
 
-  read.luma: action DI:[d] ==>
-  guard count <= 63
-  var
-    int(size=3) comp_local = maskBits( rshift( count, 4), 2 ),
-    int(size=LUMA_Y_BITS+1) y = maskBits( maskBits( rshift(count,1), 3) + if bitand( comp_local, 2 ) != 0 then 8 else 0 end + lshift(y_offset,4), LUMA_Y_BITS),
-    int(size=LUMA_X_BITS+1) x = maskBits( maskBits(count,1) + if bitand( comp_local, 1 ) != 0 then 2 else 0 end + lshift(mbx_ptr,2), LUMA_X_BITS)
-  do
-    luma[ lshift(y, LUMA_X_BITS) + x ] := d;
-    count := count + 1;
-  end
+	bool round;
 
-  read.chroma: action DI:[d] ==>
-  var
-    int(size=2) comp_local = maskBits( rshift( count,4), 1 ),
-    int(size=CHROMA_Y_BITS+1) y = maskBits( maskBits( rshift(count,1), 3) + lshift(y_offset,3), CHROMA_Y_BITS),
-    int(size=CHROMA_X_BITS+1) x = maskBits( maskBits(count,1) + lshift(mbx_ptr,1), CHROMA_X_BITS)
-  do
-    chroma[ lshift( comp_local, CHROMA_X_BITS+CHROMA_Y_BITS) + lshift( y, CHROMA_X_BITS ) + x ] := d;
-    count := count + 1;
-    if count = 96 then
-      count := 0;
-      y_offset := y_offset + 1;
-    end
-  end
+	int(size=8) count;
 
-  int(size=MV_SZ) mvx;
-  int(size=MV_SZ) mvy;
+	int(size=4) comp;
 
-  // Encode flags on halfpel: bit2 = interp. x
-  //                          bit1 = interp. y
-  //                          bit0 = round
+	cmd.newVop: action BTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, NEWVOP) != 0
+	do
+		round := bitand(cmd, ROUND_TYPE) != 0;
+		prediction_is_INTRA := bitand(cmd, INTRA) != 0;
+		comp := 0;
+		is_motion := false;
+		// ensure that we do not attempt to read MVs when filling 1st search stripe
+		mbx := -1;
+		// prefill one macroblock
+		mby := 0;
+		y_offset := -1;
+		count := 0;
+	end
 
-  bool interp_x;
+	int(size=MB_COORD_SZ) mbw_max;
 
-  getmvx: action MV:[ v ] ==>
-  do
-    interp_x := bitand( v, 1 ) != 0;
-    mvx := rshift( v, 1 );
-  end
+	int(size=MB_COORD_SZ) mbh_max;
 
-  getmvy: action MV:[ v ] ==> FLAGS:[ f ]
-  var
-    int(size = FLAG_SZ) f = if interp_x then 4 else 0 end + if bitand( v, 1) != 0 then 2 else 0 end + if round then 1 else 0 end
-  do
-    mvy := rshift( v, 1 );
-  end
+	int(size=MB_COORD_SZ) mbx;
 
-  int(size=3) mvxcount;
-  int(size=5) mvycount;
+	int(size=MB_COORD_SZ) mby;
 
-  motion: action  ==>
-  guard is_motion
-  do
-    mvxcount := 0;
-    mvycount := 0;
-  end
+	int(size=LUMA_X_BITS) mbx_ptr := 0;
 
-  noMotion: action ==> end
+	int(size=3) y_offset;
 
-  search_done: action ==>
-  guard mvycount = 9 
-  end
+	getw: action BTYPE:[ w ] ==>
+	do
+		mbw_max := w - 1;
+	end
 
-  search.luma: action ==> DO:[ luma[ lshift( maskBits(y,LUMA_Y_BITS), LUMA_X_BITS ) + maskBits( rshift(x+lshift(mbx_ptr-2,4),2),LUMA_X_BITS) ] ]
-  guard comp <= 3
-  var
-    int(size=MV_SZ+1) y := mvy + mvycount + if bitand(comp,2) != 0 then 8 else 0 end,
-    int(size=MV_SZ+1) x := mvx + lshift( mvxcount,2 ) + if bitand(comp,1)!= 0 then 8 else 0 end
-  do
-    // Clip to frame
-    if mby = 0 then
-      y := if y < 0 then 0 else y end;
-    else
-      if mby = mbh_max then
-        y := if y > 15 then 15 else y end;
-      end
-    end
-    if mbx = 0 then
-      x := if x < 0 then 0 else x end;
-    else
-      if mbx = mbw_max then
-        x := if x > 12 then 12 else x end;
-      end
-    end
+	geth: action BTYPE:[ h ] ==>
+	do
+		mbh_max := h - 1;
+	end
 
-    mvxcount := mvxcount + 1;
-    if mvxcount = 3 then
-      mvxcount := 0;
-      mvycount := mvycount + 1;
-    end
-  end
+	cmd.motion: action BTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, bitor(INTER, MOTION)) = bitor(INTER, MOTION) // var int mask = bitor( INTER, MOTION )
 
-  search.chroma: action ==> DO:[ chroma[ lshift( maskBits(comp,1), CHROMA_X_BITS+CHROMA_Y_BITS) +
-                                         lshift( maskBits(y,CHROMA_Y_BITS), CHROMA_X_BITS )+
-                                         maskBits( rshift(x + lshift(mbx_ptr-2,3) ,2), CHROMA_X_BITS)
-                                       ]
-                               ]
-  var
-    //int(size=CHROMA_Y_BITS+1) y = mvy + mvycount,
-    //int(size=CHROMA_X_BITS+1) x = mvx + lshift( mvxcount,2 )
-    int(size=MV_SZ+1) y := mvy + mvycount,
-    int(size=MV_SZ+1) x := mvx + lshift( mvxcount,2 )
-  do
-    // Clip to frame
-    if mby = 0 then
-      y := if y < 0 then 0 else y end;
-    else
-      if mby = mbh_max then
-        y := if y > 7 then 7 else y end;
-      end
-    end
-    if mbx = 0 then
-      x := if x < 0 then 0 else x end;
-    else
-      if mbx = mbw_max then
-        x := if x > 4 then 4 else x end;
-      end
-    end
+	do
+		is_motion := true;
+	end
 
-    mvxcount := mvxcount + 1;
-    if mvxcount = 3 then
-      mvxcount := 0;
-      mvycount := mvycount + 1;
-    end
-  end
+	cmd.noMotion: action BTYPE:[ cmd ] ==> FLAGS:[ 0 ]
+	guard
+		bitand(cmd, INTER) = INTER
+	do
+		mvx := 0;
+		mvy := 0;
+		is_motion := true;
+	end
 
-  schedule fsm cmd:
-    cmd    ( cmd.newVop   ) --> getw;
-    cmd    ( cmd.noMotion ) --> fill;
-    cmd    ( cmd.motion   ) --> getmvx;
-    cmd    ( cmd.other    ) --> fill;
+	cmd.other: action BTYPE:[ cmd ] ==>
+	do
+		is_motion := false;
+	end
 
-    getw   ( getw         ) --> geth;
-    geth   ( geth         ) --> fill;
-  
-    getmvx ( getmvx       ) --> getmvy;
-    getmvy ( getmvy       ) --> fill;
+	bypass: action ==>
+	guard
+		prediction_is_INTRA or comp != 0 or (mbx = mbw_max and mby = mbh_max)
+	do
+		if comp = 0 then
+		// When bypassing the last MB in frame, increment so that offset calculations are correct
+			mbx_ptr := mbx_ptr + 1;
+		end
+	end
 
-    // Fill in 3 new macroblocks
-    fill   ( bypass       ) --> motion;
-    fill   ( done         ) --> motion;
-    fill   ( read         ) --> fill;
+	next: action ==>
+	do
+		if mbx < 0 then
+			mbx := 0;
+		else
+			if comp = 5 then
+				comp := 0;
+				if mbx = mbw_max then
+					mbx := 0;
+					mby := mby + 1;
+				else
+					mbx := mbx + 1;
+				end
+			else
+				comp := comp + 1;
+			end
+		end
+	end
 
-    motion ( noMotion     ) --> next;
-    motion ( motion       ) --> search;
+	done: action ==>
+	guard
+		y_offset = 2
+	do
+		mbx_ptr := mbx_ptr + 1;
+		y_offset := -1;
+		count := 0;
+	end
 
-    search ( search_done  ) --> next;
-    search ( search       ) --> search;
+	// Note: a stripe of 3 MBs is prefetched into the search window, so
+	// the current position in the prev image is always at delta mbx = -1
+	read.luma: action DI:[ d ] ==>
+	guard
+		count <= 63
+	var
+		int(size=3) comp_local = maskBits(rshift(count, 4), 2) , int(size=LUMA_Y_BITS + 1) y =
+		maskBits(maskBits(rshift(count, 1), 3) + if bitand(comp_local, 2) != 0 then
+			8
+		else
+			0
+		end + lshift(y_offset, 4), LUMA_Y_BITS) , int(size=LUMA_X_BITS + 1) x = maskBits(maskBits(
+		count, 1) + if bitand(comp_local, 1) != 0 then
+			2
+		else
+			0
+		end + lshift(mbx_ptr, 2), LUMA_X_BITS)
+	do
+		luma[lshift(y, LUMA_X_BITS) + x] := d;
+		count := count + 1;
+	end
 
-    next   ( next         ) --> cmd;
-  end
+	read.chroma: action DI:[ d ] ==>
+	var
+		int(size=2) comp_local = maskBits(rshift(count, 4), 1) , int(size=CHROMA_Y_BITS + 1) y =
+		maskBits(maskBits(rshift(count, 1), 3) + lshift(y_offset, 3), CHROMA_Y_BITS) ,
+		int(size=CHROMA_X_BITS + 1) x = maskBits(maskBits(count, 1) + lshift(mbx_ptr, 1),
+		CHROMA_X_BITS)
+	do
+		chroma[lshift(comp_local, CHROMA_X_BITS + CHROMA_Y_BITS) + lshift(y, CHROMA_X_BITS) + x]
+		:= d;
+		count := count + 1;
+		if count = 96 then
+			count := 0;
+			y_offset := y_offset + 1;
+		end
+	end
 
-  priority
-    cmd.newVop > cmd.motion > cmd.noMotion > cmd.other;
-    bypass > done > read;
-    read.luma > read.chroma;
-    search_done > search;
-    search.luma > search.chroma;
-    motion > noMotion;
-  end
+	int(size=MV_SZ) mvx;
+
+	int(size=MV_SZ) mvy;
+
+	// Encode flags on halfpel: bit2 = interp. x
+	//                          bit1 = interp. y
+	//                          bit0 = round
+	bool interp_x;
+
+	getmvx: action MV:[ v ] ==>
+	do
+		interp_x := bitand(v, 1) != 0;
+		mvx := rshift(v, 1);
+	end
+
+	getmvy: action MV:[ v ] ==> FLAGS:[ f ]
+	var
+		int(size=FLAG_SZ) f = if interp_x then
+			4
+		else
+			0
+		end + if bitand(v, 1) != 0 then
+			2
+		else
+			0
+		end + if round then
+			1
+		else
+			0
+		end
+	do
+		mvy := rshift(v, 1);
+	end
+
+	int(size=3) mvxcount;
+
+	int(size=5) mvycount;
+
+	motion: action ==>
+	guard
+		is_motion
+	do
+		mvxcount := 0;
+		mvycount := 0;
+	end
+
+	noMotion: action ==>
+	end
+
+	search_done: action ==>
+	guard
+		mvycount = 9
+	end
+
+	search.luma: action ==> DO:[ luma[lshift(maskBits(y, LUMA_Y_BITS), LUMA_X_BITS) +
+		maskBits(rshift(x + lshift(mbx_ptr - 2, 4), 2), LUMA_X_BITS)] ]
+	guard
+		comp <= 3
+	var
+		int(size=MV_SZ + 1) y := mvy + mvycount + if bitand(comp, 2) != 0 then
+			8
+		else
+			0
+		end , int(size=MV_SZ + 1) x := mvx + lshift(mvxcount, 2) + if bitand(comp, 1) != 0 then
+			8
+		else
+			0
+		end
+	do
+	// Clip to frame
+		if mby = 0 then
+			y := if y < 0 then
+				0
+			else
+				y
+			end;
+		else
+			if mby = mbh_max then
+				y := if y > 15 then
+					15
+				else
+					y
+				end;
+			end
+		end
+		if mbx = 0 then
+			x := if x < 0 then
+				0
+			else
+				x
+			end;
+		else
+			if mbx = mbw_max then
+				x := if x > 12 then
+					12
+				else
+					x
+				end;
+			end
+		end
+		mvxcount := mvxcount + 1;
+		if mvxcount = 3 then
+			mvxcount := 0;
+			mvycount := mvycount + 1;
+		end
+	end
+
+	search.chroma: action ==> DO:[ chroma[lshift(maskBits(comp, 1), CHROMA_X_BITS +
+		CHROMA_Y_BITS) + lshift(maskBits(y, CHROMA_Y_BITS), CHROMA_X_BITS) + maskBits(rshift(x
+		+ lshift(mbx_ptr - 2, 3), 2), CHROMA_X_BITS)] ]
+	var
+	//int(size=CHROMA_Y_BITS+1) y = mvy + mvycount,
+		//int(size=CHROMA_X_BITS+1) x = mvx + lshift( mvxcount,2 )
+		int(size=MV_SZ + 1) y := mvy + mvycount , int(size=MV_SZ + 1) x := mvx + lshift(mvxcount, 2)
+	do
+	// Clip to frame
+		if mby = 0 then
+			y := if y < 0 then
+				0
+			else
+				y
+			end;
+		else
+			if mby = mbh_max then
+				y := if y > 7 then
+					7
+				else
+					y
+				end;
+			end
+		end
+		if mbx = 0 then
+			x := if x < 0 then
+				0
+			else
+				x
+			end;
+		else
+			if mbx = mbw_max then
+				x := if x > 4 then
+					4
+				else
+					x
+				end;
+			end
+		end
+		mvxcount := mvxcount + 1;
+		if mvxcount = 3 then
+			mvxcount := 0;
+			mvycount := mvycount + 1;
+		end
+	end
+
+	schedule fsm cmd :
+		cmd ( cmd.newVop ) --> getw;
+		cmd ( cmd.noMotion ) --> fill;
+		cmd ( cmd.motion ) --> getmvx;
+		cmd ( cmd.other ) --> fill;
+		getw ( getw ) --> geth;
+		geth ( geth ) --> fill;
+		getmvx ( getmvx ) --> getmvy;
+		getmvy ( getmvy ) --> fill;
+		// Fill in 3 new macroblocks
+		fill ( bypass ) --> motion;
+		fill ( done ) --> motion;
+		fill ( read ) --> fill;
+		motion ( noMotion ) --> next;
+		motion ( motion ) --> search;
+		search ( search_done ) --> next;
+		search ( search ) --> search;
+		next ( next ) --> cmd;
+	end
+
+	priority
+		cmd.newVop > cmd.motion > cmd.noMotion > cmd.other;
+		bypass > done > read;
+		read.luma > read.chroma;
+		search_done > search;
+		search.luma > search.chroma;
+		motion > noMotion;
+	end
 
 end

@@ -35,32 +35,31 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-
 // DCSplit.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
-
 import all caltrop.lib.BitOps;
+actor DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC ,
+int(size=SAMPLE_SZ) AC :
 
-actor DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC :
+	int SAMPLE_SZ = 13;
 
-  int SAMPLE_SZ = 13;
+	int(size=8) count := 0;
 
-  int(size=8) count := 0;
+	dc: action IN:[ x ] ==> DC:[ x ]
+	guard
+		count = 0
+	do
+		count := 1;
+	end
 
-  dc: action IN:[ x ] ==> DC:[ x ]
-  guard
-    count = 0
-  do
-    count := 1;
-  end
+	ac: action IN:[ x ] ==> AC:[ x ]
+	do
+		count := bitand(count + 1, 63);
+	end
 
-  ac: action IN:[ x ] ==> AC:[ x ]
-  do
-    count := bitand( count + 1, 63);
-  end
+	priority
+		dc > ac;
+	end
 
-  priority
-    dc > ac;
-  end
 end
