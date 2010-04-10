@@ -17,6 +17,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="Qp">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -153,4 +160,5 @@
         </Attribute>
     </Connection>
     <Connection dst="" dst-port="out" src="dequant" src-port="OUT"/>
+    <Connection dst="dcpred" dst-port="QP" src="" src-port="Qp"/>
 </XDF>

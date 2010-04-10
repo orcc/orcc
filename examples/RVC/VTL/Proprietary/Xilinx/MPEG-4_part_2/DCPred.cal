@@ -45,7 +45,7 @@ import all caltrop.lib.BitOps;
 
 actor DCPred (
 )
- int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ+3) A, int(size=MB_COORD_SZ+3) B, int(size=MB_COORD_SZ+3) C, int(size=SAMPLE_SZ) IN ==>
+ int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ+3) A, int(size=MB_COORD_SZ+3) B, int(size=MB_COORD_SZ+3) C, int(size=SAMPLE_SZ) IN, int(size=QUANT_SZ) QP ==>
    int(size=SAMPLE_SZ) OUT, int(size=MB_COORD_SZ+3) PTR, int(size=3) START, bool SIGNED, int(size=QUANT_SZ) QUANT :
 
   int ACPRED = 1;
@@ -65,7 +65,7 @@ actor DCPred (
 
   int SCALER_SZ = 7;
 
-  int( size=QUANT_SZ ) QP;
+  int( size=QUANT_SZ ) s_QP;
   int( size=2 ) round;
 
   // Use 3 address lines for component index to save address calculation effort
@@ -87,25 +87,26 @@ actor DCPred (
   do
     comp := 0;
     ptr := 8;
-    QP := bitand( cmd, QUANT_MASK);
-    round := bitxor( bitand( QP, 1 ), 1 );
   end
 
   skip: action BTYPE:[ x ] ==>
   end
 
-  read.inter_ac: action BTYPE:[ cmd ] ==> START:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[QP]
+  read.inter_ac: action BTYPE:[ cmd ],QP:[qp] ==> START:[ 0 ], PTR:[ 0 ], SIGNED:[ true ], QUANT:[s_QP]
   guard
     bitand( cmd, INTER   ) != 0,
     bitand( cmd, ACCODED ) != 0
   do
     is_signed := true;
+    s_QP:=qp;
   end
 
   // Any other block except INTRA
-  read.other: action BTYPE:[ cmd ] ==> START:[ -1 ]
+  read.other: action BTYPE:[ cmd ],QP:[qp] ==> START:[ -1 ]
   guard
     bitand( cmd, INTRA ) = 0
+  do
+    s_QP:=qp;
   end
 
   function abs( int x ) --> int :
@@ -116,15 +117,15 @@ actor DCPred (
   function dc_scaler( ) --> int(size=SCALER_SZ):
     if bitand( comp, 4 ) = 0 then
       // Y component
-      if QP > 0 and QP < 5 then 8 else
-        if QP > 4 and QP < 9 then 2 * QP else
-          if QP > 8 and QP < 25 then QP + 8 else (2 * QP) - 16 end
+      if s_QP > 0 and s_QP < 5 then 8 else
+        if s_QP > 4 and s_QP < 9 then 2 * s_QP else
+          if s_QP > 8 and s_QP < 25 then s_QP + 8 else (2 * s_QP) - 16 end
         end
       end
     else
       // UV component
-      if QP > 0 and QP < 5 then 8 else
-        if QP > 4 and QP < 25 then rshift(QP + 13, 1) else QP - 6 end
+      if s_QP > 0 and s_QP < 5 then 8 else
+        if s_QP > 4 and s_QP < 25 then rshift(s_QP + 13, 1) else s_QP - 6 end
       end
     end
   end
@@ -133,7 +134,7 @@ actor DCPred (
   int(size=SCALER_SZ) scaler;
   bool is_signed;
 
-  read.intra: action BTYPE:[ cmd ], A:[a], B:[b], C:[c] ==> PTR:[ if top then c else a end ], START:[ s ], SIGNED:[ is_signed ], QUANT:[QP]
+  read.intra: action BTYPE:[ cmd ], A:[a], B:[b], C:[c],QP:[qp] ==> PTR:[ if top then c else a end ], START:[ s ], SIGNED:[ is_signed ], QUANT:[s_QP]
   var
     int(size=SAMPLE_SZ) dca = dc_buf[ a ],
     int(size=SAMPLE_SZ) dcb = dc_buf[ b ],
@@ -144,6 +145,7 @@ actor DCPred (
     int(size=3) s,
     bool ac = bitand(cmd,ACPRED) != 0
   do
+    s_QP:=qp;
     scaler  := dc_scaler();
     dc_pred := ( (if top then dcc else dca end) + rshift(scaler,1) ) / scaler;
     s := if not ac then 0 else if top then 2 else 1 end end;
@@ -156,7 +158,7 @@ actor DCPred (
   // Do dequant on INTER block DC
   getdc.inter: action IN:[ dc ] ==>
   var
-    int(size=SAMPLE_SZ) v = ( QP * (lshift( abs(dc), 1) + 1) ) - round
+    int(size=SAMPLE_SZ) v = ( s_QP * (lshift( abs(dc), 1) + 1) ) - round
   do
     dc_val := if dc = 0 then 0 else
                 if not is_signed then dc else

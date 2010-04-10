@@ -44,6 +44,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="QP">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -206,4 +213,5 @@
             <Expr kind="Literal" literal-kind="Integer" value="1"/>
         </Attribute>
     </Connection>
+    <Connection dst="" dst-port="QP" src="parseheaders" src-port="QP"/>
 </XDF>

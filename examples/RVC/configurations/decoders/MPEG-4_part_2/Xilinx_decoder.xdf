@@ -229,4 +229,5 @@
             <Expr kind="Literal" literal-kind="Integer" value="1"/>
         </Attribute>
     </Connection>
+    <Connection dst="acdc" dst-port="Qp" src="parser" src-port="QP"/>
 </XDF>
