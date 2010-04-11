@@ -39,65 +39,62 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 // Put pixels out of col IDCT back into scan order
-
 import all caltrop.lib.BitOps;
+actor Retranspose () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2,
+int(size=isz) X3 ==> int(size=osz) Y :
 
-actor Retranspose ()
-   int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3 ==> int(size=osz) Y :
-   
-  int isz = 10;
-  int osz = 10; 
+	int isz = 10;
 
-  //List[ List[ List[ int(size=osz) ] ] ] mem :=
-  List ( type:int(size=osz), size=128) mem := 
-          [  0 : for int k in Integers(1, 128) ];
+	int osz = 10;
 
-  int rcount := 0;
-  int ccount := 0;
-  int select := 0;
+	//List[ List[ List[ int(size=osz) ] ] ] mem :=
+	List(type: int(size=osz), size=128) mem := [ 0 : for int k in Integers(1, 128) ];
 
-  action ==> Y:[ mem[i*64+row*8+col] ]
-  guard ccount > 0
-  var
-    int col = rshift( 64-ccount, 3 ),
-    int row = bitand( 64-ccount, 7 ),
-    int i = bitxor(select,1)
-  do
-    ccount := ccount - 1;
-  end
+	int rcount := 0;
 
-  action X0:[a], X1:[b], X2:[c], X3:[d] ==>
-  guard rcount < 64
-  var
-    int row = rshift( rcount, 3 ),
-    int quad = bitand( rshift( rcount, 2), 1)
-  do
-    // { 0, 7, 3, 4 }
-    // { 1, 6, 2, 5 }
-    if  quad = 0 then
-      mem[select*64+row*8+0] := a;
-      mem[select*64+row*8+7] := b;
-      mem[select*64+row*8+3] := c;
-      mem[select*64+row*8+4] := d;
-    else
-      mem[select*64+row*8+1] := a;
-      mem[select*64+row*8+6] := b;
-      mem[select*64+row*8+2] := c;
-      mem[select*64+row*8+5] := d;
-    end
-    rcount := rcount + 4;
-  end
+	int ccount := 0;
 
+	int select := 0;
 
-  action ==>
-  guard
-    ccount = 0 and rcount = 64
-  do
-    select := bitxor( select, 1 );
-    ccount := 64;
-    rcount := 0;
-  end
+	action ==> Y:[ mem[i * 64 + row * 8 + col] ]
+	guard
+		ccount > 0
+	var
+		int col = rshift(64 - ccount, 3) , int row = bitand(64 - ccount, 7) , int i = bitxor(select, 1)
+	do
+		ccount := ccount - 1;
+	end
 
- end
+	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ] ==>
+	guard
+		rcount < 64
+	var
+		int row = rshift(rcount, 3) , int quad = bitand(rshift(rcount, 2), 1)
+	do
+	// { 0, 7, 3, 4 }
+		// { 1, 6, 2, 5 }
+		if quad = 0 then
+			mem[select * 64 + row * 8 + 0] := a;
+			mem[select * 64 + row * 8 + 7] := b;
+			mem[select * 64 + row * 8 + 3] := c;
+			mem[select * 64 + row * 8 + 4] := d;
+		else
+			mem[select * 64 + row * 8 + 1] := a;
+			mem[select * 64 + row * 8 + 6] := b;
+			mem[select * 64 + row * 8 + 2] := c;
+			mem[select * 64 + row * 8 + 5] := d;
+		end
+		rcount := rcount + 4;
+	end
+
+	action ==>
+	guard
+		ccount = 0 and rcount = 64
+	do
+		select := bitxor(select, 1);
+		ccount := 64;
+		rcount := 0;
+	end
+
+end

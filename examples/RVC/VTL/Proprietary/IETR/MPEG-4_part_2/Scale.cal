@@ -1,38 +1,40 @@
 import all caltrop.lib.BitOps;
+actor Scale () int(size=SIN_SZ) SIn ==> int(size=SOUT_SZ) SOut :
 
-actor Scale () int (size=SIN_SZ) SIn ==> int (size=SOUT_SZ) SOut :
+// Port size declaration
+	int SIN_SZ = 13;
 
-  // Port size declaration
-  int SIN_SZ 	= 13;
-  int SOUT_SZ 	= 32;
-  
-int A = 1024;
-int B = 1138;
-int C = 1730;
-int D = 1609;
-int E = 1264;
-int F = 1922;
-int G = 1788;
-int H = 2923;
-int I = 2718;
-int J = 2528;
+	int SOUT_SZ = 32;
 
-List(type:int, size=64) scale =
-[ 
-A, B, C, D, A, D, C, B,
-B, E, F, G, B, G, F, E,
-C, F, H, I, C, I, H, F,
-D, G, I, J, D, J, I, G,
-A, B, C, D, A, D, C, B,
-D, G, I, J, D, J, I, G,
-C, F, H, I, C, I, H, F,
-B, E, F, G, B, G, F, E
-];
+	int A = 1024;
 
-  action SIn: [x] repeat 64 ==> SOut: [y] repeat 64
-    var List (type: int (size=32), size=64) y
-      do
-        y := [x[i] * scale[i]: for int i in Integers(0, 63)];
-        y[0] := y[0] + lshift( 1, 12 );
-      end
+	int B = 1138;
+
+	int C = 1730;
+
+	int D = 1609;
+
+	int E = 1264;
+
+	int F = 1922;
+
+	int G = 1788;
+
+	int H = 2923;
+
+	int I = 2718;
+
+	int J = 2528;
+
+	List(type: int, size=64) scale = [ A, B, C, D, A, D, C, B, B, E, F, G, B, G, F, E, C, F, H, I, C, I, H, F, D, G
+	, I, J, D, J, I, G, A, B, C, D, A, D, C, B, D, G, I, J, D, J, I, G, C, F, H, I, C, I, H, F, B, E, F, G, B, G, F, E ];
+
+	action SIn:[ x ] repeat 64 ==> SOut:[ y ] repeat 64
+	var
+		List(type: int(size=32), size=64) y
+	do
+		y := [ x[i] * scale[i] : for int i in Integers(0, 63) ];
+		y[0] := y[0] + lshift(1, 12);
+	end
+
 end

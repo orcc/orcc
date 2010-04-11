@@ -39,37 +39,35 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 // Multiply the incoming sample pairs with the coefficients provided by the generator.
-
 import all caltrop.lib.BitOps;
+actor Scale () int(size=isz) X0, int(size=isz) X1 ==> int(size=osz) Y0 , int(size=osz) Y1 ,
+int(size=osz) Y2 , int(size=osz) Y3 :
 
-actor Scale()
-  int(size=isz) X0, int(size=isz) X1 ==>
-  int(size=osz) Y0, int(size=osz) Y1, int(size=osz) Y2, int(size=osz) Y3 :
-  
-  int isz = 16;
-  int osz = 30;
-  int csz = 13;
+	int isz = 16;
 
-  List( type:int(size=csz), size=4 ) W0 = [ 2048, 2676, 2841, 1609 ];
-  List( type:int(size=csz), size=4 ) W1 = [ 2048, 1108,  565, 2408 ];
+	int osz = 30;
 
-  // Prefetch the next coefficients
-  int(size=csz) ww0 := W0[0];
-  int(size=csz) ww1 := 2048;
-  
-  int index := 0;
+	int csz = 13;
 
-  action X0:[a], X1:[b] ==>
-         Y0:[ a * w0 ], Y1:[ a * w1 ], Y2:[ b * w0 ], Y3:[ b * w1 ]
-  var
-    int(size=csz) w0 = ww0,
-    int(size=csz) w1 = ww1
-  do
-    index := bitand( index+1, 3 );
-    ww0 := W0[index];
-    ww1 := W1[index];
-  end
+	List(type: int(size=csz), size=4) W0 = [ 2048, 2676, 2841, 1609 ];
+
+	List(type: int(size=csz), size=4) W1 = [ 2048, 1108, 565, 2408 ];
+
+	// Prefetch the next coefficients
+	int(size=csz) ww0 := W0[0];
+
+	int(size=csz) ww1 := 2048;
+
+	int index := 0;
+
+	action X0:[ a ], X1:[ b ] ==> Y0:[ a * w0 ], Y1:[ a * w1 ], Y2:[ b * w0 ], Y3:[ b * w1 ]
+	var
+		int(size=csz) w0 = ww0 , int(size=csz) w1 = ww1
+	do
+		index := bitand(index + 1, 3);
+		ww0 := W0[index];
+		ww1 := W1[index];
+	end
 
 end

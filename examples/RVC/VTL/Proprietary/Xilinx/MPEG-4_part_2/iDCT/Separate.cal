@@ -39,25 +39,27 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 // Deinterleave row, col streams
-
 import all caltrop.lib.BitOps;
+actor Separate () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3,
+bool ROW ==> int(size=rsz) R0 , int(size=rsz) R1 , int(size=rsz) R2 , int(size=rsz) R3 ,
+int(size=csz) C0 , int(size=csz) C1 , int(size=csz) C2 , int(size=csz) C3 :
 
-actor Separate ()
-   int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3,
-   bool ROW ==>
-   int(size=rsz) R0, int(size=rsz) R1, int(size=rsz) R2, int(size=rsz) R3,
-   int(size=csz) C0, int(size=csz) C1, int(size=csz) C2, int(size=csz) C3 :
-   
-   int isz = 16;
-   int rsz = 16;
-   int csz = 10; 
+	int isz = 16;
 
-   action X0:[a], X1:[b], X2:[c], X3:[d], ROW:[r] ==> R0:[a], R1:[b], R2:[c], R3:[d]
-   guard r end
+	int rsz = 16;
 
-   action X0:[a], X1:[b], X2:[c], X3:[d], ROW:[r] ==> C0:[rshift(a,6)], C1:[rshift(b,6)], C2:[rshift(c,6)], C3:[rshift(d,6)]
-   guard not r end
+	int csz = 10;
+
+	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ], ROW:[ r ] ==> R0:[ a ], R1:[ b ], R2:[ c ], R3:[ d ]
+	guard
+		r
+	end
+
+	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ], ROW:[ r ] ==> C0:[ rshift(a, 6) ], C1:[ rshift(b, 6) ], C2
+		:[ rshift(c, 6) ], C3:[ rshift(d, 6) ]
+	guard
+		not r
+	end
 
 end

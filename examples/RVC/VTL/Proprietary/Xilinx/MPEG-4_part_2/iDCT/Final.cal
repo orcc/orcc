@@ -39,20 +39,17 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 // Final IDCT scaling in idct1d pipeline
-
 import all caltrop.lib.BitOps;
+actor Final () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3 ==>
+int(size=osz) Y0 , int(size=osz) Y1 , int(size=osz) Y2 , int(size=osz) Y3 :
 
-actor Final()
-    int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3 ==>
-    int(size=osz) Y0, int(size=osz) Y1, int(size=osz) Y2, int(size=osz) Y3 :
-    
-  int isz = 24;
-  int osz = 16;
+	int isz = 24;
 
-  action X0:[a], X1:[b], X2:[c], X3:[d] ==>
-         Y0:[rshift(a+c,8)], Y1:[rshift(a-c,8)],Y2:[rshift(b+d,8)], Y3:[rshift(b-d,8)]
-  end
-  
+	int osz = 16;
+
+	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ] ==> Y0:[ rshift(a + c, 8) ], Y1:[ rshift(a - c, 8) ], Y2:[
+		rshift(b + d, 8) ], Y3:[ rshift(b - d, 8) ]
+	end
+
 end

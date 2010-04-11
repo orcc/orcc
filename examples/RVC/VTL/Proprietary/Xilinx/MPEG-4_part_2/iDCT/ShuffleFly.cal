@@ -35,36 +35,34 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-
 // ShuffleFly.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 // Take pairs of row/col data and repackage in quads as follows:
 //  Input   {0,1} {2,3}
 // Output   {0,2,1,3}
+actor ShuffleFly () int(size=sz) X0, int(size=sz) X1 ==> int(size=sz) Y0 , int(size=sz) Y1 ,
+int(size=sz) Y2 , int(size=sz) Y3 :
 
-actor ShuffleFly () int(size=sz) X0, int(size=sz) X1 ==>
-  int(size=sz) Y0, int(size=sz) Y1, int(size=sz) Y2, int(size=sz) Y3 :
-  
-  int sz = 24;
+	int sz = 24;
 
-  int(size=sz) D0;
-  int(size=sz) D1;
+	int(size=sz) D0;
 
-  a0: action X0:[a], X1:[b] ==>
-  do
-    D0 := a;
-    D1 := b;
-  end
+	int(size=sz) D1;
 
-  a1: action X0:[d2], X1:[d3] ==> Y0:[D0+d2], Y1:[D0-d2], Y2:[D1+d3], Y3:[D1-d3]
-  end
+	a0: action X0:[ a ], X1:[ b ] ==>
+	do
+		D0 := a;
+		D1 := b;
+	end
 
-  schedule fsm s0 :
-    s0( a0 ) --> s1;
-    s1( a1 ) --> s0;
-  end
+	a1: action X0:[ d2 ], X1:[ d3 ] ==> Y0:[ D0 + d2 ], Y1:[ D0 - d2 ], Y2:[ D1 + d3 ], Y3:[ D1 - d3 ]
+	end
+
+	schedule fsm s0 :
+		s0 ( a0 ) --> s1;
+		s1 ( a1 ) --> s0;
+	end
 
 end

@@ -39,42 +39,46 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-
 // Multiplexer in idct2d pipeline. Alternates row, column bursts
 // (4 sample pairs each) into the shared idct1d. During start-up
 // or wind-down of a burst of video it will break the pattern
 // as needed.
+actor FairMerge () int(size=rsz) R0, int(size=rsz) R1, int(size=csz) C0, int(size=csz) C1
+==> int(size=csz) Y0 , int(size=csz) Y1 , bool ROWOUT :
 
-actor FairMerge ()
-    int(size=rsz) R0, int(size=rsz) R1, int(size=csz) C0, int(size=csz) C1 ==>
-    int(size=csz) Y0, int(size=csz) Y1, bool ROWOUT :
-    
-    int rsz = 13;
-    int csz = 16; 
+	int rsz = 13;
 
-      row: action R0:[a], R1:[b] ==> Y0:[a], Y1:[b], ROWOUT:[true] end
-      col: action C0:[a], C1:[b] ==> Y0:[a], Y1:[b], ROWOUT:[false] end
-  row_low: action R0:[a], R1:[b] ==> Y0:[a], Y1:[b], ROWOUT:[true] end
-  col_low: action C0:[a], C1:[b] ==> Y0:[a], Y1:[b], ROWOUT:[false] end  
+	int csz = 16;
 
-  schedule fsm r0 :
-    r0( row ) --> r1;
-    r1( row ) --> r2;
-    r2( row ) --> r3;
-    r3( row ) --> c0;
-    
-    c0( col ) --> c1;
-    c1( col ) --> c2;
-    c2( col ) --> c3;
-    c3( col ) --> r0;
+	row: action R0:[ a ], R1:[ b ] ==> Y0:[ a ], Y1:[ b ], ROWOUT:[ true ]
+	end
 
-    // low priority transitions fire if other type of input not available    
-    r0( col_low ) --> c1;
-    c0( row_low ) --> r1;
-  end
+	col: action C0:[ a ], C1:[ b ] ==> Y0:[ a ], Y1:[ b ], ROWOUT:[ false ]
+	end
 
-  priority
-    col > row_low;
-    row > col_low;
-  end 
+	row_low: action R0:[ a ], R1:[ b ] ==> Y0:[ a ], Y1:[ b ], ROWOUT:[ true ]
+	end
+
+	col_low: action C0:[ a ], C1:[ b ] ==> Y0:[ a ], Y1:[ b ], ROWOUT:[ false ]
+	end
+
+	schedule fsm r0 :
+		r0 ( row ) --> r1;
+		r1 ( row ) --> r2;
+		r2 ( row ) --> r3;
+		r3 ( row ) --> c0;
+		c0 ( col ) --> c1;
+		c1 ( col ) --> c2;
+		c2 ( col ) --> c3;
+		c3 ( col ) --> r0;
+		// low priority transitions fire if other type of input not available    
+		r0 ( col_low ) --> c1;
+		c0 ( row_low ) --> r1;
+	end
+
+	priority
+		col > row_low;
+		row > col_low;
+	end
+
 end
