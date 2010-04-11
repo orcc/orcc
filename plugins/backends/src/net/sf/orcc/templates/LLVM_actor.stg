@@ -1,6 +1,3 @@
-group LLVM_actor;
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,10 +32,10 @@ $list.variable.type.elementType$
 
 variableDeclaration(variable) ::= <<
 $if(variable.port)$
-$AllocaOp(result="%"+variable, type=variable.type.elementType+"*")$
+$AllocaOp(result={%$variable$}, type={$variable.type.elementType$*})$
 $else$
 $if(variable.list)$
-$AllocaOp(result="%"+variable, type=variable.type)$
+$AllocaOp(result={%$variable$}, type=variable.type)$
 $endif$
 $endif$
 
@@ -209,11 +206,11 @@ $result$ = trunc $ty$ $value$ to $ty2$
 
 StoreInstr(ty, value, pty, pointer, cast) ::= <<
 $if(value.intExpr)$
-$StoreOp(ty=pty, value=Expr(value)+cast, pty=pty, pointer=pointer)$
+$StoreOp(ty=pty, value={$Expr(value)$cast}, pty=pty, pointer=pointer)$
 $elseif(value.booleanExpr)$
-$StoreOp(ty=pty, value=Expr(value)+cast, pty=pty, pointer=pointer)$
+$StoreOp(ty=pty, value={$Expr(value)$cast}, pty=pty, pointer=pointer)$
 $else$
-$StoreOp(ty=ty, value=Expr(value)+cast, pty=pty, pointer=pointer)$
+$StoreOp(ty=ty, value={$Expr(value)$cast}, pty=pty, pointer=pointer)$
 $endif$
 >>
 
@@ -228,12 +225,12 @@ $transitions:{$\t$i32 $it.sourceState.index$, label %s_$it.sourceState$$\n$}$
 >>
 
 switch(fsm, transitions) ::= <<
-	$LoadOp(result="%"+fsm, ty="i32", pointer="@"+fsm)$
-	$SwitchOp(intty="i32", value="%"+fsm, defaultdest="%default", labelpairs=states(transitions))$
+	$LoadOp(result={%$fsm$}, ty="i32", pointer={@$fsm$})$
+	$SwitchOp(intty="i32", value={%$fsm$}, defaultdest="%default", labelpairs=states(transitions))$
 $transitions: {
 s_$it.sourceState$:
-	$CallOp(result="%"+it.sourceState+"_res", ty="i1", fnptrval="@"+it.sourceState+"_state_scheduler")$
-	$BrOp(cond="%"+it.sourceState+"_res", iftrue="%inc_i", iffalse="%return")$
+	$CallOp(result={%$it.sourceState$_res}, ty="i1", fnptrval={@$it.sourceState$_state_scheduler})$
+	$BrOp(cond={%$it.sourceState$_res}, iftrue="%inc_i", iffalse="%return")$
 }$
 default:
 	$BrOp(dest="%return")$
@@ -244,38 +241,38 @@ CastAssign(target, value, cast)::= <<
 $if(cast.extended)$
 %$target$_ext = $value$
 $if(cast.signed)$
-$SextOp(result="%"+target, ty=value.type, value="%"+target+"_ext", ty2=target.type)$
+$SextOp(result={%$target$}, ty=value.type, value={%$target$_ext}, ty2=target.type)$
 
 $else$
-$ZextOp(result="%"+target, ty=value.type, value="%"+target+"_ext", ty2=target.type)$
+$ZextOp(result={%$target$}, ty=value.type, value={%$target$_ext}, ty2=target.type)$
 
 $endif$
 $else$
 %$target$_trunc = $value$
-$TruncOp(result="%"+target, ty=value.type, value="%"+target+"_trunc", ty2=target.type)$
+$TruncOp(result={%$target$}, ty=value.type, value={%$target$_trunc}, ty2=target.type)$
 $endif$
 
 >>
 
 CastParameter(casts, args, params, location )::= <<
 $casts, args, params: { cast, arg, param | $if(cast)$ 
-$BitcastOp(result="%"+param+location+"_cast", ty=param.type+"*", value=Expr(param), ty2=arg.type+"*")$
+$BitcastOp(result={%$param$$location$_cast}, ty={$param.type$*}, value=Expr(param), ty2={$arg.type$*})$
 $endif$}$
 >>
 
 CastCall(result, ty, fnptrval, function_args, cast)::= <<
 $if(cast.extended)$
-$CallOp(result="%"+result+"_ext", ty=ty, fnptrval=fnptrval, function_args=function_args)$
+$CallOp(result={%$result$_ext}, ty=ty, fnptrval=fnptrval, function_args=function_args)$
 $if(cast.signed)$
-$SextOp(result="%"+result, ty=ty, value="%"+result+"_ext", ty2=result.type)$
+$SextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
 
 $else$
-$ZextOp(result="%"+result, ty=ty, value="%"+result+"_ext", ty2=result.type)$
+$ZextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
 
 $endif$
 $else$
-$CallOp(result="%"+result+"_trunc", ty=ty, fnptrval=fnptrval, function_args=function_args)$
-$TruncOp(result="%"+result, ty=ty, value="%"+result+"_trunc", ty2=result.type)$
+$CallOp(result={%$result$_trunc}, ty=ty, fnptrval=fnptrval, function_args=function_args)$
+$TruncOp(result={%$result$}, ty=ty, value={%$result$_trunc}, ty2=result.type)$
 $endif$
 
 >>
@@ -284,27 +281,27 @@ $endif$
 CastStore(ty, value, pty, pointer, cast, location)::= <<
 $if(cast.extended)$
 $if(cast.signed)$
-$SextOp(result="%"+value+"_"+location+"_ext", ty=ty, value=Expr(value), ty2=pty)$
+$SextOp(result={%$value$_$location$_ext}, ty=ty, value=Expr(value), ty2=pty)$
 
 $else$
-$ZextOp(result="%"+value+"_"+location+"_ext", ty=ty, value=Expr(value), ty2=pty)$
+$ZextOp(result={%$value$_$location$_ext}, ty=ty, value=Expr(value), ty2=pty)$
 
 $endif$
-$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_"+location+"_ext")$
+$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast={_$location$_ext})$
 $else$
-$TruncOp(result="%"+value+"_"+location+"_trunc", ty=ty, value=Expr(value), ty2=pty)$
+$TruncOp(result={%$value$_$location$_trunc}, ty=ty, value=Expr(value), ty2=pty)$
 
-$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast="_"+location+"_trunc")$
+$StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast={_$location$_trunc})$
 $endif$
-$endif$
+
 >>
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-$GetElementPtrOp(result="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr", idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
+$GetElementPtrOp(result={%$pointer$_$location$_L$indexesName(indexes)$ptr}, idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr", cast=cast, location=location)$
+$CastStore(ty=ty, value=value, pty=pty.elementType, pointer={%$pointer$_$location$_L$indexesName(indexes)$ptr}, cast=cast, location=location)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr")$
+$StoreInstr(ty=ty, value=value, pty=pty.elementType, pointer={%$pointer$_$location$_L$indexesName(indexes)$ptr})$
 $endif$
 >>
 
@@ -317,12 +314,12 @@ $endif$
 >>
 
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-$LoadOp(result="%"+pointer+"_"+location+"_Loadport"+indexesName(indexes), ty=pty+"*", pointer=Var(pointer))$
-$GetElementPtrOp(result="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr", pty=pty, ptrval="%"+pointer+"_"+location+"_Loadport"+indexesName(indexes), idx=indexes)$
+$LoadOp(result={%$pointer$_$location$_Loadport$indexesName(indexes)$}, ty={$pty$*}, pointer=Var(pointer))$
+$GetElementPtrOp(result={%$pointer$_$location$_L$indexesName(indexes)$ptr}, pty=pty, ptrval={%$pointer$_$location$_Loadport$indexesName(indexes)$}, idx=indexes)$
 $if(cast)$
-$CastStore(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr", cast=cast, location=location)$
+$CastStore(ty=ty, value=value, pty=pty, pointer={%$pointer$_$location$_L$indexesName(indexes)$ptr}, cast=cast, location=location)$
 $else$
-$StoreInstr(ty=ty, value=value, pty=pty, pointer="%"+pointer+"_"+location+"_L"+indexesName(indexes)+"ptr")$
+$StoreInstr(ty=ty, value=value, pty=pty, pointer={%$pointer$_$location$_L$indexesName(indexes)$ptr})$
 $endif$
 >>
 
@@ -334,27 +331,27 @@ StorePortWithoutIndex
 
 CastLoad(result, ty, pointer, cast)::= <<
 $if(cast.extended)$
-$LoadOp(result="%"+result+"_ext", ty=ty, pointer=pointer)$
+$LoadOp(result={%$result$_ext}, ty=ty, pointer=pointer)$
 $if(cast.signed)$
-$SextOp(result="%"+result, ty=ty, value="%"+result+"_ext", ty2=result.type)$
+$SextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
 
 $else$
-$ZextOp(result="%"+result, ty=ty, value="%"+result+"_ext", ty2=result.type)$
+$ZextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
 
 $endif$
 $else$
-$LoadOp(result="%"+result+"_trunc", ty=ty, pointer=pointer)$
-$TruncOp(result="%"+result, ty=ty, value="%"+result+"_trunc", ty2=result.type)$
+$LoadOp(result={%$result$_trunc}, ty=ty, pointer=pointer)$
+$TruncOp(result={%$result$}, ty=ty, value={%$result$_trunc}, ty2=result.type)$
 $endif$
 >>
 
 LoadPortWithIndex(result, ty, pointer, indexes, cast) ::= <<
-$LoadOp(result="%"+result+"_L", ty=ty+"*", pointer=Var(pointer))$
-$GetElementPtrOp(result="%"+result+"_"+pointer+indexesName(indexes)+"_ptr", pty=ty, ptrval="%"+result+"_L", idx=indexes)$
+$LoadOp(result={%$result$_L}, ty={$ty$*}, pointer=Var(pointer))$
+$GetElementPtrOp(result={%$result$_$pointer$$indexesName(indexes)$_ptr}, pty=ty, ptrval={%$result$_L}, idx=indexes)$
 $if(cast)$
-$CastLoad(result=result, ty=ty, pointer="%"+result+"_"+pointer+indexesName(indexes)+"_ptr", cast = cast)$
+$CastLoad(result=result, ty=ty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr}, cast = cast)$
 $else$
-$LoadOp(result="%"+result, ty=ty, pointer="%"+result+"_"+pointer+indexesName(indexes)+"_ptr")$
+$LoadOp(result={%$result$}, ty=ty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr})$
 $endif$
 
 
@@ -368,11 +365,11 @@ LoadPortWithoutIndex
 
 
 LoadWithIndex(result, ty, pointer, indexes, cast) ::= <<
-$GetElementPtrOp(result=result+"_"+pointer+"L"+indexesName(indexes)+"_ptr", idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
+$GetElementPtrOp(result={$result$_$pointer$L$indexesName(indexes)$_ptr}, idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
-$CastLoad(result=result, ty=ty.elementType, pointer=result+"_"+pointer+"L"+indexesName(indexes)+"_ptr", cast=cast)$
+$CastLoad(result=result, ty=ty.elementType, pointer={$result$_$pointer$L$indexesName(indexes)$_ptr}, cast=cast)$
 $else$
-$LoadOp(result=result, ty=ty.elementType, pointer=result+"_"+pointer+"L"+indexesName(indexes)+"_ptr")$
+$LoadOp(result=result, ty=ty.elementType, pointer={$result$_$pointer$L$indexesName(indexes)$_ptr})$
 $endif$
 
 
@@ -389,23 +386,23 @@ $endif$
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
-	$BrOp(cond=Expr(ifNode.value), iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.elseNodes))$
+	$BrOp(cond=Expr(ifNode.value), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.elseNodes)$})$
 
 b$label(ifNode.thenNodes)$: 
-$nodes_cond(first(ifNode.thenNodes))$ $nodes(rest(ifNode.thenNodes))$ $BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(first(ifNode.thenNodes))$ $nodes(rest(ifNode.thenNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.elseNodes)$:
-$nodes_cond(first(ifNode.elseNodes))$ $nodes(rest(ifNode.elseNodes))$ $BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(first(ifNode.elseNodes))$ $nodes(rest(ifNode.elseNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.joinNode)$:
 
 >>
 
 IfWithThenNode(ifNode) ::= <<
-	$BrOp(cond=Expr(ifNode.value), iftrue="%b"+label(ifNode.thenNodes), iffalse="%b"+label(ifNode.joinNode))$
+	$BrOp(cond=Expr(ifNode.value), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.thenNodes)$: 
-$nodes_cond(first(ifNode.thenNodes))$ $nodes(rest(ifNode.thenNodes))$ $BrOp(dest ="%b"+label(ifNode.joinNode))$
+$nodes_cond(first(ifNode.thenNodes))$ $nodes(rest(ifNode.thenNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.joinNode)$:
 
@@ -414,13 +411,13 @@ b$label(ifNode.joinNode)$:
 
 
 LoadLocalPort(instr) ::= <<
-$LoadOp(result="%local_"+instr.port+instr.block.label, ty="%struct.fifo_s*", pointer="@"+actorName+"_"+instr.port)$
+$LoadOp(result={%local_$instr.port$$instr.block.label$}, ty="%struct.fifo_s*", pointer={@$actorName$_$instr.port$})$
 >>
 
 HasRoom(result, action, actor, port, numToken) ::= <<
-$LoadOp(result="%"+port+"_"+action, ty="%struct.fifo_s*", pointer="@"+actor+"_"+port)$
-$CallOp(result="%"+result+"32", ty="i32", fnptrval="@hasRoom", function_args="%struct.fifo_s* %"+port+"_"+action+", i32 "+numToken)$
-$TruncOp(result="%"+result, ty="i32", value="%"+result+"32", ty2="i1")$
+$LoadOp(result={%$port$_$action$}, ty="%struct.fifo_s*", pointer={@$actor$_$port$})$
+$CallOp(result={%$result$32}, ty="i32", fnptrval="@hasRoom", function_args={%struct.fifo_s* %$port$_$action$, i32 $numToken$})$
+$TruncOp(result={%$result$}, ty="i32", value={%$result$32}, ty2="i1")$
 >>
 
 label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
@@ -445,7 +442,7 @@ $if(call.target)$
 $if(call.cast)$
 $CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)), cast=call.cast)$
 $else$
-$CallOp(result="%"+call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
+$CallOp(result={%$call.target$}, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
 $endif$
 $else$
 $CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
@@ -465,43 +462,43 @@ $endif$
 >>
 
 PhiAssignment(phi) ::= <<
-$PhiOp(result="%"+phi.target, ty=phi.target.type, pairs=phiPairs(phi))$
+$PhiOp(result={%$phi.target$}, ty=phi.target.type, pairs=phiPairs(phi))$
 
 >>
 
 Read(read) ::= <<
 $LoadLocalPort(read)$
-$CallOp(result="%"+read.target+"_"+read.block.label, ty ="i8*", fnptrval="@getReadPtr", function_args="%struct.fifo_s* %local_"+read.target+read.block.label+", i32 "+read.numTokens)$
-$BitcastOp(result="%"+read.target+"_"+read.block.label+"_cast", ty="i8*", value="%"+read.target+"_"+read.block.label, ty2=ExprType(read.port)+"*")$
-$StoreOp(ty=ExprType(read.port)+"*", value="%"+read.target+"_"+read.block.label+"_cast", pty=ExprType(read.port)+"*", pointer="%"+read.port)$
+$CallOp(result={%$read.target$_$read.block.label$}, ty ="i8*", fnptrval="@getReadPtr", function_args={%struct.fifo_s* %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
+$BitcastOp(result={%$read.target$_$read.block.label$_cast}, ty="i8*", value={%$read.target$_$read.block.label$}, ty2={$ExprType(read.port)$*})$
+$StoreOp(ty={$ExprType(read.port)$*}, value={%$read.target$_$read.block.label$_cast}, pty={$ExprType(read.port)$*}, pointer={%$read.port$})$
 
 >>
 
 ReadEnd(readEnd) ::= <<
-$LoadOp(result="%end_"+readEnd.port, ty="%struct.fifo_s*", pointer="@"+actorName+"_"+readEnd.port)$
-$CallOp(ty ="void", fnptrval="@setReadEnd", function_args="%struct.fifo_s* %end_"+readEnd.port)$
+$LoadOp(result={%end_$readEnd.port$}, ty="%struct.fifo_s*", pointer={@$actorName$_$readEnd.port$})$
+$CallOp(ty ="void", fnptrval="@setReadEnd", function_args={%struct.fifo_s* %end_$readEnd.port$})$
 
 >>
 
 Peek(peek) ::= <<
 $LoadLocalPort(peek)$
-$CallOp(result="%"+peek.target+"_"+peek.block.label, ty ="i8*", fnptrval="@getPeekPtr", function_args="%struct.fifo_s* %local_"+peek.target+peek.block.label+", i32 "+peek.numTokens)$
-$BitcastOp(result="%"+peek.target+"_"+peek.block.label+"_cast", ty="i8*", value="%"+peek.target+"_"+peek.block.label, ty2=ExprType(peek.port)+"*")$
-$StoreOp(ty=ExprType(peek.port)+"*", value="%"+peek.target+"_"+peek.block.label+"_cast", pty=ExprType(peek.port)+"*", pointer="%"+peek.port)$
+$CallOp(result={%$peek.target$_$peek.block.label$}, ty ="i8*", fnptrval="@getPeekPtr", function_args={%struct.fifo_s* %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
+$BitcastOp(result={%$peek.target$_$peek.block.label$_cast}, ty="i8*", value={%$peek.target$_$peek.block.label$}, ty2={$ExprType(peek.port)$*})$
+$StoreOp(ty={$ExprType(peek.port)$*}, value={%$peek.target$_$peek.block.label$_cast}, pty={$ExprType(peek.port)$*}, pointer={%$peek.port$})$
 
 >>
 
 Write(write) ::= <<
 $LoadLocalPort(write)$
-$CallOp(result="%"+write.target+"_"+write.block.label, ty ="i8*", fnptrval="@getWritePtr", function_args="%struct.fifo_s* %local_"+write.target+write.block.label+", i32 "+write.numTokens)$
-$BitcastOp(result="%"+write.target+"_"+write.block.label+"_cast", ty="i8*", value="%"+write.target+"_"+write.block.label, ty2=ExprType(write.port)+"*")$
-$StoreOp(ty=ExprType(write.port)+"*", value="%"+write.target+"_"+write.block.label+"_cast", pty=ExprType(write.port)+"*", pointer="%"+write.port)$
+$CallOp(result={%$write.target$_$write.block.label$}, ty ="i8*", fnptrval="@getWritePtr", function_args={%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
+$BitcastOp(result={%$write.target$_$write.block.label$_cast}, ty="i8*", value={%$write.target$_$write.block.label$}, ty2={$ExprType(write.port)$*})$
+$StoreOp(ty={$ExprType(write.port)$*}, value={%$write.target$_$write.block.label$_cast}, pty={$ExprType(write.port)$*}, pointer={%$write.port$})$
 
 >>
 
 WriteEnd(writeEnd) ::= <<
-$LoadOp(result="%end_"+writeEnd.port, ty="%struct.fifo_s*", pointer="@"+actorName+"_"+writeEnd.port)$
-$CallOp(ty ="void", fnptrval="@setWriteEnd", function_args="%struct.fifo_s* %end_"+writeEnd.port)$
+$LoadOp(result={%end_$writeEnd.port$}, ty="%struct.fifo_s*", pointer={@$actorName$_$writeEnd.port$})$
+$CallOp(ty ="void", fnptrval="@setWriteEnd", function_args={%struct.fifo_s* %end_$writeEnd.port$})$
 
 >>
 
@@ -517,8 +514,8 @@ $endif$
 
 HasTokens(hasTokens) ::= <<
 $LoadLocalPort(hasTokens)$
-$CallOp(result="%"+hasTokens.target+"32", ty="i32", fnptrval="@hasTokens", function_args="%struct.fifo_s* %local_"+hasTokens.port+hasTokens.block.label+", i32 "+hasTokens.numTokens)$
-$TruncOp(result="%"+hasTokens.target, ty="i32", value="%"+hasTokens.target+"32", ty2="i1")$
+$CallOp(result={%$hasTokens.target$32}, ty="i32", fnptrval="@hasTokens", function_args={%struct.fifo_s* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$})$
+$TruncOp(result={%$hasTokens.target$}, ty="i32", value={%$hasTokens.target$32}, ty2="i1")$
 
 >>
 
@@ -550,9 +547,9 @@ $LoadPortWithIndex(result=load.target, ty=load.source.variable.type.elementType,
 $endif$
 $else$
 $if(load.indexes.empty)$
-$LoadWithoutIndex(result="%"+load.target, ty=VarType(load.source), pointer=load.source, cast= load.cast)$
+$LoadWithoutIndex(result={%$load.target$}, ty=VarType(load.source), pointer=load.source, cast= load.cast)$
 $else$
-$LoadWithIndex(result="%"+load.target, ty=load.source.variable.type, pointer=load.source, indexes=load.indexes, cast= load.cast)$
+$LoadWithIndex(result={%$load.target$}, ty=load.source.variable.type, pointer=load.source, indexes=load.indexes, cast= load.cast)$
 $endif$
 $endif$
 
@@ -582,12 +579,12 @@ $nodes(rest(ifNode.joinNode))$
 // while node
 WhileNode(whileNode) ::= <<
 $BlockNode(whileNode.joinNode)$
-	$BrOp(cond=Expr(whileNode.value), iftrue="%b"+label(whileNode.Nodes), iffalse="%b"+label(whileNode.joinNode.successors))$
+	$BrOp(cond=Expr(whileNode.value), iftrue={%b$label(whileNode.Nodes)$}, iffalse={%b$label(whileNode.joinNode.successors)$})$
 
 b$label(whileNode.nodes)$:
 $nodes_cond(first(whileNode.nodes))$
 $nodes(rest(whileNode.nodes))$
-	$BrOp(dest="%b"+label(whileNode.joinNode))$
+	$BrOp(dest={%b$label(whileNode.joinNode)$})$
 
 b$label(whileNode.joinNode.successors)$:
 
@@ -606,7 +603,7 @@ $nodes: {$(it.class.simpleName)(it)$}$
 >>
 
 nodes_cond(nodes) ::= <<
-$nodes: {$(it.class.simpleName+"_cond")(it)$}$
+$nodes: {$({$it.class.simpleName$_cond})(it)$}$
 >>
 
 WhileNode_cond(nodes) ::= <<
@@ -624,7 +621,7 @@ $instructions(blockNode.instructions)$
 
 // if node
 BlockNode(blockNode) ::= <<
-	$BrOp(dest="%b"+label(blockNode))$
+	$BrOp(dest={%b$label(blockNode)$})$
 
 b$label(blockNode)$:
 $instructions(blockNode.instructions)$
@@ -638,18 +635,18 @@ $instructions(blockNode.instructions)$
 
 outputPattern(pattern, action) ::= <<
 $if(rest(pattern.keys))$
-	$AllocaOp(result="%p"+action+"_roomTest", type="i1")$
-	$StoreOp(ty="i1", value="1", pty="i1", pointer="%p"+action+"_roomTest")$
+	$AllocaOp(result={%p$action$_roomTest}, type="i1")$
+	$StoreOp(ty="i1", value="1", pty="i1", pointer={%p$action$_roomTest})$
 $pattern.keys:{port|
-	$HasRoom(result=action+i+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$
-	$LoadOp(result="%"+action+i+"_roomTest", ty="i1", pointer="%p"+action+"_roomTest")$
-	$AndOp(result="%"+action+i, ty="i1", op1="%"+action+i+"_room", op2="%"+action+i+"_roomTest")$
-	$StoreOp(ty="i1", value="%"+action+i, pty="i1", pointer="%p"+action+"_roomTest")$
+	$HasRoom(result={$action$$i$_room}, action=action,  actor=actorName, port=port, numToken=pattern.(port))$
+	$LoadOp(result={%$action$$i$_roomTest}, ty="i1", pointer={%p$action$_roomTest})$
+	$AndOp(result={%$action$$i$}, ty="i1", op1={%$action$$i$_room}, op2={%$action$$i$_roomTest})$
+	$StoreOp(ty="i1", value={%$action$$i$}, pty="i1", pointer={%p$action$_roomTest})$
 }$
-	$LoadOp(result="%"+action+"_room", ty="i1", pointer="%p"+action+"_roomTest")$
+	$LoadOp(result={%$action$_room}, ty="i1", pointer={%p$action$_roomTest})$
 $else$
 $pattern.keys:{port|
-	$HasRoom(result=action+"_room", action=action,  actor=actorName, port=port, numToken=pattern.(port))$}$
+	$HasRoom(result={$action$_room}, action=action,  actor=actorName, port=port, numToken=pattern.(port))$}$
 $endif$
 >>
 
@@ -660,7 +657,7 @@ $endif$
 schedulerFSM(actions, fsm) ::= <<
 @_FSM_state = internal global i32 $fsm.initialState.index$
 
-$fsm.transitions: stateScheduler(transition=it); separator="\n"$
+$fsm.transitions: {$stateScheduler(transition=it)$}; separator="\n"$
 
 $if(actions)$
 define internal i32 @outside_FSM_scheduler() {
@@ -731,12 +728,12 @@ sched_nok:
 >>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(it)$
+$nextStates: {$actionTestState(it)$}$
 >>
 
 actionTestState(nextState) ::= <<
-	$CallOp(result="%isSchedulable_"+nextState.action, ty="i1", fnptrval="@isSchedulable_"+nextState.action)$
-	$BrOp(cond="%isSchedulable_"+nextState.action, iftrue="%fire_"+nextState.action, iffalse="%skip_"+nextState.action)$
+	$CallOp(result={%isSchedulable_$nextState.action$}, ty="i1", fnptrval={@isSchedulable_$nextState.action$})$
+	$BrOp(cond={%isSchedulable_$nextState.action$}, iftrue={%fire_$nextState.action$}, iffalse={%skip_$nextState.action$})$
 
 fire_$nextState.action$:
 $if(nextState.action.outputPattern)$
@@ -753,7 +750,7 @@ skip_$nextState.action$:
 
 actionTestStateOutputs(nextState) ::= <<
 $outputPattern(pattern=nextState.action.outputPattern, action=nextState.action)$
-	$BrOp(cond="%"+nextState.action+"_room", iftrue="%hasroom_"+nextState.action, iffalse="%sched_nok")$
+	$BrOp(cond={%$nextState.action$_room}, iftrue={%hasroom_$nextState.action$}, iffalse="%sched_nok")$
 
 hasroom_$nextState.action$:
 $actionCallState(nextState)$
@@ -797,12 +794,12 @@ return:
 >>
 
 schedulingTest(actions) ::= <<
-$actions: actionTest(action=it)$
+$actions:{$actionTest(action=it)$}$
 >>
 
 actionTest(action) ::= <<
-	$CallOp(result="%isSchedulable_"+action, ty="i1", fnptrval="@isSchedulable_"+action)$
-	$BrOp(cond="%isSchedulable_"+action, iftrue="%fire_"+action, iffalse="%skip_"+action)$
+	$CallOp(result={%isSchedulable_$action$}, ty="i1", fnptrval={@isSchedulable_$action$})$
+	$BrOp(cond={%isSchedulable_$action$}, iftrue={%fire_$action$}, iffalse={%skip_$action$})$
 
 fire_$action$:
 $if(action.outputPattern)$
@@ -822,7 +819,7 @@ actionCall(action) ::= <<
 
 actionTestOutputs(action) ::= <<
 $outputPattern(pattern=action.outputPattern, action=action)$
-	$BrOp(cond="%"+action+"_room", iftrue="%hasroom_"+action, iffalse="%skip_"+action)$
+	$BrOp(cond={%$action$_room}, iftrue={%hasroom_$action$}, iffalse={%skip_$action$})$
 
 hasroom_$action$:
 $actionCall(action)$
@@ -840,7 +837,7 @@ procedure(procedure) ::= <<
 define internal $procedure.returnType$ $procedure$($procedure.parameters.list: {$argumentDeclaration(it)$}; wrap, anchor, separator=", "$) {
 entry:
 $if(procedure.locals.list)$
-	$procedure.locals.list: variableDeclaration(it)$
+	$procedure.locals.list:{$variableDeclaration(it)$}$
 	
 $endif$
 $trunc(procedure.nodes): {$(it.class.simpleName)(it)$}$
@@ -867,25 +864,25 @@ actor(actorName, actor) ::= <<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-$actor.inputs.list: fifo(it)$
+$actor.inputs.list:{$fifo(it)$}$
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-$actor.outputs.list: fifo(it)$
+$actor.outputs.list:{$fifo(it)$}$
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
-$actor.stateVars.list: stateVar(it)$
+$actor.stateVars.list:{$stateVar(it)$}$
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-$actor.procs.list: procedure(it)$
+$actor.procs.list:{$procedure(it)$}$
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-$actor.actions: action(it)$
+$actor.actions:{$action(it)$}$
 
 $if(actor.initializes)$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Initializes
-$actor.initializes: action(it)$
+$actor.initializes:{$action(it)$}$
 define i32 @$actorName$_initialize() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
