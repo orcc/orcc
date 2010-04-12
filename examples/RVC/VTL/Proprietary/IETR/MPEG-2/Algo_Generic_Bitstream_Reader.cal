@@ -32,7 +32,7 @@
 /******************************************************************************
  * BitstreamReader : a specialized actor for input bitstream handling         *
  ******************************************************************************/
-actor BitstreamReader () uint(size=8) DataIn, uint(size=8) Control ==>
+actor Algo_Generic_Bitstream_Reader() uint(size=8) DataIn, uint(size=8) Control ==>
 uint(size=32) DataOut :
 
 	///////////////////////////////////////////////////////////////////////////

@@ -12,7 +12,7 @@
 // Author: Matthieu Wipliez (mwipliez@insa-rennes.fr)
 // Rewrote the actor at block-level
 // Limit pixel value to either [0,255] or [-255,255]
-actor GEN_algo_Clip () int(size=isz) I, bool SIGNED ==> int(size=osz) O :
+actor Clip () int(size=isz) I, bool SIGNED ==> int(size=osz) O :
 
 // Port size declaration
 	int osz = 9;

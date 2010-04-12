@@ -1,19 +1,22 @@
 import all caltrop.lib.BitOps;
 actor MPEG4_algo_DCRinvpred (int DCVAL,
-	int MAXW_IN_MB,
-	int MB_COORD_SZ,
-	int BTYPE_SZ,
-	int SAMPLE_SZ,
 	int NEWVOP,
 	int INTRA,
 	int INTER,
 	int QUANT_MASK,
 	int ACCODED,
-	int ACPRED,
-	int QUANT_SZ) int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ + 3) A,
-int(size=MB_COORD_SZ + 3) B, int(size=MB_COORD_SZ + 3) C, int(size=SAMPLE_SZ) QFS_DC ==>
+	int ACPRED) int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ + 3) A, int(size=MB_COORD_SZ +
+3) B, int(size=MB_COORD_SZ + 3) C, int(size=SAMPLE_SZ) QFS_DC ==>
 int(size=SAMPLE_SZ) QF_DC , int(size=MB_COORD_SZ + 3) PTR , int(size=3) AC_PRED_DIR ,
 int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
+
+	int BTYPE_SZ = 12;
+
+	int MB_COORD_SZ = 8;
+
+	int QUANT_SZ = 6;
+
+	int SAMPLE_SZ = 13;
 
 	int SCALER_SZ = 7;
 
@@ -22,6 +25,8 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 
 	// Decoded 'quantiser_scale' - see ISO/IEC 14496-2
 	int(size=2) round;
+
+	int MAXW_IN_MB = 121;
 
 	// Flag to indicate whether 'quantiser_scale' is even or odd
 	int BUF_SIZE = (MAXW_IN_MB + 2) * 8;
