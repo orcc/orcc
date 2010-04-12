@@ -38,6 +38,7 @@ import net.sf.orcc.network.Instance;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.debug.DebugST;
 
 /**
  * This class defines a printer that uses StringTemplate.
@@ -60,6 +61,9 @@ public abstract class STPrinter extends Printer {
 	protected STPrinter(String... groupNames) {
 		group = TemplateGroupLoader.loadGroup(groupNames);
 
+		// set to "true" to inspect template
+		group.debug = false;
+
 		// registers this printer as the default printer
 		Printer.register(this);
 	}
@@ -75,14 +79,19 @@ public abstract class STPrinter extends Printer {
 	 */
 	public void printActor(String fileName, Actor actor) throws IOException {
 		if (!actor.isSystem()) {
-			ST template = group.getInstanceOf("actor");
+			if (group.debug) {
+				DebugST template = (DebugST) group.getInstanceOf("actor");
+				template.add("actor", actor);
+				template.inspect();
+			} else {
+				ST template = group.getInstanceOf("actor");
+				template.add("actor", actor);
 
-			template.add("actor", actor);
-
-			byte[] b = template.render(80).getBytes();
-			OutputStream os = new FileOutputStream(fileName);
-			os.write(b);
-			os.close();
+				byte[] b = template.render(80).getBytes();
+				OutputStream os = new FileOutputStream(fileName);
+				os.write(b);
+				os.close();
+			}
 		}
 	}
 
