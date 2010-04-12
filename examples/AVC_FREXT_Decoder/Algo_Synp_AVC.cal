@@ -213,7 +213,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	/*
 		mbTab := [ Address ][ Availability, mbSliceType, mb_type, IntraChromaPredMode, mbQpDelta, mbCBPLuma, mbCBPChroma ]
 	*/
-	List ( type: List ( type: int, size = 8) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 7)] : for int j in Integers( 0, 254)];
+	List ( type: List ( type: int, size = 9) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 8)] : for int j in Integers( 0, 254)];
 	
     int mbTabAvail				:= 0;
 	int mbSliceType				:= 1;
@@ -223,6 +223,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	int mbCBPLuma				:= 5;
 	int mbCBPChroma				:= 6;
 	int mbTransSize8x8Flag		:= 7;
+	int mbCBF					:= 8;
 	
 	//CABAC Process Conditions 
 	bool FirstSEinSlice					:= true;
@@ -2848,20 +2849,18 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		(InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4)
 	end
 	
-	function InverseRasterScan( a, b, c, d, e ) --> uint :
+	function InverseRasterScan(int a, int b, int c, int d, int e ) --> uint :
 		if e = 0 then
-			a mod ( d/b ) ) * b
+			( a mod ( d/b ) ) * b
 		else 
-			if e = 1 then
-				a / ( d/b ) ) * c
-			end
+			( a / ( d / b ) ) * c
 		end
 	end
 	
 	procedure ctxIdxCodedBlockFlag()
 	var
-		int nza,
-		int nzb,
+		int transBlockA,
+		int transBlockB,
 		int left_cbp,
 		int top_cbp,
 		int mbAddrA,
@@ -2880,28 +2879,29 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		int yW
 	begin
 		ctxIdxInc := 0;
-		
+		/*
 		if ctxBlockCat = 0 then
 			left_cbp := mbTab[GiveMbAddrA()][mbCBPLuma];
 			top_cbp  := mbTab[GiveMbAddrB()][mbCBPLuma];
 			nza := left_cbp & 0x100;
 			nzb := top_cbp &  0x100;
 		end
-		
+		*/
 		if ctxBlockCat = 1 or ctxBlockCat = 2 then
 			/*
 			nza := NonZeroCount[val_CurrMbAddr,SCAN8(luma4x4BlkIdx) - 1];
 			nzb := NonZeroCount[val_CurrMbAddr,SCAN8(luma4x4BlkIdx) - 8];
 			*/
-			// N = A
+			
 			x := InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 0 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 0 );
 			y := InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 1 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 1 );
 			
+			// N = A
 			xN := x - 1;
 			yN := y;
 			
-			xW : = ( xN + 16 ) mod 16;
-			yW : = ( yN + 16 ) mod 16;
+			xW := ( xN + 16 ) mod 16;
+			yW := ( yN + 16 ) mod 16;
 			 
 			if xN < 0 and yN > 0 and yN < 15 then
 				mbAddrA := GiveMbAddrA();
@@ -2918,24 +2918,66 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 			
 			if AvailMbA then
-				luma4x4BlkIdxA := 1;
-				/*
-				if mbTab[mbAddrA][mbTabMbtype] != P_Skip or 
-				   mbTab[mbAddrA][mbTabMbtype] != B_Skip or 
-				   mbTab[mbAddrA][mbTabMbtype] != 25 or
-				   
-				   */
+				luma4x4BlkIdxA := xW * yW;
+				
+				if ( mbTab[mbAddrA][mbTabMbtype] != P_Skip or 
+				     mbTab[mbAddrA][mbTabMbtype] != B_Skip or 
+				     mbTab[mbAddrA][mbTabMbtype] != 25 or
+				     ((mbTab[mbAddrA][mbCBPLuma] >> (luma4x4BlkIdxA >> 2)) & 1) != 0 or
+				     transform_size_8x8_flag = 0 ) then
+					transBlockA := luma4x4BlkIdxA;
+				else
+					transBlockA := -1;
+					
+				end
 			else
 				luma4x4BlkIdxA := 0;
-				nza := 0;
+				transBlockA := -1;
+			end
+			
+			// N = B
+			
+			xN := x - 1;
+			yN := y;
+			
+			xW := ( xN + 16 ) mod 16;
+			yW := ( yN + 16 ) mod 16;
+			 
+			if yN < 0 and xN > 0 and xN < 15 then
+				mbAddrB := GiveMbAddrB();
+				AvailMbB := true;
+			else
+				if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
+					mbAddrB := val_CurrMbAddr;
+					AvailMbB := true;
+				else
+					if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
+						AvailMbB := false;
+					end
+				end
+			end
+			
+			if AvailMbB then
+				luma4x4BlkIdxB := xW * yW;
+				
+				if ( mbTab[mbAddrB][mbTabMbtype] != P_Skip or 
+				     mbTab[mbAddrB][mbTabMbtype] != B_Skip or 
+				     mbTab[mbAddrB][mbTabMbtype] != 25 or
+				     ((mbTab[mbAddrB][mbCBPLuma] >> (luma4x4BlkIdxB >> 2)) & 1) != 0 or
+				     transform_size_8x8_flag = 0 ) then
+					transBlockB := luma4x4BlkIdxB;
+				else
+					transBlockB := -1;
+					
+				end
+			else
+				luma4x4BlkIdxB := 0;
+				transBlockB := -1;
 			end
 			
 			
-			
-			
-			
 		end
-		
+		/*
 		if ctxBlockCat = 3 then
 			left_cbp := mbTab[GiveMbAddrA()][mbCBPChroma];
 			top_cbp  := mbTab[GiveMbAddrB()][mbCBPChroma];
@@ -2947,15 +2989,42 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			nza := NonZeroCount[SCAN8( (4 * luma8x8BlkIdx+16) + 16) - 1];
 			nzb := NonZeroCount[SCAN8( (4 * luma8x8BlkIdx+16) + 16) - 8];
 		end
-		*/
+		
 		if  nza > 0 then
 			ctxIdxInc := ctxIdxInc + 1;
 		end	
 		if  nzb > 0 then
 			ctxIdxInc := ctxIdxInc + 2;
 		end
-
+		
 		ctxIdxInc := ctxIdxInc + (ctxBlockCat << 2);
+		*/
+		
+		if not AvailMbA and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
+		   AvailMbA and transBlockA = -1 and mbTab[mbAddrA][mbTabMbtype] != 25 then
+			condTermFlagA := 0;
+		else
+			if not AvailMbA and mbTab[val_CurrMbAddr][mbSliceType]  = SLICE_TYPE_I or
+			   mbTab[mbAddrA][mbTabMbtype] = 25 then
+				condTermFlagA := 1;
+			else
+				condTermFlagA := mbTab[mbAddrA][mbCBF];
+			end
+		end
+
+		if not AvailMbB and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
+		   AvailMbB and transBlockB = -1 and mbTab[mbAddrB][mbTabMbtype] != 25 then
+			condTermFlagB := 0;
+		else
+			if not AvailMbB and mbTab[val_CurrMbAddr][mbSliceType]  = SLICE_TYPE_I or
+			   mbTab[mbAddrB][mbTabMbtype] = 25 then
+				condTermFlagB := 1;
+			else
+				condTermFlagB := mbTab[mbAddrB][mbCBF];
+			end
+		end
+		
+		ctxIdxInc := condTermFlagA + 2*condTermFlagB;
 	end
 	
 	procedure ctxIdxSignificantCoeffFlag()
@@ -3151,7 +3220,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		if ( ctxIdxOffset = 85 ) then
 			ctxIdxCodedBlockFlag();
-			ctxIdx := ctxIdxOffset + ctxIdxInc;
+			ctxIdx := ctxIdxOffset + ctxIdxInc + ctxIdxBlockCatOffset_tab[0][ctxBlockCat];
 		end
 		
 		if ( ctxIdxOffset = 105 or ctxIdxOffset = 166 ) then
@@ -6862,6 +6931,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 		coded_block_flag := cabac_value();
 		//coded_block_flag := 1; //When coded_block_flag is not present, it is infered to be equal to 1
+		//store cbf
+		mbTab[val_CurrMbAddr][mbCBF] := coded_block_flag;
 		numCoeff := block_endIdx + 1;
 		blCabacIdx := block_startIdx;
 	end
