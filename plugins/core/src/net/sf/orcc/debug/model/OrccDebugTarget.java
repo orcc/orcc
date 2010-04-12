@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.debug.model;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +40,6 @@ import net.sf.orcc.interpreter.InterpreterMain;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
