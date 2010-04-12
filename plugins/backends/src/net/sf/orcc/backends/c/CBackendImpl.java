@@ -46,8 +46,6 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
-import org.eclipse.core.runtime.CoreException;
-
 /**
  * C back-end.
  * 
@@ -72,16 +70,10 @@ public class CBackendImpl extends AbstractBackend {
 			network.normalizeActors();
 			network.mergeActors();
 		} else {
-			if (configuration != null) {
-				try {
-					boolean classify = configuration.getAttribute(
-							"net.sf.orcc.backends.classify", false);
-					if (classify) {
-						network.classifyActors();
-					}
-				} catch (CoreException e) {
-					throw new OrccException("could not read configuration", e);
-				}
+			boolean classify = getAttribute("net.sf.orcc.backends.classify",
+					false);
+			if (classify) {
+				network.classifyActors();
 			}
 		}
 
@@ -108,18 +100,10 @@ public class CBackendImpl extends AbstractBackend {
 	protected void printNetwork(Network network) throws OrccException {
 		try {
 			String networkTemplate = "C_network";
-			if (configuration != null) {
-				boolean useNewScheduler;
-				try {
-					useNewScheduler = configuration.getAttribute(
-							"net.sf.orcc.backends.newScheduler", false);
-				} catch (CoreException e) {
-					throw new OrccException("could not read configuration", e);
-				}
-
-				if (useNewScheduler) {
-					networkTemplate = "C_network_newScheduler";
-				}
+			boolean useNewScheduler = getAttribute(
+					"net.sf.orcc.backends.newScheduler", false);
+			if (useNewScheduler) {
+				networkTemplate = "C_network_newScheduler";
 			}
 
 			NetworkPrinter networkPrinter = new NetworkPrinter(networkTemplate);

@@ -44,6 +44,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
@@ -80,7 +81,7 @@ public abstract class AbstractBackend implements Backend {
 	/**
 	 * the configuration used to launch this back-end.
 	 */
-	protected ILaunchConfiguration configuration;
+	private ILaunchConfiguration configuration;
 
 	/**
 	 * Fifo size used in backend.
@@ -184,6 +185,54 @@ public abstract class AbstractBackend implements Backend {
 		doVtlCodeGeneration(actors);
 
 		write("That's all folks!\n");
+	}
+
+	/**
+	 * Returns the boolean-valued attribute with the given name. Returns the
+	 * given default value if the attribute is undefined.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @param defaultValue
+	 *            the value to use if no value is found
+	 * @return the value or the default value if no value was found.
+	 * @throws OrccException
+	 */
+	final protected boolean getAttribute(String attributeName,
+			boolean defaultValue) throws OrccException {
+		if (configuration == null) {
+			return defaultValue;
+		}
+
+		try {
+			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
+	}
+
+	/**
+	 * Returns the string-valued attribute with the given name. Returns the
+	 * given default value if the attribute is undefined.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @param defaultValue
+	 *            the value to use if no value is found
+	 * @return the value or the default value if no value was found.
+	 * @throws OrccException
+	 */
+	final protected String getAttribute(String attributeName,
+			String defaultValue) throws OrccException {
+		if (configuration == null) {
+			return defaultValue;
+		}
+
+		try {
+			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
 	}
 
 	/**

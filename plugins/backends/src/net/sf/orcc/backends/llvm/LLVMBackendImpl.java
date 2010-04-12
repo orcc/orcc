@@ -42,8 +42,6 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.BuildCFG;
 
-import org.eclipse.core.runtime.CoreException;
-
 /**
  * LLVM back-end.
  * 
@@ -64,16 +62,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
-		if (configuration != null) {
-			try {
-				boolean classify = configuration.getAttribute(
-						"net.sf.orcc.backends.classify", false);
-				if (classify) {
-					// TODO classify actors
-				}
-			} catch (CoreException e) {
-				throw new OrccException("could not read configuration", e);
-			}
+		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
+		if (classify) {
+			// TODO classify actors
 		}
 
 		printer = new LLVMActorPrinter();
@@ -90,20 +81,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 		try {
 			printer.printActor(outputName, actor);
 
-			try {
-				if (configuration != null) {
-					boolean llvmBitcode = configuration.getAttribute(
-							"net.sf.orcc.backends.llvmBitcode", false);
-					if (llvmBitcode) {
-						String llvmAs = configuration.getAttribute(
-								"net.sf.orcc.backends.llvm-as", "");
-						if (!llvmAs.isEmpty()) {
-							printBitcode(llvmAs, outputName, actor.getName());
-						}
-					}
+			boolean llvmBitcode = getAttribute(
+					"net.sf.orcc.backends.llvmBitcode", false);
+			if (llvmBitcode) {
+				String llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
+				if (!llvmAs.isEmpty()) {
+					printBitcode(llvmAs, outputName, actor.getName());
 				}
-			} catch (CoreException e) {
-				throw new OrccException("could not read configuration", e);
 			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
