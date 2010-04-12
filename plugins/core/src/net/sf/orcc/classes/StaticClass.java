@@ -28,24 +28,24 @@
  */
 package net.sf.orcc.classes;
 
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
+
 /**
- * This class defines the SDF class. A SDF network has fixed
- * production/consumption rates.
+ * This class defines the interfaces of a static class.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class SDFNetworkClass extends CSDFNetworkClass {
+public interface StaticClass extends IClass {
+	
+	public Pattern getInputPattern();
 
-	/**
-	 * Creates a new SDF class.
-	 */
-	public SDFNetworkClass() {
-		numberOfPhases = 1;
-	}
+	public Pattern getOutputPattern();
+	
+	public int getNumTokensConsumed(Port port);
 
-	public boolean isSDF() {
-		return true;
-	}
-
+	public int getNumTokensProduced(Port port);
+	
+	public int getNumberOfPhases();
 }

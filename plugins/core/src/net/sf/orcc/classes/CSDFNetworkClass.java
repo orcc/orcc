@@ -39,13 +39,13 @@ import net.sf.orcc.network.Network;
  * @author Matthieu Wipliez
  *
  */
-public class CSDFNetworkClass extends AbstractNetworkClass {
+public class CSDFNetworkClass extends AbstractNetworkClass implements StaticClass {
 
 	private Pattern inputPattern;
 
 	private Pattern outputPattern;
 
-	private int numberOfPhases;
+	protected int numberOfPhases;
 	/**
 	 * Creates a new static class.
 	 */

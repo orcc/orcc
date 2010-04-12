@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.classes.IClass;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.serialize.IRParser;
@@ -240,6 +241,18 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	public Map<String, Expression> getParameters() {
 		return parameters;
+	}
+	
+	public IClass getContentClass() {
+		IClass clasz = null;
+		
+		if(isActor()) {
+			clasz = actor.getActorClass();
+		} else {
+			clasz = network.getNetworkClass();
+		}
+		
+		return clasz;
 	}
 
 	@Override

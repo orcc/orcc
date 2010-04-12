@@ -43,7 +43,7 @@ import net.sf.orcc.ir.Port;
  * @author Matthieu Wipliez
  * 
  */
-public class CSDFActorClass extends AbstractActorClass {
+public class CSDFActorClass extends AbstractActorClass implements StaticClass {
 
 	/**
 	 * a list of actions that can be scheduled statically.

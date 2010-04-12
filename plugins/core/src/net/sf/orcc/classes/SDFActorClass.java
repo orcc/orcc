@@ -28,13 +28,6 @@
  */
 package net.sf.orcc.classes;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 
 /**
  * This class defines the static class. A static actor has fixed
@@ -46,141 +39,13 @@ import net.sf.orcc.ir.Port;
 public class SDFActorClass extends CSDFActorClass {
 
 	/**
-	 * a list of actions that can be scheduled statically.
-	 */
-	private List<Action> actions;
-
-	private Pattern inputPattern;
-
-	private Pattern outputPattern;
-
-	/**
-	 * Creates a new static class.
+	 * Creates a new SDF class.
 	 */
 	public SDFActorClass() {
-		actions = new ArrayList<Action>();
-		inputPattern = new Pattern();
-		outputPattern = new Pattern();
 		numberOfPhases = 1;
 	}
-
-	/**
-	 * Adds the given action to the list of actions that can be scheduled
-	 * statically.
-	 * 
-	 * @param action
-	 *            an action
-	 */
-	public void addAction(Action action) {
-		actions.add(action);
-	}
-
-	/**
-	 * Returns the list of actions that can be scheduled statically.
-	 * 
-	 * @return the list of actions that can be scheduled statically
-	 */
-	public List<Action> getActions() {
-		return actions;
-	}
-
-	/**
-	 * Returns the input pattern of this static class.
-	 * 
-	 * @return the input pattern of this static class
-	 */
-	public Pattern getInputPattern() {
-		return inputPattern;
-	}
-
-	/**
-	 * Returns the number of tokens consumed by this port.
-	 * 
-	 * @param port
-	 *            an input port
-	 * @return the number of tokens consumed by this port.
-	 */
-	public int getNumTokensConsumed(Port port) {
-		Integer numTokens = inputPattern.get(port);
-		if (numTokens == null) {
-			return 0;
-		}
-		return numTokens;
-	}
-
-	/**
-	 * Returns the number of tokens written to this port.
-	 * 
-	 * @param port
-	 *            an output port
-	 * @return the number of tokens written to this port.
-	 */
-	public int getNumTokensProduced(Port port) {
-		Integer numTokens = outputPattern.get(port);
-		if (numTokens == null) {
-			return 0;
-		}
-		return numTokens;
-	}
-
-	/**
-	 * Returns the output pattern of this static class.
-	 * 
-	 * @return the output pattern of this static class
-	 */
-	public Pattern getOutputPattern() {
-		return outputPattern;
-	}
-
-	@Override
+	
 	public boolean isSDF() {
 		return true;
 	}
-
-	/**
-	 * Prints the token consumption of this static class.
-	 */
-	public void printTokenConsumption() {
-		System.out.println("input ports: " + inputPattern);
-	}
-
-	/**
-	 * Prints the token production of this static class.
-	 */
-	public void printTokenProduction() {
-		System.out.println("output ports: " + outputPattern);
-	}
-
-	/**
-	 * Saves the number of tokens consumed by input ports of the given actor.
-	 * 
-	 * @param actor
-	 *            an actor
-	 */
-	public void setTokenConsumptions(Actor actor) {
-		for (Port port : actor.getInputs()) {
-			inputPattern.put(port, port.getNumTokensConsumed());
-		}
-	}
-
-	/**
-	 * Saves the number of tokens written to output ports of the given actor.
-	 * 
-	 * @param actor
-	 *            an actor
-	 */
-	public void setTokenProductions(Actor actor) {
-		for (Port port : actor.getOutputs()) {
-			outputPattern.put(port, port.getNumTokensProduced());
-		}
-	}
-
-	public void setNumberOfPhases(int numberOfPhases) {
-		this.numberOfPhases = numberOfPhases;
-	}
-
-	public int getNumberOfPhases() {
-		return numberOfPhases;
-	}
-
 }

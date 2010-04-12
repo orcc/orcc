@@ -34,10 +34,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Actor;
+import net.sf.orcc.classes.StaticClass;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.classes.SDFActorClass;
 import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.util.Rational;
@@ -53,10 +53,9 @@ import org.jgrapht.DirectedGraph;
  * 
  */
 
-
 public class RepetitionVectorAnalyzer {
 
-	private Map<Vertex, Integer> repetitionVector = new HashMap<Vertex, Integer>();
+	private Map<String, Integer> repetitionVector = new HashMap<String, Integer>();
 	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
 
 	private DirectedGraph<Vertex, Connection> graph;
@@ -71,9 +70,16 @@ public class RepetitionVectorAnalyzer {
 	 * @throws OrccException
 	 *             if an actor is not static
 	 */
-	public Map<Vertex, Integer> computeRepetitionsVector() throws OrccException {
+	public Map<String, Integer> computeRepetitionsVector() throws OrccException {
 
-		Vertex vertex = (Vertex) graph.vertexSet().toArray()[0];
+		Vertex vertex = null;
+		for(Vertex v : graph.vertexSet()) {
+			if(v.isInstance()) {
+				vertex = v;
+				break;
+			}
+		}
+//		Vertex vertex = (Vertex) graph.vertexSet().toArray()[0];
 
 		calculateRate(vertex, new Rational(1, 1));
 
@@ -88,17 +94,18 @@ public class RepetitionVectorAnalyzer {
 			int rep = entry.getValue().getNumerator() * lcm
 					/ entry.getValue().getDenominator();
 
-			repetitionVector.put(entry.getKey(), rep);
+			repetitionVector.put(entry.getKey().getInstance().getId(), rep);
 		}
 
 		checkConsistency();
 
 		// multiply the actor repetition count with its number of phases
-		for (Map.Entry<Vertex, Integer> entry : repetitionVector.entrySet()) {
-			Integer val = entry.getValue();
-			int nbPhases = getActorStaticClass(entry.getKey()).getNumberOfPhases();
-			entry.setValue(val * nbPhases);
-		}
+		/*
+		 * for (Map.Entry<String, Integer> entry : repetitionVector.entrySet())
+		 * { Integer val = entry.getValue(); int nbPhases =
+		 * getStaticClass(entry.getKey()).getNumberOfPhases();
+		 * entry.setValue(val * nbPhases); }
+		 */
 
 		return repetitionVector;
 	}
@@ -111,12 +118,12 @@ public class RepetitionVectorAnalyzer {
 	 */
 	private void calculateRate(Vertex vertex, Rational rate)
 			throws OrccException {
-		Actor actor = vertex.getInstance().getActor();
-		if (!actor.getActorClass().isSDF()) {
-			throw new OrccException("actor" + actor.getName()
+		Instance instance = vertex.getInstance();
+		if (!instance.getContentClass().isSDF()) {
+			throw new OrccException("class" + instance.getClasz()
 					+ "is not static!");
 		}
-		SDFActorClass SdfActor = (SDFActorClass) actor.getActorClass();
+		StaticClass SdfActor = (StaticClass) instance.getContentClass();
 
 		rationals.put(vertex, rate);
 
@@ -127,7 +134,7 @@ public class RepetitionVectorAnalyzer {
 
 					Port srcPort = connection.getSource();
 					Port tgtPort = connection.getTarget();
-					SDFActorClass tgtSdfActor = getActorStaticClass(tgt);
+					StaticClass tgtSdfActor = getStaticClass(tgt);
 
 					int produced = SdfActor.getNumTokensProduced(srcPort);
 					int consumed = tgtSdfActor.getNumTokensConsumed(tgtPort);
@@ -145,7 +152,7 @@ public class RepetitionVectorAnalyzer {
 
 					Port srcPort = connection.getSource();
 					Port tgtPort = connection.getTarget();
-					SDFActorClass srcSdfActor = getActorStaticClass(src);
+					StaticClass srcSdfActor = getStaticClass(src);
 
 					int produced = srcSdfActor.getNumTokensProduced(srcPort);
 					int consumed = SdfActor.getNumTokensConsumed(tgtPort);
@@ -175,14 +182,14 @@ public class RepetitionVectorAnalyzer {
 				Port srcPort = connection.getSource();
 				Port tgtPort = connection.getTarget();
 
-				SDFActorClass srcStaticActor = getActorStaticClass(src);
-				SDFActorClass tgtStaticActor = getActorStaticClass(tgt);
+				StaticClass srcStaticActor = getStaticClass(src);
+				StaticClass tgtStaticActor = getStaticClass(tgt);
 
 				int produced = srcStaticActor.getNumTokensProduced(srcPort);
 				int consumed = tgtStaticActor.getNumTokensConsumed(tgtPort);
 
-				int srcRate = repetitionVector.get(src);
-				int tgtRate = repetitionVector.get(tgt);
+				int srcRate = repetitionVector.get(src.getInstance().getId());
+				int tgtRate = repetitionVector.get(tgt.getInstance().getId());
 
 				if (srcRate * produced != tgtRate * consumed) {
 					throw new OrccException(
@@ -192,9 +199,9 @@ public class RepetitionVectorAnalyzer {
 		}
 	}
 
-	private SDFActorClass getActorStaticClass(Vertex vertex) {
-		SDFActorClass staticClass = (SDFActorClass) vertex.getInstance().getActor()
-				.getActorClass();
+	private StaticClass getStaticClass(Vertex vertex) {
+		StaticClass staticClass = (StaticClass) vertex.getInstance()
+				.getContentClass();
 		return staticClass;
 	}
 

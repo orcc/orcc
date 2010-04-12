@@ -50,7 +50,7 @@ public class Schedule {
 		iterands = new LinkedList<Iterand>();
 	}
 
-	public void push(Iterand iterand) {
+	public void add(Iterand iterand) {
 		iterands.add(iterand);
 	}
 
@@ -70,6 +70,12 @@ public class Schedule {
 		String its = "";
 		for (Iterand iterand : iterands)
 			its += iterand;
-		return "(" + iterationCount + its + ")";
+		String res = "";
+		if(iterationCount == 0 || iterationCount == 1) {
+			res = its;
+		} else {
+			res = "(" + iterationCount + its + ")";
+		}
+		return res;
 	}
 }
