@@ -2011,7 +2011,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 		end
 		
-		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG then
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG then
 			MaxEleCompTab := synEval_Coded_Bloc_Flag_Ele;
 			foreach int e in Integers(0, MaxEleCompTab - 1) do
 				//BinIdxSize	:= synEval_Coded_Bloc_Flag[e][0];
@@ -2020,6 +2020,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				end
 			end
 		end
+		
+		
 
 		
 		//TODO other Syntax Element
@@ -2842,12 +2844,40 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		zigzag_scan[x]
 	end
 	
+	function InverseScan4x4(uint(size=4) index, uint stride) --> uint :
+		(InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4)
+	end
+	
+	function InverseRasterScan( a, b, c, d, e ) --> uint :
+		if e = 0 then
+			a mod ( d/b ) ) * b
+		else 
+			if e = 1 then
+				a / ( d/b ) ) * c
+			end
+		end
+	end
+	
 	procedure ctxIdxCodedBlockFlag()
 	var
 		int nza,
 		int nzb,
 		int left_cbp,
-		int top_cbp
+		int top_cbp,
+		int mbAddrA,
+		int mbAddrB,
+		bool AvailMbA,
+		bool AvailMbB,
+		int luma4x4BlkIdxA,
+		int luma4x4BlkIdxB,
+		int condTermFlagA,
+		int condTermFlagB,
+		int x,
+		int y,
+		int xN,
+		int yN,
+		int xW,
+		int yW
 	begin
 		ctxIdxInc := 0;
 		
@@ -2859,8 +2889,51 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end
 		
 		if ctxBlockCat = 1 or ctxBlockCat = 2 then
+			/*
 			nza := NonZeroCount[val_CurrMbAddr,SCAN8(luma4x4BlkIdx) - 1];
 			nzb := NonZeroCount[val_CurrMbAddr,SCAN8(luma4x4BlkIdx) - 8];
+			*/
+			// N = A
+			x := InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 0 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 0 );
+			y := InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 1 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 1 );
+			
+			xN := x - 1;
+			yN := y;
+			
+			xW : = ( xN + 16 ) mod 16;
+			yW : = ( yN + 16 ) mod 16;
+			 
+			if xN < 0 and yN > 0 and yN < 15 then
+				mbAddrA := GiveMbAddrA();
+				AvailMbA := true;
+			else
+				if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
+					mbAddrA := val_CurrMbAddr;
+					AvailMbA := true;
+				else
+					if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
+						AvailMbA := false;
+					end
+				end
+			end
+			
+			if AvailMbA then
+				luma4x4BlkIdxA := 1;
+				/*
+				if mbTab[mbAddrA][mbTabMbtype] != P_Skip or 
+				   mbTab[mbAddrA][mbTabMbtype] != B_Skip or 
+				   mbTab[mbAddrA][mbTabMbtype] != 25 or
+				   
+				   */
+			else
+				luma4x4BlkIdxA := 0;
+				nza := 0;
+			end
+			
+			
+			
+			
+			
 		end
 		
 		if ctxBlockCat = 3 then
@@ -3081,9 +3154,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			ctxIdx := ctxIdxOffset + ctxIdxInc;
 		end
 		
-		if ( ctxIdxOffset = 105 ) then
+		if ( ctxIdxOffset = 105 or ctxIdxOffset = 166 ) then
 			ctxIdxSignificantCoeffFlag();
-			ctxIdx := ctxIdxOffset + ctxIdxInc;
+			ctxIdx := ctxIdxOffset + ctxIdxInc + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
 		end	
 		if ( ctxIdxOffset = 276 ) then
 			if (binIdx = 0 ) then
@@ -3102,11 +3175,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG ) then
 			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[0][ctxBlockCat];
 		end	
-		*/
+		
 		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG ) then
 			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
 		end	
-		
+		*/
 		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG ) then
 			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
 		end	
@@ -6284,6 +6357,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		i8x8 < 4,
 		transform_size_8x8_flag = 0 or entropy_coding_mode_flag[pps_id] = 0 // bloc4x4 or CAVLC
+	do
+		ctxBlockCat := 2;
 	end
 
 	// for( i4x4 = 0; i4x4 < 4; i4x4++ ) {
@@ -6501,7 +6576,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	*************************************************************
 	*************************************************************/
 
-	function InverseScan4x4(uint(size=4) index, uint stride) --> uint : (InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4) end
+	
 
 	Residual_block_init_coeff_token: action ==>
 	guard
@@ -6765,7 +6840,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	/*************************************************************
 	*************************************************************
-	********       Residual Block CABAC			   	    *********
+	********       Residual Block CABAC			*********
 	*************************************************************
 	*************************************************************/
 	//residual_block_cabac()
@@ -6773,7 +6848,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//if( maxNumCoeff = = 64 | | ( ChromaArrayType = = 3 ) ) )
 	Residual_block_Cabac_coded_block_flag_start: action ==>
 	guard
-		( maxNumCoeff = 64 or chroma_format_idc[sps_id] = 3 ) and IS_CABAC()
+		IS_CABAC()
 	do
 		//Read coded_block_flag Syntax Element
 		GetCabacCodedBlockFlagSyntaxElement();
@@ -6783,21 +6858,14 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//coded_block_flag
 	Residual_block_Cabac_coded_block_flag_done: action ==>
 	guard
-		( maxNumCoeff = 64 or chroma_format_idc[sps_id] = 3 ) and cabac_end()
+		 cabac_end()
 	do
 		coded_block_flag := cabac_value();
-	end
-	
-	//else
-	Residual_block_Cabac_skip_coded_block_flag: action ==>
-	guard
-		( maxNumCoeff != 64 or chroma_format_idc[sps_id] != 3 ) and IS_CABAC()
-	do
-		coded_block_flag := 1; //When coded_block_flag is not present, it is infered to be equal to 1
+		//coded_block_flag := 1; //When coded_block_flag is not present, it is infered to be equal to 1
 		numCoeff := block_endIdx + 1;
 		blCabacIdx := block_startIdx;
 	end
-	
+
 	//if( coded_block_flag ) {
 	Residual_block_Cabac_read_significant_coeff_flag: action ==>
 	guard
@@ -7351,7 +7419,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 		// residual_block CABAC
 		Residual_block										( Residual_block_Cabac_coded_block_flag_start		) --> Residual_Cabac_coded_block_flag_done;
-		Residual_block										( Residual_block_Cabac_skip_coded_block_flag		) --> Residual_block_Cabac_read_significant_coeff_flag;
 		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_block_Cabac_read_significant_coeff_flag;
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_Cabac_read_significant_coeff_flag	) --> Residual_block_read_significant_coeff_flag_done;
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_read_significant_coeff_flag_done	) --> Residual_block_read_last_significant_coeff_flag;
