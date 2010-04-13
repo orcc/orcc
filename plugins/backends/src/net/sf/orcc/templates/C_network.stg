@@ -30,7 +30,6 @@ $broadcasts: declareBroadcast()$
 
 allocateFifoType(type, size, count) ::= <<
 DECLARE_FIFO($type$, $size$, $count$)
-
 >>
 
 doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
