@@ -2977,29 +2977,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			
 			
 		end
-		/*
-		if ctxBlockCat = 3 then
-			left_cbp := mbTab[GiveMbAddrA()][mbCBPChroma];
-			top_cbp  := mbTab[GiveMbAddrB()][mbCBPChroma];
-			nza := ( left_cbp >> ( 6 + iCbCr ) ) & 0x01;
-			nzb := ( top_cbp  >> ( 6 + iCbCr ) ) & 0x01;
-		end
-		/*
-		if ctxBlockCat != 0 or ctxBlockCat != 1 ctxBlockCat != 2 ctxBlockCat != 3 then
-			nza := NonZeroCount[SCAN8( (4 * luma8x8BlkIdx+16) + 16) - 1];
-			nzb := NonZeroCount[SCAN8( (4 * luma8x8BlkIdx+16) + 16) - 8];
-		end
-		
-		if  nza > 0 then
-			ctxIdxInc := ctxIdxInc + 1;
-		end	
-		if  nzb > 0 then
-			ctxIdxInc := ctxIdxInc + 2;
-		end
-		
-		ctxIdxInc := ctxIdxInc + (ctxBlockCat << 2);
-		*/
-		
+				
 		if not AvailMbA and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
 		   AvailMbA and transBlockA = -1 and mbTab[mbAddrA][mbTabMbtype] != 25 then
 			condTermFlagA := 0;
@@ -3240,22 +3218,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end 
 		end
 		
-		/*
-		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG ) then
-			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[0][ctxBlockCat];
-		end	
-		
-		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG ) then
-			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
-		end	
-		*/
-		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG ) then
-			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
-		end	
-		if ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 ) then
-			ctxIdx := ctxIdxOffset + ctxIdxBlockCatOffset_tab[2][ctxBlockCat];
-		end
-		
 	end
 		
 	//*************************************************************/
@@ -3449,6 +3411,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			binVal := valMPS[ctxIdx]; 
 			pStateIdx[ctxIdx] := transIdxMPS[ pStateIdx[ctxIdx] ];
 		end
+		
 		// Give the right to compare in CabacParsing
 		binValDecoded := true;
 		// write the bit into the  ReadBinString
@@ -7491,11 +7454,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		// residual_block CABAC
 		Residual_block										( Residual_block_Cabac_coded_block_flag_start		) --> Residual_Cabac_coded_block_flag_done;
 		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_block_Cabac_read_significant_coeff_flag;
+		
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_Cabac_read_significant_coeff_flag	) --> Residual_block_read_significant_coeff_flag_done;
+		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_skip_significant_coeff_flag_while	) --> Residual_block_read_coeff_abs_level_minus1_done;
+		
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_read_significant_coeff_flag_done	) --> Residual_block_read_last_significant_coeff_flag;
-		Residual_block_read_significant_coeff_flag_done		( Residual_block_skip_significant_coeff_flag_while	) --> Residual_block_read_coeff_abs_level_minus1_done;
-		Residual_block_read_last_significant_coeff_flag		( Residual_block_read_last_significant_coeff_flag_done ) --> Residual_block_read_significant_coeff_flag_done;
-		Residual_block_read_last_significant_coeff_flag		( Residual_block_skip_last_significant_coeff_flag	) --> Residual_block_read_significant_coeff_flag_done;
+		
+		Residual_block_read_last_significant_coeff_flag		( Residual_block_read_last_significant_coeff_flag_done ) --> Residual_block_Cabac_read_significant_coeff_flag;
+		Residual_block_read_last_significant_coeff_flag		( Residual_block_skip_last_significant_coeff_flag	) --> Residual_block_Cabac_read_significant_coeff_flag;
+		
 		Residual_block_read_coeff_abs_level_minus1_done		( Residual_block_read_coeff_abs_level_minus1_done	) --> Residual_block_read_coeff_sign_flag_done;
 		Residual_block_read_coeff_sign_flag_done			( Residual_block_read_coeff_sign_flag_done			) --> Residual_block_update_coeffLevel;
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_start			) --> Residual_block_update_coeffLevel_start_read_Coeff_Abs_done;
