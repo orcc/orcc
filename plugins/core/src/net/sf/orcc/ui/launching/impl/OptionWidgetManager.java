@@ -31,16 +31,16 @@ package net.sf.orcc.ui.launching.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.backends.BackendOption;
+import net.sf.orcc.backends.BrowseFileOption;
+import net.sf.orcc.backends.CheckboxOption;
+import net.sf.orcc.ui.launching.OptionWidget;
+import net.sf.orcc.ui.launching.RunSettingsTab;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.widgets.Composite;
-
-import net.sf.orcc.backends.BackendOption;
-import net.sf.orcc.backends.CheckboxOption;
-import net.sf.orcc.backends.BrowseFileOption;
-import net.sf.orcc.ui.launching.OptionWidget;
-import net.sf.orcc.ui.launching.RunSettingsTab;
 
 /**
  * This class defines an option widget manager.
@@ -68,7 +68,9 @@ public class OptionWidgetManager {
 		List<OptionWidget> widgets = new ArrayList<OptionWidget>();
 		for (BackendOption option : options) {
 			OptionWidget widget = createOption(tab, option, parent);
-			widgets.add(widget);
+			if (widget != null) {
+				widgets.add(widget);
+			}
 		}
 		return widgets;
 	}

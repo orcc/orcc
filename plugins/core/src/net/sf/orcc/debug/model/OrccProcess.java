@@ -228,6 +228,8 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 	private ILaunch launch;
 
+	private boolean launchFE;
+
 	private IProgressMonitor monitor;
 
 	private Process process;
@@ -248,6 +250,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		String backend = configuration.getAttribute(BACKEND, "");
 		String optionId = BackendFactory.getInstance().getInputId(backend);
+		launchFE = !BackendFactory.getInstance().hasFEOption(backend);
 		inputFile = configuration.getAttribute(optionId, "");
 	}
 
@@ -455,38 +458,41 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 * @throws CoreException
 	 */
 	public void start(String option) throws CoreException {
-		monitor.beginTask("Compiling dataflow program", 2);
-		monitor.subTask("Launching frontend...");
 
-		try {
-			String[] cmdLine = createCmdLine();
-			process = DebugPlugin.exec(cmdLine, null);
-		} catch (IOException e) {
-			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					"I/O error", e);
-			throw new CoreException(status);
+		if (launchFE) {
+			monitor.beginTask("Compiling dataflow program", 2);
+			monitor.subTask("Launching frontend...");
+
+			try {
+				String[] cmdLine = createCmdLine();
+				process = DebugPlugin.exec(cmdLine, null);
+			} catch (IOException e) {
+				IStatus status = new Status(IStatus.ERROR,
+						OrccActivator.PLUGIN_ID, "I/O error", e);
+				throw new CoreException(status);
+			}
+
+			// read from process
+			ReadingThread t1 = new ReadingThread(process.getErrorStream(),
+					(OrccMonitor) proxy.getErrorStreamMonitor());
+			ReadingThread t2 = new ReadingThread(process.getInputStream(),
+					(OrccMonitor) proxy.getOutputStreamMonitor());
+			t1.start();
+			t2.start();
+
+			// wait for it to finish
+			try {
+				value = process.waitFor();
+
+				// wait for reading threads to finish
+				t1.join();
+				t2.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			write("Orcc frontend exit code: " + value + "\n");
 		}
-
-		// read from process
-		ReadingThread t1 = new ReadingThread(process.getErrorStream(),
-				(OrccMonitor) proxy.getErrorStreamMonitor());
-		ReadingThread t2 = new ReadingThread(process.getInputStream(),
-				(OrccMonitor) proxy.getOutputStreamMonitor());
-		t1.start();
-		t2.start();
-
-		// wait for it to finish
-		try {
-			value = process.waitFor();
-
-			// wait for reading threads to finish
-			t1.join();
-			t2.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		write("Orcc frontend exit code: " + value + "\n");
 		try {
 			if (value == 0) {
 				if (option.equals("backend")) {

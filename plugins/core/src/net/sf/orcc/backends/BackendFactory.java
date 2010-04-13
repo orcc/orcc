@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.sf.orcc.backends.impl.BackendOptionImpl;
 import net.sf.orcc.backends.impl.BrowseFileOptionImpl;
 import net.sf.orcc.backends.impl.CheckboxOptionImpl;
 import net.sf.orcc.debug.model.OrccProcess;
@@ -142,6 +143,31 @@ public class BackendFactory {
 	}
 
 	/**
+	 * Indicate if a backend contains the "deactivate front-end" option.
+	 * 
+	 * @return true if "deactivate front-end" is present otherwise false
+	 * @throws CoreException
+	 *             if something goes wrong
+	 */
+	public boolean hasFEOption(String backend) throws CoreException {
+		List<BackendOption> options = getOptions(backend);
+		if (options != null) {
+			// return the identifier of the first "browseFile" option
+			for (BackendOption option : options) {
+				if (option instanceof BackendOptionImpl) {
+					String id = option.getIdentifier();
+					if (id.equals("net.sf.orcc.backends.deactivateFE")) {
+						return true;
+					}
+				}
+			}
+		}
+
+		// Desactive FE is not present return false
+		return false;
+	}
+
+	/**
 	 * Returns the list of the names of registered back-ends
 	 * 
 	 * @return the list of the names of registered back-ends
@@ -237,10 +263,13 @@ public class BackendFactory {
 	private List<BackendOption> parseOptions(IConfigurationElement[] elements) {
 		List<BackendOption> options = new ArrayList<BackendOption>();
 		for (IConfigurationElement element : elements) {
+			BackendOption option;
+
+			String id = element.getAttribute("id");
+			String name = element.getAttribute("name");
+
 			IConfigurationElement[] children = element.getChildren();
 			if (children.length > 0) {
-				BackendOption option;
-
 				IConfigurationElement child = children[0];
 				String type = child.getName();
 				if (type.equals("browseFile")) {
@@ -250,27 +279,30 @@ public class BackendFactory {
 				} else {
 					continue;
 				}
-
-				String id = element.getAttribute("id");
-				option.setIdentifier(id);
-				String name = element.getAttribute("name");
-				option.setName(name);
-
-				String defaultValue = element.getAttribute("defaultValue");
-				if (defaultValue == null) {
-					defaultValue = "";
+			} else {
+				if (id.equals("net.sf.orcc.backends.deactivateFE")) {
+					option = new BackendOptionImpl();
+				} else {
+					continue;
 				}
-				option.setDefaultValue(defaultValue);
-
-				String description = element.getAttribute("description");
-				if (description == null) {
-					description = "";
-				}
-				option.setDescription(description);
-
-				this.options.put(id, option);
-				options.add(option);
 			}
+			option.setIdentifier(id);
+			option.setName(name);
+
+			String defaultValue = element.getAttribute("defaultValue");
+			if (defaultValue == null) {
+				defaultValue = "";
+			}
+			option.setDefaultValue(defaultValue);
+
+			String description = element.getAttribute("description");
+			if (description == null) {
+				description = "";
+			}
+			option.setDescription(description);
+
+			this.options.put(id, option);
+			options.add(option);
 		}
 
 		return options;
