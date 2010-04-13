@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import net.sf.orcc.cal.cal.Action;
 import net.sf.orcc.cal.cal.Inequality;
+import net.sf.orcc.cal.cal.State;
 import net.sf.orcc.cal.cal.Tag;
 import net.sf.orcc.cal.cal.Transition;
 
@@ -41,7 +42,7 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		Iterator<Tag> it = inequality.getTags().iterator();
 		StringBuilder builder = new StringBuilder();
 		if (it.hasNext()) {
-			builder.append(text(it.next()));
+			builder.append(getText(it.next()));
 			while (it.hasNext()) {
 				builder.append(" > ");
 				builder.append(getText(it.next()));
@@ -50,6 +51,10 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		}
 
 		return builder.toString();
+	}
+
+	public String text(State state) {
+		return state.getName();
 	}
 
 	public String text(Tag tag) {
@@ -67,8 +72,9 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 	}
 
 	public String text(Transition transition) {
-		return transition.getSource() + " (" + getText(transition.getTag())
-				+ ") --> " + transition.getTarget();
+		return getText(transition.getSource()) + " ("
+				+ getText(transition.getTag()) + ") --> "
+				+ getText(transition.getTarget());
 	}
 
 }
