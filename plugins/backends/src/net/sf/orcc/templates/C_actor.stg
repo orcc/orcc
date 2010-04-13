@@ -23,11 +23,13 @@ listValue(value) ::= <<
 >>
 
 variableDeclaration(variable) ::= <<
-$if(variable.port)$
-$variable.type$ *$variable$
-$else$
-$variable.type$ $variable$$listSize(variable.type.dimensions)$
-$endif$
+$
+if(variable.port)
+$$variable.type$ *$variable$$
+else
+$$variable.type$ $variable$$listSize(variable.type.dimensions)$$
+endif
+$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -47,8 +49,6 @@ $endif$
 $else$
 static $variableDeclaration(variable)$;
 $endif$
-
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,62 +56,74 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 Assign(assign) ::= <<
+
 $assign.target$ = $assign.value$;
 >>
 
 Call(call) ::= <<
-$if(call.target)$
-$call.target$ = $endif$
-$call.procedure$($call.parameters; separator=", "$);
+
+$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);
 >>
 
 Decrement(decrement) ::= <<
+
 $decrement.target$--;
 >>
 
 HasTokens(hasTokens) ::= <<
+
 $hasTokens.target$ = hasTokens($instance.id$_$hasTokens.port$, $hasTokens.numTokens$);
 >>
 
 Increment(increment) ::= <<
+
 $increment.target$++;
 >>
 
 Load(load) ::= <<
+
 $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 >>
 
 Peek(peek) ::= <<
+
 $peek.target$ = getPeekPtr($instance.id$_$peek.port$, $peek.numTokens$);
 >>
 
 Read(read) ::= <<
+
 $read.target$ = getReadPtr($instance.id$_$read.port$, $read.numTokens$);
 >>
 
 ReadEnd(readEnd) ::= <<
+
 setReadEnd($instance.id$_$readEnd.port$);
 >>
 
 Return(return) ::= <<
+
 $if(return.value)$
-return $return.value$;
-$endif$
+return $return.value$;$
+endif$
 >>
 
 SelfAssignment(selfAssign) ::= <<
+
 $selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
 >>
 
 Store(store) ::= <<
+
 $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 >>
 
 Write(write) ::= <<
+
 $write.target$ = getWritePtr($instance.id$_$write.port$, $write.numTokens$);
 >>
 
 WriteEnd(writeEnd) ::= <<
+
 setWriteEnd($instance.id$_$writeEnd.port$);
 >>
 
@@ -120,11 +132,11 @@ setWriteEnd($instance.id$_$writeEnd.port$);
 ///////////////////////////////////////////////////////////////////////////////
 
 instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}; separator="\n"$
+$instructions: {$(it.class.simpleName)(it)$}$
 >>
 
 nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}; separator="\n"$
+$nodes: {$(it.class.simpleName)(it)$}$
 >>
 
 // if node
@@ -139,7 +151,8 @@ if ($ifNode.value$) {
 	$nodes(ifNode.thenNodes)$
 }$if(ifNode.elseNodes)$ else {
 	$nodes(ifNode.elseNodes)$
-}$endif$$BlockNode(ifNode.joinNode)$
+}$endif$
+$BlockNode(ifNode.joinNode)$
 >>
 
 // while node
@@ -161,7 +174,8 @@ static $procedure.returnType$ $procedure$($procedure.parameters.list: {$variable
 $if(procedure.locals.list)$
 	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
 $endif$
-	$procedure.nodes: {$(it.class.simpleName)(it)$}$}
+	$procedure.nodes: {$(it.class.simpleName)(it)$}$
+}
 
 >>
 
