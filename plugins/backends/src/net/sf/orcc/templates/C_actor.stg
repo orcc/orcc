@@ -101,7 +101,6 @@ setReadEnd($instance.id$_$readEnd.port$);
 >>
 
 Return(return) ::= <<
-
 $if(return.value)$
 return $return.value$;$
 endif$
