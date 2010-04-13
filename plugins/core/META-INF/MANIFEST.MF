@@ -40,6 +40,7 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.network.serialize,
  net.sf.orcc.network.transforms,
  net.sf.orcc.tools.classifier,
+ net.sf.orcc.ui.launching,
  net.sf.orcc.util,
  org.jgrapht,
  org.jgrapht.graph

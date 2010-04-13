@@ -29,8 +29,6 @@
 package net.sf.orcc.backends;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
@@ -299,10 +297,7 @@ public class BackendFactory {
 		if (new File(inputFile).isDirectory()) {
 			backendObj.generateVtl(process, outputFolder);
 		} else {
-			int fifoSize = configuration.getAttribute(FIFO_SIZE,
-					DEFAULT_FIFO_SIZE);
-			backendObj.generateCode(process, inputFile, outputFolder, fifoSize);
+			backendObj.generateCode(process, inputFile, outputFolder);
 		}
 	}
-
 }

@@ -52,13 +52,11 @@ public interface Backend {
 	 *            absolute path of top-level input network
 	 * @param outputFolder
 	 *            absolute path of output folder
-	 * @param fifoSize
-	 *            default FIFO size
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void generateCode(OrccProcess process, String inputFile,
-			String outputFolder, int fifoSize) throws OrccException;
+	void generateCode(OrccProcess process, String inputFile, String outputFolder)
+			throws OrccException;
 
 	/**
 	 * Loads IR files, transforms actors and prints them.

@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.backends;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -67,7 +70,7 @@ public abstract class AbstractBackend implements Backend {
 
 			try {
 				AbstractBackend backend = clasz.newInstance();
-				backend.generateCode(null, inputFile, outputFolder, 10000);
+				backend.generateCode(null, inputFile, outputFolder);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
@@ -110,6 +113,24 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	/**
+	 * This method may be implemented by subclasses that wish to skip
+	 * instantiation, or do something before/after.
+	 * 
+	 * @param network
+	 *            a network
+	 * @param outputFolder
+	 *            output folder
+	 * @throws OrccException
+	 */
+	protected void doInstantiation(Network network, String outputFolder)
+			throws OrccException {
+		write("Instantiating actors...\n");
+		network.instantiate(outputFolder);
+		Network.clearActorPool();
+		write("Instantiation done\n");
+	}
+
+	/**
 	 * This method must be implemented by subclasses to do the actual code
 	 * generation for VTL.
 	 * 
@@ -122,26 +143,21 @@ public abstract class AbstractBackend implements Backend {
 
 	@Override
 	final public void generateCode(OrccProcess process, String inputFile,
-			String outputFolder, int fifoSize) throws OrccException {
+			String outputFolder) throws OrccException {
 		this.process = process;
 
 		// set FIFO size
-		this.fifoSize = fifoSize;
+		this.fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 
-		// set output path
+		// set output path. Not sure if getAbsolutePath is necessary, I can't
+		// remember why it's used
 		path = new File(outputFolder).getAbsolutePath();
 
 		// parses top network
 		write("Parsing XDF network...\n");
 		Network network = new XDFParser(inputFile).parseNetwork();
 
-		// instantiate the network
-		write("Instantiating actors...\n");
-		network.instantiate(outputFolder);
-		Network.clearActorPool();
-
-		write("Instantiation done\n");
-
+		doInstantiation(network, outputFolder);
 		doActorCodeGeneration(network);
 
 		// print network
@@ -200,6 +216,30 @@ public abstract class AbstractBackend implements Backend {
 	 */
 	final protected boolean getAttribute(String attributeName,
 			boolean defaultValue) throws OrccException {
+		if (configuration == null) {
+			return defaultValue;
+		}
+
+		try {
+			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
+	}
+
+	/**
+	 * Returns the integer-valued attribute with the given name. Returns the
+	 * given default value if the attribute is undefined.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @param defaultValue
+	 *            the value to use if no value is found
+	 * @return the value or the default value if no value was found.
+	 * @throws OrccException
+	 */
+	final protected int getAttribute(String attributeName, int defaultValue)
+			throws OrccException {
 		if (configuration == null) {
 			return defaultValue;
 		}
