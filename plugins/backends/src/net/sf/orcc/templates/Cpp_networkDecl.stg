@@ -1,5 +1,3 @@
-group Cpp_network;
-
 includeInstance(instance) ::= <<
 $if(instance.wrapper)$
 #include "wrapperaka.h"
@@ -10,7 +8,7 @@ $endif$
 >>
 
 includeInstances(instances) ::= <<
-$instances: includeInstance(it); separator="\n"$
+$instances: includeInstance(); separator="\n"$
 >>
 
 
@@ -38,7 +36,7 @@ enum
 
 
 declareBroadcastEnums(broadcasts) ::= <<
-$broadcasts: declareBroadcastEnum(it)$
+$broadcasts: declareBroadcastEnum()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -50,7 +48,7 @@ static FifoAPI * fifo_$count$;
 >>
 
 declareFifos(edges) ::= <<
-$edges: declareFifo(network.connectionMap.(it))$
+$edges: {edge | declareFifo(network.connectionMap.(edge))}$
 >>
 
 
@@ -64,7 +62,7 @@ $endif$
 >>
 
 declareInstances(instances) ::= <<
-$instances: declareInstance(it); separator="\n"$
+$instances: declareInstance(); separator="\n"$
 >>
 
 declareBroadcast(bcast) ::= <<
@@ -72,7 +70,7 @@ actor_broadcast<$bcast.type$, $bcast.numOutput$> $bcast.id$;
 >>
 
 declareBroadcasts(broadcasts) ::= <<
-$broadcasts: declareBroadcast(it); separator="\n"$
+$broadcasts: declareBroadcast(); separator="\n"$
 >>
 
 

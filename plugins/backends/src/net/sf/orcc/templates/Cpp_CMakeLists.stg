@@ -1,5 +1,3 @@
-group Cpp_CMakeLists;
-
 printActor(id, actor) ::= <<
 $if (!actor.system)$
 Actor_$actor.name$.cpp
@@ -16,7 +14,7 @@ $endif$
 
 printSubnetwork(net) ::= <<
 Network_$net.name$.cpp
-$net.instances: printInstance(it);separator="\n"$
+$net.instances: printInstance();separator="\n"$
 
 >>
 
@@ -68,22 +66,22 @@ link_directories(
 \${LIBCAL2CPP_ROOT_PATH}/lib
 )
 
-$networkList : addLibraries(it)$
+$networkList : addLibraries()$
 
 
 add_executable (top
 main.cpp
-$networkList : printSubnetwork(it)$
+$networkList : printSubnetwork()$
 )
 
-$networkList : addDependencies(it)$
+$networkList : addDependencies()$
 
 
 target_link_libraries(top
 LibOrcc
 LibCALaka
 LibThread
-$networkList : targetLinkWrapper(it)$
+$networkList : targetLinkWrapper()$
 )
 
 >>

@@ -1,5 +1,3 @@
-group Cpp_actorDecl;
-
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -189,7 +187,7 @@ $if(actions)$
 bool outside_FSM_scheduler();
 
 $endif$
-$fsm.transitions: stateScheduler(transition=it); separator="\n"$
+$fsm.transitions: stateScheduler(); separator="\n"$
 int scheduler();
 
 >>
@@ -249,19 +247,19 @@ private:
 $parameters(actor.parameters.list)$
 ////////////////////////////////////////////////////////////////////////////////
 // Non-const state variables of the actor
-$actor.stateVars.list: nonConstStateVar(it)$
+$actor.stateVars.list: nonConstStateVar()$
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-	$actor.procs.list: procedure(it)$
+	$actor.procs.list: procedure()$
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-	$actor.actions: action(it)$
+	$actor.actions: action()$
 
 public:
 	$if(actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-	$actor.initializes: action(it)$
+	$actor.initializes: action()$
 	void initialize();
 
 $endif$

@@ -1,5 +1,3 @@
-group Cpp_main;
-
 includeNetwork(net) ::= <<
 #include "Network_$net.name$.h"
 >>
@@ -26,7 +24,7 @@ stopNetwork(net) ::= <<
 // print network
 Cpp_main(networks, globalFifoMap) ::= <<
 
-$networks : includeNetwork(it); separator="\n"$
+$networks : includeNetwork(); separator="\n"$
 
 #include "FifoFactory.h"
 
@@ -46,9 +44,9 @@ int main(int argc, char *argv[]) {
 
 	init_orcc(argc, argv, NULL);
 
-$networks : declareNetwork(it); separator="\n"$
-$networks : startNetwork(it); separator="\n"$
-$networks : stopNetwork(it); separator="\n"$
+$networks : declareNetwork(); separator="\n"$
+$networks : startNetwork(); separator="\n"$
+$networks : stopNetwork(); separator="\n"$
 	return 0;
 }
 
