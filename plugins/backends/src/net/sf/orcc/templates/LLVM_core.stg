@@ -117,10 +117,6 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 // LLVM Operations
 ///////////////////////////////////////////////////////////////////////////////
-StoreOp(ty, value, pty, pointer) ::= <<
-store $ty$ $value$, $pty$* $pointer$
->>
-
 LoadOp(ty, pointer, alignment) ::= <<
 load $ty$* $pointer$ $if(alignment)$ [, align <alignment>] $endif$
 >>
@@ -137,8 +133,8 @@ IcmpOp(result, cond, ty, op1, op2) ::= <<
 $result$ = icmp $cond$ $ty$ $op1$, $op2$
 >>
  
-GetElementPtrOp(result, pty, ptrval, idx0, idx) ::= <<
-$result$ = getelementptr $pty$* $ptrval$$if(idx0)$
+GetElementPtrOp(pty, ptrval, idx0, idx) ::= <<
+getelementptr $pty$* $ptrval$$if(idx0)$
 , i32 $idx0$
 $endif$ $if(idx)$
 , $indexes(idx)$
@@ -205,12 +201,10 @@ $result$ = trunc $ty$ $value$ to $ty2$
 ///////////////////////////////////////////////////////////////////////////////
 
 StoreInstr(ty, value, pty, pointer, cast) ::= <<
-$if(value.intExpr)$
-$StoreOp(ty=pty, value={$Expr(value)$cast}, pty=pty, pointer=pointer)$
-$elseif(value.booleanExpr)$
-$StoreOp(ty=pty, value={$Expr(value)$cast}, pty=pty, pointer=pointer)$
+$if(value.intExpr || value.booleanExpr)$
+store $pty$ $value$cast, $pty$* $pointer$
 $else$
-$StoreOp(ty=ty, value={$Expr(value)$cast}, pty=pty, pointer=pointer)$
+store $ty$ $Expr(value)$cast, $pty$* $pointer$
 $endif$
 >>
 
@@ -297,7 +291,7 @@ $endif$
 >>
 
 StoreWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-$GetElementPtrOp(result={%$pointer$_$location$_L$indexesName(indexes)$ptr}, idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
+%$pointer$_$location$_L$indexesName(indexes)$ptr = $GetElementPtrOp(idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
 $CastStore(ty=ty, value=value, pty=pty.elementType, pointer={%$pointer$_$location$_L$indexesName(indexes)$ptr}, cast=cast, location=location)$
 $else$
@@ -315,7 +309,7 @@ $endif$
 
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
 %$pointer$_$location$_Loadport$indexesName(indexes)$ = $LoadOp(ty={$pty$*}, pointer=Var(pointer))$
-$GetElementPtrOp(result={%$pointer$_$location$_L$indexesName(indexes)$ptr}, pty=pty, ptrval={%$pointer$_$location$_Loadport$indexesName(indexes)$}, idx=indexes)$
+%$pointer$_$location$_L$indexesName(indexes)$ptr = $GetElementPtrOp(pty=pty, ptrval={%$pointer$_$location$_Loadport$indexesName(indexes)$}, idx=indexes)$
 $if(cast)$
 $CastStore(ty=ty, value=value, pty=pty, pointer={%$pointer$_$location$_L$indexesName(indexes)$ptr}, cast=cast, location=location)$
 $else$
@@ -345,27 +339,20 @@ $TruncOp(result={%$result$}, ty=ty, value={%$result$_trunc}, ty2=result.type)$
 $endif$
 >>
 
-LoadPortWithIndex(result, ty, pointer, indexes, cast) ::= <<
-%$result$_L = $LoadOp(ty={$ty$*}, pointer=Var(pointer))$
-$GetElementPtrOp(result={%$result$_$pointer$$indexesName(indexes)$_ptr}, pty=ty, ptrval={%$result$_L}, idx=indexes)$
+LoadPortWithIndex(result, pty, pointer, indexes, cast) ::= <<
+%$result$_L = $LoadOp(ty={$pty$*}, pointer=Var(pointer))$
+%$result$_$pointer$$indexesName(indexes)$_ptr = $GetElementPtrOp(pty=pty, ptrval={%$result$_L}, idx=indexes)$
 $if(cast)$
-$CastLoad(result=result, ty=ty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr}, cast = cast)$
+$CastLoad(result=result, ty=pty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr}, cast = cast)$
 $else$
-%$result$ = $LoadOp(ty=ty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr})$
+%$result$ = $LoadOp(ty=pty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr})$
 $endif$
 
 
 >>
 
-LoadPortWithoutIndex(result, ty, pointer, cast) ::= <<
-LoadPortWithoutIndex
-
-
->>
-
-
 LoadWithIndex(result, ty, pointer, indexes, cast) ::= <<
-$GetElementPtrOp(result={$result$_$pointer$L$indexesName(indexes)$_ptr}, idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
+$result$_$pointer$L$indexesName(indexes)$_ptr = $GetElementPtrOp(idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
 $CastLoad(result=result, ty=ty.elementType, pointer={$result$_$pointer$L$indexesName(indexes)$_ptr}, cast=cast)$
 $else$
@@ -470,7 +457,7 @@ Read(read) ::= <<
 $LoadLocalPort(read)$
 $CallOp(result={%$read.target$_$read.block.label$}, ty ="i8*", fnptrval="@getReadPtr", function_args={%struct.fifo_s* %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
 $BitcastOp(result={%$read.target$_$read.block.label$_cast}, ty="i8*", value={%$read.target$_$read.block.label$}, ty2={$ExprType(read.port)$*})$
-$StoreOp(ty={$ExprType(read.port)$*}, value={%$read.target$_$read.block.label$_cast}, pty={$ExprType(read.port)$*}, pointer={%$read.port$})$
+store $ExprType(read.port)$* %$read.target$_$read.block.label$_cast, $ExprType(read.port)$** %$read.port$
 
 >>
 
@@ -484,7 +471,7 @@ Peek(peek) ::= <<
 $LoadLocalPort(peek)$
 $CallOp(result={%$peek.target$_$peek.block.label$}, ty ="i8*", fnptrval="@getPeekPtr", function_args={%struct.fifo_s* %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
 $BitcastOp(result={%$peek.target$_$peek.block.label$_cast}, ty="i8*", value={%$peek.target$_$peek.block.label$}, ty2={$ExprType(peek.port)$*})$
-$StoreOp(ty={$ExprType(peek.port)$*}, value={%$peek.target$_$peek.block.label$_cast}, pty={$ExprType(peek.port)$*}, pointer={%$peek.port$})$
+store $ExprType(peek.port)$* %$peek.target$_$peek.block.label$_cast, $ExprType(peek.port)$** %$peek.port$
 
 >>
 
@@ -492,7 +479,7 @@ Write(write) ::= <<
 $LoadLocalPort(write)$
 $CallOp(result={%$write.target$_$write.block.label$}, ty ="i8*", fnptrval="@getWritePtr", function_args={%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
 $BitcastOp(result={%$write.target$_$write.block.label$_cast}, ty="i8*", value={%$write.target$_$write.block.label$}, ty2={$ExprType(write.port)$*})$
-$StoreOp(ty={$ExprType(write.port)$*}, value={%$write.target$_$write.block.label$_cast}, pty={$ExprType(write.port)$*}, pointer={%$write.port$})$
+store $ExprType(write.port)$* %$write.target$_$write.block.label$_cast, $ExprType(write.port)$** %$write.port$
 
 >>
 
@@ -539,11 +526,9 @@ $endif$
 >>
 
 Load(load) ::= <<
-$if(load.source.variable.port)$
-$if(load.indexes.empty)$
-$LoadPortWithoutIndex(result=load.target, ty=load.source.variable.type.elementType, pointer=load.source, cast= load.cast)$
-$else$
-$LoadPortWithIndex(result=load.target, ty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source, cast= load.cast)$
+$if (load.source.variable.port)$
+$if (!load.indexes.empty)$
+$LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source, cast= load.cast)$
 $endif$
 $else$
 $if(load.indexes.empty)$
