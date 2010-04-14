@@ -5,12 +5,12 @@
 outputPattern(pattern, action) ::= <<
 $if(rest(pattern.keys))$
 	$AllocaOp(result={%p$action$_roomTest}, type="i1")$
-	$StoreOp(ty="i1", value="1", pty="i1", pointer={%p$action$_roomTest})$
+	store i1 1, i1* %p$action$_roomTest
 $pattern.keys:{port|
 	$HasRoom(result={$action$$i$_room}, action=action,  actor=actorName, port=port, numToken=pattern.(port))$
 	%$action$$i$_roomTest = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
 	$AndOp(result={%$action$$i$}, ty="i1", op1={%$action$$i$_room}, op2={%$action$$i$_roomTest})$
-	$StoreOp(ty="i1", value={%$action$$i$}, pty="i1", pointer={%p$action$_roomTest})$
+	store i1 %$action$$i$, i1* %p$action$_roomTest
 }$
 	%$action$_room = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
 $else$
@@ -32,7 +32,7 @@ $if(actions)$
 define internal i32 @outside_FSM_scheduler() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
-	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	store i32 0, i32* %i
 	$BrOp(dest="%bb")$
 	
 bb:  
@@ -42,7 +42,7 @@ $schedulingTest(actions)$
 inc_i:
   %i_load = $LoadOp(ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
-  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  store i32 %i_add, i32* %i
   $BrOp(dest="%bb")$
 
 return:
@@ -54,7 +54,7 @@ $endif$
 define i32 @$actorName$_scheduler() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
-	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	store i32 0, i32* %i
 	$BrOp(dest="%bb")$
 
 bb:
@@ -72,7 +72,7 @@ $switch(fsm="_FSM_state", transitions=fsm.transitions)$
 inc_i:
   %i_load = $LoadOp(ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
-  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  store i32 %i_add, i32* %i
   $BrOp(dest="%bb")$
 
 return:
@@ -128,7 +128,7 @@ $actionCallState(nextState)$
 
 actionCallState(nextState) ::= <<
 	$CallOp(ty="void", fnptrval=nextState.action.body)$
-	$StoreOp(ty="i32", value=nextState.targetState.index, pty="i32", pointer="@_FSM_state")$
+	store i32 $nextState.targetState.index$, i32* @_FSM_state
 	$BrOp(dest="%sched_ok")$
 >>
 
@@ -140,7 +140,7 @@ scheduler(actions, iterator) ::= <<
 define i32 @$actorName$_scheduler() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
-	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	store i32 0, i32* %i
 	$BrOp(dest="%bb")$
 	
 bb:  
@@ -152,7 +152,7 @@ $endif$
 inc_i:
   %i_load = $LoadOp(ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
-  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  store i32 %i_add, i32* %i
   $BrOp(dest="%bb")$
 
 return:
@@ -255,7 +255,7 @@ $actor.initializes:{$action(it)$}$
 define i32 @$actorName$_initialize() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
-	$StoreOp(ty="i32", value="0", pty="i32", pointer="%i")$
+	store i32 0, i32* %i
 	$BrOp(dest="%bb")$
 	
 bb:
@@ -267,7 +267,7 @@ $endif$
 inc_i:
   %i_load = $LoadOp(ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
-  $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
+  store i32 %i_add, i32* %i
   $BrOp(dest="%return")$
 
 return:

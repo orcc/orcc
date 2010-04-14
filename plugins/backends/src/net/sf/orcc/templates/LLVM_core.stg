@@ -340,12 +340,12 @@ $endif$
 >>
 
 LoadPortWithIndex(result, pty, pointer, indexes, cast) ::= <<
-%$result$_L = $LoadOp(ty={$pty$*}, pointer=Var(pointer))$
+%$result$_L = load $pty$** $Var(pointer)$
 %$result$_$pointer$$indexesName(indexes)$_ptr = $GetElementPtrOp(pty=pty, ptrval={%$result$_L}, idx=indexes)$
 $if(cast)$
 $CastLoad(result=result, ty=pty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr}, cast = cast)$
 $else$
-%$result$ = $LoadOp(ty=pty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr})$
+%$result$ = load $pty$* %$result$_$pointer$$indexesName(indexes)$_ptr
 $endif$
 
 
