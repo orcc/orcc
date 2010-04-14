@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(port) ::= <<
-@$actorName$_$port.name$ = common global %struct.fifo_s* null
+@$actor.name$_$port.name$ = common global %struct.fifo_s* null
 
 >>
 
@@ -31,15 +31,13 @@ $list.variable.type.elementType$
 >>
 
 variableDeclaration(variable) ::= <<
-$if(variable.port)$
-$AllocaOp(result={%$variable$}, type={$variable.type.elementType$*})$
-$else$
-$if(variable.list)$
-$AllocaOp(result={%$variable$}, type=variable.type)$
-$endif$
-$endif$
-
-
+$if(variable.port)
+$$AllocaOp(result={%$variable$}, type={$variable.type.elementType$*})$$
+else
+$$if(variable.list)
+$$AllocaOp(result={%$variable$}, type=variable.type)$$
+endif$$
+endif$
 >>
 
 indexes(indexes) ::= <<
@@ -59,11 +57,11 @@ $if(variable.intExpr)$$type$ $elseif(type.list)$$type$* $elseif(variable.boolean
 >>
 
 argumentDeclaration(variable) ::= <<
-$if(variable.type.list)$
-$variable.type$* %$variable$
-$else$
-$variable.type$ %$variable$
-$endif$
+$if(variable.type.list)
+$$variable.type$* %$variable$$
+else
+$$variable.type$ %$variable$$
+endif$
 >>
 
 Location(location) ::= <<
@@ -71,10 +69,10 @@ l$location.startLine$c$location.startColumn$
 >>
 
 ConstantValue(type, const) ::= <<
-$if(const.listConst)$
-$listValue(type=type.type, values=const.value, iterator = type.sizeIterator)$
-$else$
-$const$
+$if(const.listConst)$$
+listValue(type=type.type, values=const.value, iterator = type.sizeIterator)$
+$else
+$$const$
 $endif$
 
 >>
@@ -104,13 +102,11 @@ phiPair(value, label) ::= <<
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-$if(variable.constantValue)$
-@$variable$ = internal global $variable.type$ $ConstantValue(type=variable.type, const=variable.constantValue)$
-
-$else$
-@$variable$ = internal global $variable.type$ zeroinitializer
-
-$endif$
+$if(variable.constantValue)
+$@$variable$ = internal global $variable.type$ $ConstantValue(type=variable.type, const=variable.constantValue)$$
+else$
+@$variable$ = internal global $variable.type$ zeroinitializer$
+endif$
 >>
 
 
@@ -134,11 +130,7 @@ $result$ = icmp $cond$ $ty$ $op1$, $op2$
 >>
  
 GetElementPtrOp(pty, ptrval, idx0, idx) ::= <<
-getelementptr $pty$* $ptrval$$if(idx0)$
-, i32 $idx0$
-$endif$ $if(idx)$
-, $indexes(idx)$
-$endif$
+getelementptr $pty$* $ptrval$$if(idx0)$, i32 $idx0$$endif$ $if(idx)$, $indexes(idx)$$endif$
 >>
 
 BitcastOp(result, ty, value, ty2) ::= <<
@@ -146,37 +138,38 @@ $result$ = bitcast $ty$ $value$ to $ty2$
 >>
 
 AllocaOp(result, type, NumElements, alignment) ::= <<
-$result$ = alloca $type$ $if(NumElements)$
-[, i32 <NumElements>]
-$endif$
-$if(alignment)$
-[, align <alignment>]
-$endif$
+$result$ = alloca $type$ $if(NumElements)
+$[, i32 <NumElements>]$
+endif$$
+if(alignment)$
+[, align <alignment>]$
+endif$
 >>
 
 BrOp(cond, iftrue, iffalse, dest) ::= <<
-$if(cond)$br i1 $cond$, label $iftrue$, label $iffalse$
-$else$
-br label $dest$
-$endif$
+$if(cond)
+$br i1 $cond$, label $iftrue$, label $iffalse$$
+else
+$br label $dest$$
+endif$
 >>
 
 RetOp(type, value) ::= <<
-$if(value)$
-ret $type$ $value$
-$else$
-ret void
-$endif$
-
-
+$if(value)
+$ret $type$ $value$$
+else
+$ret void$
+endif$
 >>  
 
-SwitchOp(intty, value, defaultdest, labelpairs) ::= <<
-switch $intty$ $value$, label $defaultdest$ [ $labelpairs$ ]
->>
-
 CallOp(tail, cconv, ret_attrs, ty, fnty, fnptrval, function_args, fn_attrs) ::= <<
-$if(tail)$ [tail] $endif$call$if(cconv)$ [cconv] $endif$$if(ret_attrs)$ [ret_attrs] $endif$ $ty$$if(fnty)$ [<fnty>*] $endif$ $fnptrval$ ($if(function_args)$$function_args$$endif$) $if(fn_attrs)$ [fn_attrs] $endif$
+$if(tail)$ [tail] $endif$call$
+if(cconv)$ [cconv] $endif
+$$if(ret_attrs)$ [ret_attrs] $
+endif$ $ty$$
+if(fnty)$ [<fnty>*] $endif
+$ $fnptrval$ ($if(function_args)$$function_args$$endif$) $
+if(fn_attrs)$ [fn_attrs] $endif$
 >>
 
 PhiOp(result, ty, pairs) ::= << 
@@ -189,11 +182,11 @@ $result$ = phi $ty$ $pairs$
 ///////////////////////////////////////////////////////////////////////////////
 
 StoreInstr(ty, value, pty, ptr, cast) ::= <<
-$if(value.intExpr || value.booleanExpr)$
-store $pty$ $value$cast, $pty$* $pointer$
-$else$
-store $ty$ $Expr(value)$cast, $pty$* $pointer$
-$endif$
+$if(value.intExpr || value.booleanExpr)
+$store $pty$ $value$cast, $pty$* $pointer$$
+else
+$store $ty$ $Expr(value)$cast, $pty$* $pointer$$
+endif$
 >>
 
 
@@ -201,34 +194,14 @@ $endif$
 // Conversion instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-states(transitions) ::= <<
-
-$transitions:{$\t$i32 $it.sourceState.index$, label %s_$it.sourceState$$\n$}$
->>
-
-switch(fsm, transitions) ::= <<
-	%$fsm$ = $LoadOp(ty="i32", pointer={@$fsm$})$
-	$SwitchOp(intty="i32", value={%$fsm$}, defaultdest="%default", labelpairs=states(transitions))$
-$transitions: {
-s_$it.sourceState$:
-	%$it.sourceState$_res = $CallOp(ty="i1", fnptrval={@$it.sourceState$_state_scheduler})$
-	$BrOp(cond={%$it.sourceState$_res}, iftrue="%inc_i", iffalse="%return")$
-}$
-default:
-	$BrOp(dest="%return")$
-
->>
-
 CastAssign(target, value, cast)::= <<
 $if(cast.extended)$
 %$target$_ext = $value$
-$if(cast.signed)$
-%$target$ = sext $value.type$ %$target$_ext to $target.type$
-
-$else$
-%$target$ = zext $value.type$ %$target$_ext to $target.type$
-
-$endif$
+$if(cast.signed)
+$%$target$ = sext $value.type$ %$target$_ext to $target.type$$
+else
+$%$target$ = zext $value.type$ %$target$_ext to $target.type$$
+endif$
 $else$
 %$target$_trunc = $value$
 %$target$ = trunc $value.type$ %$target$_trunc to $target.type$
@@ -245,13 +218,11 @@ $endif$}$
 CastCall(result, ty, fnptrval, function_args, cast)::= <<
 $if(cast.extended)$
 %$result$_ext = $CallOp(ty=ty, fnptrval=fnptrval, function_args=function_args)$
-$if(cast.signed)$
-%$result$ = sext $ty$ %$result$_ext to $result.type$
-
-$else$
-%$result$ = zext $ty$ %$result$_ext to $result.type$
-
-$endif$
+$if(cast.signed)
+$%$result$ = sext $ty$ %$result$_ext to $result.type$$
+else
+$%$result$ = zext $ty$ %$result$_ext to $result.type$$
+endif$
 $else$
 %$result$_trunc = $CallOp(ty=ty, fnptrval=fnptrval, function_args=function_args)$
 %$result$ = trunc $ty$ %$result$_trunc to $result.type$
@@ -262,19 +233,16 @@ $endif$
 
 CastStore(ty, value, pty, ptr, cast, location)::= <<
 $if(cast.extended)$
-$if(cast.signed)$
-%$value$_$location$_ext = sext $ty$ $Expr(value)$ to $pty$
-
-$else$
-%$value$_$location$_ext = zext $ty$ $Expr(value)$ to $pty$
-
-$endif$
+$if(cast.signed)
+$%$value$_$location$_ext = sext $ty$ $Expr(value)$ to $pty$$
+else
+$%$value$_$location$_ext = zext $ty$ $Expr(value)$ to $pty$$
+endif$
 $StoreInstr(ty=pty, value=value, pty=pty, ptr=ptr, cast={_$location$_ext})$
 $else$
 %$value$_$location$_trunc = trunc $ty$ $Expr(value)$ to $pty$
-
-$StoreInstr(ty=pty, value=value, pty=pty, ptr=ptr, cast={_$location$_trunc})$
-$endif$
+$StoreInstr(ty=pty, value=value, pty=pty, ptr=ptr, cast={_$location$_trunc})$$
+endif$
 
 >>
 
@@ -305,26 +273,18 @@ $StoreInstr(ty=ty, value=value, pty=pty, ptr={%$pointer$_$location$_L$indexesNam
 $endif$
 >>
 
-StorePortWithoutIndex(ty, value, pty, pointer, cast) ::= <<
-StorePortWithoutIndex
-
->>
-
-
 CastLoad(result, ty, ptr, cast)::= <<
 $if(cast.extended)$
 %$result$_ext = load $ty$* $ptr$
-$if(cast.signed)$
-%$result$ = sext $ty$ %$result$_ext to $result.type$
-
-$else$
-%$result$ = zext $ty$ %$result$_ext to $result.type$
-
-$endif$
-$else$
-%$result$_trunc = load $ty$* $ptr$
-%$result$ = trunc $ty$ %$result$_trunc to $result.type$
-$endif$
+$if(cast.signed)
+$%$result$ = sext $ty$ %$result$_ext to $result.type$$
+else
+$%$result$ = zext $ty$ %$result$_ext to $result.type$$
+endif
+$$else
+$%$result$_trunc = load $ty$* $ptr$
+%$result$ = trunc $ty$ %$result$_trunc to $result.type$$
+endif$
 >>
 
 LoadPortWithIndex(result, pty, pointer, indexes, cast) ::= <<
@@ -335,8 +295,6 @@ $CastLoad(result=result, ty=pty, ptr={%$result$_$pointer$$indexesName(indexes)$_
 $else$
 %$result$ = load $pty$* %$result$_$pointer$$indexesName(indexes)$_ptr
 $endif$
-
-
 >>
 
 LoadWithIndex(result, ty, pointer, indexes, cast) ::= <<
@@ -346,8 +304,6 @@ $CastLoad(result=result, ty=ty.elementType, ptr={$result$_$pointer$L$indexesName
 $else$
 $result$ = load $ty.elementType$* $result$_$pointer$L$indexesName(indexes)$_ptr
 $endif$
-
-
 >>
 
 LoadWithoutIndex(result, ty, pointer, cast) ::= <<
@@ -356,8 +312,6 @@ $CastLoad(result=result, ty=ty, ptr=Var(pointer), cast=cast)$
 $else$
 $result$ = $LoadOp(ty=ty, pointer=Var(pointer))$
 $endif$
-
-
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
@@ -383,14 +337,13 @@ b$label(ifNode.joinNode)$:
 
 >>
 
-
-
 LoadLocalPort(instr) ::= <<
-%local_$instr.port$$instr.block.label$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actorName$_$instr.port$})$
+%local_$instr.port$$instr.block.label$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor.name$_$instr.port$})$
 >>
 
-HasRoom(result, action, actor, port, numToken) ::= <<
-%$port$_$action$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor$_$port$})$
+HasRoom(result, action, port, numToken) ::= <<
+
+%$port$_$action$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor.name$_$port$})$
 %$result$32 = $CallOp(ty="i32", fnptrval="@hasRoom", function_args={%struct.fifo_s* %$port$_$action$, i32 $numToken$})$
 %$result$ = trunc i32 %$result$32 to i1
 >>
@@ -412,120 +365,119 @@ phiVars(vars, node) ::= <<
 
 
 Call(call) ::= <<
+
 $CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=Location(call.location))$
-$if(call.target)$
-$if(call.cast)$
-$CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)), cast=call.cast)$
-$else$
-%$call.target$ = $CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
-$endif$
-$else$
-$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
-$endif$
-
-
+$if(call.target)$$
+if(call.cast)
+$$CastCall(result=call.target,
+ty=call.procedure.returnType,
+fnptrval=call.procedure,
+function_args=parametersDeclaration(arguments=call.procedure.parameters.list, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)),
+cast=call.cast)$$
+else
+$%$call.target$ = $CallOp(ty=call.procedure.returnType,
+fnptrval=call.procedure,
+function_args=parametersDeclaration(arguments=call.procedure.parameters.list, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$$
+endif
+$$else
+$$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$$
+endif$
 >>
 
 Assign(assign) ::= <<
-$if(assign.cast)$
-$CastAssign(target = assign.target, value = assign.value, cast = assign.cast)$
-$else$
-%$assign.target$ = $assign.value$
-$endif$
 
-
+$if(assign.cast)
+$$CastAssign(target = assign.target, value = assign.value, cast = assign.cast)$$
+else
+$%$assign.target$ = $assign.value$$
+endif$
 >>
 
 PhiAssignment(phi) ::= <<
-$PhiOp(result={%$phi.target$}, ty=phi.target.type, pairs=phiPairs(phi))$
 
+$PhiOp(result={%$phi.target$}, ty=phi.target.type, pairs=phiPairs(phi))$
 >>
 
 Read(read) ::= <<
+
 $LoadLocalPort(read)$
 %$read.target$_$read.block.label$ = $CallOp(ty ="i8*", fnptrval="@getReadPtr", function_args={%struct.fifo_s* %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
 $BitcastOp(result={%$read.target$_$read.block.label$_cast}, ty="i8*", value={%$read.target$_$read.block.label$}, ty2={$ExprType(read.port)$*})$
 store $ExprType(read.port)$* %$read.target$_$read.block.label$_cast, $ExprType(read.port)$** %$read.port$
-
 >>
 
 ReadEnd(readEnd) ::= <<
-%end_$readEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actorName$_$readEnd.port$})$
-$CallOp(ty ="void", fnptrval="@setReadEnd", function_args={%struct.fifo_s* %end_$readEnd.port$})$
 
+%end_$readEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor.name$_$readEnd.port$})$
+$CallOp(ty ="void", fnptrval="@setReadEnd", function_args={%struct.fifo_s* %end_$readEnd.port$})$
 >>
 
 Peek(peek) ::= <<
+
 $LoadLocalPort(peek)$
 %$peek.target$_$peek.block.label$ = $CallOp(ty ="i8*", fnptrval="@getPeekPtr", function_args={%struct.fifo_s* %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
 $BitcastOp(result={%$peek.target$_$peek.block.label$_cast}, ty="i8*", value={%$peek.target$_$peek.block.label$}, ty2={$ExprType(peek.port)$*})$
 store $ExprType(peek.port)$* %$peek.target$_$peek.block.label$_cast, $ExprType(peek.port)$** %$peek.port$
-
 >>
 
 Write(write) ::= <<
+
 $LoadLocalPort(write)$
 %$write.target$_$write.block.label$ = $CallOp(ty ="i8*", fnptrval="@getWritePtr", function_args={%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
 $BitcastOp(result={%$write.target$_$write.block.label$_cast}, ty="i8*", value={%$write.target$_$write.block.label$}, ty2={$ExprType(write.port)$*})$
 store $ExprType(write.port)$* %$write.target$_$write.block.label$_cast, $ExprType(write.port)$** %$write.port$
-
 >>
 
 WriteEnd(writeEnd) ::= <<
-%end_$writeEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actorName$_$writeEnd.port$})$
-$CallOp(ty ="void", fnptrval="@setWriteEnd", function_args={%struct.fifo_s* %end_$writeEnd.port$})$
 
+%end_$writeEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor.name$_$writeEnd.port$})$
+$CallOp(ty ="void", fnptrval="@setWriteEnd", function_args={%struct.fifo_s* %end_$writeEnd.port$})$
 >>
 
 Return(return) ::= <<
-$if(return.value)$
-$RetOp(type=return.value.type, value=Expr(return.value))$
-$else$
-$RetOp()$
 
-$endif$
-
+$if(return.value)$$
+RetOp(type=return.value.type, value=Expr(return.value))$$
+else
+$$RetOp()$$
+endif$
 >>
 
 HasTokens(hasTokens) ::= <<
+
 $LoadLocalPort(hasTokens)$
 %$hasTokens.target$32 = $CallOp(ty="i32", fnptrval="@hasTokens", function_args={%struct.fifo_s* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$})$
 %$hasTokens.target$ = trunc i32 %$hasTokens.target$32 to i1
-
 >>
 
 Store(store) ::= <<
+
 $if(store.target.variable.port)$
-$if(store.indexes.empty)$
-$StorePortWithoutIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=Var(store.target), cast=store.cast)$
-$else$
-$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$
-$endif$
-$else$
-$if(store.indexes.empty)$
-$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast, location=Location(store.location))$
-$else$
-$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$
-$endif$
-$endif$
-
-
-
+$if(!store.indexes.empty)
+$$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
+endif$$
+else
+$$if(store.indexes.empty)
+$$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast, location=Location(store.location))$$
+else
+$$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
+endif$$
+endif$
 >>
 
 Load(load) ::= <<
-$if (load.source.variable.port)$
-$if (!load.indexes.empty)$
-$LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source, cast= load.cast)$
-$endif$
-$else$
-$if(load.indexes.empty)$
-$LoadWithoutIndex(result={%$load.target$}, ty=VarType(load.source), pointer=load.source, cast= load.cast)$
-$else$
-$LoadWithIndex(result={%$load.target$}, ty=load.source.variable.type, pointer=load.source, indexes=load.indexes, cast= load.cast)$
-$endif$
-$endif$
 
+$if (load.source.variable.port)$$
+if (!load.indexes.empty)
+$$LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source, cast= load.cast)$$
+endif$$
+else$$
+if(load.indexes.empty)
+$$LoadWithoutIndex(result={%$load.target$}, ty=VarType(load.source), pointer=load.source, cast= load.cast)$$
+else
+$$LoadWithIndex(result={%$load.target$}, ty=load.source.variable.type, pointer=load.source, indexes=load.indexes, cast= load.cast)$$
+endif$$
+endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -572,12 +524,16 @@ instructions(instructions) ::= <<
 	$instructions: {$(it.class.simpleName)(it)$}$
 >>
 
+Node(node) ::= <<
+$(node.class.simpleName)(node)$
+>>
+
 nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}$
+$nodes: Node()$
 >>
 
 node_cond(node) ::= <<
-$({$node.class.simpleName$_cond})(it)$
+$({$node.class.simpleName$_cond})(node)$
 >>
 
 nodes_cond(nodes) ::= <<

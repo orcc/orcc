@@ -7,7 +7,7 @@ $if(rest(pattern.keys))$
 	$AllocaOp(result={%p$action$_roomTest}, type="i1")$
 	store i1 1, i1* %p$action$_roomTest
 $pattern.keys:{port|
-	$HasRoom(result={$action$$i$_room}, action=action,  actor=actorName, port=port, numToken=pattern.(port))$
+	$HasRoom(result={$action$$i$_room}, action=action, port=port, numToken=pattern.(port))$
 	%$action$$i$_roomTest = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
 	$AndOp(result={%$action$$i$}, ty="i1", op1={%$action$$i$_room}, op2={%$action$$i$_roomTest})$
 	store i1 %$action$$i$, i1* %p$action$_roomTest
@@ -15,7 +15,7 @@ $pattern.keys:{port|
 	%$action$_room = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
 $else$
 $pattern.keys:{port|
-	$HasRoom(result={$action$_room}, action=action,  actor=actorName, port=port, numToken=pattern.(port))$}$
+	$HasRoom(result={$action$_room}, action=action, port=port, numToken=pattern.(port))$}$
 $endif$
 >>
 
@@ -23,10 +23,36 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
 ///////////////////////////////////////////////////////////////////////////////
+
+states(transitions) ::= <<
+
+$transitions:{$\t$i32 $it.sourceState.index$, label %s_$it.sourceState$$\n$}$
+>>
+
+SwitchOp(intty, value, defaultdest, labelpairs) ::= <<
+switch $intty$ $value$, label $defaultdest$ [ $labelpairs$ ]
+>>
+
+switch(fsm, transitions) ::= <<
+	%$fsm$ = $LoadOp(ty="i32", pointer={@$fsm$})$
+	$SwitchOp(intty="i32", value={%$fsm$}, defaultdest="%default", labelpairs=states(transitions))$
+$transitions: switchTransition()$
+default:
+	$BrOp(dest="%return")$
+
+>>
+
+switchTransition(transition) ::= <<
+
+s_$transition.sourceState$:
+	%$transition.sourceState$_res = $CallOp(ty="i1", fnptrval={@$transition.sourceState$_state_scheduler})$
+	$BrOp(cond={%$transition.sourceState$_res}, iftrue="%inc_i", iffalse="%return")$
+>>
+
 schedulerFSM(actions, fsm) ::= <<
 @_FSM_state = internal global i32 $fsm.initialState.index$
 
-$fsm.transitions: {$stateScheduler(transition=it)$}; separator="\n"$
+$fsm.transitions: stateScheduler(); separator="\n"$
 
 $if(actions)$
 define internal i32 @outside_FSM_scheduler() {
@@ -51,7 +77,7 @@ return:
 }
 $endif$
 
-define i32 @$actorName$_scheduler() {
+define i32 @$actor.name$_scheduler() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
 	store i32 0, i32* %i
@@ -97,7 +123,7 @@ sched_nok:
 >>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: {$actionTestState(it)$}$
+$nextStates: actionTestState()$
 >>
 
 actionTestState(nextState) ::= <<
@@ -137,7 +163,7 @@ actionCallState(nextState) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 scheduler(actions, iterator) ::= <<
-define i32 @$actorName$_scheduler() {
+define i32 @$actor.name$_scheduler() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
 	store i32 0, i32* %i
@@ -227,7 +253,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actorName, actor) ::= <<
+actor(actor) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Generated from "$actor.name$"
 
@@ -252,7 +278,7 @@ $if(actor.initializes)$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Initializes
 $actor.initializes:{$action(it)$}$
-define i32 @$actorName$_initialize() {
+define i32 @$actor.name$_initialize() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
 	store i32 0, i32* %i
