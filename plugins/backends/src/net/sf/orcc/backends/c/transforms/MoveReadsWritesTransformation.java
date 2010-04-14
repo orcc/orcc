@@ -82,10 +82,17 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 		BlockNode.getFirst(procedure, nodes).getInstructions()
 				.addAll(0, writes);
 
-		// Put readend nodes before return instruction
+		// Put readend nodes before last instruction in the last block.
+		// In the general case the last block is expected to contain a return
+		// instruction in functions/procedures and actions.
+		// HOWEVER (this is something that we should change in the front-end),
+		// the last block is expected to be empty in isSchedulable functions,
+		// thus the "numInstructions > 0" test.
 		List<Instruction> instructions = BlockNode.getLast(procedure, nodes)
 				.getInstructions();
-		instructions.addAll(instructions.size(), readEnds);
+		int numInstructions = instructions.size();
+		instructions.addAll(numInstructions > 0 ? numInstructions - 1 : 0,
+				readEnds);
 
 		// clears the lists
 		writes.clear();
