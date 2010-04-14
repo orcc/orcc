@@ -124,6 +124,7 @@
             <checkBox></checkBox>
          </option>
          <option
+               defaultValue="true"
                description="Whether Orcc should compile the VTL contained in the given folder"
                id="net.sf.orcc.backends.compileVTL"
                name="Compile VTL">

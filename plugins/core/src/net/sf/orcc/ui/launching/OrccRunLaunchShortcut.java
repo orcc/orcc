@@ -29,6 +29,7 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.VTL_FOLDER;
@@ -218,7 +219,14 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			// create configuration
 			ILaunchConfigurationWorkingCopy wc = type.newInstance(null, name);
 			wc.setAttribute(BACKEND, backend);
-			wc.setAttribute(getInput(wc), inputFile);
+
+			if (resource.getType() == IResource.FOLDER) {
+				wc.setAttribute(VTL_FOLDER, inputFile);
+			} else {
+				wc.setAttribute(VTL_FOLDER, "<put VTL folder here>");
+				wc.setAttribute(COMPILE_XDF, true);
+				wc.setAttribute(XDF_FILE, inputFile);
+			}
 			wc.setAttribute(OUTPUT_FOLDER, folder);
 
 			config = wc.doSave();
