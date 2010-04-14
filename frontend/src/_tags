@@ -3,7 +3,6 @@ true: warn_A, warn_e, warn_error_A, warn_error_e
 "actor": include
 "cli": include
 "expr": include
-"network": include
 "parsers": include
 
 <cli/cal2ir.d.byte>: debug

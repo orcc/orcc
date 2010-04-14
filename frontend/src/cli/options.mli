@@ -20,12 +20,12 @@ type t = {
 	o_debug : bool; (** activate debug mode: compilation errors are not caught. *)
 	o_dot_cfg : bool; (** output DOT files for CFG. *)
 	o_dot_prio : (Str.regexp * bool option) list; (** output DOT files for priorities. *)
-  o_file : string; (** input file *)
+	o_file : string; (** input file *)
 	o_keep : bool; (** keep intermediate files. *)
-  o_mp : string; (** model path *)
-  o_outdir : string; (** output directory *)
+	o_outdir : string; (** output directory *)
 	o_profiling : bool; (** print profiling information *)
-  o_values : (string * Calast.expr) list; (** values *)
+	o_values : (string * Calast.expr) list; (** values *)
+	o_vtl : string; (** VTL folder *)
 }
 
 val get_dot_prio : t -> string -> bool

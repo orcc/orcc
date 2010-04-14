@@ -22,10 +22,10 @@ type t = {
 	o_dot_prio : (Str.regexp * bool option) list;
 	o_file : string;
 	o_keep : bool;
-	o_mp : string;
 	o_outdir : string;
 	o_profiling : bool;
 	o_values : (string * Calast.expr) list;
+	o_vtl : string;
 }
 
 let get_flag spec name =
@@ -55,11 +55,10 @@ let init_options () =
   let speclist =
     [
 			("-i", Arg.Set_string input_file,
-			"<file> If the argument is a file, specifies the absolute path of the input XDF network.\ 
-			Otherwise specifies the absolute path of the VTL folder.");
+			"<path> Specifies the absolute path of the VTL folder.");
 
 			("-o", Arg.Set_string output_folder,
-			"<dir> Specifies the absolute path of the output folder where generated files will be put.");
+			"<path> Specifies the absolute path of the output folder where generated files will be put.");
 
 			("--cache", Arg.Set cache, "When set, code will only be generated for actors \
 			modified after code was last generated.");
@@ -93,13 +92,13 @@ let init_options () =
 	);
 	
 	if Sys.file_exists !input_file then (
-		if not (Sys.is_directory !input_file) && not (Filename.check_suffix !input_file ".xdf") then (
-			prerr_endline "Orcc frontend: the given input file must be a .xdf file.";
-			prerr_endline !output_folder;
+		if not (Sys.is_directory !input_file) then (
+			prerr_endline "Orcc frontend: the given input path must be a folder.";
+			prerr_endline !input_file;
 			exit 1
 		)
 	) else (
-		prerr_endline "Orcc frontend: the given input file does not exist.";
+		prerr_endline "Orcc frontend: the given input path does not exist.";
 		prerr_endline !input_file;
 		exit 1
 	);
@@ -122,26 +121,17 @@ let init_options () =
 			o_debug = !debug;
 			o_dot_cfg = !dot_cfg;
 			o_dot_prio = [];
-			o_file =
-				if Sys.is_directory !input_file then
-					""
-				else
-					Filename.basename !input_file;
+			o_file = "";
 			o_keep = !keep;
-			o_mp =
-				if Sys.is_directory !input_file then
-					!input_file
-				else
-					Filename.dirname !input_file;
 			o_outdir = !output_folder;
 			o_profiling = !profiling;
 			o_values = [];
+			o_vtl = !input_file;
 		}
 	in
 
 	print_endline "Starting Orcc frontend...";
-	printf "model path: %s\n" options.o_mp;
-	printf "top network: %s\n" options.o_file;
+	printf "VTL folder: %s\n" options.o_vtl;
 	printf "output folder: %s\n" options.o_outdir;
 
 	printf "- cache is %s\n" (if options.o_cache then "enabled" else "disabled");

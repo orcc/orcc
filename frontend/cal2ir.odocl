@@ -16,8 +16,4 @@ src/cli/Options
 src/cli/Testing
 src/expr/Evaluator
 src/expr/Typing
-src/network/Cg_network
-src/network/Xdfast
 src/parsers/Cal_parser
-src/parsers/Xdf_expr_parser
-src/parsers/Xdf_parser
