@@ -311,9 +311,9 @@ StorePortWithoutIndex
 >>
 
 
-CastLoad(result, ty, pointer, cast)::= <<
+CastLoad(result, ty, ptr, cast)::= <<
 $if(cast.extended)$
-%$result$_ext = $LoadOp(ty=ty, pointer=pointer)$
+%$result$_ext = load $ty$* $ptr$
 $if(cast.signed)$
 %$result$ = sext $ty$ %$result$_ext to $result.type$
 
@@ -322,7 +322,7 @@ $else$
 
 $endif$
 $else$
-%$result$_trunc = $LoadOp(ty=ty, pointer=pointer)$
+%$result$_trunc = load $ty$* $ptr$
 %$result$ = trunc $ty$ %$result$_trunc to $result.type$
 $endif$
 >>
@@ -331,7 +331,7 @@ LoadPortWithIndex(result, pty, pointer, indexes, cast) ::= <<
 %$result$_L = load $pty$** $Var(pointer)$
 %$result$_$pointer$$indexesName(indexes)$_ptr = $GetElementPtrOp(pty=pty, ptrval={%$result$_L}, idx=indexes)$
 $if(cast)$
-$CastLoad(result=result, ty=pty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr}, cast = cast)$
+$CastLoad(result=result, ty=pty, ptr={%$result$_$pointer$$indexesName(indexes)$_ptr}, cast = cast)$
 $else$
 %$result$ = load $pty$* %$result$_$pointer$$indexesName(indexes)$_ptr
 $endif$
@@ -342,9 +342,9 @@ $endif$
 LoadWithIndex(result, ty, pointer, indexes, cast) ::= <<
 $result$_$pointer$L$indexesName(indexes)$_ptr = $GetElementPtrOp(idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
-$CastLoad(result=result, ty=ty.elementType, pointer={$result$_$pointer$L$indexesName(indexes)$_ptr}, cast=cast)$
+$CastLoad(result=result, ty=ty.elementType, ptr={$result$_$pointer$L$indexesName(indexes)$_ptr}, cast=cast)$
 $else$
-$result$ = $LoadOp(ty=ty.elementType, pointer={$result$_$pointer$L$indexesName(indexes)$_ptr})$
+$result$ = load $ty.elementType$* $result$_$pointer$L$indexesName(indexes)$_ptr
 $endif$
 
 
@@ -352,7 +352,7 @@ $endif$
 
 LoadWithoutIndex(result, ty, pointer, cast) ::= <<
 $if(cast)$
-$CastLoad(result=result, ty=ty, pointer=Var(pointer), cast=cast)$
+$CastLoad(result=result, ty=ty, ptr=Var(pointer), cast=cast)$
 $else$
 $result$ = $LoadOp(ty=ty, pointer=Var(pointer))$
 $endif$
