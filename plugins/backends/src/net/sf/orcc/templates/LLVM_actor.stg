@@ -121,9 +121,9 @@ StoreOp(ty, value, pty, pointer) ::= <<
 store $ty$ $value$, $pty$* $pointer$
 >>
 
-LoadOp(result, ty, pointer,alignment) ::= <<
-$result$ = load $ty$* $pointer$ $if(alignment)$ [, align <alignment>] $endif$
->>  
+LoadOp(ty, pointer, alignment) ::= <<
+load $ty$* $pointer$ $if(alignment)$ [, align <alignment>] $endif$
+>>
 
 AddOp(result, ty, op1, op2) ::= <<
 $result$ = add $ty$ $op1$, $op2$
@@ -225,7 +225,7 @@ $transitions:{$\t$i32 $it.sourceState.index$, label %s_$it.sourceState$$\n$}$
 >>
 
 switch(fsm, transitions) ::= <<
-	$LoadOp(result={%$fsm$}, ty="i32", pointer={@$fsm$})$
+	%$fsm$ = $LoadOp(ty="i32", pointer={@$fsm$})$
 	$SwitchOp(intty="i32", value={%$fsm$}, defaultdest="%default", labelpairs=states(transitions))$
 $transitions: {
 s_$it.sourceState$:
@@ -314,7 +314,7 @@ $endif$
 >>
 
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-$LoadOp(result={%$pointer$_$location$_Loadport$indexesName(indexes)$}, ty={$pty$*}, pointer=Var(pointer))$
+%$pointer$_$location$_Loadport$indexesName(indexes)$ = $LoadOp(ty={$pty$*}, pointer=Var(pointer))$
 $GetElementPtrOp(result={%$pointer$_$location$_L$indexesName(indexes)$ptr}, pty=pty, ptrval={%$pointer$_$location$_Loadport$indexesName(indexes)$}, idx=indexes)$
 $if(cast)$
 $CastStore(ty=ty, value=value, pty=pty, pointer={%$pointer$_$location$_L$indexesName(indexes)$ptr}, cast=cast, location=location)$
@@ -331,7 +331,7 @@ StorePortWithoutIndex
 
 CastLoad(result, ty, pointer, cast)::= <<
 $if(cast.extended)$
-$LoadOp(result={%$result$_ext}, ty=ty, pointer=pointer)$
+%$result$_ext = $LoadOp(ty=ty, pointer=pointer)$
 $if(cast.signed)$
 $SextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
 
@@ -340,18 +340,18 @@ $ZextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
 
 $endif$
 $else$
-$LoadOp(result={%$result$_trunc}, ty=ty, pointer=pointer)$
+%$result$_trunc = $LoadOp(ty=ty, pointer=pointer)$
 $TruncOp(result={%$result$}, ty=ty, value={%$result$_trunc}, ty2=result.type)$
 $endif$
 >>
 
 LoadPortWithIndex(result, ty, pointer, indexes, cast) ::= <<
-$LoadOp(result={%$result$_L}, ty={$ty$*}, pointer=Var(pointer))$
+%$result$_L = $LoadOp(ty={$ty$*}, pointer=Var(pointer))$
 $GetElementPtrOp(result={%$result$_$pointer$$indexesName(indexes)$_ptr}, pty=ty, ptrval={%$result$_L}, idx=indexes)$
 $if(cast)$
 $CastLoad(result=result, ty=ty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr}, cast = cast)$
 $else$
-$LoadOp(result={%$result$}, ty=ty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr})$
+%$result$ = $LoadOp(ty=ty, pointer={%$result$_$pointer$$indexesName(indexes)$_ptr})$
 $endif$
 
 
@@ -369,7 +369,7 @@ $GetElementPtrOp(result={$result$_$pointer$L$indexesName(indexes)$_ptr}, idx0="0
 $if(cast)$
 $CastLoad(result=result, ty=ty.elementType, pointer={$result$_$pointer$L$indexesName(indexes)$_ptr}, cast=cast)$
 $else$
-$LoadOp(result=result, ty=ty.elementType, pointer={$result$_$pointer$L$indexesName(indexes)$_ptr})$
+$result$ = $LoadOp(ty=ty.elementType, pointer={$result$_$pointer$L$indexesName(indexes)$_ptr})$
 $endif$
 
 
@@ -379,7 +379,7 @@ LoadWithoutIndex(result, ty, pointer, cast) ::= <<
 $if(cast)$
 $CastLoad(result=result, ty=ty, pointer=Var(pointer), cast=cast)$
 $else$
-$LoadOp(result=result, ty=ty, pointer=Var(pointer))$
+$result$ = $LoadOp(ty=ty, pointer=Var(pointer))$
 $endif$
 
 
@@ -411,11 +411,11 @@ b$label(ifNode.joinNode)$:
 
 
 LoadLocalPort(instr) ::= <<
-$LoadOp(result={%local_$instr.port$$instr.block.label$}, ty="%struct.fifo_s*", pointer={@$actorName$_$instr.port$})$
+%local_$instr.port$$instr.block.label$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actorName$_$instr.port$})$
 >>
 
 HasRoom(result, action, actor, port, numToken) ::= <<
-$LoadOp(result={%$port$_$action$}, ty="%struct.fifo_s*", pointer={@$actor$_$port$})$
+%$port$_$action$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor$_$port$})$
 $CallOp(result={%$result$32}, ty="i32", fnptrval="@hasRoom", function_args={%struct.fifo_s* %$port$_$action$, i32 $numToken$})$
 $TruncOp(result={%$result$}, ty="i32", value={%$result$32}, ty2="i1")$
 >>
@@ -475,7 +475,7 @@ $StoreOp(ty={$ExprType(read.port)$*}, value={%$read.target$_$read.block.label$_c
 >>
 
 ReadEnd(readEnd) ::= <<
-$LoadOp(result={%end_$readEnd.port$}, ty="%struct.fifo_s*", pointer={@$actorName$_$readEnd.port$})$
+%end_$readEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actorName$_$readEnd.port$})$
 $CallOp(ty ="void", fnptrval="@setReadEnd", function_args={%struct.fifo_s* %end_$readEnd.port$})$
 
 >>
@@ -497,7 +497,7 @@ $StoreOp(ty={$ExprType(write.port)$*}, value={%$write.target$_$write.block.label
 >>
 
 WriteEnd(writeEnd) ::= <<
-$LoadOp(result={%end_$writeEnd.port$}, ty="%struct.fifo_s*", pointer={@$actorName$_$writeEnd.port$})$
+%end_$writeEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actorName$_$writeEnd.port$})$
 $CallOp(ty ="void", fnptrval="@setWriteEnd", function_args={%struct.fifo_s* %end_$writeEnd.port$})$
 
 >>
@@ -639,11 +639,11 @@ $if(rest(pattern.keys))$
 	$StoreOp(ty="i1", value="1", pty="i1", pointer={%p$action$_roomTest})$
 $pattern.keys:{port|
 	$HasRoom(result={$action$$i$_room}, action=action,  actor=actorName, port=port, numToken=pattern.(port))$
-	$LoadOp(result={%$action$$i$_roomTest}, ty="i1", pointer={%p$action$_roomTest})$
+	%$action$$i$_roomTest = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
 	$AndOp(result={%$action$$i$}, ty="i1", op1={%$action$$i$_room}, op2={%$action$$i$_roomTest})$
 	$StoreOp(ty="i1", value={%$action$$i$}, pty="i1", pointer={%p$action$_roomTest})$
 }$
-	$LoadOp(result={%$action$_room}, ty="i1", pointer={%p$action$_roomTest})$
+	%$action$_room = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
 $else$
 $pattern.keys:{port|
 	$HasRoom(result={$action$_room}, action=action,  actor=actorName, port=port, numToken=pattern.(port))$}$
@@ -671,13 +671,13 @@ $schedulingTest(actions)$
 	$BrOp(dest="%return")$
 
 inc_i:
-  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  %i_load = $LoadOp(ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
   $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
   $BrOp(dest="%bb")$
 
 return:
-	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	%i_ret = $LoadOp(ty="i32", pointer="%i")$
 	$RetOp(type="i32", value="%i_ret")$
 }
 $endif$
@@ -701,13 +701,13 @@ $switch(fsm="_FSM_state", transitions=fsm.transitions)$
 
 
 inc_i:
-  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  %i_load = $LoadOp(ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
   $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
   $BrOp(dest="%bb")$
 
 return:
-	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	%i_ret = $LoadOp(ty="i32", pointer="%i")$
 	$RetOp(type="i32", value="%i_ret")$
 }
 
@@ -781,13 +781,13 @@ $endif$
 	$BrOp(dest="%return")$
 
 inc_i:
-  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  %i_load = $LoadOp(ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
   $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
   $BrOp(dest="%bb")$
 
 return:
-	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	%i_ret = $LoadOp(ty="i32", pointer="%i")$
 	$RetOp(type="i32", value="%i_ret")$
 }
 
@@ -896,13 +896,13 @@ $endif$
 	$BrOp(dest="%return")$
 
 inc_i:
-  $LoadOp(result="%i_load", ty="i32", pointer="%i")$
+  %i_load = $LoadOp(ty="i32", pointer="%i")$
   $AddOp(result="%i_add", ty="i32", op1="%i_load", op2="1")$
   $StoreOp(ty="i32", value="%i_add", pty="i32", pointer="%i")$
   $BrOp(dest="%return")$
 
 return:
-	$LoadOp(result="%i_ret", ty="i32", pointer="%i")$
+	%i_ret = $LoadOp(ty="i32", pointer="%i")$
 	$RetOp(type="i32", value="%i_ret")$
 }
 
