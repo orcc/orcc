@@ -93,19 +93,20 @@ public class InterpreterMain extends Thread {
 	 * Associated system objects
 	 */
 	private OrccProcess process;
+	
 	/**
 	 * The utility class that makes us able to support bound properties. This is
 	 * used for easy "debug events" exchange.
 	 */
 	private PropertyChangeSupport propertyChange;
 	private InterpreterState state = InterpreterState.IDLE;
-
 	private String stimulusFilename;
 
 	/**
 	 * Executable actor network
 	 */
 	private List<DebugThread> threadQueue;
+	private int nbOfCycles;
 
 	/**
 	 * Add the listener <code>listener</code> to the registered listeners.
@@ -122,12 +123,12 @@ public class InterpreterMain extends Thread {
 	 */
 	public void clear_breakpoint(String descriptor, int lineNumber) {
 		for (DebugThread thread : threadQueue) {
-			if (descriptor.startsWith(thread.getName())) {
+			if (descriptor.startsWith(thread.getActor().actor.getName())) {
 				thread.clear_breakpoint(lineNumber);
 			}
 		}
 	}
-
+	
 	/**
 	 * Ask each network actor for closing
 	 * 
@@ -252,10 +253,10 @@ public class InterpreterMain extends Thread {
 				Instance instance = vertex.getInstance();
 				if (instance.isActor()) {
 					Actor actor = instance.getActor();
-					if ("source".equals(actor.getName())) {
+					if ("Source".equals(actor.getName())) {
 						actorQueue.add(new SourceActor(instance.getId(), actor,
 								stimulusFilename));
-					} else if ("display".equals(actor.getName())) {
+					} else if ("Display".equals(actor.getName())) {
 						actorQueue.add(new DisplayActor(instance.getId(),
 								actor, process));
 					} else {
@@ -268,7 +269,7 @@ public class InterpreterMain extends Thread {
 						for (ActorTransformation transformation : transformations) {
 							transformation.transform(actor);
 						}
-						actorQueue.add(new InterpretedActor(instance.getId(),
+						actorQueue.add(new InterpretedActor(instance.getId(), instance.getParameters(),
 								actor));
 					}
 				} else if (instance.isBroadcast()) {
@@ -336,7 +337,7 @@ public class InterpreterMain extends Thread {
 	 * @return XDF network name
 	 */
 	public String getNetworkName() {
-		return new File(networkFilename).getName();
+		return new File(networkFilename).getName() + " at " + nbOfCycles + " cycles";
 	}
 
 	/**
@@ -354,6 +355,7 @@ public class InterpreterMain extends Thread {
 	 * 
 	 */
 	private void initialize() {
+		nbOfCycles=0;
 		// init actors of the network
 		for (AbstractInterpretedActor actor : actorQueue) {
 			actor.initialize();
@@ -447,6 +449,7 @@ public class InterpreterMain extends Thread {
 			// process.write("Schedule actor " + actor.getName() + "\n");
 			nbRunningActors += actor.schedule();
 		}
+		nbOfCycles++;
 		return nbRunningActors;
 	}
 
@@ -468,6 +471,7 @@ public class InterpreterMain extends Thread {
 			}
 			nbRunningActors += status;
 		}
+		nbOfCycles++;
 		return nbRunningActors;
 	}
 
@@ -476,9 +480,10 @@ public class InterpreterMain extends Thread {
 	 */
 	public void set_breakpoint(String descriptor, int lineNumber) {
 		for (DebugThread thread : threadQueue) {
-			if (descriptor.startsWith(thread.getName())) {
+			if (descriptor.startsWith(thread.getActor().actor.getName())) {
 				thread.set_breakpoint(lineNumber);
 			}
+			firePropertyChange("suspended step", null, null);
 		}
 	}
 
@@ -490,40 +495,6 @@ public class InterpreterMain extends Thread {
 		while (!monitor.isCanceled() && (scheduleActors() > 0))
 			;
 		close();
-	}
-
-	public void step(DebugThread steppingThread) {
-		if (state == InterpreterState.SUSPENDED) {
-			int nbRunningActors = 0;
-			int status;
-			while ((status = steppingThread.schedule()) == 0) {
-				for (DebugThread thread : threadQueue) {
-					if (thread != steppingThread) {
-						do {
-							status = thread.schedule();
-						} while (status == -1);
-						nbRunningActors += status;
-					}
-				}
-				if (nbRunningActors == 0) {
-					terminate();
-				}
-			}
-			if (status == 1) {
-				for (DebugThread thread : threadQueue) {
-					if (thread != steppingThread) {
-						status = thread.schedule();
-						do {
-							status = thread.schedule();
-						} while (status == -1);
-						nbRunningActors += status;
-					}
-				}
-				if (nbRunningActors == 0) {
-					terminate();
-				}
-			}
-		}
 	}
 
 	/**
@@ -540,12 +511,52 @@ public class InterpreterMain extends Thread {
 				} while (status == -1);
 				nbRunningActors += status;
 			}
+			nbOfCycles++;
+			if (nbRunningActors == 0) {
+				terminate();
+			}
 			firePropertyChange("suspended step", null, null);
+		}
+	}
+	
+	public void step(DebugThread steppingThread) {
+		if (state == InterpreterState.SUSPENDED) {
+			int nbRunningActors = 0;
+			int status;
+			while ((status = steppingThread.schedule()) == 0) {
+				for (DebugThread thread : threadQueue) {
+					if (thread != steppingThread) {
+						do {
+							status = thread.schedule();
+						} while (status == -1);
+						nbRunningActors += status;
+					}
+				}
+				nbOfCycles++;
+				if (nbRunningActors == 0) {
+					terminate();
+				}
+			}
+			if (status == 1) {
+				for (DebugThread thread : threadQueue) {
+					if (thread != steppingThread) {
+						status = thread.schedule();
+						do {
+							status = thread.schedule();
+						} while (status == -1);
+						nbRunningActors += status;
+					}
+				}
+				nbOfCycles++;
+				if (nbRunningActors == 0) {
+					terminate();
+				}
+			}
 		}
 	}
 
 	/**
-	 * Suspend all network actors
+	 * Schedule next schedulable action for each actor of the network
 	 */
 	public synchronized void suspendAll() {
 		if (state == InterpreterState.RUNNING) {

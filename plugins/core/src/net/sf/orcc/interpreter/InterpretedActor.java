@@ -31,6 +31,7 @@ package net.sf.orcc.interpreter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
@@ -94,12 +95,12 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	private List<Instruction> instrStack;
 
 	protected NodeInterpreter interpret;
-
-	protected boolean isSynchronousScheduler = false;
+	protected boolean isSynchronousScheduler = true;
 	private ListAllocator listAllocator;
 
 	private List<NodeInfo> nodeStack;
 	private int nodeStackLevel;
+	private Map<String,Expression> parameters; 
 	protected ActionScheduler sched;
 
 	/**
@@ -111,7 +112,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * @param actor
 	 *            an actor
 	 */
-	public InterpretedActor(String id, Actor actor) {
+	public InterpretedActor(String id, Map<String,Expression> parameters, Actor actor) {
 		super(id, actor);
 		sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
@@ -133,6 +134,9 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// Creates an expression evaluator for state and local variables init
 		this.constEval = new ConstantEvaluator();
+		
+		// Get the parameters value from instance map
+		this.parameters = parameters;
 	}
 
 	/**
@@ -234,6 +238,10 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 */
 	@Override
 	public void initialize() {
+		// Initialize actors parameters with instance map
+		for (Variable param : actor.getParameters()) {
+			param.setValue(parameters.get(param.getName()).accept(exprInterpreter));
+		}
 		// Check for List state variables which need to be allocated or
 		// initialized
 		for (Variable stateVar : actor.getStateVars()) {

@@ -63,9 +63,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	// containing launch object
 	private ILaunch fLaunch;
 
-	// name of the model to be debugged
-	private String fName;
-
 	// associated system process
 	private IProcess fProcess;
 
@@ -101,7 +98,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		fTarget = this;
 		fProcess = process;
 		fInterpreter = interpreter;
-		fName = fInterpreter.getNetworkName();
 		threadMap = new HashMap<String, OrccThread>();
 		List<DebugThread> threads = fInterpreter.getThreads();
 		fThreads = new IThread[threads.size()];
@@ -292,10 +288,11 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @see org.eclipse.debug.core.model.IDebugTarget#getName()
 	 */
 	public String getName() throws DebugException {
-		if (fName == null) {
-			fName = "RVC-CAL model";
+		String name = fInterpreter.getNetworkName();
+		if (name == null) {
+			name = "RVC-CAL model";
 		}
-		return fName;
+		return name;
 	}
 
 	/*

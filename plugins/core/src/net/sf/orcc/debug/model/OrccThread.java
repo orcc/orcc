@@ -50,6 +50,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * Debugging objects
 	 */
 	private OrccDebugTarget target;
+	private String actorName;
 
 	/**
 	 * Constructs a new thread for the given target
@@ -61,6 +62,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 		super(target);
 		this.target = target;
 		this.fThread = thread;
+		this.actorName = thread.getActorName();
 	}
 
 	/*
@@ -136,6 +138,10 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 */
 	public String getName() throws DebugException {
 		return fThread.getName();
+	}
+	
+	public String getActorName() throws DebugException {
+		return actorName;
 	}
 
 	/*

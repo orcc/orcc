@@ -507,8 +507,10 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 		}
 
 		// initializes the actor
+		// TODO : must get parameters map from instance for actors parameters
+		// initialization
 		InterpretedActor interpreted = new InterpretedActor(actor.getName(),
-				actor);
+				null, actor);
 		try {
 			interpreted.initialize();
 		} catch (Exception e) {

@@ -74,7 +74,9 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		fFileName = file.getProjectRelativePath().toString();
 		fLineNumber = frame.codeLine;
 		try {
-			fName = thread.getName() + "." + frame.currentAction;
+			fName = "ACTOR : " + thread.getActorName() + " (fired "
+					+ frame.nbOfFirings + " times) - " + "ACTION : "
+					+ frame.currentAction; // + " (line " + frame.codeLine + ")";
 		} catch (DebugException e) {
 			e.printStackTrace();
 		}

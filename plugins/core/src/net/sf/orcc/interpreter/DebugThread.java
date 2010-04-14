@@ -14,12 +14,14 @@ public class DebugThread {
 		public Integer codeLine;
 		public String currentAction;
 		public String fsmState;
+		public Integer nbOfFirings;
 		public Map<String, Object> stateVars;
 
 		public InterpreterStackFrame() {
 			actorFilename = "";
 			codeLine = 0;
 			stateVars = new HashMap<String, Object>();
+			nbOfFirings=0;
 			currentAction = "";
 		}
 	}
@@ -28,12 +30,14 @@ public class DebugThread {
 	private List<Integer> breakpoints;
 	private InterpreterMain interpreter;
 	private boolean threadStepping = false;
+	private int nbOfFirings;
 
 	public DebugThread(InterpreterMain interpreter,
 			AbstractInterpretedActor actor) {
 		this.actor = actor;
 		this.interpreter = interpreter;
 		this.breakpoints = new ArrayList<Integer>();
+		this.nbOfFirings = 0;
 	}
 
 	public void clear_breakpoint(int bkpt) {
@@ -49,14 +53,19 @@ public class DebugThread {
 	}
 
 	public String getName() {
-		return actor.name;
+		return actor.getName();
 	}
 
+	public String getActorName() {
+		return actor.actor.getName();
+	}
+	
 	public synchronized InterpreterStackFrame getStackFrame() {
 		InterpreterStackFrame stackFrame = new InterpreterStackFrame();
 		if (actor.actor != null) {
 			stackFrame.actorFilename = actor.actor.getFile();
 			stackFrame.codeLine = actor.getLastVisitedLocation().getStartLine();
+			stackFrame.nbOfFirings = nbOfFirings;
 			stackFrame.stateVars.clear();
 			for (Variable stateVar : actor.actor.getStateVars()) {
 				stackFrame.stateVars.put(stateVar.getName(), stateVar
@@ -84,6 +93,9 @@ public class DebugThread {
 
 	public int schedule() {
 		int actorStatus = actor.step(false);
+		if (actorStatus > 0) {
+			nbOfFirings++;
+		}
 		for (Integer breakpoint : breakpoints) {
 			if ((breakpoint == actor.lastVisitedLocation.getStartLine())) {
 				threadStepping = true;
