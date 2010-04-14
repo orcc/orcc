@@ -184,18 +184,6 @@ $result$ = phi $ty$ $pairs$
 
 >>
 
-ZextOp(result, ty, value, ty2) ::= << 
-$result$ = zext $ty$ $value$ to $ty2$
->>
-
-SextOp(result, ty, value, ty2) ::= << 
-$result$ = sext $ty$ $value$ to $ty2$
->>
-
-TruncOp(result, ty, value, ty2) ::= << 
-$result$ = trunc $ty$ $value$ to $ty2$
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
@@ -235,15 +223,15 @@ CastAssign(target, value, cast)::= <<
 $if(cast.extended)$
 %$target$_ext = $value$
 $if(cast.signed)$
-$SextOp(result={%$target$}, ty=value.type, value={%$target$_ext}, ty2=target.type)$
+%$target$ = sext $value.type$ %$target$_ext to $target.type$
 
 $else$
-$ZextOp(result={%$target$}, ty=value.type, value={%$target$_ext}, ty2=target.type)$
+%$target$ = zext $value.type$ %$target$_ext to $target.type$
 
 $endif$
 $else$
 %$target$_trunc = $value$
-$TruncOp(result={%$target$}, ty=value.type, value={%$target$_trunc}, ty2=target.type)$
+%$target$ = trunc $value.type$ %$target$_trunc to $target.type$
 $endif$
 
 >>
@@ -258,15 +246,15 @@ CastCall(result, ty, fnptrval, function_args, cast)::= <<
 $if(cast.extended)$
 %$result$_ext = $CallOp(ty=ty, fnptrval=fnptrval, function_args=function_args)$
 $if(cast.signed)$
-$SextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
+%$result$ = sext $ty$ %$result$_ext to $result.type$
 
 $else$
-$ZextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
+%$result$ = zext $ty$ %$result$_ext to $result.type$
 
 $endif$
 $else$
 %$result$_trunc = $CallOp(ty=ty, fnptrval=fnptrval, function_args=function_args)$
-$TruncOp(result={%$result$}, ty=ty, value={%$result$_trunc}, ty2=result.type)$
+%$result$ = trunc $ty$ %$result$_trunc to $result.type$
 $endif$
 
 >>
@@ -275,15 +263,15 @@ $endif$
 CastStore(ty, value, pty, pointer, cast, location)::= <<
 $if(cast.extended)$
 $if(cast.signed)$
-$SextOp(result={%$value$_$location$_ext}, ty=ty, value=Expr(value), ty2=pty)$
+%$value$_$location$_ext = sext $ty$ $Expr(value)$ to $pty$
 
 $else$
-$ZextOp(result={%$value$_$location$_ext}, ty=ty, value=Expr(value), ty2=pty)$
+%$value$_$location$_ext = zext $ty$ $Expr(value)$ to $pty$
 
 $endif$
 $StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast={_$location$_ext})$
 $else$
-$TruncOp(result={%$value$_$location$_trunc}, ty=ty, value=Expr(value), ty2=pty)$
+%$value$_$location$_trunc = trunc $ty$ $Expr(value)$ to $pty$
 
 $StoreInstr(ty=pty, value=value, pty=pty, pointer=pointer, cast={_$location$_trunc})$
 $endif$
@@ -327,15 +315,15 @@ CastLoad(result, ty, pointer, cast)::= <<
 $if(cast.extended)$
 %$result$_ext = $LoadOp(ty=ty, pointer=pointer)$
 $if(cast.signed)$
-$SextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
+%$result$ = sext $ty$ %$result$_ext to $result.type$
 
 $else$
-$ZextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
+%$result$ = zext $ty$ %$result$_ext to $result.type$
 
 $endif$
 $else$
 %$result$_trunc = $LoadOp(ty=ty, pointer=pointer)$
-$TruncOp(result={%$result$}, ty=ty, value={%$result$_trunc}, ty2=result.type)$
+%$result$ = trunc $ty$ %$result$_trunc to $result.type$
 $endif$
 >>
 
@@ -404,7 +392,7 @@ LoadLocalPort(instr) ::= <<
 HasRoom(result, action, actor, port, numToken) ::= <<
 %$port$_$action$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor$_$port$})$
 %$result$32 = $CallOp(ty="i32", fnptrval="@hasRoom", function_args={%struct.fifo_s* %$port$_$action$, i32 $numToken$})$
-$TruncOp(result={%$result$}, ty="i32", value={%$result$32}, ty2="i1")$
+%$result$ = trunc i32 %$result$32 to i1
 >>
 
 label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
@@ -502,7 +490,7 @@ $endif$
 HasTokens(hasTokens) ::= <<
 $LoadLocalPort(hasTokens)$
 %$hasTokens.target$32 = $CallOp(ty="i32", fnptrval="@hasTokens", function_args={%struct.fifo_s* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$})$
-$TruncOp(result={%$hasTokens.target$}, ty="i32", value={%$hasTokens.target$32}, ty2="i1")$
+%$hasTokens.target$ = trunc i32 %$hasTokens.target$32 to i1
 
 >>
 
