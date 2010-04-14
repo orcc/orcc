@@ -35,17 +35,19 @@ import net.sf.orcc.network.Network;
 /**
  * This class defines the SDF class. A SDF network has fixed
  * production/consumption rates.
- *
+ * 
  * @author Matthieu Wipliez
- *
+ * 
  */
-public class CSDFNetworkClass extends AbstractNetworkClass implements StaticClass {
+public class CSDFNetworkClass extends AbstractNetworkClass implements
+		StaticClass {
 
 	private Pattern inputPattern;
 
+	protected int numberOfPhases;
+
 	private Pattern outputPattern;
 
-	protected int numberOfPhases;
 	/**
 	 * Creates a new static class.
 	 */
@@ -61,6 +63,10 @@ public class CSDFNetworkClass extends AbstractNetworkClass implements StaticClas
 	 */
 	public Pattern getInputPattern() {
 		return inputPattern;
+	}
+
+	public int getNumberOfPhases() {
+		return numberOfPhases;
 	}
 
 	/**
@@ -107,6 +113,10 @@ public class CSDFNetworkClass extends AbstractNetworkClass implements StaticClas
 		return true;
 	}
 
+	public void setNumberOfPhases(int numberOfPhases) {
+		this.numberOfPhases = numberOfPhases;
+	}
+
 	/**
 	 * Saves the number of tokens consumed by input ports of the given actor.
 	 * 
@@ -129,14 +139,6 @@ public class CSDFNetworkClass extends AbstractNetworkClass implements StaticClas
 		for (Port port : network.getOutputs()) {
 			outputPattern.put(port, port.getNumTokensProduced());
 		}
-	}
-
-	public void setNumberOfPhases(int numberOfPhases) {
-		this.numberOfPhases = numberOfPhases;
-	}
-
-	public int getNumberOfPhases() {
-		return numberOfPhases;
 	}
 
 }

@@ -29,8 +29,9 @@ import org.eclipse.debug.core.model.IDebugTarget;
 public abstract class OrccDebugElement extends PlatformObject implements
 		IDebugElement {
 
-	public static final String ID_ORCC_DEBUG_MODEL = OrccActivator.PLUGIN_ID + ".model";
-	
+	public static final String ID_ORCC_DEBUG_MODEL = OrccActivator.PLUGIN_ID
+			+ ".model";
+
 	// containing target
 	protected OrccDebugTarget fTarget;
 

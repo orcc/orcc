@@ -88,7 +88,7 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 
 		return null;
 	}
-	
+
 	/**
 	 * Returns a list of parameter cast when needed.
 	 * 
@@ -96,33 +96,34 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 	 */
 	public List<Cast> getParamCast() {
 		List<Cast> casts = new ArrayList<Cast>();
-		List<Variable> varParams = this.getProcedure().getParameters().getList();
+		List<Variable> varParams = this.getProcedure().getParameters()
+				.getList();
 
-		for (int i=0; i<parameters.size(); i++){
+		for (int i = 0; i < parameters.size(); i++) {
 			Expression parameter = parameters.get(i);
-			
-			if(!parameter.isBooleanExpr()&& !parameter.isIntExpr()){
+
+			if (!parameter.isBooleanExpr() && !parameter.isIntExpr()) {
 				Type var = varParams.get(i).getType();
 				Type expr = parameter.getType();
-			
+
 				Cast cast = new Cast(expr, var);
 
-				if (cast.isExtended() || cast.isTrunced() ) {
+				if (cast.isExtended() || cast.isTrunced()) {
 					casts.add(cast);
-				}else if (var.isList()){
+				} else if (var.isList()) {
 					// Test size of the two list
-					if (!var.equals(expr)){
+					if (!var.equals(expr)) {
 						casts.add(cast);
-					}else{
+					} else {
 						casts.add(null);
 					}
-				}else{
+				} else {
 					casts.add(null);
 				}
 			}
-			
+
 		}
-		
+
 		return casts;
 	}
 

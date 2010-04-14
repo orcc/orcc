@@ -122,8 +122,7 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 				String[] varNames = new String[m.size()];
 				m.keySet().toArray(varNames);
 				for (int i = 0; i < m.size(); i++) {
-					elements[i] = new Variable(varNames[i], m
-							.get(varNames[i]));
+					elements[i] = new Variable(varNames[i], m.get(varNames[i]));
 				}
 			}
 			return elements;

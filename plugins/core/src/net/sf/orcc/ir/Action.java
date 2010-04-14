@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-
 /**
  * This class defines an action. An action has a location, a tag, an input and
  * an output pattern. Contrarily to the original CAL model, the scheduling

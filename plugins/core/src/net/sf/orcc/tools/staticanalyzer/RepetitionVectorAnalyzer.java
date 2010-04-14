@@ -55,59 +55,13 @@ import org.jgrapht.DirectedGraph;
 
 public class RepetitionVectorAnalyzer {
 
-	private Map<String, Integer> repetitionVector = new HashMap<String, Integer>();
+	private DirectedGraph<Vertex, Connection> graph;
 	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
 
-	private DirectedGraph<Vertex, Connection> graph;
+	private Map<String, Integer> repetitionVector = new HashMap<String, Integer>();
 
 	public RepetitionVectorAnalyzer(Network network) {
 		graph = network.getGraph();
-	}
-
-	/**
-	 * Computes the repetition vector
-	 * 
-	 * @throws OrccException
-	 *             if an actor is not static
-	 */
-	public Map<String, Integer> computeRepetitionsVector() throws OrccException {
-
-		Vertex vertex = null;
-		for(Vertex v : graph.vertexSet()) {
-			if(v.isInstance()) {
-				vertex = v;
-				break;
-			}
-		}
-//		Vertex vertex = (Vertex) graph.vertexSet().toArray()[0];
-
-		calculateRate(vertex, new Rational(1, 1));
-
-		Iterator<Rational> it = rationals.values().iterator();
-		int lcm = it.next().getDenominator();
-		while (it.hasNext()) {
-			lcm = Rational.lcm(lcm, it.next().getDenominator());
-		}
-
-		for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
-
-			int rep = entry.getValue().getNumerator() * lcm
-					/ entry.getValue().getDenominator();
-
-			repetitionVector.put(entry.getKey().getInstance().getId(), rep);
-		}
-
-		checkConsistency();
-
-		// multiply the actor repetition count with its number of phases
-		/*
-		 * for (Map.Entry<String, Integer> entry : repetitionVector.entrySet())
-		 * { Integer val = entry.getValue(); int nbPhases =
-		 * getStaticClass(entry.getKey()).getNumberOfPhases();
-		 * entry.setValue(val * nbPhases); }
-		 */
-
-		return repetitionVector;
 	}
 
 	/**
@@ -197,6 +151,52 @@ public class RepetitionVectorAnalyzer {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Computes the repetition vector
+	 * 
+	 * @throws OrccException
+	 *             if an actor is not static
+	 */
+	public Map<String, Integer> computeRepetitionsVector() throws OrccException {
+
+		Vertex vertex = null;
+		for (Vertex v : graph.vertexSet()) {
+			if (v.isInstance()) {
+				vertex = v;
+				break;
+			}
+		}
+		// Vertex vertex = (Vertex) graph.vertexSet().toArray()[0];
+
+		calculateRate(vertex, new Rational(1, 1));
+
+		Iterator<Rational> it = rationals.values().iterator();
+		int lcm = it.next().getDenominator();
+		while (it.hasNext()) {
+			lcm = Rational.lcm(lcm, it.next().getDenominator());
+		}
+
+		for (Map.Entry<Vertex, Rational> entry : rationals.entrySet()) {
+
+			int rep = entry.getValue().getNumerator() * lcm
+					/ entry.getValue().getDenominator();
+
+			repetitionVector.put(entry.getKey().getInstance().getId(), rep);
+		}
+
+		checkConsistency();
+
+		// multiply the actor repetition count with its number of phases
+		/*
+		 * for (Map.Entry<String, Integer> entry : repetitionVector.entrySet())
+		 * { Integer val = entry.getValue(); int nbPhases =
+		 * getStaticClass(entry.getKey()).getNumberOfPhases();
+		 * entry.setValue(val * nbPhases); }
+		 */
+
+		return repetitionVector;
 	}
 
 	private StaticClass getStaticClass(Vertex vertex) {

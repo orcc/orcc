@@ -90,7 +90,7 @@ public class IfNode extends AbstractNode implements ValueContainer {
 	public List<CFGNode> getThenNodes() {
 		return thenNodes;
 	}
-	
+
 	@Override
 	public Expression getValue() {
 		return value;

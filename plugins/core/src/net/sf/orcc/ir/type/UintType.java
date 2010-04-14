@@ -75,12 +75,12 @@ public class UintType extends AbstractType {
 	public Expression getSize() {
 		return size;
 	}
-	
+
 	@Override
 	public boolean isUint() {
 		return true;
 	}
-	
+
 	public void setSize(Expression size) {
 		this.size = size;
 	}

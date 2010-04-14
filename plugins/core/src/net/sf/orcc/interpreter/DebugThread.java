@@ -25,15 +25,23 @@ public class DebugThread {
 	}
 
 	private AbstractInterpretedActor actor;
+	private List<Integer> breakpoints;
 	private InterpreterMain interpreter;
 	private boolean threadStepping = false;
-	private List<Integer> breakpoints;
 
 	public DebugThread(InterpreterMain interpreter,
 			AbstractInterpretedActor actor) {
 		this.actor = actor;
 		this.interpreter = interpreter;
 		this.breakpoints = new ArrayList<Integer>();
+	}
+
+	public void clear_breakpoint(int bkpt) {
+		for (Integer breakpoint : breakpoints) {
+			if ((breakpoint == bkpt)) {
+				breakpoints.remove(breakpoint);
+			}
+		}
 	}
 
 	public AbstractInterpretedActor getActor() {
@@ -88,26 +96,18 @@ public class DebugThread {
 		return actorStatus;
 	}
 
+	public void set_breakpoint(int bkpt) {
+		breakpoints.add(bkpt);
+	}
+
 	public synchronized void stepInto() {
 		interpreter.firePropertyChange("resumed step", null, actor.name);
 		interpreter.step(this);
 		interpreter.firePropertyChange("suspended step", null, actor.name);
 	}
-	
+
 	public synchronized void stepOver() {
 		interpreter.stepAll();
-	}
-
-	public void set_breakpoint(int bkpt) {
-		breakpoints.add(bkpt);
-	}
-
-	public void clear_breakpoint(int bkpt) {
-		for (Integer breakpoint : breakpoints) {
-			if ((breakpoint == bkpt)) {
-				breakpoints.remove(breakpoint);
-			}
-		}
 	}
 
 }

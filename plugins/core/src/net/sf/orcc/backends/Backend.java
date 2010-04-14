@@ -42,8 +42,24 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 public interface Backend {
 
 	/**
-	 * Loads a hierarchical XDF network and IR files, and generates code. Some
-	 * back-ends may flatten the network.
+	 * Compiles the VTL by loading IR files, transforming actors and printing
+	 * them.
+	 * 
+	 * @param process
+	 *            the process that launched the back-end, so we can report
+	 *            messages to it
+	 * @param outputFolder
+	 *            absolute path of folder that contains IR files
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	void compileVTL(OrccProcess process, String outputFolder)
+			throws OrccException;
+
+	/**
+	 * Loads a hierarchical XDF network and compile it. Compilation may include
+	 * instantiation, flattening, transforming, printing the network, or a
+	 * subset of these steps.
 	 * 
 	 * @param process
 	 *            the process that launched the back-end, so we can report
@@ -55,21 +71,7 @@ public interface Backend {
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void generateCode(OrccProcess process, String inputFile, String outputFolder)
-			throws OrccException;
-
-	/**
-	 * Loads IR files, transforms actors and prints them.
-	 * 
-	 * @param process
-	 *            the process that launched the back-end, so we can report
-	 *            messages to it
-	 * @param outputFolder
-	 *            absolute path of folder that contains IR files
-	 * @throws OrccException
-	 *             if something goes wrong
-	 */
-	void generateVtl(OrccProcess process, String outputFolder)
+	void compileXDF(OrccProcess process, String inputFile, String outputFolder)
 			throws OrccException;
 
 	/**

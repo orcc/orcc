@@ -63,11 +63,6 @@ public class Network {
 	private static Map<String, Actor> actorPool = new HashMap<String, Actor>();
 
 	/**
-	 * the class of this network. Initialized to unknown.
-	 */
-	private IClass networkClass;
-
-	/**
 	 * Clears the actor pool. Should be called after a network has been
 	 * instantiated.
 	 */
@@ -109,6 +104,11 @@ public class Network {
 	private OrderedMap<Port> inputs;
 
 	private String name;
+
+	/**
+	 * the class of this network. Initialized to unknown.
+	 */
+	private IClass networkClass;
 
 	private Map<Instance, List<Connection>> outgoingMap;
 
@@ -355,6 +355,10 @@ public class Network {
 		return name;
 	}
 
+	public IClass getNetworkClass() {
+		return networkClass;
+	}
+
 	/**
 	 * Returns the list of networks referenced by the graph of this network.
 	 * This is different from the list of instances of this network: There are
@@ -497,17 +501,13 @@ public class Network {
 		new ActorNormalizer().transform(this);
 	}
 
-	@Override
-	public String toString() {
-		return name;
-	}
-
 	public void setNetworkClass(IClass networkClass) {
 		this.networkClass = networkClass;
 	}
 
-	public IClass getNetworkClass() {
-		return networkClass;
+	@Override
+	public String toString() {
+		return name;
 	}
 
 }

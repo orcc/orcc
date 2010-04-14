@@ -72,6 +72,10 @@ public class Broadcast extends Instance {
 		this.type = type;
 	}
 
+	public int getNumOutput() {
+		return numOutput;
+	}
+
 	public List<Integer> getOutputList() {
 		if (outputList == null) {
 			outputList = new ArrayList<Integer>();
@@ -81,10 +85,6 @@ public class Broadcast extends Instance {
 		}
 
 		return outputList;
-	}
-
-	public int getNumOutput() {
-		return numOutput;
 	}
 
 	public Type getType() {

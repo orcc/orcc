@@ -149,7 +149,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 				int i1 = (Integer) val1;
 				int i2 = (Integer) val2;
 				return i1 == i2;
-			}else if (val1 instanceof Boolean && val2 instanceof Boolean) {
+			} else if (val1 instanceof Boolean && val2 instanceof Boolean) {
 				boolean b1 = (Boolean) val1;
 				boolean b2 = (Boolean) val2;
 				return b1 == b2;

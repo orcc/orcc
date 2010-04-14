@@ -72,6 +72,24 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 		visitor.visit(this, args);
 	}
 
+	@Override
+	public Cast getCast() {
+		Type tgt = target.getType();
+		Type src = source.getVariable().getType();
+
+		if (src == null) {
+			return null;
+		}
+
+		Cast cast = new Cast(src, tgt);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
+	}
+
 	public List<Expression> getIndexes() {
 		return indexes;
 	}
@@ -107,24 +125,6 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 		source.setNode(this);
 	}
 
-	@Override
-	public Cast getCast() {
-		Type tgt = target.getType();
-		Type src = source.getVariable().getType();
-
-		if (src == null) {
-			return null;
-		}
-
-		Cast cast = new Cast(src, tgt);
-
-		if (cast.isExtended() || cast.isTrunced()) {
-			return cast;
-		}
-
-		return null;
-	}
-	
 	@Override
 	public void setTarget(LocalVariable target) {
 		CommonNodeOperations.setTarget(this, target);

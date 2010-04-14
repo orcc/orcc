@@ -92,12 +92,12 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 */
 	private Text text;
 
+	private boolean updateLaunchConfiguration;
+
 	/**
 	 * The value of this option.
 	 */
 	private String value;
-
-	private boolean updateLaunchConfiguration;
 
 	/**
 	 * Creates a new input file option.
@@ -137,7 +137,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 			if (extension != null) {
 				dialog.setFilterExtensions(new String[] { extension });
 			}
-			
+
 			// set initial directory
 			String location = resource.getParent().getLocation().toOSString();
 			dialog.setFilterPath(location);

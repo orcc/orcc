@@ -304,12 +304,13 @@ public class BackendFactory {
 		backendObj.setLaunchConfiguration(configuration);
 
 		if (configuration.getAttribute(COMPILE_VTL, false)) {
-			backendObj.generateVtl(process, outputFolder);
+			backendObj.compileVTL(process, outputFolder);
 		}
 
 		if (configuration.getAttribute(COMPILE_XDF, false)) {
 			String xdfFile = configuration.getAttribute(XDF_FILE, "");
-			backendObj.generateCode(process, xdfFile, outputFolder);
+			backendObj.compileXDF(process, xdfFile, outputFolder);
 		}
 	}
+
 }

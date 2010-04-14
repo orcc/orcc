@@ -70,7 +70,8 @@ public abstract class AbstractBackend implements Backend {
 
 			try {
 				AbstractBackend backend = clasz.newInstance();
-				backend.generateCode(null, inputFile, outputFolder);
+				backend.compileVTL(null, outputFolder);
+				backend.compileXDF(null, inputFile, outputFolder);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
@@ -101,74 +102,8 @@ public abstract class AbstractBackend implements Backend {
 	 */
 	private OrccProcess process;
 
-	/**
-	 * This method must be implemented by subclasses to do the actual code
-	 * generation for actors or instances.
-	 * 
-	 * @param network
-	 *            a network
-	 * @throws OrccException
-	 */
-	protected void doActorCodeGeneration(Network network) throws OrccException {
-	}
-
-	/**
-	 * This method may be implemented by subclasses that wish to skip
-	 * instantiation, or do something before/after.
-	 * 
-	 * @param network
-	 *            a network
-	 * @param outputFolder
-	 *            output folder
-	 * @throws OrccException
-	 */
-	protected void doInstantiation(Network network, String outputFolder)
-			throws OrccException {
-		write("Instantiating actors...\n");
-		network.instantiate(outputFolder);
-		Network.clearActorPool();
-		write("Instantiation done\n");
-	}
-
-	/**
-	 * This method must be implemented by subclasses to do the actual code
-	 * generation for VTL.
-	 * 
-	 * @param actors
-	 *            a list of actors
-	 * @throws OrccException
-	 */
-	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
-	}
-
 	@Override
-	final public void generateCode(OrccProcess process, String inputFile,
-			String outputFolder) throws OrccException {
-		this.process = process;
-
-		// set FIFO size
-		this.fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-
-		// set output path. Not sure if getAbsolutePath is necessary, I can't
-		// remember why it's used
-		path = new File(outputFolder).getAbsolutePath();
-
-		// parses top network
-		write("Parsing XDF network...\n");
-		Network network = new XDFParser(inputFile).parseNetwork();
-
-		doInstantiation(network, outputFolder);
-		doActorCodeGeneration(network);
-
-		// print network
-		write("Printing network...\n");
-		printNetwork(network);
-
-		write("That's all folks!\n");
-	}
-
-	@Override
-	final public void generateVtl(OrccProcess process, String outputFolder)
+	final public void compileVTL(OrccProcess process, String outputFolder)
 			throws OrccException {
 		this.process = process;
 
@@ -201,6 +136,72 @@ public abstract class AbstractBackend implements Backend {
 		doVtlCodeGeneration(actors);
 
 		write("That's all folks!\n");
+	}
+
+	@Override
+	final public void compileXDF(OrccProcess process, String inputFile,
+			String outputFolder) throws OrccException {
+		this.process = process;
+
+		// set FIFO size
+		this.fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+
+		// set output path. Not sure if getAbsolutePath is necessary, I can't
+		// remember why it's used
+		path = new File(outputFolder).getAbsolutePath();
+
+		// parses top network
+		write("Parsing XDF network...\n");
+		Network network = new XDFParser(inputFile).parseNetwork();
+
+		doInstantiation(network, outputFolder);
+		doXdfCodeGeneration(network);
+
+		// print network
+		write("Printing network...\n");
+		printNetwork(network);
+
+		write("That's all folks!\n");
+	}
+
+	/**
+	 * This method may be implemented by subclasses that wish to skip
+	 * instantiation, or do something before/after.
+	 * 
+	 * @param network
+	 *            a network
+	 * @param outputFolder
+	 *            output folder
+	 * @throws OrccException
+	 */
+	protected void doInstantiation(Network network, String outputFolder)
+			throws OrccException {
+		write("Instantiating actors...\n");
+		network.instantiate(outputFolder);
+		Network.clearActorPool();
+		write("Instantiation done\n");
+	}
+
+	/**
+	 * This method must be implemented by subclasses to do the actual code
+	 * generation for VTL.
+	 * 
+	 * @param actors
+	 *            a list of actors
+	 * @throws OrccException
+	 */
+	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
+	}
+
+	/**
+	 * This method must be implemented by subclasses to do the actual code
+	 * generation for actors or instances.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 */
+	protected void doXdfCodeGeneration(Network network) throws OrccException {
 	}
 
 	/**

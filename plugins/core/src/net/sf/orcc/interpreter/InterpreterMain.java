@@ -74,26 +74,32 @@ public class InterpreterMain extends Thread {
 		CONFIGURED, IDLE, RUNNING, SUSPENDED, TERMINATED
 	}
 
+	/**
+	 * XDF network transformations : - flatten - set constant actors parameters
+	 * - if required, try to merge static actors clusters
+	 */
+	public static boolean merge = false;
+
 	private List<AbstractInterpretedActor> actorQueue;
-
 	private List<CommunicationFifo> fifoList;
-	private IProgressMonitor monitor;
 
+	private IProgressMonitor monitor;
 	/**
 	 * Options
 	 */
 	private String networkFilename;
+
 	/**
 	 * Associated system objects
 	 */
 	private OrccProcess process;
-
 	/**
 	 * The utility class that makes us able to support bound properties. This is
 	 * used for easy "debug events" exchange.
 	 */
 	private PropertyChangeSupport propertyChange;
 	private InterpreterState state = InterpreterState.IDLE;
+
 	private String stimulusFilename;
 
 	/**
@@ -112,6 +118,17 @@ public class InterpreterMain extends Thread {
 	}
 
 	/**
+	 * Clear a breakpoint from a specific actor
+	 */
+	public void clear_breakpoint(String descriptor, int lineNumber) {
+		for (DebugThread thread : threadQueue) {
+			if (descriptor.startsWith(thread.getName())) {
+				thread.clear_breakpoint(lineNumber);
+			}
+		}
+	}
+
+	/**
 	 * Ask each network actor for closing
 	 * 
 	 */
@@ -124,25 +141,6 @@ public class InterpreterMain extends Thread {
 		for (CommunicationFifo fifo : fifoList) {
 			fifo.close();
 		}
-	}
-
-	/**
-	 * XDF network transformations : - flatten - set constant actors parameters
-	 * - if required, try to merge static actors clusters
-	 */
-	public static boolean merge = false;
-
-	private void networkTransformations(Network network) throws OrccException {
-		// Flatten the hierarchical network
-		network.flatten();
-		// Try to merge some actors
-		if (merge) {
-			network.classifyActors();
-			network.normalizeActors();
-			network.mergeActors();
-		}
-		// Add broadcasts before connecting actors
-		new BroadcastAdder().transform(network);
 	}
 
 	/**
@@ -362,6 +360,19 @@ public class InterpreterMain extends Thread {
 		}
 	}
 
+	private void networkTransformations(Network network) throws OrccException {
+		// Flatten the hierarchical network
+		network.flatten();
+		// Try to merge some actors
+		if (merge) {
+			network.classifyActors();
+			network.normalizeActors();
+			network.mergeActors();
+		}
+		// Add broadcasts before connecting actors
+		new BroadcastAdder().transform(network);
+	}
+
 	/**
 	 * Remove the listener listener from the registered listeners.
 	 * 
@@ -414,7 +425,7 @@ public class InterpreterMain extends Thread {
 				int status = scheduleThreads();
 				if (status < 0) {
 					state = InterpreterState.SUSPENDED;
-				}else if (status == 0) {
+				} else if (status == 0) {
 					terminate();
 				}
 				break;
@@ -451,13 +462,24 @@ public class InterpreterMain extends Thread {
 		for (DebugThread thread : threadQueue) {
 			do {
 				status = thread.schedule();
-			}while (status==-1);
+			} while (status == -1);
 			if (thread.isStepping()) {
 				return -1;
 			}
 			nbRunningActors += status;
 		}
 		return nbRunningActors;
+	}
+
+	/**
+	 * Set a breakpoint in a specific actor
+	 */
+	public void set_breakpoint(String descriptor, int lineNumber) {
+		for (DebugThread thread : threadQueue) {
+			if (descriptor.startsWith(thread.getName())) {
+				thread.set_breakpoint(lineNumber);
+			}
+		}
 	}
 
 	/**
@@ -470,29 +492,11 @@ public class InterpreterMain extends Thread {
 		close();
 	}
 
-	/**
-	 * Schedule next schedulable action for each actor of the network
-	 */
-	public synchronized void stepAll() {
-		if (state == InterpreterState.SUSPENDED) {
-			int nbRunningActors = 0;
-			int status;
-			firePropertyChange("resumed step", null, null);
-			for (DebugThread thread : threadQueue) {
-				do {
-					status = thread.schedule();
-				} while (status == -1);
-				nbRunningActors += status;
-			}
-			firePropertyChange("suspended step", null, null);
-		}
-	}
-	
 	public void step(DebugThread steppingThread) {
 		if (state == InterpreterState.SUSPENDED) {
 			int nbRunningActors = 0;
 			int status;
-			while ((status=steppingThread.schedule()) == 0) {
+			while ((status = steppingThread.schedule()) == 0) {
 				for (DebugThread thread : threadQueue) {
 					if (thread != steppingThread) {
 						do {
@@ -523,34 +527,30 @@ public class InterpreterMain extends Thread {
 	}
 
 	/**
+	 * Schedule next schedulable action for each actor of the network
+	 */
+	public synchronized void stepAll() {
+		if (state == InterpreterState.SUSPENDED) {
+			int nbRunningActors = 0;
+			int status;
+			firePropertyChange("resumed step", null, null);
+			for (DebugThread thread : threadQueue) {
+				do {
+					status = thread.schedule();
+				} while (status == -1);
+				nbRunningActors += status;
+			}
+			firePropertyChange("suspended step", null, null);
+		}
+	}
+
+	/**
 	 * Suspend all network actors
 	 */
 	public synchronized void suspendAll() {
 		if (state == InterpreterState.RUNNING) {
 			state = InterpreterState.SUSPENDED;
 			firePropertyChange("suspended client", null, null);
-		}
-	}
-
-	/**
-	 * Set a breakpoint in a specific actor
-	 */
-	public void set_breakpoint(String descriptor, int lineNumber) {
-		for (DebugThread thread : threadQueue) {
-			if (descriptor.startsWith(thread.getName())) {
-				thread.set_breakpoint(lineNumber);
-			}
-		}
-	}
-
-	/**
-	 * Clear a breakpoint from a specific actor
-	 */
-	public void clear_breakpoint(String descriptor, int lineNumber) {
-		for (DebugThread thread : threadQueue) {
-			if (descriptor.startsWith(thread.getName())) {
-				thread.clear_breakpoint(lineNumber);
-			}
 		}
 	}
 

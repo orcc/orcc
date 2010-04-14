@@ -127,7 +127,7 @@ public class OrccLineBreakpointAdapter implements IToggleBreakpointsTarget {
 			for (int i = 0; i < breakpoints.length; i++) {
 				IBreakpoint breakpoint = breakpoints[i];
 				if (resource.equals(breakpoint.getMarker().getResource())) {
-					if (((ILineBreakpoint) breakpoint).getLineNumber() == (lineNumber+1)) {
+					if (((ILineBreakpoint) breakpoint).getLineNumber() == (lineNumber + 1)) {
 						// remove
 						breakpoint.delete();
 						return;
@@ -136,7 +136,7 @@ public class OrccLineBreakpointAdapter implements IToggleBreakpointsTarget {
 			}
 			// create line breakpoint (code doc starting at 0)
 			OrccLineBreakpoint lineBreakpoint = new OrccLineBreakpoint(
-					resource, lineNumber+1);
+					resource, lineNumber + 1);
 			DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(
 					lineBreakpoint);
 		}

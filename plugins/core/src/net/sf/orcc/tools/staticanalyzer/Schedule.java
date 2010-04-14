@@ -42,9 +42,9 @@ import java.util.List;
  */
 public class Schedule {
 
-	private int iterationCount;
-
 	private List<Iterand> iterands;
+
+	private int iterationCount;
 
 	public Schedule() {
 		iterands = new LinkedList<Iterand>();
@@ -54,16 +54,16 @@ public class Schedule {
 		iterands.add(iterand);
 	}
 
-	public void setIterationCount(int interationCount) {
-		this.iterationCount = interationCount;
+	public List<Iterand> getIterands() {
+		return iterands;
 	}
 
 	public int getIterationCount() {
 		return iterationCount;
 	}
 
-	public List<Iterand> getIterands() {
-		return iterands;
+	public void setIterationCount(int interationCount) {
+		this.iterationCount = interationCount;
 	}
 
 	public String toString() {
@@ -71,7 +71,7 @@ public class Schedule {
 		for (Iterand iterand : iterands)
 			its += iterand;
 		String res = "";
-		if(iterationCount == 0 || iterationCount == 1) {
+		if (iterationCount == 0 || iterationCount == 1) {
 			res = its;
 		} else {
 			res = "(" + iterationCount + its + ")";

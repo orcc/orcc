@@ -48,14 +48,14 @@ public class OrccSimuLaunchDelegate implements ILaunchConfigurationDelegate {
 	@Override
 	public void launch(ILaunchConfiguration configuration, String mode,
 			ILaunch launch, IProgressMonitor monitor) throws CoreException {
-		
+
 		// Create a new Orcc process for starting RVC-CAL interpreter
 		OrccProcess process = new OrccProcess(launch, configuration, monitor);
 		launch.addProcess(process);
 		if (mode.equals(ILaunchManager.DEBUG_MODE)) {
 			process.start("debugger");
-		}else {
-			process.start("simulator");			
+		} else {
+			process.start("simulator");
 		}
 	}
 }

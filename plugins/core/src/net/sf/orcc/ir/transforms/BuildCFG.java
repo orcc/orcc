@@ -84,17 +84,17 @@ public class BuildCFG extends AbstractActorTransformation {
 
 			CFGNode join = node.getJoinNode();
 			graph.addVertex(join);
-			
-			if (node.getThenNodes().isEmpty()){
+
+			if (node.getThenNodes().isEmpty()) {
 				graph.addEdge(previous, join);
-			}else{
+			} else {
 				last = (CFGNode) visit(node.getThenNodes(), node);
 				graph.addEdge(last, join);
 			}
-			
-			if (node.getElseNodes().isEmpty()){
+
+			if (node.getElseNodes().isEmpty()) {
 				graph.addEdge(previous, join);
-			}else{
+			} else {
 				last = (CFGNode) visit(node.getElseNodes(), node);
 				graph.addEdge(last, join);
 			}
@@ -118,7 +118,6 @@ public class BuildCFG extends AbstractActorTransformation {
 
 			CFGNode last = (CFGNode) visit(node.getNodes(), join);
 			graph.addEdge(last, join);
-			
 
 			return node;
 		}

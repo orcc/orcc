@@ -46,9 +46,11 @@ public class Sequitur {
 	public static void main(String[] args) {
 		Sequitur seq = new Sequitur();
 		List<Character> terminals = new ArrayList<Character>();
-		//final String pattern = "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc";
+		// final String pattern =
+		// "abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbc";
 		final String pattern = "abbbbbbbbbbccccccccbccccccccbccccccccbccccccccbccccccccbccccccccbccccccccbd";
-		//final String pattern = "aaaaaaaaaaaaaaaabcccccccccccccccccccccccccccccccc";
+		// final String pattern =
+		// "aaaaaaaaaaaaaaaabcccccccccccccccccccccccccccccccc";
 		for (int i = 0; i < 1; i++) {
 			for (char c : pattern.toCharArray()) {
 				terminals.add(c);

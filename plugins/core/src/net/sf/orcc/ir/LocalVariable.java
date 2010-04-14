@@ -159,6 +159,10 @@ public class LocalVariable extends Variable implements
 		return (suffix != null);
 	}
 
+	public boolean isAssignable() {
+		return assignable;
+	}
+
 	/**
 	 * Indicates wether or not this local variable is assigned
 	 * 
@@ -166,10 +170,6 @@ public class LocalVariable extends Variable implements
 	 */
 	public boolean isAssigned() {
 		return index != 0;
-	}
-
-	public boolean isAssignable() {
-		return assignable;
 	}
 
 	public boolean isConstant() {

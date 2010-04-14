@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.classes;
 
-
 /**
  * This class defines the static class. A static actor has fixed
  * production/consumption rates.
@@ -44,7 +43,7 @@ public class SDFActorClass extends CSDFActorClass {
 	public SDFActorClass() {
 		numberOfPhases = 1;
 	}
-	
+
 	public boolean isSDF() {
 		return true;
 	}

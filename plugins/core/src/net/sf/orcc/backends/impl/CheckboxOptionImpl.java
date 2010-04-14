@@ -41,7 +41,7 @@ import net.sf.orcc.backends.CheckboxOption;
  */
 public class CheckboxOptionImpl extends BackendOptionImpl implements
 		CheckboxOption {
-	
+
 	private List<BackendOption> options;
 
 	@Override

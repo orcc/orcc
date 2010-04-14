@@ -61,7 +61,7 @@ public abstract class AbstractExpressionVisitor implements ExpressionVisitor {
 	public void visit(UnaryExpr expr, Object... args) {
 		expr.getExpr().accept(this, args);
 	}
-	
+
 	public void visit(VarExpr expr, Object... args) {
 	}
 

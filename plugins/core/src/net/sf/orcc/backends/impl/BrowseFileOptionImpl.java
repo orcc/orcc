@@ -38,7 +38,7 @@ import net.sf.orcc.backends.BrowseFileOption;
  */
 public class BrowseFileOptionImpl extends BackendOptionImpl implements
 		BrowseFileOption {
-	
+
 	private String extension;
 
 	private boolean folder;

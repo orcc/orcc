@@ -40,7 +40,7 @@ public class SourceActor extends AbstractInterpretedActor {
 
 	public String fileName;
 	private RandomAccessFile in;
-	
+
 	public SourceActor(String id, Actor actor, String inputBitstream) {
 		super(id, actor);
 		fileName = inputBitstream;

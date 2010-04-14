@@ -38,14 +38,14 @@ import net.sf.orcc.ir.Port;
  * 
  */
 public interface StaticClass extends IClass {
-	
+
 	public Pattern getInputPattern();
 
-	public Pattern getOutputPattern();
-	
+	public int getNumberOfPhases();
+
 	public int getNumTokensConsumed(Port port);
 
 	public int getNumTokensProduced(Port port);
-	
-	public int getNumberOfPhases();
+
+	public Pattern getOutputPattern();
 }

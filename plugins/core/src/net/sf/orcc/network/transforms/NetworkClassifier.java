@@ -49,15 +49,39 @@ import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
  */
 public class NetworkClassifier implements INetworkTransformation {
 
-	private static int SDF = 0;
 	private static int CSDF = 1;
 	private static int DYNAMIC = 2;
+	private static int SDF = 0;
 
 	/**
 	 * Creates a new classifier
 	 */
 
 	public NetworkClassifier() {
+	}
+
+	private IClass getNetworkClass(Network network) {
+		IClass networkClass = new SDFNetworkClass();
+
+		int currentClass = SDF;
+
+		for (Actor actor : network.getActors()) {
+			IClass clasz = actor.getActorClass();
+
+			if (clasz.isDynamic() || clasz.isQuasiStatic()) {
+				if (currentClass < DYNAMIC) {
+					networkClass = new DynamicNetworkClass();
+					currentClass = DYNAMIC;
+				}
+			} else if (clasz.isCSDF()) {
+				if (currentClass < CSDF) {
+					networkClass = new CSDFNetworkClass();
+					currentClass = CSDF;
+				}
+			}
+		}
+		return networkClass;
+
 	}
 
 	@Override
@@ -78,29 +102,5 @@ public class NetworkClassifier implements INetworkTransformation {
 		}
 
 		network.setNetworkClass(getNetworkClass(network));
-	}
-
-	private IClass getNetworkClass(Network network) {
-		IClass networkClass = new SDFNetworkClass();
-
-		int currentClass = SDF;
-
-		for (Actor actor : network.getActors()) {
-			IClass clasz = actor.getActorClass();
-
-			if (clasz.isDynamic() || clasz.isQuasiStatic()) {
-				if (currentClass < DYNAMIC) {
-					networkClass = new DynamicNetworkClass();
-					currentClass = DYNAMIC;
-				}
-			} else if (clasz.isCSDF()) {
-				if (currentClass < CSDF) {
-					networkClass = new CSDFNetworkClass();
-					currentClass = CSDF;
-					}
-			}
-		}
-		return networkClass;
-
 	}
 }

@@ -80,11 +80,11 @@ public class BroadcastActor extends AbstractInterpretedActor {
 
 		return running;
 	}
-	
+
 	public void setInport(Port inport) {
 		this.inport = inport;
 	}
-	
+
 	public void setOutport(Port outport) {
 		this.outports.add(outport);
 	}

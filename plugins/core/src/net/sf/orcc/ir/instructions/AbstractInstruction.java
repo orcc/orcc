@@ -55,10 +55,10 @@ public abstract class AbstractInstruction extends AbstractLocalizable implements
 	}
 
 	@Override
-	public Cast getCast(){
+	public Cast getCast() {
 		return null;
 	}
-	
+
 	@Override
 	public void setBlock(BlockNode block) {
 		this.block = block;

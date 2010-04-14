@@ -84,7 +84,7 @@ public class Store extends AbstractInstruction implements ValueContainer {
 			return null;
 		}
 
-		if (value.isIntExpr()|| value.isBooleanExpr()) {
+		if (value.isIntExpr() || value.isBooleanExpr()) {
 			return null;
 		}
 

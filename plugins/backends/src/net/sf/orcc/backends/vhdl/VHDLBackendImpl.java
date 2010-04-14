@@ -73,7 +73,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	private VHDLActorPrinter printer;
 
 	@Override
-	protected void doActorCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		printer = new VHDLActorPrinter();
 		List<Actor> actors = network.getActors();
 		transformActors(actors);

@@ -130,7 +130,7 @@ public class BinaryExpr extends AbstractExpression {
 	public void setOp(BinaryOp op) {
 		this.op = op;
 	}
-	
+
 	public void setType(Type type) {
 		this.type = type;
 	}

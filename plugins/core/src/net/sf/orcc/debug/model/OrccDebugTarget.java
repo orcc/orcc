@@ -367,9 +367,9 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 
 	public void propertyChange(PropertyChangeEvent event) {
 		OrccThread orccThread = threadMap.get(event.getNewValue());
-		 if (orccThread != null) {
-			 orccThread.setBreakpoints(null);
-		 }
+		if (orccThread != null) {
+			orccThread.setBreakpoints(null);
+		}
 
 		if (event.getPropertyName().equals("started")) {
 			started();
@@ -378,7 +378,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		} else if (event.getPropertyName().startsWith("resumed")) {
 			if (event.getPropertyName().endsWith("step")) {
 				resumed(DebugEvent.STEP_OVER, orccThread);
-			}else if (event.getPropertyName().endsWith("client")) {
+			} else if (event.getPropertyName().endsWith("client")) {
 				resumed(DebugEvent.CLIENT_REQUEST, orccThread);
 			}
 		} else if (event.getPropertyName().startsWith("suspended")) {

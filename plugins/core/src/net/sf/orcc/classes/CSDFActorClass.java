@@ -52,9 +52,9 @@ public class CSDFActorClass extends AbstractActorClass implements StaticClass {
 
 	private Pattern inputPattern;
 
-	private Pattern outputPattern;
-
 	protected int numberOfPhases;
+
+	private Pattern outputPattern;
 
 	/**
 	 * Creates a new static class.
@@ -92,6 +92,10 @@ public class CSDFActorClass extends AbstractActorClass implements StaticClass {
 	 */
 	public Pattern getInputPattern() {
 		return inputPattern;
+	}
+
+	public int getNumberOfPhases() {
+		return numberOfPhases;
 	}
 
 	/**
@@ -152,6 +156,10 @@ public class CSDFActorClass extends AbstractActorClass implements StaticClass {
 		System.out.println("output ports: " + outputPattern);
 	}
 
+	public void setNumberOfPhases(int numberOfPhases) {
+		this.numberOfPhases = numberOfPhases;
+	}
+
 	/**
 	 * Saves the number of tokens consumed by input ports of the given actor.
 	 * 
@@ -174,14 +182,6 @@ public class CSDFActorClass extends AbstractActorClass implements StaticClass {
 		for (Port port : actor.getOutputs()) {
 			outputPattern.put(port, port.getNumTokensProduced());
 		}
-	}
-
-	public void setNumberOfPhases(int numberOfPhases) {
-		this.numberOfPhases = numberOfPhases;
-	}
-
-	public int getNumberOfPhases() {
-		return numberOfPhases;
 	}
 
 }

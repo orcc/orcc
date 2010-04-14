@@ -275,9 +275,10 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	}
 
 	/**
-	 * Set the CFG of this procedure. 
+	 * Set the CFG of this procedure.
 	 * 
-	 * @param the CFG of this procedure
+	 * @param the
+	 *            CFG of this procedure
 	 */
 	public void setGraph(CFG graph) {
 		this.graph = graph;

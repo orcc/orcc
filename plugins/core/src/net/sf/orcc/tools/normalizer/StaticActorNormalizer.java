@@ -296,10 +296,10 @@ public class StaticActorNormalizer {
 		// add state variables
 		addStateVariables(procedure, staticCls.getInputPattern());
 		addStateVariables(procedure, staticCls.getOutputPattern());
-		
+
 		// change accesses to FIFO
 		new ChangeFifoArrayAccess().transform(actor);
-		
+
 		// removes read/writes
 		new RemoveReadWrites().transform(actor);
 

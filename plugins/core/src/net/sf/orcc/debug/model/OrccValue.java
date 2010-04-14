@@ -43,7 +43,7 @@ public class OrccValue extends OrccDebugElement implements IValue {
 		super(target);
 		if (value != null) {
 			fValue = value.toString();
-		}else {
+		} else {
 			fValue = "null";
 		}
 	}

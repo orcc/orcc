@@ -45,6 +45,18 @@ public interface OrccLaunchConstants {
 	public static final String BACKEND = "net.sf.orcc.backend";
 
 	/**
+	 * Whether we should compile the VTL. Must be kept in sync with options in
+	 * the back-ends plug-in.
+	 */
+	public static final String COMPILE_VTL = "net.sf.orcc.backends.compileVTL";
+
+	/**
+	 * Whether we should compile the given XDF input file. Must be kept in sync
+	 * with options in the back-ends plug-in.
+	 */
+	public static final String COMPILE_XDF = "net.sf.orcc.backends.compileXDF";
+
+	/**
 	 * When set, Orcc frontend will be launched in debug mode.
 	 */
 	public static final String DEBUG_MODE = "net.sf.orcc.debugMode";
@@ -102,30 +114,6 @@ public interface OrccLaunchConstants {
 	public static final String FIFO_SIZE = "net.sf.orcc.fifoSize";
 
 	/**
-	 * Folder of the VTL associated with an Orcc configuration. Must be kept in
-	 * sync with options in the back-ends plug-in.
-	 */
-	public static final String VTL_FOLDER = "net.sf.orcc.backends.vtlFolder";
-
-	/**
-	 * Whether we should compile the VTL. Must be kept in sync with options in
-	 * the back-ends plug-in.
-	 */
-	public static final String COMPILE_VTL = "net.sf.orcc.backends.compileVTL";
-
-	/**
-	 * Whether we should compile the given XDF input file. Must be kept in sync
-	 * with options in the back-ends plug-in.
-	 */
-	public static final String COMPILE_XDF = "net.sf.orcc.backends.compileXDF";
-
-	/**
-	 * Input file associated with an Orcc configuration. Must be kept in sync
-	 * with options in the back-ends plug-in.
-	 */
-	public static final String XDF_FILE = "net.sf.orcc.backends.xdfFile";
-
-	/**
 	 * Input stimulus file associated with an Orcc configuration.
 	 */
 	public static final String INPUT_STIMULUS = "net.sf.orcc.inputStimulus";
@@ -159,5 +147,17 @@ public interface OrccLaunchConstants {
 	 * Orcc simulation configuration type.
 	 */
 	public static final String SIMULATION_CONFIG_TYPE = "net.sf.orcc.simuLaunchConfigurationType";
+
+	/**
+	 * Folder of the VTL associated with an Orcc configuration. Must be kept in
+	 * sync with options in the back-ends plug-in.
+	 */
+	public static final String VTL_FOLDER = "net.sf.orcc.backends.vtlFolder";
+
+	/**
+	 * Input file associated with an Orcc configuration. Must be kept in sync
+	 * with options in the back-ends plug-in.
+	 */
+	public static final String XDF_FILE = "net.sf.orcc.backends.xdfFile";
 
 }

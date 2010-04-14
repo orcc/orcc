@@ -32,47 +32,45 @@ package net.sf.orcc.tools.staticanalyzer;
 import net.sf.orcc.network.Vertex;
 
 /**
- * This class defines an element of the body of a schedule.
- * An iterand can be either a vertex or another schedule.
+ * This class defines an element of the body of a schedule. An iterand can be
+ * either a vertex or another schedule.
  * 
  * @author Ghislain Roquier
  * 
  */
 
-
 public class Iterand {
 
 	private enum Type {
-		VERTEX, 
-		SCHEDULE
+		SCHEDULE, VERTEX
 	};
-
-	private Type type;
 
 	private Object contents;
 
-	public Iterand(Vertex vertex) {
-		contents = vertex;
-		type = Type.VERTEX;
-	}
+	private Type type;
 
 	public Iterand(Schedule schedule) {
 		contents = schedule;
 		type = Type.SCHEDULE;
 	}
 
-	public boolean isVertex() {
-		return (type == Type.VERTEX);
+	public Iterand(Vertex vertex) {
+		contents = vertex;
+		type = Type.VERTEX;
 	}
 
 	public boolean isSchedule() {
 		return (type == Type.SCHEDULE);
 	}
 
+	public boolean isVertex() {
+		return (type == Type.VERTEX);
+	}
+
 	public String toString() {
 		Object obj;
-		if(isVertex()) {
-			obj = ((Vertex)contents).getInstance().getClasz(); 
+		if (isVertex()) {
+			obj = ((Vertex) contents).getInstance().getClasz();
 		} else {
 			obj = contents;
 		}

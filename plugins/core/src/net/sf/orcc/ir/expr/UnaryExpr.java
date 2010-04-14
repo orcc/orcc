@@ -53,7 +53,7 @@ public class UnaryExpr extends AbstractExpression {
 		this.op = op;
 		this.type = type;
 	}
-	
+
 	public UnaryExpr(UnaryOp op, Expression expr, Type type) {
 		this(new Location(), op, expr, type);
 	}

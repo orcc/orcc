@@ -66,7 +66,7 @@ public class BoolExpr extends AbstractExpression {
 	public Type getType() {
 		return new BoolType();
 	}
-	
+
 	public boolean getValue() {
 		return value;
 	}

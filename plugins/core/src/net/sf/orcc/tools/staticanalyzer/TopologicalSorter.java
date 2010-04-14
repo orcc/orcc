@@ -36,7 +36,6 @@ import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
 
-
 /**
  * This class computes a topological sort of the graph.
  * 

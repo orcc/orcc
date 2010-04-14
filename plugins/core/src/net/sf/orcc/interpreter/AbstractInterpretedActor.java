@@ -55,7 +55,6 @@ public abstract class AbstractInterpretedActor {
 	 */
 	public void initialize() {
 	}
-	
 
 	/**
 	 * Check next action to be scheduled and interpret it if I/O FIFO are free.
@@ -67,7 +66,8 @@ public abstract class AbstractInterpretedActor {
 	}
 
 	/**
-	 * Check next instruction of the current schedulable action to be interpreted and interpret it.
+	 * Check next instruction of the current schedulable action to be
+	 * interpreted and interpret it.
 	 * 
 	 * @return 1 if running
 	 */

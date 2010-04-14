@@ -56,7 +56,7 @@ public class ListExpr extends AbstractExpression {
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);
 	}
-	
+
 	@Override
 	public void accept(ExpressionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
@@ -64,20 +64,20 @@ public class ListExpr extends AbstractExpression {
 
 	@Override
 	public Type getType() {
-		if (value.size()==0){
+		if (value.size() == 0) {
 			return null;
 		}
-		
-		//Verify if every expressions on the list are getting the same type
+
+		// Verify if every expressions on the list are getting the same type
 		Expression firstExpr = value.get(0);
 		Type refType = firstExpr.getType();
-		for (Expression expr : value){
+		for (Expression expr : value) {
 			Type type = expr.getType();
-			if(!refType.equals(type)){
+			if (!refType.equals(type)) {
 				return null;
 			}
 		}
-		
+
 		return new ListType(new IntExpr(value.size()), refType);
 	}
 

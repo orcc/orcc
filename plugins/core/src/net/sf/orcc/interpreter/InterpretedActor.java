@@ -63,17 +63,15 @@ import net.sf.orcc.ir.nodes.WhileNode;
  */
 public class InterpretedActor extends AbstractInterpretedActor {
 
-	private ConstantEvaluator constEval;
-
 	/**
 	 * Debugger utils
 	 */
 	public class NodeInfo {
-		public int subNodeIdx;
-		public int nbSubNodes;
-		public List<CFGNode> subNodes;
-		public BlockNode joinNode;
 		public Expression condition;
+		public BlockNode joinNode;
+		public int nbSubNodes;
+		public int subNodeIdx;
+		public List<CFGNode> subNodes;
 
 		public NodeInfo(int subNodeIdx, int nbSubNodes, List<CFGNode> subNodes,
 				BlockNode joinNode, Expression condition) {
@@ -85,21 +83,23 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		}
 	}
 
-	private Action currentAction = null;
-	private List<NodeInfo> nodeStack;
-	private int nodeStackLevel;
-	private List<Instruction> instrStack;
+	private ConstantEvaluator constEval;
 
+	private Action currentAction = null;
+	protected ExpressionEvaluator exprInterpreter;
 	/**
 	 * Simulator properties
 	 */
 	protected String fsmState;
+	private List<Instruction> instrStack;
 
 	protected NodeInterpreter interpret;
-	protected boolean isSynchronousScheduler = false;
 
-	protected ExpressionEvaluator exprInterpreter;
+	protected boolean isSynchronousScheduler = false;
 	private ListAllocator listAllocator;
+
+	private List<NodeInfo> nodeStack;
+	private int nodeStackLevel;
 	protected ActionScheduler sched;
 
 	/**
@@ -306,79 +306,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
 
-	@Override
-	public Integer schedule() {
-		if (isSynchronousScheduler) {
-			// "Synchronous-like" scheduling policy : schedule only 1 action per
-			// actor at each "schedule" (network logical cycle) call
-			Action action = getNextAction();
-			if (action != null) {
-				return execute(action);
-			} else {
-				return 0;
-			}
-
-		} else {
-			// Other scheduling policy : schedule the actor as long as it can
-			// execute an action
-			int running = 0;
-			boolean schedulable = true;
-			if (sched.hasFsm()) {
-				while (schedulable) {
-					schedulable = false;
-					// Check for untagged actions first
-					for (Action action : sched.getActions()) {
-						schedulable = isSchedulable(action);
-						if (schedulable) {
-							if (checkOutputPattern(action.getOutputPattern())) {
-								running = execute(action);
-							} else {
-								schedulable = false;
-							}
-							break;
-						}
-					}
-					if (!schedulable) {
-						// If no untagged action has been executed,
-						// Then check for next FSM transition
-						for (NextStateInfo info : sched.getFsm()
-								.getTransitions(fsmState)) {
-							Action action = info.getAction();
-							schedulable = isSchedulable(action);
-							if (schedulable) {
-								if (checkOutputPattern(action
-										.getOutputPattern())) {
-									// Update FSM state
-									fsmState = info.getTargetState().getName();
-									running = execute(action);
-								} else {
-									schedulable = false;
-								}
-								break;
-							}
-						}
-					}
-				}
-			} else {
-				while (schedulable) {
-					schedulable = false;
-					for (Action action : sched.getActions()) {
-						schedulable = isSchedulable(action);
-						if (schedulable) {
-							if (checkOutputPattern(action.getOutputPattern())) {
-								running = execute(action);
-							} else {
-								schedulable = false;
-							}
-							break;
-						}
-					}
-				}
-			}
-			return running;
-		}
-	}
-
 	private boolean popNodeStack() {
 		boolean exeStmt = false;
 		NodeInfo node = nodeStack.get(nodeStackLevel - 1);
@@ -455,6 +382,79 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	}
 
 	@Override
+	public Integer schedule() {
+		if (isSynchronousScheduler) {
+			// "Synchronous-like" scheduling policy : schedule only 1 action per
+			// actor at each "schedule" (network logical cycle) call
+			Action action = getNextAction();
+			if (action != null) {
+				return execute(action);
+			} else {
+				return 0;
+			}
+
+		} else {
+			// Other scheduling policy : schedule the actor as long as it can
+			// execute an action
+			int running = 0;
+			boolean schedulable = true;
+			if (sched.hasFsm()) {
+				while (schedulable) {
+					schedulable = false;
+					// Check for untagged actions first
+					for (Action action : sched.getActions()) {
+						schedulable = isSchedulable(action);
+						if (schedulable) {
+							if (checkOutputPattern(action.getOutputPattern())) {
+								running = execute(action);
+							} else {
+								schedulable = false;
+							}
+							break;
+						}
+					}
+					if (!schedulable) {
+						// If no untagged action has been executed,
+						// Then check for next FSM transition
+						for (NextStateInfo info : sched.getFsm()
+								.getTransitions(fsmState)) {
+							Action action = info.getAction();
+							schedulable = isSchedulable(action);
+							if (schedulable) {
+								if (checkOutputPattern(action
+										.getOutputPattern())) {
+									// Update FSM state
+									fsmState = info.getTargetState().getName();
+									running = execute(action);
+								} else {
+									schedulable = false;
+								}
+								break;
+							}
+						}
+					}
+				}
+			} else {
+				while (schedulable) {
+					schedulable = false;
+					for (Action action : sched.getActions()) {
+						schedulable = isSchedulable(action);
+						if (schedulable) {
+							if (checkOutputPattern(action.getOutputPattern())) {
+								running = execute(action);
+							} else {
+								schedulable = false;
+							}
+							break;
+						}
+					}
+				}
+			}
+			return running;
+		}
+	}
+
+	@Override
 	public int step(boolean doStepInto) {
 		if (currentAction == null) {
 			currentAction = getNextAction();
@@ -475,7 +475,8 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			}
 		}
 		if (currentAction != null) {
-			while ((nodeStackLevel > 0) && (!popNodeStack()));
+			while ((nodeStackLevel > 0) && (!popNodeStack()))
+				;
 			if (nodeStackLevel > 0) {
 				return -1;
 			} else {

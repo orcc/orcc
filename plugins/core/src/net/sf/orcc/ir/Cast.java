@@ -106,10 +106,10 @@ public class Cast {
 		if (source.toString().equals(target.toString())) {
 			return false;
 		}
-		
-		if (target.isList()){
-			ListType list = (ListType)target;
-			if (source.toString().equals(list.getElementType().toString())){
+
+		if (target.isList()) {
+			ListType list = (ListType) target;
+			if (source.toString().equals(list.getElementType().toString())) {
 				return false;
 			}
 		}
@@ -117,12 +117,11 @@ public class Cast {
 		return getSizeOf(source) < getSizeOf(target);
 
 	}
-	
+
 	/**
 	 * Return true if the source type is signed
 	 * 
-	 * @return a boolean indicating if source is signed
-	 *         type
+	 * @return a boolean indicating if source is signed type
 	 */
 	public boolean isSigned() {
 		if (source.isUint()) {
@@ -130,12 +129,12 @@ public class Cast {
 		}
 
 		if (source.isList()) {
-			ListType type = (ListType)source;
-			if(type.getElementType().isUint()){
+			ListType type = (ListType) source;
+			if (type.getElementType().isUint()) {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -155,12 +154,12 @@ public class Cast {
 		}
 
 		if (target.isList()) {
-			ListType list = (ListType)target;
-			if (source.toString().equals(list.getElementType().toString())){
+			ListType list = (ListType) target;
+			if (source.toString().equals(list.getElementType().toString())) {
 				return false;
 			}
 		}
-		
+
 		return getSizeOf(source) > getSizeOf(target);
 	}
 }

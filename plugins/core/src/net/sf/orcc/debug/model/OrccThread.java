@@ -182,7 +182,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	public boolean hasStackFrames() throws DebugException {
 		return isSuspended();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -200,7 +200,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	public boolean isSuspended() {
 		return target.isSuspended() && !isTerminated();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

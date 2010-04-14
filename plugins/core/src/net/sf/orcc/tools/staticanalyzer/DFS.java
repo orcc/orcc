@@ -52,61 +52,14 @@ import org.jgrapht.DirectedGraph;
 
 public class DFS {
 
-
-	private DirectedGraph<Vertex, Connection> graph;
-
-	private Set<Vertex> defined = new HashSet<Vertex>();
-
-	private Map<Vertex, TimeStamp> timeStamps = new HashMap<Vertex, TimeStamp>();
-
-	public DFS(DirectedGraph<Vertex, Connection> graph) {
-		this.graph = graph;
-	}
-
-	
-	public List<Vertex> orderedByFinishingTime() {
-		List<Vertex> sorted = new LinkedList<Vertex>(getTimestamps().keySet());
-		Collections.sort(sorted, new TimeStampComparator(timeStamps));
-		return sorted;
-	}
-	
-	private Map<Vertex, TimeStamp> getTimestamps() {
-
-		for (Vertex vertex : graph.vertexSet()) {
-			if (!defined.contains(vertex)) {
-				dfsVisit(vertex);
-			}
-		}
-		return timeStamps;
-	}
-	
-	private void dfsVisit(Vertex vertex) {
-		defined.add(vertex);
-		TimeStamp.currentTime++;
-		timeStamps.put(vertex, new TimeStamp(TimeStamp.currentTime, 0));
-
-		for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-			Vertex tgtVertex = graph.getEdgeTarget(connection);
-			if (!defined.contains(tgtVertex)) {
-				dfsVisit(tgtVertex);
-			}
-		}
-		TimeStamp.currentTime++;
-		timeStamps.get(vertex).setFinished(TimeStamp.currentTime);
-	}
-	
 	private static class TimeStamp {
 
 		static int currentTime = 0;
-		private int start;
 		private int finish;
+		private int start;
 
 		public TimeStamp(int discovered, int finished) {
 			this.start = discovered;
-			this.finish = finished;
-		}
-
-		public void setFinished(int finished) {
 			this.finish = finished;
 		}
 
@@ -117,6 +70,10 @@ public class DFS {
 		@SuppressWarnings("unused")
 		public int getStarted() {
 			return start;
+		}
+
+		public void setFinished(int finished) {
+			this.finish = finished;
 		}
 	}
 
@@ -131,7 +88,48 @@ public class DFS {
 		public int compare(Vertex v1, Vertex v2) {
 			return map.get(v2).getFinished() - map.get(v1).getFinished();
 		}
-		
+
+	}
+
+	private Set<Vertex> defined = new HashSet<Vertex>();
+
+	private DirectedGraph<Vertex, Connection> graph;
+
+	private Map<Vertex, TimeStamp> timeStamps = new HashMap<Vertex, TimeStamp>();
+
+	public DFS(DirectedGraph<Vertex, Connection> graph) {
+		this.graph = graph;
+	}
+
+	private void dfsVisit(Vertex vertex) {
+		defined.add(vertex);
+		TimeStamp.currentTime++;
+		timeStamps.put(vertex, new TimeStamp(TimeStamp.currentTime, 0));
+
+		for (Connection connection : graph.outgoingEdgesOf(vertex)) {
+			Vertex tgtVertex = graph.getEdgeTarget(connection);
+			if (!defined.contains(tgtVertex)) {
+				dfsVisit(tgtVertex);
+			}
+		}
+		TimeStamp.currentTime++;
+		timeStamps.get(vertex).setFinished(TimeStamp.currentTime);
+	}
+
+	private Map<Vertex, TimeStamp> getTimestamps() {
+
+		for (Vertex vertex : graph.vertexSet()) {
+			if (!defined.contains(vertex)) {
+				dfsVisit(vertex);
+			}
+		}
+		return timeStamps;
+	}
+
+	public List<Vertex> orderedByFinishingTime() {
+		List<Vertex> sorted = new LinkedList<Vertex>(getTimestamps().keySet());
+		Collections.sort(sorted, new TimeStampComparator(timeStamps));
+		return sorted;
 	}
 
 }

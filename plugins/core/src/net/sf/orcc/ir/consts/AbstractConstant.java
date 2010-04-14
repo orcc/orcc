@@ -80,12 +80,6 @@ public abstract class AbstractConstant implements Constant {
 	}
 
 	@Override
-	public String toString() {
-		return Printer.getInstance().toString(this);
-	}
-
-
-	@Override
 	public boolean isBoolConst() {
 		return false;
 	}
@@ -103,5 +97,10 @@ public abstract class AbstractConstant implements Constant {
 	@Override
 	public boolean isStringConst() {
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Printer.getInstance().toString(this);
 	}
 }

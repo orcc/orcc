@@ -99,12 +99,12 @@ public class ListType extends AbstractType {
 	 * @return the number of elements of this list
 	 */
 	public Type getElementType() {
-		if (type.isList()){
-			return ((ListType)type).getElementType();
+		if (type.isList()) {
+			return ((ListType) type).getElementType();
 		}
 		return type;
 	}
-	
+
 	/**
 	 * Returns the number of elements of this list type.
 	 * 
@@ -120,15 +120,15 @@ public class ListType extends AbstractType {
 	 * @return a list of indice corresponding to the list size
 	 */
 	public List<Expression> getSizeIterator() {
-		List <Expression> it = new ArrayList<Expression>();
-		
-		for (int i = 0; i < ((IntExpr)size).getValue(); i++){
+		List<Expression> it = new ArrayList<Expression>();
+
+		for (int i = 0; i < ((IntExpr) size).getValue(); i++) {
 			it.add(new IntExpr(i));
-		} 
-		
+		}
+
 		return it;
 	}
-	
+
 	/**
 	 * Returns the type of the list
 	 * 

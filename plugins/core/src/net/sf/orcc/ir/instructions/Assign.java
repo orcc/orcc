@@ -44,8 +44,8 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Assign extends AbstractInstruction implements LocalTargetContainer,
-		ValueContainer {
+public class Assign extends AbstractInstruction implements
+		LocalTargetContainer, ValueContainer {
 
 	private LocalVariable target;
 
@@ -72,24 +72,24 @@ public class Assign extends AbstractInstruction implements LocalTargetContainer,
 	}
 
 	@Override
-	public Cast getCast(){
+	public Cast getCast() {
 		Type expr = value.getType();
 		Type val = target.getType();
-		
-		if (expr == null){
-			return null;	
+
+		if (expr == null) {
+			return null;
 		}
-		
-		if (value.isIntExpr() || value.isBooleanExpr()){
-			return null;	
+
+		if (value.isIntExpr() || value.isBooleanExpr()) {
+			return null;
 		}
-		
+
 		Cast cast = new Cast(expr, val);
 
-		if (cast.isExtended()||cast.isTrunced()){
+		if (cast.isExtended() || cast.isTrunced()) {
 			return cast;
 		}
-		
+
 		return null;
 	}
 
@@ -122,7 +122,7 @@ public class Assign extends AbstractInstruction implements LocalTargetContainer,
 	public void setValueSimple(Expression value) {
 		this.value = value;
 	}
-	
+
 	@Override
 	public String toString() {
 		return target + " = " + getValue();

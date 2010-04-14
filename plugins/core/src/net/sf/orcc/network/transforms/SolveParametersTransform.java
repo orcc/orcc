@@ -134,7 +134,7 @@ public class SolveParametersTransform implements ExpressionInterpreter,
 		this.network = network;
 		for (Instance instance : network.getInstances()) {
 			solveParameters(instance.getParameters());
-			
+
 			if (instance.isNetwork()) {
 				Network subNetwork = instance.getNetwork();
 				updateNetworkParameters(subNetwork, instance.getParameters());

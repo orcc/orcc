@@ -59,7 +59,7 @@ public class XlimBackendImpl extends AbstractBackend {
 	private XlimActorPrinter printer;
 
 	@Override
-	protected void doActorCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		printer = new XlimActorPrinter();
 		printInstances(network);
 	}

@@ -73,7 +73,7 @@ public class CppBackendImpl extends AbstractBackend {
 	private CppActorPrinter printer;
 
 	@Override
-	protected void doActorCodeGeneration(Network network) throws OrccException {
+	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
 		if (partitioning) {

@@ -37,6 +37,13 @@ package net.sf.orcc.classes;
 public interface IClass {
 
 	/**
+	 * Returns true if this network class is CSDF.
+	 * 
+	 * @return true if this network class is CSDF
+	 */
+	public boolean isCSDF();
+
+	/**
 	 * Returns true if this network class is dynamic.
 	 * 
 	 * @return true if this network class is dynamic
@@ -50,20 +57,11 @@ public interface IClass {
 	 */
 	public boolean isQuasiStatic();
 
-	
-	/**
-	 * Returns true if this network class is CSDF.
-	 * 
-	 * @return true if this network class is CSDF
-	 */
-	public boolean isCSDF();
-	
 	/**
 	 * Returns true if this network class is SDF.
 	 * 
 	 * @return true if this network class is SDF
 	 */
 	public boolean isSDF();
-
 
 }

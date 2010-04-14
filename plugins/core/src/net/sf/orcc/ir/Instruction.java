@@ -74,7 +74,7 @@ public interface Instruction extends User {
 	 * @return Type of cast made by this instruction
 	 */
 	public Cast getCast();
-	
+
 	/**
 	 * Sets the block that contains this instruction.
 	 * 

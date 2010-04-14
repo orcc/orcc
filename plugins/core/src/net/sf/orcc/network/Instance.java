@@ -206,6 +206,18 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		return clasz;
 	}
 
+	public IClass getContentClass() {
+		IClass clasz = null;
+
+		if (isActor()) {
+			clasz = actor.getActorClass();
+		} else {
+			clasz = network.getNetworkClass();
+		}
+
+		return clasz;
+	}
+
 	/**
 	 * Returns the file in which this instance is defined.
 	 * 
@@ -242,18 +254,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	public Map<String, Expression> getParameters() {
 		return parameters;
 	}
-	
-	public IClass getContentClass() {
-		IClass clasz = null;
-		
-		if(isActor()) {
-			clasz = actor.getActorClass();
-		} else {
-			clasz = network.getNetworkClass();
-		}
-		
-		return clasz;
-	}
 
 	@Override
 	public int hashCode() {
@@ -283,7 +283,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				throw new OrccException("Could not parse instance \"" + id
 						+ "\" because: " + e.getLocalizedMessage(), e);
 			} catch (FileNotFoundException e) {
-				throw new OrccException("I/O error when parsing \"" + id + "\"", e);
+				throw new OrccException(
+						"I/O error when parsing \"" + id + "\"", e);
 			}
 		}
 	}

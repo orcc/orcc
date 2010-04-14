@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.classes;
 
-
 /**
  * This class defines the class of a network.
  * 
@@ -38,17 +37,17 @@ package net.sf.orcc.classes;
 public abstract class AbstractNetworkClass implements IClass {
 
 	@Override
+	public boolean isCSDF() {
+		return false;
+	}
+
+	@Override
 	public boolean isDynamic() {
 		return false;
 	}
 
 	@Override
 	public boolean isQuasiStatic() {
-		return false;
-	}
-
-	@Override
-	public boolean isCSDF() {
 		return false;
 	}
 

@@ -95,7 +95,7 @@ public class CommunicationFifo implements ICommunicationFifo {
 			System.arraycopy(queue, readPos, target, 0, target.length);
 			readPos += target.length;
 			if (readPos == size) {
-				readPos=0;
+				readPos = 0;
 			}
 		} else {
 			System.arraycopy(queue, readPos, target, 0, size - readPos);
@@ -135,7 +135,7 @@ public class CommunicationFifo implements ICommunicationFifo {
 			System.arraycopy(source, 0, queue, writePos, source.length);
 			writePos += source.length;
 			if (writePos == size) {
-				writePos=0;
+				writePos = 0;
 			}
 		} else {
 			System.arraycopy(source, 0, queue, writePos, size - writePos);
@@ -147,10 +147,10 @@ public class CommunicationFifo implements ICommunicationFifo {
 			try {
 				if (source[0] instanceof Boolean) {
 					for (int i = 0; i < source.length; i++) {
-						if ((Boolean)source[i]) {
+						if ((Boolean) source[i]) {
 							out.write("1\n");
-						}else {
-							out.write("0\n");							
+						} else {
+							out.write("0\n");
 						}
 					}
 				} else {

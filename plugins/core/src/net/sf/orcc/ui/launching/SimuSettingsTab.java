@@ -298,7 +298,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		return file;
 	}
 
-	 private boolean getFolderFromText() {
+	private boolean getFolderFromText() {
 		String value = textOutput.getText();
 		File file = new File(value);
 		if (file.isDirectory()) {
@@ -359,7 +359,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			return false;
 		}
 
-		 if (!getStimulusFromText()) {
+		if (!getStimulusFromText()) {
 			setErrorMessage("Given stimulus path does not specify an existing file");
 			return false;
 		}

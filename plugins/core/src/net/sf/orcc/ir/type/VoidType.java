@@ -53,10 +53,10 @@ public class VoidType extends AbstractType {
 	public boolean equals(Object obj) {
 		return (obj instanceof VoidType);
 	}
-	
+
 	@Override
 	public boolean isVoid() {
 		return true;
 	}
-	
+
 }
