@@ -29,9 +29,11 @@
 package net.sf.orcc.backends;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_VTL;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +45,6 @@ import net.sf.orcc.backends.impl.BrowseFileOptionImpl;
 import net.sf.orcc.backends.impl.CheckboxOptionImpl;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ui.OrccActivator;
-import net.sf.orcc.ui.launching.OrccLaunchConstants;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -107,29 +108,6 @@ public class BackendFactory {
 				+ ".backends");
 
 		parseBackends(elements);
-	}
-
-	/**
-	 * Returns the identifier of the option that contains the input file that
-	 * should be given to the front-end and back-end/interpreter/debugger.
-	 * 
-	 * @return the identifier of the option that contains an input file
-	 * @throws CoreException
-	 *             if something goes wrong
-	 */
-	public String getInputId(String backend) throws CoreException {
-		List<BackendOption> options = getOptions(backend);
-		if (options != null) {
-			// return the identifier of the first "browseFile" option
-			for (BackendOption option : options) {
-				if (option instanceof BrowseFileOption) {
-					return option.getIdentifier();
-				}
-			}
-		}
-
-		// by default, return the identifier of the "input file" option
-		return OrccLaunchConstants.INPUT_FILE;
 	}
 
 	/**
@@ -321,15 +299,17 @@ public class BackendFactory {
 			ILaunchConfiguration configuration) throws Exception {
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 		String backend = configuration.getAttribute(BACKEND, "");
-		String inputId = getInputId(backend);
-		String inputFile = configuration.getAttribute(inputId, "");
 
 		Backend backendObj = backends.get(backend);
 		backendObj.setLaunchConfiguration(configuration);
-		if (new File(inputFile).isDirectory()) {
+
+		if (configuration.getAttribute(COMPILE_VTL, false)) {
 			backendObj.generateVtl(process, outputFolder);
-		} else {
-			backendObj.generateCode(process, inputFile, outputFolder);
+		}
+
+		if (configuration.getAttribute(COMPILE_XDF, false)) {
+			String xdfFile = configuration.getAttribute(XDF_FILE, "");
+			backendObj.generateCode(process, xdfFile, outputFolder);
 		}
 	}
 }

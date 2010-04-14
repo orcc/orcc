@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.SIMULATION_CONFIG_TYPE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +137,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			wc = type.newInstance(null, name);
 
 			// source file
-			wc.setAttribute(INPUT_FILE, file.getLocation().toOSString());
+			wc.setAttribute(XDF_FILE, file.getLocation().toOSString());
 
 			// stimulus
 			String stimulus = browseStimulusFiles(getShell(), file);
@@ -175,7 +175,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			ILaunchConfiguration[] candidates = manager
 					.getLaunchConfigurations(type);
 			for (ILaunchConfiguration config : candidates) {
-				String fileName = config.getAttribute(INPUT_FILE, "");
+				String fileName = config.getAttribute(XDF_FILE, "");
 				if (fileName.equals(file.getLocation().toOSString())) {
 					configs.add(config);
 				}

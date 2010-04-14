@@ -32,18 +32,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.classes.CSDFActorClass;
+import net.sf.orcc.classes.DynamicActorClass;
 import net.sf.orcc.classes.IClass;
+import net.sf.orcc.classes.QuasiStaticClass;
+import net.sf.orcc.classes.SDFActorClass;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
-import net.sf.orcc.classes.DynamicActorClass;
-import net.sf.orcc.classes.QuasiStaticClass;
-import net.sf.orcc.classes.CSDFActorClass;
-import net.sf.orcc.classes.SDFActorClass;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;

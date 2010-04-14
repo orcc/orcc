@@ -487,7 +487,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			if (marker != null) {
 				// try {
 				// String inputFile = getLaunch(). getLaunchConfiguration()
-				// .getAttribute(INPUT_FILE, "");
+				// .getAttribute(XDF_FILE, "");
 				// IPath p = new Path(new File(inputFile).getParent());
 				// return marker.getResource().getFullPath().equals(p);
 				// } catch (CoreException e) {

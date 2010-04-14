@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.classes.IClass;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Port;
@@ -47,8 +48,6 @@ import net.sf.orcc.network.transforms.SolveParametersTransform;
 import net.sf.orcc.tools.normalizer.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrderedMap;
-
-import net.sf.orcc.classes.IClass;
 
 import org.jgrapht.DirectedGraph;
 

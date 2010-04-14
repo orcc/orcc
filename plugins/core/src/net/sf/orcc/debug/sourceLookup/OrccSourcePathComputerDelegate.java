@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.debug.sourceLookup;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -56,7 +56,7 @@ public class OrccSourcePathComputerDelegate implements
 			ILaunchConfiguration configuration, IProgressMonitor monitor)
 			throws CoreException {
 		// get input file
-		String inputFile = configuration.getAttribute(INPUT_FILE, "");
+		String inputFile = configuration.getAttribute(XDF_FILE, "");
 
 		// we know the file is in the workspace
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();

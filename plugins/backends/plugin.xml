@@ -7,7 +7,10 @@
             class="net.sf.orcc.backends.c.CBackendImpl"
             name="C">
          <option
-               id="net.sf.orcc.backends.xdfInputFile">
+               id="net.sf.orcc.backends.compileVTL">
+         </option>
+         <option
+               id="net.sf.orcc.backends.compileXDF">
          </option>
          <option
                id="net.sf.orcc.backends.classify">
@@ -20,21 +23,30 @@
             class="net.sf.orcc.backends.java.JavaBackendImpl"
             name="Java">
          <option
-               id="net.sf.orcc.backends.xdfInputFile">
+               id="net.sf.orcc.backends.compileVTL">
+         </option>
+         <option
+               id="net.sf.orcc.backends.compileXDF">
          </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.cpp.CppBackendImpl"
             name="C++">
          <option
-               id="net.sf.orcc.backends.xdfInputFile">
+               id="net.sf.orcc.backends.compileVTL">
+         </option>
+         <option
+               id="net.sf.orcc.backends.compileXDF">
          </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
             name="LLVM">
          <option
-               id="net.sf.orcc.backends.vtlFolder">
+               id="net.sf.orcc.backends.compileVTL">
+         </option>
+         <option
+               id="net.sf.orcc.backends.compileXDF">
          </option>
          <option
                id="net.sf.orcc.backends.classify">
@@ -47,40 +59,25 @@
             class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
             name="VHDL">
          <option
-               id="net.sf.orcc.backends.xdfInputFile">
+               id="net.sf.orcc.backends.compileVTL">
+         </option>
+         <option
+               id="net.sf.orcc.backends.compileXDF">
          </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
             name="XLIM">
          <option
-               id="net.sf.orcc.backends.xdfInputFile">
-         </option>
-      </backend>
-      <backend
-            class="net.sf.orcc.backends.flattener.FlattenerBackendImpl"
-            name="Network flattener">
-         <option
-               id="net.sf.orcc.backends.xdfInputFile">
+               id="net.sf.orcc.backends.compileVTL">
          </option>
          <option
-               id="net.sf.orcc.backends.deactivateFE">
+               id="net.sf.orcc.backends.compileXDF">
          </option>
       </backend>
    </extension>
    <extension
          point="net.sf.orcc.core.options">
-      <option
-            description="Specify the top-level file to compile"
-            id="net.sf.orcc.backends.xdfInputFile"
-            name="Input file">
-         <browseFile
-               extension="xdf"
-               folder="false"
-               workspace="true">
-         </browseFile>
-      </option>
-      
          <option
                defaultValue="false"
                description="Whether we should generate .ll or .bc files"
@@ -127,20 +124,6 @@
             <checkBox></checkBox>
          </option>
          <option
-               description="The folder that contains the Video Tool Library (VTL)"
-               id="net.sf.orcc.backends.vtlFolder"
-               name="VTL folder">
-            <browseFile
-                  folder="true"
-                  workspace="true">
-            </browseFile>
-         </option>
-         <option
-               description="Deactivate the generation of intermediate actor"
-               id="net.sf.orcc.backends.deactivateFE"
-               name="Deactivate frontend">
-         </option>
-         <option
                description="Whether Orcc should compile the VTL contained in the given folder"
                id="net.sf.orcc.backends.compileVTL"
                name="Compile VTL">
@@ -158,12 +141,12 @@
          </option>
          <option
                description="Whether Orcc should compile the given hierarchical XDF network"
-               id="net.sf.orcc.backends.compileXdfNetwork"
+               id="net.sf.orcc.backends.compileXDF"
                name="Compile XDF Network">
             <checkBox>
                <option
                      description="Specify the top-level file to compile"
-                     id="net.sf.orcc.backends.xdfInputFile"
+                     id="net.sf.orcc.backends.xdfFile"
                      name="XDF file">
                   <browseFile
                         extension="xdf"

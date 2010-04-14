@@ -31,6 +31,8 @@ package net.sf.orcc.ui.launching;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.RUN_CONFIG_TYPE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.VTL_FOLDER;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -216,7 +218,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			// create configuration
 			ILaunchConfigurationWorkingCopy wc = type.newInstance(null, name);
 			wc.setAttribute(BACKEND, backend);
-			wc.setAttribute(getInputId(wc), inputFile);
+			wc.setAttribute(getInput(wc), inputFile);
 			wc.setAttribute(OUTPUT_FOLDER, folder);
 
 			config = wc.doSave();
@@ -247,8 +249,8 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			ILaunchConfiguration[] candidates = manager
 					.getLaunchConfigurations(type);
 			for (ILaunchConfiguration config : candidates) {
-				String fileName = config.getAttribute(getInputId(config), "");
-				if (fileName.equals(file.getLocation().toOSString())) {
+				String fileName = getInput(config);
+				if (file.getLocation().toOSString().equals(fileName)) {
 					configs.add(config);
 				}
 			}
@@ -261,20 +263,26 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 	}
 
 	/**
-	 * Returns the identifier of the input field of the back-end set in the
-	 * given configuration.
+	 * Returns the input field of the back-end set in the given configuration.
 	 * 
 	 * @param configuration
 	 *            a launch configuration (or a copy of)
-	 * @return the identifier of the input field
+	 * @return the identifier of the input field, or <code>null</code> if not
+	 *         set.
 	 * @throws CoreException
 	 *             if something goes wrong with the configuration
 	 */
-	private String getInputId(ILaunchConfiguration configuration)
+	private String getInput(ILaunchConfiguration configuration)
 			throws CoreException {
-		BackendFactory factory = BackendFactory.getInstance();
-		String backend = configuration.getAttribute(BACKEND, "");
-		return factory.getInputId(backend);
+		String input = configuration.getAttribute(XDF_FILE, "");
+		if (input.isEmpty()) {
+			input = configuration.getAttribute(VTL_FOLDER, "");
+			if (input.isEmpty()) {
+				return null;
+			}
+		}
+
+		return input;
 	}
 
 	public IResource getLaunchableResource(IEditorPart editorpart) {

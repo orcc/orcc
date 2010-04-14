@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_FILE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 
 import java.io.File;
 
@@ -331,7 +331,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			String value = configuration.getAttribute(INPUT_FILE, "");
+			String value = configuration.getAttribute(XDF_FILE, "");
 			textNetwork.setText(value);
 
 			value = configuration.getAttribute(INPUT_STIMULUS, "");
@@ -382,7 +382,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		String value = textNetwork.getText();
-		configuration.setAttribute(INPUT_FILE, value);
+		configuration.setAttribute(XDF_FILE, value);
 
 		value = textStimulus.getText();
 		configuration.setAttribute(INPUT_STIMULUS, value);
@@ -393,7 +393,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(INPUT_FILE, "");
+		configuration.setAttribute(XDF_FILE, "");
 		configuration.setAttribute(INPUT_STIMULUS, "");
 		configuration.setAttribute(OUTPUT_FOLDER, "");
 	}

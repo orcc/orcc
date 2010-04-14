@@ -29,6 +29,7 @@
 package net.sf.orcc.debug.model;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_VTL;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
@@ -43,6 +44,7 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +56,7 @@ import java.util.List;
 import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.interpreter.InterpreterMain;
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.launching.OrccLaunchConstants;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -224,11 +227,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 	private String contents;
 
-	private String inputFile;
-
 	private ILaunch launch;
-
-	private boolean launchFE;
 
 	private IProgressMonitor monitor;
 
@@ -247,11 +246,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		this.monitor = monitor;
 		contents = "";
 		proxy = new OrccProxy();
-
-		String backend = configuration.getAttribute(BACKEND, "");
-		String optionId = BackendFactory.getInstance().getInputId(backend);
-		launchFE = !BackendFactory.getInstance().hasFEOption(backend);
-		inputFile = configuration.getAttribute(optionId, "");
 	}
 
 	@Override
@@ -309,6 +303,8 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		File file = new File(exe);
 		file.setExecutable(true);
 
+		String inputFile = configuration.getAttribute(
+				OrccLaunchConstants.XDF_FILE, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
 		cmdList.add(quoteFile(exe));
@@ -366,14 +362,10 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	/**
 	 * Calls one of the backends.
 	 * 
-	 * @param configuration
-	 *            The configuration.
 	 * @throws CoreException
 	 */
-	private void launchBackend(ILaunchConfiguration configuration)
-			throws CoreException {
+	private void launchBackend() throws CoreException {
 		String backend = configuration.getAttribute(BACKEND, "");
-
 		try {
 			BackendFactory factory = BackendFactory.getInstance();
 			factory.runBackend(this, configuration);
@@ -382,6 +374,41 @@ public class OrccProcess extends PlatformObject implements IProcess {
 					backend + " backend could not generate code", e);
 			throw new CoreException(status);
 		}
+	}
+
+	private void launchFrontend() throws CoreException {
+		monitor.beginTask("Compiling dataflow program", 2);
+		monitor.subTask("Launching frontend...");
+
+		try {
+			String[] cmdLine = createCmdLine();
+			process = DebugPlugin.exec(cmdLine, null);
+		} catch (IOException e) {
+			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+					"I/O error", e);
+			throw new CoreException(status);
+		}
+
+		// read from process
+		ReadingThread t1 = new ReadingThread(process.getErrorStream(),
+				(OrccMonitor) proxy.getErrorStreamMonitor());
+		ReadingThread t2 = new ReadingThread(process.getInputStream(),
+				(OrccMonitor) proxy.getOutputStreamMonitor());
+		t1.start();
+		t2.start();
+
+		// wait for it to finish
+		try {
+			value = process.waitFor();
+
+			// wait for reading threads to finish
+			t1.join();
+			t2.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		write("Orcc frontend exit code: " + value + "\n");
 	}
 
 	/**
@@ -404,11 +431,14 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 		boolean enableTraces = configuration.getAttribute(ENABLE_TRACES,
 				DEFAULT_TRACES);
+
+		String xdfFile = configuration.getAttribute(XDF_FILE, "");
+
 		try {
 			// Get interpreter instance and configure it
 			InterpreterMain interpreter = new InterpreterMain();
 			interpreter.configSystem(this, monitor);
-			interpreter.configNetwork(inputFile, fifoSize, inputStimulus,
+			interpreter.configNetwork(xdfFile, fifoSize, inputStimulus,
 					enableTraces, outputFolder);
 			if (option.equals("debugger")) {
 				// Add the DebugTarget as a listener of interpreter
@@ -458,41 +488,11 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 * @throws CoreException
 	 */
 	public void start(String option) throws CoreException {
-
+		boolean launchFE = configuration.getAttribute(COMPILE_VTL, false);
 		if (launchFE) {
-			monitor.beginTask("Compiling dataflow program", 2);
-			monitor.subTask("Launching frontend...");
-
-			try {
-				String[] cmdLine = createCmdLine();
-				process = DebugPlugin.exec(cmdLine, null);
-			} catch (IOException e) {
-				IStatus status = new Status(IStatus.ERROR,
-						OrccActivator.PLUGIN_ID, "I/O error", e);
-				throw new CoreException(status);
-			}
-
-			// read from process
-			ReadingThread t1 = new ReadingThread(process.getErrorStream(),
-					(OrccMonitor) proxy.getErrorStreamMonitor());
-			ReadingThread t2 = new ReadingThread(process.getInputStream(),
-					(OrccMonitor) proxy.getOutputStreamMonitor());
-			t1.start();
-			t2.start();
-
-			// wait for it to finish
-			try {
-				value = process.waitFor();
-
-				// wait for reading threads to finish
-				t1.join();
-				t2.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			write("Orcc frontend exit code: " + value + "\n");
+			launchFrontend();
 		}
+
 		try {
 			if (value == 0) {
 				if (option.equals("backend")) {
@@ -501,7 +501,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 					write("*********************************************"
 							+ "**********************************\n");
 					write("Launching Orcc backend...\n");
-					launchBackend(configuration);
+					launchBackend();
 					write("Orcc backend done.");
 				} else {
 					monitor.subTask("Launching simulator...");
