@@ -304,7 +304,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		file.setExecutable(true);
 
 		String inputFile = configuration.getAttribute(
-				OrccLaunchConstants.XDF_FILE, "");
+				OrccLaunchConstants.VTL_FOLDER, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
 		cmdList.add(quoteFile(exe));

@@ -41,6 +41,8 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.BuildCFG;
+import net.sf.orcc.network.Network;
+import net.sf.orcc.network.serialize.XDFWriter;
 
 /**
  * LLVM back-end.
@@ -59,6 +61,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	private LLVMActorPrinter printer;
+
+	@Override
+	protected void doInstantiation(Network network, String outputFolder) {
+		// we do not instantiate because we only want to flatten
+	}
 
 	@Override
 	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
@@ -94,7 +101,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 	}
 
-	protected void printBitcode(String execPath, String inputName, String actor) {
+	private void printBitcode(String execPath, String inputName, String actor) {
 		List<String> cmdList = new ArrayList<String>();
 		String outputName = path + File.separator + actor + ".bc";
 
@@ -112,6 +119,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 			System.err.println("Could not print bitcode : ");
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	protected void printNetwork(Network network) throws OrccException {
+		network.flatten();
+		new XDFWriter(new File(path), network);
 	}
 
 	@Override
