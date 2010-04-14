@@ -379,13 +379,16 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		}
 	}
 
-	private void popNodeStack() {
+	private boolean popNodeStack() {
+		boolean exeStmt = false;
 		NodeInfo node = nodeStack.get(nodeStackLevel - 1);
+
 		if (node.nbSubNodes > 0) {
 			if (node.subNodeIdx == node.nbSubNodes) {
 				if ((node.condition != null)
 						&& ((Boolean) node.condition.accept(exprInterpreter))) {
 					node.subNodeIdx = 0;
+					exeStmt = true;
 				} else {
 					nodeStack.remove(nodeStackLevel - 1);
 					nodeStackLevel--;
@@ -416,6 +419,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 								.getJoinNode(), null));
 					}
 					nodeStackLevel++;
+					exeStmt = true;
 				} else if (subNode instanceof WhileNode) {
 					Expression condition = ((WhileNode) subNode).getValue();
 					if ((Boolean) condition.accept(exprInterpreter)) {
@@ -424,6 +428,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 								.getNodes(), null, condition));
 						nodeStackLevel++;
 					}
+					exeStmt = true;
 				} else /* BlockNode => add instructions to stack */{
 					Iterator<Instruction> it = ((BlockNode) subNode).iterator();
 					while (it.hasNext()) {
@@ -439,12 +444,14 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				Instruction instr = instrStack.remove(0);
 				instr.accept(interpret);
 				lastVisitedLocation = instr.getLocation();
+				exeStmt = true;
 			}
 			if (instrStack.size() == 0) {
 				nodeStack.remove(nodeStackLevel - 1);
 				nodeStackLevel--;
 			}
 		}
+		return exeStmt;
 	}
 
 	@Override
@@ -468,15 +475,15 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			}
 		}
 		if (currentAction != null) {
+			while ((nodeStackLevel > 0) && (!popNodeStack()));
 			if (nodeStackLevel > 0) {
-				popNodeStack();
-				return 0;
+				return -1;
 			} else {
 				currentAction = null;
 				return 1;
 			}
 		} else {
-			return -1;
+			return 0;
 		}
 	}
 }

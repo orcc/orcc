@@ -59,7 +59,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 
 	// associated interpreter
 	private InterpreterMain fInterpreter;
-	
+
 	// containing launch object
 	private ILaunch fLaunch;
 
@@ -95,8 +95,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 *                if unable to connect to host
 	 */
 	public OrccDebugTarget(ILaunch launch, IProcess process,
-			InterpreterMain interpreter)
-			throws CoreException {
+			InterpreterMain interpreter) throws CoreException {
 		super(null);
 		fLaunch = launch;
 		fTarget = this;
@@ -128,13 +127,9 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			try {
 				if (breakpoint.isEnabled()) {
 					try {
-						// sendRequest("set "
-						// + (((ILineBreakpoint) breakpoint)
-						// .getLineNumber() - 1));
-						sendRequest(
-								"set",
-								breakpoint.getMarker().getResource().getName(),
-								(((ILineBreakpoint) breakpoint).getLineNumber()));
+						sendRequest("set", breakpoint.getMarker().getResource()
+								.getName(), (((ILineBreakpoint) breakpoint)
+								.getLineNumber()));
 					} catch (CoreException e) {
 					}
 				}
@@ -195,7 +190,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 				}
 			}
 		}
-		suspended(DebugEvent.BREAKPOINT, orccThread);
 	}
 
 	/*
@@ -208,11 +202,9 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
 		if (supportsBreakpoint(breakpoint)) {
 			try {
-				// sendRequest("clear "
-				// + ((ILineBreakpoint) breakpoint).getLineNumber());
-				sendRequest("clear",
-						breakpoint.getMarker().getResource().getName(),
-						(((ILineBreakpoint) breakpoint).getLineNumber()));
+				sendRequest("clear", breakpoint.getMarker().getResource()
+						.getName(), (((ILineBreakpoint) breakpoint)
+						.getLineNumber()));
 			} catch (CoreException e) {
 			}
 		}
@@ -330,7 +322,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @see org.eclipse.debug.core.model.IDebugTarget#hasThreads()
 	 */
 	public boolean hasThreads() throws DebugException {
-		return true; // WTB Changed per bug #138600
+		return true;
 	}
 
 	/**
@@ -375,10 +367,9 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 
 	public void propertyChange(PropertyChangeEvent event) {
 		OrccThread orccThread = threadMap.get(event.getNewValue());
-//		if (orccThread != null) {
-//			orccThread.setBreakpoints(null);
-//			orccThread.setStepping(false);
-//		}
+		 if (orccThread != null) {
+			 orccThread.setBreakpoints(null);
+		 }
 
 		if (event.getPropertyName().equals("started")) {
 			started();
@@ -386,11 +377,8 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			terminated();
 		} else if (event.getPropertyName().startsWith("resumed")) {
 			if (event.getPropertyName().endsWith("step")) {
-				if (orccThread != null) {
-					orccThread.setStepping(true);
-				}
 				resumed(DebugEvent.STEP_OVER, orccThread);
-			} else if (event.getPropertyName().endsWith("client")) {
+			}else if (event.getPropertyName().endsWith("client")) {
 				resumed(DebugEvent.CLIENT_REQUEST, orccThread);
 			}
 		} else if (event.getPropertyName().startsWith("suspended")) {
@@ -401,6 +389,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			} else if (event.getPropertyName().indexOf("breakpoint") >= 0) {
 				if (orccThread != null) {
 					breakpointHit(event.getPropertyName(), orccThread);
+					suspended(DebugEvent.BREAKPOINT, null);
 				}
 			}
 		}
@@ -423,13 +412,13 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 */
 	private void resumed(int detail, OrccThread orccThread) {
 		if (orccThread != null) {
-			orccThread.resumed();
 			orccThread.fireResumeEvent(detail);
 		} else {
 			fSuspended = false;
 			for (IThread thread : fThreads) {
 				((OrccThread) thread).fireResumeEvent(detail);
 			}
+			fireResumeEvent(detail);
 		}
 	}
 
@@ -538,13 +527,13 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 */
 	private void suspended(int detail, OrccThread orccThread) {
 		if (orccThread != null) {
-			orccThread.suspended();
 			orccThread.fireSuspendEvent(detail);
 		} else {
 			fSuspended = true;
 			for (IThread thread : fThreads) {
 				((OrccThread) thread).fireSuspendEvent(detail);
 			}
+			fireSuspendEvent(detail);
 		}
 	}
 

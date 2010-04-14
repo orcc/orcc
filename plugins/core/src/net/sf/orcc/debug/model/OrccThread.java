@@ -44,22 +44,12 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * Breakpoints this thread is suspended at or <code>null</code> if none.
 	 */
 	private IBreakpoint[] fBreakpoints;
-	/**
-	 * Whether this thread is stepping or suspended
-	 */
-	private boolean fStepping = false;
-	
-	private boolean fSuspended = true;
-
-	private boolean fTerminated = false;
 
 	private DebugThread fThread;
 	/**
 	 * Debugging objects
 	 */
 	private OrccDebugTarget target;
-
-	
 
 	/**
 	 * Constructs a new thread for the given target
@@ -79,7 +69,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
 	public boolean canResume() {
-		return isSuspended();
+		return false;
 	}
 
 	/*
@@ -88,7 +78,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
 	 */
 	public boolean canStepInto() {
-		return isSuspended();
+		return isSuspended() && isStepping();
 	}
 
 	/*
@@ -97,7 +87,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#canStepOver()
 	 */
 	public boolean canStepOver() {
-		return isSuspended();
+		return isSuspended() && isStepping();
 	}
 
 	/*
@@ -115,7 +105,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
 	public boolean canSuspend() {
-		return !isSuspended();
+		return false;
 	}
 
 	/*
@@ -124,7 +114,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
 	public boolean canTerminate() {
-		return !isTerminated();
+		return false;
 	}
 
 	/*
@@ -199,7 +189,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
 	public boolean isStepping() {
-		return fStepping;
+		return fThread.isStepping() && !isTerminated();
 	}
 
 	/*
@@ -208,7 +198,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
-		return fSuspended;
+		return target.isSuspended() && !isTerminated();
 	}
 	
 	/*
@@ -217,7 +207,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#isTerminated()
 	 */
 	public boolean isTerminated() {
-		return (target.isTerminated() || fTerminated);
+		return target.isTerminated();
 	}
 
 	/*
@@ -226,11 +216,6 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
-		fThread.resume();
-	}
-
-	public void resumed() {
-		fSuspended = false;
 	}
 
 	/**
@@ -243,16 +228,6 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 */
 	protected void setBreakpoints(IBreakpoint[] breakpoints) {
 		fBreakpoints = breakpoints;
-	}
-
-	/**
-	 * Sets whether this thread is stepping
-	 * 
-	 * @param stepping
-	 *            whether stepping
-	 */
-	protected void setStepping(boolean stepping) {
-		fStepping = stepping;
 	}
 
 	/*
@@ -287,11 +262,6 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
-		fThread.suspend();
-	}
-
-	public void suspended() {
-		fSuspended = true;
 	}
 
 	/*
@@ -300,7 +270,5 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
-		fThread.terminate();
-		fTerminated = true;
 	}
 }
