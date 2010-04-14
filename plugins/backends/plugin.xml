@@ -140,6 +140,39 @@
                id="net.sf.orcc.backends.deactivateFE"
                name="Deactivate frontend">
          </option>
+         <option
+               description="Whether Orcc should compile the VTL contained in the given folder"
+               id="net.sf.orcc.backends.compileVTL"
+               name="Compile VTL">
+            <checkBox>
+               <option
+                     description="The folder that contains the Video Tool Library (VTL)"
+                     id="net.sf.orcc.backends.vtlFolder"
+                     name="VTL folder">
+                  <browseFile
+                        folder="true"
+                        workspace="true">
+                  </browseFile>
+               </option>
+            </checkBox>
+         </option>
+         <option
+               description="Whether Orcc should compile the given hierarchical XDF network"
+               id="net.sf.orcc.backends.compileXdfNetwork"
+               name="Compile XDF Network">
+            <checkBox>
+               <option
+                     description="Specify the top-level file to compile"
+                     id="net.sf.orcc.backends.xdfInputFile"
+                     name="XDF file">
+                  <browseFile
+                        extension="xdf"
+                        folder="false"
+                        workspace="true">
+                  </browseFile>
+               </option>
+            </checkBox>
+         </option>
    </extension>
 
 </plugin>
