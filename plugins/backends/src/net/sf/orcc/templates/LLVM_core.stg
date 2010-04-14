@@ -175,8 +175,8 @@ SwitchOp(intty, value, defaultdest, labelpairs) ::= <<
 switch $intty$ $value$, label $defaultdest$ [ $labelpairs$ ]
 >>
 
-CallOp(result, tail, cconv, ret_attrs, ty, fnty, fnptrval, function_args, fn_attrs) ::= <<
-$if(result)$$result$ = $endif$$if(tail)$ [tail] $endif$call$if(cconv)$ [cconv] $endif$$if(ret_attrs)$ [ret_attrs] $endif$ $ty$$if(fnty)$ [<fnty>*] $endif$ $fnptrval$ ($if(function_args)$$function_args$$endif$) $if(fn_attrs)$ [fn_attrs] $endif$
+CallOp(tail, cconv, ret_attrs, ty, fnty, fnptrval, function_args, fn_attrs) ::= <<
+$if(tail)$ [tail] $endif$call$if(cconv)$ [cconv] $endif$$if(ret_attrs)$ [ret_attrs] $endif$ $ty$$if(fnty)$ [<fnty>*] $endif$ $fnptrval$ ($if(function_args)$$function_args$$endif$) $if(fn_attrs)$ [fn_attrs] $endif$
 >>
 
 PhiOp(result, ty, pairs) ::= << 
@@ -223,7 +223,7 @@ switch(fsm, transitions) ::= <<
 	$SwitchOp(intty="i32", value={%$fsm$}, defaultdest="%default", labelpairs=states(transitions))$
 $transitions: {
 s_$it.sourceState$:
-	$CallOp(result={%$it.sourceState$_res}, ty="i1", fnptrval={@$it.sourceState$_state_scheduler})$
+	%$it.sourceState$_res = $CallOp(ty="i1", fnptrval={@$it.sourceState$_state_scheduler})$
 	$BrOp(cond={%$it.sourceState$_res}, iftrue="%inc_i", iffalse="%return")$
 }$
 default:
@@ -256,7 +256,7 @@ $endif$}$
 
 CastCall(result, ty, fnptrval, function_args, cast)::= <<
 $if(cast.extended)$
-$CallOp(result={%$result$_ext}, ty=ty, fnptrval=fnptrval, function_args=function_args)$
+%$result$_ext = $CallOp(ty=ty, fnptrval=fnptrval, function_args=function_args)$
 $if(cast.signed)$
 $SextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
 
@@ -265,7 +265,7 @@ $ZextOp(result={%$result$}, ty=ty, value={%$result$_ext}, ty2=result.type)$
 
 $endif$
 $else$
-$CallOp(result={%$result$_trunc}, ty=ty, fnptrval=fnptrval, function_args=function_args)$
+%$result$_trunc = $CallOp(ty=ty, fnptrval=fnptrval, function_args=function_args)$
 $TruncOp(result={%$result$}, ty=ty, value={%$result$_trunc}, ty2=result.type)$
 $endif$
 
@@ -403,7 +403,7 @@ LoadLocalPort(instr) ::= <<
 
 HasRoom(result, action, actor, port, numToken) ::= <<
 %$port$_$action$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor$_$port$})$
-$CallOp(result={%$result$32}, ty="i32", fnptrval="@hasRoom", function_args={%struct.fifo_s* %$port$_$action$, i32 $numToken$})$
+%$result$32 = $CallOp(ty="i32", fnptrval="@hasRoom", function_args={%struct.fifo_s* %$port$_$action$, i32 $numToken$})$
 $TruncOp(result={%$result$}, ty="i32", value={%$result$32}, ty2="i1")$
 >>
 
@@ -429,7 +429,7 @@ $if(call.target)$
 $if(call.cast)$
 $CastCall(result=call.target, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)), cast=call.cast)$
 $else$
-$CallOp(result={%$call.target$}, ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
+%$call.target$ = $CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
 $endif$
 $else$
 $CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
@@ -455,7 +455,7 @@ $PhiOp(result={%$phi.target$}, ty=phi.target.type, pairs=phiPairs(phi))$
 
 Read(read) ::= <<
 $LoadLocalPort(read)$
-$CallOp(result={%$read.target$_$read.block.label$}, ty ="i8*", fnptrval="@getReadPtr", function_args={%struct.fifo_s* %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
+%$read.target$_$read.block.label$ = $CallOp(ty ="i8*", fnptrval="@getReadPtr", function_args={%struct.fifo_s* %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
 $BitcastOp(result={%$read.target$_$read.block.label$_cast}, ty="i8*", value={%$read.target$_$read.block.label$}, ty2={$ExprType(read.port)$*})$
 store $ExprType(read.port)$* %$read.target$_$read.block.label$_cast, $ExprType(read.port)$** %$read.port$
 
@@ -469,7 +469,7 @@ $CallOp(ty ="void", fnptrval="@setReadEnd", function_args={%struct.fifo_s* %end_
 
 Peek(peek) ::= <<
 $LoadLocalPort(peek)$
-$CallOp(result={%$peek.target$_$peek.block.label$}, ty ="i8*", fnptrval="@getPeekPtr", function_args={%struct.fifo_s* %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
+%$peek.target$_$peek.block.label$ = $CallOp(ty ="i8*", fnptrval="@getPeekPtr", function_args={%struct.fifo_s* %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
 $BitcastOp(result={%$peek.target$_$peek.block.label$_cast}, ty="i8*", value={%$peek.target$_$peek.block.label$}, ty2={$ExprType(peek.port)$*})$
 store $ExprType(peek.port)$* %$peek.target$_$peek.block.label$_cast, $ExprType(peek.port)$** %$peek.port$
 
@@ -477,7 +477,7 @@ store $ExprType(peek.port)$* %$peek.target$_$peek.block.label$_cast, $ExprType(p
 
 Write(write) ::= <<
 $LoadLocalPort(write)$
-$CallOp(result={%$write.target$_$write.block.label$}, ty ="i8*", fnptrval="@getWritePtr", function_args={%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
+%$write.target$_$write.block.label$ = $CallOp(ty ="i8*", fnptrval="@getWritePtr", function_args={%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
 $BitcastOp(result={%$write.target$_$write.block.label$_cast}, ty="i8*", value={%$write.target$_$write.block.label$}, ty2={$ExprType(write.port)$*})$
 store $ExprType(write.port)$* %$write.target$_$write.block.label$_cast, $ExprType(write.port)$** %$write.port$
 
@@ -501,7 +501,7 @@ $endif$
 
 HasTokens(hasTokens) ::= <<
 $LoadLocalPort(hasTokens)$
-$CallOp(result={%$hasTokens.target$32}, ty="i32", fnptrval="@hasTokens", function_args={%struct.fifo_s* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$})$
+%$hasTokens.target$32 = $CallOp(ty="i32", fnptrval="@hasTokens", function_args={%struct.fifo_s* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$})$
 $TruncOp(result={%$hasTokens.target$}, ty="i32", value={%$hasTokens.target$32}, ty2="i1")$
 
 >>

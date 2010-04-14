@@ -59,7 +59,7 @@ entry:
 
 bb:
 $if(actions)$
-	$CallOp(result="%outside_FSM_res", ty="i32", fnptrval="@outside_FSM_scheduler")$
+	%outside_FSM_res = $CallOp(ty="i32", fnptrval="@outside_FSM_scheduler")$
 	$IcmpOp(result="%outside_FSM", cond="sgt", ty="i32", op1="%outside_FSM_res", op2="0")$
 	$BrOp(cond="%outside_FSM", iftrue="%inc_i", iffalse="%fsm_state")$
 
@@ -101,7 +101,7 @@ $nextStates: {$actionTestState(it)$}$
 >>
 
 actionTestState(nextState) ::= <<
-	$CallOp(result={%isSchedulable_$nextState.action$}, ty="i1", fnptrval={@isSchedulable_$nextState.action$})$
+	%isSchedulable_$nextState.action$ = $CallOp(ty="i1", fnptrval={@isSchedulable_$nextState.action$})$
 	$BrOp(cond={%isSchedulable_$nextState.action$}, iftrue={%fire_$nextState.action$}, iffalse={%skip_$nextState.action$})$
 
 fire_$nextState.action$:
@@ -167,7 +167,7 @@ $actions:{$actionTest(action=it)$}$
 >>
 
 actionTest(action) ::= <<
-	$CallOp(result={%isSchedulable_$action$}, ty="i1", fnptrval={@isSchedulable_$action$})$
+	%isSchedulable_$action$ = $CallOp(ty="i1", fnptrval={@isSchedulable_$action$})$
 	$BrOp(cond={%isSchedulable_$action$}, iftrue={%fire_$action$}, iffalse={%skip_$action$})$
 
 fire_$action$:
