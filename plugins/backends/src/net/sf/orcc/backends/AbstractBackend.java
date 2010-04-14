@@ -342,7 +342,7 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	@Override
-	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -375,7 +375,7 @@ public abstract class AbstractBackend implements Backend {
 	 * @param text
 	 *            a string
 	 */
-	protected void write(String text) {
+	final protected void write(String text) {
 		if (process != null) {
 			process.write(text);
 		}

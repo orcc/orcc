@@ -63,14 +63,16 @@ public class JavaBackendImpl extends AbstractBackend {
 	private JavaActorPrinter printer;
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		network.flatten();
-
+	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
 		printer = new JavaActorPrinter();
 
-		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printActors(actors);
+	}
+
+	@Override
+	protected void doXdfCodeGeneration(Network network) throws OrccException {
+		network.flatten();
 	}
 
 	@Override

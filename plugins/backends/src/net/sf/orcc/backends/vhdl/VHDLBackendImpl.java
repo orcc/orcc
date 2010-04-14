@@ -67,6 +67,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	private NetworkPrinter networkPrinter;
+
 	/**
 	 * printer is protected
 	 */
