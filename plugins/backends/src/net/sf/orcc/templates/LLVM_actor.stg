@@ -2,16 +2,18 @@
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
+outputPatternRoom(port, portNumber) ::= <<
+$HasRoom(result={$action$$portNumber$_room}, action=action, port=port, numToken=pattern.(port))$
+%$action$$portNumber$_roomTest = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
+$AndOp(result={%$action$$portNumber$}, ty="i1", op1={%$action$$portNumber$_room}, op2={%$action$$portNumber$_roomTest})$
+store i1 %$action$$portNumber$, i1* %p$action$_roomTest
+>>
+
 outputPattern(pattern, action) ::= <<
 $if(rest(pattern.keys))$
 	$AllocaOp(result={%p$action$_roomTest}, type="i1")$
 	store i1 1, i1* %p$action$_roomTest
-$pattern.keys:{port|
-	$HasRoom(result={$action$$i$_room}, action=action, port=port, numToken=pattern.(port))$
-	%$action$$i$_roomTest = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
-	$AndOp(result={%$action$$i$}, ty="i1", op1={%$action$$i$_room}, op2={%$action$$i$_roomTest})$
-	store i1 %$action$$i$, i1* %p$action$_roomTest
-}$
+	$pattern.keys: {$outputPatternRoom(port=it, portNumber=i)$}$
 	%$action$_room = $LoadOp(ty="i1", pointer={%p$action$_roomTest})$
 $else$
 $pattern.keys:{port|
