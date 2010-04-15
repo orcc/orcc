@@ -1,94 +1,87 @@
-group C_network_newScheduler : C_network;
-
 ///////////////////////////////////////////////////////////////////////////////
 // Declare actors
 
+declareActor(instance) ::= "$instance.id$"
 declareActors(instances) ::= <<
-struct actor $instances: {$it.id$}; wrap, separator=", "$;
+struct actor $instances: declareActor(); wrap, separator=", "$;
 
 >>
 
+declareActorArray(instance) ::= "&$instance.id$"
+
 declareActorsArray(instances) ::= <<
-struct actor *actors[] = {$instances: {&$it.id$}; wrap, separator=", "$};
+struct actor *actors[] = {$instances: declareActorArray(); wrap, separator=", "$};
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declare successors
 
-goDeclareSuccessors(instance, successors) ::= <<
-$if(!successors.empty)$
-struct actor *$instance.id$_successors[] = {$successors: {&$it.id$}; wrap, separator=", "$};
+goDeclareSuccessor(instance) ::= "&$instance.id$"
 
+goDeclareSuccessors(instance, successors) ::= <<
+$if(!successors.empty)
+$struct actor *$instance.id$_successors[] = {$
+successors: goDeclareSuccessor(); wrap, separator=", "$};
 $endif$
 >>
 
 declareSuccessors(instances) ::= <<
-$instances: goDeclareSuccessors(instance=it, successors=network.successorsMap.(it))$
+$instances: {$goDeclareSuccessors(instance=it, successors=network.successorsMap.(it))$}$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declare connections
 
 declareConnection(source, sourcePort, target, targetPort, count) ::= <<
-struct conn_s conn_$count$ = {&fifo_$count$, &$source.id$, &$target.id$};
 
+struct conn_s conn_$count$ = {&fifo_$count$, &$source.id$, &$target.id$};
 >>
 
 tryDeclareConnection(edge, src, tgt) ::= <<
-$if (src.instance)$
-$if (tgt.instance)$
-$declareConnection(
+$if (src.instance && tgt.instance)
+$$declareConnection(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
-  count=network.connectionMap.(edge))$
-$endif$
-$endif$
+  count=network.connectionMap.(edge))$$
+endif$
 >>
 
 declareConnections(edges) ::= <<
-$edges: tryDeclareConnection(
-  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it)) $
+$edges: {$tryDeclareConnection(
+  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it))$}$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declare inputs and outputs
 
 goDeclareInputsOutputs(instance, incoming, outgoing) ::= <<
-$if(!incoming.empty)$
-struct conn_s *$instance.id$_inputs[] = {$incoming: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
-
-$endif$
-$if(!outgoing.empty)$
-struct conn_s *$instance.id$_outputs[] = {$outgoing: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
-
+$if(!incoming.empty)
+$struct conn_s *$instance.id$_inputs[] = {$incoming: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
+$endif$$
+if(!outgoing.empty)
+$struct conn_s *$instance.id$_outputs[] = {$outgoing: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
 $endif$
 >>
 
 declareInputsOutputs(instances) ::= <<
 $instances:
-  goDeclareInputsOutputs(instance=it,
+  {$goDeclareInputsOutputs(instance=it,
     incoming=network.incomingMap.(it),
-    outgoing=network.outgoingMap.(it))$
+    outgoing=network.outgoingMap.(it))$}$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define actors
 
 fillActorStruct(instance) ::= <<
-struct actor $instance.id$ = {"$instance.id$", $instance.id$_scheduler, $length(network.incomingMap.(instance))$, $length(network.outgoingMap.(instance))$, $length(network.successorsMap.(instance))$, $if(network.incomingMap.(instance).empty)$
-NULL
-$else$
-$instance.id$_inputs
-$endif$, $if(network.outgoingMap.(instance).empty)$
-NULL
-$else$
-$instance.id$_outputs
-$endif$, $if(network.successorsMap.(instance).empty)$
-NULL
-$else$
-$instance.id$_successors
-$endif$};
 
+struct actor $instance.id$ = {"$instance.id$", $instance.id$_scheduler, $
+length(network.incomingMap.(instance))$, $
+length(network.outgoingMap.(instance))$, $
+length(network.successorsMap.(instance))$, $
+if(network.incomingMap.(instance).empty)$NULL$else$$instance.id$_inputs$endif$, $
+if(network.outgoingMap.(instance).empty)$NULL$else$$instance.id$_outputs$endif$, $
+if(network.successorsMap.(instance).empty)$NULL$else$$instance.id$_successors$endif$};
 >>
 
 fillActorsStructs(instances) ::= <<
