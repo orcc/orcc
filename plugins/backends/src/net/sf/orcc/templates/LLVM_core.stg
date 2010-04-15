@@ -160,7 +160,7 @@ $ret $type$ $value$$
 else
 $ret void$
 endif$
->>  
+>>
 
 CallOp(tail, cconv, ret_attrs, ty, fnty, fnptrval, function_args, fn_attrs) ::= <<
 $if(tail)$ [tail] $endif$call$
@@ -183,9 +183,9 @@ $result$ = phi $ty$ $pairs$
 
 StoreInstr(ty, value, pty, ptr, cast) ::= <<
 $if(value.intExpr || value.booleanExpr)
-$store $pty$ $value$cast, $pty$* $pointer$$
+$store $pty$ $value$$cast$, $pty$* $ptr$$
 else
-$store $ty$ $Expr(value)$cast, $pty$* $pointer$$
+$store $ty$ $Expr(value)$$cast$, $pty$* $ptr$$
 endif$
 >>
 
@@ -520,8 +520,12 @@ b$label(whileNode.joinNode.successors)$:
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-instructions(instructions) ::= <<
-	$instructions: {$(it.class.simpleName)(it)$}$
+Instruction(instruction) ::= <<
+$(instruction.class.simpleName)(instruction)$
+>>
+
+Instructions(instructions) ::= <<
+	$instructions: Instruction()$
 >>
 
 Node(node) ::= <<
@@ -550,7 +554,7 @@ $IfNode(nodes)$
 
 
 BlockNode_cond(blockNode) ::= <<
-$instructions(blockNode.instructions)$
+$Instructions(blockNode.instructions)$
 >>
 
 // if node
@@ -558,5 +562,5 @@ BlockNode(blockNode) ::= <<
 	$BrOp(dest={%b$label(blockNode)$})$
 
 b$label(blockNode)$:
-$instructions(blockNode.instructions)$
+$Instructions(blockNode.instructions)$
 >>

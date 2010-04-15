@@ -229,14 +229,14 @@ $actionCall(action)$
 
 procedure(procedure) ::= <<
 
-define internal $procedure.returnType$ $procedure$($procedure.parameters.list: {$argumentDeclaration(it)$}; wrap, anchor, separator=", "$) {
+define internal $procedure.returnType$ $procedure$($procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", "$) {
 entry:
 $if(procedure.locals.list)$
-	$procedure.locals.list:{$variableDeclaration(it)$}$
-	
+	$procedure.locals.list: variableDeclaration()$
 $endif$
-$trunc(procedure.nodes): {$(it.class.simpleName)(it)$}$
-	$last(procedure.nodes): {$instructions(it.instructions)$}$}
+$nodes(trunc(procedure.nodes))$
+$Instructions(last(procedure.nodes).instructions)$
+}
 
 >>
 
