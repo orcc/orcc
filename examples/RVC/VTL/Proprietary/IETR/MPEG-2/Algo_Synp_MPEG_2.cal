@@ -276,8 +276,10 @@ uint(size=1) HasNonIntraQuant, uint(size=8) NonIntraQuantCoeff :
 	  	colour_desc (colour_description) --> display_param;
 	  	display_param (display_parameters) --> resync;
 	  	udata_start_code (user_data_start_code) --> check_udata;
-	  	check_udata (check_user_data) --> udata;
-	  	check_udata (check_user_data) --> resync;
+	  	
+	  	// like in Highlander, there may be only one!
+	  	// check_udata (check_user_data) --> udata;
+	  	// check_udata (check_user_data) --> resync;
 	  	udata (user_data) --> check_udata;
 	end
 	
