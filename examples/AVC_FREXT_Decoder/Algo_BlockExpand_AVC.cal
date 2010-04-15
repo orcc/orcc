@@ -169,8 +169,9 @@ actor Algo_BlockExpand_AVC (int SAMPLE_SZ)
   end
 
   schedule fsm entropie_type:
-    entropie_type	( SkipBlockExpand	) --> entropie_type;
+    entropie_type	( SkipBlockExpand	) --> SendCabacValue;
    	SendCabacValue 	( SendCabacResValue	) --> SendCabacValue;
+   
     entropie_type	( BlockExpand		) --> check_last;
 	check_last 		( check_last 		) --> check_last_done;
 	check_last_done ( read_immediate 	) --> check_last;

@@ -245,6 +245,18 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	bool CabacTerminated				:= false;
 	int getBitStreamValue;
 	bool cbp_done := false;
+	
+	/* Coeff abs level minus 1 parsing*/
+	
+	int coeff_abs := 0;
+	int Coeff_J := 0;
+	bool StartPrefix := false;
+	bool StartSuffix := false;
+	bool GetSign := false;
+	bool StopCoeff := false;
+	bool StartCoeffSignAbs := false;
+	bool StartCoeff_J_Dec := false;
+	
 	//CABAC Decode Variables
 	/* Defines the Final Value of the Cabac Decoding Process and the Index of the Cabac Compare Tbale SynElVal */
 	int ValueIndex;
@@ -2918,7 +2930,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 			
 			if AvailMbA then
-				luma4x4BlkIdxA := xW * yW;
+				luma4x4BlkIdxA := ( xW * 4 ) + yW;
 				
 				if ( mbTab[mbAddrA][mbTabMbtype] != P_Skip or 
 				     mbTab[mbAddrA][mbTabMbtype] != B_Skip or 
@@ -2958,7 +2970,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 			
 			if AvailMbB then
-				luma4x4BlkIdxB := xW * yW;
+				luma4x4BlkIdxB := ( xW * 4 ) + yW;
 				
 				if ( mbTab[mbAddrB][mbTabMbtype] != P_Skip or 
 				     mbTab[mbAddrB][mbTabMbtype] != B_Skip or 
@@ -3231,7 +3243,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	CabacParsing: action ==>
 	guard
-		CabacStartProcess
+		CabacStartProcess and CABAC_SEARCH_SYNTAX_ELEMENT != CABAC_COEFF_ABS_LEVEL_MINUS1
 	var
 		int loop
 	do
@@ -3341,8 +3353,114 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			0
 		end
 	end
+		
+	/********************** Coeff_Abs_Parsing action **********************/
 	
+	Coeff_Abs_Parsing: action ==>
+	guard
+		CabacStartProcess and CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1
+	do
 	
+		if StartPrefix then
+			if StartDecodeDecision = false and GetSign = false then
+				//give the ctxIdx
+				
+				//Get the bin Value
+				StartDecodeDecision := true;
+				//Do not give the hand to Coeff_Abs_Parsing
+				CabacStartProcess := false;
+			end
+
+			if binValDecoded = true and GetSign = false then
+				if binVal = 0 then
+					StartDecodeBypass := true;
+					CabacStartProcess := false;
+					GetSign := true;
+				else
+					StartSuffix := true;
+					coeff_abs := 2;
+					StopCoeff := true;
+					Coeff_J   := 0;
+				end	
+			end
+			
+			if binValDecoded = true and GetSign = true then
+				if binVal = 1 then
+					CabacValue := -1;
+				else
+					CabacValue := 1;
+				end
+				
+				GetSign := false;
+				//Finishing the Prefix for a 0 binVal
+				StartPrefix := false;
+			end
+			
+		end
+		
+		if StartSuffix then
+			
+			if coeff_abs < 15 then
+				if binValDecoded = false and StopCoeff then
+					//Give the ctxIdx
+					
+					StartDecodeDecision := true;	
+					//Do not give the hand to Coeff_Abs_Parsing
+					CabacStartProcess := false;
+				else
+					if binVal = 1 then
+						coeff_abs := coeff_abs + 1;
+					else
+						StopCoeff := false;
+					end
+				end
+			end
+			
+			if coeff_abs >= 15  then
+				if binValDecoded = false and StopCoeff = false then
+					StartDecodeBypass := true;
+					CabacStartProcess := false;
+				else
+					if binVal = 1 then
+						coeff_abs := coeff_abs + 1 << Coeff_J;
+						Coeff_J := Coeff_J + 1;
+					else
+						StopCoeff := true;
+						StartCoeff_J_Dec := true;
+					end
+				end
+				
+				if Coeff_J != 0  and StartCoeff_J_Dec then
+					if binValDecoded = false and StopCoeff then
+						StartDecodeBypass := true;
+						CabacStartProcess := false;
+					else
+						if binVal = 1 then
+							coeff_abs := coeff_abs + 1 << Coeff_J;
+							Coeff_J := Coeff_J -1;
+						else
+							StopCoeff := false;
+							StartCoeffSignAbs := true;
+						end
+					end
+				end
+			end	
+		end
+		
+		if StartCoeffSignAbs then
+			if binValDecoded = false then
+				StartDecodeBypass := true;
+				CabacStartProcess := false;
+			else
+				if binVal = 1 then
+					CabacValue := coeff_abs * (-1);
+				else
+					CabacValue := coeff_abs;
+				end
+			end
+		end
+	end
+
 	/********************** RenormD actions **********************/
 	
 	RenormD_Read: action ==>
