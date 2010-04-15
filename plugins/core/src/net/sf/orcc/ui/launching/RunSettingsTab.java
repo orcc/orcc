@@ -246,10 +246,19 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab implements
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			backend = configuration.getAttribute(BACKEND, "");
+			// hide options of the previously-selected back-end (if any)
+			if (backend != null && !backend.isEmpty()) {
+				List<OptionWidget> widgets = optionWidgets.get(backend);
+				OptionWidgetManager.hideOptions(widgets);
+			}
 
+			backend = configuration.getAttribute(BACKEND, "");
 			int index = comboBackend.indexOf(backend);
-			comboBackend.select(index);
+			if (index == -1) {
+				comboBackend.deselectAll();
+			} else {
+				comboBackend.select(index);
+			}
 
 			updateLaunchConfiguration = false;
 			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
@@ -264,7 +273,11 @@ public class RunSettingsTab extends AbstractLaunchConfigurationTab implements
 						configuration);
 			}
 
-			updateOptionSelection();
+			// show options of the newly-selected back-end
+			if (backend != null && !backend.isEmpty()) {
+				List<OptionWidget> widgets = optionWidgets.get(backend);
+				OptionWidgetManager.showOptions(widgets);
+			}
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
