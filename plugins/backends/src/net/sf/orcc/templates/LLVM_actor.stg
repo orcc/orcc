@@ -242,6 +242,14 @@ $Node(last(procedure.nodes))$
 
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// Parameters
+///////////////////////////////////////////////////////////////////////////////
+
+actorParameter(parameter) ::= <<
+@$parameter$ = constant $parameter.type$ undef
+
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action
@@ -261,25 +269,28 @@ actor(actor) ::= <<
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-$actor.inputs.list:{$fifo(it)$}$
+$actor.inputs.list: fifo()$
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-$actor.outputs.list:{$fifo(it)$}$
+$actor.outputs.list: fifo()$
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Parameter values of the instance
+$actor.parameters.list: actorParameter()$
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
-$actor.stateVars.list:{$stateVar(it)$}$
+$actor.stateVars.list: stateVar()$
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-$actor.procs.list:{$procedure(it)$}$
+$actor.procs.list: procedure()$
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-$actor.actions:{$action(it)$}$
+$actor.actions: action()$
 
 $if(actor.initializes)$
 ;////////////////////////////////////////////////////////////////////////////////
 ;// Initializes
-$actor.initializes:{$action(it)$}$
+$actor.initializes: action()$
 define i32 @$actor.name$_initialize() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
