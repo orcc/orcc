@@ -318,10 +318,10 @@ IfWithThenElseNodes(ifNode) ::= <<
 	$BrOp(cond=Expr(ifNode.value), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.elseNodes)$})$
 
 b$label(ifNode.thenNodes)$: 
-$nodes_cond(first(ifNode.thenNodes))$ $nodes(rest(ifNode.thenNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
+$Nodes_cond(first(ifNode.thenNodes))$ $Nodes(rest(ifNode.thenNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.elseNodes)$:
-$nodes_cond(first(ifNode.elseNodes))$ $nodes(rest(ifNode.elseNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
+$Nodes_cond(first(ifNode.elseNodes))$ $Nodes(rest(ifNode.elseNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.joinNode)$:
 
@@ -331,7 +331,7 @@ IfWithThenNode(ifNode) ::= <<
 	$BrOp(cond=Expr(ifNode.value), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.thenNodes)$: 
-$nodes_cond(first(ifNode.thenNodes))$ $nodes(rest(ifNode.thenNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
+$Nodes_cond(first(ifNode.thenNodes))$ $Nodes(rest(ifNode.thenNodes))$ $BrOp(dest ={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.joinNode)$:
 
@@ -497,8 +497,8 @@ $else$
 3
 $endif$
 $endif$
-$nodes_cond(first(ifNode.joinNode))$
-$nodes(rest(ifNode.joinNode))$
+$Nodes_cond(first(ifNode.joinNode))$
+$Nodes(rest(ifNode.joinNode))$
 
 >>
 
@@ -508,8 +508,8 @@ $BlockNode(whileNode.joinNode)$
 	$BrOp(cond=Expr(whileNode.value), iftrue={%b$label(whileNode.Nodes)$}, iffalse={%b$label(whileNode.joinNode.successors)$})$
 
 b$label(whileNode.nodes)$:
-$nodes_cond(first(whileNode.nodes))$
-$nodes(rest(whileNode.nodes))$
+$Nodes_cond(first(whileNode.nodes))$
+$Nodes(rest(whileNode.nodes))$
 	$BrOp(dest={%b$label(whileNode.joinNode)$})$
 
 b$label(whileNode.joinNode.successors)$:
@@ -532,16 +532,16 @@ Node(node) ::= <<
 $(node.class.simpleName)(node)$
 >>
 
-nodes(nodes) ::= <<
+Nodes(nodes) ::= <<
 $nodes: Node()$
 >>
 
-node_cond(node) ::= <<
+Node_cond(node) ::= <<
 $({$node.class.simpleName$_cond})(node)$
 >>
 
-nodes_cond(nodes) ::= <<
-$nodes: node_cond()$
+Nodes_cond(nodes) ::= <<
+$nodes: Node_cond()$
 >>
 
 WhileNode_cond(nodes) ::= <<
@@ -551,7 +551,6 @@ $WhileNode(nodes)$
 IfNode_cond(nodes) ::= <<
 $IfNode(nodes)$
 >>
-
 
 BlockNode_cond(blockNode) ::= <<
 $Instructions(blockNode.instructions)$

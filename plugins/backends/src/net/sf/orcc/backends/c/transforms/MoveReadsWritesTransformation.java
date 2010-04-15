@@ -40,6 +40,7 @@ import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -88,8 +89,18 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 		// HOWEVER (this is something that we should change in the front-end),
 		// the last block is expected to be empty in isSchedulable functions,
 		// thus the "numInstructions > 0" test.
-		List<Instruction> instructions = BlockNode.getLast(procedure, nodes)
-				.getInstructions();
+		BlockNode block;
+		CFGNode last = nodes.get(nodes.size() - 1);
+		if (last instanceof BlockNode) {
+			block = (BlockNode) last;
+		} else if (last instanceof IfNode) {
+			block = ((IfNode) last).getJoinNode();
+		} else {
+			block = new BlockNode(procedure);
+			nodes.add(block);
+		}
+
+		List<Instruction> instructions = block.getInstructions();
 		int numInstructions = instructions.size();
 		instructions.addAll(numInstructions > 0 ? numInstructions - 1 : 0,
 				readEnds);

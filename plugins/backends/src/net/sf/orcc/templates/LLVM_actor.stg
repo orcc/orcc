@@ -234,8 +234,8 @@ entry:
 $if(procedure.locals.list)$
 	$procedure.locals.list: variableDeclaration()$
 $endif$
-$nodes(trunc(procedure.nodes))$
-$Instructions(last(procedure.nodes).instructions)$
+$Nodes(trunc(procedure.nodes))$
+$Node(last(procedure.nodes))$
 }
 
 >>
