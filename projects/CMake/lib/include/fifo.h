@@ -29,8 +29,6 @@
 #ifndef FIFO_H
 #define FIFO_H
 
-#include <string.h>
-
 struct fifo_s {
 	int elt_size;
 	int size;
@@ -44,66 +42,16 @@ static struct fifo_s fifo_##count = { sizeof(type), size, array_##count, 0, 0 };
 
 #define contents(fifo, ptr) (& (fifo)->contents[(ptr) * (fifo)->elt_size])
 
-static void *getPeekPtr(struct fifo_s *fifo, int n) {
-	return contents(fifo, fifo->read_ptr);
-}
-
-static void *getReadPtr(struct fifo_s *fifo, int n) {
-	int ptr = fifo->read_ptr;
-	fifo->read_ptr += n;
-	return contents(fifo, ptr);
-}
-
-static int hasRoom(struct fifo_s *fifo, int n) {
-	int num_free = fifo->size - fifo->write_ptr;
-	int res = (num_free >= n);
-#ifndef BRAINDEAD_FIFO
-	if (!res) {
-		// the FIFO is full, check if it is artificial
-		int num_tokens = fifo->write_ptr - fifo->read_ptr;
-		if (fifo->read_ptr >= num_tokens + n) {
-			// there is room to copy the not-read-yet tokens at the beginning of the FIFO
-			if (num_tokens > 0) {
-				// only copy if there are tokens
-				memcpy(fifo->contents, contents(fifo, fifo->read_ptr), num_tokens * fifo->elt_size);
-			}
-			fifo->read_ptr = 0;
-			fifo->write_ptr = num_tokens;
-
-			res = ((fifo->size - num_tokens) >= n);
-		}
-	}
+#ifdef DEBUG
+	extern void *getPeekPtr(struct fifo_s *fifo, int n);
+	extern void *getReadPtr(struct fifo_s *fifo, int n);
+	extern void *getWritePtr(struct fifo_s *fifo, int n);
+	extern int hasRoom(struct fifo_s *fifo, int n);
+	extern int hasTokens(struct fifo_s *fifo, int n);
+	extern void setReadEnd(struct fifo_s *fifo);
+	extern void setWriteEnd(struct fifo_s *fifo);
+#else
+	#include "fifo.inc.h"
 #endif
-	return res;
-}
-
-static int hasTokens(struct fifo_s *fifo, int n) {
-	int num_tokens = fifo->write_ptr - fifo->read_ptr;
-	int res = (num_tokens >= n);
-#ifndef BRAINDEAD_FIFO
-	if (!res) {
-		if (num_tokens == 0) {
-			// there are no tokens in the FIFO, just resets the read/write pointers
-			// this might allow fireable actions with no room on output ports to fire
-			fifo->read_ptr = 0;
-			fifo->write_ptr = 0;
-		}
-	}
-#endif
-
-	return res;
-}
-
-static void *getWritePtr(struct fifo_s *fifo, int n) {
-	int ptr = fifo->write_ptr;
-	fifo->write_ptr += n;
-	return contents(fifo, ptr);
-}
-
-static void setWriteEnd(struct fifo_s *fifo) {
-}
-
-static void setReadEnd(struct fifo_s *fifo) {
-}
 
 #endif

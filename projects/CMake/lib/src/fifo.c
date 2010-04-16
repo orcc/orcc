@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2009, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,61 +26,16 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-struct conn_s {
-	struct fifo_s *fifo;
-	struct actor *source;
-	struct actor *target;
-};
+#include "fifo.h"
 
-struct actor {
-	char *name;
-	int (*sched_func)();
-	int num_inputs;
-	int num_outputs;
-	int num_successors;
-	struct conn_s **inputs;
-	struct conn_s **outputs;
-	struct actor **successors;
-};
+#ifdef DEBUG
+#include "fifo.inc.h"
+#endif
 
-struct list_head {
-	struct list_head *prev, *next;
-	void *payload;
-};
-
-struct scheduler {
-	int num_actors;
-	struct actor **actors;
-	struct list_head schedulable;
-	struct list_head scheduled;
-};
-
-/**
- * Initializes the given scheduler.
- */
-void sched_init(struct scheduler *sched, int num_actors, struct actor **actors);
-
-/**
- * add the actor to the schedulable list
- */
-void sched_add_schedulable(struct scheduler *sched, struct actor *actor);
-
-/**
- * add the actor to the scheduled list
- */
-void sched_add_scheduled(struct scheduler *sched, struct actor *actor);
-
-/**
- * returns the next schedulable actor
- */
-struct actor *sched_get_next_schedulable(struct scheduler *sched);
-
-/**
- * returns true if this actor is schedulable
- */
-int sched_is_schedulable(struct actor *actor);
-
+#ifdef __cplusplus
+}
 #endif
