@@ -407,18 +407,16 @@ end $procedure$;
 >>
 
 VarUsed(procedure) ::= <<
-$procedure.stateVarsUsed: {$functionParameter(it)$; }; wrap$
-
+$procedure.stateVarsUsed: functionParameter(); wrap$
 >>
 
 parameters(procedure) ::= <<
-$procedure.parameters.list: {$functionParameter(it)$;}$
+$procedure.parameters.list: functionParameter()$
 >>
 
 functionParameter(variable) ::= <<
-$
-if(!variable.type.list)
-$$variable$ : $typeFunction(variable.type)$$
+$if(!variable.type.list)
+$$variable$ : $typeFunction(variable.type)$; $
 else
 $-- error !!!!! type memory type$
 endif
@@ -582,8 +580,13 @@ $
 
 switch(transitions) ::= <<
 
-$transitions: {when s_$it.sourceState$ =>
-$stateScheduler()$}$
+$transitions: switchTransition()$
+>>
+
+switchTransition(transition) ::= <<
+when s_$transition.sourceState$ =>
+  $stateScheduler(transition)$
+
 >>
 
 stateScheduler(transition) ::= <<
