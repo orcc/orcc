@@ -35,8 +35,8 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines a node that performs an operation on a port. This can be a
- * Peek, a Read or a Write.
+ * This class defines an instruction that performs an operation on a port. This
+ * can be a Peek, a Read or a Write.
  * 
  * @author Matthieu Wipliez
  * 

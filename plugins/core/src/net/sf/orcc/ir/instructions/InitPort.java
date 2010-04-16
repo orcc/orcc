@@ -34,7 +34,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 /**
  * This class does something, but only Jérôme knows what it is :D
  * 
- * @author Jérôme GORIN
+ * @author Jérôme Gorin
  * 
  */
 public class InitPort extends AbstractInstruction {

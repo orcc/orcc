@@ -11,8 +11,8 @@ int $bcast.id$_scheduler() {
 		  { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
 *tok_output_$n$ = *tok_input;
 }$	
-		setReadEnd($bcast.id$_input);
-		$bcast.outputList: { n | setWriteEnd($bcast.id$_output_$n$);}; separator="\n"$
+		setReadEnd($bcast.id$_input, 1);
+		$bcast.outputList: { n | setWriteEnd($bcast.id$_output_$n$, 1);}; separator="\n"$
 		i++;
 	}
 

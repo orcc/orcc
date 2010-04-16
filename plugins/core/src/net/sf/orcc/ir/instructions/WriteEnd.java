@@ -28,28 +28,18 @@
  */
 package net.sf.orcc.ir.instructions;
 
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Port;
-
 /**
  * This class defines a WriteEnd instruction. This node is used in code
  * generation to signal that an action has finished writing to a FIFO.
  * 
- * @author Jérôme GORIN
+ * @author Jérôme Gorin
+ * @author Matthieu Wipliez
  * 
  */
-public class WriteEnd extends AbstractInstruction {
+public class WriteEnd extends AbstractFifoInstruction {
 
-	private Port port;
-
-	public WriteEnd(Location location, Port port) {
-		super(location);
-		setPort(port);
-	}
-
-	public WriteEnd(Write node) {
-		super(node.getLocation());
-		setPort(node.getPort());
+	public WriteEnd(Write write) {
+		super(write.getLocation(), write.getPort(), write.getNumTokens(), null);
 	}
 
 	@Override
@@ -62,17 +52,9 @@ public class WriteEnd extends AbstractInstruction {
 		visitor.visit(this, args);
 	}
 
-	public Port getPort() {
-		return port;
-	}
-
-	public void setPort(Port port) {
-		this.port = port;
-	}
-
 	@Override
 	public String toString() {
-		return "writeEnd(" + getPort() + ")";
+		return "writeEnd(" + getPort() + ", " + getNumTokens() + ")";
 	}
 
 }

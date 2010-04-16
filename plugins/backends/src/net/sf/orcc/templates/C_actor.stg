@@ -97,7 +97,7 @@ $read.target$ = getReadPtr($instance.id$_$read.port$, $read.numTokens$);
 
 ReadEnd(readEnd) ::= <<
 
-setReadEnd($instance.id$_$readEnd.port$);
+setReadEnd($instance.id$_$readEnd.port$, $readEnd.numTokens$);
 >>
 
 Return(return) ::= <<
@@ -123,7 +123,7 @@ $write.target$ = getWritePtr($instance.id$_$write.port$, $write.numTokens$);
 
 WriteEnd(writeEnd) ::= <<
 
-setWriteEnd($instance.id$_$writeEnd.port$);
+setWriteEnd($instance.id$_$writeEnd.port$, $writeEnd.numTokens$);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
