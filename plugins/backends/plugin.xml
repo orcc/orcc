@@ -120,7 +120,7 @@
                defaultValue="false"
                description="Uses an experimental scheduler instead of using the default round-robin scheduler"
                id="net.sf.orcc.backends.newScheduler"
-               name="Use the experimental scheduler">
+               name="Use the experimental scheduler (not functional yet)">
             <checkBox></checkBox>
          </option>
          <option

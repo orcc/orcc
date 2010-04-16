@@ -194,8 +194,6 @@ static void scheduler() {
 						sched_add_schedulable(&my_scheduler, succ);
 					}
 				}
-				
-				sched_add_scheduled(&my_scheduler, my_actor);
 			}
 
 			my_actor = sched_get_next_schedulable(&my_scheduler);
@@ -204,9 +202,6 @@ static void scheduler() {
 #ifdef PRINT_FIRINGS
 		printf("\n");
 #endif
-		update_fifos(&my_scheduler);
-		sched_promote(&my_scheduler);
-		my_actor = sched_get_next_schedulable(&my_scheduler);
 	}
 }
 
