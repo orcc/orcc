@@ -66,8 +66,7 @@ Actor_Schedul(actor) ::= <<
     $actor.actions: printActionLocals()$  --
   begin
     if reset_n = '0' then 
-      $actor.stateVars.list: stateConst()$
-      $InitFSM(actor.actionScheduler.fsm)$      --
+      $actor.stateVars.list: stateConst()$      $InitFSM(actor.actionScheduler.fsm)$      --
       $actor.inputs.list: fifo_in_init(); separator="\n"$
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       $actor.outputs.list: Actor_out()$    --
@@ -261,6 +260,7 @@ $
 >>
 
 Read(read) ::= <<
+
 $
 if(read.unit)
 $$
@@ -285,13 +285,13 @@ $-- read multiple token not coded yet
 $
 endif
 $
-
 >>
 
 // a "return" must be transformed when the attribute "transformReturn"
 // is present, which normally only occurs when printActionSchedulerInline
 // is called
 Return(return) ::= <<
+
 $
 if(return.value)
 $$
@@ -305,10 +305,10 @@ return $return.value$;$
 $$
 endif
 $
-
 >>
 
 Store(store) ::= <<
+
 $if(store.indexes)$$
 if(store.target.variable.port)
 $
@@ -323,7 +323,6 @@ $
 $store.target$ <= $store.value$;$
 endif
 $
-
 >>
 
 Write(write) ::= <<
@@ -367,14 +366,18 @@ $instructions(blockNode.instructions)$
 
 // if node
 IfNode(ifNode) ::= <<
+
 if ($ifNode.value$) then
-  $nodes(ifNode.thenNodes)$$if(ifNode.elseNodes)$else
-  $nodes(ifNode.elseNodes)$end if;$endif$
+  $nodes(ifNode.thenNodes)$$if(ifNode.elseNodes)$
+else
+  $nodes(ifNode.elseNodes)$
+end if;$endif$
 $BlockNode(ifNode.joinNode)$
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
+
 while ($whileNode.value$) loop
   $nodes(whileNode.nodes)$$BlockNode(whileNode.joinNode)$end loop;
 >>
@@ -383,66 +386,94 @@ while ($whileNode.value$) loop
 // Prints functions
 ///////////////////////////////////////////////////////////////////////////////
 
+function(procedure, transformReturn) ::= <<
+$
+if (procedure.returnType.void)
+$procedure $procedure$($parameters(procedure.parameters.list)$dummy : std_logic) is
+$
+else
+$function $procedure$($VarUsed(procedure)$$parameters(procedure)$dummy : std_logic) $returnFunction(procedure.returnType) $ is
+$
+endif
+$$
+if(procedure.locals.list)
+$$procedure.locals.list: {$VarInFctDeclaration(it)$;$\n$}$$
+endif
+$begin
+  $procedure.nodes: {$(it.class.simpleName)(it)$}$
+end $procedure$;
+
+>>
+
+VarUsed(procedure) ::= <<
+$procedure.stateVarsUsed: {$functionParameter(it)$; }; wrap$
+
+>>
+
+parameters(procedure) ::= <<
+$procedure.parameters.list: {$functionParameter(it)$;}$
+>>
+
 functionParameter(variable) ::= <<
-$if(!(listSize(variable.type.dimensions)))$
-$variable$ : $typeFunction(variable.type)$
-$else$
--- error !!!!! type memory type
-$endif$
+$
+if(!variable.type.list)
+$$variable$ : $typeFunction(variable.type)$$
+else
+$-- error !!!!! type memory type$
+endif
+$
 >>
 
 VarInFctDeclaration(variable) ::= <<
-$variable.type.dimensions$
-$if(variable.port)$
-variable $variable$ : $typeFunction(variable.type)$
-$else$
-  $if(!(listSize(variable.type.dimensions)))$
-variable $variable$ : $typeFunction(variable.type)$
-  $else$
--- error !!!!! type memory_type
-  $endif$
-$endif$
+$
+if(variable.port)
+$  variable $variable$ : $typeFunction(variable.type)$$
+else
+$$
+  if(!variable.type.list)
+$  variable $variable$ : $typeFunction(variable.type)$$
+  else
+$  -- error !!!!! type memory_type$
+  endif
+$$
+endif
+$
 >>
 
+
 returnFunction(type) ::= <<
-$if(type.bool)$
-return std_logic 
-$else$
-$if(type.int)$
-return integer 
-$endif$
-$endif$
+$
+if(type.bool)
+$return std_logic$
+else
+$$
+  if(type.int)
+$return integer$
+  endif
+$$
+endif
+$
 >>
 
 typeFunction(type) ::= <<
-$if(type.bool)$
-std_logic 
-$else$
-$if(type.int)$
-integer
-$else$
-integer 
-$endif$
-$endif$
+$
+if(type.bool)
+$std_logic$
+else
+$$
+if(type.int)
+$integer$
+else
+$integer$
+endif
+$$
+endif
+$
 >>
 
-parameters(params) ::= <<
-$params: { $functionParameter()$; }; wrap$
->>
 
-function(procedure, transformReturn) ::= <<
-$if (procedure.returnType.void)$
-procedure $procedure$($parameters(procedure.parameters.list)$dummy : std_logic) is
-$else$
-function $procedure$($parameters(procedure.stateVarsUsed)$$parameters(procedure.parameters.list)$dummy : std_logic) $returnFunction(procedure.returnType)$is
-$endif$
 
-  $if(procedure.locals.list)$
-  $procedure.locals.list: {$VarInFctDeclaration()$;$\n$}$
-  $endif$begin
-  $procedure.nodes: {$(it.class.simpleName)(it)$}$end $procedure$;
 
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action
@@ -640,7 +671,9 @@ end architecture rtl_$actor.name$;
 
 action(action) ::= <<
 
--- TODO
-$procedure(procedure=action.body)$
+----------------------------------------------
+--  !!!!           TODO               !!!
+-- $procedure(procedure=action.body)$
+----------------------------------------------
 
 >>
