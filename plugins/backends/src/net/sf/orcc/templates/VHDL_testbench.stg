@@ -1,27 +1,32 @@
 fifo_in(port) ::= <<
-$if(port.type.bool)$
-signal $actorName$_$port.name$_data  : std_logic;$\n$
-$else$
-signal $actorName$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$
-$endif$
+$
+if(port.type.bool)
+$signal $actorName$_$port.name$_data  : std_logic;$\n$$
+else
+$signal $actorName$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+endif
+$
 signal $actorName$_$port.name$_empty : std_logic;
 signal $actorName$_$port.name$_read  : std_logic;
 
 >>
 
-
 fifo_out(port) ::= <<
 signal $actorName$_$port.name$_full  : std_logic;
-$if(last(port.name))$
-$if(port.type.bool)$
-signal $actorName$_$port.name$_data  : std_logic;$\n$
-$else$
-signal $actorName$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$
-$endif$signal $actorName$_$port.name$_write : std_logic;
-$else$
-signal $actorName$_$port.name$_data  : $port.type$;
-signal $actorName$_$port.name$_write : std_logic;
-$endif$
+$
+if(last(port.name))
+$$
+if(port.type.bool)
+$signal $actorName$_$port.name$_data  : std_logic;$\n$$
+else
+$signal $actorName$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+endif
+$signal $actorName$_$port.name$_write : std_logic;$
+else
+$signal $actorName$_$port.name$_data  : $port.type$;
+signal $actorName$_$port.name$_write : std_logic;$
+endif
+$
 
 >>
 
@@ -58,10 +63,10 @@ sig_const() ::= <<
 constant clk_period      : time := 10 ns;
 type severity_level is (note, warning, error, failure);
 type tb_type is (after_reset, read_file, CheckRead);
-$actor.inputs.list: signal_in(it)$--
-$actor.outputs.list: signal_out(it)$--
-$actor.inputs.list: fifo_in(it)$--
-$actor.outputs.list: fifo_out(it)$
+$actor.inputs.list: signal_in()$--
+$actor.outputs.list: signal_out()$--
+$actor.inputs.list: fifo_in()$--
+$actor.outputs.list: fifo_out()$
 signal count             : integer range 255 downto 0;
 signal clock             : std_logic := '0';
 signal reset_n           : std_logic;
@@ -113,13 +118,13 @@ WaveGen_Proc_In : process (reset_n, clock)
   variable line_number : line;
 begin
   if reset_n = '0' then
-    $actor.inputs.list: fifo_in_init(it)$    --
-    $actor.inputs.list: tb_FSM_init(it)$
+    $actor.inputs.list: fifo_in_init()$    --
+    $actor.inputs.list: tb_FSM_init()$
     count <= 0;
     
   elsif falling_edge(clock) then
     --
-    $actor.inputs.list:  {$case_define_in(it)$}; separator="\n"$$\n$
+    $actor.inputs.list:  {$case_define_in()$}; separator="\n"$$\n$
   end if;
 end process WaveGen_Proc_In;
 

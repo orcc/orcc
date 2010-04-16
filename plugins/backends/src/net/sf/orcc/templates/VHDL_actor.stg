@@ -110,8 +110,7 @@ begin
     --
     $actor.actions: printActionSchedulerInline(); separator="\n"$
     
-    $schedulingTest(actor.initializes)$
-    $actor.initializes$
+    $schedulingTest(actor.actions)$
     end if;
   end if;
 end process $actor.name$_proc;
@@ -202,7 +201,8 @@ $assign.target$ := $assign.value$;
 Call(call) ::= <<
 $
 if(call.target)
-$$call.target$ := $call.procedure$($call.procedure.stateVarsUsed: {$it$, }$$call.parameters: {$it$, }$'1');$
+$
+$call.target$ := $call.procedure$($call.procedure.stateVarsUsed: {$it$, }$$call.parameters: {$it$, }$'1');$
 else
 $$
 if(call.parameters)
@@ -215,6 +215,7 @@ endif
 $$
 endif
 $
+
 >>
 
 HasTokens(hasTokens) ::= <<
@@ -223,54 +224,75 @@ $hasTokens.target$ := $actor.name$_$hasTokens.port$_send;
 >>
 
 Load(load) ::= <<
-$if(load.indexes)$
-$if(load.source.variable.port)$
-$load.target$ := $load.source$;
+$
+if(load.indexes)
+$$
+if(load.source.variable.port)
+$
+$load.target$ := $load.source$;$
+else
+$
+$load.target$ := $load.source$($load.indexes : {$it$}; separator=", "$);$
+endif
+$$
+else
+$
+$load.target$ := $load.source$;$
+endif
+$
 
-$else$
-$load.target$ := $load.source$($load.indexes : {$it$}; separator=", "$);
-
-$endif$
-$else$
-$load.target$ := $load.source$; 
-
-$endif$
 >>
 
 Peek(peek) ::= <<
-$if(peek.unit)$
-$if(peek.target.type.bool)$
-$peek.target$ := $actor.name$_$peek.port$_data;$\n$
-$else$
-$if(peek.target.type.int)$
-$peek.target$ := to_integer(signed($actor.name$_$peek.port$_data));
-$else$
-$peek.target$ := to_integer(unsigned($actor.name$_$peek.port$_data));
-$endif$
-$endif$
-$else$
--- peek multiple token not coded yet
-$endif$
+$
+if(peek.unit)
+$$
+if(peek.target.type.bool)
+$$peek.target$ := $actor.name$_$peek.port$_data;$\n$$
+else
+$$
+if(peek.target.type.int)
+$$peek.target$ := to_integer(signed($actor.name$_$peek.port$_data));$
+else
+$$peek.target$ := to_integer(unsigned($actor.name$_$peek.port$_data));$
+endif
+$$
+endif
+$$
+else
+$-- peek multiple token not coded yet$
+endif
+$
+
 >>
 
 
 
 Read(read) ::= <<
-$if(read.unit)$
-$if(read.target.type.bool)$
-$read.target$ := $actor.name$_$read.port$_data;$\n$
-$else$
-$if(read.target.type.int)$
+$
+if(read.unit)
+$$
+if(read.target.type.bool)
+$$read.target$ := $actor.name$_$read.port$_data;$\n$
+$
+else
+$$
+if(read.target.type.int)
+$
 $read.target$ := to_integer(signed($actor.name$_$read.port$_data));
-$else$
-$read.target$ := to_integer(unsigned($actor.name$_$read.port$_data));
-$endif$
-$endif$
-$actor.name$_$read.port$_ack <= '1';
-$else$
--- read multiple token not coded yet
-$endif$
-
+$
+else
+$
+$read.target$ := to_integer(unsigned($actor.name$_$read.port$_data));$
+endif
+$$
+endif
+$$actor.name$_$read.port$_ack <= '1';$
+else
+$-- read multiple token not coded yet
+$
+endif
+$
 
 >>
 
@@ -295,31 +317,40 @@ $
 >>
 
 Store(store) ::= <<
-$if(store.indexes)$
-$if(store.target.variable.port)$
-$store.target$ := $store.value$;
-
-$else$
-$store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;
-
-$endif$
-$else$
-$store.target$ <= $store.value$;
-
-$endif$
+$if(store.indexes)$$
+if(store.target.variable.port)
+$
+$store.target$ := $store.value$;$
+else
+$
+$store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
+endif
+$$
+else
+$
+$store.target$ <= $store.value$;$
+endif
+$
 
 >>
 
 Write(write) ::= <<
-$if(write.target.type.bool)$
-$actor.name$_$write.port$_data <= $write.target$;$\n$
-$else$
-$if(write.target.type.int)$
-$actor.name$_$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$\n$
-$else$
-$actor.name$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$\n$
-$endif$
-$endif$
+$
+if(write.target.type.bool)
+$
+$actor.name$_$write.port$_data <= $write.target$;$\n$$
+else
+$$
+if(write.target.type.int)
+$
+$actor.name$_$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$\n$$
+else
+$
+$actor.name$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$\n$$
+endif
+$$
+endif
+$
 $actor.name$_$write.port$_write <= '1';
 
 >>
@@ -466,6 +497,11 @@ $pattern.keys:{port|$actor.name$_$port$_full = '0'}; separator=" and "$
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
+schedulingTest(actions) ::= <<
+-- Actions
+if $actions: actionTest(); separator="\nelsif "$
+>>
+
 actionTest(action) ::= <<
 (isSchedulable_$action$_go = '1') then$
 if(action.outputPattern)
@@ -479,13 +515,6 @@ endif
 $
 
 >>
-
-schedulingTest(actions) ::= <<
--- Actions
-if $actions: actionTest(); separator="\nelsif "$
->>
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
 
