@@ -32,7 +32,7 @@ extern "C" {
 
 #include "fifo.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #include "fifo.inc.h"
 #endif
 

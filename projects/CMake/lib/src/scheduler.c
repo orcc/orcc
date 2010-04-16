@@ -144,10 +144,10 @@ void sched_init(struct scheduler *sched, int num_actors, struct actor **actors) 
 int sched_is_schedulable(struct actor *actor) {
 	int i;
 	for (i = 0; i < actor->num_inputs; i++) {
-		if (!hasTokens(actor->inputs[i]->fifo, 1)) {
-			return 0;
+		if (hasTokens(actor->inputs[i]->fifo, 1)) {
+			return 1;
 		}
 	}
 
-	return 1;
+	return 0;
 }

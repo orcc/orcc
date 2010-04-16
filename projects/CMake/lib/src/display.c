@@ -288,8 +288,8 @@ int display_scheduler() {
 			height = ptr[0] * 16;
 
 			display_set_video(width, height);
-			setReadEnd(display_WIDTH);
-			setReadEnd(display_HEIGHT);
+			setReadEnd(display_WIDTH, 1);
+			setReadEnd(display_HEIGHT, 1);
 			i++;
 		}
 
@@ -298,7 +298,7 @@ int display_scheduler() {
 				display_init();
 			}
 			display_write_mb(getReadPtr(display_B, 384));
-			setReadEnd(display_B);
+			setReadEnd(display_B, 384);
 			i++;
 			res = 1;
 		} else {

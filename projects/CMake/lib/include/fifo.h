@@ -29,27 +29,34 @@
 #ifndef FIFO_H
 #define FIFO_H
 
+/** lock free fifo ring buffer structure */
 struct fifo_s {
-	int elt_size;
-	int size;
-	char *contents;
-	int read_ptr;
-	int write_ptr;
+	int elt_size; /** the size of an element */
+	int size; /** size of the ringbuffer (in elements) */
+	char *contents; /** the memory containing the ringbuffer */
+	
+	int read_ind; /** the current position of the reader */
+	int write_ind; /** the current position of the writer */
+	int fill_count; /** the fill count */
+
+	char *fifo_buffer_ptr;
+	char fifo_buffer[2048];
 };
 
+// declare FIFO with a size equal to (size)
 #define DECLARE_FIFO(type, size, count) static char array_##count[(size) * sizeof(type)]; \
-static struct fifo_s fifo_##count = { sizeof(type), size, array_##count, 0, 0 };
+static struct fifo_s fifo_##count = { sizeof(type), (size), array_##count, 0, 0 };
 
 #define contents(fifo, ptr) (& (fifo)->contents[(ptr) * (fifo)->elt_size])
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	extern void *getPeekPtr(struct fifo_s *fifo, int n);
 	extern void *getReadPtr(struct fifo_s *fifo, int n);
 	extern void *getWritePtr(struct fifo_s *fifo, int n);
 	extern int hasRoom(struct fifo_s *fifo, int n);
 	extern int hasTokens(struct fifo_s *fifo, int n);
-	extern void setReadEnd(struct fifo_s *fifo);
-	extern void setWriteEnd(struct fifo_s *fifo);
+	extern void setReadEnd(struct fifo_s *fifo, int n);
+	extern void setWriteEnd(struct fifo_s *fifo, int n);
 #else
 	#include "fifo.inc.h"
 #endif

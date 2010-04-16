@@ -40,9 +40,11 @@ struct actor {
 	int (*sched_func)();
 	int num_inputs;
 	int num_outputs;
+	int num_predecessors;
 	int num_successors;
 	struct conn_s **inputs;
 	struct conn_s **outputs;
+	struct actor **predecessors;
 	struct actor **successors;
 };
 

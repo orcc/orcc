@@ -268,19 +268,19 @@ int Compare_scheduler() {
 			width = ptr[0] * 16;
 			ptr = getReadPtr(Compare_HEIGHT, 1);
 			height = ptr[0] * 16;
-			if (init==1){
+			if (init == 1) {
 				Compare_init(width, height);
 				init=0;
 			}
-			setReadEnd(Compare_WIDTH);
-			setReadEnd(Compare_HEIGHT);
 
+			setReadEnd(Compare_WIDTH, 1);
+			setReadEnd(Compare_HEIGHT, 1);
 		}
 
 		if (hasTokens(Compare_B, 384)) {
 			Compare_write_mb(getReadPtr(Compare_B, 384));
 			res = 1;
-			setReadEnd(Compare_B);
+			setReadEnd(Compare_B, 384);
 		} else {
 			res = 0;
 		}

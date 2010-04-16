@@ -89,7 +89,7 @@ int source_scheduler() {
 		}
 		i++;
 		cnt++;
-		setWriteEnd(source_O);
+		setWriteEnd(source_O, 1);
 	}
 
 	return i;
