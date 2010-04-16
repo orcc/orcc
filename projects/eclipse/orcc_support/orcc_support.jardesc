@@ -11,36 +11,11 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.actors{IActor.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.debug{SocketServerThread.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{StringType.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj{FifoManager.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.actors{IScheduler.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug{Location.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{BoolType.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{AbstractType.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug{DDPServer.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{UintType.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj{CLIParameters.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;org.json{JSONArray.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.actors{Broadcast.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj{IntFifo.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;org.json{JSONException.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.debug{AbstractActorDebug.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.actors{Actor_display.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug{DDPConstants.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;org.json{JSONObject.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;org.json{JSONTokener.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.debug{InterpreterThread.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.debug{ISchedulerDebug.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;org.json{JSONString.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{AbstractTypeVisitor.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{TypeVisitor.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{ListType.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{VoidType.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug{Variable.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type{IntType.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.actors{Actor_source.java"/>
-        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.debug{IActorDebug.java"/>
+        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug"/>
+        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.actors"/>
+        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj"/>
+        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;org.json"/>
+        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.debug.type"/>
+        <javaElement handleIdentifier="=net.sf.orcc.java/src&lt;net.sf.orcc.oj.debug"/>
     </selectedElements>
 </jardesc>
