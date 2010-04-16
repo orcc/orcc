@@ -1,5 +1,3 @@
-group VHDL_network;
-
 ///////////////////////////////////////////////////////////////////////////////
 // print signals()
 
@@ -51,22 +49,22 @@ $else$
 width => $targetPort.type.size$)$\n$
 $endif$
 port map (
-  write_data => $source.id$_$sourcePort.name$_write, 
+  wr_data    => $source.id$_$sourcePort.name$_write, 
 $if(targetPort.type.bool)$ 
   data_in(0) => $source.id$_$sourcePort.name$_data_out,$\n$
 $else$
   data_in    => $source.id$_$sourcePort.name$_data_out,$\n$
 $endif$
   full       => $source.id$_$sourcePort.name$_full, 
-  read_data  => $target.id$_$targetPort.name$_read, 
+  rd_data    => $target.id$_$targetPort.name$_read, 
 $if(targetPort.type.bool)$ 
   data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$
 $else$
   data_out   => $target.id$_$targetPort.name$_data_in,$\n$
 $endif$
   empty      => $target.id$_$targetPort.name$_empty, 
-  clock_in   => clock, 
-  clock_out  => clock, 
+  wr_clk   => clock, 
+  rd_clk  => clock, 
   reset_n    => reset_n); 
 
 

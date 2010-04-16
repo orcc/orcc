@@ -1,5 +1,3 @@
-group VHDL_testbench;
-
 fifo_in(port) ::= <<
 $if(port.type.bool)$
 signal $actorName$_$port.name$_data  : std_logic;$\n$
