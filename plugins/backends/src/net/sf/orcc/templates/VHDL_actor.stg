@@ -194,11 +194,12 @@ $variable$ <= $variable.constantValue$;
 ///////////////////////////////////////////////////////////////////////////////
 
 Assign(assign) ::= <<
-$assign.target$ := $assign.value$;
 
+$assign.target$ := $assign.value$;
 >>
 
 Call(call) ::= <<
+
 $
 if(call.target)
 $
@@ -215,37 +216,30 @@ endif
 $$
 endif
 $
-
 >>
 
 HasTokens(hasTokens) ::= <<
-$hasTokens.target$ := $actor.name$_$hasTokens.port$_send;
 
+$hasTokens.target$ := $actor.name$_$hasTokens.port$_send;
 >>
 
 Load(load) ::= <<
-$
-if(load.indexes)
-$$
-if(load.source.variable.port)
-$
-$load.target$ := $load.source$;$
-else
-$
-$load.target$ := $load.source$($load.indexes : {$it$}; separator=", "$);$
-endif
-$$
-else
-$
-$load.target$ := $load.source$;$
-endif
-$
 
+$if(load.indexes)
+$$if(load.source.variable.port)
+$$load.target$ := $load.source$;$
+else
+$$load.target$ := $load.source$($load.indexes : {$it$}; separator=", "$);$
+endif
+$$
+else
+$$load.target$ := $load.source$;$
+endif$
 >>
 
 Peek(peek) ::= <<
-$
-if(peek.unit)
+
+$if(peek.unit)
 $$
 if(peek.target.type.bool)
 $$peek.target$ := $actor.name$_$peek.port$_data;$\n$$
@@ -265,8 +259,6 @@ endif
 $
 
 >>
-
-
 
 Read(read) ::= <<
 $
@@ -303,13 +295,13 @@ Return(return) ::= <<
 $
 if(return.value)
 $$
-if(transformReturn)
+  if(transformReturn)
 $
 $procedure$_go := $return.value$;$
-else
+  else
 $
 return $return.value$;$
-endif
+  endif
 $$
 endif
 $
@@ -335,24 +327,24 @@ $
 >>
 
 Write(write) ::= <<
+
 $
 if(write.target.type.bool)
-$
-$actor.name$_$write.port$_data <= $write.target$;$\n$$
+$$actor.name$_$write.port$_data <= $write.target$;$
 else
 $$
-if(write.target.type.int)
+  if(write.target.type.int)
 $
-$actor.name$_$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$\n$$
-else
+$actor.name$_$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
+  else
 $
-$actor.name$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$\n$$
-endif
+$actor.name$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
+  endif
 $$
 endif
 $
-$actor.name$_$write.port$_write <= '1';
 
+$actor.name$_$write.port$_write <= '1';
 >>
 
 
@@ -625,7 +617,7 @@ architecture rtl_$actor.name$ of $actor.name$ is
   ---------------------------------------------------------------------------
   -- Functions and procedures
   ---------------------------------------------------------------------------
-  $actor.procs.list: function(); separator="\n"$
+  $actor.procs.list: {$function(procedure=it)$}; separator="\n"$
 
   ---------------------------------------------------------------------------
   -- FSM
