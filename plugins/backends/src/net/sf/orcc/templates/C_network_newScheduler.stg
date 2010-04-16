@@ -14,6 +14,22 @@ struct actor *actors[] = {$instances: declareActorArray(); wrap, separator=", "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Declare predecessors
+
+goDeclarePredecessor(instance) ::= "&$instance.id$"
+
+goDeclarePredecessors(instance, predecessors) ::= <<
+$if(!predecessors.empty)
+$struct actor *$instance.id$_predecessors[] = {$
+predecessors: goDeclarePredecessor(); wrap, separator=", "$};
+$endif$
+>>
+
+declarePredecessors(instances) ::= <<
+$instances: {$goDeclarePredecessors(instance=it, predecessors=network.predecessorsMap.(it))$}$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // Declare successors
 
 goDeclareSuccessor(instance) ::= "&$instance.id$"
@@ -78,9 +94,11 @@ fillActorStruct(instance) ::= <<
 struct actor $instance.id$ = {"$instance.id$", $instance.id$_scheduler, $
 length(network.incomingMap.(instance))$, $
 length(network.outgoingMap.(instance))$, $
+length(network.predecessorsMap.(instance))$, $
 length(network.successorsMap.(instance))$, $
 if(network.incomingMap.(instance).empty)$NULL$else$$instance.id$_inputs$endif$, $
 if(network.outgoingMap.(instance).empty)$NULL$else$$instance.id$_outputs$endif$, $
+if(network.predecessorsMap.(instance).empty)$NULL$else$$instance.id$_predecessors$endif$, $
 if(network.successorsMap.(instance).empty)$NULL$else$$instance.id$_successors$endif$};
 >>
 
@@ -121,6 +139,10 @@ $declareSchedulers(network.instances)$
 // Declaration of a struct actor for each actor
 
 $declareActors(network.instances)$
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of the predecessors of each actor
+
+$declarePredecessors(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the successors of each actor
 

@@ -116,6 +116,8 @@ public class Network {
 
 	private OrderedMap<GlobalVariable> parameters;
 
+	private Map<Instance, List<Instance>> predecessorsMap;
+
 	private Map<Connection, Vertex> sourceMap;
 
 	private Map<Instance, List<Instance>> successorsMap;
@@ -179,6 +181,7 @@ public class Network {
 			connectionMap.put(connection, i++);
 		}
 
+		predecessorsMap = new HashMap<Instance, List<Instance>>();
 		successorsMap = new HashMap<Instance, List<Instance>>();
 		incomingMap = new HashMap<Instance, List<Connection>>();
 		outgoingMap = new HashMap<Instance, List<Connection>>();
@@ -189,6 +192,19 @@ public class Network {
 				List<Connection> incoming = Arrays.asList(connections
 						.toArray(new Connection[0]));
 				incomingMap.put(vertex.getInstance(), incoming);
+
+				// compute predecessors
+				Set<Instance> predecessors = new HashSet<Instance>();
+				for (Connection connection : connections) {
+					Vertex source = graph.getEdgeSource(connection);
+					if (source.isInstance()) {
+						predecessors.add(source.getInstance());
+					}
+				}
+
+				List<Instance> predecessorsList = Arrays.asList(predecessors
+						.toArray(new Instance[0]));
+				predecessorsMap.put(vertex.getInstance(), predecessorsList);
 
 				// outgoing edges
 				connections = graph.outgoingEdgesOf(vertex);
@@ -426,6 +442,17 @@ public class Network {
 	 */
 	public OrderedMap<GlobalVariable> getParameters() {
 		return parameters;
+	}
+
+	/**
+	 * Returns a map that associates each instance to the list of its
+	 * predecessors.
+	 * 
+	 * @return a map that associates each instance to the list of its
+	 *         predecessors
+	 */
+	public Map<Instance, List<Instance>> getPredecessorsMap() {
+		return predecessorsMap;
 	}
 
 	/**
