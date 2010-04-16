@@ -379,7 +379,8 @@ $BlockNode(ifNode.joinNode)$
 WhileNode(whileNode) ::= <<
 
 while ($whileNode.value$) loop
-  $nodes(whileNode.nodes)$$BlockNode(whileNode.joinNode)$end loop;
+  $nodes(whileNode.nodes)$$BlockNode(whileNode.joinNode)$
+end loop;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -485,6 +486,7 @@ $procedure.nodes: {$(it.class.simpleName)(it)$}$
 
 // prints the scheduler of the given action "inline" (ie not within a function)
 printActionSchedulerInline(action) ::= <<
+
 -- tests if "$action$" action is schedulable
 $procedure(procedure=action.scheduler, transformReturn="true")$
 >>
@@ -557,47 +559,47 @@ FSM <= s_$fsm.initialState$;
 >>
 
 schedulerFSM(actions, fsm) ::= <<
+
 $
 if(actions)
-$$schedulingTest(actions)$
+$
+$schedulingTest(actions)$
 else
   case FSM is
   $switch(fsm.transitions)$
 end case;
 end if;$
 else
-$case FSM is
+$
+
+case FSM is
   $switch(fsm.transitions)$
 end case;$
 endif
 $
-
 >>
 
 
 switch(transitions) ::= <<
+
 $transitions: {when s_$it.sourceState$ =>
 $stateScheduler()$}$
 >>
 
 stateScheduler(transition) ::= <<
+$transition$
+
   -- $transition.sourceState$_state_scheduler
   $schedulingTestState(nextStates=transition.nextStateInfo)$
-
 >>
 
 schedulingTestState(nextStates) ::= <<
+
 if $nextStates: actionTestState(); separator="elsif"$end if;
-
->>
-
-// prints the action referenced by the "nextState" parameter
-// and updates the FSM state
-actionCallState(nextState) ::= <<
-$printActionBodyInline(nextState.action)$FSM <= s_$nextState.targetState$;
 >>
 
 actionTestState(nextState) ::= <<
+
 (isSchedulable_$nextState.action$_go = '1') then
   $if(nextState.action.outputPattern)$
   if ($outputPattern(nextState.action.outputPattern)$) then
@@ -606,8 +608,14 @@ actionTestState(nextState) ::= <<
   $else$
   $actionCallState(nextState)$
   $endif$
-
 >>
+
+// prints the action referenced by the "nextState" parameter
+// and updates the FSM state
+actionCallState(nextState) ::= <<
+$printActionBodyInline(nextState.action)$FSM <= s_$nextState.targetState$;
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
@@ -673,7 +681,7 @@ action(action) ::= <<
 
 ----------------------------------------------
 --  !!!!           TODO               !!!
--- $procedure(procedure=action.body)$
+ $procedure(procedure=action.body)$
 ----------------------------------------------
 
 >>
