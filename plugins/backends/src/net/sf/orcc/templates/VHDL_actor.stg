@@ -60,60 +60,60 @@ $
 
 
 Actor_Schedul(actor) ::= <<
-$actor.name$_proc : process (reset_n, clock) is
-  $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
-  --
-  $actor.actions: printActionLocals()$  --
-begin
-  if reset_n = '0' then 
-    $actor.stateVars.list: stateConst()$
-    $InitFSM(actor.actionScheduler.fsm)$    --
-    $actor.inputs.list: fifo_in_init(); separator="\n"$
-    $actor.outputs.list: fifo_out_init(); separator="\n"$
-    $actor.outputs.list: Actor_out()$    --
-  elsif rising_edge(clock) then
-    $
-    if(actor.initializes)
-    $ -- $actor.initializes: action()$$
-    endif
-    $
-    $actor.inputs.list: fifo_in_init(); separator="\n"$
-    $actor.outputs.list: fifo_out_init(); separator="\n"$
+  $actor.name$_proc : process (reset_n, clock) is
+    $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
     --
-    $actor.actions: printActionSchedulerInline(); separator="\n"$
-    $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$   
-  end if;
-end process $actor.name$_proc;
+    $actor.actions: printActionLocals()$  --
+  begin
+    if reset_n = '0' then 
+      $actor.stateVars.list: stateConst()$
+      $InitFSM(actor.actionScheduler.fsm)$      --
+      $actor.inputs.list: fifo_in_init(); separator="\n"$
+      $actor.outputs.list: fifo_out_init(); separator="\n"$
+      $actor.outputs.list: Actor_out()$    --
+    elsif rising_edge(clock) then
+      $
+      if(actor.initializes)
+      $ -- $actor.initializes: action()$$
+      endif
+      $
+      $actor.inputs.list: fifo_in_init(); separator="\n"$
+      $actor.outputs.list: fifo_out_init(); separator="\n"$
+      --
+      $actor.actions: printActionSchedulerInline(); separator="\n"$
+      $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$   
+    end if;
+  end process $actor.name$_proc;
 
 >>
 
 
 Actor_No_Schedul(actor) ::= <<
-$actor.name$_proc : process (reset_n, clock) is
-  $actor.actions: {action| $action.scheduler$_go : std_logic;}; separator="\n"$
-  --
-  $actor.actions: printActionLocals()$  --
-begin
-  if reset_n = '0' then 
-    $actor.stateVars.list: stateConst()$    --
-    $actor.inputs.list: fifo_in_init(); separator="\n"$
-    $actor.outputs.list: fifo_out_init(); separator="\n"$
-    $actor.outputs.list: Actor_out()$    --
-  elsif rising_edge(clock) then
-    $
-    if(actor.initializes)
-    $$actor.initializes: action()$$
-    endif
-    $
-    $actor.inputs.list: fifo_in_init(); separator="\n"$
-    $actor.outputs.list: fifo_out_init(); separator="\n"$
+  $actor.name$_proc : process (reset_n, clock) is
+    $actor.actions: {action| $action.scheduler$_go : std_logic;}; separator="\n"$
     --
-    $actor.actions: printActionSchedulerInline(); separator="\n"$
+    $actor.actions: printActionLocals()$  --
+  begin
+    if reset_n = '0' then 
+      $actor.stateVars.list: stateConst()$      --
+      $actor.inputs.list: fifo_in_init(); separator="\n"$
+      $actor.outputs.list: fifo_out_init(); separator="\n"$
+      $actor.outputs.list: Actor_out()$    --
+    elsif rising_edge(clock) then
+      $
+      if(actor.initializes)
+      $$actor.initializes: action()$$
+      endif
+      $
+      $actor.inputs.list: fifo_in_init(); separator="\n"$
+      $actor.outputs.list: fifo_out_init(); separator="\n"$
+      --
+      $actor.actions: printActionSchedulerInline(); separator="\n"$
     
-    $schedulingTest(actor.actions)$
+      $schedulingTest(actor.actions)$
+      end if;
     end if;
-  end if;
-end process $actor.name$_proc;
+  end process $actor.name$_proc;
 
 >>
 
@@ -376,8 +376,8 @@ $instructions(blockNode.instructions)$
 // if node
 IfNode(ifNode) ::= <<
 if ($ifNode.value$) then
-	$nodes(ifNode.thenNodes)$$if(ifNode.elseNodes)$else
-	$nodes(ifNode.elseNodes)$end if;$endif$
+  $nodes(ifNode.thenNodes)$$if(ifNode.elseNodes)$else
+  $nodes(ifNode.elseNodes)$end if;$endif$
 $BlockNode(ifNode.joinNode)$
 >>
 
@@ -506,12 +506,12 @@ actionTest(action) ::= <<
 (isSchedulable_$action$_go = '1') then$
 if(action.outputPattern)
 $
-if ($outputPattern(pattern=action.outputPattern)$) then
-  $printActionBodyInline(action)$
-end if;$
+  if ($outputPattern(pattern=action.outputPattern)$) then
+    $printActionBodyInline(action)$
+  end if;$
 else
-$$printActionBodyInline(action)$$
-endif
+$  $printActionBodyInline(action)$$
+  endif
 $
 
 >>
