@@ -243,24 +243,28 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	bool NextBitToDecode				:= true;
 	bool StartRenormDRead				:= false;
 	bool CabacTerminated				:= false;
+	bool StartDecodeBypassStart			:= false;
 	int getBitStreamValue;
 	bool cbp_done := false;
 	
 	/* Coeff abs level minus 1 parsing*/
-	
+	int numDecodAbsLevelEq1 := 1;
+	int numDecodAbsLevelGt1 := 0;
 	int coeff_abs := 0;
 	int Coeff_J := 0;
-	bool StartPrefix := false;
+	bool StartPrefix := true;
 	bool StartSuffix := false;
 	bool GetSign := false;
-	bool StopCoeff := false;
+	bool StopCoeff := true;
 	bool StartCoeffSignAbs := false;
 	bool StartCoeff_J_Dec := false;
+	
+	
 	
 	//CABAC Decode Variables
 	/* Defines the Final Value of the Cabac Decoding Process and the Index of the Cabac Compare Tbale SynElVal */
 	int ValueIndex;
-	uint CabacValue;
+	int CabacValue;
 	/* Defines the number of bins to Read, used as BinsToRead: = synElVal[ValueIndex][0] */
 	int BinsToRead;
 	
@@ -1904,7 +1908,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		CabacStartProcess := true;
 	end 
 	
-	function cabac_value() --> uint:
+	function cabac_value() --> int:
 		CabacValue
 	end	
 	
@@ -3027,6 +3031,42 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			ctxIdxInc := if ( ( blCabacIdx / NumC8x8 ) < 2 ) then blCabacIdx / NumC8x8 else 2 end;
 		end
 	end
+	
+	function Min(int a, int b) --> int:
+		if a > b then
+			b
+		else
+			a
+		end
+	end
+
+	procedure ctxIdxCoeffAbsLevel()
+	var
+		int temp
+	begin
+		if ctxBlockCat < 5 then
+			ctxIdxOffset := 227;
+		end
+		
+		
+		if binIdx = 0 then
+			if numDecodAbsLevelGt1 !=0 then
+				ctxIdxInc := 0;
+			else
+				ctxIdxInc := Min(numDecodAbsLevelEq1, 4);
+			end
+		else
+			if ctxBlockCat = 3 then
+				temp := 1;
+			else
+				temp := 0;
+			end
+			
+			ctxIdxInc := 5 + Min(4 - temp, numDecodAbsLevelGt1);
+		end
+		
+		ctxIdx := ctxIdxOffset + ctxIdxInc + ctxIdxBlockCatOffset_tab[2][ctxBlockCat];
+	end
 
 	//Derivation process for ctxIdx
 	procedure GetCtxIdx()
@@ -3362,38 +3402,52 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	do
 	
 		if StartPrefix then
-			if StartDecodeDecision = false and GetSign = false then
+			if binValDecoded = false then
+				binIdx := binIdx + 1;
 				//give the ctxIdx
-				
+				ctxIdxCoeffAbsLevel();
 				//Get the bin Value
 				StartDecodeDecision := true;
 				//Do not give the hand to Coeff_Abs_Parsing
 				CabacStartProcess := false;
+				NextBitToDecode := false;
+				// Init binIdx
+				binIdx := 0;
 			end
 
 			if binValDecoded = true and GetSign = false then
+				// Increment binIdx
+				binIdx := binIdx + 1;
 				if binVal = 0 then
 					StartDecodeBypass := true;
+					bypassFlag := true;
 					CabacStartProcess := false;
 					GetSign := true;
 				else
+					binValDecoded := false;
 					StartSuffix := true;
+					StartPrefix := false;
 					coeff_abs := 2;
 					StopCoeff := true;
 					Coeff_J   := 0;
 				end	
 			end
 			
-			if binValDecoded = true and GetSign = true then
+			if binValDecoded = true and StartDecodeBypass = false then
+				// Increment binIdx
+				binIdx := binIdx + 1;
 				if binVal = 1 then
 					CabacValue := -1;
 				else
 					CabacValue := 1;
 				end
 				
-				GetSign := false;
 				//Finishing the Prefix for a 0 binVal
 				StartPrefix := false;
+				numDecodAbsLevelEq1 := numDecodAbsLevelEq1 + 1;
+				//Stop cabac process and give the value
+				CabacStartProcess := false;
+				FoundSE := true;
 			end
 			
 		end
@@ -3403,53 +3457,71 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			if coeff_abs < 15 then
 				if binValDecoded = false and StopCoeff then
 					//Give the ctxIdx
-					
+					ctxIdxCoeffAbsLevel();
 					StartDecodeDecision := true;	
 					//Do not give the hand to Coeff_Abs_Parsing
 					CabacStartProcess := false;
 				else
+					// Increment binIdx
+					binIdx := binIdx + 1;
 					if binVal = 1 then
 						coeff_abs := coeff_abs + 1;
 					else
 						StopCoeff := false;
+						StartCoeffSignAbs := true;
+						StartSuffix := false;
 					end
+					binValDecoded := false;
 				end
 			end
 			
 			if coeff_abs >= 15  then
 				if binValDecoded = false and StopCoeff = false then
 					StartDecodeBypass := true;
+					bypassFlag := true;
 					CabacStartProcess := false;
 				else
+					// Increment binIdx
+					binIdx := binIdx + 1;
 					if binVal = 1 then
-						coeff_abs := coeff_abs + 1 << Coeff_J;
+						coeff_abs := coeff_abs + (1 << Coeff_J);
 						Coeff_J := Coeff_J + 1;
 					else
 						StopCoeff := true;
 						StartCoeff_J_Dec := true;
 					end
+					binValDecoded := false;
 				end
 				
 				if Coeff_J != 0  and StartCoeff_J_Dec then
 					if binValDecoded = false and StopCoeff then
 						StartDecodeBypass := true;
+						bypassFlag := true;
 						CabacStartProcess := false;
 					else
+						// Increment binIdx
+						binIdx := binIdx + 1;
 						if binVal = 1 then
-							coeff_abs := coeff_abs + 1 << Coeff_J;
+							coeff_abs := coeff_abs + (1 << Coeff_J);
 							Coeff_J := Coeff_J -1;
 						else
 							StopCoeff := false;
 							StartCoeffSignAbs := true;
 						end
+						binValDecoded := false;
 					end
+				else
+					StartSuffix := false;
 				end
+				
+				
 			end	
 		end
 		
 		if StartCoeffSignAbs then
 			if binValDecoded = false then
 				StartDecodeBypass := true;
+				bypassFlag := 1;
 				CabacStartProcess := false;
 			else
 				if binVal = 1 then
@@ -3457,7 +3529,23 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 				else
 					CabacValue := coeff_abs;
 				end
+				numDecodAbsLevelGt1 := numDecodAbsLevelGt1 + 1;
+				
+			
+				//Stop cabac process and give the value
+				CabacStartProcess := false;
+				FoundSE := true;
 			end
+		end
+		
+		if FoundSE then
+			// Init Coeff_Abs_Parsing
+			StartPrefix := true;
+			StartSuffix := false;
+			StartCoeffSignAbs := false;
+			binValDecoded := false;
+			binIdx := -1;
+			GetSign := false;
 		end
 	end
 
@@ -3547,7 +3635,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	/********************** DecodeBypass actions **********************/
 	
-	Start_DecodeBypass: action ==>
+	DecodeBypassRead: action ==>
 	guard
 		StartDecodeBypass and
 		bypassFlag 
@@ -3556,11 +3644,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		// Do not give the hand to CabacParsing
 		CabacStartProcess := false;
 		StartDecodeBypass := false;
+		StartDecodeBypassStart := true;
 	end
 	
-	DecodeBypass: action ==>
+	DecodeBypassStart: action ==>
 	guard
-		bypassFlag and done_reading_bits()
+		StartDecodeBypassStart and bypassFlag and done_reading_bits()
 	do
 		codIOffset := codIOffset << 1;
 		codIOffset := codIOffset | read_result();
@@ -3574,8 +3663,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		// Give the right write a bit into ReadBinString[]
 		binValDecoded := true;
-		
-		StartDecodeBypass := false;
+		bypassFlag := false;
+		StartDecodeBypassStart := false;
 		// Give the hand to CabacParsing
 		CabacStartProcess := true;
 	end
@@ -7085,21 +7174,12 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		tempCoeff := numCoeff - 1;
 		coeff_abs_level_minus1[ tempCoeff ] := cabac_value();
 		
-		//Read coeff_sign_flag[ numCoeff - 1 ]
-		GetCabacCoeffSignFlagSyntaxElement();
-		start_cabac();
-	end
-	
-	Residual_block_read_coeff_sign_flag_done: action ==>
-	guard
-		cabac_end()
-	do
-		coeff_sign_flag[ numCoeff - 1 ] := cabac_value();
-		 
-		level[ numCoeff - 1 ] := ( coeff_abs_level_minus1[ numCoeff - 1 ] + 1 ) * ( 1 - 2 * coeff_sign_flag[ numCoeff - 1 ] );
+		level[ numCoeff - 1 ] := coeff_abs_level_minus1[ numCoeff - 1 ];
 		
 		blCabacIdx := numCoeff - 2;
+		
 	end
+	
 	
 	//for( i = numCoeff - 2; i >= 0; i-- )
 	Residual_block_update_coeffLevel_start: action ==>
@@ -7111,29 +7191,19 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		start_cabac();
 	end
 	
-	Residual_block_update_coeffLevel_start_read_Coeff_Abs_done: action ==>
+	Residual_block_update_coeffLevel_read: action ==>
 	guard
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1 and cabac_end()
 	do
 		coeff_abs_level_minus1[ blCabacIdx ] := cabac_value();	
 		
-		//Read coeff_sign_flag[ numCoeff - 1 ]
-		GetCabacCoeffSignFlagSyntaxElement();
-		start_cabac();
-	end
-	
-	Residual_block_update_coeffLevel_start_read_Coeff_sign_done: action ==>
-	guard
-		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1 and cabac_end()
-	do
+		level[ blCabacIdx ] := coeff_abs_level_minus1[ blCabacIdx ];
 		
-		coeff_sign_flag[ numCoeff - 1 ] := cabac_value();
-		level[ blCabacIdx ] := ( coeff_abs_level_minus1[ blCabacIdx ] + 1 )*( 1 - 2 * coeff_sign_flag[ blCabacIdx ] );
-	
 		blCabacIdx := blCabacIdx - 1;
 	end
 	
-	Residual_block_update_coeffLevel_start_not_read: action ==>
+	
+	Residual_block_update_coeffLevel_not_read: action ==>
 	guard
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 0
 	do
@@ -7574,20 +7644,19 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_block_Cabac_read_significant_coeff_flag;
 		
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_Cabac_read_significant_coeff_flag	) --> Residual_block_read_significant_coeff_flag_done;
-		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_skip_significant_coeff_flag_while	) --> Residual_block_read_coeff_abs_level_minus1_done;
+		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_skip_significant_coeff_flag_while	) --> Residual_block_read_coeff_abs_level_minus1_first;
 		
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_read_significant_coeff_flag_done	) --> Residual_block_read_last_significant_coeff_flag;
 		
 		Residual_block_read_last_significant_coeff_flag		( Residual_block_read_last_significant_coeff_flag_done ) --> Residual_block_Cabac_read_significant_coeff_flag;
 		Residual_block_read_last_significant_coeff_flag		( Residual_block_skip_last_significant_coeff_flag	) --> Residual_block_Cabac_read_significant_coeff_flag;
 		
-		Residual_block_read_coeff_abs_level_minus1_done		( Residual_block_read_coeff_abs_level_minus1_done	) --> Residual_block_read_coeff_sign_flag_done;
-		Residual_block_read_coeff_sign_flag_done			( Residual_block_read_coeff_sign_flag_done			) --> Residual_block_update_coeffLevel;
-		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_start			) --> Residual_block_update_coeffLevel_start_read_Coeff_Abs_done;
+		Residual_block_read_coeff_abs_level_minus1_first	( Residual_block_read_coeff_abs_level_minus1_done	) --> Residual_block_update_coeffLevel;
+		
+		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_start			) --> Residual_block_update_coeffLevel_read;
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_done				) --> Residual_return;
-		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_start_not_read	) --> Residual_block_update_coeffLevel;
-		Residual_block_update_coeffLevel_start_read_Coeff_Abs_done	( Residual_block_update_coeffLevel_start_read_Coeff_Abs_done ) --> Residual_block_update_coeffLevel_start_read_Coeff_sign_done;
-		Residual_block_update_coeffLevel_start_read_Coeff_sign_done	( Residual_block_update_coeffLevel_start_read_Coeff_sign_done ) --> Residual_block_update_coeffLevel;
+		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_not_read			) --> Residual_block_update_coeffLevel;
+		Residual_block_update_coeffLevel_read				( Residual_block_update_coeffLevel_read				) --> Residual_block_update_coeffLevel;													
 	
 	end
 	
