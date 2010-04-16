@@ -11,7 +11,7 @@ endif
 $
 
 $actor.name$_$port.name$_empty : in std_logic;
-$actor.name$_$port.name$_read  : out std_logic;
+$actor.name$_$port.name$_ack  : out std_logic;
 
 >>
 
@@ -36,7 +36,7 @@ $
 >>
 
 fifo_in_init(port) ::=<<
-$actor.name$_$port.name$_read <= '0';
+$actor.name$_$port.name$_ack <= '0';
 >>
 fifo_out_init(port) ::=<<
 $actor.name$_$port.name$_write <= '0';
@@ -66,7 +66,8 @@ $actor.name$_proc : process (reset_n, clock) is
   $actor.actions: printActionLocals()$  --
 begin
   if reset_n = '0' then 
-    $actor.stateVars.list: stateConst()$$InitFSM(actor.actionScheduler.fsm)$    --
+    $actor.stateVars.list: stateConst()$
+    $InitFSM(actor.actionScheduler.fsm)$    --
     $actor.inputs.list: fifo_in_init(); separator="\n"$
     $actor.outputs.list: fifo_out_init(); separator="\n"$
     $actor.outputs.list: Actor_out()$    --
@@ -75,7 +76,8 @@ begin
     if(actor.initializes)
     $ -- $actor.initializes: action()$$
     endif
-    $$actor.inputs.list: fifo_in_init(); separator="\n"$
+    $
+    $actor.inputs.list: fifo_in_init(); separator="\n"$
     $actor.outputs.list: fifo_out_init(); separator="\n"$
     --
     $actor.actions: printActionSchedulerInline(); separator="\n"$
@@ -102,11 +104,14 @@ begin
     if(actor.initializes)
     $$actor.initializes: action()$$
     endif
-    $$actor.inputs.list: fifo_in_init(); separator="\n"$
+    $
+    $actor.inputs.list: fifo_in_init(); separator="\n"$
     $actor.outputs.list: fifo_out_init(); separator="\n"$
     --
     $actor.actions: printActionSchedulerInline(); separator="\n"$
+    
     $schedulingTest(actor.initializes)$
+    $actor.initializes$
     end if;
   end if;
 end process $actor.name$_proc;
@@ -175,6 +180,7 @@ if(variable.constantValue)
 $$declareConst(variable=variable)$$
 endif
 $
+
 >>
 
 
@@ -260,7 +266,7 @@ $else$
 $read.target$ := to_integer(unsigned($actor.name$_$read.port$_data));
 $endif$
 $endif$
-$actor.name$_$read.port$_read <= '1';
+$actor.name$_$read.port$_ack <= '1';
 $else$
 -- read multiple token not coded yet
 $endif$
@@ -272,15 +278,20 @@ $endif$
 // is present, which normally only occurs when printActionSchedulerInline
 // is called
 Return(return) ::= <<
-$if(return.value)$
-$if(transformReturn)$
-$procedure$_go := $return.value$;
+$
+if(return.value)
+$$
+if(transformReturn)
+$
+$procedure$_go := $return.value$;$
+else
+$
+return $return.value$;$
+endif
+$$
+endif
+$
 
-$else$
-return $return.value$;
-
-$endif$
-$endif$
 >>
 
 Store(store) ::= <<
@@ -479,10 +490,12 @@ if $actions: actionTest(); separator="\nelsif "$
 // Scheduler with FSM
 
 DefineFSM(actions, fsm) ::= <<
-$if(fsm)$
-type FSM_type is ($fsm.states: {s_$it$}; separator=", "$);
-signal FSM : FSM_type;
-$endif$
+$
+if(fsm)
+$type FSM_type is ($fsm.states: {s_$it$}; separator=", "$);
+signal FSM : FSM_type;$
+endif
+$
 
 >>
 
