@@ -2,7 +2,7 @@
 <feature
       id="net.sf.orcc"
       label="Orcc"
-      version="0.8.0.rc1"
+      version="0.8.0.rc2"
       provider-name="IETR/INSA Rennes">
 
    <description url="http://orcc.sf.net">
@@ -51,46 +51,6 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
    <url>
       <update url="http://orcc.sf.net/eclipse"/>
    </url>
-
-   <plugin
-         id="net.sf.orcc.frontend.linux.x86"
-         os="linux"
-         arch="x86"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.sf.orcc.frontend.linux.x86_64"
-         os="linux"
-         arch="x86_64"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.sf.orcc.frontend.win32.x86"
-         os="win32"
-         arch="x86"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="net.sf.orcc.frontend.win32.x86_64"
-         os="win32"
-         arch="x86_64"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
 
    <plugin
          id="net.sf.orcc.core"

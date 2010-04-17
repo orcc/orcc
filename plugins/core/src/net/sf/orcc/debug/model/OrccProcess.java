@@ -66,6 +66,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
@@ -253,51 +254,12 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		return !terminated;
 	}
 
-	/**
-	 * Checks that the URL that points to Orcc frontend executable is not null,
-	 * and throws a CoreException otherwise.
-	 * 
-	 * @param url
-	 * @throws CoreException
-	 */
-	private void checkUrl(URL url) throws CoreException {
-		if (url == null) {
-			String detail1 = "This may be caused by a missing cal2ir.d.byte or "
-					+ "cal2ir.native file in the fragment matching your "
-					+ "platform.";
-			IStatus s1 = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					detail1);
-
-			String detail2 = "Another cause of this problem might be that no "
-					+ "Orcc frontend is available for your platform.";
-			IStatus s2 = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					detail2);
-
-			IStatus status = new MultiStatus(OrccActivator.PLUGIN_ID, 0,
-					new IStatus[] { s1, s2 },
-					"No executable of Orcc frontend available!", null);
-			throw new CoreException(status);
-		}
-	}
-
 	private String[] createCmdLine() throws CoreException, IOException {
 		List<String> cmdList = new ArrayList<String>();
-		String exeName;
-		if (configuration.getAttribute(DEBUG_MODE, DEFAULT_DEBUG)) {
-			exeName = "cal2ir.d.byte";
-		} else {
-			exeName = "cal2ir.native";
-		}
-
-		Bundle bundle = OrccActivator.getDefault().getBundle();
-		IPath path = new Path("frontend/" + exeName);
-
-		URL url = FileLocator.find(bundle, path, null);
-		checkUrl(url);
-		url = FileLocator.toFileURL(url);
 
 		// get an OS-specific executable name
-		path = new Path(url.getPath());
+		URL url = getFrontEndURL();
+		IPath path = new Path(url.getPath());
 		String exe = path.toOSString();
 
 		File file = new File(exe);
@@ -327,6 +289,45 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		}
 
 		return cmdList.toArray(new String[] {});
+	}
+
+	/**
+	 * Returns a file:/ URL where the front-end executable can be found.
+	 * 
+	 * @return a file:/ URL where the front-end executable can be found
+	 * @throws CoreException
+	 *             if the executable can not be found
+	 * @throws IOException
+	 *             if the executable can be found but not read
+	 */
+	private URL getFrontEndURL() throws CoreException, IOException {
+		String exeName;
+		if (configuration.getAttribute(DEBUG_MODE, DEFAULT_DEBUG)) {
+			exeName = "cal2ir.d.byte";
+		} else {
+			exeName = "cal2ir.native";
+		}
+
+		String os = Platform.getOS();
+		String arch = Platform.getOSArch();
+
+		Bundle bundle = OrccActivator.getDefault().getBundle();
+		IPath path = new Path("frontend/" + os + "." + arch + "/" + exeName);
+
+		URL url = FileLocator.find(bundle, path, null);
+		if (url == null) {
+			String detail1 = "It seems that no front-end could be found "
+					+ "for your platform \"" + os + "." + arch + "\".";
+			IStatus s1 = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+					detail1);
+
+			IStatus status = new MultiStatus(OrccActivator.PLUGIN_ID, 0,
+					new IStatus[] { s1 },
+					"No executable of Orcc frontend available!", null);
+			throw new CoreException(status);
+		}
+
+		return FileLocator.toFileURL(url);
 	}
 
 	@Override
