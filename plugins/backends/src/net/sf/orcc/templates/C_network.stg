@@ -129,6 +129,10 @@ network(debugFifos, fifoSize, network) ::= <<
 #include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __APPLE__
+#include "SDL.h"
+#endif
+
 
 #include "fifo.h"
 #include "orcc_util.h"
@@ -164,8 +168,13 @@ static void scheduler() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+#ifdef __APPLE__
+int main(int argc, char *argv[]) {
+	init_orcc(argc, argv);
+#else
 int main(int argc, char *argv[], char *env[]) {
 	init_orcc(argc, argv, env);
+#endif
 
 	scheduler();
 

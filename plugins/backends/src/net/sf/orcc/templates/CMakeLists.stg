@@ -27,9 +27,15 @@ find_package(SDL_image REQUIRED)
 # Common include directories
 include_directories(\${orcc_INCLUDE_DIR} \${SDL_INCLUDE_DIR} \${SDLIMAGE_INCLUDE_DIR})
 
-add_executable ($network.name$
+set(filenames
 $network.name$.c
 $network.instances: printInstance()$)
+
+IF(APPLE)
+add_executable($network.name$ \${filenames} /Library/Frameworks/SDL.framework/Resources/SDLMain.m)
+ELSE(APPLE)
+add_executable($network.name$ \${filenames})
+ENDIF(APPLE)
 
 target_link_libraries($network.name$ \${orcc_LIBRARY} \${SDL_LIBRARY})
 

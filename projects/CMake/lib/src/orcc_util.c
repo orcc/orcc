@@ -101,8 +101,12 @@ void print_usage() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
-void init_orcc(int argc, char *argv[], char *env[]) {
-	int c;
+#ifdef __APPLE__
+void init_orcc(int argc, char *argv[]){
+#else
+void init_orcc(int argc, char *argv[], char *env[]){
+#endif
+int c;
 	const char *ostr = "i:o:";
 
 	program = argv[0];
