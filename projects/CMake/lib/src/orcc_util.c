@@ -35,6 +35,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "orcc_util.h"
+
 // define to 1 if your system has the termios.h header
 #define HAS_TERMIOS 0
 
@@ -56,7 +58,7 @@ char *input_file;
 char *yuv_file;
 
 // Pause function
-int pause() {
+void pause() {
 #ifdef _WIN32
 	printf("Press a key to continue\n");
 	_getch();
@@ -92,7 +94,7 @@ void print_and_exit(const char *msg) {
 	exit(1);
 }
 
-static const char *usage = "%s: -i <file> ...\n";
+static const char *usage = "%s: -i <file> [-o <file>]...\n";
 static char *program;
 
 void print_usage() {
@@ -101,13 +103,9 @@ void print_usage() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
-#ifdef __APPLE__
-void init_orcc(int argc, char *argv[]){
-#else
-void init_orcc(int argc, char *argv[], char *env[]){
-#endif
-int c;
+void init_orcc(int argc, char *argv[]) {
 	const char *ostr = "i:o:";
+	int c;
 
 	program = argv[0];
 	

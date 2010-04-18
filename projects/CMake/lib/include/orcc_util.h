@@ -38,14 +38,10 @@ extern char *input_file;
 extern char *yuv_file;
 
 // initialize APR and parse command-line options
-#ifdef __APPLE__
 void init_orcc(int argc, char *argv[]);
-#else
-void init_orcc(int argc, char *argv[], char *env[]);
-#endif
 
 // pause function
-int pause();
+void pause();
 
 // print usage
 void print_usage();
