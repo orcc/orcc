@@ -10,7 +10,7 @@ $$actor.name$_$port.name$_data  : in std_logic_vector($port.type.size$ -1 downto
 endif
 $
 
-$actor.name$_$port.name$_empty : in std_logic;
+$actor.name$_$port.name$_send : in std_logic;
 $actor.name$_$port.name$_ack  : out std_logic;
 
 >>
@@ -89,7 +89,7 @@ Actor_Schedul(actor) ::= <<
 
 Actor_No_Schedul(actor) ::= <<
   $actor.name$_proc : process (reset_n, clock) is
-    $actor.actions: {action| $action.scheduler$_go : std_logic;}; separator="\n"$
+    $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
     --
     $actor.actions: printActionLocals()$  --
   begin

@@ -24,7 +24,7 @@ $signal $instance.actor$_$it$_data_in   : std_logic_vector($it.type.size$ - 1 do
 endif
 $
 signal $instance.actor$_$it$_ack       : std_logic;
-signal $instance.actor$_$it$_empty     : std_logic;
+signal $instance.actor$_$it$_send      : std_logic;
 >>
 
 printSigOutput() ::= <<
@@ -103,16 +103,17 @@ else
 $  data_in    => $source.id$_$sourcePort.name$_data_out,$\n$$
 endif
 $  full       => $source.id$_$sourcePort.name$_full, 
-  rd_data    => $target.id$_$targetPort.name$_ack, 
+  rd_ack      => $target.id$_$targetPort.name$_ack, 
 $
 if(targetPort.type.bool)
 $   data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$$
 else
 $  data_out   => $target.id$_$targetPort.name$_data_in,$\n$$
 endif
-$  empty      => $target.id$_$targetPort.name$_empty, 
-  wr_clk   => clock, 
-  rd_clk  => clock, 
+$  send       => $target.id$_$targetPort.name$_send, 
+  empty      => open,
+  wr_clk     => clock, 
+  rd_clk     => clock, 
   reset_n    => reset_n); 
 >>
 
@@ -126,7 +127,7 @@ $source.id$_$sourcePort.name$_full   <= $network$_$tgt.port$_full;
 assignOut(target, targetPort) ::= <<
 
 $target.id$_$targetPort.name$_data_in <= $network$_$src.port$_data;
-$target.id$_$targetPort.name$_empty <= $network$_$src.port$_empty;
+$target.id$_$targetPort.name$_send    <= $network$_$src.port$_send;
 $network$_$src.port$_ack <= $target.id$_$targetPort.name$_ack;
 >>
 
@@ -147,8 +148,8 @@ else
 $$network$_$it$_data    : in  std_logic_vector($it.type.size$ - 1 downto 0);$\n$$
 endif
 $
-$network$_$it$_empty   : in  std_logic;
-$network$_$it$_ack    : out std_logic;
+$network$_$it$_send     : in  std_logic;
+$network$_$it$_ack      : out std_logic;
 >>
 
 printNetPortsOutput() ::= <<
@@ -174,7 +175,7 @@ $network.outputs.list: printNetsOutput(); separator="\n"$
 printNetsInput() ::= <<
 $network$_$it$_data   => $network$_$it$_data_in,
 $network$_$it$_ack    => $network$_$it$_ack,
-$network$_$it$_empty  => $network$_$it$_empty,
+$network$_$it$_send   => $network$_$it$_send,
 >>
 
 printNetsOutput() ::= <<
@@ -194,7 +195,7 @@ $instance.actor.outputs.list: printPortsOutput(); separator="\n"$
 printPortsInput() ::= <<
 $instance.actor$_$it$_data   => $instance.actor$_$it$_data_in,
 $instance.actor$_$it$_ack    => $instance.actor$_$it$_ack,
-$instance.actor$_$it$_empty  => $instance.actor$_$it$_empty,
+$instance.actor$_$it$_send   => $instance.actor$_$it$_send,
 >>
 
 printPortsOutput(it) ::= <<
