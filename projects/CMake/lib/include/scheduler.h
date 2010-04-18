@@ -31,11 +31,11 @@
 
 struct conn_s {
 	struct fifo_s *fifo;
-	struct actor *source;
-	struct actor *target;
+	struct actor_s *source;
+	struct actor_s *target;
 };
 
-struct actor {
+struct actor_s {
 	char *name;
 	int (*sched_func)();
 	int num_inputs;
@@ -44,45 +44,45 @@ struct actor {
 	int num_successors;
 	struct conn_s **inputs;
 	struct conn_s **outputs;
-	struct actor **predecessors;
-	struct actor **successors;
+	struct actor_s **predecessors;
+	struct actor_s **successors;
 };
 
-struct list_head {
-	struct list_head *prev, *next;
+struct list_s {
+	struct list_s *prev, *next;
 	void *payload;
 };
 
-struct scheduler {
+struct scheduler_s {
 	int num_actors;
-	struct actor **actors;
-	struct list_head schedulable;
-	struct list_head scheduled;
+	struct actor_s **actors;
+	struct list_s schedulable;
+	struct list_s scheduled;
 };
 
 /**
  * Initializes the given scheduler.
  */
-void sched_init(struct scheduler *sched, int num_actors, struct actor **actors);
+void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors);
 
 /**
  * add the actor to the schedulable list
  */
-void sched_add_schedulable(struct scheduler *sched, struct actor *actor);
+void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *actor);
 
 /**
  * add the actor to the scheduled list
  */
-void sched_add_scheduled(struct scheduler *sched, struct actor *actor);
+void sched_add_scheduled(struct scheduler_s *sched, struct actor_s *actor);
 
 /**
  * returns the next schedulable actor
  */
-struct actor *sched_get_next_schedulable(struct scheduler *sched);
+struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched);
 
 /**
  * returns true if this actor is schedulable
  */
-int sched_is_schedulable(struct actor *actor);
+int sched_is_schedulable(struct actor_s *actor);
 
 #endif

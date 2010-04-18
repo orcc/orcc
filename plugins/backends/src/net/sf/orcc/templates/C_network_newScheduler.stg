@@ -3,14 +3,14 @@
 
 declareActor(instance) ::= "$instance.id$"
 declareActors(instances) ::= <<
-struct actor $instances: declareActor(); wrap, separator=", "$;
+struct actor_s $instances: declareActor(); wrap, separator=", "$;
 
 >>
 
 declareActorArray(instance) ::= "&$instance.id$"
 
 declareActorsArray(instances) ::= <<
-struct actor *actors[] = {$instances: declareActorArray(); wrap, separator=", "$};
+struct actor_s *actors[] = {$instances: declareActorArray(); wrap, separator=", "$};
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ goDeclarePredecessor(instance) ::= "&$instance.id$"
 
 goDeclarePredecessors(instance, predecessors) ::= <<
 $if(!predecessors.empty)
-$struct actor *$instance.id$_predecessors[] = {$
+$struct actor_s *$instance.id$_predecessors[] = {$
 predecessors: goDeclarePredecessor(); wrap, separator=", "$};
 $endif$
 >>
@@ -36,7 +36,7 @@ goDeclareSuccessor(instance) ::= "&$instance.id$"
 
 goDeclareSuccessors(instance, successors) ::= <<
 $if(!successors.empty)
-$struct actor *$instance.id$_successors[] = {$
+$struct actor_s *$instance.id$_successors[] = {$
 successors: goDeclareSuccessor(); wrap, separator=", "$};
 $endif$
 >>
@@ -91,7 +91,7 @@ $instances:
 
 fillActorStruct(instance) ::= <<
 
-struct actor $instance.id$ = {"$instance.id$", $instance.id$_scheduler, $
+struct actor_s $instance.id$ = {"$instance.id$", $instance.id$_scheduler, $
 length(network.incomingMap.(instance))$, $
 length(network.outgoingMap.(instance))$, $
 length(network.predecessorsMap.(instance))$, $
@@ -168,8 +168,8 @@ $declareActorsArray(network.instances)$
 
 static void scheduler() {
 	int i;
-	struct actor *my_actor;
-	struct scheduler my_scheduler;
+	struct actor_s *my_actor;
+	struct scheduler_s my_scheduler;
 
 	// initializes the actors that need it
 	$printInitializes(network.instances)$
@@ -189,7 +189,7 @@ static void scheduler() {
 				// we consider its successors as schedulable
 
 				for (i = 0; i < my_actor->num_successors; i++) {
-					struct actor *succ = my_actor->successors[i];
+					struct actor_s *succ = my_actor->successors[i];
 					if (sched_is_schedulable(succ)) {
 						sched_add_schedulable(&my_scheduler, succ);
 					}
@@ -206,8 +206,8 @@ static void scheduler() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char *argv[], char *env[]) {
-	init_orcc(argc, argv, env);
+int main(int argc, char *argv[]) {
+	init_orcc(argc, argv);
 
 	scheduler();
 
