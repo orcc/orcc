@@ -1,136 +1,164 @@
 ///////////////////////////////////////////////////////////////////////////////
 // print signals()
 
-printSig(instance) ::= <<
-$if (instance.actor)$
-$instance.actor.inputs.list: printSigInput(it)$
-$instance.actor.outputs.list: printSigOutput(it)$
-$endif$
->>
-
-printSigInput(it) ::= <<
-$if(it.type.bool)$
-signal $instance.actor$_$it$_data_in   : std_logic;$\n$
-$else$
-signal $instance.actor$_$it$_data_in   : std_logic_vector($it.type.size$ - 1 downto 0);$\n$
-$endif$
-signal $instance.actor$_$it$_read      : std_logic;
-signal $instance.actor$_$it$_empty     : std_logic;
-
->>
-
-printSigOutput(it) ::= <<
-$if(it.type.bool)$
-signal $instance.actor$_$it$_data_out   : std_logic;$\n$
-$else$
-signal $instance.actor$_$it$_data_out   : std_logic_vector($it.type.size$ - 1 downto 0);$\n$
-$endif$
-signal $instance.actor$_$it$_full       : std_logic;
-signal $instance.actor$_$it$_write      : std_logic;
-
->> 
-
 printSignals(instances) ::= <<
 $instances: printSig()$
-
 >>
 
+printSig(instance) ::= <<
+$
+if(instance.actor)
+$$instance.actor.inputs.list: printSigInput()$
+$instance.actor.outputs.list: printSigOutput()$$
+endif
+$
+>>
+
+printSigInput() ::= <<
+--
+$
+if(it.type.bool)
+$signal $instance.actor$_$it$_data_in   : std_logic;$\n$$
+else
+$signal $instance.actor$_$it$_data_in   : std_logic_vector($it.type.size$ - 1 downto 0);$\n$$
+endif
+$
+signal $instance.actor$_$it$_ack       : std_logic;
+signal $instance.actor$_$it$_empty     : std_logic;
+>>
+
+printSigOutput() ::= <<
+--
+$
+if(it.type.bool)
+$signal $instance.actor$_$it$_data_out   : std_logic;$\n$$
+else
+$signal $instance.actor$_$it$_data_out   : std_logic_vector($it.type.size$ - 1 downto 0);$\n$$
+endif
+$
+signal $instance.actor$_$it$_full       : std_logic;
+signal $instance.actor$_$it$_write      : std_logic;
+>> 
 
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
-assignFifo(source, sourcePort, target, targetPort, count) ::= <<
-fifo_$count$ : entity work.fifo_generic 
-generic map (
-depth => $edge.size$,
-$if(targetPort.type.bool)$
-width => 0)$\n$
-$else$
-width => $targetPort.type.size$)$\n$
-$endif$
-port map (
-  wr_data    => $source.id$_$sourcePort.name$_write, 
-$if(targetPort.type.bool)$ 
-  data_in(0) => $source.id$_$sourcePort.name$_data_out,$\n$
-$else$
-  data_in    => $source.id$_$sourcePort.name$_data_out,$\n$
-$endif$
-  full       => $source.id$_$sourcePort.name$_full, 
-  rd_data    => $target.id$_$targetPort.name$_read, 
-$if(targetPort.type.bool)$ 
-  data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$
-$else$
-  data_out   => $target.id$_$targetPort.name$_data_in,$\n$
-$endif$
-  empty      => $target.id$_$targetPort.name$_empty, 
-  wr_clk   => clock, 
-  rd_clk  => clock, 
-  reset_n    => reset_n); 
-
-
+assignFifos(edges) ::= <<
+$edges: assignFifo()$
 >>
 
-assignIn(source, sourcePort) ::= <<
-$network$_$tgt.port$_data   <= $source.id$_$sourcePort.name$_data_out;
-$network$_$tgt.port$_write   <= $source.id$_$sourcePort.name$_write;
-$source.id$_$sourcePort.name$_full   <= $network$_$tgt.port$_full;
-
->>
-
-assignOut(target, targetPort) ::= <<
-$target.id$_$targetPort.name$_data_in <= $network$_$src.port$_data;
-$target.id$_$targetPort.name$_empty <= $network$_$src.port$_empty;
-$network$_$src.port$_read <= $target.id$_$targetPort.name$_read;
-
-
+assignFifo(edge) ::= <<
+$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$if (src.instance)$
-  $if (tgt.instance)$
-$assignFifo(
+$
+if (src.instance)
+$$
+  if (tgt.instance)
+$
+
+$doAssignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
-  count=network.connectionMap.(edge))$
-  $else$ 
-$assignIn(source=src.instance, sourcePort=edge.source)$
-  $endif$
-$else$
-  $if (tgt.instance)$
-$assignOut(target=tgt.instance, targetPort=edge.target)$
-  $endif$
-$endif$
+  count=network.connectionMap.(edge))$$
+  else
+  $
+
+$assignIn(source=src.instance, sourcePort=edge.source)$$
+  endif
+$$
+else
+$$
+  if (tgt.instance)
+  $
+
+$assignOut(target=tgt.instance, targetPort=edge.target)$$
+  endif
+  $$
+endif
+$
 >>
 
-assignFifos(edges) ::= <<
-$edges: tryAssignFifo(
-  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it)) $
+doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
+
+fifo_$count$ : entity work.fifo_generic 
+generic map (
+depth => $edge.size$,
+$
+if(targetPort.type.bool)
+$width => 0)
+$
+else
+$width => $targetPort.type.size$)
+$
+endif
+$
+port map (
+  wr_data    => $source.id$_$sourcePort.name$_write, 
+$
+if(targetPort.type.bool)
+$  data_in(0) => $source.id$_$sourcePort.name$_data_out,$\n$$
+else
+$  data_in    => $source.id$_$sourcePort.name$_data_out,$\n$$
+endif
+$  full       => $source.id$_$sourcePort.name$_full, 
+  rd_data    => $target.id$_$targetPort.name$_ack, 
+$
+if(targetPort.type.bool)
+$   data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$$
+else
+$  data_out   => $target.id$_$targetPort.name$_data_in,$\n$$
+endif
+$  empty      => $target.id$_$targetPort.name$_empty, 
+  wr_clk   => clock, 
+  rd_clk  => clock, 
+  reset_n    => reset_n); 
 >>
+
+assignIn(source, sourcePort) ::= <<
+
+$network$_$tgt.port$_data    <= $source.id$_$sourcePort.name$_data_out;
+$network$_$tgt.port$_write   <= $source.id$_$sourcePort.name$_write;
+$source.id$_$sourcePort.name$_full   <= $network$_$tgt.port$_full;
+>>
+
+assignOut(target, targetPort) ::= <<
+
+$target.id$_$targetPort.name$_data_in <= $network$_$src.port$_data;
+$target.id$_$targetPort.name$_empty <= $network$_$src.port$_empty;
+$network$_$src.port$_ack <= $target.id$_$targetPort.name$_ack;
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // print IOs of the TOP Network
 
 printNetworkPorts(network) ::= <<
-$network.inputs.list: printNetPortsInput(it); separator="\n"$
-$network.outputs.list: printNetPortsOutput(it); separator="\n"$
+$network.inputs.list: printNetPortsInput(); separator="\n"$
+$network.outputs.list: printNetPortsOutput(); separator="\n"$
 >>
 
-printNetPortsInput(it) ::= <<
-$if(it.type.bool)$
-$network$_$it$_data    : in  std_logic;$\n$
-$else$
-$network$_$it$_data    : in  std_logic_vector($it.type.size$ - 1 downto 0);$\n$
-$endif$
+printNetPortsInput() ::= <<
+$
+if(it.type.bool)
+$$network$_$it$_data    : in  std_logic;$\n$$
+else
+$$network$_$it$_data    : in  std_logic_vector($it.type.size$ - 1 downto 0);$\n$$
+endif
+$
 $network$_$it$_empty   : in  std_logic;
-$network$_$it$_read    : out std_logic;
+$network$_$it$_ack    : out std_logic;
 >>
 
-printNetPortsOutput(it) ::= <<
-$if(it.type.bool)$
-$network$_$it$_data   : out std_logic;$\n$
-$else$
-$network$_$it$_data   : out std_logic_vector($it.type.size$ - 1 downto 0);$\n$
-$endif$
+printNetPortsOutput() ::= <<
+$
+if(it.type.bool)
+$$network$_$it$_data   : out std_logic;$\n$$
+else
+$$network$_$it$_data   : out std_logic_vector($it.type.size$ - 1 downto 0);$\n$$
+endif
+$
 $network$_$it$_write      : out std_logic;
 $network$_$it$_full       : in  std_logic;
 >>
@@ -139,17 +167,17 @@ $network$_$it$_full       : in  std_logic;
 // print IOs of the Networks
 
 printNetworksPorts(network) ::= <<
-$network.inputs.list: printNetsInput(it); separator="\n"$
-$network.outputs.list: printNetsOutput(it); separator="\n"$
+$network.inputs.list: printNetsInput(); separator="\n"$
+$network.outputs.list: printNetsOutput(); separator="\n"$
 >>
 
-printNetsInput(it) ::= <<
+printNetsInput() ::= <<
 $network$_$it$_data   => $network$_$it$_data_in,
-$network$_$it$_read   => $network$_$it$_read,
+$network$_$it$_ack    => $network$_$it$_ack,
 $network$_$it$_empty  => $network$_$it$_empty,
 >>
 
-printNetsOutput(it) ::= <<
+printNetsOutput() ::= <<
 $network$_$it$_data   => $network$_$it$_data_out,
 $network$_$it$_full   => $network$_$it$_full,
 $network$_$it$_write  => $network$_$it$_write,
@@ -159,13 +187,13 @@ $network$_$it$_write  => $network$_$it$_write,
 // print IOs of the actors
 
 printActorPorts(instance) ::= <<
-$instance.actor.inputs.list: printPortsInput(it); separator="\n"$
-$instance.actor.outputs.list: printPortsOutput(it); separator="\n"$
+$instance.actor.inputs.list: printPortsInput(); separator="\n"$
+$instance.actor.outputs.list: printPortsOutput(); separator="\n"$
 >>
 
-printPortsInput(it) ::= <<
+printPortsInput() ::= <<
 $instance.actor$_$it$_data   => $instance.actor$_$it$_data_in,
-$instance.actor$_$it$_read   => $instance.actor$_$it$_read,
+$instance.actor$_$it$_ack    => $instance.actor$_$it$_ack,
 $instance.actor$_$it$_empty  => $instance.actor$_$it$_empty,
 >>
 
@@ -179,37 +207,42 @@ $instance.actor$_$it$_write  => $instance.actor$_$it$_write,
 // print actors and networks
 
 printActor(instance) ::= <<
-$if (instance.actor)$
-$if (!instance.actor.system)$
-
-$it.id$ : entity work.$it.actor$
+$
+if (instance.actor)
+$$
+  if (!instance.actor.system)
+  $
+$instance.id$ : entity work.$instance.actor$
   port map (
     $printActorPorts(instance)$
     clock            => clock, 
     reset_n          => reset_n);
-
-$endif$
-$endif$
+  $
+  endif
+  $$
+endif
+$
 >>
 
 printNetwork(instance) ::= <<
-$if (!instance.actor)$
-
-$it.id$ : entity work.$it.network$
+$
+if (!instance.actor)
+$
+$instance.id$ : entity work.$instance.network$
   generic map (
     SIZE             => SIZE) 
   port map (
     $printNetworksPorts(it.network)$
     clock            => clock, 
     reset_n          => reset_n);
-
-$endif$
+$
+endif
+$
 >>
 
 printNetAct(instances) ::= <<
-$instances: printActor()$
-$instances: printNetwork()$
-
+$instances: printActor(); separator="\n"$
+$instances: printNetwork(); separator="\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -225,8 +258,7 @@ use ieee.numeric_std.all;
 
 entity $network.name$ is
   generic (
-  SIZE : integer := $fifoSize$
-  );
+  SIZE : integer := $fifoSize$);
   port (
     $printNetworkPorts(network)$
     clock   : in std_logic;
