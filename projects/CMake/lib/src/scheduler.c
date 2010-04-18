@@ -107,22 +107,20 @@ void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *actor) {
 }
 
 void sched_add_predecessors(struct scheduler_s *sched, struct actor_s *actor) {
-	int i;
-	for (i = 0; i < actor->num_predecessors; i++) {
+	int i, n;
+	n = actor->num_predecessors;
+	for (i = 0; i < n; i++) {
 		struct actor_s *pred = actor->predecessors[i];
-		if (sched_is_schedulable(pred)) {
-			sched_add_schedulable(sched, pred);
-		}
+		sched_add_schedulable(sched, pred);
 	}
 }
 
 void sched_add_successors(struct scheduler_s *sched, struct actor_s *actor) {
-	int i;
-	for (i = 0; i < actor->num_successors; i++) {
+	int i, n;
+	n = actor->num_successors;
+	for (i = 0; i < n; i++) {
 		struct actor_s *succ = actor->successors[i];
-		if (sched_is_schedulable(succ)) {
-			sched_add_schedulable(sched, succ);
-		}
+		sched_add_schedulable(sched, succ);
 	}
 }
 

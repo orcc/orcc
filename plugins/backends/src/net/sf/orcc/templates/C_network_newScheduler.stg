@@ -180,25 +180,23 @@ static void scheduler() {
 	sched_add_schedulable(&my_scheduler, &source);
 	my_actor = sched_get_next_schedulable(&my_scheduler);
 	while (my_actor != NULL) {
-		while (my_actor != NULL) {
-			iterations++;
-			si.num_firings = 0;
-			my_actor->sched_func(&si);
+		iterations++;
+		si.num_firings = 0;
+		my_actor->sched_func(&si);
 #ifdef PRINT_FIRINGS
-			printf("%5i\t%s\n", si.num_firings, my_actor->name);
+		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 #endif
-			if (si.reason == full) {
-				sched_add_successors(&my_scheduler, my_actor);
-			} else if (si.reason == starved) {
-				sched_add_predecessors(&my_scheduler, my_actor);
-			}
-
-			my_actor = sched_get_next_schedulable(&my_scheduler);
+		if (si.reason == full) {
+			sched_add_successors(&my_scheduler, my_actor);
+		} else if (si.reason == starved) {
+			sched_add_predecessors(&my_scheduler, my_actor);
 		}
 
-#ifdef PRINT_FIRINGS
-		printf("\n");
-#endif
+		my_actor = sched_get_next_schedulable(&my_scheduler);
+
+		if (iterations % 1000 == 0) {
+			//printf("\n");
+		}
 	}
 }
 
