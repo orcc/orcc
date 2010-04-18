@@ -1,39 +1,39 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
- *     contributors may be used to endorse or promote products derived from this
- *     software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
+* Copyright (c) 2009, IETR/INSA of Rennes
+* All rights reserved.
+* 
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+* 
+*   * Redistributions of source code must retain the above copyright notice,
+*     this list of conditions and the following disclaimer.
+*   * Redistributions in binary form must reproduce the above copyright notice,
+*     this list of conditions and the following disclaimer in the documentation
+*     and/or other materials provided with the distribution.
+*   * Neither the name of the IETR/INSA of Rennes nor the names of its
+*     contributors may be used to endorse or promote products derived from this
+*     software without specific prior written permission.
+* 
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+* WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+* SUCH DAMAGE.
+*/
 
 #include "fifo.h"
 #include "orcc_util.h"
 
 // from APR
 /* Ignore Microsoft's interpretation of secure development
- * and the POSIX string handling API
- */
+* and the POSIX string handling API
+*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -75,94 +75,94 @@ static int  images = 0 ;
 
 int Filesize ( FILE *f )
 {
-   long  oldfp, fsize ;
-   
-   oldfp = ftell(f);
-   if ( oldfp < 0L ) 
-      return -1 ;
-   if ( 0 != fseek(f, 0, SEEK_END) ) 
-      return -1 ;
-   fsize = ftell(f);
-   if ( fsize < 0 ) 
-      return -1 ;
-   if ( 0 != fseek(f, oldfp, SEEK_SET) ) 
-      return -1 ;
-   return fsize ;
+	long  oldfp, fsize ;
+
+	oldfp = ftell(f);
+	if ( oldfp < 0L ) 
+		return -1 ;
+	if ( 0 != fseek(f, 0, SEEK_END) ) 
+		return -1 ;
+	fsize = ftell(f);
+	if ( fsize < 0 ) 
+		return -1 ;
+	if ( 0 != fseek(f, oldfp, SEEK_SET) ) 
+		return -1 ;
+	return fsize ;
 }
 
 static void Read_YUV_init (int xsize, int ysize, char * filename )
 {
-    if((ptfile = fopen(filename, "rb")) == NULL){
-        printf("Cannot open yuv_file concatenated input file '%s' for reading\n"
-         , filename);
-      exit( -1);
+	if((ptfile = fopen(filename, "rb")) == NULL){
+		printf("Cannot open yuv_file concatenated input file '%s' for reading\n"
+			, filename);
+		exit( -1);
 	}
 
 
-   if ( (xsize_int = xsize) == 0 ) 
-   {
-      printf("xsize %d invalid\n", xsize);
-      exit( -2);
-   }
-   if ( (ysize_int = ysize) == 0 ) 
-   {
-      printf("ysize %d invalid\n", ysize);
-      exit( -3);
-   }
+	if ( (xsize_int = xsize) == 0 ) 
+	{
+		printf("xsize %d invalid\n", xsize);
+		exit( -2);
+	}
+	if ( (ysize_int = ysize) == 0 ) 
+	{
+		printf("ysize %d invalid\n", ysize);
+		exit( -3);
+	}
 
-  NumberOfFrames = Filesize(ptfile) / (xsize * ysize + xsize * ysize / 2);
+	NumberOfFrames = Filesize(ptfile) / (xsize * ysize + xsize * ysize / 2);
 }
 
 void Read_YUV ( unsigned char *Y, unsigned char *U, unsigned char *V )
 {
 
-    /***********************/
-    /*  Declare variables  */
-    /***********************/
+	/***********************/
+	/*  Declare variables  */
+	/***********************/
 
-    /***********************/
-    /* Function's Body     */
-    /***********************/
+	/***********************/
+	/* Function's Body     */
+	/***********************/
 
-    fread(Y, sizeof(unsigned char), xsize_int * ysize_int, ptfile);
-    fread(U, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
-    fread(V, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
-    images++ ;
+	fread(Y, sizeof(unsigned char), xsize_int * ysize_int, ptfile);
+	fread(U, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
+	fread(V, sizeof(unsigned char), xsize_int * ysize_int / 4, ptfile);
+	images++ ;
 
-    if ( images == NumberOfFrames ) {
-       fseek(ptfile, 0, SEEK_SET);
-       images = 0 ;
-    }
+	if ( images == NumberOfFrames ) {
+		fseek(ptfile, 0, SEEK_SET);
+		images = 0 ;
+	}
 
 }
 
 static void DiffUcharImage ( const int x_size, const int y_size, const unsigned char *img1_uchar, const unsigned char *img2_uchar )
 {
 	/*Mes variables locales*/
-   int   i,j ;
-   int   error = 0 ;
-   
-   for ( j = 0 ; j < y_size ; j++ ) {
+	int   i,j ;
+	int   error = 0 ;
 
-	   for ( i = 0 ; i < x_size; i++ ) 
-	   {
-		   if ( abs(img1_uchar [j * x_size + i ] - img2_uchar [j * x_size + i])!=0  ) 
-		   {
-			   error++ ;
+	for ( j = 0 ; j < y_size ; j++ ) {
 
-			   if( error < 100)
-				   printf("error %d instead of %d at position : i= %d, j= %d, mb_x= %d, mb_y= %d \n", img1_uchar [j * x_size + i] , img2_uchar [j * x_size + i], i, j, i/16,j/16);
+		for ( i = 0 ; i < x_size; i++ ) 
+		{
+			if ( abs(img1_uchar [j * x_size + i ] - img2_uchar [j * x_size + i])!=0  ) 
+			{
+				error++ ;
 
-		   }
-	   }
-   }
+				if( error < 100)
+					printf("error %d instead of %d at position : i= %d, j= %d, mb_x= %d, mb_y= %d \n", img1_uchar [j * x_size + i] , img2_uchar [j * x_size + i], i, j, i/16,j/16);
 
-   if ( error != 0 ) {
-      printf("error %d !!!!!!!!!!!!!\n", error);
-      //system("pause");
-   }
- //  else
-   //   printf("OK\n");
+			}
+		}
+	}
+
+	if ( error != 0 ) {
+		printf("error %d !!!!!!!!!!!!!\n", error);
+		//system("pause");
+	}
+	//  else
+	//   printf("OK\n");
 
 }
 
@@ -259,32 +259,37 @@ static void Compare_init(int width, int height) {
 }
 static int init=1;
 
-int Compare_scheduler() {
-	int res = 1;
-	while (res) {
+void Compare_scheduler(struct schedinfo_s *si) {
+	int i = 0;
+
+	while (1) {
 		if (hasTokens(Compare_WIDTH, 1) && hasTokens(Compare_HEIGHT, 1)) {
 			short *ptr, width, height;
+
 			ptr = getReadPtr(Compare_WIDTH, 1);
 			width = ptr[0] * 16;
 			ptr = getReadPtr(Compare_HEIGHT, 1);
 			height = ptr[0] * 16;
+
 			if (init == 1) {
 				Compare_init(width, height);
-				init=0;
+				init = 0;
 			}
 
 			setReadEnd(Compare_WIDTH, 1);
 			setReadEnd(Compare_HEIGHT, 1);
+			i++;
 		}
 
 		if (hasTokens(Compare_B, 384)) {
 			Compare_write_mb(getReadPtr(Compare_B, 384));
-			res = 1;
 			setReadEnd(Compare_B, 384);
+			i++;
 		} else {
-			res = 0;
+			break;
 		}
 	}
 
-	return 0;
+	si->num_firings = i;
+	si->reason = starved;
 }

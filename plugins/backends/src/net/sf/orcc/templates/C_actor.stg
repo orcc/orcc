@@ -241,8 +241,8 @@ void $instance.id$_scheduler(struct schedinfo_s *si) {
 
 actionCallState(nextState) ::= <<
 $nextState.action.body$();
-goto l_$nextState.targetState$;
 i++;
+goto l_$nextState.targetState$;
 >>
 
 actionTestState(nextState) ::= <<
@@ -316,10 +316,11 @@ static enum states _FSM_state = s_$fsm.initialState$;
 
 $if(actions)$
 static int outside_FSM_scheduler() {
-	int res = 0;
 	int i = 0;
-	$schedulingTest(actions)$
-	return res;
+	$schedulingTest(actions)$ else {
+		return 0;
+	}
+	return 1;
 }
 $endif$
 

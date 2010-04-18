@@ -94,16 +94,36 @@ static __inline void list_init(struct list_s *list) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *actor) {
-	struct list_s *list = new_list();
-	list->payload = actor;
-	list_add_tail(&(sched->schedulable), list);
+	struct list_s *list;
+	
+	// only add the actor in the schedulable list if it is not already there
+	// like a list.contains(actor) but in O(1) instead of O(n)
+	if (!actor->in_list) {
+		list = new_list();
+		list->payload = actor;
+		list_add_tail(&(sched->schedulable), list);
+		actor->in_list = 1;
+	}
 }
 
-void sched_add_scheduled(struct scheduler_s *sched, struct actor_s *actor) {
-	struct list_s *list = new_list();
-	list->payload = actor;
-	list_add_tail(&(sched->scheduled), list);
-	printf("scheduled actor: %s\n", actor->name);
+void sched_add_predecessors(struct scheduler_s *sched, struct actor_s *actor) {
+	int i;
+	for (i = 0; i < actor->num_predecessors; i++) {
+		struct actor_s *pred = actor->predecessors[i];
+		if (sched_is_schedulable(pred)) {
+			sched_add_schedulable(sched, pred);
+		}
+	}
+}
+
+void sched_add_successors(struct scheduler_s *sched, struct actor_s *actor) {
+	int i;
+	for (i = 0; i < actor->num_successors; i++) {
+		struct actor_s *succ = actor->successors[i];
+		if (sched_is_schedulable(succ)) {
+			sched_add_schedulable(sched, succ);
+		}
+	}
 }
 
 /**
@@ -122,6 +142,9 @@ struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 	first = list->next;
 	actor = (struct actor_s *)first->payload;
 	list_remove(first);
+
+	// actor is not a member of the list anymore
+	actor->in_list = 0;
 
 	return actor;
 }

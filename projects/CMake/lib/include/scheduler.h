@@ -37,7 +37,7 @@ struct conn_s {
 
 struct actor_s {
 	char *name;
-	int (*sched_func)();
+	void (*sched_func)(struct schedinfo_s *);
 	int num_inputs;
 	int num_outputs;
 	int num_predecessors;
@@ -46,6 +46,8 @@ struct actor_s {
 	struct conn_s **outputs;
 	struct actor_s **predecessors;
 	struct actor_s **successors;
+
+	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
 };
 
 struct list_s {
@@ -84,5 +86,9 @@ struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched);
  * returns true if this actor is schedulable
  */
 int sched_is_schedulable(struct actor_s *actor);
+
+void sched_add_predecessors(struct scheduler_s *sched, struct actor_s *actor);
+
+void sched_add_successors(struct scheduler_s *sched, struct actor_s *actor);
 
 #endif

@@ -70,15 +70,15 @@ void source_initialize() {
 
 extern struct fifo_s *source_O;
 
-int source_scheduler() {
+void source_scheduler(struct schedinfo_s *si) {
 	unsigned char *ptr;
 	int i = 0;
 	int n;
 
 	if (feof(F)) {
-		return 0;
+		fseek(F, 0, 0);
 	}
-	
+
 	while (hasRoom(source_O, 1)) {
 		ptr = getWritePtr(source_O, 1);
 		n = fread(ptr, 1, 1, F);
@@ -92,5 +92,6 @@ int source_scheduler() {
 		setWriteEnd(source_O, 1);
 	}
 
-	return i;
+	si->num_firings = i;
+	si->reason = full;
 }

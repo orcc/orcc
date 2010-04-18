@@ -1,40 +1,40 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the documentation
- *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
- *     contributors may be used to endorse or promote products derived from this
- *     software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
+* Copyright (c) 2009, IETR/INSA of Rennes
+* All rights reserved.
+* 
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+* 
+*   * Redistributions of source code must retain the above copyright notice,
+*     this list of conditions and the following disclaimer.
+*   * Redistributions in binary form must reproduce the above copyright notice,
+*     this list of conditions and the following disclaimer in the documentation
+*     and/or other materials provided with the distribution.
+*   * Neither the name of the IETR/INSA of Rennes nor the names of its
+*     contributors may be used to endorse or promote products derived from this
+*     software without specific prior written permission.
+* 
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+* STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+* WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+* SUCH DAMAGE.
+*/
 #include "SDL.h"
 
 #include "fifo.h"
 
 #ifdef BENCHMARK
-	#include <locale.h>
-	#include <time.h>
-	FILE * pFile;
-	static Uint32 tInit = 0;
+#include <locale.h>
+#include <time.h>
+FILE * pFile;
+static Uint32 tInit = 0;
 #endif
 
 
@@ -110,10 +110,10 @@ void display_show_image(void) {
 			1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
 
 #ifdef BENCHMARK
-	if (tInit == 0)
-		tInit = t2;
-	
-	fprintf (pFile, "%d \t %f \n",(t2-tInit),1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
+		if (tInit == 0)
+			tInit = t2;
+
+		fprintf (pFile, "%d \t %f \n",(t2-tInit),1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
 
 #endif
 		t = t2;
@@ -210,10 +210,10 @@ static int init = 0;
 
 static void display_init() {
 	// First, initialize SDL's video subsystem.
-    if (SDL_Init( SDL_INIT_VIDEO ) < 0) {
-        fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
+	if (SDL_Init( SDL_INIT_VIDEO ) < 0) {
+		fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
 		press_a_key(-1);
-    }
+	}
 
 	SDL_WM_SetCaption("display", NULL);
 
@@ -276,12 +276,13 @@ static void display_set_video(int width, int height) {
 	}
 }
 
-int display_scheduler() {
+void display_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	int res = 1;
-	while (res) {
+
+	while (1) {
 		if (hasTokens(display_WIDTH, 1) && hasTokens(display_HEIGHT, 1)) {
 			short *ptr, width, height;
+
 			ptr = getReadPtr(display_WIDTH, 1);
 			width = ptr[0] * 16;
 			ptr = getReadPtr(display_HEIGHT, 1);
@@ -297,14 +298,15 @@ int display_scheduler() {
 			if (!init) {
 				display_init();
 			}
+
 			display_write_mb(getReadPtr(display_B, 384));
 			setReadEnd(display_B, 384);
 			i++;
-			res = 1;
 		} else {
-			res = 0;
+			break;
 		}
 	}
 
-	return i;
+	si->num_firings = i;
+	si->reason = starved;
 }

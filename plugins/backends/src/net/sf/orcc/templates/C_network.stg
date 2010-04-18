@@ -1,5 +1,3 @@
-declareBroadcast
-
 BroadcastWrite(n) ::= <<
 tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
 *tok_output_$n$ = *tok_input;

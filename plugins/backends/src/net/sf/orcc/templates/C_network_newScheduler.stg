@@ -167,9 +167,10 @@ $declareActorsArray(network.instances)$
 // #define PRINT_FIRINGS
 
 static void scheduler() {
-	int i;
-	struct actor_s *my_actor;
 	struct scheduler_s my_scheduler;
+	struct actor_s *my_actor;
+	struct schedinfo_s si;
+	int iterations = 0;
 
 	// initializes the actors that need it
 	$printInitializes(network.instances)$
@@ -180,20 +181,16 @@ static void scheduler() {
 	my_actor = sched_get_next_schedulable(&my_scheduler);
 	while (my_actor != NULL) {
 		while (my_actor != NULL) {
-			int num_firings = my_actor->sched_func();
+			iterations++;
+			si.num_firings = 0;
+			my_actor->sched_func(&si);
 #ifdef PRINT_FIRINGS
-			printf("%5i\t%s\n", num_firings, my_actor->name);
+			printf("%5i\t%s\n", si.num_firings, my_actor->name);
 #endif
-			if (num_firings > 0) {
-				// the actor has fired, so it is likely it has produced data
-				// we consider its successors as schedulable
-
-				for (i = 0; i < my_actor->num_successors; i++) {
-					struct actor_s *succ = my_actor->successors[i];
-					if (sched_is_schedulable(succ)) {
-						sched_add_schedulable(&my_scheduler, succ);
-					}
-				}
+			if (si.reason == full) {
+				sched_add_successors(&my_scheduler, my_actor);
+			} else if (si.reason == starved) {
+				sched_add_predecessors(&my_scheduler, my_actor);
 			}
 
 			my_actor = sched_get_next_schedulable(&my_scheduler);

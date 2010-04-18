@@ -34,10 +34,14 @@
 
 extern struct fifo_s *sink_I;
 
-int sink_scheduler() {
+void sink_scheduler(struct schedinfo_s *si) {
+	int i = 0;
 	while (hasTokens(sink_I, 1)) {
 		getReadPtr(sink_I, 1);
+		i++;
+		setReadEnd(sink_I, 1);
 	}
 
-	return 0;
+	si->num_firings = i;
+	si->reason = starved;
 }
