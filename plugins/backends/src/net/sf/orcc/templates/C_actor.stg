@@ -208,6 +208,8 @@ if (isSchedulable_$action$()) {
 	if ($outputPattern(pattern=action.outputPattern)$) {
 		$actionCall(action)$
 	} else {
+		si->num_firings = i;
+		si->reason = full;
 		break;
 	}
 	$else$
@@ -220,16 +222,16 @@ $actions: actionTest(); separator=" else "$
 >>
 
 scheduler(actions) ::= <<
-int $instance.id$_scheduler() {
+void $instance.id$_scheduler(struct schedinfo_s *si) {
 	int i = 0;
   
 	while (1) {
 		$if(actions)$$schedulingTest(actions)$$endif$ else {
+			si->num_firings = i;
+			si->reason = starved;
 			break;
 		}
 	}
-
-	return i;
 }
 
 >>
@@ -250,7 +252,9 @@ if (isSchedulable_$nextState.action$()) {
 		$actionCallState(nextState)$
 	} else {
 		_FSM_state = s_$transition.sourceState$;
-		return i;
+		si->num_firings = i;
+		si->reason = full;
+		return;
 	}
 	$else$
 	$actionCallState(nextState)$
@@ -272,7 +276,9 @@ l_$transition.sourceState$:
 	$endif$
 	$schedulingTestState(nextStates=transition.nextStateInfo)$ else {
 		_FSM_state = s_$transition.sourceState$;
-		return i;
+		si->num_firings = i;
+		si->reason = starved;
+		return;
 	}
 >>
 
@@ -317,7 +323,7 @@ static int outside_FSM_scheduler() {
 }
 $endif$
 
-int $instance.id$_scheduler() {
+void $instance.id$_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	// jump to FSM state 

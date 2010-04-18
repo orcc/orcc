@@ -1,22 +1,36 @@
+declareBroadcast
+
+BroadcastWrite(n) ::= <<
+tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
+*tok_output_$n$ = *tok_input;
+>>
+
+BroadcastWriteEnd(n) ::= <<
+setWriteEnd($bcast.id$_output_$n$, 1);
+>>
+
 declareBroadcast(bcast) ::= <<
-int $bcast.id$_scheduler() {
+void $bcast.id$_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 	$bcast.type$ *tok_input;
 	$bcast.outputList: { n | $bcast.type$ *tok_output_$n$;
 }$
-	while (hasTokens($bcast.id$_input, 1)
-		$bcast.outputList:{ && hasRoom($bcast.id$_output_$i0$, 1)}$) {
-		tok_input = getReadPtr($bcast.id$_input, 1);
-		$bcast.outputList:
-		  { n | tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
-*tok_output_$n$ = *tok_input;
-}$	
-		setReadEnd($bcast.id$_input, 1);
-		$bcast.outputList: { n | setWriteEnd($bcast.id$_output_$n$, 1);}; separator="\n"$
-		i++;
+	while (hasTokens($bcast.id$_input, 1)) {
+		if ($bcast.outputList:{hasRoom($bcast.id$_output_$i0$, 1)}; separator=" && "$) {
+			tok_input = getReadPtr($bcast.id$_input, 1);
+			$bcast.outputList: BroadcastWrite()$
+			setReadEnd($bcast.id$_input, 1);
+			$bcast.outputList: BroadcastWriteEnd()$
+			i++;
+		} else {
+			si->reason = full;
+			si->num_firings = i;
+			return;
+		}
 	}
 
-	return i;
+	si->reason = starved;
+	si->num_firings = i;
 }
 
 >>
@@ -94,7 +108,7 @@ $instances: initialize()$
 >>
 
 declareSchedulers(instances) ::= <<
-$instances: {extern int $it.id$_scheduler();}; separator="\n"$
+$instances: {extern void $it.id$_scheduler(struct schedinfo_s *si);}; separator="\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,11 +124,16 @@ printInitializes(instances) ::= <<
 $instances: printInitialize()$
 >>
 
-printSchedulers(instances) ::= <<
-$instances: {i = $it.id$_scheduler();
+printSchedulerInstance(instance) ::= <<
+si.num_firings = 0;
+$instance.id$_scheduler(&si);
 #ifdef PRINT_FIRINGS
-printf("$it.id$_scheduler: %i\n", i);
-#endif}; separator="\n"$
+printf("$instance.id$_scheduler: %i\n", si->num_firings);
+#endif
+>>
+
+printSchedulers(instances) ::= <<
+$instances: printSchedulerInstance(); separator="\n"$
 
 #ifdef PRINT_FIRINGS
 printf("\n");
@@ -158,7 +177,7 @@ $declareSchedulers(network.instances)$
 // Actor scheduler
 
 static void scheduler() {
-	int i;
+	struct schedinfo_s si;
 
 	$printInitializes(network.instances)$
 	while (1) {

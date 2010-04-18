@@ -29,6 +29,16 @@
 #ifndef FIFO_H
 #define FIFO_H
 
+enum reasons {
+	starved,
+	full
+};
+
+struct schedinfo_s {
+	int num_firings;
+	enum reasons reason;
+};
+
 /** lock free fifo ring buffer structure */
 struct fifo_s {
 	int elt_size; /** the size of an element */
