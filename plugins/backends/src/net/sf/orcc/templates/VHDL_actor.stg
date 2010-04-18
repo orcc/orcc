@@ -584,25 +584,23 @@ $transitions: switchTransition()$
 >>
 
 switchTransition(transition) ::= <<
+
+
 when s_$transition.sourceState$ =>
   $stateScheduler(transition)$
-
 >>
 
 stateScheduler(transition) ::= <<
-$transition$
-
   -- $transition.sourceState$_state_scheduler
   $schedulingTestState(nextStates=transition.nextStateInfo)$
 >>
 
 schedulingTestState(nextStates) ::= <<
 
-if $nextStates: actionTestState(); separator="elsif"$end if;
+if $nextStates: actionTestState(); separator="--\nelsif"$end if;
 >>
 
 actionTestState(nextState) ::= <<
-
 (isSchedulable_$nextState.action$_go = '1') then
   $if(nextState.action.outputPattern)$
   if ($outputPattern(nextState.action.outputPattern)$) then
