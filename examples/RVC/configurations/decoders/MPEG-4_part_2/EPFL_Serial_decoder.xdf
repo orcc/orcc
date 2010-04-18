@@ -202,9 +202,9 @@
     <Connection dst="texture" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
     <Connection dst="" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
     <Connection dst="" dst-port="HEIGHT" src="parser" src-port="HEIGHT"/>
-    <Connection dst="texture" dst-port="QP" src="parser" src-port="QP"/>
     <Connection dst="motion" dst-port="TEX" src="texture" src-port="f"/>
     <Connection dst="motion" dst-port="MV" src="parser" src-port="MV"/>
     <Connection dst="motion" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
     <Connection dst="" dst-port="VID" src="motion" src-port="VID"/>
+    <Connection dst="texture" dst-port="QP" src="parser" src-port="QP"/>
 </XDF>

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="BTYPE" x="57" y="400"/>
-      <vertex id="QFS_DC" x="171" y="187"/>
-      <vertex id="PTR" x="507" y="73"/>
-      <vertex id="AC_PRED_DIR" x="507" y="168"/>
-      <vertex id="SIGNED" x="507" y="263"/>
-      <vertex id="QF_DC" x="507" y="358"/>
-      <vertex id="QUANT" x="507" y="453"/>
-      <vertex id="MODE" x="507" y="548"/>
-      <vertex id="addressing" x="171" y="282"/>
-      <vertex id="invpred" x="308" y="252"/>
-      <vertex id="QP" x="85" y="222"/>
+      <vertex id="BTYPE" x="84" y="101"/>
+      <vertex id="QFS_DC" x="90" y="211"/>
+      <vertex id="PTR" x="508" y="70"/>
+      <vertex id="AC_PRED_DIR" x="508" y="163"/>
+      <vertex id="SIGNED" x="508" y="256"/>
+      <vertex id="QF_DC" x="508" y="349"/>
+      <vertex id="QUANT" x="508" y="442"/>
+      <vertex id="MODE" x="508" y="535"/>
+      <vertex id="QP" x="102" y="335"/>
+      <vertex id="invpred" x="343" y="180"/>
    </vertices>
 </layout>

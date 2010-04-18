@@ -1,4 +1,3 @@
-import all caltrop.lib.BitOps;
 actor MPEG4_algo_DCRinvpred (int DCVAL,
 	int NEWVOP,
 	int INTRA,

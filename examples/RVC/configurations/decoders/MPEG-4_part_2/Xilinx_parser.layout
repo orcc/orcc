@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="BITS" x="16" y="67"/>
-      <vertex id="BTYPE" x="285" y="6"/>
-      <vertex id="MV" x="549" y="82"/>
-      <vertex id="B" x="418" y="157"/>
-      <vertex id="WIDTH" x="231" y="261"/>
-      <vertex id="HEIGHT" x="238" y="121"/>
-      <vertex id="parseheaders" x="106" y="76"/>
-      <vertex id="mvseq" x="312" y="47"/>
-      <vertex id="blkexp" x="303" y="153"/>
-      <vertex id="mvrecon" x="446" y="47"/>
-      <vertex id="QP" x="403" y="295"/>
+      <vertex id="BITS" x="57" y="428"/>
+      <vertex id="BTYPE" x="312" y="70"/>
+      <vertex id="MV" x="574" y="664"/>
+      <vertex id="B" x="448" y="190"/>
+      <vertex id="WIDTH" x="312" y="310"/>
+      <vertex id="HEIGHT" x="312" y="403"/>
+      <vertex id="QP" x="341" y="486"/>
+      <vertex id="parseheaders" x="160" y="356"/>
+      <vertex id="mvseq" x="312" y="589"/>
+      <vertex id="blkexp" x="312" y="163"/>
+      <vertex id="mvrecon" x="448" y="637"/>
    </vertices>
 </layout>
