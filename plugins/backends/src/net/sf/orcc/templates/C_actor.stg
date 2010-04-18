@@ -199,7 +199,6 @@ $pattern.keys:{port|hasRoom($instance.id$_$port$, $pattern.(port)$)}; separator=
 
 actionCall(action) ::= <<
 $action.body$();
-res = 1;
 i++;
 >>
 
@@ -208,6 +207,8 @@ if (isSchedulable_$action$()) {
 	$if(action.outputPattern)$
 	if ($outputPattern(pattern=action.outputPattern)$) {
 		$actionCall(action)$
+	} else {
+		break;
 	}
 	$else$
 	$actionCall(action)$
@@ -220,14 +221,12 @@ $actions: actionTest(); separator=" else "$
 
 scheduler(actions) ::= <<
 int $instance.id$_scheduler() {
-	int res = 1;
 	int i = 0;
   
-	while (res) {
-		res = 0;
-		$if(actions)$
-		$schedulingTest(actions)$
-		$endif$
+	while (1) {
+		$if(actions)$$schedulingTest(actions)$$endif$ else {
+			break;
+		}
 	}
 
 	return i;
@@ -240,9 +239,8 @@ int $instance.id$_scheduler() {
 
 actionCallState(nextState) ::= <<
 $nextState.action.body$();
-_FSM_state = s_$nextState.targetState$;
-res = 1;
-(*pi)++;
+goto l_$nextState.targetState$;
+i++;
 >>
 
 actionTestState(nextState) ::= <<
@@ -250,6 +248,9 @@ if (isSchedulable_$nextState.action$()) {
 	$if(nextState.action.outputPattern)$
 	if ($outputPattern(nextState.action.outputPattern)$) {
 		$actionCallState(nextState)$
+	} else {
+		_FSM_state = s_$transition.sourceState$;
+		return i;
 	}
 	$else$
 	$actionCallState(nextState)$
@@ -260,24 +261,38 @@ schedulingTestState(nextStates) ::= <<
 $nextStates: actionTestState(); separator=" else "$
 >>
 
-stateScheduler(transition) ::= <<
-static int $transition.sourceState$_state_scheduler(int *pi) {
-	int res = 0;
-	$schedulingTestState(nextStates=transition.nextStateInfo)$
-	return res;
-}
+Transition(transition) ::= <<
 
+
+l_$transition.sourceState$:
+	$if (actions)$
+	while (outside_FSM_scheduler()) {
+		i++;
+	}
+	$endif$
+	$schedulingTestState(nextStates=transition.nextStateInfo)$ else {
+		_FSM_state = s_$transition.sourceState$;
+		return i;
+	}
+>>
+
+Transitions(actions, transitions) ::= <<
+$transitions: Transition()$
+>>
+
+switchTransition(transition) ::= <<
+
+case s_$transition.sourceState$:
+	goto l_$transition.sourceState$;
 >>
 
 switch(transitions) ::= <<
 switch (_FSM_state) {
-$transitions: {case s_$it.sourceState$:
-	res = $it.sourceState$_state_scheduler(&i);
-	break;
-}$
+$transitions: switchTransition()$
 default:
 	printf("unknown state: %s\n", stateNames[_FSM_state]);
-	break;
+	pause();
+	exit(1);
 }
 >>
 
@@ -300,29 +315,16 @@ static int outside_FSM_scheduler() {
 	$schedulingTest(actions)$
 	return res;
 }
-
-
 $endif$
-$fsm.transitions: stateScheduler(); separator="\n"$
-int $instance.id$_scheduler() {
-	int res = 1;
-	int i = 0;
-	
-	while (res) {
-		res = 0;
-		$if(actions)$
-		if (outside_FSM_scheduler()) {
-			res = 1;
-			i++;
-		} else {
-			$switch(fsm.transitions)$
-		}
-		$else$
-		$switch(fsm.transitions)$
-		$endif$
-	}
 
-	return i;
+int $instance.id$_scheduler() {
+	int i = 0;
+
+	// jump to FSM state 
+	$switch(fsm.transitions)$
+
+	// FSM transitions
+$Transitions(actions=actions, transitions=fsm.transitions)$
 }
 
 >>
@@ -343,6 +345,7 @@ instance(instance) ::= <<
 #include <stdlib.h>
 
 #include "fifo.h"
+#include "orcc_util.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs

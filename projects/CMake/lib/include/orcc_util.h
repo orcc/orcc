@@ -29,7 +29,6 @@
 
 #ifndef ORCC_UTIL_H
 #define ORCC_UTIL_H
-#include "SDL.h"
 
 // input file
 extern char *input_file;
