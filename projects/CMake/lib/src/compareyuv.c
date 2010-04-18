@@ -26,6 +26,10 @@
 * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 * SUCH DAMAGE.
 */
+#include <sys/stat.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "fifo.h"
 #include "orcc_util.h"
@@ -34,8 +38,6 @@
 /* Ignore Microsoft's interpretation of secure development
 * and the POSIX string handling API
 */
-#include <stdio.h>
-#include <stdlib.h>
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 #ifndef _CRT_SECURE_NO_DEPRECATE
@@ -72,24 +74,9 @@ static int  ysize_int;
 static int  images = 0;
 
 static int Filesize(FILE *f) {
-	long oldfp, fsize;
-
-	oldfp = ftell(f);
-	if (oldfp < 0L) {
-		return -1;
-	}
-	if (fseek(f, 0, SEEK_END) != 0) {
-		return -1;
-	}
-
-	fsize = ftell(f);
-	if (fsize < 0) {
-		return -1;
-	}
-	if (fseek(f, oldfp, SEEK_SET) != 0) {
-		return -1;
-	}
-	return fsize;
+	struct stat st;
+	fstat(fileno(f), &st);
+	return st.st_size;
 }
 
 static void Read_YUV_init(int xsize, int ysize, char * filename) {
