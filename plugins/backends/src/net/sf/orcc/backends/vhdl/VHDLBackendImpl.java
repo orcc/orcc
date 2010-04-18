@@ -125,8 +125,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 		try {
 			for (Network subNetwork : network.getNetworks()) {
 				for (Instance instance : subNetwork.getInstances()) {
-					if (instance.isActor()) {
-						Actor actor = instance.getActor();
+					//if (instance.isActor()) {
+						//Actor actor = instance.getActor();
 						String id = instance.getId();
 						File folder = new File(path + File.separator
 								+ "Testbench");
@@ -136,8 +136,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 						String outputName = path + File.separator + "Testbench"
 								+ File.separator + id + "_tb.vhd";
-						tbPrinter.printTestbench(outputName, id, actor);
-					}
+						tbPrinter.printTestbench(outputName, instance);
+					//}
 				}
 			}
 		} catch (IOException e) {

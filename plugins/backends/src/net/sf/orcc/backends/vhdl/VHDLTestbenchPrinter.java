@@ -42,6 +42,7 @@ import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.util.INameable;
 
 import org.stringtemplate.v4.ST;
@@ -71,10 +72,10 @@ public final class VHDLTestbenchPrinter extends Printer {
 		this("VHDL_testbench");
 
 		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_");
-		transformations.put("index", "index_");
-		transformations.put("getw", "getw_");
-		transformations.put("select", "select_");
+		transformations.put("abs", "abs_1");
+		transformations.put("access", "access_1");
+		transformations.put("component", "component_1");
+		transformations.put("select", "select_1");
 	}
 
 	/**
@@ -103,11 +104,12 @@ public final class VHDLTestbenchPrinter extends Printer {
 	 *            actor to print
 	 * @throws IOException
 	 */
-	public void printTestbench(String fileName, String id, Actor actor)
+	public void printTestbench(String fileName, Instance instance)
 			throws IOException {
 		ST template = group.getInstanceOf("testbench");
+		Actor actor = instance.getActor();
 
-		template.add("actorName", id);
+		template.add("instance", instance);
 		template.add("actor", actor);
 
 		byte[] b = template.render(80).getBytes();

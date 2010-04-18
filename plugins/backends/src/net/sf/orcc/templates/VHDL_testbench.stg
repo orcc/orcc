@@ -1,53 +1,51 @@
 fifo_in(port) ::= <<
 $
 if(port.type.bool)
-$signal $actorName$_$port.name$_data  : std_logic;$\n$$
+$signal $actor.name$_$port.name$_data  : std_logic;$\n$$
 else
-$signal $actorName$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $actor.name$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif
 $
-signal $actorName$_$port.name$_empty : std_logic;
-signal $actorName$_$port.name$_read  : std_logic;
-
+signal $actor.name$_$port.name$_send : std_logic;
+signal $actor.name$_$port.name$_ack  : std_logic;
 >>
 
 fifo_out(port) ::= <<
-signal $actorName$_$port.name$_full  : std_logic;
+signal $actor.name$_$port.name$_full  : std_logic;
 $
 if(last(port.name))
 $$
 if(port.type.bool)
-$signal $actorName$_$port.name$_data  : std_logic;$\n$$
+$signal $actor.name$_$port.name$_data  : std_logic;$\n$$
 else
-$signal $actorName$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $actor.name$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif
-$signal $actorName$_$port.name$_write : std_logic;$
+$signal $actor.name$_$port.name$_write : std_logic;$
 else
-$signal $actorName$_$port.name$_data  : $port.type$;
-signal $actorName$_$port.name$_write : std_logic;$
+$signal $actor.name$_$port.name$_data  : $port.type$;
+signal $actor.name$_$port.name$_write : std_logic;$
 endif
 $
-
 >>
 
 
 fifo_in_init(port) ::=<<
-$actorName$_$port.name$_empty <= '1';$"\n"$
+$actor.name$_$port.name$_send <= '0';$"\n"$
 >>
 fifo_out_init(port) ::=<<
-$actorName$_$port.name$_full <= '0';$"\n"$
+$actor.name$_$port.name$_full <= '0';$"\n"$
 >>
 
 fifo_map_in(port) ::= <<
-$actorName$_$port.name$_data  => $actorName$_$port.name$_data,
-$actorName$_$port.name$_empty => $actorName$_$port.name$_empty,
-$actorName$_$port.name$_read  => $actorName$_$port.name$_read
+$actor.name$_$port.name$_data  => $actor.name$_$port.name$_data,
+$actor.name$_$port.name$_send => $actor.name$_$port.name$_send,
+$actor.name$_$port.name$_ack   => $actor.name$_$port.name$_ack
 >>
 
 fifo_map_out(port) ::= <<
-$actorName$_$port.name$_data  => $actorName$_$port.name$_data,
-$actorName$_$port.name$_full  => $actorName$_$port.name$_full,
-$actorName$_$port.name$_write => $actorName$_$port.name$_write
+$actor.name$_$port.name$_data  => $actor.name$_$port.name$_data,
+$actor.name$_$port.name$_full  => $actor.name$_$port.name$_full,
+$actor.name$_$port.name$_write => $actor.name$_$port.name$_write
 >>
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
@@ -60,13 +58,24 @@ $value : {[$it$]} $
 >>
 
 sig_const() ::= <<
-constant clk_period      : time := 10 ns;
+constant PERIOD      : time := 10 ns;
+--
 type severity_level is (note, warning, error, failure);
 type tb_type is (after_reset, read_file, CheckRead);
-$actor.inputs.list: signal_in()$--
-$actor.outputs.list: signal_out()$--
-$actor.inputs.list: fifo_in()$--
-$actor.outputs.list: fifo_out()$
+--
+-- Input files
+$actor.inputs.list: signal_in(); separator="\n"$
+--
+-- Output files
+$actor.outputs.list: signal_out(); separator="\n"$
+--
+-- Input signals
+$actor.inputs.list: fifo_in(); separator="\n"$
+--
+-- Output signals
+$actor.outputs.list: fifo_out(); separator="\n"$
+--
+-- Configuration
 signal count             : integer range 255 downto 0;
 signal clock             : std_logic := '0';
 signal reset_n           : std_logic;
@@ -74,44 +83,41 @@ signal reset_n           : std_logic;
 >>
 
 signal_in(port) ::= <<
---
-signal tb_FSM_$actorName$_$port.name$  : tb_type;
-file sim_file_$actorName$_$port.name$  : text is "$actorName$_$port.name$_sim.txt";
-
+signal tb_FSM_$actor.name$_$port.name$  : tb_type;
+file sim_file_$actor.name$_$port.name$  : text is "$actor.name$_$port.name$_sim.txt";
 >>
 
 signal_out(port) ::= <<
---
-file sim_file_$actorName$_$port.name$  : text is "$actorName$_$port.name$_sim.txt";
-
+file sim_file_$actor.name$_$port.name$  : text is "$actor.name$_$port.name$_sim.txt";
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Process
 ///////////////////////////////////////////////////////////////////////////////
 init_process() ::= <<
-  -- clock generation
-  clock <= not clock after clk_period/2;
+-- clock generation
+clock <= not clock after PERIOD/2;
 
-  -- reset generation
-  process
-  begin
-    reset_n <= '0';
-    wait for 10*clk_period;
-    reset_n <= '1';
-    wait;
-  end process;
+-- reset generation
+process
+begin
+  reset_n <= '0';
+  wait for 10*PERIOD;
+  reset_n <= '1';
+  wait;
+end process;
 
 >>
 
 tb_FSM_init(port) ::= <<
-  tb_FSM_$actorName$_$port.name$ <= after_reset;
+tb_FSM_$actor.name$_$port.name$ <= after_reset;
 
 >>
     
 
 
 waveform_process_in() ::= <<
+--
 -- Input(s) waveform Generation
 WaveGen_Proc_In : process (reset_n, clock)
   variable Input_bit   : integer range 2147483647 downto - 2147483648;
@@ -119,12 +125,11 @@ WaveGen_Proc_In : process (reset_n, clock)
 begin
   if reset_n = '0' then
     $actor.inputs.list: fifo_in_init()$    --
-    $actor.inputs.list: tb_FSM_init()$
-    count <= 0;
-    
+    $actor.inputs.list: tb_FSM_init()$    count <= 0;
+  --  
   elsif falling_edge(clock) then
     --
-    $actor.inputs.list:  {$case_define_in()$}; separator="\n"$$\n$
+    $actor.inputs.list: case_define_in(); separator="\n"$$\n$
   end if;
 end process WaveGen_Proc_In;
 
@@ -132,65 +137,70 @@ end process WaveGen_Proc_In;
 
 
 case_define_in(port) ::= <<
-case tb_FSM_$actorName$_$port.name$ is
+
+case tb_FSM_$actor.name$_$port.name$ is
   when after_reset =>
     count <= count + 1;
     if count = 15 then
-      tb_FSM_$actorName$_$port.name$ <= read_file;
+      tb_FSM_$actor.name$_$port.name$ <= read_file;
       count           <= 0;
     end if;
 
   when read_file =>
-    if (not endfile (sim_file_$actorName$_$port.name$)) then
-      readline(sim_file_$actorName$_$port.name$, line_number);
+    if (not endfile (sim_file_$actor.name$_$port.name$)) then
+      readline(sim_file_$actor.name$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
-$if(port.type.bool)$
-        if (input_bit = 1) then
-          $actorName$_$port.name$_data  <= '1';
-        else
-          $actorName$_$port.name$_data  <= '0';
-        end if;
-$else$
-$if(port.type.int)$
-        $actorName$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$
-$else$
-        $actorName$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$
-$endif$
-$endif$
-        $actorName$_$port.name$_empty <= '0';    
-        tb_FSM_$actorName$_$port.name$ <= CheckRead;
+$
+if(port.type.bool)
+$      if (input_bit = 1) then
+         $actor.name$_$port.name$_data  <= '1';
+       else
+         $actor.name$_$port.name$_data  <= '0';
+       end if;$
+else
+$$
+  if(port.type.int)
+  $        $actor.name$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
+  else
+  $        $actor.name$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
+  endif
+  $$
+endif
+$        $actor.name$_$port.name$_send <= '1';    
+        tb_FSM_$actor.name$_$port.name$ <= CheckRead;
       end if;
     end if;
 
   when CheckRead =>
-    if (not endfile (sim_file_$actorName$_$port.name$)) and $actorName$_$port.name$_read = '1' then
-      readline(sim_file_$actorName$_$port.name$, line_number);
+    if (not endfile (sim_file_$actor.name$_$port.name$)) and $actor.name$_$port.name$_ack = '1' then
+      readline(sim_file_$actor.name$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
-$if(port.type.bool)$
-        if (input_bit = 1) then
-          $actorName$_$port.name$_data  <= '1';
-        else
-          $actorName$_$port.name$_data  <= '0';
-        end if;
-$else$
-$if(port.type.int)$
-        $actorName$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$
-$else$
-        $actorName$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$
-$endif$
-$endif$
-        $actorName$_$port.name$_empty <= '0';     
+$
+if(port.type.bool)
+$      if (input_bit = 1) then
+         $actor.name$_$port.name$_data  <= '1';
+       else
+         $actor.name$_$port.name$_data  <= '0';
+       end if;$
+else
+$$
+  if(port.type.int)
+  $        $actor.name$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
+  else
+  $        $actor.name$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
+  endif
+  $$
+endif
+$        $actor.name$_$port.name$_send <= '1';      
       end if;
     end if;
 
   when others => null;
 end case;
-
-
 >>
 
 waveform_process_out() ::= <<
@@ -200,10 +210,10 @@ WaveGen_Proc_Out : process (reset_n, clock)
   variable line_number : line;
 begin
   if reset_n = '0' then
-    $actor.outputs.list: fifo_out_init(it)$    --
+    $actor.outputs.list: fifo_out_init()$    --
   elsif rising_edge(clock) then
     --
-    $actor.outputs.list:  {$case_define_out(it)$}; separator="\n"$
+    $actor.outputs.list: case_define_out(); separator="\n"$
   end if;
 end process WaveGen_Proc_Out;
 
@@ -211,36 +221,39 @@ end process WaveGen_Proc_Out;
 
 
 case_define_out(port) ::= <<
-    if (not endfile (sim_file_$actorName$_$port.name$) and $actorName$_$port.name$_write = '1') then
-      readline(sim_file_$actorName$_$port.name$, line_number);
+    if (not endfile (sim_file_$actor.name$_$port.name$) and $actor.name$_$port.name$_write = '1') then
+      readline(sim_file_$actor.name$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
-$if(port.type.bool)$
-        if Input_bit = 1 then
-          assert ($actorName$_$port.name$_data = '1')
+$
+if(port.type.bool)
+$        if Input_bit = 1 then
+          assert ($actor.name$_$port.name$_data = '1')
             report "incorrectly value computed : 0 instead of : 1"
             severity error;
         else
-          assert ($actorName$_$port.name$_data = '0')
+          assert ($actor.name$_$port.name$_data = '0')
             report "incorrectly value computed : 1 instead of : 0"
             severity error;                
-        end if;
-$else$
-$if(port.type.int)$
-        assert ($actorName$_$port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
-          -- report "incorrectly value computed : " & to_string(to_integer(to_signed($actorName$_$port.name$_data))) & " instead of :" & to_string(input_bit)
-          report "incorrectly value computed : " & str(to_integer(signed($actorName$_$port.name$_data))) & " instead of :" & str(input_bit)
-          severity error;$\n$
-$else$
-        assert ($actorName$_$port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
-          report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($actorName$_$port.name$_data))) & " instead of :" & to_string(input_bit)
-          --report "Incorrectly value computed : " & str(to_integer(unsigned($actorName$_$port.name$_data))) & " instead of :" & str(input_bit)
-          severity error;$\n$
-$endif$
-$endif$
-        --
-        $actorName$_$port.name$_full <= '0';    
+        end if;$
+else
+$$
+  if(port.type.int)
+  $        assert ($actor.name$_$port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
+          -- report "incorrectly value computed : " & to_string(to_integer(to_signed($actor.name$_$port.name$_data))) & " instead of :" & to_string(input_bit)
+          report "incorrectly value computed : " & str(to_integer(signed($actor.name$_$port.name$_data))) & " instead of :" & str(input_bit)
+          severity error;$\n$$
+  else
+  $        assert ($actor.name$_$port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
+          report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($actor.name$_$port.name$_data))) & " instead of :" & to_string(input_bit)
+          --report "Incorrectly value computed : " & str(to_integer(unsigned($actor.name$_$port.name$_data))) & " instead of :" & str(input_bit)
+          severity error;$\n$$
+  endif
+  $$
+endif
+$        --
+        $actor.name$_$port.name$_full <= '0';    
       end if;
     end if;
 
@@ -249,7 +262,7 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 // testbench
 ///////////////////////////////////////////////////////////////////////////////
-testbench(actorName, actor) ::= <<
+testbench(instance, actor) ::= <<
 ------------------------------------------------------------------------------
 -- Generated from $actor.name$ actor
 ------------------------------------------------------------------------------
@@ -271,6 +284,7 @@ architecture rtl of $actor.name$_testbench is
 
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
+  --------------------------------------------------------------------------- 
   $sig_const()$
   ---------------------------------------------------------------------------
 
@@ -280,12 +294,12 @@ begin
     port map (
       clock      => clock,
       reset_n    => reset_n,
-      $actor.inputs.list: {$fifo_map_in(it)$}; separator=",\n"$,
-      $actor.outputs.list: {$fifo_map_out(it)$}; separator=",\n"$);
+      $actor.inputs.list: fifo_map_in(); separator=",\n"$,
+      $actor.outputs.list: fifo_map_out(); separator=",\n"$);
       
-  $init_process()$
-  $waveform_process_in()$
-  $waveform_process_out()$
+    $init_process()$
+    $waveform_process_in()$
+    $waveform_process_out()$
 
 end architecture rtl;
 >>
