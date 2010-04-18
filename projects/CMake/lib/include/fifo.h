@@ -49,16 +49,6 @@ static struct fifo_s fifo_##count = { sizeof(type), (size), array_##count, 0, 0 
 
 #define contents(fifo, ptr) (& (fifo)->contents[(ptr) * (fifo)->elt_size])
 
-#ifdef _DEBUG
-	extern void *getPeekPtr(struct fifo_s *fifo, int n);
-	extern void *getReadPtr(struct fifo_s *fifo, int n);
-	extern void *getWritePtr(struct fifo_s *fifo, int n);
-	extern int hasRoom(struct fifo_s *fifo, int n);
-	extern int hasTokens(struct fifo_s *fifo, int n);
-	extern void setReadEnd(struct fifo_s *fifo, int n);
-	extern void setWriteEnd(struct fifo_s *fifo, int n);
-#else
-	#include "fifo.inc.h"
-#endif
+#include "fifo.inc.h"
 
 #endif

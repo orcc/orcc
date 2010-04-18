@@ -26,11 +26,7 @@
 * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 * SUCH DAMAGE.
 */
-#ifdef _DEBUG
-#define DECL
-#else
 #define DECL static
-#endif
 
 #include <string.h>
 #include <stdlib.h>
