@@ -1,24 +1,26 @@
 BroadcastWrite(n) ::= <<
-tok_output_$n$ = getWritePtr($bcast.id$_output_$n$, 1);
+tok_output_$n$ = getWritePtr($instance.id$_output_$n$, 1);
 *tok_output_$n$ = *tok_input;
 >>
 
 BroadcastWriteEnd(n) ::= <<
-setWriteEnd($bcast.id$_output_$n$, 1);
+setWriteEnd($instance.id$_output_$n$, 1);
 >>
 
-declareBroadcast(bcast) ::= <<
-void $bcast.id$_scheduler(struct schedinfo_s *si) {
+declareBroadcast(instance) ::= <<
+$if (instance.broadcast)
+$
+void $instance.id$_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	$bcast.type$ *tok_input;
-	$bcast.outputList: { n | $bcast.type$ *tok_output_$n$;
+	$instance.broadcast.type$ *tok_input;
+	$instance.broadcast.outputList: { n | $instance.broadcast.type$ *tok_output_$n$;
 }$
-	while (hasTokens($bcast.id$_input, 1)) {
-		if ($bcast.outputList:{hasRoom($bcast.id$_output_$i0$, 1)}; separator=" && "$) {
-			tok_input = getReadPtr($bcast.id$_input, 1);
-			$bcast.outputList: BroadcastWrite(); separator="\n"$
-			setReadEnd($bcast.id$_input, 1);
-			$bcast.outputList: BroadcastWriteEnd()$
+	while (hasTokens($instance.id$_input, 1)) {
+		if ($instance.broadcast.outputList:{hasRoom($instance.id$_output_$i0$, 1)}; separator=" && "$) {
+			tok_input = getReadPtr($instance.id$_input, 1);
+			$instance.broadcast.outputList: BroadcastWrite(); separator="\n"$
+			setReadEnd($instance.id$_input, 1);
+			$instance.broadcast.outputList: BroadcastWriteEnd()$
 			i++;
 		} else {
 			si->reason = full;
@@ -29,12 +31,13 @@ void $bcast.id$_scheduler(struct schedinfo_s *si) {
 
 	si->reason = starved;
 	si->num_firings = i;
-}
+}$
+endif$
 
 >>
 
-declareBroadcasts(broadcasts) ::= <<
-$broadcasts: declareBroadcast()$
+declareBroadcasts(instances) ::= <<
+$instances: declareBroadcast()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -164,7 +167,7 @@ $allocateFifos(network.connections)$
 $assignFifos(network.connections)$
 
 ////////////////////////////////////////////////////////////////////////////////
-$declareBroadcasts(network.broadcasts)$
+$declareBroadcasts(network.instances)$
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers

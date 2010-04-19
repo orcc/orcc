@@ -55,7 +55,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 
 	/**
 	 * the actor referenced by this instance. May be <code>null</code> if this
-	 * instance references a network.
+	 * instance references a network or a broadcast.
 	 */
 	private Actor actor;
 
@@ -63,6 +63,12 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * attributes
 	 */
 	private Map<String, IAttribute> attributes;
+
+	/**
+	 * the broadcast referenced by this instance. May be <code>null</code> if
+	 * this instance references an actor or a network.
+	 */
+	private Broadcast broadcast;
 
 	/**
 	 * the class of this instance
@@ -79,13 +85,11 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	private String id;
 
-	private boolean isBroadcast;
-
 	private boolean isWrapper;
 
 	/**
 	 * the network referenced by this instance. May be <code>null</code> if this
-	 * instance references a actor.
+	 * instance references an actor or a broadcast.
 	 */
 	private Network network;
 
@@ -94,23 +98,11 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	private Map<String, Expression> parameters;
 
-	/**
-	 * Creates a new virtual instance. Only used by subclass Broadcast.
-	 * 
-	 * @param id
-	 *            the instance id
-	 * @param clasz
-	 *            the instance class
-	 * @param parameters
-	 *            parameters of this instance
-	 */
-	protected Instance(String id, String clasz,
-			Map<String, Expression> parameters) {
-		this.attributes = new HashMap<String, IAttribute>();
-		this.clasz = clasz;
+	public Instance(String id, Broadcast broadcast) {
 		this.id = id;
-		this.isBroadcast = true;
-		this.parameters = parameters;
+		this.broadcast = broadcast;
+		this.parameters = new HashMap<String, Expression>();
+		this.attributes = new HashMap<String, IAttribute>();
 	}
 
 	/**
@@ -132,14 +124,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		this.isWrapper = true;
 		this.parameters = parameters;
 		this.attributes = attributes;
-	}
-
-	
-	public Instance(String id, Network network) {
-		this.id = id;
-		this.network = network;
-		this.parameters = new HashMap<String, Expression>();
-		this.attributes = new HashMap<String, IAttribute>();
 	}
 
 	/**
@@ -189,7 +173,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * Returns the actor referenced by this instance.
 	 * 
 	 * @return the actor referenced by this instance, or <code>null</code> if
-	 *         this instance references a network.
+	 *         this instance does not reference an actor
 	 */
 	public Actor getActor() {
 		return actor;
@@ -206,11 +190,38 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	}
 
 	/**
+	 * Returns the broadcast referenced by this instance.
+	 * 
+	 * @return the broadcast referenced by this instance, or <code>null</code>
+	 *         if this instance does not reference a broadcasst
+	 */
+	public Broadcast getBroadcast() {
+		return broadcast;
+	}
+
+	/**
 	 * Returns the class of this instance.
 	 * 
 	 * @return the class of this instance
 	 */
 	public String getClasz() {
+		return clasz;
+	}
+
+	/**
+	 * Returns the classification class of the instance.
+	 * 
+	 * @return the classification class of this instance
+	 */
+	public IClass getContentClass() {
+		IClass clasz = null;
+
+		if (isActor()) {
+			clasz = actor.getActorClass();
+		} else {
+			clasz = network.getNetworkClass();
+		}
+
 		return clasz;
 	}
 
@@ -236,7 +247,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * Returns the network referenced by this instance.
 	 * 
 	 * @return the network referenced by this instance, or <code>null</code> if
-	 *         this instance references an actor.
+	 *         this instance does not reference a network
 	 */
 	public Network getNetwork() {
 		return network;
@@ -249,23 +260,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	public Map<String, Expression> getParameters() {
 		return parameters;
-	}
-	
-	/**
-	 * Returns the classification class of the instance.
-	 * 
-	 * @return the classification class of this instance
-	 */
-	public IClass getContentClass() {
-		IClass clasz = null;
-		
-		if(isActor()) {
-			clasz = actor.getActorClass();
-		} else {
-			clasz = network.getNetworkClass();
-		}
-		
-		return clasz;
 	}
 
 	@Override
@@ -296,7 +290,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				throw new OrccException("Could not parse instance \"" + id
 						+ "\" because: " + e.getLocalizedMessage(), e);
 			} catch (FileNotFoundException e) {
-				throw new OrccException("I/O error when parsing \"" + id + "\"", e);
+				throw new OrccException(
+						"I/O error when parsing \"" + id + "\"", e);
 			}
 		}
 	}
@@ -316,7 +311,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @return true if this instance is a broadcast
 	 */
 	public boolean isBroadcast() {
-		return isBroadcast;
+		return (broadcast != null);
 	}
 
 	/**

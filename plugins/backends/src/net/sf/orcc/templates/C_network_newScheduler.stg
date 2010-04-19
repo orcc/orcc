@@ -24,7 +24,7 @@ Neighbors(map, ports) ::= <<
 $ports: Neighbor(); separator=", "$
 >>
 
-goDeclarePredSucc(actor, inputs, outputs) ::= <<
+goDeclarePredSucc(inputs, outputs) ::= <<
 $if(!inputs.empty)
 $struct actor_s *$instance.id$_predecessors[] = {$Neighbors(map=network.predecessorsMap.(instance), ports=inputs)$};
 $endif$$
@@ -35,8 +35,11 @@ $endif$
 
 goDeclarePredsSuccs(instance, incoming, outgoing) ::= <<
 $if (instance.actor)
-$$goDeclarePredSucc(actor=instance.actor,
-    inputs=instance.actor.inputs.list, outputs=instance.actor.outputs.list)$$
+$$goDeclarePredSucc(inputs=instance.actor.inputs.list,
+                    outputs=instance.actor.outputs.list)$$
+elseif (instance.broadcast)
+$$goDeclarePredSucc(inputs=instance.broadcast.inputs.list,
+                   outputs=instance.broadcast.outputs.list)$$
 endif$
 >>
 
@@ -53,13 +56,13 @@ $instances:
 NumInputs(instance) ::= <<
 $if (instance.actor)
 $$instance.actor.inputs.length$$
-else$$if (instance.broadcast)$1$else$0$endif$$endif$
+elseif (instance.broadcast)$1$else$0$endif$
 >>
 
 NumOutputs(instance) ::= <<
 $if (instance.actor)
 $$instance.actor.outputs.length$$
-else$$if (instance.broadcast)$$instance.numOutputs$$else$0$endif$$endif$
+elseif (instance.broadcast)$$instance.broadcast.numOutputs$$else$0$endif$
 >>
 
 fillActorStruct(instance) ::= <<
@@ -96,7 +99,7 @@ $allocateFifos(network.connections)$
 // FIFO pointer assignments
 $assignFifos(network.connections)$
 ////////////////////////////////////////////////////////////////////////////////
-$declareBroadcasts(network.broadcasts)$
+$declareBroadcasts(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
 $declareInitializes(network.instances)$

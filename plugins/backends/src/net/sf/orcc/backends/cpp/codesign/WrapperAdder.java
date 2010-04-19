@@ -130,9 +130,12 @@ public class WrapperAdder {
 				int numOutput = outList.size();
 				if (numOutput > 1) {
 					// add broadcast vertex
-					Broadcast bcast = new Broadcast(instance.getId(), srcPort
-							.getName(), numOutput, srcPort.getType());
-					Vertex vertexBCast = new Vertex(bcast);
+					Broadcast bcast = new Broadcast(numOutput, srcPort
+							.getType());
+					String name = "broadcast_" + instance.getId() + "_"
+							+ srcPort.getName();
+					Instance newInst = new Instance(name, bcast);
+					Vertex vertexBCast = new Vertex(newInst);
 					graph.addVertex(vertexBCast);
 
 					// add connections

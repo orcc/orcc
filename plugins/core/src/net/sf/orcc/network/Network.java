@@ -190,18 +190,24 @@ public class Network {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
 				if (instance.isActor()) {
-					computePredSuccActor(vertex, instance.getActor());
+					Actor actor = instance.getActor();
+					computePredSucc(vertex, actor.getInputs(), actor
+							.getOutputs());
 				} else if (instance.isBroadcast()) {
+					Broadcast bcast = instance.getBroadcast();
+					computePredSucc(vertex, bcast.getInputs(), bcast
+							.getOutputs());
 				}
 			}
 		}
 	}
 
-	private void computePredSuccActor(Vertex vertex, Actor actor) {
+	private void computePredSucc(Vertex vertex, OrderedMap<Port> inputs,
+			OrderedMap<Port> outputs) {
 		Map<Port, Instance> map = new LinkedHashMap<Port, Instance>();
 		predecessorsMap.put(vertex.getInstance(), map);
 		Set<Connection> incoming = graph.incomingEdgesOf(vertex);
-		for (Port port : actor.getInputs()) {
+		for (Port port : inputs) {
 			for (Connection connection : incoming) {
 				if (port.equals(connection.getTarget())) {
 					map.put(port, graph.getEdgeSource(connection).getInstance());
@@ -212,7 +218,7 @@ public class Network {
 		map = new LinkedHashMap<Port, Instance>();
 		successorsMap.put(vertex.getInstance(), map);
 		Set<Connection> outgoing = graph.outgoingEdgesOf(vertex);
-		for (Port port : actor.getOutputs()) {
+		for (Port port : outputs) {
 			for (Connection connection : outgoing) {
 				if (port.equals(connection.getSource())) {
 					map.put(port, graph.getEdgeTarget(connection).getInstance());
@@ -283,26 +289,6 @@ public class Network {
 		}
 
 		return Arrays.asList(actors.toArray(new Actor[0]));
-	}
-
-	/**
-	 * Returns the list of broadcasts referenced by the graph of this network.
-	 * 
-	 * @return a list of actors
-	 */
-	public List<Broadcast> getBroadcasts() {
-		List<Broadcast> broadcasts = new ArrayList<Broadcast>();
-		for (Vertex vertex : getGraph().vertexSet()) {
-			if (vertex.isInstance()) {
-				Instance instance = vertex.getInstance();
-				if (instance.isBroadcast()) {
-					Broadcast bcast = (Broadcast) instance;
-					broadcasts.add(bcast);
-				}
-			}
-		}
-
-		return broadcasts;
 	}
 
 	/**

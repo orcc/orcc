@@ -29,11 +29,12 @@
 package net.sf.orcc.network;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * This class defines a broadcast as a particular instance.
@@ -41,13 +42,17 @@ import net.sf.orcc.ir.Type;
  * @author Matthieu Wipliez
  * 
  */
-public class Broadcast extends Instance {
+public class Broadcast {
 
 	public static final String CLASS = "";
+
+	private OrderedMap<Port> inputs;
 
 	private int numOutputs;
 
 	private List<Integer> outputList;
+
+	private OrderedMap<Port> outputs;
 
 	private Type type;
 
@@ -65,18 +70,51 @@ public class Broadcast extends Instance {
 	 * @param type
 	 *            type of this broadcast
 	 */
-	public Broadcast(String actorName, String portName, int numOutputs,
-			Type type) {
-		super("broadcast_" + actorName + "_" + portName, CLASS,
-				new HashMap<String, Expression>());
+	public Broadcast(int numOutputs, Type type) {
 		this.numOutputs = numOutputs;
 		this.type = type;
+
+		Location location = new Location();
+
+		inputs = new OrderedMap<Port>();
+		String name = "input";
+		inputs.add("", location, name, new Port(location, type, name));
+
+		outputs = new OrderedMap<Port>();
+		for (int i = 0; i < numOutputs; i++) {
+			location = new Location();
+			name = "output_" + i;
+			outputs.add("", location, name, new Port(location, type, name));
+		}
+	}
+
+	public Port getInput() {
+		return inputs.get("input");
+	}
+
+	/**
+	 * Returns the ordered map of input ports.
+	 * 
+	 * @return the ordered map of input ports
+	 */
+	public OrderedMap<Port> getInputs() {
+		return inputs;
 	}
 
 	public int getNumOutputs() {
 		return numOutputs;
 	}
 
+	public Port getOutput(String name) {
+		return outputs.get(name);
+	}
+
+	/**
+	 * Returns a list of integers containing [0, 1, ..., n - 1] where n is the
+	 * number of ports of this broadcast.
+	 * 
+	 * @return a list of integers
+	 */
 	public List<Integer> getOutputList() {
 		if (outputList == null) {
 			outputList = new ArrayList<Integer>();
@@ -86,6 +124,15 @@ public class Broadcast extends Instance {
 		}
 
 		return outputList;
+	}
+
+	/**
+	 * Returns the ordered map of output ports.
+	 * 
+	 * @return the ordered map of output ports
+	 */
+	public OrderedMap<Port> getOutputs() {
+		return outputs;
 	}
 
 	public Type getType() {
