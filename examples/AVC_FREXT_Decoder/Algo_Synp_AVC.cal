@@ -215,7 +215,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	*/
 	List ( type: List ( type: int, size = 9) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 8)] : for int j in Integers( 0, 254)];
 	
-    int mbTabAvail				:= 0;
+	int mbTabAvail				:= 0;
 	int mbSliceType				:= 1;
 	int mbTabMbtype				:= 2;
 	int mbIntraChromaPredMode	:= 3;
@@ -244,6 +244,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	bool StartRenormDRead				:= false;
 	bool CabacTerminated				:= false;
 	bool StartDecodeBypassStart			:= false;
+	
 	int getBitStreamValue;
 	bool cbp_done := false;
 	
@@ -281,10 +282,18 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	int blCabacIdx := 0;
 	uint(size=5) numCoeff := 0;
 	int maxNumIdx := 0;
-	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 254)] ;
-	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 254)] ;
-	List (type: int(size = 8), size = 256) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 254)] ;
-	List (type: int(size = 8), size = 256) coeff_sign_flag				:= [0: for int i in Integers(0, 254)] ;
+	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 255)] ;
+	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 255)] ;
+	List (type: int(size = 8), size = 256) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 255)] ;
+	List (type: int(size = 8), size = 256) coeff_sign_flag				:= [0: for int i in Integers(0, 255)] ;
+	
+	/* Up and Left Macroblock luma and chroma Residual Values */
+	List (type :int(size = 8 ), size = 256) MB_luma_up 					:= [0: for int i in Integers(0, 255)] ;
+	List (type :int(size = 8 ), size = 256) MB_luma_left				:= [0: for int i in Integers(0, 255)] ;
+	List (type :int(size = 8 ), size = 64)	MB_chroma_cr_up				:= [0: for int i in Integers(0, 64)] ;
+	List (type :int(size = 8 ), size = 64)  MB_chroma_cr_left			:= [0: for int i in Integers(0, 64)] ;
+	List (type :int(size = 8 ), size = 64)  MB_chroma_cr_up				:= [0: for int i in Integers(0, 64)] ;
+	List (type :int(size = 8 ), size = 64)  MB_chroma_cr_left			:= [0: for int i in Integers(0, 64)] ;
 	
 	int synEval_MB_I_Ele = 26;
 	List ( type: List ( type: int(size = 8), size = 8) , size = 26 ) synEval_MB_I = 
@@ -2121,57 +2130,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	
-	//*************************************************************/
-	/*************************************************************
-	*************************************************************
-	********       		CABAC Binarization		    	*********
-	*************************************************************
-	*************************************************************/
-	/*
-		
-	procedure UEGkbinarization(int SyntaxElement, bool signedValFlag, int uCoff, int k)
-	var
-		bool test,
-		int sufS,
-		int stopLoop,
-		int i
-	begin
-		
-		TUbinarization( SyntaxElement, uCoff);
-		synElValTestValue( 1, uCoff);
-		test := ( not signedValFlag and synElValTest = 1 ) or ( signedValFlag and synElVal[0] = 0 and BinIdx = 0 ) ;
-		
-		if ( not test ) then
-			if ( Abs( SyntaxElement ) >= uCoff ) then
-				sufS := Abs( SyntaxElement ) - uCoff;
-				stopLoop := 0;
-				i := 0;
-				while( stopLoop != 0 ) do
-					if( sufS >= ( 1 << k ) ) then
-						synElVal[i] := 1;
-						sufS := sufS - ( 1 << k );
-						k := k + 1;
-					else
-						synElVal[i] := 0;
-						while( k > 0 ) do
-							synElVal[i] := ( sufS >> k ) & 0x01;
-							k := k - 1;
-						end
-						stopLoop := 1;
-					end
-				end
-			end 
-			if( signedValFlag and synElVal != 0 ) then
-     				if( synElVal > 0 ) then
-          				synElVal[ i + 1 ] := 0;
-     				else
-          				synElVal[ i + 1 ] := 1;
-				end
-			end
-		end
-	end
-	*/
-	
 	procedure Getbinarization(int SyntaxElement)
 	begin
 		if ( SyntaxElement = CABAC_MB_TYPE_SI ) then
@@ -2895,19 +2853,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		int yW
 	begin
 		ctxIdxInc := 0;
-		/*
-		if ctxBlockCat = 0 then
-			left_cbp := mbTab[GiveMbAddrA()][mbCBPLuma];
-			top_cbp  := mbTab[GiveMbAddrB()][mbCBPLuma];
-			nza := left_cbp & 0x100;
-			nzb := top_cbp &  0x100;
-		end
-		*/
+		
 		if ctxBlockCat = 1 or ctxBlockCat = 2 then
-			/*
-			nza := NonZeroCount[val_CurrMbAddr,SCAN8(luma4x4BlkIdx) - 1];
-			nzb := NonZeroCount[val_CurrMbAddr,SCAN8(luma4x4BlkIdx) - 8];
-			*/
+			
 			
 			x := InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 0 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 0 );
 			y := InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 1 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 1 );
@@ -2994,6 +2942,30 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			
 		end
 				
+		if ctxBlockCat = 3  then
+		
+		if not mbAddrA_Avail() then
+			condTermFlagA := 0;
+		else
+			if ( mbTab[GiveMbAddrA()][mbTabMbtype] = 25 and mbTab[GiveMbAddrA()][mbSliceType] = SLICE_TYPE_I ) then
+				condTermFlagA := 1;
+			end
+			
+			if ( binIdx = 0 and mbTab[GiveMbAddrA()][mbCBPChroma] = 0) or
+			   ( binIdx = 1 and mbTab[GiveMbAddrA()][mbCBPChroma] = 2) then
+				condTermFlagA := 0;
+			else
+				condTermFlagA := 1;
+			end
+		end
+		
+		
+		end		
+		
+		if ctxBlockCat = 4  then
+		end		
+		
+		
 		if not AvailMbA and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
 		   AvailMbA and transBlockA = -1 and mbTab[mbAddrA][mbTabMbtype] != 25 then
 			condTermFlagA := 0;
@@ -3551,6 +3523,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			binValDecoded := false;
 			binIdx := -1;
 			GetSign := false;
+			NextBitToDecode := true;
 		end
 	end
 
@@ -6903,7 +6876,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		TotalCoeff() >0
 	do
 		if leveltype = 1 then //luma
-    		val_cbp_blk:=(1<<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
+    			val_cbp_blk:=(1<<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
 			NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]] := TotalCoeff();
 		else //chroma
 			if iCbCr = 0 then NonZeroCountCb[val_CurrMbAddr, luma4x4BlkIdx] := TotalCoeff(); else NonZeroCountCr[val_CurrMbAddr, luma4x4BlkIdx] := TotalCoeff(); end
@@ -7220,6 +7193,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		blCabacIdx < 0
 	end
 	
+	Residual_block_Sent_Zeros_4x4 : action ==> VALUE : [ 0 ] repeat 16
+	guard
+		coded_block_flag = 0
+	end
 	
 	
 	//******* End of Residual Block CABAC ********//  
@@ -7649,6 +7626,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_block_Cabac_read_significant_coeff_flag;
 		
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_Cabac_read_significant_coeff_flag	) --> Residual_block_read_significant_coeff_flag_done;
+		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_Sent_Zeros_4x4						) --> Residual_return;
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_skip_significant_coeff_flag_while	) --> Residual_block_read_coeff_abs_level_minus1_first;
 		
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_read_significant_coeff_flag_done	) --> Residual_block_read_last_significant_coeff_flag;
