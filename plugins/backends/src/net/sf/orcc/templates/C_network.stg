@@ -7,6 +7,18 @@ BroadcastWriteEnd(n) ::= <<
 setWriteEnd($instance.id$_output_$n$, 1);
 >>
 
+outputPatternPort(num) ::= <<
+if (!hasRoom($instance.id$_output_$num$, 1)) {
+	ports |= (1 << $num$);
+}
+>>
+
+outputPattern(outputs) ::= <<
+int ports = 0;
+$outputs: outputPatternPort(); separator="\n"$
+if (ports != 0) {
+>>
+
 declareBroadcast(instance) ::= <<
 $if (instance.broadcast)
 $
@@ -16,21 +28,23 @@ void $instance.id$_scheduler(struct schedinfo_s *si) {
 	$instance.broadcast.outputList: { n | $instance.broadcast.type$ *tok_output_$n$;
 }$
 	while (hasTokens($instance.id$_input, 1)) {
-		if ($instance.broadcast.outputList:{hasRoom($instance.id$_output_$i0$, 1)}; separator=" && "$) {
-			tok_input = getReadPtr($instance.id$_input, 1);
-			$instance.broadcast.outputList: BroadcastWrite(); separator="\n"$
-			setReadEnd($instance.id$_input, 1);
-			$instance.broadcast.outputList: BroadcastWriteEnd()$
-			i++;
-		} else {
-			si->reason = full;
+		$outputPattern(instance.broadcast.outputList)$
 			si->num_firings = i;
+			si->reason = full;
+			si->ports = ports;
 			return;
 		}
+
+		tok_input = getReadPtr($instance.id$_input, 1);
+		$instance.broadcast.outputList: BroadcastWrite(); separator="\n"$
+		setReadEnd($instance.id$_input, 1);
+		$instance.broadcast.outputList: BroadcastWriteEnd(); separator="\n"$
+		i++;
 	}
 
 	si->reason = starved;
 	si->num_firings = i;
+	si->ports = 0x01;
 }$
 endif$
 
