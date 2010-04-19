@@ -34,8 +34,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.stringtemplate.v4.STGroup;
-
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
