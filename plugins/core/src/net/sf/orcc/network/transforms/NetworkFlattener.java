@@ -29,7 +29,6 @@
 package net.sf.orcc.network.transforms;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -113,15 +112,8 @@ public class NetworkFlattener implements INetworkTransformation {
 		List<Connection> incomingEdgeSet = new ArrayList<Connection>(graph
 				.incomingEdgesOf(vertex));
 		for (Connection edge : incomingEdgeSet) {
-			Set<Connection> outgoingEdgeSet = new HashSet<Connection>();
-			for (Vertex v : subGraph.vertexSet()) {
-				if (v.isPort()) {
-					if (edge.getTarget().getName()
-							.equals(v.getPort().getName())) {
-						outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
-					}
-				}
-			}
+			Vertex v = new Vertex("Input", edge.getTarget());
+			Set<Connection> outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
 
 			for (Connection newEdge : outgoingEdgeSet) {
 				Connection incoming = new Connection(edge.getSource(), newEdge
@@ -150,15 +142,8 @@ public class NetworkFlattener implements INetworkTransformation {
 		List<Connection> outgoingEdgeSet = new ArrayList<Connection>(graph
 				.outgoingEdgesOf(vertex));
 		for (Connection edge : outgoingEdgeSet) {
-			Set<Connection> incomingEdgeSet = new HashSet<Connection>();
-			for (Vertex v : subGraph.vertexSet()) {
-				if (v.isPort()) {
-					if (edge.getSource().getName()
-							.equals(v.getPort().getName())) {
-						incomingEdgeSet = subGraph.incomingEdgesOf(v);
-					}
-				}
-			}
+			Vertex v = new Vertex("Output", edge.getSource());
+			Set<Connection> incomingEdgeSet = subGraph.incomingEdgesOf(v);
 
 			for (Connection newEdge : incomingEdgeSet) {
 				Connection incoming = new Connection(newEdge.getSource(), edge
