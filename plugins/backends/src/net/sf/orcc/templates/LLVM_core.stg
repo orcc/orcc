@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(port) ::= <<
-@$actor.name$_$port.name$ = common global %struct.fifo_s* null
+@$port.name$ = common global %struct.fifo_s* null
 
 >>
 
