@@ -3466,6 +3466,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 					binIdx := binIdx + 1;
 					if binVal = 1 then
 						coeff_abs := coeff_abs + 1;
+						if coeff_abs >= 15  then
+							StopCoeff := false;
+						end
 					else
 						StopCoeff := false;
 						StartCoeffSignAbs := true;
@@ -3476,44 +3479,46 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			end
 			
 			if coeff_abs >= 15  then
-				if binValDecoded = false and StopCoeff = false then
-					StartDecodeBypass := true;
-					bypassFlag := true;
-					CabacStartProcess := false;
-				else
-					// Increment binIdx
-					binIdx := binIdx + 1;
-					if binVal = 1 then
-						coeff_abs := coeff_abs + (1 << Coeff_J);
-						Coeff_J := Coeff_J + 1;
-					else
-						StopCoeff := true;
-						StartCoeff_J_Dec := true;
-					end
-					binValDecoded := false;
-				end
-				
-				if Coeff_J != 0  and StartCoeff_J_Dec then
-					if binValDecoded = false and StopCoeff then
-						StartDecodeBypass := true;
-						bypassFlag := true;
-						CabacStartProcess := false;
-					else
-						// Increment binIdx
-						binIdx := binIdx + 1;
-						if binVal = 1 then
-							coeff_abs := coeff_abs + (1 << Coeff_J);
-							Coeff_J := Coeff_J -1;
+				if StartCoeff_J_Dec = false then
+						if binValDecoded = false and StopCoeff = false then
+							StartDecodeBypass := true;
+							bypassFlag := true;
+							CabacStartProcess := false;
 						else
-							StopCoeff := false;
-							StartCoeffSignAbs := true;
+							// Increment binIdx
+							binIdx := binIdx + 1;
+							if binVal = 1 then
+								coeff_abs := coeff_abs + (1 << Coeff_J);
+								Coeff_J := Coeff_J + 1;
+							else
+								StopCoeff := true;
+								StartCoeff_J_Dec := true;
+							end
+							binValDecoded := false;
 						end
-						binValDecoded := false;
-					end
 				else
-					StartSuffix := false;
+					if Coeff_J != 0  then
+						if binValDecoded = false then
+							StartDecodeBypass := true;
+							bypassFlag := true;
+							CabacStartProcess := false;
+						else
+							// Increment binIdx
+							binIdx := binIdx + 1;
+							if binVal = 1 then
+								coeff_abs := coeff_abs + (1 << Coeff_J - 1);
+								Coeff_J := Coeff_J - 1;
+							else
+								Coeff_J := Coeff_J - 1;
+							end
+							binValDecoded := false;
+						end
+					else
+						StartCoeffSignAbs := true;
+						StartSuffix := false;
+						StartCoeff_J_Dec := false;
+					end
 				end
-				
 				
 			end	
 		end
@@ -7191,7 +7196,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		start_cabac();
 	end
 	
-	Residual_block_update_coeffLevel_read: action ==>
+	Residual_block_update_coeffLevel_read: action ==> VALUE : [ level[blCabacIdx + 1] ]
 	guard
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1 and cabac_end()
 	do
@@ -7203,7 +7208,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	end
 	
 	
-	Residual_block_update_coeffLevel_not_read: action ==>
+	Residual_block_update_coeffLevel_not_read: action ==> VALUE : [ 0 ]
 	guard
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 0
 	do
