@@ -190,8 +190,16 @@ $procedure(action.body)$$procedure(action.scheduler)$
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
+outputPatternPort(port) ::= <<
+if (!hasRoom($instance.id$_$port$, $pattern.(port)$)) {
+	ports |= 0x$instance.actor.maskOutput.(port)$;
+}
+>>
+
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|hasRoom($instance.id$_$port$, $pattern.(port)$)}; separator=" && "$
+int ports = 0;
+$pattern.keys: outputPatternPort(); separator="\n"$
+if (ports != 0) {
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -205,16 +213,14 @@ i++;
 actionTest(action) ::= <<
 if (isSchedulable_$action$()) {
 	$if(action.outputPattern)$
-	if ($outputPattern(pattern=action.outputPattern)$) {
-		$actionCall(action)$
-	} else {
+	$outputPattern(pattern=action.outputPattern)$
 		si->num_firings = i;
 		si->reason = full;
+		si->ports = ports;
 		break;
 	}
-	$else$
-	$actionCall(action)$
 	$endif$
+	$actionCall(action)$
 }>>
 
 schedulingTest(actions) ::= <<
@@ -229,6 +235,7 @@ void $instance.id$_scheduler(struct schedinfo_s *si) {
 		$if(actions)$$schedulingTest(actions)$$endif$ else {
 			si->num_firings = i;
 			si->reason = starved;
+			si->ports = 0x$instance.actor.maskInputs$;
 			break;
 		}
 	}
@@ -248,17 +255,15 @@ goto l_$nextState.targetState$;
 actionTestState(nextState) ::= <<
 if (isSchedulable_$nextState.action$()) {
 	$if(nextState.action.outputPattern)$
-	if ($outputPattern(nextState.action.outputPattern)$) {
-		$actionCallState(nextState)$
-	} else {
+	$outputPattern(nextState.action.outputPattern)$
 		_FSM_state = s_$transition.sourceState$;
 		si->num_firings = i;
 		si->reason = full;
+		si->ports = ports;
 		return;
 	}
-	$else$
-	$actionCallState(nextState)$
 	$endif$
+	$actionCallState(nextState)$
 }>>
 
 schedulingTestState(nextStates) ::= <<
@@ -278,6 +283,7 @@ l_$transition.sourceState$:
 		_FSM_state = s_$transition.sourceState$;
 		si->num_firings = i;
 		si->reason = starved;
+		si->ports = 0x$instance.actor.maskInputsTransition.(transition)$;
 		return;
 	}
 >>

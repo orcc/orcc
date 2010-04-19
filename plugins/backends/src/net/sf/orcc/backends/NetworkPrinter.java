@@ -79,7 +79,7 @@ public class NetworkPrinter {
 			boolean debugFifos, int fifoSize) throws IOException {
 		ST template = group.getInstanceOf("network");
 
-		network.computeGraphMaps();
+		network.computeTemplateMaps();
 
 		template.add("debugFifos", debugFifos);
 		template.add("network", network);

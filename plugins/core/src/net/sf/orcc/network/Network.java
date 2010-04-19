@@ -164,7 +164,7 @@ public class Network {
 	 * Computes the source map and target maps that associate each connection to
 	 * its source vertex (respectively target vertex).
 	 */
-	public void computeGraphMaps() {
+	public void computeTemplateMaps() {
 		sourceMap = new HashMap<Connection, Vertex>();
 		for (Connection connection : graph.edgeSet()) {
 			sourceMap.put(connection, graph.getEdgeSource(connection));

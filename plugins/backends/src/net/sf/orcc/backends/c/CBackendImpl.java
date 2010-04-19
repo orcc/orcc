@@ -135,6 +135,8 @@ public class CBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
+		
+		actor.computeTemplateMaps();
 	}
 
 }

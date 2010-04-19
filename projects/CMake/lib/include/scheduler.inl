@@ -137,13 +137,11 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 /**
  * add the actor to the schedulable list
  */
-static void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *actor) {
-	struct list_s *list;
-	
+static void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *actor) {	
 	// only add the actor in the schedulable list if it is not already there
 	// like a list.contains(actor) but in O(1) instead of O(n)
 	if (!actor->in_list) {
-		list = new_list();
+		struct list_s *list = new_list();
 		list->payload = actor;
 		list_add_tail(&(sched->schedulable), list);
 		actor->in_list = 1;

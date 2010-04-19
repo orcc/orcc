@@ -1,5 +1,3 @@
-#define BRAINDEAD_FIFO 1
-
 #include "fifo.h"
 #include "scheduler.h"
 

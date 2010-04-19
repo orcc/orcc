@@ -38,14 +38,10 @@ struct conn_s {
 struct actor_s {
 	char *name;
 	void (*sched_func)(struct schedinfo_s *);
-	int num_inputs;
-	int num_outputs;
-	int num_predecessors;
-	int num_successors;
-	struct conn_s **inputs;
-	struct conn_s **outputs;
-	struct actor_s **predecessors;
-	struct actor_s **successors;
+	int num_inputs; /** number of input ports */
+	int num_outputs; /** number of output ports */
+	struct actor_s *predecessors; /** predecessors: one actor per port. */
+	struct actor_s *successors; /** successors: one actor per port. */
 
 	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
 };
