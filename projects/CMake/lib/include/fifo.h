@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,7 @@ enum reasons {
 struct schedinfo_s {
 	int num_firings;
 	enum reasons reason;
+	int ports; /** contains a mask that indicate the ports affected */
 };
 
 /** lock free fifo ring buffer structure */
@@ -59,6 +60,6 @@ static struct fifo_s fifo_##count = { sizeof(type), (size), array_##count, 0, 0 
 
 #define contents(fifo, ptr) (& (fifo)->contents[(ptr) * (fifo)->elt_size])
 
-#include "fifo.inc.h"
+#include "fifo.inl"
 
 #endif
