@@ -52,8 +52,6 @@ public final class VHDLActorPrinter extends STPrinter {
 
 	public static Pattern adjacent_ = Pattern.compile("_+");
 
-	private STGroup group;
-
 	private Map<String, String> transformations;
 
 	/**
