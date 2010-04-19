@@ -14,74 +14,35 @@ struct actor_s *actors[] = {$instances: declareActorArray(); wrap, separator=", 
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Declare predecessors
+// Declare predecessors and successors
 
-goDeclarePredecessor(instance) ::= "&$instance.id$"
+Neighbor(port) ::= <<
+&$map.(port).id$
+>>
 
-goDeclarePredecessors(instance, predecessors) ::= <<
-$if(!predecessors.empty)
-$struct actor_s *$instance.id$_predecessors[] = {$
-predecessors: goDeclarePredecessor(); wrap, separator=", "$};
+Neighbors(map, ports) ::= <<
+$ports: Neighbor(); separator=", "$
+>>
+
+goDeclarePredSucc(actor, inputs, outputs) ::= <<
+$if(!inputs.empty)
+$struct actor_s *$instance.id$_predecessors[] = {$Neighbors(map=network.predecessorsMap.(instance), ports=inputs)$};
+$endif$$
+if(!outputs.empty)
+$struct actor_s *$instance.id$_successors[] = {$Neighbors(map=network.successorsMap.(instance), ports=outputs)$};
 $endif$
 >>
 
-declarePredecessors(instances) ::= <<
-$instances: {$goDeclarePredecessors(instance=it, predecessors=network.predecessorsMap.(it))$}$
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Declare successors
-
-goDeclareSuccessor(instance) ::= "&$instance.id$"
-
-goDeclareSuccessors(instance, successors) ::= <<
-$if(!successors.empty)
-$struct actor_s *$instance.id$_successors[] = {$
-successors: goDeclareSuccessor(); wrap, separator=", "$};
-$endif$
->>
-
-declareSuccessors(instances) ::= <<
-$instances: {$goDeclareSuccessors(instance=it, successors=network.successorsMap.(it))$}$
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Declare connections
-
-declareConnection(source, sourcePort, target, targetPort, count) ::= <<
-
-struct conn_s conn_$count$ = {&fifo_$count$, &$source.id$, &$target.id$};
->>
-
-tryDeclareConnection(edge, src, tgt) ::= <<
-$if (src.instance && tgt.instance)
-$$declareConnection(
-  source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target,
-  count=network.connectionMap.(edge))$$
+goDeclarePredsSuccs(instance, incoming, outgoing) ::= <<
+$if (instance.actor)
+$$goDeclarePredSucc(actor=instance.actor,
+    inputs=instance.actor.inputs.list, outputs=instance.actor.outputs.list)$$
 endif$
 >>
 
-declareConnections(edges) ::= <<
-$edges: {$tryDeclareConnection(
-  edge=it, src=network.sourceMap.(it), tgt=network.targetMap.(it))$}$
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Declare inputs and outputs
-
-goDeclareInputsOutputs(instance, incoming, outgoing) ::= <<
-$if(!incoming.empty)
-$struct conn_s *$instance.id$_inputs[] = {$incoming: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
-$endif$$
-if(!outgoing.empty)
-$struct conn_s *$instance.id$_outputs[] = {$outgoing: {&conn_$network.connectionMap.(it)$}; wrap, separator=", "$};
-$endif$
->>
-
-declareInputsOutputs(instances) ::= <<
+declarePredsSuccs(instances) ::= <<
 $instances:
-  {$goDeclareInputsOutputs(instance=it,
+  {$goDeclarePredsSuccs(instance=it,
     incoming=network.incomingMap.(it),
     outgoing=network.outgoingMap.(it))$}$
 >>
@@ -89,17 +50,24 @@ $instances:
 ///////////////////////////////////////////////////////////////////////////////
 // Define actors
 
+NumInputs(instance) ::= <<
+$if (instance.actor)
+$$instance.actor.inputs.length$$
+else$$if (instance.broadcast)$1$else$0$endif$$endif$
+>>
+
+NumOutputs(instance) ::= <<
+$if (instance.actor)
+$$instance.actor.outputs.length$$
+else$$if (instance.broadcast)$$instance.numOutputs$$else$0$endif$$endif$
+>>
+
 fillActorStruct(instance) ::= <<
 
 struct actor_s $instance.id$ = {"$instance.id$", $instance.id$_scheduler, $
-length(network.incomingMap.(instance))$, $
-length(network.outgoingMap.(instance))$, $
-length(network.predecessorsMap.(instance))$, $
-length(network.successorsMap.(instance))$, $
-if(network.incomingMap.(instance).empty)$NULL$else$$instance.id$_inputs$endif$, $
-if(network.outgoingMap.(instance).empty)$NULL$else$$instance.id$_outputs$endif$, $
-if(network.predecessorsMap.(instance).empty)$NULL$else$$instance.id$_predecessors$endif$, $
-if(network.successorsMap.(instance).empty)$NULL$else$$instance.id$_successors$endif$};
+NumInputs(instance)$, $NumOutputs(instance)$, $
+if(instance.actor.inputs.list.empty)$NULL$else$$instance.id$_predecessors$endif$, $
+if(instance.actor.outputs.list.empty)$NULL$else$$instance.id$_successors$endif$};
 >>
 
 fillActorsStructs(instances) ::= <<
@@ -115,7 +83,6 @@ network(debugFifos, fifoSize, network) ::= <<
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BRAINDEAD_FIFO 1
 #include "fifo.h"
 #include "scheduler.h"
 #include "orcc_util.h"
@@ -140,25 +107,14 @@ $declareSchedulers(network.instances)$
 
 $declareActors(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
-// Declaration of the predecessors of each actor
+// Declaration of the predecessors and successors of each actor
 
-$declarePredecessors(network.instances)$
-////////////////////////////////////////////////////////////////////////////////
-// Declaration of the successors of each actor
-
-$declareSuccessors(network.instances)$
-////////////////////////////////////////////////////////////////////////////////
-// Declaration of conn_s structures
-
-$declareConnections(network.connections)$
-////////////////////////////////////////////////////////////////////////////////
-// Declaration of the inputs and outputs of each actor
-
-$declareInputsOutputs(network.instances)$
+$declarePredsSuccs(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the actors array
 
 $fillActorsStructs(network.instances)$
+
 $declareActorsArray(network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
@@ -187,9 +143,9 @@ static void scheduler() {
 		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 #endif
 		if (si.reason == full) {
-			sched_add_successors(&my_scheduler, my_actor);
+			sched_add_successors(&my_scheduler, my_actor, si.ports);
 		} else if (si.reason == starved) {
-			sched_add_predecessors(&my_scheduler, my_actor);
+			sched_add_predecessors(&my_scheduler, my_actor, si.ports);
 		}
 
 		my_actor = sched_get_next_schedulable(&my_scheduler);

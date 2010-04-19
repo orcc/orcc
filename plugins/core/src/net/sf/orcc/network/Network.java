@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -116,11 +117,11 @@ public class Network {
 
 	private OrderedMap<GlobalVariable> parameters;
 
-	private Map<Instance, List<Instance>> predecessorsMap;
+	private Map<Instance, Map<Port, Instance>> predecessorsMap;
 
 	private Map<Connection, Vertex> sourceMap;
 
-	private Map<Instance, List<Instance>> successorsMap;
+	private Map<Instance, Map<Port, Instance>> successorsMap;
 
 	private Map<Connection, Vertex> targetMap;
 
@@ -160,6 +161,66 @@ public class Network {
 		new NetworkClassifier().transform(this);
 	}
 
+	private void computeIncomingOutgoingMaps() {
+		incomingMap = new HashMap<Instance, List<Connection>>();
+		outgoingMap = new HashMap<Instance, List<Connection>>();
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				// incoming edges
+				Set<Connection> connections = graph.incomingEdgesOf(vertex);
+				List<Connection> incoming = Arrays.asList(connections
+						.toArray(new Connection[0]));
+				incomingMap.put(vertex.getInstance(), incoming);
+
+				// outgoing edges
+				connections = graph.outgoingEdgesOf(vertex);
+				List<Connection> outgoing = Arrays.asList(connections
+						.toArray(new Connection[0]));
+				outgoingMap.put(vertex.getInstance(), outgoing);
+			}
+		}
+	}
+
+	private void computePredecessorsSuccessorsMaps() {
+		predecessorsMap = new HashMap<Instance, Map<Port, Instance>>();
+		successorsMap = new HashMap<Instance, Map<Port, Instance>>();
+
+		// for each instance
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				if (instance.isActor()) {
+					computePredSuccActor(vertex, instance.getActor());
+				} else if (instance.isBroadcast()) {
+				}
+			}
+		}
+	}
+
+	private void computePredSuccActor(Vertex vertex, Actor actor) {
+		Map<Port, Instance> map = new LinkedHashMap<Port, Instance>();
+		predecessorsMap.put(vertex.getInstance(), map);
+		Set<Connection> incoming = graph.incomingEdgesOf(vertex);
+		for (Port port : actor.getInputs()) {
+			for (Connection connection : incoming) {
+				if (port.equals(connection.getTarget())) {
+					map.put(port, graph.getEdgeSource(connection).getInstance());
+				}
+			}
+		}
+
+		map = new LinkedHashMap<Port, Instance>();
+		successorsMap.put(vertex.getInstance(), map);
+		Set<Connection> outgoing = graph.outgoingEdgesOf(vertex);
+		for (Port port : actor.getOutputs()) {
+			for (Connection connection : outgoing) {
+				if (port.equals(connection.getSource())) {
+					map.put(port, graph.getEdgeTarget(connection).getInstance());
+				}
+			}
+		}
+	}
+
 	/**
 	 * Computes the source map and target maps that associate each connection to
 	 * its source vertex (respectively target vertex).
@@ -181,51 +242,8 @@ public class Network {
 			connectionMap.put(connection, i++);
 		}
 
-		predecessorsMap = new HashMap<Instance, List<Instance>>();
-		successorsMap = new HashMap<Instance, List<Instance>>();
-		incomingMap = new HashMap<Instance, List<Connection>>();
-		outgoingMap = new HashMap<Instance, List<Connection>>();
-		for (Vertex vertex : graph.vertexSet()) {
-			if (vertex.isInstance()) {
-				// incoming edges
-				Set<Connection> connections = graph.incomingEdgesOf(vertex);
-				List<Connection> incoming = Arrays.asList(connections
-						.toArray(new Connection[0]));
-				incomingMap.put(vertex.getInstance(), incoming);
-
-				// compute predecessors
-				Set<Instance> predecessors = new HashSet<Instance>();
-				for (Connection connection : connections) {
-					Vertex source = graph.getEdgeSource(connection);
-					if (source.isInstance()) {
-						predecessors.add(source.getInstance());
-					}
-				}
-
-				List<Instance> predecessorsList = Arrays.asList(predecessors
-						.toArray(new Instance[0]));
-				predecessorsMap.put(vertex.getInstance(), predecessorsList);
-
-				// outgoing edges
-				connections = graph.outgoingEdgesOf(vertex);
-				List<Connection> outgoing = Arrays.asList(connections
-						.toArray(new Connection[0]));
-				outgoingMap.put(vertex.getInstance(), outgoing);
-
-				// compute successors
-				Set<Instance> successors = new HashSet<Instance>();
-				for (Connection connection : connections) {
-					Vertex target = graph.getEdgeTarget(connection);
-					if (target.isInstance()) {
-						successors.add(target.getInstance());
-					}
-				}
-
-				List<Instance> successorsList = Arrays.asList(successors
-						.toArray(new Instance[0]));
-				successorsMap.put(vertex.getInstance(), successorsList);
-			}
-		}
+		computeIncomingOutgoingMaps();
+		computePredecessorsSuccessorsMaps();
 	}
 
 	/**
@@ -445,13 +463,11 @@ public class Network {
 	}
 
 	/**
-	 * Returns a map that associates each instance to the list of its
-	 * predecessors.
+	 * Returns a map that associates a port to the list of its predecessors.
 	 * 
-	 * @return a map that associates each instance to the list of its
-	 *         predecessors
+	 * @return a map that associates a port to the list of its predecessors
 	 */
-	public Map<Instance, List<Instance>> getPredecessorsMap() {
+	public Map<Instance, Map<Port, Instance>> getPredecessorsMap() {
 		return predecessorsMap;
 	}
 
@@ -465,12 +481,11 @@ public class Network {
 	}
 
 	/**
-	 * Returns a map that associates each instance to the list of its
-	 * successors.
+	 * Returns a map that associates a port to the list of its successors.
 	 * 
-	 * @return a map that associates each instance to the list of its successors
+	 * @return a map that associates a port to the list of its successors
 	 */
-	public Map<Instance, List<Instance>> getSuccessorsMap() {
+	public Map<Instance, Map<Port, Instance>> getSuccessorsMap() {
 		return successorsMap;
 	}
 

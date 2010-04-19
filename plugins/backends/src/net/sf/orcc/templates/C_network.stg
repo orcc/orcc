@@ -16,7 +16,7 @@ void $bcast.id$_scheduler(struct schedinfo_s *si) {
 	while (hasTokens($bcast.id$_input, 1)) {
 		if ($bcast.outputList:{hasRoom($bcast.id$_output_$i0$, 1)}; separator=" && "$) {
 			tok_input = getReadPtr($bcast.id$_input, 1);
-			$bcast.outputList: BroadcastWrite()$
+			$bcast.outputList: BroadcastWrite(); separator="\n"$
 			setReadEnd($bcast.id$_input, 1);
 			$bcast.outputList: BroadcastWriteEnd()$
 			i++;

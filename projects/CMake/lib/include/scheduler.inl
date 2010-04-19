@@ -150,7 +150,7 @@ static void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *act
 
 static void sched_add_predecessors(struct scheduler_s *sched, struct actor_s *actor) {
 	int i, n;
-	n = actor->num_predecessors;
+	n = actor->num_inputs;
 	for (i = 0; i < n; i++) {
 		struct actor_s *pred = actor->predecessors[i];
 		sched_add_schedulable(sched, pred);
@@ -159,7 +159,7 @@ static void sched_add_predecessors(struct scheduler_s *sched, struct actor_s *ac
 
 static void sched_add_successors(struct scheduler_s *sched, struct actor_s *actor) {
 	int i, n;
-	n = actor->num_successors;
+	n = actor->num_outputs;
 	for (i = 0; i < n; i++) {
 		struct actor_s *succ = actor->successors[i];
 		sched_add_schedulable(sched, succ);

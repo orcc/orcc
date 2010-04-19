@@ -45,7 +45,7 @@ public class Broadcast extends Instance {
 
 	public static final String CLASS = "";
 
-	private int numOutput;
+	private int numOutputs;
 
 	private List<Integer> outputList;
 
@@ -65,21 +65,22 @@ public class Broadcast extends Instance {
 	 * @param type
 	 *            type of this broadcast
 	 */
-	public Broadcast(String actorName, String portName, int numOutput, Type type) {
+	public Broadcast(String actorName, String portName, int numOutputs,
+			Type type) {
 		super("broadcast_" + actorName + "_" + portName, CLASS,
 				new HashMap<String, Expression>());
-		this.numOutput = numOutput;
+		this.numOutputs = numOutputs;
 		this.type = type;
 	}
 
-	public int getNumOutput() {
-		return numOutput;
+	public int getNumOutputs() {
+		return numOutputs;
 	}
 
 	public List<Integer> getOutputList() {
 		if (outputList == null) {
 			outputList = new ArrayList<Integer>();
-			for (int i = 0; i < numOutput; i++) {
+			for (int i = 0; i < numOutputs; i++) {
 				outputList.add(i);
 			}
 		}
