@@ -44,4 +44,5 @@ void sink_scheduler(struct schedinfo_s *si) {
 
 	si->num_firings = i;
 	si->reason = starved;
+	si->ports = 0x01; // FIFO connected to first input port is empty
 }

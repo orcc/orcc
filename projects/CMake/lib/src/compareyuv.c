@@ -258,4 +258,5 @@ void Compare_scheduler(struct schedinfo_s *si) {
 
 	si->num_firings = i;
 	si->reason = starved;
+	si->ports = 0x07; // FIFOs connected to first three input ports are empty
 }
