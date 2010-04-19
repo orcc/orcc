@@ -228,12 +228,6 @@ public abstract class Variable implements INameable {
 		return (expression != null);
 	}
 
-	@Override
-	public int hashCode() {
-		// the hash code of a variable is the hash code of its name
-		return getName().hashCode();
-	}
-
 	/**
 	 * Returns <code>true</code> if this variable is global.
 	 * 

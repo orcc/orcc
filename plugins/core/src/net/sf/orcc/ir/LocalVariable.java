@@ -92,20 +92,6 @@ public class LocalVariable extends Variable implements
 		return getName().compareTo(varDef.getName());
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof LocalVariable) {
-			LocalVariable varDef = (LocalVariable) obj;
-			boolean name = varDef.getName().equals(this.getName());
-			boolean suffix = hasSuffix() && varDef.hasSuffix()
-					&& getSuffix() == varDef.getSuffix() || !hasSuffix()
-					&& !varDef.hasSuffix();
-			boolean index = (this.index == varDef.index);
-			return name && suffix && index;
-		}
-		return false;
-	}
-
 	/**
 	 * Returns the base name of this variable, which is the original name of the
 	 * variable, without suffix nor index.
