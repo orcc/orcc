@@ -52,9 +52,7 @@ public class OrccLineBreakpoint extends LineBreakpoint {
 
 	/**
 	 * Constructs a line breakpoint on the given resource at the given line
-	 * number. The line number is 1-based (i.e. the first line of a file is line
-	 * number 1). The Orcc VM uses 0-based line numbers, so this line number
-	 * translation is done at breakpoint install time.
+	 * number.
 	 * 
 	 * @param resource
 	 *            file on which to set the breakpoint

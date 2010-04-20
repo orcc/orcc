@@ -436,6 +436,7 @@ public class InterpreterMain extends Thread {
 				break;
 			}
 		}
+		close();
 	}
 
 	/**
@@ -569,7 +570,6 @@ public class InterpreterMain extends Thread {
 	 * Terminate the interpretation of the current actors network
 	 */
 	public synchronized void terminate() {
-		close();
 		state = InterpreterState.TERMINATED;
 		firePropertyChange("terminated", null, null);
 	}

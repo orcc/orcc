@@ -59,14 +59,21 @@ public class OrccModelPresentation extends LabelProvider implements
 
 	@Override
 	public String getEditorId(IEditorInput input, Object element) {
-		if (element instanceof IFile || element instanceof ILineBreakpoint) {
+		if (element instanceof IFile) {
 			try {
 				return IDE.getEditorDescriptor((IFile) element).getId();
 			} catch (PartInitException e) {
 				e.printStackTrace();
 			}
 		}
-
+		if (element instanceof ILineBreakpoint) {
+			try {
+				return IDE.getEditorDescriptor((IFile) ((ILineBreakpoint) element)
+						.getMarker().getResource()).getId();
+			} catch (PartInitException e) {
+				e.printStackTrace();
+			}
+		}
 		return null;
 	}
 

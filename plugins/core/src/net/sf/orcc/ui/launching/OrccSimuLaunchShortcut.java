@@ -28,9 +28,11 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_VTL;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.SIMULATION_CONFIG_TYPE;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 
 import java.util.ArrayList;
@@ -72,7 +74,17 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 
 	private String browseOutputFolder(Shell shell, IFile file) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select output folder:");
+		dialog.setMessage("Select output folder :");
+		// set initial directory
+		String location = file.getParent().getLocation().toOSString();
+		dialog.setFilterPath(location);
+
+		return dialog.open();
+	}
+
+	private String browseVTLFolder(Shell shell, IFile file) {
+		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
+		dialog.setMessage("Select VTL folder :");
 		// set initial directory
 		String location = file.getParent().getLocation().toOSString();
 		dialog.setFilterPath(location);
@@ -82,7 +94,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 
 	private String browseStimulusFiles(Shell shell, IFile file) {
 		FileDialog fd = new FileDialog(shell, SWT.OPEN);
-		fd.setText("Select input stimulus:");
+		fd.setText("Select input stimulus :");
 		String[] filterExt = { "*.*" };
 		fd.setFilterExtensions(filterExt);
 		String location = file.getParent().getLocation().toOSString();
@@ -136,10 +148,18 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			name = manager.generateLaunchConfigurationName(name);
 			wc = type.newInstance(null, name);
 
-			// source file
+			// source XDF file
 			wc.setAttribute(XDF_FILE, file.getLocation().toOSString());
 
-			// stimulus
+			// source VTL folder
+			String folder = browseVTLFolder(getShell(), file);
+			if (folder == null) {
+				return null;
+			}
+			wc.setAttribute(VTL_FOLDER, folder);
+			wc.setAttribute(COMPILE_VTL, true);
+			
+			// stimulus file
 			String stimulus = browseStimulusFiles(getShell(), file);
 			if (stimulus == null) {
 				return null;
@@ -147,7 +167,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			wc.setAttribute(INPUT_STIMULUS, stimulus);
 
 			// output folder
-			String folder = browseOutputFolder(getShell(), file);
+			folder = browseOutputFolder(getShell(), file);
 			if (folder == null) {
 				return null;
 			}

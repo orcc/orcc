@@ -28,8 +28,10 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_VTL;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 
 import java.io.File;
@@ -79,6 +81,8 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private Text textNetwork;
+	
+	private Text textVTL;
 
 	private Text textOutput;
 
@@ -132,8 +136,8 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private void browseOutputFolder(Shell shell) {
 		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select output folder:");
-		if (getFolderFromText()) {
+		dialog.setMessage("Select output folder : ");
+		if (getFolderFromText(textOutput)) {
 			// set initial directory if it is valid
 			dialog.setFilterPath(textOutput.getText());
 		}
@@ -146,13 +150,27 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private void browseStimulusFiles(Shell shell) {
 		FileDialog fd = new FileDialog(shell, SWT.OPEN);
-		fd.setText("Select input stimulus:");
+		fd.setText("Select input stimulus : ");
 		fd.setFilterPath(textStimulus.getText());
 		String[] filterExt = { "*.*" };
 		fd.setFilterExtensions(filterExt);
 		String fileName = fd.open();
 		if (fileName != null) {
 			textStimulus.setText(fileName);
+		}
+	}
+
+	private void browseVTLFolder(Shell shell) {
+		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
+		dialog.setMessage("Select VTL folder : ");
+		if (getFolderFromText(textVTL)) {
+			// set initial directory if it is valid
+			dialog.setFilterPath(textVTL.getText());
+		}
+
+		String dir = dialog.open();
+		if (dir != null) {
+			textVTL.setText(dir);
 		}
 	}
 
@@ -169,20 +187,22 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		composite.setLayoutData(data);
 		setControl(composite);
 
-		createControlNetwork(font, composite);
-		createControlBitstream(font, composite);
-
 		Label lbl = new Label(composite, SWT.NONE);
 		data = new GridData(GridData.FILL_HORIZONTAL);
 		data.heightHint = 1;
 		lbl.setLayoutData(data);
+		
+		createControlNetwork(font, composite);
+		createControlVTL(font, composite);
+		createControlStimulus(font, composite);
+		
 		createControlOutput(font, composite);
 	}
 
-	private void createControlBitstream(Font font, Composite parent) {
+	private void createControlStimulus(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
-		group.setText("&Input stimulus:");
+		group.setText("&Input stimulus :");
 		group.setLayout(new GridLayout(2, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
@@ -216,7 +236,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	private void createControlNetwork(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
-		group.setText("&Input:");
+		group.setText("&Input XDF :");
 		group.setLayout(new GridLayout(2, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
@@ -250,7 +270,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	private void createControlOutput(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
-		group.setText("&Output:");
+		group.setText("&Output :");
 		group.setLayout(new GridLayout(3, false));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
@@ -289,6 +309,48 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		});
 	}
 
+	private void createControlVTL(Font font, Composite parent) {
+		final Group group = new Group(parent, SWT.NONE);
+		group.setFont(font);
+		group.setText("&VTL :");
+		group.setLayout(new GridLayout(3, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		group.setLayoutData(data);
+
+		createControlVTLFolder(font, group);
+	}
+
+	private void createControlVTLFolder(Font font, final Group group) {
+		Label lbl = new Label(group, SWT.NONE);
+		lbl.setFont(font);
+		lbl.setText("VTL folder:");
+		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+
+		textVTL = new Text(group, SWT.BORDER | SWT.SINGLE);
+		textVTL.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		textVTL.setLayoutData(data);
+		textVTL.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateLaunchConfigurationDialog();
+			}
+		});
+
+		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseVTLFolder(group.getShell());
+			}
+		});
+	}
+	
 	private IFile getFileFromText() {
 		String value = textNetwork.getText();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -298,8 +360,8 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		return file;
 	}
 
-	private boolean getFolderFromText() {
-		String value = textOutput.getText();
+	private boolean getFolderFromText(Text text) {
+		String value = text.getText();
 		File file = new File(value);
 		if (file.isDirectory()) {
 			return true;
@@ -334,6 +396,9 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			String value = configuration.getAttribute(XDF_FILE, "");
 			textNetwork.setText(value);
 
+			value = configuration.getAttribute(VTL_FOLDER, "");
+			textVTL.setText(value);
+			
 			value = configuration.getAttribute(INPUT_STIMULUS, "");
 			textStimulus.setText(value);
 
@@ -359,6 +424,17 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			return false;
 		}
 
+		value = textVTL.getText();
+		if (value.isEmpty()) {
+			setErrorMessage("VTL path not specified");
+			return false;
+		}
+
+		if (!getFolderFromText(textVTL)) {
+			setErrorMessage("Given output path does not specify an existing folder");
+			return false;
+		}
+		
 		if (!getStimulusFromText()) {
 			setErrorMessage("Given stimulus path does not specify an existing file");
 			return false;
@@ -370,7 +446,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			return false;
 		}
 
-		if (!getFolderFromText()) {
+		if (!getFolderFromText(textOutput)) {
 			setErrorMessage("Given output path does not specify an existing folder");
 			return false;
 		}
@@ -384,6 +460,10 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		String value = textNetwork.getText();
 		configuration.setAttribute(XDF_FILE, value);
 
+		value = textVTL.getText();
+		configuration.setAttribute(VTL_FOLDER, value);
+		configuration.setAttribute(COMPILE_VTL, true);
+		
 		value = textStimulus.getText();
 		configuration.setAttribute(INPUT_STIMULUS, value);
 
@@ -394,6 +474,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(XDF_FILE, "");
+		configuration.setAttribute(VTL_FOLDER, "");
 		configuration.setAttribute(INPUT_STIMULUS, "");
 		configuration.setAttribute(OUTPUT_FOLDER, "");
 	}
