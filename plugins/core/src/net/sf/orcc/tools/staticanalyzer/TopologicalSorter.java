@@ -31,10 +31,12 @@ package net.sf.orcc.tools.staticanalyzer;
 
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
 
 /**
  * This class computes a topological sort of the graph.
@@ -51,7 +53,16 @@ public class TopologicalSorter {
 		this.graph = graph;
 	}
 
-	public List<Vertex> topologicalSort() {
-		return new DFS(graph).orderedByFinishingTime();
+	public List<Vertex> topologicalSort() throws OrccException {
+		if (isAcyclic()) {
+			return new DFS(graph).orderedByFinishingTime();
+		} else {
+			throw new OrccException("the given graph is not acyclic!");
+		}
 	}
+
+	private boolean isAcyclic() {
+		return !(new CycleDetector<Vertex, Connection>(graph).detectCycles());
+	}
+
 }

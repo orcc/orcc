@@ -29,7 +29,7 @@
 
 package net.sf.orcc.tools.staticanalyzer;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,12 +42,12 @@ import java.util.List;
  */
 public class Schedule {
 
-	private List<Iterand> iterands;
-
 	private int iterationCount;
 
+	private List<Iterand> iterands;
+
 	public Schedule() {
-		iterands = new LinkedList<Iterand>();
+		iterands = new ArrayList<Iterand>();
 	}
 
 	public void add(Iterand iterand) {
@@ -78,4 +78,5 @@ public class Schedule {
 		}
 		return res;
 	}
+
 }

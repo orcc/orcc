@@ -67,6 +67,14 @@ public class Iterand {
 		return (type == Type.VERTEX);
 	}
 
+	public Schedule getSchedule() {
+		return (Schedule) contents;
+	}
+
+	public Vertex getVertex() {
+		return (Vertex) contents;
+	}
+
 	public String toString() {
 		Object obj;
 		if (isVertex()) {

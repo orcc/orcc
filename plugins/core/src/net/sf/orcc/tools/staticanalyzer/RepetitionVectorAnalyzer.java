@@ -58,7 +58,7 @@ public class RepetitionVectorAnalyzer {
 	private DirectedGraph<Vertex, Connection> graph;
 	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
 
-	private Map<String, Integer> repetitionVector = new HashMap<String, Integer>();
+	private Map<Vertex, Integer> repetitionVector = new HashMap<Vertex, Integer>();
 
 	public RepetitionVectorAnalyzer(Network network) {
 		graph = network.getGraph();
@@ -142,8 +142,8 @@ public class RepetitionVectorAnalyzer {
 				int produced = srcStaticActor.getNumTokensProduced(srcPort);
 				int consumed = tgtStaticActor.getNumTokensConsumed(tgtPort);
 
-				int srcRate = repetitionVector.get(src.getInstance().getId());
-				int tgtRate = repetitionVector.get(tgt.getInstance().getId());
+				int srcRate = repetitionVector.get(src);
+				int tgtRate = repetitionVector.get(tgt);
 
 				if (srcRate * produced != tgtRate * consumed) {
 					throw new OrccException(
@@ -159,7 +159,7 @@ public class RepetitionVectorAnalyzer {
 	 * @throws OrccException
 	 *             if an actor is not static
 	 */
-	public Map<String, Integer> computeRepetitionsVector() throws OrccException {
+	public Map<Vertex, Integer> computeRepetitionsVector() throws OrccException {
 
 		Vertex vertex = null;
 		for (Vertex v : graph.vertexSet()) {
@@ -183,7 +183,7 @@ public class RepetitionVectorAnalyzer {
 			int rep = entry.getValue().getNumerator() * lcm
 					/ entry.getValue().getDenominator();
 
-			repetitionVector.put(entry.getKey().getInstance().getId(), rep);
+			repetitionVector.put(entry.getKey(), rep);
 		}
 
 		checkConsistency();
