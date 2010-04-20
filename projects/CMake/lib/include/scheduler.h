@@ -46,16 +46,9 @@ struct actor_s {
 	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
 };
 
-struct list_s {
-	struct list_s *prev, *next;
-	void *payload;
-};
-
 struct scheduler_s {
 	int num_actors;
 	struct actor_s **actors;
-	struct list_s schedulable;
-	struct list_s scheduled;
 };
 
 #include "scheduler.inl"
