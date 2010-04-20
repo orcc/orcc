@@ -288,12 +288,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	List (type: int(size = 8), size = 256) coeff_sign_flag				:= [0: for int i in Integers(0, 255)] ;
 	
 	/* Up and Left Macroblock luma and chroma Residual Values */
-	List (type :int(size = 8 ), size = 256) MB_luma_up 					:= [0: for int i in Integers(0, 255)] ;
-	List (type :int(size = 8 ), size = 256) MB_luma_left				:= [0: for int i in Integers(0, 255)] ;
-	List (type :int(size = 8 ), size = 64)	MB_chroma_cr_up				:= [0: for int i in Integers(0, 64)] ;
-	List (type :int(size = 8 ), size = 64)  MB_chroma_cr_left			:= [0: for int i in Integers(0, 64)] ;
-	List (type :int(size = 8 ), size = 64)  MB_chroma_cr_up				:= [0: for int i in Integers(0, 64)] ;
-	List (type :int(size = 8 ), size = 64)  MB_chroma_cr_left			:= [0: for int i in Integers(0, 64)] ;
+	List ( type: List ( type: int(size = 8), size = 256) , size = PICWIDTH + 1 ) MB_Luma		:=  [ [ 0 : for int i in Integers( 0, 255) ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 8), size = 64)  , size = PICWIDTH + 1 ) MB_Chroma_Cr	:=  [ [ 0 : for int i in Integers( 0, 63)  ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 8), size = 64)  , size = PICWIDTH + 1 ) MB_Chroma_Cb	:=  [ [ 0 : for int i in Integers( 0, 63)  ]: for int j in Integers( 0, PICWIDTH) ];
 	
 	int synEval_MB_I_Ele = 26;
 	List ( type: List ( type: int(size = 8), size = 8) , size = 26 ) synEval_MB_I = 
@@ -2963,6 +2960,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		end		
 		
 		if ctxBlockCat = 4  then
+			//Todo
+			condTermFlagA := 1;
 		end		
 		
 		
@@ -6632,8 +6631,19 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	*/
 	Residual_luma_inc_AC_4x4: action ==>
 	do
+		
+		//Save the Values to the MB_Luma
+		foreach int i in Integers(0, 3) do
+		  foreach int j in Integers(0, 3) do
+		    MB_Luma[val_CurrMbAddr][ 8*i8x8 + 4*i4x4 + 16*i + j] := level[4*i + j];
+		  end
+		 end
+	  
 		i4x4 := i4x4 +1;
-		if i4x4 = 4 then i4x4 := 0; i8x8 := i8x8+1; end
+		if i4x4 = 4 then 
+		  i4x4 := 0; 
+		  i8x8 := i8x8 + 1; 
+		end
 	end
 	//end for
 
@@ -7083,6 +7093,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		mbTab[val_CurrMbAddr][mbCBF] := coded_block_flag;
 		numCoeff := block_endIdx + 1;
 		blCabacIdx := block_startIdx;
+		//Delete previous Decoded level
+		foreach int i in Integers(0, maxNumCoeff - 1) do
+			level[i] := 0;
+		end
 	end
 
 	//if( coded_block_flag ) {
@@ -7090,6 +7104,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		coded_block_flag = 1 and blCabacIdx < numCoeff - 1
 	do	
+	
 		//read significant_coeff_flag Syntax Element
 		GetCabacSignificantCoeffFlagSyntaxElement();
 		start_cabac();
@@ -7193,7 +7208,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		blCabacIdx < 0
 	end
 	
-	Residual_block_Sent_Zeros_4x4 : action ==> VALUE : [ 0 ] repeat 16
+	Residual_block_Sent_Zeros_4x4 : action ==> VALUE : [ [0: for int i in Integers(0,15)] ] repeat 16
 	guard
 		coded_block_flag = 0
 	end
