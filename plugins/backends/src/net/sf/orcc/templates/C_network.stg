@@ -143,7 +143,7 @@ printSchedulerInstance(instance) ::= <<
 si.num_firings = 0;
 $instance.id$_scheduler(&si);
 #ifdef PRINT_FIRINGS
-printf("$instance.id$_scheduler: %i\n", si->num_firings);
+printf("$instance.id$_scheduler: %i\n", si.num_firings);
 #endif
 >>
 
