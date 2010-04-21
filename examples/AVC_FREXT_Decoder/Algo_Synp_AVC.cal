@@ -2389,23 +2389,6 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		val_CurrMbAddr != 0
 	end
 	
-	/*
-	function GivembAddrC( ) --> int :
-		val_CurrMbAddr - PicWidthInMbs + 1
-	end
-	
-	function mbAddrC_Avail() --> bool :
-		( ( val_CurrMbAddr + 1 ) mod PicWidthInMbs  ) = 0
-	end
-	
-	function GivembAddrD( ) --> int :
-		val_CurrMbAddr - PicWidthInMbs - 1
-	end
-	
-	function mbAddrD_Avail() --> bool :
-		( val_CurrMbAddr mod PicWidthInMbs ) = 0
-	end
-	*/
 	function GiveMbSliceTypeAddrA( ) --> int :
 		if (mbAddrA_Avail() ) then
 			mbTab[ GiveMbAddrA() ][ mbSliceType ]
@@ -2611,35 +2594,27 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		xN := ( luma8x8BlkIdx mod 2 ) * 8 - 1;
 		yN := ( luma8x8BlkIdx  /  2 ) * 8; 
 		
-		if xN < 0 and yN > 0 and yN < 15 then
-			mbAddrA := GiveMbAddrA();
-			AvailMbA := true;
-		else
-			if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
-				mbAddrA := val_CurrMbAddr;
-				AvailMbA := true;
+		if xN < 0 and ( yN >= 0 and yN < 15 ) then
+				mbAddrA  := GiveMbAddrA();
+				AvailMbA :=  mbAddrA_Avail();
 			else
-				if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
-					AvailMbA := false;
+				if xN >= 0 and xN < 15 and yN >= 0 and yN < 15 then
+					mbAddrA := val_CurrMbAddr;
+					AvailMbA := true;
 				end
-			end
 		end
 		
 		//Neighbouring for B
 		xN := ( luma8x8BlkIdx mod 2 ) * 8;
 		yN := ( luma8x8BlkIdx  /  2 ) * 8 - 1; 
-		if yN < 0 and xN > 0 and xN < 15 then
-			mbAddrB := GiveMbAddrB();
-			AvailMbB := true;
-		else
-			if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
-				mbAddrB := val_CurrMbAddr;
-				AvailMbB := true;
+		if yN < 0 and ( xN >= 0 and xN < 15 ) then
+				mbAddrB  := GiveMbAddrB();
+				AvailMbB :=  mbAddrB_Avail();
 			else
-				if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
-					AvailMbB := false;
+				if xN >= 0 and xN < 15 and yN >= 0 and yN < 15 then
+					mbAddrB := val_CurrMbAddr;
+					AvailMbB := true;
 				end
-			end
 		end
 		
 		if  not AvailMbA then
@@ -2864,28 +2839,26 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			xW := ( xN + 16 ) mod 16;
 			yW := ( yN + 16 ) mod 16;
 			 
-			if xN < 0 and yN > 0 and yN < 15 then
-				mbAddrA := GiveMbAddrA();
-				AvailMbA := true;
+						
+			if xN < 0 and ( yN >= 0 and yN < 15 ) then
+				mbAddrA  := GiveMbAddrA();
+				AvailMbA :=  mbAddrA_Avail();
 			else
-				if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
+				if xN >= 0 and xN < 15 and yN >= 0 and yN < 15 then
 					mbAddrA := val_CurrMbAddr;
 					AvailMbA := true;
-				else
-					if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
-						AvailMbA := false;
-					end
 				end
 			end
+			  
 			
 			if AvailMbA then
 				luma4x4BlkIdxA := ( xW * 4 ) + yW;
 				
-				if ( mbTab[mbAddrA][mbTabMbtype] != P_Skip or 
-				     mbTab[mbAddrA][mbTabMbtype] != B_Skip or 
-				     mbTab[mbAddrA][mbTabMbtype] != 25 or
+				if ( (mbTab[mbAddrA][mbTabMbtype] != P_Skip) or 
+				     (mbTab[mbAddrA][mbTabMbtype] != B_Skip) or 
+				     (mbTab[mbAddrA][mbTabMbtype] != 25) or
 				     ((mbTab[mbAddrA][mbCBPLuma] >> (luma4x4BlkIdxA >> 2)) & 1) != 0 or
-				     transform_size_8x8_flag = 0 ) then
+				     (transform_size_8x8_flag = 0) ) then
 					transBlockA := luma4x4BlkIdxA;
 				else
 					transBlockA := -1;
@@ -2904,28 +2877,24 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			xW := ( xN + 16 ) mod 16;
 			yW := ( yN + 16 ) mod 16;
 			 
-			if yN < 0 and xN > 0 and xN < 15 then
-				mbAddrB := GiveMbAddrB();
-				AvailMbB := true;
+			if yN < 0 and ( xN >= 0 and xN < 15 ) then
+			  mbAddrB := GiveMbAddrB();
+			  AvailMbB := mbAddrB_Avail();
 			else
-				if xN > 0 and xN < 15 and yN > 0 and yN < 15 then
-					mbAddrB := val_CurrMbAddr;
-					AvailMbB := true;
-				else
-					if xN > 15 and yN > 0 and yN < 15 or yN > 15 then
-						AvailMbB := false;
-					end
-				end
+			  if xN >= 0 and xN < 15 and yN >= 0 and yN < 15 then
+			    mbAddrB := val_CurrMbAddr;
+			    AvailMbB := true;
+			  end
 			end
-			
+			 
 			if AvailMbB then
 				luma4x4BlkIdxB := ( xW * 4 ) + yW;
 				
-				if ( mbTab[mbAddrB][mbTabMbtype] != P_Skip or 
-				     mbTab[mbAddrB][mbTabMbtype] != B_Skip or 
-				     mbTab[mbAddrB][mbTabMbtype] != 25 or
+				if ( (mbTab[mbAddrB][mbTabMbtype] != P_Skip) or 
+				     (mbTab[mbAddrB][mbTabMbtype] != B_Skip) or 
+				     (mbTab[mbAddrB][mbTabMbtype] != 25) or
 				     ((mbTab[mbAddrB][mbCBPLuma] >> (luma4x4BlkIdxB >> 2)) & 1) != 0 or
-				     transform_size_8x8_flag = 0 ) then
+				     (transform_size_8x8_flag = 0) ) then
 					transBlockB := luma4x4BlkIdxB;
 				else
 					transBlockB := -1;
