@@ -4083,7 +4083,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		set_bits_to_read(2);
 	end
 
-	read_Pps_num_slice_groups_minus1: action ==>
+	read_Pps_num_slice_groups_minus1: action ==> ENTROPY_TYPE:[ IS_CAVLC() ]
 	guard
 		done_reading_bits()
 	do
@@ -5245,19 +5245,19 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 
 	//if (entropy_coding_mode_flag) : CABAC
 	//while( !byte_aligned())
-	read_SliceD_CABAC_alignement: action ==> ENTROPY_TYPE:[IS_CAVLC()]
+	read_SliceD_CABAC_alignement: action ==>
 	guard
 		entropy_coding_mode_flag[pps_id] = 1
 	do
 		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
 	end
 
-	read_SliceD_skip_CABAC_alignement: action ==> ENTROPY_TYPE:[IS_CAVLC()]
+	read_SliceD_skip_CABAC_alignement: action ==>
 	guard
 		entropy_coding_mode_flag[pps_id] = 0
 	end
 
-	SliceD_init: action ==>
+	SliceD_init: action ==> // ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		(entropy_coding_mode_flag[pps_id] = 1 and done_reading_bits()) or entropy_coding_mode_flag[pps_id] = 0
 	do
@@ -7126,6 +7126,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		//Read coeff_abs_level_minus1[ numCoeff - 1 ]
 		GetCabacCoeffAbsLevelMinus1SyntaxElement();
 		start_cabac();
+		numDecodAbsLevelEq1 := 1;
+		numDecodAbsLevelGt1 := 0;
 	end
 	
 	Residual_block_read_coeff_abs_level_minus1_done: action ==>
