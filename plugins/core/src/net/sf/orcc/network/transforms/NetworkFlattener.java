@@ -35,6 +35,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -95,6 +96,37 @@ public class NetworkFlattener implements INetworkTransformation {
 	}
 
 	/**
+	 * Returns the port in the given sub-network that matches the given port
+	 * with the given direction. The port exists as-is in the sub-network if
+	 * network has been instantiated, otherwise it uses the input (or output,
+	 * depending on the direction argument) port of the sub-network.
+	 * 
+	 * @param subNetwork
+	 *            the sub-network
+	 * @param direction
+	 *            direction of port
+	 * @param port
+	 *            a port
+	 * @return a vertex that matches the port in the given sub-network
+	 */
+	private Vertex getPort(Network subNetwork, String direction, Port port) {
+		Vertex v = new Vertex(direction, port);
+		if (subNetwork.getGraph().containsVertex(v)) {
+			return v;
+		} else {
+			// this is the case when instantiation has not been done
+			// so we just pick up the port
+			if (direction.equals("Input")) {
+				port = subNetwork.getInput(port.getName());
+			} else {
+				port = subNetwork.getOutput(port.getName());
+			}
+
+			return new Vertex(direction, port);
+		}
+	}
+
+	/**
 	 * Links each predecessor of vertex to the successors of the input port in
 	 * subGraph
 	 * 
@@ -102,17 +134,17 @@ public class NetworkFlattener implements INetworkTransformation {
 	 *            the parent graph
 	 * @param graph
 	 *            the parent graph
-	 * @param subGraph
-	 *            the child graph
+	 * @param subNetwork
+	 *            the child network
 	 * @throws OrccException
 	 */
 	private void linkIncomingConnections(Vertex vertex,
-			DirectedGraph<Vertex, Connection> graph,
-			DirectedGraph<Vertex, Connection> subGraph) {
+			DirectedGraph<Vertex, Connection> graph, Network subNetwork) {
+		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
 		List<Connection> incomingEdgeSet = new ArrayList<Connection>(graph
 				.incomingEdgesOf(vertex));
 		for (Connection edge : incomingEdgeSet) {
-			Vertex v = new Vertex("Input", edge.getTarget());
+			Vertex v = getPort(subNetwork, "Input", edge.getTarget());
 			Set<Connection> outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
 
 			for (Connection newEdge : outgoingEdgeSet) {
@@ -132,17 +164,17 @@ public class NetworkFlattener implements INetworkTransformation {
 	 *            the current vertex
 	 * @param graph
 	 *            the parent graph
-	 * @param subGraph
-	 *            the child graph
+	 * @param subNetwork
+	 *            the child network
 	 * @throws OrccException
 	 */
 	private void linkOutgoingConnections(Vertex vertex,
-			DirectedGraph<Vertex, Connection> graph,
-			DirectedGraph<Vertex, Connection> subGraph) {
+			DirectedGraph<Vertex, Connection> graph, Network subNetwork) {
+		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
 		List<Connection> outgoingEdgeSet = new ArrayList<Connection>(graph
 				.outgoingEdgesOf(vertex));
 		for (Connection edge : outgoingEdgeSet) {
-			Vertex v = new Vertex("Output", edge.getSource());
+			Vertex v = getPort(subNetwork, "Output", edge.getSource());
 			Set<Connection> incomingEdgeSet = subGraph.incomingEdgesOf(v);
 
 			for (Connection newEdge : incomingEdgeSet) {
@@ -171,9 +203,9 @@ public class NetworkFlattener implements INetworkTransformation {
 					// copy vertices and edges
 					copySubGraph(instance.getAttributes(), network, instance);
 					linkOutgoingConnections(vertex, network.getGraph(),
-							subNetwork.getGraph());
+							subNetwork);
 					linkIncomingConnections(vertex, network.getGraph(),
-							subNetwork.getGraph());
+							subNetwork);
 
 					// remove vertex from this graph
 					network.getGraph().removeVertex(vertex);
