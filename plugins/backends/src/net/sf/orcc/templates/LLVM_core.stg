@@ -332,12 +332,12 @@ b$label(ifNode.joinNode)$:
 >>
 
 LoadLocalPort(instr) ::= <<
-%local_$instr.port$$instr.block.label$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor.name$_$instr.port$})$
+%local_$instr.port$$instr.block.label$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$instr.port$})$
 >>
 
 HasRoom(result, action, port, numToken) ::= <<
 
-%$port$_$action$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor.name$_$port$})$
+%$port$_$action$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$port$})$
 %$result$32 = $CallOp(ty="i32", fnptrval="@hasRoom", function_args={%struct.fifo_s* %$port$_$action$, i32 $numToken$})$
 %$result$ = trunc i32 %$result$32 to i1
 >>
@@ -402,7 +402,7 @@ store $ExprType(read.port)$* %$read.target$_$read.block.label$_cast, $ExprType(r
 
 ReadEnd(readEnd) ::= <<
 
-%end_$readEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor.name$_$readEnd.port$})$
+%end_$readEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$readEnd.port$})$
 $CallOp(ty ="void", fnptrval="@setReadEnd", function_args={%struct.fifo_s* %end_$readEnd.port$})$
 >>
 
@@ -424,7 +424,7 @@ store $ExprType(write.port)$* %$write.target$_$write.block.label$_cast, $ExprTyp
 
 WriteEnd(writeEnd) ::= <<
 
-%end_$writeEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$actor.name$_$writeEnd.port$})$
+%end_$writeEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$writeEnd.port$})$
 $CallOp(ty ="void", fnptrval="@setWriteEnd", function_args={%struct.fifo_s* %end_$writeEnd.port$})$
 >>
 
