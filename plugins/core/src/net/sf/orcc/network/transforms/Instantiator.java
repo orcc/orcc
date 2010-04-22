@@ -54,6 +54,8 @@ public class Instantiator implements INetworkTransformation {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
+	private Network network;
+
 	private String path;
 
 	/**
@@ -88,7 +90,8 @@ public class Instantiator implements INetworkTransformation {
 				String name = parameter.getName();
 				Expression value = values.get(name);
 				if (value == null) {
-					throw new OrccRuntimeException("Instance "
+					throw new OrccRuntimeException("In network \""
+							+ network.getName() + "\": Instance "
 							+ instance.getId() + " has no value for parameter "
 							+ name);
 				}
@@ -98,7 +101,8 @@ public class Instantiator implements INetworkTransformation {
 			for (String name : values.keySet()) {
 				Variable parameter = parameters.get(name);
 				if (parameter == null) {
-					throw new OrccRuntimeException("Instance "
+					throw new OrccRuntimeException("In network \""
+							+ network.getName() + "\": Instance "
 							+ instance.getId()
 							+ " is given a value for a parameter " + name
 							+ " that is not declared.");
@@ -117,7 +121,9 @@ public class Instantiator implements INetworkTransformation {
 	 *             wrong
 	 */
 	public void transform(Network network) throws OrccException {
+		this.network = network;
 		graph = network.getGraph();
+
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
@@ -162,8 +168,10 @@ public class Instantiator implements INetworkTransformation {
 			}
 
 			if (srcPort == null) {
-				throw new OrccException("A Connection refers to "
-						+ "a non-existent source port: \"" + srcPortName + "\"");
+				throw new OrccException("In network \"" + network.getName()
+						+ "\": A Connection refers to "
+						+ "a non-existent source port: \"" + srcPortName
+						+ "\" of instance \"" + source.getId() + "\"");
 			}
 
 			connection.setSource(srcPort);
@@ -190,8 +198,10 @@ public class Instantiator implements INetworkTransformation {
 
 			// check ports exist
 			if (dstPort == null) {
-				throw new OrccException("A Connection refers to "
-						+ "a non-existent target port: \"" + dstPortName + "\"");
+				throw new OrccException("In network \"" + network.getName()
+						+ "\": A Connection refers to "
+						+ "a non-existent target port: \"" + dstPortName
+						+ "\" of instance \"" + target.getId() + "\"");
 			}
 
 			connection.setTarget(dstPort);
