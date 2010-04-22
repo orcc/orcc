@@ -185,7 +185,7 @@ int PICHEIGHT=720/16; //number of MB per columns
   end
  
   //write MB on the output display
-  action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_CHROMA * MB_WIDTH_CHROMA-1)] ] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA
+  Display_MB_CHROMA:action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_CHROMA * MB_WIDTH_CHROMA-1)] ] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA
   guard
     flag_display[pic_display_idx] = 0 and flag_picture_end[pic_display_idx] = 1,
     MB_WIDTH = MB_WIDTH_CHROMA
@@ -216,10 +216,9 @@ int PICHEIGHT=720/16; //number of MB per columns
   end
  
   //write MB on the output display
-  action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_LUMA * MB_WIDTH_LUMA-1)] ] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA
+  Display_MB_LUMA:action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_LUMA * MB_WIDTH_LUMA-1)] ] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA
   guard
-    flag_display[pic_display_idx] = 0 and flag_picture_end[pic_display_idx] = 1,
-    MB_WIDTH = MB_WIDTH_LUMA
+    flag_display[pic_display_idx] = 0 and flag_picture_end[pic_display_idx] = 1
   var
     uint CurrAddrInPix, uint(size=5) last_idx,
     uint(size=2) flag_poc := 0,
@@ -245,22 +244,31 @@ int PICHEIGHT=720/16; //number of MB per columns
       println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
     end
   end
+  
+  skip_Display: action ==>
+  guard
+    flag_display[pic_display_idx] = 1 or flag_picture_end[pic_display_idx] = 0
+  end
 
   
   schedule fsm  read_ref_parameters:
-    read_ref_parameters   	(read_ref_parameters)		--> read_pic_parameters;
-    read_pic_parameters   	(read_pic_parameters)		--> read_ref_list;
-    read_ref_list			(refList_done)				--> read_write;
-    read_ref_list			(read_refList)				--> read_ref_list;
-    read_write				(write_data	) 		  	--> read_write;
-    read_write				(read_data	) 		  	--> read_write;
-    read_write				(get_writeAddr) 		  	--> read_write;
-    read_write				(get_readAddr) 		  		--> read_write;
-    read_write			  	(write_picture_done) 		--> read_ref_parameters;
+    read_ref_parameters   	(read_ref_parameters )--> read_pic_parameters;
+    read_pic_parameters   	(read_pic_parameters )--> read_ref_list;
+    read_ref_list			(refList_done        )--> read_write;
+    read_ref_list			(read_refList        )--> read_ref_list;
+    read_write				(write_data	         )--> read_write;
+    read_write				(read_data	         )--> read_write;
+    read_write				(get_writeAddr       )--> read_write;
+    read_write				(get_readAddr        )--> read_write;
+    read_write			  	(write_picture_done  )--> Display;
+    Display                 (Display_MB_CHROMA   )--> Display;
+    Display                 (Display_MB_LUMA     )--> Display;
+    Display                 (skip_Display        )--> read_ref_parameters;
   end
 
   priority
-    write_data > read_data > write_picture_done  > get_writeAddr > get_readAddr ;
-  	refList_done >	read_refList;
+    write_data        > read_data > write_picture_done  > get_writeAddr > get_readAddr ;
+  	refList_done      > read_refList;
+  	Display_MB_CHROMA > Display_MB_LUMA;
   end
 end
