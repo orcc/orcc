@@ -43,6 +43,7 @@ $actor.name$_$port.name$_write <= '0';
 >>
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,40 +59,35 @@ $
 
 >>
 
+SensitivSig(variable) ::= <<
+$
+if(variable.port)
+ $$variable$,$
+endif
+$
+>>
+
+SensitivFIFO(port) ::=<<
+$actor.name$_$port.name$_send
+>>
 
 Actor_Schedul(actor) ::= <<
-  $actor.name$_proc : process (reset_n, clock) is
-    $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
-    --
-    $actor.actions: printActionLocals()$  --
+  $actor.name$_scheduler : process (reset_n, $actor.stateVars.list: SensitivSig()$ $actor.inputs.list: SensitivFIFO(); separator=", "$) is
+    $actor.actions: printActionLocalSchedul()$  --
   begin
     if reset_n = '0' then 
-      $actor.stateVars.list: stateConst()$      $InitFSM(actor.actionScheduler.fsm)$      --
-      $actor.inputs.list: fifo_in_init(); separator="\n"$
-      $actor.outputs.list: fifo_out_init(); separator="\n"$
-      $actor.outputs.list: Actor_out()$    --
-    elsif rising_edge(clock) then
-      $
-      if(actor.initializes)
-      $ -- $actor.initializes: action()$$
-      endif
-      $
-      $actor.inputs.list: fifo_in_init(); separator="\n"$
-      $actor.outputs.list: fifo_out_init(); separator="\n"$
-      --
+      $actor.actions: {action| $action.scheduler$_go <= '0';}; separator="\n"$
+    else
       $actor.actions: printActionSchedulerInline(); separator="\n"$
-      $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$   
     end if;
-  end process $actor.name$_proc;
+  end process $actor.name$_scheduler;
 
 >>
 
 
-Actor_No_Schedul(actor) ::= <<
-  $actor.name$_proc : process (reset_n, clock) is
-    $actor.actions: {action|variable $action.scheduler$_go : std_logic;}; separator="\n"$
-    --
-    $actor.actions: printActionLocals()$  --
+Actor_Exec(actor) ::= <<
+  $actor.name$_execute : process (reset_n, clock) is
+    $actor.actions: printActionLocalBody()$  --
   begin
     if reset_n = '0' then 
       $actor.stateVars.list: stateConst()$      --
@@ -106,13 +102,36 @@ Actor_No_Schedul(actor) ::= <<
       $
       $actor.inputs.list: fifo_in_init(); separator="\n"$
       $actor.outputs.list: fifo_out_init(); separator="\n"$
-      --
-      $actor.actions: printActionSchedulerInline(); separator="\n"$
-    
+      --  
       $schedulingTest(actor.actions)$
       end if;
     end if;
-  end process $actor.name$_proc;
+  end process $actor.name$_execute;
+
+>>
+
+
+Actor_Exec_FSM(actor) ::= <<
+  $actor.name$_execute : process (reset_n, clock) is
+    $actor.actions: printActionLocalBody()$  --
+  begin
+    if reset_n = '0' then 
+      $actor.stateVars.list: stateConst()$      $InitFSM(actor.actionScheduler.fsm)$      --
+      $actor.inputs.list: fifo_in_init(); separator="\n"$
+      $actor.outputs.list: fifo_out_init(); separator="\n"$
+      $actor.outputs.list: Actor_out()$    --
+    elsif rising_edge(clock) then
+      $
+      if(actor.initializes)
+      $$actor.initializes: action()$$
+      endif
+      $
+      $actor.inputs.list: fifo_in_init(); separator="\n"$
+      $actor.outputs.list: fifo_out_init(); separator="\n"$
+      --     
+      $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$   
+    end if;
+  end process $actor.name$_execute;
 
 >>
 
@@ -126,7 +145,6 @@ listSize(value) ::= <<
 $value : {0 to $it$ -1}; separator=", "$
 >>
 
-
 // the values of a list: {val1, val2, ..., valn}
 listValue(value) ::= <<
 ($value; wrap, separator=", "$)
@@ -139,18 +157,38 @@ $signal $variable$ : $variable.type$;
 $
 else
 $$
-if(!variable.type.list)
-$
+  if(!variable.type.list)
+  $$
+    if(!variable.assignable)
+    $
+constant $variable$ : $variable.type$ := $variable.constantValue$;$
+    else
+    $
 signal $variable$ : $variable.type$;$
-else
-$
+    endif
+  $$
+  else
+  $$
+    if(!variable.assignable)
+    $$
+      if(variable.constantValue)
+      $
+type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
+constant $variable$ : memory_type_$variable$ := $variable.constantValue$;$ 
+      endif
+    $$
+    else
+    $
 type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
 signal $variable$ : memory_type_$variable$;$
-endif
+    endif
+  $$
+  endif
 $$
 endif
 $
 >>
+
 
 variableDeclaration(variable) ::= <<
 $
@@ -175,7 +213,11 @@ $
 stateConst(variable) ::= <<
 $
 if(variable.constantValue)
+  $$
+  if(variable.assignable)
 $$declareConst(variable=variable)$$
+  endif
+  $$
 endif
 $
 
@@ -186,6 +228,7 @@ declareConst(variable) ::= <<
 $variable$ <= $variable.constantValue$;
 
 >>
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -297,7 +340,7 @@ if(return.value)
 $$
   if(transformReturn)
 $
-$procedure$_go := $return.value$;$
+$procedure$_go <= $return.value$;$
   else
 $
 return $return.value$;$
@@ -485,7 +528,7 @@ $procedure.nodes: {$(it.class.simpleName)(it)$}$
 // prints the scheduler of the given action "inline" (ie not within a function)
 printActionSchedulerInline(action) ::= <<
 
--- tests if "$action$" action is schedulable
+-- test if "$action$" action is schedulable
 $procedure(procedure=action.scheduler, transformReturn="true")$
 >>
 
@@ -501,6 +544,14 @@ $
 // of the given action
 printActionLocals(action) ::= <<
 $printLocals(action.body)$$printLocals(action.scheduler)$
+>>
+
+printActionLocalSchedul(action) ::= <<
+$printLocals(action.scheduler)$
+>>
+
+printActionLocalBody(action) ::= <<
+$printLocals(action.body)$
 >>
 
 // prints the body of the given action "inline" (ie not within a function)
@@ -652,6 +703,7 @@ architecture rtl_$actor.name$ of $actor.name$ is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
+  $actor.actions: {action|signal $action.scheduler$_go : std_logic;}; separator="\n"$  
   $actor.stateVars.list: signalDeclaration()$
 
   ---------------------------------------------------------------------------
@@ -667,9 +719,15 @@ architecture rtl_$actor.name$ of $actor.name$ is
 begin
 $
 if(actor.actionScheduler.fsm)
-$  $Actor_Schedul(actor)$$
+$
+  $Actor_Schedul(actor)$
+
+  $Actor_Exec_FSM(actor)$$
 else
-$  $Actor_No_Schedul(actor)$$
+$
+  $Actor_Schedul(actor)$
+
+  $Actor_Exec(actor)$$
 endif
 $
 
