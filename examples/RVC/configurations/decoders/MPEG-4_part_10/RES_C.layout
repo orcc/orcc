@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="CoefDC" x="16" y="207"/>
+      <vertex id="QP" x="25" y="250"/>
+      <vertex id="ScalingList" x="27" y="294"/>
+      <vertex id="CoefAC" x="23" y="125"/>
+      <vertex id="CoefACR_C" x="714" y="200"/>
+      <vertex id="Algo_DCR_Hadamard_CHROMA" x="156" y="162"/>
+      <vertex id="IS_IQ_IT_C" x="404" y="183"/>
+      <vertex id="Algo_Merge_4x4_to_8x8" x="555" y="183"/>
+   </vertices>
+</layout>

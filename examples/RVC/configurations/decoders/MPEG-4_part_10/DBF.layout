@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Z" x="127" y="450"/>
+      <vertex id="PicWidthInMb" x="105" y="368"/>
+      <vertex id="PicSizeInMb" x="114" y="338"/>
+      <vertex id="MbIntraFlag" x="113" y="308"/>
+      <vertex id="Cbp_blk" x="125" y="184"/>
+      <vertex id="Alpha_offset" x="113" y="126"/>
+      <vertex id="Beta_offset" x="115" y="154"/>
+      <vertex id="QP" x="126" y="390"/>
+      <vertex id="MV" x="136" y="281"/>
+      <vertex id="RefIdx" x="116" y="425"/>
+      <vertex id="LFDisable" x="122" y="249"/>
+      <vertex id="FirstMbInSlice" x="112" y="215"/>
+      <vertex id="WD" x="500" y="213"/>
+      <vertex id="Algo_DBF" x="501" y="148"/>
+      <vertex id="Mgnt_DBF" x="315" y="154"/>
+   </vertices>
+</layout>
