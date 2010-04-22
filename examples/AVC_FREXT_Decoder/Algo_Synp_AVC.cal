@@ -182,7 +182,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	bool PcmAlignementZeroBitDone := false;
 	bool PcmSampleLumaDone := false;
 	bool PcmSampleChromaDone := false;
-
+	int Cabac_Offset := 0;
 	
 	//CABAC SE
 	uint (size = 1) coded_block_flag;
@@ -253,6 +253,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	int numDecodAbsLevelGt1 := 0;
 	int coeff_abs := 0;
 	int Coeff_J := 0;
+	int CountCoeff := 0;
+	int CabacZigZagIdx := 0;
 	bool StartPrefix := true;
 	bool StartSuffix := false;
 	bool GetSign := false;
@@ -286,6 +288,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 255)] ;
 	List (type: int(size = 8), size = 256) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 255)] ;
 	List (type: int(size = 8), size = 256) coeff_sign_flag				:= [0: for int i in Integers(0, 255)] ;
+	List (type: int(size = 8), size = 64)  CoeffIndex			:= [0: for int i in Integers(0, 63)] ;
 	
 	/* Up and Left Macroblock luma and chroma Residual Values */
 	List ( type: List ( type: int(size = 8), size = 256) , size = PICWIDTH + 1 ) MB_Luma		:=  [ [ 0 : for int i in Integers( 0, 255) ]: for int j in Integers( 0, PICWIDTH) ];
@@ -846,6 +849,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	List (type:int(size=SAMPLE_SZ),size=16) level := [ 0 : for int i in Integers( 1, 16)];
 	List (type:uint(size=4),size=16) run := [ 0 : for int i in Integers( 1, 16)];
 	List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
+	List ( type: uint(size=4), size=16) InverseScan4x4TabAlt := [ 0, 1, 4, 8, 5, 2, 3, 6, 9, 12, 13, 10, 7, 11, 14, 15 ];
 
 	List ( type: List ( type: uint(size=7), size=3), size=62 ) VLC_nC_0to2 = //[n][coef_length / coef_val / coef_token]
 		[ 
@@ -6544,6 +6548,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		transform_size_8x8_flag = 0 or entropy_coding_mode_flag[pps_id] = 0 // bloc4x4 or CAVLC
 	do
 		ctxBlockCat := 2;
+		Cabac_Offset := 0;
 	end
 
 	// for( i4x4 = 0; i4x4 < 4; i4x4++ ) {
@@ -7066,6 +7071,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		foreach int i in Integers(0, maxNumCoeff - 1) do
 			level[i] := 0;
 		end
+		CountCoeff := -1;
 	end
 
 	//if( coded_block_flag ) {
@@ -7073,7 +7079,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	guard
 		coded_block_flag = 1 and blCabacIdx < numCoeff - 1
 	do	
-	
+		
 		//read significant_coeff_flag Syntax Element
 		GetCabacSignificantCoeffFlagSyntaxElement();
 		start_cabac();
@@ -7088,6 +7094,9 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		significant_coeff_flag[ blCabacIdx ] := cabac_value();
 		
 		if significant_coeff_flag[ blCabacIdx ] = 1 then
+			CountCoeff := CountCoeff + 1;
+			CoeffIndex[CountCoeff] := blCabacIdx;
+			
 			GetCabacLastSignificantCoeffFlagSyntaxElement();
 			start_cabac();
 		end
@@ -7135,12 +7144,15 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		cabac_end()
 	
 	do
-		tempCoeff := numCoeff - 1;
-		coeff_abs_level_minus1[ tempCoeff ] := cabac_value();
+	
 		
-		level[ numCoeff - 1 ] := coeff_abs_level_minus1[ numCoeff - 1 ];
+		CabacZigZagIdx := InverseScan4x4TabAlt[ CoeffIndex[CountCoeff] ];
 		
-		blCabacIdx := numCoeff - 2;
+		coeff_abs_level_minus1[ CabacZigZagIdx ] := cabac_value();
+		
+		level[ CabacZigZagIdx ] := coeff_abs_level_minus1[ CabacZigZagIdx ];
+		
+		CountCoeff := CountCoeff - 1;
 		
 	end
 	
@@ -7148,7 +7160,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//for( i = numCoeff - 2; i >= 0; i-- )
 	Residual_block_update_coeffLevel_start: action ==>
 	guard
-		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1
+		CountCoeff >= 0
 	do
 		//Read coeff_abs_level_minus1[ numCoeff - 1 ]
 		GetCabacCoeffAbsLevelMinus1SyntaxElement();
@@ -7157,26 +7169,21 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	
 	Residual_block_update_coeffLevel_read: action ==> VALUE : [ level[blCabacIdx + 1] ]
 	guard
-		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1 and cabac_end()
+		CountCoeff >= 0 and cabac_end()
 	do
-		coeff_abs_level_minus1[ blCabacIdx ] := cabac_value();	
+		CabacZigZagIdx := InverseScan4x4TabAlt[ CoeffIndex[CountCoeff] ];
 		
-		level[ blCabacIdx ] := coeff_abs_level_minus1[ blCabacIdx ];
+		coeff_abs_level_minus1[ CabacZigZagIdx ] := cabac_value();
 		
-		blCabacIdx := blCabacIdx - 1;
+		level[ CabacZigZagIdx ] := coeff_abs_level_minus1[ CabacZigZagIdx ];
+		
+		CountCoeff := CountCoeff - 1;
 	end
 	
-	
-	Residual_block_update_coeffLevel_not_read: action ==> VALUE : [ 0 ]
-	guard
-		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 0
-	do
-		blCabacIdx := blCabacIdx - 1;
-	end
 	
 	Residual_block_update_coeffLevel_done: action ==>
 	guard
-		blCabacIdx < 0
+		CountCoeff < 0
 	end
 	
 	Residual_block_Sent_Zeros_4x4 : action ==> VALUE : [ [0: for int i in Integers(0,15)] ] repeat 16
@@ -7624,8 +7631,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_start			) --> Residual_block_update_coeffLevel_read;
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_done				) --> Residual_return;
-		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_not_read			) --> Residual_block_update_coeffLevel;
-		Residual_block_update_coeffLevel_read				( Residual_block_update_coeffLevel_read				) --> Residual_block_update_coeffLevel;													
+		Residual_block_update_coeffLevel_read				( Residual_block_update_coeffLevel_read				) --> Residual_block_update_coeffLevel;				
 	
 	end
 	
