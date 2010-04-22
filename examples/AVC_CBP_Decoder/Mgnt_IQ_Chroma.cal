@@ -15,17 +15,13 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Mgnt_IQ_Chroma( int PREDTYPE_SZ ) int(size=SAMPLE_SZ) CoefDCR_C, int(size=SAMPLE_SZ) CoefAC_C ==> int(size=SAMPLE_SZ) Lev2d, int(size=PREDTYPE_SZ) intra_DC_flag
+actor Mgnt_IQ_Chroma() int(size=16) CoefDCR_C, int(size=16) CoefAC_C ==> int(size=16) Lev2d, int(size=2) intra_DC_flag
 :  
-  
-  	// Port size declaration
-	int SAMPLE_SZ = 16;
-  
   int Nb4x4:=4;
    
   lev2d: action CoefDCR_C:[x], CoefAC_C:[ y ] repeat 16 ==> Lev2d:[ buff ] repeat 16
   var
-  	List (type: int(size=SAMPLE_SZ), size=16) buff := [ 0 : for int s in Integers( 0, 15) ]
+  	List (type: int(size=16), size=16) buff := [ 0 : for int s in Integers( 0, 15) ]
   	do
   	buff[0] := x;
   	foreach int i in Integers(1,15) do

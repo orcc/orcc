@@ -10,35 +10,27 @@ import all caltrop.lib.BitOps;
 
 // BTYPE
 // refID  MB position (x,y)
-actor Mgnt_FBAddr_Chroma_MxN ( int ADDR_SZ,   int loca_SZ,    int ref_SZ,
-    						   int frac_SZ,   int PartSZ_SZ, int PicS_SZ,int PicW_SZ,
-    						   int MB_WIDTH ) 
+actor Mgnt_FBAddr_Chroma_MxN () 
    							
-   							 int (size=SAMPLE_SZ) Coef_ACR, 
+   							 int (size=16) Coef_ACR, 
    							 uint(size=8)         Mb_Type, 
-   							 int (size=MV_SZ)     MV, 
-   							 uint(size=Idx_SZ)    RefIdx, 
-  							 uint(size=loca_SZ)   Location , 
-  							 uint(size=PartSZ_SZ) PartSZ, 
-  							 uint(size=PicS_SZ)   PicSizeInMb, 
-  							 uint(size=PicW_SZ)   PicWidthInMb,
+   							 int (size=16)     MV, 
+   							 uint(size=3)    RefIdx, 
+  							 uint(size=11)   Location , 
+  							 uint(size=6) PartSZ, 
+  							 uint(size=13)   PicSizeInMb, 
+  							 uint(size=7)   PicWidthInMb,
   							 uint(size=3)         MbPartIdx,
   							 uint(size=13)        CurrMbAddr,
    							 bool                 Write_Done
   															   ==> 
-  												 				  int (size=SAMPLE_SZ) Coef_ACR_P, 
+  												 				  int (size=16) Coef_ACR_P, 
    																  uint(size=21) 	   RA, 
    																  uint(size=11)        RA_Width, 
    																  uint(size=11)        RA_Height, 
-   																  uint(size=ref_SZ)    refbuf, 
-   			
-   																  int (size=frac_SZ)   Frac :
-   																  
-   // Port size declaration
-  int MV_SZ = 16;
-  int SAMPLE_SZ = 16;
-  int Idx_SZ = 3;
-  
+   																  uint(size=3)    refbuf, 
+   																  int (size=4)   Frac :
+
 	/* ***
 		Global Variables
 							*** */
@@ -92,7 +84,7 @@ actor Mgnt_FBAddr_Chroma_MxN ( int ADDR_SZ,   int loca_SZ,    int ref_SZ,
   Mb_Type_NOK: action Mb_Type      :[a],
   		              PicWidthInMb :[ b ], 
   		              PicSizeInMb  :[ c ], 
-  		              Coef_ACR     :[ d ] repeat MB_WIDTH*MB_WIDTH,
+  		              Coef_ACR     :[ d ] repeat 8*8,
   		              CurrMbAddr   :[ valCurrMbAddr ] ==> 
   guard
   	a = 0 or a = 1
@@ -111,9 +103,9 @@ actor Mgnt_FBAddr_Chroma_MxN ( int ADDR_SZ,   int loca_SZ,    int ref_SZ,
   Mb_Type_OK: action Mb_Type      :[a],
   	                 PicWidthInMb :[ b ], 
   	                 PicSizeInMb  :[ c ], 
-  	                 Coef_ACR     :[d] repeat MB_WIDTH*MB_WIDTH,
+  	                 Coef_ACR     :[d] repeat 8*8,
   	                 CurrMbAddr   :[valCurrMbAddr]              ==> 
-  	     										                   Coef_ACR_P:[d] repeat MB_WIDTH*MB_WIDTH
+  	     										                   Coef_ACR_P:[d] repeat 8*8
   guard
   	a = 2
   do 

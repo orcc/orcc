@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Prediction">
+<XDF name="Prediction_L">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -200,7 +200,13 @@
     <Decl kind="Param" name="DPBMAXSIZE">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Param" name="MODE_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="MV_SZ">
         <Type name="int"/>
     </Decl>
     <Decl kind="Param" name="QUANT_SIZE">
@@ -227,11 +233,17 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
+        </Parameter>
+        <Parameter name="MV_SZ">
+            <Expr kind="Var" name="MV_SZ"/>
         </Parameter>
         <Parameter name="SAMPLE_SIZE">
             <Expr kind="Var" name="SAMPLE_SIZE"/>
@@ -248,9 +260,6 @@
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
-        <Parameter name="NB_PIC">
-            <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Select">
         <!-- ************************* -->
@@ -260,9 +269,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MB_WIDTH">
-            <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
     </Instance>
     <Instance id="Intra_16x16">
         <!-- ************************* -->
@@ -302,8 +308,14 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
         <Parameter name="LUMA_CHROMA">
             <Expr kind="Literal" literal-kind="Integer" value="16"/>
+        </Parameter>
+        <Parameter name="MV_SZ">
+            <Expr kind="Var" name="MV_SZ"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>

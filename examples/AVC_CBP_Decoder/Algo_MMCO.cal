@@ -56,13 +56,13 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Mickael Raulet IETR/INSA of Rennes
 
 
-actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> uint(size=5) RefList :  
-  List(type:uint(size=4),size=NB_PIC) reordering_ref_list := [0 :for int s in Integers(0,NB_PIC-1)];
-  List(type:int,size=NB_PIC) short_term_list:= [0 :for int s in Integers(0,NB_PIC-1)];
-  List(type:int,size=NB_PIC) pic_idx_list:= [0 :for int s in Integers(0,NB_PIC-1)];
-  List(type:int(size=5),size=NB_PIC) long_term_list := [-1 :for int s in Integers(0,NB_PIC-1)];
-  List(type:uint(size = 5), size = 2*NB_PIC) RefListTab := [-1 :for int s in Integers(0,2*NB_PIC-1)];
-  List(type:uint(size=4),size= 2*NB_PIC) RefListSent := [0: for int s in Integers(0, 2*NB_PIC-1)];
+actor Algo_MMCO () uint(size=5) RefReordering, uint(size=5) MMCO ==> uint(size=5) RefList :  
+  List(type:uint(size=4),size=16) reordering_ref_list := [0 :for int s in Integers(0,16-1)];
+  List(type:int,size=16) short_term_list:= [0 :for int s in Integers(0,16-1)];
+  List(type:int,size=16) pic_idx_list:= [0 :for int s in Integers(0,16-1)];
+  List(type:int(size=5),size=16) long_term_list := [-1 :for int s in Integers(0,16-1)];
+  List(type:uint(size = 5), size = 2*16) RefListTab := [-1 :for int s in Integers(0,2*16-1)];
+  List(type:uint(size=4),size= 2*16) RefListSent := [0: for int s in Integers(0, 2*16-1)];
   
   uint(size=3) mmco_opcode;
   
@@ -114,7 +114,7 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     // choose pic_curr_idx
     idx := pic_curr_idx;
     while not flag do
-      idx:= (idx +1) mod NB_PIC;
+      idx:= (idx +1) mod 16;
       flag :=  true;
       if short_term_count != 0 then
         foreach int i in Integers (0, short_term_count - 1) do
@@ -160,7 +160,7 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
       end
       ListIndex :=  short_term_count;
     else 
-      reordering_ref_list := [0 :for int s in Integers(0,NB_PIC-1)];
+      reordering_ref_list := [0 :for int s in Integers(0,16-1)];
     end 
     
     if long_term_count != 0 then 
@@ -332,7 +332,7 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
   guard
   	EndInitSentRefList = false and ( short_term_count + long_term_count != 0 )
   var 
-    List(type:uint(size=4),size=2*NB_PIC) reflist:= [0: for int k in Integers(0,2*NB_PIC-1)],
+    List(type:uint(size=4),size=2*16) reflist:= [0: for int k in Integers(0,2*16-1)],
     int ListIndex := 0
   do
     if short_term_count != 0 then 
@@ -387,9 +387,9 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     flag_long_term   := b;
     short_term_count := 0;
     long_term_count  := 0;
-    short_term_list:= [ -1 :for int s in Integers(0,NB_PIC-1)];
-    pic_idx_list:= [ -1 :for int s in Integers(0,NB_PIC-1)];
-    long_term_list   := [-1 :for int s in Integers(0,NB_PIC-1)];
+    short_term_list:= [ -1 :for int s in Integers(0,16-1)];
+    pic_idx_list:= [ -1 :for int s in Integers(0,16-1)];
+    long_term_list   := [-1 :for int s in Integers(0,16-1)];
   end
   
   read_not_IDR_not_MMCO: action MMCO:[a , b]==>
@@ -485,7 +485,7 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     a = 4
   do
     long_term_max_idx := b;
-    foreach int i in Integers(long_term_max_idx, NB_PIC-1) do
+    foreach int i in Integers(long_term_max_idx, 16-1) do
       if long_term_list[i] != -1 then long_term_count := long_term_count-1; long_term_list[i] := -1; end
     end
   end
@@ -498,11 +498,11 @@ actor Algo_MMCO (int NB_PIC) uint(size=5) RefReordering, uint(size=5) MMCO ==> u
     frame_num:=0;
     pic_curr_idx:=0;
     short_term_count := 0;
-    short_term_list := [-1 :for int s in Integers(0,NB_PIC-1)];
-    pic_idx_list := [-1 :for int s in Integers(0,NB_PIC-1)];
+    short_term_list := [-1 :for int s in Integers(0,16-1)];
+    pic_idx_list := [-1 :for int s in Integers(0,16-1)];
     long_term_count := 0;
     long_term_max_idx := 0;
-    long_term_list := [-1 :for int s in Integers(0,NB_PIC-1)];
+    long_term_list := [-1 :for int s in Integers(0,16-1)];
   end
   
   // Mark the current picture as long term reference picture

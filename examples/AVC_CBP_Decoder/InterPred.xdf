@@ -148,6 +148,12 @@
     <Decl kind="Param" name="MB_WIDTH">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="MV_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Param" name="MODE_SZ">
         <Type name="int"/>
     </Decl>
@@ -162,12 +168,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MB_WIDTH">
-            <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
-        <Parameter name="MODE_SZ">
-            <Expr kind="Var" name="MODE_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Interp_SeparableSixTapQuarterPelAVC">
         <!-- ************************* -->
@@ -177,15 +177,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PIX_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
-        <Parameter name="PartSZ_SZ">
-            <Expr kind="Var" name="MODE_SZ"/>
-        </Parameter>
-        <Parameter name="frac_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="16"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Interp_split_MB">
         <!-- ************************* -->

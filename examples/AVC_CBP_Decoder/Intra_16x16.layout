@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="79" y="115"/>
-      <vertex id="PicWidthInMb" x="41" y="387"/>
-      <vertex id="PredMode" x="56" y="238"/>
-      <vertex id="FirstMbInSlice" x="49" y="193"/>
-      <vertex id="MB_IN" x="57" y="427"/>
-      <vertex id="Coef_ACR" x="84" y="79"/>
-      <vertex id="Mb_Type" x="51" y="345"/>
-      <vertex id="MB_intraPred16x16" x="998" y="411"/>
-      <vertex id="Mgnt_Intra_16x16" x="403" y="246"/>
-      <vertex id="Algo_IntraPred_LUMA_16x16" x="614" y="264"/>
-      <vertex id="Algo_Add_16x16" x="836" y="393"/>
-      <vertex id="Buffer_Neighbour_FullMb" x="202" y="391"/>
-      <vertex id="ConstrainedIFlag" x="202" y="37"/>
+      <vertex id="CurrMbAddr" x="57" y="220"/>
+      <vertex id="PicWidthInMb" x="57" y="427"/>
+      <vertex id="PredMode" x="202" y="70"/>
+      <vertex id="FirstMbInSlice" x="202" y="163"/>
+      <vertex id="MB_IN" x="57" y="520"/>
+      <vertex id="Coef_ACR" x="202" y="277"/>
+      <vertex id="Mb_Type" x="57" y="613"/>
+      <vertex id="ConstrainedIFlag" x="202" y="370"/>
+      <vertex id="MB_intraPred16x16" x="1014" y="472"/>
+      <vertex id="Mgnt_Intra_16x16" x="403" y="298"/>
+      <vertex id="Algo_IntraPred_LUMA_16x16" x="630" y="325"/>
+      <vertex id="Algo_Add_16x16" x="852" y="454"/>
+      <vertex id="Buffer_Neighbour_FullMb" x="202" y="484"/>
    </vertices>
 </layout>

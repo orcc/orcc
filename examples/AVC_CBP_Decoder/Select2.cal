@@ -15,34 +15,31 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Select (int MB_WIDTH )/* int(size=SAMPLE_SZ) X0,*/ int(size=9) X1 , int(size=9) X2, int(size=9) X3, uint(size=8) Mb_Type  ==> int(size=9) X :
-  uint(size=9) count := MB_WIDTH*MB_WIDTH;
+actor Select ()/* int(size=16) X0,*/ int(size=9) X1 , int(size=9) X2, int(size=9) X3, uint(size=8) Mb_Type  ==> int(size=9) X :
+  uint(size=9) count := 8*8;
   uint(size=3) sel;
-  
-    // Port size declaration
-  int SAMPLE_SZ = 16;
   
 	GetMbType:action Mb_Type:[a]==> 
 	do
 		sel:= a;
 	end
   /*
-	GetIntra4x4:action X0:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	GetIntra4x4:action X0:[x] repeat 8*8 ==> X:[x] repeat 8*8
 	guard
     	sel = 0
 	end
   */
-	GetIntra16x16:action X1:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH 
+	GetIntra16x16:action X1:[x] repeat 8*8 ==> X:[x] repeat 8*8 
 	guard
 		sel = 1
 	end
   
-	GetInter:action X2:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	GetInter:action X2:[x] repeat 8*8 ==> X:[x] repeat 8*8
 	guard
     	sel = 2
 	end
 	
-	GetPCM: action X3:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	GetPCM: action X3:[x] repeat 8*8 ==> X:[x] repeat 8*8
 	guard
     	sel = 4
 	end

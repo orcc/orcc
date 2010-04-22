@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="InterPred">
+<XDF name="MVReconstruct">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -107,6 +107,12 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
+    <Decl kind="Param" name="MV_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Param" name="MODE_SZ">
         <Type name="int"/>
     </Decl>
@@ -121,9 +127,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MODE_SZ">
-            <Expr kind="Var" name="MODE_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_MVR_MultiFrameAdptive">
         <!-- ************************* -->
@@ -133,9 +136,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MODE_SZ">
-            <Expr kind="Var" name="MODE_SZ"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Add">
         <!-- ************************* -->

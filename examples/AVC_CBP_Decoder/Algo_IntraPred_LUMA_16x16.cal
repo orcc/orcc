@@ -71,16 +71,16 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 import all caltrop.lib.BitOps;
 
-actor Algo_IntraPred_LUMA_16x16 ( int PIX_SZ )
-  int(size=PIX_SZ) Y_LEFT,     // List
-  int(size=PIX_SZ) Y_UP,       // List
-  int(size=PIX_SZ) Y_UP_LEFT,  // point
+actor Algo_IntraPred_LUMA_16x16 ()
+  int(size=16) Y_LEFT,     // List
+  int(size=16) Y_UP,       // List
+  int(size=16) Y_UP_LEFT,  // point
 
   uint(size=1) AVAIL,              // up, left, up_left availability List
 
   uint(size = 4) PredMode
 
-  ==> int(size=PIX_SZ) MPR:
+  ==> int(size=16) MPR:
 
 
   // res variable used by procedure sum 
@@ -89,7 +89,7 @@ actor Algo_IntraPred_LUMA_16x16 ( int PIX_SZ )
   int(size=32) sum_temp;
   
   
-  procedure summ(List(type:int(size=PIX_SZ), size=16) list, int n)
+  procedure summ(List(type:int(size=16), size=16) list, int n)
   begin
     res := 0;
     if n > 0 then
@@ -107,10 +107,10 @@ actor Algo_IntraPred_LUMA_16x16 ( int PIX_SZ )
   int(size=2) up_avail;
   int(size=2) up_left_avail;
 
-  List(type:int(size=PIX_SZ), size= 16) y_left;
-  List(type:int(size=PIX_SZ), size= 16) y_up;
-  int(size=PIX_SZ)       y_up_left;
-  List( type:int(size=PIX_SZ), size=16*16 ) mpr := [ 0 : for int i in Integers( 0, 16*16 - 1) ];
+  List(type:int(size=16), size= 16) y_left;
+  List(type:int(size=16), size= 16) y_up;
+  int(size=16)       y_up_left;
+  List( type:int(size=16), size=16*16 ) mpr := [ 0 : for int i in Integers( 0, 16*16 - 1) ];
 
   read.avail: action AVAIL:[avail] repeat 3 ==>
   do
@@ -199,8 +199,8 @@ actor Algo_IntraPred_LUMA_16x16 ( int PIX_SZ )
  var
     int mean,
     int H, int V, int a, int b, int c,
-    List(type: int(size=PIX_SZ), size = 7) sum_list,
-    List(type: int(size=PIX_SZ), size = 7) sum_list2
+    List(type: int(size=16), size = 7) sum_list,
+    List(type: int(size=16), size = 7) sum_list2
  do
  	sum_list := [(i+1)*(y_up[8+i]  -y_up[6-i]  ):for int i in Integers(0,6)];
     summ(sum_list,7);

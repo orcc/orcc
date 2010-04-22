@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Decoding_C">
+<XDF name="Prediction_C">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -200,6 +200,9 @@
     <Decl kind="Param" name="SAMPLE_SIZE">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -226,6 +229,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
@@ -244,9 +250,6 @@
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
-        <Parameter name="NB_PIC">
-            <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Select_chroma">
         <!-- ************************* -->
@@ -256,9 +259,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="MB_WIDTH">
-            <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
     </Instance>
     <Instance id="Deblocking Filter">
         <!-- ************************* -->
@@ -268,8 +268,14 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
         <Parameter name="LUMA_CHROMA">
             <Expr kind="Literal" literal-kind="Integer" value="8"/>
+        </Parameter>
+        <Parameter name="MV_SZ">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Literal" literal-kind="Integer" value="8"/>

@@ -6,12 +6,12 @@
 
 import all caltrop.lib.BitOps;
 
-actor Algo_Interp_EighthPelBilinear( int frac_SZ, int PIX_SZ, int PartSZ_SZ ) 
-		int(size=frac_SZ) Frac, 
-		int(size=PIX_SZ) RD, 
-		uint(size=PartSZ_SZ) PartSZ 
+actor Algo_Interp_EighthPelBilinear() 
+		int(size=4) Frac, 
+		int(size=16) RD, 
+		uint(size=6) PartSZ 
 				==> 
-				int(size=PIX_SZ) INTERP:
+				int(size=16) INTERP:
 
   int(size=32) x ;
   int(size=32) y ;
@@ -25,7 +25,7 @@ actor Algo_Interp_EighthPelBilinear( int frac_SZ, int PIX_SZ, int PartSZ_SZ )
   int width;
   int height;
 
-  List( type:int(size=PIX_SZ), size=289 ) inbuf := [ 0 : for int i in Integers( 0, 288) ];
+  List( type:int(size=16), size=289 ) inbuf := [ 0 : for int i in Integers( 0, 288) ];
 
   procedure compensate( )
   begin  

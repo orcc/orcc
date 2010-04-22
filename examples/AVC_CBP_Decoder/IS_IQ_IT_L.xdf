@@ -57,6 +57,9 @@
     <Decl kind="Param" name="QUANT_SIZE">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="PREDTYPE_SIZE">
+        <Type name="int"/>
+    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -88,9 +91,6 @@
         <!-- ************************* -->
         <Parameter name="NB4x4">
             <Expr kind="Literal" literal-kind="Integer" value="16"/>
-        </Parameter>
-        <Parameter name="QUANT_SZ">
-            <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>
     </Instance>
     <Instance id="IT4x4">

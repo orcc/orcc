@@ -19,30 +19,25 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Mgnt_Intra_4x4 ( int MB_WIDTH )
+actor Mgnt_Intra4x4 ()
 	uint (size=8) Mb_Type,
 	uint(size=13) FirstMbInSlice,
 	uint(size=7) PicWidthInMb,
 	uint(size=13) CurrMbAddr,
 	uint(size=4) PredMode,
-	uint(size=SAMPLE_SZ) EDGE,
+	uint(size=16) EDGE,
 	int(size=9) MB_4X4,
-	int(size=SAMPLE_SZ) Coef_ACR,
+	int(size=16) Coef_ACR,
 	bool ConstrainedIFlag 
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode4x4,
-		int(size=SAMPLE_SZ) Coef_ACR_4X4,
-		int(size=SAMPLE_SZ) Y_Left4,
-		int(size=SAMPLE_SZ) Y_Up4,
-		int(size=SAMPLE_SZ) Y_UpLeft4
+		int(size=16) Coef_ACR_4X4,
+		int(size=16) Y_Left4,
+		int(size=16) Y_Up4,
+		int(size=16) Y_UpLeft4
 		:  
   	
-  	
-  	// Port size declaration
-	int SAMPLE_SZ = 16;
-	
-	
 	//Token counter
 	int (size = 6) mb_counter := 0;
 	
@@ -51,14 +46,14 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
     List ( type:uint(size=4), size=16 )  t_scan2_Index = [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15];
 
 	//List that contains the neighbouring pixel of the current 16x16 Mb, from bottom to top then left to right 
-	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) left_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH-1)];
-  	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH+4 ) top_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH+3)];
-  	uint(size=SAMPLE_SZ) topLeft_16x16_edge := 0;
+	List( type:uint(size=16), size=16 ) left_16x16_edge := [ 0 : for int i in Integers( 0, 16-1)];
+  	List( type:uint(size=16), size=16+4 ) top_16x16_edge := [ 0 : for int i in Integers( 0, 16+3)];
+  	uint(size=16) topLeft_16x16_edge := 0;
   
     //List that contains the edge of the previous 4x4 Mb predicted 
-	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH) bottom_4x4_edge := [0 : for int i in Integers( 0, MB_WIDTH-1)];
-	List( type:uint(size=SAMPLE_SZ), size=4 ) right_4x4_edge := [ 0 : for int i in Integers( 0, 3)];
-	uint(size=SAMPLE_SZ) bottomRight_4x4_edge := 0;
+	List( type:uint(size=16), size=16) bottom_4x4_edge := [0 : for int i in Integers( 0, 16-1)];
+	List( type:uint(size=16), size=4 ) right_4x4_edge := [ 0 : for int i in Integers( 0, 3)];
+	uint(size=16) bottomRight_4x4_edge := 0;
 	
 	// Available 4x4 edge for prediction [left, top, top left, top right]
 	List( type:uint(size=1), size=4 ) avail := [ 0 : for int i in Integers( 0, 3) ];
@@ -68,11 +63,11 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	uint(size=1) top_16x16_avail := 0;
 	uint(size=1) topLeft_16x16_avail := 0;
 	uint(size=1) topRight_16x16_avail := 0;
-	List( type:uint(size=1), size=MB_WIDTH) topLeft_4x4_avail := [0 : for int i in Integers( 0, MB_WIDTH-1)];
-	List( type:uint(size=1), size=MB_WIDTH) topRight_4x4_avail := [0 : for int i in Integers( 0, MB_WIDTH-1)];
+	List( type:uint(size=1), size=16) topLeft_4x4_avail := [0 : for int i in Integers( 0, 16-1)];
+	List( type:uint(size=1), size=16) topRight_4x4_avail := [0 : for int i in Integers( 0, 16-1)];
 
   	//FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =720/16;
+  	uint(size=7) PICWIDTH =45;
 	List( type:bool, size=PICWIDTH) is_intra := [false : for int i in Integers( 0, PICWIDTH-1)];
 	uint(size=13) curr_pos:=0;
 	bool intra_top_left:=false;
@@ -85,7 +80,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 		FirstMbInSlice:[b], 
 		PicWidthInMb:[c], 
 		CurrMbAddr:[d], 
-		Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH,
+		Coef_ACR:[e] repeat 16*16,
 		ConstrainedIFlag:[c_intra_flag],
 		PredMode:[f]==>
 	guard
@@ -101,7 +96,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 		Mb_Type:[a], 
 		PicWidthInMb:[c], 
 		CurrMbAddr:[d], 
-		Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH,
+		Coef_ACR:[e] repeat 16*16,
 		ConstrainedIFlag:[c_intra_flag],
 		FirstMbInSlice:[f] ==>
 	guard
@@ -134,11 +129,11 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	  	PicWidthInMb:[c], 
 	  	CurrMbAddr:[d], 
 		ConstrainedIFlag:[c_intra_flag],
-		Coef_ACR:[coef_ac] repeat MB_WIDTH * MB_WIDTH, 
-	  	PredMode:[v] repeat MB_WIDTH 
+		Coef_ACR:[coef_ac] repeat 16 * 16, 
+	  	PredMode:[v] repeat 16 
 	  		==>
-		  	Coef_ACR_4X4:[coef_ac] repeat MB_WIDTH * MB_WIDTH,
-		  	PredMode4x4:[[v[t_scan2_Index[s]]:for int s in Integers(0,15)] ] repeat MB_WIDTH
+		  	Coef_ACR_4X4:[coef_ac] repeat 16 * 16,
+		  	PredMode4x4:[[v[t_scan2_Index[s]]:for int s in Integers(0,15)] ] repeat 16
 	guard
 		a = 0
 	var
@@ -188,12 +183,12 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	//******************************* Receiving required token ********************************************
   
 	//Receive the value of the 16x16 Mb neighbouring pixel from bottom to top, then corner, then left to right 
-	EdgeNeighbour:action EDGE:[v] repeat 2*MB_WIDTH+5 ==> 
+	EdgeNeighbour:action EDGE:[v] repeat 2*16+5 ==> 
 	do
 		//Store left, top and top left border
-		left_16x16_edge := [v[s]:for int s in Integers(0,MB_WIDTH-1)];
-		topLeft_16x16_edge := v[MB_WIDTH];
-		top_16x16_edge := [v[s]:for int s in Integers(MB_WIDTH+1,2*MB_WIDTH+4)];
+		left_16x16_edge := [v[s]:for int s in Integers(0,16-1)];
+		topLeft_16x16_edge := v[16];
+		top_16x16_edge := [v[s]:for int s in Integers(16+1,2*16+4)];
 	end
   
 	//Receive pixel value from the previous 4x4 Mb Predicted and store its edge
@@ -219,7 +214,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	//**** Select and send available edge ****
 	AvailEdge:action ==> Avail:[ avail ] repeat 3
 	guard
-		mb_counter< MB_WIDTH
+		mb_counter< 16
 	do
 		 	
 		//4x4 edge available for left
@@ -238,7 +233,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	SendEdge.LeftEdge16:action ==> Y_Left4:[ [left_16x16_edge[s+mb_counter]: for int s in Integers(0,3)]]repeat 4
 	guard 
 	  	avail[0] = 1,
-	  	mb_counter mod rshift(MB_WIDTH, 2) = 0
+	  	mb_counter mod rshift(16, 2) = 0
 	do
 		avail[0] := 0;
 	end 
@@ -247,7 +242,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	SendEdge.LeftEdge4:action ==> Y_Left4:[ [right_4x4_edge[s]: for int s in Integers(0,3)] ]repeat 4
 	guard 
 		avail[0] = 1,
-		mb_counter mod rshift(MB_WIDTH, 2) != 0
+		mb_counter mod rshift(16, 2) != 0
 	do
 		avail[0] := 0;
 	end 
@@ -257,7 +252,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	guard 
 	  	avail[1] = 1,
 	  	avail[3] = 1,
-	  	mb_counter < MB_WIDTH / 4
+	  	mb_counter < 16 / 4
 	do
 		avail[1] := 0;
 		avail[3] := 0;
@@ -268,7 +263,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	guard 
 		avail[1] = 1,
 		avail[3] = 1,
-		mb_counter >= MB_WIDTH / 4
+		mb_counter >= 16 / 4
 	do
 		avail[1] := 0;
 		avail[3] := 0;
@@ -279,10 +274,10 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	guard 
 	  	avail[1] = 1,
 	  	avail[3] = 0,
-	  	mb_counter < MB_WIDTH / 4
+	  	mb_counter < 16 / 4
   	
 	var
-		List (type: int(size=SAMPLE_SZ), size=64) buff := [ 0 : for int t in Integers( 0, 63) ]
+		List (type: int(size=16), size=64) buff := [ 0 : for int t in Integers( 0, 63) ]
 	do
 		avail[1] := 0;
 		foreach int s in Integers(0, 3) do
@@ -298,9 +293,9 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	guard 
 		avail[1] = 1,
 		avail[3] = 0,
-		mb_counter >= MB_WIDTH / 4
+		mb_counter >= 16 / 4
 	var
-		List (type: int(size=SAMPLE_SZ), size=16) buff := [ 0 : for int t in Integers( 0, 15) ]
+		List (type: int(size=16), size=16) buff := [ 0 : for int t in Integers( 0, 15) ]
 	  
 	do
 		avail[1] := 0;
@@ -318,7 +313,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	guard 
 		avail[2] = 1
 	var
-		uint (size=SAMPLE_SZ) v
+		uint (size=16) v
 	do
  		v :=if mb_counter = 0 then
   				topLeft_16x16_edge
@@ -341,7 +336,7 @@ actor Mgnt_Intra_4x4 ( int MB_WIDTH )
 	//End of every process, wait for the next mb_type
 	EndEdge:action ==>
 	guard
-		mb_counter = MB_WIDTH,
+		mb_counter = 16,
 		avail[0] = 0,
 		avail[1] = 0,
 		avail[2] = 0,

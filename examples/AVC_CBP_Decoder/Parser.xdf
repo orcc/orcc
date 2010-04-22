@@ -323,6 +323,15 @@
     <Decl kind="Param" name="DPBMAXSIZE">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="PREDTYPE_SIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="MV_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Param" name="MODE_SZ">
         <Type name="int"/>
     </Decl>
@@ -346,9 +355,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Buffer_Size">
-            <Expr kind="Literal" literal-kind="Integer" value="100000"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Synp_AVC">
         <!-- ************************* -->
@@ -394,10 +400,16 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
         </Parameter>
-     </Instance>
+        <Parameter name="MV_SZ">
+            <Expr kind="Var" name="MV_SZ"/>
+        </Parameter>
+    </Instance>
     <Instance id="Algo_MMCO">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -406,9 +418,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="NB_PIC">
-            <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Parser_IPCM">
         <!-- ************************* -->

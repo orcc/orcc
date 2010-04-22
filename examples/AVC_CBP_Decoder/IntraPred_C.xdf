@@ -89,9 +89,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PIX_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Add">
         <!-- ************************* -->
@@ -101,6 +98,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
     </Instance>
     <Instance id="Buffer_Neighbour_FullMb">
         <!-- ************************* -->
@@ -122,9 +122,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ID">
-            <Expr kind="Literal" literal-kind="Integer" value="1"/>
-        </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>

@@ -70,19 +70,19 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 import all caltrop.lib.BitOps;
 
-actor Algo_IntraPred_CHROMA ( int PIX_SZ )
-		int(size=PIX_SZ) C_LEFT,     // List
-		int(size=PIX_SZ) C_UP,       // List
-		int(size=PIX_SZ) C_UP_LEFT,  // point
+actor Algo_IntraPred_CHROMA ()
+		int(size=16) C_LEFT,     // List
+		int(size=16) C_UP,       // List
+		int(size=16) C_UP_LEFT,  // point
 		uint(size=1) AVAIL,              // up, left, up_left availability List
 		uint(size=4) PredMode
 				==> 
-				int(size=PIX_SZ) MPR:
+				int(size=16) MPR:
 
   int res;
   int sum_temp;
 
-  procedure Sum(List(type:int ( size = PIX_SZ ), size = 16) list, int n)
+  procedure Sum(List(type:int ( size = 16 ), size = 16) list, int n)
   begin
  	res := 0;
  	if n > 0 then   	
@@ -101,10 +101,10 @@ actor Algo_IntraPred_CHROMA ( int PIX_SZ )
   uint(size=1) up_avail;
   uint(size=1) up_left_avail;
 
-  List(type:int(size=PIX_SZ), size=8) c_left;
-  List(type:int(size=PIX_SZ), size=8) c_up;
-  int(size=PIX_SZ)       c_up_left:= 0 ;
-  List( type:int(size=PIX_SZ), size=8*8 ) mpr := [ 0 : for int i in Integers( 0, 63) ];
+  List(type:int(size=16), size=8) c_left;
+  List(type:int(size=16), size=8) c_up;
+  int(size=16)       c_up_left:= 0 ;
+  List( type:int(size=16), size=8*8 ) mpr := [ 0 : for int i in Integers( 0, 63) ];
   
   read.avail: action AVAIL:[avail] repeat 3 ==>
   do
@@ -159,7 +159,7 @@ actor Algo_IntraPred_CHROMA ( int PIX_SZ )
     //   +----+----+
     int s0 := 0, int s1 := 0, int s2 := 0, int s3 := 0,
     int m0 := 128, int m1 := 128, int m2 := 128, int m3 := 128,
-    List(type: int(size = PIX_SZ), size = 7) sum_list
+    List(type: int(size = 16), size = 7) sum_list
   	do
   		if up_avail = 1 then
     		/*	
@@ -241,7 +241,7 @@ actor Algo_IntraPred_CHROMA ( int PIX_SZ )
 	mode = 3
   var
     int H, int V, int a, int b, int c,
-    List(type: int(size = PIX_SZ), size = 3) sum_list
+    List(type: int(size = 16), size = 3) sum_list
   do
     sum_list := [(i+1)*(c_up[4+i]  - c_up[2-i]  ):for int i in Integers(0,2)];
     Sum(sum_list,3);

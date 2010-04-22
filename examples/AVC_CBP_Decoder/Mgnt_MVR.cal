@@ -51,9 +51,9 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-actor Mgnt_MVR (int MODE_SZ) 
+actor Mgnt_MVR () 
 	uint(size=3) MbPartIdx,
-	uint(size=Idx_SZ) RefIdx,
+	uint(size=3) RefIdx,
 	uint(size=5) MbPartWidth,
 	uint(size=5) MbPartHeigth,
 	uint(size=13) CurrMbAddr,
@@ -63,20 +63,16 @@ actor Mgnt_MVR (int MODE_SZ)
 	uint(size=1) MbIntraFlag
 		==> 
 		uint(size=11)Location, 
-		uint(size=MODE_SZ) PartSZ, 
-		uint(size=Idx_SZ) refIdxLXN, 
-		int(size=MV_SZ) mvLX,
-		int(size=MV_SZ) mv_out,
-		uint(size=Idx_SZ) refidx_out
+		uint(size=6) PartSZ, 
+		uint(size=3) refIdxLXN, 
+		int(size=16) mvLX,
+		int(size=16) mv_out,
+		uint(size=3) refidx_out
 		:
 
-  // Port size declaration
-  int MV_SZ = 16;
-  int Idx_SZ = 3;
-  
 	//FIXME! number of MB per line of picture
-	int PICWIDTH=720/16; //number of MB per lines
-	int PICHEIGHT=576/16; //number of MB per columns
+	int PICWIDTH=1280/16; //number of MB per lines
+	int PICHEIGHT=720/16; //number of MB per columns
  
 	    
 	uint(size=5) count := 16;
@@ -91,7 +87,7 @@ actor Mgnt_MVR (int MODE_SZ)
 	uint(size=5) mbpart_h;
 	bool mvdone:=true;
   
-	List(type: List(type:List(type:int(size=14), size=2), size=16), size= PICWIDTH *PICHEIGHT) mv;
+	List(type: List(type:List(type:int(size=14), size=2), size=16), size=PICWIDTH*PICHEIGHT) mv;
 	List(type: List(type:int(size=5), size=16), size=PICWIDTH*PICHEIGHT) refidx;
   
 	List(type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];

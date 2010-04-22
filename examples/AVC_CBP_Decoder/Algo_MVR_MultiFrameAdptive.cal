@@ -54,35 +54,31 @@ Copyright (c) ISO/IEC 2008.
 
 
 
-actor Algo_MVR_MultiFrameAdptive (int MODE_SZ) 
-		uint(size=Idx_SZ) mbPartIdx,
-		uint(size=MODE_SZ) PartSZ,
-		uint(size=Idx_SZ) refIdxLX,
-		uint(size=Idx_SZ) refIdxLXN,
-		int(size=MV_SZ) mvLX 
+actor Algo_MVR_MultiFrameAdptive () 
+		uint(size=3) mbPartIdx,
+		uint(size=6) PartSZ,
+		uint(size=3) refIdxLX,
+		uint(size=3) refIdxLXN,
+		int(size=16) mvLX 
 		==> 
-		int(size=MV_SZ) mvpLX 
+		int(size=16) mvpLX 
 		:
 
-  // Port size declaration
-  int MV_SZ = 16;
-  int Idx_SZ = 3;
-  
-  
-  int(size=Idx_SZ) mbPartIdxt;
-  int(size=MODE_SZ) MbPartWidth;
-  int(size=MODE_SZ) MbPartHeight;
-  int(size=Idx_SZ) refIdxL0t;  
-  int(size=Idx_SZ) refIdxL0At;
-  int(size=Idx_SZ) refIdxL0Bt;
-  int(size=Idx_SZ) refIdxL0Ct;
-  List(type:int(size=MV_SZ),size=2) mvL0tA := [0,0];
-  List(type:int(size=MV_SZ),size=2) mvL0tB := [0,0]; 
-  List(type:int(size=MV_SZ),size=2) mvL0tC := [0,0]; 
-  List(type:int(size=MV_SZ),size=2) mvpL0t := [0,0];
-  List(type:int(size=MV_SZ),size=2) tempa := [0,0];
-  List(type:int(size=MV_SZ),size=2) tempb := [0,0];
-  List(type:int(size=MV_SZ),size=2) tempc := [0,0];
+
+  int(size=3) mbPartIdxt;
+  int(size=6) MbPartWidth;
+  int(size=6) MbPartHeight;
+  int(size=3) refIdxL0t;  
+  int(size=3) refIdxL0At;
+  int(size=3) refIdxL0Bt;
+  int(size=3) refIdxL0Ct;
+  List(type:int(size=16),size=2) mvL0tA := [0,0];
+  List(type:int(size=16),size=2) mvL0tB := [0,0]; 
+  List(type:int(size=16),size=2) mvL0tC := [0,0]; 
+  List(type:int(size=16),size=2) mvpL0t := [0,0];
+  List(type:int(size=16),size=2) tempa := [0,0];
+  List(type:int(size=16),size=2) tempb := [0,0];
+  List(type:int(size=16),size=2) tempc := [0,0];
 
 
   function middle( int a, int b, int c ) --> int :

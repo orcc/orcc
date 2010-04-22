@@ -7,7 +7,7 @@
       <vertex id="QP" x="383" y="70"/>
       <vertex id="ScalingList" x="383" y="163"/>
       <vertex id="CoefACR_L" x="945" y="283"/>
-      <vertex id="Algo_IS_Zigzag_4x4_AC" x="185" y="242"/>
+      <vertex id="Algo_IS_Zigzag_4x4_AC" x="185" y="256"/>
       <vertex id="Mgnt_IQ_INTRA16x16" x="383" y="256"/>
       <vertex id="Algo_IQ_QSAndSLAndIDCTScaler_4x4" x="572" y="247"/>
       <vertex id="IT4x4" x="837" y="274"/>

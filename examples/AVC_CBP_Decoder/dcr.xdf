@@ -81,6 +81,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
     </Instance>
     <Instance id="Algo_DCR_Hadamard_LUMA_Scaling">
         <!-- ************************* -->
@@ -90,9 +93,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="QUANT_SZ">
-            <Expr kind="Var" name="QUANT_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_DC_Transpose4x4_1">
         <!-- ************************* -->
@@ -102,6 +102,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="SAMPLE_SZ">
+            <Expr kind="Var" name="SAMPLE_SIZE"/>
+        </Parameter>
     </Instance>
     <Instance id="Algo_DCR_Hadamard_LUMA_Reordering">
         <!-- ************************* -->

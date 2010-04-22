@@ -3,7 +3,7 @@
    <vertices>
       <vertex id="X" x="57" y="79"/>
       <vertex id="Y" x="1028" y="79"/>
-      <vertex id="Algo_IT4x4_1d_0" x="143" y="80"/>
+      <vertex id="Algo_IT4x4_1d_0" x="143" y="70"/>
       <vertex id="Algo_Transpose4x4_0" x="308" y="70"/>
       <vertex id="Algo_IT4x4_1d_1" x="495" y="70"/>
       <vertex id="Algo_Transpose4x4_1" x="660" y="70"/>

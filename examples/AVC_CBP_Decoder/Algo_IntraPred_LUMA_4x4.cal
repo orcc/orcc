@@ -53,14 +53,14 @@ Copyright (c) ISO/IEC 2007.
 
 import all caltrop.lib.BitOps;
 
-actor Algo_IntraPred_LUMA_4x4 ( int PIX_SZ )
-  int(size=PIX_SZ) Y_LEFT,     // List
-  int(size=PIX_SZ) Y_UP,       // List
-  int(size=PIX_SZ) Y_UP_LEFT,  // point
+actor Algo_IntraPred_LUMA_4x4 ()
+  int(size=16) Y_LEFT,     // List
+  int(size=16) Y_UP,       // List
+  int(size=16) Y_UP_LEFT,  // point
   uint(size=1) AVAIL,              // up, left, up_left, up_right availability List
   uint(size=4) PredMode
 
-  ==> int(size=PIX_SZ) MPR:
+  ==> int(size=16) MPR:
 
   /* res variable used by procedure sum */
   int res;
@@ -70,14 +70,14 @@ actor Algo_IntraPred_LUMA_4x4 ( int PIX_SZ )
   int(size=2) left_avail;
   int(size=2) up_avail;
   int(size=2) up_left_avail;
-  int(size=PIX_SZ)       y_up_left;
+  int(size=16)       y_up_left;
 
-  List(type:int(size=PIX_SZ), size=4) y_left := [ 0 : for int i in Integers( 0, 3) ];
-  List(type:int(size=PIX_SZ), size=8) y_up := [ 0 : for int i in Integers( 0, 7) ];
-  List(type:int(size=PIX_SZ), size=4*4 ) mpr := [ 0 : for int i in Integers( 0, 15) ];
+  List(type:int(size=16), size=4) y_left := [ 0 : for int i in Integers( 0, 3) ];
+  List(type:int(size=16), size=8) y_up := [ 0 : for int i in Integers( 0, 7) ];
+  List(type:int(size=16), size=4*4 ) mpr := [ 0 : for int i in Integers( 0, 15) ];
   
   
-  procedure Summ(List(type:int(size=PIX_SZ), size=16) list, int n)
+  procedure Summ(List(type:int(size=16), size=16) list, int n)
   begin
     res := 0;
     if n > 0 then

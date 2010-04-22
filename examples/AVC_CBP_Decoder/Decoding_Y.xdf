@@ -215,6 +215,15 @@
     <Decl kind="Param" name="SAMPLE_SIZE">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="PREDTYPE_SIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="MV_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Param" name="MODE_SZ">
         <Type name="int"/>
     </Decl>
@@ -244,11 +253,17 @@
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
         </Parameter>
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SZ"/>
+        </Parameter>
+        <Parameter name="MV_SZ">
+            <Expr kind="Var" name="MV_SZ"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>
@@ -265,6 +280,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="PREDTYPE_SIZE">
+            <Expr kind="Var" name="PREDTYPE_SIZE"/>
+        </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>

@@ -214,6 +214,12 @@
     <Decl kind="Param" name="DPBMAXSIZE">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="PREDTYPE_SIZE">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Variable" name="MB_WIDTH">
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="8"/>
@@ -232,7 +238,10 @@
         <Parameter name="DPBMAXSIZE">
             <Expr kind="Var" name="DPBMAXSIZE"/>
         </Parameter>
-         <Parameter name="MB_WIDTH">
+        <Parameter name="Idx_SZ">
+            <Expr kind="Var" name="Idx_SZ"/>
+        </Parameter>
+        <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>
         <Parameter name="SAMPLE_SIZE">

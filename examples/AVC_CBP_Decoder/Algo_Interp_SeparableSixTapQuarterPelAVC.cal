@@ -5,11 +5,11 @@
 // Fractional luma sample interpolation for motion compensation of AVC
 import all caltrop.lib.BitOps;
 
-actor Algo_Interp_SeparableSixTapQuarterPelAVC ( int frac_SZ, int PIX_SZ, int PartSZ_SZ ) 
-		uint(size=frac_SZ) Frac, int(size=PIX_SZ) RD,
-		uint(size=PartSZ_SZ) PartSZ
+actor Algo_Interp_SeparableSixTapQuarterPelAVC () 
+		uint(size=16) Frac, int(size=16) RD,
+		uint(size=6) PartSZ
 				==>
-				int(size=PIX_SZ) INTERP:
+				int(size=16) INTERP:
 
   int(size=32) x ;
   int(size=32) y ;
@@ -22,7 +22,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ( int frac_SZ, int PIX_SZ, int Pa
   int temp; 
   int temp2;
   uint(size=1) buf_done;  
-  List( type:int(size=PIX_SZ), size=441 ) inbuf := [ 0 : for int i in Integers( 0, 440) ];
+  List( type:int(size=16), size=441 ) inbuf := [ 0 : for int i in Integers( 0, 440) ];
   List( type:int(size=32), size=6 ) half_pel := [ 0 : for int i in Integers( 0, 5) ];
   
   procedure compensate( )

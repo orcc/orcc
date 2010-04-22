@@ -18,14 +18,10 @@ This FU puts together 4*4 macroblock send in raster scan order to generate a 16x
  
 *****************************************************************************/
 
-actor Algo_Merge_4x4_to_8x8 ( ) int(size=SAMPLE_SZ) X ==> int(size=SAMPLE_SZ) Y :
- 
-  // Port size declaration
-  int SAMPLE_SZ = 16;
-  
-  
+actor Algo_Merge_4x4_to_8x8 () int(size=16) X ==> int(size=16) Y :
+
   //Tab containing the 8x8 macroblock
-  List( type:int(size=SAMPLE_SZ), size=64 ) buff := [ 0 : for int i in Integers(0, 63) ];
+  List( type:int(size=16), size=64 ) buff := [ 0 : for int i in Integers(0, 63) ];
   
   action X:[ x ] repeat 4*8 ==> Y:[ buff ] repeat 4*8
   var

@@ -18,14 +18,11 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Algo_Add ( ) 
-		int(size=SAMPLE_SZ) X, 
-		int(size=SAMPLE_SZ) Y 
+actor Algo_Add () 
+		int(size=16) X, 
+		int(size=16) Y 
 				==> 
 				int(size=9) Z :
-  
-  // Port size declaration
-  int SAMPLE_SZ = 16;
   
   // Clip the value higher than 255 and lower to 0
   function clip(int x)-->int :

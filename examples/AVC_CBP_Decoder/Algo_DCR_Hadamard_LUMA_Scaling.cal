@@ -53,16 +53,13 @@ Copyright (c) ISO/IEC 2007.
 
 import all caltrop.lib.BitOps;
 
-actor Algo_DCR_Hadamard_LUMA_Scaling ( int QUANT_SZ )
-		int(size=SAMPLE_SZ) I, 
-		int(size=QUANT_SZ) QP,
-		int(size=QUANT_SZ) ScalingList
+actor Algo_DCR_Hadamard_LUMA_Scaling ()
+		int(size=16) I, 
+		int(size=8) QP,
+		int(size=8) ScalingList
 				==>
-				int(size=SAMPLE_SZ) O:
+				int(size=16) O:
 
-// Port size declaration
-  int SAMPLE_SZ = 16;
-  
   List( type:uint(size=5), size=6*16 ) t_normAdjust4x4  = [// same as a AVC_IQ4x4's t_normAdjust4x4. used only 16*n-th(n=0..5) elements in this FU. 
     // qp_rem = 0
     10, 13, 10, 13, 13, 16, 13, 16, 10, 13, 10, 13, 13, 16, 13, 16,
@@ -86,11 +83,11 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ( int QUANT_SZ )
     0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
   ];
 
-  List( type:int(size=SAMPLE_SZ), size=96 ) t_LevelScale;
-  int(size=QUANT_SZ) qp;
-  int(size=QUANT_SZ) qp_per;
-  int(size=QUANT_SZ) qp_rem;
-  int(size=QUANT_SZ) qp_sft;
+  List( type:int(size=16), size=96 ) t_LevelScale;
+  int(size=8) qp;
+  int(size=8) qp_per;
+  int(size=8) qp_rem;
+  int(size=8) qp_sft;
 
   read_qp: action QP:[x] ==>
   do

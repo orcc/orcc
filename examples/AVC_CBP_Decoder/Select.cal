@@ -15,8 +15,8 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Select (int MB_WIDTH ) 
-	int(size=SAMPLE_SZ) X0,
+actor Select () 
+	int(size=16) X0,
 	int(size=9) X1 ,
 	int(size=9) X2,
 	int(size=9) X3,
@@ -25,10 +25,6 @@ actor Select (int MB_WIDTH )
 		int(size=9) X
 		:
   
-  // Port size declaration
-  int SAMPLE_SZ = 16;
-  
-  
 	uint(size=3) sel;
   
 	GetMbType:action Mb_Type:[a]==> 
@@ -36,22 +32,22 @@ actor Select (int MB_WIDTH )
 		sel:= a;
 	end
   
-	GetIntra4x4:action X0:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	GetIntra4x4:action X0:[x] repeat 16*16 ==> X:[x] repeat 16*16
 	guard
     	sel = 0
 	end
   
-	GetIntra16x16:action X1:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH 
+	GetIntra16x16:action X1:[x] repeat 16*16 ==> X:[x] repeat 16*16 
 	guard
 		sel = 1
 	end
   
-	GetInter:action X2:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	GetInter:action X2:[x] repeat 16*16 ==> X:[x] repeat 16*16
 	guard
     	sel = 2
 	end
 	
-	GetPCM: action X3:[x] repeat MB_WIDTH*MB_WIDTH ==> X:[x] repeat MB_WIDTH*MB_WIDTH
+	GetPCM: action X3:[x] repeat 16*16 ==> X:[x] repeat 16*16
 	guard
     	sel = 4
 	end

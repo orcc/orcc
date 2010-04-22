@@ -53,20 +53,15 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
 actor Algo_BlockSplit_AVC () 
-		int(size=SAMPLE_SZ) Block 
+		int(size=16) Block 
 		==>  
-			int(size=SAMPLE_SZ) Block_Y_DC, 
-			int(size=SAMPLE_SZ) Block_Y_AC,
-			int(size=SAMPLE_SZ) Block_U_DC,
-			int(size=SAMPLE_SZ) Block_U_AC,
-			int(size=SAMPLE_SZ) Block_V_DC,
-			int(size=SAMPLE_SZ) Block_V_AC:
-  
-  
-  // Port size declaration
-  int SAMPLE_SZ = 16;
-  
-  
+			int(size=16) Block_Y_DC, 
+			int(size=16) Block_Y_AC,
+			int(size=16) Block_U_DC,
+			int(size=16) Block_U_AC,
+			int(size=16) Block_V_DC,
+			int(size=16) Block_V_AC:
+
   splitY_DC: action Block:[ x ] repeat 16 ==> Block_Y_DC:[ x ] repeat 16 
   end
   

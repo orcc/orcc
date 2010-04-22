@@ -19,32 +19,30 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Mgnt_Intra ( int MB_WIDTH, int ID )
+actor Mgnt_Intra (int MB_WIDTH)
 	uint(size=13) FirstMbInSlice,
 	uint (size=8) Mb_Type,
 	uint(size=7) PicWidthInMb,
 	uint(size=13) CurrMbAddr,
 	uint(size=4) PredMode,
-	uint(size=SAMPLE_SZ) EDGE, 
-	int(size=SAMPLE_SZ) Coef_ACR,
+	uint(size=16) EDGE, 
+	int(size=16) Coef_ACR,
 	bool ConstrainedIFlag 
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode_I,
-		int(size=SAMPLE_SZ) Coef_ACR_I,
-		int(size=SAMPLE_SZ) Y_Left,
-		int(size=SAMPLE_SZ) Y_Up,
-		int(size=SAMPLE_SZ) Y_UpLeft
+		int(size=16) Coef_ACR_I,
+		int(size=16) Y_Left,
+		int(size=16) Y_Up,
+		int(size=16) Y_UpLeft
 		:  
-	
-	// Port size declaration
-	int SAMPLE_SZ = 16;
-	
-	
+	int MB_WIDTH_MAX    = 16;
+	int MB_WIDTH_LUMA   = 16;
+	int MB_WIDTH_CHROMA = 8;
 	//List that contains the neighbouring pixel of the current 16x16 Mb, from bottom to top then left to right 
-	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) left_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH-1)];
-  	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH + 4 ) top_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH+3)];
-  	uint(size=SAMPLE_SZ) topLeft_16x16_edge := 0;
+	List( type:uint(size=16), size=MB_WIDTH_MAX ) left_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH_MAX-1)];
+  	List( type:uint(size=16), size=MB_WIDTH_MAX + 4 ) top_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH_MAX+3)];
+  	uint(size=16) topLeft_16x16_edge := 0;
   
 	// Available edge for prediction [left, top, top left, top right]
 	List( type:uint(size=1), size=3 ) avail := [ 0 : for int i in Integers( 0, 2) ];
@@ -55,7 +53,7 @@ actor Mgnt_Intra ( int MB_WIDTH, int ID )
 	uint(size=1) topLeft_16x16_avail := 0;
 
   	//FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =720/16;
+  	uint(size=7) PICWIDTH =45;
 	List( type:bool, size=PICWIDTH) is_intra := [false : for int i in Integers( 0, PICWIDTH-1)];
 	uint(size=13) curr_pos:=0;
 	bool intra_top_left:=false;
@@ -64,7 +62,18 @@ actor Mgnt_Intra ( int MB_WIDTH, int ID )
   
   
 	//Mb_Type_NOK : Consume the token from prediction 4x4 
-	MbTypeNOK_intra4x4:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH, PredMode:[f] repeat MB_WIDTH==>
+	MbTypeNOK_intra4x4_CHROMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA, PredMode:[f] repeat MB_WIDTH_CHROMA==>
+	guard
+		a        = 0,
+		MB_WIDTH = MB_WIDTH_CHROMA
+	do
+		curr_pos:=d mod c;
+		intra_top_left:=is_intra[curr_pos];
+		is_intra[curr_pos]:=true;
+	end
+
+	//Mb_Type_NOK : Consume the token from prediction 4x4 
+	MbTypeNOK_intra4x4_LUMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA, PredMode:[f] repeat MB_WIDTH_LUMA==>
 	guard
 		a = 0
 	do
@@ -74,7 +83,18 @@ actor Mgnt_Intra ( int MB_WIDTH, int ID )
 	end
   
 	//Mb_Type_NOK : Consume the token from inter prediction 
-	MbTypeNOK_inter:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH*MB_WIDTH ==>
+	MbTypeNOK_inter_CHROMA:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ==>
+	guard
+		a        = 2,
+		MB_WIDTH = MB_WIDTH_CHROMA
+	do
+		curr_pos:=d mod c;
+		intra_top_left:=is_intra[curr_pos];
+		is_intra[curr_pos]:=false;
+	end
+  
+	//Mb_Type_NOK : Consume the token from inter prediction 
+	MbTypeNOK_inter_LUMA:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA ==>
 	guard
 		a = 2
 	do
@@ -94,7 +114,38 @@ actor Mgnt_Intra ( int MB_WIDTH, int ID )
 	end
   
 	//Mb_Type_OK : Enable the prediction 
-	MbTypeOK:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH*MB_WIDTH ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH*MB_WIDTH
+	MbTypeOK_CHROMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
+	guard
+		a        = 1,
+		MB_WIDTH = MB_WIDTH_CHROMA
+	var
+	  	uint(size=13) first_mb_in_slice,
+	  	uint(size=13) mbcurr,
+	  	uint(size=7) picwidth
+	do
+		//Store token value
+		mbcurr := d;
+		first_mb_in_slice := b;
+		picwidth := c; 
+		curr_pos:=d mod c;
+				 
+		//Set 16x16 the available edge
+		left_16x16_avail := if (mbcurr = first_mb_in_slice) or ((mbcurr mod picwidth) = 0) then 0 else 
+								if (is_intra[curr_pos-1] or c_intra_flag=false) then 1 else 0 end   
+							end;
+		top_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth) then 0 else 
+								if (is_intra[curr_pos] or c_intra_flag=false) then 1 else 0 end   
+							end;
+		topLeft_16x16_avail :=  if (mbcurr - first_mb_in_slice < picwidth +1) then 0 else 
+									if (intra_top_left or c_intra_flag=false) then 1 else 0 end   
+								end;
+
+		intra_top_left:=is_intra[curr_pos];
+		is_intra[curr_pos]:=true;
+	end
+  
+	//Mb_Type_OK : Enable the prediction 
+	MbTypeOK_LUMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
 	guard
 		a = 1
 	var
@@ -126,12 +177,23 @@ actor Mgnt_Intra ( int MB_WIDTH, int ID )
 	//******************************* Receiving required token ********************************************
   
 	//Receive the value of the 16x16 Mb neighbouring pixel from bottom to top, then corner, then left to right 
-	InitEdge:action EDGE:[v] repeat 2*MB_WIDTH+1 ==> 
+	InitEdge_CHROMA:action EDGE:[v] repeat 2*MB_WIDTH_CHROMA+1 ==>
+	guard
+		MB_WIDTH = MB_WIDTH_CHROMA
 	do
 		//Store left, top and top left border
-		left_16x16_edge := [v[s]:for int s in Integers(0,MB_WIDTH-1)];
-		topLeft_16x16_edge := v[MB_WIDTH];
-		top_16x16_edge := [v[s]:for int s in Integers(MB_WIDTH+1,2*MB_WIDTH)];
+		left_16x16_edge := [v[s]:for int s in Integers(0,MB_WIDTH_CHROMA-1)];
+		topLeft_16x16_edge := v[MB_WIDTH_CHROMA];
+		top_16x16_edge := [v[s]:for int s in Integers(MB_WIDTH_CHROMA+1,2*MB_WIDTH_CHROMA)];
+	end
+  
+	//Receive the value of the 16x16 Mb neighbouring pixel from bottom to top, then corner, then left to right 
+	InitEdge_LUMA:action EDGE:[v] repeat 2*MB_WIDTH_LUMA+1 ==> 
+	do
+		//Store left, top and top left border
+		left_16x16_edge := [v[s]:for int s in Integers(0,MB_WIDTH_LUMA-1)];
+		topLeft_16x16_edge := v[MB_WIDTH_LUMA];
+		top_16x16_edge := [v[s]:for int s in Integers(MB_WIDTH_LUMA+1,2*MB_WIDTH_LUMA)];
 	end
    
 	//******************************* Processing ********************************************
@@ -157,7 +219,16 @@ actor Mgnt_Intra ( int MB_WIDTH, int ID )
 	end 
 
 	//Left neighbour from 16x16 edge
-	Reset.AvailLeft:action ==> Y_Left:[left_16x16_edge]repeat MB_WIDTH
+	Reset.AvailLeft_CHROMA:action ==> Y_Left:[left_16x16_edge]repeat MB_WIDTH_CHROMA
+	guard 
+		avail[0] = 1,
+		MB_WIDTH = MB_WIDTH_CHROMA
+	do
+		avail[0] := 0;
+	end 
+
+	//Left neighbour from 16x16 edge
+	Reset.AvailLeft_LUMA:action ==> Y_Left:[left_16x16_edge]repeat MB_WIDTH_LUMA
 	guard 
 		avail[0] = 1
 	do
@@ -165,9 +236,19 @@ actor Mgnt_Intra ( int MB_WIDTH, int ID )
 	end 
   
 	//Top and right neighbour from 16x16 edge
-	Reset.AvailTop:action ==> Y_Up:[top_16x16_edge]repeat MB_WIDTH
+	Reset.AvailTop_CHROMA:action ==> Y_Up:[top_16x16_edge]repeat MB_WIDTH_CHROMA
 	guard 
-		avail[1] = 1
+		avail[1] = 1,
+		MB_WIDTH = MB_WIDTH_CHROMA
+	do
+		avail[1] := 0;
+	end
+  
+	//Top and right neighbour from 16x16 edge
+	Reset.AvailTop_LUMA:action ==> Y_Up:[top_16x16_edge]repeat MB_WIDTH_LUMA
+	guard 
+		avail[1] = 1,
+		MB_WIDTH = MB_WIDTH_LUMA
 	do
 		avail[1] := 0;
 	end
@@ -181,17 +262,26 @@ actor Mgnt_Intra ( int MB_WIDTH, int ID )
 	end
 	
 	schedule fsm Mb_Type:
-		Mb_Type     (MbTypeNOK_inter	)--> Mb_Type;
-		Mb_Type     (MbTypeNOK_intra4x4	)--> Mb_Type;
-		Mb_Type     (MbTypeNOK_I_PCM	)--> Mb_Type;		
-		Mb_Type     (MbTypeOK			)--> InitEdge;
-		InitEdge    (InitEdge			)--> InitAvail;
-		InitAvail	(InitAvail			)--> Reset;
-		Reset    	(ResetNone			)--> Mb_Type;
-		Reset    	(Reset				)--> Reset;
+		Mb_Type  (MbTypeNOK_inter_CHROMA    )--> Mb_Type;
+		Mb_Type  (MbTypeNOK_inter_LUMA      )--> Mb_Type;
+		Mb_Type  (MbTypeNOK_intra4x4_CHROMA )--> Mb_Type;
+		Mb_Type  (MbTypeNOK_intra4x4_LUMA	)--> Mb_Type;
+		Mb_Type  (MbTypeNOK_I_PCM           )--> Mb_Type;
+		Mb_Type  (MbTypeOK_CHROMA           )--> InitEdge;
+		Mb_Type  (MbTypeOK_LUMA             )--> InitEdge;
+		InitEdge (InitEdge_CHROMA           )--> InitAvail;
+		InitEdge (InitEdge_LUMA             )--> InitAvail;
+		InitAvail(InitAvail                 )--> Reset;
+		Reset    (ResetNone                 )--> Mb_Type;
+		Reset    (Reset                     )--> Reset;
 	end
 	
 	priority
-		ResetNone > Reset.AvailLeft > Reset.AvailTopLeft;
+		ResetNone > Reset.AvailLeft_CHROMA > Reset.AvailLeft_LUMA > Reset.AvailTopLeft;
+		Reset.AvailTop_CHROMA              > Reset.AvailTop_LUMA;
+		MbTypeNOK_intra4x4_CHROMA          > MbTypeNOK_intra4x4_LUMA;
+		MbTypeNOK_inter_CHROMA             > MbTypeNOK_inter_LUMA;
+		MbTypeOK_CHROMA                    > MbTypeOK_LUMA;
+		InitEdge_CHROMA                    > InitEdge_LUMA;
 	end
 end

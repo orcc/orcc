@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Top">
+<XDF name="DBF">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -100,6 +100,12 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
+    <Decl kind="Param" name="MV_SZ">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <Decl kind="Param" name="QUANT_SIZE">
         <Type name="int"/>
     </Decl>
@@ -131,9 +137,6 @@
         <!-- ************************* -->
         <Parameter name="LUMA_CHROMA">
             <Expr kind="Var" name="LUMA_CHROMA"/>
-        </Parameter>
-        <Parameter name="QUANT_SZ">
-            <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>
     </Instance>
     <!-- ************************************** -->

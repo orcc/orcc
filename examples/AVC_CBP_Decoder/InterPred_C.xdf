@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="InterPred">
+<XDF name="InterPred_C">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -148,6 +148,9 @@
     <Decl kind="Param" name="MB_WIDTH">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="Idx_SZ">
+        <Type name="int"/>
+    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -159,30 +162,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ADDR_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="11"/>
-        </Parameter>
-        <Parameter name="MB_WIDTH">
-            <Expr kind="Var" name="MB_WIDTH"/>
-        </Parameter>
-        <Parameter name="PartSZ_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="6"/>
-        </Parameter>
-        <Parameter name="PicS_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="13"/>
-        </Parameter>
-        <Parameter name="PicW_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="7"/>
-        </Parameter>
-        <Parameter name="frac_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="4"/>
-        </Parameter>
-        <Parameter name="loca_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="11"/>
-        </Parameter>
-        <Parameter name="ref_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="3"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Interp_EighthPelBilinear">
         <!-- ************************* -->
@@ -192,15 +171,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PIX_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
-        <Parameter name="PartSZ_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="6"/>
-        </Parameter>
-        <Parameter name="frac_SZ">
-            <Expr kind="Literal" literal-kind="Integer" value="4"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Interp_split_MB_C">
         <!-- ************************* -->

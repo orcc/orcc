@@ -61,19 +61,15 @@ actor Algo_Interp_split_MB_C ()
 		uint(size=3) MbPartIdx, 
 		uint(size=5) MbPartWidth, 
 		uint(size=5) MbPartHeigth, 
-		int(size=SAMPLE_SZ) INTERP 
-				==> int(size=SAMPLE_SZ) MBPred :
+		int(size=16) INTERP 
+				==> int(size=16) MBPred :
  
- // Port size declaration
-  int SAMPLE_SZ = 16;
-  
-  
   uint(size=5) count := 0;
   uint(size=5) mbpart_idx;
   uint(size=5) mbpart_w;
   uint(size=5) mbpart_h;
   
-  List ( type:int(size=SAMPLE_SZ), size=64) MB := [ 0 : for int i in Integers(0,63)];
+  List ( type:int(size=16), size=64) MB := [ 0 : for int i in Integers(0,63)];
   List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];  
   
   get_part: action MbPartIdx:[a], MbPartWidth:[b], MbPartHeigth:[c] ==> 

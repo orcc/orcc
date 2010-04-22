@@ -58,12 +58,10 @@ actor Algo_BlockExpand_AVC ()
 		int(size=12) VALUE, 
 		bool LAST 
   			==> 
-  			int(size=SAMPLE_SZ) Block :
+  			int(size=16) Block :
 
-  // Port size declaration
-  int SAMPLE_SZ = 16;
   
-  List(type:int(size=SAMPLE_SZ), size=16) value_buf := [ 0 : for int i in Integers(0,15) ];  
+  List(type:int(size=16), size=16) value_buf := [ 0 : for int i in Integers(0,15) ];  
   uint(size=5) stuff_count := 0;
   
   uint(size=5) count := 0;  // Index of next sample to be transmitted

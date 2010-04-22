@@ -132,19 +132,19 @@ actor CompAVC_To_File (String file, int width, int height) int Y, int U, int V =
 	      ref := uframe [ (uvy*uvwidth) + uvx ];
           
           //Compare reference with generated pixel
-          /*if pu != ref then
+          if pu != ref then
           	eu := eu + 1;
           	println("*** Warning : Found "+ pu + " instead of "+ ref + " for U in loop " + n + " for frame "+fcount+" *********");
-          end*/
+          end
           
           //Take the right V value in file
 	      ref := vframe [ (uvy*uvwidth) + uvx ];
           
           //Compare reference with generated pixel
-          /*if pv != ref then
+          if pv != ref then
           	ev := ev + 1;
           	println("*** Warning : Found "+ pv + " instead of "+ ref + " for V in loop " + n + " for frame "+fcount+" *********");
-          end*/
+          end
    		end
    		
    		// Advance to next MB position

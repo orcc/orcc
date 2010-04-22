@@ -19,19 +19,14 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Buffer_Neighbour_4x4 ( int MB_WIDTH ) 
+actor Buffer_Neighbour_4x4 () 
 uint (size=8) Mb_Type, uint(size=13) CurrMbAddr, int(size=9) MB_IN, uint(size=7) PicWidthInMb 
 ==> 
-uint(size=SAMPLE_SZ) EDGE 
+uint(size=16) EDGE 
 :
 
-
-// Port size declaration
-  int SAMPLE_SZ = 16;
-  
-  
   	//FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =720/16;
+  	uint(size=7) PICWIDTH =45;
 
   	//Flag	
   	uint (size = 1) ReadFlag := 0;
@@ -44,11 +39,11 @@ uint(size=SAMPLE_SZ) EDGE
   	
   	
 	//List containing edge pixel value 
-	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH) top_edge := [0 : for int i in Integers( 0, PICWIDTH * MB_WIDTH-1)];
-	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH ) left_edge := [ 0 : for int i in Integers( 0, MB_WIDTH-1)];
-	uint(size=SAMPLE_SZ) topLeft_edge := 0;
+	List( type:uint(size=16), size=PICWIDTH * 16) top_edge := [0 : for int i in Integers( 0, PICWIDTH * 16-1)];
+	List( type:uint(size=16), size=16 ) left_edge := [ 0 : for int i in Integers( 0, 16-1)];
+	uint(size=16) topLeft_edge := 0;
 	
-	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH) result := [0 : for int i in Integers( 0, PICWIDTH * MB_WIDTH-1)];
+	List( type:uint(size=16), size=PICWIDTH * 16) result := [0 : for int i in Integers( 0, PICWIDTH * 16-1)];
 	
   
   	//Mb_Type_OK : Send value of edge needed and store the edge of macroblock decoded
@@ -61,55 +56,55 @@ uint(size=SAMPLE_SZ) EDGE
   	end  
   
   	//Receive pixel value from current decoded macroblock
-  	Mb_Neighbour:action MB_IN:[v] repeat MB_WIDTH*MB_WIDTH ==> 
+  	Mb_Neighbour:action MB_IN:[v] repeat 16*16 ==> 
   	do
   		//Store bottom , right and bottom right edge
-  		topLeft_edge := top_edge[MB_WIDTH-1+ mb_Index*MB_WIDTH];
-  		foreach int s in Integers(0,MB_WIDTH-1)
+  		topLeft_edge := top_edge[16-1+ mb_Index*16];
+  		foreach int s in Integers(0,16-1)
   		do
-  			top_edge[s+ mb_Index *MB_WIDTH]:= v[s+(MB_WIDTH-1)*MB_WIDTH];
+  			top_edge[s+ mb_Index *16]:= v[s+(16-1)*16];
   		end
-  		left_edge :=  [v[s*MB_WIDTH-1]:for int s in Integers(1,MB_WIDTH)];
+  		left_edge :=  [v[s*16-1]:for int s in Integers(1,16)];
   	end
   
   	//Send the edge needed to process the intra prediction of the current macroblock
-  	CALCEDGE1:action ==> EDGE:[ result	] repeat 2*MB_WIDTH+5
+  	CALCEDGE1:action ==> EDGE:[ result	] repeat 2*16+5
   	guard 
 		mb_type_ok = 0,
   		mb_Index < PICWIDTH-1
   	do
 		
-		foreach int s in Integers(0,MB_WIDTH-1)
+		foreach int s in Integers(0,16-1)
 		do
   			result[s]:= left_edge[s];
   		end
-  		result[MB_WIDTH]:= topLeft_edge;
+  		result[16]:= topLeft_edge;
   		
-  		foreach int s in Integers(0,MB_WIDTH+5)
+  		foreach int s in Integers(0,16+5)
 		do
-  			result[MB_WIDTH+1+s]:= top_edge [s+ mb_Index *MB_WIDTH];
+  			result[16+1+s]:= top_edge [s+ mb_Index *16];
   		end
   	end
   	
-  	CALCEDGE2:action ==> EDGE:[ result	] repeat 2*MB_WIDTH+5
+  	CALCEDGE2:action ==> EDGE:[ result	] repeat 2*16+5
   	guard 
 		mb_type_ok = 0,
 		mb_Index = PICWIDTH-1
   	do		
-		foreach int s in Integers(0,MB_WIDTH-1)
+		foreach int s in Integers(0,16-1)
 		do
   			result[s]:= left_edge[s];
   		end
-  		result[MB_WIDTH]:= topLeft_edge;
+  		result[16]:= topLeft_edge;
   		
-  		foreach int s in Integers(0,MB_WIDTH-1)
+  		foreach int s in Integers(0,16-1)
 		do
-  			result[MB_WIDTH+1+s]:= top_edge [s+ mb_Index *MB_WIDTH];
+  			result[16+1+s]:= top_edge [s+ mb_Index *16];
   		end
 
   		foreach int s in Integers(0,3)
 		do
-  			result[2*MB_WIDTH+1+s]:= top_edge [MB_WIDTH-1+ mb_Index *MB_WIDTH];
+  			result[2*16+1+s]:= top_edge [16-1+ mb_Index *16];
   		end
   	end
  	
