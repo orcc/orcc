@@ -52,7 +52,7 @@
  * Copyright (c) ISO/IEC 2008-2010.
  */
 
-actor Algo_Add () int(size=16) X, int(size=16) Y	==> int(size=16) Z:
+actor Algo_Add_AVC () int(size=16) X, int(size=16) Y	==> int(size=16) Z:
 
   action X:[x], Y:[y] ==> Z:[ x+ y]
   end

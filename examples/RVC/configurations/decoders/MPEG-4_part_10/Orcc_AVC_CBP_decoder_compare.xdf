@@ -16,13 +16,10 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/orcc_fread"/>
+        <Class name="../../../VTL/System/Source"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="fname">
-            <Expr kind="Literal" literal-kind="String" value=""/>
-        </Parameter>
     </Instance>
     <Instance id="AVCDecoder">
         <!-- ************************* -->
@@ -46,7 +43,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/orcc_DispYUV"/>
+        <Class name="../../../VTL/System/Display"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -55,7 +52,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/orcc_DispYUV"/>
+        <Class name="../../../VTL/System/Compare"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

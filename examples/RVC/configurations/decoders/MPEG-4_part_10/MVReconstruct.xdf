@@ -141,7 +141,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Add"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Add_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
