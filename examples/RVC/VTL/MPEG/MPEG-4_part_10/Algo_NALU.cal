@@ -1,4 +1,4 @@
-/********************************************************************************
+/***********************************************************************
 
 This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
 ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
@@ -16,72 +16,146 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 This FU remove emulation_prevention_three_byte, send the RBSP bytes and the number of rbsp bytes between 2 NAL.
 
-*****************************************************************************/
+***********************************************************************/
 
-actor Algo_NALU() 
-	int(size=8) bits8 
-	==> 
-	int(size=8) bits_rbsp8, 
-	uint nb_rbsp_bytes
-	:
- 
-  uint(size=8) byte0;
-  uint(size=8) byte1; 
-  uint(size=2) byte_count := 0;
-  uint(size=2) start_code := 0;
-  uint num_bytes_in_RBSP:=0;
-    
-  get_byte: action bits8:[ b ] ==>
-  guard 
-    byte_count < 2
-  do
-    if byte_count = 1 then
-      byte0 := byte1;
-    end 
-    
-    byte1:=b;
-    byte_count := byte_count+1;
-  end
-  
-  emul: action bits8:[ b ] ==> bits_rbsp8:[ 0 , 0 ]
-  guard 
-    byte_count = 2,
-    byte0 = 0 and byte1 = 0 and b = 3
-  do
-    byte_count := 0;
-    num_bytes_in_RBSP := num_bytes_in_RBSP+2;
-  end
-  
-  send: action bits8:[ b ] ==> bits_rbsp8:[v]
-  guard 
-    byte_count = 2
-  var 
-    uint(size=8) v
-  do
-    if start_code = 1 then
-      num_bytes_in_RBSP := num_bytes_in_RBSP+1;
-    end
-    if byte0 = 0 and byte1 = 0 and b = 1 then 
-      start_code := start_code+1;
-    end
-    v := byte0;
-    byte0 := byte1; 
-    byte1 := b;
-  end
-  
-  send_nb_rbsp_bytes: action  ==> nb_rbsp_bytes:[ v ]
-  guard 
-    start_code = 2
-  var 
-    uint v
-  do
-    v := num_bytes_in_RBSP - 4; // 3 for start_code + 1 for NAL Unit header
-    num_bytes_in_RBSP :=0;
-    start_code := 1;
-  end
+actor Algo_NALU ()
+		int(size = 8) bits8
+			==>
+		int (size = 8)            bits_rbsp8,
+		uint(size = SZ_NB_RBSP) nb_rbsp_bytes
+			:
 
-  priority
-    send_nb_rbsp_bytes > emul > send;
-  end
-end
+/*
+*
+* Global variables
+*
+*/
 
+		uint(size = 32)         SZ_NB_RBSP          = 32; /* >= log2(NB_RBSP_BYTE_MAX) */
+		int (size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 1000000;
+		uint(size = 2)          byte_count         := 0; /* nb byte(s) stored in fifo */
+		int (size = 8)          fifo_lsb           := 0;
+		int (size = 8)          fifo_msb           := 0;
+		int (size = 8)          prev_byte_fifo     := 255; /*Previous fifo_msb. Permit to know if the 
+		                                                     start code was 00 00 00 01 or 00 00 01*/
+		uint(size = SZ_NB_RBSP) nb_bytes_mem       := 0; /* nb byte(s) stored in Input_Bitstream */
+		uint(size = SZ_NB_RBSP) nb_bytes_in_rbsp   := -1; /* the NALU header is not included in rbsp */
+		uint(size = SZ_NB_RBSP) nb_bytes_sent      := 0;
+		uint(size = 2)          start_code         := 0;
+		bool                    nb_rbsp_byte_ready := false;
+		List (type: int(size = 8), size = NB_RBSP_BYTE_MAX) Input_Bitstream := [0 : for int l in Integers(0, NB_RBSP_BYTE_MAX - 1)];
+
+/*
+*
+* Actions
+*
+*/
+
+	/* Fill the fifo which permit to detect an emul prevention 3 byte */
+	fill_fifo: action 
+			bits8:[b]
+				==>
+		guard
+			byte_count < 2
+		do
+			fifo_msb := fifo_lsb;
+			fifo_lsb := b;
+			byte_count := byte_count+1;
+		end /* fill_fifo */
+
+	/* Delete bytes added in the rbsp*/
+	delete_emul_3_byte: action
+			bits8:[b]
+				==>
+		guard
+			byte_count = 2,
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
+		do
+			byte_count       := 0;
+			Input_Bitstream[nb_bytes_mem]     := 0;
+			Input_Bitstream[nb_bytes_mem + 1] := 0;
+			nb_bytes_in_rbsp := nb_bytes_in_rbsp + 2;
+			nb_bytes_mem     := nb_bytes_mem + 2;
+		end /* delete_emul_3_byte */
+
+	/* Save RBSP and start code bytes in a buffer */
+	mem_received_byte: action
+			bits8:[b]
+				==>
+		guard
+			byte_count = 2
+		var
+			uint(size = 16)unsigned_bits8
+		do
+			if(nb_bytes_mem < NB_RBSP_BYTE_MAX) then
+				Input_Bitstream[nb_bytes_mem] := fifo_msb;
+				nb_bytes_mem := nb_bytes_mem + 1;
+				if(start_code = 1) then
+					nb_bytes_in_rbsp := nb_bytes_in_rbsp + 1;
+				end
+			else
+				/* !!!FIXME!!!
+				   That's Baloo !!!!
+				   Put in what you should do in this case
+				*/
+			end
+			
+			if( (fifo_msb = 0) and (fifo_lsb = 0) and  (b = 1) ) then // if it's a start code
+				start_code := start_code + 1;
+				if(start_code = 2) then //if we have data to sent
+					nb_rbsp_byte_ready := true;
+					nb_bytes_sent      := 0;
+					/* The byte 01 of the start code is still in the fifo.
+					   2 bytes (00 00) of the next start code are in the
+					   buffer and are included in nb_bytes_in_rbsp*/
+					nb_bytes_in_rbsp   := nb_bytes_in_rbsp -2;
+					if(prev_byte_fifo = 0) then 
+						nb_bytes_in_rbsp   := nb_bytes_in_rbsp - 1; //The start code is 00 00 00 01 !!
+					end
+				end
+			end
+			prev_byte_fifo := fifo_msb;
+			fifo_msb       := fifo_lsb;
+			fifo_lsb       := b;
+		end /* mem_received_byte */
+
+	/* send the nb_rbsp */
+	send_nb_rbsp_bytes: action
+				==>
+			nb_rbsp_bytes:[nb_bytes_in_rbsp]
+		guard
+			start_code         = 2,
+			nb_rbsp_byte_ready = true
+		do
+			nb_rbsp_byte_ready := false;
+		end /* send_nb_rbsp_bytes */
+
+	/* send the rbsp */
+	send_rbsp: action
+				==>
+			bits_rbsp8:[out_rbsp]
+		guard
+			start_code = 2
+		var
+			int(size = 8) out_rbsp
+		do
+			out_rbsp      := Input_Bitstream[nb_bytes_sent];
+			nb_bytes_sent := nb_bytes_sent + 1;
+			if(nb_bytes_sent >= nb_bytes_mem) then //if we have finished the sent of data
+				start_code       := 1;
+				nb_bytes_mem     := 0;
+				nb_bytes_in_rbsp := -1; /* the NALU header is not included in rbsp */
+			end
+		end /* send_rbsp */
+
+/*
+*
+* Scheduler
+*
+*/
+
+	priority
+		send_nb_rbsp_bytes > send_rbsp > delete_emul_3_byte > mem_received_byte;
+	end /* priority */
+
+end /* actor */
