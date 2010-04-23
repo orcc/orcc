@@ -72,7 +72,12 @@ public final class LLVMActorPrinter extends STPrinter {
 	@Override
 	public String toString(INameable nameable) {
 		if (nameable instanceof Procedure) {
-			return "@" + nameable.getName();
+			Procedure procedure = (Procedure) nameable;
+			if(procedure.getName().startsWith("isSchedulable_")){
+				// procedure is type of isSchedulable
+				return "@" + nameable.getName(); 
+			}
+			return "@action_" + nameable.getName();
 		} else {
 			return nameable.getName();
 		}
