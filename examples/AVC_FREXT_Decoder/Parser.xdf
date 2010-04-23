@@ -489,8 +489,6 @@
         src="Algo_Synp_AVC" src-port="VALUE"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="LAST"
         src="Algo_Synp_AVC" src-port="LAST"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
-        src="Algo_BlockExpand_AVC" src-port="Block"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="CurrMbAddr"
         src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="MbIntraFlag"
@@ -555,6 +553,10 @@
     <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="MbType"/>
     <Connection dst="" dst-port="Intra_DC_flag"
         src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="ENTROPY_TYPE"
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block_CAVLC"
+        src="Algo_BlockExpand_AVC" src-port="Block"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block_CABAC"
+        src="Algo_Synp_AVC" src-port="Block_CABAC"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Entropy_Type"
         src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
 </XDF>

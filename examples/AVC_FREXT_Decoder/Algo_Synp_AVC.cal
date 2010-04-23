@@ -66,7 +66,8 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 			uint(size=4) RUN, 
 			int(size=12) VALUE, 
 			bool LAST,
-			bool ENTROPY_TYPE, 
+			bool ENTROPY_TYPE,
+			int(size = 16) Block_CABAC, 
 			int(size=8) ScalingList, 
 			int(size=8) QP,
 			int(size=8) QP_Cb, 
@@ -4087,7 +4088,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		set_bits_to_read(2);
 	end
 
-	read_Pps_num_slice_groups_minus1: action ==> ENTROPY_TYPE:[ IS_CAVLC() ]
+	read_Pps_num_slice_groups_minus1: action ==> // ENTROPY_TYPE:[ IS_CAVLC() ]
 	guard
 		done_reading_bits()
 	do
@@ -5261,7 +5262,7 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		entropy_coding_mode_flag[pps_id] = 0
 	end
 
-	SliceD_init: action ==> // ENTROPY_TYPE:[IS_CAVLC()]
+	SliceD_init: action ==>  ENTROPY_TYPE:[IS_CAVLC()]
 	guard
 		(entropy_coding_mode_flag[pps_id] = 1 and done_reading_bits()) or entropy_coding_mode_flag[pps_id] = 0
 	do
@@ -6635,10 +6636,11 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		i8x8 = 4
 	end
 	//end for
-	
+	/* 
 	Residual_luma_AC_CABAC: action ==>
 	guard
-		val_CodedBlockPatternLuma &  ( 1 << i8x8 )
+		IS_CABAC() and
+		( (val_CodedBlockPatternLuma & ( 1 << i8x8 )) = 1 )
 	do
 		block_startIdx := 4 * block_startIdx ;
 		block_endIdx := 4 * block_endIdx + 3;
@@ -6648,9 +6650,10 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 	//if not CABAC
 	Residual_luma_skip_AC_CABAC: action ==>
 	guard
-		( val_CodedBlockPatternLuma &  ( 1 << i8x8 ) ) != 0
+		IS_CABAC() and
+		(( val_CodedBlockPatternLuma &  ( 1 << i8x8 ) ) != 0)
 	end
-	
+	*/
 	//--> residual_block( level8x8[ i8x8 ], 4 * startIdx, 4 * endIdx + 3, 64 )
 	
 	//if( ChromaArrayType = = 1 | | ChromaArrayType = = 2 )
@@ -7575,14 +7578,13 @@ actor Algo_Synp_AVC(int SAMPLE_SZ, int MVSZ, int Idx_SZ)
 		Residual_return										( Residual_return_luma_DC							) --> Residual_luma_AC_init;
 		Residual_luma_DC_init								( Residual_luma_skip_DC_init						) --> Residual_luma_AC_init;
 		Residual_luma_AC_init								( Residual_luma_AC_init								) --> Residual_luma_AC_CAVLC;
+		
 		Residual_luma_AC_CAVLC								( Residual_luma_AC_CAVLC							) --> Residual_luma_AC_CodedBlock8x8;
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_AC_CodedBlock8x8					) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_luma_AC							) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8				) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
-		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_luma_AC_CABAC;
-		Residual_luma_AC_CABAC								( Residual_luma_AC_CABAC 							) --> Residual_block;
-		Residual_luma_AC_CABAC								( Residual_luma_skip_AC_CABAC						) --> Residual_chroma; 
+		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma;		
 		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_chroma_DC_init							) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_chroma_DC							) --> Residual_chroma_DC_init;
