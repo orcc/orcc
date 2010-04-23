@@ -84,8 +84,6 @@ actor Algo_NALU ()
 				==>
 		guard
 			byte_count = 2
-		var
-			uint(size = 16)unsigned_bits8
 		do
 			if(nb_bytes_mem < NB_RBSP_BYTE_MAX) then
 				Input_Bitstream[nb_bytes_mem] := fifo_msb;
