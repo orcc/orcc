@@ -1,13 +1,33 @@
 // Mgnt_Merger420
 //
 // Author: Christophe Lucarz (christophe.lucarz@epfl.ch)
-actor Mgnt_Merger420 () int(size=9) Y, int(size=9) U, int(size=9) V ==> int(size=9) YUV :
+actor Mgnt_Merger420 () int(size=9) Y, int(size=9) U, int(size=9) V ==> uint(size=8) YUV :
 
-// Port size declaration
-	int PIX_SZ = 9;
+	List(type: int(size=9), size=256) out_y := [ 0 : for int i in Integers(0, 255) ];
 
 	// Select the Y blocks 
-	Y: action Y:[ y ] repeat 4 * 64 ==> YUV:[ y ] repeat 256
+	Y: action Y:[ y ] repeat 256 ==> YUV:[ out_y ] repeat 256
+	do
+		foreach int j in Integers(0, 7) do
+			foreach int i in Integers(0, 7) do
+				out_y[i + j * 16] := y[i + j * 8];
+			end
+		end
+		foreach int j in Integers(0, 7) do
+			foreach int i in Integers(0, 7) do
+				out_y[i + 8 + j * 16] := y[i + 64 + j * 8];
+			end
+		end
+		foreach int j in Integers(0, 7) do
+			foreach int i in Integers(0, 7) do
+				out_y[i + (j + 8) * 16] := y[i + 2 * 64 + j * 8];
+			end
+		end
+		foreach int j in Integers(0, 7) do
+			foreach int i in Integers(0, 7) do
+				out_y[i + 8 + (j + 8) * 16] := y[i + 3 * 64 + j * 8];
+			end
+		end
 	end
 
 	// Select the U blocks 

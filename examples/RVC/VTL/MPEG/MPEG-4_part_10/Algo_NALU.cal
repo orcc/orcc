@@ -19,9 +19,9 @@ This FU remove emulation_prevention_three_byte, send the RBSP bytes and the numb
 ***********************************************************************/
 
 actor Algo_NALU ()
-		int(size = 8) bits8
+		uint(size = 8) bits8
 			==>
-		int (size = 8)            bits_rbsp8,
+		uint (size = 8)            bits_rbsp8,
 		uint(size = SZ_NB_RBSP) nb_rbsp_bytes
 			:
 

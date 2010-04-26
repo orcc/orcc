@@ -11,7 +11,7 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.import all caltrop.lib.BitOps;
 // Read in bytes and shift out serially in msb-first order.
 import all caltrop.lib.BitOps;
-actor Serialize () int(size=8) in8 ==> bool out :
+actor Serialize () uint(size=8) in8 ==> bool out :
 
 	int(size=4) count := 0;
 

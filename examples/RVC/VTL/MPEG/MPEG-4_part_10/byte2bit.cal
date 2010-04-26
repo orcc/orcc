@@ -14,7 +14,7 @@
 
 import all caltrop.lib.BitOps;
 
-actor byte2bit () int(size=8) in8 ==> uint(size=1) out :
+actor byte2bit () uint(size=8) in8 ==> uint(size=1) out :
 
   int(size=4) count := 0;
   int(size=9) buf;

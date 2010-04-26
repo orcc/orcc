@@ -20,9 +20,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="fname">
-            <Expr kind="Literal" literal-kind="String" value="D:\Sequences\ipcm.264"/>
-        </Parameter>
     </Instance>
     <Instance id="AVCDecoder">
         <!-- ************************* -->
@@ -44,15 +41,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="height">
-            <Expr kind="Literal" literal-kind="Integer" value="288"/>
-        </Parameter>
-        <Parameter name="title">
-            <Expr kind="Literal" literal-kind="String" value="RVC Display Foreman QCIF"/>
-        </Parameter>
-        <Parameter name="width">
-            <Expr kind="Literal" literal-kind="Integer" value="352"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

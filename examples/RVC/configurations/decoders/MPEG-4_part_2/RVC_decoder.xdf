@@ -4,7 +4,7 @@
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
     <Port kind="Input" name="bits">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
@@ -14,9 +14,9 @@
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
     <Port kind="Output" name="VID">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits" x="16" y="247"/>
-      <vertex id="MCD" x="471" y="267"/>
-      <vertex id="VIDEO" x="708" y="332"/>
-      <vertex id="MBD" x="711" y="248"/>
-      <vertex id="MBA" x="706" y="209"/>
-      <vertex id="MCA" x="712" y="289"/>
-      <vertex id="WIDTH" x="292" y="328"/>
-      <vertex id="HEIGHT" x="268" y="268"/>
-      <vertex id="serialize" x="88" y="201"/>
-      <vertex id="parser" x="177" y="211"/>
-      <vertex id="acdc" x="338" y="183"/>
-      <vertex id="idct2d" x="473" y="191"/>
-      <vertex id="motion" x="578" y="233"/>
+      <vertex id="bits" x="57" y="283"/>
+      <vertex id="MCD" x="557" y="181"/>
+      <vertex id="VIDEO" x="821" y="73"/>
+      <vertex id="MBD" x="821" y="166"/>
+      <vertex id="MBA" x="821" y="259"/>
+      <vertex id="MCA" x="821" y="352"/>
+      <vertex id="WIDTH" x="403" y="70"/>
+      <vertex id="HEIGHT" x="403" y="163"/>
+      <vertex id="serialize" x="157" y="274"/>
+      <vertex id="parser" x="282" y="229"/>
+      <vertex id="acdc" x="403" y="256"/>
+      <vertex id="idct2d" x="557" y="274"/>
+      <vertex id="motion" x="678" y="256"/>
    </vertices>
 </layout>

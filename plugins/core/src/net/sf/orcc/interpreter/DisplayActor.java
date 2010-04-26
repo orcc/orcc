@@ -60,14 +60,13 @@ public class DisplayActor extends AbstractInterpretedActor {
 	}
 
 	private static int convertYCbCrtoRGB(int y, int cb, int cr) {
-		y = (76306 * (y - 16)) + 32768;
-		int r = (y + (104597 * (cr - 128))) >> 16;
-		int g = (y - ((25675 * (cb - 128)) + (53279 * (cr - 128)))) >> 16;
-		int b = (y + (132201 * (cb - 128)) >> 16);
+		int C = y - 16;
+		int D = cb - 128;
+		int E = cr - 128;
 
-		r = clip(r);
-		g = clip(g);
-		b = clip(b);
+		int r = clip((298 * C + 409 * E + 128) >> 8);
+		int g = clip((298 * C - 100 * D - 208 * E + 128) >> 8);
+		int b = clip((298 * C + 516 * D + 128) >> 8);
 
 		return (r << 16) | (g << 8) | b;
 	}
@@ -208,20 +207,23 @@ public class DisplayActor extends AbstractInterpretedActor {
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				int index = 8 * j + i;
 
-				int u = (Integer) mb[256 + index];
-				int v = (Integer) mb[320 + index];
+				int u = (Integer) mb[256 + 8 * i + j];
+				int v = (Integer) mb[320 + 8 * i + j];
+				int y0 = (Integer) mb[2 * i * 16 + 2 * j];
+				int y1 = (Integer) mb[2 * i * 16 + 2 * j + 1];
+				int y2 = (Integer) mb[(2 * i + 1) * 16 + 2 * j];
+				int y3 = (Integer) mb[(2 * i + 1) * 16 + 2 * j + 1];
 
-				for (int ym = 0; ym < 2; ym++) {
-					for (int xm = 0; xm < 2; xm++) {
-						int y = (Integer) mb[64 * (xm + 2 * ym) + index];
+				int rgb0 = convertYCbCrtoRGB(y0, u, v);
+				int rgb1 = convertYCbCrtoRGB(y1, u, v);
+				int rgb2 = convertYCbCrtoRGB(y2, u, v);
+				int rgb3 = convertYCbCrtoRGB(y3, u, v);
 
-						int rgb = convertYCbCrtoRGB(y, u, v);
-
-						image.setRGB(x + i + xm * 8, this.y + j + ym * 8, rgb);
-					}
-				}
+				image.setRGB(x + j * 2, y + i * 2, rgb0);
+				image.setRGB(x + j * 2 + 1, y + i * 2, rgb1);
+				image.setRGB(x + j * 2, y + i * 2 + 1, rgb2);
+				image.setRGB(x + j * 2 + 1, y + i * 2 + 1, rgb3);
 			}
 		}
 

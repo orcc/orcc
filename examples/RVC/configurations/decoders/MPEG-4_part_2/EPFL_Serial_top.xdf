@@ -39,11 +39,21 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Merger">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Mgnt_Merger_xilinx"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="decoder" dst-port="bits" src="source" src-port="O"/>
-    <Connection dst="display" dst-port="B" src="decoder" src-port="VID"/>
     <Connection dst="display" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
     <Connection dst="display" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
+    <Connection dst="Merger" dst-port="YUV_i" src="decoder" src-port="VID"/>
+    <Connection dst="display" dst-port="B" src="Merger" src-port="YUV"/>
 </XDF>
