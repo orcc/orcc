@@ -133,7 +133,7 @@ void display_show_image(void) {
 }
 
 void display_write_mb(unsigned char tokens[384]) {
-	int i, j, x, y, cnt, base, idx;
+	int i, j, cnt, base;
 
 	//printf("display_write_mb (%i, %i)\n", m_x, m_y);
 
@@ -143,8 +143,8 @@ void display_write_mb(unsigned char tokens[384]) {
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
 			int tok = tokens[cnt];
+			int idx = base + i * m_width + j;
 			cnt++;
-			idx = base + i * m_width + j;
 			img_buf_y[idx] = tok;
 		}
 	}
@@ -153,8 +153,8 @@ void display_write_mb(unsigned char tokens[384]) {
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
 			int tok = tokens[cnt];
+			int idx = base + i * m_width / 2 + j;
 			cnt++;
-			idx = base + i * m_width / 2 + j;
 			img_buf_u[idx] = tok;
 		}
 	}
@@ -162,8 +162,8 @@ void display_write_mb(unsigned char tokens[384]) {
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
 			int tok = tokens[cnt];
+			int idx = base + i * m_width / 2 + j;
 			cnt++;
-			idx = base + i * m_width / 2 + j;
 			img_buf_v[idx] = tok;
 		}
 	}
