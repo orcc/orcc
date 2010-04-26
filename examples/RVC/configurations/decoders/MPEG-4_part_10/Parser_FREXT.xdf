@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Parser">
+<XDF name="Parser_FREXT">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
     <Port kind="Input" name="bits8">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
@@ -16,303 +16,299 @@
     <Port kind="Output" name="CoefDC_L">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="CoefAC_L">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="Intra_DC_flag">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="PredMode">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="ScalingList">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="QP">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="CurrMbAddr">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="PicWidthInMb">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="PicSizeInMb">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="FirstMbInSlice">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="POC">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MbPartIdx">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="RefIdx">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MbPartWidth">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MbPartHeigth">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MvRes">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="Mb_Type">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="RefReordering">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MMCO">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="Width">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="Height">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="MV">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="LOCATION">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="11"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="PART_SZ">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="RefList">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="Mb_TypeC">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="CoefAC_Cb">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="CoefDC_Cb">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="CoefDC_Cr">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="CoefAC_Cr">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="IntraPredModeC">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="QP_Cb">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="QP_Cr">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="slice_alpha_c0_offset">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="slice_beta_offset">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="LFDisable">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="CodedBlockPattern">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="mv_out">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="ref_idx">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="I_PCM_Y">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="I_PCM_U">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="I_PCM_V">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="ConstrainedIFlag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
@@ -342,7 +338,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="byte2bit"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/byte2bit"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -351,67 +347,46 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_NALU"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_NALU"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Buffer_Size">
-            <Expr kind="Literal" literal-kind="Integer" value="10000"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Synp_AVC">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_Synp_AVC"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Synp_AVC_FREXT"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
-        <Parameter name="MVSZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_BlockExpand_AVC">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_BlockExpand_AVC"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockExpand_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_BlockSplit_AVC">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_BlockSplit_AVC"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockSplit_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_IntraPred_Split">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_IntraPred_Split"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Split"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="MVReconstruct">
         <!-- ************************* -->
@@ -435,19 +410,16 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_MMCO"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_MMCO"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="NB_PIC">
-            <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Parser_IPCM">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_Parser_IPCM"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Parser_IPCM"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -473,12 +445,12 @@
     <Connection dst="" dst-port="PredMode" src="Algo_IntraPred_Split" src-port="PredMode"/>
     <Connection dst="byte2bit" dst-port="in8" src="Algo_NALU" src-port="bits_rbsp8">
         <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="200000"/>
+            <Expr kind="Literal" literal-kind="Integer" value="1000"/>
         </Attribute>
     </Connection>
     <Connection dst="Algo_Synp_AVC" dst-port="bits" src="byte2bit" src-port="out">
         <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="100000"/>
+            <Expr kind="Literal" literal-kind="Integer" value="10000"/>
         </Attribute>
     </Connection>
     <Connection dst="Algo_Synp_AVC" dst-port="nb_rbsp_bytes"
@@ -555,8 +527,8 @@
         src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
     <Connection dst="Algo_BlockSplit_AVC" dst-port="Block_CAVLC"
         src="Algo_BlockExpand_AVC" src-port="Block"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block_CABAC"
-        src="Algo_Synp_AVC" src-port="Block_CABAC"/>
     <Connection dst="Algo_BlockSplit_AVC" dst-port="Entropy_Type"
         src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block_CABAC"
+        src="Algo_Synp_AVC" src-port="Block_CABAC"/>
 </XDF>

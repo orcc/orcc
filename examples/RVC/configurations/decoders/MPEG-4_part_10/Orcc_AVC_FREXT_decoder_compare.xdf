@@ -1,105 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="IT4x4">
+<XDF name="Orcc_AVC_CBP_decoder_compare">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="X">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
-    <Port kind="Output" name="Y">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="SAMPLE_SIZE">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="Algo_IT4x4_1d_0">
+    <Instance id="source">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_IT4x4_1d"/>
+        <Class name="../../../VTL/System/Source"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
-    <Instance id="Algo_Transpose4x4_0">
+    <Instance id="AVCDecoder">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_Transpose4x4"/>
+        <Class name="AVC_CBP_decoder"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
-    <Instance id="Algo_IT4x4_1d_1">
+    <Instance id="Merger">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_IT4x4_1d"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Merger420_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
-    <Instance id="Algo_Transpose4x4_1">
+    <Instance id="display">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_Transpose4x4"/>
+        <Class name="../../../VTL/System/Display"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
-    <Instance id="Algo_IT4x4_Addshift">
+    <Instance id="Compare">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Algo_IT4x4_Addshift"/>
+        <Class name="../../../VTL/System/Compare"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="SAMPLE_SZ">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Algo_IT4x4_1d_0" dst-port="X" src="" src-port="X"/>
-    <Connection dst="" dst-port="Y" src="Algo_IT4x4_Addshift" src-port="Y"/>
-    <Connection dst="Algo_Transpose4x4_0" dst-port="X"
-        src="Algo_IT4x4_1d_0" src-port="Y"/>
-    <Connection dst="Algo_IT4x4_1d_1" dst-port="X"
-        src="Algo_Transpose4x4_0" src-port="Y"/>
-    <Connection dst="Algo_Transpose4x4_1" dst-port="X"
-        src="Algo_IT4x4_1d_1" src-port="Y"/>
-    <Connection dst="Algo_IT4x4_Addshift" dst-port="X"
-        src="Algo_Transpose4x4_1" src-port="Y"/>
+    <Connection dst="AVCDecoder" dst-port="bits8" src="source" src-port="O"/>
+    <Connection dst="Merger" dst-port="U" src="AVCDecoder" src-port="Display_Cb"/>
+    <Connection dst="Merger" dst-port="V" src="AVCDecoder" src-port="Display_Cr"/>
+    <Connection dst="display" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="display" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
+    <Connection dst="display" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
+    <Connection dst="Merger" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
+    <Connection dst="Compare" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="Compare" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
+    <Connection dst="Compare" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
 </XDF>

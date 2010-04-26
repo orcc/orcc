@@ -1,6 +1,0 @@
-actor Transpose () int In ==> int Out :
-
-  action In:[ x ] repeat 64 ==> Out: [ [ x[ 8 * c + r ] : for int r in Integers(0,7), for int c in Integers(0,7) ] ] repeat 64
-  end
-
- end

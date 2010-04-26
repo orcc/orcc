@@ -1,3 +1,0 @@
-top-level networks with the following settings when you launch one of the examples below (compilation options-->defauft fifo size has to be 1000): 
-  (1) Orcc_AVC_CBP_decoder.xdf: AVC CBP decoder
-  (2) Orcc_AVC_CBP_decoder_compare.xdf: AVC CBP decoder with comparison of output
