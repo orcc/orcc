@@ -58,7 +58,7 @@ char *input_file;
 char *yuv_file;
 
 // Pause function
-void pause() {
+void wait_for_key() {
 #ifdef _WIN32
 	printf("Press a key to continue\n");
 	_getch();

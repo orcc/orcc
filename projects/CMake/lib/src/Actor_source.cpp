@@ -36,7 +36,7 @@ void actor_source::initialize() {
 	if (input_file == NULL) {
 		print_usage();
 		fprintf(stderr, "No input file given!\n");
-		pause();
+		wait_for_key();
 		exit(1);
 	}
 
@@ -47,7 +47,7 @@ void actor_source::initialize() {
 		}
 
 		fprintf(stderr, "could not open file \"%s\"\n", fname);
-		pause();
+		wait_for_key();
 		exit(1);
 	}
 }

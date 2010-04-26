@@ -40,7 +40,7 @@ extern char *yuv_file;
 void init_orcc(int argc, char *argv[]);
 
 // pause function
-void pause();
+void wait_for_key();
 
 // print usage
 void print_usage();
