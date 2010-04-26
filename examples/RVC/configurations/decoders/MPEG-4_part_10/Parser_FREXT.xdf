@@ -374,7 +374,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockSplit_AVC"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockSplit_AVC_FREXT"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

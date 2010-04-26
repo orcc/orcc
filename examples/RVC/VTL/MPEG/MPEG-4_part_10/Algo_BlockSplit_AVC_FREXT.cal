@@ -51,9 +51,13 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-
+/*
+ * Modified by Endri Bezati(IETR/INSA Rennes, EPFL) to understand the CABAC blocks
+ */
 actor Algo_BlockSplit_AVC () 
-		int(size=16) Block 
+		int(size=16) Block_CAVLC,
+		int(size=16) Block_CABAC,
+		bool Entropy_Type
 		==>  
 			int(size=16) Block_Y_DC, 
 			int(size=16) Block_Y_AC,
@@ -62,31 +66,88 @@ actor Algo_BlockSplit_AVC ()
 			int(size=16) Block_V_DC,
 			int(size=16) Block_V_AC:
 
-  splitY_DC: action Block:[ x ] repeat 16 ==> Block_Y_DC:[ x ] repeat 16 
+  bool EntropyType := true; //CAVLC :true and CABAC: false
+  bool TypeReceived := false;
+  
+  action Entropy_Type:[ x ] ==>
+  guard
+  	not TypeReceived
+  do
+  		EntropyType  := x;
+  		TypeReceived := true;
+  end
+ 
+  CAVLC_Split: action ==>
+  guard
+  	EntropyType
   end
   
-  splitY_AC: action Block:[ x ] repeat 16 * 16 ==> Block_Y_AC:[ x ] repeat 16 * 16 
+  CABAC_Split: action ==>
+  guard
+  	not EntropyType
   end
   
-  splitU_DC: action Block:[ x ] repeat 4 ==> Block_U_DC:[ x ] repeat 4
+  //CAVLC Split
+  
+  CAVLC_splitY_DC: action Block_CAVLC:[ x ] repeat 16 ==> Block_Y_DC:[ x] repeat 16 
   end
   
-  splitV_DC: action Block:[ x ] repeat 4 ==> Block_V_DC:[ x ] repeat 4 
+  CAVLC_splitY_AC: action Block_CAVLC:[ x ] repeat 16 * 16 ==> Block_Y_AC:[ x ] repeat 16 * 16 
   end
   
-  splitU_AC: action Block:[ x ] repeat 8 * 8 ==> Block_U_AC:[ x ] repeat 8 * 8 
+  CAVLC_splitU_DC: action Block_CAVLC:[ x ] repeat 4 ==> Block_U_DC:[ x ] repeat 4
   end
   
-  splitV_AC: action Block:[ x ] repeat 8 * 8 ==> Block_V_AC:[ x ] repeat 8 * 8 
+  CAVLC_splitV_DC: action Block_CAVLC:[ x ] repeat 4 ==> Block_V_DC:[ x ] repeat 4 
   end
   
-  schedule fsm  splitY_DC:
-  	splitY_DC				(splitY_DC) 		--> splitY_AC;
-  	splitY_AC			  	(splitY_AC) 		--> splitU_DC;
-  	splitU_DC				(splitU_DC) 		--> splitV_DC;
-  	splitV_DC				(splitV_DC) 		--> splitU_AC;
-  	splitU_AC			  	(splitU_AC) 		--> splitV_AC;
-  	splitV_AC			  	(splitV_AC) 		--> splitY_DC;
+  CAVLC_splitU_AC: action Block_CAVLC:[ x ] repeat 8 * 8 ==> Block_U_AC:[ x ] repeat 8 * 8 
+  end
+  
+  CAVLC_splitV_AC: action Block_CAVLC:[ x ] repeat 8 * 8 ==> Block_V_AC:[ x ] repeat 8 * 8 
+  end
+  
+  //CABAC Split
+  
+  CABAC_splitY_DC: action Block_CABAC:[ x ] repeat 16 ==> Block_Y_DC:[ x] repeat 16 
+  end
+  
+  CABAC_splitY_AC: action Block_CABAC:[ x ] repeat 16 * 16 ==> Block_Y_AC:[ x ] repeat 16 * 16 
+  end
+  
+  CABAC_splitU_DC: action Block_CABAC:[ x ] repeat 4 ==> Block_U_DC:[ x ] repeat 4
+  end
+  
+  CABAC_splitV_DC: action Block_CABAC:[ x ] repeat 4 ==> Block_V_DC:[ x ] repeat 4 
+  end
+  
+  CABAC_splitU_AC: action Block_CABAC:[ x ] repeat 8 * 8 ==> Block_U_AC:[ x ] repeat 8 * 8 
+  end
+  
+  CABAC_splitV_AC: action Block_CABAC:[ x ] repeat 8 * 8 ==> Block_V_AC:[ x ] repeat 8 * 8 
+  end
+  
+  
+  schedule fsm E_Type:
+  
+  	E_Type					(CAVLC_Split)			--> CAVLC_splitY_DC;
+  
+   
+  	CAVLC_splitY_DC			(CAVLC_splitY_DC) 		--> CAVLC_splitY_AC;
+    CAVLC_splitY_AC			(CAVLC_splitY_AC) 		--> CAVLC_splitU_DC;
+  	CAVLC_splitU_DC			(CAVLC_splitU_DC) 		--> CAVLC_splitV_DC;
+  	CAVLC_splitV_DC			(CAVLC_splitV_DC) 		--> CAVLC_splitU_AC;
+    CAVLC_splitU_AC			(CAVLC_splitU_AC) 		--> CAVLC_splitV_AC;
+    CAVLC_splitV_AC			(CAVLC_splitV_AC) 		--> CAVLC_splitY_DC;
+    
+    E_Type					(CABAC_Split)			--> CABAC_splitY_DC;
+    
+    CABAC_splitY_DC			(CABAC_splitY_DC) 		--> CABAC_splitY_AC;
+    CABAC_splitY_AC			(CABAC_splitY_AC) 		--> CABAC_splitU_DC;
+  	CABAC_splitU_DC			(CABAC_splitU_DC) 		--> CABAC_splitV_DC;
+  	CABAC_splitV_DC			(CABAC_splitV_DC) 		--> CABAC_splitU_AC;
+    CABAC_splitU_AC			(CABAC_splitU_AC) 		--> CABAC_splitV_AC;
+    CABAC_splitV_AC			(CABAC_splitV_AC) 		--> CABAC_splitY_DC;
   end
   
 end
