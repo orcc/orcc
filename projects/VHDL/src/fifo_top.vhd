@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
--- Title      : Generic FIFO
+-- Title      : FIFO TOP
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : generic_fifo.vhd
+-- File       : fifo_top.vhd
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-04-20
+-- Last update: 2010-04-27
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ use ieee.std_logic_1164.all;
 -------------------------------------------------------------------------------
 
 
-entity FIFO_generic is
+entity fifo_top is
   generic
     (
       depth : integer := 32;
@@ -68,107 +68,64 @@ entity FIFO_generic is
       send     : out std_logic;
       data_out : out std_logic_vector (width -1 downto 0);
       empty    : out std_logic);
-end FIFO_generic;
+end fifo_top;
 
 
 -------------------------------------------------------------------------------
 
 
-architecture arch_FIFO_generic of FIFO_generic is
-
-
-  -----------------------------------------------------------------------------
-  -- Internal type declarations
-  -----------------------------------------------------------------------------
-
-  type memory_type is array (depth -1 downto 0) of
-    std_logic_vector(width -1 downto 0);
-  signal memory : memory_type;
+architecture arch_fifo_top of fifo_top is
 
   -----------------------------------------------------------------------------
   -- Internal signal declarations
   -----------------------------------------------------------------------------
   --
-  signal adresse_RAM_w         : integer range (depth -1) downto 0 := 0;
-  signal adresse_RAM_r         : integer range (depth -1) downto 0 := 0;
-  signal full_FIFO, empty_FIFO : std_logic;
-  --
+  signal link_send  : std_logic;
+  signal link_full  : std_logic;
+  signal dest_ready : std_logic;
+  signal link_data  : std_logic_vector (width -1 downto 0);
   -----------------------------------------------------------------------------
-  
 begin
 
-  send     <= not empty_FIFO;
-  empty    <= empty_FIFO;
-  full     <= full_FIFO;
-  data_out <= memory(adresse_RAM_r);
+  create_FIFO : if depth > 0 generate
+    FIFO_generic_1 : entity work.FIFO_generic
+      generic map (
+        depth => depth,
+        width => width)
+      port map (
+        reset_n  => reset_n,
+        wr_clk   => wr_clk,
+        wr_data  => wr_data,
+        data_in  => data_in,
+        full     => full,
+        rd_clk   => rd_clk,
+        rd_ack   => dest_ready,
+        send     => link_send,
+        data_out => link_data,
+        empty    => empty);
+  end generate;
 
-  -- purpose: store data
-  RAM_write : process (wr_clk, reset_n)
-  begin
-    if reset_n = '0' then
-      adresse_RAM_w <= 0;
-      --
-    elsif rising_edge(wr_clk) then
-      if (wr_data = '1' and adresse_RAM_w < depth -1) then
-        memory(adresse_RAM_w) <= data_in;
-        adresse_RAM_w         <= adresse_RAM_w + 1;
-      elsif (wr_data = '1') then
-        memory(adresse_RAM_w) <= data_in;
-        adresse_RAM_w         <= 0;
-      end if;
-    end if;
-  end process RAM_write;
-
-
--- purpose: load data
-  RAM_read : process (rd_clk, reset_n)
-  begin
-    if reset_n = '0' then
-      adresse_RAM_r <= 0;
-      --
-    elsif rising_edge(rd_clk) then
-      if (rd_ack = '1' and adresse_RAM_r < depth -1) then
-        adresse_RAM_r <= adresse_RAM_r + 1;
-      elsif (rd_ack = '1') then
-        adresse_RAM_r <= 0;
-      end if;
-    end if;
-  end process RAM_read;
+  create_link : if depth = 0 generate
+    link_data <= data_in;
+    link_send <= wr_data;
+    full      <= not dest_ready;
+    empty     <= '0';
+  end generate;
 
 
+  arbiter_1 : entity work.arbiter
+    generic map (
+      width => width)
+    port map (
+      clock         => rd_clk,
+      reset_n       => reset_n,
+      data_in       => link_data,
+      data_in_send  => link_send,
+      dest_ready    => dest_ready,
+      data_out      => data_out,
+      data_out_send => send,
+      data_out_ack  => rd_ack);
 
--- Management of the flags
-  Flag_proc : process (adresse_RAM_r, adresse_RAM_w) is
-  begin
-    if (adresse_RAM_w = adresse_RAM_r) then
-      empty_FIFO <= '1';
-      full_FIFO  <= '0';
-      --
-    elsif (adresse_RAM_w > adresse_RAM_r) then
-      if (adresse_RAM_w - adresse_RAM_r < 3) then
-        empty_FIFO <= '1';
-        full_FIFO  <= '0';
-      elsif (depth - adresse_RAM_w + adresse_RAM_r < 3) then
-        empty_FIFO <= '0';
-        full_FIFO  <= '1';
-      else
-        empty_FIFO <= '0';
-        full_FIFO  <= '0';
-      end if;
-    else
-      if (adresse_RAM_r - adresse_RAM_w < 3) then
-        empty_FIFO <= '0';
-        full_FIFO  <= '1';
-      elsif (depth - adresse_RAM_r + adresse_RAM_w < 3) then
-        empty_FIFO <= '1';
-        full_FIFO  <= '0';
-      else
-        empty_FIFO <= '0';
-        full_FIFO  <= '0';
-      end if;
-    end if;
-  end process Flag_proc;
-
-end arch_FIFO_generic;
+end arch_fifo_top;
 
 --------------------------------------------------------------------------
