@@ -32,7 +32,7 @@ actor Algo_NALU ()
 */
 
 		uint(size = 32)         SZ_NB_RBSP          = 32; /* >= log2(NB_RBSP_BYTE_MAX) */
-		int (size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 1000000;
+		int (size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 100000;
 		uint(size = 2)          byte_count         := 0; /* nb byte(s) stored in fifo */
 		int (size = 8)          fifo_lsb           := 0;
 		int (size = 8)          fifo_msb           := 0;
@@ -83,21 +83,14 @@ actor Algo_NALU ()
 			bits8:[b]
 				==>
 		guard
-			byte_count = 2
+			byte_count = 2,
+			nb_bytes_mem < NB_RBSP_BYTE_MAX
 		do
-			if(nb_bytes_mem < NB_RBSP_BYTE_MAX) then
-				Input_Bitstream[nb_bytes_mem] := fifo_msb;
-				nb_bytes_mem := nb_bytes_mem + 1;
-				if(start_code = 1) then
-					nb_bytes_in_rbsp := nb_bytes_in_rbsp + 1;
-				end
-			else
-				/* !!!FIXME!!!
-				   That's Baloo !!!!
-				   Put in what you should do in this case
-				*/
+			Input_Bitstream[nb_bytes_mem] := fifo_msb;
+			nb_bytes_mem := nb_bytes_mem + 1;
+			if(start_code = 1) then
+				nb_bytes_in_rbsp := nb_bytes_in_rbsp + 1;
 			end
-			
 			if( (fifo_msb = 0) and (fifo_lsb = 0) and  (b = 1) ) then // if it's a start code
 				start_code := start_code + 1;
 				if(start_code = 2) then //if we have data to sent
@@ -117,6 +110,13 @@ actor Algo_NALU ()
 			fifo_lsb       := b;
 		end /* mem_received_byte */
 
+
+	/* the buffer is full => we stop the program */
+	buffer_overflow: action ==>
+		guard
+			nb_bytes_mem >= NB_RBSP_BYTE_MAX
+		end
+
 	/* send the nb_rbsp */
 	send_nb_rbsp_bytes: action
 				==>
@@ -128,29 +128,46 @@ actor Algo_NALU ()
 			nb_rbsp_byte_ready := false;
 		end /* send_nb_rbsp_bytes */
 
+
 	/* send the rbsp */
 	send_rbsp: action
 				==>
 			bits_rbsp8:[out_rbsp]
 		guard
-			start_code = 2
+			start_code    = 2,
+			nb_bytes_sent < nb_bytes_mem
 		var
 			int(size = 8) out_rbsp
 		do
 			out_rbsp      := Input_Bitstream[nb_bytes_sent];
 			nb_bytes_sent := nb_bytes_sent + 1;
-			if(nb_bytes_sent >= nb_bytes_mem) then //if we have finished the sent of data
-				start_code       := 1;
-				nb_bytes_mem     := 0;
-				nb_bytes_in_rbsp := -1; /* the NALU header is not included in rbsp */
-			end
 		end /* send_rbsp */
+
+	/* send of rbsp finished */
+	send_rbsp_done: action ==>
+		guard
+			start_code    =  2,
+			nb_bytes_sent >= nb_bytes_mem
+		do
+			start_code       := 1;
+			nb_bytes_mem     := 0;
+			nb_bytes_in_rbsp := -1; /* the NALU header is not included in rbsp */
+		end
 
 /*
 *
 * Scheduler
 *
 */
+	schedule fsm get_bytes_or_send_nb_rbsp:
+		get_bytes_or_send_nb_rbsp (fill_fifo          )-->get_bytes_or_send_nb_rbsp;
+		get_bytes_or_send_nb_rbsp (delete_emul_3_byte )-->get_bytes_or_send_nb_rbsp;
+		get_bytes_or_send_nb_rbsp (mem_received_byte  )-->get_bytes_or_send_nb_rbsp;
+		get_bytes_or_send_nb_rbsp (buffer_overflow    )-->undefined;
+		get_bytes_or_send_nb_rbsp (send_nb_rbsp_bytes )-->send_rbsp;
+		send_rbsp                 (send_rbsp          )-->send_rbsp;
+		send_rbsp                 (send_rbsp_done     )-->get_bytes_or_send_nb_rbsp;
+	end
 
 	priority
 		send_nb_rbsp_bytes > send_rbsp > delete_emul_3_byte > mem_received_byte;
