@@ -2885,7 +2885,7 @@ actor Algo_Synp_AVC_FREXT()
 			AvailMbA := NeighMbAvail;
 			
 			if AvailMbA then
-				luma4x4BlkIdxA := ( NeighMb_xW * 4 ) + NeighMb_yW;
+				luma4x4BlkIdxA := ( (NeighMb_yW >> 2) * 4 ) + (NeighMb_xW >> 2);
 				
 				if ( (mbTab[mbAddrA][mbTabMbtype] != P_Skip) or 
 				     (mbTab[mbAddrA][mbTabMbtype] != B_Skip) or 
@@ -2910,7 +2910,7 @@ actor Algo_Synp_AVC_FREXT()
 			AvailMbB := NeighMbAvail;
 			 
 			if AvailMbB then
-				luma4x4BlkIdxB := ( NeighMb_xW * 4 ) + NeighMb_yW;
+				luma4x4BlkIdxB := ( (NeighMb_yW >> 2) * 4 ) + (NeighMb_xW >> 2) ;
 				
 				if ( (mbTab[mbAddrB][mbTabMbtype] != P_Skip) or 
 				     (mbTab[mbAddrB][mbTabMbtype] != B_Skip) or 
@@ -2964,7 +2964,7 @@ actor Algo_Synp_AVC_FREXT()
 			   mbTab[mbAddrA][mbTabMbtype] = 25 then
 				condTermFlagA := 1;
 			else
-				condTermFlagA := mbTab[mbAddrA][mbCBF];
+				condTermFlagA := transblock_cbf[mbAddrA][InverseScan4x4Tab[luma4x4BlkIdxA]];
 			end
 		end
 
@@ -2976,7 +2976,7 @@ actor Algo_Synp_AVC_FREXT()
 			   mbTab[mbAddrB][mbTabMbtype] = 25 then
 				condTermFlagB := 1;
 			else
-				condTermFlagB := mbTab[mbAddrB][mbCBF];
+				condTermFlagB := transblock_cbf[mbAddrB][InverseScan4x4Tab[luma4x4BlkIdxB]];
 			end
 		end
 		
