@@ -135,45 +135,29 @@ static void DiffUcharImage(const int x_size, const int y_size, const unsigned ch
 	//   printf("OK\n");
 }
 
-void Compare_write_mb(short tokens[384]) {
-	int i, j, x, y, cnt, base, idx;
+void Compare_write_mb(unsigned char tokens[384]) {
+	int i, j, cnt, base, idx;
 
 	//printf("display_write_mb (%i, %i)\n", m_x, m_y);
 
 	cnt = 0;
 	base = m_y * m_width + m_x;
 
-	for (y = 0; y < 2; y++) {
-		for (x = 0; x < 2; x++) {
-			for (i = 0; i < 8; i++) {
-				for (j = 0; j < 8; j++) {
-					int tok = tokens[cnt];
-					cnt++;
-
-					if (tok < 0) {
-						tok = 0;
-					} else if (tok > 255) {
-						tok = 255;
-					}
-
-					idx = base + (i + 8 * y) * m_width + (j + 8 * x);
-					img_buf_y[idx] = tok;
-				}
-			}
+	for (i = 0; i < 16; i++) {
+		for (j = 0; j < 16; j++) {
+			int tok = tokens[cnt];
+			cnt++;
+			
+			idx = base + i * m_width + j;
+			img_buf_y[idx] = tok;
 		}
 	}
-
+	
 	base = m_y / 2 * m_width / 2 + m_x / 2;
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
 			int tok = tokens[cnt];
 			cnt++;
-
-			if (tok < 0) {
-				tok = 0;
-			} else if (tok > 255) {
-				tok = 255;
-			}
 
 			idx = base + i * m_width / 2 + j;
 			img_buf_u[idx] = tok;
@@ -184,13 +168,6 @@ void Compare_write_mb(short tokens[384]) {
 		for (j = 0; j < 8; j++) {
 			int tok = tokens[cnt];
 			cnt++;
-
-			if (tok < 0) {
-				tok = 0;
-			} else if (tok > 255) {
-				tok = 255;
-			}
-
 			idx = base + i * m_width / 2 + j;
 			img_buf_v[idx] = tok;
 		}

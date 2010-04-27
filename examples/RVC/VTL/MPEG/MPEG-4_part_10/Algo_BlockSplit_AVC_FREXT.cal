@@ -54,7 +54,7 @@ Copyright (c) ISO/IEC 2008.
 /*
  * Modified by Endri Bezati(IETR/INSA Rennes, EPFL) to understand the CABAC blocks
  */
-actor Algo_BlockSplit_AVC () 
+actor Algo_BlockSplit_AVC_FREXT () 
 		int(size=16) Block_CAVLC,
 		int(size=16) Block_CABAC,
 		bool Entropy_Type
