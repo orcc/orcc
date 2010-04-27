@@ -7085,7 +7085,7 @@ actor Algo_Synp_AVC_FREXT()
 		//coded_block_flag := 1; //When coded_block_flag is not present, it is infered to be equal to 1
 		//store cbf
 		
-		transblock_cbf[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]] := coded_block_flag;
+		transblock_cbf[val_CurrMbAddr][luma4x4BlkIdx] := coded_block_flag;
 		
 		mbTab[val_CurrMbAddr][mbCBF] := coded_block_flag;
 		numCoeff := block_endIdx + 1;
