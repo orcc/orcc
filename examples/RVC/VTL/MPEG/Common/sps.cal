@@ -1,0 +1,10 @@
+actor sps () ==> int(size=16) Width , int(size=16) Height :
+
+	int _width = 832/16;
+
+	int _height = 480/16;
+
+	action ==> Width:[ _width ], Height:[ _height ] 
+	end
+
+end
