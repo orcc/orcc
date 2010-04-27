@@ -274,6 +274,12 @@ actor Algo_Synp_AVC_FREXT()
 	 uint luma8x8BlkIdx;
 	 uint luma8x8BlkIdxA;
 	 uint luma8x8BlkIdxB;
+	 
+	List ( type: List ( type: int(size = 8), size = 16) , size = PICWIDTH + 1 ) transblock_cbf :=  [ [ 0 : for int i in Integers( 0, 16) ]: for int j in Integers( 0, PICWIDTH) ];
+	 uint NeighMbAddr;
+	 bool NeighMbAvail;
+	 uint NeighMb_xW;
+	 uint NeighMb_yW;
 	
 	int P_Skip = 254;
 	int B_Skip = 255;
@@ -2804,6 +2810,47 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
+	function GetMb4x4_X() --> int:
+	  InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 0 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 0 )
+	end
+	
+	function GetMb4x4_Y() --> int:
+	  InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 1 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 1 )
+	end
+	
+	procedure getNeighbouring(int xN, int yN, int maxW, int maxH)
+	begin
+		if xN < 0 then
+  			if yN < maxH - 1 then
+				NeighMbAvail := mbAddrA_Avail();
+				NeighMbAddr := GiveMbAddrA();
+  			else
+				NeighMbAvail := false;
+  			end
+ 		else
+			if xN < maxW - 1 then
+  				if yN < 0 then
+					NeighMbAvail := mbAddrB_Avail();
+					NeighMbAddr := GiveMbAddrB();
+  				else
+    				if yN < maxH - 1 then
+      					NeighMbAvail := true;
+      					NeighMbAddr  := val_CurrMbAddr;
+    				end
+    			end
+			else
+  				NeighMbAvail := false;
+			end
+		end
+ 
+  
+  //Give xW
+	NeighMb_xW := ( xN + maxW ) mod maxW;
+  
+  //Give yW
+	NeighMb_yW := ( yN + maxH ) mod maxH;
+	end
+	
 	procedure ctxIdxCodedBlockFlag()
 	var
 		int transBlockA,
@@ -2830,30 +2877,15 @@ actor Algo_Synp_AVC_FREXT()
 		if ctxBlockCat = 1 or ctxBlockCat = 2 then
 			
 			
-			x := InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 0 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 0 );
-			y := InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 1 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 1 );
-			
-			// N = A
-			xN := x - 1;
-			yN := y;
-			
-			xW := ( xN + 16 ) mod 16;
-			yW := ( yN + 16 ) mod 16;
-			 
-						
-			if xN < 0 and ( yN >= 0 and yN < 15 ) then
-				mbAddrA  := GiveMbAddrA();
-				AvailMbA :=  mbAddrA_Avail();
-			else
-				if xN >= 0 and xN < 15 and yN >= 0 and yN < 15 then
-					mbAddrA := val_CurrMbAddr;
-					AvailMbA := true;
-				end
-			end
+			//Get Neighbouring for MB A
+			  getNeighbouring( GetMb4x4_X() - 1, GetMb4x4_Y(), 16, 16);
 			  
+			//Associate Values
+			mbAddrA  := NeighMbAddr;
+			AvailMbA := NeighMbAvail;
 			
 			if AvailMbA then
-				luma4x4BlkIdxA := ( xW * 4 ) + yW;
+				luma4x4BlkIdxA := ( NeighMb_xW * 4 ) + NeighMb_yW;
 				
 				if ( (mbTab[mbAddrA][mbTabMbtype] != P_Skip) or 
 				     (mbTab[mbAddrA][mbTabMbtype] != B_Skip) or 
@@ -2870,26 +2902,15 @@ actor Algo_Synp_AVC_FREXT()
 				transBlockA := -1;
 			end
 			
-			// N = B
-			
-			xN := x - 1;
-			yN := y;
-			
-			xW := ( xN + 16 ) mod 16;
-			yW := ( yN + 16 ) mod 16;
-			 
-			if yN < 0 and ( xN >= 0 and xN < 15 ) then
-			  mbAddrB := GiveMbAddrB();
-			  AvailMbB := mbAddrB_Avail();
-			else
-			  if xN >= 0 and xN < 15 and yN >= 0 and yN < 15 then
-			    mbAddrB := val_CurrMbAddr;
-			    AvailMbB := true;
-			  end
-			end
+			//Get Neighbouring for MB B
+			  getNeighbouring( GetMb4x4_X(), GetMb4x4_Y() - 1, 16, 16);
+			  
+			//Associate Values
+			mbAddrB  := NeighMbAddr;
+			AvailMbB := NeighMbAvail;
 			 
 			if AvailMbB then
-				luma4x4BlkIdxB := ( xW * 4 ) + yW;
+				luma4x4BlkIdxB := ( NeighMb_xW * 4 ) + NeighMb_yW;
 				
 				if ( (mbTab[mbAddrB][mbTabMbtype] != P_Skip) or 
 				     (mbTab[mbAddrB][mbTabMbtype] != B_Skip) or 
@@ -7063,6 +7084,9 @@ actor Algo_Synp_AVC_FREXT()
 		coded_block_flag := cabac_value();
 		//coded_block_flag := 1; //When coded_block_flag is not present, it is infered to be equal to 1
 		//store cbf
+		
+		transblock_cbf[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]] := coded_block_flag;
+		
 		mbTab[val_CurrMbAddr][mbCBF] := coded_block_flag;
 		numCoeff := block_endIdx + 1;
 		blCabacIdx := block_startIdx;
