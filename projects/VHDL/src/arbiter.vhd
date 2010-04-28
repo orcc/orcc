@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-04-27
+-- Last update: 2010-04-28
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -92,19 +92,22 @@ begin
     if reset_n = '0' then
       count <= 0;
     elsif rising_edge(clock) then
-      if send = FIRST_SEND then
-        register_data <= data_in;
-        count         <= 1;
-      elsif send = SEND_SIGNAL then
-        register_data <= data_in;
-        count         <= 2;
-      elsif send = WAIT_ACK then
-        count <= 3;
-      elsif send = SEND_DATA then
-        register_data <= data_in;
-      elsif send = SEND_NODATA then
-        count <= 0;
-      end if;
+      case send is
+        when FIRST_SEND =>
+          register_data <= data_in;
+          count         <= 1;
+        when SEND_SIGNAL =>
+          register_data <= data_in;
+          count         <= 2;
+        when WAIT_ACK =>
+          count <= 3;
+        when SEND_DATA =>
+          register_data <= data_in;
+        when SEND_NODATA =>
+          count <= 0;
+        when others =>
+          null;
+      end case;
     end if;
   end process arbiter_proc;
 
@@ -123,55 +126,64 @@ begin
       dest_ready <= '1';
       send       <= FIRST_SEND;
       --
-      -- Count = 1 (First data send, test the destination acknowledgement)
-    elsif count = 1 and data_out_ack = '1' and data_in_send = '1' then
-      dest_ready    <= '1';
-      send          <= SEND_DATA;
-      data_out      <= register_data;
-      data_out_send <= '1';
-    elsif count = 1 and data_out_ack = '0' and data_in_send = '1' then
-      dest_ready    <= '1';
-      send          <= SEND_SIGNAL;
-      data_out      <= register_data;
-      data_out_send <= '1';
-    elsif count = 1 and data_out_ack = '0' and data_in_send = '0' then
-      dest_ready    <= '1';
-      send          <= WAIT_ACK;
-      data_out      <= register_data;
-      data_out_send <= '1';
-      iready        <= '0';
-      --
-      -- Count = 2 (Under processing however there are no input data anymore)
-    elsif count = 2 and data_out_ack = '1' and data_in_send = '1' then
-      dest_ready    <= '1';
-      send          <= SEND_DATA;
-      data_out      <= register_data;
-      data_out_send <= '1';
-    elsif count = 2 and data_out_ack = '1' and data_in_send = '0' then
-      dest_ready    <= '1';
-      data_out      <= register_data;
-      data_out_send <= '1';
-    elsif count = 2 and data_out_ack = '0' then
-      dest_ready    <= '0';
-      data_out_send <= '1';
-      --
-      -- Count = 3  (One data in register, wait for an acknowledgement)
-    elsif count = 3 and data_out_ack = '1' and (data_in_send = '1' or iready = '1') then
-      send          <= FIRST_SEND;
-      data_out_send <= '0';
-    elsif count = 3 and data_out_ack = '1' and data_in_send = '0' and iready = '0' then
-      send          <= SEND_NODATA;
-      data_out_send <= '0';
-    elsif count = 3 and data_out_ack = '0' and data_in_send = '1' then
-      iready        <= '1';
-      dest_ready    <= '0';
-      data_out_send <= '1';
-    elsif count = 3 and data_out_ack = '0' then
-      dest_ready    <= '0';
-      data_out_send <= '1';
+    elsif (data_in_send = '1' or iready = '1') and data_out_ack = '1' then
+      iready <= '0';
+      if count = 1 then
+        dest_ready    <= '1';
+        send          <= SEND_DATA;
+        data_out      <= register_data;
+        data_out_send <= '1';
+      elsif count = 2 then
+        dest_ready    <= '1';
+        send          <= SEND_DATA;
+        data_out      <= register_data;
+        data_out_send <= '1';
+      elsif count = 3 then
+        send          <= FIRST_SEND;
+        data_out_send <= '0';
+      end if;
+    elsif data_in_send = '1' and data_out_ack = '0' then
+      if count = 1 then
+        dest_ready    <= '1';
+        send          <= SEND_SIGNAL;
+        data_out      <= register_data;
+        data_out_send <= '1';
+      elsif count = 2 then
+        iready        <= '1';
+        dest_ready    <= '0';
+        data_out_send <= '1';
+      elsif count = 3 then
+        iready        <= '1';
+        dest_ready    <= '0';
+        data_out_send <= '1';
+      end if;
+    elsif data_in_send = '0' and iready = '0' and data_out_ack = '1' then
+      if count = 1 then
+        send          <= SEND_NODATA;
+        data_out_send <= '0';
+      elsif count = 2 then
+        send          <= WAIT_ACK;
+        data_out_send <= '1';
+      elsif count = 3 then
+        send          <= SEND_NODATA;
+        data_out_send <= '0';
+      end if;
     else
-      data_out_send <= '0';
-      dest_ready    <= '1';
+      if count = 1 then
+        dest_ready    <= '1';
+        send          <= WAIT_ACK;
+        data_out      <= register_data;
+        data_out_send <= '1';
+      elsif count = 2 then
+        dest_ready    <= '0';
+        data_out_send <= '1';
+      elsif count = 3 then
+        dest_ready    <= '0';
+        data_out_send <= '1';
+      else
+        data_out_send <= '0';
+        dest_ready    <= '1';
+      end if;
     end if;
   end process Flag_proc;
 
