@@ -275,7 +275,11 @@ actor Algo_Synp_AVC_FREXT()
 	 uint luma8x8BlkIdxA;
 	 uint luma8x8BlkIdxB;
 	 
-	List ( type: List ( type: int(size = 8), size = 16) , size = PICWIDTH + 1 ) transblock_cbf :=  [ [ 0 : for int i in Integers( 0, 16) ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH + 1 ) transblock_cbf 		:=  [ [ 0 : for int i in Integers( 0, 16) ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cr		:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cb		:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH + 1 ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH) ];
+	
 	 uint NeighMbAddr;
 	 bool NeighMbAvail;
 	 uint NeighMb_xW;
@@ -2818,6 +2822,14 @@ actor Algo_Synp_AVC_FREXT()
 	  InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 1 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 1 )
 	end
 	
+	function GetMb4x4_Chroma_X() --> int:
+	  InverseRasterScan( luma4x4BlkIdx, 4, 4, 8, 0 )
+	end
+	
+	function GetMb4x4_Chroma_Y() --> int:
+	  InverseRasterScan( luma4x4BlkIdx, 4, 4, 8, 1 )
+	end
+	
 	procedure getNeighbouring(int xN, int yN, int maxW, int maxH)
 	begin
 		if xN < 0 then
@@ -2837,17 +2849,17 @@ actor Algo_Synp_AVC_FREXT()
       					NeighMbAvail := true;
       					NeighMbAddr  := val_CurrMbAddr;
     				end
-    			end
+			end
 			else
-  				NeighMbAvail := false;
+				NeighMbAvail := false;
 			end
 		end
  
   
-  //Give xW
+	//Give xW
 	NeighMb_xW := ( xN + maxW ) mod maxW;
   
-  //Give yW
+	//Give yW
 	NeighMb_yW := ( yN + maxH ) mod maxH;
 	end
 	
@@ -2863,6 +2875,8 @@ actor Algo_Synp_AVC_FREXT()
 		bool AvailMbB,
 		int luma4x4BlkIdxA,
 		int luma4x4BlkIdxB,
+		int chroma4x4BlkIdxA,
+		int chroma4x4BlkIdxB,
 		int condTermFlagA,
 		int condTermFlagB,
 		int x,
@@ -2874,11 +2888,48 @@ actor Algo_Synp_AVC_FREXT()
 	begin
 		ctxIdxInc := 0;
 		
+		/* ************************************************************************************************
+		    Luma 16x16 Block DC
+		 ************************************************************************************************* */
+		
+		if ctxBlockCat = 0 then
+			// N = A
+			getNeighbouring(-1,0,16,16);
+			//Assign Values
+			mbAddrA  := NeighMbAddr;
+			AvailMbA := NeighMbAvail;
+			
+			if AvailMbA then
+			  if IS_INxN(mbTab[mbAddrA][mbSliceType], mbTab[mbAddrA][mbTabMbtype]) then
+				  transBlockA := mbAddrA; 
+				end
+			else
+				transBlockA := 0;
+			end
+			
+			// N = B
+			getNeighbouring(0,-1,16,16);
+			//Assign Values
+			mbAddrB  := NeighMbAddr;
+			AvailMbB := NeighMbAvail;
+			
+			if AvailMbB then
+				if IS_INxN(mbTab[mbAddrB][mbSliceType], mbTab[mbAddrB][mbTabMbtype]) then
+				  transBlockB := mbAddrB; 
+				end
+			else
+				transBlockB := 0;
+			end
+		end
+		
+		/* ************************************************************************************************
+		    Luma 4x4 Block AC, luma4x4BlkIdx
+		 ************************************************************************************************* */
+		
 		if ctxBlockCat = 1 or ctxBlockCat = 2 then
 			
-			
 			//Get Neighbouring for MB A
-			  getNeighbouring( GetMb4x4_X() - 1, GetMb4x4_Y(), 16, 16);
+			getNeighbouring( GetMb4x4_X() - 1, GetMb4x4_Y(), 16, 16);
 			  
 			//Associate Values
 			mbAddrA  := NeighMbAddr;
@@ -2903,7 +2954,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			//Get Neighbouring for MB B
-			  getNeighbouring( GetMb4x4_X(), GetMb4x4_Y() - 1, 16, 16);
+			getNeighbouring( GetMb4x4_X(), GetMb4x4_Y() - 1, 16, 16);
 			  
 			//Associate Values
 			mbAddrB  := NeighMbAddr;
@@ -2920,41 +2971,105 @@ actor Algo_Synp_AVC_FREXT()
 					transBlockB := luma4x4BlkIdxB;
 				else
 					transBlockB := -1;
-					
 				end
 			else
 				luma4x4BlkIdxB := 0;
 				transBlockB := -1;
 			end
-			
-			
 		end
-				
+		
+		/* ************************************************************************************************
+		    Chroma DC, chroma component index iCbCr
+		 ************************************************************************************************* */
+		
 		if ctxBlockCat = 3  then
-		
-		if not mbAddrA_Avail() then
-			condTermFlagA := 0;
-		else
-			if ( mbTab[GiveMbAddrA()][mbTabMbtype] = 25 and mbTab[GiveMbAddrA()][mbSliceType] = SLICE_TYPE_I ) then
-				condTermFlagA := 1;
+			// N = A
+			getNeighbouring(-1,0,4,4);
+			//Assign Values
+			mbAddrA  := NeighMbAddr;
+			AvailMbA := NeighMbAvail;
+			
+			if AvailMbA then
+				if mbTab[mbAddrA][mbTabMbtype] != 25 then
+				  transBlockA := mbAddrA; 
+				end
+			else
+				transBlockA := 0;
 			end
 			
-			if ( binIdx = 0 and mbTab[GiveMbAddrA()][mbCBPChroma] = 0) or
-			   ( binIdx = 1 and mbTab[GiveMbAddrA()][mbCBPChroma] = 2) then
-				condTermFlagA := 0;
+			// N = B
+			getNeighbouring(0,-1,4,4);
+			//Assign Values
+			mbAddrB  := NeighMbAddr;
+			AvailMbB := NeighMbAvail;
+			
+			if AvailMbB then
+				if mbTab[mbAddrB][mbTabMbtype] != 25 then
+				  transBlockB := mbAddrB; 
+				end
 			else
-				condTermFlagA := 1;
+				transBlockB := 0;
 			end
 		end
 		
-		
-		end		
+		/* ************************************************************************************************
+		    Chroma AC, chroma component i ndex iCbCr
+		 ************************************************************************************************* */
 		
 		if ctxBlockCat = 4  then
-			//Todo
-			condTermFlagA := 1;
+			// N = A
+			//Get Neighbouring for MB A
+			getNeighbouring( GetMb4x4_Chroma_X() - 1, GetMb4x4_Chroma_Y(), 8, 8);
+			  
+			//Associate Values
+			mbAddrA  := NeighMbAddr;
+			AvailMbA := NeighMbAvail;
+			if AvailMbA then
+				chroma4x4BlkIdxA := ( (NeighMb_yW >> 2) * 2 ) + (NeighMb_xW >> 2);
+				if ( (mbTab[mbAddrA][mbTabMbtype]  != P_Skip) or 
+				     (mbTab[mbAddrA][mbTabMbtype]  != B_Skip) or 
+				     (mbTab[mbAddrA][mbTabMbtype]  != 25) or
+				     (mbTab[mbAddrA][mbCBPChroma] != 2) ) then
+				     
+					transBlockA := chroma4x4BlkIdxA;
+				else
+					transBlockA := -1;
+				end
+			else
+			      chroma4x4BlkIdxA := 0;
+			      transBlockA := -1;
+			end
+			
+			// N = B
+			//Get Neighbouring for MB A
+			getNeighbouring( GetMb4x4_Chroma_X(), GetMb4x4_Chroma_Y() - 1, 8, 8);
+			  
+			//Associate Values
+			mbAddrB  := NeighMbAddr;
+			AvailMbB := NeighMbAvail;
+			if AvailMbB then
+				chroma4x4BlkIdxB := ( (NeighMb_yW >> 2) * 2 ) + (NeighMb_xW >> 2);
+				if ( (mbTab[mbAddrB][mbTabMbtype]  != P_Skip) or 
+				     (mbTab[mbAddrB][mbTabMbtype]  != B_Skip) or 
+				     (mbTab[mbAddrB][mbTabMbtype]  != 25) or
+				     (mbTab[mbAddrB][mbCBPChroma] != 2) ) then
+				     
+					transBlockB := chroma4x4BlkIdxB;
+				else
+					transBlockB := -1;
+				end
+			else
+			      chroma4x4BlkIdxA := 0;
+			      transBlockA := -1;
+			end
 		end		
 		
+		/* ************************************************************************************************
+		    CtxIdxInc
+		 ************************************************************************************************* */
+		
+		
+		// condTermFlagA
 		
 		if not AvailMbA and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
 		   AvailMbA and transBlockA = -1 and mbTab[mbAddrA][mbTabMbtype] != 25 then
@@ -2964,9 +3079,30 @@ actor Algo_Synp_AVC_FREXT()
 			   mbTab[mbAddrA][mbTabMbtype] = 25 then
 				condTermFlagA := 1;
 			else
-				condTermFlagA := transblock_cbf[mbAddrA][InverseScan4x4Tab[luma4x4BlkIdxA]];
+				
+				if ctxBlockCat = 0 then
+					condTermFlagA := mbTab[mbAddrA][mbCBF];
+				end
+				
+				if ctxBlockCat = 1 or ctxBlockCat = 2 then
+					condTermFlagA := transblock_cbf[mbAddrA][InverseScan4x4Tab[luma4x4BlkIdxA]];
+				end
+				
+				if ctxBlockCat = 3 then
+					condTermFlagA := transblock_cbf_dc_cr_cb[transBlockA][iCbCr];
+				end
+				
+				if ctxBlockCat = 4 then
+					if iCbCr = 0 then
+						condTermFlagA := transblock_cbf_cb[mbAddrA][chroma4x4BlkIdxA];
+					else
+						condTermFlagA := transblock_cbf_cr[mbAddrA][chroma4x4BlkIdxA];
+					end
+				end				
 			end
 		end
+		
+		// condTermFlagB
 
 		if not AvailMbB and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
 		   AvailMbB and transBlockB = -1 and mbTab[mbAddrB][mbTabMbtype] != 25 then
@@ -2976,7 +3112,26 @@ actor Algo_Synp_AVC_FREXT()
 			   mbTab[mbAddrB][mbTabMbtype] = 25 then
 				condTermFlagB := 1;
 			else
-				condTermFlagB := transblock_cbf[mbAddrB][InverseScan4x4Tab[luma4x4BlkIdxB]];
+				
+				if ctxBlockCat = 0 then
+					condTermFlagB := mbTab[mbAddrB][mbCBF];
+				end
+				
+				if ctxBlockCat = 1 or ctxBlockCat = 2 then
+					condTermFlagB := transblock_cbf[mbAddrB][InverseScan4x4Tab[luma4x4BlkIdxB]];
+				end
+				
+				if ctxBlockCat = 3 then
+					condTermFlagB := transblock_cbf_dc_cr_cb[transBlockB][iCbCr];
+				end
+				
+				if ctxBlockCat = 4 then
+					if iCbCr = 0 then
+						condTermFlagB := transblock_cbf_cb[mbAddrB][chroma4x4BlkIdxB];
+					else
+						condTermFlagB := transblock_cbf_cr[mbAddrB][chroma4x4BlkIdxB];
+					end
+				end
 			end
 		end
 		
@@ -6545,7 +6700,7 @@ actor Algo_Synp_AVC_FREXT()
 	end
 
 	//else
-	Residual_luma_skip_DC_init: action ==> LAST:[true]//, ENTROPY_TYPE:[IS_CAVLC()]
+	Residual_luma_skip_DC_init: action ==> LAST:[true]//, FIXME sent here a block of 16 zeros to Block_CABAC
 	guard
 		bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16()
 	end
@@ -6706,7 +6861,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		leveltype = 2
 	do
-		iCbCr := iCbCr +1; 
+		iCbCr := iCbCr + 1; 
 	end
 
 	// else
@@ -6717,7 +6872,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//for( i = 0; i < 4 * NumC8x8; i++ )
 		//ChromaDCLevel[ iCbCr ][ i ] = 0
-		iCbCr := iCbCr +1; 
+		iCbCr := iCbCr + 1; 
 	end   
 	//end if
 
@@ -7085,9 +7240,33 @@ actor Algo_Synp_AVC_FREXT()
 		//coded_block_flag := 1; //When coded_block_flag is not present, it is infered to be equal to 1
 		//store cbf
 		
-		transblock_cbf[val_CurrMbAddr][luma4x4BlkIdx] := coded_block_flag;
+		//16x16 Luma DC Block
 		
-		mbTab[val_CurrMbAddr][mbCBF] := coded_block_flag;
+		if ctxBlockCat = 0 then
+			mbTab[val_CurrMbAddr][mbCBF] := coded_block_flag;
+		end
+		
+		// 4x4 Luma AC Block
+		if ctxBlockCat = 1 or ctxBlockCat = 2 then
+			transblock_cbf[val_CurrMbAddr][luma4x4BlkIdx] := coded_block_flag;
+		end
+		
+		if ctxBlockCat = 3 then
+			transblock_cbf_dc_cr_cb[val_CurrMbAddr][iCbCr] := coded_block_flag;
+		end
+		
+		if ctxBlockCat = 4 then
+			if iCbCr = 0 then
+				transblock_cbf_cb[val_CurrMbAddr][luma4x4BlkIdx] := coded_block_flag;
+			else
+				transblock_cbf_cr[val_CurrMbAddr][luma4x4BlkIdx] := coded_block_flag;
+			end
+		end
+	
+		
+		
+
+		
 		numCoeff := block_endIdx + 1;
 		blCabacIdx := block_startIdx;
 		//Delete previous Decoded level
