@@ -189,12 +189,12 @@ public class RepetitionVectorAnalyzer {
 		checkConsistency();
 
 		// multiply the actor repetition count with its number of phases
-		/*
-		 * for (Map.Entry<String, Integer> entry : repetitionVector.entrySet())
-		 * { Integer val = entry.getValue(); int nbPhases =
-		 * getStaticClass(entry.getKey()).getNumberOfPhases();
-		 * entry.setValue(val * nbPhases); }
-		 */
+
+		for (Map.Entry<Vertex, Integer> entry : repetitionVector.entrySet()) {
+			Integer val = entry.getValue();
+			int nbPhases = getStaticClass(entry.getKey()).getNumberOfPhases();
+			entry.setValue(val * nbPhases);
+		}
 
 		return repetitionVector;
 	}

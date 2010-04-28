@@ -112,6 +112,12 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		this.attributes = new HashMap<String, IAttribute>();
 	}
 
+	public Instance(String id, Actor actor) {
+		this.id = id;
+		this.actor = actor;
+		this.parameters = new HashMap<String, Expression>();
+		this.attributes = new HashMap<String, IAttribute>();
+	}
 	/**
 	 * Creates a new virtual instance. Only used by subclass Wrapper in the C++
 	 * backend.

@@ -55,16 +55,16 @@ public class FlatSASScheduler implements IScheduler {
 	public Schedule schedule(Network network) throws OrccException {
 		graph = network.getGraph();
 
-		Map<Vertex, Integer> rep = new RepetitionVectorAnalyzer(network)
+		Map<Vertex, Integer> repetitions = new RepetitionVectorAnalyzer(network)
 				.computeRepetitionsVector();
 
 		Schedule topSched = new Schedule();
 
-		List<Vertex> sort = new TopologicalSorter(graph).topologicalSort();
+		List<Vertex> sort = new TopologicalSorter().topologicalSort(network);
 		for (Vertex vertex : sort) {
 			if (vertex.isInstance()) {
 				Schedule subSched = new Schedule();
-				subSched.setIterationCount(rep.get(vertex));
+				subSched.setIterationCount(repetitions.get(vertex));
 				subSched.add(new Iterand(vertex));
 				topSched.add(new Iterand(subSched));
 			}
