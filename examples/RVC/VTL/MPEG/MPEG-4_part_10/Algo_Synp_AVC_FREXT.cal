@@ -67,7 +67,6 @@ actor Algo_Synp_AVC_FREXT()
 			int(size=12) VALUE, 
 			bool LAST,
 			bool ENTROPY_TYPE,
-			int(size = 16) Block_CABAC, 
 			int(size=8) ScalingList, 
 			int(size=8) QP, 
 			int(size=8) QP_Cb, 
@@ -6700,10 +6699,17 @@ actor Algo_Synp_AVC_FREXT()
 	end
 
 	//else
-	Residual_luma_skip_DC_init: action ==> LAST:[true]//, FIXME sent here a block of 16 zeros to Block_CABAC
+	Residual_luma_skip_DC_init: action ==> LAST:[true]
 	guard
-		bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16()
+		( bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16() ) and IS_CAVLC()
 	end
+	/*
+	Residual_luma_skip_DC_init_CABAC: action ==> VALUE:[0: for int in Integer(0,15)] repeat 16
+	guard
+		( bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16() ) and IS_CABAC()
+	end
+	*/
+	
 	//end if
 
 	Residual_luma_AC_init: action ==>
@@ -6913,8 +6919,15 @@ actor Algo_Synp_AVC_FREXT()
 		leveltype = 3
 	do
 		i4x4 := i4x4 +1;
-		if i4x4 = 4 then i4x4 := 0; i8x8 := i8x8 +1; end
-		if i8x8 = NumC8x8 then i8x8 := 0; iCbCr := iCbCr +1; end
+		if i4x4 = 4 then 
+			i4x4 := 0; 
+			i8x8 := i8x8 +1; 
+		end
+		
+		if i8x8 = NumC8x8 then 
+			i8x8 := 0; 
+			iCbCr := iCbCr +1; 
+		end
 	end
 
 	// else

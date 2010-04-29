@@ -365,7 +365,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockExpand_AVC"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockExpand_AVC_FREXT"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -374,7 +374,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockSplit_AVC_FREXT"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockSplit_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -533,10 +533,8 @@
     <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="MbType"/>
     <Connection dst="" dst-port="Intra_DC_flag"
         src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block_CAVLC"
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
         src="Algo_BlockExpand_AVC" src-port="Block"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Entropy_Type"
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="ENTROPY_TYPE"
         src="Algo_Synp_AVC_FREXT" src-port="ENTROPY_TYPE"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block_CABAC"
-        src="Algo_Synp_AVC_FREXT" src-port="Block_CABAC"/>
 </XDF>
