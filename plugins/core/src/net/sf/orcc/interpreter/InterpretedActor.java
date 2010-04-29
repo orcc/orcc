@@ -100,7 +100,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 	private List<NodeInfo> nodeStack;
 	private int nodeStackLevel;
-	private Map<String,Expression> parameters; 
+	private Map<String, Expression> parameters;
 	protected ActionScheduler sched;
 
 	/**
@@ -112,7 +112,8 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * @param actor
 	 *            an actor
 	 */
-	public InterpretedActor(String id, Map<String,Expression> parameters, Actor actor) {
+	public InterpretedActor(String id, Map<String, Expression> parameters,
+			Actor actor) {
 		super(id, actor);
 		sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
@@ -134,7 +135,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// Creates an expression evaluator for state and local variables init
 		this.constEval = new ConstantEvaluator();
-		
+
 		// Get the parameters value from instance map
 		this.parameters = parameters;
 	}
@@ -240,8 +241,12 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	public void initialize() {
 		// Initialize actors parameters with instance map
 		for (Variable param : actor.getParameters()) {
-			param.setValue(parameters.get(param.getName()).accept(exprInterpreter));
+			Expression value = parameters.get(param.getName());
+			if (value != null) {
+				param.setValue(value.accept(exprInterpreter));
+			}
 		}
+
 		// Check for List state variables which need to be allocated or
 		// initialized
 		for (Variable stateVar : actor.getStateVars()) {

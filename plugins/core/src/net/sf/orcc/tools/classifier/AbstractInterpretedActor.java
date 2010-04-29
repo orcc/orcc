@@ -28,9 +28,12 @@
  */
 package net.sf.orcc.tools.classifier;
 
+import java.util.HashMap;
+
 import net.sf.orcc.interpreter.InterpretedActor;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Pattern;
 
 /**
@@ -57,7 +60,7 @@ public class AbstractInterpretedActor extends InterpretedActor {
 			ConfigurationAnalyzer analyzer) {
 		// TODO : "null" argument must be replaced by the instance parameters
 		// map for actor initialization
-		super(id, null, actor);
+		super(id, new HashMap<String, Expression>(), actor);
 
 		// will schedule one step at a time
 		isSynchronousScheduler = true;

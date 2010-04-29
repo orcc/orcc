@@ -65,15 +65,19 @@ public class CBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		if (merge) {
+		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
+		if (classify) {
 			network.classifyActors();
-			network.normalizeActors();
-			network.mergeActors();
-		} else {
-			boolean classify = getAttribute("net.sf.orcc.backends.classify",
+
+			boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
 					false);
-			if (classify) {
-				network.classifyActors();
+			if (normalize) {
+				network.normalizeActors();
+			}
+			
+			boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
+			if (merge) {
+				network.mergeActors();
 			}
 		}
 
@@ -135,7 +139,7 @@ public class CBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
-		
+
 		actor.computeTemplateMaps();
 	}
 

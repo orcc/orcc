@@ -97,21 +97,21 @@
          <option
                defaultValue="false"
                id="net.sf.orcc.backends.classify"
-               description="Whether actors should be classified"
+               description="This option enables optimizations such as transformation to higher-level and actor merging"
                name="Classify actors">
             <checkBox>
                <option
-                     defaultValue="true"
-                     description="Classify actors independently of their neighbours"
-                     id="net.sf.orcc.backends.classifyIntra"
-                     name="intra">
+                     defaultValue="false"
+                     id="net.sf.orcc.backends.normalize"
+                     description="Transform actors to higher-level"
+                     name="Transform actors to higher-level">
                   <checkBox></checkBox>
                </option>
                <option
                      defaultValue="false"
-                     description="&lt;Description of groquier&apos;s classification method&gt;"
-                     id="net.sf.orcc.backends.classifyGroquier"
-                     name="groquier">
+                     description="When activated, static actors will be merged together"
+                     id="net.sf.orcc.backends.merge"
+                     name="Merge static actors together">
                   <checkBox></checkBox>
                </option>
             </checkBox>
@@ -120,7 +120,7 @@
                defaultValue="false"
                description="Uses an experimental scheduler instead of using the default round-robin scheduler"
                id="net.sf.orcc.backends.newScheduler"
-               name="Use the experimental scheduler (not functional yet)">
+               name="Use the experimental scheduler">
             <checkBox></checkBox>
          </option>
          <option
