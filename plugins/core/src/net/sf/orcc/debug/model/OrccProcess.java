@@ -55,6 +55,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.interpreter.InterpreterMain;
+import net.sf.orcc.network.Network;
 import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.OrccLaunchConstants;
 
@@ -371,6 +372,10 @@ public class OrccProcess extends PlatformObject implements IProcess {
 			BackendFactory factory = BackendFactory.getInstance();
 			factory.runBackend(this, configuration);
 		} catch (Exception e) {
+			// clear actor pool because it might not have been done if we got an
+			// error too soon
+			Network.clearActorPool();
+
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					backend + " backend could not generate code", e);
 			throw new CoreException(status);
