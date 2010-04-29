@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-03-12
+-- Last update: 2010-04-21
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -64,34 +64,40 @@ end;
 package body orcc_package is
 
   function bitand(op1 : integer; op2 : integer; size : integer) return integer is
-    variable arg1   : std_logic_vector(size - 1 downto 0);
-    variable arg2   : std_logic_vector(size - 1 downto 0);
+    variable arg1 : std_logic_vector(size downto 0);
+    variable arg2 : std_logic_vector(size downto 0);
+    variable arg3 : std_logic_vector(size downto 0);
   begin
-      arg1   := std_logic_vector(to_signed(op1, size));
-      arg2   := std_logic_vector(to_signed(op2, size));
-    return to_integer(signed(arg1 and arg2));
+    arg1 := std_logic_vector(to_signed(op1, size +1));
+    arg2 := std_logic_vector(to_signed(op2, size +1));
+    arg3 := arg1 and arg2;
+    return to_integer(signed(arg3(size -1 downto 0)));
   end function;
 
   function bitor(op1 : integer; op2 : integer; size : integer) return integer is
-    variable arg1   : std_logic_vector(size - 1 downto 0);
-    variable arg2   : std_logic_vector(size - 1 downto 0);
+    variable arg1 : std_logic_vector(size downto 0);
+    variable arg2 : std_logic_vector(size downto 0);
+    variable arg3 : std_logic_vector(size downto 0);  
   begin
-      arg1   := std_logic_vector(to_signed(op1, size));
-      arg2   := std_logic_vector(to_signed(op2, size));
-    return to_integer(signed(arg1 or arg2));
+    arg1 := std_logic_vector(to_signed(op1, size +1));
+    arg2 := std_logic_vector(to_signed(op2, size +1));
+    arg3 := arg1 or arg2;
+    return to_integer(signed(arg3(size -1 downto 0)));
   end function;
 
   function bitxor(op1 : integer; op2 : integer; size : integer) return integer is
-    variable arg1   : std_logic_vector(size - 1 downto 0);
-    variable arg2   : std_logic_vector(size - 1 downto 0);
+    variable arg1 : std_logic_vector(size downto 0);
+    variable arg2 : std_logic_vector(size downto 0);
+    variable arg3 : std_logic_vector(size downto 0);   
   begin
-      arg1   := std_logic_vector(to_signed(op1, size));
-      arg2   := std_logic_vector(to_signed(op2, size));
-    return to_integer(signed(arg1 xor arg2));
+    arg1 := std_logic_vector(to_signed(op1, size +1));
+    arg2 := std_logic_vector(to_signed(op2, size +1));
+    arg3 := arg1 xor arg2;
+    return to_integer(signed(arg3(size -1 downto 0)));
   end function;
 
   function bitnot(op1 : integer; size : integer) return integer is
-    variable result : std_logic_vector(size - 1 downto 0);
+    variable result : std_logic_vector(size downto 0);
   begin
     result := not std_logic_vector(to_signed(op1, size));
     return to_integer(signed(result));
@@ -124,5 +130,6 @@ package body orcc_package is
   begin
     return to_integer(to_signed(op1, size) srl op2);
   end function;
-  
+
+ 
 end package body orcc_package;
