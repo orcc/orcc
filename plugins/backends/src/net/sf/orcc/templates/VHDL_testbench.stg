@@ -1,52 +1,65 @@
 fifo_in(port) ::= <<
 $
 if(port.type.bool)
-$signal $actor.name$_$port.name$_data  : std_logic;$\n$$
+$signal $instance.id$_$port.name$_data  : std_logic;$\n$$
 else
-$signal $actor.name$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $instance.id$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif
 $
-signal $actor.name$_$port.name$_send : std_logic;
-signal $actor.name$_$port.name$_ack  : std_logic;
+signal $instance.id$_$port.name$_send : std_logic;
+signal $instance.id$_$port.name$_ack  : std_logic;
 >>
 
 fifo_out(port) ::= <<
-signal $actor.name$_$port.name$_full  : std_logic;
+signal $instance.id$_$port.name$_full  : std_logic;
 $
 if(last(port.name))
 $$
 if(port.type.bool)
-$signal $actor.name$_$port.name$_data  : std_logic;$\n$$
+$signal $instance.id$_$port.name$_data  : std_logic;$\n$$
 else
-$signal $actor.name$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $instance.id$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif
-$signal $actor.name$_$port.name$_write : std_logic;$
+$signal $instance.id$_$port.name$_write : std_logic;$
 else
-$signal $actor.name$_$port.name$_data  : $port.type$;
-signal $actor.name$_$port.name$_write : std_logic;$
+$signal $instance.id$_$port.name$_data  : $port.type$;
+signal $instance.id$_$port.name$_write : std_logic;$
 endif
 $
 >>
 
 
 fifo_in_init(port) ::=<<
-$actor.name$_$port.name$_send <= '0';$"\n"$
+$instance.id$_$port.name$_send <= '0';$"\n"$
 >>
 fifo_out_init(port) ::=<<
-$actor.name$_$port.name$_full <= '0';$"\n"$
+$instance.id$_$port.name$_full <= '0';$"\n"$
 >>
 
-fifo_map_in(port) ::= <<
-$actor.name$_$port.name$_data  => $actor.name$_$port.name$_data,
-$actor.name$_$port.name$_send => $actor.name$_$port.name$_send,
-$actor.name$_$port.name$_ack   => $actor.name$_$port.name$_ack
+fifo_actor_in(port) ::= <<
+$instance.actor.name$_$port.name$_data  => $instance.id$_$port.name$_data,
+$instance.actor.name$_$port.name$_send  => $instance.id$_$port.name$_send,
+$instance.actor.name$_$port.name$_ack   => $instance.id$_$port.name$_ack
 >>
 
-fifo_map_out(port) ::= <<
-$actor.name$_$port.name$_data  => $actor.name$_$port.name$_data,
-$actor.name$_$port.name$_full  => $actor.name$_$port.name$_full,
-$actor.name$_$port.name$_write => $actor.name$_$port.name$_write
+fifo_actor_out(port) ::= <<
+$instance.actor.name$_$port.name$_data  => $instance.id$_$port.name$_data,
+$instance.actor.name$_$port.name$_full  => $instance.id$_$port.name$_full,
+$instance.actor.name$_$port.name$_write => $instance.id$_$port.name$_write
 >>
+
+fifo_network_in(port) ::= <<
+$instance.network.name$_$port.name$_data  => $instance.id$_$port.name$_data,
+$instance.network.name$_$port.name$_send  => $instance.id$_$port.name$_send,
+$instance.network.name$_$port.name$_ack   => $instance.id$_$port.name$_ack
+>>
+
+fifo_network_out(port) ::= <<
+$instance.network.name$_$port.name$_data  => $instance.id$_$port.name$_data,
+$instance.network.name$_$port.name$_full  => $instance.id$_$port.name$_full,
+$instance.network.name$_$port.name$_write => $instance.id$_$port.name$_write
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,38 +70,38 @@ listSize(value) ::= <<
 $value : {[$it$]} $
 >>
 
-sig_const() ::= <<
+sig_const(input, output) ::= <<
 constant PERIOD      : time := 10 ns;
 --
 type severity_level is (note, warning, error, failure);
 type tb_type is (after_reset, read_file, CheckRead);
 --
 -- Input files
-$actor.inputs.list: signal_in(); separator="\n"$
+$input.list: signal_in(); separator="\n"$
 --
 -- Output files
-$actor.outputs.list: signal_out(); separator="\n"$
+$output.list: signal_out(); separator="\n"$
 --
 -- Input signals
-$actor.inputs.list: fifo_in(); separator="\n"$
+$input.list: fifo_in(); separator="\n"$
 --
 -- Output signals
-$actor.outputs.list: fifo_out(); separator="\n"$
+$output.list: fifo_out(); separator="\n"$
 --
 -- Configuration
 signal count             : integer range 255 downto 0;
 signal clock             : std_logic := '0';
-signal reset_n           : std_logic;
+signal reset_n           : std_logic := '0';
 
 >>
 
 signal_in(port) ::= <<
-signal tb_FSM_$actor.name$_$port.name$  : tb_type;
-file sim_file_$actor.name$_$port.name$  : text is "$actor.name$_$port.name$_sim.txt";
+signal tb_FSM_$instance.id$_$port.name$  : tb_type;
+file sim_file_$instance.id$_$port.name$  : text is "$instance.id$_$port.name$_sim.txt";
 >>
 
 signal_out(port) ::= <<
-file sim_file_$actor.name$_$port.name$  : text is "$actor.name$_$port.name$_sim.txt";
+file sim_file_$instance.id$_$port.name$  : text is "$instance.id$_$port.name$_sim.txt";
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,13 +112,7 @@ init_process() ::= <<
 clock <= not clock after PERIOD/2;
 
 -- reset generation
-process
-begin
-  reset_n <= '0';
-  wait for 10*PERIOD;
-  reset_n <= '1';
-  wait;
-end process;
+reset_n <= '1' after 10*PERIOD;
 
 >>
 
@@ -116,7 +123,7 @@ tb_FSM_$actor.name$_$port.name$ <= after_reset;
     
 
 
-waveform_process_in() ::= <<
+waveform_process_in(input) ::= <<
 --
 -- Input(s) waveform Generation
 WaveGen_Proc_In : process (reset_n, clock)
@@ -124,12 +131,12 @@ WaveGen_Proc_In : process (reset_n, clock)
   variable line_number : line;
 begin
   if reset_n = '0' then
-    $actor.inputs.list: fifo_in_init()$    --
-    $actor.inputs.list: tb_FSM_init()$    count <= 0;
+    $input.list: fifo_in_init()$    --
+    $input.list: tb_FSM_init()$    count <= 0;
   --  
   elsif falling_edge(clock) then
     --
-    $actor.inputs.list: case_define_in(); separator="\n"$$\n$
+    $input.list: case_define_in(); separator="\n"$$\n$
   end if;
 end process WaveGen_Proc_In;
 
@@ -155,47 +162,47 @@ case tb_FSM_$actor.name$_$port.name$ is
 $
 if(port.type.bool)
 $      if (input_bit = 1) then
-         $actor.name$_$port.name$_data  <= '1';
+         $instance.id$_$port.name$_data  <= '1';
        else
-         $actor.name$_$port.name$_data  <= '0';
+         $instance.id$_$port.name$_data  <= '0';
        end if;$
 else
 $$
   if(port.type.int)
-  $        $actor.name$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
+  $        $instance.id$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
   else
-  $        $actor.name$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
+  $        $instance.id$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
   endif
   $$
 endif
-$        $actor.name$_$port.name$_send <= '1';    
-        tb_FSM_$actor.name$_$port.name$ <= CheckRead;
+$        $instance.id$_$port.name$_send <= '1';    
+        tb_FSM_$instance.id$_$port.name$ <= CheckRead;
       end if;
     end if;
 
   when CheckRead =>
-    if (not endfile (sim_file_$actor.name$_$port.name$)) and $actor.name$_$port.name$_ack = '1' then
-      readline(sim_file_$actor.name$_$port.name$, line_number);
+    if (not endfile (sim_file_$instance.id$_$port.name$)) and $instance.id$_$port.name$_ack = '1' then
+      readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
 $
 if(port.type.bool)
 $      if (input_bit = 1) then
-         $actor.name$_$port.name$_data  <= '1';
+         $instance.id$_$port.name$_data  <= '1';
        else
-         $actor.name$_$port.name$_data  <= '0';
+         $instance.id$_$port.name$_data  <= '0';
        end if;$
 else
 $$
   if(port.type.int)
-  $        $actor.name$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
+  $        $instance.id$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
   else
-  $        $actor.name$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
+  $        $instance.id$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
   endif
   $$
 endif
-$        $actor.name$_$port.name$_send <= '1';      
+$        $instance.id$_$port.name$_send <= '1';      
       end if;
     end if;
 
@@ -203,17 +210,17 @@ $        $actor.name$_$port.name$_send <= '1';
 end case;
 >>
 
-waveform_process_out() ::= <<
+waveform_process_out(output) ::= <<
 -- Output(s) waveform Generation
 WaveGen_Proc_Out : process (reset_n, clock)
   variable Input_bit   : integer range 2147483647 downto - 2147483648;
   variable line_number : line;
 begin
   if reset_n = '0' then
-    $actor.outputs.list: fifo_out_init()$    --
+    $output.list: fifo_out_init()$    --
   elsif rising_edge(clock) then
     --
-    $actor.outputs.list: case_define_out(); separator="\n"$
+    $output.list: case_define_out(); separator="\n"$
   end if;
 end process WaveGen_Proc_Out;
 
@@ -221,39 +228,39 @@ end process WaveGen_Proc_Out;
 
 
 case_define_out(port) ::= <<
-    if (not endfile (sim_file_$actor.name$_$port.name$) and $actor.name$_$port.name$_write = '1') then
-      readline(sim_file_$actor.name$_$port.name$, line_number);
+    if (not endfile (sim_file_$instance.id$_$port.name$) and $instance.id$_$port.name$_write = '1') then
+      readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
 $
 if(port.type.bool)
 $        if Input_bit = 1 then
-          assert ($actor.name$_$port.name$_data = '1')
+          assert ($instance.id$_$port.name$_data = '1')
             report "incorrectly value computed : 0 instead of : 1"
             severity error;
         else
-          assert ($actor.name$_$port.name$_data = '0')
+          assert ($instance.id$_$port.name$_data = '0')
             report "incorrectly value computed : 1 instead of : 0"
             severity error;                
         end if;$
 else
 $$
   if(port.type.int)
-  $        assert ($actor.name$_$port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
-          -- report "incorrectly value computed : " & to_string(to_integer(to_signed($actor.name$_$port.name$_data))) & " instead of :" & to_string(input_bit)
-          report "incorrectly value computed : " & str(to_integer(signed($actor.name$_$port.name$_data))) & " instead of :" & str(input_bit)
+  $        assert ($instance.id$_$port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
+          -- report "incorrectly value computed : " & to_string(to_integer(to_signed($instance.id$_$port.name$_data))) & " instead of :" & to_string(input_bit)
+          report "incorrectly value computed : " & str(to_integer(signed($instance.id$_$port.name$_data))) & " instead of :" & str(input_bit)
           severity error;$\n$$
   else
-  $        assert ($actor.name$_$port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
-          report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($actor.name$_$port.name$_data))) & " instead of :" & to_string(input_bit)
-          --report "Incorrectly value computed : " & str(to_integer(unsigned($actor.name$_$port.name$_data))) & " instead of :" & str(input_bit)
+  $        assert ($instance.id$_$port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
+          report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($instance.id$_$port.name$_data))) & " instead of :" & to_string(input_bit)
+          --report "Incorrectly value computed : " & str(to_integer(unsigned($instance.id$_$port.name$_data))) & " instead of :" & str(input_bit)
           severity error;$\n$$
   endif
   $$
 endif
 $        --
-        $actor.name$_$port.name$_full <= '0';    
+        $instance.id$_$port.name$_full <= '0';    
       end if;
     end if;
 
@@ -264,7 +271,7 @@ $        --
 ///////////////////////////////////////////////////////////////////////////////
 testbench(instance, actor) ::= <<
 ------------------------------------------------------------------------------
--- Generated from $actor.name$ actor
+-- Generated from $instance.id$
 ------------------------------------------------------------------------------
 
 library ieee;
@@ -275,31 +282,55 @@ use ieee.numeric_std.all;
 library work;
 use work.sim_package.all;
 
-entity $actor.name$_testbench is
+entity $instance.id$_testbench is
 
-end $actor.name$_testbench;
+end $instance.id$_testbench;
 
 
-architecture rtl of $actor.name$_testbench is 
+architecture rtl of $instance.id$_testbench is 
 
-  ---------------------------------------------------------------------------
+$
+if(instance.actor)
+$  ---------------------------------------------------------------------------
   -- Signal & constant declaration
   --------------------------------------------------------------------------- 
-  $sig_const()$
+  $sig_const(input=instance.actor.inputs,output=instance.actor.outputs)$
   ---------------------------------------------------------------------------
 
 begin
 
-  $actor.name$_orcc : entity work.$actor.name$
+  $instance.actor.name$_orcc : entity work.$instance.actor.name$
     port map (
       clock      => clock,
       reset_n    => reset_n,
-      $actor.inputs.list: fifo_map_in(); separator=",\n"$,
-      $actor.outputs.list: fifo_map_out(); separator=",\n"$);
+      $instance.actor.inputs.list: fifo_actor_in(); separator=",\n"$,
+      $instance.actor.outputs.list: fifo_actor_out(); separator=",\n"$);
       
     $init_process()$
-    $waveform_process_in()$
-    $waveform_process_out()$
+    $waveform_process_in(input=instance.actor.inputs)$
+    $waveform_process_out(output=instance.actor.outputs)$
+$
+else
+$  ---------------------------------------------------------------------------
+  -- Signal & constant declaration
+  --------------------------------------------------------------------------- 
+  $sig_const(input=instance.network.inputs,output=instance.network.outputs)$
+  ---------------------------------------------------------------------------
+
+begin
+
+  $instance.network.name$_orcc : entity work.$instance.network.name$
+    port map (
+      clock      => clock,
+      reset_n    => reset_n,
+      $instance.network.inputs.list: fifo_network_in(); separator=",\n"$,
+      $instance.network.outputs.list: fifo_network_out(); separator=",\n"$);
+      
+    $init_process()$
+    $waveform_process_in(input=instance.network.inputs)$
+    $waveform_process_out(output=instance.network.outputs)$$
+endif
+$
 
 end architecture rtl;
 >>
