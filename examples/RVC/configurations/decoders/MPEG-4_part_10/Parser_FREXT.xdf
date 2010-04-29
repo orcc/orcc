@@ -361,7 +361,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_BlockExpand_AVC">
+    <Instance id="Algo_BlockExpand_AVC_FREXT">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -456,11 +456,11 @@
     </Connection>
     <Connection dst="Algo_Synp_AVC_FREXT" dst-port="nb_rbsp_bytes"
         src="Algo_NALU" src-port="nb_rbsp_bytes"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="RUN"
+    <Connection dst="Algo_BlockExpand_AVC_FREXT" dst-port="RUN"
         src="Algo_Synp_AVC_FREXT" src-port="RUN"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="VALUE"
+    <Connection dst="Algo_BlockExpand_AVC_FREXT" dst-port="VALUE"
         src="Algo_Synp_AVC_FREXT" src-port="VALUE"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="LAST"
+    <Connection dst="Algo_BlockExpand_AVC_FREXT" dst-port="LAST"
         src="Algo_Synp_AVC_FREXT" src-port="LAST"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="CurrMbAddr"
         src="Algo_Synp_AVC_FREXT" src-port="CurrMbAddr"/>
@@ -534,7 +534,7 @@
     <Connection dst="" dst-port="Intra_DC_flag"
         src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
     <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
-        src="Algo_BlockExpand_AVC" src-port="Block"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="ENTROPY_TYPE"
+        src="Algo_BlockExpand_AVC_FREXT" src-port="Block"/>
+    <Connection dst="Algo_BlockExpand_AVC_FREXT" dst-port="ENTROPY_TYPE"
         src="Algo_Synp_AVC_FREXT" src-port="ENTROPY_TYPE"/>
 </XDF>

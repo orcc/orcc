@@ -54,15 +54,15 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
 actor Algo_BlockExpand_AVC_FREXT () 
-		bool ENTROPY_TYPE,
+		int(size=2) ENTROPY_TYPE,
 		uint(size=4) RUN, 
 		int(size=12) VALUE,
 		bool LAST 
   			==> 
   			int(size=16) Block :
 
-  bool EntropyType  := true; //CAVLC :true and CABAC: false
-  bool TypeReceived := false;
+  int EntropyType;
+  bool TypeNotReceived := false;
   
   List(type:int(size=16), size=16) value_buf := [ 0 : for int i in Integers(0,15) ];  
   uint(size=5) stuff_count := 0;
@@ -76,20 +76,20 @@ actor Algo_BlockExpand_AVC_FREXT ()
   
   action ENTROPY_TYPE:[ x ] ==>
   guard
-  	not TypeReceived
+  		not TypeNotReceived
   do
   		EntropyType  := x;
-  		TypeReceived := true;
+  		TypeNotReceived := true;
   end
  
   CAVLC_Split: action ==>
   guard
-  	EntropyType
+  	EntropyType = 0 and TypeNotReceived
   end
   
   CABAC_Split: action ==>
   guard
-  	not EntropyType
+  	EntropyType = 1 and TypeNotReceived
   end
   
   sent_cabac_block: action VALUE:[x] ==> Block:[x]
