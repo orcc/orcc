@@ -1,0 +1,47 @@
+// Mgnt_Merger420
+//
+// Author: Christophe Lucarz (christophe.lucarz@epfl.ch)
+actor Mgnt_Merger_xilinx () int(size=9) YUV_i ==> uint(size=8) YUV :
+
+	List(type: uint(size=8), size=256) out_y := [ 0 : for int i in Integers(0, 255) ];
+
+	// Select the Y blocks 
+	Y: action YUV_i:[ y ] repeat 256 ==> YUV:[ out_y ] repeat 256
+	do
+		foreach int j in Integers(0, 7) do
+			foreach int i in Integers(0, 7) do
+				out_y[i + j * 16] := y[i + j * 8];
+			end
+		end
+		foreach int j in Integers(0, 7) do
+			foreach int i in Integers(0, 7) do
+				out_y[i + 8 + j * 16] := y[i + 64 + j * 8];
+			end
+		end
+		foreach int j in Integers(0, 7) do
+			foreach int i in Integers(0, 7) do
+				out_y[i + (j + 8) * 16] := y[i + 2 * 64 + j * 8];
+			end
+		end
+		foreach int j in Integers(0, 7) do
+			foreach int i in Integers(0, 7) do
+				out_y[i + 8 + (j + 8) * 16] := y[i + 3 * 64 + j * 8];
+			end
+		end
+	end
+
+	// Select the U blocks 
+	U: action YUV_i:[ u ] repeat 64 ==> YUV:[ u ] repeat 64
+	end
+
+	// Select the V blocks 
+	V: action YUV_i:[ v ] repeat 64 ==> YUV:[ v ] repeat 64
+	end
+
+	schedule fsm Y :
+		Y ( Y ) --> U;
+		U ( U ) --> V;
+		V ( V ) --> Y;
+	end
+
+end
