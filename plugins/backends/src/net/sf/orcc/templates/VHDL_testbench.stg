@@ -117,7 +117,7 @@ reset_n <= '1' after 10*PERIOD;
 >>
 
 tb_FSM_init(port) ::= <<
-tb_FSM_$actor.name$_$port.name$ <= after_reset;
+tb_FSM_$instance.id$_$port.name$ <= after_reset;
 
 >>
     
@@ -145,17 +145,17 @@ end process WaveGen_Proc_In;
 
 case_define_in(port) ::= <<
 
-case tb_FSM_$actor.name$_$port.name$ is
+case tb_FSM_$instance.id$_$port.name$ is
   when after_reset =>
     count <= count + 1;
     if count = 15 then
-      tb_FSM_$actor.name$_$port.name$ <= read_file;
+      tb_FSM_$instance.id$_$port.name$ <= read_file;
       count           <= 0;
     end if;
 
   when read_file =>
-    if (not endfile (sim_file_$actor.name$_$port.name$)) then
-      readline(sim_file_$actor.name$_$port.name$, line_number);
+    if (not endfile (sim_file_$instance.id$_$port.name$)) then
+      readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
         read(line_number, input_bit);
