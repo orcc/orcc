@@ -2376,6 +2376,72 @@ actor Algo_Synp_AVC_FREXT()
 	*************************************************************
 	*************************************************************/
 	
+	function SCAN8(int x) --> int:
+		zigzag_scan[x]
+	end
+	
+	function InverseScan4x4(uint(size=4) index, uint stride) --> uint :
+		(InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4)
+	end
+	
+	function InverseRasterScan(int a, int b, int c, int d, int e ) --> uint :
+		if e = 0 then
+			( a mod ( d/b ) ) * b
+		else 
+			( a / ( d / b ) ) * c
+		end
+	end
+	
+	function GetMb4x4_X() --> int:
+	  InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 0 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 0 )
+	end
+	
+	function GetMb4x4_Y() --> int:
+	  InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 1 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 1 )
+	end
+	
+	function GetMb4x4_Chroma_X() --> int:
+	  InverseRasterScan( luma4x4BlkIdx, 4, 4, 8, 0 )
+	end
+	
+	function GetMb4x4_Chroma_Y() --> int:
+	  InverseRasterScan( luma4x4BlkIdx, 4, 4, 8, 1 )
+	end
+	
+	procedure getNeighbouring(int xN, int yN, int maxW, int maxH)
+	begin
+		if xN < 0 then
+  			if yN < maxH - 1 then
+				NeighMbAvail := mbAddrA_Avail();
+				NeighMbAddr := GiveMbAddrA();
+  			else
+				NeighMbAvail := false;
+  			end
+ 		else
+			if xN < maxW - 1 then
+  				if yN < 0 then
+					NeighMbAvail := mbAddrB_Avail();
+					NeighMbAddr := GiveMbAddrB();
+  				else
+    				if yN < maxH - 1 then
+      					NeighMbAvail := true;
+      					NeighMbAddr  := val_CurrMbAddr;
+    				end
+			end
+			else
+				NeighMbAvail := false;
+			end
+		end
+ 
+  
+		//Give xW
+		NeighMb_xW := ( xN + maxW ) mod maxW;
+	  
+		//Give yW
+		NeighMb_yW := ( yN + maxH ) mod maxH;
+	end
+	
+	
 	// FIXME : Add the possibility to return false when the mbAddr belongs to another slice
 	function mbAddrAvailable( int mbAddrN ) --> bool : 
 		if ( ( mbAddrN < 0 ) or ( mbAddrN > PicSizeInMbs ) )then 
@@ -2406,7 +2472,7 @@ actor Algo_Synp_AVC_FREXT()
 		mbAddrAvailable( GiveMbAddrB() )
 	end
 	
-	function GivePrevMbAdd( ) --> int :
+	function GivePrevMbAdd() --> int :
 		val_CurrMbAddr - 1
 	end
 	
@@ -2414,90 +2480,51 @@ actor Algo_Synp_AVC_FREXT()
 		val_CurrMbAddr != 0
 	end
 	
-	function GiveMbSliceTypeAddrA( ) --> int :
-		if (mbAddrA_Avail() ) then
-			mbTab[ GiveMbAddrA() ][ mbSliceType ]
-		else
-			-1
-		end		
-	end
-	
-	function GiveMbSliceTypeAddrB( ) --> int :
-		if (mbAddrB_Avail() ) then
-			mbTab[ GiveMbAddrB() ][ mbSliceType ]
-		else
-			-1
-		end		
-	end
-	
-	function GiveMbSliceTypePrevMbAddr( ) --> int :
-		if (prevMbAddr_Avail() ) then
-			mbTab[ GivePrevMbAdd() ][ mbSliceType ]
-		else
-			-1
-		end		
-	end
-	
-	function GiveMbTypeAddrA( ) --> int :
-		if (mbAddrA_Avail() ) then
-			mbTab[ GiveMbAddrA() ][ mbTabAvail ]
-		else
-			-1
-		end		
-	end
-	
-	function GiveMbTypeAddrB( ) --> int :
-		if (mbAddrB_Avail() ) then
-			mbTab[ GiveMbAddrB() ][ mbTabAvail ]
+	function GiveMbSliceType(bool MbAvail, int mbAdresse) --> int :
+		if ( MbAvail ) then
+			mbTab[ mbAdresse ][ mbSliceType ]
 		else
 			-1
 		end		
 	end
 		
-	function GiveMbTypePrevMbAddr( ) --> int:
-		if (prevMbAddr_Avail() ) then
-			mbTab[ GivePrevMbAdd() ][ mbTabAvail ]
+	
+	function GiveMbType( bool MbAvail, int mbAdresse ) --> int :
+		if ( MbAvail ) then
+			mbTab[ mbAdresse ][ mbTabMbtype ]
+		else
+			-1
+		end		
+	end
+	
+	function GiveIntraChromaPredMode( bool MbAvail, int mbAdresse ) --> int :
+		if ( MbAvail ) then
+			mbTab[ mbAdresse ][ mbIntraChromaPredMode ]
 		else
 			-1
 		end		
 	end
 	
 	
-	function GiveIntraChromaPredModeAddrA( ) --> int :
-		if (mbAddrA_Avail() ) then
-			mbTab[ GiveMbAddrA() ][ mbIntraChromaPredMode ]
-		else
-			-1
-		end		
-	end
-	
-	function GiveIntraChromaPredModeAddrB( ) --> int :
-		if (mbAddrB_Avail() ) then
-			mbTab[ GiveMbAddrB() ][ mbIntraChromaPredMode ]
-		else
-			-1
-		end		
-	end
-	
-	function GiveCBPLumaPrevMbAddr() --> int :
-		if( prevMbAddr_Avail() ) then
-			mbTab[ GivePrevMbAdd() ][ mbCBPLuma ]
+	function GiveCBPLuma( bool MbAvail, int mbAdresse ) --> int :
+		if( MbAvail ) then
+			mbTab[ mbAdresse ][ mbCBPLuma ]
 		else
 			-1
 		end
 	end
 	
-	function GiveCBPChromaPrevMbAddr() --> int :
-		if( prevMbAddr_Avail() ) then
-			mbTab[ GivePrevMbAdd() ][ mbCBPChroma ]
+	function GiveCBPChroma( bool MbAvail, int mbAdresse ) --> int :
+		if( MbAvail ) then
+			mbTab[ mbAdresse ][ mbCBPChroma ]
 		else
 			-1
 		end
 	end
 	
-	function GiveMbQpDelta() -->  int:
-	if( prevMbAddr_Avail() ) then
-			mbTab[ GivePrevMbAdd() ][ mbQpDelta ]
+	function GiveMbQpDelta( bool MbAvail, int mbAdresse ) -->  int:
+		if( MbAvail ) then
+			mbTab[ mbAdresse ][ mbQpDelta ]
 		else
 			-1
 		end
@@ -2514,35 +2541,47 @@ actor Algo_Synp_AVC_FREXT()
 	
 	procedure ctxIdxincMbType() 
 	var
-		int condTermFlagA,
-		int condTermFlagB
+		int  condTermFlagA,
+		int  condTermFlagB,
+		int  mbAddr,
+		bool AvailMb
 	begin
-		if ( not mbAddrA_Avail() ) then
+		//N = A
+		getNeighbouring(-1, 0, 16, 16);
+		//Assign Values
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if ( not AvailMb ) then
 			condTermFlagA := 0;
 		else
-		    if ( ctxIdxOffset = 0  and ( IS_SI(GiveMbSliceTypeAddrA() ) and ( IS_I4x4(GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) and IS_INxN( GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) ) ) or
-				 ctxIdxOffset = 3  and IS_INxN( GiveMbSliceTypeAddrA(), GiveMbTypeAddrA() ) or
-				 ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
-					
+			if ( ( ctxIdxOffset = 0 and IS_SI(GiveMbSliceType(AvailMb,mbAddr))) or		  
+			     ( ctxIdxOffset = 3  and IS_INxN( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr) ) ) or
+			     ( ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) )then
+	
 				 condTermFlagA := 0;
 			else
 				 condTermFlagA := 1;
 			end	
-			
-		
 		end
 		
-		if ( not mbAddrB_Avail() ) then
-			 condTermFlagB := 0;
+		//N = B
+		getNeighbouring(0, -1, 16, 16);
+		//Assign Values
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if ( not AvailMb ) then
+			condTermFlagB := 0;
 		else
-		    if( ctxIdxOffset = 0  and ( IS_SI( GiveMbSliceTypeAddrB() ) and ( IS_I4x4( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) and IS_INxN( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) ) ) or
-			    ctxIdxOffset = 3  and IS_INxN( GiveMbSliceTypeAddrB(), GiveMbTypeAddrB() ) or
-			    ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) then
+			if ( ( ctxIdxOffset = 0 and IS_SI(GiveMbSliceType(AvailMb,mbAddr))) or		  
+			     ( ctxIdxOffset = 3  and IS_INxN( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr) ) ) or
+			     ( ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) )then
 	
-			    condTermFlagB := 0;
+				 condTermFlagB := 0;
 			else
 				 condTermFlagB := 1;
-			end
+			end	
 		end
 		
 		ctxIdxInc := condTermFlagA + condTermFlagB;
@@ -2551,14 +2590,22 @@ actor Algo_Synp_AVC_FREXT()
 	procedure ctxIdxincIntraChromaPredmode()
 	var
 		int condTermFlagA,
-		int condTermFlagB
+		int condTermFlagB,
+		int  mbAddr,
+		bool AvailMb
 	begin
-		if not mbAddrA_Avail() then
+		//N = A
+		getNeighbouring(-1, 0, 16, 16);
+		//Assign Values
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if ( not AvailMb ) then
 			condTermFlagA := 0;
 		else	
-			if ( IS_P( GiveMbSliceTypeAddrA() ) or
-			     GiveMbSliceTypeAddrA() = SLICE_TYPE_I and GiveMbTypeAddrA() = 25 or
-			     GiveIntraChromaPredModeAddrA() = 0 ) then
+			if ( IS_P( GiveMbSliceType(AvailMb,mbAddr) ) or
+			     GiveMbType(AvailMb,mbAddr) = 25 or
+			     GiveIntraChromaPredMode(AvailMb,mbAddr) = 0 ) then
 			 
 				 condTermFlagA := 0;
 			else
@@ -2566,32 +2613,45 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if  not mbAddrB_Avail() then
-			condTermFlagB := 0;
-		else
-			if ( IS_P( GiveMbSliceTypeAddrB() ) or
-			     GiveMbSliceTypeAddrB() = SLICE_TYPE_I and GiveMbTypeAddrB() = 25 or
-			     GiveIntraChromaPredModeAddrB() = 0 ) then
+		//N = B
+		getNeighbouring(0, -1, 16, 16);
+		//Assign Values
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if ( not AvailMb ) then
+			condTermFlagA := 0;
+		else	
+			if ( IS_P( GiveMbSliceType(AvailMb,mbAddr) ) or
+			     GiveMbType(AvailMb,mbAddr) = 25 or
+			     GiveIntraChromaPredMode(AvailMb,mbAddr) = 0 ) then
 			 
 				 condTermFlagB := 0;
 			else
 				 condTermFlagB := 1;
 			end
-		
 		end
+		
 			
 		ctxIdxInc := condTermFlagA + condTermFlagB;
 	end
 	
 	procedure ctxIdxincMbQpDelta()
+	var
+		int  mbAddr,
+		bool AvailMb
 	begin
+		//Assign Values
+		mbAddr  := GivePrevMbAdd();
+		AvailMb := prevMbAddr_Avail();
+		
 		//FIXME add P_Skip and B_Skip
 		if not prevMbAddr_Avail() then
 			ctxIdxInc := 0;
 		else
-			if ( GiveMbSliceTypePrevMbAddr() = SLICE_TYPE_I and GiveMbTypePrevMbAddr() = 25 or
-		          not IS_INxN( GiveMbSliceTypePrevMbAddr(), GiveMbTypePrevMbAddr() ) and GiveCBPLumaPrevMbAddr() = 0 and GiveCBPChromaPrevMbAddr() = 0 or
-				  GiveMbQpDelta() = 0 ) then
+			if ( GiveMbSliceType(AvailMb,mbAddr) = SLICE_TYPE_I and GiveMbType(AvailMb,mbAddr) = 25 or
+		             not IS_INxN( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr)) and GiveCBPLuma(AvailMb,mbAddr) = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0 or
+			     GiveMbQpDelta(AvailMb,mbAddr)  = 0 )  then
 				 
 				 ctxIdxInc := 0;
 			else
@@ -2607,46 +2667,25 @@ actor Algo_Synp_AVC_FREXT()
 		int condTermFlagB,
 		int xN,
 		int yN,
-		int mbAddrA,
-		int mbAddrB,
-		bool AvailMbA,
-		bool AvailMbB
+		int mbAddr,
+		bool AvailMb
 		
 	begin
 		//if ctxIdxOffset = 73 then
-		AvailMbA := false;
+		//AvailMbA := false;
 		//Neighbouring for A
-		xN := ( luma8x8BlkIdx mod 2 ) * 8 - 1;
-		yN := ( luma8x8BlkIdx  /  2 ) * 8; 
+		xN := ( binIdx mod 2 ) * 8 ;
+		yN := ( binIdx  /  2 ) * 8; 
 		
-		if xN < 0 and ( yN >= 0 and yN < 15 ) then
-				mbAddrA  := GiveMbAddrA();
-				AvailMbA :=  mbAddrA_Avail();
-			else
-				if xN >= 0 and xN < 15 and yN >= 0 and yN < 15 then
-					mbAddrA := val_CurrMbAddr;
-					AvailMbA := true;
-				end
-		end
+		getNeighbouring(xN - 1, yN, 8, 8);
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
 		
-		//Neighbouring for B
-		xN := ( luma8x8BlkIdx mod 2 ) * 8;
-		yN := ( luma8x8BlkIdx  /  2 ) * 8 - 1; 
-		if yN < 0 and ( xN >= 0 and xN < 15 ) then
-				mbAddrB  := GiveMbAddrB();
-				AvailMbB :=  mbAddrB_Avail();
-			else
-				if xN >= 0 and xN < 15 and yN >= 0 and yN < 15 then
-					mbAddrB := val_CurrMbAddr;
-					AvailMbB := true;
-				end
-		end
-		
-		if  not AvailMbA then
+		if  not AvailMb then
 			condTermFlagA := 0;
 		else
-			if  ( mbTab[mbAddrA][mbTabMbtype] = 25 and  mbTab[mbAddrA][mbSliceType] = 2 ) or
-				  ( mbAddrA != val_CurrMbAddr and ( mbTab[mbAddrA][mbTabMbtype] != P_Skip or mbTab[mbAddrA][mbTabMbtype] != B_Skip ) ) then
+			if  ( GiveMbType(AvailMb,mbAddr) = 25 and GiveMbSliceType(AvailMb,mbAddr) = 2 ) or
+				  ( mbAddr != val_CurrMbAddr and ( GiveMbType(AvailMb,mbAddr) != P_Skip or GiveMbType(AvailMb,mbAddr) != B_Skip ) ) then
 				
 				condTermFlagA := 0;
 			else
@@ -2654,11 +2693,15 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if  not AvailMbB then
+		getNeighbouring(xN , yN - 1, 8, 8);
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if  not AvailMb then
 			condTermFlagB := 0;
 		else
-			if  ( mbTab[mbAddrB][mbTabMbtype] = 25 and  mbTab[mbAddrB][mbSliceType] = 2 ) or
-			    ( mbAddrB != val_CurrMbAddr and ( mbTab[mbAddrB][mbTabMbtype] != P_Skip or mbTab[mbAddrB][mbTabMbtype] != B_Skip ) ) then
+			if  ( GiveMbType(AvailMb,mbAddr) = 25 and GiveMbSliceType(AvailMb,mbAddr) = 2 ) or
+				  ( mbAddr != val_CurrMbAddr and ( GiveMbType(AvailMb,mbAddr) != P_Skip or GiveMbType(AvailMb,mbAddr) != B_Skip ) ) then
 				
 				condTermFlagB := 0;
 			else
@@ -2673,38 +2716,54 @@ actor Algo_Synp_AVC_FREXT()
 	var
 		int condTermFlagA,
 		int condTermFlagB,
+		int mbAddr,
+		bool AvailMb,
 		int temp
 	begin
 		//if ctxIdxOffset = 77
-		if not mbAddrA_Avail() then
+		
+		//N = A
+		getNeighbouring(-1, 0, 16, 16);
+		//Assign Values
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if ( not AvailMb ) then
 			condTermFlagA := 0;
 		else
-			if ( mbTab[GiveMbAddrA()][mbTabMbtype] = 25 and mbTab[GiveMbAddrA()][mbSliceType] = SLICE_TYPE_I ) then
+			if ( GiveMbType(AvailMb,mbAddr) = 25 and GiveMbSliceType(AvailMb,mbAddr) = SLICE_TYPE_I ) then
 				condTermFlagA := 1;
 			end
 			
-			if ( binIdx = 0 and mbTab[GiveMbAddrA()][mbCBPChroma] = 0) or
-			   ( binIdx = 1 and mbTab[GiveMbAddrA()][mbCBPChroma] = 2) then
+			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) = 2) then
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
 			end
 		end
 		
-		if not mbAddrB_Avail() then
+		//N = A
+		getNeighbouring(0, -1, 16, 16);
+		//Assign Values
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if ( not AvailMb ) then
 			condTermFlagB := 0;
 		else
-			if ( mbTab[GiveMbAddrB()][mbTabMbtype] = 25 and mbTab[GiveMbAddrB()][mbSliceType] = SLICE_TYPE_I ) then
+			if ( GiveMbType(AvailMb,mbAddr) = 25 and GiveMbSliceType(AvailMb,mbAddr) = SLICE_TYPE_I ) then
 				condTermFlagB := 1;
 			end
 			
-			if ( binIdx = 0 and mbTab[GiveMbAddrB()][mbCBPChroma] = 0) or
-			   ( binIdx = 1 and mbTab[GiveMbAddrB()][mbCBPChroma] = 2) then
+			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) = 2) then
 				condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
 			end
 		end
+		
 		if binIdx = 1 then
 			temp := 4;
 		else
@@ -2719,19 +2778,31 @@ actor Algo_Synp_AVC_FREXT()
 	procedure ctxIdxTransSize8x8Flag()
 	var
 		int condTermFlagA,
-		int condTermFlagB
+		int condTermFlagB,
+		int mbAddr,
+		bool AvailMb
 	begin
-		if not mbAddrA_Avail() then
+		getNeighbouring(-1, 0, 8, 8);
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		
+		if not AvailMb then
 				condTermFlagA := 0;
 		else
-			if mbTab[GiveMbAddrA()][mbTransSize8x8Flag] = 0 then
+			if mbTab[mbAddr][mbTransSize8x8Flag] = 0 then
 				condTermFlagA := 1;
 			end
 		end
-		if not mbAddrB_Avail() then
+		
+		getNeighbouring(0, -1, 8, 8);
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if not AvailMb then
 				condTermFlagB := 0;
 		else
-			if mbTab[GiveMbAddrB()][mbTransSize8x8Flag] = 0 then
+			if mbTab[mbAddr][mbTransSize8x8Flag] = 0 then
 				condTermFlagB := 1;
 			end
 		end
@@ -2811,72 +2882,7 @@ actor Algo_Synp_AVC_FREXT()
 		end
 		
 	end
-	
-	function SCAN8(int x) --> int:
-		zigzag_scan[x]
-	end
-	
-	function InverseScan4x4(uint(size=4) index, uint stride) --> uint :
-		(InverseScan4x4Tab[index] /4) * stride + (InverseScan4x4Tab[index] mod 4)
-	end
-	
-	function InverseRasterScan(int a, int b, int c, int d, int e ) --> uint :
-		if e = 0 then
-			( a mod ( d/b ) ) * b
-		else 
-			( a / ( d / b ) ) * c
-		end
-	end
-	
-	function GetMb4x4_X() --> int:
-	  InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 0 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 0 )
-	end
-	
-	function GetMb4x4_Y() --> int:
-	  InverseRasterScan( ( luma4x4BlkIdx / 4 ), 8, 8, 16, 1 ) + InverseRasterScan( ( luma4x4BlkIdx mod 4 ), 4, 4, 8, 1 )
-	end
-	
-	function GetMb4x4_Chroma_X() --> int:
-	  InverseRasterScan( luma4x4BlkIdx, 4, 4, 8, 0 )
-	end
-	
-	function GetMb4x4_Chroma_Y() --> int:
-	  InverseRasterScan( luma4x4BlkIdx, 4, 4, 8, 1 )
-	end
-	
-	procedure getNeighbouring(int xN, int yN, int maxW, int maxH)
-	begin
-		if xN < 0 then
-  			if yN < maxH - 1 then
-				NeighMbAvail := mbAddrA_Avail();
-				NeighMbAddr := GiveMbAddrA();
-  			else
-				NeighMbAvail := false;
-  			end
- 		else
-			if xN < maxW - 1 then
-  				if yN < 0 then
-					NeighMbAvail := mbAddrB_Avail();
-					NeighMbAddr := GiveMbAddrB();
-  				else
-    				if yN < maxH - 1 then
-      					NeighMbAvail := true;
-      					NeighMbAddr  := val_CurrMbAddr;
-    				end
-			end
-			else
-				NeighMbAvail := false;
-			end
-		end
- 
-  
-	//Give xW
-	NeighMb_xW := ( xN + maxW ) mod maxW;
-  
-	//Give yW
-	NeighMb_yW := ( yN + maxH ) mod maxH;
-	end
-	
+		
 	procedure ctxIdxCodedBlockFlag()
 	var
 		int transBlockA,
@@ -2892,13 +2898,7 @@ actor Algo_Synp_AVC_FREXT()
 		int chroma4x4BlkIdxA,
 		int chroma4x4BlkIdxB,
 		int condTermFlagA,
-		int condTermFlagB,
-		int x,
-		int y,
-		int xN,
-		int yN,
-		int xW,
-		int yW
+		int condTermFlagB
 	begin
 		ctxIdxInc := 0;
 		
@@ -5510,8 +5510,9 @@ actor Algo_Synp_AVC_FREXT()
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
-			MvRes:[0,0], 
+			MvRes:[0,0],
 			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+			
 	guard
 		prevMbSkipped = 1
 	var 
@@ -5525,6 +5526,19 @@ actor Algo_Synp_AVC_FREXT()
 			moreDataFlag := more_rbsp_data();
 		end
 	end
+	/*
+	
+	read_SliceD_mb_skip_run_done1_CAVLC: action ==>  LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+	guard
+		IS_CAVLC()
+	end
+	
+	read_SliceD_mb_skip_run_done1_CABAC: action ==>
+	guard
+		IS_CAVBAC()
+	end
+	*/
+	
 
 	read_SliceD_mb_skip_run_done2: action ==>
 	guard
@@ -6062,13 +6076,17 @@ actor Algo_Synp_AVC_FREXT()
 	// --> residual( )
 
 	//else
-	read_MB_layer_skip_mb_qp_delta: action 
-		==> 
 		
-			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+	read_MB_layer_skip_mb_qp_delta: action ==>  LAST:[[true: for int t in Integers(0,26) ]] repeat 27
 	guard
-		val_CodedBlockPatternLuma = 0, CodedBlockPatternChroma = 0, not IS_Intra_16x16()
+		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and ( not IS_Intra_16x16() ) ) and IS_CAVLC()
 	end
+	
+	read_MB_layer_skip_mb_qp_delta_CABAC: action ==> 
+	guard
+		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and ( not IS_Intra_16x16() ) ) and IS_CABAC()
+	end
+	
 	//end if
 
 	//end if
@@ -6717,7 +6735,12 @@ actor Algo_Synp_AVC_FREXT()
 
 	Residual_return_luma_DC: action ==> LAST:[true]
 	guard
-		leveltype=0
+		leveltype=0 and IS_CAVLC()
+	end
+	
+	Residual_return_luma_DC_CABAC: action ==> 
+	guard
+		leveltype=0 and IS_CABAC()
 	end
 
 	//else
@@ -6777,15 +6800,18 @@ actor Algo_Synp_AVC_FREXT()
 
 	Residual_return_luma_AC: action ==> LAST: [true]
 	guard
-		leveltype = 1
+		leveltype = 1 and IS_CAVLC()
 	end
 	
+	Residual_return_luma_AC_CABAC: action ==>
+	guard
+		leveltype = 1 and IS_CABAC()
+	end
 	
 	// else 
 	Residual_luma_skip_AC_CodedBlock8x8: action ==>  LAST: [true]
 	guard
-		i4x4 < 4,
-		rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 // MB sub part 8x8 == 0
+		(i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CAVLC()
 	do
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 		/*
@@ -6799,6 +6825,24 @@ actor Algo_Synp_AVC_FREXT()
 		*/
 	end
 	// end if
+	
+	Residual_luma_skip_AC_CodedBlock8x8_CABAC: action ==> 
+	guard
+		(i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC()
+	do
+		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
+		/*
+		// if( !bmFlag && MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
+		for( i = 0; i < 15; i++ )
+		i16x16AClevel[ i8x8 * 4 + i4x4 ][ i ] = 0
+		// else
+		for( i = 0; i < 16; i++ )
+		level[ i8x8 * 4 + i4x4 ][ i ] = 0
+		// end if
+		*/
+	end
+	// end if
+	
 
 	/*
 	if( !entropy_coding_mode_flag && transform_size_8x8_flag )
@@ -6880,22 +6924,39 @@ actor Algo_Synp_AVC_FREXT()
 
 	Residual_return_chroma_DC: action ==> LAST: [true]
 	guard
-		leveltype = 2
+		leveltype = 2 and IS_CAVLC()
 	do
 		iCbCr := iCbCr + 1; 
 	end
+	
+	Residual_return_chroma_DC_CABAC: action ==>
+	guard
+		leveltype = 2 and IS_CABAC()
+	do
+		iCbCr := iCbCr + 1; 
+	end
+	
+	
 
 	// else
 	Residual_skip_chroma_DC_init: action ==> LAST: [true]
 	guard
-		iCbCr < 2,
-		bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0
+		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CAVLC()
 	do
 		//for( i = 0; i < 4 * NumC8x8; i++ )
 		//ChromaDCLevel[ iCbCr ][ i ] = 0
 		iCbCr := iCbCr + 1; 
 	end   
 	//end if
+	
+	Residual_skip_chroma_DC_init_CABAC: action ==> LAST: [true]
+	guard
+		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC()
+	do
+		//for( i = 0; i < 4 * NumC8x8; i++ )
+		//ChromaDCLevel[ iCbCr ][ i ] = 0
+		iCbCr := iCbCr + 1; 
+	end   
 
 	Residual_skip_chroma_DC: action ==>
 	guard
@@ -6931,7 +6992,7 @@ actor Algo_Synp_AVC_FREXT()
 
 	Residual_return_chroma_AC: action ==> LAST:[true]
 	guard
-		leveltype = 3
+		leveltype = 3 and IS_CAVLC()
 	do
 		i4x4 := i4x4 +1;
 		if i4x4 = 4 then 
@@ -6944,12 +7005,28 @@ actor Algo_Synp_AVC_FREXT()
 			iCbCr := iCbCr +1; 
 		end
 	end
+	
+	Residual_return_chroma_AC_CABAC: action ==> LAST:[true]
+	guard
+		leveltype = 3 and IS_CABAC()
+	do
+		i4x4 := i4x4 +1;
+		if i4x4 = 4 then 
+			i4x4 := 0; 
+			i8x8 := i8x8 +1; 
+		end
+		
+		if i8x8 = NumC8x8 then 
+			i8x8 := 0; 
+			iCbCr := iCbCr +1; 
+		end
+	end
+	
 
 	// else
 	Residual_chroma_AC_skip_CodedBlock4x4: action ==> LAST: [true]
 	guard
-		iCbCr < 2,
-		bitand(CodedBlockPatternChroma, 2) != 2 or endIdx <= 0
+		(iCbCr < 2 and bitand(CodedBlockPatternChroma, 2) != 2 or endIdx <= 0) and IS_CAVLC()
 	do
 		/* for( i = 0; i < 15; i++ )
 		ChromaACLevel[ iCbCr ][ i8x8*4+i4x4 ][ i ] = 0
@@ -6959,6 +7036,21 @@ actor Algo_Synp_AVC_FREXT()
 		if i8x8 = NumC8x8 then i8x8:=0; iCbCr := iCbCr +1; end
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 	end
+	
+	
+	Residual_chroma_AC_skip_CodedBlock4x4_CABAC: action ==> VALUE: [[0: for int j in Integers(0,15)]] repeat 16
+	guard
+		(iCbCr < 2 and bitand(CodedBlockPatternChroma, 2) != 2 or endIdx <= 0) and IS_CABAC()
+	do
+		/* for( i = 0; i < 15; i++ )
+		ChromaACLevel[ iCbCr ][ i8x8*4+i4x4 ][ i ] = 0
+		*/
+		i4x4 := i4x4 +1;
+		if i4x4 = 4 then i4x4 := 0; i8x8 := i8x8 +1; end
+		if i8x8 = NumC8x8 then i8x8:=0; iCbCr := iCbCr +1; end
+		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
+	end
+	
 	//end if
 
 	Residual_skip_chroma_AC: action ==> 
@@ -7291,15 +7383,13 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 	
-		
-		
-
-		
 		numCoeff := block_endIdx + 1;
 		blCabacIdx := block_startIdx;
 		//Delete previous Decoded level
 		foreach int i in Integers(0, maxNumCoeff - 1) do
-			level[i] := 0;
+			 significant_coeff_flag[i]      := 0;
+			 last_significant_coeff_flag[i] := 0;
+			 level[i] := 0;
 		end
 	end
 
@@ -7356,7 +7446,7 @@ actor Algo_Synp_AVC_FREXT()
 	//skip significant_coeff_flag[ i ] read
 	Residual_block_skip_significant_coeff_flag_while: action ==>
 	guard
-		blCabacIdx > numCoeff - 1
+		blCabacIdx >= numCoeff - 1
 	do
 		//Read coeff_abs_level_minus1[ numCoeff - 1 ]
 		GetCabacCoeffAbsLevelMinus1SyntaxElement();
@@ -7402,7 +7492,7 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	
 	
-	Residual_block_update_coeffLevel_not_read: action ==> VALUE : [ 0 ]
+	Residual_block_update_coeffLevel_not_read: action ==> 
 	guard
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 0
 	do
@@ -7764,6 +7854,7 @@ actor Algo_Synp_AVC_FREXT()
 		read_MB_layer_mb_qp_delta_done						( read_MB_layer_mb_qp_delta_done	                ) --> Residual_init; 
 		// --> residual ()
 		read_MB_layer_mb_qp_delta							( read_MB_layer_skip_mb_qp_delta					) --> SliceD_update;
+		read_MB_layer_mb_qp_delta							( read_MB_layer_skip_mb_qp_delta_CABAC				) --> SliceD_update;
 
 		// sub_mb_pred
 		Sub_mb_pred											( sub_MB_pred_init_sub_mb_type						) --> read_sub_MB_pred_sub_mb_type;
@@ -7832,6 +7923,7 @@ actor Algo_Synp_AVC_FREXT()
 		Residual_init										( Residual_init										) --> Residual_luma_DC_init;
 		Residual_luma_DC_init								( Residual_luma_DC_init								) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_luma_DC							) --> Residual_luma_AC_init;
+		Residual_return										( Residual_return_luma_DC_CABAC						) --> Residual_luma_AC_init;
 		Residual_luma_DC_init								( Residual_luma_skip_DC_init						) --> Residual_luma_AC_init;
 		Residual_luma_DC_init								( Residual_luma_skip_DC_init_CABAC					) --> Residual_luma_AC_init;
 		Residual_luma_AC_init								( Residual_luma_AC_init								) --> Residual_luma_AC_CAVLC;
@@ -7839,18 +7931,25 @@ actor Algo_Synp_AVC_FREXT()
 		Residual_luma_AC_CAVLC								( Residual_luma_AC_CAVLC							) --> Residual_luma_AC_CodedBlock8x8;
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_AC_CodedBlock8x8					) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_luma_AC							) --> Residual_luma_inc_AC_4x4;
+		Residual_return										( Residual_return_luma_AC_CABAC						) --> Residual_luma_inc_AC_4x4;
+		
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8				) --> Residual_luma_inc_AC_4x4;
+		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC			) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
 		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma;		
 		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_chroma_DC_init							) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_chroma_DC							) --> Residual_chroma_DC_init;
+		Residual_return										( Residual_return_chroma_DC_CABAC					) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init						) --> Residual_chroma_DC_init;
+		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init_CABAC				) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_skip_chroma_DC							) --> Residual_chroma_AC_init;
 		Residual_chroma_AC_init								( Residual_chroma_AC_init							) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_CodedBlock4x4 					) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_chroma_AC							) --> Residual_chroma_AC_CodedBlock4x4;
+		Residual_return										( Residual_return_chroma_AC_CABAC					) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4 			) --> Residual_chroma_AC_CodedBlock4x4;
+		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4_CABAC 			) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_skip_chroma_AC							) --> SliceD_update; 
 		// --> macrobloc_layer / --> Slice_data
 
