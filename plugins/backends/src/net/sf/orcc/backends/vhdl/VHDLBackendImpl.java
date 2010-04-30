@@ -66,12 +66,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 		main(VHDLBackendImpl.class, args);
 	}
 
-	private NetworkPrinter networkPrinter;
-
 	/**
-	 * printer is protected
+	 * printers are protected
 	 */
 	private VHDLActorPrinter printer;
+	private NetworkPrinter networkPrinter;	
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
@@ -115,6 +114,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				networkPrinter.printNetwork(outputName, subNetwork, false,
 						fifoSize);
 			}
+			new TCLPrinter().printTCL(path, network);		
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

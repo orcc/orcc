@@ -1,0 +1,28 @@
+printActor(id, actor) ::= <<
+$
+if (!actor.system)
+$$id$.vhd
+$
+endif
+$
+>>
+
+printInstance(instance) ::= <<
+$
+if (instance.actor)
+$$printActor(id=instance.id, actor=instance.actor)$$
+endif
+$
+>>
+
+TCLLists(network) ::= <<
+# Generated from $network.name$
+set SRC "../Src"
+
+# Comon
+vcom -93 -reportprogress 30 -work work SRC/clip_sv.vhd
+$network.instances: printInstance()$)
+
+
+
+>>
