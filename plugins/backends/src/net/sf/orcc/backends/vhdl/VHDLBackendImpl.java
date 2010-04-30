@@ -113,7 +113,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 			networkPrinter = new NetworkPrinter("VHDL_network");
 
 			String outputName = path + File.separator + "Design"
-					+ File.separator + network.getName() + "_TOP.vhd";
+					+ File.separator + network.getName() + ".vhd";
 			networkPrinter.printNetwork(outputName, network, false, fifoSize);
 
 			for (Network subNetwork : network.getNetworks()) {

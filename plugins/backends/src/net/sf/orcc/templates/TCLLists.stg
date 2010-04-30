@@ -1,18 +1,25 @@
 printEntity(entity) ::= <<
-vcom -93 -reportprogress 30 -work work \$SRC/$entity$.vhd
+vcom -93 -reportprogress 30 -work work \$Design/$entity$.vhd
 >>
 
 TCLLists(name, entities) ::= <<
 # Generated from $name$
 set SRC "../Src"
+set Design "../Src/Design"
+set Testbench "../Src/Testbench"
 
-# Comon
+# Compile
 vcom -93 -reportprogress 30 -work work \$SRC/orcc_package.vhd
 vcom -93 -reportprogress 30 -work work \$SRC/arbiter.vhd
 vcom -93 -reportprogress 30 -work work \$SRC/fifo_generic.vhd
 vcom -93 -reportprogress 30 -work work \$SRC/fifo_top.vhd
 vcom -93 -reportprogress 30 -work work \$SRC/sim_package.vhd
-
 $entities: printEntity(); separator="\n"$
+vcom -93 -reportprogress 30 -work work \$Testbench/$name$_tb.vhd
+
+# Simulate
+vsim $name$_testbench
+do wave.do
+run 1 us
 
 >>
