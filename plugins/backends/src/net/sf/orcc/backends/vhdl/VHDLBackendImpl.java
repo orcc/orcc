@@ -70,7 +70,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 * printers are protected
 	 */
 	private VHDLActorPrinter printer;
-	private NetworkPrinter networkPrinter;	
+	private NetworkPrinter networkPrinter;
+	private VHDLTestbenchPrinter tbPrinter;
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
@@ -99,7 +100,14 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
-		printTestbench(network);
+		tbPrinter = new VHDLTestbenchPrinter();
+		File folder = new File(path + File.separator + "Testbench");
+		if (!folder.exists()) {
+			folder.mkdir();
+		}
+
+		Instance instance = new Instance(network.getName(), network);
+		printTestbench(instance);
 
 		try {
 			networkPrinter = new NetworkPrinter("VHDL_network");
@@ -114,26 +122,24 @@ public class VHDLBackendImpl extends AbstractBackend {
 				networkPrinter.printNetwork(outputName, subNetwork, false,
 						fifoSize);
 			}
-			new TCLPrinter().printTCL(path, network);		
+
+			new TCLPrinter().printTCL(path, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
 	}
 
-	private void printTestbench(Network network) throws OrccException {
-		VHDLTestbenchPrinter tbPrinter = new VHDLTestbenchPrinter();
-		try {			
-			for (Network subNetwork : network.getNetworks()) {
-				for (Instance instance : subNetwork.getInstances()) {
-						String id = instance.getId();
-						File folder = new File(path + File.separator
-								+ "Testbench");
-						if (!folder.exists()) {
-							folder.mkdir();
-						}
-						String outputName = path + File.separator + "Testbench"
-								+ File.separator + id + "_tb.vhd";
-						tbPrinter.printTestbench(outputName, instance);
+	private void printTestbench(Instance instance) throws OrccException {
+		try {
+			String id = instance.getId();
+			String outputName = path + File.separator + "Testbench"
+					+ File.separator + id + "_tb.vhd";
+			tbPrinter.printInstance(outputName, instance);
+
+			if (instance.isNetwork()) {
+				Network network = instance.getNetwork();
+				for (Instance subInstance : network.getInstances()) {
+					printTestbench(subInstance);
 				}
 			}
 		} catch (IOException e) {

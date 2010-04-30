@@ -98,6 +98,14 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	private Map<String, Expression> parameters;
 
+	/**
+	 * Creates a new instance of the given broadcast with the given identifier.
+	 * 
+	 * @param id
+	 *            the instance identifier
+	 * @param broadcast
+	 *            a broadcast
+	 */
 	public Instance(String id, Broadcast broadcast) {
 		this.id = id;
 		this.broadcast = broadcast;
@@ -105,6 +113,14 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		this.attributes = new HashMap<String, IAttribute>();
 	}
 
+	/**
+	 * Creates a new instance of the given network with the given identifier.
+	 * 
+	 * @param id
+	 *            the instance identifier
+	 * @param network
+	 *            a network
+	 */
 	public Instance(String id, Network network) {
 		this.id = id;
 		this.network = network;
@@ -112,12 +128,21 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		this.attributes = new HashMap<String, IAttribute>();
 	}
 
+	/**
+	 * Creates a new instance of the given actor with the given identifier.
+	 * 
+	 * @param id
+	 *            the instance identifier
+	 * @param actor
+	 *            an actor
+	 */
 	public Instance(String id, Actor actor) {
 		this.id = id;
 		this.actor = actor;
 		this.parameters = new HashMap<String, Expression>();
 		this.attributes = new HashMap<String, IAttribute>();
 	}
+
 	/**
 	 * Creates a new virtual instance. Only used by subclass Wrapper in the C++
 	 * backend.

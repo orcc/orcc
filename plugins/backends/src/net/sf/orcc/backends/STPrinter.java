@@ -106,7 +106,7 @@ public abstract class STPrinter extends Printer {
 	 */
 	public void printInstance(String fileName, Instance instance)
 			throws IOException {
-		if (!instance.getActor().isSystem()) {
+		if (!instance.isActor() || !instance.getActor().isSystem()) {
 			ST template = group.getInstanceOf("instance");
 
 			template.add("instance", instance);

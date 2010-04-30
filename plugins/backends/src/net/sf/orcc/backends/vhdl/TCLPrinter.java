@@ -33,8 +33,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 import org.stringtemplate.v4.ST;
@@ -48,6 +53,10 @@ import org.stringtemplate.v4.STGroup;
  */
 public class TCLPrinter {
 
+	private List<String> entities;
+
+	private HashSet<String> entitySet;
+
 	private STGroup group;
 
 	/**
@@ -60,8 +69,38 @@ public class TCLPrinter {
 		group = TemplateGroupLoader.loadGroup("TCLLists");
 	}
 
+	private void computeEntityList(Instance instance) {
+		if (instance.isActor()) {
+			Actor actor = instance.getActor();
+			String name = actor.getName();
+			if (!entitySet.contains(name)) {
+				entitySet.add(name);
+				entities.add(name);
+			}
+		} else if (instance.isNetwork()) {
+			Network network = instance.getNetwork();
+			String name = network.getName();
+			if (!entitySet.contains(name)) {
+				for (Instance subInstance : network.getInstances()) {
+					computeEntityList(subInstance);
+				}
+
+				entitySet.add(name);
+				entities.add(name);
+			}
+		}
+	}
+
+	private List<String> getEntities(Instance instance) {
+		entities = new ArrayList<String>();
+		entitySet = new HashSet<String>();
+		computeEntityList(instance);
+		return entities;
+	}
+
 	/**
-	 * Prints the given network, subnetwork and instance to a file whose name is given.
+	 * Prints the given network, subnetwork and instance to a file whose name is
+	 * given.
 	 * 
 	 * @param path
 	 *            output path
@@ -70,10 +109,11 @@ public class TCLPrinter {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public void printTCL(String path, Network network) throws IOException {
+	public void printTCL(String path, Instance instance) throws IOException {
 		ST template = group.getInstanceOf("TCLLists");
-		template.add("network", network);
-		
+		template.add("name", instance.getNetwork().getName());
+		template.add("entities", getEntities(instance));
+
 		String fileName = path + File.separator + "TCLLists.tcl";
 
 		byte[] b = template.render(80).getBytes();
@@ -83,4 +123,3 @@ public class TCLPrinter {
 	}
 
 }
-
