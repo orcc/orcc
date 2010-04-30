@@ -122,22 +122,18 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	private void printTestbench(Network network) throws OrccException {
 		VHDLTestbenchPrinter tbPrinter = new VHDLTestbenchPrinter();
-		try {
+		try {			
 			for (Network subNetwork : network.getNetworks()) {
 				for (Instance instance : subNetwork.getInstances()) {
-					//if (instance.isActor()) {
-						//Actor actor = instance.getActor();
 						String id = instance.getId();
 						File folder = new File(path + File.separator
 								+ "Testbench");
 						if (!folder.exists()) {
 							folder.mkdir();
 						}
-
 						String outputName = path + File.separator + "Testbench"
 								+ File.separator + id + "_tb.vhd";
 						tbPrinter.printTestbench(outputName, instance);
-					//}
 				}
 			}
 		} catch (IOException e) {
