@@ -61,7 +61,7 @@ actor Algo_BlockExpand_AVC_FREXT ()
   			==> 
   			int(size=16) Block :
 
-  int EntropyType;
+  int(size = 2) EntropyType;
   bool TypeNotReceived := false;
   
   List(type:int(size=16), size=16) value_buf := [ 0 : for int i in Integers(0,15) ];  

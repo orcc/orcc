@@ -2050,7 +2050,11 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG then
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG or 
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or 
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or 
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_END_OF_SLICE_FLAG then
+			
 			MaxEleCompTab := synEval_Coded_Bloc_Flag_Ele;
 			foreach int e in Integers(0, MaxEleCompTab - 1) do
 				//BinIdxSize	:= synEval_Coded_Bloc_Flag[e][0];
@@ -2140,6 +2144,11 @@ actor Algo_Synp_AVC_FREXT()
 	procedure GetCabacCoeffSignFlagSyntaxElement()
 	begin
 		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_COEFF_SIGN_FLAG;
+	end
+	
+	procedure GetCabacEndOfSliceFlagSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_END_OF_SLICE_FLAG;
 	end
 	
 	
@@ -2342,18 +2351,18 @@ actor Algo_Synp_AVC_FREXT()
 		end
 		
 		if ( SyntaxElement = CABAC_COEFF_SIGN_FLAG ) then
-			maxBinIdxCtx := 0; //FIXME prefix
+			maxBinIdxCtx := 0;
 			bypassFlag := true;		
 		end
 		
 		if ( SyntaxElement = CABAC_END_OF_SLICE_FLAG ) then
-			maxBinIdxCtx := 0; //FIXME prefix
+			maxBinIdxCtx := 0;
 			ctxIdxOffset := 276;
 			bypassFlag := false;		
 		end
 		
 		if ( SyntaxElement = CABAC_TRANSFORM_SIZE_8x8_FLAG ) then
-			maxBinIdxCtx := 0; //FIXME prefix
+			maxBinIdxCtx := 0;
 			ctxIdxOffset := 399;
 			bypassFlag := false;		
 		end
@@ -3714,9 +3723,9 @@ actor Algo_Synp_AVC_FREXT()
 			// Give the hand to CabacParsing
 			CabacStartProcess := true;
 		end
-		
-		if StartDecodeTerminate then
-			StartDecodeTerminate := false;
+		// Decode Terminate done
+		if ctxIdx = 276 then
+			CabacStartProcess := true;
 		end
 		
 	end	
@@ -3808,32 +3817,27 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if codIOffset >= codIRange then
 			binVal := 1;
+			binValDecoded := true;
+			// Start Cabac Process
+			CabacStartProcess := true;
+			// Give the right write a bit into ReadBinString[]
+			binValDecoded := true;
 		else
 			binVal := 0;
+			if codIRange < 0x100 then
+				StartRenormDRead := true;
+			else
+				binValDecoded := true;
+				// Start Cabac Process
+				CabacStartProcess := true;
+				// Give the right write a bit into ReadBinString[]
+				binValDecoded := true;
+			end
 		end
-		
-		// Give the right write a bit into ReadBinString[]
-		binValDecoded := true;
-		// Do not give the hand to CabacParsing
-		CabacStartProcess := false;
+			
 		StartDecodeTerminate := false;
 	end
 	
-	DecodeTerminate_donne: action ==>
-	guard
-		ctxIdx = 276 and binVal = 1
-	do
-		// Give the hand to CabacParsing
-		CabacStartProcess := true;
-	end
-	
-	DecodeTerminate_not_donne: action ==>
-	guard
-		ctxIdx = 276 and binVal = 0 and
-		StartRenormDRead = false
-	do
-		StartRenormDRead := true;
-	end
 	
 	/********************** Cabac Initialization **********************/
 	
@@ -5439,7 +5443,7 @@ actor Algo_Synp_AVC_FREXT()
 		entropy_coding_mode_flag[pps_id] = 0
 	end
 
-	SliceD_init: action ==>  ENTROPY_TYPE:[if IS_CAVLC() then 1 else 0 end]
+	SliceD_init: action ==>  ENTROPY_TYPE:[entropy_coding_mode_flag[pps_id]]
 	guard
 		(entropy_coding_mode_flag[pps_id] = 1 and done_reading_bits()) or entropy_coding_mode_flag[pps_id] = 0
 	do
@@ -5650,9 +5654,10 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		entropy_coding_mode_flag[pps_id] = 1
 	do
-		println("SliceD_update_CABAC : CABAC not yet implemented");
 		//if( slice_type != I && slice_type != SI )
-		if slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI then prevMbSkipped := mb_skip_flag; end
+		if slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI then 
+		  prevMbSkipped := mb_skip_flag; 
+		end
 		//end if
 		//if( MbaffFrameFlag && val_CurrMbAddr % 2 = = 0 )
 		if MbaffFrameFlag = 1 and (val_CurrMbAddr mod 2) = 0 then 
@@ -5661,11 +5666,22 @@ actor Algo_Synp_AVC_FREXT()
 			// end_of_slice_flag 2 ae(v)
 			// moreDataFlag = !end_of_slice_flag end
 			//println("read ae end_of_slice_flag");
+		else
+		  GetCabacEndOfSliceFlagSyntaxElement();
+		  start_cabac();
 		end
+		
+	end
+	
+	SliceD_update_CABAC_done: action ==>
+	guard
+		IS_CABAC() and cabac_end()
+	do
+		moreDataFlag :=  if cabac_value() = 1 then 0 else 1 end;
 		//end if
 		NextMbAddress();
 	end
-
+	
 	//while( moreDataFlag )
 	SliceD_while_moreDataFlag: action ==>
 	guard
@@ -7714,14 +7730,15 @@ actor Algo_Synp_AVC_FREXT()
 		SliceD_stop_byte_align_done							( send_data_position_information	                ) --> syncSliceD_endwhile;
 		syncSliceD_endwhile									( syncSliceD_endwhile								) --> SliceD_while_moreDataFlag;
 		
-		SliceD_update										( SliceD_update_CABAC								) --> SliceD_while_moreDataFlag;
+		SliceD_update										( SliceD_update_CABAC								) --> SliceD_Update_done;
+		SliceD_Update_done									( SliceD_update_CABAC_done							) --> SliceD_while_moreDataFlag;
 		SliceD_while_moreDataFlag							( SliceD_while_moreDataFlag							) --> sync_do_mb_layer;
 		SliceD_while_moreDataFlag							( SliceD_end										) --> search_start_code;
 		read_SliceD_mb_field_decoding_flag					( SliceD_end										) --> search_start_code;
 		
 		// macrobloc_layer
 		read_MB_layer_mb_type								( read_MB_layer_mb_type								) --> read_MB_layer_mb_type_done;
-		//read_MB_layer_mb_type_done							( read_MB_layer_mb_type_not_done					) --> read_MB_layer_mb_type_done;
+		//read_MB_layer_mb_type_done						( read_MB_layer_mb_type_not_done					) --> read_MB_layer_mb_type_done;
 		read_MB_layer_mb_type_done							( read_MB_layer_mb_type_done						) --> read_MB_layer_check_I_PCM;
 		read_MB_layer_check_I_PCM							( read_MB_layer_I_PCM_alignement					) --> read_MB_layer_pcm_sample_luma0;
 		read_MB_layer_pcm_sample_luma0					    ( read_MB_layer_pcm_sample_luma0	                ) --> read_MB_layer_pcm_sample_luma1;
@@ -7861,7 +7878,7 @@ actor Algo_Synp_AVC_FREXT()
 		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_block_Cabac_read_significant_coeff_flag;
 		
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_Cabac_read_significant_coeff_flag	) --> Residual_block_read_significant_coeff_flag_done;
-		Residual_block_Cabac_read_significant_coeff_flag	( Residual_Sent_Zeros								) --> Residual_block_Sent_Zeros;
+		Residual_block_Cabac_read_significant_coeff_flag	( Residual_Sent_Zeros								) --> Residual_CABAC_Sent_Zeros;
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_skip_significant_coeff_flag_while	) --> Residual_block_read_coeff_abs_level_minus1_first;
 		
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_read_significant_coeff_flag_done	) --> Residual_block_read_last_significant_coeff_flag;

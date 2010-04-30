@@ -321,8 +321,8 @@
     <Connection dst="Deblocking_Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Deblocking_Filter" dst-port="MbIntraFlag" src="" src-port="Mb_TypeC"/>
     <Connection dst="Select_chroma" dst-port="X3" src="" src-port="I_PCM_C"/>
-    <Connection dst="" dst-port="Display_C" src="Buffer_inter" src-port="Display"/>
     <Connection dst="Intra8x8" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Deblocking_Filter" dst-port="Alpha_offset" src="" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="" dst-port="Display_C" src="Select_chroma" src-port="X"/>
 </XDF>

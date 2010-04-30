@@ -370,8 +370,8 @@
     <Connection dst="Deblocking_Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Deblocking_Filter" dst-port="MbIntraFlag" src="" src-port="Mb_Type"/>
     <Connection dst="Select" dst-port="X3" src="" src-port="I_PCM_Y"/>
-    <Connection dst="" dst-port="Display_L" src="Buffer_inter" src-port="Display"/>
     <Connection dst="Intra_16x16" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Intra_4x4" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
+    <Connection dst="" dst-port="Display_L" src="Select" src-port="X"/>
 </XDF>
