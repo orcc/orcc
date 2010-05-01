@@ -1,4 +1,5 @@
 src/actor/ast/Action_sched
+src/actor/ast/Ast2ast_globals
 src/actor/ast/Ast2ir
 src/actor/ast/Ast2ir_action
 src/actor/ast/Ast2ir_expr

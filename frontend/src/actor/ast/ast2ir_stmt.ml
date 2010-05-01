@@ -1,6 +1,6 @@
 (*****************************************************************************)
-(* ORCC frontend                                                             *)
-(* Copyright (c) 2008-2009, IETR/INSA of Rennes.                             *)
+(* Orcc frontend                                                             *)
+(* Copyright (c) 2008-2010, IETR/INSA of Rennes.                             *)
 (* All rights reserved.                                                      *)
 (*                                                                           *)
 (* This software is governed by the CeCILL-B license under French law and    *)
@@ -221,5 +221,9 @@ and create_while env vars graph node loc expr var_info_list children =
 to the action local variables. This is why the function returns a
 (vars, stmts) couple. *)
 let ir_of_stmts env vars graph node stmts =
-	let (vars, last) = ir_of_stmts_rec env (List.rev vars) graph node stmts in
+	let (vars, stmts) =
+		Ast2ast_globals.add_globals_management env (List.rev vars) stmts
+	in
+	
+	let (vars, last) = ir_of_stmts_rec env vars graph node stmts in
 	(vars, last)

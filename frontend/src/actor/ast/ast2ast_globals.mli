@@ -1,6 +1,6 @@
 (*****************************************************************************)
 (* Orcc frontend                                                             *)
-(* Copyright (c) 2008-2009, IETR/INSA of Rennes.                             *)
+(* Copyright (c) 2010, IETR/INSA of Rennes.                                  *)
 (* All rights reserved.                                                      *)
 (*                                                                           *)
 (* This software is governed by the CeCILL-B license under French law and    *)
@@ -14,6 +14,6 @@
 
 (** [ir_of_stmts env vars node stmts] returns [(vars, node)] where [node]
 is the last node translated. *)
-val ir_of_stmts : Ast2ir_util.env -> Calir.IR.var_def list ->
-		Calir.CFG.t -> Calir.IR.node -> Calast.stmt list ->
-  Calir.IR.var_def list * Calir.IR.node
+val add_globals_management : Ast2ir_util.env -> Calir.IR.var_def list ->
+	Calast.stmt list ->
+	Calir.IR.var_def list * Calast.stmt list
