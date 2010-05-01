@@ -48,6 +48,7 @@ let mk_loc loc =
 let rec mk_cst cst =
 	match cst with
 	| CBool b -> bool b
+	| CFloat f -> float f
 	| CInt i -> int i
 	| CList list -> array (List.map (fun cst -> mk_cst cst) list)
 	| CStr s -> string s
@@ -104,6 +105,7 @@ let rec mk_expr expr =
 	let (loc, node) =
 		match expr with
 		| ExprBool (loc, b) -> (loc, bool b)
+		| ExprFloat (loc, f) -> (loc, float f)
 		| ExprInt (loc, i) -> (loc, int i)
 		| ExprStr (loc, s) -> (loc, string s)
 		| ExprVar (loc, var_use) -> (loc, array [ string "var"; mk_var_use var_use])
@@ -121,10 +123,11 @@ let rec mk_expr expr =
 
 and 
 
-(** [mk_type typ] returns a single element that can be "boolType", "intType",
-"listType", "stringType", "uintType", or "voidType". *)
+(** [mk_type typ] returns a string for simple types ("bool", "float", "String", "void")
+or an array for complex types ("int", "uint" and "List") *)
  mk_type = function
 	| TypeBool -> string "bool"
+	| TypeFloat -> string "float"
 	| TypeInt size -> array [string "int"; mk_expr (ExprInt (dummy_loc, size))]
   | TypeList (typ, size) ->
 		array [string "List"; mk_expr (ExprInt (dummy_loc, size)); mk_type typ]

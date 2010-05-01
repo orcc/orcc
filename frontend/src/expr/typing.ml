@@ -76,6 +76,7 @@ let rec check_list_size loc tgt_typ tgt_length typ length =
 let rec type_of_cst cst =
 	match cst with
 		| CBool _ -> TypeBool
+		| CFloat _ -> TypeFloat
 		| CInt int -> type_of_int int
 		| CList list ->
 			(match list with
@@ -153,6 +154,7 @@ let rec type_of_expr = function
 			typ
 		
 	| ExprBool _ -> TypeBool
+	| ExprFloat _ -> TypeFloat
 	| ExprInt (_, int) -> type_of_int int
 	| ExprStr _ -> TypeStr
 	| ExprUOp (loc, uop, expr, typ) ->

@@ -46,6 +46,7 @@ type bop =
 
 type constant =
 	| CBool of bool (** boolean constant *)
+	| CFloat of float (** float constant *)
 	| CInt of int (** integer constant *)
 	| CList of constant list  (** list constant *)
 	| CStr of string (** string constant *)
@@ -59,6 +60,7 @@ type lattice =
 (** A type definition *)
 type type_def =
 	| TypeBool
+	| TypeFloat
 	| TypeInt of int (** int(size=) *)
   | TypeList of type_def * int (** list(type:, size=)*)
 	| TypeStr
@@ -76,6 +78,7 @@ module rec IR :
 		type expr =
 			| ExprBOp of Loc.t * expr * bop * expr * type_def (** CAL binary expression. *)
 			| ExprBool of Loc.t * bool (** CAL boolean literal. *)
+			| ExprFloat of Loc.t * float (** CAL float literal. *)
 			| ExprInt of Loc.t * int (** CAL integer literal. *)
 			| ExprStr of Loc.t * string (** CAL string literal. *)
 			| ExprUOp of Loc.t * uop * expr * type_def (** CAL unary expression. *)
@@ -308,21 +311,3 @@ Fails if [join] is not a [Join]. *)
 val get_join_nodes : IR.node -> IR.node list
 
 val set_join_nodes : IR.node -> IR.node list -> unit
-
-(** [append_node graph existing new_node] appends [new_node] after [existing]. *)
-val append_node : CFG.t -> IR.node -> IR.node -> unit
-
-(** [remove_node graph node] removes the node [node] from the [graph], linking its
-predecessors to its successors. *)
-val remove_node : CFG.t -> IR.node -> unit
-
-val remove_var_use : IR.var_use -> unit
-
-val remove_use : IR.expr -> unit
-
-(** [remove_var_uses graph node] removes all the uses of the variable used by [node]. *)
-val remove_var_uses : CFG.t -> IR.node -> unit
-
-(** [remove_var_uses_join graph join node] removes all the uses of the variable
-used by [node], should be used on complex nodes (if and while). *)
-val remove_var_uses_join : CFG.t -> IR.node -> IR.node -> unit

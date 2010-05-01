@@ -199,6 +199,7 @@ module PrettyPrinter = struct
 
 	let rec pp_expr ?(prec = 0) f = function
 		| ExprBool (_, bool) -> pp f "%B" bool
+		| ExprFloat (_, float) -> pp f "%f" float
 		| ExprInt (_, int) -> pp f "%i" int
 		| ExprStr (_, string) -> pp f "\"%s\"" string
 		| ExprVar (_, var) -> pp_var_use f var
@@ -220,6 +221,7 @@ module PrettyPrinter = struct
 
 	and pp_type f = function
 		| TypeBool -> pp f "bool"
+		| TypeFloat -> pp f "float"
 		| TypeInt size -> pp f "@[<h>int(size=%i)@]" size
 		| TypeStr -> pp f "String"
 		| TypeUint size -> pp f "@[<h>uint(size=%i)@]" size

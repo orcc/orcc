@@ -46,6 +46,7 @@ type bop =
 
 type constant =
 	| CBool of bool
+	| CFloat of float
 	| CInt of int
 	| CList of constant list
 	| CStr of string
@@ -57,6 +58,7 @@ type lattice =
 
 type type_def =
 	| TypeBool
+	| TypeFloat
 	| TypeInt of int
   | TypeList of type_def * int
 	| TypeStr
@@ -71,6 +73,7 @@ module rec IR :
 		type expr =
 			| ExprBOp of Loc.t * expr * bop * expr * type_def
 			| ExprBool of Loc.t * bool
+			| ExprFloat of Loc.t * float
 			| ExprInt of Loc.t * int
 			| ExprStr of Loc.t * string
 			| ExprUOp of Loc.t * uop * expr * type_def
@@ -132,6 +135,7 @@ module rec IR :
 		type expr =
 			| ExprBOp of Loc.t * expr * bop * expr * type_def
 			| ExprBool of Loc.t * bool
+			| ExprFloat of Loc.t * float
 			| ExprInt of Loc.t * int
 			| ExprStr of Loc.t * string
 			| ExprUOp of Loc.t * uop * expr * type_def
@@ -346,6 +350,7 @@ let mk_while graph node loc expr bt last_child e1 e2 =
 
 let rec string_of_constant = function
 	| CBool b -> string_of_bool b
+	| CFloat f -> string_of_float f
 	| CInt i -> string_of_int i
 	| CStr s -> s
 	| CList list -> "[" ^ String.concat ", " (List.map (string_of_constant) list) ^ "]"
@@ -414,6 +419,7 @@ module Iterators = struct
 			| ExprBool _ -> expr
 			| ExprBOp (loc, e1, bop, e2, t) ->
 				ExprBOp (loc, map_expr f e1, bop, map_expr f e2, t)
+			| ExprFloat _ -> expr
 			| ExprInt _ -> expr
 			| ExprStr _ -> expr
 			| ExprUOp (loc, uop, e, t) ->
@@ -429,6 +435,7 @@ module Iterators = struct
 		| ExprBOp (_loc, e1, _bop, e2, _t) ->
 			iter_expr f e1;
 			iter_expr f e2
+		| ExprFloat _ -> ()
 		| ExprInt _ -> ()
 		| ExprStr _ -> ()
 		| ExprUOp (_loc, _uop, e, _t) -> iter_expr f e
@@ -489,80 +496,3 @@ module Iterators = struct
 		actor.ac_initializes
 
 end
-
-(*****************************************************************************)
-(*****************************************************************************)
-(*****************************************************************************)
-
-let rec remove_use = function
-	| ExprBOp (_, e1, _, e2, _) ->
-		remove_use e1;
-		remove_use e2
-	| ExprUOp (_, _, expr, _) -> remove_use expr
-	| ExprVar (_, var_use) -> remove_var_use var_use
-	| _ -> ()
-
-let rec remove_var_uses graph node =
-	match node.n_kind with
-		| AssignPhi (_, _, var_uses, _, _) -> Array.iter remove_var_use var_uses
-		| AssignVar (_, expr) -> remove_use expr
-		| Call (_, _, parameters) -> List.iter remove_use parameters
-		| Return expr -> remove_use expr
-		| Load (_, _, indexes) -> List.iter remove_use indexes
-		| Store (_, indexes, expr) ->
-			List.iter remove_use indexes;
-			remove_use expr
-		| Empty -> ()
-		| Join (_, nodes) -> List.iter (remove_var_uses graph) nodes
-
-		| If (expr, bt, be, if_join) ->
-			remove_use expr;
-			remove_var_uses_join graph if_join bt;
-			remove_var_uses_join graph if_join be
-		| While (expr, bt, _be) ->
-			remove_use expr;
-			remove_var_uses_join graph node bt
-
-		| HasTokens _
-		| Peek _
-		| Read _
-		| Write _ -> ()
-
-and remove_var_uses_join graph join node =
-	Iterators.iter_cfg
-		(fun node _join -> remove_var_uses graph node)
-	graph node join
-
-let remove_node graph node =
-	remove_var_uses graph node;
-	if CFG.mem_vertex graph node then
-		let preds = CFG.pred_e graph node in
-		let succs = CFG.succ_e graph node in
-		List.iter
-			(fun pred_e ->
-				CFG.remove_edge_e graph pred_e;
-				List.iter
-					(fun succ_e ->
-						CFG.remove_edge_e graph succ_e;
-						CFG.add_edge_e graph (CFG.E.src pred_e, CFG.E.label succ_e, CFG.E.dst succ_e))
-				succs)
-		preds;
-		CFG.remove_vertex graph node
-	else
-		match node.n_kind with
-			| AssignPhi (_, _, _, _, join) ->
-				(match join.n_kind with
-					| Join (flags, nodes) ->
-						let nodes = List.filter (fun phi -> phi != node) nodes in
-						join.n_kind <- Join (flags, nodes)
-					| _ -> failwith "never happens")
-			| _ -> ()
-
-let append_node graph existing new_node =
-	let succs = CFG.succ_e graph existing in
-	List.iter
-		(fun succ_e ->
-			CFG.remove_edge_e graph succ_e;
-			CFG.add_edge graph new_node (CFG.E.dst succ_e))
-	succs;
-	CFG.add_edge graph existing new_node
