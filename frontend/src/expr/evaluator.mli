@@ -32,10 +32,3 @@ val ir_of_var_info : Ast2ir_util.env -> Calast.var_info -> Calir.IR.var_def
 (** [ir_of_type env loc typ] translates a [Calast.type_def]
 to a [Calir.type_def]. *)
 val ir_of_type: Ast2ir_util.env -> Loc.t -> Calast.type_def -> Calir.type_def
-
-(** [latt_of_expr expr] returns a [Calir.lattice] from a [Calir.IR.expr]. *)
-val latt_of_expr: Calir.IR.expr -> Calir.lattice
-
-(** [replace_const expr] returns a new expression where references to variables
-with a constant lattice have been replaced by their values. *)
-val replace_const: Calir.IR.expr -> Calir.IR.expr
