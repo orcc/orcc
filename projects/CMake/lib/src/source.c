@@ -52,7 +52,7 @@ void source_initialize() {
 	if (input_file == NULL) {
 		print_usage();
 		fprintf(stderr, "No input file given!\n");
-		pause();
+		wait_for_key();
 		exit(1);
 	}
 
@@ -63,7 +63,7 @@ void source_initialize() {
 		}
 
 		fprintf(stderr, "could not open file \"%s\"\n", input_file);
-		pause();
+		wait_for_key();
 		exit(1);
 	}
 }

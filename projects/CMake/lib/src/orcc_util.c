@@ -90,7 +90,7 @@ void wait_for_key() {
 
 // print APR error and exit
 void print_and_exit(const char *msg) {
-	pause();
+	wait_for_key();
 	exit(1);
 }
 
