@@ -281,7 +281,7 @@ l_$transition.sourceState$:
 	$endif$
 	$if (transition.nextStateInfo.empty)$
 	printf("stuck in state \"$transition.sourceState$\"\n");
-	pause();
+	wait_for_key();
 	exit(1);
 	$else$
 	$schedulingTestState(nextStates=transition.nextStateInfo)$ else {
@@ -309,7 +309,7 @@ switch (_FSM_state) {
 $transitions: switchTransition()$
 default:
 	printf("unknown state: %s\n", stateNames[_FSM_state]);
-	pause();
+	wait_for_key();
 	exit(1);
 }
 >>

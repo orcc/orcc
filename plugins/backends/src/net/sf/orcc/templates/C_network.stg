@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 	scheduler();
 
 	printf("End of simulation! Press a key to continue\n");
-	pause();
+	wait_for_key();
 
 	return 0;
 }
