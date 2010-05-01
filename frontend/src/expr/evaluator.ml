@@ -50,6 +50,7 @@ let rec assert_cst_types_equal loc = function
 @raise NotEvaluable if [e] cannot be statically evaluated. *)
 let rec eval env = function
 	| Calast.ExprBool (_, bool) -> CBool bool
+	| Calast.ExprFloat (_, float) -> CFloat float
 	| Calast.ExprInt (_, int) -> CInt int
 	| Calast.ExprStr (_, str) -> CStr str
 	| Calast.ExprVar (loc, var_ref) ->
@@ -311,6 +312,8 @@ and ir_of_var_info env var_info =
 
 and ir_of_type env loc = function
 	| Calast.TypeBool -> TypeBool
+	| Calast.TypeFloat -> TypeFloat
+	| Calast.TypeStr -> TypeStr
 
 	| Calast.TypeInt expr ->
 		(try
@@ -325,8 +328,6 @@ and ir_of_type env loc = function
 				| CInt i -> TypeList (ir_of_type env loc t, i)
 				| _ -> error_size_not_constant loc "List"
 		with Not_evaluable reason -> error_size_not_constant ~reason loc "List")
-
-	| Calast.TypeStr -> TypeStr
 
 	| Calast.TypeUint expr ->
 		(try

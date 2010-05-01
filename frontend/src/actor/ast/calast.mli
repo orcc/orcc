@@ -50,6 +50,7 @@ type expr =
 	| ExprBOp of Loc.t * expr * bop * expr (** CAL binary expression. *)
 	| ExprBool of Loc.t * bool (** CAL boolean literal. *)
 	| ExprCall of Loc.t * string * expr list (** CAL function call expression. *)
+	| ExprFloat of Loc.t * float (** CAL float literal. *)
 	| ExprIf of Loc.t * expr * expr * expr (** CAL if expression. *)
 	| ExprIdx of Loc.t * var_ref * expr list
 	(** CAL array access expression: array var, indexes. *)
@@ -64,6 +65,7 @@ type expr =
 (** A type definition *)
 and type_def =
 	| TypeBool
+	| TypeFloat
 	| TypeInt of expr (** int(size=) *)
   | TypeList of type_def * expr (** list(type:, size=)*)
 	| TypeStr

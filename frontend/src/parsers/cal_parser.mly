@@ -99,6 +99,7 @@ let find_size_or_default loc typeAttrs default =
 let type_of_typeDef loc name typeAttrs =
 	match name with
 		| "bool" -> Calast.TypeBool
+		| "float" -> Calast.TypeFloat
 		| "int" -> Calast.TypeInt (find_size_or_default loc typeAttrs 32)
 		| "list" ->
 			Asthelper.failwith loc
@@ -550,6 +551,7 @@ expression:
 | LPAREN expression RPAREN { $2 }
 | TRUE { Calast.ExprBool (loc (), true) }
 | FALSE { Calast.ExprBool (loc (), false) }
+| FLOAT { Calast.ExprFloat (loc (), $1) }
 | INT { Calast.ExprInt (loc (), $1) }
 | STRING { Calast.ExprStr (loc (), $1) }
 | ident LPAREN expressionsOpt RPAREN

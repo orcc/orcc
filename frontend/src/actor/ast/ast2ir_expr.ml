@@ -125,6 +125,9 @@ let rec ir_of_expr env vars graph node ((_, target) as context) expr =
 	| Calast.ExprBool (loc, bool) ->
 		let expr = ExprBool (loc, bool) in
 		(env, vars, node, expr)
+	| Calast.ExprFloat (loc, float) ->
+		let expr = ExprFloat (loc, float) in
+		(env, vars, node, expr)
 	| Calast.ExprInt (loc, int) ->
 		let expr = ExprInt (loc, int) in
 		(env, vars, node, expr)
