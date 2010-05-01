@@ -21,11 +21,16 @@ type binding =
 	| Procedure of proc
 	| Variable of var_def
 
-type env = (binding Asthelper.SM.t * int Asthelper.SH.t)
+type env = {
+	bindings: binding Asthelper.SM.t;
+	suffixes: int Asthelper.SH.t
+}
 
-let add_binding (map, ht) name var = (Asthelper.SM.add name var map, ht)
-let get_binding (map, _) var = Asthelper.SM.find var map
-let has_binding (map, _) var = Asthelper.SM.mem var map
+let add_binding env name var =
+	{ env with bindings = Asthelper.SM.add name var env.bindings }
+
+let get_binding env var = Asthelper.SM.find var env.bindings
+let has_binding env var = Asthelper.SM.mem var env.bindings
 
 let get_binding_proc env var =
 	match get_binding env var with
@@ -73,20 +78,20 @@ let add_binding_var_check env var var_def =
 	else
 		add_binding_var env var var_def
 
-let get_suffix (_, ht) var =
+let get_suffix env var =
 	let suffix = 
 		try
-			Asthelper.SH.find ht var
+			Asthelper.SH.find env.suffixes var
 		with Not_found -> 0
 	in
-	Asthelper.SH.replace ht var (suffix + 1);
+	Asthelper.SH.replace env.suffixes var (suffix + 1);
 	Some suffix
 
-let remove_binding_var (map, ht) var =
-	ignore (get_binding_var (map, ht) var.v_name);
-	(Asthelper.SM.remove var.v_name map, ht)
+let remove_binding_var env var =
+	ignore (get_binding_var env var.v_name);
+	{env with bindings = Asthelper.SM.remove var.v_name env.bindings}
 
-let reset_suffix (_, ht) = Asthelper.SH.clear ht
+let reset_suffix env = Asthelper.SH.clear env.suffixes
 
 let mk_external name params return =
 	let entry = mk_node Empty in
@@ -102,7 +107,8 @@ let mk_env () =
 	List.fold_left
 		(fun env (name, params, return) ->
 			add_binding_proc env (mk_external name params return))
-	(Asthelper.SM.empty, Asthelper.SH.create 50)
+	{	bindings = Asthelper.SM.empty;
+		suffixes = Asthelper.SH.create 50 }
 	[
 		("println", [mk_param "msg" TypeStr], TypeVoid)
 	]

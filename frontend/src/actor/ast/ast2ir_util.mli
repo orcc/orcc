@@ -18,7 +18,7 @@ type binding =
   | Procedure of Calir.IR.proc
   | Variable of Calir.IR.var_def
 
-type env = (binding Asthelper.SM.t * int Asthelper.SH.t)
+type env
 
 (** [mk_env ()] creates a new environment. *)
 val mk_env : unit -> env
