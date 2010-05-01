@@ -1,14 +1,14 @@
 BroadcastWrite(n) ::= <<
-tok_output_$n$ = getWritePtr($instance.id$_output_$n$, 1);
+tok_output_$n$ = fifo_$instance.broadcast.type$_write($instance.id$_output_$n$, 1);
 *tok_output_$n$ = *tok_input;
 >>
 
 BroadcastWriteEnd(n) ::= <<
-setWriteEnd($instance.id$_output_$n$, 1);
+fifo_$instance.broadcast.type$_write_end($instance.id$_output_$n$, 1);
 >>
 
 outputPatternPort(num) ::= <<
-if (!hasRoom($instance.id$_output_$num$, 1)) {
+if (!fifo_$instance.broadcast.type$_has_room($instance.id$_output_$num$, 1)) {
 	ports |= (1 << $num$);
 }
 >>
@@ -27,7 +27,7 @@ void $instance.id$_scheduler(struct schedinfo_s *si) {
 	$instance.broadcast.type$ *tok_input;
 	$instance.broadcast.outputList: { n | $instance.broadcast.type$ *tok_output_$n$;
 }$
-	while (hasTokens($instance.id$_input, 1)) {
+	while (fifo_$instance.broadcast.type$_has_tokens($instance.id$_input, 1)) {
 		$outputPattern(instance.broadcast.outputList)$
 			si->num_firings = i;
 			si->reason = full;
@@ -35,9 +35,9 @@ void $instance.id$_scheduler(struct schedinfo_s *si) {
 			return;
 		}
 
-		tok_input = getReadPtr($instance.id$_input, 1);
+		tok_input = fifo_$instance.broadcast.type$_read($instance.id$_input, 1);
 		$instance.broadcast.outputList: BroadcastWrite(); separator="\n"$
-		setReadEnd($instance.id$_input, 1);
+		fifo_$instance.broadcast.type$_read_end($instance.id$_input, 1);
 		$instance.broadcast.outputList: BroadcastWriteEnd(); separator="\n"$
 		i++;
 	}
@@ -89,8 +89,8 @@ $edges: allocateFifo()$
 // assigns FIFOs
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
-struct fifo_s *$source.id$_$sourcePort.name$ = &fifo_$count$;
-struct fifo_s *$target.id$_$targetPort.name$ = &fifo_$count$;
+struct fifo_$sourcePort.type$_s *$source.id$_$sourcePort.name$ = &fifo_$count$;
+struct fifo_$sourcePort.type$_s *$target.id$_$targetPort.name$ = &fifo_$count$;
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<

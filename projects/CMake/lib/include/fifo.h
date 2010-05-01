@@ -40,26 +40,60 @@ struct schedinfo_s {
 	int ports; /** contains a mask that indicate the ports affected */
 };
 
-/** lock free fifo ring buffer structure */
-struct fifo_s {
-	int elt_size; /** the size of an element */
-	int size; /** size of the ringbuffer (in elements) */
-	char *contents; /** the memory containing the ringbuffer */
-	
-	int read_ind; /** the current position of the reader */
-	int write_ind; /** the current position of the writer */
-	int fill_count; /** the fill count */
-
-	char *fifo_buffer_ptr;
-	char fifo_buffer[2048];
-};
+typedef unsigned char u_char;
+typedef unsigned short u_short;
+typedef unsigned int u_int;
 
 // declare FIFO with a size equal to (size)
-#define DECLARE_FIFO(type, size, count) static char array_##count[(size) * sizeof(type)]; \
-static struct fifo_s fifo_##count = { sizeof(type), (size), array_##count, 0, 0 };
+#define DECLARE_FIFO(type, size, count) static type array_##count[(size)]; \
+static struct FIFO_S(type) fifo_##count = { (size), array_##count, 0, 0 };
 
-#define contents(fifo, ptr) (& (fifo)->contents[(ptr) * (fifo)->elt_size])
+#define FIFO_S(T) FIFO_S_EXPAND(T)
+#define FIFO_S_EXPAND(T) fifo_##T##_s
 
-#include "fifo.inl"
+#define FIFO_HAS_ROOM(T) FIFO_HAS_ROOM_EXPAND(T)
+#define FIFO_HAS_ROOM_EXPAND(T) fifo_ ## T ## _has_room
+
+#define FIFO_HAS_TOKENS(T) FIFO_HAS_TOKENS_EXPAND(T)
+#define FIFO_HAS_TOKENS_EXPAND(T) fifo_ ## T ## _has_tokens
+
+#define FIFO_PEEK(T) FIFO_PEEK_EXPAND(T)
+#define FIFO_PEEK_EXPAND(T) fifo_ ## T ## _peek
+
+#define FIFO_READ(T) FIFO_READ_EXPAND(T)
+#define FIFO_READ_EXPAND(T) fifo_ ## T ## _read
+
+#define FIFO_READ_END(T) FIFO_READ_END_EXPAND(T)
+#define FIFO_READ_END_EXPAND(T) fifo_ ## T ## _read_end
+
+#define FIFO_WRITE(T) FIFO_WRITE_EXPAND(T)
+#define FIFO_WRITE_EXPAND(T) fifo_ ## T ## _write
+
+#define FIFO_WRITE_END(T) FIFO_WRITE_END_EXPAND(T)
+#define FIFO_WRITE_END_EXPAND(T) fifo_ ## T ## _write_end
+
+#define T char
+#include "fifo_generic.h"
+#undef T
+
+#define T u_char
+#include "fifo_generic.h"
+#undef T
+
+#define T short
+#include "fifo_generic.h"
+#undef T
+
+#define T u_short
+#include "fifo_generic.h"
+#undef T
+
+#define T int
+#include "fifo_generic.h"
+#undef T
+
+#define T u_int
+#include "fifo_generic.h"
+#undef T
 
 #endif

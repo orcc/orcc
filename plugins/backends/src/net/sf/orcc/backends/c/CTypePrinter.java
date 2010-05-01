@@ -84,7 +84,7 @@ public class CTypePrinter extends DefaultTypePrinter {
 
 	@Override
 	public void visit(UintType type) {
-		builder.append("unsigned ");
+		builder.append("u_");
 		printInt(type.getSize());
 	}
 

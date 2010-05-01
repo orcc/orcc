@@ -47,9 +47,9 @@
 #endif
 
 
-extern struct fifo_s *Compare_B;
-extern struct fifo_s *Compare_WIDTH;
-extern struct fifo_s *Compare_HEIGHT;
+extern struct fifo_char_s *Compare_B;
+extern struct fifo_short_s *Compare_WIDTH;
+extern struct fifo_short_s *Compare_HEIGHT;
 
 #define MAX_WIDTH 704
 #define MAX_HEIGHT 576
@@ -147,12 +147,12 @@ void Compare_write_mb(unsigned char tokens[384]) {
 		for (j = 0; j < 16; j++) {
 			int tok = tokens[cnt];
 			cnt++;
-			
+
 			idx = base + i * m_width + j;
 			img_buf_y[idx] = tok;
 		}
 	}
-	
+
 	base = m_y / 2 * m_width / 2 + m_x / 2;
 	for (i = 0; i < 8; i++) {
 		for (j = 0; j < 8; j++) {
@@ -206,27 +206,28 @@ void Compare_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	while (1) {
-		if (hasTokens(Compare_WIDTH, 1) && hasTokens(Compare_HEIGHT, 1)) {
+		if (fifo_short_has_tokens(Compare_WIDTH, 1) && fifo_short_has_tokens(Compare_HEIGHT, 1)) {
 			short *ptr, width, height;
 
-			ptr = getReadPtr(Compare_WIDTH, 1);
+			ptr = fifo_short_read(Compare_WIDTH, 1);
 			width = ptr[0] * 16;
-			ptr = getReadPtr(Compare_HEIGHT, 1);
+			fifo_short_read_end(Compare_WIDTH, 1);
+
+			ptr = fifo_short_read(Compare_HEIGHT, 1);
 			height = ptr[0] * 16;
+			fifo_short_read_end(Compare_HEIGHT, 1);
 
 			if (init == 1) {
 				Compare_init(width, height);
 				init = 0;
 			}
 
-			setReadEnd(Compare_WIDTH, 1);
-			setReadEnd(Compare_HEIGHT, 1);
 			i++;
 		}
 
-		if (hasTokens(Compare_B, 384)) {
-			Compare_write_mb(getReadPtr(Compare_B, 384));
-			setReadEnd(Compare_B, 384);
+		if (fifo_char_has_tokens(Compare_B, 384)) {
+			Compare_write_mb(fifo_char_read(Compare_B, 384));
+			fifo_char_read_end(Compare_B, 384);
 			i++;
 		} else {
 			break;

@@ -31,68 +31,61 @@
 #include <string.h>
 #include <stdlib.h>
 
-DECL int hasTokens(struct fifo_s *fifo, int n) {
+DECL int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, int n) {
 	return fifo->fill_count >= n;
 }
 
-DECL int hasRoom(struct fifo_s *fifo, int n) {
+DECL int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, int n) {
 	// Test if distance between the read ptr and the write is longer than n
 	return (fifo->size - fifo->fill_count) >= n;
 }
 
-DECL void *getPeekPtr(struct fifo_s *fifo, int n) {
-	if (fifo->read_ind + n > fifo->size) {
+DECL T *FIFO_PEEK(T)(struct FIFO_S(T) *fifo, int n) {
+	if (fifo->read_ind + n <= fifo->size) {
+		return &fifo->contents[fifo->read_ind];
+	} else {
 		int num_end = fifo->size - fifo->read_ind;
 		int num_beginning = n - num_end;
 
 		// Copy the end of the fifo
 		if (num_end != 0) {
-			memcpy(fifo->fifo_buffer, contents(fifo, fifo->read_ind), fifo->elt_size * num_end);
+			memcpy(fifo->fifo_buffer, &fifo->contents[fifo->read_ind], num_end * sizeof(T));
 		}
 
 		// Copy the rest of the data at the beginning of the FIFO
 		if (num_beginning != 0) {
-			memcpy(&fifo->fifo_buffer[fifo->elt_size * num_end], fifo->contents, fifo->elt_size * num_beginning);
+			memcpy(&fifo->fifo_buffer[num_end], fifo->contents, num_beginning * sizeof(T));
 		}
 
-		fifo->fifo_buffer_ptr = fifo->fifo_buffer;
 		return fifo->fifo_buffer;
-	} else {
-		fifo->fifo_buffer_ptr = NULL;
-		return contents(fifo, fifo->read_ind);
 	}
 }
 
-DECL void *getReadPtr(struct fifo_s *fifo, int n) {
-	return getPeekPtr(fifo, n);
+DECL T *FIFO_READ(T)(struct FIFO_S(T) *fifo, int n) {
+	return FIFO_PEEK(T)(fifo, n);
 }
 
-DECL void setReadEnd(struct fifo_s *fifo, int n) {
+DECL void FIFO_READ_END(T)(struct FIFO_S(T) *fifo, int n) {
 	fifo->fill_count -= n;
-	if (fifo->fifo_buffer_ptr == NULL) {
+	if (fifo->read_ind + n <= fifo->size) {
 		fifo->read_ind += n;
 	} else {
-		int num_end = fifo->size - fifo->read_ind;
-		int num_beginning = n - num_end;
-
-		fifo->fifo_buffer_ptr = NULL;
+		int num_beginning = fifo->read_ind + n - fifo->size;
 		fifo->read_ind = num_beginning;
 	}
 }
 
-DECL void *getWritePtr(struct fifo_s *fifo, int n) {
-	if (fifo->write_ind + n > fifo->size) {
-		fifo->fifo_buffer_ptr = fifo->fifo_buffer;
-		return fifo->fifo_buffer;
+DECL T *FIFO_WRITE(T)(struct FIFO_S(T) *fifo, int n) {
+	if (fifo->write_ind + n <= fifo->size) {
+		return &fifo->contents[fifo->write_ind];
 	} else {
-		fifo->fifo_buffer_ptr = NULL;
-		return contents(fifo, fifo->write_ind);
+		return fifo->fifo_buffer;
 	}
 }
 
-DECL void setWriteEnd(struct fifo_s *fifo, int n) {
+DECL void FIFO_WRITE_END(T)(struct FIFO_S(T) *fifo, int n) {
 	fifo->fill_count += n;
-	if (fifo->fifo_buffer_ptr == NULL) {
+	if (fifo->write_ind + n <= fifo->size) {
 		fifo->write_ind += n;
 	} else {
 		int num_end = fifo->size - fifo->write_ind;
@@ -100,15 +93,14 @@ DECL void setWriteEnd(struct fifo_s *fifo, int n) {
 
 		// Copy data at the end of the FIFO
 		if (num_end != 0) {
-			memcpy(contents(fifo, fifo->write_ind), fifo->fifo_buffer_ptr, fifo->elt_size * num_end);
+			memcpy(&fifo->contents[fifo->write_ind], fifo->fifo_buffer, num_end * sizeof(T));
 		}
 
 		// Copy the rest of data at the beginning of the FIFO
 		if (num_beginning) {
-			memcpy(fifo->contents, &fifo->fifo_buffer_ptr[fifo->elt_size * num_end], fifo->elt_size * num_beginning);
+			memcpy(fifo->contents, &fifo->fifo_buffer[num_end], num_beginning * sizeof(T));
 		}
 
-		fifo->fifo_buffer_ptr = NULL;
 		fifo->write_ind = num_beginning;
 	}
 }
