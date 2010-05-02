@@ -16,4 +16,4 @@
 is the last node translated. *)
 val add_globals_management : Ast2ir_util.env -> Calir.IR.var_def list ->
 	Calast.stmt list ->
-	Calir.IR.var_def list * Calast.stmt list
+	Ast2ir_util.env * Calir.IR.var_def list * Calast.stmt list

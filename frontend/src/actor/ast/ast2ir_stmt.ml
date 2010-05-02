@@ -123,7 +123,7 @@ let rec ir_of_stmts_rec env vars graph entry stmts =
 						
 						(* note that we add the assignment instructions statement before *)
 						(* children because children are likely to depend on those *)
-						(* instructions (unless the programmer is dumb of course ^^). *)
+						(* instructions. *)
 						(vars, children)
 
 					(* instructions. actually in this case without a 's'. *)
@@ -221,9 +221,10 @@ and create_while env vars graph node loc expr var_info_list children =
 to the action local variables. This is why the function returns a
 (vars, stmts) couple. *)
 let ir_of_stmts env vars graph node stmts =
-	let (vars, stmts) =
-		Ast2ast_globals.add_globals_management env (List.rev vars) stmts
-	in
+	let vars = List.rev vars in
+	(*let (env, vars, stmts) =
+		Ast2ast_globals.add_globals_management env vars stmts
+	in*)
 	
 	let (vars, last) = ir_of_stmts_rec env vars graph node stmts in
 	(vars, last)

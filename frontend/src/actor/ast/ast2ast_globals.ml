@@ -19,31 +19,37 @@ open IR
 
 module SM = Asthelper.SM
 
+let local_name name = "local_" ^ name
+
 (* ug = update globals *)
 
-(** [load_var env loaded loc var_ref] retrieves the var_def binding from the
+(** [load_var env loaded var_ref] retrieves the var_def binding from the
 environment, and if it is a global whose type is not List, returns a new name
 ["local_" ^ var_ref], and add the binding to [loaded] if not already there. *)
-let load_var env loaded loc var_ref =
-	let var_def = ir_of_var_ref env loc var_ref in
-	match (var_def.v_global, var_def.v_type) with
-		| (true, TypeList _) -> (loaded, var_ref)
-		| (true, _) ->
-			let loaded =
-				if SM.mem var_ref loaded then
-					loaded
-				else
-					SM.add var_ref var_def loaded
-			in
-			(loaded, "local_" ^ var_ref)
-		| (false, _) -> (loaded, var_ref)
+let load_var env loaded var_ref =
+	if has_binding_var env var_ref then
+		let var_def = get_binding_var env var_ref in
+		match (var_def.v_global, var_def.v_type) with
+			| (true, TypeList _) -> (loaded, var_ref)
+			| (true, _) ->
+				let loaded =
+					if SM.mem var_ref loaded then
+						loaded
+					else
+						SM.add var_ref var_def loaded
+				in
+				(loaded, local_name var_ref)
+			| (false, _) -> (loaded, var_ref)
+	else
+		(* no bindings => a local variable *)
+		(loaded, var_ref)
 
 (** [ug_expr env loaded expr] returns a [(loaded, expr)] tuple where references to
 globals have been replaced appropriately by calling [load_var]. *)
 let rec ug_expr env loaded expr =
 	match expr with
 		| Calast.ExprVar (loc, var_ref) ->
-			let (loaded, var_ref) = load_var env loaded loc var_ref in
+			let (loaded, var_ref) = load_var env loaded var_ref in
 			(loaded, Calast.ExprVar (loc, var_ref))
 
 		| Calast.ExprBOp (loc, e1, bop, e2) ->
@@ -56,7 +62,7 @@ let rec ug_expr env loaded expr =
 			(loaded, Calast.ExprCall (loc, name, parameters))
 		
 		| Calast.ExprIdx (loc, (var_loc, var_ref), indexes) ->
-			let (loaded, var_ref) = load_var env loaded loc var_ref in
+			let (loaded, var_ref) = load_var env loaded var_ref in
 			let (loaded, indexes) = ug_exprs env loaded indexes in
 			(loaded, Calast.ExprIdx (loc, (var_loc, var_ref), indexes))
 
@@ -114,19 +120,22 @@ let ug_instrs env loaded stored instrs =
 	
 				| Calast.InstrAssignVar (loc, (loc_var, var), expr) ->
 					let (loaded, expr) = ug_expr env loaded expr in
-					let var_def = ir_of_var_ref env loc_var var in
 					let (stored, var) =
-						(* no need to check the variable's type because *)
-						(* the var is NOT supposed to be an array *)
-						if var_def.v_global then
-							let stored =
-								if SM.mem var stored then
-									stored
-								else
-									SM.add var var_def stored
-							in
-							(stored, "local_" ^ var)
+						if has_binding_var env var then
+							let var_def = get_binding_var env var in
+							match (var_def.v_global, var_def.v_type) with
+								| (true, TypeList _) -> (stored, var)
+								| (true, _) ->
+									let stored =
+										if SM.mem var stored then
+											stored
+										else
+											SM.add var var_def stored
+									in
+									(stored, local_name var)
+								| _ -> (stored, var)
 						else
+							(* no bindings => a local variable *)
 							(stored, var)
 					in
 					let instr = Calast.InstrAssignVar (loc, (loc_var, var), expr) in
@@ -205,22 +214,58 @@ let rec ug_stmts env loaded stored stmts =
 	in
 	(loaded, stored, List.rev stmts)
 
-let add_vars vars loaded stored =
-	ignore (loaded, stored);
-	vars
+let add_vars env vars loaded stored =
+	let globals =
+		SM.fold
+			(fun var_name var_def loaded ->
+				SM.add var_name var_def loaded)
+		stored loaded
+	in
+	SM.fold
+		(fun var_name var_def (env, vars) ->
+			(* Note that the local variable must share the node of the global *)
+			(* variable it references so that the expressions that reference it *)
+			(* can use the lattice information. *)
+			let local_var_def =
+				{ var_def with
+					v_assignable = true; (* may be assigned if loaded. *)
+					v_global = false; (* is local *)
+					v_name = local_name var_name }
+			in
+			let vars = local_var_def :: vars in
+			let env = add_binding_var env local_var_def.v_name local_var_def in
+			(env, vars))
+	globals (env, vars)
 
 let add_loads loaded stmts =
-	ignore (loaded);
-	stmts
+	let instrs =
+		SM.fold
+			(fun var_name _var_def instrs ->
+				let expr = Calast.ExprVar (dummy_loc, var_name) in
+				let instr =
+					Calast.InstrAssignVar (dummy_loc, (dummy_loc, local_name var_name), expr)
+				in
+				instr :: instrs)
+		loaded []
+	in
+	Calast.StmtInstr (dummy_loc, List.rev instrs) :: stmts
 
 let add_stores stored stmts =
-	ignore (stored);
-	stmts
+	let instrs =
+		SM.fold
+			(fun var_name _var_def instrs ->
+				let expr = Calast.ExprVar (dummy_loc, local_name var_name) in
+				let instr =
+					Calast.InstrAssignVar (dummy_loc, (dummy_loc, var_name), expr)
+				in
+				instr :: instrs)
+		stored []
+	in
+	stmts @ [Calast.StmtInstr (dummy_loc, List.rev instrs)]
 
 let add_globals_management env vars stmts =
-	(*let (loaded, stored, stmts) = ug_stmts env SM.empty SM.empty stmts in
-	let stmts = add_stores stored (List.rev stmts) in
+	let (loaded, stored, stmts) = ug_stmts env SM.empty SM.empty stmts in
 	let stmts = add_loads loaded stmts in
-	let vars = add_vars vars loaded stored in*)
-	ignore (env);
-	(vars, stmts)
+	let stmts = add_stores stored stmts in
+	let (env, vars) = add_vars env vars loaded stored in
+	(env, vars, stmts)
