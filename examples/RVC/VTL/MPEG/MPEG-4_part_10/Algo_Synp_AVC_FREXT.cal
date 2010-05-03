@@ -294,8 +294,8 @@ actor Algo_Synp_AVC_FREXT()
 	int maxNumIdx := 0;
 	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 255)] ;
 	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 255)] ;
-	List (type: int(size = 8), size = 256) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 255)] ;
-	List (type: int(size = 8), size = 256) coeff_sign_flag				:= [0: for int i in Integers(0, 255)] ;
+	List (type: int(size = 16), size = 16) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 15)] ;
+
 	
 	/* Up and Left Macroblock luma and chroma Residual Values */
 	List ( type: int(size = 16), size = 16  )  MB_DC_Luma	:= [ 0 : for int i in Integers( 0, 15)  ];
@@ -485,8 +485,8 @@ actor Algo_Synp_AVC_FREXT()
 		[ 2, 1, 1, 1 ]
 	];
 	
-	int synEval_Intra_Chroma_Pred_Mode_Ele = 8;
-	List ( type: List ( type: int(size = 8), size = 4) , size = 8 ) synEval_Intra_Chroma_Pred_Mode = 
+	int synEval_Intra_Chroma_Pred_Mode_Ele = 4;
+	List ( type: List ( type: int(size = 8), size = 4) , size = 4 ) synEval_Intra_Chroma_Pred_Mode = 
 	[
 		[ 0, 0, 0, 0 ],
 		[ 1, 1, 0, 0 ],
@@ -5617,7 +5617,8 @@ actor Algo_Synp_AVC_FREXT()
 			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
 			cbp_blk:[cbp_blk_tmp],
 			MbIntraFlag:[mb_intra_flag]
-	guard IS_I_PCM()
+	guard 
+		IS_I_PCM()
 	var 
 		int mb_addr,
 		int cbp_blk_tmp=val_cbp_blk
@@ -5693,7 +5694,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		moreDataFlag :=  if cabac_value() = 1 then 0 else 1 end;
 		//end if
-		NextMbAddress();
+		//NextMbAddress();
 	end
 	
 	//while( moreDataFlag )
@@ -7821,7 +7822,9 @@ actor Algo_Synp_AVC_FREXT()
 		syncSliceD_endwhile									( syncSliceD_endwhile								) --> SliceD_while_moreDataFlag;
 		
 		SliceD_update										( SliceD_update_CABAC								) --> SliceD_Update_done;
-		SliceD_Update_done									( SliceD_update_CABAC_done							) --> SliceD_while_moreDataFlag;
+		SliceD_Update_done									( SliceD_update_CABAC_done							) --> SliceD_sent_data;
+		SliceD_sent_data									( send_data_position_information_is_ipcm            ) --> SliceD_while_moreDataFlag;
+		SliceD_sent_data									( send_data_position_information	                ) --> SliceD_while_moreDataFlag;
 		SliceD_while_moreDataFlag							( SliceD_while_moreDataFlag							) --> sync_do_mb_layer;
 		SliceD_while_moreDataFlag							( SliceD_end										) --> search_start_code;
 		read_SliceD_mb_field_decoding_flag					( SliceD_end										) --> search_start_code;
