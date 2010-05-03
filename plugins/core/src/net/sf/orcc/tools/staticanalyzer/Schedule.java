@@ -29,8 +29,12 @@
 
 package net.sf.orcc.tools.staticanalyzer;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import net.sf.orcc.network.Vertex;
 
 /**
  * This class defines a schedule. A schedule is composed of a header
@@ -44,14 +48,18 @@ public class Schedule {
 
 	private int iterationCount;
 
-	private List<Iterand> iterands;
+	private LinkedList<Iterand> iterands;
 
 	public Schedule() {
-		iterands = new ArrayList<Iterand>();
+		iterands = new LinkedList<Iterand>();
 	}
 
 	public void add(Iterand iterand) {
-		iterands.add(iterand);
+		iterands.offer(iterand);
+	}
+
+	public void remove() {
+		iterands.poll();
 	}
 
 	public List<Iterand> getIterands() {
@@ -64,6 +72,24 @@ public class Schedule {
 
 	public void setIterationCount(int interationCount) {
 		this.iterationCount = interationCount;
+	}
+
+	public Set<Vertex> getScheduledActors() {
+		Set<Vertex> scheduledActors = new LinkedHashSet<Vertex>();
+		LinkedList<Iterand> stack = new LinkedList<Iterand>(iterands);
+
+		while (!stack.isEmpty()) {
+			Iterand iterand = stack.pop();
+			if (iterand.isVertex()) {
+				scheduledActors.add(iterand.getVertex());
+			} else {
+				Schedule schedule = iterand.getSchedule();
+				for (Iterand subIterand : schedule.getIterands()) {
+					stack.push(subIterand);
+				}
+			}
+		}
+		return scheduledActors;
 	}
 
 	public String toString() {

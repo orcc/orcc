@@ -33,7 +33,6 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
@@ -50,9 +49,13 @@ public class TopologicalSorter {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
-	public List<Vertex> topologicalSort(Network network) throws OrccException {
-		graph = network.getGraph();
-
+	public TopologicalSorter(DirectedGraph<Vertex, Connection> graph) {
+		this.graph = graph;
+	}
+	
+	public List<Vertex> topologicalSort()
+			throws OrccException {
+	
 		if (isAcyclic()) {
 			return new DFS(graph).orderedByFinishingTime();
 		} else {

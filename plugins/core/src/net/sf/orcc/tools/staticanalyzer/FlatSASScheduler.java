@@ -60,7 +60,7 @@ public class FlatSASScheduler implements IScheduler {
 
 		Schedule topSched = new Schedule();
 
-		List<Vertex> sort = new TopologicalSorter().topologicalSort(network);
+		List<Vertex> sort = new TopologicalSorter(network.getGraph()).topologicalSort();
 		for (Vertex vertex : sort) {
 			if (vertex.isInstance()) {
 				Schedule subSched = new Schedule();
