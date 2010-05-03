@@ -28,8 +28,12 @@
  */
 package net.sf.orcc.tools.classifier;
 
+import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.classes.CSDFActorClass;
@@ -277,6 +281,8 @@ public class ActorClassifierIndependent {
 		ActionScheduler sched = actor.getActionScheduler();
 		FSM fsm = sched.getFsm();
 		if (isQuasiStaticFsm(fsm)) {
+			System.out.println(actor.getName()
+					+ " has a quasi-static-compatible FSM");
 			String initialState = fsm.getInitialState().getName();
 
 			// analyze the configuration of this actor
@@ -371,8 +377,64 @@ public class ActorClassifierIndependent {
 	 *            a Finite State Machine
 	 * @return <code>true</code> if the given FSM has quasi-static form
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean isQuasiStaticFsm(FSM fsm) {
-		return false;
+		DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
+		State initialState = fsm.getInitialState();
+
+		int n = graph.vertexSet().size();
+		int[] belongs = new int[n];
+		Set<State>[] branches = new Set[n];
+
+		Queue<State> queue = new ArrayDeque<State>();
+		Set<UniqueEdge> edges = graph.outgoingEdgesOf(initialState);
+		for (UniqueEdge edge : edges) {
+			State target = graph.getEdgeTarget(edge);
+			Set<State> set = new HashSet<State>();
+			set.add(target);
+			branches[target.getIndex()] = set;
+
+			if (!target.equals(initialState)) {
+				belongs[target.getIndex()] = target.getIndex();
+				queue.add(target);
+			}
+		}
+
+		while (!queue.isEmpty()) {
+			State state = queue.remove();
+			int index = belongs[state.getIndex()];
+
+			edges = graph.outgoingEdgesOf(state);
+			for (UniqueEdge edge : edges) {
+				State target = graph.getEdgeTarget(edge);
+				if (target.equals(initialState)) {
+					if (branches[index].contains(initialState)) {
+						// at most one path back to initial state
+						return false;
+					}
+					branches[index].add(initialState);
+				} else if (!target.equals(state)) {
+					// ignore loops
+					if (belongs[target.getIndex()] == 0) {
+						belongs[target.getIndex()] = index;
+						branches[index].add(target);
+						queue.add(target);
+					} else if (belongs[target.getIndex()] != index) {
+						// state belongs to another branch
+						return false;
+					}
+				}
+			}
+		}
+
+		for (Set<State> branch : branches) {
+			if (branch != null && !branch.isEmpty()
+					&& !branch.contains(initialState)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**

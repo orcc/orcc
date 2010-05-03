@@ -59,6 +59,8 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 	private ConfigurationAnalyzer analyzer;
 
+	private boolean portRead;
+
 	private boolean schedulableMode;
 
 	public AbstractNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
@@ -140,10 +142,11 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 	@Override
 	public void visit(Peek peek, Object... args) {
-		if (peek.getPort().equals(analyzer.getConfigurationPort())) {
+		if (peek.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
 			int value = analyzer.getConfigurationValue(action);
 			Object[] target = (Object[]) peek.getTarget().getValue();
 			target[0] = value;
+			portRead = true;
 		}
 	}
 
