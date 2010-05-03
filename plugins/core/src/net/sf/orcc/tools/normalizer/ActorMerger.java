@@ -77,6 +77,7 @@ import net.sf.orcc.tools.staticanalyzer.BufferManager;
 import net.sf.orcc.tools.staticanalyzer.FlatSASScheduler;
 import net.sf.orcc.tools.staticanalyzer.Iterand;
 import net.sf.orcc.tools.staticanalyzer.Schedule;
+import net.sf.orcc.tools.staticanalyzer.StaticNetworkClusterer;
 import net.sf.orcc.tools.staticanalyzer.StaticSubsetDetector;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;

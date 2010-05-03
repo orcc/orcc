@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.normalizer;
+package net.sf.orcc.tools.staticanalyzer;
 
 import java.util.HashMap;
 import java.util.HashSet;
