@@ -271,8 +271,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	/* CABAC Neighbouring */
 	 uint luma8x8BlkIdx;
-	 uint luma8x8BlkIdxA;
-	 uint luma8x8BlkIdxB;
+	
 	 
 	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH + 1 ) transblock_cbf 		:=  [ [ 0 : for int i in Integers( 0, 16) ]: for int j in Integers( 0, PICWIDTH) ];
 	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cr		:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
@@ -295,7 +294,9 @@ actor Algo_Synp_AVC_FREXT()
 	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 255)] ;
 	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 255)] ;
 	List (type: int(size = 16), size = 16) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 15)] ;
-
+	
+	List (type: int(size = 2), size = 4)   prior_decoded_bin_cbp		:= [0: for int i in Integers(0, 3)] ;
+	int bk_cbp := 0;
 	
 	/* Up and Left Macroblock luma and chroma Residual Values */
 	List ( type: int(size = 16), size = 16  )  MB_DC_Luma	:= [ 0 : for int i in Integers( 0, 15)  ];
@@ -2668,7 +2669,8 @@ actor Algo_Synp_AVC_FREXT()
 		int xN,
 		int yN,
 		int mbAddr,
-		bool AvailMb
+		bool AvailMb,
+		int luma8x8BlkIdxN
 		
 	begin
 		//if ctxIdxOffset = 73 then
@@ -2684,9 +2686,10 @@ actor Algo_Synp_AVC_FREXT()
 		if  not AvailMb then
 			condTermFlagA := 0;
 		else
-			if  ( GiveMbType(AvailMb,mbAddr) = 25 and GiveMbSliceType(AvailMb,mbAddr) = 2 ) or
-				  ( mbAddr != val_CurrMbAddr and ( GiveMbType(AvailMb,mbAddr) != P_Skip or GiveMbType(AvailMb,mbAddr) != B_Skip ) ) then
-				
+			luma8x8BlkIdxN :=  1 << ( 2*(NeighMb_yW/2) + 1 );
+			if  ( GiveMbType(AvailMb,mbAddr) = 25  or
+			      ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 0x01)  = 0 ) or
+			      ( ( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then				
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
@@ -2700,9 +2703,10 @@ actor Algo_Synp_AVC_FREXT()
 		if  not AvailMb then
 			condTermFlagB := 0;
 		else
-			if  ( GiveMbType(AvailMb,mbAddr) = 25 and GiveMbSliceType(AvailMb,mbAddr) = 2 ) or
-				  ( mbAddr != val_CurrMbAddr and ( GiveMbType(AvailMb,mbAddr) != P_Skip or GiveMbType(AvailMb,mbAddr) != B_Skip ) ) then
-				
+			luma8x8BlkIdxN :=  1 << ( 2*(NeighMb_yW/2) + 1 );
+			if  ( GiveMbType(AvailMb,mbAddr) = 25  or
+			      ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 0x01)  = 0 ) or
+			      ( ( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then				
 				condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
@@ -2736,14 +2740,14 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
-			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) then
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) = 2) then
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
 			end
 		end
 		
-		//N = A
+		//N = B
 		getNeighbouring(0, -1, 16, 16);
 		//Assign Values
 		mbAddr  := NeighMbAddr;
@@ -2757,7 +2761,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
-			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) then
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) = 2) then
 				condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
@@ -3759,6 +3763,11 @@ actor Algo_Synp_AVC_FREXT()
 		binValDecoded := true;
 		// write the bit into the  ReadBinString
 		ReadBinString[binIdx + 1] := binVal;
+		
+		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA then
+			prior_decoded_bin_cbp := binVal;
+			bk_cbp := bk_cbp + 1;
+		end
 		
 		if codIRange < 0x0100 then
 			StartRenormDRead := true;
@@ -5817,6 +5826,9 @@ actor Algo_Synp_AVC_FREXT()
 		//Update mbTab with the current type of mb and slice_type
 		mbTab[val_CurrMbAddr][mbSliceType] := slice_type;
 		mbTab[val_CurrMbAddr][mbTabMbtype] := mb_type;
+		
+		//Initialize bk counter for cbp_Luma, see Derivation process of ctxIdxInc for the syntax element coded_block_flag
+		bk_cbp := 0;
 		
 	end
 
