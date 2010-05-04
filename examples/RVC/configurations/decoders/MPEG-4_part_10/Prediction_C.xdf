@@ -324,5 +324,5 @@
     <Connection dst="Intra8x8" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Deblocking_Filter" dst-port="Alpha_offset" src="" src-port="slice_alpha_c0_offset"/>
-    <Connection dst="" dst-port="Display_C" src="Select_chroma" src-port="X"/>
+    <Connection dst="" dst-port="Display_C" src="Buffer_inter" src-port="Display"/>
 </XDF>

@@ -373,5 +373,5 @@
     <Connection dst="Intra_16x16" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Intra_4x4" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
-    <Connection dst="" dst-port="Display_L" src="Select" src-port="X"/>
+    <Connection dst="" dst-port="Display_L" src="Buffer_inter" src-port="Display"/>
 </XDF>
