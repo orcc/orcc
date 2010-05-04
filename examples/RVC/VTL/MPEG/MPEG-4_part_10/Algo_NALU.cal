@@ -32,7 +32,7 @@ actor Algo_NALU ()
 */
 
 		uint(size = 32)         SZ_NB_RBSP          = 32; /* >= log2(NB_RBSP_BYTE_MAX) */
-		int (size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 100000;
+		int (size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 500000;
 		uint(size = 2)          byte_count         := 0; /* nb byte(s) stored in fifo */
 		int (size = 8)          fifo_lsb           := 0;
 		int (size = 8)          fifo_msb           := 0;

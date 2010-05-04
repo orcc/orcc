@@ -56,493 +56,535 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Mickael Raulet IETR/INSA of Rennes
 
 
-actor Algo_MMCO () uint(size=5) RefReordering, uint(size=5) MMCO ==> uint(size=5) RefList :  
-  List(type:uint(size=4),size=16) reordering_ref_list := [0 :for int s in Integers(0,16-1)];
-  List(type:int,size=16) short_term_list:= [0 :for int s in Integers(0,16-1)];
-  List(type:int,size=16) pic_idx_list:= [0 :for int s in Integers(0,16-1)];
-  List(type:int(size=5),size=16) long_term_list := [-1 :for int s in Integers(0,16-1)];
-  List(type:uint(size = 5), size = 2*16) RefListTab := [-1 :for int s in Integers(0,2*16-1)];
-  List(type:uint(size=4),size= 2*16) RefListSent := [0: for int s in Integers(0, 2*16-1)];
-  
-  uint(size=3) mmco_opcode;
-  
-  uint(size=4) pic_curr_idx;
-  uint frame_num;
-  uint pred                      := 0;
-  uint(size=4) index             := 0;
-  uint(size=4) num_ref_frames    := 0;
-  uint(size=4) short_term_count  := 0;
-  uint(size=4) long_term_count   := 0;
-  uint(size=1) flag_long_term    := 0;
-  uint(size=4) long_term_idx     := 0;
-  uint(size=4) long_term_max_idx := 0;
-  int CounterRefList             := 0;
-  int CounterRefListTab          := 0;
-  int CounterRefListSent		 := 0;
-  bool EndInitIdc3               := false;
-  bool EndInitSentRefList        := false;
-  
-  update_idx: action ==>
-  var
-    int(size=5) idx := -1, 
-    bool flag := false,
-    int j
-  do
-    if long_term_count + short_term_count = num_ref_frames then
-      //remove short
-	  foreach int i in Integers (0, short_term_count - 2) do
-       	short_term_list[i] := short_term_list[i];
-       	pic_idx_list[i] := pic_idx_list[i];
-      end
-      short_term_count := short_term_count -1; 
-    end
-    // add current picture
-    if flag_long_term = 0 then
-	   j:=short_term_count - 1;
-       foreach int i in Integers (0, short_term_count - 1) do
-       	 short_term_list[j + 1] := short_term_list[j];
-       	 pic_idx_list[j + 1] := pic_idx_list[j];
-       	 j:= j - 1;
-       end
-       short_term_list[0] := frame_num;
-	   pic_idx_list[0]:= pic_curr_idx;
-       short_term_count := short_term_count +1;
-    else
-      if long_term_list[long_term_idx] = -1 then long_term_count := long_term_count +1; end
-      long_term_list[long_term_idx] := pic_curr_idx;
-    end
-    // choose pic_curr_idx
-    idx := pic_curr_idx;
-    while not flag do
-      idx:= (idx +1) mod 16;
-      flag :=  true;
-      if short_term_count != 0 then
-        foreach int i in Integers (0, short_term_count - 1) do
-          if pic_idx_list[i] = idx then flag := false; end
-        end
-      end
-      if long_term_count != 0 then
-        foreach int i in Integers(0, long_term_max_idx) do
-          if long_term_list[i] = idx then flag := false; end
-        end
-      end
-    end
-    pic_curr_idx := idx;
-  end
-  
+actor Algo_MMCO () 
+	uint(size=5)  RefReordering,
+	uint(size=5)  MMCO,
+	int (size=32) MaxFrameNum
+		==>
+	int(size=32) RefList
+		:
 
-  read_num_ref_frames: action MMCO:[a, b]==> RefList:[pic_curr_idx]
-  do
-    num_ref_frames := a;
-    flag_long_term := 0;
-    frame_num:= b;
-  end
- 
-  
-  read_ref_pic_list_reordering_flag_0: action RefReordering:[v] ==>
-  guard
-    v = 0
-  end
-  
-  
-  
-  read_ref_pic_list_reordering_flag_1: action RefReordering:[v]  ==> 
-  guard
-    v = 1
-   var 
-  	int ListIndex := 0
-  do
-    pred := frame_num;
-    index:= 0;
-    if short_term_count != 0 then 
-      foreach int i in Integers (0, short_term_count - 1) do
-        reordering_ref_list[i] := pic_idx_list[i];
-      end
-      ListIndex :=  short_term_count;
-    else 
-      reordering_ref_list := [0 :for int s in Integers(0,16-1)];
-    end 
-    
-    if long_term_count != 0 then 
-      foreach int i in Integers(0, long_term_max_idx) do
-        if long_term_list[i] != -1 then 
-        	reordering_ref_list[ListIndex] := long_term_list[i]; 
-        	ListIndex := ListIndex + 1 ;
-        end
-      end
-    end
-  end
- 
- 
- 
-  
-  read_reordering_of_pic_nums_idc_01: action RefReordering:[a, b]==>
-  guard 
-    (a = 0 or a = 1) 
-  var 
-  	uint(size=4) idx, 
-  	uint(size=4) pred_idx,
-  	int counter_for 
-  	
-  do
-    if a = 0 then 
-    	pred := pred - b - 1 ; 
-    else 
-    	pred := pred + b+1; 
-    end
-    foreach int i in Integers(0, short_term_count-1) do
-      if short_term_list[i] = pred then 
-      	pred_idx := pic_idx_list[i]; 
-      end
-    end
-    foreach int i in Integers(0, short_term_count+long_term_count-1) do
-      if reordering_ref_list[i] = pred_idx then 
-      	idx := i; 
-      end
-    end
-    if ( idx = 0 ) then 
-    	//just copy the reference list
-    	 foreach int i in Integers(0, short_term_count + long_term_count - 2) do
-    	 	reordering_ref_list[i] := reordering_ref_list[i + 1];
-    	 end
-    else 
-    	//Remove from the reference list the frame at index equals to idx
-    	foreach int i in Integers(0, idx - 1) do
-    	 	reordering_ref_list[i] := reordering_ref_list[i];
-    	end
-    	foreach int i in Integers(idx, short_term_count+long_term_count - 2) do
-    	    reordering_ref_list[i] := reordering_ref_list[i + 1];
-    	end 
-    end
-    if ( index = 0 ) then
-    	counter_for:=short_term_count + long_term_count - 1;
-      //Add a frame at index equals to 0.
-       foreach int i in Integers(0, counter_for) do
-    	 	reordering_ref_list[counter_for - i + 1] := reordering_ref_list[counter_for - i];
-       end
-       reordering_ref_list[0] := pred_idx;
-    else
-      //Add a frame at index equals to index.
-      //So copy the index - 1 first elements
-      //Add pred_ix at index "index"
-      //and copy the others elements of the list
-        foreach int i in Integers(0, index - 1) do
-        	reordering_ref_list[i] := reordering_ref_list[i];
-        end
-    	counter_for:=short_term_count + long_term_count - 1;
-        foreach int i in Integers(0, counter_for - index) do
-        	reordering_ref_list[counter_for - i] := reordering_ref_list[counter_for - i - 1];
-        end
-        reordering_ref_list[index] := pred_idx;
-    end
-    index := index +1 ;
-  end
 
- 
+	List(type:uint(size=4),size=16)        reordering_ref_list := [0 :for int s in Integers(0,16-1)];
+	List(type:int(size=32),size=16)        short_term_list     := [0 :for int s in Integers(0,16-1)];
+	List(type:int,size=16)                 pic_idx_list        := [0 :for int s in Integers(0,16-1)];
+	List(type:int(size=32),size=16)         long_term_list      := [-1 :for int s in Integers(0,16-1)];
+	List(type:uint(size = 5), size = 2*16) RefListTab          := [-1 :for int s in Integers(0,2*16-1)];
+	List(type:uint(size=4),size= 2*16)     RefListSent         := [0: for int s in Integers(0, 2*16-1)];
+	  
+	uint(size=3)  mmco_opcode;
+	uint(size=4)  pic_curr_idx;
+	uint          frame_num;
+	int           pred               := 0;
+	int (size=32) ValMaxFrameNum     := 0;
+	uint(size=4)  index              := 0;
+	uint(size=4)  num_ref_frames     := 0;
+	uint(size=4)  short_term_count   := 0;
+	uint(size=4)  long_term_count    := 0;
+	uint(size=1)  flag_long_term     := 0;
+	uint(size=4)  long_term_idx      := 0;
+	uint(size=4)  long_term_max_idx  := 0;
+	int           CounterRefList     := 0;
+	int           CounterRefListTab  := 0;
+	int           CounterRefListSent := 0;
+	bool          EndInitIdc3        := false;
+	bool          EndInitSentRefList := false;
   
-  read_reordering_of_pic_nums_idc_2: action RefReordering:[a, b]==>
-  guard 
-    a = 2
-  var 
-  	uint(size=4) idx,
-  	int counter_for  
-  do
-    foreach int i in Integers(0, short_term_count+long_term_count-1) do
-      if reordering_ref_list[i] = long_term_list[b] then idx := i; end
-    end
-    if idx = 0 then 
-    	//just copy the reference list
-    	 foreach int i in Integers(0, short_term_count + long_term_count - 2) do
-    	 	reordering_ref_list[i] := reordering_ref_list[i + 1];
-    	 end
-    else 
-    	//Remove from the reference list the frame at index equals to idx
-    	foreach int i in Integers(0, idx - 1) do
-    	 	reordering_ref_list[i] := reordering_ref_list[i];
-    	end
-    	foreach int i in Integers(idx, short_term_count+long_term_count - 2) do
-    	    reordering_ref_list[i] := reordering_ref_list[i + 1];
-    	end 
-     end
-    if index = 0 then
-        //Add a frame at index equals to 0.
-    	counter_for:=short_term_count + long_term_count - 1;
-        foreach int i in Integers(0, counter_for) do
-    	 	reordering_ref_list[counter_for - i + 1] := reordering_ref_list[counter_for - i];
-       end
-       reordering_ref_list[0] := long_term_list[b];
-    else
-      //Add a frame at index equals to index.
-      //So copy the index - 1 first elements
-      //Add pred_ix at index "index"
-      //and copy the others elements of the list
-        foreach int i in Integers(0, index - 1) do
-        	reordering_ref_list[i] := reordering_ref_list[i];
-        end
-        counter_for:=short_term_count + long_term_count - 1;
-        foreach int i in Integers(0, counter_for - index) do
-        	reordering_ref_list[counter_for - i] := reordering_ref_list[counter_for - i - 1];
-        end
-        reordering_ref_list[index] := long_term_list[b];
-    end
-    index := index + 1 ;
-  end
+	update_idx: action ==>
+		var
+			//int(size=5) idx  := -1, 
+			bool        flag := false,
+			int         j
+		do
+			if (long_term_count + short_term_count = num_ref_frames) then
+				short_term_count       := short_term_count -1; 
+			end
+			// add current picture
+			if (flag_long_term = 0) then
+				j := short_term_count - 1;
+				foreach int i in Integers (0, short_term_count - 1)
+				do
+					short_term_list[j + 1] := short_term_list[j];
+					pic_idx_list[j + 1]    := pic_idx_list[j];
+					j := j - 1;
+				end
+				short_term_list[0] := frame_num;
+				pic_idx_list[0]    := pic_curr_idx;
+				short_term_count   := short_term_count +1;
+			else
+				if (long_term_list[long_term_idx] = -1) then 
+					long_term_count := long_term_count +1;
+				end
+				long_term_list[long_term_idx] := pic_curr_idx;
+			end
+			// choose pic_curr_idx
+			/*idx := pic_curr_idx;
+			while(not flag)
+			do
+				idx  := (idx +1) mod 16;
+				flag :=  true;
+				foreach int i in Integers (0, short_term_count - 1)
+				do
+					if (pic_idx_list[i] = idx) then 
+						flag := false;
+					end
+				end
+				if (long_term_count != 0) then
+					foreach int i in Integers(0, long_term_max_idx)
+					do
+						if (long_term_list[i] = idx) then
+							flag := false;
+						end
+					end
+				end
+			end
+			pic_curr_idx := idx;*/
+		end
 
-  read_reordering_of_pic_nums_idc_3: action RefReordering:[a] ==>
-  guard 
-  	a = 3
-  do
-  	RefListTab[0] := short_term_count + long_term_count;
-  	foreach int s in Integers(0, short_term_count + long_term_count - 1) do
-  		RefListTab[s + 1] := reordering_ref_list[s];	
-  	end
-  	
-  	EndInitIdc3 := true;
-  	
-  end
-	
- IDC3SendRefList: action ==> RefList:[ref]
- guard
- 	EndInitIdc3
- var
- 	uint(size = 5) ref
- do
- 	ref := RefListTab[CounterRefListTab];
- 	
- 	CounterRefListTab := CounterRefListTab + 1;
- end		
 
-  IDC3SendRefListDone: action ==>
-  guard
-	CounterRefListTab = short_term_count + long_term_count + 1
-  do
-	CounterRefListTab := 0;
-	EndInitIdc3 := false;
-  end	
+	read_num_ref_frames: action
+			MMCO:[a, b],
+			MaxFrameNum:[MaxFrNu]
+				==>
+			//RefList:[pic_curr_idx]
+			RefList:[b]
+		do
+			num_ref_frames := a;
+			pic_curr_idx   := b;
+			frame_num      := b;
+			ValMaxFrameNum := MaxFrNu;
+			flag_long_term := 0;
+		end
 
- InitRefList_zero: action ==> RefList:[0]
-  guard
-    (short_term_count + long_term_count) = 0
-  do
-  	EndInitSentRefList := false;
-  end
+
+	read_ref_pic_list_reordering_flag_0: action 
+			RefReordering:[v]
+				==>
+		guard
+			v = 0
+		end
+
+
+	read_ref_pic_list_reordering_flag_1: action 
+			RefReordering:[v]
+				==> 
+		guard
+			v = 1
+		var 
+			int ListIndex := 0
+		do
+			pred  := frame_num;
+			index := 0;
+			if (short_term_count != 0) then 
+				foreach int i in Integers (0, short_term_count - 1)
+				do
+					reordering_ref_list[i] := short_term_list[i];
+				end
+				ListIndex :=  short_term_count;
+			else 
+				reordering_ref_list := [0 :for int s in Integers(0,16-1)];
+			end 
+			if (long_term_count != 0) then 
+				foreach int i in Integers(0, long_term_max_idx)
+				do
+					if ( (long_term_list[i] != -1) and (ListIndex <= 16) ) then 
+						reordering_ref_list[ListIndex] := long_term_list[i]; 
+						ListIndex                      := ListIndex + 1 ;
+					end
+				end
+			end
+		end
 
   
-  InitRefList_not0: action ==> 
-  guard
-  	EndInitSentRefList = false and ( short_term_count + long_term_count != 0 )
-  var 
-    List(type:uint(size=4),size=2*16) reflist:= [0: for int k in Integers(0,2*16-1)],
-    int ListIndex := 0
-  do
-    if short_term_count != 0 then 
-      foreach int l in Integers( 0, short_term_count - 1 ) do
-        reflist[l] := pic_idx_list[l];
-      end
-      ListIndex := short_term_count; 
-    else 
-      foreach int s in Integers( 0, short_term_count + long_term_count - 1 ) do
-        reflist[s] := 0;
-      end
-      ListIndex := short_term_count + long_term_count;
-    end
-   
-    if long_term_count != 0 then
-      foreach int i in Integers(0, long_term_max_idx) do
-        if long_term_list[i] != -1 then 
-          reflist[ListIndex + i] := long_term_list[i]; 
-        end
-      end
-    end
-    RefListSent[0] := short_term_count + long_term_count;
-  	foreach int s in Integers(0, short_term_count + long_term_count - 1) do
-  	  RefListSent[s + 1] := reflist[s];	
-  	end
-   	EndInitSentRefList := true;	
-  end
- 
-  SendRefList: action ==> RefList:[ref]
-  guard
-       EndInitSentRefList 
-  var
-    uint(size = 5) ref
-  do
-    ref := RefListSent[CounterRefListTab];
-	CounterRefListTab := CounterRefListTab + 1;
-  end		
-	 
-  SendRefListDone: action ==>
-  guard
-		( CounterRefListTab = short_term_count + long_term_count + 1 ) 
-  do
-	CounterRefListTab := 0;
-	EndInitSentRefList := false;
-  end	
-  
-  
-  read_IDR: action MMCO:[a , b]==>
-  guard 
-    a = 0
-  do
-    flag_long_term   := b;
-    short_term_count := 0;
-    long_term_count  := 0;
-    short_term_list:= [ -1 :for int s in Integers(0,16-1)];
-    pic_idx_list:= [ -1 :for int s in Integers(0,16-1)];
-    long_term_list   := [-1 :for int s in Integers(0,16-1)];
-  end
-  
-  read_not_IDR_not_MMCO: action MMCO:[a , b]==>
-  guard 
-    a = 1 and b = 0
-  end
-  
-  read_not_IDR_MMCO: action MMCO:[a , b]==>
-  guard 
-    a = 1 and b = 1
-  end
-  
-  MMCO_opcode0: action MMCO:[ a ]==>
-  guard 
-    a = 0
-  end
-  
-  // Mark a short term reference picture as "unused for reference "
-  MMCO_opcode.v1: action MMCO:[ a, b ]==>
-  guard 
-    a = 1
-  var 
-  	uint(size=4) idx
-  do
-    pred := frame_num - b-1; 
-    foreach int i in Integers( 0, short_term_count - 1 ) do
-      if short_term_list[i] = pred then 
-        idx := i;
-      end
-    end
+	read_reordering_of_pic_nums_idc_01: action
+			RefReordering:[a, b]
+				==>
+		guard 
+			(a = 0 or a = 1) 
+		var 
+			uint(size=4) idx         := 0, 
+			uint(size=4) pred_idx    := 0,
+			int          counter_for := 0
+		do
+			if (a = 0) then 
+				pred := pred - b - 1 ; 
+				if(pred < 0) then
+					pred := pred + ValMaxFrameNum;
+				end
+			else // if(a =1) then
+				pred := pred + b+1;
+				if(pred >= ValMaxFrameNum) then
+					pred := pred - ValMaxFrameNum;
+				end
+			end
+			/*foreach int i in Integers(0, short_term_count-1)
+			do
+				if (short_term_list[i] = pred) then 
+					pred_idx := pic_idx_list[i];
+				end
+			end*/
+			foreach int i in Integers(0, short_term_count+long_term_count-1)
+			do
+				//if (reordering_ref_list[i] = pred_idx) then 
+				if (reordering_ref_list[i] = pred) then 
+					idx := i; 
+				end
+			end
+			//Remove from the reference list the frame at index equals to idx
+			foreach int i in Integers(idx, short_term_count+long_term_count - 2)
+			do
+				reordering_ref_list[i] := reordering_ref_list[i + 1];
+			end
 
-    if ( idx = 0 ) then
-      foreach int s in Integers( 0, short_term_count - 2 ) do
-        short_term_list[s] := short_term_list[s + 1];
-    	pic_idx_list[s] := pic_idx_list[s + 1];
-      end
-    else
-      foreach int i in Integers(0, idx - 1) do
-        short_term_list[i] := short_term_list[i];
-        pic_idx_list[i] := pic_idx_list[i];
-      end
-      foreach int i in Integers(idx, short_term_count+long_term_count - 2) do
-        short_term_list[i] := short_term_list[i + 1];
-    	pic_idx_list[i] := pic_idx_list[i + 1];
-      end 
-    end
-    
-    short_term_count := short_term_count-1;
-  end
-  
-  // Mark a long term reference picture as "unused for reference "
-  MMCO_opcode.v2: action MMCO:[ a, b ]==>
-  guard 
-    a = 2
-  do
-    long_term_list[b] := -1;
-    long_term_count := long_term_count-1;
-  end
-  
-  // Mark a short term reference picture as long term
-  MMCO_opcode.v3: action MMCO:[a, b, c ]==>
-  guard 
-    a = 3
-  var uint(size=4) idx 
-  do
-    pred := frame_num - b-1; 
-    foreach int i in Integers(0, short_term_count-1) do
-      if short_term_list[i] = pred then idx := i; end
-    end
-    if long_term_list[c] = -1 then long_term_count := long_term_count+1; end
-	long_term_list[c] := pic_idx_list[idx];
-    if ( idx = 0 ) then
-      foreach int s in Integers( 0, short_term_count - 2 ) do
-        short_term_list[s] := short_term_list[s + 1];
-    	pic_idx_list[s] := pic_idx_list[s + 1];
-      end
-    else
-      foreach int i in Integers(0, idx - 1) do
-        short_term_list[i] := short_term_list[i];
-        pic_idx_list[i] := pic_idx_list[i];
-      end
-      foreach int i in Integers(idx, short_term_count+long_term_count - 2) do
-        short_term_list[i] := short_term_list[i + 1];
-        pic_idx_list[i] := pic_idx_list[i + 1];
-      end 
-    end
-    short_term_count := short_term_count-1;
-  end
-  
-  // Specify the maximum long term frame index
-  MMCO_opcode.v4: action MMCO:[a, b ]==>
-  guard 
-    a = 4
-  do
-    long_term_max_idx := b;
-    foreach int i in Integers(long_term_max_idx, 16-1) do
-      if long_term_list[i] != -1 then long_term_count := long_term_count-1; long_term_list[i] := -1; end
-    end
-  end
- 
-  // Mark all reference picture as "unused for reference "
-  MMCO_opcode.v5: action MMCO:[a]==>
-  guard 
-    a = 5
-  do
-    frame_num:=0;
-    pic_curr_idx:=0;
-    short_term_count := 0;
-    short_term_list := [-1 :for int s in Integers(0,16-1)];
-    pic_idx_list := [-1 :for int s in Integers(0,16-1)];
-    long_term_count := 0;
-    long_term_max_idx := 0;
-    long_term_list := [-1 :for int s in Integers(0,16-1)];
-  end
-  
-  // Mark the current picture as long term reference picture
-  MMCO_opcode.v6: action MMCO:[a, b ]==>
-  guard 
-    a = 6
-  do
-    if long_term_list[b] != -1 then long_term_count := long_term_count-1; long_term_list[b] := -1; end
-	long_term_idx := b;
-	flag_long_term := 1;
-  end
- 
-  schedule fsm  read_num_ref_frames:
-    read_num_ref_frames							( read_num_ref_frames)					--> read_ref_pic_list_reordering_flag;
-    read_ref_pic_list_reordering_flag			( read_ref_pic_list_reordering_flag_0) 	--> send_refList;
-    send_refList								( InitRefList_zero)						--> check_IDR;
-    send_refList								( InitRefList_not0)						--> RefListTabSent;
-    RefListTabSent								( SendRefList )							--> RefListTabSent;
-    RefListTabSent								( SendRefListDone )						--> check_IDR;
-    
-    
-    read_ref_pic_list_reordering_flag	  		(read_ref_pic_list_reordering_flag_1)	--> read_reordering_of_pic_nums_idc;
-    read_reordering_of_pic_nums_idc		  		(read_reordering_of_pic_nums_idc_01)	--> read_reordering_of_pic_nums_idc;
-    read_reordering_of_pic_nums_idc		   		(read_reordering_of_pic_nums_idc_2)		--> read_reordering_of_pic_nums_idc;
-    
-    read_reordering_of_pic_nums_idc				(read_reordering_of_pic_nums_idc_3)		--> IDC3SendRefList;
-    IDC3SendRefList	 							(IDC3SendRefList)				  		--> IDC3SendRefList;
-    IDC3SendRefList	 							(IDC3SendRefListDone)				    --> check_IDR;
-  
-    check_IDR									(read_IDR)								--> update_idx;
-    check_IDR									(read_not_IDR_not_MMCO)					--> update_idx;
-    check_IDR									(read_not_IDR_MMCO)						--> MMCO_opcode;
-    MMCO_opcode									(MMCO_opcode)							--> MMCO_opcode;
-    MMCO_opcode									(MMCO_opcode0)							--> update_idx;
-    update_idx									(update_idx)							--> read_num_ref_frames; 
-  end
+			//Add a frame at index equals to index.
+			//So copy the index - 1 first elements
+			//Add pred_ix at index "index"
+			//and copy the others elements of the list
+			counter_for:=short_term_count + long_term_count - 1;
+			foreach int i in Integers(0, counter_for - index)
+			do
+				reordering_ref_list[counter_for - i] := reordering_ref_list[counter_for - i - 1];
+			end
+			reordering_ref_list[index] := pred;
+			index := index +1 ;
+		end
 
-  priority
-  	SendRefListDone     > SendRefList;
-  	IDC3SendRefListDone > IDC3SendRefList;
-  end
+
+	read_reordering_of_pic_nums_idc_2: action
+			RefReordering:[a, b]
+				==>
+		guard 
+			a = 2
+		var 
+			uint(size=32) idx,
+			int counter_for  
+		do
+			foreach int i in Integers(0, short_term_count+long_term_count-1)
+			do
+				if (reordering_ref_list[i] = long_term_list[b]) then 
+					idx := i;
+				end
+			end
+
+			//Remove from the reference list the frame at index equals to idx
+			foreach int i in Integers(idx, short_term_count+long_term_count - 2)
+			do
+				reordering_ref_list[i] := reordering_ref_list[i + 1];
+			end 
+			
+			//Add a frame at index equals to index.
+			//So copy the index - 1 first elements
+			//Add pred_ix at index "index"
+			//and copy the others elements of the list
+			counter_for:=short_term_count + long_term_count - 1;
+			foreach int i in Integers(0, counter_for - index)
+			do
+				reordering_ref_list[counter_for - i] := reordering_ref_list[counter_for - i - 1];
+			end
+			reordering_ref_list[index] := long_term_list[b];
+			
+			reordering_ref_list[index] := long_term_list[b];
+			index := index + 1 ;
+		end
+
+
+	read_reordering_of_pic_nums_idc_3: action
+			RefReordering:[a]
+				==>
+		guard 
+			a = 3
+		do
+			RefListTab[0] := short_term_count + long_term_count;
+			foreach int s in Integers(0, short_term_count + long_term_count - 1)
+			do
+				RefListTab[s + 1] := reordering_ref_list[s];
+			end
+			EndInitIdc3 := true;
+		end
+
+
+	IDC3SendRefList: action 
+				==>
+			RefList:[ref]
+		guard
+			EndInitIdc3
+		var
+			uint(size = 5) ref
+		do
+			ref := RefListTab[CounterRefListTab];
+			CounterRefListTab := CounterRefListTab + 1;
+		end		
+
+
+	IDC3SendRefListDone: action ==>
+		guard
+			CounterRefListTab = short_term_count + long_term_count + 1
+		do
+			CounterRefListTab := 0;
+			EndInitIdc3       := false;
+		end	
+
+
+	InitRefList_zero: action 
+				==>
+			RefList:[0]
+		guard
+			(short_term_count + long_term_count) = 0
+		do
+			EndInitSentRefList := false;
+		end
+
+
+	InitRefList_not0: action ==> 
+		guard
+			(EndInitSentRefList = false)  and  ( short_term_count + long_term_count != 0 )
+		var 
+			List(type:uint(size=4),size=2*16) reflist := [0: for int k in Integers(0,2*16-1)],
+			int ListIndex := 0
+		do
+			if (short_term_count != 0) then 
+				foreach int l in Integers( 0, short_term_count - 1 )
+				do
+					reflist[l] := short_term_list[l];
+				end
+				ListIndex      := short_term_count; 
+			else // => inutile !
+				foreach int s in Integers( 0, short_term_count + long_term_count - 1 )
+				do
+					reflist[s] := 0;
+				end
+				ListIndex := short_term_count + long_term_count; 
+			end
+			if (long_term_count != 0) then
+				foreach int i in Integers(0, long_term_max_idx)
+				do
+					if (long_term_list[i] != -1) then 
+						reflist[ListIndex + i] := long_term_list[i]; 
+					end
+				end
+			end
+			RefListSent[0] := short_term_count + long_term_count;
+			foreach int s in Integers(0, short_term_count + long_term_count - 1)
+			do
+				RefListSent[s + 1] := reflist[s];	
+			end
+			EndInitSentRefList     := true;	
+		end
+
+
+	SendRefList: action
+				==>
+			RefList:[ref]
+		guard
+			EndInitSentRefList = true
+		var
+			uint(size = 5) ref
+		do
+			ref := RefListSent[CounterRefListTab];
+			CounterRefListTab := CounterRefListTab + 1;
+		end
+
+
+	SendRefListDone: action ==>
+		guard
+			CounterRefListTab = short_term_count + long_term_count + 1
+		do
+			CounterRefListTab  := 0;
+			EndInitSentRefList := false;
+		end
+
+
+	read_IDR: action
+			MMCO:[a , b]
+				==>
+		guard 
+			a = 0
+		do
+			flag_long_term   := b;
+			short_term_count := 0;
+			long_term_count  := 0;
+			short_term_list  := [-1 :for int s in Integers(0,16-1)];
+			pic_idx_list     := [-1 :for int s in Integers(0,16-1)];
+			long_term_list   := [-1 :for int s in Integers(0,16-1)];
+		end
+
+
+	read_not_IDR_not_MMCO: action
+			MMCO:[a , b]
+				==>
+		guard
+			a = 1 and b = 0
+		end
+
+
+	read_not_IDR_MMCO: action
+			MMCO:[a , b]
+				==>
+		guard 
+			a = 1 and b = 1
+		end
+
+
+	MMCO_opcode0: action
+			MMCO:[ a ]
+				==>
+		guard 
+			a = 0
+		end
+
+
+	// Mark a short term reference picture as "unused for reference "
+	MMCO_opcode.v1: action
+			MMCO:[ a, b ]
+				==>
+		guard 
+			a = 1
+		var 
+			uint(size=32) idx
+		do
+			pred := frame_num - b-1;
+			if(pred < 0) then
+				pred := pred + ValMaxFrameNum;
+			end
+			foreach int i in Integers( 0, short_term_count - 1 )
+			do
+				if (short_term_list[i] = pred) then 
+					idx := i;
+				end
+			end
+			foreach int i in Integers(idx, short_term_count - 2)
+			do
+				short_term_list[i] := short_term_list[i+1];
+			end
+			short_term_count := short_term_count-1;
+		end
+
+
+	// Mark a long term reference picture as "unused for reference "
+	MMCO_opcode.v2: action
+			MMCO:[ a, b ]
+				==>
+		guard 
+			a = 2
+		do
+			long_term_list[b] := -1;
+			long_term_count   := long_term_count-1;
+		end
+
+
+	// Mark a short term reference picture as long term
+	MMCO_opcode.v3: action
+			MMCO:[a, b, c ]
+				==>
+		guard 
+			a = 3
+		var
+			uint(size=4) idx 
+		do
+			pred := frame_num - b-1; 
+			if(pred < 0) then
+				pred := pred + ValMaxFrameNum;
+			end
+			foreach int i in Integers(0, short_term_count-1)
+			do
+				if (short_term_list[i] = pred) then
+					idx := i;
+				end
+			end
+			foreach int i in Integers(idx, short_term_count - 2)
+			do
+					short_term_list[i] := short_term_list[i + 1];
+			end
+			short_term_count := short_term_count-1;
+			
+			if (long_term_list[c] = -1) then
+				long_term_count := long_term_count+1;
+			end
+			long_term_list[c] := pred;
+		end
+
+
+	// Specify the maximum long term frame index
+	MMCO_opcode.v4: action
+			MMCO:[a, b ]
+				==>
+		guard 
+			a = 4
+		do
+			long_term_max_idx := b;
+			foreach int i in Integers(long_term_max_idx, 16-1)
+			do
+				if (long_term_list[i] != -1) then
+					long_term_count   := long_term_count-1;
+					long_term_list[i] := -1;
+				end
+			end
+		end
+
+
+	// Mark all reference picture as "unused for reference "
+	MMCO_opcode.v5: action
+			MMCO:[a]
+				==>
+		guard 
+			a = 5
+		do
+			frame_num         :=0;
+			pic_curr_idx      :=0;
+			short_term_count  := 0;
+			short_term_list   := [-1 :for int s in Integers(0,16-1)];
+			pic_idx_list      := [-1 :for int s in Integers(0,16-1)];
+			long_term_count   := 0;
+			long_term_max_idx := 0;
+			long_term_list    := [-1 :for int s in Integers(0,16-1)];
+		end
+  
+	// Mark the current picture as long term reference picture
+	MMCO_opcode.v6: action
+			MMCO:[a, b ]
+				==>
+		guard 
+			a = 6
+		do
+			if (long_term_list[b] != -1) then
+				long_term_count   := long_term_count-1;
+				long_term_list[b] := -1;
+			end
+			long_term_idx  := b;
+			flag_long_term := 1;
+		end
+
+
+	schedule fsm  read_num_ref_frames:
+		read_num_ref_frames               (read_num_ref_frames                 )--> read_ref_pic_list_reordering_flag;
+
+		/* there isn't list to sent */
+		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_0 )--> send_refList;
+		send_refList                      (InitRefList_zero                    )--> check_IDR;
+		send_refList                      (InitRefList_not0                    )--> RefListTabSent;
+		RefListTabSent                    (SendRefList                         )--> RefListTabSent;
+		RefListTabSent                    (SendRefListDone                     )--> check_IDR;
+
+		/* there is list 0 to sent */
+		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_1 )--> read_reordering_of_pic_nums_idc;
+		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_01  )--> read_reordering_of_pic_nums_idc;
+		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_2   )--> read_reordering_of_pic_nums_idc;
+		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_3   )--> IDC3SendRefList;
+		IDC3SendRefList                   (IDC3SendRefList                     )--> IDC3SendRefList;
+		IDC3SendRefList                   (IDC3SendRefListDone                 )--> check_IDR;
+
+		/* Get values about memory_management_control_operation */
+		check_IDR                         (read_IDR                            )--> update_idx;
+		check_IDR                         (read_not_IDR_not_MMCO               )--> update_idx;
+		check_IDR                         (read_not_IDR_MMCO                   )--> MMCO_opcode;
+		MMCO_opcode                       (MMCO_opcode                         )--> MMCO_opcode;
+		MMCO_opcode                       (MMCO_opcode0                        )--> update_idx;
+		update_idx                        (update_idx                          )--> read_num_ref_frames; 
+	end
+
+	priority
+		SendRefListDone     > SendRefList;
+		IDC3SendRefListDone > IDC3SendRefList;
+	end
 
 end

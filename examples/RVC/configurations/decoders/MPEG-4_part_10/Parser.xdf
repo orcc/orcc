@@ -182,9 +182,9 @@
         </Type>
     </Port>
     <Port kind="Output" name="RefList">
-        <Type name="uint">
+        <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
         </Type>
     </Port>
@@ -496,7 +496,11 @@
     <Connection dst="Algo_MMCO" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
     <Connection dst="Algo_MMCO" dst-port="RefReordering"
         src="Algo_Synp_AVC" src-port="RefReordering"/>
-    <Connection dst="" dst-port="RefList" src="Algo_MMCO" src-port="RefList"/>
+    <Connection dst="" dst-port="RefList" src="Algo_MMCO" src-port="RefList">
+        <Attribute kind="Value" name="bufferSize">
+            <Expr kind="Literal" literal-kind="Integer" value="1000000"/>
+        </Attribute>
+    </Connection>
     <Connection dst="" dst-port="CoefDC_Cr" src="Algo_BlockSplit_AVC" src-port="Block_V_DC"/>
     <Connection dst="" dst-port="CoefDC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_DC"/>
     <Connection dst="" dst-port="CoefAC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_AC"/>
@@ -527,4 +531,6 @@
     <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="MbType"/>
     <Connection dst="" dst-port="Intra_DC_flag"
         src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
+    <Connection dst="Algo_MMCO" dst-port="MaxFrameNum"
+        src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
 </XDF>

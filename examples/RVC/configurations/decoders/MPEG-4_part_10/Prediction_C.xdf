@@ -98,9 +98,9 @@
         <Type name="uint"/>
     </Port>
     <Port kind="Input" name="RefList">
-        <Type name="uint">
+        <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
         </Type>
     </Port>

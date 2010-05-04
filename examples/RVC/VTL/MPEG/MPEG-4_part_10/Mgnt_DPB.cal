@@ -17,71 +17,93 @@ This copyright notice must be included in all copies or derivative works. Copyri
 //Modified by Endri Bezati <endri.bezati@insa-renens.fr>
 //To work with Orcc
 actor Mgnt_DPB ( int MB_WIDTH ) 
-		uint(size=7) PicWidthInMb, 
-		uint(size=13) CurrMbAddr, 
-		uint(size=13) PicSizeInMb, 
-		uint POC, 
-		uint(size=5) RefList, 
-		int(size=9) WD, 
-		uint(size=21) RA, 
-		uint(size=11) RA_Width, 
-		uint(size=11) RA_Height,  
-		uint(size=3) RefIdx 
+	uint(size=7) PicWidthInMb, 
+	uint(size=13) CurrMbAddr, 
+	uint(size=13) PicSizeInMb, 
+	uint POC, 
+	int(size=32) RefList, 
+	int(size=9) WD, 
+	uint(size=21) RA, 
+	uint(size=11) RA_Width, 
+	uint(size=11) RA_Height,  
+	uint(size=3) RefIdx 
 		==> 
-		int(size=16) RD, 
-		//int(size=9) Display,
-		bool Write_Done
-:  
-//FIXME! number of MB per line of picture
-int PICWIDTH=1280/16; //number of MB per lines
-int PICHEIGHT=720/16; //number of MB per columns
+	int(size=16) RD, 
+	int(size=9) Display,
+	bool Write_Done
+		:
+	//FIXME! number of MB per line of picture
+	int PICWIDTH=1280/16; //number of MB per lines
+	int PICHEIGHT=720/16; //number of MB per columns
 
-  int MB_WIDTH_MAX    = 16;
-  int MB_WIDTH_LUMA   = 16;
-  int MB_WIDTH_CHROMA = 8;
-
-  uint(size=7) picwidth :=0;
-  uint(size=13) picsize := 0;
-  List(type:uint,size=16) poc := [0 :for int s in Integers(0,16-1)];
-  uint(size=21) wa := 0;
-  uint(size=11) wa_W;
-  uint(size=11) wa_H;
-  uint(size=11) wa_x := 0;
-  uint(size=11) wa_y := 0;
-  List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=16) pic;
-  uint(size=4) pic_curr_idx := 0;
-  List(type:uint(size=4),size=16) pic_ref_idx := [0 :for int s in Integers(0,16-1)];
-  List(type:uint(size=1),size=16) flag_picture_end := [1 : for int s in Integers(0,16-1)];
-  List(type:uint(size=1),size=16) flag_display := [1 : for int s in Integers(0,16-1)];
-  int(size=14) nbMBdisplay := 0;
-  uint(size=4) pic_display_idx := 0;
-  uint(size=21) ra := 0;
-  uint(size=11) ra_W;
-  uint(size=11) ra_H;
-  uint(size=11) ra_x := 0;
-  uint(size=11) ra_y := 0;
-  uint(size=4) nb_ref := 0;
-  uint(size=4) ref_idx := 0;
-  uint(size=1) read_done := 1;
-  uint(size=1) write_done := 1;
-  uint(size=16) currmbaddr := 0;
-  int countRead := 0;
-  
-  initialize ==>
+	int MB_WIDTH_MAX    = 16;
+	int MB_WIDTH_LUMA   = 16;
+	int MB_WIDTH_CHROMA = 8;
+	
+	uint(size=7) picwidth :=0;
+	uint(size=13) picsize := 0;
+	List(type:uint,size=16) poc := [0 :for int s in Integers(0,16-1)];
+	uint(size=21) wa := 0;
+	uint(size=11) wa_W;
+	uint(size=11) wa_H;
+	uint(size=11) wa_x := 0;
+	uint(size=11) wa_y := 0;
+	List(type:int(size=32),size=17) pic_index_to_frame_num := [-1 :for int s in Integers(0,16)];
+	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=17) pic;
+	int(size=32) pic_curr_idx := 0;
+	List(type:uint(size=4),size=17) pic_ref_idx := [0 :for int s in Integers(0,17-1)];
+	List(type:uint(size=1),size=17) flag_picture_end := [1 : for int s in Integers(0,17-1)];
+	List(type:uint(size=1),size=17) flag_display := [1 : for int s in Integers(0,17-1)];
+	int(size=14) nbMBdisplay := 0;
+	int(size=5) pic_display_idx := -1;
+	uint(size=21) ra := 0;
+	uint(size=11) ra_W;
+	uint(size=11) ra_H;
+	uint(size=11) ra_x := 0;
+	uint(size=11) ra_y := 0;
+	uint(size=4) nb_ref := 0;
+	uint(size=4) ref_idx := 0;
+	uint(size=1) read_done := 1;
+	uint(size=1) write_done := 1;
+	uint(size=16) currmbaddr := 0;
+	int countRead := 0;
+ 
+initialize ==>
   do
-    pic := [ [-1 : for int i in Integers( 0, PICWIDTH*PICHEIGHT*256-1)]: for int j in Integers( 0, 16-1) ];
+    pic := [ [-1 : for int i in Integers( 0, PICWIDTH*PICHEIGHT*256-1)]: for int j in Integers( 0, 17-1) ];
   end
 
     
   read_ref_parameters: action RefList:[a, b] ==>
+  var
+  	bool         idx_selected := false,
+  	int(size=32) i            := 0
   do
-    pic_curr_idx := a;
+  	pic_curr_idx := -1;
+  	while((not idx_selected) and (i < 17))
+  	do
+  		if(pic_index_to_frame_num[i] = a) then
+  			pic_curr_idx := i;
+  			idx_selected := true;
+  		else if((pic_index_to_frame_num[i] = -1) and (pic_curr_idx = -1)) then
+  		     	pic_curr_idx              := i;
+  		     	pic_index_to_frame_num[i] := a;
+  		     end
+  		end
+  		i := i + 1;
+  	end
+
+  	/*Fix Me!!! ==> exception*/
+  	if(pic_curr_idx = -1) then
+  		pic_curr_idx := 16;
+  		pic_index_to_frame_num[16] := a;
+  	end
     nb_ref := b;
   end
   
   read_pic_parameters: action  POC:[c] ==>
   guard
-    flag_picture_end[pic_curr_idx] = 1, flag_display[pic_curr_idx] = 1 //flag_display pour ne pas virer l image avant de l'avoir affichï¿½e
+    flag_picture_end[pic_curr_idx] = 1, flag_display[pic_curr_idx] = 1 //flag_display pour ne pas virer l image avant de l'avoir affichée
   do
 		    
     poc[pic_curr_idx] := c;
@@ -90,18 +112,56 @@ int PICHEIGHT=720/16; //number of MB per columns
     //println("read_pic_parameters: pic_curr_idx "+pic_curr_idx+" poc "+poc+" pic_ref_idx "+pic_ref_idx+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display+" pic_display_idx "+pic_display_idx);
   end
 
-  read_refList: action RefList:[v] ==>  
+  read_refList: action RefList:[v] ==>
+  var
+  	int          idx := 0,
+  	bool         idx_selected := false,
+  	int(size=32) i            := 0
   do
-    pic_ref_idx[countRead] := v;
+  	while((not idx_selected) and (i < 17))
+  	do
+  		if(pic_index_to_frame_num[i] = v) then
+  			idx          := i;
+  			idx_selected := true;
+  		end
+  		i := i + 1;
+  	end
+    pic_ref_idx[countRead] := idx;
     countRead := countRead +1;
   end
   
   refList_done: action ==> 
   guard
   	countRead  =  nb_ref
+  var
+  	bool is_present := false
   do
     if nb_ref = 0 then
       pic_ref_idx[0] := 0;
+      foreach int i in Integers(0,16)
+      do
+      	if(i != pic_curr_idx)then
+      		pic_index_to_frame_num[i] := -1;
+      	end
+      end
+    else
+      foreach int i in Integers(0,16)
+      do
+      	is_present := false;
+      	if(i != pic_curr_idx)then
+      		foreach int j in Integers(0,nb_ref-1)
+      		do
+      			if(pic_ref_idx[j] = i)then
+      				is_present := true;
+      			end
+      		end
+      	else
+      		is_present := true;
+      	end
+      	if(not is_present) then
+      		pic_index_to_frame_num[i] := -1;
+      	end
+      end
     end
   	countRead := 0;
   end
@@ -142,12 +202,48 @@ int PICHEIGHT=720/16; //number of MB per columns
   write_picture_done: action ==> Write_Done:[true]
   guard 
       write_done = 1, currmbaddr = picsize - 1
+  var
+    uint(size=5) idx,
+    int (size=32) frame_num
   do
     println("write_picture_done");
     flag_picture_end[pic_curr_idx] := 1;
     wa_x := 0;
     wa_y := 0;
     currmbaddr:=0;
+    
+    if(pic_display_idx>=0) then
+    	frame_num := pic_index_to_frame_num[pic_display_idx];
+    else
+    	frame_num := -1;
+    end
+	pic_display_idx := -1;
+	foreach int i in Integers (0,16)
+	do
+		if( (pic_index_to_frame_num[i] > frame_num) and flag_display[i] = 0 and flag_picture_end[i]=1) then
+			if(pic_display_idx != -1) then
+				if(pic_index_to_frame_num[i]<pic_index_to_frame_num[pic_display_idx])then
+					pic_display_idx := i;
+				end
+			else
+				pic_display_idx := i;
+			end
+		end
+	end
+	if(pic_display_idx = -1) then
+		foreach int i in Integers (0,16)
+		do
+			if(pic_index_to_frame_num[i] >= 0 and flag_display[i] = 0 and flag_picture_end[i]=1) then
+				if(pic_display_idx != -1) then
+					if(pic_index_to_frame_num[i]<pic_index_to_frame_num[pic_display_idx])then
+						pic_display_idx := i;
+					end
+				else
+					pic_display_idx := i;
+				end
+			end			
+		end
+	end
   end 
   
   get_readAddr: action RA:[a], RA_Width:[b], RA_Height:[c], RefIdx:[e] ==>
@@ -185,7 +281,7 @@ int PICHEIGHT=720/16; //number of MB per columns
   end
  
   //write MB on the output display
-  Display_MB_CHROMA:action ==>  /*Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_CHROMA * MB_WIDTH_CHROMA-1)] ] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA*/
+  Display_MB_CHROMA:action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_CHROMA * MB_WIDTH_CHROMA-1)] ] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA
   guard
     flag_display[pic_display_idx] = 0 and flag_picture_end[pic_display_idx] = 1,
     MB_WIDTH = MB_WIDTH_CHROMA
@@ -193,6 +289,8 @@ int PICHEIGHT=720/16; //number of MB per columns
     uint CurrAddrInPix, uint(size=5) last_idx,
     uint(size=2) flag_poc := 0,
     uint(size=5) idx,
+    int (size=32) frame_num,
+    int (size=6) new_pic_display_idx := -1,
     
     List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH_CHROMA*MB_WIDTH_CHROMA) ] 
   do
@@ -206,23 +304,26 @@ int PICHEIGHT=720/16; //number of MB per columns
     if nbMBdisplay = picsize then 
       flag_display[pic_display_idx] := 1;
       nbMBdisplay := 0;
-      if (pic_display_idx<16 - 1) then
+      
+   /*   if (pic_display_idx<16 - 1) then
       	pic_display_idx := pic_display_idx + 1;
       else
       	pic_display_idx := 0;
-      end
-      println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
+      end*/
+    //  println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
     end
   end
  
   //write MB on the output display
-  Display_MB_LUMA:action ==>  /*Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_LUMA * MB_WIDTH_LUMA-1)] ] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA*/
+  Display_MB_LUMA:action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_LUMA * MB_WIDTH_LUMA-1)] ] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA
   guard
     flag_display[pic_display_idx] = 0 and flag_picture_end[pic_display_idx] = 1
   var
     uint CurrAddrInPix, uint(size=5) last_idx,
     uint(size=2) flag_poc := 0,
     uint(size=5) idx,
+    int (size=32) frame_num,
+    int (size=6) new_pic_display_idx := -1,
     
     List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH_LUMA*MB_WIDTH_LUMA) ] 
   do
@@ -236,12 +337,12 @@ int PICHEIGHT=720/16; //number of MB per columns
     if nbMBdisplay = picsize then 
       flag_display[pic_display_idx] := 1;
       nbMBdisplay := 0;
-      if (pic_display_idx<16 - 1) then
+     /* if (pic_display_idx<16 - 1) then
       	pic_display_idx := pic_display_idx + 1;
       else
       	pic_display_idx := 0;
-      end
-      println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
+      end*/
+     // println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
     end
   end
   
