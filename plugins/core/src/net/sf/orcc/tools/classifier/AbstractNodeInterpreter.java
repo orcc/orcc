@@ -44,6 +44,7 @@ import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 
 /**
  * This class defines an abstract node/instruction interpreter. It refines the
@@ -196,6 +197,32 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 						exprInterpreter));
 			}
 		}
+	}
+
+	@Override
+	public void visit(WhileNode node, Object... args) {
+		// Interpret first expression ("while" condition)
+		Object condition = node.getValue().accept(exprInterpreter);
+
+		if (condition instanceof Boolean) {
+			while ((Boolean) condition) {
+				for (CFGNode subNode : node.getNodes()) {
+					subNode.accept(this, args);
+				}
+
+				// Interpret next value of "while" condition
+				condition = node.getValue().accept(exprInterpreter);
+				if (!(condition instanceof Boolean) && schedulableMode) {
+					// only throw exception in schedulable mode
+					throw new OrccRuntimeException("null condition");
+				}
+			}
+		} else if (schedulableMode) {
+			// only throw exception in schedulable mode
+			throw new OrccRuntimeException("null condition");
+		}
+
+		node.getJoinNode().accept(this, args);
 	}
 
 	@Override
