@@ -29,45 +29,19 @@
 package net.sf.orcc.tools.classifier;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import jp.ac.kobe_u.cs.cream.DefaultSolver;
-import jp.ac.kobe_u.cs.cream.IntDomain;
-import jp.ac.kobe_u.cs.cream.IntVariable;
-import jp.ac.kobe_u.cs.cream.Network;
 import jp.ac.kobe_u.cs.cream.Solution;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.UintType;
 
 /**
  * This class defines a configuration analyzer.
@@ -77,264 +51,7 @@ import net.sf.orcc.ir.type.UintType;
  */
 public class TimeDependencyAnalyzer {
 
-	/**
-	 * This class defines a visitor that examines expressions that depend on a
-	 * value peeked from the configuration port.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class ConstraintExpressionVisitor implements ExpressionInterpreter {
-
-		/**
-		 * Creates a new constraint expression visitor.
-		 * 
-		 */
-		public ConstraintExpressionVisitor() {
-		}
-
-		/**
-		 * Adds a constraint between an integer variable and either another
-		 * integer variable or an integer value.
-		 * 
-		 * @param v1
-		 *            an integer variable
-		 * @param op
-		 *            a binary operator
-		 * @param o2
-		 *            an integer variable or an integer value
-		 */
-		private Object addConstraint(IntVariable v1, BinaryOp op, Object o2) {
-			switch (op) {
-			case BITAND:
-				if (o2 instanceof Integer) {
-					return v1.bitand((Integer) o2);
-				}
-				break;
-			case EQ:
-				if (o2 instanceof IntVariable) {
-					v1.equals((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.equals(((Integer) o2).intValue());
-				}
-				break;
-			case GE:
-				if (o2 instanceof IntVariable) {
-					v1.ge((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.ge((Integer) o2);
-				}
-				break;
-			case GT:
-				if (o2 instanceof IntVariable) {
-					v1.gt((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.gt((Integer) o2);
-				}
-				break;
-			case LE:
-				if (o2 instanceof IntVariable) {
-					v1.le((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.le((Integer) o2);
-				}
-				break;
-			case LT:
-				if (o2 instanceof IntVariable) {
-					v1.lt((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.lt((Integer) o2);
-				}
-				break;
-			case NE:
-				if (o2 instanceof IntVariable) {
-					v1.notEquals((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.notEquals((Integer) o2);
-				}
-				break;
-			default:
-				throw new OrccRuntimeException("unsupported binary operator");
-			}
-
-			return null;
-		}
-
-		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
-			Object o1 = expr.getE1().accept(this);
-			Object o2 = expr.getE2().accept(this);
-
-			BinaryOp op = expr.getOp();
-			if (o1 instanceof IntVariable) {
-				IntVariable v1 = (IntVariable) o1;
-				return addConstraint(v1, op, o2);
-			} else {
-				if (o2 instanceof IntVariable) {
-					IntVariable v2 = (IntVariable) o2;
-					return addConstraint(v2, op.getReversedInequality(), o1);
-				} else {
-					switch (op) {
-					case LOGIC_AND:
-						return null;
-					default:
-						throw new OrccRuntimeException(
-								"no variable in expression");
-					}
-				}
-			}
-		}
-
-		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
-			return expr.getValue();
-		}
-
-		@Override
-		public Object interpret(IntExpr expr, Object... args) {
-			return expr.getValue();
-		}
-
-		@Override
-		public Object interpret(ListExpr expr, Object... args) {
-			throw new OrccRuntimeException("unsupported list expression");
-		}
-
-		@Override
-		public Object interpret(StringExpr expr, Object... args) {
-			throw new OrccRuntimeException("unsupported string expression");
-		}
-
-		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
-			switch (expr.getOp()) {
-			case MINUS:
-				Object obj = expr.getExpr().accept(this);
-				if (obj instanceof IntVariable) {
-					return ((IntVariable) obj).negate();
-				} else if (obj instanceof Integer) {
-					return -((Integer) obj);
-				}
-			}
-
-			throw new OrccRuntimeException("unsupported unary operation");
-		}
-
-		@Override
-		public Object interpret(VarExpr expr, Object... args) {
-			Variable variable = expr.getVar().getVariable();
-			if (variable == null) {
-				throw new OrccRuntimeException("unknown variable");
-			}
-			return variables.get(variable);
-		}
-
-	}
-
-	/**
-	 * This class defines a visitor that examines guards that depend on a value
-	 * peeked from the configuration port. This visitor is only run if there is
-	 * a configuration port.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class GuardVisitor extends AbstractActorTransformation {
-
-		/**
-		 * Creates a guard visitor.
-		 * 
-		 */
-		public GuardVisitor() {
-		}
-
-		/**
-		 * Associate the target local variable with an int variable that has the
-		 * characteristics (name, domain) of the given variable.
-		 * 
-		 * @param target
-		 *            a target local variable
-		 * @param variable
-		 *            a state variable or a port
-		 */
-		private void associateVariable(Variable target, Variable variable) {
-			IntVariable intVar = variables.get(variable);
-			if (intVar == null) {
-				// create int variable associated with given variable
-				// variable may be a state variable or a port
-				intVar = new IntVariable(network, getDomain(variable), variable
-						.getName());
-				variables.put(variable, intVar);
-			}
-
-			// associate int variable with local variable
-			variables.put(target, intVar);
-		}
-
-		/**
-		 * Returns the domain of the given variable, or throws an exception.
-		 * 
-		 * @param variable
-		 *            a variable
-		 * @return the domain of the given variable
-		 */
-		private IntDomain getDomain(Variable variable) {
-			int lo;
-			int hi;
-
-			if (variable.getType().isInt()) {
-				IntType type = (IntType) variable.getType();
-				Expression size = type.getSize();
-				ExpressionEvaluator evaluator = new ExpressionEvaluator();
-				int num = evaluator.evaluateAsInteger(size);
-				lo = -(1 << (num - 1));
-				hi = (1 << (num - 1)) - 1;
-			} else if (variable.getType().isUint()) {
-				UintType type = (UintType) variable.getType();
-				Expression size = type.getSize();
-				ExpressionEvaluator evaluator = new ExpressionEvaluator();
-				int num = evaluator.evaluateAsInteger(size);
-				lo = 0;
-				hi = 1 << num - 1;
-			} else if (variable.getType().isBool()) {
-				lo = 0;
-				hi = 1;
-			} else {
-				throw new OrccRuntimeException("type of variable not supported");
-			}
-
-			return new IntDomain(lo, hi);
-		}
-
-		@Override
-		public void visit(Assign assign, Object... args) {
-			ConstraintExpressionVisitor visitor = new ConstraintExpressionVisitor();
-			assign.getValue().accept(visitor);
-		}
-
-		@Override
-		public void visit(Load load, Object... args) {
-			associateVariable(load.getTarget(), load.getSource().getVariable());
-		}
-
-		@Override
-		public void visit(Peek peek, Object... args) {
-			associateVariable(peek.getTarget(), peek.getPort());
-		}
-
-	}
-
 	private Actor actor;
-
-	/**
-	 * the constraint network
-	 */
-	private Network network;
-
-	/**
-	 * a map of IR variables to constraint variables
-	 */
-	private Map<Variable, IntVariable> variables;
 
 	/**
 	 * Creates a new configuration analyzer for the given actor
@@ -357,19 +74,16 @@ public class TimeDependencyAnalyzer {
 	 *         compatible
 	 */
 	private boolean areGuardsCompatible(Action previous, Action action) {
-		network = new Network();
-		variables = new HashMap<Variable, IntVariable>();
-
+		ConstraintBuilder builder = new ConstraintBuilder();
 		try {
-			GuardVisitor visitor = new GuardVisitor();
-			visitAction(previous, visitor);
-			visitAction(action, visitor);
+			builder.visitAction(previous);
+			builder.visitAction(action);
 		} catch (OrccRuntimeException e) {
 			System.out.println(actor + ": could not evaluate guards");
 			return true;
 		}
 
-		DefaultSolver solver = new DefaultSolver(network);
+		DefaultSolver solver = new DefaultSolver(builder.getNetwork());
 		Solution solution = solver.findFirst();
 		if (solution != null) {
 			System.out.println(actor + ": guards are compatible");
@@ -439,21 +153,6 @@ public class TimeDependencyAnalyzer {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Visits the given action with the given visitor.
-	 * 
-	 * @param action
-	 *            action associated with the next state
-	 * @param visitor
-	 *            a node visitor
-	 */
-	private void visitAction(Action action, NodeVisitor visitor) {
-		Procedure scheduler = action.getScheduler();
-		for (CFGNode node : scheduler.getNodes()) {
-			node.accept(visitor);
-		}
 	}
 
 }

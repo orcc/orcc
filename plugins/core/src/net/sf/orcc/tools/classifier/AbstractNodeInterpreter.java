@@ -31,7 +31,6 @@ package net.sf.orcc.tools.classifier;
 import java.lang.reflect.Array;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
@@ -63,11 +62,25 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 	private boolean schedulableMode;
 
-	public AbstractNodeInterpreter(String id, ConfigurationAnalyzer analyzer) {
-		this.analyzer = analyzer;
-
-		listAllocator = new ListAllocator();
+	/**
+	 * Creates a new abstract node interpreter that uses
+	 * {@link AbstractExpressionEvaluator} to evaluate expressions.
+	 */
+	public AbstractNodeInterpreter() {
+		super();
 		exprInterpreter = new AbstractExpressionEvaluator();
+	}
+
+	/**
+	 * Creates a new abstract node interpreter that uses the given configuration
+	 * analyzer.
+	 * 
+	 * @param analyzer
+	 *            a configuration analyzer
+	 */
+	public AbstractNodeInterpreter(ConfigurationAnalyzer analyzer) {
+		this();
+		this.analyzer = analyzer;
 	}
 
 	/**

@@ -58,15 +58,13 @@ public class AbstractInterpretedActor extends InterpretedActor {
 	 */
 	public AbstractInterpretedActor(String id, Actor actor,
 			ConfigurationAnalyzer analyzer) {
-		// TODO : "null" argument must be replaced by the instance parameters
-		// map for actor initialization
 		super(id, new HashMap<String, Expression>(), actor);
 
 		// will schedule one step at a time
 		isSynchronousScheduler = true;
 
 		// Build a node interpreter for visiting CFG and instructions
-		interpret = new AbstractNodeInterpreter(id, analyzer);
+		interpret = new AbstractNodeInterpreter(analyzer);
 	}
 
 	@Override

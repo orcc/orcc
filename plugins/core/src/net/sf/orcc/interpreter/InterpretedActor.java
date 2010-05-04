@@ -131,7 +131,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		instrStack = new ArrayList<Instruction>();
 
 		// Build a node interpreter for visiting CFG and instructions
-		interpret = new NodeInterpreter(name);
+		interpret = new NodeInterpreter();
 
 		// Creates an expression evaluator for state and local variables init
 		this.constEval = new ConstantEvaluator();

@@ -80,13 +80,10 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	private Object returnValue;
 
 	/**
-	 * Creates a new node interpreter without setting its list allocator nor its
-	 * expression interpreter.
+	 * Creates a new node interpreter that has a list allocator and uses the
+	 * {@link ExpressionEvaluator} class to evaluate expressions.
 	 */
-	protected NodeInterpreter() {
-	}
-
-	public NodeInterpreter(String id) {
+	public NodeInterpreter() {
 		// Create the List allocator for called procedure local vars
 		listAllocator = new ListAllocator();
 

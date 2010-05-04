@@ -28,11 +28,8 @@
  */
 package net.sf.orcc.tools.classifier;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -52,6 +49,7 @@ import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.traverse.DepthFirstIterator;
 
 /**
  * This class defines an actor classifier that uses symbolic execution to
@@ -244,13 +242,7 @@ public class ActorClassifierIndependent {
 			Action action) {
 		SDFActorClass staticClass = new SDFActorClass();
 
-		actor.resetTokenConsumption();
-		actor.resetTokenProduction();
-
-		// creates a partial interpreter
-		AbstractInterpretedActor interpretedActor = new AbstractInterpretedActor(
-				actor.getName(), actor, analyzer);
-		interpretedActor.initialize();
+		AbstractInterpretedActor interpretedActor = newInterpreter();
 		interpretedActor.setAction(action);
 
 		// schedule the actor
@@ -300,6 +292,8 @@ public class ActorClassifierIndependent {
 
 			return quasiStatic;
 		} else {
+			System.out.println(actor.getName()
+					+ " has an FSM that is NOT compatible with quasi-static");
 			return new DynamicActorClass();
 		}
 	}
@@ -377,59 +371,26 @@ public class ActorClassifierIndependent {
 	 *            a Finite State Machine
 	 * @return <code>true</code> if the given FSM has quasi-static form
 	 */
-	@SuppressWarnings("unchecked")
 	private boolean isQuasiStaticFsm(FSM fsm) {
 		DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
 		State initialState = fsm.getInitialState();
-
-		int n = graph.vertexSet().size();
-		int[] belongs = new int[n];
-		Set<State>[] branches = new Set[n];
-
-		Queue<State> queue = new ArrayDeque<State>();
 		Set<UniqueEdge> edges = graph.outgoingEdgesOf(initialState);
 		for (UniqueEdge edge : edges) {
 			State target = graph.getEdgeTarget(edge);
-			Set<State> set = new HashSet<State>();
-			set.add(target);
-			branches[target.getIndex()] = set;
 
-			if (!target.equals(initialState)) {
-				belongs[target.getIndex()] = target.getIndex();
-				queue.add(target);
-			}
-		}
+			DepthFirstIterator<State, UniqueEdge> it;
+			it = new DepthFirstIterator<FSM.State, UniqueEdge>(graph, target);
 
-		while (!queue.isEmpty()) {
-			State state = queue.remove();
-			int index = belongs[state.getIndex()];
-
-			edges = graph.outgoingEdgesOf(state);
-			for (UniqueEdge edge : edges) {
-				State target = graph.getEdgeTarget(edge);
-				if (target.equals(initialState)) {
-					if (branches[index].contains(initialState)) {
-						// at most one path back to initial state
-						return false;
-					}
-					branches[index].add(initialState);
-				} else if (!target.equals(state)) {
-					// ignore loops
-					if (belongs[target.getIndex()] == 0) {
-						belongs[target.getIndex()] = index;
-						branches[index].add(target);
-						queue.add(target);
-					} else if (belongs[target.getIndex()] != index) {
-						// state belongs to another branch
-						return false;
-					}
+			boolean cyclesBackToInitialState = false;
+			while (it.hasNext()) {
+				State state = it.next();
+				if (state.equals(initialState)) {
+					cyclesBackToInitialState = true;
+					break;
 				}
 			}
-		}
 
-		for (Set<State> branch : branches) {
-			if (branch != null && !branch.isEmpty()
-					&& !branch.contains(initialState)) {
+			if (!cyclesBackToInitialState) {
 				return false;
 			}
 		}
@@ -446,10 +407,11 @@ public class ActorClassifierIndependent {
 	private AbstractInterpretedActor newInterpreter() {
 		AbstractInterpretedActor interpretedActor = new AbstractInterpretedActor(
 				actor.getName(), actor, analyzer);
-		interpretedActor.initialize();
 
 		actor.resetTokenConsumption();
 		actor.resetTokenProduction();
+
+		interpretedActor.initialize();
 
 		return interpretedActor;
 	}
