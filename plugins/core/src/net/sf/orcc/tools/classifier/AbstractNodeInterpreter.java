@@ -160,16 +160,16 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 			int value = analyzer.getConfigurationValue(action);
 			Object[] target = (Object[]) peek.getTarget().getValue();
 			target[0] = value;
-			portRead = true;
 		}
 	}
 
 	@Override
 	public void visit(Read read, Object... args) {
-		if (read.getPort().equals(analyzer.getConfigurationPort())) {
+		if (read.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
 			int value = analyzer.getConfigurationValue(action);
 			Object[] target = (Object[]) read.getTarget().getValue();
 			target[0] = value;
+			portRead = true;
 		}
 
 		read.getPort().increaseTokenConsumption(read.getNumTokens());

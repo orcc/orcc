@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jp.ac.kobe_u.cs.cream.DefaultSolver;
+import jp.ac.kobe_u.cs.cream.IntVariable;
+import jp.ac.kobe_u.cs.cream.Solution;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -171,31 +174,34 @@ public class ConfigurationAnalyzer {
 		for (NextStateInfo info : fsm.getTransitions(initialState)) {
 			ConstraintBuilder visitor = new ConstraintBuilder();
 
+			// add negated constraints of previous actions
 			visitor.setNegateConstraints(true);
 			for (Action action : previous) {
 				visitor.visitAction(action);
 			}
-			visitor.setNegateConstraints(false);
 
+			// add constraint of current action
+			visitor.setNegateConstraints(false);
 			visitor.visitAction(info.getAction());
 
+			// add current action to "previous" list
 			previous.add(info.getAction());
-			// TODO
 
-			// if (visitor.getVariable() == null) {
-			// System.out.println("no constraint on " + port);
-			// } else {
-			// IntVariable variable = visitor.getVariable();
-			// if (variable != null) {
-			// DefaultSolver solver = new DefaultSolver(variable
-			// .getNetwork());
-			// Solution solution = solver.findFirst();
-			// if (solution != null) {
-			// int value = solution.getIntValue(variable);
-			// values.put(info.getAction(), value);
-			// }
-			// }
-			// }
+			// solve
+			IntVariable variable = visitor.getVariable(port.getName());
+			if (variable == null) {
+				System.out.println("no constraint on " + port);
+			} else {
+				if (variable != null) {
+					DefaultSolver solver = new DefaultSolver(variable
+							.getNetwork());
+					Solution solution = solver.findFirst();
+					if (solution != null) {
+						int value = solution.getIntValue(variable);
+						values.put(info.getAction(), value);
+					}
+				}
+			}
 		}
 	}
 

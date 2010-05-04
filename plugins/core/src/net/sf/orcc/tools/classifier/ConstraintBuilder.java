@@ -29,6 +29,7 @@
 package net.sf.orcc.tools.classifier;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jp.ac.kobe_u.cs.cream.IntDomain;
@@ -39,6 +40,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -211,7 +213,14 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 			if (variable == null) {
 				throw new OrccRuntimeException("unknown variable");
 			}
-			return variables.get(variable);
+
+			Type type = variable.getType();
+			Object value = variable.getValue();
+			if (value != null && (type.isInt() || type.isUint())) {
+				return value;
+			} else {
+				return variables.get(variable);
+			}
 		}
 
 	}
@@ -224,12 +233,18 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	private Network network;
 
 	/**
+	 * a map of name to constraint variables
+	 */
+	private Map<String, IntVariable> variableNames;
+
+	/**
 	 * a map of IR variables to constraint variables
 	 */
 	private Map<Variable, IntVariable> variables;
 
 	public ConstraintBuilder() {
 		network = new Network();
+		variableNames = new HashMap<String, IntVariable>();
 		variables = new HashMap<Variable, IntVariable>();
 	}
 
@@ -250,6 +265,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 			intVar = new IntVariable(network, getDomain(variable), variable
 					.getName());
 			variables.put(variable, intVar);
+			variableNames.put(intVar.getName(), intVar);
 		}
 
 		// associate int variable with local variable
@@ -303,6 +319,15 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	}
 
 	/**
+	 * Returns the constraint variable with the given name.
+	 * 
+	 * @return the constraint variable with the given name
+	 */
+	public IntVariable getVariable(String name) {
+		return variableNames.get(name);
+	}
+
+	/**
 	 * Sets the negateConstraints flag.
 	 * 
 	 * @param negateConstraints
@@ -320,7 +345,23 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 
 	@Override
 	public void visit(Load load, Object... args) {
-		associateVariable(load.getTarget(), load.getSource().getVariable());
+		// execute the load
+		super.visit(load);
+
+		Variable source = load.getSource().getVariable();
+		List<Expression> indexes = load.getIndexes();
+		if (!indexes.isEmpty()) {
+			if (indexes.size() != 1) {
+				throw new OrccRuntimeException("loading multi-dimensional "
+						+ "arrays not supported by constraint builder");
+			}
+			if (!indexes.get(0).equals(new IntExpr(0))) {
+				throw new OrccRuntimeException("loading arrays "
+						+ "with index != 0 not supported");
+			}
+		}
+
+		associateVariable(load.getTarget(), source);
 	}
 
 	@Override
