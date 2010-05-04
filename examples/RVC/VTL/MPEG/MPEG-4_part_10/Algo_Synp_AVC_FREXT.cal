@@ -145,7 +145,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	// SLICE TYPES
 	
-	function IS_INxN(int SliceType, int Mbtype) --> bool : (Mbtype > 0 and Mbtype < 25) and (SliceType = SLICE_TYPE_I) end
+	function IS_INxN(int SliceType, int Mbtype) --> bool : (Mbtype >= 0 and Mbtype < 25) and (SliceType = SLICE_TYPE_I) end
 	function IS_I4x4(int SliceType, int Mbtype) --> bool : (Mbtype = 0 ) and (SliceType = SLICE_TYPE_I) end
 	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
 	function IS_P(int SliceType) --> bool : SliceType = SLICE_TYPE_P end
@@ -2459,7 +2459,7 @@ actor Algo_Synp_AVC_FREXT()
 		if val_CurrMbAddr = 0 then
 			false
 		else 
-			( val_CurrMbAddr mod PicWidthInMbs ) = 0
+			( val_CurrMbAddr mod PicWidthInMbs ) != 0
 		end
 	end
 	
@@ -2736,7 +2736,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
-			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) = 2) then
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) then
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
@@ -2757,7 +2757,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
-			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) = 2) then
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) then
 				condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
@@ -5514,7 +5514,7 @@ actor Algo_Synp_AVC_FREXT()
 			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
 			
 	guard
-		prevMbSkipped = 1
+		prevMbSkipped = 1 and IS_CAVLC()
 	var 
 		int mb_addr
 	do
@@ -5526,6 +5526,42 @@ actor Algo_Synp_AVC_FREXT()
 			moreDataFlag := more_rbsp_data();
 		end
 	end
+	
+	read_SliceD_mb_skip_run_done1_CABAC: action 
+		==> 
+			CurrMbAddr:[mb_addr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[first_mb_in_slice],
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
+			slice_beta_offset:[val_slice_beta_offset],
+			LFDisable:[disable_deblocking_filter_idc],
+			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
+			cbp_blk:[0],
+			QP:[val_QP], 
+			QP_Cb:[val_QP_Cb], 
+			QP_Cr:[val_QP_Cr], 
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			MbIntraFlag:[0], 
+			MbPartIdx:[1], 
+			RefIdx:[0], 
+			MbPartWidth:[16], 
+			MbPartHeigth:[16], 
+			MvRes:[0,0]			
+	guard
+		prevMbSkipped = 1 and IS_CABAC()
+	var 
+		int mb_addr
+	do
+		mb_addr:=val_CurrMbAddr;
+		NextMbAddress();
+		mb_skip_run := mb_skip_run -1;
+		if mb_skip_run = 0 then 
+			prevMbSkipped := 0; 
+			moreDataFlag := more_rbsp_data();
+		end
+	end
+	
 	/*
 	
 	read_SliceD_mb_skip_run_done1_CAVLC: action ==>  LAST:[[true: for int t in Integers(0,26) ]] repeat 27
@@ -7796,7 +7832,7 @@ actor Algo_Synp_AVC_FREXT()
 		read_SliceH_slice_group_change_cycle_done			( read_SliceH_slice_group_change_cycle_done			) --> read_SliceD_CABAC_alignement;
 		read_SliceH_slice_group_change_cycle				( read_SliceH_skip_slice_group_change_cycle	) --> read_SliceD_CABAC_alignement;
 
-		// read Slice Data     only decoding CAVLC process is implemented
+		// read Slice Data    
 		read_SliceD_CABAC_alignement						( read_SliceD_CABAC_alignement						) --> read_SliceD_init;
 		read_SliceD_CABAC_alignement						( read_SliceD_skip_CABAC_alignement	                ) --> read_SliceD_init;
 		read_SliceD_init									( SliceD_init										) --> sync_do_mb_layer;
@@ -7804,6 +7840,7 @@ actor Algo_Synp_AVC_FREXT()
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_run							) --> read_SliceD_mb_skip_run_done0;
 		read_SliceD_mb_skip_run_done0						( read_SliceD_mb_skip_run_done0						) --> read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1						) --> read_SliceD_mb_skip_run_done1;
+		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1_CABAC				) --> read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done2						) --> read_SliceD_mb_skip_run_done2_moredata;
 		read_SliceD_mb_skip_run_done2_moredata              ( read_SliceD_mb_skip_run_done2_moredata_1          ) --> read_SliceD_mb_field_decoding_flag;
 		read_SliceD_mb_skip_run_done2_moredata 				( read_SliceD_mb_skip_run_done2_moredata_0			) --> syncSliceD_endwhile;
@@ -7827,6 +7864,7 @@ actor Algo_Synp_AVC_FREXT()
 		SliceD_sent_data									( send_data_position_information	                ) --> SliceD_while_moreDataFlag;
 		SliceD_while_moreDataFlag							( SliceD_while_moreDataFlag							) --> sync_do_mb_layer;
 		SliceD_while_moreDataFlag							( SliceD_end										) --> search_start_code;
+	
 		read_SliceD_mb_field_decoding_flag					( SliceD_end										) --> search_start_code;
 		
 		// macrobloc_layer
