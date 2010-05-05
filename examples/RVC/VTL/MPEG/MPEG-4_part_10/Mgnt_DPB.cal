@@ -364,6 +364,8 @@ purge_List: action
 		do
 			if(i != pic_curr_idx) then
 				pic_index_to_frame_num[i] := -1;
+			else
+				pic_index_to_frame_num[i] := 0;
 			end
 		end
 	end

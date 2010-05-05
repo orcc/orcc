@@ -92,7 +92,6 @@ actor Algo_MMCO ()
 	int           CounterRefListSent := 0;
 	bool          EndInitIdc3        := false;
 	bool          EndInitSentRefList := false;
-	bool          FrameIsIDR         := false;
   
 	update_idx: action ==>
 		var
@@ -403,7 +402,6 @@ actor Algo_MMCO ()
 	read_IDR: action
 			MMCO:[a , b]
 				==>
-			DelList:[-1]
 		guard 
 			a = 0
 		do
@@ -414,7 +412,6 @@ actor Algo_MMCO ()
 			pic_idx_list     := [-1 :for int s in Integers(0,16-1)];
 			long_term_list   := [-1 :for int s in Integers(0,16-1)];
 			Nbframedel       := 0;
-			FrameIsIDR       := true;
 		end
 
 
@@ -425,7 +422,6 @@ actor Algo_MMCO ()
 			a = 1 and b = 0
 		do
 			Nbframedel := 0;
-			FrameIsIDR := false;
 		end
 
 
@@ -436,7 +432,6 @@ actor Algo_MMCO ()
 			a = 1 and b = 1
 		do
 			Nbframedel := 0;
-			FrameIsIDR := false;
 		end
 
 
@@ -585,8 +580,6 @@ actor Algo_MMCO ()
 	SendSizeDelList: action
 				==>
 			DelList:[Nbframedel]
-		guard
-			FrameIsIDR = false
 		end
 
 	SendDelList : action
@@ -601,7 +594,7 @@ actor Algo_MMCO ()
 
 	SendDelListDone : action ==>
 		guard
-			(Nbframedel <= 0) or (FrameIsIDR = true)
+			Nbframedel <= 0
 		end
 
 	schedule fsm  read_num_ref_frames:
@@ -630,7 +623,6 @@ actor Algo_MMCO ()
 		MMCO_opcode                       (MMCO_opcode0                        )--> update_idx;
 		update_idx                        (update_idx                          )--> SendSizeDelList;
 		SendSizeDelList                   (SendSizeDelList                     )--> SendDelList;
-		SendSizeDelList                   (SendDelListDone                     )--> read_num_ref_frames;
 		SendDelList                       (SendDelList                         )--> SendDelList;
 		SendDelList                       (SendDelListDone                     )--> read_num_ref_frames;
 	end
