@@ -536,6 +536,13 @@ actor Algo_Synp_AVC_FREXT()
 		[ 9, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0  ]
 	];
 	
+	List ( type: List ( type: int, size = 4) , size = 2 ) CBP_binIdx= 
+	[
+		[0, 2, 0, 2],
+		[0, 0, 2, 2]
+	];
+	
+	
 	/* Max Binary Index */
 	int MaxBinIdx;
 	
@@ -2679,35 +2686,35 @@ actor Algo_Synp_AVC_FREXT()
 		xN := ( binIdx mod 2 ) * 8 ;
 		yN := ( binIdx  /  2 ) * 8; 
 		
-		getNeighbouring(xN - 1, yN, 8, 8);
+		getNeighbouring(xN - 1, yN, 16, 16);
 		mbAddr  := NeighMbAddr;
 		AvailMb := NeighMbAvail;
 		
 		if  not AvailMb then
 			condTermFlagA := 0;
 		else
-			luma8x8BlkIdxN :=  1 << ( 2*(NeighMb_yW/2) + 1 );
+			luma8x8BlkIdxN := 2*(NeighMb_yW >> 3) + (NeighMb_xW >> 3) ;
 			if  ( GiveMbType(AvailMb,mbAddr) = 25  or
-			      ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 0x01)  = 0 ) or
-			      ( ( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then				
+			      ( ( mbAddr != val_CurrMbAddr) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
+			      ( ( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
 			end
 		end
 		
-		getNeighbouring(xN , yN - 1, 8, 8);
+		getNeighbouring(xN, yN - 1, 16, 16);
 		mbAddr  := NeighMbAddr;
 		AvailMb := NeighMbAvail;
 		
 		if  not AvailMb then
 			condTermFlagB := 0;
 		else
-			luma8x8BlkIdxN :=  1 << ( 2*(NeighMb_yW/2) + 1 );
+			luma8x8BlkIdxN := 2*(NeighMb_yW >> 3) + (NeighMb_xW >> 3) ;
 			if  ( GiveMbType(AvailMb,mbAddr) = 25  or
-			      ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 0x01)  = 0 ) or
-			      ( ( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then				
-				condTermFlagB := 0;
+			      ( ( mbAddr != val_CurrMbAddr) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
+			      ( ( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
+			    condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
 			end
@@ -2716,6 +2723,7 @@ actor Algo_Synp_AVC_FREXT()
 		ctxIdxInc := condTermFlagA + 2*condTermFlagB;
 	end
 	
+
 	procedure ctxIdxCodedBlockPatternChroma()
 	var
 		int condTermFlagA,
@@ -2740,7 +2748,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
-			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) = 2) then
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) then
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
@@ -2761,7 +2769,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
-			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) = 2) then
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) then
 				condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
@@ -3062,7 +3070,7 @@ actor Algo_Synp_AVC_FREXT()
 			//Get Neighbouring for MB A
 			getNeighbouring( GetMb4x4_Chroma_X(), GetMb4x4_Chroma_Y() - 1, 8, 8);
 			  
-			//Associate Values
+			//Associate ValuesL
 			mbAddrB  := NeighMbAddr;
 			AvailMbB := NeighMbAvail;
 			if AvailMbB then
@@ -3765,7 +3773,7 @@ actor Algo_Synp_AVC_FREXT()
 		ReadBinString[binIdx + 1] := binVal;
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA then
-			prior_decoded_bin_cbp := binVal;
+			prior_decoded_bin_cbp[binIdx] := binVal;
 			bk_cbp := bk_cbp + 1;
 		end
 		
@@ -6875,7 +6883,7 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	// end if
 	
-	Residual_luma_skip_AC_CodedBlock8x8_CABAC: action ==> 
+	Residual_luma_skip_AC_CodedBlock8x8_CABAC: action ==> VALUE:[ [0: for int i in Integers(0,15)]] repeat 16
 	guard
 		(i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC()
 	do
