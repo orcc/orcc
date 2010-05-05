@@ -33,5 +33,6 @@
       <vertex id="Intra_16x16" x="247" y="549"/>
       <vertex id="Intra_4x4" x="247" y="822"/>
       <vertex id="Deblocking_Filter" x="742" y="680"/>
+      <vertex id="DelList" x="761" y="1196"/>
    </vertices>
 </layout>

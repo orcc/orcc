@@ -32,5 +32,6 @@
       <vertex id="Buffer_inter" x="947" y="1454"/>
       <vertex id="Select_chroma" x="875" y="1290"/>
       <vertex id="Deblocking_Filter" x="708" y="932"/>
+      <vertex id="DelList" x="751" y="1487"/>
    </vertices>
 </layout>

@@ -5,9 +5,9 @@
       <vertex id="QP" x="51" y="594"/>
       <vertex id="ScalingList" x="36" y="266"/>
       <vertex id="CoefAC" x="46" y="198"/>
-      <vertex id="CurrMbAddr" x="250" y="94"/>
+      <vertex id="CurrMbAddr" x="244" y="86"/>
       <vertex id="PredMode" x="238" y="551"/>
-      <vertex id="FirstMbInSlice" x="246" y="141"/>
+      <vertex id="FirstMbInSlice" x="243" y="155"/>
       <vertex id="Mb_TypeC" x="252" y="406"/>
       <vertex id="PicWidthInMB" x="233" y="522"/>
       <vertex id="POC" x="258" y="439"/>
@@ -27,9 +27,10 @@
       <vertex id="mv_in" x="244" y="645"/>
       <vertex id="slice_beta_offset" x="227" y="742"/>
       <vertex id="I_PCM_C" x="260" y="184"/>
-      <vertex id="ConstrainedIFlag" x="231" y="54"/>
+      <vertex id="ConstrainedIFlag" x="233" y="48"/>
       <vertex id="Display" x="645" y="204"/>
       <vertex id="PRED_C" x="440" y="180"/>
       <vertex id="RES_C" x="134" y="188"/>
+      <vertex id="DelList" x="259" y="116"/>
    </vertices>
 </layout>

@@ -310,6 +310,13 @@
     <Port kind="Output" name="ConstrainedIFlag">
         <Type name="bool"/>
     </Port>
+    <Port kind="Output" name="DelList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -533,4 +540,5 @@
         src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
     <Connection dst="Algo_MMCO" dst-port="MaxFrameNum"
         src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
+    <Connection dst="" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>
 </XDF>

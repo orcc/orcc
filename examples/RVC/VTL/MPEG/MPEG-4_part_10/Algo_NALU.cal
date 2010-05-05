@@ -31,7 +31,7 @@ actor Algo_NALU ()
 *
 */
 
-		uint(size = 32)         SZ_NB_RBSP          = 32; /* = log2(NB_RBSP_BYTE_MAX) */
+		uint(size = 32)         SZ_NB_RBSP          = 32; /* >= log2(NB_RBSP_BYTE_MAX) */
 		uint(size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 500000;
 		uint(size = 2)          byte_count         := 0;  /* nb byte(s) stored in fifo */
 		uint(size = 8)          fifo_lsb           := 0;
@@ -39,7 +39,7 @@ actor Algo_NALU ()
 		uint(size = 8)          prev_byte_fifo     := 255; /*Previous fifo_msb. Permit to know if the 
 		                                                     start code was 00 00 00 01 or 00 00 01*/
 		uint(size = SZ_NB_RBSP) nb_bytes_mem       := 0;  /* nb byte(s) stored in Input_Bitstream */
-		int (size = SZ_NB_RBSP) nb_bytes_in_rbsp   := -1; /* the NALU header is not included in rbsp */
+		uint(size = SZ_NB_RBSP) nb_bytes_in_rbsp   := 0;
 		uint(size = SZ_NB_RBSP) nb_bytes_sent      := 0;
 		uint(size = 2)          start_code         := 0;
 		bool                    nb_rbsp_byte_ready := false;
@@ -100,9 +100,9 @@ actor Algo_NALU ()
 					nb_rbsp_byte_ready := true;
 					nb_bytes_sent      := 0;
 					/* The byte 01 of the start code is still in the fifo.
-					   2 bytes (00 00) of the next start code are in the
-					   buffer and are included in nb_bytes_in_rbsp*/
-					nb_bytes_in_rbsp   := nb_bytes_in_rbsp -2;
+					   2 bytes (00 00) of the next start code and the NALU header
+					   are included in nb_bytes_in_rbsp*/
+					nb_bytes_in_rbsp   := nb_bytes_in_rbsp -3;
 					if(prev_byte_fifo = 0) then 
 						nb_bytes_in_rbsp   := nb_bytes_in_rbsp - 1; //The start code is 00 00 00 01 !!
 					end
@@ -154,7 +154,7 @@ actor Algo_NALU ()
 		do
 			start_code       := 1;
 			nb_bytes_mem     := 0;
-			nb_bytes_in_rbsp := -1; /* the NALU header is not included in rbsp */
+			nb_bytes_in_rbsp := 0;
 		end
 
 /*

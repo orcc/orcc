@@ -61,17 +61,20 @@ actor Algo_MMCO ()
 	uint(size=5)  MMCO,
 	int (size=32) MaxFrameNum
 		==>
-	int(size=32) RefList
+	int(size=32) RefList,
+	int(size=32) DelList
 		:
 
 
-	List(type:uint(size=4),size=16)        reordering_ref_list := [0 :for int s in Integers(0,16-1)];
-	List(type:int(size=32),size=16)        short_term_list     := [0 :for int s in Integers(0,16-1)];
-	List(type:int,size=16)                 pic_idx_list        := [0 :for int s in Integers(0,16-1)];
+	List(type:uint(size=4),size=16)         reordering_ref_list := [0 :for int s in Integers(0,16-1)];
+	List(type:int(size=32),size=16)         short_term_list     := [0 :for int s in Integers(0,16-1)];
+	List(type:int,size=16)                  pic_idx_list        := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32),size=16)         long_term_list      := [-1 :for int s in Integers(0,16-1)];
-	List(type:uint(size = 5), size = 2*16) RefListTab          := [-1 :for int s in Integers(0,2*16-1)];
-	List(type:uint(size=4),size= 2*16)     RefListSent         := [0: for int s in Integers(0, 2*16-1)];
-	  
+	List(type:uint(size = 32), size = 2*16) RefListTab          := [-1 :for int s in Integers(0,2*16-1)];
+	List(type:uint(size=4),size= 2*16)      RefListSent         := [0: for int s in Integers(0, 2*16-1)];
+	List(type:int(size=32),size= 16)        DelListTab          := [0: for int s in Integers(0, 2*16-1)];
+
+	int (size=32) Nbframedel         := 0;	  
 	uint(size=3)  mmco_opcode;
 	uint(size=4)  pic_curr_idx;
 	uint          frame_num;
@@ -89,6 +92,7 @@ actor Algo_MMCO ()
 	int           CounterRefListSent := 0;
 	bool          EndInitIdc3        := false;
 	bool          EndInitSentRefList := false;
+	bool          FrameIsIDR         := false;
   
 	update_idx: action ==>
 		var
@@ -97,7 +101,9 @@ actor Algo_MMCO ()
 			int         j
 		do
 			if (long_term_count + short_term_count = num_ref_frames) then
-				short_term_count       := short_term_count -1; 
+				short_term_count       := short_term_count -1;
+				DelListTab[Nbframedel] := short_term_list[short_term_count];
+				Nbframedel             := Nbframedel + 1;
 			end
 			// add current picture
 			if (flag_long_term = 0) then
@@ -397,6 +403,7 @@ actor Algo_MMCO ()
 	read_IDR: action
 			MMCO:[a , b]
 				==>
+			DelList:[-1]
 		guard 
 			a = 0
 		do
@@ -406,6 +413,8 @@ actor Algo_MMCO ()
 			short_term_list  := [-1 :for int s in Integers(0,16-1)];
 			pic_idx_list     := [-1 :for int s in Integers(0,16-1)];
 			long_term_list   := [-1 :for int s in Integers(0,16-1)];
+			Nbframedel       := 0;
+			FrameIsIDR       := true;
 		end
 
 
@@ -414,6 +423,9 @@ actor Algo_MMCO ()
 				==>
 		guard
 			a = 1 and b = 0
+		do
+			Nbframedel := 0;
+			FrameIsIDR := false;
 		end
 
 
@@ -422,14 +434,9 @@ actor Algo_MMCO ()
 				==>
 		guard 
 			a = 1 and b = 1
-		end
-
-
-	MMCO_opcode0: action
-			MMCO:[ a ]
-				==>
-		guard 
-			a = 0
+		do
+			Nbframedel := 0;
+			FrameIsIDR := false;
 		end
 
 
@@ -457,6 +464,9 @@ actor Algo_MMCO ()
 				short_term_list[i] := short_term_list[i+1];
 			end
 			short_term_count := short_term_count-1;
+
+			DelListTab[Nbframedel] := pred;
+			Nbframedel := Nbframedel + 1;
 		end
 
 
@@ -467,6 +477,9 @@ actor Algo_MMCO ()
 		guard 
 			a = 2
 		do
+			DelListTab[Nbframedel] := long_term_list[b];
+			Nbframedel := Nbframedel + 1;
+			
 			long_term_list[b] := -1;
 			long_term_count   := long_term_count-1;
 		end
@@ -515,8 +528,10 @@ actor Algo_MMCO ()
 			foreach int i in Integers(long_term_max_idx, 16-1)
 			do
 				if (long_term_list[i] != -1) then
-					long_term_count   := long_term_count-1;
-					long_term_list[i] := -1;
+					DelListTab[Nbframedel] := long_term_list[i];
+					Nbframedel          := Nbframedel + 1;
+					long_term_list[i]   := -1;
+					long_term_count     := long_term_count-1;
 				end
 			end
 		end
@@ -529,14 +544,15 @@ actor Algo_MMCO ()
 		guard 
 			a = 5
 		do
-			frame_num         :=0;
-			pic_curr_idx      :=0;
+			frame_num         := 0;
+			pic_curr_idx      := 0;
 			short_term_count  := 0;
 			short_term_list   := [-1 :for int s in Integers(0,16-1)];
 			pic_idx_list      := [-1 :for int s in Integers(0,16-1)];
 			long_term_count   := 0;
 			long_term_max_idx := 0;
 			long_term_list    := [-1 :for int s in Integers(0,16-1)];
+			Nbframedel        := -1;
 		end
   
 	// Mark the current picture as long term reference picture
@@ -554,6 +570,34 @@ actor Algo_MMCO ()
 			flag_long_term := 1;
 		end
 
+
+	MMCO_opcode0: action
+			MMCO:[ a ]
+				==>
+		guard 
+			a = 0
+		end
+	SendSizeDelList: action
+				==>
+			DelList:[Nbframedel]
+		guard
+			FrameIsIDR = false
+		end
+
+	SendDelList : action
+				==>
+			DelList:[ValDelFrame]
+		var
+			int(size=32) ValDelFrame
+		do
+			Nbframedel  := Nbframedel - 1;
+			ValDelFrame := DelListTab[Nbframedel];
+		end
+
+	SendDelListDone : action ==>
+		guard
+			(Nbframedel = 0) or (FrameIsIDR = true)
+		end
 
 	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames               (read_num_ref_frames                 )--> read_ref_pic_list_reordering_flag;
@@ -579,11 +623,17 @@ actor Algo_MMCO ()
 		check_IDR                         (read_not_IDR_MMCO                   )--> MMCO_opcode;
 		MMCO_opcode                       (MMCO_opcode                         )--> MMCO_opcode;
 		MMCO_opcode                       (MMCO_opcode0                        )--> update_idx;
-		update_idx                        (update_idx                          )--> read_num_ref_frames; 
+		update_idx                        (update_idx                          )--> SendSizeDelList;
+		SendSizeDelList                   (SendSizeDelList                     )--> SendDelList;
+		SendSizeDelList                   (SendDelListDone                     )--> read_num_ref_frames;
+		SendDelList                       (SendDelList                         )--> SendDelList;
+		SendDelList                       (SendDelListDone                     )--> read_num_ref_frames;
 	end
 
 	priority
 		SendRefListDone     > SendRefList;
+		SendDelListDone     > SendDelList;
+		SendSizeDelList     > SendDelListDone;
 		IDC3SendRefListDone > IDC3SendRefList;
 	end
 

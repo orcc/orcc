@@ -191,6 +191,13 @@
     <Port kind="Input" name="ConstrainedIFlag">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="DelList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -313,4 +320,5 @@
     <Connection dst="TEX_L" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="TEX_L" dst-port="slice_alpha_c0_offset" src="" src-port="slice_alpha_c0_offset"/>
     <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_beta_offset"/>
+    <Connection dst="TEX_L" dst-port="DelList" src="" src-port="DelList"/>
 </XDF>

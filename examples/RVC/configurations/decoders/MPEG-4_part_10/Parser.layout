@@ -26,7 +26,7 @@
       <vertex id="MV" x="1136" y="1490"/>
       <vertex id="LOCATION" x="1116" y="1458"/>
       <vertex id="PART_SZ" x="1120" y="1518"/>
-      <vertex id="RefList" x="1106" y="1683"/>
+      <vertex id="RefList" x="1106" y="1701"/>
       <vertex id="Mb_TypeC" x="947" y="1307"/>
       <vertex id="CoefAC_Cb" x="1265" y="1761"/>
       <vertex id="CoefDC_Cb" x="1262" y="1786"/>
@@ -54,5 +54,6 @@
       <vertex id="MVReconstruct" x="926" y="1468"/>
       <vertex id="Algo_MMCO" x="933" y="1664"/>
       <vertex id="Algo_Parser_IPCM" x="952" y="2014"/>
+      <vertex id="DelList" x="1112" y="1671"/>
    </vertices>
 </layout>

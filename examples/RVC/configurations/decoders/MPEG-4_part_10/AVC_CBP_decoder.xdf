@@ -290,4 +290,7 @@
         src="FUN_Parser" src-port="ConstrainedIFlag"/>
     <Connection dst="Decode_V" dst-port="ConstrainedIFlag"
         src="FUN_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="Decoding_Y" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
+    <Connection dst="Decode_U" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
+    <Connection dst="Decode_V" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
 </XDF>

@@ -2,14 +2,14 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="75" y="876"/>
-      <vertex id="Display_L" x="680" y="597"/>
-      <vertex id="Display_Cb" x="680" y="1299"/>
-      <vertex id="Display_Cr" x="680" y="1990"/>
-      <vertex id="Width" x="409" y="95"/>
-      <vertex id="Height" x="409" y="192"/>
+      <vertex id="Display_L" x="750" y="407"/>
+      <vertex id="Display_Cb" x="771" y="974"/>
+      <vertex id="Display_Cr" x="748" y="1516"/>
+      <vertex id="Width" x="418" y="541"/>
+      <vertex id="Height" x="416" y="503"/>
       <vertex id="FUN_Parser" x="169" y="859"/>
-      <vertex id="Decoding_Y" x="409" y="289"/>
-      <vertex id="Decode_U" x="409" y="1002"/>
-      <vertex id="Decode_V" x="409" y="1693"/>
+      <vertex id="Decoding_Y" x="539" y="387"/>
+      <vertex id="Decode_U" x="556" y="955"/>
+      <vertex id="Decode_V" x="566" y="1499"/>
    </vertices>
 </layout>
