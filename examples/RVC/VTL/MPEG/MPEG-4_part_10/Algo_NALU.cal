@@ -31,15 +31,15 @@ actor Algo_NALU ()
 *
 */
 
-		uint(size = 32)         SZ_NB_RBSP          = 32; /* >= log2(NB_RBSP_BYTE_MAX) */
-		int (size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 500000;
-		uint(size = 2)          byte_count         := 0; /* nb byte(s) stored in fifo */
-		int (size = 8)          fifo_lsb           := 0;
-		int (size = 8)          fifo_msb           := 0;
-		int (size = 8)          prev_byte_fifo     := 255; /*Previous fifo_msb. Permit to know if the 
+		uint(size = 32)         SZ_NB_RBSP          = 32; /* = log2(NB_RBSP_BYTE_MAX) */
+		uint(size = SZ_NB_RBSP) NB_RBSP_BYTE_MAX    = 500000;
+		uint(size = 2)          byte_count         := 0;  /* nb byte(s) stored in fifo */
+		uint(size = 8)          fifo_lsb           := 0;
+		uint(size = 8)          fifo_msb           := 0;
+		uint(size = 8)          prev_byte_fifo     := 255; /*Previous fifo_msb. Permit to know if the 
 		                                                     start code was 00 00 00 01 or 00 00 01*/
-		uint(size = SZ_NB_RBSP) nb_bytes_mem       := 0; /* nb byte(s) stored in Input_Bitstream */
-		uint(size = SZ_NB_RBSP) nb_bytes_in_rbsp   := -1; /* the NALU header is not included in rbsp */
+		uint(size = SZ_NB_RBSP) nb_bytes_mem       := 0;  /* nb byte(s) stored in Input_Bitstream */
+		int (size = SZ_NB_RBSP) nb_bytes_in_rbsp   := -1; /* the NALU header is not included in rbsp */
 		uint(size = SZ_NB_RBSP) nb_bytes_sent      := 0;
 		uint(size = 2)          start_code         := 0;
 		bool                    nb_rbsp_byte_ready := false;
@@ -58,9 +58,9 @@ actor Algo_NALU ()
 		guard
 			byte_count < 2
 		do
-			fifo_msb := fifo_lsb;
-			fifo_lsb := b;
-			byte_count := byte_count+1;
+			fifo_msb   := fifo_lsb;
+			fifo_lsb   := b;
+			byte_count := byte_count + 1;
 		end /* fill_fifo */
 
 	/* Delete bytes added in the rbsp*/
@@ -73,9 +73,12 @@ actor Algo_NALU ()
 		do
 			byte_count       := 0;
 			Input_Bitstream[nb_bytes_mem]     := 0;
-			Input_Bitstream[nb_bytes_mem + 1] := 0;
+			if(nb_bytes_mem - 1 < NB_RBSP_BYTE_MAX) then
+				Input_Bitstream[nb_bytes_mem + 1] := 0;
+				nb_bytes_mem := nb_bytes_mem + 1;
+			end
 			nb_bytes_in_rbsp := nb_bytes_in_rbsp + 2;
-			nb_bytes_mem     := nb_bytes_mem + 2;
+			nb_bytes_mem     := nb_bytes_mem + 1;
 		end /* delete_emul_3_byte */
 
 	/* Save RBSP and start code bytes in a buffer */
