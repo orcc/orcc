@@ -512,6 +512,9 @@ actor Algo_MMCO ()
 			
 			if (long_term_list[c] = -1) then
 				long_term_count := long_term_count+1;
+			else
+				DelListTab[Nbframedel] := long_term_list[c];
+				Nbframedel := Nbframedel + 1;
 			end
 			long_term_list[c] := pred;
 		end
@@ -529,9 +532,9 @@ actor Algo_MMCO ()
 			do
 				if (long_term_list[i] != -1) then
 					DelListTab[Nbframedel] := long_term_list[i];
-					Nbframedel          := Nbframedel + 1;
-					long_term_list[i]   := -1;
-					long_term_count     := long_term_count-1;
+					Nbframedel             := Nbframedel + 1;
+					long_term_list[i]      := -1;
+					long_term_count        := long_term_count-1;
 				end
 			end
 		end
@@ -563,8 +566,10 @@ actor Algo_MMCO ()
 			a = 6
 		do
 			if (long_term_list[b] != -1) then
-				long_term_count   := long_term_count-1;
-				long_term_list[b] := -1;
+				DelListTab[Nbframedel] := long_term_list[b];
+				Nbframedel             := Nbframedel + 1;
+				long_term_count        := long_term_count - 1;
+				long_term_list[b]      := -1;
 			end
 			long_term_idx  := b;
 			flag_long_term := 1;
@@ -596,7 +601,7 @@ actor Algo_MMCO ()
 
 	SendDelListDone : action ==>
 		guard
-			(Nbframedel = 0) or (FrameIsIDR = true)
+			(Nbframedel <= 0) or (FrameIsIDR = true)
 		end
 
 	schedule fsm  read_num_ref_frames:
