@@ -6,10 +6,7 @@
 //              into its respective Y, U and V components.
 //
 import all caltrop.lib.BitOps;
-actor splitter_420_B (int NEWVOP,
-	int INTRA,
-	int INTER,
-	int ACCODED) int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BTYPE ==> int(size=SAMPLE_SZ) Y ,
+actor splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BTYPE ==> int(size=SAMPLE_SZ) Y ,
 int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 
 // Port size declaration
@@ -18,6 +15,14 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 	int SAMPLE_SZ = 13;
 
 	int BLOCK_SZ = 64;
+
+	int NEWVOP = 2048;
+
+	int INTRA = 1024;
+
+	int INTER = 512;
+
+	int ACCODED = 2;
 
 	int(size=4) comp := 0;
 

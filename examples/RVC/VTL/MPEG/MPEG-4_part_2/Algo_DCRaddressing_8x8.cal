@@ -48,8 +48,7 @@
 //   1 component per block.
 // * Variable 'comp' removed since only one component.
 import all caltrop.lib.BitOps;
-actor Algo_DCRaddressing_8x8 (int NEWVOP,
-	int INTRA) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ) A , int(size=MB_COORD_SZ) B
+actor Algo_DCRaddressing_8x8 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ) A , int(size=MB_COORD_SZ) B
 , int(size=MB_COORD_SZ) C :
 
 // Port size declaration
@@ -58,6 +57,10 @@ actor Algo_DCRaddressing_8x8 (int NEWVOP,
 	int MB_COORD_SZ = 8;
 
 	int MAXW_IN_MB = 121;
+
+	int NEWVOP = 2048;
+
+	int INTRA = 1024;
 
 	// Generate indices into the stream history to locate
 	//   A  neighbor to the left

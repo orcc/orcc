@@ -47,8 +47,7 @@
 // * Block pointer bitwidth reduced from MB_COORD_SZ+3 to MB_COORD_SZ+2 since only
 //   4 components per block.
 import all caltrop.lib.BitOps;
-actor Algo_DCRaddressing_16x16 (int NEWVOP,
-	int INTRA) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
+actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
 + 2) B , int(size=MB_COORD_SZ + 2) C :
 
 // Port size declaration
@@ -57,6 +56,10 @@ actor Algo_DCRaddressing_16x16 (int NEWVOP,
 	int MB_COORD_SZ = 8;
 
 	int MAXW_IN_MB = 121;
+
+	int NEWVOP = 2048;
+
+	int INTRA = 1024;
 
 	// Generate indices into the stream history to locate
 	//   A  neighbour to the left

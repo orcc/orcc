@@ -71,13 +71,7 @@
 // * In advance action, indices adjust after every component instead of 6 since now
 //   dealing with a single 8x8 block rather than 6 8x8 blocks.
 import all caltrop.lib.BitOps;
-actor Algo_DCRinvpred_chroma_8x8 (int DCVAL,
-	int NEWVOP,
-	int INTRA,
-	int INTER,
-	int QUANT_MASK,
-	int ACCODED,
-	int ACPRED) int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B,
+actor Algo_DCRinvpred_chroma_8x8 () int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B,
 int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
 int(size=SAMPLE_SZ) QF_DC , int(size=MB_COORD_SZ) PTR , int(size=3) AC_PRED_DIR , bool
 SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
@@ -92,6 +86,18 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	int MAXW_IN_MB = 121;
 
 	int QUANT_SZ = 6;
+
+	int DCVAL = 128*8;
+
+	int NEWVOP = 2048;
+
+	int INTRA = 1024;
+
+	int INTER = 512;
+
+	int ACCODED = 2;
+
+	int ACPRED = 1;
 
 	// Use 3 address lines for component index to save address calculation effort
 	// Also, location 0 is reserved for all uncoded blocks. This protocol must

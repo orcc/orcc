@@ -68,27 +68,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="DCVAL">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="NEWVOP">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="INTRA">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="INTER">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="QUANT_MASK">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="ACCODED">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="ACPRED">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -100,12 +79,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
     </Instance>
     <Instance id="invpred">
         <!-- ************************* -->
@@ -115,31 +88,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ACCODED">
-            <Expr kind="Var" name="ACCODED"/>
-        </Parameter>
-        <Parameter name="ACPRED">
-            <Expr kind="Var" name="ACPRED"/>
-        </Parameter>
-        <Parameter name="DCVAL">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="128"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Expr>
-        </Parameter>
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
-        <Parameter name="QUANT_MASK">
-            <Expr kind="Var" name="QUANT_MASK"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

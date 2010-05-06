@@ -4,11 +4,13 @@
 // 
 // Description: the sequence of BTYPE token is not homogeneous, there is fist a NEW VOP command, then, the width and height of this VOP, then the  corresponding 8x8 blocks of texture, motion or mixed tex/mot. This actor will delete the tokens concerning the information of the VOP and redistribute the tokens to the Y, U and V components. So that the adder have directly the token intra, accoded or mixed.
 import all caltrop.lib.BitOps;
-actor splitter_BTYPE (int NEWVOP) int(size=BTYPE_SZ) BTYPE ==> int(size=BTYPE_SZ) Y ,
+actor splitter_BTYPE () int(size=BTYPE_SZ) BTYPE ==> int(size=BTYPE_SZ) Y ,
 int(size=BTYPE_SZ) U , int(size=BTYPE_SZ) V :
 
 // Port size declaration
 	int BTYPE_SZ = 12;
+
+	int NEWVOP = 2048;
 
 	// to send the newvop token to the address and add block (arrggg) 
 	cmd.newVop: action BTYPE:[ cmd ] ==> Y:[ cmd ], U:[ cmd ], V:[ cmd ]

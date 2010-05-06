@@ -75,31 +75,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ACCODED">
-            <Expr kind="Var" name="ACCODED"/>
-        </Parameter>
-        <Parameter name="ACPRED">
-            <Expr kind="Var" name="ACPRED"/>
-        </Parameter>
-        <Parameter name="DCVAL">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="128"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Expr>
-        </Parameter>
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
-        <Parameter name="QUANT_MASK">
-            <Expr kind="Var" name="QUANT_MASK"/>
-        </Parameter>
     </Instance>
     <Instance id="IS">
         <!-- ************************* -->
