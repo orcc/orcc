@@ -3055,8 +3055,7 @@ actor Algo_Synp_AVC_FREXT()
 				if ( (mbTab[mbAddrA][mbTabMbtype]  != P_Skip) or 
 				     (mbTab[mbAddrA][mbTabMbtype]  != B_Skip) or 
 				     (mbTab[mbAddrA][mbTabMbtype]  != 25) or
-				     (mbTab[mbAddrA][mbCBPChroma] != 2) ) then
-				     
+				     (mbTab[mbAddrA][mbCBPChroma] = 2) ) then	     
 					transBlockA := chroma4x4BlkIdxA;
 				else
 					transBlockA := -1;
@@ -3078,15 +3077,15 @@ actor Algo_Synp_AVC_FREXT()
 				if ( (mbTab[mbAddrB][mbTabMbtype]  != P_Skip) or 
 				     (mbTab[mbAddrB][mbTabMbtype]  != B_Skip) or 
 				     (mbTab[mbAddrB][mbTabMbtype]  != 25) or
-				     (mbTab[mbAddrB][mbCBPChroma] != 2) ) then
+				     (mbTab[mbAddrB][mbCBPChroma] = 2) ) then
 				     
 					transBlockB := chroma4x4BlkIdxB;
 				else
 					transBlockB := -1;
 				end
 			else
-			      chroma4x4BlkIdxA := 0;
-			      transBlockA := -1;
+			      chroma4x4BlkIdxB := 0;
+			      transBlockB := -1;
 			end
 		end		
 		
@@ -5579,20 +5578,6 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
-	/*
-	
-	read_SliceD_mb_skip_run_done1_CAVLC: action ==>  LAST:[[true: for int t in Integers(0,26) ]] repeat 27
-	guard
-		IS_CAVLC()
-	end
-	
-	read_SliceD_mb_skip_run_done1_CABAC: action ==>
-	guard
-		IS_CAVBAC()
-	end
-	*/
-	
-
 	read_SliceD_mb_skip_run_done2: action ==>
 	guard
 		prevMbSkipped = 0
@@ -5612,7 +5597,7 @@ actor Algo_Synp_AVC_FREXT()
 		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
 		entropy_coding_mode_flag[pps_id] = 1
 	do
-		println("read_SliceD_mb_skip_flag : CABAC not yet implemented");
+		println("read_SliceD_mb_skip_flag : CABAC interleaved not implemented");
 		// mb_skip_flag   ae(v)
 		// moreDataFlag = !mb_skip_flag
 	end
@@ -6883,7 +6868,7 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	// end if
 	
-	Residual_luma_skip_AC_CodedBlock8x8_CABAC: action ==> VALUE:[ [0: for int i in Integers(0,15)]] repeat 16
+	Residual_luma_skip_AC_CodedBlock8x8_CABAC: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16 
 	guard
 		(i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC()
 	do
@@ -7006,7 +6991,7 @@ actor Algo_Synp_AVC_FREXT()
 	end   
 	//end if
 	
-	Residual_skip_chroma_DC_init_CABAC: action ==> LAST: [true]
+	Residual_skip_chroma_DC_init_CABAC: action ==> VALUE:[[0: for int i in Integers(0,63)]] repeat 64 
 	guard
 		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC()
 	do
@@ -7063,7 +7048,7 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
-	Residual_return_chroma_AC_CABAC: action ==> LAST:[true]
+	Residual_return_chroma_AC_CABAC: action ==> 
 	guard
 		leveltype = 3 and IS_CABAC()
 	do
@@ -7571,7 +7556,7 @@ actor Algo_Synp_AVC_FREXT()
 		ctxBlockCat = 0 or ctxBlockCat = 1 or ctxBlockCat = 2
 	end
 		
-	Residual_block_Sent_8_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,8)] ] repeat 8
+	Residual_block_Sent_8_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,16)] ] repeat 16
 	guard
 		ctxBlockCat = 4
 	end
@@ -7583,9 +7568,14 @@ actor Algo_Synp_AVC_FREXT()
 	
 	Residual_Sent_16_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
 	guard
-		maxNumCoeff = 16
+		ctxBlockCat = 0 or ctxBlockCat = 1 or ctxBlockCat = 2 
 	end
-	
+	/*
+	Residual_Sent_15_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
+	guard
+		maxNumCoeff = 15
+	end
+	*/
 	Residual_Sent_8_Zero: action ==> VALUE : [ [0: for int i in Integers(0,8) ] ] repeat 8
 	guard
 		maxNumCoeff = 8
@@ -7593,7 +7583,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	Residual_Sent_4_Zero: action ==> VALUE : [ [0: for int i in Integers(0,4) ] ] repeat 4
 	guard
-		maxNumCoeff = 4
+		ctxBlockCat = 3
 	end
 	
 	
@@ -8060,6 +8050,7 @@ actor Algo_Synp_AVC_FREXT()
 		
 		//Sent Zeros
 		Residual_CABAC_Sent_Zeros							( Residual_Sent_16_Zero 							) --> Residual_return;
+		//Residual_CABAC_Sent_Zeros							( Residual_Sent_15_Zero 							) --> Residual_return;
 		Residual_CABAC_Sent_Zeros							( Residual_Sent_8_Zero 								) --> Residual_return;
 		Residual_CABAC_Sent_Zeros							( Residual_Sent_4_Zero 								) --> Residual_return;
 		
