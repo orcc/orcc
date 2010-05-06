@@ -56,6 +56,7 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.UintType;
 
 public class ConstraintBuilder extends AbstractNodeInterpreter {
@@ -219,7 +220,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 			if (value != null && (type.isInt() || type.isUint())) {
 				return value;
 			} else {
-				return variables.get(variable);
+				return getIntVariable(variable);
 			}
 		}
 
@@ -235,22 +236,21 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	/**
 	 * a map of name to constraint variables
 	 */
-	private Map<String, IntVariable> variableNames;
+	private Map<String, IntVariable> variableConstraints;
 
 	/**
 	 * a map of IR variables to constraint variables
 	 */
-	private Map<Variable, IntVariable> variables;
+	private Map<Variable, Variable> variables;
 
 	public ConstraintBuilder() {
 		network = new Network();
-		variableNames = new HashMap<String, IntVariable>();
-		variables = new HashMap<Variable, IntVariable>();
+		variableConstraints = new HashMap<String, IntVariable>();
+		variables = new HashMap<Variable, Variable>();
 	}
 
 	/**
-	 * Associate the target local variable with an int variable that has the
-	 * characteristics (name, domain) of the given variable.
+	 * Associate the target local variable with the source variable.
 	 * 
 	 * @param target
 	 *            a target local variable
@@ -258,18 +258,10 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	 *            a state variable or a port
 	 */
 	private void associateVariable(Variable target, Variable variable) {
-		IntVariable intVar = variables.get(variable);
-		if (intVar == null) {
-			// create int variable associated with given variable
-			// variable may be a state variable or a port
-			intVar = new IntVariable(network, getDomain(variable), variable
-					.getName());
-			variables.put(variable, intVar);
-			variableNames.put(intVar.getName(), intVar);
+		Variable source = variables.get(target);
+		if (source == null) {
+			variables.put(target, variable);
 		}
-
-		// associate int variable with local variable
-		variables.put(target, intVar);
 	}
 
 	/**
@@ -283,28 +275,65 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		int lo;
 		int hi;
 
-		if (variable.getType().isInt()) {
-			IntType type = (IntType) variable.getType();
-			Expression size = type.getSize();
-			ExpressionEvaluator evaluator = new ExpressionEvaluator();
-			int num = evaluator.evaluateAsInteger(size);
-			lo = -(1 << (num - 1));
-			hi = (1 << (num - 1)) - 1;
-		} else if (variable.getType().isUint()) {
-			UintType type = (UintType) variable.getType();
-			Expression size = type.getSize();
-			ExpressionEvaluator evaluator = new ExpressionEvaluator();
-			int num = evaluator.evaluateAsInteger(size);
-			lo = 0;
-			hi = 1 << num - 1;
-		} else if (variable.getType().isBool()) {
-			lo = 0;
-			hi = 1;
+		Object value = variable.getValue();
+		Type type = variable.getType();
+		if (type.isList()) {
+			type = ((ListType) type).getElementType();
+		}
+
+		if (type.isInt()) {
+			if (value instanceof Integer) {
+				lo = (Integer) value;
+				hi = lo;
+			} else {
+				Expression size = ((IntType) type).getSize();
+				ExpressionEvaluator evaluator = new ExpressionEvaluator();
+				int num = evaluator.evaluateAsInteger(size);
+				lo = -(1 << (num - 1));
+				hi = (1 << (num - 1)) - 1;
+			}
+		} else if (type.isUint()) {
+			if (value instanceof Integer) {
+				lo = (Integer) value;
+				hi = lo;
+			} else {
+				Expression size = ((UintType) type).getSize();
+				ExpressionEvaluator evaluator = new ExpressionEvaluator();
+				int num = evaluator.evaluateAsInteger(size);
+				lo = 0;
+				hi = 1 << num - 1;
+			}
+		} else if (type.isBool()) {
+			if (value instanceof Boolean) {
+				lo = ((Boolean) value) ? 1 : 0;
+				hi = lo;
+			} else {
+				lo = 0;
+				hi = 1;
+			}
 		} else {
 			throw new OrccRuntimeException("type of variable not supported");
 		}
 
 		return new IntDomain(lo, hi);
+	}
+
+	private IntVariable getIntVariable(Variable variable) {
+		Variable source = variables.get(variable);
+		if (source == null) {
+			source = variable;
+		}
+
+		IntVariable intVar = variableConstraints.get(source.getName());
+		if (intVar == null) {
+			// create int variable associated with given variable
+			// variable may be a state variable or a port
+			intVar = new IntVariable(network, getDomain(source), source
+					.getName());
+			variableConstraints.put(intVar.getName(), intVar);
+		}
+
+		return intVar;
 	}
 
 	/**
@@ -324,7 +353,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	 * @return the constraint variable with the given name
 	 */
 	public IntVariable getVariable(String name) {
-		return variableNames.get(name);
+		return variableConstraints.get(name);
 	}
 
 	/**
