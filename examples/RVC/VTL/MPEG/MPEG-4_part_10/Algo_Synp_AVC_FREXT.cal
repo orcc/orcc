@@ -7570,12 +7570,12 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		ctxBlockCat = 0 or ctxBlockCat = 1 or ctxBlockCat = 2 
 	end
-	/*
+	
 	Residual_Sent_15_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
 	guard
-		maxNumCoeff = 15
+		ctxBlockCat = 4
 	end
-	*/
+	
 	Residual_Sent_8_Zero: action ==> VALUE : [ [0: for int i in Integers(0,8) ] ] repeat 8
 	guard
 		maxNumCoeff = 8
@@ -8050,7 +8050,7 @@ actor Algo_Synp_AVC_FREXT()
 		
 		//Sent Zeros
 		Residual_CABAC_Sent_Zeros							( Residual_Sent_16_Zero 							) --> Residual_return;
-		//Residual_CABAC_Sent_Zeros							( Residual_Sent_15_Zero 							) --> Residual_return;
+		Residual_CABAC_Sent_Zeros							( Residual_Sent_15_Zero 							) --> Residual_return;
 		Residual_CABAC_Sent_Zeros							( Residual_Sent_8_Zero 								) --> Residual_return;
 		Residual_CABAC_Sent_Zeros							( Residual_Sent_4_Zero 								) --> Residual_return;
 		
