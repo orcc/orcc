@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 
@@ -125,7 +126,7 @@ public class XlimNames {
 		if (params.containsKey(varName)) {
 			return params.get(varName);
 		}
-		if (use.getVariable().isPort()) {
+		if (!var.isGlobal() && ((LocalVariable) var).isPort()) {
 			return getPortName(use, actionName);
 		}
 
@@ -142,7 +143,7 @@ public class XlimNames {
 	 * @return Variable name
 	 */
 	public String getVarName(Variable var, String actionName) {
-		if (var.isPort()) {
+		if (var instanceof LocalVariable && ((LocalVariable) var).isPort()) {
 			return getPortName(var, actionName);
 		}
 		return getVarTemplate(var, actionName);

@@ -105,11 +105,6 @@ public class Assign extends AbstractInstruction implements
 
 	@Override
 	public void setTarget(LocalVariable target) {
-		CommonNodeOperations.setTarget(this, target);
-	}
-
-	@Override
-	public void setTargetSimple(LocalVariable target) {
 		this.target = target;
 	}
 

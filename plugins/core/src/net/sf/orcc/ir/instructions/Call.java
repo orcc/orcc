@@ -40,7 +40,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines a Call instruction, which possibly stores the result to a
@@ -171,11 +170,6 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 
 	@Override
 	public void setTarget(LocalVariable target) {
-		CommonNodeOperations.setTarget(this, target);
-	}
-
-	@Override
-	public void setTargetSimple(LocalVariable target) {
 		this.target = target;
 	}
 

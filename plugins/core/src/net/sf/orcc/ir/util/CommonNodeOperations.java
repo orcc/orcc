@@ -30,14 +30,9 @@ package net.sf.orcc.ir.util;
 
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.Variable;
 
 /**
  * This class defines operations common to nodes.
@@ -46,52 +41,6 @@ import net.sf.orcc.ir.Variable;
  * 
  */
 public class CommonNodeOperations {
-
-	/**
-	 * Sets the local variable assigned by this node. Uses are updated to point
-	 * to this node.
-	 * 
-	 * @param node
-	 *            an {@link CFGNode} that implements
-	 *            {@link LocalTargetContainer}
-	 * @param target
-	 *            a local variable
-	 */
-	public static void setTarget(LocalTargetContainer node, LocalVariable target) {
-		LocalVariable thisTarget = node.getTarget();
-		if (thisTarget != null) {
-			thisTarget.removeUse((Instruction) node);
-		}
-
-		if (target != null) {
-			target.addUse((Instruction) node);
-		}
-
-		node.setTargetSimple(target);
-	}
-
-	/**
-	 * Sets the local variable assigned by this node. Uses are updated to point
-	 * to this node.
-	 * 
-	 * @param node
-	 *            an {@link CFGNode} that implements
-	 *            {@link LocalTargetContainer}
-	 * @param target
-	 *            a local variable
-	 */
-	public static void setTarget(TargetContainer node, Variable target) {
-		Variable thisTarget = node.getTarget();
-		if (thisTarget != null) {
-			thisTarget.removeUse((Instruction) node);
-		}
-
-		if (target != null) {
-			target.addUse((Instruction) node);
-		}
-
-		node.setTargetSimple(target);
-	}
 
 	/**
 	 * Sets the value of this node. Uses are updated to point to this node.

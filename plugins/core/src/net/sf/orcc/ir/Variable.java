@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.util.INameable;
 
 /**
@@ -244,30 +243,6 @@ public abstract class Variable implements INameable {
 	 */
 	public boolean isList() {
 		return type.isList();
-	}
-
-	/**
-	 * Returns true if this variable is used by at least one instruction that
-	 * reads from/writes to a port.
-	 * 
-	 * @return true if this variable is used by at least one instruction that
-	 *         reads from/writes to a port
-	 */
-	public boolean isPort() {
-		boolean isPort = false;
-		for (Use use : getUses()) {
-			if (use.getNode() instanceof AbstractFifoInstruction) {
-				AbstractFifoInstruction fifoNode = (AbstractFifoInstruction) use
-						.getNode();
-				if (getName().startsWith(fifoNode.getPort().getName())
-						|| getName().endsWith(fifoNode.getPort().getName())) {
-					isPort = true;
-					break;
-				}
-			}
-		}
-
-		return isPort;
 	}
 
 	/**

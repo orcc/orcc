@@ -37,8 +37,10 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.util.OrderedMap;
 
@@ -50,23 +52,19 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class DeadVariableRemoval extends AbstractActorTransformation {
 
+	private boolean changed;
+
 	@Override
-	public void visitProcedure(Procedure procedure) {
-		boolean changed = true;
+	@SuppressWarnings("unchecked")
+	public void visit(Assign assign, Object... args) {
+		LocalVariable variable = assign.getTarget();
+		if (!variable.isUsed()) {
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			assign.setValue(null);
+			it.remove();
 
-		while (changed) {
-			super.visitProcedure(procedure);
-
-			changed = false;
-			OrderedMap<Variable> locals = procedure.getLocals();
-			Iterator<Variable> it = locals.iterator();
-			while (it.hasNext()) {
-				LocalVariable local = (LocalVariable) it.next();
-				if (local.getUses().isEmpty()) {
-					changed = true;
-					it.remove();
-				}
-			}
+			procedure.getLocals().remove(variable);
+			changed = true;
 		}
 	}
 
@@ -74,12 +72,13 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	@SuppressWarnings("unchecked")
 	public void visit(Load load, Object... args) {
 		LocalVariable variable = load.getTarget();
-		List<Use> uses = variable.getUses();
-		if (uses.size() == 1 && uses.get(0).getNode() == load) {
+		if (!variable.isUsed()) {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			load.setTarget(null);
-			load.getSource().remove();
+			load.setSource(null);
 			it.remove();
+
+			procedure.getLocals().remove(variable);
+			changed = true;
 		}
 	}
 
@@ -87,18 +86,59 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	@SuppressWarnings("unchecked")
 	public void visit(Peek peek, Object... args) {
 		Variable variable = peek.getTarget();
-		List<Use> uses = variable.getUses();
-		if (uses.size() == 1 && uses.get(0).getNode() == peek) {
+		if (!variable.isUsed()) {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			peek.setTarget(null);
-			peek.getPort().removeUse(peek);
+			peek.setPort(null);
 			it.remove();
+
+			procedure.getLocals().remove(variable);
+			changed = true;
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(PhiAssignment phi, Object... args) {
+		Variable variable = phi.getTarget();
+		if (!variable.isUsed()) {
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			it.remove();
+
+			List<Use> vars = phi.getVars();
+			for (Use use : vars) {
+				use.remove();
+			}
+
+			procedure.getLocals().remove(variable);
+			changed = true;
 		}
 	}
 
 	@Override
 	public void visit(Read read, Object... args) {
 		// do NOT remove read!
+	}
+
+	@Override
+	public void visitProcedure(Procedure procedure) {
+		changed = true;
+
+		while (changed) {
+			changed = false;
+
+			// first shot: removes locals not used by any instruction
+			OrderedMap<Variable> locals = procedure.getLocals();
+			Iterator<Variable> it = locals.iterator();
+			while (it.hasNext()) {
+				LocalVariable local = (LocalVariable) it.next();
+				if (!local.isUsed() && local.getInstruction() == null) {
+					changed = true;
+					it.remove();
+				}
+			}
+
+			super.visitProcedure(procedure);
+		}
 	}
 
 }

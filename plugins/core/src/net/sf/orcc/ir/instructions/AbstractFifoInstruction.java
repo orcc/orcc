@@ -32,7 +32,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines an instruction that performs an operation on a port. This
@@ -109,19 +108,16 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 	 */
 	public void setPort(Port port) {
 		if (this.port != null) {
-			port.removeUse(this);
+			this.port.removeUse(this);
 		}
 		this.port = port;
-		port.addUse(this);
+		if (port != null) {
+			port.addUse(this);
+		}
 	}
 
 	@Override
 	public void setTarget(Variable target) {
-		CommonNodeOperations.setTarget(this, target);
-	}
-
-	@Override
-	public void setTargetSimple(Variable target) {
 		this.target = target;
 	}
 

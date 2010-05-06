@@ -35,6 +35,7 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -94,7 +95,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 	public void visit(Load node, Object... args) {
 		Use use = node.getSource();
 		Variable var = use.getVariable();
-		if (var.isPort()) {
+		if (!var.isGlobal() && ((LocalVariable) var).isPort()) {
 			use.remove();
 			use = new Use(stateVars.get(var.getName()), node);
 			node.setSource(use);
@@ -107,7 +108,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 	public void visit(Store node, Object... args) {
 		Use use = node.getTarget();
 		Variable var = use.getVariable();
-		if (var.isPort()) {
+		if (!var.isGlobal() && ((LocalVariable) var).isPort()) {
 			use.remove();
 			use = new Use(stateVars.get(var.getName()), node);
 			node.setTarget(use);

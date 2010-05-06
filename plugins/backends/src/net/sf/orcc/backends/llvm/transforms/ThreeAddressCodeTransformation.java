@@ -403,7 +403,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		// Transform Local boolean Variable into int Variable (to be remove
 		// later)
 		for (Variable var : procedure.getLocals()) {
-			if (var.isPort()) {
+			if (((LocalVariable) var).isPort()) {
 				ListType listType = (ListType) var.getType();
 				if (listType.getElementType().isBool()) {
 					listType.setElementType(new IntType(new IntExpr(32)));

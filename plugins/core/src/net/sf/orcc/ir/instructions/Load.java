@@ -37,7 +37,6 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines an instruction that Loads data from memory to a local
@@ -122,16 +121,13 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 			this.source.remove();
 		}
 		this.source = source;
-		source.setNode(this);
+		if (source != null) {
+			source.setNode(this);
+		}
 	}
 
 	@Override
 	public void setTarget(LocalVariable target) {
-		CommonNodeOperations.setTarget(this, target);
-	}
-
-	@Override
-	public void setTargetSimple(LocalVariable target) {
 		this.target = target;
 	}
 

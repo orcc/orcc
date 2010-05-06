@@ -869,12 +869,14 @@ public class IRParser {
 
 	private Write parseWrite(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		LocalVariable varDef = (LocalVariable) getVariable(array
+		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = outputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		return new Write(loc, port, numTokens, varDef);
+		Write write = new Write(loc, port, numTokens, target);
+		target.setInstruction(write);
+		return write;
 	}
 
 	private void putAction(Tag tag, Action action) {

@@ -44,19 +44,11 @@ public interface TargetContainer {
 	public Variable getTarget();
 
 	/**
-	 * Sets the target of this node. Uses are updated to point to this node.
+	 * Sets the target of this node.
 	 * 
 	 * @param target
 	 *            a variable
 	 */
 	public void setTarget(Variable target);
-
-	/**
-	 * Sets the target of this node without updating the use list.
-	 * 
-	 * @param target
-	 *            a variable
-	 */
-	public void setTargetSimple(Variable target);
 
 }

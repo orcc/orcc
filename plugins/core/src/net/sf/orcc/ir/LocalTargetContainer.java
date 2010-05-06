@@ -44,19 +44,11 @@ public interface LocalTargetContainer {
 	public LocalVariable getTarget();
 
 	/**
-	 * Sets the target of this node. Uses are updated to point to this node.
+	 * Sets the target of this node.
 	 * 
 	 * @param target
 	 *            a local variable
 	 */
 	public void setTarget(LocalVariable target);
-
-	/**
-	 * Sets the target of this node without updating the use list.
-	 * 
-	 * @param target
-	 *            a local variable
-	 */
-	public void setTargetSimple(LocalVariable target);
 
 }

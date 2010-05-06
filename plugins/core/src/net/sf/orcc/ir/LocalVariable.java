@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ir;
 
+import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
+
 /**
  * This class represents a local variable. A local variable is a variable that
  * can be assigned, has a SSA index, and a reference to the node where it is
@@ -160,6 +162,26 @@ public class LocalVariable extends Variable implements
 
 	public boolean isConstant() {
 		return constant;
+	}
+
+	/**
+	 * Returns true if this variable is used by at least one instruction that
+	 * reads from/writes to a port.
+	 * 
+	 * @return true if this variable is used by at least one instruction that
+	 *         reads from/writes to a port
+	 */
+	public boolean isPort() {
+		boolean isPort = false;
+		if (instruction instanceof AbstractFifoInstruction) {
+			AbstractFifoInstruction fifo = (AbstractFifoInstruction) instruction;
+			if (getName().startsWith(fifo.getPort().getName())
+					|| getName().endsWith(fifo.getPort().getName())) {
+				isPort = true;
+			}
+		}
+
+		return isPort;
 	}
 
 	public void setAssignable(boolean assignable) {
