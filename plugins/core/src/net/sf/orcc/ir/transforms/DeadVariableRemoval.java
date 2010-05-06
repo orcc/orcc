@@ -29,10 +29,17 @@
 package net.sf.orcc.ir.transforms;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -45,14 +52,53 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
-		OrderedMap<Variable> locals = procedure.getLocals();
-		Iterator<Variable> it = locals.iterator();
-		while (it.hasNext()) {
-			LocalVariable local = (LocalVariable) it.next();
-			if (local.getUses().isEmpty()) {
-				it.remove();
+		boolean changed = true;
+
+		while (changed) {
+			super.visitProcedure(procedure);
+
+			changed = false;
+			OrderedMap<Variable> locals = procedure.getLocals();
+			Iterator<Variable> it = locals.iterator();
+			while (it.hasNext()) {
+				LocalVariable local = (LocalVariable) it.next();
+				if (local.getUses().isEmpty()) {
+					changed = true;
+					it.remove();
+				}
 			}
 		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Load load, Object... args) {
+		LocalVariable variable = load.getTarget();
+		List<Use> uses = variable.getUses();
+		if (uses.size() == 1 && uses.get(0).getNode() == load) {
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			load.setTarget(null);
+			load.getSource().remove();
+			it.remove();
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Peek peek, Object... args) {
+		Variable variable = peek.getTarget();
+		List<Use> uses = variable.getUses();
+		if (uses.size() == 1 && uses.get(0).getNode() == peek) {
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			peek.setTarget(null);
+			peek.getPort().removeUse(peek);
+			it.remove();
+		}
+	}
+
+	@Override
+	public void visit(Read read, Object... args) {
+		// do NOT remove read!
 	}
 
 }

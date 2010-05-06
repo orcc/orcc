@@ -192,14 +192,11 @@ public class ConfigurationAnalyzer {
 			if (variable == null) {
 				System.out.println("no constraint on " + port);
 			} else {
-				if (variable != null) {
-					DefaultSolver solver = new DefaultSolver(variable
-							.getNetwork());
-					Solution solution = solver.findFirst();
-					if (solution != null) {
-						int value = solution.getIntValue(variable);
-						values.put(info.getAction(), value);
-					}
+				DefaultSolver solver = new DefaultSolver(variable.getNetwork());
+				Solution solution = solver.findFirst();
+				if (solution != null) {
+					int value = solution.getIntValue(variable);
+					values.put(info.getAction(), value);
 				}
 			}
 		}

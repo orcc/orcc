@@ -128,6 +128,11 @@ public class ActorClassifierIndependent {
 			staticClass.printTokenConsumption();
 			staticClass.printTokenProduction();
 			System.out.println();
+		} else if (clasz.isCSDF()) {
+			CSDFActorClass csdfClass = (CSDFActorClass) clasz;
+			csdfClass.printTokenConsumption();
+			csdfClass.printTokenProduction();
+			System.out.println();
 		} else if (clasz.isDynamic()) {
 			System.out.println("actor " + actor + " classified dynamic");
 		}

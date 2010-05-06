@@ -36,6 +36,7 @@ import net.sf.orcc.classes.SDFNetworkClass;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
+import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
@@ -87,14 +88,13 @@ public class NetworkClassifier implements INetworkTransformation {
 	@Override
 	public void transform(Network network) throws OrccException {
 		// will remove phi so the actor can be interpreted
-		ActorTransformation phi = new PhiRemoval();
-
-		// will remove dead globals (they are useless anyway)
-		ActorTransformation dge = new DeadGlobalElimination();
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadVariableRemoval(), new PhiRemoval() };
 
 		for (Actor actor : network.getActors()) {
-			dge.transform(actor);
-			phi.transform(actor);
+			for (ActorTransformation transformation : transformations) {
+				transformation.transform(actor);
+			}
 
 			ActorClassifierIndependent classifier = new ActorClassifierIndependent();
 			IClass clasz = classifier.classify(actor);

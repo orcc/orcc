@@ -87,34 +87,34 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(Assign node, Object... args) {
+	public void visit(Assign assign, Object... args) {
 	}
 
 	@Override
-	public void visit(BlockNode node, Object... args) {
-		ListIterator<Instruction> it = node.listIterator();
+	public void visit(BlockNode blockNode, Object... args) {
+		ListIterator<Instruction> it = blockNode.listIterator();
 		while (it.hasNext()) {
 			it.next().accept(this, it);
 		}
 	}
 
 	@Override
-	public void visit(Call node, Object... args) {
+	public void visit(Call call, Object... args) {
 	}
 
 	@Override
-	public void visit(HasTokens node, Object... args) {
+	public void visit(HasTokens hasTokens, Object... args) {
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
-		visit(node.getThenNodes());
-		visit(node.getElseNodes());
-		visit(node.getJoinNode(), args);
+	public void visit(IfNode ifNode, Object... args) {
+		visit(ifNode.getThenNodes());
+		visit(ifNode.getElseNodes());
+		visit(ifNode.getJoinNode(), args);
 	}
 
 	@Override
-	public void visit(InitPort node, Object... args) {
+	public void visit(InitPort initPort, Object... args) {
 	}
 
 	/**
@@ -134,27 +134,27 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(Load node, Object... args) {
+	public void visit(Load load, Object... args) {
 	}
 
 	@Override
-	public void visit(Peek node, Object... args) {
+	public void visit(Peek peek, Object... args) {
 	}
 
 	@Override
-	public void visit(PhiAssignment node, Object... args) {
+	public void visit(PhiAssignment phi, Object... args) {
 	}
 
 	@Override
-	public void visit(Read node, Object... args) {
+	public void visit(Read read, Object... args) {
 	}
 
 	@Override
-	public void visit(ReadEnd node, Object... args) {
+	public void visit(ReadEnd readEnd, Object... args) {
 	}
 
 	@Override
-	public void visit(Return node, Object... args) {
+	public void visit(Return returnInstr, Object... args) {
 	}
 
 	@Override
@@ -163,21 +163,21 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(Store node, Object... args) {
+	public void visit(Store store, Object... args) {
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
-		visit(node.getNodes());
-		visit(node.getJoinNode(), args);
+	public void visit(WhileNode whileNode, Object... args) {
+		visit(whileNode.getNodes());
+		visit(whileNode.getJoinNode(), args);
 	}
 
 	@Override
-	public void visit(Write node, Object... args) {
+	public void visit(Write write, Object... args) {
 	}
 
 	@Override
-	public void visit(WriteEnd node, Object... args) {
+	public void visit(WriteEnd writeEnd, Object... args) {
 	}
 
 	/**
