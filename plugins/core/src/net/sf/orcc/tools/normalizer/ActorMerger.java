@@ -29,6 +29,8 @@
 package net.sf.orcc.tools.normalizer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,12 +79,12 @@ import net.sf.orcc.tools.staticanalyzer.BufferManager;
 import net.sf.orcc.tools.staticanalyzer.FlatSASScheduler;
 import net.sf.orcc.tools.staticanalyzer.Iterand;
 import net.sf.orcc.tools.staticanalyzer.Schedule;
-import net.sf.orcc.tools.staticanalyzer.StaticNetworkClusterer;
 import net.sf.orcc.tools.staticanalyzer.StaticSubsetDetector;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.DirectedSubgraph;
 
 /**
  * This class defines a network transformation that merges actors until a
@@ -102,59 +104,51 @@ public class ActorMerger implements INetworkTransformation {
 
 	private Schedule schedule;
 
-	private Map<Connection, Integer> buffers;
+	private Map<Connection, Integer> bufferCapacities;
 
-	private OrderedMap<Procedure> procs = new OrderedMap<Procedure>();
+	private OrderedMap<Procedure> procs;
 
 	private OrderedMap<Variable> variables;
+
+	private OrderedMap<Variable> stateVars;
 
 	private OrderedMap<Port> inputs;
 
 	private OrderedMap<Port> outputs;
 
-	private OrderedMap<Variable> stateVars;
-
-	private List<LocalVariable> indexes = new ArrayList<LocalVariable>();
+	private List<LocalVariable> indexes;
 
 	private int index = 0;
 
+	private Map<Connection, Variable> bufferMap;
+	private Map<Connection, Port> outputsMap;
+	private Map<Connection, Port> inputsMap;
+
+	private Map<Port, Variable> stateVarsMap;
+
 	/**
-	 * Converts FIFO between static actors into state variables
+	 * Converts FIFO between static actors into buffers
 	 * 
 	 */
-	private void addStateVariables() {
-		for (Map.Entry<Connection, Integer> entry : buffers.entrySet()) {
+	private void createInternalBuffers() {
 
+		int index = 0;
+		bufferMap = new HashMap<Connection, Variable>();
+		for (Map.Entry<Connection, Integer> entry : bufferCapacities.entrySet()) {
 			Connection connection = entry.getKey();
 			Expression size = new IntExpr(entry.getValue());
+			String name = "buf_" + index;
+			Type type = new ListType(size, connection.getSource().getType());
+			Variable buf = new StateVariable(new Location(), type, name, false,
+					(Constant) null);
+			bufferMap.put(connection, buf);
+			stateVarsMap.put(connection.getSource(), buf);
+			stateVarsMap.put(connection.getTarget(), buf);
+			index++;
 
-			Vertex src = graph.getEdgeSource(connection);
-			Vertex tgt = graph.getEdgeTarget(connection);
-
-			Port srcPort = connection.getSource();
-			Port tgtPort = connection.getTarget();
-
-			String name;
-			Type type;
-			if (src.isPort()) {
-				name = src.getPort().getName();
-				type = new ListType(size, tgtPort.getType());
-			} else if (tgt.isPort()) {
-				name = tgt.getPort().getName();
-				type = new ListType(size, srcPort.getType());
-			} else {
-				name = src.getInstance().getId() + "_" + srcPort.getName()
-						+ "_" + tgt.getInstance().getId() + "_"
-						+ tgtPort.getName();
-				type = new ListType(size, srcPort.getType());
-			}
-
-			stateVars.add(name, new Location(), name, new StateVariable(
-					new Location(), type, name, false, (Constant) null));
 		}
 	}
 
-	
 	/**
 	 * Converts a given action into a procedure
 	 * 
@@ -175,9 +169,9 @@ public class ActorMerger implements INetworkTransformation {
 			Port port = entry.getKey();
 			Expression size = new IntExpr(entry.getValue());
 			Type type = new ListType(size, port.getType());
-			LocalVariable parameter = new LocalVariable(false, 0,
-					new Location(), port.getName(), null, null, type);
-			parameters.add("", new Location(), parameter.getName(), parameter);
+			LocalVariable param = new LocalVariable(false, 0, new Location(),
+					port.getName(), null, null, type);
+			parameters.add("", new Location(), param.getName(), param);
 		}
 
 		Pattern outputPattern = action.getOutputPattern();
@@ -186,10 +180,8 @@ public class ActorMerger implements INetworkTransformation {
 			Port port = entry.getKey();
 			Expression size = new IntExpr(entry.getValue());
 			Type type = new ListType(size, port.getType());
-
 			LocalVariable parameter = new LocalVariable(false, 0,
 					new Location(), port.getName(), null, null, type);
-
 			parameters.add("", new Location(), parameter.getName(), parameter);
 		}
 
@@ -207,11 +199,11 @@ public class ActorMerger implements INetworkTransformation {
 		Pattern inputPattern = new Pattern();
 		Pattern outputPattern = new Pattern();
 
-		for (Port port : inputs) {
+		for (Port port : inputsMap.values()) {
 			inputPattern.put(port, port.getNumTokensConsumed());
 		}
 
-		for (Port port : outputs) {
+		for (Port port : outputsMap.values()) {
 			outputPattern.put(port, port.getNumTokensProduced());
 		}
 
@@ -223,27 +215,6 @@ public class ActorMerger implements INetworkTransformation {
 				scheduler, body);
 	}
 
-	private Actor createActor() {
-
-		stateVars = new OrderedMap<Variable>();
-
-		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
-		ActionList actions = new ActionList();
-		ActionList initializes = new ActionList();
-		ActionScheduler scheduler = new ActionScheduler(actions.getList(), null);
-
-		String name = "";
-		for (Vertex vertex : schedule.getScheduledActors()) {
-			name += vertex.getInstance().getId();
-		}
-
-		Actor superActor = new Actor(name, "", parameters, inputs, outputs,
-				stateVars, procs, actions.getList(), initializes.getList(),
-				scheduler, null);
-
-		return superActor;
-	}
-
 	/**
 	 * Creates the body of the static action.
 	 * 
@@ -252,6 +223,7 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private Procedure createBody() throws OrccException {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
+		indexes = new ArrayList<LocalVariable>();
 		variables = new OrderedMap<Variable>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, new Location(),
@@ -264,40 +236,48 @@ public class ActorMerger implements INetworkTransformation {
 
 	private void createLoopedSchedule(Procedure procedure, Schedule schedule,
 			List<CFGNode> nodes) throws OrccException {
+
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
-
 				Vertex vertex = iterand.getVertex();
-
 				Actor actor = vertex.getInstance().getActor();
 
 				OrderedMap<Variable> vars = actor.getStateVars();
 
+				for(Procedure proc : actor.getProcs()) {
+					proc.setName(vertex.getInstance().getId() + "_"
+							+ proc.getName());
+				procs.add("", new Location(), proc.getName(), proc);
+				}
+				
 				for (Variable var : vars) {
 					String name = vertex.getInstance().getId() + "_"
 							+ var.getName();
 					var.setName(name);
 					stateVars.add("", new Location(), name, var);
 				}
-				new RemoveReadWrites().transform(actor);
 
 				List<Action> actions = actor.getActions();
-
 				if (actions.size() <= 1) {
+
 					Procedure proc = convertActionToFunction(actions.get(0));
 
 					proc.setName(vertex.getInstance().getId() + "_"
 							+ proc.getName());
 					BlockNode blkNode = new BlockNode(procedure);
 					LocalVariable loopVar = indexes.get(index - 1);
-					List<Expression> parameters = getParams(loopVar, vertex);
-					Call call = new Call(null, null, proc, parameters);
+
+					List<Expression> parameters = putParams(loopVar, actions
+							.get(0));
+
+					// List<Expression> parameters = getParams(loopVar, vertex,
+					// params);
+
 					Expression binopExpr = new BinaryExpr(new VarExpr(new Use(
 							loopVar)), BinaryOp.PLUS, new IntExpr(1),
 							new IntType(new IntExpr(32)));
-					Assign assign = new Assign(loopVar, binopExpr);
-					blkNode.add(call);
-					blkNode.add(assign);
+					blkNode.add(new Call(null, null, proc, parameters));
+					blkNode.add(new Assign(loopVar, binopExpr));
 					nodes.add(blkNode);
 					procs.add("", new Location(), proc.getName(), proc);
 				} else {
@@ -327,7 +307,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				WhileNode whileNode = new WhileNode(procedure, null,
 						statements, new BlockNode(procedure));
-				
+
 				Expression condition = new BinaryExpr(new VarExpr(new Use(
 						loopVar)), BinaryOp.LT, new IntExpr(sched
 						.getIterationCount()), new BoolType());
@@ -344,13 +324,39 @@ public class ActorMerger implements INetworkTransformation {
 		}
 	}
 
-	private void createWrites(Procedure procedure) {
-		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
-		for (Port port : outputs) {
-			Variable var = stateVars.get(port.getName());
-			Write read = new Write(port, port.getNumTokensProduced(), var);
-			block.add(read);
+	private List<Expression> putParams(LocalVariable loopVar, Action action) {
+
+		List<Expression> params = new ArrayList<Expression>();
+
+		for (Map.Entry<Port, Integer> entry : action.getInputPattern()
+				.entrySet()) {
+			Variable var = stateVarsMap.get(entry.getKey());
+			int size = entry.getValue();
+
+			Expression expr = new BinaryExpr(new IntExpr(size), BinaryOp.TIMES,
+					new VarExpr(new Use(loopVar)), new IntType(new IntExpr(32)));
+
+			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
+					BinaryOp.PLUS, expr, new IntType(new IntExpr(32)));
+
+			params.add(param);
 		}
+
+		for (Map.Entry<Port, Integer> entry : action.getOutputPattern()
+				.entrySet()) {
+			Variable var = stateVarsMap.get(entry.getKey());
+			int size = entry.getValue();
+
+			Expression expr = new BinaryExpr(new IntExpr(size), BinaryOp.TIMES,
+					new VarExpr(new Use(loopVar)), new IntType(new IntExpr(32)));
+
+			Expression inParam = new BinaryExpr(new VarExpr(new Use(var)),
+					BinaryOp.PLUS, expr, new IntType(new IntExpr(32)));
+
+			params.add(inParam);
+		}
+
+		return params;
 	}
 
 	/**
@@ -390,15 +396,13 @@ public class ActorMerger implements INetworkTransformation {
 	private void createInputTests(BlockNode block) {
 
 		int i = 0;
-		for (Port port : inputs) {
+		for (Port port : inputsMap.values()) {
 			Location location = new Location();
 			int numTokens = port.getNumTokensConsumed();
-
 			LocalVariable varDef = new LocalVariable(true, i, new Location(),
 					"pattern", null, null, new BoolType());
 			i++;
 			variables.add("", location, varDef.getName(), varDef);
-
 			HasTokens hasTokens = new HasTokens(location, port, numTokens,
 					varDef);
 			varDef.setInstruction(hasTokens);
@@ -410,85 +414,148 @@ public class ActorMerger implements INetworkTransformation {
 		Location location = new Location();
 		variables = new OrderedMap<Variable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
-
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
 				new BoolType(), new OrderedMap<Variable>(), variables, nodes);
-
 		BlockNode block = new BlockNode(procedure);
 		nodes.add(block);
-
 		createInputTests(block);
 		createInputCondition(block);
-
 		return procedure;
 	}
 
 	private void createReads(Procedure procedure) {
 		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
-		for (Port port : inputs) {
-			Variable var = stateVars.get(port.getName());
-			Read read = new Read(port, port.getNumTokensConsumed(), var);
+		for (Port port : inputsMap.values()) {
+			OrderedMap<Variable> locals = procedure.getLocals();
+			Expression size = new IntExpr(port.getNumTokensConsumed());
+			Type type = new ListType(size, port.getType());
+			LocalVariable local = new LocalVariable(true, 0, new Location(),
+					port.getName(), null, null, type);
+			locals.add("", new Location(), port.getName(), local);
+			Read read = new Read(port, port.getNumTokensConsumed(), local);
 			block.add(read);
 		}
 	}
 
-	private List<Expression> getParams(Variable loopVar, Vertex vertex) {
-		List<Expression> parameters = new ArrayList<Expression>();
+	private void createWrites(Procedure procedure) {
+		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
+		for (Port port : outputsMap.values()) {
+			OrderedMap<Variable> locals = procedure.getLocals();
+			Expression size = new IntExpr(port.getNumTokensProduced());
+			Type type = new ListType(size, port.getType());
+			LocalVariable local = new LocalVariable(true, 0, new Location(),
+					port.getName(), null, null, type);
+			locals.add("", new Location(), port.getName(), local);
+			Write read = new Write(port, port.getNumTokensProduced(), local);
+			block.add(read);
+		}
+	}
 
-		for (Connection connection : graph.incomingEdgesOf(vertex)) {
+	private void updateConnection(Vertex merge, Set<Vertex> vertices) {
+		Set<Connection> connections = new HashSet<Connection>(graph.edgeSet());
+		for (Connection connection : connections) {
 			Vertex src = graph.getEdgeSource(connection);
 			Vertex tgt = graph.getEdgeTarget(connection);
-			Port srcPort = connection.getSource();
-			Port tgtPort = connection.getTarget();
-
-			String name = "";
-			if (src.isPort()) {
-				name = src.getPort().getName();
-			} else {
-				name = src.getInstance().getId() + "_" + srcPort.getName()
-						+ "_" + tgt.getInstance().getId() + "_"
-						+ tgtPort.getName();
+			if (!vertices.contains(src) && vertices.contains(tgt)) {
+				Connection newConn = new Connection(connection.getSource(),
+						inputsMap.get(connection), null);
+				graph.addEdge(graph.getEdgeSource(connection), merge, newConn);
 			}
+			if (vertices.contains(src) && !vertices.contains(tgt)) {
+				Connection newConn = new Connection(outputsMap.get(connection),
+						connection.getTarget(), null);
+				graph.addEdge(merge, graph.getEdgeTarget(connection), newConn);
+			}
+		}
+	}
 
-			Variable stateVar = stateVars.get(name);
+	private Actor createActor(Set<Vertex> vertices) throws OrccException {
 
-			Expression expr = new BinaryExpr(new IntExpr(tgtPort
-					.getNumTokensConsumed()), BinaryOp.TIMES, new VarExpr(
-					new Use(loopVar)), new IntType(new IntExpr(32)));
+		stateVars = new OrderedMap<Variable>();
+		procs = new OrderedMap<Procedure>();
 
-			Expression inParam = new BinaryExpr(new VarExpr(new Use(stateVar)),
-					BinaryOp.PLUS, expr, new IntType(new IntExpr(32)));
+		String name = "";
 
-			parameters.add(inParam);
+		for (Vertex vertex : vertices) {
+			String id = vertex.getInstance().getId();
+			name += id;
 		}
 
-		for (Connection connection : graph.outgoingEdgesOf(vertex)) {
+		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
+		ActionList actions = new ActionList();
+		ActionList initializes = new ActionList();
+		ActionScheduler scheduler = new ActionScheduler(actions.getList(), null);
+
+		
+		Actor actor = new Actor(name, "", parameters, inputs,
+				outputs, stateVars, procs, actions.getList(),
+				initializes.getList(), scheduler, null);
+
+		createInternalBuffers();
+		addStateVars();
+		Action action = createAction();
+		actor.getActions().add(action);
+
+		return actor;
+	}
+
+	private void addStateVars() {
+		/*
+		 * for(Port port : inputsMap.values()) { stateVars.add("", new
+		 * Location(), port.getName(), port); } for(Port port :
+		 * outputsMap.values()) { stateVars.add("", new Location(),
+		 * port.getName(), port); }
+		 */
+		for (Variable var : bufferMap.values()) {
+			stateVars.add("", new Location(), var.getName(), var);
+		}
+
+	}
+
+	private void getOutputs(Set<Vertex> vertices) {
+		int index = 0;
+		outputsMap = new HashMap<Connection, Port>();
+
+		outputs = new OrderedMap<Port>();
+
+		for (Connection connection : graph.edgeSet()) {
+			Vertex src = graph.getEdgeSource(connection);
 			Vertex tgt = graph.getEdgeTarget(connection);
-			Port srcPort = connection.getSource();
-			Port tgtPort = connection.getTarget();
 
-			String name = "";
-			if (tgt.isPort()) {
-				name = tgt.getPort().getName();
-			} else {
-				name = vertex.getInstance().getId() + "_" + srcPort.getName()
-						+ "_" + tgt.getInstance().getId() + "_"
-						+ tgtPort.getName();
+			if (vertices.contains(src) && !vertices.contains(tgt)) {
+				Port srcPort = connection.getSource();
+				Port port = new Port(srcPort);
+				port.setName("output_" + index);
+				port.increaseTokenProduction(srcPort.getNumTokensProduced());
+				outputsMap.put(connection, port);
+				outputs.add("", new Location(), port.getName(), port);
+				stateVarsMap.put(connection.getSource(), port);
+				index++;
 			}
-
-			Variable stateVar = stateVars.get(name);
-
-			Expression expr = new BinaryExpr(new IntExpr(srcPort
-					.getNumTokensProduced()), BinaryOp.TIMES, new VarExpr(
-					new Use(loopVar)), new IntType(new IntExpr(32)));
-
-			Expression outParam = new BinaryExpr(
-					new VarExpr(new Use(stateVar)), BinaryOp.PLUS, expr,
-					new IntType(new IntExpr(32)));
-
-			parameters.add(outParam);
 		}
-		return parameters;
+	}
+
+	private void getInputs(Set<Vertex> vertices) {
+		int index = 0;
+
+		inputsMap = new HashMap<Connection, Port>();
+		inputs = new OrderedMap<Port>();
+		stateVarsMap = new HashMap<Port, Variable>();
+		for (Connection connection : graph.edgeSet()) {
+			Vertex src = graph.getEdgeSource(connection);
+			Vertex tgt = graph.getEdgeTarget(connection);
+
+			if (!vertices.contains(src) && vertices.contains(tgt)) {
+				Port tgtPort = connection.getTarget();
+				Port port = new Port(tgtPort);
+				port.setName("input_" + index);
+				port.increaseTokenConsumption(tgtPort.getNumTokensConsumed());
+				inputsMap.put(connection, port);
+				inputs.add("", new Location(), port.getName(), port);
+				stateVarsMap.put(connection.getTarget(), port);
+				index++;
+			}
+		}
 	}
 
 	/**
@@ -498,55 +565,36 @@ public class ActorMerger implements INetworkTransformation {
 	 *         otherwise
 	 * @throws OrccException
 	 */
-	private Actor mergeActors(Network network) throws OrccException {
-		graph = network.getGraph();
-		inputs = network.getInputs();
-		outputs = network.getOutputs();
-
-		Actor actor = createActor();
-
-		addStateVariables();
-		Action action = createAction();
-		actor.getActions().add(action);
-		Vertex vertex = new Vertex(new Instance("cluster", actor));
-		graph.addVertex(vertex);
-
-		return actor;
+	private void mergeActors(Set<Vertex> vertices) throws OrccException {
+		getInputs(vertices);
+		getOutputs(vertices);
+		Actor actor = createActor(vertices);
+		Vertex mergeVertex = new Vertex(new Instance(actor.getName(), actor));
+		graph.addVertex(mergeVertex);
+		updateConnection(mergeVertex, vertices);
+		graph.removeAllVertices(vertices);
 	}
 
 	@Override
 	public void transform(Network network) throws OrccException {
+		graph = network.getGraph();
 
 		Set<Set<Vertex>> sets = new StaticSubsetDetector(network)
 				.staticRegionSets();
-
-		int index = 0;
 		for (Set<Vertex> vertices : sets) {
-			Vertex vertex = new StaticNetworkClusterer(network).cluster(
-					"clust_" + index, vertices);
-
-			Network cluster = vertex.getInstance().getNetwork();
-			schedule = new FlatSASScheduler().schedule(cluster);
-			BufferManager bufMngt = new BufferManager(cluster);
-			bufMngt.instrument(schedule);
-			buffers = bufMngt.getBufferCapacities();
-
-			Actor actor = mergeActors(cluster);
-			graph = network.getGraph();
-			Vertex merge = new Vertex(new Instance(actor.getName(), actor));
-			graph.addVertex(merge);
-
-			for (Connection connection : graph.incomingEdgesOf(vertex)) {
-				Connection newConn = new Connection(connection.getSource(),
-						inputs.get(connection.getTarget().getName()), null);
-				graph.addEdge(graph.getEdgeSource(connection), merge, newConn);
+			Network subnetwork = new Network(null, null, null, null, null,
+					new DirectedSubgraph<Vertex, Connection>(graph, vertices,
+							null));
+			schedule = new FlatSASScheduler().schedule(subnetwork);
+			bufferCapacities = new BufferManager(subnetwork)
+					.getBufferCapacities(schedule);
+			for (Vertex vertex : vertices) {
+				Actor actor = vertex.getInstance().getActor();
+				new RemoveReadWrites().transform(actor);
 			}
-			for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-				Connection newConn = new Connection(outputs.get(connection
-						.getSource().getName()), connection.getTarget(), null);
-				graph.addEdge(merge, graph.getEdgeTarget(connection), newConn);
-			}
-			graph.removeVertex(vertex);
+
+			mergeActors(vertices);
+
 		}
 	}
 }
