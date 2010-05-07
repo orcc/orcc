@@ -6110,7 +6110,7 @@ actor Algo_Synp_AVC_FREXT()
 				end
 			end
 		end
-		
+		mbTab[val_CurrMbAddr][mbQpDelta] := mb_qp_delta;
 		val_QP := (val_QP + mb_qp_delta + 52) mod 52;
 		val_QP_Cb := qP_tab[val_QP + chroma_qp_index_offset[pps_id]];
 		val_QP_Cr := qP_tab[val_QP + second_chroma_qp_index_offset[pps_id]];
@@ -6558,7 +6558,8 @@ actor Algo_Synp_AVC_FREXT()
 			intra_chroma_pred_mode := cabac_value();
 			end
 		end
-			
+		
+		mbTab[val_CurrMbAddr][mbIntraChromaPredMode] := intra_chroma_pred_mode;
 	end
 
 	//else
