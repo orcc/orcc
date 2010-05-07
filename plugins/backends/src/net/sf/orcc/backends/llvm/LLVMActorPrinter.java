@@ -52,7 +52,7 @@ public final class LLVMActorPrinter extends STPrinter {
 	 *             If the template file could not be read.
 	 */
 	public LLVMActorPrinter() {
-		super("LLVM_core", "LLVM_header", "LLVM_actor");
+		super("LLVM_core", "LLVM_header", "LLVM_actor", "LLVM_metadata");
 	}
 
 	@Override
