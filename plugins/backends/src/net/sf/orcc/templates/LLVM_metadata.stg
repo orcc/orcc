@@ -1,6 +1,15 @@
+fifos_decl_MD(actor) ::= <<
+!inputs = !{$actor.inputs.list: fifo_decl_MD(); separator=", "$}
+!outputs = !{$actor.outputs.list: fifo_decl_MD(); separator=", "$}
+>>
 
-fifo_metadata(port) ::= <<
-!$port.location.startLine$$port.location.startColumn$ = metadata !{
+fifo_decl_MD(port) ::= <<
+!$Location(port.location)$
+>>
+
+
+fifo_MD(port) ::= <<
+!$Location(port.location)$ = metadata !{
 i32 458804, 							;; Tag = 52 + LLVMDebugVersion 
 i32 0, 									;; Unused field.
 metadata !"", 							;; Reference to context descriptor

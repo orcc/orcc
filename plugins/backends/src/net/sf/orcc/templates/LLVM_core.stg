@@ -4,7 +4,7 @@
 
 fifo(port) ::= <<
 @$port.name$ = common global %struct.fifo_s* null
-$fifo_metadata(port)$
+$fifo_MD(port)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ endif$
 >>
 
 Location(location) ::= <<
-l$location.startLine$c$location.startColumn$
+$location.startLine$$location.startColumn$
 >>
 
 ConstantValue(type, const) ::= <<
