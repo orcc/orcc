@@ -268,7 +268,8 @@ actor Algo_Synp_AVC_FREXT()
 	int CabacValue;
 	/* Defines the number of bins to Read, used as BinsToRead: = synElVal[ValueIndex][0] */
 	int BinsToRead;
-	
+	int binIdxOffset := 0;
+	int PreviousCtxIdx := 0;
 	/* CABAC Neighbouring */
 	 uint luma8x8BlkIdx;
 	
@@ -3413,136 +3414,10 @@ actor Algo_Synp_AVC_FREXT()
 		end
 		
 	end
-		
-	//*************************************************************/
-	/*************************************************************
-	*************************************************************
-	********      CABAC Parsing                     	*********
-	*************************************************************
-	*************************************************************/
-
 	
 	
-	CabacParsing: action ==>
-	guard
-		CabacStartProcess and CABAC_SEARCH_SYNTAX_ELEMENT != CABAC_COEFF_ABS_LEVEL_MINUS1
-	var
-		int loop
-	do
-		
-		// Start Initialization Process
-		if ( FirstSEinSlice ) then
-			StartCabacInit := true;
-			// Do not give the hand to Cabac Parsing Process if the initialization has not finished
-			CabacStartProcess := false;
-			FirstSEinSlice := false;
-		else
-		
-			//Get Binarization for the requested Synatx Element
-			if GetBinarizationFlag = false then
-				// Recovers maxBinIdxCtx and ctxIdxOffset 
-				Getbinarization(CABAC_SEARCH_SYNTAX_ELEMENT);
-				// Update the Bin string that we are going to compare with
-				updateSynElVal();
-				ValueIndex := 0; 
-				GetBinarizationFlag := true;
-			end
-			
-			
-			if FoundSE = false and NextBitToDecode then
-				
-				// Update the binIdx
-				binIdx := binIdx + 1;
-				
-				// Calculates ctxIdx
-				GetCtxIdx();
-				
-				if bypassFlag then
-					StartDecodeBypass := true;
-				else if ctxIdx = 276 then
-					StartDecodeTerminate := true;
-				else
-					StartDecodeDecision := true;
-				end end
-				//Read Next Bit when we have compared it first
-				NextBitToDecode := false;
-				// Do not give the hand to Cabac Parsing Process if the initialization has not finished
-				CabacStartProcess := false;
-			end
-			
-			if binValDecoded then
-				loop := 0;
-				while loop < MaxEleCompTab  do
-					
-					MaxBinIdx := synElVal[loop][0];
-					if binIdx = MaxBinIdx then
-						FoundSE := true;
-						foreach int s in Integers(1, MaxBinIdx + 1) do
-							FoundSE := FoundSE and ReadBinString[s] = synElVal[loop][s];
-						end
-						
-						if FoundSE then
-							//Attribute the valueIndex
-							ValueIndex := loop;
-							//If you found the Bin String Stop the Loop
-							loop := MaxEleCompTab;
-						end
-					else
-						if loop = MaxEleCompTab -1 then
-							NextBitToDecode := true;
-							//If MaxBinIdx := synElVal[e][0] then quit the loop
-							loop := MaxEleCompTab;
-						end
-					end
-					
-					binValDecoded := false;
-					loop := loop + 1;
-				end
-				
-			end
-					
-			if FoundSE then
-				binIdx := -1;
-				//Save cabac value
-				CabacValue := ValueIndex;
-				ValueIndex := -1;
-				CabacStartProcess := false;
-				GetBinarizationFlag := false; 
-				NextBitToDecode := true;
-				binValDecoded := false;
-				CabacTerminated := true;
-			end
-			
-			if (CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I) and ValueIndex = 25 and FoundSE then
-				Cabac_Arithmetic_Decoding_Engine_Start := true;
-				set_bits_to_read(9);
-			end
-		end
-	end
-	
-	
-	//*************************************************************/
-	/*************************************************************
-	*************************************************************
-	********      CABAC Arithmetic Decoding           	*********
-	*************************************************************
-	*************************************************************/
-	
-	function intXOR(int value) --> int:
-		if value = 0 then
-			1
-		else
-			0
-		end
-	end
-		
-	/********************** Coeff_Abs_Parsing action **********************/
-	
-	Coeff_Abs_Parsing: action ==>
-	guard
-		CabacStartProcess and CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1
-	do
-	
+	procedure CoeffAbsParsing()
+	begin
 		if StartPrefix then
 			if binValDecoded = false then
 				binIdx := binIdx + 1;
@@ -3694,6 +3569,318 @@ actor Algo_Synp_AVC_FREXT()
 			binIdx := -1;
 			GetSign := false;
 			NextBitToDecode := true;
+		end
+	end
+	
+	
+	procedure GetMbTypeParsing()
+	var
+		int IS_Intra
+	begin
+	
+		if slice_type = SLICE_TYPE_I then
+			IS_Intra := 1;
+		else
+			IS_Intra := 0;
+		end
+		
+		if binIdx = 0 then
+			if binValDecoded = false then
+				ctxIdxincMbType();
+				ctxIdx := 3 + ctxIdxInc;
+				PreviousCtxIdx := ctxIdx + 2;
+				StartDecodeDecision := true;
+				CabacStartProcess := false;
+				NextBitToDecode := false;
+			else
+				if binVal = 0 then
+					FoundSE := true;
+					CabacValue := 0; 	/* INTRA 4x4*/
+				else
+					CabacValue := 1;
+					binValDecoded := false;
+					binIdx := binIdx + 1;
+				end
+			end
+		end
+		
+		if binIdx = 1 then
+			if binValDecoded = false then
+				ctxIdx := 276;
+				StartDecodeTerminate := true;
+				CabacStartProcess := false;
+				NextBitToDecode := false;
+			else
+				if binVal = 1 then
+					CabacValue := 25;	/*PCM*/
+					FoundSE := true;
+				else
+					CabacValue := 1;
+					binValDecoded := false;
+					binIdx := binIdx + 1;
+				end
+			end
+		end
+		
+		if binIdx = 2 then
+			if binValDecoded = false then
+				ctxIdx := PreviousCtxIdx;
+				StartDecodeDecision := true;
+				CabacStartProcess := false;
+				NextBitToDecode := false;
+			else
+				if binVal = 1 then
+					CabacValue := CabacValue + 12;	/* CBPLuma = 0 */ 
+					binValDecoded := false;
+					binIdx := binIdx + 1;
+				end
+			end
+		end
+		
+		if binIdx = 3 then
+			if binValDecoded = false then
+				ctxIdx := PreviousCtxIdx + 2;
+				StartDecodeDecision := true;
+				CabacStartProcess := false;
+				NextBitToDecode := false;
+			else
+				if binVal = 1 then
+					 binIdxOffset := 1;
+				end
+				binValDecoded := false;
+				binIdx := binIdx + 1;
+			end
+		end
+		
+		if binIdx = 4 then
+			if binIdxOffset = 1 then
+				if binValDecoded = false then
+					ctxIdx := PreviousCtxIdx + 2 + IS_Intra;
+					StartDecodeDecision := true;
+					CabacStartProcess := false;
+					NextBitToDecode := false;
+				else
+					if binVal = 0 then
+						CabacValue := CabacValue + 4*2; 	
+					else
+						CabacValue := CabacValue + 4*1;
+					end
+					binValDecoded := false;
+					binIdx := binIdx + 1;
+				end
+			else
+				if binValDecoded = false then
+					ctxIdx := PreviousCtxIdx + 3 + IS_Intra;
+					StartDecodeDecision := true;
+					CabacStartProcess := false;
+					NextBitToDecode := false;
+				else
+					if binVal = 1 then
+						CabacValue := CabacValue + 2;
+					end
+					binValDecoded := false;
+					binIdx := binIdx + 1;
+				end
+			end
+		end
+		
+		if binIdx = 5 then
+			if binIdxOffset = 0 then
+				if binValDecoded = false then
+					ctxIdx := PreviousCtxIdx + 3 + IS_Intra;
+					StartDecodeDecision := true;
+					CabacStartProcess := false;
+					NextBitToDecode := false;
+				else
+					if binVal = 1 then
+						CabacValue := CabacValue + 2;
+					end
+					binValDecoded := false;
+					binIdx := binIdx + 1;
+				end
+			else
+				if binValDecoded = false then
+					ctxIdx := PreviousCtxIdx + 3 + 2*IS_Intra;
+					StartDecodeDecision := true;
+					CabacStartProcess := false;
+					NextBitToDecode := false;
+				else
+					if binVal = 1 then
+						CabacValue := CabacValue + 1;
+					end
+					binValDecoded := false;
+					binIdx := binIdx + 1;
+					FoundSE := true;
+				end 
+			end
+		end
+		
+		if binIdx = 6 then
+			if binValDecoded = false then
+				ctxIdx := PreviousCtxIdx + 3 + 2*IS_Intra;
+				StartDecodeDecision := true;
+				CabacStartProcess := false;
+				NextBitToDecode := false;
+			else
+				if binVal = 1 then
+					CabacValue := CabacValue + 1;
+				end
+				binValDecoded := false;
+				binIdx := binIdx + 1;
+				FoundSE := true;
+			end 
+		end
+		
+		
+		if FoundSE = true then
+			binValDecoded := false;
+			binIdx := -1;
+			NextBitToDecode := true;
+		end
+	end
+		
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********      CABAC Parsing                     	*********
+	*************************************************************
+	*************************************************************/
+
+	
+	
+	CabacParsing: action ==>
+	guard
+		CabacStartProcess and ( CABAC_SEARCH_SYNTAX_ELEMENT != CABAC_COEFF_ABS_LEVEL_MINUS1),
+		CabacStartProcess and (CABAC_SEARCH_SYNTAX_ELEMENT != CABAC_MB_TYPE_I )
+	var
+		int loop
+	do
+		
+		// Start Initialization Process
+		if ( FirstSEinSlice ) then
+			StartCabacInit := true;
+			// Do not give the hand to Cabac Parsing Process if the initialization has not finished
+			CabacStartProcess := false;
+			FirstSEinSlice := false;
+		else
+		
+			//Get Binarization for the requested Synatx Element
+			if GetBinarizationFlag = false then
+				// Recovers maxBinIdxCtx and ctxIdxOffset 
+				Getbinarization(CABAC_SEARCH_SYNTAX_ELEMENT);
+				// Update the Bin string that we are going to compare with
+				updateSynElVal();
+				ValueIndex := 0; 
+				GetBinarizationFlag := true;
+			end
+			
+			
+			if FoundSE = false and NextBitToDecode then
+				
+				// Update the binIdx
+				binIdx := binIdx + 1;
+				
+				// Calculates ctxIdx
+				GetCtxIdx();
+				
+				if bypassFlag then
+					StartDecodeBypass := true;
+				else if ctxIdx = 276 then
+					StartDecodeTerminate := true;
+				else
+					StartDecodeDecision := true;
+				end end
+				//Read Next Bit when we have compared it first
+				NextBitToDecode := false;
+				// Do not give the hand to Cabac Parsing Process if the initialization has not finished
+				CabacStartProcess := false;
+			end
+			
+			if binValDecoded then
+				loop := 0;
+				while loop < MaxEleCompTab  do
+					
+					MaxBinIdx := synElVal[loop][0];
+					if binIdx = MaxBinIdx then
+						FoundSE := true;
+						foreach int s in Integers(1, MaxBinIdx + 1) do
+							FoundSE := FoundSE and ReadBinString[s] = synElVal[loop][s];
+						end
+						
+						if FoundSE then
+							//Attribute the valueIndex
+							ValueIndex := loop;
+							//If you found the Bin String Stop the Loop
+							loop := MaxEleCompTab;
+						end
+					else
+						if loop = MaxEleCompTab -1 then
+							NextBitToDecode := true;
+							//If MaxBinIdx := synElVal[e][0] then quit the loop
+							loop := MaxEleCompTab;
+						end
+					end
+					
+					binValDecoded := false;
+					loop := loop + 1;
+				end
+				
+			end
+					
+			if FoundSE then
+				binIdx := -1;
+				//Save cabac value
+				CabacValue := ValueIndex;
+				ValueIndex := -1;
+				CabacStartProcess := false;
+				GetBinarizationFlag := false; 
+				NextBitToDecode := true;
+				binValDecoded := false;
+				CabacTerminated := true;
+			end
+			
+			if (CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I) and ValueIndex = 25 and FoundSE then
+				Cabac_Arithmetic_Decoding_Engine_Start := true;
+				set_bits_to_read(9);
+			end
+		end
+	end
+	
+	
+	//*************************************************************/
+	/*************************************************************
+	*************************************************************
+	********      CABAC Arithmetic Decoding           	*********
+	*************************************************************
+	*************************************************************/
+	
+	function intXOR(int value) --> int:
+		if value = 0 then
+			1
+		else
+			0
+		end
+	end
+		
+	/********************** Coeff_Abs_Parsing action **********************/
+	
+	NewCabacParsing: action ==>
+	guard
+		CabacStartProcess and ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I )
+	do
+		if ( FirstSEinSlice ) then
+			StartCabacInit := true;
+			// Do not give the hand to Cabac Parsing Process if the initialization has not finished
+			CabacStartProcess := false;
+			FirstSEinSlice := false;  
+		else
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP then
+			      GetMbTypeParsing();
+			end
+		
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
+			      CoeffAbsParsing();
+			end
 		end
 	end
 
@@ -5791,6 +5978,8 @@ actor Algo_Synp_AVC_FREXT()
 		
 		else 
 			if IS_CABAC() then
+				//initialization of binIdx
+				binIdx := 0;
 				GetCabacMbTypeSyntaxElement();
 				start_cabac();
 			end 
