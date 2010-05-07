@@ -1,0 +1,18 @@
+
+fifo_metadata(port) ::= <<
+!$port.location.startLine$$port.location.startColumn$ = metadata !{
+i32 458804, 							;; Tag = 52 + LLVMDebugVersion 
+i32 0, 									;; Unused field.
+metadata !"", 							;; Reference to context descriptor
+metadata !"$port.name$", 				;; Name
+metadata !"$port.name$", 				;; Display name (fully qualified C++ name)
+metadata !"", 							;; MIPS linkage name (for C++)
+metadata !"", 							;; Reference to file where defined
+i32 0, 									;; Line number where defined
+metadata !"", 							;; Reference to type descriptor
+i1 false, 								;; True if the global is local to compile unit (static)
+i1 true, 								;; True if the global is defined in the compile unit (not extern)
+%struct.fifo_s** @$port.name$			;; Reference to the global variable
+};
+
+>>
