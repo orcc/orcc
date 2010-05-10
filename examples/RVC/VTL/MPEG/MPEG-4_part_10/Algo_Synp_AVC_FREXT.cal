@@ -144,8 +144,8 @@ actor Algo_Synp_AVC_FREXT()
 	bool B_Skip_Flag := false;
 	
 	// SLICE TYPES
-	
-	function IS_INxN(int SliceType, int Mbtype) --> bool : (Mbtype >= 0 and Mbtype < 25) and (SliceType = SLICE_TYPE_I) end
+	function IS_I16x16(int SliceType, int Mbtype) --> bool : (Mbtype >= 1 and Mbtype <= 24 ) and (SliceType = SLICE_TYPE_I) end
+	function IS_INxN(int SliceType, int Mbtype) --> bool : (Mbtype = 0) and (SliceType = SLICE_TYPE_I) end
 	function IS_I4x4(int SliceType, int Mbtype) --> bool : (Mbtype = 0 ) and (SliceType = SLICE_TYPE_I) end
 	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
 	function IS_P(int SliceType) --> bool : SliceType = SLICE_TYPE_P end
@@ -2659,7 +2659,7 @@ actor Algo_Synp_AVC_FREXT()
 			ctxIdxInc := 0;
 		else
 			if ( GiveMbSliceType(AvailMb,mbAddr) = SLICE_TYPE_I and GiveMbType(AvailMb,mbAddr) = 25 or
-		             not IS_INxN( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr)) and GiveCBPLuma(AvailMb,mbAddr) = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0 or
+		             not IS_I16x16( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr)) and GiveCBPLuma(AvailMb,mbAddr) = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0 or
 			     GiveMbQpDelta(AvailMb,mbAddr)  = 0 )  then
 				 
 				 ctxIdxInc := 0;
@@ -2927,7 +2927,7 @@ actor Algo_Synp_AVC_FREXT()
 			AvailMbA := NeighMbAvail;
 			
 			if AvailMbA then
-			  if IS_INxN(mbTab[mbAddrA][mbSliceType], mbTab[mbAddrA][mbTabMbtype]) then
+			  if IS_I16x16(mbTab[mbAddrA][mbSliceType], mbTab[mbAddrA][mbTabMbtype]) then
 				  transBlockA := mbAddrA; 
 				end
 			else
@@ -3589,7 +3589,7 @@ actor Algo_Synp_AVC_FREXT()
 				ctxIdxOffset := 3; 
 				ctxIdxincMbType();
 				ctxIdx := 3 + ctxIdxInc;
-				PreviousCtxIdx := ctxIdx + 2;
+				PreviousCtxIdx := 3 + 2;
 				StartDecodeDecision := true;
 				CabacStartProcess := false;
 				NextBitToDecode := false;
@@ -4030,10 +4030,11 @@ actor Algo_Synp_AVC_FREXT()
 			binValDecoded := true;
 		else
 			binVal := 0;
+			binValDecoded := true;
 			if codIRange < 0x100 then
 				StartRenormDRead := true;
 			else
-				binValDecoded := true;
+				
 				// Start Cabac Process
 				CabacStartProcess := true;
 				// Give the right write a bit into ReadBinString[]
