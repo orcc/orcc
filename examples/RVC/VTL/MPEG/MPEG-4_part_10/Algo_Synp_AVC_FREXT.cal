@@ -3586,6 +3586,7 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if binIdx = 0 then
 			if binValDecoded = false then
+				ctxIdxOffset := 3; 
 				ctxIdxincMbType();
 				ctxIdx := 3 + ctxIdxInc;
 				PreviousCtxIdx := ctxIdx + 2;
