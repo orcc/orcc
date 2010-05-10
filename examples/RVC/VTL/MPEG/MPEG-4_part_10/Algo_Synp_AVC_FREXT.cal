@@ -3625,16 +3625,16 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if binIdx = 2 and FoundSE = false  then
 			if binValDecoded = false then
-				ctxIdx := PreviousCtxIdx;
+				ctxIdx := PreviousCtxIdx + 1;
 				StartDecodeDecision := true;
 				CabacStartProcess := false;
 				NextBitToDecode := false;
 			else
 				if binVal = 1 then
 					CabacValue := CabacValue + 12;	/* CBPLuma = 0 */ 
-					binValDecoded := false;
-					binIdx := binIdx + 1;
 				end
+				binValDecoded := false;
+				binIdx := binIdx + 1;
 			end
 		end
 		
@@ -3686,7 +3686,7 @@ actor Algo_Synp_AVC_FREXT()
 		end
 		
 		if binIdx = 5 and FoundSE = false then
-			if binIdxOffset = 0 then
+			if binIdxOffset = 1 then
 				if binValDecoded = false then
 					ctxIdx := PreviousCtxIdx + 3 + IS_Intra;
 					StartDecodeDecision := true;
