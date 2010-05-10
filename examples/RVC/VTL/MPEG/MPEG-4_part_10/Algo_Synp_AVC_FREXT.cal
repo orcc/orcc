@@ -3604,7 +3604,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if binIdx = 1 then
+		if binIdx = 1 and FoundSE = false then
 			if binValDecoded = false then
 				ctxIdx := 276;
 				StartDecodeTerminate := true;
@@ -3622,7 +3622,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if binIdx = 2 then
+		if binIdx = 2 and FoundSE = false  then
 			if binValDecoded = false then
 				ctxIdx := PreviousCtxIdx;
 				StartDecodeDecision := true;
@@ -3637,7 +3637,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if binIdx = 3 then
+		if binIdx = 3 and FoundSE = false then
 			if binValDecoded = false then
 				ctxIdx := PreviousCtxIdx + 2;
 				StartDecodeDecision := true;
@@ -3652,7 +3652,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if binIdx = 4 then
+		if binIdx = 4 and FoundSE = false then
 			if binIdxOffset = 1 then
 				if binValDecoded = false then
 					ctxIdx := PreviousCtxIdx + 2 + IS_Intra;
@@ -3684,7 +3684,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if binIdx = 5 then
+		if binIdx = 5 and FoundSE = false then
 			if binIdxOffset = 0 then
 				if binValDecoded = false then
 					ctxIdx := PreviousCtxIdx + 3 + IS_Intra;
@@ -3715,7 +3715,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if binIdx = 6 then
+		if binIdx = 6 and FoundSE = false  then
 			if binValDecoded = false then
 				ctxIdx := PreviousCtxIdx + 3 + 2*IS_Intra;
 				StartDecodeDecision := true;
@@ -3736,6 +3736,7 @@ actor Algo_Synp_AVC_FREXT()
 			binValDecoded := false;
 			binIdx := -1;
 			NextBitToDecode := true;
+			CabacStartProcess := false;
 		end
 	end
 		
@@ -3866,7 +3867,8 @@ actor Algo_Synp_AVC_FREXT()
 	
 	NewCabacParsing: action ==>
 	guard
-		CabacStartProcess and ( CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I )
+		( CabacStartProcess and CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 ) or 
+		( CabacStartProcess and CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I )
 	do
 		if ( FirstSEinSlice ) then
 			StartCabacInit := true;
