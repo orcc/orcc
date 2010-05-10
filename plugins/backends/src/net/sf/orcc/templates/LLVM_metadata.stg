@@ -1,27 +1,112 @@
-fifos_decl_MD(actor) ::= <<
+decl_MD(actor) ::= <<
+!source = !{!0}
+!name = !{!1}
+$if(actor.inputs.list)$
 !inputs = !{$actor.inputs.list: fifo_decl_MD(); separator=", "$}
+$endif$
+$if(actor.outputs.list)$
 !outputs = !{$actor.outputs.list: fifo_decl_MD(); separator=", "$}
+$endif$
+$if(actor.parameters.list)$
+!parameters = !{$actor.parameters.list: parameter_decl_MD(); separator=", "$}
+$endif$
+$if(actor.stateVars.list)$
+;!stateVars = !{$actor.stateVars.list: stateVar_decl_MD(); separator=", "$}
+$endif$
+
+!0 = metadata !{$file_MD(actor)$}
+!1 = metadata !{$varName_MD(actor)$}
+$actor.inputs.list: fifo_MD()$
+$actor.outputs.list: fifo_MD()$
+$actor.parameters.list: parameter_MD()$
+$actor.stateVars.list: stateVar_MD()$
 >>
+
+file_MD(actor) ::= <<
+metadata !"$actor.file$"
+>>
+
+startLine_MD(var) ::= <<
+i32 $var.location.startLine$
+>>
+
+startColumn_MD(var) ::= <<
+i32 $var.location.startColumn$
+>>
+
+endColumn_MD(var) ::= <<
+i32 $var.location.endColumn$
+>>
+
+varType_MD(var) ::= <<
+metadata !"int" $if(var.type.bool)$
+bool
+$elsif(var.type.int)$
+int
+$elsif(var.type.list)$
+list
+$elsif(var.type.string)$
+string
+$elsif(var.type.uint)$
+uint
+$elsif(var.type.void)$
+void
+$endif$
+>>
+
+varSize_MD(var) ::= <<
+i32 $var.type.size$
+>>
+
+varName_MD(var) ::= <<
+metadata !"$var$"
+>>
+
 
 fifo_decl_MD(port) ::= <<
 !$Location(port.location)$
 >>
 
+parameter_decl_MD(parameter) ::= <<
+!$Location(parameter.location)$
+>>
+
+stateVar_decl_MD(var) ::= <<
+!$Location(var.location)$
+>>
+
+
+Location_decl_MD(var) ::= <<
+!$Location(var.location)$0
+>>
+
+Type_decl_MD(var) ::= <<
+!$Location(var.location)$1
+>>
+
+Type_MD(var) ::= <<
+$Type_decl_MD(var)$ = metadata  !{$varType_MD(var)$, $varSize_MD(var)$}
+>>
+
+Location_MD(var) ::=<<
+$Location_decl_MD(var)$ = metadata  !{$startLine_MD(var)$, $startColumn_MD(var)$, $endColumn_MD(var)$}
+>>
+
+
+stateVar_MD(var) ::= <<
+
+>>
+
+
 
 fifo_MD(port) ::= <<
-!$Location(port.location)$ = metadata !{
-i32 458804, 							;; Tag = 52 + LLVMDebugVersion 
-i32 0, 									;; Unused field.
-metadata !"", 							;; Reference to context descriptor
-metadata !"$port.name$", 				;; Name
-metadata !"$port.name$", 				;; Display name (fully qualified C++ name)
-metadata !"", 							;; MIPS linkage name (for C++)
-metadata !"", 							;; Reference to file where defined
-i32 0, 									;; Line number where defined
-metadata !"", 							;; Reference to type descriptor
-i1 false, 								;; True if the global is local to compile unit (static)
-i1 true, 								;; True if the global is defined in the compile unit (not extern)
-%struct.fifo_s** @$port.name$			;; Reference to the global variable
-};
+$fifo_decl_MD(port)$ = metadata !{metadata $Location_decl_MD(port)$, metadata $Type_decl_MD(port)$, $varName_MD(port)$}
+$Location_MD(port)$
+$Type_MD(port)$
+>>
+
+
+parameter_MD(parameter) ::= <<
+
 
 >>

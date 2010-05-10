@@ -266,7 +266,6 @@ $procedure(action.body)$$procedure(action.scheduler)$
 actor(actor) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Generated from "$actor.name$"
-$fifos_decl_MD(actor)$
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
@@ -324,6 +323,8 @@ $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.f
 $else$
 $scheduler(actions=actor.actionScheduler.actions)$
 $endif$ 
+
+$decl_MD(actor)$
 
 $header()$
 >>
