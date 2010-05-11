@@ -26,12 +26,13 @@
       <vertex id="mv_in" x="489" y="1376"/>
       <vertex id="I_PCM_C" x="226" y="495"/>
       <vertex id="ConstrainedIFlag" x="489" y="289"/>
+      <vertex id="DelList" x="751" y="1487"/>
       <vertex id="Display_C" x="1185" y="1564"/>
       <vertex id="Intra8x8" x="708" y="384"/>
       <vertex id="Inter" x="226" y="1515"/>
       <vertex id="Buffer_inter" x="947" y="1454"/>
       <vertex id="Select_chroma" x="875" y="1290"/>
       <vertex id="Deblocking_Filter" x="708" y="932"/>
-      <vertex id="DelList" x="751" y="1487"/>
+      <vertex id="FrameNum" x="742" y="1513"/>
    </vertices>
 </layout>

@@ -23,6 +23,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	uint          POC, 
 	int(size=32)  RefList, 
 	int(size=32)  DelList, 
+	uint(size=32)  FrameNum_CurrPic,
 	int(size=9)   WD,
 	uint(size=21) RA,
 	uint(size=11) RA_Width,
@@ -52,7 +53,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	List(type:int(size=32),size=17) pic_index_to_frame_num := [-1 :for int s in Integers(0,16)];
 	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=17) pic;
 	int(size=32) pic_curr_idx := 0;
-	List(type:int(size=5),size=17) pic_ref_idx := [0 :for int s in Integers(0,17-1)];
+	List(type:int(size=5),size=17)  pic_ref_idx := [0 :for int s in Integers(0,17-1)];
 	List(type:uint(size=1),size=17) flag_picture_end := [1 : for int s in Integers(0,17-1)];
 	List(type:uint(size=1),size=17) flag_display := [1 : for int s in Integers(0,17-1)];
 	int(size=14)  nbMBdisplay := 0;
@@ -76,7 +77,7 @@ initialize ==>
   end
 
     
-  read_ref_parameters: action RefList:[a, b] ==>
+  read_ref_parameters: action FrameNum_CurrPic:[a],RefList:[ b] ==>
   var
   	bool         idx_selected := false,
   	int(size=32) i            := 0

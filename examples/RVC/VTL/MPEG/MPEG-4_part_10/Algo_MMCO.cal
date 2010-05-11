@@ -59,6 +59,7 @@ Copyright (c) ISO/IEC 2008.
 actor Algo_MMCO () 
 	uint(size=32)  RefReordering,
 	uint(size=32)  MMCO,
+	uint(size=32)  FraNum,
 	int (size=32) MaxFrameNum
 		==>
 	int(size=32) RefList,
@@ -126,11 +127,12 @@ actor Algo_MMCO ()
 
 
 	read_num_ref_frames: action
-			MMCO:[a, b],
+			MMCO:[a],
+			FraNum:[b],
 			MaxFrameNum:[MaxFrNu]
 				==>
 			//RefList:[pic_curr_idx]
-			RefList:[b]
+			//RefList:[b]
 		do
 			num_ref_frames := a;
 			last_frame_num := frame_num;

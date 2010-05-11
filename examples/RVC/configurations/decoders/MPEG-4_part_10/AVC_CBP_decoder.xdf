@@ -293,4 +293,7 @@
     <Connection dst="Decoding_Y" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
     <Connection dst="Decode_U" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
     <Connection dst="Decode_V" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
+    <Connection dst="Decoding_Y" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum_CurrPic"/>
+    <Connection dst="Decode_U" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum_CurrPic"/>
+    <Connection dst="Decode_V" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum_CurrPic"/>
 </XDF>

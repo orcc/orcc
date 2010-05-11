@@ -303,6 +303,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="FrameNum_CurrPic">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -525,4 +532,6 @@
     <Connection dst="Algo_MMCO" dst-port="MaxFrameNum"
         src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
     <Connection dst="" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>
+    <Connection dst="Algo_MMCO" dst-port="FraNum" src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
+    <Connection dst="" dst-port="FrameNum_CurrPic" src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
 </XDF>

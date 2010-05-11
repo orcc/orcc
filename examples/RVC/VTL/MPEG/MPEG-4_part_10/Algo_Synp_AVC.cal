@@ -82,6 +82,7 @@ actor Algo_Synp_AVC()
 			uint(size=1) MbIntraFlag, 
 			uint(size=32) RefReordering, 
 			uint(size=32) MMCO,
+			uint(size=32) FramNumCurrPic,
 			int (size=32) MaxFrameNum,
 			uint(size=16) cbp_blk,
 			int(size=6) slice_alpha_c0_offset, 
@@ -2015,7 +2016,7 @@ actor Algo_Synp_AVC()
 	end
 
 
-	read_SliceH_frame_num: action ==> MMCO:[num_ref_frames[sps_id], frame_num], MaxFrameNum:[ValMaxFrameNum]
+	read_SliceH_frame_num: action ==> MMCO:[num_ref_frames[sps_id] ],FramNumCurrPic:[frame_num], MaxFrameNum:[ValMaxFrameNum]
 	guard
 		done_reading_bits(),first_mb_in_slice=0
 	var
