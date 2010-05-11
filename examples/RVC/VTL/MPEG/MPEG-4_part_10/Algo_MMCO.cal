@@ -57,85 +57,83 @@ Copyright (c) ISO/IEC 2008.
 
 
 actor Algo_MMCO () 
-	uint(size=32)  MMCO,
-	uint(size=32)  FraNum,
+	uint(size=32) MMCO,
+	uint(size=32) FraNum,
 	int (size=32) MaxFrameNum
 		==>
 	int(size=32) DelList
 		:
 
+	List(type:int(size=32), size=16) short_term_list        := [0     : for int s in Integers(0,15)];
+	List(type:bool        , size=16) short_term_false_frame := [false : for int s in Integers(0,15)];
+	List(type:int(size=32), size=16) long_term_list         := [-1    : for int s in Integers(0,15)];
+	List(type:int(size=32), size=16) DelListTab             := [0     : for int s in Integers(0,15)];
 
-	List(type:int(size=32),size=16)         reordering_ref_list := [0 :for int s in Integers(0,16-1)];
-	List(type:int(size=32),size=16)         short_term_list     := [0 :for int s in Integers(0,16-1)];
-	List(type:int,size=16)                  pic_idx_list        := [0 :for int s in Integers(0,16-1)];
-	List(type:int(size=32),size=16)         long_term_list      := [-1 :for int s in Integers(0,16-1)];
-	List(type:uint(size = 32), size = 2*16) RefListTab          := [-1 :for int s in Integers(0,2*16-1)];
-	List(type:uint(size=32),size= 2*16)     RefListSent         := [0: for int s in Integers(0, 2*16-1)];
-	List(type:int(size=32),size= 16)        DelListTab          := [0: for int s in Integers(0, 2*16-1)];
-
-	int (size=32) Nbframedel         := 0;	  
-	uint(size=3)  mmco_opcode;
-	uint(size=32) pic_curr_idx;
+	int (size=32) Nbframedel         := 0;
 	uint          frame_num          := 0;
 	uint          last_frame_num     := 0;
 	int           pred               := 0;
 	int (size=32) ValMaxFrameNum     := 0;
-	uint(size=4)  index              := 0;
 	uint(size=4)  num_ref_frames     := 0;
 	uint(size=4)  short_term_count   := 0;
 	uint(size=4)  long_term_count    := 0;
 	uint(size=1)  flag_long_term     := 0;
 	uint(size=4)  long_term_idx      := 0;
 	uint(size=4)  long_term_max_idx  := 0;
-	int           CounterRefList     := 0;
-	int           CounterRefListTab  := 0;
-	int           CounterRefListSent := 0;
-	bool          EndInitIdc3        := false;
-	bool          EndInitSentRefList := false;
-  
-	update_idx: action ==>
-		var
-			bool        flag := false,
-			int         j
-		do
-			if (long_term_count + short_term_count = num_ref_frames) then
-				short_term_count       := short_term_count - 1;
-				DelListTab[Nbframedel] := short_term_list[short_term_count];
-				Nbframedel             := Nbframedel + 1;
-			end
-			// add current picture
-			if (flag_long_term = 0) then
-				j := short_term_count - 1;
-				foreach int i in Integers (0, short_term_count - 1)
-				do
-					short_term_list[j + 1] := short_term_list[j];
-					pic_idx_list[j + 1]    := pic_idx_list[j];
-					j := j - 1;
-				end
-				short_term_list[0] := frame_num;
-				pic_idx_list[0]    := pic_curr_idx;
-				short_term_count   := short_term_count +1;
-			else
-				if (long_term_list[long_term_idx] = -1) then 
-					long_term_count := long_term_count +1;
-				end
-				long_term_list[long_term_idx] := pic_curr_idx;
-			end
-		end
+
 
 
 	read_num_ref_frames: action
-			MMCO:[a],
-			FraNum:[b],
+			MMCO:[ValNumRefFrame],
+			FraNum:[ValFrame_Num],
 			MaxFrameNum:[MaxFrNu]
 				==>
 		do
-			num_ref_frames := a;
+			num_ref_frames := ValNumRefFrame;
 			last_frame_num := frame_num;
-			pic_curr_idx   := b;
-			frame_num      := b;
+			frame_num      := ValFrame_Num;
 			ValMaxFrameNum := MaxFrNu;
-			flag_long_term := 0;
+		end
+
+
+	FillFalseRefFrame : action ==>
+		guard
+			frame_num != (last_frame_num + 1) mod ValMaxFrameNum
+		var
+			int false_frame_num := (last_frame_num + 1) mod ValMaxFrameNum
+		do
+				Nbframedel := 0;
+				num_ref_frames := if(num_ref_frames>16)then 16 else num_ref_frames end;
+				while(false_frame_num != frame_num)
+				do
+					if(long_term_count + short_term_count = num_ref_frames) then
+						if(Nbframedel>15) then
+							Nbframedel := 15;
+						end
+						if (short_term_false_frame[short_term_count - 1] = false) then
+							DelListTab[Nbframedel] := short_term_list[short_term_count - 1];
+							Nbframedel             := Nbframedel + 1;
+						end
+						short_term_count       := short_term_count - 1;
+					end
+					foreach int i in Integers(0,short_term_count - 1)
+					do
+						short_term_list[short_term_count - i]        := short_term_list[short_term_count - i - 1];
+						short_term_false_frame[short_term_count - i] := short_term_false_frame[short_term_count - i - 1];
+					end
+					short_term_list[0]        := false_frame_num;
+					short_term_false_frame[0] := true;
+					short_term_count   := short_term_count + 1;
+					false_frame_num    := (false_frame_num + 1) mod ValMaxFrameNum;
+				end
+		end
+
+
+	skip_FillFalseRefFrame : action ==>
+		guard
+			frame_num = (last_frame_num + 1) mod ValMaxFrameNum
+		do
+				Nbframedel := 0;
 		end
 
 
@@ -149,7 +147,6 @@ actor Algo_MMCO ()
 			short_term_count := 0;
 			long_term_count  := 0;
 			short_term_list  := [-1 :for int s in Integers(0,16-1)];
-			pic_idx_list     := [-1 :for int s in Integers(0,16-1)];
 			long_term_list   := [-1 :for int s in Integers(0,16-1)];
 			Nbframedel       := -1;
 		end
@@ -160,6 +157,8 @@ actor Algo_MMCO ()
 				==>
 		guard
 			a = 1 and b = 0
+		do
+			flag_long_term := 0;
 		end
 
 
@@ -168,6 +167,16 @@ actor Algo_MMCO ()
 				==>
 		guard 
 			a = 1 and b = 1
+		do
+			flag_long_term := 0;
+		end
+
+
+	MMCO_opcode_v0: action
+			MMCO:[ a ]
+				==>
+		guard 
+			a = 0
 		end
 
 
@@ -193,7 +202,8 @@ actor Algo_MMCO ()
 			if(idx != -1) then
 				foreach int i in Integers(idx, short_term_count - 2)
 				do
-					short_term_list[i] := short_term_list[i+1];
+					short_term_list[i]        := short_term_list[i+1];
+					short_term_false_frame[i] := short_term_false_frame[i+1];
 				end
 				short_term_count := short_term_count-1;
 				DelListTab[Nbframedel] := pred;
@@ -240,7 +250,8 @@ actor Algo_MMCO ()
 			if(idx != -1) then
 				foreach int i in Integers(idx, short_term_count - 2)
 				do
-						short_term_list[i] := short_term_list[i + 1];
+						short_term_list[i]        := short_term_list[i + 1];
+						short_term_false_frame[i] := short_term_false_frame[i + 1];
 				end
 				short_term_count := short_term_count - 1;
 				
@@ -283,16 +294,15 @@ actor Algo_MMCO ()
 			a = 5
 		do
 			frame_num         := 0;
-			pic_curr_idx      := 0;
 			short_term_count  := 0;
 			short_term_list   := [-1 :for int s in Integers(0,16-1)];
-			pic_idx_list      := [-1 :for int s in Integers(0,16-1)];
 			long_term_count   := 0;
 			long_term_max_idx := 0;
 			long_term_list    := [-1 :for int s in Integers(0,16-1)];
 			Nbframedel        := -1;
 		end
-  
+
+
 	// Mark the current picture as long term reference picture
 	MMCO_opcode.v6: action
 			MMCO:[a, b ]
@@ -310,13 +320,38 @@ actor Algo_MMCO ()
 			flag_long_term := 1;
 		end
 
-
-	MMCO_opcode0: action
-			MMCO:[ a ]
-				==>
-		guard 
-			a = 0
+	update_idx: action ==>
+		var
+			bool        flag := false,
+			int         j
+		do
+			if (long_term_count + short_term_count = num_ref_frames) then
+				short_term_count       := short_term_count - 1;
+				if(short_term_false_frame[short_term_count] = false) then
+					DelListTab[Nbframedel] := short_term_list[short_term_count];
+					Nbframedel             := Nbframedel + 1;
+				end
+			end
+			// add current picture
+			if (flag_long_term = 0) then
+				j := short_term_count - 1;
+				foreach int i in Integers (0, short_term_count - 1)
+				do
+					short_term_list[j + 1]        := short_term_list[j];
+					short_term_false_frame[j + 1] := short_term_false_frame[j];
+					j := j - 1;
+				end
+				short_term_list[0]        := frame_num;
+				short_term_false_frame[0] := false;
+				short_term_count          := short_term_count +1;
+			else
+				if (long_term_list[long_term_idx] = -1) then 
+					long_term_count := long_term_count +1;
+				end
+				long_term_list[long_term_idx] := frame_num;
+			end
 		end
+
 	SendSizeDelList: action
 				==>
 			DelList:[Nbframedel]
@@ -337,42 +372,6 @@ actor Algo_MMCO ()
 			Nbframedel <= 0
 		end
 
-	FillFalseRefFrame : action ==>
-		guard
-			frame_num != (last_frame_num + 1) mod ValMaxFrameNum
-		var
-			int false_frame_num := (last_frame_num + 1) mod ValMaxFrameNum
-		do
-				Nbframedel := 0;
-				num_ref_frames := if(num_ref_frames>16)then 16 else num_ref_frames end;
-				while(false_frame_num != frame_num)
-				do
-					if(long_term_count + short_term_count = num_ref_frames) then
-						if(Nbframedel>15) then
-							Nbframedel := 15;
-						end
-						DelListTab[Nbframedel] := short_term_list[short_term_count - 1];
-						Nbframedel             := Nbframedel + 1;
-						short_term_count       := short_term_count - 1;
-					end
-					foreach int i in Integers(0,short_term_count - 1)
-					do
-						short_term_list[short_term_count - i] := short_term_list[short_term_count - i - 1];
-					end
-					short_term_list[0] := false_frame_num;
-					short_term_count   := short_term_count + 1;
-					false_frame_num    := (false_frame_num + 1) mod ValMaxFrameNum;
-				end
-		end
-
-	skip_FillFalseRefFrame : action ==>
-		guard
-			frame_num = (last_frame_num + 1) mod ValMaxFrameNum
-		do
-				Nbframedel := 0;
-		end
-
-
 	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames               (read_num_ref_frames                 )--> FillFalseRefFrame;
 		FillFalseRefFrame                 (FillFalseRefFrame                   )--> check_IDR;
@@ -383,7 +382,7 @@ actor Algo_MMCO ()
 		check_IDR                         (read_not_IDR_not_MMCO               )--> update_idx;
 		check_IDR                         (read_not_IDR_MMCO                   )--> MMCO_opcode;
 		MMCO_opcode                       (MMCO_opcode                         )--> MMCO_opcode;
-		MMCO_opcode                       (MMCO_opcode0                        )--> update_idx;
+		MMCO_opcode                       (MMCO_opcode_v0                      )--> update_idx;
 		update_idx                        (update_idx                          )--> SendSizeDelList;
 		SendSizeDelList                   (SendSizeDelList                     )--> SendDelList;
 		SendDelList                       (SendDelList                         )--> SendDelList;
