@@ -7043,7 +7043,11 @@ actor Algo_Synp_AVC_FREXT()
 		i8x8 < 4,
 		transform_size_8x8_flag = 0 or entropy_coding_mode_flag[pps_id] = 0 // bloc4x4 or CAVLC
 	do
-		ctxBlockCat := 2;
+		if IS_Intra_16x16() then
+			ctxBlockCat := 1;  
+		else  
+			ctxBlockCat := 2;
+		end
 	end
 
 	// for( i4x4 = 0; i4x4 < 4; i4x4++ ) {
