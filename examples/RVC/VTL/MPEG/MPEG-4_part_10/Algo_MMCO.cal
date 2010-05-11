@@ -57,8 +57,8 @@ Copyright (c) ISO/IEC 2008.
 
 
 actor Algo_MMCO () 
-	uint(size=5)  RefReordering,
-	uint(size=5)  MMCO,
+	uint(size=32)  RefReordering,
+	uint(size=32)  MMCO,
 	int (size=32) MaxFrameNum
 		==>
 	int(size=32) RefList,
@@ -66,18 +66,19 @@ actor Algo_MMCO ()
 		:
 
 
-	List(type:uint(size=4),size=16)         reordering_ref_list := [0 :for int s in Integers(0,16-1)];
+	List(type:int(size=32),size=16)         reordering_ref_list := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32),size=16)         short_term_list     := [0 :for int s in Integers(0,16-1)];
 	List(type:int,size=16)                  pic_idx_list        := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32),size=16)         long_term_list      := [-1 :for int s in Integers(0,16-1)];
 	List(type:uint(size = 32), size = 2*16) RefListTab          := [-1 :for int s in Integers(0,2*16-1)];
-	List(type:uint(size=4),size= 2*16)      RefListSent         := [0: for int s in Integers(0, 2*16-1)];
+	List(type:uint(size=32),size= 2*16)     RefListSent         := [0: for int s in Integers(0, 2*16-1)];
 	List(type:int(size=32),size= 16)        DelListTab          := [0: for int s in Integers(0, 2*16-1)];
 
 	int (size=32) Nbframedel         := 0;	  
 	uint(size=3)  mmco_opcode;
-	uint(size=4)  pic_curr_idx;
-	uint          frame_num;
+	uint(size=32) pic_curr_idx;
+	uint          frame_num          := 0;
+	uint          last_frame_num     := 0;
 	int           pred               := 0;
 	int (size=32) ValMaxFrameNum     := 0;
 	uint(size=4)  index              := 0;
@@ -95,12 +96,11 @@ actor Algo_MMCO ()
   
 	update_idx: action ==>
 		var
-			//int(size=5) idx  := -1, 
 			bool        flag := false,
 			int         j
 		do
 			if (long_term_count + short_term_count = num_ref_frames) then
-				short_term_count       := short_term_count -1;
+				short_term_count       := short_term_count - 1;
 				DelListTab[Nbframedel] := short_term_list[short_term_count];
 				Nbframedel             := Nbframedel + 1;
 			end
@@ -122,28 +122,6 @@ actor Algo_MMCO ()
 				end
 				long_term_list[long_term_idx] := pic_curr_idx;
 			end
-			// choose pic_curr_idx
-			/*idx := pic_curr_idx;
-			while(not flag)
-			do
-				idx  := (idx +1) mod 16;
-				flag :=  true;
-				foreach int i in Integers (0, short_term_count - 1)
-				do
-					if (pic_idx_list[i] = idx) then 
-						flag := false;
-					end
-				end
-				if (long_term_count != 0) then
-					foreach int i in Integers(0, long_term_max_idx)
-					do
-						if (long_term_list[i] = idx) then
-							flag := false;
-						end
-					end
-				end
-			end
-			pic_curr_idx := idx;*/
 		end
 
 
@@ -155,6 +133,7 @@ actor Algo_MMCO ()
 			RefList:[b]
 		do
 			num_ref_frames := a;
+			last_frame_num := frame_num;
 			pic_curr_idx   := b;
 			frame_num      := b;
 			ValMaxFrameNum := MaxFrNu;
@@ -176,16 +155,19 @@ actor Algo_MMCO ()
 		guard
 			v = 1
 		var 
-			int ListIndex := 0
+			int ListIndex := 0,
+			/*List(type:uint(size=4),size=16) refFrameListXShortTerm := [0 :for int s in Integers(0,16-1)],
+			List(type:uint(size=4),size=16) refFrameListLongTerm := [0 :for int s in Integers(0,16-1)],*/
+			int(size=32) frame_num_short_term
 		do
 			pred  := frame_num;
 			index := 0;
-			if (short_term_count != 0) then 
+			if (short_term_count != 0) then
 				foreach int i in Integers (0, short_term_count - 1)
 				do
-					reordering_ref_list[i] := short_term_list[i];
+					reordering_ref_list[ListIndex] := short_term_list[i];
+					ListIndex                      := ListIndex + 1 ;
 				end
-				ListIndex :=  short_term_count;
 			else 
 				reordering_ref_list := [0 :for int s in Integers(0,16-1)];
 			end 
@@ -207,8 +189,7 @@ actor Algo_MMCO ()
 		guard 
 			(a = 0 or a = 1) 
 		var 
-			uint(size=4) idx         := 0, 
-			uint(size=4) pred_idx    := 0,
+			uint(size=4) idx         := 0,
 			int          counter_for := 0
 		do
 			if (a = 0) then 
@@ -222,15 +203,8 @@ actor Algo_MMCO ()
 					pred := pred - ValMaxFrameNum;
 				end
 			end
-			/*foreach int i in Integers(0, short_term_count-1)
-			do
-				if (short_term_list[i] = pred) then 
-					pred_idx := pic_idx_list[i];
-				end
-			end*/
 			foreach int i in Integers(0, short_term_count+long_term_count-1)
 			do
-				//if (reordering_ref_list[i] = pred_idx) then 
 				if (reordering_ref_list[i] = pred) then 
 					idx := i; 
 				end
@@ -344,7 +318,7 @@ actor Algo_MMCO ()
 		guard
 			(EndInitSentRefList = false)  and  ( short_term_count + long_term_count != 0 )
 		var 
-			List(type:uint(size=4),size=2*16) reflist := [0: for int k in Integers(0,2*16-1)],
+			List(type:uint(size=32),size=2*16) reflist := [0: for int k in Integers(0,2*16-1)],
 			int ListIndex := 0
 		do
 			if (short_term_count != 0) then 
@@ -383,7 +357,7 @@ actor Algo_MMCO ()
 		guard
 			EndInitSentRefList = true
 		var
-			uint(size = 5) ref
+			uint(size = 32) ref
 		do
 			ref := RefListSent[CounterRefListTab];
 			CounterRefListTab := CounterRefListTab + 1;
@@ -411,7 +385,7 @@ actor Algo_MMCO ()
 			short_term_list  := [-1 :for int s in Integers(0,16-1)];
 			pic_idx_list     := [-1 :for int s in Integers(0,16-1)];
 			long_term_list   := [-1 :for int s in Integers(0,16-1)];
-			Nbframedel       := 0;
+			Nbframedel       := -1;
 		end
 
 
@@ -420,8 +394,6 @@ actor Algo_MMCO ()
 				==>
 		guard
 			a = 1 and b = 0
-		do
-			Nbframedel := 0;
 		end
 
 
@@ -430,8 +402,6 @@ actor Algo_MMCO ()
 				==>
 		guard 
 			a = 1 and b = 1
-		do
-			Nbframedel := 0;
 		end
 
 
@@ -442,7 +412,7 @@ actor Algo_MMCO ()
 		guard 
 			a = 1
 		var 
-			uint(size=32) idx
+			int(size=5) idx := -1
 		do
 			pred := frame_num - b-1;
 			if(pred < 0) then
@@ -454,14 +424,15 @@ actor Algo_MMCO ()
 					idx := i;
 				end
 			end
-			foreach int i in Integers(idx, short_term_count - 2)
-			do
-				short_term_list[i] := short_term_list[i+1];
+			if(idx != -1) then
+				foreach int i in Integers(idx, short_term_count - 2)
+				do
+					short_term_list[i] := short_term_list[i+1];
+				end
+				short_term_count := short_term_count-1;
+				DelListTab[Nbframedel] := pred;
+				Nbframedel := Nbframedel + 1;
 			end
-			short_term_count := short_term_count-1;
-
-			DelListTab[Nbframedel] := pred;
-			Nbframedel := Nbframedel + 1;
 		end
 
 
@@ -472,11 +443,12 @@ actor Algo_MMCO ()
 		guard 
 			a = 2
 		do
-			DelListTab[Nbframedel] := long_term_list[b];
-			Nbframedel := Nbframedel + 1;
-			
-			long_term_list[b] := -1;
-			long_term_count   := long_term_count-1;
+			if(long_term_list[b] != -1) then
+				DelListTab[Nbframedel] := long_term_list[b];
+				Nbframedel := Nbframedel + 1;
+				long_term_list[b] := -1;
+				long_term_count   := long_term_count-1;
+			end
 		end
 
 
@@ -487,7 +459,7 @@ actor Algo_MMCO ()
 		guard 
 			a = 3
 		var
-			uint(size=4) idx 
+			int(size=5) idx := -1
 		do
 			pred := frame_num - b-1; 
 			if(pred < 0) then
@@ -499,19 +471,21 @@ actor Algo_MMCO ()
 					idx := i;
 				end
 			end
-			foreach int i in Integers(idx, short_term_count - 2)
-			do
-					short_term_list[i] := short_term_list[i + 1];
+			if(idx != -1) then
+				foreach int i in Integers(idx, short_term_count - 2)
+				do
+						short_term_list[i] := short_term_list[i + 1];
+				end
+				short_term_count := short_term_count - 1;
+				
+				if (long_term_list[c] = -1) then
+					long_term_count := long_term_count + 1;
+				else
+					DelListTab[Nbframedel] := long_term_list[c];
+					Nbframedel := Nbframedel + 1;
+				end
+				long_term_list[c] := pred;
 			end
-			short_term_count := short_term_count-1;
-			
-			if (long_term_list[c] = -1) then
-				long_term_count := long_term_count+1;
-			else
-				DelListTab[Nbframedel] := long_term_list[c];
-				Nbframedel := Nbframedel + 1;
-			end
-			long_term_list[c] := pred;
 		end
 
 
@@ -529,7 +503,7 @@ actor Algo_MMCO ()
 					DelListTab[Nbframedel] := long_term_list[i];
 					Nbframedel             := Nbframedel + 1;
 					long_term_list[i]      := -1;
-					long_term_count        := long_term_count-1;
+					long_term_count        := long_term_count - 1;
 				end
 			end
 		end
@@ -597,6 +571,42 @@ actor Algo_MMCO ()
 			Nbframedel <= 0
 		end
 
+	FillFalseRefFrame : action ==>
+		guard
+			frame_num != (last_frame_num + 1) mod ValMaxFrameNum
+		var
+			int false_frame_num := (last_frame_num + 1) mod ValMaxFrameNum
+		do
+				Nbframedel := 0;
+				num_ref_frames := if(num_ref_frames>16)then 16 else num_ref_frames end;
+				while(false_frame_num != frame_num)
+				do
+					if(long_term_count + short_term_count = num_ref_frames) then
+						if(Nbframedel>15) then
+							Nbframedel := 15;
+						end
+						DelListTab[Nbframedel] := short_term_list[short_term_count - 1];
+						Nbframedel             := Nbframedel + 1;
+						short_term_count       := short_term_count - 1;
+					end
+					foreach int i in Integers(0,short_term_count - 1)
+					do
+						short_term_list[short_term_count - i] := short_term_list[short_term_count - i - 1];
+					end
+					short_term_list[0] := false_frame_num;
+					short_term_count   := short_term_count + 1;
+					false_frame_num    := (false_frame_num + 1) mod ValMaxFrameNum;
+				end
+		end
+
+	skip_FillFalseRefFrame : action ==>
+		guard
+			frame_num = (last_frame_num + 1) mod ValMaxFrameNum
+		do
+				Nbframedel := 0;
+		end
+
+
 	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames               (read_num_ref_frames                 )--> read_ref_pic_list_reordering_flag;
 
@@ -605,7 +615,7 @@ actor Algo_MMCO ()
 		send_refList                      (InitRefList_zero                    )--> check_IDR;
 		send_refList                      (InitRefList_not0                    )--> RefListTabSent;
 		RefListTabSent                    (SendRefList                         )--> RefListTabSent;
-		RefListTabSent                    (SendRefListDone                     )--> check_IDR;
+		RefListTabSent                    (SendRefListDone                     )--> FillFalseRefFrame;
 
 		/* there is list 0 to sent */
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_1 )--> read_reordering_of_pic_nums_idc;
@@ -613,7 +623,7 @@ actor Algo_MMCO ()
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_2   )--> read_reordering_of_pic_nums_idc;
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_3   )--> IDC3SendRefList;
 		IDC3SendRefList                   (IDC3SendRefList                     )--> IDC3SendRefList;
-		IDC3SendRefList                   (IDC3SendRefListDone                 )--> check_IDR;
+		IDC3SendRefList                   (IDC3SendRefListDone                 )--> FillFalseRefFrame;
 
 		/* Get values about memory_management_control_operation */
 		check_IDR                         (read_IDR                            )--> update_idx;
@@ -625,6 +635,8 @@ actor Algo_MMCO ()
 		SendSizeDelList                   (SendSizeDelList                     )--> SendDelList;
 		SendDelList                       (SendDelList                         )--> SendDelList;
 		SendDelList                       (SendDelListDone                     )--> read_num_ref_frames;
+		FillFalseRefFrame                 (FillFalseRefFrame                   )--> check_IDR;
+		FillFalseRefFrame                 (skip_FillFalseRefFrame              )--> check_IDR;
 	end
 
 	priority

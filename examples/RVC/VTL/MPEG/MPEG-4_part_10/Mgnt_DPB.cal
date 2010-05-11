@@ -52,7 +52,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	List(type:int(size=32),size=17) pic_index_to_frame_num := [-1 :for int s in Integers(0,16)];
 	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=17) pic;
 	int(size=32) pic_curr_idx := 0;
-	List(type:uint(size=4),size=17) pic_ref_idx := [0 :for int s in Integers(0,17-1)];
+	List(type:int(size=5),size=17) pic_ref_idx := [0 :for int s in Integers(0,17-1)];
 	List(type:uint(size=1),size=17) flag_picture_end := [1 : for int s in Integers(0,17-1)];
 	List(type:uint(size=1),size=17) flag_display := [1 : for int s in Integers(0,17-1)];
 	int(size=14)  nbMBdisplay := 0;
@@ -85,6 +85,9 @@ initialize ==>
   	while((not idx_selected) and (i < 17))
   	do
   		if(pic_index_to_frame_num[i] = a) then
+  			if(pic_curr_idx != -1) then
+  				pic_index_to_frame_num[pic_curr_idx] := -1;
+  			end
   			pic_curr_idx := i;
   			idx_selected := true;
   		else if((pic_index_to_frame_num[i] = -1) and (pic_curr_idx = -1)) then
@@ -116,7 +119,7 @@ initialize ==>
 
   read_refList: action RefList:[v] ==>
   var
-  	int          idx := 0,
+  	int          idx := -1,
   	bool         idx_selected := false,
   	int(size=32) i            := 0
   do
@@ -135,35 +138,9 @@ initialize ==>
   refList_done: action ==> 
   guard
   	countRead  =  nb_ref
- // var
- // 	bool is_present := false
   do
     if nb_ref = 0 then
       pic_ref_idx[0] := 0;
- /*     foreach int i in Integers(0,16)
-      do
-      	if(i != pic_curr_idx)then
-      		pic_index_to_frame_num[i] := -1;
-      	end
-      end
-    else
-      foreach int i in Integers(0,16)
-      do
-      	is_present := false;
-      	if(i != pic_curr_idx)then
-      		foreach int j in Integers(0,nb_ref-1)
-      		do
-      			if(pic_ref_idx[j] = i)then
-      				is_present := true;
-      			end
-      		end
-      	else
-      		is_present := true;
-      	end
-      	if(not is_present) then
-      		pic_index_to_frame_num[i] := -1;
-      	end
-      end*/
     end
   	countRead := 0;
   end
@@ -268,18 +245,22 @@ initialize ==>
   var 
     uint(size=16) v
   do
-    v := pic[ pic_ref_idx[ref_idx] ][ra + ra_x + ra_y * picwidth * MB_WIDTH];
-    ra_x := ra_x +1;
-    if ra_x = ra_W then
-      ra_y := ra_y +1;
-      if ra_y != ra_H then
-        ra_x := 0; 
-      else 
-        ra_x := 0;
-        ra_y := 0; 
-        read_done := 1;
-      end
-    end
+  	if(pic_ref_idx[ref_idx] != -1) then
+	    v := pic[ pic_ref_idx[ref_idx] ][ra + ra_x + ra_y * picwidth * MB_WIDTH];
+	    ra_x := ra_x +1;
+	    if ra_x = ra_W then
+	      ra_y := ra_y +1;
+	      if ra_y != ra_H then
+	        ra_x := 0; 
+	      else 
+	        ra_x := 0;
+	        ra_y := 0; 
+	        read_done := 1;
+	      end
+	    end
+	else
+		/*Fix me !!!*/
+	end
   end
  
   //write MB on the output display
@@ -306,12 +287,6 @@ initialize ==>
     if nbMBdisplay = picsize then 
       flag_display[pic_display_idx] := 1;
       nbMBdisplay := 0;
-      
-   /*   if (pic_display_idx<16 - 1) then
-      	pic_display_idx := pic_display_idx + 1;
-      else
-      	pic_display_idx := 0;
-      end*/
     //  println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
     end
   end
@@ -339,11 +314,6 @@ initialize ==>
     if nbMBdisplay = picsize then 
       flag_display[pic_display_idx] := 1;
       nbMBdisplay := 0;
-     /* if (pic_display_idx<16 - 1) then
-      	pic_display_idx := pic_display_idx + 1;
-      else
-      	pic_display_idx := 0;
-      end*/
      // println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
     end
   end

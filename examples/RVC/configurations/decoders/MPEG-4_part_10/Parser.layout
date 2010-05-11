@@ -19,8 +19,6 @@
       <vertex id="MbPartHeigth" x="711" y="1020"/>
       <vertex id="MvRes" x="711" y="1314"/>
       <vertex id="Mb_Type" x="947" y="1214"/>
-      <vertex id="RefReordering" x="711" y="1407"/>
-      <vertex id="MMCO" x="711" y="1500"/>
       <vertex id="Width" x="711" y="1593"/>
       <vertex id="Height" x="711" y="1686"/>
       <vertex id="MV" x="1136" y="1490"/>
@@ -45,15 +43,15 @@
       <vertex id="I_PCM_U" x="1149" y="2010"/>
       <vertex id="I_PCM_V" x="1150" y="2039"/>
       <vertex id="ConstrainedIFlag" x="711" y="2430"/>
+      <vertex id="DelList" x="1112" y="1671"/>
       <vertex id="byte2bit" x="333" y="1704"/>
       <vertex id="Algo_NALU" x="164" y="1761"/>
-      <vertex id="Algo_Synp_AVC" x="458" y="1509"/>
+      <vertex id="Algo_Synp_AVC" x="439" y="1508"/>
       <vertex id="Algo_BlockExpand_AVC" x="916" y="1769"/>
       <vertex id="Algo_BlockSplit_AVC" x="1081" y="1767"/>
       <vertex id="Algo_IntraPred_Split" x="711" y="1113"/>
       <vertex id="MVReconstruct" x="926" y="1468"/>
       <vertex id="Algo_MMCO" x="933" y="1664"/>
       <vertex id="Algo_Parser_IPCM" x="952" y="2014"/>
-      <vertex id="DelList" x="1112" y="1671"/>
    </vertices>
 </layout>

@@ -132,20 +132,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefReordering">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="MMCO">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="Width">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -478,8 +464,6 @@
         src="Algo_Synp_AVC" src-port="PicWidthInMb"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="IntraPredMode"
         src="Algo_Synp_AVC" src-port="IntraPredMode"/>
-    <Connection dst="" dst-port="RefReordering" src="Algo_Synp_AVC" src-port="RefReordering"/>
-    <Connection dst="" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
     <Connection dst="" dst-port="Width" src="Algo_Synp_AVC" src-port="WIDTH"/>
     <Connection dst="" dst-port="Height" src="Algo_Synp_AVC" src-port="HEIGHT"/>
     <Connection dst="" dst-port="LOCATION" src="MVReconstruct" src-port="LOCATION"/>
