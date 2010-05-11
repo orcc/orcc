@@ -13,6 +13,9 @@ $endif$
 $if(actor.stateVars.list)$
 ;!stateVars = !{$actor.stateVars.list: stateVar_decl_MD(); separator=", "$}
 $endif$
+$if(actor.actions)$
+!actions = !{$actor.actions: action_decl_MD(); separator=", "$}
+$endif$
 
 !0 = metadata !{$file_MD(actor)$}
 !1 = metadata !{$varName_MD(actor)$}
@@ -20,7 +23,133 @@ $actor.inputs.list: fifo_MD()$
 $actor.outputs.list: fifo_MD()$
 $actor.parameters.list: parameter_MD()$
 $actor.stateVars.list: stateVar_MD()$
+$actor.actions: action_MD()$
+
 >>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor MD declaration
+///////////////////////////////////////////////////////////////////////////////
+
+stateVar_decl_MD(var) ::= <<
+!$Location(var.location)$
+>>
+
+fifo_decl_MD(port) ::= <<
+!$Location(port.location)$
+>>
+
+parameter_decl_MD(parameter) ::= <<
+!$Location(parameter.location)$
+>>
+
+action_decl_MD(action) ::= <<
+!$Location(action.location)$
+>>
+
+Proc_decl_MD(proc) ::= <<
+!$Location(proc.location)$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor MD body
+///////////////////////////////////////////////////////////////////////////////
+
+action_MD(action) ::= <<
+$action_decl_MD(action)$ = metadata !{metadata $Sched_decl_MD(action)$, metadata $Body_decl_MD(action)$}
+$Sched_MD(action)$
+$Body_MD(action)$
+>>
+
+fifo_MD(port) ::= <<
+$fifo_decl_MD(port)$ = metadata !{metadata $Location_decl_MD(port)$, metadata $Type_decl_MD(port)$, $varName_MD(port)$, %struct.fifo_s** @$port.name$}
+$Location_MD(port)$
+$Type_MD(port)$
+>>
+
+Proc_MD(proc, MD, index) ::= <<
+$MD$$index$ = metadata !{metadata !"test"}
+>>
+
+
+parameter_MD(parameter) ::= <<
+
+>>
+
+stateVar_MD(var) ::= <<
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor MD member declaration
+///////////////////////////////////////////////////////////////////////////////
+
+Sched_decl_MD(proc) ::= <<
+!$Location(proc.location)$0
+>>
+
+Body_decl_MD(proc) ::= <<
+!$Location(proc.location)$1
+>>
+
+Location_decl_MD(var) ::= <<
+!$Location(var.location)$2
+>>
+
+Type_decl_MD(var) ::= <<
+!$Location(var.location)$3
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor MD member body
+///////////////////////////////////////////////////////////////////////////////
+
+
+Type_MD(var) ::= <<
+$Type_decl_MD(var)$ = metadata  !{$varType_MD(var)$}
+>>
+
+Location_MD(var) ::=<<
+$Location_decl_MD(var)$ = metadata  !{$startLine_MD(var)$, $startColumn_MD(var)$, $endColumn_MD(var)$}
+>>
+
+Sched_MD(action) ::= <<
+$Sched_decl_MD(action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExtern_MD(action.scheduler)$, i1()* $action.scheduler$}
+
+>>
+
+Body_MD(action) ::= <<
+$Body_decl_MD(action)$ = metadata  !{$varName_MD(action.body)$, $procExtern_MD(action.body)$, void()* $action.body$}
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor MD data
+///////////////////////////////////////////////////////////////////////////////
+
+
+varType_MD(var) ::= <<
+metadata !"$var.type.size$" 
+>>
+
+procExtern_MD(proc) ::= <<
+$if(proc.external)$i1 0$else$i1 1$endif$ 
+>>
+
+procRetType_MD(proc) ::= <<
+metadata !"$proc.returnType$"
+>>
+
+
+varSize_MD(var) ::= <<
+i32 $var.type.size$
+>>
+
+varName_MD(var) ::= <<
+metadata !"$var.name$"
+>>
+
 
 file_MD(actor) ::= <<
 metadata !"$actor.file$"
@@ -38,75 +167,9 @@ endColumn_MD(var) ::= <<
 i32 $var.location.endColumn$
 >>
 
-varType_MD(var) ::= <<
-metadata !"int" $if(var.type.bool)$
-bool
-$elsif(var.type.int)$
-int
-$elsif(var.type.list)$
-list
-$elsif(var.type.string)$
-string
-$elsif(var.type.uint)$
-uint
-$elsif(var.type.void)$
-void
-$endif$
->>
-
-varSize_MD(var) ::= <<
-i32 $var.type.size$
->>
-
-varName_MD(var) ::= <<
-metadata !"$var$"
->>
-
-
-fifo_decl_MD(port) ::= <<
-!$Location(port.location)$
->>
-
-parameter_decl_MD(parameter) ::= <<
-!$Location(parameter.location)$
->>
-
-stateVar_decl_MD(var) ::= <<
-!$Location(var.location)$
->>
-
-
-Location_decl_MD(var) ::= <<
-!$Location(var.location)$0
->>
-
-Type_decl_MD(var) ::= <<
-!$Location(var.location)$1
->>
-
-Type_MD(var) ::= <<
-$Type_decl_MD(var)$ = metadata  !{$varType_MD(var)$, $varSize_MD(var)$}
->>
-
-Location_MD(var) ::=<<
-$Location_decl_MD(var)$ = metadata  !{$startLine_MD(var)$, $startColumn_MD(var)$, $endColumn_MD(var)$}
->>
-
-
-stateVar_MD(var) ::= <<
-
->>
 
 
 
-fifo_MD(port) ::= <<
-$fifo_decl_MD(port)$ = metadata !{metadata $Location_decl_MD(port)$, metadata $Type_decl_MD(port)$, $varName_MD(port)$}
-$Location_MD(port)$
-$Type_MD(port)$
->>
 
 
-parameter_MD(parameter) ::= <<
 
-
->>
