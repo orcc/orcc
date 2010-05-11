@@ -6302,6 +6302,8 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		val_CodedBlockPatternLuma := Intra_16x16_tab[mb_type][2];
 		CodedBlockPatternChroma := Intra_16x16_tab[mb_type][1];
+		mbTab[val_CurrMbAddr][mbCBPLuma]	:= val_CodedBlockPatternLuma;
+		mbTab[val_CurrMbAddr][mbCBPChroma]	:= CodedBlockPatternChroma;
 	end
 	//end if
 
