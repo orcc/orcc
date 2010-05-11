@@ -167,13 +167,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefList">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="Mb_TypeC">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -310,6 +303,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="RefList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -424,6 +424,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Algo_RefList0">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_RefList"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -492,13 +501,6 @@
         src="Algo_Synp_AVC" src-port="RefIdx"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
     <Connection dst="Algo_MMCO" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
-    <Connection dst="Algo_MMCO" dst-port="RefReordering"
-        src="Algo_Synp_AVC" src-port="RefReordering"/>
-    <Connection dst="" dst-port="RefList" src="Algo_MMCO" src-port="RefList">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="1000000"/>
-        </Attribute>
-    </Connection>
     <Connection dst="" dst-port="CoefDC_Cr" src="Algo_BlockSplit_AVC" src-port="Block_V_DC"/>
     <Connection dst="" dst-port="CoefDC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_DC"/>
     <Connection dst="" dst-port="CoefAC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_AC"/>
@@ -534,4 +536,12 @@
     <Connection dst="" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>
     <Connection dst="Algo_MMCO" dst-port="FraNum" src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
     <Connection dst="" dst-port="FrameNum_CurrPic" src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
+    <Connection dst="Algo_RefList0" dst-port="FraNum"
+        src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
+    <Connection dst="Algo_RefList0" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
+    <Connection dst="Algo_RefList0" dst-port="MaxFrameNum"
+        src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
+    <Connection dst="Algo_RefList0" dst-port="RefReordering"
+        src="Algo_Synp_AVC" src-port="RefReordering"/>
+    <Connection dst="" dst-port="RefList" src="Algo_RefList0" src-port="RefList"/>
 </XDF>
