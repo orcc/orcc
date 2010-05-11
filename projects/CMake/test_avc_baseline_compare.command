@@ -37,10 +37,10 @@ fi
 
 ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-1/MR1_BT_A.h264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-1/MR1_BT_A.yuv
 ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-2/MR2_TANDBERG_E.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-2/MR2_TANDBERG_E.yuv
-# ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-3/MR3_TANDBERG_B.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-3/MR3_TANDBERG_B.yuv
+./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-3/MR3_TANDBERG_B.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-3/MR3_TANDBERG_B.yuv
 # ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-4/MR4_TANDBERG_C.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-4/MR4_TANDBERG_C.yuv
 # ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-5/MR5_TANDBERG_C.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-5/MR5_TANDBERG_C.yuv
-# ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-6/MR1_MW_A.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-6/MR1_MW_A_rec.qcif
+./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-6/MR1_MW_A.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-6/MR1_MW_A_rec.qcif
 # ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-7/MR2_MW_A.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-7/MR2_MW_A_rec.qcif
 # ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-11/HCBP1_HHI_A.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-11/HCBP1_HHI_A.yuv
 # ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/MMCO/AVCMR-12/HCBP2_HHI_A.264 -o ~/Movies/AVC/CAVLC/MMCO/AVCMR-12/HCBP2_HHI_A.yuv
