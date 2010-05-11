@@ -172,7 +172,7 @@ actor Algo_Synp_AVC_FREXT()
 		/* List Used as a result for Binarization */
 	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 25)] : for int j in Integers( 0, 100)];
 	//List ( type: uint(size=2), size=128 ) synElVal := [ 0 : for int i in Integers( 0, 127)];
-	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 100)];
+	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 127)];
 	
 	
 	//Cabac intialisation process for the arithmetic decoding engine
@@ -1937,6 +1937,9 @@ actor Algo_Synp_AVC_FREXT()
 	begin
 		FoundSE := false;
 		CabacStartProcess := true;
+		foreach int s in Integers(0,15) do
+			ReadBinString[s] := 0;
+		end
 	end 
 	
 	function cabac_value() --> int:
@@ -2067,7 +2070,7 @@ actor Algo_Synp_AVC_FREXT()
 			MaxEleCompTab := synEval_Coded_Bloc_Flag_Ele;
 			foreach int e in Integers(0, MaxEleCompTab - 1) do
 				//BinIdxSize	:= synEval_Coded_Bloc_Flag[e][0];
-				foreach int s in Integers(0, 3) do
+				foreach int s in Integers(0, 1) do
 					synElVal[e][s] := synEval_Coded_Bloc_Flag[e][s];
 				end
 			end
@@ -4013,7 +4016,7 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	
 	/********************** DecodeTerminate actions **********************/
-	
+	/*
 	DecodeTerminate: action ==>
 	guard
 		StartDecodeTerminate and
@@ -4044,8 +4047,40 @@ actor Algo_Synp_AVC_FREXT()
 			
 		StartDecodeTerminate := false;
 	end
-	
-	
+	*/
+	DecodeTerminate: action ==>
+	guard
+		StartDecodeTerminate and
+		ctxIdx = 276
+	var 
+		int tempOffest
+	do
+		codIRange  := codIRange - 2;
+		tempOffest := codIOffset - codIRange;
+		
+		if tempOffest > 0 then
+			binVal := 1;
+			binValDecoded := true;
+			// Start Cabac Process
+			CabacStartProcess := true;
+			// Give the right write a bit into ReadBinString[]
+			binValDecoded := true;
+		else
+			binVal := 0;
+			binValDecoded := true;
+			if codIRange < 0x100 then
+				StartRenormDRead := true;
+			else
+				// Start Cabac Process
+				CabacStartProcess := true;
+				// Give the right write a bit into ReadBinString[]
+				binValDecoded := true;
+			end
+		end
+			
+		StartDecodeTerminate := false;
+
+	end
 	/********************** Cabac Initialization **********************/
 	
 	CabacInit: action ==>
