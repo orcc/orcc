@@ -5705,6 +5705,28 @@ actor Algo_Synp_AVC_FREXT()
 		prevMbSkipped := 0;
 		if field_pic_flag = 0 and mb_adaptive_frame_field_flag[sps_id] = 1 then MbaffFrameFlag := 1; else MbaffFrameFlag := 0; end
 		FirstSEinSlice := true;
+		//Init Tabs 
+		foreach int i in Integers(0,PICWIDTH*PICHEIGHT - 1) do
+			foreach int j in Integers(0,3) do
+				transblock_cbf_cr[i][j] := 0;
+				transblock_cbf_cb[i][j] := 0;
+			end
+		end
+		
+		foreach int i in Integers(0,PICWIDTH*PICHEIGHT - 1) do
+			foreach int j in Integers(0,15) do
+				transblock_cbf[i][j] := 0;
+			end
+		end
+		
+		foreach int i in Integers(0,PICWIDTH*PICHEIGHT - 1) do
+			foreach int j in Integers(0,1) do
+				transblock_cbf_dc_cr_cb[i][j] := 0;
+			end
+		end
+		
+		
+				
 	end
 
 	//do
