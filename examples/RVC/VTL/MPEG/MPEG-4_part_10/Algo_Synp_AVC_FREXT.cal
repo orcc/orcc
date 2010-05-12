@@ -2632,7 +2632,7 @@ actor Algo_Synp_AVC_FREXT()
 		AvailMb := NeighMbAvail;
 		
 		if ( not AvailMb ) then
-			condTermFlagA := 0;
+			condTermFlagB := 0;
 		else	
 			if ( IS_P( GiveMbSliceType(AvailMb,mbAddr) ) or
 			     GiveMbType(AvailMb,mbAddr) = 25 or
