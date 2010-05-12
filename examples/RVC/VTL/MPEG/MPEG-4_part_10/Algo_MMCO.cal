@@ -61,7 +61,11 @@ actor Algo_MMCO ()
 	uint(size=32) FraNum,
 	int (size=32) MaxFrameNum
 		==>
-	int(size=32) DelList
+	int (size=32) DelList,
+	uint(size=32) ShortTermList,
+	uint(size=32) LongTermList,
+	uint(size=32) Nb_LT_Frame,
+	uint(size=32) LTMaxIdx
 		:
 
 	List(type:int(size=32), size=16) short_term_list        := [0     : for int s in Integers(0,15)];
@@ -74,9 +78,11 @@ actor Algo_MMCO ()
 	uint          last_frame_num     := 0;
 	int           pred               := 0;
 	int (size=32) ValMaxFrameNum     := 0;
-	uint(size=4)  num_ref_frames     := 0;
-	uint(size=4)  short_term_count   := 0;
-	uint(size=4)  long_term_count    := 0;
+	uint(size=5)  num_ref_frames     := 0;
+	uint(size=5)  short_term_count   := 0;
+	uint(size=5)  long_term_count    := 0;
+	uint(size=5)  Nb_short_term_sent := 0;
+	uint(size=5)  Nb_long_term_sent  := 0;
 	uint(size=1)  flag_long_term     := 0;
 	uint(size=4)  long_term_idx      := 0;
 	uint(size=4)  long_term_max_idx  := 0;
@@ -310,13 +316,22 @@ actor Algo_MMCO ()
 		guard 
 			a = 6
 		do
+			if (long_term_count + short_term_count = num_ref_frames) then
+				short_term_count       := short_term_count - 1;
+				if(short_term_false_frame[short_term_count] = false) then
+					DelListTab[Nbframedel] := short_term_list[short_term_count];
+					Nbframedel             := Nbframedel + 1;
+				end
+			end
+			
 			if (long_term_list[b] != -1) then
 				DelListTab[Nbframedel] := long_term_list[b];
 				Nbframedel             := Nbframedel + 1;
-				long_term_count        := long_term_count - 1;
 				long_term_list[b]      := -1;
+			else 
+					long_term_count := long_term_count +1;
 			end
-			long_term_idx  := b;
+			long_term_list[b] := frame_num;
 			flag_long_term := 1;
 		end
 
@@ -325,15 +340,15 @@ actor Algo_MMCO ()
 			bool        flag := false,
 			int         j
 		do
-			if (long_term_count + short_term_count = num_ref_frames) then
-				short_term_count       := short_term_count - 1;
-				if(short_term_false_frame[short_term_count] = false) then
-					DelListTab[Nbframedel] := short_term_list[short_term_count];
-					Nbframedel             := Nbframedel + 1;
-				end
-			end
 			// add current picture
 			if (flag_long_term = 0) then
+				if (long_term_count + short_term_count = num_ref_frames) then
+					short_term_count       := short_term_count - 1;
+					if(short_term_false_frame[short_term_count] = false) then
+						DelListTab[Nbframedel] := short_term_list[short_term_count];
+						Nbframedel             := Nbframedel + 1;
+					end
+				end
 				j := short_term_count - 1;
 				foreach int i in Integers (0, short_term_count - 1)
 				do
@@ -344,22 +359,66 @@ actor Algo_MMCO ()
 				short_term_list[0]        := frame_num;
 				short_term_false_frame[0] := false;
 				short_term_count          := short_term_count +1;
-			else
-				if (long_term_list[long_term_idx] = -1) then 
-					long_term_count := long_term_count +1;
-				end
-				long_term_list[long_term_idx] := frame_num;
 			end
 		end
+
+
+	SendSizeLists: action 
+				==>
+			ShortTermList:[short_term_count],
+			Nb_LT_Frame  :[long_term_count]
+		do
+			Nb_short_term_sent := 0;
+		end
+
+
+	SendShortTermList: action
+				==>
+			ShortTermList:[ValShortTermList]
+		guard
+			Nb_short_term_sent < short_term_count
+		var
+			uint(size=32) ValShortTermList
+		do
+			ValShortTermList := short_term_list[Nb_short_term_sent];
+			Nb_short_term_sent := Nb_short_term_sent + 1;
+		end
+
+	
+	SendShortTermList_Done: action ==>
+		do
+			Nb_long_term_sent := 0;
+		end
+
+
+	SendLongTermList: action
+				==>
+			LongTermList:[ValLongTermList]
+		guard
+			Nb_long_term_sent < 16
+		var
+			uint(size=32) ValLongTermList
+		do
+			ValLongTermList   := long_term_list[Nb_long_term_sent];
+			Nb_long_term_sent := Nb_long_term_sent + 1;
+		end
+
+	
+	SendLongTermList_Done: action ==>
+		end
+
 
 	SendSizeDelList: action
 				==>
 			DelList:[Nbframedel]
 		end
 
+
 	SendDelList : action
 				==>
 			DelList:[ValDelFrame]
+		guard
+			Nbframedel > 0
 		var
 			int(size=32) ValDelFrame
 		do
@@ -367,31 +426,41 @@ actor Algo_MMCO ()
 			ValDelFrame := DelListTab[Nbframedel];
 		end
 
+
 	SendDelListDone : action ==>
-		guard
-			Nbframedel <= 0
 		end
 
+
 	schedule fsm  read_num_ref_frames:
-		read_num_ref_frames               (read_num_ref_frames                 )--> FillFalseRefFrame;
-		FillFalseRefFrame                 (FillFalseRefFrame                   )--> check_IDR;
-		FillFalseRefFrame                 (skip_FillFalseRefFrame              )--> check_IDR;
+		read_num_ref_frames  (read_num_ref_frames                 )--> FillFalseRefFrame;
+
+		FillFalseRefFrame    (FillFalseRefFrame                   )--> check_IDR;
+		FillFalseRefFrame    (skip_FillFalseRefFrame              )--> check_IDR;
 
 		/* Get values about memory_management_control_operation */
-		check_IDR                         (read_IDR                            )--> update_idx;
-		check_IDR                         (read_not_IDR_not_MMCO               )--> update_idx;
-		check_IDR                         (read_not_IDR_MMCO                   )--> MMCO_opcode;
-		MMCO_opcode                       (MMCO_opcode                         )--> MMCO_opcode;
-		MMCO_opcode                       (MMCO_opcode_v0                      )--> update_idx;
-		update_idx                        (update_idx                          )--> SendSizeDelList;
+		check_IDR            (read_IDR                            )--> update_idx;
+		check_IDR            (read_not_IDR_not_MMCO               )--> update_idx;
+		check_IDR            (read_not_IDR_MMCO                   )--> MMCO_opcode;
+		MMCO_opcode          (MMCO_opcode                         )--> MMCO_opcode;
+		MMCO_opcode          (MMCO_opcode_v0                      )--> update_idx;
+
+		update_idx           (update_idx                          )--> SendSizeLists;
+
+		SendSizeLists (SendSizeLists                              )-->SendShortTermList;
+		SendShortTermList(SendShortTermList                       )-->SendShortTermList;
+		SendShortTermList(SendShortTermList_Done                  )-->SendLongTermList;
+		SendLongTermList(SendLongTermList                         )-->SendLongTermList;
+		SendLongTermList(SendLongTermList_Done                    )-->SendSizeDelList;
+
 		SendSizeDelList                   (SendSizeDelList                     )--> SendDelList;
 		SendDelList                       (SendDelList                         )--> SendDelList;
 		SendDelList                       (SendDelListDone                     )--> read_num_ref_frames;
 	end
 
 	priority
-		SendDelListDone     > SendDelList;
-		SendSizeDelList     > SendDelListDone;
+		SendSizeDelList     > SendDelList     > SendDelListDone;
+		SendShortTermList   > SendShortTermList_Done;
+		SendLongTermList    > SendLongTermList_Done;
 	end
 
 end

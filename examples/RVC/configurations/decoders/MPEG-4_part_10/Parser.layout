@@ -42,7 +42,9 @@
       <vertex id="I_PCM_U" x="1149" y="2031"/>
       <vertex id="I_PCM_V" x="1150" y="2060"/>
       <vertex id="ConstrainedIFlag" x="711" y="2430"/>
-      <vertex id="DelList" x="1062" y="1680"/>
+      <vertex id="DelList" x="1146" y="1687"/>
+      <vertex id="FrameNum_CurrPic" x="690" y="1565"/>
+      <vertex id="RefList" x="1256" y="1782"/>
       <vertex id="byte2bit" x="333" y="1704"/>
       <vertex id="Algo_NALU" x="164" y="1761"/>
       <vertex id="Algo_Synp_AVC" x="439" y="1508"/>
@@ -50,10 +52,8 @@
       <vertex id="Algo_BlockSplit_AVC" x="1081" y="1887"/>
       <vertex id="Algo_IntraPred_Split" x="711" y="1113"/>
       <vertex id="MVReconstruct" x="926" y="1468"/>
-      <vertex id="Algo_MMCO" x="936" y="1671"/>
+      <vertex id="Algo_MMCO" x="926" y="1664"/>
       <vertex id="Algo_Parser_IPCM" x="952" y="2035"/>
-      <vertex id="FrameNum_CurrPic" x="690" y="1565"/>
-      <vertex id="Algo_RefList0" x="938" y="1772"/>
-      <vertex id="RefList" x="1058" y="1785"/>
+      <vertex id="Algo_RefList0" x="1137" y="1729"/>
    </vertices>
 </layout>

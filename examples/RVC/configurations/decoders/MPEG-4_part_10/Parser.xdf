@@ -538,10 +538,15 @@
     <Connection dst="" dst-port="FrameNum_CurrPic" src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
     <Connection dst="Algo_RefList0" dst-port="FraNum"
         src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
-    <Connection dst="Algo_RefList0" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
     <Connection dst="Algo_RefList0" dst-port="MaxFrameNum"
         src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
     <Connection dst="Algo_RefList0" dst-port="RefReordering"
         src="Algo_Synp_AVC" src-port="RefReordering"/>
     <Connection dst="" dst-port="RefList" src="Algo_RefList0" src-port="RefList"/>
+    <Connection dst="Algo_RefList0" dst-port="ShortTermList"
+        src="Algo_MMCO" src-port="ShortTermList"/>
+    <Connection dst="Algo_RefList0" dst-port="LongTermList"
+        src="Algo_MMCO" src-port="LongTermList"/>
+    <Connection dst="Algo_RefList0" dst-port="Nb_LT_Frame"
+        src="Algo_MMCO" src-port="Nb_LT_Frame"/>
 </XDF>
