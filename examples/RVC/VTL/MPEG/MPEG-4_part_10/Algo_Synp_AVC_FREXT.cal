@@ -3665,9 +3665,9 @@ actor Algo_Synp_AVC_FREXT()
 					NextBitToDecode := false;
 				else
 					if binVal = 0 then
-						CabacValue := CabacValue + 4*2; 	
+						CabacValue := CabacValue + 4*1; 	
 					else
-						CabacValue := CabacValue + 4*1;
+						CabacValue := CabacValue + 4*2;
 					end
 					binValDecoded := false;
 					binIdx := binIdx + 1;
