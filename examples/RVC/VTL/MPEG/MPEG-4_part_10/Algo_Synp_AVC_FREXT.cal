@@ -213,7 +213,7 @@ actor Algo_Synp_AVC_FREXT()
 	/*
 		mbTab := [ Address ][ Availability, mbSliceType, mb_type, IntraChromaPredMode, mbQpDelta, mbCBPLuma, mbCBPChroma ]
 	*/
-	List ( type: List ( type: int, size = 9) , size = 255 ) mbTab := [[ 0 : for int i in Integers( 0, 8)] : for int j in Integers( 0, 254)];
+	List ( type: List ( type: int, size = 9) , size = PICWIDTH*PICHEIGHT - 1 ) mbTab := [[ 0 : for int i in Integers( 0, 8)] : for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2)];
 	
 	int mbTabAvail				:= 0;
 	int mbSliceType				:= 1;
@@ -5706,20 +5706,21 @@ actor Algo_Synp_AVC_FREXT()
 		if field_pic_flag = 0 and mb_adaptive_frame_field_flag[sps_id] = 1 then MbaffFrameFlag := 1; else MbaffFrameFlag := 0; end
 		FirstSEinSlice := true;
 		//Init Tabs 
-		foreach int i in Integers(0,PICWIDTH*PICHEIGHT - 1) do
+		foreach int i in Integers(0,PicSizeInMbs - 1) do
+			mbTab[i][mbCBF] := 0;
 			foreach int j in Integers(0,3) do
 				transblock_cbf_cr[i][j] := 0;
 				transblock_cbf_cb[i][j] := 0;
 			end
 		end
 		
-		foreach int i in Integers(0,PICWIDTH*PICHEIGHT - 1) do
+		foreach int i in Integers(0,PicSizeInMbs - 1) do
 			foreach int j in Integers(0,15) do
 				transblock_cbf[i][j] := 0;
 			end
 		end
 		
-		foreach int i in Integers(0,PICWIDTH*PICHEIGHT - 1) do
+		foreach int i in Integers(0,PicSizeInMbs - 1) do
 			foreach int j in Integers(0,1) do
 				transblock_cbf_dc_cr_cb[i][j] := 0;
 			end
