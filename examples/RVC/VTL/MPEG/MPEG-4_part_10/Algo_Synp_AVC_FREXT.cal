@@ -4078,7 +4078,8 @@ actor Algo_Synp_AVC_FREXT()
 				binValDecoded := true;
 			end
 		end
-			
+		// write the bit into the  ReadBinString
+		ReadBinString[binIdx + 1] := binVal;	
 		StartDecodeTerminate := false;
 
 	end
@@ -5703,6 +5704,7 @@ actor Algo_Synp_AVC_FREXT()
 		moreDataFlag := 1;
 		prevMbSkipped := 0;
 		if field_pic_flag = 0 and mb_adaptive_frame_field_flag[sps_id] = 1 then MbaffFrameFlag := 1; else MbaffFrameFlag := 0; end
+		FirstSEinSlice := true;
 	end
 
 	//do
