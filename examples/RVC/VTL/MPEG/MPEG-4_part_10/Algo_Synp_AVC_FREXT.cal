@@ -4059,7 +4059,7 @@ actor Algo_Synp_AVC_FREXT()
 		codIRange  := codIRange - 2;
 		tempOffest := codIOffset - codIRange;
 		
-		if tempOffest > 0 then
+		if tempOffest >= 0 then
 			binVal := 1;
 			binValDecoded := true;
 			// Start Cabac Process
@@ -7129,9 +7129,9 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	// end if
 	
-	Residual_luma_skip_AC_CodedBlock8x8_CABAC: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16 
+	Residual_luma_skip_AC_CodedBlock8x8_CABAC_16: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16
 	guard
-		(i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC()
+		( (i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC() ) and mb_type = 0
 	do
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 		/*
@@ -7146,7 +7146,23 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	// end if
 	
-
+	Residual_luma_skip_AC_CodedBlock8x8_CABAC_15: action ==> VALUE:[[0: for int i in Integers(0,14)]] repeat 15 
+	guard
+		( (i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC()) and mb_type > 0
+	do	
+		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
+		/*
+		// if( !bmFlag && MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
+		for( i = 0; i < 15; i++ )
+		i16x16AClevel[ i8x8 * 4 + i4x4 ][ i ] = 0
+		// else
+		for( i = 0; i < 16; i++ )
+		level[ i8x8 * 4 + i4x4 ][ i ] = 0
+		// end if
+		*/
+	end
+	// end if
+	
 	/*
 	if( !entropy_coding_mode_flag && transform_size_8x8_flag )
 	for( i = 0; i < 16; i++ )
@@ -7252,9 +7268,18 @@ actor Algo_Synp_AVC_FREXT()
 	end   
 	//end if
 	
-	Residual_skip_chroma_DC_init_CABAC: action ==> VALUE:[[0: for int i in Integers(0,63)]] repeat 64 
+	Residual_skip_chroma_DC_init_CABAC_1: action ==> VALUE:[[0: for int i in Integers(0,3)]] repeat 4 
 	guard
-		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC()
+		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC() and NumC8x8 = 1
+	do
+		//for( i = 0; i < 4 * NumC8x8; i++ )
+		//ChromaDCLevel[ iCbCr ][ i ] = 0
+		iCbCr := iCbCr + 1; 
+	end   
+	
+	Residual_skip_chroma_DC_init_CABAC_2: action ==> VALUE:[[0: for int i in Integers(0,7)]] repeat 8 
+	guard
+		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC() and NumC8x8 = 2
 	do
 		//for( i = 0; i < 4 * NumC8x8; i++ )
 		//ChromaDCLevel[ iCbCr ][ i ] = 0
@@ -7812,39 +7837,48 @@ actor Algo_Synp_AVC_FREXT()
 		coded_block_flag = 0
 	end
 	
+	
 	Residual_block_Sent_16_Coeff : action ==> VALUE : [ [level[i]: for int i in Integers(0,15)] ] repeat 16
 	guard
-		ctxBlockCat = 0 or ctxBlockCat = 1 or ctxBlockCat = 2
-	end
-		
-	Residual_block_Sent_8_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,16)] ] repeat 16
-	guard
-		ctxBlockCat = 4
+		maxNumCoeff = 16
 	end
 	
-	Residual_block_Sent_4_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,3)] ] repeat 4
+	Residual_block_Sent_15_Coeff : action ==> VALUE : [ [level[i]: for int i in Integers(0,14)] ] repeat 15
 	guard
-		ctxBlockCat = 3
+		maxNumCoeff = 15
 	end
 	
-	Residual_Sent_16_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
-	guard
-		ctxBlockCat = 0 or ctxBlockCat = 1 or ctxBlockCat = 2 
-	end
 	
-	Residual_Sent_15_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
-	guard
-		ctxBlockCat = 4
-	end
-	
-	Residual_Sent_8_Zero: action ==> VALUE : [ [0: for int i in Integers(0,8) ] ] repeat 8
+	Residual_block_Sent_8_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,7)] ] repeat 8
 	guard
 		maxNumCoeff = 8
 	end
 	
-	Residual_Sent_4_Zero: action ==> VALUE : [ [0: for int i in Integers(0,4) ] ] repeat 4
+	Residual_block_Sent_4_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,3)] ] repeat 4
 	guard
-		ctxBlockCat = 3
+		maxNumCoeff = 4
+	end
+	
+	
+	
+	Residual_Sent_16_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
+	guard
+		maxNumCoeff = 16
+	end
+	
+	Residual_Sent_15_Zero: action ==> VALUE : [ [0: for int i in Integers(0,14) ] ] repeat 15
+	guard
+		maxNumCoeff = 15
+	end
+	
+	Residual_Sent_8_Zero: action ==> VALUE : [ [0: for int i in Integers(0,7) ] ] repeat 8
+	guard
+		maxNumCoeff = 8
+	end
+	
+	Residual_Sent_4_Zero: action ==> VALUE : [ [0: for int i in Integers(0,3) ] ] repeat 4
+	guard
+		maxNumCoeff = 4
 	end
 	
 	
@@ -8246,7 +8280,8 @@ actor Algo_Synp_AVC_FREXT()
 		Residual_return										( Residual_return_luma_AC_CABAC						) --> Residual_luma_inc_AC_4x4;
 		
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8				) --> Residual_luma_inc_AC_4x4;
-		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC			) --> Residual_luma_inc_AC_4x4;
+		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC_16			) --> Residual_luma_inc_AC_4x4;
+		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC_15			) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
 		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma;		
 		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
@@ -8254,7 +8289,8 @@ actor Algo_Synp_AVC_FREXT()
 		Residual_return										( Residual_return_chroma_DC							) --> Residual_chroma_DC_init;
 		Residual_return										( Residual_return_chroma_DC_CABAC					) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init						) --> Residual_chroma_DC_init;
-		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init_CABAC				) --> Residual_chroma_DC_init;
+		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init_CABAC_1				) --> Residual_chroma_DC_init;
+		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init_CABAC_2				) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_skip_chroma_DC							) --> Residual_chroma_AC_init;
 		Residual_chroma_AC_init								( Residual_chroma_AC_init							) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_CodedBlock4x4 					) --> Residual_block; // --> residual_block()
@@ -8306,6 +8342,7 @@ actor Algo_Synp_AVC_FREXT()
 		
 		//Sent Tokens		
 		Residual_CABAC_Sent_Coeff_Tokens					( Residual_block_Sent_16_Coeff						) --> Residual_return;
+		Residual_CABAC_Sent_Coeff_Tokens					( Residual_block_Sent_15_Coeff						) --> Residual_return;
 		Residual_CABAC_Sent_Coeff_Tokens					( Residual_block_Sent_8_Coeff						) --> Residual_return;
 		Residual_CABAC_Sent_Coeff_Tokens					( Residual_block_Sent_4_Coeff						) --> Residual_return;
 		
