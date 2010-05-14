@@ -99,6 +99,8 @@ public class ActorMerger implements INetworkTransformation {
 	private static final String ACTION_NAME = "static_action";
 
 	private static final String SCHEDULER_NAME = "isSchedulable_" + ACTION_NAME;
+	
+	private int actorIdx = 0;
 
 	private DirectedGraph<Vertex, Connection> graph;
 
@@ -171,7 +173,8 @@ public class ActorMerger implements INetworkTransformation {
 			Type type = new ListType(size, port.getType());
 			LocalVariable param = new LocalVariable(false, 0, new Location(),
 					port.getName(), null, null, type);
-			parameters.add("", new Location(), param.getName(), param);
+			if(!parameters.contains(param))
+				parameters.add("", new Location(), param.getName(), param);
 		}
 
 		Pattern outputPattern = action.getOutputPattern();
@@ -182,7 +185,8 @@ public class ActorMerger implements INetworkTransformation {
 			Type type = new ListType(size, port.getType());
 			LocalVariable parameter = new LocalVariable(false, 0,
 					new Location(), port.getName(), null, null, type);
-			parameters.add("", new Location(), parameter.getName(), parameter);
+			if(!parameters.contains(parameter))
+				parameters.add("", new Location(), parameter.getName(), parameter);
 		}
 
 		return proc;
@@ -474,20 +478,13 @@ public class ActorMerger implements INetworkTransformation {
 		stateVars = new OrderedMap<Variable>();
 		procs = new OrderedMap<Procedure>();
 
-		String name = "";
-
-		for (Vertex vertex : vertices) {
-			String id = vertex.getInstance().getId();
-			name += id;
-		}
-
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 		ActionList actions = new ActionList();
 		ActionList initializes = new ActionList();
 		ActionScheduler scheduler = new ActionScheduler(actions.getList(), null);
 
 		
-		Actor actor = new Actor(name, "", parameters, inputs,
+		Actor actor = new Actor("actor_"+actorIdx++, "", parameters, inputs,
 				outputs, stateVars, procs, actions.getList(),
 				initializes.getList(), scheduler, null);
 
@@ -500,16 +497,9 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	private void addStateVars() {
-		/*
-		 * for(Port port : inputsMap.values()) { stateVars.add("", new
-		 * Location(), port.getName(), port); } for(Port port :
-		 * outputsMap.values()) { stateVars.add("", new Location(),
-		 * port.getName(), port); }
-		 */
 		for (Variable var : bufferMap.values()) {
 			stateVars.add("", new Location(), var.getName(), var);
 		}
-
 	}
 
 	private void getOutputs(Set<Vertex> vertices) {
@@ -597,4 +587,5 @@ public class ActorMerger implements INetworkTransformation {
 
 		}
 	}
+	
 }

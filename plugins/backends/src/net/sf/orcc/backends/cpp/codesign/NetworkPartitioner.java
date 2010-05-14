@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.cpp.codesign;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +38,7 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.network.Connection;
@@ -47,7 +47,6 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
-import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
@@ -63,14 +62,9 @@ import org.jgrapht.graph.DirectedMultigraph;
  */
 
 public class NetworkPartitioner {
-
-	private File file;
-
 	/**
 	 * 
 	 */
-	private File folder;
-
 	private DirectedGraph<Vertex, Connection> graph;
 
 	private Map<Port, Vertex> incomingFanout;
@@ -83,18 +77,15 @@ public class NetworkPartitioner {
 
 	private int nbOutput;
 
-	private Network network;
-
 	private Map<Port, Map<String, Vertex>> outgoingFanout;
 
 	private Map<Connection, Port> outgoingPort = new HashMap<Connection, Port>();
 
 	private Map<Port, String> partitionMap = new HashMap<Port, String>();
+	
+	private List<Network> networks = new ArrayList<Network>();
 
-	public NetworkPartitioner(File folder, Network network, Boolean manageFanout) {
-		this.folder = folder;
-		this.network = network;
-		graph = network.getGraph();
+	public NetworkPartitioner(Boolean manageFanout) {
 		this.manageFanout = manageFanout;
 	}
 
@@ -170,8 +161,7 @@ public class NetworkPartitioner {
 			vertex = new Vertex("Input", port);
 			network.getGraph().addVertex(vertex);
 
-			network.getInputs().add(file.getAbsolutePath(), port.getLocation(),
-					port.getName(), port);
+			network.getInputs().add("", new Location(), port.getName(), port);
 
 			incomingFanout.put(srcPort, vertex);
 			incomingPort.put(connection, port);
@@ -204,13 +194,10 @@ public class NetworkPartitioner {
 		Port tgtPort = connection.getTarget();
 
 		Port port = new Port(tgtPort);
-		port.setName("output_" + nbOutput);
+		port.setName("output_" + nbOutput++);
 		Vertex vertex = new Vertex("Output", port);
 		network.getGraph().addVertex(vertex);
-		network.getOutputs().add(file.getAbsolutePath(), port.getLocation(),
-				port.getName(), port);
-
-		nbOutput++;
+		network.getOutputs().add("", new Location(), port.getName(), port);
 
 		if (!outgoingFanout.containsKey(srcPort) || !manageFanout) {
 
@@ -253,8 +240,6 @@ public class NetworkPartitioner {
 			Network network) throws OrccException {
 
 		String name = entry.getKey();
-		file = new File(folder.getAbsolutePath() + File.separator + name
-				+ ".xdf");
 
 		DirectedGraph<Vertex, Connection> graph = new DirectedMultigraph<Vertex, Connection>(
 				Connection.class);
@@ -278,16 +263,14 @@ public class NetworkPartitioner {
 
 		// adds variables of the previous flatten network to the sub-network
 		for (GlobalVariable var : network.getVariables()) {
-			GlobalVariable newVar = new GlobalVariable(var.getLocation(), var
+			GlobalVariable newVar = new GlobalVariable(new Location(), var
 					.getType(), var.getName(), var.getExpression());
 
-			variables.add(file.getAbsolutePath(), newVar.getLocation(), newVar
-					.getName(), newVar);
+			variables.add("", new Location(), newVar.getName(), newVar);
 		}
 
 		createConnections(entry.getValue(), subNetwork);
 
-		new XDFWriter(folder, subNetwork);
 		return subNetwork;
 	}
 
@@ -339,7 +322,7 @@ public class NetworkPartitioner {
 		return partName;
 	}
 
-	public List<Network> getSubnetworks() throws OrccException {
+	public List<Network> getSubnetworks(Network network) throws OrccException {
 		List<Network> subNetworks = new ArrayList<Network>();
 
 		for (Map.Entry<String, Set<Vertex>> entry : getPartitionSets()
@@ -354,12 +337,10 @@ public class NetworkPartitioner {
 	 *
 	 */
 
-	public void transform() throws OrccException {
+	public void transform(Network network) throws OrccException {
 		graph = network.getGraph();
 
-		Map<String, Set<Vertex>> partitions = new HashMap<String, Set<Vertex>>();
-
-		partitions = getPartitionSets();
+		Map<String, Set<Vertex>> partitions = getPartitionSets();
 
 		// Creates a copy of vertices of graph
 		Set<Vertex> vertices = new HashSet<Vertex>(graph.vertexSet());
@@ -370,12 +351,12 @@ public class NetworkPartitioner {
 
 			Network subNetwork = createPartition(entry, network);
 
-			Instance instance = new Instance(folder.getAbsolutePath(), entry
-					.getKey(), subNetwork.getName(),
-					new HashMap<String, Expression>(),
-					new HashMap<String, IAttribute>());
+			networks.add(subNetwork);
+			
+			Instance instance = new Instance(subNetwork.getName(), subNetwork);
 
 			Vertex vertex = new Vertex(instance);
+
 			graph.addVertex(vertex);
 
 			topHierNetworkVertices.put(entry.getKey(), vertex);
@@ -405,6 +386,10 @@ public class NetworkPartitioner {
 			}
 		}
 		graph.removeAllVertices(vertices);
+	}
+
+	public List<Network> getNetworks() {
+		return networks;
 	}
 
 }

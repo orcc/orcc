@@ -220,8 +220,7 @@ public class StaticSubsetDetector {
 				clusteredGraph).stronglyConnectedSets();
 
 		for (Set<Vertex> scc : sccs) {
-			int size = scc.size();
-			if (scc.remove(clusterVertex) && size > 1) {
+			if (scc.remove(clusterVertex) && scc.size() > 1) {
 				for (Vertex v : scc) {
 					IClass clasz = v.getInstance().getContentClass();
 					if (clasz.isSDF()) {

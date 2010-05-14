@@ -3,7 +3,7 @@ $if(instance.wrapper)$
 #include "wrapperaka.h"
 $elseif(instance.broadcast)$
 $else$
-#include "Actor_$instance.actor.name$.h"
+#include "$instance.actor.name$.h"
 $endif$
 >>
 

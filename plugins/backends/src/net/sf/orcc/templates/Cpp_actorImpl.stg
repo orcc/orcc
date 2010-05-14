@@ -93,8 +93,6 @@ $endif$
 >>
 
 ReadEnd(readEnd) ::= <<
-setReadEnd($actor.name$_$readEnd.port$);
-
 >>
 
 Return(return) ::= <<
@@ -124,8 +122,6 @@ $endif$
 >>
 
 WriteEnd(writeEnd) ::= <<
-setWriteEnd($actor.name$_$writeEnd.port$);
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

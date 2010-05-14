@@ -30,12 +30,13 @@ package net.sf.orcc.backends.cpp;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.cpp.codesign.NetworkPartitioner;
 import net.sf.orcc.backends.cpp.codesign.WrapperAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -56,16 +57,14 @@ public class CppBackendImpl extends AbstractBackend {
 
 	public static Boolean partitioning = false;
 
+	private NetworkPartitioner partitioner;
+
 	/**
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		if (args.length == 3) {
-			partitioning = Boolean.parseBoolean(args[2]);
-		}
-		String[] newArgs = { args[0], args[1] };
-		main(CppBackendImpl.class, newArgs);
+		main(CppBackendImpl.class, args);
 	}
 
 	private CppActorPrinter impl_printer;
@@ -76,27 +75,47 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		if (partitioning) {
-			path += File.separator + network.getName();
-			new File(path).mkdir();
+		boolean partition = getAttribute("net.sf.orcc.backends.partition",
+				false);
+		if (partition) {
+			partitioning = true;
+			partitioner = new NetworkPartitioner(true);
+			partitioner.transform(network);
+
 		}
+
+		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
+		if (classify) {
+			network.classifyActors();
+
+			boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
+					false);
+			if (normalize) {
+				network.normalizeActors();
+			}
+
+			boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
+			if (merge) {
+				network.mergeActors();
+			}
+		}
+
 		printer = new CppActorPrinter("Cpp_actorDecl");
 		impl_printer = new CppActorPrinter("Cpp_actorImpl");
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
+
 		printActors(network.getActors());
 	}
 
 	@Override
 	protected void printActor(Actor actor) throws OrccException {
 		try {
-			String outputName = path + File.separator + "Actor_"
-					+ actor.getName() + ".h";
+			String name = actor.getName();
+			String outputName = path + File.separator + name + ".h";
 			printer.printActor(outputName, actor);
-
-			outputName = path + File.separator + "Actor_" + actor.getName()
-					+ ".cpp";
+			outputName = path + File.separator + name + ".cpp";
 			impl_printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
@@ -111,22 +130,30 @@ public class CppBackendImpl extends AbstractBackend {
 			NetworkPrinter networkImplPrinter = new NetworkPrinter(
 					"Cpp_networkImpl");
 
-			// only for the codesign
+			List<Network> networks;
 			if (partitioning) {
-				new WrapperAdder().transform(network);
+				networks = partitioner.getNetworks();
+			} else {
+				networks = Arrays.asList(network);
 			}
 
-			String name = network.getName();
+			for (Network subnetwork : networks) {
 
-			String outputName = path + File.separator + "Network_" + name
-					+ ".h";
-			networkPrinter.printNetwork(outputName, network, false, fifoSize);
-			outputName = path + File.separator + "Network_" + name + ".cpp";
-			networkImplPrinter.printNetwork(outputName, network, false,
-					fifoSize);
+				if (partitioning) {
+					new WrapperAdder().transform(subnetwork);
+				}
 
-			List<Network> networks = new ArrayList<Network>();
-			networks.add(network);
+				String name = subnetwork.getName();
+
+				String outputName = path + File.separator + name + ".h";
+				networkPrinter.printNetwork(outputName, subnetwork, false,
+						fifoSize);
+				outputName = path + File.separator + name + ".cpp";
+				networkImplPrinter.printNetwork(outputName, subnetwork, false,
+						fifoSize);
+
+			}
+
 			new CppMainPrinter().printMain(path, networks, null);
 			new CppCMakePrinter().printCMake(path, networks);
 		} catch (IOException e) {
