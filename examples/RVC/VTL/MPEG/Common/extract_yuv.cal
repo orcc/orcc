@@ -1,8 +1,8 @@
-actor extract_yuv () int(size=16) Width, int(size=16) Height, uint(size=PIX_SZ) YUV ==>
-uint(size=PIX_SZ) Y , uint(size=PIX_SZ) U , uint(size=PIX_SZ) V :
+actor extract_yuv () int(size=16) Width, int(size=16) Height, uint(size=8) YUV ==>
+int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 
 // Port size declaration
-	int PIX_SZ = 8;
+	int PIX_SZ = 9;
 
 	//constant definition
 	int MAX_BLOCKSZ_Y = 16;
