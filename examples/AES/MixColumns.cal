@@ -1,0 +1,73 @@
+/*
+This FU is part of a CAL implementation of AES (Rijndael).
+
+To support parallel processing of multiple blocks, 
+ the output of each FU is expanded to include the round number.
+That is, each 16-byte block is expanded to 17-byte block,
+ whose first byte is the current round index of the block. 
+
+FU ID: MixColumns
+Function: This FU performs MixColumns process in each round of the encipher.
+
+Naming convention of input and output ports:
+1) IP = Input Port, OP = Output Port, PT = Plaintext;
+2) when there is a single port, named as "IP_abc" or "OP_abc";
+3) when there is multiple ports, named as "IPx_abc" or "OPx_abc", 
+   where "x" is a number to inform graphiti about the location of the port;
+4) when the meaning of the input/output ports are obvious, "_abc" is omitted from the port names.  
+
+Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010 
+*/
+
+actor MixColumns () uint(size=8) IP1_PT, uint(size=8) IP0_Key ==> uint(size=8) OP:
+	
+	int Nr := 10;
+	
+	get_Nr:
+	action IP0_Key:[x] ==>
+	do
+		Nr := 6 + rshift(x,2);
+	end
+
+	last_round: // If it is the last round, simply forward tokens to the next FU.
+	action IP1_PT:[x] repeat 17 ==> OP:[x] repeat 17 guard x[0]>=Nr end
+	
+	List(type:uint(size=8), size=17) y := [0 : for int i in Integers(1,17)];
+	List(type:uint(size=8), size=4) b := [0, 0, 0, 0];
+
+	// MixColumn based on simplified multiplifications.
+	procedure MixColumn (List(type:uint(size=8),size=4) a, int i)
+	begin
+		foreach int j in Integers(0,3) do
+			b[j] := lshift(a[j],1) mod 256;
+			if bitand(a[j],0x80)=0x80 then
+				b[j] := bitxor(b[j],0x1b);
+			end
+		end
+		y[i] := bitxor(bitxor(bitxor(bitxor(b[0],a[3]),a[2]),b[1]),a[1]);
+		y[i+1] := bitxor(bitxor(bitxor(bitxor(b[1],a[0]),a[3]),b[2]),a[2]);
+		y[i+2] := bitxor(bitxor(bitxor(bitxor(b[2],a[1]),a[0]),b[3]),a[3]);
+		y[i+3] := bitxor(bitxor(bitxor(bitxor(b[3],a[2]),a[1]),b[0]),a[0]);
+	end
+	
+	normal_round: // If it is not the last round, do MixColumns.
+	action IP1_PT:[x] repeat 17 ==> OP:[y] repeat 17
+	guard x[0]<Nr
+	var
+		int index := 1 // Start from the second byte.
+	do
+		y[0] := x[0];
+		foreach int i in Integers(0,3)
+		do
+			MixColumn([x[index],x[index+1],x[index+2],x[index+3]], index);
+			index := index + 4;
+		end
+	end
+	
+	schedule fsm initial:
+		initial        (get_Nr) --> working;
+		working  (normal_round) --> working;
+		working    (last_round) --> working;
+	end
+
+end

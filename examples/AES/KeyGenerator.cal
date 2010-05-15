@@ -1,0 +1,21 @@
+// This FU is used to send a key to the AES cipher. 
+
+actor KeyGenerator () ==> uint(size=8) Key :
+
+	int KeySize = 16;
+	List(type:uint(size=8), size=KeySize+1) K = [ // Key
+		KeySize,
+		0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f
+	];
+	
+	bool KeySent := false;
+
+	// Orcc does not allow a list sent out as a single token.
+	// So we have to send a number of bytes instead.
+	action ==> Key:[K] repeat KeySize+1
+	guard not KeySent
+	do
+		KeySent := true;
+	end
+	
+end

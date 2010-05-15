@@ -1,0 +1,43 @@
+/*
+This FU is part of a CAL implementation of AES (Rijndael).
+
+To support parallel processing of multiple blocks, 
+ the output of each FU is expanded to include the round number.
+That is, each 16-byte block is expanded to 17-byte block,
+ whose first byte is the current round index of the block. 
+
+FU ID: ShiftRows
+Function: This FU performs ShiftRows process in each round of the encipher.
+
+Naming convention of input and output ports:
+1) IP = Input Port, OP = Output Port;
+2) when there is a single port, named as "IP_abc" or "OP_abc";
+3) when there is multiple ports, named as "IPx_abc" or "OPx_abc", 
+   where "x" is a number to inform graphiti about the location of the port;
+4) when the meaning of the input/output ports are obvious, "_abc" is omitted from the port names.  
+
+Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010 
+*/
+
+actor ShiftRows () uint(size=8) IP ==> uint(size=8) OP:
+	
+	List(type:int, size=16) indices =
+	[ // Note that the plaintext is columnwise.
+		 0, 5,10,15,
+		 4, 9,14, 3,
+		 8,13, 2, 7,
+		12, 1, 6,11
+	];
+
+	List(type:uint(size=8), size=17) y := [0 : for int i in Integers(1,17)];
+
+	action IP:[x] repeat 17 ==> OP:[y] repeat 17
+	do
+		y[0] := x[0];
+		foreach int i in Integers(1,16)
+		do
+			y[i] := x[indices[i-1]+1];
+		end
+	end
+
+end
