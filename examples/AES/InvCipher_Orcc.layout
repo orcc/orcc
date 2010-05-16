@@ -3,7 +3,7 @@
    <vertices>
       <vertex id="AES Decipher" x="208" y="118"/>
       <vertex id="Source" x="57" y="70"/>
-      <vertex id="Display" x="392" y="128"/>
       <vertex id="KeyGenerator" x="57" y="185"/>
+      <vertex id="Plaintext" x="425" y="173"/>
    </vertices>
 </layout>
