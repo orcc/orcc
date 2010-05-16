@@ -82,8 +82,10 @@ actor Algo_Synp_AVC_FREXT()
 			uint(size=5) MbPartHeigth, 
 			int(size=16) MvRes, 
 			uint(size=1) MbIntraFlag, 
-			uint(size=5) RefReordering, 
-			uint(size=5) MMCO, 
+			uint(size=32) RefReordering, 
+			uint(size=32) MMCO,
+			uint(size=32) FramNumCurrPic,
+			int (size=32) MaxFrameNum,
 			uint(size=16) cbp_blk,
 			int(size=6) slice_alpha_c0_offset, 
 			int(size=6) slice_beta_offset,
@@ -4767,11 +4769,14 @@ actor Algo_Synp_AVC_FREXT()
 	end
 
 
-	read_SliceH_frame_num: action ==> MMCO:[num_ref_frames[sps_id], frame_num]
+	read_SliceH_frame_num: action ==> MMCO:[num_ref_frames[sps_id] ],FramNumCurrPic:[frame_num], MaxFrameNum:[ValMaxFrameNum]
 	guard
 		done_reading_bits(),first_mb_in_slice=0
+	var
+		int(size=32) ValMaxFrameNum
 	do
-		frame_num := read_result();
+		frame_num      := read_result();
+		ValMaxFrameNum := 1 << (log2_max_frame_num_minus4[sps_id] + 4);
 	end
 
 	skip_read_SliceH_frame_num: action ==> 
