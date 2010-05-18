@@ -29,9 +29,9 @@
 package net.sf.orcc.frontend;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
@@ -202,7 +202,7 @@ public class Frontend {
 
 		try {
 			actorPath = new File(actorPath + ".cal").getCanonicalPath();
-			InputStream in = new FileInputStream(actorPath);
+			Reader in = new FileReader(actorPath);
 			IParseResult result = parser.parse(in);
 			EObject root = result.getRootASTElement();
 			aActor = (net.sf.orcc.cal.cal.Actor) root;
