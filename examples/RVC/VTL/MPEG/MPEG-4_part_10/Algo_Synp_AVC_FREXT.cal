@@ -82,7 +82,8 @@ actor Algo_Synp_AVC_FREXT()
 			uint(size=5) MbPartHeigth, 
 			int(size=16) MvRes, 
 			uint(size=1) MbIntraFlag, 
-			uint(size=32) RefReordering, 
+			uint(size=32) RefReordering,
+			uint(size=5)  Nb_RefFrame_l0,
 			uint(size=32) MMCO,
 			uint(size=32) FramNumCurrPic,
 			int (size=32) MaxFrameNum,
@@ -5139,8 +5140,8 @@ actor Algo_Synp_AVC_FREXT()
 		ref_pic_idx :=0 ;
 	end
 
-	read_SliceH_ref_pic_list_reordering_flag_l0_done: action ==> RefReordering:[ref_pic_list_reordering_flag_l0]
-	guard
+	read_SliceH_ref_pic_list_reordering_flag_l0_done: action ==> RefReordering:[ref_pic_list_reordering_flag_l0], Nb_RefFrame_l0:[slice_num_ref_idx_l0_active_minus1 + 1]
+	guard 
 		done_reading_bits(), first_mb_in_slice=0
 	do
 		ref_pic_list_reordering_flag_l0 := read_result();
@@ -5270,7 +5271,7 @@ actor Algo_Synp_AVC_FREXT()
 	//end if
 
 	//else (slice_type % 5 == 2 || slice_type % 5 == 4)
-	read_SliceH_skip_ref_pic_list_reordering: action ==> RefReordering:[0]
+	read_SliceH_skip_ref_pic_list_reordering: action ==> RefReordering:[0], Nb_RefFrame_l0:[0]
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI, first_mb_in_slice=0
 	end
