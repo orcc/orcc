@@ -390,14 +390,14 @@ actor Algo_RefList ()
 		end
 
 	schedule fsm  read_num_ref_frames:
-		read_num_ref_frames               (read_num_ref_frames                 )--> read_ref_pic_list_reordering_flag;
+		read_num_ref_frames               (read_num_ref_frames                 )--> ReadSizeLists;
 
 		/* there isn't list to sent */
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_0 )--> send_refList;
 		send_refList                      (InitRefList_zero                    )--> ReadSizeLists;
 		send_refList                      (InitRefList_not0                    )--> RefListTabSent;
 		RefListTabSent                    (SendRefList                         )--> RefListTabSent;
-		RefListTabSent                    (SendRefListDone                     )--> ReadSizeLists;
+		RefListTabSent                    (SendRefListDone                     )--> read_num_ref_frames;
 
 		/* there is list 0 to sent */
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_1 )--> read_reordering_of_pic_nums_idc;
@@ -405,14 +405,14 @@ actor Algo_RefList ()
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_2   )--> read_reordering_of_pic_nums_idc;
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_3   )--> IDC3SendRefList;
 		IDC3SendRefList                   (IDC3SendRefList                     )--> IDC3SendRefList;
-		IDC3SendRefList                   (IDC3SendRefListDone                 )--> ReadSizeLists;
+		IDC3SendRefList                   (IDC3SendRefListDone                 )--> read_num_ref_frames;
 
 
 		ReadSizeLists                     (ReadSizeLists                       )-->ReadShortTermList;
 		ReadShortTermList                 (ReadShortTermList                   )-->ReadShortTermList;
 		ReadShortTermList                 (ReadShortTermList_Done              )-->ReadLongTermList;
 		ReadLongTermList                  (ReadLongTermList                    )-->ReadLongTermList;
-		ReadLongTermList                  (ReadLongTermList_Done               )-->read_num_ref_frames;
+		ReadLongTermList                  (ReadLongTermList_Done               )-->read_ref_pic_list_reordering_flag;
 	end
 
 	priority

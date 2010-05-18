@@ -434,8 +434,8 @@ actor Algo_MMCO ()
 	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames  (read_num_ref_frames                 )--> FillFalseRefFrame;
 
-		FillFalseRefFrame    (FillFalseRefFrame                   )--> check_IDR;
-		FillFalseRefFrame    (skip_FillFalseRefFrame              )--> check_IDR;
+		FillFalseRefFrame    (FillFalseRefFrame                   )--> SendSizeLists;
+		FillFalseRefFrame    (skip_FillFalseRefFrame              )--> SendSizeLists;
 
 		/* Get values about memory_management_control_operation */
 		check_IDR         (read_IDR               )--> update_idx;
@@ -444,13 +444,13 @@ actor Algo_MMCO ()
 		MMCO_opcode       (MMCO_opcode            )--> MMCO_opcode;
 		MMCO_opcode       (MMCO_opcode_v0         )--> update_idx;
 
-		update_idx        (update_idx             )--> SendSizeLists;
+		update_idx        (update_idx             )--> SendSizeDelList;
 
 		SendSizeLists     (SendSizeLists          )-->SendShortTermList;
 		SendShortTermList (SendShortTermList      )-->SendShortTermList;
 		SendShortTermList (SendShortTermList_Done )-->SendLongTermList;
 		SendLongTermList  (SendLongTermList       )-->SendLongTermList;
-		SendLongTermList  (SendLongTermList_Done  )-->SendSizeDelList;
+		SendLongTermList  (SendLongTermList_Done  )-->check_IDR;
 
 		SendSizeDelList   (SendSizeDelList        )--> SendDelList;
 		SendDelList       (SendDelList            )--> SendDelList;
