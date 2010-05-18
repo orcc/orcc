@@ -61,8 +61,10 @@ actor Algo_RefList ()
 	uint(size=32)  FraNum,
 	int (size=32) MaxFrameNum,
 	uint(size=32) ShortTermList,
+	uint(size=5)  SzSTList,
 	uint(size=32) LongTermList,
-	uint(size=32) Nb_LT_Frame
+	uint(size=5) Nb_LT_Frame,
+	uint(size=5) Nb_RefFrame
 		==>
 	int(size=32) RefList
 		:
@@ -79,8 +81,8 @@ actor Algo_RefList ()
 	int           pred               := 0;
 	int (size=32) ValMaxFrameNum     := 0;
 	uint(size=4)  index              := 0;
-	uint(size=4)  short_term_count   := 0;
-	uint(size=4)  long_term_count    := 0;
+	uint(size=5)  short_term_count   := 0;
+	uint(size=5)  long_term_count    := 0;
 	uint(size=4)  long_term_idx      := 0;
 	int           CounterRefList     := 0;
 	int           CounterRefListTab  := 0;
@@ -89,6 +91,7 @@ actor Algo_RefList ()
 	bool          EndInitSentRefList := false;
 	uint(size=5)  Nb_short_term_read := 0;
 	uint(size=5)  Nb_long_term_read  := 0;
+	uint(size=5)  NumMaxListRefFrame := 0;
 
 
 	read_num_ref_frames: action
@@ -102,15 +105,23 @@ actor Algo_RefList ()
 
 
 	read_ref_pic_list_reordering_flag_0: action 
-			RefReordering:[v]
+			RefReordering:[v],
+			Nb_RefFrame:[ValIDxMax]
 				==>
 		guard
 			v = 0
+		do
+			if(ValIDxMax < short_term_count + long_term_count) then
+				NumMaxListRefFrame := ValIDxMax;
+			else
+				NumMaxListRefFrame := short_term_count + long_term_count;
+			end
 		end
 
 
 	read_ref_pic_list_reordering_flag_1: action 
-			RefReordering:[v]
+			RefReordering:[v],
+			Nb_RefFrame:[ValIDxMax]
 				==> 
 		guard
 			v = 1
@@ -118,6 +129,11 @@ actor Algo_RefList ()
 			int ListIndex := 0,
 			int(size=32) frame_num_short_term
 		do
+			if(ValIDxMax < short_term_count + long_term_count) then
+				NumMaxListRefFrame := ValIDxMax;
+			else
+				NumMaxListRefFrame := short_term_count + long_term_count;
+			end
 			pred  := frame_num;
 			index := 0;
 			if (short_term_count != 0) then
@@ -231,8 +247,8 @@ actor Algo_RefList ()
 		guard 
 			a = 3
 		do
-			RefListTab[0] := short_term_count + long_term_count;
-			foreach int s in Integers(0, short_term_count + long_term_count - 1)
+			RefListTab[0] := NumMaxListRefFrame;
+			foreach int s in Integers(0, NumMaxListRefFrame - 1)
 			do
 				RefListTab[s + 1] := reordering_ref_list[s];
 			end
@@ -255,7 +271,7 @@ actor Algo_RefList ()
 
 	IDC3SendRefListDone: action ==>
 		guard
-			CounterRefListTab = short_term_count + long_term_count + 1
+			CounterRefListTab = NumMaxListRefFrame + 1
 		do
 			CounterRefListTab := 0;
 			EndInitIdc3       := false;
@@ -300,8 +316,8 @@ actor Algo_RefList ()
 					end
 				end
 			end
-			RefListSent[0] := short_term_count + long_term_count;
-			foreach int s in Integers(0, short_term_count + long_term_count - 1)
+			RefListSent[0] := NumMaxListRefFrame;
+			foreach int s in Integers(0, NumMaxListRefFrame - 1)
 			do
 				RefListSent[s + 1] := reflist[s];	
 			end
@@ -324,7 +340,7 @@ actor Algo_RefList ()
 
 	SendRefListDone: action ==>
 		guard
-			CounterRefListTab = short_term_count + long_term_count + 1
+			CounterRefListTab = NumMaxListRefFrame + 1
 		do
 			CounterRefListTab  := 0;
 			EndInitSentRefList := false;
@@ -332,7 +348,7 @@ actor Algo_RefList ()
 
 
 	ReadSizeLists: action
-			ShortTermList:[size_short_term_list],
+			SzSTList   :[size_short_term_list],
 			Nb_LT_Frame:[val_long_term_count]
 				==>
 		do

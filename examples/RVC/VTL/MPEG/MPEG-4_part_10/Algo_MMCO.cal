@@ -63,9 +63,9 @@ actor Algo_MMCO ()
 		==>
 	int (size=32) DelList,
 	uint(size=32) ShortTermList,
+	uint(size=5)  SzSTList,
 	uint(size=32) LongTermList,
-	uint(size=32) Nb_LT_Frame,
-	uint(size=32) LTMaxIdx
+	uint(size=5) Nb_LT_Frame
 		:
 
 	List(type:int(size=32), size=16) short_term_list        := [0     : for int s in Integers(0,15)];
@@ -365,8 +365,8 @@ actor Algo_MMCO ()
 
 	SendSizeLists: action 
 				==>
-			ShortTermList:[short_term_count],
-			Nb_LT_Frame  :[long_term_count]
+			SzSTList    :[short_term_count],
+			Nb_LT_Frame :[long_term_count]
 		do
 			Nb_short_term_sent := 0;
 		end
@@ -438,23 +438,23 @@ actor Algo_MMCO ()
 		FillFalseRefFrame    (skip_FillFalseRefFrame              )--> check_IDR;
 
 		/* Get values about memory_management_control_operation */
-		check_IDR            (read_IDR                            )--> update_idx;
-		check_IDR            (read_not_IDR_not_MMCO               )--> update_idx;
-		check_IDR            (read_not_IDR_MMCO                   )--> MMCO_opcode;
-		MMCO_opcode          (MMCO_opcode                         )--> MMCO_opcode;
-		MMCO_opcode          (MMCO_opcode_v0                      )--> update_idx;
+		check_IDR         (read_IDR               )--> update_idx;
+		check_IDR         (read_not_IDR_not_MMCO  )--> update_idx;
+		check_IDR         (read_not_IDR_MMCO      )--> MMCO_opcode;
+		MMCO_opcode       (MMCO_opcode            )--> MMCO_opcode;
+		MMCO_opcode       (MMCO_opcode_v0         )--> update_idx;
 
-		update_idx           (update_idx                          )--> SendSizeLists;
+		update_idx        (update_idx             )--> SendSizeLists;
 
-		SendSizeLists (SendSizeLists                              )-->SendShortTermList;
-		SendShortTermList(SendShortTermList                       )-->SendShortTermList;
-		SendShortTermList(SendShortTermList_Done                  )-->SendLongTermList;
-		SendLongTermList(SendLongTermList                         )-->SendLongTermList;
-		SendLongTermList(SendLongTermList_Done                    )-->SendSizeDelList;
+		SendSizeLists     (SendSizeLists          )-->SendShortTermList;
+		SendShortTermList (SendShortTermList      )-->SendShortTermList;
+		SendShortTermList (SendShortTermList_Done )-->SendLongTermList;
+		SendLongTermList  (SendLongTermList       )-->SendLongTermList;
+		SendLongTermList  (SendLongTermList_Done  )-->SendSizeDelList;
 
-		SendSizeDelList                   (SendSizeDelList                     )--> SendDelList;
-		SendDelList                       (SendDelList                         )--> SendDelList;
-		SendDelList                       (SendDelListDone                     )--> read_num_ref_frames;
+		SendSizeDelList   (SendSizeDelList        )--> SendDelList;
+		SendDelList       (SendDelList            )--> SendDelList;
+		SendDelList       (SendDelListDone        )--> read_num_ref_frames;
 	end
 
 	priority
