@@ -312,7 +312,8 @@ actor Algo_RefList ()
 				foreach int i in Integers(0, 15)
 				do
 					if (long_term_list[i] != -1) then 
-						reflist[ListIndex + i] := long_term_list[i]; 
+						reflist[ListIndex] := long_term_list[i];
+						ListIndex          := ListIndex + 1;
 					end
 				end
 			end
