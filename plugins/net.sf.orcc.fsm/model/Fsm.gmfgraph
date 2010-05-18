@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmfgraph:Canvas xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmfgraph="http://www.eclipse.org/gmf/2006/GraphicalDefinition" name="cal">
+  <figures name="Default">
+    <figures xsi:type="gmfgraph:PolylineDecoration" name="TransitionSourceTargetDecoration"/>
+    <figures xsi:type="gmfgraph:PolylineDecoration" name="TransitionTargetTargetDecoration"/>
+    <descriptors name="TransitionSourceFigure">
+      <actualFigure xsi:type="gmfgraph:PolylineConnection" name="TransitionSourceFigure" targetDecoration="//@figures.0/@figures.0"/>
+    </descriptors>
+    <descriptors name="TransitionTargetFigure">
+      <actualFigure xsi:type="gmfgraph:PolylineConnection" name="TransitionTargetFigure" targetDecoration="//@figures.0/@figures.1"/>
+    </descriptors>
+    <descriptors name="StateFigure">
+      <actualFigure xsi:type="gmfgraph:Rectangle" name="StateFigure">
+        <layout xsi:type="gmfgraph:FlowLayout"/>
+        <children xsi:type="gmfgraph:Label" name="StateNameFigure" text="&lt;...>"/>
+      </actualFigure>
+      <accessors figure="//@figures.0/@descriptors.2/@actualFigure/@children.0"/>
+    </descriptors>
+  </figures>
+  <nodes name="State" figure="StateFigure"/>
+  <connections name="TransitionSource" figure="TransitionSourceFigure"/>
+  <connections name="TransitionTarget" figure="TransitionTargetFigure"/>
+  <labels name="StateName" figure="StateFigure" accessor="//@figures.0/@descriptors.2/@accessors.0"/>
+</gmfgraph:Canvas>
