@@ -107,7 +107,7 @@ public class CalLinkingService extends DefaultLinkingService {
 		Function function = getFunction(name);
 		if (function != null) {
 			Actor actor = getActor(context);
-			actor.getFunctions().add(function);
+			actor.getBuiltinFunctions().add(function);
 			return Collections.singletonList((EObject) function);
 		}
 
@@ -128,7 +128,7 @@ public class CalLinkingService extends DefaultLinkingService {
 		Procedure procedure = getProcedure(name);
 		if (procedure != null) {
 			Actor actor = getActor(context);
-			actor.getProcedures().add(procedure);
+			actor.getBuiltinProcedures().add(procedure);
 			return Collections.singletonList((EObject) procedure);
 		}
 

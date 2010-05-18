@@ -18,16 +18,41 @@ process(EClassifier this) :
 
 process(EClass this) :
 	switch (this.name) {
+		case "Actor": (
+			// add a transient list of built-in functions to Actor class 
+			let ftype = (EClass) ePackage.eContents.selectFirst(e|((EClass) e).name == "Function") :
+			let ptype = (EClass) ePackage.eContents.selectFirst(e|((EClass) e).name == "Procedure") :
+			let builtinFunctions = new EReference :
+			let builtinProcedures = new EReference :
+
+			builtinFunctions.setContainment(true) ->
+			builtinFunctions.setEType(ftype) ->
+			builtinFunctions.setName("builtinFunctions") ->
+			builtinFunctions.setTransient(true) ->
+			builtinFunctions.setLowerBound(0) ->
+			builtinFunctions.setUpperBound(-1) ->
+			this.eStructuralFeatures.add(builtinFunctions) ->
+
+			builtinProcedures.setContainment(true) ->
+			builtinProcedures.setEType(ptype) ->
+			builtinProcedures.setName("builtinProcedures") ->
+			builtinProcedures.setTransient(true) ->
+			builtinProcedures.setLowerBound(0) ->
+			builtinProcedures.setUpperBound(-1) ->
+			this.eStructuralFeatures.add(builtinProcedures)
+        )
+
 		case "Schedule": (
-			// make schedule contain the list of states referenced by transitions 
+			// add a transient list of states referenced by transitions to Schedule class 
 			let etype = (EClass) ePackage.eContents.selectFirst(e|((EClass) e).name == "State") :
-			let states = new EReference :
-			states.setContainment(true) ->
-			states.setEType(etype) ->
-			states.setName("states") ->
-			states.setLowerBound(0) ->
-			states.setUpperBound(-1) ->
-			this.eStructuralFeatures.add(states)
+			let field = new EReference :
+			field.setContainment(true) ->
+			field.setEType(etype) ->
+			field.setName("states") ->
+			field.setTransient(true) ->
+			field.setLowerBound(0) ->
+			field.setUpperBound(-1) ->
+			this.eStructuralFeatures.add(field)
         )
         
 		case "VariableReference": (

@@ -10,7 +10,7 @@ generate cal "http://orcc.sf.net/cal/Cal"
 
 Actor:
 	(imports+=Import)*
-	'actor' name=ID ('[' ']')?
+	'actor' name=ID
 		'(' (parameters += Parameter (',' parameters += Parameter)*)? ')'
 		(inputs += Port (',' inputs += Port)*)? '==>'
 		(outputs += Port (',' outputs += Port)*)? ':'
@@ -29,8 +29,8 @@ Actor:
 
 Port: type=Type name=ID;
 
-Import returns Tag:
-	'import' ('all' Tag | Tag) ';';
+Import:
+	'import' ('all' tag=Tag | tag=Tag ('=' id = ID)?) ';';
 
 Function:
 	'function' name=ID
