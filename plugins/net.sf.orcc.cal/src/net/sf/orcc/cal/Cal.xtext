@@ -29,7 +29,7 @@ Actor:
 
 Port: type=Type name=ID;
 
-Import:
+Import returns Tag:
 	'import' ('all' Tag | Tag) ';';
 
 Function:
