@@ -88,20 +88,6 @@ actor Algo_MMCO ()
 	uint(size=4)  long_term_max_idx  := 0;
 
 
-
-	first_read_num_ref_frames: action
-			MMCO       :[ValNumRefFrame],
-			FraNum     :[ValFrame_Num],
-			MaxFrameNum:[MaxFrNu]
-				==>
-		do
-			num_ref_frames := ValNumRefFrame;
-			ValMaxFrameNum := MaxFrNu;
-			last_frame_num := MaxFrNu - 1;
-			frame_num      := ValFrame_Num;
-		end
-
-
 	read_num_ref_frames: action
 			MMCO:[ValNumRefFrame],
 			FraNum:[ValFrame_Num],
@@ -444,8 +430,7 @@ actor Algo_MMCO ()
 		end
 
 
-	schedule fsm  first_read_num_ref_frames:
-		first_read_num_ref_frames (first_read_num_ref_frames           )--> FillFalseRefFrame;
+	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames       (read_num_ref_frames                 )--> FillFalseRefFrame;
 
 		FillFalseRefFrame    (FillFalseRefFrame                   )--> SendSizeLists;
