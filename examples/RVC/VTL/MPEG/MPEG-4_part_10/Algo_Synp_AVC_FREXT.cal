@@ -184,8 +184,8 @@ actor Algo_Synp_AVC_FREXT()
 	bool PcmAlignementZeroBitDone := false;
 	bool PcmSampleLumaDone := false;
 	bool PcmSampleChromaDone := false;
-
-	
+	bool SentChromaZeros := false;
+	bool SentLumaDCZeros := false;
 	//CABAC SE
 	uint (size = 1) coded_block_flag;
 	
@@ -7045,6 +7045,8 @@ actor Algo_Synp_AVC_FREXT()
 	Residual_return_luma_DC_CABAC: action ==> 
 	guard
 		leveltype=0 and IS_CABAC()
+	do
+		SentLumaDCZeros := true;
 	end
 
 	//else
@@ -7192,7 +7194,7 @@ actor Algo_Synp_AVC_FREXT()
 	//end if
 	*/
 
-	Residual_luma_skip_AC_CAVLC: action ==>
+	Residual_luma_skip_AC_CAVLC: action ==> 
 	guard
 		i8x8 = 4
 	end
@@ -7232,6 +7234,18 @@ actor Algo_Synp_AVC_FREXT()
 		luma4x4BlkIdx := 0;
 	end
 
+	Residual_return_DC_Luma_Sent_Zero: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16
+	guard
+		SentLumaDCZeros
+	do
+		SentLumaDCZeros := false;
+	end
+	
+	Residual_return_DC_Luma_Sent_Zero_Skip: action ==>
+	guard
+		not SentLumaDCZeros
+	end
+	
 	// for( iCbCr = 0; iCbCr < 2; iCbCr++ )
 	//if( ( CodedBlockPatternChroma & 3 ) && startIdx = = 0 ) // chroma DC residual present
 	Residual_chroma_DC_init: action ==>
@@ -7347,6 +7361,7 @@ actor Algo_Synp_AVC_FREXT()
 		if i4x4 = 4 then 
 			i4x4 := 0; 
 			i8x8 := i8x8 +1; 
+			SentChromaZeros := true;
 		end
 		
 		if i8x8 = NumC8x8 then 
@@ -7355,6 +7370,17 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
+	Residual_return_Chroma_AC_CABAC_Sent_4_Zero: action ==> VALUE:[[0: for int i in Integers(0,3)]] repeat 4 
+	guard
+		SentChromaZeros
+	do
+		SentChromaZeros := false;
+	end
+	
+	Residual_return_Chroma_AC_CABAC_Sent_4_Zero_Skip: action ==>
+	guard
+		not SentChromaZeros
+	end
 
 	// else
 	Residual_chroma_AC_skip_CodedBlock4x4: action ==> LAST: [true]
@@ -8289,7 +8315,9 @@ actor Algo_Synp_AVC_FREXT()
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC_15			) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
 		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma;		
-		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
+		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_Sent_Luma_DC_Zeros;
+		Residual_Sent_Luma_DC_Zeros							( Residual_return_DC_Luma_Sent_Zero					) --> Residual_chroma_DC_init;
+		Residual_Sent_Luma_DC_Zeros							( Residual_return_DC_Luma_Sent_Zero_Skip			) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_chroma_DC_init							) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_chroma_DC							) --> Residual_chroma_DC_init;
 		Residual_return										( Residual_return_chroma_DC_CABAC					) --> Residual_chroma_DC_init;
@@ -8300,7 +8328,9 @@ actor Algo_Synp_AVC_FREXT()
 		Residual_chroma_AC_init								( Residual_chroma_AC_init							) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_CodedBlock4x4 					) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_chroma_AC							) --> Residual_chroma_AC_CodedBlock4x4;
-		Residual_return										( Residual_return_chroma_AC_CABAC					) --> Residual_chroma_AC_CodedBlock4x4;
+		Residual_return										( Residual_return_chroma_AC_CABAC					) --> Sent_4_Zero;
+		Sent_4_Zero											( Residual_return_Chroma_AC_CABAC_Sent_4_Zero		) --> Residual_chroma_AC_CodedBlock4x4;
+		Sent_4_Zero											( Residual_return_Chroma_AC_CABAC_Sent_4_Zero_Skip	) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4 			) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4_CABAC 			) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_skip_chroma_AC							) --> SliceD_update; 
