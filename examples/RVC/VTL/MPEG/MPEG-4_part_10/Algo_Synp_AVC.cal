@@ -80,7 +80,7 @@ actor Algo_Synp_AVC()
 			uint(size=5) MbPartHeigth, 
 			int(size=16) MvRes, 
 			uint(size=1) MbIntraFlag, 
-			uint(size=32) RefReordering,
+			uint(size=31) RefReordering,
 			uint(size=5)  Nb_RefFrame_l0,
 			uint(size=31) MMCO,
 			uint(size=5)  NumRefFrame,
