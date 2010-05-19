@@ -17,15 +17,56 @@ open Ast2ir_util
 open Calir
 open IR
 
+let format_of_expr env vars graph node expr =
+	let ctx = Ast2ir_expr.mk_context () in
+	
+	let rec aux left expr =
+		match expr with
+		| Calast.ExprBOp (_, e1, Calast.BOpPlus, e2) when left ->
+			let (env, vars, node, exprs) = aux true e1 in
+			let (env, vars, node, expr) =
+				Ast2ir_expr.ir_of_expr env vars graph node ctx e2
+			in
+			(env, vars, node, exprs @ [expr])
+		
+		| _ ->
+			let (env, vars, node, expr) =
+				Ast2ir_expr.ir_of_expr env vars graph node ctx expr
+			in
+			(env, vars, node, [expr])
+	in
+	aux true expr
+
+let mk_print env graph node loc parameters =
+	let proc = Ast2ir_util.ir_of_proc_name env loc "print" in
+	let call = mk_node_loc loc (Call (None, proc, parameters)) in
+	CFG.add_edge graph node call;
+	call
+
+let ir_of_print env vars graph node loc parameters =
+	let (env, vars, node, parameters) =
+		match parameters with
+		| [] -> (env, vars, node, [])
+		| [expr] -> format_of_expr env vars graph node expr
+		| _ -> Asthelper.failwith loc "print only accepts at most one argument"
+	in
+	(env, vars, mk_print env graph node loc parameters)
+
+let ir_of_println env vars graph node loc parameters =
+	let (env, vars, node, parameters) =
+		match parameters with
+		| [] -> (env, vars, node, [])
+		| [expr] -> format_of_expr env vars graph node expr
+		| _ -> Asthelper.failwith loc "println only accepts at most one argument"
+	in
+	let parameters = (parameters @ [ExprStr (loc, "\\n")]) in 
+	(env, vars, mk_print env graph node loc parameters)
+
 (*****************************************************************************)
 (*****************************************************************************)
 (*****************************************************************************)
 (* conversion of statements. During this conversion, variables declared *)
 (* in inner blocks are moved up at the action/procedure scope. *)
-
-let ir_of_println env vars node loc name parameters =
-	ignore (loc, name, parameters);
-	(env, vars, node)
 
 (** ir_of_store converts an assignment to a store. It is called when var_def
 is a List or a global. *)
@@ -91,17 +132,18 @@ let ir_of_instrs env vars graph node instrs =
 						(env, vars, Ast2ir_expr.mk_assign graph node var_def expr))
 
 			| Calast.InstrCall (loc, name, parameters) ->
-				if name = "println" then
-					ir_of_println env vars node loc name parameters
-				else
-					let ctx = Ast2ir_expr.mk_context () in
-					let (env, vars, node, parameters) =
-						Ast2ir_expr.ir_of_expr_list env vars graph node ctx parameters
-					in
-					let proc = Ast2ir_util.ir_of_proc_name env loc name in
-					let call = mk_node_loc loc (Call (None, proc, parameters)) in
-					CFG.add_edge graph node call;
-					(env, vars, call))
+				match name with
+					| "print" -> ir_of_print env vars graph node loc parameters
+					| "println" -> ir_of_println env vars graph node loc parameters
+					| _ ->
+						let ctx = Ast2ir_expr.mk_context () in
+						let (env, vars, node, parameters) =
+							Ast2ir_expr.ir_of_expr_list env vars graph node ctx parameters
+						in
+						let proc = Ast2ir_util.ir_of_proc_name env loc name in
+						let call = mk_node_loc loc (Call (None, proc, parameters)) in
+						CFG.add_edge graph node call;
+						(env, vars, call))
 	(env, vars, node) instrs
 
 (** [ir_of_stmts_rec env vars stmts] transforms the [Calast.stmt list] to

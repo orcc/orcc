@@ -110,7 +110,7 @@ let mk_env () =
 	{	bindings = Asthelper.SM.empty;
 		suffixes = Asthelper.SH.create 50 }
 	[
-		("println", [mk_param "msg" TypeStr], TypeVoid)
+		("print", [], TypeVoid) (* print takes any number of arguments *)
 	]
 
 let mk_tmp env vars typ =
