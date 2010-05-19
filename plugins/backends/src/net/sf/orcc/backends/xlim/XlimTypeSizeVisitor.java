@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim;
 import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.FloatType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -136,6 +137,12 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 *            Void type
 	 */
 	public void visit(VoidType type) {
+	}
+
+	@Override
+	public void visit(FloatType type) {
+		element.setAttribute(SIZE, "32");
+		element.setAttribute(TYPENAME, FLOAT);
 	}
 
 }

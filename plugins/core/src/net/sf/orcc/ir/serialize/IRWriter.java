@@ -100,6 +100,7 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.FloatType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -489,6 +490,11 @@ public class IRWriter {
 		}
 
 		@Override
+		public Object interpret(FloatType type) {
+			return FloatType.NAME;
+		}
+
+		@Override
 		public Object interpret(IntType type) {
 			JSONArray array = new JSONArray();
 			array.put(IntType.NAME);
@@ -673,13 +679,13 @@ public class IRWriter {
 		obj.put(KEY_NAME, actor.getName());
 		obj.put(IRConstants.KEY_INPUTS, writePorts(actor.getInputs()));
 		obj.put(IRConstants.KEY_OUTPUTS, writePorts(actor.getOutputs()));
-		obj.put(IRConstants.KEY_STATE_VARS, writeStateVariables(actor
-				.getStateVars()));
+		obj.put(IRConstants.KEY_STATE_VARS,
+				writeStateVariables(actor.getStateVars()));
 		obj.put(IRConstants.KEY_PROCEDURES, writeProcedures(actor.getProcs()));
 
 		obj.put(IRConstants.KEY_ACTIONS, writeActions(actor.getActions()));
-		obj.put(IRConstants.KEY_INITIALIZES, writeActions(actor
-				.getInitializes()));
+		obj.put(IRConstants.KEY_INITIALIZES,
+				writeActions(actor.getInitializes()));
 
 		array = writeActionScheduler(actor.getActionScheduler());
 		obj.put(IRConstants.KEY_ACTION_SCHED, array);

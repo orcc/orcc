@@ -75,6 +75,13 @@ public interface Type {
 	public boolean isBool();
 
 	/**
+	 * Returns true if this type is <tt>float</tt>.
+	 * 
+	 * @return true if this type is <tt>float</tt>
+	 */
+	public boolean isFloat();
+
+	/**
 	 * Returns true if this type is <tt>int</tt>.
 	 * 
 	 * @return true if this type is <tt>int</tt>

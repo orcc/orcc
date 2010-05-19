@@ -38,6 +38,8 @@ public interface TypeInterpreter {
 
 	public Object interpret(BoolType type);
 
+	public Object interpret(FloatType type);
+
 	public Object interpret(IntType type);
 
 	public Object interpret(ListType type);

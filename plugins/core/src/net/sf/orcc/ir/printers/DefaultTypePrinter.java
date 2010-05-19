@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.printers;
 
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.FloatType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
@@ -61,6 +62,11 @@ public class DefaultTypePrinter implements TypeVisitor {
 	@Override
 	public void visit(BoolType type) {
 		builder.append("bool");
+	}
+
+	@Override
+	public void visit(FloatType type) {
+		builder.append("float");
 	}
 
 	@Override

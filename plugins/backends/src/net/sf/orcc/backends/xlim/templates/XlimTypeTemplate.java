@@ -35,6 +35,7 @@ package net.sf.orcc.backends.xlim.templates;
  */
 public interface XlimTypeTemplate {
 	public static final String BOOL = "bool";
+	public static final String FLOAT = "float";
 	public static final String INT = "int";
 	public static final String LIST = "List";
 	public static final String STRING = "String";

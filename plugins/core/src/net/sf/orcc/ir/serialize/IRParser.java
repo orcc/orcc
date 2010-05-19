@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir.serialize;
 
+import static net.sf.orcc.ir.Procedure.print;
 import static net.sf.orcc.ir.serialize.IRConstants.BINARY_EXPR;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTIONS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
@@ -82,7 +83,6 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.consts.AbstractConstant;
 import net.sf.orcc.ir.consts.BoolConst;
 import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.consts.ListConst;
@@ -155,6 +155,16 @@ public class IRParser {
 
 	private Scope<Variable> variables;
 
+	/**
+	 * Returns the action associated with the tag represented by the given JSON
+	 * array.
+	 * 
+	 * @param array
+	 *            an array of JSON strings
+	 * @return the action (or initialize) associated with the tag
+	 * @throws JSONException
+	 *             if a JSON syntax error occurs
+	 */
 	private Action getAction(JSONArray array) throws JSONException {
 		if (array.length() == 0) {
 			// removes the first untagged action found
@@ -169,6 +179,18 @@ public class IRParser {
 		}
 	}
 
+	/**
+	 * Returns the variable associated with the variable represented by the
+	 * given JSON array.
+	 * 
+	 * @param array
+	 *            an array that contains a variable name, suffix, and SSA index
+	 * @return the variable associated with the name
+	 * @throws JSONException
+	 *             if a JSON syntax error occurs
+	 * @throws OrccException
+	 *             if a semantic error occurs
+	 */
 	private Variable getVariable(JSONArray array) throws JSONException,
 			OrccException {
 		String name = array.getString(0);
@@ -184,6 +206,17 @@ public class IRParser {
 		return varDef;
 	}
 
+	/**
+	 * Parses the action represented by the given JSON array.
+	 * 
+	 * @param array
+	 *            an array that defines an action
+	 * @return an action
+	 * @throws JSONException
+	 *             if a JSON syntax error occurs
+	 * @throws OrccException
+	 *             if a semantic error occurs
+	 */
 	private Action parseAction(JSONArray array) throws JSONException,
 			OrccException {
 		JSONArray tagArray = array.getJSONArray(0);
@@ -195,8 +228,8 @@ public class IRParser {
 		Pattern ip = parsePattern(inputs, array.getJSONArray(1));
 		Pattern op = parsePattern(outputs, array.getJSONArray(2));
 
-		Procedure scheduler = parseProc(array.getJSONArray(3), false);
-		Procedure body = parseProc(array.getJSONArray(4), false);
+		Procedure scheduler = parseProc(array.getJSONArray(3));
+		Procedure body = parseProc(array.getJSONArray(4));
 
 		Action action = new Action(body.getLocation(), tag, ip, op, scheduler,
 				body);
@@ -204,6 +237,17 @@ public class IRParser {
 		return action;
 	}
 
+	/**
+	 * Parses the given JSON array as a list of actions.
+	 * 
+	 * @param array
+	 *            a JSON array whose each entry encodes an action
+	 * @return a list of actions
+	 * @throws JSONException
+	 *             if a JSON syntax error occurs
+	 * @throws OrccException
+	 *             if a semantic error occurs
+	 */
 	private List<Action> parseActions(JSONArray array) throws JSONException,
 			OrccException {
 		List<Action> actions = new ArrayList<Action>();
@@ -214,6 +258,18 @@ public class IRParser {
 		return actions;
 	}
 
+	/**
+	 * Parses the given JSON array as an action scheduler.
+	 * 
+	 * @param array
+	 *            an array whose first entry is a list of actions and whose
+	 *            second entry is a JSON-encoded FSM
+	 * @return an action scheduler
+	 * @throws JSONException
+	 *             if a JSON syntax error occurs
+	 * @throws OrccException
+	 *             if a semantic error occurs
+	 */
 	private ActionScheduler parseActionScheduler(JSONArray array)
 			throws JSONException, OrccException {
 		JSONArray actionArray = array.getJSONArray(0);
@@ -230,11 +286,13 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the input stream that this parser's constructor was given as JSON,
-	 * and returns an actor from it.
+	 * Parses the given input stream as JSON and returns an IR actor.
 	 * 
-	 * @return An {@link Actor}.
-	 * @throws JSONException
+	 * @param in
+	 *            an input stream that contains JSON content
+	 * @return an {@link Actor}
+	 * @throws OrccException
+	 *             if a semantic error occurs
 	 */
 	public Actor parseActor(InputStream in) throws OrccException {
 		try {
@@ -242,6 +300,9 @@ public class IRParser {
 			procs = new OrderedMap<Procedure>();
 			untaggedActions = new ArrayList<Action>();
 			variables = new Scope<Variable>();
+
+			// register built-in procedures
+			procs.add(file, print.getLocation(), print.getName(), print);
 
 			JSONTokener tokener = new JSONTokener(new InputStreamReader(in));
 			JSONObject obj = new JSONObject(tokener);
@@ -261,7 +322,8 @@ public class IRParser {
 
 			array = obj.getJSONArray(KEY_PROCEDURES);
 			for (int i = 0; i < array.length(); i++) {
-				parseProc(array.getJSONArray(i), true);
+				Procedure proc = parseProc(array.getJSONArray(i));
+				procs.add(file, proc.getLocation(), proc.getName(), proc);
 			}
 
 			array = obj.getJSONArray(KEY_ACTIONS);
@@ -320,7 +382,13 @@ public class IRParser {
 		}
 
 		List<Expression> parameters = parseExprs(array.getJSONArray(2));
-		Call call = new Call(loc, res, procs.get(procName), parameters);
+		Procedure proc = procs.get(procName);
+		if (proc == null) {
+			throw new OrccException(file, loc, "unknown procedure: \""
+					+ procName + "\"");
+		}
+
+		Call call = new Call(loc, res, proc, parameters);
 		if (res != null) {
 			res.setInstruction(call);
 		}
@@ -331,10 +399,13 @@ public class IRParser {
 	 * Parses the given object as a constant.
 	 * 
 	 * @param obj
-	 *            A YAML-encoded constant that may be a {@link Boolean}, an
-	 *            {@link Integer}, a {@link List} or a {@link String}.
-	 * @return An {@link AbstractConstant} created from the given object.
+	 *            a {@link Boolean}, an {@link Integer}, a {@link List} or a
+	 *            {@link String}
+	 * @return a {@link Constant} created from the given object
 	 * @throws JSONException
+	 *             if a JSON syntax error occurs
+	 * @throws OrccException
+	 *             if a semantic error occurs
 	 */
 	private Constant parseConstant(Object obj) throws JSONException,
 			OrccException {
@@ -619,12 +690,15 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the given list as a list of ports.
+	 * Parses the given JSON array as a list of ports.
 	 * 
-	 * @param list
-	 *            A list of YAML-encoded {@link LocalVariable}s.
-	 * @return A {@link List}&lt;{@link LocalVariable}&gt;.
+	 * @param array
+	 *            an array of JSON-encoded ports
+	 * @return an ordered map of ports
 	 * @throws JSONException
+	 *             if a JSON syntax error occurs
+	 * @throws OrccException
+	 *             if a semantic error occurs
 	 */
 	private OrderedMap<Port> parsePorts(JSONArray array) throws JSONException,
 			OrccException {
@@ -644,18 +718,16 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses a procedure and optionally adds it to the {@link #procs} map.
+	 * Parses a procedure.
 	 * 
 	 * @param array
 	 *            a JSON array
-	 * @param register
-	 *            if true, add this procedure to the {@link #procs} map.
 	 * @return the procedure parsed
 	 * @throws JSONException
 	 * @throws OrccException
 	 */
-	private Procedure parseProc(JSONArray array, boolean register)
-			throws JSONException, OrccException {
+	private Procedure parseProc(JSONArray array) throws JSONException,
+			OrccException {
 		String name = array.getString(0);
 		boolean external = array.getBoolean(1);
 
@@ -676,10 +748,6 @@ public class IRParser {
 
 		// go back to previous scope
 		variables = variables.getParent().getParent();
-
-		if (register) {
-			procs.add(file, location, name, procedure);
-		}
 
 		AbstractNode.resetLabelCount();
 
@@ -712,11 +780,11 @@ public class IRParser {
 	/**
 	 * Parses the given list as a list of state variables. A
 	 * {@link StateVariable} is a {@link LocalVariable} with an optional
-	 * reference to an {@link AbstractConstant} that contain the variable's
-	 * initial value.
+	 * reference to a {@link Constant} that contain the variable's initial
+	 * value.
 	 * 
 	 * @param list
-	 *            A list of YAML-encoded {@link LocalVariable}.
+	 *            A list of JSON-encoded {@link LocalVariable}.
 	 * @return A {@link List}&lt;{@link StateVariable}&gt;.
 	 * @throws JSONException
 	 */
@@ -763,9 +831,9 @@ public class IRParser {
 	 * Parses the given object as a type definition.
 	 * 
 	 * @param obj
-	 *            A YAML-encoded type definition. This is either a
-	 *            {@link String} for simple types (bool, String, void) or a
-	 *            {@link List} for types with parameters (int, uint, List).
+	 *            A type definition. This is either a {@link String} for simple
+	 *            types (bool, float, String, void) or a {@link List} for types
+	 *            with parameters (int, uint, List).
 	 * @return An {@link Type}.
 	 * @throws JSONException
 	 */
@@ -820,10 +888,9 @@ public class IRParser {
 	 * Returns a variable definition using objects returned by the given
 	 * iterator.
 	 * 
-	 * @param it
-	 *            An iterator on YAML-encoded objects that hold information
-	 *            about a variable definition.
-	 * @return A {@link LocalVariable}.
+	 * @param array
+	 *            an array that contains a variable definition
+	 * @return A {@link LocalVariable}
 	 * @throws JSONException
 	 */
 	private LocalVariable parseVarDef(JSONArray array) throws JSONException,

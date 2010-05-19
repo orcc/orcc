@@ -144,6 +144,17 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 	}
 
 	/**
+	 * Returns <code>true</code> if this call is a call to the built-in "print"
+	 * procedure.
+	 * 
+	 * @return <code>true</code> if this call is a call to the built-in "print"
+	 *         procedure
+	 */
+	public boolean isPrint() {
+		return procedure == Procedure.print;
+	}
+
+	/**
 	 * Sets the parameters of this call node. Uses are updated to point to this
 	 * node.
 	 * 

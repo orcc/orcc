@@ -154,7 +154,7 @@ public class DefaultExpressionPrinter implements ExpressionVisitor {
 	@Override
 	public void visit(StringExpr expr, Object... args) {
 		builder.append('"');
-		builder.append(expr.getValue().replaceAll("\\\\", "\\\\\\\\"));
+		builder.append(expr.getValue());
 		builder.append('"');
 	}
 

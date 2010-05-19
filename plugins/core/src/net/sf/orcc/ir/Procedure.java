@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +43,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.INameable;
 import net.sf.orcc.util.OrderedMap;
 
@@ -52,6 +54,10 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class Procedure extends AbstractLocalizable implements INameable {
+
+	public static final Procedure print = new Procedure("print", true,
+			new Location(), new VoidType(), new OrderedMap<Variable>(),
+			new OrderedMap<Variable>(), new ArrayList<CFGNode>());
 
 	/**
 	 * This class visits the procedure to find the state variables used.

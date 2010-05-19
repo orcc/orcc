@@ -39,6 +39,10 @@ public abstract class AbstractTypeVisitor implements TypeVisitor {
 	}
 
 	@Override
+	public void visit(FloatType type) {
+	}
+
+	@Override
 	public void visit(IntType type) {
 	}
 

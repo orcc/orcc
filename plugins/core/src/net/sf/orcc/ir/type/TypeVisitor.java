@@ -38,6 +38,8 @@ public interface TypeVisitor {
 
 	public void visit(BoolType type);
 
+	public void visit(FloatType type);
+
 	public void visit(IntType type);
 
 	public void visit(ListType type);

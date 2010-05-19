@@ -60,9 +60,42 @@ Assign(assign) ::= <<
 $assign.target$ = $assign.value$;
 >>
 
+PrintFormatType(type) ::= <<
+$if (type.bool)
+$i$
+elseif (type.float)
+$f$
+elseif (type.int)
+$i$
+elseif (type.list)
+$p$
+elseif (type.string)
+$s$
+elseif (type.uint)
+$ui$
+elseif (type.void)
+$p$
+endif$ 
+>>
+
+PrintFormat(parameter) ::= <<
+$if (parameter.stringExpr)
+$$parameter$$
+else
+$ "%$PrintFormatType(parameter.type)$" $
+endif$
+>>
+
+PrintParameter(parameter) ::= <<
+$if (!parameter.stringExpr)$, $parameter$$endif$
+>>
+
 Call(call) ::= <<
 
-$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);
+$if(call.print)$printf($call.parameters: PrintFormat()$$call.parameters: PrintParameter()$);$
+else
+$$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
+endif$
 >>
 
 Decrement(decrement) ::= <<
@@ -168,6 +201,7 @@ $BlockNode(whileNode.joinNode)$
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
+$if(!procedure.external)$
 
 static $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
 $if(procedure.locals.list)$
@@ -176,6 +210,7 @@ $endif$
 	$procedure.nodes: {$(it.class.simpleName)(it)$}$
 }
 
+$endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

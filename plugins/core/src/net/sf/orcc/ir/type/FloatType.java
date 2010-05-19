@@ -28,70 +28,34 @@
  */
 package net.sf.orcc.ir.type;
 
-import java.util.Collections;
-import java.util.List;
-
-import net.sf.orcc.ir.Printer;
-import net.sf.orcc.ir.Type;
-
 /**
- * This class is an abstract implementation of {@link Type}.
+ * This class defines a float type.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractType implements Type {
+public class FloatType extends AbstractType {
+
+	public static final String NAME = "float";
 
 	@Override
-	public abstract Object accept(TypeInterpreter interpreter);
-
-	@Override
-	public abstract void accept(TypeVisitor visitor);
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<Integer> getDimensions() {
-		return Collections.EMPTY_LIST;
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
 	}
 
 	@Override
-	public boolean isBool() {
-		return false;
+	public void accept(TypeVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof FloatType);
 	}
 
 	@Override
 	public boolean isFloat() {
-		return false;
-	}
-
-	@Override
-	public boolean isInt() {
-		return false;
-	}
-
-	@Override
-	public boolean isList() {
-		return false;
-	}
-
-	@Override
-	public boolean isString() {
-		return false;
-	}
-
-	@Override
-	public boolean isUint() {
-		return false;
-	}
-
-	@Override
-	public boolean isVoid() {
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Printer.getInstance().toString(this);
+		return true;
 	}
 
 }
