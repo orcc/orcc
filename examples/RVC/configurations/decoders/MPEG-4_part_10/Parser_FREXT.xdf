@@ -548,12 +548,11 @@
     <Connection dst="Algo_RefList0" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
     <Connection dst="Algo_RefList0" dst-port="SzSTList" src="Algo_MMCO" src-port="SzSTList"/>
-    <Connection dst="Algo_RefList0" dst-port="Nb_RefFrame"
-        src="Algo_Synp_AVC" src-port="Nb_RefFrame_l0"/>
-    <Connection dst="Algo_RefList0" dst-port="Nb_LT_Frame"
-        src="Algo_MMCO" src-port="NbLTFrame"/>
     <Connection dst="Algo_MMCO" dst-port="NumReferenceFrame"
         src="Algo_Synp_AVC" src-port="NumRefFrame"/>
+    <Connection dst="Algo_RefList0" dst-port="NbRefFrame"
+        src="Algo_Synp_AVC" src-port="Nb_RefFrame_l0"/>
+    <Connection dst="Algo_RefList0" dst-port="NbLTFrame" src="Algo_MMCO" src-port="NbLTFrame"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="ENTROPY_TYPE"
         src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
 </XDF>
