@@ -71,26 +71,23 @@ actor Algo_RefList ()
 
 
 	List(type:int(size=32),size=16)         reordering_ref_list := [0 :for int s in Integers(0,16-1)];
-	List(type:int(size=32),size=16)         short_term_list     := [0 :for int s in Integers(0,16-1)];
+	List(type:int(size=32),size=16)         STList     := [0 :for int s in Integers(0,16-1)];
 	List(type:int,size=16)                  pic_idx_list        := [0 :for int s in Integers(0,16-1)];
-	List(type:int(size=32),size=16)         long_term_list      := [-1 :for int s in Integers(0,16-1)];
+	List(type:int(size=32),size=16)         LTList      := [-1 :for int s in Integers(0,16-1)];
 	List(type:uint(size = 32), size = 2*16) RefListTab          := [-1 :for int s in Integers(0,2*16-1)];
 	List(type:uint(size=32),size= 2*16)     RefListSent         := [0: for int s in Integers(0, 2*16-1)];
 
 	uint          frame_num          := 0;
 	int           pred               := 0;
 	int (size=32) ValMaxFrameNum     := 0;
-	uint(size=4)  index              := 0;
-	uint(size=5)  short_term_count   := 0;
-	uint(size=5)  long_term_count    := 0;
-	uint(size=4)  long_term_idx      := 0;
-	int           CounterRefList     := 0;
-	int           CounterRefListTab  := 0;
-	int           CounterRefListSent := 0;
-	bool          EndInitIdc3        := false;
-	bool          EndInitSentRefList := false;
-	uint(size=5)  Nb_short_term_read := 0;
-	uint(size=5)  Nb_long_term_read  := 0;
+	uint(size=4)  IdxInsertFrame     := 0;
+	uint(size=5)  ShortTermCount   := 0;
+	uint(size=5)  LongTermCount    := 0;
+	int           CounterRefListTab  := 0;/**/
+	bool          EndInitIdc3        := false;/**/
+	bool          EndInitSentRefList := false;/**/
+	uint(size=5)  NbSTRead := 0;
+	uint(size=5)  NbLTRead  := 0;
 	uint(size=5)  NumMaxListRefFrame := 0;
 
 
@@ -111,10 +108,10 @@ actor Algo_RefList ()
 		guard
 			v = 0
 		do
-			if(ValIDxMax < short_term_count + long_term_count) then
+			if(ValIDxMax < ShortTermCount + LongTermCount) then
 				NumMaxListRefFrame := ValIDxMax;
 			else
-				NumMaxListRefFrame := short_term_count + long_term_count;
+				NumMaxListRefFrame := ShortTermCount + LongTermCount;
 			end
 		end
 
@@ -129,27 +126,27 @@ actor Algo_RefList ()
 			int ListIndex := 0,
 			int(size=32) frame_num_short_term
 		do
-			if(ValIDxMax < short_term_count + long_term_count) then
+			if(ValIDxMax < ShortTermCount + LongTermCount) then
 				NumMaxListRefFrame := ValIDxMax;
 			else
-				NumMaxListRefFrame := short_term_count + long_term_count;
+				NumMaxListRefFrame := ShortTermCount + LongTermCount;
 			end
 			pred  := frame_num;
-			index := 0;
-			if (short_term_count != 0) then
-				foreach int i in Integers (0, short_term_count - 1)
+			IdxInsertFrame := 0;
+			if (ShortTermCount != 0) then
+				foreach int i in Integers (0, ShortTermCount - 1)
 				do
-					reordering_ref_list[ListIndex] := short_term_list[i];
+					reordering_ref_list[ListIndex] := STList[i];
 					ListIndex                      := ListIndex + 1 ;
 				end
 			else 
 				reordering_ref_list := [0 :for int s in Integers(0,16-1)];
 			end 
-			if (long_term_count != 0) then 
+			if (LongTermCount != 0) then 
 				foreach int i in Integers(0, 15)
 				do
-					if ( (long_term_list[i] != -1) and (ListIndex <= 16) ) then 
-						reordering_ref_list[ListIndex] := long_term_list[i]; 
+					if ( (LTList[i] != -1) and (ListIndex <= 16) ) then 
+						reordering_ref_list[ListIndex] := LTList[i]; 
 						ListIndex                      := ListIndex + 1 ;
 					end
 				end
@@ -177,29 +174,29 @@ actor Algo_RefList ()
 					pred := pred - ValMaxFrameNum;
 				end
 			end
-			foreach int i in Integers(0, short_term_count+long_term_count-1)
+			foreach int i in Integers(0, ShortTermCount+LongTermCount-1)
 			do
 				if (reordering_ref_list[i] = pred) then 
 					idx := i; 
 				end
 			end
-			//Remove from the reference list the frame at index equals to idx
-			foreach int i in Integers(idx, short_term_count+long_term_count - 2)
+			//Remove from the reference list the frame at IdxInsertFrame equals to idx
+			foreach int i in Integers(idx, ShortTermCount+LongTermCount - 2)
 			do
 				reordering_ref_list[i] := reordering_ref_list[i + 1];
 			end
 
-			//Add a frame at index equals to index.
-			//So copy the index - 1 first elements
-			//Add pred_ix at index "index"
+			//Add a frame at IdxInsertFrame equals to IdxInsertFrame.
+			//So copy the IdxInsertFrame - 1 first elements
+			//Add pred_ix at IdxInsertFrame "IdxInsertFrame"
 			//and copy the others elements of the list
-			counter_for:=short_term_count + long_term_count - 1;
-			foreach int i in Integers(0, counter_for - index)
+			counter_for:=ShortTermCount + LongTermCount - 1;
+			foreach int i in Integers(0, counter_for - IdxInsertFrame)
 			do
 				reordering_ref_list[counter_for - i] := reordering_ref_list[counter_for - i - 1];
 			end
-			reordering_ref_list[index] := pred;
-			index := index +1 ;
+			reordering_ref_list[IdxInsertFrame] := pred;
+			IdxInsertFrame := IdxInsertFrame +1 ;
 		end
 
 
@@ -212,32 +209,32 @@ actor Algo_RefList ()
 			uint(size=32) idx,
 			int counter_for  
 		do
-			foreach int i in Integers(0, short_term_count+long_term_count-1)
+			foreach int i in Integers(0, ShortTermCount+LongTermCount-1)
 			do
-				if (reordering_ref_list[i] = long_term_list[b]) then 
+				if (reordering_ref_list[i] = LTList[b]) then 
 					idx := i;
 				end
 			end
 
-			//Remove from the reference list the frame at index equals to idx
-			foreach int i in Integers(idx, short_term_count+long_term_count - 2)
+			//Remove from the reference list the frame at IdxInsertFrame equals to idx
+			foreach int i in Integers(idx, ShortTermCount+LongTermCount - 2)
 			do
 				reordering_ref_list[i] := reordering_ref_list[i + 1];
 			end 
 			
-			//Add a frame at index equals to index.
-			//So copy the index - 1 first elements
-			//Add pred_ix at index "index"
+			//Add a frame at IdxInsertFrame equals to IdxInsertFrame.
+			//So copy the IdxInsertFrame - 1 first elements
+			//Add pred_ix at IdxInsertFrame "IdxInsertFrame"
 			//and copy the others elements of the list
-			counter_for:=short_term_count + long_term_count - 1;
-			foreach int i in Integers(0, counter_for - index)
+			counter_for:=ShortTermCount + LongTermCount - 1;
+			foreach int i in Integers(0, counter_for - IdxInsertFrame)
 			do
 				reordering_ref_list[counter_for - i] := reordering_ref_list[counter_for - i - 1];
 			end
-			reordering_ref_list[index] := long_term_list[b];
+			reordering_ref_list[IdxInsertFrame] := LTList[b];
 			
-			reordering_ref_list[index] := long_term_list[b];
-			index := index + 1 ;
+			reordering_ref_list[IdxInsertFrame] := LTList[b];
+			IdxInsertFrame := IdxInsertFrame + 1 ;
 		end
 
 
@@ -282,7 +279,7 @@ actor Algo_RefList ()
 				==>
 			RefList:[0]
 		guard
-			(short_term_count + long_term_count) = 0
+			(ShortTermCount + LongTermCount) = 0
 		do
 			EndInitSentRefList := false;
 		end
@@ -290,29 +287,29 @@ actor Algo_RefList ()
 
 	InitRefList_not0: action ==> 
 		guard
-			(EndInitSentRefList = false)  and  ( short_term_count + long_term_count != 0 )
+			(EndInitSentRefList = false)  and  ( ShortTermCount + LongTermCount != 0 )
 		var 
 			List(type:uint(size=32),size=2*16) reflist := [0: for int k in Integers(0,2*16-1)],
 			int ListIndex := 0
 		do
-			if (short_term_count != 0) then 
-				foreach int l in Integers( 0, short_term_count - 1 )
+			if (ShortTermCount != 0) then 
+				foreach int l in Integers( 0, ShortTermCount - 1 )
 				do
-					reflist[l] := short_term_list[l];
+					reflist[l] := STList[l];
 				end
-				ListIndex      := short_term_count; 
+				ListIndex      := ShortTermCount; 
 			else // => inutile !
-				foreach int s in Integers( 0, short_term_count + long_term_count - 1 )
+				foreach int s in Integers( 0, ShortTermCount + LongTermCount - 1 )
 				do
 					reflist[s] := 0;
 				end
-				ListIndex := short_term_count + long_term_count; 
+				ListIndex := ShortTermCount + LongTermCount; 
 			end
-			if (long_term_count != 0) then
+			if (LongTermCount != 0) then
 				foreach int i in Integers(0, 15)
 				do
-					if (long_term_list[i] != -1) then 
-						reflist[ListIndex] := long_term_list[i];
+					if (LTList[i] != -1) then 
+						reflist[ListIndex] := LTList[i];
 						ListIndex          := ListIndex + 1;
 					end
 				end
@@ -349,53 +346,53 @@ actor Algo_RefList ()
 
 
 	ReadSizeLists: action
-			SzSTList   :[size_short_term_list],
-			Nb_LT_Frame:[val_long_term_count]
+			SzSTList    :[size_short_term_list],
+			Nb_LT_Frame :[val_long_term_count]
 				==>
 		do
-			short_term_count   := size_short_term_list;
-			long_term_count    := val_long_term_count;
-			Nb_short_term_read := 0;
+			ShortTermCount   := size_short_term_list;
+			LongTermCount    := val_long_term_count;
+			NbSTRead := 0;
+			NbLTRead := 0;
 		end
 
 
 	ReadShortTermList: action
-			ShortTermList:[ValShortTerm]
+			ShortTermList :[ValShortTerm]
 				==>
 		guard
-			Nb_short_term_read < short_term_count
+			NbSTRead < ShortTermCount
 		do
-			short_term_list[Nb_short_term_read] := ValShortTerm;
-			Nb_short_term_read := Nb_short_term_read + 1;
-		end
-
-	
-	ReadShortTermList_Done: action ==>
-		do
-			Nb_long_term_read := 0;
+			STList[NbSTRead] := ValShortTerm;
+			NbSTRead         := NbSTRead + 1;
 		end
 
 
 	ReadLongTermList: action
-			LongTermList:[ValLongTerm]
+			LongTermList :[ValLongTerm]
 				==>
 		guard
-			Nb_long_term_read < 16
+			NbLTRead < 16
 		do
-			long_term_list[Nb_long_term_read] := ValLongTerm;
-			Nb_long_term_read := Nb_long_term_read + 1;
+			LTList[NbLTRead] := ValLongTerm;
+			NbLTRead         := NbLTRead + 1;
 		end
 
 	
-	ReadLongTermList_Done: action ==>
+	ReadListsDone: action ==>
 		end
 
 	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames               (read_num_ref_frames                 )--> ReadSizeLists;
 
+		ReadSizeLists                     (ReadSizeLists                       )-->ReadLists;
+		ReadLists                 (ReadShortTermList                   )-->ReadLists;
+		ReadLists                  (ReadLongTermList                    )-->ReadLists;
+		ReadLists                  (ReadListsDone               )-->read_ref_pic_list_reordering_flag;
+
 		/* there isn't list to sent */
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_0 )--> send_refList;
-		send_refList                      (InitRefList_zero                    )--> ReadSizeLists;
+		send_refList                      (InitRefList_zero                    )--> read_num_ref_frames;
 		send_refList                      (InitRefList_not0                    )--> RefListTabSent;
 		RefListTabSent                    (SendRefList                         )--> RefListTabSent;
 		RefListTabSent                    (SendRefListDone                     )--> read_num_ref_frames;
@@ -409,18 +406,13 @@ actor Algo_RefList ()
 		IDC3SendRefList                   (IDC3SendRefListDone                 )--> read_num_ref_frames;
 
 
-		ReadSizeLists                     (ReadSizeLists                       )-->ReadShortTermList;
-		ReadShortTermList                 (ReadShortTermList                   )-->ReadShortTermList;
-		ReadShortTermList                 (ReadShortTermList_Done              )-->ReadLongTermList;
-		ReadLongTermList                  (ReadLongTermList                    )-->ReadLongTermList;
-		ReadLongTermList                  (ReadLongTermList_Done               )-->read_ref_pic_list_reordering_flag;
 	end
 
 	priority
 		SendRefListDone      > SendRefList;
 		IDC3SendRefListDone  > IDC3SendRefList;
-		ReadShortTermList    > ReadShortTermList_Done;
-		ReadLongTermList     > ReadLongTermList_Done;
+		ReadShortTermList    > ReadListsDone;
+		ReadLongTermList     > ReadListsDone;
 	end
 
 end
