@@ -54,6 +54,6 @@
       <vertex id="MVReconstruct" x="926" y="1468"/>
       <vertex id="Algo_MMCO" x="905" y="1678"/>
       <vertex id="Algo_Parser_IPCM" x="951" y="2125"/>
-      <vertex id="Algo_RefList0" x="1121" y="1731"/>
+      <vertex id="Algo_RefList0" x="1148" y="1729"/>
    </vertices>
 </layout>

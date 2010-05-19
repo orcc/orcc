@@ -27,6 +27,7 @@
       <vertex id="I_PCM_Y" x="247" y="452"/>
       <vertex id="ConstrainedIFlag" x="57" y="751"/>
       <vertex id="DelList" x="757" y="1185"/>
+      <vertex id="FrameNum" x="745" y="1238"/>
       <vertex id="Display_L" x="1173" y="1270"/>
       <vertex id="Inter" x="247" y="1179"/>
       <vertex id="Buffer_inter" x="935" y="1160"/>
@@ -34,6 +35,5 @@
       <vertex id="Intra_16x16" x="247" y="549"/>
       <vertex id="Intra_4x4" x="247" y="822"/>
       <vertex id="Deblocking_Filter" x="742" y="680"/>
-      <vertex id="FrameNum" x="745" y="1238"/>
    </vertices>
 </layout>

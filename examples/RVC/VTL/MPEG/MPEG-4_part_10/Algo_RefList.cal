@@ -58,11 +58,11 @@ Copyright (c) ISO/IEC 2008.
 
 actor Algo_RefList () 
 	uint(size=32)  RefReordering,
-	uint(size=32)  FraNum,
-	int (size=32) MaxFrameNum,
-	uint(size=32) ShortTermList,
+	uint(size=31)  FraNum,
+	uint(size=31) MaxFrameNum,
+	uint(size=31) ShortTermList,
 	uint(size=5)  SzSTList,
-	uint(size=32) LongTermList,
+	uint(size=31) LongTermList,
 	uint(size=5) Nb_LT_Frame,
 	uint(size=5) Nb_RefFrame
 		==>

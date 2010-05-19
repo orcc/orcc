@@ -23,7 +23,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	uint          POC, 
 	int(size=32)  RefList, 
 	int(size=32)  DelList, 
-	uint(size=32)  FrameNum_CurrPic,
+	uint(size=31)  FrameNum_CurrPic,
 	int(size=9)   WD,
 	uint(size=21) RA,
 	uint(size=11) RA_Width,

@@ -57,359 +57,353 @@ Copyright (c) ISO/IEC 2008.
 
 
 actor Algo_MMCO () 
-	uint(size=32) MMCO,
-	uint(size=32) FraNum,
-	int (size=32) MaxFrameNum
+	uint(size=31) MMCO,
+	uint(size=31) FraNum,
+	uint(size=31) MaxFrameNum,
+	uint(size=5)  NumReferenceFrame
 		==>
 	int (size=32) DelList,
-	uint(size=32) ShortTermList,
+	uint(size=31) ShortTermList,
 	uint(size=5)  SzSTList,
-	uint(size=32) LongTermList,
-	uint(size=5) Nb_LT_Frame
+	uint(size=31) LongTermList,
+	uint(size=5)  NbLTFrame
 		:
 
-	List(type:int(size=32), size=16) short_term_list        := [0     : for int s in Integers(0,15)];
-	List(type:bool        , size=16) short_term_false_frame := [false : for int s in Integers(0,15)];
-	List(type:int(size=32), size=16) long_term_list         := [-1    : for int s in Integers(0,15)];
-	List(type:int(size=32), size=16) DelListTab             := [0     : for int s in Integers(0,15)];
+	List(type:uint(size=31), size=16) STList              := [0     : for int s in Integers(0,15)];
+	List(type:bool         , size=16) ShortTermFalseFrame := [false : for int s in Integers(0,15)];
+	List(type:int (size=32), size=16) LTList              := [-1    : for int s in Integers(0,15)];
+	List(type:uint(size=31), size=16) DelListTab          := [0     : for int s in Integers(0,15)];
 
-	int (size=32) Nbframedel         := 0;
-	uint          frame_num          := 0;
-	uint          last_frame_num     := 0;
-	int           pred               := 0;
-	int (size=32) ValMaxFrameNum     := 0;
-	uint(size=5)  num_ref_frames     := 0;
-	uint(size=5)  short_term_count   := 0;
-	uint(size=5)  long_term_count    := 0;
-	uint(size=5)  Nb_short_term_sent := 0;
-	uint(size=5)  Nb_long_term_sent  := 0;
-	uint(size=1)  flag_long_term     := 0;
-	uint(size=4)  long_term_idx      := 0;
-	uint(size=4)  long_term_max_idx  := 0;
+	int (size=6)  NbFrameDel       := 0;
+	uint(size=31) FrameNum         := 0;
+	uint(size=31) LastFrameNum     := 0;
+	uint(size=31) ValMaxFrameNum   := 0;
+	uint(size=5)  NumRefFrame      := 0;
+	uint(size=5)  ShortTermCount   := 0;
+	uint(size=5)  LongTermCount    := 0;
+	uint(size=5)  NbShortTermSent  := 0;
+	uint(size=5)  NbLongTermSent   := 0;
+	uint(size=1)  FlagLongTerm     := 0;
+	uint(size=4)  LongTermFrameIdx := 0;
 
 
 	read_num_ref_frames: action
-			MMCO:[ValNumRefFrame],
-			FraNum:[ValFrame_Num],
-			MaxFrameNum:[MaxFrNu]
+			NumReferenceFrame :[ValNumRefFrame],
+			FraNum            :[ValFrame_Num],
+			MaxFrameNum       :[MaxFrNu]
 				==>
 		do
-			num_ref_frames := ValNumRefFrame;
+			NumRefFrame    := ValNumRefFrame;
 			ValMaxFrameNum := MaxFrNu;
-			last_frame_num := frame_num;
-			frame_num      := ValFrame_Num;
+			LastFrameNum   := FrameNum;
+			FrameNum       := ValFrame_Num;
+			NbFrameDel     := 0;
 		end
 
 
 	FillFalseRefFrame : action ==>
 		guard
-			frame_num != (last_frame_num + 1) mod ValMaxFrameNum
+			FrameNum != (LastFrameNum + 1) mod ValMaxFrameNum
 		var
-			int false_frame_num := (last_frame_num + 1) mod ValMaxFrameNum
+			uint(size=31) false_frame_num := (LastFrameNum + 1) mod ValMaxFrameNum
 		do
-				Nbframedel := 0;
-				num_ref_frames := if(num_ref_frames>16)then 16 else num_ref_frames end;
-				while(false_frame_num != frame_num)
+				while(false_frame_num != FrameNum)
 				do
-					if(long_term_count + short_term_count = num_ref_frames) then
-						if(Nbframedel>15) then
-							Nbframedel := 15;
+					if(LongTermCount + ShortTermCount = NumRefFrame) then
+						if(NbFrameDel  >  15) then
+							NbFrameDel := 15;
 						end
-						if (short_term_false_frame[short_term_count - 1] = false) then
-							DelListTab[Nbframedel] := short_term_list[short_term_count - 1];
-							Nbframedel             := Nbframedel + 1;
+						if (ShortTermFalseFrame[ShortTermCount - 1] = false) then
+							DelListTab[NbFrameDel] := STList[ShortTermCount - 1];
+							NbFrameDel             := NbFrameDel + 1;
 						end
-						short_term_count       := short_term_count - 1;
+						ShortTermCount := ShortTermCount - 1;
 					end
-					foreach int i in Integers(0,short_term_count - 1)
+					foreach int i in Integers(0,ShortTermCount - 1)
 					do
-						short_term_list[short_term_count - i]        := short_term_list[short_term_count - i - 1];
-						short_term_false_frame[short_term_count - i] := short_term_false_frame[short_term_count - i - 1];
+						STList             [ShortTermCount - i] := STList             [ShortTermCount - i - 1];
+						ShortTermFalseFrame[ShortTermCount - i] := ShortTermFalseFrame[ShortTermCount - i - 1];
 					end
-					short_term_list[0]        := false_frame_num;
-					short_term_false_frame[0] := true;
-					short_term_count   := short_term_count + 1;
-					false_frame_num    := (false_frame_num + 1) mod ValMaxFrameNum;
+					STList[0]              := false_frame_num;
+					ShortTermFalseFrame[0] := true;
+					ShortTermCount         := ShortTermCount + 1;
+					false_frame_num        := (false_frame_num + 1) mod ValMaxFrameNum;
 				end
 		end
 
 
-	skip_FillFalseRefFrame : action ==>
+	FillFalseRefFrame_done : action ==>
 		guard
-			frame_num = (last_frame_num + 1) mod ValMaxFrameNum
+			FrameNum = (LastFrameNum + 1) mod ValMaxFrameNum
+		end
+
+
+	SendSizeLists: action 
+				==>
+			SzSTList  :[ShortTermCount],
+			NbLTFrame :[LongTermCount]
 		do
-				Nbframedel := 0;
+			NbShortTermSent := 0;
+			NbLongTermSent  := 0;
+		end
+
+
+	SendShortTermList: action
+				==>
+			ShortTermList :[ValShortTermList]
+		guard
+			NbShortTermSent < ShortTermCount
+		var
+			uint(size=31) ValShortTermList
+		do
+			ValShortTermList := STList[NbShortTermSent];
+			NbShortTermSent  := NbShortTermSent + 1;
+		end
+
+
+	SendLongTermList: action
+				==>
+			LongTermList :[ValLongTermList]
+		guard
+			NbLongTermSent < 16
+		var
+			uint(size=31) ValLongTermList
+		do
+			ValLongTermList := LTList[NbLongTermSent];
+			NbLongTermSent  := NbLongTermSent + 1;
+		end
+
+	
+	SendLists_Done: action ==>
 		end
 
 
 	read_IDR: action
-			MMCO:[a , b]
+			MMCO :[NotIdr , is_long_term]
 				==>
 		guard 
-			a = 0
+			NotIdr = 0
 		do
-			flag_long_term   := b;
-			short_term_count := 0;
-			long_term_count  := 0;
-			short_term_list  := [-1 :for int s in Integers(0,16-1)];
-			long_term_list   := [-1 :for int s in Integers(0,16-1)];
-			Nbframedel       := -1;
+			FlagLongTerm     := is_long_term;
+			LongTermFrameIdx := 0;
+			ShortTermCount   := 0;
+			LongTermCount    := 0;
+			LTList           := [-1 :for int s in Integers(0,15)];
+			NbFrameDel       := -1;
 		end
 
 
 	read_not_IDR_not_MMCO: action
-			MMCO:[a , b]
+			MMCO :[NotIdr , adaptive_ref_pic_marking_mode_flag]
 				==>
 		guard
-			a = 1 and b = 0
+			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 0)
 		do
-			flag_long_term := 0;
+			FlagLongTerm := 0;
 		end
 
 
 	read_not_IDR_MMCO: action
-			MMCO:[a , b]
+			MMCO :[NotIdr , adaptive_ref_pic_marking_mode_flag]
 				==>
 		guard 
-			a = 1 and b = 1
+			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 1)
 		do
-			flag_long_term := 0;
+			FlagLongTerm := 0;
 		end
 
 
-	MMCO_opcode_v0: action
-			MMCO:[ a ]
+	MMCO_opcode_IsEqualTo0: action
+			MMCO :[opcode]
 				==>
 		guard 
-			a = 0
+			opcode = 0
 		end
 
 
 	// Mark a short term reference picture as "unused for reference "
-	MMCO_opcode.v1: action
-			MMCO:[ a, b ]
+	MMCO_opcode.IsEqualTo1: action
+			MMCO :[opcode, difference_of_pic_nums_minus1]
 				==>
 		guard 
-			a = 1
+			opcode = 1
 		var 
-			int(size=5) idx := -1
+			int(size=5)  idx := -1,
+			int(size=32) FrameNumST
 		do
-			pred := frame_num - b-1;
-			if(pred < 0) then
-				pred := pred + ValMaxFrameNum;
+			FrameNumST := FrameNum - difference_of_pic_nums_minus1 - 1;
+			if(FrameNumST < 0) then
+				FrameNumST := FrameNumST + ValMaxFrameNum;
 			end
-			foreach int i in Integers( 0, short_term_count - 1 )
+			foreach int i in Integers( 0, ShortTermCount - 1 )
 			do
-				if (short_term_list[i] = pred) then 
+				if (STList[i] = FrameNumST) then 
 					idx := i;
 				end
 			end
 			if(idx != -1) then
-				foreach int i in Integers(idx, short_term_count - 2)
+				foreach int i in Integers(idx, ShortTermCount - 2)
 				do
-					short_term_list[i]        := short_term_list[i+1];
-					short_term_false_frame[i] := short_term_false_frame[i+1];
+					STList[i]              := STList[i+1];
+					ShortTermFalseFrame[i] := ShortTermFalseFrame[i+1];
 				end
-				short_term_count := short_term_count-1;
-				DelListTab[Nbframedel] := pred;
-				Nbframedel := Nbframedel + 1;
+				ShortTermCount         := ShortTermCount - 1;
+				DelListTab[NbFrameDel] := FrameNumST;
+				NbFrameDel             := NbFrameDel + 1;
 			end
 		end
 
 
 	// Mark a long term reference picture as "unused for reference "
-	MMCO_opcode.v2: action
-			MMCO:[ a, b ]
+	MMCO_opcode.IsEqualTo2: action
+			MMCO:[opcode, IdxLTFrame ]
 				==>
 		guard 
-			a = 2
+			opcode = 2
 		do
-			if(long_term_list[b] != -1) then
-				DelListTab[Nbframedel] := long_term_list[b];
-				Nbframedel := Nbframedel + 1;
-				long_term_list[b] := -1;
-				long_term_count   := long_term_count-1;
+			if(LTList[IdxLTFrame]  != -1) then
+				DelListTab[NbFrameDel] := LTList[IdxLTFrame];
+				NbFrameDel             := NbFrameDel + 1;
+				LTList[IdxLTFrame]     := -1;
+				LongTermCount          := LongTermCount - 1;
 			end
 		end
 
 
 	// Mark a short term reference picture as long term
-	MMCO_opcode.v3: action
-			MMCO:[a, b, c ]
+	MMCO_opcode.IsEqualTo3: action
+			MMCO:[opcode, difference_of_pic_nums_minus1, IdxLTFrame]
 				==>
 		guard 
-			a = 3
+			opcode = 3
 		var
-			int(size=5) idx := -1
+			int(size=5) idx := -1,
+			int(size=32)FrameNumST
 		do
-			pred := frame_num - b-1; 
-			if(pred < 0) then
-				pred := pred + ValMaxFrameNum;
+			FrameNumST := FrameNum - difference_of_pic_nums_minus1 - 1; 
+			if(FrameNumST < 0) then
+				FrameNumST := FrameNumST + ValMaxFrameNum;
 			end
-			foreach int i in Integers(0, short_term_count-1)
+			foreach int i in Integers(0, ShortTermCount-1)
 			do
-				if (short_term_list[i] = pred) then
+				if (STList[i] = FrameNumST) then
 					idx := i;
 				end
 			end
 			if(idx != -1) then
-				foreach int i in Integers(idx, short_term_count - 2)
+				foreach int i in Integers(idx, ShortTermCount - 2)
 				do
-						short_term_list[i]        := short_term_list[i + 1];
-						short_term_false_frame[i] := short_term_false_frame[i + 1];
+						STList[i]              := STList[i + 1];
+						ShortTermFalseFrame[i] := ShortTermFalseFrame[i + 1];
 				end
-				short_term_count := short_term_count - 1;
+				ShortTermCount := ShortTermCount - 1;
 				
-				if (long_term_list[c] = -1) then
-					long_term_count := long_term_count + 1;
+				if (LTList[IdxLTFrame] = -1) then
+					LongTermCount := LongTermCount + 1;
 				else
-					DelListTab[Nbframedel] := long_term_list[c];
-					Nbframedel := Nbframedel + 1;
+					DelListTab[NbFrameDel] := LTList[IdxLTFrame];
+					NbFrameDel             := NbFrameDel + 1;
 				end
-				long_term_list[c] := pred;
+				LTList[IdxLTFrame] := FrameNumST;
 			end
 		end
 
 
 	// Specify the maximum long term frame index
-	MMCO_opcode.v4: action
-			MMCO:[a, b ]
+	MMCO_opcode.IsEqualTo4: action
+			MMCO:[opcode, long_term_max_idx]
 				==>
 		guard 
-			a = 4
+			opcode = 4
 		do
-			long_term_max_idx := b;
-			foreach int i in Integers(long_term_max_idx, 16-1)
+			foreach int i in Integers(long_term_max_idx, 15)
 			do
-				if (long_term_list[i] != -1) then
-					DelListTab[Nbframedel] := long_term_list[i];
-					Nbframedel             := Nbframedel + 1;
-					long_term_list[i]      := -1;
-					long_term_count        := long_term_count - 1;
+				if (LTList[i] != -1) then
+					DelListTab[NbFrameDel] := LTList[i];
+					NbFrameDel             := NbFrameDel + 1;
+					LTList[i]              := -1;
+					LongTermCount          := LongTermCount - 1;
 				end
 			end
 		end
 
 
 	// Mark all reference picture as "unused for reference "
-	MMCO_opcode.v5: action
-			MMCO:[a]
+	MMCO_opcode.IsEqualTo5: action
+			MMCO:[opcode]
 				==>
 		guard 
-			a = 5
+			opcode = 5
 		do
-			frame_num         := 0;
-			short_term_count  := 0;
-			short_term_list   := [-1 :for int s in Integers(0,16-1)];
-			long_term_count   := 0;
-			long_term_max_idx := 0;
-			long_term_list    := [-1 :for int s in Integers(0,16-1)];
-			Nbframedel        := -1;
+			FrameNum       := 0;
+			ShortTermCount := 0;
+			STList         := [-1 :for int s in Integers(0,16-1)];
+			LongTermCount  := 0;
+			LTList         := [-1 :for int s in Integers(0,16-1)];
+			NbFrameDel     := -1;
 		end
 
 
 	// Mark the current picture as long term reference picture
-	MMCO_opcode.v6: action
-			MMCO:[a, b ]
+	MMCO_opcode.IsEqualTo6: action
+			MMCO:[opcode, IdxLTFrame]
 				==>
 		guard 
-			a = 6
+			opcode = 6
 		do
-			if (long_term_count + short_term_count = num_ref_frames) then
-				short_term_count       := short_term_count - 1;
-				if(short_term_false_frame[short_term_count] = false) then
-					DelListTab[Nbframedel] := short_term_list[short_term_count];
-					Nbframedel             := Nbframedel + 1;
-				end
-			end
-			
-			if (long_term_list[b] != -1) then
-				DelListTab[Nbframedel] := long_term_list[b];
-				Nbframedel             := Nbframedel + 1;
-				long_term_list[b]      := -1;
+			LongTermFrameIdx := IdxLTFrame;
+			FlagLongTerm     := 1;
+		end
+
+
+	AddFrameInLTList: action ==>
+		guard
+			FlagLongTerm = 1
+		do
+
+			if (LTList[LongTermFrameIdx] != -1) then
+				DelListTab[NbFrameDel] := LTList[LongTermFrameIdx];
+				NbFrameDel             := NbFrameDel + 1;
 			else 
-					long_term_count := long_term_count +1;
+				LongTermCount          := LongTermCount +1;
 			end
-			long_term_list[b] := frame_num;
-			flag_long_term := 1;
-		end
+			LTList[LongTermFrameIdx]   := FrameNum;
 
-	update_idx: action ==>
-		var
-			bool        flag := false,
-			int         j
-		do
-			// add current picture
-			if (flag_long_term = 0) then
-				if (long_term_count + short_term_count = num_ref_frames) then
-					short_term_count       := short_term_count - 1;
-					if(short_term_false_frame[short_term_count] = false) then
-						DelListTab[Nbframedel] := short_term_list[short_term_count];
-						Nbframedel             := Nbframedel + 1;
-					end
+			if (LongTermCount + ShortTermCount > NumRefFrame) then
+				ShortTermCount := ShortTermCount - 1;
+				if(ShortTermFalseFrame[ShortTermCount] = false) then
+					DelListTab[NbFrameDel] := STList[ShortTermCount];
+					NbFrameDel             := NbFrameDel + 1;
 				end
-				j := short_term_count - 1;
-				foreach int i in Integers (0, short_term_count - 1)
-				do
-					short_term_list[j + 1]        := short_term_list[j];
-					short_term_false_frame[j + 1] := short_term_false_frame[j];
-					j := j - 1;
-				end
-				short_term_list[0]        := frame_num;
-				short_term_false_frame[0] := false;
-				short_term_count          := short_term_count +1;
 			end
 		end
 
 
-	SendSizeLists: action 
-				==>
-			SzSTList    :[short_term_count],
-			Nb_LT_Frame :[long_term_count]
-		do
-			Nb_short_term_sent := 0;
-		end
-
-
-	SendShortTermList: action
-				==>
-			ShortTermList:[ValShortTermList]
+	AddFrameInSTList: action ==>
 		guard
-			Nb_short_term_sent < short_term_count
-		var
-			uint(size=32) ValShortTermList
+			FlagLongTerm = 0
 		do
-			ValShortTermList := short_term_list[Nb_short_term_sent];
-			Nb_short_term_sent := Nb_short_term_sent + 1;
-		end
-
-	
-	SendShortTermList_Done: action ==>
-		do
-			Nb_long_term_sent := 0;
-		end
-
-
-	SendLongTermList: action
-				==>
-			LongTermList:[ValLongTermList]
-		guard
-			Nb_long_term_sent < 16
-		var
-			uint(size=32) ValLongTermList
-		do
-			ValLongTermList   := long_term_list[Nb_long_term_sent];
-			Nb_long_term_sent := Nb_long_term_sent + 1;
-		end
-
-	
-	SendLongTermList_Done: action ==>
+			if (LongTermCount + ShortTermCount = NumRefFrame) then
+				ShortTermCount := ShortTermCount - 1;
+				if(ShortTermFalseFrame[ShortTermCount] = false) then
+					DelListTab[NbFrameDel] := STList[ShortTermCount];
+					NbFrameDel             := NbFrameDel + 1;
+				end
+			end
+			foreach int i in Integers (0, ShortTermCount - 1)
+			do
+				STList             [ShortTermCount - i] := STList             [ShortTermCount - i - 1];
+				ShortTermFalseFrame[ShortTermCount - i] := ShortTermFalseFrame[ShortTermCount - i - 1];
+			end
+			STList[0]              := FrameNum;
+			ShortTermFalseFrame[0] := false;
+			ShortTermCount         := ShortTermCount +1;
 		end
 
 
 	SendSizeDelList: action
 				==>
-			DelList:[Nbframedel]
+			DelList:[NbFrameDel]
 		end
 
 
@@ -417,12 +411,12 @@ actor Algo_MMCO ()
 				==>
 			DelList:[ValDelFrame]
 		guard
-			Nbframedel > 0
+			NbFrameDel > 0
 		var
 			int(size=32) ValDelFrame
 		do
-			Nbframedel  := Nbframedel - 1;
-			ValDelFrame := DelListTab[Nbframedel];
+			NbFrameDel  := NbFrameDel - 1;
+			ValDelFrame := DelListTab[NbFrameDel];
 		end
 
 
@@ -431,35 +425,35 @@ actor Algo_MMCO ()
 
 
 	schedule fsm  read_num_ref_frames:
-		read_num_ref_frames       (read_num_ref_frames                 )--> FillFalseRefFrame;
+		read_num_ref_frames (read_num_ref_frames    )--> FillFalseRefFrame;
 
-		FillFalseRefFrame    (FillFalseRefFrame                   )--> SendSizeLists;
-		FillFalseRefFrame    (skip_FillFalseRefFrame              )--> SendSizeLists;
+		FillFalseRefFrame   (FillFalseRefFrame      )--> SendSizeLists;
+		FillFalseRefFrame   (FillFalseRefFrame_done )--> SendSizeLists;
+
+		SendSizeLists       (SendSizeLists          )--> SendLists;
+		SendLists           (SendShortTermList      )--> SendLists;
+		SendLists           (SendLongTermList       )--> SendLists;
+		SendLists           (SendLists_Done         )--> check_IDR;
 
 		/* Get values about memory_management_control_operation */
-		check_IDR         (read_IDR               )--> update_idx;
-		check_IDR         (read_not_IDR_not_MMCO  )--> update_idx;
-		check_IDR         (read_not_IDR_MMCO      )--> MMCO_opcode;
-		MMCO_opcode       (MMCO_opcode            )--> MMCO_opcode;
-		MMCO_opcode       (MMCO_opcode_v0         )--> update_idx;
+		check_IDR           (read_IDR               )--> AddFrameInList;
+		check_IDR           (read_not_IDR_not_MMCO  )--> AddFrameInList;
+		check_IDR           (read_not_IDR_MMCO      )--> MMCO_opcode;
+		MMCO_opcode         (MMCO_opcode            )--> MMCO_opcode;
+		MMCO_opcode         (MMCO_opcode_IsEqualTo0 )--> AddFrameInList;
 
-		update_idx        (update_idx             )--> SendSizeDelList;
+		AddFrameInList      (AddFrameInLTList       )--> SendSizeDelList;
+		AddFrameInList      (AddFrameInSTList       )--> SendSizeDelList;
 
-		SendSizeLists     (SendSizeLists          )-->SendShortTermList;
-		SendShortTermList (SendShortTermList      )-->SendShortTermList;
-		SendShortTermList (SendShortTermList_Done )-->SendLongTermList;
-		SendLongTermList  (SendLongTermList       )-->SendLongTermList;
-		SendLongTermList  (SendLongTermList_Done  )-->check_IDR;
-
-		SendSizeDelList   (SendSizeDelList        )--> SendDelList;
-		SendDelList       (SendDelList            )--> SendDelList;
-		SendDelList       (SendDelListDone        )--> read_num_ref_frames;
+		SendSizeDelList     (SendSizeDelList        )--> SendDelList;
+		SendDelList         (SendDelList            )--> SendDelList;
+		SendDelList         (SendDelListDone        )--> read_num_ref_frames;
 	end
 
 	priority
-		SendSizeDelList     > SendDelList     > SendDelListDone;
-		SendShortTermList   > SendShortTermList_Done;
-		SendLongTermList    > SendLongTermList_Done;
+		SendDelList       > SendDelListDone;
+		SendShortTermList > SendLists_Done;
+		SendLongTermList  > SendLists_Done;
 	end
 
 end

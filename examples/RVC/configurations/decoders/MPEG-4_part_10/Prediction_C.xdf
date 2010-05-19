@@ -180,7 +180,7 @@
     <Port kind="Input" name="FrameNum">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
             </Entry>
         </Type>
     </Port>
