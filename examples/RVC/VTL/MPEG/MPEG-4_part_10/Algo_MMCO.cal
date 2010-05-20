@@ -69,6 +69,12 @@ actor Algo_MMCO ()
 	uint(size=5)  NbLTFrame
 		:
 
+/*
+*
+* Global variables
+*
+*/
+
 	List(type:uint(size=31), size=16) STList              := [0     : for int s in Integers(0,15)];
 	List(type:bool         , size=16) ShortTermFalseFrame := [false : for int s in Integers(0,15)];
 	List(type:int (size=32), size=16) LTList              := [-1    : for int s in Integers(0,15)];
@@ -86,7 +92,14 @@ actor Algo_MMCO ()
 	uint(size=1)  FlagLongTerm     := 0;
 	uint(size=4)  LongTermFrameIdx := 0;
 
+/*
+*
+* Actions
+*
+*/
 
+
+	//Get the Frame Num and others informations about the current picture
 	read_num_ref_frames: action
 			NumReferenceFrame :[ValNumRefFrame],
 			FraNum            :[ValFrame_Num],
@@ -101,6 +114,8 @@ actor Algo_MMCO ()
 		end
 
 
+	//If the new frame num isn't following the previous frame num,
+	//we must fill the short term list with all the missed frame num
 	FillFalseRefFrame : action ==>
 		guard
 			FrameNum != (LastFrameNum + 1) mod ValMaxFrameNum
@@ -400,13 +415,13 @@ actor Algo_MMCO ()
 			ShortTermCount         := ShortTermCount +1;
 		end
 
-
+	//Send the length of the DelList
 	SendSizeDelList: action
 				==>
 			DelList:[NbFrameDel]
 		end
 
-
+	//Send the DelList
 	SendDelList : action
 				==>
 			DelList:[ValDelFrame]
@@ -419,11 +434,15 @@ actor Algo_MMCO ()
 			ValDelFrame := DelListTab[NbFrameDel];
 		end
 
-
+	//Sent of the DelList is completed
 	SendDelListDone : action ==>
 		end
 
-
+/*
+*
+* Scheduler
+*
+*/
 	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames (read_num_ref_frames    )--> FillFalseRefFrame;
 

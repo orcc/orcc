@@ -76,8 +76,9 @@ actor Algo_NALU ()
 			if(nb_bytes_mem - 1 < NB_RBSP_BYTE_MAX) then
 				Input_Bitstream[nb_bytes_mem + 1] := 0;
 				nb_bytes_mem := nb_bytes_mem + 1;
+				nb_bytes_in_rbsp := nb_bytes_in_rbsp + 1;
 			end
-			nb_bytes_in_rbsp := nb_bytes_in_rbsp + 2;
+			nb_bytes_in_rbsp := nb_bytes_in_rbsp + 1;
 			nb_bytes_mem     := nb_bytes_mem + 1;
 		end /* delete_emul_3_byte */
 
@@ -100,9 +101,9 @@ actor Algo_NALU ()
 					nb_rbsp_byte_ready := true;
 					nb_bytes_sent      := 0;
 					/* The byte 01 of the start code is still in the fifo.
-					   2 bytes (00 00) of the next start code and the NALU header
-					   are included in nb_bytes_in_rbsp*/
-					nb_bytes_in_rbsp   := nb_bytes_in_rbsp -3;
+					   2 bytes (00 01) of the current start code, 1 byte of the next start
+					   code and the NALU header are included in nb_bytes_in_rbsp*/
+					nb_bytes_in_rbsp   := nb_bytes_in_rbsp - 4;
 					if(prev_byte_fifo = 0) then 
 						nb_bytes_in_rbsp   := nb_bytes_in_rbsp - 1; //The start code is 00 00 00 01 !!
 					end
