@@ -1,7 +1,7 @@
 %{
 (*****************************************************************************)
-(* ORCC frontend                                                             *)
-(* Copyright (c) 2008-2009, IETR/INSA of Rennes.                             *)
+(* Orcc frontend                                                             *)
+(* Copyright (c) 2008-2010, IETR/INSA of Rennes.                             *)
 (* All rights reserved.                                                      *)
 (*                                                                           *)
 (* This software is governed by the CeCILL-B license under French law and    *)
@@ -285,7 +285,7 @@ let var assignable global loc name t v =
 %left LT LE GT GE
 %left SHIFT_LEFT SHIFT_RIGHT
 %left PLUS MINUS
-%left DIV MOD TIMES SLASH
+%left DIV DIV_INT MOD TIMES
 %right EXP
 %nonassoc NOT SHARP UMINUS
 
