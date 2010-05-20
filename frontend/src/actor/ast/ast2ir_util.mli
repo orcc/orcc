@@ -39,6 +39,7 @@ val has_binding_var: env -> string -> bool
 
 val get_suffix: env -> string -> int option
 
+(** only used in [Ast2ir_action.create_loop]. *)
 val remove_binding_var: env -> Calir.IR.var_def -> env
 
 val reset_suffix: env -> unit
@@ -61,3 +62,13 @@ val ir_of_var_ref : env -> Loc.t -> string -> Calir.IR.var_def
 (** [ir_of_proc_name env loc proc_name] returns the procedure definition
 named [proc_name]. *)
 val ir_of_proc_name : env -> Loc.t -> string -> Calir.IR.proc
+
+(** [local_name global] returns the local name of a global variable. *)
+val local_name : Calir.IR.var_def -> string
+
+(** [get_global env vars graph node global] returns a tuple
+[(env, vars, node, local)]
+where [local] is the local variable that contains the given scalar global. *)
+val get_global :
+	env -> Calir.IR.var_def list -> Calir.CFG.t -> Calir.IR.node -> Calir.IR.var_def ->
+		env * Calir.IR.var_def list * Calir.IR.node * Calir.IR.var_def

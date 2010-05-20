@@ -19,6 +19,37 @@ open Ast2ir_util
 open Calir
 open IR
 
+(*****************************************************************************)
+(*****************************************************************************)
+(*****************************************************************************)
+
+(* deal with context to minimize number of temporary variables created *)
+
+type parent =
+	| PCall
+	| PIf
+	| PList
+	| POther
+
+type context = parent option * (var_def * expr list) option
+
+let mk_context ?var_def ?indexes () =
+	match var_def with
+		| None -> (None, None)
+		| Some var_def ->
+			let indexes =
+				match indexes with
+					| None -> []
+					| Some indexes -> indexes
+			in
+			(None, Some (var_def, indexes))
+
+(*****************************************************************************)
+(*****************************************************************************)
+(*****************************************************************************)
+
+(* utility functions *)
+
 let ir_of_uop = function
 	| Calast.UOpMinus -> UOpMinus
 	| Calast.UOpNbElts -> UOpNbElts
@@ -45,25 +76,6 @@ let ir_of_bop = function
 	| Calast.BOpShR -> BOpShR
 	| Calast.BOpTimes -> BOpTimes
 
-type parent =
-	| PCall
-	| PIf
-	| PList
-	| POther
-
-type context = parent option * (var_def * expr list) option
-
-let mk_context ?var_def ?indexes () =
-	match var_def with
-		| None -> (None, None)
-		| Some var_def ->
-			let indexes =
-				match indexes with
-					| None -> []
-					| Some indexes -> indexes
-			in
-			(None, Some (var_def, indexes))
-
 let mk_assign graph node var_def expr =
 	match expr with
 		| ExprVar (_, var_use) when var_use.vu_def == var_def ->
@@ -82,6 +94,11 @@ let mk_store loc graph node var_def indexes expr =
 			CFG.add_edge graph node store;
 			store
 
+(*****************************************************************************)
+(*****************************************************************************)
+(*****************************************************************************)
+
+(** [add_increments graph node] does something. Can't remember what though! *)
 let rec add_increments graph node =
 	match node.n_kind with
 		| While (ExprBOp (_, ExprVar (_, use), BOpLT, _, _), bt, be) ->
@@ -114,6 +131,12 @@ let rec add_increments graph node =
 			match CFG.succ graph node with
 				| [] -> node
 				| h :: _ -> add_increments graph h
+
+(*****************************************************************************)
+(*****************************************************************************)
+(*****************************************************************************)
+
+(* the real deal is below *)
 
 exception Not_builtin
 
@@ -151,12 +174,10 @@ let rec ir_of_expr env vars graph node ((_, target) as context) expr =
 			let expr = ExprVar (loc, mk_var_use var_def) in
 			(env, vars, node, expr)
 		| _ ->
-			(* creates a temp var with the same type as the global *)
-			let (env, vars, tgt) = mk_tmp env vars var_def.v_type in
-			let load = mk_node (Load (ref tgt, mk_var_use var_def, [])) in
-			let expr = ExprVar (loc, mk_var_use tgt) in
-			CFG.add_edge graph node load;
-			(env, vars, load, expr))
+			(* retrieve the local variable that contains the given scalar global. *)
+			let (env, vars, node, var_def) = get_global env vars graph node var_def in
+			let expr = ExprVar (loc, mk_var_use var_def) in
+			(env, vars, node, expr))
 
 	| Calast.ExprIdx (loc, (var_loc, var_ref), indexes) ->
 		ir_of_idx env vars graph node context loc var_loc var_ref indexes

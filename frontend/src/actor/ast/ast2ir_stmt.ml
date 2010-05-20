@@ -17,6 +17,12 @@ open Ast2ir_util
 open Calir
 open IR
 
+(*****************************************************************************)
+(*****************************************************************************)
+(*****************************************************************************)
+
+(* conversion of println *)
+
 let format_of_expr env vars graph node expr =
 	let ctx = Ast2ir_expr.mk_context () in
 	
@@ -99,6 +105,8 @@ let ir_of_store env vars graph node loc var_def indexes expr =
 			CFG.add_edge graph node store;
 			(env, vars, store)
 
+(** [ir_of_instrs env vars graph node instrs] transforms the [Calast.instr list] to
+a [stmt list]. *)
 let ir_of_instrs env vars graph node instrs =
 	List.fold_left
 		(fun (env, vars, node) instr ->
@@ -136,6 +144,7 @@ let ir_of_instrs env vars graph node instrs =
 					| "print" -> ir_of_print env vars graph node loc parameters
 					| "println" -> ir_of_println env vars graph node loc parameters
 					| _ ->
+						(* a call to a function not built-in *)
 						let ctx = Ast2ir_expr.mk_context () in
 						let (env, vars, node, parameters) =
 							Ast2ir_expr.ir_of_expr_list env vars graph node ctx parameters
@@ -149,8 +158,7 @@ let ir_of_instrs env vars graph node instrs =
 (** [ir_of_stmts_rec env vars stmts] transforms the [Calast.stmt list] to
 a [stmt list]. During this transformation, any variable declared in an inner block
 (block, foreach, while) is moved at the action/procedure scope. This is why we need the 
-[vars] variables, so that new variables can be added there. The [env_level] map contains
-the level associated with each inner variable declared. *)
+[vars] variables, so that new variables can be added there. *)
 let rec ir_of_stmts_rec env vars graph entry stmts =
 	let (vars, exit) =
 		List.fold_left
