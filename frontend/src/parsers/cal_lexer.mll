@@ -61,10 +61,19 @@ let _ =
 			("regexp", REGEXP);
 			("repeat", REPEAT);
 			("schedule", SCHEDULE);
+			("size", SIZE);
 			("then", THEN);
 			("true", TRUE);
+			("type", TYPE);
 			("var", VAR);
 			("while", WHILE);
+
+			("bool", TYPE_BOOL);
+			("float", TYPE_FLOAT);
+			("int", TYPE_INT);
+			("List", TYPE_LIST);
+			("String", TYPE_STRING);
+			("uint", TYPE_UINT);
     ]
 
 (* Update the current location with file name and line number. *)

@@ -55,85 +55,6 @@ let uop loc op e = Calast.ExprUOp (loc, op, e)
 (*****************************************************************************)
 (*****************************************************************************)
 (*****************************************************************************)
-(* Type definitions *)
-
-(** Defines different kinds of type attributes. *)
-type type_attr =
-	| ExprAttr of Calast.expr (** A type attribute that references an expression. *)
-	| TypeAttr of Calast.type_def (** A type attribute that references a type. *)
-
-(** [find_size loc typeAttrs] attemps to find a [type_attr] named ["size"]
- that is an [ExprAttr]. The function returns a [Calast.expr]. *)
-let find_size loc typeAttrs =
-	let attr = 
-		List.assoc "size" typeAttrs
-	in
-  match attr with
-		| ExprAttr e -> e
-		| _ ->
-		  Asthelper.failwith loc "size must be an expression!"
-
-(** [find_type loc typeAttrs] attemps to find a [type_attr] named ["type"]
- that is an [TypeAttr]. The function returns a [Calast.type_def]. *)
-let find_type loc typeAttrs =
-	let attr = 
-		List.assoc "type" typeAttrs
-	in
-  match attr with
-		| TypeAttr t -> t
-		| _ -> Asthelper.failwith loc "type must be a type!"
-
-(** [find_size_or_default loc typeAttrs] attemps to find a [type_attr]
- named ["size"] that is an [ExprAttr]. If not found, the function returns the
- default size given as an [int]. *)
-let find_size_or_default loc typeAttrs default =
-	(* size in bits *)
-	try
-		find_size loc typeAttrs
-	with Not_found ->
-  	(* no size information found, assuming "default" bits. *)
-  	Calast.ExprInt (loc, default)
-
-(** [type_of_typeDef loc name typeAttrs] returns a [Calast.type_def] from a
- name and type attributes that were parsed. *)
-let type_of_typeDef loc name typeAttrs =
-	match name with
-		| "bool" -> Calast.TypeBool
-		| "float" -> Calast.TypeFloat
-		| "int" -> Calast.TypeInt (find_size_or_default loc typeAttrs 32)
-		| "list" ->
-			Asthelper.failwith loc
-				"The type \"list\" is deprecated. Please use \"List\"."
-		| "List" ->
-			(* get a type *)
-			let t =
-				try
-					find_type loc typeAttrs
-			  with Not_found ->
-			    Asthelper.failwith loc
-						"RVC-CAL requires that all lists have a type."
-			in
-			
-			(* and a size in number of elements *)
-			let size =
-				try
-					find_size loc typeAttrs
-				with Not_found ->
-			    Asthelper.failwith loc
-						"RVC-CAL requires that all lists have a size."
-			in
-			Calast.TypeList (t, size)
-    | "string" ->
-			Asthelper.failwith loc
-				"The type \"string\" is deprecated. Please use \"String\"."
-		| "String" -> Calast.TypeStr
-		| "uint" -> Calast.TypeUint (find_size_or_default loc typeAttrs 32)
-		| t ->
-			Asthelper.failwith loc ("Unsupported type \"" ^ t ^ "\"")
-
-(*****************************************************************************)
-(*****************************************************************************)
-(*****************************************************************************)
 (* Actor definitions. *)
 
 let get_something p l =
@@ -232,10 +153,19 @@ let var assignable global loc name t v =
 %token REGEXP
 %token REPEAT
 %token SCHEDULE
+%token SIZE
 %token THEN
 %token TRUE
+%token TYPE
 %token VAR
 %token WHILE
+
+%token TYPE_BOOL
+%token TYPE_FLOAT
+%token TYPE_INT
+%token TYPE_LIST
+%token TYPE_STRING
+%token TYPE_UINT
 
 /* tokens */
 %token ARROW
@@ -378,14 +308,14 @@ actionTagOpt:
 /***************************************************************************/
 /* a CAL actor. */
 actor:
-	actorImportsOpt ACTOR ident typeParsOpt LPAREN actorParametersOpt RPAREN
+	actorImportsOpt ACTOR ident LPAREN actorParametersOpt RPAREN
 	actorPortDeclsOpt DOUBLE_EQUAL_ARROW actorPortDeclsOpt COLON
 	actorDeclarationsOpt
 	END EOF
 	{
 		let (_, name) = $3 in
 
-		let (declarations, schedule) = $12 in
+		let (declarations, schedule) = $11 in
 		let (actions, declarations) = get_actions declarations in
 		let (funcs, declarations) = get_funcs declarations in
 		let (priorities, declarations) = get_priorities declarations in
@@ -398,11 +328,11 @@ actor:
 		ac_file = ""; (* this is filled later by parse_actor *)
 	  ac_fsm = schedule;
 		ac_funcs = funcs;
-	  ac_inputs = $8;
+	  ac_inputs = $7;
 		ac_initializes = initializes;
 	  ac_name = name;
-	  ac_outputs = $10;
-	  ac_parameters = $6;
+	  ac_outputs = $9;
+	  ac_parameters = $5;
 	  ac_priorities = priorities;
 	  ac_procs = procs;
 	  ac_vars = vars }
@@ -718,45 +648,21 @@ statements:
 /*****************************************************************************/
 /* type attributes and definitions */
 
-/* a type attribute, such as "type:" and "size=" */
-typeAttr:
-	ident COLON typeDef
-	{ let (_, name) = $1 in
-		(name, TypeAttr $3) }
-| ident EQ expression
-	{ let (_, name) = $1 in
-		(name, ExprAttr $3) }
+typeAttrSize: SIZE EQ expression { $3 }
+typeAttrType: TYPE COLON typeDef { $3 }
 
-typeAttrs:
-	typeAttr { [$1] }
-| typeAttrs COMMA typeAttr { $3 :: $1 }
+typeAttrSizeOpt:
+	{ Calast.ExprInt (loc(), 32) }
+| LPAREN typeAttrSize RPAREN { $2 }
 
-/* a type definition: bool, int(size=5), list(type:int, size=10)... */	
+/* a type definition: bool, int(size=5), list(type:int, size=10)... */
 typeDef:
-	ident
-	{ let (_, name) = $1 in
-		type_of_typeDef (loc ()) name [] }
-| ident LBRACKET typePars RBRACKET 
-	{ Asthelper.failwith (loc ()) "RVC-CAL does not support type parameters." }
-| ident LPAREN typeAttrs RPAREN
-	{ let (_, name) = $1 in
-		type_of_typeDef (loc ()) name (List.rev $3) }
-
-/*****************************************************************************/
-/* type parameters */
-
-typePar:
-	ident { () } 
-| ident LT typeDef { () }
-
-typePars:
-	typePar { () }
-| typePars typePar { () }
-
-typeParsOpt:
-	{ () }
-| LBRACKET typePars RBRACKET
-	{ Asthelper.failwith (loc ()) "RVC-CAL does not support type parameters." }
+	TYPE_BOOL { Calast.TypeBool }
+| TYPE_FLOAT { Calast.TypeFloat }
+| TYPE_STRING { Calast.TypeStr }
+| TYPE_INT typeAttrSizeOpt { Calast.TypeInt $2 }
+| TYPE_UINT typeAttrSizeOpt { Calast.TypeUint $2 }
+| TYPE_LIST LPAREN typeAttrType COMMA typeAttrSize RPAREN { Calast.TypeList ($3, $5) }
 
 /*****************************************************************************/
 /* variable declarations */
