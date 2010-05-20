@@ -1218,7 +1218,7 @@ actor Algo_Synp_AVC()
 	function done_reading_bits() --> bool : bits_to_read_count < 0 end
 	function read_result() --> int : read_result_in_progress end
 	function more_rbsp_data() --> uint(size=1) : 
-		if (bit_count + 8)/ 8  < val_nb_rbsp_bytes - 1 
+		if (bit_count + 8)/ 8  < val_nb_rbsp_bytes 
 			then 1 
 			else 
 				if (8 - (bit_count mod 8) = 8) then

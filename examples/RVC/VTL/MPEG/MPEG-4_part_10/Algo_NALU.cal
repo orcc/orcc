@@ -102,7 +102,7 @@ actor Algo_NALU ()
 					nb_bytes_sent      := 0;
 					/* The byte 01 of the start code is still in the fifo.
 					   2 bytes (00 01) of the current start code, 1 byte of the next start
-					   code and the NALU header are included in nb_bytes_in_rbsp*/
+					   code (00) and the NALU header are included in nb_bytes_in_rbsp*/
 					nb_bytes_in_rbsp   := nb_bytes_in_rbsp - 4;
 					if(prev_byte_fifo = 0) then 
 						nb_bytes_in_rbsp   := nb_bytes_in_rbsp - 1; //The start code is 00 00 00 01 !!
