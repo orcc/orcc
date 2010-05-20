@@ -4517,7 +4517,9 @@ actor Algo_Synp_AVC()
 
 	byte_align: action ==>
 	do
-		set_bits_to_read( 8 - bitand( bit_count, 7 ) );
+		if(bitand( bit_count, 7 )) then
+			set_bits_to_read( 8 - bitand( bit_count, 7 ) );
+		end
 	end
 	
 	
