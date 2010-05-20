@@ -69,22 +69,35 @@ actor Algo_RefList ()
 	int (size=32) RefList
 		:
 
+/*
+*
+* Global variables
+*
+*/
+
 	List(type:int(size=32), size=16) RefListTab := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32), size=16) STList     := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32), size=16) LTList     := [-1 :for int s in Integers(0,16-1)];
 
-	uint(size=31) FrameNum           := 0;
+	uint(size=31) FrameNum           := 0; /* Frame Number of the current picture                                       */
 	int (size=32) ValMovedFrame      := 0;
 	uint(size=31) ValMaxFrameNum     := 0;
 	uint(size=4)  IdxInsertFrame     := 0;
-	uint(size=5)  ShortTermCount     := 0;
-	uint(size=5)  LongTermCount      := 0;
-	uint(size=5)  CounterRefListTab  := 0;
-	uint(size=5)  NbSTRead           := 0;
-	uint(size=5)  NbLTRead           := 0;
-	uint(size=5)  NumMaxListRefFrame := 0;
+	uint(size=5)  ShortTermCount     := 0; /* Contains number of available short term reference picture                 */
+	uint(size=5)  LongTermCount      := 0; /* Contains number of available long term reference picture                  */
+	uint(size=5)  CounterRefListTab  := 0; /* Contains the number of RefList's element which are sent                   */
+	uint(size=5)  NbSTRead           := 0; /* Contains the number of Short Term List's' element which are read          */
+	uint(size=5)  NbLTRead           := 0; /* Contains the number of Long Term List's' element which are read           */
+	uint(size=5)  NumMaxListRefFrame := 0; /* Frame Number of all pictures must be between 0 and NumMaxListRefFrame - 1 */
+
+/*
+*
+* Actions
+*
+*/
 
 
+	//Gets slice's FrameNum and slice's MaxFrameNum
 	read_num_ref_frames: action
 			FraNum      :[frame_num],
 			MaxFrameNum :[MaxFrNu]
@@ -95,6 +108,7 @@ actor Algo_RefList ()
 		end
 
 
+	//Get the size of Long Term and Short Term lists
 	ReadSizeLists: action
 			SzSTList    :[size_short_term_list],
 			NbLTFrame :[val_long_term_count]
@@ -107,6 +121,7 @@ actor Algo_RefList ()
 		end
 
 
+	//Fill the Short Term List
 	ReadShortTermList: action
 			ShortTermList :[ValShortTerm]
 				==>
@@ -118,6 +133,7 @@ actor Algo_RefList ()
 		end
 
 
+	//Fill the Long Term List
 	ReadLongTermList: action
 			LongTermList :[ValLongTerm]
 				==>
@@ -129,10 +145,12 @@ actor Algo_RefList ()
 		end
 
 
+	//Long Term and Short Term are read
 	ReadListsDone: action ==>
 		end
 
 
+	//Get the Length of the Reference Frame (and send it throw RefList) and initialize the RefListTab
 	InitRefList: action
 		NbRefFrame :[ValIDxMax]
 			==>
@@ -140,12 +158,14 @@ actor Algo_RefList ()
 	var
 			int ListIndex := 0
 	do
+		//NumMaxListRefFrame = min(ValIDxMax, ShortTermCount + LongTermCount)
 		if(ValIDxMax < ShortTermCount + LongTermCount) then
 			NumMaxListRefFrame := ValIDxMax;
 		else
 			NumMaxListRefFrame := ShortTermCount + LongTermCount;
 		end
 
+		//Initialize RefListTab
 		foreach int i in Integers (0, ShortTermCount - 1)
 		do
 			RefListTab[i] := STList[i];
@@ -160,10 +180,13 @@ actor Algo_RefList ()
 				end
 			end
 		end
+
+		//Indicates that nothing in RefList has been sent
 		CounterRefListTab := 0;
 	end
 
 
+	//If we don't have to reorder the list, we jump to SendRefList (see scheduler)
 	read_ref_pic_list_reordering_flag_0: action 
 			RefReordering :[reordering_flag]
 				==>
@@ -172,6 +195,7 @@ actor Algo_RefList ()
 		end
 
 
+	//We have to reorder the list
 	read_ref_pic_list_reordering_flag_1: action 
 			RefReordering :[reordering_flag]
 				==> 
@@ -182,7 +206,8 @@ actor Algo_RefList ()
 			IdxInsertFrame := 0;
 		end
 
-  
+
+	//A Short Term Reference must be reordered
 	read_reordering_of_pic_nums_idc_0or1: action
 			RefReordering :[reordering_of_pic_nums_idc, abs_diff_pic_num_minus1]
 				==>
@@ -191,6 +216,7 @@ actor Algo_RefList ()
 		var 
 			uint(size=4) idxRefList         := 0
 		do
+			//Compute the value of the re-mapped reference picture
 			if (reordering_of_pic_nums_idc = 0) then 
 				ValMovedFrame := ValMovedFrame - abs_diff_pic_num_minus1 - 1 ; 
 				if(ValMovedFrame < 0) then
@@ -202,28 +228,30 @@ actor Algo_RefList ()
 					ValMovedFrame := ValMovedFrame - ValMaxFrameNum;
 				end
 			end
+
+			//Search the location of the reference picture (ValMovedFrame) in the RefList
 			foreach int i in Integers(0, ShortTermCount + LongTermCount-1)
 			do
 				if (RefListTab[i] = ValMovedFrame) then 
 					idxRefList := i; 
 				end
 			end
-			//Remove from the reference list the frame at IdxInsertFrame equals to idx
 
-			//Add a frame at IdxInsertFrame equals to IdxInsertFrame.
-			//So copy the IdxInsertFrame - 1 first elements
-			//Add pred_ix at IdxInsertFrame "IdxInsertFrame"
-			//and copy the others elements of the list
-
+			//Shift to the right all the element with an index between 
+			//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
+			//Thanks to this shift, the short term reference picture located at idxRefList is deleted.
 			foreach int i in Integers (0, idxRefList - IdxInsertFrame - 1)
 			do
 				RefListTab[idxRefList - i] := RefListTab[idxRefList - i - 1];
 			end
+			//Put the short term ref picture in his new position
 			RefListTab[IdxInsertFrame] := ValMovedFrame;
+			//The next reference picture will be insert next to this ref picture
 			IdxInsertFrame             := IdxInsertFrame +1 ;
 		end
 
 
+	//A Long Term Reference must be reordered
 	read_reordering_of_pic_nums_idc_2: action
 			RefReordering:[reordering_of_pic_nums_idc, idx_LTList]
 				==>
@@ -232,6 +260,7 @@ actor Algo_RefList ()
 		var 
 			uint(size=32) idxRefList
 		do
+			//Search the location of the reference picture in the RefList
 			foreach int i in Integers(0, ShortTermCount + LongTermCount - 1)
 			do
 				if (RefListTab[i] = LTList[idx_LTList]) then 
@@ -239,21 +268,21 @@ actor Algo_RefList ()
 				end
 			end
 
-			//Remove from the reference list the frame at IdxInsertFrame equals to idx
-			
-			//Add a frame at IdxInsertFrame equals to IdxInsertFrame.
-			//So copy the IdxInsertFrame - 1 first elements
-			//Add pred_ix at IdxInsertFrame "IdxInsertFrame"
-			//and copy the others elements of the list
+			//Shift to the right all the element with an index between 
+			//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
+			//Thanks to this shift, the long term reference picture located at idxRefList is deleted.
 			foreach int i in Integers (0, idxRefList - IdxInsertFrame - 1)
 			do
 				RefListTab[idxRefList - i] := RefListTab[idxRefList - i - 1];
 			end			
+			//Put the long term ref picture in his new position
 			RefListTab[IdxInsertFrame] := LTList[idx_LTList];
+			//The next reference picture will be insert next to this ref picture
 			IdxInsertFrame             := IdxInsertFrame + 1 ;
 		end
 
 
+	//Reordering is completed
 	read_reordering_of_pic_nums_idc_3: action
 			RefReordering:[reordering_of_pic_nums_idc]
 				==>
@@ -261,7 +290,7 @@ actor Algo_RefList ()
 			reordering_of_pic_nums_idc = 3
 		end
 
-
+	//Send the RefList
 	SendRefList: action 
 				==>
 			RefList:[ref]
@@ -274,11 +303,15 @@ actor Algo_RefList ()
 			CounterRefListTab := CounterRefListTab + 1;
 	end
 
-
+	//The RefList is sent
 	SendRefListDone: action ==>
 	end
 
-
+/*
+*
+* Scheduler
+*
+*/
 	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames               (read_num_ref_frames                  )--> ReadSizeLists;
 
@@ -288,10 +321,8 @@ actor Algo_RefList ()
 		ReadLists                         (ReadListsDone                        )--> InitRefList;
 
 		InitRefList                       (InitRefList                          )--> read_ref_pic_list_reordering_flag;
-		/* there isn't list to sent */
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_0  )--> SendRefList;
 
-		/* there is list 0 to sent */
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_1  )--> read_reordering_of_pic_nums_idc;
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_0or1 )--> read_reordering_of_pic_nums_idc;
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_2    )--> read_reordering_of_pic_nums_idc;
