@@ -1,8 +1,0 @@
-// XFAIL: a given port cannot be referenced more than once in a given action
-
-actor Actor () int Port1, int Port2 ==> int Port3, int Port4, int Port5:
-
-  action Port1:[a], Port1:[b] ==>
-  end
-
-end

@@ -1,5 +1,0 @@
-// XFAIL: any two parameters may not have the same name
-
-actor Actor (int PARAM, int PARAM) ==> :
-
-end

@@ -1,7 +1,0 @@
-// XFAIL: a state variable may not override a parameter
-
-actor Actor (int PARAM) ==> :
-
-  int PARAM := 5;
-
-end

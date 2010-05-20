@@ -1,5 +1,0 @@
-// PASS: an input port and an output port may have similar names, because context is always enough to disambiguate a reference to a port
-
-actor Actor () int(size=3) DuplicatePort ==> int(size=5) DuplicatePort :
-
-end

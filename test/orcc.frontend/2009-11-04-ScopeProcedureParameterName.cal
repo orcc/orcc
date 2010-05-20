@@ -1,9 +1,0 @@
-// XFAIL: any two procedure parameters may not have the same name
-
-actor Actor () ==> :
-
-  procedure X(int PARAM, int PARAM)
-  begin
-  end
-
-end

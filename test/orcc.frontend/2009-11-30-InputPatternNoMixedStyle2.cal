@@ -1,8 +1,0 @@
-// XFAIL: input pattern associated with ports by name or by position, but not both!
-
-actor Actor () int Port1, int Port2, int Port3 ==> int Port4, int Port5, int Port6, int Port7:
-
-  action [a], Port2:[b], Port3:[c] ==>
-  end
-
-end
