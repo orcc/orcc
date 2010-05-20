@@ -1,0 +1,14 @@
+actor Load_store_test_simple () ==> :
+	
+	int s := 0;
+	
+	test: action ==>
+	do
+		println("s = " + s);
+		s := s + 1;
+		s := s + 1;
+		s := s + 1;
+		println("s = " + s);
+	end
+	
+end

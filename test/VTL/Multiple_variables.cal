@@ -1,0 +1,118 @@
+actor Multiple_variables (int LUMA_CHROMA) uint(size=8) DB_I, uint(size=6) BS
+==> uint(size=8) DB_O :
+
+//LUMA_CHROMA luma:=0, chroma:=1
+	///////////////
+	// Constants //
+	///////////////
+	int SAMPLE_SZ = 8;
+
+	int MB_BLOCK_SIZE_MAX = 16;
+
+	int MB_BLOCK_SIZE_LUMA = 16;
+
+	int MB_BLOCK_SIZE_CHROMA = 8;
+
+	int MB_BLOCK_SIZE;
+
+	int FRAME = 0;
+
+	// image structures
+	int TOP_FIELD = 1;
+
+	int BOTTOM_FIELD = 2;
+
+	int MAXVAL_LUMA = 255;
+
+	int MAXVAL_CHROMA = 255;
+
+	/////////////////////
+	// State Variables //
+	/////////////////////
+	List(type: List(type: uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX), size=MB_BLOCK_SIZE_MAX) curr_mb
+	:= [ [ 0 : for int i in Integers(0, MB_BLOCK_SIZE_MAX - 1) ] : for int j in
+	Integers(0, MB_BLOCK_SIZE_MAX - 1) ];
+
+	List(type: List(type: uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX), size=MB_BLOCK_SIZE_MAX) up_mb
+	:= [ [ 0 : for int i in Integers(0, MB_BLOCK_SIZE_MAX - 1) ] : for int j in
+	Integers(0, MB_BLOCK_SIZE_MAX - 1) ];
+
+	List(type: List(type: uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX), size=MB_BLOCK_SIZE_MAX) left_mb
+	:= [ [ 0 : for int i in Integers(0, MB_BLOCK_SIZE_MAX - 1) ] : for int j in
+	Integers(0, MB_BLOCK_SIZE_MAX - 1) ];
+
+	// option to disable filtering for image or across slices
+	// Macroblock parameters
+	List(type: uint(size=6), size=3) Alist := [ 0 : for int i in Integers(0, 3 - 1)
+	];
+
+	//curr,left,up
+	List(type: uint(size=6), size=3) Blist := [ 0 : for int i in Integers(0, 3 - 1)
+	];
+
+	//curr,left,up 
+	uint(size=1) StrengthNotZero := 0;
+
+	List(type: uint(size=3), size=32) Strength := [ 0 : for int i in Integers(0,
+	32 - 1) ];
+
+	// Read Macroblock data
+	StartMB_LUMA: action DB_I:[ v ] repeat (MB_BLOCK_SIZE_LUMA + 4) * (
+		MB_BLOCK_SIZE_LUMA + 4), BS:[ u ] repeat 38 ==>
+	var
+		List(type: int(size=SAMPLE_SZ), size=4 * MB_BLOCK_SIZE_LUMA) upbuf :=
+		[ 0 : for int i in Integers(0, 4 * MB_BLOCK_SIZE_LUMA - 1) ],
+		
+		List(type: int(size=SAMPLE_SZ), size=4 * MB_BLOCK_SIZE_LUMA) leftbuf :=
+		[ 0 : for int i in Integers(0, 4 * MB_BLOCK_SIZE_LUMA - 1) ],
+		
+		List(type: int(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA)
+			currbuf :=
+			[ 0 : for int i in Integers(0, MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA - 1) ],
+		
+		int uc := 0, int lc := 0, int cc := 0
+	do
+		foreach int i in Integers(0, (MB_BLOCK_SIZE_LUMA + 4) * (MB_BLOCK_SIZE_LUMA +
+		4) - 1) do
+			if (i < 4 * (MB_BLOCK_SIZE_LUMA + 4)) then
+				if ((i mod (MB_BLOCK_SIZE_LUMA + 4)) > 3) then
+					upbuf[uc] := v[i];
+					uc := uc + 1;
+				end
+			else
+				if ((i mod (MB_BLOCK_SIZE_LUMA + 4)) > 3) then
+					currbuf[cc] := v[i];
+					cc := cc + 1;
+				else
+					leftbuf[lc] := v[i];
+					lc := lc + 1;
+				end
+			end
+		end
+		foreach int y in Integers(0, MB_BLOCK_SIZE_LUMA - 1) do
+			foreach int x in Integers(0, MB_BLOCK_SIZE_LUMA - 1) do
+				curr_mb[y, x] := currbuf[x + y * MB_BLOCK_SIZE_LUMA];
+			end
+		end
+		foreach int y in Integers(0, MB_BLOCK_SIZE_LUMA - 1) do
+			foreach int x in Integers(MB_BLOCK_SIZE_LUMA - 4, MB_BLOCK_SIZE_LUMA - 1) do
+				left_mb[y, x] := leftbuf[(x mod 4) + y * 4];
+			end
+		end
+		foreach int y in Integers(MB_BLOCK_SIZE_LUMA - 4, MB_BLOCK_SIZE_LUMA - 1) do
+			foreach int x in Integers(0, MB_BLOCK_SIZE_LUMA - 1) do
+				up_mb[y, x] := upbuf[x + ((y mod 4) * MB_BLOCK_SIZE_LUMA)];
+			end
+		end
+		StrengthNotZero := 0;
+		foreach int i in Integers(0, 31) do
+			Strength[i] := u[i];
+			if (Strength[i] != 0) then
+				StrengthNotZero := 1;
+			end
+		end
+		Alist := [ u[i] : for int i in Integers(32, 34) ];
+		Blist := [ u[i] : for int i in Integers(35, 37) ];
+	end
+
+end
