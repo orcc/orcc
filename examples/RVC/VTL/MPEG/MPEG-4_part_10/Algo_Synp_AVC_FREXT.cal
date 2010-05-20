@@ -111,7 +111,9 @@ actor Algo_Synp_AVC_FREXT()
 	bool First_part := false;
 	int Codeword;
 	int CodeLen;
-
+	
+	bool TRACE := true;
+	int  trVal := 0;
 	// ********** Read CAVLC ********** //
 	bool NewCoeff := false;
 	uint(size=2) CAVLC_type;// 0 coeff_token, 1 total_zeros, 2 run_before
@@ -1908,7 +1910,7 @@ actor Algo_Synp_AVC_FREXT()
 								total_zeros := VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][2]; NewCoeff := false; 
 							end
 						else //maxNumCoeff = 8
-							println("Chroma DC 2x4 block not implemented");
+							////println("Chroma DC 2x4 block not implemented");
 						end
 					end
 				end
@@ -4176,7 +4178,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		nal_unit_type := mask_bits(read_result(), 5);
 		nal_ref_idc := mask_bits(rshift(read_result(), 5), 2);
-		//println("nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
+		////println("nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
 		bit_count := 0;
 	end
  
@@ -4243,7 +4245,7 @@ actor Algo_Synp_AVC_FREXT()
 		or profile_idc[sps_id] = 83 
 		or profile_idc[sps_id] = 86)
 	 do
-		println("read_Sps_chroma_format_idc not yet implemented");
+		//println("read_Sps_chroma_format_idc not yet implemented");
 	 end
 	 // end if
  
@@ -4486,8 +4488,8 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		vui_parameters_present_flag[sps_id] := mask_bits(read_result(), 1);
 		set_bits_to_read(1); //to continue reading the bitstream
-		//println("read Sps header done");
-		//println("");
+		////println("read Sps header done");
+		////println("");
 	end
 	/******* End of Sequence Parameter Set HEADER  ********/
  
@@ -4543,7 +4545,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		num_slice_groups_minus1[pps_id] := vld_ue();
 		start_vld();
-		println("num_slice_groups_minus1 > 0 not yet implemented");
+		//println("num_slice_groups_minus1 > 0 not yet implemented");
 	end
 
 	read_Pps_check_slice_group_map_type: action ==>
@@ -4551,7 +4553,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end()
 	do
 		slice_group_map_type[pps_id] := vld_ue();
-		println("read_Pps_check_slice_group_map_type : "+slice_group_map_type[pps_id]);
+		//println("read_Pps_check_slice_group_map_type : "+slice_group_map_type[pps_id]);
 		if slice_group_map_type[pps_id] = 0 or slice_group_map_type[pps_id] = 2 or slice_group_map_type[pps_id] = 6 then start_vld(); end
 		if slice_group_map_type[pps_id] = 3 or slice_group_map_type[pps_id] = 4 or slice_group_map_type[pps_id] =5 then set_bits_to_read(1); end
 		Pps_inc :=0;
@@ -4623,7 +4625,7 @@ actor Algo_Synp_AVC_FREXT()
 		slice_group_map_type[pps_id] = 6
 	do
 		pic_size_in_map_units_minus1[pps_id] := vld_ue();
-		println(" PB : slice_group_map_type = 6 -> search code_start"); 
+		//println(" PB : slice_group_map_type = 6 -> search code_start"); 
 	end
 	// end if
 
@@ -4697,8 +4699,8 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
-		//println("read Pps header done");
-		println("");
+		////println("read Pps header done");
+		//println("");
 	end
 
 	//Not implemented due to guard condition : more_rbsp_data 
@@ -4706,8 +4708,8 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 	more_rbsp_data()=1
 	do
-	println("PPS High Profile not yet implemented !");
-	println("");
+	//println("PPS High Profile not yet implemented !");
+	//println("");
 	end
 	*/
 	/******* End of Picture Parameter Set HEADER  ********/
@@ -5011,7 +5013,7 @@ actor Algo_Synp_AVC_FREXT()
 			end 
 		end
 		POC_val := if TopFieldOrderCnt < BottomFieldOrderCnt then TopFieldOrderCnt else BottomFieldOrderCnt end ;
-		//println("Currentpoc "+POC);
+		////println("Currentpoc "+POC);
 		prev_frame_num_offset := frame_num_offset;
 		prev_frame_num := frame_num;
 		prevPicOrderCntLsb := pic_order_cnt_lsb;
@@ -5293,7 +5295,7 @@ actor Algo_Synp_AVC_FREXT()
 		(weighted_pred_flag[sps_id] = 1 and (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP))
 		or (weighted_bipred_idc[sps_id] = 1 and slice_type = SLICE_TYPE_B)
 	do
-		println("SliceH : pred_weight_table not yet implemented"); 
+		////println("SliceH : pred_weight_table not yet implemented"); 
 	end
  
 	//else
@@ -5654,13 +5656,13 @@ actor Algo_Synp_AVC_FREXT()
 		done_reading_bits()
 	do
 		slice_group_change_cycle := read_result();
-		//println("read Slice header done");
+		////println("read Slice header done");
 	end
 
 	//else
 	read_SliceH_skip_slice_group_change_cycle: action ==>
 	//do
-	//println("read Slice header done");
+	////println("read Slice header done");
 	end
 	//end if
 
@@ -5822,7 +5824,8 @@ actor Algo_Synp_AVC_FREXT()
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
-			MvRes:[0,0]			
+			MvRes:[0,0],
+			VALUE:[[0: for int i in Integers(0,407) ]] repeat 408
 	guard
 		prevMbSkipped = 1 and IS_CABAC()
 	var 
@@ -5856,7 +5859,7 @@ actor Algo_Synp_AVC_FREXT()
 		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
 		entropy_coding_mode_flag[pps_id] = 1
 	do
-		println("read_SliceD_mb_skip_flag : CABAC interleaved not implemented");
+		////println("read_SliceD_mb_skip_flag : CABAC interleaved not implemented");
 		// mb_skip_flag   ae(v)
 		// moreDataFlag = !mb_skip_flag
 	end
@@ -5883,7 +5886,7 @@ actor Algo_Synp_AVC_FREXT()
 		MbaffFrameFlag = 1,
 		(( val_CurrMbAddr mod 2) = 0 or ( (val_CurrMbAddr mod 2) = 1 and prevMbSkipped = 1) )
 	do
-		println("read_SliceD_mb_field_decoding_flag : interleaved not implemented");
+		////println("read_SliceD_mb_field_decoding_flag : interleaved not implemented");
 	end
 
 	// else
@@ -5977,7 +5980,7 @@ actor Algo_Synp_AVC_FREXT()
 			//else 
 			// end_of_slice_flag 2 ae(v)
 			// moreDataFlag = !end_of_slice_flag end
-			//println("read ae end_of_slice_flag");
+			////println("read ae end_of_slice_flag");
 		else
 		  GetCabacEndOfSliceFlagSyntaxElement();
 		  start_cabac();
@@ -6004,8 +6007,8 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		moreDataFlag = 0
 	//do
-	//println("read Slice Data done");
-	//println("");
+	////println("read Slice Data done");
+	////println("");
 	end
 	//******* End of Slice DATA  ********/
  
@@ -6387,7 +6390,7 @@ actor Algo_Synp_AVC_FREXT()
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and ( not IS_Intra_16x16() ) ) and IS_CAVLC()
 	end
 	
-	read_MB_layer_skip_mb_qp_delta_CABAC: action ==> 
+	read_MB_layer_skip_mb_qp_delta_CABAC: action ==> VALUE:[[0: for int i in Integers(0,407)]] repeat 408
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and ( not IS_Intra_16x16() ) ) and IS_CABAC()
 	end
@@ -7020,6 +7023,10 @@ actor Algo_Synp_AVC_FREXT()
 		bmFlag := 0;
 		startIdx := 0;
 		endIdx := 15;
+		if TRACE then
+			println("*********************************************************************");
+			println("MB:"+val_CurrMbAddr);
+		end
 	end
 	
 		
@@ -7049,6 +7056,12 @@ actor Algo_Synp_AVC_FREXT()
 		leveltype=0 and IS_CABAC()
 	do
 		SentLumaDCZeros := true;
+		if TRACE then
+			println("Luma DC 16x16");
+			foreach int s in Integers(0, 15) do
+				println("LumaDC16x16[" + s + "] := " + level[s]);
+			end
+		end
 	end
 
 	//else
@@ -7060,6 +7073,10 @@ actor Algo_Synp_AVC_FREXT()
 	Residual_luma_skip_DC_init_CABAC: action ==> VALUE:[ [0: for int i in Integers(0,15)]] repeat 16
 	guard
 		( bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16() ) and IS_CABAC()
+	do
+		if TRACE then
+			println("Skip Luma DC 16x16");
+		end
 	end
 	
 	
@@ -7085,6 +7102,10 @@ actor Algo_Synp_AVC_FREXT()
 		else  
 			ctxBlockCat := 2;
 		end
+		
+		if TRACE then
+			println("Starting Luma AC");
+		end
 	end
 
 	// for( i4x4 = 0; i4x4 < 4; i4x4++ ) {
@@ -7108,6 +7129,10 @@ actor Algo_Synp_AVC_FREXT()
 			// --> residual_block( level[ i8x8 * 4 + i4x4 ], startIdx, endIdx, 16)
 		end
 		//end if
+		
+		if TRACE then
+			println("luma4x4BlkIdx:=" + luma4x4BlkIdx);
+		end
 	end
 
 	Residual_return_luma_AC: action ==> LAST: [true]
@@ -7118,11 +7143,23 @@ actor Algo_Synp_AVC_FREXT()
 	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [level[i]: for int i in Integers(0,14)]] repeat 15
 	guard
 		leveltype = 1 and maxNumCoeff = 15 and IS_CABAC()
+	do
+		if TRACE then
+			foreach int s in Integers(0, 14) do
+				println("LumaAC16x16[" + s + "] := " + level[s]);
+			end
+		end
 	end
 	
 	Residual_return_luma_AC_CABAC_16_Coeff: action ==> VALUE:[ [level[i]: for int i in Integers(0,15)]] repeat 16
 	guard
 		leveltype = 1 and maxNumCoeff = 16 and IS_CABAC()
+	do
+		if TRACE then
+			foreach int s in Integers(0, 15) do
+				println("LumaAC4x4[" + s + "] := " + level[s]);
+			end
+		end
 	end
 	
 	
@@ -7158,6 +7195,10 @@ actor Algo_Synp_AVC_FREXT()
 		level[ i8x8 * 4 + i4x4 ][ i ] = 0
 		// end if
 		*/
+		
+		if TRACE then
+			println("Skipping Luma AC 16x16");
+		end
 	end
 	// end if
 	
@@ -7175,6 +7216,10 @@ actor Algo_Synp_AVC_FREXT()
 		level[ i8x8 * 4 + i4x4 ][ i ] = 0
 		// end if
 		*/
+		
+		if TRACE then
+			println("Skipping Luma AC 4x4");
+		end
 	end
 	// end if
 	
@@ -7247,6 +7292,10 @@ actor Algo_Synp_AVC_FREXT()
 		SentLumaDCZeros
 	do
 		SentLumaDCZeros := false;
+	
+		if TRACE then
+			println("Senting Luma 16x16 DC Zeros");
+		end
 	end
 	
 	Residual_return_DC_Luma_Sent_Zero_Skip: action ==>
@@ -7265,6 +7314,10 @@ actor Algo_Synp_AVC_FREXT()
 		block_endIdx := 4 * NumC8x8 - 1;
 		maxNumCoeff := 4 * NumC8x8;
 		ctxBlockCat := 3;
+		if TRACE then
+			println("Starting Chroma AC ");
+			println("MB:" +val_CurrMbAddr + " iCbCr := " + iCbCr);
+		end
 	end 
 	//--> residual_block( ChromaDCLevel[ iCbCr ], 0, 4 * NumC8x8 - 1, 4 * NumC8x8 )
 
@@ -7279,14 +7332,24 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		leveltype = 2 and maxNumCoeff = 4 and IS_CABAC()
 	do
-		iCbCr := iCbCr + 1; 
+		iCbCr := iCbCr + 1;
+		if TRACE then
+			foreach int s in Integers(0, 3) do
+				println("ChromaDC[" + s + "] := " + level[s]);
+			end
+		end
 	end
 	
 	Residual_return_chroma_DC_CABAC_8_Coeff: action ==> VALUE:[[level[i]: for int i in Integers(0,7)]] repeat 8
 	guard
 		leveltype = 2 and maxNumCoeff = 8 and IS_CABAC()
 	do
-		iCbCr := iCbCr + 1; 
+		iCbCr := iCbCr + 1;
+		if TRACE then
+			foreach int s in Integers(0, 7) do
+				println("ChromaDC[" + s + "] := " + level[s]);
+			end
+		end
 	end
 	
 	
@@ -7309,6 +7372,9 @@ actor Algo_Synp_AVC_FREXT()
 		//for( i = 0; i < 4 * NumC8x8; i++ )
 		//ChromaDCLevel[ iCbCr ][ i ] = 0
 		iCbCr := iCbCr + 1; 
+		if TRACE then
+			println("Skipping DC Chroma 4");
+		end
 	end   
 	
 	Residual_skip_chroma_DC_init_CABAC_2: action ==> VALUE:[[0: for int i in Integers(0,7)]] repeat 8 
@@ -7318,6 +7384,9 @@ actor Algo_Synp_AVC_FREXT()
 		//for( i = 0; i < 4 * NumC8x8; i++ )
 		//ChromaDCLevel[ iCbCr ][ i ] = 0
 		iCbCr := iCbCr + 1; 
+		if TRACE then
+			println("Skipping DC Chroma 8");
+		end
 	end   
 
 	Residual_skip_chroma_DC: action ==>
@@ -7334,6 +7403,9 @@ actor Algo_Synp_AVC_FREXT()
 		i4x4 := 0;
 		luma4x4BlkIdx := 0;
 		ctxBlockCat := 4;
+		if TRACE then
+			println("Starting AC Chroma");
+		end
 	end
 
 	//for( iCbCr = 0; iCbCr < 2; iCbCr++ )
@@ -7383,6 +7455,13 @@ actor Algo_Synp_AVC_FREXT()
 			i8x8 := 0; 
 			iCbCr := iCbCr +1; 
 		end
+		if TRACE then
+			println("luma4x4BlkIdx := " + luma4x4BlkIdx);
+			foreach int s in Integers(0, 7) do
+				println("ChromaAC[" + s + "] := " + level[s]);
+			end
+		end
+		
 	end
 	
 	Residual_return_Chroma_AC_CABAC_Sent_4_Zero: action ==> VALUE:[[0: for int i in Integers(0,3)]] repeat 4 
@@ -7428,6 +7507,9 @@ actor Algo_Synp_AVC_FREXT()
 		if i8x8 = NumC8x8 then 
 			i8x8:=0; 
 			iCbCr := iCbCr +1; 
+		end
+		if TRACE then
+			println("Skipping Chroma AC");
 		end
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 	end
