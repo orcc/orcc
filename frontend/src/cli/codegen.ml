@@ -1,6 +1,6 @@
 (*****************************************************************************)
-(* ORCC frontend                                                             *)
-(* Copyright (c) 2008-2009, IETR/INSA of Rennes.                             *)
+(* Orcc frontend                                                             *)
+(* Copyright (c) 2008-2010, IETR/INSA of Rennes.                             *)
 (* All rights reserved.                                                      *)
 (*                                                                           *)
 (* This software is governed by the CeCILL-B license under French law and    *)
@@ -44,39 +44,75 @@ let get_actors_vtl folder =
 	
 	aux SS.empty ""
 
-(** whether at least an actor has errors. *)
-let model_has_errors = ref false
+let reference_mtime = ref 0.0
+let num_cached = ref 0
 
-(** [load_instance options cls_name] loads the actor that has the given class name,
+(** [compile_actor options cls_name] loads the actor that has the given class name,
 and generates its IR in the output folder given by [options.o_outdir]. *)
-let load_instance options cls_name =
-	let out_base = Filename.concat options.o_outdir cls_name in
+let compile_actor options cls_name =
 	let abs_file = Filename.concat options.o_vtl cls_name in
-
 	let cal_file = abs_file ^ ".cal" in
-	(* parse actor and convert it to IR. *)
-	let ast_actor = Cal_parser_wrapper.parse_actor cal_file in
-	let basename = Filename.basename abs_file in
-	if ast_actor.Calast.ac_name <> basename then
-		Asthelper.failwith {dummy_loc with Loc.file_name = cal_file}
-			("The actor name is \"" ^ ast_actor.Calast.ac_name ^ "\", but it MUST be \
-			the same as the file name, i.e. \"" ^ basename ^ "\"!");
+
+	let file_base = Filename.basename abs_file in
+	let out_base = Filename.concat options.o_outdir file_base in
 	
-	let actor =
-		Ast2ir.ir_of_ast options out_base ast_actor
-	in
-	(try
+	let generate () =
+		(* parse actor *)
+		let ast_actor = Cal_parser_wrapper.parse_actor cal_file in
+		let basename = Filename.basename abs_file in
+		if ast_actor.Calast.ac_name <> basename then
+			Asthelper.failwith {dummy_loc with Loc.file_name = cal_file}
+				("The actor name is \"" ^ ast_actor.Calast.ac_name ^ "\", but it MUST be \
+				the same as the file name, i.e. \"" ^ basename ^ "\"!");
+
+		(* convert to IR *)
+		let actor =
+			Ast2ir.ir_of_ast options out_base ast_actor
+		in
+
+		(* apply SSA and generate JSON *)
 		Codegen_ir.codegen {options with o_file = cls_name ^ ".cal"} actor
-	with Asthelper.Compilation_error ->
-		if options.o_debug then
-			Printexc.print_backtrace stdout;
-		model_has_errors := true)
+	in
+
+	let ir_file = out_base ^ ".json" in
+	if Sys.file_exists ir_file then
+		let in_stats = Unix.stat cal_file in
+		let out_stats = Unix.stat ir_file in
+		
+		(* if .cal file is more recent than .json file, *)
+		(* or if front-end is more recent than .json file *)
+		if in_stats.Unix.st_mtime > out_stats.Unix.st_mtime ||
+			!reference_mtime > out_stats.Unix.st_mtime then
+				generate ()
+		else
+			incr num_cached
+	else
+		(* IR has not been generated for this actor *)
+		generate ()
 
 (** [start options] generates the IR of each actor in a network whose top is given by
 the options.o_file field, or else of each actor in the folder given by options.o_mp. *)
 let start options =
 	printf "Finding actors in the VTL...\n%!";
 	let actors = get_actors_vtl options.o_vtl in
+	
+	(* reference time *)
+	let exe_filename = Sys.argv.(0) in
+	let stats = Unix.stat exe_filename in
+	reference_mtime := stats.Unix.st_mtime;
+	num_cached := 0;
 
 	printf "Generating %i actors...\n%!" (SS.cardinal actors);
-	SS.iter (load_instance options) actors
+	let num_errors = ref 0 in
+	SS.iter
+		(fun file ->
+			try
+				compile_actor options file
+			with Asthelper.Compilation_error ->
+				if options.o_debug then
+					Printexc.print_backtrace stdout;
+				incr num_errors)
+		actors;
+	printf "%i actors were cached...\n%!" !num_cached;
+
+	!num_errors

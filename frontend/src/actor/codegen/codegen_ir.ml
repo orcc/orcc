@@ -1,6 +1,6 @@
 (*****************************************************************************)
-(* ORCC frontend                                                             *)
-(* Copyright (c) 2008-2009, IETR/INSA of Rennes.                             *)
+(* Orcc frontend                                                             *)
+(* Copyright (c) 2008-2010, IETR/INSA of Rennes.                             *)
 (* All rights reserved.                                                      *)
 (*                                                                           *)
 (* This software is governed by the CeCILL-B license under French law and    *)
@@ -363,21 +363,6 @@ let print out_base actor n =
 	Asthelper.PrettyPrinter.pp_actor f actor;
 	close_out oc
 
-(** [transform_actor options out_base actor] transforms actor by applying
-SSA transformation, constant propagation, peephole optims *)
-let transform_actor options out_base actor =
-	if options.o_keep then print out_base actor 1;
-
-	Cal_ssa.compute_ssa actor;
-	if options.o_keep then print out_base actor 2;
-	if options.o_dot_cfg then Asthelper.print_cfg (out_base ^ "_a") actor;
-
-	(* resets the node ID counter so IR nodes don't end up with huge IDs *)
-	(* no IR nodes should be created in *this* actor's graph after that. *)
-	reset_id ()
-
-let cached = ref false
-
 (** [codegen options actor] apply transformations to an actor in IR form,
 and prints it in JSON. *)
 let codegen options actor =
@@ -385,32 +370,24 @@ let codegen options actor =
 	let out_base = Filename.concat options.o_outdir file_base in
 	let out_name = out_base ^ ".json" in
 	
-	(** generates code *)
-	let go_for_it () =
-		transform_actor options out_base actor;
-		let t1 = Sys.time () in
+	(* prints IR *)
+	if options.o_keep then print out_base actor 1;
 
-		(* in debug mode, prints pretty JSON *)
-		Json_io.save_json ~compact:(not options.o_debug) out_name (mk_node actor);
-		file_name := "";
-		
-		let t2 = Sys.time () in
-		time := !time +. (t2 -. t1)
-	in
+	(* computes SSA and prints IR after it *)
+	Cal_ssa.compute_ssa actor;
+	if options.o_keep then print out_base actor 2;
+	if options.o_dot_cfg then Asthelper.print_cfg (out_base ^ "_a") actor;
+
+	(* resets the node ID counter so IR nodes don't end up with huge IDs *)
+	(* no IR nodes should be created in *this* actor's graph after that. *)
+	reset_id ();
+
+	(* measures time. *)
+	let t1 = Sys.time () in
+
+	(* in debug mode, prints pretty JSON *)
+	Json_io.save_json ~compact:(not options.o_debug) out_name (mk_node actor);
+	file_name := "";
 	
-	if Sys.file_exists out_name then (
-		let in_stats = Unix.stat actor.Calir.ac_file in
-		let out_stats = Unix.stat out_name in
-		if not options.o_cache ||
-			in_stats.Unix.st_mtime > out_stats.Unix.st_mtime then
-			go_for_it ()
-		else (
-			(* tell the user that at least one actor was cached *)
-			if not !cached then (
-				printf "Note: Some actors were already generated, skipped them.\n";
-				cached := true
-			)
-		)
-	) else (
-		go_for_it ()
-	)
+	let t2 = Sys.time () in
+	time := !time +. (t2 -. t1)

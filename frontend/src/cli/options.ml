@@ -1,6 +1,6 @@
 (*****************************************************************************)
-(* ORCC frontend                                                             *)
-(* Copyright (c) 2008-2009, IETR/INSA of Rennes.                             *)
+(* Orcc frontend                                                             *)
+(* Copyright (c) 2008-2010, IETR/INSA of Rennes.                             *)
 (* All rights reserved.                                                      *)
 (*                                                                           *)
 (* This software is governed by the CeCILL-B license under French law and    *)
@@ -16,7 +16,6 @@ open Printf
 open Calir
 
 type t = {
-	o_cache : bool;
 	o_debug : bool;
 	o_dot_cfg : bool;
 	o_dot_prio : (Str.regexp * bool option) list;
@@ -24,7 +23,6 @@ type t = {
 	o_keep : bool;
 	o_outdir : string;
 	o_profiling : bool;
-	o_values : (string * Calast.expr) list;
 	o_vtl : string;
 }
 
@@ -44,7 +42,6 @@ let get_dot_prio options name =
 
 (** [init_options ()] sets, checks and returns the options passed to cal2ir. *)
 let init_options () =
-	let cache = ref false in
 	let debug = ref false in
 	let dot_cfg = ref false in
 	let keep = ref false in
@@ -59,9 +56,6 @@ let init_options () =
 
 			("-o", Arg.Set_string output_folder,
 			"<path> Specifies the absolute path of the output folder where generated files will be put.");
-
-			("--cache", Arg.Set cache, "When set, code will only be generated for actors \
-			modified after code was last generated.");
 
 			("--debug", Arg.Set debug, "When set, compilation errors are not caught \
 			and their backtraces are printed.");
@@ -117,7 +111,6 @@ let init_options () =
 	
 	let options =
 		{
-			o_cache = !cache;
 			o_debug = !debug;
 			o_dot_cfg = !dot_cfg;
 			o_dot_prio = [];
@@ -125,7 +118,6 @@ let init_options () =
 			o_keep = !keep;
 			o_outdir = !output_folder;
 			o_profiling = !profiling;
-			o_values = [];
 			o_vtl = !input_file;
 		}
 	in
@@ -134,7 +126,6 @@ let init_options () =
 	printf "VTL folder: %s\n" options.o_vtl;
 	printf "output folder: %s\n" options.o_outdir;
 
-	printf "- cache is %s\n" (if options.o_cache then "enabled" else "disabled");
 	printf "- debug is %s\n" (if options.o_debug then "enabled" else "disabled");
 	printf "- profiling is %s\n" (if options.o_profiling then "enabled" else "disabled");
 	if options.o_keep then
