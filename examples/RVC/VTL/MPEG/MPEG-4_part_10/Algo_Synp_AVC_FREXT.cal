@@ -112,8 +112,8 @@ actor Algo_Synp_AVC_FREXT()
 	int Codeword;
 	int CodeLen;
 	
-	bool TRACE := true;
-	int  trVal := 0;
+	bool TRACE := false;
+	bool TRACE_BIARI := true;
 	// ********** Read CAVLC ********** //
 	bool NewCoeff := false;
 	uint(size=2) CAVLC_type;// 0 coeff_token, 1 total_zeros, 2 run_before
@@ -193,7 +193,7 @@ actor Algo_Synp_AVC_FREXT()
 	//CABAC SE
 	uint (size = 1) coded_block_flag;
 	
-	
+	int SearchForMbType := 0;
 	
 	//CABAC Binarisation
 	
@@ -219,7 +219,7 @@ actor Algo_Synp_AVC_FREXT()
 	/*
 		mbTab := [ Address ][ Availability, mbSliceType, mb_type, IntraChromaPredMode, mbQpDelta, mbCBPLuma, mbCBPChroma ]
 	*/
-	List ( type: List ( type: int, size = 9) , size = PICWIDTH*PICHEIGHT - 1 ) mbTab := [[ 0 : for int i in Integers( 0, 8)] : for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2)];
+	List ( type: List ( type: int, size = 10) , size = PICWIDTH*PICHEIGHT - 1 ) mbTab := [[ 0 : for int i in Integers( 0, 9)] : for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2)];
 	
 	int mbTabAvail				:= 0;
 	int mbSliceType				:= 1;
@@ -230,6 +230,7 @@ actor Algo_Synp_AVC_FREXT()
 	int mbCBPChroma				:= 6;
 	int mbTransSize8x8Flag		:= 7;
 	int mbCBF					:= 8;
+	int mbSkipFlag				:= 9;
 	
 	//CABAC Process Conditions 
 	bool FirstSEinSlice					:= true;
@@ -266,8 +267,10 @@ actor Algo_Synp_AVC_FREXT()
 	bool StartCoeffSignAbs := false;
 	bool StartCoeff_J_Dec := false;
 	
+	/* CABAC Mb type parsing */
+	bool SuffixMbTypeP := true;
 	
-	
+	int binIdxMb := 0;
 	//CABAC Decode Variables
 	/* Defines the Final Value of the Cabac Decoding Process and the Index of the Cabac Compare Tbale SynElVal */
 	int ValueIndex;
@@ -566,7 +569,7 @@ actor Algo_Synp_AVC_FREXT()
 	int CABAC_MB_TYPE_P_SP  	 				:= 2;
 	int CABAC_MB_TYPE_B      	 				:= 3;
 	int CABAC_MB_SKIP_FLAG_P_SP  				:= 4; 
-	int CABAC_MB_SKIP_FLAG_B     				:= 5;
+	int CABAC_MB_SKIP_FLAG	    				:= 5;
 	int CABAC_SUB_MB_TYPE_P_SP   				:= 6;
 	int CABAC_SUB_MB_TYPE_B	     				:= 7; 
 	int CABAC_MVD_L0_0_0	     				:= 8;
@@ -2093,12 +2096,16 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if slice_type = SLICE_TYPE_I then
 			CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_I;
+			SearchForMbType := 0;
 		else if  slice_type = SLICE_TYPE_SI then
 				CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_SI;
+				SearchForMbType := 0;
 		else if  slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then
 			CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_P_SP;
+			SearchForMbType := 1;
 		else if  slice_type = SLICE_TYPE_B then
 				CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_B;
+				SearchForMbType := 2;
 		end end end end	
 		
 	end
@@ -2169,6 +2176,10 @@ actor Algo_Synp_AVC_FREXT()
 		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_END_OF_SLICE_FLAG;
 	end
 	
+	procedure GetCabacMbSkipSyntaxElement()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_SKIP_FLAG;
+	end
 	
 	procedure Getbinarization(int SyntaxElement)
 	begin
@@ -2197,7 +2208,7 @@ actor Algo_Synp_AVC_FREXT()
 			ctxIdxOffset := 21;
 			bypassFlag := false;
 		end
-		if ( SyntaxElement = CABAC_MB_SKIP_FLAG_B ) then
+		if ( SyntaxElement = CABAC_MB_SKIP_FLAG ) then
 			maxBinIdxCtx := 0;
 			ctxIdxOffset := 24;
 			bypassFlag := false;
@@ -3219,7 +3230,49 @@ actor Algo_Synp_AVC_FREXT()
 		
 		ctxIdx := ctxIdxOffset + ctxIdxInc + ctxIdxBlockCatOffset_tab[2][ctxBlockCat];
 	end
-
+	
+	procedure ctxIdxincMbSkipFlag() 
+	var
+		int  condTermFlagA,
+		int  condTermFlagB,
+		int  mbAddr,
+		bool AvailMb
+	begin
+		//N = A
+		getNeighbouring(-1, 0, 16, 16);
+		//Assign Values
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if ( not AvailMb ) then
+			condTermFlagA := 0;
+		else
+			if mbTab[mbAddr][mbSkipFlag] = 1 then
+				 condTermFlagA := 0;
+			else
+				 condTermFlagA := 1;
+			end	
+		end
+		
+		//N = B
+		getNeighbouring(0, -1, 16, 16);
+		//Assign Values
+		mbAddr  := NeighMbAddr;
+		AvailMb := NeighMbAvail;
+		
+		if ( not AvailMb ) then
+			condTermFlagB := 0;
+		else
+			if mbTab[mbAddr][mbSkipFlag] = 1 then
+				 condTermFlagA := 0;
+			else
+				 condTermFlagA := 1;
+			end	
+		end
+		
+		ctxIdxInc := condTermFlagA + condTermFlagB;
+	end
+	
 	//Derivation process for ctxIdx
 	procedure GetCtxIdx()
 	begin
@@ -3581,8 +3634,54 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
+	procedure GetMbSkipFlag()
+	begin
+		
+		if slice_type = SLICE_TYPE_P then	
+			if binValDecoded = false then
+				ctxIdxincMbSkipFlag();
+				ctxIdx := 11 + ctxIdxInc;
+				PreviousCtxIdx := 3 + 2;
+				StartDecodeDecision := true;
+				CabacStartProcess := false;
+				NextBitToDecode := false;
+			else
+				if binVal = 0 then
+					FoundSE := true;
+					CabacValue := 0; 	/* INTRA 4x4*/
+				else
+					FoundSE := true;
+					CabacValue := 1;
+				end
+			end
+		end
+		
+		if slice_type = SLICE_TYPE_B then	
+			if binValDecoded = false then
+				ctxIdxincMbSkipFlag();
+				ctxIdx := 24 + ctxIdxInc;
+				PreviousCtxIdx := 3 + 2;
+				StartDecodeDecision := true;
+				CabacStartProcess := false;
+				NextBitToDecode := false;
+			else
+				if binVal = 0 then
+					FoundSE := true;
+					CabacValue := 0; 	/* INTRA 4x4*/
+				else
+					CabacValue := 1;
+					binValDecoded := false;
+				end
+			end
+		end
+		
+		if FoundSE then
+			binValDecoded := false;
+			CabacStartProcess := false;
+		end
+	end
 	
-	procedure GetMbTypeParsing()
+	procedure GetMbType_I()
 	var
 		int IS_Intra
 	begin
@@ -3593,7 +3692,7 @@ actor Algo_Synp_AVC_FREXT()
 			IS_Intra := 0;
 		end
 		
-		if binIdx = 0 then
+		if binIdxMb = 0 then
 			if binValDecoded = false then
 				ctxIdxOffset := 3; 
 				ctxIdxincMbType();
@@ -3609,12 +3708,12 @@ actor Algo_Synp_AVC_FREXT()
 				else
 					CabacValue := 1;
 					binValDecoded := false;
-					binIdx := binIdx + 1;
+					binIdxMb := binIdxMb + 1;
 				end
 			end
 		end
 		
-		if binIdx = 1 and FoundSE = false then
+		if binIdxMb = 1 and FoundSE = false then
 			if binValDecoded = false then
 				ctxIdx := 276;
 				StartDecodeTerminate := true;
@@ -3627,12 +3726,12 @@ actor Algo_Synp_AVC_FREXT()
 				else
 					CabacValue := 1;
 					binValDecoded := false;
-					binIdx := binIdx + 1;
+					binIdxMb := binIdxMb + 1;
 				end
 			end
 		end
 		
-		if binIdx = 2 and FoundSE = false  then
+		if binIdxMb = 2 and FoundSE = false  then
 			if binValDecoded = false then
 				ctxIdx := PreviousCtxIdx + 1;
 				StartDecodeDecision := true;
@@ -3643,11 +3742,11 @@ actor Algo_Synp_AVC_FREXT()
 					CabacValue := CabacValue + 12;	/* CBPLuma = 0 */ 
 				end
 				binValDecoded := false;
-				binIdx := binIdx + 1;
+				binIdxMb := binIdxMb + 1;
 			end
 		end
 		
-		if binIdx = 3 and FoundSE = false then
+		if binIdxMb = 3 and FoundSE = false then
 			if binValDecoded = false then
 				ctxIdx := PreviousCtxIdx + 2;
 				StartDecodeDecision := true;
@@ -3658,11 +3757,11 @@ actor Algo_Synp_AVC_FREXT()
 					 binIdxOffset := 1;
 				end
 				binValDecoded := false;
-				binIdx := binIdx + 1;
+				binIdxMb := binIdxMb + 1;
 			end
 		end
 		
-		if binIdx = 4 and FoundSE = false then
+		if binIdxMb = 4 and FoundSE = false then
 			if binIdxOffset = 1 then
 				if binValDecoded = false then
 					ctxIdx := PreviousCtxIdx + 2 + IS_Intra;
@@ -3676,7 +3775,7 @@ actor Algo_Synp_AVC_FREXT()
 						CabacValue := CabacValue + 4*2;
 					end
 					binValDecoded := false;
-					binIdx := binIdx + 1;
+					binIdxMb := binIdxMb + 1;
 				end
 			else
 				if binValDecoded = false then
@@ -3689,12 +3788,12 @@ actor Algo_Synp_AVC_FREXT()
 						CabacValue := CabacValue + 2;
 					end
 					binValDecoded := false;
-					binIdx := binIdx + 1;
+					binIdxMb := binIdxMb + 1;
 				end
 			end
 		end
 		
-		if binIdx = 5 and FoundSE = false then
+		if binIdxMb = 5 and FoundSE = false then
 			if binIdxOffset = 1 then
 				if binValDecoded = false then
 					ctxIdx := PreviousCtxIdx + 3 + IS_Intra;
@@ -3706,7 +3805,7 @@ actor Algo_Synp_AVC_FREXT()
 						CabacValue := CabacValue + 2;
 					end
 					binValDecoded := false;
-					binIdx := binIdx + 1;
+					binIdxMb := binIdxMb + 1;
 				end
 			else
 				if binValDecoded = false then
@@ -3719,13 +3818,13 @@ actor Algo_Synp_AVC_FREXT()
 						CabacValue := CabacValue + 1;
 					end
 					binValDecoded := false;
-					binIdx := binIdx + 1;
+					binIdxMb := binIdxMb + 1;
 					FoundSE := true;
 				end 
 			end
 		end
 		
-		if binIdx = 6 and FoundSE = false  then
+		if binIdxMb = 6 and FoundSE = false  then
 			if binValDecoded = false then
 				ctxIdx := PreviousCtxIdx + 3 + 2*IS_Intra;
 				StartDecodeDecision := true;
@@ -3736,7 +3835,7 @@ actor Algo_Synp_AVC_FREXT()
 					CabacValue := CabacValue + 1;
 				end
 				binValDecoded := false;
-				binIdx := binIdx + 1;
+				binIdxMb := binIdxMb + 1;
 				FoundSE := true;
 			end 
 		end
@@ -3744,10 +3843,114 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if FoundSE = true then
 			binValDecoded := false;
-			binIdx := -1;
+			binIdxMb := -1;
 			NextBitToDecode := true;
 			CabacStartProcess := false;
 			binIdxOffset := 0;
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP then
+				CabacValue := CabacValue + 5;
+			end
+		end
+	end
+	
+	procedure GetMbType_P()
+	begin
+		if SuffixMbTypeP then
+			/* IS P type */
+			if binIdxMb = 0 then
+				if binValDecoded = false then
+					ctxIdx := 14;
+					StartDecodeDecision := true;
+					CabacStartProcess := false;
+					NextBitToDecode := false;
+				else
+					if binVal = 1 then
+						SuffixMbTypeP := false;
+						binValDecoded := false;
+						/* Get Intra Type Mb */
+					else
+						binValDecoded := false;
+						binIdxMb := binIdxMb + 1;
+					end
+				end
+			end
+			
+			if binIdxMb = 1 and FoundSE = false then
+				if binValDecoded = false then
+					ctxIdx := 15;
+					StartDecodeDecision := true;
+					CabacStartProcess := false;
+					NextBitToDecode := false;
+				else
+					if binVal = 0 then
+						binIdxOffset := 0;
+					else
+						binIdxOffset := 1;
+					end
+					binValDecoded := false;
+					binIdxMb := binIdxMb + 1;
+				end
+			end
+			
+			if binIdxMb = 2 and FoundSE = false then
+				if binIdxOffset = 0 then
+					if binValDecoded = false then
+						ctxIdx := 16;
+						StartDecodeDecision := true;
+						CabacStartProcess := false;
+						NextBitToDecode := false;
+					else
+						if binVal = 0 then
+							CabacValue := 0;
+						else
+							CabacValue := 3;
+						end
+						FoundSE := true;
+					end
+				else
+					if binValDecoded = false then
+						ctxIdx := 17;
+						StartDecodeDecision := true;
+						CabacStartProcess := false;
+						NextBitToDecode := false;
+					else
+						if binVal = 0 then
+							CabacValue := 2;
+						else
+							CabacValue := 1;
+						end
+						FoundSE := true;
+					end 
+				end
+			end
+			
+			if FoundSE then
+				binValDecoded := false;
+				binIdxMb := -1;
+				NextBitToDecode := true;
+				CabacStartProcess := false;
+				binIdxOffset := 0;
+			end
+		else
+			GetMbType_I();
+		end
+	end
+	
+	procedure GetMbType_B()
+	begin
+		println("Not yet implemented");
+	end
+	
+	procedure GetMbTypeParsing()
+	begin
+		if SearchForMbType = 0 then
+			GetMbType_I();
+		else
+			if SearchForMbType = 1 then
+				 GetMbType_P();
+			else
+				 GetMbType_B();
+			end
 		end
 	end
 		
@@ -3887,12 +4090,17 @@ actor Algo_Synp_AVC_FREXT()
 			CabacStartProcess := false;
 			FirstSEinSlice := false;  
 		else
-			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP then
-			      GetMbTypeParsing();
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_B then	
+				GetMbTypeParsing();
 			end
-		
+			
+			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
 			      CoeffAbsParsing();
+			end
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG then
+				GetMbSkipFlag();
 			end
 		end
 	end
@@ -3951,6 +4159,10 @@ actor Algo_Synp_AVC_FREXT()
 		qCodIRangeIdx := ( codIRange >> 6 ) & 3;
 		codIRangeLPS := rangeTabLPS[pStateIdx[ctxIdx]][qCodIRangeIdx];
 		codIRange := codIRange - codIRangeLPS;
+		
+		if TRACE_BIARI then
+			println("codIRange := " + codIRange + "codIOffset := " + codIOffset);
+		end
 		
 		if codIOffset >= codIRange then
 			binVal     := intXOR(valMPS[ctxIdx]);
@@ -4022,39 +4234,6 @@ actor Algo_Synp_AVC_FREXT()
 		CabacStartProcess := true;
 	end
 	
-	/********************** DecodeTerminate actions **********************/
-	/*
-	DecodeTerminate: action ==>
-	guard
-		StartDecodeTerminate and
-		ctxIdx = 276
-	do
-		codIRange := codIRange - 2;
-		
-		if codIOffset >= codIRange then
-			binVal := 1;
-			binValDecoded := true;
-			// Start Cabac Process
-			CabacStartProcess := true;
-			// Give the right write a bit into ReadBinString[]
-			binValDecoded := true;
-		else
-			binVal := 0;
-			binValDecoded := true;
-			if codIRange < 0x100 then
-				StartRenormDRead := true;
-			else
-				
-				// Start Cabac Process
-				CabacStartProcess := true;
-				// Give the right write a bit into ReadBinString[]
-				binValDecoded := true;
-			end
-		end
-			
-		StartDecodeTerminate := false;
-	end
-	*/
 	DecodeTerminate: action ==>
 	guard
 		StartDecodeTerminate and
@@ -4062,31 +4241,44 @@ actor Algo_Synp_AVC_FREXT()
 	var 
 		int tempOffest
 	do
-		codIRange  := codIRange - 2;
-		tempOffest := codIOffset - codIRange;
-		
-		if tempOffest >= 0 then
+		if val_CurrMbAddr = 98 then 
 			binVal := 1;
 			binValDecoded := true;
 			// Start Cabac Process
 			CabacStartProcess := true;
 			// Give the right write a bit into ReadBinString[]
 			binValDecoded := true;
+			// write the bit into the  ReadBinString
+			ReadBinString[binIdx + 1] := binVal;	
+			StartDecodeTerminate := false;
 		else
-			binVal := 0;
-			binValDecoded := true;
-			if codIRange < 0x100 then
-				StartRenormDRead := true;
-			else
+		
+			codIRange  := codIRange - 2;
+			tempOffest := codIOffset - codIRange;
+			
+			if tempOffest >= 0 then
+				binVal := 1;
+				binValDecoded := true;
 				// Start Cabac Process
 				CabacStartProcess := true;
 				// Give the right write a bit into ReadBinString[]
 				binValDecoded := true;
+			else
+				binVal := 0;
+				binValDecoded := true;
+				if codIRange < 0x100 then
+					StartRenormDRead := true;
+				else
+					// Start Cabac Process
+					CabacStartProcess := true;
+					// Give the right write a bit into ReadBinString[]
+					binValDecoded := true;
+				end
 			end
+			// write the bit into the  ReadBinString
+			ReadBinString[binIdx + 1] := binVal;	
+			StartDecodeTerminate := false;
 		end
-		// write the bit into the  ReadBinString
-		ReadBinString[binIdx + 1] := binVal;	
-		StartDecodeTerminate := false;
 
 	end
 	/********************** Cabac Initialization **********************/
@@ -5859,22 +6051,40 @@ actor Algo_Synp_AVC_FREXT()
 		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
 		entropy_coding_mode_flag[pps_id] = 1
 	do
-		////println("read_SliceD_mb_skip_flag : CABAC interleaved not implemented");
+		GetCabacMbSkipSyntaxElement();
+		start_cabac();
 		// mb_skip_flag   ae(v)
 		// moreDataFlag = !mb_skip_flag
 	end
-	
-	//TODO for cabac
-	/*
+		
 	read_SliceD_mb_skip_flag_done: action ==>
 	guard
-		MbaffFrameFlag = 1
+		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
+		IS_CABAC(),
+		cabac_end()
+	do
+		mb_skip_flag := cabac_value();
+		
+		if mb_skip_flag = 1 then
+			if slice_type = SLICE_TYPE_P then 
+					mbTab[val_CurrMbAddr][mbTabMbtype] := P_Skip; 
+			else 
+				if slice_type = SLICE_TYPE_B then 
+					mbTab[val_CurrMbAddr][mbTabMbtype] := B_Skip; 
+				end 
+			end
+		end
+			
+		mbTab[val_CurrMbAddr][mbSkipFlag] := mb_skip_flag;
+		moreDataFlag := if mb_skip_flag = 1 then 0 else 1 end;
 	end
-	*/
+	
 	//else (slice_type = I || slice_type = SI)
 	read_SliceD_skip_mb_skip: action ==>
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
+	do
+		mbTab[val_CurrMbAddr][mbSkipFlag] := 0;
 	end
 	//end if
 
@@ -6054,7 +6264,7 @@ actor Algo_Synp_AVC_FREXT()
 		else 
 			if IS_CABAC() then
 				//initialization of binIdx
-				binIdx := 0;
+				binIdxMb := 0;
 				GetCabacMbTypeSyntaxElement();
 				start_cabac();
 			end 
@@ -7971,51 +8181,6 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		coded_block_flag = 0
 	end
-	/*
-	
-	Residual_block_Sent_16_Coeff : action ==> VALUE : [ [level[i]: for int i in Integers(0,15)] ] repeat 16
-	guard
-		maxNumCoeff = 16
-	end
-	
-	Residual_block_Sent_15_Coeff : action ==> VALUE : [ [level[i]: for int i in Integers(0,14)] ] repeat 15
-	guard
-		maxNumCoeff = 15
-	end
-	
-	
-	Residual_block_Sent_8_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,7)] ] repeat 8
-	guard
-		maxNumCoeff = 8
-	end
-	
-	Residual_block_Sent_4_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,3)] ] repeat 4
-	guard
-		maxNumCoeff = 4
-	end
-	
-	
-	
-	Residual_Sent_16_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
-	guard
-		maxNumCoeff = 16
-	end
-	
-	Residual_Sent_15_Zero: action ==> VALUE : [ [0: for int i in Integers(0,14) ] ] repeat 15
-	guard
-		maxNumCoeff = 15
-	end
-	
-	Residual_Sent_8_Zero: action ==> VALUE : [ [0: for int i in Integers(0,7) ] ] repeat 8
-	guard
-		maxNumCoeff = 8
-	end
-	
-	Residual_Sent_4_Zero: action ==> VALUE : [ [0: for int i in Integers(0,3) ] ] repeat 4
-	guard
-		maxNumCoeff = 4
-	end
-	*/
 	
 	//******* End of Residual Block CABAC ********//  
 	
@@ -8286,8 +8451,10 @@ actor Algo_Synp_AVC_FREXT()
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done2						) --> read_SliceD_mb_skip_run_done2_moredata;
 		read_SliceD_mb_skip_run_done2_moredata              ( read_SliceD_mb_skip_run_done2_moredata_1          ) --> read_SliceD_mb_field_decoding_flag;
 		read_SliceD_mb_skip_run_done2_moredata 				( read_SliceD_mb_skip_run_done2_moredata_0			) --> syncSliceD_endwhile;
-		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag 							) --> undefined; // CABAC : not yet implemented
+		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag 							) --> read_SliceD_mb_skip; 
+		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag_done						) --> read_SliceD_mb_field_decoding_flag; 
 		read_SliceD_mb_skip									( read_SliceD_skip_mb_skip 							) --> read_SliceD_mb_field_decoding_flag;
+		
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_mb_field_decoding_flag				) --> undefined; // interleaved not implemented
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_skip_mb_field_decoding_flag			) --> read_MB_layer_mb_type;
 		// --> macrobloc_layer()
@@ -8485,20 +8652,7 @@ actor Algo_Synp_AVC_FREXT()
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_done				) --> Residual_return;
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_not_read			) --> Residual_block_update_coeffLevel;
 		Residual_block_update_coeffLevel_read				( Residual_block_update_coeffLevel_read				) --> Residual_block_update_coeffLevel;
-		/*
-		//Sent Tokens		
-		Residual_CABAC_Sent_Coeff_Tokens					( Residual_block_Sent_16_Coeff						) --> Residual_return;
-		Residual_CABAC_Sent_Coeff_Tokens					( Residual_block_Sent_15_Coeff						) --> Residual_return;
-		Residual_CABAC_Sent_Coeff_Tokens					( Residual_block_Sent_8_Coeff						) --> Residual_return;
-		Residual_CABAC_Sent_Coeff_Tokens					( Residual_block_Sent_4_Coeff						) --> Residual_return;
-		
-		//Sent Zeros
-		Residual_CABAC_Sent_Zeros							( Residual_Sent_16_Zero 							) --> Residual_return;
-		Residual_CABAC_Sent_Zeros							( Residual_Sent_15_Zero 							) --> Residual_return;
-		Residual_CABAC_Sent_Zeros							( Residual_Sent_8_Zero 								) --> Residual_return;
-		Residual_CABAC_Sent_Zeros							( Residual_Sent_4_Zero 								) --> Residual_return;
-		*/
-															
+							
 	
 	end
 	
@@ -8517,6 +8671,7 @@ actor Algo_Synp_AVC_FREXT()
 		MB_pred_init_mvd_l0 > read_MB_pred_ref_idx_l1 > read_MB_pred_skip_ref_idx_l1;
 		MB_pred_init_mvd_l1 >  read_MB_pred_mvd_l0 > read_MB_pred_skip_mvd_l0;
 		MB_pred_done  > read_MB_pred_mvd_l1 > read_MB_pred_skip_mvd_l1;
+		read_SliceD_mb_skip_flag_done > read_SliceD_mb_skip_flag;
 		test_zero_byte > generic_done;
 		test_one_byte  > generic_done;
 		send_data_position_information_is_ipcm>send_data_position_information;
