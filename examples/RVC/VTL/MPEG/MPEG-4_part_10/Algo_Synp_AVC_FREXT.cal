@@ -8458,7 +8458,12 @@ actor Algo_Synp_AVC_FREXT()
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_mb_field_decoding_flag				) --> undefined; // interleaved not implemented
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_skip_mb_field_decoding_flag			) --> read_MB_layer_mb_type;
 		// --> macrobloc_layer()
+		
 		SliceD_update										( SliceD_update_CAVLC								) --> SliceD_moredata;
+		
+		SliceD_update										( SliceD_update_CABAC								) --> SliceD_Update_done;
+		SliceD_Update_done									( SliceD_update_CABAC_done							) --> SliceD_moredata;
+		
 		SliceD_moredata                                     ( SliceD_moredata_1                                 ) --> SliceD_moredata_1_done;
 		SliceD_moredata_1_done								( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_moredata_1_done								( send_data_position_information	                ) --> syncSliceD_endwhile;
@@ -8466,14 +8471,9 @@ actor Algo_Synp_AVC_FREXT()
 		SliceD_stop_byte_align_done							( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_stop_byte_align_done							( send_data_position_information	                ) --> syncSliceD_endwhile;
 		syncSliceD_endwhile									( syncSliceD_endwhile								) --> SliceD_while_moreDataFlag;
-		
-		SliceD_update										( SliceD_update_CABAC								) --> SliceD_Update_done;
-		SliceD_Update_done									( SliceD_update_CABAC_done							) --> SliceD_sent_data;
-		SliceD_sent_data									( send_data_position_information_is_ipcm            ) --> SliceD_while_moreDataFlag;
-		SliceD_sent_data									( send_data_position_information	                ) --> SliceD_while_moreDataFlag;
+	
 		SliceD_while_moreDataFlag							( SliceD_while_moreDataFlag							) --> sync_do_mb_layer;
 		SliceD_while_moreDataFlag							( SliceD_end										) --> search_start_code;
-	
 		read_SliceD_mb_field_decoding_flag					( SliceD_end										) --> search_start_code;
 		
 		// macrobloc_layer
