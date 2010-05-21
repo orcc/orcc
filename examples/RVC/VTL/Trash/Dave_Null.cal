@@ -1,0 +1,9 @@
+actor Dave_Null () 
+	int(size=32) Token
+	==>
+    :
+	action 
+			Token:[b]
+				==>
+	end
+end
