@@ -117,8 +117,6 @@ actor Algo_MMCO ()
 	//If the new frame num isn't following the previous frame num,
 	//we must fill the short term list with all the missed frame num
 	FillFalseRefFrame : action ==>
-		guard
-			FrameNum != (LastFrameNum + 1) mod ValMaxFrameNum
 		var
 			uint(size=31) false_frame_num := (LastFrameNum + 1) mod ValMaxFrameNum
 		do
@@ -149,7 +147,7 @@ actor Algo_MMCO ()
 
 	FillFalseRefFrame_done : action ==>
 		guard
-			FrameNum = (LastFrameNum + 1) mod ValMaxFrameNum
+			(FrameNum = (LastFrameNum + 1) mod ValMaxFrameNum) or (FrameNum = LastFrameNum)
 		end
 
 
@@ -470,9 +468,10 @@ actor Algo_MMCO ()
 	end
 
 	priority
-		SendDelList       > SendDelListDone;
-		SendShortTermList > SendLists_Done;
-		SendLongTermList  > SendLists_Done;
+		SendDelList            > SendDelListDone;
+		SendShortTermList      > SendLists_Done;
+		SendLongTermList       > SendLists_Done;
+		FillFalseRefFrame_done > FillFalseRefFrame;
 	end
 
 end

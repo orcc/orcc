@@ -433,6 +433,24 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Black_Hole">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Trash/Dave_Null"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_RefList1">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_RefList"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -553,4 +571,19 @@
     <Connection dst="Algo_RefList0" dst-port="NbRefFrame"
         src="Algo_Synp_AVC" src-port="Nb_RefFrame_l0"/>
     <Connection dst="Algo_RefList0" dst-port="NbLTFrame" src="Algo_MMCO" src-port="NbLTFrame"/>
+    <Connection dst="Algo_RefList1" dst-port="LongTermList"
+        src="Algo_MMCO" src-port="LongTermList"/>
+    <Connection dst="Algo_RefList1" dst-port="NbLTFrame" src="Algo_MMCO" src-port="NbLTFrame"/>
+    <Connection dst="Algo_RefList1" dst-port="ShortTermList"
+        src="Algo_MMCO" src-port="ShortTermList"/>
+    <Connection dst="Algo_RefList1" dst-port="SzSTList" src="Algo_MMCO" src-port="SzSTList"/>
+    <Connection dst="Algo_RefList1" dst-port="FraNum"
+        src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
+    <Connection dst="Algo_RefList1" dst-port="MaxFrameNum"
+        src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
+    <Connection dst="Algo_RefList1" dst-port="NbRefFrame"
+        src="Algo_Synp_AVC" src-port="Nb_RefFrame_l0"/>
+    <Connection dst="Algo_RefList1" dst-port="RefReordering"
+        src="Algo_Synp_AVC" src-port="RefReordering"/>
+    <Connection dst="Black_Hole" dst-port="Token" src="Algo_RefList1" src-port="RefList"/>
 </XDF>
