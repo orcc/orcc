@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="In0" x="57" y="215"/>
+      <vertex id="In1" x="57" y="308"/>
+      <vertex id="In2" x="57" y="401"/>
+      <vertex id="In3" x="57" y="494"/>
+      <vertex id="Out" x="663" y="356"/>
+      <vertex id="s00" x="290" y="72"/>
+      <vertex id="s01" x="290" y="402"/>
+      <vertex id="s02" x="290" y="567"/>
+      <vertex id="s03" x="290" y="237"/>
+      <vertex id="s10" x="419" y="567"/>
+      <vertex id="s12" x="419" y="72"/>
+      <vertex id="s13" x="419" y="402"/>
+      <vertex id="s11" x="419" y="237"/>
+      <vertex id="out" x="541" y="320"/>
+      <vertex id="in" x="154" y="211"/>
+   </vertices>
+</layout>

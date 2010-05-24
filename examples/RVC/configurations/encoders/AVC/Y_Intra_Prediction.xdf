@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Y_Intra_Prediction">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="In">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Byte_Intra">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Y_16x16_Intra_Prediction">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Y_16x16_Intra_Prediction"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Controller">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/Controller"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Mode_Selection_16_4">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/Mode_Selection_16_4"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Y_4x4_Intra_Prediction">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Y_4x4_Intra_Prediction"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Mux_Intra_16_4">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/Mux_Intra_16_4"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Rearrange">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/Rearrange"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Controller" dst-port="In" src="" src-port="In"/>
+    <Connection dst="Mode_Selection_16_4" dst-port="Score_16"
+        src="Y_16x16_Intra_Prediction" src-port="Score_16"/>
+    <Connection dst="Mode_Selection_16_4" dst-port="Mode_16"
+        src="Y_16x16_Intra_Prediction" src-port="Mode_16"/>
+    <Connection dst="Mode_Selection_16_4" dst-port="Mode_4"
+        src="Y_4x4_Intra_Prediction" src-port="Mode_4"/>
+    <Connection dst="Mode_Selection_16_4" dst-port="Score_4"
+        src="Y_4x4_Intra_Prediction" src-port="Score_4"/>
+    <Connection dst="Y_16x16_Intra_Prediction" dst-port="OutMB_16"
+        src="Controller" src-port="OutMB_16"/>
+    <Connection dst="Y_16x16_Intra_Prediction"
+        dst-port="OutPredictor_16" src="Controller" src-port="OutPredictor_16"/>
+    <Connection dst="Y_16x16_Intra_Prediction" dst-port="MBType_16"
+        src="Controller" src-port="MBType_16"/>
+    <Connection dst="Y_4x4_Intra_Prediction" dst-port="OutPredictor_4"
+        src="Controller" src-port="OutPredictor_4"/>
+    <Connection dst="Controller" dst-port="InReconstructed_4"
+        src="Y_4x4_Intra_Prediction" src-port="InReconstructed_4"/>
+    <Connection dst="Mux_Intra_16_4" dst-port="BMode_16"
+        src="Y_16x16_Intra_Prediction" src-port="Mode_16"/>
+    <Connection dst="Mux_Intra_16_4" dst-port="BMode_4"
+        src="Y_4x4_Intra_Prediction" src-port="Mode_4"/>
+    <Connection dst="Mux_Intra_16_4" dst-port="Sel_16_4"
+        src="Mode_Selection_16_4" src-port="Sel_16_4"/>
+    <Connection dst="Y_4x4_Intra_Prediction" dst-port="OutBlock_4"
+        src="Controller" src-port="OutBlock_4"/>
+    <Connection dst="Controller" dst-port="Sel_16_4"
+        src="Mode_Selection_16_4" src-port="Sel_16_4"/>
+    <Connection dst="Y_4x4_Intra_Prediction" dst-port="BlockType_4"
+        src="Controller" src-port="BlockType_4"/>
+    <Connection dst="Mux_Intra_16_4" dst-port="QTC4"
+        src="Y_4x4_Intra_Prediction" src-port="QTC4"/>
+    <Connection dst="Mux_Intra_16_4" dst-port="QTC16"
+        src="Y_16x16_Intra_Prediction" src-port="QTC16"/>
+    <Connection dst="Controller" dst-port="InReconstructed_16"
+        src="Y_16x16_Intra_Prediction" src-port="InReconstructed_16"/>
+    <Connection dst="Rearrange" dst-port="InReconstructed_16"
+        src="Y_16x16_Intra_Prediction" src-port="InReconstructed_16"/>
+    <Connection dst="Rearrange" dst-port="InReconstructed_4"
+        src="Y_4x4_Intra_Prediction" src-port="InReconstructed_4"/>
+    <Connection dst="Rearrange" dst-port="Sel_16_4"
+        src="Mode_Selection_16_4" src-port="Sel_16_4"/>
+    <Connection dst="" dst-port="Byte_Intra" src="Rearrange" src-port="Byte_Intra"/>
+</XDF>

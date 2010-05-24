@@ -1,0 +1,8 @@
+actor ResidueCalculator () int In0, int In1, int In2, int In3, int In4, int In5, int In6, int In7 ==> 
+						   int Out0, int Out1, int Out2, int Out3:
+
+	action In0:[in0], In1:[in1], In2:[in2], In3:[in3], In4:[in4], In5:[in5], In6:[in6], In7:[in7] ==> 
+		   Out0:[in0-in4], Out1:[in1-in5], Out2:[in2-in6], Out3:[in3-in7]
+	end			
+ 
+end

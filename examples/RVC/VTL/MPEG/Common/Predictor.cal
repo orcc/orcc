@@ -1,0 +1,249 @@
+actor Predictor () int In, int MBType ==> int Out0, int Out1, int Out2, int Out3
+:
+
+	List(type: int, size=16) prevRow := [ 0 : for int t in Integers(0, 15) ];
+
+	List(type: int, size=16) prevCol := [ 0 : for int t in Integers(0, 15) ];
+
+	int count := 0;
+
+	int mean := 0;
+
+	int mbType := 0;
+
+	int mode := 4;
+
+	function clip(int value) --> int :
+		if (value < 0) then
+			0
+		else
+			if (value > 255) then
+				255
+			else
+				value
+			end
+		end
+	end
+
+	MBType: action MBType:[ m ] ==>
+	guard
+		mode = 4
+	do
+		mbType := m;
+	end
+
+	In: action In:[ in0 ] ==>
+	guard
+		(count < 32 and mbType = 0) or (count < 16 and mbType != 0)
+	do
+		if (mbType = 0) then
+			if (count < 16) then
+				prevRow[count] := in0;
+			else
+				prevCol[count - 16] := in0;
+			end
+		else
+			if (mbType = 1) then
+				prevCol[count] := in0;
+			else
+				prevRow[count] := in0;
+			end
+		end
+		count := count + 1;
+		mean := mean + in0;
+	end
+
+	FinishIn: action ==>
+	guard
+		(count = 32 and mbType = 0) or (count = 16 and mbType != 0)
+	do
+		count := 0;
+		if (mbType = 0) then
+			mean := mean / 32;
+			mode := 0;
+		else
+			mean := mean / 16;
+			if (mbType = 1) then
+				mode := 1;
+			else
+				mode := 0;
+			end
+		end
+	end
+
+	int i := 0;
+
+	int block := 0;
+
+	Mode0: action ==> Out0:[ prevRow[i] ], Out1:[ prevRow[i + 1] ], Out2:[ prevRow
+		[i + 2] ], Out3:[ prevRow[i + 3] ]
+	guard
+		count < 4 and block < 16 and mode = 0
+	do
+		count := count + 1;
+	end
+
+	FinishBlockMode0: action ==>
+	guard
+		count = 4 and block < 16 and mode = 0
+	do
+		count := 0;
+		block := block + 1;
+		i := (i + 4) mod 16;
+	end
+
+	Mode1: action ==> Out0:[ prevCol[old_i] ], Out1:[ prevCol[old_i] ], Out2:[
+		prevCol[old_i] ], Out3:[ prevCol[old_i] ]
+	guard
+		count < 4 and block < 16 and mode = 1
+	var
+		int old_i
+	do
+		old_i := i;
+		i := i + 1;
+		count := count + 1;
+	end
+
+	FinishBlockMode1: action ==>
+	guard
+		count = 4 and block < 16 and mode = 1
+	do
+		count := 0;
+		block := block + 1;
+		if (block mod 4 != 0) then
+			i := i - 4;
+		end
+	end
+
+	Mode2: action ==> Out0:[ mean ], Out1:[ mean ], Out2:[ mean ], Out3:[ mean ]
+	guard
+		block < 16 and mode = 2
+	do
+		count := count + 1;
+		if (count mod 4 = 0) then
+			count := 0;
+			block := block + 1;
+		end
+	end
+
+	int h := 0;
+
+	int v := 0;
+
+	int x := 0;
+
+	int y := 0;
+
+	int a := 0;
+
+	int b := 0;
+
+	int c := 0;
+
+	CalculateHV: action ==>
+	guard
+		count < 8 and mode = 3
+	do
+		h := h + ((x + 1) * (prevRow[8 + x] - prevRow[7 - x]));
+		v := v + ((x + 1) * (prevCol[8 + x] - prevCol[7 - x]));
+		x := x + 1;
+		count := count + 1;
+	end
+
+	FinishHV: action ==>
+	guard
+		count = 8 and mode = 3
+	do
+		count := 0;
+		x := 0;
+		a := 16 * (prevRow[15] + prevCol[15]);
+		b := (5 * h + 32) >> 6;
+		c := (5 * v + 32) >> 6;
+	end
+
+	Mode3: action ==> Out0:[ out0 ], Out1:[ out1 ], Out2:[ out2 ], Out3:[ out3 ]
+	guard
+		count < 4 and block < 16 and mode = 3
+	var
+		int out0 , int out1 , int out2 , int out3
+	do
+		out0 := (a + b * (x - 7) + c * (y - 7));
+		out1 := (a + b * (x - 6) + c * (y - 7));
+		out2 := (a + b * (x - 5) + c * (y - 7));
+		out3 := (a + b * (x - 4) + c * (y - 7));
+		out0 := clip((out0 + (1 << (5 - 1))) >> 5);
+		out1 := clip((out1 + (1 << (5 - 1))) >> 5);
+		out2 := clip((out2 + (1 << (5 - 1))) >> 5);
+		out3 := clip((out3 + (1 << (5 - 1))) >> 5);
+		y := y + 1;
+		count := count + 1;
+	end
+
+	FinishBlockMode3: action ==>
+	guard
+		count = 4 and block < 16 and mode = 3
+	do
+		block := block + 1;
+		count := 0;
+		x := (x + 4) mod 16;
+		if (block mod 4 != 0) then
+			y := y - 4;
+		end
+	end
+
+	FinishMode: action ==>
+	guard
+		block = 16
+	do
+		count := 0;
+		block := 0;
+		i := 0;
+		x := 0;
+		y := 0;
+		if (mbType = 0) then
+			mode := mode + 1;
+		else
+			if (mbType = 1) then
+			//Upper Border MB... Try Modes 1 (Horizontal) and 2 (DC)
+				//Shouldn't have a difference for the 1st MB. However, standard should be revised 
+				if (mode = 1) then
+					mode := 2;
+				else
+					mode := 4;
+				end
+			else
+				if (mode = 0) then
+				//Left Border MB... Try Modes 0 (Vertical) and 2 (DC)
+					mode := 2;
+				else
+					mode := 4;
+				end
+			end
+		end
+	end
+
+	schedule fsm init :
+		init ( MBType ) --> s0;
+		s0 ( In ) --> s0;
+		s0 ( FinishIn ) --> s1;
+		s1 ( Mode0 ) --> s2;
+		s1 ( Mode1 ) --> s3;
+		s1 ( Mode2 ) --> s4;
+		s1 ( CalculateHV ) --> s5;
+		s1 ( MBType ) --> s0;
+		s2 ( Mode0 ) --> s2;
+		s2 ( FinishBlockMode0 ) --> s2;
+		s2 ( FinishMode ) --> s1;
+		s3 ( Mode1 ) --> s3;
+		s3 ( FinishBlockMode1 ) --> s3;
+		s3 ( FinishMode ) --> s1;
+		s4 ( Mode2 ) --> s4;
+		s4 ( FinishMode ) --> s1;
+		s5 ( CalculateHV ) --> s5;
+		s5 ( FinishHV ) --> s6;
+		s6 ( Mode3 ) --> s6;
+		s6 ( FinishBlockMode3 ) --> s6;
+		s6 ( FinishMode ) --> s1;
+	end
+
+end

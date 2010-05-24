@@ -1,0 +1,25 @@
+//This is a fake actor, until both 16x16 and 4x4 modes are supported
+//16x16 misses the hierarchical transform, 
+//as well as the CAVLC/bitstream generation syntax elements
+
+//Rate-Distortion should be considered here
+//It might not be logic to rely only on the Hadamard scores (unless opposite is proven).
+//The rate difference according to the number of modes sent should be considered
+// Cost = D + lambda*R, where lambda is a function of QP 
+
+actor Mode_Selection_16_4 () int Score_16, int Mode_16, int Score_4, int Mode_4 ==> int Sel_16_4:
+	
+	int dummy:=0;
+	
+	Selected_16_4: action Score_16:[s16], Mode_16:[m16],Score_4:[score_4] repeat 16, Mode_4:[mode_4] repeat 16 ==> [dummy]
+	/*
+	do
+		if dummy=0 then
+			dummy:=1;
+		else
+			dummy:=0;
+		endif
+	*/	
+	end
+	
+end

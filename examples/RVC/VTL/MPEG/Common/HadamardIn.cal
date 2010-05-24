@@ -1,0 +1,60 @@
+actor HadamardIn () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, int Out2, int Out3,
+														   int Out4, int Out5, int Out6, int Out7,
+														   int Out8, int Out9, int Out10, int Out11,
+														   int Out12, int Out13, int Out14, int Out15:
+
+
+List(type:int, size=16) block := [0: for int t in Integers(0,15)];
+
+ 
+
+
+A: action In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==> 
+do
+	block[0]:=in0;
+	block[1]:=in1;
+	block[2]:=in2;
+	block[3]:=in3;
+end
+
+B: action In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==> 
+do
+	block[4]:=in0;
+	block[5]:=in1;
+	block[6]:=in2;
+	block[7]:=in3;
+end
+
+C: action In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==> 
+do
+	block[8]:=in0;
+	block[9]:=in1;
+	block[10]:=in2;
+	block[11]:=in3;
+end
+
+D: action In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==> 
+do
+	block[12]:=in0;
+	block[13]:=in1;
+	block[14]:=in2;
+	block[15]:=in3;
+end
+
+
+E: action ==> Out0:[block[0]],  Out1:[block[4]],  Out2:[block[8]],   Out3:[block[12]],
+			  Out4:[block[1]],  Out5:[block[5]],  Out6:[block[9]],   Out7:[block[13]],
+			  Out8:[block[2]],  Out9:[block[6]],  Out10:[block[10]], Out11:[block[14]],
+			  Out12:[block[3]], Out13:[block[7]], Out14:[block[11]], Out15:[block[15]]
+end			  
+
+
+schedule fsm s0:
+ s0(A) --> s1;
+ s1(B) --> s2;
+ s2(C) --> s3;
+ s3(D) --> s4;
+ s4(E) --> s0;
+end
+
+end

@@ -1,0 +1,53 @@
+actor Transposer () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, int Out2, int Out3:
+	
+	List(type:int, size=16) Array0 := [0 : for int i in Integers(1,16)];
+	
+
+	int a:=0;
+	int mode:=0;
+	
+	A: action In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
+	guard a<16
+	do 
+		Array0[a]:=in0;
+		Array0[a+1]:=in1;
+		Array0[a+2]:=in2;
+		Array0[a+3]:=in3;
+		a:=a+4;	
+	end 
+	
+	FinishA: action ==>
+	guard a=16
+	do
+		a:=0;
+	end
+	
+	
+	B: action ==> Out0:[out0], Out1:[out1], Out2:[out2], Out3:[out3]
+	guard a<4
+	var int out0, int out1, int out2, int out3 
+	do 
+		out0:=Array0[a];
+		out1:=Array0[a+4];
+		out2:=Array0[a+8];
+		out3:=Array0[a+12];
+		a:=a+1;	
+	end 
+	
+	
+	FinishB: action ==>
+	guard a=4
+	do
+		a:=0;
+	end
+	
+	schedule fsm s0:
+		s0(A)-->s0;
+		s0(FinishA)-->s1;
+		s1(B)-->s1;
+		s1(FinishB)-->s0;
+	end
+	
+	
+	
+end

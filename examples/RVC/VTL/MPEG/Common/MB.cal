@@ -1,0 +1,85 @@
+actor MB () int In, int MBType ==> int Out0, int Out1, int Out2, int Out3:
+
+	List(type:int, size=16*16) mb := [0: for int t in Integers(0,(16*16)-1)]; 
+	int i := 0;
+	int count := 0;
+	int origin:= 0;
+	int block:= 0;
+	int mode:=0;
+	int inCount:=0;
+	int mbType:=0;
+	 
+	 
+	MBType: action MBType:[m] ==> 
+	do
+		mbType:=m;
+	end	
+	
+	In: action In:[in0] ==> 
+	guard inCount<16*16
+	do
+		mb[inCount] := in0;
+		inCount:= inCount+1;
+	end
+	
+	FinishIn: action ==>
+	guard inCount=16*16
+	do inCount:=0;
+	end
+	
+	A: action ==> Out0:[out0], Out1:[out1], Out2:[out2], Out3:[out3]
+	guard count<4 and block<16 
+	var int out0, int out1, int out2, int out3
+	do
+		out0:=mb[i];
+		out1:=mb[i+1];
+		out2:=mb[i+2];
+		out3:=mb[i+3];
+		i:=i+16;
+		count:=count+1;
+	end
+
+
+	B: action ==> 
+	guard count=4 and block<16 
+	do
+		count:=0;
+		block:=block+1;
+		if(block mod 4 = 0) then
+			origin:=origin + 4 + 16*3;
+		else
+			origin:=origin+4;
+		end	
+		i:=origin;
+	end
+
+	C: action ==>
+	guard block=16 
+	do
+		block:=0;
+		i:=0;
+		origin:=0;
+		mode:=mode+1;
+	end
+	
+	D: action ==>
+	guard (mode=4 and mbType=0) or (mode=2 and mbType!=0)
+	do mode:=0;
+	end
+		
+	
+	schedule fsm init :
+		init(MBType) --> s0;
+		s0(In) --> s0;
+		s0(FinishIn) --> s1;
+		s1(A) --> s1;
+		s1(B) --> s1;
+		s1(C) --> s1;
+		s1(D) --> init;
+	end
+	
+	priority
+		D>A;
+	end
+	
+end

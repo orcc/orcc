@@ -1,0 +1,168 @@
+//actor ReconstructedMB () int In0, int In1, int In2, int In3, int BestMode, int MBType, int Sel_16_4 ==> int Out:
+actor ReconstructedMB () int In0, int In1, int In2, int In3, int BestMode, int MBType ==> int Out:
+
+	List(type:int, size=256) Array0 := [0 : for int t in Integers(0,255)];
+	List(type:int, size=256) Array1 := [0 : for int t in Integers(0,255)];
+	List(type:int, size=256) Array2 := [0 : for int t in Integers(0,255)];
+	List(type:int, size=256) Array3 := [0 : for int t in Integers(0,255)];
+	
+	int i:=0;
+	int count:=0;
+	int block:=0;
+	int origin:=0;
+	int mode:= 0;
+	int bm:=0;
+	int mbType:=0;
+	
+	MBType: action MBType:[m] ==> 
+	do
+		mbType:=m;
+	end	
+	
+	
+	A: action  In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
+	guard count<4 and block<16 and mode<4 and mbType=0
+	var int out0, int out1, int out2, int out3
+	do
+		if(mode=0) then
+			Array0[i]:=in0;
+			Array0[i+1]:=in1;
+			Array0[i+2]:=in2;
+			Array0[i+3]:=in3;
+		else
+			if(mode=1) then
+				Array1[i]:=in0;
+				Array1[i+1]:=in1;
+				Array1[i+2]:=in2;
+				Array1[i+3]:=in3;
+			else
+				if(mode=2) then
+					Array2[i]:=in0;
+					Array2[i+1]:=in1;
+					Array2[i+2]:=in2;
+					Array2[i+3]:=in3;
+				else
+					Array3[i]:=in0;
+					Array3[i+1]:=in1;
+					Array3[i+2]:=in2;
+					Array3[i+3]:=in3;
+				end
+			end
+		end				
+		i:=i+16;
+		count:=count+1;
+	end
+
+	
+	A1: action  In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
+	guard count<4 and block<16 and mode<2 and mbType=1
+	var int out0, int out1, int out2, int out3
+	do
+		if(mode=0) then
+			Array1[i]:=in0;
+			Array1[i+1]:=in1;
+			Array1[i+2]:=in2;
+			Array1[i+3]:=in3;
+		else
+			Array2[i]:=in0;
+			Array2[i+1]:=in1;
+			Array2[i+2]:=in2;
+			Array2[i+3]:=in3;
+		end					
+		i:=i+16;
+		count:=count+1;
+	end
+	
+	A2: action  In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
+	guard count<4 and block<16 and mode<2 and mbType=2
+	var int out0, int out1, int out2, int out3
+	do
+		if(mode=0) then
+			Array0[i]:=in0;
+			Array0[i+1]:=in1;
+			Array0[i+2]:=in2;
+			Array0[i+3]:=in3;
+		else
+			Array2[i]:=in0;
+			Array2[i+1]:=in1;
+			Array2[i+2]:=in2;
+			Array2[i+3]:=in3;
+		end					
+		i:=i+16;
+		count:=count+1;
+	end
+	
+	B: action ==> 
+	guard count=4 and block<16 
+	do
+		count:=0;
+		block:=block+1;
+		if(block mod 4 = 0) then
+			origin:=origin + 4 + 16*3;
+		else
+			origin:=origin+4;
+		end	
+		i:=origin;
+	end
+
+	C: action ==>
+	guard block=16 
+	do
+		block:=0;
+		i:=0;
+		origin:=0;
+		mode:=mode+1;
+	end
+	
+	D: action BestMode:[b] ==>
+	guard (mode=4 and mbType=0) or (mode=2 and mbType!=0)
+	do
+		i:=0;
+		bm:=b;
+	end
+		
+	E: action  ==>  Out:[out]
+	guard i<256
+	var int out 
+	do
+		if(bm=0) then
+			out:=Array0[i];
+		else
+			if(bm=1) then
+				out:=Array1[i];
+			else
+				if(bm=2) then
+					out:=Array2[i];
+				else
+					out:=Array3[i];
+				end
+			end
+		end
+		i:=i+1;		
+	end
+	
+	F: action ==>
+	guard i=256
+	do 
+		i:=0;
+		mode:=0;
+	end
+	
+	schedule fsm init :
+		
+		init(MBType) --> s0;
+		s0(A) --> s0;
+		s0(A1) --> s0;
+		s0(A2) --> s0;
+		s0(B) --> s0;
+		s0(C) --> s0;
+		s0(D) --> s1;
+		s1(E) --> s1;
+		s1(F) --> init;
+	end
+		
+	//priority
+		//D>A;
+	//end
+
+end

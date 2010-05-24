@@ -1,0 +1,11 @@
+actor HadamardSATD () int In0, int In1, int In2, int In3 ==> int Out:
+
+
+	A: action In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==> Out:[out]
+	var int out
+	do
+		out := (in0+in1+in2+in3)>>1;
+	end
+
+ 
+end

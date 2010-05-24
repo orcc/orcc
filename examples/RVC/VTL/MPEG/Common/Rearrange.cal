@@ -1,0 +1,240 @@
+ actor Rearrange() int InReconstructed_16, int InReconstructed_4, int Sel_16_4 ==> int(size=9) Byte_Intra:
+
+	int width=176; int height=144;
+	int frameSize=width*height;
+	int rowSize=width*16;
+	
+	List(type:int, size=rowSize) frameRow := [0: for int t in Integers(1,rowSize)];
+ 
+	int count:=0;
+	int i:=0;
+	int origin:=0;
+	int nmbs:=0;
+	int nblocks:=0;
+	int nrows:=0;
+	
+	//////////////////////////////////////////////////////////////////////////
+ 	
+	Selected_16: action Sel_16_4:[s] ==>
+	guard s=1
+	end
+	
+	In_16: action InReconstructed_16:[in0] ==> 
+	guard count < 16*16
+	do
+		frameRow[i]:=in0;
+		count:=count+1;
+		if(count mod 16 = 0)then
+			i:=i+width-15;
+		else
+			i:=i+1;
+		end		
+	end
+
+	FinishIn_16: action ==> 
+	guard count = 16*16
+	do
+		println("--- MB # " +nmbs+" was encoded via 16x16 Intra Prediction Mode");
+		count:=0;
+		origin:=origin+16;
+		i:=origin;
+		nmbs:=nmbs+1;
+	end	
+	
+	FinishRow_16: action ==>
+	guard count=16*16 and ((nmbs+1) mod (rowSize/256) = 0)
+	do
+		println("--- MB # " +nmbs+" was encoded via 16x16 Intra Prediction Mode");
+		println("++++++++++ Last MB in row # " +nrows+" is a 16x16 Intra Predicted MB ++++++++++");
+		nrows:=nrows+1;
+		nmbs:=nmbs+1;
+		i:=0;
+		origin:=0;
+		count:=0;	
+	end	
+	
+	FinishFrame_16: action ==>
+	guard count=16*16 and (nmbs+1)=(frameSize/256)
+	do
+		println("--- MB # " +nmbs+" was encoded via 16x16 Intra Prediction Mode");
+		println("++++++++++ Last MB in row # " +nrows+" is a 16x16 Intra Predicted MB ++++++++++");
+		println("================================ Last Block in Frame is 16x16 ================================");
+		i:=0;
+		nmbs:=0;
+		origin:=0;
+		count:=0;
+		nrows:=0;
+	end
+	
+	
+	//////////////////////////////////////////////////////////////////////////
+	
+	Selected_4: action Sel_16_4:[s] ==>
+	guard s=0
+	end
+	
+	In_4: action InReconstructed_4:[in0] ==>
+	guard count < 4*4
+	do
+		frameRow[i]:=in0;
+		count:=count+1;
+		if(count mod 4 = 0)then
+			i:=i+width-3;
+		else
+			i:=i+1;
+		end		
+	end
+
+	FinishIn_4: action ==> 
+	guard count=4*4 and nblocks<15
+	do
+		count:=0;
+		
+		origin:=origin+4;	
+		if (nblocks = 1 or nblocks = 5 or nblocks = 9 or nblocks = 13) then
+			origin := origin - 8 + 4*width;
+			else
+				if (nblocks = 3 or nblocks = 11) then
+					origin := origin - 4*width;
+					else
+						if(nblocks = 7) then
+							origin := origin - 16 + 4*width;
+						end
+				end
+		end
+		
+		
+		nblocks:=nblocks+1;
+		i:=origin;
+	end	
+		
+	
+	MBFinishIn_4: action ==> 
+	guard count=4*4 and nblocks=15
+	do
+		println("--- MB # " +nmbs+" was encoded via 4x4 Intra Prediction Mode");
+		
+		nblocks := 0;
+		origin := origin + 4 - 12*width;
+		
+		i:=origin;
+		nmbs:=nmbs+1;
+		count:=0;	
+	end	
+	
+
+	NotFinishRow_4: action ==>	
+	guard (nmbs mod (rowSize/256)) != 0
+	end
+	
+	
+	MBFinishRow_4: action ==>
+	guard (nmbs mod (rowSize/256)) = 0
+	do
+		println("++++++++++ Last MB in row # " +nrows+" is a 4x4 Intra Predicted MB ++++++++++");
+		
+		nrows:=nrows+1;
+		
+		i:=0;
+		origin:=0;
+		count:=0;
+		nblocks:=0;
+	end
+	
+	
+	MBFinishFrame_4: action ==>
+	guard nmbs=(frameSize/256)
+	do
+		println("++++++++++ Last MB in row # " +nrows+" is a 4x4 Intra Predicted MB ++++++++++");
+		println("================================ Last Block in Frame is 4x4 ================================");
+		
+		nmbs:=0;
+		i:=0;
+		origin:=0;
+		count:=0;
+		
+		nblocks:=0;
+		nrows:=0;
+	end
+	
+	
+	//////////////////////////////////////////////////////////////////////////
+	
+	Flush_4: action InReconstructed_4:[inR] ==>
+	guard count < 16*16
+	do
+		count := count + 1;
+	end
+	
+	FinishFlush_4: action ==>
+	guard count = 16*16
+	do
+		count := 0;
+		println("finish_flush");
+	end
+	
+	Flush_16: action InReconstructed_16:[inR] ==>
+	guard count < 16*16
+	do
+		count := count + 1;
+	end
+	
+	FinishFlush_16: action ==>
+	guard count = 16*16
+	do
+		count := 0;
+	end
+	
+	Fire: action ==> Byte_Intra:[out]
+	guard count<rowSize
+	var int out
+	do
+		out:=frameRow[count];
+		count:=count+1;
+	end
+	
+	FinishFire: action ==>
+	guard count=rowSize
+	do
+		count:=0;
+	end
+	
+	//////////////////////////////////////////////////////////////////////////
+	
+
+	schedule fsm CheckModeDecision_16x16_Vs_4x4:
+		
+		CheckModeDecision_16x16_Vs_4x4(Selected_16) --> FlushExtraTokensOf4x4;
+		CheckModeDecision_16x16_Vs_4x4(Selected_4) --> FlushExtraTokensOf16x16;
+		
+		FlushExtraTokensOf16x16(Flush_16)-->FlushExtraTokensOf16x16;
+		FlushExtraTokensOf16x16(FinishFlush_16)-->ReadBlock_4x4;
+		
+		FlushExtraTokensOf4x4(Flush_4)-->FlushExtraTokensOf4x4;
+		FlushExtraTokensOf4x4(FinishFlush_4)-->ReadMB_16x16;
+		
+		ReadMB_16x16(In_16)-->ReadMB_16x16;
+		ReadMB_16x16(FinishIn_16)-->CheckModeDecision_16x16_Vs_4x4;
+		ReadMB_16x16(FinishRow_16)-->FireRow;
+		ReadMB_16x16(FinishFrame_16)-->FireRow;
+		
+		ReadBlock_4x4(In_4)-->ReadBlock_4x4;
+		ReadBlock_4x4(FinishIn_4)-->ReadBlock_4x4;
+		ReadBlock_4x4(MBFinishIn_4)-->CheckFinish_4x4;
+		
+		CheckFinish_4x4(NotFinishRow_4) --> CheckModeDecision_16x16_Vs_4x4;
+		CheckFinish_4x4(MBFinishRow_4) --> FireRow;
+		CheckFinish_4x4(MBFinishFrame_4) --> FireRow;
+		
+		FireRow(Fire)-->FireRow;
+		FireRow(FinishFire)-->CheckModeDecision_16x16_Vs_4x4;
+			
+	end
+	
+	priority
+		FinishFrame_16 > FinishRow_16;
+		FinishRow_16 > FinishIn_16;
+		MBFinishFrame_4 > MBFinishRow_4;
+	end		
+
+end

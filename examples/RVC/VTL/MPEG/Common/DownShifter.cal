@@ -1,0 +1,6 @@
+actor DownShifter () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, int Out2, int Out3:
+
+	Shift: action [in0], [in1], [in2], [in3] ==> [(in0+32)>>6], [(in1+32)>>6], [(in2+32)>>6], [(in3+32)>>6]
+	end
+	
+end

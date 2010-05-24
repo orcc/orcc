@@ -1,0 +1,18 @@
+actor QuantiserAdderMultiplier () int W, int MF, int F, int QBits ==> int Out:
+	
+	A: action W:[w], MF:[mf], F:[f], QBits:[qbits] ==> Out:[out]
+	var int out, int tempW
+	do 
+		if(w<0)then
+			//tempW:=bitand(32,w); //01111111
+			tempW:=w* -1;
+		else
+			tempW:=w;
+		end
+		out:= ((tempW*mf)+(f))>>(qbits);
+		if(w<0)then
+			out:=out * -1;
+		end
+	end
+	
+end

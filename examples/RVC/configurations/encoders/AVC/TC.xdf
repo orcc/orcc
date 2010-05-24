@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="TC">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="In0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In2">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In3">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Out0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Out1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Out2">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Out3">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QTC_0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QTC_1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QTC_2">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QTC_3">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <Decl kind="Variable" name="qp">
+        <Type name="int"/>
+        <Expr kind="Literal" literal-kind="Integer" value="30"/>
+    </Decl>
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="DCT">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DCT"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="IDCT">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="IDCT"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Quantisation">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Quantisation"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="qp">
+            <Expr kind="Var" name="qp"/>
+        </Parameter>
+    </Instance>
+    <Instance id="Rescaler">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/Rescaler"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="qp">
+            <Expr kind="Var" name="qp"/>
+        </Parameter>
+    </Instance>
+    <Instance id="DownShifter">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DownShifter"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Quantisation" dst-port="In0" src="DCT" src-port="Out0"/>
+    <Connection dst="Quantisation" dst-port="In1" src="DCT" src-port="Out1"/>
+    <Connection dst="Quantisation" dst-port="In2" src="DCT" src-port="Out2"/>
+    <Connection dst="Quantisation" dst-port="In3" src="DCT" src-port="Out3"/>
+    <Connection dst="Rescaler" dst-port="In0" src="Quantisation" src-port="Out0"/>
+    <Connection dst="Rescaler" dst-port="In1" src="Quantisation" src-port="Out1"/>
+    <Connection dst="Rescaler" dst-port="In2" src="Quantisation" src-port="Out2"/>
+    <Connection dst="Rescaler" dst-port="In3" src="Quantisation" src-port="Out3"/>
+    <Connection dst="DCT" dst-port="In0" src="" src-port="In0"/>
+    <Connection dst="DCT" dst-port="In1" src="" src-port="In1"/>
+    <Connection dst="DCT" dst-port="In2" src="" src-port="In2"/>
+    <Connection dst="DCT" dst-port="In3" src="" src-port="In3"/>
+    <Connection dst="IDCT" dst-port="In0" src="Rescaler" src-port="Out0"/>
+    <Connection dst="IDCT" dst-port="In1" src="Rescaler" src-port="Out1"/>
+    <Connection dst="IDCT" dst-port="In2" src="Rescaler" src-port="Out2"/>
+    <Connection dst="IDCT" dst-port="In3" src="Rescaler" src-port="Out3"/>
+    <Connection dst="" dst-port="QTC_0" src="Quantisation" src-port="Out0"/>
+    <Connection dst="" dst-port="QTC_1" src="Quantisation" src-port="Out1"/>
+    <Connection dst="" dst-port="QTC_2" src="Quantisation" src-port="Out2"/>
+    <Connection dst="" dst-port="QTC_3" src="Quantisation" src-port="Out3"/>
+    <Connection dst="DownShifter" dst-port="In0" src="IDCT" src-port="Out0"/>
+    <Connection dst="DownShifter" dst-port="In1" src="IDCT" src-port="Out1"/>
+    <Connection dst="DownShifter" dst-port="In2" src="IDCT" src-port="Out2"/>
+    <Connection dst="DownShifter" dst-port="In3" src="IDCT" src-port="Out3"/>
+    <Connection dst="" dst-port="Out0" src="DownShifter" src-port="Out0"/>
+    <Connection dst="" dst-port="Out1" src="DownShifter" src-port="Out1"/>
+    <Connection dst="" dst-port="Out2" src="DownShifter" src-port="Out2"/>
+    <Connection dst="" dst-port="Out3" src="DownShifter" src-port="Out3"/>
+</XDF>

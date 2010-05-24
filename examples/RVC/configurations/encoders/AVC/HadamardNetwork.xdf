@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="HadamardNetwork">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="In0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In2">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In3">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Out">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="s00">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardStage0"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="s01">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardStage0"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="s02">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardStage0"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="s03">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardStage0"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="s10">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardStage1"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="s12">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardStage1"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="s13">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardStage1"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="s11">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardStage1"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="out">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardSATD"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="in">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/HadamardIn"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="s10" dst-port="In0" src="s00" src-port="Out0"/>
+    <Connection dst="s10" dst-port="In1" src="s01" src-port="Out0"/>
+    <Connection dst="s10" dst-port="In2" src="s02" src-port="Out0"/>
+    <Connection dst="s10" dst-port="In3" src="s03" src-port="Out0"/>
+    <Connection dst="s11" dst-port="In0" src="s00" src-port="Out1"/>
+    <Connection dst="s11" dst-port="In1" src="s01" src-port="Out1"/>
+    <Connection dst="s11" dst-port="In2" src="s02" src-port="Out1"/>
+    <Connection dst="s11" dst-port="In3" src="s03" src-port="Out1"/>
+    <Connection dst="s12" dst-port="In1" src="s01" src-port="Out2"/>
+    <Connection dst="s12" dst-port="In0" src="s00" src-port="Out2"/>
+    <Connection dst="s12" dst-port="In2" src="s02" src-port="Out2"/>
+    <Connection dst="s12" dst-port="In3" src="s03" src-port="Out2"/>
+    <Connection dst="s13" dst-port="In3" src="s03" src-port="Out3"/>
+    <Connection dst="s13" dst-port="In2" src="s02" src-port="Out3"/>
+    <Connection dst="s13" dst-port="In1" src="s01" src-port="Out3"/>
+    <Connection dst="s13" dst-port="In0" src="s00" src-port="Out3"/>
+    <Connection dst="out" dst-port="In0" src="s10" src-port="Out"/>
+    <Connection dst="out" dst-port="In1" src="s11" src-port="Out"/>
+    <Connection dst="out" dst-port="In2" src="s12" src-port="Out"/>
+    <Connection dst="out" dst-port="In3" src="s13" src-port="Out"/>
+    <Connection dst="" dst-port="Out" src="out" src-port="Out"/>
+    <Connection dst="s00" dst-port="In0" src="in" src-port="Out0"/>
+    <Connection dst="s00" dst-port="In1" src="in" src-port="Out1"/>
+    <Connection dst="s00" dst-port="In2" src="in" src-port="Out2"/>
+    <Connection dst="s00" dst-port="In3" src="in" src-port="Out3"/>
+    <Connection dst="s01" dst-port="In0" src="in" src-port="Out4"/>
+    <Connection dst="s01" dst-port="In1" src="in" src-port="Out5"/>
+    <Connection dst="s01" dst-port="In2" src="in" src-port="Out6"/>
+    <Connection dst="s01" dst-port="In3" src="in" src-port="Out7"/>
+    <Connection dst="s02" dst-port="In0" src="in" src-port="Out8"/>
+    <Connection dst="s02" dst-port="In1" src="in" src-port="Out9"/>
+    <Connection dst="s02" dst-port="In2" src="in" src-port="Out10"/>
+    <Connection dst="s02" dst-port="In3" src="in" src-port="Out11"/>
+    <Connection dst="s03" dst-port="In0" src="in" src-port="Out12"/>
+    <Connection dst="s03" dst-port="In1" src="in" src-port="Out13"/>
+    <Connection dst="s03" dst-port="In2" src="in" src-port="Out14"/>
+    <Connection dst="s03" dst-port="In3" src="in" src-port="Out15"/>
+    <Connection dst="in" dst-port="In0" src="" src-port="In0"/>
+    <Connection dst="in" dst-port="In1" src="" src-port="In1"/>
+    <Connection dst="in" dst-port="In2" src="" src-port="In2"/>
+    <Connection dst="in" dst-port="In3" src="" src-port="In3"/>
+</XDF>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="IDCT">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="In0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In2">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="In3">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Out0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Out1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Out2">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Out3">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="IDCT1D0">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/IDCT1D"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Transposer">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/Transposer"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="IDCT1D1">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/Common/IDCT1D"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="IDCT1D0" dst-port="In0" src="" src-port="In0"/>
+    <Connection dst="IDCT1D0" dst-port="In1" src="" src-port="In1"/>
+    <Connection dst="IDCT1D0" dst-port="In2" src="" src-port="In2"/>
+    <Connection dst="IDCT1D0" dst-port="In3" src="" src-port="In3"/>
+    <Connection dst="Transposer" dst-port="In0" src="IDCT1D0" src-port="Out0"/>
+    <Connection dst="Transposer" dst-port="In1" src="IDCT1D0" src-port="Out1"/>
+    <Connection dst="Transposer" dst-port="In2" src="IDCT1D0" src-port="Out2"/>
+    <Connection dst="Transposer" dst-port="In3" src="IDCT1D0" src-port="Out3"/>
+    <Connection dst="IDCT1D1" dst-port="In0" src="Transposer" src-port="Out0"/>
+    <Connection dst="IDCT1D1" dst-port="In1" src="Transposer" src-port="Out1"/>
+    <Connection dst="IDCT1D1" dst-port="In2" src="Transposer" src-port="Out2"/>
+    <Connection dst="IDCT1D1" dst-port="In3" src="Transposer" src-port="Out3"/>
+    <Connection dst="" dst-port="Out0" src="IDCT1D1" src-port="Out0"/>
+    <Connection dst="" dst-port="Out1" src="IDCT1D1" src-port="Out1"/>
+    <Connection dst="" dst-port="Out2" src="IDCT1D1" src-port="Out2"/>
+    <Connection dst="" dst-port="Out3" src="IDCT1D1" src-port="Out3"/>
+</XDF>

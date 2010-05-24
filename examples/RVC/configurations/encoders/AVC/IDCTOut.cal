@@ -1,0 +1,21 @@
+actor IDCTOut () In ==> Out0, Out1, Out2, Out3 :
+
+List(type:int , size=4 ) x := [0 : for t in Integers(0,3)];
+
+i:=0;
+
+	A: action In ==>
+	guard i<4 
+	do
+		x[i]:=In;
+		i:=i+1;
+	end
+		
+	B: action ==> Out0:[x[0]], Out1:[x[1]], Out2:[x[2]], Out3:[x[3]]
+	guard i=4
+	do
+		i:=0;
+	end	
+
+end
+
