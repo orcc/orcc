@@ -88,11 +88,8 @@ let get_suffix env var =
 	Some suffix
 
 let remove_binding_var env var =
-	if has_binding_var env var.v_name then
-		{env with bindings = Asthelper.SM.remove var.v_name env.bindings}
-	else
-		Asthelper.failwith var.v_loc
-			(sprintf "variable \"%s\" is not defined" var.v_name)
+	ignore (get_binding_var env var.v_name);
+	{env with bindings = Asthelper.SM.remove var.v_name env.bindings}
 
 let reset_suffix env = Asthelper.SH.clear env.suffixes
 
@@ -140,35 +137,3 @@ let ir_of_proc_name env loc proc =
 	else
 		Asthelper.failwith loc
 			(sprintf "reference to undefined function/procedure \"%s\"!" proc)
-
-(*****************************************************************************)
-(*****************************************************************************)
-(*****************************************************************************)
-
-(** [local_name global] returns the local name of a global variable. *)
-let local_name global = "local_" ^ global.v_name
-
-(** [get_global env vars graph node global] returns a tuple
-[(env, vars, node, local)]
-where [local] is the local variable that contains the given scalar global. *)
-let get_global env vars graph node global =
-	let local_name = local_name global in 
-	if has_binding_var env local_name then
-		let local = get_binding_var env local_name in
-		(env, vars, node, local)
-	else (
-		(* printf "no existing binding of %s\n" local_name; *)
-
-		(* creates a local variable with the name local_name and *)
-		(* the same type as the global *)
-		let local =
-			mk_var_def true false dummy_loc local_name global.v_type
-		in
-		let env = add_binding_var env local.v_name local in
-		let vars = local :: vars in
-
-		(* loads the variable *)
-		let load = mk_node (Load (ref local, mk_var_use global, [])) in
-		CFG.add_edge graph node load;
-		(env, vars, load, local)
-	)
