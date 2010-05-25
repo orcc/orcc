@@ -1941,7 +1941,6 @@ actor Algo_Synp_AVC()
 		done_reading_bits()
 	do
 		//println("read Pps header done");
-		println("");
 	end
 
 	//Not implemented due to guard condition : more_rbsp_data 

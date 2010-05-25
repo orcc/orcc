@@ -186,7 +186,7 @@ initialize ==>
     uint(size=5) idx,
     int (size=32) frame_num
   do
-    println("write_picture_done");
+    //println("write_picture_done");
     flag_picture_end[pic_curr_idx] := 1;
     wa_x := 0;
     wa_y := 0;
