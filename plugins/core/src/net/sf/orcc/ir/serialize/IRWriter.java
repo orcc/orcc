@@ -565,7 +565,7 @@ public class IRWriter {
 	public void write(String outputDir) throws OrccException {
 		try {
 			OutputStream os = new FileOutputStream(outputDir + File.separator
-					+ actor.getName() + "_2.json");
+					+ actor.getName() + ".json");
 			JSONObject obj = writeActor();
 			os.write(obj.toString(2).getBytes("UTF-8"));
 		} catch (IOException e) {

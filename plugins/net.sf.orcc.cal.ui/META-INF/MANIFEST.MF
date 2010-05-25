@@ -7,6 +7,7 @@ Bundle-SymbolicName: net.sf.orcc.cal.ui;singleton:=true
 Eclipse-RegisterBuddy: org.eclipse.xtext.log4j
 Bundle-ActivationPolicy: lazy
 Require-Bundle: net.sf.orcc.cal;visibility:=reexport,
+ net.sf.orcc.core,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  org.eclipse.xtext.ui,

@@ -181,5 +181,11 @@
             class="net.sf.orcc.cal.ui.CalExecutableExtensionFactory:org.eclipse.xtext.ui.editor.quickfix.MarkerResolutionGenerator">
       </markerResolutionGenerator>
    </extension>
+   <extension
+         point="org.eclipse.xtext.builder.participant">
+      <participant
+            class="net.sf.orcc.cal.ui.builder.ActorBuilder">
+      </participant>
+   </extension>
 
 </plugin>

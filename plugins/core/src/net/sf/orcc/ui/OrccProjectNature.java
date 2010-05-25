@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,36 +26,41 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.frontend;
+package net.sf.orcc.ui;
 
-import java.io.File;
-
-import net.sf.orcc.OrccException;
-import net.sf.orcc.frontend.transforms.AstToIR;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.serialize.IRWriter;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.runtime.CoreException;
 
 /**
- * This class defines an RVC-CAL front-end.
+ * This class describes the "Orcc" project nature.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Frontend {
+public class OrccProjectNature implements IProjectNature {
 
-	/**
-	 * output folder
-	 */
-	private File outputFolder;
+	public static final String NATURE_ID = "net.sf.orcc.core.OrccNature";
 
-	public Frontend(String outputFolder) {
-		this.outputFolder = new File(outputFolder);
+	private IProject project;
+
+	@Override
+	public void configure() throws CoreException {
+		
 	}
 
-	public void compile(String file, net.sf.orcc.cal.cal.Actor anActor)
-			throws OrccException {
-		Actor actor = new AstToIR().transform(file, anActor);
-		new IRWriter(actor).write(outputFolder.toString());
+	@Override
+	public void deconfigure() throws CoreException {
+	}
+
+	@Override
+	public IProject getProject() {
+		return project;
+	}
+
+	@Override
+	public void setProject(IProject project) {
+		this.project = project;
 	}
 
 }
