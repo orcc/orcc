@@ -82,8 +82,10 @@ actor Algo_Synp_AVC_FREXT()
 			uint(size=5) MbPartHeigth, 
 			int(size=16) MvRes, 
 			uint(size=1) MbIntraFlag, 
-			uint(size=31) RefReordering,
+			uint(size=31) RefReordering_l0,
+			uint(size=31) RefReordering_l1,
 			uint(size=5)  Nb_RefFrame_l0,
+			uint(size=5)  Nb_RefFrame_l1,
 			uint(size=31) MMCO,
 			uint(size=5)  NumRefFrame,
 			uint(size=31) FramNumCurrPic,
@@ -748,7 +750,7 @@ actor Algo_Synp_AVC_FREXT()
 	//*****************************************************************
 
 	//*******  ref_pic_list_reordering  ********/
-	uint(size=1) ref_pic_list_reordering_flag_l0;
+	uint(size=1) ref_pic_list_reordering_flag;
 	uint(size=5) ref_pic_idx;
 	uint(size=2) reordering_of_pic_nums_idc;
 	List (type:uint,size=32) abs_diff_pic_num_minus1_l0 := [ 0 : for int i in Integers( 0, 31)];
@@ -5336,11 +5338,11 @@ end
 		ref_pic_idx :=0 ;
 	end
 
-	read_SliceH_ref_pic_list_reordering_flag_l0_done: action ==> RefReordering:[ref_pic_list_reordering_flag_l0], Nb_RefFrame_l0:[slice_num_ref_idx_l0_active_minus1 + 1]
+	read_SliceH_ref_pic_list_reordering_flag_l0_done: action ==> RefReordering_l0:[ref_pic_list_reordering_flag], Nb_RefFrame_l0:[slice_num_ref_idx_l0_active_minus1 + 1]
 	guard 
 		done_reading_bits(), first_mb_in_slice=0
 	do
-		ref_pic_list_reordering_flag_l0 := read_result();
+		ref_pic_list_reordering_flag := read_result();
 		reordering_of_pic_nums_idc :=0;
 	end
 
@@ -5348,20 +5350,20 @@ end
 	guard
 		done_reading_bits(), first_mb_in_slice!=0
 	do
-		ref_pic_list_reordering_flag_l0 := read_result();
+		ref_pic_list_reordering_flag := read_result();
 		reordering_of_pic_nums_idc :=0;
 	end
 
 	//if (ref_pic_list_reordering_flag_l0)
 	//do
-	read_SliceH_reordering_of_pic_nums_idc: action ==>
+	read_SliceH_reordering_of_pic_nums_idc_l0: action ==>
 	guard 
-		ref_pic_list_reordering_flag_l0 = 1
+		ref_pic_list_reordering_flag = 1
 	do
 		start_vld();
 	end
 
-	read_SliceH_reordering_of_pic_nums_idc_done: action ==> RefReordering:[reordering_of_pic_nums_idc]
+	read_SliceH_reordering_of_pic_nums_idc_l0_done: action ==> RefReordering_l0:[reordering_of_pic_nums_idc]
 	guard
 		vld_end(), first_mb_in_slice=0
 	do
@@ -5369,7 +5371,7 @@ end
 		if reordering_of_pic_nums_idc != 3 then start_vld(); end
 	end
 
-	skip_read_SliceH_reordering_of_pic_nums_idc_done: action ==>
+	skip_read_SliceH_reordering_of_pic_nums_idc_l0_done: action ==>
 	guard
 		vld_end(), first_mb_in_slice!=0
 	do
@@ -5378,7 +5380,7 @@ end
 	end
 
 	//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
-	read_SliceH_abs_diff_pic_num_minus1_done: action ==> RefReordering:[vld_ue()]
+	read_SliceH_abs_diff_pic_num_minus1_l0_done: action ==> RefReordering_l0:[vld_ue()]
 	guard
 		vld_end(), first_mb_in_slice=0,
 		reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
@@ -5387,7 +5389,7 @@ end
 	end
 
 	//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
-	skip_read_SliceH_abs_diff_pic_num_minus1_done: action ==> 
+	skip_read_SliceH_abs_diff_pic_num_minus1_l0_done: action ==> 
 	guard
 		vld_end(), first_mb_in_slice!=0,
 		reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
@@ -5395,7 +5397,7 @@ end
 			abs_diff_pic_num_minus1_l0[ref_pic_idx] := vld_ue();
 	end
 	// else if (reordering_of_pic_nums_idc == 2)
-	read_SliceH_long_term_pic_num_done_idc2: action ==> RefReordering:[vld_ue()]
+	read_SliceH_long_term_pic_num_idc2_l0_done: action ==> RefReordering_l0:[vld_ue()]
 	guard
 		vld_end(), first_mb_in_slice=0,
 		reordering_of_pic_nums_idc =2
@@ -5403,7 +5405,7 @@ end
 			long_term_pic_num_l0[ref_pic_idx] := vld_ue();
 	end
 
-	skip_read_SliceH_long_term_pic_num_done_idc2: action ==>
+	skip_read_SliceH_long_term_pic_num_idc2_l0_done: action ==>
 	guard
 		vld_end(), first_mb_in_slice!=0,
 		reordering_of_pic_nums_idc =2
@@ -5411,7 +5413,7 @@ end
 			long_term_pic_num_l0[ref_pic_idx] := vld_ue();
 	end
 	//else (reordering_of_pic_nums_idc == 3)
-	read_SliceH_skip_reordering_of_pic_nums_idc3: action ==>
+	read_SliceH_skip_reordering_of_pic_nums_idc3_l0: action ==>
 	guard
 		reordering_of_pic_nums_idc = 3
 	end
@@ -5419,14 +5421,124 @@ end
 	//while (reordering_of_pic_nums_idc != 3)
 
 	//else ( !ref_pic_list_reordering_flag_l0  )
-	read_SliceH_skip_reordering_of_pic_nums_idc: action ==>
+	read_SliceH_skip_reordering_of_pic_nums_idc_l0: action ==>
 	guard 
-		ref_pic_list_reordering_flag_l0 = 0
+		ref_pic_list_reordering_flag = 0
 	end
+					//if (slice_type % 5 == 1)
+					read_SliceH_ref_pic_list_reordering_flag_l1: action ==>
+					guard
+						slice_type = SLICE_TYPE_B
+					do
+						set_bits_to_read(1);
+						ref_pic_idx :=0 ;
+					end
+
+					read_SliceH_ref_pic_list_reordering_flag_l1_done: action ==> RefReordering_l1:[ref_pic_list_reordering_flag], Nb_RefFrame_l1:[slice_num_ref_idx_l0_active_minus1 + 1]
+					guard 
+						done_reading_bits(), first_mb_in_slice=0
+					do
+						ref_pic_list_reordering_flag := read_result();
+						reordering_of_pic_nums_idc :=0;
+					end
+
+					skip_read_SliceH_ref_pic_list_reordering_flag_l1_done: action ==>
+					guard
+						done_reading_bits(), first_mb_in_slice!=0
+					do
+						ref_pic_list_reordering_flag := read_result();
+						reordering_of_pic_nums_idc :=0;
+					end
+
+					//if (ref_pic_list_reordering_flag_l1)
+					//do
+					read_SliceH_reordering_of_pic_nums_idc_l1: action ==>
+					guard 
+						ref_pic_list_reordering_flag = 1
+					do
+						start_vld();
+					end
+
+					read_SliceH_reordering_of_pic_nums_idc_l1_done: action ==> RefReordering_l1:[reordering_of_pic_nums_idc]
+					guard
+						vld_end(), first_mb_in_slice=0
+					do
+						reordering_of_pic_nums_idc := vld_ue();
+						if reordering_of_pic_nums_idc != 3 then start_vld(); end
+					end
+
+					skip_read_SliceH_reordering_of_pic_nums_idc_l1_done: action ==>
+					guard
+						vld_end(), first_mb_in_slice!=0
+					do
+						reordering_of_pic_nums_idc := vld_ue();
+						if reordering_of_pic_nums_idc != 3 then start_vld(); end
+					end
+
+					//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
+					read_SliceH_abs_diff_pic_num_minus1_l1_done: action ==> RefReordering_l1:[vld_ue()]
+					guard
+						vld_end(), first_mb_in_slice=0,
+						reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
+					do
+							abs_diff_pic_num_minus1_l0[ref_pic_idx] := vld_ue();
+					end
+
+					//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
+					skip_read_SliceH_abs_diff_pic_num_minus1_l1_done: action ==> 
+					guard
+						vld_end(), first_mb_in_slice!=0,
+						reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
+					do
+							abs_diff_pic_num_minus1_l0[ref_pic_idx] := vld_ue();
+					end
+					// else if (reordering_of_pic_nums_idc == 2)
+					read_SliceH_long_term_pic_num_idc2_l1_done: action ==> RefReordering_l1:[vld_ue()]
+					guard
+						vld_end(), first_mb_in_slice=0,
+						reordering_of_pic_nums_idc =2
+					do
+							long_term_pic_num_l0[ref_pic_idx] := vld_ue();
+					end
+
+					skip_read_SliceH_long_term_pic_num_idc2_l1_done: action ==>
+					guard
+						vld_end(), first_mb_in_slice!=0,
+						reordering_of_pic_nums_idc =2
+					do
+							long_term_pic_num_l0[ref_pic_idx] := vld_ue();
+					end
+					//else (reordering_of_pic_nums_idc == 3)
+					read_SliceH_skip_reordering_of_pic_nums_idc3_l1: action ==>
+					guard
+						reordering_of_pic_nums_idc = 3
+					end
+					//end if
+					//while (reordering_of_pic_nums_idc != 3)
+
+					//else ( !ref_pic_list_reordering_flag_l1  )
+					read_SliceH_skip_reordering_of_pic_nums_idc_l1: action ==>
+					guard 
+						ref_pic_list_reordering_flag = 0
+					end
+					//end if
+
+					//else (slice_type % 5 != 1)
+					read_SliceH_skip_ref_pic_list_reordering_l1: action ==> RefReordering_l1:[0], Nb_RefFrame_l1:[0]
+					guard
+						slice_type != SLICE_TYPE_B
+					end
+
+					skip_read_SliceH_skip_ref_pic_list_reordering_l1: action ==>
+					guard
+						slice_type != SLICE_TYPE_B
+					end
+					//end if
+	
 	//end if
 
 	//else (slice_type % 5 == 2 || slice_type % 5 == 4)
-	read_SliceH_skip_ref_pic_list_reordering: action ==> RefReordering:[0], Nb_RefFrame_l0:[0]
+	read_SliceH_skip_ref_pic_list_reordering: action ==> RefReordering_l0:[0], Nb_RefFrame_l0:[0], RefReordering_l1:[0], Nb_RefFrame_l1:[0]
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI, first_mb_in_slice=0
 	end
@@ -8406,26 +8518,43 @@ end
 		read_SliceH_num_ref_idx_active_override_flag		( read_SliceH_num_ref_idx_active_override_flag		) --> read_SliceH_num_ref_idx_l0_active_minus1;
 		read_SliceH_num_ref_idx_l0_active_minus1			( read_SliceH_num_ref_idx_l0_active_minus1			) --> read_SliceH_num_ref_idx_l1_active_minus1;
 		read_SliceH_num_ref_idx_l1_active_minus1			( read_SliceH_num_ref_idx_l1_active_minus1			) --> read_SliceH_num_ref_idx_l1_active_minus1_done;
-		read_SliceH_num_ref_idx_l1_active_minus1_done		( read_SliceH_num_ref_idx_l1_active_minus1_done		) --> read_SliceH_ref_pic_list_reordering;
-		read_SliceH_num_ref_idx_l1_active_minus1			( read_SliceH_skip_num_ref_idx_l1_active_minus1		) --> read_SliceH_ref_pic_list_reordering;
-		read_SliceH_num_ref_idx_l0_active_minus1			( read_SliceH_skip_num_ref_idx_l0_active_minus1		) --> read_SliceH_ref_pic_list_reordering;
-		read_SliceH_num_ref_idx_active_override_flag		( read_SliceH_skip_num_ref_idx_active_override_flag	) --> read_SliceH_ref_pic_list_reordering;
+		read_SliceH_num_ref_idx_l1_active_minus1_done		( read_SliceH_num_ref_idx_l1_active_minus1_done		) --> read_SliceH_ref_pic_list_reordering_l0;
+		read_SliceH_num_ref_idx_l1_active_minus1			( read_SliceH_skip_num_ref_idx_l1_active_minus1		) --> read_SliceH_ref_pic_list_reordering_l0;
+		read_SliceH_num_ref_idx_l0_active_minus1			( read_SliceH_skip_num_ref_idx_l0_active_minus1		) --> read_SliceH_ref_pic_list_reordering_l0;
+		read_SliceH_num_ref_idx_active_override_flag		( read_SliceH_skip_num_ref_idx_active_override_flag	) --> read_SliceH_ref_pic_list_reordering_l0;
 
-		//ref_pic_list_reordering
-		read_SliceH_ref_pic_list_reordering					( read_SliceH_ref_pic_list_reordering_flag_l0		) --> read_SliceH_ref_pic_list_reordering_flag_l0_done;
-		read_SliceH_ref_pic_list_reordering					( read_SliceH_skip_ref_pic_list_reordering			) --> read_SliceH_pred_weight_table;
-		read_SliceH_ref_pic_list_reordering					( skip_read_SliceH_skip_ref_pic_list_reordering			) --> read_SliceH_pred_weight_table;
-		read_SliceH_ref_pic_list_reordering_flag_l0_done	( read_SliceH_ref_pic_list_reordering_flag_l0_done	) --> read_SliceH_reordering_of_pic_nums_idc;
-		read_SliceH_ref_pic_list_reordering_flag_l0_done	( skip_read_SliceH_ref_pic_list_reordering_flag_l0_done	) --> read_SliceH_reordering_of_pic_nums_idc;
-		read_SliceH_reordering_of_pic_nums_idc 				( read_SliceH_reordering_of_pic_nums_idc	        ) --> read_SliceH_reordering_of_pic_nums_idc_done;
-		read_SliceH_reordering_of_pic_nums_idc				( read_SliceH_skip_reordering_of_pic_nums_idc		) --> read_SliceH_pred_weight_table;	
-		read_SliceH_reordering_of_pic_nums_idc_done			( read_SliceH_reordering_of_pic_nums_idc_done		) --> look_SliceH_reordering_of_pic_nums_idc;	
-		read_SliceH_reordering_of_pic_nums_idc_done			( skip_read_SliceH_reordering_of_pic_nums_idc_done		) --> look_SliceH_reordering_of_pic_nums_idc;	
-		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_abs_diff_pic_num_minus1_done	        ) --> read_SliceH_reordering_of_pic_nums_idc;	
-		look_SliceH_reordering_of_pic_nums_idc				( skip_read_SliceH_abs_diff_pic_num_minus1_done	        ) --> read_SliceH_reordering_of_pic_nums_idc;	
-		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_long_term_pic_num_done_idc2				) --> read_SliceH_reordering_of_pic_nums_idc;
-		look_SliceH_reordering_of_pic_nums_idc				( skip_read_SliceH_long_term_pic_num_done_idc2				) --> read_SliceH_reordering_of_pic_nums_idc;
-		look_SliceH_reordering_of_pic_nums_idc				( read_SliceH_skip_reordering_of_pic_nums_idc3		) --> read_SliceH_pred_weight_table;
+		//ref_pic_list_reordering_l0
+		read_SliceH_ref_pic_list_reordering_l0				( read_SliceH_ref_pic_list_reordering_flag_l0           ) --> read_SliceH_ref_pic_list_reordering_flag_l0_done;
+		read_SliceH_ref_pic_list_reordering_l0				( read_SliceH_skip_ref_pic_list_reordering              ) --> read_SliceH_pred_weight_table;
+		read_SliceH_ref_pic_list_reordering_l0				( skip_read_SliceH_skip_ref_pic_list_reordering         ) --> read_SliceH_pred_weight_table;
+		read_SliceH_ref_pic_list_reordering_flag_l0_done	( read_SliceH_ref_pic_list_reordering_flag_l0_done      ) --> read_SliceH_reordering_of_pic_nums_idc_l0;
+		read_SliceH_ref_pic_list_reordering_flag_l0_done	( skip_read_SliceH_ref_pic_list_reordering_flag_l0_done ) --> read_SliceH_reordering_of_pic_nums_idc_l0;
+		read_SliceH_reordering_of_pic_nums_idc_l0 			( read_SliceH_reordering_of_pic_nums_idc_l0             ) --> read_SliceH_reordering_of_pic_nums_idc_l0_done;
+		read_SliceH_reordering_of_pic_nums_idc_l0			( read_SliceH_skip_reordering_of_pic_nums_idc_l0        ) --> read_SliceH_ref_pic_list_reordering_l1;	
+		read_SliceH_reordering_of_pic_nums_idc_l0_done		( read_SliceH_reordering_of_pic_nums_idc_l0_done        ) --> look_SliceH_reordering_of_pic_nums_idc_l0;	
+		read_SliceH_reordering_of_pic_nums_idc_l0_done		( skip_read_SliceH_reordering_of_pic_nums_idc_l0_done   ) --> look_SliceH_reordering_of_pic_nums_idc_l0;	
+		look_SliceH_reordering_of_pic_nums_idc_l0			( read_SliceH_abs_diff_pic_num_minus1_l0_done           ) --> read_SliceH_reordering_of_pic_nums_idc_l0;	
+		look_SliceH_reordering_of_pic_nums_idc_l0			( skip_read_SliceH_abs_diff_pic_num_minus1_l0_done      ) --> read_SliceH_reordering_of_pic_nums_idc_l0;	
+		look_SliceH_reordering_of_pic_nums_idc_l0			( read_SliceH_long_term_pic_num_idc2_l0_done            ) --> read_SliceH_reordering_of_pic_nums_idc_l0;
+		look_SliceH_reordering_of_pic_nums_idc_l0			( skip_read_SliceH_long_term_pic_num_idc2_l0_done       ) --> read_SliceH_reordering_of_pic_nums_idc_l0;
+		look_SliceH_reordering_of_pic_nums_idc_l0			( read_SliceH_skip_reordering_of_pic_nums_idc3_l0       ) --> read_SliceH_ref_pic_list_reordering_l1;
+		//ref_pic_list_reordering_l1
+		read_SliceH_ref_pic_list_reordering_l1				( read_SliceH_ref_pic_list_reordering_flag_l1           ) --> read_SliceH_ref_pic_list_reordering_flag_l1_done;
+		read_SliceH_ref_pic_list_reordering_l1				( read_SliceH_skip_ref_pic_list_reordering_l1           ) --> read_SliceH_pred_weight_table;
+		read_SliceH_ref_pic_list_reordering_l1				( skip_read_SliceH_skip_ref_pic_list_reordering_l1      ) --> read_SliceH_pred_weight_table;
+		read_SliceH_ref_pic_list_reordering_flag_l1_done	( read_SliceH_ref_pic_list_reordering_flag_l1_done      ) --> read_SliceH_reordering_of_pic_nums_idc_l1;
+		read_SliceH_ref_pic_list_reordering_flag_l1_done	( skip_read_SliceH_ref_pic_list_reordering_flag_l1_done ) --> read_SliceH_reordering_of_pic_nums_idc_l1;
+		read_SliceH_reordering_of_pic_nums_idc_l1 			( read_SliceH_reordering_of_pic_nums_idc_l1             ) --> read_SliceH_reordering_of_pic_nums_idc_l1_done;
+		read_SliceH_reordering_of_pic_nums_idc_l1			( read_SliceH_skip_reordering_of_pic_nums_idc_l1        ) --> read_SliceH_pred_weight_table;	
+		read_SliceH_reordering_of_pic_nums_idc_l1_done		( read_SliceH_reordering_of_pic_nums_idc_l1_done        ) --> look_SliceH_reordering_of_pic_nums_idc_l1;	
+		read_SliceH_reordering_of_pic_nums_idc_l1_done		( skip_read_SliceH_reordering_of_pic_nums_idc_l1_done   ) --> look_SliceH_reordering_of_pic_nums_idc_l1;	
+		look_SliceH_reordering_of_pic_nums_idc_l1			( read_SliceH_abs_diff_pic_num_minus1_l1_done           ) --> read_SliceH_reordering_of_pic_nums_idc_l1;	
+		look_SliceH_reordering_of_pic_nums_idc_l1			( skip_read_SliceH_abs_diff_pic_num_minus1_l1_done      ) --> read_SliceH_reordering_of_pic_nums_idc_l1;	
+		look_SliceH_reordering_of_pic_nums_idc_l1			( read_SliceH_long_term_pic_num_idc2_l1_done            ) --> read_SliceH_reordering_of_pic_nums_idc_l1;
+		look_SliceH_reordering_of_pic_nums_idc_l1			( skip_read_SliceH_long_term_pic_num_idc2_l1_done       ) --> read_SliceH_reordering_of_pic_nums_idc_l1;
+		look_SliceH_reordering_of_pic_nums_idc_l1			( read_SliceH_skip_reordering_of_pic_nums_idc3_l1       ) --> read_SliceH_pred_weight_table;
+
+
 		//pred_weight_table
 		read_SliceH_pred_weight_table						( read_SliceH_pred_weight_table						) --> read_SliceH_dec_ref_pic_marking; //not yet realised
 		read_SliceH_pred_weight_table						( read_SliceH_skip_pred_weight_table				) --> read_SliceH_dec_ref_pic_marking;

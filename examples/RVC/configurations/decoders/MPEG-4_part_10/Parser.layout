@@ -55,7 +55,5 @@
       <vertex id="Algo_MMCO" x="905" y="1678"/>
       <vertex id="Algo_Parser_IPCM" x="951" y="2125"/>
       <vertex id="Algo_RefList0" x="1167" y="1730"/>
-      <vertex id="Black_Hole" x="1320" y="1558"/>
-      <vertex id="Algo_RefList1" x="1198" y="1555"/>
    </vertices>
 </layout>
