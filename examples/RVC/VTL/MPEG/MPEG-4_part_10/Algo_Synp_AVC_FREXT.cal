@@ -114,6 +114,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	bool TRACE := false;//true;
 	bool TRACE_MRL := false;//true;
+	bool TRACE_BIARI :=false; //true;
 
 	int  trVal := 0;
 	// ********** Read CAVLC ********** //
@@ -8220,54 +8221,6 @@ end
 		coded_block_flag = 0
 	end
 	
-<<<<<<< .mine
-	Residual_block_Sent_16_Coeff : action ==> VALUE : [ [level[i]: for int i in Integers(0,15)] ] repeat 16
-	guard
-		maxNumCoeff = 16
-
-	end
-	
-	Residual_block_Sent_15_Coeff : action ==> VALUE : [ [level[i]: for int i in Integers(0,14)] ] repeat 15
-	guard
-		maxNumCoeff = 15
-	end
-	
-	
-	Residual_block_Sent_8_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,7)] ] repeat 8
-	guard
-		maxNumCoeff = 8
-	end
-	
-	Residual_block_Sent_4_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,3)] ] repeat 4
-	guard
-		maxNumCoeff = 4
-	end
-	
-	
-	
-	Residual_Sent_16_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
-	guard
-		maxNumCoeff = 16
-	end
-	
-	Residual_Sent_15_Zero: action ==> VALUE : [ [0: for int i in Integers(0,14) ] ] repeat 15
-	guard
-		maxNumCoeff = 15
-	end
-	
-	Residual_Sent_8_Zero: action ==> VALUE : [ [0: for int i in Integers(0,7) ] ] repeat 8
-	guard
-		maxNumCoeff = 8
-	end
-	
-	Residual_Sent_4_Zero: action ==> VALUE : [ [0: for int i in Integers(0,3) ] ] repeat 4
-	guard
-		maxNumCoeff = 4
-	end
-	*/
-	
-=======
->>>>>>> .r1371
 	//******* End of Residual Block CABAC ********//  
 	
 	test_one_byte: action ==>
