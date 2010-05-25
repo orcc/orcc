@@ -7499,14 +7499,21 @@ end
 		leveltype = 1 and IS_CAVLC()
 	end
 	
-	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [0,level[i]: for int i in Integers(0,14)]] repeat 16
+	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [level[i]: for int i in Integers(0,15)]] repeat 16
 	guard
 		leveltype = 1 and maxNumCoeff = 15 and IS_CABAC()
+	var
+		List (type:int(size=16),size=16) level_temp
 	do
 		if TRACE then
 			foreach int s in Integers(0, 14) do
 				println("LumaAC16x16[" + s + "] := " + level[s]);
 			end
+		end
+		
+		level_temp[0] := 0;
+		foreach int s in Integers(1, 15) do
+			level_temp[s] := level[s - 1];
 		end
 	end
 	
@@ -7542,7 +7549,7 @@ end
 	
 	Residual_luma_skip_AC_CodedBlock8x8_CABAC_16: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16
 	guard
-		( (i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC() ) and IS_Intra_4x4()
+		( (i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC() )
 	do
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 		/*
@@ -7557,27 +7564,6 @@ end
 		
 		if TRACE then
 			println("Skipping Luma AC 16x16");
-		end
-	end
-	// end if
-	
-	Residual_luma_skip_AC_CodedBlock8x8_CABAC_15: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16 
-	guard
-		( (i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC()) and IS_Intra_16x16()
-	do	
-		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
-		/*
-		// if( !bmFlag && MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
-		for( i = 0; i < 15; i++ )
-		i16x16AClevel[ i8x8 * 4 + i4x4 ][ i ] = 0
-		// else
-		for( i = 0; i < 16; i++ )
-		level[ i8x8 * 4 + i4x4 ][ i ] = 0
-		// end if
-		*/
-		
-		if TRACE then
-			println("Skipping Luma AC 4x4");
 		end
 	end
 	// end if
@@ -7646,21 +7632,6 @@ end
 		luma4x4BlkIdx := 0;
 	end
 
-	Residual_return_DC_Luma_Sent_Zero: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16
-	guard
-		SentLumaDCZeros
-	do
-		SentLumaDCZeros := false;
-	
-		if TRACE then
-			println("Senting Luma 16x16 DC Zeros");
-		end
-	end
-	
-	Residual_return_DC_Luma_Sent_Zero_Skip: action ==>
-	guard
-		not SentLumaDCZeros
-	end
 	
 	// for( iCbCr = 0; iCbCr < 2; iCbCr++ )
 	//if( ( CodedBlockPatternChroma & 3 ) && startIdx = = 0 ) // chroma DC residual present
@@ -7799,9 +7770,11 @@ end
 		end
 	end
 	
-	Residual_return_chroma_AC_CABAC: action ==> VALUE:[[0,level[i]: for int i in Integers(0,14)]] repeat 16
+	Residual_return_chroma_AC_CABAC: action ==> VALUE:[[level_temp[i]: for int i in Integers(0,15)]] repeat 16
 	guard
 		leveltype = 3 and IS_CABAC()
+	var
+		List (type:int(size=16),size=16) level_temp
 	do
 		i4x4 := i4x4 +1;
 		if i4x4 = 4 then 
@@ -7820,22 +7793,14 @@ end
 				println("ChromaAC[" + s + "] := " + level[s]);
 			end
 		end
+		level_temp[0] := 0;
+		foreach int s in Integers(1, 15) do
+			level_temp[s] := level[s - 1];
+		end
+		
 		
 	end
 	
-	Residual_return_Chroma_AC_CABAC_Sent_4_Zero: action ==> VALUE:[[0: for int i in Integers(0,3)]] repeat 4 
-	guard
-		SentChromaZeros
-	do
-		SentChromaZeros := false;
-	end
-	
-	Residual_return_Chroma_AC_CABAC_Sent_4_Zero_Skip: action ==>
-	guard
-		not SentChromaZeros
-	end
-	
-
 	// else
 	Residual_chroma_AC_skip_CodedBlock4x4: action ==> LAST: [true]
 	guard
@@ -8756,9 +8721,7 @@ end
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC_15			) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
 		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma;		
-		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_Sent_Luma_DC_Zeros;
-		Residual_Sent_Luma_DC_Zeros							( Residual_return_DC_Luma_Sent_Zero					) --> Residual_chroma_DC_init;
-		Residual_Sent_Luma_DC_Zeros							( Residual_return_DC_Luma_Sent_Zero_Skip			) --> Residual_chroma_DC_init;
+		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_chroma_DC_init							) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_chroma_DC							) --> Residual_chroma_DC_init;
 		Residual_return										( Residual_return_chroma_DC_CABAC_4_Coeff			) --> Residual_chroma_DC_init;
@@ -8771,11 +8734,9 @@ end
 		Residual_chroma_AC_init								( Residual_chroma_AC_init							) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_CodedBlock4x4 					) --> Residual_block; // --> residual_block()
 		Residual_return										( Residual_return_chroma_AC							) --> Residual_chroma_AC_CodedBlock4x4;
-		Residual_return										( Residual_return_chroma_AC_CABAC					) --> Sent_4_Zero;
-		Sent_4_Zero											( Residual_return_Chroma_AC_CABAC_Sent_4_Zero		) --> Residual_chroma_AC_CodedBlock4x4;
-		Sent_4_Zero											( Residual_return_Chroma_AC_CABAC_Sent_4_Zero_Skip	) --> Residual_chroma_AC_CodedBlock4x4;
+		Residual_return										( Residual_return_chroma_AC_CABAC					) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4 			) --> Residual_chroma_AC_CodedBlock4x4;
-		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4_CABAC 		) --> Sent_4_Zero;
+		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4_CABAC 		) --> Residual_chroma_AC_CodedBlock4x4;
 
 		Residual_chroma_AC_CodedBlock4x4					( Residual_skip_chroma_AC							) --> SliceD_update; 
 		// --> macrobloc_layer / --> Slice_data
