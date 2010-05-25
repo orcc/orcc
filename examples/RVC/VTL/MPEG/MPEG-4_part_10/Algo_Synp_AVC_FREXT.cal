@@ -7414,7 +7414,7 @@ end
 	guard
 		leveltype=0 and IS_CABAC()
 	do
-		SentLumaDCZeros := true;
+		SentLumaDCZeros := false;
 		if TRACE then
 			println("Luma DC 16x16");
 			foreach int s in Integers(0, 15) do
@@ -7499,7 +7499,7 @@ end
 		leveltype = 1 and IS_CAVLC()
 	end
 	
-	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [level[i]: for int i in Integers(0,14)]] repeat 15
+	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [0,level[i]: for int i in Integers(0,14)]] repeat 16
 	guard
 		leveltype = 1 and maxNumCoeff = 15 and IS_CABAC()
 	do
@@ -7561,7 +7561,7 @@ end
 	end
 	// end if
 	
-	Residual_luma_skip_AC_CodedBlock8x8_CABAC_15: action ==> VALUE:[[0: for int i in Integers(0,14)]] repeat 15 
+	Residual_luma_skip_AC_CodedBlock8x8_CABAC_15: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16 
 	guard
 		( (i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC()) and IS_Intra_16x16()
 	do	
@@ -7799,7 +7799,7 @@ end
 		end
 	end
 	
-	Residual_return_chroma_AC_CABAC: action ==> VALUE:[[level[i]: for int i in Integers(0,14)]] repeat 15
+	Residual_return_chroma_AC_CABAC: action ==> VALUE:[[0,level[i]: for int i in Integers(0,14)]] repeat 16
 	guard
 		leveltype = 3 and IS_CABAC()
 	do
@@ -7807,7 +7807,7 @@ end
 		if i4x4 = 4 then 
 			i4x4 := 0; 
 			i8x8 := i8x8 +1; 
-			SentChromaZeros := true;
+			SentChromaZeros := false;
 		end
 		
 		if i8x8 = NumC8x8 then 
@@ -7834,6 +7834,7 @@ end
 	guard
 		not SentChromaZeros
 	end
+	
 
 	// else
 	Residual_chroma_AC_skip_CodedBlock4x4: action ==> LAST: [true]
@@ -7850,7 +7851,7 @@ end
 	end
 	
 	
-	Residual_chroma_AC_skip_CodedBlock4x4_CABAC: action ==> VALUE: [[0: for int j in Integers(0,14)]] repeat 15
+	Residual_chroma_AC_skip_CodedBlock4x4_CABAC: action ==> VALUE: [[0: for int j in Integers(0,15)]] repeat 16
 	guard
 		(iCbCr < 2 and bitand(CodedBlockPatternChroma, 2) != 2 or endIdx <= 0) and IS_CABAC()
 	do
@@ -7861,7 +7862,7 @@ end
 		if i4x4 = 4 then 
 			i4x4 := 0; 
 			i8x8 := i8x8 +1; 
-			SentChromaZeros := true;
+			SentChromaZeros := false;
 		end
 		if i8x8 = NumC8x8 then 
 			i8x8:=0; 
