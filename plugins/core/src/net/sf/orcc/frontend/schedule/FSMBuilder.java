@@ -39,8 +39,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.orcc.cal.cal.Schedule;
-import net.sf.orcc.cal.cal.Transition;
+import net.sf.orcc.cal.cal.AstSchedule;
+import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Tag;
@@ -73,7 +73,7 @@ public class FSMBuilder {
 	 * @param tree
 	 *            an ANTLR tree that represents the AST of an FSM.
 	 */
-	public FSMBuilder(Schedule schedule) {
+	public FSMBuilder(AstSchedule schedule) {
 		graph = new DirectedMultigraph<String, UniqueEdge>(UniqueEdge.class);
 		initialState = schedule.getInitialState().getName();
 		parseTransitions(schedule.getTransitions());
@@ -193,8 +193,8 @@ public class FSMBuilder {
 	 * @param tree
 	 *            an ANTLR tree whose root is TRANSITIONS
 	 */
-	private void parseTransitions(List<Transition> transitions) {
-		for (Transition transition : transitions) {
+	private void parseTransitions(List<AstTransition> transitions) {
+		for (AstTransition transition : transitions) {
 			String source = transition.getSource().getName();
 			Tag tag = new Tag(transition.getTag());
 			String target = transition.getTarget().getName();

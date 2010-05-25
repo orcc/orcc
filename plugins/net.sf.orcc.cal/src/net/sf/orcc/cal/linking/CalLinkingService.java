@@ -33,64 +33,100 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.cal.cal.Actor;
+import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstSchedule;
+import net.sf.orcc.cal.cal.AstState;
+import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
-import net.sf.orcc.cal.cal.Function;
-import net.sf.orcc.cal.cal.Procedure;
-import net.sf.orcc.cal.cal.Schedule;
-import net.sf.orcc.cal.cal.State;
-import net.sf.orcc.cal.cal.Transition;
 
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.linking.impl.DefaultLinkingService;
 import org.eclipse.xtext.parsetree.AbstractNode;
 
 public class CalLinkingService extends DefaultLinkingService {
 
-	private Map<String, Function> functions;
+	/**
+	 * Keep stubs so that new ones aren't created for each linking pass.
+	 */
+	private final Map<String, AstState> stubbedRefs;
 
-	private Map<String, Procedure> procedures;
+	private Resource stubsResource = null;
+
+	private Map<String, AstFunction> functions;
+
+	private Map<String, AstProcedure> procedures;
 
 	/**
 	 * Creates a new CAL linking service which creates builtin functions.
 	 */
 	public CalLinkingService() {
-		functions = new HashMap<String, Function>();
+		stubbedRefs = new HashMap<String, AstState>();
 
-		Function function;
-		function = CalFactory.eINSTANCE.createFunction();
+		functions = new HashMap<String, AstFunction>();
+
+		AstFunction function;
+		function = CalFactory.eINSTANCE.createAstFunction();
 		function.setName("bitand");
 		functions.put(function.getName(), function);
 
-		function = CalFactory.eINSTANCE.createFunction();
+		function = CalFactory.eINSTANCE.createAstFunction();
 		function.setName("bitnot");
 		functions.put(function.getName(), function);
 
-		function = CalFactory.eINSTANCE.createFunction();
+		function = CalFactory.eINSTANCE.createAstFunction();
 		function.setName("bitor");
 		functions.put(function.getName(), function);
 
-		function = CalFactory.eINSTANCE.createFunction();
+		function = CalFactory.eINSTANCE.createAstFunction();
 		function.setName("bitxor");
 		functions.put(function.getName(), function);
 
-		function = CalFactory.eINSTANCE.createFunction();
+		function = CalFactory.eINSTANCE.createAstFunction();
 		function.setName("lshift");
 		functions.put(function.getName(), function);
 
-		function = CalFactory.eINSTANCE.createFunction();
+		function = CalFactory.eINSTANCE.createAstFunction();
 		function.setName("rshift");
 		functions.put(function.getName(), function);
 
-		procedures = new HashMap<String, Procedure>();
+		procedures = new HashMap<String, AstProcedure>();
 
-		Procedure procedure;
-		procedure = CalFactory.eINSTANCE.createProcedure();
+		AstProcedure procedure;
+		procedure = CalFactory.eINSTANCE.createAstProcedure();
 		procedure.setName("println");
 		procedures.put(procedure.getName(), procedure);
+	}
+
+	/**
+	 * Use a temporary 'child' resource to hold created stubs. The real resource
+	 * URI is used to generate a 'temporary' resource to be the container for
+	 * stub EObjects.
+	 * 
+	 * @param source
+	 *            the real resource that is being parsed
+	 * @return the cached reference to a resource named by the real resource
+	 *         with the added extension 'xmi'
+	 */
+	private Resource makeResource(Resource source) {
+		if (null != stubsResource)
+			return stubsResource;
+		URI stubURI = source.getURI();
+		stubURI = stubURI.appendFileExtension("xmi");
+		stubsResource = source.getResourceSet().getResource(stubURI, false);
+		if (null == stubsResource) {
+			// TODO find out if this should be cleaned up so as not to clutter
+			// the project.
+			source.getResourceSet().createResource(stubURI);
+			stubsResource = source.getResourceSet().getResource(stubURI, false);
+		}
+		return stubsResource;
 	}
 
 	/**
@@ -104,9 +140,9 @@ public class CalLinkingService extends DefaultLinkingService {
 	 * @return a list
 	 */
 	private List<EObject> builtinFunction(EObject context, String name) {
-		Function function = getFunction(name);
+		AstFunction function = getFunction(name);
 		if (function != null) {
-			Actor actor = getActor(context);
+			AstActor actor = getActor(context);
 			actor.getBuiltinFunctions().add(function);
 			return Collections.singletonList((EObject) function);
 		}
@@ -125,9 +161,9 @@ public class CalLinkingService extends DefaultLinkingService {
 	 * @return a list
 	 */
 	private List<EObject> builtinProcedure(EObject context, String name) {
-		Procedure procedure = getProcedure(name);
+		AstProcedure procedure = getProcedure(name);
 		if (procedure != null) {
-			Actor actor = getActor(context);
+			AstActor actor = getActor(context);
 			actor.getBuiltinProcedures().add(procedure);
 			return Collections.singletonList((EObject) procedure);
 		}
@@ -142,16 +178,16 @@ public class CalLinkingService extends DefaultLinkingService {
 	 *            an object
 	 * @return an actor
 	 */
-	private Actor getActor(EObject context) {
+	private AstActor getActor(EObject context) {
 		EObject container = context.eContainer();
 		if (container == null) {
-			return (Actor) context;
+			return (AstActor) context;
 		} else {
 			return getActor(container);
 		}
 	}
 
-	private Function getFunction(String name) {
+	private AstFunction getFunction(String name) {
 		return functions.get(name);
 	}
 
@@ -165,12 +201,13 @@ public class CalLinkingService extends DefaultLinkingService {
 		final EClass requiredType = ref.getEReferenceType();
 		final String s = getCrossRefNodeAsString(node);
 		if (requiredType != null && s != null) {
-			if (CalPackage.Literals.FUNCTION.isSuperTypeOf(requiredType)) {
+			if (CalPackage.Literals.AST_FUNCTION.isSuperTypeOf(requiredType)) {
 				return builtinFunction(context, s);
-			} else if (CalPackage.Literals.PROCEDURE
+			} else if (CalPackage.Literals.AST_PROCEDURE
 					.isSuperTypeOf(requiredType)) {
 				return builtinProcedure(context, s);
-			} else if (CalPackage.Literals.STATE.isSuperTypeOf(requiredType)) {
+			} else if (CalPackage.Literals.AST_STATE
+					.isSuperTypeOf(requiredType)) {
 				return getState(context, ref, s);
 			}
 		}
@@ -178,37 +215,42 @@ public class CalLinkingService extends DefaultLinkingService {
 		return Collections.emptyList();
 	}
 
-	private Procedure getProcedure(String name) {
+	private AstProcedure getProcedure(String name) {
 		return procedures.get(name);
 	}
 
 	private List<EObject> getState(EObject context, EReference reference,
 			String name) {
+		AstActor actor;
 		if (reference.getName().equals("initialState")) {
-			Schedule schedule = (Schedule) context;
-			State state = getState(schedule, name);
-			// schedule.setInitialState(state);
-
-			return Collections.singletonList((EObject) state);
+			AstSchedule schedule = (AstSchedule) context;
+			actor = (AstActor) schedule.eContainer();
 		} else if (reference.getName().equals("source")) {
-			Transition transition = (Transition) context;
-			Schedule schedule = (Schedule) transition.eContainer();
-			State state = getState(schedule, name);
-
-			return Collections.singletonList((EObject) state);
+			AstTransition transition = (AstTransition) context;
+			AstSchedule schedule = (AstSchedule) transition.eContainer();
+			actor = (AstActor) schedule.eContainer();
 		} else if (reference.getName().equals("target")) {
-			Transition transition = (Transition) context;
-			Schedule schedule = (Schedule) transition.eContainer();
-			State state = getState(schedule, name);
-
-			return Collections.singletonList((EObject) state);
+			AstTransition transition = (AstTransition) context;
+			AstSchedule schedule = (AstSchedule) transition.eContainer();
+			actor = (AstActor) schedule.eContainer();
+		} else {
+			return Collections.emptyList();
 		}
 
-		return Collections.emptyList();
+		AstState stub = stubbedRefs.get(name);
+		if (null == stub) {
+			// Create the model element instance using the factory
+			stub = CalFactory.eINSTANCE.createAstState();
+			stub.setName(name);
+			// Attach the stub to the resource that's being parsed
+			Resource res = makeResource(actor.eResource());
+			res.getContents().add(stub);
+		}
+		return Collections.singletonList((EObject) stub);
 	}
 
-	public State getState(Schedule schedule, String name) {
-		State state = CalFactory.eINSTANCE.createState();
+	public AstState getState(AstSchedule schedule, String name) {
+		AstState state = CalFactory.eINSTANCE.createAstState();
 		state.setName(name);
 		schedule.getStates().add(state);
 		return state;

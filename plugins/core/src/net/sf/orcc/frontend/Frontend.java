@@ -31,6 +31,7 @@ package net.sf.orcc.frontend;
 import java.io.File;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.frontend.transforms.AstToIR;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
@@ -52,9 +53,8 @@ public class Frontend {
 		this.outputFolder = new File(outputFolder);
 	}
 
-	public void compile(String file, net.sf.orcc.cal.cal.Actor anActor)
-			throws OrccException {
-		Actor actor = new AstToIR().transform(file, anActor);
+	public void compile(String file, AstActor astActor) throws OrccException {
+		Actor actor = new AstToIR().transform(file, astActor);
 		new IRWriter(actor).write(outputFolder.toString());
 	}
 

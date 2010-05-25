@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.cal.validation;
 
-import net.sf.orcc.cal.cal.Function;
-import net.sf.orcc.cal.cal.Procedure;
-import net.sf.orcc.cal.cal.Variable;
+import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstVariable;
 
 import org.eclipse.xtext.validation.Check;
 
@@ -43,7 +43,7 @@ import org.eclipse.xtext.validation.Check;
 public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
-	public void checkIsFunctionUsed(Function function) {
+	public void checkIsFunctionUsed(AstFunction function) {
 		// List<CallExpression> refs = function.getCalls();
 		// if (refs.isEmpty()) {
 		// warning("Unused function", CalPackage.FUNCTION__NAME);
@@ -51,7 +51,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check
-	public void checkIsFunctionUsed(Procedure procedure) {
+	public void checkIsFunctionUsed(AstProcedure procedure) {
 		// List<CallStatement> refs = procedure.getCalls();
 		// if (refs.isEmpty()) {
 		// warning("Unused procedure", CalPackage.PROCEDURE__NAME);
@@ -59,7 +59,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check
-	public void checkIsVariabledUsed(Variable variable) {
+	public void checkIsVariabledUsed(AstVariable variable) {
 		// loop variables do not have to be used
 		// if (!(variable.eContainer() instanceof Generator || variable
 		// .eContainer() instanceof ForeachStatement)) {

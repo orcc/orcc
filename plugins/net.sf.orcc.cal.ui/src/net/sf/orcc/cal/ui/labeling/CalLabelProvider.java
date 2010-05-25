@@ -5,11 +5,11 @@ package net.sf.orcc.cal.ui.labeling;
 
 import java.util.Iterator;
 
-import net.sf.orcc.cal.cal.Action;
-import net.sf.orcc.cal.cal.Inequality;
-import net.sf.orcc.cal.cal.State;
-import net.sf.orcc.cal.cal.Tag;
-import net.sf.orcc.cal.cal.Transition;
+import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstInequality;
+import net.sf.orcc.cal.cal.AstState;
+import net.sf.orcc.cal.cal.AstTag;
+import net.sf.orcc.cal.cal.AstTransition;
 
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
@@ -29,8 +29,8 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		super(delegate);
 	}
 
-	public String text(Action action) {
-		Tag tag = action.getTag();
+	public String text(AstAction action) {
+		AstTag tag = action.getTag();
 		if (tag == null) {
 			return "(untagged)";
 		} else {
@@ -38,8 +38,8 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		}
 	}
 
-	public String text(Inequality inequality) {
-		Iterator<Tag> it = inequality.getTags().iterator();
+	public String text(AstInequality inequality) {
+		Iterator<AstTag> it = inequality.getTags().iterator();
 		StringBuilder builder = new StringBuilder();
 		if (it.hasNext()) {
 			builder.append(getText(it.next()));
@@ -53,11 +53,11 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		return builder.toString();
 	}
 
-	public String text(State state) {
+	public String text(AstState state) {
 		return state.getName();
 	}
 
-	public String text(Tag tag) {
+	public String text(AstTag tag) {
 		Iterator<String> it = tag.getIdentifiers().iterator();
 		StringBuilder builder = new StringBuilder();
 		if (it.hasNext()) {
@@ -71,7 +71,7 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		return builder.toString();
 	}
 
-	public String text(Transition transition) {
+	public String text(AstTransition transition) {
 		return getText(transition.getSource()) + " ("
 				+ getText(transition.getTag()) + ") --> "
 				+ getText(transition.getTarget());

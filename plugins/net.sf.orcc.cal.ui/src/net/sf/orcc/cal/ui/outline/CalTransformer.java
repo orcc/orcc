@@ -5,10 +5,10 @@ package net.sf.orcc.cal.ui.outline;
 
 import java.util.List;
 
-import net.sf.orcc.cal.cal.Action;
-import net.sf.orcc.cal.cal.Actor;
-import net.sf.orcc.cal.cal.Priority;
-import net.sf.orcc.cal.cal.Schedule;
+import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstPriority;
+import net.sf.orcc.cal.cal.AstSchedule;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
@@ -23,7 +23,7 @@ import org.eclipse.xtext.ui.editor.outline.transformer.AbstractDeclarativeSemant
 public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer {
 
 	@CreateNode
-	public ContentOutlineNode createNode(Actor actor,
+	public ContentOutlineNode createNode(AstActor actor,
 			ContentOutlineNode parentNode) {
 		ContentOutlineNode node = super.newOutlineNode(actor, parentNode);
 
@@ -35,12 +35,12 @@ public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer 
 		createNodes(node, "Procedures", actor.getProcedures());
 		createNodes(node, "Actions", actor.getActions());
 
-		Schedule schedule = actor.getSchedule();
+		AstSchedule schedule = actor.getSchedule();
 		if (schedule != null) {
 			createNodes(node, "FSM", schedule.getTransitions());
 		}
 
-		List<Priority> priorities = actor.getPriorities();
+		List<AstPriority> priorities = actor.getPriorities();
 		if (!priorities.isEmpty()) {
 			createNodes(node, "Priorities", priorities.get(0).getInequalities());
 		}
@@ -59,11 +59,11 @@ public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer 
 		}
 	}
 
-	public List<EObject> getChildren(Action action) {
+	public List<EObject> getChildren(AstAction action) {
 		return NO_CHILDREN;
 	}
 
-	public List<EObject> getChildren(Actor actor) {
+	public List<EObject> getChildren(AstActor actor) {
 		return NO_CHILDREN;
 	}
 

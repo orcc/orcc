@@ -31,15 +31,15 @@ package net.sf.orcc.cal.scoping;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.cal.cal.Action;
-import net.sf.orcc.cal.cal.Actor;
-import net.sf.orcc.cal.cal.ForeachStatement;
-import net.sf.orcc.cal.cal.Function;
-import net.sf.orcc.cal.cal.Generator;
-import net.sf.orcc.cal.cal.InputPattern;
-import net.sf.orcc.cal.cal.ListExpression;
-import net.sf.orcc.cal.cal.Procedure;
-import net.sf.orcc.cal.cal.Variable;
+import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstForeachStatement;
+import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.AstGenerator;
+import net.sf.orcc.cal.cal.AstInputPattern;
+import net.sf.orcc.cal.cal.AstListExpression;
+import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstVariable;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
@@ -65,15 +65,15 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_variable(Action action,
+	public IScope scope_AstVariableReference_variable(AstAction action,
 			EReference reference) {
-		List<Variable> elements = new ArrayList<Variable>();
-		for (InputPattern pattern : action.getInputs()) {
+		List<AstVariable> elements = new ArrayList<AstVariable>();
+		for (AstInputPattern pattern : action.getInputs()) {
 			elements.addAll(pattern.getTokens());
 		}
 		elements.addAll(action.getVariables());
 
-		Actor actor = (Actor) action.eContainer();
+		AstActor actor = (AstActor) action.eContainer();
 		return Scopes.scopeFor(elements, getScope(actor, reference));
 	}
 
@@ -86,9 +86,9 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_variable(Actor actor,
+	public IScope scope_AstVariableReference_variable(AstActor actor,
 			EReference reference) {
-		List<Variable> elements = new ArrayList<Variable>();
+		List<AstVariable> elements = new ArrayList<AstVariable>();
 		elements.addAll(actor.getParameters());
 		elements.addAll(actor.getStateVariables());
 		return Scopes.scopeFor(elements);
@@ -103,12 +103,12 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_variable(ForeachStatement foreach,
-			EReference reference) {
-		List<Variable> variables = new ArrayList<Variable>();
+	public IScope scope_AstVariableReference_variable(
+			AstForeachStatement foreach, EReference reference) {
+		List<AstVariable> variables = new ArrayList<AstVariable>();
 		variables.add(foreach.getVariable());
-		return Scopes.scopeFor(variables, getScope(foreach.eContainer(),
-				reference));
+		return Scopes.scopeFor(variables,
+				getScope(foreach.eContainer(), reference));
 	}
 
 	/**
@@ -120,13 +120,13 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_variable(Function function,
+	public IScope scope_AstVariableReference_variable(AstFunction function,
 			EReference reference) {
-		List<Variable> elements = new ArrayList<Variable>();
+		List<AstVariable> elements = new ArrayList<AstVariable>();
 		elements.addAll(function.getParameters());
 		elements.addAll(function.getVariables());
 
-		Actor actor = (Actor) function.eContainer();
+		AstActor actor = (AstActor) function.eContainer();
 		return Scopes.scopeFor(elements, getScope(actor, reference));
 	}
 
@@ -139,10 +139,10 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_variable(ListExpression list,
+	public IScope scope_AstVariableReference_variable(AstListExpression list,
 			EReference reference) {
-		List<Variable> elements = new ArrayList<Variable>();
-		for (Generator generator : list.getGenerators()) {
+		List<AstVariable> elements = new ArrayList<AstVariable>();
+		for (AstGenerator generator : list.getGenerators()) {
 			elements.add(generator.getVariable());
 		}
 		EObject container = list.eContainer();
@@ -158,13 +158,13 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_VariableReference_variable(Procedure procedure,
+	public IScope scope_AstVariableReference_variable(AstProcedure procedure,
 			EReference reference) {
-		List<Variable> elements = new ArrayList<Variable>();
+		List<AstVariable> elements = new ArrayList<AstVariable>();
 		elements.addAll(procedure.getParameters());
 		elements.addAll(procedure.getVariables());
 
-		Actor actor = (Actor) procedure.eContainer();
+		AstActor actor = (AstActor) procedure.eContainer();
 		return Scopes.scopeFor(elements, getScope(actor, reference));
 	}
 

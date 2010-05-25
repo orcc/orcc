@@ -34,9 +34,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.cal.cal.Action;
+import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.CalFactory;
-import net.sf.orcc.cal.cal.Tag;
+import net.sf.orcc.cal.cal.AstTag;
 
 /**
  * A list of action is like an ordered map, except keys are tags (list of
@@ -45,27 +45,27 @@ import net.sf.orcc.cal.cal.Tag;
  * @author Matthieu Wipliez
  * 
  */
-public class CalActionList implements Iterable<Action> {
+public class CalActionList implements Iterable<AstAction> {
 
-	private List<Action> actionList;
+	private List<AstAction> actionList;
 
-	private Map<List<String>, List<Action>> tagMap;
+	private Map<List<String>, List<AstAction>> tagMap;
 
 	/**
 	 * Creates an empty action list.
 	 */
 	public CalActionList() {
-		actionList = new ArrayList<Action>();
-		tagMap = new HashMap<List<String>, List<Action>>();
+		actionList = new ArrayList<AstAction>();
+		tagMap = new HashMap<List<String>, List<AstAction>>();
 	}
 
 	/**
 	 * Creates an action list.
 	 */
-	public CalActionList(List<Action> actions) {
+	public CalActionList(List<AstAction> actions) {
 		this();
 
-		for (Action action : actions) {
+		for (AstAction action : actions) {
 			add(action);
 		}
 	}
@@ -76,10 +76,10 @@ public class CalActionList implements Iterable<Action> {
 	 * @param action
 	 *            an action
 	 */
-	public void add(Action action) {
+	public void add(AstAction action) {
 		actionList.add(action);
 
-		Tag tag = action.getTag();
+		AstTag tag = action.getTag();
 		if (tag != null && !tag.getIdentifiers().isEmpty()) {
 			// a tag has the form a.b.c
 			// we add the action to the tagMap for entries:
@@ -90,9 +90,9 @@ public class CalActionList implements Iterable<Action> {
 				identifiers.add(id);
 
 				// add the action to the list of actions associated with tag
-				List<Action> actions = tagMap.get(identifiers);
+				List<AstAction> actions = tagMap.get(identifiers);
 				if (actions == null) {
-					actions = new ArrayList<Action>();
+					actions = new ArrayList<AstAction>();
 					tagMap.put(identifiers, actions);
 				}
 				actions.add(action);
@@ -110,7 +110,7 @@ public class CalActionList implements Iterable<Action> {
 	 *            a list of identifiers
 	 * @return the list of actions that match the given list of identifiers
 	 */
-	public List<Action> getActions(List<String> identifiers) {
+	public List<AstAction> getActions(List<String> identifiers) {
 		return tagMap.get(identifiers);
 	}
 
@@ -119,7 +119,7 @@ public class CalActionList implements Iterable<Action> {
 	 * 
 	 * @return the list of objects of this scope
 	 */
-	public List<Action> getList() {
+	public List<AstAction> getList() {
 		return actionList;
 	}
 
@@ -128,10 +128,10 @@ public class CalActionList implements Iterable<Action> {
 	 * 
 	 * @return the list of tags
 	 */
-	public List<Tag> getTags() {
-		List<Tag> tags = new ArrayList<Tag>();
+	public List<AstTag> getTags() {
+		List<AstTag> tags = new ArrayList<AstTag>();
 		for (List<String> identifiers : tagMap.keySet()) {
-			Tag tag = CalFactory.eINSTANCE.createTag();
+			AstTag tag = CalFactory.eINSTANCE.createAstTag();
 			tag.getIdentifiers().addAll(identifiers);
 			tags.add(tag);
 		}
@@ -143,14 +143,14 @@ public class CalActionList implements Iterable<Action> {
 	 * 
 	 * @return the list of tags whose length is given
 	 */
-	public List<Tag> getTags(int length) {
+	public List<AstTag> getTags(int length) {
 		if (length == 0) {
 			return getTags();
 		} else {
-			List<Tag> tags = new ArrayList<Tag>();
+			List<AstTag> tags = new ArrayList<AstTag>();
 			for (List<String> identifiers : tagMap.keySet()) {
 				if (identifiers.size() == length) {
-					Tag tag = CalFactory.eINSTANCE.createTag();
+					AstTag tag = CalFactory.eINSTANCE.createAstTag();
 					tag.getIdentifiers().addAll(identifiers);
 					tags.add(tag);
 				}
@@ -161,7 +161,7 @@ public class CalActionList implements Iterable<Action> {
 	}
 
 	@Override
-	public Iterator<Action> iterator() {
+	public Iterator<AstAction> iterator() {
 		return actionList.iterator();
 	}
 

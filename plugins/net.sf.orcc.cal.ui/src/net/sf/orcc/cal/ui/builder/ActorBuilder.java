@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.cal.cal.Actor;
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.frontend.Frontend;
 
 import org.eclipse.core.resources.IFolder;
@@ -41,8 +41,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			Iterator<EObject> it = contents.iterator();
 			if (it.hasNext()) {
 				EObject obj = it.next();
-				if (obj instanceof Actor) {
-					Actor actor = (Actor) obj;
+				if (obj instanceof AstActor) {
+					AstActor actor = (AstActor) obj;
 
 					try {
 						URL resourceUrl = new URL(resource.getURI().toString());

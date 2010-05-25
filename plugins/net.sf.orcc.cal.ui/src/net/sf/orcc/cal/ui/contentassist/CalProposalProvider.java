@@ -30,14 +30,14 @@ package net.sf.orcc.cal.ui.contentassist;
 
 import java.util.List;
 
-import net.sf.orcc.cal.cal.Action;
-import net.sf.orcc.cal.cal.Actor;
+import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstInequality;
+import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstPriority;
+import net.sf.orcc.cal.cal.AstTag;
+import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.CalFactory;
-import net.sf.orcc.cal.cal.Inequality;
-import net.sf.orcc.cal.cal.Port;
-import net.sf.orcc.cal.cal.Priority;
-import net.sf.orcc.cal.cal.Tag;
-import net.sf.orcc.cal.cal.Transition;
 import net.sf.orcc.util.CalActionList;
 
 import org.eclipse.emf.common.util.EList;
@@ -60,32 +60,33 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 
 	public void completeInequality_Tags(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		if (model instanceof Priority) {
+		if (model instanceof AstPriority) {
 			proposeAllTags(model, context, acceptor);
 		}
 	}
 
 	public void completeInputPattern_Port(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		Actor actor = (Actor) model.eContainer();
+		AstActor actor = (AstActor) model.eContainer();
 		proposePorts(actor.getInputs(), assignment, context, acceptor);
 	}
 
 	public void completeOutputPattern_Port(EObject model,
 			Assignment assignment, ContentAssistContext context,
 			ICompletionProposalAcceptor acceptor) {
-		Actor actor = (Actor) model.eContainer();
+		AstActor actor = (AstActor) model.eContainer();
 		proposePorts(actor.getOutputs(), assignment, context, acceptor);
 	}
 
 	public void completeTag_Identifiers(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		if (model instanceof Inequality || model instanceof Transition) {
+		if (model instanceof AstInequality || model instanceof AstTransition) {
 			proposeAllTags(model.eContainer(), context, acceptor);
-		} else if (model instanceof Tag) {
-			Tag tag = (Tag) model;
+		} else if (model instanceof AstTag) {
+			AstTag tag = (AstTag) model;
 			EObject parent = tag.eContainer();
-			if (parent instanceof Inequality || parent instanceof Transition) {
+			if (parent instanceof AstInequality
+					|| parent instanceof AstTransition) {
 				proposeTagAfter(tag, parent.eContainer(), context, acceptor);
 			}
 		}
@@ -100,10 +101,10 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 	 */
 	private void proposeAllTags(EObject model, ContentAssistContext context,
 			ICompletionProposalAcceptor acceptor) {
-		Actor actor = (Actor) model.eContainer();
-		List<Action> actions = actor.getActions();
-		List<Tag> tags = new CalActionList(actions).getTags(1);
-		for (Tag tag : tags) {
+		AstActor actor = (AstActor) model.eContainer();
+		List<AstAction> actions = actor.getActions();
+		List<AstTag> tags = new CalActionList(actions).getTags(1);
+		for (AstTag tag : tags) {
 			String tagName = getLabelProvider().getText(tag);
 			ICompletionProposal proposal = createCompletionProposal(tagName,
 					context);
@@ -119,8 +120,9 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 	 * @param context
 	 * @param acceptor
 	 */
-	private void proposePorts(final EList<Port> ports, Assignment assignment,
-			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+	private void proposePorts(final EList<AstPort> ports,
+			Assignment assignment, ContentAssistContext context,
+			ICompletionProposalAcceptor acceptor) {
 		lookupCrossReference(((CrossReference) assignment.getTerminal()),
 				context, acceptor, new Predicate<IEObjectDescription>() {
 
@@ -143,19 +145,19 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 	 * @param context
 	 * @param acceptor
 	 */
-	private void proposeTagAfter(Tag tag, EObject parent,
+	private void proposeTagAfter(AstTag tag, EObject parent,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
-		Actor actor = (Actor) parent.eContainer();
-		List<Action> actions = actor.getActions();
+		AstActor actor = (AstActor) parent.eContainer();
+		List<AstAction> actions = actor.getActions();
 		int n = tag.getIdentifiers().size() - 1;
 		List<String> identifiers = tag.getIdentifiers().subList(0, n);
 
 		actions = new CalActionList(actions).getActions(identifiers);
-		for (Action action : actions) {
+		for (AstAction action : actions) {
 			identifiers = action.getTag().getIdentifiers();
 			if (n < identifiers.size()) {
 				List<String> last = identifiers.subList(n, n + 1);
-				Tag proposedTag = CalFactory.eINSTANCE.createTag();
+				AstTag proposedTag = CalFactory.eINSTANCE.createAstTag();
 				proposedTag.getIdentifiers().addAll(last);
 
 				String tagName = getLabelProvider().getText(proposedTag);

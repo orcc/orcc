@@ -1,59 +1,35 @@
 package net.sf.orcc.cal.naming;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
-import net.sf.orcc.cal.cal.Action;
-import net.sf.orcc.cal.cal.ForeachStatement;
-import net.sf.orcc.cal.cal.Generator;
-import net.sf.orcc.cal.cal.Tag;
+import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstForeachStatement;
+import net.sf.orcc.cal.cal.AstGenerator;
+import net.sf.orcc.cal.cal.AstTag;
 
 import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider;
 
 public class CalQualifiedNameProvider extends
 		DefaultDeclarativeQualifiedNameProvider {
-
-	private Map<ForeachStatement, Integer> foreachCount = new HashMap<ForeachStatement, Integer>();
-
-	private Map<Generator, Integer> generatorCount = new HashMap<Generator, Integer>();
-
-	public String qualifiedName(Action action) {
-		Tag tag = action.getTag();
+	
+	public String qualifiedName(AstAction action) {
+		AstTag tag = action.getTag();
 		if (tag == null) {
-			return "(untagged)";
+			return "(untagged)" + action.hashCode();
 		} else {
 			return getQualifiedName(tag);
 		}
 	}
 
-	public String qualifiedName(ForeachStatement statement) {
-		Integer count = foreachCount.get(statement);
-		if (count == null) {
-			foreachCount.put(statement, 0);
-			count = 0;
-		} else {
-			count++;
-			foreachCount.put(statement, count);
-		}
-		
-		return "foreach." + count;
+	public String qualifiedName(AstForeachStatement foreach) {
+		return "foreach." + foreach.hashCode();
 	}
 
-	public String qualifiedName(Generator generator) {
-		Integer count = generatorCount.get(generator);
-		if (count == null) {
-			generatorCount.put(generator, 0);
-			count = 0;
-		} else {
-			count++;
-			generatorCount.put(generator, count);
-		}
-		
-		return "generator." + count;
+	public String qualifiedName(AstGenerator generator) {
+		return "generator." + generator.hashCode();
 	}
 
-	public String qualifiedName(Tag tag) {
+	public String qualifiedName(AstTag tag) {
 		Iterator<String> it = tag.getIdentifiers().iterator();
 		StringBuilder builder = new StringBuilder();
 		if (it.hasNext()) {

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.cal.ui;
 
-import net.sf.orcc.cal.cal.Action;
+import net.sf.orcc.cal.cal.AstAction;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
@@ -46,7 +46,7 @@ public class CalLocationProvider extends DefaultLocationInFileProvider {
 	@Override
 	protected EStructuralFeature getIdentifierFeature(EObject obj) {
 		final EClass eClass = obj.eClass();
-		if (obj instanceof Action) {
+		if (obj instanceof AstAction) {
 			return eClass.getEStructuralFeature("tag");
 		} else {
 			return super.getIdentifierFeature(obj);
