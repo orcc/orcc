@@ -112,8 +112,10 @@ actor Algo_Synp_AVC_FREXT()
 	int Codeword;
 	int CodeLen;
 	
-	bool TRACE := false;
-	bool TRACE_BIARI := true;
+	bool TRACE := false;//true;
+	bool TRACE_MRL := false;//true;
+
+	int  trVal := 0;
 	// ********** Read CAVLC ********** //
 	bool NewCoeff := false;
 	uint(size=2) CAVLC_type;// 0 coeff_token, 1 total_zeros, 2 run_before
@@ -5209,6 +5211,9 @@ actor Algo_Synp_AVC_FREXT()
 		prev_frame_num_offset := frame_num_offset;
 		prev_frame_num := frame_num;
 		prevPicOrderCntLsb := pic_order_cnt_lsb;
+if TRACE_MRL then
+println("POC "+ POC_val);
+end
 	end
 
 	//if (redundant_pic_cnt_present_flag)
@@ -5994,6 +5999,21 @@ actor Algo_Synp_AVC_FREXT()
 			prevMbSkipped := 0; 
 			moreDataFlag := more_rbsp_data();
 		end
+if TRACE_MRL then
+println("CurrMbAddr "+ mb_addr);
+println("MbIntraFlag "+0);
+println("QP "+val_QP);
+println("QP_Cb "+ val_QP_Cb);
+println("QP_Cr "+ val_QP_Cr);
+println("ConstrainedIFlag "+constrained_intra_pred_flag[pps_id]);
+println("PicWidthInMb "+PicWidthInMbs);
+println("PicSizeInMb "+ PicSizeInMbs);
+println("FirstMbInSlice "+ first_mb_in_slice);
+println("slice_alpha_c0_offset "+val_slice_alpha_c0_offset);
+println("slice_beta_offset "+val_slice_beta_offset);
+println("LFDisable "+disable_deblocking_filter_idc);
+println("cbp_blk "+0);
+end
 	end
 	
 	read_SliceD_mb_skip_run_done1_CABAC: action 
@@ -6030,6 +6050,21 @@ actor Algo_Synp_AVC_FREXT()
 			prevMbSkipped := 0; 
 			moreDataFlag := more_rbsp_data();
 		end
+if TRACE_MRL then
+println("CurrMbAddr "+ mb_addr);
+println("MbIntraFlag "+0);
+println("QP "+val_QP);
+println("QP_Cb "+ val_QP_Cb);
+println("QP_Cr "+ val_QP_Cr);
+println("ConstrainedIFlag "+constrained_intra_pred_flag[pps_id]);
+println("PicWidthInMb "+PicWidthInMbs);
+println("PicSizeInMb "+ PicSizeInMbs);
+println("FirstMbInSlice "+ first_mb_in_slice);
+println("slice_alpha_c0_offset "+val_slice_alpha_c0_offset);
+println("slice_beta_offset "+val_slice_beta_offset);
+println("LFDisable "+disable_deblocking_filter_idc);
+println("cbp_blk "+0);
+end
 	end
 	
 	read_SliceD_mb_skip_run_done2: action ==>
@@ -6133,6 +6168,21 @@ actor Algo_Synp_AVC_FREXT()
 		int mb_addr,
 		int cbp_blk_tmp=val_cbp_blk
 	do
+if TRACE_MRL then
+println("CurrMbAddr "+ val_CurrMbAddr);
+println("MbIntraFlag "+ mb_intra_flag);
+println("QP "+val_QP);
+println("QP_Cb "+ val_QP_Cb);
+println("QP_Cr "+ val_QP_Cr);
+println("ConstrainedIFlag "+constrained_intra_pred_flag[pps_id]);
+println("PicWidthInMb "+PicWidthInMbs);
+println("PicSizeInMb "+ PicSizeInMbs);
+println("FirstMbInSlice "+ first_mb_in_slice);
+println("slice_alpha_c0_offset "+val_slice_alpha_c0_offset);
+println("slice_beta_offset "+val_slice_beta_offset);
+println("LFDisable "+disable_deblocking_filter_idc);
+println("cbp_blk "+ cbp_blk_tmp);
+end
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
 		val_cbp_blk:=0;
@@ -6158,6 +6208,21 @@ actor Algo_Synp_AVC_FREXT()
 		int mb_addr,
 		int cbp_blk_tmp=val_cbp_blk
 	do
+if TRACE_MRL then 
+println("CurrMbAddr "+ val_CurrMbAddr);
+println("MbIntraFlag "+ mb_intra_flag);
+println("QP "+val_QP);
+println("QP_Cb "+ val_QP_Cb);
+println("QP_Cr "+ val_QP_Cr);
+println("ConstrainedIFlag "+constrained_intra_pred_flag[pps_id]);
+println("PicWidthInMb "+PicWidthInMbs);
+println("PicSizeInMb "+ PicSizeInMbs);
+println("FirstMbInSlice "+ first_mb_in_slice);
+println("slice_alpha_c0_offset "+val_slice_alpha_c0_offset);
+println("slice_beta_offset "+val_slice_beta_offset);
+println("LFDisable "+disable_deblocking_filter_idc);
+println("cbp_blk "+ cbp_blk_tmp);		
+end
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
 		val_cbp_blk:=0;
@@ -6875,6 +6940,9 @@ actor Algo_Synp_AVC_FREXT()
 				start_cabac();
 			end 
 		end
+if TRACE_MRL then
+println("IntraPredMode: "+1);
+end
 		
 	end
 
@@ -6950,6 +7018,12 @@ actor Algo_Synp_AVC_FREXT()
 	read_MB_pred_skip_rem_intra4x4_pred_mode: action ==> IntraPredMode: [ [ rem_intra4x4_pred_mode[ s ] :for int s in Integers(0,15)] ] repeat 16
 	guard
 		luma4x4BlkIdx = 16
+	do
+if TRACE_MRL then
+		foreach int i in Integers(0,15) do
+			println("IntraPredMode: "+rem_intra4x4_pred_mode[ i ]);
+		end
+end
 	end
 	//end for
 
@@ -7004,6 +7078,11 @@ actor Algo_Synp_AVC_FREXT()
 	MB_pred_init_Intra_16x16: action ==> IntraPredMode: [ 3, Intra_16x16_tab[mb_type][0] ]
 	guard
 		IS_Intra_16x16()
+	do
+if TRACE_MRL then
+		println("IntraPredMode: "+3);
+		println("IntraPredMode: "+Intra_16x16_tab[mb_type][0]);		
+end
 	end
 	//end if
 
@@ -7036,6 +7115,9 @@ actor Algo_Synp_AVC_FREXT()
 		end
 		
 		mbTab[val_CurrMbAddr][mbIntraChromaPredMode] := intra_chroma_pred_mode;
+if TRACE_MRL then
+		println("IntraPredModeC "+ intra_chroma_pred_mode);
+end
 	end
 
 	//else
@@ -8021,6 +8103,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//Read coded_block_flag Syntax Element
 		GetCabacCodedBlockFlagSyntaxElement();
+
 		start_cabac();
 	end
 	
@@ -8042,6 +8125,7 @@ actor Algo_Synp_AVC_FREXT()
 		// 4x4 Luma AC Block
 		if ctxBlockCat = 1 or ctxBlockCat = 2 then
 			transblock_cbf[val_CurrMbAddr][luma4x4BlkIdx] := coded_block_flag;
+			val_cbp_blk:=(coded_block_flag <<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
 		end
 		
 		if ctxBlockCat = 3 then
@@ -8182,6 +8266,54 @@ actor Algo_Synp_AVC_FREXT()
 		coded_block_flag = 0
 	end
 	
+<<<<<<< .mine
+	Residual_block_Sent_16_Coeff : action ==> VALUE : [ [level[i]: for int i in Integers(0,15)] ] repeat 16
+	guard
+		maxNumCoeff = 16
+
+	end
+	
+	Residual_block_Sent_15_Coeff : action ==> VALUE : [ [level[i]: for int i in Integers(0,14)] ] repeat 15
+	guard
+		maxNumCoeff = 15
+	end
+	
+	
+	Residual_block_Sent_8_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,7)] ] repeat 8
+	guard
+		maxNumCoeff = 8
+	end
+	
+	Residual_block_Sent_4_Coeff: action ==> VALUE :  [ [level[i]: for int i in Integers(0,3)] ] repeat 4
+	guard
+		maxNumCoeff = 4
+	end
+	
+	
+	
+	Residual_Sent_16_Zero: action ==> VALUE : [ [0: for int i in Integers(0,15) ] ] repeat 16
+	guard
+		maxNumCoeff = 16
+	end
+	
+	Residual_Sent_15_Zero: action ==> VALUE : [ [0: for int i in Integers(0,14) ] ] repeat 15
+	guard
+		maxNumCoeff = 15
+	end
+	
+	Residual_Sent_8_Zero: action ==> VALUE : [ [0: for int i in Integers(0,7) ] ] repeat 8
+	guard
+		maxNumCoeff = 8
+	end
+	
+	Residual_Sent_4_Zero: action ==> VALUE : [ [0: for int i in Integers(0,3) ] ] repeat 4
+	guard
+		maxNumCoeff = 4
+	end
+	*/
+	
+=======
+>>>>>>> .r1371
 	//******* End of Residual Block CABAC ********//  
 	
 	test_one_byte: action ==>
