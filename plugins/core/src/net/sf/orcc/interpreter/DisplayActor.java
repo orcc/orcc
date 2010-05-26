@@ -40,6 +40,12 @@ import javax.swing.JFrame;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Actor;
 
+/**
+ * This class describes a display actor.
+ * 
+ * @author Pierre-Laurent Lagalaye
+ * 
+ */
 public class DisplayActor extends AbstractInterpretedActor {
 
 	private static DisplayActor instance;

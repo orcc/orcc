@@ -34,6 +34,12 @@ import java.io.RandomAccessFile;
 
 import net.sf.orcc.ir.Actor;
 
+/**
+ * This class describes a source actor.
+ * 
+ * @author Pierre-Laurent Lagalaye
+ * 
+ */
 public class SourceActor extends AbstractInterpretedActor {
 
 	public String fileName;

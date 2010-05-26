@@ -34,6 +34,12 @@ import java.util.List;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
 
+/**
+ * This class describes a broadcast actor.
+ * 
+ * @author Pierre-Laurent Lagalaye
+ * 
+ */
 public class BroadcastActor extends AbstractInterpretedActor {
 
 	private Port inport;

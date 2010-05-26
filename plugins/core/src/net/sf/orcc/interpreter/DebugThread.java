@@ -2,6 +2,12 @@ package net.sf.orcc.interpreter;
 
 import net.sf.orcc.interpreter.AbstractInterpretedActor.InterpreterStackFrame;
 
+/**
+ * This class describes a debug thread.
+ * 
+ * @author Pierre-Laurent Lagalaye
+ * 
+ */
 public class DebugThread {
 
 	public AbstractInterpretedActor instance;
