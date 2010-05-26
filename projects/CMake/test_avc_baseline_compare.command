@@ -30,7 +30,7 @@ fi
 ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/general/AVCMIDR-1/MIDR_MW_D.264 -o ~/Movies/AVC/CAVLC/general/AVCMIDR-1/MIDR_MW_D_rec.qcif
 # parser to check ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/general/AVCNRF-1/NRF_MW_E.264 -o ~/Movies/AVC/CAVLC/general/AVCNRF-1/NRF_MW_E_rec.qcif
 ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/general/AVCMPS-1/MPS_MW_A.264 -o ~/Movies/AVC/CAVLC/general/AVCMPS-1/MPS_MW_A_rec.qcif
-./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/IPCM/AVCPCM-1/CVPCMNL1_SVA_C.264 -o ~/Movies/AVC/CAVLC/IPCM/AVCPCM-1/CVPCMNL1_SVA_C_rec.yuv
+# ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/IPCM/AVCPCM-1/CVPCMNL1_SVA_C.264 -o ~/Movies/AVC/CAVLC/IPCM/AVCPCM-1/CVPCMNL1_SVA_C_rec.yuv
 # parser to check ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/IPCM/AVCPCM-2/CVPCMNL2_SVA_C.264 -o ~/Movies/AVC/CAVLC/IPCM/AVCPCM-2/CVPCMNL2_SVA_C_rec.yuv
 
 ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CAVLC/Long_Sequence/AVCLS-1/LS_SVA_D.264 -o ~/Movies/AVC/CAVLC/Long_Sequence/AVCLS-1/LS_SVA_D_rec.yuv
