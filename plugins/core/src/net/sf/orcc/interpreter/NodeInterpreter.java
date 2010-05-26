@@ -123,16 +123,18 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 		// Set the input parameters of the called procedure if any
 		List<Expression> callParams = instr.getParameters();
-		
+
 		// Special "print" case
 		if (proc.getName().equals("print")) {
 			if (args.length > 1) {
-//				String str = "";
 				for (int i = 0; i < callParams.size(); i++) {
-//					str += (callParams.get(i).accept(exprInterpreter));
-					((OrccProcess)args[1]).write((callParams.get(i).accept(exprInterpreter)).toString());
+					if (callParams.get(i).isBooleanExpr())
+						((OrccProcess) args[1]).write((String) (callParams
+								.get(i).accept(exprInterpreter)));
+					else
+						((OrccProcess) args[1]).write((callParams.get(i)
+								.accept(exprInterpreter)).toString());
 				}
-//				((OrccProcess)args[1]).write(str);
 			}
 		} else {
 			List<Variable> procParams = proc.getParameters().getList();
@@ -176,20 +178,25 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		Object condition = node.getValue().accept(exprInterpreter);
 
 		/* if (condition is true) then */
-		if ((Boolean) condition) {
-			for (CFGNode subNode : node.getThenNodes()) {
-				subNode.accept(this, args);
-			}
-			/* else */
-		} else {
-			List<CFGNode> elseNodes = node.getElseNodes();
-			if (!elseNodes.isEmpty()) {
-				for (CFGNode subNode : elseNodes) {
+		if (condition instanceof Boolean) {
+			if ((Boolean) condition) {
+				for (CFGNode subNode : node.getThenNodes()) {
 					subNode.accept(this, args);
 				}
+				/* else */
+			} else {
+				List<CFGNode> elseNodes = node.getElseNodes();
+				if (!elseNodes.isEmpty()) {
+					for (CFGNode subNode : elseNodes) {
+						subNode.accept(this, args);
+					}
+				}
 			}
+			node.getJoinNode().accept(this, args);
+		} else {
+			throw new OrccRuntimeException("Condition not boolean at line "
+					+ node.getLocation().getStartLine() + "\n");
 		}
-		node.getJoinNode().accept(this, args);
 	}
 
 	@Override
@@ -267,13 +274,19 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 			Object obj = variable.getValue();
 			Object objPrev = obj;
 			Integer lastIndex = 0;
-			for (Expression index : instr.getIndexes()) {
-				objPrev = obj;
-				lastIndex = (Integer) index.accept(exprInterpreter);
-				obj = Array.get(objPrev, lastIndex);
+			try {
+				for (Expression index : instr.getIndexes()) {
+					objPrev = obj;
+					lastIndex = (Integer) index.accept(exprInterpreter);
+					obj = Array.get(objPrev, lastIndex);
+				}
+				Array.set(objPrev, lastIndex,
+						instr.getValue().accept(exprInterpreter));
+			} catch (ArrayIndexOutOfBoundsException e) {
+				throw new OrccRuntimeException(
+						"Array index out of bounds at line "
+								+ instr.getLocation().getStartLine());
 			}
-			Array.set(objPrev, lastIndex,
-					instr.getValue().accept(exprInterpreter));
 		}
 	}
 
@@ -282,13 +295,18 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		// Interpret first expression ("while" condition)
 		Object condition = node.getValue().accept(exprInterpreter);
 		// while (condition is true) do
-		while ((Boolean) condition) {
-			// control flow sub-statements
-			for (CFGNode subNode : node.getNodes()) {
-				subNode.accept(this, args);
+		if (condition instanceof Boolean) {
+			while ((Boolean) condition) {
+				// control flow sub-statements
+				for (CFGNode subNode : node.getNodes()) {
+					subNode.accept(this, args);
+				}
+				// Interpret next value of "while" condition
+				condition = node.getValue().accept(exprInterpreter);
 			}
-			// Interpret next value of "while" condition
-			condition = node.getValue().accept(exprInterpreter);
+		} else {
+			throw new OrccRuntimeException("Condition not boolean at line "
+					+ node.getLocation().getStartLine() + "\n");
 		}
 	}
 
