@@ -36,9 +36,7 @@ import java.util.Map;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstState;
-import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 
@@ -52,23 +50,16 @@ import org.eclipse.xtext.parsetree.AbstractNode;
 
 public class CalLinkingService extends DefaultLinkingService {
 
-	/**
-	 * Keep stubs so that new ones aren't created for each linking pass.
-	 */
-	private final Map<String, AstState> stubbedRefs;
-
-	private Resource stubsResource = null;
-
 	private Map<String, AstFunction> functions;
 
 	private Map<String, AstProcedure> procedures;
+
+	private Resource stubsResource = null;
 
 	/**
 	 * Creates a new CAL linking service which creates builtin functions.
 	 */
 	public CalLinkingService() {
-		stubbedRefs = new HashMap<String, AstState>();
-
 		functions = new HashMap<String, AstFunction>();
 
 		AstFunction function;
@@ -105,31 +96,6 @@ public class CalLinkingService extends DefaultLinkingService {
 	}
 
 	/**
-	 * Use a temporary 'child' resource to hold created stubs. The real resource
-	 * URI is used to generate a 'temporary' resource to be the container for
-	 * stub EObjects.
-	 * 
-	 * @param source
-	 *            the real resource that is being parsed
-	 * @return the cached reference to a resource named by the real resource
-	 *         with the added extension 'xmi'
-	 */
-	private Resource makeResource(Resource source) {
-		if (null != stubsResource)
-			return stubsResource;
-		URI stubURI = source.getURI();
-		stubURI = stubURI.appendFileExtension("xmi");
-		stubsResource = source.getResourceSet().getResource(stubURI, false);
-		if (null == stubsResource) {
-			// TODO find out if this should be cleaned up so as not to clutter
-			// the project.
-			source.getResourceSet().createResource(stubURI);
-			stubsResource = source.getResourceSet().getResource(stubURI, false);
-		}
-		return stubsResource;
-	}
-
-	/**
 	 * Returns a singleton if <code>name</code> is a builtin function, and an
 	 * empty list otherwise.
 	 * 
@@ -140,10 +106,14 @@ public class CalLinkingService extends DefaultLinkingService {
 	 * @return a list
 	 */
 	private List<EObject> builtinFunction(EObject context, String name) {
-		AstFunction function = getFunction(name);
+		AstFunction function = functions.get(name);
 		if (function != null) {
 			AstActor actor = getActor(context);
-			actor.getBuiltinFunctions().add(function);
+
+			// Attach the stub to the resource that's being parsed
+			Resource res = makeResource(actor.eResource());
+			res.getContents().add(function);
+
 			return Collections.singletonList((EObject) function);
 		}
 
@@ -161,10 +131,14 @@ public class CalLinkingService extends DefaultLinkingService {
 	 * @return a list
 	 */
 	private List<EObject> builtinProcedure(EObject context, String name) {
-		AstProcedure procedure = getProcedure(name);
+		AstProcedure procedure = procedures.get(name);
 		if (procedure != null) {
 			AstActor actor = getActor(context);
-			actor.getBuiltinProcedures().add(procedure);
+
+			// Attach the stub to the resource that's being parsed
+			Resource res = makeResource(actor.eResource());
+			res.getContents().add(procedure);
+
 			return Collections.singletonList((EObject) procedure);
 		}
 
@@ -176,21 +150,17 @@ public class CalLinkingService extends DefaultLinkingService {
 	 * 
 	 * @param context
 	 *            an object
-	 * @return an actor
+	 * @return the actor in which <code>context</code> occurs
 	 */
 	private AstActor getActor(EObject context) {
-		EObject container = context.eContainer();
-		if (container == null) {
+		if (context instanceof AstActor) {
 			return (AstActor) context;
 		} else {
-			return getActor(container);
+			return getActor(context.eContainer());
 		}
 	}
 
-	private AstFunction getFunction(String name) {
-		return functions.get(name);
-	}
-
+	@Override
 	public List<EObject> getLinkedObjects(EObject context, EReference ref,
 			AbstractNode node) {
 		List<EObject> result = super.getLinkedObjects(context, ref, node);
@@ -215,45 +185,44 @@ public class CalLinkingService extends DefaultLinkingService {
 		return Collections.emptyList();
 	}
 
-	private AstProcedure getProcedure(String name) {
-		return procedures.get(name);
-	}
-
 	private List<EObject> getState(EObject context, EReference reference,
 			String name) {
-		AstActor actor;
-		if (reference.getName().equals("initialState")) {
-			AstSchedule schedule = (AstSchedule) context;
-			actor = (AstActor) schedule.eContainer();
-		} else if (reference.getName().equals("source")) {
-			AstTransition transition = (AstTransition) context;
-			AstSchedule schedule = (AstSchedule) transition.eContainer();
-			actor = (AstActor) schedule.eContainer();
-		} else if (reference.getName().equals("target")) {
-			AstTransition transition = (AstTransition) context;
-			AstSchedule schedule = (AstSchedule) transition.eContainer();
-			actor = (AstActor) schedule.eContainer();
-		} else {
-			return Collections.emptyList();
-		}
+		AstActor actor = getActor(context);
 
-		AstState stub = stubbedRefs.get(name);
-		if (null == stub) {
-			// Create the model element instance using the factory
-			stub = CalFactory.eINSTANCE.createAstState();
-			stub.setName(name);
-			// Attach the stub to the resource that's being parsed
-			Resource res = makeResource(actor.eResource());
-			res.getContents().add(stub);
-		}
-		return Collections.singletonList((EObject) stub);
-	}
-
-	public AstState getState(AstSchedule schedule, String name) {
+		// Create the model element instance using the factory
 		AstState state = CalFactory.eINSTANCE.createAstState();
 		state.setName(name);
-		schedule.getStates().add(state);
-		return state;
+
+		// Attach the stub to the resource that's being parsed
+		Resource res = makeResource(actor.eResource());
+		res.getContents().add(state);
+
+		return Collections.singletonList((EObject) state);
+	}
+
+	/**
+	 * Use a temporary 'child' resource to hold created stubs. The real resource
+	 * URI is used to generate a 'temporary' resource to be the container for
+	 * stub EObjects.
+	 * 
+	 * @param source
+	 *            the real resource that is being parsed
+	 * @return the cached reference to a resource named by the real resource
+	 *         with the added extension 'xmi'
+	 */
+	private Resource makeResource(Resource source) {
+		if (null != stubsResource)
+			return stubsResource;
+		URI stubURI = source.getURI().appendFileExtension("xmi");
+
+		stubsResource = source.getResourceSet().getResource(stubURI, false);
+		if (null == stubsResource) {
+			// TODO find out if this should be cleaned up so as not to clutter
+			// the project.
+			stubsResource = source.getResourceSet().createResource(stubURI);
+		}
+
+		return stubsResource;
 	}
 
 }
