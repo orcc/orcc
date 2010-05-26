@@ -27,7 +27,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
 			throws CoreException {
-		IFolder folder = context.getBuiltProject().getFolder("generated");
+		IFolder folder = context.getBuiltProject().getFolder(".generated");
 		if (!folder.exists()) {
 			folder.create(true, true, null);
 		}
@@ -68,4 +68,5 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			}
 		}
 	}
+
 }
