@@ -108,6 +108,21 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 
 	protected Object interpretBinaryExpr(BinaryExpr expr, Object val1,
 			Object val2) {
+		/* Non initialized variables check */
+//		if (val1 == null) {
+//			if (val2 instanceof Integer) {
+//				val1 = 0;
+//			}else if (val2 instanceof Boolean) {
+//				val1 = false;
+//			}
+//		}else if (val2 == null) {
+//			if (val1 instanceof Integer) {
+//				val2 = 0;
+//			}else if (val1 instanceof Boolean) {
+//				val2 = false;
+//			}
+//		}
+		/* Evaluation */
 		switch (expr.getOp()) {
 		case BITAND:
 			if (val1 instanceof Integer && val2 instanceof Integer) {
@@ -250,7 +265,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			break;
 		}
 
-		throw new OrccRuntimeException("Error at location : "
+		throw new OrccRuntimeException("Error at line "
 				+ expr.getLocation().getStartLine()
 				+ "\nCould not evaluate binary expression with OP="
 				+ expr.getOp().toString() + "(" + expr.getOp().getText()
@@ -281,7 +296,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			break;
 		}
 
-		throw new OrccRuntimeException("Error at location : "
+		throw new OrccRuntimeException("Error at line "
 				+ expr.getLocation().getStartLine()
 				+ "\nCould not evaluate unary expression with OP="
 				+ expr.getOp().toString() + "(" + expr.getOp().getText() + ")");

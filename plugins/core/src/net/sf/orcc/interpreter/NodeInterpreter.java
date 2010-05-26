@@ -31,11 +31,12 @@ package net.sf.orcc.interpreter;
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.ICommunicationFifo;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
@@ -122,36 +123,50 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 		// Set the input parameters of the called procedure if any
 		List<Expression> callParams = instr.getParameters();
-		List<Variable> procParams = proc.getParameters().getList();
-		for (int i = 0; i < callParams.size(); i++) {
-			Variable procVar = procParams.get(i);
-			procVar.setValue(callParams.get(i).accept(exprInterpreter));
-		}
-
-		// Allocate procedure local List variables
-		for (Variable local : proc.getLocals()) {
-			Type type = local.getType();
-			if (type.isList()) {
-				local.setValue(listAllocator.allocate(type));
+		
+		// Special "print" case
+		if (proc.getName().equals("print")) {
+			if (args.length > 1) {
+//				String str = "";
+				for (int i = 0; i < callParams.size(); i++) {
+//					str += (callParams.get(i).accept(exprInterpreter));
+					((OrccProcess)args[1]).write((callParams.get(i).accept(exprInterpreter)).toString());
+				}
+//				((OrccProcess)args[1]).write(str);
 			}
-		}
+		} else {
+			List<Variable> procParams = proc.getParameters().getList();
+			for (int i = 0; i < callParams.size(); i++) {
+				Variable procVar = procParams.get(i);
+				procVar.setValue(callParams.get(i).accept(exprInterpreter));
+			}
 
-		// Interpret procedure body
-		for (CFGNode node : proc.getNodes()) {
-			node.accept(this);
-		}
+			// Allocate procedure local List variables
+			for (Variable local : proc.getLocals()) {
+				Type type = local.getType();
+				if (type.isList()) {
+					local.setValue(listAllocator.allocate(type));
+				}
+			}
 
-		// Get procedure result if any
-		if (instr.hasResult()) {
-			instr.getTarget().setValue(returnValue);
+			// Interpret procedure body
+			for (CFGNode node : proc.getNodes()) {
+				node.accept(this);
+			}
+
+			// Get procedure result if any
+			if (instr.hasResult()) {
+				instr.getTarget().setValue(returnValue);
+			}
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(HasTokens instr, Object... args) {
-		ICommunicationFifo fifo = instr.getPort().fifo();
+		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
+				.get(instr.getPort().getName());
 		boolean hasTok = fifo.hasTokens(instr.getNumTokens());
-
 		instr.getTarget().setValue(hasTok);
 	}
 
@@ -179,7 +194,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(InitPort instr, Object... args) {
-		// Nothing TODO ?
+		// Nothing to do
 	}
 
 	@Override
@@ -197,11 +212,12 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Peek instr, Object... args) {
 		Object[] target = (Object[]) (instr.getTarget().getValue());
-
-		ICommunicationFifo fifo = instr.getPort().fifo();
+		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
+				.get(instr.getPort().getName());
 		fifo.peek(target);
 	}
 
@@ -214,11 +230,12 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Read instr, Object... args) {
 		Object[] target = (Object[]) instr.getTarget().getValue();
-
-		ICommunicationFifo fifo = instr.getPort().fifo();
+		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
+				.get(instr.getPort().getName());
 		fifo.get(target);
 	}
 
@@ -255,8 +272,8 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 				lastIndex = (Integer) index.accept(exprInterpreter);
 				obj = Array.get(objPrev, lastIndex);
 			}
-			Array.set(objPrev, lastIndex, instr.getValue().accept(
-					exprInterpreter));
+			Array.set(objPrev, lastIndex,
+					instr.getValue().accept(exprInterpreter));
 		}
 	}
 
@@ -275,11 +292,12 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Write instr, Object... args) {
 		Object[] target = (Object[]) instr.getTarget().getValue();
-
-		ICommunicationFifo fifo = instr.getPort().fifo();
+		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
+				.get(instr.getPort().getName());
 		fifo.put(target);
 	}
 

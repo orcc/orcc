@@ -39,6 +39,8 @@ import java.io.File;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -81,7 +83,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private Text textNetwork;
-	
+
 	private Text textVTL;
 
 	private Text textOutput;
@@ -101,7 +103,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 
 		tree.setMessage("Please select an existing file:");
-		tree.setTitle("Choose an existing file");
+		tree.setTitle("Choose input XDF file");
 
 		tree.setValidator(new ISelectionStatusValidator() {
 
@@ -161,16 +163,49 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	}
 
 	private void browseVTLFolder(Shell shell) {
-		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select VTL folder : ");
-		if (getFolderFromText(textVTL)) {
-			// set initial directory if it is valid
-			dialog.setFilterPath(textVTL.getText());
+		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
+				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
+				new WorkbenchContentProvider());
+		tree.setAllowMultiple(false);
+		tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
+
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		IResource resource = root.getContainerForLocation(new Path(textVTL
+				.getText()));
+
+		if (resource != null) {
+			tree.setInitialSelection(resource);
 		}
 
-		String dir = dialog.open();
-		if (dir != null) {
-			textVTL.setText(dir);
+		tree.setMessage("Please select an existing folder :");
+		tree.setTitle("Choose VTL folder");
+
+		tree.setValidator(new ISelectionStatusValidator() {
+
+			@Override
+			public IStatus validate(Object[] selection) {
+				if (selection.length == 1) {
+					if (selection[0] instanceof IFolder) {
+						return new Status(IStatus.OK, OrccActivator.PLUGIN_ID,
+								"");
+					} else {
+						return new Status(IStatus.ERROR,
+								OrccActivator.PLUGIN_ID,
+								"Only folders can be selected, not files nor projects");
+					}
+				}
+
+				return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+						"No folder selected.");
+			}
+
+		});
+
+		// opens the dialog
+		if (tree.open() == Window.OK) {
+			resource = (IResource) tree.getFirstResult();
+			textVTL.setText(resource.getLocation().toOSString());
 		}
 	}
 
@@ -191,11 +226,11 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		data = new GridData(GridData.FILL_HORIZONTAL);
 		data.heightHint = 1;
 		lbl.setLayoutData(data);
-		
+
 		createControlNetwork(font, composite);
 		createControlVTL(font, composite);
 		createControlStimulus(font, composite);
-		
+
 		createControlOutput(font, composite);
 	}
 
@@ -350,7 +385,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			}
 		});
 	}
-	
+
 	private IFile getFileFromText() {
 		String value = textNetwork.getText();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -398,7 +433,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 			value = configuration.getAttribute(VTL_FOLDER, "");
 			textVTL.setText(value);
-			
+
 			value = configuration.getAttribute(INPUT_STIMULUS, "");
 			textStimulus.setText(value);
 
@@ -431,10 +466,10 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		}
 
 		if (!getFolderFromText(textVTL)) {
-			setErrorMessage("Given output path does not specify an existing folder");
+			setErrorMessage("Given VTL path does not specify an existing folder");
 			return false;
 		}
-		
+
 		if (!getStimulusFromText()) {
 			setErrorMessage("Given stimulus path does not specify an existing file");
 			return false;
@@ -463,7 +498,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		value = textVTL.getText();
 		configuration.setAttribute(VTL_FOLDER, value);
 		configuration.setAttribute(COMPILE_VTL, true);
-		
+
 		value = textStimulus.getText();
 		configuration.setAttribute(INPUT_STIMULUS, value);
 
@@ -475,6 +510,7 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(XDF_FILE, "");
 		configuration.setAttribute(VTL_FOLDER, "");
+		configuration.setAttribute(COMPILE_VTL, true);
 		configuration.setAttribute(INPUT_STIMULUS, "");
 		configuration.setAttribute(OUTPUT_FOLDER, "");
 	}

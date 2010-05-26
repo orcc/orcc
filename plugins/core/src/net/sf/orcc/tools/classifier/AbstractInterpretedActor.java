@@ -58,10 +58,7 @@ public class AbstractInterpretedActor extends InterpretedActor {
 	 */
 	public AbstractInterpretedActor(String id, Actor actor,
 			ConfigurationAnalyzer analyzer) {
-		super(id, new HashMap<String, Expression>(), actor);
-
-		// will schedule one step at a time
-		isSynchronousScheduler = true;
+		super(id, new HashMap<String, Expression>(), actor, null, null);
 
 		// Build a node interpreter for visiting CFG and instructions
 		interpret = new AbstractNodeInterpreter(analyzer);

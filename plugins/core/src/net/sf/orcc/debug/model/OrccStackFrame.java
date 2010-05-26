@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.debug.model;
 
-import net.sf.orcc.interpreter.DebugThread.InterpreterStackFrame;
+import net.sf.orcc.interpreter.AbstractInterpretedActor.InterpreterStackFrame;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
@@ -76,19 +76,32 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		try {
 			fName = "ACTOR : " + thread.getActorName() + " (fired "
 					+ frame.nbOfFirings + " times) - " + "ACTION : "
-					+ frame.currentAction; // + " (line " + frame.codeLine + ")";
+					+ frame.currentAction; // + " (line " + frame.codeLine +
+											// ")";
 		} catch (DebugException e) {
 			e.printStackTrace();
 		}
 		int numVars = frame.stateVars.size();
 		fVariables = new IVariable[numVars + 1];
 		OrccValue value = new OrccValue((OrccDebugTarget) thread
-				.getDebugTarget(), frame.fsmState);
+				.getDebugTarget(), frame.fsmState, null);
 		fVariables[0] = new OrccVariable(this, "FSM state", value);
 		String[] varNames = frame.stateVars.keySet().toArray(new String[0]);
 		for (int i = 1; i < numVars + 1; i++) {
-			value = new OrccValue((OrccDebugTarget) thread.getDebugTarget(),
-					frame.stateVars.get(varNames[i - 1]));
+			Object var = frame.stateVars.get(varNames[i - 1]);
+			if ((var!=null) && var.getClass().isArray()) {
+				IVariable[]subVars = new IVariable[((Object[])var).length];
+				for (Integer j = 0; j<((Object[])var).length; j++) {
+					OrccValue subValue = new OrccValue((OrccDebugTarget) thread.getDebugTarget(),
+							((Object[])var)[j], null);
+					subVars[j] = new OrccVariable(this, j.toString(), subValue);
+				}
+				value = new OrccValue((OrccDebugTarget) thread.getDebugTarget(),
+						var, subVars);
+			}else {
+				value = new OrccValue((OrccDebugTarget) thread.getDebugTarget(),
+						var, null);
+			}
 			fVariables[i] = new OrccVariable(this, varNames[i - 1], value);
 		}
 	}

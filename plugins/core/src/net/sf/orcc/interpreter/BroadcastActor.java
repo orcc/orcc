@@ -32,14 +32,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ICommunicationFifo;
 import net.sf.orcc.ir.Port;
 
 public class BroadcastActor extends AbstractInterpretedActor {
 
 	private Port inport;
-
 	private List<Port> outports;
+
+	private CommunicationFifo inFifo;
 
 	public BroadcastActor(String id, Actor actor) {
 		super(id, actor);
@@ -52,28 +52,32 @@ public class BroadcastActor extends AbstractInterpretedActor {
 
 	private boolean hasRoom(List<Port> outports) {
 		for (Port out : outports) {
-			ICommunicationFifo outFifo = out.fifo();
-			if (!outFifo.hasRoom(1)) {
+			CommunicationFifo outFifo = ioFifos.get(out.getName());
+			if (!outFifo.hasRoom(1))
 				return false;
-			}
 		}
 		return true;
 	}
 
 	@Override
 	public void initialize() {
+		inFifo = ioFifos.get(inport.getName());
+	}
+
+	@Override
+	public Integer run() {
+		return schedule();
 	}
 
 	@Override
 	public Integer schedule() {
-		ICommunicationFifo inFifo = inport.fifo();
 		Object[] inData = new Object[1];
 		Integer running = 0;
-		while (inFifo.hasTokens(1) && hasRoom(outports)) {
+		while ((inFifo.hasTokens(1)) && hasRoom(outports)) {
 			running = 1;
 			inFifo.get(inData);
-			for (Port out : outports) {
-				ICommunicationFifo outFifo = out.fifo();
+			for (Port outport : outports) {
+				CommunicationFifo outFifo = ioFifos.get(outport.getName());
 				outFifo.put(inData);
 			}
 		}

@@ -38,9 +38,9 @@ import org.eclipse.debug.core.model.IVariable;
 public class OrccVariable extends OrccDebugElement implements IVariable {
 
 	private OrccStackFrame fFrame;
-	// name & stack frmae
+	// name & stack frame
 	private String fName;
-	private OrccValue fValue;
+	private IValue fValue;
 
 	/**
 	 * Constructs a variable contained in the given stack frame with the given
@@ -51,7 +51,7 @@ public class OrccVariable extends OrccDebugElement implements IVariable {
 	 * @param name
 	 *            variable name
 	 */
-	public OrccVariable(OrccStackFrame frame, String name, OrccValue value) {
+	public OrccVariable(OrccStackFrame frame, String name, IValue value) {
 		super((OrccDebugTarget) frame.getDebugTarget());
 		fFrame = frame;
 		fName = name;

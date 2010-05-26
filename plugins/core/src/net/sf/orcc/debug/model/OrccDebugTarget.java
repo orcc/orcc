@@ -343,6 +343,19 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		return false;
 	}
 
+	/**
+	 * Check if any debug thread is currently stepping
+	 * @return
+	 */
+	public boolean isStepping() {
+		for (OrccThread thread : threadMap.values()) {
+			if (thread.isStepping()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

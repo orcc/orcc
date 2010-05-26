@@ -36,10 +36,9 @@ import net.sf.orcc.ir.Actor;
 
 public class SourceActor extends AbstractInterpretedActor {
 
-	private CommunicationFifo fifo_O;
-
 	public String fileName;
 	private RandomAccessFile in;
+	private CommunicationFifo fifo_O;
 
 	public SourceActor(String id, Actor actor, String inputBitstream) {
 		super(id, actor);
@@ -60,7 +59,8 @@ public class SourceActor extends AbstractInterpretedActor {
 	@Override
 	public void initialize() {
 		// Connect to FIFO
-		fifo_O = (CommunicationFifo) actor.getOutput("O").fifo();
+		fifo_O = ioFifos.get("O");
+		// open stream
 		try {
 			in = new RandomAccessFile(fileName, "r");
 		} catch (FileNotFoundException e) {
@@ -70,16 +70,36 @@ public class SourceActor extends AbstractInterpretedActor {
 	}
 
 	@Override
-	public Integer schedule() {
-		Object[] source = new Integer[1];
+	public Integer run() {
 		int running = 0;
+		Integer[] byteRead = new Integer[1];
+
+		try {
+			while (fifo_O.hasRoom(1)) {
+				byteRead[0] = in.read();
+				if (byteRead[0] != -1) {
+					fifo_O.put(byteRead);
+					running = 1;
+				}
+			}
+		} catch (IOException e) {
+			String msg = "I/O exception: \"" + fileName + "\"";
+			throw new RuntimeException(msg, e);
+		}
+
+		return running;
+	}
+
+	@Override
+	public Integer schedule() {
+		int running = 0;
+		Integer[] byteRead = new Integer[1];
 
 		try {
 			if (fifo_O.hasRoom(1)) {
-				int byteRead = in.read();
-				if (byteRead != -1) {
-					source[0] = byteRead;
-					fifo_O.put(source);
+				byteRead[0] = in.read();
+				if (byteRead[0] != -1) {
+					fifo_O.put(byteRead);
 					running = 1;
 				}
 			}

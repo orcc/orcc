@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
@@ -71,7 +72,7 @@ public class InterpreterMain extends Thread {
 	 * Interpreter automaton control
 	 */
 	public enum InterpreterState {
-		CONFIGURED, IDLE, RUNNING, SUSPENDED, TERMINATED
+		CONFIGURED, IDLE, RUNNING, BREAKPOINT, SUSPENDED, TERMINATED
 	}
 
 	/**
@@ -81,7 +82,6 @@ public class InterpreterMain extends Thread {
 	public static boolean merge = false;
 
 	private List<AbstractInterpretedActor> actorQueue;
-	private List<CommunicationFifo> fifoList;
 
 	private IProgressMonitor monitor;
 	/**
@@ -93,7 +93,7 @@ public class InterpreterMain extends Thread {
 	 * Associated system objects
 	 */
 	private OrccProcess process;
-	
+
 	/**
 	 * The utility class that makes us able to support bound properties. This is
 	 * used for easy "debug events" exchange.
@@ -107,6 +107,8 @@ public class InterpreterMain extends Thread {
 	 */
 	private List<DebugThread> threadQueue;
 	private int nbOfCycles;
+	private Map<String, Map<String, CommunicationFifo>> fifoMap;
+	private List<CommunicationFifo> fifoList;
 
 	/**
 	 * Add the listener <code>listener</code> to the registered listeners.
@@ -122,23 +124,23 @@ public class InterpreterMain extends Thread {
 	 * Clear a breakpoint from a specific actor
 	 */
 	public void clear_breakpoint(String descriptor, int lineNumber) {
-		for (DebugThread thread : threadQueue) {
-			if (descriptor.startsWith(thread.getActor().actor.getName())) {
-				thread.clear_breakpoint(lineNumber);
+		for (AbstractInterpretedActor instance : actorQueue) {
+			if (descriptor.startsWith(instance.actor.getName())) {
+				instance.clearBreakpoint(lineNumber);
 			}
 		}
 	}
-	
+
 	/**
 	 * Ask each network actor for closing
 	 * 
 	 */
 	private void close() {
 		// close actors of the network
-		for (AbstractInterpretedActor actor : actorQueue) {
-			actor.close();
+		for (AbstractInterpretedActor instance : actorQueue) {
+			instance.close();
 		}
-		// Close network FIFOs
+		// Close network FIFOs tracers
 		for (CommunicationFifo fifo : fifoList) {
 			fifo.close();
 		}
@@ -154,8 +156,8 @@ public class InterpreterMain extends Thread {
 	 * @throws Exception
 	 */
 	public synchronized void configNetwork(String inputNetwork, int fifoSize,
-			String inputStimulus, boolean enableTraces, String outputFolder)
-			throws Exception {
+			String inputStimulus, boolean enableTraces, String outputFolder,
+			String tracesFolder) throws Exception {
 		// Store "input" configuration
 		this.networkFilename = inputNetwork;
 		this.stimulusFilename = inputStimulus;
@@ -165,6 +167,7 @@ public class InterpreterMain extends Thread {
 
 		// Instantiate the network
 		network.instantiate(outputFolder);
+		Network.clearActorPool();
 
 		// Apply network transformations
 		networkTransformations(network);
@@ -175,8 +178,9 @@ public class InterpreterMain extends Thread {
 		// Get network graph...
 		DirectedGraph<Vertex, Connection> graph = network.getGraph();
 		// ...and connect network actors to FIFOs thanks to their port names
-		Set<Connection> connections = graph.edgeSet();
+		fifoMap = new HashMap<String, Map<String, CommunicationFifo>>();
 		fifoList = new ArrayList<CommunicationFifo>();
+		Set<Connection> connections = graph.edgeSet();
 		for (Connection connection : connections) {
 			Vertex srcVertex = graph.getEdgeSource(connection);
 			Vertex tgtVertex = graph.getEdgeTarget(connection);
@@ -201,13 +205,18 @@ public class InterpreterMain extends Thread {
 				// actors
 				Port srcPort = connection.getSource();
 				Port tgtPort = connection.getTarget();
-				CommunicationFifo fifo = new CommunicationFifo(size,
-						enableTraces, outputFolder, srcInst.getId() + "_"
+				CommunicationFifo comFifo = new CommunicationFifo(size,
+						enableTraces, tracesFolder, srcInst.getId() + "_"
 								+ srcPort.getName());
-				fifoList.add(fifo);
+				fifoList.add(comFifo);
 				// connect source actor to the FIFO
 				if (srcPort != null) {
-					srcPort.bind(fifo);
+					if (fifoMap.get(srcInst.getId()) == null) {
+						fifoMap.put(srcInst.getId(),
+								new HashMap<String, CommunicationFifo>());
+					}
+					fifoMap.get(srcInst.getId())
+							.put(srcPort.getName(), comFifo);
 					if (srcInst.isBroadcast()) {
 						// Broadcast actor to be explicitly connected to its
 						// port
@@ -223,7 +232,12 @@ public class InterpreterMain extends Thread {
 				}
 				// connect target actor to the FIFO
 				if (tgtPort != null) {
-					tgtPort.bind(fifo);
+					if (fifoMap.get(tgtInst.getId()) == null) {
+						fifoMap.put(tgtInst.getId(),
+								new HashMap<String, CommunicationFifo>());
+					}
+					fifoMap.get(tgtInst.getId())
+							.put(tgtPort.getName(), comFifo);
 					if (tgtInst.isBroadcast()) {
 						// Broadcast actor to be explicitly connected to its
 						// ports
@@ -251,14 +265,15 @@ public class InterpreterMain extends Thread {
 		for (Vertex vertex : graph.vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
+				AbstractInterpretedActor interpretedActor = null;
 				if (instance.isActor()) {
 					Actor actor = instance.getActor();
 					if ("Source".equals(actor.getName())) {
-						actorQueue.add(new SourceActor(instance.getId(), actor,
-								stimulusFilename));
+						interpretedActor = new SourceActor(instance.getId(),
+								actor, stimulusFilename);
 					} else if ("Display".equals(actor.getName())) {
-						actorQueue.add(new DisplayActor(instance.getId(),
-								actor, process));
+						interpretedActor = new DisplayActor(instance.getId(),
+								actor, process);
 					} else {
 						// Apply some simplification transformations
 						ActorTransformation[] transformations = {
@@ -269,19 +284,25 @@ public class InterpreterMain extends Thread {
 						for (ActorTransformation transformation : transformations) {
 							transformation.transform(actor);
 						}
-						actorQueue.add(new InterpretedActor(instance.getId(), instance.getParameters(),
-								actor));
+						interpretedActor = new InterpretedActor(
+								instance.getId(), instance.getParameters(),
+								actor, outputFolder, process);
 					}
 				} else if (instance.isBroadcast()) {
-					actorQueue.add(bcastMap.get(instance.getId()));
+					interpretedActor = bcastMap.get(instance.getId());
+				}
+				if (interpretedActor != null) {
+					interpretedActor.ioFifos = fifoMap.get(interpretedActor
+							.getName());
+					actorQueue.add(interpretedActor);
 				}
 			}
 		}
 
 		// Create interpreter debug threads from actor queue
 		threadQueue = new ArrayList<DebugThread>();
-		for (AbstractInterpretedActor actor : actorQueue) {
-			threadQueue.add(new DebugThread(this, actor));
+		for (AbstractInterpretedActor instance : actorQueue) {
+			threadQueue.add(new DebugThread(this, instance));
 		}
 
 		// Check interpreter completely configured
@@ -337,7 +358,8 @@ public class InterpreterMain extends Thread {
 	 * @return XDF network name
 	 */
 	public String getNetworkName() {
-		return new File(networkFilename).getName() + " at " + nbOfCycles + " cycles";
+		return new File(networkFilename).getName() + " at " + nbOfCycles
+				+ " cycles";
 	}
 
 	/**
@@ -355,10 +377,10 @@ public class InterpreterMain extends Thread {
 	 * 
 	 */
 	private void initialize() {
-		nbOfCycles=0;
+		nbOfCycles = 0;
 		// init actors of the network
-		for (AbstractInterpretedActor actor : actorQueue) {
-			actor.initialize();
+		for (AbstractInterpretedActor instance : actorQueue) {
+			instance.initialize();
 		}
 	}
 
@@ -423,12 +445,25 @@ public class InterpreterMain extends Thread {
 				firePropertyChange("started", null, null);
 				break;
 			case RUNNING:
-				// Continue running all threads
-				int status = scheduleThreads();
-				if (status < 0) {
-					state = InterpreterState.SUSPENDED;
-				} else if (status == 0) {
+				// Continue running the whole network of actors
+				int status = runActors();
+				if (status <= 0) {
 					terminate();
+				}
+				break;
+			case BREAKPOINT:
+				try {
+					// Let's wait a little bit in order to let debugger
+					// understand which actor has reached a breakpoint
+					Thread.sleep(500);
+					for (DebugThread thread : threadQueue) {
+						if (!thread.isSuspended()) {
+							thread.suspend(0);
+						}
+					}
+					state = InterpreterState.SUSPENDED;
+				} catch (InterruptedException e) {
+					// No problem !
 				}
 				break;
 			case SUSPENDED:
@@ -440,37 +475,54 @@ public class InterpreterMain extends Thread {
 	}
 
 	/**
+	 * Run each actor from the network while it is schedulable and return the
+	 * number of alive actors
+	 * 
+	 */
+	private int runActors() {
+		int nbRunningActors = 0;
+		int actorStatus = 0;
+		for (DebugThread thread : threadQueue) {
+			actorStatus = thread.instance.run();
+			// process.write("Run actor " + thread.getName() + " returning "
+			// + actorStatus + "\n");
+			if (actorStatus == -2) {
+				state = InterpreterState.BREAKPOINT;
+				int bkpt = thread.instance.goToBreakpoint();
+				thread.suspend(bkpt);
+				nbRunningActors++;
+			} else if (actorStatus < 0)
+				return actorStatus;
+			else if (actorStatus != 0)
+				nbRunningActors++;
+		}
+		nbOfCycles++;
+		// process.write(nbRunningActors + "actors are running...\n");
+		return nbRunningActors;
+	}
+
+	/**
 	 * Schedule each actor from the network and return the number of alive
 	 * actors
 	 * 
 	 */
 	private int scheduleActors() {
 		int nbRunningActors = 0;
-		for (AbstractInterpretedActor actor : actorQueue) {
-			// process.write("Schedule actor " + actor.getName() + "\n");
-			nbRunningActors += actor.schedule();
-		}
-		nbOfCycles++;
-		return nbRunningActors;
-	}
-
-	/**
-	 * Schedule each debug thread (corresponding to network actors) and return
-	 * the number of active threads. If thread is suspended, execute it until
-	 * the end of the current action
-	 * 
-	 */
-	private int scheduleThreads() {
-		int nbRunningActors = 0;
-		int status;
+		int actorStatus = 0;
 		for (DebugThread thread : threadQueue) {
-			do {
-				status = thread.schedule();
-			} while (status == -1);
-			if (thread.isStepping()) {
-				return -1;
+			if (!thread.instance.isStepping()) {
+				actorStatus = thread.instance.schedule();
+				if (actorStatus == -2) {
+					int bkpt = thread.instance.goToBreakpoint();
+					thread.suspend(bkpt);
+					nbRunningActors++;
+				} else if (actorStatus < 0)
+					return actorStatus;
+				else if (actorStatus != 0)
+					nbRunningActors++;
+			} else {
+				nbRunningActors++;
 			}
-			nbRunningActors += status;
 		}
 		nbOfCycles++;
 		return nbRunningActors;
@@ -480,11 +532,10 @@ public class InterpreterMain extends Thread {
 	 * Set a breakpoint in a specific actor
 	 */
 	public void set_breakpoint(String descriptor, int lineNumber) {
-		for (DebugThread thread : threadQueue) {
-			if (descriptor.startsWith(thread.getActor().actor.getName())) {
-				thread.set_breakpoint(lineNumber);
+		for (AbstractInterpretedActor instance : actorQueue) {
+			if (descriptor.startsWith(instance.actor.getName())) {
+				instance.setBreakpoint(lineNumber);
 			}
-			firePropertyChange("suspended step", null, null);
 		}
 	}
 
@@ -493,7 +544,7 @@ public class InterpreterMain extends Thread {
 	 */
 	public synchronized void simulate() {
 		initialize();
-		while (!monitor.isCanceled() && (scheduleActors() > 0))
+		while (!monitor.isCanceled() && (runActors() > 0))
 			;
 		close();
 	}
@@ -503,65 +554,70 @@ public class InterpreterMain extends Thread {
 	 */
 	public synchronized void stepAll() {
 		if (state == InterpreterState.SUSPENDED) {
-			int nbRunningActors = 0;
-			int status;
 			firePropertyChange("resumed step", null, null);
-			for (DebugThread thread : threadQueue) {
-				do {
-					status = thread.schedule();
-				} while (status == -1);
-				nbRunningActors += status;
-			}
-			nbOfCycles++;
-			if (nbRunningActors == 0) {
+			if (scheduleActors() <= 0) {
 				terminate();
+			} else {
+				firePropertyChange("suspended step", null, null);
 			}
-			firePropertyChange("suspended step", null, null);
 		}
 	}
-	
-	public void step(DebugThread steppingThread) {
+
+	/**
+	 * Step into a specific actor action. When the end of the action has been
+	 * reached, schedule all other actors.
+	 * 
+	 * @param steppingActor
+	 */
+	public void step(AbstractInterpretedActor steppingActor, boolean stepInto) {
 		if (state == InterpreterState.SUSPENDED) {
-			int nbRunningActors = 0;
 			int status;
-			while ((status = steppingThread.schedule()) == 0) {
-				for (DebugThread thread : threadQueue) {
-					if (thread != steppingThread) {
-						do {
-							status = thread.schedule();
-						} while (status == -1);
-						nbRunningActors += status;
-					}
-				}
-				nbOfCycles++;
-				if (nbRunningActors == 0) {
+			while ((status = steppingActor.step(stepInto)) == 0) {
+				// Stepping thread cannot schedule any action, so run all actors
+				// to generate required inputs
+				if (scheduleActors() <= 0) {
 					terminate();
+					return;
 				}
 			}
 			if (status == 1) {
-				for (DebugThread thread : threadQueue) {
-					if (thread != steppingThread) {
-						status = thread.schedule();
-						do {
-							status = thread.schedule();
-						} while (status == -1);
-						nbRunningActors += status;
+				// Stepping action has been completed, run all actors except
+				// stepping actor
+				for (AbstractInterpretedActor instance : actorQueue) {
+					if (!instance.isStepping()) {
+						status = instance.schedule();
+						if (status == -1) {
+							terminate();
+							return;
+						}
 					}
-				}
-				nbOfCycles++;
-				if (nbRunningActors == 0) {
-					terminate();
 				}
 			}
 		}
 	}
 
 	/**
-	 * Schedule next schedulable action for each actor of the network
+	 * Finish current stepping action in order to be able to run the whole
+	 * network again
+	 * 
+	 * @param steppingActor
+	 */
+	public void stepReturn(AbstractInterpretedActor steppingActor) {
+		if (state == InterpreterState.SUSPENDED) {
+			while (steppingActor.step(false) > 1)
+				;
+		}
+	}
+
+	/**
+	 * Suspend the entire network
 	 */
 	public synchronized void suspendAll() {
 		if (state == InterpreterState.RUNNING) {
 			state = InterpreterState.SUSPENDED;
+			for (DebugThread thread : threadQueue) {
+				thread.suspend(0);
+			}
 			firePropertyChange("suspended client", null, null);
 		}
 	}

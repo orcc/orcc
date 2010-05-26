@@ -73,7 +73,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 
 	int(size=QUANT_SZ) s_QP;
 
-	int(size=2) round;
+	int(size=2) round=0;
 
 	// Use 3 address lines for component index to save address calculation effort
 	// Also, location 0 is reserved for all uncoded blocks. This protocol must

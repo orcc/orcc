@@ -34,15 +34,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import net.sf.orcc.ir.ICommunicationFifo;
-
 /**
  * A FIFO of object arrays for exchanging data between actors.
  * 
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class CommunicationFifo implements ICommunicationFifo {
+public class CommunicationFifo {
 
 	private FileOutputStream fos;
 

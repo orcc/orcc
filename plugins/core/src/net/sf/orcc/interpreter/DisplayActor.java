@@ -48,6 +48,7 @@ public class DisplayActor extends AbstractInterpretedActor {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private long lastTime;
 
 	private static int clip(int n) {
 		if (n < 0) {
@@ -76,9 +77,7 @@ public class DisplayActor extends AbstractInterpretedActor {
 	private Canvas canvas;
 
 	private CommunicationFifo fifo_B;
-
 	private CommunicationFifo fifo_HEIGHT;
-
 	private CommunicationFifo fifo_WIDTH;
 
 	private JFrame frame;
@@ -135,9 +134,37 @@ public class DisplayActor extends AbstractInterpretedActor {
 	@Override
 	public void initialize() {
 		// Connect to FIFOs
-		fifo_WIDTH = (CommunicationFifo) actor.getInput("WIDTH").fifo();
-		fifo_HEIGHT = (CommunicationFifo) actor.getInput("HEIGHT").fifo();
-		fifo_B = (CommunicationFifo) actor.getInput("B").fifo();
+		fifo_WIDTH = ioFifos.get("WIDTH");
+		fifo_HEIGHT = ioFifos.get("HEIGHT");
+		fifo_B = ioFifos.get("B");
+		lastTime = System.currentTimeMillis();
+	}
+
+	@Override
+	public Integer run() {
+		int running = 0;
+
+		if (userInterruption) {
+			return -1;
+		}
+
+		if ((fifo_WIDTH.hasTokens(1)) && (fifo_HEIGHT.hasTokens(1))) {
+			setVideoSize();
+			running = 1;
+		}
+
+		while (fifo_B.hasTokens(384)) {
+			writeMB();
+			running = 1;
+			if (buffer != null) {
+				Graphics graphics = buffer.getDrawGraphics();
+				graphics.drawImage(image, 0, 0, null);
+				buffer.show();
+				graphics.dispose();
+			}
+		}
+
+		return running;
 	}
 
 	@Override
@@ -145,10 +172,10 @@ public class DisplayActor extends AbstractInterpretedActor {
 		int running = 0;
 
 		if (userInterruption) {
-			return -1;
+			return -2;
 		}
 
-		if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
+		if ((fifo_WIDTH.hasTokens(1)) && (fifo_HEIGHT.hasTokens(1))) {
 			setVideoSize();
 			running = 1;
 		}
@@ -156,7 +183,6 @@ public class DisplayActor extends AbstractInterpretedActor {
 		if (fifo_B.hasTokens(384)) {
 			writeMB();
 			running = 1;
-			// TODO: print when frame is complete => ?
 			if (buffer != null) {
 				Graphics graphics = buffer.getDrawGraphics();
 				graphics.drawImage(image, 0, 0, null);
@@ -169,14 +195,14 @@ public class DisplayActor extends AbstractInterpretedActor {
 	}
 
 	private void setVideoSize() {
-		Object[] width = new Integer[1];
-		Object[] height = new Integer[1];
+		Object[] fifoWidth = new Integer[1];
+		Object[] fifoHeight = new Integer[1];
 
-		fifo_WIDTH.get(width);
-		fifo_HEIGHT.get(height);
+		fifo_WIDTH.get(fifoWidth);
+		fifo_HEIGHT.get(fifoHeight);
 
-		int newWidth = (Integer) width[0] << 4;
-		int newHeight = (Integer) height[0] << 4;
+		int newWidth = ((Integer) fifoWidth[0]) << 4;
+		int newHeight = ((Integer) fifoHeight[0]) << 4;
 
 		if (newWidth != this.width || newHeight != this.height) {
 
@@ -238,6 +264,9 @@ public class DisplayActor extends AbstractInterpretedActor {
 			x = 0;
 			y = 0;
 			numImages++;
+			long timeFrame = System.currentTimeMillis() - lastTime;
+			lastTime = System.currentTimeMillis();
+			process.write("Frame decoding time = " + timeFrame + "\n");
 		}
 	}
 

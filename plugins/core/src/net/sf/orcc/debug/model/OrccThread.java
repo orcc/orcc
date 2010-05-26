@@ -98,7 +98,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#canStepReturn()
 	 */
 	public boolean canStepReturn() {
-		return false;
+		return isSuspended() && isStepping();
 	}
 
 	/*
@@ -107,7 +107,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
 	public boolean canSuspend() {
-		return false;
+		return !isSuspended();
 	}
 
 	/*
@@ -204,7 +204,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
-		return target.isSuspended() && !isTerminated();
+		return fThread.isSuspended() && !isTerminated();
 	}
 
 	/*
@@ -260,6 +260,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
 	 */
 	public void stepReturn() throws DebugException {
+		fThread.stepReturn();
 	}
 
 	/*

@@ -29,20 +29,23 @@
 package net.sf.orcc.debug.model;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IIndexedValue;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 
 /**
  * Value of a Orcc variable.
  */
-public class OrccValue extends OrccDebugElement implements IValue {
+public class OrccValue extends OrccDebugElement implements IValue, IIndexedValue {
 
 	private String fValue;
+	private IVariable[] fVariables;
 
-	public OrccValue(OrccDebugTarget target, Object value) {
+	public OrccValue(OrccDebugTarget target, Object value, IVariable[] variables) {
 		super(target);
 		if (value != null) {
 			fValue = value.toString();
+			fVariables = variables;
 		} else {
 			fValue = "null";
 		}
@@ -77,7 +80,11 @@ public class OrccValue extends OrccDebugElement implements IValue {
 	 * @see org.eclipse.debug.core.model.IValue#getVariables()
 	 */
 	public IVariable[] getVariables() throws DebugException {
-		return new IVariable[0];
+		if (fVariables != null) {
+			return fVariables;
+		}else {
+			return new IVariable[0];
+		}
 	}
 
 	/*
@@ -86,7 +93,7 @@ public class OrccValue extends OrccDebugElement implements IValue {
 	 * @see org.eclipse.debug.core.model.IValue#hasVariables()
 	 */
 	public boolean hasVariables() throws DebugException {
-		return false;
+		return (fVariables!=null);
 	}
 
 	/*
@@ -96,5 +103,28 @@ public class OrccValue extends OrccDebugElement implements IValue {
 	 */
 	public boolean isAllocated() throws DebugException {
 		return true;
+	}
+
+	
+	public IVariable getVariable(int offset) throws DebugException {
+		return fVariables[offset];
+	}
+
+	
+	public IVariable[] getVariables(int offset, int length)
+			throws DebugException {
+		IVariable[] variables = new OrccVariable[length];
+		for (int i = 0; i < length; i++) {
+			variables[i] = fVariables[i+offset];
+		}
+		return variables;
+	}
+
+	public int getSize() throws DebugException {
+		return fVariables.length;
+	}
+
+	public int getInitialOffset() {
+		return 0;
 	}
 }

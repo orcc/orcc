@@ -38,9 +38,18 @@ import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.ui.OrccActivator;
+
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -63,6 +72,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.dialogs.ISelectionStatusValidator;
+import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * 
@@ -83,13 +96,51 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 	}
 
 	private String browseVTLFolder(Shell shell, IFile file) {
-		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select VTL folder :");
-		// set initial directory
-		String location = file.getParent().getLocation().toOSString();
-		dialog.setFilterPath(location);
+		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
+				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
+				new WorkbenchContentProvider());
+		tree.setAllowMultiple(false);
+		tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
 
-		return dialog.open();
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceRoot root = workspace.getRoot();
+		String location = file.getParent().getLocation().toOSString();
+		IResource resource = root.getContainerForLocation(new Path(location));
+
+		if (resource != null) {
+			tree.setInitialSelection(resource);
+		}
+
+		tree.setMessage("Please select an existing folder :");
+		tree.setTitle("Choose VTL folder");
+
+		tree.setValidator(new ISelectionStatusValidator() {
+
+			@Override
+			public IStatus validate(Object[] selection) {
+				if (selection.length == 1) {
+					if (selection[0] instanceof IFolder) {
+						return new Status(IStatus.OK, OrccActivator.PLUGIN_ID,
+								"");
+					} else {
+						return new Status(IStatus.ERROR,
+								OrccActivator.PLUGIN_ID,
+								"Only folders can be selected, not files nor projects");
+					}
+				}
+
+				return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+						"No folder selected.");
+			}
+
+		});
+
+		// opens the dialog
+		if (tree.open() == Window.OK) {
+			resource = (IResource) tree.getFirstResult();
+			return resource.getLocation().toOSString();
+		}
+		return null;
 	}
 
 	private String browseStimulusFiles(Shell shell, IFile file) {
@@ -158,7 +209,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			}
 			wc.setAttribute(VTL_FOLDER, folder);
 			wc.setAttribute(COMPILE_VTL, true);
-			
+
 			// stimulus file
 			String stimulus = browseStimulusFiles(getShell(), file);
 			if (stimulus == null) {

@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -64,10 +66,12 @@ import net.sf.orcc.ir.nodes.WhileNode;
  */
 public class InterpretedActor extends AbstractInterpretedActor {
 
+	private OrccProcess process;
+
 	/**
 	 * Debugger utils
 	 */
-	public class NodeInfo {
+	private class NodeInfo {
 		public Expression condition;
 		public BlockNode joinNode;
 		public int nbSubNodes;
@@ -84,60 +88,89 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		}
 	}
 
-	private ConstantEvaluator constEval;
+	private class Breakpoint {
+		public Breakpoint(Action action, Integer lineNb) {
+			this.action = action;
+			this.lineNb = lineNb;
+		}
 
+		public Action action;
+		public int lineNb;
+	}
+
+	private List<Breakpoint> breakpoints;
 	private Action currentAction = null;
-	protected ExpressionEvaluator exprInterpreter;
-	/**
-	 * Simulator properties
-	 */
-	protected String fsmState;
+	private Action breakAction = null;
 	private List<Instruction> instrStack;
-
-	protected NodeInterpreter interpret;
-	protected boolean isSynchronousScheduler = true;
-	private ListAllocator listAllocator;
-
+	private boolean isStepping = false;
+	private int nbOfFirings;
 	private List<NodeInfo> nodeStack;
 	private int nodeStackLevel;
-	private Map<String, Expression> parameters;
+
+	/**
+	 * Interpretation and evaluation tools
+	 */
+	protected NodeInterpreter interpret;
+	private ConstantEvaluator constEval;
+	protected ExpressionEvaluator exprInterpreter;
+	private ListAllocator listAllocator;
+
+	/**
+	 * Actor's FSM management parameters
+	 */
+	protected String fsmState;
 	protected ActionScheduler sched;
 
 	/**
-	 * Creates a new interpreted actor with the given instance id and the given
-	 * actor
+	 * Actor's constant parameters to be set at initialization time
+	 */
+	private Map<String, Expression> parameters;
+
+	/**
+	 * Creates a new interpreted actor instance for simulation or debug
 	 * 
 	 * @param id
-	 *            id of the instance of the given actor
+	 *            name of the associated instance
+	 * @param parameters
+	 *            actor's parameters to be set
 	 * @param actor
-	 *            an actor
+	 *            actor class definition
+	 * @param outputFolder
+	 *            location of compiled actors objects
 	 */
 	public InterpretedActor(String id, Map<String, Expression> parameters,
-			Actor actor) {
+			Actor actor, String outputFolder, OrccProcess process) {
+		// Set instance name and actor class definition at parent level
 		super(id, actor);
-		sched = actor.getActionScheduler();
+
+		// Register master process (used for console I/O access)
+		this.process = process;
+		
+		// Build a node interpreter for visiting CFG and instructions
+		interpret = new NodeInterpreter();
+		// Create the List allocator for state and procedure local vars
+		this.listAllocator = new ListAllocator();
+		// Creates an expression evaluator for state and local variables init
+		this.constEval = new ConstantEvaluator();
+		// Create the expression evaluator
+		this.exprInterpreter = new ExpressionEvaluator();
+
+		// Get actor FSM properties
+		this.sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
 			this.fsmState = sched.getFsm().getInitialState().getName();
 		} else {
-			fsmState = "IDLE";
+			this.fsmState = "IDLE";
 		}
-
-		// Create the List allocator for state and procedure local vars
-		listAllocator = new ListAllocator();
-		// Create the expression evaluator
-		exprInterpreter = new ExpressionEvaluator();
-		// Create lists for nodes and instructions in case of debug mode
-		nodeStack = new ArrayList<NodeInfo>();
-		instrStack = new ArrayList<Instruction>();
-
-		// Build a node interpreter for visiting CFG and instructions
-		interpret = new NodeInterpreter();
-
-		// Creates an expression evaluator for state and local variables init
-		this.constEval = new ConstantEvaluator();
 
 		// Get the parameters value from instance map
 		this.parameters = parameters;
+
+		// Create lists for nodes and instructions in case of debug mode
+		this.nodeStack = new ArrayList<NodeInfo>();
+		this.instrStack = new ArrayList<Instruction>();
+		this.breakpoints = new ArrayList<Breakpoint>();
+		this.nbOfFirings = 0;
 	}
 
 	/**
@@ -150,16 +183,24 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 */
 	protected boolean checkOutputPattern(Pattern outputPattern) {
 		if (outputPattern != null) {
-			boolean freeOutput = true;
 			for (Entry<Port, Integer> entry : outputPattern.entrySet()) {
 				Port outputPort = entry.getKey();
 				Integer nbOfTokens = entry.getValue();
-				freeOutput &= outputPort.fifo().hasRoom(nbOfTokens);
+				if (!ioFifos.get(outputPort.getName()).hasRoom(nbOfTokens)) {
+					return false;
+				}
 			}
+		}
+		return true;
+	}
 
-			return freeOutput;
-		} else {
-			return true;
+	@Override
+	public void clearBreakpoint(int breakpoint) {
+		// Remove breakpoint from the list
+		for (Breakpoint bkpt : breakpoints) {
+			if ((breakpoint == bkpt.lineNb)) {
+				breakpoints.remove(bkpt);
+			}
 		}
 	}
 
@@ -180,6 +221,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		lastVisitedAction = action.getName();
 		// Interpret the whole action
 		interpretProc(action.getBody());
+		nbOfFirings++;
 		return 1;
 	}
 
@@ -222,6 +264,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 				}
 			}
 		} else {
+			// Check next schedulable action in respect of the priority order
 			for (Action action : sched.getActions()) {
 				if (isSchedulable(action)) {
 					if (checkOutputPattern(action.getOutputPattern())) {
@@ -234,45 +277,89 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		return null;
 	}
 
+	@Override
+	public InterpreterStackFrame getStackFrame() {
+		InterpreterStackFrame stackFrame = new InterpreterStackFrame();
+		stackFrame.actorFilename = actor.getFile();
+		stackFrame.codeLine = lastVisitedLocation.getStartLine();
+		stackFrame.nbOfFirings = nbOfFirings;
+		stackFrame.stateVars.clear();
+		for (Variable stateVar : actor.getStateVars()) {
+			stackFrame.stateVars.put(stateVar.getName(), stateVar.getValue());
+		}
+		stackFrame.currentAction = lastVisitedAction;
+		stackFrame.fsmState = fsmState;
+		return stackFrame;
+	}
+
+	@Override
+	public int goToBreakpoint() {
+		int bkptLine = 0;
+		// Then interpret the actor until breakpoint is reached
+		while (bkptLine == 0) {
+			int actorStatus = step(false);
+			if (actorStatus <= 1) {
+				throw new OrccRuntimeException(
+						"Error : cannot synchronize to action breakpoint");
+			} else {
+				for (Breakpoint bkpt : breakpoints) {
+					if ((bkpt.lineNb == lastVisitedLocation.getStartLine())) {
+						bkptLine = bkpt.lineNb;
+						isStepping = true;
+					}
+				}
+			}
+		}
+		return bkptLine;
+	}
+
 	/**
-	 * Launch initializing actions of this actor.
+	 * Initialize interpreted actor. That is to say constant parameters,
+	 * initialized state variables, allocation and initialization of state
+	 * arrays.
 	 */
 	@Override
 	public void initialize() {
-		// Initialize actors parameters with instance map
-		for (Variable param : actor.getParameters()) {
-			Expression value = parameters.get(param.getName());
-			if (value != null) {
-				param.setValue(value.accept(exprInterpreter));
-			}
-		}
-
-		// Check for List state variables which need to be allocated or
-		// initialized
-		for (Variable stateVar : actor.getStateVars()) {
-			Type type = stateVar.getType();
-			// Initialize variables with constant values
-			Constant initConst = ((StateVariable) stateVar).getConstantValue();
-			if (initConst == null) {
-				if (type.isList()) {
-					// Allocate empty array variable
-					stateVar.setValue(listAllocator.allocate(type));
-				}
-			} else {
-				// initialize
-				Object initVal = initConst.accept(constEval);
-				stateVar.setValue(initVal);
-			}
-		}
-
-		// Get initializing procedure if any
-		for (Action action : actor.getInitializes()) {
-			Object isSchedulable = interpretProc(action.getScheduler());
-			if (isSchedulable instanceof Boolean) {
-				if ((Boolean) isSchedulable) {
-					interpretProc(action.getBody());
+		try {
+			// Initialize actors parameters with instance map
+			for (Variable param : actor.getParameters()) {
+				Expression value = parameters.get(param.getName());
+				if (value != null) {
+					param.setValue(value.accept(exprInterpreter));
 				}
 			}
+
+			// Check for List state variables which need to be allocated or
+			// initialized
+			for (Variable stateVar : actor.getStateVars()) {
+				Type type = stateVar.getType();
+				// Initialize variables with constant values
+				Constant initConst = ((StateVariable) stateVar)
+						.getConstantValue();
+				if (initConst == null) {
+					if (type.isList()) {
+						// Allocate empty array variable
+						stateVar.setValue(listAllocator.allocate(type));
+					}
+				} else {
+					// initialize
+					Object initVal = initConst.accept(constEval);
+					stateVar.setValue(initVal);
+				}
+			}
+
+			// Get initializing procedure if any
+			for (Action action : actor.getInitializes()) {
+				Object isSchedulable = interpretProc(action.getScheduler());
+				if (isSchedulable instanceof Boolean) {
+					if ((Boolean) isSchedulable) {
+						interpretProc(action.getBody());
+					}
+				}
+			}
+		} catch (OrccRuntimeException ex) {
+			throw new OrccRuntimeException("Runtime exception thrown by actor "
+					+ actor.getName() + " :\n" + ex.getMessage());
 		}
 	}
 
@@ -297,7 +384,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// Interpret procedure body
 		for (CFGNode node : procedure.getNodes()) {
-			node.accept(interpret);
+			node.accept(interpret, ioFifos, process);
 		}
 
 		// Procedure return value
@@ -319,6 +406,14 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
 
+	@Override
+	public boolean isStepping() {
+		return isStepping;
+	}
+
+	/**
+	 * Manages the stack of nodes to be interpreted by the debugger
+	 */
 	private boolean popNodeStack() {
 		boolean exeStmt = false;
 		NodeInfo node = nodeStack.get(nodeStackLevel - 1);
@@ -382,7 +477,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			// Instructions
 			if (instrStack.size() > 0) {
 				Instruction instr = instrStack.remove(0);
-				instr.accept(interpret);
+				instr.accept(interpret, ioFifos, process);
 				lastVisitedLocation = instr.getLocation();
 				exeStmt = true;
 			}
@@ -395,109 +490,122 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	}
 
 	@Override
-	public Integer schedule() {
-		if (isSynchronousScheduler) {
-			// "Synchronous-like" scheduling policy : schedule only 1 action per
-			// actor at each "schedule" (network logical cycle) call
-			Action action = getNextAction();
-			if (action != null) {
-				return execute(action);
-			} else {
-				return 0;
+	public Integer run() {
+		try {
+			// Synchronize actor to the end of current stepping action
+			if (isStepping) {
+				while (step(false) == 2)
+					;
+				isStepping = false;
 			}
-
-		} else {
-			// Other scheduling policy : schedule the actor as long as it can
-			// execute an action
-			int running = 0;
-			boolean schedulable = true;
-			if (sched.hasFsm()) {
-				while (schedulable) {
-					schedulable = false;
-					// Check for untagged actions first
-					for (Action action : sched.getActions()) {
-						schedulable = isSchedulable(action);
-						if (schedulable) {
-							if (checkOutputPattern(action.getOutputPattern())) {
-								running = execute(action);
-							} else {
-								schedulable = false;
-							}
-							break;
-						}
-					}
-					if (!schedulable) {
-						// If no untagged action has been executed,
-						// Then check for next FSM transition
-						for (NextStateInfo info : sched.getFsm()
-								.getTransitions(fsmState)) {
-							Action action = info.getAction();
-							schedulable = isSchedulable(action);
-							if (schedulable) {
-								if (checkOutputPattern(action
-										.getOutputPattern())) {
-									// Update FSM state
-									fsmState = info.getTargetState().getName();
-									running = execute(action);
-								} else {
-									schedulable = false;
-								}
-								break;
-							}
-						}
+			// "Round-robbin-like" scheduling policy : schedule only all
+			// schedulable
+			// action of an
+			// actor before returning
+			int nbOfFiredActions = 0;
+			Action action;
+			while ((action = getNextAction()) != null) {
+				for (Breakpoint bkpt : breakpoints) {
+					if (action == bkpt.action) {
+						breakAction = action;
+						return -2;
 					}
 				}
-			} else {
-				while (schedulable) {
-					schedulable = false;
-					for (Action action : sched.getActions()) {
-						schedulable = isSchedulable(action);
-						if (schedulable) {
-							if (checkOutputPattern(action.getOutputPattern())) {
-								running = execute(action);
-							} else {
-								schedulable = false;
-							}
-							break;
-						}
-					}
-				}
+				nbOfFiredActions += execute(action);
+				nbOfFirings += nbOfFiredActions;
+				return nbOfFiredActions;
 			}
-			return running;
+			return 0;
+		} catch (OrccRuntimeException ex) {
+			throw new OrccRuntimeException("Runtime exception thrown by actor "
+					+ actor.getName() + " :\n" + ex.getMessage());
 		}
 	}
 
 	@Override
-	public int step(boolean doStepInto) {
-		if (currentAction == null) {
-			currentAction = getNextAction();
-			if (currentAction != null) {
-				lastVisitedAction = currentAction.getName();
-				// Allocate local List variables
-				for (Variable local : currentAction.getBody().getLocals()) {
-					Type type = local.getType();
-					if (type.isList()) {
-						local.setValue(listAllocator.allocate(type));
+	public Integer schedule() {
+		try {
+			// Synchronize actor to the end of current stepping action
+			if (isStepping) {
+				while (step(false) == 2)
+					;
+				isStepping = false;
+			}
+			// "Synchronous-like" scheduling policy : schedule only 1 action per
+			// actor at each "schedule" (network logical cycle) call
+			Action action = getNextAction();
+			if (action != null) {
+				for (Breakpoint bkpt : breakpoints) {
+					if (action == bkpt.action) {
+						breakAction = action;
+						return -2;
 					}
 				}
-				// Initialize stack frame
-				nodeStack.add(new NodeInfo(0, currentAction.getBody()
-						.getNodes().size(), currentAction.getBody().getNodes(),
-						null, null));
-				nodeStackLevel = 1;
+				return execute(action);
+			} else {
+				return 0;
+			}
+		} catch (OrccRuntimeException ex) {
+			throw new OrccRuntimeException("Runtime exception thrown by actor "
+					+ actor.getName() + " :\n" + ex.getMessage());
+		}
+	}
+
+	@Override
+	public void setBreakpoint(int breakpoint) {
+		Breakpoint bkpt = new Breakpoint(null, 0);
+		for (Action action : actor.getActions()) {
+			if ((action.getLocation().getStartLine() > bkpt.lineNb)
+					&& (action.getLocation().getStartLine() < breakpoint)) {
+				bkpt.action = action;
+				bkpt.lineNb = breakpoint;
 			}
 		}
-		if (currentAction != null) {
-			while ((nodeStackLevel > 0) && (!popNodeStack()))
-				;
-			if (nodeStackLevel > 0) {
-				return -1;
-			} else {
-				currentAction = null;
-				return 1;
+		// Add breakpoint to the list
+		breakpoints.add(bkpt);
+	}
+
+	@Override
+	public int step(boolean doStepInto) {
+		try {
+			if (currentAction == null) {
+				if (isStepping == false) {
+					currentAction = breakAction;
+				} else {
+					currentAction = getNextAction();
+				}
+				if (currentAction != null) {
+					nbOfFirings++;
+					lastVisitedAction = currentAction.getName();
+					// Allocate local List variables
+					for (Variable local : currentAction.getBody().getLocals()) {
+						Type type = local.getType();
+						if (type.isList()) {
+							local.setValue(listAllocator.allocate(type));
+						}
+					}
+					// Initialize stack frame
+					nodeStack.add(new NodeInfo(0, currentAction.getBody()
+							.getNodes().size(), currentAction.getBody()
+							.getNodes(), null, null));
+					nodeStackLevel = 1;
+				}
 			}
-		} else {
-			return 0;
+			if (currentAction != null) {
+				while ((nodeStackLevel > 0) && (!popNodeStack()))
+					;
+				if (nodeStackLevel > 0) {
+					return 2;
+				} else {
+					currentAction = null;
+					return 1;
+				}
+			} else {
+				return 0;
+			}
+		} catch (OrccRuntimeException ex) {
+			throw new OrccRuntimeException("Runtime exception thrown by actor "
+					+ actor.getName() + " :\n" + ex.getMessage());
 		}
 	}
 }

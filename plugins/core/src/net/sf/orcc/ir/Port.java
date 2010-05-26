@@ -28,6 +28,10 @@
  */
 package net.sf.orcc.ir;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+
 /**
  * This class defines a port. A port is just a variable, with a location, a
  * type, a name.
@@ -37,7 +41,8 @@ package net.sf.orcc.ir;
  */
 public class Port extends Variable implements Comparable<Port> {
 
-	private ICommunicationFifo fifoBinding;
+//	private Map<String, Queue<Object>> fifo;
+//	private Map<String, Integer> fifoSize;
 
 	/**
 	 * the number of tokens consumed by this port.
@@ -61,6 +66,8 @@ public class Port extends Variable implements Comparable<Port> {
 	 */
 	public Port(Location location, Type type, String name) {
 		super(location, type, name, true);
+//		fifo = new HashMap<String, Queue<Object>>();
+//		fifoSize = new HashMap<String, Integer>();
 	}
 
 	/**
@@ -76,9 +83,10 @@ public class Port extends Variable implements Comparable<Port> {
 	 * @param fifo
 	 *            the communication FIFO
 	 */
-	public void bind(ICommunicationFifo fifo) {
-		this.fifoBinding = fifo;
-	}
+//	public void bind(Queue<Object> fifo, int fifoSize, String instanceId) {
+//		this.fifo.put(instanceId, fifo);
+//		this.fifoSize.put(instanceId, fifoSize);
+//	}
 
 	@Override
 	public int compareTo(Port port) {
@@ -90,9 +98,13 @@ public class Port extends Variable implements Comparable<Port> {
 	 * 
 	 * @return fifo_binding the communication FIFO implemented interface
 	 */
-	public ICommunicationFifo fifo() {
-		return fifoBinding;
-	}
+//	public Queue<Object> getFifo(String instanceId) {
+//		return fifo.get(instanceId);
+//	}
+//
+//	public int getFifoSize(String instanceId) {
+//		return fifoSize.get(instanceId);
+//	}
 
 	/**
 	 * Returns the number of tokens consumed by this port.
