@@ -263,8 +263,6 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	@Override
 	protected void configureFormatting(FormattingConfig c) {
 		f = (CalGrammarAccess) getGrammarAccess();
-
-		c.setIndentationSpace("\t");
 		c.setLinewrap().after(f.getML_COMMENTRule());
 
 		// Tags
@@ -290,6 +288,8 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		configureTypeInt(c);
 		configureTypeList(c);
 		configureTypeUint(c);
+
+		c.setLinewrap().before(f.getSL_COMMENTRule());
 
 		f = null;
 	}
