@@ -134,7 +134,7 @@ void TraceAka::addPort(unsigned uIdx, std::string &msg)
 void TraceAka::captureToken(FifoAPI* poFifo, std::string &msg)
 {
 	FILE *poFile = NULL;
-	unsigned uIdx = (unsigned)poFifo;
+	size_t uIdx = (size_t)poFifo;
 	std::list<std::string>* poList = NULL;
 
 	std::map<unsigned,FILE*>::iterator it=m_oMapFile.find(uIdx);
