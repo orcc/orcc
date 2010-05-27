@@ -5,17 +5,17 @@
       <vertex id="PicWidthInMb" x="57" y="171"/>
       <vertex id="PredMode" x="57" y="654"/>
       <vertex id="FirstMbInSlice" x="57" y="848"/>
-      <vertex id="MbPartIdx" x="57" y="1139"/>
-      <vertex id="RefIdx" x="57" y="1236"/>
-      <vertex id="MbPartWidth" x="57" y="1333"/>
-      <vertex id="MbPartHeigth" x="57" y="1430"/>
+      <vertex id="MbPartIdx" x="40" y="1273"/>
+      <vertex id="RefIdx" x="50" y="1363"/>
+      <vertex id="MbPartWidth" x="35" y="1305"/>
+      <vertex id="MbPartHeigth" x="33" y="1245"/>
       <vertex id="PicSizeInMb" x="57" y="1527"/>
       <vertex id="Coef_ACR" x="57" y="945"/>
-      <vertex id="LOCATION" x="57" y="1624"/>
-      <vertex id="MV" x="57" y="1721"/>
-      <vertex id="PartSZ" x="57" y="1818"/>
-      <vertex id="POC" x="742" y="70"/>
-      <vertex id="RefList" x="742" y="188"/>
+      <vertex id="LOCATION" x="49" y="1183"/>
+      <vertex id="MV" x="64" y="1210"/>
+      <vertex id="PartSZ" x="49" y="1332"/>
+      <vertex id="POC" x="622" y="1192"/>
+      <vertex id="RefList" x="758" y="1365"/>
       <vertex id="Mb_Type" x="57" y="1042"/>
       <vertex id="QP" x="523" y="230"/>
       <vertex id="LFDisable" x="523" y="327"/>
@@ -26,8 +26,8 @@
       <vertex id="mv_in" x="523" y="812"/>
       <vertex id="I_PCM_Y" x="247" y="452"/>
       <vertex id="ConstrainedIFlag" x="57" y="751"/>
-      <vertex id="DelList" x="757" y="1185"/>
-      <vertex id="FrameNum" x="745" y="1238"/>
+      <vertex id="DelList" x="732" y="1122"/>
+      <vertex id="FrameNum" x="614" y="1157"/>
       <vertex id="Display_L" x="1173" y="1270"/>
       <vertex id="Inter" x="247" y="1179"/>
       <vertex id="Buffer_inter" x="935" y="1160"/>
@@ -35,5 +35,6 @@
       <vertex id="Intra_16x16" x="247" y="549"/>
       <vertex id="Intra_4x4" x="247" y="822"/>
       <vertex id="Deblocking_Filter" x="742" y="680"/>
+      <vertex id="Mgnt_Display" x="693" y="1228"/>
    </vertices>
 </layout>

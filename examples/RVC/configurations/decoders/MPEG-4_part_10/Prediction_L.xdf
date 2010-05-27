@@ -327,6 +327,15 @@
             <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>
     </Instance>
+    <Instance id="Mgnt_Display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Display"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -390,4 +399,8 @@
     <Connection dst="" dst-port="Display_L" src="Buffer_inter" src-port="Display"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="Buffer_inter" dst-port="FrameNum_CurrPic" src="" src-port="FrameNum"/>
+    <Connection dst="Buffer_inter" dst-port="POCtoDisplay"
+        src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="Mgnt_Display" dst-port="POC" src="" src-port="POC"/>
+    <Connection dst="Mgnt_Display" dst-port="FrameNum_CurrPic" src="" src-port="FrameNum"/>
 </XDF>
