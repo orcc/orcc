@@ -74,7 +74,9 @@ $MD$$index$ = metadata !{metadata !"test"}
 
 
 parameter_MD(parameter) ::= <<
-
+$parameter_decl_MD(parameter)$ = metadata !{metadata $Location_decl_MD(parameter)$, metadata $Type_decl_MD(parameter)$}
+$Location_MD(parameter)$
+$Type_MD(parameter)$
 >>
 
 stateVar_MD(var) ::= <<
@@ -101,6 +103,10 @@ Type_decl_MD(var) ::= <<
 !$Location(var.location)$3
 >>
 
+VarDef_decl_MD(var) ::= <<
+!$Location(var.location)$4
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor MD member body
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,6 +125,13 @@ $Sched_decl_MD(action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExter
 
 >>
 
+
+VarDef_MD(var) ::= <<
+VarDef_decl_MD(var) = metadata !{$varName_MD(var)$, $varAssignable_MD(var)$, $varSuffix_MD(var)$,  $varIndex_MD(var)$}
+
+>>
+
+
 Body_MD(action) ::= <<
 $Body_decl_MD(action)$ = metadata  !{$varName_MD(action.body)$, $procExtern_MD(action.body)$, void()* $action.body$}
 
@@ -131,6 +144,18 @@ $Body_decl_MD(action)$ = metadata  !{$varName_MD(action.body)$, $procExtern_MD(a
 
 varType_MD(var) ::= <<
 metadata !"$var.type.size$" 
+>>
+
+varAssignable_MD(var) ::= <<
+i1 $if(var.assignable)$1$else$0$endif$
+>>
+
+varSuffix_MD(var) ::= <<
+i32 $var.suffix$
+>>
+
+varIndex_MD(var) ::= <<
+i32 $var.index$
 >>
 
 procExtern_MD(proc) ::= <<
