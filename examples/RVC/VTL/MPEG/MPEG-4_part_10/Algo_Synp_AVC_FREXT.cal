@@ -5967,10 +5967,13 @@ end
 		val_CurrMbAddr := first_mb_in_slice;
 		PicWidthInMbs := (pic_width_in_mbs_minus1[sps_id] +1);
 		PicSizeInMbs := PicWidthInMbs * (pic_height_in_map_units_minus1[sps_id] +1);
-		NonZeroCount := [[ 0 : for int j in Integers(0, 16-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
-		NonZeroCountCb := [[ 0 : for int j in Integers(0, 4-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
-		NonZeroCountCr := [[ 0 : for int j in Integers(0, 4-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
-
+		
+		if IS_CAVLC() then
+		  NonZeroCount   := [[ 0 : for int j in Integers(0, 16-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
+		  NonZeroCountCb := [[ 0 : for int j in Integers(0, 4-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
+		  NonZeroCountCr := [[ 0 : for int j in Integers(0, 4-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
+		end
+		
 		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 		Mb_y := val_CurrMbAddr / PicWidthInMbs;
 
@@ -5979,26 +5982,30 @@ end
 		if field_pic_flag = 0 and mb_adaptive_frame_field_flag[sps_id] = 1 then MbaffFrameFlag := 1; else MbaffFrameFlag := 0; end
 		FirstSEinSlice := true;
 		//Init Tabs 
-		foreach int i in Integers(0,PicSizeInMbs - 1) do
-			mbTab[i][mbCBF] := 0;
-			foreach int j in Integers(0,3) do
-				transblock_cbf_cr[i][j] := 0;
-				transblock_cbf_cb[i][j] := 0;
-			end
-		end
 		
-		foreach int i in Integers(0,PicSizeInMbs - 1) do
-			foreach int j in Integers(0,15) do
-				transblock_cbf[i][j] := 0;
-			end
+		if IS_CABAC() then
+		  foreach int i in Integers(0,PicSizeInMbs - 1) do
+			  mbTab[i][mbCBF] := 0;
+			  foreach int j in Integers(0,3) do
+				  transblock_cbf_cr[i][j] := 0;
+				  transblock_cbf_cb[i][j] := 0;
+			  end
+		  end
+		  
+		  foreach int i in Integers(0,PicSizeInMbs - 1) do
+			  foreach int j in Integers(0,15) do
+				  transblock_cbf[i][j] := 0;
+			  end
+		  end
+		  
+		  foreach int i in Integers(0,PicSizeInMbs - 1) do
+			  foreach int j in Integers(0,1) do
+				  transblock_cbf_dc_cr_cb[i][j] := 0;
+			  end
+		  end
+		  //Init FoundSE
+		  FoundSE := false;
 		end
-		
-		foreach int i in Integers(0,PicSizeInMbs - 1) do
-			foreach int j in Integers(0,1) do
-				transblock_cbf_dc_cr_cb[i][j] := 0;
-			end
-		end
-		
 		
 				
 	end
@@ -6162,8 +6169,8 @@ end
 	read_SliceD_mb_skip_flag_done: action ==>
 	guard
 		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
-		IS_CABAC(),
-		cabac_end()
+		IS_CABAC() and cabac_end()
+		
 	do
 		mb_skip_flag := cabac_value();
 		
