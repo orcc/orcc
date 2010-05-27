@@ -7499,7 +7499,7 @@ end
 		leveltype = 1 and IS_CAVLC()
 	end
 	
-	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [level[i]: for int i in Integers(0,15)]] repeat 16
+	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [level_temp[i]: for int i in Integers(0,15)]] repeat 16
 	guard
 		leveltype = 1 and maxNumCoeff = 15 and IS_CABAC()
 	var
