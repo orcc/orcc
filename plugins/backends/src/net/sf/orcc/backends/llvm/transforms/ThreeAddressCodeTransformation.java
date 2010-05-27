@@ -391,9 +391,11 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		Iterator<Type> itt = types.iterator();
 		while (pit.hasNext()) {
 			Expression value = pit.next();
-			Expression expr = (Expression) value.accept(new ExpressionSplitter(
-					it, itt.next()));
-			pit.set(expr);
+			if (itt.hasNext()){
+				Expression expr = (Expression) value.accept(new ExpressionSplitter(
+						it, itt.next()));
+				pit.set(expr);
+			}
 		}
 		it.next();
 	}
@@ -416,9 +418,10 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		// set the label counter to prevent new nodes from having the same label
 		// as existing nodes
 		List<CFGNode> nodes = procedure.getNodes();
-		CFGNode lastNode = nodes.get(nodes.size() - 1);
-		AbstractNode.setLabelCount(lastNode.getLabel() + 1);
-
+		if (nodes.size() > 0 ){
+			CFGNode lastNode = nodes.get(nodes.size() - 1);
+			AbstractNode.setLabelCount(lastNode.getLabel() + 1);
+		}
 		super.visitProcedure(procedure);
 	}
 
