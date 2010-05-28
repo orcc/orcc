@@ -32,19 +32,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstBooleanExpression;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstIntType;
-import net.sf.orcc.cal.cal.AstIntegerExpression;
-import net.sf.orcc.cal.cal.AstListType;
-import net.sf.orcc.cal.cal.AstLiteralExpression;
 import net.sf.orcc.cal.cal.AstPort;
-import net.sf.orcc.cal.cal.AstStringExpression;
 import net.sf.orcc.cal.cal.AstType;
-import net.sf.orcc.cal.cal.AstUintType;
+import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeInt;
+import net.sf.orcc.cal.cal.AstTypeList;
+import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -54,15 +51,10 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
@@ -74,7 +66,53 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class AstToIR {
 
+	private class ExpressionEvaluator extends CalSwitch<Expression> {
+
+		
+		
+	}
+
+	private class ExpressionTransformer extends CalSwitch<Expression> {
+
+	}
+
+	private class TypeTransformer extends CalSwitch<Type> {
+
+		@Override
+		public Type caseAstTypeBool(AstTypeBool type) {
+			return new BoolType();
+		}
+
+		@Override
+		public Type caseAstTypeInt(AstTypeInt type) {
+			Expression size = evalExpression(type.getSize());
+			return new IntType(size);
+		}
+
+		@Override
+		public Type caseAstTypeList(AstTypeList listType) {
+			Type type = transformType(listType.getType());
+			Expression size = evalExpression(listType.getSize());
+			return new ListType(size, type);
+		}
+
+		@Override
+		public Type caseAstTypeUint(AstTypeUint type) {
+			Expression size = evalExpression(type.getSize());
+			return new UintType(size);
+		}
+
+	}
+
+	final private ExpressionEvaluator exprEvaluator;
+
+	final private ExpressionTransformer exprTransformer;
+
+	private String file;
+
 	private Map<AstPort, Port> portMap;
+
+	final private TypeTransformer typeTransformer;
 
 	private Map<AstVariable, Variable> variableMap;
 
@@ -82,9 +120,28 @@ public class AstToIR {
 		portMap = new HashMap<AstPort, Port>();
 		variableMap = new HashMap<AstVariable, Variable>();
 		variableMap.toString();
+
+		exprEvaluator = new ExpressionEvaluator();
+		exprTransformer = new ExpressionTransformer();
+		typeTransformer = new TypeTransformer();
 	}
 
+	private Expression evalExpression(AstExpression expr) {
+		return exprEvaluator.doSwitch(expr);
+	}
+
+	/**
+	 * Transforms the given AST Actor to an IR actor.
+	 * 
+	 * @param file
+	 *            the .cal file where the actor is defined
+	 * @param astActor
+	 *            the AST of the actor
+	 * @return the actor in IR form
+	 */
 	public Actor transform(String file, AstActor astActor) {
+		this.file = file;
+
 		String name = astActor.getName();
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 		OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
@@ -103,34 +160,7 @@ public class AstToIR {
 	}
 
 	private Expression transformExpression(AstExpression expr) {
-		if (expr instanceof AstLiteralExpression) {
-			return transformExprLiteral((AstLiteralExpression) expr);
-		}
-
-		Location location = new Location();
-		return new IntExpr(location, 42);
-	}
-
-	private Expression transformExprLiteral(AstLiteralExpression expr) {
-		if (expr instanceof AstBooleanExpression) {
-			AstBooleanExpression aBool = (AstBooleanExpression) expr;
-			Location location = new Location();
-			boolean value = Boolean.parseBoolean(aBool.getValue());
-			return new BoolExpr(location, value);
-		} else if (expr instanceof AstIntegerExpression) {
-			AstIntegerExpression aInt = (AstIntegerExpression) expr;
-			Location location = new Location();
-			int value = aInt.getValue();
-			return new IntExpr(location, value);
-		} else if (expr instanceof AstStringExpression) {
-			AstStringExpression aString = (AstStringExpression) expr;
-			Location location = new Location();
-			String value = aString.getValue();
-			return new StringExpr(location, value);
-		}
-
-		// never happens
-		throw new OrccRuntimeException("unknown literal expression type");
+		return exprTransformer.doSwitch(expr);
 	}
 
 	private OrderedMap<Port> transformPorts(List<AstPort> portList) {
@@ -140,37 +170,14 @@ public class AstToIR {
 			Type type = transformType(aPort.getType());
 			Port port = new Port(location, type, aPort.getName());
 			portMap.put(aPort, port);
-			ports.add("", location, port.getName(), port);
+			ports.add(file, location, port.getName(), port);
 		}
 
 		return ports;
 	}
 
 	private Type transformType(AstType aType) {
-		String typeName = aType.getName();
-		if (typeName.equals("bool")) {
-			return new BoolType();
-		} else if (typeName.equals("int")) {
-			Expression size = transformExpression(((AstIntType) aType)
-					.getSize());
-			return new IntType(size);
-		} else if (typeName.equals("List")) {
-			Type type = transformType(((AstListType) aType).getType());
-			Expression size = transformExpression(((AstListType) aType)
-					.getSize());
-			return new ListType(size, type);
-		} else if (typeName.equals("String")) {
-			return new StringType();
-		} else if (typeName.equals("uint")) {
-			Expression size = transformExpression(((AstUintType) aType)
-					.getSize());
-			return new UintType(size);
-		} else if (typeName.equals("void")) {
-			return new VoidType();
-		}
-
-		// never happens
-		throw new OrccRuntimeException("unknown type \"" + typeName + "\"");
+		return typeTransformer.doSwitch(aType);
 	}
 
 }

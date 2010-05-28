@@ -41,6 +41,11 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider;
 public class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
 
 	@Override
+	public Class<? extends ILinkingService> bindILinkingService() {
+		return CalLinkingService.class;
+	}
+
+	@Override
 	public Class<? extends IQualifiedNameProvider> bindIQualifiedNameProvider() {
 		return CalQualifiedNameProvider.class;
 	}
@@ -48,11 +53,6 @@ public class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
 	@Override
 	public Class<? extends IValueConverterService> bindIValueConverterService() {
 		return CalValueConverter.class;
-	}
-
-	@Override
-	public Class<? extends ILinkingService> bindILinkingService() {
-		return CalLinkingService.class;
 	}
 
 }

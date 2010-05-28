@@ -33,12 +33,12 @@ import java.util.List;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstForeachStatement;
+import net.sf.orcc.cal.cal.AstExpressionGenerator;
+import net.sf.orcc.cal.cal.AstExpressionList;
 import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstInputPattern;
-import net.sf.orcc.cal.cal.AstListExpression;
 import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstVariable;
 
 import org.eclipse.emf.ecore.EObject;
@@ -95,20 +95,22 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	}
 
 	/**
-	 * Returns the scope for a variable referenced inside a foreach statement.
+	 * Returns the scope for a variable referenced inside a generator.
 	 * 
-	 * @param foreach
-	 *            a foreach statement
+	 * @param list
+	 *            a list expression
 	 * @param reference
 	 *            a variable reference
 	 * @return a scope
 	 */
-	public IScope scope_AstVariableReference_variable(
-			AstForeachStatement foreach, EReference reference) {
-		List<AstVariable> variables = new ArrayList<AstVariable>();
-		variables.add(foreach.getVariable());
-		return Scopes.scopeFor(variables,
-				getScope(foreach.eContainer(), reference));
+	public IScope scope_AstVariableReference_variable(AstExpressionList list,
+			EReference reference) {
+		List<AstVariable> elements = new ArrayList<AstVariable>();
+		for (AstExpressionGenerator generator : list.getGenerators()) {
+			elements.add(generator.getVariable());
+		}
+		EObject container = list.eContainer();
+		return Scopes.scopeFor(elements, getScope(container, reference));
 	}
 
 	/**
@@ -131,25 +133,6 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	}
 
 	/**
-	 * Returns the scope for a variable referenced inside a generator.
-	 * 
-	 * @param list
-	 *            a list expression
-	 * @param reference
-	 *            a variable reference
-	 * @return a scope
-	 */
-	public IScope scope_AstVariableReference_variable(AstListExpression list,
-			EReference reference) {
-		List<AstVariable> elements = new ArrayList<AstVariable>();
-		for (AstGenerator generator : list.getGenerators()) {
-			elements.add(generator.getVariable());
-		}
-		EObject container = list.eContainer();
-		return Scopes.scopeFor(elements, getScope(container, reference));
-	}
-
-	/**
 	 * Returns the scope for a variable referenced inside a procedure.
 	 * 
 	 * @param procedure
@@ -166,6 +149,23 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 
 		AstActor actor = (AstActor) procedure.eContainer();
 		return Scopes.scopeFor(elements, getScope(actor, reference));
+	}
+
+	/**
+	 * Returns the scope for a variable referenced inside a foreach statement.
+	 * 
+	 * @param foreach
+	 *            a foreach statement
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_AstVariableReference_variable(
+			AstStatementForeach foreach, EReference reference) {
+		List<AstVariable> variables = new ArrayList<AstVariable>();
+		variables.add(foreach.getVariable());
+		return Scopes.scopeFor(variables,
+				getScope(foreach.eContainer(), reference));
 	}
 
 }

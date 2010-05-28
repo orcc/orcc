@@ -31,6 +31,7 @@ package net.sf.orcc.frontend;
 import java.io.File;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.frontend.transforms.AstToIR;
 import net.sf.orcc.ir.Actor;
@@ -54,8 +55,12 @@ public class Frontend {
 	}
 
 	public void compile(String file, AstActor astActor) throws OrccException {
-		Actor actor = new AstToIR().transform(file, astActor);
-		new IRWriter(actor).write(outputFolder.toString());
+		try {
+			Actor actor = new AstToIR().transform(file, astActor);
+			new IRWriter(actor).write(outputFolder.toString());
+		} catch (OrccRuntimeException e) {
+			throw new OrccException(e.getMessage());
+		}
 	}
 
 }

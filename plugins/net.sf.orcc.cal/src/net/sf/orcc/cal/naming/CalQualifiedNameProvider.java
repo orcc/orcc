@@ -32,8 +32,8 @@ import java.util.Iterator;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstForeachStatement;
-import net.sf.orcc.cal.cal.AstGenerator;
+import net.sf.orcc.cal.cal.AstExpressionGenerator;
+import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTag;
 
 import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider;
@@ -83,12 +83,12 @@ public class CalQualifiedNameProvider extends
 		return actor.getName();
 	}
 
-	public String qualifiedName(AstForeachStatement foreach) {
-		return "foreach." + blockCount++;
+	public String qualifiedName(AstExpressionGenerator generator) {
+		return "generator." + blockCount++;
 	}
 
-	public String qualifiedName(AstGenerator generator) {
-		return "generator." + blockCount++;
+	public String qualifiedName(AstStatementForeach foreach) {
+		return "foreach." + blockCount++;
 	}
 
 	public String qualifiedName(AstTag tag) {
