@@ -112,7 +112,7 @@ actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size
 	guard
 		preferRead
 	do
-		println("select.read.prefer RA " + a);
+		// println("select.read.prefer RA " + a);
 		address_t := a;
 		burstSize := BURSTSIZE;
 		preferRead := false;
@@ -122,7 +122,7 @@ actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size
 	guard
 		not preferRead
 	do
-		println("select.write.prefer WA " + a);
+		// println("select.write.prefer WA " + a);
 		address_t := a;
 		burstSize := BURSTSIZE;
 		preferRead := true;
@@ -132,7 +132,7 @@ actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size
 	guard
 		not preferRead
 	do
-		println("select.read.low RA" + a);
+		// println("select.read.low RA" + a);
 		address_t := a;
 		burstSize := BURSTSIZE;
 		preferRead := false;
@@ -142,7 +142,7 @@ actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size
 	guard
 		preferRead
 	do
-		println("select.write.low WA" + a);
+		// println("select.write.low WA" + a);
 		address_t := a;
 		burstSize := BURSTSIZE;
 		preferRead := true;
