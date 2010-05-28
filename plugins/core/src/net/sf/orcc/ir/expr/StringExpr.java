@@ -48,6 +48,10 @@ public class StringExpr extends AbstractExpression {
 		this.value = value;
 	}
 
+	public StringExpr(String value) {
+		this(new Location(), value);
+	}
+
 	@Override
 	public Object accept(ExpressionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);

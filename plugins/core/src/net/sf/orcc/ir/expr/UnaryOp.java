@@ -31,7 +31,7 @@ package net.sf.orcc.ir.expr;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 
 /**
  * This class defines the unary operators of the IR.
@@ -75,13 +75,13 @@ public enum UnaryOp {
 	 * @param name
 	 *            an operator name
 	 * @return a unary operator
-	 * @throws OrccException
+	 * @throws OrccRuntimeException
 	 *             if there is no operator with the given name
 	 */
-	public static UnaryOp getOperator(String name) throws OrccException {
+	public static UnaryOp getOperator(String name) throws OrccRuntimeException {
 		UnaryOp op = operators.get(name);
 		if (op == null) {
-			throw new OrccException("unknown operator \"" + name + "\"");
+			throw new OrccRuntimeException("unknown operator \"" + name + "\"");
 		} else {
 			return op;
 		}
