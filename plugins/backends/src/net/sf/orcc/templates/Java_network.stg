@@ -1,3 +1,15 @@
+declareBroadcast(instance) ::= <<
+$if (instance.broadcast)$
+private Broadcast actor_$instance.id$;
+$endif$
+>>
+
+createBroadcast(instance) ::= <<
+$if (instance.broadcast)$
+actor_$instance.id$ = new Broadcast($length(instance.broadcast.outputList)$);
+$endif$
+>>
+
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 actor_$source.id$.setFifo("$sourcePort.name$", fifo_$count$);
 actor_$target.id$.setFifo("$targetPort.name$", fifo_$count$);
@@ -34,7 +46,7 @@ $endif$
 >>
 
 scheduleActor(instance) ::= <<
-$if (instance.actor)$
+$if (instance.actor || instance.broadcast)$
 i += actor_$instance.id$.schedule();
 $endif$
 >>
@@ -65,12 +77,12 @@ public class Network_$network.name$ implements IScheduler {
 	// Actors
 	$network.instances: declareActor()$
 	// Broadcasts
-	$network.broadcasts: { bcast | private Broadcast actor_$bcast.id$;}; separator="\n"$
+	$network.instances: declareBroadcast()$
 
 	@Override
 	public void initialize() {
 		$network.instances: constructActor()$
-		$network.broadcasts: { bcast | actor_$bcast.id$ = new Broadcast($length(bcast.outputList)$);}; separator="\n"$
+		$network.instances: createBroadcast()$
 
 		$assignFifos(network.connections)$
 	}

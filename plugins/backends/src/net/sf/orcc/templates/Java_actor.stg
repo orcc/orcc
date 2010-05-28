@@ -77,25 +77,35 @@ $endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Nodes
+// Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-// hasTokens node
+PrintParameter(parameter) ::= <<$parameter$>>
+
+Call(call) ::= <<
+
+$if(call.print)$System.out.print($call.parameters: PrintParameter(); separator=" + "$);$
+else
+$$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
+endif$
+>>
+
+// hasTokens instruction
 HasTokens(hasTokens) ::= <<
 $hasTokens.target$ = fifo_$hasTokens.port$.hasTokens($hasTokens.numTokens$);
 >>
 
-// peek node
+// peek instruction
 Peek(peek) ::= <<
 fifo_$peek.port$.peek($peek.target$);
 >>
 
-// read node
+// read instruction
 Read(read) ::= <<
 fifo_$read.port$.get($read.target$);
 >>
 
-// write node
+// write instruction
 Write(write) ::= <<
 fifo_$write.port$.put($write.target$);
 >>
