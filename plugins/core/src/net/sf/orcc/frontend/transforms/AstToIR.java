@@ -69,14 +69,8 @@ import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.text.Region;
 import org.eclipse.xtext.parsetree.CompositeNode;
 import org.eclipse.xtext.parsetree.NodeUtil;
-import org.eclipse.xtext.parsetree.ParseTreeUtil;
-import org.eclipse.xtext.parsetree.impl.ParsetreeUtil;
-import org.eclipse.xtext.ui.ILocationInFileProvider;
-
-import com.google.inject.Inject;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -156,9 +150,6 @@ public class AstToIR {
 	final private ExpressionTransformer exprTransformer;
 
 	private String file;
-
-	@Inject
-	private ILocationInFileProvider locationProvider;
 
 	private Map<AstPort, Port> portMap;
 
