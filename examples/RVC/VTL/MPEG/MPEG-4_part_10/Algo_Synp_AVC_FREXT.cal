@@ -257,7 +257,7 @@ actor Algo_Synp_AVC_FREXT()
 	bool CabacTerminated				:= false;
 	bool StartDecodeBypassStart			:= false;
 	
-	int getBitStreamValue;
+	bool getBitStreamValue;
 	bool cbp_done := false;
 	
 	/* Coeff abs level minus 1 parsing*/
@@ -3606,7 +3606,7 @@ actor Algo_Synp_AVC_FREXT()
 		if StartCoeffSignAbs then
 			if binValDecoded = false then
 				StartDecodeBypass := true;
-				bypassFlag := 1;
+				bypassFlag := true;
 				CabacStartProcess := false;
 			else
 				if binVal = 1 then
@@ -6718,7 +6718,7 @@ end
 			if IS_CABAC() then
 				mb_qp_delta := cabac_value();
 				
-				if ( mb_qp_delta & 0x01 ) then
+				if ( mb_qp_delta & 0x01) = 1 then
 					mb_qp_delta := ( mb_qp_delta + 1 ) >> 1;
 				else
 					mb_qp_delta :=  -( ( mb_qp_delta + 1 ) >> 1);
@@ -8334,7 +8334,7 @@ end
 
 	byte_align: action ==>
 	do
-		if(bitand( bit_count, 7 )) then
+		if(bitand( bit_count, 7 )!=0) then
 			set_bits_to_read( 8 - bitand( bit_count, 7 ) );
 		end
 	end
