@@ -95,7 +95,8 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		// until now, printer is default printer
-		printer = new STPrinter("C_actor");
+		printer = new STPrinter();
+		printer.loadGroups("C_actor");
 		printer.setExpressionPrinter(CExpressionPrinter.class);
 		printer.setTypePrinter(CTypePrinter.class);
 
@@ -130,16 +131,14 @@ public class CBackendImpl extends AbstractBackend {
 				networkTemplates[0] = "C_network";
 			}
 
-			STPrinter networkPrinter = new STPrinter(networkTemplates);
-			networkPrinter.setExpressionPrinter(CExpressionPrinter.class);
-			networkPrinter.setTypePrinter(CTypePrinter.class);
+			printer.loadGroups(networkTemplates);
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);
 
 			String outputName = path + File.separator + network.getName()
 					+ ".c";
-			networkPrinter.printNetwork(outputName, network, false, fifoSize);
+			printer.printNetwork(outputName, network, false, fifoSize);
 
 			new CMakePrinter().printCMake(path, network);
 		} catch (IOException e) {

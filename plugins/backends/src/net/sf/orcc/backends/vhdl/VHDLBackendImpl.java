@@ -72,11 +72,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		main(VHDLBackendImpl.class, args);
 	}
 
-	private STPrinter networkPrinter;
-
 	private STPrinter printer;
-
-	private STPrinter tbPrinter;
 
 	private final Map<String, String> transformations;
 
@@ -90,7 +86,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		printer = new STPrinter("VHDL_actor");
+		printer = new STPrinter();
+		printer.loadGroups("VHDL_actor");
 		printer.setExpressionPrinter(VHDLExpressionPrinter.class);
 		printer.setTypePrinter(VHDLTypePrinter.class);
 
@@ -118,9 +115,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
-		tbPrinter = new STPrinter("VHDL_testbench");
-		tbPrinter.setExpressionPrinter(VHDLExpressionPrinter.class);
-		tbPrinter.setTypePrinter(VHDLTypePrinter.class);
+		printer.loadGroups("VHDL_testbench");
 
 		File folder = new File(path + File.separator + "Testbench");
 		if (!folder.exists()) {
@@ -131,19 +126,16 @@ public class VHDLBackendImpl extends AbstractBackend {
 		printTestbench(instance);
 
 		try {
-			networkPrinter = new STPrinter("VHDL_network");
-			networkPrinter.setExpressionPrinter(VHDLExpressionPrinter.class);
-			networkPrinter.setTypePrinter(VHDLTypePrinter.class);
+			printer.loadGroups("VHDL_network");
 
 			String outputName = path + File.separator + "Design"
 					+ File.separator + network.getName() + ".vhd";
-			networkPrinter.printNetwork(outputName, network, false, fifoSize);
+			printer.printNetwork(outputName, network, false, fifoSize);
 
 			for (Network subNetwork : network.getNetworks()) {
 				outputName = path + File.separator + "Design" + File.separator
 						+ subNetwork.getName() + ".vhd";
-				networkPrinter.printNetwork(outputName, subNetwork, false,
-						fifoSize);
+				printer.printNetwork(outputName, subNetwork, false, fifoSize);
 			}
 
 			new TCLPrinter().printTCL(path, instance);
@@ -157,7 +149,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 			String id = instance.getId();
 			String outputName = path + File.separator + "Testbench"
 					+ File.separator + id + "_tb.vhd";
-			tbPrinter.printInstance(outputName, instance);
+			printer.printInstance(outputName, instance);
 
 			if (instance.isNetwork()) {
 				Network network = instance.getNetwork();

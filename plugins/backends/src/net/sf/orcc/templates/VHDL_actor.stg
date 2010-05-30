@@ -145,11 +145,6 @@ listSize(value) ::= <<
 $value : {0 to $it$ -1}; separator=", "$
 >>
 
-// the values of a list: {val1, val2, ..., valn}
-listValue(value) ::= <<
-($value; wrap, separator=", "$)
->>
-
 signalDeclaration(variable) ::= <<
 $
 if(variable.port)
@@ -161,7 +156,7 @@ $$
   $$
     if(!variable.assignable)
     $
-constant $variable$ : $variable.type$ := $variable.constantValue; format="constant"$;$
+constant $variable$ : $variable.type$ := $Constant(variable.constantValue)$;$
     else
     $
 signal $variable$ : $variable.type$;$
@@ -174,7 +169,7 @@ signal $variable$ : $variable.type$;$
       if(variable.constantValue)
       $
 type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
-constant $variable$ : memory_type_$variable$ := $variable.constantValue; format="constant"$;$ 
+constant $variable$ : memory_type_$variable$ := $Constant(variable.constantValue)$;$ 
       endif
     $$
     else
@@ -210,12 +205,13 @@ $
 ///////////////////////////////////////////////////////////////////////////////
 // Constant Signal
 ///////////////////////////////////////////////////////////////////////////////
+
 stateConst(variable) ::= <<
 $
 if(variable.constantValue)
   $$
   if(variable.assignable)
-$$declareConst(variable=variable)$$
+$$declareConst(variable)$$
   endif
   $$
 endif
@@ -225,11 +221,36 @@ $
 
 
 declareConst(variable) ::= <<
-$variable$ <= $variable.constantValue; format="constant"$;
+$variable$ <= $Constant(variable.constantValue)$;
 
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// Constants
+///////////////////////////////////////////////////////////////////////////////
 
+Constant(constant) ::= <<
+$(constant.class.simpleName)(constant)$
+>>
+
+Boolean(constant) ::= <<
+$if (constant)$'1'$else$'0'$endif$
+>>
+
+Integer(constant) ::= <<
+$constant$
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+List(constant) ::= <<
+($constant: Constant(); wrap, separator=", "$)
+>>
+
+ArrayList(constant) ::= <<$List(constant)$>>
+
+String(constant) ::= <<
+"$constant$"
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions

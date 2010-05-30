@@ -51,7 +51,7 @@ List(constant) ::= <<
 ArrayList(constant) ::= <<$List(constant)$>>
 
 String(constant) ::= <<
-$constant; format="constant"$
+"$constant$"
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

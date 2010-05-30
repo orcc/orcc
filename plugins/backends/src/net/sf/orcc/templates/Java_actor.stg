@@ -67,10 +67,14 @@ setParameters(parameters) ::= <<
 $parameters: setParameter()$
 >>
 
+Boolean(constant) ::= <<
+$constant$
+>>
+
 // a state variable
 stateVar(variable) ::= <<
 $if(variable.constantValue)$
-private $variableDeclaration(variable)$ = $variable.constantValue; format="constant"$;
+private $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;
 $else$
 private $variableDeclarationInit(variable)$;
 $endif$

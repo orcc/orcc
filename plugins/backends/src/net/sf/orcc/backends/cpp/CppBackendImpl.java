@@ -100,10 +100,12 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 		}
 
-		printer = new STPrinter("C_actor", "Cpp_actorDecl");
+		printer = new STPrinter();
+		printer.loadGroups("C_actor", "Cpp_actorDecl");
 		printer.setExpressionPrinter(CppExprPrinter.class);
 		printer.setTypePrinter(CppTypePrinter.class);
-		impl_printer = new STPrinter("C_actor", "Cpp_actorImpl");
+		impl_printer = new STPrinter();
+		impl_printer.loadGroups("C_actor", "Cpp_actorImpl");
 		impl_printer.setExpressionPrinter(CppExprPrinter.class);
 		impl_printer.setTypePrinter(CppTypePrinter.class);
 
@@ -129,11 +131,13 @@ public class CppBackendImpl extends AbstractBackend {
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
 		try {
-			STPrinter networkPrinter = new STPrinter("Cpp_networkDecl");
+			STPrinter networkPrinter = new STPrinter();
+			networkPrinter.loadGroups("Cpp_networkDecl");
 			networkPrinter.setExpressionPrinter(CppExprPrinter.class);
 			networkPrinter.setTypePrinter(CppTypePrinter.class);
-			
-			STPrinter networkImplPrinter = new STPrinter("Cpp_networkImpl");
+
+			STPrinter networkImplPrinter = new STPrinter();
+			networkImplPrinter.loadGroups("Cpp_networkImpl");
 			networkImplPrinter.setExpressionPrinter(CppExprPrinter.class);
 			networkImplPrinter.setTypePrinter(CppTypePrinter.class);
 

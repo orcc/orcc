@@ -78,21 +78,6 @@ public final class STPrinter {
 
 	}
 
-	private class StringRenderer implements AttributeRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			// only calls toString when format is "constant"
-			// first tests for null because it is faster
-			if (formatString != null && "constant".equals(formatString)) {
-				return STPrinter.this.toString((String) o);
-			} else {
-				return (String) o;
-			}
-		}
-
-	}
-
 	private class TypeRenderer implements AttributeRenderer {
 
 		@Override
@@ -104,27 +89,31 @@ public final class STPrinter {
 
 	private Class<? extends ExpressionPrinter> expressionPrinter;
 
-	final protected STGroup group;
+	private STGroup group;
 
 	private Class<? extends TypePrinter> typePrinter;
 
 	/**
-	 * Creates a new StringTemplate printer with the given template group name.
+	 * Creates a new printer.
+	 */
+	public STPrinter() {
+	}
+
+	/**
+	 * Loads the given template groups.
 	 * 
 	 * @param groupNames
 	 *            names of the template groups
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	public STPrinter(String... groupNames) {
+	public void loadGroups(String... groupNames) {
 		group = TemplateGroupLoader.loadGroup(groupNames);
 
 		// set to "true" to inspect template
 		group.debug = false;
 
 		// register renderers
-		group.registerRenderer(String.class, new StringRenderer());
-
 		AttributeRenderer renderer;
 
 		Class<?>[] classesExpression = { BinaryExpr.class, BoolExpr.class,
@@ -247,14 +236,6 @@ public final class STPrinter {
 		}
 		expression.accept(printer, Integer.MAX_VALUE);
 		return printer.toString();
-	}
-
-	private String toString(String string) {
-		StringBuilder builder = new StringBuilder();
-		builder.append('"');
-		builder.append(string.replaceAll("\\\\", "\\\\\\\\"));
-		builder.append('"');
-		return builder.toString();
 	}
 
 	private String toString(Type type) {

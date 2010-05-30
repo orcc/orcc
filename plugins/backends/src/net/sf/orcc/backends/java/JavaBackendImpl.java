@@ -65,7 +65,8 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
-		printer = new STPrinter("C_actor", "Java_actor");
+		printer = new STPrinter();
+		printer.loadGroups("C_actor", "Java_actor");
 		printer.setExpressionPrinter(CppExprPrinter.class);
 		printer.setTypePrinter(JavaTypePrinter.class);
 
@@ -92,10 +93,7 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
 		try {
-			STPrinter networkPrinter = new STPrinter("C_network",
-					"Java_network");
-			networkPrinter.setExpressionPrinter(CppExprPrinter.class);
-			networkPrinter.setTypePrinter(JavaTypePrinter.class);
+			printer.loadGroups("C_network", "Java_network");
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);
@@ -103,7 +101,7 @@ public class JavaBackendImpl extends AbstractBackend {
 			String name = network.getName();
 			String outputName = path + File.separator + "Network_" + name
 					+ ".java";
-			networkPrinter.printNetwork(outputName, network, false, fifoSize);
+			printer.printNetwork(outputName, network, false, fifoSize);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

@@ -68,10 +68,10 @@ $location.startLine$$location.startColumn$$location.endColumn$
 >>
 
 ConstantValue(type, const) ::= <<
-$if(const.listConst)$$
+$if(type.list)$$
 listValue(type=type.type, values=const.value, iterator = type.sizeIterator)$
 $else
-$$const; format="constant"$
+$$const$
 $endif$
 
 >>

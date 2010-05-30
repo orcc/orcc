@@ -75,7 +75,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 			// TODO classify actors
 		}
 
-		printer = new STPrinter("LLVM_core", "LLVM_header", "LLVM_actor",
+		printer = new STPrinter();
+		printer.loadGroups("LLVM_core", "LLVM_header", "LLVM_actor",
 				"LLVM_metadata");
 		printer.setExpressionPrinter(LLVMExprPrinter.class);
 		printer.setTypePrinter(LLVMTypePrinter.class);

@@ -20,9 +20,14 @@ $variable.type$ $variable$$listSize(variable.type.dimensions)$
 ///////////////////////////////////////////////////////////////////////////////
 // Const state variables
 ///////////////////////////////////////////////////////////////////////////////
+
+Boolean(constant) ::= <<
+$constant$
+>>
+
 stateVar(variable) ::= <<
 $if(variable.constantValue)$
-$variableDeclaration(variable)$ = $variable.constantValue; format="constant"$;$\n$
+$variableDeclaration(variable)$ = $Constant(variable.constantValue)$;$\n$
 $endif$
 >>
 
