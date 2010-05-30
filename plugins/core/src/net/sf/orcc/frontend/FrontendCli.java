@@ -29,9 +29,6 @@
 package net.sf.orcc.frontend;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,12 +36,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstActor;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.parser.IParseResult;
-import org.eclipse.xtext.parser.IParser;
-import org.eclipse.xtext.parser.antlr.IAntlrParser;
-
-import com.google.inject.Injector;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -71,29 +66,30 @@ public class FrontendCli {
 
 	private Frontend frontend;
 
-	private IParser parser;
-
 	public FrontendCli(String vtlFolder, String outputFolder)
 			throws OrccException {
 		File file = new File(outputFolder);
 		if (!file.exists()) {
 			file.mkdir();
 		}
-		
+
 		frontend = new Frontend(outputFolder);
 
-		// guice stuff
-		Injector guiceInjector = new CalStandaloneSetup()
-				.createInjectorAndDoEMFRegistration();
-		parser = guiceInjector.getInstance(IAntlrParser.class);
+		System.out.println("doing setup of CAL Xtext parser");
+		CalStandaloneSetup.doSetup();
+		System.out.println("done");
 
 		File vtl = new File(vtlFolder);
 		actors = new ArrayList<File>();
 		getActors(vtl);
+
+		resourceSet = new ResourceSetImpl();
 		for (File actor : actors) {
 			processActor(actor);
 		}
 	}
+
+	private ResourceSet resourceSet;
 
 	private void getActors(File vtl) {
 		for (File file : vtl.listFiles()) {
@@ -106,16 +102,9 @@ public class FrontendCli {
 	}
 
 	private void processActor(File actorPath) throws OrccException {
-		AstActor astActor = null;
-
-		try {
-			Reader in = new FileReader(actorPath);
-			IParseResult result = parser.parse(in);
-			EObject root = result.getRootASTElement();
-			astActor = (AstActor) root;
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
+		URI uri = URI.createFileURI(actorPath.getAbsolutePath());
+		Resource resource = resourceSet.getResource(uri, true);
+		AstActor astActor = (AstActor) resource.getContents().get(0);
 
 		frontend.compile(actorPath.getAbsolutePath(), astActor);
 	}

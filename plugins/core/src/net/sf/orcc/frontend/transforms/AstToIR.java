@@ -32,8 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.common.util.EList;
-
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
@@ -53,14 +51,18 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -69,10 +71,6 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class AstToIR {
-
-	private class ExpressionTransformer extends CalSwitch<Expression> {
-
-	}
 
 	private class TypeTransformer extends CalSwitch<Type> {
 
@@ -83,7 +81,13 @@ public class AstToIR {
 
 		@Override
 		public Type caseAstTypeInt(AstTypeInt type) {
-			Expression size = exprEvaluator.evaluateAsIntExpr(type.getSize());
+			AstExpression astSize = type.getSize();
+			Expression size;
+			if (astSize == null) {
+				size = new IntExpr(Util.getLocation(type), 32);
+			} else {
+				size = exprEvaluator.evaluateAsIntExpr(astSize);
+			}
 			return new IntType(size);
 		}
 
@@ -97,15 +101,19 @@ public class AstToIR {
 
 		@Override
 		public Type caseAstTypeUint(AstTypeUint type) {
-			Expression size = exprEvaluator.evaluateAsIntExpr(type.getSize());
+			AstExpression astSize = type.getSize();
+			Expression size;
+			if (astSize == null) {
+				size = new IntExpr(Util.getLocation(type), 32);
+			} else {
+				size = exprEvaluator.evaluateAsIntExpr(astSize);
+			}
 			return new UintType(size);
 		}
 
 	}
 
-	final private AstExpressionEvaluator exprEvaluator;
-
-	final private ExpressionTransformer exprTransformer;
+	private AstExpressionEvaluator exprEvaluator;
 
 	private String file;
 
@@ -120,8 +128,6 @@ public class AstToIR {
 		variableMap = new HashMap<AstVariable, Variable>();
 		variableMap.toString();
 
-		exprEvaluator = new AstExpressionEvaluator();
-		exprTransformer = new ExpressionTransformer();
 		typeTransformer = new TypeTransformer();
 	}
 
@@ -136,6 +142,7 @@ public class AstToIR {
 	 */
 	public Actor transform(String file, AstActor astActor) {
 		this.file = file;
+		exprEvaluator = new AstExpressionEvaluator(file);
 
 		String name = astActor.getName();
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
@@ -161,15 +168,27 @@ public class AstToIR {
 		for (AstVariable astVariable : stateVariables) {
 			Location location = Util.getLocation(astVariable);
 			Type type = transformType(astVariable.getType());
-			Object initialValue = astVariable.getValue();
-			
+			String name = astVariable.getName();
+			boolean assignable = astVariable.isAssignable();
+
+			// evaluate initial value (if any)
+			AstExpression astValue = astVariable.getValue();
+			Object initialValue;
+			if (astValue == null) {
+				initialValue = null;
+			} else {
+				initialValue = exprEvaluator.evaluate(astValue);
+
+				// register the value
+				exprEvaluator.registerValue(astVariable, initialValue);
+			}
+
+			StateVariable stateVariable = new StateVariable(location, type,
+					name, assignable, initialValue);
+			stateVars.add(file, location, name, stateVariable);
 		}
 
 		return stateVars;
-	}
-
-	private Expression transformExpression(AstExpression expr) {
-		return exprTransformer.doSwitch(expr);
 	}
 
 	private OrderedMap<Port> transformPorts(List<AstPort> portList) {

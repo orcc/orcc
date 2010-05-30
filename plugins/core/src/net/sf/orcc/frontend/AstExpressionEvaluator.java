@@ -55,9 +55,12 @@ import net.sf.orcc.ir.expr.UnaryOp;
  */
 public class AstExpressionEvaluator extends CalSwitch<Object> {
 
+	private String file;
+
 	private Map<AstVariable, Object> values;
 
-	public AstExpressionEvaluator() {
+	public AstExpressionEvaluator(String file) {
+		this.file = file;
 		this.values = new HashMap<AstVariable, Object>();
 	}
 
@@ -269,8 +272,10 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		AstVariable variable = expression.getValue().getVariable();
 		Object value = values.get(variable);
 		if (value == null) {
-			throw new OrccRuntimeException("variable " + variable.getName()
-					+ " does not have a compile-time constant value");
+			String message = "variable " + variable.getName()
+					+ " does not have a compile-time constant value";
+			throw new OrccRuntimeException(file, Util.getLocation(expression),
+					message);
 		}
 
 		return value;
