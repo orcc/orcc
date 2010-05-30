@@ -52,7 +52,7 @@ public class FrontendCli {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws OrccException {
+	public static void main(String[] args) {
 		if (args.length == 2) {
 			new FrontendCli(args[0], args[1]);
 		} else {
@@ -66,8 +66,7 @@ public class FrontendCli {
 
 	private Frontend frontend;
 
-	public FrontendCli(String vtlFolder, String outputFolder)
-			throws OrccException {
+	public FrontendCli(String vtlFolder, String outputFolder) {
 		File file = new File(outputFolder);
 		if (!file.exists()) {
 			file.mkdir();
@@ -101,12 +100,16 @@ public class FrontendCli {
 		}
 	}
 
-	private void processActor(File actorPath) throws OrccException {
+	private void processActor(File actorPath) {
 		URI uri = URI.createFileURI(actorPath.getAbsolutePath());
 		Resource resource = resourceSet.getResource(uri, true);
 		AstActor astActor = (AstActor) resource.getContents().get(0);
 
-		frontend.compile(actorPath.getAbsolutePath(), astActor);
+		try {
+			frontend.compile(actorPath.getAbsolutePath(), astActor);
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
