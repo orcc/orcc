@@ -37,8 +37,21 @@ import java.util.Locale;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.FloatType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.network.Instance;
-import net.sf.orcc.util.INameable;
 
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.ST;
@@ -51,7 +64,67 @@ import org.stringtemplate.v4.debug.DebugST;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class STPrinter implements AttributeRenderer {
+public abstract class STPrinter {
+
+	private class BooleanRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			return STPrinter.this.toString((Boolean) o);
+		}
+
+	}
+
+	private class ExpressionRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			return STPrinter.this.toString((Expression) o);
+		}
+
+	}
+
+	private class IntegerRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			return STPrinter.this.toString((Integer) o);
+		}
+
+	}
+
+	private class ListRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			return STPrinter.this.toString((List<?>) o);
+		}
+
+	}
+
+	private class StringRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			// only calls toString when format is "constant"
+			// first tests for null because it is faster
+			if (formatString != null && "constant".equals(formatString)) {
+				return STPrinter.this.toString((String) o);
+			} else {
+				return (String) o;
+			}
+		}
+
+	}
+
+	private class TypeRenderer implements AttributeRenderer {
+
+		@Override
+		public String toString(Object o, String formatString, Locale locale) {
+			return STPrinter.this.toString((Type) o);
+		}
+
+	}
 
 	final protected STGroup group;
 
@@ -68,6 +141,36 @@ public abstract class STPrinter implements AttributeRenderer {
 
 		// set to "true" to inspect template
 		group.debug = false;
+
+		// register renderers
+		group.registerRenderer(Boolean.class, new BooleanRenderer());
+		group.registerRenderer(Integer.class, new IntegerRenderer());
+		group.registerRenderer(List.class, new ListRenderer());
+		group.registerRenderer(String.class, new StringRenderer());
+
+		/*Class<?>[] classesINameable = { Procedure.class, GlobalVariable.class,
+				LocalVariable.class, Port.class, StateVariable.class,
+				Variable.class };
+		AttributeRenderer renderer = new INameableRenderer();
+		for (Class<?> clasz : classesINameable) {
+			group.registerRenderer(clasz, renderer);
+		}*/
+
+		Class<?>[] classesExpression = { BinaryExpr.class, BoolExpr.class,
+				IntExpr.class, ListExpr.class, StringExpr.class,
+				UnaryExpr.class, VarExpr.class };
+		AttributeRenderer renderer = new ExpressionRenderer();
+		for (Class<?> clasz : classesExpression) {
+			group.registerRenderer(clasz, renderer);
+		}
+
+		Class<?>[] classesType = { BoolType.class, FloatType.class,
+				IntType.class, ListType.class, StringType.class,
+				UintType.class, VoidType.class };
+		renderer = new TypeRenderer();
+		for (Class<?> clasz : classesType) {
+			group.registerRenderer(clasz, renderer);
+		}
 	}
 
 	/**
@@ -124,9 +227,7 @@ public abstract class STPrinter implements AttributeRenderer {
 		return bool.toString();
 	}
 
-	protected String toString(INameable nameable) {
-		return nameable.toString();
-	}
+	protected abstract String toString(Expression expression);
 
 	protected String toString(Integer integer) {
 		return integer.toString();
@@ -144,25 +245,6 @@ public abstract class STPrinter implements AttributeRenderer {
 		return template.render(80);
 	}
 
-	@Override
-	public String toString(Object o, String formatString, Locale locale) {
-		if (o instanceof Boolean) {
-			return toString((Boolean) o);
-		} else if (o instanceof Integer) {
-			return toString((Integer) o);
-		} else if (o instanceof List<?>) {
-			return toString((List<?>) o);
-		} else if (o instanceof Expression) {
-			return toString((Expression) o);
-		} else if (o instanceof INameable) {
-			return toString((INameable) o);
-		} else if (o instanceof Type) {
-			return toString((Type) o);
-		}
-
-		return null;
-	}
-
 	protected String toString(String string) {
 		StringBuilder builder = new StringBuilder();
 		builder.append('"');
@@ -170,8 +252,6 @@ public abstract class STPrinter implements AttributeRenderer {
 		builder.append('"');
 		return builder.toString();
 	}
-
-	protected abstract String toString(Expression expression);
 
 	protected abstract String toString(Type type);
 

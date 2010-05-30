@@ -29,15 +29,9 @@
  */
 package net.sf.orcc.backends.vhdl;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.util.INameable;
 
 /**
  * This class defines a VHDL actor printer.
@@ -47,24 +41,11 @@ import net.sf.orcc.util.INameable;
  */
 public final class VHDLTestbenchPrinter extends STPrinter {
 
-	public static Pattern adjacent_ = Pattern.compile("_+");
-
-	private Map<String, String> transformations;
-
 	/**
-	 * Creates a new network printer with the template "VHDL_actor".
-	 * 
-	 * @throws IOException
-	 *             If the template file could not be read.
+	 * Creates a new testbench printer with the template "VHDL_testbench".
 	 */
 	public VHDLTestbenchPrinter() {
 		super("VHDL_testbench");
-
-		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_1");
-		transformations.put("access", "access_1");
-		transformations.put("component", "component_1");
-		transformations.put("select", "select_1");
 	}
 
 	@Override
@@ -77,17 +58,6 @@ public final class VHDLTestbenchPrinter extends STPrinter {
 		VHDLExpressionPrinter printer = new VHDLExpressionPrinter();
 		expression.accept(printer, Integer.MAX_VALUE);
 		return printer.toString();
-	}
-
-	@Override
-	public String toString(INameable nameable) {
-		String name = nameable.getName();
-		if (transformations.containsKey(name)) {
-			return transformations.get(name);
-		} else {
-			// replaces adjacent underscores by a single underscore
-			return adjacent_.matcher(name).replaceAll("_");
-		}
 	}
 
 	@Override

@@ -29,13 +29,10 @@
 package net.sf.orcc.backends.c;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.util.INameable;
 
 /**
  * This class defines a C actor printer.
@@ -45,8 +42,6 @@ import net.sf.orcc.util.INameable;
  */
 public final class CActorPrinter extends STPrinter {
 
-	private Map<String, String> transformations;
-
 	/**
 	 * Creates a new network printer with the template "C_actor".
 	 * 
@@ -55,12 +50,6 @@ public final class CActorPrinter extends STPrinter {
 	 */
 	public CActorPrinter() {
 		super("C_actor");
-
-		transformations = new HashMap<String, String>();
-		transformations.put("abs", "abs_");
-		transformations.put("index", "index_");
-		transformations.put("getw", "getw_");
-		transformations.put("select", "select_");
 	}
 
 	@Override
@@ -72,16 +61,6 @@ public final class CActorPrinter extends STPrinter {
 		CExpressionPrinter printer = new CExpressionPrinter();
 		expression.accept(printer, Integer.MAX_VALUE);
 		return printer.toString();
-	}
-
-	@Override
-	public String toString(INameable nameable) {
-		String name = nameable.getName();
-		if (transformations.containsKey(name)) {
-			return transformations.get(name);
-		} else {
-			return name;
-		}
 	}
 
 	public String toString(Type type) {

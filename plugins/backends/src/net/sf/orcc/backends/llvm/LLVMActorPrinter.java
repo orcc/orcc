@@ -33,9 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.util.INameable;
 
 /**
  * This class defines a LLVM actor printer.
@@ -70,20 +68,6 @@ public final class LLVMActorPrinter extends STPrinter {
 		LLVMExprPrinter printer = new LLVMExprPrinter();
 		expression.accept(printer);
 		return printer.toString();
-	}
-
-	@Override
-	public String toString(INameable nameable) {
-		if (nameable instanceof Procedure) {
-			Procedure procedure = (Procedure) nameable;
-			if(procedure.getName().startsWith("isSchedulable_")){
-				// procedure is type of isSchedulable
-				return "@" + nameable.getName(); 
-			}
-			return "@action_" + nameable.getName();
-		} else {
-			return nameable.getName();
-		}
 	}
 
 	@Override

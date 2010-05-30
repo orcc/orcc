@@ -71,7 +71,7 @@ ConstantValue(type, const) ::= <<
 $if(const.listConst)$$
 listValue(type=type.type, values=const.value, iterator = type.sizeIterator)$
 $else
-$$const$
+$$const; format="constant"$
 $endif$
 
 >>

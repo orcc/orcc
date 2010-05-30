@@ -39,12 +39,12 @@ stateVar(variable) ::= <<
 $if(variable.constantValue)$
 $if(!variable.assignable)$
 $if(!variable.type.list)$
-#define $variable$ $variable.constantValue$
+#define $variable$ $variable.constantValue; format="constant"$
 $else$
-static $variableDeclaration(variable)$ = $variable.constantValue$;
+static $variableDeclaration(variable)$ = $variable.constantValue; format="constant"$;
 $endif$
 $else$
-static $variableDeclaration(variable)$ = $variable.constantValue$;
+static $variableDeclaration(variable)$ = $variable.constantValue; format="constant"$;
 $endif$
 $else$
 static $variableDeclaration(variable)$;

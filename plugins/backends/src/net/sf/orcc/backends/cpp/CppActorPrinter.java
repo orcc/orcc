@@ -33,7 +33,6 @@ import java.io.IOException;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.util.INameable;
 
 /**
  * This class defines a C++ actor printer.
@@ -59,11 +58,6 @@ public final class CppActorPrinter extends STPrinter {
 		CppExprPrinter printer = new CppExprPrinter();
 		expression.accept(printer, Integer.MAX_VALUE);
 		return printer.toString();
-	}
-
-	@Override
-	public String toString(INameable nameable) {
-		return nameable.getName();
 	}
 
 	@Override

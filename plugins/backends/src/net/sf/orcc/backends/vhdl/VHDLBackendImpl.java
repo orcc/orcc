@@ -31,11 +31,15 @@ package net.sf.orcc.backends.vhdl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
@@ -58,6 +62,8 @@ import net.sf.orcc.network.Network;
  */
 public class VHDLBackendImpl extends AbstractBackend {
 
+	public static Pattern adjacentUnderscores = Pattern.compile("_+");
+
 	/**
 	 * 
 	 * @param args
@@ -66,12 +72,21 @@ public class VHDLBackendImpl extends AbstractBackend {
 		main(VHDLBackendImpl.class, args);
 	}
 
-	/**
-	 * printers are protected
-	 */
-	private VHDLActorPrinter printer;
 	private NetworkPrinter networkPrinter;
+
+	private VHDLActorPrinter printer;
+
 	private VHDLTestbenchPrinter tbPrinter;
+
+	private final Map<String, String> transformations;
+
+	public VHDLBackendImpl() {
+		transformations = new HashMap<String, String>();
+		transformations.put("abs", "abs_1");
+		transformations.put("access", "access_1");
+		transformations.put("component", "component_1");
+		transformations.put("select", "select_1");
+	}
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
@@ -149,8 +164,13 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
+		ActorTransformation[] transformations = {
+				new DeadGlobalElimination(),
+				new DeadCodeElimination(),
+				new DeadVariableRemoval(),
+				new RenameTransformation(this.transformations),
+				// replaces adjacent underscores by a single underscore
+				new RenameTransformation(adjacentUnderscores, "_"),
 				new Inline(), new PhiRemoval(), new VariableRedimension(),
 				new BoolExprTransform(), new VariableRenamer(),
 				new TransformConditionals() };

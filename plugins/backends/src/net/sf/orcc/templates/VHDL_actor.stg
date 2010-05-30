@@ -161,7 +161,7 @@ $$
   $$
     if(!variable.assignable)
     $
-constant $variable$ : $variable.type$ := $variable.constantValue$;$
+constant $variable$ : $variable.type$ := $variable.constantValue; format="constant"$;$
     else
     $
 signal $variable$ : $variable.type$;$
@@ -174,7 +174,7 @@ signal $variable$ : $variable.type$;$
       if(variable.constantValue)
       $
 type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
-constant $variable$ : memory_type_$variable$ := $variable.constantValue$;$ 
+constant $variable$ : memory_type_$variable$ := $variable.constantValue; format="constant"$;$ 
       endif
     $$
     else
@@ -225,7 +225,7 @@ $
 
 
 declareConst(variable) ::= <<
-$variable$ <= $variable.constantValue$;
+$variable$ <= $variable.constantValue; format="constant"$;
 
 >>
 

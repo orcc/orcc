@@ -70,7 +70,7 @@ $parameters: setParameter()$
 // a state variable
 stateVar(variable) ::= <<
 $if(variable.constantValue)$
-private $variableDeclaration(variable)$ = $variable.constantValue$;
+private $variableDeclaration(variable)$ = $variable.constantValue; format="constant"$;
 $else$
 private $variableDeclarationInit(variable)$;
 $endif$

@@ -22,7 +22,7 @@ $variable.type$ $variable$$listSize(variable.type.dimensions)$
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
 $if(variable.constantValue)$
-$variableDeclaration(variable)$ = $variable.constantValue$;$\n$
+$variableDeclaration(variable)$ = $variable.constantValue; format="constant"$;$\n$
 $endif$
 >>
 

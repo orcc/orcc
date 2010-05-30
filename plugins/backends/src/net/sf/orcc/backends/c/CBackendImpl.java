@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,15 @@ package net.sf.orcc.backends.c;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.NetworkPrinter;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
+import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
@@ -61,6 +64,16 @@ public class CBackendImpl extends AbstractBackend {
 	 */
 	protected CActorPrinter printer;
 
+	private final Map<String, String> transformations;
+
+	public CBackendImpl() {
+		transformations = new HashMap<String, String>();
+		transformations.put("abs", "abs_");
+		transformations.put("index", "index_");
+		transformations.put("getw", "getw_");
+		transformations.put("select", "select_");
+	}
+
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
@@ -74,7 +87,7 @@ public class CBackendImpl extends AbstractBackend {
 			if (normalize) {
 				network.normalizeActors();
 			}
-			
+
 			boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
 			if (merge) {
 				network.mergeActors();
@@ -134,6 +147,7 @@ public class CBackendImpl extends AbstractBackend {
 	protected void transformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new RenameTransformation(this.transformations),
 				new PhiRemoval(), new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
