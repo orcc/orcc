@@ -28,16 +28,10 @@
  */
 package net.sf.orcc.backends.xlim;
 
+import java.util.List;
+
 import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
-import net.sf.orcc.backends.xlim.templates.XlimNodeTemplate;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstantVisitor;
-import net.sf.orcc.ir.consts.IntConst;
-import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.ir.consts.StringConst;
-import net.sf.orcc.ir.type.ListType;
 
 import org.w3c.dom.Element;
 
@@ -46,7 +40,7 @@ import org.w3c.dom.Element;
  * 
  * @author Samuel Keller EPFL
  */
-public class XlimValueVisitor implements ConstantVisitor, XlimAttributeTemplate {
+public class XlimValueVisitor implements XlimAttributeTemplate {
 
 	/**
 	 * Element to modify
@@ -79,9 +73,9 @@ public class XlimValueVisitor implements ConstantVisitor, XlimAttributeTemplate 
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(BoolConst constant, Object... args) {
+	public void visit(Boolean constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		element.setAttribute(VALUE, constant.getValue() ? "1" : "0");
+		element.setAttribute(VALUE, constant.booleanValue() ? "1" : "0");
 	}
 
 	/**
@@ -92,9 +86,9 @@ public class XlimValueVisitor implements ConstantVisitor, XlimAttributeTemplate 
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(IntConst constant, Object... args) {
+	public void visit(Integer constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		element.setAttribute(VALUE, Integer.toString(constant.getValue()));
+		element.setAttribute(VALUE, Integer.toString(constant));
 	}
 
 	/**
@@ -105,13 +99,14 @@ public class XlimValueVisitor implements ConstantVisitor, XlimAttributeTemplate 
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(ListConst constant, Object... args) {
+	public void visit(List<?> constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		for (Constant value : constant.getValue()) {
-			Element sub = XlimNodeTemplate.newInitValue(element);
-			value.accept(new XlimValueVisitor(sub, ((ListType) type)
-					.getElementType()));
-		}
+		// FIXME
+		// for (Object value : constant) {
+		// Element sub = XlimNodeTemplate.newInitValue(element);
+		// value.accept(new XlimValueVisitor(sub, ((ListType) type)
+		// .getElementType()));
+		// }
 	}
 
 	/**
@@ -122,9 +117,9 @@ public class XlimValueVisitor implements ConstantVisitor, XlimAttributeTemplate 
 	 * @param args
 	 *            Arguments sent (not used)
 	 */
-	public void visit(StringConst constant, Object... args) {
+	public void visit(String constant, Object... args) {
 		type.accept(new XlimTypeSizeVisitor(element));
-		element.setAttribute(VALUE, constant.getValue());
+		element.setAttribute(VALUE, constant);
 	}
 
 }

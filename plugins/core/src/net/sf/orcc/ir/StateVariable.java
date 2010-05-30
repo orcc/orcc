@@ -56,10 +56,10 @@ public class StateVariable extends GlobalVariable {
 	 *            initial value
 	 */
 	public StateVariable(Location location, Type type, String name,
-			boolean assignable, Constant value) {
+			boolean assignable, Object initialValue) {
 		super(location, type, name);
 		this.assignable = assignable;
-		this.constantValue = value;
+		this.initialValue = initialValue;
 	}
 
 	/**

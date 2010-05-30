@@ -29,9 +29,9 @@
 package net.sf.orcc.backends.llvm;
 
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.orcc.backends.STPrinter;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -54,12 +54,15 @@ public final class LLVMActorPrinter extends STPrinter {
 	public LLVMActorPrinter() {
 		super("LLVM_core", "LLVM_header", "LLVM_actor", "LLVM_metadata");
 	}
+	
+	@Override
+	public String toString(Boolean bool) {
+		return bool.booleanValue() ? "1" : "0";
+	}
 
 	@Override
-	public String toString(Constant constant) {
-		LLVMConstPrinter printer = new LLVMConstPrinter();
-		constant.accept(printer);
-		return printer.toString();
+	protected String toString(List<?> list) {
+		return list.toString();
 	}
 
 	@Override

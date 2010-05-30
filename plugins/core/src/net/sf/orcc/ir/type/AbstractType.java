@@ -31,7 +31,6 @@ package net.sf.orcc.ir.type;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.orcc.ir.Printer;
 import net.sf.orcc.ir.Type;
 
 /**
@@ -91,7 +90,9 @@ public abstract class AbstractType implements Type {
 
 	@Override
 	public String toString() {
-		return Printer.getInstance().toString(this);
+		TypePrinter printer = new TypePrinter();
+		accept(printer);
+		return printer.toString();
 	}
 
 }

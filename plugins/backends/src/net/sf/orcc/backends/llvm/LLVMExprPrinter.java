@@ -35,11 +35,11 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 
 /**
  * This class defines an LLVM expression printer.
@@ -47,7 +47,7 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
  * @author Jérôme GORIN
  * 
  */
-public class LLVMExprPrinter extends DefaultExpressionPrinter {
+public class LLVMExprPrinter extends ExpressionPrinter {
 
 	private boolean signed;
 

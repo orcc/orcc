@@ -29,7 +29,7 @@
 package net.sf.orcc.ir;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.consts.AbstractConstant;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 
 /**
  * This class represents a global variable. A global variable is a variable that
@@ -44,7 +44,7 @@ public class GlobalVariable extends Variable {
 	/**
 	 * variable constant value.
 	 */
-	protected Constant constantValue;
+	protected Object initialValue;
 
 	/**
 	 * Creates a new global variable from the given global variable.
@@ -54,7 +54,7 @@ public class GlobalVariable extends Variable {
 	 */
 	public GlobalVariable(GlobalVariable variable) {
 		super(variable);
-		this.constantValue = variable.constantValue;
+		this.initialValue = variable.initialValue;
 	}
 
 	/**
@@ -98,25 +98,20 @@ public class GlobalVariable extends Variable {
 	 */
 	public void evaluate() {
 		if (hasExpression()) {
-			constantValue = AbstractConstant.evaluate(getExpression());
+			initialValue = getExpression().accept(new ExpressionEvaluator());
 		}
 	}
 
 	/**
-	 * Returns the constant value of this global variable. If this variable has
-	 * no constant value, {@link #evaluate()} is called first.
+	 * Returns the initial value of this global variable, or <code>null</code>
+	 * if this variable has no initial constant value. The initial value may be
+	 * a boolean, an integer, a list or a string.
 	 * 
-	 * @return a constant, or <code>null</code> if this variable has no constant
-	 *         value.
-	 * @throws OrccRuntimeException
-	 *             if the value could not be evaluated to a constant
+	 * @return an object, or <code>null</code> if this variable has no constant
+	 *         value
 	 */
-	public Constant getConstantValue() {
-		if (constantValue == null && hasExpression()) {
-			evaluate();
-		}
-
-		return constantValue;
+	public Object getConstantValue() {
+		return initialValue;
 	}
 
 }

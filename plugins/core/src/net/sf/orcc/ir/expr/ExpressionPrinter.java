@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.printers;
+package net.sf.orcc.ir.expr;
 
 import java.util.Iterator;
 import java.util.List;
@@ -50,14 +50,14 @@ import net.sf.orcc.ir.expr.VarExpr;
  * @author Matthieu Wipliez
  * 
  */
-public class DefaultExpressionPrinter implements ExpressionVisitor {
+public class ExpressionPrinter implements ExpressionVisitor {
 
 	protected StringBuilder builder;
 
 	/**
 	 * Creates a new expression printer.
 	 */
-	public DefaultExpressionPrinter() {
+	public ExpressionPrinter() {
 		builder = new StringBuilder();
 	}
 

@@ -31,7 +31,6 @@ package net.sf.orcc.backends.cpp;
 import java.io.IOException;
 
 import net.sf.orcc.backends.STPrinter;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.INameable;
@@ -53,13 +52,6 @@ public final class CppActorPrinter extends STPrinter {
 	 */
 	public CppActorPrinter(String name) {
 		super("C_actor", name);
-	}
-
-	@Override
-	public String toString(Constant constant) {
-		CppConstPrinter printer = new CppConstPrinter(group);
-		constant.accept(printer);
-		return printer.toString();
 	}
 
 	@Override

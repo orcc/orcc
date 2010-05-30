@@ -31,11 +31,16 @@ package net.sf.orcc.backends;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Locale;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Printer;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.network.Instance;
+import net.sf.orcc.util.INameable;
 
+import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.debug.DebugST;
@@ -46,7 +51,7 @@ import org.stringtemplate.v4.debug.DebugST;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class STPrinter extends Printer {
+public abstract class STPrinter implements AttributeRenderer {
 
 	final protected STGroup group;
 
@@ -63,9 +68,6 @@ public abstract class STPrinter extends Printer {
 
 		// set to "true" to inspect template
 		group.debug = false;
-
-		// registers this printer as the default printer
-		Printer.register(this);
 	}
 
 	/**
@@ -117,5 +119,60 @@ public abstract class STPrinter extends Printer {
 			os.close();
 		}
 	}
+
+	protected String toString(Boolean bool) {
+		return bool.toString();
+	}
+
+	protected String toString(INameable nameable) {
+		return nameable.toString();
+	}
+
+	protected String toString(Integer integer) {
+		return integer.toString();
+	}
+
+	protected String toString(List<?> list) {
+		// set instance of list template as current template
+		ST template = group.getInstanceOf("listValue");
+		for (Object cst : list) {
+			template.add("value", cst.toString());
+		}
+
+		// restore previous template as current template, and set attribute
+		// "value" to the instance of the list template
+		return template.render(80);
+	}
+
+	@Override
+	public String toString(Object o, String formatString, Locale locale) {
+		if (o instanceof Boolean) {
+			return toString((Boolean) o);
+		} else if (o instanceof Integer) {
+			return toString((Integer) o);
+		} else if (o instanceof List<?>) {
+			return toString((List<?>) o);
+		} else if (o instanceof Expression) {
+			return toString((Expression) o);
+		} else if (o instanceof INameable) {
+			return toString((INameable) o);
+		} else if (o instanceof Type) {
+			return toString((Type) o);
+		}
+
+		return null;
+	}
+
+	protected String toString(String string) {
+		StringBuilder builder = new StringBuilder();
+		builder.append('"');
+		builder.append(string.replaceAll("\\\\", "\\\\\\\\"));
+		builder.append('"');
+		return builder.toString();
+	}
+
+	protected abstract String toString(Expression expression);
+
+	protected abstract String toString(Type type);
 
 }

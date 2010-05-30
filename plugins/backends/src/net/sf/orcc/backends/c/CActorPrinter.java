@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.orcc.backends.STPrinter;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.INameable;
@@ -65,13 +64,10 @@ public final class CActorPrinter extends STPrinter {
 	}
 
 	@Override
-	public String toString(Constant constant) {
-		CConstPrinter printer = new CConstPrinter(group);
-		constant.accept(printer);
-		return printer.toString();
+	public String toString(Boolean bool) {
+		return bool.booleanValue() ? "1" : "0";
 	}
 
-	@Override
 	public String toString(Expression expression) {
 		CExpressionPrinter printer = new CExpressionPrinter();
 		expression.accept(printer, Integer.MAX_VALUE);
@@ -88,7 +84,6 @@ public final class CActorPrinter extends STPrinter {
 		}
 	}
 
-	@Override
 	public String toString(Type type) {
 		CTypePrinter printer = new CTypePrinter();
 		type.accept(printer);

@@ -40,7 +40,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.Instruction;
@@ -50,7 +49,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.consts.ConstantEvaluator;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -111,8 +109,9 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * Interpretation and evaluation tools
 	 */
 	protected NodeInterpreter interpret;
-	private ConstantEvaluator constEval;
+
 	protected ExpressionEvaluator exprInterpreter;
+
 	private ListAllocator listAllocator;
 
 	/**
@@ -145,13 +144,12 @@ public class InterpretedActor extends AbstractInterpretedActor {
 
 		// Register master process (used for console I/O access)
 		this.process = process;
-		
+
 		// Build a node interpreter for visiting CFG and instructions
 		interpret = new NodeInterpreter();
 		// Create the List allocator for state and procedure local vars
 		this.listAllocator = new ListAllocator();
-		// Creates an expression evaluator for state and local variables init
-		this.constEval = new ConstantEvaluator();
+
 		// Create the expression evaluator
 		this.exprInterpreter = new ExpressionEvaluator();
 
@@ -334,7 +332,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 			for (Variable stateVar : actor.getStateVars()) {
 				Type type = stateVar.getType();
 				// Initialize variables with constant values
-				Constant initConst = ((StateVariable) stateVar)
+				Object initConst = ((StateVariable) stateVar)
 						.getConstantValue();
 				if (initConst == null) {
 					if (type.isList()) {
@@ -343,8 +341,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 					}
 				} else {
 					// initialize
-					Object initVal = initConst.accept(constEval);
-					stateVar.setValue(initVal);
+					stateVar.setValue(initConst);
 				}
 			}
 
@@ -555,7 +552,8 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	public void setBreakpoint(int breakpoint) {
 		Breakpoint bkpt = new Breakpoint(actor.getActions().get(0), breakpoint);
 		for (Action action : actor.getActions()) {
-			if ((action.getLocation().getStartLine() > bkpt.action.getLocation().getStartLine())
+			if ((action.getLocation().getStartLine() > bkpt.action
+					.getLocation().getStartLine())
 					&& (action.getLocation().getStartLine() < breakpoint)) {
 				bkpt.action = action;
 			}

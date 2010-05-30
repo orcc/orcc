@@ -34,11 +34,11 @@ import java.math.BigInteger;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.printers.DefaultTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypePrinter;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 
@@ -48,7 +48,7 @@ import net.sf.orcc.ir.type.VoidType;
  * @author Nicolas Siret
  * 
  */
-public class VHDLTypePrinter extends DefaultTypePrinter {
+public class VHDLTypePrinter extends TypePrinter {
 
 	/**
 	 * Prints an integer with the given number of bits.

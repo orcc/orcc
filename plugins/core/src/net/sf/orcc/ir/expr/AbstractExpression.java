@@ -31,7 +31,6 @@ package net.sf.orcc.ir.expr;
 import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Printer;
 
 /**
  * This interface defines an expression.
@@ -96,7 +95,9 @@ public abstract class AbstractExpression extends AbstractLocalizable implements
 
 	@Override
 	public String toString() {
-		return Printer.getInstance().toString(this);
+		ExpressionPrinter printer = new ExpressionPrinter();
+		accept(printer, Integer.MAX_VALUE);
+		return printer.toString();
 	}
 
 }

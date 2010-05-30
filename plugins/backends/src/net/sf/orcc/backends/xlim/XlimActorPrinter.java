@@ -51,7 +51,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
@@ -208,8 +207,8 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 											"_scheduler_" + action.getName()));
 							Element operationE = XlimNodeTemplate.newOperation(
 									body, NOOP);
-							XlimNodeTemplate.newInPort(operationE, names
-									.getTempName());
+							XlimNodeTemplate.newInPort(operationE,
+									names.getTempName());
 							XlimNodeTemplate.newOutPort(operationE, ready,
 									assign.getTarget().getType());
 							XlimNodeTemplate.newInPort(guardE, ready);
@@ -339,8 +338,8 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 *            Direction of the port
 	 */
 	private void addPort(Port port, String dir) {
-		Element newPort = XlimNodeTemplate.newActorPort(root, dir, port
-				.getName());
+		Element newPort = XlimNodeTemplate.newActorPort(root, dir,
+				port.getName());
 		port.getType().accept(new XlimTypeSizeVisitor(newPort));
 	}
 
@@ -422,8 +421,8 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 */
 	private void addScheduler(ActionScheduler scheduler, Element root) {
 		for (Action action : scheduler.getActions()) {
-			Element[] sched = addScheduler(action, names.putDecision(), names
-					.putDecision(), root);
+			Element[] sched = addScheduler(action, names.putDecision(),
+					names.putDecision(), root);
 			Element ifE = sched[0];
 			root = XlimNodeTemplate.newModule(ifE, ELSE);
 		}
@@ -450,8 +449,8 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 
 				Element fsmState = XlimNodeTemplate.newStateVar(root, fsmname);
 
-				XlimNodeTemplate.newInitValue(fsmState, "1", BOOL, start
-						.equals(state) ? "1" : "0");
+				XlimNodeTemplate.newInitValue(fsmState, "1", BOOL,
+						start.equals(state) ? "1" : "0");
 			}
 		}
 
@@ -522,8 +521,8 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 			if (stateVar.isUsed()) {
 
 				String sourceName = stateVar.getName();
-				Element newState = XlimNodeTemplate.newStateVar(root, names
-						.getVarName(stateVar, ""), sourceName);
+				Element newState = XlimNodeTemplate.newStateVar(root,
+						names.getVarName(stateVar, ""), sourceName);
 
 				StateVariable state = (StateVariable) stateVar;
 				/*
@@ -555,10 +554,11 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 					}
 				} else {
 					// For others just use the init value
-					Constant value = state.getConstantValue();
+					Object value = state.getConstantValue();
 					if (value != null) {
-						value.accept(new XlimValueVisitor(init2, state
-								.getType()));
+						// FIXME
+						// value.accept(new XlimValueVisitor(init2, state
+						// .getType()));
 					} else {
 						init2.setAttribute(VALUE, "0");
 						state.getType().accept(new XlimTypeSizeVisitor(init2));

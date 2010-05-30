@@ -69,7 +69,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
@@ -83,10 +82,6 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.IntConst;
-import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.ir.consts.StringConst;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -401,34 +396,28 @@ public class IRParser {
 	 * @param obj
 	 *            a {@link Boolean}, an {@link Integer}, a {@link List} or a
 	 *            {@link String}
-	 * @return a {@link Constant} created from the given object
+	 * @return a constant created from the given object
 	 * @throws JSONException
 	 *             if a JSON syntax error occurs
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
-	private Constant parseConstant(Object obj) throws JSONException,
+	private Object parseConstant(Object obj) throws JSONException,
 			OrccException {
-		Constant constant = null;
-
-		if (obj instanceof Boolean) {
-			constant = new BoolConst((Boolean) obj);
-		} else if (obj instanceof Integer) {
-			constant = new IntConst((Integer) obj);
+		if (obj instanceof Boolean || obj instanceof Integer
+				|| obj instanceof String) {
+			return obj;
 		} else if (obj instanceof JSONArray) {
 			JSONArray array = (JSONArray) obj;
-			List<Constant> cstList = new ArrayList<Constant>();
+			List<Object> cstList = new ArrayList<Object>();
 			for (int i = 0; i < array.length(); i++) {
 				cstList.add(parseConstant(array.get(i)));
 			}
-			constant = new ListConst(cstList);
-		} else if (obj instanceof String) {
-			constant = new StringConst((String) obj);
+
+			return cstList;
 		} else {
 			throw new OrccException("Unknown constant: " + obj);
 		}
-
-		return constant;
 	}
 
 	private Expression parseExpr(JSONArray array) throws JSONException,
@@ -780,8 +769,7 @@ public class IRParser {
 	/**
 	 * Parses the given list as a list of state variables. A
 	 * {@link StateVariable} is a {@link LocalVariable} with an optional
-	 * reference to a {@link Constant} that contain the variable's initial
-	 * value.
+	 * reference to a constant that contain the variable's initial value.
 	 * 
 	 * @param list
 	 *            A list of JSON-encoded {@link LocalVariable}.
@@ -802,7 +790,7 @@ public class IRParser {
 			Location location = parseLocation(varDefArray.getJSONArray(1));
 			Type type = parseType(varDefArray.get(2));
 
-			Constant init = null;
+			Object init = null;
 			if (!stateArray.isNull(1)) {
 				init = parseConstant(stateArray.get(1));
 			}

@@ -36,10 +36,10 @@ import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.UintType;
 
@@ -49,7 +49,7 @@ import net.sf.orcc.ir.type.UintType;
  * @author Nicolas Siret
  * 
  */
-public class VHDLExpressionPrinter extends DefaultExpressionPrinter {
+public class VHDLExpressionPrinter extends ExpressionPrinter {
 
 	private int getSizeOfType(Expression expr) {
 		Type type = expr.getType();

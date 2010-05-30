@@ -32,8 +32,8 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
 
 /**
  * This class defines a C expression printer.
@@ -41,7 +41,7 @@ import net.sf.orcc.ir.printers.DefaultExpressionPrinter;
  * @author Matthieu Wipliez
  * 
  */
-public class CExpressionPrinter extends DefaultExpressionPrinter {
+public class CExpressionPrinter extends ExpressionPrinter {
 
 	@Override
 	public void visit(BinaryExpr expr, Object... args) {

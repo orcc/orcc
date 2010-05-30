@@ -41,7 +41,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -99,7 +98,7 @@ public class ActorMerger implements INetworkTransformation {
 	private static final String ACTION_NAME = "static_action";
 
 	private static final String SCHEDULER_NAME = "isSchedulable_" + ACTION_NAME;
-	
+
 	private int actorIdx = 0;
 
 	private DirectedGraph<Vertex, Connection> graph;
@@ -142,7 +141,7 @@ public class ActorMerger implements INetworkTransformation {
 			String name = "buf_" + index;
 			Type type = new ListType(size, connection.getSource().getType());
 			Variable buf = new StateVariable(new Location(), type, name, false,
-					(Constant) null);
+					null);
 			bufferMap.put(connection, buf);
 			stateVarsMap.put(connection.getSource(), buf);
 			stateVarsMap.put(connection.getTarget(), buf);
@@ -173,7 +172,7 @@ public class ActorMerger implements INetworkTransformation {
 			Type type = new ListType(size, port.getType());
 			LocalVariable param = new LocalVariable(false, 0, new Location(),
 					port.getName(), null, null, type);
-			if(!parameters.contains(param))
+			if (!parameters.contains(param))
 				parameters.add("", new Location(), param.getName(), param);
 		}
 
@@ -185,8 +184,9 @@ public class ActorMerger implements INetworkTransformation {
 			Type type = new ListType(size, port.getType());
 			LocalVariable parameter = new LocalVariable(false, 0,
 					new Location(), port.getName(), null, null, type);
-			if(!parameters.contains(parameter))
-				parameters.add("", new Location(), parameter.getName(), parameter);
+			if (!parameters.contains(parameter))
+				parameters.add("", new Location(), parameter.getName(),
+						parameter);
 		}
 
 		return proc;
@@ -248,12 +248,12 @@ public class ActorMerger implements INetworkTransformation {
 
 				OrderedMap<Variable> vars = actor.getStateVars();
 
-				for(Procedure proc : actor.getProcs()) {
+				for (Procedure proc : actor.getProcs()) {
 					proc.setName(vertex.getInstance().getId() + "_"
 							+ proc.getName());
-				procs.add("", new Location(), proc.getName(), proc);
+					procs.add("", new Location(), proc.getName(), proc);
 				}
-				
+
 				for (Variable var : vars) {
 					String name = vertex.getInstance().getId() + "_"
 							+ var.getName();
@@ -271,8 +271,8 @@ public class ActorMerger implements INetworkTransformation {
 					BlockNode blkNode = new BlockNode(procedure);
 					LocalVariable loopVar = indexes.get(index - 1);
 
-					List<Expression> parameters = putParams(loopVar, actions
-							.get(0));
+					List<Expression> parameters = putParams(loopVar,
+							actions.get(0));
 
 					// List<Expression> parameters = getParams(loopVar, vertex,
 					// params);
@@ -313,8 +313,8 @@ public class ActorMerger implements INetworkTransformation {
 						statements, new BlockNode(procedure));
 
 				Expression condition = new BinaryExpr(new VarExpr(new Use(
-						loopVar)), BinaryOp.LT, new IntExpr(sched
-						.getIterationCount()), new BoolType());
+						loopVar)), BinaryOp.LT, new IntExpr(
+						sched.getIterationCount()), new BoolType());
 				whileNode.setValue(condition);
 
 				nodes.add(whileNode);
@@ -483,8 +483,7 @@ public class ActorMerger implements INetworkTransformation {
 		ActionList initializes = new ActionList();
 		ActionScheduler scheduler = new ActionScheduler(actions.getList(), null);
 
-		
-		Actor actor = new Actor("actor_"+actorIdx++, "", parameters, inputs,
+		Actor actor = new Actor("actor_" + actorIdx++, "", parameters, inputs,
 				outputs, stateVars, procs, actions.getList(),
 				initializes.getList(), scheduler, null);
 
@@ -587,5 +586,5 @@ public class ActorMerger implements INetworkTransformation {
 
 		}
 	}
-	
+
 }

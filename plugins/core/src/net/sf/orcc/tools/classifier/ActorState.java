@@ -34,7 +34,6 @@ import java.util.Map.Entry;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
@@ -67,7 +66,7 @@ public class ActorState {
 		for (Variable variable : actor.getStateVars()) {
 			Type type = variable.getType();
 			StateVariable stateVariable = (StateVariable) variable;
-			Constant constant = stateVariable.getConstantValue();
+			Object constant = stateVariable.getConstantValue();
 			if (constant != null && !type.isList()) {
 				// we might consider this constant if it is used by guards
 				boolean usedByGuard = false;

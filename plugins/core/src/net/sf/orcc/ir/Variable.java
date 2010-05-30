@@ -332,7 +332,7 @@ public abstract class Variable implements INameable {
 
 	@Override
 	public String toString() {
-		return Printer.getInstance().toString(this);
+		return getName();
 	}
 
 }

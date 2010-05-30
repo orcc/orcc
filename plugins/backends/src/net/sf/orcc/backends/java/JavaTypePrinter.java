@@ -28,11 +28,11 @@
  */
 package net.sf.orcc.backends.java;
 
-import net.sf.orcc.ir.printers.DefaultTypePrinter;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypePrinter;
 import net.sf.orcc.ir.type.UintType;
 
 /**
@@ -41,7 +41,7 @@ import net.sf.orcc.ir.type.UintType;
  * @author Matthieu Wipliez
  * 
  */
-public class JavaTypePrinter extends DefaultTypePrinter {
+public class JavaTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(BoolType type) {

@@ -26,32 +26,31 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.printers;
+package net.sf.orcc.ir.type;
 
-import java.util.Iterator;
-import java.util.List;
-
-import net.sf.orcc.ir.Constant;
-import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstantVisitor;
-import net.sf.orcc.ir.consts.IntConst;
-import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.ir.consts.StringConst;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.FloatType;
+import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 
 /**
- * This class defines the default constant printer.
+ * This class defines the default type printer.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class DefaultConstantPrinter implements ConstantVisitor {
+public class TypePrinter implements TypeVisitor {
 
 	protected StringBuilder builder;
 
 	/**
-	 * Creates a new expression printer.
+	 * Creates a new type printer.
 	 */
-	public DefaultConstantPrinter() {
+	public TypePrinter() {
 		builder = new StringBuilder();
 	}
 
@@ -61,37 +60,46 @@ public class DefaultConstantPrinter implements ConstantVisitor {
 	}
 
 	@Override
-	public void visit(BoolConst constant, Object... args) {
-		builder.append(constant.getValue());
+	public void visit(BoolType type) {
+		builder.append("bool");
 	}
 
 	@Override
-	public void visit(IntConst constant, Object... args) {
-		builder.append(constant.getValue());
+	public void visit(FloatType type) {
+		builder.append("float");
 	}
 
 	@Override
-	public void visit(ListConst constant, Object... args) {
-		List<Constant> list = constant.getValue();
-		if (list.isEmpty()) {
-			builder.append("[]");
-		} else {
-			Iterator<Constant> it = list.iterator();
-			builder.append('[');
-			builder.append(it.next().toString());
-			while (it.hasNext()) {
-				builder.append(", ");
-				builder.append(it.next().toString());
-			}
-			builder.append(']');
-		}
+	public void visit(IntType type) {
+		builder.append("int(size=");
+		builder.append(type.getSize().toString());
+		builder.append(")");
 	}
 
 	@Override
-	public void visit(StringConst constant, Object... args) {
-		builder.append('"');
-		builder.append(constant.getValue().replaceAll("\\\\", "\\\\\\\\"));
-		builder.append('"');
+	public void visit(ListType type) {
+		builder.append("List(type:");
+		builder.append(type.getElementType().toString());
+		builder.append(", size=");
+		builder.append(type.getSize().toString());
+		builder.append(")");
+	}
+
+	@Override
+	public void visit(StringType type) {
+		builder.append("String");
+	}
+
+	@Override
+	public void visit(UintType type) {
+		builder.append("uint(size=");
+		builder.append(type.getSize().toString());
+		builder.append(")");
+	}
+
+	@Override
+	public void visit(VoidType type) {
+		builder.append("void");
 	}
 
 }

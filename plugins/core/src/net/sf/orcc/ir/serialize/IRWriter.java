@@ -53,7 +53,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
@@ -66,11 +65,6 @@ import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.consts.BoolConst;
-import net.sf.orcc.ir.consts.ConstantInterpreter;
-import net.sf.orcc.ir.consts.IntConst;
-import net.sf.orcc.ir.consts.ListConst;
-import net.sf.orcc.ir.consts.StringConst;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
@@ -120,41 +114,6 @@ import org.json.JSONObject;
  * 
  */
 public class IRWriter {
-
-	/**
-	 * This class defines a constant writer that serializes a constant to JSON.
-	 * 
-	 * @author Matthieu Wipliez
-	 * 
-	 */
-	private class ConstantWriter implements ConstantInterpreter {
-
-		@Override
-		public Object interpret(BoolConst constant, Object... args) {
-			return constant.getValue();
-		}
-
-		@Override
-		public Object interpret(IntConst constant, Object... args) {
-			return constant.getValue();
-		}
-
-		@Override
-		public Object interpret(ListConst constant, Object... args) {
-			JSONArray array = new JSONArray();
-			List<Constant> constants = constant.getValue();
-			for (Constant cst : constants) {
-				array.put(cst.accept(this));
-			}
-			return array;
-		}
-
-		@Override
-		public Object interpret(StringConst constant, Object... args) {
-			return constant.getValue();
-		}
-
-	}
 
 	/**
 	 * This class defines an expression writer that serializes an expression to
@@ -536,8 +495,6 @@ public class IRWriter {
 
 	private Actor actor;
 
-	private final ConstantWriter constWriter;
-
 	private final ExpressionWriter exprWriter;
 
 	private final InstructionWriter instrWriter;
@@ -555,7 +512,6 @@ public class IRWriter {
 	public IRWriter(Actor actor) {
 		this.actor = actor;
 
-		constWriter = new ConstantWriter();
 		exprWriter = new ExpressionWriter();
 		instrWriter = new InstructionWriter();
 		nodeWriter = new NodeWriter();
@@ -690,6 +646,22 @@ public class IRWriter {
 		array = writeActionScheduler(actor.getActionScheduler());
 		obj.put(IRConstants.KEY_ACTION_SCHED, array);
 		return obj;
+	}
+
+	private Object writeConstant(Object obj) {
+		if (obj instanceof Boolean || obj instanceof Integer
+				|| obj instanceof String) {
+			return obj;
+		} else if (obj instanceof List<?>) {
+			List<?> list = (List<?>) obj;
+			JSONArray array = new JSONArray();
+			for (Object o : list) {
+				array.put(writeConstant(o));
+			}
+			return array;
+		} else {
+			throw new OrccRuntimeException("Unknown constant: " + obj);
+		}
 	}
 
 	/**
@@ -874,12 +846,11 @@ public class IRWriter {
 		variableArray.put(writeLocation(variable.getLocation()));
 		variableArray.put(writeType(variable.getType()));
 
-		Constant constant = variable.getConstantValue();
+		Object constant = variable.getConstantValue();
 		if (constant == null) {
 			array.put(JSONObject.NULL);
 		} else {
-			Object constantValue = variable.getConstantValue().accept(
-					constWriter);
+			Object constantValue = writeConstant(constant);
 			array.put(constantValue);
 		}
 

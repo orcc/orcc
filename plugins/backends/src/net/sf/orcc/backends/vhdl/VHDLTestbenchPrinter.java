@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.orcc.backends.STPrinter;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.util.INameable;
@@ -69,10 +68,8 @@ public final class VHDLTestbenchPrinter extends STPrinter {
 	}
 
 	@Override
-	public String toString(Constant constant) {
-		VHDLConstPrinter printer = new VHDLConstPrinter(group);
-		constant.accept(printer);
-		return printer.toString();
+	public String toString(Boolean bool) {
+		return bool.booleanValue() ? "'1'" : "'0'";
 	}
 
 	@Override

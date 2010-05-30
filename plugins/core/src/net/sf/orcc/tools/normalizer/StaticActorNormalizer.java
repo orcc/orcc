@@ -38,7 +38,6 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Constant;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -50,7 +49,6 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.consts.IntConst;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -108,8 +106,8 @@ public class StaticActorNormalizer {
 			if (indexes.size() < depth) {
 				LocalVariable varDef = new LocalVariable(true, depth - 1,
 						new Location(), "loop", null, null, new BoolType());
-				variables.add(actor.getFile(), varDef.getLocation(), varDef
-						.getName(), varDef);
+				variables.add(actor.getFile(), varDef.getLocation(),
+						varDef.getName(), varDef);
 				indexes.add(varDef);
 			}
 
@@ -130,8 +128,8 @@ public class StaticActorNormalizer {
 
 			// assign condition
 			Expression condition = new BinaryExpr(new VarExpr(new Use(loopVar,
-					whileNode)), BinaryOp.LT, new IntExpr(pattern
-					.getNumIterations()), new BoolType());
+					whileNode)), BinaryOp.LT, new IntExpr(
+					pattern.getNumIterations()), new BoolType());
 			whileNode.setValue(condition);
 
 			// accept sub pattern
@@ -205,16 +203,16 @@ public class StaticActorNormalizer {
 
 			Expression size = new IntExpr(numTokens);
 			Type type = new ListType(size, port.getType());
-			StateVariable var = new StateVariable(new Location(), type, port
-					.getName(), false, (Constant) null);
+			StateVariable var = new StateVariable(new Location(), type,
+					port.getName(), false, null);
 			stateVars.add(actor.getFile(), var.getLocation(), var.getName(),
 					var);
 
 			StateVariable varCount = new StateVariable(new Location(),
 					new IntType(new IntExpr(32)), port.getName() + "_count",
-					true, new IntConst(0));
-			stateVars.add(actor.getFile(), varCount.getLocation(), varCount
-					.getName(), varCount);
+					true, 0);
+			stateVars.add(actor.getFile(), varCount.getLocation(),
+					varCount.getName(), varCount);
 
 			Use use = new Use(varCount);
 			Store store = new Store(use, new ArrayList<Expression>(),
