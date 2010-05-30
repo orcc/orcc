@@ -175,25 +175,25 @@ AstStatement:
 ///////////////////////////////////////////////////////////////////////////////
 
 AstExpression:
-	AstExpressionAnd ({AstBinOpSeq.left=current} operator=('||' | 'or') right=AstExpressionAnd)*;
+	AstExpressionAnd ({AstExpressionBinary.left=current} operator=('||' | 'or') right=AstExpressionAnd)*;
 AstExpressionAnd returns AstExpression:
-	AstExpressionBitor ({AstBinOpSeq.left=current} operator=('&&' | 'and') right=AstExpressionBitor)*;
+	AstExpressionBitor ({AstExpressionBinary.left=current} operator=('&&' | 'and') right=AstExpressionBitor)*;
 AstExpressionBitor returns AstExpression:
-	AstExpressionBitand ({AstBinOpSeq.left=current} operator='|' right=AstExpressionBitand)*;
+	AstExpressionBitand ({AstExpressionBinary.left=current} operator='|' right=AstExpressionBitand)*;
 AstExpressionBitand returns AstExpression:
-	AstExpressionEq ({AstBinOpSeq.left=current} operator='&' right=AstExpressionEq)*;
+	AstExpressionEq ({AstExpressionBinary.left=current} operator='&' right=AstExpressionEq)*;
 AstExpressionEq returns AstExpression:
-	AstExpressionRelational ({AstBinOpSeq.left=current} operator=('=' | '!=') right=AstExpressionRelational)*;
+	AstExpressionRelational ({AstExpressionBinary.left=current} operator=('=' | '!=') right=AstExpressionRelational)*;
 AstExpressionRelational returns AstExpression:
-	AstExpressionShift ({AstBinOpSeq.left=current} operator=('<' | '<=' | '>' | '>=') right=AstExpressionShift)*;
+	AstExpressionShift ({AstExpressionBinary.left=current} operator=('<' | '<=' | '>' | '>=') right=AstExpressionShift)*;
 AstExpressionShift returns AstExpression:
-	AstExpressionAdditive ({AstBinOpSeq.left=current} operator=('<<' | '>>') right=AstExpressionAdditive)*;
+	AstExpressionAdditive ({AstExpressionBinary.left=current} operator=('<<' | '>>') right=AstExpressionAdditive)*;
 AstExpressionAdditive returns AstExpression:
-	AstExpressionMultiplicative ({AstBinOpSeq.left=current} operator=('+' | '-') right=AstExpressionMultiplicative)*;
+	AstExpressionMultiplicative ({AstExpressionBinary.left=current} operator=('+' | '-') right=AstExpressionMultiplicative)*;
 AstExpressionMultiplicative returns AstExpression:
-	AstExpressionExp ({AstBinOpSeq.left=current} operator=('*' | '/' | 'div' | 'mod') right=AstExpressionExp)*;
+	AstExpressionExp ({AstExpressionBinary.left=current} operator=('*' | '/' | 'div' | 'mod') right=AstExpressionExp)*;
 AstExpressionExp returns AstExpression:
-	AstExpressionUnary ({AstBinOpSeq.left=current} operator='^' right=AstExpressionUnary)*;
+	AstExpressionUnary ({AstExpressionBinary.left=current} operator='^' right=AstExpressionUnary)*;
 
 AstExpressionUnary returns AstExpression:
 	{AstExpressionUnary} unaryOperator=('-' | 'not' | '#') expression=AstExpressionPostfix
@@ -240,7 +240,9 @@ AstExpressionLiteral:
 	| AstExpressionInteger
 	| AstExpressionString;
 
-AstExpressionBoolean: value=('true' | 'false');
+AstExpressionBoolean: value=BOOL;
+
+terminal BOOL returns ecore::EBoolean: 'true' | 'false';
 
 AstExpressionInteger: value=(INT | HEX);
 

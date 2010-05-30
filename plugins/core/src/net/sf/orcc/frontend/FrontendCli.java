@@ -28,7 +28,23 @@
  */
 package net.sf.orcc.frontend;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.OrccException;
+import net.sf.orcc.cal.CalStandaloneSetup;
+import net.sf.orcc.cal.cal.AstActor;
+
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.parser.IParseResult;
+import org.eclipse.xtext.parser.IParser;
+import org.eclipse.xtext.parser.antlr.IAntlrParser;
+
+import com.google.inject.Injector;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -42,114 +58,66 @@ public class FrontendCli {
 	 * @param args
 	 */
 	public static void main(String[] args) throws OrccException {
-		if (args.length == 4) {
-			boolean printPrio = Boolean.parseBoolean(args[2]);
-			boolean printFSM = Boolean.parseBoolean(args[3]);
-			new FrontendCli(args[0], args[1], printPrio, printFSM);
-		} else if (args.length == 2) {
+		if (args.length == 2) {
 			new FrontendCli(args[0], args[1]);
 		} else {
 			System.err.println("Usage: Frontend "
 					+ "<absolute path of VTL folder> "
-					+ "<absolute path of output folder> "
-					+ "[<priorities print flag> <FSM print flag>]");
+					+ "<absolute path of output folder>");
 		}
 	}
 
-	/**
-	 * output folder
-	 */
-	//private File outputFolder;
+	private List<File> actors;
 
-	//private IParser parser;
+	private Frontend frontend;
 
-	/**
-	 * print FSM flag
-	 */
-	//private boolean printFSM;
-
-	/**
-	 * print priorities flag
-	 */
-	//private boolean printPriorities;
+	private IParser parser;
 
 	public FrontendCli(String vtlFolder, String outputFolder)
 			throws OrccException {
-		this(vtlFolder, outputFolder, false, false);
-	}
-
-	/**
-	 * 
-	 * 
-	 * @param topLevelNetwork
-	 *            absolute file name of top-level network
-	 * @param outputFolder
-	 *            absolute file name of output folder
-	 * @param printPriorities
-	 *            if <code>true</code>, the front-end will print a DOT file with
-	 *            the priority graph
-	 * @param printFSM
-	 *            if <code>true</code>, the front-end will print a DOT file with
-	 *            the FSM graph
-	 * @throws OrccException
-	 */
-	public FrontendCli(String vtlFolder, String outputFolder,
-			boolean printPriorities, boolean printFSM) throws OrccException {
-//		this.printPriorities = printPriorities;
-//		this.printFSM = printFSM;
-//
-//		try {
-//			this.outputFolder = new File(outputFolder).getCanonicalFile();
-//		} catch (IOException e) {
-//			throw new OrccException("I/O error", e);
-//		}
-//
-//		// guice stuff
-//		Injector guiceInjector = new CalStandaloneSetup()
-//				.createInjectorAndDoEMFRegistration();
-//		parser = guiceInjector.getInstance(IAntlrParser.class);
-
+		File file = new File(outputFolder);
+		if (!file.exists()) {
+			file.mkdir();
+		}
 		
+		frontend = new Frontend(outputFolder);
+
+		// guice stuff
+		Injector guiceInjector = new CalStandaloneSetup()
+				.createInjectorAndDoEMFRegistration();
+		parser = guiceInjector.getInstance(IAntlrParser.class);
+
+		File vtl = new File(vtlFolder);
+		actors = new ArrayList<File>();
+		getActors(vtl);
+		for (File actor : actors) {
+			processActor(actor);
+		}
 	}
 
-//	private Actor processActor(String actorPath) throws OrccException {
-//		net.sf.orcc.cal.cal.Actor aActor = null;
-//
-//		try {
-//			actorPath = new File(actorPath + ".cal").getCanonicalPath();
-//			Reader in = new FileReader(actorPath);
-//			IParseResult result = parser.parse(in);
-//			EObject root = result.getRootASTElement();
-//			aActor = (net.sf.orcc.cal.cal.Actor) root;
-//		} catch (IOException e) {
-//			throw new OrccException("I/O error", e);
-//		}
-//
-//		Actor actor = new AstToIR().transform(actorPath, aActor);
-//
-//		if (printPriorities) {
-//			// prints priority graph
-//			String fileName = "priority_" + actor.getName() + ".dot";
-//			File file = new File(outputFolder, fileName);
-//			file.toString();
-//		}
-//
-//		if (printFSM) {
-//			// prints FSM
-//			String fileName = "fsm_" + actor.getName() + ".dot";
-//			File file = new File(outputFolder, fileName);
-//
-//			// prints FSM after priorities have been applied
-//			ActionScheduler scheduler = actor.getActionScheduler();
-//			if (scheduler.hasFsm()) {
-//				fileName = "fsm_" + actor.getName() + "_2.dot";
-//				file = new File(outputFolder, fileName);
-//				scheduler.getFsm().printGraph(file);
-//			}
-//		}
-//
-//		new IRWriter(actor).write(outputFolder.toString());
-//		return actor;
-//	}
+	private void getActors(File vtl) {
+		for (File file : vtl.listFiles()) {
+			if (file.isDirectory()) {
+				getActors(file);
+			} else if (file.getName().endsWith(".cal")) {
+				actors.add(file);
+			}
+		}
+	}
+
+	private void processActor(File actorPath) throws OrccException {
+		AstActor astActor = null;
+
+		try {
+			Reader in = new FileReader(actorPath);
+			IParseResult result = parser.parse(in);
+			EObject root = result.getRootASTElement();
+			astActor = (AstActor) root;
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
+
+		frontend.compile(actorPath.getAbsolutePath(), astActor);
+	}
 
 }

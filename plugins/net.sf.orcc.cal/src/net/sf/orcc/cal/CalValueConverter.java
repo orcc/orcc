@@ -36,9 +36,34 @@ import org.eclipse.xtext.parsetree.AbstractNode;
 import org.eclipse.xtext.util.Strings;
 
 /**
- * Converts hexadecimal to integer.
+ * Converts "true" and "false" to booleans, and hexadecimal to integer.
  */
 public class CalValueConverter extends DefaultTerminalConverters {
+
+	@ValueConverter(rule = "BOOL")
+	public IValueConverter<Boolean> BOOL() {
+		return new IValueConverter<Boolean>() {
+
+			public String toString(Boolean value) {
+				return value.toString();
+			}
+
+			public Boolean toValue(String string, AbstractNode node) {
+				if (Strings.isEmpty(string)) {
+					throw new ValueConverterException(
+							"Couldn't convert empty string to boolean", node,
+							null);
+				}
+
+				if ("true".equals(string)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+		};
+	}
 
 	@ValueConverter(rule = "HEX")
 	public IValueConverter<Integer> HEX() {

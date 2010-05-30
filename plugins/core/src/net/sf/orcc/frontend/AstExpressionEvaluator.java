@@ -26,12 +26,26 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.frontend;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.cal.cal.AstExpression;
+import net.sf.orcc.cal.cal.AstExpressionBinary;
+import net.sf.orcc.cal.cal.AstExpressionBoolean;
+import net.sf.orcc.cal.cal.AstExpressionInteger;
+import net.sf.orcc.cal.cal.AstExpressionString;
+import net.sf.orcc.cal.cal.AstExpressionUnary;
+import net.sf.orcc.cal.cal.AstExpressionVariable;
+import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 
 /**
  * This class defines an expression evaluator.
@@ -39,77 +53,21 @@ import net.sf.orcc.ir.Expression;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class ExpressionEvaluator implements ExpressionInterpreter {
+public class AstExpressionEvaluator extends CalSwitch<Object> {
 
-	/**
-	 * Evaluates this expression and return its value as an integer.
-	 * 
-	 * @param expr
-	 *            an expression to evaluate
-	 * @return the expression evaluated as an integer
-	 * @throws OrccRuntimeException
-	 *             if the expression cannot be evaluated as an integer
-	 */
-	public int evaluateAsInteger(Expression expr) {
-		Object value = expr.accept(this, Integer.MIN_VALUE);
-		if (value instanceof Integer) {
-			return ((Integer) value).intValue();
-		}
+	private Map<AstVariable, Object> values;
 
-		// evaluated ok, but not as an integer
-		throw new OrccRuntimeException("expected integer expression");
+	public AstExpressionEvaluator() {
+		this.values = new HashMap<AstVariable, Object>();
 	}
 
 	@Override
-	public Object interpret(BinaryExpr expr, Object... args) {
-		Object val1 = expr.getE1().accept(this);
-		Object val2 = expr.getE2().accept(this);
-		return interpretBinaryExpr(expr, val1, val2);
-	}
+	public Object caseAstExpressionBinary(AstExpressionBinary expression) {
+		BinaryOp op = BinaryOp.getOperator(expression.getOperator());
+		Object val1 = doSwitch(expression.getLeft());
+		Object val2 = doSwitch(expression.getRight());
 
-	@Override
-	public Object interpret(BoolExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object interpret(IntExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object interpret(ListExpr expr, Object... args) {
-		List<Expression> expressions = expr.getValue();
-		Object[] values = new Object[expressions.size()];
-		int i = 0;
-		for (Expression expression : expressions) {
-			values[i] = expression.accept(this);
-			i++;
-		}
-
-		return values;
-	}
-
-	@Override
-	public Object interpret(StringExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object interpret(UnaryExpr expr, Object... args) {
-		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
-		return interpretUnaryExpr(expr, value);
-	}
-
-	@Override
-	public Object interpret(VarExpr expr, Object... args) {
-		return expr.getVar().getVariable().getValue();
-	}
-
-	protected Object interpretBinaryExpr(BinaryExpr expr, Object val1,
-			Object val2) {
-		/* Evaluation */
-		switch (expr.getOp()) {
+		switch (op) {
 		case BITAND:
 			if (val1 instanceof Integer && val2 instanceof Integer) {
 				int i1 = (Integer) val1;
@@ -252,14 +210,32 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 		}
 
 		throw new OrccRuntimeException("Uninitialized variable at line "
-				+ expr.getLocation().getStartLine()
-				+ "\nCould not evaluate binary expression "
-				+ expr.getOp().toString() + "(" + expr.getOp().getText()
-				+ ")\n");
+				+ Util.getLocation(expression).getStartLine()
+				+ "\nCould not evaluate binary expression " + op.toString()
+				+ "(" + op.getText() + ")\n");
 	}
 
-	protected Object interpretUnaryExpr(UnaryExpr expr, Object value) {
-		switch (expr.getOp()) {
+	@Override
+	public Object caseAstExpressionBoolean(AstExpressionBoolean expression) {
+		return expression.isValue();
+	}
+
+	@Override
+	public Object caseAstExpressionInteger(AstExpressionInteger expression) {
+		return expression.getValue();
+	}
+
+	@Override
+	public Object caseAstExpressionString(AstExpressionString expression) {
+		return expression.getValue();
+	}
+
+	@Override
+	public Object caseAstExpressionUnary(AstExpressionUnary expression) {
+		UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
+		Object value = doSwitch(expression.getExpression());
+
+		switch (op) {
 		case BITNOT:
 			if (value instanceof Integer) {
 				int i = (Integer) value;
@@ -283,9 +259,73 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 		}
 
 		throw new OrccRuntimeException("Uninitialized variable at line "
-				+ expr.getLocation().getStartLine()
-				+ "\nCould not evaluate unary expression "
-				+ expr.getOp().toString() + "(" + expr.getOp().getText() + ")\n");
+				+ Util.getLocation(expression).getStartLine()
+				+ "\nCould not evaluate unary expression " + op.toString()
+				+ "(" + op.getText() + ")\n");
+	}
+
+	@Override
+	public Object caseAstExpressionVariable(AstExpressionVariable expression) {
+		AstVariable variable = expression.getValue().getVariable();
+		Object value = values.get(variable);
+		if (value == null) {
+			throw new OrccRuntimeException("variable " + variable.getName()
+					+ " does not have a compile-time constant value");
+		}
+
+		return value;
+	}
+
+	/**
+	 * Evaluates the given AST expression and returns an object that can be a
+	 * boolean, an integer, a string, or a list of objects.
+	 * 
+	 * @param expression
+	 *            an AST expression
+	 * @return the expression value
+	 * @throws OrccRuntimeException
+	 *             if the given expression cannot be evaluated.
+	 */
+	public Object evaluate(AstExpression expression) {
+		return doSwitch(expression);
+	}
+
+	/**
+	 * Evaluates the given AST expression and returns the expression as an
+	 * integer, or throws an exception.
+	 * 
+	 * @param expression
+	 *            an AST expression
+	 * @return an integer
+	 * @throws OrccRuntimeException
+	 *             if the given expression cannot be evaluated.
+	 */
+	public int evaluateAsInteger(AstExpression expression) {
+		Object value = doSwitch(expression);
+		if (value instanceof Integer) {
+			return ((Integer) value).intValue();
+		}
+
+		// evaluated ok, but not as an integer
+		throw new OrccRuntimeException("expected integer expression");
+	}
+
+	public Expression evaluateAsIntExpr(AstExpression expression) {
+		int value = evaluateAsInteger(expression);
+		Location location = Util.getLocation(expression);
+		return new IntExpr(location, value);
+	}
+
+	/**
+	 * Registers the given variable with the given value.
+	 * 
+	 * @param variable
+	 *            an AST variable
+	 * @param value
+	 *            a value as an object.
+	 */
+	public void registerValue(AstVariable variable, Object value) {
+		values.put(variable, value);
 	}
 
 }
