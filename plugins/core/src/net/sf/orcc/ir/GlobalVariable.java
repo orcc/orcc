@@ -42,6 +42,11 @@ import net.sf.orcc.ir.expr.ExpressionEvaluator;
 public class GlobalVariable extends Variable {
 
 	/**
+	 * variable possible assign expression
+	 */
+	private Expression expression;
+
+	/**
 	 * variable constant value.
 	 */
 	protected Object initialValue;
@@ -87,7 +92,8 @@ public class GlobalVariable extends Variable {
 	 */
 	public GlobalVariable(Location location, Type type, String name,
 			Expression value) {
-		super(location, type, name, true, value);
+		super(location, type, name, true);
+		this.expression = value;
 	}
 
 	/**
@@ -103,15 +109,31 @@ public class GlobalVariable extends Variable {
 	}
 
 	/**
-	 * Returns the initial value of this global variable, or <code>null</code>
-	 * if this variable has no initial constant value. The initial value may be
-	 * a boolean, an integer, a list or a string.
+	 * Returns the initial expression of this variable.
 	 * 
-	 * @return an object, or <code>null</code> if this variable has no constant
-	 *         value
+	 * @return the initial expression of this variable
 	 */
-	public Object getConstantValue() {
-		return initialValue;
+	public Expression getExpression() {
+		return expression;
+	}
+
+	/**
+	 * Returns <code>true</code> if this variable has an initial expression.
+	 * 
+	 * @return <code>true</code> if this variable has an initial expression
+	 */
+	public boolean hasExpression() {
+		return (expression != null);
+	}
+
+	/**
+	 * Sets the initial expression of this variable.
+	 * 
+	 * @param expression
+	 *            the initial expression of this variable
+	 */
+	public void setExpression(Expression expression) {
+		this.expression = expression;
 	}
 
 }

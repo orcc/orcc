@@ -233,7 +233,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		LocalVariable target = instr.getTarget();
 		for (Use use : instr.getVars()) {
 			Variable var = use.getVariable();
-			target.setValue(var.getExpression().accept(exprInterpreter));
+			target.setValue(var.getValue());
 		}
 	}
 

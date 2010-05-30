@@ -44,11 +44,6 @@ import net.sf.orcc.util.INameable;
 public abstract class Variable implements INameable {
 
 	/**
-	 * variable possible assign expression
-	 */
-	private Expression expression;
-
-	/**
 	 * true if this variable is global
 	 */
 	private boolean global;
@@ -100,29 +95,6 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
-	 * Creates a new variable with the given location, type, and name.
-	 * 
-	 * @param location
-	 *            the variable location
-	 * @param type
-	 *            the variable type
-	 * @param name
-	 *            the variable name
-	 * @param global
-	 *            whether this variable is global
-	 */
-	public Variable(Location location, Type type, String name, boolean global,
-			Expression expression) {
-		this.location = location;
-		this.type = type;
-		this.name = name;
-		this.global = global;
-		this.expression = expression;
-
-		this.uses = new ArrayList<Use>();
-	}
-
-	/**
 	 * Creates a new variable from the given variable.
 	 * 
 	 * @param variable
@@ -162,15 +134,6 @@ public abstract class Variable implements INameable {
 	 */
 	public void addUse(Use use) {
 		uses.add(use);
-	}
-
-	/**
-	 * Returns the initial expression of this variable.
-	 * 
-	 * @return the initial expression of this variable
-	 */
-	public Expression getExpression() {
-		return expression;
 	}
 
 	/**
@@ -216,15 +179,6 @@ public abstract class Variable implements INameable {
 	 */
 	public Object getValue() {
 		return value;
-	}
-
-	/**
-	 * Returns <code>true</code> if this variable has an initial expression.
-	 * 
-	 * @return <code>true</code> if this variable has an initial expression
-	 */
-	public boolean hasExpression() {
-		return (expression != null);
 	}
 
 	/**
@@ -278,16 +232,6 @@ public abstract class Variable implements INameable {
 	 */
 	public void removeUse(Use use) {
 		uses.remove(use);
-	}
-
-	/**
-	 * Sets the initial expression of this variable.
-	 * 
-	 * @param expression
-	 *            the initial expression of this variable
-	 */
-	public void setExpression(Expression expression) {
-		this.expression = expression;
 	}
 
 	/**

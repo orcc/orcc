@@ -140,8 +140,7 @@ public class ActorMerger implements INetworkTransformation {
 			Expression size = new IntExpr(entry.getValue());
 			String name = "buf_" + index;
 			Type type = new ListType(size, connection.getSource().getType());
-			Variable buf = new StateVariable(new Location(), type, name, false,
-					null);
+			Variable buf = new StateVariable(new Location(), type, name, false);
 			bufferMap.put(connection, buf);
 			stateVarsMap.put(connection.getSource(), buf);
 			stateVarsMap.put(connection.getTarget(), buf);

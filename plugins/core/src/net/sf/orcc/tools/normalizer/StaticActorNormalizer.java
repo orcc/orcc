@@ -204,7 +204,7 @@ public class StaticActorNormalizer {
 			Expression size = new IntExpr(numTokens);
 			Type type = new ListType(size, port.getType());
 			StateVariable var = new StateVariable(new Location(), type,
-					port.getName(), false, null);
+					port.getName(), false);
 			stateVars.add(actor.getFile(), var.getLocation(), var.getName(),
 					var);
 

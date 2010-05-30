@@ -631,7 +631,7 @@ public class IRParser {
 			Type type = parseType(varDefArray.get(2));
 
 			StateVariable parameter = new StateVariable(location, type, name,
-					false, (Expression) null);
+					false);
 
 			// register the state variable
 			variables.add(file, location, name, parameter);

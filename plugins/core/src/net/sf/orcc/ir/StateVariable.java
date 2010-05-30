@@ -35,12 +35,32 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public class StateVariable extends GlobalVariable {
+public class StateVariable extends Variable {
 
 	/**
 	 * whether the variable is assignable.
 	 */
 	private boolean assignable;
+
+	private Object initialValue;
+
+	/**
+	 * Creates a new state variable with the given location, type, name and
+	 * initial value expressed as an expression.
+	 * 
+	 * @param location
+	 *            the state variable location
+	 * @param type
+	 *            the state variable type
+	 * @param name
+	 *            the state variable name
+	 * @param value
+	 *            initial value
+	 */
+	public StateVariable(Location location, Type type, String name,
+			boolean assignable) {
+		this(location, type, name, assignable, null);
+	}
 
 	/**
 	 * Creates a new state variable with the given location, type, name and
@@ -57,28 +77,21 @@ public class StateVariable extends GlobalVariable {
 	 */
 	public StateVariable(Location location, Type type, String name,
 			boolean assignable, Object initialValue) {
-		super(location, type, name);
+		super(location, type, name, true);
 		this.assignable = assignable;
 		this.initialValue = initialValue;
 	}
 
 	/**
-	 * Creates a new state variable with the given location, type, name and
-	 * initial value expressed as an expression.
+	 * Returns the initial value of this state variable, or <code>null</code> if
+	 * this variable has no initial constant value. The initial value may be a
+	 * boolean, an integer, a list or a string.
 	 * 
-	 * @param location
-	 *            the state variable location
-	 * @param type
-	 *            the state variable type
-	 * @param name
-	 *            the state variable name
-	 * @param value
-	 *            initial value
+	 * @return an object, or <code>null</code> if this variable has no constant
+	 *         value
 	 */
-	public StateVariable(Location location, Type type, String name,
-			boolean assignable, Expression value) {
-		super(location, type, name, value);
-		this.assignable = assignable;
+	public Object getConstantValue() {
+		return initialValue;
 	}
 
 	/**

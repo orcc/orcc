@@ -99,7 +99,7 @@ public class SolveParametersTransform implements ExpressionInterpreter,
 	public Object interpret(VarExpr expr, Object... args) {
 		Variable var = expr.getVar().getVariable();
 		OrderedMap<GlobalVariable> variables = network.getVariables();
-		Variable variable = variables.get(var.getName());
+		GlobalVariable variable = variables.get(var.getName());
 		Expression value = variable.getExpression();
 		return value;
 	}
@@ -153,7 +153,7 @@ public class SolveParametersTransform implements ExpressionInterpreter,
 	 */
 	private void updateNetworkParameters(Network network,
 			Map<String, Expression> values) {
-		for (Variable parameter : network.getParameters()) {
+		for (GlobalVariable parameter : network.getParameters()) {
 			String name = parameter.getName();
 			Expression value = values.get(name);
 			if (value == null) {
