@@ -31,14 +31,15 @@ package net.sf.orcc.backends;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Locale;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -49,9 +50,11 @@ import net.sf.orcc.ir.type.FloatType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypePrinter;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
 
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.ST;
@@ -64,40 +67,13 @@ import org.stringtemplate.v4.debug.DebugST;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class STPrinter {
-
-	private class BooleanRenderer implements AttributeRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			return STPrinter.this.toString((Boolean) o);
-		}
-
-	}
+public final class STPrinter {
 
 	private class ExpressionRenderer implements AttributeRenderer {
 
 		@Override
 		public String toString(Object o, String formatString, Locale locale) {
 			return STPrinter.this.toString((Expression) o);
-		}
-
-	}
-
-	private class IntegerRenderer implements AttributeRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			return STPrinter.this.toString((Integer) o);
-		}
-
-	}
-
-	private class ListRenderer implements AttributeRenderer {
-
-		@Override
-		public String toString(Object o, String formatString, Locale locale) {
-			return STPrinter.this.toString((List<?>) o);
 		}
 
 	}
@@ -126,7 +102,11 @@ public abstract class STPrinter {
 
 	}
 
+	private Class<? extends ExpressionPrinter> expressionPrinter;
+
 	final protected STGroup group;
+
+	private Class<? extends TypePrinter> typePrinter;
 
 	/**
 	 * Creates a new StringTemplate printer with the given template group name.
@@ -136,30 +116,21 @@ public abstract class STPrinter {
 	 * @throws IOException
 	 *             If the template file could not be read.
 	 */
-	protected STPrinter(String... groupNames) {
+	public STPrinter(String... groupNames) {
 		group = TemplateGroupLoader.loadGroup(groupNames);
 
 		// set to "true" to inspect template
 		group.debug = false;
 
 		// register renderers
-		group.registerRenderer(Boolean.class, new BooleanRenderer());
-		group.registerRenderer(Integer.class, new IntegerRenderer());
-		group.registerRenderer(List.class, new ListRenderer());
 		group.registerRenderer(String.class, new StringRenderer());
 
-		/*Class<?>[] classesINameable = { Procedure.class, GlobalVariable.class,
-				LocalVariable.class, Port.class, StateVariable.class,
-				Variable.class };
-		AttributeRenderer renderer = new INameableRenderer();
-		for (Class<?> clasz : classesINameable) {
-			group.registerRenderer(clasz, renderer);
-		}*/
+		AttributeRenderer renderer;
 
 		Class<?>[] classesExpression = { BinaryExpr.class, BoolExpr.class,
 				IntExpr.class, ListExpr.class, StringExpr.class,
 				UnaryExpr.class, VarExpr.class };
-		AttributeRenderer renderer = new ExpressionRenderer();
+		renderer = new ExpressionRenderer();
 		for (Class<?> clasz : classesExpression) {
 			group.registerRenderer(clasz, renderer);
 		}
@@ -223,29 +194,62 @@ public abstract class STPrinter {
 		}
 	}
 
-	protected String toString(Boolean bool) {
-		return bool.toString();
+	/**
+	 * Prints the given network to a file whose name is given. debugFifos
+	 * specifies whether debug information should be printed about FIFOs, and
+	 * fifoSize is the default FIFO size.
+	 * 
+	 * @param fileName
+	 *            The output file name.
+	 * @param network
+	 *            The network to generate code for.
+	 * @param debugFifos
+	 *            Whether debug information should be printed about FIFOs.
+	 * @param fifoSize
+	 *            Default FIFO size.
+	 * @throws IOException
+	 *             if there is an I/O error
+	 */
+	public void printNetwork(String fileName, Network network,
+			boolean debugFifos, int fifoSize) throws IOException {
+		ST template = group.getInstanceOf("network");
+
+		network.computeTemplateMaps();
+
+		template.add("debugFifos", debugFifos);
+		template.add("network", network);
+		template.add("fifoSize", fifoSize);
+
+		byte[] b = template.render(80).getBytes();
+		OutputStream os = new FileOutputStream(fileName);
+		os.write(b);
+		os.close();
 	}
 
-	protected abstract String toString(Expression expression);
-
-	protected String toString(Integer integer) {
-		return integer.toString();
+	public void setExpressionPrinter(Class<? extends ExpressionPrinter> printer) {
+		this.expressionPrinter = printer;
 	}
 
-	protected String toString(List<?> list) {
-		// set instance of list template as current template
-		ST template = group.getInstanceOf("listValue");
-		for (Object cst : list) {
-			template.add("value", cst.toString());
+	public void setTypePrinter(Class<? extends TypePrinter> printer) {
+		this.typePrinter = printer;
+	}
+
+	private String toString(Expression expression) {
+		ExpressionPrinter printer;
+		try {
+			printer = expressionPrinter.newInstance();
+		} catch (InstantiationException e) {
+			throw new OrccRuntimeException(
+					"expression printer cannot be instantiated", e);
+		} catch (IllegalAccessException e) {
+			throw new OrccRuntimeException(
+					"expression printer cannot be instantiated", e);
 		}
-
-		// restore previous template as current template, and set attribute
-		// "value" to the instance of the list template
-		return template.render(80);
+		expression.accept(printer, Integer.MAX_VALUE);
+		return printer.toString();
 	}
 
-	protected String toString(String string) {
+	private String toString(String string) {
 		StringBuilder builder = new StringBuilder();
 		builder.append('"');
 		builder.append(string.replaceAll("\\\\", "\\\\\\\\"));
@@ -253,6 +257,19 @@ public abstract class STPrinter {
 		return builder.toString();
 	}
 
-	protected abstract String toString(Type type);
+	private String toString(Type type) {
+		TypePrinter printer;
+		try {
+			printer = typePrinter.newInstance();
+		} catch (InstantiationException e) {
+			throw new OrccRuntimeException(
+					"type printer cannot be instantiated", e);
+		} catch (IllegalAccessException e) {
+			throw new OrccRuntimeException(
+					"type printer cannot be instantiated", e);
+		}
+		type.accept(printer);
+		return printer.toString();
+	}
 
 }

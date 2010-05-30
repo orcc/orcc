@@ -35,7 +35,7 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.cpp.codesign.NetworkPartitioner;
 import net.sf.orcc.backends.cpp.codesign.WrapperAdder;
 import net.sf.orcc.ir.Actor;
@@ -67,9 +67,9 @@ public class CppBackendImpl extends AbstractBackend {
 		main(CppBackendImpl.class, args);
 	}
 
-	private CppActorPrinter impl_printer;
+	private STPrinter impl_printer;
 
-	private CppActorPrinter printer;
+	private STPrinter printer;
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
@@ -100,8 +100,12 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 		}
 
-		printer = new CppActorPrinter("Cpp_actorDecl");
-		impl_printer = new CppActorPrinter("Cpp_actorImpl");
+		printer = new STPrinter("C_actor", "Cpp_actorDecl");
+		printer.setExpressionPrinter(CppExprPrinter.class);
+		printer.setTypePrinter(CppTypePrinter.class);
+		impl_printer = new STPrinter("C_actor", "Cpp_actorImpl");
+		impl_printer.setExpressionPrinter(CppExprPrinter.class);
+		impl_printer.setTypePrinter(CppTypePrinter.class);
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
@@ -125,10 +129,13 @@ public class CppBackendImpl extends AbstractBackend {
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
 		try {
-			NetworkPrinter networkPrinter = new NetworkPrinter(
-					"Cpp_networkDecl");
-			NetworkPrinter networkImplPrinter = new NetworkPrinter(
-					"Cpp_networkImpl");
+			STPrinter networkPrinter = new STPrinter("Cpp_networkDecl");
+			networkPrinter.setExpressionPrinter(CppExprPrinter.class);
+			networkPrinter.setTypePrinter(CppTypePrinter.class);
+			
+			STPrinter networkImplPrinter = new STPrinter("Cpp_networkImpl");
+			networkImplPrinter.setExpressionPrinter(CppExprPrinter.class);
+			networkImplPrinter.setTypePrinter(CppTypePrinter.class);
 
 			List<Network> networks;
 			if (partitioning) {
@@ -138,7 +145,6 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 
 			for (Network subnetwork : networks) {
-
 				if (partitioning) {
 					new WrapperAdder().transform(subnetwork);
 				}
@@ -151,7 +157,6 @@ public class CppBackendImpl extends AbstractBackend {
 				outputName = path + File.separator + name + ".cpp";
 				networkImplPrinter.printNetwork(outputName, subnetwork, false,
 						fifoSize);
-
 			}
 
 			new CppMainPrinter().printMain(path, networks, null);

@@ -17,11 +17,6 @@ listSize(value) ::= <<
 $value : {[$it$]} $
 >>
 
-// the values of a list: {val1, val2, ..., valn}
-listValue(value) ::= <<
-{$value; wrap, separator=", "$}
->>
-
 variableDeclaration(variable) ::= <<
 $
 if(variable.port)
@@ -33,6 +28,33 @@ $
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Constants
+///////////////////////////////////////////////////////////////////////////////
+
+Constant(constant) ::= <<
+$(constant.class.simpleName)(constant)$
+>>
+
+Boolean(constant) ::= <<
+$if (constant)$1$else$0$endif$
+>>
+
+Integer(constant) ::= <<
+$constant$
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+List(constant) ::= <<
+{$constant: Constant(); wrap, separator=", "$}
+>>
+
+ArrayList(constant) ::= <<$List(constant)$>>
+
+String(constant) ::= <<
+$constant; format="constant"$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
@@ -41,10 +63,10 @@ $if(!variable.assignable)$
 $if(!variable.type.list)$
 #define $variable$ $variable.constantValue; format="constant"$
 $else$
-static $variableDeclaration(variable)$ = $variable.constantValue; format="constant"$;
+static $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;
 $endif$
 $else$
-static $variableDeclaration(variable)$ = $variable.constantValue; format="constant"$;
+static $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;
 $endif$
 $else$
 static $variableDeclaration(variable)$;

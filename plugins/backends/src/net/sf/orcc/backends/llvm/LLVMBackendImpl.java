@@ -35,6 +35,7 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
+import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
@@ -60,7 +61,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		main(LLVMBackendImpl.class, args);
 	}
 
-	private LLVMActorPrinter printer;
+	private STPrinter printer;
 
 	@Override
 	protected void doInstantiation(Network network, String outputFolder) {
@@ -74,7 +75,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 			// TODO classify actors
 		}
 
-		printer = new LLVMActorPrinter();
+		printer = new STPrinter("LLVM_core", "LLVM_header", "LLVM_actor",
+				"LLVM_metadata");
+		printer.setExpressionPrinter(LLVMExprPrinter.class);
+		printer.setTypePrinter(LLVMTypePrinter.class);
 
 		// transforms and prints actors
 		transformActors(actors);

@@ -36,7 +36,7 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.ir.Actor;
@@ -62,7 +62,7 @@ public class CBackendImpl extends AbstractBackend {
 	/**
 	 * printer is protected in order to be visible to CQuasiBackendImpl
 	 */
-	protected CActorPrinter printer;
+	protected STPrinter printer;
 
 	private final Map<String, String> transformations;
 
@@ -95,7 +95,9 @@ public class CBackendImpl extends AbstractBackend {
 		}
 
 		// until now, printer is default printer
-		printer = new CActorPrinter();
+		printer = new STPrinter("C_actor");
+		printer.setExpressionPrinter(CExpressionPrinter.class);
+		printer.setTypePrinter(CTypePrinter.class);
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
@@ -128,7 +130,9 @@ public class CBackendImpl extends AbstractBackend {
 				networkTemplates[0] = "C_network";
 			}
 
-			NetworkPrinter networkPrinter = new NetworkPrinter(networkTemplates);
+			STPrinter networkPrinter = new STPrinter(networkTemplates);
+			networkPrinter.setExpressionPrinter(CExpressionPrinter.class);
+			networkPrinter.setTypePrinter(CTypePrinter.class);
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);

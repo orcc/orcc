@@ -34,7 +34,8 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
@@ -60,11 +61,13 @@ public class JavaBackendImpl extends AbstractBackend {
 		main(JavaBackendImpl.class, args);
 	}
 
-	private JavaActorPrinter printer;
+	private STPrinter printer;
 
 	@Override
 	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
-		printer = new JavaActorPrinter();
+		printer = new STPrinter("C_actor", "Java_actor");
+		printer.setExpressionPrinter(CppExprPrinter.class);
+		printer.setTypePrinter(JavaTypePrinter.class);
 
 		transformActors(actors);
 		printActors(actors);
@@ -89,8 +92,10 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
 		try {
-			NetworkPrinter networkPrinter = new NetworkPrinter("C_network",
+			STPrinter networkPrinter = new STPrinter("C_network",
 					"Java_network");
+			networkPrinter.setExpressionPrinter(CppExprPrinter.class);
+			networkPrinter.setTypePrinter(JavaTypePrinter.class);
 
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);

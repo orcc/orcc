@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.NetworkPrinter;
+import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
@@ -72,11 +72,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 		main(VHDLBackendImpl.class, args);
 	}
 
-	private NetworkPrinter networkPrinter;
+	private STPrinter networkPrinter;
 
-	private VHDLActorPrinter printer;
+	private STPrinter printer;
 
-	private VHDLTestbenchPrinter tbPrinter;
+	private STPrinter tbPrinter;
 
 	private final Map<String, String> transformations;
 
@@ -90,7 +90,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		printer = new VHDLActorPrinter();
+		printer = new STPrinter("VHDL_actor");
+		printer.setExpressionPrinter(VHDLExpressionPrinter.class);
+		printer.setTypePrinter(VHDLTypePrinter.class);
+
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printActors(actors);
@@ -115,7 +118,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void printNetwork(Network network) throws OrccException {
-		tbPrinter = new VHDLTestbenchPrinter();
+		tbPrinter = new STPrinter("VHDL_testbench");
+		tbPrinter.setExpressionPrinter(VHDLExpressionPrinter.class);
+		tbPrinter.setTypePrinter(VHDLTypePrinter.class);
+
 		File folder = new File(path + File.separator + "Testbench");
 		if (!folder.exists()) {
 			folder.mkdir();
@@ -125,7 +131,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 		printTestbench(instance);
 
 		try {
-			networkPrinter = new NetworkPrinter("VHDL_network");
+			networkPrinter = new STPrinter("VHDL_network");
+			networkPrinter.setExpressionPrinter(VHDLExpressionPrinter.class);
+			networkPrinter.setTypePrinter(VHDLTypePrinter.class);
 
 			String outputName = path + File.separator + "Design"
 					+ File.separator + network.getName() + ".vhd";
