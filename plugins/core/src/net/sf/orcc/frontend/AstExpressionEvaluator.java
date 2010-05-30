@@ -272,8 +272,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		AstVariable variable = expression.getValue().getVariable();
 		Object value = values.get(variable);
 		if (value == null) {
-			String message = "variable " + variable.getName()
-					+ " does not have a compile-time constant value";
+			String message = "variable \"" + variable.getName() + "\" ("
+					+ Util.getLocation(variable)
+					+ ") does not have a compile-time constant value";
 			throw new OrccRuntimeException(file, Util.getLocation(expression),
 					message);
 		}

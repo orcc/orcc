@@ -38,8 +38,11 @@ import net.sf.orcc.cal.cal.AstActor;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import org.eclipse.xtext.resource.XtextResource;
+import org.eclipse.xtext.resource.XtextResourceSet;
+
+import com.google.inject.Injector;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -54,7 +57,15 @@ public class FrontendCli {
 	 */
 	public static void main(String[] args) {
 		if (args.length == 2) {
-			new FrontendCli(args[0], args[1]);
+			System.out.println("doing setup of CAL Xtext parser");
+			Injector injector = new CalStandaloneSetup()
+					.createInjectorAndDoEMFRegistration();
+			FrontendCli fe = injector.getInstance(FrontendCli.class);
+			System.out.println("done");
+
+			fe.setVtlFolder(args[0]);
+			fe.setOutputFolder(args[1]);
+			fe.processActors();
 		} else {
 			System.err.println("Usage: Frontend "
 					+ "<absolute path of VTL folder> "
@@ -66,29 +77,11 @@ public class FrontendCli {
 
 	private Frontend frontend;
 
-	public FrontendCli(String vtlFolder, String outputFolder) {
-		File file = new File(outputFolder);
-		if (!file.exists()) {
-			file.mkdir();
-		}
+	private XtextResourceSet resourceSet;
 
-		frontend = new Frontend(outputFolder);
+	public FrontendCli() {
 
-		System.out.println("doing setup of CAL Xtext parser");
-		CalStandaloneSetup.doSetup();
-		System.out.println("done");
-
-		File vtl = new File(vtlFolder);
-		actors = new ArrayList<File>();
-		getActors(vtl);
-
-		resourceSet = new ResourceSetImpl();
-		for (File actor : actors) {
-			processActor(actor);
-		}
 	}
-
-	private ResourceSet resourceSet;
 
 	private void getActors(File vtl) {
 		for (File file : vtl.listFiles()) {
@@ -105,11 +98,45 @@ public class FrontendCli {
 		Resource resource = resourceSet.getResource(uri, true);
 		AstActor astActor = (AstActor) resource.getContents().get(0);
 
+		// only compile if actor has no errors
+		List<Diagnostic> errors = astActor.eResource().getErrors();
+		if (!errors.isEmpty()) {
+			for (Diagnostic error : errors) {
+				System.err.println(error);
+			}
+
+			return;
+		}
+
 		try {
 			frontend.compile(actorPath.getAbsolutePath(), astActor);
 		} catch (OrccException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void processActors() {
+		resourceSet = new XtextResourceSet();
+		resourceSet.addLoadOption(XtextResource.OPTION_RESOLVE_ALL,
+				Boolean.TRUE);
+		for (File actor : actors) {
+			processActor(actor);
+		}
+	}
+
+	private void setOutputFolder(String outputFolder) {
+		File file = new File(outputFolder);
+		if (!file.exists()) {
+			file.mkdir();
+		}
+
+		frontend = new Frontend(outputFolder);
+	}
+
+	private void setVtlFolder(String vtlFolder) {
+		File vtl = new File(vtlFolder);
+		actors = new ArrayList<File>();
+		getActors(vtl);
 	}
 
 }

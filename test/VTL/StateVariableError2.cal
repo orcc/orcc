@@ -1,0 +1,9 @@
+actor StateVariableError2 () ==> :
+	
+	int x := 0;
+	
+	int y = z * 3;
+	
+	int z;
+	
+end

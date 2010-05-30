@@ -29,6 +29,9 @@
 package net.sf.orcc.frontend;
 
 import java.io.File;
+import java.util.List;
+
+import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
@@ -55,11 +58,15 @@ public class Frontend {
 	}
 
 	public void compile(String file, AstActor astActor) throws OrccException {
-		try {
-			Actor actor = new AstToIR().transform(file, astActor);
-			new IRWriter(actor).write(outputFolder.toString());
-		} catch (OrccRuntimeException e) {
-			throw new OrccException(e.getMessage());
+		// only compile if actor has no errors
+		List<Diagnostic> errors = astActor.eResource().getErrors();
+		if (errors.isEmpty()) {
+			try {
+				Actor actor = new AstToIR().transform(file, astActor);
+				new IRWriter(actor).write(outputFolder.toString());
+			} catch (OrccRuntimeException e) {
+				throw new OrccException(e.getMessage(), e);
+			}
 		}
 	}
 
