@@ -4,7 +4,7 @@
 package net.sf.orcc.cal.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.xtext.ui.ILocationInFileProvider;
+import org.eclipse.xtext.resource.ILocationInFileProvider;
 
 /**
  * Use this class to register components to be used within the IDE.

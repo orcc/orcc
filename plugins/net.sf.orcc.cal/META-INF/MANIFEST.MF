@@ -7,7 +7,6 @@ Bundle-SymbolicName: net.sf.orcc.cal; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.xtext,
  org.eclipse.xtext.generator;resolution:=optional,
- de.itemis.xtext.antlr;resolution:=optional,
  org.apache.commons.logging;resolution:=optional,
  org.eclipse.emf.codegen.ecore;resolution:=optional,
  org.eclipse.emf.mwe.utils;resolution:=optional,
@@ -21,12 +20,12 @@ Require-Bundle: org.eclipse.xtext,
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sf.orcc.cal,
- net.sf.orcc.cal.services,
  net.sf.orcc.cal.cal,
- net.sf.orcc.cal.cal.impl,
  net.sf.orcc.cal.cal.util,
- net.sf.orcc.cal.parseTreeConstruction,
- net.sf.orcc.cal.parser.antlr,
  net.sf.orcc.cal.parser.antlr.internal,
+ net.sf.orcc.cal.services,
+ net.sf.orcc.cal.validation,
  net.sf.orcc.util,
- net.sf.orcc.cal.validation
+ net.sf.orcc.cal.cal.impl,
+ net.sf.orcc.cal.parseTreeConstruction,
+ net.sf.orcc.cal.parser.antlr

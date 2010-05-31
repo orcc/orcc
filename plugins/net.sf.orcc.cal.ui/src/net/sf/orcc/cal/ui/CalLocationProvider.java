@@ -33,7 +33,7 @@ import net.sf.orcc.cal.cal.AstAction;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.xtext.ui.DefaultLocationInFileProvider;
+import org.eclipse.xtext.resource.DefaultLocationInFileProvider;
 
 /**
  * This class provides location for the objects of the AST.
