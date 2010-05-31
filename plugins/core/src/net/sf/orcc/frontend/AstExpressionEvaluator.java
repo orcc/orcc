@@ -74,8 +74,8 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	@Override
 	public Object caseAstExpressionBinary(AstExpressionBinary expression) {
 		BinaryOp op = BinaryOp.getOperator(expression.getOperator());
-		Object val1 = doSwitch(expression.getLeft());
-		Object val2 = doSwitch(expression.getRight());
+		Object val1 = evaluate(expression.getLeft());
+		Object val2 = evaluate(expression.getRight());
 
 		switch (op) {
 		case BITAND:
@@ -240,9 +240,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		}
 
 		if ("bitand".equals(name)) {
-			if (parameters.size() == 2) {
-				Object obj1 = parameters.get(0);
-				Object obj2 = parameters.get(1);
+			if (values.size() == 2) {
+				Object obj1 = values.get(0);
+				Object obj2 = values.get(1);
 				if (obj1 instanceof Integer && obj2 instanceof Integer) {
 					return (Integer) obj1 & (Integer) obj2;
 				}
@@ -252,9 +252,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					"bitand expects two integer expressions");
 		}
 		if ("bitor".equals(name)) {
-			if (parameters.size() == 2) {
-				Object obj1 = parameters.get(0);
-				Object obj2 = parameters.get(1);
+			if (values.size() == 2) {
+				Object obj1 = values.get(0);
+				Object obj2 = values.get(1);
 				if (obj1 instanceof Integer && obj2 instanceof Integer) {
 					return (Integer) obj1 | (Integer) obj2;
 				}
@@ -264,9 +264,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					"bitor expects two integer expressions");
 		}
 		if ("bitxor".equals(name)) {
-			if (parameters.size() == 2) {
-				Object obj1 = parameters.get(0);
-				Object obj2 = parameters.get(1);
+			if (values.size() == 2) {
+				Object obj1 = values.get(0);
+				Object obj2 = values.get(1);
 				if (obj1 instanceof Integer && obj2 instanceof Integer) {
 					return (Integer) obj1 ^ (Integer) obj2;
 				}
@@ -276,8 +276,8 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					"bitxor expects two integer expressions");
 		}
 		if ("bitnot".equals(name)) {
-			if (parameters.size() == 1) {
-				Object obj = parameters.get(0);
+			if (values.size() == 1) {
+				Object obj = values.get(0);
 				if (obj instanceof Integer) {
 					return ~(Integer) obj;
 				}
@@ -287,9 +287,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					"bitor expects two integer expressions");
 		}
 		if ("lshift".equals(name)) {
-			if (parameters.size() == 2) {
-				Object obj1 = parameters.get(0);
-				Object obj2 = parameters.get(1);
+			if (values.size() == 2) {
+				Object obj1 = values.get(0);
+				Object obj2 = values.get(1);
 				if (obj1 instanceof Integer && obj2 instanceof Integer) {
 					return (Integer) obj1 << (Integer) obj2;
 				}
@@ -299,9 +299,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					"lshift expects two integer expressions");
 		}
 		if ("rshift".equals(name)) {
-			if (parameters.size() == 2) {
-				Object obj1 = parameters.get(0);
-				Object obj2 = parameters.get(1);
+			if (values.size() == 2) {
+				Object obj1 = values.get(0);
+				Object obj2 = values.get(1);
 				if (obj1 instanceof Integer && obj2 instanceof Integer) {
 					return (Integer) obj1 >> (Integer) obj2;
 				}
@@ -319,12 +319,14 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	public Object caseAstExpressionIf(AstExpressionIf expression) {
 		Object condition = evaluate(expression.getCondition());
 
+		// evaluates both branches so errors are caught early
+		Object oThen = evaluate(expression.getThen());
+		Object oElse = evaluate(expression.getElse());
+
 		if (condition instanceof Boolean) {
 			if ((Boolean) condition) {
-				Object oThen = evaluate(expression.getThen());
 				return oThen;
 			} else {
-				Object oElse = evaluate(expression.getElse());
 				return oElse;
 			}
 		} else {
@@ -335,8 +337,39 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 
 	@Override
 	public Object caseAstExpressionIndex(AstExpressionIndex expression) {
-		throw new OrccRuntimeException(file, Util.getLocation(expression),
-				"TODO index");
+		AstVariable variable = expression.getSource().getVariable();
+		Object value = values.get(variable);
+		if (value == null) {
+			String message = "variable \"" + variable.getName() + "\" ("
+					+ Util.getLocation(variable)
+					+ ") does not have a compile-time constant value";
+			throw new OrccRuntimeException(file, Util.getLocation(expression),
+					message);
+		}
+
+		List<AstExpression> indexes = expression.getIndexes();
+
+		for (AstExpression index : indexes) {
+			Object indexValue = evaluate(index);
+			if (value instanceof List<?>) {
+				List<?> list = (List<?>) value;
+				if (indexValue instanceof Integer) {
+					value = list.get((Integer) indexValue);
+				} else {
+					throw new OrccRuntimeException(file,
+							Util.getLocation(expression),
+							"index must be an integer");
+				}
+			} else {
+				throw new OrccRuntimeException(file,
+						Util.getLocation(expression), "variable \""
+								+ variable.getName() + "\" ("
+								+ Util.getLocation(variable)
+								+ ") must be of type List");
+			}
+		}
+		
+		return value;
 	}
 
 	@Override
@@ -346,8 +379,18 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 
 	@Override
 	public Object caseAstExpressionList(AstExpressionList expression) {
-		throw new OrccRuntimeException(file, Util.getLocation(expression),
-				"TODO list");
+		List<AstGenerator> generators = expression.getGenerators();
+		if (!generators.isEmpty()) {
+			// generators will be translated to statements in initialize
+			return null;
+		}
+
+		List<AstExpression> expressions = expression.getExpressions();
+		List<Object> list = new ArrayList<Object>(expressions.size());
+		for (AstExpression subExpression : expressions) {
+			list.add(evaluate(subExpression));
+		}
+		return list;
 	}
 
 	@Override
@@ -358,7 +401,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	@Override
 	public Object caseAstExpressionUnary(AstExpressionUnary expression) {
 		UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
-		Object value = doSwitch(expression.getExpression());
+		Object value = evaluate(expression.getExpression());
 
 		switch (op) {
 		case BITNOT:
@@ -435,7 +478,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	 *             if the given expression cannot be evaluated.
 	 */
 	public int evaluateAsInteger(AstExpression expression) {
-		Object value = doSwitch(expression);
+		Object value = evaluate(expression);
 		if (value instanceof Integer) {
 			return ((Integer) value).intValue();
 		}
