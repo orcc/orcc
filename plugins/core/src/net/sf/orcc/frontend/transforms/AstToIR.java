@@ -37,8 +37,10 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeFloat;
 import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
+import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
@@ -56,8 +58,10 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.FloatType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
@@ -80,6 +84,11 @@ public class AstToIR {
 		}
 
 		@Override
+		public Type caseAstTypeFloat(AstTypeFloat type) {
+			return new FloatType();
+		}
+
+		@Override
 		public Type caseAstTypeInt(AstTypeInt type) {
 			AstExpression astSize = type.getSize();
 			Expression size;
@@ -97,6 +106,11 @@ public class AstToIR {
 			Expression size = exprEvaluator.evaluateAsIntExpr(listType
 					.getSize());
 			return new ListType(size, type);
+		}
+
+		@Override
+		public Type caseAstTypeString(AstTypeString type) {
+			return new StringType();
 		}
 
 		@Override
@@ -164,6 +178,19 @@ public class AstToIR {
 				scheduler, null);
 	}
 
+	private OrderedMap<Port> transformPorts(List<AstPort> portList) {
+		OrderedMap<Port> ports = new OrderedMap<Port>();
+		for (AstPort aPort : portList) {
+			Location location = Util.getLocation(aPort);
+			Type type = transformType(aPort.getType());
+			Port port = new Port(location, type, aPort.getName());
+			portMap.put(aPort, port);
+			ports.add(file, location, port.getName(), port);
+		}
+
+		return ports;
+	}
+
 	private OrderedMap<Variable> transformStateVariables(
 			EList<AstVariable> stateVariables) {
 		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
@@ -191,19 +218,6 @@ public class AstToIR {
 		}
 
 		return stateVars;
-	}
-
-	private OrderedMap<Port> transformPorts(List<AstPort> portList) {
-		OrderedMap<Port> ports = new OrderedMap<Port>();
-		for (AstPort aPort : portList) {
-			Location location = Util.getLocation(aPort);
-			Type type = transformType(aPort.getType());
-			Port port = new Port(location, type, aPort.getName());
-			portMap.put(aPort, port);
-			ports.add(file, location, port.getName(), port);
-		}
-
-		return ports;
 	}
 
 	private Type transformType(AstType aType) {
