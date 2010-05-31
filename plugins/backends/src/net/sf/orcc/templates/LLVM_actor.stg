@@ -47,7 +47,7 @@ default:
 switchTransition(transition) ::= <<
 
 s_$transition.sourceState$:
-	%$transition.sourceState$_res = $CallOp(ty="i1", fnptrval={@$transition.sourceState$_state_scheduler})$
+	%$transition.sourceState$_res = $CallOp(ty="i1", fnptrval={$transition.sourceState$_state_scheduler})$
 	$BrOp(cond={%$transition.sourceState$_res}, iftrue="%inc_i", iffalse="%return")$
 >>
 
@@ -87,7 +87,7 @@ entry:
 
 bb:
 $if(actions)$
-	%outside_FSM_res = $CallOp(ty="i32", fnptrval="@outside_FSM_scheduler")$
+	%outside_FSM_res = $CallOp(ty="i32", fnptrval="outside_FSM_scheduler")$
 	$IcmpOp(result="%outside_FSM", cond="sgt", ty="i32", op1="%outside_FSM_res", op2="0")$
 	$BrOp(cond="%outside_FSM", iftrue="%inc_i", iffalse="%fsm_state")$
 
@@ -129,7 +129,7 @@ $nextStates: actionTestState()$
 >>
 
 actionTestState(nextState) ::= <<
-	%isSchedulable_$nextState.action$ = $CallOp(ty="i1", fnptrval={@isSchedulable_$nextState.action$})$
+	%isSchedulable_$nextState.action$ = $CallOp(ty="i1", fnptrval={isSchedulable_$nextState.action$})$
 	$BrOp(cond={%isSchedulable_$nextState.action$}, iftrue={%fire_$nextState.action$}, iffalse={%skip_$nextState.action$})$
 
 fire_$nextState.action$:
@@ -195,7 +195,7 @@ $actions:{$actionTest(action=it)$}$
 >>
 
 actionTest(action) ::= <<
-	%isSchedulable_$action$ = $CallOp(ty="i1", fnptrval={@isSchedulable_$action$})$
+	%isSchedulable_$action$ = $CallOp(ty="i1", fnptrval={isSchedulable_$action$})$
 	$BrOp(cond={%isSchedulable_$action$}, iftrue={%fire_$action$}, iffalse={%skip_$action$})$
 
 fire_$action$:

@@ -121,7 +121,7 @@ $Location_decl_MD(var)$ = metadata  !{$startLine_MD(var)$, $startColumn_MD(var)$
 >>
 
 Sched_MD(action) ::= <<
-$Sched_decl_MD(action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExtern_MD(action.scheduler)$, i1()* $action.scheduler$}
+$Sched_decl_MD(action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExtern_MD(action.scheduler)$, i1()* @$action.scheduler$}
 
 >>
 
@@ -133,7 +133,7 @@ VarDef_decl_MD(var) = metadata !{$varName_MD(var)$, $varAssignable_MD(var)$, $va
 
 
 Body_MD(action) ::= <<
-$Body_decl_MD(action)$ = metadata  !{$varName_MD(action.body)$, $procExtern_MD(action.body)$, void()* $action.body$}
+$Body_decl_MD(action)$ = metadata  !{$varName_MD(action.body)$, $procExtern_MD(action.body)$, void()* @$action.body$}
 
 >>
 

@@ -130,6 +130,7 @@ public class LLVMExprPrinter extends ExpressionPrinter {
 		Type type;
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
+		LLVMTypePrinter typePrinter = new LLVMTypePrinter();
 
 		if (e1 instanceof VarExpr) {
 			Use use = ((VarExpr) e1).getVar();
@@ -148,9 +149,11 @@ public class LLVMExprPrinter extends ExpressionPrinter {
 		}
 
 		builder.append(toString(op));
-
-		builder.append(" " + type.toString() + " ");
-
+		
+		type.accept(typePrinter);
+		
+		builder.append(" " + typePrinter.toString() + " ");
+		
 		if (e1 instanceof VarExpr) {
 			builder.append("%");
 		}
