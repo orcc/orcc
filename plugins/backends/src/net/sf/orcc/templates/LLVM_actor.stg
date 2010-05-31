@@ -231,7 +231,7 @@ $actionCall(action)$
 
 procedure(procedure) ::= <<
 $if(!procedure.external)$
-define internal $procedure.returnType$ $procedure$($procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", "$) {
+define internal $procedure.returnType$ @$procedure$($procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", "$) {
 entry:
 $if(procedure.locals.list)$
 	$procedure.locals.list: variableDeclaration()$
