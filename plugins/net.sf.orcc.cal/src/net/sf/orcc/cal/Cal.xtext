@@ -223,9 +223,9 @@ AstExpressionIf:
 
 AstExpressionList:
 	'[' expressions+=AstExpression (',' expressions+=AstExpression)*
-	(':' generators+=AstExpressionGenerator (',' generators+=AstExpressionGenerator)*)? ']';
+	(':' generators+=AstGenerator (',' generators+=AstGenerator)*)? ']';
 
-AstExpressionGenerator:
+AstGenerator:
 	'for' variable=AstVariableDeclaration 'in'
 	'Integers' '(' lower=AstExpression ',' higher=AstExpression ')';
 

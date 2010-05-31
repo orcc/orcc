@@ -33,9 +33,9 @@ import java.util.List;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstExpressionGenerator;
 import net.sf.orcc.cal.cal.AstExpressionList;
 import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatementForeach;
@@ -106,7 +106,7 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 	public IScope scope_AstVariableReference_variable(AstExpressionList list,
 			EReference reference) {
 		List<AstVariable> elements = new ArrayList<AstVariable>();
-		for (AstExpressionGenerator generator : list.getGenerators()) {
+		for (AstGenerator generator : list.getGenerators()) {
 			elements.add(generator.getVariable());
 		}
 		EObject container = list.eContainer();

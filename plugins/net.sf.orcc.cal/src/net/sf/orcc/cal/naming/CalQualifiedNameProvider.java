@@ -32,7 +32,7 @@ import java.util.Iterator;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstExpressionGenerator;
+import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTag;
 
@@ -83,7 +83,7 @@ public class CalQualifiedNameProvider extends
 		return actor.getName();
 	}
 
-	public String qualifiedName(AstExpressionGenerator generator) {
+	public String qualifiedName(AstGenerator generator) {
 		return "generator." + blockCount++;
 	}
 

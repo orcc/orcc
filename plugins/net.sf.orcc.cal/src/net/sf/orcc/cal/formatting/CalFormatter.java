@@ -32,12 +32,12 @@ import net.sf.orcc.cal.services.CalGrammarAccess;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstActionElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstActorElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionCallElements;
-import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionGeneratorElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionIfElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionIndexElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionListElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstExpressionPostfixElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstFunctionElements;
+import net.sf.orcc.cal.services.CalGrammarAccess.AstGeneratorElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstInitializeElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstPriorityElements;
 import net.sf.orcc.cal.services.CalGrammarAccess.AstProcedureElements;
@@ -217,8 +217,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	 *            formatting config
 	 */
 	private void configureExpressionList(FormattingConfig c) {
-		AstExpressionGeneratorElements gaccess = f
-				.getAstExpressionGeneratorAccess();
+		AstGeneratorElements gaccess = f.getAstGeneratorAccess();
 
 		c.setNoSpace().around(gaccess.getLeftParenthesisKeyword_4());
 		c.setNoSpace().before(gaccess.getRightParenthesisKeyword_8());

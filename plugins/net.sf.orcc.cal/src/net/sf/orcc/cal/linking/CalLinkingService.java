@@ -48,6 +48,13 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.linking.impl.DefaultLinkingService;
 import org.eclipse.xtext.parsetree.AbstractNode;
 
+/**
+ * This class defines a linking service for built-in functions/procedures and
+ * FSM states.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public class CalLinkingService extends DefaultLinkingService {
 
 	private Map<String, AstFunction> functions;

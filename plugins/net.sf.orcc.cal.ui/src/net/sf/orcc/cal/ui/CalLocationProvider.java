@@ -52,5 +52,5 @@ public class CalLocationProvider extends DefaultLocationInFileProvider {
 			return super.getIdentifierFeature(obj);
 		}
 	}
-	
+
 }

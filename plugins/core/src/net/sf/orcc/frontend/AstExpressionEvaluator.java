@@ -38,7 +38,6 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
 import net.sf.orcc.cal.cal.AstExpressionCall;
-import net.sf.orcc.cal.cal.AstExpressionGenerator;
 import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
 import net.sf.orcc.cal.cal.AstExpressionInteger;
@@ -46,6 +45,7 @@ import net.sf.orcc.cal.cal.AstExpressionList;
 import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
+import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.ir.Expression;
@@ -316,12 +316,6 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	@Override
-	public Object caseAstExpressionGenerator(AstExpressionGenerator expression) {
-		throw new OrccRuntimeException(file, Util.getLocation(expression),
-				"TODO generator");
-	}
-
-	@Override
 	public Object caseAstExpressionIf(AstExpressionIf expression) {
 		Object condition = evaluate(expression.getCondition());
 
@@ -408,6 +402,12 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		}
 
 		return value;
+	}
+
+	@Override
+	public Object caseAstGenerator(AstGenerator expression) {
+		throw new OrccRuntimeException(file, Util.getLocation(expression),
+				"TODO generator");
 	}
 
 	/**
