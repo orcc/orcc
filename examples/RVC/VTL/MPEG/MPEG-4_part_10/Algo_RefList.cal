@@ -64,7 +64,9 @@ actor Algo_RefList ()
 	uint(size=5)  SzSTList,
 	uint(size=31) LongTermList,
 	uint(size=5)  NbLTFrame,
-	uint(size=5)  NbRefFrame
+	uint(size=5)  NbRefFrame,
+	int (size=32) DelList,
+	uint(size=32) POC
 		==>
 	int (size=32) RefList
 		:
@@ -75,7 +77,12 @@ actor Algo_RefList ()
 *
 */
 
+	List(type:int (size=32), size=32) FrameNumList := [-1 :for int s in Integers(0,31)];
+	List(type:int (size=32), size=32) IdxLTList    := [-1 :for int s in Integers(0,31)];
+	List(type:uint(size=32), size=32) POCList      := [ 0 :for int s in Integers(0,31)];
+
 	List(type:int(size=32), size=16) RefListTab := [0 :for int s in Integers(0,16-1)];
+	List(type:int(size=32), size=16) IdxList    := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32), size=16) STList     := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32), size=16) LTList     := [-1 :for int s in Integers(0,16-1)];
 
@@ -89,7 +96,9 @@ actor Algo_RefList ()
 	uint(size=5)  NbSTRead           := 0; /* Contains the number of Short Term List's' element which are read          */
 	uint(size=5)  NbLTRead           := 0; /* Contains the number of Long Term List's' element which are read           */
 	uint(size=5)  NumMaxListRefFrame := 0; /* Frame Number of all pictures must be between 0 and NumMaxListRefFrame - 1 */
-
+	int (size=32) SizeList           := 0;
+	int (size=32) CounterList        := 0;
+	uint(size=32) CurrentPOC;
 /*
 *
 * Actions
@@ -97,14 +106,71 @@ actor Algo_RefList ()
 */
 
 
+	ReadSizeDelList: action
+			DelList :[SizeDelList]
+				==>
+		do
+			SizeList    := SizeDelList;
+			CounterList := 0;
+			if(SizeList = -1) then
+				foreach int i in Integers(0,31)
+				do
+					if(FrameNumList[i] != FrameNum) then
+						FrameNumList[i] := -1;
+						IdxLTList[i]    := -1;
+						POCList[i]      := 0;
+					else
+						FrameNumList[i] := 0;
+					end
+				end
+			end
+		end
+
+
+	ReadDelList: action
+			DelList :[ValDelList]
+				==>
+		guard
+			CounterList < SizeList
+		do
+			foreach int i in Integers(0,31)
+			do
+				if(FrameNumList[i] = ValDelList) then
+					FrameNumList[i] := -1;
+					IdxLTList[i]    := -1;
+					POCList[i]      := 0;
+				end
+			end
+			CounterList := CounterList + 1;
+		end
+
+	ReadDelListDone: action ==>
+		guard
+			CounterList >= SizeList
+		end
+
 	//Gets slice's FrameNum and slice's MaxFrameNum
 	read_num_ref_frames: action
 			FraNum      :[frame_num],
+			POC         :[ValPOC],
 			MaxFrameNum :[MaxFrNu]
 				==>
+		var
+			bool Idxfound := false,
+			int(size=4) idx := 0
 		do
 			FrameNum       := frame_num;
+			CurrentPOC     := ValPOC;
 			ValMaxFrameNum := MaxFrNu;
+			while(not Idxfound)
+			do
+				if( (FrameNumList[idx] = -1) or (idx = 31) ) then
+					FrameNumList[idx] := frame_num;
+					POCList[idx]      := ValPOC;
+					Idxfound          := true;
+				end
+				idx := idx + 1;
+			end
 		end
 
 
@@ -118,6 +184,10 @@ actor Algo_RefList ()
 			LongTermCount  := val_long_term_count;
 			NbSTRead       := 0;
 			NbLTRead       := 0;
+			foreach int i in Integers(0,31)
+			do
+				IdxLTList[i] := -1;
+			end
 		end
 
 
@@ -141,6 +211,12 @@ actor Algo_RefList ()
 			NbLTRead < 16
 		do
 			LTList[NbLTRead] := ValLongTerm;
+			foreach int i in Integers(0,31)
+			do
+				if(FrameNumList[i] = ValLongTerm) then
+					IdxLTList[i] := NbLTRead;
+				end
+			end
 			NbLTRead         := NbLTRead + 1;
 		end
 
@@ -154,7 +230,7 @@ actor Algo_RefList ()
 	InitRefList: action
 		NbRefFrame :[ValIDxMax]
 			==>
-		RefList     :[NumMaxListRefFrame]
+		RefList      :[NumMaxListRefFrame]
 	var
 			int ListIndex := 0
 	do
@@ -181,6 +257,9 @@ actor Algo_RefList ()
 			end
 		end
 
+//		println("FrameNum :="+FrameNum);
+//		println("Current Poc :="+CurrentPOC);
+//		println("Nb elem :="+NumMaxListRefFrame);
 		//Indicates that nothing in RefList has been sent
 		CounterRefListTab := 0;
 	end
@@ -293,13 +372,18 @@ actor Algo_RefList ()
 	//Send the RefList
 	SendRefList: action 
 				==>
-			RefList:[ref]
+			RefList:[poc]
 		guard
 			CounterRefListTab < NumMaxListRefFrame 
 		var
-			uint(size = 31) ref
+			int (size = 32) poc := 0
 		do
-			ref               := RefListTab[CounterRefListTab];
+			foreach int i in Integers(0,31)
+			do
+				if(FrameNumList[i] = RefListTab[CounterRefListTab] and POCList[i] != CurrentPOC) then
+					poc := POCList[i];
+				end
+			end
 			CounterRefListTab := CounterRefListTab + 1;
 	end
 
@@ -313,6 +397,10 @@ actor Algo_RefList ()
 *
 */
 	schedule fsm  read_num_ref_frames:
+		ReadSizeDelList                   (ReadSizeDelList                      )--> ReadDelList;
+		ReadDelList                       (ReadDelList                          )--> ReadDelList;
+		ReadDelList                       (ReadDelListDone                      )--> read_num_ref_frames;
+
 		read_num_ref_frames               (read_num_ref_frames                  )--> ReadSizeLists;
 
 		ReadSizeLists                     (ReadSizeLists                        )--> ReadLists;
@@ -329,7 +417,7 @@ actor Algo_RefList ()
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_3    )--> SendRefList;
 
 		SendRefList                       (SendRefList                          )--> SendRefList;
-		SendRefList                       (SendRefListDone                      )--> read_num_ref_frames;
+		SendRefList                       (SendRefListDone                      )--> ReadSizeDelList;
 
 
 	end

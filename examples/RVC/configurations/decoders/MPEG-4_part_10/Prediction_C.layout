@@ -15,7 +15,7 @@
       <vertex id="MV" x="57" y="1960"/>
       <vertex id="PartSZ" x="57" y="2057"/>
       <vertex id="POC" x="545" y="1518"/>
-      <vertex id="RefList" x="708" y="287"/>
+      <vertex id="RefList" x="580" y="1746"/>
       <vertex id="Mb_TypeC" x="57" y="445"/>
       <vertex id="slice_beta_offset" x="489" y="773"/>
       <vertex id="slice_alpha_c0_offset" x="489" y="870"/>
@@ -26,14 +26,15 @@
       <vertex id="mv_in" x="489" y="1376"/>
       <vertex id="I_PCM_C" x="226" y="495"/>
       <vertex id="ConstrainedIFlag" x="489" y="289"/>
-      <vertex id="DelList" x="674" y="1452"/>
+      <vertex id="DelList" x="619" y="1471"/>
       <vertex id="FrameNum" x="528" y="1494"/>
       <vertex id="Display_C" x="1185" y="1564"/>
       <vertex id="Intra8x8" x="708" y="384"/>
-      <vertex id="Inter" x="226" y="1515"/>
+      <vertex id="Inter" x="226" y="1513"/>
       <vertex id="Buffer_inter" x="947" y="1454"/>
       <vertex id="Select_chroma" x="875" y="1290"/>
       <vertex id="Deblocking_Filter" x="708" y="932"/>
       <vertex id="Mgnt_Display" x="655" y="1542"/>
+      <vertex id="RefIdxtoPOC" x="674" y="1680"/>
    </vertices>
 </layout>

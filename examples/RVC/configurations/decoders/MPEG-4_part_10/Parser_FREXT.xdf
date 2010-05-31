@@ -588,4 +588,8 @@
         src="Algo_MMCO" src-port="ShortTermList"/>
     <Connection dst="Algo_RefList1" dst-port="SzSTList" src="Algo_MMCO" src-port="SzSTList"/>
     <Connection dst="Black_Hole" dst-port="Token" src="Algo_RefList1" src-port="RefList"/>
+    <Connection dst="Algo_RefList0" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
+    <Connection dst="Algo_RefList1" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
+    <Connection dst="Algo_RefList1" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>
+    <Connection dst="Algo_RefList0" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>
 </XDF>

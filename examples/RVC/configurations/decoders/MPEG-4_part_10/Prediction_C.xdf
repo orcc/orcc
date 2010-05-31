@@ -296,6 +296,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="RefIdxtoPOC">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -314,8 +323,6 @@
     <Connection dst="Buffer_inter" dst-port="RA" src="Inter" src-port="RA_C"/>
     <Connection dst="Buffer_inter" dst-port="RA_Height" src="Inter" src-port="RA_Height_C"/>
     <Connection dst="Buffer_inter" dst-port="RA_Width" src="Inter" src-port="RA_Width_C"/>
-    <Connection dst="Buffer_inter" dst-port="RefIdx" src="Inter" src-port="RefIdx_C"/>
-    <Connection dst="Buffer_inter" dst-port="RefList" src="" src-port="RefList"/>
     <Connection dst="Intra8x8" dst-port="Mb_Type" src="" src-port="Mb_TypeC"/>
     <Connection dst="Inter" dst-port="Mb_Type" src="" src-port="Mb_TypeC"/>
     <Connection dst="Inter" dst-port="Coef_ACR" src="" src-port="Coef_ACR"/>
@@ -354,4 +361,9 @@
         src="Mgnt_Display" src-port="POCtoDisplay"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="Mgnt_Display" dst-port="FrameNum_CurrPic" src="" src-port="FrameNum"/>
+    <Connection dst="RefIdxtoPOC" dst-port="RefIdx" src="Inter" src-port="RefIdx_C"/>
+    <Connection dst="Buffer_inter" dst-port="POCtoRead"
+        src="RefIdxtoPOC" src-port="POCtoRead"/>
+    <Connection dst="RefIdxtoPOC" dst-port="PicID" src="Inter" src-port="PicID"/>
+    <Connection dst="RefIdxtoPOC" dst-port="RefList" src="" src-port="RefList"/>
 </XDF>

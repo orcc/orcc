@@ -12,7 +12,7 @@
       <vertex id="PicWidthInMb" x="711" y="369"/>
       <vertex id="PicSizeInMb" x="711" y="462"/>
       <vertex id="FirstMbInSlice" x="711" y="555"/>
-      <vertex id="POC" x="711" y="648"/>
+      <vertex id="POC" x="902" y="844"/>
       <vertex id="MbPartIdx" x="711" y="741"/>
       <vertex id="RefIdx" x="711" y="834"/>
       <vertex id="MbPartWidth" x="711" y="927"/>
@@ -42,9 +42,9 @@
       <vertex id="I_PCM_U" x="1117" y="2130"/>
       <vertex id="I_PCM_V" x="1118" y="2159"/>
       <vertex id="ConstrainedIFlag" x="711" y="2430"/>
-      <vertex id="DelList" x="1144" y="1690"/>
+      <vertex id="DelList" x="1134" y="1671"/>
       <vertex id="FrameNum_CurrPic" x="690" y="1565"/>
-      <vertex id="RefList" x="1267" y="1746"/>
+      <vertex id="RefList" x="1301" y="1724"/>
       <vertex id="byte2bit" x="333" y="1704"/>
       <vertex id="Algo_NALU" x="164" y="1761"/>
       <vertex id="Algo_Synp_AVC" x="439" y="1508"/>
@@ -54,6 +54,6 @@
       <vertex id="MVReconstruct" x="926" y="1468"/>
       <vertex id="Algo_MMCO" x="905" y="1678"/>
       <vertex id="Algo_Parser_IPCM" x="951" y="2125"/>
-      <vertex id="Algo_RefList0" x="1167" y="1730"/>
+      <vertex id="Algo_RefList0" x="1181" y="1702"/>
    </vertices>
 </layout>

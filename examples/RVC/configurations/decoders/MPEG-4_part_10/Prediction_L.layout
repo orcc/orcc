@@ -15,7 +15,7 @@
       <vertex id="MV" x="64" y="1210"/>
       <vertex id="PartSZ" x="49" y="1332"/>
       <vertex id="POC" x="622" y="1192"/>
-      <vertex id="RefList" x="758" y="1365"/>
+      <vertex id="RefList" x="608" y="1448"/>
       <vertex id="Mb_Type" x="57" y="1042"/>
       <vertex id="QP" x="523" y="230"/>
       <vertex id="LFDisable" x="523" y="327"/>
@@ -29,12 +29,13 @@
       <vertex id="DelList" x="732" y="1122"/>
       <vertex id="FrameNum" x="614" y="1157"/>
       <vertex id="Display_L" x="1173" y="1270"/>
-      <vertex id="Inter" x="247" y="1179"/>
+      <vertex id="Inter" x="246" y="1185"/>
       <vertex id="Buffer_inter" x="935" y="1160"/>
       <vertex id="Select" x="537" y="1043"/>
       <vertex id="Intra_16x16" x="247" y="549"/>
       <vertex id="Intra_4x4" x="247" y="822"/>
       <vertex id="Deblocking_Filter" x="742" y="680"/>
       <vertex id="Mgnt_Display" x="693" y="1228"/>
+      <vertex id="RefIdxtoPOC" x="699" y="1362"/>
    </vertices>
 </layout>

@@ -28,8 +28,9 @@ actor Mgnt_FBAddr_Chroma_MxN ()
    																  uint(size=21) 	   RA, 
    																  uint(size=11)        RA_Width, 
    																  uint(size=11)        RA_Height, 
-   																  uint(size=3)    refbuf, 
-   																  int (size=4)   Frac :
+   																  uint(size=4)    refbuf, 
+   																  int (size=4)   Frac, 
+   																  uint (size=1)  PicID :
 
 	/* ***
 		Global Variables
@@ -64,6 +65,7 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   int currMB   := 0;
   int pic_size := 0;
   
+  uint(size=1) ValPicID := 0;
   
   //Mb_Type_NOK_and_IPCM : Consume the token, nothing else to do 
   Mb_Type_NOK_and_IPCM: action Mb_Type      :[a],
@@ -178,9 +180,11 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   MB_Ndone: action ==>
   end
   
-  PIC_done: action Write_Done:[ w_done ] ==>
+  PIC_done: action Write_Done:[ w_done ] ==> PicID     : [ValPicID]
   guard
   	currMB = pic_size - 1
+  do
+  	ValPicID := ValPicID + 1;
   end
 
   PIC_Ndone: action ==>
@@ -192,7 +196,8 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   read_address: action ==> RA        : [ r_addr ], 
   						   RA_Width  : [ 1 ], 
   						   RA_Height : [ 1 ], 
-  						   refbuf    : [ ID ]
+  						   refbuf    : [ ID ],
+  						   PicID     : [ValPicID]
   
   var int r_addr,
       int temp3

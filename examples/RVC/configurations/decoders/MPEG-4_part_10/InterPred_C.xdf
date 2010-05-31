@@ -117,7 +117,7 @@
     <Port kind="Output" name="RefIdx_C">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
@@ -132,6 +132,13 @@
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="11"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="PicID">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="1"/>
             </Entry>
         </Type>
     </Port>
@@ -234,4 +241,6 @@
         dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN" dst-port="RefIdx"
         src="" src-port="RefIdx"/>
+    <Connection dst="" dst-port="PicID"
+        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="PicID"/>
 </XDF>

@@ -131,7 +131,14 @@
     <Port kind="Output" name="RefIdx_L">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="PicID">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="1"/>
             </Entry>
         </Type>
     </Port>
@@ -240,4 +247,6 @@
         src="" src-port="MbPartIdx"/>
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="Write_Done"
         src="" src-port="Write_done"/>
+    <Connection dst="" dst-port="PicID"
+        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="PicID"/>
 </XDF>
