@@ -146,10 +146,12 @@ public class AstToIR {
 
 		String name = astActor.getName();
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
-		OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
-		OrderedMap<Port> outputs = transformPorts(astActor.getOutputs());
+
+		// first state variables, because port's sizes may depend on them.
 		OrderedMap<Variable> stateVars = transformStateVariables(astActor
 				.getStateVariables());
+		OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
+		OrderedMap<Port> outputs = transformPorts(astActor.getOutputs());
 		OrderedMap<Procedure> procedures = new OrderedMap<Procedure>();
 
 		ActionList actions = new ActionList();

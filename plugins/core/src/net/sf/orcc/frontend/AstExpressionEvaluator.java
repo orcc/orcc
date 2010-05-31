@@ -28,14 +28,21 @@
  */
 package net.sf.orcc.frontend;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
+import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionGenerator;
+import net.sf.orcc.cal.cal.AstExpressionIf;
+import net.sf.orcc.cal.cal.AstExpressionIndex;
 import net.sf.orcc.cal.cal.AstExpressionInteger;
+import net.sf.orcc.cal.cal.AstExpressionList;
 import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
@@ -224,8 +231,129 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	@Override
+	public Object caseAstExpressionCall(AstExpressionCall expression) {
+		String name = expression.getFunction().getName();
+		List<AstExpression> parameters = expression.getParameters();
+		List<Object> values = new ArrayList<Object>(parameters.size());
+		for (AstExpression parameter : parameters) {
+			values.add(evaluate(parameter));
+		}
+
+		if ("bitand".equals(name)) {
+			if (parameters.size() == 2) {
+				Object obj1 = parameters.get(0);
+				Object obj2 = parameters.get(1);
+				if (obj1 instanceof Integer && obj2 instanceof Integer) {
+					return (Integer) obj1 & (Integer) obj2;
+				}
+			}
+
+			throw new OrccRuntimeException(file, Util.getLocation(expression),
+					"bitand expects two integer expressions");
+		}
+		if ("bitor".equals(name)) {
+			if (parameters.size() == 2) {
+				Object obj1 = parameters.get(0);
+				Object obj2 = parameters.get(1);
+				if (obj1 instanceof Integer && obj2 instanceof Integer) {
+					return (Integer) obj1 | (Integer) obj2;
+				}
+			}
+
+			throw new OrccRuntimeException(file, Util.getLocation(expression),
+					"bitor expects two integer expressions");
+		}
+		if ("bitxor".equals(name)) {
+			if (parameters.size() == 2) {
+				Object obj1 = parameters.get(0);
+				Object obj2 = parameters.get(1);
+				if (obj1 instanceof Integer && obj2 instanceof Integer) {
+					return (Integer) obj1 ^ (Integer) obj2;
+				}
+			}
+
+			throw new OrccRuntimeException(file, Util.getLocation(expression),
+					"bitxor expects two integer expressions");
+		}
+		if ("bitnot".equals(name)) {
+			if (parameters.size() == 1) {
+				Object obj = parameters.get(0);
+				if (obj instanceof Integer) {
+					return ~(Integer) obj;
+				}
+			}
+
+			throw new OrccRuntimeException(file, Util.getLocation(expression),
+					"bitor expects two integer expressions");
+		}
+		if ("lshift".equals(name)) {
+			if (parameters.size() == 2) {
+				Object obj1 = parameters.get(0);
+				Object obj2 = parameters.get(1);
+				if (obj1 instanceof Integer && obj2 instanceof Integer) {
+					return (Integer) obj1 << (Integer) obj2;
+				}
+			}
+
+			throw new OrccRuntimeException(file, Util.getLocation(expression),
+					"lshift expects two integer expressions");
+		}
+		if ("rshift".equals(name)) {
+			if (parameters.size() == 2) {
+				Object obj1 = parameters.get(0);
+				Object obj2 = parameters.get(1);
+				if (obj1 instanceof Integer && obj2 instanceof Integer) {
+					return (Integer) obj1 >> (Integer) obj2;
+				}
+			}
+
+			throw new OrccRuntimeException(file, Util.getLocation(expression),
+					"rshift expects two integer expressions");
+		}
+
+		throw new OrccRuntimeException(file, Util.getLocation(expression),
+				"unknown function \"" + name + "\"");
+	}
+
+	@Override
+	public Object caseAstExpressionGenerator(AstExpressionGenerator expression) {
+		throw new OrccRuntimeException(file, Util.getLocation(expression),
+				"TODO generator");
+	}
+
+	@Override
+	public Object caseAstExpressionIf(AstExpressionIf expression) {
+		Object condition = evaluate(expression.getCondition());
+
+		if (condition instanceof Boolean) {
+			if ((Boolean) condition) {
+				Object oThen = evaluate(expression.getThen());
+				return oThen;
+			} else {
+				Object oElse = evaluate(expression.getElse());
+				return oElse;
+			}
+		} else {
+			throw new OrccRuntimeException(file, Util.getLocation(expression
+					.getCondition()), "expected condition of type bool");
+		}
+	}
+
+	@Override
+	public Object caseAstExpressionIndex(AstExpressionIndex expression) {
+		throw new OrccRuntimeException(file, Util.getLocation(expression),
+				"TODO index");
+	}
+
+	@Override
 	public Object caseAstExpressionInteger(AstExpressionInteger expression) {
 		return expression.getValue();
+	}
+
+	@Override
+	public Object caseAstExpressionList(AstExpressionList expression) {
+		throw new OrccRuntimeException(file, Util.getLocation(expression),
+				"TODO list");
 	}
 
 	@Override
