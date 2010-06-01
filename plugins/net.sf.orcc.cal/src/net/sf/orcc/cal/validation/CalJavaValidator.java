@@ -36,12 +36,15 @@ import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
+import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.validation.Check;
 
 /**
@@ -110,25 +113,31 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
 	public void checkIsVariabledUsed(final AstVariable variable) {
-		if (variable.eContainer() instanceof AstInputPattern) {
+		// do not take variables declared by input patterns and
+		// generator/foreach
+		EObject container = variable.eContainer();
+		if (container instanceof AstInputPattern
+				|| container instanceof AstGenerator
+				|| container instanceof AstStatementForeach) {
 			return;
 		}
-		
-		if (variable.eContainer() instanceof AstGenerator) {
-			return;
-		}
-		
+
 		try {
 			boolean used = new BooleanSwitch() {
 
 				@Override
-				public Boolean caseAstExpressionVariable(
-						AstExpressionVariable expression) {
-					if (expression.getValue().getVariable().equals(variable)) {
+				public Boolean caseAstStatementAssign(AstStatementAssign assign) {
+					if (assign.getTarget().getVariable().equals(variable)) {
 						return true;
 					}
 
-					return false;
+					return super.caseAstStatementAssign(assign);
+				}
+
+				@Override
+				public Boolean caseAstExpressionVariable(
+						AstExpressionVariable expression) {
+					return expression.getValue().getVariable().equals(variable);
 				}
 
 				@Override

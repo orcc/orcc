@@ -45,6 +45,7 @@ import org.eclipse.xtext.util.CancelIndicator;
 import org.eclipse.xtext.validation.CheckMode;
 import org.eclipse.xtext.validation.IResourceValidator;
 import org.eclipse.xtext.validation.Issue;
+import org.eclipse.xtext.validation.Issue.Severity;
 
 import com.google.inject.Injector;
 
@@ -102,35 +103,34 @@ public class FrontendCli {
 		Resource resource = resourceSet.getResource(uri, true);
 		AstActor astActor = (AstActor) resource.getContents().get(0);
 
-		// only compile if actor has no errors
+		boolean hasErrors = false;
+
+		// contains linking errors
 		List<Diagnostic> errors = astActor.eResource().getErrors();
 		if (!errors.isEmpty()) {
 			for (Diagnostic error : errors) {
 				System.err.println(error);
 			}
 
-			return;
+			hasErrors = true;
 		}
 
+		// validates (unique names and CAL validator)
 		IResourceValidator v = ((XtextResource) resource)
 				.getResourceServiceProvider().getResourceValidator();
 		List<Issue> issues = v.validate(resource, CheckMode.ALL,
-				new CancelIndicator() {
-
-					@Override
-					public boolean isCanceled() {
-						// TODO Auto-generated method stub
-						return false;
-					}
-
-				});
+				new CancelIndicator.NullImpl());
 
 		for (Issue issue : issues) {
 			System.err.println(issue.toString());
+			if (issue.getSeverity() == Severity.ERROR) {
+				hasErrors = true;
+			}
 		}
 
+		// only compile if there are no errors
 		try {
-			if (!issues.isEmpty()) {
+			if (!hasErrors) {
 				frontend.compile(actorPath.getAbsolutePath(), astActor);
 			}
 		} catch (OrccException e) {
