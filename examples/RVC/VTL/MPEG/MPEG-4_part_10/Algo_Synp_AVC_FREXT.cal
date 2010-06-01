@@ -1949,7 +1949,8 @@ actor Algo_Synp_AVC_FREXT()
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or
-		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1  or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP  then
 		   
 		   StartNewCabacParsing := true;
 		else  
@@ -1963,7 +1964,8 @@ actor Algo_Synp_AVC_FREXT()
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or
-		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP then
 		   
 		   StartNewCabacParsing := false;
 		else  
@@ -2134,6 +2136,21 @@ actor Algo_Synp_AVC_FREXT()
 				CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_B;
 				SearchForMbType := 2;
 		end end end end	
+		
+	end
+	
+	procedure GetCabacSubMbTypeSyntaxElement()
+	begin
+		
+		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then
+			CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_SUB_MB_TYPE_P_SP;
+			SearchForMbType := 0;
+		else 
+			if  slice_type = SLICE_TYPE_B then
+				CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_SUB_MB_TYPE_B;
+				SearchForMbType := 1;	
+			end 
+		end	
 		
 	end
 	
@@ -3968,6 +3985,72 @@ actor Algo_Synp_AVC_FREXT()
 		println("Not yet implemented");
 	end
 	
+	procedure GetSubMbType_P()
+	begin
+		
+		if binIdxMb = 0 then
+			if binValDecoded = false then
+				ctxIdx := 21;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+				NextBitToDecode := false;
+			else
+				if binVal = 1 then
+					CabacValue := 0;
+					FoundSE := 1;
+				else
+					binIdxMb := binIdxMb + 1;
+				end
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdxMb = 1 and FoundSE = false then
+			if binValDecoded = false then
+				ctxIdx := 22;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+				NextBitToDecode := false;
+			else
+				if binVal = 0 then
+					CabacValue := 1;
+					FoundSE := 1;
+				else
+					binIdxOffset := 1;
+					binIdxMb := binIdxMb + 1;
+				end
+				binValDecoded := false;
+				
+			end
+		end
+		
+		if binIdxMb = 2 and FoundSE = false then
+			if binValDecoded = false then
+				ctxIdx := 23;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+				NextBitToDecode := false;
+			else
+				if binVal = 1 then
+					CabacValue := 2;
+					FoundSE := 1;
+				else
+					CabacValue := 3;
+					FoundSE := 1;
+				end
+				binValDecoded := false;
+				
+			end
+		end
+		
+		if FoundSE then
+			binValDecoded := false;
+			binIdxMb := -1;
+			NextBitToDecode := true;
+			StopCabacProcess();
+		end
+	end
+	
 	procedure GetMbTypeParsing()
 	begin
 		if SearchForMbType = 0 then
@@ -4127,6 +4210,11 @@ actor Algo_Synp_AVC_FREXT()
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG then
 				GetMbSkipFlag();
 			end
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP then
+				GetSubMbType_P();
+			end
+			
 		end
 	end
 
@@ -6782,18 +6870,38 @@ end
 	sub_MB_pred_init_sub_mb_type: action ==> 
 	do
 		mbPartIdx := 0;
-		start_vld();
+		
+		if IS_CAVLC() then
+			start_vld();
+		else
+			binIdxMb := 0;
+			GetCabacSubMbTypeSyntaxElement();
+			StartCabacProcess();
+		end
 	end
 
 	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 	read_sub_MB_pred_sub_mb_type: action ==> 
 	guard
-		vld_end(),
-		mbPartIdx < 4
+		( (vld_end() and mbPartIdx < 4) and IS_CAVLC() ) or
+		( (cabac_end() and mbPartIdx < 4) and IS_CABAC() )
 	do
-		sub_mb_type[mbPartIdx] := vld_ue();
-		mbPartIdx := mbPartIdx +1;
-		if mbPartIdx < 4 then start_vld(); end
+		if IS_CAVLC() then
+			sub_mb_type[mbPartIdx] := vld_ue();
+			mbPartIdx := mbPartIdx +1;
+			if mbPartIdx < 4 then start_vld(); end
+		else
+			if IS_CABAC() then
+				  sub_mb_type[mbPartIdx] := cabac_value();
+				  mbPartIdx := mbPartIdx +1;
+				  if mbPartIdx < 4 then 
+					binIdxMb := 0;
+					GetCabacSubMbTypeSyntaxElement();
+					StartCabacProcess();
+				  end
+			end
+		end
+		  
 	end
 	//end for
 
