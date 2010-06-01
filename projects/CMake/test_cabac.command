@@ -3,6 +3,11 @@ newdir=`echo $0 | sed 's/test_cabac.command//'`
 cd $newdir/build/AVC_CBP_Compare/Release
 fi
 
+
+
+./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CABAC/general/AVCCANL-1/CANL1_TOSHIBA_G.264 -o ~/Movies/AVC/CABAC/general/AVCCANL-1/CANL1_TOSHIBA_G_dec.yuv
+./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CABAC/general/AVCCANL-2/CANL1_Sony_E.jsv -o ~/Movies/AVC/CABAC/general/AVCCANL-2/CANL1_Sony_E.yuv
+
 ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CABAC/general/AVCCABA-1/CABA1_Sony_D.jsv -o ~/Movies/AVC/CABAC/general/AVCCABA-1/CABA1_Sony_D.yuv
 ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CABAC/general/AVCCABA-5/CABA1_SVA_B.264 -o ~/Movies/AVC/CABAC/general/AVCCABA-5/CABA1_SVA_B_rec.yuv
-# ./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CABAC/MB_QP_DELTA/AVCCAQP-1/CAQP1_Sony_B.jsv -o ~/Movies/AVC/CABAC/MB_QP_DELTA/AVCCAQP-1/CAQP1_Sony_B.jsv
+./Orcc_AVC_CBP_decoder_compare -i ~/Movies/AVC/CABAC/MB_QP_DELTA/AVCCAQP-1/CAQP1_Sony_B.jsv -o ~/Movies/AVC/CABAC/MB_QP_DELTA/AVCCAQP-1/CAQP1_Sony_B.jsv
