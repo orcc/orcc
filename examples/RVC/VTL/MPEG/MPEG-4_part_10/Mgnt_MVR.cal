@@ -114,8 +114,6 @@ actor Mgnt_MVR ()
 	guard
 		count >= 16,
 		c = 0
-	var 
-		uint CurrMb4x4Addr
 	do
 		first_mb_in_slice:=d;
 		picW := b; 
@@ -345,7 +343,6 @@ actor Mgnt_MVR ()
   guard
     count >= 16 and  mvdone=false
   var 
-    uint j,
     List(type:uint(size=5),size=16) refidx_out_l := [-2 : for int i2 in Integers(0,15)],
     List(type:int(size=14),size=32) mv_out_l := [0 : for int i1 in Integers(0,31)]   
   do    

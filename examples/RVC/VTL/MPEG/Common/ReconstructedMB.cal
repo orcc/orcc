@@ -22,7 +22,6 @@ actor ReconstructedMB () int In0, int In1, int In2, int In3, int BestMode, int M
 	
 	A: action  In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
 	guard count<4 and block<16 and mode<4 and mbType=0
-	var int out0, int out1, int out2, int out3
 	do
 		if(mode=0) then
 			Array0[i]:=in0;
@@ -56,7 +55,6 @@ actor ReconstructedMB () int In0, int In1, int In2, int In3, int BestMode, int M
 	
 	A1: action  In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
 	guard count<4 and block<16 and mode<2 and mbType=1
-	var int out0, int out1, int out2, int out3
 	do
 		if(mode=0) then
 			Array1[i]:=in0;
@@ -75,7 +73,6 @@ actor ReconstructedMB () int In0, int In1, int In2, int In3, int BestMode, int M
 	
 	A2: action  In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
 	guard count<4 and block<16 and mode<2 and mbType=2
-	var int out0, int out1, int out2, int out3
 	do
 		if(mode=0) then
 			Array0[i]:=in0;

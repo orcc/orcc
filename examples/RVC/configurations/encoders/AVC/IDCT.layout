@@ -5,12 +5,12 @@
       <vertex id="In1" x="57" y="164"/>
       <vertex id="In2" x="57" y="257"/>
       <vertex id="In3" x="57" y="350"/>
-      <vertex id="Out0" x="552" y="71"/>
-      <vertex id="Out1" x="552" y="164"/>
-      <vertex id="Out2" x="552" y="257"/>
-      <vertex id="Out3" x="552" y="350"/>
+      <vertex id="Out0" x="559" y="71"/>
+      <vertex id="Out1" x="559" y="164"/>
+      <vertex id="Out2" x="559" y="257"/>
+      <vertex id="Out3" x="559" y="350"/>
       <vertex id="IDCT1D0" x="154" y="175"/>
-      <vertex id="Transposer" x="283" y="175"/>
-      <vertex id="IDCT1D1" x="423" y="175"/>
+      <vertex id="Transposer2" x="283" y="175"/>
+      <vertex id="IDCT1D1" x="430" y="175"/>
    </vertices>
 </layout>

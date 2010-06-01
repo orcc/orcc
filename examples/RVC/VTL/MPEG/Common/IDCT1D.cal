@@ -7,6 +7,7 @@ actor IDCT1D () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, int O
 		out1:= (in0-in2) + ((in1>>1)-in3);
 		out2:= (in0-in2) - ((in1>>1)-in3);
 		out3:= (in0+in2) - (in1+(in3>>1));
+		println("IDCT1D");
 	end
 	
 	

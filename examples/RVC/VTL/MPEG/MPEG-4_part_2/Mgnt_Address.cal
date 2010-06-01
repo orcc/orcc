@@ -61,10 +61,6 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 
 	int max_chroma_pixels = (maxw_in_pixels * maxh_in_pixels) / 4 + chroma_pixel_offset;
 
-	int luma_buf_size = max_luma_pixels;
-
-	int chroma_buf_size = max_chroma_pixels;
-
 	int luma_base = 0;
 
 	int chroma_base = 0;

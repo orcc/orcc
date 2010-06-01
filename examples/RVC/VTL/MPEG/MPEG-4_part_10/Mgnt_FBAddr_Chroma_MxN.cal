@@ -49,17 +49,12 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   int o_y;
   int addr_x;
   int addr_y;
-  int temp_mode; 
   int width;
   int height;
-  int temp;
-  int w_x;
-  int w_y;
   int ID;
   
   int Picheight_c := 1;
   int Picwidth_c  := 1;
-  int ref;
   
   int count    := 0;
   int currMB   := 0;
@@ -199,8 +194,7 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   						   refbuf    : [ ID ],
   						   PicID     : [ValPicID]
   
-  var int r_addr,
-      int temp3
+  var int r_addr
   do
  
     addr_x := o_x;

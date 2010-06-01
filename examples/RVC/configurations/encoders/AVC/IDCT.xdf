@@ -65,6 +65,9 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
+    <Decl kind="Param" name="INTRA">
+        <Type name="int"/>
+    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -77,7 +80,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Transposer">
+    <Instance id="Transposer2">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -85,6 +88,12 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA"/>
+        </Parameter>
+        <Parameter name="ROW">
+            <Expr kind="Literal" literal-kind="Integer" value="4"/>
+        </Parameter>
     </Instance>
     <Instance id="IDCT1D1">
         <!-- ************************* -->
@@ -102,14 +111,14 @@
     <Connection dst="IDCT1D0" dst-port="In1" src="" src-port="In1"/>
     <Connection dst="IDCT1D0" dst-port="In2" src="" src-port="In2"/>
     <Connection dst="IDCT1D0" dst-port="In3" src="" src-port="In3"/>
-    <Connection dst="Transposer" dst-port="In0" src="IDCT1D0" src-port="Out0"/>
-    <Connection dst="Transposer" dst-port="In1" src="IDCT1D0" src-port="Out1"/>
-    <Connection dst="Transposer" dst-port="In2" src="IDCT1D0" src-port="Out2"/>
-    <Connection dst="Transposer" dst-port="In3" src="IDCT1D0" src-port="Out3"/>
-    <Connection dst="IDCT1D1" dst-port="In0" src="Transposer" src-port="Out0"/>
-    <Connection dst="IDCT1D1" dst-port="In1" src="Transposer" src-port="Out1"/>
-    <Connection dst="IDCT1D1" dst-port="In2" src="Transposer" src-port="Out2"/>
-    <Connection dst="IDCT1D1" dst-port="In3" src="Transposer" src-port="Out3"/>
+    <Connection dst="Transposer2" dst-port="In0" src="IDCT1D0" src-port="Out0"/>
+    <Connection dst="Transposer2" dst-port="In1" src="IDCT1D0" src-port="Out1"/>
+    <Connection dst="Transposer2" dst-port="In2" src="IDCT1D0" src-port="Out2"/>
+    <Connection dst="Transposer2" dst-port="In3" src="IDCT1D0" src-port="Out3"/>
+    <Connection dst="IDCT1D1" dst-port="In0" src="Transposer2" src-port="Out0"/>
+    <Connection dst="IDCT1D1" dst-port="In1" src="Transposer2" src-port="Out1"/>
+    <Connection dst="IDCT1D1" dst-port="In2" src="Transposer2" src-port="Out2"/>
+    <Connection dst="IDCT1D1" dst-port="In3" src="Transposer2" src-port="Out3"/>
     <Connection dst="" dst-port="Out0" src="IDCT1D1" src-port="Out0"/>
     <Connection dst="" dst-port="Out1" src="IDCT1D1" src-port="Out1"/>
     <Connection dst="" dst-port="Out2" src="IDCT1D1" src-port="Out2"/>

@@ -59,7 +59,7 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 	// Select the Y blocks 
 	write_Y: action ==> Y:[ _buf_y ] repeat MAX_BLOCKSZ_Y * MAX_BLOCKSZ_Y
 	var
-		List(type: int(size=PIX_SZ), size=MAX_BLOCKSZ_Y * MAX_BLOCKSZ_Y) _buf_y , int cpt := 0
+		List(type: int(size=PIX_SZ), size=MAX_BLOCKSZ_Y * MAX_BLOCKSZ_Y) _buf_y
 	do
 		foreach int i in Integers(0, MAX_BLOCKSZ_Y - 1) do
 			foreach int j in Integers(0, MAX_BLOCKSZ_Y - 1) do

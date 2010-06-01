@@ -19,8 +19,6 @@ int(size=PIX_SZ) MOT :
 
 	int PIX_SZ = 9;
 
-	bool _CAL_tokenMonitor := true;
-
 	// Compensation function
 	function compensate(int p00, int p10, int p01, int p11) --> int :
 		if flags = 0 then

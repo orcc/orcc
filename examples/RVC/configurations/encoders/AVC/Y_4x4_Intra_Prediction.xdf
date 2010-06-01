@@ -58,6 +58,9 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
+    <Decl kind="Param" name="INTRA16">
+        <Type name="int"/>
+    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -123,6 +126,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="INTRA">
+            <Expr kind="Var" name="INTRA16"/>
+        </Parameter>
     </Instance>
     <Instance id="ReconstructedBlock">
         <!-- ************************* -->

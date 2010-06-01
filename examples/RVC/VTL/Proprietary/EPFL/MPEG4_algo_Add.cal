@@ -18,8 +18,6 @@ actor MPEG4_algo_Add (// Command flags from parser
 	int ACCODED) int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==>
 int(size=PIX_SZ) VID :
 
-	int MB_COORD_SZ = 8;
-
 	int PIX_SZ = 9;
 
 	int BTYPE_SZ = 12;

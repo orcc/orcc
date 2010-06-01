@@ -49,9 +49,6 @@ int MB_BLOCK_SIZE_MAX     = 16;
 int MB_BLOCK_SIZE_LUMA    = 16;
 int MB_BLOCK_SIZE_CHROMA  = 8;
 int MB_BLOCK_SIZE;
-int FRAME                 = 0;   // image structures
-int TOP_FIELD             = 1;
-int BOTTOM_FIELD          = 2;
 int MAXVAL_LUMA           = 255;
 int MAXVAL_CHROMA         = 255;  
 /////////////////////
@@ -61,11 +58,6 @@ List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BL
 List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BLOCK_SIZE_MAX) up_mb  := [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE_MAX-1)]: for int j in Integers( 0, MB_BLOCK_SIZE_MAX-1) ];
 List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BLOCK_SIZE_MAX) left_mb:= [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE_MAX-1)]: for int j in Integers( 0, MB_BLOCK_SIZE_MAX-1) ];
 
-//
-// Image parameters
-//
-uint(size=2) interlace := FRAME;     // frame or field
-uint(size=2) LFDisable := 0;         // option to disable filtering for image or across slices
 // Macroblock parameters
 List(type:uint(size=6), size=3) Alist := [ 0 : for int i in Integers(0, 3 - 1) ]; //curr,left,up
 List(type:uint(size=6), size=3) Blist := [ 0 : for int i in Integers(0, 3 - 1) ]; //curr,left,up 
@@ -73,7 +65,6 @@ uint(size=1) StrengthNotZero := 0;
 uint(size=1) useLeft := 0;
 uint(size=1) useUp := 0;
 
-uint(size=3) mvlimit := 4;//frame
 uint(size=3) edge_curr := 0;
 int xQ := 0; 
 int yQ := 0;

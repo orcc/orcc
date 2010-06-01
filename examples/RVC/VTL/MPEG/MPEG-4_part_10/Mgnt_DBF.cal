@@ -72,10 +72,6 @@ int INT64_MIN            = -32768;
 int MIN_QP               =  0;
 int MAX_QP               = 51;
 int FRAME                = 0;   // image structures
-int TOP_FIELD            = 1;
-int BOTTOM_FIELD         = 2;
-int MAXVAL_LUMA          = 255;
-int MAXVAL_CHROMA        = 255;
 uint(size=1) mixedModeEdgeFlag = 0; // mixed mode currently not supported
 
 /////////////////////
@@ -90,14 +86,12 @@ uint(size=13) left_slice_nr:=0;
 uint(size=4) up_mb_type; int up_cbp_blk; uint(size=8) up_QP;
 uint(size=13) up_slice_nr:=0; 
 uint(size=5) blkP; uint(size=5) blkQ; 
-uint cnt:=0;      
 //
 // Image parameters
 //
 uint(size=8) MB_Width := 1;          // MBs across one frame of current image
 uint(size=8) MB_Height := 1;         // MBs from top to bottom of one frame of current image
 uint(size=2) chroma_format := 1;     // only 4:2:0 supported
-uint(size=3) bit_depth := 8;         // up to 8 supported
 uint(size=2) interlace := FRAME;     // frame or field
 uint(size=2) valLFDisable := 0;         // option to disable filtering for image or across slices
 uint(size=13) firstmbinslice:=0;
@@ -256,11 +250,6 @@ read_pic_parameters: action  ==>
 
 ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g] repeat 32,LFDisable:[j]==> 
   guard a=2
-  var   
-  	uint cbp1,
-  	uint cbp2,
-  	int mv1,
-  	int mv2
   do      	
     MB_Width := width;          
     MB_Height:= height / width;

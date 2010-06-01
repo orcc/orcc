@@ -197,7 +197,6 @@ actor Algo_IntraPred_LUMA_16x16 ()
  guard
  	mode = 3
  var
-    int mean,
     int H, int V, int a, int b, int c,
     List(type: int(size=16), size = 7) sum_list,
     List(type: int(size=16), size = 7) sum_list2

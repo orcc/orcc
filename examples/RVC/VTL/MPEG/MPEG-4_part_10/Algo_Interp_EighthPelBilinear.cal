@@ -17,11 +17,9 @@ actor Algo_Interp_EighthPelBilinear()
   int(size=32) y ;
   int(size=32) o_x ;
   int(size=32) o_y ;
-  int(size=32) n;
   int(size=32) x_index ;
   int(size=32) y_index ;
   int temp;
-  int temp_mode; 
   int width;
   int height;
 

@@ -16,7 +16,6 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 
 actor Select2 ()/* int(size=16) X0,*/ int(size=9) X1 , int(size=9) X2, int(size=9) X3, uint(size=8) Mb_Type  ==> int(size=9) X :
-  uint(size=9) count := 8*8;
   uint(size=3) sel;
   
 	GetMbType:action Mb_Type:[a]==> 

@@ -80,7 +80,6 @@ actor Algo_IntraPred_CHROMA ()
 				int(size=16) MPR:
 
   int res;
-  int sum_temp;
 
   procedure Sum(List(type:int ( size = 16 ), size = 16) list, int n)
   begin

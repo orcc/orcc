@@ -34,7 +34,6 @@ int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 		end
 	end
 
-	int(size=7) count;
 
 	int(size=QUANT_SZ) quant;
 
@@ -44,7 +43,6 @@ int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 	do
 		quant := q;
 		round := bitxor(bitand(q, 1), 1);
-		count := 0;
 	end
 
 	function abs(int x) --> int :

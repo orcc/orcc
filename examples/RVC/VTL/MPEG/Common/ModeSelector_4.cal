@@ -1,6 +1,6 @@
 actor ModeSelector_4 () int BlockType, int SATD ==> int Mode, int Score, int Position:
 
-	int bType;
+	int bType:=0;
 	int minScore;
 	int bestMode;
 	int old_bestMode:=0;

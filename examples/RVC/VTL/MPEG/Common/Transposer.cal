@@ -1,14 +1,14 @@
-actor Transposer () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, int Out2, int Out3:
+actor Transposer (int INTRA, int ROW) int In0, int In1, int In2, int In3 ==> int Out0, int Out1, int Out2, int Out3:
 	
 	List(type:int, size=16) Array0 := [0 : for int i in Integers(1,16)];
 	
 
 	int a:=0;
-	int mode:=0;
 	
 	A: action In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
 	guard a<16
 	do 
+		println("A"+ INTRA+ROW +" "+ a);
 		Array0[a]:=in0;
 		Array0[a+1]:=in1;
 		Array0[a+2]:=in2;
@@ -20,6 +20,7 @@ actor Transposer () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, i
 	guard a=16
 	do
 		a:=0;
+		println("end A"+ INTRA+ROW +" "+ a);
 	end
 	
 	
@@ -27,6 +28,7 @@ actor Transposer () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, i
 	guard a<4
 	var int out0, int out1, int out2, int out3 
 	do 
+		println("B"+ INTRA+ROW +" "+ a);
 		out0:=Array0[a];
 		out1:=Array0[a+4];
 		out2:=Array0[a+8];
@@ -39,6 +41,7 @@ actor Transposer () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, i
 	guard a=4
 	do
 		a:=0;
+		println("end B"+ INTRA+ROW +" "+ a);
 	end
 	
 	schedule fsm s0:

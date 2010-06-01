@@ -76,9 +76,6 @@ actor Algo_MVR_MultiFrameAdptive ()
   List(type:int(size=16),size=2) mvL0tB := [0,0]; 
   List(type:int(size=16),size=2) mvL0tC := [0,0]; 
   List(type:int(size=16),size=2) mvpL0t := [0,0];
-  List(type:int(size=16),size=2) tempa := [0,0];
-  List(type:int(size=16),size=2) tempb := [0,0];
-  List(type:int(size=16),size=2) tempc := [0,0];
 
 
   function middle( int a, int b, int c ) --> int :

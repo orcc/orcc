@@ -205,10 +205,6 @@ actor Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that 
 
 	int(size=MV_SZ) mv_y;
 
-	int(size=MV_SZ) pred_x;
-
-	int(size=MV_SZ) pred_y;
-
 	int(size=MV_SZ + 2) sum_x;
 
 	int(size=MV_SZ + 2) sum_y;

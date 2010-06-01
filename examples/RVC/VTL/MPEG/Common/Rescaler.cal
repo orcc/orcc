@@ -16,6 +16,7 @@ actor Rescaler(int qp) int In0, int In1, int In2, int In3 ==>
 		out1:=in1*vc[qp];
 		out2:=in2*va[qp];
 		out3:=in3*vc[qp];
+		println("rescalerA");
 		
 	end															  
 		
@@ -27,7 +28,7 @@ actor Rescaler(int qp) int In0, int In1, int In2, int In3 ==>
 		out1:=in1*vb[qp];
 		out2:=in2*vc[qp];
 		out3:=in3*vb[qp];
-		
+		println("rescalerB");
 	end	
 
 
