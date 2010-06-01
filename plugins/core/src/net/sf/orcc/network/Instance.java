@@ -324,6 +324,9 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				InputStream in = new FileInputStream(file);
 				actor = new IRParser().parseActor(in);
 				Network.putActorInPool(className, actor);
+
+				// replace path class by actor class
+				clasz = className;
 			} catch (OrccException e) {
 				throw new OrccException("Could not parse instance \"" + id
 						+ "\" because: " + e.getLocalizedMessage(), e);
