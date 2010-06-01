@@ -6,13 +6,6 @@
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
-    <Port kind="Output" name="Ciphertext">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -46,10 +39,19 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Print_val">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Print_val"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="AES Encipher" dst-port="Key" src="KeyGenerator" src-port="Key"/>
     <Connection dst="AES Encipher" dst-port="Plaintext" src="Source" src-port="O"/>
-    <Connection dst="" dst-port="Ciphertext" src="AES Encipher" src-port="Ciphertext"/>
+    <Connection dst="Print_val" dst-port="IP" src="AES Encipher" src-port="Ciphertext"/>
 </XDF>

@@ -31,4 +31,9 @@
 
 actor Print_val () uint(size=8) IP ==> :
 
+action IP:[val]==>
+do
+	println("value "+val);
+end
+
 end
