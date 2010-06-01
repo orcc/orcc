@@ -64,7 +64,9 @@ public class JavaBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	@Override
-	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
+	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+		List<Actor> actors = parseActors(files);
+
 		printer = new STPrinter();
 		printer.loadGroups("C_actor", "Java_actor");
 		printer.setExpressionPrinter(CppExprPrinter.class);

@@ -37,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -51,7 +52,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
- * This class is an abstract implementation of {@link Backend}.
+ * This class is an abstract implementation of {@link Backend}. The following
+ * methods should be extended by back-ends:
+ * <ul>
+ * <li>{@link #doVtlCodeGeneration(List)} is called when "Compile VTL" is
+ * enabled</li>
+ * <li>{@link #doXdfCodeGeneration(Network)} is called when "Compile XDF" is
+ * enabled</li>
+ * <li>{@link #printActor(Actor)} is called by {@link #printActors(List)}.</li>
+ * <li>{@link #printInstance(Instance)} is called by
+ * {@link #printInstances(Network)}.</li>
+ * <li>{@link #printNetwork(Network)} is called by
+ * {@link #compileXDF(OrccProcess, String, String)}.</li>
+ * </ul>
  * 
  * @author Matthieu Wipliez
  * 
@@ -112,28 +125,16 @@ public abstract class AbstractBackend implements Backend {
 
 		// lists actors
 		write("Lists actors...\n");
-		List<Actor> actors = new ArrayList<Actor>();
 		File[] files = new File(outputFolder).listFiles(new FileFilter() {
 
 			@Override
 			public boolean accept(File pathname) {
 				return pathname.getName().endsWith(".json");
 			}
+
 		});
 
-		// parses actors
-		write("Parsing " + files.length + " actors...\n");
-		try {
-			for (File file : files) {
-				InputStream in = new FileInputStream(file);
-				Actor actor = new IRParser().parseActor(in);
-				actors.add(actor);
-			}
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
-
-		doVtlCodeGeneration(actors);
+		doVtlCodeGeneration(Arrays.asList(files));
 
 		write("That's all folks!\n");
 	}
@@ -186,16 +187,16 @@ public abstract class AbstractBackend implements Backend {
 	 * This method must be implemented by subclasses to do the actual code
 	 * generation for VTL.
 	 * 
-	 * @param actors
-	 *            a list of actors
+	 * @param files
+	 *            a list of IR files
 	 * @throws OrccException
 	 */
-	protected void doVtlCodeGeneration(List<Actor> actors) throws OrccException {
+	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 	}
 
 	/**
 	 * This method must be implemented by subclasses to do the actual code
-	 * generation for actors or instances.
+	 * generation for the network or its instances or both.
 	 * 
 	 * @param network
 	 *            a network
@@ -277,7 +278,32 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	/**
-	 * Prints the given actor.
+	 * Parses the given file list and returns a list of actors.
+	 * 
+	 * @param files
+	 *            a list of JSON files
+	 * @return a list of actors
+	 * @throws OrccException
+	 */
+	final protected List<Actor> parseActors(List<File> files)
+			throws OrccException {
+		write("Parsing " + files.size() + " actors...\n");
+		List<Actor> actors = new ArrayList<Actor>();
+		try {
+			for (File file : files) {
+				InputStream in = new FileInputStream(file);
+				Actor actor = new IRParser().parseActor(in);
+				actors.add(actor);
+			}
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
+		return actors;
+	}
+
+	/**
+	 * Prints the given actor. Should be overridden by back-ends that wish to
+	 * print the given actor.
 	 * 
 	 * @param actor
 	 *            the actor
@@ -304,7 +330,8 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	/**
-	 * Prints the given instance.
+	 * Prints the given instance. Should be overridden by back-ends that wish to
+	 * print the given instance.
 	 * 
 	 * @param instance
 	 *            the instance
@@ -333,7 +360,8 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	/**
-	 * Prints the given network.
+	 * Prints the given network. Should be overridden by back-ends that wish to
+	 * print the given network.
 	 * 
 	 * @param network
 	 *            the network
