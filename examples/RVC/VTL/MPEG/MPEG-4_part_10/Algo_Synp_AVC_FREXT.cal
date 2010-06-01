@@ -302,6 +302,12 @@ actor Algo_Synp_AVC_FREXT()
 	int P_Skip = 254;
 	int B_Skip = 255;
 	int tempCoeff;
+	
+	/* MVD and REF CABAC Neighbouring */
+	
+	int mbAddrN;
+	int mbPartIdxN;
+	int subMbPartIdxN;
 	/* reidual block Cabac */
 	
 	int blCabacIdx := 0;
@@ -1950,7 +1956,9 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1  or
-		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP  then
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MVD_L0_0_0 or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := true;
 		else  
@@ -1964,8 +1972,10 @@ actor Algo_Synp_AVC_FREXT()
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or
-		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 or
-		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP then
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1  or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MVD_L0_0_0 or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := false;
 		else  
@@ -2152,6 +2162,16 @@ actor Algo_Synp_AVC_FREXT()
 			end 
 		end	
 		
+	end
+	
+	procedure GetCabacRefIdxLx()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_REF_IDX_L0_L1;
+	end
+	
+	procedure GetCabacMvdLx()
+	begin
+		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MVD_L0_0_0;
 	end
 	
 	procedure GetCabacCodedBlockPatternLumaSyntaxElement()
@@ -2514,10 +2534,55 @@ actor Algo_Synp_AVC_FREXT()
 		NeighMb_yW := ( yN + maxH ) mod maxH;
 	end
 	
+	procedure getNeighbouringMV(int xN, int yN, int xD, int yD, int maxW, int maxH)
+	begin
+		xN := xN + xD;
+		yN := yN + yD;
+		
+		if xN < 0 then
+  			if yN < 0 then
+				NeighMbAvail := mbAddrD_Avail();
+				NeighMbAddr := GiveMbAddrD();
+	
+			else
+				if yN < maxH - 1 then
+					NeighMbAvail := mbAddrA_Avail();
+					NeighMbAddr := GiveMbAddrA();
+				else
+					NeighMbAvail := false;
+				end
+  			end
+ 		else
+			if xN < maxW - 1 then
+  				if yN < 0 then
+					NeighMbAvail := mbAddrB_Avail();
+					NeighMbAddr := GiveMbAddrB();
+  				else
+    				if yN < maxH - 1 then
+      					NeighMbAvail := true;
+      					NeighMbAddr  := val_CurrMbAddr;
+    				end
+    			end
+			else
+			      if xN >= maxW - 1 and yN < 0 then
+					NeighMbAvail := mbAddrC_Avail();
+					NeighMbAddr := GiveMbAddrD();
+			      else
+					NeighMbAvail := false;
+			      end
+			end
+		end
+		
+		//Give xW
+		NeighMb_xW := ( xN + maxW ) mod maxW;
+	  
+		//Give yW
+		NeighMb_yW := ( yN + maxH ) mod maxH;
+	end
 	
 	// FIXME : Add the possibility to return false when the mbAddr belongs to another slice
-	function mbAddrAvailable( int mbAddrN ) --> bool : 
-		if ( ( mbAddrN < 0 ) or ( mbAddrN > PicSizeInMbs ) )then 
+	function mbAddrAvailable( int mbAddrX ) --> bool : 
+		if ( ( mbAddrX < 0 ) or ( mbAddrX > PicSizeInMbs ) )then 
 			false  //return 
 		else 
 			true  //return
@@ -2543,6 +2608,22 @@ actor Algo_Synp_AVC_FREXT()
 	
 	function mbAddrB_Avail() --> bool :
 		mbAddrAvailable( GiveMbAddrB() )
+	end
+	
+	function GiveMbAddrC( ) --> int :
+		val_CurrMbAddr - PicWidthInMbs + 1
+	end
+
+	function mbAddrC_Avail() --> bool :
+		( ( val_CurrMbAddr + 1 ) mod PicWidthInMbs  ) != 0
+	end
+
+	function GiveMbAddrD( ) --> int :
+		val_CurrMbAddr - PicWidthInMbs - 1
+	end
+
+	function mbAddrD_Avail() --> bool :
+		( val_CurrMbAddr mod PicWidthInMbs ) != 0
 	end
 	
 	function GivePrevMbAdd() --> int :
@@ -4063,7 +4144,16 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 	end
-		
+	
+	procedure GetMvD_Lx()
+	begin
+		println("Not yet implemented");
+	end
+	
+	procedure GetRefIdx_Lx()
+	begin
+		println("Not yet implemented");
+	end
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -4214,6 +4304,14 @@ actor Algo_Synp_AVC_FREXT()
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP then
 				GetSubMbType_P();
 			end
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MVD_L0_0_0 then
+				GetMvD_Lx();
+			end
+			
+		   	if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
+		   		GetRefIdx_Lx();
+		   	end
 			
 		end
 	end
@@ -6920,14 +7018,28 @@ end
 		(slice_num_ref_idx_l0_active_minus1 > 0 or mb_field_decoding_flag = 1),
 		not IS_B_Direct_8x8(), not IS_P_8x8ref0(), not IS_SubMBPred_L1(), not IS_SubMBNA()
 	do
-		if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+		if IS_CAVLC() then
+			if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+		else
+			if IS_CABAC() then
+				//FIXME Maybe will do like CAVLC
+				GetCabacRefIdxLx();
+				StartCabacProcess();
+			end
+		end
 	end
 
 	read_sub_MB_pred_ref_idx_l0_done: action ==> 
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		ref_idx_l0[mbPartIdx] := if slice_num_ref_idx_l0_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		if IS_CAVLC() then
+			ref_idx_l0[mbPartIdx] := if slice_num_ref_idx_l0_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		else
+			if IS_CABAC() then
+				ref_idx_l0[mbPartIdx] := cabac_value();
+			end
+		end
 		mbPartIdx := mbPartIdx +1;
 	end
 
@@ -6957,14 +7069,27 @@ end
 		(slice_num_ref_idx_l1_active_minus1 > 0 or mb_field_decoding_flag = 1),
 		not IS_B_Direct_8x8(), not IS_P_8x8ref0(), not IS_SubMBPred_L0(), not IS_SubMBNA()
 	do
-		if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+		if IS_CAVLC() then
+			if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+		else
+			//FIXME Maybe will do like CAVLC
+			GetCabacRefIdxLx();
+			StartCabacProcess();
+		end
 	end
 
 	read_sub_MB_pred_ref_idx_l1_done: action ==> 
 	guard
-		(slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())
+		( (slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits() ) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CAVLC() ) or
+		( (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CABAC() ) 
 	do
-		ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		if IS_CAVLC() then
+			ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		else
+			if IS_CABAC() then
+				 ref_idx_l1[mbPartIdx] := cabac_value();
+			end
+		end
 		mbPartIdx := mbPartIdx +1;
 	end
 
@@ -7000,22 +7125,44 @@ end
 	guard
 		subMbPartIdx < NumSubMbPart()
 	do
-		start_vld();
+		if IS_CAVLC() then
+			start_vld();
+		else
+			if IS_CABAC() then
+			      GetCabacMvdLx();
+			      StartCabacProcess();
+			end
+		end
 	end
 
 	read_sub_MB_pred_mvd_l0_done1: action ==> MvRes:[mvd_l0]
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		mvd_l0 := vld_se();
-		start_vld();
+		if IS_CAVLC() then
+			mvd_l0 := vld_se();
+			start_vld();
+		else
+			if IS_CABAC() then
+				mvd_l0 := cabac_value();
+				GetCabacMvdLx();
+				StartCabacProcess();
+		
+			end
+		end
 	end
 
 	read_sub_MB_pred_mvd_l0_done2: action ==> MvRes:[mvd_l0] 
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		mvd_l0 := vld_se();
+		if IS_CAVLC() then
+			mvd_l0 := vld_se();
+		else
+			if IS_CABAC() then
+				mvd_l0 := cabac_value();
+			end
+		end
 		subMbPartIdx := subMbPartIdx +1;
 	end
 	//end for
@@ -7060,22 +7207,45 @@ end
 	guard
 		subMbPartIdx < NumSubMbPart()
 	do
-		start_vld();
+		if IS_CAVLC() then
+			start_vld();
+		else
+			if IS_CABAC() then
+			      GetCabacMvdLx();
+			      StartCabacProcess();
+			end
+		end
 	end
 
 	read_sub_MB_pred_mvd_l1_done1: action ==> 
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		mvd_l1 := vld_se();
-		start_vld();
+		if IS_CAVLC() then
+			mvd_l1 := vld_se();
+			start_vld();
+		else
+			if IS_CABAC() then
+				mvd_l1 := cabac_value();
+				GetCabacMvdLx();
+				StartCabacProcess();
+		
+			end
+		end
+				
 	end
 
 	read_sub_MB_pred_mvd_l1_done2: action ==> 
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		mvd_l1 := vld_se();
+		if IS_CAVLC() then
+			mvd_l1 := vld_se();
+		else
+			if IS_CABAC() then
+				mvd_l1 := cabac_value();
+			end
+		end
 		subMbPartIdx := subMbPartIdx +1;
 	end
 	//end for
