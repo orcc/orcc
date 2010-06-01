@@ -43,10 +43,6 @@ import all caltrop.lib.BitOps;
 import java.lang.Math;
 actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
 
-	int MAXW_IN_MB = 121;
-
-	int MAXH_IN_MB = 69;
-
 	//bool _CAL_tokenMonitor := true;
 	// find the number of bits needed to represent some positive integer
 	/*   function log2_ceil(n):
@@ -54,32 +50,6 @@ actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size
    end
 */
 // Frame buffer organization:
-	// Address    <-- FRAMEBITS --><-- YBITS --><-- XBITS --><-- COMPBITS --><-- BLOCKBITS -->
-	// Data are stored as 32 bit words representing 4 horizontally consecutive pixels.
-	// This allows an entire macroblock to be streamed to/from DRAM in one burst.
-	int COMPONENTS = 6;
-
-	// Y0, Y1, Y2, Y2, U, V
-	int BLOCKSIZE = 64;
-
-	int PIXELS_PER_WORD = 4;
-
-	//int FRAMEBITS       = log2_ceil( 2 );                 // Current, prev. frame
-	int FRAMEBITS = 1;
-
-	//int COMPBITS        = log2_ceil( COMPONENTS );        
-	int COMPBITS = 3;
-
-	//int YBITS           = log2_ceil( MAXH_IN_MB );
-	int YBITS = 5;
-
-	//int XBITS           = log2_ceil( MAXW_IN_MB );
-	int XBITS = 6;
-
-	//int BLOCKBITS       = log2_ceil( BLOCKSIZE / PIXELS_PER_WORD ) ;
-	int BLOCKBITS = 4;
-
-	int MEMBITS = FRAMEBITS + YBITS + XBITS + COMPBITS + BLOCKBITS;
 
 	//int MEMSIZE         = lshift( 1, MEMBITS );
 	int MEMSIZE = 524268;
@@ -89,19 +59,6 @@ actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size
 
 	List(type: int(size=32), size=MEMSIZE) buf := [ 0 : for int i in Integers(1, MEMSIZE) ];
 
-	/*
-  action RA:[ a ] ==> RD:[ [ buf[a + i]  : for i in Integers(0, BURSTSIZE-1) ] ] repeat BURSTSIZE
-  end
-
-  action WA:[ a ], WD:[ d ] repeat BURSTSIZE ==>
-  var i := 0
-  do
-    while i < BURSTSIZE do
-      buf[ a + i ] :=  d[i];
-      i := i + 1;
-    end
-  end
-  */
 	int address_t := 0;
 
 	int burstSize := 0;

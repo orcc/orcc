@@ -53,8 +53,6 @@ int(size=MB_COORD_SZ + 3) B , int(size=MB_COORD_SZ + 3) C :
 
 	int INTRA = 1024;
 
-	int SAMPLE_SZ = 13;
-
 	// Generate indices into the stream history to locate
 	//   A  neighbor to the left
 	//   B  neighbor above left

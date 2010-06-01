@@ -1,8 +1,5 @@
 actor Mgnt_Merger420_AVC () int(size=9) Y, int(size=9) U, int(size=9) V ==> uint(size=8) YUV :
 
-// Port size declaration
-	int PIX_SZ = 9;
-
 	// Select the Y blocks 
 	Y: action Y:[ y ] repeat 4 * 64 ==> YUV:[ y ] repeat 256
 	end

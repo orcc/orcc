@@ -57,8 +57,6 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 
 	int max_chroma_pixels = max_luma_pixels / 4;
 
-	int buf_size = max_luma_pixels + 2 * max_chroma_pixels;
-
 	int luma_base = 0;
 
 	int chroma_u_base = max_luma_pixels;
@@ -298,15 +296,6 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	end
 
 	bool round;
-
-	// Start a new VOP by setting VOP parameters and initializing the block scan
-	int tok_btype := 0;
-
-	int tok_mv := 0;
-
-	int tok_ra := 0;
-
-	int tok_wa := 0;
 
 	cmd.newVop: action BTYPE:[ cmd ] ==>
 	guard

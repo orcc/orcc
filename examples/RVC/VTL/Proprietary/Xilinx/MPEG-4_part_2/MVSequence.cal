@@ -69,7 +69,6 @@ actor MVSequence () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A :
 	//  +---+---+   +---+   +---+
 	//  | 2 | 3 | 
 	//  +---+---+
-	bool _CAL_tokenMonitor := true;
 
 	int(size=MB_COORD_SZ) mbx := 0;
 

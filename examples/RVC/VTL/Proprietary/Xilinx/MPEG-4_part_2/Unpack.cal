@@ -57,13 +57,7 @@ int(size=PIX_SZ) DO :
 
 	int NEWVOP = 2048;
 
-	int INTRA = 1024;
-
 	int INTER = 512;
-
-	function maskBits(int v, int n) --> int :
-		bitand(v, lshift(1, n) - 1)
-	end
 
 	function extractByte(int v, int n) --> int :
 		bitand(rshift(v, (3 - n) * 8), 255)

@@ -141,7 +141,7 @@ actor Mgnt_MVR ()
   
 	send_part.others: action ==> refIdxLXN:[[refABC[t]:for int t in Integers(0,2)]] repeat 3, mvLX:[[mvABC[s]:for int s in Integers(0,5)]] repeat 6
 	var 
-		uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2)+ (InverseScan4x4Tab[count] /4) * lshift( picW,2) + (InverseScan4x4Tab[count] mod 4),
+		// uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2)+ (InverseScan4x4Tab[count] /4) * lshift( picW,2) + (InverseScan4x4Tab[count] mod 4),
 		List(type:int(size=5),size=3) refABC := [-2 : for int i in Integers(0,2)],
 		uint(size=2) match_count := 0,
 		List(type:int,size=6) mvABC := [0 : for int i0 in Integers(0,5)]

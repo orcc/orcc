@@ -25,7 +25,7 @@ actor Algo_IDCT2D_ISOIEC_23002_1 () int(size=13) IN, bool SIGNED ==> int(size=9)
 
 	action IN:[ x ] repeat 64, SIGNED:[ s ] ==> OUT:[ block1 ] repeat 64
 	var
-		int i , List(type: int, size=64) block1 , List(type: int, size=64) block2
+		List(type: int, size=64) block1 , List(type: int, size=64) block2
 	do
 		block1 := [ 0 : for int n in Integers(0, 63) ];
 		block2 := [ 0 : for int n in Integers(0, 63) ];

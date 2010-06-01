@@ -44,18 +44,8 @@ import all caltrop.lib.BitOps;
 import java.lang.Math;
 actor MemoryManager () int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA , int(size=32) WA :
 
-	int MAXW_IN_MB = 121;
-
-	// maximum image width (in macroblocks)
-	int MAXH_IN_MB = 69;
-
-	// maximum image height (in macroblocks)
-	int SEARCHWIN_IN_MB = 3;
-
 	// search window size (in macroblocks)
 	int BTYPE_SZ = 12;
-
-	int PIX_SZ = 9;
 
 	int NEWVOP = 2048;
 
@@ -74,12 +64,6 @@ actor MemoryManager () int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA , int(size=3
 	// Address     FRAMEBITS  YBITS  XBITS  COMPBITS  BLOCKBITS 
 	// Data are stored as 32 bit words representing 4 horizontally consecutive pixels.
 	// This allows an entire macroblock to be streamed to/from DRAM in one burst.
-	int COMPONENTS = 6;
-
-	// Y0, Y1, Y2, Y2, U, V
-	int BLOCKSIZE = 64;
-
-	int PIXELS_PER_WORD = 4;
 
 	//int FRAMEBITS       = log2_ceil( 2 );                 // Current, prev. frame
 	int FRAMEBITS = 1;

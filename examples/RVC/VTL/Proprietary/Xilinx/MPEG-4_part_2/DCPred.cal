@@ -59,8 +59,6 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 
 	int MB_COORD_SZ = 8;
 
-	int QUANT_MASK = 31;
-
 	int NEWVOP = 2048;
 
 	int INTRA = 1024;

@@ -53,8 +53,6 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
 	int ROUND_TYPE = 32;
 
-	int SEARCHWIN_IN_MB = 3;
-
 	int MOTION = 8;
 
 	int NEWVOP = 2048;
@@ -84,17 +82,9 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
 	int LUMA_Y_BITS = 6;
 
-	int LUMA_X_SIZE = lshift(1, LUMA_X_BITS);
-
-	int LUMA_Y_SIZE = lshift(1, LUMA_Y_BITS);
-
 	int CHROMA_X_BITS = 3;
 
 	int CHROMA_Y_BITS = 5;
-
-	int CHROMA_X_SIZE = lshift(1, CHROMA_X_BITS);
-
-	int CHROMA_Y_SIZE = lshift(1, CHROMA_Y_BITS);
 
 	//  list( type:list(type:int(size=32), size=LUMA_X_SIZE), size=LUMA_Y_SIZE )
 	//           luma := initList( initList(0,LUMA_X_SIZE), LUMA_Y_SIZE );   // 2 BRAMs

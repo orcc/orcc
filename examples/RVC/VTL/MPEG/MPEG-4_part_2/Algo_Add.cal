@@ -18,8 +18,6 @@ actor Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ)
 // Port size declaration
 	int BTYPE_SZ = 12;
 
-	int MB_COORD_SZ = 8;
-
 	int PIX_SZ = 9;
 
 	int NEWVOP = 2048;
