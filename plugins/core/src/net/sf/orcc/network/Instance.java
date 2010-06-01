@@ -328,8 +328,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				throw new OrccException("Could not parse instance \"" + id
 						+ "\" because: " + e.getLocalizedMessage(), e);
 			} catch (FileNotFoundException e) {
-				throw new OrccException(
-						"I/O error when parsing \"" + id + "\"", e);
+				throw new OrccException("Actor \"" + id
+						+ "\" not found! Did you compile the VTL?", e);
 			}
 		}
 	}
