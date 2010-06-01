@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.orcc.cal.cal.AstTag;
-
 /**
  * This class defines an action tag as a list of strings.
  * 
@@ -77,10 +75,9 @@ public class Tag implements Comparable<Tag>, Iterable<String> {
 	}
 
 	/**
-	 * Creates a tag from an AST tag object.
+	 * Creates a tag from a list of identifiers.
 	 */
-	public Tag(AstTag tag) {
-		List<String> identifiers = tag.getIdentifiers();
+	public Tag(List<String> identifiers) {
 		this.identifiers = new ArrayList<String>(identifiers);
 	}
 

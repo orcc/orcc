@@ -28,14 +28,26 @@
  */
 package net.sf.orcc.cal.validation;
 
+import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionIndex;
+import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.AstGenerator;
+import net.sf.orcc.cal.cal.AstInputPattern;
+import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.util.BooleanSwitch;
+import net.sf.orcc.cal.util.Util;
 
 import org.eclipse.xtext.validation.Check;
 
 /**
- * This class describes the validation of an RVC-CAL actor.
+ * This class describes the validation of an RVC-CAL actor. The checks tagged as
+ * "expensive" are only performed when the file is saved and before code
+ * generation.
  * 
  * @author Matthieu Wipliez
  * 
@@ -43,31 +55,100 @@ import org.eclipse.xtext.validation.Check;
 public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
-	public void checkIsFunctionUsed(AstFunction function) {
-		// List<CallExpression> refs = function.getCalls();
-		// if (refs.isEmpty()) {
-		// warning("Unused function", CalPackage.FUNCTION__NAME);
-		// }
+	public void checkPriorities(AstPriority priority) {
+
 	}
 
 	@Check
-	public void checkIsFunctionUsed(AstProcedure procedure) {
-		// List<CallStatement> refs = procedure.getCalls();
-		// if (refs.isEmpty()) {
-		// warning("Unused procedure", CalPackage.PROCEDURE__NAME);
-		// }
+	public void checkIsFunctionUsed(final AstFunction function) {
+		try {
+			boolean used = new BooleanSwitch() {
+
+				@Override
+				public Boolean caseAstExpressionCall(
+						AstExpressionCall expression) {
+					if (expression.getFunction().equals(function)) {
+						return true;
+					}
+
+					return super.caseAstExpressionCall(expression);
+				}
+
+			}.doSwitch(Util.getActor(function));
+
+			if (!used) {
+				warning("Unused function", CalPackage.AST_FUNCTION__NAME);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 	}
 
 	@Check
-	public void checkIsVariabledUsed(AstVariable variable) {
-		// loop variables do not have to be used
-		// if (!(variable.eContainer() instanceof Generator || variable
-		// .eContainer() instanceof ForeachStatement)) {
-		// List<VariableReference> refs = variable.getReferences();
-		// if (refs.isEmpty()) {
-		// warning("Unused variable", CalPackage.VARIABLE__NAME);
-		// }
-		// }
+	public void checkIsProcedureUsed(final AstProcedure procedure) {
+		try {
+			boolean used = new BooleanSwitch() {
+
+				@Override
+				public Boolean caseAstStatementCall(AstStatementCall call) {
+					if (call.getProcedure().equals(procedure)) {
+						return true;
+					}
+
+					return false;
+				}
+
+			}.doSwitch(Util.getActor(procedure));
+
+			if (!used) {
+				warning("Unused procedure", CalPackage.AST_PROCEDURE__NAME);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
+	@Check
+	public void checkIsVariabledUsed(final AstVariable variable) {
+		if (variable.eContainer() instanceof AstInputPattern) {
+			return;
+		}
+		
+		if (variable.eContainer() instanceof AstGenerator) {
+			return;
+		}
+		
+		try {
+			boolean used = new BooleanSwitch() {
+
+				@Override
+				public Boolean caseAstExpressionVariable(
+						AstExpressionVariable expression) {
+					if (expression.getValue().getVariable().equals(variable)) {
+						return true;
+					}
+
+					return false;
+				}
+
+				@Override
+				public Boolean caseAstExpressionIndex(
+						AstExpressionIndex expression) {
+					if (expression.getSource().getVariable().equals(variable)) {
+						return true;
+					}
+
+					return super.caseAstExpressionIndex(expression);
+				}
+
+			}.doSwitch(Util.getActor(variable));
+
+			if (!used) {
+				warning("Unused variable", CalPackage.AST_VARIABLE__NAME);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
 	}
 
 }

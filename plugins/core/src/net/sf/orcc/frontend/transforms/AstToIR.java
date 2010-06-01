@@ -32,9 +32,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstSchedule;
+import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
 import net.sf.orcc.cal.cal.AstTypeFloat;
@@ -46,14 +49,19 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.frontend.AstExpressionEvaluator;
 import net.sf.orcc.frontend.Util;
+import net.sf.orcc.frontend.schedule.ActionSorter;
+import net.sf.orcc.frontend.schedule.FSMBuilder;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -63,6 +71,7 @@ import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
+import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
@@ -168,14 +177,72 @@ public class AstToIR {
 		OrderedMap<Port> outputs = transformPorts(astActor.getOutputs());
 		OrderedMap<Procedure> procedures = new OrderedMap<Procedure>();
 
-		ActionList actions = new ActionList();
-		ActionList initializes = new ActionList();
+		// transform actions
+		ActionList actions = transformActions(astActor.getActions());
+
+		// transform initializes
+		ActionList initializes = transformActions(astActor.getInitializes());
+
+		// sort actions by priority
+		ActionSorter sorter = new ActionSorter(actions);
+		actions = sorter.applyPriority(astActor.getPriorities());
+
+		// transform FSM
+		AstSchedule schedule = astActor.getSchedule();
 		FSM fsm = null;
+		if (schedule != null) {
+			FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
+			fsm = builder.buildFSM(actions);
+		}
+
+		// create action scheduler
 		ActionScheduler scheduler = new ActionScheduler(actions.getList(), fsm);
 
+		// create IR actor
 		return new Actor(name, file, parameters, inputs, outputs, stateVars,
 				procedures, actions.getList(), initializes.getList(),
 				scheduler, null);
+	}
+
+	private void transformAction(AstAction astAction, Pattern inputPattern,
+			Pattern outputPattern, Procedure scheduler, Procedure body) {
+		// TODO fill patterns, scheduler and body
+	}
+
+	private ActionList transformActions(List<AstAction> actions) {
+		ActionList actionList = new ActionList();
+		for (AstAction astAction : actions) {
+			Location location = Util.getLocation(astAction);
+
+			// transform tag
+			AstTag astTag = astAction.getTag();
+			Tag tag;
+			if (astTag == null) {
+				tag = new Tag();
+			} else {
+				tag = new Tag(astAction.getTag().getIdentifiers());
+			}
+
+			Pattern inputPattern = new Pattern();
+			Pattern outputPattern = new Pattern();
+
+			String name = tag.toString();
+
+			// creates scheduler and body
+			Procedure scheduler = new Procedure(name, location, new BoolType());
+			Procedure body = new Procedure(name, location, new VoidType());
+
+			// fills the patterns and procedures
+			transformAction(astAction, inputPattern, outputPattern, scheduler,
+					body);
+
+			// creates IR action and add it to action list
+			Action action = new Action(location, tag, inputPattern,
+					outputPattern, scheduler, body);
+			actionList.add(action);
+		}
+
+		return actionList;
 	}
 
 	private OrderedMap<Port> transformPorts(List<AstPort> portList) {

@@ -41,6 +41,10 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.resource.XtextResourceSet;
+import org.eclipse.xtext.util.CancelIndicator;
+import org.eclipse.xtext.validation.CheckMode;
+import org.eclipse.xtext.validation.IResourceValidator;
+import org.eclipse.xtext.validation.Issue;
 
 import com.google.inject.Injector;
 
@@ -108,8 +112,27 @@ public class FrontendCli {
 			return;
 		}
 
+		IResourceValidator v = ((XtextResource) resource)
+				.getResourceServiceProvider().getResourceValidator();
+		List<Issue> issues = v.validate(resource, CheckMode.ALL,
+				new CancelIndicator() {
+
+					@Override
+					public boolean isCanceled() {
+						// TODO Auto-generated method stub
+						return false;
+					}
+
+				});
+
+		for (Issue issue : issues) {
+			System.err.println(issue.toString());
+		}
+
 		try {
-			frontend.compile(actorPath.getAbsolutePath(), astActor);
+			if (!issues.isEmpty()) {
+				frontend.compile(actorPath.getAbsolutePath(), astActor);
+			}
 		} catch (OrccException e) {
 			e.printStackTrace();
 		}

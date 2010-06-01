@@ -34,7 +34,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.cal.cal.AstInequality;
+import net.sf.orcc.cal.cal.AstPriority;
+import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
@@ -93,14 +96,14 @@ public class ActionSorter {
 	 * 
 	 * @param priorities
 	 */
-	public ActionList applyPriority(List<List<Tag>> priorities)
-			throws OrccException {
+	public ActionList applyPriority(List<AstPriority> priorities) {
 		buildGraph(priorities);
 		CycleDetector<Action, DefaultEdge> cycleDetector = new CycleDetector<Action, DefaultEdge>(
 				graph);
 		Set<Action> cycle = cycleDetector.findCycles();
 		if (!cycle.isEmpty()) {
-			throw new OrccException("cycle detected in priorities: " + cycle);
+			throw new OrccRuntimeException("cycle detected in priorities: "
+					+ cycle);
 		}
 
 		ActionList actions = new ActionList();
@@ -145,28 +148,30 @@ public class ActionSorter {
 	 *            a list of inequalities, an inequality being a list of tags
 	 *            (and a tag is a list of strings)
 	 */
-	private void buildGraph(List<List<Tag>> priorities) {
+	private void buildGraph(List<AstPriority> priorities) {
 		for (Action action : actionList) {
 			if (!action.getTag().isEmpty()) {
 				graph.addVertex(action);
 			}
 		}
 
-		for (List<Tag> inequality : priorities) {
-			// the grammar requires there be at least two tags
-			Iterator<Tag> it = inequality.iterator();
-			Tag previousTag = it.next();
-			while (it.hasNext()) {
-				Tag tag = it.next();
-				List<Action> sources = actionList.getActions(previousTag);
-				List<Action> targets = actionList.getActions(tag);
-				for (Action source : sources) {
-					for (Action target : targets) {
-						graph.addEdge(source, target);
+		for (AstPriority priority : priorities) {
+			for (AstInequality inequality : priority.getInequalities()) {
+				// the grammar requires there be at least two tags
+				Iterator<AstTag> it = inequality.getTags().iterator();
+				Tag previousTag = new Tag(it.next().getIdentifiers());
+				while (it.hasNext()) {
+					Tag tag = new Tag(it.next().getIdentifiers());
+					List<Action> sources = actionList.getActions(previousTag);
+					List<Action> targets = actionList.getActions(tag);
+					for (Action source : sources) {
+						for (Action target : targets) {
+							graph.addEdge(source, target);
+						}
 					}
-				}
 
-				previousTag = tag;
+					previousTag = tag;
+				}
 			}
 		}
 	}

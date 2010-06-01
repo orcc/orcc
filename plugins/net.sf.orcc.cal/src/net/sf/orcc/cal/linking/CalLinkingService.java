@@ -39,6 +39,7 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.util.Util;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
@@ -115,7 +116,7 @@ public class CalLinkingService extends DefaultLinkingService {
 	private List<EObject> builtinFunction(EObject context, String name) {
 		AstFunction function = functions.get(name);
 		if (function != null) {
-			AstActor actor = getActor(context);
+			AstActor actor = Util.getActor(context);
 
 			// Attach the stub to the resource that's being parsed
 			Resource res = makeResource(actor.eResource());
@@ -140,7 +141,7 @@ public class CalLinkingService extends DefaultLinkingService {
 	private List<EObject> builtinProcedure(EObject context, String name) {
 		AstProcedure procedure = procedures.get(name);
 		if (procedure != null) {
-			AstActor actor = getActor(context);
+			AstActor actor = Util.getActor(context);
 
 			// Attach the stub to the resource that's being parsed
 			Resource res = makeResource(actor.eResource());
@@ -150,21 +151,6 @@ public class CalLinkingService extends DefaultLinkingService {
 		}
 
 		return Collections.emptyList();
-	}
-
-	/**
-	 * Returns the actor in which <code>context</code> occurs.
-	 * 
-	 * @param context
-	 *            an object
-	 * @return the actor in which <code>context</code> occurs
-	 */
-	private AstActor getActor(EObject context) {
-		if (context instanceof AstActor) {
-			return (AstActor) context;
-		} else {
-			return getActor(context.eContainer());
-		}
 	}
 
 	@Override
@@ -194,7 +180,7 @@ public class CalLinkingService extends DefaultLinkingService {
 
 	private List<EObject> getState(EObject context, EReference reference,
 			String name) {
-		AstActor actor = getActor(context);
+		AstActor actor = Util.getActor(context);
 
 		// Create the model element instance using the factory
 		AstState state = CalFactory.eINSTANCE.createAstState();

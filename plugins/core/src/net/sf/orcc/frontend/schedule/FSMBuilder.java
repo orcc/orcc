@@ -196,7 +196,7 @@ public class FSMBuilder {
 	private void parseTransitions(List<AstTransition> transitions) {
 		for (AstTransition transition : transitions) {
 			String source = transition.getSource().getName();
-			Tag tag = new Tag(transition.getTag());
+			Tag tag = new Tag(transition.getTag().getIdentifiers());
 			String target = transition.getTarget().getName();
 			graph.addVertex(source);
 			graph.addVertex(target);

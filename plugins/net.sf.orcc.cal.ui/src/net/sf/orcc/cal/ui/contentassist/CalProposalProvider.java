@@ -38,7 +38,7 @@ import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.CalFactory;
-import net.sf.orcc.util.CalActionList;
+import net.sf.orcc.cal.util.CalActionList;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;

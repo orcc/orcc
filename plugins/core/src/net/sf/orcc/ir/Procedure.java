@@ -172,7 +172,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	private Type returnType;
 
 	/**
-	 * Construcs a new procedure.
+	 * Creates a new procedure.
 	 * 
 	 * @param name
 	 *            The procedure name.
@@ -196,6 +196,29 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		this.locals = locals;
 		this.name = name;
 		this.parameters = parameters;
+		this.returnType = returnType;
+	}
+
+	/**
+	 * Creates a new procedure, not external, with empty parameters, locals, and
+	 * nodes.
+	 * 
+	 * @param name
+	 *            The procedure name.
+	 * @param external
+	 *            Whether it is external or not.
+	 * @param location
+	 *            The procedure location.
+	 * @param returnType
+	 *            The procedure return type.
+	 */
+	public Procedure(String name, Location location, Type returnType) {
+		super(location);
+		this.external = false;
+		this.nodes = new ArrayList<CFGNode>();
+		this.locals = new OrderedMap<Variable>();
+		this.name = name;
+		this.parameters = new OrderedMap<Variable>();
 		this.returnType = returnType;
 	}
 
