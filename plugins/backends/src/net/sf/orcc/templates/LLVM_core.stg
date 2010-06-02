@@ -69,12 +69,7 @@ $location.startLine$$location.startColumn$$location.endColumn$
 >>
 
 ConstantValue(type, const) ::= <<
-$if(type.list)$$
-listValue(type=type.type, values=const.value, iterator = type.sizeIterator)$
-$else
-$$const$
-$endif$
-
+$if(type.list)$ $Constant(constant = const, type = type, iterator = type.sizeIterator)$ $else$ $Constant(constant = const)$ $endif$
 >>
 
 
@@ -82,16 +77,24 @@ $endif$
 // List
 ///////////////////////////////////////////////////////////////////////////////
 
-// the values of a list: {val1, val2, ..., valn}
-listValue(type, values, iterator) ::= <<
-$if(first(values).listConst)$
-[$iterator, values :{ iterator, value | $type$ $if(value)$ $listValue(type=type.type, values=value.value, iterator= type.sizeIterator)$ $else$ zeroinitializer $endif$}; separator=", "$]
-$else$
-[$values:{$type$ $it$}; separator=", "$]
-$endif$
-
+Constant(constant, type, iterator) ::= <<
+$(constant.class.simpleName)(constant = constant, type = type, iterator = iterator)$
 >>
 
+Boolean(constant, iterator) ::= <<
+$if (constant)$1$else$0$endif$
+>>
+
+Integer(constant, type, iterator) ::= <<
+$constant$
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+List(constant, type, iterator) ::= <<
+[$iterator, constant: {iterator, value | $type.type$ $if(value)$ $Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)$ $else$ zeroinitializer $endif$ }; wrap, separator=", "$]
+>>
+
+ArrayList(constant, type, iterator) ::= <<$List(constant = constant, type = type, iterator=iterator)$>>
 
 // phi definition
 phiPair(value, label) ::= <<
@@ -103,8 +106,8 @@ phiPair(value, label) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
 $if(variable.constantValue)
-$@$variable$ = internal global $variable.type$ $ConstantValue(type=variable.type, const=variable.constantValue)$$
-else$
+$@$variable$ = internal global $variable.type$ $ConstantValue(type=variable.type, const=variable.constantValue)$
+$else$
 @$variable$ = internal global $variable.type$ zeroinitializer$
 endif$
 >>
