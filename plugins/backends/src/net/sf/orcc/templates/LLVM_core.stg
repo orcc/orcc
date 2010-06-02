@@ -81,7 +81,7 @@ Constant(constant, type, iterator) ::= <<
 $(constant.class.simpleName)(constant = constant, type = type, iterator = iterator)$
 >>
 
-Boolean(constant, iterator) ::= <<
+Boolean(constant, type, iterator) ::= <<
 $if (constant)$1$else$0$endif$
 >>
 
