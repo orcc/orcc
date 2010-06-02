@@ -29,6 +29,7 @@
 package net.sf.orcc.network.transforms;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -53,6 +54,12 @@ import org.jgrapht.DirectedGraph;
  */
 public class NetworkFlattener implements INetworkTransformation {
 
+	private Map<String, Integer> identifiers;
+
+	public NetworkFlattener() {
+		identifiers = new HashMap<String, Integer>();
+	}
+
 	/**
 	 * Copies all instances and edges between them of subGraph in graph
 	 * 
@@ -71,9 +78,16 @@ public class NetworkFlattener implements INetworkTransformation {
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
 				Instance subInstance = vertex.getInstance();
-				subInstance.setId(instance.getId() + "_" + subInstance.getId());
 
-				Map<String, IAttribute> vertexAttrs = vertex.getInstance()
+				// set hierarchical identifier
+				subInstance.getHierarchicalId().add(0, instance.getId());
+
+				// get a unique identifier
+				String id = getUniqueIdentifier(instance.getId(), subInstance);
+				subInstance.setId(id);
+
+				// copy attributes
+				Map<String, IAttribute> vertexAttrs = subInstance
 						.getAttributes();
 				for (Entry<String, IAttribute> attr : attrs.entrySet()) {
 					if (!vertexAttrs.containsKey(attr.getKey())) {
@@ -127,6 +141,28 @@ public class NetworkFlattener implements INetworkTransformation {
 	}
 
 	/**
+	 * Returns a unique id in the given network.
+	 */
+	private String getUniqueIdentifier(String parentId, Instance instance) {
+		String id = parentId + "_" + instance.getId();
+		if (identifiers.containsKey(id)) {
+			// identifier exists in the graph => generates a new one
+			int num = identifiers.get(id);
+			String newId = String.format(id + "_%02d", num);
+			while (identifiers.containsKey(newId)) {
+				num++;
+				newId = String.format(id + "_%02d", num);
+			}
+			identifiers.put(id, num + 1);
+			return newId;
+		} else {
+			// identifier does not exist in the graph: returns the original id
+			identifiers.put(id, 0);
+			return id;
+		}
+	}
+
+	/**
 	 * Links each predecessor of vertex to the successors of the input port in
 	 * subGraph
 	 * 
@@ -141,17 +177,17 @@ public class NetworkFlattener implements INetworkTransformation {
 	private void linkIncomingConnections(Vertex vertex,
 			DirectedGraph<Vertex, Connection> graph, Network subNetwork) {
 		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
-		List<Connection> incomingEdgeSet = new ArrayList<Connection>(graph
-				.incomingEdgesOf(vertex));
+		List<Connection> incomingEdgeSet = new ArrayList<Connection>(
+				graph.incomingEdgesOf(vertex));
 		for (Connection edge : incomingEdgeSet) {
 			Vertex v = getPort(subNetwork, "Input", edge.getTarget());
 			Set<Connection> outgoingEdgeSet = subGraph.outgoingEdgesOf(v);
 
 			for (Connection newEdge : outgoingEdgeSet) {
-				Connection incoming = new Connection(edge.getSource(), newEdge
-						.getTarget(), edge.getAttributes());
-				graph.addEdge(graph.getEdgeSource(edge), subGraph
-						.getEdgeTarget(newEdge), incoming);
+				Connection incoming = new Connection(edge.getSource(),
+						newEdge.getTarget(), edge.getAttributes());
+				graph.addEdge(graph.getEdgeSource(edge),
+						subGraph.getEdgeTarget(newEdge), incoming);
 			}
 		}
 	}
@@ -171,17 +207,17 @@ public class NetworkFlattener implements INetworkTransformation {
 	private void linkOutgoingConnections(Vertex vertex,
 			DirectedGraph<Vertex, Connection> graph, Network subNetwork) {
 		DirectedGraph<Vertex, Connection> subGraph = subNetwork.getGraph();
-		List<Connection> outgoingEdgeSet = new ArrayList<Connection>(graph
-				.outgoingEdgesOf(vertex));
+		List<Connection> outgoingEdgeSet = new ArrayList<Connection>(
+				graph.outgoingEdgesOf(vertex));
 		for (Connection edge : outgoingEdgeSet) {
 			Vertex v = getPort(subNetwork, "Output", edge.getSource());
 			Set<Connection> incomingEdgeSet = subGraph.incomingEdgesOf(v);
 
 			for (Connection newEdge : incomingEdgeSet) {
-				Connection incoming = new Connection(newEdge.getSource(), edge
-						.getTarget(), edge.getAttributes());
-				graph.addEdge(subGraph.getEdgeSource(newEdge), graph
-						.getEdgeTarget(edge), incoming);
+				Connection incoming = new Connection(newEdge.getSource(),
+						edge.getTarget(), edge.getAttributes());
+				graph.addEdge(subGraph.getEdgeSource(newEdge),
+						graph.getEdgeTarget(edge), incoming);
 			}
 		}
 	}
@@ -190,6 +226,12 @@ public class NetworkFlattener implements INetworkTransformation {
 	public void transform(Network network) {
 		List<Vertex> vertexSet = new ArrayList<Vertex>(network.getGraph()
 				.vertexSet());
+		for (Vertex vertex : vertexSet) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				identifiers.put(instance.getId(), 0);
+			}
+		}
 
 		for (Vertex vertex : vertexSet) {
 			if (vertex.isInstance()) {
@@ -211,6 +253,10 @@ public class NetworkFlattener implements INetworkTransformation {
 					network.getGraph().removeVertex(vertex);
 				}
 			}
+		}
+
+		for (Instance instance : network.getInstances()) {
+			instance.getHierarchicalClass().add(0, network.getName());
 		}
 	}
 

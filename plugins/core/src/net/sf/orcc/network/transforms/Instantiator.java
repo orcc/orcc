@@ -130,8 +130,9 @@ public class Instantiator implements INetworkTransformation {
 				if (instance.isNetwork()) {
 					// instantiate the child network
 					instance.getNetwork().instantiate(path);
-				} else if (!instance.isBroadcast()) {
-					// instantiate the child actor
+				} else {
+					// at this point there are only actors and networks, so if
+					// it is not a network it's an actor: instantiate it
 					instance.instantiate(path);
 				}
 			}
