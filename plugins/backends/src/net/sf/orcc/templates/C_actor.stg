@@ -414,8 +414,13 @@ $parameters.keys: { k | #define $k$ $parameters.(k)$
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
+PrintHierarchicalPath(path) ::= <<
+$path; separator="/"$
+>>
+
 instance(instance) ::= <<
-// $instance.id$ generated from "$instance.actor.name$"
+// /$first(instance.hierarchicalClass)$/$PrintHierarchicalPath(instance.hierarchicalId)$
+// Source file is "$instance.actor.file$"
 
 #include <stdio.h>
 #include <stdlib.h>
