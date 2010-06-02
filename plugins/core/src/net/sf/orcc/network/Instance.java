@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,9 +82,14 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	private File file;
 
 	/**
-	 * the path from the top-level to this instance.
+	 * the path of classes from the top-level to this instance.
 	 */
-	private List<String> hierarchicalPath;
+	private List<String> hierarchicalClass;
+
+	/**
+	 * the path of identifiers from the top-level to this instance.
+	 */
+	private List<String> hierarchicalId;
 
 	/**
 	 * the id of this instance
@@ -101,13 +107,10 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	private Map<String, Expression> parameters;
 
+	/**
+	 * the wrapper referenced by this instance.
+	 */
 	private Wrapper wrapper;
-
-	private Instance(String id) {
-		this.id = id;
-		this.parameters = new HashMap<String, Expression>();
-		this.attributes = new HashMap<String, IAttribute>();
-	}
 
 	/**
 	 * Creates a new instance of the given actor with the given identifier.
@@ -118,11 +121,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 *            an actor
 	 */
 	public Instance(String id, Actor actor) {
-		this(id);
+		this(id, actor.getName());
 		this.actor = actor;
-
-		// update the class from the actor declared name
-		this.clasz = actor.getName();
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 *            a broadcast
 	 */
 	public Instance(String id, Broadcast broadcast) {
-		this(id);
+		this(id, "Broadcast");
 		this.broadcast = broadcast;
 	}
 
@@ -147,11 +147,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 *            a network
 	 */
 	public Instance(String id, Network network) {
-		this(id);
+		this(id, network.getName());
 		this.network = network;
-
-		// update the class from the network declared name
-		this.clasz = network.getName();
 	}
 
 	/**
@@ -175,6 +172,27 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	}
 
 	/**
+	 * Creates a new instance with the given id and empty parameters and
+	 * attributes.
+	 * 
+	 * @param id
+	 *            instance identifier
+	 */
+	private Instance(String id, String clasz) {
+		this.id = id;
+		this.clasz = clasz;
+
+		this.parameters = new HashMap<String, Expression>();
+		this.attributes = new HashMap<String, IAttribute>();
+
+		this.hierarchicalId = new ArrayList<String>(1);
+		this.hierarchicalId.add(id);
+
+		this.hierarchicalClass = new ArrayList<String>(1);
+		this.hierarchicalClass.add(clasz);
+	}
+
+	/**
 	 * Creates a new virtual instance.
 	 * 
 	 * @param id
@@ -189,8 +207,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	public Instance(String id, String clasz,
 			Map<String, Expression> parameters,
 			Map<String, IAttribute> attributes) {
-		this(id);
-		this.clasz = clasz;
+		this(id, clasz);
 		this.parameters.putAll(parameters);
 		this.attributes.putAll(attributes);
 	}
@@ -204,7 +221,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 *            a wrapper
 	 */
 	public Instance(String id, Wrapper wrapper) {
-		this(id);
+		this(id, "Wrapper");
 		this.wrapper = wrapper;
 	}
 
@@ -280,6 +297,24 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	}
 
 	/**
+	 * Returns the path of classes from the top-level to this instance.
+	 * 
+	 * @return the path of classes from the top-level to this instance
+	 */
+	public List<String> getHierarchicalClass() {
+		return hierarchicalClass;
+	}
+
+	/**
+	 * Returns the path of identifiers from the top-level to this instance.
+	 * 
+	 * @return the path of identifiers from the top-level to this instance
+	 */
+	public List<String> getHierarchicalId() {
+		return hierarchicalId;
+	}
+
+	/**
 	 * Returns the identifier of this instance.
 	 * 
 	 * @return the identifier of this instance
@@ -307,6 +342,16 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		return parameters;
 	}
 
+	/**
+	 * Returns the wrapper referenced by this instance.
+	 * 
+	 * @return the wrapper referenced by this instance, or <code>null</code> if
+	 *         this instance does not reference a wrapper
+	 */
+	public Wrapper getWrapper() {
+		return wrapper;
+	}
+
 	@Override
 	public int hashCode() {
 		// the hash code of an instance is the hash code of its identifier
@@ -331,9 +376,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				InputStream in = new FileInputStream(file);
 				actor = new IRParser().parseActor(in);
 				Network.putActorInPool(className, actor);
-
-				// replace path class by actor class
-				clasz = className;
 			} catch (OrccException e) {
 				throw new OrccException("Could not parse instance \"" + id
 						+ "\" because: " + e.getLocalizedMessage(), e);
@@ -341,6 +383,16 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				throw new OrccException("Actor \"" + id
 						+ "\" not found! Did you compile the VTL?", e);
 			}
+		}
+
+		// replace path-based class by actor class
+		clasz = className;
+		
+		// and update hierarchical class
+		if (!hierarchicalClass.isEmpty()) {
+			int last = hierarchicalClass.size() - 1;
+			hierarchicalClass.remove(last);
+			hierarchicalClass.add(clasz);
 		}
 	}
 
