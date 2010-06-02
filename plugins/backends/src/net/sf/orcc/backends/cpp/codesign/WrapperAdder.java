@@ -43,6 +43,7 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.Wrapper;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.util.OrderedMap;
 
@@ -95,8 +96,8 @@ public class WrapperAdder {
 			i++;
 
 			Map<String, IAttribute> attributes = connection.getAttributes();
-			Connection connBcastTarget = new Connection(outputPort, connection
-					.getTarget(), attributes);
+			Connection connBcastTarget = new Connection(outputPort,
+					connection.getTarget(), attributes);
 			graph.addEdge(vertexBCast, target, connBcastTarget);
 
 			// setting source to null so we don't examine it again
@@ -130,8 +131,8 @@ public class WrapperAdder {
 				int numOutput = outList.size();
 				if (numOutput > 1) {
 					// add broadcast vertex
-					Broadcast bcast = new Broadcast(numOutput, srcPort
-							.getType());
+					Broadcast bcast = new Broadcast(numOutput,
+							srcPort.getType());
 					String name = "broadcast_" + instance.getId() + "_"
 							+ srcPort.getName();
 					Instance newInst = new Instance(name, bcast);
@@ -149,8 +150,8 @@ public class WrapperAdder {
 	private void examineVertex(Vertex vertex) throws OrccException {
 		// make a copy of the existing outgoing connections of vertex because
 		// the set returned is modified when new edges are added
-		Set<Connection> connections = new HashSet<Connection>(graph
-				.outgoingEdgesOf(vertex));
+		Set<Connection> connections = new HashSet<Connection>(
+				graph.outgoingEdgesOf(vertex));
 
 		// for each connection, add it to a port => connection map
 		// port is a port of vertex
@@ -176,10 +177,8 @@ public class WrapperAdder {
 		OrderedMap<Port> outputs = network.getOutputs();
 
 		if (inputs.size() > 0 || outputs.size() > 0) {
-
-			Wrapper wrapper = new Wrapper(network.getName(), inputs.size(),
-					outputs.size());
-			Vertex vWrap = new Vertex(wrapper);
+			Wrapper wrapper = new Wrapper(inputs.size(), outputs.size());
+			Vertex vWrap = new Vertex(new Instance(network.getName(), wrapper));
 
 			graph.addVertex(vWrap);
 

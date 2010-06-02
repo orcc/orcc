@@ -140,8 +140,8 @@ public class XDFParser {
 				if (node.getNodeName().equals("Op")) {
 					Element op = (Element) node;
 					String name = op.getAttribute("name");
-					return new ParseContinuation<BinaryOp>(node, BinaryOp
-							.getOperator(name));
+					return new ParseContinuation<BinaryOp>(node,
+							BinaryOp.getOperator(name));
 				}
 
 				node = node.getNextSibling();
@@ -307,8 +307,8 @@ public class XDFParser {
 				if (node.getNodeName().equals("Op")) {
 					Element op = (Element) node;
 					String name = op.getAttribute("name");
-					return new ParseContinuation<UnaryOp>(node, UnaryOp
-							.getOperator(name));
+					return new ParseContinuation<UnaryOp>(node,
+							UnaryOp.getOperator(name));
 				}
 
 				node = node.getNextSibling();
@@ -779,7 +779,19 @@ public class XDFParser {
 		Map<String, Expression> parameters = parseParameters(child);
 		Map<String, IAttribute> attributes = parseAttributes(child);
 
-		return new Instance(path, id, clasz, parameters, attributes);
+		// create instance
+		File file = new File(path, clasz + ".xdf");
+		if (file.exists()) {
+			// cool, we got a network
+			XDFParser parser = new XDFParser(file.getAbsolutePath());
+			Network network = parser.parseNetwork();
+
+			return new Instance(id, network, parameters, attributes);
+		} else {
+			// not a network => will load later when the instantiate method is
+			// called
+			return new Instance(id, clasz, parameters, attributes);
+		}
 	}
 
 	/**

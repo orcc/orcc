@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
@@ -42,7 +43,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
-import net.sf.orcc.network.serialize.XDFParser;
 
 /**
  * This class defines an instance. An instance has an id, a class, parameters
@@ -81,11 +81,14 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	private File file;
 
 	/**
+	 * the path from the top-level to this instance.
+	 */
+	private List<String> hierarchicalPath;
+
+	/**
 	 * the id of this instance
 	 */
 	private String id;
-
-	private boolean isWrapper;
 
 	/**
 	 * the network referenced by this instance. May be <code>null</code> if this
@@ -98,32 +101,10 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	private Map<String, Expression> parameters;
 
-	/**
-	 * Creates a new instance of the given broadcast with the given identifier.
-	 * 
-	 * @param id
-	 *            the instance identifier
-	 * @param broadcast
-	 *            a broadcast
-	 */
-	public Instance(String id, Broadcast broadcast) {
-		this.id = id;
-		this.broadcast = broadcast;
-		this.parameters = new HashMap<String, Expression>();
-		this.attributes = new HashMap<String, IAttribute>();
-	}
+	private Wrapper wrapper;
 
-	/**
-	 * Creates a new instance of the given network with the given identifier.
-	 * 
-	 * @param id
-	 *            the instance identifier
-	 * @param network
-	 *            a network
-	 */
-	public Instance(String id, Network network) {
+	private Instance(String id) {
 		this.id = id;
-		this.network = network;
 		this.parameters = new HashMap<String, Expression>();
 		this.attributes = new HashMap<String, IAttribute>();
 	}
@@ -137,69 +118,94 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 *            an actor
 	 */
 	public Instance(String id, Actor actor) {
-		this.id = id;
+		this(id);
 		this.actor = actor;
-		this.parameters = new HashMap<String, Expression>();
-		this.attributes = new HashMap<String, IAttribute>();
+
+		// update the class from the actor declared name
+		this.clasz = actor.getName();
 	}
 
 	/**
-	 * Creates a new virtual instance. Only used by subclass Wrapper in the C++
-	 * backend.
+	 * Creates a new instance of the given broadcast with the given identifier.
 	 * 
 	 * @param id
-	 *            the instance id
-	 * @param clasz
-	 *            the instance class
-	 * @param parameters
-	 *            parameters of this instance
+	 *            the instance identifier
+	 * @param broadcast
+	 *            a broadcast
 	 */
-	protected Instance(String id, String clasz,
+	public Instance(String id, Broadcast broadcast) {
+		this(id);
+		this.broadcast = broadcast;
+	}
+
+	/**
+	 * Creates a new instance of the given network with the given identifier.
+	 * 
+	 * @param id
+	 *            the instance identifier
+	 * @param network
+	 *            a network
+	 */
+	public Instance(String id, Network network) {
+		this(id);
+		this.network = network;
+
+		// update the class from the network declared name
+		this.clasz = network.getName();
+	}
+
+	/**
+	 * Creates a new instance of the given network with the given identifier.
+	 * 
+	 * @param id
+	 *            the instance identifier
+	 * @param network
+	 *            a network
+	 * @param parameters
+	 *            the parameters of this instance
+	 * @param attributes
+	 *            the attributes of this instance
+	 */
+	public Instance(String id, Network network,
 			Map<String, Expression> parameters,
 			Map<String, IAttribute> attributes) {
-		this.clasz = clasz;
-		this.id = id;
-		this.isWrapper = true;
-		this.parameters = parameters;
-		this.attributes = attributes;
+		this(id, network);
+		this.parameters.putAll(parameters);
+		this.attributes.putAll(attributes);
 	}
 
 	/**
-	 * Creates a new instance, and try to load it. The path indicates the path
-	 * in which files should be searched.
+	 * Creates a new virtual instance.
 	 * 
-	 * @param path
-	 *            the path in which we should look for files
 	 * @param id
 	 *            the instance id
 	 * @param clasz
 	 *            the instance class
 	 * @param parameters
-	 *            parameters of this instance
+	 *            the parameters of this instance
 	 * @param attributes
-	 *            a map of attributes
-	 * @throws OrccException
+	 *            the attributes of this instance
 	 */
-	public Instance(String path, String id, String clasz,
+	public Instance(String id, String clasz,
 			Map<String, Expression> parameters,
-			Map<String, IAttribute> attributes) throws OrccException {
-		this.attributes = attributes;
-		this.id = id;
-		this.parameters = parameters;
+			Map<String, IAttribute> attributes) {
+		this(id);
+		this.clasz = clasz;
+		this.parameters.putAll(parameters);
+		this.attributes.putAll(attributes);
+	}
 
-		file = new File(path, clasz + ".xdf");
-		if (file.exists()) {
-			// cool, we got a network
-			XDFParser parser = new XDFParser(file.getAbsolutePath());
-			network = parser.parseNetwork();
-
-			// update the class from the network declared name
-			this.clasz = network.getName();
-		} else {
-			// not a network => will load later when the instantiate method is
-			// called
-			this.clasz = clasz;
-		}
+	/**
+	 * Creates a new instance of the given wrapper with the given identifier.
+	 * 
+	 * @param id
+	 *            the instance identifier
+	 * @param wrapper
+	 *            a wrapper
+	 */
+	public Instance(String id, Wrapper wrapper) {
+		this(id);
+		this.wrapper = wrapper;
 	}
 
 	@Override
@@ -264,7 +270,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	}
 
 	/**
-	 * Returns the file in which this instance is defined.
+	 * Returns the file in which this instance is defined. This file is only
+	 * valid for instances that refer to actors and were instantiated.
 	 * 
 	 * @return the file in which this instance is defined
 	 */
@@ -370,13 +377,15 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @return true if this instance is a wrapper
 	 */
 	public boolean isWrapper() {
-		return isWrapper;
+		return (wrapper != null);
 	}
 
-	public void setClasz(String clasz) {
-		this.clasz = clasz;
-	}
-
+	/**
+	 * Changes the identifier of this instance.
+	 * 
+	 * @param id
+	 *            a new identifier
+	 */
 	public void setId(String id) {
 		this.id = id;
 	}

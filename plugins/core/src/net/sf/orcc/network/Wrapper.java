@@ -26,13 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.cpp.codesign;
-
-import java.util.HashMap;
-
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.attributes.IAttribute;
+package net.sf.orcc.network;
 
 /**
  * This class defines a wrapper as a particular instance. This class is only
@@ -42,41 +36,31 @@ import net.sf.orcc.network.attributes.IAttribute;
  * @author Ghislain Roquier
  * 
  */
-public class Wrapper extends Instance {
+public class Wrapper {
 
-	public static final String CLASS = "";
+	private int numInputs;
 
-	private int numInput;
-
-	private int numOutput;
+	private int numOutputs;
 
 	/**
-	 * Creates a new wrapper whose name is composed from the given actor name
-	 * and port name. The wrapper will have the number of inputs and outputs
-	 * given and the given type.
+	 * Creates a new wrapper with the given number of inputs and outputs.
 	 * 
-	 * @param actorName
-	 *            name of the source actor
-	 * @param portName
-	 *            name of the source output port connected to this broadcast
+	 * @param numInputs
+	 *            number of inputs
 	 * @param numOutput
 	 *            number of outputs
-	 * @param type
-	 *            type of this broadcast
 	 */
-	public Wrapper(String actorName, int numInput, int numOutput) {
-		super(actorName, CLASS, new HashMap<String, Expression>(),
-				new HashMap<String, IAttribute>());
-		this.numInput = numInput;
-		this.numOutput = numOutput;
+	public Wrapper(int numInputs, int numOutputs) {
+		this.numInputs = numInputs;
+		this.numOutputs = numOutputs;
 	}
 
-	public int getNumInput() {
-		return numInput;
+	public int getNumInputs() {
+		return numInputs;
 	}
 
-	public int getNumOutput() {
-		return numOutput;
+	public int getNumOutputs() {
+		return numOutputs;
 	}
 
 }
