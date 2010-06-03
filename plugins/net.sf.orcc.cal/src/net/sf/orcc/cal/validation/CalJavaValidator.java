@@ -70,14 +70,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	private IQualifiedNameProvider nameProvider;
 
 	/**
-	 * Check action tag coherence. Tag's name must be different to port and state variable name.
+	 * Check action tag coherence. Tag's name must be different to port and
+	 * state variable name.
 	 */
 	@Check
 	public void checkActionTag(final AstAction action) {
 		AstActor actor = EcoreUtil2.getContainerOfType(action, AstActor.class);
 		String name = nameProvider.getQualifiedName(action);
-		
-		/** Check if tag name is not already used in a state variable */
+
+		// Check if tag name is not already used in a state variable
 		List<AstVariable> variables = actor.getStateVariables();
 		for (AstVariable variable : variables) {
 			if (name.equals(variable.getName())) {
@@ -86,31 +87,24 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 						CalPackage.AST_ACTION__TAG);
 			}
 		}
-		
-		/** Check if tag name is not already used in an input port */
-		List <AstPort> inputs = actor.getInputs();	
+
+		// Check if tag name is not already used in an input port
+		List<AstPort> inputs = actor.getInputs();
 		for (AstPort input : inputs) {
 			if (name.equals(input.getName())) {
-				error("Action " + name
-						+ " has the same name as an input port",
+				error("Action " + name + " has the same name as an input port",
 						CalPackage.AST_ACTION__TAG);
 			}
 		}
-		
-		/** Check if tag name is not already used in an input port */
-		List <AstPort> outputs = actor.getOutputs();	
+
+		// Check if tag name is not already used in an output port
+		List<AstPort> outputs = actor.getOutputs();
 		for (AstPort output : outputs) {
 			if (name.equals(output.getName())) {
-				error("Action " + name
-						+ " has the same name as an output port",
+				error("Action " + name + " has the same name as an output port",
 						CalPackage.AST_ACTION__TAG);
 			}
 		}
-	}
-
-	@Check
-	public void checkPriorities(AstPriority priority) {
-
 	}
 
 	@Check
@@ -177,12 +171,13 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			boolean used = new BooleanSwitch() {
 
 				@Override
-				public Boolean caseAstStatementAssign(AstStatementAssign assign) {
-					if (assign.getTarget().getVariable().equals(variable)) {
+				public Boolean caseAstExpressionIndex(
+						AstExpressionIndex expression) {
+					if (expression.getSource().getVariable().equals(variable)) {
 						return true;
 					}
 
-					return super.caseAstStatementAssign(assign);
+					return super.caseAstExpressionIndex(expression);
 				}
 
 				@Override
@@ -192,13 +187,12 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				}
 
 				@Override
-				public Boolean caseAstExpressionIndex(
-						AstExpressionIndex expression) {
-					if (expression.getSource().getVariable().equals(variable)) {
+				public Boolean caseAstStatementAssign(AstStatementAssign assign) {
+					if (assign.getTarget().getVariable().equals(variable)) {
 						return true;
 					}
 
-					return super.caseAstExpressionIndex(expression);
+					return super.caseAstStatementAssign(assign);
 				}
 
 			}.doSwitch(Util.getActor(variable));
@@ -209,6 +203,11 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
+	}
+
+	@Check
+	public void checkPriorities(AstPriority priority) {
+
 	}
 
 }
