@@ -35,39 +35,66 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-// Scale.cal
+// Retranspose.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-// Multiply the incoming sample pairs with the coefficients provided by the generator.
+// Put pixels out of col IDCT back into scan order
 import all caltrop.lib.BitOps;
-actor Scale () int(size=isz) X0, int(size=isz) X1 ==> int(size=osz) Y0 , int(size=osz) Y1 ,
-int(size=osz) Y2 , int(size=osz) Y3 :
+actor Xilinx_retranspose () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2,
+int(size=isz) X3 ==> int(size=osz) Y :
 
-	int isz = 16;
+	int isz = 10;
 
-	int osz = 30;
+	int osz = 10;
 
-	int csz = 13;
+	//List[ List[ List[ int(size=osz) ] ] ] mem :=
+	List(type: int(size=osz), size=128) mem := [ 0 : for int k in Integers(1, 128) ];
 
-	List(type: int(size=csz), size=4) W0 = [ 2048, 2676, 2841, 1609 ];
+	int rcount := 0;
 
-	List(type: int(size=csz), size=4) W1 = [ 2048, 1108, 565, 2408 ];
+	int ccount := 0;
 
-	// Prefetch the next coefficients
-	int(size=csz) ww0 := W0[0];
+	int select := 0;
 
-	int(size=csz) ww1 := 2048;
-
-	int index := 0;
-
-	action X0:[ a ], X1:[ b ] ==> Y0:[ a * w0 ], Y1:[ a * w1 ], Y2:[ b * w0 ], Y3:[ b * w1 ]
+	action ==> Y:[ mem[i * 64 + row * 8 + col] ]
+	guard
+		ccount > 0
 	var
-		int(size=csz) w0 = ww0 , int(size=csz) w1 = ww1
+		int col = rshift(64 - ccount, 3) , int row = bitand(64 - ccount, 7) , int i = bitxor(select, 1)
 	do
-		index := bitand(index + 1, 3);
-		ww0 := W0[index];
-		ww1 := W1[index];
+		ccount := ccount - 1;
+	end
+
+	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ] ==>
+	guard
+		rcount < 64
+	var
+		int row = rshift(rcount, 3) , int quad = bitand(rshift(rcount, 2), 1)
+	do
+	// { 0, 7, 3, 4 }
+		// { 1, 6, 2, 5 }
+		if quad = 0 then
+			mem[select * 64 + row * 8 + 0] := a;
+			mem[select * 64 + row * 8 + 7] := b;
+			mem[select * 64 + row * 8 + 3] := c;
+			mem[select * 64 + row * 8 + 4] := d;
+		else
+			mem[select * 64 + row * 8 + 1] := a;
+			mem[select * 64 + row * 8 + 6] := b;
+			mem[select * 64 + row * 8 + 2] := c;
+			mem[select * 64 + row * 8 + 5] := d;
+		end
+		rcount := rcount + 4;
+	end
+
+	action ==>
+	guard
+		ccount = 0 and rcount = 64
+	do
+		select := bitxor(select, 1);
+		ccount := 64;
+		rcount := 0;
 	end
 
 end

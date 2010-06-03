@@ -35,50 +35,39 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-// FairMerge.cal
+// Scale.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-// Multiplexer in idct2d pipeline. Alternates row, column bursts
-// (4 sample pairs each) into the shared idct1d. During start-up
-// or wind-down of a burst of video it will break the pattern
-// as needed.
-actor FairMerge () int(size=rsz) R0, int(size=rsz) R1, int(size=csz) C0, int(size=csz) C1
-==> int(size=csz) Y0 , int(size=csz) Y1 , bool ROWOUT :
+// Multiply the incoming sample pairs with the coefficients provided by the generator.
+import all caltrop.lib.BitOps;
+actor Xilinx_scale () int(size=isz) X0, int(size=isz) X1 ==> int(size=osz) Y0 , int(size=osz) Y1 ,
+int(size=osz) Y2 , int(size=osz) Y3 :
 
-	int rsz = 13;
+	int isz = 16;
 
-	int csz = 16;
+	int osz = 30;
 
-	row: action R0:[ a ], R1:[ b ] ==> Y0:[ a ], Y1:[ b ], ROWOUT:[ true ]
-	end
+	int csz = 13;
 
-	col: action C0:[ a ], C1:[ b ] ==> Y0:[ a ], Y1:[ b ], ROWOUT:[ false ]
-	end
+	List(type: int(size=csz), size=4) W0 = [ 2048, 2676, 2841, 1609 ];
 
-	row_low: action R0:[ a ], R1:[ b ] ==> Y0:[ a ], Y1:[ b ], ROWOUT:[ true ]
-	end
+	List(type: int(size=csz), size=4) W1 = [ 2048, 1108, 565, 2408 ];
 
-	col_low: action C0:[ a ], C1:[ b ] ==> Y0:[ a ], Y1:[ b ], ROWOUT:[ false ]
-	end
+	// Prefetch the next coefficients
+	int(size=csz) ww0 := W0[0];
 
-	schedule fsm r0 :
-		r0 ( row ) --> r1;
-		r1 ( row ) --> r2;
-		r2 ( row ) --> r3;
-		r3 ( row ) --> c0;
-		c0 ( col ) --> c1;
-		c1 ( col ) --> c2;
-		c2 ( col ) --> c3;
-		c3 ( col ) --> r0;
-		// low priority transitions fire if other type of input not available    
-		r0 ( col_low ) --> c1;
-		c0 ( row_low ) --> r1;
-	end
+	int(size=csz) ww1 := 2048;
 
-	priority
-		col > row_low;
-		row > col_low;
+	int index := 0;
+
+	action X0:[ a ], X1:[ b ] ==> Y0:[ a * w0 ], Y1:[ a * w1 ], Y2:[ b * w0 ], Y3:[ b * w1 ]
+	var
+		int(size=csz) w0 = ww0 , int(size=csz) w1 = ww1
+	do
+		index := bitand(index + 1, 3);
+		ww0 := W0[index];
+		ww1 := W1[index];
 	end
 
 end

@@ -35,21 +35,34 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-// Final.cal
+// ShuffleFly.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-// Final IDCT scaling in idct1d pipeline
-import all caltrop.lib.BitOps;
-actor Final () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3 ==>
-int(size=osz) Y0 , int(size=osz) Y1 , int(size=osz) Y2 , int(size=osz) Y3 :
+// Take pairs of row/col data and repackage in quads as follows:
+//  Input   {0,1} {2,3}
+// Output   {0,2,1,3}
+actor Xilinx_shuffleFly () int(size=sz) X0, int(size=sz) X1 ==> int(size=sz) Y0 , int(size=sz) Y1 ,
+int(size=sz) Y2 , int(size=sz) Y3 :
 
-	int isz = 24;
+	int sz = 24;
 
-	int osz = 16;
+	int(size=sz) D0;
 
-	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ] ==> Y0:[ rshift(a + c, 8) ], Y1:[ rshift(a - c, 8) ], Y2:[
-		rshift(b + d, 8) ], Y3:[ rshift(b - d, 8) ]
+	int(size=sz) D1;
+
+	a0: action X0:[ a ], X1:[ b ] ==>
+	do
+		D0 := a;
+		D1 := b;
+	end
+
+	a1: action X0:[ d2 ], X1:[ d3 ] ==> Y0:[ D0 + d2 ], Y1:[ D0 - d2 ], Y2:[ D1 + d3 ], Y3:[ D1 - d3 ]
+	end
+
+	schedule fsm s0 :
+		s0 ( a0 ) --> s1;
+		s1 ( a1 ) --> s0;
 	end
 
 end

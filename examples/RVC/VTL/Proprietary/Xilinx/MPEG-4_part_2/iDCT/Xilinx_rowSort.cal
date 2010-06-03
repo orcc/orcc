@@ -35,31 +35,82 @@ BEGINCOPYRIGHT X
 	
 ENDCOPYRIGHT
 */
-// Separate.cal
+// RowSort.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-// Deinterleave row, col streams
-import all caltrop.lib.BitOps;
-actor Separate () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3,
-bool ROW ==> int(size=rsz) R0 , int(size=rsz) R1 , int(size=rsz) R2 , int(size=rsz) R3 ,
-int(size=csz) C0 , int(size=csz) C1 , int(size=csz) C2 , int(size=csz) C3 :
+// Read row queue and write pairs of data to IDCT FairMerge
+actor Xilinx_rowSort () int(size=sz) ROW ==> int(size=sz) Y0 , int(size=sz) Y1 :
 
-	int isz = 16;
+	int sz = 13;
 
-	int rsz = 16;
+	int(size=sz) x0;
 
-	int csz = 10;
+	int(size=sz) x1;
 
-	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ], ROW:[ r ] ==> R0:[ a ], R1:[ b ], R2:[ c ], R3:[ d ]
-	guard
-		r
+	int(size=sz) x2;
+
+	int(size=sz) x3;
+
+	int(size=sz) x5;
+
+	a0: action ROW:[ a ] ==>
+	do
+		x0 := a;
 	end
 
-	action X0:[ a ], X1:[ b ], X2:[ c ], X3:[ d ], ROW:[ r ] ==> C0:[ rshift(a, 6) ], C1:[ rshift(b, 6) ], C2
-		:[ rshift(c, 6) ], C3:[ rshift(d, 6) ]
-	guard
-		not r
+	a1: action ROW:[ a ] ==>
+	do
+		x1 := a;
+	end
+
+	a2: action ROW:[ a ] ==>
+	do
+		x2 := a;
+	end
+
+	a3: action ROW:[ a ] ==>
+	do
+		x3 := a;
+	end
+
+	a4: action ROW:[ a ] ==> Y0:[ x0 ], Y1:[ a ]
+	end
+
+	a5: action ROW:[ a ] ==>
+	do
+		x5 := a;
+	end
+
+	a6: action ROW:[ a ] ==> Y0:[ x2 ], Y1:[ a ]
+	end
+
+	a7: action ROW:[ a ] ==> Y0:[ x1 ], Y1:[ a ]
+	end
+
+	a8: action ROW:[ a ] ==> Y0:[ x5 ], Y1:[ x3 ]
+	do
+		x0 := a;
+	end
+
+	a9: action ==> Y0:[ x5 ], Y1:[ x3 ]
+	end
+
+	schedule fsm s0 :
+		s0 ( a0 ) --> s1;
+		s1 ( a1 ) --> s2;
+		s2 ( a2 ) --> s3;
+		s3 ( a3 ) --> s4;
+		s4 ( a4 ) --> s5;
+		s5 ( a5 ) --> s6;
+		s6 ( a6 ) --> s7;
+		s7 ( a7 ) --> s8;
+		s8 ( a8 ) --> s1;
+		s8 ( a9 ) --> s0;
+	end
+
+	priority
+		a8 > a9;
 	end
 
 end
