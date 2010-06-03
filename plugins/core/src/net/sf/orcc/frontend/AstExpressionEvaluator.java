@@ -66,9 +66,10 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 
 	private Map<AstVariable, Object> values;
 
-	public AstExpressionEvaluator(String file) {
-		this.file = file;
-		this.values = new HashMap<AstVariable, Object>();
+	/**
+	 * Creates a new AST expression evaluator.
+	 */
+	public AstExpressionEvaluator() {
 	}
 
 	@Override
@@ -368,7 +369,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 								+ ") must be of type List");
 			}
 		}
-		
+
 		return value;
 	}
 
@@ -491,6 +492,18 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		int value = evaluateAsInteger(expression);
 		Location location = Util.getLocation(expression);
 		return new IntExpr(location, value);
+	}
+
+	/**
+	 * Initializes the evaluator and sets the file in which expressions are
+	 * defined.
+	 * 
+	 * @param file
+	 *            a file name
+	 */
+	public void initialize(String file) {
+		this.file = file;
+		this.values = new HashMap<AstVariable, Object>();
 	}
 
 	/**

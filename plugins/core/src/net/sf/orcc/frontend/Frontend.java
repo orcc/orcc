@@ -31,14 +31,15 @@ package net.sf.orcc.frontend;
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.frontend.transforms.AstToIR;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
+
+import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+
+import com.google.inject.Inject;
 
 /**
  * This class defines an RVC-CAL front-end.
@@ -48,13 +49,15 @@ import net.sf.orcc.ir.serialize.IRWriter;
  */
 public class Frontend {
 
+	@Inject
+	private AstTransformer astTransformer;
+
 	/**
 	 * output folder
 	 */
 	private File outputFolder;
 
-	public Frontend(String outputFolder) {
-		this.outputFolder = new File(outputFolder);
+	public Frontend() {
 	}
 
 	public void compile(String file, AstActor astActor) throws OrccException {
@@ -62,12 +65,16 @@ public class Frontend {
 		List<Diagnostic> errors = astActor.eResource().getErrors();
 		if (errors.isEmpty()) {
 			try {
-				Actor actor = new AstToIR().transform(file, astActor);
+				Actor actor = astTransformer.transform(file, astActor);
 				new IRWriter(actor).write(outputFolder.toString());
 			} catch (OrccRuntimeException e) {
 				throw new OrccException(e.getMessage(), e);
 			}
 		}
+	}
+
+	public void setOutputFolder(String outputFolder) {
+		this.outputFolder = new File(outputFolder);
 	}
 
 }

@@ -35,6 +35,7 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
 
 import org.eclipse.core.resources.IFolder;
@@ -50,6 +51,8 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
 
+import com.google.inject.Injector;
+
 /**
  * This class defines an actor builder invoked by Xtext. The class is referenced
  * by an extension point in the plugin.xml as an Xtext builder participant.
@@ -58,6 +61,20 @@ import org.eclipse.xtext.builder.IXtextBuilderParticipant;
  * 
  */
 public class ActorBuilder implements IXtextBuilderParticipant {
+
+	private Frontend frontend;
+
+	/**
+	 * Creates a new actor builder.
+	 */
+	public ActorBuilder() {
+		// since the actor builder is not created by Guice we have to manually
+		// retrieve the injector so we can inject the front-end (and its
+		// dependencies)
+		Injector injector = CalActivator.getInstance().getInjector(
+				"net.sf.orcc.cal.Cal");
+		frontend = injector.getInstance(Frontend.class);
+	}
 
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
@@ -68,7 +85,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		}
 
 		String outputFolder = folder.getLocation().toOSString();
-		Frontend frontend = new Frontend(outputFolder);
+		frontend.setOutputFolder(outputFolder);
 
 		ResourceSet set = context.getResourceSet();
 		for (Resource resource : set.getResources()) {

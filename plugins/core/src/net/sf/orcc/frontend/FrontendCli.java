@@ -47,6 +47,7 @@ import org.eclipse.xtext.validation.IResourceValidator;
 import org.eclipse.xtext.validation.Issue;
 import org.eclipse.xtext.validation.Issue.Severity;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 
 /**
@@ -80,6 +81,7 @@ public class FrontendCli {
 
 	private List<File> actors;
 
+	@Inject
 	private Frontend frontend;
 
 	private XtextResourceSet resourceSet;
@@ -153,7 +155,7 @@ public class FrontendCli {
 			file.mkdir();
 		}
 
-		frontend = new Frontend(outputFolder);
+		frontend.setOutputFolder(outputFolder);
 	}
 
 	private void setVtlFolder(String vtlFolder) {
