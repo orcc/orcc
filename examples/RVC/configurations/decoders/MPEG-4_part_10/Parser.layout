@@ -55,5 +55,6 @@
       <vertex id="Algo_MMCO" x="905" y="1678"/>
       <vertex id="Algo_Parser_IPCM" x="951" y="2125"/>
       <vertex id="Algo_RefList0" x="1181" y="1702"/>
+      <vertex id="SizeDPBMax" x="787" y="2013"/>
    </vertices>
 </layout>

@@ -15,7 +15,7 @@
       <vertex id="MV" x="64" y="1210"/>
       <vertex id="PartSZ" x="49" y="1332"/>
       <vertex id="POC" x="622" y="1192"/>
-      <vertex id="RefList" x="608" y="1448"/>
+      <vertex id="RefList" x="602" y="1420"/>
       <vertex id="Mb_Type" x="57" y="1042"/>
       <vertex id="QP" x="523" y="230"/>
       <vertex id="LFDisable" x="523" y="327"/>
@@ -28,6 +28,7 @@
       <vertex id="ConstrainedIFlag" x="57" y="751"/>
       <vertex id="DelList" x="732" y="1122"/>
       <vertex id="FrameNum" x="614" y="1157"/>
+      <vertex id="MaxDPBSize" x="557" y="1223"/>
       <vertex id="Display_L" x="1173" y="1270"/>
       <vertex id="Inter" x="246" y="1185"/>
       <vertex id="Buffer_inter" x="935" y="1160"/>

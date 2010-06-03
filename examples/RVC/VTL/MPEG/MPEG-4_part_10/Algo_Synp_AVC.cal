@@ -92,7 +92,8 @@ actor Algo_Synp_AVC()
 			uint(size=2) LFDisable,
 			bool ConstrainedIFlag,
 			int(size=16) WIDTH, 
-			int(size=16) HEIGHT
+			int(size=16) HEIGHT,
+			uint(size=5) SizeDPBMax
 		:
   	// FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =1280/16;
@@ -167,6 +168,8 @@ actor Algo_Synp_AVC()
 	List (type: uint, size=32) frame_crop_top_offset := [ 0 : for int i in Integers( 0, 31) ];
 	List (type: uint, size=32) frame_crop_bottom_offset := [ 0 : for int i in Integers( 0, 31) ];
 	List (type: uint(size=1), size=32) vui_parameters_present_flag := [ 0 : for int i in Integers( 0, 31) ];
+
+	List (type: uint(size=5), size=32) MaxDPBSz := [16 : for int i in Integers(0,31)];
 
 	/*************************************************************
 	*************************************************************
@@ -956,8 +959,100 @@ actor Algo_Synp_AVC()
 	guard
 		done_reading_bits(),
 		read_result() = 0
+	var
+		uint(size=32) PicWidthInMacroBs,
+		uint(size=32) FrameHeightInMacroBs,
+		uint(size=8)  Val_Level_IDC,
+		int(size=32)  MaxDPB_x_2,
+		uint(size=32) MaxFS,
+		uint(size=32) Sqrt_8MaxFS,
+		uint(size=32) FrameHeight_x_PicWidth,
+		uint(size=32) MaxDPBSize
 	do
-		frame_mbs_only_flag[sps_id] := mask_bits(read_result(), 1);
+		frame_mbs_only_flag[sps_id] := 0;
+		Val_Level_IDC := level_idc[sps_id];
+		if(Val_Level_IDC < 31) then                          // 1 <= Level Number <= 3
+			if(Val_Level_IDC < 12) then                           // 1 <= Level Number <= 1.1
+				if(   Val_Level_IDC = 10 
+				   or (bitand(level_idc[sps_id],0x10) = 0)) then            // Level Number = 1 or 1b
+					MaxFS       := 99;
+					Sqrt_8MaxFS := 28;
+					MaxDPB_x_2  := 297;
+				else                                                        // Level Number = 1.1
+					MaxFS       := 396;
+					Sqrt_8MaxFS := 56;
+					MaxDPB_x_2  := 675;
+				end
+			else                                                  // 1.2 <= Level Number <= 3
+				if(Val_Level_IDC < 21) then                                 // 1.2 <= Level Number <= 2
+					MaxFS       := 396;
+					Sqrt_8MaxFS := 56;
+					MaxDPB_x_2  := 1782;
+				else                                              // 2.1 <= Level Number <= 3
+					if(Val_Level_IDC = 21) then                             // Level Number = 2.1
+						MaxFS       := 792;
+						Sqrt_8MaxFS := 80;//79.5989
+						MaxDPB_x_2  := 3564;
+					else                                                    // Level Number = 2.2 or 3
+						MaxFS       := 1620;
+						Sqrt_8MaxFS := 114;//113.8419
+						MaxDPB_x_2  := 6075;
+					end
+				end
+			end
+		else                                                 // 3.1 <= Level Number <= 5.1
+			if(Val_Level_IDC < 42) then                           // 3.1 <= Level Number <= 4.1
+				if(Val_Level_IDC < 33) then                            // 3.1 <= Level Number <= 3.2
+					if(Val_Level_IDC = 31) then                             // Level Number = 3.1
+						MaxFS       := 3600;
+						Sqrt_8MaxFS := 170;//169.7056
+						MaxDPB_x_2  := 13500;
+					else                                                    // Level Number = 3.2
+						MaxFS       := 5120;
+						Sqrt_8MaxFS := 202;//202.3858
+						MaxDPB_x_2  := 15360;
+					end
+				else                                                        // Level Number = 4 or 4.1
+					MaxFS       := 8192;
+					Sqrt_8MaxFS := 256;//256
+					MaxDPB_x_2  := 24576;
+				end
+			else                                                  // 4.2 <= Level Number <= 5.1
+				if(Val_Level_IDC = 42) then                                 // Level Number = 4.2
+					MaxFS       := 8704;
+					Sqrt_8MaxFS := 264;//263.8788
+					MaxDPB_x_2  := 26112;
+				else
+					if(Val_Level_IDC = 50) then                             // Level Number = 5
+						MaxFS       := 22080;
+						Sqrt_8MaxFS := 420;//420.2856
+						MaxDPB_x_2  := 82800;
+					else                                                    // Level Number = 5.1
+						MaxFS       := 36864;
+						Sqrt_8MaxFS := 543;//543.0580
+						MaxDPB_x_2  := 138240;
+					end
+				end
+			end
+		end
+		PicWidthInMacroBs    := pic_width_in_mbs_minus1[sps_id] + 1;
+		FrameHeightInMacroBs := (2 - 0) * (pic_height_in_map_units_minus1[sps_id] + 1);
+		if(PicWidthInMacroBs > Sqrt_8MaxFS) then
+			PicWidthInMacroBs := Sqrt_8MaxFS;
+		end
+		if(FrameHeightInMacroBs > Sqrt_8MaxFS) then
+			FrameHeightInMacroBs := Sqrt_8MaxFS;
+		end
+		FrameHeight_x_PicWidth := FrameHeightInMacroBs * PicWidthInMacroBs;
+		if(FrameHeight_x_PicWidth > MaxFS) then
+			FrameHeight_x_PicWidth := MaxFS;
+		end
+		MaxDPBSize := (512 * MaxDPB_x_2) / (FrameHeight_x_PicWidth * 384);
+		if(MaxDPBSize >= 16) then
+			MaxDPBSz[sps_id] := 16;
+		else
+			MaxDPBSz[sps_id] := MaxDPBSize;
+		end
 		set_bits_to_read(1);
 	end
 
@@ -973,8 +1068,100 @@ actor Algo_Synp_AVC()
 	guard
 		done_reading_bits(),
 		read_result() = 1
+	var
+		uint(size=32) PicWidthInMacroBs,
+		uint(size=32) FrameHeightInMacroBs,
+		uint(size=8)  Val_Level_IDC,
+		int(size=32)  MaxDPB_x_2,
+		uint(size=32) MaxFS,
+		uint(size=32) Sqrt_8MaxFS,
+		uint(size=32) FrameHeight_x_PicWidth,
+		uint(size=32) MaxDPBSize
 	do
-		frame_mbs_only_flag[sps_id] := mask_bits(read_result(), 1);
+		frame_mbs_only_flag[sps_id] := 1;
+		Val_Level_IDC := level_idc[sps_id];
+		if(Val_Level_IDC < 31) then                          // 1 <= Level Number <= 3
+			if(Val_Level_IDC < 12) then                           // 1 <= Level Number <= 1.1
+				if(   Val_Level_IDC = 10 
+				   or (bitand(level_idc[sps_id],0x10) = 0)) then            // Level Number = 1 or 1b
+					MaxFS       := 99;
+					Sqrt_8MaxFS := 28;
+					MaxDPB_x_2  := 297;
+				else                                                        // Level Number = 1.1
+					MaxFS       := 396;
+					Sqrt_8MaxFS := 56;
+					MaxDPB_x_2  := 675;
+				end
+			else                                                  // 1.2 <= Level Number <= 3
+				if(Val_Level_IDC < 21) then                                 // 1.2 <= Level Number <= 2
+					MaxFS       := 396;
+					Sqrt_8MaxFS := 56;
+					MaxDPB_x_2  := 1782;
+				else                                              // 2.1 <= Level Number <= 3
+					if(Val_Level_IDC = 21) then                             // Level Number = 2.1
+						MaxFS       := 792;
+						Sqrt_8MaxFS := 80;//79.5989
+						MaxDPB_x_2  := 3564;
+					else                                                    // Level Number = 2.2 or 3
+						MaxFS       := 1620;
+						Sqrt_8MaxFS := 114;//113.8419
+						MaxDPB_x_2  := 6075;
+					end
+				end
+			end
+		else                                                 // 3.1 <= Level Number <= 5.1
+			if(Val_Level_IDC < 42) then                           // 3.1 <= Level Number <= 4.1
+				if(Val_Level_IDC < 33) then                            // 3.1 <= Level Number <= 3.2
+					if(Val_Level_IDC = 31) then                             // Level Number = 3.1
+						MaxFS       := 3600;
+						Sqrt_8MaxFS := 170;//169.7056
+						MaxDPB_x_2  := 13500;
+					else                                                    // Level Number = 3.2
+						MaxFS       := 5120;
+						Sqrt_8MaxFS := 202;//202.3858
+						MaxDPB_x_2  := 15360;
+					end
+				else                                                        // Level Number = 4 or 4.1
+					MaxFS       := 8192;
+					Sqrt_8MaxFS := 256;//256
+					MaxDPB_x_2  := 24576;
+				end
+			else                                                  // 4.2 <= Level Number <= 5.1
+				if(Val_Level_IDC = 42) then                                 // Level Number = 4.2
+					MaxFS       := 8704;
+					Sqrt_8MaxFS := 264;//263.8788
+					MaxDPB_x_2  := 26112;
+				else
+					if(Val_Level_IDC = 50) then                             // Level Number = 5
+						MaxFS       := 22080;
+						Sqrt_8MaxFS := 420;//420.2856
+						MaxDPB_x_2  := 82800;
+					else                                                    // Level Number = 5.1
+						MaxFS       := 36864;
+						Sqrt_8MaxFS := 543;//543.0580
+						MaxDPB_x_2  := 138240;
+					end
+				end
+			end
+		end
+		PicWidthInMacroBs    := pic_width_in_mbs_minus1[sps_id] + 1;
+		FrameHeightInMacroBs := (2 - 0) * (pic_height_in_map_units_minus1[sps_id] + 1);
+		if(PicWidthInMacroBs > Sqrt_8MaxFS) then
+			PicWidthInMacroBs := Sqrt_8MaxFS;
+		end
+		if(FrameHeightInMacroBs > Sqrt_8MaxFS) then
+			FrameHeightInMacroBs := Sqrt_8MaxFS;
+		end
+		FrameHeight_x_PicWidth := FrameHeightInMacroBs * PicWidthInMacroBs;
+		if(FrameHeight_x_PicWidth > MaxFS) then
+			FrameHeight_x_PicWidth := MaxFS;
+		end
+		MaxDPBSize := (512 * MaxDPB_x_2) / (FrameHeight_x_PicWidth * 384);
+		if(MaxDPBSize >= 16) then
+			MaxDPBSz[sps_id] := 16;
+		else
+			MaxDPBSz[sps_id] := MaxDPBSize;
+		end
 	end
 	//end if
 
@@ -1513,7 +1700,7 @@ actor Algo_Synp_AVC()
 	guard first_mb_in_slice!=0
 	end
 
-	CalcPOC: action ==> POC:[POC_val]
+	CalcPOC: action ==> POC :[POC_val], SizeDPBMax :[MaxDPBSz[sps_id]]
 	guard first_mb_in_slice=0
 	var 
 		int PicOrderCntMsb,

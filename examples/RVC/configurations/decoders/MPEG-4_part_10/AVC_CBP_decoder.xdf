@@ -296,4 +296,7 @@
     <Connection dst="Decoding_Y" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum_CurrPic"/>
     <Connection dst="Decode_U" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum_CurrPic"/>
     <Connection dst="Decode_V" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum_CurrPic"/>
+    <Connection dst="Decoding_Y" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
+    <Connection dst="Decode_U" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
+    <Connection dst="Decode_V" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
 </XDF>

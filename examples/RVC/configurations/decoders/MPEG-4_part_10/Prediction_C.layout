@@ -14,7 +14,7 @@
       <vertex id="LOCATION" x="57" y="1863"/>
       <vertex id="MV" x="57" y="1960"/>
       <vertex id="PartSZ" x="57" y="2057"/>
-      <vertex id="POC" x="545" y="1518"/>
+      <vertex id="POC" x="527" y="1506"/>
       <vertex id="RefList" x="580" y="1746"/>
       <vertex id="Mb_TypeC" x="57" y="445"/>
       <vertex id="slice_beta_offset" x="489" y="773"/>
@@ -27,7 +27,8 @@
       <vertex id="I_PCM_C" x="226" y="495"/>
       <vertex id="ConstrainedIFlag" x="489" y="289"/>
       <vertex id="DelList" x="619" y="1471"/>
-      <vertex id="FrameNum" x="528" y="1494"/>
+      <vertex id="FrameNum" x="520" y="1481"/>
+      <vertex id="MaxDPBSize" x="529" y="1563"/>
       <vertex id="Display_C" x="1185" y="1564"/>
       <vertex id="Intra8x8" x="708" y="384"/>
       <vertex id="Inter" x="226" y="1513"/>

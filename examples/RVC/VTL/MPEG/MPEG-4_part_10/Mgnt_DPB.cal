@@ -14,9 +14,7 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-//Modified by Endri Bezati <endri.bezati@insa-renens.fr>
-//To work with Orcc
-actor Mgnt_DPB ( int MB_WIDTH ) 
+actor Mgnt_DPB ( int MB_WIDTH )
 	uint(size=7)  PicWidthInMb, 
 	uint(size=13) CurrMbAddr, 
 	uint(size=13) PicSizeInMb, 
@@ -34,230 +32,262 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	int(size=9)  Display,
 	bool         Write_Done
 		:
-	//FIXME! number of MB per line of picture
-	int PICWIDTH=1280/16; //number of MB per lines
-	int PICHEIGHT=720/16; //number of MB per columns
 
-	int MB_WIDTH_LUMA   = 16;
+	uint NB_PIC         = 33;
+	uint SZ_NBPIC       = 6; /* >= log2(NB_PIC) */
+
 	int MB_WIDTH_CHROMA = 8;
-	
-	uint(size=7)  picwidth :=0;
-	uint(size=13) picsize := 0;
-	List(type:uint,size=17) poc := [0 :for int s in Integers(0,17-1)];
-	uint(size=21) wa := 0;
-	uint(size=11) wa_W;
-	uint(size=11) wa_H;
-	uint(size=11) wa_x := 0;
-	uint(size=11) wa_y := 0;
-	List(type:int(size=32),size=17) pic_index_to_frame_num := [-1 :for int s in Integers(0,16)];
-	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=17) pic;
-	int(size=32) pic_curr_idx := 0;
-	List(type:uint(size=1),size=17) flag_picture_end := [1 : for int s in Integers(0,17-1)];
-	List(type:uint(size=1),size=17) flag_display := [1 : for int s in Integers(0,17-1)];
-	int(size=14)  nbMBdisplay := 0;
-	int(size=5)   pic_display_idx := -1;
-	uint(size=21) ra := 0;
-	uint(size=11) ra_W;
-	uint(size=11) ra_H;
-	uint(size=11) ra_x := 0;
-	uint(size=11) ra_y := 0;
+	int MB_WIDTH_LUMA   = 16;
+	//FIXME! number of MB per line of picture
+	int PICWIDTH        = 1280/16; //number of MB per lines
+	int PICHEIGHT       = 720/16; //number of MB per columns
+
+	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
+	List(type:uint,size=NB_PIC)            ListPOC       := [ 0    :for int s in Integers(0,NB_PIC-1)];
+	List(type:int(size=32),size=NB_PIC)    ListFrameNum  := [-1    :for int s in Integers(0,NB_PIC-1)];
+	List(type:bool        ,size=NB_PIC)    PictureReady  := [false :for int s in Integers(0,NB_PIC-1)];
+	List(type:bool        ,size=NB_PIC)    PicDisplayed  := [true  :for int s in Integers(0,NB_PIC-1)];
+	List(type:bool        ,size=NB_PIC)    IsAReference  := [false :for int s in Integers(0,NB_PIC-1)];
+
+	int (size=32) pic_curr_idx     := 0;
+	uint(size=7)  PicWidthInMacroB := 0;
+	uint(size=13) PicSizeInMacroB  := 0;
+
+	/*Write information*/
+	bool          write_done       := true;
+	uint(size=16) currmbaddr       := 0;
+	uint(size=21) wa_offset        := 0;
+	uint(size=11) wa_W             := 0;
+	uint(size=11) wa_H             := 0;
+	uint(size=11) wa_x             := 0;
+	uint(size=11) wa_y             := 0;
+
+	/*Read Information*/
+	bool                read_done  := true;
+	uint(size=21)       ra_offset  := 0;
+	uint(size=11)       ra_W       := 0;
+	uint(size=11)       ra_H       := 0;
+	uint(size=11)       ra_x       := 0;
+	uint(size=11)       ra_y       := 0;
+	uint(size=SZ_NBPIC) Ref_idx    := 0;
+
+	/*Display Information*/
+	int(size=14)          nbMBdisplay         := 0;
+	int(size=32)          NextPOCtoDisplay    := -1;
+	int(size=SZ_NBPIC+1)  IdxNextPOCtoDisplay := -1;
+	bool                  ListScanned         := true;
+
+	/*Delete information*/
 	int(size=32)  nb_del := 0;
-	uint(size=1)  read_done := 1;
-	uint(size=1)  write_done := 1;
-	uint(size=16) currmbaddr := 0;
-	uint(size=4)  Ref_idx := 0;
- 
-initialize ==>
-  do
-    pic := [ [-1 : for int i in Integers( 0, PICWIDTH*PICHEIGHT*256-1)]: for int j in Integers( 0, 17-1) ];
-  end
+	int countRead := 0;
 
-    
-  read_ref_parameters: action FrameNum_CurrPic:[a] ==>
-  var
-  	bool         idx_selected := false,
-  	int(size=32) i            := 0
-  do
-  	pic_curr_idx := -1;
-  	while((not idx_selected) and (i < 17))
-  	do
-  		if(pic_index_to_frame_num[i] = a) then
-  			if(pic_curr_idx != -1) then
-  				pic_index_to_frame_num[pic_curr_idx] := -1;
-  			end
-  			pic_curr_idx := i;
-  			idx_selected := true;
-  		else if((pic_index_to_frame_num[i] = -1) and (pic_curr_idx = -1)) then
-  		     	pic_curr_idx              := i;
-  		     	pic_index_to_frame_num[i] := a;
-  		     end
-  		end
-  		i := i + 1;
-  	end
 
-  	/*Fix Me!!! ==> exception*/
-  	if(pic_curr_idx = -1) then
-  		pic_curr_idx := 16;
-  		pic_index_to_frame_num[16] := a;
-  	end
-  end
-  
-  read_pic_parameters: action  POC:[c] ==>
-  guard
-    flag_picture_end[pic_curr_idx] = 1, flag_display[pic_curr_idx] = 1 //flag_display pour ne pas virer l image avant de l'avoir affichée
-  do
-		    
-    poc[pic_curr_idx] := c;
-    flag_picture_end[pic_curr_idx] := 0;
-    flag_display[pic_curr_idx] := 0;
-    //println("read_pic_parameters: pic_curr_idx "+pic_curr_idx+" poc "+poc+" pic_ref_idx "+pic_ref_idx+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display+" pic_display_idx "+pic_display_idx);
-  end
-  
-  get_writeAddr: action PicWidthInMb:[a], PicSizeInMb:[b], CurrMbAddr:[v] ==>
-  guard
-    write_done = 1
-  var
-  	uint(size=16) x,
-  	uint(size=16) y
-  do
-    picwidth := a;
-    picsize := b;
-    currmbaddr := v;
-    x := v mod picwidth;
-    y := v / picwidth;
-    wa := y *MB_WIDTH* MB_WIDTH*picwidth + x*MB_WIDTH;
-    wa_W := MB_WIDTH;
-    wa_H := MB_WIDTH;
-    wa_x := 0;
-    wa_y := 0;
-    write_done := 0;
-  end
-  
-  //Write_data: 
-  write_data : action WD:[v] ==>
-  guard 
-  	write_done = 0
-  do
-    pic[pic_curr_idx,wa + wa_x + wa_y * picwidth * MB_WIDTH] := v;
-    wa_x := wa_x +1;
-    if wa_x = wa_W then
-      wa_y := wa_y +1;
-      if wa_y != wa_H then wa_x := 0; else write_done :=1; end
-    end
-  end
-        
-  write_picture_done: action POCtoDisplay:[poc2display] ==> Write_Done:[true]
-  guard 
-      write_done = 1, currmbaddr = picsize - 1
-  do
-    //println("write_picture_done");
-    flag_picture_end[pic_curr_idx] := 1;
-    wa_x := 0;
-    wa_y := 0;
-    currmbaddr:=0;
-
-	pic_display_idx := 0;
-    foreach int i in Integers(0,16)
-    do
-    	if((poc[i]=poc2display) and (pic_index_to_frame_num[i] != -1)) then
-    		pic_display_idx := i;
-    	end
-    end
-  end 
-  
-  get_readAddr: action RA:[a], RA_Width:[b], RA_Height:[c], POCtoRead:[f] ==>
-  guard
-    read_done = 1
-  do
-    ra := a;
-    ra_W := b;
-    ra_H := c;
-    ra_x := 0;
-    ra_y := 0;
-    read_done := 0;
-
-    foreach int i in Integers(0,16)
-    do
-    	if(f=poc[i] and pic_index_to_frame_num[i] != -1) then
-    		Ref_idx := i;
-    	end
-    end
-  end
-  
-  // Read data
-  read_data: action  ==> RD:[v]
-  guard 
-    read_done = 0
-  var 
-    uint(size=16) v
-  do
-  	if(Ref_idx != -1) then
-	    v := pic[ Ref_idx ][ra + ra_x + ra_y * picwidth * MB_WIDTH];
-	    ra_x := ra_x +1;
-	    if ra_x = ra_W then
-	      ra_y := ra_y +1;
-	      if ra_y != ra_H then
-	        ra_x := 0; 
-	      else 
-	        ra_x := 0;
-	        ra_y := 0; 
-	        read_done := 1;
-	      end
-	    end
-	else
-		/*Fix me !!!*/
+	initialize ==>
+	do
+		pic := [ [-1 : for int i in Integers( 0, PICWIDTH*PICHEIGHT*255)]: for int j in Integers( 0, NB_PIC-1) ];
 	end
-  end
- 
-  //write MB on the output display
-  Display_MB_CHROMA:action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_CHROMA * MB_WIDTH_CHROMA-1)] ] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA
+
+
+	get_writeAddr: action
+			PicWidthInMb :[PICwidthInMb],
+			PicSizeInMb  :[PICSizeInMb],
+			CurrMbAddr   :[CurrMacroBAddr]
+				==>
+		guard
+			write_done = true
+		var
+			uint(size=16) XinMb,
+			uint(size=16) YinMb
+		do
+			PicWidthInMacroB := PICwidthInMb;
+			PicSizeInMacroB  := PICSizeInMb;
+			currmbaddr       := CurrMacroBAddr;
+			XinMb      := CurrMacroBAddr mod PicWidthInMacroB;
+			YinMb      := CurrMacroBAddr  /  PicWidthInMacroB;
+			wa_offset  := YinMb * MB_WIDTH * (MB_WIDTH * PicWidthInMacroB) + XinMb * MB_WIDTH;
+			wa_W       := MB_WIDTH;
+			wa_H       := MB_WIDTH;
+			wa_x       := 0;
+			wa_y       := 0;
+			write_done := false;
+		end
+
+
+	//Write_data: 
+	write_data : action
+			WD :[wd]
+				==>
+		guard 
+			write_done = false
+		do
+			pic[pic_curr_idx, wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
+			wa_x := wa_x +1;
+			if(wa_x = wa_W) then
+				wa_y := wa_y +1;
+				if(wa_y != wa_H) then
+					wa_x := 0;
+				else
+					write_done :=true;
+				end
+			end
+		end
+
+
+	get_readAddr: action
+			RA        :[ra],
+			RA_Width  :[RAWidth],
+			RA_Height :[RAHeight],
+			POCtoRead :[poc2read]
+				==>
+		guard
+			read_done = true
+		do
+			ra_offset := ra;
+			ra_W      := RAWidth;
+			ra_H      := RAHeight;
+			ra_x      := 0;
+			ra_y      := 0;
+			read_done := false;
+			Ref_idx   := 0;
+			foreach int i in Integers(0,NB_PIC-1)
+			do
+				if( (poc2read=ListPOC[i]) and (ListFrameNum[i] != -1)) then
+					Ref_idx := i;
+				end
+			end
+		end
+
+
+	// Read data
+	read_data: action
+				==>
+			RD :[rd]
+		guard 
+			read_done = false
+		var 
+			uint(size=16) rd
+		do
+			rd   := pic[Ref_idx][ra_offset + ra_x + ra_y * PicWidthInMacroB * MB_WIDTH];
+			ra_x := ra_x +1;
+			if(ra_x = ra_W) then
+				ra_y := ra_y +1;
+				if(ra_y != ra_H) then
+					ra_x := 0; 
+				else 
+					ra_x := 0;
+					ra_y := 0; 
+					read_done := true;
+				end
+			end
+		end
+
+	write_picture_done: action
+				==>
+			Write_Done:[true]
+		guard 
+			write_done = true,
+			currmbaddr = PicSizeInMacroB - 1
+		do
+			PictureReady[pic_curr_idx] := true;
+			wa_x        := 0;
+			wa_y        := 0;
+			currmbaddr  :=0;
+			ListScanned := false;
+		end
+
+
+	read_ref_parameters: action
+			FrameNum_CurrPic :[FrNu],
+			POC              :[Valpoc]
+				==>
+		var
+			bool         idx_selected := false,
+			int(size=32) i            := 0
+		do
+			pic_curr_idx := -1;
+			while((not idx_selected) and (i < NB_PIC))
+			do
+				if((PicDisplayed[i] = true) and (IsAReference[i] = false)) then
+					idx_selected    := true;
+					pic_curr_idx    := i;
+					ListFrameNum[i] := FrNu;
+					ListPOC[i]      := Valpoc;
+					IsAReference[i] := true;
+					PictureReady[i] := false;
+					PicDisplayed[i] := false;
+				end
+				i := i + 1;
+			end
+			/*Fix Me!!! ==> exception*/
+			if(pic_curr_idx = -1) then
+				pic_curr_idx    := 0;
+				ListFrameNum[0] := FrNu;
+				ListPOC[0]      := Valpoc;
+				IsAReference[0] := true;
+				PictureReady[0] := false;
+				PicDisplayed[0] := false;
+			end
+		end
+
+
+	//write MB on the output display
+	Display.chroma:action ==>
+			Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_CHROMA * MB_WIDTH_CHROMA-1)] ] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA
+		guard
+			IdxNextPOCtoDisplay != -1,
+			MB_WIDTH = MB_WIDTH_CHROMA
+		var
+			uint         CurrAddrInPix,
+			List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH_CHROMA*MB_WIDTH_CHROMA) ] 
+		do
+			CurrAddrInPix := (nbMBdisplay mod PicWidthInMacroB)*MB_WIDTH_CHROMA + (nbMBdisplay / PicWidthInMacroB)*MB_WIDTH_CHROMA*MB_WIDTH_CHROMA*PicWidthInMacroB ;
+			foreach int y in Integers(0, (MB_WIDTH_CHROMA-1))
+			do
+				foreach int x in Integers(0, (MB_WIDTH_CHROMA-1))
+				do
+					buff[x + y * MB_WIDTH_CHROMA] := pic[IdxNextPOCtoDisplay][CurrAddrInPix + x + y * MB_WIDTH_CHROMA * PicWidthInMacroB];
+				end
+			end
+			nbMBdisplay := nbMBdisplay +1;
+		end
+
+
+	//write MB on the output display
+	Display.luma:action ==>
+			Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_LUMA * MB_WIDTH_LUMA-1)] ] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA
+		guard
+			IdxNextPOCtoDisplay != -1,
+			MB_WIDTH != MB_WIDTH_CHROMA
+		var
+			uint         CurrAddrInPix,
+			List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH_LUMA*MB_WIDTH_LUMA) ] 
+		do
+			CurrAddrInPix := (nbMBdisplay mod PicWidthInMacroB)*MB_WIDTH_LUMA + (nbMBdisplay / PicWidthInMacroB)*MB_WIDTH_LUMA*MB_WIDTH_LUMA*PicWidthInMacroB ;
+			foreach int y in Integers(0, (MB_WIDTH_LUMA-1))
+			do
+				foreach int x in Integers(0, (MB_WIDTH_LUMA-1))
+				do
+					buff[x + y * MB_WIDTH_LUMA] := pic[IdxNextPOCtoDisplay][CurrAddrInPix + x + y * MB_WIDTH_LUMA * PicWidthInMacroB];
+				end
+			end
+			nbMBdisplay := nbMBdisplay +1;
+		end
+  Display.skip: action ==>
   guard
-    flag_display[pic_display_idx] = 0 and flag_picture_end[pic_display_idx] = 1,
-    MB_WIDTH = MB_WIDTH_CHROMA
-  var
-    uint CurrAddrInPix,    
-    List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH_CHROMA*MB_WIDTH_CHROMA) ] 
+  	IdxNextPOCtoDisplay = -1
+  end
+
+  Display.done: action ==>
+  guard
+  	nbMBdisplay = PicSizeInMacroB
   do
-    CurrAddrInPix := (nbMBdisplay mod picwidth)*MB_WIDTH_CHROMA + (nbMBdisplay / picwidth)*MB_WIDTH_CHROMA*MB_WIDTH_CHROMA*picwidth ;
-    foreach int y in Integers(0, (MB_WIDTH_CHROMA-1)) do
-      foreach int x in Integers(0, (MB_WIDTH_CHROMA-1)) do
-        buff[x + y * MB_WIDTH_CHROMA] := pic[pic_display_idx][CurrAddrInPix + x + y * MB_WIDTH_CHROMA * picwidth];
-      end
-    end
-    nbMBdisplay := nbMBdisplay +1;
-    if nbMBdisplay = picsize then 
-      flag_display[pic_display_idx] := 1;
-      nbMBdisplay := 0;
-    //  println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
-    end
+	PicDisplayed[IdxNextPOCtoDisplay] := true;
+	NextPOCtoDisplay := -1;
+//	println("IdxNextPOCtoDisplay:"+IdxNextPOCtoDisplay+" poc:"+ListPOC[IdxNextPOCtoDisplay]);
+	IdxNextPOCtoDisplay := -1;
+	nbMBdisplay := 0;
   end
- 
-  //write MB on the output display
-  Display_MB_LUMA:action ==>  Display:[ [buff[s] :for int s in Integers(0,MB_WIDTH_LUMA * MB_WIDTH_LUMA-1)] ] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA
-  guard
-    flag_display[pic_display_idx] = 0 and flag_picture_end[pic_display_idx] = 1
-  var
-    uint CurrAddrInPix,
-    List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH_LUMA*MB_WIDTH_LUMA) ] 
-  do
-    CurrAddrInPix := (nbMBdisplay mod picwidth)*MB_WIDTH_LUMA + (nbMBdisplay / picwidth)*MB_WIDTH_LUMA*MB_WIDTH_LUMA*picwidth ;
-    foreach int y in Integers(0, (MB_WIDTH_LUMA-1)) do
-      foreach int x in Integers(0, (MB_WIDTH_LUMA-1)) do
-        buff[x + y * MB_WIDTH_LUMA] := pic[pic_display_idx][CurrAddrInPix + x + y * MB_WIDTH_LUMA * picwidth];
-      end
-    end
-    nbMBdisplay := nbMBdisplay +1;
-    if nbMBdisplay = picsize then 
-      flag_display[pic_display_idx] := 1;
-      nbMBdisplay := 0;
-     // println(" new pic_display_idx "+pic_display_idx+" poc "+poc+" flag_picture_end "+flag_picture_end+" flag_display "+flag_display);
-    end
-  end
-  
-  skip_Display: action ==>
-  guard
-    flag_display[pic_display_idx] = 1 or flag_picture_end[pic_display_idx] = 0
-  end
+
 
 
 purge_List: action 
@@ -266,12 +296,13 @@ purge_List: action
 	guard
 		val_nb_del = -1
 	do
-		foreach int i in Integers(0,16)
+		foreach int i in Integers(0,NB_PIC - 1)
 		do
 			if(i != pic_curr_idx) then
-				pic_index_to_frame_num[i] := -1;
+				ListFrameNum[i] := -1;
+				IsAReference[i] := false;
 			else
-				pic_index_to_frame_num[i] := 0;
+				ListFrameNum[i] := 0;
 			end
 		end
 	end
@@ -287,10 +318,11 @@ read_del_parameters: action
 
 read_delList: action DelList:[ValFrameNum] ==>
 	do
-		foreach int i in Integers (0,16)
+		foreach int i in Integers (0,NB_PIC - 1)
 		do
-			if(pic_index_to_frame_num[i]   = ValFrameNum) then
-				pic_index_to_frame_num[i] := -1;
+			if(ListFrameNum[i]   = ValFrameNum) then
+				ListFrameNum[i] := -1;
+				IsAReference[i] := false;
 			end
 		end
 		nb_del := nb_del - 1;
@@ -303,27 +335,82 @@ read_delList_done: action ==>
 	end
 
 
-  schedule fsm  read_ref_parameters:
-    read_ref_parameters   	(read_ref_parameters )--> read_pic_parameters;
-    read_pic_parameters   	(read_pic_parameters )--> read_write;
+getNextPOCtoDisplay: action
+		POCtoDisplay :[poc2disp]
+			==>
+	guard
+		NextPOCtoDisplay = -1
+	do
+		NextPOCtoDisplay := poc2disp;
+		ListScanned      := false;
+	end
+skip_getNextPOCtoDisplay: action ==>
+	end
+
+getidxdisplay: action ==>
+	guard
+		ListScanned = false
+	do
+		IdxNextPOCtoDisplay := -1;
+		foreach int i in Integers (0,NB_PIC - 1)
+		do
+			if(ListPOC[i] = NextPOCtoDisplay)then
+					if(PictureReady[i] = true) then
+						if(PicDisplayed[i] = false) then
+							IdxNextPOCtoDisplay := i;
+						end
+					end
+			end
+		end
+		ListScanned := true;
+	end
+
+	skip_getidxdisplay: action ==>
+		end
+  
+   schedule fsm  read_ref_parameters:
     read_write				(write_data	         )--> read_write;
     read_write				(read_data	         )--> read_write;
     read_write				(get_writeAddr       )--> read_write;
     read_write				(get_readAddr        )--> read_write;
-    read_write			  	(write_picture_done  )--> Display;
-    Display                 (Display_MB_CHROMA   )--> Display;
-    Display                 (Display_MB_LUMA     )--> Display;
-    Display                 (skip_Display        )--> read_del_parameters;
+    read_write			  	(write_picture_done  )--> read_del_parameters;
+    
+ /*   NotRead_NotWrite(get_readAddr        )--> ;
+    NotRead_NotWrite(get_writeAddr        )--> ;
+
+    Read_NotWrite
+
+    NotRead_Write
+
+	Read_Write*/
+
+	getNextPOCtoDisplay(getNextPOCtoDisplay)-->getidxdisplay;
+	getNextPOCtoDisplay(skip_getNextPOCtoDisplay)-->getidxdisplay;
+
+	getidxdisplay( getidxdisplay)-->Display;
+	getidxdisplay( skip_getidxdisplay)-->read_write;
+
+    read_ref_parameters   	(read_ref_parameters )--> getNextPOCtoDisplay;
+Display(Display.skip)-->read_write;
+Display(Display.luma)-->Display;
+Display(Display.chroma)-->Display;
+Display(Display.done)-->getNextPOCtoDisplay;
     read_del_parameters     (purge_List          )--> read_ref_parameters;
     read_del_parameters     (read_del_parameters )--> read_del_list;
     read_del_list			(read_delList        )--> read_del_list;
     read_del_list			(read_delList_done   )--> read_ref_parameters;
+
+
+
+
   end
 
   priority
-    write_data        > read_data > write_picture_done  > get_writeAddr > get_readAddr ;
-  	Display_MB_CHROMA > Display_MB_LUMA;
+    getNextPOCtoDisplay > getidxdisplay> write_data        > read_data > write_picture_done  > get_writeAddr > get_readAddr ;
+  	Display.skip > Display.done >Display.chroma >Display.luma;
   	purge_List        > read_del_parameters;
   	read_delList_done > read_delList;
+  	getNextPOCtoDisplay > skip_getNextPOCtoDisplay;
+  	getidxdisplay > skip_getidxdisplay;
   end
 end

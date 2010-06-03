@@ -205,6 +205,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="MaxDPBSize">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -329,4 +336,5 @@
     <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_beta_offset"/>
     <Connection dst="TEX_L" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="TEX_L" dst-port="FrameNum" src="" src-port="FrameNum"/>
+    <Connection dst="TEX_L" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
 </XDF>

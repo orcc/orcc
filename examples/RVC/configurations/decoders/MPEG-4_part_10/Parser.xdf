@@ -310,6 +310,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="SizeDPBMax">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -555,4 +562,5 @@
     <Connection dst="Algo_RefList0" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>
     <Connection dst="Algo_RefList0" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="" dst-port="RefList" src="Algo_RefList0" src-port="RefList"/>
+    <Connection dst="" dst-port="SizeDPBMax" src="Algo_Synp_AVC" src-port="SizeDPBMax"/>
 </XDF>

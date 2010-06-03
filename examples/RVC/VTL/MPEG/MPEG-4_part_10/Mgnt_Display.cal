@@ -17,57 +17,86 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 actor Mgnt_Display ()
 	uint(size=32) POC,
-	uint(size=31) FrameNum_CurrPic
+	uint(size=31) FrameNum,
+	uint(size=5)  MaxDPBSize
 	
 		==>
   	uint(size=32) POCtoDisplay
 		:
 
 
-	List(type:int (size=32),size=16) frame_num := [-1 :for int s in Integers(0,15)];
-	List(type:uint(size=32),size=16) poc;
+	List(type:int (size=32),size=16) frame_num  := [-1    :for int s in Integers(0,15)];
+	List(type:int (size=32),size=16) ListPOC    := [-1    :for int s in Integers(0,15)];
+	List(type:bool         ,size=16) IsUsed     := [false :for int s in Integers(0,15)];
 	
-	int(size=5) IdxNextPOC := -1;
+	int (size=5)  IdxNextPOC      := -1;
+	uint(size=4)  CurrentIdx      := 0;
+	int (size=32) NextPOC         := 0;
+	uint(size=5)  NbPic           := 0;
+	uint(size=5)  SizeDPBMax      := 16;
 
 
 	GetPOC: action
-			POC:[ValPOC],
-			FrameNum_CurrPic:[FrNu]
+			POC        :[ValPOC],
+			FrameNum   :[FrNu]
+		//	MaxDPBSize :[ValMaxDPBSize]
 				==>
 		var
-			uint(size=4) idx          := 0,
 			bool         idx_selected := false
 		do
-			while( (idx < 16) and (not idx_selected) )
+			CurrentIdx := 0;
+			while( (CurrentIdx < 16) and (not idx_selected) )
 			do
-				if(frame_num[idx] = -1) then
-					frame_num[idx] := FrNu;
-					poc[idx]       := ValPOC;
-					idx_selected   := true;
+				if(IsUsed[CurrentIdx] = false) then
+					frame_num[CurrentIdx] := FrNu;
+					ListPOC[CurrentIdx]   := ValPOC;
+					IsUsed[CurrentIdx]    := true;
+					idx_selected          := true;
 				end
-				idx := idx + 1;
+				CurrentIdx := CurrentIdx + 1;
 			end
+		//	SizeDPBMax      := ValMaxDPBSize;
+			CurrentIdx      := CurrentIdx - 1;
+			NbPic           := NbPic + 1;
 		end
+action MaxDPBSize:[a] ==>
+end
 
-
-	SearchForNextPOC: action ==>
-		var
-			//uint(size=5) idx,
-			int (size=32) frame_num_last_poc
+/*	SearchForNextPOC.POCType0: action
+				==>
+		guard
+			PicOrderCntType = 0
 		do
-			
-			if(IdxNextPOC != -1) then
-				frame_num_last_poc := frame_num[IdxNextPOC];
-				IdxNextPOC         := -1;
-			else
-				frame_num_last_poc := -1;
+			IdxNextPOC := -1;
+			foreach int i in Integers(0,15)
+			do
+				if( (ListPOC[i] = NextPOC) and (IsUsed[i] = true)) then
+					IdxNextPOC := i;
+				end
 			end
+			if(IdxNextPOC = -1) then
+				if( (ListPOC[CurrentIdx] < NextPOC) and (IsUsed[CurrentIdx] = true) ) then
+					if( (ListPOC[CurrentIdx] = 0) or (ListPOC[CurrentIdx] = 1) ) then
+						IdxNextPOC := CurrentIdx;
+						NextPOC    := ListPOC[CurrentIdx];
+					else
+						NextPOC := 1;
+					end
+				end
+			end
+		end*/
 
+	SearchForNextPOC.launch: action ==>
+		guard
+			NbPic = SizeDPBMax
+		do
+			IdxNextPOC := -1;	
+			
 			foreach int i in Integers (0,15)
 			do
-				if(frame_num[i] > frame_num_last_poc) then
+				if((ListPOC[i] >= NextPOC) and (IsUsed[i] = true)) then
 					if(IdxNextPOC != -1) then
-						if(frame_num[i] < frame_num[IdxNextPOC])then
+						if((ListPOC[i] < ListPOC[IdxNextPOC]) )then
 							IdxNextPOC := i;
 						end
 					else
@@ -78,27 +107,39 @@ actor Mgnt_Display ()
 			if(IdxNextPOC = -1) then
 				foreach int i in Integers (0,15)
 				do
-					if(frame_num[i] >= 0) then
+					if((ListPOC[i] >= 0) and(IsUsed[i] = true)) then
 						if(IdxNextPOC != -1) then
-							if(frame_num[i]<frame_num[IdxNextPOC])then
+							if(ListPOC[i]<ListPOC[IdxNextPOC])then
 								IdxNextPOC := i;
+								NextPOC := ListPOC[i];
 							end
 						else
 							IdxNextPOC := i;
+							NextPOC := ListPOC[i];
 						end
 					end
-				end	
+				end
+			else
+				NextPOC := ListPOC[IdxNextPOC];
 			end
+			NextPOC := NextPOC + 1;
 		end
 
+	SearchForNextPOC.skip: action ==>
+		guard
+			NbPic < SizeDPBMax
+		do
+			IdxNextPOC := -1;	
+		end
 
 	SendNextPOC: action
 				==>
-			POCtoDisplay :[ poc[IdxNextPOC] ]
+			POCtoDisplay :[ ListPOC[IdxNextPOC] ]
 		guard
 			IdxNextPOC >= 0
 		do
-			frame_num[IdxNextPOC] := -1;
+			IsUsed[IdxNextPOC] := false;
+			NbPic              := NbPic - 1;
 		end
 
 
@@ -109,7 +150,7 @@ actor Mgnt_Display ()
 	schedule fsm GetPOC:
 		GetPOC           (GetPOC           )-->SearchForNextPOC;
 		SearchForNextPOC (SearchForNextPOC )-->SendNextPOC;
-		SendNextPOC      (SendNextPOC      )-->GetPOC;
+		SendNextPOC      (SendNextPOC      )-->SearchForNextPOC;
 		SendNextPOC      (skipSendNextPOC  )-->GetPOC;
 	end
 
