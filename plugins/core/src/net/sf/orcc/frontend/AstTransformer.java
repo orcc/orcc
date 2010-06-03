@@ -107,9 +107,6 @@ import com.google.inject.Inject;
  */
 public class AstTransformer {
 
-	@Inject
-	private IQualifiedNameProvider nameProvider;
-
 	/**
 	 * This class transforms an AST statement into one or more IR instructions
 	 * and/or nodes.
@@ -280,6 +277,15 @@ public class AstTransformer {
 	final private Map<AstFunction, Procedure> functionsMap;
 
 	/**
+	 * Contains the current list of local variables where local variables should
+	 * be added.
+	 */
+	private OrderedMap<Variable> locals;
+
+	@Inject
+	private IQualifiedNameProvider nameProvider;
+
+	/**
 	 * Contains the current list of nodes where nodes should be added by the
 	 * expression transformer.
 	 */
@@ -323,7 +329,7 @@ public class AstTransformer {
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
 		typeTransformer = new TypeTransformer();
-		
+
 		exprEvaluator = new AstExpressionEvaluator();
 	}
 
@@ -336,11 +342,8 @@ public class AstTransformer {
 	 *            the AST action
 	 * @param inputPattern
 	 *            the IR input pattern
-	 * @param locals
-	 *            local variables of the procedure
 	 */
-	private void actionAddReads(AstAction astAction, Pattern inputPattern,
-			OrderedMap<Variable> locals) {
+	private void actionAddReads(AstAction astAction, Pattern inputPattern) {
 		// TODO add reads to the "nodes" node list
 	}
 
@@ -365,11 +368,8 @@ public class AstTransformer {
 	 * @param inputPattern
 	 *            a list of AST input patterns, where an AST input patterns
 	 *            contains a list of tokens and possibly a repeat clause.
-	 * @param locals
-	 *            local variables of the procedure
 	 */
-	private void actionDeclareTokens(List<AstInputPattern> inputPattern,
-			OrderedMap<Variable> locals) {
+	private void actionDeclareTokens(List<AstInputPattern> inputPattern) {
 		// TODO add tokens to "locals" ordered map
 	}
 
@@ -420,7 +420,7 @@ public class AstTransformer {
 		variablesMap.clear();
 		proceduresMap.clear();
 		functionsMap.clear();
-		
+
 		this.file = file;
 		exprEvaluator.initialize(file);
 
@@ -432,8 +432,11 @@ public class AstTransformer {
 				.getStateVariables());
 		OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
 		OrderedMap<Port> outputs = transformPorts(astActor.getOutputs());
-		OrderedMap<Procedure> procedures = transformProcedures(astActor
-				.getProcedures());
+
+		// transforms functions and procedures
+		OrderedMap<Procedure> procedures = new OrderedMap<Procedure>();
+		transformFunctions(astActor.getFunctions(), procedures);
+		transformProcedures(astActor.getProcedures(), procedures);
 
 		// transform actions
 		ActionList actions = transformActions(astActor.getActions());
@@ -485,12 +488,13 @@ public class AstTransformer {
 		actionFillIsSchedulable(astAction, scheduler);
 
 		// will append nodes to the body's node list
+		this.locals = body.getLocals();
 		this.nodes = body.getNodes();
 
-		actionDeclareTokens(astAction.getInputs(), body.getLocals());
-		actionAddReads(astAction, inputPattern, body.getLocals());
-		transformLocalVariables(astAction.getVariables(), body.getLocals());
-		transformStatements(astAction.getStatements(), body);
+		actionDeclareTokens(astAction.getInputs());
+		actionAddReads(astAction, inputPattern);
+		transformLocalVariables(astAction.getVariables());
+		transformStatements(astAction.getStatements());
 		actionAddWrites(astAction, outputPattern);
 	}
 
@@ -550,8 +554,30 @@ public class AstTransformer {
 		return exprTransformer.doSwitch(expression);
 	}
 
-	private void transformLocalVariables(List<AstVariable> variables,
-			OrderedMap<Variable> locals) {
+	private void transformFunctions(List<AstFunction> astFunctions,
+			OrderedMap<Procedure> procedures) {
+		for (AstFunction astFunction : astFunctions) {
+			String name = astFunction.getName();
+			Location location = Util.getLocation(astFunction);
+			Type type = transformType(astFunction.getType());
+
+			Procedure procedure = new Procedure(name, location, type);
+
+			// will append nodes to this procedure's node list
+			this.locals = procedure.getLocals();
+			this.nodes = procedure.getNodes();
+
+			transformParameters(astFunction.getParameters(), procedure);
+			transformLocalVariables(astFunction.getVariables());
+			transformExpression(astFunction.getExpression());
+
+			procedures.add(file, location, name, procedure);
+
+			functionsMap.put(astFunction, procedure);
+		}
+	}
+
+	private void transformLocalVariables(List<AstVariable> variables) {
 		for (AstVariable astVariable : variables) {
 			Location location = Util.getLocation(astVariable);
 			String name = astVariable.getName();
@@ -609,9 +635,8 @@ public class AstTransformer {
 		return ports;
 	}
 
-	private OrderedMap<Procedure> transformProcedures(
-			List<AstProcedure> astProcedures) {
-		OrderedMap<Procedure> procedures = new OrderedMap<Procedure>();
+	private void transformProcedures(List<AstProcedure> astProcedures,
+			OrderedMap<Procedure> procedures) {
 		for (AstProcedure astProcedure : astProcedures) {
 			String name = astProcedure.getName();
 			Location location = Util.getLocation(astProcedure);
@@ -619,19 +644,17 @@ public class AstTransformer {
 			Procedure procedure = new Procedure(name, location, new VoidType());
 
 			// will append nodes to this procedure's node list
+			this.locals = procedure.getLocals();
 			this.nodes = procedure.getNodes();
 
 			transformParameters(astProcedure.getParameters(), procedure);
-			transformLocalVariables(astProcedure.getVariables(),
-					procedure.getLocals());
-			transformStatements(astProcedure.getStatements(), procedure);
+			transformLocalVariables(astProcedure.getVariables());
+			transformStatements(astProcedure.getStatements());
 
 			procedures.add(file, location, name, procedure);
 
 			proceduresMap.put(astProcedure, procedure);
 		}
-
-		return procedures;
 	}
 
 	/**
@@ -645,8 +668,7 @@ public class AstTransformer {
 		stmtTransformer.doSwitch(statement);
 	}
 
-	private void transformStatements(List<AstStatement> statements,
-			Procedure procedure) {
+	private void transformStatements(List<AstStatement> statements) {
 		for (AstStatement statement : statements) {
 			transformStatement(statement);
 		}
