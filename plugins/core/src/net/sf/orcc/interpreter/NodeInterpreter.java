@@ -240,11 +240,18 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		if (instr.getIndexes().isEmpty()) {
 			target.setValue(source.getValue());
 		} else {
-			Object obj = source.getValue();
-			for (Expression index : instr.getIndexes()) {
-				obj = Array.get(obj, (Integer) index.accept(exprInterpreter));
+			try {
+				Object obj = source.getValue();
+				for (Expression index : instr.getIndexes()) {
+					obj = Array.get(obj,
+							(Integer) index.accept(exprInterpreter));
+				}
+				target.setValue(obj);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				throw new OrccRuntimeException(
+						"Array index out of bounds at line "
+								+ instr.getLocation().getStartLine());
 			}
-			target.setValue(obj);
 		}
 	}
 
