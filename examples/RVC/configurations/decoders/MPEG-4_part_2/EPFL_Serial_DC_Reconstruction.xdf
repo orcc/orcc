@@ -137,9 +137,6 @@
         <Parameter name="NEWVOP">
             <Expr kind="Var" name="NEWVOP"/>
         </Parameter>
-        <Parameter name="QUANT_MASK">
-            <Expr kind="Var" name="QUANT_MASK"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

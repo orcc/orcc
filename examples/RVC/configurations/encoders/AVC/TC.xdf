@@ -93,9 +93,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="INTRA">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Variable" name="qp">
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="30"/>
@@ -111,9 +108,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
     </Instance>
     <Instance id="IDCT">
         <!-- ************************* -->
@@ -123,9 +117,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
     </Instance>
     <Instance id="Quantisation">
         <!-- ************************* -->

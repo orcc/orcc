@@ -34,9 +34,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTRA16">
-            <Expr kind="Literal" literal-kind="Integer" value="10"/>
-        </Parameter>
     </Instance>
     <Instance id="Controller">
         <!-- ************************* -->
@@ -64,9 +61,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTRA16">
-            <Expr kind="Literal" literal-kind="Integer" value="8"/>
-        </Parameter>
     </Instance>
     <Instance id="Mux_Intra_16_4">
         <!-- ************************* -->

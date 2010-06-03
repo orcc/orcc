@@ -44,7 +44,6 @@ import all caltrop.lib.BitOps;
 actor Algo_Synp_MPEG_4 (
     // Maximum image width (in units of macroblocks) that the decoder can handle.
     // It is used to allocate line buffer space at compile time.
-  int QUANT_MASK,
   int ROUND_TYPE,
   int FCODE_MASK,
   int FCODE_SHIFT,

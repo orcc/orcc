@@ -2,7 +2,6 @@ actor MPEG4_algo_DCRinvpred (int DCVAL,
 	int NEWVOP,
 	int INTRA,
 	int INTER,
-	int QUANT_MASK,
 	int ACCODED,
 	int ACPRED) int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ + 3) A, int(size=MB_COORD_SZ +
 3) B, int(size=MB_COORD_SZ + 3) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>

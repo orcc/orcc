@@ -66,9 +66,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
         <Parameter name="INTRA">
             <Expr kind="Var" name="INTRA"/>
         </Parameter>

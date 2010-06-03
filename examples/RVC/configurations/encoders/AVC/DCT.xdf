@@ -65,9 +65,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="INTRA">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -88,12 +85,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
-        <Parameter name="ROW">
-            <Expr kind="Literal" literal-kind="Integer" value="0"/>
-        </Parameter>
     </Instance>
     <Instance id="DCT1D1">
         <!-- ************************* -->

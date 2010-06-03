@@ -82,7 +82,6 @@ actor Algo_RefList ()
 	List(type:uint(size=32), size=32) POCList      := [ 0 :for int s in Integers(0,31)];
 
 	List(type:int(size=32), size=16) RefListTab := [0 :for int s in Integers(0,16-1)];
-	List(type:int(size=32), size=16) IdxList    := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32), size=16) STList     := [0 :for int s in Integers(0,16-1)];
 	List(type:int(size=32), size=16) LTList     := [-1 :for int s in Integers(0,16-1)];
 
