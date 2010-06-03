@@ -271,7 +271,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	/* CABAC Mb type parsing */
 	bool SuffixMbTypeP := true;
-	
+	int compIdx;
 	int binIdxMb := 0;
 	//CABAC Decode Variables
 	/* Defines the Final Value of the Cabac Decoding Process and the Index of the Cabac Compare Tbale SynElVal */
@@ -284,11 +284,17 @@ actor Algo_Synp_AVC_FREXT()
 	/* CABAC Neighbouring */
 	 uint luma8x8BlkIdx;
 	
+	 /* CABAC Coded Block Flag Lists */
 	 
 	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH*PICHEIGHT ) transblock_cbf	:=  [ [ 0 : for int i in Integers( 0, 15) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cr	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cb	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	
+	/* CABAC MVD and REF Lists */
+														  /*val_CurrMbAddr, mbPartIdx, subMbPartIdx,compIdx*/
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L0 :=  [ [ [ [ -1:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L1 :=  [ [ [ [ -1:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	
 	 uint NeighMbAddr;
 	 bool NeighMbAvail;
@@ -315,17 +321,6 @@ actor Algo_Synp_AVC_FREXT()
 	
 	List (type: int(size = 2), size = 4)   prior_decoded_bin_cbp		:= [0: for int i in Integers(0, 3)] ;
 	int bk_cbp := 0;
-	
-	/* Up and Left Macroblock luma and chroma Residual Values */
-	List ( type: int(size = 16), size = 16  )  MB_DC_Luma	:= [ 0 : for int i in Integers( 0, 15)  ];
-	
-	List ( type: int(size = 16), size = 256 )  MB_AC_Luma	:= [ 0 : for int i in Integers( 0, 255) ];
-	
-	List ( type: int(size = 16), size = 4   )  MB_DC_Cr	:= [ 0 : for int i in Integers( 0, 3  ) ];
-	List ( type: int(size = 16), size = 4   )  MB_DC_Cb	:= [ 0 : for int i in Integers( 0, 3  ) ];
-	
-	List ( type: int(size = 16), size = 64  )  MB_AC_Cr	:= [ 0 : for int i in Integers( 0, 63)  ];
-	List ( type: int(size = 16), size = 64  )  MB_AC_Cb	:= [ 0 : for int i in Integers( 0, 63)  ];
 	
 	int synEval_MB_I_Ele = 26;
 	List ( type: List ( type: int(size = 8), size = 8) , size = 26 ) synEval_MB_I = 
@@ -7185,6 +7180,8 @@ end
 		else
 			if IS_CABAC() then
 				mvd_l0 := cabac_value();
+				//Save the decode mvd
+				Mvd_L0[val_CurrMbAddr][mbPartIdx][subMbPartIdx][0] := mvd_l0;
 				GetCabacMvdLx();
 				StartCabacProcess();
 		
@@ -7201,6 +7198,8 @@ end
 		else
 			if IS_CABAC() then
 				mvd_l0 := cabac_value();
+				//Save the decode mvd
+				Mvd_L0[val_CurrMbAddr][mbPartIdx][subMbPartIdx][1] := mvd_l0;
 			end
 		end
 		subMbPartIdx := subMbPartIdx +1;
@@ -7267,6 +7266,8 @@ end
 		else
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
+				//Save the decode mvd
+				Mvd_L1[val_CurrMbAddr][mbPartIdx][subMbPartIdx][0] := mvd_l0;
 				GetCabacMvdLx();
 				StartCabacProcess();
 		
@@ -7284,6 +7285,8 @@ end
 		else
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
+				//Save the decode mvd
+				Mvd_L1[val_CurrMbAddr][mbPartIdx][subMbPartIdx][1] := mvd_l0;
 			end
 		end
 		subMbPartIdx := subMbPartIdx +1;
@@ -7616,23 +7619,48 @@ end
 		mbPartIdx < NumMbPart(),
 		not IS_MBPred_L1(mbPartIdx), not IS_MBNA(mbPartIdx)
 	do
-		start_vld();
+		if IS_CAVLC() then
+			start_vld();
+		else
+			if IS_CABAC() then
+			      GetCabacMvdLx();
+			      StartCabacProcess();
+			end
+		end
 	end
 
 	read_MB_pred_mvd_l0_done0: action ==> MvRes:[mvd_l0]
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		mvd_l0 := vld_se();
-		start_vld();
+		if IS_CAVLC() then
+			mvd_l0 := vld_se();
+			start_vld();
+		else
+			if IS_CABAC() then
+				mvd_l0 := cabac_value();
+				//Save the decode mvd
+				Mvd_L0[val_CurrMbAddr][mbPartIdx][0][0] := mvd_l0;
+				GetCabacMvdLx();
+				StartCabacProcess();
+			end
+		end
 	end
 
 	read_MB_pred_mvd_l0_done1: action ==> MvRes:[mvd_l0]
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		mvd_l0 := vld_se();
-		mbPartIdx := mbPartIdx +1;
+		if IS_CAVLC() then
+			mvd_l0 := vld_se();
+		else
+			if IS_CABAC() then
+				mvd_l0 := cabac_value();
+				//Save the decode mvd
+				Mvd_L0[val_CurrMbAddr][mbPartIdx][subMbPartIdx][1] := mvd_l0;
+			end
+		end
+		subMbPartIdx := subMbPartIdx +1;
 	end
 
 	//else
@@ -7659,22 +7687,48 @@ end
 		mbPartIdx < NumMbPart(),
 		not IS_MBPred_L0(mbPartIdx), not IS_MBNA(mbPartIdx)
 	do
-		start_vld();
+		if IS_CAVLC() then
+			start_vld();
+		else
+			if IS_CABAC() then
+			      GetCabacMvdLx();
+			      StartCabacProcess();
+			end
+		end
 	end
 
 	read_MB_pred_mvd_l1_done0: action ==> 
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		mvd_l1 := vld_se();
-		start_vld();
+		if IS_CAVLC() then
+			mvd_l1 := vld_se();
+			start_vld();
+		else
+			if IS_CABAC() then
+				mvd_l1 := cabac_value();
+				//Save the decode mvd
+				Mvd_L1[val_CurrMbAddr][mbPartIdx][0][0] := mvd_l0;
+				GetCabacMvdLx();
+				StartCabacProcess();
+		
+			end
+		end
 	end
 
 	read_MB_pred_mvd_l1_done1: action ==> 
 	guard
-		vld_end()
+		( vld_end() and IS_CAVLC() ) or ( cabac_end() and IS_CABAC() )
 	do
-		mvd_l1 := vld_se();
+		if IS_CAVLC() then
+			mvd_l1 := vld_se();
+		else
+			if IS_CABAC() then
+				mvd_l1 := cabac_value();
+				//Save the decode mvd
+				Mvd_L1[val_CurrMbAddr][mbPartIdx][0][1] := mvd_l0;
+			end
+		end
 		mbPartIdx := mbPartIdx +1;
 	end
 
