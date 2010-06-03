@@ -42,12 +42,29 @@ import net.sf.orcc.ir.Location;
  */
 public abstract class AbstractInterpretedActor {
 
+	/**
+	 * Interpreted actor's local copy (instantiation)
+	 */
 	protected Actor actor;
+
+	/**
+	 * Interpreted instance general information
+	 */
 	protected String lastVisitedAction;
 	protected Location lastVisitedLocation;
 	protected String name;
+
+	/**
+	 * Communication FIFOs
+	 */
 	public Map<String, CommunicationFifo> ioFifos;
 
+	/**
+	 * Debug stack frame content definition.
+	 * 
+	 * @author plagalay
+	 * 
+	 */
 	public class InterpreterStackFrame {
 		public String actorFilename;
 		public Integer codeLine;

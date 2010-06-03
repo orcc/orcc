@@ -44,6 +44,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
@@ -128,12 +129,40 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		if (proc.getName().equals("print")) {
 			if (args.length > 1) {
 				for (int i = 0; i < callParams.size(); i++) {
-					if (callParams.get(i).isBooleanExpr())
-						((OrccProcess) args[1]).write((String) (callParams
-								.get(i).accept(exprInterpreter)));
-					else
+					if (callParams.get(i).isStringExpr()) {
+						// String characters rework for escaped control
+						// management
+						String str = ((StringExpr) callParams.get(i))
+								.getValue();
+						char[] strArray = str.toCharArray();
+						int idx = 0;
+						boolean esc = false;
+						for (char _char : strArray) {
+							if (_char == '\\') {
+								esc = true;
+							} else if ((_char == 'n') && (esc)) {
+								strArray[idx++] = 10;
+								esc = false;
+							} else if ((_char == 'r') && (esc)) {
+								strArray[idx++] = 13;
+								esc = false;
+							} else if ((_char == 't') && (esc)) {
+								strArray[idx++] = 9;
+								esc = false;
+							} else {
+								strArray[idx++] = _char;
+								esc = false;
+							}
+						}
+						char[] printStrArray = new char[idx];
+						for (int c = 0; c < idx; c++)
+							printStrArray[c] = strArray[c];
+						((OrccProcess) args[1])
+								.write(new String(printStrArray));
+					} else {
 						((OrccProcess) args[1]).write((callParams.get(i)
 								.accept(exprInterpreter)).toString());
+					}
 				}
 			}
 		} else {

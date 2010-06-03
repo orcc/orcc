@@ -369,9 +369,9 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	public void instantiate(String path) throws OrccException {
 		String className = new File(clasz).getName();
 		actor = Network.getActorFromPool(className);
+		file = new File(path, className + ".json");
 		if (actor == null) {
 			// try and load the actor
-			file = new File(path, className + ".json");
 			try {
 				InputStream in = new FileInputStream(file);
 				actor = new IRParser().parseActor(in);

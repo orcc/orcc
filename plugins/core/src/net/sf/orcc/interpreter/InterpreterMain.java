@@ -31,6 +31,8 @@ package net.sf.orcc.interpreter;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,7 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
@@ -267,7 +270,12 @@ public class InterpreterMain extends Thread {
 				Instance instance = vertex.getInstance();
 				AbstractInterpretedActor interpretedActor = null;
 				if (instance.isActor()) {
-					Actor actor = instance.getActor();
+					// Create a new actor instance for interpretation
+					InputStream in = new FileInputStream(instance.getFile());
+					Actor actor = new IRParser().parseActor(in);
+					// Check instance type for creating corresponding
+					// interpreted actor (system generic or application
+					// specific)
 					if ("Source".equals(actor.getName())) {
 						interpretedActor = new SourceActor(instance.getId(),
 								actor, stimulusFilename);
@@ -289,8 +297,11 @@ public class InterpreterMain extends Thread {
 								actor, outputFolder, process);
 					}
 				} else if (instance.isBroadcast()) {
+					// Broadcast interpreted actor case
 					interpretedActor = bcastMap.get(instance.getId());
 				}
+				// If instance was an actor to be interpreted, register it to
+				// the interpretation queue and set the instance FIFO map
 				if (interpretedActor != null) {
 					interpretedActor.ioFifos = fifoMap.get(interpretedActor
 							.getName());

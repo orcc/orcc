@@ -316,6 +316,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * initialized state variables, allocation and initialization of state
 	 * arrays.
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize() {
 		try {
@@ -341,7 +342,12 @@ public class InterpretedActor extends AbstractInterpretedActor {
 					}
 				} else {
 					// initialize
-					stateVar.setValue(initConst);
+					if (type.isList()) {
+						stateVar.setValue(((ArrayList<Object>) initConst)
+								.toArray());
+					} else {
+						stateVar.setValue(initConst);
+					}
 				}
 			}
 
