@@ -142,6 +142,21 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
 	function IS_P(int SliceType) --> bool : SliceType = SLICE_TYPE_P end
 	
+	/* P and B Images */
+	function IS_P_Skip() --> bool: slice_type = SLICE_TYPE_P and mb_type = P_Skip end
+	function IS_B_Skip() --> bool:  slice_type = SLICE_TYPE_B and mb_type = B_Skip end
+	function IS_P_8x8() --> bool: slice_type = SLICE_TYPE_P and mb_type = 3 end
+	function IS_B_Direct_16x16() --> bool: slice_type = SLICE_TYPE_B and mb_type = 0 end
+	function IS_B_8x8() --> bool: slice_type = SLICE_TYPE_B and mb_type = 22 end
+	function IS_B_Direct_8x8() --> bool: slice_type = SLICE_TYPE_B and sub_mb_type[mbPartIdx] = 0 end
+	function IS_IPCM_Tab(int Addr, int MbType) -->bool:
+		if Addr < 0 then
+			false
+		else
+			mbTab[Addr][MbType] = 25
+		end
+	end
+	
 	
 	//Entropie decoding
 	function IS_CAVLC() --> bool: entropy_coding_mode_flag[pps_id] = 0 end
@@ -280,8 +295,8 @@ actor Algo_Synp_AVC_FREXT()
 	 uint NeighMb_xW;
 	 uint NeighMb_yW;
 	
-	int P_Skip = 254;
-	int B_Skip = 255;
+	uint P_Skip = 254;
+	uint B_Skip = 255;
 	int tempCoeff;
 	
 	/* MVD and REF CABAC Neighbouring */
@@ -1721,7 +1736,7 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_Intra_16x16() --> bool : mb_intra_flag = 1 and mb_type > 0 and mb_type <25 end
 	function IS_I_PCM() --> bool : mb_intra_flag = 1 and mb_type = 25 end
 	function IS_P_8x8ref0() --> bool : slice_type = SLICE_TYPE_P and mb_type = 4 end
-	function IS_B_Direct_8x8() --> bool : slice_type = SLICE_TYPE_B and sub_mb_type[ mbPartIdx ] = 0 end
+	//function IS_B_Direct_8x8() --> bool : slice_type = SLICE_TYPE_B and sub_mb_type[ mbPartIdx ] = 0 end
 	
 
 	function vld_end() --> bool : not NewVLD end
@@ -2539,11 +2554,11 @@ actor Algo_Synp_AVC_FREXT()
 					NeighMbAvail := mbAddrB_Avail();
 					NeighMbAddr := GiveMbAddrB();
   				else
-    				if yN < maxH - 1 then
-      					NeighMbAvail := true;
-      					NeighMbAddr  := val_CurrMbAddr;
-    				end
-    			end
+					if yN < maxH - 1 then
+						NeighMbAvail := true;
+						NeighMbAddr  := val_CurrMbAddr;
+					end
+				end
 			else
 			      if xN >= maxW - 1 and yN < 0 then
 					NeighMbAvail := mbAddrC_Avail();
@@ -3224,11 +3239,11 @@ actor Algo_Synp_AVC_FREXT()
 		// condTermFlagA
 		
 		if not AvailMbA and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
-		   AvailMbA and transBlockA = -1 and mbTab[mbAddrA][mbTabMbtype] != 25 then
+		   AvailMbA and transBlockA = -1 and IS_IPCM_Tab(mbAddrA,mbTabMbtype) != true then
 			condTermFlagA := 0;
 		else
-			if not AvailMbA and mbTab[val_CurrMbAddr][mbSliceType]  = SLICE_TYPE_I or
-			   mbTab[mbAddrA][mbTabMbtype] = 25 then
+			if not AvailMbA and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_I or
+			  IS_IPCM_Tab(mbAddrA,mbTabMbtype) then
 				condTermFlagA := 1;
 			else
 				
@@ -3257,11 +3272,11 @@ actor Algo_Synp_AVC_FREXT()
 		// condTermFlagB
 
 		if not AvailMbB and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
-		   AvailMbB and transBlockB = -1 and mbTab[mbAddrB][mbTabMbtype] != 25 then
+		   AvailMbB and transBlockB = -1 and IS_IPCM_Tab(mbAddrB,mbTabMbtype) = false then
 			condTermFlagB := 0;
 		else
 			if not AvailMbB and mbTab[val_CurrMbAddr][mbSliceType]  = SLICE_TYPE_I or
-			   mbTab[mbAddrB][mbTabMbtype] = 25 then
+			   IS_IPCM_Tab(mbAddrB,mbTabMbtype) then
 				condTermFlagB := 1;
 			else
 				
@@ -3583,6 +3598,50 @@ actor Algo_Synp_AVC_FREXT()
 		
 	end
 	
+	
+	procedure GetCtxIdxMvd()
+	var
+		int condTermFlagA,
+		int condTermFlagB,
+		int predPartWidth,
+		int x,
+		int y,
+		int xN,
+		int yN,
+		int xS,
+		int yS
+	begin
+		if mb_type = 3 then
+			println("8X8 not supportes");
+		else
+			//Inverse sub-macroclock partiontion scanning process
+			x := InverseRasterScan(subMbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
+			y := InverseRasterScan(subMbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
+			xS := 0;
+			yS := 0;
+		end
+		
+		//Only 16x16 Block Supported for the moment
+		if IS_P_Skip() or IS_B_Skip() or IS_B_Direct_16x16() then
+			predPartWidth := 16;
+		else
+			predPartWidth := P_tab[mb_type][1];
+		end
+		
+		//MB A
+		xN := x + xS - 1;
+		yN := y + yS;
+		
+		getNeighbouring(xN , yN, 16, 16);
+		
+		if not NeighMbAvail then
+			mbPartIdxN    := -1;
+			subMbPartIdxN := -1;
+		else
+			mbPartIdxN    := -1;
+		end
+	
+	end
 	
 	procedure CoeffAbsParsing()
 	begin
@@ -8577,13 +8636,13 @@ end
 	guard
 		done_reading_bits(),
 		bitand( read_result(), 255 ) = 1
-    end
+	end
 
 	test_zero_byte: action ==>
 	guard
 		done_reading_bits(),
 		bitand( read_result(), 255 ) = 0
-    end
+	end
 
 	request_byte: action ==>
 	guard
