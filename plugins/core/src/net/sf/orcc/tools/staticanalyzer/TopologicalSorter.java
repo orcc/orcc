@@ -56,13 +56,10 @@ public class TopologicalSorter {
 	public List<Vertex> topologicalSort()
 			throws OrccException {
 	
-		if (isAcyclic()) {
-			return new DFS(graph).orderedByFinishingTime();
-		} else {
-			throw new OrccException("the given graph is not acyclic!");
-		}
+		return new DFS(graph).orderedByFinishingTime();
 	}
 
+	@SuppressWarnings("unused")
 	private boolean isAcyclic() {
 		return !(new CycleDetector<Vertex, Connection>(graph).detectCycles());
 	}

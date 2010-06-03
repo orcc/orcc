@@ -40,10 +40,13 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.classes.IClass;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
+import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.StrongConnectivityInspector;
@@ -125,10 +128,22 @@ public class StaticSubsetDetector {
 			}
 		}
 
-		for (List<Vertex> list : staticRegionList) {
-			Set<Vertex> set = new HashSet<Vertex>(list);
-			staticRegionSet.add(set);
+		/*
+		 * for (List<Vertex> list : staticRegionList) { Set<Vertex> set = new
+		 * HashSet<Vertex>(list); staticRegionSet.add(set); }
+		 */
+
+		for (List<Vertex> list1 : staticRegionList) {
+			for (List<Vertex> list2 : staticRegionList) {
+				Set<Vertex> set1 = new HashSet<Vertex>(list1);
+				Set<Vertex> set2 = new HashSet<Vertex>(list2);
+				staticRegionSet.add(set1);
+				if (set1.containsAll(set2)) {
+					staticRegionSet.remove(set2);
+				}
+			}
 		}
+
 		return staticRegionSet;
 	}
 
@@ -178,6 +193,9 @@ public class StaticSubsetDetector {
 
 		boolean ret = true;
 
+		int inIndex = 0;
+		int outIndex = 0;
+
 		DirectedGraph<Vertex, Connection> clusteredGraph = new DirectedMultigraph<Vertex, Connection>(
 				Connection.class);
 
@@ -185,12 +203,12 @@ public class StaticSubsetDetector {
 			clusteredGraph.addVertex(vertex);
 		}
 		for (Connection connection : graph.edgeSet()) {
-			clusteredGraph.addEdge(graph.getEdgeSource(connection), graph
-					.getEdgeTarget(connection), connection);
+			clusteredGraph.addEdge(graph.getEdgeSource(connection),
+					graph.getEdgeTarget(connection), connection);
 		}
 
-		Actor cluster = new Actor("", "", null, null, null, null, null, null,
-				null, null, null);
+		Actor cluster = new Actor("cluster", "", null, new OrderedMap<Port>(),
+				new OrderedMap<Port>(), null, null, null, null, null, null);
 		Vertex clusterVertex = new Vertex(new Instance(cluster.getName(),
 				cluster));
 
@@ -198,19 +216,27 @@ public class StaticSubsetDetector {
 
 		for (Connection edge : graph.edgeSet()) {
 			Vertex srcVertex = graph.getEdgeSource(edge);
-			if (vertices.contains(srcVertex)) {
-				Connection incoming = new Connection(edge.getSource(), edge
-						.getTarget(), edge.getAttributes());
-				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
-				clusteredGraph.removeEdge(edge);
-			}
-
 			Vertex tgtVertex = graph.getEdgeTarget(edge);
-			if (vertices.contains(srcVertex)) {
-				Connection outgoing = new Connection(edge.getSource(), edge
-						.getTarget(), edge.getAttributes());
+
+			if (!vertices.contains(srcVertex) && vertices.contains(tgtVertex)) {
+
+				Port tgtPort = new Port(edge.getTarget());
+				tgtPort.setName("input_" + outIndex++);
+				cluster.getInputs().add("", new Location(), tgtPort.getName(),
+						tgtPort);
+				Connection incoming = new Connection(edge.getSource(), tgtPort,
+						edge.getAttributes());
+				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
+			} else if (vertices.contains(srcVertex)
+					&& !vertices.contains(tgtVertex)) {
+
+				Port srcPort = new Port(edge.getSource());
+				srcPort.setName("output_" + inIndex++);
+				cluster.getOutputs().add("", new Location(), srcPort.getName(),
+						srcPort);
+				Connection outgoing = new Connection(srcPort, edge.getTarget(),
+						edge.getAttributes());
 				clusteredGraph.addEdge(clusterVertex, tgtVertex, outgoing);
-				clusteredGraph.removeEdge(edge);
 			}
 		}
 
@@ -223,7 +249,7 @@ public class StaticSubsetDetector {
 			if (scc.remove(clusterVertex) && scc.size() > 1) {
 				for (Vertex v : scc) {
 					IClass clasz = v.getInstance().getContentClass();
-					if (clasz.isSDF()) {
+					if (!clasz.isSDF()) {
 						ret = false;
 					}
 				}
@@ -231,5 +257,4 @@ public class StaticSubsetDetector {
 		}
 		return ret;
 	}
-
 }
