@@ -31,7 +31,7 @@
       <vertex id="CoefAC_Cr" x="1026" y="206"/>
       <vertex id="IntraPredModeC" x="473" y="264"/>
       <vertex id="QP_Cb" x="513" y="758"/>
-      <vertex id="QP_Cr" x="516" y="793"/>
+      <vertex id="QP_Cr" x="578" y="803"/>
       <vertex id="slice_alpha_c0_offset" x="479" y="949"/>
       <vertex id="slice_beta_offset" x="480" y="981"/>
       <vertex id="LFDisable" x="489" y="299"/>
@@ -57,5 +57,6 @@
       <vertex id="Algo_RefList0" x="904" y="480"/>
       <vertex id="Algo_RefList1" x="906" y="292"/>
       <vertex id="Black_Hole" x="1044" y="352"/>
+      <vertex id="SizeDPBMax" x="661" y="836"/>
    </vertices>
 </layout>
