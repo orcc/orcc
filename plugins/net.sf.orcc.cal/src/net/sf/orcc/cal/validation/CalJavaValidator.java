@@ -38,6 +38,7 @@ import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstInputPattern;
+import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatementAssign;
@@ -68,15 +69,40 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	@Inject
 	private IQualifiedNameProvider nameProvider;
 
+	/**
+	 * Check action tag coherence. Tag's name must be different to port and state variable name.
+	 */
 	@Check
 	public void checkActionTag(final AstAction action) {
 		AstActor actor = EcoreUtil2.getContainerOfType(action, AstActor.class);
+		String name = nameProvider.getQualifiedName(action);
+		
+		/** Check if tag name is not already used in a state variable */
 		List<AstVariable> variables = actor.getStateVariables();
 		for (AstVariable variable : variables) {
-			String name = nameProvider.getQualifiedName(action);
 			if (name.equals(variable.getName())) {
 				error("Action " + name
 						+ " has the same name as a state variable",
+						CalPackage.AST_ACTION__TAG);
+			}
+		}
+		
+		/** Check if tag name is not already used in an input port */
+		List <AstPort> inputs = actor.getInputs();	
+		for (AstPort input : inputs) {
+			if (name.equals(input.getName())) {
+				error("Action " + name
+						+ " has the same name as an input port",
+						CalPackage.AST_ACTION__TAG);
+			}
+		}
+		
+		/** Check if tag name is not already used in an input port */
+		List <AstPort> outputs = actor.getOutputs();	
+		for (AstPort output : outputs) {
+			if (name.equals(output.getName())) {
+				error("Action " + name
+						+ " has the same name as an output port",
 						CalPackage.AST_ACTION__TAG);
 			}
 		}
