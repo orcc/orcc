@@ -558,10 +558,11 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	public void setBreakpoint(int breakpoint) {
 		Breakpoint bkpt = new Breakpoint(actor.getActions().get(0), breakpoint);
 		for (Action action : actor.getActions()) {
-			if ((action.getLocation().getStartLine() > bkpt.action
-					.getLocation().getStartLine())
-					&& (action.getLocation().getStartLine() < breakpoint)) {
-				bkpt.action = action;
+			if (action.getLocation().getStartLine() <= breakpoint) {
+				if (action.getLocation().getStartLine() > bkpt.action
+						.getLocation().getStartLine()) {
+					bkpt.action = action;
+				}
 			}
 		}
 		// Add breakpoint to the list

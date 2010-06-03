@@ -43,7 +43,7 @@ public class DebugThread {
 	public void resume() {
 		isSuspended = false;
 	}
-	
+
 	public synchronized void stepInto() {
 		interpreter.firePropertyChange("resumed step", null, instance.name);
 		interpreter.step(instance, true);
@@ -61,15 +61,15 @@ public class DebugThread {
 		interpreter.stepReturn(instance);
 		interpreter.firePropertyChange("suspended step", null, instance.name);
 	}
-	
+
 	public void suspend(int breakpoint) {
 		isSuspended = true;
 		if (breakpoint != 0) {
 			interpreter.firePropertyChange(
 					"suspended breakpoint " + breakpoint, null, instance.name);
 		} else {
-			interpreter.firePropertyChange(
-					"suspended step", null, instance.name);			
+			interpreter.firePropertyChange("suspended step", null,
+					instance.name);
 		}
 	}
 
