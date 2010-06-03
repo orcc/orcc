@@ -163,7 +163,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	bool StartNewCabacParsing := false;
 		/* List Used as a result for Binarization */
-	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 25)] : for int j in Integers( 0, 100)];
+	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 24)] : for int j in Integers( 0, 99)];
 	//List ( type: uint(size=2), size=128 ) synElVal := [ 0 : for int i in Integers( 0, 127)];
 	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 127)];
 	
@@ -270,10 +270,10 @@ actor Algo_Synp_AVC_FREXT()
 	 uint luma8x8BlkIdx;
 	
 	 
-	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH*PICHEIGHT - 1 ) transblock_cbf	:=  [ [ 0 : for int i in Integers( 0, 16) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2) ];
-	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT - 1 ) transblock_cbf_cr	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2) ];
-	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT - 1 ) transblock_cbf_cb	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2) ];
-	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH*PICHEIGHT - 1 ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2) ];
+	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH*PICHEIGHT ) transblock_cbf	:=  [ [ 0 : for int i in Integers( 0, 15) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cr	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cb	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	
 	 uint NeighMbAddr;
 	 bool NeighMbAvail;
@@ -4059,7 +4059,7 @@ actor Algo_Synp_AVC_FREXT()
 			else
 				if binVal = 1 then
 					CabacValue := 0;
-					FoundSE := 1;
+					FoundSE := true;
 				else
 					binIdxMb := binIdxMb + 1;
 				end
@@ -4076,7 +4076,7 @@ actor Algo_Synp_AVC_FREXT()
 			else
 				if binVal = 0 then
 					CabacValue := 1;
-					FoundSE := 1;
+					FoundSE := true;
 				else
 					binIdxOffset := 1;
 					binIdxMb := binIdxMb + 1;
@@ -4095,10 +4095,10 @@ actor Algo_Synp_AVC_FREXT()
 			else
 				if binVal = 1 then
 					CabacValue := 2;
-					FoundSE := 1;
+					FoundSE := true;
 				else
 					CabacValue := 3;
-					FoundSE := 1;
+					FoundSE := true;
 				end
 				binValDecoded := false;
 				
