@@ -65,13 +65,9 @@ actor Algo_Synp_MPEG_4 (
   int SAMPLE_SZ 		= 13;
   int MV_SZ				= 9;
   int SAMPLE_COUNT_SZ 	= 8;
-  int MAXW_IN_MB		= 121;
     
   // Constants for various field lengths (bits) and special values.
 
-  int VO_HEADER_LENGTH      = 27;
-  int VO_NO_SHORT_HEADER    = 8;
-  int VO_ID_LENGTH          = 5;
 
   int VOL_START_CODE                      = 32; //0x20
   int VOL_ID_LENGTH                       = 1;
@@ -125,7 +121,6 @@ actor Algo_Synp_MPEG_4 (
   int VOP_FCODE_FOR_MASK              = lshift( 1, VOP_FCODE_FOR_LENGTH ) - 1;
   int BITS_QUANT                      = 5;
   int BITS_QUANT_MASK                 = lshift( 1, BITS_QUANT           ) - 1;
-  int MCBPC_LENGTH                    = 9;
   int ESCAPE_CODE                     = 7167;
 
   function mask_bits( int v, int n ) --> int :
