@@ -99,7 +99,7 @@ public class ActorMerger implements INetworkTransformation {
 
 	private static final String SCHEDULER_NAME = "isSchedulable_" + ACTION_NAME;
 
-	private int actorIdx = 0;
+	private int clusterIdx = 0;
 
 	private DirectedGraph<Vertex, Connection> graph;
 
@@ -108,6 +108,8 @@ public class ActorMerger implements INetworkTransformation {
 	private Map<Connection, Integer> bufferCapacities;
 
 	private OrderedMap<Procedure> procs;
+
+	private OrderedMap<Variable> loopVariables = new OrderedMap<Variable>();
 
 	private OrderedMap<Variable> variables;
 
@@ -125,7 +127,7 @@ public class ActorMerger implements INetworkTransformation {
 	private Map<Connection, Port> outputsMap;
 	private Map<Connection, Port> inputsMap;
 
-	private Map<Port, Variable> stateVarsMap;
+	private Map<Port, Variable> buffersMap;
 
 	/**
 	 * Converts FIFO between static actors into buffers
@@ -140,10 +142,11 @@ public class ActorMerger implements INetworkTransformation {
 			Expression size = new IntExpr(entry.getValue());
 			String name = "buf_" + index;
 			Type type = new ListType(size, connection.getSource().getType());
-			Variable buf = new StateVariable(new Location(), type, name, false);
+			Variable buf = new LocalVariable(true, 0, new Location(), name,
+					null, null, type);
 			bufferMap.put(connection, buf);
-			stateVarsMap.put(connection.getSource(), buf);
-			stateVarsMap.put(connection.getTarget(), buf);
+			buffersMap.put(connection.getSource(), buf);
+			buffersMap.put(connection.getTarget(), buf);
 			index++;
 
 		}
@@ -227,10 +230,12 @@ public class ActorMerger implements INetworkTransformation {
 	private Procedure createBody() throws OrccException {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 		indexes = new ArrayList<LocalVariable>();
-		variables = new OrderedMap<Variable>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, new Location(),
-				new VoidType(), new OrderedMap<Variable>(), variables, nodes);
+				new VoidType(), new OrderedMap<Variable>(), loopVariables,
+				nodes);
+
+		addStateVars();
 		createReads(procedure);
 		createLoopedSchedule(procedure, schedule, nodes);
 		createWrites(procedure);
@@ -296,7 +301,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				if (indexes.size() <= index) {
 					indexes.add(loopVar);
-					variables.add("", new Location(), loopVar.getName(),
+					loopVariables.add("", new Location(), loopVar.getName(),
 							loopVar);
 				}
 
@@ -333,7 +338,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		for (Map.Entry<Port, Integer> entry : action.getInputPattern()
 				.entrySet()) {
-			Variable var = stateVarsMap.get(entry.getKey());
+			Variable var = buffersMap.get(entry.getKey());
 			int size = entry.getValue();
 
 			Expression expr = new BinaryExpr(new IntExpr(size), BinaryOp.TIMES,
@@ -347,7 +352,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		for (Map.Entry<Port, Integer> entry : action.getOutputPattern()
 				.entrySet()) {
-			Variable var = stateVarsMap.get(entry.getKey());
+			Variable var = buffersMap.get(entry.getKey());
 			int size = entry.getValue();
 
 			Expression expr = new BinaryExpr(new IntExpr(size), BinaryOp.TIMES,
@@ -429,13 +434,9 @@ public class ActorMerger implements INetworkTransformation {
 	private void createReads(Procedure procedure) {
 		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
 		for (Port port : inputsMap.values()) {
-			OrderedMap<Variable> locals = procedure.getLocals();
-			Expression size = new IntExpr(port.getNumTokensConsumed());
-			Type type = new ListType(size, port.getType());
-			LocalVariable local = new LocalVariable(true, 0, new Location(),
-					port.getName(), null, null, type);
-			locals.add("", new Location(), port.getName(), local);
-			Read read = new Read(port, port.getNumTokensConsumed(), local);
+			Variable local = loopVariables.get(port.getName());
+			int numTokens = port.getNumTokensConsumed();
+			Read read = new Read(port, numTokens, local);
 			block.add(read);
 		}
 	}
@@ -443,13 +444,9 @@ public class ActorMerger implements INetworkTransformation {
 	private void createWrites(Procedure procedure) {
 		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
 		for (Port port : outputsMap.values()) {
-			OrderedMap<Variable> locals = procedure.getLocals();
-			Expression size = new IntExpr(port.getNumTokensProduced());
-			Type type = new ListType(size, port.getType());
-			LocalVariable local = new LocalVariable(true, 0, new Location(),
-					port.getName(), null, null, type);
-			locals.add("", new Location(), port.getName(), local);
-			Write read = new Write(port, port.getNumTokensProduced(), local);
+			Variable local = buffersMap.get(port);
+			int numTokens = port.getNumTokensProduced();
+			Write read = new Write(port, numTokens, local);
 			block.add(read);
 		}
 	}
@@ -482,12 +479,11 @@ public class ActorMerger implements INetworkTransformation {
 		ActionList initializes = new ActionList();
 		ActionScheduler scheduler = new ActionScheduler(actions.getList(), null);
 
-		Actor actor = new Actor("actor_" + actorIdx++, "", parameters, inputs,
-				outputs, stateVars, procs, actions.getList(),
+		Actor actor = new Actor("cluster_" + clusterIdx++, "", parameters,
+				inputs, outputs, stateVars, procs, actions.getList(),
 				initializes.getList(), scheduler, null);
 
 		createInternalBuffers();
-		addStateVars();
 		Action action = createAction();
 		actor.getActions().add(action);
 
@@ -495,8 +491,10 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	private void addStateVars() {
-		for (Variable var : bufferMap.values()) {
-			stateVars.add("", new Location(), var.getName(), var);
+		for (Variable var : buffersMap.values()) {
+			if (loopVariables.get(var.getName()) == null) {
+				loopVariables.add("", new Location(), var.getName(), var);
+			}
 		}
 	}
 
@@ -517,7 +515,13 @@ public class ActorMerger implements INetworkTransformation {
 				port.increaseTokenProduction(srcPort.getNumTokensProduced());
 				outputsMap.put(connection, port);
 				outputs.add("", new Location(), port.getName(), port);
-				stateVarsMap.put(connection.getSource(), port);
+
+				
+				Expression size = new IntExpr(port.getNumTokensProduced());
+				Type type = new ListType(size, port.getType());
+				Variable var = new LocalVariable(true, 0, new Location(),
+						port.getName(), null, null, type);
+				buffersMap.put(connection.getSource(), var);
 				index++;
 			}
 		}
@@ -528,7 +532,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		inputsMap = new HashMap<Connection, Port>();
 		inputs = new OrderedMap<Port>();
-		stateVarsMap = new HashMap<Port, Variable>();
+		buffersMap = new HashMap<Port, Variable>();
 		for (Connection connection : graph.edgeSet()) {
 			Vertex src = graph.getEdgeSource(connection);
 			Vertex tgt = graph.getEdgeTarget(connection);
@@ -540,7 +544,13 @@ public class ActorMerger implements INetworkTransformation {
 				port.increaseTokenConsumption(tgtPort.getNumTokensConsumed());
 				inputsMap.put(connection, port);
 				inputs.add("", new Location(), port.getName(), port);
-				stateVarsMap.put(connection.getTarget(), port);
+
+				Expression size = new IntExpr(port.getNumTokensConsumed());
+				Type type = new ListType(size, port.getType());
+				Variable var = new LocalVariable(true, 0, new Location(),
+						port.getName(), null, null, type);
+
+				buffersMap.put(connection.getTarget(), var);
 				index++;
 			}
 		}

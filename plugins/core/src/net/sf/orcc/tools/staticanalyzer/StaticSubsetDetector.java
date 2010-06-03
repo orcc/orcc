@@ -134,12 +134,14 @@ public class StaticSubsetDetector {
 		 */
 
 		for (List<Vertex> list1 : staticRegionList) {
-			for (List<Vertex> list2 : staticRegionList) {
-				Set<Vertex> set1 = new HashSet<Vertex>(list1);
-				Set<Vertex> set2 = new HashSet<Vertex>(list2);
-				staticRegionSet.add(set1);
-				if (set1.containsAll(set2)) {
-					staticRegionSet.remove(set2);
+			if (list1.size() > 1) {
+				for (List<Vertex> list2 : staticRegionList) {
+					Set<Vertex> set1 = new HashSet<Vertex>(list1);
+					Set<Vertex> set2 = new HashSet<Vertex>(list2);
+					staticRegionSet.add(set1);
+					if (set1.containsAll(set2)) {
+						staticRegionSet.remove(set2);
+					}
 				}
 			}
 		}
@@ -246,11 +248,13 @@ public class StaticSubsetDetector {
 				clusteredGraph).stronglyConnectedSets();
 
 		for (Set<Vertex> scc : sccs) {
-			if (scc.remove(clusterVertex) && scc.size() > 1) {
-				for (Vertex v : scc) {
-					IClass clasz = v.getInstance().getContentClass();
-					if (!clasz.isSDF()) {
-						ret = false;
+			if (scc.size() > 1) {
+				if (scc.remove(clusterVertex)) {
+					for (Vertex v : scc) {
+						IClass clasz = v.getInstance().getContentClass();
+						if (!clasz.isSDF()) {
+							ret = false;
+						}
 					}
 				}
 			}
