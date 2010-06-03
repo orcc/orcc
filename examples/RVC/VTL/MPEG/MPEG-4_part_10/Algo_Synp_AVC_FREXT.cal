@@ -3599,6 +3599,10 @@ actor Algo_Synp_AVC_FREXT()
 		int condTermFlagA,
 		int condTermFlagB,
 		int predPartWidth,
+		int predModeEqualFlagA,
+		int predModeEqualFlagB,
+		int absMvdCompA,
+		int absMvdCompB,
 		int x,
 		int y,
 		int xN,
@@ -3633,7 +3637,14 @@ actor Algo_Synp_AVC_FREXT()
 			mbPartIdxN    := -1;
 			subMbPartIdxN := -1;
 		else
-			mbPartIdxN    := -1;
+			mbPartIdxN    := ( (NeighMb_yW >> 2) * 4 ) + (NeighMb_xW >> 2);
+			subMbPartIdxN := ( (NeighMb_yW >> 2) * 2 ) + (NeighMb_xW >> 2);
+			//FIXME: whet partition is not yet decoded
+			if IS_SubMBPred_L0_CABAC(subMbPartIdxN) and  IS_SubMBBiPred_CABAC(subMbPartIdxN) then
+				predModeEqualFlagA := 1;
+			else
+				predModeEqualFlagA := 0;
+			end
 		end
 	
 	end
@@ -6998,6 +7009,11 @@ end
 	function IS_SubMBNA() --> bool : SubMbPredMode() = 7 end
 	function SubMbPartWidthHeigth(uint(size=1) x) --> uint(size=5) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[sub_mb_type[mbPartIdx]][1+x] else if slice_type = SLICE_TYPE_B then B_tab_sub[sub_mb_type[mbPartIdx]][1+x] else 1 end end end
 
+	function SubMbPredMode_CABAC(int x) --> uint(size=3) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[sub_mb_type[x]][3] else if slice_type = SLICE_TYPE_B then B_tab_sub[sub_mb_type[x]][3] else 7 end end end
+	function IS_SubMBPred_L0_CABAC(int x) --> bool : SubMbPredMode_CABAC(x) = 0 end
+	function IS_SubMBPred_L1_CABAC(int x) --> bool : SubMbPredMode_CABAC(x) = 1 end
+	function IS_SubMBBiPred_CABAC(int x) --> bool : SubMbPredMode_CABAC(x) = 2 end
+	function IS_SubMBDirect_CABAC(int x) --> bool : SubMbPredMode_CABAC(x) = 3 end
 
 
 	sub_MB_pred_init_sub_mb_type: action ==> 
@@ -7115,7 +7131,7 @@ end
 
 	read_sub_MB_pred_ref_idx_l1_done: action ==> 
 	guard
-		( (slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits() ) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CAVLC() ) or
+		( ((slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits() ) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())) and IS_CAVLC() ) or
 		( (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CABAC() ) 
 	do
 		if IS_CAVLC() then
