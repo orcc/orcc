@@ -28,6 +28,10 @@
  */
 package net.sf.orcc.cal.validation;
 
+import java.util.List;
+
+import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpressionCall;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
@@ -45,7 +49,11 @@ import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.validation.Check;
+
+import com.google.inject.Inject;
 
 /**
  * This class describes the validation of an RVC-CAL actor. The checks tagged as
@@ -56,6 +64,23 @@ import org.eclipse.xtext.validation.Check;
  * 
  */
 public class CalJavaValidator extends AbstractCalJavaValidator {
+
+	@Inject
+	private IQualifiedNameProvider nameProvider;
+
+	@Check
+	public void checkActionTag(final AstAction action) {
+		AstActor actor = EcoreUtil2.getContainerOfType(action, AstActor.class);
+		List<AstVariable> variables = actor.getStateVariables();
+		for (AstVariable variable : variables) {
+			String name = nameProvider.getQualifiedName(action);
+			if (name.equals(variable.getName())) {
+				error("Action " + name
+						+ " has the same name as a state variable",
+						CalPackage.AST_ACTION__TAG);
+			}
+		}
+	}
 
 	@Check
 	public void checkPriorities(AstPriority priority) {
