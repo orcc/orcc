@@ -60,7 +60,7 @@ actor Mgnt_Display ()
 			NbPic           := NbPic + 1;
 		end
 
-	SearchForNextPOC.launch: action ==>
+	SearchForNextPOC.buffer_full: action ==>
 		guard
 			NbPic = SizeDPBMax
 		do
@@ -99,11 +99,20 @@ actor Mgnt_Display ()
 			NextPOC := NextPOC + 1;
 		end
 
-	SearchForNextPOC.skip: action ==>
+	SearchForNextPOC.buffer_not_full: action ==>
 		guard
 			NbPic < SizeDPBMax
 		do
 			IdxNextPOC := -1;	
+			foreach int i in Integers (0,15)
+			do
+				if((ListPOC[i] = NextPOC) and (IsUsed[i] = true)) then
+					if(IdxNextPOC = -1) then
+						IdxNextPOC := i;
+						NextPOC := NextPOC + 1;
+					end
+				end
+			end
 		end
 
 	SendNextPOC: action
@@ -117,7 +126,9 @@ actor Mgnt_Display ()
 		end
 
 
-	skipSendNextPOC: action ==>
+	skipSendNextPOC: action
+				==>
+			//POCtoDisplay :[ -1 ]
 		end
 
 
