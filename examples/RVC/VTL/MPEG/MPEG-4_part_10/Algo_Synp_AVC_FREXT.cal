@@ -307,7 +307,8 @@ actor Algo_Synp_AVC_FREXT()
 	List ( type: List ( type: int, size = 4) , size = PICWIDTH*PICHEIGHT ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	
 	bool IS_L0 := false;
-	
+	int mvd_temp :=0;
+	int ctx_temp :=0;
 	uint NeighMbAddr;
 	bool NeighMbAvail;
 	uint NeighMb_xW;
@@ -3623,15 +3624,11 @@ actor Algo_Synp_AVC_FREXT()
 		int xS,
 		int yS
 	begin
-		if mb_type = 3 then
-			println("8X8 not supportes");
-		else
-			//Inverse sub-macroclock partiontion scanning process
-			x := InverseRasterScan(subMbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
-			y := InverseRasterScan(subMbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
-			xS := 0;
-			yS := 0;
-		end
+		//Inverse sub-macroclock partiontion scanning process
+		x := InverseRasterScan(subMbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
+		y := InverseRasterScan(subMbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
+		xS := 0;
+		yS := 0;
 		
 		//Only 16x16 Block Supported for the moment
 		if IS_P_Skip() or IS_B_Skip() or IS_B_Direct_16x16() then
@@ -3640,7 +3637,7 @@ actor Algo_Synp_AVC_FREXT()
 			predPartWidth := P_tab[mb_type][1];
 		end
 		
-		//MB A
+		//N = A
 		xN := x + xS - 1;
 		yN := y + yS;
 		
@@ -3678,6 +3675,48 @@ actor Algo_Synp_AVC_FREXT()
 					absMvdCompA := ABS(Mvd_L0[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
 				else
 					absMvdCompA := ABS(Mvd_L1[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
+				end
+			end
+		end
+		
+		//N = B
+		xN := x + xS;
+		yN := y + yS - 1;
+		
+		getNeighbouring(xN , yN, 16, 16);
+		
+		if not NeighMbAvail then
+			mbPartIdxN    := -1;
+			subMbPartIdxN := -1;
+		else
+			mbPartIdxN    := ( (NeighMb_yW >> 2) * 4 ) + (NeighMb_xW >> 2);
+			subMbPartIdxN := ( (NeighMb_yW >> 2) * 2 ) + (NeighMb_xW >> 2);
+			//FIXME: whet partition is not yet decoded
+			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
+				if IS_SubMBPred_L0_CABAC(subMbPartIdxN, NeighMbAddr) and  IS_SubMBBiPred_CABAC(subMbPartIdxN, NeighMbAddr) then
+					predModeEqualFlagB := 1;
+				else
+					predModeEqualFlagB := 0;
+				end
+			else
+				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) and  IS_MBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) then
+					predModeEqualFlagB := 1;
+				else
+					predModeEqualFlagB := 0;
+				end
+			end
+		end
+		
+		if NeighMbAddr < -1 then
+			absMvdCompB := 0;
+		else
+			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagB = 0 then
+				absMvdCompB := 0;
+			else
+				if IS_L0 then
+					absMvdCompB := ABS(Mvd_L0[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
+				else
+					absMvdCompB := ABS(Mvd_L1[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
 				end
 			end
 		end
@@ -4237,7 +4276,140 @@ actor Algo_Synp_AVC_FREXT()
 	
 	procedure GetMvD_Lx()
 	begin
-		println("Not yet implemented");
+		if StartPrefix then
+			if binValDecoded = false then
+				if compIdx = 0 then
+					ctxIdxOffset := 40;
+				else
+					ctxIdxOffset := 47;
+				end
+				//give the ctxIdx
+				GetCtxIdxMvd();
+				ctxIdx := ctxIdxInc + ctxIdxOffset;
+				//Get the bin Value
+				StartDecodeDecision := true;
+				//Do not give the hand to Coeff_Abs_Parsing
+				StopCabacProcess();
+				NextBitToDecode := false;
+			else
+				// Increment binIdx
+				binIdx := binIdx + 1;
+				if binVal = 1 then
+					StartSuffix := true;
+					mvd_temp := 1;
+					ctx_temp := 3;
+				else
+					CabacValue := 0;
+					FoundSE := 1;
+				end
+				StartPrefix := false;
+			end
+			
+		end
+		
+		if StartSuffix then
+			
+			if mvd_temp < 9 then
+				if binValDecoded = false and StopCoeff then
+					//Give the ctxIdx
+					ctxIdx := ctxIdxOffset + ctx_temp;
+					StartDecodeDecision := true;	
+					//Do not give the hand to Coeff_Abs_Parsing
+					StopCabacProcess();
+				else
+					// Increment binIdx
+					if binVal = 1 then
+						mvd_temp := mvd_temp + 1;
+						if ctx_temp < 6 then
+							ctx_temp := ctx_temp + 1;
+						end
+						if mvd_temp >= 9  then
+							StopCoeff := false;
+							Coeff_J := 3;
+						end
+					else
+						StopCoeff := false;
+						StartCoeffSignAbs := true;
+						StartSuffix := false;
+					end
+					binValDecoded := false;
+				end
+			end
+			
+			if mvd_temp >= 9  then
+				if StartCoeff_J_Dec = false then
+						if binValDecoded = false and StopCoeff = false then
+							StartDecodeBypass := true;
+							bypassFlag := true;
+							StopCabacProcess();
+						else
+							// Increment binIdx
+							if binVal = 1 then
+								mvd_temp := mvd_temp + (1 << Coeff_J);
+								Coeff_J := Coeff_J + 1;
+							else
+								StopCoeff := true;
+								StartCoeff_J_Dec := true;
+							end
+							binValDecoded := false;
+						end
+				else
+					if Coeff_J != 0  then
+						if binValDecoded = false then
+							StartDecodeBypass := true;
+							bypassFlag := true;
+							StopCabacProcess();
+						else
+							// Increment binIdx
+							if binVal = 1 then
+								mvd_temp := mvd_temp + (1 << Coeff_J - 1);
+								Coeff_J := Coeff_J - 1;
+							else
+								Coeff_J := Coeff_J - 1;
+							end
+							binValDecoded := false;
+						end
+					else
+						StartCoeffSignAbs := true;
+						StartSuffix := false;
+						StartCoeff_J_Dec := false;
+					end
+				end
+				
+			end	
+		end
+		
+		if StartCoeffSignAbs then
+			if binValDecoded = false then
+				StartDecodeBypass := true;
+				bypassFlag := true;
+				StopCabacProcess();
+			else
+				if binVal = 1 then
+					CabacValue := mvd_temp * (-1);
+				else
+					CabacValue := mvd_temp;
+				end
+				numDecodAbsLevelGt1 := numDecodAbsLevelGt1 + 1;
+				
+			
+				//Stop cabac process and give the value
+				
+				FoundSE := true;
+			end
+		end
+		
+		if FoundSE then
+			// Init Coeff_Abs_Parsing
+			StartPrefix := true;
+			StartSuffix := false;
+			StartCoeffSignAbs := false;
+			binValDecoded := false;
+			binIdx := -1;
+			GetSign := false;
+			NextBitToDecode := true;
+			StopCabacProcess();
+		end
 	end
 	
 	procedure GetRefIdx_Lx()
@@ -4251,8 +4423,6 @@ actor Algo_Synp_AVC_FREXT()
 	*************************************************************
 	*************************************************************/
 
-	
-	
 	CabacParsing: action ==>
 	guard
 		CabacStartProcess
@@ -4278,7 +4448,6 @@ actor Algo_Synp_AVC_FREXT()
 				GetBinarizationFlag := true;
 			end
 			
-			
 			if FoundSE = false and NextBitToDecode then
 				
 				// Update the binIdx
@@ -4299,7 +4468,7 @@ actor Algo_Synp_AVC_FREXT()
 				// Do not give the hand to Cabac Parsing Process if the initialization has not finished
 				StopCabacProcess();
 			end
-			
+
 			if binValDecoded then
 				loop := 0;
 				while loop < MaxEleCompTab  do
@@ -4330,7 +4499,7 @@ actor Algo_Synp_AVC_FREXT()
 				end
 				
 			end
-					
+
 			if FoundSE then
 				binIdx := -1;
 				//Save cabac value
@@ -4349,7 +4518,6 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 	end
-	
 	
 	//*************************************************************/
 	/*************************************************************
@@ -4382,7 +4550,6 @@ actor Algo_Synp_AVC_FREXT()
 				GetMbTypeParsing();
 			end
 			
-			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
 			      CoeffAbsParsing();
 			end
@@ -4399,10 +4566,9 @@ actor Algo_Synp_AVC_FREXT()
 				GetMvD_Lx();
 			end
 			
-		   	if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
-		   		GetRefIdx_Lx();
-		   	end
-			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
+				GetRefIdx_Lx();
+			end
 		end
 	end
 
@@ -4430,7 +4596,6 @@ actor Algo_Synp_AVC_FREXT()
 		if ( codIRange < 0x0100 ) then
 			set_bits_to_read(1);
 		end
-
 	end
 	
 	RenormD_Done: action ==>
@@ -4596,11 +4761,9 @@ actor Algo_Synp_AVC_FREXT()
 					end
 									
 					if ( preCtxState  <=  63 )  then
-						//FIX ME: (( 63 - pre ) << 1) + 0;
 						pStateIdx[i]	:= 63 - preCtxState;
 						valMPS[i]		:= 0 ;
 					else 
-						//FIX ME: (( pre - 64 ) << 1) + 1;
 						pStateIdx[i]	:= preCtxState - 64;
 						valMPS[i]		:= 1;
 					end
