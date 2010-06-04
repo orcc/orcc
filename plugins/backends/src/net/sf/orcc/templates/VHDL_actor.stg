@@ -252,6 +252,37 @@ String(constant) ::= <<
 "$constant$"
 >>
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Cast
+///////////////////////////////////////////////////////////////////////////////
+
+CastStore(value, target, cast)::= <<
+$
+if(cast.extended)
+  $$store.target$ := $store.value$$
+else
+$
+$target$ := cast($value$, $value.type.size$, $target.variable.type.size$)$
+endif
+$
+
+>>
+
+CastLoad(target, source, cast)::= <<
+$
+if(cast.extended)
+  $$load.target$ := $load.source$$
+else
+$
+-- cast not extended
+$target$ := cast($source$, $source.type.size$, $target.variable.type.size$)$
+endif
+$
+
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
@@ -289,11 +320,19 @@ $hasTokens.target$ := $actor.name$_$hasTokens.port$_send;
 Load(load) ::= <<
 
 $if(load.indexes)
-$$if(load.source.variable.port)
+$$
+  if(load.source.variable.port)
+  $$
+    if(load.cast)
+$$CastLoad(target=load.target, source=load.source, cast=load.cast)$;
+-- $load.target$ := $load.source$;$
+    else
 $$load.target$ := $load.source$;$
-else
+    endif
+  $$
+  else
 $$load.target$ := $load.source$($load.indexes : {$it$}; separator=", "$);$
-endif
+  endif
 $$
 else
 $$load.target$ := $load.source$;$
@@ -373,14 +412,21 @@ $
 
 Store(store) ::= <<
 
-$if(store.indexes)$$
-if(store.target.variable.port)
-$
-$store.target$ := $store.value$;$
-else
+$if(store.indexes)
+$$
+  if(store.target.variable.port)
+  $$
+    if(store.cast)
+$$CastStore(value=store.value, target=store.target, cast=store.cast)$;
+-- $store.target$ := $store.value$;$
+    else
+$$store.target$ := $store.value$;$
+    endif
+  $$
+  else
 $
 $store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
-endif
+  endif
 $$
 else
 $
