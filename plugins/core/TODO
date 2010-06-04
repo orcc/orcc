@@ -1,3 +1,0 @@
-implement this variable register allocator for similarly named variables (so that as many temporaries can be put together).
-
-check that an action does not have the same name as a function/procedure/variable (because in C all these become declarations within the same namespace).

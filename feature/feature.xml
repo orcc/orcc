@@ -2,7 +2,7 @@
 <feature
       id="net.sf.orcc"
       label="Orcc"
-      version="0.8.0.rc2"
+      version="0.8.1.rc1"
       provider-name="IETR/INSA Rennes">
 
    <description url="http://orcc.sf.net">
