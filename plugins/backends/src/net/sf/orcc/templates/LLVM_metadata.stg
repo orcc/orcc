@@ -1,6 +1,7 @@
 decl_MD(actor) ::= <<
-!source = !{!0}
-!name = !{!1}
+!source = !{$source_decl_MD()$}
+!name = !{$name_decl_MD()$}
+!action_scheduler = !{$actionScheduler_decl_MD()$}
 $if(actor.inputs.list)$
 !inputs = !{$actor.inputs.list: fifo_decl_MD(); separator=", "$}
 $endif$
@@ -17,8 +18,9 @@ $if(actor.actions)$
 !actions = !{$actor.actions: action_decl_MD(); separator=", "$}
 $endif$
 
-!0 = metadata !{$file_MD(actor)$}
-!1 = metadata !{$varName_MD(actor)$}
+$source_MD(actor)$
+$name_MD(actor)$
+$actionScheduler_MD(actor.actionScheduler)$
 $actor.inputs.list: fifo_MD()$
 $actor.outputs.list: fifo_MD()$
 $actor.parameters.list: parameter_MD()$
@@ -31,6 +33,20 @@ $actor.actions: action_MD()$
 ///////////////////////////////////////////////////////////////////////////////
 // Actor MD declaration
 ///////////////////////////////////////////////////////////////////////////////
+
+source_decl_MD() ::= <<
+!0
+>>
+
+
+name_decl_MD() ::= <<
+!1
+>>
+
+
+actionScheduler_decl_MD() ::= <<
+!3
+>>
 
 stateVar_decl_MD(var) ::= <<
 !$Location(var.location)$
@@ -55,6 +71,24 @@ Proc_decl_MD(proc) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Actor MD body
 ///////////////////////////////////////////////////////////////////////////////
+
+source_MD(actor) ::= <<
+$source_decl_MD()$ = metadata !{$file_MD(actor)$}
+>>
+
+
+name_MD(actor) ::= <<
+$name_decl_MD()$ = metadata !{$varName_MD(actor)$}
+>>
+
+
+actionScheduler_MD(actionScheduler) ::= <<
+$if(actor.actionScheduler.fsm)$
+!not implemented
+$else$
+$actionScheduler_decl_MD()$ = metadata !{i32()* @scheduler}
+$endif$
+>>
 
 action_MD(action) ::= <<
 $action_decl_MD(action)$ = metadata !{metadata $Sched_decl_MD(action)$, metadata $Body_decl_MD(action)$}
