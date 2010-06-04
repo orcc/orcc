@@ -25,14 +25,14 @@ actor Predictor () int In, int MBType ==> int Out0, int Out1, int Out2, int Out3
 		end
 	end
 
-	MBType: action MBType:[ m ] ==>
+	Read_MBType: action MBType:[ m ] ==>
 	guard
 		mode = 4
 	do
 		mbType := m;
 	end
 
-	In: action In:[ in0 ] ==>
+	Read_In: action In:[ in0 ] ==>
 	guard
 		(count < 32 and mbType = 0) or (count < 16 and mbType != 0)
 	do
@@ -223,14 +223,14 @@ actor Predictor () int In, int MBType ==> int Out0, int Out1, int Out2, int Out3
 	end
 
 	schedule fsm init :
-		init ( MBType ) --> s0;
-		s0 ( In ) --> s0;
+		init ( Read_MBType ) --> s0;
+		s0 ( Read_In ) --> s0;
 		s0 ( FinishIn ) --> s1;
 		s1 ( Mode0 ) --> s2;
 		s1 ( Mode1 ) --> s3;
 		s1 ( Mode2 ) --> s4;
 		s1 ( CalculateHV ) --> s5;
-		s1 ( MBType ) --> s0;
+		s1 ( Read_MBType ) --> s0;
 		s2 ( Mode0 ) --> s2;
 		s2 ( FinishBlockMode0 ) --> s2;
 		s2 ( FinishMode ) --> s1;

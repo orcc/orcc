@@ -7,7 +7,7 @@ actor ModeSelector () int MBType, int SATD ==> int Mode, int Score:
 	int mbType:=0;
 	 
 	
-	MBType: action MBType:[m] ==> 
+	Read_MBType: action MBType:[m] ==> 
 	do
 		mbType:=m;
 	end	
@@ -87,7 +87,7 @@ actor ModeSelector () int MBType, int SATD ==> int Mode, int Score:
 	
 	
 	schedule fsm s0:
-		s0(MBType) --> s1;
+		s0(Read_MBType) --> s1;
 		s1(InBlock) --> s1;
 		s1(FinishInBlock) --> s1;
 		s1(C) --> s0;

@@ -14,7 +14,7 @@ actor ReconstructedMB () int In0, int In1, int In2, int In3, int BestMode, int M
 	int bm:=0;
 	int mbType:=0;
 	
-	MBType: action MBType:[m] ==> 
+	Read_MBType: action MBType:[m] ==> 
 	do
 		mbType:=m;
 	end	
@@ -147,7 +147,7 @@ actor ReconstructedMB () int In0, int In1, int In2, int In3, int BestMode, int M
 	
 	schedule fsm init :
 		
-		init(MBType) --> s0;
+		init(Read_MBType) --> s0;
 		s0(A) --> s0;
 		s0(A1) --> s0;
 		s0(A2) --> s0;

@@ -41,7 +41,7 @@ MBType_16, int BlockType_4, int OutBlock_4, int OutPredictor_4, int MBType_4 :
 	int offset := 0;
 
 	//Read one row of MBs  
-	In: action In:[ inValue ] ==>
+	Read_In: action In:[ inValue ] ==>
 	guard
 		i < rowSize
 	do
@@ -532,7 +532,7 @@ MBType_16, int BlockType_4, int OutBlock_4, int OutPredictor_4, int MBType_4 :
 	end
 
 	schedule fsm ReadMBRow :
-		ReadMBRow ( In ) --> ReadMBRow;
+		ReadMBRow ( Read_In ) --> ReadMBRow;
 		ReadMBRow ( FinishIn ) --> ReadMBType_16x16;
 		ReadMBType_16x16 ( MBType ) --> PassMB_16x16;
 		PassMB_16x16 ( OutMB ) --> PassMB_16x16;

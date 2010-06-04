@@ -79,7 +79,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 	/*Delete information*/
 	int(size=32)  nb_del := 0;
-	int countRead := 0;
 
 
 	initialize ==>

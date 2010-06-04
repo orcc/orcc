@@ -10,12 +10,12 @@ actor MB () int In, int MBType ==> int Out0, int Out1, int Out2, int Out3:
 	int mbType:=0;
 	 
 	 
-	MBType: action MBType:[m] ==> 
+	Read_MBType: action MBType:[m] ==> 
 	do
 		mbType:=m;
 	end	
 	
-	In: action In:[in0] ==> 
+	Read_In: action In:[in0] ==> 
 	guard inCount<16*16
 	do
 		mb[inCount] := in0;
@@ -69,8 +69,8 @@ actor MB () int In, int MBType ==> int Out0, int Out1, int Out2, int Out3:
 		
 	
 	schedule fsm init :
-		init(MBType) --> s0;
-		s0(In) --> s0;
+		init(Read_MBType) --> s0;
+		s0(Read_In) --> s0;
 		s0(FinishIn) --> s1;
 		s1(A) --> s1;
 		s1(B) --> s1;

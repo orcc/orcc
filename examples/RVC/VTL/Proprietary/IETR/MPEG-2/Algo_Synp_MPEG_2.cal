@@ -42,7 +42,7 @@ uint(size=1) HasNonIntraQuant , uint(size=8) NonIntraQuantCoeff :
 
 	uint(size=8) CTRL_FLUSH = 0x40;
 
-	uint(size=8) CTRL_NB_BITS = 0x3F;
+	// uint(size=8) CTRL_NB_BITS = 0x3F;
 
 	// Bitstream control value
 	uint(size=8) control := 0x00;
@@ -56,7 +56,7 @@ uint(size=1) HasNonIntraQuant , uint(size=8) NonIntraQuantCoeff :
 
 	uint(size=32) SEQUENCE_HEADER_CODE = 0x000001B3;
 
-	uint(size=32) SEQUENCE_END_CODE = 0x000001B7;
+	// uint(size=32) SEQUENCE_END_CODE = 0x000001B7;
 
 	uint(size=32) EXTENSION_START_CODE = 0x000001B5;
 
@@ -67,7 +67,7 @@ uint(size=1) HasNonIntraQuant , uint(size=8) NonIntraQuantCoeff :
 
 	uint(size=4) SEQUENCE_DISPLAY_EXTENSION_ID = 2;
 
-	uint(size=4) SEQUENCE_SCALABLE_EXTENSION_ID = 5;
+	// uint(size=4) SEQUENCE_SCALABLE_EXTENSION_ID = 5;
 
 	//
 	// MPEG2 syntax descriptors
@@ -97,11 +97,11 @@ uint(size=1) HasNonIntraQuant , uint(size=8) NonIntraQuantCoeff :
 
 	uint(size=8) LOAD_INTRA_QUANT = 9;
 
-	List(type: uint(size=8), size=64) intra_quantiser_matrix;
+	// List(type: uint(size=8), size=64) intra_quantiser_matrix;
 
 	uint(size=1) flag_load_non_intra_quantiser_matrix;
 
-	List(type: uint(size=8), size=64) non_intra_quantiser_matrix;
+	// List(type: uint(size=8), size=64) non_intra_quantiser_matrix;
 
 	List(type: uint(size=8), size=64) quant_matrix_ctrl := [ CTRL_FLUSH + 8, CTRL_FLUSH + 8,
 	CTRL_FLUSH + 8, CTRL_FLUSH + 8, CTRL_FLUSH + 8, CTRL_FLUSH + 8, CTRL_FLUSH + 8, CTRL_FLUSH + 8,

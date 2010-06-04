@@ -51,7 +51,7 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
 	
   
   	//Mb_Type_OK : Send value of edge needed and store the edge of macroblock decoded
-  	Mb_Type: action Mb_Type:[a], PicWidthInMb:[b], CurrMbAddr:[c] ==>
+  	Read_Mb_Type: action Mb_Type:[a], PicWidthInMb:[b], CurrMbAddr:[c] ==>
    	do 
   		// position of the current macroblock in the line
   		mb_Index := c mod b; 
@@ -130,7 +130,7 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
    	end
 
 	schedule fsm Mb_Type:
-		Mb_Type     (Mb_Type             )--> EDGE_CALC;
+		Mb_Type     (Read_Mb_Type             )--> EDGE_CALC;
 		EDGE_CALC   (EDGE_CALC_LUMA      )--> Mb_Neighbour;
 		EDGE_CALC   (EDGE_CALC_CHROMA    )--> Mb_Neighbour;
 		EDGE_CALC   (NOT_EDGE_CALC       )--> Mb_Neighbour;

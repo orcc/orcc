@@ -1,21 +1,21 @@
 actor Mgnt_Merger420_AVC () int(size=9) Y, int(size=9) U, int(size=9) V ==> uint(size=8) YUV :
 
 	// Select the Y blocks 
-	Y: action Y:[ y ] repeat 4 * 64 ==> YUV:[ y ] repeat 256
+	Read_Y: action Y:[ y ] repeat 4 * 64 ==> YUV:[ y ] repeat 256
 	end
 
 	// Select the U blocks 
-	U: action U:[ u ] repeat 64 ==> YUV:[ u ] repeat 64
+	Read_U: action U:[ u ] repeat 64 ==> YUV:[ u ] repeat 64
 	end
 
 	// Select the V blocks 
-	V: action V:[ v ] repeat 64 ==> YUV:[ v ] repeat 64
+	Read_V: action V:[ v ] repeat 64 ==> YUV:[ v ] repeat 64
 	end
 
 	schedule fsm Y :
-		Y ( Y ) --> U;
-		U ( U ) --> V;
-		V ( V ) --> Y;
+		Y ( Read_Y ) --> U;
+		U ( Read_U ) --> V;
+		V ( Read_V ) --> Y;
 	end
 
 end

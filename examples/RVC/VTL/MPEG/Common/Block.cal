@@ -17,7 +17,7 @@ actor Block () int In, int BlockType ==> int Out0, int Out1, int Out2, int Out3
 
 	end
 
-	In: action In:[ in0 ] ==>
+	Read_In: action In:[ in0 ] ==>
 	guard
 		i < 4 * 4
 	do
@@ -64,7 +64,7 @@ actor Block () int In, int BlockType ==> int Out0, int Out1, int Out2, int Out3
 
 	schedule fsm ReadBlockType :
 		ReadBlockType ( BType ) --> ReadBlock;
-		ReadBlock ( In ) --> ReadBlock;
+		ReadBlock ( Read_In ) --> ReadBlock;
 		ReadBlock ( FinishIn ) --> FireBlock;
 		FireBlock ( FireRow ) --> FireBlock;
 		FireBlock ( FinishFireRow ) --> FireBlock;
