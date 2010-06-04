@@ -38,8 +38,8 @@ actor Mgnt_Display ()
 
 	GetPOC: action
 			POC        :[ValPOC],
-			FrameNum   :[FrNu]
-		//	MaxDPBSize :[ValMaxDPBSize]
+			FrameNum   :[FrNu],
+			MaxDPBSize :[ValMaxDPBSize]
 				==>
 		var
 			bool         idx_selected := false
@@ -55,36 +55,10 @@ actor Mgnt_Display ()
 				end
 				CurrentIdx := CurrentIdx + 1;
 			end
-		//	SizeDPBMax      := ValMaxDPBSize;
+			SizeDPBMax      := ValMaxDPBSize;
 			CurrentIdx      := CurrentIdx - 1;
 			NbPic           := NbPic + 1;
 		end
-action MaxDPBSize:[a] ==>
-end
-
-/*	SearchForNextPOC.POCType0: action
-				==>
-		guard
-			PicOrderCntType = 0
-		do
-			IdxNextPOC := -1;
-			foreach int i in Integers(0,15)
-			do
-				if( (ListPOC[i] = NextPOC) and (IsUsed[i] = true)) then
-					IdxNextPOC := i;
-				end
-			end
-			if(IdxNextPOC = -1) then
-				if( (ListPOC[CurrentIdx] < NextPOC) and (IsUsed[CurrentIdx] = true) ) then
-					if( (ListPOC[CurrentIdx] = 0) or (ListPOC[CurrentIdx] = 1) ) then
-						IdxNextPOC := CurrentIdx;
-						NextPOC    := ListPOC[CurrentIdx];
-					else
-						NextPOC := 1;
-					end
-				end
-			end
-		end*/
 
 	SearchForNextPOC.launch: action ==>
 		guard
