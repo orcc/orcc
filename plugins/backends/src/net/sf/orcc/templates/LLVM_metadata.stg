@@ -11,7 +11,7 @@ $if(actor.parameters.list)$
 !parameters = !{$actor.parameters.list: parameter_decl_MD(); separator=", "$}
 $endif$
 $if(actor.stateVars.list)$
-!stateVars = !{$actor.stateVars.list: stateVar_decl_MD(); separator=", "$}
+!state_variables = !{$actor.stateVars.list: stateVar_decl_MD(); separator=", "$}
 $endif$
 $if(actor.actions)$
 !actions = !{$actor.actions: action_decl_MD(); separator=", "$}
@@ -80,7 +80,7 @@ $Type_MD(parameter)$
 >>
 
 stateVar_MD(var) ::= <<
-$stateVar_decl_MD(var)$ = metadata !{metadata $VarDef_decl_MD(var)$, metadata $Location_decl_MD(var)$, metadata $Type_decl_MD(var)$}
+$stateVar_decl_MD(var)$ = metadata !{metadata $VarDef_decl_MD(var)$, metadata $Location_decl_MD(var)$, metadata $Type_decl_MD(var)$, $var.type$* @$var$}
 $VarDef_MD(var)$
 $Location_MD(var)$
 $Type_MD(var)$
