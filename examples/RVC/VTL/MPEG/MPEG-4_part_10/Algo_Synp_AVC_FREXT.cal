@@ -148,6 +148,10 @@ actor Algo_Synp_AVC_FREXT()
 	/* P and B Images */
 	function IS_P_Skip() --> bool: slice_type = SLICE_TYPE_P and mb_type = P_Skip end
 	function IS_B_Skip() --> bool:  slice_type = SLICE_TYPE_B and mb_type = B_Skip end
+	function ABS(int x) --> int: if x < 0 then -x else x end end
+	function IS_P_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] = P_Skip end
+	function IS_B_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] = B_Skip end
+	function IS_Intra_Pred_CABAC(int mbAddr) --> bool : ( mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] > 4) or (mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] > 22) end
 	function IS_P_8x8() --> bool: slice_type = SLICE_TYPE_P and mb_type = 3 end
 	function IS_B_Direct_16x16() --> bool: slice_type = SLICE_TYPE_B and mb_type = 0 end
 	function IS_B_8x8() --> bool: slice_type = SLICE_TYPE_B and mb_type = 22 end
@@ -159,6 +163,7 @@ actor Algo_Synp_AVC_FREXT()
 			mbTab[Addr][MbType] = 25
 		end
 	end
+	
 	
 	
 	//Entropie decoding
@@ -299,10 +304,14 @@ actor Algo_Synp_AVC_FREXT()
 	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L0 :=  [ [ [ [ -1:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L1 :=  [ [ [ [ -1:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	
-	 uint NeighMbAddr;
-	 bool NeighMbAvail;
-	 uint NeighMb_xW;
-	 uint NeighMb_yW;
+	List ( type: List ( type: int, size = 4) , size = PICWIDTH*PICHEIGHT ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	
+	bool IS_L0 := false;
+	
+	uint NeighMbAddr;
+	bool NeighMbAvail;
+	uint NeighMb_xW;
+	uint NeighMb_yW;
 	
 	uint P_Skip = 254;
 	uint B_Skip = 255;
@@ -3598,7 +3607,6 @@ actor Algo_Synp_AVC_FREXT()
 		
 	end
 	
-	
 	procedure GetCtxIdxMvd()
 	var
 		int condTermFlagA,
@@ -3646,20 +3654,43 @@ actor Algo_Synp_AVC_FREXT()
 			subMbPartIdxN := ( (NeighMb_yW >> 2) * 2 ) + (NeighMb_xW >> 2);
 			//FIXME: whet partition is not yet decoded
 			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
-				if IS_SubMBPred_L0_CABAC(subMbPartIdxN) and  IS_SubMBBiPred_CABAC(subMbPartIdxN) then
+				if IS_SubMBPred_L0_CABAC(subMbPartIdxN, NeighMbAddr) and  IS_SubMBBiPred_CABAC(subMbPartIdxN, NeighMbAddr) then
 					predModeEqualFlagA := 1;
 				else
 					predModeEqualFlagA := 0;
 				end
 			else
-				if IS_MBPred_L0_CABAC(mbPartIdxN) and  IS_MBPred_L0_CABAC(mbPartIdxN) then
+				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) and  IS_MBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) then
 					predModeEqualFlagA := 1;
 				else
 					predModeEqualFlagA := 0;
 				end
 			end
 		end
-	
+		
+		if NeighMbAddr < -1 then
+			absMvdCompA := 0;
+		else
+			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagA = 0 then
+				absMvdCompA := 0;
+			else
+				if IS_L0 then
+					absMvdCompA := ABS(Mvd_L0[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
+				else
+					absMvdCompA := ABS(Mvd_L1[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
+				end
+			end
+		end
+		
+		if absMvdCompA + absMvdCompB < 3 then
+			  ctxIdxInc := 0;
+		else
+			  if absMvdCompA + absMvdCompB > 32 then
+				ctxIdxInc := 2;
+			  else
+				ctxIdxInc := 1;
+			  end
+		end
 	end
 	
 	procedure CoeffAbsParsing()
@@ -7222,11 +7253,11 @@ end
 	function IS_SubMBNA() --> bool : SubMbPredMode() = 7 end
 	function SubMbPartWidthHeigth(uint(size=1) x) --> uint(size=5) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[sub_mb_type[mbPartIdx]][1+x] else if slice_type = SLICE_TYPE_B then B_tab_sub[sub_mb_type[mbPartIdx]][1+x] else 1 end end end
 
-	function SubMbPredMode_CABAC(int x) --> uint(size=3) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[sub_mb_type[x]][3] else if slice_type = SLICE_TYPE_B then B_tab_sub[sub_mb_type[x]][3] else 7 end end end
-	function IS_SubMBPred_L0_CABAC(int x) --> bool : SubMbPredMode_CABAC(x) = 0 end
-	function IS_SubMBPred_L1_CABAC(int x) --> bool : SubMbPredMode_CABAC(x) = 1 end
-	function IS_SubMBBiPred_CABAC(int x) --> bool : SubMbPredMode_CABAC(x) = 2 end
-	function IS_SubMBDirect_CABAC(int x) --> bool : SubMbPredMode_CABAC(x) = 3 end
+	function SubMbPredMode_CABAC(int x, int mbAddr) --> uint(size=3) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[cabac_sub_mb_type[mbAddr][x]][3] else if slice_type = SLICE_TYPE_B then B_tab_sub[cabac_sub_mb_type[mbAddr][x]][3] else 7 end end end
+	function IS_SubMBPred_L0_CABAC(int x, int mbAddr) --> bool : SubMbPredMode_CABAC(x, mbAddr) = 0 end
+	function IS_SubMBPred_L1_CABAC(int x, int mbAddr) --> bool : SubMbPredMode_CABAC(x, mbAddr) = 1 end
+	function IS_SubMBBiPred_CABAC(int x, int mbAddr)  --> bool : SubMbPredMode_CABAC(x, mbAddr) = 2 end
+	function IS_SubMBDirect_CABAC(int x, int mbAddr)  --> bool : SubMbPredMode_CABAC(x, mbAddr) = 3 end
 
 
 	sub_MB_pred_init_sub_mb_type: action ==> 
@@ -7240,6 +7271,7 @@ end
 			GetCabacSubMbTypeSyntaxElement();
 			StartCabacProcess();
 		end
+		IS_L0 := true;
 	end
 
 	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
@@ -7254,16 +7286,17 @@ end
 			if mbPartIdx < 4 then start_vld(); end
 		else
 			if IS_CABAC() then
-				  sub_mb_type[mbPartIdx] := cabac_value();
-				  mbPartIdx := mbPartIdx +1;
-				  if mbPartIdx < 4 then 
+				sub_mb_type[mbPartIdx] := cabac_value();
+				cabac_sub_mb_type[val_CurrMbAddr][mbPartIdx] := cabac_value();
+				mbPartIdx := mbPartIdx +1;
+				if mbPartIdx < 4 then 
 					binIdxMb := 0;
 					GetCabacSubMbTypeSyntaxElement();
 					StartCabacProcess();
-				  end
+				end
 			end
 		end
-		  
+		 
 	end
 	//end for
 
@@ -7340,6 +7373,7 @@ end
 			GetCabacRefIdxLx();
 			StartCabacProcess();
 		end
+		IS_L0 := false;
 	end
 
 	read_sub_MB_pred_ref_idx_l1_done: action ==> 
@@ -7382,6 +7416,7 @@ end
 		not IS_B_Direct_8x8(), not IS_SubMBPred_L1(), not IS_SubMBNA()
 	do
 		subMbPartIdx := 0;
+		IS_L0 := true;
 	end
 	//   for( subMbPartIdx = 0; subMbPartIdx < NumSubMbPart( sub_mb_type[ mbPartIdx ] ); subMbPartIdx++)
 	//     for( compIdx = 0; compIdx < 2; compIdx++ )
@@ -7458,6 +7493,7 @@ end
 		mbPartIdx = 4
 	do
 		mbPartIdx := 0;
+		IS_L0 := false;
 	end
 
 	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
@@ -7776,6 +7812,7 @@ end
 		not IS_MBPred_L1(mbPartIdx), not IS_MBNA(mbPartIdx)
 	do
 		if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+		 IS_L0 := true;
 	end
 
 	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
@@ -7802,6 +7839,7 @@ end
 		mbPartIdx = NumMbPart()
 	do
 		mbPartIdx := 0;
+		IS_L0 := false;
 	end
 
 	//  for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
@@ -7839,6 +7877,7 @@ end
 		mbPartIdx = NumMbPart()
 	do
 		mbPartIdx := 0;
+		IS_L0 := true;
 	end
 
 	//  for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
@@ -7907,6 +7946,7 @@ end
 		mbPartIdx = NumMbPart()
 	do
 		mbPartIdx := 0;
+		IS_L0 := false;
 	end
 
 	// for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
