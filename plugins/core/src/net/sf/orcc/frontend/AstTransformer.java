@@ -84,7 +84,6 @@ import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.FloatType;
 import net.sf.orcc.ir.type.IntType;
@@ -220,11 +219,11 @@ public class AstTransformer {
 		@Override
 		public Type caseAstTypeInt(AstTypeInt type) {
 			AstExpression astSize = type.getSize();
-			Expression size;
+			int size;
 			if (astSize == null) {
-				size = new IntExpr(Util.getLocation(type), 32);
+				size = 32;
 			} else {
-				size = exprEvaluator.evaluateAsIntExpr(astSize);
+				size = exprEvaluator.evaluateAsInteger(astSize);
 			}
 			return new IntType(size);
 		}
@@ -232,8 +231,7 @@ public class AstTransformer {
 		@Override
 		public Type caseAstTypeList(AstTypeList listType) {
 			Type type = transformType(listType.getType());
-			Expression size = exprEvaluator.evaluateAsIntExpr(listType
-					.getSize());
+			int size = exprEvaluator.evaluateAsInteger(listType.getSize());
 			return new ListType(size, type);
 		}
 
@@ -245,11 +243,11 @@ public class AstTransformer {
 		@Override
 		public Type caseAstTypeUint(AstTypeUint type) {
 			AstExpression astSize = type.getSize();
-			Expression size;
+			int size;
 			if (astSize == null) {
-				size = new IntExpr(Util.getLocation(type), 32);
+				size = 32;
 			} else {
-				size = exprEvaluator.evaluateAsIntExpr(astSize);
+				size = exprEvaluator.evaluateAsInteger(astSize);
 			}
 			return new UintType(size);
 		}

@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -46,9 +44,7 @@ import net.sf.orcc.ir.type.VoidType;
  */
 public class LLVMTypePrinter extends TypePrinter {
 
-	private void printInt(Expression expr) {
-		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-
+	private void printInt(int size) {
 		if (size <= 8) {
 			builder.append("i8");
 		} else if (size <= 16) {
@@ -73,10 +69,8 @@ public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(ListType type) {
-		int size = new ExpressionEvaluator().evaluateAsInteger(type.getSize());
-
 		builder.append("[");
-		builder.append(size);
+		builder.append(type.getSize());
 
 		builder.append(" x ");
 		type.getType().accept(this);
@@ -91,7 +85,6 @@ public class LLVMTypePrinter extends TypePrinter {
 	@Override
 	public void visit(UintType type) {
 		printInt(type.getSize());
-		// builder.append("i32");
 	}
 
 	@Override

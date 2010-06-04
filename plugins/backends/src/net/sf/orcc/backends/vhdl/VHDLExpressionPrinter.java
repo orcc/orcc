@@ -35,7 +35,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
@@ -59,11 +58,9 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 			if (type.isBool()) {
 				return 1;
 			} else if (type.isInt()) {
-				expr = ((IntType) type).getSize();
-				return new ExpressionEvaluator().evaluateAsInteger(expr);
+				return ((IntType) type).getSize();
 			} else if (type.isUint()) {
-				expr = ((UintType) type).getSize();
-				return new ExpressionEvaluator().evaluateAsInteger(expr);
+				return ((UintType) type).getSize();
 			} else {
 				throw new OrccRuntimeException("cannot get size of type: "
 						+ type);

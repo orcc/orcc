@@ -85,6 +85,7 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
@@ -843,15 +844,21 @@ public class IRParser {
 			JSONArray array = (JSONArray) obj;
 			String name = array.getString(0);
 			if (name.equals(IntType.NAME)) {
+				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
-				type = new IntType(expr);
+				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+				type = new IntType(size);
 			} else if (name.equals(UintType.NAME)) {
+				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
-				type = new UintType(expr);
+				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
+				type = new UintType(size);
 			} else if (name.equals(ListType.NAME)) {
+				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
+				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 				Type subType = parseType(array.get(2));
-				type = new ListType(expr, subType);
+				type = new ListType(size, subType);
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}

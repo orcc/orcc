@@ -510,26 +510,26 @@ public class XDFWriter {
 		Element typeElt = document.createElement("Type");
 
 		String name;
-		Expression size;
+		int size;
 
 		if (type.isBool()) {
 			name = "bool";
 		} else if (type.isInt()) {
 			name = "int";
 			size = ((IntType) type).getSize();
-			typeElt.appendChild(writeEntry("size", size));
+			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
 		} else if (type.isList()) {
 			name = "List";
 			size = ((ListType) type).getSize();
 			type = ((ListType) type).getElementType();
 			typeElt.appendChild(writeEntry("type", type));
-			typeElt.appendChild(writeEntry("size", size));
+			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
 		} else if (type.isString()) {
 			name = "String";
 		} else if (type.isUint()) {
 			name = "uint";
 			size = ((UintType) type).getSize();
-			typeElt.appendChild(writeEntry("size", size));
+			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
 		} else if (type.isVoid()) {
 			throw new OrccException("void type is invalid in XDF");
 		} else {

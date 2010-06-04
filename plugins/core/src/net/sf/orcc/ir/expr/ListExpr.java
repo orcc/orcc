@@ -78,7 +78,7 @@ public class ListExpr extends AbstractExpression {
 			}
 		}
 
-		return new ListType(new IntExpr(value.size()), refType);
+		return new ListType(value.size(), refType);
 	}
 
 	public List<Expression> getValue() {

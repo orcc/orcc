@@ -72,7 +72,7 @@ public class TypePrinter implements TypeVisitor {
 	@Override
 	public void visit(IntType type) {
 		builder.append("int(size=");
-		builder.append(type.getSize().toString());
+		builder.append(type.getSize());
 		builder.append(")");
 	}
 
@@ -81,7 +81,7 @@ public class TypePrinter implements TypeVisitor {
 		builder.append("List(type:");
 		builder.append(type.getType().toString());
 		builder.append(", size=");
-		builder.append(type.getSize().toString());
+		builder.append(type.getSize());
 		builder.append(")");
 	}
 
@@ -93,7 +93,7 @@ public class TypePrinter implements TypeVisitor {
 	@Override
 	public void visit(UintType type) {
 		builder.append("uint(size=");
-		builder.append(type.getSize().toString());
+		builder.append(type.getSize());
 		builder.append(")");
 	}
 

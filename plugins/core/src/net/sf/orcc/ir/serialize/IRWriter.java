@@ -457,7 +457,8 @@ public class IRWriter {
 		public Object interpret(IntType type) {
 			JSONArray array = new JSONArray();
 			array.put(IntType.NAME);
-			Expression expr = type.getSize();
+			// FIXME change JSON format back to using integer size
+			Expression expr = new IntExpr(type.getSize());
 			array.put(writeExpression(expr));
 			return array;
 		}
@@ -466,7 +467,8 @@ public class IRWriter {
 		public Object interpret(ListType type) {
 			JSONArray array = new JSONArray();
 			array.put(ListType.NAME);
-			Expression expr = type.getSize();
+			// FIXME change JSON format back to using integer size
+			Expression expr = new IntExpr(type.getSize());
 			array.put(writeExpression(expr));
 			array.put(writeType(type.getElementType()));
 			return array;
@@ -481,7 +483,8 @@ public class IRWriter {
 		public Object interpret(UintType type) {
 			JSONArray array = new JSONArray();
 			array.put(UintType.NAME);
-			Expression expr = type.getSize();
+			// FIXME change JSON format back to using integer size
+			Expression expr = new IntExpr(type.getSize());
 			array.put(writeExpression(expr));
 			return array;
 		}

@@ -204,8 +204,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				Location location = expr.getLocation();
 				target.setType(type);
 				Assign assign = new Assign(location, target, new BinaryExpr(
-						location, expr, BinaryOp.PLUS, new IntExpr(0), expr
-								.getType()));
+						location, expr, BinaryOp.PLUS, new IntExpr(0),
+						expr.getType()));
 				assign.setBlock(block);
 				it.add(assign);
 				return new VarExpr(use);
@@ -220,7 +220,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		 */
 		private LocalVariable newVariable() {
 			return new LocalVariable(true, tempVarCount++, new Location(),
-					"expr", null, null, new IntType(new IntExpr(32)));
+					"expr", null, null, new IntType(32));
 		}
 
 	}
@@ -246,13 +246,13 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		// Transform boolean Port into int port (to be remove later)
 		for (Port port : actor.getInputs()) {
 			if (port.getType().isBool()) {
-				port.setType(new IntType(new IntExpr(32)));
+				port.setType(new IntType(32));
 			}
 		}
 
 		for (Port port : actor.getOutputs()) {
 			if (port.getType().isBool()) {
-				port.setType(new IntType(new IntExpr(32)));
+				port.setType(new IntType(32));
 			}
 		}
 
@@ -319,7 +319,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		block = load.getBlock();
 		List<Type> types = new ArrayList<Type>(load.getIndexes().size());
 		for (int i = 0; i < load.getIndexes().size(); i++) {
-			types.add(new IntType(new IntExpr(32)));
+			types.add(new IntType(32));
 		}
 		visitExpressions(load.getIndexes(), args[0], types);
 	}
@@ -353,13 +353,13 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
 		for (int i = 0; i < store.getIndexes().size(); i++) {
-			types.add(new IntType(new IntExpr(32)));
+			types.add(new IntType(32));
 		}
 		visitExpressions(store.getIndexes(), it, types);
 		it.previous();
 
 		// Check store value
-		store.setValue(visitExpression(value, it, new IntType(new IntExpr(32))));
+		store.setValue(visitExpression(value, it, new IntType(32)));
 		it.next();
 	}
 
@@ -391,9 +391,9 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		Iterator<Type> itt = types.iterator();
 		while (pit.hasNext()) {
 			Expression value = pit.next();
-			if (itt.hasNext()){
-				Expression expr = (Expression) value.accept(new ExpressionSplitter(
-						it, itt.next()));
+			if (itt.hasNext()) {
+				Expression expr = (Expression) value
+						.accept(new ExpressionSplitter(it, itt.next()));
 				pit.set(expr);
 			}
 		}
@@ -408,7 +408,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			if (((LocalVariable) var).isPort()) {
 				ListType listType = (ListType) var.getType();
 				if (listType.getElementType().isBool()) {
-					listType.setElementType(new IntType(new IntExpr(32)));
+					listType.setElementType(new IntType(32));
 				}
 			}
 		}
@@ -418,7 +418,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		// set the label counter to prevent new nodes from having the same label
 		// as existing nodes
 		List<CFGNode> nodes = procedure.getNodes();
-		if (nodes.size() > 0 ){
+		if (nodes.size() > 0) {
 			CFGNode lastNode = nodes.get(nodes.size() - 1);
 			AbstractNode.setLabelCount(lastNode.getLabel() + 1);
 		}

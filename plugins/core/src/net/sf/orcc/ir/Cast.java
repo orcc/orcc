@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.UintType;
@@ -41,9 +40,9 @@ import net.sf.orcc.ir.type.UintType;
  */
 public class Cast {
 
-	Type source;
+	private Type source;
 
-	Type target;
+	private Type target;
 
 	public Cast(Type source, Type target) {
 		this.source = source;
@@ -60,12 +59,10 @@ public class Cast {
 			return 1;
 		} else if (type.isInt()) {
 			IntType intType = (IntType) type;
-			return new ExpressionEvaluator().evaluateAsInteger(intType
-					.getSize());
+			return intType.getSize();
 		} else if (type.isUint()) {
 			UintType uintType = (UintType) type;
-			return new ExpressionEvaluator().evaluateAsInteger(uintType
-					.getSize());
+			return uintType.getSize();
 		} else if (type.isList()) {
 			ListType listType = (ListType) type;
 			return getSizeOf(listType.getElementType());
@@ -115,7 +112,6 @@ public class Cast {
 		}
 
 		return getSizeOf(source) < getSizeOf(target);
-
 	}
 
 	/**

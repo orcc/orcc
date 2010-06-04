@@ -98,7 +98,7 @@ public class IntExpr extends AbstractExpression {
 			size = (int) Math.ceil(Math.log(-value) / Math.log(2.0)) + 1;
 		}
 
-		return new IntType(new IntExpr(size));
+		return new IntType(size);
 	}
 
 	public int getValue() {

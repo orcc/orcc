@@ -47,6 +47,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -352,7 +353,9 @@ public class XDFParser {
 					} else if (name.equals(IntType.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
-						Expression size = parseTypeSize(entries);
+						Expression expr = parseTypeSize(entries);
+						int size = new ExpressionEvaluator()
+								.evaluateAsInteger(expr);
 						return new ParseContinuation<Type>(node, new IntType(
 								size));
 					} else if (name.equals(ListType.NAME)) {
@@ -364,7 +367,9 @@ public class XDFParser {
 					} else if (name.equals(UintType.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
-						Expression size = parseTypeSize(entries);
+						Expression expr = parseTypeSize(entries);
+						int size = new ExpressionEvaluator()
+								.evaluateAsInteger(expr);
 						return new ParseContinuation<Type>(node, new UintType(
 								size));
 					} else {
@@ -436,7 +441,7 @@ public class XDFParser {
 			if (entry == null) {
 				throw new OrccException("List type must have a \"size\" entry");
 			}
-			Expression size = entry.getEntryAsExpr();
+			Expression expr = entry.getEntryAsExpr();
 
 			entry = entries.get("type");
 			if (entry == null) {
@@ -444,6 +449,7 @@ public class XDFParser {
 			}
 			Type type = entry.getEntryAsType();
 
+			int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 			return new ListType(size, type);
 		}
 

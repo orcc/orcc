@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.backends.c;
 
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -46,9 +44,7 @@ import net.sf.orcc.ir.type.VoidType;
  */
 public class CTypePrinter extends TypePrinter {
 
-	private void printInt(Expression expr) {
-		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-
+	private void printInt(int size) {
 		if (size <= 8) {
 			builder.append("char");
 		} else if (size <= 16) {

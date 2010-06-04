@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.type;
 
-import net.sf.orcc.ir.Expression;
 
 /**
  * This class defines an unsigned integer type.
@@ -41,7 +40,7 @@ public class UintType extends AbstractType {
 
 	public static final String NAME = "uint";
 
-	private Expression size;
+	private int size;
 
 	/**
 	 * Creates a new unsigned integer with the given size.
@@ -49,7 +48,7 @@ public class UintType extends AbstractType {
 	 * @param size
 	 *            the size of this unsigned integer type
 	 */
-	public UintType(Expression size) {
+	public UintType(int size) {
 		setSize(size);
 	}
 
@@ -66,13 +65,18 @@ public class UintType extends AbstractType {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof UintType) {
-			return size.equals(((UintType) obj).size);
+			return size == ((UintType) obj).size;
 		} else {
 			return false;
 		}
 	}
 
-	public Expression getSize() {
+	/**
+	 * Returns the size of this unsigned integer type.
+	 * 
+	 * @return the size of this unsigned integer type
+	 */
+	public int getSize() {
 		return size;
 	}
 
@@ -81,7 +85,13 @@ public class UintType extends AbstractType {
 		return true;
 	}
 
-	public void setSize(Expression size) {
+	/**
+	 * Sets the size of this unsigned integer type.
+	 * 
+	 * @param size
+	 *            the size of this unsigned integer type
+	 */
+	public void setSize(int size) {
 		this.size = size;
 	}
 

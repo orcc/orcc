@@ -45,7 +45,6 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -286,22 +285,18 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				lo = (Integer) value;
 				hi = lo;
 			} else {
-				Expression size = ((IntType) type).getSize();
-				ExpressionEvaluator evaluator = new ExpressionEvaluator();
-				int num = evaluator.evaluateAsInteger(size);
-				lo = -(1 << (num - 1));
-				hi = (1 << (num - 1)) - 1;
+				int size = ((IntType) type).getSize();
+				lo = -(1 << (size - 1));
+				hi = (1 << (size - 1)) - 1;
 			}
 		} else if (type.isUint()) {
 			if (value instanceof Integer) {
 				lo = (Integer) value;
 				hi = lo;
 			} else {
-				Expression size = ((UintType) type).getSize();
-				ExpressionEvaluator evaluator = new ExpressionEvaluator();
-				int num = evaluator.evaluateAsInteger(size);
+				int size = ((UintType) type).getSize();
 				lo = 0;
-				hi = 1 << num - 1;
+				hi = 1 << size - 1;
 			}
 		} else if (type.isBool()) {
 			if (value instanceof Boolean) {

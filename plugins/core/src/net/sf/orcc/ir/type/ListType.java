@@ -31,10 +31,7 @@ package net.sf.orcc.ir.type;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.IntExpr;
 
 /**
  * This class defines a List type.
@@ -47,7 +44,7 @@ public class ListType extends AbstractType {
 
 	public static final String NAME = "List";
 
-	private Expression size;
+	private int size;
 
 	private Type type;
 
@@ -59,7 +56,7 @@ public class ListType extends AbstractType {
 	 * @param type
 	 *            the type of this list's elements
 	 */
-	public ListType(Expression size, Type type) {
+	public ListType(int size, Type type) {
 		setSize(size);
 		setType(type);
 	}
@@ -78,7 +75,7 @@ public class ListType extends AbstractType {
 	public boolean equals(Object obj) {
 		if (obj instanceof ListType) {
 			ListType list = (ListType) obj;
-			return (size.equals(list.size) && type.equals(list.type));
+			return size == list.size && type.equals(list.type);
 		} else {
 			return false;
 		}
@@ -87,7 +84,6 @@ public class ListType extends AbstractType {
 	@Override
 	public List<Integer> getDimensions() {
 		ArrayList<Integer> dimensions = new ArrayList<Integer>(1);
-		int size = new ExpressionEvaluator().evaluateAsInteger(this.size);
 		dimensions.add(size);
 		dimensions.addAll(getType().getDimensions());
 		return dimensions;
@@ -110,20 +106,20 @@ public class ListType extends AbstractType {
 	 * 
 	 * @return the number of elements of this list type
 	 */
-	public Expression getSize() {
+	public int getSize() {
 		return size;
 	}
 
 	/**
-	 * Returns a list of indice that can be used inside a template.
+	 * Returns a list of indexes that can be used inside a template.
 	 * 
-	 * @return a list of indice corresponding to the list size
+	 * @return a list of indexes corresponding to the list size
 	 */
-	public List<Expression> getSizeIterator() {
-		List<Expression> it = new ArrayList<Expression>();
+	public List<Integer> getSizeIterator() {
+		List<Integer> it = new ArrayList<Integer>();
 
-		for (int i = 0; i < ((IntExpr) size).getValue(); i++) {
-			it.add(new IntExpr(i));
+		for (int i = 0; i < size; i++) {
+			it.add(i);
 		}
 
 		return it;
@@ -153,7 +149,13 @@ public class ListType extends AbstractType {
 		this.type = elementType;
 	}
 
-	public void setSize(Expression size) {
+	/**
+	 * Sets the number of elements of this list type.
+	 * 
+	 * @param size
+	 *            the number of elements of this list type
+	 */
+	public void setSize(int size) {
 		this.size = size;
 	}
 

@@ -138,7 +138,7 @@ public class ActorMerger implements INetworkTransformation {
 		bufferMap = new HashMap<Connection, Variable>();
 		for (Map.Entry<Connection, Integer> entry : bufferCapacities.entrySet()) {
 			Connection connection = entry.getKey();
-			Expression size = new IntExpr(entry.getValue());
+			int size = entry.getValue();
 			String name = "buf_" + index;
 			Type type = new ListType(size, connection.getSource().getType());
 			Variable buf = new LocalVariable(true, 0, new Location(), name,
@@ -169,7 +169,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		for (Map.Entry<Port, Integer> entry : inputPattern.entrySet()) {
 			Port port = entry.getKey();
-			Expression size = new IntExpr(entry.getValue());
+			int size = entry.getValue();
 			Type type = new ListType(size, port.getType());
 			LocalVariable param = new LocalVariable(false, 0, new Location(),
 					port.getName(), null, null, type);
@@ -181,7 +181,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		for (Map.Entry<Port, Integer> entry : outputPattern.entrySet()) {
 			Port port = entry.getKey();
-			Expression size = new IntExpr(entry.getValue());
+			int size = entry.getValue();
 			Type type = new ListType(size, port.getType());
 			LocalVariable parameter = new LocalVariable(false, 0,
 					new Location(), port.getName(), null, null, type);
@@ -282,7 +282,7 @@ public class ActorMerger implements INetworkTransformation {
 
 					Expression binopExpr = new BinaryExpr(new VarExpr(new Use(
 							loopVar)), BinaryOp.PLUS, new IntExpr(1),
-							new IntType(new IntExpr(32)));
+							new IntType(32));
 					blkNode.add(new Call(null, null, proc, parameters));
 					blkNode.add(new Assign(loopVar, binopExpr));
 					nodes.add(blkNode);
@@ -296,7 +296,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				LocalVariable loopVar = new LocalVariable(true, 0,
 						new Location(), "idx_" + index, null, null,
-						new IntType(new IntExpr(32)));
+						new IntType(32));
 
 				if (indexes.size() <= index) {
 					indexes.add(loopVar);
@@ -341,10 +341,10 @@ public class ActorMerger implements INetworkTransformation {
 			int size = entry.getValue();
 
 			Expression expr = new BinaryExpr(new IntExpr(size), BinaryOp.TIMES,
-					new VarExpr(new Use(loopVar)), new IntType(new IntExpr(32)));
+					new VarExpr(new Use(loopVar)), new IntType(32));
 
 			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
-					BinaryOp.PLUS, expr, new IntType(new IntExpr(32)));
+					BinaryOp.PLUS, expr, new IntType(32));
 
 			params.add(param);
 		}
@@ -355,10 +355,10 @@ public class ActorMerger implements INetworkTransformation {
 			int size = entry.getValue();
 
 			Expression expr = new BinaryExpr(new IntExpr(size), BinaryOp.TIMES,
-					new VarExpr(new Use(loopVar)), new IntType(new IntExpr(32)));
+					new VarExpr(new Use(loopVar)), new IntType(32));
 
 			Expression inParam = new BinaryExpr(new VarExpr(new Use(var)),
-					BinaryOp.PLUS, expr, new IntType(new IntExpr(32)));
+					BinaryOp.PLUS, expr, new IntType(32));
 
 			params.add(inParam);
 		}
@@ -515,8 +515,7 @@ public class ActorMerger implements INetworkTransformation {
 				outputsMap.put(connection, port);
 				outputs.add("", new Location(), port.getName(), port);
 
-				
-				Expression size = new IntExpr(port.getNumTokensProduced());
+				int size = port.getNumTokensProduced();
 				Type type = new ListType(size, port.getType());
 				Variable var = new LocalVariable(true, 0, new Location(),
 						port.getName(), null, null, type);
@@ -544,7 +543,7 @@ public class ActorMerger implements INetworkTransformation {
 				inputsMap.put(connection, port);
 				inputs.add("", new Location(), port.getName(), port);
 
-				Expression size = new IntExpr(port.getNumTokensConsumed());
+				int size = port.getNumTokensConsumed();
 				Type type = new ListType(size, port.getType());
 				Variable var = new LocalVariable(true, 0, new Location(),
 						port.getName(), null, null, type);

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.type;
 
-import net.sf.orcc.ir.Expression;
 
 /**
  * This class defines an integer type.
@@ -41,7 +40,7 @@ public class IntType extends AbstractType {
 
 	public static final String NAME = "int";
 
-	private Expression size;
+	private int size;
 
 	/**
 	 * Creates a new integer with the given size.
@@ -49,7 +48,7 @@ public class IntType extends AbstractType {
 	 * @param size
 	 *            the size of this integer type
 	 */
-	public IntType(Expression size) {
+	public IntType(int size) {
 		setSize(size);
 	}
 
@@ -66,13 +65,18 @@ public class IntType extends AbstractType {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof IntType) {
-			return size.equals(((IntType) obj).size);
+			return size == ((IntType) obj).size;
 		} else {
 			return false;
 		}
 	}
 
-	public Expression getSize() {
+	/**
+	 * Returns the size of this integer type.
+	 * 
+	 * @return the size of this integer type
+	 */
+	public int getSize() {
 		return size;
 	}
 
@@ -81,7 +85,13 @@ public class IntType extends AbstractType {
 		return true;
 	}
 
-	public void setSize(Expression size) {
+	/**
+	 * Sets the size of this integer type.
+	 * 
+	 * @param size
+	 *            the size of this integer type
+	 */
+	public void setSize(int size) {
 		this.size = size;
 	}
 

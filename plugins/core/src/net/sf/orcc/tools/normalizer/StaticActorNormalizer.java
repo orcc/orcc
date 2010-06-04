@@ -140,7 +140,7 @@ public class StaticActorNormalizer {
 			assign = new Assign(loopVar, null);
 			assign.setValue(new BinaryExpr(
 					new VarExpr(new Use(loopVar, assign)), BinaryOp.PLUS,
-					new IntExpr(1), new IntType(new IntExpr(32))));
+					new IntExpr(1), new IntType(32)));
 			block.add(assign);
 
 			// restore stuff
@@ -201,16 +201,14 @@ public class StaticActorNormalizer {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
 
-			Expression size = new IntExpr(numTokens);
-			Type type = new ListType(size, port.getType());
+			Type type = new ListType(numTokens, port.getType());
 			StateVariable var = new StateVariable(new Location(), type,
 					port.getName(), false);
 			stateVars.add(actor.getFile(), var.getLocation(), var.getName(),
 					var);
 
 			StateVariable varCount = new StateVariable(new Location(),
-					new IntType(new IntExpr(32)), port.getName() + "_count",
-					true, 0);
+					new IntType(32), port.getName() + "_count", true, 0);
 			stateVars.add(actor.getFile(), varCount.getLocation(),
 					varCount.getName(), varCount);
 

@@ -32,8 +32,6 @@ package net.sf.orcc.backends.vhdl;
 import java.math.BigInteger;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
@@ -53,17 +51,6 @@ public class VHDLTypePrinter extends TypePrinter {
 	/**
 	 * Prints an integer with the given number of bits.
 	 * 
-	 * @param expr
-	 *            an expression that gives the number of bits
-	 */
-	private void printInt(Expression expr) {
-		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-		printInt(size);
-	}
-
-	/**
-	 * Prints an integer with the given number of bits.
-	 * 
 	 * @param size
 	 *            an integer that gives the number of bits
 	 */
@@ -78,18 +65,6 @@ public class VHDLTypePrinter extends TypePrinter {
 		builder.append(bound.subtract(BigInteger.ONE));
 		builder.append(" downto -");
 		builder.append(bound);
-	}
-
-	/**
-	 * Prints an unsigned integer with the given number of bits as an integer
-	 * with the given number of bits + 1.
-	 * 
-	 * @param expr
-	 *            an expression that gives the number of bits
-	 */
-	private void printUInt(Expression expr) {
-		int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-		printInt(size + 1);
 	}
 
 	@Override
@@ -115,7 +90,7 @@ public class VHDLTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(UintType type) {
-		printUInt(type.getSize());
+		printInt(type.getSize() + 1);
 	}
 
 	@Override

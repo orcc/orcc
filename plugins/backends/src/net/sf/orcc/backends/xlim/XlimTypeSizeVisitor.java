@@ -82,13 +82,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 *            Integer type
 	 */
 	public void visit(IntType type) {
-		String size;
-		try {
-			size = type.getSize().toString();
-		} catch (Exception e) {
-			size = "";
-		}
-		element.setAttribute(SIZE, size);
+		element.setAttribute(SIZE, Integer.toString(type.getSize()));
 		element.setAttribute(TYPENAME, INT);
 	}
 
@@ -120,13 +114,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 *            Unsigned integer type
 	 */
 	public void visit(UintType type) {
-		String size;
-		try {
-			size = type.getSize().toString();
-		} catch (Exception e) {
-			size = "";
-		}
-		element.setAttribute(SIZE, size);
+		element.setAttribute(SIZE, Integer.toString(type.getSize()));
 		element.setAttribute(TYPENAME, UINT);
 	}
 
