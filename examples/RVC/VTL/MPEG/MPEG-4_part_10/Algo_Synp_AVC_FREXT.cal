@@ -142,6 +142,8 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_I4x4(int SliceType, int Mbtype) --> bool : (Mbtype = 0 ) and (SliceType = SLICE_TYPE_I) end
 	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
 	function IS_P(int SliceType) --> bool : SliceType = SLICE_TYPE_P end
+	function IS_MB_Type_P8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_P and mbTab[mbAdd][2] = 3 end
+	function IS_MB_Type_B8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_B and mbTab[mbAdd][2] = 22 end
 	
 	/* P and B Images */
 	function IS_P_Skip() --> bool: slice_type = SLICE_TYPE_P and mb_type = P_Skip end
@@ -3643,10 +3645,18 @@ actor Algo_Synp_AVC_FREXT()
 			mbPartIdxN    := ( (NeighMb_yW >> 2) * 4 ) + (NeighMb_xW >> 2);
 			subMbPartIdxN := ( (NeighMb_yW >> 2) * 2 ) + (NeighMb_xW >> 2);
 			//FIXME: whet partition is not yet decoded
-			if IS_SubMBPred_L0_CABAC(subMbPartIdxN) and  IS_SubMBBiPred_CABAC(subMbPartIdxN) then
-				predModeEqualFlagA := 1;
+			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
+				if IS_SubMBPred_L0_CABAC(subMbPartIdxN) and  IS_SubMBBiPred_CABAC(subMbPartIdxN) then
+					predModeEqualFlagA := 1;
+				else
+					predModeEqualFlagA := 0;
+				end
 			else
-				predModeEqualFlagA := 0;
+				if IS_MBPred_L0_CABAC(mbPartIdxN) and  IS_MBPred_L0_CABAC(mbPartIdxN) then
+					predModeEqualFlagA := 1;
+				else
+					predModeEqualFlagA := 0;
+				end
 			end
 		end
 	
@@ -6817,8 +6827,25 @@ end
 			if slice_type = SLICE_TYPE_B then B_tab[mb_type][1+x] else 1 end 
 		end 
 	end
+	
+	function MbPartPredModeCABAC(uint(size=1) x, int mbAddr) --> uint(size=3) : 
+		if mbTab[mbAddr][1] = SLICE_TYPE_P or mbTab[mbAddr][1] = SLICE_TYPE_SP then 
+			P_tab[mbTab[mbAddr][2]][3+x] 
+		else 
+			if slice_type = SLICE_TYPE_B then 
+				B_tab[mbTab[mbAddr][2]][3+x] 
+			else 
+				7 
+			end 
+		end 
+	end
 
+	function IS_MBPred_L0_CABAC(uint(size=1) x, int mbAddr) --> bool : MbPartPredModeCABAC(x, mbAddr) = 0 end
+	function IS_MBPred_L1_CABAC(uint(size=1) x, int mbAddr) --> bool : MbPartPredModeCABAC(x, mbAddr) = 1 end
+	function IS_MBBiPred_CABAC(uint(size=1) x, int mbAddr) --> bool : MbPartPredModeCABAC(x, mbAddr) = 2 end
+	function IS_MBDirect_CABAC(uint(size=1) x, int mbAddr) --> bool : MbPartPredModeCABAC(x, mbAddr) = 3 end
 
+	
 	read_MB_layer_mb_type: action ==>
 	do
 		if  IS_CAVLC() then
@@ -7317,7 +7344,7 @@ end
 
 	read_sub_MB_pred_ref_idx_l1_done: action ==> 
 	guard
-		( ((slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits() ) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())) and IS_CAVLC() ) or
+		( ( (slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits() ) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())) and IS_CAVLC() ) or
 		( (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CABAC() ) 
 	do
 		if IS_CAVLC() then
