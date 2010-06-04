@@ -64,7 +64,16 @@ import net.sf.orcc.ir.nodes.WhileNode;
  */
 public class InterpretedActor extends AbstractInterpretedActor {
 
-	private OrccProcess process;
+	private class Breakpoint {
+		public Action action;
+
+		public int lineNb;
+
+		public Breakpoint(Action action, Integer lineNb) {
+			this.action = action;
+			this.lineNb = lineNb;
+		}
+	}
 
 	/**
 	 * Debugger utils
@@ -86,44 +95,36 @@ public class InterpretedActor extends AbstractInterpretedActor {
 		}
 	}
 
-	private class Breakpoint {
-		public Breakpoint(Action action, Integer lineNb) {
-			this.action = action;
-			this.lineNb = lineNb;
-		}
-
-		public Action action;
-		public int lineNb;
-	}
+	private Action breakAction = null;
 
 	private List<Breakpoint> breakpoints;
 	private Action currentAction = null;
-	private Action breakAction = null;
-	private List<Instruction> instrStack;
-	private boolean isStepping = false;
-	private int nbOfFirings;
-	private List<NodeInfo> nodeStack;
-	private int nodeStackLevel;
-
-	/**
-	 * Interpretation and evaluation tools
-	 */
-	protected NodeInterpreter interpret;
-
 	protected ExpressionEvaluator exprInterpreter;
-
-	private ListAllocator listAllocator;
-
 	/**
 	 * Actor's FSM management parameters
 	 */
 	protected String fsmState;
-	protected ActionScheduler sched;
+	private List<Instruction> instrStack;
+	/**
+	 * Interpretation and evaluation tools
+	 */
+	protected NodeInterpreter interpret;
+	private boolean isStepping = false;
+	private ListAllocator listAllocator;
+
+	private int nbOfFirings;
+
+	private List<NodeInfo> nodeStack;
+
+	private int nodeStackLevel;
 
 	/**
 	 * Actor's constant parameters to be set at initialization time
 	 */
 	private Map<String, Expression> parameters;
+	private OrccProcess process;
+
+	protected ActionScheduler sched;
 
 	/**
 	 * Creates a new interpreted actor instance for simulation or debug
@@ -233,6 +234,27 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	}
 
 	/**
+	 * Converts the value to a format that the interpreter knows how to handle.
+	 * More specifically, converts lists to arrays.
+	 * 
+	 * @param value
+	 *            an object
+	 * @return the same object if value is a scalar, an array otherwise
+	 */
+	private Object getInterpretableValue(Object value) {
+		if (value instanceof List<?>) {
+			List<?> list = (List<?>) value;
+			Object[] array = list.toArray();
+			for (int i = 0; i < array.length; i++) {
+				array[i] = getInterpretableValue(array[i]);
+			}
+			return array;
+		} else {
+			return value;
+		}
+	}
+
+	/**
 	 * Get the next schedulable action to be executed for this actor
 	 * 
 	 * @return the schedulable action or null
@@ -316,7 +338,6 @@ public class InterpretedActor extends AbstractInterpretedActor {
 	 * initialized state variables, allocation and initialization of state
 	 * arrays.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize() {
 		try {
@@ -342,12 +363,7 @@ public class InterpretedActor extends AbstractInterpretedActor {
 					}
 				} else {
 					// initialize
-					if (type.isList()) {
-						stateVar.setValue(((ArrayList<Object>) initConst)
-								.toArray());
-					} else {
-						stateVar.setValue(initConst);
-					}
+					stateVar.setValue(getInterpretableValue(initConst));
 				}
 			}
 
