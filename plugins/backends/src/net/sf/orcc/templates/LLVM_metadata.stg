@@ -11,7 +11,7 @@ $if(actor.parameters.list)$
 !parameters = !{$actor.parameters.list: parameter_decl_MD(); separator=", "$}
 $endif$
 $if(actor.stateVars.list)$
-;!stateVars = !{$actor.stateVars.list: stateVar_decl_MD(); separator=", "$}
+!stateVars = !{$actor.stateVars.list: stateVar_decl_MD(); separator=", "$}
 $endif$
 $if(actor.actions)$
 !actions = !{$actor.actions: action_decl_MD(); separator=", "$}
@@ -80,7 +80,10 @@ $Type_MD(parameter)$
 >>
 
 stateVar_MD(var) ::= <<
-
+$stateVar_decl_MD(var)$ = metadata !{metadata $VarDef_decl_MD(var)$, metadata $Location_decl_MD(var)$, metadata $Type_decl_MD(var)$}
+$VarDef_MD(var)$
+$Location_MD(var)$
+$Type_MD(var)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -127,7 +130,7 @@ $Sched_decl_MD(action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExter
 
 
 VarDef_MD(var) ::= <<
-VarDef_decl_MD(var) = metadata !{$varName_MD(var)$, $varAssignable_MD(var)$, $varSuffix_MD(var)$,  $varIndex_MD(var)$}
+$VarDef_decl_MD(var)$ = metadata !{$varName_MD(var)$, $varAssignable_MD(var)$, $varSuffix_MD(var)$,  $varIndex_MD(var)$}
 
 >>
 
@@ -151,11 +154,11 @@ i1 $if(var.assignable)$1$else$0$endif$
 >>
 
 varSuffix_MD(var) ::= <<
-i32 $var.suffix$
+i32 $if(var.suffix)$$var.suffix$$else$0$endif$
 >>
 
 varIndex_MD(var) ::= <<
-i32 $var.index$
+i32 $if(var.index)$$var.index$$else$0$endif$
 >>
 
 procExtern_MD(proc) ::= <<
