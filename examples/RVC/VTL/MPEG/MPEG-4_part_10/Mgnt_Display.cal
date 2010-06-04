@@ -21,7 +21,7 @@ actor Mgnt_Display ()
 	uint(size=5)  MaxDPBSize
 	
 		==>
-  	uint(size=32) POCtoDisplay
+  	int(size=32) POCtoDisplay
 		:
 
 
@@ -128,7 +128,7 @@ actor Mgnt_Display ()
 
 	skipSendNextPOC: action
 				==>
-			//POCtoDisplay :[ -1 ]
+			POCtoDisplay :[ -1 ]
 		end
 
 

@@ -19,7 +19,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	uint(size=13) CurrMbAddr, 
 	uint(size=13) PicSizeInMb, 
 	uint          POC, 
-	uint(size=32) POCtoDisplay,
+	int( size=32) POCtoDisplay,
 	uint(size=32) POCtoRead,
 	int(size=32)  DelList, 
 	uint(size=31) FrameNum_CurrPic,
@@ -338,12 +338,15 @@ getNextPOCtoDisplay: action
 		POCtoDisplay :[poc2disp]
 			==>
 	guard
+		poc2disp         != -1,
 		NextPOCtoDisplay = -1
 	do
 		NextPOCtoDisplay := poc2disp;
 		ListScanned      := false;
 	end
-skip_getNextPOCtoDisplay: action ==>
+skip_getNextPOCtoDisplay: action
+		POCtoDisplay :[poc2disp]
+			==>
 	end
 
 getidxdisplay: action ==>
