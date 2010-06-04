@@ -105,10 +105,12 @@ phiPair(value, label) ::= <<
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-$if(variable.constantValue)
-$@$variable$ = internal global $variable.type$ $ConstantValue(type=variable.type, const=variable.constantValue)$
-$else$
-@$variable$ = internal global $variable.type$ zeroinitializer$
+@$variable$ = $if(variable.assignable)
+$ internal global $else
+$ internal constant$endif
+$ $variable.type$ $if(variable.constantValue)
+$$ConstantValue(type=variable.type, const=variable.constantValue)$$else
+$ zeroinitializer$
 endif$
 >>
 
