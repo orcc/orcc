@@ -125,4 +125,9 @@ public class IntFifo {
 		return write + "/" + read;
 	}
 
+	public void put(String[] check) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

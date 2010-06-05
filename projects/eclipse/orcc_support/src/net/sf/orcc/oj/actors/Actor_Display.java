@@ -126,8 +126,6 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				long t = System.currentTimeMillis() - startTime;
-				System.out.println(numImages + " in " + t);
 				System.exit(0);
 			}
 
@@ -274,6 +272,10 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 			x = 0;
 			y = 0;
 			numImages++;
+			long t = System.currentTimeMillis();
+			long t2= t - startTime;
+			System.out.println(numImages + " in " + t2);
+			startTime = t;
 		}
 	}
 

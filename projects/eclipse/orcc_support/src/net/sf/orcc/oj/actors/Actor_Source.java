@@ -85,6 +85,7 @@ public class Actor_Source extends AbstractActorDebug {
 				if (byteRead == -1) {
 					// back to beginning
 					in.seek(0L);
+					byteRead = in.read();
 				}
 
 				source[0] = byteRead;
