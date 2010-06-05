@@ -27,7 +27,7 @@ actor Algo_RefIdxtoPOC()
 
 	uint(size=5)  SizeList;
 	uint(size=5)  CountRead;
-	uint(size=1)  LastPicID;
+	uint(size=1)  LastPicID:=0;
 
 	ReadSizeList: action 
 			RefList :[ SizeRefList ]

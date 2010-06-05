@@ -4300,7 +4300,7 @@ actor Algo_Synp_AVC_FREXT()
 					ctx_temp := 3;
 				else
 					CabacValue := 0;
-					FoundSE := 1;
+					FoundSE := true;
 				end
 				StartPrefix := false;
 			end
