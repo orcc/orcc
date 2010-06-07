@@ -2,7 +2,7 @@
 
 This software module was originally developed by 
 Florian Decologne (IETR/INSA of Rennes) for CAVLC and 
-Endri Bezati (IETR/INSA of Rennes and EPFL) for CABAC entropy coding, 
+Endri Bezati (IETR/INSA of Rennes and EPFL) for CABAC entropy decoding, 
 in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
 for reference purposes and its performance may not have been optimized. 
 This software module is an implementation of one or more tools as 
@@ -4276,13 +4276,14 @@ actor Algo_Synp_AVC_FREXT()
 	
 	procedure GetMvD_Lx()
 	begin
-		if StartPrefix then
-			if binValDecoded = false then
-				if compIdx = 0 then
+		if compIdx = 0 then
 					ctxIdxOffset := 40;
 				else
 					ctxIdxOffset := 47;
-				end
+		end
+		
+		if StartPrefix then
+			if binValDecoded = false then
 				//give the ctxIdx
 				GetCtxIdxMvd();
 				ctxIdx := ctxIdxInc + ctxIdxOffset;
@@ -4292,10 +4293,9 @@ actor Algo_Synp_AVC_FREXT()
 				StopCabacProcess();
 				NextBitToDecode := false;
 			else
-				// Increment binIdx
-				binIdx := binIdx + 1;
 				if binVal = 1 then
 					StartSuffix := true;
+					StopCoeff := true;
 					mvd_temp := 1;
 					ctx_temp := 3;
 				else
@@ -4303,6 +4303,7 @@ actor Algo_Synp_AVC_FREXT()
 					FoundSE := true;
 				end
 				StartPrefix := false;
+				binValDecoded := false;
 			end
 			
 		end
@@ -7591,6 +7592,7 @@ end
 			start_vld();
 		else
 			if IS_CABAC() then
+				  compIdx := 0;
 			      GetCabacMvdLx();
 			      StartCabacProcess();
 			end
@@ -7609,6 +7611,7 @@ end
 				mvd_l0 := cabac_value();
 				//Save the decode mvd
 				Mvd_L0[val_CurrMbAddr][mbPartIdx][subMbPartIdx][0] := mvd_l0;
+				compIdx := 1;
 				GetCabacMvdLx();
 				StartCabacProcess();
 		
@@ -7678,6 +7681,7 @@ end
 			start_vld();
 		else
 			if IS_CABAC() then
+			      compIdx := 0;
 			      GetCabacMvdLx();
 			      StartCabacProcess();
 			end
@@ -7695,7 +7699,8 @@ end
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
 				//Save the decode mvd
-				Mvd_L1[val_CurrMbAddr][mbPartIdx][subMbPartIdx][0] := mvd_l0;
+				Mvd_L1[val_CurrMbAddr][mbPartIdx][subMbPartIdx][0] := mvd_l1;
+				compIdx := 1;
 				GetCabacMvdLx();
 				StartCabacProcess();
 		
@@ -7714,7 +7719,7 @@ end
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
 				//Save the decode mvd
-				Mvd_L1[val_CurrMbAddr][mbPartIdx][subMbPartIdx][1] := mvd_l0;
+				Mvd_L1[val_CurrMbAddr][mbPartIdx][subMbPartIdx][1] := mvd_l1;
 			end
 		end
 		subMbPartIdx := subMbPartIdx +1;
@@ -8054,6 +8059,7 @@ end
 			start_vld();
 		else
 			if IS_CABAC() then
+				  compIdx := 0;
 			      GetCabacMvdLx();
 			      StartCabacProcess();
 			end
@@ -8072,6 +8078,7 @@ end
 				mvd_l0 := cabac_value();
 				//Save the decode mvd
 				Mvd_L0[val_CurrMbAddr][mbPartIdx][0][0] := mvd_l0;
+				compIdx := 1;
 				GetCabacMvdLx();
 				StartCabacProcess();
 			end
@@ -8123,6 +8130,7 @@ end
 			start_vld();
 		else
 			if IS_CABAC() then
+				  compIdx := 0;
 			      GetCabacMvdLx();
 			      StartCabacProcess();
 			end
@@ -8140,7 +8148,8 @@ end
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
 				//Save the decode mvd
-				Mvd_L1[val_CurrMbAddr][mbPartIdx][0][0] := mvd_l0;
+				Mvd_L1[val_CurrMbAddr][mbPartIdx][0][0] := mvd_l1;
+				compIdx := 1;
 				GetCabacMvdLx();
 				StartCabacProcess();
 		
@@ -8158,7 +8167,7 @@ end
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
 				//Save the decode mvd
-				Mvd_L1[val_CurrMbAddr][mbPartIdx][0][1] := mvd_l0;
+				Mvd_L1[val_CurrMbAddr][mbPartIdx][0][1] := mvd_l1;
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
