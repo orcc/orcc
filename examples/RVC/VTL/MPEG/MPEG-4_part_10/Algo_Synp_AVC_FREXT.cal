@@ -7541,7 +7541,7 @@ end
 
 	read_sub_MB_pred_ref_idx_l1_done: action ==> 
 	guard
-		( ( (slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits() ) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())) and IS_CAVLC() ) or
+		( ( (slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) ) and IS_CAVLC() ) or
 		( (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CABAC() ) 
 	do
 		if IS_CAVLC() then
@@ -8091,7 +8091,7 @@ end
 				Mvd_L0[val_CurrMbAddr][mbPartIdx][subMbPartIdx][1] := mvd_l0;
 			end
 		end
-		subMbPartIdx := subMbPartIdx +1;
+		mbPartIdx := mbPartIdx +1;
 	end
 
 	//else
