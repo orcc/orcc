@@ -271,6 +271,6 @@ AstTypeUint: name='uint' ('(' 'size' '=' size = AstExpression ')')?;
 AstVariableDeclaration returns AstVariable: type=AstType name=ID;
 
 AstValuedVariableDeclaration returns AstVariable:
-	AstVariableDeclaration (('=' | assignable?=':=') value=AstExpression)?;
+	AstVariableDeclaration ((constant?='=' | ':=') value=AstExpression)?;
 
 AstVariableReference: variable=[AstVariable];

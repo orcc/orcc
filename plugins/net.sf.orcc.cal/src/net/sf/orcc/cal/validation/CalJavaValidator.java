@@ -125,7 +125,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}.doSwitch(Util.getActor(function));
 
 			if (!used) {
-				warning("Unused function", CalPackage.AST_FUNCTION__NAME);
+				warning("The function " + function.getName()
+						+ " is never called", CalPackage.AST_FUNCTION__NAME);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -149,7 +150,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}.doSwitch(Util.getActor(procedure));
 
 			if (!used) {
-				warning("Unused procedure", CalPackage.AST_PROCEDURE__NAME);
+				warning("The procedure " + procedure.getName()
+						+ " is never called", CalPackage.AST_PROCEDURE__NAME);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -198,7 +200,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}.doSwitch(Util.getActor(variable));
 
 			if (!used) {
-				warning("Unused variable", CalPackage.AST_VARIABLE__NAME);
+				warning("The variable is never read",
+						CalPackage.AST_VARIABLE__NAME);
 			}
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -206,8 +209,16 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check
-	public void checkPriorities(AstPriority priority) {
+	public void checkAssign(AstStatementAssign assign) {
+		AstVariable variable = assign.getTarget().getVariable();
+		if (variable.isConstant()) {
+			error("The variable " + variable.getName() + " is not assignable",
+					CalPackage.AST_STATEMENT_ASSIGN__TARGET);
+		}
+	}
 
+	@Check
+	public void checkPriorities(AstPriority priority) {
 	}
 
 }

@@ -580,7 +580,7 @@ public class AstTransformer {
 			Location location = Util.getLocation(astVariable);
 			String name = astVariable.getName();
 			Type type = transformType(astVariable.getType());
-			boolean assignable = astVariable.isAssignable();
+			boolean assignable = !astVariable.isConstant();
 
 			LocalVariable local = new LocalVariable(assignable, 0, location,
 					name, null, null, type);
@@ -688,7 +688,7 @@ public class AstTransformer {
 			Location location = Util.getLocation(astVariable);
 			Type type = transformType(astVariable.getType());
 			String name = astVariable.getName();
-			boolean assignable = astVariable.isAssignable();
+			boolean assignable = !astVariable.isConstant();
 
 			// evaluate initial value (if any)
 			AstExpression astValue = astVariable.getValue();
