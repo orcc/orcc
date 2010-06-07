@@ -83,11 +83,14 @@ public class SourceActor extends AbstractInterpretedActor {
 		try {
 			while (fifo_O.hasRoom(1)) {
 				byteRead[0] = in.read();
-				if (byteRead[0] != -1) {
-					fifo_O.put(byteRead);
-					running = 1;
+				if (byteRead[0] == -1) {
+					// back to beginning
+					in.seek(0L);
+					byteRead[0] = in.read();
 				}
-			}
+
+				fifo_O.put(byteRead);
+				running = 1;			}
 		} catch (IOException e) {
 			String msg = "I/O exception: \"" + fileName + "\"";
 			throw new RuntimeException(msg, e);
