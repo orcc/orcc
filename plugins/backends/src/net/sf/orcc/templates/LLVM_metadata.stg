@@ -188,7 +188,7 @@ $fsm.transitions: {transition | $Transition_MD(index = i, transition = transitio
 >>
 
 Transition_MD(index, transition) ::= <<
-$Transition_decl_MD(index)$ = metadata  !{ $varState_MD(transition.sourceState)$, $transition.nextStateInfo: { metadata $NextState_decl_MD(transition=index, state= i)$ }; separator=", "$}
+$Transition_decl_MD(index)$ = metadata  !{ $varState_MD(transition.sourceState)$, $transition.nextStateInfo: { metadata $NextState_decl_MD(transition=index, state= i)$}; separator=", "$, i1()* @$transition.sourceState$_state_scheduler}
 $transition.nextStateInfo: {nextStateInfo | $NextState_MD(stateIndex = index, nextStateIndex = i,nextState = nextStateInfo)$}$
 
 >>
