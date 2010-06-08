@@ -55,6 +55,8 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -695,8 +697,44 @@ public class IRWriter {
 		return array;
 	}
 
+	/**
+	 * Writes a Finite State Machine as JSON.
+	 * 
+	 * @param fsm
+	 *            an FSM (must not be <code>null</code>)
+	 * @return a JSON array
+	 */
 	private JSONArray writeFSM(FSM fsm) {
-		return null;
+		JSONArray array = new JSONArray();
+		array.put(fsm.getInitialState().getName());
+
+		JSONArray stateArray = new JSONArray();
+		array.put(stateArray);
+		for (String stateName : fsm.getStates()) {
+			stateArray.put(stateName);
+		}
+
+		JSONArray transitionsArray = new JSONArray();
+		array.put(transitionsArray);
+		for (Transition transition : fsm.getTransitions()) {
+			JSONArray transitionArray = new JSONArray();
+			transitionsArray.put(transitionArray);
+
+			transitionArray.put(transition.getSourceState().getName());
+
+			JSONArray actionsArray = new JSONArray();
+			transitionArray.put(actionsArray);
+
+			for (NextStateInfo info : transition.getNextStateInfo()) {
+				JSONArray actionArray = new JSONArray();
+				actionsArray.put(actionArray);
+
+				actionArray.put(writeActionTag(info.getAction().getTag()));
+				actionArray.put(info.getTargetState().getName());
+			}
+		}
+
+		return array;
 	}
 
 	/**
