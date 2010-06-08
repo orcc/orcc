@@ -104,43 +104,6 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	}
 
 	/**
-	 * Returns the previous block. A new block is created if there is no
-	 * previous one.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 * @param it
-	 *            an iterator over nodes of the given procedure
-	 * @return a block
-	 */
-	public static BlockNode getPrevious(Procedure procedure,
-			ListIterator<CFGNode> it) {
-		BlockNode block;
-
-		it.previous();
-		if (it.hasPrevious()) {
-			// get previous and restore iterator's position
-			CFGNode previous = it.previous();
-			it.next();
-
-			if (previous instanceof BlockNode) {
-				block = ((BlockNode) previous);
-			} else if (previous instanceof IfNode) {
-				block = ((IfNode) previous).getJoinNode();
-			} else {
-				block = ((WhileNode) previous).getJoinNode();
-			}
-		} else {
-			// no previous block, create and add a new one
-			block = new BlockNode(procedure);
-			it.add(block);
-		}
-		it.next();
-
-		return block;
-	}
-
-	/**
 	 * the list of instructions of this block node.
 	 */
 	private List<Instruction> instructions;
