@@ -123,12 +123,12 @@ AstInitialize returns AstAction:
 	('do' (statements+=AstStatement)*)?
 	'end';
 
-AstInputPattern: (port=[AstPort] ':')? '[' tokens+=AstToken (',' tokens+=AstToken)* ']'
+AstInputPattern: port=[AstPort] ':' '[' tokens+=AstToken (',' tokens+=AstToken)* ']'
 	('repeat' repeat=AstExpression)?;
 
 AstToken returns AstVariable: name=ID;
 
-AstOutputPattern: (port=[AstPort] ':')? '[' values+=AstExpression (',' values+=AstExpression)* ']'
+AstOutputPattern: port=[AstPort] ':' '[' values+=AstExpression (',' values+=AstExpression)* ']'
 	('repeat' repeat=AstExpression)?;
 
 ///////////////////////////////////////////////////////////////////////////////

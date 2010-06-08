@@ -200,7 +200,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}.doSwitch(Util.getActor(variable));
 
 			if (!used) {
-				warning("The variable is never read",
+				warning("The variable " + variable.getName() + " is never read",
 						CalPackage.AST_VARIABLE__NAME);
 			}
 		} catch (Throwable t) {

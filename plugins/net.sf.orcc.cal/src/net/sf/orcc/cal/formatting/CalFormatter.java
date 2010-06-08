@@ -123,12 +123,11 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		AstActionElements access = f.getAstActionAccess();
 
 		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
+		c.setNoSpace().before(f.getAstInputPatternAccess().getColonKeyword_1());
 		c.setNoSpace().before(
-				f.getAstInputPatternAccess().getColonKeyword_0_1());
+				f.getAstInputPatternAccess().getCommaKeyword_4_0());
 		c.setNoSpace().before(
-				f.getAstInputPatternAccess().getCommaKeyword_3_0());
-		c.setNoSpace().before(
-				f.getAstInputPatternAccess().getLeftSquareBracketKeyword_1());
+				f.getAstInputPatternAccess().getLeftSquareBracketKeyword_2());
 	}
 
 	/**
@@ -141,12 +140,12 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		AstActionElements access = f.getAstActionAccess();
 
 		c.setNoSpace().before(access.getCommaKeyword_5_1_0());
+		c.setNoSpace()
+				.before(f.getAstOutputPatternAccess().getColonKeyword_1());
 		c.setNoSpace().before(
-				f.getAstOutputPatternAccess().getColonKeyword_0_1());
+				f.getAstOutputPatternAccess().getCommaKeyword_4_0());
 		c.setNoSpace().before(
-				f.getAstOutputPatternAccess().getCommaKeyword_3_0());
-		c.setNoSpace().before(
-				f.getAstOutputPatternAccess().getLeftSquareBracketKeyword_1());
+				f.getAstOutputPatternAccess().getLeftSquareBracketKeyword_2());
 	}
 
 	/**
