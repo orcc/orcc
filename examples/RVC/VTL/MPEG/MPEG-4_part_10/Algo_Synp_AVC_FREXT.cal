@@ -107,7 +107,6 @@ actor Algo_Synp_AVC_FREXT()
 	int(size=41) read_result_in_progress; 
 	uint bit_count := 0;
 	uint val_nb_rbsp_bytes := 0;
-
 	// ********** Read VLD ********** //
 	bool NewVLD := false;
 	int VLD_Counter;
@@ -3608,6 +3607,60 @@ actor Algo_Synp_AVC_FREXT()
 		
 	end
 	
+	procedure GiveMbPartIdx(int MBtype, int xW, int yW)
+	begin
+		if MBtype = 0 then
+			mbPartIdxN := 0;
+		else
+			if MBtype = 1 or MBtype > 4 then
+				if yW = 0 then
+					mbPartIdxN := 0;
+				else
+					mbPartIdxN := 1;
+				end
+			else
+				if MBtype = 2 then
+					if xW = 0 then
+						mbPartIdxN := 0;
+					else
+						mbPartIdxN := 1;
+					end
+				else
+					if MBtype = 3 or MBtype = 4 then
+						mbPartIdxN := ( yW * 2 ) + xW;
+					end
+				end
+			end
+		end
+	end
+
+	procedure GiveSubMbPartIdx(int currSubType, int xW,int yW)
+	begin
+		if currSubType = 0 then
+			subMbPartIdxN := 0;		
+		else
+			if currSubType = 1 then
+				if yW = 7 or yW = 15 then
+					subMbPartIdxN := 1;
+				else
+					subMbPartIdxN := 0;
+				end
+			else
+				if currSubType = 2 then
+					if xW = 7 or xW = 15 then
+						subMbPartIdxN := 1;
+					else
+						subMbPartIdxN := 0;
+					end
+				else
+					if currSubType = 3 then
+						mbPartIdxN := (( yW >> 2) * 2 ) + (xW >> 2);
+					end
+				end
+			end
+		end
+	end
+	
 	procedure GetCtxIdxMvd()
 	var
 		int condTermFlagA,
@@ -3615,6 +3668,7 @@ actor Algo_Synp_AVC_FREXT()
 		int predPartWidth,
 		int predModeEqualFlagA,
 		int predModeEqualFlagB,
+		int currSubMbType,
 		int absMvdCompA,
 		int absMvdCompB,
 		int x,
@@ -3624,19 +3678,20 @@ actor Algo_Synp_AVC_FREXT()
 		int xS,
 		int yS
 	begin
+		
+		currSubMbType := sub_mb_type[mbPartIdx];
 		//Inverse sub-macroclock partiontion scanning process
-		x := InverseRasterScan(subMbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
-		y := InverseRasterScan(subMbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
-		xS := 0;
-		yS := 0;
+		x := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
+		y := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
 		
-		//Only 16x16 Block Supported for the moment
-		if IS_P_Skip() or IS_B_Skip() or IS_B_Direct_16x16() then
-			predPartWidth := 16;
+		if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
+			xS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 0);
+			yS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 1);
 		else
-			predPartWidth := P_tab[mb_type][1];
+			xS := 0;
+			yS := 0;
 		end
-		
+			
 		//N = A
 		xN := x + xS - 1;
 		yN := y + yS;
@@ -3647,25 +3702,30 @@ actor Algo_Synp_AVC_FREXT()
 			mbPartIdxN    := -1;
 			subMbPartIdxN := -1;
 		else
-			mbPartIdxN    := ( (NeighMb_yW >> 2) * 4 ) + (NeighMb_xW >> 2);
-			subMbPartIdxN := ( (NeighMb_yW >> 2) * 2 ) + (NeighMb_xW >> 2);
-			//FIXME: whet partition is not yet decoded
+			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 2, NeighMb_yW >> 2);
+						
+			if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
+				GiveSubMbPartIdx(currSubMbType, NeighMb_xW, NeighMb_yW);
+			else
+				subMbPartIdxN := 0;
+			end
+			
 			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
-				if IS_SubMBPred_L0_CABAC(subMbPartIdxN, NeighMbAddr) and  IS_SubMBBiPred_CABAC(subMbPartIdxN, NeighMbAddr) then
-					predModeEqualFlagA := 1;
-				else
+				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
 					predModeEqualFlagA := 0;
+				else
+					predModeEqualFlagA := 1;
 				end
 			else
-				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) and  IS_MBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) then
-					predModeEqualFlagA := 1;
-				else
+				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
 					predModeEqualFlagA := 0;
+				else
+					predModeEqualFlagA := 1;
 				end
 			end
 		end
 		
-		if NeighMbAddr < -1 then
+		if not NeighMbAvail then
 			absMvdCompA := 0;
 		else
 			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagA = 0 then
@@ -3689,11 +3749,14 @@ actor Algo_Synp_AVC_FREXT()
 			mbPartIdxN    := -1;
 			subMbPartIdxN := -1;
 		else
-			mbPartIdxN    := ( (NeighMb_yW >> 2) * 4 ) + (NeighMb_xW >> 2);
-			subMbPartIdxN := ( (NeighMb_yW >> 2) * 2 ) + (NeighMb_xW >> 2);
-			//FIXME: whet partition is not yet decoded
+			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 2, NeighMb_yW >> 2);
+			if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
+				GiveSubMbPartIdx(currSubMbType, NeighMb_xW, NeighMb_yW);
+			else
+				subMbPartIdxN := 0;
+			end
 			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
-				if IS_SubMBPred_L0_CABAC(subMbPartIdxN, NeighMbAddr) and  IS_SubMBBiPred_CABAC(subMbPartIdxN, NeighMbAddr) then
+				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) and  IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) then
 					predModeEqualFlagB := 1;
 				else
 					predModeEqualFlagB := 0;
@@ -3707,7 +3770,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 		
-		if NeighMbAddr < -1 then
+		if not NeighMbAvail then
 			absMvdCompB := 0;
 		else
 			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagB = 0 then
