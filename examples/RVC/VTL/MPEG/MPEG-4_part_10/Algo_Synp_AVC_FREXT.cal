@@ -6845,8 +6845,7 @@ end
 	// else if(CABAC && (slice_type != I && slice_type != SI))
 	read_SliceD_mb_skip_flag: action ==>
 	guard
-		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
-		entropy_coding_mode_flag[pps_id] = 1
+		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI and IS_CABAC()
 	do
 		GetCabacMbSkipSyntaxElement();
 		StartCabacProcess();
@@ -6856,8 +6855,7 @@ end
 		
 	read_SliceD_mb_skip_flag_done: action ==>
 	guard
-		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
-		IS_CABAC() and cabac_end()
+		(slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI and IS_CABAC()) and cabac_end()
 		
 	do
 		mb_skip_flag := cabac_value();
@@ -7032,6 +7030,8 @@ end
 		moreDataFlag :=  if cabac_value() = 1 then 0 else 1 end;
 		//end if
 		//NextMbAddress();
+		// init FoundSE
+		FoundSE := 0;
 	end
 	
 	//while( moreDataFlag )
