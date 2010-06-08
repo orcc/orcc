@@ -141,16 +141,11 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_I4x4(int SliceType, int Mbtype) --> bool : (Mbtype = 0 ) and (SliceType = SLICE_TYPE_I) end
 	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
 	function IS_P(int SliceType) --> bool : SliceType = SLICE_TYPE_P end
-	function IS_MB_Type_P8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_P and mbTab[mbAdd][2] = 3 end
-	function IS_MB_Type_B8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_B and mbTab[mbAdd][2] = 22 end
 	
 	/* P and B Images */
 	function IS_P_Skip() --> bool: slice_type = SLICE_TYPE_P and mb_type = P_Skip end
 	function IS_B_Skip() --> bool:  slice_type = SLICE_TYPE_B and mb_type = B_Skip end
 	function ABS(int x) --> int: if x < 0 then -x else x end end
-	function IS_P_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] = P_Skip end
-	function IS_B_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] = B_Skip end
-	function IS_Intra_Pred_CABAC(int mbAddr) --> bool : ( mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] > 4) or (mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] > 22) end
 	function IS_P_8x8() --> bool: slice_type = SLICE_TYPE_P and mb_type = 3 end
 	function IS_B_Direct_16x16() --> bool: slice_type = SLICE_TYPE_B and mb_type = 0 end
 	function IS_B_8x8() --> bool: slice_type = SLICE_TYPE_B and mb_type = 22 end
@@ -300,8 +295,8 @@ actor Algo_Synp_AVC_FREXT()
 	
 	/* CABAC MVD and REF Lists */
 														  /*val_CurrMbAddr, mbPartIdx, subMbPartIdx,compIdx*/
-	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L0 :=  [ [ [ [ -1:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L1 :=  [ [ [ [ -1:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L0 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L1 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	
 	List ( type: List ( type: int, size = 4) , size = PICWIDTH*PICHEIGHT ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	
@@ -317,6 +312,16 @@ actor Algo_Synp_AVC_FREXT()
 	uint B_Skip = 255;
 	int tempCoeff;
 	
+	
+	/* CABAC Neighbourhood functions */
+	function IS_P_8x8_CABAC(int mbAddr) --> bool: mbTab[mbAddr][mbSliceType] = SLICE_TYPE_P and mbTab[mbAddr][mbTabMbtype] = 3 end
+	function IS_B_8x8_CABAC(int mbAddr) --> bool:  mbTab[mbAddr][mbSliceType] = SLICE_TYPE_B and mbTab[mbAddr][mbTabMbtype] = 22 end
+	function IS_P_8x8ref0_CABAC(int mbAddr) --> bool : mbTab[mbAddr][mbSliceType] = SLICE_TYPE_P and mbTab[mbAddr][mbTabMbtype] = 4 end
+	function IS_MB_Type_P8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_P and mbTab[mbAdd][2] = 3 end
+	function IS_MB_Type_B8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_B and mbTab[mbAdd][2] = 22 end
+	function IS_P_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] = P_Skip end
+	function IS_B_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] = B_Skip end
+	function IS_Intra_Pred_CABAC(int mbAddr) --> bool : ( mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] > 4) or (mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] > 22) end
 	/* MVD and REF CABAC Neighbouring */
 	
 	int mbAddrN;
@@ -3654,7 +3659,21 @@ actor Algo_Synp_AVC_FREXT()
 					end
 				else
 					if currSubType = 3 then
-						mbPartIdxN := (( yW >> 2) * 2 ) + (xW >> 2);
+						if (xW = 3 and yW = 0) or (xW = 12 and yW = 0) or  (xW = 3 and yW = 8) or (xW = 11 and yW = 8) then
+							subMbPartIdxN := 0;
+						else
+							if (xW = 7 and yW = 0) or (xW = 15 and yW = 0) or  (xW = 7 and yW = 8) or (xW = 15 and yW = 8) then
+								subMbPartIdxN := 1;
+							else	
+								if (xW = 3 and yW = 4) or (xW = 12 and yW = 4) or  (xW = 3 and yW = 12) or (xW = 11 and yW = 12) then
+									subMbPartIdxN := 2;
+								else
+									if (xW = 7 and yW = 4) or (xW = 15 and yW = 4) or  (xW = 7 and yW = 12) or (xW = 15 and yW = 12) then
+										subMbPartIdxN := 3;
+									end
+								end
+							end
+						end			
 					end
 				end
 			end
@@ -3705,7 +3724,7 @@ actor Algo_Synp_AVC_FREXT()
 		else
 			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
 						
-			if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
+			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
 				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW);
 			else
 				subMbPartIdxN := 0;
@@ -3749,7 +3768,7 @@ actor Algo_Synp_AVC_FREXT()
 		else
 			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
 						
-			if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
+			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
 				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW);
 			else
 				subMbPartIdxN := 0;
