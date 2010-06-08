@@ -103,4 +103,13 @@ public class StateVariable extends Variable {
 		return assignable;
 	}
 
+	/**
+	 * Returns <code>true</code> if this state variable has an initial value.
+	 * 
+	 * @return <code>true</code> if this state variable has an initial value
+	 */
+	public boolean isConstantValue() {
+		return (initialValue != null);
+	}
+
 }
