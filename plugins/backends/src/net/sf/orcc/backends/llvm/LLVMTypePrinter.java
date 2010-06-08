@@ -44,18 +44,6 @@ import net.sf.orcc.ir.type.VoidType;
  */
 public class LLVMTypePrinter extends TypePrinter {
 
-	private void printInt(int size) {
-		if (size <= 8) {
-			builder.append("i8");
-		} else if (size <= 16) {
-			builder.append("i16");
-		} else if (size <= 32) {
-			builder.append("i32");
-		} else if (size <= 64) {
-			builder.append("i64");
-		}
-	}
-
 	@Override
 	public void visit(BoolType type) {
 		// boolean is a 1-bit integer.
@@ -64,7 +52,7 @@ public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(IntType type) {
-		printInt(type.getSize());
+		builder.append("i"+type.getSize());
 	}
 
 	@Override
@@ -84,7 +72,7 @@ public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(UintType type) {
-		printInt(type.getSize());
+		builder.append("i"+type.getSize());
 	}
 
 	@Override

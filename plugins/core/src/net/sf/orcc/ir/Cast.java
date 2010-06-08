@@ -55,33 +55,20 @@ public class Cast {
 	 * @return integer corresponding to the size of the selected type
 	 */
 	private int getSizeOf(Type type) {
-		int size = 0;
-		
-		// Select particular size of the type
+		// Select a particular size according to type
 		if (type.isBool()) {
 			return 1;
 		} else if (type.isInt()) {
 			IntType intType = (IntType) type;
-			size = intType.getSize();
+			return intType.getSize();
 		} else if (type.isUint()) {
 			UintType uintType = (UintType) type;
-			size = uintType.getSize();
+			return uintType.getSize();
 		} else if (type.isList()) {
 			ListType listType = (ListType) type;
 			return getSizeOf(listType.getElementType());
 		}
-		
-		//In case of int or uint return a normalized size
-		if (size <= 8) {
-			return 8;
-		} else if (size <= 16) {
-			return 16;
-		} else if (size <= 32) {
-			return 32;
-		} else if (size <= 64) {
-			return 64;
-		}
-		
+
 		return 0;
 	}
 
