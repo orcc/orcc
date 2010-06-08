@@ -18,28 +18,60 @@ $variable.type$ $variable$$listSize(variable.type.dimensions)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Const state variables
+// Constants
 ///////////////////////////////////////////////////////////////////////////////
 
+Constant(constant) ::= <<
+$(constant.class.simpleName)(constant)$
+>>
+
 Boolean(constant) ::= <<
+$if(constant)$true$else$false$endif$
+>>
+
+Integer(constant) ::= <<
 $constant$
 >>
 
-stateVar(variable) ::= <<
-$if(variable.constantValue)$
-$variableDeclaration(variable)$ = $Constant(variable.constantValue)$;$\n$
-$endif$
+// the values of a list: {val1, val2, ..., valn}
+List(constant) ::= <<
+{$constant: Constant(); wrap, separator=", "$}
+>>
+
+ArrayList(constant) ::= <<$List(constant)$>>
+
+String(constant) ::= <<
+"$constant$"
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Non-const State variables
+// Constants
 ///////////////////////////////////////////////////////////////////////////////
-nonConstStateVar(variable) ::= <<
-$if(!variable.constantValue)$
-$if(variable.type.dimensions)$
+
+defineConstantVars(variables) ::= <<
+namespace
+{
+	$variables:defineConstantVar()$}
+>>
+
+defineConstantVar(variable) ::= <<
+$if(!variable.assignable)$
+const $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;$\n$$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// State variables
+///////////////////////////////////////////////////////////////////////////////
+StateVar(variable) ::= <<
+$if(variable.assignable)$
+$if(variable.type.list)$
 $variable$ = new $variable.type$$listSize(variable.type.dimensions)$;
 $endif$
+$if(variable.initialized)$
+$variable$ = $Constant(variable.constantValue)$;
 $endif$
+$endif$
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -341,9 +373,7 @@ _FSM_state(state_$actor.actionScheduler.fsm.initialState$),
 $endif$
 ActorGen($length(actor.inputs.list)$, $length(actor.outputs.list)$)
 {
-	$stateVars : nonConstStateVar()$
-}
-
+	$stateVars : StateVar()$}
 
 >>
 
@@ -353,18 +383,11 @@ ActorGen($length(actor.inputs.list)$, $length(actor.outputs.list)$)
 
 actor(actor) ::= <<
 
-#include "Actor_$actor.name$.h"
+#include "$actor.name$.h"
 
-////////////////////////////////////////////////////////////////////////////////
-// State variables of the actor
-namespace
-{
-	$actor.stateVars.list: stateVar()$}
-
-
+$defineConstantVars(actor.stateVars.list)$
 
 $constructor(parameters=actor.parameters.list, stateVars=actor.stateVars.list)$
-
 
 void actor_$actor.name$::initializeActor()
 {

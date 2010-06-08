@@ -1,6 +1,6 @@
 printActor(id, actor) ::= <<
 $if (!actor.system)$
-Actor_$actor.name$.cpp
+$actor.name$.cpp
 $endif$
 
 >>
@@ -13,7 +13,7 @@ $endif$
 >>
 
 printSubnetwork(net) ::= <<
-Network_$net.name$.cpp
+$net.name$.cpp
 $net.instances: printInstance();separator="\n"$
 
 >>

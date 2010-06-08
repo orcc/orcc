@@ -16,7 +16,7 @@ $variable.type$$declarePointer(variable.type.dimensions)$ $variable$
 // Non-const state variables
 ///////////////////////////////////////////////////////////////////////////////
 nonConstStateVar(variable) ::= <<
-$if(!variable.constantValue)$
+$if(variable.assignable)$
 $variableDeclaration(variable)$;$\n$
 $endif$
 >>

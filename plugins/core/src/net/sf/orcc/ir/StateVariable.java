@@ -108,7 +108,7 @@ public class StateVariable extends Variable {
 	 * 
 	 * @return <code>true</code> if this state variable has an initial value
 	 */
-	public boolean isConstantValue() {
+	public boolean isInitialized() {
 		return (initialValue != null);
 	}
 

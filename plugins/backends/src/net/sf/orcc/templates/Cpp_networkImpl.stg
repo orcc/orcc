@@ -121,7 +121,7 @@ network(debugFifos, fifoSize, network, connectionMap, multicoreConnection) ::= <
  * Generated from "$network.name$"
  */
  
-#include "Network_$network.name$.h"
+#include "$network.name$.h"
 
 #define SIZE 10000
 
