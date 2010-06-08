@@ -55,19 +55,33 @@ public class Cast {
 	 * @return integer corresponding to the size of the selected type
 	 */
 	private int getSizeOf(Type type) {
+		int size = 0;
+		
+		// Select particular size of the type
 		if (type.isBool()) {
 			return 1;
 		} else if (type.isInt()) {
 			IntType intType = (IntType) type;
-			return intType.getSize();
+			size = intType.getSize();
 		} else if (type.isUint()) {
 			UintType uintType = (UintType) type;
-			return uintType.getSize();
+			size = uintType.getSize();
 		} else if (type.isList()) {
 			ListType listType = (ListType) type;
 			return getSizeOf(listType.getElementType());
 		}
-
+		
+		//In case of int or uint return a normalized size
+		if (size <= 8) {
+			return 8;
+		} else if (size <= 16) {
+			return 16;
+		} else if (size <= 32) {
+			return 32;
+		} else if (size <= 64) {
+			return 64;
+		}
+		
 		return 0;
 	}
 
@@ -96,14 +110,6 @@ public class Cast {
 	 *         type
 	 */
 	public boolean isExtended() {
-		if (source.equals(target)) {
-			return false;
-		}
-
-		if (source.toString().equals(target.toString())) {
-			return false;
-		}
-
 		if (target.isList()) {
 			ListType list = (ListType) target;
 			if (source.toString().equals(list.getElementType().toString())) {
@@ -141,14 +147,6 @@ public class Cast {
 	 *         type
 	 */
 	public boolean isTrunced() {
-		if (source.equals(target)) {
-			return false;
-		}
-
-		if (source.toString().equals(target.toString())) {
-			return false;
-		}
-
 		if (target.isList()) {
 			ListType list = (ListType) target;
 			if (source.toString().equals(list.getElementType().toString())) {
