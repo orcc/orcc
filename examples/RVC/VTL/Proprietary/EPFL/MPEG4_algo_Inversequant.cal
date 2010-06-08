@@ -62,7 +62,7 @@ int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 
 	action QP:[ q ], DC:[ dc ], AC:[ ac ] repeat 63 ==> OUT:[ v ] repeat 64
 	var
-		List(type: int, size=64) v = [ 0 : for int i in Integers(0, 63) ]
+		List(type: int, size=64) v := [ 0 : for int i in Integers(0, 63) ]
 	do
 		quant := q;
 		round := bitxor(bitand(q, 1), 1);

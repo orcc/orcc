@@ -94,7 +94,7 @@ int(size=PIX_SZ) VID :
 	// compensation action
 	motion: action halfpel:[ f ], RA:[ d ] repeat 81, WA:[ a ] repeat 64 ==> VID:[ mot ] repeat 64
 	var
-		List(type: int, size=64) mot = [ 0 : for int n in Integers(0, 63) ]
+		List(type: int, size=64) mot := [ 0 : for int n in Integers(0, 63) ]
 	do
 		flags := rshift(f, 1);
 		round := bitand(f, 1);
@@ -112,8 +112,8 @@ int(size=PIX_SZ) VID :
 	combine: action halfpel:[ f ], RA:[ d ] repeat 81, WA:[ a ] repeat 64, TEX:[ tex ] repeat 64 ==> VID:
 		[ vid ] repeat 64
 	var
-		int output , List(type: int, size=64) mot = [ 0 : for int n1 in Integers(0, 63) ] ,
-		List(type: int, size=64) vid = [ 0 : for int n2 in Integers(0, 63) ]
+		int output , List(type: int, size=64) mot := [ 0 : for int n1 in Integers(0, 63) ] ,
+		List(type: int, size=64) vid := [ 0 : for int n2 in Integers(0, 63) ]
 	do
 		flags := rshift(f, 1);
 		round := bitand(f, 1);

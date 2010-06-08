@@ -25,7 +25,7 @@ actor PredictedBlock () int In0, int In1, int In2, int In3, int Position, int Bl
 		row[3]:=in3;
 	end
 	
-	fireRow: action ==> [row[i-1]]
+	fireRow: action ==> Out:[row[i-1]]
 	guard nblocks=pos and i<4 
 	do	
 		i := i + 1;

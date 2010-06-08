@@ -378,7 +378,7 @@ EdgeLoops: action ==>
   guard
     MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
   var 
-  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)) buff=[0:for int s in Integers(0,(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1)],
+  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)) buff := [0:for int s in Integers(0,(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1)],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int j in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int k in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
     List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int l in Integers(0, MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ],
@@ -396,7 +396,7 @@ EdgeLoops: action ==>
  
  OutMB_LUMA: action ==> DB_O:[buff] repeat (MB_BLOCK_SIZE_LUMA+4) * (MB_BLOCK_SIZE_LUMA+4)
   var 
-  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)) buff=[0:for int s in Integers(0,(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1)],
+  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)) buff := [0:for int s in Integers(0,(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1)],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) upbuf := [0 : for int j in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) leftbuf := [0 : for int k in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ],
     List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int l in Integers(0, MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1) ],

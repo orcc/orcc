@@ -560,7 +560,7 @@ DBI_CHROMA: action ==> DB_I:[buff] repeat (MB_BLOCK_SIZE_CHROMA+4) * (MB_BLOCK_S
   guard
   	MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
   var 
-  	List(type:uint(size=SAMPLE_SZ),size=(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4))buff=[0:for int s in Integers(0,(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1)],
+  	List(type:uint(size=SAMPLE_SZ),size=(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4))buff := [0:for int s in Integers(0,(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1)],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int o in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
     List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ],
@@ -577,7 +577,7 @@ DBI_CHROMA: action ==> DB_I:[buff] repeat (MB_BLOCK_SIZE_CHROMA+4) * (MB_BLOCK_S
 
 DBI_LUMA: action ==> DB_I:[buff] repeat (MB_BLOCK_SIZE_LUMA+4) * (MB_BLOCK_SIZE_LUMA+4)
   var 
-  	List(type:uint(size=SAMPLE_SZ),size=(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4))buff=[0:for int s in Integers(0,(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1)],
+  	List(type:uint(size=SAMPLE_SZ),size=(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4))buff := [0:for int s in Integers(0,(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1)],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) upbuf := [0 : for int o in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ],
     List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1) ],
@@ -596,15 +596,26 @@ DBO_CHROMA: action DB_O:[v] repeat (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROM
 guard
 	MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
 var
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int os in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
-    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ],
-    int uc:=0, int lc:=0, int cc:=0     
+	List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int os in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
+	List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
+	List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ],
+	int uc:=0, int lc:=0, int cc:=0     
 do      
-  
-    foreach int i in Integers(0, (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1) do
-      if (i<4*(MB_BLOCK_SIZE_CHROMA+4)) then  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
-      else  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
+	foreach int i in Integers(0, (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1) do
+		if i < 4*(MB_BLOCK_SIZE_CHROMA+4) then
+			if (i mod (MB_BLOCK_SIZE_CHROMA+4)) > 3 then
+				upbuf[uc] := v[i];
+				uc := uc + 1;
+			end
+		else
+			if (i mod (MB_BLOCK_SIZE_CHROMA+4)) > 3 then
+				currbuf[cc] := v[i];
+				cc := cc+1;
+      		else
+				leftbuf[lc]:=v[i];
+				lc:=lc+1;
+			end
+		end
     end
     foreach int y in Integers(0, MB_BLOCK_SIZE_CHROMA-1) do
         foreach int x in Integers(0, MB_BLOCK_SIZE_CHROMA-1) do  curr_mb[y,x]:= currbuf[x + y * MB_BLOCK_SIZE_CHROMA]; end
@@ -656,7 +667,7 @@ OutMB_CHROMA: action ==>  WD:[buff] repeat MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_
     (mb_y>0) and mb_y<MB_Height,
     MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
   var 
-      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA) buff = [ 0 :for int s in Integers(0,MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ] 
+      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA) buff := [ 0 :for int s in Integers(0,MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ] 
   do    
     foreach int y in Integers(0,MB_BLOCK_SIZE_CHROMA-1) do
       foreach int x in Integers(0,MB_BLOCK_SIZE_CHROMA-1) do  
@@ -669,7 +680,7 @@ OutMB_LUMA: action ==>  WD:[buff] repeat MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA
   guard 
     (mb_y>0) and mb_y<MB_Height
   var 
-      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA) buff = [ 0 :for int s in Integers(0,MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1) ] 
+      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA) buff := [ 0 :for int s in Integers(0,MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1) ] 
   do    
     foreach int y in Integers(0,MB_BLOCK_SIZE_LUMA-1) do
       foreach int x in Integers(0,MB_BLOCK_SIZE_LUMA-1) do  
@@ -717,7 +728,7 @@ flush_fifo_CHROMA: action  ==>  WD:[buff] repeat MB_BLOCK_SIZE_CHROMA * MB_BLOCK
   guard 
     MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
   var 
-      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA) buff = [ 0 :for int s in Integers(0,MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ] 
+      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA) buff := [ 0 :for int s in Integers(0,MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ] 
   do    
     foreach int y in Integers(0,MB_BLOCK_SIZE_CHROMA-1) do
       foreach int x in Integers(0,MB_BLOCK_SIZE_CHROMA-1) do  
@@ -728,7 +739,7 @@ end
 
 flush_fifo_LUMA: action  ==>  WD:[buff] repeat MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA 
   var 
-      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA) buff = [ 0 :for int s in Integers(0,MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1) ] 
+      List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA) buff := [ 0 :for int s in Integers(0,MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1) ] 
   do    
     foreach int y in Integers(0,MB_BLOCK_SIZE_LUMA-1) do
       foreach int x in Integers(0,MB_BLOCK_SIZE_LUMA-1) do  

@@ -45,7 +45,7 @@ int(size=SAMPLE_SZ) PQF_AC :
 
 	read_write: action AC_PRED_DIR:[ mode ], QFS_AC:[ ac ] repeat 63 ==> PQF_AC:[ o ] repeat 63
 	var
-		List(type: int(size=32), size=63) o = [ 0 : for int n in Integers(0, 62) ]
+		List(type: int(size=32), size=63) o := [ 0 : for int n in Integers(0, 62) ]
 	do
 		addr := if mode = 0 then
 			0

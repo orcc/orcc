@@ -237,7 +237,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			MB_WIDTH = MB_WIDTH_CHROMA
 		var
 			uint         CurrAddrInPix,
-			List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH_CHROMA*MB_WIDTH_CHROMA) ] 
+			List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff := [ 0 :for int t in Integers(0,MB_WIDTH_CHROMA*MB_WIDTH_CHROMA) ] 
 		do
 			CurrAddrInPix := (nbMBdisplay mod PicWidthInMacroB)*MB_WIDTH_CHROMA + (nbMBdisplay / PicWidthInMacroB)*MB_WIDTH_CHROMA*MB_WIDTH_CHROMA*PicWidthInMacroB ;
 			foreach int y in Integers(0, (MB_WIDTH_CHROMA-1))
@@ -259,7 +259,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			MB_WIDTH != MB_WIDTH_CHROMA
 		var
 			uint         CurrAddrInPix,
-			List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff = [ 0 :for int t in Integers(0,MB_WIDTH_LUMA*MB_WIDTH_LUMA) ] 
+			List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff := [ 0 :for int t in Integers(0,MB_WIDTH_LUMA*MB_WIDTH_LUMA) ] 
 		do
 			CurrAddrInPix := (nbMBdisplay mod PicWidthInMacroB)*MB_WIDTH_LUMA + (nbMBdisplay / PicWidthInMacroB)*MB_WIDTH_LUMA*MB_WIDTH_LUMA*PicWidthInMacroB ;
 			foreach int y in Integers(0, (MB_WIDTH_LUMA-1))
