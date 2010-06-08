@@ -178,16 +178,19 @@ VarDef_decl_MD(var) ::= <<
 
 State_MD(fsm) ::= <<
 $State_decl_MD()$ = metadata  !{$fsm.states: varState_MD() ; separator=","$}
+
 >>
 
 Transitions_MD(fsm) ::= <<
 $Transitions_decl_MD()$ = metadata  !{$fsm.transitions: { metadata $Transition_decl_MD(i)$ }; separator=", "$ }
 $fsm.transitions: {transition | $Transition_MD(index = i, transition = transition)$}$ 
+
 >>
 
 Transition_MD(index, transition) ::= <<
 $Transition_decl_MD(index)$ = metadata  !{ $varState_MD(transition.sourceState)$, $transition.nextStateInfo: { metadata $NextState_decl_MD(transition=index, state= i)$ }; separator=", "$}
 $transition.nextStateInfo: {nextStateInfo | $NextState_MD(stateIndex = index, nextStateIndex = i,nextState = nextStateInfo)$}$
+
 >>
 
 NextState_MD(stateIndex, nextStateIndex, nextState) ::= <<
@@ -197,6 +200,7 @@ $NextState_decl_MD(transition = stateIndex, state = nextStateIndex)$ = metadata 
 
 Type_MD(var) ::= <<
 $Type_decl_MD(var)$ = metadata  !{$varType_MD(var)$}
+
 >>
 
 Location_MD(var) ::=<<
