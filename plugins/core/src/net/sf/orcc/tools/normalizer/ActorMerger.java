@@ -473,11 +473,12 @@ public class ActorMerger implements INetworkTransformation {
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 		ActionList actions = new ActionList();
 		ActionList initializes = new ActionList();
-		ActionScheduler scheduler = new ActionScheduler(actions.getList(), null);
+		ActionScheduler scheduler = new ActionScheduler(
+				actions.getAllActions(), null);
 
 		Actor actor = new Actor("cluster_" + clusterIdx++, "", parameters,
-				inputs, outputs, stateVars, procs, actions.getList(),
-				initializes.getList(), scheduler, null);
+				inputs, outputs, stateVars, procs, actions.getAllActions(),
+				initializes.getAllActions(), scheduler, null);
 
 		createInternalBuffers();
 		Action action = createAction();

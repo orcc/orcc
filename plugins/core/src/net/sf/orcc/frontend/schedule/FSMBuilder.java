@@ -173,7 +173,7 @@ public class FSMBuilder {
 		for (UniqueEdge edge : edges) {
 			String target = graph.getEdgeTarget(edge);
 			Tag tag = (Tag) edge.getObject();
-			List<Action> actions = actionList.getActions(tag);
+			List<Action> actions = actionList.getTaggedActions(tag);
 			if (actions == null) {
 				// non-existent target state
 				System.out.println("non-existent target state: " + edge);

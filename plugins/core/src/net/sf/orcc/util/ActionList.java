@@ -47,9 +47,11 @@ import net.sf.orcc.ir.Tag;
  */
 public class ActionList implements Iterable<Action> {
 
-	private List<Action> actionList;
+	final private List<Action> actionList;
 
-	private Map<Tag, List<Action>> tagMap;
+	final private Map<Tag, List<Action>> tagMap;
+
+	final private List<Action> untaggedList;
 
 	/**
 	 * Creates an empty action list.
@@ -57,6 +59,7 @@ public class ActionList implements Iterable<Action> {
 	public ActionList() {
 		actionList = new ArrayList<Action>();
 		tagMap = new HashMap<Tag, List<Action>>();
+		untaggedList = new ArrayList<Action>();
 	}
 
 	/**
@@ -69,7 +72,9 @@ public class ActionList implements Iterable<Action> {
 		actionList.add(action);
 
 		Tag tag = action.getTag();
-		if (!tag.isEmpty()) {
+		if (tag.isEmpty()) {
+			untaggedList.add(action);
+		} else {
 			// a tag has the form a.b.c
 			// we add the action to the tagMap for entries:
 			// [a]; [a, b]; [a, b, c]
@@ -97,23 +102,32 @@ public class ActionList implements Iterable<Action> {
 	}
 
 	/**
+	 * Returns the list of actions (tagged or untagged)
+	 * 
+	 * @return the list of actions (tagged or untagged)
+	 */
+	public List<Action> getAllActions() {
+		return actionList;
+	}
+
+	/**
 	 * Returns the list of actions that match the given tag.
 	 * 
 	 * @param tag
 	 *            a tag
 	 * @return the list of actions that match the given tag
 	 */
-	public List<Action> getActions(Tag tag) {
+	public List<Action> getTaggedActions(Tag tag) {
 		return tagMap.get(tag);
 	}
 
 	/**
-	 * Returns the list of objects of this scope
+	 * Returns the list of untagged actions.
 	 * 
-	 * @return the list of objects of this scope
+	 * @return the list of untagged actions
 	 */
-	public List<Action> getList() {
-		return actionList;
+	public List<Action> getUntaggedActions() {
+		return untaggedList;
 	}
 
 	@Override

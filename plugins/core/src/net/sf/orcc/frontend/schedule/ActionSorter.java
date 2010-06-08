@@ -162,8 +162,9 @@ public class ActionSorter {
 				Tag previousTag = new Tag(it.next().getIdentifiers());
 				while (it.hasNext()) {
 					Tag tag = new Tag(it.next().getIdentifiers());
-					List<Action> sources = actionList.getActions(previousTag);
-					List<Action> targets = actionList.getActions(tag);
+					List<Action> sources = actionList
+							.getTaggedActions(previousTag);
+					List<Action> targets = actionList.getTaggedActions(tag);
 					for (Action source : sources) {
 						for (Action target : targets) {
 							graph.addEdge(source, target);

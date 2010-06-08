@@ -42,6 +42,15 @@ public class ActionScheduler {
 
 	private FSM fsm;
 
+	/**
+	 * Creates a new scheduler. The given list of actions contains actions that
+	 * run outside of an FSM.
+	 * 
+	 * @param actions
+	 *            a list of actions that run outside of an FSM
+	 * @param fsm
+	 *            an FSM, or <code>null</code> if there is no FSM
+	 */
 	public ActionScheduler(List<Action> actions, FSM fsm) {
 		this.actions = actions;
 		this.fsm = fsm;

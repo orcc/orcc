@@ -496,19 +496,19 @@ public class AstTransformer {
 
 		// transform FSM
 		AstSchedule schedule = astActor.getSchedule();
-		FSM fsm = null;
-		if (schedule != null) {
+		ActionScheduler scheduler;
+		if (schedule == null) {
+			scheduler = new ActionScheduler(actions.getAllActions(), null);
+		} else {
 			FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
-			fsm = builder.buildFSM(actions);
+			FSM fsm = builder.buildFSM(actions);
+			scheduler = new ActionScheduler(actions.getUntaggedActions(), fsm);
 		}
-
-		// create action scheduler
-		ActionScheduler scheduler = new ActionScheduler(actions.getList(), fsm);
 
 		// create IR actor
 		return new Actor(name, file, parameters, inputs, outputs, stateVars,
-				procedures, actions.getList(), initializes.getList(),
-				scheduler, null);
+				procedures, actions.getAllActions(),
+				initializes.getAllActions(), scheduler, null);
 	}
 
 	/**
