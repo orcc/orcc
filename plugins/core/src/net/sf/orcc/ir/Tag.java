@@ -116,6 +116,15 @@ public class Tag implements Comparable<Tag>, Iterable<String> {
 		return identifiers.get(index);
 	}
 
+	/**
+	 * Returns the identifier tags.
+	 * 
+	 * @return a list of identifier
+	 */
+	public List<String> getTags() {
+		return identifiers;
+	}
+
 	@Override
 	public int hashCode() {
 		return identifiers.hashCode();

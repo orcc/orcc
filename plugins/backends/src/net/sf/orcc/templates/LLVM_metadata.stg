@@ -96,7 +96,8 @@ $endif$
 >>
 
 action_MD(action) ::= <<
-$action_decl_MD(action)$ = metadata !{metadata $Sched_decl_MD(action)$, metadata $Body_decl_MD(action)$}
+$action_decl_MD(action)$ = metadata !{metadata $Tag_decl_MD(action)$, metadata $Sched_decl_MD(action)$, metadata $Body_decl_MD(action)$}
+$Tag_MD(action)$
 $Sched_MD(action)$
 $Body_MD(action)$
 >>
@@ -160,16 +161,20 @@ Body_decl_MD(proc) ::= <<
 !$Location(proc.location)$1
 >>
 
-Location_decl_MD(var) ::= <<
-!$Location(var.location)$2
+Tag_decl_MD(proc) ::= <<
+!$Location(proc.location)$2
 >>
 
-Type_decl_MD(var) ::= <<
+Location_decl_MD(var) ::= <<
 !$Location(var.location)$3
 >>
 
-VarDef_decl_MD(var) ::= <<
+Type_decl_MD(var) ::= <<
 !$Location(var.location)$4
+>>
+
+VarDef_decl_MD(var) ::= <<
+!$Location(var.location)$5
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -210,6 +215,10 @@ $Location_decl_MD(var)$ = metadata  !{$startLine_MD(var)$, $startColumn_MD(var)$
 Sched_MD(action) ::= <<
 $Sched_decl_MD(action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExtern_MD(action.scheduler)$, i1()* @$action.scheduler$}
 
+>>
+
+Tag_MD(action)::=<<
+$Tag_decl_MD(action)$ = metadata  !{$action.tag.tags: varTag_MD() ; separator=", "$}
 >>
 
 
@@ -281,6 +290,10 @@ i32 $var.location.endColumn$
 
 varState_MD(state) ::= <<
 metadata !"$state$"
+>>
+
+varTag_MD(tag) ::= <<
+metadata !"$tag$"
 >>
 
 
