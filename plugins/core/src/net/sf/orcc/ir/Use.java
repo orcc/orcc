@@ -199,7 +199,7 @@ public class Use {
 	}
 
 	/**
-	 * Returns the node referenced by this use.May be <code>null</code> if the
+	 * Returns the node referenced by this use. May be <code>null</code> if the
 	 * information is not available.
 	 * 
 	 * @return the node referenced by this use

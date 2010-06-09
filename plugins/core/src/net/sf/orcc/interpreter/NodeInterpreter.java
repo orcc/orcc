@@ -297,7 +297,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(Store instr, Object... args) {
-		Variable variable = instr.getTarget().getVariable();
+		Variable variable = instr.getTarget();
 		if (instr.getIndexes().isEmpty()) {
 			variable.setValue(instr.getValue().accept(exprInterpreter));
 		} else {

@@ -212,10 +212,8 @@ public class StaticActorNormalizer {
 			stateVars.add(actor.getFile(), varCount.getLocation(),
 					varCount.getName(), varCount);
 
-			Use use = new Use(varCount);
-			Store store = new Store(use, new ArrayList<Expression>(),
+			Store store = new Store(varCount, new ArrayList<Expression>(),
 					new IntExpr(0));
-			use.setNode(store);
 			block.add(store);
 		}
 	}

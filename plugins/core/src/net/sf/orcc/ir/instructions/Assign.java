@@ -104,18 +104,23 @@ public class Assign extends AbstractInstruction implements
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void internalSetTarget(LocalVariable target) {
 		this.target = target;
+	}
+
+	@Override
+	public void internalSetValue(Expression value) {
+		this.value = value;
+	}
+
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
 	}
 
 	@Override
 	public void setValue(Expression value) {
 		CommonNodeOperations.setValue(this, value);
-	}
-
-	@Override
-	public void setValueSimple(Expression value) {
-		this.value = value;
 	}
 
 	@Override

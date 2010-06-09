@@ -806,7 +806,7 @@ public class IRParser {
 
 	private Store parseStore(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		Use target = parseVarUse(array.getJSONArray(0));
+		Variable target = getVariable(array.getJSONArray(0));
 		List<Expression> indexes = parseExprs(array.getJSONArray(1));
 		Expression value = parseExpr(array.getJSONArray(2));
 

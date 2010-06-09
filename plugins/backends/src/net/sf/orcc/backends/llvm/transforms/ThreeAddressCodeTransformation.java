@@ -362,7 +362,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		block = store.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = store.getValue();
-		Variable target = store.getTarget().getVariable();
+		Variable target = store.getTarget();
 		Type targetType = target.getType();
 
 		if (targetType.isList()) {

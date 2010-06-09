@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.type;
 
-
 /**
  * This class defines an unsigned integer type.
  * 

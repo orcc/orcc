@@ -96,6 +96,11 @@ public class IfNode extends AbstractNode implements ValueContainer {
 		return value;
 	}
 
+	@Override
+	public void internalSetValue(Expression value) {
+		this.value = value;
+	}
+
 	public void setJoinNode(BlockNode joinNode) {
 		this.joinNode = joinNode;
 	}
@@ -103,11 +108,6 @@ public class IfNode extends AbstractNode implements ValueContainer {
 	@Override
 	public void setValue(Expression value) {
 		CommonNodeOperations.setValue(this, value);
-	}
-
-	@Override
-	public void setValueSimple(Expression value) {
-		this.value = value;
 	}
 
 	@Override

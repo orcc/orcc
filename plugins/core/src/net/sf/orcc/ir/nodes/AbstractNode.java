@@ -131,4 +131,14 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 		return successors;
 	}
 
+	@Override
+	public boolean isCFGNode() {
+		return true;
+	}
+
+	@Override
+	public boolean isInstruction() {
+		return false;
+	}
+
 }

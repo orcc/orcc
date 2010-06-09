@@ -32,6 +32,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines an instruction that performs an operation on a port. This
@@ -80,6 +81,11 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 		return target;
 	}
 
+	@Override
+	public void internalSetTarget(Variable target) {
+		this.target = target;
+	}
+
 	/**
 	 * Returns true if this FIFO operation is a unit operation, which means it
 	 * uses exactly one token from its port.
@@ -118,7 +124,7 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 
 	@Override
 	public void setTarget(Variable target) {
-		this.target = target;
+		CommonNodeOperations.setTarget(this, target);
 	}
 
 }

@@ -37,6 +37,7 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines an instruction that Loads data from memory to a local
@@ -108,7 +109,19 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 		return target;
 	}
 
-	public void setIndexes(List<Expression> indexes) {
+	@Override
+	public void internalSetTarget(LocalVariable target) {
+		this.target = target;
+	}
+
+	/**
+	 * Sets the indexes of this load instruction. Uses are updated to point to
+	 * this instruction.
+	 * 
+	 * @param indexes
+	 *            a list of expressions
+	 */
+	private void setIndexes(List<Expression> indexes) {
 		if (this.indexes != null) {
 			Use.removeUses(this, this.indexes);
 		}
@@ -128,7 +141,7 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 
 	@Override
 	public void setTarget(LocalVariable target) {
-		this.target = target;
+		CommonNodeOperations.setTarget(this, target);
 	}
 
 	@Override

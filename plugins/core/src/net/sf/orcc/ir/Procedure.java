@@ -55,10 +55,6 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class Procedure extends AbstractLocalizable implements INameable {
 
-	public static final Procedure print = new Procedure("print", true,
-			new Location(), new VoidType(), new OrderedMap<Variable>(),
-			new OrderedMap<Variable>(), new ArrayList<CFGNode>());
-
 	/**
 	 * This class visits the procedure to find the state variables used.
 	 * 
@@ -122,8 +118,8 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		}
 
 		@Override
-		public void visit(Store node, Object... args) {
-			Variable var = node.getTarget().getVariable();
+		public void visit(Store store, Object... args) {
+			Variable var = store.getTarget();
 			if (!var.getType().isList()) {
 				vars.add((StateVariable) var);
 			}
@@ -136,6 +132,10 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		}
 
 	}
+
+	public static final Procedure print = new Procedure("print", true,
+			new Location(), new VoidType(), new OrderedMap<Variable>(),
+			new OrderedMap<Variable>(), new ArrayList<CFGNode>());
 
 	/**
 	 * whether this procedure is external.

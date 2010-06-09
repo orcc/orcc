@@ -331,7 +331,7 @@ public class IRWriter {
 			JSONArray body = new JSONArray();
 			instr.put(body);
 
-			body.put(writeVariable(store.getTarget().getVariable()));
+			body.put(writeVariable(store.getTarget()));
 			body.put(writeExpressions(store.getIndexes()));
 			body.put(writeExpression(store.getValue()));
 		}

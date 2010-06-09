@@ -34,6 +34,7 @@ import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines an assignment of the result of a <code>phi</code> function
@@ -84,8 +85,13 @@ public class PhiAssignment extends AbstractInstruction implements
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void internalSetTarget(LocalVariable target) {
 		this.target = target;
+	}
+
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
 	}
 
 	@Override

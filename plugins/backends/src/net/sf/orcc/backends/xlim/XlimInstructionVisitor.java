@@ -140,8 +140,8 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		node.getValue().accept(new XlimExprVisitor(names, root, actionName));
 		Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 		XlimNodeTemplate.newInPort(operationE, names.getTempName());
-		XlimNodeTemplate.newOutPort(operationE, names.getVarName(node
-				.getTarget(), actionName), node.getTarget().getType());
+		XlimNodeTemplate.newOutPort(operationE, names.getVarName(
+				node.getTarget(), actionName), node.getTarget().getType());
 
 	}
 
@@ -174,8 +174,8 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		if (target != null) {
 			Element operationE = XlimNodeTemplate.newOperation(root, NOOP);
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
-			XlimNodeTemplate.newOutPort(operationE, names.getVarName(target,
-					actionName), target.getType());
+			XlimNodeTemplate.newOutPort(operationE,
+					names.getVarName(target, actionName), target.getType());
 		}
 	}
 
@@ -206,10 +206,10 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		String name = names.getVarName(node.getSource(), actionName);
 		boolean inport = inputs.contains(name);
 		if (node.getSource().getVariable().getType().isList() && !inport) {
-			node.getIndexes().get(0).accept(
-					new XlimExprVisitor(names, root, actionName));
-			operationE = XlimNodeTemplate.newNameOperation(root, VARREF, names
-					.getVarName(node.getSource(), actionName));
+			node.getIndexes().get(0)
+					.accept(new XlimExprVisitor(names, root, actionName));
+			operationE = XlimNodeTemplate.newNameOperation(root, VARREF,
+					names.getVarName(node.getSource(), actionName));
 			XlimNodeTemplate.newInPort(operationE, names.getTempName());
 		} else {
 			operationE = XlimNodeTemplate.newOperation(root, NOOP);
@@ -220,8 +220,8 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 
 		LocalVariable local = node.getTarget();
 		Type outtype = node.getTarget().getType();
-		XlimNodeTemplate.newOutPort(operationE, names.getVarName(local,
-				actionName), outtype);
+		XlimNodeTemplate.newOutPort(operationE,
+				names.getVarName(local, actionName), outtype);
 	}
 
 	/**
@@ -237,8 +237,8 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		Element operationE = XlimNodeTemplate.newValueOperation(root, LITINT,
 				Integer.toString(node.getNumTokens()));
 
-		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), INT, node
-				.getNumTokens());
+		XlimNodeTemplate.newOutPort(operationE, names.putTempName(), INT,
+				node.getNumTokens());
 
 		Port port = node.getPort();
 		String portname = port.getName();
@@ -247,8 +247,8 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 				portname);
 
 		XlimNodeTemplate.newInPort(peekE, names.getTempName());
-		XlimNodeTemplate.newOutPort(peekE, names.getVarName(node.getTarget(),
-				actionName), port.getType());
+		XlimNodeTemplate.newOutPort(peekE,
+				names.getVarName(node.getTarget(), actionName), port.getType());
 	}
 
 	@Override
@@ -337,12 +337,12 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 	public void visit(Store node, Object... args) {
 		node.getValue().accept(new XlimExprVisitor(names, root, actionName));
 
-		Variable var = node.getTarget().getVariable();
+		Variable var = node.getTarget();
 		if (var instanceof StateVariable) {
 			Element operationE = XlimNodeTemplate
 					.newDiffOperation(root, ASSIGN);
-			operationE.setAttribute(TARGET, names.getVarName(node.getTarget(),
-					actionName));
+			operationE.setAttribute(TARGET,
+					names.getVarName(node.getTarget(), actionName));
 			String data = names.getTempName();
 
 			for (Expression expr : node.getIndexes()) {
@@ -378,8 +378,8 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 		String name = names.getVarName(node.getTarget(), actionName);
 		XlimNodeTemplate.newInPort(operationE, name);
 
-		node.getPort().getType().accept(
-				new XlimTypeSizeVisitor(writeMap.get(name)));
+		node.getPort().getType()
+				.accept(new XlimTypeSizeVisitor(writeMap.get(name)));
 	}
 
 	/**

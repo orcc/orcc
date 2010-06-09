@@ -34,7 +34,7 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public interface LocalTargetContainer {
+public interface LocalTargetContainer extends User {
 
 	/**
 	 * Returns the target of this node.
@@ -42,6 +42,18 @@ public interface LocalTargetContainer {
 	 * @return the target of this node
 	 */
 	public LocalVariable getTarget();
+
+	/**
+	 * Warning: this method is for internal uses only!
+	 * 
+	 * <p>
+	 * Sets the target of this node without updating the target variable.
+	 * </p>
+	 * 
+	 * @param target
+	 *            a local variable
+	 */
+	public void internalSetTarget(LocalVariable target);
 
 	/**
 	 * Sets the target of this node.

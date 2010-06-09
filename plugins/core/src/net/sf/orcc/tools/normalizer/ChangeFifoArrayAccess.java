@@ -77,12 +77,10 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 
 			indexes = new ArrayList<Expression>(0);
 			use = new Use(varCount);
-			Use useStore = new Use(varCount);
-			Store store = new Store(useStore, indexes, new BinaryExpr(
+			Store store = new Store(varCount, indexes, new BinaryExpr(
 					new VarExpr(use), BinaryOp.PLUS, new IntExpr(1),
 					new IntType(32)));
 			use.setNode(store);
-			useStore.setNode(store);
 
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.add(store);
@@ -92,28 +90,21 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Load node, Object... args) {
-		Use use = node.getSource();
+	public void visit(Load load, Object... args) {
+		Use use = load.getSource();
 		Variable var = use.getVariable();
 		if (!var.isGlobal() && ((LocalVariable) var).isPort()) {
-			use.remove();
-			use = new Use(stateVars.get(var.getName()), node);
-			node.setSource(use);
-
-			updateIndex(var, node, node.getIndexes(), args);
+			load.setSource(new Use(stateVars.get(var.getName()), load));
+			updateIndex(var, load, load.getIndexes(), args);
 		}
 	}
 
 	@Override
-	public void visit(Store node, Object... args) {
-		Use use = node.getTarget();
-		Variable var = use.getVariable();
-		if (!var.isGlobal() && ((LocalVariable) var).isPort()) {
-			use.remove();
-			use = new Use(stateVars.get(var.getName()), node);
-			node.setTarget(use);
-
-			updateIndex(var, node, node.getIndexes(), args);
+	public void visit(Store store, Object... args) {
+		Variable var = store.getTarget();
+		if (!var.isGlobal() && var.isPort()) {
+			store.setTarget(stateVars.get(var.getName()));
+			updateIndex(var, store, store.getIndexes(), args);
 		}
 	}
 

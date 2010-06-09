@@ -177,7 +177,7 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 	@Override
 	public void visit(Store instr, Object... args) {
-		Variable variable = instr.getTarget().getVariable();
+		Variable variable = instr.getTarget();
 		if (instr.getIndexes().isEmpty()) {
 			variable.setValue(instr.getValue().accept(exprInterpreter));
 		} else {
@@ -193,8 +193,8 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 			}
 
 			if (objPrev != null && lastIndex != null) {
-				Array.set(objPrev, lastIndex, instr.getValue().accept(
-						exprInterpreter));
+				Array.set(objPrev, lastIndex,
+						instr.getValue().accept(exprInterpreter));
 			}
 		}
 	}

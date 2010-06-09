@@ -63,6 +63,12 @@ public class Variable implements INameable {
 	private Instruction instruction;
 
 	/**
+	 * Contains a list of instructions that have this variable on their
+	 * left-hand side. Only valid for non-local variables.
+	 */
+	private List<Instruction> instructions;
+
+	/**
 	 * variable location
 	 */
 	private Location location;
@@ -131,6 +137,20 @@ public class Variable implements INameable {
 	}
 
 	/**
+	 * Adds the given instruction from the list of instructions that have this
+	 * variable on their left-hand side.
+	 * 
+	 * @param instruction
+	 *            an instruction
+	 */
+	public void addInstruction(Instruction instruction) {
+		if (instructions == null) {
+			instructions = new ArrayList<Instruction>(1);
+		}
+		instructions.add(instruction);
+	}
+
+	/**
 	 * Adds a new use of this variable in the given instruction.
 	 * 
 	 * @param instruction
@@ -153,13 +173,25 @@ public class Variable implements INameable {
 	/**
 	 * Returns the instruction where this variable is defined, or
 	 * <code>null</code> if zero or several instructions use this variable as a
-	 * target.
+	 * target. Only valid is this variable is local.
 	 * 
 	 * @return the instruction where this variable is defined, or
 	 *         <code>null</code>
 	 */
 	public Instruction getInstruction() {
 		return instruction;
+	}
+
+	/**
+	 * Returns the instructions where this variable appears on the left-hand
+	 * side, or <code>null</code> if there are no such instructions, or if this
+	 * variable is local (in which case, see {@link #getInstruction()}).
+	 * 
+	 * @return the list of instructions that have this variable on their
+	 *         left-hand side, or <code>null</code>
+	 */
+	public List<Instruction> getInstructions() {
+		return instructions;
 	}
 
 	/**
@@ -248,6 +280,19 @@ public class Variable implements INameable {
 	 */
 	public boolean isUsed() {
 		return !uses.isEmpty();
+	}
+
+	/**
+	 * Removes the given instruction from the list of instructions that have
+	 * this variable on their left-hand side.
+	 * 
+	 * @param instruction
+	 *            an instruction
+	 */
+	public void removeInstruction(Instruction instruction) {
+		if (instructions != null) {
+			instructions.remove(instruction);
+		}
 	}
 
 	/**

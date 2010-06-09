@@ -68,13 +68,13 @@ public class Return extends AbstractInstruction implements ValueContainer {
 	}
 
 	@Override
-	public void setValue(Expression value) {
-		CommonNodeOperations.setValue(this, value);
+	public void internalSetValue(Expression value) {
+		this.value = value;
 	}
 
 	@Override
-	public void setValueSimple(Expression value) {
-		this.value = value;
+	public void setValue(Expression value) {
+		CommonNodeOperations.setValue(this, value);
 	}
 
 	@Override

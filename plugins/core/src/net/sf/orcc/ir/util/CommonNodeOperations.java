@@ -30,9 +30,13 @@ package net.sf.orcc.ir.util;
 
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.LocalTargetContainer;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.Variable;
 
 /**
  * This class defines operations common to nodes.
@@ -43,24 +47,68 @@ import net.sf.orcc.ir.ValueContainer;
 public class CommonNodeOperations {
 
 	/**
-	 * Sets the value of this node. Uses are updated to point to this node.
+	 * Sets the target of the given instruction.
 	 * 
-	 * @param node
-	 *            an {@link CFGNode} that implements {@link ValueContainer}
+	 * @param instruction
+	 *            an instruction
+	 * @param target
+	 *            a variable
+	 */
+	public static void setTarget(TargetContainer instruction, Variable target) {
+		Variable thisTarget = instruction.getTarget();
+		if (thisTarget != null) {
+			thisTarget.removeInstruction((Instruction) instruction);
+		}
+
+		if (target != null) {
+			target.addInstruction((Instruction) instruction);
+		}
+
+		instruction.internalSetTarget(target);
+	}
+
+	/**
+	 * Sets the target of the given instruction.
+	 * 
+	 * @param instruction
+	 *            an instruction
+	 * @param target
+	 *            a variable
+	 */
+	public static void setTarget(LocalTargetContainer instruction,
+			LocalVariable target) {
+		Variable thisTarget = instruction.getTarget();
+		if (thisTarget != null) {
+			thisTarget.setInstruction(null);
+		}
+
+		if (target != null) {
+			target.setInstruction((Instruction) instruction);
+		}
+
+		instruction.internalSetTarget(target);
+	}
+
+	/**
+	 * Sets the value of the given user.
+	 * 
+	 * @param user
+	 *            an {@link CFGNode} or an {@link Instruction} that implements
+	 *            {@link ValueContainer}
 	 * @param value
 	 *            an expression
 	 */
-	public static void setValue(ValueContainer node, Expression value) {
-		Expression thisValue = node.getValue();
+	public static void setValue(ValueContainer user, Expression value) {
+		Expression thisValue = user.getValue();
 		if (thisValue != null) {
-			Use.removeUses((User) node, thisValue);
+			Use.removeUses(user, thisValue);
 		}
 
 		if (value != null) {
-			Use.addUses((User) node, value);
+			Use.addUses(user, value);
 		}
 
-		node.setValueSimple(value);
+		user.internalSetValue(value);
 	}
 
 }

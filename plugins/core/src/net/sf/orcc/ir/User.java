@@ -37,4 +37,8 @@ package net.sf.orcc.ir;
  */
 public interface User extends Localizable {
 
+	boolean isCFGNode();
+
+	boolean isInstruction();
+
 }

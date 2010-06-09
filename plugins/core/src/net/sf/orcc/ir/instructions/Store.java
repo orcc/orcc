@@ -33,9 +33,11 @@ import java.util.List;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.TargetContainer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -45,15 +47,16 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Store extends AbstractInstruction implements ValueContainer {
+public class Store extends AbstractInstruction implements TargetContainer,
+		ValueContainer {
 
 	private List<Expression> indexes;
 
-	private Use target;
+	private Variable target;
 
 	private Expression value;
 
-	public Store(Location location, Use target, List<Expression> indexes,
+	public Store(Location location, Variable target, List<Expression> indexes,
 			Expression value) {
 		super(location);
 		setIndexes(indexes);
@@ -61,7 +64,7 @@ public class Store extends AbstractInstruction implements ValueContainer {
 		setValue(value);
 	}
 
-	public Store(Use target, List<Expression> indexes, Expression value) {
+	public Store(Variable target, List<Expression> indexes, Expression value) {
 		this(new Location(), target, indexes, value);
 	}
 
@@ -78,7 +81,7 @@ public class Store extends AbstractInstruction implements ValueContainer {
 	@Override
 	public Cast getCast() {
 		Type expr = value.getType();
-		Type val = target.getVariable().getType();
+		Type val = target.getType();
 
 		if (expr == null) {
 			return null;
@@ -106,7 +109,7 @@ public class Store extends AbstractInstruction implements ValueContainer {
 	 * 
 	 * @return the target of this Store
 	 */
-	public Use getTarget() {
+	public Variable getTarget() {
 		return target;
 	}
 
@@ -115,9 +118,19 @@ public class Store extends AbstractInstruction implements ValueContainer {
 		return value;
 	}
 
+	@Override
+	public void internalSetTarget(Variable target) {
+		this.target = target;
+	}
+
+	@Override
+	public void internalSetValue(Expression value) {
+		this.value = value;
+	}
+
 	/**
-	 * Sets the indexes of this store node. Uses are updated to point to this
-	 * node.
+	 * Sets the indexes of this store instruction. Uses are updated to point to
+	 * this instruction.
 	 * 
 	 * @param indexes
 	 *            a list of expressions
@@ -130,22 +143,14 @@ public class Store extends AbstractInstruction implements ValueContainer {
 		Use.addUses(this, indexes);
 	}
 
-	public void setTarget(Use target) {
-		if (this.target != null) {
-			this.target.remove();
-		}
-		this.target = target;
-		target.setNode(this);
+	@Override
+	public void setTarget(Variable target) {
+		CommonNodeOperations.setTarget(this, target);
 	}
 
 	@Override
 	public void setValue(Expression value) {
 		CommonNodeOperations.setValue(this, value);
-	}
-
-	@Override
-	public void setValueSimple(Expression value) {
-		this.value = value;
 	}
 
 	@Override

@@ -60,6 +60,16 @@ public abstract class AbstractInstruction extends AbstractLocalizable implements
 	}
 
 	@Override
+	public boolean isCFGNode() {
+		return false;
+	}
+
+	@Override
+	public boolean isInstruction() {
+		return true;
+	}
+
+	@Override
 	public void setBlock(BlockNode block) {
 		this.block = block;
 	}

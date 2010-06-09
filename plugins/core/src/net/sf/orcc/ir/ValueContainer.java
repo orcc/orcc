@@ -34,7 +34,7 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public interface ValueContainer {
+public interface ValueContainer extends User {
 
 	/**
 	 * Returns the value of this node.
@@ -44,19 +44,23 @@ public interface ValueContainer {
 	public Expression getValue();
 
 	/**
+	 * Warning: this method is for internal uses only!
+	 * 
+	 * <p>
+	 * Sets the value of this node without updating the use list.
+	 * </p>
+	 * 
+	 * @param value
+	 *            an expression
+	 */
+	public void internalSetValue(Expression value);
+
+	/**
 	 * Sets the value of this node. Uses are updated to point to this node.
 	 * 
 	 * @param value
 	 *            an expression
 	 */
 	public void setValue(Expression value);
-
-	/**
-	 * Sets the value of this node without updating the use list.
-	 * 
-	 * @param value
-	 *            an expression
-	 */
-	public void setValueSimple(Expression value);
 
 }

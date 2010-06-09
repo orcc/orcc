@@ -200,8 +200,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(Store store, Object... args) {
-		Use use = store.getTarget();
-		Variable target = use.getVariable();
+		Variable target = store.getTarget();
 		if (target.getType().isBool()) {
 			Expression expr = store.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
