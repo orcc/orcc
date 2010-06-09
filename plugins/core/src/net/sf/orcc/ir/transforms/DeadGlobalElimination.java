@@ -29,9 +29,11 @@
 package net.sf.orcc.ir.transforms;
 
 import java.util.Iterator;
+import java.util.List;
 
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.util.OrderedMap;
@@ -44,6 +46,20 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class DeadGlobalElimination implements ActorTransformation {
 
+	/**
+	 * Removes the given instructions that store to an unused state variable.
+	 * 
+	 * @param instructions
+	 *            a list of instructions
+	 */
+	private void remove(List<Instruction> instructions) {
+		if (instructions != null) {
+			for (Instruction instruction : instructions) {
+				instruction.getBlock().getInstructions().remove(instruction);
+			}
+		}
+	}
+
 	@Override
 	public void transform(Actor actor) {
 		OrderedMap<Variable> stateVariables = actor.getStateVars();
@@ -52,6 +68,7 @@ public class DeadGlobalElimination implements ActorTransformation {
 			StateVariable variable = (StateVariable) it.next();
 			if (!variable.isUsed()) {
 				it.remove();
+				remove(variable.getInstructions());
 			}
 		}
 	}
