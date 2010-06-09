@@ -29,38 +29,73 @@
 
 package net.sf.orcc.tools.staticanalyzer;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
 
 /**
- * This class computes a topological sort of the graph.
+ * This interface defines a scheduler.
  * 
  * @author Ghislain Roquier
  * 
  */
+public abstract class AbstractScheduler implements IScheduler {
 
-public class TopologicalSorter {
+	protected DirectedGraph<Vertex, Connection> graph;
 
-	private DirectedGraph<Vertex, Connection> graph;
+	protected Schedule schedule;
 
-	public TopologicalSorter(DirectedGraph<Vertex, Connection> graph) {
+	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph)
+			throws OrccException {
 		this.graph = graph;
+		schedule = schedule();
 	}
 
-	@SuppressWarnings("unused")
-	private boolean isAcyclic() {
-		return !(new CycleDetector<Vertex, Connection>(graph).detectCycles());
+	public Map<Connection, Integer> getBufferCapacities() {
+
+		Map<Connection, Integer> bufferCapacities = new HashMap<Connection, Integer>();
+
+		LinkedList<Iterand> stack = new LinkedList<Iterand>(
+				schedule.getIterands());
+
+		int rep = schedule.getIterationCount();
+
+		while (!stack.isEmpty()) {
+			Iterand iterand = stack.pop();
+
+			if (iterand.isVertex()) {
+				Vertex vertex = iterand.getVertex();
+
+				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
+					int prd = connection.getSource().getNumTokensProduced();
+					bufferCapacities.put(connection, rep * prd);
+				}
+
+				for (Connection connection : graph.incomingEdgesOf(vertex)) {
+					if (!bufferCapacities.containsKey(connection)) {
+						int cns = connection.getTarget().getNumTokensConsumed();
+						bufferCapacities.put(connection, rep * cns);
+					}
+				}
+			} else {
+				Schedule sched = iterand.getSchedule();
+				rep = sched.getIterationCount();
+				for (Iterand subIterand : sched.getIterands()) {
+					stack.push(subIterand);
+				}
+			}
+		}
+		return bufferCapacities;
 	}
 
-	public List<Vertex> topologicalSort() throws OrccException {
-
-		return new DFS(graph).orderedByFinishingTime();
+	public Schedule getSchedule() {
+		return schedule;
 	}
 
 }

@@ -38,7 +38,6 @@ import net.sf.orcc.classes.StaticClass;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
-import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.util.Rational;
 
@@ -56,12 +55,13 @@ import org.jgrapht.DirectedGraph;
 public class RepetitionVectorAnalyzer {
 
 	private DirectedGraph<Vertex, Connection> graph;
+
 	private Map<Vertex, Rational> rationals = new HashMap<Vertex, Rational>();
 
 	private Map<Vertex, Integer> repetitionVector = new HashMap<Vertex, Integer>();
 
-	public RepetitionVectorAnalyzer(Network network) {
-		graph = network.getGraph();
+	public RepetitionVectorAnalyzer(DirectedGraph<Vertex, Connection> graph) {
+		this.graph = graph;
 	}
 
 	/**

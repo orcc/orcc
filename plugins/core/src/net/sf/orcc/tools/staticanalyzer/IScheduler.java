@@ -29,8 +29,10 @@
 
 package net.sf.orcc.tools.staticanalyzer;
 
+import java.util.Map;
+
 import net.sf.orcc.OrccException;
-import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Connection;
 
 /**
  * This interface defines a scheduler.
@@ -39,11 +41,15 @@ import net.sf.orcc.network.Network;
  * 
  */
 public interface IScheduler {
+	public Map<Connection, Integer> getBufferCapacities();
+
+	public Schedule getSchedule();
+
 	/**
 	 * Schedules the given network in-place.
 	 * 
 	 * @param network
 	 *            a network
 	 */
-	public Schedule schedule(Network network) throws OrccException;
+	public Schedule schedule() throws OrccException;
 }

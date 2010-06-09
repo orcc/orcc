@@ -79,117 +79,6 @@ public class StaticSubsetDetector {
 		graph = network.getGraph();
 	}
 
-	/**
-	 * Detects the static regions of the network. The detection is done by
-	 * traversing the graph
-	 * 
-	 * 
-	 */
-	public Set<Set<Vertex>> staticRegionSets() throws OrccException {
-
-		staticRegionSet = new HashSet<Set<Vertex>>();
-		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();
-		orderedVertices = new LinkedList<Vertex>();
-
-		// 1) orders vertices according to finishing time.
-		orderedVertices = new TopologicalSorter(graph).topologicalSort();
-		discovered = new HashSet<Vertex>();
-		finished = new HashSet<Vertex>();
-
-		// 2) detects static region considering vertices in order
-		// of increasing finishing time
-		Iterator<Vertex> it = orderedVertices.iterator();
-		while (it.hasNext()) {
-			Vertex vertex = it.next();
-			IClass clasz = vertex.getInstance().getContentClass();
-			if (!discovered.contains(vertex) && clasz.isSDF()) {
-				List<Vertex> set = new LinkedList<Vertex>();
-				staticRegionList.add(set);
-				staticRegionAnalysis(graph, vertex, set);
-			}
-		}
-
-		// 3) detects static region considering vertices in order of
-		// decreasing finishing time
-		discovered = new HashSet<Vertex>();
-		finished = new HashSet<Vertex>();
-
-		DirectedGraph<Vertex, Connection> inverseGraph = new EdgeReversedGraph<Vertex, Connection>(
-				graph);
-
-		it = ((LinkedList<Vertex>) orderedVertices).descendingIterator();
-		while (it.hasNext()) {
-			Vertex vertex = it.next();
-			IClass clasz = vertex.getInstance().getContentClass();
-			if (!discovered.contains(vertex) && clasz.isSDF()) {
-				List<Vertex> set = new LinkedList<Vertex>();
-				staticRegionList.add(set);
-				staticRegionAnalysis(inverseGraph, vertex, set);
-			}
-		}
-
-		/*
-		 * for (List<Vertex> list : staticRegionList) { Set<Vertex> set = new
-		 * HashSet<Vertex>(list); staticRegionSet.add(set); }
-		 */
-
-		for (List<Vertex> list1 : staticRegionList) {
-			if (list1.size() > 1) {
-				for (List<Vertex> list2 : staticRegionList) {
-					Set<Vertex> set1 = new HashSet<Vertex>(list1);
-					Set<Vertex> set2 = new HashSet<Vertex>(list2);
-					staticRegionSet.add(set1);
-					if (set1.containsAll(set2)) {
-						staticRegionSet.remove(set2);
-					}
-				}
-			}
-		}
-
-		return staticRegionSet;
-	}
-
-	/**
-	 * DFS
-	 * 
-	 * @throws OrccException
-	 * 
-	 */
-	private void staticRegionAnalysis(DirectedGraph<Vertex, Connection> graph,
-			Vertex vertex, List<Vertex> vertices) throws OrccException {
-
-		LinkedList<Vertex> stack = new LinkedList<Vertex>(Arrays.asList(vertex));
-
-		while (!stack.isEmpty()) {
-			Vertex v = stack.pop();
-			IClass clasz = v.getInstance().getContentClass();
-			if (clasz.isSDF()) {
-				if (!discovered.contains(v)) {
-					discovered.add(v);
-					if (vertices != null) {
-						vertices.add(v);
-					}
-					stack.push(v);
-					finished.add(v);
-					for (Connection edge : graph.outgoingEdgesOf(v)) {
-						Vertex tgtVertex = graph.getEdgeTarget(edge);
-						clasz = tgtVertex.getInstance().getContentClass();
-						if (!discovered.contains(tgtVertex) && clasz.isSDF()) {
-							if (vertices != null) {
-								List<Vertex> l = new LinkedList<Vertex>(
-										vertices);
-								l.add(tgtVertex);
-								if (checkCycles(graph, l)) {
-									stack.push(tgtVertex);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
 	private boolean checkCycles(DirectedGraph<Vertex, Connection> graph,
 			List<Vertex> vertices) throws OrccException {
 
@@ -260,5 +149,116 @@ public class StaticSubsetDetector {
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 * DFS
+	 * 
+	 * @throws OrccException
+	 * 
+	 */
+	private void staticRegionAnalysis(DirectedGraph<Vertex, Connection> graph,
+			Vertex vertex, List<Vertex> vertices) throws OrccException {
+
+		LinkedList<Vertex> stack = new LinkedList<Vertex>(Arrays.asList(vertex));
+
+		while (!stack.isEmpty()) {
+			Vertex v = stack.pop();
+			IClass clasz = v.getInstance().getContentClass();
+			if (clasz.isSDF()) {
+				if (!discovered.contains(v)) {
+					discovered.add(v);
+					if (vertices != null) {
+						vertices.add(v);
+					}
+					stack.push(v);
+					finished.add(v);
+					for (Connection edge : graph.outgoingEdgesOf(v)) {
+						Vertex tgtVertex = graph.getEdgeTarget(edge);
+						clasz = tgtVertex.getInstance().getContentClass();
+						if (!discovered.contains(tgtVertex) && clasz.isSDF()) {
+							if (vertices != null) {
+								List<Vertex> l = new LinkedList<Vertex>(
+										vertices);
+								l.add(tgtVertex);
+								if (checkCycles(graph, l)) {
+									stack.push(tgtVertex);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Detects the static regions of the network. The detection is done by
+	 * traversing the graph
+	 * 
+	 * 
+	 */
+	public Set<Set<Vertex>> staticRegionSets() throws OrccException {
+
+		staticRegionSet = new HashSet<Set<Vertex>>();
+		List<List<Vertex>> staticRegionList = new ArrayList<List<Vertex>>();
+		orderedVertices = new LinkedList<Vertex>();
+
+		// 1) orders vertices according to finishing time.
+		orderedVertices = new TopologicalSorter(graph).topologicalSort();
+		discovered = new HashSet<Vertex>();
+		finished = new HashSet<Vertex>();
+
+		// 2) detects static region considering vertices in order
+		// of increasing finishing time
+		Iterator<Vertex> it = orderedVertices.iterator();
+		while (it.hasNext()) {
+			Vertex vertex = it.next();
+			IClass clasz = vertex.getInstance().getContentClass();
+			if (!discovered.contains(vertex) && clasz.isSDF()) {
+				List<Vertex> set = new LinkedList<Vertex>();
+				staticRegionList.add(set);
+				staticRegionAnalysis(graph, vertex, set);
+			}
+		}
+
+		// 3) detects static region considering vertices in order of
+		// decreasing finishing time
+		discovered = new HashSet<Vertex>();
+		finished = new HashSet<Vertex>();
+
+		DirectedGraph<Vertex, Connection> inverseGraph = new EdgeReversedGraph<Vertex, Connection>(
+				graph);
+
+		it = ((LinkedList<Vertex>) orderedVertices).descendingIterator();
+		while (it.hasNext()) {
+			Vertex vertex = it.next();
+			IClass clasz = vertex.getInstance().getContentClass();
+			if (!discovered.contains(vertex) && clasz.isSDF()) {
+				List<Vertex> set = new LinkedList<Vertex>();
+				staticRegionList.add(set);
+				staticRegionAnalysis(inverseGraph, vertex, set);
+			}
+		}
+
+		/*
+		 * for (List<Vertex> list : staticRegionList) { Set<Vertex> set = new
+		 * HashSet<Vertex>(list); staticRegionSet.add(set); }
+		 */
+
+		for (List<Vertex> list1 : staticRegionList) {
+			if (list1.size() > 1) {
+				for (List<Vertex> list2 : staticRegionList) {
+					Set<Vertex> set1 = new HashSet<Vertex>(list1);
+					Set<Vertex> set2 = new HashSet<Vertex>(list2);
+					staticRegionSet.add(set1);
+					if (set1.containsAll(set2)) {
+						staticRegionSet.remove(set2);
+					}
+				}
+			}
+		}
+
+		return staticRegionSet;
 	}
 }

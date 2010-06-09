@@ -58,20 +58,12 @@ public class Schedule {
 		iterands.offer(iterand);
 	}
 
-	public void remove() {
-		iterands.poll();
-	}
-
 	public List<Iterand> getIterands() {
 		return iterands;
 	}
 
 	public int getIterationCount() {
 		return iterationCount;
-	}
-
-	public void setIterationCount(int interationCount) {
-		this.iterationCount = interationCount;
 	}
 
 	public Set<Vertex> getScheduledActors() {
@@ -90,6 +82,14 @@ public class Schedule {
 			}
 		}
 		return scheduledActors;
+	}
+
+	public void remove() {
+		iterands.poll();
+	}
+
+	public void setIterationCount(int interationCount) {
+		this.iterationCount = interationCount;
 	}
 
 	public String toString() {

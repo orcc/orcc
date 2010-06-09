@@ -34,42 +34,43 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 
 import org.jgrapht.DirectedGraph;
 
 /**
- * This class computes a static schedule from the given network. All instances of the
- * network are assumed to be static (SDF/CSDF). The network classifier is
+ * This class computes a static schedule from the given network. All instances
+ * of the network are assumed to be static (SDF/CSDF). The network classifier is
  * assumed to be computed first.
  * 
  * @author Ghislain Roquier
  * 
  */
 
-public class FlatSASScheduler implements IScheduler {
+public class FlatSASScheduler extends AbstractScheduler {
 
-	DirectedGraph<Vertex, Connection> graph;
+	public FlatSASScheduler(DirectedGraph<Vertex, Connection> graph)
+			throws OrccException {
+		super(graph);
+	}
 
-	public Schedule schedule(Network network) throws OrccException {
-		graph = network.getGraph();
+	public Schedule schedule() throws OrccException {
 
-		Map<Vertex, Integer> repetitions = new RepetitionVectorAnalyzer(network)
+		Map<Vertex, Integer> repetitions = new RepetitionVectorAnalyzer(graph)
 				.computeRepetitionsVector();
 
-		Schedule topSched = new Schedule();
+		Schedule schedule = new Schedule();
 
-		List<Vertex> sort = new TopologicalSorter(network.getGraph()).topologicalSort();
+		List<Vertex> sort = new TopologicalSorter(graph).topologicalSort();
 		for (Vertex vertex : sort) {
 			if (vertex.isInstance()) {
 				Schedule subSched = new Schedule();
 				subSched.setIterationCount(repetitions.get(vertex));
 				subSched.add(new Iterand(vertex));
-				topSched.add(new Iterand(subSched));
+				schedule.add(new Iterand(subSched));
 			}
 		}
-		return topSched;
+		return schedule;
 	}
 
 }

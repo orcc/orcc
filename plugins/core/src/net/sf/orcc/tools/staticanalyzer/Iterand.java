@@ -59,20 +59,20 @@ public class Iterand {
 		type = Type.VERTEX;
 	}
 
-	public boolean isSchedule() {
-		return (type == Type.SCHEDULE);
-	}
-
-	public boolean isVertex() {
-		return (type == Type.VERTEX);
-	}
-
 	public Schedule getSchedule() {
 		return (Schedule) contents;
 	}
 
 	public Vertex getVertex() {
 		return (Vertex) contents;
+	}
+
+	public boolean isSchedule() {
+		return (type == Type.SCHEDULE);
+	}
+
+	public boolean isVertex() {
+		return (type == Type.VERTEX);
 	}
 
 	public String toString() {
