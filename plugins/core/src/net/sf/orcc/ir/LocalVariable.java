@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 
 /**
  * This class represents a local variable. A local variable is a variable that
@@ -47,21 +46,9 @@ public class LocalVariable extends Variable implements
 	private boolean assignable;
 
 	/**
-	 * Used for constant's propagation
-	 */
-	private boolean constant;
-
-	private Expression constantExpr;
-
-	/**
 	 * SSA index.
 	 */
 	private int index;
-
-	/**
-	 * the node where the variable is assigned.
-	 */
-	private Instruction instruction;
 
 	/**
 	 * when local variables have the same name but different scopes.
@@ -69,24 +56,11 @@ public class LocalVariable extends Variable implements
 	private Integer suffix;
 
 	public LocalVariable(boolean assignable, int index, Location loc,
-			String name, Instruction instruction, Integer suffix, Type type) {
+			String name, Integer suffix, Type type) {
 		super(loc, type, name, false);
 		this.assignable = assignable;
 		this.index = index;
-		this.instruction = instruction;
 		this.suffix = suffix;
-		this.constant = false;
-		constantExpr = null;
-	}
-
-	public LocalVariable(LocalVariable other) {
-		super(other);
-		assignable = other.assignable;
-		index = other.index;
-		instruction = other.instruction;
-		suffix = other.suffix;
-		this.constant = false;
-		constantExpr = null;
 	}
 
 	@Override
@@ -104,10 +78,6 @@ public class LocalVariable extends Variable implements
 		return super.getName();
 	}
 
-	public Expression getConstant() {
-		return constantExpr;
-	}
-
 	/**
 	 * Returns the SSA index of this variable. This information is added when
 	 * translating CAL to SSA form.
@@ -116,15 +86,6 @@ public class LocalVariable extends Variable implements
 	 */
 	public int getIndex() {
 		return index;
-	}
-
-	/**
-	 * Returns the instruction where this local variable is defined.
-	 * 
-	 * @return the instruction where this local variable is defined
-	 */
-	public Instruction getInstruction() {
-		return instruction;
 	}
 
 	@Override
@@ -147,64 +108,21 @@ public class LocalVariable extends Variable implements
 		return (suffix != null);
 	}
 
+	/**
+	 * Returns <code>true</code> if this variable can be assigned to.
+	 * 
+	 * @return <code>true</code> if this variable can be assigned to
+	 */
 	public boolean isAssignable() {
 		return assignable;
-	}
-
-	/**
-	 * Indicates wether or not this local variable is assigned
-	 * 
-	 * @return true if the variable is assigned
-	 */
-	public boolean isAssigned() {
-		return index != 0;
-	}
-
-	public boolean isConstant() {
-		return constant;
-	}
-
-	/**
-	 * Returns true if this variable is used by at least one instruction that
-	 * reads from/writes to a port.
-	 * 
-	 * @return true if this variable is used by at least one instruction that
-	 *         reads from/writes to a port
-	 */
-	public boolean isPort() {
-		boolean isPort = false;
-		if (instruction instanceof AbstractFifoInstruction) {
-			AbstractFifoInstruction fifo = (AbstractFifoInstruction) instruction;
-			if (getName().startsWith(fifo.getPort().getName())
-					|| getName().endsWith(fifo.getPort().getName())) {
-				isPort = true;
-			}
-		}
-
-		return isPort;
 	}
 
 	public void setAssignable(boolean assignable) {
 		this.assignable = assignable;
 	}
 
-	public void setConstant(Expression expr) {
-		constantExpr = expr;
-		constant = true;
-	}
-
 	public void setIndex(int index) {
 		this.index = index;
-	}
-
-	/**
-	 * Sets the instruction where this local variable is defined.
-	 * 
-	 * @param instruction
-	 *            the instruction where this local variable is defined
-	 */
-	public void setInstruction(Instruction instruction) {
-		this.instruction = instruction;
 	}
 
 	public void setSuffix(int suffix) {

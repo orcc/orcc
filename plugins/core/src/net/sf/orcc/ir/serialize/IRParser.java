@@ -493,8 +493,7 @@ public class IRParser {
 
 	private HasTokens parseHasTokens(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		LocalVariable target = (LocalVariable) getVariable(array
-				.getJSONArray(0));
+		Variable target = getVariable(array.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
@@ -654,8 +653,7 @@ public class IRParser {
 
 	private Peek parsePeek(Location loc, JSONArray array) throws JSONException,
 			OrccException {
-		LocalVariable target = (LocalVariable) getVariable(array
-				.getJSONArray(0));
+		Variable target = getVariable(array.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
@@ -746,8 +744,7 @@ public class IRParser {
 
 	private Read parseRead(Location loc, JSONArray array) throws JSONException,
 			OrccException {
-		LocalVariable target = (LocalVariable) getVariable(array
-				.getJSONArray(0));
+		Variable target = getVariable(array.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
@@ -900,7 +897,7 @@ public class IRParser {
 		Type type = parseType(array.get(2));
 
 		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
-				null, suffix, type);
+				suffix, type);
 
 		// register the variable definition
 		variables.add(file, loc, varDef.getName(), varDef);
@@ -931,8 +928,7 @@ public class IRParser {
 
 	private Write parseWrite(Location loc, JSONArray array)
 			throws JSONException, OrccException {
-		LocalVariable target = (LocalVariable) getVariable(array
-				.getJSONArray(0));
+		Variable target = getVariable(array.getJSONArray(0));
 		String fifoName = array.getString(1);
 		Port port = outputs.get(fifoName);
 		int numTokens = array.getInt(2);

@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
+import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.util.INameable;
 
 /**
@@ -47,6 +49,11 @@ public abstract class Variable implements INameable {
 	 * true if this variable is global
 	 */
 	private boolean global;
+
+	/**
+	 * the instruction where the variable is assigned.
+	 */
+	private Instruction instruction;
 
 	/**
 	 * variable location
@@ -137,6 +144,18 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
+	 * Returns the instruction where this variable is defined, or
+	 * <code>null</code> if zero or several instructions use this variable as a
+	 * target.
+	 * 
+	 * @return the instruction where this variable is defined, or
+	 *         <code>null</code>
+	 */
+	public Instruction getInstruction() {
+		return instruction;
+	}
+
+	/**
 	 * Returns the location of this variable.
 	 * 
 	 * @return the location of this variable
@@ -200,6 +219,22 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
+	 * Returns true if this variable is assigned to by one instruction that is a
+	 * peek, read(end), write(end).
+	 * 
+	 * @return true if this variable is assigned to by one instruction that is a
+	 *         peek, read(end), write(end)
+	 */
+	public boolean isPort() {
+		if (instruction instanceof AbstractFifoInstruction
+				&& !(instruction instanceof HasTokens)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns true if this variable is used at least once.
 	 * 
 	 * @return true if this variable is used at least once.
@@ -232,6 +267,17 @@ public abstract class Variable implements INameable {
 	 */
 	public void removeUse(Use use) {
 		uses.remove(use);
+	}
+
+	/**
+	 * Sets the instruction where this variable is defined. This is valid if and
+	 * only if this variable is only assigned to once.
+	 * 
+	 * @param instruction
+	 *            the instruction where this local variable is defined
+	 */
+	public void setInstruction(Instruction instruction) {
+		this.instruction = instruction;
 	}
 
 	/**

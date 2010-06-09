@@ -220,7 +220,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		 */
 		private LocalVariable newVariable() {
 			return new LocalVariable(true, tempVarCount++, new Location(),
-					"expr", null, null, new IntType(32));
+					"expr", null, new IntType(32));
 		}
 
 	}

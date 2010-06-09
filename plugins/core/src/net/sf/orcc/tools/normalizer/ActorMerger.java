@@ -141,7 +141,7 @@ public class ActorMerger implements INetworkTransformation {
 			String name = "buf_" + index;
 			Type type = new ListType(size, connection.getSource().getType());
 			Variable buf = new LocalVariable(true, 0, new Location(), name,
-					null, null, type);
+					null, type);
 			buffersMap.put(connection, buf);
 			index++;
 
@@ -165,7 +165,7 @@ public class ActorMerger implements INetworkTransformation {
 			if (!parameters.contains(port)) {
 				Type type = new ListType(entry.getValue(), port.getType());
 				LocalVariable param = new LocalVariable(false, 0,
-						new Location(), port.getName(), null, null, type);
+						new Location(), port.getName(), null, type);
 				parameters.add("", new Location(), param.getName(), param);
 			}
 		}
@@ -176,7 +176,7 @@ public class ActorMerger implements INetworkTransformation {
 			Port port = entry.getKey();
 			Type type = new ListType(entry.getValue(), port.getType());
 			LocalVariable param = new LocalVariable(false, 0, new Location(),
-					port.getName(), null, null, type);
+					port.getName(), null, type);
 			parameters.add("", new Location(), param.getName(), param);
 		}
 
@@ -295,8 +295,7 @@ public class ActorMerger implements INetworkTransformation {
 			} else {
 
 				LocalVariable loopVar = new LocalVariable(true, 0,
-						new Location(), "idx_" + index, null, null,
-						new IntType(32));
+						new Location(), "idx_" + index, null, new IntType(32));
 
 				if (indexes.size() <= index) {
 					indexes.add(loopVar);
@@ -420,7 +419,7 @@ public class ActorMerger implements INetworkTransformation {
 			Location location = new Location();
 			int numTokens = port.getNumTokensConsumed();
 			LocalVariable varDef = new LocalVariable(true, i, new Location(),
-					"pattern", null, null, new BoolType());
+					"pattern", null, new BoolType());
 			i++;
 			variables.add("", location, varDef.getName(), varDef);
 			HasTokens hasTokens = new HasTokens(location, port, numTokens,
@@ -545,7 +544,7 @@ public class ActorMerger implements INetworkTransformation {
 				int size = port.getNumTokensProduced();
 				Type type = new ListType(size, port.getType());
 				Variable var = new LocalVariable(true, 0, new Location(),
-						port.getName(), null, null, type);
+						port.getName(), null, type);
 
 				buffersMap.put(connection, var);
 				index++;
@@ -574,7 +573,7 @@ public class ActorMerger implements INetworkTransformation {
 				int size = port.getNumTokensConsumed();
 				Type type = new ListType(size, port.getType());
 				Variable var = new LocalVariable(true, 0, new Location(),
-						port.getName(), null, null, type);
+						port.getName(), null, type);
 
 				buffersMap.put(connection, var);
 				index++;

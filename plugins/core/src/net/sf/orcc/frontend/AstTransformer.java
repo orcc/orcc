@@ -656,7 +656,7 @@ public class AstTransformer {
 		boolean assignable = !astVariable.isConstant();
 
 		LocalVariable local = new LocalVariable(assignable, 0, location, name,
-				null, null, type);
+				null, type);
 
 		AstExpression value = astVariable.getValue();
 		if (value != null) {
