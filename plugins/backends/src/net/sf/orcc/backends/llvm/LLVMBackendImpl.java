@@ -41,7 +41,6 @@ import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.transforms.AddInstantationProcedure;
 import net.sf.orcc.ir.transforms.BuildCFG;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
@@ -137,12 +136,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = {
-				new AddInstantationProcedure(),
-				new TypeSizeTransformation(),
+		ActorTransformation[] transformations = { new TypeSizeTransformation(),
 				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation(),
-				new BuildCFG() };
+				new MoveReadsWritesTransformation(), new BuildCFG() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

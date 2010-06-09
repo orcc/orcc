@@ -79,7 +79,6 @@ import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
-import net.sf.orcc.ir.instructions.InitPort;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -257,11 +256,6 @@ public class IRWriter {
 		@Override
 		public void visit(HasTokens hasTokens, Object... args) {
 			visitFifoInstruction(NAME_HAS_TOKENS, hasTokens, args[0]);
-		}
-
-		@Override
-		public void visit(InitPort initPort, Object... args) {
-			// nothing to do
 		}
 
 		@Override

@@ -335,7 +335,7 @@ public class IRParser {
 			ActionScheduler sched = parseActionScheduler(array);
 
 			Actor actor = new Actor(name, file, parameters, inputs, outputs,
-					stateVars, procs, actions, initializes, sched, null);
+					stateVars, procs, actions, initializes, sched);
 			in.close();
 
 			// combine basic blocks

@@ -40,7 +40,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
-import net.sf.orcc.ir.instructions.InitPort;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -111,10 +110,6 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 		visit(ifNode.getThenNodes());
 		visit(ifNode.getElseNodes());
 		visit(ifNode.getJoinNode(), args);
-	}
-
-	@Override
-	public void visit(InitPort initPort, Object... args) {
 	}
 
 	/**

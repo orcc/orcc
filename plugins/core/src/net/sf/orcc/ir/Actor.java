@@ -69,8 +69,6 @@ public class Actor {
 
 	private OrderedMap<Port> inputs;
 
-	private List<Procedure> instantations;
-
 	private Map<Transition, String> maskInputs;
 
 	private Map<Port, String> maskOutputs;
@@ -110,14 +108,12 @@ public class Actor {
 	 *            a list of initialize actions
 	 * @param scheduler
 	 *            an action scheduler
-	 * @param instantations
-	 *            a list of instantiation procedures
 	 */
 	public Actor(String name, String file, OrderedMap<Variable> parameters,
 			OrderedMap<Port> inputs, OrderedMap<Port> outputs,
 			OrderedMap<Variable> stateVars, OrderedMap<Procedure> procs,
 			List<Action> actions, List<Action> initializes,
-			ActionScheduler scheduler, List<Procedure> instantations) {
+			ActionScheduler scheduler) {
 		this.actions = actions;
 		this.file = file;
 		this.initializes = initializes;
@@ -128,7 +124,6 @@ public class Actor {
 		this.procs = procs;
 		this.actionScheduler = scheduler;
 		this.stateVars = stateVars;
-		this.instantations = instantations;
 	}
 
 	/**
@@ -235,10 +230,6 @@ public class Actor {
 	 */
 	public OrderedMap<Port> getInputs() {
 		return inputs;
-	}
-
-	public List<Procedure> getInstantations() {
-		return instantations;
 	}
 
 	/**
@@ -376,10 +367,6 @@ public class Actor {
 	 */
 	public void setActorClass(IClass actorClass) {
 		this.actorClass = actorClass;
-	}
-
-	public void setInstantations(List<Procedure> instantations) {
-		this.instantations = instantations;
 	}
 
 	public void setName(String name) {

@@ -508,7 +508,7 @@ public class AstTransformer {
 		// create IR actor
 		return new Actor(name, file, parameters, inputs, outputs, stateVars,
 				procedures, actions.getAllActions(),
-				initializes.getAllActions(), scheduler, null);
+				initializes.getAllActions(), scheduler);
 	}
 
 	/**

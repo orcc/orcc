@@ -51,10 +51,6 @@ public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 	}
 
 	@Override
-	public void visit(InitPort node, Object... args) {
-	}
-
-	@Override
 	public void visit(Load node, Object... args) {
 	}
 

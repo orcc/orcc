@@ -38,7 +38,6 @@ import net.sf.orcc.backends.xlim.templates.XlimValueTemplate;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
-import net.sf.orcc.ir.instructions.InitPort;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -129,17 +128,6 @@ public class XlimPhiInstructionVisitor implements InstructionVisitor,
 	 *            Arguments sent (not used)
 	 */
 	public void visit(HasTokens node, Object... args) {
-	}
-
-	/**
-	 * Add init port node
-	 * 
-	 * @param node
-	 *            Init port node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(InitPort node, Object... args) {
 	}
 
 	/**

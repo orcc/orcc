@@ -48,7 +48,6 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
-import net.sf.orcc.ir.instructions.InitPort;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -226,11 +225,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 			throw new OrccRuntimeException("Condition not boolean at line "
 					+ node.getLocation().getStartLine() + "\n");
 		}
-	}
-
-	@Override
-	public void visit(InitPort instr, Object... args) {
-		// Nothing to do
 	}
 
 	@Override

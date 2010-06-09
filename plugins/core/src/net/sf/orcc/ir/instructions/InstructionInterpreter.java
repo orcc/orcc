@@ -70,17 +70,6 @@ public interface InstructionInterpreter {
 	public Object interpret(HasTokens hasTokens, Object... args);
 
 	/**
-	 * Interprets an initPort instruction.
-	 * 
-	 * @param initPort
-	 *            an initPort instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(InitPort initPort, Object... args);
-
-	/**
 	 * Interprets a load instruction.
 	 * 
 	 * @param load

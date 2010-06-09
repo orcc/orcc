@@ -67,16 +67,6 @@ public interface InstructionVisitor {
 	public void visit(HasTokens hasTokens, Object... args);
 
 	/**
-	 * Visits an initPort instruction.
-	 * 
-	 * @param initPort
-	 *            an initPort instruction
-	 * @param args
-	 *            arguments
-	 */
-	public void visit(InitPort initPort, Object... args);
-
-	/**
 	 * Visits a load instruction.
 	 * 
 	 * @param load

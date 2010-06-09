@@ -507,7 +507,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		Actor actor = new Actor("cluster_" + clusterIdx++, "", parameters,
 				inputs, outputs, stateVars, procs, actions.getAllActions(),
-				initializes.getAllActions(), scheduler, null);
+				initializes.getAllActions(), scheduler);
 
 		createInternalBuffers();
 		Action action = createAction();
