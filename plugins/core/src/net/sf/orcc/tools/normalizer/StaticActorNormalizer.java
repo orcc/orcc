@@ -67,6 +67,7 @@ import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.tools.transforms.RemoveReadWrites;
 import net.sf.orcc.util.OrderedMap;
 
 /**

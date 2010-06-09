@@ -27,29 +27,40 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.staticanalyzer;
+package net.sf.orcc.tools.merger;
 
-import java.util.Map;
+import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Vertex;
+
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
 
 /**
- * This interface defines a scheduler.
+ * This class computes a topological sort of the graph.
  * 
  * @author Ghislain Roquier
  * 
  */
-public interface IScheduler {
-	public Map<Connection, Integer> getBufferCapacities();
 
-	public Schedule getSchedule();
+public class TopologicalSorter {
 
-	/**
-	 * Schedules the given network in-place.
-	 * 
-	 * @param network
-	 *            a network
-	 */
-	public Schedule schedule() throws OrccException;
+	private DirectedGraph<Vertex, Connection> graph;
+
+	public TopologicalSorter(DirectedGraph<Vertex, Connection> graph) {
+		this.graph = graph;
+	}
+
+	@SuppressWarnings("unused")
+	private boolean isAcyclic() {
+		return !(new CycleDetector<Vertex, Connection>(graph).detectCycles());
+	}
+
+	public List<Vertex> topologicalSort() throws OrccException {
+
+		return new DFS(graph).orderedByFinishingTime();
+	}
+
 }

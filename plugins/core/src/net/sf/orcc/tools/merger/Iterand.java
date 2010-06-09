@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.staticanalyzer;
+package net.sf.orcc.tools.merger;
 
 import net.sf.orcc.network.Vertex;
 

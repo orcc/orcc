@@ -27,17 +27,12 @@
  * SUCH DAMAGE.
  */
 
-package net.sf.orcc.tools.staticanalyzer;
+package net.sf.orcc.tools.merger;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
-import net.sf.orcc.network.Vertex;
-
-import org.jgrapht.DirectedGraph;
 
 /**
  * This interface defines a scheduler.
@@ -45,57 +40,16 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-public abstract class AbstractScheduler implements IScheduler {
+public interface IScheduler {
+	public Map<Connection, Integer> getBufferCapacities();
 
-	protected DirectedGraph<Vertex, Connection> graph;
+	public Schedule getSchedule();
 
-	protected Schedule schedule;
-
-	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph)
-			throws OrccException {
-		this.graph = graph;
-		schedule = schedule();
-	}
-
-	public Map<Connection, Integer> getBufferCapacities() {
-
-		Map<Connection, Integer> bufferCapacities = new HashMap<Connection, Integer>();
-
-		LinkedList<Iterand> stack = new LinkedList<Iterand>(
-				schedule.getIterands());
-
-		int rep = schedule.getIterationCount();
-
-		while (!stack.isEmpty()) {
-			Iterand iterand = stack.pop();
-
-			if (iterand.isVertex()) {
-				Vertex vertex = iterand.getVertex();
-
-				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-					int prd = connection.getSource().getNumTokensProduced();
-					bufferCapacities.put(connection, rep * prd);
-				}
-
-				for (Connection connection : graph.incomingEdgesOf(vertex)) {
-					if (!bufferCapacities.containsKey(connection)) {
-						int cns = connection.getTarget().getNumTokensConsumed();
-						bufferCapacities.put(connection, rep * cns);
-					}
-				}
-			} else {
-				Schedule sched = iterand.getSchedule();
-				rep = sched.getIterationCount();
-				for (Iterand subIterand : sched.getIterands()) {
-					stack.push(subIterand);
-				}
-			}
-		}
-		return bufferCapacities;
-	}
-
-	public Schedule getSchedule() {
-		return schedule;
-	}
-
+	/**
+	 * Schedules the given network in-place.
+	 * 
+	 * @param network
+	 *            a network
+	 */
+	public Schedule schedule() throws OrccException;
 }

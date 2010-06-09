@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.tools.normalizer;
+package net.sf.orcc.tools.merger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,11 +73,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transforms.INetworkTransformation;
-import net.sf.orcc.tools.staticanalyzer.FlatSASScheduler;
-import net.sf.orcc.tools.staticanalyzer.IScheduler;
-import net.sf.orcc.tools.staticanalyzer.Iterand;
-import net.sf.orcc.tools.staticanalyzer.Schedule;
-import net.sf.orcc.tools.staticanalyzer.StaticSubsetDetector;
+import net.sf.orcc.tools.transforms.RemoveReadWrites;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
