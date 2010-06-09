@@ -128,6 +128,18 @@ public class Use {
 	}
 
 	/**
+	 * Removes the given uses.
+	 * 
+	 * @param uses
+	 *            a list of Use
+	 */
+	public static void removeUses(List<Use> uses) {
+		for (Use use : uses) {
+			use.remove();
+		}
+	}
+
+	/**
 	 * Visits the given expression, and removes the uses that reference the
 	 * given node.
 	 * 

@@ -29,7 +29,6 @@
 package net.sf.orcc.ir.transforms;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.Instruction;
@@ -42,6 +41,7 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -54,33 +54,17 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 
 	private boolean changed;
 
-	/**
-	 * Removes the given instruction(s) that store to an unused local variable.
-	 * 
-	 * @param variable
-	 *            a local variable
-	 */
-	private void remove(LocalVariable variable) {
-		List<Instruction> instructions = variable.getInstructions();
-		if (instructions != null) {
-			for (Instruction instruction : instructions) {
-				instruction.getBlock().getInstructions().remove(instruction);
-			}
-		}
-
-		Instruction instruction = variable.getInstruction();
-		if (instruction != null) {
-			instruction.getBlock().getInstructions().remove(instruction);
-		}
-	}
-
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(Assign assign, Object... args) {
 		LocalVariable variable = assign.getTarget();
 		if (!variable.isUsed()) {
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			// clean up uses
+			assign.setTarget(null);
 			assign.setValue(null);
+
+			// remove instruction
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
 
 			procedure.getLocals().remove(variable);
@@ -91,13 +75,43 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(Load load, Object... args) {
-		LocalVariable variable = load.getTarget();
-		if (!variable.isUsed()) {
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		LocalVariable target = load.getTarget();
+		if (!target.isUsed()) {
+			// clean up uses
+			load.setTarget(null);
 			load.setSource(null);
+			Use.removeUses(load, load.getIndexes());
+
+			// remove instruction
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
 
-			procedure.getLocals().remove(variable);
+			procedure.getLocals().remove(target);
+			changed = true;
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Store store, Object... args) {
+		Variable target = store.getTarget();
+		if (!target.isUsed()) {
+			// do not remove stores to variables that are used by writes, or
+			// variables that are parameters
+			if (target.isPort() || procedure.getParameters().contains(target)) {
+				return;
+			}
+
+			// clean up uses
+			store.setTarget(null);
+			Use.removeUses(store, store.getIndexes());
+			store.setValue(null);
+
+			// remove instruction
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			it.remove();
+
+			procedure.getLocals().remove(target);
 			changed = true;
 		}
 	}
@@ -107,8 +121,12 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	public void visit(Peek peek, Object... args) {
 		Variable variable = peek.getTarget();
 		if (!variable.isUsed()) {
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			// clean up uses
+			peek.setTarget(null);
 			peek.setPort(null);
+
+			// remove instruction
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
 
 			procedure.getLocals().remove(variable);
@@ -121,13 +139,13 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	public void visit(PhiAssignment phi, Object... args) {
 		Variable variable = phi.getTarget();
 		if (!variable.isUsed()) {
+			// clean up uses
+			phi.setTarget(null);
+			Use.removeUses(phi.getVars());
+
+			// remove instruction
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
-
-			List<Use> vars = phi.getVars();
-			for (Use use : vars) {
-				use.remove();
-			}
 
 			procedure.getLocals().remove(variable);
 			changed = true;
@@ -151,10 +169,10 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			Iterator<Variable> it = locals.iterator();
 			while (it.hasNext()) {
 				LocalVariable local = (LocalVariable) it.next();
-				if (!local.isUsed() && local.getInstruction() == null) {
+				if (!local.isUsed() && local.getInstruction() == null
+						&& local.getInstructions() == null) {
 					changed = true;
 					it.remove();
-					remove(local);
 				}
 			}
 
