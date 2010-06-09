@@ -202,7 +202,7 @@ actor Algo_Synp_AVC_FREXT()
 	//CABAC Binarisation
 	
 	int maxBinIdxCtx;
-	
+	bool SentMbSkipZeros :=false;
 	bool bypassFlag := false;
 	
 	//CABAC Decoding Process
@@ -780,7 +780,7 @@ actor Algo_Synp_AVC_FREXT()
 	uint prevMbSkipped;
 	uint(size=1) MbaffFrameFlag;
 	uint mb_skip_run;
-	uint(size=1) mb_skip_flag;
+	uint(size=1) mb_skip_flag := 0;
 	uint(size=1) mb_field_decoding_flag := 0;
 	uint(size=1) end_of_slice_flag;
 
@@ -3399,9 +3399,9 @@ actor Algo_Synp_AVC_FREXT()
 			condTermFlagB := 0;
 		else
 			if mbTab[mbAddr][mbSkipFlag] = 1 then
-				 condTermFlagA := 0;
+				 condTermFlagB := 0;
 			else
-				 condTermFlagA := 1;
+				 condTermFlagB := 1;
 			end	
 		end
 		
@@ -4010,6 +4010,7 @@ actor Algo_Synp_AVC_FREXT()
 		if FoundSE then
 			binValDecoded := false;
 			StopCabacProcess();
+			NextBitToDecode := true;
 		end
 	end
 	
@@ -6797,58 +6798,7 @@ println("cbp_blk "+0);
 end
 	end
 	
-	read_SliceD_mb_skip_run_done1_CABAC: action 
-		==> 
-			CurrMbAddr:[mb_addr],
-			PicWidthInMb:[PicWidthInMbs],
-			PicSizeInMb:[PicSizeInMbs],
-			FirstMbInSlice:[first_mb_in_slice],
-			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
-			slice_beta_offset:[val_slice_beta_offset],
-			LFDisable:[disable_deblocking_filter_idc],
-			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
-			cbp_blk:[0],
-			QP:[val_QP], 
-			QP_Cb:[val_QP_Cb], 
-			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
-			MbIntraFlag:[0], 
-			MbPartIdx:[1], 
-			RefIdx:[0], 
-			MbPartWidth:[16], 
-			MbPartHeigth:[16], 
-			MvRes:[0,0],
-			VALUE:[[0: for int i in Integers(0,407) ]] repeat 408
-	guard
-		prevMbSkipped = 1 and IS_CABAC()
-	var 
-		int mb_addr
-	do
-		mb_addr:=val_CurrMbAddr;
-		NextMbAddress();
-		mb_skip_run := mb_skip_run -1;
-		if mb_skip_run = 0 then 
-			prevMbSkipped := 0; 
-			moreDataFlag := more_rbsp_data();
-		end
-if TRACE_MRL then
-println("CurrMbAddr "+ mb_addr);
-println("MbIntraFlag "+0);
-println("QP "+val_QP);
-println("QP_Cb "+ val_QP_Cb);
-println("QP_Cr "+ val_QP_Cr);
-println("ConstrainedIFlag "+constrained_intra_pred_flag[pps_id]);
-println("PicWidthInMb "+PicWidthInMbs);
-println("PicSizeInMb "+ PicSizeInMbs);
-println("FirstMbInSlice "+ first_mb_in_slice);
-println("slice_alpha_c0_offset "+val_slice_alpha_c0_offset);
-println("slice_beta_offset "+val_slice_beta_offset);
-println("LFDisable "+disable_deblocking_filter_idc);
-println("cbp_blk "+0);
-end
-	end
-	
-	read_SliceD_mb_skip_run_done2: action ==>
+		read_SliceD_mb_skip_run_done2: action ==>
 	guard
 		prevMbSkipped = 0
 	end
@@ -6891,6 +6841,23 @@ end
 			
 		mbTab[val_CurrMbAddr][mbSkipFlag] := mb_skip_flag;
 		moreDataFlag := if mb_skip_flag = 1 then 0 else 1 end;
+		SentMbSkipZeros := true;
+	end
+	
+	read_SliceD_mb_skip_flag_sent_zeros: action ==>
+	guard
+		SentMbSkipZeros and mb_skip_flag = 1 
+	do
+		SentMbSkipZeros := false;
+		FoundSE := false;
+	end
+	
+	read_SliceD_mb_skip_flag_skip_sent_zeros: action ==>
+	guard
+		SentMbSkipZeros and mb_skip_flag = 0 
+	do
+		SentMbSkipZeros := false;
+		FoundSE := false;
 	end
 	
 	//else (slice_type = I || slice_type = SI)
@@ -6983,6 +6950,8 @@ end
 			QP_Cr:[val_QP_Cr], 
 			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16,
 			MbIntraFlag:[mb_intra_flag]
+	guard
+		mb_skip_flag = 0
 	var 
 		int mb_addr,
 		int cbp_blk_tmp=val_cbp_blk
@@ -7007,6 +6976,55 @@ end
 		val_cbp_blk:=0;
 	end
 	
+	send_data_position_information_mb_skip_flag: action 
+		==> 
+			CurrMbAddr:[mb_addr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[first_mb_in_slice],
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
+			slice_beta_offset:[val_slice_beta_offset],
+			LFDisable:[disable_deblocking_filter_idc],
+			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
+			cbp_blk:[0],
+			QP:[val_QP], 
+			QP_Cb:[val_QP_Cb], 
+			QP_Cr:[val_QP_Cr], 
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			MbIntraFlag:[0], 
+			MbPartIdx:[1], 
+			RefIdx:[0], 
+			MbPartWidth:[16], 
+			MbPartHeigth:[16], 
+			MvRes:[0,0],
+			VALUE:[[0: for int i in Integers(0,407) ]] repeat 408
+	guard
+		mb_skip_flag = 1 
+	var 
+		int mb_addr
+	do
+		mb_addr:=val_CurrMbAddr;
+		NextMbAddress();
+		SentMbSkipZeros := false;
+		FoundSE := false;
+		if TRACE_MRL then
+			println("CurrMbAddr "+ mb_addr);
+			println("MbIntraFlag "+0);
+			println("QP "+val_QP);
+			println("QP_Cb "+ val_QP_Cb);
+			println("QP_Cr "+ val_QP_Cr);
+			println("ConstrainedIFlag "+constrained_intra_pred_flag[pps_id]);
+			println("PicWidthInMb "+PicWidthInMbs);
+			println("PicSizeInMb "+ PicSizeInMbs);
+			println("FirstMbInSlice "+ first_mb_in_slice);
+			println("slice_alpha_c0_offset "+val_slice_alpha_c0_offset);
+			println("slice_beta_offset "+val_slice_beta_offset);
+			println("LFDisable "+disable_deblocking_filter_idc);
+			println("cbp_blk "+0);
+		end
+	end
+	
+	
 	syncSliceD_endwhile: action ==>
 	end
 
@@ -7021,7 +7039,7 @@ end
 	//else (CABAC)
 	SliceD_update_CABAC: action ==>
 	guard
-		entropy_coding_mode_flag[pps_id] = 1
+		IS_CABAC()
 	do
 		//if( slice_type != I && slice_type != SI )
 		if slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI then 
@@ -9487,8 +9505,12 @@ end
 		read_SliceD_mb_skip_run_done2_moredata              ( read_SliceD_mb_skip_run_done2_moredata_1          ) --> read_SliceD_mb_field_decoding_flag;
 		read_SliceD_mb_skip_run_done2_moredata 				( read_SliceD_mb_skip_run_done2_moredata_0			) --> syncSliceD_endwhile;
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag 							) --> read_SliceD_mb_skip; 
-		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag_done						) --> read_SliceD_mb_field_decoding_flag; 
+		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag_done						) --> read_SliceD_mb_skip_flag_sent_zeros;
 		read_SliceD_mb_skip									( read_SliceD_skip_mb_skip 							) --> read_SliceD_mb_field_decoding_flag;
+		
+		read_SliceD_mb_skip_flag_sent_zeros					(read_SliceD_mb_skip_flag_sent_zeros				) --> SliceD_update;
+		read_SliceD_mb_skip_flag_sent_zeros					(read_SliceD_mb_skip_flag_skip_sent_zeros			) --> read_SliceD_mb_field_decoding_flag;
+		
 		
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_mb_field_decoding_flag				) --> undefined; // interleaved not implemented
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_skip_mb_field_decoding_flag			) --> read_MB_layer_mb_type;
@@ -9502,6 +9524,7 @@ end
 		SliceD_moredata                                     ( SliceD_moredata_1                                 ) --> SliceD_moredata_1_done;
 		SliceD_moredata_1_done								( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_moredata_1_done								( send_data_position_information	                ) --> syncSliceD_endwhile;
+		SliceD_moredata_1_done								( send_data_position_information_mb_skip_flag       ) --> syncSliceD_endwhile;
 		SliceD_moredata 									( SliceD_moredata_0									) --> SliceD_stop_byte_align_done;
 		SliceD_stop_byte_align_done							( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_stop_byte_align_done							( send_data_position_information	                ) --> syncSliceD_endwhile;
