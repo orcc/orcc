@@ -3680,10 +3680,10 @@ actor Algo_Synp_AVC_FREXT()
 				else
 					if currSubType = 3 then
 						if mbPart = 0 then
-							subMbPartIdxN := ((yW-1) >> 2) * 2 + (xW >> 2);
+							subMbPartIdxN := (yW >> 2) * 2 + (xW >> 2);
 						else
 							if mbPart = 1 then
-								subMbPartIdxN := ((yW-1) >> 2) * 2 + ((xW - 7) >> 2);
+								subMbPartIdxN := (yW >> 2) * 2 + ((xW - 7) >> 2);
 							else	
 								if mbPart = 2 then
 									subMbPartIdxN := (((yW-1) - 7) >> 2) * 2 + (xW >> 2);
