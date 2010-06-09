@@ -8213,7 +8213,7 @@ end
 			if IS_CABAC() then
 				mvd_l0 := cabac_value();
 				//Save the decode mvd
-				Mvd_L0[val_CurrMbAddr][mbPartIdx][subMbPartIdx][1] := mvd_l0;
+				Mvd_L0[val_CurrMbAddr][mbPartIdx][0][1] := mvd_l0;
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
