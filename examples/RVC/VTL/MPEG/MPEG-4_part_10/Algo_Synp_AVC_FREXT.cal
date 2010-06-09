@@ -3639,7 +3639,7 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 
-	procedure GiveSubMbPartIdx(int currSubType, int xW,int yW)
+	procedure GiveSubMbPartIdx(int currSubType, int xW,int yW, int mbPart)
 	begin
 		if currSubType = 0 then
 			subMbPartIdxN := 0;		
@@ -3659,17 +3659,17 @@ actor Algo_Synp_AVC_FREXT()
 					end
 				else
 					if currSubType = 3 then
-						if (xW = 3 and yW = 0) or (xW = 12 and yW = 0) or  (xW = 3 and yW = 8) or (xW = 11 and yW = 8) then
-							subMbPartIdxN := 0;
+						if mbPart = 0 then
+							subMbPartIdxN := ((yW-1) >> 2) * 2 + (xW >> 2);
 						else
-							if (xW = 7 and yW = 0) or (xW = 15 and yW = 0) or  (xW = 7 and yW = 8) or (xW = 15 and yW = 8) then
-								subMbPartIdxN := 1;
+							if mbPart = 1 then
+								subMbPartIdxN := ((yW-1) >> 2) * 2 + ((xW - 7) >> 2);
 							else	
-								if (xW = 3 and yW = 4) or (xW = 12 and yW = 4) or  (xW = 3 and yW = 12) or (xW = 11 and yW = 12) then
-									subMbPartIdxN := 2;
+								if mbPart = 2 then
+									subMbPartIdxN := (((yW-1) - 7) >> 2) * 2 + (xW >> 2);
 								else
-									if (xW = 7 and yW = 4) or (xW = 15 and yW = 4) or  (xW = 7 and yW = 12) or (xW = 15 and yW = 12) then
-										subMbPartIdxN := 3;
+									if mbPart = 3 then
+										subMbPartIdxN :=  (((yW-1) - 7) >> 2) * 2 + ((xW - 7) >> 2);
 									end
 								end
 							end
@@ -3725,7 +3725,7 @@ actor Algo_Synp_AVC_FREXT()
 			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
 						
 			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
-				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW);
+				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
 			else
 				subMbPartIdxN := 0;
 			end
@@ -3769,7 +3769,7 @@ actor Algo_Synp_AVC_FREXT()
 			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
 						
 			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
-				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW);
+				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
 			else
 				subMbPartIdxN := 0;
 			end
@@ -4493,7 +4493,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	procedure GetRefIdx_Lx()
 	begin
-		println("Not yet implemented");
+		println("REF IDX Not yet implemented");
 	end
 	//*************************************************************/
 	/*************************************************************
