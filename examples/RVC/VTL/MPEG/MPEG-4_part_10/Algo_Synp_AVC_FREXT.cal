@@ -2833,7 +2833,8 @@ actor Algo_Synp_AVC_FREXT()
 		int yN,
 		int mbAddr,
 		bool AvailMb,
-		int luma8x8BlkIdxN
+		int luma8x8BlkIdxN,
+		bool slice
 		
 	begin
 		//if ctxIdxOffset = 73 then
@@ -2849,10 +2850,20 @@ actor Algo_Synp_AVC_FREXT()
 		if  not AvailMb then
 			condTermFlagA := 0;
 		else
+			if slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI then
+				slice := true;
+			else
+				if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then
+					slice := IS_P_Skip_CABAC(mbAddr) != true;
+				else
+					slice := IS_B_Skip_CABAC(mbAddr) != true;
+				end
+			end
+			
 			luma8x8BlkIdxN := 2*(NeighMb_yW >> 3) + (NeighMb_xW >> 3) ;
-			if  ( GiveMbType(AvailMb,mbAddr) = 25  or
-			      ( ( mbAddr != val_CurrMbAddr) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
-			      ( ( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
+			if  ( GiveMbType(AvailMb,mbAddr) = 25  or 
+			    ( slice and ( mbAddr != val_CurrMbAddr) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
+			    (( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
@@ -2866,10 +2877,19 @@ actor Algo_Synp_AVC_FREXT()
 		if  not AvailMb then
 			condTermFlagB := 0;
 		else
+			if slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI then
+				slice := true;
+			else
+				if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then
+					slice := IS_P_Skip_CABAC(mbAddr) != true;
+				else
+					slice := IS_B_Skip_CABAC(mbAddr) != true;
+				end
+			end
 			luma8x8BlkIdxN := 2*(NeighMb_yW >> 3) + (NeighMb_xW >> 3) ;
-			if  ( GiveMbType(AvailMb,mbAddr) = 25  or
-			      ( ( mbAddr != val_CurrMbAddr) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
-			      ( ( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
+			if  ( GiveMbType(AvailMb,mbAddr) = 25  or 
+			    ( slice and ( mbAddr != val_CurrMbAddr) and ( mbAddr != val_CurrMbAddr) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
+			    (( mbAddr = val_CurrMbAddr ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
 			    condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
@@ -2904,7 +2924,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
-			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) then
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) or GiveMbType(AvailMb,mbAddr) = P_Skip or GiveMbType(AvailMb,mbAddr) = B_Skip then
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
@@ -2925,7 +2945,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			
 			if ( binIdx = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0) or
-			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) then
+			   ( binIdx = 1 and GiveCBPChroma(AvailMb,mbAddr) != 2) or GiveMbType(AvailMb,mbAddr) = P_Skip or GiveMbType(AvailMb,mbAddr) = B_Skip then
 				condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
@@ -6831,10 +6851,12 @@ end
 		
 		if mb_skip_flag = 1 then
 			if slice_type = SLICE_TYPE_P then 
-					mbTab[val_CurrMbAddr][mbTabMbtype] := P_Skip; 
+					mbTab[val_CurrMbAddr][mbTabMbtype] := P_Skip;
+					mbTab[val_CurrMbAddr][mbSliceType] := SLICE_TYPE_P;
 			else 
 				if slice_type = SLICE_TYPE_B then 
 					mbTab[val_CurrMbAddr][mbTabMbtype] := B_Skip; 
+					mbTab[val_CurrMbAddr][mbSliceType] := SLICE_TYPE_B;
 				end 
 			end
 		end
