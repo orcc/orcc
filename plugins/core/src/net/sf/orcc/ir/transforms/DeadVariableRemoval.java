@@ -54,6 +54,26 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 
 	private boolean changed;
 
+	/**
+	 * Removes the given instruction(s) that store to an unused local variable.
+	 * 
+	 * @param variable
+	 *            a local variable
+	 */
+	private void remove(LocalVariable variable) {
+		List<Instruction> instructions = variable.getInstructions();
+		if (instructions != null) {
+			for (Instruction instruction : instructions) {
+				instruction.getBlock().getInstructions().remove(instruction);
+			}
+		}
+
+		Instruction instruction = variable.getInstruction();
+		if (instruction != null) {
+			instruction.getBlock().getInstructions().remove(instruction);
+		}
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(Assign assign, Object... args) {
@@ -134,6 +154,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 				if (!local.isUsed() && local.getInstruction() == null) {
 					changed = true;
 					it.remove();
+					remove(local);
 				}
 			}
 
