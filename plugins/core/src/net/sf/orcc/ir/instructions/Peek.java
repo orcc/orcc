@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir.instructions;
 
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Variable;
 
 /**
  * This class defines a Peek instruction.
@@ -40,9 +40,8 @@ import net.sf.orcc.ir.Port;
  */
 public class Peek extends AbstractFifoInstruction {
 
-	public Peek(Location location, Port port, int numTokens,
-			LocalVariable varDef) {
-		super(location, port, numTokens, varDef);
+	public Peek(Location location, Port port, int numTokens, Variable target) {
+		super(location, port, numTokens, target);
 	}
 
 	@Override

@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir.instructions;
 
-import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Variable;
 
 /**
  * This class defines a HasTokens instruction.
@@ -41,8 +41,8 @@ import net.sf.orcc.ir.Port;
 public class HasTokens extends AbstractFifoInstruction {
 
 	public HasTokens(Location location, Port port, int numTokens,
-			LocalVariable varDef) {
-		super(location, port, numTokens, varDef);
+			Variable target) {
+		super(location, port, numTokens, target);
 	}
 
 	@Override
