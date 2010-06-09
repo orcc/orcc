@@ -54,7 +54,6 @@ public class DisplayActor extends AbstractInterpretedActor {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private long lastTime;
 
 	private static int clip(int n) {
 		if (n < 0) {
@@ -83,14 +82,16 @@ public class DisplayActor extends AbstractInterpretedActor {
 	private Canvas canvas;
 
 	private CommunicationFifo fifo_B;
+
 	private CommunicationFifo fifo_HEIGHT;
 	private CommunicationFifo fifo_WIDTH;
-
 	private JFrame frame;
 
 	public int height;
 
 	private BufferedImage image;
+
+	private long lastTime;
 
 	private int numImages;
 

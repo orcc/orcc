@@ -191,12 +191,12 @@ public class Network {
 				Instance instance = vertex.getInstance();
 				if (instance.isActor()) {
 					Actor actor = instance.getActor();
-					computePredSucc(vertex, actor.getInputs(), actor
-							.getOutputs());
+					computePredSucc(vertex, actor.getInputs(),
+							actor.getOutputs());
 				} else if (instance.isBroadcast()) {
 					Broadcast bcast = instance.getBroadcast();
-					computePredSucc(vertex, bcast.getInputs(), bcast
-							.getOutputs());
+					computePredSucc(vertex, bcast.getInputs(),
+							bcast.getOutputs());
 				}
 			}
 		}

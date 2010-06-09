@@ -137,6 +137,17 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	}
 
 	/**
+	 * Returns the number of elements in this ordered map. This method is just a
+	 * wrapper for {@link #size()}, but it is necessary because ST looks for
+	 * methods that start with get.
+	 * 
+	 * @return the number of elements in this ordered map
+	 */
+	public int getLength() {
+		return size();
+	}
+
+	/**
 	 * Returns the list of objects of this scope. The list returned is a copy.
 	 * Note that the list is cached for efficiency, so as long as no objects are
 	 * added or removed, calling this method will return a reference to the same
@@ -149,17 +160,6 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 			list = new ArrayList<T>(map.values());
 		}
 		return list;
-	}
-
-	/**
-	 * Returns the number of elements in this ordered map. This method is just a
-	 * wrapper for {@link #size()}, but it is necessary because ST looks for
-	 * methods that start with get.
-	 * 
-	 * @return the number of elements in this ordered map
-	 */
-	public int getLength() {
-		return size();
 	}
 
 	@Override

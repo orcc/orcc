@@ -285,7 +285,8 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 		throw new OrccRuntimeException("Uninitialized variable at line "
 				+ expr.getLocation().getStartLine()
 				+ "\nCould not evaluate unary expression "
-				+ expr.getOp().toString() + "(" + expr.getOp().getText() + ")\n");
+				+ expr.getOp().toString() + "(" + expr.getOp().getText()
+				+ ")\n");
 	}
 
 }

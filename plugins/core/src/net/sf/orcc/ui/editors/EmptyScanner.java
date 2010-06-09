@@ -48,8 +48,8 @@ import org.eclipse.swt.graphics.RGB;
 public class EmptyScanner extends RuleBasedScanner {
 
 	public EmptyScanner(ColorManager manager, RGB color) {
-		IToken commentToken = new Token(new TextAttribute(manager
-				.getColor(color)));
+		IToken commentToken = new Token(new TextAttribute(
+				manager.getColor(color)));
 		setDefaultReturnToken(commentToken);
 
 		List<IRule> rules = new ArrayList<IRule>();

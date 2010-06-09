@@ -61,10 +61,11 @@ public class StgTemplateScanner extends RuleBasedScanner {
 		private RuleState state;
 
 		public STCodeRule(ColorManager colorManager) {
-			defaultToken = new Token(new TextAttribute(colorManager
-					.getColor(IStgColorConstants.DEFAULT), null, SWT.BOLD));
-			betweenDollarsToken = new Token(new TextAttribute(colorManager
-					.getColor(IStgColorConstants.SEPARATOR)));
+			defaultToken = new Token(new TextAttribute(
+					colorManager.getColor(IStgColorConstants.DEFAULT), null,
+					SWT.BOLD));
+			betweenDollarsToken = new Token(new TextAttribute(
+					colorManager.getColor(IStgColorConstants.SEPARATOR)));
 
 			state = RuleState.DEFAULT;
 		}

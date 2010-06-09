@@ -98,8 +98,8 @@ public class BroadcastAdder implements INetworkTransformation {
 			i++;
 
 			Map<String, IAttribute> attributes = connection.getAttributes();
-			Connection connBcastTarget = new Connection(outputPort, connection
-					.getTarget(), attributes);
+			Connection connBcastTarget = new Connection(outputPort,
+					connection.getTarget(), attributes);
 			graph.addEdge(vertexBCast, target, connBcastTarget);
 
 			// setting source to null so we don't examine it again
@@ -133,8 +133,8 @@ public class BroadcastAdder implements INetworkTransformation {
 				int numOutput = outList.size();
 				if (numOutput > 1) {
 					// add broadcast vertex
-					Broadcast bcast = new Broadcast(numOutput, srcPort
-							.getType());
+					Broadcast bcast = new Broadcast(numOutput,
+							srcPort.getType());
 					String name = "broadcast_" + instance.getId() + "_"
 							+ srcPort.getName();
 					Instance newInst = new Instance(name, bcast);
@@ -152,8 +152,8 @@ public class BroadcastAdder implements INetworkTransformation {
 	private void examineVertex(Vertex vertex) throws OrccException {
 		// make a copy of the existing outgoing connections of vertex because
 		// the set returned is modified when new edges are added
-		Set<Connection> connections = new HashSet<Connection>(graph
-				.outgoingEdgesOf(vertex));
+		Set<Connection> connections = new HashSet<Connection>(
+				graph.outgoingEdgesOf(vertex));
 
 		// for each connection, add it to a port => connection map
 		// port is a port of vertex

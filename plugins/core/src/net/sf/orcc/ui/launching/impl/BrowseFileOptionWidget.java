@@ -301,8 +301,8 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	public void initializeFrom(ILaunchConfiguration configuration)
 			throws CoreException {
 		updateLaunchConfiguration = false;
-		text.setText(configuration.getAttribute(option.getIdentifier(), option
-				.getDefaultValue()));
+		text.setText(configuration.getAttribute(option.getIdentifier(),
+				option.getDefaultValue()));
 		updateLaunchConfiguration = true;
 	}
 

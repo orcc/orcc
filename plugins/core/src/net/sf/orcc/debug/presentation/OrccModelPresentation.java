@@ -68,8 +68,9 @@ public class OrccModelPresentation extends LabelProvider implements
 		}
 		if (element instanceof ILineBreakpoint) {
 			try {
-				return IDE.getEditorDescriptor((IFile) ((ILineBreakpoint) element)
-						.getMarker().getResource()).getId();
+				return IDE.getEditorDescriptor(
+						(IFile) ((ILineBreakpoint) element).getMarker()
+								.getResource()).getId();
 			} catch (PartInitException e) {
 				e.printStackTrace();
 			}

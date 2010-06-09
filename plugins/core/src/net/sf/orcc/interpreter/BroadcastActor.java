@@ -42,10 +42,10 @@ import net.sf.orcc.ir.Port;
  */
 public class BroadcastActor extends AbstractInterpretedActor {
 
-	private Port inport;
-	private List<Port> outports;
-
 	private CommunicationFifo inFifo;
+	private Port inport;
+
+	private List<Port> outports;
 
 	public BroadcastActor(String id, Actor actor) {
 		super(id, actor);

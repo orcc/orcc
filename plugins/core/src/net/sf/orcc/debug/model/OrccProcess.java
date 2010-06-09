@@ -292,6 +292,16 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		return cmdList.toArray(new String[] {});
 	}
 
+	@Override
+	public String getAttribute(String key) {
+		return null;
+	}
+
+	@Override
+	public int getExitValue() throws DebugException {
+		return value;
+	}
+
 	/**
 	 * Returns a file:/ URL where the front-end executable can be found.
 	 * 
@@ -329,16 +339,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		}
 
 		return FileLocator.toFileURL(url);
-	}
-
-	@Override
-	public String getAttribute(String key) {
-		return null;
-	}
-
-	@Override
-	public int getExitValue() throws DebugException {
-		return value;
 	}
 
 	@Override
@@ -441,7 +441,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 			new File(tracesFolder).mkdirs();
 
 		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-		
+
 		String xdfFile = configuration.getAttribute(XDF_FILE, "");
 
 		try {

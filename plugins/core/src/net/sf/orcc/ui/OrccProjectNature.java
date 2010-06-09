@@ -46,7 +46,7 @@ public class OrccProjectNature implements IProjectNature {
 
 	@Override
 	public void configure() throws CoreException {
-		
+
 	}
 
 	@Override

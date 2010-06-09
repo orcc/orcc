@@ -129,8 +129,8 @@ public class BinOpSeqParser {
 	 */
 	public static Expression parse(List<Expression> expressions,
 			List<BinaryOp> operators) throws OrccException {
-		return createPrecedenceTree(expressions, operators, 0, expressions
-				.size() - 1);
+		return createPrecedenceTree(expressions, operators, 0,
+				expressions.size() - 1);
 	}
 
 }

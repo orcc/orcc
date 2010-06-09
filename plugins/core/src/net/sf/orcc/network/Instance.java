@@ -387,7 +387,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 
 		// replace path-based class by actor class
 		clasz = className;
-		
+
 		// and update hierarchical class
 		if (!hierarchicalClass.isEmpty()) {
 			int last = hierarchicalClass.size() - 1;

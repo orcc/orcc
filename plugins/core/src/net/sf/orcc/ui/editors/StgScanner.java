@@ -64,10 +64,11 @@ public class StgScanner extends RuleBasedScanner {
 		private Map<String, IToken> map;
 
 		public KeywordRule(ColorManager colorManager) {
-			keywordToken = new Token(new TextAttribute(colorManager
-					.getColor(IStgColorConstants.KEYWORD), null, SWT.BOLD));
-			identifierToken = new Token(new TextAttribute(colorManager
-					.getColor(IStgColorConstants.DEFAULT)));
+			keywordToken = new Token(new TextAttribute(
+					colorManager.getColor(IStgColorConstants.KEYWORD), null,
+					SWT.BOLD));
+			identifierToken = new Token(new TextAttribute(
+					colorManager.getColor(IStgColorConstants.DEFAULT)));
 
 			map = new HashMap<String, IToken>();
 
@@ -114,8 +115,8 @@ public class StgScanner extends RuleBasedScanner {
 		IToken separatorToken;
 
 		public SeparatorsRule(ColorManager manager) {
-			separatorToken = new Token(new TextAttribute(manager
-					.getColor(IStgColorConstants.SEPARATOR)));
+			separatorToken = new Token(new TextAttribute(
+					manager.getColor(IStgColorConstants.SEPARATOR)));
 		}
 
 		public IToken evaluate(ICharacterScanner scanner) {

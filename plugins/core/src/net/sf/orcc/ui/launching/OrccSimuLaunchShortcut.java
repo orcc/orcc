@@ -95,6 +95,16 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 		return dialog.open();
 	}
 
+	private String browseStimulusFiles(Shell shell, IFile file) {
+		FileDialog fd = new FileDialog(shell, SWT.OPEN);
+		fd.setText("Select input stimulus :");
+		String[] filterExt = { "*.*" };
+		fd.setFilterExtensions(filterExt);
+		String location = file.getParent().getLocation().toOSString();
+		fd.setFilterPath(location);
+		return fd.open();
+	}
+
 	private String browseVTLFolder(Shell shell, IFile file) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
 				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
@@ -141,16 +151,6 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			return resource.getLocation().toOSString();
 		}
 		return null;
-	}
-
-	private String browseStimulusFiles(Shell shell, IFile file) {
-		FileDialog fd = new FileDialog(shell, SWT.OPEN);
-		fd.setText("Select input stimulus :");
-		String[] filterExt = { "*.*" };
-		fd.setFilterExtensions(filterExt);
-		String location = file.getParent().getLocation().toOSString();
-		fd.setFilterPath(location);
-		return fd.open();
 	}
 
 	private void chooseAndLaunch(IFile file, ILaunchConfiguration[] configs,

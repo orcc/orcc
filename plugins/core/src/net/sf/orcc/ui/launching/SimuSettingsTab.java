@@ -84,11 +84,11 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 	private Text textNetwork;
 
-	private Text textVTL;
-
 	private Text textOutput;
 
 	private Text textStimulus;
+
+	private Text textVTL;
 
 	private void browseFiles(Shell shell) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
@@ -234,40 +234,6 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 		createControlOutput(font, composite);
 	}
 
-	private void createControlStimulus(Font font, Composite parent) {
-		final Group group = new Group(parent, SWT.NONE);
-		group.setFont(font);
-		group.setText("&Input stimulus :");
-		group.setLayout(new GridLayout(2, false));
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		group.setLayoutData(data);
-
-		textStimulus = new Text(group, SWT.BORDER | SWT.SINGLE);
-		textStimulus.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		textStimulus.setLayoutData(data);
-		textStimulus.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				updateLaunchConfigurationDialog();
-			}
-
-		});
-
-		Button buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				browseStimulusFiles(group.getShell());
-			}
-		});
-	}
-
 	private void createControlNetwork(Font font, Composite parent) {
 		final Group group = new Group(parent, SWT.NONE);
 		group.setFont(font);
@@ -340,6 +306,40 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				browseOutputFolder(group.getShell());
+			}
+		});
+	}
+
+	private void createControlStimulus(Font font, Composite parent) {
+		final Group group = new Group(parent, SWT.NONE);
+		group.setFont(font);
+		group.setText("&Input stimulus :");
+		group.setLayout(new GridLayout(2, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		group.setLayoutData(data);
+
+		textStimulus = new Text(group, SWT.BORDER | SWT.SINGLE);
+		textStimulus.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		textStimulus.setLayoutData(data);
+		textStimulus.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateLaunchConfigurationDialog();
+			}
+
+		});
+
+		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseStimulusFiles(group.getShell());
 			}
 		});
 	}

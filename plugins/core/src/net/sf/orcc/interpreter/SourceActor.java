@@ -42,9 +42,9 @@ import net.sf.orcc.ir.Actor;
  */
 public class SourceActor extends AbstractInterpretedActor {
 
+	private CommunicationFifo fifo_O;
 	public String fileName;
 	private RandomAccessFile in;
-	private CommunicationFifo fifo_O;
 
 	public SourceActor(String id, Actor actor, String inputBitstream) {
 		super(id, actor);
@@ -90,7 +90,8 @@ public class SourceActor extends AbstractInterpretedActor {
 				}
 
 				fifo_O.put(byteRead);
-				running = 1;			}
+				running = 1;
+			}
 		} catch (IOException e) {
 			String msg = "I/O exception: \"" + fileName + "\"";
 			throw new RuntimeException(msg, e);

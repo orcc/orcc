@@ -91,7 +91,7 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 			Object var = frame.stateVars.get(varNames[i - 1]);
 			if ((var != null) && var.getClass().isArray()) {
 				IVariable[] subVars = null;
-				if (((Object[]) var).length < 1024*1024) {
+				if (((Object[]) var).length < 1024 * 1024) {
 					subVars = new IVariable[((Object[]) var).length];
 					for (Integer j = 0; j < ((Object[]) var).length; j++) {
 						OrccValue subValue = new OrccValue(

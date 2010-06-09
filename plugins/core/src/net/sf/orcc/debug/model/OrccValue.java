@@ -36,7 +36,8 @@ import org.eclipse.debug.core.model.IVariable;
 /**
  * Value of a Orcc variable.
  */
-public class OrccValue extends OrccDebugElement implements IValue, IIndexedValue {
+public class OrccValue extends OrccDebugElement implements IValue,
+		IIndexedValue {
 
 	private String fValue;
 	private IVariable[] fVariables;
@@ -49,6 +50,10 @@ public class OrccValue extends OrccDebugElement implements IValue, IIndexedValue
 		} else {
 			fValue = "null";
 		}
+	}
+
+	public int getInitialOffset() {
+		return 0;
 	}
 
 	/*
@@ -65,6 +70,10 @@ public class OrccValue extends OrccDebugElement implements IValue, IIndexedValue
 		return "integer";
 	}
 
+	public int getSize() throws DebugException {
+		return fVariables.length;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -72,6 +81,10 @@ public class OrccValue extends OrccDebugElement implements IValue, IIndexedValue
 	 */
 	public String getValueString() throws DebugException {
 		return fValue;
+	}
+
+	public IVariable getVariable(int offset) throws DebugException {
+		return fVariables[offset];
 	}
 
 	/*
@@ -82,9 +95,18 @@ public class OrccValue extends OrccDebugElement implements IValue, IIndexedValue
 	public IVariable[] getVariables() throws DebugException {
 		if (fVariables != null) {
 			return fVariables;
-		}else {
+		} else {
 			return new IVariable[0];
 		}
+	}
+
+	public IVariable[] getVariables(int offset, int length)
+			throws DebugException {
+		IVariable[] variables = new OrccVariable[length];
+		for (int i = 0; i < length; i++) {
+			variables[i] = fVariables[i + offset];
+		}
+		return variables;
 	}
 
 	/*
@@ -93,7 +115,7 @@ public class OrccValue extends OrccDebugElement implements IValue, IIndexedValue
 	 * @see org.eclipse.debug.core.model.IValue#hasVariables()
 	 */
 	public boolean hasVariables() throws DebugException {
-		return (fVariables!=null);
+		return (fVariables != null);
 	}
 
 	/*
@@ -103,28 +125,5 @@ public class OrccValue extends OrccDebugElement implements IValue, IIndexedValue
 	 */
 	public boolean isAllocated() throws DebugException {
 		return true;
-	}
-
-	
-	public IVariable getVariable(int offset) throws DebugException {
-		return fVariables[offset];
-	}
-
-	
-	public IVariable[] getVariables(int offset, int length)
-			throws DebugException {
-		IVariable[] variables = new OrccVariable[length];
-		for (int i = 0; i < length; i++) {
-			variables[i] = fVariables[i+offset];
-		}
-		return variables;
-	}
-
-	public int getSize() throws DebugException {
-		return fVariables.length;
-	}
-
-	public int getInitialOffset() {
-		return 0;
 	}
 }

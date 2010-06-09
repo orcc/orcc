@@ -75,7 +75,7 @@ public class InterpreterMain extends Thread {
 	 * Interpreter automaton control
 	 */
 	public enum InterpreterState {
-		CONFIGURED, IDLE, RUNNING, BREAKPOINT, SUSPENDED, TERMINATED
+		BREAKPOINT, CONFIGURED, IDLE, RUNNING, SUSPENDED, TERMINATED
 	}
 
 	/**
@@ -86,12 +86,16 @@ public class InterpreterMain extends Thread {
 
 	private List<AbstractInterpretedActor> actorQueue;
 
+	private List<CommunicationFifo> fifoList;
+	private Map<String, Map<String, CommunicationFifo>> fifoMap;
+
 	private IProgressMonitor monitor;
+
+	private int nbOfCycles;
 	/**
 	 * Options
 	 */
 	private String networkFilename;
-
 	/**
 	 * Associated system objects
 	 */
@@ -104,14 +108,10 @@ public class InterpreterMain extends Thread {
 	private PropertyChangeSupport propertyChange;
 	private InterpreterState state = InterpreterState.IDLE;
 	private String stimulusFilename;
-
 	/**
 	 * Executable actor network
 	 */
 	private List<DebugThread> threadQueue;
-	private int nbOfCycles;
-	private Map<String, Map<String, CommunicationFifo>> fifoMap;
-	private List<CommunicationFifo> fifoList;
 
 	/**
 	 * Add the listener <code>listener</code> to the registered listeners.
@@ -561,20 +561,6 @@ public class InterpreterMain extends Thread {
 	}
 
 	/**
-	 * Schedule next schedulable action for each actor of the network
-	 */
-	public synchronized void stepAll() {
-		if (state == InterpreterState.SUSPENDED) {
-			firePropertyChange("resumed step", null, null);
-			if (scheduleActors() <= 0) {
-				terminate();
-			} else {
-				firePropertyChange("suspended step", null, null);
-			}
-		}
-	}
-
-	/**
 	 * Step into a specific actor action. When the end of the action has been
 	 * reached, schedule all other actors.
 	 * 
@@ -603,6 +589,20 @@ public class InterpreterMain extends Thread {
 						}
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Schedule next schedulable action for each actor of the network
+	 */
+	public synchronized void stepAll() {
+		if (state == InterpreterState.SUSPENDED) {
+			firePropertyChange("resumed step", null, null);
+			if (scheduleActors() <= 0) {
+				terminate();
+			} else {
+				firePropertyChange("suspended step", null, null);
 			}
 		}
 	}

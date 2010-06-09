@@ -40,17 +40,17 @@ import org.eclipse.debug.core.model.IThread;
  */
 public class OrccThread extends OrccDebugElement implements IThread {
 
+	private String actorName;
+
 	/**
 	 * Breakpoints this thread is suspended at or <code>null</code> if none.
 	 */
 	private IBreakpoint[] fBreakpoints;
-
 	private DebugThread fThread;
 	/**
 	 * Debugging objects
 	 */
 	private OrccDebugTarget target;
-	private String actorName;
 
 	/**
 	 * Constructs a new thread for the given target
@@ -119,6 +119,10 @@ public class OrccThread extends OrccDebugElement implements IThread {
 		return false;
 	}
 
+	public String getActorName() throws DebugException {
+		return actorName;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -139,10 +143,6 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	public String getName() throws DebugException {
 		return fThread.getName();
 	}
-	
-	public String getActorName() throws DebugException {
-		return actorName;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -160,8 +160,8 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 */
 	public IStackFrame[] getStackFrames() throws DebugException {
 		if (isSuspended()) {
-			return new IStackFrame[] { new OrccStackFrame(this, fThread
-					.getStackFrame(), 0) };
+			return new IStackFrame[] { new OrccStackFrame(this,
+					fThread.getStackFrame(), 0) };
 		} else {
 			return new IStackFrame[0];
 		}

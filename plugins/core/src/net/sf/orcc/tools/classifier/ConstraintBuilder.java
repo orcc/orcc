@@ -323,8 +323,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		if (intVar == null) {
 			// create int variable associated with given variable
 			// variable may be a state variable or a port
-			intVar = new IntVariable(network, getDomain(source), source
-					.getName());
+			intVar = new IntVariable(network, getDomain(source),
+					source.getName());
 			variableConstraints.put(intVar.getName(), intVar);
 		}
 

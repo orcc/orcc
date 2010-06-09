@@ -20,12 +20,12 @@ public class DebugThread {
 		this.interpreter = interpreter;
 	}
 
-	public String getName() {
-		return instance.getName();
-	}
-
 	public String getActorName() {
 		return instance.actor.getName();
+	}
+
+	public String getName() {
+		return instance.getName();
 	}
 
 	public synchronized InterpreterStackFrame getStackFrame() {

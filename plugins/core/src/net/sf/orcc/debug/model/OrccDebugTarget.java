@@ -107,8 +107,8 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			threadMap.put(thread.getName(), (OrccThread) fThreads[idx]);
 			idx++;
 		}
-		DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(
-				this);
+		DebugPlugin.getDefault().getBreakpointManager()
+				.addBreakpointListener(this);
 	}
 
 	/*
@@ -123,9 +123,10 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			try {
 				if (breakpoint.isEnabled()) {
 					try {
-						sendRequest("set", breakpoint.getMarker().getResource()
-								.getName(), (((ILineBreakpoint) breakpoint)
-								.getLineNumber()));
+						sendRequest(
+								"set",
+								breakpoint.getMarker().getResource().getName(),
+								(((ILineBreakpoint) breakpoint).getLineNumber()));
 					} catch (CoreException e) {
 					}
 				}
@@ -199,8 +200,8 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		if (supportsBreakpoint(breakpoint)) {
 			try {
 				sendRequest("clear", breakpoint.getMarker().getResource()
-						.getName(), (((ILineBreakpoint) breakpoint)
-						.getLineNumber()));
+						.getName(),
+						(((ILineBreakpoint) breakpoint).getLineNumber()));
 			} catch (CoreException e) {
 			}
 		}
@@ -345,6 +346,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 
 	/**
 	 * Check if any debug thread is currently stepping
+	 * 
 	 * @return
 	 */
 	public boolean isStepping() {
@@ -355,7 +357,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		}
 		return false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
