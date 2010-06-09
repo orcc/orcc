@@ -190,12 +190,12 @@ public class WrapperAdder {
 					if (outputs.contains(port)) {
 						Set<Connection> conns = graph.incomingEdgesOf(vertex);
 
-						// FIX: there should be only one connection since fan-in
-						// is not allowed
+						// FIXME: there should be only one connection since
+						// fan-in is not allowed
 						for (Connection connection : conns) {
 
 							Port srcPort = connection.getSource();
-							// FIX: set the type of the source port to the one
+							// FIXME: set the type of the source port to the one
 							// of the target
 							srcPort.setType(port.getType());
 							Port tgtPort = new Port(port);

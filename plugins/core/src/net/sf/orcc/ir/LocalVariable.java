@@ -28,22 +28,15 @@
  */
 package net.sf.orcc.ir;
 
-
 /**
  * This class represents a local variable. A local variable is a variable that
- * can be assigned, has a SSA index, and a reference to the node where it is
- * defined.
+ * may have a suffix and an SSA index.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class LocalVariable extends Variable implements
 		Comparable<LocalVariable> {
-
-	/**
-	 * whether the variable is assignable.
-	 */
-	private boolean assignable;
 
 	/**
 	 * SSA index.
@@ -57,8 +50,7 @@ public class LocalVariable extends Variable implements
 
 	public LocalVariable(boolean assignable, int index, Location loc,
 			String name, Integer suffix, Type type) {
-		super(loc, type, name, false);
-		this.assignable = assignable;
+		super(loc, type, name, false, assignable);
 		this.index = index;
 		this.suffix = suffix;
 	}
@@ -106,19 +98,6 @@ public class LocalVariable extends Variable implements
 
 	public boolean hasSuffix() {
 		return (suffix != null);
-	}
-
-	/**
-	 * Returns <code>true</code> if this variable can be assigned to.
-	 * 
-	 * @return <code>true</code> if this variable can be assigned to
-	 */
-	public boolean isAssignable() {
-		return assignable;
-	}
-
-	public void setAssignable(boolean assignable) {
-		this.assignable = assignable;
 	}
 
 	public void setIndex(int index) {

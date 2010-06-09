@@ -62,10 +62,11 @@ public class Port extends Variable implements Comparable<Port> {
 	}
 
 	/**
-	 * Creates a new port from the given port
+	 * Creates a new port that has the same characteristics as the given port,
+	 * with an empty list of uses.
 	 */
 	public Port(Port port) {
-		super(port);
+		this(port.getLocation(), port.getType(), port.getName());
 	}
 
 	@Override

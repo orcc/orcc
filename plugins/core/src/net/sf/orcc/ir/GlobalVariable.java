@@ -28,13 +28,9 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.expr.ExpressionEvaluator;
-
 /**
  * This class represents a global variable. A global variable is a variable that
- * is not assignable, may have a value as an expression, which should be
- * constant when evaluated.
+ * is not assignable and may have a value as an expression.
  * 
  * @author Matthieu Wipliez
  * 
@@ -45,22 +41,6 @@ public class GlobalVariable extends Variable {
 	 * variable possible assign expression
 	 */
 	private Expression expression;
-
-	/**
-	 * variable constant value.
-	 */
-	protected Object initialValue;
-
-	/**
-	 * Creates a new global variable from the given global variable.
-	 * 
-	 * @param variable
-	 *            a global variable
-	 */
-	public GlobalVariable(GlobalVariable variable) {
-		super(variable);
-		this.initialValue = variable.initialValue;
-	}
 
 	/**
 	 * Creates a new global variable with the given location, type, and name.
@@ -94,18 +74,6 @@ public class GlobalVariable extends Variable {
 			Expression value) {
 		super(location, type, name, true);
 		this.expression = value;
-	}
-
-	/**
-	 * Evaluates this variable's value to a constant.
-	 * 
-	 * @throws OrccRuntimeException
-	 *             if the value could not be evaluated to a constant
-	 */
-	public void evaluate() {
-		if (hasExpression()) {
-			initialValue = getExpression().accept(new ExpressionEvaluator());
-		}
 	}
 
 	/**

@@ -29,18 +29,13 @@
 package net.sf.orcc.ir;
 
 /**
- * This class represents a state variable. A state variable is a global variable
- * that can be assigned.
+ * This class represents a state variable. A state variable is a variable that
+ * may have an initial value.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class StateVariable extends Variable {
-
-	/**
-	 * whether the variable is assignable.
-	 */
-	private boolean assignable;
 
 	private Object initialValue;
 
@@ -77,8 +72,7 @@ public class StateVariable extends Variable {
 	 */
 	public StateVariable(Location location, Type type, String name,
 			boolean assignable, Object initialValue) {
-		super(location, type, name, true);
-		this.assignable = assignable;
+		super(location, type, name, true, assignable);
 		this.initialValue = initialValue;
 	}
 
@@ -92,15 +86,6 @@ public class StateVariable extends Variable {
 	 */
 	public Object getConstantValue() {
 		return initialValue;
-	}
-
-	/**
-	 * Returns <code>true</code> if this state variable can be assigned.
-	 * 
-	 * @return <code>true</code> if this state variable can be assigned
-	 */
-	public boolean isAssignable() {
-		return assignable;
 	}
 
 	/**

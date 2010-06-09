@@ -34,7 +34,7 @@ variableDeclaration(variable) ::= <<
 $if(variable.port)
 $$AllocaOp(result={%$variable$}, type={$variable.type.elementType$*})$$
 else
-$$if(variable.list)
+$$if(variable.type.list)
 $$AllocaOp(result={%$variable$}, type=variable.type)$$
 endif$$
 endif$

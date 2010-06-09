@@ -38,12 +38,19 @@ import net.sf.orcc.util.INameable;
 
 /**
  * This class represents a variable. A variable has a location, a type, a name
- * and a list of uses.
+ * and a list of uses. It may be global or not, assignable or not. It has a list
+ * of instructions where it is assigned (for local variables this list has one
+ * entry). Finally, it has a value that is only used by the interpreter.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class Variable implements INameable {
+public class Variable implements INameable {
+
+	/**
+	 * whether the variable is assignable.
+	 */
+	private boolean assignable;
 
 	/**
 	 * true if this variable is global
@@ -81,7 +88,8 @@ public abstract class Variable implements INameable {
 	private Object value;
 
 	/**
-	 * Creates a new variable with the given location, type, and name.
+	 * Creates a new variable with the given location, type, and name. The
+	 * variable may be global or local, and is created as non-assignable.
 	 * 
 	 * @param location
 	 *            the variable location
@@ -93,44 +101,43 @@ public abstract class Variable implements INameable {
 	 *            whether this variable is global
 	 */
 	public Variable(Location location, Type type, String name, boolean global) {
+		this(location, type, name, global, false);
+	}
+
+	/**
+	 * Creates a new variable with the given location, type, and name, and
+	 * whether it is assignable or not.
+	 * 
+	 * @param location
+	 *            the variable location
+	 * @param type
+	 *            the variable type
+	 * @param name
+	 *            the variable name
+	 * @param global
+	 *            whether this variable is global
+	 * @param assignable
+	 *            <code>true</code> if this variable can be assigned
+	 */
+	public Variable(Location location, Type type, String name, boolean global,
+			boolean assignable) {
 		this.location = location;
 		this.type = type;
 		this.name = name;
 		this.global = global;
+		this.assignable = assignable;
 
 		this.uses = new ArrayList<Use>();
 	}
 
 	/**
-	 * Creates a new variable from the given variable.
+	 * Adds a new use of this variable in the given instruction.
 	 * 
-	 * @param variable
-	 *            a variable
+	 * @param instruction
+	 *            an instruction that uses this variable
 	 */
-	public Variable(Variable variable) {
-		this.location = variable.location;
-		this.type = variable.type;
-		this.name = variable.name;
-		this.global = variable.global;
-
-		this.uses = new ArrayList<Use>(variable.uses);
-	}
-
-	/**
-	 * Adds a new use of this variable.
-	 */
-	public void addUse() {
-		new Use(this);
-	}
-
-	/**
-	 * Adds a new use of this variable in the given node.
-	 * 
-	 * @param node
-	 *            a node that uses this variable
-	 */
-	public void addUse(Instruction node) {
-		new Use(this, node);
+	public void addUse(Instruction instruction) {
+		new Use(this, instruction);
 	}
 
 	/**
@@ -201,21 +208,21 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
+	 * Returns <code>true</code> if this variable can be assigned to.
+	 * 
+	 * @return <code>true</code> if this variable can be assigned to
+	 */
+	public boolean isAssignable() {
+		return assignable;
+	}
+
+	/**
 	 * Returns <code>true</code> if this variable is global.
 	 * 
 	 * @return <code>true</code> if this variable is global
 	 */
 	public boolean isGlobal() {
 		return global;
-	}
-
-	/**
-	 * Returns <code>true</code> if this variable is a list of value.
-	 * 
-	 * @return <code>true</code> if this variable is a list of value.
-	 */
-	public boolean isList() {
-		return type.isList();
 	}
 
 	/**
@@ -244,16 +251,16 @@ public abstract class Variable implements INameable {
 	}
 
 	/**
-	 * Removes the uses of this variable that reference the given node.
+	 * Removes the uses of this variable that reference the given instruction.
 	 * 
-	 * @param node
-	 *            a node
+	 * @param instruction
+	 *            an instruction
 	 */
-	public void removeUse(Instruction node) {
+	public void removeUse(Instruction instruction) {
 		ListIterator<Use> it = uses.listIterator();
 		while (it.hasNext()) {
 			Use use = it.next();
-			if (use.getNode().equals(node)) {
+			if (use.getNode().equals(instruction)) {
 				it.remove();
 			}
 		}
@@ -267,6 +274,16 @@ public abstract class Variable implements INameable {
 	 */
 	public void removeUse(Use use) {
 		uses.remove(use);
+	}
+
+	/**
+	 * Sets this variable as assignable or not.
+	 * 
+	 * @param assignable
+	 *            <code>true</code> if the variable is assignable
+	 */
+	public void setAssignable(boolean assignable) {
+		this.assignable = assignable;
 	}
 
 	/**
