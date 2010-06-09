@@ -218,7 +218,7 @@ $Sched_decl_MD(action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExter
 >>
 
 Tag_MD(action)::=<<
-$Tag_decl_MD(action)$ = metadata  !{$action.tag.tags: varTag_MD() ; separator=", "$}
+$Tag_decl_MD(action)$ = metadata  !{$action.tag.identifiers: varIdentifier_MD() ; separator=", "$}
 >>
 
 
@@ -292,8 +292,8 @@ varState_MD(state) ::= <<
 metadata !"$state$"
 >>
 
-varTag_MD(tag) ::= <<
-metadata !"$tag$"
+varIdentifier_MD(identifier) ::= <<
+metadata !"$identifier$"
 >>
 
 

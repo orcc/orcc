@@ -117,11 +117,11 @@ public class Tag implements Comparable<Tag>, Iterable<String> {
 	}
 
 	/**
-	 * Returns the identifier tags.
+	 * Returns the identifier of the tags.
 	 * 
 	 * @return a list of identifier
 	 */
-	public List<String> getTags() {
+	public List<String> getIdentifiers() {
 		return identifiers;
 	}
 
