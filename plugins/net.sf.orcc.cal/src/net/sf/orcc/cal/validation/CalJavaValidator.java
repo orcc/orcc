@@ -44,8 +44,10 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
+import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
 
@@ -214,6 +216,14 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		if (variable.isConstant()) {
 			error("The variable " + variable.getName() + " is not assignable",
 					CalPackage.AST_STATEMENT_ASSIGN__TARGET);
+		}
+
+		TypeChecker checker = new TypeChecker();
+		AstType type = checker.getType(assign.getValue());
+		if (!checker.areTypeCompatible(variable.getType())) {
+			error("Type mismatch: cannot convert from " + type + " to "
+					+ variable.getType(),
+					CalPackage.AST_STATEMENT_ASSIGN__VALUE);
 		}
 	}
 

@@ -4,8 +4,7 @@ Bundle-Name: Orcc core plug-in
 Bundle-SymbolicName: net.sf.orcc.core;singleton:=true
 Bundle-Version: 0.8.1.rc1
 Bundle-Activator: net.sf.orcc.ui.OrccActivator
-Require-Bundle: net.sf.orcc.cal,
- org.eclipse.core.expressions,
+Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
@@ -25,7 +24,6 @@ Bundle-Vendor: IETR/INSA Rennes
 Export-Package: net.sf.orcc,
  net.sf.orcc.backends,
  net.sf.orcc.debug.model,
- net.sf.orcc.frontend,
  net.sf.orcc.interpreter,
  net.sf.orcc.ir,
  net.sf.orcc.ir.expr,
@@ -43,4 +41,7 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.ui.launching,
  net.sf.orcc.util,
  org.jgrapht,
- org.jgrapht.graph
+ org.jgrapht.alg,
+ org.jgrapht.ext,
+ org.jgrapht.graph,
+ org.jgrapht.traverse

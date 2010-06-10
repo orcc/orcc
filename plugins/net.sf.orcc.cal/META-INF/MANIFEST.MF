@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.xtext,
  org.eclipse.xtext.util,
  org.eclipse.emf.ecore,
  org.eclipse.emf.common,
- org.antlr.runtime
+ org.antlr.runtime,
+ net.sf.orcc.core
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sf.orcc.cal,
@@ -28,4 +29,5 @@ Export-Package: net.sf.orcc.cal,
  net.sf.orcc.cal.parser.antlr.internal,
  net.sf.orcc.cal.services,
  net.sf.orcc.cal.util,
- net.sf.orcc.cal.validation
+ net.sf.orcc.cal.validation,
+ net.sf.orcc.frontend
