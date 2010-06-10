@@ -2724,7 +2724,7 @@ actor Algo_Synp_AVC_FREXT()
 		else
 			if ( ( ctxIdxOffset = 0 and IS_SI(GiveMbSliceType(AvailMb,mbAddr))) or		  
 			     ( ctxIdxOffset = 3  and IS_INxN( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr) ) ) or
-			     ( ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) )then
+			     ( ctxIdxOffset = 27 and ( IS_P_Skip_CABAC(mbAddr) or IS_B_Skip_CABAC(mbAddr) ) ) )then
 	
 				 condTermFlagA := 0;
 			else
@@ -2743,7 +2743,7 @@ actor Algo_Synp_AVC_FREXT()
 		else
 			if ( ( ctxIdxOffset = 0 and IS_SI(GiveMbSliceType(AvailMb,mbAddr))) or		  
 			     ( ctxIdxOffset = 3  and IS_INxN( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr) ) ) or
-			     ( ctxIdxOffset = 27 and ( P_Skip_Flag or B_Skip_Flag ) ) )then
+			     ( ctxIdxOffset = 27 and (  IS_P_Skip_CABAC(mbAddr) or IS_B_Skip_CABAC(mbAddr) ) ) )then
 	
 				 condTermFlagB := 0;
 			else
@@ -2816,7 +2816,7 @@ actor Algo_Synp_AVC_FREXT()
 		if not prevMbAddr_Avail() then
 			ctxIdxInc := 0;
 		else
-			if ( GiveMbSliceType(AvailMb,mbAddr) = SLICE_TYPE_I and GiveMbType(AvailMb,mbAddr) = 25 or
+			if ( GiveMbSliceType(AvailMb,mbAddr) = SLICE_TYPE_I and GiveMbType(AvailMb,mbAddr) = 25 or IS_B_Skip_CABAC(mbAddr) or IS_B_Skip_CABAC(mbAddr) or
 		             not IS_I16x16( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr)) and GiveCBPLuma(AvailMb,mbAddr) = 0 and GiveCBPChroma(AvailMb,mbAddr) = 0 or
 			     GiveMbQpDelta(AvailMb,mbAddr)  = 0 )  then
 				 
@@ -3686,13 +3686,13 @@ actor Algo_Synp_AVC_FREXT()
 							subMbPartIdxN := (yW >> 2) * 2 + (xW >> 2);
 						else
 							if mbPart = 1 then
-								subMbPartIdxN := (yW >> 2) * 2 + (((xW-1) - 7) >> 2);
+								subMbPartIdxN := (yW >> 2) * 2 + ((xW -1 - 7) >> 2);
 							else	
 								if mbPart = 2 then
 									subMbPartIdxN := (((yW-1) - 7) >> 2) * 2 + (xW >> 2);
 								else
 									if mbPart = 3 then
-										subMbPartIdxN :=  (((yW-1) - 7) >> 2) * 2 + ((xW - 7) >> 2);
+										subMbPartIdxN :=  ((yW - 1 - 7) >> 2) * 2 + ((xW - 1 - 7) >> 2);
 									end
 								end
 							end
@@ -4336,6 +4336,7 @@ actor Algo_Synp_AVC_FREXT()
 						SuffixMbTypeP := false;
 						binValDecoded := false;
 						/* Get Intra Type Mb */
+						SearchForMbType := 0;
 					else
 						binValDecoded := false;
 						binIdxMb := binIdxMb + 1;
@@ -4399,7 +4400,13 @@ actor Algo_Synp_AVC_FREXT()
 				StopCabacProcess();
 				binIdxOffset := 0;
 			end
-		else
+		end
+		
+		if SearchForMbType = 0 then
+			binValDecoded := false;
+			binIdxMb := 0;
+			NextBitToDecode := true;
+			binIdxOffset := 0;
 			GetMbType_I();
 		end
 	end
