@@ -4323,6 +4323,7 @@ actor Algo_Synp_AVC_FREXT()
 			binIdxOffset := 0;
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP then
 				CabacValue := CabacValue + 5;
+				SuffixMbTypeP := true;
 			end
 		end
 	end
@@ -7833,7 +7834,7 @@ end
 	read_sub_MB_pred_ref_idx_l1_done: action ==> 
 	guard
 		( ( (slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) ) and IS_CAVLC() ) or
-		( (slice_num_ref_idx_l1_active_minus1 > 1 and cabac_end()) and IS_CABAC() ) 
+		( cabac_end() and IS_CABAC() ) 
 	do
 		if IS_CAVLC() then
 			ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
@@ -8286,7 +8287,7 @@ end
 	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
 	guard
 		((slice_num_ref_idx_l0_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l0_active_minus1 > 1 and vld_end()) and IS_CAVLC() ) or
-		((slice_num_ref_idx_l1_active_minus1 > 1 and cabac_end()) and IS_CABAC() ) 
+		( cabac_end() and IS_CABAC() ) 
 	do
 		if IS_CAVLC() then
 			ref_idx_l0[mbPartIdx] := if slice_num_ref_idx_l0_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
@@ -8333,7 +8334,7 @@ end
 	read_MB_pred_ref_idx_l1_done: action ==> 
 	guard
 		((slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CAVLC() ) or
-		((slice_num_ref_idx_l1_active_minus1 > 1 and cabac_end()) and IS_CABAC()) 
+		(cabac_end() and IS_CABAC()) 
 	do
 		if IS_CAVLC() then
 			ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
