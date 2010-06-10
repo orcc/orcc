@@ -128,7 +128,7 @@ $Type_MD(var)$
 >>
 
 FSM_MD(fsm) ::= <<
-$FSM_decl_MD()$ = metadata !{$varState_MD(fsm.initialState)$, metadata $State_decl_MD()$, metadata $Transitions_decl_MD()$}
+$FSM_decl_MD()$ = metadata !{$varState_MD(fsm.initialState)$, metadata $State_decl_MD()$, metadata $Transitions_decl_MD()$, i32* @_FSM_state}
 $State_MD(fsm)$
 $Transitions_MD(fsm)$
 >>
