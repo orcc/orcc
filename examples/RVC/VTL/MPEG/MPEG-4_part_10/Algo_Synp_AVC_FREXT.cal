@@ -298,6 +298,9 @@ actor Algo_Synp_AVC_FREXT()
 	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L0 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L1 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	
+	List ( type: List ( type: int, size = 4)  , size = PICWIDTH*PICHEIGHT ) Ref_Idx_L0	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int, size = 4)  , size = PICWIDTH*PICHEIGHT ) Ref_Idx_L1	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	
 	List ( type: List ( type: int, size = 4) , size = PICWIDTH*PICHEIGHT ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
 	
 	bool IS_L0 := false;
@@ -3701,6 +3704,136 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	
 	procedure GetCtxIdxMvd()
+	var
+		int condTermFlagA,
+		int condTermFlagB,
+		int predPartWidth,
+		int predModeEqualFlagA,
+		int predModeEqualFlagB,
+		int currSubMbType,
+		int absMvdCompA,
+		int absMvdCompB,
+		int x,
+		int y,
+		int xN,
+		int yN,
+		int xS,
+		int yS
+	begin
+		
+		currSubMbType := sub_mb_type[mbPartIdx];
+		//Inverse sub-macroclock partiontion scanning process
+		x := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
+		y := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
+		
+		if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
+			xS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 0);
+			yS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 1);
+		else
+			xS := 0;
+			yS := 0;
+		end
+			
+		//N = A
+		xN := x + xS - 1;
+		yN := y + yS;
+		
+		getNeighbouring(xN , yN, 16, 16);
+		
+		if not NeighMbAvail then
+			mbPartIdxN    := -1;
+			subMbPartIdxN := -1;
+			absMvdCompA := 0;
+		else
+			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+						
+			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
+				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+			else
+				subMbPartIdxN := 0;
+			end
+			
+			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
+				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+					predModeEqualFlagA := 0;
+				else
+					predModeEqualFlagA := 1;
+				end
+			else
+				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+					predModeEqualFlagA := 0;
+				else
+					predModeEqualFlagA := 1;
+				end
+			end
+			
+			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagA = 0 then
+				absMvdCompA := 0;
+			else
+				if IS_L0 then
+					absMvdCompA := ABS(Mvd_L0[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
+				else
+					absMvdCompA := ABS(Mvd_L1[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
+				end
+			end
+		end
+			
+		//N = B
+		xN := x + xS;
+		yN := y + yS - 1;
+		
+		getNeighbouring(xN , yN, 16, 16);
+		
+		if not NeighMbAvail then
+			mbPartIdxN    := -1;
+			subMbPartIdxN := -1;
+			absMvdCompB := 0;
+		else
+			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+						
+			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
+				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+			else
+				subMbPartIdxN := 0;
+			end
+			
+			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
+				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+					predModeEqualFlagB := 0;
+				else
+					predModeEqualFlagB := 1;
+				end
+			else
+				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+					predModeEqualFlagB := 0;
+				else
+					predModeEqualFlagB := 1;
+				end
+			end
+			
+			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagB = 0 then
+				absMvdCompB := 0;
+			else
+				if IS_L0 then
+					absMvdCompB := ABS(Mvd_L0[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
+				else
+					absMvdCompB := ABS(Mvd_L1[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
+				end
+			end
+		end
+					
+		if absMvdCompA + absMvdCompB < 3 then
+			  ctxIdxInc := 0;
+		else
+			  if absMvdCompA + absMvdCompB > 32 then
+				ctxIdxInc := 2;
+			  else
+				ctxIdxInc := 1;
+			  end
+		end
+	end
+	
+	procedure GetCtxIdxRefIdx()
 	var
 		int condTermFlagA,
 		int condTermFlagB,
@@ -7617,6 +7750,7 @@ end
 		else
 			if IS_CABAC() then
 				ref_idx_l0[mbPartIdx] := cabac_value();
+				Ref_Idx_L0[val_CurrMbAddr][mbPartIdx] := cabac_value();
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
@@ -7628,6 +7762,7 @@ end
 		mbPartIdx < 4
 	do
 		ref_idx_l0[mbPartIdx] := 0;
+		Ref_Idx_L0[val_CurrMbAddr][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end
 	//end if
@@ -7661,13 +7796,14 @@ end
 	read_sub_MB_pred_ref_idx_l1_done: action ==> 
 	guard
 		( ( (slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) ) and IS_CAVLC() ) or
-		( (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CABAC() ) 
+		( (slice_num_ref_idx_l1_active_minus1 > 1 and cabac_end()) and IS_CABAC() ) 
 	do
 		if IS_CAVLC() then
 			ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
 		else
 			if IS_CABAC() then
 				 ref_idx_l1[mbPartIdx] := cabac_value();
+				 Ref_Idx_L1[val_CurrMbAddr][mbPartIdx] := cabac_value();
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
@@ -7679,6 +7815,7 @@ end
 		mbPartIdx < 4
 	do
 		ref_idx_l1[mbPartIdx] := 0;
+		Ref_Idx_L1[val_CurrMbAddr][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end
 	//end if
@@ -8097,15 +8234,31 @@ end
 		(slice_num_ref_idx_l0_active_minus1 > 0 or mb_field_decoding_flag = 1),
 		not IS_MBPred_L1(mbPartIdx), not IS_MBNA(mbPartIdx)
 	do
-		if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
-		 IS_L0 := true;
+		if IS_CAVLC() then
+			if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+		else
+			if IS_CABAC() then
+				//FIXME Maybe will do like CAVLC
+				GetCabacRefIdxLx();
+				StartCabacProcess();
+			end
+		end 
+		IS_L0 := true;
 	end
 
 	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
 	guard
-		(slice_num_ref_idx_l0_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l0_active_minus1 > 1 and vld_end())
+		((slice_num_ref_idx_l0_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l0_active_minus1 > 1 and vld_end()) and IS_CAVLC() ) or
+		((slice_num_ref_idx_l1_active_minus1 > 1 and cabac_end()) and IS_CABAC() ) 
 	do
-		ref_idx_l0[mbPartIdx] := if slice_num_ref_idx_l0_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		if IS_CAVLC() then
+			ref_idx_l0[mbPartIdx] := if slice_num_ref_idx_l0_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		else
+			if IS_CABAC() then
+				 ref_idx_l0[mbPartIdx] := cabac_value();
+				 Ref_Idx_L0[val_CurrMbAddr][mbPartIdx] := cabac_value();
+			end
+		end
 		mbPartIdx := mbPartIdx +1;
 	end
 
@@ -8115,6 +8268,7 @@ end
 		mbPartIdx < NumMbPart()
 	do
 		ref_idx_l0[mbPartIdx] := 0;
+		Ref_Idx_L0[val_CurrMbAddr][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end
 	//end if
@@ -8141,9 +8295,17 @@ end
 
 	read_MB_pred_ref_idx_l1_done: action ==> 
 	guard
-		(slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end())
+		((slice_num_ref_idx_l1_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l1_active_minus1 > 1 and vld_end()) and IS_CAVLC() ) or
+		((slice_num_ref_idx_l1_active_minus1 > 1 and cabac_end()) and IS_CABAC()) 
 	do
-		ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		if IS_CAVLC() then
+			ref_idx_l1[mbPartIdx] := if slice_num_ref_idx_l1_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
+		else
+			if IS_CABAC() then
+				 ref_idx_l1[mbPartIdx] := cabac_value();
+				 Ref_Idx_L1[val_CurrMbAddr][mbPartIdx] := cabac_value();
+			end
+		end
 		mbPartIdx := mbPartIdx +1;
 	end
 
@@ -8153,6 +8315,7 @@ end
 		mbPartIdx < NumMbPart()
 	do
 		ref_idx_l1[mbPartIdx] := 0;
+		Ref_Idx_L1[val_CurrMbAddr][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end
 	//end if
