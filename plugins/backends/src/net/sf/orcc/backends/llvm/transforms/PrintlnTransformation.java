@@ -100,14 +100,19 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 			// string value
 			for (Expression expr : call.getParameters()) {
 				if (expr.isStringExpr()) {
-					value += (((StringExpr) expr).getValue());
+					String strExprVal = (((StringExpr) expr).getValue());
+					
+					if (!strExprVal.equals("\\n")){
+						value += strExprVal;
+					}
+					
 
 				}
 			}
 
 			// Create state variable that contains println arguments
 			StateVariable variable = new StateVariable(call.getLocation(),
-					new StringType(value.length()), name, false, value);
+					new StringType(value.length()+1), name, false, value+"\\00");
 			Use use = new Use(variable);
 
 			// Set the created state variable into call argument
