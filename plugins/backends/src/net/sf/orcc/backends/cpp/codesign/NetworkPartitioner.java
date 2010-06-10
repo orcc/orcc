@@ -67,27 +67,17 @@ public class NetworkPartitioner {
 	 */
 	private DirectedGraph<Vertex, Connection> graph;
 
-	private Map<Port, Vertex> incomingFanout;
-
 	private Map<Connection, Port> incomingPort = new HashMap<Connection, Port>();
-
-	private Boolean manageFanout;
 
 	private int nbInput;
 
 	private int nbOutput;
 
-	private Map<Port, Map<String, Vertex>> outgoingFanout;
-
 	private Map<Connection, Port> outgoingPort = new HashMap<Connection, Port>();
 
 	private Map<Port, String> partitionMap = new HashMap<Port, String>();
-	
-	private List<Network> networks = new ArrayList<Network>();
 
-	public NetworkPartitioner(Boolean manageFanout) {
-		this.manageFanout = manageFanout;
-	}
+	private List<Network> networks = new ArrayList<Network>();
 
 	/**
 	 * Copies connections between instances on the same partition.
@@ -108,9 +98,6 @@ public class NetworkPartitioner {
 
 	private void createConnections(Set<Vertex> vertices, Network network)
 			throws OrccException {
-
-		outgoingFanout = new HashMap<Port, Map<String, Vertex>>();
-		incomingFanout = new HashMap<Port, Vertex>();
 
 		nbInput = nbOutput = 0;
 
@@ -154,24 +141,18 @@ public class NetworkPartitioner {
 		Instance tgtInstance = tgt.getInstance();
 
 		Vertex vertex = null;
-		if (!incomingFanout.containsKey(srcPort) || !manageFanout) {
-			Port port = new Port(srcPort);
-			port.setName("input_" + nbInput);
+		Port port = new Port(srcPort);
+		port.setName("input_" + nbInput);
 
-			vertex = new Vertex("Input", port);
-			network.getGraph().addVertex(vertex);
+		vertex = new Vertex("Input", port);
+		network.getGraph().addVertex(vertex);
 
-			network.getInputs().add("", new Location(), port.getName(), port);
+		network.getInputs().add("", new Location(), port.getName(), port);
 
-			incomingFanout.put(srcPort, vertex);
-			incomingPort.put(connection, port);
-			partitionMap.put(port, getPartNameOf(tgtInstance));
+		incomingPort.put(connection, port);
+		partitionMap.put(port, getPartNameAttribute(tgtInstance));
 
-			nbInput++;
-
-		} else {
-			vertex = incomingFanout.get(srcPort);
-		}
+		nbInput++;
 
 		Connection incoming = new Connection(null, connection.getTarget(),
 				connection.getAttributes());
@@ -190,7 +171,6 @@ public class NetworkPartitioner {
 			Connection connection, Network network) throws OrccException {
 
 		Instance inst = tgt.getInstance();
-		Port srcPort = connection.getSource();
 		Port tgtPort = connection.getTarget();
 
 		Port port = new Port(tgtPort);
@@ -199,36 +179,15 @@ public class NetworkPartitioner {
 		network.getGraph().addVertex(vertex);
 		network.getOutputs().add("", new Location(), port.getName(), port);
 
-		if (!outgoingFanout.containsKey(srcPort) || !manageFanout) {
+		Map<String, Vertex> map = new HashMap<String, Vertex>();
+		map.put(getPartNameAttribute(inst), vertex);
 
-			Map<String, Vertex> map = new HashMap<String, Vertex>();
-			map.put(getPartNameOf(inst), vertex);
-			outgoingFanout.put(srcPort, map);
-			outgoingPort.put(connection, port);
+		outgoingPort.put(connection, port);
 
-			Connection outgoing = new Connection(connection.getSource(), null,
-					connection.getAttributes());
+		Connection outgoing = new Connection(connection.getSource(), null,
+				connection.getAttributes());
 
-			network.getGraph().addEdge(src, vertex, outgoing);
-
-		} else {
-			if (!outgoingFanout.get(srcPort).containsKey(getPartNameOf(inst))) {
-
-				outgoingFanout.get(srcPort).put(getPartNameOf(inst), vertex);
-				outgoingPort.put(connection, port);
-
-				Connection outgoing = new Connection(connection.getSource(),
-						null, connection.getAttributes());
-
-				network.getGraph().addEdge(src, vertex, outgoing);
-
-			} else {
-
-				network.getGraph().removeVertex(vertex);
-				network.getOutputs().remove(port);
-				nbOutput--;
-			}
-		}
+		network.getGraph().addEdge(src, vertex, outgoing);
 
 	}
 
@@ -255,16 +214,14 @@ public class NetworkPartitioner {
 
 		for (Vertex vertex : entry.getValue()) {
 			Instance instance = vertex.getInstance();
-
 			instances.put(instance.getId(), instance);
 			graph.addVertex(new Vertex(instance));
-
 		}
 
 		// adds variables of the previous flatten network to the sub-network
 		for (GlobalVariable var : network.getVariables()) {
-			GlobalVariable newVar = new GlobalVariable(new Location(), var
-					.getType(), var.getName(), var.getExpression());
+			GlobalVariable newVar = new GlobalVariable(new Location(),
+					var.getType(), var.getName(), var.getExpression());
 
 			variables.add("", new Location(), newVar.getName(), newVar);
 		}
@@ -278,7 +235,7 @@ public class NetworkPartitioner {
 		Map<String, Set<Vertex>> partitionSets = new HashMap<String, Set<Vertex>>();
 
 		for (Vertex vertex : graph.vertexSet()) {
-			String partName = getPartNameOf(vertex.getInstance());
+			String partName = getPartNameAttribute(vertex.getInstance());
 
 			if (partName == null) {
 				throw new OrccException("partName attribute of instance "
@@ -306,14 +263,16 @@ public class NetworkPartitioner {
 	 * @throws OrccException
 	 *             If the instance does not contain a partName attribute.
 	 */
-	private String getPartNameOf(Instance instance) throws OrccException {
+	private String getPartNameAttribute(Instance instance) throws OrccException {
 		String partName = null;
 
 		IAttribute attr = instance.getAttribute("partName");
 		if (attr != null && attr.getType() == IAttribute.VALUE) {
 			Expression expr = ((IValueAttribute) attr).getValue();
 			if (expr.isStringExpr()) {
-				partName = ((StringExpr) expr).getValue();
+				String[] partNames = ((StringExpr) expr).getValue().split("/");
+				partName = partNames[0];
+
 			} else {
 				throw new OrccException(
 						"partName attribute must be a String expression");
@@ -352,7 +311,7 @@ public class NetworkPartitioner {
 			Network subNetwork = createPartition(entry, network);
 
 			networks.add(subNetwork);
-			
+
 			Instance instance = new Instance(subNetwork.getName(), subNetwork);
 
 			Vertex vertex = new Vertex(instance);
@@ -374,13 +333,13 @@ public class NetworkPartitioner {
 				Port srcPort = outgoingPort.get(connection);
 				Port tgtPort = incomingPort.get(connection);
 
-				Connection conn = new Connection(srcPort, tgtPort, connection
-						.getAttributes());
+				Connection conn = new Connection(srcPort, tgtPort,
+						connection.getAttributes());
 
-				Vertex srcVertex = topHierNetworkVertices.get(getPartNameOf(src
-						.getInstance()));
-				Vertex tgtVertex = topHierNetworkVertices.get(getPartNameOf(tgt
-						.getInstance()));
+				Vertex srcVertex = topHierNetworkVertices
+						.get(getPartNameAttribute(src.getInstance()));
+				Vertex tgtVertex = topHierNetworkVertices
+						.get(getPartNameAttribute(tgt.getInstance()));
 
 				graph.addEdge(srcVertex, tgtVertex, conn);
 			}

@@ -45,6 +45,7 @@ import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.serialize.XDFWriter;
 
 /**
  * C++ back-end.
@@ -76,11 +77,13 @@ public class CppBackendImpl extends AbstractBackend {
 		network.flatten();
 
 		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				false);
+				true);
 		if (partition) {
 			partitioning = true;
-			partitioner = new NetworkPartitioner(true);
+			partitioner = new NetworkPartitioner();
 			partitioner.transform(network);
+			
+			new XDFWriter(new File(path), network);
 
 		}
 
