@@ -128,13 +128,6 @@ actor Algo_Synp_AVC_FREXT()
 	
 	// ********** read CABAC ********* //
 	
-
-
-	//Skip Flags
-	
-	bool P_Skip_Flag := false;
-	bool B_Skip_Flag := false;
-	
 	// SLICE TYPES
 	function IS_I16x16(int SliceType, int Mbtype) --> bool : (Mbtype >= 1 and Mbtype <= 24 ) and (SliceType = SLICE_TYPE_I) end
 	function IS_INxN(int SliceType, int Mbtype) --> bool : (Mbtype = 0) and (SliceType = SLICE_TYPE_I) end
@@ -150,15 +143,7 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_B_Direct_16x16() --> bool: slice_type = SLICE_TYPE_B and mb_type = 0 end
 	function IS_B_8x8() --> bool: slice_type = SLICE_TYPE_B and mb_type = 22 end
 	function IS_B_Direct_8x8() --> bool: slice_type = SLICE_TYPE_B and sub_mb_type[mbPartIdx] = 0 end
-	function IS_IPCM_Tab(int Addr, int MbType) -->bool:
-		if Addr < 0 then
-			false
-		else
-			mbTab[Addr][MbType] = 25
-		end
-	end
-	
-	
+	function IS_IPCM_Tab(int Addr, int MbType) -->bool: if Addr < 0 then false else mbTab[Addr][MbType] = 25 end end
 	
 	//Entropie decoding
 	function IS_CAVLC() --> bool: entropy_coding_mode_flag[pps_id] = 0 end
@@ -179,13 +164,12 @@ actor Algo_Synp_AVC_FREXT()
 	uint binVal;
 	
 	bool StartNewCabacParsing := false;
-		/* List Used as a result for Binarization */
+	/* List Used as a result for Binarization */
 	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 24)] : for int j in Integers( 0, 99)];
-	//List ( type: uint(size=2), size=128 ) synElVal := [ 0 : for int i in Integers( 0, 127)];
 	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 127)];
 	
 	
-	//Cabac intialisation process for the arithmetic decoding engine
+	/* Cabac intialisation process for the arithmetic decoding engine */
 	bool Cabac_Arithmetic_Decoding_Engine_Start := false;
 	bool Cabac_Arithmetic_Decoding_Engine_Read_Bits_Start := false;
 	
@@ -194,6 +178,7 @@ actor Algo_Synp_AVC_FREXT()
 	bool PcmSampleChromaDone := false;
 	bool SentChromaZeros := false;
 	bool SentLumaDCZeros := false;
+	
 	//CABAC SE
 	uint (size = 1) coded_block_flag;
 	
@@ -201,7 +186,6 @@ actor Algo_Synp_AVC_FREXT()
 	
 	//CABAC Binarisation
 	
-	int maxBinIdxCtx;
 	bool SentMbSkipZeros :=false;
 	bool bypassFlag := false;
 	
@@ -253,7 +237,6 @@ actor Algo_Synp_AVC_FREXT()
 	bool StartDecodeBypass				:= false;
 	bool NextBitToDecode				:= true;
 	bool StartRenormDRead				:= false;
-	bool CabacTerminated				:= false;
 	bool StartDecodeBypassStart			:= false;
 	
 	bool getBitStreamValue;
@@ -283,6 +266,7 @@ actor Algo_Synp_AVC_FREXT()
 	int BinsToRead;
 	int binIdxOffset := 0;
 	int PreviousCtxIdx := 0;
+	
 	/* CABAC Neighbouring */
 	 uint luma8x8BlkIdx;
 	
@@ -341,165 +325,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	List (type: int(size = 2), size = 4)   prior_decoded_bin_cbp		:= [0: for int i in Integers(0, 3)] ;
 	int bk_cbp := 0;
-	
-	int synEval_MB_I_Ele = 26;
-	List ( type: List ( type: int(size = 8), size = 8) , size = 26 ) synEval_MB_I = 
-	[
-		[0, 0, 0, 0, 0, 0, 0, 0],
-		[5, 1, 0, 0, 0, 0, 0, 0],
-		[5, 1, 0, 0, 0, 0, 1, 0],
-		[5, 1, 0, 0, 0, 1, 0, 0],
-		[5, 1, 0, 0, 0, 1, 1, 0],
-		[6, 1, 0, 0, 1, 0, 0, 0],
-		[6, 1, 0, 0, 1, 0, 0, 1],
-		[6, 1, 0, 0, 1, 0, 1, 0],
-		[6, 1, 0, 0, 1, 0, 1, 1],
-		[6, 1, 0, 0, 1, 1, 0, 0],
-		[6, 1, 0, 0, 1, 1, 0, 1],
-		[6, 1, 0, 0, 1, 1, 1, 0],
-		[6, 1, 0, 0, 1, 1, 1, 1],
-		[5, 1, 0, 1, 0, 0, 0, 0],
-		[5, 1, 0, 1, 0, 0, 1, 0],
-		[5, 1, 0, 1, 0, 1, 0, 0],
-		[5, 1, 0, 1, 0, 1, 1, 0],
-		[6, 1, 0, 1, 1, 0, 0, 0],
-		[6, 1, 0, 1, 1, 0, 0, 1],
-		[6, 1, 0, 1, 1, 0, 1, 0],
-		[6, 1, 0, 1, 1, 0, 1, 1],
-		[6, 1, 0, 1, 1, 1, 0, 0],
-		[6, 1, 0, 1, 1, 1, 0, 1],
-		[6, 1, 0, 1, 1, 1, 1, 0],
-		[6, 1, 0, 1, 1, 1, 1, 1],
-		[1, 1, 1, 0, 0, 0, 0, 0]
-	];
-	int synEval_MB_P_SP_Ele = 31;
-	List ( type: List ( type: int(size = 8), size = 4) , size = 31 ) synEval_MB_P_SP = 
-	[
-		[2, 0, 0, 0],
-		[2, 0, 1, 1],
-		[2, 0, 1, 0],
-		[2, 0, 0, 1],
-		[0, 0, 0, 0],
-	    [0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0],
-		[0, 1, 0, 0]
-	];
-	
-	int synEval_MB_B_Ele = 49;
-	List ( type: List ( type: int(size = 8), size = 8) , size = 49 ) synEval_MB_B = 
-	[
-		[0, 0, 0, 0, 0, 0, 0, 0],
 		
-		[2, 1, 0, 0, 0, 0, 0, 0],
-		[2, 1, 0, 1, 0, 0, 0, 0],
-		
-		[6, 1, 1, 0, 0, 0, 0, 0],
-		[6, 1, 1, 0, 0, 0, 1, 0],
-		[6, 1, 1, 0, 0, 1, 0, 0],
-		[6, 1, 1, 0, 0, 1, 1, 0],
-		[6, 1, 1, 0, 1, 0, 0, 0],
-		[6, 1, 1, 0, 1, 0, 1, 0],
-		[6, 1, 1, 0, 1, 1, 0, 0],
-		[6, 1, 1, 0, 1, 1, 1, 0],
-		[6, 1, 1, 1, 1, 1, 0, 0],
-		[6, 1, 1, 1, 0, 0, 0, 0],
-		[6, 1, 1, 1, 0, 0, 0, 1],
-		[6, 1, 1, 1, 0, 0, 1, 0],
-		[6, 1, 1, 1, 0, 0, 1, 1],
-		[6, 1, 1, 1, 0, 1, 0, 0],
-		[6, 1, 1, 1, 0, 1, 0, 1],
-		[6, 1, 1, 1, 0, 1, 1, 0],
-		[6, 1, 1, 1, 0, 1, 1, 1],
-		[6, 1, 1, 1, 1, 0, 0, 0],
-		[6, 1, 1, 1, 1, 0, 0, 1],
-		
-		[5, 1, 1, 1, 1, 1, 1, 0],
-		
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 1, 0, 1, 0]
-	];
-	
-	int synEval_SUB_MB_P_SP_Ele = 4;
-	List ( type: List ( type: int(size = 8), size = 7) , size = 4 ) synEval_SUB_MB_P_SP = 
-	[
-		[0, 1, 0, 0, 0, 0, 0],
-		
-		[1, 0, 0, 0, 0, 0, 0],
-		
-		[2, 0, 1, 1, 0, 0, 0],
-		[2, 0, 1, 0, 0, 0, 0]
-		
-	];
-	
-	int synEval_SUB_MB_B_Ele = 13;
-	List ( type: List ( type: int(size = 8), size = 7) , size = 13 ) synEval_SUB_MB_B = 
-	[
-		[0, 0, 0, 0, 0, 0, 0],
-		
-		[2, 1, 0, 0, 0, 0, 0],
-		[2, 1, 0, 1, 0, 0, 0],
-		
-		[4, 1, 1, 0, 0, 0, 0],
-		[4, 1, 1, 0, 0, 1, 0],
-		[4, 1, 1, 0, 1, 0, 0],
-		[4, 1, 1, 0, 1, 1, 0],
-		
-		[5, 1, 1, 1, 0, 0, 0],
-		[5, 1, 1, 1, 0, 0, 1],
-		[5, 1, 1, 1, 0, 1, 0],
-		[5, 1, 1, 1, 0, 1, 1],
-		
-		[4, 1, 1, 1, 1, 0, 0],
-		[4, 1, 1, 1, 1, 1, 0]
-	];
-	
 	int synEval_Coded_Bloc_Flag_Ele = 2;
 	List ( type: List ( type: int(size = 8), size = 2) , size = 2 ) synEval_Coded_Bloc_Flag = 
 	[
@@ -612,11 +438,6 @@ actor Algo_Synp_AVC_FREXT()
 	int CABAC_COEFF_SIGN_FLAG 					:= 22;
 	int CABAC_END_OF_SLICE_FLAG 				:= 23;
 	int CABAC_TRANSFORM_SIZE_8x8_FLAG 			:= 24;
-	
-	
-	
-	
-	
 	
 	// ******** End of CABAC variables declaration ******
 	/*************************************************************
@@ -2031,27 +1852,7 @@ actor Algo_Synp_AVC_FREXT()
 	begin
 		//ValueIndex := ValueIndex + 1;
 		
-		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I then
-			MaxEleCompTab := synEval_MB_I_Ele;
-			foreach int e in Integers(0, MaxEleCompTab - 1) do
-				//BinIdxSize	:= synEval_MB_I[e][0];
-				foreach int s in Integers(0, 7) do
-					synElVal[e][s] := synEval_MB_I[e][s];
-				end
-			end
-		end
 		
-		
-		
-		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP then
-			MaxEleCompTab := synEval_MB_P_SP_Ele;
-			foreach int e in Integers(0, MaxEleCompTab - 1) do
-				//BinIdxSize	:= synEval_MB_P_SP[l][0];
-				foreach int s in Integers(0, 3) do
-					synElVal[e][s] := synEval_MB_P_SP[e][s];
-				end
-			end
-		end
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA then
 			MaxEleCompTab := synEval_CBP_Luma_Ele;
@@ -2260,93 +2061,31 @@ actor Algo_Synp_AVC_FREXT()
 	
 	procedure Getbinarization(int SyntaxElement)
 	begin
-		if ( SyntaxElement = CABAC_MB_TYPE_SI ) then
-			maxBinIdxCtx := 6;
-			ctxIdxOffset := 3;
-			bypassFlag := false;
-		end
-		if ( SyntaxElement = CABAC_MB_TYPE_I ) then
-			maxBinIdxCtx := 6;
-			ctxIdxOffset := 3;
-			bypassFlag := false;
-		end
-		if ( SyntaxElement = CABAC_MB_TYPE_P_SP ) then
-			maxBinIdxCtx := 2 + 5; //FIXME to change it throught the cabacparsing when binVal 1 --> put the correct ctxIdxOffset
-			ctxIdxOffset := 14 + 17;
-			bypassFlag := false;
-		end
-		if ( SyntaxElement = CABAC_MB_TYPE_B ) then
-			maxBinIdxCtx := 3 + 5;
-			ctxIdxOffset := 27 + 32;
-			bypassFlag := false;
-		end
-		if ( SyntaxElement = CABAC_MB_SKIP_FLAG_P_SP ) then
-			maxBinIdxCtx := 2;
-			ctxIdxOffset := 21;
-			bypassFlag := false;
-		end
-		if ( SyntaxElement = CABAC_MB_SKIP_FLAG ) then
-			maxBinIdxCtx := 0;
-			ctxIdxOffset := 24;
-			bypassFlag := false;
-		end
-		if ( SyntaxElement = CABAC_SUB_MB_TYPE_P_SP ) then
-			maxBinIdxCtx := 2;
-			ctxIdxOffset := 21;
-			bypassFlag := false;
-		end
-		if ( SyntaxElement = CABAC_SUB_MB_TYPE_B ) then
-			maxBinIdxCtx := 3;
-			ctxIdxOffset := 36;
-			bypassFlag := false;
-		end
-		if ( SyntaxElement = CABAC_MVD_L0_0_0 ) then
-			maxBinIdxCtx := 4; //prefix
-			ctxIdxOffset := 40;
-			bypassFlag := true;
-		end
-		if ( SyntaxElement = CABAC_MVD_L0_1_1 ) then
-			maxBinIdxCtx := 4; //prefix
-			ctxIdxOffset := 47;
-			bypassFlag := true;
-		end
-		if ( SyntaxElement = CABAC_REF_IDX_L0_L1 ) then
-			maxBinIdxCtx := 2; //prefix
-			ctxIdxOffset := 54;
-			bypassFlag := false;
-		end
 		if ( SyntaxElement = CABAC_MB_QP_DELTA ) then
-			maxBinIdxCtx := 2; //prefix
 			ctxIdxOffset := 60;
 			bypassFlag := false;
 		end
 		if ( SyntaxElement = CABAC_INTRA_CHROMA_PRED_MODE ) then
-			maxBinIdxCtx := 1; //prefix
 			ctxIdxOffset := 64;
 			bypassFlag := false;
 		end
 		if ( SyntaxElement = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG ) then
-			maxBinIdxCtx := 0; //prefix
 			ctxIdxOffset := 68;
 			bypassFlag := false;
 		end
 		if ( SyntaxElement = CABAC_REM_INTRA4x4_8x8_PRED_MODE ) then
-			maxBinIdxCtx := 0; //prefix
 			ctxIdxOffset := 69;
 			bypassFlag := false;
 		end
 		if ( SyntaxElement = CABAC_MB_FIELD_DECODING_FLAG ) then
-			maxBinIdxCtx := 0; //prefix
 			ctxIdxOffset := 70;
 			bypassFlag := false;
 		end
 		if ( SyntaxElement = CABAC_CODED_BLOCK_PATERN_LUMA ) then
-			maxBinIdxCtx := 3; //FIXME prefix
 			ctxIdxOffset := 73;
 			bypassFlag := false;
 		end
 		if ( SyntaxElement = CABAC_CODED_BLOCK_PATERN_CHROMA ) then
-			maxBinIdxCtx := 1; //FIXME prefix
 			ctxIdxOffset := 77;
 			bypassFlag := false;
 		end
@@ -2354,19 +2093,15 @@ actor Algo_Synp_AVC_FREXT()
 		if ( SyntaxElement = CABAC_CODED_BLOCK_FLAG ) then
 			//Generated ctxBlockCat the			
 			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
-				maxBinIdxCtx := 0; //FIXME prefix
 				ctxIdxOffset := 460;
 				bypassFlag := false;
 			else if ( ctxBlockCat > 9 and ctxBlockCat < 13 ) then
-				maxBinIdxCtx := 0; //FIXME prefix
 				ctxIdxOffset := 472;
 				bypassFlag := false;
 			else if ( ctxBlockCat = 5 and ctxBlockCat = 9 and ctxBlockCat = 13 ) then
-				maxBinIdxCtx := 0; //FIXME prefix
 				ctxIdxOffset := 1012;
 				bypassFlag := false;	
 			else
-				maxBinIdxCtx := 0; //FIXME prefix
 				ctxIdxOffset := 85;
 				bypassFlag := false;
 			end end end
@@ -2374,27 +2109,21 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if ( SyntaxElement = CABAC_SIGNIFICANT_COEFF_FLAG ) then
 			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
-				maxBinIdxCtx := 0; //FIXME prefix
 				ctxIdxOffset := 484;
 				bypassFlag := false;
 			else if ( ctxBlockCat > 9 and ctxBlockCat < 13 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 528;
 					bypassFlag := false;
 			else if ( ctxBlockCat = 5 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 402;
 					bypassFlag := false;
 			else if ( ctxBlockCat = 9 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 660;
 					bypassFlag := false;
 			else if ( ctxBlockCat = 13 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 718;
 					bypassFlag := false;		
 			else if ( ctxBlockCat < 5 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 105;
 					bypassFlag := false;		
 			end end end end end end
@@ -2402,73 +2131,32 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if ( SyntaxElement = CABAC_LAST_SIGNIFICANT_COEFF_FLAG ) then
 			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
-				maxBinIdxCtx := 0; //FIXME prefix
 				ctxIdxOffset := 572;
 				bypassFlag := false;
 			else if ( ctxBlockCat > 9 and ctxBlockCat < 13 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 616;
 					bypassFlag := false;
 			else if ( ctxBlockCat = 5 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 417;
 					bypassFlag := false;
 			else if ( ctxBlockCat = 9 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 690;
 					bypassFlag := false;
 			else if ( ctxBlockCat = 13 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 748;
 					bypassFlag := false;		
 			else if ( ctxBlockCat < 5 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
 					ctxIdxOffset := 166;
 					bypassFlag := false;		
 			end end end end end end
 		end
-		
-		if ( SyntaxElement = CABAC_COEFF_ABS_LEVEL_MINUS1 ) then
-			if ( ctxBlockCat > 5 and ctxBlockCat < 9 ) then
-				maxBinIdxCtx := 1; //FIXME prefix
-				ctxIdxOffset := 952;
-				bypassFlag := true;
-			else if ( ctxBlockCat > 9 and ctxBlockCat < 13 ) then
-					maxBinIdxCtx := 1; //FIXME prefix
-					ctxIdxOffset := 982;
-					bypassFlag := true;
-			else if ( ctxBlockCat = 5 ) then
-					maxBinIdxCtx := 0; //FIXME prefix
-					ctxIdxOffset := 417;
-					bypassFlag := true;
-			else if ( ctxBlockCat = 9 ) then
-					maxBinIdxCtx := 1; //FIXME prefix
-					ctxIdxOffset := 708;
-					bypassFlag := true;
-			else if ( ctxBlockCat = 13 ) then
-					maxBinIdxCtx := 1; //FIXME prefix
-					ctxIdxOffset := 766;
-					bypassFlag := true;		
-			else if ( ctxBlockCat < 5 ) then
-					maxBinIdxCtx := 1; //FIXME prefix
-					ctxIdxOffset := 227;
-					bypassFlag := true;		
-			end end end end end end
-		end
-		
-		if ( SyntaxElement = CABAC_COEFF_SIGN_FLAG ) then
-			maxBinIdxCtx := 0;
-			bypassFlag := true;		
-		end
-		
+			
 		if ( SyntaxElement = CABAC_END_OF_SLICE_FLAG ) then
-			maxBinIdxCtx := 0;
 			ctxIdxOffset := 276;
 			bypassFlag := false;		
 		end
 		
 		if ( SyntaxElement = CABAC_TRANSFORM_SIZE_8x8_FLAG ) then
-			maxBinIdxCtx := 0;
 			ctxIdxOffset := 399;
 			bypassFlag := false;		
 		end
@@ -2546,53 +2234,7 @@ actor Algo_Synp_AVC_FREXT()
 		//Give yW
 		NeighMb_yW := ( yN + maxH ) mod maxH;
 	end
-	
-	procedure getNeighbouringMV(int xN, int yN, int xD, int yD, int maxW, int maxH)
-	begin
-		xN := xN + xD;
-		yN := yN + yD;
 		
-		if xN < 0 then
-  			if yN < 0 then
-				NeighMbAvail := mbAddrD_Avail();
-				NeighMbAddr := GiveMbAddrD();
-	
-			else
-				if yN < maxH - 1 then
-					NeighMbAvail := mbAddrA_Avail();
-					NeighMbAddr := GiveMbAddrA();
-				else
-					NeighMbAvail := false;
-				end
-  			end
- 		else
-			if xN < maxW - 1 then
-  				if yN < 0 then
-					NeighMbAvail := mbAddrB_Avail();
-					NeighMbAddr := GiveMbAddrB();
-  				else
-					if yN < maxH - 1 then
-						NeighMbAvail := true;
-						NeighMbAddr  := val_CurrMbAddr;
-					end
-				end
-			else
-			      if xN >= maxW - 1 and yN < 0 then
-					NeighMbAvail := mbAddrC_Avail();
-					NeighMbAddr := GiveMbAddrD();
-			      else
-					NeighMbAvail := false;
-			      end
-			end
-		end
-		
-		//Give xW
-		NeighMb_xW := ( xN + maxW ) mod maxW;
-	  
-		//Give yW
-		NeighMb_yW := ( yN + maxH ) mod maxH;
-	end
-	
 	// FIXME : Add the possibility to return false when the mbAddr belongs to another slice
 	function mbAddrAvailable( int mbAddrX ) --> bool : 
 		if ( ( mbAddrX < 0 ) or ( mbAddrX > PicSizeInMbs ) )then 
@@ -2622,23 +2264,7 @@ actor Algo_Synp_AVC_FREXT()
 	function mbAddrB_Avail() --> bool :
 		mbAddrAvailable( GiveMbAddrB() )
 	end
-	
-	function GiveMbAddrC( ) --> int :
-		val_CurrMbAddr - PicWidthInMbs + 1
-	end
-
-	function mbAddrC_Avail() --> bool :
-		( ( val_CurrMbAddr + 1 ) mod PicWidthInMbs  ) != 0
-	end
-
-	function GiveMbAddrD( ) --> int :
-		val_CurrMbAddr - PicWidthInMbs - 1
-	end
-
-	function mbAddrD_Avail() --> bool :
-		( val_CurrMbAddr mod PicWidthInMbs ) != 0
-	end
-	
+		
 	function GivePrevMbAdd() --> int :
 		val_CurrMbAddr - 1
 	end
@@ -4711,7 +4337,7 @@ actor Algo_Synp_AVC_FREXT()
 		
 			//Get Binarization for the requested Synatx Element
 			if GetBinarizationFlag = false then
-				// Recovers maxBinIdxCtx and ctxIdxOffset 
+				// Recovers ctxIdxOffset 
 				Getbinarization(CABAC_SEARCH_SYNTAX_ELEMENT);
 				// Update the Bin string that we are going to compare with
 				updateSynElVal();
@@ -4780,7 +4406,6 @@ actor Algo_Synp_AVC_FREXT()
 				GetBinarizationFlag := false; 
 				NextBitToDecode := true;
 				binValDecoded := false;
-				CabacTerminated := true;
 			end
 			
 			if (CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_SI or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I) and ValueIndex = 25 and FoundSE then
@@ -7324,10 +6949,10 @@ end
 		end 
 	end
 
-	function IS_MBPred_L0_CABAC(uint(size=1) x, int mbAddr) --> bool : MbPartPredModeCABAC(x, mbAddr) = 0 end
-	function IS_MBPred_L1_CABAC(uint(size=1) x, int mbAddr) --> bool : MbPartPredModeCABAC(x, mbAddr) = 1 end
-	function IS_MBBiPred_CABAC(uint(size=1) x, int mbAddr) --> bool : MbPartPredModeCABAC(x, mbAddr) = 2 end
-	function IS_MBDirect_CABAC(uint(size=1) x, int mbAddr) --> bool : MbPartPredModeCABAC(x, mbAddr) = 3 end
+	function IS_MBPred_L0_CABAC(uint(size=1) x, int mbAddr) --> bool : if mbAddr < 0 then false else MbPartPredModeCABAC(x, mbAddr) = 0 end end
+	function IS_MBPred_L1_CABAC(uint(size=1) x, int mbAddr) --> bool : if mbAddr < 0 then false else MbPartPredModeCABAC(x, mbAddr) = 1 end end
+	function IS_MBBiPred_CABAC(uint(size=1) x, int mbAddr) --> bool : if mbAddr < 0 then false else MbPartPredModeCABAC(x, mbAddr) = 2 end end
+	function IS_MBDirect_CABAC(uint(size=1) x, int mbAddr) --> bool : if mbAddr < 0 then false else MbPartPredModeCABAC(x, mbAddr) = 3 end end
 
 	
 	read_MB_layer_mb_type: action ==>
