@@ -55,8 +55,6 @@ actor Algo_NALU ()
 	fill_fifo: action 
 			bits8:[b]
 				==>
-		guard
-			byte_count < 2
 		do
 			fifo_msb   := fifo_lsb;
 			fifo_lsb   := b;
@@ -68,7 +66,6 @@ actor Algo_NALU ()
 			bits8:[b]
 				==>
 		guard
-			byte_count = 2,
 			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
 		do
 			byte_count       := 0;
@@ -87,8 +84,9 @@ actor Algo_NALU ()
 			bits8:[b]
 				==>
 		guard
-			byte_count = 2,
-			nb_bytes_mem < NB_RBSP_BYTE_MAX
+			nb_bytes_mem < NB_RBSP_BYTE_MAX,
+			nb_rbsp_byte_ready = false,
+			not((fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3))
 		do
 			Input_Bitstream[nb_bytes_mem] := fifo_msb;
 			nb_bytes_mem                  := nb_bytes_mem + 1;
@@ -126,7 +124,6 @@ actor Algo_NALU ()
 				==>
 			nb_rbsp_bytes:[nb_bytes_in_rbsp]
 		guard
-			start_code         = 2,
 			nb_rbsp_byte_ready = true
 		do
 			nb_rbsp_byte_ready := false;
@@ -138,7 +135,6 @@ actor Algo_NALU ()
 				==>
 			bits_rbsp8:[out_rbsp]
 		guard
-			start_code    = 2,
 			nb_bytes_sent < nb_bytes_mem
 		var
 			int(size = 8) out_rbsp
@@ -149,9 +145,6 @@ actor Algo_NALU ()
 
 	/* send of rbsp finished */
 	send_rbsp_done: action ==>
-		guard
-			start_code    =  2,
-			nb_bytes_sent >= nb_bytes_mem
 		do
 			start_code       := 1;
 			nb_bytes_mem     := 0;
@@ -164,8 +157,9 @@ actor Algo_NALU ()
 *
 */
 	schedule fsm get_bytes_or_send_nb_rbsp:
-		get_bytes_or_send_nb_rbsp (fill_fifo          )-->get_bytes_or_send_nb_rbsp;
-		get_bytes_or_send_nb_rbsp (delete_emul_3_byte )-->get_bytes_or_send_nb_rbsp;
+		fill_fifo1                (fill_fifo          )-->fill_fifo2;
+		fill_fifo2                (fill_fifo          )-->get_bytes_or_send_nb_rbsp;
+		get_bytes_or_send_nb_rbsp (delete_emul_3_byte )-->fill_fifo1;
 		get_bytes_or_send_nb_rbsp (mem_received_byte  )-->get_bytes_or_send_nb_rbsp;
 		get_bytes_or_send_nb_rbsp (buffer_overflow    )-->undefined;
 		get_bytes_or_send_nb_rbsp (send_nb_rbsp_bytes )-->send_rbsp;
@@ -174,7 +168,9 @@ actor Algo_NALU ()
 	end
 
 	priority
-		send_nb_rbsp_bytes > send_rbsp > delete_emul_3_byte > mem_received_byte;
+	mem_received_byte>delete_emul_3_byte>send_nb_rbsp_bytes>buffer_overflow;
+	send_rbsp>send_rbsp_done;
+//		send_nb_rbsp_bytes > send_rbsp > delete_emul_3_byte > mem_received_byte;
 	end /* priority */
 
 end /* actor */
