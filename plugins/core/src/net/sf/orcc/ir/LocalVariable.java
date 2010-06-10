@@ -79,6 +79,15 @@ public class LocalVariable extends Variable implements
 	public int getIndex() {
 		return index;
 	}
+	
+	/**
+	 * Returns true if this variable has been assigned to an SSA index of this variable. 
+	 * 
+	 * @return true if the variable has an index otherwise false.
+	 */
+	public boolean isIndexed() {
+		return index != 0;
+	}
 
 	@Override
 	public String getName() {

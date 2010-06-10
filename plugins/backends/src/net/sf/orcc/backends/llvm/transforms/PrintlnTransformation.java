@@ -58,12 +58,12 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 	/**
 	 * String counter
 	 */
-	int strCnt;
+	private int strCnt;
 
 	/**
 	 * State variables of the actor
 	 */
-	OrderedMap<Variable> stateVars;
+	private OrderedMap<Variable> stateVars;
 
 	@Override
 	public void transform(Actor actor) {
@@ -85,7 +85,6 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 			visitProcedure(action.getScheduler());
 		}
 
-		actor.setStateVars(stateVars);
 	}
 
 	@Override

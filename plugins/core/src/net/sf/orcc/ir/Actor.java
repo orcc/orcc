@@ -318,16 +318,6 @@ public class Actor {
 	}
 	
 	/**
-	 * Sets state variables of the actor.
-	 * 
-	 * @param stateVars
-	 *			an ordered map of state variables
-	 */
-	public void  setStateVars(OrderedMap<Variable> stateVars) {
-		this.stateVars = stateVars;
-	}
-	
-	/**
 	 * Returns <code>true</code> if this actor is a <code>system</code> actor,
 	 * which means that it is supposed to be replaced by a hand-written
 	 * implementation. An actor is identified as "system" if it does not contain
