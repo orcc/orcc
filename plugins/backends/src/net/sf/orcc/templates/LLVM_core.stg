@@ -450,15 +450,15 @@ $LoadLocalPort(hasTokens)$
 
 Store(store) ::= <<
 
-$if(store.target.variable.port)$
+$if(store.target.port)$
 $if(!store.indexes.empty)
-$$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
+$$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
 endif$$
 else
 $$if(store.indexes.empty)
 $$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast, location=Location(store.location))$$
 else
-$$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.variable.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
+$$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
 endif$$
 endif$
 >>
