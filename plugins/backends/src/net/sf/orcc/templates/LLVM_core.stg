@@ -94,6 +94,10 @@ List(constant, type, iterator) ::= <<
 [$iterator, constant: {iterator, value | $type.type$ $if(value)$ $Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)$ $else$ zeroinitializer $endif$ }; wrap, separator=", "$]
 >>
 
+String(constant, type, iterator) ::= <<
+c"$constant$"
+>>
+
 ArrayList(constant, type, iterator) ::= <<$List(constant = constant, type = type, iterator=iterator)$>>
 
 // phi definition
@@ -184,6 +188,14 @@ $store $ty$ $Expr(value)$$cast$, $pty$* $ptr$$
 endif$
 >>
 
+PrintInstr(parameters) ::= <<
+call i32 (i8*, ...)* @printf( $parameters: PrintParameter()$ )
+
+>>
+
+PrintParameter(parameter) ::= <<
+i8* bitcast ($parameter.type$* @$parameter$ to i8*)
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Conversion instructions
@@ -363,7 +375,9 @@ phiVars(vars, node) ::= <<
 
 
 Call(call) ::= <<
-
+$if(call.print)$ 
+$PrintInstr(call.parameters)$ 
+$else$
 $CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=Location(call.location))$
 $if(call.target)$$
 if(call.cast)
@@ -379,7 +393,7 @@ function_args=parametersDeclaration(arguments=call.procedure.parameters.list, pa
 endif
 $$else
 $$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$$
-endif$
+endif$$endif$
 >>
 
 Assign(assign) ::= <<

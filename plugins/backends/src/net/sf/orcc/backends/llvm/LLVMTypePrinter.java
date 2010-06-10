@@ -67,7 +67,7 @@ public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(StringType type) {
-		builder.append("i8 *");
+		builder.append("["+type.getSize()+" x i8]");
 	}
 
 	@Override

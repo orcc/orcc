@@ -167,7 +167,7 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 	 * @param parameters
 	 *            a list of expressions
 	 */
-	private void setParameters(List<Expression> parameters) {
+	public void setParameters(List<Expression> parameters) {
 		if (this.parameters != null) {
 			Use.removeUses(this, this.parameters);
 		}

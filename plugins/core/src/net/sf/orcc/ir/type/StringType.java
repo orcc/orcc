@@ -37,7 +37,26 @@ package net.sf.orcc.ir.type;
  */
 public class StringType extends AbstractType {
 
+	int size;
+
 	public static final String NAME = "String";
+
+	/**
+	 * Creates a new list type.
+	 */
+	public StringType() {
+		setSize(0);
+	}
+
+	/**
+	 * Creates a new string type with the given size.
+	 * 
+	 * @param size
+	 *            the size of this string type
+	 */
+	public StringType(int size) {
+		setSize(size);
+	}
 
 	@Override
 	public Object accept(TypeInterpreter interpreter) {
@@ -54,9 +73,28 @@ public class StringType extends AbstractType {
 		return (obj instanceof StringType);
 	}
 
+	/**
+	 * Returns the size of the string type.
+	 * 
+	 * @return size of string type
+	 */
+	public int getSize() {
+		return size;
+	}
+
 	@Override
 	public boolean isString() {
 		return true;
+	}
+
+	/**
+	 * Set the size of the string type.
+	 * 
+	 * @param size
+	 *            the size of the string type
+	 */
+	public void setSize(int size) {
+		this.size = size;
 	}
 
 }

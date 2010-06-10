@@ -37,6 +37,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
+import net.sf.orcc.backends.llvm.transforms.PrintlnTransformation;
 import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
@@ -136,9 +137,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new TypeSizeTransformation(),
+		ActorTransformation[] transformations = { 
+				new TypeSizeTransformation(),
+				new PrintlnTransformation(),
 				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation(), new BuildCFG() };
+				new MoveReadsWritesTransformation(), 
+				new BuildCFG() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
