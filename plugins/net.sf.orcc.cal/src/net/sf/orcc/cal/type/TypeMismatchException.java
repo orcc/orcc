@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,90 +26,46 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.cal.type;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.cal.cal.AstExpression;
 
 /**
- * This class defines the unary operators of the IR.
+ * This class defines a type mismatch exception.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public enum UnaryOp {
+public class TypeMismatchException extends RuntimeException {
 
 	/**
-	 * a binary not <code>~</code>
+	 * 
 	 */
-	BITNOT("~"),
+	private static final long serialVersionUID = 1L;
+
+	private AstExpression expression;
 
 	/**
-	 * a logical not <code>!</code>
+	 * Creates a new exception with the given message, because the given
+	 * expression has the wrong type.
+	 * 
+	 * @param message
+	 *            a message
+	 * @param expression
+	 *            an AST expression
 	 */
-	LOGIC_NOT("!"),
-
-	/**
-	 * unary minus <code>-</code>
-	 */
-	MINUS("-"),
-
-	/**
-	 * number of elements <code>#</code>
-	 */
-	NUM_ELTS("#");
-
-	private static final Map<String, UnaryOp> operators = new HashMap<String, UnaryOp>();
-
-	static {
-		for (UnaryOp op : UnaryOp.values()) {
-			operators.put(op.text, op);
-		}
-		operators.put("not", LOGIC_NOT);
+	public TypeMismatchException(String message, AstExpression expression) {
+		super(message);
+		this.expression = expression;
 	}
 
 	/**
-	 * Returns the unary operator that has the given name.
+	 * Returns the expression that caused this exception.
 	 * 
-	 * @param name
-	 *            an operator name
-	 * @return a unary operator
-	 * @throws OrccRuntimeException
-	 *             if there is no operator with the given name
+	 * @return the expression that caused this exception
 	 */
-	public static UnaryOp getOperator(String name) throws OrccRuntimeException {
-		UnaryOp op = operators.get(name);
-		if (op == null) {
-			throw new OrccRuntimeException("unknown operator \"" + name + "\"");
-		} else {
-			return op;
-		}
-	}
-
-	/**
-	 * textual representation of this operator
-	 */
-	private String text;
-
-	/**
-	 * Creates an operator with the given textual representation.
-	 * 
-	 * @param text
-	 *            the operator textual representation
-	 */
-	private UnaryOp(String text) {
-		this.text = text;
-	}
-
-	/**
-	 * Returns the textual representation of this operator.
-	 * 
-	 * @return the textual representation of this operator
-	 */
-	public String getText() {
-		return text;
+	public AstExpression getExpression() {
+		return expression;
 	}
 
 }

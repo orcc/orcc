@@ -28,10 +28,14 @@
  */
 package net.sf.orcc.cal.validation;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionCall;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
@@ -44,14 +48,20 @@ import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
-import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.type.TypeChecker;
+import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.frontend.AstExpressionEvaluator;
+import net.sf.orcc.ir.Type;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.validation.Check;
@@ -68,8 +78,14 @@ import com.google.inject.Inject;
  */
 public class CalJavaValidator extends AbstractCalJavaValidator {
 
+	private TypeChecker checker;
+
+	private AstExpressionEvaluator exprEvaluator;
+
 	@Inject
 	private IQualifiedNameProvider nameProvider;
+
+	private TypeTransformer typeTransformer;
 
 	/**
 	 * Check action tag coherence. Tag's name must be different to port and
@@ -106,6 +122,44 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				error("Action " + name + " has the same name as an output port",
 						CalPackage.AST_ACTION__TAG);
 			}
+		}
+	}
+
+	@Check
+	public void checkActor(AstActor actor) {
+		exprEvaluator = new AstExpressionEvaluator();
+		typeTransformer = new TypeTransformer(exprEvaluator);
+		checker = new TypeChecker(typeTransformer);
+
+		Resource resource = actor.eResource();
+		String file = "";
+		try {
+			URL resourceUrl = new URL(resource.getURI().toString());
+			URL url = FileLocator.toFileURL(resourceUrl);
+			IPath path = new Path(url.getPath());
+			file = path.toOSString();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		exprEvaluator.initialize(file);
+		evaluateStateVariables(actor.getStateVariables());
+	}
+
+	@Check
+	public void checkAssign(AstStatementAssign assign) {
+		AstVariable variable = assign.getTarget().getVariable();
+		if (variable.isConstant()) {
+			error("The variable " + variable.getName() + " is not assignable",
+					CalPackage.AST_STATEMENT_ASSIGN__TARGET);
+		}
+
+		Type targetType = typeTransformer.transformType(variable.getType());
+		Type type = checker.getType(assign.getValue());
+		if (!checker.areTypeCompatible(targetType)) {
+			error("Type mismatch: cannot convert from " + type + " to "
+					+ variable.getType(),
+					CalPackage.AST_STATEMENT_ASSIGN__VALUE);
 		}
 	}
 
@@ -211,24 +265,33 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check
-	public void checkAssign(AstStatementAssign assign) {
-		AstVariable variable = assign.getTarget().getVariable();
-		if (variable.isConstant()) {
-			error("The variable " + variable.getName() + " is not assignable",
-					CalPackage.AST_STATEMENT_ASSIGN__TARGET);
-		}
-
-		TypeChecker checker = new TypeChecker();
-		AstType type = checker.getType(assign.getValue());
-		if (!checker.areTypeCompatible(variable.getType())) {
-			error("Type mismatch: cannot convert from " + type + " to "
-					+ variable.getType(),
-					CalPackage.AST_STATEMENT_ASSIGN__VALUE);
-		}
+	public void checkPriorities(AstPriority priority) {
 	}
 
-	@Check
-	public void checkPriorities(AstPriority priority) {
+	/**
+	 * Evaluates the given list of state variables, and register them as
+	 * variables.
+	 * 
+	 * @param stateVariables
+	 *            a list of state variables
+	 */
+	private void evaluateStateVariables(List<AstVariable> stateVariables) {
+		for (AstVariable astVariable : stateVariables) {
+			// evaluate initial value (if any)
+			AstExpression astValue = astVariable.getValue();
+			Object initialValue;
+			if (astValue != null) {
+				try {
+					initialValue = exprEvaluator.evaluate(astValue);
+
+					// register the value
+					exprEvaluator.registerValue(astVariable, initialValue);
+				} catch (OrccRuntimeException e) {
+					error(e.getMessage(), astVariable,
+							CalPackage.AST_VARIABLE__NAME);
+				}
+			}
+		}
 	}
 
 }

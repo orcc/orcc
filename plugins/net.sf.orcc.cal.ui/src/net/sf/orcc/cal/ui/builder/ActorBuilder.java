@@ -49,7 +49,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
+import org.eclipse.xtext.resource.XtextResource;
+import org.eclipse.xtext.util.CancelIndicator;
+import org.eclipse.xtext.validation.CheckMode;
+import org.eclipse.xtext.validation.IResourceValidator;
+import org.eclipse.xtext.validation.Issue;
+import org.eclipse.xtext.validation.Issue.Severity;
 
 import com.google.inject.Injector;
 
@@ -95,29 +102,57 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				EObject obj = it.next();
 				if (obj instanceof AstActor) {
 					AstActor actor = (AstActor) obj;
-
-					try {
-						URL resourceUrl = new URL(resource.getURI().toString());
-						URL url = FileLocator.toFileURL(resourceUrl);
-						IPath path = new Path(url.getPath());
-						String file = path.toOSString();
-
-						frontend.compile(file, actor);
-					} catch (IOException e) {
-						IStatus status = new Status(IStatus.ERROR,
-								"net.sf.orcc.cal.ui",
-								"could not generate code for "
-										+ actor.getName(), e);
-						throw new CoreException(status);
-					} catch (OrccException e) {
-						IStatus status = new Status(IStatus.ERROR,
-								"net.sf.orcc.cal.ui",
-								"could not generate code for "
-										+ actor.getName(), e);
-						throw new CoreException(status);
-					}
+					build(resource, actor);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Builds the actor defined in the given resource.
+	 * 
+	 * @param resource
+	 *            the resource of the actor
+	 * @param actor
+	 *            the AST actor
+	 * @throws CoreException
+	 *             if something goes wrong
+	 */
+	private void build(Resource resource, AstActor actor) throws CoreException {
+		// contains linking errors
+		List<Diagnostic> errors = actor.eResource().getErrors();
+		if (!errors.isEmpty()) {
+			return;
+		}
+
+		// validates (unique names and CAL validator)
+		IResourceValidator v = ((XtextResource) resource)
+				.getResourceServiceProvider().getResourceValidator();
+		List<Issue> issues = v.validate(resource, CheckMode.ALL,
+				new CancelIndicator.NullImpl());
+
+		for (Issue issue : issues) {
+			if (issue.getSeverity() == Severity.ERROR) {
+				return;
+			}
+		}
+
+		// only compile if there are no errors
+		try {
+			URL resourceUrl = new URL(resource.getURI().toString());
+			URL url = FileLocator.toFileURL(resourceUrl);
+			IPath path = new Path(url.getPath());
+			String file = path.toOSString();
+
+			frontend.compile(file, actor);
+		} catch (IOException e) {
+			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
+					"could not generate code for " + actor.getName(), e);
+			throw new CoreException(status);
+		} catch (OrccException e) {
+			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
+					"could not generate code for " + actor.getName(), e);
+			throw new CoreException(status);
 		}
 	}
 

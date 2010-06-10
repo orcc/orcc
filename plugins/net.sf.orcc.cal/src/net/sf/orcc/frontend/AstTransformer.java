@@ -60,14 +60,9 @@ import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstType;
-import net.sf.orcc.cal.cal.AstTypeBool;
-import net.sf.orcc.cal.cal.AstTypeFloat;
-import net.sf.orcc.cal.cal.AstTypeInt;
-import net.sf.orcc.cal.cal.AstTypeList;
-import net.sf.orcc.cal.cal.AstTypeString;
-import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.Action;
@@ -90,11 +85,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.FloatType;
-import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
-import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
@@ -233,56 +224,6 @@ public class AstTransformer {
 
 	}
 
-	private class TypeTransformer extends CalSwitch<Type> {
-
-		@Override
-		public Type caseAstTypeBool(AstTypeBool type) {
-			return new BoolType();
-		}
-
-		@Override
-		public Type caseAstTypeFloat(AstTypeFloat type) {
-			return new FloatType();
-		}
-
-		@Override
-		public Type caseAstTypeInt(AstTypeInt type) {
-			AstExpression astSize = type.getSize();
-			int size;
-			if (astSize == null) {
-				size = 32;
-			} else {
-				size = exprEvaluator.evaluateAsInteger(astSize);
-			}
-			return new IntType(size);
-		}
-
-		@Override
-		public Type caseAstTypeList(AstTypeList listType) {
-			Type type = transformType(listType.getType());
-			int size = exprEvaluator.evaluateAsInteger(listType.getSize());
-			return new ListType(size, type);
-		}
-
-		@Override
-		public Type caseAstTypeString(AstTypeString type) {
-			return new StringType();
-		}
-
-		@Override
-		public Type caseAstTypeUint(AstTypeUint type) {
-			AstExpression astSize = type.getSize();
-			int size;
-			if (astSize == null) {
-				size = 32;
-			} else {
-				size = exprEvaluator.evaluateAsInteger(astSize);
-			}
-			return new UintType(size);
-		}
-
-	}
-
 	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
 			.compile("\\.");
 
@@ -352,9 +293,10 @@ public class AstTransformer {
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
-		typeTransformer = new TypeTransformer();
 
 		exprEvaluator = new AstExpressionEvaluator();
+
+		typeTransformer = new TypeTransformer(exprEvaluator);
 	}
 
 	/**

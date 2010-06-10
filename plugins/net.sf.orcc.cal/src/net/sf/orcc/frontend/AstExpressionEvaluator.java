@@ -441,8 +441,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			String message = "variable \"" + variable.getName() + "\" ("
 					+ Util.getLocation(variable)
 					+ ") does not have a compile-time constant value";
-			throw new OrccRuntimeException(file, Util.getLocation(expression),
-					message);
+			throw new OrccRuntimeException(message);
 		}
 
 		return value;
@@ -492,6 +491,15 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		int value = evaluateAsInteger(expression);
 		Location location = Util.getLocation(expression);
 		return new IntExpr(location, value);
+	}
+
+	/**
+	 * Returns the file in which expressions are defined.
+	 * 
+	 * @return the file in which expressions are defined
+	 */
+	public String getFile() {
+		return file;
 	}
 
 	/**
