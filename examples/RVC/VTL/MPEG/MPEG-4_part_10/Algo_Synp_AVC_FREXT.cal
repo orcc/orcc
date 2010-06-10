@@ -3686,7 +3686,7 @@ actor Algo_Synp_AVC_FREXT()
 							subMbPartIdxN := (yW >> 2) * 2 + (xW >> 2);
 						else
 							if mbPart = 1 then
-								subMbPartIdxN := (yW >> 2) * 2 + ((xW - 7) >> 2);
+								subMbPartIdxN := (yW >> 2) * 2 + (((xW-1) - 7) >> 2);
 							else	
 								if mbPart = 2 then
 									subMbPartIdxN := (((yW-1) - 7) >> 2) * 2 + (xW >> 2);
@@ -3841,8 +3841,8 @@ actor Algo_Synp_AVC_FREXT()
 		int predModeEqualFlagA,
 		int predModeEqualFlagB,
 		int currSubMbType,
-		int absMvdCompA,
-		int absMvdCompB,
+		int refIdxZeroFlagA,
+		int refIdxZeroFlagB,
 		int x,
 		int y,
 		int xN,
@@ -3857,8 +3857,8 @@ actor Algo_Synp_AVC_FREXT()
 		y := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
 		
 		if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
-			xS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 0);
-			yS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 1);
+			xS := InverseRasterScan(0, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 0);
+			yS := InverseRasterScan(0, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 1);
 		else
 			xS := 0;
 			yS := 0;
@@ -3872,17 +3872,16 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if not NeighMbAvail then
 			mbPartIdxN    := -1;
-			subMbPartIdxN := -1;
-			absMvdCompA := 0;
+			condTermFlagA := 0;
 		else
 			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
-						
-			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
-				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+			//Give refIdxZeroFlagX value
+			if IS_L0 then
+				refIdxZeroFlagA := if Ref_Idx_L0[NeighMbAddr][mbPartIdxN] > 0 then 0 else 1 end;
 			else
-				subMbPartIdxN := 0;
+				refIdxZeroFlagA := if Ref_Idx_L1[NeighMbAddr][mbPartIdxN] > 0 then 0 else 1 end;
 			end
-			
+					
 			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
 				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
 					predModeEqualFlagA := 0;
@@ -3896,15 +3895,11 @@ actor Algo_Synp_AVC_FREXT()
 					predModeEqualFlagA := 1;
 				end
 			end
-			
-			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagA = 0 then
-				absMvdCompA := 0;
+			if IS_P_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or 
+			   IS_Intra_Pred_CABAC(NeighMbAddr) or predModeEqualFlagA = 0 or refIdxZeroFlagA = 1 then
+				condTermFlagA := 0;
 			else
-				if IS_L0 then
-					absMvdCompA := ABS(Mvd_L0[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
-				else
-					absMvdCompA := ABS(Mvd_L1[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
-				end
+				condTermFlagA := 1;
 			end
 		end
 			
@@ -3916,17 +3911,16 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if not NeighMbAvail then
 			mbPartIdxN    := -1;
-			subMbPartIdxN := -1;
-			absMvdCompB := 0;
+			condTermFlagB := 0;
 		else
 			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
-						
-			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
-				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+			//Give refIdxZeroFlagX value
+			if IS_L0 then
+				refIdxZeroFlagB := if Ref_Idx_L0[NeighMbAddr][mbPartIdxN] > 0 then 0 else 1 end;
 			else
-				subMbPartIdxN := 0;
+				refIdxZeroFlagB := if Ref_Idx_L1[NeighMbAddr][mbPartIdxN] > 0 then 0 else 1 end;
 			end
-			
+					
 			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
 				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
 					predModeEqualFlagB := 0;
@@ -3940,27 +3934,15 @@ actor Algo_Synp_AVC_FREXT()
 					predModeEqualFlagB := 1;
 				end
 			end
-			
-			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagB = 0 then
-				absMvdCompB := 0;
+			if IS_P_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or 
+			   IS_Intra_Pred_CABAC(NeighMbAddr) or predModeEqualFlagB = 0 or refIdxZeroFlagB = 1 then
+				condTermFlagB := 0;
 			else
-				if IS_L0 then
-					absMvdCompB := ABS(Mvd_L0[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
-				else
-					absMvdCompB := ABS(Mvd_L1[NeighMbAddr][mbPartIdxN][subMbPartIdxN][compIdx]);
-				end
+				condTermFlagB := 1;
 			end
 		end
-					
-		if absMvdCompA + absMvdCompB < 3 then
-			  ctxIdxInc := 0;
-		else
-			  if absMvdCompA + absMvdCompB > 32 then
-				ctxIdxInc := 2;
-			  else
-				ctxIdxInc := 1;
-			  end
-		end
+		
+		ctxIdxInc := condTermFlagA + 2*condTermFlagB;
 	end
 	
 	procedure CoeffAbsParsing()
@@ -4647,7 +4629,49 @@ actor Algo_Synp_AVC_FREXT()
 	
 	procedure GetRefIdx_Lx()
 	begin
-		println("REF IDX Not yet implemented");
+			
+		if StartPrefix then
+			CabacValue := 0;
+			GetCtxIdxRefIdx();
+			ctxIdx := 54 + ctxIdxInc;
+			StartPrefix := false;
+			StartSuffix := true;
+			StopCoeff := true;
+		end
+		
+		if StartSuffix then	
+			if binValDecoded = false and StopCoeff then
+				StartDecodeDecision := true;	
+				//Do not give the hand to GetRefIdx_Lx
+				StopCabacProcess();
+			else
+				if binVal = 0 then
+					FoundSE := true;
+					StopCoeff := false;
+				else
+					CabacValue := CabacValue + 1;
+					if ctxIdxInc < 4 then
+						ctxIdxInc := 4;
+					else
+						ctxIdxInc := 5;
+					end
+					ctxIdx := 54 + ctxIdxInc;
+					StopCoeff := true;
+					binValDecoded := false;
+				end
+			end
+		end
+		
+		if FoundSE then
+			// Init GetRefIdx_Lx
+			StartPrefix := true;
+			StartSuffix := false;
+			binValDecoded := false;
+			binIdx := -1;
+			NextBitToDecode := true;
+			StopCabacProcess();
+		end
+		
 	end
 	//*************************************************************/
 	/*************************************************************
