@@ -11,7 +11,7 @@ fifo(port) ::= <<
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 Var(var) ::= <<
-$if(var.variable.global)$@$else$%$endif$$var$
+$if(var.global)$@$else$%$endif$$var$
 >>
 
 Expr(expr) ::= <<
@@ -23,11 +23,11 @@ $expr.type$
 >>
 
 VarType(var) ::= <<
-$var.variable.type$
+$var.type$
 >>
 
 ListType(list) ::= <<
-$list.variable.type.elementType$
+$list.type.elementType$
 >>
 
 variableDeclaration(variable) ::= <<
@@ -467,13 +467,13 @@ Load(load) ::= <<
 
 $if (load.source.variable.port)$$
 if (!load.indexes.empty)
-$$LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source, cast= load.cast)$$
+$$LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source.variable, cast= load.cast)$$
 endif$$
 else$$
 if(load.indexes.empty)
-$$LoadWithoutIndex(result={%$load.target$}, ty=VarType(load.source), pointer=load.source, cast= load.cast)$$
+$$LoadWithoutIndex(result={%$load.target$}, ty=VarType(load.source.variable), pointer=load.source.variable, cast= load.cast)$$
 else
-$$LoadWithIndex(result={%$load.target$}, ty=load.source.variable.type, pointer=load.source, indexes=load.indexes, cast= load.cast)$$
+$$LoadWithIndex(result={%$load.target$}, ty=load.source.variable.type, pointer=load.source.variable, indexes=load.indexes, cast= load.cast)$$
 endif$$
 endif$
 >>
