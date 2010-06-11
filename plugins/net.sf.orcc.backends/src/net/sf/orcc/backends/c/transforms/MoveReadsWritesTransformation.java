@@ -61,16 +61,16 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Read node, Object... args) {
-		readEnds.add(new ReadEnd(node));
+	public void visit(Read read, Object... args) {
+		readEnds.add(new ReadEnd(read));
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void visit(Write node, Object... args) {
+	public void visit(Write write, Object... args) {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		writes.add(node);
-		it.set(new WriteEnd(node));
+		writes.add(write);
+		it.set(new WriteEnd(write));
 	}
 
 	@Override
