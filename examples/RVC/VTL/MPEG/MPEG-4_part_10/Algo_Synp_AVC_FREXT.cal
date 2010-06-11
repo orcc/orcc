@@ -115,9 +115,9 @@ actor Algo_Synp_AVC_FREXT()
 	int CodeLen;
 	
 	bool TRACE := false;//true;
-	bool TRACE_POC := true;
+	bool TRACE_POC := false;
 	bool TRACE_MRL := false;//true;
-	bool TRACE_BIARI := true;
+	bool TRACE_BIARI := false;
 
 	int  trVal := 0;
 	// ********** Read CAVLC ********** //
@@ -4611,7 +4611,7 @@ actor Algo_Synp_AVC_FREXT()
 	var 
 		int tempOffest
 	do
-		if val_CurrMbAddr = 98 then 
+		if val_CurrMbAddr = 98 and CABAC_SEARCH_SYNTAX_ELEMENT != 1 then 
 			binVal := 1;
 			binValDecoded := true;
 			// Start Cabac Process
