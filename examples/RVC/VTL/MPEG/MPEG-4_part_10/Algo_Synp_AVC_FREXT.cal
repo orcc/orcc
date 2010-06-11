@@ -209,7 +209,7 @@ actor Algo_Synp_AVC_FREXT()
 	*/
 	List ( type: List ( type: int, size = 10) , size = PICWIDTH*PICHEIGHT - 1 ) mbTab := [[ 0 : for int i in Integers( 0, 9)] : for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2)];
 	
-	int mbTabAvail				:= 0;
+	int TypePred					:= 0; //0:Intra 1:Inter 2: B, used for ctx prediction
 	int mbSliceType				:= 1;
 	int mbTabMbtype				:= 2;
 	int mbIntraChromaPredMode	:= 3;
@@ -309,6 +309,9 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_P_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] = P_Skip end
 	function IS_B_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] = B_Skip end
 	function IS_Intra_Pred_CABAC(int mbAddr) --> bool : ( mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] > 4) or (mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] > 22) end
+	function IS_Intra(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 0 end
+	function IS_Inter(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 1 end
+	
 	/* MVD and REF CABAC Neighbouring */
 	
 	int mbAddrN;
@@ -2731,7 +2734,7 @@ actor Algo_Synp_AVC_FREXT()
 			AvailMbA := NeighMbAvail;
 			
 			if AvailMbA then
-			  if IS_I16x16(mbTab[mbAddrA][mbSliceType], mbTab[mbAddrA][mbTabMbtype]) then
+			  if mbTab[mbAddrA][mbTabMbtype] > 0 and mbTab[mbAddrA][mbTabMbtype] < 25 then
 				  transBlockA := mbAddrA; 
 				end
 			else
@@ -2745,7 +2748,7 @@ actor Algo_Synp_AVC_FREXT()
 			AvailMbB := NeighMbAvail;
 			
 			if AvailMbB then
-				if IS_INxN(mbTab[mbAddrB][mbSliceType], mbTab[mbAddrB][mbTabMbtype]) then
+				if mbTab[mbAddrB][mbTabMbtype] > 0 and mbTab[mbAddrB][mbTabMbtype] < 25 then
 				  transBlockB := mbAddrB; 
 				end
 			else
@@ -2901,11 +2904,11 @@ actor Algo_Synp_AVC_FREXT()
 		
 		// condTermFlagA
 		
-		if not AvailMbA and mbTab[val_CurrMbAddr][mbTabMbtype] < 5 and  mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
+		if not AvailMbA and IS_Inter(val_CurrMbAddr) or
 		   AvailMbA and transBlockA = -1 and IS_IPCM_Tab(mbAddrA,mbTabMbtype) != true then
 			condTermFlagA := 0;
 		else
-			if not AvailMbA and ( mbTab[val_CurrMbAddr][mbTabMbtype] > -1 and mbTab[val_CurrMbAddr][mbTabMbtype] < 25 ) or
+			if not AvailMbA and IS_Intra(val_CurrMbAddr) or
 			  IS_IPCM_Tab(mbAddrA,mbTabMbtype) then
 				condTermFlagA := 1;
 			else
@@ -2934,11 +2937,11 @@ actor Algo_Synp_AVC_FREXT()
 		
 		// condTermFlagB
 
-		if not AvailMbB and mbTab[val_CurrMbAddr][mbTabMbtype] < 5 and mbTab[val_CurrMbAddr][mbSliceType] = SLICE_TYPE_P or
+		if not AvailMbB and IS_Inter(val_CurrMbAddr) or
 		   AvailMbB and transBlockB = -1 and IS_IPCM_Tab(mbAddrB,mbTabMbtype) = false then
 			condTermFlagB := 0;
 		else
-			if not AvailMbB and ( mbTab[val_CurrMbAddr][mbTabMbtype] > -1 and mbTab[val_CurrMbAddr][mbTabMbtype] < 25) or
+			if not AvailMbB and IS_Intra(val_CurrMbAddr) or
 			   IS_IPCM_Tab(mbAddrB,mbTabMbtype) then
 				condTermFlagB := 1;
 			else
@@ -3951,6 +3954,8 @@ actor Algo_Synp_AVC_FREXT()
 				CabacValue := CabacValue + 5;
 				SuffixMbTypeP := true;
 			end
+			//Give type prediction
+			mbTab[val_CurrMbAddr][TypePred] := 0; 
 		end
 	end
 	
@@ -4032,6 +4037,8 @@ actor Algo_Synp_AVC_FREXT()
 				NextBitToDecode := true;
 				StopCabacProcess();
 				binIdxOffset := 0;
+				//Give type prediction
+				mbTab[val_CurrMbAddr][TypePred] := 1; 
 			end
 		end
 		
