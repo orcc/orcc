@@ -90,11 +90,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) throws OrccException {
 		String outputName = path + File.separator + actor.getName() + ".s";
 
 		try {
-			printer.printActor(outputName, actor);
+			boolean cached = printer.printActor(outputName, actor);
 
 			boolean llvmBitcode = getAttribute(
 					"net.sf.orcc.backends.llvmBitcode", false);
@@ -104,6 +104,8 @@ public class LLVMBackendImpl extends AbstractBackend {
 					printBitcode(llvmAs, outputName, actor.getName());
 				}
 			}
+			
+			return cached;
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

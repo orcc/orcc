@@ -97,7 +97,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) throws OrccException {
 		String id = actor.getName();
 		File folder = new File(path + File.separator + "Design");
 		if (!folder.exists()) {
@@ -107,7 +107,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		String outputName = path + File.separator + "Design" + File.separator
 				+ id + ".vhd";
 		try {
-			printer.printActor(outputName, actor);
+			return printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

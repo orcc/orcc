@@ -307,8 +307,10 @@ public abstract class AbstractBackend implements Backend {
 	 * 
 	 * @param actor
 	 *            the actor
+	 * @return <code>true</code> if the actor was cached
 	 */
-	protected void printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) throws OrccException {
+		return false;
 	}
 
 	/**
@@ -321,12 +323,23 @@ public abstract class AbstractBackend implements Backend {
 	final protected void printActors(List<Actor> actors) throws OrccException {
 		write("Printing actors...\n");
 		long t0 = System.currentTimeMillis();
+		int numCached = 0;
+
 		for (Actor actor : actors) {
-			printActor(actor);
+			if (printActor(actor)) {
+				numCached++;
+			}
 		}
 
 		long t1 = System.currentTimeMillis();
 		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
+
+		if (numCached > 0) {
+			write("*******************************************************************************\n");
+			write("* NOTE: " + numCached + " actors were not regenerated "
+					+ "because they were already up-to-date. *\n");
+			write("*******************************************************************************\n");
+		}
 	}
 
 	/**

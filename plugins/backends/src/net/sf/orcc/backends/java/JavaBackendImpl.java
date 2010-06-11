@@ -35,6 +35,7 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.c.transforms.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -82,11 +83,11 @@ public class JavaBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) throws OrccException {
 		String name = actor.getName();
 		String outputName = path + File.separator + "Actor_" + name + ".java";
 		try {
-			printer.printActor(outputName, actor);
+			return printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
@@ -113,11 +114,12 @@ public class JavaBackendImpl extends AbstractBackend {
 	protected void transformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new PhiRemoval() };
+				new PhiRemoval(), new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
+
 	}
 
 }

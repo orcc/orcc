@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -140,10 +141,18 @@ public final class STPrinter {
 	 *            output file name
 	 * @param actor
 	 *            the actor
+	 *     @return 
 	 * @throws IOException
 	 */
-	public void printActor(String fileName, Actor actor) throws IOException {
+	public boolean printActor(String fileName, Actor actor) throws IOException {
 		if (!actor.isSystem()) {
+			// if source file is older than target file, do not generate
+			File sourceFile = new File(actor.getFile());			
+			File targetFile = new File(fileName);
+			if (sourceFile.lastModified() < targetFile.lastModified()) {
+				return true;
+			}
+			
 			if (group.debug) {
 				DebugST template = (DebugST) group.getInstanceOf("actor");
 				template.add("actor", actor);
@@ -158,6 +167,8 @@ public final class STPrinter {
 				os.close();
 			}
 		}
+		
+		return false;
 	}
 
 	/**

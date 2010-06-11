@@ -76,13 +76,12 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				true);
+		boolean partition = getAttribute("net.sf.orcc.backends.partition", true);
 		if (partition) {
 			partitioning = true;
 			partitioner = new NetworkPartitioner();
 			partitioner.transform(network);
-			
+
 			new XDFWriter(new File(path), network);
 
 		}
@@ -119,13 +118,13 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printActor(Actor actor) throws OrccException {
+	protected boolean printActor(Actor actor) throws OrccException {
 		try {
 			String name = actor.getName();
 			String outputName = path + File.separator + name + ".h";
 			printer.printActor(outputName, actor);
 			outputName = path + File.separator + name + ".cpp";
-			impl_printer.printActor(outputName, actor);
+			return impl_printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
