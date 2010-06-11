@@ -29,14 +29,19 @@
 package net.sf.orcc.runtime;
 
 /**
- * A FIFO of integers.
+ * This class defines a FIFO of integers.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class IntFifo {
 
+	/**
+	 * The contents of the FIFO.
+	 */
 	private int[] contents;
+
+	private int fillCount;
 
 	private int read;
 
@@ -49,85 +54,155 @@ public class IntFifo {
 		contents = new int[size];
 	}
 
-	public void get(boolean[] target) {
-		peek(target);
-		read += target.length;
-	}
-
-	public void get(int[] target) {
-		peek(target);
-		read += target.length;
-	}
-
-	public boolean hasRoom(int n) {
-		if ((size - write) >= n) {
-			return true;
+	/**
+	 * Returns the array where <code>numTokens</code> can be read.
+	 * 
+	 * @param numTokens
+	 *            a number of tokens to read
+	 * @return the array where <code>numTokens</code> can be read
+	 */
+	final public int[] getReadArray(int numTokens) {
+		if (read + numTokens <= size) {
+			return contents;
 		} else {
-			FifoManager.getInstance().addFullFifo(this);
-			return false;
-		}
-	}
+			int[] buffer = new int[numTokens];
 
-	public boolean hasTokens(int n) {
-		if ((write - read) >= n) {
-			return true;
-		} else {
-			FifoManager.getInstance().addEmptyFifo(this);
-			return false;
-		}
-	}
-	
-	void moveTokens() {
-		// number of tokens in the FIFO
-		int n = write - read;
+			int numEnd = size - read;
+			int numBeginning = numTokens - numEnd;
 
-		// if the read pointer is greater than the number of tokens, we can safely move
-		// the tokens at the beginning of the FIFO
-		if (read > n) {
-			// there is room to copy the not-read-yet tokens at the beginning of the FIFO
-			if (n > 0) {
-				// only copy if there are tokens
-				System.arraycopy(contents, read, contents, 0, n);
+			// Copy the end of the fifo
+			if (numEnd != 0) {
+				System.arraycopy(contents, read, buffer, 0, numEnd);
 			}
-			
-			read = 0;
-			write = n;
+
+			// Copy the rest of the data at the beginning of the FIFO
+			if (numBeginning != 0) {
+				System.arraycopy(contents, 0, buffer, numEnd, numBeginning);
+			}
+
+			return buffer;
 		}
 	}
 
-	public void peek(boolean[] target) {
-		int n = target.length;
-		for (int i = 0; i < n; i++) {
-			target[i] = (contents[read + i] != 0);
+	/**
+	 * Returns the index at which tokens can be read in the array returned by
+	 * {@link #getReadArray(int)}.
+	 * 
+	 * @param numTokens
+	 *            a number of tokens to read
+	 * @return the index at which tokens can be read in the array returned by
+	 *         {@link #getReadArray(int)}
+	 */
+	final public int getReadIndex(int numTokens) {
+		if (read + numTokens <= size) {
+			return read;
+		} else {
+			return 0;
 		}
 	}
 
-	public void peek(int[] target) {
-		int n = target.length;
-		System.arraycopy(contents, read, target, 0, n);
-	}
-
-	public void put(boolean[] source) {
-		int n = source.length;
-		for (int i = 0; i < n; i++) {
-			contents[write + i] = source[i] ? 1 : 0;
+	/**
+	 * Returns the array where <code>numTokens</code> can be written.
+	 * 
+	 * @param numTokens
+	 *            a number of tokens to write
+	 * @return the array where <code>numTokens</code> can be written
+	 */
+	final public int[] getWriteArray(int numTokens) {
+		if (write + numTokens <= size) {
+			return contents;
+		} else {
+			return new int[numTokens];
 		}
-		write += n;
 	}
 
-	public void put(int[] source) {
-		int n = source.length;
-		System.arraycopy(source, 0, contents, write, n);
-		write += n;
+	/**
+	 * Returns the index at which tokens can be written in the array returned by
+	 * {@link #getWriteArray(int)}.
+	 * 
+	 * @param numTokens
+	 *            a number of tokens to write
+	 * @return the index at which tokens can be written in the array returned by
+	 *         {@link #getWriteArray(int)}
+	 */
+	final public int getWriteIndex(int numTokens) {
+		if (write + numTokens <= size) {
+			return write;
+		} else {
+			return 0;
+		}
 	}
-	
+
+	/**
+	 * Returns <code>true</code> if there is enough room for the given number of
+	 * tokens in this FIFO.
+	 * 
+	 * @param numTokens
+	 *            a number of tokens
+	 * @return <code>true</code> if there is enough room for the given number of
+	 *         tokens in this FIFO
+	 */
+	final public boolean hasRoom(int numTokens) {
+		return (size - fillCount) >= numTokens;
+	}
+
+	/**
+	 * Returns <code>true</code> if the FIFO contains at least the given number
+	 * of tokens.
+	 * 
+	 * @param numTokens
+	 *            a number of tokens
+	 * @return <code>true</code> if the FIFO contains at least the given number
+	 *         of tokens
+	 */
+	final public boolean hasTokens(int numTokens) {
+		return fillCount >= numTokens;
+	}
+
+	/**
+	 * Signals that reading is finished.
+	 * 
+	 * @param numTokens
+	 *            the number of tokens that were read
+	 */
+	final public void readEnd(int numTokens) {
+		fillCount -= numTokens;
+		read += numTokens;
+		if (read > size) {
+			read -= size;
+		}
+	}
+
 	public String toString() {
 		return write + "/" + read;
 	}
 
-	public void put(String[] check) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * Signals that writing is finished.
+	 * 
+	 * @param numTokens
+	 *            the number of tokens that were written
+	 */
+	final public void writeEnd(int numTokens, int[] buffer) {
+		fillCount += numTokens;
+		if (write + numTokens <= size) {
+			write += numTokens;
+		} else {
+			int numEnd = size - write;
+			int numBeginning = numTokens - numEnd;
+
+			// Copy data at the end of the FIFO
+			if (numEnd != 0) {
+				System.arraycopy(buffer, 0, contents, write, numEnd);
+			}
+
+			// Copy the rest of data at the beginning of the FIFO
+			if (numBeginning != 0) {
+				System.arraycopy(buffer, numEnd, contents, 0, numBeginning);
+			}
+			
+			write = numBeginning;
+		}
 	}
 
 }
