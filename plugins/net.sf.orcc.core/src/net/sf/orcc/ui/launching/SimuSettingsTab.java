@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_VTL;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.VTL_FOLDER;
@@ -497,7 +496,6 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 
 		value = textVTL.getText();
 		configuration.setAttribute(VTL_FOLDER, value);
-		configuration.setAttribute(COMPILE_VTL, true);
 
 		value = textStimulus.getText();
 		configuration.setAttribute(INPUT_STIMULUS, value);
@@ -510,7 +508,6 @@ public class SimuSettingsTab extends AbstractLaunchConfigurationTab {
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(XDF_FILE, "");
 		configuration.setAttribute(VTL_FOLDER, "");
-		configuration.setAttribute(COMPILE_VTL, true);
 		configuration.setAttribute(INPUT_STIMULUS, "");
 		configuration.setAttribute(OUTPUT_FOLDER, "");
 	}

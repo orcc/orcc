@@ -45,12 +45,6 @@ public interface OrccLaunchConstants {
 	public static final String BACKEND = "net.sf.orcc.backend";
 
 	/**
-	 * Whether we should compile the VTL. Must be kept in sync with options in
-	 * the back-ends plug-in.
-	 */
-	public static final String COMPILE_VTL = "net.sf.orcc.backends.compileVTL";
-
-	/**
 	 * Whether we should compile the given XDF input file. Must be kept in sync
 	 * with options in the back-ends plug-in.
 	 */

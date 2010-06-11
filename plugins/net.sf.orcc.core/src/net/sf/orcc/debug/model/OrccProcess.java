@@ -29,7 +29,6 @@
 package net.sf.orcc.debug.model;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_VTL;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
@@ -498,10 +497,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 * @throws CoreException
 	 */
 	public void start(String option) throws CoreException {
-		boolean launchFE = configuration.getAttribute(COMPILE_VTL, false);
-		if (launchFE) {
-			launchFrontend();
-		}
+		launchFrontend();
 
 		try {
 			if (value == 0) {

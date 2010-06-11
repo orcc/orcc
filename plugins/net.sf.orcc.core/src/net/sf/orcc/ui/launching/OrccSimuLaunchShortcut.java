@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_VTL;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.SIMULATION_CONFIG_TYPE;
@@ -208,7 +207,6 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 				return null;
 			}
 			wc.setAttribute(VTL_FOLDER, folder);
-			wc.setAttribute(COMPILE_VTL, true);
 
 			// stimulus file
 			String stimulus = browseStimulusFiles(getShell(), file);

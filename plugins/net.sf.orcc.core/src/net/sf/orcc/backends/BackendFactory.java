@@ -29,7 +29,6 @@
 package net.sf.orcc.backends;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_VTL;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
@@ -303,9 +302,9 @@ public class BackendFactory {
 		Backend backendObj = backends.get(backend);
 		backendObj.setLaunchConfiguration(configuration);
 
-		if (configuration.getAttribute(COMPILE_VTL, false)) {
-			backendObj.compileVTL(process, outputFolder);
-		}
+		// always compile VTL.
+		// an actor is only compiled if it needs to (based on modification date)
+		backendObj.compileVTL(process, outputFolder);
 
 		if (configuration.getAttribute(COMPILE_XDF, false)) {
 			String xdfFile = configuration.getAttribute(XDF_FILE, "");
