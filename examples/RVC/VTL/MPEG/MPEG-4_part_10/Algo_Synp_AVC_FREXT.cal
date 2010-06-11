@@ -115,6 +115,7 @@ actor Algo_Synp_AVC_FREXT()
 	int CodeLen;
 	
 	bool TRACE := false;//true;
+	bool TRACE_POC := true;
 	bool TRACE_MRL := false;//true;
 	bool TRACE_BIARI := true;
 
@@ -3396,7 +3397,7 @@ actor Algo_Synp_AVC_FREXT()
 				end
 			end
 			
-			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagA = 0 then
+			if IS_Intra(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagA = 0 then
 				absMvdCompA := 0;
 			else
 				if IS_L0 then
@@ -3440,7 +3441,7 @@ actor Algo_Synp_AVC_FREXT()
 				end
 			end
 			
-			if IS_Intra_Pred_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagB = 0 then
+			if IS_Intra(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or predModeEqualFlagB = 0 then
 				absMvdCompB := 0;
 			else
 				if IS_L0 then
@@ -5759,7 +5760,7 @@ actor Algo_Synp_AVC_FREXT()
 		prev_frame_num_offset := frame_num_offset;
 		prev_frame_num := frame_num;
 		prevPicOrderCntLsb := pic_order_cnt_lsb;
-if TRACE_MRL then
+if TRACE_POC then
 println("POC "+ POC_val);
 end
 	end
