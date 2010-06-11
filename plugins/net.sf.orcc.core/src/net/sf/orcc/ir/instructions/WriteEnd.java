@@ -39,7 +39,8 @@ package net.sf.orcc.ir.instructions;
 public class WriteEnd extends AbstractFifoInstruction {
 
 	public WriteEnd(Write write) {
-		super(write.getLocation(), write.getPort(), write.getNumTokens(), null);
+		super(write.getLocation(), write.getPort(), write.getNumTokens(), write
+				.getTarget());
 	}
 
 	@Override

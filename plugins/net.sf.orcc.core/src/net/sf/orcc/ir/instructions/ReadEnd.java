@@ -39,7 +39,8 @@ package net.sf.orcc.ir.instructions;
 public class ReadEnd extends AbstractFifoInstruction {
 
 	public ReadEnd(Read read) {
-		super(read.getLocation(), read.getPort(), read.getNumTokens(), null);
+		super(read.getLocation(), read.getPort(), read.getNumTokens(), read
+				.getTarget());
 	}
 
 	@Override

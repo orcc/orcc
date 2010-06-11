@@ -455,7 +455,7 @@ public class IRParser {
 
 	private List<Expression> parseExprs(JSONArray array) throws JSONException,
 			OrccException {
-		List<Expression> exprs = new ArrayList<Expression>();
+		List<Expression> exprs = new ArrayList<Expression>(0);
 		for (int i = 0; i < array.length(); i++) {
 			exprs.add(parseExpr(array.getJSONArray(i)));
 		}
@@ -666,7 +666,7 @@ public class IRParser {
 			throws JSONException, OrccException {
 		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
-		List<Use> vars = new ArrayList<Use>();
+		List<Use> vars = new ArrayList<Use>(2);
 		array = array.getJSONArray(1);
 		for (int i = 0; i < array.length(); i++) {
 			vars.add(parseVarUse(array.getJSONArray(i)));
