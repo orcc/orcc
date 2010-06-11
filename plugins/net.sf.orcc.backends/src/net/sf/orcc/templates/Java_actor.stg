@@ -36,7 +36,7 @@ $variable.type$$listDim(variable.type.dimensions)$ $variable.name$
 // called by "local variable", or "state variable with no value"
 variableDeclarationInit(variable) ::= <<
 $if(variable.port)$
-$variable.type$[] $variable$ = new $variable.type$$listSize(variable.type.dimensions)$$
+$variable.type$[] $variable$$
 else
 $$variable.type$$listDim(variable.type.dimensions)$ $variable$$
 if(variable.type.dimensions)
@@ -96,30 +96,53 @@ endif$
 
 // hasTokens instruction
 HasTokens(hasTokens) ::= <<
+
 $hasTokens.target$ = fifo_$hasTokens.port$.hasTokens($hasTokens.numTokens$);
+>>
+
+Load(load) ::= <<
+
+$if (load.source.variable.port && !load.indexes.empty)
+$$load.target$ = $load.source$[$load.source$_Index + $first(load.indexes)$]$rest(load.indexes) : {[$it$]}$;$
+else
+$$load.target$ = $load.source$$load.indexes : {[$it$]}$;$endif$
 >>
 
 // peek instruction
 Peek(peek) ::= <<
-fifo_$peek.port$.peek($peek.target$);
+$Read(peek)$
 >>
 
 // read instruction
 Read(read) ::= <<
-fifo_$read.port$.get($read.target$);
+
+int $read.port$_Index = fifo_$read.port$.getReadIndex($read.numTokens$);
+$read.target$ = fifo_$read.port$.getReadArray($read.numTokens$);
 >>
 
 ReadEnd(readEnd) ::= <<
-fifo_$readEnd.port.type$_read_end($readEnd.port$, $readEnd.numTokens$);
+
+fifo_$readEnd.port$.readEnd($readEnd.numTokens$);
+>>
+
+Store(store) ::= <<
+
+$if (store.target.port && !store.indexes.empty)
+$$store.target$[$store.target$_Index + $first(store.indexes)$]$rest(store.indexes) : {[$it$]}$ = $store.value$;$
+else
+$$store.target$$store.indexes : {[$it$]}$ = $store.value$;$endif$
 >>
 
 // write instruction
 Write(write) ::= <<
-fifo_$write.port$.put($write.target$);
+
+$write.target$ = fifo_$write.port$.getWriteArray($write.numTokens$);
+int $write.port$_Index = fifo_$write.port$.getWriteIndex($write.numTokens$);
 >>
 
 WriteEnd(writeEnd) ::= <<
-fifo_$writeEnd.port.type$_write_end($writeEnd.port$, $writeEnd.numTokens$);
+
+fifo_$writeEnd.port$.writeEnd($writeEnd.numTokens$, $writeEnd.target$);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,7 +155,8 @@ private $procedure.returnType$ $procedure$($procedure.parameters.list: {$variabl
 $if(procedure.locals.list)$
 	$procedure.locals.list: {$variableDeclarationInit(it)$;$\n$}$
 $endif$
-	$procedure.nodes: {$(it.class.simpleName)(it)$}$}
+	$procedure.nodes: {$(it.class.simpleName)(it)$}$
+}
 
 >>
 
@@ -289,8 +313,8 @@ actor(actor) ::= <<
  */
 package net.sf.orcc.generated;
 
-import net.sf.orcc.oj.IntFifo;
-import net.sf.orcc.oj.actors.IActor;
+import net.sf.orcc.runtime.IntFifo;
+import net.sf.orcc.runtime.actors.IActor;
 
 public class Actor_$actor.name$ implements IActor {
 

@@ -59,14 +59,13 @@ network(debugFifos, fifoSize, network) ::= <<
  */
 package net.sf.orcc.generated;
 
-import net.sf.orcc.oj.CLIParameters;
-import net.sf.orcc.oj.FifoManager;
-import net.sf.orcc.oj.IntFifo;
-import net.sf.orcc.oj.actors.Actor_Display;
-import net.sf.orcc.oj.actors.Actor_Source;
-import net.sf.orcc.oj.actors.Broadcast;
-import net.sf.orcc.oj.actors.IActor;
-import net.sf.orcc.oj.actors.IScheduler;
+import net.sf.orcc.runtime.CLIParameters;
+import net.sf.orcc.runtime.IntFifo;
+import net.sf.orcc.runtime.actors.Actor_Display;
+import net.sf.orcc.runtime.actors.Actor_Source;
+import net.sf.orcc.runtime.actors.Broadcast;
+import net.sf.orcc.runtime.actors.IActor;
+import net.sf.orcc.runtime.actors.IScheduler;
 
 public class Network_$network.name$ implements IScheduler {
 
