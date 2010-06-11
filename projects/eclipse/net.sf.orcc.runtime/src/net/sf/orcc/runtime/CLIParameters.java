@@ -26,19 +26,27 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj.debug;
+package net.sf.orcc.runtime;
 
-import java.util.Map;
+public class CLIParameters {
+	
+	private String[] args;
+	
+	private static final CLIParameters instance = new CLIParameters();
 
-import net.sf.orcc.oj.actors.IScheduler;
-
-public interface ISchedulerDebug extends IScheduler {
-
-	/**
-	 * Returns a map of (names, actors).
-	 * 
-	 * @return a map of (names, actors).
-	 */
-	public Map<String, IActorDebug> getActors();
+	private CLIParameters() {	
+	}
+	
+	public static CLIParameters getInstance() {
+		return instance;
+	}
+	
+	public void setArguments(String[] args) {
+		this.args = args;
+	}
+	
+	public String getSourceFile() {
+		return args[0];
+	}
 
 }

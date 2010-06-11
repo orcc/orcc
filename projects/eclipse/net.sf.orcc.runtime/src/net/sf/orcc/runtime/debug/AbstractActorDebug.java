@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj.debug;
+package net.sf.orcc.runtime.debug;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

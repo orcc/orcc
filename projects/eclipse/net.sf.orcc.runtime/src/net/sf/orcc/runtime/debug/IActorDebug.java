@@ -26,18 +26,78 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj.actors;
+package net.sf.orcc.runtime.debug;
 
-public interface IScheduler {
+import java.util.Map;
+
+import net.sf.orcc.debug.Location;
+import net.sf.orcc.debug.type.AbstractType;
+import net.sf.orcc.runtime.actors.IActor;
+
+public interface IActorDebug extends IActor {
 
 	/**
-	 * Initializes the network.
+	 * Returns the RVC-CAL this actor was defined in.
+	 * 
+	 * @return the RVC-CAL this actor was defined in
 	 */
-	public void initialize();
+	public String getFile();
 
 	/**
-	 * Schedules the network.
+	 * Returns the location of the given action
+	 * 
+	 * @param action
+	 *            action name
+	 * @return location
 	 */
-	public void schedule();
+	public Location getLocation(String action);
+
+	/**
+	 * Returns the name of the next schedulable action.
+	 * 
+	 * @return the name of the next schedulable action, or <code>null</code> if
+	 *         no action is schedulable.
+	 */
+	public String getNextSchedulableAction();
+
+	/**
+	 * Returns the value of the given state variable.
+	 * 
+	 * @param variable
+	 *            the state variable name.
+	 * 
+	 * @return the value of the given state variable
+	 */
+	public String getValue(String variable);
+
+	/**
+	 * Returns the value of the given state variable, if the state variable is
+	 * an array.
+	 * 
+	 * @param variable
+	 *            the state variable name.
+	 * @param index
+	 *            the index.
+	 * 
+	 * @return the value of the given state variable
+	 */
+	public String getValue(String variable, int index);
+
+	/**
+	 * Returns the map of state variables of this actor.
+	 * 
+	 * @return the map of state variables of this actor
+	 */
+	public Map<String, AbstractType> getVariables();
+
+	/**
+	 * Resumes this actor.
+	 */
+	public void resume();
+
+	/**
+	 * Suspends this actor.
+	 */
+	public void suspend();
 
 }

@@ -26,78 +26,32 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj.debug;
+package net.sf.orcc.runtime.actors;
 
-import java.util.Map;
+import net.sf.orcc.runtime.IntFifo;
 
-import net.sf.orcc.debug.Location;
-import net.sf.orcc.debug.type.AbstractType;
-import net.sf.orcc.oj.actors.IActor;
-
-public interface IActorDebug extends IActor {
+public interface IActor {
 
 	/**
-	 * Returns the RVC-CAL this actor was defined in.
-	 * 
-	 * @return the RVC-CAL this actor was defined in
+	 * Initializes this actor.
 	 */
-	public String getFile();
+	public void initialize();
 
 	/**
-	 * Returns the location of the given action
+	 * Schedules this actor.
 	 * 
-	 * @param action
-	 *            action name
-	 * @return location
+	 * @return the number of firings that occurred.
 	 */
-	public Location getLocation(String action);
+	public int schedule();
 
 	/**
-	 * Returns the name of the next schedulable action.
+	 * Sets the port whose name is given to the given FIFO.
 	 * 
-	 * @return the name of the next schedulable action, or <code>null</code> if
-	 *         no action is schedulable.
+	 * @param portName
+	 *            port name
+	 * @param fifo
+	 *            FIFO
 	 */
-	public String getNextSchedulableAction();
-
-	/**
-	 * Returns the value of the given state variable.
-	 * 
-	 * @param variable
-	 *            the state variable name.
-	 * 
-	 * @return the value of the given state variable
-	 */
-	public String getValue(String variable);
-
-	/**
-	 * Returns the value of the given state variable, if the state variable is
-	 * an array.
-	 * 
-	 * @param variable
-	 *            the state variable name.
-	 * @param index
-	 *            the index.
-	 * 
-	 * @return the value of the given state variable
-	 */
-	public String getValue(String variable, int index);
-
-	/**
-	 * Returns the map of state variables of this actor.
-	 * 
-	 * @return the map of state variables of this actor
-	 */
-	public Map<String, AbstractType> getVariables();
-
-	/**
-	 * Resumes this actor.
-	 */
-	public void resume();
-
-	/**
-	 * Suspends this actor.
-	 */
-	public void suspend();
+	public void setFifo(String portName, IntFifo fifo);
 
 }

@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj.actors;
+package net.sf.orcc.runtime.actors;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
@@ -44,8 +44,8 @@ import javax.swing.Timer;
 import net.sf.orcc.debug.Location;
 import net.sf.orcc.debug.type.AbstractType;
 import net.sf.orcc.debug.type.IntType;
-import net.sf.orcc.oj.IntFifo;
-import net.sf.orcc.oj.debug.AbstractActorDebug;
+import net.sf.orcc.runtime.IntFifo;
+import net.sf.orcc.runtime.debug.AbstractActorDebug;
 
 public class Actor_Display extends AbstractActorDebug implements ActionListener {
 

@@ -26,32 +26,18 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.oj.actors;
+package net.sf.orcc.runtime.actors;
 
-import net.sf.orcc.oj.IntFifo;
-
-public interface IActor {
+public interface IScheduler {
 
 	/**
-	 * Initializes this actor.
+	 * Initializes the network.
 	 */
 	public void initialize();
 
 	/**
-	 * Schedules this actor.
-	 * 
-	 * @return the number of firings that occurred.
+	 * Schedules the network.
 	 */
-	public int schedule();
-
-	/**
-	 * Sets the port whose name is given to the given FIFO.
-	 * 
-	 * @param portName
-	 *            port name
-	 * @param fifo
-	 *            FIFO
-	 */
-	public void setFifo(String portName, IntFifo fifo);
+	public void schedule();
 
 }
