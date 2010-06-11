@@ -2400,7 +2400,7 @@ actor Algo_Synp_AVC_FREXT()
 		if ( not AvailMb ) then
 			condTermFlagA := 0;
 		else	
-			if ( IS_P( GiveMbSliceType(AvailMb,mbAddr) ) or
+			if ( IS_Inter(mbAddr) or
 			     GiveMbType(AvailMb,mbAddr) = 25 or
 			     GiveIntraChromaPredMode(AvailMb,mbAddr) = 0 ) then
 			 
@@ -2419,7 +2419,7 @@ actor Algo_Synp_AVC_FREXT()
 		if ( not AvailMb ) then
 			condTermFlagB := 0;
 		else	
-			if ( IS_P( GiveMbSliceType(AvailMb,mbAddr) ) or
+			if ( IS_Inter(mbAddr)  or
 			     GiveMbType(AvailMb,mbAddr) = 25 or
 			     GiveIntraChromaPredMode(AvailMb,mbAddr) = 0 ) then
 			 
@@ -6535,6 +6535,7 @@ end
 				  transblock_cbf_dc_cr_cb[i][j] := 0;
 			  end
 		  end
+		 		  
 		  //Init FoundSE
 		  FoundSE := false;
 		end
@@ -6757,6 +6758,11 @@ println("cbp_blk "+ cbp_blk_tmp);
 end
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
+		if IS_CABAC() then
+			foreach int i in Integers(0,9) do
+				mbTab[val_CurrMbAddr][i] := 0;
+			end
+		end
 		val_cbp_blk:=0;
 	end
 
@@ -6799,6 +6805,11 @@ println("cbp_blk "+ cbp_blk_tmp);
 end
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
+		if IS_CABAC() then
+			foreach int i in Integers(0,9) do
+				mbTab[val_CurrMbAddr][i] := 0;
+			end
+		end
 		val_cbp_blk:=0;
 	end
 	
@@ -6831,6 +6842,11 @@ end
 	do
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
+		if IS_CABAC() then
+			foreach int i in Integers(0,9) do
+				mbTab[val_CurrMbAddr][i] := 0;
+			end
+		end
 		SentMbSkipZeros := false;
 		FoundSE := false;
 		if TRACE_MRL then
