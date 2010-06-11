@@ -135,8 +135,6 @@ public abstract class AbstractBackend implements Backend {
 		});
 
 		doVtlCodeGeneration(Arrays.asList(files));
-
-		write("That's all folks!\n");
 	}
 
 	@Override
@@ -161,8 +159,6 @@ public abstract class AbstractBackend implements Backend {
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);
-
-		write("That's all folks!\n");
 	}
 
 	/**

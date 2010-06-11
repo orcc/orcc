@@ -109,9 +109,17 @@ Read(read) ::= <<
 fifo_$read.port$.get($read.target$);
 >>
 
+ReadEnd(readEnd) ::= <<
+fifo_$readEnd.port.type$_read_end($readEnd.port$, $readEnd.numTokens$);
+>>
+
 // write instruction
 Write(write) ::= <<
 fifo_$write.port$.put($write.target$);
+>>
+
+WriteEnd(writeEnd) ::= <<
+fifo_$writeEnd.port.type$_write_end($writeEnd.port$, $writeEnd.numTokens$);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
