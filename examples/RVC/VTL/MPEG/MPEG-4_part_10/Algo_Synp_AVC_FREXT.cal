@@ -6762,6 +6762,21 @@ end
 			foreach int i in Integers(0,9) do
 				mbTab[val_CurrMbAddr][i] := 0;
 			end
+			
+			foreach int i in Integers(0,3) do
+				Ref_Idx_L0[val_CurrMbAddr][i] := 0;
+				Ref_Idx_L1[val_CurrMbAddr][i] := 0;
+			end
+			
+			foreach int i in Integers(0,3) do
+				foreach int j in Integers(0,3) do
+					foreach int l in Integers(0,1) do
+						Mvd_L0[val_CurrMbAddr][i][j][l] := 0;
+						Mvd_L1[val_CurrMbAddr][i][j][l] := 0;
+					end
+				end
+			end
+			
 		end
 		val_cbp_blk:=0;
 	end
@@ -6809,6 +6824,20 @@ end
 			foreach int i in Integers(0,9) do
 				mbTab[val_CurrMbAddr][i] := 0;
 			end
+			
+			foreach int i in Integers(0,3) do
+				Ref_Idx_L0[val_CurrMbAddr][i] := 0;
+				Ref_Idx_L1[val_CurrMbAddr][i] := 0;
+			end
+			
+			foreach int i in Integers(0,3) do
+				foreach int j in Integers(0,3) do
+					foreach int l in Integers(0,1) do
+						Mvd_L0[val_CurrMbAddr][i][j][l] := 0;
+						Mvd_L1[val_CurrMbAddr][i][j][l] := 0;
+					end
+				end
+			end
 		end
 		val_cbp_blk:=0;
 	end
@@ -6845,6 +6874,20 @@ end
 		if IS_CABAC() then
 			foreach int i in Integers(0,9) do
 				mbTab[val_CurrMbAddr][i] := 0;
+			end
+			
+			foreach int i in Integers(0,3) do
+				Ref_Idx_L0[val_CurrMbAddr][i] := 0;
+				Ref_Idx_L1[val_CurrMbAddr][i] := 0;
+			end
+			
+			foreach int i in Integers(0,3) do
+				foreach int j in Integers(0,3) do
+					foreach int l in Integers(0,1) do
+						Mvd_L0[val_CurrMbAddr][i][j][l] := 0;
+						Mvd_L1[val_CurrMbAddr][i][j][l] := 0;
+					end
+				end
 			end
 		end
 		SentMbSkipZeros := false;
