@@ -7,7 +7,7 @@
             class="net.sf.orcc.backends.c.CBackendImpl"
             name="C">
          <option
-               id="net.sf.orcc.backends.compileVTL">
+               id="net.sf.orcc.backends.vtlFolder">
          </option>
          <option
                id="net.sf.orcc.backends.compileXDF">
@@ -23,7 +23,7 @@
             class="net.sf.orcc.backends.java.JavaBackendImpl"
             name="Java">
          <option
-               id="net.sf.orcc.backends.compileVTL">
+               id="net.sf.orcc.backends.vtlFolder">
          </option>
          <option
                id="net.sf.orcc.backends.compileXDF">
@@ -33,7 +33,7 @@
             class="net.sf.orcc.backends.cpp.CppBackendImpl"
             name="C++">
          <option
-               id="net.sf.orcc.backends.compileVTL">
+               id="net.sf.orcc.backends.vtlFolder">
          </option>
          <option
                id="net.sf.orcc.backends.compileXDF">
@@ -49,7 +49,7 @@
             class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
             name="LLVM">
          <option
-               id="net.sf.orcc.backends.compileVTL">
+               id="net.sf.orcc.backends.vtlFolder">
          </option>
          <option
                id="net.sf.orcc.backends.compileXDF">
@@ -65,7 +65,7 @@
             class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
             name="VHDL">
          <option
-               id="net.sf.orcc.backends.compileVTL">
+               id="net.sf.orcc.backends.vtlFolder">
          </option>
          <option
                id="net.sf.orcc.backends.compileXDF">
@@ -75,7 +75,7 @@
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
             name="XLIM">
          <option
-               id="net.sf.orcc.backends.compileVTL">
+               id="net.sf.orcc.backends.vtlFolder">
          </option>
          <option
                id="net.sf.orcc.backends.compileXDF">
@@ -137,21 +137,13 @@
             <checkBox></checkBox>
          </option>
          <option
-               defaultValue="true"
-               description="Whether Orcc should compile the VTL contained in the given folder"
-               id="net.sf.orcc.backends.compileVTL"
-               name="Compile VTL">
-            <checkBox>
-               <option
-                     description="The folder that contains the Video Tool Library (VTL)"
-                     id="net.sf.orcc.backends.vtlFolder"
-                     name="VTL folder">
-                  <browseFile
-                        folder="true"
-                        workspace="true">
-                  </browseFile>
-               </option>
-            </checkBox>
+               description="The folder that contains the Video Tool Library (VTL)"
+               id="net.sf.orcc.backends.vtlFolder"
+               name="VTL folder">
+            <browseFile
+                  folder="true"
+                  workspace="true">
+            </browseFile>
          </option>
          <option
                description="Whether Orcc should compile the given hierarchical XDF network"
