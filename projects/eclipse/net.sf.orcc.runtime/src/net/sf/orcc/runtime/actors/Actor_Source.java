@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -35,12 +35,13 @@ import java.io.RandomAccessFile;
 import net.sf.orcc.debug.Location;
 import net.sf.orcc.debug.type.StringType;
 import net.sf.orcc.runtime.CLIParameters;
-import net.sf.orcc.runtime.IntFifo;
+import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.runtime.debug.AbstractActorDebug;
 
 public class Actor_Source extends AbstractActorDebug {
 
-	private IntFifo fifo_O;
+	private Fifo_int fifo_O;
 
 	public String fileName;
 
@@ -76,7 +77,6 @@ public class Actor_Source extends AbstractActorDebug {
 
 	@Override
 	public int schedule() {
-		int[] source = new int[1];
 		int i = 0;
 
 		try {
@@ -88,8 +88,11 @@ public class Actor_Source extends AbstractActorDebug {
 					byteRead = in.read();
 				}
 
-				source[0] = byteRead;
-				fifo_O.put(source);
+				int[] source = fifo_O.getWriteArray(1);
+				int source_Index = fifo_O.getWriteIndex(1);
+				source[source_Index] = byteRead;
+				fifo_O.writeEnd(1, source);
+
 				i++;
 			}
 		} catch (IOException e) {
@@ -101,9 +104,9 @@ public class Actor_Source extends AbstractActorDebug {
 	}
 
 	@Override
-	public void setFifo(String portName, IntFifo fifo) {
+	public void setFifo(String portName, Fifo fifo) {
 		if ("O".equals(portName)) {
-			fifo_O = fifo;
+			fifo_O = (Fifo_int) fifo;
 		} else {
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);

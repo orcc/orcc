@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,35 +29,46 @@
 package net.sf.orcc.runtime.actors;
 
 import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.Fifo_boolean;
 
 /**
- * This interface defines an actor.
+ * This class defines a broadcast actor for boolean FIFOs.
  * 
  * @author Matthieu Wipliez
- *
+ * 
  */
-public interface IActor {
+public class Broadcast_boolean extends Broadcast {
 
 	/**
-	 * Initializes this actor.
-	 */
-	public void initialize();
-
-	/**
-	 * Schedules this actor.
+	 * Creates a new broadcast with the given number of outputs.
 	 * 
-	 * @return the number of firings that occurred.
+	 * @param numOutputs
+	 *            number of output ports.
 	 */
-	public int schedule();
+	public Broadcast_boolean(int numOutputs) {
+		super(numOutputs);
+	}
 
-	/**
-	 * Sets the port whose name is given to the given FIFO.
-	 * 
-	 * @param portName
-	 *            port name
-	 * @param fifo
-	 *            FIFO
-	 */
-	public void setFifo(String portName, Fifo fifo);
+	@Override
+	public int schedule() {
+		int i = 0;
+		while (!suspended && input.hasTokens(1) && outputsHaveRoom()) {
+			boolean[] tokens = ((Fifo_boolean) input).getReadArray(1); 
+			int tokens_Index = input.getReadIndex(1);
+			boolean token = tokens[tokens_Index];
+			
+			for (Fifo output : outputs) {
+				boolean[] outputTokens = ((Fifo_boolean) output).getWriteArray(1);
+				int output_Index = output.getWriteIndex(1);
+				outputTokens[output_Index] = token;
+				((Fifo_boolean) output).writeEnd(1, outputTokens);
+			}
+
+			((Fifo_boolean) input).readEnd(1);
+			i++;
+		}
+
+		return i;
+	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,20 +29,20 @@
 package net.sf.orcc.runtime.actors;
 
 import net.sf.orcc.debug.Location;
-import net.sf.orcc.runtime.IntFifo;
+import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.debug.AbstractActorDebug;
 
 /**
- * A generic broadcast actor.
+ * This class defines a generic broadcast actor.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Broadcast extends AbstractActorDebug {
+public abstract class Broadcast extends AbstractActorDebug {
 
-	private IntFifo input;
+	protected Fifo input;
 
-	private IntFifo outputs[];
+	protected Fifo outputs[];
 
 	/**
 	 * Creates a new broadcast with the given number of outputs.
@@ -53,12 +53,12 @@ public class Broadcast extends AbstractActorDebug {
 	public Broadcast(int numOutputs) {
 		super("Broadcast.java");
 
-		outputs = new IntFifo[numOutputs];
+		outputs = new Fifo[numOutputs];
 		actionLocation.put("untagged", new Location(89, 13, 31));
 	}
 
 	@Override
-	public String getNextSchedulableAction() {
+	final public String getNextSchedulableAction() {
 		if (input.hasTokens(1) && outputsHaveRoom()) {
 			return "untagged";
 		}
@@ -66,7 +66,7 @@ public class Broadcast extends AbstractActorDebug {
 		return null;
 	}
 
-	private boolean outputsHaveRoom() {
+	final protected boolean outputsHaveRoom() {
 		boolean hasRoom = true;
 		for (int i = 0; i < outputs.length && hasRoom; i++) {
 			hasRoom &= outputs[i].hasRoom(1);
@@ -76,23 +76,7 @@ public class Broadcast extends AbstractActorDebug {
 	}
 
 	@Override
-	public int schedule() {
-		int i = 0;
-		int[] tokens = new int[1];
-		while (!suspended && input.hasTokens(1) && outputsHaveRoom()) {
-			input.get(tokens);
-			for (IntFifo output : outputs) {
-				output.put(tokens);
-			}
-
-			i++;
-		}
-
-		return i;
-	}
-
-	@Override
-	public void setFifo(String portName, IntFifo fifo) {
+	final public void setFifo(String portName, Fifo fifo) {
 		if (portName.equals("input")) {
 			input = fifo;
 		} else if (portName.startsWith("output_")) {

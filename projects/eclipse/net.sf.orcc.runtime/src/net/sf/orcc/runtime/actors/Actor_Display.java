@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,8 @@ import javax.swing.Timer;
 import net.sf.orcc.debug.Location;
 import net.sf.orcc.debug.type.AbstractType;
 import net.sf.orcc.debug.type.IntType;
-import net.sf.orcc.runtime.IntFifo;
+import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.runtime.debug.AbstractActorDebug;
 
 public class Actor_Display extends AbstractActorDebug implements ActionListener {
@@ -89,11 +90,11 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 
 	private Canvas canvas;
 
-	private IntFifo fifo_B;
+	private Fifo_int fifo_B;
 
-	private IntFifo fifo_HEIGHT;
+	private Fifo_int fifo_HEIGHT;
 
-	private IntFifo fifo_WIDTH;
+	private Fifo_int fifo_WIDTH;
 
 	private JFrame frame;
 
@@ -198,13 +199,13 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 	}
 
 	@Override
-	public void setFifo(String portName, IntFifo fifo) {
+	public void setFifo(String portName, Fifo fifo) {
 		if ("B".equals(portName)) {
-			fifo_B = fifo;
+			fifo_B = (Fifo_int) fifo;
 		} else if ("WIDTH".equals(portName)) {
-			fifo_WIDTH = fifo;
+			fifo_WIDTH = (Fifo_int) fifo;
 		} else if ("HEIGHT".equals(portName)) {
-			fifo_HEIGHT = fifo;
+			fifo_HEIGHT = (Fifo_int) fifo;
 		} else {
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
@@ -212,14 +213,13 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 	}
 
 	private void setVideoSize() {
-		int[] width = new int[1];
-		int[] height = new int[1];
+		int[] width = fifo_WIDTH.getReadArray(1);
+		int width_Index = fifo_WIDTH.getReadIndex(1);
+		int[] height = fifo_HEIGHT.getReadArray(1);
+		int height_Index = fifo_HEIGHT.getReadIndex(1);
 
-		fifo_WIDTH.get(width);
-		fifo_HEIGHT.get(height);
-
-		int newWidth = width[0] << 4;
-		int newHeight = height[0] << 4;
+		int newWidth = width[width_Index] << 4;
+		int newHeight = height[height_Index] << 4;
 
 		if (newWidth != this.width || newHeight != this.height) {
 			this.width = newWidth;
@@ -234,21 +234,24 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 			image = new BufferedImage(this.width, this.height,
 					BufferedImage.TYPE_INT_RGB);
 		}
+		
+		fifo_WIDTH.readEnd(1);
+		fifo_HEIGHT.readEnd(1);
 	}
 
 	private void writeMB() {
-		int[] mb = new int[384];
-		fifo_B.get(mb);
+		int[] mb = fifo_B.getReadArray(384);
+		int mb_Index = fifo_B.getReadIndex(384);
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 
-				int u = (Integer) mb[256 + 8 * i + j];
-				int v = (Integer) mb[320 + 8 * i + j];
-				int y0 = (Integer) mb[2 * i * 16 + 2 * j];
-				int y1 = (Integer) mb[2 * i * 16 + 2 * j + 1];
-				int y2 = (Integer) mb[(2 * i + 1) * 16 + 2 * j];
-				int y3 = (Integer) mb[(2 * i + 1) * 16 + 2 * j + 1];
+				int u = (Integer) mb[mb_Index + 256 + 8 * i + j];
+				int v = (Integer) mb[mb_Index + 320 + 8 * i + j];
+				int y0 = (Integer) mb[mb_Index + 2 * i * 16 + 2 * j];
+				int y1 = (Integer) mb[mb_Index + 2 * i * 16 + 2 * j + 1];
+				int y2 = (Integer) mb[mb_Index + (2 * i + 1) * 16 + 2 * j];
+				int y3 = (Integer) mb[mb_Index + (2 * i + 1) * 16 + 2 * j + 1];
 
 				int rgb0 = convertYCbCrtoRGB(y0, u, v);
 				int rgb1 = convertYCbCrtoRGB(y1, u, v);
@@ -261,6 +264,8 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 				image.setRGB(x + j * 2 + 1, y + i * 2 + 1, rgb3);
 			}
 		}
+		
+		fifo_B.readEnd(384);
 
 		x += 16;
 		if (x == width) {
