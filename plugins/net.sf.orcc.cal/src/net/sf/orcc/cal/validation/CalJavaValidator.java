@@ -80,6 +80,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	private TypeChecker checker;
 
+	@Inject
 	private AstExpressionEvaluator exprEvaluator;
 
 	@Inject
@@ -127,7 +128,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
 	public void checkActor(AstActor actor) {
-		exprEvaluator = new AstExpressionEvaluator();
+		exprEvaluator.clearValues();
 		typeTransformer = new TypeTransformer(exprEvaluator);
 		checker = new TypeChecker(typeTransformer);
 
@@ -142,7 +143,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			e.printStackTrace();
 		}
 
-		exprEvaluator.initialize(file);
+		exprEvaluator.setFile(file);
 		evaluateStateVariables(actor.getStateVariables());
 	}
 

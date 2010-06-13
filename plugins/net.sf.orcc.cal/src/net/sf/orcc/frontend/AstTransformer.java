@@ -403,54 +403,60 @@ public class AstTransformer {
 	 * @return the actor in IR form
 	 */
 	public Actor transform(String file, AstActor astActor) {
-		portMap.clear();
-
-		variablesMap.clear();
-		proceduresMap.clear();
-		functionsMap.clear();
-
 		this.file = file;
-		exprEvaluator.initialize(file);
+		exprEvaluator.setFile(file);
 
 		String name = astActor.getName();
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
 
-		// first state variables, because port's sizes may depend on them.
-		OrderedMap<Variable> stateVars = transformStateVariables(astActor
-				.getStateVariables());
-		OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
-		OrderedMap<Port> outputs = transformPorts(astActor.getOutputs());
+		try {
+			// first state variables, because port's sizes may depend on them.
+			OrderedMap<Variable> stateVars = transformStateVariables(astActor
+					.getStateVariables());
+			OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
+			OrderedMap<Port> outputs = transformPorts(astActor.getOutputs());
 
-		// transforms functions and procedures
-		OrderedMap<Procedure> procedures = new OrderedMap<Procedure>();
-		transformFunctions(astActor.getFunctions(), procedures);
-		transformProcedures(astActor.getProcedures(), procedures);
+			// transforms functions and procedures
+			OrderedMap<Procedure> procedures = new OrderedMap<Procedure>();
+			transformFunctions(astActor.getFunctions(), procedures);
+			transformProcedures(astActor.getProcedures(), procedures);
 
-		// transform actions
-		ActionList actions = transformActions(astActor.getActions());
+			// transform actions
+			ActionList actions = transformActions(astActor.getActions());
 
-		// transform initializes
-		ActionList initializes = transformActions(astActor.getInitializes());
+			// transform initializes
+			ActionList initializes = transformActions(astActor.getInitializes());
 
-		// sort actions by priority
-		ActionSorter sorter = new ActionSorter(actions);
-		actions = sorter.applyPriority(astActor.getPriorities());
+			// sort actions by priority
+			ActionSorter sorter = new ActionSorter(actions);
+			actions = sorter.applyPriority(astActor.getPriorities());
 
-		// transform FSM
-		AstSchedule schedule = astActor.getSchedule();
-		ActionScheduler scheduler;
-		if (schedule == null) {
-			scheduler = new ActionScheduler(actions.getAllActions(), null);
-		} else {
-			FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
-			FSM fsm = builder.buildFSM(actions);
-			scheduler = new ActionScheduler(actions.getUntaggedActions(), fsm);
+			// transform FSM
+			AstSchedule schedule = astActor.getSchedule();
+			ActionScheduler scheduler;
+			if (schedule == null) {
+				scheduler = new ActionScheduler(actions.getAllActions(), null);
+			} else {
+				FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
+				FSM fsm = builder.buildFSM(actions);
+				scheduler = new ActionScheduler(actions.getUntaggedActions(),
+						fsm);
+			}
+
+			// create IR actor
+			return new Actor(name, file, parameters, inputs, outputs,
+					stateVars, procedures, actions.getAllActions(),
+					initializes.getAllActions(), scheduler);
+		} finally {
+			// cleanup
+			portMap.clear();
+
+			variablesMap.clear();
+			proceduresMap.clear();
+			functionsMap.clear();
+
+			exprEvaluator.clearValues();
 		}
-
-		// create IR actor
-		return new Actor(name, file, parameters, inputs, outputs, stateVars,
-				procedures, actions.getAllActions(),
-				initializes.getAllActions(), scheduler);
 	}
 
 	/**

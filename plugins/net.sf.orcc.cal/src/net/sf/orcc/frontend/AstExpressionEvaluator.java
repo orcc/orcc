@@ -57,7 +57,7 @@ import net.sf.orcc.ir.expr.UnaryOp;
 /**
  * This class defines an expression evaluator.
  * 
- * @author Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
  * 
  */
 public class AstExpressionEvaluator extends CalSwitch<Object> {
@@ -70,6 +70,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	 * Creates a new AST expression evaluator.
 	 */
 	public AstExpressionEvaluator() {
+		this.values = new HashMap<AstVariable, Object>();
 	}
 
 	@Override
@@ -454,6 +455,13 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	/**
+	 * Clears the values held by the evaluator.
+	 */
+	public void clearValues() {
+		values.clear();
+	}
+
+	/**
 	 * Evaluates the given AST expression and returns an object that can be a
 	 * boolean, an integer, a string, or a list of objects.
 	 * 
@@ -503,18 +511,6 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	/**
-	 * Initializes the evaluator and sets the file in which expressions are
-	 * defined.
-	 * 
-	 * @param file
-	 *            a file name
-	 */
-	public void initialize(String file) {
-		this.file = file;
-		this.values = new HashMap<AstVariable, Object>();
-	}
-
-	/**
 	 * Registers the given variable with the given value.
 	 * 
 	 * @param variable
@@ -524,6 +520,16 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	 */
 	public void registerValue(AstVariable variable, Object value) {
 		values.put(variable, value);
+	}
+
+	/**
+	 * Sets the file in which expressions are defined. Used only when reporting errors.
+	 * 
+	 * @param file
+	 *            a file name
+	 */
+	public void setFile(String file) {
+		this.file = file;
 	}
 
 }
