@@ -3,14 +3,14 @@
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-fifo(portName) ::= <<
-private IntFifo fifo_$portName$;
+fifo(port) ::= <<
+private Fifo_$port.type$ fifo_$port.name$;
 
 >>
 
-setFifo(portName) ::= <<
-if ("$portName$".equals(portName)) {
-	fifo_$portName$ = fifo;
+setFifo(port) ::= <<
+if ("$port.name$".equals(portName)) {
+	fifo_$port.name$ = (Fifo_$port.type$) fifo;
 } else 
 >>
 
@@ -313,7 +313,7 @@ actor(actor) ::= <<
  */
 package net.sf.orcc.generated;
 
-import net.sf.orcc.runtime.IntFifo;
+import net.sf.orcc.runtime.*;
 import net.sf.orcc.runtime.actors.IActor;
 
 public class Actor_$actor.name$ implements IActor {
@@ -353,7 +353,7 @@ $endif$
 	}
 
 	@Override
-	public void setFifo(String portName, IntFifo fifo) {
+	public void setFifo(String portName, Fifo fifo) {
 		$actor.inputs.list: setFifo()$$actor.outputs.list: setFifo()${
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
