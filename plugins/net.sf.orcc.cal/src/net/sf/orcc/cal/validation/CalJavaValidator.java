@@ -46,6 +46,8 @@ import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.AstVariableReference;
+import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
@@ -151,9 +153,23 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 					CalPackage.AST_STATEMENT_ASSIGN__TARGET);
 		}
 
-		Type targetType = typeTransformer.transformType(variable.getType());
+		// create expression
+		AstExpressionIndex expression = CalFactory.eINSTANCE
+				.createAstExpressionIndex();
+
+		// set reference
+		AstVariableReference reference = CalFactory.eINSTANCE
+				.createAstVariableReference();
+		reference.setVariable(variable);
+		expression.setSource(reference);
+
+		// add indexes
+		expression.getIndexes().addAll(assign.getIndexes());
+
+		// check types
+		Type targetType = checker.getType(expression);
 		Type type = checker.getType(assign.getValue());
-		if (!checker.areTypeCompatible(targetType)) {
+		if (!checker.areTypeCompatible(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
 					+ variable.getType(),
 					CalPackage.AST_STATEMENT_ASSIGN__VALUE);

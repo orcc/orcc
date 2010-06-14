@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.type;
 
+import java.util.List;
+
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -40,15 +42,19 @@ import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstGenerator;
+import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
 
 /**
  * This class defines a type checker for RVC-CAL AST.
@@ -70,69 +76,125 @@ public class TypeChecker extends CalSwitch<Type> {
 		this.typeTransformer = typeTransformer;
 	}
 
-	public boolean areTypeCompatible(Type type) {
-		return true;
+	/**
+	 * Returns <code>true</code> if the two given types are compatible.
+	 * 
+	 * @param t1
+	 *            a type
+	 * @param t2
+	 *            another type
+	 * @return <code>true</code> if the two given types are compatible
+	 */
+	public boolean areTypeCompatible(Type t1, Type t2) {
+		if (t1 == null || t2 == null) {
+			return false;
+		}
+
+		return getLub(t1, t2) != null;
 	}
 
 	@Override
 	public Type caseAstExpressionBinary(AstExpressionBinary expression) {
-		return new IntType(32);
-		/*
-		 * BinaryOp op = BinaryOp.getOperator(expression.getOperator()); Type t1
-		 * = getType(expression.getLeft()); Type t2 =
-		 * getType(expression.getRight());
-		 * 
-		 * switch (op) { case BITAND: if (val1 instanceof Integer && val2
-		 * instanceof Integer) { int i1 = (Integer) val1; int i2 = (Integer)
-		 * val2; return i1 & i2; } break; case BITOR: if (val1 instanceof
-		 * Integer && val2 instanceof Integer) { int i1 = (Integer) val1; int i2
-		 * = (Integer) val2; return i1 | i2; } break; case BITXOR: if (val1
-		 * instanceof Integer && val2 instanceof Integer) { int i1 = (Integer)
-		 * val1; int i2 = (Integer) val2; return i1 ^ i2; } break; case DIV: if
-		 * (val1 instanceof Integer && val2 instanceof Integer) { int i1 =
-		 * (Integer) val1; int i2 = (Integer) val2; return i1 / i2; } break;
-		 * case DIV_INT: if (val1 instanceof Integer && val2 instanceof Integer)
-		 * { int i1 = (Integer) val1; int i2 = (Integer) val2; return i1 / i2; }
-		 * break; case EQ: if (val1 instanceof Integer && val2 instanceof
-		 * Integer) { int i1 = (Integer) val1; int i2 = (Integer) val2; return
-		 * i1 == i2; } else if (val1 instanceof Boolean && val2 instanceof
-		 * Boolean) { boolean b1 = (Boolean) val1; boolean b2 = (Boolean) val2;
-		 * return b1 == b2; } break; case EXP: break; case GE: if (val1
-		 * instanceof Integer && val2 instanceof Integer) { int i1 = (Integer)
-		 * val1; int i2 = (Integer) val2; return i1 >= i2; } break; case GT: if
-		 * (val1 instanceof Integer && val2 instanceof Integer) { int i1 =
-		 * (Integer) val1; int i2 = (Integer) val2; return i1 > i2; } break;
-		 * case LOGIC_AND: if (val1 instanceof Boolean && val2 instanceof
-		 * Boolean) { boolean b1 = (Boolean) val1; boolean b2 = (Boolean) val2;
-		 * return b1 && b2; } break; case LE: if (val1 instanceof Integer &&
-		 * val2 instanceof Integer) { int i1 = (Integer) val1; int i2 =
-		 * (Integer) val2; return i1 <= i2; } break; case LOGIC_OR: if (val1
-		 * instanceof Boolean && val2 instanceof Boolean) { boolean b1 =
-		 * (Boolean) val1; boolean b2 = (Boolean) val2; return b1 || b2; }
-		 * break; case LT: if (val1 instanceof Integer && val2 instanceof
-		 * Integer) { int i1 = (Integer) val1; int i2 = (Integer) val2; return
-		 * i1 < i2; } break; case MINUS: if (val1 instanceof Integer && val2
-		 * instanceof Integer) { int i1 = (Integer) val1; int i2 = (Integer)
-		 * val2; return i1 - i2; } break; case MOD: if (val1 instanceof Integer
-		 * && val2 instanceof Integer) { int i1 = (Integer) val1; int i2 =
-		 * (Integer) val2; return i1 % i2; } break; case NE: if (val1 instanceof
-		 * Integer && val2 instanceof Integer) { int i1 = (Integer) val1; int i2
-		 * = (Integer) val2; return i1 != i2; } break; case PLUS: if (val1
-		 * instanceof Integer && val2 instanceof Integer) { int i1 = (Integer)
-		 * val1; int i2 = (Integer) val2; return i1 + i2; } break; case
-		 * SHIFT_LEFT: if (val1 instanceof Integer && val2 instanceof Integer) {
-		 * int i1 = (Integer) val1; int i2 = (Integer) val2; return i1 << i2; }
-		 * break; case SHIFT_RIGHT: if (val1 instanceof Integer && val2
-		 * instanceof Integer) { int i1 = (Integer) val1; int i2 = (Integer)
-		 * val2; return i1 >> i2; } break; case TIMES: if (val1 instanceof
-		 * Integer && val2 instanceof Integer) { int i1 = (Integer) val1; int i2
-		 * = (Integer) val2; return i1 * i2; } break; }
-		 * 
-		 * throw new OrccRuntimeException("Uninitialized variable at line " +
-		 * Util.getLocation(expression).getStartLine() +
-		 * "\nCould not evaluate binary expression " + op.toString() + "(" +
-		 * op.getText() + ")\n");
-		 */
+		BinaryOp op = BinaryOp.getOperator(expression.getOperator());
+		Type t1 = getType(expression.getLeft());
+		Type t2 = getType(expression.getRight());
+
+		if (t1 == null || t2 == null) {
+			return null;
+		}
+
+		switch (op) {
+		case BITAND:
+		case MOD:
+		case SHIFT_RIGHT:
+			if (!t1.isInt() && !t1.isUint()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t1 + " to int/uint", expression,
+						CalPackage.AST_EXPRESSION_BINARY__LEFT);
+				return null;
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t2 + " to int/uint", expression,
+						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
+				return null;
+			}
+			return t2;
+
+		case BITOR:
+		case BITXOR:
+		case MINUS:
+		case PLUS:
+		case TIMES:
+			if (!t1.isInt() && !t1.isUint()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t1 + " to int/uint", expression,
+						CalPackage.AST_EXPRESSION_BINARY__LEFT);
+				return null;
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t2 + " to int/uint", expression,
+						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
+				return null;
+			}
+			return getLub(t1, t2);
+
+		case DIV:
+		case DIV_INT:
+		case SHIFT_LEFT:
+			if (!t1.isInt() && !t1.isUint()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t1 + " to int/uint", expression,
+						CalPackage.AST_EXPRESSION_BINARY__LEFT);
+				return null;
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t2 + " to int/uint", expression,
+						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
+				return null;
+			}
+			return t1;
+
+		case EQ:
+		case GE:
+		case GT:
+		case LE:
+		case LT:
+		case NE:
+			Type type = getLub(t1, t2);
+			if (type == null) {
+				CalJavaValidator.getInstance().error(
+						"Incompatible operand types " + t1 + " and " + t2,
+						expression, CalPackage.AST_EXPRESSION_BINARY);
+				return null;
+			}
+			return new BoolType();
+
+		case EXP:
+			CalJavaValidator.getInstance().error("Operator ^ not implemented",
+					expression, CalPackage.AST_EXPRESSION_BINARY__OPERATOR);
+			return null;
+
+		case LOGIC_AND:
+		case LOGIC_OR:
+			if (!t1.isBool()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t1 + " to bool", expression,
+						CalPackage.AST_EXPRESSION_BINARY__LEFT);
+				return null;
+			}
+			if (!t2.isBool()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t2 + " to bool", expression,
+						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
+				return null;
+			}
+			return new BoolType();
+		}
+
+		return null;
 	}
 
 	@Override
@@ -142,17 +204,71 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionCall(AstExpressionCall expression) {
-		return new IntType(32);
+		AstType type = expression.getFunction().getType();
+		return typeTransformer.transformType(type);
 	}
 
 	@Override
 	public Type caseAstExpressionIf(AstExpressionIf expression) {
-		return new IntType(32);
+		Type type = getType(expression.getCondition());
+		if (type == null) {
+			return null;
+		}
+
+		if (!type.isBool()) {
+			CalJavaValidator.getInstance().error(
+					"Cannot convert " + type + " to bool", expression,
+					CalPackage.AST_EXPRESSION_IF__CONDITION);
+			return null;
+		}
+
+		Type t1 = getType(expression.getThen());
+		Type t2 = getType(expression.getElse());
+		if (t1 == null || t2 == null) {
+			return null;
+		}
+
+		type = getLub(t1, t2);
+		if (type == null) {
+			CalJavaValidator.getInstance().error(
+					"Incompatible operand types " + t1 + " and " + t2,
+					expression, CalPackage.AST_EXPRESSION_IF);
+			return null;
+		}
+
+		return type;
 	}
 
 	@Override
 	public Type caseAstExpressionIndex(AstExpressionIndex expression) {
-		return new IntType(32);
+		AstVariable variable = expression.getSource().getVariable();
+		Type type = typeTransformer.transformType(variable.getType());
+
+		if (type == null) {
+			return null;
+		}
+
+		List<AstExpression> indexes = expression.getIndexes();
+
+		for (AstExpression index : indexes) {
+			Type subType = getType(index);
+			if (type.isList()) {
+				if (subType.isInt() || subType.isUint()) {
+					type = ((ListType) type).getType();
+				} else {
+					CalJavaValidator.getInstance().error(
+							"index must be an integer", index,
+							CalPackage.AST_EXPRESSION);
+				}
+			} else {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + type + " to List", expression,
+						CalPackage.AST_EXPRESSION_INDEX__SOURCE);
+				return null;
+			}
+		}
+
+		return type;
 	}
 
 	@Override
@@ -162,36 +278,45 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionList(AstExpressionList expression) {
-		return new IntType(32);
+		return new ListType(0, getType(expression.getExpressions().get(0)));
 	}
 
 	@Override
 	public Type caseAstExpressionString(AstExpressionString expression) {
-		return new StringType();
+		return new StringType(expression.getValue().length());
 	}
 
 	@Override
 	public Type caseAstExpressionUnary(AstExpressionUnary expression) {
 		UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
 		Type type = getType(expression.getExpression());
+		if (type == null) {
+			return null;
+		}
 
 		switch (op) {
 		case BITNOT:
 			if (!(type.isInt() || type.isUint())) {
-				throw new TypeMismatchException("Cannot convert " + type
-						+ " to int/uint", expression.getExpression());
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + type + " to int/uint", expression,
+						CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
+				return null;
 			}
 			return type;
 		case LOGIC_NOT:
 			if (!type.isBool()) {
-				throw new TypeMismatchException("Cannot convert " + type
-						+ " to boolean", expression.getExpression());
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + type + " to boolean", expression,
+						CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
+				return null;
 			}
 			return type;
 		case MINUS:
 			if (!type.isInt()) {
-				throw new TypeMismatchException("Cannot convert " + type
-						+ " to int", expression.getExpression());
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + type + " to int", expression,
+						CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
+				return null;
 			}
 			return type;
 		case NUM_ELTS:
@@ -213,6 +338,51 @@ public class TypeChecker extends CalSwitch<Type> {
 		CalJavaValidator.getInstance().error("cannot evaluate generator",
 				expression, CalPackage.AST_GENERATOR);
 		return null;
+	}
+
+	/**
+	 * Returns the Least Upper Bound of the given types.
+	 * 
+	 * @param t1
+	 *            a type
+	 * @param t2
+	 *            another type
+	 * @return the Least Upper Bound of the given types
+	 */
+	private Type getLub(Type t1, Type t2) {
+		if (t1.isBool() && t2.isBool()) {
+			return t1;
+		} else if (t1.isFloat() && t2.isFloat()) {
+			return t1;
+		} else if (t1.isString() && t2.isString()) {
+			return t1;
+		} else if (t1.isInt() && t2.isInt()) {
+			return new IntType(Math.max(((IntType) t1).getSize(),
+					((IntType) t2).getSize()));
+		} else if (t1.isList() && t2.isList()) {
+			return getLub(((ListType) t1).getType(), ((ListType) t2).getType());
+		} else if (t1.isUint() && t2.isUint()) {
+			return new IntType(Math.max(((UintType) t1).getSize(),
+					((UintType) t2).getSize()));
+		} else if (t1.isInt() && t2.isUint()) {
+			int si = ((IntType) t1).getSize();
+			int su = ((UintType) t2).getSize();
+			if (si > su) {
+				return new IntType(si);
+			} else {
+				return new IntType(su + 1);
+			}
+		} else if (t1.isUint() && t2.isInt()) {
+			int su = ((UintType) t1).getSize();
+			int si = ((IntType) t2).getSize();
+			if (si > su) {
+				return new IntType(si);
+			} else {
+				return new IntType(su + 1);
+			}
+		} else {
+			return null;
+		}
 	}
 
 	/**
