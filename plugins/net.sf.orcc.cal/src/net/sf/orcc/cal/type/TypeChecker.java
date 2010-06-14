@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.cal.type;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -42,8 +41,9 @@ import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.frontend.Util;
+import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.type.BoolType;
@@ -196,7 +196,9 @@ public class TypeChecker extends CalSwitch<Type> {
 			return type;
 		case NUM_ELTS:
 		default:
-			throw new OrccRuntimeException("Not implemented yet");
+			CalJavaValidator.getInstance().error("Not implemented yet",
+					expression, CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
+			return null;
 		}
 	}
 
@@ -208,8 +210,9 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstGenerator(AstGenerator expression) {
-		throw new OrccRuntimeException(Util.getLocation(expression),
-				"TODO generator");
+		CalJavaValidator.getInstance().error("cannot evaluate generator",
+				expression, CalPackage.AST_GENERATOR);
+		return null;
 	}
 
 	/**

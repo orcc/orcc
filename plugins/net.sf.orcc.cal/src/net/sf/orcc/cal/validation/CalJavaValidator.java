@@ -30,7 +30,6 @@ package net.sf.orcc.cal.validation;
 
 import java.util.List;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
@@ -72,12 +71,31 @@ import com.google.inject.Inject;
  */
 public class CalJavaValidator extends AbstractCalJavaValidator {
 
+	private static CalJavaValidator instance;
+
+	/**
+	 * Returns the instance of this validator.
+	 * 
+	 * @return the instance of this validator
+	 */
+	public static CalJavaValidator getInstance() {
+		return instance;
+	}
+
 	private TypeChecker checker;
 
 	@Inject
 	private IQualifiedNameProvider nameProvider;
 
 	private TypeTransformer typeTransformer;
+
+	/**
+	 * Creates a new CAL validator written in Java.
+	 */
+	public CalJavaValidator() {
+		// set this validator as the instance
+		CalJavaValidator.instance = this;
+	}
 
 	/**
 	 * Check action tag coherence. Tag's name must be different to port and
@@ -247,6 +265,11 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public void checkPriorities(AstPriority priority) {
 	}
 
+	@Override
+	public void error(String string, EObject source, Integer feature) {
+		super.error(string, source, feature);
+	}
+
 	/**
 	 * Evaluates the given list of state variables, and register them as
 	 * variables.
@@ -260,15 +283,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			AstExpression astValue = astVariable.getValue();
 			Object initialValue;
 			if (astValue != null) {
-				try {
-					initialValue = new AstExpressionEvaluator()
-							.evaluate(astValue);
-
+				initialValue = new AstExpressionEvaluator().evaluate(astValue);
+				if (initialValue == null) {
+					error("variable "
+							+ astVariable.getName()
+							+ " does not have a compile-time constant initial value",
+							astVariable, CalPackage.AST_VARIABLE);
+				} else {
 					// register the value
 					astVariable.setInitialValue(initialValue);
-				} catch (OrccRuntimeException e) {
-					error(e.getMessage(), astVariable,
-							CalPackage.AST_VARIABLE__NAME);
 				}
 			}
 		}
