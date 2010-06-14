@@ -62,6 +62,7 @@ import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
@@ -228,11 +229,6 @@ public class AstTransformer {
 			.compile("\\.");
 
 	/**
-	 * expression evaluator
-	 */
-	final private AstExpressionEvaluator exprEvaluator;
-
-	/**
 	 * expression transformer.
 	 */
 	final private ExpressionTransformer exprTransformer;
@@ -294,9 +290,7 @@ public class AstTransformer {
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
 
-		exprEvaluator = new AstExpressionEvaluator();
-
-		typeTransformer = new TypeTransformer(exprEvaluator);
+		typeTransformer = new TypeTransformer();
 	}
 
 	/**
@@ -376,7 +370,8 @@ public class AstTransformer {
 				repeat = 1;
 				type = port.getType();
 			} else {
-				repeat = exprEvaluator.evaluateAsInteger(astRepeat);
+				repeat = new AstExpressionEvaluator()
+						.evaluateAsInteger(astRepeat);
 				type = new ListType(repeat, port.getType());
 			}
 
@@ -404,7 +399,6 @@ public class AstTransformer {
 	 */
 	public Actor transform(String file, AstActor astActor) {
 		this.file = file;
-		exprEvaluator.setFile(file);
 
 		String name = astActor.getName();
 		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
@@ -734,7 +728,7 @@ public class AstTransformer {
 			if (astValue == null) {
 				initialValue = null;
 			} else {
-				initialValue = exprEvaluator.evaluate(astValue);
+				initialValue = new AstExpressionEvaluator().evaluate(astValue);
 
 				// register the value
 				astVariable.setInitialValue(initialValue);

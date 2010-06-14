@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.frontend;
+package net.sf.orcc.cal.expression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,7 @@ import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.frontend.Util;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -59,8 +60,6 @@ import net.sf.orcc.ir.expr.UnaryOp;
  * 
  */
 public class AstExpressionEvaluator extends CalSwitch<Object> {
-
-	private String file;
 
 	/**
 	 * Creates a new AST expression evaluator.
@@ -245,7 +244,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				}
 			}
 
-			throw new OrccRuntimeException(file, Util.getLocation(expression),
+			throw new OrccRuntimeException(Util.getLocation(expression),
 					"bitand expects two integer expressions");
 		}
 		if ("bitor".equals(name)) {
@@ -257,7 +256,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				}
 			}
 
-			throw new OrccRuntimeException(file, Util.getLocation(expression),
+			throw new OrccRuntimeException(Util.getLocation(expression),
 					"bitor expects two integer expressions");
 		}
 		if ("bitxor".equals(name)) {
@@ -269,7 +268,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				}
 			}
 
-			throw new OrccRuntimeException(file, Util.getLocation(expression),
+			throw new OrccRuntimeException(Util.getLocation(expression),
 					"bitxor expects two integer expressions");
 		}
 		if ("bitnot".equals(name)) {
@@ -280,7 +279,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				}
 			}
 
-			throw new OrccRuntimeException(file, Util.getLocation(expression),
+			throw new OrccRuntimeException(Util.getLocation(expression),
 					"bitor expects two integer expressions");
 		}
 		if ("lshift".equals(name)) {
@@ -292,7 +291,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				}
 			}
 
-			throw new OrccRuntimeException(file, Util.getLocation(expression),
+			throw new OrccRuntimeException(Util.getLocation(expression),
 					"lshift expects two integer expressions");
 		}
 		if ("rshift".equals(name)) {
@@ -304,11 +303,11 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				}
 			}
 
-			throw new OrccRuntimeException(file, Util.getLocation(expression),
+			throw new OrccRuntimeException(Util.getLocation(expression),
 					"rshift expects two integer expressions");
 		}
 
-		throw new OrccRuntimeException(file, Util.getLocation(expression),
+		throw new OrccRuntimeException(Util.getLocation(expression),
 				"unknown function \"" + name + "\"");
 	}
 
@@ -327,7 +326,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return oElse;
 			}
 		} else {
-			throw new OrccRuntimeException(file, Util.getLocation(expression
+			throw new OrccRuntimeException(Util.getLocation(expression
 					.getCondition()), "expected condition of type bool");
 		}
 	}
@@ -340,7 +339,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			String message = "variable \"" + variable.getName() + "\" ("
 					+ Util.getLocation(variable)
 					+ ") does not have a compile-time constant value";
-			throw new OrccRuntimeException(file, Util.getLocation(expression),
+			throw new OrccRuntimeException(Util.getLocation(expression),
 					message);
 		}
 
@@ -353,14 +352,13 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				if (indexValue instanceof Integer) {
 					value = list.get((Integer) indexValue);
 				} else {
-					throw new OrccRuntimeException(file,
+					throw new OrccRuntimeException(
 							Util.getLocation(expression),
 							"index must be an integer");
 				}
 			} else {
-				throw new OrccRuntimeException(file,
-						Util.getLocation(expression), "variable \""
-								+ variable.getName() + "\" ("
+				throw new OrccRuntimeException(Util.getLocation(expression),
+						"variable \"" + variable.getName() + "\" ("
 								+ Util.getLocation(variable)
 								+ ") must be of type List");
 			}
@@ -445,7 +443,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 
 	@Override
 	public Object caseAstGenerator(AstGenerator expression) {
-		throw new OrccRuntimeException(file, Util.getLocation(expression),
+		throw new OrccRuntimeException(Util.getLocation(expression),
 				"TODO generator");
 	}
 
@@ -487,25 +485,6 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		int value = evaluateAsInteger(expression);
 		Location location = Util.getLocation(expression);
 		return new IntExpr(location, value);
-	}
-
-	/**
-	 * Returns the file in which expressions are defined.
-	 * 
-	 * @return the file in which expressions are defined
-	 */
-	public String getFile() {
-		return file;
-	}
-
-	/**
-	 * Sets the file in which expressions are defined. Used only when reporting errors.
-	 * 
-	 * @param file
-	 *            a file name
-	 */
-	public void setFile(String file) {
-		this.file = file;
 	}
 
 }

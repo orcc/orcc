@@ -208,8 +208,8 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstGenerator(AstGenerator expression) {
-		throw new OrccRuntimeException(typeTransformer.getFile(),
-				Util.getLocation(expression), "TODO generator");
+		throw new OrccRuntimeException(Util.getLocation(expression),
+				"TODO generator");
 	}
 
 	/**

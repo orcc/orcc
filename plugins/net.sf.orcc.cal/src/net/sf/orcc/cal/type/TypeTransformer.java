@@ -37,7 +37,7 @@ import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.frontend.AstExpressionEvaluator;
+import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.FloatType;
@@ -55,15 +55,9 @@ import net.sf.orcc.ir.type.UintType;
 public class TypeTransformer extends CalSwitch<Type> {
 
 	/**
-	 * expression evaluator
-	 */
-	final private AstExpressionEvaluator exprEvaluator;
-
-	/**
 	 * Creates a new AST type to IR type transformation.
 	 */
-	public TypeTransformer(AstExpressionEvaluator exprEvaluator) {
-		this.exprEvaluator = exprEvaluator;
+	public TypeTransformer() {
 	}
 
 	@Override
@@ -83,7 +77,7 @@ public class TypeTransformer extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = exprEvaluator.evaluateAsInteger(astSize);
+			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
 		return new IntType(size);
 	}
@@ -91,7 +85,8 @@ public class TypeTransformer extends CalSwitch<Type> {
 	@Override
 	public Type caseAstTypeList(AstTypeList listType) {
 		Type type = transformType(listType.getType());
-		int size = exprEvaluator.evaluateAsInteger(listType.getSize());
+		AstExpression expression = listType.getSize();
+		int size = new AstExpressionEvaluator().evaluateAsInteger(expression);
 		return new ListType(size, type);
 	}
 
@@ -107,18 +102,9 @@ public class TypeTransformer extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = exprEvaluator.evaluateAsInteger(astSize);
+			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
 		return new UintType(size);
-	}
-
-	/**
-	 * Returns the file in which types are defined.
-	 * 
-	 * @return the file in which types are defined
-	 */
-	public String getFile() {
-		return exprEvaluator.getFile();
 	}
 
 	/**

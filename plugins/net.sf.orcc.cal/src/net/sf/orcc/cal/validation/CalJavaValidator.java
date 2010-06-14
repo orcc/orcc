@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.cal.validation;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -50,18 +48,14 @@ import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.frontend.AstExpressionEvaluator;
 import net.sf.orcc.ir.Type;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.validation.Check;
@@ -79,9 +73,6 @@ import com.google.inject.Inject;
 public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	private TypeChecker checker;
-
-	@Inject
-	private AstExpressionEvaluator exprEvaluator;
 
 	@Inject
 	private IQualifiedNameProvider nameProvider;
@@ -128,21 +119,9 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
 	public void checkActor(AstActor actor) {
-		typeTransformer = new TypeTransformer(exprEvaluator);
+		typeTransformer = new TypeTransformer();
 		checker = new TypeChecker(typeTransformer);
 
-		Resource resource = actor.eResource();
-		String file = "";
-		try {
-			URL resourceUrl = new URL(resource.getURI().toString());
-			URL url = FileLocator.toFileURL(resourceUrl);
-			IPath path = new Path(url.getPath());
-			file = path.toOSString();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		exprEvaluator.setFile(file);
 		evaluateStateVariables(actor.getStateVariables());
 	}
 
@@ -282,7 +261,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			Object initialValue;
 			if (astValue != null) {
 				try {
-					initialValue = exprEvaluator.evaluate(astValue);
+					initialValue = new AstExpressionEvaluator()
+							.evaluate(astValue);
 
 					// register the value
 					astVariable.setInitialValue(initialValue);
