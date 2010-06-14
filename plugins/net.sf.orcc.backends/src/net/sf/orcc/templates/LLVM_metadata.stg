@@ -212,7 +212,7 @@ $NextState_decl_MD(transition = nextStateIndex, index = stateIndex)$ = metadata 
 >>
 
 Type_MD(var) ::= <<
-$Type_decl_MD(var)$ = metadata  !{$varType_MD(var)$}
+$Type_decl_MD(var)$ = metadata  !{$varType_MD(var.type)$, $varSize_MD(var.type)$}
 
 >>
 
@@ -246,8 +246,12 @@ $Body_decl_MD(action)$ = metadata  !{$varName_MD(action.body)$, $procExtern_MD(a
 ///////////////////////////////////////////////////////////////////////////////
 
 
-varType_MD(var) ::= <<
-metadata !"$var.type.size$" 
+varType_MD(type) ::= <<
+$if(type.int)$ i32 $var.type.size$ $
+elseif(type.uint)$ i32 $var.type.size$ $
+elseif(type.bool)$ i32 1 $ 
+elseif(type.list)$ i32 $type.elementType.size$ $
+endif$
 >>
 
 varAssignable_MD(var) ::= <<
@@ -271,8 +275,9 @@ metadata !"$proc.returnType$"
 >>
 
 
-varSize_MD(var) ::= <<
-i32 $var.type.size$
+varSize_MD(type) ::= <<
+$if(type.list)$ $type.dimensions: {dim | i32 $dim$}; separator=", "$ $
+else$ null $endif$
 >>
 
 varName_MD(var) ::= <<
