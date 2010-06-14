@@ -147,7 +147,7 @@ public class NetworkPartitioner {
 		vertex = new Vertex("Input", port);
 		network.getGraph().addVertex(vertex);
 
-		network.getInputs().add("", new Location(), port.getName(), port);
+		network.getInputs().add(port.getName(), port);
 
 		incomingPort.put(connection, port);
 		partitionMap.put(port, getPartNameAttribute(tgtInstance));
@@ -177,7 +177,7 @@ public class NetworkPartitioner {
 		port.setName("output_" + nbOutput++);
 		Vertex vertex = new Vertex("Output", port);
 		network.getGraph().addVertex(vertex);
-		network.getOutputs().add("", new Location(), port.getName(), port);
+		network.getOutputs().add(port.getName(), port);
 
 		Map<String, Vertex> map = new HashMap<String, Vertex>();
 		map.put(getPartNameAttribute(inst), vertex);
@@ -223,7 +223,7 @@ public class NetworkPartitioner {
 			GlobalVariable newVar = new GlobalVariable(new Location(),
 					var.getType(), var.getName(), var.getExpression());
 
-			variables.add("", new Location(), newVar.getName(), newVar);
+			variables.add(newVar.getName(), newVar);
 		}
 
 		createConnections(entry.getValue(), subNetwork);

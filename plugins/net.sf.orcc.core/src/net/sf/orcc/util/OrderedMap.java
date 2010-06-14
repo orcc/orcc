@@ -98,15 +98,32 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	}
 
 	/**
-	 * Adds an object to this ordered map with the given name, without checking
-	 * for existing bindings.
+	 * Adds an object to this ordered map with the given name.
 	 * 
 	 * @param name
 	 *            the name of an object
 	 * @param object
 	 *            an object
 	 */
-	protected final void add(String name, T object) {
+	public final void add(String name, T object) {
+		if (map.containsKey(name)) {
+			throw new OrccRuntimeException("\"" + name
+					+ "\" already defined in this scope");
+		}
+
+		addNoCheck(name, object);
+	}
+
+	/**
+	 * Adds an object to this ordered map with the given name without checking
+	 * if the variable already exists.
+	 * 
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 */
+	protected final void addNoCheck(String name, T object) {
 		map.put(name, object);
 		modified = true;
 	}

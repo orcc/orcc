@@ -115,7 +115,7 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 			}
 
 			// no existing object in this scope, nor in parent's => we're cool
-			add(name, object);
+			addNoCheck(name, object);
 		}
 	}
 

@@ -40,7 +40,6 @@ import java.util.Set;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.classes.IClass;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -113,8 +112,7 @@ public class StaticSubsetDetector {
 
 				Port tgtPort = new Port(edge.getTarget());
 				tgtPort.setName("input_" + outIndex++);
-				cluster.getInputs().add("", new Location(), tgtPort.getName(),
-						tgtPort);
+				cluster.getInputs().add(tgtPort.getName(), tgtPort);
 				Connection incoming = new Connection(edge.getSource(), tgtPort,
 						edge.getAttributes());
 				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
@@ -123,8 +121,7 @@ public class StaticSubsetDetector {
 
 				Port srcPort = new Port(edge.getSource());
 				srcPort.setName("output_" + inIndex++);
-				cluster.getOutputs().add("", new Location(), srcPort.getName(),
-						srcPort);
+				cluster.getOutputs().add(srcPort.getName(), srcPort);
 				Connection outgoing = new Connection(srcPort, edge.getTarget(),
 						edge.getAttributes());
 				clusteredGraph.addEdge(clusterVertex, tgtVertex, outgoing);

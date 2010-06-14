@@ -54,9 +54,17 @@ public class OrccRuntimeException extends RuntimeException {
 	 * Creates a new exception with the given message, identified to have
 	 * occurred in the given file at the given location.
 	 */
+	public OrccRuntimeException(Location location, String message) {
+		super(location + "\n" + message);
+	}
+
+	/**
+	 * Creates a new exception with the given message, identified to have
+	 * occurred in the given file at the given location.
+	 */
 	public OrccRuntimeException(String fileName, Location location,
 			String message) {
-		this(fileName, location, message, null);
+		super("File \"" + fileName + "\", " + location + "\n" + message);
 	}
 
 	/**

@@ -116,7 +116,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 			Use use = new Use(variable);
 
 			// Set the created state variable into call argument
-			stateVars.add("", call.getLocation(), name, variable);
+			stateVars.add(name, variable);
 			parameters.add(new VarExpr(use));
 
 			call.setParameters(parameters);
