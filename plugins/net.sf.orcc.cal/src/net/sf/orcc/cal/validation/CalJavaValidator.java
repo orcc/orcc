@@ -171,8 +171,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		Type type = checker.getType(assign.getValue());
 		if (!checker.areTypeCompatible(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
-					+ variable.getType(),
-					CalPackage.AST_STATEMENT_ASSIGN__VALUE);
+					+ targetType, CalPackage.AST_STATEMENT_ASSIGN__VALUE);
 		}
 	}
 
