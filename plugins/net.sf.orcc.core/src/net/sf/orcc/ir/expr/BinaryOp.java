@@ -242,6 +242,11 @@ public enum BinaryOp {
 		for (BinaryOp op : BinaryOp.values()) {
 			operators.put(op.text, op);
 		}
+
+		operators.put("=", EQ);
+		operators.put("and", LOGIC_AND);
+		operators.put("or", LOGIC_OR);
+		operators.put("mod", MOD);
 	}
 
 	/**
