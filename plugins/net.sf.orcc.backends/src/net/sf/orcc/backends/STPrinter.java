@@ -88,6 +88,8 @@ public final class STPrinter {
 
 	}
 
+	private boolean debugMode;
+
 	private Class<? extends ExpressionPrinter> expressionPrinter;
 
 	private STGroup group;
@@ -98,6 +100,17 @@ public final class STPrinter {
 	 * Creates a new printer.
 	 */
 	public STPrinter() {
+
+	}
+
+	/**
+	 * Creates a new printer with the given debug mode.
+	 * 
+	 * @param debugMode
+	 *            whether the printer is in debug mode or not.
+	 */
+	public STPrinter(boolean debugMode) {
+		this.debugMode = debugMode;
 	}
 
 	/**
@@ -141,18 +154,19 @@ public final class STPrinter {
 	 *            output file name
 	 * @param actor
 	 *            the actor
-	 *     @return 
+	 * @return
 	 * @throws IOException
 	 */
 	public boolean printActor(String fileName, Actor actor) throws IOException {
 		if (!actor.isSystem()) {
 			// if source file is older than target file, do not generate
-			File sourceFile = new File(actor.getFile());			
+			File sourceFile = new File(actor.getFile());
 			File targetFile = new File(fileName);
-			if (sourceFile.lastModified() < targetFile.lastModified()) {
+			if (sourceFile.lastModified() < targetFile.lastModified()
+					&& !debugMode) {
 				return true;
 			}
-			
+
 			if (group.debug) {
 				DebugST template = (DebugST) group.getInstanceOf("actor");
 				template.add("actor", actor);
@@ -167,7 +181,7 @@ public final class STPrinter {
 				os.close();
 			}
 		}
-		
+
 		return false;
 	}
 

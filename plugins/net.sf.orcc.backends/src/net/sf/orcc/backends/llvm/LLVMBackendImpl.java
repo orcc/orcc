@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.backends.llvm;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,7 +80,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 			// TODO classify actors
 		}
 
-		printer = new STPrinter();
+		printer = new STPrinter(getAttribute(DEBUG_MODE, false));
 		printer.loadGroups("LLVM_core", "LLVM_header", "LLVM_actor",
 				"LLVM_metadata");
 		printer.setExpressionPrinter(LLVMExprPrinter.class);
