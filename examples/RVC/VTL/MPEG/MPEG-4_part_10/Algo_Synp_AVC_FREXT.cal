@@ -6996,8 +6996,29 @@ end
 		end 
 	end
 
-	function IS_MBPred_L0_CABAC(uint(size=1) x, int mbAddr) --> bool : if mbAddr < 0 then false else MbPartPredModeCABAC(x, mbAddr) = 0 end end
-	function IS_MBBiPred_CABAC(uint(size=1) x, int mbAddr) --> bool : if mbAddr < 0 then false else MbPartPredModeCABAC(x, mbAddr) = 2 end end
+	function IS_MBPred_L0_CABAC(uint(size=1) x, int mbAddr) --> bool : 
+		if mbTab[mbAddr][2] > 5 then
+			false
+		else
+			if mbAddr < 0 then 
+				false 
+			else 
+				MbPartPredModeCABAC(x, mbAddr) = 0 
+			end 
+		end
+	end
+	function IS_MBBiPred_CABAC(uint(size=1) x, int mbAddr) --> bool : 
+		if mbTab[mbAddr][2] > 5 then
+			false
+		else
+			if mbAddr < 0 then 
+				false 
+			else 
+				MbPartPredModeCABAC(x, mbAddr) = 2 
+			end 
+		end
+	end
+
 
 	
 	read_MB_layer_mb_type: action ==>
