@@ -117,7 +117,7 @@ actor Algo_Synp_AVC_FREXT()
 	bool TRACE := false;//true;
 	bool TRACE_POC := false;
 	bool TRACE_MRL := false;//true;
-	bool TRACE_BIARI := false;
+	bool TRACE_BIARI := true;
 
 	// ********** Read CAVLC ********** //
 	bool NewCoeff := false;
@@ -1745,6 +1745,7 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_QP_DELTA or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1  or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP or
@@ -1762,6 +1763,7 @@ actor Algo_Synp_AVC_FREXT()
 	begin
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_QP_DELTA or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1  or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP or
@@ -4246,6 +4248,54 @@ actor Algo_Synp_AVC_FREXT()
 		end
 		
 	end
+	
+	procedure GetMbQpDelta()
+	begin
+			
+		if StartPrefix then
+			CabacValue := 0;
+			ctxIdxincMbQpDelta();
+			ctxIdx := 60 + ctxIdxInc;
+			StartPrefix := false;
+			StartSuffix := true;
+			StopCoeff := true;
+		end
+		
+		if StartSuffix then	
+			if binValDecoded = false and StopCoeff then
+				StartDecodeDecision := true;	
+				//Do not give the hand to GetRefIdx_Lx
+				StopCabacProcess();
+			else
+				if binVal = 0 then
+					FoundSE := true;
+					StopCoeff := false;
+				else
+					CabacValue := CabacValue + 1;
+					if ctxIdxInc < 2 then
+						ctxIdxInc := 2;
+					else
+						ctxIdxInc := 3;
+					end
+					ctxIdx := 60 + ctxIdxInc;
+					StopCoeff := true;
+					binValDecoded := false;
+				end
+			end
+		end
+		
+		if FoundSE then
+			// Init GetMbQpDelta
+			StartPrefix := true;
+			StartSuffix := false;
+			binValDecoded := false;
+			binIdx := -1;
+			NextBitToDecode := true;
+			StopCabacProcess();
+		end
+		
+	end
+	
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -4377,6 +4427,10 @@ actor Algo_Synp_AVC_FREXT()
 		else
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_B then	
 				GetMbTypeParsing();
+			end
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_QP_DELTA then
+				GetMbQpDelta();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
