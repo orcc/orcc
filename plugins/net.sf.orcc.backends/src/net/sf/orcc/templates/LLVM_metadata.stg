@@ -226,7 +226,8 @@ $Sched_decl_MD(action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExter
 >>
 
 Tag_MD(action)::=<<
-$Tag_decl_MD(action)$ = metadata  !{$action.tag.identifiers: varIdentifier_MD() ; separator=", "$}
+$Tag_decl_MD(action)$ = metadata  !{$if(action.tag.identifiers.empty)$ null $
+else$ $action.tag.identifiers: varIdentifier_MD() ; separator=", "$ $endif$}
 >>
 
 
