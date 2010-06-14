@@ -91,7 +91,7 @@ $if(actionScheduler.fsm)$
 $actionScheduler_decl_MD()$ = metadata !{metadata $FSM_decl_MD()$, i32()* @scheduler}
 $FSM_MD(actionScheduler.fsm)$
 $else$
-$actionScheduler_decl_MD()$ = metadata !{i32()* @scheduler}
+$actionScheduler_decl_MD()$ = metadata !{null, i32()* @scheduler}
 $endif$
 >>
 
