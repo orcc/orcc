@@ -155,6 +155,7 @@ actor Algo_Synp_AVC_FREXT()
 	int codIRangeLPS;
 	uint binVal;
 	
+	bool SEARCH_MB_TYPE := false;
 	bool StartNewCabacParsing := false;
 	/* List Used as a result for Binarization */
 	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 24)] : for int j in Integers( 0, 99)];
@@ -4590,7 +4591,7 @@ actor Algo_Synp_AVC_FREXT()
 	var 
 		int tempOffest
 	do
-		if val_CurrMbAddr = 98 and CABAC_SEARCH_SYNTAX_ELEMENT != 1 then 
+		if val_CurrMbAddr = 98 and SEARCH_MB_TYPE != true then 
 			binVal := 1;
 			binValDecoded := true;
 			// Start Cabac Process
@@ -6514,7 +6515,8 @@ end
 				  transblock_cbf_dc_cr_cb[i][j] := 0;
 			  end
 		  end
-		 		  
+		  //init mb_skip_flag
+		  mb_skip_flag := 0;
 		  //Init FoundSE
 		  FoundSE := false;
 		end
@@ -6844,7 +6846,7 @@ end
 			MvRes:[0,0],
 			VALUE:[[0: for int i in Integers(0,407) ]] repeat 408
 	guard
-		mb_skip_flag = 1 
+		mb_skip_flag = 1
 	var 
 		int mb_addr
 	do
@@ -7009,6 +7011,7 @@ end
 				binIdxMb := 0;
 				GetCabacMbTypeSyntaxElement();
 				StartCabacProcess();
+				SEARCH_MB_TYPE := true;
 			end 
 		end
 	
@@ -7025,6 +7028,7 @@ end
 		else 
 			if IS_CABAC() then
 				mb_type := cabac_value();
+				SEARCH_MB_TYPE := false;
 			end
 		end
 		
