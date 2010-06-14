@@ -128,7 +128,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
 	public void checkActor(AstActor actor) {
-		exprEvaluator.clearValues();
 		typeTransformer = new TypeTransformer(exprEvaluator);
 		checker = new TypeChecker(typeTransformer);
 
@@ -286,7 +285,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 					initialValue = exprEvaluator.evaluate(astValue);
 
 					// register the value
-					exprEvaluator.registerValue(astVariable, initialValue);
+					astVariable.setInitialValue(initialValue);
 				} catch (OrccRuntimeException e) {
 					error(e.getMessage(), astVariable,
 							CalPackage.AST_VARIABLE__NAME);

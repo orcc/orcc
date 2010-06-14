@@ -454,8 +454,6 @@ public class AstTransformer {
 			variablesMap.clear();
 			proceduresMap.clear();
 			functionsMap.clear();
-
-			exprEvaluator.clearValues();
 		}
 	}
 
@@ -739,7 +737,7 @@ public class AstTransformer {
 				initialValue = exprEvaluator.evaluate(astValue);
 
 				// register the value
-				exprEvaluator.registerValue(astVariable, initialValue);
+				astVariable.setInitialValue(initialValue);
 			}
 
 			StateVariable stateVariable = new StateVariable(location, type,

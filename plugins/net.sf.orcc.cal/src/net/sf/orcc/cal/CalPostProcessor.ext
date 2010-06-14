@@ -16,35 +16,25 @@ process(EClassifier this) :
     null
 ;
 
+EDataType getEcoreDataType(String name) :
+    org::eclipse::emf::ecore::EcorePackage::eINSTANCE.getEClassifier(name)
+;
+
+addList(EReference this, String name, EClassifier type) :
+    let opp = new EReference :
+        opp.setName(name) ->
+        opp.setEType(eContainingClass) ->
+        setEOpposite(opp) ->
+        opp.setEOpposite(this) ->
+        opp.setUpperBound(-1) ->
+        eReferenceType.eStructuralFeatures.add(opp)
+;
+
 process(EClass this) :
 	switch (this.name) {
-		case "AstActor": (
-			// add a transient list of built-in functions to Actor class 
-			let ftype = (EClass) ePackage.eContents.selectFirst(e|((EClass) e).name == "AstFunction") :
-			let ptype = (EClass) ePackage.eContents.selectFirst(e|((EClass) e).name == "AstProcedure") :
-			let builtinFunctions = new EReference :
-			let builtinProcedures = new EReference :
-
-			builtinFunctions.setContainment(true) ->
-			builtinFunctions.setEType(ftype) ->
-			builtinFunctions.setName("builtinFunctions") ->
-			builtinFunctions.setTransient(true) ->
-			builtinFunctions.setLowerBound(0) ->
-			builtinFunctions.setUpperBound(-1) ->
-			this.eStructuralFeatures.add(builtinFunctions) ->
-
-			builtinProcedures.setContainment(true) ->
-			builtinProcedures.setEType(ptype) ->
-			builtinProcedures.setName("builtinProcedures") ->
-			builtinProcedures.setTransient(true) ->
-			builtinProcedures.setLowerBound(0) ->
-			builtinProcedures.setUpperBound(-1) ->
-			this.eStructuralFeatures.add(builtinProcedures)
-        )
-
 		case "AstSchedule": (
 			// add a transient list of states referenced by transitions to Schedule class 
-			let etype = (EClass) ePackage.eContents.selectFirst(e|((EClass) e).name == "AstState") :
+			let etype = (EClass) ePackage.getEClassifier("AstState") :
 			let field = new EReference :
 			field.setContainment(true) ->
 			field.setEType(etype) ->
@@ -52,6 +42,18 @@ process(EClass this) :
 			field.setTransient(true) ->
 			field.setLowerBound(0) ->
 			field.setUpperBound(-1) ->
+			this.eStructuralFeatures.add(field)
+        )
+        
+		case "AstVariable": (
+			// add an "initial" value field to variables
+			let etype = getEcoreDataType("EJavaObject") :
+			let field = new EAttribute :
+			field.setEType(etype) ->
+			field.setName("initialValue") ->
+			field.setTransient(true) ->
+			field.setLowerBound(0) ->
+			field.setUpperBound(1) ->
 			this.eStructuralFeatures.add(field)
         )
         
@@ -74,26 +76,3 @@ process(EClass this) :
     		null
     }
 ;
-
-/*defineEOpposite(EReference this, String name) :
-    let opp = new EReference :
-        opp.setName(name) ->
-        opp.setEType(eContainingClass) ->
-        setEOpposite(opp) ->
-        opp.setEOpposite(this) ->
-        opp.setUpperBound(-1) ->
-        eReferenceType.eStructuralFeatures.add(opp)
-;*/
-
-/*create EReference this createBackReference(String name, EClass etype, String refName) :
-	this.setName(name) ->
-	this.setEType(etype) ->
-	this.setLowerBound(0) ->
-	this.setUpperBound(-1) ->
-	this.setEOpposite(etype.findEReference(refName))
-;
-
-EReference findEReference(EClass this, String refName):
-	this.eStructuralFeatures.typeSelect(EReference).selectFirst(e|e.name == refName)
-;*/
-

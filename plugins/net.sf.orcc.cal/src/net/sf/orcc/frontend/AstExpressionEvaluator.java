@@ -29,9 +29,7 @@
 package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstExpression;
@@ -64,13 +62,10 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 
 	private String file;
 
-	private Map<AstVariable, Object> values;
-
 	/**
 	 * Creates a new AST expression evaluator.
 	 */
 	public AstExpressionEvaluator() {
-		this.values = new HashMap<AstVariable, Object>();
 	}
 
 	@Override
@@ -340,7 +335,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	@Override
 	public Object caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Object value = values.get(variable);
+		Object value = variable.getInitialValue();
 		if (value == null) {
 			String message = "variable \"" + variable.getName() + "\" ("
 					+ Util.getLocation(variable)
@@ -437,7 +432,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	@Override
 	public Object caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		Object value = values.get(variable);
+		Object value = variable.getInitialValue();
 		if (value == null) {
 			String message = "variable \"" + variable.getName() + "\" ("
 					+ Util.getLocation(variable)
@@ -452,13 +447,6 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	public Object caseAstGenerator(AstGenerator expression) {
 		throw new OrccRuntimeException(file, Util.getLocation(expression),
 				"TODO generator");
-	}
-
-	/**
-	 * Clears the values held by the evaluator.
-	 */
-	public void clearValues() {
-		values.clear();
 	}
 
 	/**
@@ -508,18 +496,6 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	 */
 	public String getFile() {
 		return file;
-	}
-
-	/**
-	 * Registers the given variable with the given value.
-	 * 
-	 * @param variable
-	 *            an AST variable
-	 * @param value
-	 *            a value as an object.
-	 */
-	public void registerValue(AstVariable variable, Object value) {
-		values.put(variable, value);
 	}
 
 	/**
