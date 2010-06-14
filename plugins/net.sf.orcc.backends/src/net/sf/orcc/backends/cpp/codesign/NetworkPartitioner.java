@@ -29,8 +29,10 @@
 package net.sf.orcc.backends.cpp.codesign;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -231,6 +233,43 @@ public class NetworkPartitioner {
 		return subNetwork;
 	}
 
+	private void updatePartnames(Network network) {
+
+		for (Instance instance : network.getInstances()) {
+			if (instance.isActor()) {
+				updatePartname(instance);
+			} else {
+				updatePartnames(instance.getNetwork());
+			}
+
+		}
+	}
+
+	private void updatePartname(Instance instance) {
+
+		IValueAttribute attr = (IValueAttribute) instance
+				.getAttribute("partName");
+		StringExpr expr = (StringExpr) attr.getValue();
+		String[] partnames = expr.getValue().split("/");
+
+		StringBuffer strBuf = new StringBuffer();
+
+		Iterator<String> it = Arrays.asList(partnames).iterator();
+
+		if (it.next() != null) {
+			if (it.hasNext()) {
+				strBuf.append(it.next());
+				while (it.hasNext()) {
+					strBuf.append("/").append(it.next());
+				}
+			} else {
+				instance.getAttributes().remove("partName");
+			}
+		}
+		String str = strBuf.toString();
+		expr.setValue(str);
+	}
+
 	public Map<String, Set<Vertex>> getPartitionSets() throws OrccException {
 		Map<String, Set<Vertex>> partitionSets = new HashMap<String, Set<Vertex>>();
 
@@ -345,6 +384,7 @@ public class NetworkPartitioner {
 			}
 		}
 		graph.removeAllVertices(vertices);
+		updatePartnames(network);
 	}
 
 	public List<Network> getNetworks() {

@@ -1,54 +1,9 @@
-printActor(id, actor) ::= <<
-$if (!actor.system)$
-$actor.name$.cpp
-$endif$
 
->>
-
-printInstance(instance) ::= <<
-$if (instance.actor)$
-$printActor(id=instance.id, actor=instance.actor)$
-$endif$
-
->>
-
-printSubnetwork(net) ::= <<
-$net.name$.cpp
-$net.instances: printInstance();separator="\n"$
-
->>
-
-addLibraries(net) ::= <<
-$net.instances:
-{$if(it.wrapper)$
-add_library(LibAdaptorConfig STATIC \${LIBCAL2CPP_ROOT_PATH}/src/LibAdaptorConfig.cpp)
-add_library(LibWrapper STATIC \${LIBCAL2CPP_ROOT_PATH}/src/wrapperaka.cpp)
-$endif$}
-$
->>
-
-addDependencies(net) ::= <<
-$net.instances:
-{$if(it.wrapper)$
-add_dependencies(top LibWrapper LibAdaptorConfig)
-$endif$}
-$
->>
-targetLinkWrapper(net) ::= <<
-$net.instances :
-{$if(it.wrapper)$
-LibAdaptorFactory
-LibWrapper
-LibAdaptorConfig
-$endif$}
-$
->>
-
-Cpp_CMakeLists(networkList) ::= <<
+Cpp_CMakeLists(network) ::= <<
 # Generated from $network.name$
 
 cmake_minimum_required (VERSION 2.8)
-project (top)
+project ($network.name$)
 
 if(MSVC)
 set(CMAKE_CXX_FLAGS_DEBUG /MTd)
@@ -66,22 +21,19 @@ link_directories(
 \${LIBCAL2CPP_ROOT_PATH}/lib
 )
 
-$networkList : addLibraries()$
+$!$network.networks : addLibraries()$!$
 
 
-add_executable (top
-main.cpp
-$networkList : printSubnetwork()$
+add_executable ($network.name$
+$network.name$.cpp
+$network.actors : {$it.name$.cpp};separator="\n"$
 )
 
-$networkList : addDependencies()$
 
-
-target_link_libraries(top
+target_link_libraries($network.name$
 LibOrcc
 LibCALaka
 LibThread
-$networkList : targetLinkWrapper()$
 )
 
 >>

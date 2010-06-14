@@ -31,6 +31,7 @@ package net.sf.orcc.backends.cpp;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -44,6 +45,7 @@ import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
 
@@ -57,8 +59,6 @@ import net.sf.orcc.network.serialize.XDFWriter;
 public class CppBackendImpl extends AbstractBackend {
 
 	public static Boolean partitioning = false;
-
-	private NetworkPartitioner partitioner;
 
 	/**
 	 * 
@@ -76,14 +76,11 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean partition = getAttribute("net.sf.orcc.backends.partition", true);
+		boolean partition = getAttribute("net.sf.orcc.backends.partition",
+				false);
 		if (partition) {
 			partitioning = true;
-			partitioner = new NetworkPartitioner();
-			partitioner.transform(network);
-
-			new XDFWriter(new File(path), network);
-
+			new NetworkPartitioner().transform(network);
 		}
 
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
@@ -119,15 +116,17 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
+		boolean res = false;
 		try {
 			String name = actor.getName();
 			String outputName = path + File.separator + name + ".h";
 			printer.printActor(outputName, actor);
 			outputName = path + File.separator + name + ".cpp";
-			return impl_printer.printActor(outputName, actor);
+			impl_printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
+		return res;
 	}
 
 	@Override
@@ -145,7 +144,7 @@ public class CppBackendImpl extends AbstractBackend {
 
 			List<Network> networks;
 			if (partitioning) {
-				networks = partitioner.getNetworks();
+				networks = network.getNetworks();
 			} else {
 				networks = Arrays.asList(network);
 			}
@@ -153,7 +152,20 @@ public class CppBackendImpl extends AbstractBackend {
 			for (Network subnetwork : networks) {
 				if (partitioning) {
 					new WrapperAdder().transform(subnetwork);
+
+					Instance inst = subnetwork.getInstances().get(0);
+					if (inst.getAttribute("partName") != null) {
+						new NetworkPartitioner().transform(subnetwork);
+
+						Iterator<Network> it = subnetwork.getNetworks()
+								.iterator();
+						while (it.hasNext()) {
+							it.next().computeTemplateMaps();
+						}
+					}
 				}
+
+				new XDFWriter(new File(path), network);
 
 				String name = subnetwork.getName();
 
@@ -163,10 +175,8 @@ public class CppBackendImpl extends AbstractBackend {
 				outputName = path + File.separator + name + ".cpp";
 				networkImplPrinter.printNetwork(outputName, subnetwork, false,
 						fifoSize);
+				new CppCMakePrinter().printCMake(path, subnetwork);
 			}
-
-			new CppMainPrinter().printMain(path, networks, null);
-			new CppCMakePrinter().printCMake(path, networks);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

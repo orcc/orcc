@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
 
 import net.sf.orcc.backends.TemplateGroupLoader;
 import net.sf.orcc.network.Network;
@@ -73,10 +72,9 @@ public class CppCMakePrinter {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public void printCMake(String path, List<Network> network)
-			throws IOException {
+	public void printCMake(String path, Network network) throws IOException {
 		ST template = group.getInstanceOf("Cpp_CMakeLists");
-		template.add("networkList", network);
+		template.add("network", network);
 
 		String fileName = path + File.separator + "CMakeLists.txt";
 

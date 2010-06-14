@@ -1,61 +1,87 @@
-includeInstance(instance) ::= <<
-$if(instance.wrapper)$
-#include "wrapperaka.h"
-$elseif(instance.broadcast)$
-$else$
-#include "$instance.actor.name$.h"
-$endif$
+///////////////////////////////////////////////////////////////////////////////
+// include Actors
+includeActor(actor) ::= <<
+#include "$actor.name$.h"
 >>
 
-includeInstances(instances) ::= <<
-$instances: includeInstance(); separator="\n"$
+includeActors(actors) ::= <<
+$actors: includeActor(); separator="\n"$
 >>
 
 
-includeBroadcast(broadcasts) ::= <<
-$if(broadcasts)$
-#include "actor_broadcast.h"
 
-$endif$
+///////////////////////////////////////////////////////////////////////////////
+// initialize Instances
+argumentList(parameter) ::= <<
+$instance.parameters.(parameter)$
 >>
+
+initializeInstance(instance) ::= <<
+$instance.id$($instance.actor.parameters.list: argumentList(); separator=", "$)
+>>
+
+initializeInstances(instances) ::= <<
+$instances: initializeInstance(); separator=", "$
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // declare FIFOs
 
-declareBroadcastEnum(bcast) ::= <<
-enum 
-{
-   $bcast.id$_input
-};
-
-enum 
-{
-   $bcast.outputList: {$bcast.id$_output_$it$}; separator=",\n"$
-};
+printFifo(src, srcport, dst, dstport) ::= <<
+FifoAPI * $src$_$srcport$_$dst$_$dstport$ = FifoFactory<$edge.source.type$>::allocateFifo($edge.size$, 0);
 >>
 
+doDeclareFifo(edge, src, tgt) ::= <<
+$if(src.instance && tgt.instance)$
+$printFifo(src=src.instance.id, srcport=edge.source, dst=tgt.instance.id, dstport=edge.target)$
+$endif$
+>>
 
-declareBroadcastEnums(broadcasts) ::= <<
-$broadcasts: declareBroadcastEnum()$
+declareFifo(edge) ::= <<
+$doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+>>
+
+declareFifos(network) ::= <<
+$network.connections: declareFifo()$
+
+$if (network.networks)$
+$network.networks: declareFifos()$
+$endif$
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// declare FIFOs
+// assigns FIFOs
 
-declareFifo(count) ::= <<
-static FifoAPI * fifo_$count$;
-
+doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
+$source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, $network.name$_fifo_$count$);
+$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, $network.name$_fifo_$count$);
 >>
 
-declareFifos(edges) ::= <<
-$edges: {edge | declareFifo(network.connectionMap.(edge))}$
+tryAssignFifo(edge, src, tgt) ::= <<
+$if (src.instance && tgt.instance)$
+$doAssignFifo(
+  source=src.instance, sourcePort=edge.source,
+  target=tgt.instance, targetPort=edge.target,
+  count=network.connectionMap.(edge))$
+$endif$
 >>
 
+assignFifo(edge) ::= <<
+$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+>>
+
+assignFifos(edges) ::= <<
+$edges: assignFifo()$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// declare Instances
 
 declareInstance(instance) ::= <<
-$if(instance.wrapper)$
-WrapperAka $instance.id$;
-$elseif(instance.broadcast)$
+$if (instance.network)$
+$declareInstances(instance.network.instances)$
 $else$
 actor_$instance.actor.name$ $instance.id$;
 $endif$
@@ -65,47 +91,92 @@ declareInstances(instances) ::= <<
 $instances: declareInstance(); separator="\n"$
 >>
 
-declareBroadcast(bcast) ::= <<
-actor_broadcast<$bcast.type$, $bcast.numOutput$> $bcast.id$;
+
+
+///////////////////////////////////////////////////////////////////////////////
+// print calls to initialize() and scheduler()
+printInitialize(instance) ::= <<
+$if (instance.actor)$
+$if (!instance.actor.initializes.empty)$
+$instance.id$.initialize();
+
+$endif$
+$endif$
 >>
 
-declareBroadcasts(broadcasts) ::= <<
-$broadcasts: declareBroadcast(); separator="\n"$
+printInitializes(instances) ::= <<
+$instances: printInitialize()$
+>>
+
+printScheduler(instance) ::= <<
+res += $instance.id$.scheduler();
+>>
+
+printSchedulers(instances) ::= <<
+$instances: printScheduler(); separator="\n"$
 >>
 
 
 
+declareNetwork(network) ::= <<
+class network_$network.name$ : public Threadaka
+{
+public:
+	network_$network.name$():
+	$initializeInstances(network.instances)$
+	{
+		$assignFifos(network.connections)$
+	}
+	
+	~network_$network.name$(){}
 
-network(debugFifos, fifoSize, network, connectionMap, multicoreConnection) ::= <<
+	void start()
+	{
+		$network.instances: {$it.id$.startActorExecution();};separator="\n"$
+		Threadaka::init();
+		Threadaka::start();
+	}
+	void stop()
+	{
+		Threadaka::stop();
+	}
+	
+	void process(void * args)
+	{
+		$printInitializes(network.instances)$
+		while (1) 
+		{
+			int res = 0;
+			$printSchedulers(network.instances)$
+			if(res == 0)
+				Sleep(0);
+		}
+	}
+	
+private:	
+	$declareInstances(network.instances)$
+};
+
+>>
+
+declareNetworks(networks) ::= <<
+$networks : declareNetwork()$
+>>
+
+network(debugFifos, fifoSize, network) ::= <<
 // Generated from "$network.name$"
 
 #include "FifoFactory.h"
 #include "Threadaka.h"
 
-$includeInstances(network.instances)$
+$includeActors(network.actors)$
 
-$includeBroadcast(network.broadcasts)$
+$declareFifos(network)$
 
-$declareBroadcastEnums(network.broadcasts)$
-
-class network_$network.name$ : public Threadaka
-{
-
-public:
-	network_$network.name$();
-	~network_$network.name$();
-
-	void start();
-	void stop();
-
-	void schedule();
-
-	void process(void * args);
-	
-private:	
-	$declareInstances(network.instances)$
-	$declareBroadcasts(network.broadcasts)$
-};
-
+$if (network.networks)$
+$declareNetworks(network.networks)$
+$else$
+$declareNetwork(network)$
+$endif$
 >>
 

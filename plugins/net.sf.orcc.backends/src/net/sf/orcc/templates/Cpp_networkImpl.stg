@@ -6,13 +6,7 @@ FifoAPI * fifo_$count$ = FifoFactory<$type$>::allocateFifo($size$, $lock$);
 >>
 
 allocateFifoKind(edge, source, sourcePort, target, targetPort) ::= <<
-$if (source.wrapper)$
-$allocateFifoType(type=targetPort.type, size=edge.size, count=network.connectionMap.(edge), lock="1")$
-$elseif(target.wrapper)$
-$allocateFifoType(type=targetPort.type, size=edge.size, count=network.connectionMap.(edge), lock="1")$
-$else$
 $allocateFifoType(type=sourcePort.type, size=edge.size, count=network.connectionMap.(edge), lock="0")$
-$endif$
 >>
 
 tryAllocateFifo(edge, src, tgt) ::= <<
@@ -27,8 +21,8 @@ allocateFifo(edge) ::= <<
 $tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
 >>
 
-allocateFifos(edges) ::= <<
-$edges: allocateFifo()$
+allocateFifos(network) ::= <<
+$network.connections: allocateFifo()$
 >>
 
 
@@ -44,26 +38,15 @@ $target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, fifo_$
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$if(!src.instance)$
-$assignLockedFifo(
-  target=tgt.instance, targetPort=edge.target,
-  count=multicoreConnection.(edge), dir="ACTOR_PORT_IN")$
-$else$
-$if(!tgt.instance)$
-$assignLockedFifo(
-  target=src.instance, targetPort=edge.source,
-  count=multicoreConnection.(edge), dir="ACTOR_PORT_OUT")$
-$else$
 $doAssignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
   count=network.connectionMap.(edge))$
-$endif$
-$endif$
+	
 >>
 
 assignFifo(edge) ::= <<
-$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+$tryAssignFifo(edge=edge, src=net.sourceMap.(edge), tgt=network.targetMap.(edge))$
 >>
 
 assignFifos(edges) ::= <<
@@ -116,78 +99,108 @@ $instances: initializeInstance(); separator=",\n"$
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
-network(debugFifos, fifoSize, network, connectionMap, multicoreConnection) ::= <<
-/**
- * Generated from "$network.name$"
- */
- 
-#include "$network.name$.h"
+network(debugFifos, fifoSize, network) ::= <<
 
+$printMain(net=network)$
+
+$!$printNetwork(net=network)$!$
+
+>>
+
+printMain(net) ::= <<
+
+#include "FifoFactory.h"
+
+#include "$net.name$.h"
+$!
 #define SIZE 10000
+#ifdef __TRACE_TOKENS__
+TraceAka g_oTracer;
+#endif
+$if(net.networks)$
+$allocateFifos(net)$
+$endif$
+!$
 
-extern "C" {
-#include "orcc_util.h"
+int main(int argc, char *argv[]) {
+$if (net.networks)$
+	$net.networks : {network_$it.name$ $it.name$;};separator="\n"$
+	$net.networks : {$it.name$.start();};separator="\n"$
+	$net.networks : {$it.name$.stop();};separator="\n"$
+	return 0;
+$else$
+network_$net.name$ $net.name$;
+$net.name$.start();
+$net.name$.stop();
+$endif$
 }
+ 
+>>
 
-$declareExternalFifos(connectionMap)$
+printNetwork(net) ::= <<
 
+$if (net.networks)$
+$net.networks : printNetwork()$
+
+$else$
+/**
+ * Generated from "$net.name$"
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
 namespace
 {
-   $allocateFifos(network.connections)$
+   $allocateFifos(net)$
 }
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO pointer assignments
-network_$network.name$::network_$network.name$()
+network_$net.name$::network_$net.name$()
 :
-$initializeInstances(network.instances)$
+$initializeInstances(net.instances)$
 {
-	$assignFifos(network.connections)$
+	$assignFifos(net.connections)$
 }
 
-network_$network.name$::~network_$network.name$(){}
+network_$net.name$::~network_$net.name$(){}
 
-void network_$network.name$::start()
+void network_$net.name$::start()
 {
-	$network.instances: {$it.id$.initializeActor();}; separator="\n"$
-	
-	$network.instances: {$it.id$.startActorExecution();}; separator="\n"$
-	
+	$net.instances: {$it.id$.initializeActor();}; separator="\n"$	
+	$net.instances: {$it.id$.startActorExecution();}; separator="\n"$	
 	Threadaka::init();
 	Threadaka::start();
 }
 
-void network_$network.name$::stop()
+void network_$net.name$::stop()
 {
 	Threadaka::stop();
-	
-	$network.instances: {$it.id$.stop();}; separator="\n"$
+	$net.instances: {$it.id$.stop();}; separator="\n"$
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
-void network_$network.name$::schedule() 
+void network_$net.name$::schedule() 
 {
-	$printInitializes(network.instances)$
+	$printInitializes(net.instances)$
 	while (1) 
 	{
 		int res = 0;
-		$printSchedulers(network.instances)$
+		$printSchedulers(net.instances)$
 		if(res == 0)
 			Sleep(0);
 	}
 }
 
-void network_$network.name$::process(void * args)
+void network_$net.name$::process(void * args)
 {
 	schedule();
 }
+$endif$
 
 >>
 
