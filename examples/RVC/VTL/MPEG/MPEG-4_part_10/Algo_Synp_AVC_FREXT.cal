@@ -117,7 +117,7 @@ actor Algo_Synp_AVC_FREXT()
 	bool TRACE := false;//true;
 	bool TRACE_POC := false;
 	bool TRACE_MRL := false;//true;
-	bool TRACE_BIARI := true;
+	bool TRACE_BIARI := false;
 
 	// ********** Read CAVLC ********** //
 	bool NewCoeff := false;
@@ -9387,7 +9387,6 @@ end
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_run							) --> read_SliceD_mb_skip_run_done0;
 		read_SliceD_mb_skip_run_done0						( read_SliceD_mb_skip_run_done0						) --> read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1						) --> read_SliceD_mb_skip_run_done1;
-		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1_CABAC				) --> read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done2						) --> read_SliceD_mb_skip_run_done2_moredata;
 		read_SliceD_mb_skip_run_done2_moredata              ( read_SliceD_mb_skip_run_done2_moredata_1          ) --> read_SliceD_mb_field_decoding_flag;
 		read_SliceD_mb_skip_run_done2_moredata 				( read_SliceD_mb_skip_run_done2_moredata_0			) --> syncSliceD_endwhile;
@@ -9533,7 +9532,6 @@ end
 		
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8				) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC_16			) --> Residual_luma_inc_AC_4x4;
-		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC_15			) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
 		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma;		
 		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
