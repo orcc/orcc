@@ -6997,7 +6997,7 @@ end
 	end
 
 	function IS_MBPred_L0_CABAC(uint(size=1) x, int mbAddr) --> bool : 
-		if mbTab[mbAddr][2] > 5 then
+		if mbTab[mbAddr][2] > 3 then
 			false
 		else
 			if mbAddr < 0 then 
@@ -7008,7 +7008,7 @@ end
 		end
 	end
 	function IS_MBBiPred_CABAC(uint(size=1) x, int mbAddr) --> bool : 
-		if mbTab[mbAddr][2] > 5 then
+		if mbTab[mbAddr][2] > 3 then
 			false
 		else
 			if mbAddr < 0 then 
