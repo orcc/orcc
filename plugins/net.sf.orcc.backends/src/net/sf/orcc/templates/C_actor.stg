@@ -97,7 +97,7 @@ elseif (type.uint)
 $u$
 elseif (type.void)
 $p$
-endif$ 
+endif$
 >>
 
 PrintFormat(parameter) ::= <<
